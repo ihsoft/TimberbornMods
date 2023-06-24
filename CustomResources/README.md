@@ -1,6 +1,6 @@
 # Custom resources mod
 
-This mod allows loading mod's resources in some stock game fucntions.
+This mod allows loading mod's resources in some stock game functions.
 
 ## Background
 
@@ -16,12 +16,12 @@ TL;DR; It's not possible in HarmonyX to intercept a call to any method.
 
 It's due to [this](https://github.com/BepInEx/HarmonyX/wiki/Difference-between-Harmony-and-HarmonyX#all-prefix-patchers-are-always-run-even-if-original-method-is-skipped).
 You can like it or not, but the matter of truth, all the prefixes are always get called on
-the patched method. Unless _all the methods_ respect the `__runOriginal` approach, it doesn't
-work. If you decided to patch a method, and any other mod also patched the same method, then
-the game gets broken _for sure_.
+the patched method. Unless _all the patches_ respect the `__runOriginal` approach, it's not
+possible to reliably patch the method call result. If you decided to do it, and another mod also
+patched the same method, then the game will get broken _for sure_.
 
 You may not observe any issues during the development, but it's only because your game
-doesn't have the breaking mod. In the field, there can be some.
+doesn't have the breaking mod. In the field, there will be some.
 
 ## What should I not do?
 
