@@ -1,2 +1,6 @@
 # TimberbornMods
- Mods for Timberborn game
+Mods for the Timberborn game
+
+## Development and building
+
+Copy all the games and Unity DLLs into the `Dependencies` folder, based on the type.
