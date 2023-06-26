@@ -106,7 +106,7 @@ public static class AssetPatcher {
   /// <exception cref="AbortPrefixesException">if the custom resource was loaded</exception>
   static void MaybeLoadCustomResource<T>(string resourceName, out T result) where T : UnityEngine.Object {
     var checkName = resourceName.ToLower();
-    if (AssetPrefixes.Any(prefix => resourceName.StartsWith(checkName))) {
+    if (AssetPrefixes.Any(prefix => checkName.StartsWith(prefix))) {
       result = ResourceAssetLoader.Load<T>(resourceName);
       throw new AbortPrefixesException();  // Prevent any other prefixes to execute.
     }
