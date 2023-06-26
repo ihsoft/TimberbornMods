@@ -10,7 +10,7 @@ using UnityEngine;
 namespace UnityDev.LogUtils {
 
 /// <summary>A light version of logging utils from UnityDev.</summary>
-internal static class DebugEx {
+static class DebugEx {
   /// <summary>
   /// Logs a formatted INFO message giving a better context on the objects in the parameters.
   /// </summary>
