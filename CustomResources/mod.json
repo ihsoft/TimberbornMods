@@ -1,0 +1,8 @@
+{
+  "Name": "CustomResources",
+  "Version": "1.0.0",
+  "UniqueId": "igorz.customresources",
+  "MinimumApiVersion": "0.5.0",
+  "MinimumGameVersion": "0.2.9.1",
+  "EntryDll": "CustomResources.dll"
+}
