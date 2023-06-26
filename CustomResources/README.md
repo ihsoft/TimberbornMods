@@ -1,6 +1,9 @@
 # Custom resources mod
 
-This mod allows loading mod's resources in some stock game functions.
+This mod allows loading mod's resources in some stock game functions. Read more about it in
+[Wiki](https://github.com/ihsoft/TimberbornMods/wiki/Custom-Resources).
+
+GitHub location: https://github.com/ihsoft/TimberbornMods/tree/main/CustomResources.
 
 ## Background
 
