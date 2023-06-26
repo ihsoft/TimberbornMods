@@ -3,9 +3,9 @@
 // License: Public Domain
 
 using System.Reflection;
-using UnityDev.LogUtils;
+using UnityDev.Utils.LogUtils;
 
-namespace UnityDev.Reflections {
+namespace UnityDev.Utils.Reflections {
 
 /// <summary>Wrapper to implement efficient access to the class fields via reflection.</summary>
 /// <remarks>It ignores access scope.</remarks>

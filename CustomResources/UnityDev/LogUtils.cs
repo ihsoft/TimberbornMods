@@ -7,9 +7,10 @@ using System.Linq;
 using UnityEngine;
 
 // ReSharper disable once CheckNamespace
-namespace UnityDev.LogUtils {
+namespace UnityDev.Utils.LogUtils {
 
 /// <summary>A light version of logging utils from UnityDev.</summary>
+/// <remarks>https://github.com/ihsoft/UnityDev_Utils</remarks>
 static class DebugEx {
   /// <summary>
   /// Logs a formatted INFO message giving a better context on the objects in the parameters.

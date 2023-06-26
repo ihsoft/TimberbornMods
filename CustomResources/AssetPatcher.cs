@@ -12,8 +12,8 @@ using TimberApi.ModSystem;
 using Timberborn.AssetSystem;
 using Timberborn.InputSystem;
 using Timberborn.StatusSystem;
-using UnityDev.LogUtils;
-using UnityDev.Reflections;
+using UnityDev.Utils.LogUtils;
+using UnityDev.Utils.Reflections;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
