@@ -10,10 +10,14 @@ using HarmonyLib;
 using TimberApi.DependencyContainerSystem;
 using TimberApi.ModSystem;
 using Timberborn.AssetSystem;
+using Timberborn.InputSystem;
 using Timberborn.StatusSystem;
 using UnityDev.LogUtils;
+using UnityDev.Reflections;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
+// ReSharper disable InconsistentNaming
 namespace CustomResources {
 
 /// <summary>Installs patches that allows passing custom resource path to the game stock methods.</summary>
@@ -22,15 +26,18 @@ namespace CustomResources {
 /// It's not supported globally. Only particular methods are patched:
 /// <ul>
 /// <li>
-/// <see cref="StatusToggle"/>. Set a full resource name in the mod's namespace as <c>spriteName</c> when creating a
-/// status with icon.
+/// <see cref="StatusToggle"/>. Set a full resource name as <c>spriteName</c> when creating a status with icon.
+/// </li>
+/// <li>
+/// <see cref="CursorService"/>. Set a full path to a texture in method <see cref="CursorService.SetCursor"/>. The
+/// cursor will be created from this texture. The texture must be of type <c>Cursor</c> an allow read/write access.
 /// </li>
 /// </ul>
 /// </p>
 /// <p>
-/// This patcher can be either be a dependency to your Timberborn mod via Mod.io, or you can simply add this source into
-/// your project as a source. In the latter case, call <see cref="AssetPatcher.Patch"/> from any of the in-game
-/// configurators. Don't bother about the versions or compatibility, it's all handled inside!
+/// This patcher can be either be a dependency to your Timberborn mod via Mod.io, or you can simply add it into your
+/// project as a source. In the latter case, call <see cref="AssetPatcher.Patch"/> from any of the in-game
+/// configurators.
 /// </p>
 /// </remarks>
 public static class AssetPatcher {
@@ -84,6 +91,7 @@ public static class AssetPatcher {
     }
     var harmony = new Harmony(AssetPatcherId + Version);
     harmony.PatchAll(typeof(StatusSpriteLoaderPatch));
+    harmony.PatchAll(typeof(CursorServicePatch));
     DebugEx.Info("Custom resources patch v{0} applied from: {1}", Version, Assembly.GetExecutingAssembly());
   }
 
@@ -104,7 +112,7 @@ public static class AssetPatcher {
   /// </param>
   /// <typeparam name="T">type of the resource to load from <c>IResourceAssetLoader</c>.</typeparam>
   /// <exception cref="AbortPrefixesException">if the custom resource was loaded</exception>
-  static void MaybeLoadCustomResource<T>(string resourceName, out T result) where T : UnityEngine.Object {
+  static void MaybeLoadCustomResource<T>(string resourceName, out T result) where T : Object {
     var checkName = resourceName.ToLower();
     if (AssetPrefixes.Any(prefix => checkName.StartsWith(prefix))) {
       result = ResourceAssetLoader.Load<T>(resourceName);
@@ -134,6 +142,55 @@ public static class AssetPatcher {
         return null;
       }
       return __exception;
+    }
+  }
+
+  /// <summary>Custom cursors support.</summary>
+  /// <remarks>
+  /// Simply provide a full path to the mod's custom sprite as "cursorName" to <c>CursorService.SetCursor</c>. The
+  /// resolution of the sprite will be the size of the cursor. The game uses size 64x64.
+  /// </remarks>
+  [HarmonyPatch(typeof(CursorService), "GetCursor", typeof(string))]
+  public static class CursorServicePatch {
+    const string CustomCursorTypeName = "Timberborn.InputSystem.CustomCursor";
+    static Type _customCursorType;
+    static ReflectedField<Texture2D> _customCursorSmallCursorField;
+    static ReflectedField<Texture2D> _customCursorLargeCursorField;
+
+    [HarmonyPriority(Priority.First)]
+    static void Prefix(string cursorName, out Object __state) {
+      var checkName = cursorName.ToLower();
+      if (AssetPrefixes.Any(prefix => checkName.StartsWith(prefix))) {
+        if (_customCursorType == null) {
+          MakeReflections();
+        }
+        var texture = ResourceAssetLoader.Load<Texture2D>(cursorName);
+        __state = ScriptableObject.CreateInstance(_customCursorType);
+        _customCursorSmallCursorField.Set(__state, texture);
+        _customCursorLargeCursorField.Set(__state, texture);
+        throw new AbortPrefixesException();  // Prevent any other prefixes to execute.
+      }
+      __state = null;
+    }
+    [HarmonyPriority(Priority.First)]
+    static Exception Finalizer(Exception __exception, ref Object __result, Object __state) {
+      if (__exception is AbortPrefixesException) {
+        __result = __state;  // Catch the result, loaded in the prefix.
+        return null;
+      }
+      return __exception;
+    }
+
+    static void MakeReflections() {
+      _customCursorType = typeof(CursorService).Assembly.GetType(CustomCursorTypeName);
+      if (_customCursorType == null) {
+        throw new InvalidOperationException("Cannot find type: " + CustomCursorTypeName);
+      }
+      _customCursorSmallCursorField = new ReflectedField<Texture2D>(_customCursorType, "_smallCursor");
+      _customCursorLargeCursorField = new ReflectedField<Texture2D>(_customCursorType, "_largeCursor");
+      if (!_customCursorLargeCursorField.IsValid() || !_customCursorSmallCursorField.IsValid()) {
+        throw new InvalidOperationException("Cannot get reflections on: " + CustomCursorTypeName);
+      }
     }
   }
 }
