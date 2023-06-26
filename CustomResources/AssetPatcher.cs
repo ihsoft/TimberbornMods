@@ -131,8 +131,9 @@ public static class AssetPatcher {
     static Exception Finalizer(Exception __exception, ref Sprite __result, Sprite __state) {
       if (__exception is AbortPrefixesException) {
         __result = __state;  // Catch the result, loaded in the prefix.
+        return null;
       }
-      return null;
+      return __exception;
     }
   }
 }
