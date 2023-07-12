@@ -33,7 +33,7 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
-      <Compile Include="..\PrefabPatcher\PrefabPatcher.cs">
+      <Compile Include="..\TimberDev\PrefabPatcher.cs">
         <Link>TimberDev\PrefabPatcher.cs</Link>
       </Compile>
       <Compile Include="..\UnityDevLite\DebugEx.cs">
