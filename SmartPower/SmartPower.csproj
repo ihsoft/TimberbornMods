@@ -34,10 +34,10 @@
     </PropertyGroup>
     <ItemGroup>
       <Compile Include="..\UnityDevLite\DebugEx.cs">
-        <Link>DebugEx.cs</Link>
+        <Link>UnityDevLite\DebugEx.cs</Link>
       </Compile>
       <Compile Include="..\UnityDevLite\HostedDebugLog.cs">
-        <Link>HostedDebugLog.cs</Link>
+        <Link>UnityDevLite\HostedDebugLog.cs</Link>
       </Compile>
       <Compile Include="HarmonyPatches.cs" />
       <Compile Include="BatteryStateTextFormatter.cs" />
