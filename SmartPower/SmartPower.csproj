@@ -34,7 +34,7 @@
     </PropertyGroup>
     <ItemGroup>
       <Compile Include="..\PrefabPatcher\PrefabPatcher.cs">
-        <Link>PrefabPatcher.cs</Link>
+        <Link>TimberDev\PrefabPatcher.cs</Link>
       </Compile>
       <Compile Include="..\UnityDevLite\DebugEx.cs">
         <Link>UnityDevLite\DebugEx.cs</Link>
