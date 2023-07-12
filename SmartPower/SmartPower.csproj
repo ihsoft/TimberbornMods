@@ -99,4 +99,7 @@
     <Target Name="AfterBuild">
     </Target>
     -->
+    <Target Name="AfterBuild">
+        <Exec Command="xcopy /i /Y $(TargetPath) u:\BepInEx\plugins\SmartPower" />
+    </Target>
 </Project>
