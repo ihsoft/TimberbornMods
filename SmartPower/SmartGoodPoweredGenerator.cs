@@ -6,8 +6,8 @@ using Timberborn.GoodConsumingBuildingSystem;
 using Timberborn.MechanicalSystem;
 using Timberborn.PowerGenerating;
 using Timberborn.PrefabSystem;
-using UnityDev.LogUtils;
 using UnityDev.Utils.ReflectionUtils;
+using UnityDev.Utils.LogUtilsLite;
 
 namespace SmartPower {
 
@@ -53,8 +53,7 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator {
       if (demand <= supply) {
         return;
       }
-      DebugEx.Fine("Start good consumption on {0}: demand={1}, supply={2}",
-                   GetComponentFast<Prefab>().Name, demand, supply);
+      HostedDebugLog.Fine(this, "Start good consumption: demand={1}, supply={2}", demand, supply);
       _goodConsumingBuilding.ResumeConsumption();
       _mechanicalNode.Active = true;
       _mechanicalNode.UpdateOutput(1.0f); // Be optimistic, let it update in the next tick.
@@ -63,8 +62,7 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator {
       if (demand > supply - _maxPower) {
         return;
       }
-      DebugEx.Fine("Stop good consumption on {0}: demand={1}, supply={2}",
-                   GetComponentFast<Prefab>().Name, demand, supply);
+      HostedDebugLog.Fine(this, "Stop good consumption: demand={1}, supply={2}", demand, supply);
       _goodConsumingBuilding.PauseConsumption();
       _mechanicalNode.UpdateOutput(0);  // The graph will be updated on the next tick.
       _skipTicks = 1;

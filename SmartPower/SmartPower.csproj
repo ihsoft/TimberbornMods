@@ -33,6 +33,12 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
+      <Compile Include="..\UnityDevLite\DebugEx.cs">
+        <Link>DebugEx.cs</Link>
+      </Compile>
+      <Compile Include="..\UnityDevLite\HostedDebugLog.cs">
+        <Link>HostedDebugLog.cs</Link>
+      </Compile>
       <Compile Include="Configurator.cs" />
       <Compile Include="PrefabPatcher.cs" />
       <Compile Include="SmartGoodPoweredGenerator.cs" />
@@ -74,9 +80,6 @@
       </Reference>
       <Reference Include="Timberborn.TickSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.TickSystem.dll</HintPath>
-      </Reference>
-      <Reference Include="UnityDev_Utils, Version=1.1.8577.3436, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Binaries\UnityDev_Utils.dll</HintPath>
       </Reference>
       <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Unity\UnityEngine.dll</HintPath>

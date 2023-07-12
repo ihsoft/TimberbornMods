@@ -5,7 +5,7 @@
 using System;
 using System.Linq;
 using Timberborn.BaseComponentSystem;
-using UnityDev.LogUtils;
+using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 using Object = UnityEngine.Object;
 

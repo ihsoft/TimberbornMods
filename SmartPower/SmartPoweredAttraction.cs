@@ -5,8 +5,7 @@
 using Timberborn.BaseComponentSystem;
 using Timberborn.EnterableSystem;
 using Timberborn.MechanicalSystem;
-using Timberborn.PrefabSystem;
-using UnityDev.LogUtils;
+using UnityDev.Utils.LogUtilsLite;
 
 namespace SmartPower {
 
@@ -33,9 +32,9 @@ public sealed class SmartPoweredAttraction : BaseComponent {
       return;
     }
     if (newState) {
-      DebugEx.Fine("Disable power consumption on {0}", GetComponentFast<Prefab>().Name);
+      HostedDebugLog.Fine(this, "Disable power consumption");
     } else {
-      DebugEx.Fine("Enable power consumption on {0}", GetComponentFast<Prefab>().Name);
+      HostedDebugLog.Fine(this, "Enable power consumption");
     }
     _mechanicalBuilding.ConsumptionDisabled = newState;
   }
