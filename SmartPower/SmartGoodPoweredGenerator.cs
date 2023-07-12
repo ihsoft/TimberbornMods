@@ -55,9 +55,11 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator {
       }
       HostedDebugLog.Fine(this, "Start good consumption: demand={1}, supply={2}", demand, supply);
       _goodConsumingBuilding.ResumeConsumption();
-      _mechanicalNode.Active = true;
-      _mechanicalNode.UpdateOutput(1.0f); // Be optimistic, let it update in the next tick.
-      _skipTicks = 1;
+      if (_goodConsumingBuilding.HoursUntilNoSupply > 0) {
+        _mechanicalNode.Active = true;
+        _mechanicalNode.UpdateOutput(1.0f); // Be optimistic, let it update in the next tick.
+        _skipTicks = 1;
+      }
     } else {
       if (demand > supply - _maxPower || hasUnchargedBatteries) {
         return;
