@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System.Linq;
 using Timberborn.GoodConsumingBuildingSystem;
 using Timberborn.MechanicalSystem;
 using Timberborn.PowerGenerating;
@@ -47,8 +48,9 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator {
     var currentPower = _mechanicalNode.Graph.CurrentPower;
     var demand = currentPower.PowerDemand;
     var supply = currentPower.PowerSupply;
+    var hasUnchargedBatteries = HasAnyOperationalUnchargedBatteries();
     if (_goodConsumingBuilding.ConsumptionPaused) {
-      if (demand <= supply) {
+      if (demand <= supply && !hasUnchargedBatteries) {
         return;
       }
       HostedDebugLog.Fine(this, "Start good consumption: demand={1}, supply={2}", demand, supply);
@@ -57,13 +59,18 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator {
       _mechanicalNode.UpdateOutput(1.0f); // Be optimistic, let it update in the next tick.
       _skipTicks = 1;
     } else {
-      if (demand > supply - _maxPower) {
+      if (demand > supply - _maxPower || hasUnchargedBatteries) {
         return;
       }
       HostedDebugLog.Fine(this, "Stop good consumption: demand={1}, supply={2}", demand, supply);
       _goodConsumingBuilding.PauseConsumption();
       _mechanicalNode.UpdateOutput(0);  // The graph will be updated on the next tick.
       _skipTicks = 1;
+    }
+
+    bool HasAnyOperationalUnchargedBatteries() {
+      return _mechanicalNode.Graph.BatteryControllers
+          .Any(batteryController => batteryController.Operational && batteryController.IsNotFullyCharged);
     }
   }
   #endregion
