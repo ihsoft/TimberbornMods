@@ -13,6 +13,8 @@ using Timberborn.MechanicalSystem;
 using Timberborn.PowerGenerating;
 using UnityEngine;
 
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Local
 namespace SmartPower {
 
 [Configurator(SceneEntrypoint.MainMenu)]
