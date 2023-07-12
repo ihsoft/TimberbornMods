@@ -20,7 +20,6 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator {
   MechanicalNode _mechanicalNode;
   int _maxPower;
   int _skipTicks;
-  static readonly ReflectedField<MechanicalNode, int> NominalPowerOutputField = new("_nominalPowerOutput");
 
   #region TickableComponent implementation
   /// <inheritdoc/>
