@@ -13,6 +13,7 @@ using Timberborn.EnterableSystem;
 using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
 using Timberborn.PowerGenerating;
+using TimberDev.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
 

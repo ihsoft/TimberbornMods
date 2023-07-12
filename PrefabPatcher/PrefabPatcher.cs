@@ -9,7 +9,7 @@ using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace SmartPower {
+namespace TimberDev.Utils {
 
 /// <summary>Helper class for managing prefab components.</summary>
 /// <remarks>
