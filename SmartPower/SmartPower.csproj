@@ -39,7 +39,7 @@
       <Compile Include="..\UnityDevLite\HostedDebugLog.cs">
         <Link>HostedDebugLog.cs</Link>
       </Compile>
-      <Compile Include="Configurator.cs" />
+      <Compile Include="HarmonyPatches.cs" />
       <Compile Include="BatteryStateTextFormatter.cs" />
       <Compile Include="PrefabPatcher.cs" />
       <Compile Include="SmartGoodPoweredGenerator.cs" />
