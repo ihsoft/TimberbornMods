@@ -6,7 +6,6 @@ using System.Linq;
 using Timberborn.GoodConsumingBuildingSystem;
 using Timberborn.MechanicalSystem;
 using Timberborn.PowerGenerating;
-using Timberborn.PrefabSystem;
 using UnityDev.Utils.LogUtilsLite;
 
 namespace SmartPower {
