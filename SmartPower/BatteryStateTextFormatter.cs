@@ -2,22 +2,20 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System.Linq;
 using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
-using UnityEngine.UIElements;
 
 namespace SmartPower {
 
 /// <summary>Provides status strings for the battery state.</summary>
 public static class BatteryStateTextFormatter {
-  static readonly string ArrowUp = TextColors.ColorizeText("<GreenHighlight>🡅</GreenHighlight>");
-  static readonly string ArrowDown = TextColors.ColorizeText("<RedHighlight>🡇</RedHighlight>");
-
   const string PowerSymbolLocKey = "Mechanical.PowerSymbol";
   const string PowerCapacitySymbolLocKey = "Mechanical.PowerCapacitySymbol";
   const string HourShortLocKey = "Time.HourShort";
-  const string BatteryInfoLocKey = "IgorZ.SmartPower.BatteryInfo";
-  const string BatteryLifeLocKey = "IgorZ.SmartPower.BatteryLife";
+  const string BatteryCapacityLocKey = "IgorZ.SmartPower.BatteryCapacity";
+  const string BatteryCharging = "IgorZ.SmartPower.BatteryCharging";
+  const string BatteryDischarging = "IgorZ.SmartPower.BatteryDischarging";
 
   /// <summary>Makes a formatted string that describes the current state of the batteries in the graph.</summary>
   /// <returns>Empty string if there are no batteries in the graph.</returns>
@@ -26,19 +24,37 @@ public static class BatteryStateTextFormatter {
       return "";
     }
     var currentPower = mechanicalNode.Graph.CurrentPower;
-    string flowStr;
-    var lifetimeStr = "";
+    var batteryTotalCapacity = mechanicalNode.Graph.BatteryControllers
+        .Where(x => x.Operational)
+        .Select(x => x.Capacity)
+        .Sum();
+    var totalChargeStr = $"{currentPower.BatteryCharge:0} {loc.T(PowerCapacitySymbolLocKey)}";
+    var batteryCapacityStr = loc.T(BatteryCapacityLocKey, batteryTotalCapacity, totalChargeStr);
+
+    // Battery power is being consumed by the network.
     if (currentPower.BatteryPower > 0) {
-      flowStr = $"{ArrowDown}{currentPower.BatteryPower:0} {loc.T(PowerSymbolLocKey)}";
-      var lifetime = currentPower.BatteryCharge / currentPower.BatteryPower;
-      lifetimeStr = "\n" + loc.T(BatteryLifeLocKey, $"{lifetime:0.0}{loc.T(HourShortLocKey)}");
-    } else {
-      var flow = currentPower.PowerSupply - currentPower.PowerDemand;
-      flowStr = flow <= 0 ? $"0 {loc.T(PowerSymbolLocKey)}" : $"{ArrowUp}{flow} {loc.T(PowerSymbolLocKey)}";
+      var timeLeft = currentPower.BatteryCharge / currentPower.BatteryPower;
+      var flowStr = loc.T(
+          BatteryDischarging,
+          $"{currentPower.BatteryPower} {loc.T(PowerSymbolLocKey)}",
+          $"{timeLeft:0.0}{loc.T(HourShortLocKey)}");
+      return $"{batteryCapacityStr}\n{flowStr}";
     }
-    var capacityStr = $"{currentPower.BatteryCharge:0} {loc.T(PowerCapacitySymbolLocKey)}";
-    var batteryInfo = loc.T(BatteryInfoLocKey, capacityStr, flowStr);
-    return $"{batteryInfo}{lifetimeStr}";
+
+    // Some discharged batteries being charged using the excess power.
+    var dischargedCapacity = batteryTotalCapacity - currentPower.BatteryCharge;
+    if (currentPower.PowerSupply > currentPower.PowerDemand && dischargedCapacity > float.Epsilon) {
+      var flow = currentPower.PowerSupply - currentPower.PowerDemand;
+      var timeLeft = dischargedCapacity / flow;
+      var flowStr = loc.T(
+          BatteryCharging,
+          $"{flow} {loc.T(PowerSymbolLocKey)}",
+          $"{timeLeft:0.0}{loc.T(HourShortLocKey)}");
+      return $"{batteryCapacityStr}\n{flowStr}";
+    }
+
+    // Idle battery state.
+    return $"{batteryCapacityStr}";
   }
 }
 
