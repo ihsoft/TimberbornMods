@@ -33,6 +33,9 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
+      <Compile Include="..\TimberDev\HarmonyPatcher.cs">
+        <Link>TimberDev\HarmonyPatcher.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\PrefabPatcher.cs">
         <Link>TimberDev\PrefabPatcher.cs</Link>
       </Compile>

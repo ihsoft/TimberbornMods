@@ -3,11 +3,10 @@
 // License: Public Domain
 
 using System.Reflection;
-using Bindito.Core;
 using Bindito.Unity;
 using HarmonyLib;
-using TimberApi.ConfiguratorSystem;
-using TimberApi.SceneSystem;
+using TimberApi.ConsoleSystem;
+using TimberApi.ModSystem;
 using Timberborn.Attractions;
 using Timberborn.EnterableSystem;
 using Timberborn.Localization;
@@ -21,12 +20,11 @@ using UnityEngine.UIElements;
 // ReSharper disable UnusedMember.Local
 namespace SmartPower {
 
-[Configurator(SceneEntrypoint.MainMenu)]
-sealed class Configurator : IConfigurator {
-  public void Configure(IContainerDefinition containerDefinition) {
-    var harmony = new Harmony("IgorZ.SmartPower");
-    harmony.PatchAll(typeof(PrefabInstantiatorPatch));
-    harmony.PatchAll(typeof(NetworkFragmentServicePatch));
+// ReSharper disable once UnusedType.Global
+sealed class Plugin : IModEntrypoint {
+  public void Entry(IMod mod, IConsoleWriter consoleWriter) {
+    HarmonyPatcher.PatchWithNoDuplicates(
+        "IgorZ.SmartPower", typeof(PrefabInstantiatorPatch), typeof(NetworkFragmentServicePatch));
   }
 }
 
