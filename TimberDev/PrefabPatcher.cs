@@ -12,10 +12,6 @@ using Object = UnityEngine.Object;
 namespace TimberDev.Utils {
 
 /// <summary>Helper class for managing prefab components.</summary>
-/// <remarks>
-/// Call the patcher methods from the <c>InGame</c> configurator. Each game load refreshes the prefabs, so they need to
-/// patched on every game load.
-/// </remarks>
 public static class PrefabPatcher {
   /// <summary>Adds a new component to prefab based in the filter condition.</summary>
   /// <param name="prefab">Prefab to add the component to.</param>
