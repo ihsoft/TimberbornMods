@@ -16,6 +16,7 @@ namespace SmartPower {
 /// The checking algorithm doesn't take into account the power in the batteries.
 /// </remarks>
 public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator {
+  const float ChargeThreshold = 0.9f;
   GoodConsumingBuilding _goodConsumingBuilding;
   MechanicalNode _mechanicalNode;
   int _maxPower;
@@ -47,7 +48,7 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator {
     var currentPower = _mechanicalNode.Graph.CurrentPower;
     var demand = currentPower.PowerDemand;
     var supply = currentPower.PowerSupply;
-    var hasUnchargedBatteries = HasAnyOperationalUnchargedBatteries();
+    var hasUnchargedBatteries = HasUnchargedBatteries();
     if (_goodConsumingBuilding.ConsumptionPaused) {
       if (demand <= supply && !hasUnchargedBatteries) {
         return;
@@ -69,9 +70,9 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator {
       _skipTicks = 1;
     }
 
-    bool HasAnyOperationalUnchargedBatteries() {
+    bool HasUnchargedBatteries() {
       return _mechanicalNode.Graph.BatteryControllers
-          .Any(batteryController => batteryController.Operational && batteryController.IsNotFullyCharged);
+          .Any(ctrl => ctrl.Operational && ctrl.NormalizedCharge < ChargeThreshold);
     }
   }
   #endregion
