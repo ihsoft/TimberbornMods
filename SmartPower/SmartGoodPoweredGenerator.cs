@@ -52,7 +52,7 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator {
       if (demand <= supply && !hasUnchargedBatteries) {
         return;
       }
-      HostedDebugLog.Fine(this, "Start good consumption: demand={1}, supply={2}", demand, supply);
+      HostedDebugLog.Fine(this, "Start good consumption: demand={0}, supply={1}", demand, supply);
       _goodConsumingBuilding.ResumeConsumption();
       if (_goodConsumingBuilding.HoursUntilNoSupply > 0) {
         _mechanicalNode.Active = true;
@@ -63,7 +63,7 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator {
       if (demand > supply - _maxPower || hasUnchargedBatteries) {
         return;
       }
-      HostedDebugLog.Fine(this, "Stop good consumption: demand={1}, supply={2}", demand, supply);
+      HostedDebugLog.Fine(this, "Stop good consumption: demand={0}, supply={1}", demand, supply);
       _goodConsumingBuilding.PauseConsumption();
       _mechanicalNode.UpdateOutput(0);  // The graph will be updated on the next tick.
       _skipTicks = 1;
