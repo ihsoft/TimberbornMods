@@ -50,6 +50,7 @@
       </Compile>
       <Compile Include="Plugin.cs" />
       <Compile Include="BatteryStateTextFormatter.cs" />
+      <Compile Include="Properties\AssemblyInfo.cs" />
       <Compile Include="SmartGoodPoweredGenerator.cs" />
       <Compile Include="SmartPoweredAttraction.cs" />
     </ItemGroup>
