@@ -45,7 +45,7 @@
       <Compile Include="..\UnityDevLite\HostedDebugLog.cs">
         <Link>UnityDevLite\HostedDebugLog.cs</Link>
       </Compile>
-      <Compile Include="HarmonyPatches.cs" />
+      <Compile Include="Plugin.cs" />
       <Compile Include="BatteryStateTextFormatter.cs" />
       <Compile Include="SmartGoodPoweredGenerator.cs" />
       <Compile Include="SmartPoweredAttraction.cs" />
