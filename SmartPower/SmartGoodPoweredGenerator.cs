@@ -8,7 +8,8 @@ using Timberborn.MechanicalSystem;
 using Timberborn.PowerGenerating;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace SmartPower {
+// ReSharper disable once CheckNamespace
+namespace IgorZ.SmartPower {
 
 /// <summary>Smart version of the stock power generator.</summary>
 /// <remarks>

@@ -7,7 +7,8 @@ using Timberborn.EnterableSystem;
 using Timberborn.MechanicalSystem;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace SmartPower {
+// ReSharper disable once CheckNamespace
+namespace IgorZ.SmartPower {
 
 /// <summary>Smart version of teh stock game powered attraction.</summary>
 /// <remarks>It only consumes power if there are attendees in the building.</remarks>

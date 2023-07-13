@@ -13,12 +13,13 @@ using Timberborn.EnterableSystem;
 using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
 using Timberborn.PowerGenerating;
-using TimberDev.Utils;
+using IgorZ.TimberDev.Utils.Utils;
 using UnityEngine.UIElements;
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Local
-namespace SmartPower {
+// ReSharper disable once CheckNamespace
+namespace IgorZ.SmartPower {
 
 [Configurator(SceneEntrypoint.InGame)]
 // ReSharper disable once UnusedType.Global

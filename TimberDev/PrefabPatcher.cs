@@ -9,7 +9,8 @@ using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace TimberDev.Utils {
+// ReSharper disable once CheckNamespace
+namespace IgorZ.TimberDev.Utils.Utils {
 
 /// <summary>Helper class for managing prefab components.</summary>
 public static class PrefabPatcher {

@@ -6,7 +6,8 @@ using System.Linq;
 using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
 
-namespace SmartPower {
+// ReSharper disable once CheckNamespace
+namespace IgorZ.SmartPower {
 
 /// <summary>Provides status strings for the battery state.</summary>
 public static class BatteryStateTextFormatter {
