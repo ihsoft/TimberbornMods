@@ -1,7 +1,7 @@
 ManifestFileVersion: 0
-CRC: 3335627560
+CRC: 1932157783
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
-      Name: smart_power_icons
+      Name: smartpower_ui_icons
       Dependencies: {}
