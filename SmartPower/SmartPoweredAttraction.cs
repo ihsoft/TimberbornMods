@@ -10,7 +10,7 @@ using UnityDev.Utils.LogUtilsLite;
 // ReSharper disable once CheckNamespace
 namespace IgorZ.SmartPower {
 
-/// <summary>Smart version of teh stock game powered attraction.</summary>
+/// <summary>Smart version of the stock game powered attraction.</summary>
 /// <remarks>It only consumes power if there are attendees in the building.</remarks>
 public sealed class SmartPoweredAttraction : BaseComponent {
   Enterable _enterable;
