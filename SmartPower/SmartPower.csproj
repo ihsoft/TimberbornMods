@@ -49,7 +49,7 @@
         <Link>UnityDevLite\HostedDebugLog.cs</Link>
       </Compile>
       <Compile Include="Configurator.cs" />
-      <Compile Include="BatteryStateTextFormatter.cs" />
+      <Compile Include="StateTextFormatter.cs" />
       <Compile Include="Properties\AssemblyInfo.cs" />
       <Compile Include="SmartGoodPoweredGenerator.cs" />
       <Compile Include="SmartPoweredAttraction.cs" />

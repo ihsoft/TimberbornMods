@@ -9,8 +9,8 @@ using Timberborn.MechanicalSystem;
 // ReSharper disable once CheckNamespace
 namespace IgorZ.SmartPower {
 
-/// <summary>Provides status strings for the battery state.</summary>
-public static class BatteryStateTextFormatter {
+/// <summary>Provides formatting methods for the various states.</summary>
+public static class StateTextFormatter {
   const string PowerSymbolLocKey = "Mechanical.PowerSymbol";
   const string PowerCapacitySymbolLocKey = "Mechanical.PowerCapacitySymbol";
   const string HourShortLocKey = "Time.HourShort";
