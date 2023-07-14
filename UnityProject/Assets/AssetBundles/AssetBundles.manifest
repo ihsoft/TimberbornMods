@@ -1,0 +1,7 @@
+ManifestFileVersion: 0
+CRC: 3335627560
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: smart_power_icons
+      Dependencies: {}
