@@ -49,7 +49,7 @@ sealed class Configurator : IConfigurator {
 
     static void Postfix(MechanicalNode mechanicalNode, Label ____label, ILoc ____loc) {
       var text = StateTextFormatter.FormatBatteryText(mechanicalNode, ____loc);
-      if (text != "") {
+      if (text != null) {
         ____label.text += "\n" + text;
       }
     }

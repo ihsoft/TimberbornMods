@@ -19,10 +19,10 @@ public static class StateTextFormatter {
   const string BatteryDischarging = "IgorZ.SmartPower.BatteryDischarging";
 
   /// <summary>Makes a formatted string that describes the current state of the batteries in the graph.</summary>
-  /// <returns>Empty string if there are no batteries in the graph.</returns>
+  /// <returns><c>null</c> if there are no batteries in the graph.</returns>
   public static string FormatBatteryText(MechanicalNode mechanicalNode, ILoc loc) {
     if (mechanicalNode.Graph.BatteryControllers.IsEmpty()) {
-      return "";
+      return null;
     }
     var currentPower = mechanicalNode.Graph.CurrentPower;
     var batteryTotalCapacity = mechanicalNode.Graph.BatteryControllers
