@@ -27,7 +27,7 @@ public static class CustomizableInstantiator {
   /// every game load.
   /// </remarks>
   /// <param name="patchId">
-  /// Unique id of the patch. Adding multiple patchers with teh same ID will result in overwriting.
+  /// Unique id of the patch. Adding multiple patchers with the same ID will result in overwriting the old patch.
   /// </param>
   /// <param name="patchFn">The method to call on the prefab being patched.</param>
   public static void AddPatcher(string patchId, Action<GameObject> patchFn) {
