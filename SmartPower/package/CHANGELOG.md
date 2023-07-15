@@ -1,6 +1,6 @@
-# v1.1 (pre-release)
+# v1.1 (14 Jul 2023)
 * [Enhancement] Add `deDe` locale file. Thanks to juf0816@Discord.
-* [Enhancement] Adjust power consumption in mauufactures when they don't produce product. In the
+* [Enhancement] Adjust power consumption in maufactures when they don't produce product. In the
   power save mode the consumption is 10% of the nominal building power.
 * [Fix] Properly update attraction state on game load.
 
