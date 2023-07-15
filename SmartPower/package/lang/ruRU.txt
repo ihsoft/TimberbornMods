@@ -2,3 +2,9 @@ ID,Text
 IgorZ.SmartPower.BatteryCapacity,"Заряд батарей: {0} / {1}"
 IgorZ.SmartPower.BatteryCharging,"Батареи заряжаются: <GreenHighlight>🡅</GreenHighlight>{0} ({1})"
 IgorZ.SmartPower.BatteryDischarging,"Батареи рязряжаются: <RedHighlight>🡇</RedHighlight>{0} ({1})"
+
+IgorZ.SmartPower.MechanicalBuilding.NoWorkersStatus,"<SolidHighlight>⏻</SolidHighlight> Никого нет на рабочем месте"
+IgorZ.SmartPower.MechanicalBuilding.NoFuelStatus,"<SolidHighlight>⏻</SolidHighlight> Закончилось топливо"
+IgorZ.SmartPower.MechanicalBuilding.NoInputStatus,"<SolidHighlight>⏻</SolidHighlight> Не хватает ингредиентов"
+IgorZ.SmartPower.MechanicalBuilding.BlockedOutputStatus,"<SolidHighlight>⏻</SolidHighlight> Нет места для продукции"
+IgorZ.SmartPower.MechanicalBuilding.PowerSavingModeStatus,"Режим сбережения энергии"

@@ -4,5 +4,19 @@
   "UniqueId": "igorz.smartpower",
   "MinimumApiVersion": "0.5.5",
   "MinimumGameVersion": "0.4.9.0",
-  "EntryDll": "SmartPower.dll"
+  "EntryDll": "SmartPower.dll",
+  "Assets": [
+    {
+      "Prefix": "igorz.smartpower",
+      "Scenes": [
+        "InGame",
+      ]
+    }
+  ],
+  "Dependencies": [
+    {
+      "UniqueId": "igorz.customresources",
+      "MinimumVersion": "1.0.0"
+    }
+  ]
 }

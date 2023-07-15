@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System.Collections.Generic;
 using System.Linq;
 using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
@@ -14,9 +15,15 @@ public static class StateTextFormatter {
   const string PowerSymbolLocKey = "Mechanical.PowerSymbol";
   const string PowerCapacitySymbolLocKey = "Mechanical.PowerCapacitySymbol";
   const string HourShortLocKey = "Time.HourShort";
+
   const string BatteryCapacityLocKey = "IgorZ.SmartPower.BatteryCapacity";
   const string BatteryCharging = "IgorZ.SmartPower.BatteryCharging";
   const string BatteryDischarging = "IgorZ.SmartPower.BatteryDischarging";
+
+  const string NoWorkersLocKey = "IgorZ.SmartPower.MechanicalBuilding.NoWorkersStatus";
+  const string NoFuelLocKey = "IgorZ.SmartPower.MechanicalBuilding.NoFuelStatus";
+  const string NoInputModeLocKey = "IgorZ.SmartPower.MechanicalBuilding.NoInputStatus";
+  const string BlockedOutputLocKey = "IgorZ.SmartPower.MechanicalBuilding.BlockedOutputStatus";
 
   /// <summary>Makes a formatted string that describes the current state of the batteries in the graph.</summary>
   /// <returns><c>null</c> if there are no batteries in the graph.</returns>
@@ -56,6 +63,32 @@ public static class StateTextFormatter {
 
     // Idle battery state.
     return $"{batteryCapacityStr}";
+  }
+
+  /// <summary>Makes a formatted string that describes the power saving mode reason(s).</summary>
+  /// <returns><c>null</c> if the building is not in power saving mode or if the building is not compatible.</returns>
+  public static string FormatBuildingText(MechanicalNode mechanicalNode, ILoc loc) {
+    if (!mechanicalNode.IsConsumer) {
+      return null;
+    }
+    var smartMechanicalBuilding = mechanicalNode.GetComponentFast<SmartMechanicalBuilding>();
+    if (smartMechanicalBuilding == null || !smartMechanicalBuilding.StandbyMode) {
+      return null;
+    }
+    var lines = new List<string>();
+    if (smartMechanicalBuilding.AllWorkersOut) {
+      lines.Add(loc.T(NoWorkersLocKey));
+    }
+    if (smartMechanicalBuilding.NoFuel) {
+      lines.Add(loc.T(NoFuelLocKey));
+    }
+    if (smartMechanicalBuilding.MissingIngredients) {
+      lines.Add(loc.T(NoInputModeLocKey));
+    }
+    if (smartMechanicalBuilding.BlockedOutput) {
+      lines.Add(loc.T(BlockedOutputLocKey));
+    }
+    return string.Join("\n", lines);
   }
 }
 

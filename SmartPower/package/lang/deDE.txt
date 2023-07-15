@@ -2,3 +2,9 @@ ID,Text
 IgorZ.SmartPower.BatteryCapacity,"Energiespeicher: {0} / {1}"
 IgorZ.SmartPower.BatteryCharging,"Energiespeicher laden: <GreenHighlight>🡅</GreenHighlight>{0} ({1})"
 IgorZ.SmartPower.BatteryDischarging,"Energiespeicher entladen: <RedHighlight>🡇</RedHighlight>{0} ({1})"
+
+IgorZ.SmartPower.MechanicalBuilding.NoWorkersStatus,"<SolidHighlight>⏻</SolidHighlight> No workers at workplace"
+IgorZ.SmartPower.MechanicalBuilding.NoFuelStatus,"<SolidHighlight>⏻</SolidHighlight> Fuel run out"
+IgorZ.SmartPower.MechanicalBuilding.NoInputStatus,"<SolidHighlight>⏻</SolidHighlight> Missing ingredients"
+IgorZ.SmartPower.MechanicalBuilding.BlockedOutputStatus,"<SolidHighlight>⏻</SolidHighlight> Too much products"
+IgorZ.SmartPower.MechanicalBuilding.PowerSavingModeStatus,"Power saving mode"
