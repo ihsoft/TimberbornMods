@@ -1,3 +1,6 @@
+# v1.2 (pre-release)
+* [Update] Change `deDE` strings.
+
 # v1.1 (14 Jul 2023)
 * [Enhancement] Add `deDe` locale file. Thanks to juf0816@Discord.
 * [Enhancement] Adjust power consumption in maufactures when they don't produce product. In the
