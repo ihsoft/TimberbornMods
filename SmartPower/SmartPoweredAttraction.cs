@@ -24,7 +24,7 @@ public sealed class SmartPoweredAttraction : BaseComponent {
   }
 
   public void Start() {
-    _mechanicalBuilding.ConsumptionDisabled = true;
+    UpdateConsumingState();
   }
 
   void UpdateConsumingState() {
