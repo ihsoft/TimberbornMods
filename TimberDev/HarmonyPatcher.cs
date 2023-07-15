@@ -9,6 +9,7 @@ using UnityDev.Utils.LogUtilsLite;
 // ReSharper disable once CheckNamespace
 namespace IgorZ.TimberDev.Utils.Utils {
 
+/// <summary>Helper class to safely apply harmony patches.</summary>
 public static class HarmonyPatcher {
   /// <summary>Applies Harmony patches.</summary>
   /// <remarks>This method ensures that no Harmony patches are applied twice.</remarks>

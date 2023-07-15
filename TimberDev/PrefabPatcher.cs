@@ -48,9 +48,13 @@ public static class PrefabPatcher {
   /// <summary>Helper filter class to check the existing and required components on prefab.</summary>
   public class RequiredComponentsDep {
     readonly Type[] _requiredComponents;
+
+    /// <summary>Creates dependency from the types.</summary>
     public RequiredComponentsDep(params Type[] requiredComponents) {
       _requiredComponents = requiredComponents;
     }
+
+    /// <summary>Checks if prefab has all the dependency classes.</summary>
     public bool Check(GameObject prefab) {
       var components = prefab.GetComponents<BaseComponent>().Select(x => x.GetType()).ToArray();
       return _requiredComponents.All(components.Contains);

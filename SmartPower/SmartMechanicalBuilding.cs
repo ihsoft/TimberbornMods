@@ -38,11 +38,18 @@ public class SmartMechanicalBuilding : MechanicalBuilding {
 
   #region API
   /// <summary>
-  /// 
+  /// Indicates that the building is expected to be staffed and working, but no workers are currently at the working
+  /// place(s).
   /// </summary>
   public bool AllWorkersOut { get; private set; }
+
+  /// <summary>Indicates that the required ingredients are missing and the work cannot start.</summary>
   public bool MissingIngredients { get; private set; }
+
+  /// <summary>Indicates that there is now fuel to execute the recipe.</summary>
   public bool NoFuel { get; private set; }
+
+  /// <summary>Indicates that there is no free space in inventory to stock the product(s).</summary>
   public bool BlockedOutput { get; private set; }
 
   /// <summary>Tells if the building is not consuming full power due to the conditions.</summary>
@@ -91,6 +98,7 @@ public class SmartMechanicalBuilding : MechanicalBuilding {
   #endregion
 
   #region Implementation
+  #pragma warning disable CS1591
   [Inject]
   public void InjectDependencies(ILoc loc) {
     _loc = loc;

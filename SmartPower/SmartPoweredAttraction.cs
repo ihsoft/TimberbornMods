@@ -16,14 +16,14 @@ public sealed class SmartPoweredAttraction : BaseComponent {
   Enterable _enterable;
   MechanicalBuilding _mechanicalBuilding;
   
-  public void Awake() {
+  void Awake() {
     _mechanicalBuilding = GetComponentFast<MechanicalBuilding>();
     _enterable = GetComponentFast<Enterable>();
     _enterable.EntererAdded += (_, _) => UpdateConsumingState();
     _enterable.EntererRemoved += (_, _) => UpdateConsumingState();
   }
 
-  public void Start() {
+  void Start() {
     UpdateConsumingState();
   }
 
