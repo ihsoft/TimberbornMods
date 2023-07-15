@@ -37,7 +37,7 @@ sealed class Configurator : IConfigurator {
         typeof(NetworkFragmentServicePatch),
         typeof(ConsumerFragmentServicePatch));
     CustomizableInstantiator.AddPatcher(
-        typeof(Configurator).FullName,
+        PatchId,
         prefab => {
           PrefabPatcher.ReplaceComponent<GoodPoweredGenerator, SmartGoodPoweredGenerator>(prefab, _ => true);
           PrefabPatcher.ReplaceComponent<MechanicalBuilding, SmartMechanicalBuilding>(
