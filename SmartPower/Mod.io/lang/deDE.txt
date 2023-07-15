@@ -1,4 +1,0 @@
-ID,Text
-IgorZ.SmartPower.BatteryCapacity,"Energiespeicher: {0} / {1}"
-IgorZ.SmartPower.BatteryCharging,"Energiespeicher laden: <GreenHighlight>🡅</GreenHighlight>{0} ({1})"
-IgorZ.SmartPower.BatteryDischarging,"Energiespeicher entladen: <RedHighlight>🡇</RedHighlight>{0} ({1})"

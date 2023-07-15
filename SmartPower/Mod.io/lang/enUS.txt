@@ -1,4 +1,0 @@
-ID,Text
-IgorZ.SmartPower.BatteryCapacity,"Batteries charge: {0} / {1}"
-IgorZ.SmartPower.BatteryCharging,"Batteries charging: <GreenHighlight>🡅</GreenHighlight>{0} ({1})"
-IgorZ.SmartPower.BatteryDischarging,"Batteries discharging: <RedHighlight>🡇</RedHighlight>{0} ({1})"
