@@ -12,7 +12,7 @@ using TimberApi.ModSystem;
 using Timberborn.AssetSystem;
 using Timberborn.InputSystem;
 using Timberborn.StatusSystem;
-using UnityDev.Utils.LogUtils;
+using UnityDev.Utils.LogUtilsLite;
 using UnityDev.Utils.Reflections;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -186,11 +186,8 @@ public static class AssetPatcher {
       if (_customCursorType == null) {
         throw new InvalidOperationException("Cannot find type: " + CustomCursorTypeName);
       }
-      _customCursorSmallCursorField = new ReflectedField<Texture2D>(_customCursorType, "_smallCursor");
-      _customCursorLargeCursorField = new ReflectedField<Texture2D>(_customCursorType, "_largeCursor");
-      if (!_customCursorLargeCursorField.IsValid() || !_customCursorSmallCursorField.IsValid()) {
-        throw new InvalidOperationException("Cannot get reflections on: " + CustomCursorTypeName);
-      }
+      _customCursorSmallCursorField = new ReflectedField<Texture2D>(_customCursorType, "_smallCursor", throwOnFailure: true);
+      _customCursorLargeCursorField = new ReflectedField<Texture2D>(_customCursorType, "_largeCursor", throwOnFailure: true);
     }
   }
 }

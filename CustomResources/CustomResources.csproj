@@ -33,11 +33,15 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
+      <Compile Include="..\UnityDevLite\DebugEx.cs">
+        <Link>UnityDevLite\DebugEx.cs</Link>
+      </Compile>
+      <Compile Include="..\UnityDevLite\ReflectedField.cs">
+        <Link>UnityDevLite\ReflectedField.cs</Link>
+      </Compile>
       <Compile Include="AssetPatcher.cs" />
       <Compile Include="Configurator.cs" />
       <Compile Include="Properties\AssemblyInfo.cs" />
-      <Compile Include="UnityDev\LogUtils.cs" />
-      <Compile Include="UnityDev\ReflectedField.cs" />
     </ItemGroup>
     <ItemGroup>
       <Reference Include="0Harmony, Version=2.9.0.0, Culture=neutral, PublicKeyToken=null">
@@ -75,8 +79,17 @@
       <Reference Include="Timberborn.AssetSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.AssetSystem.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.BaseComponentSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.BaseComponentSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.BlockSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.BlockSystem.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.InputSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.InputSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.PrefabSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.PrefabSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.StatusSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.StatusSystem.dll</HintPath>
