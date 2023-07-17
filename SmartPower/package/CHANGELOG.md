@@ -1,5 +1,6 @@
 # v1.2 (pre-release)
 * [Update] Change `deDE` strings.
+* [Fix #2] Allow specifying if the engine must be generating power regardless to the smart logic.
 
 # v1.1 (14 Jul 2023)
 * [Enhancement] Add `deDe` locale file. Thanks to juf0816@Discord.

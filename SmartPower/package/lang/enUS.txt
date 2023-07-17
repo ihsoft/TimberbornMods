@@ -3,6 +3,8 @@ IgorZ.SmartPower.BatteryCapacity,"Batteries charge: {0} / {1}"
 IgorZ.SmartPower.BatteryCharging,"Batteries charging: <GreenHighlight>🡅</GreenHighlight>{0} ({1})"
 IgorZ.SmartPower.BatteryDischarging,"Batteries discharging: <RedHighlight>🡇</RedHighlight>{0} ({1})"
 
+IgorZ.SmartPower.PoweredGenerator.NeverStop,"Never stop this generator"
+
 IgorZ.SmartPower.MechanicalBuilding.NoWorkersStatus,"<SolidHighlight>⏻</SolidHighlight> No workers at workplace"
 IgorZ.SmartPower.MechanicalBuilding.NoFuelStatus,"<SolidHighlight>⏻</SolidHighlight> Fuel has run out"
 IgorZ.SmartPower.MechanicalBuilding.NoInputStatus,"<SolidHighlight>⏻</SolidHighlight> Missing ingredients"

@@ -58,6 +58,8 @@
       <Compile Include="SmartGoodPoweredGenerator.cs" />
       <Compile Include="SmartMechanicalBuilding.cs" />
       <Compile Include="SmartPoweredAttraction.cs" />
+      <Compile Include="UI\Configurator.cs" />
+      <Compile Include="UI\SmartGoodPoweredGeneratorFragment.cs" />
     </ItemGroup>
     <ItemGroup>
       <Reference Include="0Harmony, Version=2.9.0.0, Culture=neutral, PublicKeyToken=null">
@@ -91,6 +93,9 @@
       <Reference Include="Timberborn.EnterableSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.EnterableSystem.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.EntityPanelSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.EntityPanelSystem.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.GoodConsumingBuildingSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.GoodConsumingBuildingSystem.dll</HintPath>
       </Reference>
@@ -105,6 +110,9 @@
       </Reference>
       <Reference Include="Timberborn.MechanicalSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.MechanicalSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.Persistence, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.Persistence.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.PowerGenerating, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.PowerGenerating.dll</HintPath>
@@ -126,6 +134,9 @@
       </Reference>
       <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Unity\UnityEngine.CoreModule.dll</HintPath>
+      </Reference>
+      <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Unity\UnityEngine.TextRenderingModule.dll</HintPath>
       </Reference>
       <Reference Include="UnityEngine.UIElementsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Unity\UnityEngine.UIElementsModule.dll</HintPath>

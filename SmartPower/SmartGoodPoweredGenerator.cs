@@ -5,6 +5,7 @@
 using System.Linq;
 using Timberborn.GoodConsumingBuildingSystem;
 using Timberborn.MechanicalSystem;
+using Timberborn.Persistence;
 using Timberborn.PowerGenerating;
 using UnityDev.Utils.LogUtilsLite;
 
@@ -16,7 +17,7 @@ namespace IgorZ.SmartPower {
 /// It will check the actual demand and supply and only stop/start as many generators as needed to satisfy the demand.
 /// The checking algorithm doesn't take into account the power in the batteries.
 /// </remarks>
-public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator {
+public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersistentEntity {
   const float ChargeThreshold = 0.9f;
   GoodConsumingBuilding _goodConsumingBuilding;
   MechanicalNode _mechanicalNode;
@@ -30,6 +31,28 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator {
       UpdateGoodConsumption();
     }
   }
+  #endregion
+
+  #region IPersistentEntity implemenatation
+  static readonly ComponentKey AutomationBehaviorKey = new(typeof(SmartGoodPoweredGenerator).FullName);
+  static readonly PropertyKey<bool> NeverShutdownKey = new(nameof(NeverShutdown));
+
+  public void Save(IEntitySaver entitySaver) {
+    entitySaver.GetComponent(AutomationBehaviorKey).Set(NeverShutdownKey, NeverShutdown);
+  }
+
+  public void Load(IEntityLoader entityLoader) {
+    if (!entityLoader.HasComponent(AutomationBehaviorKey)) {
+      return;
+    }
+    var state = entityLoader.GetComponent(AutomationBehaviorKey);
+    NeverShutdown = state.GetValueOrNullable(NeverShutdownKey) ?? false;
+  }
+  #endregion
+
+  #region API
+  /// <summary>Tells the smart logic to never shutdown this generator.</summary>
+  public bool NeverShutdown { get; set; }
   #endregion
 
   #region Implementation
@@ -51,7 +74,7 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator {
     var supply = currentPower.PowerSupply;
     var hasUnchargedBatteries = HasUnchargedBatteries();
     if (_goodConsumingBuilding.ConsumptionPaused) {
-      if (demand <= supply && !hasUnchargedBatteries) {
+      if (demand <= supply && !hasUnchargedBatteries && !NeverShutdown) {
         return;
       }
       HostedDebugLog.Fine(this, "Start good consumption: demand={0}, supply={1}", demand, supply);
@@ -62,7 +85,7 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator {
         _skipTicks = 1;
       }
     } else {
-      if (demand > supply - _maxPower || hasUnchargedBatteries) {
+      if (demand > supply - _maxPower || hasUnchargedBatteries || NeverShutdown) {
         return;
       }
       HostedDebugLog.Fine(this, "Stop good consumption: demand={0}, supply={1}", demand, supply);
