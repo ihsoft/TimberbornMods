@@ -21,6 +21,8 @@ namespace IgorZ.TimberDev.CustomInstantiator {
 /// </remarks>
 /// <seealso cref="PrefabPatcher"/>
 public static class CustomizableInstantiator {
+  static readonly string HarmonyPatchId = typeof(CustomizableInstantiator).AssemblyQualifiedName;
+
   /// <summary>Adds a patcher method. Must be called from the <c>InGame</c> configurator.</summary>
   /// <remarks>
   /// The patcher method will be called exactly once for every unique prefab. The prefab patchers are re-applied on
@@ -31,7 +33,7 @@ public static class CustomizableInstantiator {
   /// </param>
   /// <param name="patchFn">The method to call on the prefab being patched.</param>
   public static void AddPatcher(string patchId, Action<GameObject> patchFn) {
-    HarmonyPatcher.PatchRepeated(typeof(CustomizableInstantiator).FullName, typeof(PrefabInstantiatePatch));
+    HarmonyPatcher.PatchRepeated(HarmonyPatchId, typeof(PrefabInstantiatePatch));
     PrefabInstantiatePatch.Patchers[patchId] = patchFn;
     PrefabInstantiatePatch.PatchedCache.Clear();
   }
