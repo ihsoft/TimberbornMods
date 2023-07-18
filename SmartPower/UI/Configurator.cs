@@ -3,7 +3,7 @@
 // License: Public Domain
 
 using Bindito.Core;
-using IgorZ.TimberDev.Utils.Utils;
+using IgorZ.TimberDev.Utils;
 using TimberApi.ConfiguratorSystem;
 using TimberApi.SceneSystem;
 using Timberborn.EntityPanelSystem;

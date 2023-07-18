@@ -10,7 +10,7 @@ using Timberborn.Attractions;
 using Timberborn.EnterableSystem;
 using Timberborn.MechanicalSystem;
 using Timberborn.PowerGenerating;
-using IgorZ.TimberDev.Utils.Utils;
+using IgorZ.TimberDev.Utils;
 using Timberborn.Workshops;
 
 // ReSharper disable InconsistentNaming
