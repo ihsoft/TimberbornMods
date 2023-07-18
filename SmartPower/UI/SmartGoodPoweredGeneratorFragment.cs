@@ -16,8 +16,10 @@ namespace IgorZ.SmartPower.UI {
 /// <summary>UI fragment that controls <see cref="SmartGoodPoweredGenerator"/> settings.</summary>
 sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
   const string NeverStopThisGeneratorLocKey = "IgorZ.SmartPower.PoweredGenerator.NeverStop";
-  const string ChargeLevelLocKey = "IgorZ.SmartPower.PoweredGenerator.ChargeBatteriesRatioText";
+  const string ChargeLevelLocKey = "IgorZ.SmartPower.PoweredGenerator.ChargeBatteriesRangeText";
   static readonly Color NormalColor = new(0.8f, 0.8f, 0.8f);
+  const float BatteriesChargeRangeSize = 0.25f;
+  const float BatteriesChargeRangeStep = 0.05f;
 
   readonly UIBuilder _builder;
   readonly ILoc _loc;
@@ -45,13 +47,14 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
         });
 
     _chargeBatteriesSlider = _visualElementLoader.LoadVisualElement("Common/IntegerSlider").Q<Slider>("Slider");
-    _chargeBatteriesSlider.lowValue = 0.0f;
-    _chargeBatteriesSlider.highValue = 1.0f;
+    _chargeBatteriesSlider.lowValue = 0.1f;
+    _chargeBatteriesSlider.highValue = 0.9f - BatteriesChargeRangeSize;
     _chargeBatteriesSlider.RegisterValueChangedCallback(
         _ => {
-          var value = Mathf.Round(_chargeBatteriesSlider.value / 0.05f) * 0.05f;
+          var value = Mathf.Round(_chargeBatteriesSlider.value / BatteriesChargeRangeStep) * BatteriesChargeRangeStep;
           _chargeBatteriesSlider.SetValueWithoutNotify(value);
-          _generator.ChargeBatteriesThreshold = value;
+          _generator.DischargeBatteriesThreshold = value;
+          _generator.ChargeBatteriesThreshold = value + BatteriesChargeRangeSize;
           UpdateControls();
         });
 
@@ -71,7 +74,7 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
     _generator = entity.GetComponentFast<SmartGoodPoweredGenerator>();
     if (_generator != null) {
       _neverShutdownCheckbox.SetValueWithoutNotify(_generator.NeverShutdown);
-      _chargeBatteriesSlider.SetValueWithoutNotify(_generator.ChargeBatteriesThreshold);
+      _chargeBatteriesSlider.SetValueWithoutNotify(_generator.DischargeBatteriesThreshold);
       UpdateControls();
       _root.ToggleDisplayStyle(visible: true);
     } else {
@@ -88,14 +91,9 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
   }
 
   void UpdateControls() {
-    if (_generator.NeverShutdown) {
-      _chargeBatteriesText.ToggleDisplayStyle(visible: false);
-      _chargeBatteriesSlider.ToggleDisplayStyle(visible: false);
-    } else {
-      _chargeBatteriesText.ToggleDisplayStyle(visible: true);
-      _chargeBatteriesSlider.ToggleDisplayStyle(visible: true);
-      _chargeBatteriesText.text = _loc.T(ChargeLevelLocKey, Mathf.RoundToInt(_chargeBatteriesSlider.value * 100));
-    }
+    _chargeBatteriesText.text = _loc.T(
+        ChargeLevelLocKey, Mathf.RoundToInt(_generator.DischargeBatteriesThreshold * 100),
+        Mathf.RoundToInt(_generator.ChargeBatteriesThreshold * 100));
   }
 }
 

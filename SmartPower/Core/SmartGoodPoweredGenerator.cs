@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using Timberborn.BuildingsBlocking;
 using Timberborn.GoodConsumingBuildingSystem;
 using Timberborn.MechanicalSystem;
 using Timberborn.Persistence;
@@ -17,17 +18,19 @@ namespace IgorZ.SmartPower {
 /// The checking algorithm doesn't take into account the power in the batteries.
 /// </remarks>
 public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersistentEntity {
-  const float DefaultBatteryChargingRatio = 0.9f;
+  const float MaxBatteryChargeRatio = 0.9f;
+  const float MinBatteryChargeRatio = 0.65f;
 
   GoodConsumingBuilding _goodConsumingBuilding;
   MechanicalNode _mechanicalNode;
+  PausableBuilding _pausable;
   int _maxPower;
   int _skipTicks;
 
   #region TickableComponent implementation
   /// <inheritdoc/>
   public override void Tick() {
-    if (_mechanicalNode.Graph != null) {
+    if ((_pausable == null || !_pausable.Paused) && _mechanicalNode.Graph != null) {
       UpdateGoodConsumption();
     }
   }
@@ -37,20 +40,25 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
   static readonly ComponentKey AutomationBehaviorKey = new(typeof(SmartGoodPoweredGenerator).FullName);
   static readonly PropertyKey<bool> NeverShutdownKey = new(nameof(NeverShutdown));
   static readonly PropertyKey<float> ChargeBatteriesThresholdKey = new(nameof(ChargeBatteriesThreshold));
+  static readonly PropertyKey<float> DischargeBatteriesThresholdKey = new(nameof(DischargeBatteriesThreshold));
 
+  /// <inheritdoc/>
   public void Save(IEntitySaver entitySaver) {
     var saver = entitySaver.GetComponent(AutomationBehaviorKey);
     saver.Set(NeverShutdownKey, NeverShutdown);
     saver.Set(ChargeBatteriesThresholdKey, ChargeBatteriesThreshold);
+    saver.Set(DischargeBatteriesThresholdKey, DischargeBatteriesThreshold);
   }
 
+  /// <inheritdoc/>
   public void Load(IEntityLoader entityLoader) {
     if (!entityLoader.HasComponent(AutomationBehaviorKey)) {
       return;
     }
     var state = entityLoader.GetComponent(AutomationBehaviorKey);
     NeverShutdown = state.GetValueOrNullable(NeverShutdownKey) ?? false;
-    ChargeBatteriesThreshold = state.GetValueOrNullable(ChargeBatteriesThresholdKey) ?? DefaultBatteryChargingRatio;
+    ChargeBatteriesThreshold = state.GetValueOrNullable(ChargeBatteriesThresholdKey) ?? MaxBatteryChargeRatio;
+    DischargeBatteriesThreshold = state.GetValueOrNullable(DischargeBatteriesThresholdKey) ?? MinBatteryChargeRatio;
   }
   #endregion
 
@@ -58,8 +66,11 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
   /// <summary>Tells the smart logic to never shutdown this generator.</summary>
   public bool NeverShutdown { get; set; }
 
-  /// <summary>Sets the maximum level to which this generator should charge teh batteries.</summary>
-  public float ChargeBatteriesThreshold { get; set; } = DefaultBatteryChargingRatio;
+  /// <summary>The maximum level to which this generator should charge the batteries.</summary>
+  public float ChargeBatteriesThreshold { get; set; } = MaxBatteryChargeRatio;
+
+  /// <summary>The minimum level to let the batteries to discharge to.</summary>
+  public float DischargeBatteriesThreshold { get; set; } = MinBatteryChargeRatio;
   #endregion
 
   #region Implementation
@@ -68,6 +79,10 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
     _goodConsumingBuilding = GetComponentFast<GoodConsumingBuilding>();
     _mechanicalNode = GetComponentFast<MechanicalNode>();
     _maxPower = GetComponentFast<MechanicalNodeSpecification>().PowerOutput;
+    _pausable = GetComponentFast<PausableBuilding>();
+    if (_pausable) {
+      _pausable.PausedChanged += (_, _) => _goodConsumingBuilding.ResumeConsumption();
+    }
     enabled = true;
   }
 
@@ -81,33 +96,41 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
     var supply = currentPower.PowerSupply;
     var batteryCapacity = 0;
     var batteryCharge = 0.0f;
+    var hasBatteries = false;
     foreach (var batteryCtrl in _mechanicalNode.Graph.BatteryControllers) {
       if (batteryCtrl.Operational) {
         batteryCapacity += batteryCtrl.Capacity;
         batteryCharge += batteryCtrl.Charge;
+        hasBatteries = true;
       }
     }
-    var needChargedBatteries =
-        ChargeBatteriesThreshold > 0 && batteryCharge < batteryCapacity * ChargeBatteriesThreshold;
+    var batteriesChargeRatio = hasBatteries ? batteryCharge / batteryCapacity : -1;
     if (_goodConsumingBuilding.ConsumptionPaused) {
-      if (demand <= supply && !needChargedBatteries && !NeverShutdown) {
-        return;
+      // Resume if need power to charge batteries or cover shortage.
+      if (!hasBatteries && demand > supply
+          || hasBatteries && batteriesChargeRatio < DischargeBatteriesThreshold
+          || NeverShutdown) {
+        HostedDebugLog.Fine(
+            this, "Start good consumption: demand={0}, supply={1}, batteries={2:0.00}, threshold={3}",
+            demand, supply, batteriesChargeRatio, DischargeBatteriesThreshold);
+        _goodConsumingBuilding.ResumeConsumption();
+        if (_goodConsumingBuilding.HoursUntilNoSupply > 0) {
+          _mechanicalNode.Active = true;
+          _mechanicalNode.UpdateOutput(1.0f); // Be optimistic, let it update in the next tick.
+          _skipTicks = 1;
+        }
       }
-      HostedDebugLog.Fine(this, "Start good consumption: demand={0}, supply={1}", demand, supply);
-      _goodConsumingBuilding.ResumeConsumption();
-      if (_goodConsumingBuilding.HoursUntilNoSupply > 0) {
-        _mechanicalNode.Active = true;
-        _mechanicalNode.UpdateOutput(1.0f); // Be optimistic, let it update in the next tick.
+    } else if (!NeverShutdown) {
+      // Pause if no ways to spend the excess power from the generator.
+      if (!hasBatteries && supply - _maxPower >= demand 
+          || hasBatteries && batteriesChargeRatio > ChargeBatteriesThreshold) {
+        HostedDebugLog.Fine(
+            this, "Stop good consumption: demand={0}, supply={1}, batteries={2:0.00}, check={3}",
+            demand, supply, batteriesChargeRatio, ChargeBatteriesThreshold);
+        _goodConsumingBuilding.PauseConsumption();
+        _mechanicalNode.UpdateOutput(0);  // The graph will be updated on the next tick.
         _skipTicks = 1;
       }
-    } else {
-      if (demand > supply - _maxPower || needChargedBatteries || NeverShutdown) {
-        return;
-      }
-      HostedDebugLog.Fine(this, "Stop good consumption: demand={0}, supply={1}", demand, supply);
-      _goodConsumingBuilding.PauseConsumption();
-      _mechanicalNode.UpdateOutput(0);  // The graph will be updated on the next tick.
-      _skipTicks = 1;
     }
   }
   #endregion
