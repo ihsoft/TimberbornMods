@@ -49,11 +49,14 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
     _chargeBatteriesSlider.highValue = 1.0f;
     _chargeBatteriesSlider.RegisterValueChangedCallback(
         _ => {
-          _generator.ChargeBatteriesThreshold = _chargeBatteriesSlider.value;
+          var value = Mathf.Round(_chargeBatteriesSlider.value / 0.05f) * 0.05f;
+          _chargeBatteriesSlider.SetValueWithoutNotify(value);
+          _generator.ChargeBatteriesThreshold = value;
           UpdateControls();
         });
 
     _chargeBatteriesText = _builder.Presets().Labels().Label(color: NormalColor);
+    _chargeBatteriesText.style.marginTop = 5;
 
     _root = _builder.CreateFragmentBuilder()
         .AddComponent(_neverShutdownCheckbox)
