@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using Bindito.Core;
+using IgorZ.TimberDev.Utils.Utils;
 using TimberApi.ConfiguratorSystem;
 using TimberApi.SceneSystem;
 using Timberborn.EntityPanelSystem;
@@ -13,7 +14,13 @@ namespace IgorZ.SmartPower.UI {
 [Configurator(SceneEntrypoint.InGame)]
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
+  static readonly string PatchId = typeof(Configurator).FullName;
+
   public void Configure(IContainerDefinition containerDefinition) {
+    HarmonyPatcher.PatchRepeated(
+        PatchId,
+        typeof(NetworkFragmentServicePatch),
+        typeof(ConsumerFragmentServicePatch));
     containerDefinition.Bind<SmartGoodPoweredGeneratorFragment>().AsSingleton();
     containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
   }

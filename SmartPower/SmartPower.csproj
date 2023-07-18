@@ -59,6 +59,8 @@
       <Compile Include="SmartMechanicalBuilding.cs" />
       <Compile Include="SmartPoweredAttraction.cs" />
       <Compile Include="UI\Configurator.cs" />
+      <Compile Include="UI\ConsumerFragmentServicePatch.cs" />
+      <Compile Include="UI\NetworkFragmentServicePatch.cs" />
       <Compile Include="UI\SmartGoodPoweredGeneratorFragment.cs" />
     </ItemGroup>
     <ItemGroup>

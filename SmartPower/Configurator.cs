@@ -2,20 +2,16 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Reflection;
 using Bindito.Core;
-using HarmonyLib;
 using IgorZ.TimberDev.CustomInstantiator;
 using TimberApi.ConfiguratorSystem;
 using TimberApi.SceneSystem;
 using Timberborn.Attractions;
 using Timberborn.EnterableSystem;
-using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
 using Timberborn.PowerGenerating;
 using IgorZ.TimberDev.Utils.Utils;
 using Timberborn.Workshops;
-using UnityEngine.UIElements;
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Local
@@ -32,10 +28,6 @@ sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).FullName;
 
   public void Configure(IContainerDefinition containerDefinition) {
-    HarmonyPatcher.PatchRepeated(
-        PatchId,
-        typeof(NetworkFragmentServicePatch),
-        typeof(ConsumerFragmentServicePatch));
     CustomizableInstantiator.AddPatcher(
         PatchId,
         prefab => {
@@ -44,42 +36,6 @@ sealed class Configurator : IConfigurator {
               prefab, SmartMechBuildingDeps.Check);
           PrefabPatcher.AddComponent<SmartPoweredAttraction>(prefab, SmartAttractionDeps.Check);
         });
-  }
-
-  [HarmonyPatch]
-  static class NetworkFragmentServicePatch {
-    const string NetworkFragmentServiceClassName = "Timberborn.MechanicalSystemUI.NetworkFragmentService";
-    const string MethodName = "Update";
-
-    static MethodBase TargetMethod() {
-      var type = AccessTools.TypeByName(NetworkFragmentServiceClassName);
-      return AccessTools.FirstMethod(type, method => method.Name == MethodName);
-    }
-
-    static void Postfix(MechanicalNode mechanicalNode, Label ____label, ILoc ____loc) {
-      var text = StateTextFormatter.FormatBatteryText(mechanicalNode, ____loc);
-      if (text != null) {
-        ____label.text += "\n" + text;
-      }
-    }
-  }
-
-  [HarmonyPatch]
-  static class ConsumerFragmentServicePatch {
-    const string NetworkFragmentServiceClassName = "Timberborn.MechanicalSystemUI.ConsumerFragmentService";
-    const string MethodName = "Update";
-
-    static MethodBase TargetMethod() {
-      var type = AccessTools.TypeByName(NetworkFragmentServiceClassName);
-      return AccessTools.FirstMethod(type, method => method.Name == MethodName);
-    }
-
-    static void Postfix(MechanicalNode mechanicalNode, Label ____label, ILoc ____loc) {
-      var text = StateTextFormatter.FormatBuildingText(mechanicalNode, ____loc);
-      if (text != null) {
-        ____label.text += "\n" + text;
-      }
-    }
   }
 }
 
