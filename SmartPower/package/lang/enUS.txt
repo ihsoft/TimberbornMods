@@ -4,6 +4,7 @@ IgorZ.SmartPower.BatteryCharging,"Batteries charging: <GreenHighlight>🡅</Gree
 IgorZ.SmartPower.BatteryDischarging,"Batteries discharging: <RedHighlight>🡇</RedHighlight>{0} ({1})"
 
 IgorZ.SmartPower.PoweredGenerator.NeverStop,"Never stop this generator"
+IgorZ.SmartPower.PoweredGenerator.ChargeBatteriesRatioText,"Charge batteries to {0}%"
 
 IgorZ.SmartPower.MechanicalBuilding.NoWorkersStatus,"<SolidHighlight>⏻</SolidHighlight> No workers at workplace"
 IgorZ.SmartPower.MechanicalBuilding.NoFuelStatus,"<SolidHighlight>⏻</SolidHighlight> Fuel has run out"

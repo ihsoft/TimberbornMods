@@ -16,7 +16,7 @@ namespace IgorZ.SmartPower.UI {
 /// <summary>UI fragment that controls <see cref="SmartGoodPoweredGenerator"/> settings.</summary>
 sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
   const string NeverStopThisGeneratorLocKey = "IgorZ.SmartPower.PoweredGenerator.NeverStop";
-  const string ChargeLevelLocKey = "Charge batteries to {0}%";
+  const string ChargeLevelLocKey = "IgorZ.SmartPower.PoweredGenerator.ChargeBatteriesRatioText";
   static readonly Color NormalColor = new(0.8f, 0.8f, 0.8f);
 
   readonly UIBuilder _builder;
