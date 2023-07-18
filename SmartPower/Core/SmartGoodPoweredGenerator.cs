@@ -17,7 +17,6 @@ namespace IgorZ.SmartPower {
 /// The checking algorithm doesn't take into account the power in the batteries.
 /// </remarks>
 public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersistentEntity {
-  const float BatteryChargeThreshold = 0.9f;
   GoodConsumingBuilding _goodConsumingBuilding;
   MechanicalNode _mechanicalNode;
   int _maxPower;
@@ -35,9 +34,12 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
   #region IPersistentEntity implemenatation
   static readonly ComponentKey AutomationBehaviorKey = new(typeof(SmartGoodPoweredGenerator).FullName);
   static readonly PropertyKey<bool> NeverShutdownKey = new(nameof(NeverShutdown));
+  static readonly PropertyKey<float> ChargeBatteriesThresholdKey = new(nameof(ChargeBatteriesThreshold));
 
   public void Save(IEntitySaver entitySaver) {
-    entitySaver.GetComponent(AutomationBehaviorKey).Set(NeverShutdownKey, NeverShutdown);
+    var saver = entitySaver.GetComponent(AutomationBehaviorKey);
+    saver.Set(NeverShutdownKey, NeverShutdown);
+    saver.Set(ChargeBatteriesThresholdKey, ChargeBatteriesThreshold);
   }
 
   public void Load(IEntityLoader entityLoader) {
@@ -46,12 +48,16 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
     }
     var state = entityLoader.GetComponent(AutomationBehaviorKey);
     NeverShutdown = state.GetValueOrNullable(NeverShutdownKey) ?? false;
+    ChargeBatteriesThreshold = state.GetValueOrNullable(ChargeBatteriesThresholdKey) ?? 0.9f;
   }
   #endregion
 
   #region API
   /// <summary>Tells the smart logic to never shutdown this generator.</summary>
   public bool NeverShutdown { get; set; }
+
+  /// <summary>Sets the maximum level to which this generator should charge teh batteries.</summary>
+  public float ChargeBatteriesThreshold { get; set; }
   #endregion
 
   #region Implementation
@@ -79,9 +85,10 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
         batteryCharge += batteryCtrl.Charge;
       }
     }
-    var hasUnchargedBatteries = batteryCharge < batteryCapacity * BatteryChargeThreshold;
+    var needChargedBatteries =
+        ChargeBatteriesThreshold > 0 && batteryCharge < batteryCapacity * ChargeBatteriesThreshold;
     if (_goodConsumingBuilding.ConsumptionPaused) {
-      if (demand <= supply && !hasUnchargedBatteries && !NeverShutdown) {
+      if (demand <= supply && !needChargedBatteries && !NeverShutdown) {
         return;
       }
       HostedDebugLog.Fine(this, "Start good consumption: demand={0}, supply={1}", demand, supply);
@@ -92,7 +99,7 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
         _skipTicks = 1;
       }
     } else {
-      if (demand > supply - _maxPower || hasUnchargedBatteries || NeverShutdown) {
+      if (demand > supply - _maxPower || needChargedBatteries || NeverShutdown) {
         return;
       }
       HostedDebugLog.Fine(this, "Stop good consumption: demand={0}, supply={1}", demand, supply);
