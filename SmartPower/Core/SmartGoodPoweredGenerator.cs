@@ -2,7 +2,6 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Linq;
 using Timberborn.GoodConsumingBuildingSystem;
 using Timberborn.MechanicalSystem;
 using Timberborn.Persistence;
@@ -18,7 +17,7 @@ namespace IgorZ.SmartPower {
 /// The checking algorithm doesn't take into account the power in the batteries.
 /// </remarks>
 public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersistentEntity {
-  const float ChargeThreshold = 0.9f;
+  const float BatteryChargeThreshold = 0.9f;
   GoodConsumingBuilding _goodConsumingBuilding;
   MechanicalNode _mechanicalNode;
   int _maxPower;
@@ -72,7 +71,15 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
     var currentPower = _mechanicalNode.Graph.CurrentPower;
     var demand = currentPower.PowerDemand;
     var supply = currentPower.PowerSupply;
-    var hasUnchargedBatteries = HasUnchargedBatteries();
+    var batteryCapacity = 0;
+    var batteryCharge = 0.0f;
+    foreach (var batteryCtrl in _mechanicalNode.Graph.BatteryControllers) {
+      if (batteryCtrl.Operational) {
+        batteryCapacity += batteryCtrl.Capacity;
+        batteryCharge += batteryCtrl.Charge;
+      }
+    }
+    var hasUnchargedBatteries = batteryCharge < batteryCapacity * BatteryChargeThreshold;
     if (_goodConsumingBuilding.ConsumptionPaused) {
       if (demand <= supply && !hasUnchargedBatteries && !NeverShutdown) {
         return;
@@ -92,11 +99,6 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
       _goodConsumingBuilding.PauseConsumption();
       _mechanicalNode.UpdateOutput(0);  // The graph will be updated on the next tick.
       _skipTicks = 1;
-    }
-
-    bool HasUnchargedBatteries() {
-      return _mechanicalNode.Graph.BatteryControllers
-          .Any(ctrl => ctrl.Operational && ctrl.NormalizedCharge < ChargeThreshold);
     }
   }
   #endregion
