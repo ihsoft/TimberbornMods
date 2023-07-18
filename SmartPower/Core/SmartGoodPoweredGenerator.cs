@@ -17,6 +17,8 @@ namespace IgorZ.SmartPower {
 /// The checking algorithm doesn't take into account the power in the batteries.
 /// </remarks>
 public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersistentEntity {
+  const float DefaultBatteryChargingRatio = 0.9f;
+
   GoodConsumingBuilding _goodConsumingBuilding;
   MechanicalNode _mechanicalNode;
   int _maxPower;
@@ -48,7 +50,7 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
     }
     var state = entityLoader.GetComponent(AutomationBehaviorKey);
     NeverShutdown = state.GetValueOrNullable(NeverShutdownKey) ?? false;
-    ChargeBatteriesThreshold = state.GetValueOrNullable(ChargeBatteriesThresholdKey) ?? 0.9f;
+    ChargeBatteriesThreshold = state.GetValueOrNullable(ChargeBatteriesThresholdKey) ?? DefaultBatteryChargingRatio;
   }
   #endregion
 
@@ -57,7 +59,7 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
   public bool NeverShutdown { get; set; }
 
   /// <summary>Sets the maximum level to which this generator should charge teh batteries.</summary>
-  public float ChargeBatteriesThreshold { get; set; }
+  public float ChargeBatteriesThreshold { get; set; } = DefaultBatteryChargingRatio;
   #endregion
 
   #region Implementation
