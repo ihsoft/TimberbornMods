@@ -89,15 +89,13 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
 
   void UpdateControls() {
     if (_generator.NeverShutdown) {
-      _chargeBatteriesText.SetEnabled(false);
-      _chargeBatteriesSlider.SetEnabled(false);
-      _chargeBatteriesSlider.SetValueWithoutNotify(1.0f);
-      _generator.ChargeBatteriesThreshold = 1.0f;
+      _chargeBatteriesText.ToggleDisplayStyle(visible: false);
+      _chargeBatteriesSlider.ToggleDisplayStyle(visible: false);
     } else {
-      _chargeBatteriesText.SetEnabled(true);
-      _chargeBatteriesSlider.SetEnabled(true);
+      _chargeBatteriesText.ToggleDisplayStyle(visible: true);
+      _chargeBatteriesSlider.ToggleDisplayStyle(visible: true);
+      _chargeBatteriesText.text = _loc.T(ChargeLevelLocKey, Mathf.RoundToInt(_chargeBatteriesSlider.value * 100));
     }
-    _chargeBatteriesText.text = _loc.T(ChargeLevelLocKey, Mathf.RoundToInt(_chargeBatteriesSlider.value * 100));
   }
 }
 
