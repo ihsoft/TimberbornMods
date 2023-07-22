@@ -100,7 +100,7 @@
         <HintPath>..\Dependencies\Timberborn\Timberborn.WaterSystem.dll</HintPath>
       </Reference>
       <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\..\..\Unity\UnityDev_Utils\Dependencies\Unity\UnityEngine.CoreModule.dll</HintPath>
+        <HintPath>..\Dependencies\Unity\UnityEngine.CoreModule.dll</HintPath>
       </Reference>
       <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Unity\UnityEngine.TextRenderingModule.dll</HintPath>
