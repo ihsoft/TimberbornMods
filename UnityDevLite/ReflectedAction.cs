@@ -62,6 +62,9 @@ public sealed class ReflectedAction<T, TArg0> {
   /// <seealso cref="IsValid"/>
   public ReflectedAction(string methodName,  bool throwOnFailure = false) {
     _methodInfo = typeof(T).GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+    if (_methodInfo != null) {
+      return;
+    }
     if (throwOnFailure) {
       throw new InvalidOperationException($"Cannot obtain method {typeof(T)}.{methodName}");
     }
