@@ -13,7 +13,7 @@ using Object = UnityEngine.Object;
 namespace IgorZ.TimberDev.Utils {
 
 /// <summary>Helper class for managing prefab components.</summary>
-public static class PrefabPatcher {
+static class PrefabPatcher {
   /// <summary>Adds a new component to prefab based in the filter condition.</summary>
   /// <param name="prefab">Prefab to add the component to.</param>
   /// <param name="checkDeps">Filter condition.</param>

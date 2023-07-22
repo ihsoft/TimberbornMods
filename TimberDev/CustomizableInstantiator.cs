@@ -20,7 +20,7 @@ namespace IgorZ.TimberDev.CustomInstantiator {
 /// can be configured differently from their normal asset state.
 /// </remarks>
 /// <seealso cref="PrefabPatcher"/>
-public static class CustomizableInstantiator {
+static class CustomizableInstantiator {
   static readonly string HarmonyPatchId = typeof(CustomizableInstantiator).AssemblyQualifiedName;
 
   /// <summary>Adds a patcher method. Must be called from the <c>InGame</c> configurator.</summary>

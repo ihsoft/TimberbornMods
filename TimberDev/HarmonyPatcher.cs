@@ -10,7 +10,7 @@ using UnityDev.Utils.LogUtilsLite;
 namespace IgorZ.TimberDev.Utils {
 
 /// <summary>Helper class to safely apply harmony patches.</summary>
-public static class HarmonyPatcher {
+static class HarmonyPatcher {
   /// <summary>Applies Harmony patches.</summary>
   /// <remarks>This method ensures that no Harmony patches are applied twice.</remarks>
   /// <param name="patchId">Unique patch ID. Duplicated patches for the same ID will be silently ignored.</param>

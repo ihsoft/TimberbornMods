@@ -12,7 +12,7 @@ namespace UnityDev.Utils.Reflections {
 /// <summary>Wrapper to implement an efficient access to the class method via reflection.</summary>
 /// <remarks>Implements access to a method that returns <c>void</c> and accepts no arguments.</remarks>
 /// <typeparam name="T">type of the class to get the method for.</typeparam>
-public sealed class ReflectedAction<T> {
+sealed class ReflectedAction<T> {
   readonly MethodInfo _methodInfo;
 
   /// <summary>Creates the reflection for the action.</summary>
@@ -50,7 +50,7 @@ public sealed class ReflectedAction<T> {
 /// <remarks>Implements access to a method that returns <c>void</c> and accepts exactly one argument.</remarks>
 /// <typeparam name="T">type of the class to get the method for.</typeparam>
 /// <typeparam name="TArg0">type of the action argument.</typeparam>
-public sealed class ReflectedAction<T, TArg0> {
+sealed class ReflectedAction<T, TArg0> {
   readonly MethodInfo _methodInfo;
 
   /// <summary>Creates the reflection for the action.</summary>

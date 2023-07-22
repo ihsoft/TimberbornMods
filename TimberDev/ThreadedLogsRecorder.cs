@@ -14,7 +14,7 @@ namespace IgorZ.TimberDev.Logging {
 
 /// <summary>Helper to catch logs from the non-main threads and spitting them out to the main logger.</summary>
 /// <remarks>Bind this class via Bindito as singleton to make it working.</remarks>
-public class ThreadedLogsRecorder : ILoadableSingleton, ITickableSingleton {
+class ThreadedLogsRecorder : ILoadableSingleton, ITickableSingleton {
   readonly ConcurrentQueue<string> _logRecords = new();
   Thread _mainUnityThread;
 

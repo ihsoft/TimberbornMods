@@ -13,7 +13,7 @@ namespace UnityDev.Utils.LogUtilsLite {
 /// <remarks>https://github.com/ihsoft/UnityDev_Utils</remarks>
 /// <seealso cref="DebugEx.LoggingSettings"/>
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-public static class HostedDebugLog {
+static class HostedDebugLog {
   /// <summary>Logs a formatted INFO message with a host identifier.</summary>
   public static void Info(BaseComponent host, string format, params object[] args) {
     Log(LogType.Log, host, format, args);

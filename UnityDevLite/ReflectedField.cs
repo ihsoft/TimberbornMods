@@ -12,7 +12,7 @@ namespace UnityDev.Utils.Reflections {
 /// <remarks>It ignores access scope.</remarks>
 /// <typeparam name="T">type of the class to get the field for.</typeparam>
 /// <typeparam name="TV">type of the field value.</typeparam>
-public sealed class ReflectedField<T, TV> {
+sealed class ReflectedField<T, TV> {
   readonly FieldInfo _fieldInfo;
 
   /// <summary>Creates the reflection for the field.</summary>
@@ -68,7 +68,7 @@ public sealed class ReflectedField<T, TV> {
 /// <summary>Wrapper to implement efficient access to the class fields via reflection.</summary>
 /// <remarks>It ignores access scope.</remarks>
 /// <typeparam name="TV">type of the field value.</typeparam>
-public sealed class ReflectedField<TV> {
+sealed class ReflectedField<TV> {
   readonly FieldInfo _fieldInfo;
 
   /// <summary>Creates the reflection for the field.</summary>
