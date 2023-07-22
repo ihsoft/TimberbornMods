@@ -5,6 +5,7 @@
 using Bindito.Core;
 using IgorZ.TimberCommons.WaterService;
 using Timberborn.BlockSystem;
+using Timberborn.Persistence;
 using Timberborn.TickSystem;
 using Timberborn.WaterSystem;
 using UnityEngine;
@@ -13,22 +14,20 @@ namespace IgorZ.TimberCommons.WaterValveComponent {
 
 // TODO: settings
 // Ingame:
-// * Limit overflow (over 1 high) maybe user setting default 1high
-// * Backflow
+// * Limit overflow (over 1 high) maybe user setting default 1high - NA
+// * Backflow - NA
 // Component:
-// * Enable overflow(or just user setting)
-// * max Flow rate
+// * Enable overflow(or just user setting) - NA
 // * Variable flow rate toggle
 // * Allow backflow
 // * Min water lever
-// * In/output cord
 
 /// <summary>Component that moves water from input to output based on the water levels.</summary>
 /// <remarks>
 /// The water is moved from tiles with a higher level to the tiles with a lover level. The maximum water flow can be
 /// limited. Add this component to a water obstacle prefab.
 /// </remarks>
-public class WaterValve : TickableComponent {
+public class WaterValve : TickableComponent, IPersistentEntity {
   #region Unity fields
   // ReSharper disable InconsistentNaming
 
@@ -39,16 +38,13 @@ public class WaterValve : TickableComponent {
   Vector2Int _outputCoordinates = new(0, 2);
 
   [SerializeField]
-  internal float _waterFlowPerSecond = 1.5f;
+  float _waterFlowPerSecond = 1.5f;
 
   [SerializeField]
-  internal float _flowBoostPerOneMeterDiff = 0.0f;
+  bool _canChangeFlowInGame = false;
 
   [SerializeField]
-  internal float _minimumWaterLevel = 0.1f;
-
-  [SerializeField]
-  internal float _minimumWaterLevelDiff = 0.05f;
+  float _minimumInGameFlow = 0;
 
   // ReSharper restore InconsistentNaming
   #endregion
@@ -58,6 +54,9 @@ public class WaterValve : TickableComponent {
   public float WaterHeightAtOutput { get; private set; }
   public float CurrentFlow { get; private set; }
   public float FlowLimit => _waterFlowPerSecond;
+  public float FlowLimitSetting { get; internal set; }
+  public bool CanChangeFlowInGame => _canChangeFlowInGame;
+  public float MinimumInGameFlow => _minimumInGameFlow;
   #endregion
 
   IWaterService _waterService;
@@ -70,7 +69,7 @@ public class WaterValve : TickableComponent {
   int _valveBaseZ;
 
   //FIXME: check the ouptut drop level? can it be palced like this? maybe yes
-  internal bool _logStats;
+  internal bool _logExtraStats;
   internal bool _useCustomSimulation = true;
 
   void Awake() {
@@ -82,8 +81,8 @@ public class WaterValve : TickableComponent {
     base.StartTickable();
     _valveBaseZ = _blockObject.Coordinates.z;
     // FIXME: Debug settings
-    _inputCoordinates = new Vector2Int(0, -3);
-    _outputCoordinates = new Vector2Int(0, 4);
+    // _inputCoordinates = new Vector2Int(0, -3);
+    // _outputCoordinates = new Vector2Int(0, 4);
     _inputCoordinatesTransformed = _blockObject.Transform(_inputCoordinates);
     _inputTileIndex = _directWaterServiceAccessor.MapIndexService.CoordinatesToIndex(_inputCoordinatesTransformed);
     _outputCoordinatesTransformed = _blockObject.Transform(_outputCoordinates);
@@ -99,7 +98,7 @@ public class WaterValve : TickableComponent {
       _directWaterServiceAccessor.DeleteWaterConsumer(_inputTileIndex);
       MoveWaterLight(Time.fixedDeltaTime);
     } else {
-      _directWaterServiceAccessor.SetWaterConsumer(_inputTileIndex, _waterFlowPerSecond);
+      _directWaterServiceAccessor.SetWaterConsumer(_inputTileIndex, FlowLimitSetting);
       _directWaterServiceAccessor.FlushWaterStats(
           _inputTileIndex, out var waterTakenLastTick, out var waterShortageLastTick);
       CurrentFlow = 2 * waterTakenLastTick / Time.fixedDeltaTime;
@@ -109,11 +108,8 @@ public class WaterValve : TickableComponent {
 
   void MoveWaterLight(float deltaTime) {
     CurrentFlow = 0;
-    if (WaterHeightAtInput - WaterHeightAtOutput < _minimumWaterLevelDiff) {
-      return;
-    }
     var availableWater = WaterHeightAtInput - WaterHeightAtOutput;
-    var canMoveWater = Mathf.Min(availableWater, _waterFlowPerSecond);
+    var canMoveWater = Mathf.Min(availableWater, FlowLimitSetting);
     CurrentFlow = canMoveWater / deltaTime;
     var depthChange = canMoveWater / 2;
     _waterService.AddWater(_inputCoordinatesTransformed, depthChange);
@@ -125,6 +121,27 @@ public class WaterValve : TickableComponent {
     _waterService = waterService;
     _directWaterServiceAccessor = directWaterServiceAccessor;
   }
+
+  #region IPersistentEntity implementation
+  static readonly ComponentKey WaterValveKey = new(typeof(WaterValve).FullName);
+  static readonly PropertyKey<float> WaterFlowLimitKey = new(nameof(FlowLimitSetting));
+
+  /// <inheritdoc/>
+  public void Save(IEntitySaver entitySaver) {
+    var saver = entitySaver.GetComponent(WaterValveKey);
+    saver.Set(WaterFlowLimitKey, FlowLimitSetting);
+  }
+
+  /// <inheritdoc/>
+  public void Load(IEntityLoader entityLoader) {
+    if (!entityLoader.HasComponent(WaterValveKey)) {
+      FlowLimitSetting = _waterFlowPerSecond;
+      return;
+    }
+    var state = entityLoader.GetComponent(WaterValveKey);
+    FlowLimitSetting = state.GetValueOrNullable(WaterFlowLimitKey) ?? _waterFlowPerSecond;
+  }
+  #endregion
 }
 
 }
