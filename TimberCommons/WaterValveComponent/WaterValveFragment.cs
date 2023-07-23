@@ -17,8 +17,8 @@ namespace IgorZ.TimberCommons.WaterValveComponent {
 sealed class WaterValveFragment : IEntityPanelFragment {
   const string WaterFlowTextLocKey = "Limit water flow to: {0} cms";
   const string WaterFlowLocKey = "Water flow: {0} cms";
-  const string WaterLevelAtInput = "Water level at input: {0:0.00} m";
-  const string WaterLevelAtOutput = "Water level at output: {0:0.00} m";
+  const string WaterLevelAtInput = "Water level at input: {0:0.00}";
+  const string WaterLevelAtOutput = "Water level at output: {0:0.00}";
 
   readonly UIBuilder _builder;
   readonly ILoc _loc;
@@ -66,12 +66,12 @@ sealed class WaterValveFragment : IEntityPanelFragment {
         });
 
     _root = _builder.CreateFragmentBuilder()
-        .AddComponent(_useCustomSimulationCheckbox)
-        .AddComponent(_logStatsCheckbox)
         .AddComponent(_waterFlowText)
         .AddComponent(_waterFlowSlider)
         .AddComponent(_infoLabel)
-        .BuildAndInitialize();;
+        .AddComponent(_useCustomSimulationCheckbox)
+        .AddComponent(_logStatsCheckbox)
+        .BuildAndInitialize();
     _root.ToggleDisplayStyle(visible: false);
     return _root;
   }
@@ -108,18 +108,18 @@ sealed class WaterValveFragment : IEntityPanelFragment {
       _waterFlowSlider.lowValue = 0;
       _waterFlowSlider.highValue = 10;
     } else {
-      _waterFlowSlider.lowValue = _waterValve.MinimumInGameFlow;
-      _waterFlowSlider.highValue = _waterValve.FlowLimit;
+      _waterFlowSlider.lowValue = Mathf.Min(_waterValve.MinimumInGameFlow, _waterValve.FlowLimitSetting);
+      _waterFlowSlider.highValue = Mathf.Max(_waterValve.FlowLimit, _waterValve.FlowLimitSetting);
     }
     _waterFlowSlider.SetValueWithoutNotify(_waterValve.FlowLimitSetting);
-    _waterFlowText.ToggleDisplayStyle(visible: _devModeManager.Enabled || adjustWaterFlow);
-    _waterFlowSlider.ToggleDisplayStyle(visible: _devModeManager.Enabled || adjustWaterFlow);
-    var info = new List<string>();
+    var info = new List<string> {
+        _loc.T(WaterFlowLocKey, _waterValve.CurrentFlow.ToString("0.0"))
+    };
     if (_devModeManager.Enabled) {
+      info.Add("\nDEV MODE DATA:");
       info.Add(string.Format(WaterLevelAtInput, _waterValve.WaterHeightAtInput));
       info.Add(string.Format(WaterLevelAtOutput, _waterValve.WaterHeightAtOutput));
     }
-    info.Add(_loc.T(WaterFlowLocKey, _waterValve.CurrentFlow.ToString("0.0")));
     _infoLabel.text = string.Join("\n", info);
   }
 }
