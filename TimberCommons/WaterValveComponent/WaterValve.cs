@@ -18,7 +18,6 @@ namespace IgorZ.TimberCommons.WaterValveComponent {
 // * Backflow - NA
 // Component:
 // * Enable overflow(or just user setting) - NA
-// * Variable flow rate toggle
 // * Allow backflow
 // * Min water lever
 
@@ -30,6 +29,9 @@ namespace IgorZ.TimberCommons.WaterValveComponent {
 public class WaterValve : TickableComponent, IPersistentEntity {
   #region Unity fields
   // ReSharper disable InconsistentNaming
+
+  [SerializeField]
+  bool _showUIPanel = true;
 
   [SerializeField]
   Vector2Int _inputCoordinates = new(0, 0);
@@ -57,18 +59,18 @@ public class WaterValve : TickableComponent, IPersistentEntity {
   public float FlowLimitSetting { get; internal set; }
   public bool CanChangeFlowInGame => _canChangeFlowInGame;
   public float MinimumInGameFlow => _minimumInGameFlow;
+  public bool ShowUIPanel => _showUIPanel;
   #endregion
 
   IWaterService _waterService;
   DirectWaterServiceAccessor _directWaterServiceAccessor;
+  DirectWaterServiceAccessor.WaterMover _waterMover;
 
   BlockObject _blockObject;
   Vector2Int _inputCoordinatesTransformed;
   Vector2Int _outputCoordinatesTransformed;
-  int _inputTileIndex;
   int _valveBaseZ;
 
-  //FIXME: check the ouptut drop level? can it be palced like this? maybe yes
   internal bool _logExtraStats;
   internal bool _useCustomSimulation = true;
 
@@ -80,29 +82,33 @@ public class WaterValve : TickableComponent, IPersistentEntity {
   public override void StartTickable() {
     base.StartTickable();
     _valveBaseZ = _blockObject.Coordinates.z;
-    // FIXME: Debug settings
-    // _inputCoordinates = new Vector2Int(0, -3);
-    // _outputCoordinates = new Vector2Int(0, 4);
     _inputCoordinatesTransformed = _blockObject.Transform(_inputCoordinates);
-    _inputTileIndex = _directWaterServiceAccessor.MapIndexService.CoordinatesToIndex(_inputCoordinatesTransformed);
     _outputCoordinatesTransformed = _blockObject.Transform(_outputCoordinates);
     _valveBaseZ = _blockObject.BaseZ;
   }
 
   // FIXME(IgorZ): Once the debugging is done, set the consumer state once in StartTickable. 
   public override void Tick() {
-    // FIXME: Unreliable check of the depths!
     WaterHeightAtInput = Mathf.Max(_waterService.WaterHeight(_inputCoordinatesTransformed), _valveBaseZ);
     WaterHeightAtOutput = Mathf.Max(_waterService.WaterHeight(_outputCoordinatesTransformed), _valveBaseZ);
     if (!_useCustomSimulation || !_directWaterServiceAccessor.IsValid) {
-      _directWaterServiceAccessor.DeleteWaterConsumer(_inputTileIndex);
+      if (_waterMover != null) {
+        _directWaterServiceAccessor.DeleteWaterMover(_waterMover);
+        _waterMover = null;
+      }
       MoveWaterLight(Time.fixedDeltaTime);
     } else {
-      _directWaterServiceAccessor.SetWaterConsumer(_inputTileIndex, FlowLimitSetting);
-      _directWaterServiceAccessor.FlushWaterStats(
-          _inputTileIndex, out var waterTakenLastTick, out var waterShortageLastTick);
-      CurrentFlow = 2 * waterTakenLastTick / Time.fixedDeltaTime;
-      _waterService.AddWater(_outputCoordinatesTransformed, waterTakenLastTick);
+      if (_waterMover == null) {
+        _waterMover = new DirectWaterServiceAccessor.WaterMover(
+            _directWaterServiceAccessor.CoordinatesToIndex(_inputCoordinatesTransformed),
+            _directWaterServiceAccessor.CoordinatesToIndex(_outputCoordinatesTransformed)) {
+            FreeFlow = true,
+        };
+        _directWaterServiceAccessor.AddWaterMover(_waterMover);
+      }
+      _waterMover.WaterFlow = FlowLimitSetting;
+      CurrentFlow = 2 * _waterMover.WaterMoved / Time.fixedDeltaTime;
+      _waterMover.WaterMoved = 0;
     }
   }
 

@@ -30,29 +30,44 @@ namespace IgorZ.TimberCommons.WaterService {
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 public class DirectWaterServiceAccessor : IPostLoadableSingleton, ILateUpdatableSingleton {
-  object _waterMapObj;
-  PropertyInfo _flowsPropertyFn;
-  PropertyInfo _depthsPropertyFn;
+  /// <summary>Water mover definition.</summary>
+  /// <remarks>
+  /// The mover takes water from the inout and drops it at the output. Various settings allow adjusting the exact
+  /// behavior of the mover.
+  /// </remarks>
+  public class WaterMover {
+    internal WaterMover ThreadSafeWaterMover;
 
-  class WaterConsumer {
+    /// <summary>Index of the tile to get water from.</summary>
+    public int InputTileIndex => _inputTileIndex;
+    internal int _inputTileIndex;
+
+    /// <summary>Index of the tile to drop the water to.</summary>
+    public int OutputTileIndex => _outputTileIndex;
+    internal int _outputTileIndex;
+
+    /// <summary>
+    /// In <see cref="FreeFlow"/> mode this is the maximum allowed flow. Otherwise, it's a desirable flow that the mover
+    /// will try to achieve, given there is enough water supply at the input.
+    /// </summary>
     public float WaterFlow;
-    public float WaterTaken;
-    public float WaterShortage;
 
-    public WaterConsumer Copy() {
-      // ReSharper disable once UseObjectOrCollectionInitializer
-      var copy = new WaterConsumer();
-      copy.WaterFlow = WaterFlow;
-      copy.WaterShortage = WaterShortage;
-      copy.WaterTaken = WaterTaken;
-      return copy;
+    /// <summary>Accumulated amount of moved water. Reset it to 0 to measure flow between the ticks.</summary>
+    public float WaterMoved;
+
+    /// <summary>Tells the logic to check if the water level at output is not above the input tile level.</summary>
+    public bool FreeFlow;
+
+    public WaterMover(int inputTileIndex, int outputTileIndex) {
+      _inputTileIndex = inputTileIndex;
+      _outputTileIndex = outputTileIndex;
     }
   } 
-  readonly Dictionary<int, WaterConsumer> _waterConsumers = new();
-  Dictionary<int, WaterConsumer> _threadSafeWaterConsumers = new();
+  readonly List<WaterMover> _waterMovers = new();
+  List<WaterMover> _threadSafeWaterMovers;
 
   #region API
-  /// <summary>Shortcut to the map index service to get the tile indexes.</summary>
+  /// <summary>Shortcut to the map index service.</summary>
   public MapIndexService MapIndexService { get; private set; }
 
   /// <summary>Water depths indexed by the tile index.</summary>
@@ -65,69 +80,46 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ILateUpdatable
   /// The values can be read from any thread, but the updates must be synchronized to the <c>ParallelTick</c> calls.
   /// </p>
   /// </remarks>
-  public float[] WaterDepths { get; private set; }
+  /// <seealso cref="CoordinatesToIndex"/>
+  public float[] WaterDepths => _waterDepths;
+  float[] _waterDepths;
 
   /// <summary>Water flows indexed by the tile index.</summary>
   /// <remarks>
   /// The values can be read from any thread, but the updates must be synchronized to the <c>ParallelTick</c> calls.
   /// </remarks>
-  public WaterFlow[] WaterFlows { get; private set; }
+  /// <seealso cref="CoordinatesToIndex"/>
+  public WaterFlow[] WaterFlows => _waterFlows;
+  WaterFlow[] _waterFlows;
+
+  public int[] SurfaceHeights => _surfaceHeights;
+  int[] _surfaceHeights;
 
   /// <summary>Indicates if the direct water system access can be used.</summary>
   public bool IsValid { get; private set; }
 
-  /// <summary>Sets up a water consumed at the tile.</summary>
+  /// <summary>Shortcut method to covert coordinates to tile index.</summary>
+  public int CoordinatesToIndex(Vector2Int coordinates) {
+    return MapIndexService.CoordinatesToIndex(coordinates);
+  }
+
+  /// <summary>Ads a new water mover.</summary>
   /// <remarks>
   /// This method can be called from the main thread as frequent as needed, but the actual simulation logic will be
   /// updated on the next tick.
   /// </remarks>
-  /// <param name="tileIndex">Index of the tile (see
-  /// <see cref="Timberborn.MapIndexSystem.MapIndexService.CoordinatesToIndex"/>). It can be a new tile or an existing
-  /// consumer.
-  /// </param>
-  /// <param name="waterDemandPerSecond">
-  /// Desired water consumption per second. A less amount of water can be actually consumed if there is not enough
-  /// supply.
-  /// </param>
-  /// <seealso cref="FlushWaterStats"/>
-  public void SetWaterConsumer(int tileIndex, float waterDemandPerSecond) {
-    if (!_waterConsumers.TryGetValue(tileIndex, out var consumer)) {
-      _waterConsumers.Add(tileIndex, new WaterConsumer { WaterFlow = waterDemandPerSecond });
-    } else {
-      consumer.WaterFlow = waterDemandPerSecond;
-    }
+  /// <param name="waterMover">Mover definition. All required fields musty be properly filled.</param>
+  public void AddWaterMover(WaterMover waterMover) {
+    _waterMovers.Add(waterMover);
   }
 
-  /// <summary>Removes water consumer for the tile.</summary>
+  /// <summary>Removes the specified water mover.</summary>
   /// <remarks>
   /// This method can be called from the main thread as frequent as needed, but the actual simulation logic will be
   /// updated on the next tick.
   /// </remarks>
-  /// <param name="tileIndex">Index of the tile (see
-  /// <see cref="Timberborn.MapIndexSystem.MapIndexService.CoordinatesToIndex"/>). It's not required to specify an
-  /// existing water consumer.
-  /// </param>
-  public void DeleteWaterConsumer(int tileIndex) {
-    _waterConsumers.Remove(tileIndex);
-  }
-
-  /// <summary>Returns accumulated water consumptions stat and resets the counters for the tile.</summary>
-  /// <param name="tileIndex">Index of the tile (see
-  /// <see cref="Timberborn.MapIndexSystem.MapIndexService.CoordinatesToIndex"/>). The tile must be a water consumer.
-  /// </param>
-  /// <param name="takenWater">The amount of water that was actually taken from the scene.</param>
-  /// <param name="waterShortage">
-  /// The amount of water that was requested, but not taken from the scene due to there was not enough supply.
-  /// </param>
-  /// <exception cref="InvalidOperationException">if not water consumer at the tile.</exception>
-  /// <seealso cref="SetWaterConsumer"/>
-  public void FlushWaterStats(int tileIndex, out float takenWater, out float waterShortage) {
-    if (!_waterConsumers.TryGetValue(tileIndex, out var consumer)) {
-      throw new InvalidOperationException($"No water consumer at tile index {tileIndex}");
-    }
-    takenWater = consumer.WaterTaken;
-    waterShortage = consumer.WaterShortage;
-    consumer.WaterTaken = consumer.WaterShortage = 0;
+  public void DeleteWaterMover(WaterMover waterMover) {
+    _waterMovers.Remove(waterMover);
   }
   #endregion
 
@@ -143,19 +135,15 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ILateUpdatable
       DebugEx.Warning("Cannot get WaterMap type. DirectWaterSystem is inactive.");
       return;
     }
-    _flowsPropertyFn = waterMapType.GetProperty("Outflows");
-    _depthsPropertyFn = waterMapType.GetProperty("WaterDepths");
-    if (_flowsPropertyFn == null || _depthsPropertyFn == null) {
+    var flowsPropertyFn = waterMapType.GetProperty("Outflows");
+    var depthsPropertyFn = waterMapType.GetProperty("WaterDepths");
+    if (flowsPropertyFn == null || depthsPropertyFn == null) {
       DebugEx.Warning("Cannot get access to WaterMap type. DirectWaterSystem is inactive.");
       return;
     }
-    _waterMapObj = DependencyContainer.GetInstance(waterMapType);
-    if (_waterMapObj == null) {
-      DebugEx.Warning("Cannot obtain WaterMap instance. DirectWaterSystem is inactive.");
-      return;
-    }
-    WaterDepths = _depthsPropertyFn.GetValue(_waterMapObj) as float[];
-    WaterFlows = _flowsPropertyFn.GetValue(_waterMapObj) as WaterFlow[];
+    var waterMapObj = DependencyContainer.GetInstance(waterMapType);
+    _waterDepths = depthsPropertyFn.GetValue(waterMapObj) as float[];
+    _waterFlows = flowsPropertyFn.GetValue(waterMapObj) as WaterFlow[];
     if (WaterDepths == null || WaterFlows == null) { // This is unexpected!
       throw new InvalidOperationException("Cannot get data from WaterMap");
     }
@@ -163,6 +151,18 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ILateUpdatable
     if (MapIndexService == null) { // This is unexpected!
       throw new InvalidOperationException("Cannot get MapIndexService instance");
     }
+
+    var surfaceServiceType = waterServiceAssembly.GetType("Timberborn.WaterSystem.ImpermeableSurfaceService");
+    if (surfaceServiceType == null) {
+      DebugEx.Warning("Cannot get ImpermeableSurfaceService type. DirectWaterSystem is inactive.");
+      return;
+    }
+    var heightPropertyFn = surfaceServiceType.GetProperty("Heights");
+    if (heightPropertyFn == null) {
+      DebugEx.Warning("Cannot get access to ImpermeableSurfaceService type. DirectWaterSystem is inactive.");
+      return;
+    }
+    _surfaceHeights = heightPropertyFn.GetValue(DependencyContainer.GetInstance(surfaceServiceType)) as int[];
 
     HarmonyPatcher.PatchRepeated(GetType().AssemblyQualifiedName, typeof(WaterSimulatorWaterDepthsPatch));
     WaterSimulatorWaterDepthsPatch.DirectWaterServiceAccessor = this;
@@ -173,16 +173,27 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ILateUpdatable
   #region ILateUpdatableSingleton implementation
   /// <summary>Updates stats in the water consumers and creates a thread safe copy.</summary>
   public void LateUpdateSingleton() {
-    var newConsumers = new Dictionary<int, WaterConsumer>();
-    foreach (var item in _waterConsumers) {
-      var itemValue = item.Value;
-      if (_threadSafeWaterConsumers.TryGetValue(item.Key, out var existing)) {
-        itemValue.WaterTaken += existing.WaterTaken;
-        itemValue.WaterShortage += existing.WaterShortage;
+    var newMovers = new List<WaterMover>();
+    foreach (var waterMover in _waterMovers) {
+      if (waterMover.InputTileIndex == -1 || waterMover.OutputTileIndex == -1) {
+        throw new InvalidOperationException("Water consumers and givers are not supported yet!");
       }
-      newConsumers.Add(item.Key, new WaterConsumer { WaterFlow = itemValue.WaterFlow });
+      var threadSafeMover = waterMover.ThreadSafeWaterMover;
+      if (threadSafeMover != null) {
+        waterMover.WaterMoved += threadSafeMover.WaterMoved;
+        threadSafeMover.WaterMoved = 0;
+        threadSafeMover.WaterFlow = waterMover.WaterFlow;
+        threadSafeMover.FreeFlow = waterMover.FreeFlow;
+      } else {
+        threadSafeMover = new WaterMover(waterMover.InputTileIndex, waterMover.OutputTileIndex) {
+            WaterFlow = waterMover.WaterFlow,
+            FreeFlow = waterMover.FreeFlow,
+        };
+        waterMover.ThreadSafeWaterMover = threadSafeMover;
+      }
+      newMovers.Add(threadSafeMover);
     }
-    _threadSafeWaterConsumers = newConsumers;
+    _threadSafeWaterMovers = newMovers;
   }
   #endregion
 
@@ -192,17 +203,28 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ILateUpdatable
   /// </summary>
   /// <param name="deltaTime">Simulation step delta.</param>
   void UpdateDepthsCallback(float deltaTime) {
-    foreach (var item in _threadSafeWaterConsumers) {
-      var inputIndex = item.Key;
-      var consumer = item.Value;
-      var depth = WaterDepths[inputIndex];
-      var needAmount = consumer.WaterFlow * deltaTime;
-      var canTakeAmount = Mathf.Min(needAmount, depth);
-      if (canTakeAmount < needAmount) {
-        consumer.WaterShortage += needAmount - canTakeAmount;
+    for (var i = _threadSafeWaterMovers.Count - 1; i >= 0; i--) {
+      var waterMover = _threadSafeWaterMovers[i];
+      var inputIndex = waterMover._inputTileIndex;
+      var outputIndex = waterMover._outputTileIndex;
+      var needAmount = waterMover.WaterFlow * deltaTime;
+      var inDepth = _waterDepths[inputIndex];
+      var canTakeAmount = Mathf.Min(needAmount, inDepth);
+      if (waterMover.FreeFlow) {
+        var inHeight = _surfaceHeights[inputIndex];
+        var outDepth = _waterDepths[outputIndex];
+        var outHeight = _surfaceHeights[outputIndex];
+        var waterDiff = (inHeight + inDepth - outHeight - outDepth) / 2;
+        if (waterDiff < float.Epsilon) {
+          continue;
+        }
+        if (waterDiff < canTakeAmount) {
+          canTakeAmount = waterDiff;
+        }
       }
-      WaterDepths[inputIndex] -= canTakeAmount;
-      consumer.WaterTaken += canTakeAmount;
+      _waterDepths[inputIndex] -= canTakeAmount;
+      _waterDepths[outputIndex] += canTakeAmount;
+      waterMover.WaterMoved += canTakeAmount;
     }
   }
   #endregion
