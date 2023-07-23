@@ -53,13 +53,34 @@ public class WaterValve : TickableComponent, IPersistentEntity {
   #endregion
 
   #region API
+  /// <summary>Absolute height of the water surface above the map at teh valve intake.</summary>
   public float WaterHeightAtInput { get; private set; }
+
+  /// <summary>Absolute height of the water surface above the map at the valve outtake.</summary>
   public float WaterHeightAtOutput { get; private set; }
+
+  /// <summary>The current speed of the water movement per second.</summary>
+  /// <remarks>
+  /// This value get become less than the limit if not enough water supply at the intake, but it must never be above the
+  /// <see cref="FlowLimitSetting"/>.
+  /// </remarks>
   public float CurrentFlow { get; private set; }
+
+  /// <summary>Absolute limit of the water flow form the prefab.</summary>
   public float FlowLimit => _waterFlowPerSecond;
+
+  /// <summary>Current water flow limit that was adjusted via UI or loaded from the saved state.</summary>
   public float FlowLimitSetting { get; internal set; }
+
+  /// <summary>Indicates that flow limit can be changed via UI panel. It's a prefab setting.</summary>
   public bool CanChangeFlowInGame => _canChangeFlowInGame;
+
+  /// <summary>The minimum flow limit that can be set via UI panel. It's a prefab setting.</summary>
+  /// <remarks>The maximum level is <see cref="FlowLimit"/>.</remarks>
+  /// <seealso cref="CanChangeFlowInGame"/>
   public float MinimumInGameFlow => _minimumInGameFlow;
+
+  /// <summary>Indicates if the UI panel should be shown when the valve is selected. It's a prefab setting.</summary>
   public bool ShowUIPanel => _showUIPanel;
   #endregion
 
