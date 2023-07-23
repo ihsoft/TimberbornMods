@@ -17,6 +17,8 @@ namespace IgorZ.TimberCommons.WaterValveComponent {
 sealed class WaterValveFragment : IEntityPanelFragment {
   const string WaterFlowTextLocKey = "Limit water flow to: {0} cms";
   const string WaterFlowLocKey = "Water flow: {0} cms";
+  const string WaterDepthAtIntakeLocKey = "Water depth at intake: {0}";
+  const string WaterDepthAtOuttakeLocKey = "Water depth at outtake: {0}";
   const string WaterLevelAtInput = "Water level at input: {0:0.00}";
   const string WaterLevelAtOutput = "Water level at output: {0:0.00}";
 
@@ -113,6 +115,8 @@ sealed class WaterValveFragment : IEntityPanelFragment {
     }
     _waterFlowSlider.SetValueWithoutNotify(_waterValve.FlowLimitSetting);
     var info = new List<string> {
+        _loc.T(WaterDepthAtIntakeLocKey, _waterValve.WaterDepthAtIntake.ToString("0.00")),
+        _loc.T(WaterDepthAtOuttakeLocKey, _waterValve.WaterDepthAtOuttake.ToString("0.00")),
         _loc.T(WaterFlowLocKey, _waterValve.CurrentFlow.ToString("0.0"))
     };
     if (_devModeManager.Enabled) {

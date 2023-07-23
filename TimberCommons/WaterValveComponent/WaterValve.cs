@@ -59,6 +59,12 @@ public class WaterValve : TickableComponent, IPersistentEntity {
   /// <summary>Absolute height of the water surface above the map at the valve outtake.</summary>
   public float WaterHeightAtOutput { get; private set; }
 
+  /// <summary>Water depth at the valve intake relative to the terrain or the bottom obstacle(s).</summary>
+  public float WaterDepthAtIntake { get; private set; }
+
+  /// <summary>Water depth at the valve outtake relative to the terrain or the bottom obstacle(s).</summary>
+  public float WaterDepthAtOuttake { get; private set; }
+
   /// <summary>The current speed of the water movement per second.</summary>
   /// <remarks>
   /// This value get become less than the limit if not enough water supply at the intake, but it must never be above the
@@ -92,6 +98,8 @@ public class WaterValve : TickableComponent, IPersistentEntity {
   Vector2Int _inputCoordinatesTransformed;
   Vector2Int _outputCoordinatesTransformed;
   int _valveBaseZ;
+  int _inputTileIndex;
+  int _outputTileIndex;
 
   internal bool _logExtraStats;
   internal bool _useCustomSimulation = true;
@@ -109,13 +117,17 @@ public class WaterValve : TickableComponent, IPersistentEntity {
     _valveBaseZ = _blockObject.Coordinates.z;
     _inputCoordinatesTransformed = _blockObject.Transform(_inputCoordinates);
     _outputCoordinatesTransformed = _blockObject.Transform(_outputCoordinates);
+    _inputTileIndex = _directWaterServiceAccessor.CoordinatesToIndex(_inputCoordinatesTransformed);
+    _outputTileIndex = _directWaterServiceAccessor.CoordinatesToIndex(_outputCoordinatesTransformed);
     _valveBaseZ = _blockObject.BaseZ;
   }
 
   // FIXME(IgorZ): Once the debugging is done, set the consumer state once in StartTickable. 
   public override void Tick() {
     WaterHeightAtInput = Mathf.Max(_waterService.WaterHeight(_inputCoordinatesTransformed), _valveBaseZ);
+    WaterDepthAtIntake = _directWaterServiceAccessor.WaterDepths[_inputTileIndex];
     WaterHeightAtOutput = Mathf.Max(_waterService.WaterHeight(_outputCoordinatesTransformed), _valveBaseZ);
+    WaterDepthAtOuttake = _directWaterServiceAccessor.WaterDepths[_outputTileIndex];
     if (!_useCustomSimulation || !_directWaterServiceAccessor.IsValid) {
       if (_waterMover != null) {
         _directWaterServiceAccessor.DeleteWaterMover(_waterMover);
