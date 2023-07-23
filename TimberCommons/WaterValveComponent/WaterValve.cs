@@ -145,11 +145,11 @@ public class WaterValve : TickableComponent, IPersistentEntity {
   /// <inheritdoc/>
   public void Load(IEntityLoader entityLoader) {
     if (!entityLoader.HasComponent(WaterValveKey)) {
-      FlowLimitSetting = _waterFlowPerSecond;
+      FlowLimitSetting = FlowLimit;
       return;
     }
     var state = entityLoader.GetComponent(WaterValveKey);
-    FlowLimitSetting = state.GetValueOrNullable(WaterFlowLimitKey) ?? _waterFlowPerSecond;
+    FlowLimitSetting = state.GetValueOrNullable(WaterFlowLimitKey) ?? FlowLimit;
   }
   #endregion
 }
