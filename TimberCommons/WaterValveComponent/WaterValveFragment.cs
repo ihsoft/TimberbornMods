@@ -16,8 +16,8 @@ using UnityEngine.UIElements;
 namespace IgorZ.TimberCommons.WaterValveComponent {
 
 sealed class WaterValveFragment : IEntityPanelFragment {
-  const string WaterFlowTextLocKey = "Limit water flow to: {0} cms";
-  const string WaterFlowLocKey = "Water flow: {0} cms";
+  const string WaterFlowTextLocKey = "Limit water flow to: {0} m³/s";
+  const string WaterFlowLocKey = "Water flow: {0} m³/s";
   const string WaterDepthAtIntakeLocKey = "Water depth at intake: {0}";
   const string WaterDepthAtOuttakeLocKey = "Water depth at outtake: {0}";
   const string WaterLevelAtInput = "Water level at input: {0:0.00}";
