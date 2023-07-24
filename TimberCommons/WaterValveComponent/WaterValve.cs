@@ -49,6 +49,9 @@ public class WaterValve : TickableComponent, IPersistentEntity {
   [SerializeField]
   float _minimumInGameFlow = 0;
 
+  [SerializeField]
+  internal bool _freeFlow = true;
+
   // ReSharper restore InconsistentNaming
   #endregion
 
@@ -138,12 +141,11 @@ public class WaterValve : TickableComponent, IPersistentEntity {
       if (_waterMover == null) {
         _waterMover = new DirectWaterServiceAccessor.WaterMover(
             _directWaterServiceAccessor.CoordinatesToIndex(_inputCoordinatesTransformed),
-            _directWaterServiceAccessor.CoordinatesToIndex(_outputCoordinatesTransformed)) {
-            FreeFlow = true,
-        };
+            _directWaterServiceAccessor.CoordinatesToIndex(_outputCoordinatesTransformed));
         _directWaterServiceAccessor.AddWaterMover(_waterMover);
       }
       _waterMover.WaterFlow = FlowLimitSetting;
+      _waterMover.FreeFlow = _freeFlow;
       CurrentFlow = 2 * _waterMover.WaterMoved / Time.fixedDeltaTime;
       _waterMover.WaterMoved = 0;
     }

@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System.Collections.Generic;
+using IgorZ.TimberDev.UI;
 using TimberApi.UiBuilderSystem;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
@@ -21,6 +22,7 @@ sealed class WaterValveFragment : IEntityPanelFragment {
   const string WaterDepthAtOuttakeLocKey = "Water depth at outtake: {0}";
   const string WaterLevelAtInput = "Water level at input: {0:0.00}";
   const string WaterLevelAtOutput = "Water level at output: {0:0.00}";
+  const string FreeFlowText = "Free flow";
 
   readonly UIBuilder _builder;
   readonly ILoc _loc;
@@ -34,7 +36,7 @@ sealed class WaterValveFragment : IEntityPanelFragment {
   Label _waterFlowText;
   Slider _waterFlowSlider;
   Toggle _logStatsCheckbox;
-  Toggle _useCustomSimulationCheckbox;
+  Toggle _freeFlowCheckbox;
 
   WaterValve _waterValve;
 
@@ -54,10 +56,6 @@ sealed class WaterValveFragment : IEntityPanelFragment {
     _logStatsCheckbox = _builder.Presets().Toggles()
          .CheckmarkInverted(text: "Log extra stats", color: NormalColor);
     _logStatsCheckbox.RegisterValueChangedCallback(_ => _waterValve._logExtraStats = _logStatsCheckbox.value);
-    _useCustomSimulationCheckbox = _builder.Presets().Toggles()
-        .CheckmarkInverted(text: "Use custom simulation", color: NormalColor);
-    _useCustomSimulationCheckbox.RegisterValueChangedCallback(
-        _ => _waterValve._useCustomSimulation = _useCustomSimulationCheckbox.value);
 
     _waterFlowSlider = _visualElementLoader.LoadVisualElement("Common/IntegerSlider").Q<Slider>("Slider");
     _waterFlowSlider.RegisterValueChangedCallback(
@@ -66,12 +64,16 @@ sealed class WaterValveFragment : IEntityPanelFragment {
           _waterFlowSlider.SetValueWithoutNotify(value);
           _waterValve.FlowLimitSetting = value;
         });
+    _freeFlowCheckbox = _builder.Presets().Toggles()
+        .CheckmarkInverted(text: FreeFlowText, color: UiFactory.PanelNormalColor);
+    _freeFlowCheckbox.RegisterValueChangedCallback(
+        _ => _waterValve._freeFlow = _freeFlowCheckbox.value);
 
     _root = _builder.CreateFragmentBuilder()
         .AddComponent(_waterFlowText)
         .AddComponent(_waterFlowSlider)
         .AddComponent(_infoLabel)
-        .AddComponent(_useCustomSimulationCheckbox)
+        .AddComponent(_freeFlowCheckbox)
         .AddComponent(_logStatsCheckbox)
         .BuildAndInitialize();
     _root.ToggleDisplayStyle(visible: false);
@@ -84,7 +86,7 @@ sealed class WaterValveFragment : IEntityPanelFragment {
       _waterValve = null;
     } 
     if (_waterValve != null) {
-      _useCustomSimulationCheckbox.SetValueWithoutNotify(_waterValve._useCustomSimulation);
+      _freeFlowCheckbox.SetValueWithoutNotify(_waterValve._freeFlow);
       _logStatsCheckbox.SetValueWithoutNotify(_waterValve._logExtraStats);
       _root.ToggleDisplayStyle(visible: true);
     }
@@ -100,7 +102,7 @@ sealed class WaterValveFragment : IEntityPanelFragment {
       _root.ToggleDisplayStyle(visible: false);
       return;
     }
-    _useCustomSimulationCheckbox.ToggleDisplayStyle(visible: _devModeManager.Enabled);
+    _freeFlowCheckbox.ToggleDisplayStyle(visible: _devModeManager.Enabled);
     _logStatsCheckbox.ToggleDisplayStyle(visible: _devModeManager.Enabled);
     var adjustWaterFlow = _devModeManager.Enabled || _waterValve.CanChangeFlowInGame;
     _waterFlowText.ToggleDisplayStyle(visible: adjustWaterFlow);
