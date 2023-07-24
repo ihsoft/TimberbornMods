@@ -9,7 +9,6 @@ using System.Reflection;
 using HarmonyLib;
 using IgorZ.TimberDev.Utils;
 using TimberApi.DependencyContainerSystem;
-using Timberborn.MapIndexSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.WaterSystem;
 using UnityDev.Utils.LogUtilsLite;
@@ -40,12 +39,10 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ILateUpdatable
     internal bool LogExtraStats;
 
     /// <summary>Index of the tile to get water from.</summary>
-    public int InputTileIndex => _inputTileIndex;
-    internal int _inputTileIndex;
+    public int InputTileIndex;
 
     /// <summary>Index of the tile to drop the water to.</summary>
-    public int OutputTileIndex => _outputTileIndex;
-    internal int _outputTileIndex;
+    public int OutputTileIndex;
 
     /// <summary>
     /// In <see cref="FreeFlow"/> mode this is the maximum allowed flow. Otherwise, it's a desirable flow that the mover
@@ -73,13 +70,15 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ILateUpdatable
     /// <seealso cref="DirectWaterServiceAccessor.SurfaceHeights"/>
     public float MinHeightAtInput = -1;
 
-    public WaterMover(int inputTileIndex, int outputTileIndex) {
-      _inputTileIndex = inputTileIndex;
-      _outputTileIndex = outputTileIndex;
+    public override string ToString() {
+      return string.Format("[WaterMover#in={0},out={1},flow={2},free={3},inMin={4},outMax={5}]",
+          InputTileIndex, OutputTileIndex, WaterFlow, FreeFlow, MinHeightAtInput, MaxHeightAtOutput);
     }
 
     internal WaterMover CopyDefinition() {
-      return new WaterMover(_inputTileIndex, _outputTileIndex) {
+      return new WaterMover {
+          InputTileIndex = InputTileIndex,
+          OutputTileIndex = OutputTileIndex,
           WaterFlow = WaterFlow,
           FreeFlow = FreeFlow,
           MaxHeightAtOutput = MaxHeightAtOutput,
@@ -89,6 +88,8 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ILateUpdatable
     }
 
     internal void UpdateSettingsFrom(WaterMover source) {
+      InputTileIndex = source.InputTileIndex;
+      OutputTileIndex = source.OutputTileIndex;
       WaterFlow = source.WaterFlow;
       FreeFlow = source.FreeFlow;
       MaxHeightAtOutput = source.MaxHeightAtOutput;
@@ -97,12 +98,9 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ILateUpdatable
     }
   } 
   readonly List<WaterMover> _waterMovers = new();
-  List<WaterMover> _threadSafeWaterMovers;
+  List<WaterMover> _threadSafeWaterMovers = new();
 
   #region API
-  /// <summary>Shortcut to the map index service.</summary>
-  public MapIndexService MapIndexService { get; private set; }
-
   /// <summary>Water depths indexed by the tile index.</summary>
   /// <remarks>
   /// <p>
@@ -113,7 +111,6 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ILateUpdatable
   /// The values can be read from any thread, but the updates must be synchronized to the <c>ParallelTick</c> calls.
   /// </p>
   /// </remarks>
-  /// <seealso cref="CoordinatesToIndex"/>
   public float[] WaterDepths => _waterDepths;
   float[] _waterDepths;
 
@@ -121,7 +118,6 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ILateUpdatable
   /// <remarks>
   /// The values can be read from any thread, but the updates must be synchronized to the <c>ParallelTick</c> calls.
   /// </remarks>
-  /// <seealso cref="CoordinatesToIndex"/>
   public WaterFlow[] WaterFlows => _waterFlows;
   WaterFlow[] _waterFlows;
 
@@ -132,17 +128,11 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ILateUpdatable
   /// The values can be read from any thread, but the updates must be synchronized to the <c>ParallelTick</c> calls.
   /// </p>
   /// </remarks>
-  /// <seealso cref="CoordinatesToIndex"/>
   public int[] SurfaceHeights => _surfaceHeights;
   int[] _surfaceHeights;
 
   /// <summary>Indicates if the direct water system access can be used.</summary>
   public bool IsValid { get; private set; }
-
-  /// <summary>Shortcut method to covert coordinates to tile index.</summary>
-  public int CoordinatesToIndex(Vector2Int coordinates) {
-    return MapIndexService.CoordinatesToIndex(coordinates);
-  }
 
   /// <summary>Ads a new water mover.</summary>
   /// <remarks>
@@ -187,10 +177,6 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ILateUpdatable
     _waterFlows = flowsPropertyFn.GetValue(waterMapObj) as WaterFlow[];
     if (WaterDepths == null || WaterFlows == null) { // This is unexpected!
       throw new InvalidOperationException("Cannot get data from WaterMap");
-    }
-    MapIndexService = DependencyContainer.GetInstance<MapIndexService>();
-    if (MapIndexService == null) { // This is unexpected!
-      throw new InvalidOperationException("Cannot get MapIndexService instance");
     }
 
     var surfaceServiceType = waterServiceAssembly.GetType("Timberborn.WaterSystem.ImpermeableSurfaceService");
@@ -242,8 +228,8 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ILateUpdatable
   void UpdateDepthsCallback(float deltaTime) {
     for (var i = _threadSafeWaterMovers.Count - 1; i >= 0; i--) {
       var waterMover = _threadSafeWaterMovers[i];
-      var inputIndex = waterMover._inputTileIndex;
-      var outputIndex = waterMover._outputTileIndex;
+      var inputIndex = waterMover.InputTileIndex;
+      var outputIndex = waterMover.OutputTileIndex;
       var needAmount = waterMover.WaterFlow * deltaTime;
       var inDepth = _waterDepths[inputIndex];
       var inWaterHeight = _surfaceHeights[inputIndex] + inDepth;
