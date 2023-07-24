@@ -75,7 +75,7 @@ public class WaterValve : TickableComponent, IPersistentEntity {
   /// </remarks>
   public float CurrentFlow { get; private set; }
 
-  /// <summary>Absolute limit of the water flow form the prefab.</summary>
+  /// <summary>Absolute limit of the water flow from the prefab.</summary>
   public float FlowLimit => _waterFlowPerSecond;
 
   /// <summary>Current water flow limit that was adjusted via UI or loaded from the saved state.</summary>
@@ -112,7 +112,9 @@ public class WaterValve : TickableComponent, IPersistentEntity {
   int _outputTileIndex;
 
   internal bool _logExtraStats;
-  internal bool _useCustomSimulation = true;
+
+  //FIXME: it's a debug stuff, drop it on release.
+  bool _useCustomSimulation = true;
 
   void Awake() {
     UpdateAdjustableValuesFromPrefab();
