@@ -115,6 +115,7 @@ public class WaterValve : TickableComponent, IPersistentEntity {
   internal bool _useCustomSimulation = true;
 
   void Awake() {
+    UpdateAdjustableValuesFromPrefab();
     _blockObject = GetComponentFast<BlockObject>();
     enabled = true;
   }
@@ -172,6 +173,10 @@ public class WaterValve : TickableComponent, IPersistentEntity {
   public void InjectDependencies(IWaterService waterService, DirectWaterServiceAccessor directWaterServiceAccessor) {
     _waterService = waterService;
     _directWaterServiceAccessor = directWaterServiceAccessor;
+  }
+
+  void UpdateAdjustableValuesFromPrefab() {
+    WaterFlow = FlowLimit;
   }
 
   #region IPersistentEntity implementation
