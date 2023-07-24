@@ -71,7 +71,7 @@ public class WaterValve : TickableComponent, IPersistentEntity {
   /// <summary>The current speed of the water movement per second.</summary>
   /// <remarks>
   /// This value get become less than the limit if not enough water supply at the intake, but it must never be above the
-  /// <see cref="FlowLimitSetting"/>.
+  /// <see cref="WaterFlow"/>.
   /// </remarks>
   public float CurrentFlow { get; private set; }
 
@@ -79,7 +79,14 @@ public class WaterValve : TickableComponent, IPersistentEntity {
   public float FlowLimit => _waterFlowPerSecond;
 
   /// <summary>Current water flow limit that was adjusted via UI or loaded from the saved state.</summary>
-  public float FlowLimitSetting { get; internal set; }
+  public float WaterFlow { get; internal set; }
+
+  /// <summary>Indicates that the water is moving in a "natural" way from the higher levels to the lowers.</summary>
+  /// <remarks>
+  /// If this value is <c>false</c>, then the component is actually a pump that can make the output lever higher than at
+  /// the input.
+  /// </remarks>
+  public bool IsFreeFlow => _freeFlow;
 
   /// <summary>Indicates that flow limit can be changed via UI panel. It's a prefab setting.</summary>
   public bool CanChangeFlowInGame => _canChangeFlowInGame;
@@ -144,7 +151,7 @@ public class WaterValve : TickableComponent, IPersistentEntity {
             _directWaterServiceAccessor.CoordinatesToIndex(_outputCoordinatesTransformed));
         _directWaterServiceAccessor.AddWaterMover(_waterMover);
       }
-      _waterMover.WaterFlow = FlowLimitSetting;
+      _waterMover.WaterFlow = WaterFlow;
       _waterMover.FreeFlow = _freeFlow;
       CurrentFlow = 2 * _waterMover.WaterMoved / Time.fixedDeltaTime;
       _waterMover.WaterMoved = 0;
@@ -154,7 +161,7 @@ public class WaterValve : TickableComponent, IPersistentEntity {
   void MoveWaterLight(float deltaTime) {
     CurrentFlow = 0;
     var availableWater = WaterHeightAtInput - WaterHeightAtOutput;
-    var canMoveWater = Mathf.Min(availableWater, FlowLimitSetting);
+    var canMoveWater = Mathf.Min(availableWater, WaterFlow);
     CurrentFlow = canMoveWater / deltaTime;
     var depthChange = canMoveWater / 2;
     _waterService.AddWater(_inputCoordinatesTransformed, depthChange);
@@ -169,22 +176,22 @@ public class WaterValve : TickableComponent, IPersistentEntity {
 
   #region IPersistentEntity implementation
   static readonly ComponentKey WaterValveKey = new(typeof(WaterValve).FullName);
-  static readonly PropertyKey<float> WaterFlowLimitKey = new(nameof(FlowLimitSetting));
+  static readonly PropertyKey<float> WaterFlowLimitKey = new(nameof(WaterFlow));
 
   /// <inheritdoc/>
   public void Save(IEntitySaver entitySaver) {
     var saver = entitySaver.GetComponent(WaterValveKey);
-    saver.Set(WaterFlowLimitKey, FlowLimitSetting);
+    saver.Set(WaterFlowLimitKey, WaterFlow);
   }
 
   /// <inheritdoc/>
   public void Load(IEntityLoader entityLoader) {
     if (!entityLoader.HasComponent(WaterValveKey)) {
-      FlowLimitSetting = FlowLimit;
+      UpdateAdjustableValuesFromPrefab();
       return;
     }
     var state = entityLoader.GetComponent(WaterValveKey);
-    FlowLimitSetting = state.GetValueOrNullable(WaterFlowLimitKey) ?? FlowLimit;
+    WaterFlow = state.GetValueOrNullable(WaterFlowLimitKey) ?? FlowLimit;
   }
   #endregion
 }

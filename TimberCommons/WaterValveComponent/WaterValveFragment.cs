@@ -56,18 +56,12 @@ sealed class WaterValveFragment : IEntityPanelFragment {
     _logStatsCheckbox = _builder.Presets().Toggles()
          .CheckmarkInverted(text: "Log extra stats", color: NormalColor);
     _logStatsCheckbox.RegisterValueChangedCallback(_ => _waterValve._logExtraStats = _logStatsCheckbox.value);
-
-    _waterFlowSlider = _visualElementLoader.LoadVisualElement("Common/IntegerSlider").Q<Slider>("Slider");
-    _waterFlowSlider.RegisterValueChangedCallback(
-        _ => {
-          var value = Mathf.Round(_waterFlowSlider.value / 0.05f) * 0.05f;
-          _waterFlowSlider.SetValueWithoutNotify(value);
-          _waterValve.FlowLimitSetting = value;
-        });
     _freeFlowCheckbox = _builder.Presets().Toggles()
         .CheckmarkInverted(text: FreeFlowText, color: UiFactory.PanelNormalColor);
     _freeFlowCheckbox.RegisterValueChangedCallback(
         _ => _waterValve._freeFlow = _freeFlowCheckbox.value);
+
+    _waterFlowSlider = UiFactory.Create(_visualElementLoader, v => _waterValve.WaterFlow = v);
 
     _root = _builder.CreateFragmentBuilder()
         .AddComponent(_waterFlowText)
@@ -88,6 +82,8 @@ sealed class WaterValveFragment : IEntityPanelFragment {
     if (_waterValve != null) {
       _freeFlowCheckbox.SetValueWithoutNotify(_waterValve._freeFlow);
       _logStatsCheckbox.SetValueWithoutNotify(_waterValve._logExtraStats);
+      _waterFlowSlider.highValue = Mathf.Max(_waterValve.FlowLimit, _waterValve.WaterFlow);
+      _waterFlowSlider.SetValueWithoutNotify(_waterValve.WaterFlow);
       _root.ToggleDisplayStyle(visible: true);
     }
   }
@@ -106,16 +102,15 @@ sealed class WaterValveFragment : IEntityPanelFragment {
     _logStatsCheckbox.ToggleDisplayStyle(visible: _devModeManager.Enabled);
     var adjustWaterFlow = _devModeManager.Enabled || _waterValve.CanChangeFlowInGame;
     _waterFlowText.ToggleDisplayStyle(visible: adjustWaterFlow);
-    _waterFlowText.text = string.Format(WaterFlowTextLocKey, _waterValve.FlowLimitSetting.ToString("0.0#"));
+    _waterFlowText.text = string.Format(WaterFlowTextLocKey, _waterValve.WaterFlow.ToString("0.0#"));
     _waterFlowSlider.ToggleDisplayStyle(visible: adjustWaterFlow);
     if (_devModeManager.Enabled) {
       _waterFlowSlider.lowValue = 0;
       _waterFlowSlider.highValue = 10;
     } else {
-      _waterFlowSlider.lowValue = Mathf.Min(_waterValve.MinimumInGameFlow, _waterValve.FlowLimitSetting);
-      _waterFlowSlider.highValue = Mathf.Max(_waterValve.FlowLimit, _waterValve.FlowLimitSetting);
+      _waterFlowSlider.lowValue = Mathf.Min(_waterValve.MinimumInGameFlow, _waterValve.WaterFlow);
+      _waterFlowSlider.highValue = Mathf.Max(_waterValve.FlowLimit, _waterValve.WaterFlow);
     }
-    _waterFlowSlider.SetValueWithoutNotify(_waterValve.FlowLimitSetting);
     var info = new List<string> {
         _loc.T(WaterDepthAtIntakeLocKey, _waterValve.WaterDepthAtIntake.ToString("0.00")),
         _loc.T(WaterDepthAtOuttakeLocKey, _waterValve.WaterDepthAtOuttake.ToString("0.00")),
