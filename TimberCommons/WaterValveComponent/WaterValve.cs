@@ -6,6 +6,7 @@ using System;
 using Bindito.Core;
 using IgorZ.TimberCommons.WaterService;
 using Timberborn.BlockSystem;
+using Timberborn.MapIndexSystem;
 using Timberborn.Persistence;
 using Timberborn.TickSystem;
 using Timberborn.WaterSystem;
@@ -31,7 +32,7 @@ public class WaterValve : TickableComponent, IPersistentEntity {
   // ReSharper disable InconsistentNaming
 
   [SerializeField]
-  bool _showUIPanel = true;
+  bool _showUIPanel = false;
 
   [SerializeField]
   Vector2Int _inputCoordinates = new(0, 0);
@@ -49,13 +50,13 @@ public class WaterValve : TickableComponent, IPersistentEntity {
   float _minimumInGameFlow = 0;
 
   [SerializeField]
-  internal bool _freeFlow = true;
+  bool _freeFlow = true;
 
   [SerializeField]
-  internal float _minimumWaterLevelAtIntake = 0.2f;
+  float _minimumWaterLevelAtIntake = 0.2f;
 
   [SerializeField]
-  internal float _maximumWaterLevelAtOuttake = 0.6f;
+  float _maximumWaterLevelAtOuttake = 0.6f;
 
   // ReSharper restore InconsistentNaming
   #endregion
@@ -72,13 +73,26 @@ public class WaterValve : TickableComponent, IPersistentEntity {
 
   /// <summary>The minimum level of water to maintain at the input.</summary>
   /// <remarks>The valve won't take water if the level is blow the setting. Values below zero mean "no limit".</remarks>
-  public float MinWaterLevelAtIntake => _minimumWaterLevelAtIntake;
+  public float MinWaterLevelAtIntake {
+    get => _minimumWaterLevelAtIntake;
+    internal set {
+      _minimumWaterLevelAtIntake = value;
+      _waterMover.MinHeightAtInput = value > 0 ? value + _valveBaseZ : -1.0f;
+    }
+  }
 
   /// <summary>The maximum level of water to maintain at the output.</summary>
   /// <remarks>
   /// The valve won't move water if the level is above the setting. Values below zero mean "no limit".
   /// </remarks>
-  public float MaxWaterLevelAtOuttake => _maximumWaterLevelAtOuttake;
+  //public float MaxWaterLevelAtOuttake => _maximumWaterLevelAtOuttake;
+  public float MaxWaterLevelAtOuttake {
+    get => _maximumWaterLevelAtOuttake;
+    internal set {
+      _maximumWaterLevelAtOuttake = value;
+      _waterMover.MaxHeightAtOutput = value > 0 ? value + _valveBaseZ : -1.0f;
+    }
+  }
 
   /// <summary>Water depth at the valve outtake relative to the terrain or the bottom obstacle(s).</summary>
   public float WaterDepthAtOuttake { get; private set; }
@@ -94,14 +108,21 @@ public class WaterValve : TickableComponent, IPersistentEntity {
   public float FlowLimit => _waterFlowPerSecond;
 
   /// <summary>Current water flow limit that was adjusted via UI or loaded from the saved state.</summary>
-  public float WaterFlow { get; internal set; }
+  /// <remarks>It can be adjusted interactively during the game if <see cref="CanChangeFlowInGame"/> is set.</remarks>
+  public float WaterFlow {
+    get => _waterMover.WaterFlow;
+    internal set => _waterMover.WaterFlow = value;
+  }
 
   /// <summary>Indicates that the water is moving in a "natural" way from the higher levels to the lowers.</summary>
   /// <remarks>
   /// If this value is <c>false</c>, then the component is actually a pump that can make the output lever higher than at
   /// the input.
   /// </remarks>
-  public bool IsFreeFlow => _freeFlow;
+  public bool IsFreeFlow {
+    get => _waterMover.FreeFlow;
+    internal set => _waterMover.FreeFlow = value;
+  }
 
   /// <summary>Indicates that flow limit can be changed via UI panel. It's a prefab setting.</summary>
   public bool CanChangeFlowInGame => _canChangeFlowInGame;
@@ -117,23 +138,22 @@ public class WaterValve : TickableComponent, IPersistentEntity {
 
   IWaterService _waterService;
   DirectWaterServiceAccessor _directWaterServiceAccessor;
-  DirectWaterServiceAccessor.WaterMover _waterMover;
+  MapIndexService _mapIndexService;
+  readonly DirectWaterServiceAccessor.WaterMover _waterMover = new();
 
   BlockObject _blockObject;
+  int _valveBaseZ;
   Vector2Int _inputCoordinatesTransformed;
   Vector2Int _outputCoordinatesTransformed;
-  int _valveBaseZ;
-  int _inputTileIndex;
-  int _outputTileIndex;
 
-  internal bool _logExtraStats;
-
-  //FIXME: it's a debug stuff, drop it on release.
-  bool _useCustomSimulation = true;
+  public bool LogExtraStats {
+    get => _waterMover.LogExtraStats;
+    internal set => _waterMover.LogExtraStats = value;
+  }
 
   void Awake() {
-    UpdateAdjustableValuesFromPrefab();
     _blockObject = GetComponentFast<BlockObject>();
+    UpdateAdjustableValuesFromPrefab();
     enabled = true;
   }
 
@@ -142,61 +162,37 @@ public class WaterValve : TickableComponent, IPersistentEntity {
       throw new InvalidOperationException("WaterValve requires operational DirectWaterServiceAccessor. See the logs!");
     }
     base.StartTickable();
+
     _valveBaseZ = _blockObject.Coordinates.z;
     _inputCoordinatesTransformed = _blockObject.Transform(_inputCoordinates);
     _outputCoordinatesTransformed = _blockObject.Transform(_outputCoordinates);
-    _inputTileIndex = _directWaterServiceAccessor.CoordinatesToIndex(_inputCoordinatesTransformed);
-    _outputTileIndex = _directWaterServiceAccessor.CoordinatesToIndex(_outputCoordinatesTransformed);
-    _valveBaseZ = _blockObject.Coordinates.z;
+    _waterMover.InputTileIndex = _mapIndexService.CoordinatesToIndex(_inputCoordinatesTransformed);
+    _waterMover.OutputTileIndex = _mapIndexService.CoordinatesToIndex(_outputCoordinatesTransformed);
+    MinWaterLevelAtIntake = _minimumWaterLevelAtIntake;
+    MaxWaterLevelAtOuttake = _maximumWaterLevelAtOuttake;
+    _directWaterServiceAccessor.AddWaterMover(_waterMover);
   }
 
-  // FIXME(IgorZ): Once the debugging is done, set the consumer state once in StartTickable. 
   public override void Tick() {
     WaterHeightAtInput = Mathf.Max(_waterService.WaterHeight(_inputCoordinatesTransformed), _valveBaseZ);
-    WaterDepthAtIntake = _directWaterServiceAccessor.WaterDepths[_inputTileIndex];
+    WaterDepthAtIntake = _directWaterServiceAccessor.WaterDepths[_waterMover.InputTileIndex];
     WaterHeightAtOutput = Mathf.Max(_waterService.WaterHeight(_outputCoordinatesTransformed), _valveBaseZ);
-    WaterDepthAtOuttake = _directWaterServiceAccessor.WaterDepths[_outputTileIndex];
-    if (!_useCustomSimulation || !_directWaterServiceAccessor.IsValid) {
-      if (_waterMover != null) {
-        _directWaterServiceAccessor.DeleteWaterMover(_waterMover);
-        _waterMover = null;
-      }
-      MoveWaterLight(Time.fixedDeltaTime);
-    } else {
-      if (_waterMover == null) {
-        _waterMover = new DirectWaterServiceAccessor.WaterMover(
-            _directWaterServiceAccessor.CoordinatesToIndex(_inputCoordinatesTransformed),
-            _directWaterServiceAccessor.CoordinatesToIndex(_outputCoordinatesTransformed));
-        _directWaterServiceAccessor.AddWaterMover(_waterMover);
-      }
-      _waterMover.WaterFlow = WaterFlow;
-      _waterMover.FreeFlow = _freeFlow;
-      _waterMover.MinHeightAtInput = MinWaterLevelAtIntake > 0 ? MinWaterLevelAtIntake + _valveBaseZ : -1.0f;
-      _waterMover.MaxHeightAtOutput = MaxWaterLevelAtOuttake > 0 ? MaxWaterLevelAtOuttake + _valveBaseZ : -1.0f;
-      _waterMover.LogExtraStats = _logExtraStats;
-      CurrentFlow = 2 * _waterMover.WaterMoved / Time.fixedDeltaTime;
-      _waterMover.WaterMoved = 0;
-    }
-  }
-
-  void MoveWaterLight(float deltaTime) {
-    CurrentFlow = 0;
-    var availableWater = WaterHeightAtInput - WaterHeightAtOutput;
-    var canMoveWater = Mathf.Min(availableWater, WaterFlow);
-    CurrentFlow = canMoveWater / deltaTime;
-    var depthChange = canMoveWater / 2;
-    _waterService.AddWater(_inputCoordinatesTransformed, depthChange);
-    _waterService.AddWater(_outputCoordinatesTransformed, depthChange);
+    WaterDepthAtOuttake = _directWaterServiceAccessor.WaterDepths[_waterMover.OutputTileIndex];
+    CurrentFlow = 2 * _waterMover.WaterMoved / Time.fixedDeltaTime;
+    _waterMover.WaterMoved = 0;
   }
 
   [Inject]
-  public void InjectDependencies(IWaterService waterService, DirectWaterServiceAccessor directWaterServiceAccessor) {
+  public void InjectDependencies(IWaterService waterService, DirectWaterServiceAccessor directWaterServiceAccessor,
+                                 MapIndexService mapIndexService) {
     _waterService = waterService;
     _directWaterServiceAccessor = directWaterServiceAccessor;
+    _mapIndexService = mapIndexService;
   }
 
   void UpdateAdjustableValuesFromPrefab() {
     WaterFlow = FlowLimit;
+    IsFreeFlow = _freeFlow;
   }
 
   #region IPersistentEntity implementation

@@ -62,23 +62,23 @@ sealed class WaterValveFragment : IEntityPanelFragment {
 
     _logStatsCheckbox = _builder.Presets().Toggles()
          .CheckmarkInverted(text: LogExtraStatsText, color: UiFactory.PanelNormalColor);
-    _logStatsCheckbox.RegisterValueChangedCallback(_ => _waterValve._logExtraStats = _logStatsCheckbox.value);
+    _logStatsCheckbox.RegisterValueChangedCallback(_ => _waterValve.LogExtraStats = _logStatsCheckbox.value);
 
     _freeFlowCheckbox = _builder.Presets().Toggles()
         .CheckmarkInverted(text: FreeFlowText, color: UiFactory.PanelNormalColor);
     _freeFlowCheckbox.RegisterValueChangedCallback(
-        _ => _waterValve._freeFlow = _freeFlowCheckbox.value);
+        _ => _waterValve.IsFreeFlow = _freeFlowCheckbox.value);
 
     _waterFlowLimitText = presets.Labels().Label(color: UiFactory.PanelNormalColor);
     _waterFlowLimitSlider = UiFactory.Create(_visualElementLoader, v => _waterValve.WaterFlow = v);
 
     _inputWaterLevelText = presets.Labels().Label(color: UiFactory.PanelNormalColor);
     _inputWaterLevelSlider = UiFactory.Create(
-        _visualElementLoader, v => _waterValve._minimumWaterLevelAtIntake = v, highValue: 5);
+        _visualElementLoader, v => _waterValve.MinWaterLevelAtIntake = v, highValue: 5);
 
     _outputWaterLevelText = presets.Labels().Label(color: UiFactory.PanelNormalColor);
     _outputWaterLevelSlider = UiFactory.Create(
-        _visualElementLoader, v => _waterValve._maximumWaterLevelAtOuttake = v, highValue: 5);
+        _visualElementLoader, v => _waterValve.MaxWaterLevelAtOuttake = v, highValue: 5);
 
     _root = _builder.CreateFragmentBuilder()
         .AddComponent(_waterFlowLimitText).AddComponent(_waterFlowLimitSlider)
@@ -118,10 +118,10 @@ sealed class WaterValveFragment : IEntityPanelFragment {
       _outputWaterLevelSlider.SetValueWithoutNotify(_waterValve.MaxWaterLevelAtOuttake);
       _outputWaterLevelSlider.ToggleDisplayStyle(visible: _devModeManager.Enabled);
 
-      _freeFlowCheckbox.SetValueWithoutNotify(_waterValve._freeFlow);
+      _freeFlowCheckbox.SetValueWithoutNotify(_waterValve.IsFreeFlow);
       _freeFlowCheckbox.ToggleDisplayStyle(visible: _devModeManager.Enabled);
 
-      _logStatsCheckbox.SetValueWithoutNotify(_waterValve._logExtraStats);
+      _logStatsCheckbox.SetValueWithoutNotify(_waterValve.LogExtraStats);
       _logStatsCheckbox.ToggleDisplayStyle(visible: _devModeManager.Enabled);
     }
     _root.ToggleDisplayStyle(visible: _waterValve != null && (_waterValve.ShowUIPanel || _devModeManager.Enabled));
