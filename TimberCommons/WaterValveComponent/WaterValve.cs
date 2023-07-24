@@ -122,7 +122,7 @@ public class WaterValve : TickableComponent, IPersistentEntity {
     _outputCoordinatesTransformed = _blockObject.Transform(_outputCoordinates);
     _inputTileIndex = _directWaterServiceAccessor.CoordinatesToIndex(_inputCoordinatesTransformed);
     _outputTileIndex = _directWaterServiceAccessor.CoordinatesToIndex(_outputCoordinatesTransformed);
-    _valveBaseZ = _blockObject.BaseZ;
+    _valveBaseZ = _blockObject.Coordinates.z;
   }
 
   // FIXME(IgorZ): Once the debugging is done, set the consumer state once in StartTickable. 
