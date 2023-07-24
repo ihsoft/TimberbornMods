@@ -156,6 +156,7 @@ public class WaterValve : TickableComponent, IPersistentEntity {
       }
       _waterMover.WaterFlow = WaterFlow;
       _waterMover.FreeFlow = _freeFlow;
+      _waterMover.LogExtraStats = _logExtraStats;
       CurrentFlow = 2 * _waterMover.WaterMoved / Time.fixedDeltaTime;
       _waterMover.WaterMoved = 0;
     }
