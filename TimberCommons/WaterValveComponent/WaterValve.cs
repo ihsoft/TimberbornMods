@@ -20,7 +20,6 @@ namespace IgorZ.TimberCommons.WaterValveComponent {
 // Component:
 // * Enable overflow(or just user setting) - NA
 // * Allow backflow
-// * Min water lever
 
 /// <summary>Component that moves water from input to output based on the water levels.</summary>
 /// <remarks>
@@ -52,6 +51,12 @@ public class WaterValve : TickableComponent, IPersistentEntity {
   [SerializeField]
   internal bool _freeFlow = true;
 
+  [SerializeField]
+  internal float _minimumWaterLevelAtIntake = 0.2f;
+
+  [SerializeField]
+  internal float _maximumWaterLevelAtOuttake = 0.6f;
+
   // ReSharper restore InconsistentNaming
   #endregion
 
@@ -64,6 +69,16 @@ public class WaterValve : TickableComponent, IPersistentEntity {
 
   /// <summary>Water depth at the valve intake relative to the terrain or the bottom obstacle(s).</summary>
   public float WaterDepthAtIntake { get; private set; }
+
+  /// <summary>The minimum level of water to maintain at the input.</summary>
+  /// <remarks>The valve won't take water if the level is blow the setting. Values below zero mean "no limit".</remarks>
+  public float MinWaterLevelAtIntake => _minimumWaterLevelAtIntake;
+
+  /// <summary>The maximum level of water to maintain at the output.</summary>
+  /// <remarks>
+  /// The valve won't move water if the level is above the setting. Values below zero mean "no limit".
+  /// </remarks>
+  public float MaxWaterLevelAtOuttake => _maximumWaterLevelAtOuttake;
 
   /// <summary>Water depth at the valve outtake relative to the terrain or the bottom obstacle(s).</summary>
   public float WaterDepthAtOuttake { get; private set; }
@@ -156,6 +171,8 @@ public class WaterValve : TickableComponent, IPersistentEntity {
       }
       _waterMover.WaterFlow = WaterFlow;
       _waterMover.FreeFlow = _freeFlow;
+      _waterMover.MinHeightAtInput = MinWaterLevelAtIntake > 0 ? MinWaterLevelAtIntake + _valveBaseZ : -1.0f;
+      _waterMover.MaxHeightAtOutput = MaxWaterLevelAtOuttake > 0 ? MaxWaterLevelAtOuttake + _valveBaseZ : -1.0f;
       _waterMover.LogExtraStats = _logExtraStats;
       CurrentFlow = 2 * _waterMover.WaterMoved / Time.fixedDeltaTime;
       _waterMover.WaterMoved = 0;

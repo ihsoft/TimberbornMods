@@ -23,6 +23,8 @@ sealed class WaterValveFragment : IEntityPanelFragment {
 
   const string WaterLevelAtInputText = "Water level at input: {0:0.00}";
   const string WaterLevelAtOutputText = "Water level at output: {0:0.00}";
+  const string MinimumLevelAtIntakeText = "Minimum level at intake: {0:0.00}";
+  const string MaximumLevelAtOuttakeText = "Maximum level at outtake: {0:0.00}";
   const string FreeFlowText = "Free flow";
   const string LogExtraStatsText = "Log extra stats";
 
@@ -35,6 +37,10 @@ sealed class WaterValveFragment : IEntityPanelFragment {
   Label _infoLabel;
   Label _waterFlowText;
   Slider _waterFlowSlider;
+  Label _inputWaterLevelText;
+  Slider _inputWaterLevelSlider;
+  Label _outputWaterLevelText;
+  Slider _outputWaterLevelSlider;
   Toggle _logStatsCheckbox;
   Toggle _freeFlowCheckbox;
 
@@ -63,10 +69,21 @@ sealed class WaterValveFragment : IEntityPanelFragment {
 
     _waterFlowSlider = UiFactory.Create(_visualElementLoader, v => _waterValve.WaterFlow = v);
 
+    _inputWaterLevelText = presets.Labels().Label(color: UiFactory.PanelNormalColor);
+    _outputWaterLevelText = presets.Labels().Label(color: UiFactory.PanelNormalColor);
+    _inputWaterLevelSlider = UiFactory.Create(
+        _visualElementLoader, v => _waterValve._minimumWaterLevelAtIntake = v, highValue: 5);
+    _outputWaterLevelSlider = UiFactory.Create(
+        _visualElementLoader, v => _waterValve._maximumWaterLevelAtOuttake = v, highValue: 5);
+
     _root = _builder.CreateFragmentBuilder()
         .AddComponent(_waterFlowText)
         .AddComponent(_waterFlowSlider)
         .AddComponent(_infoLabel)
+        .AddComponent(_inputWaterLevelText)
+        .AddComponent(_inputWaterLevelSlider)
+        .AddComponent(_outputWaterLevelText)
+        .AddComponent(_outputWaterLevelSlider)
         .AddComponent(_freeFlowCheckbox)
         .AddComponent(_logStatsCheckbox)
         .BuildAndInitialize();
@@ -84,6 +101,8 @@ sealed class WaterValveFragment : IEntityPanelFragment {
       _logStatsCheckbox.SetValueWithoutNotify(_waterValve._logExtraStats);
       _waterFlowSlider.highValue = Mathf.Max(_waterValve.FlowLimit, _waterValve.WaterFlow);
       _waterFlowSlider.SetValueWithoutNotify(_waterValve.WaterFlow);
+      _inputWaterLevelSlider.SetValueWithoutNotify(_waterValve.MinWaterLevelAtIntake);
+      _outputWaterLevelSlider.SetValueWithoutNotify(_waterValve.MaxWaterLevelAtOuttake);
       _root.ToggleDisplayStyle(visible: true);
     }
   }
@@ -111,6 +130,14 @@ sealed class WaterValveFragment : IEntityPanelFragment {
       _waterFlowSlider.lowValue = Mathf.Min(_waterValve.MinimumInGameFlow, _waterValve.WaterFlow);
       _waterFlowSlider.highValue = Mathf.Max(_waterValve.FlowLimit, _waterValve.WaterFlow);
     }
+    if (_devModeManager.Enabled) {
+      _inputWaterLevelText.text = string.Format(MinimumLevelAtIntakeText, _waterValve.MinWaterLevelAtIntake);
+      _outputWaterLevelText.text = string.Format(MaximumLevelAtOuttakeText, _waterValve.MaxWaterLevelAtOuttake);
+    }
+    _inputWaterLevelSlider.ToggleDisplayStyle(visible: _devModeManager.Enabled);
+    _inputWaterLevelText.ToggleDisplayStyle(visible: _devModeManager.Enabled);
+    _outputWaterLevelSlider.ToggleDisplayStyle(visible: _devModeManager.Enabled);
+    _outputWaterLevelText.ToggleDisplayStyle(visible: _devModeManager.Enabled);
     var info = new List<string> {
         _loc.T(WaterDepthAtIntakeLocKey, _waterValve.WaterDepthAtIntake.ToString("0.00")),
         _loc.T(WaterDepthAtOuttakeLocKey, _waterValve.WaterDepthAtOuttake.ToString("0.00")),
