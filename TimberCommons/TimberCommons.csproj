@@ -34,6 +34,7 @@
     </PropertyGroup>
     <ItemGroup>
       <Compile Include="TimberDev\HarmonyPatcher.cs" />
+      <Compile Include="TimberDev\UiFactory.cs" />
       <Compile Include="UnityDevLite\DebugEx.cs" />
       <Compile Include="WaterService\Configurator.cs" />
       <Compile Include="WaterService\DirectWaterServiceAccessor.cs" />
