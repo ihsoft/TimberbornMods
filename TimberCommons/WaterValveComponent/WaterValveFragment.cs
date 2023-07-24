@@ -16,11 +16,12 @@ using UnityEngine.UIElements;
 
 namespace IgorZ.TimberCommons.WaterValveComponent {
 
+/// <summary>Shows UP panel for the WaterValve component.</summary>
 sealed class WaterValveFragment : IEntityPanelFragment {
-  const string WaterFlowTextLocKey = "Limit water flow to: {0} m³/s";
-  const string WaterFlowLocKey = "Water flow: {0} m³/s";
-  const string WaterDepthAtIntakeLocKey = "Water depth at intake: {0}";
-  const string WaterDepthAtOuttakeLocKey = "Water depth at outtake: {0}";
+  const string WaterFlowLimitLocKey = "IgorZ.TimberCommons.WaterValve.WaterFlowLimit";
+  const string CurrentWaterFlowLocKey = "IgorZ.TimberCommons.WaterValve.CurrentWaterFlow";
+  const string WaterDepthAtIntakeLocKey = "IgorZ.TimberCommons.WaterValve.WaterDepthAtIntake";
+  const string WaterDepthAtOuttakeLocKey = "IgorZ.TimberCommons.WaterValve.WaterDepthAtOuttake";
 
   const string WaterLevelAtInputText = "Water level at input: {0:0.00}";
   const string WaterLevelAtOutputText = "Water level at output: {0:0.00}";
@@ -136,11 +137,11 @@ sealed class WaterValveFragment : IEntityPanelFragment {
     if (_waterValve == null || !_waterValve.ShowUIPanel && !_devModeManager.Enabled) {
       return;
     }
-    _waterFlowLimitText.text = string.Format(WaterFlowTextLocKey, _waterValve.WaterFlow.ToString("0.0#"));
+    _waterFlowLimitText.text = _loc.T(WaterFlowLimitLocKey, _waterValve.WaterFlow.ToString("0.0#"));
     var info = new List<string> {
         _loc.T(WaterDepthAtIntakeLocKey, _waterValve.WaterDepthAtIntake.ToString("0.00")),
         _loc.T(WaterDepthAtOuttakeLocKey, _waterValve.WaterDepthAtOuttake.ToString("0.00")),
-        _loc.T(WaterFlowLocKey, _waterValve.CurrentFlow.ToString("0.0"))
+        _loc.T(CurrentWaterFlowLocKey, _waterValve.CurrentFlow.ToString("0.0"))
     };
     if (_devModeManager.Enabled) {
       _inputWaterLevelText.text = string.Format(MinimumLevelAtIntakeText, _waterValve.MinWaterLevelAtIntake);
