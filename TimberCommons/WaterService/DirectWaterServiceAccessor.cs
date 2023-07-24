@@ -37,6 +37,7 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ILateUpdatable
   /// </remarks>
   public class WaterMover {
     internal WaterMover ThreadSafeWaterMover;
+    internal bool LogExtraStats;
 
     /// <summary>Index of the tile to get water from.</summary>
     public int InputTileIndex => _inputTileIndex;
@@ -58,9 +59,41 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ILateUpdatable
     /// <summary>Tells the logic to check if the water level at output is not above the input tile level.</summary>
     public bool FreeFlow;
 
+    /// <summary>
+    /// The maximum absolute water height to keep at the outtake. No water will be moved if the level is already high.
+    /// </summary>
+    /// <remarks>Set it to a negative value to indicate that this chek is not needed.</remarks>
+    /// <seealso cref="DirectWaterServiceAccessor.SurfaceHeights"/>
+    public float MaxHeightAtOutput = -1;
+
+    /// <summary>
+    /// The minimum absolute water height to keep at the outtake. No water will be moved if the level is already high.
+    /// </summary>
+    /// <remarks>Set it to a negative value to indicate that this chek is not needed.</remarks>
+    /// <seealso cref="DirectWaterServiceAccessor.SurfaceHeights"/>
+    public float MinHeightAtInput = -1;
+
     public WaterMover(int inputTileIndex, int outputTileIndex) {
       _inputTileIndex = inputTileIndex;
       _outputTileIndex = outputTileIndex;
+    }
+
+    internal WaterMover CopyDefinition() {
+      return new WaterMover(_inputTileIndex, _outputTileIndex) {
+          WaterFlow = WaterFlow,
+          FreeFlow = FreeFlow,
+          MaxHeightAtOutput = MaxHeightAtOutput,
+          MinHeightAtInput = MinHeightAtInput,
+          LogExtraStats = LogExtraStats,
+      };
+    }
+
+    internal void UpdateSettingsFrom(WaterMover source) {
+      WaterFlow = source.WaterFlow;
+      FreeFlow = source.FreeFlow;
+      MaxHeightAtOutput = source.MaxHeightAtOutput;
+      MinHeightAtInput = source.MinHeightAtInput;
+      LogExtraStats = source.LogExtraStats;
     }
   } 
   readonly List<WaterMover> _waterMovers = new();
@@ -92,6 +125,14 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ILateUpdatable
   public WaterFlow[] WaterFlows => _waterFlows;
   WaterFlow[] _waterFlows;
 
+  /// <summary>Water height bases indexed by the tile index.</summary>
+  /// <remarks>
+  /// <p>This height accounts both the terrain and the water obstacle blocks.</p>
+  /// <p>
+  /// The values can be read from any thread, but the updates must be synchronized to the <c>ParallelTick</c> calls.
+  /// </p>
+  /// </remarks>
+  /// <seealso cref="CoordinatesToIndex"/>
   public int[] SurfaceHeights => _surfaceHeights;
   int[] _surfaceHeights;
 
@@ -182,13 +223,9 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ILateUpdatable
       if (threadSafeMover != null) {
         waterMover.WaterMoved += threadSafeMover.WaterMoved;
         threadSafeMover.WaterMoved = 0;
-        threadSafeMover.WaterFlow = waterMover.WaterFlow;
-        threadSafeMover.FreeFlow = waterMover.FreeFlow;
+        threadSafeMover.UpdateSettingsFrom(waterMover);
       } else {
-        threadSafeMover = new WaterMover(waterMover.InputTileIndex, waterMover.OutputTileIndex) {
-            WaterFlow = waterMover.WaterFlow,
-            FreeFlow = waterMover.FreeFlow,
-        };
+        threadSafeMover = waterMover.CopyDefinition();
         waterMover.ThreadSafeWaterMover = threadSafeMover;
       }
       newMovers.Add(threadSafeMover);
@@ -209,17 +246,37 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ILateUpdatable
       var outputIndex = waterMover._outputTileIndex;
       var needAmount = waterMover.WaterFlow * deltaTime;
       var inDepth = _waterDepths[inputIndex];
+      var inWaterHeight = _surfaceHeights[inputIndex] + inDepth;
+      var outWaterHeight = _surfaceHeights[outputIndex] + _waterDepths[outputIndex];
       var canTakeAmount = Mathf.Min(needAmount, inDepth);
+      if (canTakeAmount < float.Epsilon) {
+        continue;
+      }
       if (waterMover.FreeFlow) {
-        var inHeight = _surfaceHeights[inputIndex];
-        var outDepth = _waterDepths[outputIndex];
-        var outHeight = _surfaceHeights[outputIndex];
-        var waterDiff = (inHeight + inDepth - outHeight - outDepth) / 2;
+        var waterDiff = (inWaterHeight - outWaterHeight) / 2;
         if (waterDiff < float.Epsilon) {
           continue;
         }
         if (waterDiff < canTakeAmount) {
           canTakeAmount = waterDiff;
+        }
+      }
+      if (waterMover.MinHeightAtInput > 0) {
+        var waterToTarget = inWaterHeight - waterMover.MinHeightAtInput;
+        if (waterToTarget < float.Epsilon) {
+          continue;
+        }
+        if (waterToTarget < canTakeAmount) {
+          canTakeAmount = waterToTarget;
+        }
+      }
+      if (waterMover.MaxHeightAtOutput > 0) {
+        var waterToTarget = waterMover.MaxHeightAtOutput - outWaterHeight;
+        if (waterToTarget < float.Epsilon) {
+          continue;
+        }
+        if (waterToTarget < canTakeAmount) {
+          canTakeAmount = waterToTarget;
         }
       }
       _waterDepths[inputIndex] -= canTakeAmount;
