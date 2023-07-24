@@ -20,16 +20,16 @@ sealed class WaterValveFragment : IEntityPanelFragment {
   const string WaterFlowLocKey = "Water flow: {0} m³/s";
   const string WaterDepthAtIntakeLocKey = "Water depth at intake: {0}";
   const string WaterDepthAtOuttakeLocKey = "Water depth at outtake: {0}";
-  const string WaterLevelAtInput = "Water level at input: {0:0.00}";
-  const string WaterLevelAtOutput = "Water level at output: {0:0.00}";
+
+  const string WaterLevelAtInputText = "Water level at input: {0:0.00}";
+  const string WaterLevelAtOutputText = "Water level at output: {0:0.00}";
   const string FreeFlowText = "Free flow";
+  const string LogExtraStatsText = "Log extra stats";
 
   readonly UIBuilder _builder;
   readonly ILoc _loc;
   readonly VisualElementLoader _visualElementLoader;
   readonly DevModeManager _devModeManager;
-
-  static readonly Color NormalColor = new(0.8f, 0.8f, 0.8f);
 
   VisualElement _root;
   Label _infoLabel;
@@ -50,11 +50,11 @@ sealed class WaterValveFragment : IEntityPanelFragment {
 
   public VisualElement InitializeFragment() {
     var presets = _builder.Presets();
-    _infoLabel = presets.Labels().Label(color: NormalColor);
-    _waterFlowText = presets.Labels().Label(color: NormalColor);
+    _infoLabel = presets.Labels().Label(color: UiFactory.PanelNormalColor);
+    _waterFlowText = presets.Labels().Label(color: UiFactory.PanelNormalColor);
 
     _logStatsCheckbox = _builder.Presets().Toggles()
-         .CheckmarkInverted(text: "Log extra stats", color: NormalColor);
+         .CheckmarkInverted(text: LogExtraStatsText, color: UiFactory.PanelNormalColor);
     _logStatsCheckbox.RegisterValueChangedCallback(_ => _waterValve._logExtraStats = _logStatsCheckbox.value);
     _freeFlowCheckbox = _builder.Presets().Toggles()
         .CheckmarkInverted(text: FreeFlowText, color: UiFactory.PanelNormalColor);
@@ -118,8 +118,8 @@ sealed class WaterValveFragment : IEntityPanelFragment {
     };
     if (_devModeManager.Enabled) {
       info.Add("\nDEV MODE DATA:");
-      info.Add(string.Format(WaterLevelAtInput, _waterValve.WaterHeightAtInput));
-      info.Add(string.Format(WaterLevelAtOutput, _waterValve.WaterHeightAtOutput));
+      info.Add(string.Format(WaterLevelAtInputText, _waterValve.WaterHeightAtInput));
+      info.Add(string.Format(WaterLevelAtOutputText, _waterValve.WaterHeightAtOutput));
     }
     _infoLabel.text = string.Join("\n", info);
   }
