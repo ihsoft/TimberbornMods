@@ -10,6 +10,7 @@ using HarmonyLib;
 using IgorZ.TimberDev.Utils;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.SingletonSystem;
+using Timberborn.TickSystem;
 using Timberborn.WaterSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
@@ -28,7 +29,7 @@ namespace IgorZ.TimberCommons.WaterService {
 /// </remarks>
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
-public class DirectWaterServiceAccessor : IPostLoadableSingleton, ILateUpdatableSingleton {
+public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingleton {
   /// <summary>Water mover definition.</summary>
   /// <remarks>
   /// The mover takes water from the inout and drops it at the output. Various settings allow adjusting the exact
@@ -197,9 +198,9 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ILateUpdatable
   }
   #endregion
 
-  #region ILateUpdatableSingleton implementation
+  #region ITickableSingleton implementation
   /// <summary>Updates stats in the water consumers and creates a thread safe copy.</summary>
-  public void LateUpdateSingleton() {
+  public void Tick() {
     var newMovers = new List<WaterMover>();
     foreach (var waterMover in _waterMovers) {
       if (waterMover.InputTileIndex == -1 || waterMover.OutputTileIndex == -1) {
