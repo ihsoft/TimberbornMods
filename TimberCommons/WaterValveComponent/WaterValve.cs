@@ -15,14 +15,6 @@ using UnityEngine;
 
 namespace IgorZ.TimberCommons.WaterValveComponent {
 
-// TODO: settings
-// Ingame:
-// * Limit overflow (over 1 high) maybe user setting default 1high - NA
-// * Backflow - NA
-// Component:
-// * Enable overflow(or just user setting) - NA
-// * Allow backflow
-
 /// <summary>Component that moves water from input to output based on the water levels.</summary>
 /// <remarks>
 /// The water is moved from tiles with a higher level to the tiles with a lover level. The maximum water flow can be
@@ -59,6 +51,9 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
   [SerializeField]
   float _maximumWaterLevelAtOuttake = 0.6f;
 
+  [SerializeField]
+  bool _allowDisablingOutputLevelCheck = true;
+
   // ReSharper restore InconsistentNaming
   #endregion
 
@@ -89,12 +84,12 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
   /// <remarks>
   /// The valve won't move water if the level is above the setting. Values below zero mean "no limit".
   /// </remarks>
-  //public float MaxWaterLevelAtOuttake => _maximumWaterLevelAtOuttake;
+  /// <seealso cref="OutputLevelCheckDisabled"/>
   public float MaxWaterLevelAtOuttake {
     get => _maximumWaterLevelAtOuttake;
     internal set {
       _maximumWaterLevelAtOuttake = value;
-      _waterMover.MaxHeightAtOutput = value > 0 ? value + _valveBaseZ : -1.0f;
+      _waterMover.MaxHeightAtOutput = !OutputLevelCheckDisabled && value > 0 ? value + _valveBaseZ : -1.0f;
     }
   }
 
@@ -135,6 +130,26 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
   /// <remarks>The maximum level is <see cref="FlowLimit"/>.</remarks>
   /// <seealso cref="CanChangeFlowInGame"/>
   public float MinimumInGameFlow => _minimumInGameFlow;
+
+  /// <summary>Indicates that water level check at the output can be disabled via UI.</summary>
+  /// <seealso cref="MaxWaterLevelAtOuttake"/>
+  /// <seealso cref="OutputLevelCheckDisabled"/>
+  public bool CanDisableOutputLevelCheck => _allowDisablingOutputLevelCheck;
+
+  /// <summary>Tells if the output water level check is being performed by the valve.</summary>
+  /// <remarks>
+  /// This setting depends on <see cref="MaxWaterLevelAtOuttake"/>. If the maximum water level is not set, then this
+  /// setting has no effect.
+  /// </remarks>
+  /// <seealso cref="MaxWaterLevelAtOuttake"/>
+  public bool OutputLevelCheckDisabled {
+    get => _outputLevelCheckDisabled;
+    set {
+      _outputLevelCheckDisabled = value;
+      MaxWaterLevelAtOuttake = MaxWaterLevelAtOuttake; // Refresh water mover.
+    }
+  }
+  bool _outputLevelCheckDisabled;
 
   /// <summary>Indicates if the UI panel should be shown when the valve is selected. It's a prefab setting.</summary>
   public bool ShowUIPanel => _showUIPanel;
@@ -201,11 +216,13 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
   #region IPersistentEntity implementation
   static readonly ComponentKey WaterValveKey = new(typeof(WaterValve).FullName);
   static readonly PropertyKey<float> WaterFlowLimitKey = new(nameof(WaterFlow));
+  static readonly PropertyKey<bool> OutputLevelCheckDisabledKey = new(nameof(OutputLevelCheckDisabled));
 
   /// <inheritdoc/>
   public void Save(IEntitySaver entitySaver) {
     var saver = entitySaver.GetComponent(WaterValveKey);
     saver.Set(WaterFlowLimitKey, WaterFlow);
+    saver.Set(OutputLevelCheckDisabledKey, OutputLevelCheckDisabled);
   }
 
   /// <inheritdoc/>
@@ -216,6 +233,7 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
     }
     var state = entityLoader.GetComponent(WaterValveKey);
     WaterFlow = state.GetValueOrNullable(WaterFlowLimitKey) ?? FlowLimit;
+    OutputLevelCheckDisabled = state.GetValueOrNullable(OutputLevelCheckDisabledKey) ?? false;
   }
   #endregion
 
