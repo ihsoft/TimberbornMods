@@ -40,19 +40,40 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
     internal bool LogExtraStats;
 
     /// <summary>Index of the tile to get water from.</summary>
-    public int InputTileIndex;
+    /// <remarks>If set to <c>-1</c>, then only the mover will only be adding water.</remarks>
+    /// <seealso cref="DropWaterLimit"/>
+    public int InputTileIndex = -1;
 
     /// <summary>Index of the tile to drop the water to.</summary>
-    public int OutputTileIndex;
+    /// <remarks>If set to <c>-1</c>, then the mover will only be consuming water.</remarks>
+    /// <seealso cref="ConsumeWaterLimit"/>
+    public int OutputTileIndex = -1;
 
     /// <summary>
     /// In <see cref="FreeFlow"/> mode this is the maximum allowed flow. Otherwise, it's a desirable flow that the mover
     /// will try to achieve, given there is enough water supply at the input.
     /// </summary>
+    /// <remarks>The flow must not be a negative value.</remarks>
     public float WaterFlow;
 
-    /// <summary>Accumulated amount of moved water. Reset it to 0 to measure flow between the ticks.</summary>
+    /// <summary>Accumulated amount of moved water.</summary>
+    /// <seealso cref="DropWaterLimit"/>
+    /// <seealso cref="ConsumeWaterLimit"/>
     public float WaterMoved;
+
+    /// <summary>Maximum amount of water to drop at the outtake.</summary>
+    /// <remarks>
+    /// Water mover stops when <see cref="WaterMoved"/> reaches this value. If set to a negative value, then the limit
+    /// is not checked.
+    /// </remarks>
+    public float DropWaterLimit = -1;
+
+    /// <summary>Maximum amount of water that can be consumed at the intake.</summary>
+    /// <remarks>
+    /// Water mover stops when <see cref="WaterMoved"/> reaches this value. If set to a negative value, then the limit
+    /// is not checked.
+    /// </remarks>
+    public float ConsumeWaterLimit = -1;
 
     /// <summary>Tells the logic to check if the water level at output is not above the input tile level.</summary>
     public bool FreeFlow;
@@ -80,6 +101,8 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
       return new WaterMover {
           InputTileIndex = InputTileIndex,
           OutputTileIndex = OutputTileIndex,
+          DropWaterLimit = DropWaterLimit,
+          ConsumeWaterLimit = ConsumeWaterLimit,
           WaterFlow = WaterFlow,
           FreeFlow = FreeFlow,
           MaxHeightAtOutput = MaxHeightAtOutput,
@@ -203,13 +226,22 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
   public void Tick() {
     var newMovers = new List<WaterMover>();
     foreach (var waterMover in _waterMovers) {
-      if (waterMover.InputTileIndex == -1 || waterMover.OutputTileIndex == -1) {
-        throw new InvalidOperationException("Water consumers and givers are not supported yet!");
+      if (waterMover.InputTileIndex == -1 && waterMover.OutputTileIndex == -1) {
+        throw new InvalidOperationException("Water mover must have input or output defined");
+      }
+      if (waterMover.WaterFlow < 0) {
+        throw new InvalidOperationException("Water flow must be a positive or zero value");
       }
       var threadSafeMover = waterMover.ThreadSafeWaterMover;
       if (threadSafeMover != null) {
         waterMover.WaterMoved += threadSafeMover.WaterMoved;
         threadSafeMover.WaterMoved = 0;
+        if (waterMover.ConsumeWaterLimit >= 0) {
+          threadSafeMover.ConsumeWaterLimit = Mathf.Max(waterMover.ConsumeWaterLimit - waterMover.WaterMoved, 0);
+        }
+        if (waterMover.DropWaterLimit >= 0) {
+          threadSafeMover.DropWaterLimit = Mathf.Max(waterMover.DropWaterLimit - waterMover.WaterMoved, 0);
+        }
         threadSafeMover.UpdateSettingsFrom(waterMover);
       } else {
         threadSafeMover = waterMover.CopyDefinition();
@@ -225,51 +257,145 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
   /// <summary>
   /// Processes the water consumption. Must only be called from the thread that is processing the water height updates. 
   /// </summary>
+  /// <remarks>
+  /// This method is called from the water simulation threads at a very high frequency. Keep it simple and fast.
+  /// </remarks>
   /// <param name="deltaTime">Simulation step delta.</param>
   void UpdateDepthsCallback(float deltaTime) {
     for (var i = _threadSafeWaterMovers.Count - 1; i >= 0; i--) {
       var waterMover = _threadSafeWaterMovers[i];
       var inputIndex = waterMover.InputTileIndex;
       var outputIndex = waterMover.OutputTileIndex;
-      var needAmount = waterMover.WaterFlow * deltaTime;
-      var inDepth = _waterDepths[inputIndex];
-      var inWaterHeight = _surfaceHeights[inputIndex] + inDepth;
-      var outWaterHeight = _surfaceHeights[outputIndex] + _waterDepths[outputIndex];
-      var canTakeAmount = Mathf.Min(needAmount, inDepth);
-      if (canTakeAmount < float.Epsilon) {
-        continue;
+      if (inputIndex != -1 && outputIndex != -1) {
+        MoveWater(waterMover, deltaTime);
+      } else if (inputIndex != -1) {
+        ConsumeWater(waterMover, deltaTime);
+      } else {
+        DropWater(waterMover, deltaTime);
       }
-      if (waterMover.FreeFlow) {
-        var waterDiff = (inWaterHeight - outWaterHeight) / 2;
-        if (waterDiff < float.Epsilon) {
-          continue;
-        }
-        if (waterDiff < canTakeAmount) {
-          canTakeAmount = waterDiff;
-        }
-      }
-      if (waterMover.MinHeightAtInput > 0) {
-        var waterToTarget = inWaterHeight - waterMover.MinHeightAtInput;
-        if (waterToTarget < float.Epsilon) {
-          continue;
-        }
-        if (waterToTarget < canTakeAmount) {
-          canTakeAmount = waterToTarget;
-        }
-      }
-      if (waterMover.MaxHeightAtOutput > 0) {
-        var waterToTarget = waterMover.MaxHeightAtOutput - outWaterHeight;
-        if (waterToTarget < float.Epsilon) {
-          continue;
-        }
-        if (waterToTarget < canTakeAmount) {
-          canTakeAmount = waterToTarget;
-        }
-      }
-      _waterDepths[inputIndex] -= canTakeAmount;
-      _waterDepths[outputIndex] += canTakeAmount;
-      waterMover.WaterMoved += canTakeAmount;
     }
+  }
+
+  void MoveWater(WaterMover waterMover, float deltaTime) {
+    var inputIndex = waterMover.InputTileIndex;
+    var outputIndex = waterMover.OutputTileIndex;
+    var inDepth = _waterDepths[inputIndex];
+    var canMoveAmount = Mathf.Min(waterMover.WaterFlow * deltaTime, inDepth);
+    if (canMoveAmount < float.Epsilon) {
+      return;
+    }
+    var inWaterHeight = _surfaceHeights[inputIndex] + inDepth;
+    var outWaterHeight = _surfaceHeights[outputIndex] + _waterDepths[outputIndex];
+    if (waterMover.FreeFlow) {
+      var waterDiff = (inWaterHeight - outWaterHeight) / 2;
+      if (waterDiff < float.Epsilon) {
+        return;
+      }
+      if (waterDiff < canMoveAmount) {
+        canMoveAmount = waterDiff;
+      }
+    }
+    if (waterMover.MinHeightAtInput > 0) {
+      var waterToTarget = inWaterHeight - waterMover.MinHeightAtInput;
+      if (waterToTarget < float.Epsilon) {
+        return;
+      }
+      if (waterToTarget < canMoveAmount) {
+        canMoveAmount = waterToTarget;
+      }
+    }
+    if (waterMover.MaxHeightAtOutput > 0) {
+      var waterToTarget = waterMover.MaxHeightAtOutput - outWaterHeight;
+      if (waterToTarget < float.Epsilon) {
+        return;
+      }
+      if (waterToTarget < canMoveAmount) {
+        canMoveAmount = waterToTarget;
+      }
+    }
+    var waterMovedTillNow = waterMover.WaterMoved;
+    var consumeLimit = waterMover.ConsumeWaterLimit;
+    if (consumeLimit >= 0) {
+      var waterToTarget = consumeLimit - waterMovedTillNow;
+      if (waterToTarget < float.Epsilon) {
+        return;
+      }
+      if (waterToTarget < canMoveAmount) {
+        canMoveAmount = waterToTarget;
+      }
+    }
+    var dropLimit = waterMover.DropWaterLimit;
+    if (dropLimit >= 0) {
+      var waterToTarget = dropLimit - waterMovedTillNow;
+      if (waterToTarget < float.Epsilon) {
+        return;
+      }
+      if (waterToTarget < canMoveAmount) {
+        canMoveAmount = waterToTarget;
+      }
+    }
+    _waterDepths[inputIndex] -= canMoveAmount;
+    _waterDepths[outputIndex] += canMoveAmount;
+    waterMover.WaterMoved = waterMovedTillNow + canMoveAmount;
+  }
+
+  void ConsumeWater(WaterMover waterMover, float deltaTime) {
+    var inputIndex = waterMover.InputTileIndex;
+    var needAmount = waterMover.WaterFlow * deltaTime;
+    var inDepth = _waterDepths[inputIndex];
+    var canTakeAmount = Mathf.Min(needAmount, inDepth);
+    if (canTakeAmount < float.Epsilon) {
+      return;
+    }
+    if (waterMover.MinHeightAtInput > 0) {
+      var waterToTarget = _surfaceHeights[inputIndex] + inDepth - waterMover.MinHeightAtInput;
+      if (waterToTarget < float.Epsilon) {
+        return;
+      }
+      if (waterToTarget < canTakeAmount) {
+        canTakeAmount = waterToTarget;
+      }
+    }
+    var waterMovedTillNow = waterMover.WaterMoved;
+    var consumeLimit = waterMover.ConsumeWaterLimit;
+    if (consumeLimit >= 0) {
+      var waterToTarget = consumeLimit - waterMovedTillNow;
+      if (waterToTarget < float.Epsilon) {
+        return;
+      }
+      if (waterToTarget < canTakeAmount) {
+        canTakeAmount = waterToTarget;
+      }
+    }
+    _waterDepths[inputIndex] -= canTakeAmount;
+    waterMover.WaterMoved = waterMovedTillNow + canTakeAmount;
+  }
+
+  void DropWater(WaterMover waterMover, float deltaTime) {
+    var outputIndex = waterMover.OutputTileIndex;
+    var canDropAmount = waterMover.WaterFlow * deltaTime;
+    if (waterMover.MaxHeightAtOutput > 0) {
+      var waterToTarget = waterMover.MaxHeightAtOutput - _surfaceHeights[outputIndex] - _waterDepths[outputIndex];
+      if (waterToTarget < float.Epsilon) {
+        return;
+      }
+      if (waterToTarget < canDropAmount) {
+        canDropAmount = waterToTarget;
+      }
+    }
+    var waterMovedTillNow = waterMover.WaterMoved;
+    var dropLimit = waterMover.DropWaterLimit;
+    if (dropLimit >= 0) {
+      var waterToTarget = dropLimit - waterMovedTillNow;
+      if (waterToTarget < float.Epsilon) {
+        return;
+      }
+      if (waterToTarget < canDropAmount) {
+        canDropAmount = waterToTarget;
+      }
+    }
+    _waterDepths[outputIndex] += canDropAmount;
+    waterMover.WaterMoved = waterMovedTillNow + canDropAmount;
   }
   #endregion
 
