@@ -97,7 +97,6 @@ sealed class WaterValveFragment : IEntityPanelFragment {
   public void ShowFragment(BaseComponent entity) {
     _waterValve = entity.GetComponentFast<WaterValve>();
     if (_waterValve != null) {
-      var showWaterFlowLimitControls = _devModeManager.Enabled || _waterValve.CanChangeFlowInGame;
       if (_devModeManager.Enabled) {
         _waterFlowLimitSlider.lowValue = 0;
         _waterFlowLimitSlider.highValue = Mathf.Max(_waterValve.WaterFlow, 10);
@@ -105,11 +104,10 @@ sealed class WaterValveFragment : IEntityPanelFragment {
         _waterFlowLimitSlider.lowValue = Mathf.Min(_waterValve.MinimumInGameFlow, _waterValve.WaterFlow);
         _waterFlowLimitSlider.highValue = Mathf.Max(_waterValve.FlowLimit, _waterValve.WaterFlow);
       }
+      var showWaterFlowLimitControls = _devModeManager.Enabled || _waterValve.CanChangeFlowInGame;
       _waterFlowLimitText.ToggleDisplayStyle(visible: showWaterFlowLimitControls);
       _waterFlowLimitSlider.ToggleDisplayStyle(visible: showWaterFlowLimitControls);
-      if (showWaterFlowLimitControls) {
-        _waterFlowLimitSlider.SetValueWithoutNotify(_waterValve.WaterFlow);
-      }
+      _waterFlowLimitSlider.SetValueWithoutNotify(_waterValve.WaterFlow);
 
       _inputWaterLevelText.ToggleDisplayStyle(visible: _devModeManager.Enabled);
       _inputWaterLevelSlider.SetValueWithoutNotify(_waterValve.MinWaterLevelAtIntake);
