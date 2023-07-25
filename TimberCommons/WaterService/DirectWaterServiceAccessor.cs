@@ -76,7 +76,7 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
     public float ConsumeWaterLimit = -1;
 
     /// <summary>Tells the logic to check if the water level at output is not above the input tile level.</summary>
-    public bool FreeFlow;
+    public bool FreeFlow = true;
 
     /// <summary>
     /// The maximum absolute water height to keep at the outtake. No water will be moved if the level is already high.
