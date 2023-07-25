@@ -43,9 +43,6 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
   float _minimumInGameFlow = 0;
 
   [SerializeField]
-  bool _freeFlow = true;
-
-  [SerializeField]
   float _minimumWaterLevelAtIntake = 0.2f;
 
   [SerializeField]
@@ -112,16 +109,6 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
     internal set => _waterMover.WaterFlow = value;
   }
 
-  /// <summary>Indicates that the water is moving in a "natural" way from the higher levels to the lowers.</summary>
-  /// <remarks>
-  /// If this value is <c>false</c>, then the component behaves as a pump that can make the output lever higher than at
-  /// the input.
-  /// </remarks>
-  public bool IsFreeFlow {
-    get => _waterMover.FreeFlow;
-    internal set => _waterMover.FreeFlow = value;
-  }
-
   /// <summary>Indicates that flow limit can be changed via UI panel. It's a prefab setting.</summary>
   /// <seealso cref="MinimumInGameFlow"/>
   public bool CanChangeFlowInGame => _canChangeFlowInGame;
@@ -165,11 +152,6 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
   Vector2Int _inputCoordinatesTransformed;
   Vector2Int _outputCoordinatesTransformed;
 
-  public bool LogExtraStats {
-    get => _waterMover.LogExtraStats;
-    internal set => _waterMover.LogExtraStats = value;
-  }
-
   void Awake() {
     _blockObject = GetComponentFast<BlockObject>();
     UpdateAdjustableValuesFromPrefab();
@@ -210,7 +192,6 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
 
   void UpdateAdjustableValuesFromPrefab() {
     WaterFlow = _waterFlowPerSecond;
-    IsFreeFlow = _freeFlow;
   }
 
   #region IPersistentEntity implementation

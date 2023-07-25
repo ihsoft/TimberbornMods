@@ -28,8 +28,6 @@ sealed class WaterValveFragment : IEntityPanelFragment {
   const string WaterLevelAtOutputText = "Water level at output: {0:0.00}";
   const string MinimumLevelAtIntakeText = "Minimum level at intake: {0:0.00}";
   const string MaximumLevelAtOuttakeText = "Maximum level at outtake: {0:0.00}";
-  const string FreeFlowText = "Free flow";
-  const string LogExtraStatsText = "Log extra stats";
 
   readonly UIBuilder _builder;
   readonly ILoc _loc;
@@ -45,8 +43,6 @@ sealed class WaterValveFragment : IEntityPanelFragment {
   Slider _inputWaterLevelSlider;
   Label _outputWaterLevelText;
   Slider _outputWaterLevelSlider;
-  Toggle _logStatsCheckbox;
-  Toggle _freeFlowCheckbox;
 
   WaterValve _waterValve;
 
@@ -62,15 +58,6 @@ sealed class WaterValveFragment : IEntityPanelFragment {
   public VisualElement InitializeFragment() {
     var presets = _builder.Presets();
     _infoLabel = presets.Labels().Label(color: UiFactory.PanelNormalColor);
-
-    _logStatsCheckbox = _builder.Presets().Toggles()
-         .CheckmarkInverted(text: LogExtraStatsText, color: UiFactory.PanelNormalColor);
-    _logStatsCheckbox.RegisterValueChangedCallback(_ => _waterValve.LogExtraStats = _logStatsCheckbox.value);
-
-    _freeFlowCheckbox = _builder.Presets().Toggles()
-        .CheckmarkInverted(text: FreeFlowText, color: UiFactory.PanelNormalColor);
-    _freeFlowCheckbox.RegisterValueChangedCallback(
-        _ => _waterValve.IsFreeFlow = _freeFlowCheckbox.value);
 
     _disableOutputLevelCheckCheckbox = _builder.Presets().Toggles()
         .CheckmarkInverted(text: _loc.T(DisableLevelCheckAtOutputLocKey), color: UiFactory.PanelNormalColor);
@@ -95,8 +82,6 @@ sealed class WaterValveFragment : IEntityPanelFragment {
         .AddComponent(_infoLabel)
         .AddComponent(_inputWaterLevelText).AddComponent(_inputWaterLevelSlider)
         .AddComponent(_outputWaterLevelText).AddComponent(_outputWaterLevelSlider)
-        .AddComponent(_freeFlowCheckbox)
-        .AddComponent(_logStatsCheckbox)
         .BuildAndInitialize();
     _root.ToggleDisplayStyle(visible: false);
 
@@ -129,12 +114,6 @@ sealed class WaterValveFragment : IEntityPanelFragment {
       _outputWaterLevelText.ToggleDisplayStyle(visible: _devModeManager.Enabled);
       _outputWaterLevelSlider.SetValueWithoutNotify(_waterValve.MaxWaterLevelAtOuttake);
       _outputWaterLevelSlider.ToggleDisplayStyle(visible: _devModeManager.Enabled);
-
-      _freeFlowCheckbox.SetValueWithoutNotify(_waterValve.IsFreeFlow);
-      _freeFlowCheckbox.ToggleDisplayStyle(visible: _devModeManager.Enabled);
-
-      _logStatsCheckbox.SetValueWithoutNotify(_waterValve.LogExtraStats);
-      _logStatsCheckbox.ToggleDisplayStyle(visible: _devModeManager.Enabled);
     }
     _root.ToggleDisplayStyle(visible: _waterValve != null && (_waterValve.ShowUIPanel || _devModeManager.Enabled));
   }
