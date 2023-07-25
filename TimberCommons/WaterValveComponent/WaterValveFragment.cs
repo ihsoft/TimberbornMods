@@ -136,19 +136,24 @@ sealed class WaterValveFragment : IEntityPanelFragment {
       return;
     }
     _waterFlowLimitText.text = _loc.T(WaterFlowLimitLocKey, _waterValve.WaterFlow.ToString("0.0#"));
-    var info = new List<string> {
-        _loc.T(WaterDepthAtIntakeLocKey, _waterValve.WaterDepthAtIntake.ToString("0.00")),
-        _loc.T(WaterDepthAtOuttakeLocKey, _waterValve.WaterDepthAtOuttake.ToString("0.00")),
-        _loc.T(CurrentWaterFlowLocKey, _waterValve.CurrentFlow.ToString("0.0"))
-    };
     if (_devModeManager.Enabled) {
       _inputWaterLevelText.text = string.Format(MinimumLevelAtIntakeText, _waterValve.MinWaterLevelAtIntake);
       _outputWaterLevelText.text = string.Format(MaximumLevelAtOuttakeText, _waterValve.MaxWaterLevelAtOuttake);
-      info.Add("\nDEV MODE DATA:");
-      info.Add(string.Format(WaterLevelAtInputText, _waterValve.WaterHeightAtInput));
-      info.Add(string.Format(WaterLevelAtOutputText, _waterValve.WaterHeightAtOutput));
     }
-    _infoLabel.text = string.Join("\n", info);
+    if (_waterValve.enabled) {
+      var info = new List<string> {
+          _loc.T(WaterDepthAtIntakeLocKey, _waterValve.WaterDepthAtIntake.ToString("0.00")),
+          _loc.T(WaterDepthAtOuttakeLocKey, _waterValve.WaterDepthAtOuttake.ToString("0.00")),
+          _loc.T(CurrentWaterFlowLocKey, _waterValve.CurrentFlow.ToString("0.0"))
+      };
+      if (_devModeManager.Enabled) {
+        info.Add("\nDEV MODE DATA:");
+        info.Add(string.Format(WaterLevelAtInputText, _waterValve.WaterHeightAtInput));
+        info.Add(string.Format(WaterLevelAtOutputText, _waterValve.WaterHeightAtOutput));
+      }
+      _infoLabel.text = string.Join("\n", info);
+    }
+    _infoLabel.ToggleDisplayStyle(visible: _waterValve.enabled);
   }
 
   [OnEvent]

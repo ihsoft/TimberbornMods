@@ -6,6 +6,7 @@ using System;
 using Bindito.Core;
 using IgorZ.TimberCommons.WaterService;
 using Timberborn.BlockSystem;
+using Timberborn.ConstructibleSystem;
 using Timberborn.MapIndexSystem;
 using Timberborn.Persistence;
 using Timberborn.TickSystem;
@@ -27,7 +28,7 @@ namespace IgorZ.TimberCommons.WaterValveComponent {
 /// The water is moved from tiles with a higher level to the tiles with a lover level. The maximum water flow can be
 /// limited. Add this component to a water obstacle prefab.
 /// </remarks>
-public class WaterValve : TickableComponent, IPersistentEntity {
+public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinishedStateListener {
   #region Unity fields
   // ReSharper disable InconsistentNaming
 
@@ -157,7 +158,7 @@ public class WaterValve : TickableComponent, IPersistentEntity {
   void Awake() {
     _blockObject = GetComponentFast<BlockObject>();
     UpdateAdjustableValuesFromPrefab();
-    enabled = true;
+    enabled = false;
   }
 
   public override void StartTickable() {
@@ -171,7 +172,6 @@ public class WaterValve : TickableComponent, IPersistentEntity {
     _outputCoordinatesTransformed = _blockObject.Transform(_outputCoordinates);
     _waterMover.InputTileIndex = _mapIndexService.CoordinatesToIndex(_inputCoordinatesTransformed);
     _waterMover.OutputTileIndex = _mapIndexService.CoordinatesToIndex(_outputCoordinatesTransformed);
-    _directWaterServiceAccessor.AddWaterMover(_waterMover);
     MinWaterLevelAtIntake = MinWaterLevelAtIntake;
     MaxWaterLevelAtOuttake = MaxWaterLevelAtOuttake;
   }
@@ -216,6 +216,20 @@ public class WaterValve : TickableComponent, IPersistentEntity {
     }
     var state = entityLoader.GetComponent(WaterValveKey);
     WaterFlow = state.GetValueOrNullable(WaterFlowLimitKey) ?? FlowLimit;
+  }
+  #endregion
+
+  #region IFinishedStateListener implementation
+  /// <inheritdoc/>
+  public void OnEnterFinishedState() {
+    enabled = true;
+    _directWaterServiceAccessor.AddWaterMover(_waterMover);
+  }
+
+  /// <inheritdoc/>
+  public void OnExitFinishedState() {
+    enabled = false;
+    _directWaterServiceAccessor.DeleteWaterMover(_waterMover);
   }
   #endregion
 }
