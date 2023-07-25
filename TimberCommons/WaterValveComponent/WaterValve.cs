@@ -32,7 +32,7 @@ public class WaterValve : TickableComponent, IPersistentEntity {
   // ReSharper disable InconsistentNaming
 
   [SerializeField]
-  bool _showUIPanel = false;
+  bool _showUIPanel = true;
 
   [SerializeField]
   Vector2Int _inputCoordinates = new(0, 0);
@@ -44,7 +44,7 @@ public class WaterValve : TickableComponent, IPersistentEntity {
   float _waterFlowPerSecond = 1.5f;
 
   [SerializeField]
-  bool _canChangeFlowInGame = false;
+  bool _canChangeFlowInGame = true;
 
   [SerializeField]
   float _minimumInGameFlow = 0;
@@ -71,6 +71,9 @@ public class WaterValve : TickableComponent, IPersistentEntity {
   /// <summary>Water depth at the valve intake relative to the terrain or the bottom obstacle(s).</summary>
   public float WaterDepthAtIntake { get; private set; }
 
+  /// <summary>Water depth at the valve outtake relative to the terrain or the bottom obstacle(s).</summary>
+  public float WaterDepthAtOuttake { get; private set; }
+
   /// <summary>The minimum level of water to maintain at the input.</summary>
   /// <remarks>The valve won't take water if the level is blow the setting. Values below zero mean "no limit".</remarks>
   public float MinWaterLevelAtIntake {
@@ -94,21 +97,20 @@ public class WaterValve : TickableComponent, IPersistentEntity {
     }
   }
 
-  /// <summary>Water depth at the valve outtake relative to the terrain or the bottom obstacle(s).</summary>
-  public float WaterDepthAtOuttake { get; private set; }
-
-  /// <summary>The current speed of the water movement per second.</summary>
+  /// <summary>The actual speed of the water movement per second.</summary>
   /// <remarks>
-  /// This value get become less than the limit if not enough water supply at the intake, but it must never be above the
-  /// <see cref="WaterFlow"/>.
+  /// This value is not a constant and changes based on the water supply at the intake and the available space at the
+  /// outtake. It can be zero, but cannot be negative or exceed the <see cref="WaterFlow"/> setting.
   /// </remarks>
   public float CurrentFlow { get; private set; }
 
   /// <summary>Absolute limit of the water flow from the prefab.</summary>
+  /// <seealso cref="WaterFlow"/>
   public float FlowLimit => _waterFlowPerSecond;
 
-  /// <summary>Current water flow limit that was adjusted via UI or loaded from the saved state.</summary>
+  /// <summary>Current water flow limit setting that was adjusted via UI or loaded from the saved state.</summary>
   /// <remarks>It can be adjusted interactively during the game if <see cref="CanChangeFlowInGame"/> is set.</remarks>
+  /// <seealso cref="FlowLimit"/>
   public float WaterFlow {
     get => _waterMover.WaterFlow;
     internal set => _waterMover.WaterFlow = value;
@@ -116,7 +118,7 @@ public class WaterValve : TickableComponent, IPersistentEntity {
 
   /// <summary>Indicates that the water is moving in a "natural" way from the higher levels to the lowers.</summary>
   /// <remarks>
-  /// If this value is <c>false</c>, then the component is actually a pump that can make the output lever higher than at
+  /// If this value is <c>false</c>, then the component behaves as a pump that can make the output lever higher than at
   /// the input.
   /// </remarks>
   public bool IsFreeFlow {
@@ -125,6 +127,7 @@ public class WaterValve : TickableComponent, IPersistentEntity {
   }
 
   /// <summary>Indicates that flow limit can be changed via UI panel. It's a prefab setting.</summary>
+  /// <seealso cref="MinimumInGameFlow"/>
   public bool CanChangeFlowInGame => _canChangeFlowInGame;
 
   /// <summary>The minimum flow limit that can be set via UI panel. It's a prefab setting.</summary>
@@ -168,9 +171,9 @@ public class WaterValve : TickableComponent, IPersistentEntity {
     _outputCoordinatesTransformed = _blockObject.Transform(_outputCoordinates);
     _waterMover.InputTileIndex = _mapIndexService.CoordinatesToIndex(_inputCoordinatesTransformed);
     _waterMover.OutputTileIndex = _mapIndexService.CoordinatesToIndex(_outputCoordinatesTransformed);
-    MinWaterLevelAtIntake = _minimumWaterLevelAtIntake;
-    MaxWaterLevelAtOuttake = _maximumWaterLevelAtOuttake;
     _directWaterServiceAccessor.AddWaterMover(_waterMover);
+    MinWaterLevelAtIntake = MinWaterLevelAtIntake;
+    MaxWaterLevelAtOuttake = MaxWaterLevelAtOuttake;
   }
 
   public override void Tick() {
@@ -191,7 +194,7 @@ public class WaterValve : TickableComponent, IPersistentEntity {
   }
 
   void UpdateAdjustableValuesFromPrefab() {
-    WaterFlow = FlowLimit;
+    WaterFlow = _waterFlowPerSecond;
     IsFreeFlow = _freeFlow;
   }
 
