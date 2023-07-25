@@ -31,6 +31,8 @@
         <DefineConstants>TRACE</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
+        <DebugSymbols>true</DebugSymbols>
+        <DocumentationFile>bin\Release\TimberCommons.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
       <Compile Include="TimberDev\HarmonyPatcher.cs" />

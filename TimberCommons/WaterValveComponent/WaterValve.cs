@@ -142,6 +142,7 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
   public bool ShowUIPanel => _showUIPanel;
   #endregion
 
+  #region Implementation
   IWaterService _waterService;
   DirectWaterServiceAccessor _directWaterServiceAccessor;
   MapIndexService _mapIndexService;
@@ -158,6 +159,22 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
     enabled = false;
   }
 
+  /// <summary>Injected instances.</summary>
+  [Inject]
+  public void InjectDependencies(IWaterService waterService, DirectWaterServiceAccessor directWaterServiceAccessor,
+                                 MapIndexService mapIndexService) {
+    _waterService = waterService;
+    _directWaterServiceAccessor = directWaterServiceAccessor;
+    _mapIndexService = mapIndexService;
+  }
+
+  void UpdateAdjustableValuesFromPrefab() {
+    WaterFlow = _waterFlowPerSecond;
+  }
+  #endregion
+
+  #region TickableComponent implemenatation
+  /// <inheritdoc/>
   public override void StartTickable() {
     if (!_directWaterServiceAccessor.IsValid) {
       throw new InvalidOperationException("WaterValve requires operational DirectWaterServiceAccessor. See the logs!");
@@ -173,6 +190,7 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
     MaxWaterLevelAtOuttake = MaxWaterLevelAtOuttake;
   }
 
+  /// <inheritdoc/>
   public override void Tick() {
     WaterHeightAtInput = Mathf.Max(_waterService.WaterHeight(_inputCoordinatesTransformed), _valveBaseZ);
     WaterDepthAtIntake = _directWaterServiceAccessor.WaterDepths[_waterMover.InputTileIndex];
@@ -181,18 +199,7 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
     CurrentFlow = 2 * _waterMover.WaterMoved / Time.fixedDeltaTime;
     _waterMover.WaterMoved = 0;
   }
-
-  [Inject]
-  public void InjectDependencies(IWaterService waterService, DirectWaterServiceAccessor directWaterServiceAccessor,
-                                 MapIndexService mapIndexService) {
-    _waterService = waterService;
-    _directWaterServiceAccessor = directWaterServiceAccessor;
-    _mapIndexService = mapIndexService;
-  }
-
-  void UpdateAdjustableValuesFromPrefab() {
-    WaterFlow = _waterFlowPerSecond;
-  }
+  #endregion
 
   #region IPersistentEntity implementation
   static readonly ComponentKey WaterValveKey = new(typeof(WaterValve).FullName);
