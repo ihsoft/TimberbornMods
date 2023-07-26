@@ -1,0 +1,43 @@
+ID,Text
+IgorZ.Automation.ToolGroup.Main.DisplayName,"Setup automation"
+IgorZ.Automation.ToolGroup.Terrain.DisplayName,"Terrain changing"
+IgorZ.Automation.ToolGroup.Water.DisplayName,"Water conditions"
+IgorZ.Automation.ToolGroup.Power.DisplayName,"Power conditions"
+IgorZ.Automation.ToolGroup.Storage.DisplayName,"Storages conditions"
+
+IgorZ.Automation.Tool.tmpl.2LevelsDynamite.DisplayName,"Explode terrain 2 blocks down"
+IgorZ.Automation.Tool.tmpl.3LevelsDynamite.DisplayName,"Explode terrain 3 blocks down"
+IgorZ.Automation.Tool.tmpl.4LevelsDynamite.DisplayName,"Explode terrain 4 blocks down"
+IgorZ.Automation.Tool.tmpl.5LevelsDynamite.DisplayName,"Explode terrain 5 blocks down"
+IgorZ.Automation.Tool.tmpl.6LevelsDynamite.DisplayName,"Explode terrain 6 blocks down"
+IgorZ.Automation.Tool.tmpl.XLevelsDynamite.Description,"This template can be applied to dynamites, whether it is finished or still being built. Upon completion, the dynamite will detonate automatically, and a new dynamite blueprint will be placed to dig deeper."
+
+IgorZ.Automation.Tool.tmpl.EmptyAt50pct.DisplayName,"Empty the storage if capacity is above 50%"
+IgorZ.Automation.Tool.tmpl.EmptyAt60pct.DisplayName,"Empty the storage if capacity is above 60%"
+IgorZ.Automation.Tool.tmpl.EmptyAt70pct.DisplayName,"Empty the storage if capacity is above 70%"
+IgorZ.Automation.Tool.tmpl.EmptyAt80pct.DisplayName,"Empty the storage if capacity is above 80%"
+IgorZ.Automation.Tool.tmpl.EmptyAt90pct.DisplayName,"Empty the storage if capacity is above 90%"
+IgorZ.Automation.Tool.tmpl.EmptyAtXpct.Description,"This template can be applied to building that produce one type of good and have no input stock. If the <i>output</i> stock level exceeds the predetermined threshold, the building will transition into an 'empty' mode, facilitating rapid removal of goods."
+
+IgorZ.Automation.EmptyOutputStore.CustomStatus,"The building is being emptied on a priority basis."
+
+IgorZ.Automation.Tool.tmpl.DroughtPause.DisplayName,"Template: Pause during drought"
+IgorZ.Automation.Tool.tmpl.DroughtPause.Description,"Apply this template on buildings that should stay paused during droughts."
+IgorZ.Automation.Tool.tmpl.TemperatePause.DisplayName,"Template: Pause during temperate weather"
+IgorZ.Automation.Tool.tmpl.TemperatePause.Description,"Apply this template on buildings that should stay paused during temperate weather."
+
+IgorZ.Automation.CancelTool.Title,"Cancel automation"
+IgorZ.Automation.CancelTool.Description,"Use this tool to cleanup any automation on the buildings or construction sites."
+IgorZ.Automation.PauseTool.Title,"Pause buildings"
+IgorZ.Automation.PauseTool.Description,"Use this tool to pause buildings and construction sites."
+IgorZ.Automation.ResumeTool.Title,"Unpause buildings"
+IgorZ.Automation.ResumeTool.Description,"Use this tool to unpause buildings and construction sites."
+
+IgorZ.Automation.DummyTitle,"Generic title"
+IgorZ.Automation.DummyDescirption,"Generic descirption"
+
+TimberDev_Utils.Tools.LockSelectTool.SelectingObject,"Selecting: {0}"
+TimberDev_Utils.Tools.LockSelectTool.SelectingNObjects,"Selecting: {0} (x{1})"
+TimberDev_Utils.Tools.LockSelectTool.StartSelectingPrompt,"Point to an entity and click to start selecting"
+TimberDev_Utils.Tools.LockSelectTool.StartObjectSelectingPrompt,"Click to start selecting: {0}"
+TimberDev_Utils.Tools.LockSelectTool.DescriptionHint,"Hold <i>SHIFT</i> to select items of one type only."

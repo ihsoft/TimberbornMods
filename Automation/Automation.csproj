@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+        <ProjectGuid>{CD9EA9B6-88C7-417F-B9AC-B43FF6500001}</ProjectGuid>
+        <OutputType>Library</OutputType>
+        <AppDesignerFolder>Properties</AppDesignerFolder>
+        <RootNamespace>Automation</RootNamespace>
+        <AssemblyName>Automation</AssemblyName>
+        <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+        <FileAlignment>512</FileAlignment>
+        <LangVersion>9</LangVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <OutputPath>bin\Debug\</OutputPath>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugType>pdbonly</DebugType>
+        <Optimize>true</Optimize>
+        <OutputPath>bin\Release\</OutputPath>
+        <DefineConstants>TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <ItemGroup>
+      <Compile Include="Actions\AutomationActionBase.cs" />
+      <Compile Include="Actions\DetonateDynamiteAction.cs" />
+      <Compile Include="Actions\MarkForEmptyingAction.cs" />
+      <Compile Include="Actions\PauseAction.cs" />
+      <Compile Include="Actions\UnmarkForEmptyingAction.cs" />
+      <Compile Include="Actions\UnpauseAction.cs" />
+      <Compile Include="Conditions\AutomationConditionBase.cs" />
+      <Compile Include="Conditions\AutomationConditionBehaviorBase.cs" />
+      <Compile Include="Conditions\BlockObjectConditionBase.cs" />
+      <Compile Include="Conditions\GlobalConditionBase.cs" />
+      <Compile Include="Conditions\OutputStockAboveThresholdCondition.cs" />
+      <Compile Include="Conditions\OutputStockBelowThresholdCondition.cs" />
+      <Compile Include="Conditions\OutputStockThresholdConditionBase.cs" />
+      <Compile Include="Conditions\WeatherTrackerConditionBase.cs" />
+      <Compile Include="Conditions\DroughtEndedCondition.cs" />
+      <Compile Include="Conditions\DroughtStartedCondition.cs" />
+      <Compile Include="Conditions\ObjectFinishedCondition.cs" />
+      <Compile Include="Core\AutomationBehavior.cs" />
+      <Compile Include="Core\AutomationService.cs" />
+      <Compile Include="Core\Configurator.cs" />
+      <Compile Include="Core\IAutomationConditionListener.cs" />
+      <Compile Include="Core\IAutomationCondition.cs" />
+      <Compile Include="Core\IAutomationAction.cs" />
+      <Compile Include="Properties\AssemblyInfo.cs" />
+      <Compile Include="Tools\ApplyTemplateTool.cs" />
+      <Compile Include="Tools\AutomationRule.cs" />
+      <Compile Include="Tools\CancelTool.cs" />
+      <Compile Include="Tools\IAutomationModeEnabler.cs" />
+      <Compile Include="Tools\PauseTool.cs" />
+      <Compile Include="Tools\ResumeTool.cs" />
+      <Compile Include="UI\AutomationFragment.cs" />
+      <Compile Include="UI\Configurator.cs" />
+      <Compile Include="UnityDevLite\DebugEx.cs" />
+      <Compile Include="UnityDevLite\HostedDebugLog.cs" />
+      <Compile Include="UnityDevLite\ReflectedAction.cs" />
+      <Compile Include="Utils\AbstractAreaSelectionTool.cs" />
+      <Compile Include="Utils\AbstractLockingTool.cs" />
+      <Compile Include="Utils\CustomToolSystem.cs" />
+      <Compile Include="Utils\DynamicClassSerializer.cs" />
+      <Compile Include="Utils\IGameSerializable.cs" />
+      <Compile Include="Utils\StaticClassSerializer.cs" />
+      <Compile Include="Utils\ToolWithDescription.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <Reference Include="0Harmony, Version=2.9.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\0Harmony.dll</HintPath>
+      </Reference>
+      <Reference Include="BepInEx, Version=5.4.21.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\BepInEx.dll</HintPath>
+      </Reference>
+      <Reference Include="Bindito.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Bindito.Core.dll</HintPath>
+      </Reference>
+      <Reference Include="Bindito.Unity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Bindito.Unity.dll</HintPath>
+      </Reference>
+      <Reference Include="TimberApi, Version=0.5.5.3, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\TimberApi.dll</HintPath>
+      </Reference>
+      <Reference Include="TimberApi, Version=0.5.5.6, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\TimberApi.dll</HintPath>
+      </Reference>
+      <Reference Include="TimberApi.Common, Version=0.5.5.3, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\TimberApi.Common.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.AreaSelectionSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.AreaSelectionSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.AssetSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.AssetSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.Attractions, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.Attractions.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.BaseComponentSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.BaseComponentSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.BlockObjectTools, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.BlockObjectTools.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.BlockSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.BlockSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.BottomBarSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.BottomBarSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.BuilderPrioritySystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.BuilderPrioritySystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.BuildingsBlocking, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.BuildingsBlocking.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.Characters, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.Characters.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.Common, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.Common.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.ConstructibleSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.ConstructibleSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.ConstructionMode, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.ConstructionMode.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.Coordinates, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.Coordinates.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.CoreUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.CoreUI.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.Emptying, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.Emptying.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.EnterableSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.EnterableSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.EntityPanelSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.EntityPanelSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.EntitySystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.EntitySystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.Explosions, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.Explosions.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.GameSaveRuntimeSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.GameSaveRuntimeSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.GoodConsumingBuildingSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.GoodConsumingBuildingSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.Goods, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.Goods.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.InputSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.InputSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.InventorySystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.InventorySystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.Localization, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.Localization.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.MechanicalSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.MechanicalSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.Navigation, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.Navigation.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.Persistence, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.Persistence.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.PlantingUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.PlantingUI.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.PowerGenerating, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.PowerGenerating.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.PrefabSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.PrefabSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.SelectionSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.SelectionSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.SelectionToolSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.SelectionToolSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.SingletonSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.SingletonSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.StatusSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.StatusSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.TemplateSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.TemplateSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.TickSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.TickSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.ToolSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.ToolSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.WeatherSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.WeatherSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.WorldSerialization, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.WorldSerialization.dll</HintPath>
+      </Reference>
+      <Reference Include="UnityDev_Utils, Version=1.1.8577.3436, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Binaries\UnityDev_Utils.dll</HintPath>
+      </Reference>
+      <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Unity\UnityEngine.dll</HintPath>
+      </Reference>
+      <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Unity\UnityEngine.CoreModule.dll</HintPath>
+      </Reference>
+      <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Unity\UnityEngine.TextRenderingModule.dll</HintPath>
+      </Reference>
+      <Reference Include="UnityEngine.UIElementsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Unity\UnityEngine.UIElementsModule.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+    <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+         Other similar extension points exist, see Microsoft.Common.targets.
+    <Target Name="BeforeBuild">
+    </Target>
+    <Target Name="AfterBuild">
+    </Target>
+    -->
+    <Target Name="AfterBuild">
+        <Exec Command="xcopy /i /Y $(TargetPath) u:\BepInEx\plugins\IFTTT_Automation" />
+    </Target>
+</Project>

@@ -1,0 +1,9 @@
+{
+  "Id": "Automation.ResumeTool",
+  "GroupId": "AutomationToolGroupId",
+  "Type": "Automation.Tools.ResumeTool",
+  "Order": 11,
+  "Icon": "igorz.automation/ui_buttons/player-play",
+  "NameLocKey": "IgorZ.Automation.ResumeTool.Title",
+  "DescriptionLocKey": "IgorZ.Automation.ResumeTool.Description"
+}

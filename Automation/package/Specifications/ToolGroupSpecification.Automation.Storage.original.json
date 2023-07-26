@@ -1,0 +1,13 @@
+{
+  "Id": "AutomationStorageToolGroupId",
+  "GroupId": "AutomationToolGroupId",
+  "Type": "AutomationToolGroup",
+  "Layout": "Green",
+  "Order": 23,
+  "Icon": "igorz.automation/ui_buttons/automation-group-storage",
+  "NameLocKey": "IgorZ.Automation.ToolGroup.Storage.DisplayName",
+  "FallbackGroup": false,
+  "GroupInformation": {
+    "BottomBarSection": 0
+  }
+}

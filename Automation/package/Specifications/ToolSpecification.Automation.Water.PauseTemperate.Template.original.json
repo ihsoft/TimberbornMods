@@ -1,0 +1,21 @@
+{
+  "Id": "Automation.Tmpl.Water.PauseTemperate",
+  "GroupId": "AutomationWaterToolGroupId",
+  "Type": "Automation.Templates.ApplyTemplateTool",
+  "Order": 2,
+  "Icon": "igorz.automation/ui_buttons/icon-temperate-pause",
+  "NameLocKey": "IgorZ.Automation.Tool.tmpl.TemperatePause.DisplayName",
+  "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.TemperatePause.Description",
+  "ToolInformation": {
+    "Rules": [
+      {
+        "Condition": { "TypeId": "Automation.Conditions.DroughtStartedCondition" },
+        "Action": { "TypeId": "Automation.Actions.UnpauseAction" }
+      },
+      {
+        "Condition": { "TypeId": "Automation.Conditions.DroughtEndedCondition" },
+        "Action": { "TypeId": "Automation.Actions.PauseAction" }
+      }
+    ]
+  }
+}

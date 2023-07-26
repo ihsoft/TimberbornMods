@@ -1,0 +1,21 @@
+{
+  "Id": "Automation.Tmpl.Water.PauseDrought",
+  "GroupId": "AutomationWaterToolGroupId",
+  "Type": "Automation.Templates.ApplyTemplateTool",
+  "Order": 1,
+  "Icon": "igorz.automation/ui_buttons/icon-drought-pause",
+  "NameLocKey": "IgorZ.Automation.Tool.tmpl.DroughtPause.DisplayName",
+  "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.DroughtPause.Description",
+  "ToolInformation": {
+    "Rules": [
+      {
+        "Condition": { "TypeId": "Automation.Conditions.DroughtStartedCondition" },
+        "Action": { "TypeId": "Automation.Actions.PauseAction" }
+      },
+      {
+        "Condition": { "TypeId": "Automation.Conditions.DroughtEndedCondition" },
+        "Action": { "TypeId": "Automation.Actions.UnpauseAction" }
+      }
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "Id": "AutomationPowerToolGroupId",
+  "GroupId": "AutomationToolGroupId",
+  "Type": "AutomationToolGroup",
+  "Layout": "Green",
+  "Order": 22,
+  "Icon": "igorz.automation/ui_buttons/automation-power",
+  "NameLocKey": "IgorZ.Automation.ToolGroup.Power.DisplayName",
+  "FallbackGroup": false,
+  "GroupInformation": {
+    "BottomBarSection": 0
+  }
+}
