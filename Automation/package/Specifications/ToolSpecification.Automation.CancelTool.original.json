@@ -3,7 +3,7 @@
   "GroupId": "AutomationToolGroupId",
   "Type": "Automation.Tools.CancelTool",
   "Order": 200,
-  "Icon": "igorz.automation/ui_buttons/cancel",
+  "Icon": "igorz.automation/ui_icons/cancel",
   "NameLocKey": "IgorZ.Automation.CancelTool.Title",
   "DescriptionLocKey": "IgorZ.Automation.CancelTool.Description"
 }

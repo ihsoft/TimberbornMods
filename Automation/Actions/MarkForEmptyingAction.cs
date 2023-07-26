@@ -18,7 +18,7 @@ namespace Automation.Actions {
 /// explicit control over this mode.
 /// </remarks>
 public sealed class MarkForEmptyingAction : AutomationActionBase {
-  const string CustomStatusIcon = "igorz.automation/ui_buttons/status-icon-emptying";
+  const string CustomStatusIcon = "igorz.automation/ui_icons/status-icon-emptying";
   const string CustomStatusDescriptionKey = "IgorZ.Automation.EmptyOutputStore.CustomStatus";
 
   /// <summary>

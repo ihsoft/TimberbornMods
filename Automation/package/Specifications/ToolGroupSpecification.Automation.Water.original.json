@@ -4,7 +4,7 @@
   "Type": "AutomationToolGroup",
   "Layout": "Green",
   "Order": 21,
-  "Icon": "igorz.automation/ui_buttons/automation-water",
+  "Icon": "igorz.automation/ui_icons/automation-water",
   "NameLocKey": "IgorZ.Automation.ToolGroup.Water.DisplayName",
   "FallbackGroup": false,
   "GroupInformation": {

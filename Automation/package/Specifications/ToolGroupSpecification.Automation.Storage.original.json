@@ -4,7 +4,7 @@
   "Type": "AutomationToolGroup",
   "Layout": "Green",
   "Order": 23,
-  "Icon": "igorz.automation/ui_buttons/automation-group-storage",
+  "Icon": "igorz.automation/ui_icons/automation-group-storage",
   "NameLocKey": "IgorZ.Automation.ToolGroup.Storage.DisplayName",
   "FallbackGroup": false,
   "GroupInformation": {

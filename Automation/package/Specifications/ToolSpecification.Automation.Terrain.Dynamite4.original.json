@@ -3,7 +3,7 @@
   "GroupId": "AutomationTerrainToolGroupId",
   "Type": "Automation.Templates.ApplyTemplateTool",
   "Order": 3,
-  "Icon": "igorz.automation/ui_buttons/icon-dynamite-down-4",
+  "Icon": "igorz.automation/ui_icons/icon-dynamite-down-4",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.4LevelsDynamite.DisplayName",
   "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.XLevelsDynamite.Description",
   "ToolInformation": {

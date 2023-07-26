@@ -3,7 +3,7 @@
   "GroupId": "AutomationStorageToolGroupId",
   "Type": "Automation.Templates.ApplyTemplateTool",
   "Order": 10,
-  "Icon": "igorz.automation/ui_buttons/icon-empty-50pct",
+  "Icon": "igorz.automation/ui_icons/icon-empty-50pct",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.EmptyAt50pct.DisplayName",
   "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.EmptyAtXpct.Description",
   "ToolInformation": {

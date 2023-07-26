@@ -3,7 +3,7 @@
   "GroupId": "AutomationWaterToolGroupId",
   "Type": "Automation.Templates.ApplyTemplateTool",
   "Order": 1,
-  "Icon": "igorz.automation/ui_buttons/icon-drought-pause",
+  "Icon": "igorz.automation/ui_icons/icon-drought-pause",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.DroughtPause.DisplayName",
   "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.DroughtPause.Description",
   "ToolInformation": {
