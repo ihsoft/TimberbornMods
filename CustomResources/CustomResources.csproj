@@ -33,15 +33,12 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
-      <Compile Include="..\UnityDevLite\DebugEx.cs">
-        <Link>UnityDevLite\DebugEx.cs</Link>
-      </Compile>
-      <Compile Include="..\UnityDevLite\ReflectedField.cs">
-        <Link>UnityDevLite\ReflectedField.cs</Link>
-      </Compile>
       <Compile Include="AssetPatcher.cs" />
       <Compile Include="Configurator.cs" />
       <Compile Include="Properties\AssemblyInfo.cs" />
+      <Compile Include="UnityDevLite\DebugEx.cs" />
+      <Compile Include="UnityDevLite\ReflectedField.cs" />
+      <Compile Include="UnityDevLite\TypeUtils.cs" />
     </ItemGroup>
     <ItemGroup>
       <Reference Include="0Harmony, Version=2.9.0.0, Culture=neutral, PublicKeyToken=null">
