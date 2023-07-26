@@ -81,14 +81,14 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
     /// <summary>
     /// The maximum absolute water height to keep at the outtake. No water will be moved if the level is already high.
     /// </summary>
-    /// <remarks>Set it to a negative value to indicate that this chek is not needed.</remarks>
+    /// <remarks>Set it to a negative value to indicate that this check is not needed.</remarks>
     /// <seealso cref="DirectWaterServiceAccessor.SurfaceHeights"/>
     public float MaxHeightAtOutput = -1;
 
     /// <summary>
     /// The minimum absolute water height to keep at the outtake. No water will be moved if the level is already high.
     /// </summary>
-    /// <remarks>Set it to a negative value to indicate that this chek is not needed.</remarks>
+    /// <remarks>Set it to a negative value to indicate that this check is not needed.</remarks>
     /// <seealso cref="DirectWaterServiceAccessor.SurfaceHeights"/>
     public float MinHeightAtInput = -1;
 
