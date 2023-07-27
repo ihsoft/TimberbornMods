@@ -159,6 +159,10 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
     enabled = false;
   }
 
+  void OnDestroy() {
+    _directWaterServiceAccessor.DeleteWaterMover(_waterMover);
+  }
+
   /// <summary>Injected instances.</summary>
   [Inject]
   public void InjectDependencies(IWaterService waterService, DirectWaterServiceAccessor directWaterServiceAccessor,
@@ -188,6 +192,7 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
     _waterMover.OutputTileIndex = _mapIndexService.CoordinatesToIndex(_outputCoordinatesTransformed);
     MinWaterLevelAtIntake = MinWaterLevelAtIntake;
     MaxWaterLevelAtOuttake = MaxWaterLevelAtOuttake;
+    _directWaterServiceAccessor.AddWaterMover(_waterMover);
   }
 
   /// <inheritdoc/>
@@ -229,13 +234,11 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
   /// <inheritdoc/>
   public void OnEnterFinishedState() {
     enabled = true;
-    _directWaterServiceAccessor.AddWaterMover(_waterMover);
   }
 
   /// <inheritdoc/>
   public void OnExitFinishedState() {
     enabled = false;
-    _directWaterServiceAccessor.DeleteWaterMover(_waterMover);
   }
   #endregion
 }
