@@ -21,7 +21,7 @@ sealed class PauseTool : AbstractLockingTool {
 
   #region AbstractAreaSelectionTool overries
   /// <inheritdoc/>
-  protected override string CursorName => "igorz.automation/cursors/pause-cursor-large";
+  protected override string CursorName => "igorz.automation/cursors/pause-cursor";
 
   /// <inheritdoc/>
   protected override bool ObjectFilterExpression(BlockObject blockObject) {
