@@ -1,8 +1,8 @@
 # v1.1 (pre-release)
 * [Fix #4] In rare cases the game crashes when valve gets built.
-* Added `deDE` localization from @juf0816.
-* Added `Particle System` property to the `WaterValve` component.
+* Add `deDE` localization from @juf0816.
 * Update `ruRU` localization.
+* Add `Particle System` property to the `WaterValve` component.
 
 # v1.0 (25 Jul 2023)
 * Initial version of the mod.
