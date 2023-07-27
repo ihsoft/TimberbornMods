@@ -8,6 +8,7 @@ using IgorZ.TimberCommons.WaterService;
 using Timberborn.BlockSystem;
 using Timberborn.ConstructibleSystem;
 using Timberborn.MapIndexSystem;
+using Timberborn.Particles;
 using Timberborn.Persistence;
 using Timberborn.TickSystem;
 using Timberborn.WaterSystem;
@@ -50,6 +51,9 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
 
   [SerializeField]
   bool _allowDisablingOutputLevelCheck = true;
+
+  [SerializeField]
+  ParticleSystem _particleSystem = null;
 
   // ReSharper restore InconsistentNaming
   #endregion
@@ -146,15 +150,19 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
   IWaterService _waterService;
   DirectWaterServiceAccessor _directWaterServiceAccessor;
   MapIndexService _mapIndexService;
+  ParticlesRunnerFactory _particlesRunnerFactory;
+
   readonly DirectWaterServiceAccessor.WaterMover _waterMover = new();
 
   BlockObject _blockObject;
+  ParticlesRunner _particlesRunner;
   int _valveBaseZ;
   Vector2Int _inputCoordinatesTransformed;
   Vector2Int _outputCoordinatesTransformed;
 
   void Awake() {
     _blockObject = GetComponentFast<BlockObject>();
+    _particlesRunner = _particlesRunnerFactory.CreateForFinishedState(GameObjectFast, _particleSystem);
     UpdateAdjustableValuesFromPrefab();
     enabled = false;
   }
@@ -166,10 +174,11 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
   /// <summary>Injected instances.</summary>
   [Inject]
   public void InjectDependencies(IWaterService waterService, DirectWaterServiceAccessor directWaterServiceAccessor,
-                                 MapIndexService mapIndexService) {
+                                 MapIndexService mapIndexService, ParticlesRunnerFactory particlesRunnerFactory) {
     _waterService = waterService;
     _directWaterServiceAccessor = directWaterServiceAccessor;
     _mapIndexService = mapIndexService;
+    _particlesRunnerFactory = particlesRunnerFactory;
   }
 
   void UpdateAdjustableValuesFromPrefab() {
@@ -203,6 +212,11 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
     WaterDepthAtOuttake = _directWaterServiceAccessor.WaterDepths[_waterMover.OutputTileIndex];
     CurrentFlow = 2 * _waterMover.WaterMoved / Time.fixedDeltaTime;
     _waterMover.WaterMoved = 0;
+    if (CurrentFlow > 0) {
+      _particlesRunner.Play();
+    } else {
+      _particlesRunner.Stop();
+    }
   }
   #endregion
 
