@@ -27,8 +27,8 @@ static class UiFactory {
   /// </param>
   /// <param name="lowValue">The lowest possible value.</param>
   /// <param name="highValue">The highest possible value.</param>
-  public static Slider Create(VisualElementLoader visualElementLoader, Action<float> onValueChangedFn,
-                              float stepSize = 0.05f, float lowValue = 0, float highValue = 1.0f) {
+  public static Slider CreateSlider(VisualElementLoader visualElementLoader, Action<float> onValueChangedFn,
+                                    float stepSize = 0.05f, float lowValue = 0, float highValue = 1.0f) {
     var slider = visualElementLoader.LoadVisualElement("Common/IntegerSlider").Q<Slider>("Slider");
     slider.lowValue = lowValue;
     slider.highValue = highValue;
