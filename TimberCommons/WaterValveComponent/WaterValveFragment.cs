@@ -66,14 +66,14 @@ sealed class WaterValveFragment : IEntityPanelFragment {
     _disableOutputLevelCheckCheckbox.style.marginBottom = 5;
 
     _waterFlowLimitText = presets.Labels().Label(color: UiFactory.PanelNormalColor);
-    _waterFlowLimitSlider = UiFactory.Create(_visualElementLoader, v => _waterValve.WaterFlow = v);
+    _waterFlowLimitSlider = UiFactory.CreateSlider(_visualElementLoader, v => _waterValve.WaterFlow = v);
 
     _inputWaterLevelText = presets.Labels().Label(color: UiFactory.PanelNormalColor);
-    _inputWaterLevelSlider = UiFactory.Create(
+    _inputWaterLevelSlider = UiFactory.CreateSlider(
         _visualElementLoader, v => _waterValve.MinWaterLevelAtIntake = v, highValue: 5);
 
     _outputWaterLevelText = presets.Labels().Label(color: UiFactory.PanelNormalColor);
-    _outputWaterLevelSlider = UiFactory.Create(
+    _outputWaterLevelSlider = UiFactory.CreateSlider(
         _visualElementLoader, v => _waterValve.MaxWaterLevelAtOuttake = v, highValue: 5);
 
     _root = _builder.CreateFragmentBuilder()
