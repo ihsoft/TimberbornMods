@@ -162,7 +162,9 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
 
   void Awake() {
     _blockObject = GetComponentFast<BlockObject>();
-    _particlesRunner = _particlesRunnerFactory.CreateForFinishedState(GameObjectFast, _particleSystem);
+    if (_particleSystem != null) {
+      _particlesRunner = _particlesRunnerFactory.CreateForFinishedState(GameObjectFast, _particleSystem);
+    }
     UpdateAdjustableValuesFromPrefab();
     enabled = false;
   }
@@ -212,10 +214,12 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
     WaterDepthAtOuttake = _directWaterServiceAccessor.WaterDepths[_waterMover.OutputTileIndex];
     CurrentFlow = 2 * _waterMover.WaterMoved / Time.fixedDeltaTime;
     _waterMover.WaterMoved = 0;
-    if (CurrentFlow > 0) {
-      _particlesRunner.Play();
-    } else {
-      _particlesRunner.Stop();
+    if (_particlesRunner != null) {
+      if (CurrentFlow > float.Epsilon) {
+        _particlesRunner.Play();
+      } else {
+        _particlesRunner.Stop();
+      }
     }
   }
   #endregion
