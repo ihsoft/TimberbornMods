@@ -1,4 +1,4 @@
-# v1.1 (pre-release)
+# v1.1 (27 Jul 2023)
 * [Fix #4] In rare cases the game crashes when valve gets built.
 * Add `deDE` localization from @juf0816.
 * Update `ruRU` localization.
