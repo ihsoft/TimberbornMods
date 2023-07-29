@@ -1,6 +1,6 @@
 Simple tool to gather _all_ dependencies from C# assembly DLL.
 
-Point the tool to any DLL inside the game folder. All the requeried depecnencies will be either
+Point the tool to any DLL inside the game folder. All the required dependencies will be either
 printed or copied to the designated folder.
 
 E.g. in order to be able making custom cursor resources for `CursorService.SetCursor`, you'd need
