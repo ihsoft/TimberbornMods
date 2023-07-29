@@ -1,4 +1,4 @@
-# v1.3 (pre-release)
+# v1.3 (28 Jul 2023)
 * Switch to Timber API 0.6.0 and remove `CustomResources` dependency.
 * Update `deDE` localization.
 
