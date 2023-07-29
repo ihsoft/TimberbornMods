@@ -8,6 +8,7 @@ using IgorZ.TimberCommons.WaterService;
 using Timberborn.BlockSystem;
 using Timberborn.ConstructibleSystem;
 using Timberborn.MapIndexSystem;
+using Timberborn.Particles;
 using Timberborn.Persistence;
 using Timberborn.TickSystem;
 using Timberborn.WaterSystem;
@@ -50,6 +51,9 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
 
   [SerializeField]
   bool _allowDisablingOutputLevelCheck = true;
+
+  [SerializeField]
+  ParticleSystem _particleSystem = null;
 
   // ReSharper restore InconsistentNaming
   #endregion
@@ -146,26 +150,37 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
   IWaterService _waterService;
   DirectWaterServiceAccessor _directWaterServiceAccessor;
   MapIndexService _mapIndexService;
+  ParticlesRunnerFactory _particlesRunnerFactory;
+
   readonly DirectWaterServiceAccessor.WaterMover _waterMover = new();
 
   BlockObject _blockObject;
+  ParticlesRunner _particlesRunner;
   int _valveBaseZ;
   Vector2Int _inputCoordinatesTransformed;
   Vector2Int _outputCoordinatesTransformed;
 
   void Awake() {
     _blockObject = GetComponentFast<BlockObject>();
+    if (_particleSystem != null) {
+      _particlesRunner = _particlesRunnerFactory.CreateForFinishedState(GameObjectFast, _particleSystem);
+    }
     UpdateAdjustableValuesFromPrefab();
     enabled = false;
+  }
+
+  void OnDestroy() {
+    _directWaterServiceAccessor.DeleteWaterMover(_waterMover);
   }
 
   /// <summary>Injected instances.</summary>
   [Inject]
   public void InjectDependencies(IWaterService waterService, DirectWaterServiceAccessor directWaterServiceAccessor,
-                                 MapIndexService mapIndexService) {
+                                 MapIndexService mapIndexService, ParticlesRunnerFactory particlesRunnerFactory) {
     _waterService = waterService;
     _directWaterServiceAccessor = directWaterServiceAccessor;
     _mapIndexService = mapIndexService;
+    _particlesRunnerFactory = particlesRunnerFactory;
   }
 
   void UpdateAdjustableValuesFromPrefab() {
@@ -188,6 +203,7 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
     _waterMover.OutputTileIndex = _mapIndexService.CoordinatesToIndex(_outputCoordinatesTransformed);
     MinWaterLevelAtIntake = MinWaterLevelAtIntake;
     MaxWaterLevelAtOuttake = MaxWaterLevelAtOuttake;
+    _directWaterServiceAccessor.AddWaterMover(_waterMover);
   }
 
   /// <inheritdoc/>
@@ -198,6 +214,13 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
     WaterDepthAtOuttake = _directWaterServiceAccessor.WaterDepths[_waterMover.OutputTileIndex];
     CurrentFlow = 2 * _waterMover.WaterMoved / Time.fixedDeltaTime;
     _waterMover.WaterMoved = 0;
+    if (_particlesRunner != null) {
+      if (CurrentFlow > float.Epsilon) {
+        _particlesRunner.Play();
+      } else {
+        _particlesRunner.Stop();
+      }
+    }
   }
   #endregion
 
@@ -229,13 +252,11 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
   /// <inheritdoc/>
   public void OnEnterFinishedState() {
     enabled = true;
-    _directWaterServiceAccessor.AddWaterMover(_waterMover);
   }
 
   /// <inheritdoc/>
   public void OnExitFinishedState() {
     enabled = false;
-    _directWaterServiceAccessor.DeleteWaterMover(_waterMover);
   }
   #endregion
 }
