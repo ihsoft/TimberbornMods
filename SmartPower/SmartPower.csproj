@@ -42,6 +42,7 @@
       <Compile Include="TimberDev\CustomizableInstantiator.cs" />
       <Compile Include="TimberDev\HarmonyPatcher.cs" />
       <Compile Include="TimberDev\PrefabPatcher.cs" />
+      <Compile Include="TimberDev\UiFactory.cs" />
       <Compile Include="UI\Configurator.cs" />
       <Compile Include="UI\ConsumerFragmentServicePatch.cs" />
       <Compile Include="UI\NetworkFragmentServicePatch.cs" />
