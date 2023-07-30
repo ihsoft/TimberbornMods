@@ -37,11 +37,6 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity {
   List<IAutomationAction> _actions = new();
 
   #region API
-  public bool AddRule(IAutomationCondition condition, IAutomationAction action) {
-    if (HasRule(condition, action)) {
-      HostedDebugLog.Warning(this, "Skipping duplicate rule: condition={0}, action={1}", condition, action);
-      return false;
-    }
   /// <summary>Creates a rule from the condition and action.</summary>
   /// <param name="condition">
   /// Condition definition. It will be owned by the behavior. Don't change or re-use it after adding.
@@ -49,18 +44,14 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity {
   /// <param name="action">
   /// Action definition. It will be owned by the behavior. Don't change or re-use it after adding.
   /// </param>
+  public void AddRule(IAutomationCondition condition, IAutomationAction action) {
     action.Condition = condition;
     condition.Behavior = this;
     action.Behavior = this;
     condition.SyncState();
-    if (action.IsMarkedForCleanup || condition.IsMarkedForCleanup) {
-      HostedDebugLog.Fine(this, "Skipping rule that is marked for cleanup: {0}", action);
-      return true;
-    }
     _actions.Add(action);
     HostedDebugLog.Fine(this, "Adding rule: {0}", action);
     UpdateRegistration();
-    return true;
   }
 
   /// <summary>Deletes the specified rule.</summary>
