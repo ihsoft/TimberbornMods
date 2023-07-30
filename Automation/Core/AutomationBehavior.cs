@@ -15,6 +15,7 @@ using UnityDev.Utils.LogUtilsLite;
 
 namespace Automation.Core {
 
+/// <summary>The component that keeps all teh automation state on the building.</summary>
 public sealed class AutomationBehavior : BaseComponent, IPersistentEntity {
   #region Injection shortcuts
   public AutomationService AutomationService { get; private set; }
@@ -28,8 +29,10 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity {
   /// </summary>
   public BlockObject BlockObject { get; private set; }
 
+  /// <summary>Indicates if there are any actions on the building.</summary>
   public bool HasActions => _actions.Count > 0;
 
+  /// <summary>All actions on the building.</summary>
   public IEnumerable<IAutomationAction> Actions => _actions.AsReadOnly();
   List<IAutomationAction> _actions = new();
 
@@ -39,6 +42,13 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity {
       HostedDebugLog.Warning(this, "Skipping duplicate rule: condition={0}, action={1}", condition, action);
       return false;
     }
+  /// <summary>Creates a rule from the condition and action.</summary>
+  /// <param name="condition">
+  /// Condition definition. It will be owned by the behavior. Don't change or re-use it after adding.
+  /// </param>
+  /// <param name="action">
+  /// Action definition. It will be owned by the behavior. Don't change or re-use it after adding.
+  /// </param>
     action.Condition = condition;
     condition.Behavior = this;
     action.Behavior = this;

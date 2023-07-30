@@ -13,10 +13,12 @@ using Timberborn.PrefabSystem;
 
 namespace Automation.Tools {
 
-/// <summary>The base item of the automation.</summary>
+/// <summary>Definition of an automation rule.</summary>
 /// <remarks>
-/// Each rules defines and executes a term: "if &lt;condition> is true, then execute this &lt;action>"
+/// Each rule defines and executes a term: "if &lt;condition> is true, then execute this &lt;action>". This class is
+/// intended to be only a <i>definition</i> of the rule. Do not re-use it in the execution logic.
 /// </remarks>
+/// <seealso cref="IAutomationAction"/>
 public sealed class AutomationRule : IGameSerializable {
   #region Implementation of IGameSerializable
   static readonly PropertyKey<AutomationConditionBase> ConditionPropertyKey = new("Condition");

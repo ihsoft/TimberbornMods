@@ -7,9 +7,7 @@ using Automation.Utils;
 namespace Automation.Core {
 
 /// <summary>Base action interface.</summary>
-/// <remarks>
-/// It defines what is expected from a regular action n scope of the automation system.
-/// </remarks>
+/// <remarks>It defines what is expected from a regular action in scope of the automation system.</remarks>
 public interface IAutomationAction : IGameSerializable {
   /// <summary>Automation behavior this action belongs to.</summary>
   /// <remarks>
@@ -48,6 +46,8 @@ public interface IAutomationAction : IGameSerializable {
   public string UiDescription { get; }
 
   /// <summary>Returns a full copy of the action <i>definition</i>. There must be no state copied.</summary>
+  /// <remarks>This method MUST copy all of the base class properties!</remarks>
+  /// <seealso cref="TemplateFamily"/>
   public IAutomationAction CloneDefinition();
 
   /// <summary>Verifies that the definitions of the two actions are equal.</summary>
