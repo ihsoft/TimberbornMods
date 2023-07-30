@@ -2,7 +2,6 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Automation.Core;
