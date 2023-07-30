@@ -40,7 +40,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
   #region AutomationActionBase overrides
   /// <inheritdoc/>
   public override IAutomationAction CloneDefinition() {
-    return new DetonateDynamiteAction { RepeatCount = RepeatCount };
+    return new DetonateDynamiteAction { TemplateFamily = TemplateFamily, RepeatCount = RepeatCount };
   }
 
   /// <inheritdoc/>
@@ -131,7 +131,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
         yield break;
       }
 
-      // Wait for the old object to cleaned up and place another one.
+      // Wait for the old object to clean up and place another one.
       var coordinates = blockObject.Coordinates;
       yield return new WaitUntil(() => blockObject == null);
       coordinates.z = coordinates.z - 1;

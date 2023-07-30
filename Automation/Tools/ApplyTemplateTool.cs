@@ -19,12 +19,22 @@ sealed class ApplyTemplateTool : AbstractAreaSelectionTool, IAutomationModeEnabl
   static readonly Color ToolColor = new(0, 1, 1, 0.7f);
 
   #region Tool information
-  static readonly ListKey<AutomationRule> RulesListKey = new("Rules");
+  /// <summary>Class that holds the template tool configuration.</summary>
   public sealed class ToolInfo : CustomToolSystem.ToolInformation {
+    static readonly ListKey<AutomationRule> RulesListKey = new(nameof(Rules));
+    static readonly PropertyKey<string> TemplateFamilyNameKey = new(nameof(TemplateFamilyName));
+
+    /// <summary>Full list of the rules that this template should apply on the object.</summary>
     public ReadOnlyCollection<AutomationRule> Rules { get; private set; }
+
+    /// <summary>
+    /// A logical rules group name. Rules from the same group will overwrite any existing rules from the same group.
+    /// </summary>
+    public string TemplateFamilyName { get; private set; }
 
     /// <inheritdoc/>
     public override void Load(IObjectLoader objectLoader) {
+      TemplateFamilyName = objectLoader.Get(TemplateFamilyNameKey);
       Rules = objectLoader.Get(RulesListKey, AutomationRule.RuleSerializer).AsReadOnly();
     }
   }
@@ -46,14 +56,13 @@ sealed class ApplyTemplateTool : AbstractAreaSelectionTool, IAutomationModeEnabl
 
   /// <inheritdoc/>
   protected override void OnObjectAction(BlockObject blockObject) {
-    var behavior = blockObject.GetComponentFast<AutomationBehavior>();
-    behavior.ClearActions();
     var info = (ToolInfo) ToolInformation;
+    var behavior = blockObject.GetComponentFast<AutomationBehavior>();
+    behavior.RemoveRulesForTemplateFamily(info.TemplateFamilyName);
     foreach (var rule in info.Rules) {
-      if (rule.Action is not IAutomationConditionListener listener) {
-        throw new InvalidOperationException("Action is not a condition state listener: " + rule.Action);
-      }
-      behavior.AddRule(rule.Condition.CloneDefinition(), rule.Action.CloneDefinition());
+      var action = rule.Action.CloneDefinition();
+      action.TemplateFamily = info.TemplateFamilyName;
+      behavior.AddRule(rule.Condition.CloneDefinition(), action);
     }
   }
 

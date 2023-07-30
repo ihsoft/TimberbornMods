@@ -30,6 +30,14 @@ public interface IAutomationAction : IGameSerializable {
   /// <remarks>Such actions are considered inactive and should not process any logic.</remarks>
   public bool IsMarkedForCleanup { get; }
 
+  /// <summary>Name of the templates family that created this action.</summary>
+  /// <remarks>
+  /// Several templates can set the same automation, but with different condition settings. Such templates form
+  /// "a family". Applying another template from the same family may (or may not) clear the exiting automations from the
+  /// same family. It's the template handler responsibility to deal with the existing automations.
+  /// </remarks>
+  public string TemplateFamily { get; set; }
+
   /// <summary>Returns a localized string to present the action description in UI.</summary>
   /// <remarks>
   /// The string must give exhaustive description on what the action does, but at the same time it should be as short as

@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System.Collections.Generic;
 using System.Text;
 using Automation.Core;
 using TimberApi.UiBuilderSystem;
@@ -15,6 +16,9 @@ using UnityEngine.UIElements;
 namespace Automation.UI {
 
 sealed class AutomationFragment : IEntityPanelFragment {
+  const string RulesAreaCaptionTextLocKey = "Automation rules:";
+  const string RuleTextLocKey = "If {0}, then {1}";
+
   readonly UIBuilder _builder;
   readonly ILoc _loc;
 
@@ -45,17 +49,28 @@ sealed class AutomationFragment : IEntityPanelFragment {
     if (component == null || !component.HasActions) {
       return;
     }
+    var sortedActions = new List<IAutomationAction>();
+    foreach (var action in component.Actions) {
+      var insertPos = 0;
+      while (insertPos < sortedActions.Count) {
+        if (string.CompareOrdinal(sortedActions[insertPos].TemplateFamily, action.TemplateFamily) > 0) {
+          break;
+        }
+        insertPos++;
+      }
+      sortedActions.Insert(insertPos, action);
+    }
     var rules = new StringBuilder();
     var actionsAdded = 0;
-    foreach (var action in component.Actions) {
+    foreach (var action in sortedActions) {
       if (actionsAdded++ > 0) {
         rules.AppendLine();
       }
       rules.Append(SpecialStrings.RowStarter);
-      rules.Append(string.Format("If {0}, then {1}", action.Condition.UiDescription, action.UiDescription));
+      rules.Append(_loc.T(RuleTextLocKey, action.Condition.UiDescription, action.UiDescription));
     }
-    _caption.text = "Automation rules:";
-    //_rulesList.text = rules.ToString();
+    _caption.text = _loc.T(RulesAreaCaptionTextLocKey);
+    //FIXME: ColorizeText will only apply to the LOC strings. Keep it for now.
     _rulesList.text = TextColors.ColorizeText(rules.ToString());
     _root.ToggleDisplayStyle(visible: true);
   }

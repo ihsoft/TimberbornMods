@@ -21,7 +21,10 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
   /// <remarks>This version returns <c>null</c> if the action cannot be loaded.</remarks>
   public static readonly DynamicClassSerializer<AutomationActionBase> ActionSerializerNullable = new(false);
 
-  #region ICondition implementation
+  #region IAutomationAction implementation
+  /// <inheritdoc/>
+  public string TemplateFamily { get; set; }
+
   /// <inheritdoc/>
   public virtual AutomationBehavior Behavior {
     get => _behavior;

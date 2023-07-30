@@ -47,6 +47,7 @@ public sealed class ObjectFinishedCondition : AutomationConditionBase {
     }
     ConditionState = true;
     IsMarkedForCleanup = true;
+    //FIXME: call system to have the state accounted.
   }
   #endregion
 }

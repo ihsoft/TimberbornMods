@@ -53,17 +53,32 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity {
     return true;
   }
 
-  public void ClearActions() {
-    foreach (var action in _actions) {
-      action.Condition.Behavior = null;
-      action.Behavior = null;
-    }
-    _actions.Clear();
+  /// <summary>Deletes the specified rule.</summary>
+  /// <see cref="Actions"/>
+  public void DeleteRuleAt(int index) {
+    var action = _actions[index];
+    action.Condition.Behavior = null;
+    action.Behavior = null;
+    _actions.RemoveAt(index);
     UpdateRegistration();
   }
 
-  public bool HasRule(IAutomationCondition condition, IAutomationAction action) {
-    return _actions.Any(r => r.CheckSameDefinition(action) && r.Condition.CheckSameDefinition(condition));
+  /// <summary>Removes all rules that were defined for the specified template group.</summary>
+  public void RemoveRulesForTemplateFamily(string templateFamily) {
+    HostedDebugLog.Fine(this, "Removing all rules for template family: {0}", templateFamily);
+    for (var i = _actions.Count - 1; i >= 0; i--) {
+      var action = _actions[i];
+      if (action.TemplateFamily == templateFamily) {
+        DeleteRuleAt(i);
+      }
+    }
+  }
+
+  /// <summary>Removes all automation rules from the block object.</summary>
+  public void ClearAllRules() {
+    while (_actions.Count > 0) {
+      DeleteRuleAt(0);
+    }
   }
   #endregion
 
@@ -111,7 +126,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity {
   }
 
   void OnDestroy() {
-    ClearActions();
+    ClearAllRules();
   }
 
   void UpdateRegistration() {

@@ -29,7 +29,7 @@ public sealed class MarkForEmptyingAction : AutomationActionBase {
   #region AutomationActionBase overrides
   /// <inheritdoc/>
   public override IAutomationAction CloneDefinition() {
-    return new MarkForEmptyingAction();
+    return new MarkForEmptyingAction { TemplateFamily = TemplateFamily };
   }
 
   /// <inheritdoc/>

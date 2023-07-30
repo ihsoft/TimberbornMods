@@ -13,7 +13,7 @@ public class PauseAction : AutomationActionBase {
   #region AutomationActionBase overrides
   /// <inheritdoc/>
   public override IAutomationAction CloneDefinition() {
-    return new PauseAction();
+    return new PauseAction { TemplateFamily = TemplateFamily };
   }
 
   /// <inheritdoc/>

@@ -13,7 +13,7 @@ public class UnmarkForEmptyingAction : AutomationActionBase {
   #region AutomationActionBase overrides
   /// <inheritdoc/>
   public override IAutomationAction CloneDefinition() {
-    return new UnmarkForEmptyingAction();
+    return new UnmarkForEmptyingAction { TemplateFamily = TemplateFamily };
   }
 
   /// <inheritdoc/>
