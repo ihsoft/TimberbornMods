@@ -37,6 +37,7 @@
       <Compile Include="Actions\DetonateDynamiteAction.cs" />
       <Compile Include="Actions\MarkForEmptyingAction.cs" />
       <Compile Include="Actions\PauseAction.cs" />
+      <Compile Include="Actions\SetFloodgateHeightAction.cs" />
       <Compile Include="Actions\UnmarkForEmptyingAction.cs" />
       <Compile Include="Actions\UnpauseAction.cs" />
       <Compile Include="Conditions\AutomationConditionBase.cs" />
@@ -208,6 +209,9 @@
       </Reference>
       <Reference Include="Timberborn.ToolSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.ToolSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.WaterBuildings, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.WaterBuildings.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.WeatherSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.WeatherSystem.dll</HintPath>
