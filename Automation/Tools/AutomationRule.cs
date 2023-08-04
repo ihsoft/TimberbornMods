@@ -19,7 +19,7 @@ namespace Automation.Tools {
 /// intended to be only a <i>definition</i> of the rule. Do not re-use it in the execution logic.
 /// </remarks>
 /// <seealso cref="IAutomationAction"/>
-public sealed class AutomationRule : IGameSerializable {
+sealed class AutomationRule : IGameSerializable {
   #region Implementation of IGameSerializable
   static readonly PropertyKey<AutomationConditionBase> ConditionPropertyKey = new("Condition");
   static readonly PropertyKey<AutomationActionBase> ActionPropertyKey = new("Action");

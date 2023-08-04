@@ -5,6 +5,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Automation.Conditions;
+using Automation.Tools;
 using Timberborn.BaseComponentSystem;
 using Timberborn.Common;
 using Timberborn.Localization;
