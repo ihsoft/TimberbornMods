@@ -18,9 +18,16 @@ namespace Automation.Core {
 /// <summary>The component that keeps all teh automation state on the building.</summary>
 public sealed class AutomationBehavior : BaseComponent, IPersistentEntity {
   #region Injection shortcuts
+  /// <summary>Shortcut to the <see cref="AutomationService"/>.</summary>
   public AutomationService AutomationService { get; private set; }
+
+  /// <summary>Shortcut to the <see cref="ILoc"/>.</summary>
   public ILoc Loc => AutomationService.Loc;
+
+  /// <summary>Shortcut to the <see cref="EventBus"/>.</summary>
   public EventBus EventBus => AutomationService.EventBus;
+
+  /// <summary>Shortcut to the <see cref="BaseInstantiator"/>.</summary>
   public BaseInstantiator BaseInstantiator => AutomationService.BaseInstantiator;
   #endregion
 
@@ -117,6 +124,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity {
   #endregion
 
   #region Implementation
+  /// <summary>Injects the dependencies. It has to be public to work.</summary>
   [Inject]
   public void InjectDependencies(AutomationService automationService) {
     AutomationService = automationService;

@@ -15,6 +15,16 @@ using UnityEngine;
 
 namespace Automation.Utils {
 
+/// <summary>The base class to teh selection tool implementations.</summary>
+/// <remarks>
+/// Implements the boilerplate of the selection logic. The descendants only need to react on the business logic related
+/// events to customize the behavior.
+/// </remarks>
+/// <seealso cref="ObjectFilterExpression"/>
+/// <seealso cref="OnObjectAction"/>
+/// <seealso cref="OnHighlightChange"/>
+/// <seealso cref="OnSelectionModeChange"/>
+/// <seealso cref="SetColorSchema"/>
 public abstract class AbstractAreaSelectionTool : ToolWithDescription, IInputProcessor {
   #region Internal fields
   BlockObjectSelectionDrawer _highlightSelectionDrawer;
@@ -29,7 +39,9 @@ public abstract class AbstractAreaSelectionTool : ToolWithDescription, IInputPro
   #endregion
 
   #region Injections
+  /// <summary>Shortcut to the <see cref="InputService"/>.</summary>
   protected InputService InputService { get; private set; }
+
   AreaBlockObjectPickerFactory _areaBlockObjectPickerFactory;
   BlockObjectSelectionDrawerFactory _blockObjectSelectionDrawerFactory;
   #endregion
@@ -73,6 +85,9 @@ public abstract class AbstractAreaSelectionTool : ToolWithDescription, IInputPro
   /// <seealso cref="SelectionModeActive"/>
   protected ReadOnlyCollection<BlockObject> SelectedObjects { get; private set; }
 
+  /// <summary>The full path to the custom cursor resource name.</summary>
+  /// <remarks>The mod must have a resource of type <c>CustomCursor</c> in the assets with this name.</remarks>
+  /// <value><c>null</c> if no custom cursor needed.</value>
   protected abstract string CursorName { get; }
   #endregion
 
@@ -153,10 +168,12 @@ public abstract class AbstractAreaSelectionTool : ToolWithDescription, IInputPro
   #endregion
 
   #region Local methods
+  /// <summary>Creates the abstract tool.</summary>
   protected AbstractAreaSelectionTool() {
     DescriptionHintSectionLoc = SelectionToolSystemLocKeys.ClickOrHoldTipKey;
   }
 
+  /// <summary>Injects the condition dependencies. It has to be public to work.</summary>
   [Inject]
   public void InjectDependencies(AreaBlockObjectPickerFactory areaBlockObjectPickerFactory, InputService inputService,
                                  BlockObjectSelectionDrawerFactory blockObjectSelectionDrawerFactory,

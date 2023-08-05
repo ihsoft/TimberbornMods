@@ -101,6 +101,9 @@ public sealed class AutomationService : IPostLoadableSingleton {
     _registeredBehaviors.Remove(behavior);
   }
 
+  /// <summary>
+  /// Activates highlighting of the automated objects if a <see cref="IAutomationModeEnabler"/> tool is activated.
+  /// </summary>
   [OnEvent]
   public void OnToolEntered(ToolEnteredEvent toolEnteredEvent) {
     if (toolEnteredEvent.Tool is not IAutomationModeEnabler) {
@@ -109,6 +112,9 @@ public sealed class AutomationService : IPostLoadableSingleton {
     HighlightAutomationObjects();
   }
 
+  /// <summary>
+  /// Deactivates highlighting of the automated objects if a <see cref="IAutomationModeEnabler"/> tool is deactivated.
+  /// </summary>
   [OnEvent]
   public void OnToolExited(ToolExitedEvent toolExitedEvent) {
     UnhighlightAutomationObjects();

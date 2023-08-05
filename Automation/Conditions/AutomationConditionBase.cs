@@ -20,7 +20,6 @@ namespace Automation.Conditions {
 /// this, override <see cref="CheckSameDefinition"/> and <see cref="IsValidAt"/>.
 /// </p>
 /// </remarks>
-/// <seealso cref="AutomationConditionBehaviorBase"/>
 [SuppressMessage("ReSharper", "MemberCanBeProtected.Global")]
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 public abstract class AutomationConditionBase : IAutomationCondition {

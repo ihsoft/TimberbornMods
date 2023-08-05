@@ -6,6 +6,12 @@ using Automation.Core;
 
 namespace Automation.Conditions {
 
+/// <summary>
+/// Condition that checks if the output inventory fill rate is above the
+/// <see cref="OutputStockThresholdConditionBase.Threshold"/>.
+/// </summary>
+/// <remarks>This condition only triggers on the inventory changes.</remarks>
+// ReSharper disable once UnusedType.Global
 public sealed class OutputStockAboveThresholdCondition : OutputStockThresholdConditionBase {
   const string DescriptionLocKey = "IgorZ.Automation.OutputStockAboveThresholdCondition.Description";
 

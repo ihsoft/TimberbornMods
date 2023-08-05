@@ -8,6 +8,8 @@ using Timberborn.SingletonSystem;
 
 namespace Automation.Conditions {
 
+/// <summary>Condition that triggers when the object enters the finished state.</summary>
+/// <remarks>This condition must be used with caution. Any finished building gets this event during the load.</remarks>
 public sealed class ObjectFinishedCondition : AutomationConditionBase {
   const string DescriptionLocKey = "IgorZ.Automation.ObjectFinishedCondition.Description";
 
@@ -42,6 +44,7 @@ public sealed class ObjectFinishedCondition : AutomationConditionBase {
   #endregion
 
   #region Implementation
+  /// <summary>Triggers when the object or building becomes a "constructed" entity.</summary>
   [OnEvent]
   public void OnConstructibleEnteredFinishedStateEvent(ConstructibleEnteredFinishedStateEvent @event) {
     if (@event.Constructible.GameObjectFast != Behavior.GameObjectFast) {

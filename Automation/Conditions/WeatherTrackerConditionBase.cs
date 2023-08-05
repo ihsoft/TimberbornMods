@@ -8,6 +8,8 @@ using Timberborn.WeatherSystem;
 
 namespace Automation.Conditions {
 
+/// <summary>The base class for the conditions that need to react on the weather season change.</summary>
+/// <remarks>The state change only happens when a notification is sent from the game.</remarks>
 public abstract class WeatherTrackerConditionBase : AutomationConditionBase {
   #region AutomationConditionBase overrides
   /// <inheritdoc/>
@@ -34,11 +36,13 @@ public abstract class WeatherTrackerConditionBase : AutomationConditionBase {
   #endregion
 
   #region Implemenatation
+  /// <summary>Triggers when weather season changes to drought.</summary>
   [OnEvent]
   public void OnDroughtStartedEvent(DroughtStartedEvent @event) {
     OnWeatherChanged(isDrought: true);
   }
 
+  /// <summary>Triggers when weather season changes to temperate.</summary>
   [OnEvent]
   public void OnDroughtEndedEvent(DroughtEndedEvent @event) {
     OnWeatherChanged(isDrought: false);

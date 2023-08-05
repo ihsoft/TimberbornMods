@@ -10,6 +10,7 @@ using Timberborn.Persistence;
 
 namespace Automation.Actions {
 
+/// <summary>The base class for all automation actions.</summary>
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public abstract class AutomationActionBase : IAutomationAction, IAutomationConditionListener {
