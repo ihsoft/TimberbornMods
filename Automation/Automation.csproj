@@ -43,9 +43,6 @@
       <Compile Include="Actions\UnmarkForEmptyingAction.cs" />
       <Compile Include="Actions\UnpauseAction.cs" />
       <Compile Include="Conditions\AutomationConditionBase.cs" />
-      <Compile Include="Conditions\AutomationConditionBehaviorBase.cs" />
-      <Compile Include="Conditions\BlockObjectConditionBase.cs" />
-      <Compile Include="Conditions\GlobalConditionBase.cs" />
       <Compile Include="Conditions\OutputStockAboveThresholdCondition.cs" />
       <Compile Include="Conditions\OutputStockBelowThresholdCondition.cs" />
       <Compile Include="Conditions\OutputStockThresholdConditionBase.cs" />
