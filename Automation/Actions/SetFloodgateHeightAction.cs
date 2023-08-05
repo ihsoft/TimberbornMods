@@ -9,6 +9,7 @@ using UnityEngine;
 
 namespace Automation.Actions {
 
+/// <summary>Adjusts flood gate height.</summary>
 public sealed class SetFloodgateHeightAction : AutomationActionBase {
   const string DescriptionLocKey = "IgorZ.Automation.SetFloodgateHeightAction.Description";
 
