@@ -23,7 +23,7 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
 
   #region IAutomationAction implementation
   /// <inheritdoc/>
-  public string TemplateFamily { get; set; }
+  public string TemplateFamily { get; set; } = "";
 
   /// <inheritdoc/>
   public virtual AutomationBehavior Behavior {
@@ -68,11 +68,13 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
   #region IGameSerializable implemenation
   static readonly PropertyKey<AutomationConditionBase> ConditionPropertyKey = new("Condition");
   static readonly PropertyKey<bool> IsMarkedForCleanupKey = new("IsMarkedForCleanup");
+  static readonly PropertyKey<string> TemplateFamilyKey = new("TemplateFamily");
 
   /// <inheritdoc/>
   public virtual void LoadFrom(IObjectLoader objectLoader) {
     Condition = objectLoader.GetValueOrNull(ConditionPropertyKey, AutomationConditionBase.ConditionSerializerNullable);
     IsMarkedForCleanup = objectLoader.Has(IsMarkedForCleanupKey) && objectLoader.Get(IsMarkedForCleanupKey);
+    TemplateFamily = objectLoader.GetValueOrNull(TemplateFamilyKey) ?? "";
   }
 
   /// <inheritdoc/>
@@ -81,6 +83,7 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
       objectSaver.Set(ConditionPropertyKey, condition, AutomationConditionBase.ConditionSerializer);
     }
     objectSaver.Set(IsMarkedForCleanupKey, IsMarkedForCleanup);
+    objectSaver.Set(TemplateFamilyKey, TemplateFamily);
   }
   #endregion
 
