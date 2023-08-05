@@ -26,7 +26,7 @@ public sealed class AutomationService : IPostLoadableSingleton {
   bool _highlightingEnabled;
   #endregion
 
-  public AutomationService(EventBus eventBus, Highlighter highlighter, BaseInstantiator baseInstantiator, ILoc loc) {
+  AutomationService(EventBus eventBus, Highlighter highlighter, BaseInstantiator baseInstantiator, ILoc loc) {
     EventBus = eventBus;
     BaseInstantiator = baseInstantiator;
     Loc = loc;
