@@ -21,9 +21,9 @@ IgorZ.Automation.Tool.tmpl.EmptyAtXpct.Description,"This template can be applied
 
 IgorZ.Automation.EmptyOutputStore.CustomStatus,"The building is being emptied on a priority basis."
 
-IgorZ.Automation.Tool.tmpl.DroughtPause.DisplayName,"Template: Pause during drought"
+IgorZ.Automation.Tool.tmpl.DroughtPause.DisplayName,"Pause during drought"
 IgorZ.Automation.Tool.tmpl.DroughtPause.Description,"Apply this template on buildings that should stay paused during droughts."
-IgorZ.Automation.Tool.tmpl.TemperatePause.DisplayName,"Template: Pause during temperate weather"
+IgorZ.Automation.Tool.tmpl.TemperatePause.DisplayName,"Pause during temperate weather"
 IgorZ.Automation.Tool.tmpl.TemperatePause.Description,"Apply this template on buildings that should stay paused during temperate weather."
 
 IgorZ.Automation.Tool.tmpl.DroughtCloseFloodgate.DisplayName,"Close floodgate during drought"
