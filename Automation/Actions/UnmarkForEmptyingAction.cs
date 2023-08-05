@@ -9,7 +9,9 @@ using UnityDev.Utils.LogUtilsLite;
 namespace Automation.Actions {
 
 /// <summary>Action that disables the storage empty mode.</summary>
-public class UnmarkForEmptyingAction : AutomationActionBase {
+public sealed class UnmarkForEmptyingAction : AutomationActionBase {
+  const string DescriptionLocKey = "IgorZ.Automation.UnmarkForEmptyingAction.Description";
+
   #region AutomationActionBase overrides
   /// <inheritdoc/>
   public override IAutomationAction CloneDefinition() {
@@ -17,7 +19,7 @@ public class UnmarkForEmptyingAction : AutomationActionBase {
   }
 
   /// <inheritdoc/>
-  public override string UiDescription => "<SolidHighlight>stop emptying storage</SolidHighlight>";
+  public override string UiDescription => Behavior.Loc.T(DescriptionLocKey);
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {

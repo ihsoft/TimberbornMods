@@ -16,8 +16,8 @@ using UnityEngine.UIElements;
 namespace Automation.UI {
 
 sealed class AutomationFragment : IEntityPanelFragment {
-  const string RulesAreaCaptionTextLocKey = "Automation rules:";
-  const string RuleTextLocKey = "If {0}, then {1}";
+  const string RulesAreaCaptionTextLocKey = "IgorZ.Automation.AutomationFragment.RulesAreaCaptionTextLocKey";
+  const string RuleTextLocKey = "IgorZ.Automation.AutomationFragment.RuleTextLocKey";
 
   readonly UIBuilder _builder;
   readonly ILoc _loc;
@@ -70,8 +70,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
       rules.Append(_loc.T(RuleTextLocKey, action.Condition.UiDescription, action.UiDescription));
     }
     _caption.text = _loc.T(RulesAreaCaptionTextLocKey);
-    //FIXME: ColorizeText will only apply to the LOC strings. Keep it for now.
-    _rulesList.text = TextColors.ColorizeText(rules.ToString());
+    _rulesList.text = rules.ToString();
     _root.ToggleDisplayStyle(visible: true);
   }
 

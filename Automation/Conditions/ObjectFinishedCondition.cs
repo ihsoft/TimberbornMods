@@ -9,9 +9,11 @@ using Timberborn.SingletonSystem;
 namespace Automation.Conditions {
 
 public sealed class ObjectFinishedCondition : AutomationConditionBase {
+  const string DescriptionLocKey = "IgorZ.Automation.ObjectFinishedCondition.Description";
+
   #region BlockObjectConditionBase implementation
   /// <inheritdoc/>
-  public override string UiDescription => "<SolidHighlight>construction complete</SolidHighlight>";
+  public override string UiDescription => Behavior.Loc.T(DescriptionLocKey);
 
   /// <inheritdoc/>
   public override IAutomationCondition CloneDefinition() {

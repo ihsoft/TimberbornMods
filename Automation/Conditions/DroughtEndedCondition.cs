@@ -7,9 +7,11 @@ using Automation.Core;
 namespace Automation.Conditions {
 
 public sealed class DroughtEndedCondition : WeatherTrackerConditionBase {
+  const string DescriptionLocKey = "IgorZ.Automation.DroughtEndedCondition.Description";
+
   #region WeatherTrackerConditionBase implemenantion
   /// <inheritdoc/>
-  public override string UiDescription => "<SolidHighlight>drought ended</SolidHighlight>";
+  public override string UiDescription => Behavior.Loc.T(DescriptionLocKey);
 
   /// <inheritdoc/>
   public override IAutomationCondition CloneDefinition() {

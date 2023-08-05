@@ -27,6 +27,9 @@ namespace Automation.Actions {
 /// <remarks>Use it to drill down deep holes in terrain.</remarks>
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public sealed class DetonateDynamiteAction : AutomationActionBase {
+  const string DescriptionLocKey = "IgorZ.Automation.DetonateDynamiteAction.Description";
+  const string RepeatCountLocKey = "IgorZ.Automation.DetonateDynamiteAction.RepeatCountInfo";
+
   /// <summary>
   /// Number of times to place a new dynamite. Any value less or equal to zero results in no extra actions on trigger.
   /// </summary>
@@ -39,9 +42,9 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
   /// <inheritdoc/>
   public override string UiDescription {
     get {
-      var res = "<SolidHighlight>detonate dynamite</SolidHighlight>";
+      var res = Behavior.Loc.T(DescriptionLocKey);
       if (RepeatCount > 0) {
-        res += string.Format(" and add another <GreenHighlight>{0} times</GreenHighlight>", RepeatCount);
+        res += Behavior.Loc.T(RepeatCountLocKey, RepeatCount);
       }
       return res;
     }

@@ -7,9 +7,10 @@ using Automation.Core;
 namespace Automation.Conditions {
 
 public sealed class OutputStockAboveThresholdCondition : OutputStockThresholdConditionBase {
+  const string DescriptionLocKey = "IgorZ.Automation.OutputStockAboveThresholdCondition.Description";
+
   /// <inheritdoc/>
-  public override string UiDescription =>
-      string.Format("<SolidHighlight>output stock above {0}%</SolidHighlight>", Threshold);
+  public override string UiDescription => Behavior.Loc.T(DescriptionLocKey, Threshold);
 
   /// <inheritdoc/>
   public override IAutomationCondition CloneDefinition() {
