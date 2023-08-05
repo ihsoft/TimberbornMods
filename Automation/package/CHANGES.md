@@ -1,4 +1,4 @@
-# v0.7 (pre-release)
+# v0.7 (5 Aug 2023)
 * Allow multiple different templates on the same object.
 * Add templates for floodgate automation.
 
