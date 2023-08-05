@@ -1,4 +1,4 @@
-// Timberborn Utils
+// Timberborn Mod: Automation
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
@@ -9,15 +9,17 @@ namespace Automation.Actions {
 
 /// <summary>Action that pauses a pausable building.</summary>
 /// <remarks>Due to any construction site is pausable, this action can only be applied to a finished building.</remarks>
-public class PauseAction : AutomationActionBase {
+public sealed class PauseAction : AutomationActionBase {
+  const string DescriptionLocKey = "IgorZ.Automation.PauseAction.Description";
+
   #region AutomationActionBase overrides
   /// <inheritdoc/>
   public override IAutomationAction CloneDefinition() {
-    return new PauseAction();
+    return new PauseAction { TemplateFamily = TemplateFamily };
   }
 
   /// <inheritdoc/>
-  public override string UiDescription => "<SolidHighlight>pause building</SolidHighlight>";
+  public override string UiDescription => Behavior.Loc.T(DescriptionLocKey);
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {

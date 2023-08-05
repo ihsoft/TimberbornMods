@@ -1,4 +1,4 @@
-// Timberborn Utils
+// Timberborn Mod: Automation
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
@@ -27,7 +27,8 @@ namespace Automation.Actions {
 /// <remarks>Use it to drill down deep holes in terrain.</remarks>
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public sealed class DetonateDynamiteAction : AutomationActionBase {
-  static readonly PropertyKey<int> RepeatPropertyKey = new("Repeat");
+  const string DescriptionLocKey = "IgorZ.Automation.DetonateDynamiteAction.Description";
+  const string RepeatCountLocKey = "IgorZ.Automation.DetonateDynamiteAction.RepeatCountInfo";
 
   /// <summary>
   /// Number of times to place a new dynamite. Any value less or equal to zero results in no extra actions on trigger.
@@ -35,12 +36,23 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
   /// <remarks>
   /// A too big value is not a problem. When the bottom of the map is reached, the dynamite simply won't get placed.
   /// </remarks>
-  public int RepeatCount;
+  public int RepeatCount { get; private set; }
 
   #region AutomationActionBase overrides
   /// <inheritdoc/>
+  public override string UiDescription {
+    get {
+      var res = Behavior.Loc.T(DescriptionLocKey);
+      if (RepeatCount > 0) {
+        res += Behavior.Loc.T(RepeatCountLocKey, RepeatCount);
+      }
+      return res;
+    }
+  }
+
+  /// <inheritdoc/>
   public override IAutomationAction CloneDefinition() {
-    return new DetonateDynamiteAction { RepeatCount = RepeatCount };
+    return new DetonateDynamiteAction { TemplateFamily = TemplateFamily, RepeatCount = RepeatCount };
   }
 
   /// <inheritdoc/>
@@ -48,6 +60,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
     return behavior.GetComponentFast<Dynamite>() != null;
   }
 
+  /// <inheritdoc/>
   public override void OnConditionState(IAutomationCondition automationCondition) {
     if (!Condition.ConditionState) {
       return;
@@ -57,8 +70,11 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
     component.blockObject = Behavior.BlockObject;
     component.repeatCount = RepeatCount;
   }
+  #endregion
 
   #region IGameSerializable implemenation
+  static readonly PropertyKey<int> RepeatPropertyKey = new("Repeat");
+
   /// <summary>Loads action state and declaration.</summary>
   public override void LoadFrom(IObjectLoader objectLoader) {
     base.LoadFrom(objectLoader);
@@ -69,17 +85,6 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
   public override void SaveTo(IObjectSaver objectSaver) {
     base.SaveTo(objectSaver);
     objectSaver.Set(RepeatPropertyKey, RepeatCount);
-  }
-  #endregion
-
-  public override string UiDescription {
-    get {
-      var res = "<SolidHighlight>detonate dynamite</SolidHighlight>";
-      if (RepeatCount > 0) {
-        res += string.Format(" and add another <GreenHighlight>{0} times</GreenHighlight>", RepeatCount);
-      }
-      return res;
-    }
   }
   #endregion
 
@@ -131,7 +136,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
         yield break;
       }
 
-      // Wait for the old object to cleaned up and place another one.
+      // Wait for the old object to clean up and place another one.
       var coordinates = blockObject.Coordinates;
       yield return new WaitUntil(() => blockObject == null);
       coordinates.z = coordinates.z - 1;

@@ -1,4 +1,4 @@
-// Timberborn Utils
+// Timberborn Mod: Automation
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
@@ -10,6 +10,7 @@ using Timberborn.Persistence;
 
 namespace Automation.Actions {
 
+/// <summary>The base class for all automation actions.</summary>
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public abstract class AutomationActionBase : IAutomationAction, IAutomationConditionListener {
@@ -21,7 +22,10 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
   /// <remarks>This version returns <c>null</c> if the action cannot be loaded.</remarks>
   public static readonly DynamicClassSerializer<AutomationActionBase> ActionSerializerNullable = new(false);
 
-  #region ICondition implementation
+  #region IAutomationAction implementation
+  /// <inheritdoc/>
+  public string TemplateFamily { get; set; } = "";
+
   /// <inheritdoc/>
   public virtual AutomationBehavior Behavior {
     get => _behavior;
@@ -65,11 +69,13 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
   #region IGameSerializable implemenation
   static readonly PropertyKey<AutomationConditionBase> ConditionPropertyKey = new("Condition");
   static readonly PropertyKey<bool> IsMarkedForCleanupKey = new("IsMarkedForCleanup");
+  static readonly PropertyKey<string> TemplateFamilyKey = new("TemplateFamily");
 
   /// <inheritdoc/>
   public virtual void LoadFrom(IObjectLoader objectLoader) {
     Condition = objectLoader.GetValueOrNull(ConditionPropertyKey, AutomationConditionBase.ConditionSerializerNullable);
     IsMarkedForCleanup = objectLoader.Has(IsMarkedForCleanupKey) && objectLoader.Get(IsMarkedForCleanupKey);
+    TemplateFamily = objectLoader.GetValueOrNull(TemplateFamilyKey) ?? "";
   }
 
   /// <inheritdoc/>
@@ -78,6 +84,7 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
       objectSaver.Set(ConditionPropertyKey, condition, AutomationConditionBase.ConditionSerializer);
     }
     objectSaver.Set(IsMarkedForCleanupKey, IsMarkedForCleanup);
+    objectSaver.Set(TemplateFamilyKey, TemplateFamily);
   }
   #endregion
 

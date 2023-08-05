@@ -31,18 +31,18 @@
         <DefineConstants>TRACE</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
+        <DebugSymbols>true</DebugSymbols>
+        <DocumentationFile>bin\Release\Automation.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
       <Compile Include="Actions\AutomationActionBase.cs" />
       <Compile Include="Actions\DetonateDynamiteAction.cs" />
       <Compile Include="Actions\MarkForEmptyingAction.cs" />
       <Compile Include="Actions\PauseAction.cs" />
+      <Compile Include="Actions\SetFloodgateHeightAction.cs" />
       <Compile Include="Actions\UnmarkForEmptyingAction.cs" />
       <Compile Include="Actions\UnpauseAction.cs" />
       <Compile Include="Conditions\AutomationConditionBase.cs" />
-      <Compile Include="Conditions\AutomationConditionBehaviorBase.cs" />
-      <Compile Include="Conditions\BlockObjectConditionBase.cs" />
-      <Compile Include="Conditions\GlobalConditionBase.cs" />
       <Compile Include="Conditions\OutputStockAboveThresholdCondition.cs" />
       <Compile Include="Conditions\OutputStockBelowThresholdCondition.cs" />
       <Compile Include="Conditions\OutputStockThresholdConditionBase.cs" />
@@ -208,6 +208,9 @@
       </Reference>
       <Reference Include="Timberborn.ToolSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.ToolSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.WaterBuildings, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.WaterBuildings.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.WeatherSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.WeatherSystem.dll</HintPath>
