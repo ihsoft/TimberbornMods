@@ -26,6 +26,15 @@ IgorZ.Automation.Tool.tmpl.DroughtPause.Description,"Apply this template on buil
 IgorZ.Automation.Tool.tmpl.TemperatePause.DisplayName,"Template: Pause during temperate weather"
 IgorZ.Automation.Tool.tmpl.TemperatePause.Description,"Apply this template on buildings that should stay paused during temperate weather."
 
+IgorZ.Automation.Tool.tmpl.DroughtCloseFloodgate.DisplayName,"Close floodgate during drought"
+IgorZ.Automation.Tool.tmpl.DroughtCloseFloodgate.Description,"Apply this template on floodgates that need to be closed during droughs, or fully open otherwise."
+IgorZ.Automation.Tool.tmpl.DroughtOpenFloodgate.DisplayName,"Open floodgate during drought"
+IgorZ.Automation.Tool.tmpl.DroughtOpenFloodgate.Description,"Apply this template on floodgates that need to slowly drain water during droughs, or be closed otherwise."
+IgorZ.Automation.Tool.tmpl.TemperateCloseFloodgate.DisplayName,"Close floodgate during temperate weather"
+IgorZ.Automation.Tool.tmpl.TemperateCloseFloodgate.Description,"Apply this template on floodgates that need to be closed during temperate weather, or fully open otherwise."
+IgorZ.Automation.Tool.tmpl.TemperateOpenFloodgate.DisplayName,"Open floodgate during temperate weather"
+IgorZ.Automation.Tool.tmpl.TemperateOpenFloodgate.Description,"Apply this template on floodgates that need to slowly drain water during temperate weather, or be closed otherwise."
+
 IgorZ.Automation.CancelTool.Title,"Cancel automation"
 IgorZ.Automation.CancelTool.Description,"Use this tool to cleanup any automation on the buildings or construction sites."
 IgorZ.Automation.PauseTool.Title,"Pause buildings"
