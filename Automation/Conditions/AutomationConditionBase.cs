@@ -11,14 +11,8 @@ namespace Automation.Conditions {
 
 /// <summary>The base class of any automation condition.</summary>
 /// <remarks>
-/// <p>
 /// The descendants of this class must encapsulate all settings of the condition and provide functionality to set up the
 /// dynamic logic.
-/// </p>
-/// <p>
-/// The default base implementation matches by the type name only and valid on finished block objects only. To change
-/// this, override <see cref="CheckSameDefinition"/> and <see cref="IsValidAt"/>.
-/// </p>
 /// </remarks>
 [SuppressMessage("ReSharper", "MemberCanBeProtected.Global")]
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
@@ -101,10 +95,7 @@ public abstract class AutomationConditionBase : IAutomationCondition {
     return other != null && other.GetType() == GetType();
   }
 
-  /// <inheritdoc/>
-  public virtual bool IsValidAt(AutomationBehavior behavior) {
-    return behavior.BlockObject.Finished;
-  }
+  public abstract bool IsValidAt(AutomationBehavior behavior);
 
   /// <summary>
   /// Notifies that a new behavior has been assigned to the condition. It's the time to setup the behaviors. 

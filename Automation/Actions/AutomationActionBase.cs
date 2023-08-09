@@ -101,9 +101,7 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
   }
 
   /// <inheritdoc/>
-  public virtual bool IsValidAt(AutomationBehavior behavior) {
-    return behavior.BlockObject.enabled;
-  }
+  public abstract bool IsValidAt(AutomationBehavior behavior);
 
   /// <summary>
   /// Notifies that a new behavior has been assigned to the condition. It's the time to setup the behaviors. 

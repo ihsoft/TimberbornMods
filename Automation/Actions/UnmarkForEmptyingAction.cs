@@ -23,7 +23,7 @@ public sealed class UnmarkForEmptyingAction : AutomationActionBase {
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
-    return base.IsValidAt(behavior) && behavior.GetComponentFast<Emptiable>() != null;
+    return behavior.GetComponentFast<Emptiable>() != null;
   }
 
   /// <inheritdoc/>
