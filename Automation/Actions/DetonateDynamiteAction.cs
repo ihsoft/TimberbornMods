@@ -106,17 +106,15 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
       yield return null; // Act on the next frame to avoid synchronous complications.
 
       yield return new WaitUntil(NoCharactersOnBlock);
-      if (blockObject == null || !blockObject.enabled) {
-        DebugEx.Warning("Dynamite object died prematurely");
-        yield break;
+      if (blockObject != null && blockObject.enabled) {
+        var dynamite = blockObject.GetComponentFast<Dynamite>();
+        if (dynamite == null) {
+          DebugEx.Warning("Dynamite prefab not found on block object");
+          yield break;
+        }
+        DebugEx.Fine("Detonate dynamite: coordinates={0}, tries={1}", blockObject.Coordinates, repeatCount);
+        dynamite.Trigger();
       }
-      var dynamite = blockObject.GetComponentFast<Dynamite>();
-      if (dynamite == null) {
-        DebugEx.Warning("Dynamite prefab not found on block object");
-        yield break;
-      }
-      DebugEx.Fine("Detonate dynamite: coordinates={0}, tries={1}", blockObject.Coordinates, repeatCount);
-      dynamite.Trigger();
       if (repeatCount <= 0) {
         yield break;
       }
