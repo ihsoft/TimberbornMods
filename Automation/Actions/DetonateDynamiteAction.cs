@@ -11,10 +11,8 @@ using Automation.Core;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.BlockObjectTools;
 using Timberborn.BlockSystem;
-using Timberborn.Characters;
 using Timberborn.Coordinates;
 using Timberborn.Explosions;
-using Timberborn.Navigation;
 using Timberborn.Persistence;
 using Timberborn.ToolSystem;
 using UnityDev.Utils.LogUtilsLite;
@@ -92,14 +90,15 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
   class DetonateAndRepeatRule : MonoBehaviour {
     static readonly ReflectedAction<BlockObjectTool, IEnumerable<OrientedCoordinates>> BlockObjectToolPlace =
         new("Place");
+    const float MinDistanceToCheckOccupants = 2.0f;
 
-    CharacterPopulation _characterPopulation;
+    IBlockOccupancyService _blockOccupancyService;
 
     public BlockObject blockObject;
     public int repeatCount;
 
     void Awake() {
-      _characterPopulation = DependencyContainer.GetInstance<CharacterPopulation>();
+      _blockOccupancyService = DependencyContainer.GetInstance<IBlockOccupancyService>();
       StartCoroutine(WaitAndPlace());
     }
 
@@ -157,10 +156,8 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
     bool NoCharactersOnBlock() {
       if (blockObject == null || !blockObject.enabled) {
         return true; // Terminate the check.
-      } 
-      return _characterPopulation.Characters
-          .Select(character => NavigationCoordinateSystem.WorldToGridInt(character.TransformFast.position))
-          .All(gridInt => blockObject.Coordinates != gridInt);
+      }
+      return !_blockOccupancyService.OccupantPresentOnArea(blockObject, MinDistanceToCheckOccupants);
     }
   }
   #endregion
