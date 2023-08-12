@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System.Linq;
 using System.Text;
 using Automation.Utils;
 using Timberborn.BlockSystem;
@@ -43,9 +44,8 @@ public class DebugPickTool : AbstractAreaSelectionTool {
     var lines = new StringBuilder();
     lines.AppendLine(new string('*', 10));
     lines.AppendLine($"Components on {DebugEx.BaseComponentToString(blockObject)}:");
-    foreach (var comp in blockObject.AllComponents) {
-      lines.AppendLine(comp.GetType().ToString());
-    }
+    var names = blockObject.AllComponents.Select(x => x.GetType().ToString()).OrderBy(x => x);
+    lines.AppendLine(string.Join("\n", names));
     lines.AppendLine(new string('*', 10));
     DebugEx.Warning(lines.ToString());
   }
