@@ -89,7 +89,7 @@ public static class CustomToolSystem {
     protected ToolInformation ToolInformation { get; private set; }
 
     /// <summary>Shortcut to <see cref="ILoc"/>.</summary>
-    protected ILoc Loc  { get; private set; }
+    protected ILoc Loc { get; private set; }
 
     /// <summary>Initializes the tool. Do all logic here instead of the constructor.</summary>
     protected virtual void Initialize() {
@@ -146,10 +146,14 @@ public static class CustomToolSystem {
 
   /// <summary>Registers an arbitrary class as a tool group.</summary>
   /// <remarks>
-  /// <p>Call this method from the configurator to define the tool groups of your mod. Each tool class can be bound only
-  /// once, or an exception will be thrown.</p>
-  /// <p>The registered class will be created via Bindito. Implement a method, attributed with <c>[Inject]</c>, to have
-  /// extra injections provided.</p>
+  /// <p>
+  /// Call this method from the configurator to define the tool groups of your mod. Each tool class can be bound only
+  /// once, or an exception will be thrown.
+  /// </p>
+  /// <p>
+  /// The registered class will be created via Bindito. Implement a method, attributed with <c>[Inject]</c>, to have
+  /// extra injections provided.
+  /// </p>
   /// </remarks>
   /// <param name="containerDefinition">The configurator interface.</param>
   /// <param name="groupTypeName">
