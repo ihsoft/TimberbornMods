@@ -1,4 +1,8 @@
 ID,Text
+IgorZ.Automation.DebugPickTool.Title,"Debug tool"
+IgorZ.Automation.DebugPickTool.Description,"Prints components on the selected object."
+IgorZ.Automation.DebugPickTool.DescriptionHint,"Hold <i>SHIFT</i> to print Accessible."
+
 IgorZ.Automation.ToolGroup.Main.DisplayName,"Setup automation"
 IgorZ.Automation.ToolGroup.Terrain.DisplayName,"Terrain changing"
 IgorZ.Automation.ToolGroup.Water.DisplayName,"Water conditions"
