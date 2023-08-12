@@ -36,14 +36,14 @@ public class DebugPickTool : AbstractAreaSelectionTool {
   }
 
   void PrintAllComponents(BlockObject blockObject) {
-    var names = new StringBuilder();
-    names.AppendLine(new string('*', 10));
-    names.AppendLine("Components on " + DebugEx.BaseComponentToString(blockObject) + ":");
+    var lines = new StringBuilder();
+    lines.AppendLine(new string('*', 10));
+    lines.AppendLine($"Components on {DebugEx.BaseComponentToString(blockObject)}:");
     foreach (var comp in blockObject.AllComponents) {
-      names.AppendLine(comp.GetType().ToString());
+      lines.AppendLine(comp.GetType().ToString());
     }
-    names.AppendLine(new string('*', 10));
-    DebugEx.Warning(names.ToString());
+    lines.AppendLine(new string('*', 10));
+    DebugEx.Warning(lines.ToString());
   }
 
   void PrintAccessible(BlockObject blockObject) {
@@ -52,14 +52,14 @@ public class DebugPickTool : AbstractAreaSelectionTool {
       HostedDebugLog.Error(blockObject, "No accessible component found");
       return;
     }
-    var names = new StringBuilder();
-    names.AppendLine(new string('*', 10));
-    names.AppendLine("Accesses on " + DebugEx.BaseComponentToString(blockObject) + ":");
-    foreach (var comp in accessible.Accesses) {
-      names.AppendLine(comp.ToString());
+    var lines = new StringBuilder();
+    lines.AppendLine(new string('*', 10));
+    lines.AppendLine($"Accesses on {DebugEx.BaseComponentToString(blockObject)}:");
+    foreach (var access in accessible.Accesses) {
+      lines.AppendLine(access.ToString());
     }
-    names.AppendLine(new string('*', 10));
-    DebugEx.Warning(names.ToString());
+    lines.AppendLine(new string('*', 10));
+    DebugEx.Warning(lines.ToString());
   }
 }
 
