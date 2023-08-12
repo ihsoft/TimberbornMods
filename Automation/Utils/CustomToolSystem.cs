@@ -96,6 +96,11 @@ public static class CustomToolSystem {
     }
     #endregion
 
+    #region Tool implementation
+    /// <inheritdoc/>
+    public override bool DevModeTool => ToolSpecification.DevMode;
+    #endregion
+
     #region Implementation
     /// <summary>Injects the dependencies. It has to be public to work.</summary>
     [Inject]
@@ -119,8 +124,8 @@ public static class CustomToolSystem {
     /// <summary>Loads the tool's custom information.</summary>
     public abstract void Load(IObjectLoader objectLoader);
   }
-  #region API
 
+  #region API
   /// <summary>Registers a simple tool group that just contains other tools.</summary>
   /// <param name="containerDefinition">The configurator interface.</param>
   /// <param name="groupTypeName">The tool group type as specified in the TimberAPI specification.</param>
