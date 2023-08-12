@@ -5,6 +5,7 @@
 using System.Text;
 using Automation.Utils;
 using Timberborn.BlockSystem;
+using Timberborn.BlockSystemNavigation;
 using Timberborn.Navigation;
 using UnityDev.Utils.LogUtilsLite;
 
@@ -17,7 +18,8 @@ public class DebugPickTool : AbstractAreaSelectionTool {
 
   /// <inheritdoc/>
   protected override void Initialize() {
-    DescriptionBullets = new[] { "IgorZ.Automation.DebugPickTool.DescriptionHint" };
+    DescriptionBullets = new[]
+        { "IgorZ.Automation.DebugPickTool.DescriptionHint1", "IgorZ.Automation.DebugPickTool.DescriptionHint2" };
     base.Initialize();
   }
 
@@ -30,6 +32,8 @@ public class DebugPickTool : AbstractAreaSelectionTool {
   protected override void OnObjectAction(BlockObject blockObject) {
     if (InputService.IsShiftHeld) {
       PrintAccessible(blockObject);
+    } else if (InputService.IsCtrlHeld) {
+      PrintNavMesh(blockObject);
     } else {
       PrintAllComponents(blockObject);
     }
@@ -57,6 +61,22 @@ public class DebugPickTool : AbstractAreaSelectionTool {
     lines.AppendLine($"Accesses on {DebugEx.BaseComponentToString(blockObject)}:");
     foreach (var access in accessible.Accesses) {
       lines.AppendLine(access.ToString());
+    }
+    lines.AppendLine(new string('*', 10));
+    DebugEx.Warning(lines.ToString());
+  }
+
+  void PrintNavMesh(BlockObject blockObject) {
+    var settings = blockObject.GetComponentFast<BlockObjectNavMeshSettings>();
+    if (settings == null) {
+      HostedDebugLog.Error(blockObject, "No BlockObjectNavMeshSettings component found");
+      return;
+    }
+    var lines = new StringBuilder();
+    lines.AppendLine(new string('*', 10));
+    lines.AppendLine($"NavMesh edges on {DebugEx.BaseComponentToString(blockObject)}:");
+    foreach (var edge in settings.ManuallySetEdges()) {
+      lines.AppendLine($"{edge.Start} => {edge.End}");
     }
     lines.AppendLine(new string('*', 10));
     DebugEx.Warning(lines.ToString());

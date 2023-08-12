@@ -1,7 +1,8 @@
 ID,Text
 IgorZ.Automation.DebugPickTool.Title,"Debug tool"
 IgorZ.Automation.DebugPickTool.Description,"Prints components on the selected object."
-IgorZ.Automation.DebugPickTool.DescriptionHint,"Hold <i>SHIFT</i> to print Accessible."
+IgorZ.Automation.DebugPickTool.DescriptionHint1,"Hold <i>SHIFT</i> to print Accessible."
+IgorZ.Automation.DebugPickTool.DescriptionHint2,"Hold <i>CTRL</i> to print NavMesh edges."
 
 IgorZ.Automation.ToolGroup.Main.DisplayName,"Setup automation"
 IgorZ.Automation.ToolGroup.Terrain.DisplayName,"Terrain changing"
