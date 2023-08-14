@@ -22,6 +22,7 @@ sealed class Configurator : IConfigurator {
     CustomToolSystem.BindTool<ResumeTool>(containerDefinition);
     CustomToolSystem.BindTool<CancelTool>(containerDefinition);
     CustomToolSystem.BindTool<ApplyTemplateTool, ApplyTemplateTool.ToolInfo>(containerDefinition);
+    CustomToolSystem.BindTool<DebugPickTool>(containerDefinition);
     containerDefinition.MultiBind<TemplateModule>().ToProvider(ProvideTemplateModule).AsSingleton();
     containerDefinition.Bind<AutomationService>().AsSingleton();
   }
