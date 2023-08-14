@@ -9,6 +9,7 @@ using Bindito.Core;
 using TimberApi.ConfiguratorSystem;
 using TimberApi.SceneSystem;
 using Timberborn.BlockSystem;
+using Timberborn.Buildings;
 using Timberborn.TemplateSystem;
 
 namespace Automation.Core {
@@ -29,7 +30,7 @@ sealed class Configurator : IConfigurator {
 
   static TemplateModule ProvideTemplateModule() {
     var builder = new TemplateModule.Builder();
-    builder.AddDecorator<BlockObject, AutomationBehavior>();
+    builder.AddDecorator<Building, AutomationBehavior>();
     return builder.Build();
   }
 }
