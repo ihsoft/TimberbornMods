@@ -8,14 +8,13 @@ using Automation.Utils;
 using Bindito.Core;
 using TimberApi.ConfiguratorSystem;
 using TimberApi.SceneSystem;
-using Timberborn.BlockSystem;
 using Timberborn.Buildings;
 using Timberborn.TemplateSystem;
 
 namespace Automation.Core {
 
-// ReSharper disable once InconsistentNaming
 [Configurator(SceneEntrypoint.InGame)]
+// ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     CustomToolSystem.BindGroupWithConstructionModeEnabler(containerDefinition, "AutomationToolGroup");
