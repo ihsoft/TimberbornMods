@@ -60,6 +60,7 @@
       <Compile Include="Tools\ApplyTemplateTool.cs" />
       <Compile Include="Tools\AutomationRule.cs" />
       <Compile Include="Tools\CancelTool.cs" />
+      <Compile Include="Tools\DebugPickTool.cs" />
       <Compile Include="Tools\IAutomationModeEnabler.cs" />
       <Compile Include="Tools\PauseTool.cs" />
       <Compile Include="Tools\ResumeTool.cs" />
