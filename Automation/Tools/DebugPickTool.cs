@@ -5,6 +5,7 @@
 using System.Linq;
 using System.Text;
 using Automation.Utils;
+using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BlockSystemNavigation;
 using Timberborn.Navigation;
@@ -21,6 +22,7 @@ public class DebugPickTool : AbstractAreaSelectionTool {
   protected override void Initialize() {
     DescriptionBullets = new[]
         { "IgorZ.Automation.DebugPickTool.DescriptionHint1", "IgorZ.Automation.DebugPickTool.DescriptionHint2" };
+    DescriptionHintSectionLoc = null;
     base.Initialize();
   }
 
@@ -40,25 +42,25 @@ public class DebugPickTool : AbstractAreaSelectionTool {
     }
   }
 
-  void PrintAllComponents(BlockObject blockObject) {
+  internal static void PrintAllComponents(BaseComponent component) {
     var lines = new StringBuilder();
     lines.AppendLine(new string('*', 10));
-    lines.AppendLine($"Components on {DebugEx.BaseComponentToString(blockObject)}:");
-    var names = blockObject.AllComponents.Select(x => x.GetType().ToString()).OrderBy(x => x);
+    lines.AppendLine($"Components on {DebugEx.BaseComponentToString(component)}:");
+    var names = component.AllComponents.Select(x => x.GetType().ToString()).OrderBy(x => x);
     lines.AppendLine(string.Join("\n", names));
     lines.AppendLine(new string('*', 10));
     DebugEx.Warning(lines.ToString());
   }
 
-  void PrintAccessible(BlockObject blockObject) {
-    var accessible = blockObject.GetComponentFast<Accessible>();
+  internal static void PrintAccessible(BaseComponent component) {
+    var accessible = component.GetComponentFast<Accessible>();
     if (accessible == null) {
-      HostedDebugLog.Error(blockObject, "No accessible component found");
+      HostedDebugLog.Error(component, "No accessible component found");
       return;
     }
     var lines = new StringBuilder();
     lines.AppendLine(new string('*', 10));
-    lines.AppendLine($"Accesses on {DebugEx.BaseComponentToString(blockObject)}:");
+    lines.AppendLine($"Accesses on {DebugEx.BaseComponentToString(component)}:");
     foreach (var access in accessible.Accesses) {
       lines.AppendLine(access.ToString());
     }
@@ -66,15 +68,15 @@ public class DebugPickTool : AbstractAreaSelectionTool {
     DebugEx.Warning(lines.ToString());
   }
 
-  void PrintNavMesh(BlockObject blockObject) {
-    var settings = blockObject.GetComponentFast<BlockObjectNavMeshSettings>();
+  internal static void PrintNavMesh(BaseComponent component) {
+    var settings = component.GetComponentFast<BlockObjectNavMeshSettings>();
     if (settings == null) {
-      HostedDebugLog.Error(blockObject, "No BlockObjectNavMeshSettings component found");
+      HostedDebugLog.Error(component, "No BlockObjectNavMeshSettings component found");
       return;
     }
     var lines = new StringBuilder();
     lines.AppendLine(new string('*', 10));
-    lines.AppendLine($"NavMesh edges on {DebugEx.BaseComponentToString(blockObject)}:");
+    lines.AppendLine($"NavMesh edges on {DebugEx.BaseComponentToString(component)}:");
     foreach (var edge in settings.ManuallySetEdges()) {
       lines.AppendLine($"{edge.Start} => {edge.End}");
     }
