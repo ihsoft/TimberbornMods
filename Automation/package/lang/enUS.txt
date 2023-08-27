@@ -67,6 +67,6 @@ IgorZ.Automation.ObjectFinishedCondition.Description,"<SolidHighlight>constructi
 IgorZ.Automation.OutputStockAboveThresholdCondition.Description,"<SolidHighlight>output stock above {0}%</SolidHighlight>"
 IgorZ.Automation.OutputStockBelowThresholdCondition.Description,"<SolidHighlight>output stock below {0}%</SolidHighlight>"
 IgorZ.Automation.PauseAction.Description,"<SolidHighlight>pause building</SolidHighlight>"
-IgorZ.Automation.SetFloodgateHeightAction.Description,"<SolidHighlight>set height to {0}m</SolidHighlight>"
+IgorZ.Automation.SetFloodgateHeightAction.Description,"<SolidHighlight>set height to {0}</SolidHighlight>"
 IgorZ.Automation.UnmarkForEmptyingAction.Description,"<SolidHighlight>stop emptying storage</SolidHighlight>"
 IgorZ.Automation.UnpauseAction.Description,"<SolidHighlight>unpause building</SolidHighlight>"
