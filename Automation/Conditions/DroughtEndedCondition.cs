@@ -22,6 +22,11 @@ public sealed class DroughtEndedCondition : WeatherTrackerConditionBase {
   }
 
   /// <inheritdoc/>
+  public override bool IsValidAt(AutomationBehavior behavior) {
+    return true;
+  }
+
+  /// <inheritdoc/>
   protected override void OnWeatherChanged(bool isDrought) {
     ConditionState = !isDrought;
   }

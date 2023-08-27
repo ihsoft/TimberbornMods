@@ -22,9 +22,6 @@ public abstract class OutputStockThresholdConditionBase : AutomationConditionBas
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
-    if (!base.IsValidAt(behavior)) {
-      return false;
-    }
     var inventory = behavior.GetComponentFast<Inventory>();
     return inventory != null && inventory.IsOutput && !inventory.IsInput && inventory.OutputGoods.Count == 1;
   }

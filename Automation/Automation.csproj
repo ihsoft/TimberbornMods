@@ -43,6 +43,9 @@
       <Compile Include="Actions\UnmarkForEmptyingAction.cs" />
       <Compile Include="Actions\UnpauseAction.cs" />
       <Compile Include="Conditions\AutomationConditionBase.cs" />
+      <Compile Include="Conditions\CheckAccessBlockCondition.cs" />
+      <Compile Include="Conditions\PathCheckingController.cs" />
+      <Compile Include="Conditions\Configurator.cs" />
       <Compile Include="Conditions\OutputStockAboveThresholdCondition.cs" />
       <Compile Include="Conditions\OutputStockBelowThresholdCondition.cs" />
       <Compile Include="Conditions\OutputStockThresholdConditionBase.cs" />
@@ -60,6 +63,7 @@
       <Compile Include="Tools\ApplyTemplateTool.cs" />
       <Compile Include="Tools\AutomationRule.cs" />
       <Compile Include="Tools\CancelTool.cs" />
+      <Compile Include="Tools\DebugPickTool.cs" />
       <Compile Include="Tools\IAutomationModeEnabler.cs" />
       <Compile Include="Tools\PauseTool.cs" />
       <Compile Include="Tools\ResumeTool.cs" />
@@ -110,17 +114,23 @@
       <Reference Include="Timberborn.BlockSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.BlockSystem.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.BlockSystemNavigation, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.BlockSystemNavigation.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.BottomBarSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.BottomBarSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.BuilderPrioritySystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.BuilderPrioritySystem.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.Buildings, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.Buildings.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.BuildingsBlocking, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.BuildingsBlocking.dll</HintPath>
       </Reference>
-      <Reference Include="Timberborn.Characters, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.Characters.dll</HintPath>
+      <Reference Include="Timberborn.BuildingsNavigation, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.BuildingsNavigation.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.Common, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.Common.dll</HintPath>
@@ -130,6 +140,9 @@
       </Reference>
       <Reference Include="Timberborn.ConstructionMode, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.ConstructionMode.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.ConstructionSites, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.ConstructionSites.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.Coordinates, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.Coordinates.dll</HintPath>
@@ -151,6 +164,9 @@
       </Reference>
       <Reference Include="Timberborn.Explosions, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.Explosions.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.GameDistricts, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.GameDistricts.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.GameSaveRuntimeSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.GameSaveRuntimeSystem.dll</HintPath>

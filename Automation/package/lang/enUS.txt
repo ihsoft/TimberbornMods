@@ -1,4 +1,9 @@
 ID,Text
+IgorZ.Automation.DebugPickTool.Title,"Debug tool"
+IgorZ.Automation.DebugPickTool.Description,"Prints components on the selected object."
+IgorZ.Automation.DebugPickTool.DescriptionHint1,"Hold <i>SHIFT</i> to print Accessible."
+IgorZ.Automation.DebugPickTool.DescriptionHint2,"Hold <i>CTRL</i> to print NavMesh edges."
+
 IgorZ.Automation.ToolGroup.Main.DisplayName,"Setup automation"
 IgorZ.Automation.ToolGroup.Terrain.DisplayName,"Terrain changing"
 IgorZ.Automation.ToolGroup.Water.DisplayName,"Water conditions"
@@ -62,6 +67,6 @@ IgorZ.Automation.ObjectFinishedCondition.Description,"<SolidHighlight>constructi
 IgorZ.Automation.OutputStockAboveThresholdCondition.Description,"<SolidHighlight>output stock above {0}%</SolidHighlight>"
 IgorZ.Automation.OutputStockBelowThresholdCondition.Description,"<SolidHighlight>output stock below {0}%</SolidHighlight>"
 IgorZ.Automation.PauseAction.Description,"<SolidHighlight>pause building</SolidHighlight>"
-IgorZ.Automation.SetFloodgateHeightAction.Description,"<SolidHighlight>set height to {0}m</SolidHighlight>"
+IgorZ.Automation.SetFloodgateHeightAction.Description,"<SolidHighlight>set height to {0}</SolidHighlight>"
 IgorZ.Automation.UnmarkForEmptyingAction.Description,"<SolidHighlight>stop emptying storage</SolidHighlight>"
 IgorZ.Automation.UnpauseAction.Description,"<SolidHighlight>unpause building</SolidHighlight>"

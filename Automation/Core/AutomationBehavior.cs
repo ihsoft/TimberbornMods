@@ -88,6 +88,17 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity {
       DeleteRuleAt(0);
     }
   }
+
+  /// <summary>Removes all rules that depend on condition and/or action that is marked fro cleanup.</summary>
+  public void CollectCleanedRules() {
+    for (int i = _actions.Count - 1; i >= 0; i--) {
+      var action = _actions[i];
+      if (action.IsMarkedForCleanup || action.Condition.IsMarkedForCleanup) {
+        HostedDebugLog.Fine(this, "Cleaning up action: {0}", action);
+        DeleteRuleAt(i);
+      }
+    }
+  }
   #endregion
 
   #region IPersistentEntity implemenatation

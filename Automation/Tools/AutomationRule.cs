@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Automation.Actions;
 using Automation.Conditions;
 using Automation.Core;
@@ -65,6 +66,7 @@ sealed class AutomationRule : IGameSerializable {
 
   #region Implentation
   /// <inheritdoc/>
+  [SuppressMessage("ReSharper", "Unity.NoNullPropagation")]
   public override string ToString() {
     var prefabName = Action.Behavior?.GetComponentFast<Prefab>()?.Name;
     var coords = Action.Behavior?.GetComponentFast<BlockObject>().Coordinates;
