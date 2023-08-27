@@ -8,6 +8,7 @@ using Automation.Utils;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BlockSystemNavigation;
+using Timberborn.Buildings;
 using Timberborn.Navigation;
 using UnityDev.Utils.LogUtilsLite;
 
@@ -28,7 +29,7 @@ public class DebugPickTool : AbstractAreaSelectionTool {
 
   /// <inheritdoc/>
   protected override bool ObjectFilterExpression(BlockObject blockObject) {
-    return true;
+    return !InputService.IsAltHeld || !SelectionModeActive || SelectedObjects[0] == blockObject;
   }
 
   /// <inheritdoc/>
@@ -77,7 +78,20 @@ public class DebugPickTool : AbstractAreaSelectionTool {
     var lines = new StringBuilder();
     lines.AppendLine(new string('*', 10));
     lines.AppendLine($"NavMesh edges on {DebugEx.BaseComponentToString(component)}:");
-    foreach (var edge in settings.ManuallySetEdges()) {
+    var isPath = component.GetComponentFast<Building>().Path;
+    var blockObject = component.GetComponentFast<BlockObject>();
+    var isSolid = blockObject.Solid;
+    lines.AppendLine($"Building: isPath={isPath}, isSolid={isSolid}");
+    if (isSolid) {
+      var blocks = blockObject.PositionedBlocks.GetAllBlocks();
+      lines.AppendLine($"{blocks.Length} blocks:");
+      foreach (var block in blocks) {
+        lines.AppendLine($"{block.Coordinates}, stackable={block.Stackable}");
+      }
+    }
+    var edges = settings.ManuallySetEdges().ToList();
+    lines.AppendLine($"{edges.Count} edges:");
+    foreach (var edge in edges) {
       lines.AppendLine($"{edge.Start} => {edge.End}");
     }
     lines.AppendLine(new string('*', 10));
