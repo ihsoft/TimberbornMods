@@ -1,4 +1,4 @@
-# v0.8 (pre-release)
+# v0.8 (27 Aug 2023)
 * Better checking logic for the characters on the detonated dynamite. Now checking an area of 5x5.
 * Fix a bug in the dynamite drilldown tool that resulted in not palcing extra dynamites in some cases.
 
