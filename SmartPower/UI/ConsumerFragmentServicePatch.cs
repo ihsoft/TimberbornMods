@@ -23,6 +23,9 @@ static class ConsumerFragmentServicePatch {
   }
 
   static void Postfix(MechanicalNode mechanicalNode, Label ____label, ILoc ____loc) {
+    if (____label.style.display == DisplayStyle.None) {
+      return;
+    }
     var text = StateTextFormatter.FormatBuildingText(mechanicalNode, ____loc);
     if (text != null) {
       ____label.text += "\n" + text;
