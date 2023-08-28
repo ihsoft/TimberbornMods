@@ -1,4 +1,4 @@
-# v1.4 (pre-release)
+# v1.4 (27 Aug 2023)
 * [Fix #8] Optimize UI fragments handling.
 
 # v1.3 (28 Jul 2023)
