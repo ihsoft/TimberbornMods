@@ -14,7 +14,7 @@ public class CollectDependencies {
 
   /// <summary>Assemblies we don't care about.</summary>
   /// <remarks>They will be somehow resolved inside Unity.</remarks>
-  static readonly List<string> SkipPrefixes = new List<string>() {
+  static readonly List<string> SkipPrefixes = new() {
       "System.Web",
       "System.Xml",
       "System.Data",
@@ -22,6 +22,13 @@ public class CollectDependencies {
       "System.ServiceModel",
       "System.Runtime.Serialization",
       "System.EnterpriseServices",
+  };
+
+  static readonly List<string> SkipDllPrefixes = new() {
+      "mscorlib.",
+      "netstandard.",
+      "System.",
+      "UnityEngine.",
   };
 
   /// <summary>Captures all the DLLs from the game target folders.</summary>
@@ -88,7 +95,11 @@ public class CollectDependencies {
       Console.WriteLine($"Copy {dependencies.Count} depencdecies...");
       var output = Path.GetFullPath(args[1]);
       foreach (var location in dependencies.Values) {
-        File.Copy(location, Path.Combine(output, Path.GetFileName(location)));
+        var dllName = Path.GetFileName(location);
+        if (SkipDllPrefixes.Any(x => dllName.StartsWith(x))) {
+          continue;
+        }
+        File.Copy(location, Path.Combine(output, Path.GetFileName(location)), true);
       }
     }
 

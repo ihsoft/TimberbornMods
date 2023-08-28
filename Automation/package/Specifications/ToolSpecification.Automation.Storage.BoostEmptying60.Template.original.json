@@ -7,6 +7,7 @@
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.EmptyAt60pct.DisplayName",
   "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.EmptyAtXpct.Description",
   "ToolInformation": {
+    "TemplateFamilyName": "Storage.BoostEmptying",
     "Rules": [
       {
         "Condition": { "TypeId": "Automation.Conditions.OutputStockAboveThresholdCondition", "Threshold": 60 },

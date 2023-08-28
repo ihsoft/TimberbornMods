@@ -1,4 +1,4 @@
-// Timberborn Utils
+// Timberborn Mod: Automation
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
@@ -7,9 +7,7 @@ using Automation.Utils;
 namespace Automation.Core {
 
 /// <summary>Base action interface.</summary>
-/// <remarks>
-/// It defines what is expected from a regular action n scope of the automation system.
-/// </remarks>
+/// <remarks>It defines what is expected from a regular action in scope of the automation system.</remarks>
 public interface IAutomationAction : IGameSerializable {
   /// <summary>Automation behavior this action belongs to.</summary>
   /// <remarks>
@@ -30,6 +28,14 @@ public interface IAutomationAction : IGameSerializable {
   /// <remarks>Such actions are considered inactive and should not process any logic.</remarks>
   public bool IsMarkedForCleanup { get; }
 
+  /// <summary>Name of the templates family that created this action.</summary>
+  /// <remarks>
+  /// Several templates can set the same automation, but with different condition settings. Such templates form
+  /// "a family". Applying another template from the same family may (or may not) clear the exiting automations from the
+  /// same family. It's the template handler responsibility to deal with the existing automations.
+  /// </remarks>
+  public string TemplateFamily { get; set; }
+
   /// <summary>Returns a localized string to present the action description in UI.</summary>
   /// <remarks>
   /// The string must give exhaustive description on what the action does, but at the same time it should be as short as
@@ -40,6 +46,8 @@ public interface IAutomationAction : IGameSerializable {
   public string UiDescription { get; }
 
   /// <summary>Returns a full copy of the action <i>definition</i>. There must be no state copied.</summary>
+  /// <remarks>This method MUST copy all of the base class properties!</remarks>
+  /// <seealso cref="TemplateFamily"/>
   public IAutomationAction CloneDefinition();
 
   /// <summary>Verifies that the definitions of the two actions are equal.</summary>

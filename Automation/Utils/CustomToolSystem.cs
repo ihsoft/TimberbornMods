@@ -35,10 +35,21 @@ public static class CustomToolSystem {
   public class CustomToolGroup : ToolGroup, IToolGroup {
 
     #region IToolGroup implementation
+    /// <summary>The unique ID of the tool. It's defined in the specification.</summary>
     public string Id => _specification.Id;
+
+    /// <summary>The too group ID to attach this tool to. It's defined in the specification.</summary>
     public string GroupId => _specification.GroupId;
+
+    /// <summary>The tool order in the tool group. It's defined in the specification.</summary>
     public int Order => _specification.Order;
+
+    /// <summary>The tool's section (whatever it is). It's defined in the specification.</summary>
     public string Section => _specification.Section;
+
+    /// <summary>
+    /// Indicates if the tool must only be available in the dev mode. It's defined in the specification.
+    /// </summary>
     public bool DevMode => _specification.DevMode;
     #endregion
 
@@ -77,14 +88,21 @@ public static class CustomToolSystem {
     /// </value>
     protected ToolInformation ToolInformation { get; private set; }
 
-    protected ILoc Loc  { get; private set; }
+    /// <summary>Shortcut to <see cref="ILoc"/>.</summary>
+    protected ILoc Loc { get; private set; }
 
     /// <summary>Initializes the tool. Do all logic here instead of the constructor.</summary>
     protected virtual void Initialize() {
     }
     #endregion
 
+    #region Tool implementation
+    /// <inheritdoc/>
+    public override bool DevModeTool => ToolSpecification.DevMode;
+    #endregion
+
     #region Implementation
+    /// <summary>Injects the dependencies. It has to be public to work.</summary>
     [Inject]
     public void InjectDependencies(ILoc loc) {
       Loc = loc;
@@ -103,10 +121,11 @@ public static class CustomToolSystem {
   /// <summary>Class base for the tool information classes.</summary>
   /// <seealso cref="CustomToolSystem.BindTool{TTool, TInfo}"/>
   public abstract class ToolInformation {
+    /// <summary>Loads the tool's custom information.</summary>
     public abstract void Load(IObjectLoader objectLoader);
   }
-  #region API
 
+  #region API
   /// <summary>Registers a simple tool group that just contains other tools.</summary>
   /// <param name="containerDefinition">The configurator interface.</param>
   /// <param name="groupTypeName">The tool group type as specified in the TimberAPI specification.</param>
@@ -127,10 +146,14 @@ public static class CustomToolSystem {
 
   /// <summary>Registers an arbitrary class as a tool group.</summary>
   /// <remarks>
-  /// <p>Call this method from the configurator to define the tool groups of your mod. Each tool class can be bound only
-  /// once, or an exception will be thrown.</p>
-  /// <p>The registered class will be created via Bindito. Implement a method, attributed with <c>[Inject]</c>, to have
-  /// extra injections provided.</p>
+  /// <p>
+  /// Call this method from the configurator to define the tool groups of your mod. Each tool class can be bound only
+  /// once, or an exception will be thrown.
+  /// </p>
+  /// <p>
+  /// The registered class will be created via Bindito. Implement a method, attributed with <c>[Inject]</c>, to have
+  /// extra injections provided.
+  /// </p>
   /// </remarks>
   /// <param name="containerDefinition">The configurator interface.</param>
   /// <param name="groupTypeName">

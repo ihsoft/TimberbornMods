@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Automation.Actions;
 using Automation.Conditions;
 using Automation.Core;
@@ -13,11 +14,13 @@ using Timberborn.PrefabSystem;
 
 namespace Automation.Tools {
 
-/// <summary>The base item of the automation.</summary>
+/// <summary>Definition of an automation rule.</summary>
 /// <remarks>
-/// Each rules defines and executes a term: "if &lt;condition> is true, then execute this &lt;action>"
+/// Each rule defines and executes a term: "if &lt;condition> is true, then execute this &lt;action>". This class is
+/// intended to be only a <i>definition</i> of the rule. Do not re-use it in the execution logic.
 /// </remarks>
-public sealed class AutomationRule : IGameSerializable {
+/// <seealso cref="IAutomationAction"/>
+sealed class AutomationRule : IGameSerializable {
   #region Implementation of IGameSerializable
   static readonly PropertyKey<AutomationConditionBase> ConditionPropertyKey = new("Condition");
   static readonly PropertyKey<AutomationActionBase> ActionPropertyKey = new("Action");
@@ -63,6 +66,7 @@ public sealed class AutomationRule : IGameSerializable {
 
   #region Implentation
   /// <inheritdoc/>
+  [SuppressMessage("ReSharper", "Unity.NoNullPropagation")]
   public override string ToString() {
     var prefabName = Action.Behavior?.GetComponentFast<Prefab>()?.Name;
     var coords = Action.Behavior?.GetComponentFast<BlockObject>().Coordinates;

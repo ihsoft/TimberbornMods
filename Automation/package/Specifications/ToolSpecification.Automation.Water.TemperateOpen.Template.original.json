@@ -1,0 +1,22 @@
+{
+  "Id": "Automation.Tmpl.Water.OpenFloodgateTemperate",
+  "GroupId": "AutomationWaterToolGroupId",
+  "Type": "Automation.Templates.ApplyTemplateTool",
+  "Order": 6,
+  "Icon": "igorz.automation/ui_icons/icon-temperate-open",
+  "NameLocKey": "IgorZ.Automation.Tool.tmpl.TemperateOpenFloodgate.DisplayName",
+  "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.TemperateOpenFloodgate.Description",
+  "ToolInformation": {
+    "TemplateFamilyName": "Water.FloodgateManagement",
+    "Rules": [
+      {
+        "Condition": { "TypeId": "Automation.Conditions.DroughtStartedCondition" },
+        "Action": { "TypeId": "Automation.Actions.SetFloodgateHeightAction", "StepsDown": 0 }
+      },
+      {
+        "Condition": { "TypeId": "Automation.Conditions.DroughtEndedCondition" },
+        "Action": { "TypeId": "Automation.Actions.SetFloodgateHeightAction", "StepsDown": 1 }
+      }
+    ]
+  }
+}

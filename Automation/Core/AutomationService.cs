@@ -4,7 +4,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Automation.Conditions;
+using Automation.Tools;
 using Timberborn.BaseComponentSystem;
 using Timberborn.Common;
 using Timberborn.Localization;
@@ -23,10 +23,9 @@ public sealed class AutomationService : IPostLoadableSingleton {
   readonly Color _highlightColor = Color.cyan * 0.5f;
   readonly Highlighter _highlighter;
   bool _highlightingEnabled;
-  BaseComponent _rootComponent;
   #endregion
 
-  public AutomationService(EventBus eventBus, Highlighter highlighter, BaseInstantiator baseInstantiator, ILoc loc) {
+  AutomationService(EventBus eventBus, Highlighter highlighter, BaseInstantiator baseInstantiator, ILoc loc) {
     EventBus = eventBus;
     BaseInstantiator = baseInstantiator;
     Loc = loc;
@@ -65,24 +64,6 @@ public sealed class AutomationService : IPostLoadableSingleton {
     _highlightingEnabled = false;
     _highlighter.UnhighlightAllSecondary();
   }
-
-  /// <summary>Obtains a global automation behavior object.</summary>
-  /// <remarks>
-  /// Such object exists as singletons in the game scene. It's an object that monitors the overall game state and
-  /// doesn't depend on a specific game object.
-  /// </remarks>
-  /// <typeparam name="T">the behavior type to return or create</typeparam>
-  /// <returns>Existing or new instance of the behavior of the requested type.</returns>
-  public T GetGlobalBehavior<T>() where T : AutomationConditionBehaviorBase {
-    if (_rootComponent == null) {
-      var prefabObj = new GameObject("#rootPrefab-" + GetType().ToString());
-      var rootObj = BaseInstantiator.InstantiateInactive(prefabObj, null);
-      Object.Destroy(prefabObj);
-      _rootComponent = BaseInstantiator.AddComponent<RootComponent>(rootObj);
-    }
-    return _rootComponent.GetComponentFast<T>() ?? BaseInstantiator.AddComponent<T>(_rootComponent.GameObjectFast);
-  }
-  internal sealed class RootComponent : BaseComponent {}
   #endregion
 
   #region Implementation
@@ -100,6 +81,9 @@ public sealed class AutomationService : IPostLoadableSingleton {
     _registeredBehaviors.Remove(behavior);
   }
 
+  /// <summary>
+  /// Activates highlighting of the automated objects if a <see cref="IAutomationModeEnabler"/> tool is activated.
+  /// </summary>
   [OnEvent]
   public void OnToolEntered(ToolEnteredEvent toolEnteredEvent) {
     if (toolEnteredEvent.Tool is not IAutomationModeEnabler) {
@@ -108,6 +92,9 @@ public sealed class AutomationService : IPostLoadableSingleton {
     HighlightAutomationObjects();
   }
 
+  /// <summary>
+  /// Deactivates highlighting of the automated objects if a <see cref="IAutomationModeEnabler"/> tool is deactivated.
+  /// </summary>
   [OnEvent]
   public void OnToolExited(ToolExitedEvent toolExitedEvent) {
     UnhighlightAutomationObjects();
