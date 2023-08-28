@@ -25,7 +25,7 @@ static class HarmonyPatcher {
 
   /// <summary>Applies Harmony patches.</summary>
   /// <remarks>
-  /// This method can be called multiple time for the same patch ID. The duplicates will just be ignored.
+  /// This method can be called multiple times for the same patch ID. The duplicates will just be ignored.
   /// </remarks>
   /// <param name="patchId">Unique patch ID. Duplicated patches for the same ID will be silently ignored.</param>
   /// <param name="patchTypes">Static types that define Harmony patches.</param>
