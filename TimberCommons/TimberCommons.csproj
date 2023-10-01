@@ -52,14 +52,8 @@
       <Reference Include="Bindito.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Bindito.Core.dll</HintPath>
       </Reference>
-      <Reference Include="TimberApi, Version=0.5.5.6, Culture=neutral, PublicKeyToken=null">
+      <Reference Include="TimberApi, Version=0.6.2.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\TimberApi.dll</HintPath>
-      </Reference>
-      <Reference Include="TimberApi.Common, Version=0.5.5.6, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\TimberApi.Common.dll</HintPath>
-      </Reference>
-      <Reference Include="TimberApi.Core, Version=0.5.5.6, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\TimberApi.Core.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.BaseComponentSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.BaseComponentSystem.dll</HintPath>
