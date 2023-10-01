@@ -48,7 +48,7 @@ public abstract class AbstractLockingTool : AbstractAreaSelectionTool {
           ? Loc.T(SelectingOneObjectLoc, LockedEntityNiceName)
           : Loc.T(SelectingNObjectsLoc, LockedEntityNiceName, goodObjectsSelectedCount);
     }
-    if (!InputService.IsShiftHeld || InputService.MouseOverUI || SelectionModeActive) {
+    if (!IsShiftHeld || InputService.MouseOverUI || SelectionModeActive) {
       return "";
     }
     if (HighlightedBlockObject != null && CheckCanLockOnComponent(HighlightedBlockObject)) {
@@ -68,7 +68,7 @@ public abstract class AbstractLockingTool : AbstractAreaSelectionTool {
   protected override void OnSelectionModeChange(bool newMode) {
     base.OnSelectionModeChange(newMode);
     if (newMode) {
-      if (!InputService.IsShiftHeld
+      if (!IsShiftHeld
           || HighlightedBlockObject == null
           || !CheckCanLockOnComponent(HighlightedBlockObject)) {
         return;
