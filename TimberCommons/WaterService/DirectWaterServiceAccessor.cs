@@ -407,12 +407,19 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
   static class WaterSimulatorWaterDepthsPatch {
     const string NetworkFragmentServiceClassName = "Timberborn.WaterSystem.WaterSimulator";
     const string MethodName = "UpdateWaterDepths";
+    // FIXME: Use it as the only name if/when u5 hits main branch. 
+    const string MethodNameUpdate5 = "UpdateWaterChanges";
 
     public static DirectWaterServiceAccessor DirectWaterServiceAccessor;
 
     static MethodBase TargetMethod() {
       var type = AccessTools.TypeByName(NetworkFragmentServiceClassName);
-      return AccessTools.FirstMethod(type, method => method.Name == MethodName);
+      var methodBase = AccessTools.FirstMethod(type, method => method.Name == MethodName);
+      if (methodBase == null) {
+        DebugEx.Warning("[Timber Commons] Using an experimental feature to support Update 5");
+        methodBase = AccessTools.FirstMethod(type, method => method.Name == MethodNameUpdate5);
+      }
+      return methodBase;
     }
 
     static void Postfix(float ____deltaTime) {
