@@ -130,6 +130,7 @@ public abstract class AbstractLockingTool : AbstractAreaSelectionTool {
   #endregion
 
   #region Local methods
+  /// <summary>Injects the dependencies. It has to be public to work.</summary>
   [Inject]
   public void InjectDependencies(EntityBadgeService entityBadgeService) {
     _entityBadgeService = entityBadgeService;

@@ -7,6 +7,7 @@
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.5LevelsDynamite.DisplayName",
   "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.XLevelsDynamite.Description",
   "ToolInformation": {
+    "TemplateFamilyName": "Terrain.DynamiteDigging",
     "Rules": [
       {
         "Condition": { "TypeId": "Automation.Conditions.ObjectFinishedCondition" },

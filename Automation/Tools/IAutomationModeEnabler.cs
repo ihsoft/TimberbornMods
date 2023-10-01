@@ -1,8 +1,8 @@
-// Timberborn Utils
+// Timberborn Mod: Automation
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-namespace Automation {
+namespace Automation.Tools {
 
 /// <summary>
 /// Tool decoration interface that indicates that automation object should be highlighted on the map.

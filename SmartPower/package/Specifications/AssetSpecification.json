@@ -1,0 +1,6 @@
+{
+  "IgnoreDirectoryPrefixes": [
+    "Sprites/StatusIcons/",
+    "Sprites/StatusIcons\\",
+  ]
+}

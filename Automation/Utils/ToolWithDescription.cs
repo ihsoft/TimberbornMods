@@ -24,13 +24,13 @@ public abstract class ToolWithDescription : CustomToolSystem.CustomTool {
   #region API
   /// <summary>
   /// The localization key of the text to present as the tool caption. If <c>null</c>,
-  /// then <see cref="TimberApi.ToolSystem.ToolSpecification.NameLocKey"/> is used.
+  /// then <c>TimberApi.ToolSystem.ToolSpecification.NameLocKey</c> is used.
   /// </summary>
   protected string DescriptionTitleLoc = null;
 
   /// <summary>
   /// The localization key of the text to present as the tool description. If <c>null</c>,
-  /// then <see cref="TimberApi.ToolSystem.ToolSpecification.DescriptionLocKey"/> is used.
+  /// then <c>"TimberApi.ToolSystem.ToolSpecification.DescriptionLocKey</c> is used.
   /// </summary>
   protected string DescriptionMainSectionLoc = null;
 

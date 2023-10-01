@@ -1,8 +1,8 @@
 {
   "Name": "Automation",
-  "Version": "0.5.0",
+  "Version": "0.8.0",
   "UniqueId": "igorz.automation",
-  "MinimumApiVersion": "0.5.5",
+  "MinimumApiVersion": "0.6.0",
   "MinimumGameVersion": "0.4.9.0",
   "EntryDll": "Automation.dll",
   "Assets": [
@@ -13,10 +13,4 @@
       ]
     }
   ],
-  "Dependencies": [
-    {
-      "UniqueId": "igorz.customresources",
-      "MinimumVersion": "1.0.0"
-    }
-  ]
 }

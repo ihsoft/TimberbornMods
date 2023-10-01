@@ -1,4 +1,4 @@
-// Timberborn Utils
+// Timberborn Mod: Automation
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
@@ -57,9 +57,6 @@ public interface IAutomationCondition : IGameSerializable {
 
   /// <summary>Returns a full copy of the condition <i>definition</i>. There must be no state copied.</summary>
   public IAutomationCondition CloneDefinition();
-
-  /// <summary>Verifies that the definitions of the two conditions are equal.</summary>
-  public bool CheckSameDefinition(IAutomationCondition other);
 
   /// <summary>Verifies that the condition can be used on the provided automation behavior.</summary>
   public bool IsValidAt(AutomationBehavior behavior);

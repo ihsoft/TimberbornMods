@@ -1,4 +1,4 @@
-// Timberborn Utils
+// Timberborn Mod: Automation
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
@@ -10,6 +10,8 @@ using Timberborn.Persistence;
 namespace Automation.Conditions {
 
 /// <summary>Base class for conditions that check output goods in inventories for a specific threshold.</summary>
+/// <remarks>This condition only triggers on the inventory changes.</remarks>
+/// <seealso cref="Inventory"/>
 [SuppressMessage("ReSharper", "MemberCanBeProtected.Global")]
 public abstract class OutputStockThresholdConditionBase : AutomationConditionBase {
   #region AutomationConditionBase implementation
@@ -20,9 +22,6 @@ public abstract class OutputStockThresholdConditionBase : AutomationConditionBas
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
-    if (!base.IsValidAt(behavior)) {
-      return false;
-    }
     var inventory = behavior.GetComponentFast<Inventory>();
     return inventory != null && inventory.IsOutput && !inventory.IsInput && inventory.OutputGoods.Count == 1;
   }
