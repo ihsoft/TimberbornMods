@@ -1,3 +1,10 @@
+# v1.4 (27 Aug 2023)
+* [Fix #8] Optimize UI fragments handling.
+
+# v1.3 (28 Jul 2023)
+* Switch to Timber API 0.6.0 and remove `CustomResources` dependency.
+* Update `deDE` localization.
+
 # v1.2 (19 Jul 2023)
 * [Update] Change `deDE` strings.
 * [Enhancement #1] Add a setting to control batteries charging at per engine level.

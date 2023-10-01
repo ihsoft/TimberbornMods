@@ -1,4 +1,4 @@
-// Timberborn Utils
+// Timberborn Mod: Automation
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
@@ -9,19 +9,21 @@ using UnityDev.Utils.LogUtilsLite;
 namespace Automation.Actions {
 
 /// <summary>Action that disables the storage empty mode.</summary>
-public class UnmarkForEmptyingAction : AutomationActionBase {
+public sealed class UnmarkForEmptyingAction : AutomationActionBase {
+  const string DescriptionLocKey = "IgorZ.Automation.UnmarkForEmptyingAction.Description";
+
   #region AutomationActionBase overrides
   /// <inheritdoc/>
   public override IAutomationAction CloneDefinition() {
-    return new UnmarkForEmptyingAction();
+    return new UnmarkForEmptyingAction { TemplateFamily = TemplateFamily };
   }
 
   /// <inheritdoc/>
-  public override string UiDescription => "<SolidHighlight>stop emptying storage</SolidHighlight>";
+  public override string UiDescription => Behavior.Loc.T(DescriptionLocKey);
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
-    return base.IsValidAt(behavior) && behavior.GetComponentFast<Emptiable>() != null;
+    return behavior.GetComponentFast<Emptiable>() != null;
   }
 
   /// <inheritdoc/>

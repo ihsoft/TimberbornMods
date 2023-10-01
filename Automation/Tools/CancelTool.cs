@@ -31,7 +31,7 @@ sealed class CancelTool : AbstractAreaSelectionTool, IAutomationModeEnabler {
 
   /// <inheritdoc/>
   protected override void OnObjectAction(BlockObject blockObject) {
-    blockObject.GetComponentFast<AutomationBehavior>().ClearActions();
+    blockObject.GetComponentFast<AutomationBehavior>().ClearAllRules();
   }
   #endregion
 }

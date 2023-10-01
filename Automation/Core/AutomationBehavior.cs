@@ -15,11 +15,19 @@ using UnityDev.Utils.LogUtilsLite;
 
 namespace Automation.Core {
 
+/// <summary>The component that keeps all teh automation state on the building.</summary>
 public sealed class AutomationBehavior : BaseComponent, IPersistentEntity {
   #region Injection shortcuts
+  /// <summary>Shortcut to the <see cref="AutomationService"/>.</summary>
   public AutomationService AutomationService { get; private set; }
+
+  /// <summary>Shortcut to the <see cref="ILoc"/>.</summary>
   public ILoc Loc => AutomationService.Loc;
+
+  /// <summary>Shortcut to the <see cref="EventBus"/>.</summary>
   public EventBus EventBus => AutomationService.EventBus;
+
+  /// <summary>Shortcut to the <see cref="BaseInstantiator"/>.</summary>
   public BaseInstantiator BaseInstantiator => AutomationService.BaseInstantiator;
   #endregion
 
@@ -28,42 +36,68 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity {
   /// </summary>
   public BlockObject BlockObject { get; private set; }
 
+  /// <summary>Indicates if there are any actions on the building.</summary>
   public bool HasActions => _actions.Count > 0;
 
+  /// <summary>All actions on the building.</summary>
   public IEnumerable<IAutomationAction> Actions => _actions.AsReadOnly();
   List<IAutomationAction> _actions = new();
 
   #region API
-  public bool AddRule(IAutomationCondition condition, IAutomationAction action) {
-    if (HasRule(condition, action)) {
-      HostedDebugLog.Warning(this, "Skipping duplicate rule: condition={0}, action={1}", condition, action);
-      return false;
-    }
+  /// <summary>Creates a rule from the condition and action.</summary>
+  /// <param name="condition">
+  /// Condition definition. It will be owned by the behavior. Don't change or re-use it after adding.
+  /// </param>
+  /// <param name="action">
+  /// Action definition. It will be owned by the behavior. Don't change or re-use it after adding.
+  /// </param>
+  public void AddRule(IAutomationCondition condition, IAutomationAction action) {
     action.Condition = condition;
     condition.Behavior = this;
     action.Behavior = this;
     condition.SyncState();
-    if (action.IsMarkedForCleanup || condition.IsMarkedForCleanup) {
-      HostedDebugLog.Fine(this, "Skipping rule that is marked for cleanup: {0}", action);
-      return true;
-    }
     _actions.Add(action);
     HostedDebugLog.Fine(this, "Adding rule: {0}", action);
     UpdateRegistration();
-    return true;
   }
 
-  public void ClearActions() {
-    foreach (var action in _actions) {
-      action.Condition.Behavior = null;
-      action.Behavior = null;
-    }
-    _actions.Clear();
+  /// <summary>Deletes the specified rule.</summary>
+  /// <see cref="Actions"/>
+  public void DeleteRuleAt(int index) {
+    var action = _actions[index];
+    action.Condition.Behavior = null;
+    action.Behavior = null;
+    _actions.RemoveAt(index);
     UpdateRegistration();
   }
 
-  public bool HasRule(IAutomationCondition condition, IAutomationAction action) {
-    return _actions.Any(r => r.CheckSameDefinition(action) && r.Condition.CheckSameDefinition(condition));
+  /// <summary>Removes all rules that were defined for the specified template group.</summary>
+  public void RemoveRulesForTemplateFamily(string templateFamily) {
+    HostedDebugLog.Fine(this, "Removing all rules for template family: {0}", templateFamily);
+    for (var i = _actions.Count - 1; i >= 0; i--) {
+      var action = _actions[i];
+      if (action.TemplateFamily == templateFamily) {
+        DeleteRuleAt(i);
+      }
+    }
+  }
+
+  /// <summary>Removes all automation rules from the block object.</summary>
+  public void ClearAllRules() {
+    while (_actions.Count > 0) {
+      DeleteRuleAt(0);
+    }
+  }
+
+  /// <summary>Removes all rules that depend on condition and/or action that is marked fro cleanup.</summary>
+  public void CollectCleanedRules() {
+    for (int i = _actions.Count - 1; i >= 0; i--) {
+      var action = _actions[i];
+      if (action.IsMarkedForCleanup || action.Condition.IsMarkedForCleanup) {
+        HostedDebugLog.Fine(this, "Cleaning up action: {0}", action);
+        DeleteRuleAt(i);
+      }
+    }
   }
   #endregion
 
@@ -101,6 +135,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity {
   #endregion
 
   #region Implementation
+  /// <summary>Injects the dependencies. It has to be public to work.</summary>
   [Inject]
   public void InjectDependencies(AutomationService automationService) {
     AutomationService = automationService;
@@ -111,7 +146,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity {
   }
 
   void OnDestroy() {
-    ClearActions();
+    ClearAllRules();
   }
 
   void UpdateRegistration() {

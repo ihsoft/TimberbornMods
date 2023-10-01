@@ -1,4 +1,4 @@
-// Timberborn Utils
+// Timberborn Mod: Automation
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
@@ -18,6 +18,7 @@ namespace Automation.Actions {
 /// explicit control over this mode.
 /// </remarks>
 public sealed class MarkForEmptyingAction : AutomationActionBase {
+  const string DescriptionLocKey = "IgorZ.Automation.MarkForEmptyingAction.Description";
   const string CustomStatusIcon = "igorz.automation/ui_icons/status-icon-emptying";
   const string CustomStatusDescriptionKey = "IgorZ.Automation.EmptyOutputStore.CustomStatus";
 
@@ -29,15 +30,15 @@ public sealed class MarkForEmptyingAction : AutomationActionBase {
   #region AutomationActionBase overrides
   /// <inheritdoc/>
   public override IAutomationAction CloneDefinition() {
-    return new MarkForEmptyingAction();
+    return new MarkForEmptyingAction { TemplateFamily = TemplateFamily };
   }
 
   /// <inheritdoc/>
-  public override string UiDescription => "<SolidHighlight>empty storage</SolidHighlight>";
+  public override string UiDescription => Behavior.Loc.T(DescriptionLocKey);
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
-    return base.IsValidAt(behavior) && behavior.GetComponentFast<Emptiable>() != null;
+    return behavior.GetComponentFast<Emptiable>() != null;
   }
 
   /// <inheritdoc/>
