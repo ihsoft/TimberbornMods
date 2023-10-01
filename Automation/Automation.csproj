@@ -180,6 +180,9 @@
       <Reference Include="Timberborn.Goods, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.Goods.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.HazardousWeatherSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.HazardousWeatherSystem.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.InputSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.InputSystem.dll</HintPath>
       </Reference>
@@ -233,9 +236,6 @@
       </Reference>
       <Reference Include="Timberborn.WaterBuildings, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.WaterBuildings.dll</HintPath>
-      </Reference>
-      <Reference Include="Timberborn.WeatherSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.WeatherSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.WorldSerialization, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.WorldSerialization.dll</HintPath>

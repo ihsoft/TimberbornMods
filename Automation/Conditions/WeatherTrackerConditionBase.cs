@@ -3,8 +3,8 @@
 // License: Public Domain
 
 using TimberApi.DependencyContainerSystem;
+using Timberborn.HazardousWeatherSystem;
 using Timberborn.SingletonSystem;
-using Timberborn.WeatherSystem;
 
 namespace Automation.Conditions {
 
@@ -14,8 +14,8 @@ public abstract class WeatherTrackerConditionBase : AutomationConditionBase {
   #region AutomationConditionBase overrides
   /// <inheritdoc/>
   public override void SyncState() {
-    var droughtService = DependencyContainer.GetInstance<DroughtService>();
-    OnWeatherChanged(isDrought: droughtService.IsDrought);
+    var weatherService = DependencyContainer.GetInstance<HazardousWeatherService>();
+    OnWeatherChanged(isDrought: weatherService.CurrentCycleHazardousWeather is DroughtWeather);
   }
 
   /// <inheritdoc/>
@@ -38,13 +38,13 @@ public abstract class WeatherTrackerConditionBase : AutomationConditionBase {
   #region Implemenatation
   /// <summary>Triggers when weather season changes to drought.</summary>
   [OnEvent]
-  public void OnDroughtStartedEvent(DroughtStartedEvent @event) {
-    OnWeatherChanged(isDrought: true);
+  public void OnDroughtStartedEvent(HazardousWeatherStartedEvent @event) {
+    OnWeatherChanged(isDrought: @event.HazardousWeather is DroughtWeather);
   }
 
   /// <summary>Triggers when weather season changes to temperate.</summary>
   [OnEvent]
-  public void OnDroughtEndedEvent(DroughtEndedEvent @event) {
+  public void OnDroughtEndedEvent(HazardousWeatherEndedEvent @event) {
     OnWeatherChanged(isDrought: false);
   }
   #endregion
