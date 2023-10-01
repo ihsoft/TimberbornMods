@@ -1,3 +1,7 @@
+# v0.9 (30 Sep 2023)
+* Fixed to support Update 5.
+* The start of a badtide season is not considered as a drought start in the wather automations.
+
 # v0.8 (27 Aug 2023)
 * Better checking logic for the characters on the detonated dynamite. Now checking an area of 5x5.
 * Fix a bug in the dynamite drilldown tool that resulted in not palcing extra dynamites in some cases.
