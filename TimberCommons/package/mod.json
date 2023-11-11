@@ -1,8 +1,8 @@
 {
   "Name": "TimberCommons",
-  "Version": "1.2.0",
+  "Version": "1.3.0",
   "UniqueId": "igorz.timbercommons",
-  "MinimumApiVersion": "0.5.5",
-  "MinimumGameVersion": "0.4.9.0",
+  "MinimumApiVersion": "0.6.2",
+  "MinimumGameVersion": "0.5.2.0",
   "EntryDll": "TimberCommons.dll"
 }
