@@ -1,6 +1,7 @@
 ID,Text
 IgorZ.TimberCommons.WaterValve.WaterFlowLimit,"Limitiert Fließgeschwindigkeit auf: {0} m³/s"
 IgorZ.TimberCommons.WaterValve.CurrentWaterFlow,"Fließgeschwindigkeit: {0} m³/s"
-IgorZ.TimberCommons.WaterValve.WaterDepthAtIntake,"Wasserstand am Zufluss: {0}"
-IgorZ.TimberCommons.WaterValve.WaterDepthAtOuttake,"Wasserstand am Abfluss: {0}"
-IgorZ.TimberCommons.WaterValve.DisableLevelCheckAtOutput,"Keine Überprüfung des Wasserstands\r\nam Abfluss"
+IgorZ.TimberCommons.WaterValve.WaterDepthAtIntake,"Tiefe am Zufluss: {0}"
+IgorZ.TimberCommons.WaterValve.WaterDepthAtOuttake,"Tiefe am Abfluss: {0}"
+IgorZ.TimberCommons.WaterValve.DisableLevelCheckAtOutput,"Keine Überprüfung des Wasserstands
+am Abfluss",
