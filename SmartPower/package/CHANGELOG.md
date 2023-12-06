@@ -1,3 +1,7 @@
+# v1.5 (5 Dec 2023)
+* Experimental version for Update 5.
+* [Fix #18] Fix crashes on Timberborn 0.5.4.0.
+
 # v1.4 (27 Aug 2023)
 * [Fix #8] Optimize UI fragments handling.
 

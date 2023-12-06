@@ -22,6 +22,7 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
   const float MinBatteryChargeRatio = 0.65f;
 
   GoodConsumingBuilding _goodConsumingBuilding;
+  GoodConsumingToggle _goodConsumingToggle;
   MechanicalNode _mechanicalNode;
   PausableBuilding _pausable;
   int _maxPower;
@@ -77,11 +78,12 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
   new void Awake() {
     base.Awake();
     _goodConsumingBuilding = GetComponentFast<GoodConsumingBuilding>();
+    _goodConsumingToggle = _goodConsumingBuilding.GetGoodConsumingToggle();
     _mechanicalNode = GetComponentFast<MechanicalNode>();
     _maxPower = GetComponentFast<MechanicalNodeSpecification>().PowerOutput;
     _pausable = GetComponentFast<PausableBuilding>();
-    if (_pausable) {
-      _pausable.PausedChanged += (_, _) => _goodConsumingBuilding.ResumeConsumption();
+    if (_pausable != null) {
+      _pausable.PausedChanged += (_, _) => _goodConsumingToggle.ResumeConsumption();
     }
     enabled = true;
   }
@@ -113,7 +115,7 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
         HostedDebugLog.Fine(
             this, "Start good consumption: demand={0}, supply={1}, batteries={2:0.00}, threshold={3}",
             demand, supply, batteriesChargeRatio, DischargeBatteriesThreshold);
-        _goodConsumingBuilding.ResumeConsumption();
+        _goodConsumingToggle.ResumeConsumption();
         if (_goodConsumingBuilding.HoursUntilNoSupply > 0) {
           _mechanicalNode.Active = true;
           _mechanicalNode.UpdateOutput(1.0f); // Be optimistic, let it update in the next tick.
@@ -127,7 +129,7 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
         HostedDebugLog.Fine(
             this, "Stop good consumption: demand={0}, supply={1}, batteries={2:0.00}, check={3}",
             demand, supply, batteriesChargeRatio, ChargeBatteriesThreshold);
-        _goodConsumingBuilding.PauseConsumption();
+        _goodConsumingToggle.PauseConsumption();
         _mechanicalNode.UpdateOutput(0);  // The graph will be updated on the next tick.
         _skipTicks = 1;
       }
