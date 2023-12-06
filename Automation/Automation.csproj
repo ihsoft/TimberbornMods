@@ -96,7 +96,7 @@
       <Reference Include="System.Collections.Immutable, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
         <HintPath>..\Dependencies\Timberborn\System.Collections.Immutable.dll</HintPath>
       </Reference>
-      <Reference Include="TimberApi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <Reference Include="TimberApi, Version=0.6.3.1, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\TimberApi.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.AreaSelectionSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
