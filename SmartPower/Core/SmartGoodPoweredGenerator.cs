@@ -85,7 +85,6 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
     if (_pausable != null) {
       _pausable.PausedChanged += (_, _) => _goodConsumingToggle.ResumeConsumption();
     }
-    enabled = true;
   }
 
   void UpdateGoodConsumption() {
