@@ -1,9 +1,9 @@
 {
   "Name": "Automation",
-  "Version": "0.10.0",
+  "Version": "0.11.0",
   "UniqueId": "igorz.automation",
   "MinimumApiVersion": "0.6.3.1",
-  "MinimumGameVersion": "0.5.4.2",
+  "MinimumGameVersion": "0.5.5.0",
   "EntryDll": "Automation.dll",
   "Assets": [
     {

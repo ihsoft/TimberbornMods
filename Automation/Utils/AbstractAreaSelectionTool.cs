@@ -170,7 +170,7 @@ public abstract class AbstractAreaSelectionTool : ToolWithDescription, IInputPro
   #region Local methods
   /// <summary>Creates the abstract tool.</summary>
   protected AbstractAreaSelectionTool() {
-    DescriptionHintSectionLoc = SelectionToolSystemLocKeys.ClickOrHoldTipKey;
+    DescriptionHintSectionLoc = "SelectionTool.ClickOrHoldTip";
   }
 
   /// <summary>Injects the condition dependencies. It has to be public to work.</summary>
