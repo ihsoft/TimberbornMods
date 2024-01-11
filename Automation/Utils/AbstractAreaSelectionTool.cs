@@ -135,7 +135,7 @@ public abstract class AbstractAreaSelectionTool : ToolWithDescription, IInputPro
   /// <inheritdoc/>
   public override void Enter() {
     InputService.AddInputProcessor(this);
-    _areaBlockObjectPicker = _areaBlockObjectPickerFactory.Create();
+    _areaBlockObjectPicker = _areaBlockObjectPickerFactory.CreatePickingUpwards();
     if (CursorName != null) {
       _cursorService.SetCursor(CursorName);
     }
