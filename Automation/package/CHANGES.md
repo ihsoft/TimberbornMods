@@ -1,3 +1,7 @@
+# v0.12 (10 Jan 2024)
+* Experimental version for Update 5.
+* [Fix #22] Mod doesn't load in Timberborn 0.5.6.3.
+
 # v0.11 (15 Dec 2023)
 * Experimental version for Update 5.
 * [Fix #21] Mod doesn't load in Timberborn 0.5.5.0.
