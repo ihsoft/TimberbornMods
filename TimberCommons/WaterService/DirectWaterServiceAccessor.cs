@@ -190,7 +190,7 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
 
   #region IPostLoadableSingleton implementation
   /// <summary>Gets accessors to the water system internal classes and properties.</summary>
-  /// <remarks>It's expected to ev called after all the game state is loaded and ready.</remarks>
+  /// <remarks>It's expected to be called after all the game state is loaded and ready.</remarks>
   public void PostLoad() {
     DebugEx.Fine("Initializing direct access to WaterSystem...");
 
@@ -430,13 +430,13 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
   [SuppressMessage("ReSharper", "UnusedMember.Local")]
   [SuppressMessage("ReSharper", "InconsistentNaming")]
   static class WaterSimulatorWaterDepthsPatch {
-    const string NetworkFragmentServiceClassName = "Timberborn.WaterSystem.WaterSimulator";
+    const string WaterSimulatorClasName = "Timberborn.WaterSystem.WaterSimulator";
     const string MethodName = "UpdateWaterChanges";
 
     public static DirectWaterServiceAccessor DirectWaterServiceAccessor;
 
     static MethodBase TargetMethod() {
-      var type = AccessTools.TypeByName(NetworkFragmentServiceClassName);
+      var type = AccessTools.TypeByName(WaterSimulatorClasName);
       var methodBase = AccessTools.FirstMethod(type, method => method.Name == MethodName);
       return methodBase;
     }
