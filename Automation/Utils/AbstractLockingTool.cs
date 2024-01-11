@@ -16,7 +16,7 @@ namespace Automation.Utils {
 
 /// <summary>Tool that can select objects by user criteria.</summary>
 /// <remarks>
-/// On selection start this toll checks the highlighted entity. If allowed for, it will be used to filter the other
+/// On selection start this tool checks the highlighted entity. If allowed for, it will be used to filter the other
 /// entities during the selection. This allows user to select only specific entities.
 /// </remarks>
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]

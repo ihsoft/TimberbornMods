@@ -217,6 +217,7 @@ public abstract class AbstractAreaSelectionTool : ToolWithDescription, IInputPro
     _highlightSelectionDrawer.StopDrawing();
     _actionSelectionDrawer.StopDrawing();
     SelectionModeActive = false;
+    HighlightedBlockObject = null;
   }
 
   void CreateDrawers() {
