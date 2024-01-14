@@ -39,6 +39,9 @@
       <Compile Include="TimberDev\HarmonyPatcher.cs" />
       <Compile Include="TimberDev\UiFactory.cs" />
       <Compile Include="UnityDevLite\DebugEx.cs" />
+      <Compile Include="UnityDevLite\HostedDebugLog.cs" />
+      <Compile Include="UnityDevLite\ReflectedField.cs" />
+      <Compile Include="UnityDevLite\TypeUtils.cs" />
       <Compile Include="WaterService\Configurator.cs" />
       <Compile Include="WaterService\DirectSoilMoistureSystemAccessor.cs" />
       <Compile Include="WaterService\DirectWaterServiceAccessor.cs" />
