@@ -35,6 +35,7 @@
         <DocumentationFile>bin\Release\TimberCommons.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
+      <Compile Include="IrrigationTowerComponent\IrrigationTower.cs" />
       <Compile Include="Properties\AssemblyInfo.cs" />
       <Compile Include="TimberDev\HarmonyPatcher.cs" />
       <Compile Include="TimberDev\UiFactory.cs" />
@@ -56,6 +57,10 @@
       <Reference Include="Bindito.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Bindito.Core.dll</HintPath>
       </Reference>
+      <Reference Include="Bindito.Unity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Bindito.Unity.dll</HintPath>
+      </Reference>
+      <Reference Include="System" />
       <Reference Include="TimberApi, Version=0.6.2.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\TimberApi.dll</HintPath>
       </Reference>
@@ -64,6 +69,18 @@
       </Reference>
       <Reference Include="Timberborn.BlockSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.BlockSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.BuildingRange, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.BuildingRange.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.Buildings, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.Buildings.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.BuildingsUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.BuildingsUI.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.Common, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.Common.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.ConstructibleSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.ConstructibleSystem.dll</HintPath>
@@ -79,6 +96,15 @@
       </Reference>
       <Reference Include="Timberborn.EntityPanelSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.EntityPanelSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.EntitySystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.EntitySystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.GoodConsumingBuildingSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.GoodConsumingBuildingSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.GoodConsumingBuildingSystemUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.GoodConsumingBuildingSystemUI.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.Localization, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.Localization.dll</HintPath>
@@ -97,6 +123,15 @@
       </Reference>
       <Reference Include="Timberborn.SingletonSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.SingletonSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.SoilBarrierSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.SoilBarrierSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.SoilMoistureSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.SoilMoistureSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.TerrainSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.TerrainSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.TickSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.TickSystem.dll</HintPath>
