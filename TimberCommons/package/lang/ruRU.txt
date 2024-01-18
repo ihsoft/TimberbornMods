@@ -4,3 +4,8 @@ IgorZ.TimberCommons.WaterValve.CurrentWaterFlow,"Скорость течения
 IgorZ.TimberCommons.WaterValve.WaterDepthAtIntake,"Глубина воды на входе: {0}"
 IgorZ.TimberCommons.WaterValve.WaterDepthAtOuttake,"Глубина воды на выходе: {0}"
 IgorZ.TimberCommons.WaterValve.DisableLevelCheckAtOutput,"Не проверять уровень воды на выходе"
+
+IgorZ.TimberCommons.WaterTower.IrrigationCoverage,"Используемый потенциал: {0:0.#}%"
+IgorZ.TimberCommons.WaterTower.IrrigatedArea,"Площадь покрытия: {0}"
+IgorZ.TimberCommons.WaterTower.EffectiveRange,"Дистанция орошения: {0}"
+IgorZ.TimberCommons.WaterTower.SupplyRemaining,"Запаса хватит на {0}д {1}ч"

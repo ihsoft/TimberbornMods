@@ -35,7 +35,9 @@
         <DocumentationFile>bin\Release\TimberCommons.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
+      <Compile Include="IrrigationTowerComponent\Configurator.cs" />
       <Compile Include="IrrigationTowerComponent\IrrigationTower.cs" />
+      <Compile Include="IrrigationTowerComponent\IrrigationTowerFragment.cs" />
       <Compile Include="Properties\AssemblyInfo.cs" />
       <Compile Include="TimberDev\HarmonyPatcher.cs" />
       <Compile Include="TimberDev\UiFactory.cs" />
