@@ -71,7 +71,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
         }
       }
       DebugEx.Fine("Updating the list of moisture overrides: old={0}, new={1}",
-                   SoilMoistureSimulatorPatch.MoistureOverrides.Count, overridesCache.Count);
+                   SoilMoistureSimulatorPatch.MoistureOverrides?.Count, overridesCache.Count);
       SoilMoistureSimulatorPatch.MoistureOverrides = overridesCache;
     }
   }
