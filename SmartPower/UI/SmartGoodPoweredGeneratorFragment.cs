@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using IgorZ.TimberDev.UI;
 using TimberApi.UiBuilderSystem;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
@@ -17,9 +18,7 @@ namespace IgorZ.SmartPower.UI {
 sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
   const string NeverStopThisGeneratorLocKey = "IgorZ.SmartPower.PoweredGenerator.NeverStop";
   const string ChargeLevelLocKey = "IgorZ.SmartPower.PoweredGenerator.ChargeBatteriesRangeText";
-  static readonly Color NormalColor = new(0.8f, 0.8f, 0.8f);
   const float BatteriesChargeRangeSize = 0.25f;
-  const float BatteriesChargeRangeStep = 0.05f;
 
   readonly UIBuilder _builder;
   readonly ILoc _loc;
@@ -39,26 +38,21 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
 
   public VisualElement InitializeFragment() {
     _neverShutdownCheckbox = _builder.Presets().Toggles()
-        .CheckmarkInverted(locKey: NeverStopThisGeneratorLocKey, color: NormalColor);
+        .CheckmarkInverted(locKey: NeverStopThisGeneratorLocKey, color: UiFactory.PanelNormalColor);
     _neverShutdownCheckbox.RegisterValueChangedCallback(
         _ => {
           _generator.NeverShutdown = _neverShutdownCheckbox.value;
           UpdateControls();
         });
 
-    _chargeBatteriesSlider = _visualElementLoader.LoadVisualElement("Common/IntegerSlider").Q<Slider>("Slider");
-    _chargeBatteriesSlider.lowValue = 0.1f;
-    _chargeBatteriesSlider.highValue = 0.9f - BatteriesChargeRangeSize;
-    _chargeBatteriesSlider.RegisterValueChangedCallback(
-        _ => {
-          var value = Mathf.Round(_chargeBatteriesSlider.value / BatteriesChargeRangeStep) * BatteriesChargeRangeStep;
-          _chargeBatteriesSlider.SetValueWithoutNotify(value);
+    _chargeBatteriesSlider = UiFactory.CreateSlider(
+        _visualElementLoader, value => {
           _generator.DischargeBatteriesThreshold = value;
           _generator.ChargeBatteriesThreshold = value + BatteriesChargeRangeSize;
           UpdateControls();
-        });
+        }, lowValue: 0.1f, highValue: 0.9f - BatteriesChargeRangeSize);
 
-    _chargeBatteriesText = _builder.Presets().Labels().Label(color: NormalColor);
+    _chargeBatteriesText = _builder.Presets().Labels().Label(color: UiFactory.PanelNormalColor);
     _chargeBatteriesText.style.marginTop = 5;
 
     _root = _builder.CreateFragmentBuilder()

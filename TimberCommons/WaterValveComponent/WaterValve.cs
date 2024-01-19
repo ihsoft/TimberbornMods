@@ -53,6 +53,9 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
   bool _allowDisablingOutputLevelCheck = true;
 
   [SerializeField]
+  bool _moveContaminatedWater = true;
+
+  [SerializeField]
   ParticleSystem _particleSystem = null;
 
   // ReSharper restore InconsistentNaming
@@ -142,6 +145,16 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
   }
   bool _outputLevelCheckDisabled;
 
+  /// <summary>Tells if the contamination should also be moved.</summary>
+  /// <remarks>If not set, then the valve works as a filter and only clear water is emitted at the drop.</remarks>
+  public bool MoveContaminatedWater {
+    get => _moveContaminatedWater;
+    set {
+      _moveContaminatedWater = value;
+      _waterMover.MoveContaminatedWater = value;
+    }
+  }
+
   /// <summary>Indicates if the UI panel should be shown when the valve is selected. It's a prefab setting.</summary>
   public bool ShowUIPanel => _showUIPanel;
   #endregion
@@ -203,6 +216,7 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
     _waterMover.OutputTileIndex = _mapIndexService.CoordinatesToIndex(_outputCoordinatesTransformed);
     MinWaterLevelAtIntake = MinWaterLevelAtIntake;
     MaxWaterLevelAtOuttake = MaxWaterLevelAtOuttake;
+    MoveContaminatedWater = MoveContaminatedWater;
     _directWaterServiceAccessor.AddWaterMover(_waterMover);
   }
 
@@ -228,12 +242,14 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
   static readonly ComponentKey WaterValveKey = new(typeof(WaterValve).FullName);
   static readonly PropertyKey<float> WaterFlowLimitKey = new(nameof(WaterFlow));
   static readonly PropertyKey<bool> OutputLevelCheckDisabledKey = new(nameof(OutputLevelCheckDisabled));
+  static readonly PropertyKey<bool> MoveContaminatedWaterKey = new(nameof(MoveContaminatedWater));
 
   /// <inheritdoc/>
   public void Save(IEntitySaver entitySaver) {
     var saver = entitySaver.GetComponent(WaterValveKey);
     saver.Set(WaterFlowLimitKey, WaterFlow);
     saver.Set(OutputLevelCheckDisabledKey, OutputLevelCheckDisabled);
+    saver.Set(MoveContaminatedWaterKey, MoveContaminatedWater);
   }
 
   /// <inheritdoc/>
@@ -244,7 +260,8 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
     }
     var state = entityLoader.GetComponent(WaterValveKey);
     WaterFlow = state.GetValueOrNullable(WaterFlowLimitKey) ?? FlowLimit;
-    OutputLevelCheckDisabled = state.GetValueOrNullable(OutputLevelCheckDisabledKey) ?? false;
+    OutputLevelCheckDisabled = state.GetValueOrNullable(OutputLevelCheckDisabledKey) ?? _outputLevelCheckDisabled;
+    MoveContaminatedWater = state.GetValueOrNullable(MoveContaminatedWaterKey) ?? _moveContaminatedWater;
   }
   #endregion
 
