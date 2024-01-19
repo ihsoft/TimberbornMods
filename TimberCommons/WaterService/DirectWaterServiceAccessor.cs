@@ -11,6 +11,7 @@ using IgorZ.TimberDev.Utils;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.TickSystem;
+using Timberborn.WaterContaminationSystem;
 using Timberborn.WaterSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
@@ -40,7 +41,7 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
     internal bool LogExtraStats;
 
     /// <summary>Index of the tile to get water from.</summary>
-    /// <remarks>If set to <c>-1</c>, then only the mover will only be adding water.</remarks>
+    /// <remarks>If set to <c>-1</c>, then the mover will only be adding water.</remarks>
     /// <seealso cref="DropWaterLimit"/>
     public int InputTileIndex = -1;
 
@@ -78,6 +79,9 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
     /// <summary>Tells the logic to check if the water level at output is not above the input tile level.</summary>
     public bool FreeFlow = true;
 
+    /// <summary>Tells that the contamination should also be moved.</summary>
+    public bool MoveContaminatedWater;
+
     /// <summary>
     /// The maximum absolute water height to keep at the outtake. No water will be moved if the level is already high.
     /// </summary>
@@ -94,8 +98,9 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
 
     /// <inheritdoc/>
     public override string ToString() {
-      return string.Format("[WaterMover#in={0},out={1},flow={2},free={3},inMin={4},outMax={5}]",
-          InputTileIndex, OutputTileIndex, WaterFlow, FreeFlow, MinHeightAtInput, MaxHeightAtOutput);
+      return string.Format("[WaterMover#in={0},out={1},flow={2},free={3},inMin={4},outMax={5},moveBadWater={6}]",
+          InputTileIndex, OutputTileIndex, WaterFlow, FreeFlow, MinHeightAtInput, MaxHeightAtOutput,
+          MoveContaminatedWater);
     }
 
     internal WaterMover CopyDefinition() {
@@ -106,6 +111,7 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
           ConsumeWaterLimit = ConsumeWaterLimit,
           WaterFlow = WaterFlow,
           FreeFlow = FreeFlow,
+          MoveContaminatedWater = MoveContaminatedWater,
           MaxHeightAtOutput = MaxHeightAtOutput,
           MinHeightAtInput = MinHeightAtInput,
           LogExtraStats = LogExtraStats,
@@ -117,13 +123,16 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
       OutputTileIndex = source.OutputTileIndex;
       WaterFlow = source.WaterFlow;
       FreeFlow = source.FreeFlow;
+      MoveContaminatedWater = source.MoveContaminatedWater;
       MaxHeightAtOutput = source.MaxHeightAtOutput;
       MinHeightAtInput = source.MinHeightAtInput;
       LogExtraStats = source.LogExtraStats;
     }
-  } 
+  }
+
   readonly List<WaterMover> _waterMovers = new();
   List<WaterMover> _threadSafeWaterMovers = new();
+  float[] _waterContaminations;
 
   #region API
   /// <summary>Water depths indexed by the tile index.</summary>
@@ -203,6 +212,8 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
     if (WaterDepths == null || WaterFlows == null) { // This is unexpected!
       throw new InvalidOperationException("Cannot get data from WaterMap");
     }
+    var waterContaminationObj = DependencyContainer.GetInstance<WaterContaminationMap>();
+    _waterContaminations = waterContaminationObj.Contaminations;
 
     var surfaceServiceType = waterServiceAssembly.GetType("Timberborn.WaterSystem.ImpermeableSurfaceService");
     if (surfaceServiceType == null) {
@@ -335,8 +346,22 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
         canMoveAmount = waterToTarget;
       }
     }
+
+    if (canMoveAmount < float.Epsilon) {
+      return;  // Nothing to move.
+    }
+
     _waterDepths[inputIndex] -= canMoveAmount;
-    _waterDepths[outputIndex] += canMoveAmount;
+    var initialWaterDepth = _waterDepths[outputIndex];
+    var endWaterDepth = initialWaterDepth + canMoveAmount;
+    _waterDepths[outputIndex] = endWaterDepth;
+
+    var inputContamination = waterMover.MoveContaminatedWater ? _waterContaminations[inputIndex] : 0;
+    var outputContamination =
+        (_waterContaminations[outputIndex] * initialWaterDepth + inputContamination * canMoveAmount)
+        / endWaterDepth;
+    _waterContaminations[outputIndex] = outputContamination > 1.0f ? 1.0f : outputContamination;
+
     waterMover.WaterMoved = waterMovedTillNow + canMoveAmount;
   }
 
@@ -406,13 +431,14 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
   [SuppressMessage("ReSharper", "InconsistentNaming")]
   static class WaterSimulatorWaterDepthsPatch {
     const string NetworkFragmentServiceClassName = "Timberborn.WaterSystem.WaterSimulator";
-    const string MethodName = "UpdateWaterDepths";
+    const string MethodName = "UpdateWaterChanges";
 
     public static DirectWaterServiceAccessor DirectWaterServiceAccessor;
 
     static MethodBase TargetMethod() {
       var type = AccessTools.TypeByName(NetworkFragmentServiceClassName);
-      return AccessTools.FirstMethod(type, method => method.Name == MethodName);
+      var methodBase = AccessTools.FirstMethod(type, method => method.Name == MethodName);
+      return methodBase;
     }
 
     static void Postfix(float ____deltaTime) {
