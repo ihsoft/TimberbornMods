@@ -88,7 +88,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
 
   #region MonoBehavior object to handle action repeat
   class DetonateAndRepeatRule : MonoBehaviour {
-    static readonly ReflectedAction<BlockObjectTool, IEnumerable<OrientedCoordinates>> BlockObjectToolPlace =
+    static readonly ReflectedAction<BlockObjectTool, IEnumerable<Placement>> BlockObjectToolPlace =
         new("Place");
     const float MinDistanceToCheckOccupants = 2.0f;
 
@@ -137,7 +137,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
       var coordinates = blockObject.Coordinates;
       yield return new WaitUntil(() => blockObject == null);
       coordinates.z = coordinates.z - 1;
-      BlockObjectToolPlace.Invoke(dynamiteTool, new List<OrientedCoordinates> { new(coordinates, Orientation.Cw0) });
+      BlockObjectToolPlace.Invoke(dynamiteTool, new List<Placement> { new(coordinates) });
       var blockService = DependencyContainer.GetInstance<BlockService>();
       BlockObject newDynamite;
       do {
