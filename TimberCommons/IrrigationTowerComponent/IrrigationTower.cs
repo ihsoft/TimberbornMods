@@ -46,27 +46,28 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
 
   #region API
 
-  /// <summary>The tiles that are eligible to get water.</summary>
-  /// <remarks>The actual number of irrigated tiles can be less if the building efficiency is not 100%.</remarks>
-  /// <seealso cref="IsIrrigating"/>
-  /// <seealso cref="EffectiveRange"/>
-  public HashSet<Vector2Int> EligibleTiles { get; private set; }
+  /// <summary>The number of tiles that are getting water.</summary>
+  /// <remarks>This is how many tiles are in the effective range and can be reached from the tower.</remarks>
+  /// <see cref="EffectiveRange"/>
+  public int IrrigatedTilesCount { get; private set; }
+
+  /// <summary>The number of tiles that can be irrigated at the 100% efficiency.</summary>
+  /// <see cref="_irrigationRange"/>
+  public int EligibleTilesCount { get; private set; }
+
+  /// <summary>
+  /// The maximum number of tiles which this component could irrigate on a flat surface if there were no irrigation
+  /// obstacles.
+  /// </summary>
+  public int MaxCoveredTilesCount { get; private set; }
 
   /// <summary>Tells if the building is being irrigating the tiles in range.</summary>
-  /// <seealso cref="EligibleTiles"/>
+  /// <seealso cref="IrrigatedTilesCount"/>
   public bool IsIrrigating => _overrideIndex != -1;
-
-  /// <summary>The number of tiles which this component could irrigate if there were no irrigation obstacles.</summary>
-  /// <remarks>It's the base to determine the <see cref="IrrigationCoverage"/>.</remarks>
-  public int IrrigationMaxCoverage { get; private set; }
-
-  /// <summary>The percentage of the actually irrigated tiles compared to the total number of tiles in range.</summary>
-  /// <remarks>Due to the terrain layout, not all of the tiles in range may be eligible to the irrigation.</remarks>
-  /// <seealso cref="IsIrrigating"/>
-  public float IrrigationCoverage { get; private set; }
 
   /// <summary>The current irrigation range.</summary>
   /// <remarks>It can change based on the building efficiency providers reports.</remarks>
+  /// <seealso cref="IrrigatedTilesCount"/>
   public int EffectiveRange => Mathf.RoundToInt(_irrigationRange * _currentEfficiency);
 
   #endregion
@@ -75,9 +76,7 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
 
   /// <inheritdoc />
   public IEnumerable<Vector3Int> GetBlocksInRange() {
-    return EligibleTiles != null
-        ? EligibleTiles.Select(v => new Vector3Int(v.x, v.y, _baseZ)).ToArray()
-        : GetTiles(useEffectiveRange: false, skipChecks: false).Select(v => new Vector3Int(v.x, v.y, _baseZ));
+    return GetTiles(range: EffectiveRange, skipChecks: false).Select(v => new Vector3Int(v.x, v.y, _baseZ));
   }
 
   /// <inheritdoc />
@@ -127,10 +126,16 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
       return;
     }
     UpdateBuildingPositioning();
-    IrrigationMaxCoverage = GetTiles(useEffectiveRange: false, skipChecks: true).Count;
-    _tilesLayoutChanged = true;
+    if (!MaxCoverageByRadius.TryGetValue(_irrigationRange, out var maxCoverage)) {
+      maxCoverage = GetTiles(range: _irrigationRange, skipChecks: true).Count;
+      MaxCoverageByRadius.Add(_irrigationRange, maxCoverage);
+      DebugEx.Fine("Calculated max coverage: radius={0}, coverage={1}", _irrigationRange, maxCoverage);
+    }
+    MaxCoveredTilesCount = maxCoverage;
+    _needMoistureSystemUpdate = true;
     UpdateState();
   }
+  static readonly Dictionary<int, int> MaxCoverageByRadius = new();
 
   /// <inheritdoc/>
   public override void Tick() {
@@ -170,7 +175,7 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
   /// trigger it on every tick.
   /// </remarks>
   /// <seealso cref="UpdateState"/>
-  bool _tilesLayoutChanged = true;
+  bool _needMoistureSystemUpdate = true;
 
   /// <summary>The Z level at which this building will irrigate the tiles.</summary>
   /// <remarks>The irrigation won't work above or below.</remarks>
@@ -183,11 +188,10 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
   Vector2 _buildingCenter;
 
   /// <summary>The per hour consumption defined by the consuming building prefab.</summary>
-  /// <remarks>It's a base for the <see cref="IrrigationCoverage"/> adjustments.</remarks>
   float _prefabGoodPerHour;
 
   /// <summary>The last calculated efficiency modifier.</summary>
-  float _currentEfficiency = -1f;
+  float _currentEfficiency = 1.0f;
 
   /// <summary>It must be public for the injection logic to work.</summary>
   [Inject]
@@ -210,39 +214,32 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
   }
 
   /// <summary>Updates the eligible tiles and moisture system.</summary>
-  /// <remarks>If case of there are changes in the irrigating tiles, the moisturing will be stopped.</remarks>
-  /// <seealso cref="_tilesLayoutChanged"/>
+  /// <remarks>If case of there are changes in the irrigating tiles, the moisturising will be stopped.</remarks>
+  /// <seealso cref="_needMoistureSystemUpdate"/>
   void UpdateState() {
-    var needMoistuireSystemUpdate = false;
-
     // Efficiency affects the irrigated radius.
     var newEfficiency = GetEfficiency();
     if (Mathf.Abs(_currentEfficiency - newEfficiency) > float.Epsilon) {
       HostedDebugLog.Fine(this, "Efficiency changed: {0} => {1}", _currentEfficiency, newEfficiency);
       _currentEfficiency = newEfficiency;
-      needMoistuireSystemUpdate = true;
+      _needMoistureSystemUpdate = true;
     }
 
-    // Changing in terrine or new/destroyed buildings.
-    if (_tilesLayoutChanged) {
-      _tilesLayoutChanged = false;
-      needMoistuireSystemUpdate = true;
-      var oldTilesCount = EligibleTiles?.Count;
-      EligibleTiles = GetTiles(useEffectiveRange: false, skipChecks: false);
-      HostedDebugLog.Fine(this, "Tiles updated: {0} => {1}", oldTilesCount, EligibleTiles.Count);
-      IrrigationCoverage = (float)EligibleTiles.Count / IrrigationMaxCoverage;
-      if (IrrigationCoverage > 0) {
-        GoodPerHourField.Set(_goodConsumingBuilding, _prefabGoodPerHour * IrrigationCoverage);
+    // Sync the state.
+    if (_needMoistureSystemUpdate) {
+      _needMoistureSystemUpdate = false;
+      StopMoisturizing();
+      IrrigatedTilesCount = GetTiles(range: EffectiveRange, skipChecks: false).Count;
+      EligibleTilesCount = GetTiles(range: _irrigationRange, skipChecks: false).Count;
+      HostedDebugLog.Fine(this, "Tiles updated: eligible={0}, irrigated={1}", EligibleTilesCount, IrrigatedTilesCount);
+      var irrigationCoverage = (float)IrrigatedTilesCount / MaxCoveredTilesCount;
+      if (irrigationCoverage > 0) {
+        GoodPerHourField.Set(_goodConsumingBuilding, _prefabGoodPerHour * irrigationCoverage);
       } else {
         // Zero consumption rate causes troubles to the consuming building component.
         GoodPerHourField.Set(_goodConsumingBuilding, _prefabGoodPerHour);
       }
       GetComponentFast<BuildingWithRangeUpdater>().OnPostTransformChanged();
-    }
-
-    // Sync the state.
-    if (needMoistuireSystemUpdate) {
-      StopMoisturizing();
     }
     if (_goodConsumingBuilding.IsConsuming) {
       StartMoisturizing();
@@ -256,7 +253,7 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
     if (_overrideIndex != -1) {
       return;
     }
-    var irrigatedTiles = GetTiles(useEffectiveRange: true, skipChecks: false);
+    var irrigatedTiles = GetTiles(range: EffectiveRange, skipChecks: false);
     _overrideIndex = _directSoilMoistureSystemAccessor.AddMoistureOverride(irrigatedTiles, _moistureLevel);
   }
 
@@ -297,7 +294,6 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
     }
     var dx = maxX - minX;
     var dy = maxY - minY;
-
     _buildingCenter = new Vector2(minX + dx / 2.0f, minY + dy / 2.0f);
     _radiusAdjuster = Math.Max(dx + 1, dy + 1) / 2.0f;
     _adjustedMaxSqrRadius = (_irrigationRange + _radiusAdjuster) * (_irrigationRange + _radiusAdjuster);
@@ -313,13 +309,11 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
   }
 
   /// <summary>Returns all the tiles in the irrigated range.</summary>
-  HashSet<Vector2Int> GetTiles(bool useEffectiveRange, bool skipChecks) {
+  HashSet<Vector2Int> GetTiles(float range, bool skipChecks) {
     var tilesToVisit = new Queue<Vector2Int>();
-    var visitedTiles = new HashSet<int>();
+    var visitedTiles = new HashSet<Vector2Int>();
     var result = new List<Vector2Int>();
-    var sqrRadius = useEffectiveRange
-        ? (EffectiveRange + _radiusAdjuster) * (EffectiveRange + _radiusAdjuster)
-        : _adjustedMaxSqrRadius;
+    var sqrRadius = (range + _radiusAdjuster) * (range + _radiusAdjuster);
 
     tilesToVisit.Enqueue(_blockObject.Placement.Coordinates.XY());
     while (!tilesToVisit.IsEmpty()) {
@@ -329,11 +323,10 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
           continue; // Reject the out of map tiles.
         }
       }
-      var index = _mapIndexService.CoordinatesToIndex(tile);
-      if (visitedTiles.Contains(index)) {
+      if (!visitedTiles.Add(tile)) {
         continue; // Already checked, skip it.
       }
-      visitedTiles.Add(index);
+      var index = _mapIndexService.CoordinatesToIndex(tile);
       var sqrDist = (tile.x - _buildingCenter.x) * (tile.x - _buildingCenter.x)
           + (tile.y - _buildingCenter.y) * (tile.y - _buildingCenter.y);
       if (sqrDist > sqrRadius
@@ -364,16 +357,18 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
   #region Terrain and buildings change callbacks
 
   /// <summary>Triggers the tiles update if something is built within the range.</summary>
-  /// <seealso cref="EligibleTiles"/>
+  /// <seealso cref="EligibleTilesCount"/>
+  /// <seealso cref="IrrigatedTilesCount"/>
   [OnEvent]
   public void OnConstructibleEnteredFinishedStateEvent(ConstructibleEnteredFinishedStateEvent e) {
     if (IsTileInRange(e.Constructible.GetComponentFast<BlockObject>().Coordinates.XY())) {
-      _tilesLayoutChanged = true;
+      _needMoistureSystemUpdate = true;
     }
   }
 
   /// <summary>Triggers the tiles update if something has been destroyed within the range.</summary>
-  /// <seealso cref="EligibleTiles"/>
+  /// <seealso cref="EligibleTilesCount"/>
+  /// <seealso cref="IrrigatedTilesCount"/>
   [OnEvent]
   public void OnEntityDeletedEvent(EntityDeletedEvent e) {
     var constructable = e.Entity.GetComponentFast<Constructible>();
@@ -381,14 +376,14 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
       return; // The preview objects cannot affect irrigation.
     }
     if (IsTileInRange(e.Entity.GetComponentFast<BlockObject>().Coordinates.XY())) {
-      _tilesLayoutChanged = true;
+      _needMoistureSystemUpdate = true;
     }
   }
 
   /// <summary>The terrain changes must trigger the irrigation coverage re-calculation.</summary>
   void OnTerrainHeightChanged(object sender, TerrainHeightChangedEventArgs e) {
     if (IsTileInRange(e.Coordinates)) {
-      _tilesLayoutChanged = true;
+      _needMoistureSystemUpdate = true;
     }
   }
 

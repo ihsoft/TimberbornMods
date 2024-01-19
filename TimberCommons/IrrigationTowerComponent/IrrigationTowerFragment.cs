@@ -58,9 +58,10 @@ sealed class IrrigationTowerFragment : IEntityPanelFragment {
       return;
     }
     if (_irrigationTower.enabled) {
+      var coveragePct = _irrigationTower.EligibleTilesCount * 100f / _irrigationTower.MaxCoveredTilesCount;
       var info = new List<string> {
-          _loc.T(IrrigationCoverageLocKey, _irrigationTower.IrrigationCoverage * 100f),
-          _loc.T(IrrigatedAreaLocKey, _irrigationTower.EligibleTiles.Count),
+          _loc.T(IrrigationCoverageLocKey, coveragePct),
+          _loc.T(IrrigatedAreaLocKey, _irrigationTower.IrrigatedTilesCount),
           _loc.T(EffectiveRangeLocKey, _irrigationTower.EffectiveRange),
       };
       _infoLabel.text = string.Join("\n", info);
