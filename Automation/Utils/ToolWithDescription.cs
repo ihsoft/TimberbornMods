@@ -7,6 +7,7 @@ using System.Text;
 using Timberborn.CoreUI;
 using Timberborn.Localization;
 using Timberborn.ToolSystem;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 namespace Automation.Utils {
@@ -57,6 +58,15 @@ public abstract class ToolWithDescription : CustomToolSystem.CustomTool {
   protected void SetDescriptionDirty() {
     _cachedDescription = null;
   }
+
+  /// <summary>Tells if any of the shift keys is held.</summary>
+  protected bool IsShiftHeld => Keyboard.current.shiftKey.isPressed;
+
+  /// <summary>Tells if any of the control keys is held.</summary>
+  protected bool IsCtrlHeld => Keyboard.current.ctrlKey.isPressed;
+
+  /// <summary>Tells if any of the alt keys is held.</summary>
+  protected bool IsAltHeld => Keyboard.current.altKey.isPressed;
   #endregion
 
   #region Tool overrides

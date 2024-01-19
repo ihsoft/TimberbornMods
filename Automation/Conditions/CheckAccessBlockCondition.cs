@@ -27,6 +27,7 @@ public sealed class CheckAccessBlockCondition : AutomationConditionBase {
   public bool IsReversedCondition { get; private set; }
 
   #region AutomationConditionBase implementation
+  /// <inheritdoc/>
   public override string UiDescription =>
       Behavior.Loc.T(!IsReversedCondition ? BlockingPathNameLocKey : NotBlockingPathNameLocKey);
 

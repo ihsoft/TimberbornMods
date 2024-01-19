@@ -131,8 +131,6 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   /// <remarks>Needs to be public to work.</remarks>
   [OnEvent]
   public void OnEntityDeletedEvent(EntityDeletedEvent @event) {
-    //FIXME: only make index dirty if monitored site is deleted.
-    DebugEx.Warning("*** entity deleted");
     RemoveSite(@event.Entity);
   }
 
