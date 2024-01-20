@@ -15,6 +15,7 @@ using UnityDev.Utils.LogUtilsLite;
 namespace Automation.Tools {
 
 /// <summary>Debug tool to show various information about block objects.</summary>
+// ReSharper disable once ClassNeverInstantiated.Global
 public class DebugPickTool : AbstractAreaSelectionTool {
   /// <inheritdoc/>
   protected override string CursorName => null;
