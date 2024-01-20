@@ -24,6 +24,7 @@ sealed class WaterValveFragment : IEntityPanelFragment {
   const string WaterDepthAtOuttakeLocKey = "IgorZ.TimberCommons.WaterValve.WaterDepthAtOuttake";
   const string DisableLevelCheckAtOutputLocKey = "IgorZ.TimberCommons.WaterValve.DisableLevelCheckAtOutput"; 
 
+  const string MoveContaminatedWater = "Move contaminated water";
   const string WaterLevelAtInputText = "Water level at input: {0:0.00}";
   const string WaterLevelAtOutputText = "Water level at output: {0:0.00}";
   const string MinimumLevelAtIntakeText = "Minimum level at intake: {0:0.00}";
@@ -39,6 +40,7 @@ sealed class WaterValveFragment : IEntityPanelFragment {
   Label _waterFlowLimitText;
   Slider _waterFlowLimitSlider;
   Toggle _disableOutputLevelCheckCheckbox;
+  Toggle _moveContaminatedWaterCheckCheckbox;
   Label _inputWaterLevelText;
   Slider _inputWaterLevelSlider;
   Label _outputWaterLevelText;
@@ -65,6 +67,12 @@ sealed class WaterValveFragment : IEntityPanelFragment {
         _ => _waterValve.OutputLevelCheckDisabled = _disableOutputLevelCheckCheckbox.value);
     _disableOutputLevelCheckCheckbox.style.marginBottom = 5;
 
+    _moveContaminatedWaterCheckCheckbox = _builder.Presets().Toggles()
+        .CheckmarkInverted(text: MoveContaminatedWater, color: UiFactory.PanelNormalColor);
+    _moveContaminatedWaterCheckCheckbox.RegisterValueChangedCallback(
+        _ => _waterValve.MoveContaminatedWater = _moveContaminatedWaterCheckCheckbox.value);
+    _moveContaminatedWaterCheckCheckbox.style.marginBottom = 5;
+
     _waterFlowLimitText = presets.Labels().Label(color: UiFactory.PanelNormalColor);
     _waterFlowLimitSlider = UiFactory.CreateSlider(_visualElementLoader, v => _waterValve.WaterFlow = v);
 
@@ -79,6 +87,7 @@ sealed class WaterValveFragment : IEntityPanelFragment {
     _root = _builder.CreateFragmentBuilder()
         .AddComponent(_waterFlowLimitText).AddComponent(_waterFlowLimitSlider)
         .AddComponent(_disableOutputLevelCheckCheckbox)
+        .AddComponent(_moveContaminatedWaterCheckCheckbox)
         .AddComponent(_infoLabel)
         .AddComponent(_inputWaterLevelText).AddComponent(_inputWaterLevelSlider)
         .AddComponent(_outputWaterLevelText).AddComponent(_outputWaterLevelSlider)
@@ -106,6 +115,9 @@ sealed class WaterValveFragment : IEntityPanelFragment {
       _disableOutputLevelCheckCheckbox.SetValueWithoutNotify(_waterValve.OutputLevelCheckDisabled);
       _disableOutputLevelCheckCheckbox.ToggleDisplayStyle(
           visible: _devModeManager.Enabled || _waterValve.CanDisableOutputLevelCheck);
+
+      _moveContaminatedWaterCheckCheckbox.SetValueWithoutNotify(_waterValve.MoveContaminatedWater);
+      _moveContaminatedWaterCheckCheckbox.ToggleDisplayStyle(visible: _devModeManager.Enabled);
 
       _inputWaterLevelText.ToggleDisplayStyle(visible: _devModeManager.Enabled);
       _inputWaterLevelSlider.SetValueWithoutNotify(_waterValve.MinWaterLevelAtIntake);
