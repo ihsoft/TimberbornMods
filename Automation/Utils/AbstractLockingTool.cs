@@ -16,7 +16,7 @@ namespace Automation.Utils {
 
 /// <summary>Tool that can select objects by user criteria.</summary>
 /// <remarks>
-/// On selection start this toll checks the highlighted entity. If allowed for, it will be used to filter the other
+/// On selection start this tool checks the highlighted entity. If allowed for, it will be used to filter the other
 /// entities during the selection. This allows user to select only specific entities.
 /// </remarks>
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
@@ -48,7 +48,7 @@ public abstract class AbstractLockingTool : AbstractAreaSelectionTool {
           ? Loc.T(SelectingOneObjectLoc, LockedEntityNiceName)
           : Loc.T(SelectingNObjectsLoc, LockedEntityNiceName, goodObjectsSelectedCount);
     }
-    if (!InputService.IsShiftHeld || InputService.MouseOverUI || SelectionModeActive) {
+    if (!IsShiftHeld || InputService.MouseOverUI || SelectionModeActive) {
       return "";
     }
     if (HighlightedBlockObject != null && CheckCanLockOnComponent(HighlightedBlockObject)) {
@@ -68,7 +68,7 @@ public abstract class AbstractLockingTool : AbstractAreaSelectionTool {
   protected override void OnSelectionModeChange(bool newMode) {
     base.OnSelectionModeChange(newMode);
     if (newMode) {
-      if (!InputService.IsShiftHeld
+      if (!IsShiftHeld
           || HighlightedBlockObject == null
           || !CheckCanLockOnComponent(HighlightedBlockObject)) {
         return;

@@ -29,14 +29,14 @@ public class DebugPickTool : AbstractAreaSelectionTool {
 
   /// <inheritdoc/>
   protected override bool ObjectFilterExpression(BlockObject blockObject) {
-    return !InputService.IsAltHeld || !SelectionModeActive || SelectedObjects[0] == blockObject;
+    return !IsAltHeld || !SelectionModeActive || SelectedObjects[0] == blockObject;
   }
 
   /// <inheritdoc/>
   protected override void OnObjectAction(BlockObject blockObject) {
-    if (InputService.IsShiftHeld) {
+    if (IsShiftHeld) {
       PrintAccessible(blockObject);
-    } else if (InputService.IsCtrlHeld) {
+    } else if (IsCtrlHeld) {
       PrintNavMesh(blockObject);
     } else {
       PrintAllComponents(blockObject);
