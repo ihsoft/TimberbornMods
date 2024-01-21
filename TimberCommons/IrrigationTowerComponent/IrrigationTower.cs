@@ -29,7 +29,6 @@ using UnityDev.Utils.LogUtilsLite;
 using UnityDev.Utils.Reflections;
 using UnityEngine;
 
-//IPostInitializableLoadedEntity
 namespace IgorZ.TimberCommons.IrrigationTowerComponent {
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateListener, IPostTransformChangeListener,
@@ -122,6 +121,7 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
   #endregion
 
   #region IConsumptionRateFormatter implementation
+
   const string DaysShortLocKey = "Time.DaysShort";
 
   public string GetRate() {
@@ -132,32 +132,31 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
   public string GetTime() {
     return _loc.T(DaysShortLocKey, "1");
   }
+
   #endregion
 
   #region TickableComponent implementation
 
   /// <inheritdoc/>
   public override void StartTickable() {
-    if (_blockObject.Preview) {
-      enabled = false;
-      return;
-    }
     UpdateBuildingPositioning();
-    if (!MaxCoverageByRadius.TryGetValue(_irrigationRange, out var maxCoverage)) {
-      maxCoverage = GetTiles(range: _irrigationRange, skipChecks: true).Count;
-      MaxCoverageByRadius.Add(_irrigationRange, maxCoverage);
-      DebugEx.Fine("Calculated max coverage: radius={0}, coverage={1}", _irrigationRange, maxCoverage);
+    if (!MaxCoverageByRadius.TryGetValue(_foundationSize, out var coverages)) {
+      coverages = new Dictionary<int, int>();
+      MaxCoverageByRadius.Add(_foundationSize, coverages);
     }
-    MaxCoveredTilesCount = maxCoverage;
-    _needMoistureSystemUpdate = true;
+    if (!coverages.TryGetValue(_irrigationRange, out var coverage)) {
+      coverage = GetTiles(range: _irrigationRange, skipChecks: true).Count;
+      coverages.Add(_irrigationRange, coverage);
+      DebugEx.Fine(
+          "Calculated max coverage: size={0}, range={1}, coverage={2}", _foundationSize, _irrigationRange, coverage);
+    }
+    MaxCoveredTilesCount = coverage;
     UpdateState();
   }
-  static readonly Dictionary<int, int> MaxCoverageByRadius = new();
+  static readonly Dictionary<Vector2Int, Dictionary<int, int>> MaxCoverageByRadius = new();
 
   /// <inheritdoc/>
-  public override void Tick() {
-    UpdateState();
-  }
+  public override void Tick() => UpdateState();
 
   #endregion
 
@@ -199,6 +198,9 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
   /// <remarks>The irrigation won't work above or below.</remarks>
   /// <seealso cref="UpdateBuildingPositioning"/>
   int _baseZ;
+
+  /// <summary>The size of the building. The range is counted from the boundaries.</summary>
+  Vector2Int _foundationSize;
 
   /// <summary>The building approximated center to use when determining the range.</summary>
   /// <remarks>The coordinates may not be integer. It depends on the actual building size.</remarks>
@@ -250,7 +252,8 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
       StopMoisturizing();
       IrrigatedTilesCount = GetTiles(range: EffectiveRange, skipChecks: false).Count;
       EligibleTilesCount = GetTiles(range: _irrigationRange, skipChecks: false).Count;
-      HostedDebugLog.Fine(this, "Tiles updated: eligible={0}, irrigated={1}", EligibleTilesCount, IrrigatedTilesCount);
+      HostedDebugLog.Fine(this, "Tiles updated: eligible={0}, irrigated={1}, efficiency={2}",
+                          EligibleTilesCount, IrrigatedTilesCount, _currentEfficiency);
       var irrigationCoverage = (float)IrrigatedTilesCount / MaxCoveredTilesCount;
       if (irrigationCoverage > 0) {
         GoodPerHourField.Set(_goodConsumingBuilding, _prefabGoodPerHour * irrigationCoverage);
@@ -313,6 +316,7 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
     }
     var dx = maxX - minX;
     var dy = maxY - minY;
+    _foundationSize = new Vector2Int(dx + 1, dy + 1);
     _buildingCenter = new Vector2(minX + dx / 2.0f, minY + dy / 2.0f);
     _radiusAdjuster = Math.Max(dx + 1, dy + 1) / 2.0f;
     _adjustedMaxSqrRadius = (_irrigationRange + _radiusAdjuster) * (_irrigationRange + _radiusAdjuster);
