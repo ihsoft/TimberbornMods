@@ -35,6 +35,7 @@
         <DocumentationFile>bin\Release\TimberCommons.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
+      <Compile Include="Common\IConsumptionRateFormatter.cs" />
       <Compile Include="IrrigationTowerComponent\Configurator.cs" />
       <Compile Include="IrrigationTowerComponent\IrrigationTower.cs" />
       <Compile Include="IrrigationTowerComponent\IrrigationTowerFragment.cs" />
@@ -108,6 +109,9 @@
       <Reference Include="Timberborn.GoodConsumingBuildingSystemUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.GoodConsumingBuildingSystemUI.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.GoodsUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.GoodsUI.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.Localization, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.Localization.dll</HintPath>
       </Reference>
@@ -137,6 +141,9 @@
       </Reference>
       <Reference Include="Timberborn.TickSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.TickSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.UIFormatters, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.UIFormatters.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.WaterContaminationSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.WaterContaminationSystem.dll</HintPath>

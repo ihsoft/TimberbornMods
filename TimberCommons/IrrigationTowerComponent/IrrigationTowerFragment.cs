@@ -4,7 +4,9 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using HarmonyLib;
+using IgorZ.TimberCommons.Common;
 using IgorZ.TimberDev.UI;
 using TimberApi.UiBuilderSystem;
 using Timberborn.BaseComponentSystem;
@@ -12,7 +14,9 @@ using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
 using Timberborn.GoodConsumingBuildingSystem;
 using Timberborn.GoodConsumingBuildingSystemUI;
+using Timberborn.GoodsUI;
 using Timberborn.Localization;
+using Timberborn.UIFormatters;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -86,6 +90,47 @@ static class GoodConsumingBuildingFragmentPatch {
     if (____goodConsumingBuilding.HoursUntilNoSupply > SwitchToDaysThreshold) {
       var duration = Mathf.RoundToInt(____goodConsumingBuilding.HoursUntilNoSupply);
       ____hoursLeft.text = ____loc.T(SupplyRemainingLocKey, duration / 24, duration % 24);
+    }
+  }
+}
+#endregion
+
+#region Harmony patch to improve consumption rate fromatting
+[HarmonyPatch]
+[SuppressMessage("ReSharper", "UnusedMember.Local")]
+static class GoodConsumingBuildingDescriberPatch {
+  const string ResourceNameAndAmountPerHourLocKey = "Core.ResourceNameAndAmountPerHour";
+  const string DescriptionLocKey = "GoodConsuming.SupplyDescription";
+  const string PatchClassName = "Timberborn.GoodConsumingBuildingSystemUI.GoodConsumingBuildingDescriber";
+  const string PatchMethodName = "DescribeSupply";
+
+  static MethodBase TargetMethod() {
+    var type = AccessTools.TypeByName(PatchClassName);
+    return AccessTools.FirstMethod(type, method => method.Name == PatchMethodName);
+  }
+
+  [SuppressMessage("ReSharper", "InconsistentNaming")]
+  static void Postfix(ref bool __runOriginal, ref EntityDescription __result,
+                      ILoc ____loc, GoodDescriber ____goodDescriber,
+                      DescribedAmountFactory ____describedAmountFactory,
+                      ResourceAmountFormatter ____resourceAmountFormatter,
+                      ProductionItemFactory ____productionItemFactory,
+                      GoodConsumingBuilding ____goodConsumingBuilding) {
+    if (!__runOriginal) {
+      return;  // The other patches must follow the same style to properly support the skip logic!
+    }
+
+    var formatters = new List<IConsumptionRateFormatter>();
+    ____goodConsumingBuilding.GetComponentsFast(formatters);
+    if (formatters.Count > 0) {
+      var formatter = formatters[0];
+      var describedGood = ____goodDescriber.GetDescribedGood(____goodConsumingBuilding.Supply);
+      var param = ____resourceAmountFormatter.FormatPerHour(
+          describedGood.DisplayName, ____goodConsumingBuilding.GoodPerHour);
+      var tooltip = ____loc.T(DescriptionLocKey, param);
+      var input = ____describedAmountFactory.CreatePlain("", formatter.GetRate(), describedGood.Icon, tooltip);
+      var content = ____productionItemFactory.CreateInput(input);
+      __result = EntityDescription.CreateInputSectionWithTime(content, int.MaxValue, formatter.GetTime());
     }
   }
 }

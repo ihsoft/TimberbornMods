@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Bindito.Core;
+using IgorZ.TimberCommons.Common;
 using IgorZ.TimberCommons.WaterService;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
@@ -17,6 +18,7 @@ using Timberborn.Common;
 using Timberborn.ConstructibleSystem;
 using Timberborn.EntitySystem;
 using Timberborn.GoodConsumingBuildingSystem;
+using Timberborn.Localization;
 using Timberborn.MapIndexSystem;
 using Timberborn.PrefabSystem;
 using Timberborn.SingletonSystem;
@@ -27,9 +29,11 @@ using UnityDev.Utils.LogUtilsLite;
 using UnityDev.Utils.Reflections;
 using UnityEngine;
 
+//IPostInitializableLoadedEntity
 namespace IgorZ.TimberCommons.IrrigationTowerComponent {
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateListener, IPostTransformChangeListener {
+class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateListener, IPostTransformChangeListener,
+                        IConsumptionRateFormatter {
   #region Unity conrolled fields
 
   /// <summary>The maximum distance of irrigation from the building's boundary.</summary>
@@ -117,6 +121,19 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
 
   #endregion
 
+  #region IConsumptionRateFormatter implementation
+  const string DaysShortLocKey = "Time.DaysShort";
+
+  public string GetRate() {
+    var goodPerHour = GoodPerHourField.Get(_goodConsumingBuilding) * 24;
+    return goodPerHour.ToString("0.#");
+  }
+
+  public string GetTime() {
+    return _loc.T(DaysShortLocKey, "1");
+  }
+  #endregion
+
   #region TickableComponent implementation
 
   /// <inheritdoc/>
@@ -153,6 +170,7 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
   SoilBarrierMap _soilBarrierMap;
   MapIndexService _mapIndexService;
   EventBus _eventBus;
+  ILoc _loc;
   DirectSoilMoistureSystemAccessor _directSoilMoistureSystemAccessor;
 
   BlockObject _blockObject;
@@ -196,12 +214,13 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
   /// <summary>It must be public for the injection logic to work.</summary>
   [Inject]
   public void InjectDependencies(ITerrainService terrainService, SoilBarrierMap soilBarrierMap,
-                                 MapIndexService mapIndexService, EventBus eventBus,
+                                 MapIndexService mapIndexService, EventBus eventBus, ILoc loc,
                                  DirectSoilMoistureSystemAccessor directSoilMoistureSystemAccessor) {
     _terrainService = terrainService;
     _soilBarrierMap = soilBarrierMap;
     _mapIndexService = mapIndexService;
     _eventBus = eventBus;
+    _loc = loc;
     _directSoilMoistureSystemAccessor = directSoilMoistureSystemAccessor;
   }
 

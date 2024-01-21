@@ -22,6 +22,8 @@ sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<IrrigationTowerFragment>().AsSingleton();
     containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
+    HarmonyPatcher.PatchRepeated(
+        PatchId, typeof(GoodConsumingBuildingFragmentPatch), typeof(GoodConsumingBuildingDescriberPatch));
   }
 
   /// <summary>UI for the irrigation tower component.</summary>
