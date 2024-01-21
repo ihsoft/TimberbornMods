@@ -2,15 +2,11 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Reflection;
 using Bindito.Core;
-using IgorZ.TimberDev.CustomInstantiator;
 using IgorZ.TimberDev.Utils;
 using TimberApi.ConfiguratorSystem;
 using TimberApi.SceneSystem;
 using Timberborn.EntityPanelSystem;
-using Timberborn.GoodConsumingBuildingSystem;
-using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.TimberCommons.IrrigationTowerComponent {
 
