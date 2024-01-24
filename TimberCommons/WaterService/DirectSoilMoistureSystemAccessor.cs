@@ -2,17 +2,27 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using Bindito.Core;
 using HarmonyLib;
+using IgorZ.TimberCommons.IrrigationTowerComponent;
 using IgorZ.TimberDev.Utils;
+using Timberborn.BaseComponentSystem;
+using Timberborn.BlockSystem;
+using Timberborn.Common;
+using Timberborn.ConstructibleSystem;
+using Timberborn.EntitySystem;
 using Timberborn.MapIndexSystem;
 using Timberborn.SingletonSystem;
+using Timberborn.SoilBarrierSystem;
+using Timberborn.TerrainSystem;
 using Timberborn.TickSystem;
 using UnityDev.Utils.LogUtilsLite;
+using UnityDev.Utils.Reflections;
 using UnityEngine;
 
 namespace IgorZ.TimberCommons.WaterService {
@@ -32,19 +42,64 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   /// <returns>Unique ID of the created override. Use it to delete the overrides.</returns>
   /// <seealso cref="RemoveMoistureOverride"/>
   public int AddMoistureOverride(IEnumerable<Vector2Int> tiles, float moisture) {
-    var index = _nextOverrideId++;
+    var index = _nextMoistureOverrideId++;
     _moistureOverrides.Add(
         index,
         tiles.Distinct().Select(c => _mapIndexService.CoordinatesToIndex(c)).ToDictionary(k => k, _ => moisture));
-    _needCacheUpdate = true;
+    _needMoistureOverridesUpdate = true;
     return index;
   }
 
-  /// <summary>Removes the override.</summary>
+  /// <summary>Removes the moisture override.</summary>
   /// <param name="overrideId">The ID of the override to remove.</param>
   /// <seealso cref="AddMoistureOverride"/>
   public void RemoveMoistureOverride(int overrideId) {
-    _needCacheUpdate = _moistureOverrides.Remove(overrideId);
+    _needMoistureOverridesUpdate = _moistureOverrides.Remove(overrideId);
+  }
+
+  /// <summary>Sets contamination blockers for a set of tiles.</summary>
+  /// <remarks>The same tiles can be listed in multiple overrides.</remarks>
+  /// <param name="tiles">The tiles to set the blocker at.</param>
+  /// <returns>Unique ID of the created override. Use it to delete the overrides.</returns>
+  /// <seealso cref="RemoveContaminationOverride"/>
+  /// FIXME: handle remove soil barrier to restore any erased overrides.
+  public int AddContaminationOverride(IEnumerable<Vector2Int> tiles) {
+    var tilesSet = tiles.ToHashSet();
+    var totalOld = _contaminatedTilesHash.Count;
+    var index = _nextContaminationOverrideId++;
+    _contaminationOverrides.Add(index, tilesSet);
+    _contaminatedTilesHash = _contaminationOverrides.SelectMany(item => item.Value).ToHashSet();
+    foreach (var barrierTile in tilesSet) {
+      _soilBarrierMap.AddContaminationBarrierAt(barrierTile);
+    }
+    DebugEx.Fine("Added {0} contamination blockers. Total blockers overrides: {1} => {2}",
+                 tilesSet.Count, totalOld, _contaminatedTilesHash.Count);
+    return index;
+  }
+
+  /// <summary>Removes the contamination blockers override.</summary>
+  /// <param name="overrideId">The ID of the override to remove.</param>
+  /// <seealso cref="AddContaminationOverride"/>
+  public void RemoveContaminationOverride(int overrideId) {
+    if (!_contaminationOverrides.TryGetValue(overrideId, out var barriers)) {
+      return;
+    }
+    var oldBarriers = _contaminatedTilesHash;
+    _contaminationOverrides.Remove(overrideId);
+    _contaminatedTilesHash = _contaminationOverrides.SelectMany(item => item.Value).ToHashSet();
+    var barriersToRemove = oldBarriers.Where(x => !_contaminatedTilesHash.Contains(x));
+    foreach (var barrier in barriersToRemove) {
+      var skipIt = _blockService
+          .GetObjectsAt(new Vector3Int(barrier.x, barrier.y, _terrainService.CellHeight(barrier)))
+          .Any(IsContaminationBlocker);
+      if (skipIt) {
+        DebugEx.Fine("Don't affect contamination barrier at: {0}", barrier);
+        continue;
+      }
+      _soilBarrierMap.RemoveContaminationBarrierAt(barrier);
+    }
+    DebugEx.Fine("Removed {0} contamination blockers. Total blockers overrides: {1} => {2}",
+                 barriers.Count, oldBarriers.Count, _contaminatedTilesHash.Count);
   }
   #endregion
 
@@ -54,14 +109,16 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
     DebugEx.Fine("Initializing direct access to SoilMoistureSystem...");
     HarmonyPatcher.PatchRepeated(GetType().AssemblyQualifiedName, typeof(SoilMoistureSimulatorPatch));
     SoilMoistureSimulatorPatch.MoistureOverrides = null;
+    _eventBus.Register(this);
   }
   #endregion
 
   #region ITickableSingleton implementation
   /// <summary>Updates the moisture cache and creates a thread safe copy.</summary>
   public void Tick() {
-    if (_needCacheUpdate) {
-      _needCacheUpdate = false;
+    if (_needMoistureOverridesUpdate) {
+      _needMoistureOverridesUpdate = false;
+      //FIXME: build the cache sync, then swap. Use same instance on load.
       var overridesCache = new Dictionary<int, float>();
       foreach (var value in _moistureOverrides.Values.SelectMany(item => item)) {
         if (overridesCache.TryGetValue(value.Key, out var existingValue)) {
@@ -79,31 +136,67 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
 
   #region Implementation
   readonly Dictionary<int, Dictionary<int, float>> _moistureOverrides = new();
-  int _nextOverrideId = 1;
-  bool _needCacheUpdate;
+  int _nextMoistureOverrideId = 1;
+  bool _needMoistureOverridesUpdate;
+
+  readonly Dictionary<int, HashSet<Vector2Int>> _contaminationOverrides = new();
+  HashSet<Vector2Int> _contaminatedTilesHash = new();
+  int _nextContaminationOverrideId = 1;
+
+  const string SoilBarrierTypeName = "Timberborn.SoilBarrierSystem.SoilBarrier";
+  static readonly Type SoilBarrierType = TypeUtils.GetInternalType(SoilBarrierTypeName);
+  static readonly ReflectedField<bool> SoilBarrierBlockContamintaionField = new(
+      SoilBarrierTypeName, "_blockContamination", throwOnFailure: true);
+
   MapIndexService _mapIndexService;
+  SoilBarrierMap _soilBarrierMap;
+  BlockService _blockService;
+  ITerrainService _terrainService;
+  EventBus _eventBus;
 
   /// <summary>Injects run-time dependencies.</summary>
   [Inject]
-  public void InjectDependencies(MapIndexService mapIndexService) {
+  public void InjectDependencies(MapIndexService mapIndexService, SoilBarrierMap soilBarrierMap,
+                                 BlockService blockService, ITerrainService terrainService, EventBus eventBus) {
     _mapIndexService = mapIndexService;
+    _soilBarrierMap = soilBarrierMap;
+    _blockService = blockService;
+    _terrainService = terrainService;
+    _eventBus = eventBus;
+  }
+
+  [OnEvent]
+  public void OnEntityDeletedEvent(EntityDeletedEvent e) {
+    var constructible = e.Entity.GetComponentFast<Constructible>();
+    if (constructible == null || !constructible.IsFinished) {
+      return; // Ignore preview objects.
+    }
+    var tile = constructible.GetComponentFast<BlockObject>().Coordinates.XY();
+    if (_contaminatedTilesHash.Contains(tile) && IsContaminationBlocker(constructible)) {
+      DebugEx.Fine("*** Restore contamination barrier at: {0}", tile);
+      _soilBarrierMap.AddContaminationBarrierAt(tile);
+    }
+  }
+
+  /// <summary>Tells if the building blocks soil contamination.</summary>
+  static bool IsContaminationBlocker(BaseComponent component) {
+    var barrier = component.GetComponentInChildren(SoilBarrierType);
+    return barrier != null && SoilBarrierBlockContamintaionField.Get(barrier);
   }
   #endregion
 
-  #region Harmony patch
+  #region Harmony patch to override mosture levels.
   [HarmonyPatch]
   [SuppressMessage("ReSharper", "UnusedMember.Local")]
   [SuppressMessage("ReSharper", "InconsistentNaming")]
   static class SoilMoistureSimulatorPatch {
-    const string SoilMoistureSimulatorClassName = "Timberborn.SoilMoistureSystem.SoilMoistureSimulator";
+    const string ClassName = "Timberborn.SoilMoistureSystem.SoilMoistureSimulator";
     const string MethodName = "GetUpdatedMoisture";
 
     public static Dictionary<int, float> MoistureOverrides;
     
     static MethodBase TargetMethod() {
-      var type = AccessTools.TypeByName(SoilMoistureSimulatorClassName);
-      var methodBase = AccessTools.FirstMethod(type, method => method.Name == MethodName);
-      return methodBase;
+      return AccessTools.FirstMethod(AccessTools.TypeByName(ClassName), method => method.Name == MethodName);
     }
 
     static void Postfix(int index, ref bool __runOriginal, ref float __result) {
