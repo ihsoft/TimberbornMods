@@ -2,14 +2,11 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reflection;
 using Bindito.Core;
 using HarmonyLib;
-using IgorZ.TimberCommons.IrrigationTowerComponent;
 using IgorZ.TimberDev.Utils;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
@@ -19,10 +16,10 @@ using Timberborn.EntitySystem;
 using Timberborn.MapIndexSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.SoilBarrierSystem;
+using Timberborn.SoilMoistureSystem;
 using Timberborn.TerrainSystem;
 using Timberborn.TickSystem;
 using UnityDev.Utils.LogUtilsLite;
-using UnityDev.Utils.Reflections;
 using UnityEngine;
 
 namespace IgorZ.TimberCommons.WaterService {
@@ -115,21 +112,21 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   #region ITickableSingleton implementation
   /// <summary>Updates the moisture cache and creates a thread safe copy.</summary>
   public void Tick() {
-    if (_needMoistureOverridesUpdate) {
-      _needMoistureOverridesUpdate = false;
-      //FIXME: build the cache sync, then swap. Use same instance on load.
-      var overridesCache = new Dictionary<int, float>();
-      foreach (var value in _moistureOverrides.Values.SelectMany(item => item)) {
-        if (overridesCache.TryGetValue(value.Key, out var existingValue)) {
-          overridesCache[value.Key] = Mathf.Max(value.Value, existingValue);
-        } else {
-          overridesCache.Add(value.Key, value.Value);
-        }
-      }
-      DebugEx.Fine("Updating the list of moisture overrides: old={0}, new={1}",
-                   SoilMoistureSimulatorPatch.MoistureOverrides?.Count, overridesCache.Count);
-      SoilMoistureSimulatorPatch.MoistureOverrides = overridesCache;
+    if (!_needMoistureOverridesUpdate) {
+      return;
     }
+    _needMoistureOverridesUpdate = false;
+    var overridesCache = new Dictionary<int, float>();
+    foreach (var value in _moistureOverrides.Values.SelectMany(item => item)) {
+      if (overridesCache.TryGetValue(value.Key, out var existingValue)) {
+        overridesCache[value.Key] = Mathf.Max(value.Value, existingValue);
+      } else {
+        overridesCache.Add(value.Key, value.Value);
+      }
+    }
+    DebugEx.Fine("Updating the list of moisture overrides: old={0}, new={1}",
+                 SoilMoistureSimulatorPatch.MoistureOverrides?.Count, overridesCache.Count);
+    SoilMoistureSimulatorPatch.MoistureOverrides = overridesCache;
   }
   #endregion
 
@@ -141,11 +138,6 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   readonly Dictionary<int, HashSet<Vector2Int>> _contaminationOverrides = new();
   HashSet<Vector2Int> _contaminatedTilesCache = new();
   int _nextContaminationOverrideId = 1;
-
-  const string SoilBarrierTypeName = "Timberborn.SoilBarrierSystem.SoilBarrier";
-  static readonly Type SoilBarrierType = TypeUtils.GetInternalType(SoilBarrierTypeName);
-  static readonly ReflectedField<bool> SoilBarrierBlockContamintaionField = new(
-      SoilBarrierTypeName, "_blockContamination", throwOnFailure: true);
 
   MapIndexService _mapIndexService;
   SoilBarrierMap _soilBarrierMap;
@@ -179,25 +171,18 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
 
   /// <summary>Tells if the building blocks soil contamination.</summary>
   static bool IsContaminationBlocker(BaseComponent component) {
-    var barrier = component.GetComponentInChildren(SoilBarrierType);
-    return barrier != null && SoilBarrierBlockContamintaionField.Get(barrier);
+    var barrier = component.GetComponentFast<SoilBarrier>();
+    return barrier != null && barrier._blockContamination;
   }
   #endregion
 
   #region Harmony patch to override mosture levels.
-  [HarmonyPatch]
-  [SuppressMessage("ReSharper", "UnusedMember.Local")]
-  [SuppressMessage("ReSharper", "InconsistentNaming")]
+  [HarmonyPatch(typeof(SoilMoistureSimulator), nameof(SoilMoistureSimulator.GetUpdatedMoisture))]
   static class SoilMoistureSimulatorPatch {
-    const string ClassName = "Timberborn.SoilMoistureSystem.SoilMoistureSimulator";
-    const string MethodName = "GetUpdatedMoisture";
-
     public static Dictionary<int, float> MoistureOverrides;
-    
-    static MethodBase TargetMethod() {
-      return AccessTools.FirstMethod(AccessTools.TypeByName(ClassName), method => method.Name == MethodName);
-    }
 
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    // ReSharper disable once UnusedMember.Local
     static void Postfix(int index, ref bool __runOriginal, ref float __result) {
       if (!__runOriginal) {
         return;  // The other patches must follow the same style to properly support the skip logic!

@@ -26,7 +26,6 @@ using Timberborn.SoilBarrierSystem;
 using Timberborn.TerrainSystem;
 using Timberborn.TickSystem;
 using UnityDev.Utils.LogUtilsLite;
-using UnityDev.Utils.Reflections;
 using UnityEngine;
 
 namespace IgorZ.TimberCommons.IrrigationTowerComponent {
@@ -130,7 +129,7 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
   const string DaysShortLocKey = "Time.DaysShort";
 
   public string GetRate() {
-    var goodPerHour = GoodPerHourField.Get(_goodConsumingBuilding) * 24;
+    var goodPerHour = _goodConsumingBuilding._goodPerHour * 24;
     return goodPerHour.ToString("0.#");
   }
 
@@ -166,9 +165,6 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
   #endregion
 
   #region Implemenation
-
-  static readonly ReflectedField<GoodConsumingBuilding, float> GoodPerHourField = new(
-      "_goodPerHour", throwOnFailure: true);
 
   ITerrainService _terrainService;
   SoilBarrierMap _soilBarrierMap;
@@ -241,7 +237,7 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
     _blockObject = GetComponentFast<BlockObject>();
     _prefab = GetComponentFast<Prefab>();
     _goodConsumingBuilding = GetComponentFast<GoodConsumingBuilding>();
-    _prefabGoodPerHour = GoodPerHourField.Get(_goodConsumingBuilding);
+    _prefabGoodPerHour = _goodConsumingBuilding._goodPerHour;
     GetComponentsFast(_efficiencyProviders);
   }
 
@@ -267,10 +263,10 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
                           EligibleTilesCount, IrrigatedTilesCount, _currentEfficiency);
       var irrigationCoverage = (float)IrrigatedTilesCount / MaxCoveredTilesCount;
       if (irrigationCoverage > 0) {
-        GoodPerHourField.Set(_goodConsumingBuilding, _prefabGoodPerHour * irrigationCoverage);
+        _goodConsumingBuilding._goodPerHour = _prefabGoodPerHour * irrigationCoverage;
       } else {
         // Zero consumption rate causes troubles to the consuming building component.
-        GoodPerHourField.Set(_goodConsumingBuilding, _prefabGoodPerHour);
+        _goodConsumingBuilding._goodPerHour = _prefabGoodPerHour;
       }
       GetComponentFast<BuildingWithRangeUpdater>().OnPostTransformChanged();
     }
@@ -314,6 +310,8 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
       return 1f;
     }
     var efficiency = 1f;
+    // ReSharper disable once ForCanBeConvertedToForeach
+    // ReSharper disable once LoopCanBeConvertedToQuery
     for (var i = 0; i < _efficiencyProviders.Count; i++) {
       efficiency *= _efficiencyProviders[i].Efficiency;
     }

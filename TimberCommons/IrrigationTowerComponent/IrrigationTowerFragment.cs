@@ -4,7 +4,6 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using HarmonyLib;
 using IgorZ.TimberCommons.Common;
 using IgorZ.TimberDev.UI;
@@ -75,13 +74,13 @@ sealed class IrrigationTowerFragment : IEntityPanelFragment {
 }
 
 #region Harmony patch to show supply in days and hours.
-[HarmonyPatch(typeof(GoodConsumingBuildingFragment), "UpdateProgressBar")]
-[SuppressMessage("ReSharper", "UnusedMember.Local")]
+[HarmonyPatch(typeof(GoodConsumingBuildingFragment), nameof(GoodConsumingBuildingFragment.UpdateProgressBar))]
 static class GoodConsumingBuildingFragmentPatch {
   const string SupplyRemainingLocKey = "IgorZ.TimberCommons.WaterTower.SupplyRemaining";
   const float SwitchToDaysThreshold = 24f;
 
   [SuppressMessage("ReSharper", "InconsistentNaming")]
+  // ReSharper disable once UnusedMember.Local
   static void Postfix(ref bool __runOriginal, ILoc ____loc, Label ____hoursLeft,
                       GoodConsumingBuilding ____goodConsumingBuilding) {
     if (!__runOriginal) {
@@ -96,20 +95,12 @@ static class GoodConsumingBuildingFragmentPatch {
 #endregion
 
 #region Harmony patch to improve consumption rate fromatting
-[HarmonyPatch]
-[SuppressMessage("ReSharper", "UnusedMember.Local")]
+[HarmonyPatch(typeof(GoodConsumingBuildingDescriber), nameof(GoodConsumingBuildingDescriber.DescribeSupply))]
 static class GoodConsumingBuildingDescriberPatch {
-  const string ResourceNameAndAmountPerHourLocKey = "Core.ResourceNameAndAmountPerHour";
   const string DescriptionLocKey = "GoodConsuming.SupplyDescription";
-  const string PatchClassName = "Timberborn.GoodConsumingBuildingSystemUI.GoodConsumingBuildingDescriber";
-  const string PatchMethodName = "DescribeSupply";
-
-  static MethodBase TargetMethod() {
-    var type = AccessTools.TypeByName(PatchClassName);
-    return AccessTools.FirstMethod(type, method => method.Name == PatchMethodName);
-  }
 
   [SuppressMessage("ReSharper", "InconsistentNaming")]
+  // ReSharper disable once UnusedMember.Local
   static void Postfix(ref bool __runOriginal, ref EntityDescription __result,
                       ILoc ____loc, GoodDescriber ____goodDescriber,
                       DescribedAmountFactory ____describedAmountFactory,
