@@ -62,18 +62,17 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   /// <param name="tiles">The tiles to set the blocker at.</param>
   /// <returns>Unique ID of the created override. Use it to delete the overrides.</returns>
   /// <seealso cref="RemoveContaminationOverride"/>
-  /// FIXME: handle remove soil barrier to restore any erased overrides.
   public int AddContaminationOverride(IEnumerable<Vector2Int> tiles) {
     var tilesSet = tiles.ToHashSet();
-    var totalOld = _contaminatedTilesHash.Count;
+    var oldCacheSize = _contaminatedTilesCache.Count;
     var index = _nextContaminationOverrideId++;
     _contaminationOverrides.Add(index, tilesSet);
-    _contaminatedTilesHash = _contaminationOverrides.SelectMany(item => item.Value).ToHashSet();
+    _contaminatedTilesCache = _contaminationOverrides.SelectMany(item => item.Value).ToHashSet();
     foreach (var barrierTile in tilesSet) {
       _soilBarrierMap.AddContaminationBarrierAt(barrierTile);
     }
-    DebugEx.Fine("Added {0} contamination blockers. Total blockers overrides: {1} => {2}",
-                 tilesSet.Count, totalOld, _contaminatedTilesHash.Count);
+    DebugEx.Fine("Added contamination override: id={0}, tiles={1}. Cache size: {2} => {3}",
+                 index, tilesSet.Count, oldCacheSize, _contaminatedTilesCache.Count);
     return index;
   }
 
@@ -84,10 +83,10 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
     if (!_contaminationOverrides.TryGetValue(overrideId, out var barriers)) {
       return;
     }
-    var oldBarriers = _contaminatedTilesHash;
+    var oldTilesCache = _contaminatedTilesCache;
     _contaminationOverrides.Remove(overrideId);
-    _contaminatedTilesHash = _contaminationOverrides.SelectMany(item => item.Value).ToHashSet();
-    var barriersToRemove = oldBarriers.Where(x => !_contaminatedTilesHash.Contains(x));
+    _contaminatedTilesCache = _contaminationOverrides.SelectMany(item => item.Value).ToHashSet();
+    var barriersToRemove = oldTilesCache.Where(x => !_contaminatedTilesCache.Contains(x));
     foreach (var barrier in barriersToRemove) {
       var skipIt = _blockService
           .GetObjectsAt(new Vector3Int(barrier.x, barrier.y, _terrainService.CellHeight(barrier)))
@@ -98,8 +97,8 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
       }
       _soilBarrierMap.RemoveContaminationBarrierAt(barrier);
     }
-    DebugEx.Fine("Removed {0} contamination blockers. Total blockers overrides: {1} => {2}",
-                 barriers.Count, oldBarriers.Count, _contaminatedTilesHash.Count);
+    DebugEx.Fine("Removed contamination override: id={0}, tiles={1}. Cache size: {1} => {2}",
+                 overrideId, barriers.Count, oldTilesCache.Count, _contaminatedTilesCache.Count);
   }
   #endregion
 
@@ -140,7 +139,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   bool _needMoistureOverridesUpdate;
 
   readonly Dictionary<int, HashSet<Vector2Int>> _contaminationOverrides = new();
-  HashSet<Vector2Int> _contaminatedTilesHash = new();
+  HashSet<Vector2Int> _contaminatedTilesCache = new();
   int _nextContaminationOverrideId = 1;
 
   const string SoilBarrierTypeName = "Timberborn.SoilBarrierSystem.SoilBarrier";
@@ -172,8 +171,8 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
       return; // Ignore preview objects.
     }
     var tile = constructible.GetComponentFast<BlockObject>().Coordinates.XY();
-    if (_contaminatedTilesHash.Contains(tile) && IsContaminationBlocker(constructible)) {
-      DebugEx.Fine("*** Restore contamination barrier at: {0}", tile);
+    if (_contaminatedTilesCache.Contains(tile) && IsContaminationBlocker(constructible)) {
+      DebugEx.Fine("Restore contamination barrier at: {0}", tile);
       _soilBarrierMap.AddContaminationBarrierAt(tile);
     }
   }
