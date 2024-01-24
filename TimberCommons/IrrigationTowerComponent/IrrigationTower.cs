@@ -45,6 +45,11 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
   // ReSharper disable once InconsistentNaming
   internal float _moistureLevel = 1.0f;
 
+  /// <summary>Indicates that the irrigated tiles should also block contamination spreading.</summary>
+  [SerializeField]
+  // ReSharper disable once InconsistentNaming
+  internal bool _blockContamination = true;
+
   #endregion
 
   #region API
@@ -66,7 +71,7 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
 
   /// <summary>Tells if the building is being irrigating the tiles in range.</summary>
   /// <seealso cref="IrrigatedTilesCount"/>
-  public bool IsIrrigating => _overrideIndex != -1;
+  public bool IsIrrigating => _moistureOverrideIndex != -1;
 
   /// <summary>The current irrigation range.</summary>
   /// <remarks>It can change based on the building efficiency providers reports.</remarks>
@@ -180,11 +185,17 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
   float _adjustedMaxSqrRadius;
   float _radiusAdjuster;
 
-  /// <summary>The override, registered in teh direct moisture system component.</summary>
+  /// <summary>The moisture override, registered in the direct moisture system component.</summary>
   /// <remarks>Value <c>-1</c> means the moisture override was not setup.</remarks>
   /// <seealso cref="StartMoisturizing"/>
   /// <seealso cref="StopMoisturizing"/>
-  int _overrideIndex = -1;
+  int _moistureOverrideIndex = -1;
+
+  /// <summary>The contamination blocker override, registered in the direct moisture system component.</summary>
+  /// <remarks>Value <c>-1</c> means the contamination blocker override was not setup.</remarks>
+  /// <seealso cref="StartMoisturizing"/>
+  /// <seealso cref="StopMoisturizing"/>
+  int _contaminationOverrideIndex = -1;
 
   /// <summary>If set to <c>true</c>, then the irrigated tiles set will be updated on the next tick.</summary>
   /// <remarks>
@@ -272,20 +283,28 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
 
   /// <summary>Starts logic on the irrigated tiles.</summary>
   void StartMoisturizing() {
-    if (_overrideIndex != -1) {
+    if (_moistureOverrideIndex != -1 && (!_blockContamination || _contaminationOverrideIndex != -1)) {
       return;
     }
     var irrigatedTiles = GetTiles(range: EffectiveRange, skipChecks: false);
-    _overrideIndex = _directSoilMoistureSystemAccessor.AddMoistureOverride(irrigatedTiles, _moistureLevel);
+    if (_moistureOverrideIndex == -1) {
+      _moistureOverrideIndex = _directSoilMoistureSystemAccessor.AddMoistureOverride(irrigatedTiles, _moistureLevel);
+    }
+    if (_blockContamination && _contaminationOverrideIndex == -1) {
+      _contaminationOverrideIndex = _directSoilMoistureSystemAccessor.AddContaminationOverride(irrigatedTiles);
+    }
   }
 
   /// <summary>Stops any logic on the irrigated tiles.</summary>
   void StopMoisturizing() {
-    if (_overrideIndex == -1) {
-      return;
+    if (_moistureOverrideIndex != -1) {
+      _directSoilMoistureSystemAccessor.RemoveMoistureOverride(_moistureOverrideIndex);
+      _moistureOverrideIndex = -1;
     }
-    _directSoilMoistureSystemAccessor.RemoveMoistureOverride(_overrideIndex);
-    _overrideIndex = -1;
+    if (_contaminationOverrideIndex != -1) {
+      _directSoilMoistureSystemAccessor.RemoveContaminationOverride(_contaminationOverrideIndex);
+      _contaminationOverrideIndex = -1;
+    }
   }
 
   /// <summary>Returns the current building efficiency modifier.</summary>
