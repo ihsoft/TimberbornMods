@@ -139,16 +139,16 @@ sealed class WaterValveFragment : IEntityPanelFragment {
     if (_waterValve == null || !_waterValve.ShowUIPanel && !_devModeManager.Enabled) {
       return;
     }
-    _waterFlowLimitText.text = _loc.T(WaterFlowLimitLocKey, _waterValve.WaterFlow.ToString("0.0#"));
+    _waterFlowLimitText.text = _loc.T(WaterFlowLimitLocKey, _waterValve.WaterFlow);
     if (_devModeManager.Enabled) {
       _inputWaterLevelText.text = string.Format(MinimumLevelAtIntakeText, _waterValve.MinWaterLevelAtIntake);
       _outputWaterLevelText.text = string.Format(MaximumLevelAtOuttakeText, _waterValve.MaxWaterLevelAtOuttake);
     }
     if (_waterValve.enabled) {
       var info = new List<string> {
-          _loc.T(WaterDepthAtIntakeLocKey, _waterValve.WaterDepthAtIntake.ToString("0.00")),
-          _loc.T(WaterDepthAtOuttakeLocKey, _waterValve.WaterDepthAtOuttake.ToString("0.00")),
-          _loc.T(CurrentWaterFlowLocKey, _waterValve.CurrentFlow.ToString("0.0"))
+          _loc.T(WaterDepthAtIntakeLocKey, _waterValve.WaterDepthAtIntake),
+          _loc.T(WaterDepthAtOuttakeLocKey, _waterValve.WaterDepthAtOuttake),
+          _loc.T(CurrentWaterFlowLocKey, _waterValve.CurrentFlow)
       };
       if (_devModeManager.Enabled) {
         info.Add("\nDEV MODE DATA:");

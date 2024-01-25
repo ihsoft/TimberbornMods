@@ -1,8 +1,8 @@
 ID,Text
-IgorZ.TimberCommons.WaterValve.WaterFlowLimit,"Ограничить cкорость течения : {0} м³/с"
-IgorZ.TimberCommons.WaterValve.CurrentWaterFlow,"Скорость течения: {0} м³/с"
-IgorZ.TimberCommons.WaterValve.WaterDepthAtIntake,"Глубина воды на входе: {0}"
-IgorZ.TimberCommons.WaterValve.WaterDepthAtOuttake,"Глубина воды на выходе: {0}"
+IgorZ.TimberCommons.WaterValve.WaterFlowLimit,"Ограничить cкорость течения : {0:0.00} м³/с"
+IgorZ.TimberCommons.WaterValve.CurrentWaterFlow,"Скорость течения: {0:0.00} м³/с"
+IgorZ.TimberCommons.WaterValve.WaterDepthAtIntake,"Глубина воды на входе: {0:0.00}"
+IgorZ.TimberCommons.WaterValve.WaterDepthAtOuttake,"Глубина воды на выходе: {0:0.00}"
 IgorZ.TimberCommons.WaterValve.DisableLevelCheckAtOutput,"Не проверять уровень воды на выходе"
 
 IgorZ.TimberCommons.WaterTower.IrrigationCoverage,"Используемый потенциал: {0:0.#}%"
