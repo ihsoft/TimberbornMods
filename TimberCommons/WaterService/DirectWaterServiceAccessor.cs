@@ -187,8 +187,8 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
     _waterContaminations = _waterContaminationMap.Contaminations;
     _surfaceHeights = _impermeableSurfaceService.Heights;
 
-    HarmonyPatcher.PatchRepeated(GetType().AssemblyQualifiedName, typeof(WaterSimulatorWaterDepthsPatch));
-    WaterSimulatorWaterDepthsPatch.DirectWaterServiceAccessor = this;
+    HarmonyPatcher.PatchRepeated(GetType().AssemblyQualifiedName, typeof(WaterSimulatorUpdateWaterParametersPatch));
+    WaterSimulatorUpdateWaterParametersPatch.DirectWaterServiceAccessor = this;
   }
   #endregion
 
@@ -397,8 +397,8 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
   #endregion
 
   #region Harmony patch to implement the custom updates to water depths
-  [HarmonyPatch(typeof(WaterSimulator), nameof(WaterSimulator.UpdateWaterChanges))]
-  static class WaterSimulatorWaterDepthsPatch {
+  [HarmonyPatch(typeof(WaterSimulator), nameof(WaterSimulator.UpdateWaterParameters))]
+  static class WaterSimulatorUpdateWaterParametersPatch {
     public static DirectWaterServiceAccessor DirectWaterServiceAccessor;
 
     // ReSharper disable once UnusedMember.Local
