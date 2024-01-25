@@ -5,10 +5,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
+using Bindito.Core;
 using HarmonyLib;
 using IgorZ.TimberDev.Utils;
-using TimberApi.DependencyContainerSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.TickSystem;
 using Timberborn.WaterContaminationSystem;
@@ -148,13 +147,6 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
   public float[] WaterDepths => _waterDepths;
   float[] _waterDepths;
 
-  /// <summary>Water flows indexed by the tile index.</summary>
-  /// <remarks>
-  /// The values can be read from any thread, but the updates must be synchronized to the <c>ParallelTick</c> calls.
-  /// </remarks>
-  public WaterFlow[] WaterFlows => _waterFlows;
-  WaterFlow[] _waterFlows;
-
   /// <summary>Water height bases indexed by the tile index.</summary>
   /// <remarks>
   /// <p>This height accounts both the terrain and the water obstacle blocks.</p>
@@ -164,9 +156,6 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
   /// </remarks>
   public int[] SurfaceHeights => _surfaceHeights;
   int[] _surfaceHeights;
-
-  /// <summary>Indicates if the direct water system access can be used.</summary>
-  public bool IsValid { get; private set; }
 
   /// <summary>Ads a new water mover.</summary>
   /// <remarks>
@@ -194,42 +183,12 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
   public void PostLoad() {
     DebugEx.Fine("Initializing direct access to WaterSystem...");
 
-    var waterServiceAssembly = typeof(IWaterService).Assembly;
-    var waterMapType = waterServiceAssembly.GetType("Timberborn.WaterSystem.WaterMap");
-    if (waterMapType == null) {
-      DebugEx.Warning("Cannot get WaterMap type. DirectWaterSystem is inactive.");
-      return;
-    }
-    var flowsPropertyFn = waterMapType.GetProperty("Outflows");
-    var depthsPropertyFn = waterMapType.GetProperty("WaterDepths");
-    if (flowsPropertyFn == null || depthsPropertyFn == null) {
-      DebugEx.Warning("Cannot get access to WaterMap type. DirectWaterSystem is inactive.");
-      return;
-    }
-    var waterMapObj = DependencyContainer.GetInstance(waterMapType);
-    _waterDepths = depthsPropertyFn.GetValue(waterMapObj) as float[];
-    _waterFlows = flowsPropertyFn.GetValue(waterMapObj) as WaterFlow[];
-    if (WaterDepths == null || WaterFlows == null) { // This is unexpected!
-      throw new InvalidOperationException("Cannot get data from WaterMap");
-    }
-    var waterContaminationObj = DependencyContainer.GetInstance<WaterContaminationMap>();
-    _waterContaminations = waterContaminationObj.Contaminations;
-
-    var surfaceServiceType = waterServiceAssembly.GetType("Timberborn.WaterSystem.ImpermeableSurfaceService");
-    if (surfaceServiceType == null) {
-      DebugEx.Warning("Cannot get ImpermeableSurfaceService type. DirectWaterSystem is inactive.");
-      return;
-    }
-    var heightPropertyFn = surfaceServiceType.GetProperty("Heights");
-    if (heightPropertyFn == null) {
-      DebugEx.Warning("Cannot get access to ImpermeableSurfaceService type. DirectWaterSystem is inactive.");
-      return;
-    }
-    _surfaceHeights = heightPropertyFn.GetValue(DependencyContainer.GetInstance(surfaceServiceType)) as int[];
+    _waterDepths = _waterMap.WaterDepths;
+    _waterContaminations = _waterContaminationMap.Contaminations;
+    _surfaceHeights = _impermeableSurfaceService.Heights;
 
     HarmonyPatcher.PatchRepeated(GetType().AssemblyQualifiedName, typeof(WaterSimulatorWaterDepthsPatch));
     WaterSimulatorWaterDepthsPatch.DirectWaterServiceAccessor = this;
-    IsValid = true;
   }
   #endregion
 
@@ -266,6 +225,18 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
   #endregion
 
   #region Implementation
+  WaterMap _waterMap;
+  WaterContaminationMap _waterContaminationMap;
+  ImpermeableSurfaceService _impermeableSurfaceService;
+
+  /// <summary>Injects run-time dependencies.</summary>
+  [Inject]
+  public void InjectDependencies(WaterMap waterMap, WaterContaminationMap waterContaminationMap,
+                                 ImpermeableSurfaceService impermeableSurfaceService) {
+    _waterMap = waterMap;
+    _waterContaminationMap = waterContaminationMap;
+    _impermeableSurfaceService = impermeableSurfaceService;
+  }
   /// <summary>
   /// Processes the water consumption. Must only be called from the thread that is processing the water height updates. 
   /// </summary>
@@ -425,22 +396,13 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
   }
   #endregion
 
-  #region WaterSimulator Harmony patch
-  [HarmonyPatch]
-  [SuppressMessage("ReSharper", "UnusedMember.Local")]
-  [SuppressMessage("ReSharper", "InconsistentNaming")]
+  #region Harmony patch to implement the custom updates to water depths
+  [HarmonyPatch(typeof(WaterSimulator), nameof(WaterSimulator.UpdateWaterChanges))]
   static class WaterSimulatorWaterDepthsPatch {
-    const string WaterSimulatorClasName = "Timberborn.WaterSystem.WaterSimulator";
-    const string MethodName = "UpdateWaterChanges";
-
     public static DirectWaterServiceAccessor DirectWaterServiceAccessor;
 
-    static MethodBase TargetMethod() {
-      var type = AccessTools.TypeByName(WaterSimulatorClasName);
-      var methodBase = AccessTools.FirstMethod(type, method => method.Name == MethodName);
-      return methodBase;
-    }
-
+    // ReSharper disable once UnusedMember.Local
+    // ReSharper disable once InconsistentNaming
     static void Postfix(float ____deltaTime) {
       DirectWaterServiceAccessor?.UpdateDepthsCallback(____deltaTime);
     }

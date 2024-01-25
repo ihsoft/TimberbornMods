@@ -2,7 +2,6 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System;
 using Bindito.Core;
 using IgorZ.TimberCommons.WaterService;
 using Timberborn.BlockSystem;
@@ -204,9 +203,6 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
   #region TickableComponent implemenatation
   /// <inheritdoc/>
   public override void StartTickable() {
-    if (!_directWaterServiceAccessor.IsValid) {
-      throw new InvalidOperationException("WaterValve requires operational DirectWaterServiceAccessor. See the logs!");
-    }
     base.StartTickable();
 
     _valveBaseZ = _blockObject.Coordinates.z;

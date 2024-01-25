@@ -159,9 +159,6 @@
       <Reference Include="Timberborn.WaterContaminationSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.WaterContaminationSystem.dll</HintPath>
       </Reference>
-      <Reference Include="Timberborn.WaterSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.WaterSystem.dll</HintPath>
-      </Reference>
       <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Unity\UnityEngine.CoreModule.dll</HintPath>
       </Reference>
@@ -185,6 +182,7 @@
     <Reference Include="..\Dependencies\Timberborn\Timberborn.SoilMoistureSystem.dll" Publicize="true" />
     <Reference Include="..\Dependencies\Timberborn\Timberborn.GoodConsumingBuildingSystemUI.dll" Publicize="true" />
     <Reference Include="..\Dependencies\Timberborn\Timberborn.GoodConsumingBuildingSystem.dll" Publicize="true" />
+    <Reference Include="..\Dependencies\Timberborn\Timberborn.WaterSystem.dll" Publicize="true" />
   </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
