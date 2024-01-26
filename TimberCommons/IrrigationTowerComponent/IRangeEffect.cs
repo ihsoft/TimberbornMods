@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿// Timberborn Mod: Timberborn Commons
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace IgorZ.TimberCommons.IrrigationSystem {
