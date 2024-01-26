@@ -50,7 +50,8 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <summary>The optional name to use to group irrigation ranges in preview.</summary>
   [SerializeField]
   // ReSharper disable once InconsistentNaming
-  internal string _rangeName;
+  // ReSharper disable once RedundantDefaultMemberInitializer
+  internal string _rangeName = null;
 
   #endregion
 
