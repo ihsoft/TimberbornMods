@@ -8,7 +8,7 @@ using TimberApi.ConfiguratorSystem;
 using TimberApi.SceneSystem;
 using Timberborn.EntityPanelSystem;
 
-namespace IgorZ.TimberCommons.IrrigationTowerComponent {
+namespace IgorZ.TimberCommons.IrrigationSystem {
 
 [Configurator(SceneEntrypoint.InGame)]
 // ReSharper disable once UnusedType.Global

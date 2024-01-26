@@ -7,20 +7,15 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Bindito.Core;
-using IgorZ.TimberCommons.Common;
 using IgorZ.TimberCommons.WaterService;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BuildingRange;
-using Timberborn.Buildings;
 using Timberborn.BuildingsUI;
 using Timberborn.Common;
 using Timberborn.ConstructibleSystem;
 using Timberborn.EntitySystem;
-using Timberborn.GoodConsumingBuildingSystem;
-using Timberborn.Localization;
 using Timberborn.MapIndexSystem;
-using Timberborn.PrefabSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.SoilBarrierSystem;
 using Timberborn.TerrainSystem;
@@ -28,10 +23,18 @@ using Timberborn.TickSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
-namespace IgorZ.TimberCommons.IrrigationTowerComponent {
+namespace IgorZ.TimberCommons.IrrigationSystem {
+
+/// <summary>Base component for the irrigation towers.</summary>
+/// <remarks>
+/// The tower irrigates tiles (sets moisture level to a constant value) within a certain range. The ground level of the
+/// eligible tiles must be the same as the tower itself. Only the "connected" tiles are eligible for irrigation.
+/// Connected tiles must be immediately adjusted to each other on left, right, top or bottom side. If the tile is
+/// blocked for irrigation (e.g. via a moisture blocker), then it's not eligible for irrigation. 
+/// </remarks>
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateListener, IPostTransformChangeListener,
-                        IConsumptionRateFormatter {
+public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateListener,
+                                        IPostTransformChangeListener {
   #region Unity conrolled fields
 
   /// <summary>The maximum distance of irrigation from the building's boundary.</summary>
@@ -44,10 +47,10 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
   // ReSharper disable once InconsistentNaming
   internal float _moistureLevel = 1.0f;
 
-  /// <summary>Indicates that the irrigated tiles should also block contamination spreading.</summary>
+  /// <summary>The optional name to use to group irrigation ranges in preview.</summary>
   [SerializeField]
   // ReSharper disable once InconsistentNaming
-  internal bool _blockContamination = true;
+  internal string _rangeName;
 
   #endregion
 
@@ -77,6 +80,9 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
   /// <seealso cref="IrrigatedTilesCount"/>
   public int EffectiveRange => Mathf.RoundToInt(_irrigationRange * _currentEfficiency);
 
+  /// <summary>The block object of this tower.</summary>
+  protected BlockObject BlockObject { get; private set; }
+
   #endregion
 
   #region IBuildingWithRange implementation
@@ -93,7 +99,7 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
 
   /// <inheritdoc />
   public IEnumerable<string> RangeNames() {
-    yield return _prefab.PrefabName;
+    yield return _rangeName ?? typeof(IrrigationTower).FullName;
   }
 
   #endregion
@@ -124,25 +130,46 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
 
   #endregion
 
-  #region IConsumptionRateFormatter implementation
-
-  const string DaysShortLocKey = "Time.DaysShort";
-
-  public string GetRate() {
-    var goodPerHour = _goodConsumingBuilding._goodPerHour * 24;
-    return goodPerHour.ToString("0.#");
-  }
-
-  public string GetTime() {
-    return _loc.T(DaysShortLocKey, "1");
-  }
-
-  #endregion
-
   #region TickableComponent implementation
 
   /// <inheritdoc/>
   public override void StartTickable() {
+    base.StartTickable();
+    Initialize();
+    UpdateState();
+  }
+  static readonly Dictionary<Vector2Int, Dictionary<int, int>> MaxCoverageByRadius = new();
+
+  /// <inheritdoc/>
+  public override void Tick() => UpdateState();
+
+  #endregion
+
+  #region Overridable methods
+
+  /// <summary>Indicates if the tower has everything to moisturizing the tiles.</summary>
+  protected abstract bool CanMoisturize();
+
+  /// <summary>Notifies that the irrigation started on the provided tiles.</summary>
+  /// <param name="tiles">All the affected tiles.</param>
+  /// <seealso cref="IrrigatedTilesCount"/>
+  protected abstract void IrrigationStarted(IEnumerable<Vector2Int> tiles);
+
+  /// <summary>Notifies that the irrigation process has stopped.</summary>
+  protected abstract void IrrigationStopped();
+
+  /// <summary>Called when the tower consumption rate needs to be recalculated.</summary>
+  /// <seealso cref="EligibleTilesCount"/>
+  /// <seealso cref="IrrigatedTilesCount"/>
+  protected abstract void UpdateConsumptionRate();
+ 
+  /// <summary>Returns the current building efficiency modifier.</summary>
+  /// <remarks>Values less <c>1.0</c> reduce the effective range.</remarks>
+  /// <seealso cref="EffectiveRange"/>
+  protected abstract float GetEfficiency();
+
+  /// <summary>Initializes the component right before the first tick.</summary>
+  protected virtual void Initialize() {
     UpdateBuildingPositioning();
     if (!MaxCoverageByRadius.TryGetValue(_foundationSize, out var coverages)) {
       coverages = new Dictionary<int, int>();
@@ -155,12 +182,7 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
           "Calculated max coverage: size={0}, range={1}, coverage={2}", _foundationSize, _irrigationRange, coverage);
     }
     MaxCoveredTilesCount = coverage;
-    UpdateState();
   }
-  static readonly Dictionary<Vector2Int, Dictionary<int, int>> MaxCoverageByRadius = new();
-
-  /// <inheritdoc/>
-  public override void Tick() => UpdateState();
 
   #endregion
 
@@ -170,13 +192,7 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
   SoilBarrierMap _soilBarrierMap;
   MapIndexService _mapIndexService;
   EventBus _eventBus;
-  ILoc _loc;
   DirectSoilMoistureSystemAccessor _directSoilMoistureSystemAccessor;
-
-  BlockObject _blockObject;
-  Prefab _prefab;
-  GoodConsumingBuilding _goodConsumingBuilding;
-  readonly List<IBuildingEfficiencyProvider> _efficiencyProviders = new();
 
   float _adjustedMaxSqrRadius;
   float _radiusAdjuster;
@@ -186,12 +202,6 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
   /// <seealso cref="StartMoisturizing"/>
   /// <seealso cref="StopMoisturizing"/>
   int _moistureOverrideIndex = -1;
-
-  /// <summary>The contamination blocker override, registered in the direct moisture system component.</summary>
-  /// <remarks>Value <c>-1</c> means the contamination blocker override was not setup.</remarks>
-  /// <seealso cref="StartMoisturizing"/>
-  /// <seealso cref="StopMoisturizing"/>
-  int _contaminationOverrideIndex = -1;
 
   /// <summary>If set to <c>true</c>, then the irrigated tiles set will be updated on the next tick.</summary>
   /// <remarks>
@@ -214,31 +224,23 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
   /// <seealso cref="UpdateBuildingPositioning"/>
   Vector2 _buildingCenter;
 
-  /// <summary>The per hour consumption defined by the consuming building prefab.</summary>
-  float _prefabGoodPerHour;
-
   /// <summary>The last calculated efficiency modifier.</summary>
   float _currentEfficiency = 1.0f;
 
   /// <summary>It must be public for the injection logic to work.</summary>
   [Inject]
   public void InjectDependencies(ITerrainService terrainService, SoilBarrierMap soilBarrierMap,
-                                 MapIndexService mapIndexService, EventBus eventBus, ILoc loc,
+                                 MapIndexService mapIndexService, EventBus eventBus,
                                  DirectSoilMoistureSystemAccessor directSoilMoistureSystemAccessor) {
     _terrainService = terrainService;
     _soilBarrierMap = soilBarrierMap;
     _mapIndexService = mapIndexService;
     _eventBus = eventBus;
-    _loc = loc;
     _directSoilMoistureSystemAccessor = directSoilMoistureSystemAccessor;
   }
 
-  void Awake() {
-    _blockObject = GetComponentFast<BlockObject>();
-    _prefab = GetComponentFast<Prefab>();
-    _goodConsumingBuilding = GetComponentFast<GoodConsumingBuilding>();
-    _prefabGoodPerHour = _goodConsumingBuilding._goodPerHour;
-    GetComponentsFast(_efficiencyProviders);
+  protected virtual void Awake() {
+    BlockObject = GetComponentFast<BlockObject>();
   }
 
   /// <summary>Updates the eligible tiles and moisture system.</summary>
@@ -261,16 +263,11 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
       EligibleTilesCount = GetTiles(range: _irrigationRange, skipChecks: false).Count;
       HostedDebugLog.Fine(this, "Tiles updated: eligible={0}, irrigated={1}, efficiency={2}",
                           EligibleTilesCount, IrrigatedTilesCount, _currentEfficiency);
-      var irrigationCoverage = (float)IrrigatedTilesCount / MaxCoveredTilesCount;
-      if (irrigationCoverage > 0) {
-        _goodConsumingBuilding._goodPerHour = _prefabGoodPerHour * irrigationCoverage;
-      } else {
-        // Zero consumption rate causes troubles to the consuming building component.
-        _goodConsumingBuilding._goodPerHour = _prefabGoodPerHour;
-      }
+      UpdateConsumptionRate();
       GetComponentFast<BuildingWithRangeUpdater>().OnPostTransformChanged();
     }
-    if (_goodConsumingBuilding.IsConsuming) {
+
+    if (CanMoisturize()) {
       StartMoisturizing();
     } else {
       StopMoisturizing();
@@ -279,48 +276,27 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
 
   /// <summary>Starts logic on the irrigated tiles.</summary>
   void StartMoisturizing() {
-    if (_moistureOverrideIndex != -1 && (!_blockContamination || _contaminationOverrideIndex != -1)) {
+    if (_moistureOverrideIndex != -1) {
       return;
     }
     var irrigatedTiles = GetTiles(range: EffectiveRange, skipChecks: false);
-    if (_moistureOverrideIndex == -1) {
-      _moistureOverrideIndex = _directSoilMoistureSystemAccessor.AddMoistureOverride(irrigatedTiles, _moistureLevel);
-    }
-    if (_blockContamination && _contaminationOverrideIndex == -1) {
-      _contaminationOverrideIndex = _directSoilMoistureSystemAccessor.AddContaminationOverride(irrigatedTiles);
-    }
+    _moistureOverrideIndex = _directSoilMoistureSystemAccessor.AddMoistureOverride(irrigatedTiles, _moistureLevel);
+    IrrigationStarted(irrigatedTiles);
   }
 
   /// <summary>Stops any logic on the irrigated tiles.</summary>
   void StopMoisturizing() {
-    if (_moistureOverrideIndex != -1) {
-      _directSoilMoistureSystemAccessor.RemoveMoistureOverride(_moistureOverrideIndex);
-      _moistureOverrideIndex = -1;
+    if (_moistureOverrideIndex == -1) {
+      return;
     }
-    if (_contaminationOverrideIndex != -1) {
-      _directSoilMoistureSystemAccessor.RemoveContaminationOverride(_contaminationOverrideIndex);
-      _contaminationOverrideIndex = -1;
-    }
-  }
-
-  /// <summary>Returns the current building efficiency modifier.</summary>
-  /// <seealso cref="IBuildingEfficiencyProvider"/>
-  float GetEfficiency() {
-    if (!_blockObject.Finished) {
-      return 1f;
-    }
-    var efficiency = 1f;
-    // ReSharper disable once ForCanBeConvertedToForeach
-    // ReSharper disable once LoopCanBeConvertedToQuery
-    for (var i = 0; i < _efficiencyProviders.Count; i++) {
-      efficiency *= _efficiencyProviders[i].Efficiency;
-    }
-    return efficiency;
+    _directSoilMoistureSystemAccessor.RemoveMoistureOverride(_moistureOverrideIndex);
+    _moistureOverrideIndex = -1;
+    IrrigationStopped();
   }
 
   /// <summary>Updates the building size and position to its current state.</summary>
   void UpdateBuildingPositioning() {
-    var foundation = _blockObject.PositionedBlocks.GetFoundationCoordinates();
+    var foundation = BlockObject.PositionedBlocks.GetFoundationCoordinates();
     var minX = int.MaxValue;
     var maxX = int.MinValue;
     var minY = int.MaxValue;
@@ -337,7 +313,7 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
     _buildingCenter = new Vector2(minX + dx / 2.0f, minY + dy / 2.0f);
     _radiusAdjuster = Math.Max(dx + 1, dy + 1) / 2.0f;
     _adjustedMaxSqrRadius = (_irrigationRange + _radiusAdjuster) * (_irrigationRange + _radiusAdjuster);
-    _baseZ = _blockObject.Placement.Coordinates.z;
+    _baseZ = BlockObject.Placement.Coordinates.z;
   }
 
   /// <summary>Tells if the provided tile is within the tower's max range.</summary>
@@ -355,7 +331,7 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
     var result = new List<Vector2Int>();
     var sqrRadius = (range + _radiusAdjuster) * (range + _radiusAdjuster);
 
-    tilesToVisit.Enqueue(_blockObject.Placement.Coordinates.XY());
+    tilesToVisit.Enqueue(BlockObject.Placement.Coordinates.XY());
     while (!tilesToVisit.IsEmpty()) {
       var tile = tilesToVisit.Dequeue();
       if (!skipChecks) {
@@ -387,7 +363,7 @@ class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateLis
 
     // The building itself is not being irrigated. Remove it from the tiles.
     var final = result.ToHashSet();
-    var foundation = _blockObject.PositionedBlocks.GetFoundationCoordinates().Select(c => c.XY()).ToHashSet();
+    var foundation = BlockObject.PositionedBlocks.GetFoundationCoordinates().Select(c => c.XY()).ToHashSet();
     final.RemoveWhere(x => foundation.Contains(x));
     return final;
   }

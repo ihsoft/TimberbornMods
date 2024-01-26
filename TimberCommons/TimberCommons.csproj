@@ -37,8 +37,12 @@
     </PropertyGroup>
     <ItemGroup>
       <Compile Include="Common\IConsumptionRateFormatter.cs" />
+      <Compile Include="IrrigationTowerComponent\BlockContaminationRangeEffect.cs" />
       <Compile Include="IrrigationTowerComponent\Configurator.cs" />
+      <Compile Include="IrrigationTowerComponent\GoodConsumingIrrigationTower.cs" />
+      <Compile Include="IrrigationTowerComponent\IRangeEffect.cs" />
       <Compile Include="IrrigationTowerComponent\IrrigationTower.cs" />
+      <Compile Include="IrrigationTowerComponent\IrrigationTowerDummy.cs" />
       <Compile Include="IrrigationTowerComponent\IrrigationTowerFragment.cs" />
       <Compile Include="Properties\AssemblyInfo.cs" />
       <Compile Include="TimberDev\HarmonyPatcher.cs" />

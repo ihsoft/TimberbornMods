@@ -19,7 +19,7 @@ using Timberborn.UIFormatters;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace IgorZ.TimberCommons.IrrigationTowerComponent {
+namespace IgorZ.TimberCommons.IrrigationSystem {
 
 sealed class IrrigationTowerFragment : IEntityPanelFragment {
   const string IrrigationCoverageLocKey = "IgorZ.TimberCommons.WaterTower.IrrigationCoverage";
