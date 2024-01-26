@@ -1,4 +1,8 @@
-﻿using Timberborn.BaseComponentSystem;
+﻿// Timberborn Mod: Timberborn Commons
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+
+using Timberborn.BaseComponentSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
