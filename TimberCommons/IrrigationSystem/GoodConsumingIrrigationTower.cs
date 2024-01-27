@@ -56,7 +56,7 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
 
   /// <inheritdoc/>
   protected override void IrrigationStopped() {
-    _rangeEffects.ForEach(x => x.RestEffect());
+    _rangeEffects.ForEach(x => x.ResetEffect());
   }
 
   /// <inheritdoc/>

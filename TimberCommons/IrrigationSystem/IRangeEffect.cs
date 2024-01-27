@@ -25,7 +25,7 @@ public interface IRangeEffect {
   public void ApplyEffect(IEnumerable<Vector2Int> tiles);
 
   /// <summary>Resets all effects that were applied in the last call to <see cref="ApplyEffect"/></summary>
-  public void RestEffect();
+  public void ResetEffect();
 }
 
 }

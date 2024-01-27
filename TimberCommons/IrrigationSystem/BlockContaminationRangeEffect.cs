@@ -31,12 +31,12 @@ public sealed class BlockContaminationRangeEffect : BaseComponent, IRangeEffect 
 
   /// <inheritdoc/>
   public void ApplyEffect(IEnumerable<Vector2Int> tiles) {
-    RestEffect();
+    ResetEffect();
     _contaminationOverrideIndex = _directSoilMoistureSystemAccessor.AddContaminationOverride(tiles);
   }
 
   /// <inheritdoc/>
-  public void RestEffect() {
+  public void ResetEffect() {
     if (_contaminationOverrideIndex == -1) {
       return;
     }
@@ -58,5 +58,10 @@ public sealed class BlockContaminationRangeEffect : BaseComponent, IRangeEffect 
   }
 
   #endregion
+
+  /// <inheritdoc/>
+  public override string ToString() {
+    return $"[{GetType().Name}#{EffectGroup}]";
+  } 
 }
 }
