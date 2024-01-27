@@ -61,9 +61,8 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
 
   /// <inheritdoc/>
   protected override void UpdateConsumptionRate() {
-    var irrigationCoverage = (float)IrrigatedTilesCount / MaxCoveredTilesCount;
-    if (irrigationCoverage > 0) {
-      _goodConsumingBuilding._goodPerHour = _prefabGoodPerHour * irrigationCoverage;
+    if (Coverage > 0) {
+      _goodConsumingBuilding._goodPerHour = _prefabGoodPerHour * Coverage;
     } else {
       // Zero consumption rate causes troubles to the consuming building component.
       _goodConsumingBuilding._goodPerHour = _prefabGoodPerHour;

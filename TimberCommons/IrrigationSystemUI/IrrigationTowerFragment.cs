@@ -15,7 +15,7 @@ using UnityEngine.UIElements;
 namespace IgorZ.TimberCommons.IrrigationSystemUI {
 
 sealed class IrrigationTowerFragment : IEntityPanelFragment {
-  const string IrrigationCoverageLocKey = "IgorZ.TimberCommons.WaterTower.IrrigationCoverage";
+  const string TowerUtilizationLocKey = "IgorZ.TimberCommons.WaterTower.Utilization";
   const string IrrigatedAreaLocKey = "IgorZ.TimberCommons.WaterTower.IrrigatedArea";
   const string EffectiveRangeLocKey = "IgorZ.TimberCommons.WaterTower.EffectiveRange";
 
@@ -54,10 +54,10 @@ sealed class IrrigationTowerFragment : IEntityPanelFragment {
       return;
     }
     if (_irrigationTower.enabled) {
-      var coveragePct = _irrigationTower.EligibleTilesCount * 100f / _irrigationTower.MaxCoveredTilesCount;
+      var utilization = _irrigationTower.EligibleTiles.Count * 100f / _irrigationTower.MaxCoveredTilesCount;
       var info = new List<string> {
-          _loc.T(IrrigationCoverageLocKey, coveragePct),
-          _loc.T(IrrigatedAreaLocKey, _irrigationTower.IrrigatedTilesCount),
+          _loc.T(TowerUtilizationLocKey, utilization),
+          _loc.T(IrrigatedAreaLocKey, _irrigationTower.ReachableTiles.Count),
           _loc.T(EffectiveRangeLocKey, _irrigationTower.EffectiveRange),
       };
       _infoLabel.text = string.Join("\n", info);
