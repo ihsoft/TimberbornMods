@@ -13,6 +13,7 @@ namespace IgorZ.TimberCommons.WaterService {
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<DirectWaterServiceAccessor>().AsSingleton();
+    containerDefinition.Bind<DirectSoilMoistureSystemAccessor>().AsSingleton();
   }
 }
 

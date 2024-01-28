@@ -34,6 +34,7 @@ static class DebugEx {
 
   /// <summary>Logs a formatted INFO message when the <i>verbose</i> logging mode is enabled.</summary>
   /// <inheritdoc cref="Info"/>
+  /// <seealso cref="LoggingSettings"/>
   public static void Fine(string format, params object[] args) {
     if (LoggingSettings.VerbosityLevel > 0) {
       Log(LogType.Log, format, args);

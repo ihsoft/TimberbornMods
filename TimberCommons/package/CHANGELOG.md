@@ -1,3 +1,6 @@
+# v1.4 (27 Jan 2024)
+* [Fix #28] "Water bump" at the water intake.
+
 # v1.3 (10 Nov 2023)
 * [Fix #17] Support contaminated water (Update 5).
 * This version is not compatible with Update 4.

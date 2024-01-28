@@ -1,6 +1,11 @@
 ID,Text
-IgorZ.TimberCommons.WaterValve.WaterFlowLimit,"Limit water flow to: {0} m³/s"
-IgorZ.TimberCommons.WaterValve.CurrentWaterFlow,"Water flow: {0} m³/s"
-IgorZ.TimberCommons.WaterValve.WaterDepthAtIntake,"Water depth at intake: {0}"
-IgorZ.TimberCommons.WaterValve.WaterDepthAtOuttake,"Water depth at outtake: {0}"
+IgorZ.TimberCommons.WaterValve.WaterFlowLimit,"Limit water flow to: {0:0.00} m³/s"
+IgorZ.TimberCommons.WaterValve.CurrentWaterFlow,"Water flow: {0:0.00} m³/s"
+IgorZ.TimberCommons.WaterValve.WaterDepthAtIntake,"Water depth at intake: {0:0.00}"
+IgorZ.TimberCommons.WaterValve.WaterDepthAtOuttake,"Water depth at outtake: {0:0.00}"
 IgorZ.TimberCommons.WaterValve.DisableLevelCheckAtOutput,"Don't check water level at outtake"
+
+IgorZ.TimberCommons.WaterTower.Utilization,"Utilized potential: {0:0.#}%"
+IgorZ.TimberCommons.WaterTower.IrrigatedArea,"Covered area: {0}"
+IgorZ.TimberCommons.WaterTower.EffectiveRange,"Effective range: {0}"
+IgorZ.TimberCommons.WaterTower.SupplyRemaining,"Supply will last for {0}d {1}h"

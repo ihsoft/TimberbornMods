@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import Project="..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\build\BepInEx.AssemblyPublicizer.MSBuild.props" Condition="Exists('..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\build\BepInEx.AssemblyPublicizer.MSBuild.props')" />
     <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -35,11 +36,24 @@
         <DocumentationFile>bin\Release\TimberCommons.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
+      <Compile Include="Common\IConsumptionRateFormatter.cs" />
+      <Compile Include="IrrigationSystem\BlockContaminationRangeEffect.cs" />
+      <Compile Include="IrrigationSystem\GoodConsumingIrrigationTower.cs" />
+      <Compile Include="IrrigationSystem\IRangeEffect.cs" />
+      <Compile Include="IrrigationSystem\IrrigationTower.cs" />
+      <Compile Include="IrrigationSystem\ManufactoryIrrigationTower.cs" />
+      <Compile Include="IrrigationTowerComponent\IrrigationTowerDummy.cs" />
       <Compile Include="Properties\AssemblyInfo.cs" />
       <Compile Include="TimberDev\HarmonyPatcher.cs" />
       <Compile Include="TimberDev\UiFactory.cs" />
+      <Compile Include="IrrigationSystemUI\Configurator.cs" />
+      <Compile Include="IrrigationSystemUI\GoodConsumingBuildingDescriberPatch.cs" />
+      <Compile Include="IrrigationSystemUI\GoodConsumingBuildingFragmentPatch.cs" />
+      <Compile Include="IrrigationSystemUI\IrrigationTowerFragment.cs" />
       <Compile Include="UnityDevLite\DebugEx.cs" />
+      <Compile Include="UnityDevLite\HostedDebugLog.cs" />
       <Compile Include="WaterService\Configurator.cs" />
+      <Compile Include="WaterService\DirectSoilMoistureSystemAccessor.cs" />
       <Compile Include="WaterService\DirectWaterServiceAccessor.cs" />
       <Compile Include="WaterValveComponent\Configurator.cs" />
       <Compile Include="WaterValveComponent\WaterValve.cs" />
@@ -49,8 +63,39 @@
       <Reference Include="0Harmony, Version=2.9.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\0Harmony.dll</HintPath>
       </Reference>
+      <Reference Include="AsmResolver, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\lib\net472\AsmResolver.dll</HintPath>
+        <Private>True</Private>
+      </Reference>
+      <Reference Include="AsmResolver.DotNet, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\lib\net472\AsmResolver.DotNet.dll</HintPath>
+        <Private>True</Private>
+      </Reference>
+      <Reference Include="AsmResolver.PE, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\lib\net472\AsmResolver.PE.dll</HintPath>
+        <Private>True</Private>
+      </Reference>
+      <Reference Include="AsmResolver.PE.File, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\lib\net472\AsmResolver.PE.File.dll</HintPath>
+        <Private>True</Private>
+      </Reference>
+      <Reference Include="BepInEx.AssemblyPublicizer, Version=0.4.1.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\lib\net472\BepInEx.AssemblyPublicizer.dll</HintPath>
+        <Private>True</Private>
+      </Reference>
+      <Reference Include="BepInEx.AssemblyPublicizer.MSBuild, Version=0.4.1.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\lib\net472\BepInEx.AssemblyPublicizer.MSBuild.dll</HintPath>
+        <Private>True</Private>
+      </Reference>
       <Reference Include="Bindito.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Bindito.Core.dll</HintPath>
+      </Reference>
+      <Reference Include="Bindito.Unity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Bindito.Unity.dll</HintPath>
+      </Reference>
+      <Reference Include="System" />
+      <Reference Include="System.Collections.Immutable, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+        <HintPath>..\Dependencies\Timberborn\System.Collections.Immutable.dll</HintPath>
       </Reference>
       <Reference Include="TimberApi, Version=0.6.2.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\TimberApi.dll</HintPath>
@@ -60,6 +105,21 @@
       </Reference>
       <Reference Include="Timberborn.BlockSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.BlockSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.BuildingRange, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.BuildingRange.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.Buildings, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.Buildings.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.BuildingsBlocking, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.BuildingsBlocking.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.BuildingsUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.BuildingsUI.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.Common, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.Common.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.ConstructibleSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.ConstructibleSystem.dll</HintPath>
@@ -75,6 +135,15 @@
       </Reference>
       <Reference Include="Timberborn.EntityPanelSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.EntityPanelSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.EntitySystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.EntitySystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.Goods, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.Goods.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.GoodsUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.GoodsUI.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.Localization, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.Localization.dll</HintPath>
@@ -94,14 +163,20 @@
       <Reference Include="Timberborn.SingletonSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.SingletonSystem.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.TerrainSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.TerrainSystem.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.TickSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.TickSystem.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.TimeSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.TimeSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.UIFormatters, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.UIFormatters.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.WaterContaminationSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.WaterContaminationSystem.dll</HintPath>
-      </Reference>
-      <Reference Include="Timberborn.WaterSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.WaterSystem.dll</HintPath>
       </Reference>
       <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Unity\UnityEngine.CoreModule.dll</HintPath>
@@ -116,6 +191,19 @@
         <HintPath>..\Dependencies\Unity\UnityEngine.UIElementsModule.dll</HintPath>
       </Reference>
     </ItemGroup>
+    <ItemGroup>
+      <None Include="packages.config" />
+    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
+    <!-- Publicize directly when referencing -->
+    <Reference Include="..\Dependencies\Timberborn\Timberborn.SoilBarrierSystem.dll" Publicize="true" />
+    <Reference Include="..\Dependencies\Timberborn\Timberborn.SoilMoistureSystem.dll" Publicize="true" />
+    <Reference Include="..\Dependencies\Timberborn\Timberborn.GoodConsumingBuildingSystemUI.dll" Publicize="true" />
+    <Reference Include="..\Dependencies\Timberborn\Timberborn.GoodConsumingBuildingSystem.dll" Publicize="true" />
+    <Reference Include="..\Dependencies\Timberborn\Timberborn.WaterSystem.dll" Publicize="true" />
+    <Reference Include="..\Dependencies\Timberborn\Timberborn.Workshops.dll" Publicize="true" />
+  </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.
@@ -126,5 +214,11 @@
     -->
     <Target Name="AfterBuild">
         <Exec Command="xcopy /i /Y $(TargetPath) u:\BepInEx\plugins\TimberCommons" />
+    </Target>
+    <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+      <PropertyGroup>
+        <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
+      </PropertyGroup>
+      <Error Condition="!Exists('..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\build\BepInEx.AssemblyPublicizer.MSBuild.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\build\BepInEx.AssemblyPublicizer.MSBuild.props'))" />
     </Target>
 </Project>
