@@ -5,7 +5,7 @@ IgorZ.TimberCommons.WaterValve.WaterDepthAtIntake,"Water depth at intake: {0:0.0
 IgorZ.TimberCommons.WaterValve.WaterDepthAtOuttake,"Water depth at outtake: {0:0.00}"
 IgorZ.TimberCommons.WaterValve.DisableLevelCheckAtOutput,"Don't check water level at outtake"
 
-IgorZ.TimberCommons.WaterTower.IrrigationCoverage,"Utilized potential: {0:0.#}%"
+IgorZ.TimberCommons.WaterTower.Utilization,"Utilized potential: {0:0.#}%"
 IgorZ.TimberCommons.WaterTower.IrrigatedArea,"Covered area: {0}"
 IgorZ.TimberCommons.WaterTower.EffectiveRange,"Effective range: {0}"
 IgorZ.TimberCommons.WaterTower.SupplyRemaining,"Supply will last for {0}d {1}h"
