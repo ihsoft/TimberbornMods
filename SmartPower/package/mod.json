@@ -1,9 +1,9 @@
 {
   "Name": "SmartPower",
-  "Version": "1.4.0",
+  "Version": "1.5.0",
   "UniqueId": "igorz.smartpower",
-  "MinimumApiVersion": "0.6.0",
-  "MinimumGameVersion": "0.4.9.0",
+  "MinimumApiVersion": "0.6.3.1",
+  "MinimumGameVersion": "0.5.4.2",
   "EntryDll": "SmartPower.dll",
   "Assets": [
     {
