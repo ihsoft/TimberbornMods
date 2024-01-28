@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using Bindito.Core;
 using HarmonyLib;
 using IgorZ.TimberDev.Utils;
@@ -19,16 +18,12 @@ namespace IgorZ.TimberCommons.WaterService {
 
 /// <summary>
 /// Class that allows accessing to the internal water system logic. Be careful using it! The internal logic runs in
-/// threads, so it's not safe to access anything anytime.
+/// threads, so it may not be safe to access anything anytime.
 /// </summary>
 /// <remarks>
-/// This code interacts with the game's water system via reflections to the internal classes and properties. If the
-/// relevant accessors cannot be obtained, then <c>DirectWaterServiceAccessor</c> goes into invalid state. Clients
-/// must check for <see cref="IsValid"/> before trying to use direct access. It's a good idea to have backup code in the
-/// client for this case.
+/// This code interacts with the internal game's water system objects and fields (via "publicize"). The changes to the
+/// game logic can break teh behavior.
 /// </remarks>
-[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingleton {
   /// <summary>Water mover definition.</summary>
   /// <remarks>
@@ -37,6 +32,8 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
   /// </remarks>
   public class WaterMover {
     internal WaterMover ThreadSafeWaterMover;
+    
+    // ReSharper disable once MemberCanBePrivate.Global
     internal bool LogExtraStats;
 
     /// <summary>Index of the tile to get water from.</summary>
@@ -97,9 +94,10 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
 
     /// <inheritdoc/>
     public override string ToString() {
+      // ReSharper disable once UseStringInterpolation
       return string.Format("[WaterMover#in={0},out={1},flow={2},free={3},inMin={4},outMax={5},moveBadWater={6}]",
-          InputTileIndex, OutputTileIndex, WaterFlow, FreeFlow, MinHeightAtInput, MaxHeightAtOutput,
-          MoveContaminatedWater);
+                           InputTileIndex, OutputTileIndex, WaterFlow, FreeFlow, MinHeightAtInput, MaxHeightAtOutput,
+                           MoveContaminatedWater);
     }
 
     internal WaterMover CopyDefinition() {

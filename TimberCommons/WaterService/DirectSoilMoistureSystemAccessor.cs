@@ -156,6 +156,8 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
     _eventBus = eventBus;
   }
 
+  /// <summary>Reacts on contamination blockers removal.</summary>
+  /// <remarks>If there are overriden blocker for the tile, then the barrier is restored.</remarks>
   [OnEvent]
   public void OnEntityDeletedEvent(EntityDeletedEvent e) {
     var constructible = e.Entity.GetComponentFast<Constructible>();

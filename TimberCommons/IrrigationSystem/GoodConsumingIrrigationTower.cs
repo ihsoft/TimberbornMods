@@ -12,14 +12,14 @@ using UnityEngine;
 
 namespace IgorZ.TimberCommons.IrrigationSystem {
 
-/// <summary>Irrigation tower that runs on top of `GoodConsumingBuilding`.</summary>
+/// <summary>Irrigation tower that runs on top of <see cref="GoodConsumingBuilding"/>.</summary>
 /// <remarks>
 /// <p>
 /// The building is responsible for dealing with the goods (e.g. water). The tower will keep tiles in range irrigated as
 /// long as the building is consuming fuel (i.e. it's active).
 /// </p>
 /// <p>
-/// If building has components, implementing <see cref="IRangeEffect"/>, then they will be applied one the irrigation
+/// If building has components, implementing <see cref="IRangeEffect"/>, then they will be applied once the irrigation
 /// started. The <see cref="IRangeEffect.EffectGroup"/> is not considered, all effects will be used. 
 /// </p>
 /// </remarks>
@@ -99,6 +99,7 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
     _loc = loc;
   }
 
+  /// <inheritdoc/>
   protected override void Awake() {
     base.Awake();
     _goodConsumingBuilding = GetComponentFast<GoodConsumingBuilding>();

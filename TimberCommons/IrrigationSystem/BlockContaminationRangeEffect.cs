@@ -10,18 +10,23 @@ using UnityEngine;
 
 namespace IgorZ.TimberCommons.IrrigationSystem {
 
-/// <summary>Range effect blocks contamination on the tiles.</summary>
+/// <summary>A range effect that blocks the contamination on the tiles.</summary>
 /// <remarks>
 /// The ranges can intersect. Tiles in the intersections will be properly handled when one of the effects is removed.
 /// </remarks>
+/// <seealso cref="GoodConsumingIrrigationTower"/>
+/// <seealso cref="ManufactoryIrrigationTower"/>
 /// <seealso cref="DirectSoilMoistureSystemAccessor"/>
 public sealed class BlockContaminationRangeEffect : BaseComponent, IRangeEffect {
-  #region Unity managed fields
 
+  #region Unity managed fields
+  // ReSharper disable InconsistentNaming
+
+  /// <inheritdoc cref="EffectGroup"/>
   [SerializeField]
-  // ReSharper disable once InconsistentNaming
   string _effectGroupName = "BlockContamination";
 
+  // ReSharper restore InconsistentNaming
   #endregion
 
   #region IRangeEffect implementation
