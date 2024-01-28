@@ -41,6 +41,7 @@
       <Compile Include="IrrigationSystem\GoodConsumingIrrigationTower.cs" />
       <Compile Include="IrrigationSystem\IRangeEffect.cs" />
       <Compile Include="IrrigationSystem\IrrigationTower.cs" />
+      <Compile Include="IrrigationSystem\ManufactoryIrrigationTower.cs" />
       <Compile Include="IrrigationTowerComponent\IrrigationTowerDummy.cs" />
       <Compile Include="Properties\AssemblyInfo.cs" />
       <Compile Include="TimberDev\HarmonyPatcher.cs" />
@@ -93,6 +94,9 @@
         <HintPath>..\Dependencies\Timberborn\Bindito.Unity.dll</HintPath>
       </Reference>
       <Reference Include="System" />
+      <Reference Include="System.Collections.Immutable, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+        <HintPath>..\Dependencies\Timberborn\System.Collections.Immutable.dll</HintPath>
+      </Reference>
       <Reference Include="TimberApi, Version=0.6.2.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\TimberApi.dll</HintPath>
       </Reference>
@@ -107,6 +111,9 @@
       </Reference>
       <Reference Include="Timberborn.Buildings, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.Buildings.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.BuildingsBlocking, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.BuildingsBlocking.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.BuildingsUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.BuildingsUI.dll</HintPath>
@@ -131,6 +138,9 @@
       </Reference>
       <Reference Include="Timberborn.EntitySystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.EntitySystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.Goods, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.Goods.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.GoodsUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.GoodsUI.dll</HintPath>
@@ -158,6 +168,9 @@
       </Reference>
       <Reference Include="Timberborn.TickSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.TickSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.TimeSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.TimeSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.UIFormatters, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.UIFormatters.dll</HintPath>
@@ -189,6 +202,7 @@
     <Reference Include="..\Dependencies\Timberborn\Timberborn.GoodConsumingBuildingSystemUI.dll" Publicize="true" />
     <Reference Include="..\Dependencies\Timberborn\Timberborn.GoodConsumingBuildingSystem.dll" Publicize="true" />
     <Reference Include="..\Dependencies\Timberborn\Timberborn.WaterSystem.dll" Publicize="true" />
+    <Reference Include="..\Dependencies\Timberborn\Timberborn.Workshops.dll" Publicize="true" />
   </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
