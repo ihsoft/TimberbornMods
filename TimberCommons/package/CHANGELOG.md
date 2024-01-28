@@ -1,4 +1,4 @@
-# v1.4 (pre-release)
+# v1.4 (27 Jan 2024)
 * [Fix #28] "Water bump" at the water intake.
 
 # v1.3 (10 Nov 2023)
