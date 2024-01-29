@@ -2,14 +2,13 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Diagnostics.CodeAnalysis;
 using HarmonyLib;
 using Timberborn.GoodConsumingBuildingSystem;
 using Timberborn.GoodConsumingBuildingSystemUI;
 using Timberborn.Localization;
-using UnityEngine;
 using UnityEngine.UIElements;
 
+// ReSharper disable InconsistentNaming
 namespace IgorZ.TimberCommons.IrrigationSystemUI {
 
 /// Harmony patch to show supply in days and hours.
@@ -18,7 +17,6 @@ static class GoodConsumingBuildingFragmentPatch {
   const string SupplyRemainingLocKey = "IgorZ.TimberCommons.WaterTower.SupplyRemaining";
   const float SwitchToDaysThreshold = 24f;
 
-  [SuppressMessage("ReSharper", "InconsistentNaming")]
   // ReSharper disable once UnusedMember.Local
   static void Postfix(ref bool __runOriginal, ILoc ____loc, Label ____hoursLeft,
                       GoodConsumingBuilding ____goodConsumingBuilding) {
