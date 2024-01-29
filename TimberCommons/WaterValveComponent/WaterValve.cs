@@ -61,7 +61,7 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
   #endregion
 
   #region API
-  /// <summary>Absolute height of the water surface above the map at teh valve intake.</summary>
+  /// <summary>Absolute height of the water surface above the map at the valve intake.</summary>
   public float WaterHeightAtInput { get; private set; }
 
   /// <summary>Absolute height of the water surface above the map at the valve outtake.</summary>

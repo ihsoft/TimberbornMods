@@ -88,7 +88,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   /// <summary>The percentile of the tiles that are reachable to the maximum coverage.</summary>
   /// <remarks>
-  /// This value is used to scale teh building consumption. All goods consumption in the buildings should be configured
+  /// This value is used to scale the building consumption. All goods consumption in the buildings should be configured
   /// for the maximum coverage.</remarks>
   /// <seealso cref="ReachableTiles"/>
   /// <seealso cref="MaxCoveredTilesCount"/>

@@ -17,7 +17,7 @@ namespace IgorZ.TimberCommons.IrrigationSystemUI {
 
 /// <summary>Harmony patch to improve consumption rate formatting.</summary>
 /// <remarks>
-/// Instead of doing own logic on the formatting, it let's teh components decide via
+/// Instead of doing own logic on the formatting, it let's the components decide via
 /// <see cref="IConsumptionRateFormatter"/>.
 /// </remarks>
 [HarmonyPatch(typeof(GoodConsumingBuildingDescriber), nameof(GoodConsumingBuildingDescriber.DescribeSupply))]
