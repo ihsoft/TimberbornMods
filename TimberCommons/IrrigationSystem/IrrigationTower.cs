@@ -50,7 +50,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   /// <summary>The optional name to use to group irrigation ranges in preview.</summary>
   [SerializeField]
-  internal string _rangeName = null;
+  internal string _rangeName = "";
 
   // ReSharper restore InconsistentNaming
   // ReSharper restore RedundantDefaultMemberInitializer
@@ -128,7 +128,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   /// <inheritdoc />
   public IEnumerable<string> RangeNames() {
-    yield return _rangeName ?? typeof(IrrigationTower).FullName;
+    yield return _rangeName.Length > 0 ? _rangeName : typeof(IrrigationTower).FullName;
   }
 
   #endregion
