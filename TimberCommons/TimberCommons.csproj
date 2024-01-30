@@ -84,7 +84,6 @@
       <Compile Include="IrrigationSystem\IRangeEffect.cs" />
       <Compile Include="IrrigationSystem\IrrigationTower.cs" />
       <Compile Include="IrrigationSystem\ManufactoryIrrigationTower.cs" />
-      <Compile Include="IrrigationTowerComponent\IrrigationTowerDummy.cs" />
       <Compile Include="Properties\AssemblyInfo.cs" />
       <Compile Include="IrrigationSystemUI\Configurator.cs" />
       <Compile Include="IrrigationSystemUI\GoodConsumingBuildingDescriberPatch.cs" />
