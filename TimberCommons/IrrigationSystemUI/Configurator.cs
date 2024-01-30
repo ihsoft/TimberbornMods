@@ -20,6 +20,7 @@ sealed class Configurator : IConfigurator {
 
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<IrrigationTowerFragment>().AsSingleton();
+    containerDefinition.Bind<GrowthRateModifierFragment>().AsSingleton();
     containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
 
     var patches = new List<Type> { typeof(GoodConsumingBuildingDescriberPatch) };
@@ -36,14 +37,18 @@ sealed class Configurator : IConfigurator {
   /// <summary>UI for the irrigation tower component.</summary>
   sealed class EntityPanelModuleProvider : IProvider<EntityPanelModule> {
     readonly IrrigationTowerFragment _irrigationTowerFragment;
+    readonly GrowthRateModifierFragment _growthRateModifierFragment;
 
-    public EntityPanelModuleProvider(IrrigationTowerFragment irrigationTowerFragment) {
+    public EntityPanelModuleProvider(IrrigationTowerFragment irrigationTowerFragment,
+                                     GrowthRateModifierFragment growthRateModifierFragment) {
       _irrigationTowerFragment = irrigationTowerFragment;
+      _growthRateModifierFragment = growthRateModifierFragment;
     }
 
     public EntityPanelModule Get() {
       var builder = new EntityPanelModule.Builder();
       builder.AddBottomFragment(_irrigationTowerFragment);
+      builder.AddBottomFragment(_growthRateModifierFragment);
       return builder.Build();
     }
   }
