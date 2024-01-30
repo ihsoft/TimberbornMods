@@ -1,4 +1,10 @@
 # v1.5 (started on 1/28/2024):
+* Relase irrigation towers code.
+* Add contamination blocker effect for irrigation towers.
+* Add growth rate modifier effect for irrigation towers.
+* Add a feature control file (TimberDev_Features.txt).
+* Add a feature to show duration as "Xd Yh" (instade of simple "XX hours") in the good consuming buidlings.
+* Add a feature to show duration as "Xd Yh" (instead of rounding to teh closes whoel day) in the growable dialogs.
 
 # v1.4 (27 Jan 2024)
 * [Fix #28] "Water bump" at the water intake.
