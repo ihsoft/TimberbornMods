@@ -6,6 +6,7 @@ using HarmonyLib;
 using Timberborn.GoodConsumingBuildingSystem;
 using Timberborn.GoodConsumingBuildingSystemUI;
 using Timberborn.Localization;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 // ReSharper disable InconsistentNaming
