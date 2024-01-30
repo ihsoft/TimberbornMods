@@ -3,10 +3,10 @@
 // License: Public Domain
 
 using HarmonyLib;
+using IgorZ.TimberCommons.Common;
 using Timberborn.GoodConsumingBuildingSystem;
 using Timberborn.GoodConsumingBuildingSystemUI;
 using Timberborn.Localization;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 // ReSharper disable InconsistentNaming
@@ -16,7 +16,6 @@ namespace IgorZ.TimberCommons.IrrigationSystemUI {
 [HarmonyPatch(typeof(GoodConsumingBuildingFragment), nameof(GoodConsumingBuildingFragment.UpdateProgressBar))]
 static class GoodConsumingBuildingFragmentPatch {
   const string SupplyRemainingLocKey = "IgorZ.TimberCommons.WaterTower.SupplyRemaining";
-  const float SwitchToDaysThreshold = 24f;
 
   // ReSharper disable once UnusedMember.Local
   static void Postfix(ref bool __runOriginal, ILoc ____loc, Label ____hoursLeft,
@@ -24,10 +23,8 @@ static class GoodConsumingBuildingFragmentPatch {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!
     }
-    if (____goodConsumingBuilding.HoursUntilNoSupply > SwitchToDaysThreshold) {
-      var duration = Mathf.RoundToInt(____goodConsumingBuilding.HoursUntilNoSupply);
-      ____hoursLeft.text = ____loc.T(SupplyRemainingLocKey, duration / 24, duration % 24);
-    }
+    var duration = HoursShortFormatter.Format(____loc, ____goodConsumingBuilding.HoursUntilNoSupply);
+    ____hoursLeft.text = ____loc.T(SupplyRemainingLocKey, duration);
   }
 }
 

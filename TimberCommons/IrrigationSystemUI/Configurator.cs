@@ -1,4 +1,11 @@
-﻿using Bindito.Core;
+﻿// Timberborn Mod: Timberborn Commons
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+
+using System;
+using System.Collections.Generic;
+using Bindito.Core;
+using IgorZ.TimberCommons.Common;
 using IgorZ.TimberDev.Utils;
 using TimberApi.ConfiguratorSystem;
 using TimberApi.SceneSystem;
@@ -14,8 +21,12 @@ sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<IrrigationTowerFragment>().AsSingleton();
     containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
-    HarmonyPatcher.PatchRepeated(
-        PatchId, typeof(GoodConsumingBuildingFragmentPatch), typeof(GoodConsumingBuildingDescriberPatch));
+
+    var patches = new List<Type> { typeof(GoodConsumingBuildingDescriberPatch) };
+    if (Features.GoodConsumingBuildingUIDaysHoursForAll) {
+      patches.Add(typeof(GoodConsumingBuildingFragmentPatch));
+    }
+    HarmonyPatcher.PatchRepeated(PatchId, patches.ToArray());
   }
 
   /// <summary>UI for the irrigation tower component.</summary>

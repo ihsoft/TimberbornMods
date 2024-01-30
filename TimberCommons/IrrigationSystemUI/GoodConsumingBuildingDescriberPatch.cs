@@ -2,7 +2,6 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Collections.Generic;
 using HarmonyLib;
 using IgorZ.TimberCommons.Common;
 using Timberborn.EntityPanelSystem;
