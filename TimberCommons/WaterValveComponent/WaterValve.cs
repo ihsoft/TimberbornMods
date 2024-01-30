@@ -25,36 +25,47 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
   // ReSharper disable InconsistentNaming
 
   [SerializeField]
+  [Tooltip("Indicates if the valve UI fragment should be shown in game for this building.")]
   bool _showUIPanel = true;
 
   [SerializeField]
+  [Tooltip("Relative coordinates at which the water will be taken.")]
   Vector2Int _inputCoordinates = new(0, 0);
 
   [SerializeField]
+  [Tooltip("Relative coordinates at which the water will be dropped.")]
   Vector2Int _outputCoordinates = new(0, 2);
 
   [SerializeField]
+  [Tooltip("Maximum water flow in cubic metres per second.")]
   float _waterFlowPerSecond = 1.5f;
 
   [SerializeField]
+  [Tooltip("Indicates if the flow rate can be adjust in game by the player.")]
   bool _canChangeFlowInGame = true;
 
   [SerializeField]
+  [Tooltip("If the flow change is allowed, then this will be the minimum possible value to set.")]
   float _minimumInGameFlow = 0;
 
   [SerializeField]
+  [Tooltip("Don't take water at input below this threshold. Set to -1 to disable this check.")]
   float _minimumWaterLevelAtIntake = 0.2f;
 
   [SerializeField]
+  [Tooltip("Don't drop water at output above this threshold. Set to -1 to disable this check.")]
   float _maximumWaterLevelAtOuttake = 0.6f;
 
   [SerializeField]
+  [Tooltip("Indicates that water level check at the output can be disabled via UI.")]
   bool _allowDisablingOutputLevelCheck = true;
 
   [SerializeField]
+  [Tooltip("Tells if the contamination should also be moved.")]
   bool _moveContaminatedWater = true;
 
   [SerializeField]
+  [Tooltip("If set, then will start on non-zero flow and stop if no water is being moving via the valve.")]
   ParticleSystem _particleSystem = null;
 
   // ReSharper restore InconsistentNaming

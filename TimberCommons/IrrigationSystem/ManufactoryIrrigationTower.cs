@@ -38,6 +38,7 @@ public class ManufactoryIrrigationTower : IrrigationTower {
   /// <remarks>Each row is mappings like: <c>&lt;recipe id>=&lt;effect group></c>. The keys must be unique.</remarks>
   /// <see cref="IRangeEffect.EffectGroup"/>
   [SerializeField]
+  [Tooltip("Format: RecipeId=EffectName. Recipe IDs in the list must be unique.")]
   internal string[] _effects = {};
 
   // ReSharper restore InconsistentNaming

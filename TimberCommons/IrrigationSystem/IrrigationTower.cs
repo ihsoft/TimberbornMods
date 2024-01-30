@@ -41,14 +41,18 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   /// <summary>The maximum distance of irrigation from the building's boundary.</summary>
   [SerializeField]
+  [Tooltip("The max distance from the building boundaries at which the tiles can get water.")]
   internal int _irrigationRange = 10;
 
   /// <summary>The moisture level of the tiles in range.</summary>
   [SerializeField]
+  [Tooltip("Values above 1.0 will extend the effective irrigated range beyond the IrrigationRange setting.")]
   internal float _moistureLevel = 1.0f;
 
   /// <summary>The optional name to use to group irrigation ranges in preview.</summary>
   [SerializeField]
+  [Tooltip("When a building with range is selected, the ranges with the same name will be shown for all other"
+      + " buildings. Leave this field empty to let all towers of any kind to show their ranges at the same time.")]
   internal string _rangeName = "";
 
   // ReSharper restore InconsistentNaming

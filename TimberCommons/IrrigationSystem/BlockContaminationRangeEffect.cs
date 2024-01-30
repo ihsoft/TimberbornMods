@@ -24,6 +24,8 @@ public sealed class BlockContaminationRangeEffect : BaseComponent, IRangeEffect 
 
   /// <inheritdoc cref="EffectGroup"/>
   [SerializeField]
+  [Tooltip(
+      "The name by which this effect can be found by the other components. Multiple effects can have the same name.")]
   string _effectGroupName = "BlockContamination";
 
   // ReSharper restore InconsistentNaming
