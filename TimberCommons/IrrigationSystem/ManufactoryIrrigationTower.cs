@@ -47,7 +47,7 @@ public class ManufactoryIrrigationTower : IrrigationTower {
 
   /// <inheritdoc/>
   public override void Tick() {
-    if (!PausableBuilding.Paused) {
+    if (CanMoisturize()) {
       _manufactory.IncreaseProductionProgress(_dayNightCycle.FixedDeltaTimeInHours);
     }
     base.Tick();
@@ -57,7 +57,7 @@ public class ManufactoryIrrigationTower : IrrigationTower {
 
   /// <inheritdoc/>
   protected override bool CanMoisturize() {
-    return !PausableBuilding.Paused && _manufactory.IsReadyToProduce;
+    return BlockableBuilding.IsUnblocked && _manufactory.IsReadyToProduce;
   }
 
   /// <inheritdoc/>

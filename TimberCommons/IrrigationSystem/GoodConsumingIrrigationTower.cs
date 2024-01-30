@@ -8,7 +8,6 @@ using IgorZ.TimberCommons.Common;
 using Timberborn.Buildings;
 using Timberborn.GoodConsumingBuildingSystem;
 using Timberborn.Localization;
-using UnityEngine;
 
 namespace IgorZ.TimberCommons.IrrigationSystem {
 
@@ -46,7 +45,7 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
 
   /// <inheritdoc/>
   protected override bool CanMoisturize() {
-    return _goodConsumingBuilding.CanUse && !_goodConsumingBuilding.ConsumptionPaused;
+    return BlockableBuilding.IsUnblocked && _goodConsumingBuilding.CanUse && !_goodConsumingBuilding.ConsumptionPaused;
   }
 
   /// <inheritdoc/>

@@ -105,8 +105,8 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <summary>Shortcut to the building's block object.</summary>
   protected BlockObject BlockObject { get; private set; }
 
-  /// <summary>Tower is always a pausable building.</summary>
-  protected PausableBuilding PausableBuilding { get; private set; }
+  /// <summary>Tower is always a blockable building.</summary>
+  protected BlockableBuilding BlockableBuilding { get; private set; }
 
   // ReSharper restore MemberCanBeProtected.Global
   // ReSharper restore MemberCanBePrivate.Global
@@ -119,9 +119,9 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
     if (!BlockObject.Finished) {
       return GetTiles(range: _irrigationRange, skipChecks: false).Select(v => new Vector3Int(v.x, v.y, _baseZ));
     }
-    return PausableBuilding.Paused
-        ? EligibleTiles.Select(v => new Vector3Int(v.x, v.y, _baseZ))
-        : ReachableTiles.Select(v => new Vector3Int(v.x, v.y, _baseZ));
+    return BlockableBuilding.IsUnblocked
+        ? ReachableTiles.Select(v => new Vector3Int(v.x, v.y, _baseZ))
+        : EligibleTiles.Select(v => new Vector3Int(v.x, v.y, _baseZ));
   }
 
   /// <inheritdoc />
@@ -141,7 +141,8 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <inheritdoc/>
   public virtual void OnEnterFinishedState() {
     _terrainService.TerrainHeightChanged += OnTerrainHeightChanged;
-    PausableBuilding.PausedChanged += OnPauseChanged;
+    BlockableBuilding.BuildingBlocked += OnBlockedStateChanged;
+    BlockableBuilding.BuildingUnblocked += OnBlockedStateChanged;
     _eventBus.Register(this);
   }
 
@@ -149,7 +150,8 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   public virtual void OnExitFinishedState() {
     StopMoisturizing();
     _terrainService.TerrainHeightChanged -= OnTerrainHeightChanged;
-    PausableBuilding.PausedChanged -= OnPauseChanged;
+    BlockableBuilding.BuildingBlocked -= OnBlockedStateChanged;
+    BlockableBuilding.BuildingUnblocked -= OnBlockedStateChanged;
     _eventBus.Unregister(this);
   }
 
@@ -275,7 +277,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <summary>Awake is called when the script instance is being loaded.</summary>
   protected virtual void Awake() {
     BlockObject = GetComponentFast<BlockObject>();
-    PausableBuilding = GetComponentFast<PausableBuilding>();
+    BlockableBuilding = GetComponentFast<BlockableBuilding>();
   }
 
   /// <summary>Updates the eligible tiles and moisture system.</summary>
@@ -442,8 +444,8 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   #region Component callbacks
 
-  /// <summary>Updates range selection since paused towers can show different tiles.</summary>
-  void OnPauseChanged(object sender, EventArgs e) {
+  /// <summary>Updates range selection since blocked towers can show different tiles.</summary>
+  void OnBlockedStateChanged(object sender, EventArgs e) {
     GetComponentFast<BuildingWithRangeUpdater>().OnPostTransformChanged();
   }
 
