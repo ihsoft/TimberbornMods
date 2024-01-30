@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Bindito.Core;
 using IgorZ.TimberCommons.WaterService;
@@ -77,11 +78,11 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <summary>The tiles that can get water.</summary>
   /// <remarks>These tiles are in the effective range and can be reached from the tower.</remarks>
   /// <see cref="EffectiveRange"/>
-  public HashSet<Vector2Int> ReachableTiles { get; private set; } = new();
+  public ImmutableHashSet<Vector2Int> ReachableTiles { get; private set; } = ImmutableHashSet.Create<Vector2Int>();
 
   /// <summary>The tiles that can be irrigated at the 100% efficiency.</summary>
   /// <see cref="IrrigationRange"/>
-  public HashSet<Vector2Int> EligibleTiles { get; private set; } = new();
+  public ImmutableHashSet<Vector2Int> EligibleTiles { get; private set; } = ImmutableHashSet.Create<Vector2Int>();
 
   /// <summary>
   /// The maximum number of tiles which this component could irrigate on a flat surface if there were no irrigation
@@ -299,8 +300,8 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
       var newIrrigatedTiles = GetTiles(range: EffectiveRange, skipChecks: false);
       if (!newIrrigatedTiles.SetEquals(ReachableTiles) || !newEligibleTiles.SetEquals(EligibleTiles)) {
         StopMoisturizing();
-        EligibleTiles = newEligibleTiles;
-        ReachableTiles = newIrrigatedTiles;
+        EligibleTiles = newEligibleTiles.ToImmutableHashSet();
+        ReachableTiles = newIrrigatedTiles.ToImmutableHashSet();
         Coverage = (float)newIrrigatedTiles.Count / MaxCoveredTilesCount;
         HostedDebugLog.Fine(this, "Covered tiles updated: eligible={0}, irrigated={1}, utilization={2}, efficiency={3}",
                             EligibleTiles.Count, ReachableTiles.Count, Coverage, _currentEfficiency);
