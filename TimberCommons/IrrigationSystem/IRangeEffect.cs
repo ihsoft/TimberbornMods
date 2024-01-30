@@ -22,7 +22,7 @@ public interface IRangeEffect {
 
   /// <summary>Applies affect to the specified tiles.</summary>
   /// <param name="tiles">The tiles to apply effect to.</param>
-  public void ApplyEffect(IEnumerable<Vector2Int> tiles);
+  public void ApplyEffect(HashSet<Vector2Int> tiles);
 
   /// <summary>Resets all effects that were applied in the last call to <see cref="ApplyEffect"/></summary>
   public void ResetEffect();

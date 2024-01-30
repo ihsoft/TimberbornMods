@@ -61,7 +61,7 @@ public class ManufactoryIrrigationTower : IrrigationTower {
   }
 
   /// <inheritdoc/>
-  protected override void IrrigationStarted(IEnumerable<Vector2Int> tiles) {
+  protected override void IrrigationStarted() {
     StartEffectsForCurrentRecipe();
   }
 

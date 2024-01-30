@@ -183,10 +183,9 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <summary>Indicates if the tower has everything to moisturizing the tiles.</summary>
   protected abstract bool CanMoisturize();
 
-  /// <summary>Notifies that the irrigation started on the provided tiles.</summary>
-  /// <param name="tiles">All the affected tiles.</param>
+  /// <summary>Notifies that the irrigation started.</summary>
   /// <seealso cref="ReachableTiles"/>
-  protected abstract void IrrigationStarted(IEnumerable<Vector2Int> tiles);
+  protected abstract void IrrigationStarted();
 
   /// <summary>Notifies that the irrigation process has stopped.</summary>
   protected abstract void IrrigationStopped();
@@ -320,9 +319,8 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
     if (_moistureOverrideIndex != -1) {
       return;
     }
-    var irrigatedTiles = GetTiles(range: EffectiveRange, skipChecks: false);
-    _moistureOverrideIndex = _directSoilMoistureSystemAccessor.AddMoistureOverride(irrigatedTiles, _moistureLevel);
-    IrrigationStarted(irrigatedTiles);
+    _moistureOverrideIndex = _directSoilMoistureSystemAccessor.AddMoistureOverride(ReachableTiles, _moistureLevel);
+    IrrigationStarted();
   }
 
   /// <summary>Stops any logic on the irrigated tiles.</summary>

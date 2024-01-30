@@ -50,8 +50,8 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
   }
 
   /// <inheritdoc/>
-  protected override void IrrigationStarted(IEnumerable<Vector2Int> tiles) {
-    _rangeEffects.ForEach(x => x.ApplyEffect(tiles));
+  protected override void IrrigationStarted() {
+    _rangeEffects.ForEach(x => x.ApplyEffect(ReachableTiles));
   }
 
   /// <inheritdoc/>
