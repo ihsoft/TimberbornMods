@@ -73,6 +73,8 @@
       <Compile Include="Common\Features.cs" />
       <Compile Include="Common\HoursShortFormatter.cs" />
       <Compile Include="Common\IConsumptionRateFormatter.cs" />
+      <Compile Include="IrrigationSystemUI\GrowableFragmentPatch.cs" />
+      <Compile Include="IrrigationSystemUI\GrowableToolPanelItemFactoryPatch.cs" />
       <Compile Include="IrrigationSystem\BlockContaminationRangeEffect.cs" />
       <Compile Include="IrrigationSystem\ModifyGrowableGrowthRangeEffect.cs" />
       <Compile Include="IrrigationSystem\Configurator.cs" />

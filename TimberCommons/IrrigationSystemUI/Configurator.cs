@@ -26,6 +26,10 @@ sealed class Configurator : IConfigurator {
     if (Features.GoodConsumingBuildingUIDaysHoursForAll) {
       patches.Add(typeof(GoodConsumingBuildingFragmentPatch));
     }
+    if (Features.GrowableGrowthTimeUIDaysHoursViewForAll) {
+      patches.Add(typeof(GrowableToolPanelItemFactoryPatch));
+      patches.Add(typeof(GrowableFragmentPatch));
+    }
     HarmonyPatcher.PatchRepeated(PatchId, patches.ToArray());
   }
 

@@ -7,3 +7,7 @@
 # Indicates that duration in the "supply lasts for" message on GoodConsumingBuilding UI should be
 # formatted as "Xd Yh" instead of "XX hours".
 GoodConsumingBuildingUI.DaysHoursViewForAllBuildings
+
+# Indicates that durations for the growth time for all growables should be formatted as "Xd Yh" instead of rounding
+# to days.
+GrowableGrowthTimeUI.DaysHoursViewForAllGrowables

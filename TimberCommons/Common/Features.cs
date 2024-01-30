@@ -19,6 +19,13 @@ static class Features {
   /// <seealso cref="HoursShortFormatter"/>
   public static bool GoodConsumingBuildingUIDaysHoursForAll;
 
+  /// <summary>
+  /// Indicates that durations for the growth time for all growables should be formatted as "Xd Yh" instead of rounding
+  /// to days.
+  /// </summary>
+  /// <seealso cref="HoursShortFormatter"/>
+  public static bool GrowableGrowthTimeUIDaysHoursViewForAll;
+
   static Features() {
     FeatureController.ReadFeatures(Consume);
   }
@@ -30,6 +37,9 @@ static class Features {
         return true;
       case "GoodConsumingBuildingUI.DaysHoursViewForAllBuildings":
         GoodConsumingBuildingUIDaysHoursForAll = isEnabled;
+        return true;
+      case "GrowableGrowthTimeUI.DaysHoursViewForAllGrowables":
+        GrowableGrowthTimeUIDaysHoursViewForAll = isEnabled;
         return true;
       default:
         return false;
