@@ -68,7 +68,10 @@
       </Compile>
       <Compile Include="Common\IConsumptionRateFormatter.cs" />
       <Compile Include="IrrigationSystem\BlockContaminationRangeEffect.cs" />
+      <Compile Include="IrrigationSystem\ModifyGrowableGrowthRangeEffect.cs" />
+      <Compile Include="IrrigationSystem\Configurator.cs" />
       <Compile Include="IrrigationSystem\GoodConsumingIrrigationTower.cs" />
+      <Compile Include="IrrigationSystem\GrowthRateModifier.cs" />
       <Compile Include="IrrigationSystem\IRangeEffect.cs" />
       <Compile Include="IrrigationSystem\IrrigationTower.cs" />
       <Compile Include="IrrigationSystem\ManufactoryIrrigationTower.cs" />
@@ -189,6 +192,9 @@
       <Reference Include="Timberborn.SingletonSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.SingletonSystem.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.TemplateSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.TemplateSystem.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.TerrainSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.TerrainSystem.dll</HintPath>
       </Reference>
@@ -229,6 +235,8 @@
     <Reference Include="..\Dependencies\Timberborn\Timberborn.GoodConsumingBuildingSystem.dll" Publicize="true" />
     <Reference Include="..\Dependencies\Timberborn\Timberborn.WaterSystem.dll" Publicize="true" />
     <Reference Include="..\Dependencies\Timberborn\Timberborn.Workshops.dll" Publicize="true" />
+    <Reference Include="..\Dependencies\Timberborn\Timberborn.Growing.dll" Publicize="true" />
+    <Reference Include="..\Dependencies\Timberborn\Timberborn.GrowingUI.dll" Publicize="true" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\TimberDev\README.md">
