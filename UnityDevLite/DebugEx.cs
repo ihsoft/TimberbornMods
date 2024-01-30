@@ -115,7 +115,7 @@ static class DebugEx {
   public static class LoggingSettings {
     const string LogLevelVerbosityFile = "UnityDev_verboselogging";
 
-    public static int VerbosityLevel { get; private set; }
+    public static int VerbosityLevel;
 
     static LoggingSettings() {
       var assembly = typeof(DebugEx).Assembly;
