@@ -39,6 +39,9 @@
       <Compile Include="..\TimberDev\CustomizableInstantiator.cs">
         <Link>TimberDev\CustomizableInstantiator.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\FeatureController.cs">
+        <Link>TimberDev\FeatureController.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\HarmonyPatcher.cs">
         <Link>TimberDev\HarmonyPatcher.cs</Link>
       </Compile>
@@ -66,6 +69,8 @@
       <Compile Include="..\UnityDevLite\TypeUtils.cs">
         <Link>UnityDevLite\TypeUtils.cs</Link>
       </Compile>
+      <Compile Include="Common\Configurator.cs" />
+      <Compile Include="Common\Features.cs" />
       <Compile Include="Common\HoursShortFormatter.cs" />
       <Compile Include="Common\IConsumptionRateFormatter.cs" />
       <Compile Include="IrrigationSystem\BlockContaminationRangeEffect.cs" />
