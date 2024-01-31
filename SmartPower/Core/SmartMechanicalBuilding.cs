@@ -29,6 +29,10 @@ public class SmartMechanicalBuilding : MechanicalBuilding {
   // ReSharper disable once MemberCanBePrivate.Global
   public bool NeedsSmartLogic => _mechanicalNode.IsConsumer && !_mechanicalNode.IsGenerator;
 
+  // ReSharper disable once MemberCanBePrivate.Global
+  /// <summary>Indicates that teh building has a working place that should have workers.</summary>
+  public bool HasWorkingPlaces { get; private set; }
+
   /// <summary>
   /// Indicates that the building is expected to be staffed and working, but no workers are currently at the working
   /// place(s).
@@ -107,6 +111,7 @@ public class SmartMechanicalBuilding : MechanicalBuilding {
     _standbyStatus = StatusToggle.CreateNormalStatus(StandbyStatusIcon, _loc.T(PowerSavingModeLocKey));
     var subject = GetComponentFast<StatusSubject>();
     subject.RegisterStatus(_standbyStatus);
+    HasWorkingPlaces = GetComponentFast<Workshop>() != null;
   }
 
   /// <summary>It must be public for the injection logic to work.</summary>
@@ -122,7 +127,7 @@ public class SmartMechanicalBuilding : MechanicalBuilding {
       return;
     }
     var hasRecipe = _manufactory.HasCurrentRecipe;
-    AllWorkersOut = hasRecipe && _enterable != null && _enterable.NumberOfEnterersInside == 0;
+    AllWorkersOut = HasWorkingPlaces && hasRecipe && _enterable != null && _enterable.NumberOfEnterersInside == 0;
     MissingIngredients = hasRecipe && !_manufactory.HasAllIngredients;
     BlockedOutput = hasRecipe && !_manufactory.Inventory.HasUnreservedCapacity(_manufactory.CurrentRecipe.Products);
     NoFuel = hasRecipe && !_manufactory.HasFuel;
