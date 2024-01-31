@@ -2,27 +2,24 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Reflection;
 using HarmonyLib;
 using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
+using Timberborn.MechanicalSystemUI;
 using UnityEngine.UIElements;
 
+// ReSharper disable InconsistentNaming
 // ReSharper disable once CheckNamespace
 namespace IgorZ.SmartPower.UI {
 
-/// <summary>Adds smart mechanical building status to teh stock consumer building UI fragment.</summary>
-[HarmonyPatch]
+/// <summary>Adds smart mechanical building status to the stock consumer building UI fragment.</summary>
+[HarmonyPatch(typeof(ConsumerFragmentService), nameof(ConsumerFragmentService.Update))]
 static class ConsumerFragmentServicePatch {
-  const string NetworkFragmentServiceClassName = "Timberborn.MechanicalSystemUI.ConsumerFragmentService";
-  const string MethodName = "Update";
-
-  static MethodBase TargetMethod() {
-    var type = AccessTools.TypeByName(NetworkFragmentServiceClassName);
-    return AccessTools.FirstMethod(type, method => method.Name == MethodName);
-  }
-
-  static void Postfix(MechanicalNode mechanicalNode, Label ____label, ILoc ____loc) {
+  // ReSharper disable once UnusedMember.Local
+  static void Postfix(ref bool __runOriginal, MechanicalNode mechanicalNode, Label ____label, ILoc ____loc) {
+    if (!__runOriginal) {
+      return;  // The other patches must follow the same style to properly support the skip logic!
+    }
     if (____label.style.display == DisplayStyle.None) {
       return;
     }
