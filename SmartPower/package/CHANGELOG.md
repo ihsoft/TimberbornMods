@@ -1,4 +1,5 @@
 # v1.7 (started on 1/30/2024)
+* [Fix #27] Smart Power does not work for buildings with supply.
 
 # v1.6 (8 Dec 2023)
 * [Fix #20] Fix crashes on game load in Timberborn 0.5.4.2.
