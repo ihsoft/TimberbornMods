@@ -34,23 +34,46 @@
         <DocumentationFile>bin\Release\SmartPower.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
+      <Compile Include="..\TimberDev\CustomizableInstantiator.cs">
+        <Link>TimberDev\CustomizableInstantiator.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\HarmonyPatcher.cs">
+        <Link>TimberDev\HarmonyPatcher.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\PrefabPatcher.cs">
+        <Link>TimberDev\PrefabPatcher.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\ThreadedLogsRecorder.cs">
+        <Link>TimberDev\ThreadedLogsRecorder.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UiFactory.cs">
+        <Link>TimberDev\UiFactory.cs</Link>
+      </Compile>
+      <Compile Include="..\UnityDevLite\DebugEx.cs">
+        <Link>UnityDevLite\DebugEx.cs</Link>
+      </Compile>
+      <Compile Include="..\UnityDevLite\HostedDebugLog.cs">
+        <Link>UnityDevLite\HostedDebugLog.cs</Link>
+      </Compile>
+      <Compile Include="..\UnityDevLite\ReflectedAction.cs">
+        <Link>UnityDevLite\ReflectedAction.cs</Link>
+      </Compile>
+      <Compile Include="..\UnityDevLite\ReflectedField.cs">
+        <Link>UnityDevLite\ReflectedField.cs</Link>
+      </Compile>
+      <Compile Include="..\UnityDevLite\TypeUtils.cs">
+        <Link>UnityDevLite\TypeUtils.cs</Link>
+      </Compile>
       <Compile Include="Core\Configurator.cs" />
       <Compile Include="Core\SmartGoodPoweredGenerator.cs" />
       <Compile Include="Core\SmartMechanicalBuilding.cs" />
       <Compile Include="Core\SmartPoweredAttraction.cs" />
       <Compile Include="Properties\AssemblyInfo.cs" />
-      <Compile Include="TimberDev\CustomizableInstantiator.cs" />
-      <Compile Include="TimberDev\HarmonyPatcher.cs" />
-      <Compile Include="TimberDev\PrefabPatcher.cs" />
-      <Compile Include="TimberDev\UiFactory.cs" />
       <Compile Include="UI\Configurator.cs" />
       <Compile Include="UI\ConsumerFragmentServicePatch.cs" />
       <Compile Include="UI\NetworkFragmentServicePatch.cs" />
       <Compile Include="UI\SmartGoodPoweredGeneratorFragment.cs" />
       <Compile Include="UI\StateTextFormatter.cs" />
-      <Compile Include="UnityDevLite\DebugEx.cs" />
-      <Compile Include="UnityDevLite\HostedDebugLog.cs" />
-      <Compile Include="UnityDevLite\ReflectedAction.cs" />
     </ItemGroup>
     <ItemGroup>
       <Reference Include="0Harmony, Version=2.9.0.0, Culture=neutral, PublicKeyToken=null">
@@ -113,6 +136,9 @@
       </Reference>
       <Reference Include="Timberborn.PrefabSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.PrefabSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.SingletonSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.SingletonSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.StatusSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.StatusSystem.dll</HintPath>
