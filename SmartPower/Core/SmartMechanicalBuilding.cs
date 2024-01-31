@@ -22,18 +22,11 @@ namespace IgorZ.SmartPower {
 /// consumes only a fraction of the nominal power.
 /// </remarks>
 public class SmartMechanicalBuilding : MechanicalBuilding {
-  const string StandbyStatusIcon = "igorz.smartpower/ui_icons/status-icon-standby";
-  const float NonFuelRecipeIdleStateConsumption = 0.1f;
-  const string PowerSavingModeLocKey = "IgorZ.SmartPower.MechanicalBuilding.PowerSavingModeStatus";
-
-  Manufactory _manufactory;
-  Enterable _enterable;
-  ILoc _loc;
-  StatusToggle _standbyStatus;
 
   #region API
 
   /// <summary>Indicates that this building logic must is handled by the smart behavior.</summary>
+  // ReSharper disable once MemberCanBePrivate.Global
   public bool NeedsSmartLogic => _mechanicalNode.IsConsumer && !_mechanicalNode.IsGenerator;
 
   /// <summary>
@@ -73,17 +66,7 @@ public class SmartMechanicalBuilding : MechanicalBuilding {
 
   #endregion
 
-  #region MechanicalBuilding overrides
-
-  /// <inheritdoc cref="MechanicalBuilding.Awake" />
-  public new void Awake() {
-    base.Awake();
-    _manufactory = GetComponentFast<Manufactory>();
-    _enterable = GetComponentFast<Enterable>();
-    _standbyStatus = StatusToggle.CreateNormalStatus(StandbyStatusIcon, _loc.T(PowerSavingModeLocKey));
-    var subject = GetComponentFast<StatusSubject>();
-    subject.RegisterStatus(_standbyStatus);
-  }
+  #region TickableComponent overrides
 
   /// <inheritdoc/>
   public override void StartTickable() {
@@ -106,6 +89,25 @@ public class SmartMechanicalBuilding : MechanicalBuilding {
   #endregion
 
   #region Implementation
+
+  const string StandbyStatusIcon = "igorz.smartpower/ui_icons/status-icon-standby";
+  const float NonFuelRecipeIdleStateConsumption = 0.1f;
+  const string PowerSavingModeLocKey = "IgorZ.SmartPower.MechanicalBuilding.PowerSavingModeStatus";
+
+  Manufactory _manufactory;
+  Enterable _enterable;
+  ILoc _loc;
+  StatusToggle _standbyStatus;
+
+  /// <inheritdoc cref="MechanicalBuilding.Awake" />
+  public new void Awake() {
+    base.Awake();
+    _manufactory = GetComponentFast<Manufactory>();
+    _enterable = GetComponentFast<Enterable>();
+    _standbyStatus = StatusToggle.CreateNormalStatus(StandbyStatusIcon, _loc.T(PowerSavingModeLocKey));
+    var subject = GetComponentFast<StatusSubject>();
+    subject.RegisterStatus(_standbyStatus);
+  }
 
   /// <summary>It must be public for the injection logic to work.</summary>
   [Inject]
