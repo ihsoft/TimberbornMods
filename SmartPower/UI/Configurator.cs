@@ -2,6 +2,9 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
+using System.Collections.Generic;
+using System.IO;
 using Bindito.Core;
 using IgorZ.TimberDev.Utils;
 using TimberApi.ConfiguratorSystem;
@@ -17,10 +20,11 @@ sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).FullName;
 
   public void Configure(IContainerDefinition containerDefinition) {
-    HarmonyPatcher.PatchRepeated(
-        PatchId,
-        typeof(NetworkFragmentServicePatch),
-        typeof(ConsumerFragmentServicePatch));
+    var patches = new List<Type> { typeof(ConsumerFragmentServicePatch) };
+    if (Features.NetworkShowBatteryStats) {
+      patches.Add(typeof(NetworkFragmentServicePatch));
+    }
+    HarmonyPatcher.PatchRepeated(PatchId, patches.ToArray());
     containerDefinition.Bind<SmartGoodPoweredGeneratorFragment>().AsSingleton();
     containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
   }
