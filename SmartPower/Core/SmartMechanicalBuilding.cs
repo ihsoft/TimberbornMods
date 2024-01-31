@@ -9,7 +9,6 @@ using Timberborn.MechanicalSystem;
 using Timberborn.StatusSystem;
 using Timberborn.Workshops;
 using UnityDev.Utils.LogUtilsLite;
-using UnityDev.Utils.Reflections;
 
 // ReSharper disable once CheckNamespace
 namespace IgorZ.SmartPower {
@@ -23,20 +22,20 @@ namespace IgorZ.SmartPower {
 /// consumes only a fraction of the nominal power.
 /// </remarks>
 public class SmartMechanicalBuilding : MechanicalBuilding {
-  static readonly ReflectedAction<MechanicalBuilding> UpdateActiveAndPoweredMethod = new(
-      "UpdateActiveAndPowered", throwOnFailure: true);
-
   const string StandbyStatusIcon = "igorz.smartpower/ui_icons/status-icon-standby";
   const float NonFuelRecipeIdleStateConsumption = 0.1f;
   const string PowerSavingModeLocKey = "IgorZ.SmartPower.MechanicalBuilding.PowerSavingModeStatus";
 
-  MechanicalNode _mechanicalNode;
   Manufactory _manufactory;
   Enterable _enterable;
   ILoc _loc;
   StatusToggle _standbyStatus;
 
   #region API
+
+  /// <summary>Indicates that this building logic must is handled by the smart behavior.</summary>
+  public bool NeedsSmartLogic => _mechanicalNode.IsConsumer && !_mechanicalNode.IsGenerator;
+
   /// <summary>
   /// Indicates that the building is expected to be staffed and working, but no workers are currently at the working
   /// place(s).
@@ -71,40 +70,50 @@ public class SmartMechanicalBuilding : MechanicalBuilding {
     }
   }
   bool _idleState;
+
   #endregion
 
   #region MechanicalBuilding overrides
-  /// <inheritdoc/>
-  public override void StartTickable() {
-    base.StartTickable();
-    _mechanicalNode = GetComponentFast<MechanicalNode>();
+
+  /// <inheritdoc cref="MechanicalBuilding.Awake" />
+  public new void Awake() {
+    base.Awake();
     _manufactory = GetComponentFast<Manufactory>();
     _enterable = GetComponentFast<Enterable>();
     _standbyStatus = StatusToggle.CreateNormalStatus(StandbyStatusIcon, _loc.T(PowerSavingModeLocKey));
     var subject = GetComponentFast<StatusSubject>();
     subject.RegisterStatus(_standbyStatus);
-    UpdateNodeCharacteristics();
+  }
+
+  /// <inheritdoc/>
+  public override void StartTickable() {
+    base.StartTickable();
+    if (NeedsSmartLogic) {
+      SmartUpdateNodeCharacteristics();
+    }
   }
 
   /// <inheritdoc/>
   public override void Tick() {
-    if (!_mechanicalNode.IsConsumer || _mechanicalNode.IsGenerator) {
+    if (!NeedsSmartLogic) {
       base.Tick();
       return;
     }
-    UpdateNodeCharacteristics();
-    UpdateActiveAndPoweredMethod.Invoke(this);
+    SmartUpdateNodeCharacteristics();
+    UpdateActiveAndPowered();
   }
+
   #endregion
 
   #region Implementation
-  #pragma warning disable CS1591
+
+  /// <summary>It must be public for the injection logic to work.</summary>
   [Inject]
   public void InjectDependencies(ILoc loc) {
     _loc = loc;
   }
 
-  void UpdateNodeCharacteristics() {
+  void SmartUpdateNodeCharacteristics() {
     if (ConsumptionDisabled) {
       _mechanicalNode.UpdateInput(0);
       AllWorkersOut = MissingIngredients = BlockedOutput = NoFuel = StandbyMode = false;
@@ -118,6 +127,7 @@ public class SmartMechanicalBuilding : MechanicalBuilding {
     StandbyMode = AllWorkersOut || MissingIngredients || NoFuel || BlockedOutput;
     _mechanicalNode.UpdateInput(StandbyMode ? NonFuelRecipeIdleStateConsumption : 1.0f);
   }
+
   #endregion
 }
 
