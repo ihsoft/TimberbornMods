@@ -1,3 +1,5 @@
+# v1.7 (started on 1/30/2024)
+
 # v1.6 (8 Dec 2023)
 * [Fix #20] Fix crashes on game load in Timberborn 0.5.4.2.
 
