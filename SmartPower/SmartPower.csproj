@@ -38,6 +38,9 @@
       <Compile Include="..\TimberDev\CustomizableInstantiator.cs">
         <Link>TimberDev\CustomizableInstantiator.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\FeatureController.cs">
+        <Link>TimberDev\FeatureController.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\HarmonyPatcher.cs">
         <Link>TimberDev\HarmonyPatcher.cs</Link>
       </Compile>
@@ -66,6 +69,7 @@
         <Link>UnityDevLite\TypeUtils.cs</Link>
       </Compile>
       <Compile Include="Core\Configurator.cs" />
+      <Compile Include="Core\Features.cs" />
       <Compile Include="Core\SmartGoodPoweredGenerator.cs" />
       <Compile Include="Core\SmartMechanicalBuilding.cs" />
       <Compile Include="Core\SmartPoweredAttraction.cs" />

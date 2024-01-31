@@ -12,13 +12,14 @@ using Timberborn.MechanicalSystem;
 using Timberborn.PowerGenerating;
 using IgorZ.TimberDev.Utils;
 using Timberborn.Workshops;
+using UnityDev.Utils.LogUtilsLite;
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Local
 // ReSharper disable once CheckNamespace
 namespace IgorZ.SmartPower {
 
-[Configurator(SceneEntrypoint.InGame)]
+[Configurator(SceneEntrypoint.All)]
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
   static readonly PrefabPatcher.RequiredComponentsDep SmartAttractionDeps =
@@ -28,6 +29,9 @@ sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).FullName;
 
   public void Configure(IContainerDefinition containerDefinition) {
+    if (Features.DebugExVerboseLogging && DebugEx.LoggingSettings.VerbosityLevel < 5) {
+      DebugEx.LoggingSettings.VerbosityLevel = 5;
+    }
     CustomizableInstantiator.AddPatcher(
         PatchId,
         prefab => {
