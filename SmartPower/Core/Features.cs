@@ -21,17 +21,12 @@ static class Features {
     FeatureController.ReadFeatures(Consume);
   }
 
-  static bool Consume(string featureName, bool isEnabled) {
-    switch (featureName) {
-      case "DebugEx.VerboseLogging":
-        DebugExVerboseLogging = isEnabled;
-        return true;
-      case "Network.ShowBatteryVitals":
-        NetworkShowBatteryStats = isEnabled;
-        return true;
-      default:
-        return false;
-    }
+  static bool Consume(string name, bool enabled, string value) {
+    return name switch {
+        "DebugEx.VerboseLogging" => FeatureController.SetFlag(ref DebugExVerboseLogging, name, enabled, value),
+        "Network.ShowBatteryVitals" => FeatureController.SetFlag(ref NetworkShowBatteryStats, name, enabled, value),
+        _ => false
+    };
   }
 }
 
