@@ -5,6 +5,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading;
 using Bindito.Core;
 using HarmonyLib;
 using IgorZ.TimberDev.Utils;
@@ -18,7 +19,6 @@ using Timberborn.SingletonSystem;
 using Timberborn.SoilBarrierSystem;
 using Timberborn.SoilMoistureSystem;
 using Timberborn.TerrainSystem;
-using Timberborn.TickSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
@@ -28,7 +28,7 @@ namespace IgorZ.TimberCommons.WaterService {
 /// <remarks>
 /// This code uses HarmonyX patches to access internal game's logic. Significant changes to it may break the mod.
 /// </remarks>
-public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickableSingleton {
+public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton {
   #region API
   /// <summary>Creates moisture level overrides for a set of tiles.</summary>
   /// <remarks>
@@ -40,10 +40,13 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   /// <seealso cref="RemoveMoistureOverride"/>
   public int AddMoistureOverride(IEnumerable<Vector2Int> tiles, float moisture) {
     var index = _nextMoistureOverrideId++;
-    _moistureOverrides.Add(
-        index,
-        tiles.Distinct().Select(c => _mapIndexService.CoordinatesToIndex(c)).ToDictionary(k => k, _ => moisture));
-    _needMoistureOverridesUpdate = true;
+    var tilesDict = tiles.Select(c => _mapIndexService.CoordinatesToIndex(c))
+        .ToDictionary(k => k, _ => moisture);
+    _moistureOverrides.Add(index,tilesDict);
+    var oldCacheSize = SoilMoistureSimulatorPatch.MoistureOverrides?.Count;
+    UpdateMoistureMap();
+    DebugEx.Fine("Added moisture override: id={0}, tiles={1}. Cache size: {2} => {3}",
+                 index, tilesDict.Count, oldCacheSize, SoilMoistureSimulatorPatch.MoistureOverrides?.Count);
     return index;
   }
 
@@ -51,7 +54,14 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   /// <param name="overrideId">The ID of the override to remove.</param>
   /// <seealso cref="AddMoistureOverride"/>
   public void RemoveMoistureOverride(int overrideId) {
-    _needMoistureOverridesUpdate = _moistureOverrides.Remove(overrideId);
+    if (!_moistureOverrides.TryGetValue(overrideId, out var tilesDict)) {
+      return;
+    }
+    _moistureOverrides.Remove(overrideId);
+    var oldCacheSize = SoilMoistureSimulatorPatch.MoistureOverrides?.Count;
+    UpdateMoistureMap();
+    DebugEx.Fine("Removed moisture override: id={0}, tiles={1}. Cache size: {2} => {3}",
+                 overrideId, tilesDict.Count, oldCacheSize, SoilMoistureSimulatorPatch.MoistureOverrides?.Count);
   }
 
   /// <summary>Sets contamination blockers for a set of tiles.</summary>
@@ -94,7 +104,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
       }
       _soilBarrierMap.RemoveContaminationBarrierAt(barrier);
     }
-    DebugEx.Fine("Removed contamination override: id={0}, tiles={1}. Cache size: {1} => {2}",
+    DebugEx.Fine("Removed contamination override: id={0}, tiles={1}. Cache size: {2} => {3}",
                  overrideId, barriers.Count, oldTilesCache.Count, _contaminatedTilesCache.Count);
   }
   #endregion
@@ -109,31 +119,9 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   }
   #endregion
 
-  #region ITickableSingleton implementation
-  /// <summary>Updates the moisture cache and creates a thread safe copy.</summary>
-  public void Tick() {
-    if (!_needMoistureOverridesUpdate) {
-      return;
-    }
-    _needMoistureOverridesUpdate = false;
-    var overridesCache = new Dictionary<int, float>();
-    foreach (var value in _moistureOverrides.Values.SelectMany(item => item)) {
-      if (overridesCache.TryGetValue(value.Key, out var existingValue)) {
-        overridesCache[value.Key] = Mathf.Max(value.Value, existingValue);
-      } else {
-        overridesCache.Add(value.Key, value.Value);
-      }
-    }
-    DebugEx.Fine("Updating the list of moisture overrides: old={0}, new={1}",
-                 SoilMoistureSimulatorPatch.MoistureOverrides?.Count, overridesCache.Count);
-    SoilMoistureSimulatorPatch.MoistureOverrides = overridesCache;
-  }
-  #endregion
-
   #region Implementation
   readonly Dictionary<int, Dictionary<int, float>> _moistureOverrides = new();
   int _nextMoistureOverrideId = 1;
-  bool _needMoistureOverridesUpdate;
 
   readonly Dictionary<int, HashSet<Vector2Int>> _contaminationOverrides = new();
   HashSet<Vector2Int> _contaminatedTilesCache = new();
@@ -154,6 +142,21 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
     _blockService = blockService;
     _terrainService = terrainService;
     _eventBus = eventBus;
+  }
+
+
+  /// <summary>Recalculates moisture override cache.</summary>
+  void UpdateMoistureMap() {
+    var overridesCache = new Dictionary<int, float>();
+    foreach (var value in _moistureOverrides.Values.SelectMany(item => item)) {
+      if (overridesCache.TryGetValue(value.Key, out var existingValue)) {
+        overridesCache[value.Key] = Mathf.Max(value.Value, existingValue);
+      } else {
+        overridesCache.Add(value.Key, value.Value);
+      }
+    }
+    // Must be thread-safe.
+    Interlocked.Exchange(ref SoilMoistureSimulatorPatch.MoistureOverrides, overridesCache);
   }
 
   /// <summary>Reacts on contamination blockers removal.</summary>
@@ -181,6 +184,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   #region Harmony patch to override mosture levels.
   [HarmonyPatch(typeof(SoilMoistureSimulator), nameof(SoilMoistureSimulator.GetUpdatedMoisture))]
   static class SoilMoistureSimulatorPatch {
+    // It will be accessed from the threads, so don't modify the dict once assigned.
     public static Dictionary<int, float> MoistureOverrides;
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -189,7 +193,10 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
       if (!__runOriginal) {
         return;  // The other patches must follow the same style to properly support the skip logic!
       }
-      if (MoistureOverrides != null && MoistureOverrides.TryGetValue(index, out var newLevel)) {
+
+      // Get a reference since the overrides instance can be updated for another thread.
+      var overrides = MoistureOverrides;
+      if (overrides != null && overrides.TryGetValue(index, out var newLevel)) {
         __result = __result < newLevel ? newLevel : __result;
         __runOriginal = false;
       }

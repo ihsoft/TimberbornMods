@@ -448,6 +448,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <summary>Updates range selection since blocked towers can show different tiles.</summary>
   void OnBlockedStateChanged(object sender, EventArgs e) {
     GetComponentFast<BuildingWithRangeUpdater>().OnPostTransformChanged();
+    UpdateState();
   }
 
   #endregion  
