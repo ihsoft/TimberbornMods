@@ -234,26 +234,18 @@
     <ItemGroup>
       <None Include="packages.config" />
     </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
-    <!-- Publicize directly when referencing -->
-    <Reference Include="..\Dependencies\Timberborn\Timberborn.SoilBarrierSystem.dll" Publicize="true" />
-    <Reference Include="..\Dependencies\Timberborn\Timberborn.SoilMoistureSystem.dll" Publicize="true" />
-    <Reference Include="..\Dependencies\Timberborn\Timberborn.GoodConsumingBuildingSystemUI.dll" Publicize="true" />
-    <Reference Include="..\Dependencies\Timberborn\Timberborn.GoodConsumingBuildingSystem.dll" Publicize="true" />
-    <Reference Include="..\Dependencies\Timberborn\Timberborn.WaterSystem.dll" Publicize="true" />
-    <Reference Include="..\Dependencies\Timberborn\Timberborn.Workshops.dll" Publicize="true" />
-    <Reference Include="..\Dependencies\Timberborn\Timberborn.Growing.dll" Publicize="true" />
-    <Reference Include="..\Dependencies\Timberborn\Timberborn.GrowingUI.dll" Publicize="true" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\TimberDev\README.md">
-      <Link>TimberDev\README.md</Link>
-    </Content>
-    <Content Include="..\UnityDevLite\README.md">
-      <Link>UnityDevLite\README.md</Link>
-    </Content>
-  </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
+      <!-- Publicize directly when referencing -->
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.SoilBarrierSystem.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.SoilMoistureSystem.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.GoodConsumingBuildingSystemUI.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.GoodConsumingBuildingSystem.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.WaterSystem.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.Workshops.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.Growing.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.GrowingUI.dll" Publicize="true" />
+    </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.
