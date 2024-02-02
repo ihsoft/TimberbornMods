@@ -310,7 +310,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
       }
     }
 
-    if (CanMoisturize()) {
+    if (BlockableBuilding.IsUnblocked && CanMoisturize()) {
       StartMoisturizing();
     } else {
       StopMoisturizing();

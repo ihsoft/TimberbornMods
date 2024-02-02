@@ -45,7 +45,7 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
 
   /// <inheritdoc/>
   protected override bool CanMoisturize() {
-    return BlockableBuilding.IsUnblocked && _goodConsumingBuilding.CanUse && !_goodConsumingBuilding.ConsumptionPaused;
+    return _goodConsumingBuilding.CanUse && !_goodConsumingBuilding.ConsumptionPaused;
   }
 
   /// <inheritdoc/>
