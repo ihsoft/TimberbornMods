@@ -30,20 +30,16 @@ static class Features {
     FeatureController.ReadFeatures(Consume);
   }
 
-  static bool Consume(string featureName, bool isEnabled) {
-    switch (featureName) {
-      case "DebugEx.VerboseLogging":
-        DebugExVerboseLogging = isEnabled;
-        return true;
-      case "GoodConsumingBuildingUI.DaysHoursViewForAllBuildings":
-        GoodConsumingBuildingUIDaysHoursForAll = isEnabled;
-        return true;
-      case "GrowableGrowthTimeUI.DaysHoursViewForAllGrowables":
-        GrowableGrowthTimeUIDaysHoursViewForAll = isEnabled;
-        return true;
-      default:
-        return false;
-    }
+  static bool Consume(string name, bool enabled, string value) {
+    return name switch {
+        "DebugEx.VerboseLogging" =>
+            FeatureController.SetFlag(ref DebugExVerboseLogging, name, enabled, value),
+        "GoodConsumingBuildingUI.DaysHoursViewForAllBuildings" =>
+            FeatureController.SetFlag(ref GoodConsumingBuildingUIDaysHoursForAll, name, enabled, value),
+        "GrowableGrowthTimeUI.DaysHoursViewForAllGrowables" =>
+            FeatureController.SetFlag(ref GrowableGrowthTimeUIDaysHoursViewForAll, name, enabled, value),
+        _ => false
+    };
   }
 }
 
