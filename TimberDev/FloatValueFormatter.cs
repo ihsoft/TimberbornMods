@@ -11,9 +11,9 @@ public static class FloatValueFormatter {
   /// <param name="value">The value to format.</param>
   public static string FormatSmallValue(float value) {
     return value switch {
-        > 10f => value.ToString("F0"),
-        > 1f => value.ToString("0.#"),
-        > 0.1f => value.ToString("0.0#"),
+        >= 10f => value.ToString("F0"),
+        >= 1f => value.ToString("0.#"),
+        >= 0.1f => value.ToString("0.0#"),
         _ => value.ToString("0.00#")
     };
   }
