@@ -222,9 +222,6 @@
       <Reference Include="Timberborn.TimeSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.TimeSystem.dll</HintPath>
       </Reference>
-      <Reference Include="Timberborn.UIFormatters, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.UIFormatters.dll</HintPath>
-      </Reference>
       <Reference Include="Timberborn.WaterContaminationSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.WaterContaminationSystem.dll</HintPath>
       </Reference>

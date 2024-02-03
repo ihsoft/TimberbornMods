@@ -7,9 +7,8 @@ using IgorZ.TimberCommons.Common;
 using Timberborn.EntityPanelSystem;
 using Timberborn.GoodConsumingBuildingSystem;
 using Timberborn.GoodConsumingBuildingSystemUI;
-using Timberborn.GoodsUI;
-using Timberborn.Localization;
-using Timberborn.UIFormatters;
+using UnityDev.Utils.LogUtilsLite;
+using UnityEngine.UIElements;
 
 // ReSharper disable InconsistentNaming
 namespace IgorZ.TimberCommons.IrrigationSystemUI {
@@ -25,26 +24,21 @@ static class GoodConsumingBuildingDescriberPatch {
 
   // ReSharper disable once UnusedMember.Local
   static void Postfix(ref bool __runOriginal, ref EntityDescription __result,
-                      ILoc ____loc, GoodDescriber ____goodDescriber,
-                      DescribedAmountFactory ____describedAmountFactory,
-                      ResourceAmountFormatter ____resourceAmountFormatter,
-                      ProductionItemFactory ____productionItemFactory,
                       GoodConsumingBuilding ____goodConsumingBuilding) {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!
     }
-
     var formatter = ____goodConsumingBuilding.GetComponentFast<IConsumptionRateFormatter>();
     if (formatter == null) {
       return;
     }
-    var describedGood = ____goodDescriber.GetDescribedGood(____goodConsumingBuilding.Supply);
-    var param = ____resourceAmountFormatter.FormatPerHour(
-        describedGood.DisplayName, ____goodConsumingBuilding.GoodPerHour);
-    var tooltip = ____loc.T(DescriptionLocKey, param);
-    var input = ____describedAmountFactory.CreatePlain("", formatter.GetRate(), describedGood.Icon, tooltip);
-    var content = ____productionItemFactory.CreateInput(input);
-    __result = EntityDescription.CreateInputSectionWithTime(content, int.MaxValue, formatter.GetTime());
+    var fuelAmountLabel = __result.Section.Q<Label>("Amount");
+    if (fuelAmountLabel != null) {
+      fuelAmountLabel.text = formatter.GetRate();
+      __result = EntityDescription.CreateInputSectionWithTime(__result.Section, int.MaxValue, formatter.GetTime());
+    } else {
+      DebugEx.Warning("Cannot override GoodConsumingBuilding description");
+    }
   }
 }
 
