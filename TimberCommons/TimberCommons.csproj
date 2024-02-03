@@ -82,7 +82,7 @@
       <Compile Include="IrrigationSystemUI\GrowableToolPanelItemFactoryPatch.cs" />
       <Compile Include="IrrigationSystemUI\GrowthRateModifierFragment.cs" />
       <Compile Include="IrrigationSystemUI\ManufactoryDescriberGetCraftingTimePatch.cs" />
-      <Compile Include="IrrigationSystemUI\ManufactoryDescriberDescribeRecipePatch.cs" />
+      <Compile Include="IrrigationSystemUI\ManufactoryDescriberGetInputsPatch.cs" />
       <Compile Include="IrrigationSystem\BlockContaminationRangeEffect.cs" />
       <Compile Include="IrrigationSystem\ModifyGrowableGrowthRangeEffect.cs" />
       <Compile Include="IrrigationSystem\Configurator.cs" />

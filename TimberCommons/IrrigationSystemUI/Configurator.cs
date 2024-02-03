@@ -37,8 +37,7 @@ sealed class Configurator : IConfigurator {
       patches.Add(typeof(ManufactoryDescriberGetCraftingTimePatch));
     }
     if (Features.ShowLongValueForLowFuelConsumptionRecipes) {
-      patches.Add(typeof(ManufactoryDescriberDescribeRecipePatch1));
-      patches.Add(typeof(ManufactoryDescriberDescribeRecipePatch2));
+      patches.Add(typeof(ManufactoryDescriberGetInputsPatch));
     }
     HarmonyPatcher.PatchRepeated(PatchId, patches.ToArray());
   }
