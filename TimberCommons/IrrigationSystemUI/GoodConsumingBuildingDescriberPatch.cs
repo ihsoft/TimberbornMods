@@ -20,8 +20,6 @@ namespace IgorZ.TimberCommons.IrrigationSystemUI {
 /// </remarks>
 [HarmonyPatch(typeof(GoodConsumingBuildingDescriber), nameof(GoodConsumingBuildingDescriber.DescribeSupply))]
 static class GoodConsumingBuildingDescriberPatch {
-  const string DescriptionLocKey = "GoodConsuming.SupplyDescription";
-
   // ReSharper disable once UnusedMember.Local
   static void Postfix(ref bool __runOriginal, ref EntityDescription __result,
                       GoodConsumingBuilding ____goodConsumingBuilding) {
