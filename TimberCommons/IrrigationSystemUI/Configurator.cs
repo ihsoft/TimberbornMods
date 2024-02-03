@@ -23,13 +23,22 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<GrowthRateModifierFragment>().AsSingleton();
     containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
 
-    var patches = new List<Type> { typeof(GoodConsumingBuildingDescriberPatch) };
+    var patches = new List<Type> {
+        typeof(GoodConsumingBuildingDescriberPatch),
+    };
     if (Features.GoodConsumingBuildingUIDaysHoursForAll) {
       patches.Add(typeof(GoodConsumingBuildingFragmentPatch));
     }
     if (Features.GrowableGrowthTimeUIDaysHoursViewForAll) {
       patches.Add(typeof(GrowableToolPanelItemFactoryPatch));
       patches.Add(typeof(GrowableFragmentPatch));
+    }
+    if (Features.ShowDaysHoursForSlowRecipes) {
+      patches.Add(typeof(ManufactoryDescriberGetCraftingTimePatch));
+    }
+    if (Features.ShowLongValueForLowFuelConsumptionRecipes) {
+      patches.Add(typeof(ManufactoryDescriberDescribeRecipePatch1));
+      patches.Add(typeof(ManufactoryDescriberDescribeRecipePatch2));
     }
     HarmonyPatcher.PatchRepeated(PatchId, patches.ToArray());
   }

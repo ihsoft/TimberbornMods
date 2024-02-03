@@ -42,6 +42,9 @@
       <Compile Include="..\TimberDev\FeatureController.cs">
         <Link>TimberDev\FeatureController.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\FloatValueFormatter.cs">
+        <Link>TimberDev\FloatValueFormatter.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\HarmonyPatcher.cs">
         <Link>TimberDev\HarmonyPatcher.cs</Link>
       </Compile>
@@ -78,6 +81,8 @@
       <Compile Include="IrrigationSystemUI\GrowableFragmentPatch.cs" />
       <Compile Include="IrrigationSystemUI\GrowableToolPanelItemFactoryPatch.cs" />
       <Compile Include="IrrigationSystemUI\GrowthRateModifierFragment.cs" />
+      <Compile Include="IrrigationSystemUI\ManufactoryDescriberGetCraftingTimePatch.cs" />
+      <Compile Include="IrrigationSystemUI\ManufactoryDescriberDescribeRecipePatch.cs" />
       <Compile Include="IrrigationSystem\BlockContaminationRangeEffect.cs" />
       <Compile Include="IrrigationSystem\ModifyGrowableGrowthRangeEffect.cs" />
       <Compile Include="IrrigationSystem\Configurator.cs" />
@@ -247,6 +252,7 @@
       <Reference Include="..\Dependencies\Timberborn\Timberborn.Workshops.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.Growing.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.GrowingUI.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.WorkshopsUI.dll" Publicize="true" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

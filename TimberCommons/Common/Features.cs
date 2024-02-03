@@ -26,6 +26,16 @@ static class Features {
   /// <seealso cref="HoursShortFormatter"/>
   public static bool GrowableGrowthTimeUIDaysHoursViewForAll;
 
+  /// <summary>Indicates whether recipe durations exceeding 24 hours should be displayed in days/hours format.</summary>
+  /// <seealso cref="HoursShortFormatter.Format"/>
+  public static bool ShowDaysHoursForSlowRecipes;
+
+  /// <summary>
+  /// Specifies whether fuel rates below 0.1 should be displayed with increased precision in the recipe UI.
+  /// </summary>
+  /// <seealso cref="FloatValueFormatter.FormatSmallValue"/>
+  public static bool ShowLongValueForLowFuelConsumptionRecipes;
+
   static Features() {
     FeatureController.ReadFeatures(Consume);
   }
@@ -38,6 +48,10 @@ static class Features {
             FeatureController.SetFlag(ref GoodConsumingBuildingUIDaysHoursForAll, name, enabled, value),
         "GrowableGrowthTimeUI.DaysHoursViewForAllGrowables" =>
             FeatureController.SetFlag(ref GrowableGrowthTimeUIDaysHoursViewForAll, name, enabled, value),
+        "RecipesUI.ShowDaysHoursForSlowRecipes" =>
+            FeatureController.SetFlag(ref ShowDaysHoursForSlowRecipes, name, enabled, value),
+        "RecipesUI.ShowLongValueForLowFuelConsumptionRecipes" =>
+            FeatureController.SetFlag(ref ShowLongValueForLowFuelConsumptionRecipes, name, enabled, value),
         _ => false
     };
   }

@@ -11,3 +11,9 @@ GoodConsumingBuildingUI.DaysHoursViewForAllBuildings
 # Indicates that durations for the growth time for all growables should be formatted as "Xd Yh" instead of rounding
 # to days.
 GrowableGrowthTimeUI.DaysHoursViewForAllGrowables
+
+# Indicates whether recipe durations exceeding 24 hours should be displayed in days/hours format.
+RecipesUI.ShowDaysHoursForSlowRecipes
+
+# Specifies whether fuel rates below 0.1 should be displayed with increased precision in the recipe UI.
+RecipesUI.ShowLongValueForLowFuelConsumptionRecipes
