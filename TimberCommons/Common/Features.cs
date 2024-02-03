@@ -16,14 +16,14 @@ static class Features {
   /// Indicates that duration in the "supply lasts for" message on <see cref="GoodConsumingBuilding"/> UI should be
   /// formatted as "Xd Yh" instead of "XX hours".
   /// </summary>
-  /// <seealso cref="HoursShortFormatter"/>
+  /// <seealso cref="HoursShortFormatter.Format"/>
   public static bool GoodConsumingBuildingUIDaysHoursForAll;
 
   /// <summary>
   /// Indicates that durations for the growth time for all growables should be formatted as "Xd Yh" instead of rounding
   /// to days.
   /// </summary>
-  /// <seealso cref="HoursShortFormatter"/>
+  /// <seealso cref="HoursShortFormatter.Format"/>
   public static bool GrowableGrowthTimeUIDaysHoursViewForAll;
 
   /// <summary>Indicates whether recipe durations exceeding 24 hours should be displayed in days/hours format.</summary>
