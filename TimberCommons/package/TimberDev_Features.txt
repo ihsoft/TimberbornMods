@@ -4,6 +4,9 @@
 # Enables extra logging. Usefull for the debugging issues, but creates a nosie in the logs.
 !DebugEx.VerboseLogging
 
+# Overrides the maximum registry size for PrefabOptimizer to suppress log complaints.
+!PrefabOptimizer.MaxExpectedRegistrySize=500
+
 # Indicates that duration in the "supply lasts for" message on GoodConsumingBuilding UI should be
 # formatted as "Xd Yh" instead of "XX hours".
 GoodConsumingBuildingUI.DaysHoursViewForAllBuildings

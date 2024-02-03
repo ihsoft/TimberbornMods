@@ -36,6 +36,9 @@ static class Features {
   /// <seealso cref="FloatValueFormatter.FormatSmallValue"/>
   public static bool ShowLongValueForLowFuelConsumptionRecipes;
 
+  /// <summary>Overrides the maximum registry size for PrefabOptimizer to suppress log complaints.</summary>
+  public static int PrefabOptimizerMaxExpectedRegistrySize = -1;
+
   static Features() {
     FeatureController.ReadFeatures(Consume);
   }
@@ -52,6 +55,8 @@ static class Features {
             FeatureController.SetFlag(ref ShowDaysHoursForSlowRecipes, name, enabled, value),
         "RecipesUI.ShowLongValueForLowFuelConsumptionRecipes" =>
             FeatureController.SetFlag(ref ShowLongValueForLowFuelConsumptionRecipes, name, enabled, value),
+        "PrefabOptimizer.MaxExpectedRegistrySize" =>
+            FeatureController.SetValue(ref PrefabOptimizerMaxExpectedRegistrySize, name, enabled, value),
         _ => false
     };
   }
