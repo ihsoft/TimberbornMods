@@ -3,7 +3,6 @@
 // License: Public Domain
 
 using HarmonyLib;
-using IgorZ.TimberCommons.Common;
 using IgorZ.TimberDev.Utils;
 using Timberborn.GoodConsumingBuildingSystem;
 using Timberborn.GoodConsumingBuildingSystemUI;

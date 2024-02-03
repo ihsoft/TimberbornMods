@@ -3,12 +3,10 @@
 // License: Public Domain
 
 using HarmonyLib;
-using IgorZ.TimberCommons.Common;
 using IgorZ.TimberDev.Utils;
 using Timberborn.Growing;
 using Timberborn.GrowingUI;
 using Timberborn.Localization;
-using UnityDev.Utils.LogUtilsLite;
 using UnityEngine.UIElements;
 
 // ReSharper disable InconsistentNaming
