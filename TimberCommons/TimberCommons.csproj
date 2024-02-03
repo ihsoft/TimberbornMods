@@ -45,6 +45,9 @@
       <Compile Include="..\TimberDev\HarmonyPatcher.cs">
         <Link>TimberDev\HarmonyPatcher.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\HoursShortFormatter.cs">
+        <Link>TimberDev\HoursShortFormatter.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\PrefabPatcher.cs">
         <Link>TimberDev\PrefabPatcher.cs</Link>
       </Compile>
@@ -71,7 +74,6 @@
       </Compile>
       <Compile Include="Common\Configurator.cs" />
       <Compile Include="Common\Features.cs" />
-      <Compile Include="Common\HoursShortFormatter.cs" />
       <Compile Include="Common\IConsumptionRateFormatter.cs" />
       <Compile Include="IrrigationSystemUI\GrowableFragmentPatch.cs" />
       <Compile Include="IrrigationSystemUI\GrowableToolPanelItemFactoryPatch.cs" />
