@@ -34,7 +34,7 @@ namespace IgorZ.TimberCommons.IrrigationSystem {
 /// blocked for irrigation (e.g. via a moisture blocker), then it's not eligible for irrigation. 
 /// </remarks>
 public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateListener,
-                                        IPostTransformChangeListener, IPausableComponent {
+                                        IPostTransformChangeListener, IPausableComponent, ILateTickable {
 
   #region Unity conrolled fields
   // ReSharper disable InconsistentNaming
