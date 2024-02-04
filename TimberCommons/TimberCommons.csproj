@@ -78,11 +78,14 @@
       <Compile Include="Common\Configurator.cs" />
       <Compile Include="Common\Features.cs" />
       <Compile Include="Common\IConsumptionRateFormatter.cs" />
+      <Compile Include="Common\ISupplyLeftProvider.cs" />
       <Compile Include="IrrigationSystemUI\GrowableFragmentPatch.cs" />
       <Compile Include="IrrigationSystemUI\GrowableToolPanelItemFactoryPatch.cs" />
       <Compile Include="IrrigationSystemUI\GrowthRateModifierFragment.cs" />
       <Compile Include="IrrigationSystemUI\ManufactoryDescriberGetCraftingTimePatch.cs" />
       <Compile Include="IrrigationSystemUI\ManufactoryDescriberGetInputsPatch.cs" />
+      <Compile Include="IrrigationSystemUI\ManufactoryInventoryFragmentInitializeFragmentPatch.cs" />
+      <Compile Include="IrrigationSystemUI\ManufactoryInventoryFragmentUpdateFragmentPatch.cs" />
       <Compile Include="IrrigationSystem\BlockContaminationRangeEffect.cs" />
       <Compile Include="IrrigationSystem\ModifyGrowableGrowthRangeEffect.cs" />
       <Compile Include="IrrigationSystem\Configurator.cs" />
@@ -188,6 +191,9 @@
       </Reference>
       <Reference Include="Timberborn.GoodsUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.GoodsUI.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.InventorySystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.InventorySystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.Localization, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.Localization.dll</HintPath>
