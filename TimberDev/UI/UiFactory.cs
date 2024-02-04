@@ -7,7 +7,8 @@ using Timberborn.CoreUI;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-// ReSharper disable once CheckNamespace
+// ReSharper disable UnusedMember.Local
+// ReSharper disable MemberCanBePrivate.Global
 namespace IgorZ.TimberDev.UI {
 
 static class UiFactory {

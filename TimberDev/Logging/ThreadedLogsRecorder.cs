@@ -9,7 +9,8 @@ using Timberborn.TickSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
-// ReSharper disable once CheckNamespace
+// ReSharper disable UnusedMember.Local
+// ReSharper disable MemberCanBePrivate.Global
 namespace IgorZ.TimberDev.Logging {
 
 /// <summary>Helper to catch logs from the non-main threads and spitting them out to the main logger.</summary>

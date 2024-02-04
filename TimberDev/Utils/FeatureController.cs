@@ -8,8 +8,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using UnityDev.Utils.LogUtilsLite;
 
+// ReSharper disable UnusedMember.Local
 // ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable once CheckNamespace
 namespace IgorZ.TimberDev.Utils {
 
 /// <summary>Helper class to control enabling/disabling of specific features in the plugin.</summary>

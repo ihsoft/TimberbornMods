@@ -5,7 +5,8 @@
 using Timberborn.Localization;
 using UnityEngine;
 
-// ReSharper disable once CheckNamespace
+// ReSharper disable UnusedMember.Local
+// ReSharper disable MemberCanBePrivate.Global
 namespace IgorZ.TimberDev.UI {
 
 /// <summary>Utility class to format strings for UI.</summary>

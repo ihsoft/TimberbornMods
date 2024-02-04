@@ -9,7 +9,8 @@ using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-// ReSharper disable once CheckNamespace
+// ReSharper disable UnusedMember.Local
+// ReSharper disable MemberCanBePrivate.Global
 namespace IgorZ.TimberDev.Utils {
 
 /// <summary>Helper class for managing prefab components.</summary>
