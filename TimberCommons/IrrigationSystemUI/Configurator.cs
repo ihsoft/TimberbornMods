@@ -25,6 +25,8 @@ sealed class Configurator : IConfigurator {
 
     var patches = new List<Type> {
         typeof(GoodConsumingBuildingDescriberPatch),
+        typeof(ManufactoryInventoryFragmentInitializeFragmentPatch),
+        typeof(ManufactoryInventoryFragmentUpdateFragmentPatch),
     };
     if (Features.GoodConsumingBuildingUIDaysHoursForAll) {
       patches.Add(typeof(GoodConsumingBuildingFragmentPatch));
