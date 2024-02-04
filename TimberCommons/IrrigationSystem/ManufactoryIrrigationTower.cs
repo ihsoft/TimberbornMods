@@ -6,8 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Bindito.Core;
+using IgorZ.TimberCommons.Common;
+using IgorZ.TimberDev.UI;
 using Timberborn.Common;
 using Timberborn.Goods;
+using Timberborn.Localization;
 using Timberborn.TimeSystem;
 using Timberborn.Workshops;
 using UnityDev.Utils.LogUtilsLite;
@@ -28,7 +31,7 @@ namespace IgorZ.TimberCommons.IrrigationSystem {
 /// currently selected recipe (<see cref="Manufactory.CurrentRecipe"/>). For this, define the effects field.
 /// </p>
 /// </remarks>
-public class ManufactoryIrrigationTower : IrrigationTower {
+public class ManufactoryIrrigationTower : IrrigationTower, ISupplyLeftProvider {
 
   #region Unity controlled fields
   // ReSharper disable InconsistentNaming
@@ -51,6 +54,7 @@ public class ManufactoryIrrigationTower : IrrigationTower {
   public override void Tick() {
     if (CanMoisturize()) {
       _manufactory.IncreaseProductionProgress(_dayNightCycle.FixedDeltaTimeInHours);
+      UpdateConsumptionStats();
     }
     base.Tick();
   }
@@ -108,19 +112,32 @@ public class ManufactoryIrrigationTower : IrrigationTower {
 
   #endregion
 
+  #region ISupplyLeftProvider implementation
+
+  /// <inheritdoc/>
+  public (float progress, string progressBarMsg) GetStats() {
+    return (_ingredientsConsumptionProgress, _progressUpdateMsg);
+  }
+
+  #endregion
+
   #region Implemenation
 
   Manufactory _manufactory;
   IDayNightCycle _dayNightCycle;
+  ILoc _loc;
 
   Dictionary<string, string> _effectsRulesDict;
   Dictionary<string, List<IRangeEffect>> _availableEffectsDict;
   static readonly List<IRangeEffect> NoEffects = new();
+  float _ingredientsConsumptionProgress;
+  string _progressUpdateMsg;
 
   /// <summary>It must be public for the injection logic to work.</summary>
   [Inject]
-  public void InjectDependencies(IDayNightCycle dayNightCycle) {
+  public void InjectDependencies(IDayNightCycle dayNightCycle, ILoc loc) {
     _dayNightCycle = dayNightCycle;
+    _loc = loc;
   }
 
   /// <inheritdoc/>
@@ -188,6 +205,7 @@ public class ManufactoryIrrigationTower : IrrigationTower {
   void UpdateCurrentRecipeDuration() {
     var currentRecipeId = _manufactory.CurrentRecipe?.Id;
     if (currentRecipeId == null) {
+      UpdateConsumptionStats();
       return;
     }
     var originalRecipe = _manufactory.ProductionRecipes.First(x => x.Id == currentRecipeId);
@@ -203,6 +221,41 @@ public class ManufactoryIrrigationTower : IrrigationTower {
     HostedDebugLog.Fine(
         this, "Adjusted recipe duration: id={0}, original={1}, new={2}", originalRecipe.Id,
         originalRecipe.CycleDurationInHours, adjustedCycleDurationInHours);
+    UpdateConsumptionStats();
+  }
+
+  /// <summary>Updates the "lasts for" stats for the UI fragment.</summary>
+  /// <remarks>It must be called each time the current recipe or consumption is updated.</remarks>
+  void UpdateConsumptionStats() {
+    var recipe = _manufactory.CurrentRecipe;
+    if (recipe == null) {
+      _ingredientsConsumptionProgress = -1;
+      _progressUpdateMsg = null;
+      return; // Cannot estimate.
+    }
+    var inventory = _manufactory.Inventory;
+    var totalGoodsInRecipe = recipe.Ingredients.Count + (recipe.ConsumesFuel ? 1 : 0);
+    var supplyLeftHours = new float[totalGoodsInRecipe];
+    var supplyAtMaxCapacity = new float[totalGoodsInRecipe];
+    for (var index = 0; index < recipe.Ingredients.Count; index++) {
+      var ingredient = recipe.Ingredients[index];
+      var stock = inventory.AmountInStock(ingredient.GoodId);
+      var consumePerHour = ingredient.Amount / recipe.CycleDurationInHours;
+      supplyLeftHours[index] = stock / consumePerHour;
+      supplyAtMaxCapacity[index] = inventory.LimitedAmount(ingredient.GoodId) / consumePerHour;
+    }
+    if (recipe.ConsumesFuel) {
+      var index = supplyLeftHours.Length - 1;
+      var stock = inventory.AmountInStock(recipe.Fuel.Id) + _manufactory.FuelRemaining;
+      var consumePerHour = 1f / (recipe.CyclesFuelLasts * recipe.CycleDurationInHours);
+      supplyLeftHours[index] = stock / consumePerHour;
+      supplyAtMaxCapacity[index] = inventory.LimitedAmount(recipe.Fuel.Id) / consumePerHour;
+    }
+
+    var minLastsHours = supplyLeftHours.Min();
+    var maxReserveHours = supplyAtMaxCapacity.Min();
+    _ingredientsConsumptionProgress = minLastsHours / maxReserveHours;
+    _progressUpdateMsg = CommonFormats.FormatSupplyLeft(_loc, minLastsHours);
   }
 
   #endregion
