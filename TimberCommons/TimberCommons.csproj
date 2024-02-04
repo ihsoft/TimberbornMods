@@ -36,29 +36,26 @@
         <DocumentationFile>bin\Release\TimberCommons.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
-      <Compile Include="..\TimberDev\CustomizableInstantiator.cs">
-        <Link>TimberDev\CustomizableInstantiator.cs</Link>
+      <Compile Include="..\TimberDev\Logging\ThreadedLogsRecorder.cs">
+        <Link>TimberDev\Logging\ThreadedLogsRecorder.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\FeatureController.cs">
-        <Link>TimberDev\FeatureController.cs</Link>
+      <Compile Include="..\TimberDev\UI\CommonFormats.cs">
+        <Link>TimberDev\UI\CommonFormats.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\FloatValueFormatter.cs">
-        <Link>TimberDev\FloatValueFormatter.cs</Link>
+      <Compile Include="..\TimberDev\UI\UiFactory.cs">
+        <Link>TimberDev\UI\UiFactory.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\HarmonyPatcher.cs">
-        <Link>TimberDev\HarmonyPatcher.cs</Link>
+      <Compile Include="..\TimberDev\Utils\CustomizableInstantiator.cs">
+        <Link>TimberDev\Utils\CustomizableInstantiator.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\HoursShortFormatter.cs">
-        <Link>TimberDev\HoursShortFormatter.cs</Link>
+      <Compile Include="..\TimberDev\Utils\FeatureController.cs">
+        <Link>TimberDev\Utils\FeatureController.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\PrefabPatcher.cs">
-        <Link>TimberDev\PrefabPatcher.cs</Link>
+      <Compile Include="..\TimberDev\Utils\HarmonyPatcher.cs">
+        <Link>TimberDev\Utils\HarmonyPatcher.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\ThreadedLogsRecorder.cs">
-        <Link>TimberDev\ThreadedLogsRecorder.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\UiFactory.cs">
-        <Link>TimberDev\UiFactory.cs</Link>
+      <Compile Include="..\TimberDev\Utils\PrefabPatcher.cs">
+        <Link>TimberDev\Utils\PrefabPatcher.cs</Link>
       </Compile>
       <Compile Include="..\UnityDevLite\DebugEx.cs">
         <Link>UnityDevLite\DebugEx.cs</Link>

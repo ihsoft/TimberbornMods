@@ -3,7 +3,7 @@
 // License: Public Domain
 
 using HarmonyLib;
-using IgorZ.TimberDev.Utils;
+using IgorZ.TimberDev.UI;
 using Timberborn.GoodConsumingBuildingSystem;
 using Timberborn.GoodConsumingBuildingSystemUI;
 using Timberborn.Localization;
@@ -15,7 +15,6 @@ namespace IgorZ.TimberCommons.IrrigationSystemUI {
 /// Harmony patch to show supply in days and hours.
 [HarmonyPatch(typeof(GoodConsumingBuildingFragment), nameof(GoodConsumingBuildingFragment.UpdateProgressBar))]
 static class GoodConsumingBuildingFragmentPatch {
-  const string SupplyRemainingLocKey = "IgorZ.TimberCommons.WaterTower.SupplyRemaining";
 
   // ReSharper disable once UnusedMember.Local
   static void Postfix(ref bool __runOriginal, ILoc ____loc, Label ____hoursLeft,
@@ -23,8 +22,7 @@ static class GoodConsumingBuildingFragmentPatch {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!
     }
-    var duration = HoursShortFormatter.Format(____loc, ____goodConsumingBuilding.HoursUntilNoSupply);
-    ____hoursLeft.text = ____loc.T(SupplyRemainingLocKey, duration);
+    ____hoursLeft.text = CommonFormats.DaysHoursFormat(____loc, ____goodConsumingBuilding.HoursUntilNoSupply);
   }
 }
 

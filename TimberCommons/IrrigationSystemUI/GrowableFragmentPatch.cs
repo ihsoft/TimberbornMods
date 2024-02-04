@@ -3,9 +3,7 @@
 // License: Public Domain
 
 using HarmonyLib;
-using IgorZ.TimberCommons.Common;
-using IgorZ.TimberCommons.IrrigationSystem;
-using IgorZ.TimberDev.Utils;
+using IgorZ.TimberDev.UI;
 using Timberborn.Growing;
 using Timberborn.GrowingUI;
 using Timberborn.Localization;
@@ -22,7 +20,7 @@ static class GrowableFragmentPatch {
     if (!__runOriginal || ____growable == null) {
       return;  // The other patches must follow the same style to properly support the skip logic!
     }
-    ____growthTime.text = HoursShortFormatter.Format(____loc, ____growable.GrowthTimeInDays * 24f);
+    ____growthTime.text = CommonFormats.DaysHoursFormat(____loc, ____growable.GrowthTimeInDays * 24f);
   }
 }
 

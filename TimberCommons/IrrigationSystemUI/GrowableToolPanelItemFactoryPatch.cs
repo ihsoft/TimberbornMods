@@ -3,7 +3,7 @@
 // License: Public Domain
 
 using HarmonyLib;
-using IgorZ.TimberDev.Utils;
+using IgorZ.TimberDev.UI;
 using Timberborn.Growing;
 using Timberborn.GrowingUI;
 using Timberborn.Localization;
@@ -19,7 +19,7 @@ static class GrowableToolPanelItemFactoryPatch {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!
     }
-    __result.Q<Label>("GrowthTime").text = HoursShortFormatter.Format(____loc, growable.GrowthTimeInDays * 24f); 
+    __result.Q<Label>("GrowthTime").text = CommonFormats.DaysHoursFormat(____loc, growable.GrowthTimeInDays * 24f);
   }
 }
 

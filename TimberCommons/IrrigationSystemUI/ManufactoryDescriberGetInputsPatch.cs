@@ -5,7 +5,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
-using IgorZ.TimberDev.Utils;
+using IgorZ.TimberDev.UI;
 using Timberborn.Goods;
 using Timberborn.WorkshopsUI;
 using UnityDev.Utils.LogUtilsLite;
@@ -29,7 +29,7 @@ static class ManufactoryDescriberGetInputsPatch {
     var inputs = __result.ToList();
     var fuelAmountLabel = inputs.Last().Q<Label>("Amount");
     if (fuelAmountLabel != null) {
-      fuelAmountLabel.text = FloatValueFormatter.FormatSmallValue(1f / productionRecipe.CyclesFuelLasts);
+      fuelAmountLabel.text = CommonFormats.FormatSmallValue(1f / productionRecipe.CyclesFuelLasts);
     } else {
       DebugEx.Warning("Cannot override fuel consumption rate for recipe: {0}", productionRecipe.Id);
     }

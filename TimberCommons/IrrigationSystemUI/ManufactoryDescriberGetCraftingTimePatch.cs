@@ -3,8 +3,7 @@
 // License: Public Domain
 
 using HarmonyLib;
-using IgorZ.TimberCommons.Common;
-using IgorZ.TimberDev.Utils;
+using IgorZ.TimberDev.UI;
 using Timberborn.Goods;
 using Timberborn.Localization;
 using Timberborn.WorkshopsUI;
@@ -22,7 +21,7 @@ static class ManufactoryDescriberGetCraftingTimePatch {
       return false; // The other patches must follow the same style to properly support the skip logic!
     }
     var duration = productionRecipe.CycleDurationInHours / workers;
-    __result = HoursShortFormatter.Format(____loc, duration);
+    __result = CommonFormats.DaysHoursFormat(____loc, duration);
     return false;
   }
 }
