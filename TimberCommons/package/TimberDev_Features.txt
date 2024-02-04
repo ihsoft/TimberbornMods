@@ -1,0 +1,22 @@
+# This file allows enabling and disabling various features that can affect the whole game.
+# To disable a feature, add prefix "!" to the feature name.
+
+# Enables extra logging. Usefull for the debugging issues, but creates a nosie in the logs.
+!DebugEx.VerboseLogging
+
+# Overrides the maximum registry size for PrefabOptimizer to suppress log complaints.
+!PrefabOptimizer.MaxExpectedRegistrySize=500
+
+# Indicates that duration in the "supply lasts for" message on GoodConsumingBuilding UI should be
+# formatted as "Xd Yh" instead of "XX hours".
+GoodConsumingBuildingUI.DaysHoursViewForAllBuildings
+
+# Indicates that durations for the growth time for all growables should be formatted as "Xd Yh" instead of rounding
+# to days.
+GrowableGrowthTimeUI.DaysHoursViewForAllGrowables
+
+# Indicates whether recipe durations exceeding 24 hours should be displayed in days/hours format.
+RecipesUI.ShowDaysHoursForSlowRecipes
+
+# Specifies whether fuel rates below 0.1 should be displayed with increased precision in the recipe UI.
+RecipesUI.ShowLongValueForLowFuelConsumptionRecipes

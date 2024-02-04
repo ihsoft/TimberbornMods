@@ -10,8 +10,8 @@ using IgorZ.TimberDev.Utils;
 using UnityEngine;
 
 // ReSharper disable UnusedMember.Local
-// ReSharper disable once CheckNamespace
-namespace IgorZ.TimberDev.CustomInstantiator {
+// ReSharper disable MemberCanBePrivate.Global
+namespace IgorZ.TimberDev.Utils {
 
 /// <summary>Class that allows customizing components on prefabs.</summary>
 /// <remarks>

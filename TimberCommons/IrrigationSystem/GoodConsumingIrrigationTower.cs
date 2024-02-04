@@ -8,7 +8,6 @@ using IgorZ.TimberCommons.Common;
 using Timberborn.Buildings;
 using Timberborn.GoodConsumingBuildingSystem;
 using Timberborn.Localization;
-using UnityEngine;
 
 namespace IgorZ.TimberCommons.IrrigationSystem {
 
@@ -50,8 +49,8 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
   }
 
   /// <inheritdoc/>
-  protected override void IrrigationStarted(IEnumerable<Vector2Int> tiles) {
-    _rangeEffects.ForEach(x => x.ApplyEffect(tiles));
+  protected override void IrrigationStarted() {
+    _rangeEffects.ForEach(x => x.ApplyEffect(ReachableTiles));
   }
 
   /// <inheritdoc/>

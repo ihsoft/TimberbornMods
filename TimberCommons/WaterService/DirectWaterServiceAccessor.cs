@@ -22,7 +22,7 @@ namespace IgorZ.TimberCommons.WaterService {
 /// </summary>
 /// <remarks>
 /// This code interacts with the internal game's water system objects and fields (via "publicize"). The changes to the
-/// game logic can break teh behavior.
+/// game logic can break the behavior.
 /// </remarks>
 public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingleton {
   /// <summary>Water mover definition.</summary>
