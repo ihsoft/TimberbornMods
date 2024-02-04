@@ -189,7 +189,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton {
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     // ReSharper disable once UnusedMember.Local
-    static void Postfix(int index, ref bool __runOriginal, ref float __result) {
+    static void Postfix(int index, bool __runOriginal, ref float __result) {
       if (!__runOriginal) {
         return;  // The other patches must follow the same style to properly support the skip logic!
       }
@@ -198,7 +198,6 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton {
       var overrides = MoistureOverrides;
       if (overrides != null && overrides.TryGetValue(index, out var newLevel)) {
         __result = __result < newLevel ? newLevel : __result;
-        __runOriginal = false;
       }
     }
   }
