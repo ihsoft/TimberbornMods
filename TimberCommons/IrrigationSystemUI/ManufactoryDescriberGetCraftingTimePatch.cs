@@ -16,7 +16,7 @@ namespace IgorZ.TimberCommons.IrrigationSystemUI {
 static class ManufactoryDescriberGetCraftingTimePatch {
   // ReSharper disable once UnusedMember.Local
   static bool Prefix(RecipeSpecification productionRecipe, float workers,
-                     ILoc ____loc, ref bool __runOriginal, ref string __result) {
+                     ILoc ____loc, bool __runOriginal, ref string __result) {
     if (!__runOriginal) {
       return false; // The other patches must follow the same style to properly support the skip logic!
     }

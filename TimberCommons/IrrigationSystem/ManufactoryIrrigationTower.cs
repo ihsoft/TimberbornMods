@@ -45,6 +45,8 @@ public class ManufactoryIrrigationTower : IrrigationTower {
   // ReSharper restore RedundantDefaultMemberInitializer
   #endregion
 
+  #region TickableComponent overrides
+
   /// <inheritdoc/>
   public override void Tick() {
     if (CanMoisturize()) {
@@ -52,6 +54,8 @@ public class ManufactoryIrrigationTower : IrrigationTower {
     }
     base.Tick();
   }
+
+  #endregion
 
   #region IrrigationTower overrides
 

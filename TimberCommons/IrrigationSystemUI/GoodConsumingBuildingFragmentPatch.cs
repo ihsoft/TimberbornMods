@@ -17,7 +17,7 @@ namespace IgorZ.TimberCommons.IrrigationSystemUI {
 static class GoodConsumingBuildingFragmentPatch {
 
   // ReSharper disable once UnusedMember.Local
-  static void Postfix(ref bool __runOriginal, ILoc ____loc, Label ____hoursLeft,
+  static void Postfix(bool __runOriginal, ILoc ____loc, Label ____hoursLeft,
                       GoodConsumingBuilding ____goodConsumingBuilding) {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!

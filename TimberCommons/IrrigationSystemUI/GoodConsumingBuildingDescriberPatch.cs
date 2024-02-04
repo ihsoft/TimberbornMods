@@ -21,7 +21,7 @@ namespace IgorZ.TimberCommons.IrrigationSystemUI {
 [HarmonyPatch(typeof(GoodConsumingBuildingDescriber), nameof(GoodConsumingBuildingDescriber.DescribeSupply))]
 static class GoodConsumingBuildingDescriberPatch {
   // ReSharper disable once UnusedMember.Local
-  static void Postfix(ref bool __runOriginal, ref EntityDescription __result,
+  static void Postfix(bool __runOriginal, ref EntityDescription __result,
                       GoodConsumingBuilding ____goodConsumingBuilding) {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!

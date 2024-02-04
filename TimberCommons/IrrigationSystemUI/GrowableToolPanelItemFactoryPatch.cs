@@ -15,7 +15,7 @@ namespace IgorZ.TimberCommons.IrrigationSystemUI {
 [HarmonyPatch(typeof(GrowableToolPanelItemFactory), nameof(GrowableToolPanelItemFactory.Create))]
 static class GrowableToolPanelItemFactoryPatch {
   // ReSharper disable once UnusedMember.Local
-  static void Postfix(Growable growable, ref bool __runOriginal, ref VisualElement __result, ILoc ____loc) {
+  static void Postfix(Growable growable, bool __runOriginal, ref VisualElement __result, ILoc ____loc) {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!
     }

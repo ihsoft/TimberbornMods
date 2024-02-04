@@ -192,7 +192,7 @@ public sealed class ModifyGrowableGrowthRangeEffect : BaseComponent, IRangeEffec
 
   #region Events and callabcks
 
-  /// <summary>Checks if a newly created growable needs to get teh effect.</summary>
+  /// <summary>Checks if a newly created growable needs to get the effect.</summary>
   [OnEvent]
   public void OnEntityInitializedEvent(EntityInitializedEvent e) {
     if (_allTiles == null) {
