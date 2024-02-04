@@ -4,10 +4,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Bindito.Core;
 using IgorZ.TimberCommons.WaterService;
-using JetBrains.Annotations;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BuildingRange;
@@ -34,7 +34,7 @@ namespace IgorZ.TimberCommons.IrrigationSystem {
 /// blocked for irrigation (e.g. via a moisture blocker), then it's not eligible for irrigation. 
 /// </remarks>
 public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateListener,
-                                        IPostTransformChangeListener, IPausableComponent {
+                                        IPostTransformChangeListener, IPausableComponent, ILateTickable {
 
   #region Unity conrolled fields
   // ReSharper disable InconsistentNaming
@@ -42,15 +42,19 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   /// <summary>The maximum distance of irrigation from the building's boundary.</summary>
   [SerializeField]
+  [Tooltip("The max distance from the building boundaries at which the tiles can get water.")]
   internal int _irrigationRange = 10;
 
   /// <summary>The moisture level of the tiles in range.</summary>
   [SerializeField]
+  [Tooltip("Values above 1.0 will extend the effective irrigated range beyond the IrrigationRange setting.")]
   internal float _moistureLevel = 1.0f;
 
   /// <summary>The optional name to use to group irrigation ranges in preview.</summary>
   [SerializeField]
-  internal string _rangeName = null;
+  [Tooltip("When a building with range is selected, the ranges with the same name will be shown for all other"
+      + " buildings. Leave this field empty to let all towers of any kind to show their ranges at the same time.")]
+  internal string _rangeName = "";
 
   // ReSharper restore InconsistentNaming
   // ReSharper restore RedundantDefaultMemberInitializer
@@ -74,11 +78,11 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <summary>The tiles that can get water.</summary>
   /// <remarks>These tiles are in the effective range and can be reached from the tower.</remarks>
   /// <see cref="EffectiveRange"/>
-  public HashSet<Vector2Int> ReachableTiles { get; private set; } = new();
+  public ImmutableHashSet<Vector2Int> ReachableTiles { get; private set; } = ImmutableHashSet.Create<Vector2Int>();
 
   /// <summary>The tiles that can be irrigated at the 100% efficiency.</summary>
   /// <see cref="IrrigationRange"/>
-  public HashSet<Vector2Int> EligibleTiles { get; private set; } = new();
+  public ImmutableHashSet<Vector2Int> EligibleTiles { get; private set; } = ImmutableHashSet.Create<Vector2Int>();
 
   /// <summary>
   /// The maximum number of tiles which this component could irrigate on a flat surface if there were no irrigation
@@ -88,7 +92,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   /// <summary>The percentile of the tiles that are reachable to the maximum coverage.</summary>
   /// <remarks>
-  /// This value is used to scale teh building consumption. All goods consumption in the buildings should be configured
+  /// This value is used to scale the building consumption. All goods consumption in the buildings should be configured
   /// for the maximum coverage.</remarks>
   /// <seealso cref="ReachableTiles"/>
   /// <seealso cref="MaxCoveredTilesCount"/>
@@ -102,8 +106,8 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <summary>Shortcut to the building's block object.</summary>
   protected BlockObject BlockObject { get; private set; }
 
-  /// <summary>Tower is always a pausable building.</summary>
-  protected PausableBuilding PausableBuilding { get; private set; }
+  /// <summary>Tower is always a blockable building.</summary>
+  protected BlockableBuilding BlockableBuilding { get; private set; }
 
   // ReSharper restore MemberCanBeProtected.Global
   // ReSharper restore MemberCanBePrivate.Global
@@ -116,9 +120,9 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
     if (!BlockObject.Finished) {
       return GetTiles(range: _irrigationRange, skipChecks: false).Select(v => new Vector3Int(v.x, v.y, _baseZ));
     }
-    return PausableBuilding.Paused
-        ? EligibleTiles.Select(v => new Vector3Int(v.x, v.y, _baseZ))
-        : ReachableTiles.Select(v => new Vector3Int(v.x, v.y, _baseZ));
+    return BlockableBuilding.IsUnblocked
+        ? ReachableTiles.Select(v => new Vector3Int(v.x, v.y, _baseZ))
+        : EligibleTiles.Select(v => new Vector3Int(v.x, v.y, _baseZ));
   }
 
   /// <inheritdoc />
@@ -128,7 +132,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   /// <inheritdoc />
   public IEnumerable<string> RangeNames() {
-    yield return _rangeName ?? typeof(IrrigationTower).FullName;
+    yield return _rangeName.Length > 0 ? _rangeName : typeof(IrrigationTower).FullName;
   }
 
   #endregion
@@ -138,7 +142,8 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <inheritdoc/>
   public virtual void OnEnterFinishedState() {
     _terrainService.TerrainHeightChanged += OnTerrainHeightChanged;
-    PausableBuilding.PausedChanged += OnPauseChanged;
+    BlockableBuilding.BuildingBlocked += OnBlockedStateChanged;
+    BlockableBuilding.BuildingUnblocked += OnBlockedStateChanged;
     _eventBus.Register(this);
   }
 
@@ -146,7 +151,8 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   public virtual void OnExitFinishedState() {
     StopMoisturizing();
     _terrainService.TerrainHeightChanged -= OnTerrainHeightChanged;
-    PausableBuilding.PausedChanged -= OnPauseChanged;
+    BlockableBuilding.BuildingBlocked -= OnBlockedStateChanged;
+    BlockableBuilding.BuildingUnblocked -= OnBlockedStateChanged;
     _eventBus.Unregister(this);
   }
 
@@ -180,10 +186,9 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <summary>Indicates if the tower has everything to moisturizing the tiles.</summary>
   protected abstract bool CanMoisturize();
 
-  /// <summary>Notifies that the irrigation started on the provided tiles.</summary>
-  /// <param name="tiles">All the affected tiles.</param>
+  /// <summary>Notifies that the irrigation started.</summary>
   /// <seealso cref="ReachableTiles"/>
-  protected abstract void IrrigationStarted(IEnumerable<Vector2Int> tiles);
+  protected abstract void IrrigationStarted();
 
   /// <summary>Notifies that the irrigation process has stopped.</summary>
   protected abstract void IrrigationStopped();
@@ -273,7 +278,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <summary>Awake is called when the script instance is being loaded.</summary>
   protected virtual void Awake() {
     BlockObject = GetComponentFast<BlockObject>();
-    PausableBuilding = GetComponentFast<PausableBuilding>();
+    BlockableBuilding = GetComponentFast<BlockableBuilding>();
   }
 
   /// <summary>Updates the eligible tiles and moisture system.</summary>
@@ -295,8 +300,8 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
       var newIrrigatedTiles = GetTiles(range: EffectiveRange, skipChecks: false);
       if (!newIrrigatedTiles.SetEquals(ReachableTiles) || !newEligibleTiles.SetEquals(EligibleTiles)) {
         StopMoisturizing();
-        EligibleTiles = newEligibleTiles;
-        ReachableTiles = newIrrigatedTiles;
+        EligibleTiles = newEligibleTiles.ToImmutableHashSet();
+        ReachableTiles = newIrrigatedTiles.ToImmutableHashSet();
         Coverage = (float)newIrrigatedTiles.Count / MaxCoveredTilesCount;
         HostedDebugLog.Fine(this, "Covered tiles updated: eligible={0}, irrigated={1}, utilization={2}, efficiency={3}",
                             EligibleTiles.Count, ReachableTiles.Count, Coverage, _currentEfficiency);
@@ -305,7 +310,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
       }
     }
 
-    if (CanMoisturize()) {
+    if (BlockableBuilding.IsUnblocked && CanMoisturize()) {
       StartMoisturizing();
     } else {
       StopMoisturizing();
@@ -317,9 +322,8 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
     if (_moistureOverrideIndex != -1) {
       return;
     }
-    var irrigatedTiles = GetTiles(range: EffectiveRange, skipChecks: false);
-    _moistureOverrideIndex = _directSoilMoistureSystemAccessor.AddMoistureOverride(irrigatedTiles, _moistureLevel);
-    IrrigationStarted(irrigatedTiles);
+    _moistureOverrideIndex = _directSoilMoistureSystemAccessor.AddMoistureOverride(ReachableTiles, _moistureLevel);
+    IrrigationStarted();
   }
 
   /// <summary>Stops any logic on the irrigated tiles.</summary>
@@ -441,12 +445,14 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   #region Component callbacks
 
-  /// <summary>Updates range selection since paused towers can show different tiles.</summary>
-  void OnPauseChanged(object sender, EventArgs e) {
+  /// <summary>Updates range selection since blocked towers can show different tiles.</summary>
+  void OnBlockedStateChanged(object sender, EventArgs e) {
     GetComponentFast<BuildingWithRangeUpdater>().OnPostTransformChanged();
+    UpdateState();
   }
 
   #endregion  
 
 }
+
 }

@@ -2,7 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using Bindito.Core;
 using IgorZ.TimberCommons.WaterService;
 using Timberborn.BaseComponentSystem;
@@ -24,6 +24,8 @@ public sealed class BlockContaminationRangeEffect : BaseComponent, IRangeEffect 
 
   /// <inheritdoc cref="EffectGroup"/>
   [SerializeField]
+  [Tooltip(
+      "The name by which this effect can be found by the other components. Multiple effects can have the same name.")]
   string _effectGroupName = "BlockContamination";
 
   // ReSharper restore InconsistentNaming
@@ -35,7 +37,7 @@ public sealed class BlockContaminationRangeEffect : BaseComponent, IRangeEffect 
   public string EffectGroup => _effectGroupName;
 
   /// <inheritdoc/>
-  public void ApplyEffect(IEnumerable<Vector2Int> tiles) {
+  public void ApplyEffect(ImmutableHashSet<Vector2Int> tiles) {
     ResetEffect();
     _contaminationOverrideIndex = _directSoilMoistureSystemAccessor.AddContaminationOverride(tiles);
   }

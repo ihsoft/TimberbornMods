@@ -8,4 +8,7 @@ IgorZ.TimberCommons.WaterValve.DisableLevelCheckAtOutput,"Не проверят�
 IgorZ.TimberCommons.WaterTower.Utilization,"Используемый потенциал: {0:0.#}%"
 IgorZ.TimberCommons.WaterTower.IrrigatedArea,"Площадь покрытия: {0}"
 IgorZ.TimberCommons.WaterTower.EffectiveRange,"Дистанция орошения: {0}"
-IgorZ.TimberCommons.WaterTower.SupplyRemaining,"Запаса хватит на {0}д {1}ч"
+IgorZ.TimberCommons.WaterTower.SupplyRemaining,"Запаса хватит на {0}","The argument is an already formatted duration string"
+
+IgorZ.TimberCommons.GrowthRateModifier.BoostPercentile,"Ускорение роста: <GreenHighlight>🡅</GreenHighlight>{0:0.#}%"
+IgorZ.TimberCommons.GrowthRateModifier.SlowdownPercentile,"Замедление роста: <RedHighlight>🡇</RedHighlight>{0:0.#}%"
