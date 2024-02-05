@@ -35,6 +35,21 @@
         <DocumentationFile>bin\Release\Automation.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
+      <Compile Include="..\UnityDevLite\DebugEx.cs">
+        <Link>UnityDevLite\DebugEx.cs</Link>
+      </Compile>
+      <Compile Include="..\UnityDevLite\HostedDebugLog.cs">
+        <Link>UnityDevLite\HostedDebugLog.cs</Link>
+      </Compile>
+      <Compile Include="..\UnityDevLite\ReflectedAction.cs">
+        <Link>UnityDevLite\ReflectedAction.cs</Link>
+      </Compile>
+      <Compile Include="..\UnityDevLite\ReflectedField.cs">
+        <Link>UnityDevLite\ReflectedField.cs</Link>
+      </Compile>
+      <Compile Include="..\UnityDevLite\TypeUtils.cs">
+        <Link>UnityDevLite\TypeUtils.cs</Link>
+      </Compile>
       <Compile Include="Actions\AutomationActionBase.cs" />
       <Compile Include="Actions\DetonateDynamiteAction.cs" />
       <Compile Include="Actions\MarkForEmptyingAction.cs" />
@@ -69,9 +84,6 @@
       <Compile Include="Tools\ResumeTool.cs" />
       <Compile Include="UI\AutomationFragment.cs" />
       <Compile Include="UI\Configurator.cs" />
-      <Compile Include="UnityDevLite\DebugEx.cs" />
-      <Compile Include="UnityDevLite\HostedDebugLog.cs" />
-      <Compile Include="UnityDevLite\ReflectedAction.cs" />
       <Compile Include="Utils\AbstractAreaSelectionTool.cs" />
       <Compile Include="Utils\AbstractLockingTool.cs" />
       <Compile Include="Utils\CustomToolSystem.cs" />
