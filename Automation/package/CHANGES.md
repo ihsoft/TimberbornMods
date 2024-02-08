@@ -1,6 +1,8 @@
 # v0.13 (pre-relealse):
 * Add "finish now" debug tool to immediatelty complete construction of the selected objects.
 * Fix detecting current drought state condition.
+* Change weather icons to the current game scheme.
+* Add new skins for the debug tools.
 
 # v0.12 (10 Jan 2024)
 * Experimental version for Update 5.
