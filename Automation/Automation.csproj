@@ -145,6 +145,7 @@
       <Reference Include="Bindito.Unity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Bindito.Unity.dll</HintPath>
       </Reference>
+      <Reference Include="System" />
       <Reference Include="System.Collections.Immutable, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
         <HintPath>..\Dependencies\Timberborn\System.Collections.Immutable.dll</HintPath>
       </Reference>
@@ -285,6 +286,9 @@
       </Reference>
       <Reference Include="Timberborn.WaterBuildings, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.WaterBuildings.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.WeatherSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.WeatherSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.WorldSerialization, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.WorldSerialization.dll</HintPath>
