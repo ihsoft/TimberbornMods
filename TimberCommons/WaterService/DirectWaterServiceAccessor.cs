@@ -130,6 +130,7 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
   readonly List<WaterMover> _waterMovers = new();
   List<WaterMover> _threadSafeWaterMovers = new();
   float[] _waterContaminations;
+  float[] _contaminationsBuffer;
 
   #region API
   /// <summary>Water depths indexed by the tile index.</summary>
@@ -183,6 +184,7 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
 
     _waterDepths = _waterMap.WaterDepths;
     _waterContaminations = _waterContaminationMap.Contaminations;
+    _contaminationsBuffer = _waterSimulator._contaminationsBuffer;
     _surfaceHeights = _impermeableSurfaceService.Heights;
 
     HarmonyPatcher.PatchRepeated(GetType().AssemblyQualifiedName, typeof(WaterSimulatorUpdateWaterParametersPatch));
@@ -226,14 +228,16 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
   WaterMap _waterMap;
   WaterContaminationMap _waterContaminationMap;
   ImpermeableSurfaceService _impermeableSurfaceService;
+  WaterSimulator _waterSimulator;
 
   /// <summary>Injects run-time dependencies.</summary>
   [Inject]
   public void InjectDependencies(WaterMap waterMap, WaterContaminationMap waterContaminationMap,
-                                 ImpermeableSurfaceService impermeableSurfaceService) {
+                                 ImpermeableSurfaceService impermeableSurfaceService, WaterSimulator waterSimulator) {
     _waterMap = waterMap;
     _waterContaminationMap = waterContaminationMap;
     _impermeableSurfaceService = impermeableSurfaceService;
+    _waterSimulator = waterSimulator;
   }
   /// <summary>
   /// Processes the water consumption. Must only be called from the thread that is processing the water height updates. 
@@ -329,7 +333,7 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
     var outputContamination =
         (_waterContaminations[outputIndex] * initialWaterDepth + inputContamination * canMoveAmount)
         / endWaterDepth;
-    _waterContaminations[outputIndex] = outputContamination > 1.0f ? 1.0f : outputContamination;
+    _contaminationsBuffer[outputIndex] = outputContamination > 1.0f ? 1.0f : outputContamination;
 
     waterMover.WaterMoved = waterMovedTillNow + canMoveAmount;
   }
