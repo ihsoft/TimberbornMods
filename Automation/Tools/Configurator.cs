@@ -24,6 +24,7 @@ sealed class Configurator : IConfigurator {
     CustomToolSystem.BindTool<CancelTool>(containerDefinition);
     CustomToolSystem.BindTool<ApplyTemplateTool, ApplyTemplateTool.ToolInfo>(containerDefinition);
     CustomToolSystem.BindTool<DebugPickTool>(containerDefinition);
+    CustomToolSystem.BindTool<DebugFinishNowTool>(containerDefinition);
   }
 }
 

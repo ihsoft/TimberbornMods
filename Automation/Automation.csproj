@@ -64,6 +64,7 @@
       <Compile Include="Tools\AutomationRule.cs" />
       <Compile Include="Tools\CancelTool.cs" />
       <Compile Include="Tools\Configurator.cs" />
+      <Compile Include="Tools\DebugFinishNowTool.cs" />
       <Compile Include="Tools\DebugPickTool.cs" />
       <Compile Include="Tools\IAutomationModeEnabler.cs" />
       <Compile Include="Tools\PauseTool.cs" />

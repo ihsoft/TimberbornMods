@@ -4,6 +4,9 @@ IgorZ.Automation.DebugPickTool.Description,"Prints components on the selected ob
 IgorZ.Automation.DebugPickTool.DescriptionHint1,"Hold <i>SHIFT</i> to print Accessible."
 IgorZ.Automation.DebugPickTool.DescriptionHint2,"Hold <i>CTRL</i> to print NavMesh edges."
 
+IgorZ.Automation.DebugFinishNowTool.Title,"Finish now debug tool"
+IgorZ.Automation.DebugFinishNowTool.Description,"Imemdiately finishes the selected constructables."
+
 IgorZ.Automation.ToolGroup.Main.DisplayName,"Setup automation"
 IgorZ.Automation.ToolGroup.Terrain.DisplayName,"Terrain changing"
 IgorZ.Automation.ToolGroup.Water.DisplayName,"Water conditions"
