@@ -36,6 +36,18 @@
         <DocumentationFile>bin\Release\Automation.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
+      <Compile Include="..\TimberDev\Utils\CustomizableInstantiator.cs">
+        <Link>Utils\CustomizableInstantiator.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\FeatureController.cs">
+        <Link>Utils\FeatureController.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\HarmonyPatcher.cs">
+        <Link>Utils\HarmonyPatcher.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\PrefabPatcher.cs">
+        <Link>Utils\PrefabPatcher.cs</Link>
+      </Compile>
       <Compile Include="..\UnityDevLite\DebugEx.cs">
         <Link>UnityDevLite\DebugEx.cs</Link>
       </Compile>
@@ -72,6 +84,7 @@
       <Compile Include="Core\AutomationBehavior.cs" />
       <Compile Include="Core\AutomationService.cs" />
       <Compile Include="Core\Configurator.cs" />
+      <Compile Include="Core\Features.cs" />
       <Compile Include="Core\IAutomationConditionListener.cs" />
       <Compile Include="Core\IAutomationCondition.cs" />
       <Compile Include="Core\IAutomationAction.cs" />
