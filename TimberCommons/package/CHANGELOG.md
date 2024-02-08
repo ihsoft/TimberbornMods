@@ -1,3 +1,5 @@
+# v1.6 (started on 2/7/2024):
+
 # v1.5 (3 Feb 2024):
 * Relase irrigation towers code.
 * Introduce the irrigation tower components: `GoodConsumingIrrigationTower` and `ManufactoryIrrigationTower`.
