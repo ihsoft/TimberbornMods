@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using Bindito.Core;
+using IgorZ.TimberDev.Logging;
 using TimberApi.ConfiguratorSystem;
 using TimberApi.SceneSystem;
 
@@ -13,6 +14,8 @@ namespace IgorZ.TimberCommons.WaterService {
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<DirectWaterServiceAccessor>().AsSingleton();
+    containerDefinition.Bind<DirectSoilMoistureSystemAccessor>().AsSingleton();
+    containerDefinition.Bind<ThreadedLogsRecorder>().AsSingleton();
   }
 }
 
