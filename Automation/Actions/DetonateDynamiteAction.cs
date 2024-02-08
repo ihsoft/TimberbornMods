@@ -16,7 +16,6 @@ using Timberborn.Explosions;
 using Timberborn.Persistence;
 using Timberborn.ToolSystem;
 using UnityDev.Utils.LogUtilsLite;
-using UnityDev.Utils.Reflections;
 using UnityEngine;
 
 namespace Automation.Actions {
@@ -88,8 +87,6 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
 
   #region MonoBehavior object to handle action repeat
   class DetonateAndRepeatRule : MonoBehaviour {
-    static readonly ReflectedAction<BlockObjectTool, IEnumerable<Placement>> BlockObjectToolPlace =
-        new("Place");
     const float MinDistanceToCheckOccupants = 2.0f;
 
     IBlockOccupancyService _blockOccupancyService;
@@ -127,7 +124,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
           .ToolButtons.Select(x => x.Tool)
           .OfType<BlockObjectTool>()
           .FirstOrDefault(x => x.Prefab.name.StartsWith("Dynamite"));
-      if (dynamiteTool == null || !BlockObjectToolPlace.IsValid()) {
+      if (dynamiteTool == null) {
         DebugEx.Error("Cannot execute dynamite place tool");
         Destroy(gameObject);
         yield break;
@@ -137,7 +134,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
       var coordinates = blockObject.Coordinates;
       yield return new WaitUntil(() => blockObject == null);
       coordinates.z = coordinates.z - 1;
-      BlockObjectToolPlace.Invoke(dynamiteTool, new List<Placement> { new(coordinates) });
+      dynamiteTool.Place(new List<Placement> { new(coordinates) });
       var blockService = DependencyContainer.GetInstance<BlockService>();
       BlockObject newDynamite;
       do {
