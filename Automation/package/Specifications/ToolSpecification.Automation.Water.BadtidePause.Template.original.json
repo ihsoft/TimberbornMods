@@ -11,11 +11,11 @@
     "Rules": [
       {
         "Condition": { "TypeId": "Automation.Conditions.BadtideStartedCondition" },
-        "Action": { "TypeId": "Automation.Actions.UnpauseAction" }
+        "Action": { "TypeId": "Automation.Actions.PauseAction" }
       },
       {
         "Condition": { "TypeId": "Automation.Conditions.BadtideEndedCondition" },
-        "Action": { "TypeId": "Automation.Actions.PauseAction" }
+        "Action": { "TypeId": "Automation.Actions.UnpauseAction" }
       }
     ]
   }
