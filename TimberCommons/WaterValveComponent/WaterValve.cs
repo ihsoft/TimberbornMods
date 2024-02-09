@@ -5,6 +5,7 @@
 using Bindito.Core;
 using IgorZ.TimberCommons.WaterService;
 using Timberborn.BlockSystem;
+using Timberborn.BuildingsBlocking;
 using Timberborn.ConstructibleSystem;
 using Timberborn.MapIndexSystem;
 using Timberborn.Particles;
@@ -20,9 +21,10 @@ namespace IgorZ.TimberCommons.WaterValveComponent {
 /// The water is moved from tiles with a higher level to the tiles with a lover level. The maximum water flow can be
 /// limited. Add this component to a water obstacle prefab.
 /// </remarks>
-public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinishedStateListener {
+public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinishedStateListener, IPausableComponent {
   #region Unity fields
   // ReSharper disable InconsistentNaming
+  // ReSharper disable RedundantDefaultMemberInitializer
 
   [SerializeField]
   [Tooltip("Indicates if the valve UI fragment should be shown in game for this building.")]
@@ -68,10 +70,12 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
   [Tooltip("If set, then will start on non-zero flow and stop if no water is being moving via the valve.")]
   ParticleSystem _particleSystem = null;
 
+  // ReSharper restore RedundantDefaultMemberInitializer
   // ReSharper restore InconsistentNaming
   #endregion
 
   #region API
+
   /// <summary>Absolute height of the water surface above the map at the valve intake.</summary>
   public float WaterHeightAtInput { get; private set; }
 
@@ -88,9 +92,9 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
   /// <remarks>The valve won't take water if the level is blow the setting. Values below zero mean "no limit".</remarks>
   public float MinWaterLevelAtIntake {
     get => _minimumWaterLevelAtIntake;
-    internal set {
+    set {
       _minimumWaterLevelAtIntake = value;
-      _waterMover.MinHeightAtInput = value > 0 ? value + _valveBaseZ : -1.0f;
+      UpdateWaterMover();
     }
   }
 
@@ -101,9 +105,9 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
   /// <seealso cref="OutputLevelCheckDisabled"/>
   public float MaxWaterLevelAtOuttake {
     get => _maximumWaterLevelAtOuttake;
-    internal set {
+    set {
       _maximumWaterLevelAtOuttake = value;
-      _waterMover.MaxHeightAtOutput = !OutputLevelCheckDisabled && value > 0 ? value + _valveBaseZ : -1.0f;
+      UpdateWaterMover();
     }
   }
 
@@ -123,7 +127,7 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
   /// <seealso cref="FlowLimit"/>
   public float WaterFlow {
     get => _waterMover.WaterFlow;
-    internal set => _waterMover.WaterFlow = value;
+    set => _waterMover.WaterFlow = value;
   }
 
   /// <summary>Indicates that flow limit can be changed via UI panel. It's a prefab setting.</summary>
@@ -150,7 +154,7 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
     get => _outputLevelCheckDisabled;
     set {
       _outputLevelCheckDisabled = value;
-      MaxWaterLevelAtOuttake = MaxWaterLevelAtOuttake; // Refresh water mover.
+      UpdateWaterMover();
     }
   }
   bool _outputLevelCheckDisabled;
@@ -161,23 +165,30 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
     get => _moveContaminatedWater;
     set {
       _moveContaminatedWater = value;
-      _waterMover.MoveContaminatedWater = value;
+      UpdateWaterMover();
     }
   }
 
   /// <summary>Indicates if the UI panel should be shown when the valve is selected. It's a prefab setting.</summary>
   public bool ShowUIPanel => _showUIPanel;
+
+  /// <summary>Tells if the valve is active and processing water.</summary>
+  public bool IsActive { get; private set; }
   #endregion
 
   #region Implementation
+
   IWaterService _waterService;
   DirectWaterServiceAccessor _directWaterServiceAccessor;
   MapIndexService _mapIndexService;
   ParticlesRunnerFactory _particlesRunnerFactory;
 
+  /// <summary>Changes to the mover will be propagated to the simulation system on the next tick.</summary>
+  /// <seealso cref="UpdateWaterMover"/>
   readonly DirectWaterServiceAccessor.WaterMover _waterMover = new();
 
   BlockObject _blockObject;
+  PausableBuilding _pausableBuilding;
   ParticlesRunner _particlesRunner;
   int _valveBaseZ;
   Vector2Int _inputCoordinatesTransformed;
@@ -185,15 +196,11 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
 
   void Awake() {
     _blockObject = GetComponentFast<BlockObject>();
+    _pausableBuilding = GetComponentFast<PausableBuilding>();
     if (_particleSystem != null) {
       _particlesRunner = _particlesRunnerFactory.CreateForFinishedState(GameObjectFast, _particleSystem);
     }
-    UpdateAdjustableValuesFromPrefab();
-    enabled = false;
-  }
-
-  void OnDestroy() {
-    _directWaterServiceAccessor.DeleteWaterMover(_waterMover);
+    _waterMover.WaterFlow = _waterFlowPerSecond;
   }
 
   /// <summary>Injected instances.</summary>
@@ -206,29 +213,46 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
     _particlesRunnerFactory = particlesRunnerFactory;
   }
 
-  void UpdateAdjustableValuesFromPrefab() {
-    WaterFlow = _waterFlowPerSecond;
+  /// <summary>Adds water mover to the simulation system.</summary>
+  void StartWaterMover() {
+    if (IsActive) {
+      StopWaterMover();
+    }
+    UpdateWaterMover();
+    _directWaterServiceAccessor.AddWaterMover(_waterMover);
+    IsActive = true;
   }
+
+  /// <summary>Removes water mover from the simulation system.</summary>
+  void StopWaterMover() {
+    if (!IsActive) {
+      return;
+    }
+    IsActive = false;
+    _directWaterServiceAccessor.DeleteWaterMover(_waterMover);
+    if (_particlesRunner != null) {
+      _particlesRunner.Stop();
+    }
+  }
+
+  /// <summary>Updates water mover to the current settings.</summary>
+  void UpdateWaterMover() {
+    _waterMover.MinHeightAtInput = _minimumWaterLevelAtIntake > 0 ? _minimumWaterLevelAtIntake + _valveBaseZ : -1.0f;
+    _waterMover.MaxHeightAtOutput = !OutputLevelCheckDisabled && _maximumWaterLevelAtOuttake > 0
+        ? _maximumWaterLevelAtOuttake + _valveBaseZ
+        : -1.0f;
+    _waterMover.MoveContaminatedWater = _moveContaminatedWater;
+  }
+
   #endregion
 
   #region TickableComponent implemenatation
-  /// <inheritdoc/>
-  public override void StartTickable() {
-    base.StartTickable();
-
-    _valveBaseZ = _blockObject.Coordinates.z;
-    _inputCoordinatesTransformed = _blockObject.Transform(_inputCoordinates);
-    _outputCoordinatesTransformed = _blockObject.Transform(_outputCoordinates);
-    _waterMover.InputTileIndex = _mapIndexService.CoordinatesToIndex(_inputCoordinatesTransformed);
-    _waterMover.OutputTileIndex = _mapIndexService.CoordinatesToIndex(_outputCoordinatesTransformed);
-    MinWaterLevelAtIntake = MinWaterLevelAtIntake;
-    MaxWaterLevelAtOuttake = MaxWaterLevelAtOuttake;
-    MoveContaminatedWater = MoveContaminatedWater;
-    _directWaterServiceAccessor.AddWaterMover(_waterMover);
-  }
 
   /// <inheritdoc/>
   public override void Tick() {
+    if (!IsActive) {
+      return;
+    }
     WaterHeightAtInput = Mathf.Max(_waterService.WaterHeight(_inputCoordinatesTransformed), _valveBaseZ);
     WaterDepthAtIntake = _directWaterServiceAccessor.WaterDepths[_waterMover.InputTileIndex];
     WaterHeightAtOutput = Mathf.Max(_waterService.WaterHeight(_outputCoordinatesTransformed), _valveBaseZ);
@@ -243,9 +267,11 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
       }
     }
   }
+
   #endregion
 
   #region IPersistentEntity implementation
+
   static readonly ComponentKey WaterValveKey = new(typeof(WaterValve).FullName);
   static readonly PropertyKey<float> WaterFlowLimitKey = new(nameof(WaterFlow));
   static readonly PropertyKey<bool> OutputLevelCheckDisabledKey = new(nameof(OutputLevelCheckDisabled));
@@ -262,26 +288,42 @@ public sealed class WaterValve : TickableComponent, IPersistentEntity, IFinished
   /// <inheritdoc/>
   public void Load(IEntityLoader entityLoader) {
     if (!entityLoader.HasComponent(WaterValveKey)) {
-      UpdateAdjustableValuesFromPrefab();
       return;
     }
     var state = entityLoader.GetComponent(WaterValveKey);
     WaterFlow = state.GetValueOrNullable(WaterFlowLimitKey) ?? FlowLimit;
-    OutputLevelCheckDisabled = state.GetValueOrNullable(OutputLevelCheckDisabledKey) ?? _outputLevelCheckDisabled;
-    MoveContaminatedWater = state.GetValueOrNullable(MoveContaminatedWaterKey) ?? _moveContaminatedWater;
+    _outputLevelCheckDisabled = state.GetValueOrNullable(OutputLevelCheckDisabledKey) ?? _outputLevelCheckDisabled;
+    _moveContaminatedWater = state.GetValueOrNullable(MoveContaminatedWaterKey) ?? _moveContaminatedWater;
   }
+
   #endregion
 
   #region IFinishedStateListener implementation
+
   /// <inheritdoc/>
   public void OnEnterFinishedState() {
-    enabled = true;
+    _valveBaseZ = _blockObject.Coordinates.z;
+    _inputCoordinatesTransformed = _blockObject.Transform(_inputCoordinates);
+    _outputCoordinatesTransformed = _blockObject.Transform(_outputCoordinates);
+    _waterMover.InputTileIndex = _mapIndexService.CoordinatesToIndex(_inputCoordinatesTransformed);
+    _waterMover.OutputTileIndex = _mapIndexService.CoordinatesToIndex(_outputCoordinatesTransformed);
+    _pausableBuilding.PausedChanged += (_, _) => {
+      if (_pausableBuilding.Paused) {
+        StopWaterMover();
+      } else {
+        StartWaterMover();
+      }
+    };
+    if (!_pausableBuilding.Paused) {
+      StartWaterMover();
+    }
   }
 
   /// <inheritdoc/>
   public void OnExitFinishedState() {
-    enabled = false;
+    StopWaterMover();
   }
+
   #endregion
 }
 

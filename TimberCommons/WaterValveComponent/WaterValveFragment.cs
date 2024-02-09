@@ -144,7 +144,7 @@ sealed class WaterValveFragment : IEntityPanelFragment {
       _inputWaterLevelText.text = string.Format(MinimumLevelAtIntakeText, _waterValve.MinWaterLevelAtIntake);
       _outputWaterLevelText.text = string.Format(MaximumLevelAtOuttakeText, _waterValve.MaxWaterLevelAtOuttake);
     }
-    if (_waterValve.enabled) {
+    if (_waterValve.IsActive) {
       var info = new List<string> {
           _loc.T(WaterDepthAtIntakeLocKey, _waterValve.WaterDepthAtIntake),
           _loc.T(WaterDepthAtOuttakeLocKey, _waterValve.WaterDepthAtOuttake),
@@ -157,7 +157,7 @@ sealed class WaterValveFragment : IEntityPanelFragment {
       }
       _infoLabel.text = string.Join("\n", info);
     }
-    _infoLabel.ToggleDisplayStyle(visible: _waterValve.enabled);
+    _infoLabel.ToggleDisplayStyle(visible: _waterValve.IsActive);
   }
 
   [OnEvent]
