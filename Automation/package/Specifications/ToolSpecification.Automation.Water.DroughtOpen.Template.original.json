@@ -2,7 +2,7 @@
   "Id": "Automation.Tmpl.Water.OpenFloodgateDrought",
   "GroupId": "AutomationWaterToolGroupId",
   "Type": "Automation.Templates.ApplyTemplateTool",
-  "Order": 4,
+  "Order": 30,
   "Icon": "igorz.automation/ui_icons/icon-drought-open",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.DroughtOpenFloodgate.DisplayName",
   "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.DroughtOpenFloodgate.Description",

@@ -71,6 +71,8 @@
       <Compile Include="Actions\UnmarkForEmptyingAction.cs" />
       <Compile Include="Actions\UnpauseAction.cs" />
       <Compile Include="Conditions\AutomationConditionBase.cs" />
+      <Compile Include="Conditions\BadtideEndedCondition.cs" />
+      <Compile Include="Conditions\BadtideStartedCondition.cs" />
       <Compile Include="Conditions\CheckAccessBlockCondition.cs" />
       <Compile Include="Conditions\PathCheckingController.cs" />
       <Compile Include="Conditions\Configurator.cs" />
