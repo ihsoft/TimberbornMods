@@ -99,6 +99,7 @@
       <Compile Include="WaterService\Configurator.cs" />
       <Compile Include="WaterService\DirectSoilMoistureSystemAccessor.cs" />
       <Compile Include="WaterService\DirectWaterServiceAccessor.cs" />
+      <Compile Include="WaterService\SoilMoistureSimulatorGetUpdatedMoisturePatch.cs" />
       <Compile Include="WaterValveComponent\Configurator.cs" />
       <Compile Include="WaterValveComponent\WaterValve.cs" />
       <Compile Include="WaterValveComponent\WaterValveFragment.cs" />
