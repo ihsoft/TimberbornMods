@@ -231,6 +231,13 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   DirectSoilMoistureSystemAccessor _directSoilMoistureSystemAccessor;
 
   float _adjustedMaxSqrRadius;
+
+  /// <summary>This is a delta to be added to any distance value to account the building's boundaries.</summary>
+  /// <remarks>
+  /// All the tiles are considered in terms of "a range from the boundary", not from the building's center. The bigger
+  /// the boundary (building's size), the greater is this adjuster. Not that it doesn't handle well the case of the
+  /// boundary that is not a perfect square. 
+  /// </remarks>
   float _radiusAdjuster;
 
   /// <summary>The moisture override, registered in the direct moisture system component.</summary>
@@ -322,7 +329,8 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
     if (_moistureOverrideIndex != -1) {
       return;
     }
-    _moistureOverrideIndex = _directSoilMoistureSystemAccessor.AddMoistureOverride(ReachableTiles, _moistureLevel);
+    _moistureOverrideIndex = _directSoilMoistureSystemAccessor.AddMoistureOverride(
+        ReachableTiles, _moistureLevel, tile => CalculateDesertLevel(tile, EffectiveRange));
     IrrigationStarted();
   }
 
@@ -358,12 +366,31 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
     _baseZ = BlockObject.Placement.Coordinates.z;
   }
 
+  /// <summary>Calculates the tile's "moisture look" based on its distance from the tower.</summary>
+  float CalculateDesertLevel(Vector2Int tile, float range) {
+    var desertLevelFadeInLength = range * DesertLevelFadeInRangePct;
+    var bestMoistureRadius = range + _radiusAdjuster - desertLevelFadeInLength;
+    var dist = Mathf.Sqrt(GetSqrtDistance(tile));
+    if (dist <= bestMoistureRadius) {
+      return LowerestDesertLevel;
+    }
+    return LowerestDesertLevel + DesertLevelFadeInLength * ((dist - bestMoistureRadius) / desertLevelFadeInLength);
+  }
+  const float DesertLevelFadeInRangePct = 0.25f;
+  const float LowerestDesertLevel = DirectSoilMoistureSystemAccessor.DesertLevelWellMoisturized;
+  const float HighestDesertLevel = DirectSoilMoistureSystemAccessor.DesertLevelAlmostDry;
+  const float DesertLevelFadeInLength = HighestDesertLevel - LowerestDesertLevel;
+
+  /// <summary>Get's square distance of the tile form the building's center.</summary>
+  float GetSqrtDistance(Vector2Int tile) {
+    return (tile.x - _buildingCenter.x) * (tile.x - _buildingCenter.x)
+        + (tile.y - _buildingCenter.y) * (tile.y - _buildingCenter.y);
+  }
+
   /// <summary>Tells if the provided tile is within the tower's max range.</summary>
   /// <seealso cref="_irrigationRange"/>
   bool IsTileInRange(Vector2Int tile) {
-    var sqrDist = (tile.x - _buildingCenter.x) * (tile.x - _buildingCenter.x)
-        + (tile.y - _buildingCenter.y) * (tile.y - _buildingCenter.y);
-    return sqrDist <= _adjustedMaxSqrRadius;
+    return GetSqrtDistance(tile) <= _adjustedMaxSqrRadius;
   }
 
   /// <summary>Returns all the tiles in the irrigated range.</summary>
@@ -385,9 +412,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
         continue; // Already checked, skip it.
       }
       var index = _mapIndexService.CoordinatesToIndex(tile);
-      var sqrDist = (tile.x - _buildingCenter.x) * (tile.x - _buildingCenter.x)
-          + (tile.y - _buildingCenter.y) * (tile.y - _buildingCenter.y);
-      if (sqrDist > sqrRadius
+      if (GetSqrtDistance(tile) > sqrRadius
           || !skipChecks && _terrainService.UnsafeCellHeight(index) != _baseZ
           || !skipChecks && _soilBarrierMap.FullMoistureBarriers[index]) {
         continue; // Not eligible.

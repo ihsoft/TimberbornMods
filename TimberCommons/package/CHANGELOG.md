@@ -1,6 +1,7 @@
 # v1.6 (started on 2/7/2024):
 * [Fix #33] Water valve doesn't handle contamination correctly.
-* Make WaterValve pausable.
+* [Feature] Make WaterValve pausable.
+* [Feature] Show the tiles, irrigated by the `WaterTower`, as *green* on the map instead of "barely green, maybe dying".
 
 # v1.5 (3 Feb 2024):
 * Relase irrigation towers code.
