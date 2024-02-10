@@ -100,6 +100,7 @@
       <Compile Include="WaterService\DirectSoilMoistureSystemAccessor.cs" />
       <Compile Include="WaterService\DirectWaterServiceAccessor.cs" />
       <Compile Include="WaterService\SoilMoistureSimulatorGetUpdatedMoisturePatch.cs" />
+      <Compile Include="WaterService\TerrainMaterialMapSetDesertIntensityPatch.cs" />
       <Compile Include="WaterValveComponent\Configurator.cs" />
       <Compile Include="WaterValveComponent\WaterValve.cs" />
       <Compile Include="WaterValveComponent\WaterValveFragment.cs" />
@@ -257,6 +258,7 @@
       <Reference Include="..\Dependencies\Timberborn\Timberborn.Growing.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.GrowingUI.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.WorkshopsUI.dll" Publicize="true" />
+      <Reference Include="Timberborn.TerrainSystem" Publicize="true" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -16,6 +16,7 @@ sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     HarmonyPatcher.PatchRepeated(
         GetType().AssemblyQualifiedName,
+        typeof(TerrainMaterialMapSetDesertIntensityPatch),
         typeof(SoilMoistureSimulatorGetUpdatedMoisturePatch));
 
     containerDefinition.Bind<DirectWaterServiceAccessor>().AsSingleton();
