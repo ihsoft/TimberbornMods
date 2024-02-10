@@ -40,6 +40,12 @@ static class Features {
   /// <summary>Overrides the maximum registry size for PrefabOptimizer to suppress log complaints.</summary>
   public static int PrefabOptimizerMaxExpectedRegistrySize = -1;
 
+  /// <summary>
+  /// Specifies whether the terrain view should be adjusted to present irrigated tiles as "well moisturized". Otherwise,
+  /// the stock logic will decide based on the moisture level.
+  /// </summary>
+  public static bool OverrideDesertLevelsForWaterTowers;
+
   static Features() {
     FeatureController.ReadFeatures(Consume);
   }
@@ -58,6 +64,8 @@ static class Features {
             FeatureController.SetFlag(ref ShowLongValueForLowFuelConsumptionRecipes, name, enabled, value),
         "PrefabOptimizer.MaxExpectedRegistrySize" =>
             FeatureController.SetValue(ref PrefabOptimizerMaxExpectedRegistrySize, name, enabled, value),
+        "WaterTowers.OverrideDesertLevels" =>
+                FeatureController.SetFlag(ref OverrideDesertLevelsForWaterTowers, name, enabled, value),
         _ => false
     };
   }

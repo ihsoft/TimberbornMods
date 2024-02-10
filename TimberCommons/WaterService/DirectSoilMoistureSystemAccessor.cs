@@ -8,6 +8,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using Bindito.Core;
+using IgorZ.TimberCommons.Common;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.Common;
@@ -220,6 +221,9 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton {
     }
 
     // Desert levels. It only affects UI appearance.
+    if (!Features.OverrideDesertLevelsForWaterTowers) {
+      return;
+    }
     var desertOverridesCache = new Dictionary<Vector2Int, float>();
     foreach (var value in _desertLevelOverrides.Values.SelectMany(item => item)) {
       if (desertOverridesCache.TryGetValue(value.Key, out var existingValue)) {
@@ -238,6 +242,9 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton {
   /// <summary>Requests the terrain appearance update to reflect the overriden desert levels.</summary>
   /// <seealso cref="DesertLevelOverrides"/>
   void UpdateTilesAppearance(IEnumerable<Vector2Int> tiles) {
+    if (!Features.OverrideDesertLevelsForWaterTowers) {
+      return;
+    }
     foreach (var tile in tiles) {
       _terrainMaterialMap.SetDesertIntensity(tile, _terrainMaterialMap.GetDesertIntensity(tile));
     }

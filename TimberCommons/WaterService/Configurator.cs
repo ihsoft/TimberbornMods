@@ -2,7 +2,10 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
+using System.Collections.Generic;
 using Bindito.Core;
+using IgorZ.TimberCommons.Common;
 using IgorZ.TimberDev.Logging;
 using IgorZ.TimberDev.Utils;
 using TimberApi.ConfiguratorSystem;
@@ -14,10 +17,12 @@ namespace IgorZ.TimberCommons.WaterService {
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
-    HarmonyPatcher.PatchRepeated(
-        GetType().AssemblyQualifiedName,
-        typeof(TerrainMaterialMapSetDesertIntensityPatch),
-        typeof(SoilMoistureSimulatorGetUpdatedMoisturePatch));
+
+    var patches = new List<Type> { typeof(SoilMoistureSimulatorGetUpdatedMoisturePatch) };
+    if (Features.OverrideDesertLevelsForWaterTowers) {
+      patches.Add(typeof(TerrainMaterialMapSetDesertIntensityPatch));
+    }
+    HarmonyPatcher.PatchRepeated(GetType().AssemblyQualifiedName, patches.ToArray());
 
     containerDefinition.Bind<DirectWaterServiceAccessor>().AsSingleton();
     containerDefinition.Bind<DirectSoilMoistureSystemAccessor>().AsSingleton();

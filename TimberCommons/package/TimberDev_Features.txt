@@ -20,3 +20,7 @@ RecipesUI.ShowDaysHoursForSlowRecipes
 
 # Specifies whether fuel rates below 0.1 should be displayed with increased precision in the recipe UI.
 RecipesUI.ShowLongValueForLowFuelConsumptionRecipes
+
+# Specifies whether the terrain view should be adjusted to present irrigated tiles as "well moisturized". Otherwise,
+# the stock logic will decide based on the moisture level.
+WaterTowers.OverrideDesertLevels
