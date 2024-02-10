@@ -39,10 +39,10 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton {
     var tilesDict = tiles.Select(c => _mapIndexService.CoordinatesToIndex(c))
         .ToDictionary(k => k, _ => moisture);
     _moistureOverrides.Add(index,tilesDict);
-    var oldCacheSize = SoilMoistureSimulatorGetUpdatedMoisturePatch.MoistureOverrides?.Count;
+    var oldCacheSize = MoistureOverrides?.Count;
     UpdateMoistureMap();
     DebugEx.Fine("Added moisture override: id={0}, tiles={1}. Cache size: {2} => {3}",
-                 index, tilesDict.Count, oldCacheSize, SoilMoistureSimulatorGetUpdatedMoisturePatch.MoistureOverrides?.Count);
+                 index, tilesDict.Count, oldCacheSize, MoistureOverrides?.Count);
     return index;
   }
 
@@ -54,10 +54,10 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton {
       return;
     }
     _moistureOverrides.Remove(overrideId);
-    var oldCacheSize = SoilMoistureSimulatorGetUpdatedMoisturePatch.MoistureOverrides?.Count;
+    var oldCacheSize = MoistureOverrides?.Count;
     UpdateMoistureMap();
     DebugEx.Fine("Removed moisture override: id={0}, tiles={1}. Cache size: {2} => {3}",
-                 overrideId, tilesDict.Count, oldCacheSize, SoilMoistureSimulatorGetUpdatedMoisturePatch.MoistureOverrides?.Count);
+                 overrideId, tilesDict.Count, oldCacheSize, MoistureOverrides?.Count);
   }
 
   /// <summary>Sets contamination blockers for a set of tiles.</summary>
@@ -108,12 +108,16 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton {
   #region IPostLoadableSingleton implementation
   /// <summary>Sets up the moisture override logic.</summary>
   public void PostLoad() {
-    SoilMoistureSimulatorGetUpdatedMoisturePatch.MoistureOverrides = null;
+    MoistureOverrides = null;
     _eventBus.Register(this);
   }
   #endregion
 
   #region Implementation
+
+  /// <summary>Map of the overriden levels.</summary>
+  /// <remarks>It will be accessed from the threads, so don't modify the dict once assigned.</remarks>
+  internal static Dictionary<int, float> MoistureOverrides;
   readonly Dictionary<int, Dictionary<int, float>> _moistureOverrides = new();
   int _nextMoistureOverrideId = 1;
 
@@ -150,7 +154,10 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton {
       }
     }
     // Must be thread-safe.
-    Interlocked.Exchange(ref SoilMoistureSimulatorGetUpdatedMoisturePatch.MoistureOverrides, overridesCache);
+    if (overridesCache.Count == 0) {
+      overridesCache = null;
+    }
+    Interlocked.Exchange(ref MoistureOverrides, overridesCache);
   }
 
   /// <summary>Reacts on contamination blockers removal.</summary>
