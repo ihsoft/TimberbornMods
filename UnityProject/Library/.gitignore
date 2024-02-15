@@ -27,3 +27,5 @@ ArtifactDB
 ArtifactDB-lock
 SourceAssetDB
 SourceAssetDB-lock
+Undo*
+MarkdownImageCache
