@@ -15,7 +15,7 @@ MonoBehaviour:
   FirstLoad: 1
   ShowOnStartup: 1
   GameExecutable: Timberborn.exe
-  GamePath: R:\Program Files (x86)\Steam\steamapps\common\Timberborn
+  GamePath: U:\
   Is64Bit: 1
   DateTimeFormat: HH:mm:ss:fff
   CreatedDateFormat: MMM/dd HH:mm:ss
