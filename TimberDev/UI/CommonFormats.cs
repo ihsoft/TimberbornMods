@@ -23,6 +23,8 @@ public static class CommonFormats {
   /// <summary>Gives a VERY short form of the "hours amount".</summary>
   public static string DaysHoursFormat(ILoc loc, float hoursAmount) {
     switch (hoursAmount) {
+      case <= 0.01f:
+        return loc.T(HoursLocKey, "0");
       case < 1f:
         return loc.T(HoursLocKey, hoursAmount.ToString("0.##"));
       case < 10f:

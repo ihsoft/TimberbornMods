@@ -2,6 +2,7 @@
 * [Fix #33] Water valve doesn't handle contamination correctly.
 * [Feature] Make WaterValve pausable.
 * [Feature] Show the tiles, irrigated by the `WaterTower`, as *green* on the map instead of "barely green, maybe dying".
+* [Enhancement] Show duration values below `0.01` as zero.
 
 # v1.5 (3 Feb 2024):
 * Relase irrigation towers code.
