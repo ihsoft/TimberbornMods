@@ -40,6 +40,14 @@
         "com.unity.modules.imgui": "1.0.0"
       }
     },
+    "timberapi": {
+      "version": "file:TimberAPI",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "bepinex-bepinexpack_timberborn": "5.4.21"
+      }
+    },
     "com.unity.modules.ai": {
       "version": "1.0.0",
       "depth": 0,
