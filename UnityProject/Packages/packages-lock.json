@@ -48,6 +48,14 @@
         "bepinex-bepinexpack_timberborn": "5.4.21"
       }
     },
+    "timbercommons": {
+      "version": "file:TimberCommons",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "timberborn": "5.9.0"
+      }
+    },
     "com.unity.modules.ai": {
       "version": "1.0.0",
       "depth": 0,
