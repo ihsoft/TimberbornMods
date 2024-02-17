@@ -56,6 +56,14 @@
         "timberborn": "5.9.0"
       }
     },
+    "timberborn": {
+      "version": "file:Timberborn",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "timberapi": "0.6.5"
+      }
+    },
     "com.unity.modules.ai": {
       "version": "1.0.0",
       "depth": 0,
