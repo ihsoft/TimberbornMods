@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   FirstLoad: 1
   ShowOnStartup: 1
-  GameExecutable: Timberborn.exe
-  GamePath: U:\
-  Is64Bit: 1
+  GameExecutable: 
+  GamePath: 
+  Is64Bit: 0
   DateTimeFormat: HH:mm:ss:fff
   CreatedDateFormat: MMM/dd HH:mm:ss
   ShowLogWindow: 1
@@ -31,4 +31,4 @@ MonoBehaviour:
   SelectedManifest: {fileID: 0}
   QuickAccessPipelines: []
   QuickAccessManifests: []
-  ImportConfiguration: {fileID: 11400000, guid: 61f4a8c2ad80de24ea3808b8777b78a9, type: 2}
+  ImportConfiguration: {fileID: 0}
