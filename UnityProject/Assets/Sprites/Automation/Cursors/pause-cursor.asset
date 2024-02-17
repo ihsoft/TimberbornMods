@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -384587693, guid: 09a6a30d2fdad3c47b877b6dc233eacf, type: 3}
+  m_Script: {fileID: -384587693, guid: 6c83f14598db6589a8cefd1092f1e018, type: 3}
   m_Name: pause-cursor
   m_EditorClassIdentifier: 
   _smallCursor: {fileID: 2800000, guid: c334446b6bec7f84dab4dc4c205f6e27, type: 3}
