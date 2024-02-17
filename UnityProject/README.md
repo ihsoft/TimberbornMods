@@ -1,62 +1,69 @@
 # Overview
 
-**ATTENTION:** This project cannot be used "as-is" from Github! Read below and follow the
-required steps before even trying to open it.
+This project is intended to be used "as-is" after checking in from GitHub. All the key packages
+are already pre-installed and configured. However, as the game and the dependent mods are updated,
+so needs this project too.
 
-This folder contains a Unity project that is used to build assets for all the mods. For the proper
-work it should migrate to the current version of Unity used in the game.
+## Before you start
 
-**Do not submit game or mod DLLs to Github!** Add them locally, create the assets and build
-bundles. Only submit *.meta files for the used scripts since they contain GUIDs by which the
-script is referred.
-
-**HINT:** Unity tends to hang on the assembly update. To prevent it (or at least make it less
-frequent) add the following command line arguments:
+Unity tends to hang on the assembly update. To prevent it (or at least make it less frequent), add
+the following command line arguments:
 
 - `-DisableDirectoryMonitor`
 - `-disable-assembly-updater`
 
-**HINT:** If Unity hangs during assembly updates (no progress shown), give it 5 minutes and then
-just kill it from the Task Manager. Then, restart. It usually works fine, but may need 2-3
-attempts before the editor starts.
+## Updating to the new game version
 
-**HINT:** It would be a very good idea to move this folder to a fast SSD drive. Use junctions to
-map the folder from the main Git repository to SSD (if the repository is not already there).
-
-## Getting Game DLLs
-
-Before doing any work, you must import the current game DLLs. It is done via ThunderKit.
+Do not just copy DLLs from the game's folder! It's important to restore the right meta files.
+Otherwise, the stock buildings prefabs won't load and any new prefabs made may not work fine in
+the game.
 
 1. Run the editor.
 2. Go to "Tools > ThunderKit > Settings".
 3. Choose "ThunderKit Settings" menu and provide the valid path to the game in the "Game Path"
    input field.
 4. Click "Import" and let the progress complete (can take some time). The kit will ask to restart
-   the editor, do it.
-5. Go to "Window > Package Manager". You should see a group for "DefaultCompany" that has an item
-   "Timberborn". If it's there, then it worked as expected.
-6. Now you have all the game's DLLs at `Packages/Timberborn`.
+   the editor, don't! Just exit the editor.
+5. Rollback the changes in `packages-lock.json` file since import breaks the package dependencies.
+6. Rollback the changes in `Timberborn/package.json` and update version in it to the current game's
+   version.
+7. Run the editor and check if there are no errors on load.
 
-This setup is enough for creating custom cursors (e.g. for the `Automation` mod).
+The game's libraries are installed as package "Timberborn". It can be seen in the Package Manager.
 
-## Committing Changes to the Project
+## Updating TimberAPI
 
-If some scripts or related stuff needs to be committed, then it's better to isolate the changes
-that were made by ThunderKit. Save the project, go to "Package Manager", remove the Timberborn
-package, and close the editor. The state that you get on disk is safe to be committed to Github.
+1. Ensure the game version is up to date.
+2. Go to the game's `BepInEx/plugins/timberapi/TimberApi/core` folder and copy all the content
+   into the Unity packages folder located at `Packages/TimberAPI`.
+3. Update the version in the `package.json`.
 
-In this setup, some assets in the project may become invalid, but as long as you don't modify or
-build them, it's not a problem. Repeat steps from the above article to bring the game's stuff
-back and the assets will become functional again.
+The API's libraries are installed as package "TimberAPI". It can be seen in the Package Manager.
+
+## Updating TimberCommons
+
+1. Ensure the game and TimberAPI are up to date.
+2. Build the latest version of TimberCommons.
+3. Copy `TimberCommons.dll` and `CHANGES.md` files into `Package/TimberCommons` folder.
+4. Update the version in the `package.json`.
+
+The library is installed as package "TimberCommons". It can be seen in the Package Manager.
+
+**ATTENTION:** Do **not** touch meta file for the DLL! It's important to keep it unchanged since
+it contain the GUID under which the prefabs can address the components.
 
 ## Making Asset Bundles
 
-The bundles are what Timber mods consume to load the prefabs and other resources. Every resource
-must be tagged to the specific bundle to be packed there. It's selected in the inspector, at the
-very bottom line named "AssetBundle".
+The bundles are what Timber mods consume to load the prefabs and other resources. To build asset
+bundles for the mods from this repo:
 
-To build the bundles (they are built all at once), go to "Assets > Build AssetBundles". If there
-were no changes, nothing will happen. Otherwise, there will be a progress dialog presented and
-it may take some time. This will create bundles at `Assets/AssetBundles`. Copy the bundles to
-the appropriate mod's asset folder, renaming the file if needed (they get names from the asset
-bundle name).
+1. In the Unity editor, open `Assets` folder and find asset `pipeline`.
+2. In the inspector, click "Execute".
+3. The bundles will be created in the `AssetBundles` folder.
+4. Copy the new bundles into the appropriate mod `Asset` subfolder.
+
+## Working on the Other Mods
+
+Given it's up to date, this setup is fully equipped for modding. If you want to learn how
+to adjust any mod or grab and modify the stock buildings, go to the `Mods` folder and read
+the `README.md`.

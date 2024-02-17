@@ -1,5 +1,11 @@
 {
   "dependencies": {
+    "bepinex-bepinexpack_timberborn": {
+      "version": "file:BepInEx",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.passivepicasso.thunderkit": {
       "version": "https://github.com/PassivePicasso/ThunderKit.git#8.0.6",
       "depth": 0,
@@ -32,6 +38,30 @@
       "dependencies": {
         "com.unity.modules.ui": "1.0.0",
         "com.unity.modules.imgui": "1.0.0"
+      }
+    },
+    "timberapi": {
+      "version": "file:TimberAPI",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "bepinex-bepinexpack_timberborn": "5.4.21"
+      }
+    },
+    "timbercommons": {
+      "version": "file:TimberCommons",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "timberborn": "5.9.0"
+      }
+    },
+    "timberborn": {
+      "version": "file:Timberborn",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "timberapi": "0.6.5"
       }
     },
     "com.unity.modules.ai": {

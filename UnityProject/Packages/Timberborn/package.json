@@ -1,0 +1,13 @@
+{
+  "name": "timberborn",
+  "displayName": "Timberborn",
+  "version": "5.9.1",
+  "unity": "2023.1",
+  "description":"Imported assemblies from game Timberborn",
+  "author": {
+    "name": "Mechanistry"
+  },
+  "dependencies": {
+    "timberapi": "0.6.5"
+  }
+}
