@@ -15,10 +15,12 @@ namespace IgorZ.TimberCommons.IrrigationSystem {
 
 /// <summary>Component that can change the growth rate on the "growable" entities.</summary>
 /// <remarks>
-/// It's added to every growable entity in the game. Any code can access it and register its own modifications rates.
-/// However, only the worst "moderator" and the best "boost" will be considered. The effects are not adding up.
+/// Don't add to prefab! It's added to every growable entity in the game. Any code can access it and register its own
+/// modifications rates. However, only the worst "moderator" and the best "boost" will be considered. The effects are
+/// not adding up.
 /// </remarks>
 /// <seealso cref="ModifyGrowableGrowthRangeEffect"/>
+[AddComponentMenu("")] // Hide in the Unity Editor inspector.
 public sealed class GrowthRateModifier : BaseComponent {
 
   #region API properties
