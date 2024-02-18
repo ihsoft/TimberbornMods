@@ -3,6 +3,7 @@
 * [Feature] Make WaterValve pausable.
 * [Feature] Show the tiles, irrigated by the `WaterTower`, as *green* on the map instead of "barely green, maybe dying".
 * [Enhancement] Show duration values below `0.01` as zero.
+* [Enhancement] In the IrrigationTower, consider all foundation tiles to find the irrigated area.
 
 # v1.5 (3 Feb 2024):
 * Relase irrigation towers code.

@@ -56,6 +56,14 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
       + " buildings. Leave this field empty to let all towers of any kind to show their ranges at the same time.")]
   internal string _rangeName = "";
 
+  /// <summary>
+  /// Indicates that only foundation tiles with "ground only" setting will be considered when searching for the eligible
+  /// tiles.
+  /// </summary>
+  [SerializeField]
+  [Tooltip("Indicates that only ground tiles will be used for irrigated tiles search.")]
+  bool _irrigateFromGroundTilesOnly = true;
+
   // ReSharper restore InconsistentNaming
   // ReSharper restore RedundantDefaultMemberInitializer
   #endregion
@@ -270,6 +278,9 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <summary>The last calculated efficiency modifier.</summary>
   float _currentEfficiency = 1.0f;
 
+  /// <summary>Cached positioned blocks to start searching for the eligible tiles.</summary>
+  List<Vector2Int> _foundationTiles;
+
   /// <summary>It must be public for the injection logic to work.</summary>
   [Inject]
   public void InjectDependencies(ITerrainService terrainService, SoilBarrierMap soilBarrierMap,
@@ -364,6 +375,17 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
     _radiusAdjuster = Math.Max(dx + 1, dy + 1) / 2.0f;
     _adjustedMaxSqrRadius = (_irrigationRange + _radiusAdjuster) * (_irrigationRange + _radiusAdjuster);
     _baseZ = BlockObject.Placement.Coordinates.z;
+
+    if (_irrigateFromGroundTilesOnly) {
+      _foundationTiles = BlockObject.PositionedBlocks.GetAllBlocks()
+          .Where(x => x.MatterBelow == MatterBelow.Ground)
+          .Select(x => x.Coordinates.XY())
+          .ToList();
+    } else {
+      _foundationTiles = BlockObject.PositionedBlocks.GetFoundationCoordinates()
+          .Select(x => x.XY())
+          .ToList();
+    }
   }
 
   /// <summary>Calculates the tile's "moisture look" based on its distance from the tower.</summary>
@@ -400,7 +422,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
     var result = new List<Vector2Int>();
     var sqrRadius = (range + _radiusAdjuster) * (range + _radiusAdjuster);
 
-    tilesToVisit.Enqueue(BlockObject.Placement.Coordinates.XY());
+    _foundationTiles.ForEach(tile => tilesToVisit.Enqueue(tile));
     while (!tilesToVisit.IsEmpty()) {
       var tile = tilesToVisit.Dequeue();
       if (!skipChecks) {
