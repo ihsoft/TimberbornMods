@@ -84,6 +84,7 @@
       <Compile Include="IrrigationSystemUI\ManufactoryInventoryFragmentInitializeFragmentPatch.cs" />
       <Compile Include="IrrigationSystemUI\ManufactoryInventoryFragmentUpdateFragmentPatch.cs" />
       <Compile Include="IrrigationSystem\BlockContaminationRangeEffect.cs" />
+      <Compile Include="IrrigationSystem\IrrigationPipe.cs" />
       <Compile Include="IrrigationSystem\ModifyGrowableGrowthRangeEffect.cs" />
       <Compile Include="IrrigationSystem\Configurator.cs" />
       <Compile Include="IrrigationSystem\GoodConsumingIrrigationTower.cs" />
