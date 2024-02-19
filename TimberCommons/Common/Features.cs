@@ -46,6 +46,13 @@ static class Features {
   /// </summary>
   public static bool OverrideDesertLevelsForWaterTowers;
 
+  /// <summary>Specifies whether no UI changes to the stock logic must be made by the mod.</summary>
+  /// <remarks>
+  /// It's a super setting to any UI affecting Harmony patches. If the game doesn't work well or the mod doesn't load,
+  /// enable this feature and only the stock UI will be in action.
+  /// </remarks>
+  public static bool DisableAllUiPatches;
+
   static Features() {
     FeatureController.ReadFeatures(Consume);
   }
@@ -54,6 +61,8 @@ static class Features {
     return name switch {
         "DebugEx.VerboseLogging" =>
             FeatureController.SetFlag(ref DebugExVerboseLogging, name, enabled, value),
+        "CommonUI.DisableAllPatches" =>
+            FeatureController.SetFlag(ref DisableAllUiPatches, name, enabled, value),
         "GoodConsumingBuildingUI.DaysHoursViewForAllBuildings" =>
             FeatureController.SetFlag(ref GoodConsumingBuildingUIDaysHoursForAll, name, enabled, value),
         "GrowableGrowthTimeUI.DaysHoursViewForAllGrowables" =>
@@ -65,7 +74,7 @@ static class Features {
         "PrefabOptimizer.MaxExpectedRegistrySize" =>
             FeatureController.SetValue(ref PrefabOptimizerMaxExpectedRegistrySize, name, enabled, value),
         "WaterTowers.OverrideDesertLevels" =>
-                FeatureController.SetFlag(ref OverrideDesertLevelsForWaterTowers, name, enabled, value),
+            FeatureController.SetFlag(ref OverrideDesertLevelsForWaterTowers, name, enabled, value),
         _ => false
     };
   }

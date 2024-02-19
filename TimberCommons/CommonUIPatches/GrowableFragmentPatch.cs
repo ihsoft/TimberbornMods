@@ -10,7 +10,7 @@ using Timberborn.Localization;
 using UnityEngine.UIElements;
 
 // ReSharper disable InconsistentNaming
-namespace IgorZ.TimberCommons.CommonUI {
+namespace IgorZ.TimberCommons.CommonUIPatches {
 
 /// Harmony patch to show grow rate as days/hours.
 [HarmonyPatch(typeof(GrowableFragment), nameof(GrowableFragment.UpdateFragment))]

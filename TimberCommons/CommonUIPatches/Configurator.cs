@@ -10,7 +10,7 @@ using IgorZ.TimberDev.Utils;
 using TimberApi.SceneSystem;
 using TimberApi.ConfiguratorSystem;
 
-namespace IgorZ.TimberCommons.CommonUI {
+namespace IgorZ.TimberCommons.CommonUIPatches {
 
 // ReSharper disable once UnusedType.Global
 [Configurator(SceneEntrypoint.InGame)]
@@ -18,6 +18,9 @@ sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).FullName;
 
   public void Configure(IContainerDefinition containerDefinition) {
+    if (Features.DisableAllUiPatches) {
+      return;
+    }
     var patches = new List<Type> {
         typeof(GoodConsumingBuildingDescriberPatch),
         typeof(ManufactoryInventoryFragmentInitializeFragmentPatch),

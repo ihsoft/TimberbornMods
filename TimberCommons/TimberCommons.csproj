@@ -72,15 +72,15 @@
       <Compile Include="..\UnityDevLite\TypeUtils.cs">
         <Link>UnityDevLite\TypeUtils.cs</Link>
       </Compile>
-      <Compile Include="CommonUI\Configurator.cs" />
-      <Compile Include="CommonUI\GoodConsumingBuildingDescriberPatch.cs" />
-      <Compile Include="CommonUI\GoodConsumingBuildingFragmentPatch.cs" />
-      <Compile Include="CommonUI\GrowableFragmentPatch.cs" />
-      <Compile Include="CommonUI\GrowableToolPanelItemFactoryPatch.cs" />
-      <Compile Include="CommonUI\ManufactoryDescriberGetCraftingTimePatch.cs" />
-      <Compile Include="CommonUI\ManufactoryDescriberGetInputsPatch.cs" />
-      <Compile Include="CommonUI\ManufactoryInventoryFragmentInitializeFragmentPatch.cs" />
-      <Compile Include="CommonUI\ManufactoryInventoryFragmentUpdateFragmentPatch.cs" />
+      <Compile Include="CommonUIPatches\Configurator.cs" />
+      <Compile Include="CommonUIPatches\GoodConsumingBuildingDescriberPatch.cs" />
+      <Compile Include="CommonUIPatches\GoodConsumingBuildingFragmentPatch.cs" />
+      <Compile Include="CommonUIPatches\GrowableFragmentPatch.cs" />
+      <Compile Include="CommonUIPatches\GrowableToolPanelItemFactoryPatch.cs" />
+      <Compile Include="CommonUIPatches\ManufactoryDescriberGetCraftingTimePatch.cs" />
+      <Compile Include="CommonUIPatches\ManufactoryDescriberGetInputsPatch.cs" />
+      <Compile Include="CommonUIPatches\ManufactoryInventoryFragmentInitializeFragmentPatch.cs" />
+      <Compile Include="CommonUIPatches\ManufactoryInventoryFragmentUpdateFragmentPatch.cs" />
       <Compile Include="Common\Configurator.cs" />
       <Compile Include="Common\Features.cs" />
       <Compile Include="Common\IConsumptionRateFormatter.cs" />

@@ -11,7 +11,7 @@ using Timberborn.Localization;
 using UnityEngine.UIElements;
 
 // ReSharper disable InconsistentNaming
-namespace IgorZ.TimberCommons.CommonUI {
+namespace IgorZ.TimberCommons.CommonUIPatches {
 
 /// <summary>Harmony patch to show supply in days and hours.</summary>
 /// <remarks>

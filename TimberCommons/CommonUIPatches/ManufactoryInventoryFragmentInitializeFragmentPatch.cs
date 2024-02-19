@@ -10,7 +10,7 @@ using UnityEngine.UIElements;
 using ProgressBar = Timberborn.CoreUI.ProgressBar;
 
 // ReSharper disable InconsistentNaming
-namespace IgorZ.TimberCommons.CommonUI {
+namespace IgorZ.TimberCommons.CommonUIPatches {
 
 /// <summary>Harmony patch that adds "supply left" element to the manufactory UI fragment.</summary>
 /// <remarks>It only adds an element, but the actual handling is not made here.</remarks>

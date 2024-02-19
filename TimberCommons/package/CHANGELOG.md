@@ -6,6 +6,8 @@
 * [Enhancement] Show duration values below `0.01` as zero.
 * [Enhancement] In the IrrigationTower, consider all foundation tiles to find the irrigated area.
 * [Enhancement] Improve irrigated area calculation and update performance.
+* [Enhancement] Add feature `CommonUI.DisableAllPatches` to disable all UI related Harmony patches
+  from the mod. It's disabled by default.
 
 # v1.5 (3 Feb 2024):
 * Relase irrigation towers code.

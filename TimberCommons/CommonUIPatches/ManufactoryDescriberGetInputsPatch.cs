@@ -13,7 +13,7 @@ using UnityEngine.UIElements;
 
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
-namespace IgorZ.TimberCommons.CommonUI {
+namespace IgorZ.TimberCommons.CommonUIPatches {
 
 /// <summary>Harmony patch to show low fuel ingredient consumption rate in the recipe UIs.</summary>
 [HarmonyPatch(typeof(ManufactoryDescriber), nameof(ManufactoryDescriber.GetInputs))]

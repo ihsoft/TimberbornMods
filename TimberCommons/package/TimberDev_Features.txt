@@ -24,3 +24,8 @@ RecipesUI.ShowLongValueForLowFuelConsumptionRecipes
 # Specifies whether the terrain view should be adjusted to present irrigated tiles as "well moisturized". Otherwise,
 # the stock logic will decide based on the moisture level.
 WaterTowers.OverrideDesertLevels
+
+# Specifies whether no UI changes to the stock logic must be made by the mod.
+# It's a super setting to any UI affecting Harmony patches. If the game doesn't work well or the mod doesn't load,
+# enable this feature and only the stock UI will be in action.
+!CommonUI.DisableAllPatches

@@ -11,7 +11,7 @@ using UnityDev.Utils.LogUtilsLite;
 using UnityEngine.UIElements;
 
 // ReSharper disable InconsistentNaming
-namespace IgorZ.TimberCommons.CommonUI {
+namespace IgorZ.TimberCommons.CommonUIPatches {
 
 /// <summary>Harmony patch to support <see cref="IConsumptionRateFormatter"/> on buildings.</summary>
 /// <remarks>
