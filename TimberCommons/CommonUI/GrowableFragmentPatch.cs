@@ -10,16 +10,17 @@ using Timberborn.Localization;
 using UnityEngine.UIElements;
 
 // ReSharper disable InconsistentNaming
-namespace IgorZ.TimberCommons.IrrigationSystemUI {
+namespace IgorZ.TimberCommons.CommonUI {
 
-[HarmonyPatch(typeof(GrowableToolPanelItemFactory), nameof(GrowableToolPanelItemFactory.Create))]
-static class GrowableToolPanelItemFactoryPatch {
+/// Harmony patch to show grow rate as days/hours.
+[HarmonyPatch(typeof(GrowableFragment), nameof(GrowableFragment.UpdateFragment))]
+static class GrowableFragmentPatch {
   // ReSharper disable once UnusedMember.Local
-  static void Postfix(Growable growable, bool __runOriginal, ref VisualElement __result, ILoc ____loc) {
-    if (!__runOriginal) {
+  static void Postfix(bool __runOriginal, ILoc ____loc, Label ____growthTime, Growable ____growable) {
+    if (!__runOriginal || ____growable == null) {
       return;  // The other patches must follow the same style to properly support the skip logic!
     }
-    __result.Q<Label>("GrowthTime").text = CommonFormats.DaysHoursFormat(____loc, growable.GrowthTimeInDays * 24f);
+    ____growthTime.text = CommonFormats.DaysHoursFormat(____loc, ____growable.GrowthTimeInDays * 24f);
   }
 }
 

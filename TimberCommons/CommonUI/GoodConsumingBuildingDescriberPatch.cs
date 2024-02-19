@@ -11,9 +11,9 @@ using UnityDev.Utils.LogUtilsLite;
 using UnityEngine.UIElements;
 
 // ReSharper disable InconsistentNaming
-namespace IgorZ.TimberCommons.IrrigationSystemUI {
+namespace IgorZ.TimberCommons.CommonUI {
 
-/// <summary>Harmony patch to improve consumption rate formatting in the building description tooltip.</summary>
+/// <summary>Harmony patch to support <see cref="IConsumptionRateFormatter"/> on buildings.</summary>
 /// <remarks>
 /// Instead of doing own logic on the formatting, it let's the components decide via
 /// <see cref="IConsumptionRateFormatter"/>.

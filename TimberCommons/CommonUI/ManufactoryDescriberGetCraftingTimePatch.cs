@@ -9,9 +9,9 @@ using Timberborn.Localization;
 using Timberborn.WorkshopsUI;
 
 // ReSharper disable InconsistentNaming
-namespace IgorZ.TimberCommons.IrrigationSystemUI {
+namespace IgorZ.TimberCommons.CommonUI {
 
-/// <summary>Shows days/hours format for the recipe duration greater than 24 hours.</summary>
+/// <summary>Harmony patch to show days and hours for the slow recipes.</summary>
 [HarmonyPatch(typeof(ManufactoryDescriber), nameof(ManufactoryDescriber.GetCraftingTime))]
 static class ManufactoryDescriberGetCraftingTimePatch {
   // ReSharper disable once UnusedMember.Local

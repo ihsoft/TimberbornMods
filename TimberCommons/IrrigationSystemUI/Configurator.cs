@@ -2,11 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System;
-using System.Collections.Generic;
 using Bindito.Core;
-using IgorZ.TimberCommons.Common;
-using IgorZ.TimberDev.Utils;
 using TimberApi.ConfiguratorSystem;
 using TimberApi.SceneSystem;
 using Timberborn.EntityPanelSystem;
@@ -22,29 +18,10 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<IrrigationTowerFragment>().AsSingleton();
     containerDefinition.Bind<GrowthRateModifierFragment>().AsSingleton();
     containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
-
-    var patches = new List<Type> {
-        typeof(GoodConsumingBuildingDescriberPatch),
-        typeof(ManufactoryInventoryFragmentInitializeFragmentPatch),
-        typeof(ManufactoryInventoryFragmentUpdateFragmentPatch),
-    };
-    if (Features.GoodConsumingBuildingUIDaysHoursForAll) {
-      patches.Add(typeof(GoodConsumingBuildingFragmentPatch));
-    }
-    if (Features.GrowableGrowthTimeUIDaysHoursViewForAll) {
-      patches.Add(typeof(GrowableToolPanelItemFactoryPatch));
-      patches.Add(typeof(GrowableFragmentPatch));
-    }
-    if (Features.ShowDaysHoursForSlowRecipes) {
-      patches.Add(typeof(ManufactoryDescriberGetCraftingTimePatch));
-    }
-    if (Features.ShowLongValueForLowFuelConsumptionRecipes) {
-      patches.Add(typeof(ManufactoryDescriberGetInputsPatch));
-    }
-    HarmonyPatcher.PatchRepeated(PatchId, patches.ToArray());
   }
 
-  /// <summary>UI for the irrigation tower component.</summary>
+  /// <summary>UI for the irrigation related components.</summary>
+  /// <remarks>The tower and boosted trees.</remarks>
   sealed class EntityPanelModuleProvider : IProvider<EntityPanelModule> {
     readonly IrrigationTowerFragment _irrigationTowerFragment;
     readonly GrowthRateModifierFragment _growthRateModifierFragment;
