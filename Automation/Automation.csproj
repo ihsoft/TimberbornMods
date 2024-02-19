@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+    <Import Project="..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\build\BepInEx.AssemblyPublicizer.MSBuild.props" Condition="Exists('..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\build\BepInEx.AssemblyPublicizer.MSBuild.props')" />
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -35,6 +36,18 @@
         <DocumentationFile>bin\Release\Automation.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
+      <Compile Include="..\TimberDev\Utils\CustomizableInstantiator.cs">
+        <Link>Utils\CustomizableInstantiator.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\FeatureController.cs">
+        <Link>Utils\FeatureController.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\HarmonyPatcher.cs">
+        <Link>Utils\HarmonyPatcher.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\PrefabPatcher.cs">
+        <Link>Utils\PrefabPatcher.cs</Link>
+      </Compile>
       <Compile Include="..\UnityDevLite\DebugEx.cs">
         <Link>UnityDevLite\DebugEx.cs</Link>
       </Compile>
@@ -58,6 +71,8 @@
       <Compile Include="Actions\UnmarkForEmptyingAction.cs" />
       <Compile Include="Actions\UnpauseAction.cs" />
       <Compile Include="Conditions\AutomationConditionBase.cs" />
+      <Compile Include="Conditions\BadtideEndedCondition.cs" />
+      <Compile Include="Conditions\BadtideStartedCondition.cs" />
       <Compile Include="Conditions\CheckAccessBlockCondition.cs" />
       <Compile Include="Conditions\PathCheckingController.cs" />
       <Compile Include="Conditions\Configurator.cs" />
@@ -71,6 +86,7 @@
       <Compile Include="Core\AutomationBehavior.cs" />
       <Compile Include="Core\AutomationService.cs" />
       <Compile Include="Core\Configurator.cs" />
+      <Compile Include="Core\Features.cs" />
       <Compile Include="Core\IAutomationConditionListener.cs" />
       <Compile Include="Core\IAutomationCondition.cs" />
       <Compile Include="Core\IAutomationAction.cs" />
@@ -78,6 +94,8 @@
       <Compile Include="Tools\ApplyTemplateTool.cs" />
       <Compile Include="Tools\AutomationRule.cs" />
       <Compile Include="Tools\CancelTool.cs" />
+      <Compile Include="Tools\Configurator.cs" />
+      <Compile Include="Tools\DebugFinishNowTool.cs" />
       <Compile Include="Tools\DebugPickTool.cs" />
       <Compile Include="Tools\IAutomationModeEnabler.cs" />
       <Compile Include="Tools\PauseTool.cs" />
@@ -99,12 +117,37 @@
       <Reference Include="BepInEx, Version=5.4.21.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\BepInEx.dll</HintPath>
       </Reference>
+      <Reference Include="AsmResolver, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\lib\net472\AsmResolver.dll</HintPath>
+        <Private>True</Private>
+      </Reference>
+      <Reference Include="AsmResolver.DotNet, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\lib\net472\AsmResolver.DotNet.dll</HintPath>
+        <Private>True</Private>
+      </Reference>
+      <Reference Include="AsmResolver.PE, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\lib\net472\AsmResolver.PE.dll</HintPath>
+        <Private>True</Private>
+      </Reference>
+      <Reference Include="AsmResolver.PE.File, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\lib\net472\AsmResolver.PE.File.dll</HintPath>
+        <Private>True</Private>
+      </Reference>
+      <Reference Include="BepInEx.AssemblyPublicizer, Version=0.4.1.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\lib\net472\BepInEx.AssemblyPublicizer.dll</HintPath>
+        <Private>True</Private>
+      </Reference>
+      <Reference Include="BepInEx.AssemblyPublicizer.MSBuild, Version=0.4.1.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\lib\net472\BepInEx.AssemblyPublicizer.MSBuild.dll</HintPath>
+        <Private>True</Private>
+      </Reference>
       <Reference Include="Bindito.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Bindito.Core.dll</HintPath>
       </Reference>
       <Reference Include="Bindito.Unity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Bindito.Unity.dll</HintPath>
       </Reference>
+      <Reference Include="System" />
       <Reference Include="System.Collections.Immutable, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
         <HintPath>..\Dependencies\Timberborn\System.Collections.Immutable.dll</HintPath>
       </Reference>
@@ -122,9 +165,6 @@
       </Reference>
       <Reference Include="Timberborn.BaseComponentSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.BaseComponentSystem.dll</HintPath>
-      </Reference>
-      <Reference Include="Timberborn.BlockObjectTools, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.BlockObjectTools.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.BlockSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.BlockSystem.dll</HintPath>
@@ -249,6 +289,9 @@
       <Reference Include="Timberborn.WaterBuildings, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.WaterBuildings.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.WeatherSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.WeatherSystem.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.WorldSerialization, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.WorldSerialization.dll</HintPath>
       </Reference>
@@ -268,6 +311,14 @@
         <HintPath>..\Dependencies\Unity\UnityEngine.UIElementsModule.dll</HintPath>
       </Reference>
     </ItemGroup>
+    <ItemGroup>
+      <None Include="packages.config" />
+    </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
+      <!-- Publicize directly when referencing -->
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.BlockObjectTools.dll" Publicize="true" />
+    </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.
@@ -278,5 +329,11 @@
     -->
     <Target Name="AfterBuild">
         <Exec Command="xcopy /i /Y $(TargetPath) u:\BepInEx\plugins\Automation" />
+    </Target>
+    <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+      <PropertyGroup>
+        <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
+      </PropertyGroup>
+      <Error Condition="!Exists('..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\build\BepInEx.AssemblyPublicizer.MSBuild.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\build\BepInEx.AssemblyPublicizer.MSBuild.props'))" />
     </Target>
 </Project>

@@ -27,8 +27,10 @@ public sealed class DroughtEndedCondition : WeatherTrackerConditionBase {
   }
 
   /// <inheritdoc/>
-  protected override void OnWeatherChanged(bool isDrought) {
-    ConditionState = !isDrought;
+  protected override void OnWeatherChanged(bool? isDrought, bool? isBadtide) {
+    if (isDrought.HasValue) {
+      ConditionState = !isDrought.Value;
+    }
   }
   #endregion
 }

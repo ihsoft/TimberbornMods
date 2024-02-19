@@ -2,8 +2,8 @@
   "Id": "Automation.DebugPickTool",
   "GroupId": "AutomationToolGroupId",
   "Type": "Automation.Tools.DebugPickTool",
-  "Order": -1,
-  "Icon": "igorz.automation/ui_icons/bug-tracker",
+  "Order": -100,
+  "Icon": "igorz.automation/ui_icons/debug-inspect",
   "DevMode": true,
   "NameLocKey": "IgorZ.Automation.DebugPickTool.Title",
   "DescriptionLocKey": "IgorZ.Automation.DebugPickTool.Description"

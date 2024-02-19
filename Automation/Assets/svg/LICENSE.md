@@ -16,3 +16,10 @@ License definition: https://www.svgrepo.com/page/licensing#PD
 
 * https://www.svgrepo.com/svg/438144/multimedia-play-icon-circle-button
 * https://www.svgrepo.com/svg/438153/multimedia-pause-icon-circle-button
+* https://www.svgrepo.com/svg/366125/execute-inspect
+
+# MIT License
+
+License definition: https://www.svgrepo.com/page/licensing/#MIT
+
+* AUTHOR: framework7io - https://www.svgrepo.com/svg/437004/hammer

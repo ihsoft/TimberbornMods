@@ -4,6 +4,9 @@ IgorZ.Automation.DebugPickTool.Description,"Prints components on the selected ob
 IgorZ.Automation.DebugPickTool.DescriptionHint1,"Hold <i>SHIFT</i> to print Accessible."
 IgorZ.Automation.DebugPickTool.DescriptionHint2,"Hold <i>CTRL</i> to print NavMesh edges."
 
+IgorZ.Automation.DebugFinishNowTool.Title,"Finish now debug tool"
+IgorZ.Automation.DebugFinishNowTool.Description,"Immediately finishes the selected constructables."
+
 IgorZ.Automation.ToolGroup.Main.DisplayName,"Setup automation"
 IgorZ.Automation.ToolGroup.Terrain.DisplayName,"Terrain changing"
 IgorZ.Automation.ToolGroup.Water.DisplayName,"Water conditions"
@@ -28,6 +31,8 @@ IgorZ.Automation.EmptyOutputStore.CustomStatus,"The building is being emptied on
 
 IgorZ.Automation.Tool.tmpl.DroughtPause.DisplayName,"Pause during drought"
 IgorZ.Automation.Tool.tmpl.DroughtPause.Description,"Apply this template on buildings that should stay paused during droughts."
+IgorZ.Automation.Tool.tmpl.BadtidePause.DisplayName,"Pause during badtide"
+IgorZ.Automation.Tool.tmpl.BadtidePause.Description,"Apply this template on buildings that should stay paused during badtides."
 IgorZ.Automation.Tool.tmpl.TemperatePause.DisplayName,"Pause during temperate weather"
 IgorZ.Automation.Tool.tmpl.TemperatePause.Description,"Apply this template on buildings that should stay paused during temperate weather."
 
@@ -35,6 +40,10 @@ IgorZ.Automation.Tool.tmpl.DroughtCloseFloodgate.DisplayName,"Close floodgate du
 IgorZ.Automation.Tool.tmpl.DroughtCloseFloodgate.Description,"Apply this template on floodgates that need to be closed during droughs, or fully open otherwise."
 IgorZ.Automation.Tool.tmpl.DroughtOpenFloodgate.DisplayName,"Open floodgate during drought"
 IgorZ.Automation.Tool.tmpl.DroughtOpenFloodgate.Description,"Apply this template on floodgates that need to slowly drain water during droughs, or be closed otherwise."
+IgorZ.Automation.Tool.tmpl.BadtideCloseFloodgate.DisplayName,"Close floodgate during badtide"
+IgorZ.Automation.Tool.tmpl.BadtideCloseFloodgate.Description,"Apply this template on floodgates that need to be closed during badtides, or fully open otherwise."
+IgorZ.Automation.Tool.tmpl.BadtideOpenFloodgate.DisplayName,"Open floodgate during badtide"
+IgorZ.Automation.Tool.tmpl.BadtideOpenFloodgate.Description,"Apply this template on floodgates that need to slowly drain water during badtides, or be closed otherwise."
 IgorZ.Automation.Tool.tmpl.TemperateCloseFloodgate.DisplayName,"Close floodgate during temperate weather"
 IgorZ.Automation.Tool.tmpl.TemperateCloseFloodgate.Description,"Apply this template on floodgates that need to be closed during temperate weather, or fully open otherwise."
 IgorZ.Automation.Tool.tmpl.TemperateOpenFloodgate.DisplayName,"Open floodgate during temperate weather"
@@ -70,3 +79,6 @@ IgorZ.Automation.PauseAction.Description,"<SolidHighlight>pause building</SolidH
 IgorZ.Automation.SetFloodgateHeightAction.Description,"<SolidHighlight>set height to {0}</SolidHighlight>"
 IgorZ.Automation.UnmarkForEmptyingAction.Description,"<SolidHighlight>stop emptying storage</SolidHighlight>"
 IgorZ.Automation.UnpauseAction.Description,"<SolidHighlight>unpause building</SolidHighlight>"
+
+IgorZ.Automation.BadtideEndedCondition.Description,"<SolidHighlight>badtide ended</SolidHighlight>"
+IgorZ.Automation.BadtideStartedCondition.Description,"<SolidHighlight>badtide started</SolidHighlight>"

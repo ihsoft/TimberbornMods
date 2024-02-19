@@ -5,6 +5,7 @@
 using TimberApi.DependencyContainerSystem;
 using Timberborn.HazardousWeatherSystem;
 using Timberborn.SingletonSystem;
+using Timberborn.WeatherSystem;
 
 namespace Automation.Conditions {
 
@@ -14,8 +15,17 @@ public abstract class WeatherTrackerConditionBase : AutomationConditionBase {
   #region AutomationConditionBase overrides
   /// <inheritdoc/>
   public override void SyncState() {
-    var weatherService = DependencyContainer.GetInstance<HazardousWeatherService>();
-    OnWeatherChanged(isDrought: weatherService.CurrentCycleHazardousWeather is DroughtWeather);
+    var weatherService = DependencyContainer.GetInstance<WeatherService>();
+    if (weatherService.IsHazardousWeather) {
+      var hazardousWeatherService = DependencyContainer.GetInstance<HazardousWeatherService>();
+      if (hazardousWeatherService.CurrentCycleHazardousWeather is DroughtWeather) {
+        OnWeatherChanged(isDrought: true, isBadtide: null);
+      } else if (hazardousWeatherService.CurrentCycleHazardousWeather is BadtideWeather) {
+        OnWeatherChanged(isDrought: null, isBadtide: true);
+      }
+    } else {
+      OnWeatherChanged(isDrought: false, isBadtide: false);
+    }
   }
 
   /// <inheritdoc/>
@@ -30,22 +40,38 @@ public abstract class WeatherTrackerConditionBase : AutomationConditionBase {
   #endregion
 
   #region API
+
   /// <summary>Callback that is triggered when weather conditions change.</summary>
-  /// <param name="isDrought"></param>
-  protected abstract void OnWeatherChanged(bool isDrought);
+  /// <param name="isDrought">Indicates if drought season started or ended.</param>
+  /// <param name="isBadtide">Indicates if badtide season started or ended.</param>
+  protected abstract void OnWeatherChanged(bool? isDrought, bool? isBadtide);
   #endregion
 
   #region Implemenatation
   /// <summary>Triggers when weather season changes to drought.</summary>
   [OnEvent]
   public void OnDroughtStartedEvent(HazardousWeatherStartedEvent @event) {
-    OnWeatherChanged(isDrought: @event.HazardousWeather is DroughtWeather);
+    switch (@event.HazardousWeather) {
+      case DroughtWeather:
+        OnWeatherChanged(isDrought: true, isBadtide: null);
+        break;
+      case BadtideWeather:
+        OnWeatherChanged(isDrought: null, isBadtide: true);
+        break;
+    }
   }
 
   /// <summary>Triggers when weather season changes to temperate.</summary>
   [OnEvent]
   public void OnDroughtEndedEvent(HazardousWeatherEndedEvent @event) {
-    OnWeatherChanged(isDrought: false);
+    switch (@event.HazardousWeather) {
+      case DroughtWeather:
+        OnWeatherChanged(isDrought: false, isBadtide: null);
+        break;
+      case BadtideWeather:
+        OnWeatherChanged(isDrought: null, isBadtide: false);
+        break;
+    }
   }
   #endregion
 }
