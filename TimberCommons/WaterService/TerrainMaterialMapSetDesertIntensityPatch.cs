@@ -18,7 +18,6 @@ static class TerrainMaterialMapSetDesertIntensityPatch {
       return;  // The other patches must follow the same style to properly support the skip logic!
     }
 
-    // Get a reference since the overrides instance can be updated from another thread.
     var overrides = DirectSoilMoistureSystemAccessor.DesertLevelOverrides;
     if (overrides == null || !overrides.TryGetValue(coordinates, out var newLevel) || newLevel > desertIntensity) {
       return;

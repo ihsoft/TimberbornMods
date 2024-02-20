@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using Bindito.Core;
@@ -159,7 +158,6 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton {
   public void PostLoad() {
     MoistureLevelOverrides = null;
     DesertLevelOverrides = null;
-    _loadedAtFrameCount = Time.frameCount;
     _eventBus.Register(this);
   }
 
@@ -168,12 +166,10 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton {
   #region Implementation
 
   /// <summary>Map of the overriden moisture levels.</summary>
-  /// <remarks>It will be accessed from the threads, so use <see cref="Interlocked"/> to update it.</remarks>
-  internal static IReadOnlyDictionary<int, float> MoistureLevelOverrides;
+  internal static Dictionary<int, float> MoistureLevelOverrides;
 
   /// <summary>Map of the overriden desert levels.</summary>
-  /// <remarks>It will be accessed from the threads, so use <see cref="Interlocked"/> to update it.</remarks>
-  internal static IReadOnlyDictionary<Vector2Int, float> DesertLevelOverrides;
+  internal static Dictionary<Vector2Int, float> DesertLevelOverrides;
 
   readonly Dictionary<int, Dictionary<int, float>> _moistureLevelOverrides = new();
   readonly Dictionary<int, Dictionary<Vector2Int, float>> _desertLevelOverrides = new();
@@ -214,11 +210,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton {
         moistureOverridesCache.Add(value.Key, value.Value);
       }
     }
-    if (moistureOverridesCache.Count == 0) {
-      Interlocked.Exchange(ref MoistureLevelOverrides, null);
-    } else {
-      Interlocked.Exchange(ref MoistureLevelOverrides, moistureOverridesCache.ToImmutableDictionary());
-    }
+    MoistureLevelOverrides = moistureOverridesCache.Count == 0 ? null : moistureOverridesCache;
 
     // Desert levels. It only affects UI appearance.
     if (!Features.OverrideDesertLevelsForWaterTowers) {
@@ -232,11 +224,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton {
         desertOverridesCache.Add(value.Key, value.Value);
       }
     }
-    if (desertOverridesCache.Count == 0) {
-      Interlocked.Exchange(ref DesertLevelOverrides, null);
-    } else {
-      Interlocked.Exchange(ref DesertLevelOverrides, desertOverridesCache.ToImmutableDictionary());
-    }
+    DesertLevelOverrides = desertOverridesCache.Count == 0 ? null : desertOverridesCache;
   }
 
   /// <summary>Requests the terrain appearance update to reflect the overriden desert levels.</summary>
@@ -248,12 +236,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton {
     foreach (var tile in tiles) {
       _terrainMaterialMap.SetDesertIntensity(tile, _terrainMaterialMap.GetDesertIntensity(tile));
     }
-    if (_loadedAtFrameCount == Time.frameCount) {
-      // Only force it on load. Otherwise, let the normal logic to kick in.
-      _terrainMaterialMap.ProcessDesertTextureChanges();
-    }
   }
-  static int _loadedAtFrameCount; // This is when the current game was last time loaded.
 
   /// <summary>Reacts on contamination blockers removal.</summary>
   /// <remarks>If there are overriden blocker for the tile, then the barrier is restored.</remarks>
