@@ -2,7 +2,8 @@
 * [Fix #33] Water valve doesn't handle contamination correctly.
 * [Fix #38] "Supply will last for" text disappeared in UI.
 * [Feature] Make WaterValve pausable.
-* [Feature] Show the tiles, irrigated by the `WaterTower`, as *green* on the map instead of "barely green, maybe dying".
+* [Feature] Show the tiles, irrigated by the `WaterTower`, as *green* on the map instead of
+  "barely green, maybe dying".
 * [Enhancement] Show duration values below `0.01` as zero.
 * [Enhancement] In the IrrigationTower, consider all foundation tiles to find the irrigated area.
 * [Enhancement] Improve irrigated area calculation and update performance.
