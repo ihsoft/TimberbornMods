@@ -4,8 +4,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Bindito.Core;
 using IgorZ.TimberCommons.WaterService;
 using Timberborn.BaseComponentSystem;
@@ -86,11 +87,11 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <summary>The tiles that can get water.</summary>
   /// <remarks>These tiles are in the effective range and can be reached from the tower.</remarks>
   /// <see cref="EffectiveRange"/>
-  public ImmutableHashSet<Vector2Int> ReachableTiles { get; private set; } = ImmutableHashSet.Create<Vector2Int>();
+  public HashSet<Vector2Int> ReachableTiles { get; private set; } = new();
 
   /// <summary>The tiles that can be irrigated at the 100% efficiency.</summary>
   /// <see cref="IrrigationRange"/>
-  public ImmutableHashSet<Vector2Int> EligibleTiles { get; private set; } = ImmutableHashSet.Create<Vector2Int>();
+  public HashSet<Vector2Int> EligibleTiles { get; private set; } = new();
 
   /// <summary>
   /// The maximum number of tiles which this component could irrigate on a flat surface if there were no irrigation
@@ -238,6 +239,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   MapIndexService _mapIndexService;
   EventBus _eventBus;
   DirectSoilMoistureSystemAccessor _directSoilMoistureSystemAccessor;
+  HashSet<int> _foundationTilesIndexes = new();
 
   /// <summary>This is a delta to be added to any distance value to account the building's boundaries.</summary>
   /// <remarks>
@@ -278,18 +280,18 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   float _currentEfficiency = 1.0f;
 
   /// <summary>Cached positioned blocks to start searching for the eligible tiles.</summary>
-  List<Vector2Int> _foundationTiles;
+  List<Vector2Int> _startingTiles;
 
   /// <summary>All tiles that had non-baseZ height during the last eligible tiles refresh.</summary>
   /// <remarks>React on the terrain changes to these tiles only.</remarks>
   /// <seealso cref="_baseZ"/>
   /// <seealso cref="GetTiles"/>
-  HashSet<Vector2Int> _irrigationObstacles = new();
+  HashSet<int> _irrigationObstacles = new();
 
   /// <summary>All tiles that had an irrigation barrier set during the last eligible tiles refresh.</summary>
   /// <remarks>When en entity is deleted, only react to it if was a barrier.</remarks>
   /// <seealso cref="GetTiles"/>
-  HashSet<Vector2Int> _irrigationBarriers = new();
+  HashSet<int> _irrigationBarriers = new();
 
   /// <summary>It must be public for the injection logic to work.</summary>
   [Inject]
@@ -324,15 +326,12 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
     // Sync the state.
     if (_needMoistureSystemUpdate) {
       _needMoistureSystemUpdate = false;
-      var newCoverageMap = GetTiles(range: _irrigationRange, skipChecks: false);
-      EligibleTiles = newCoverageMap.eligible.ToImmutableHashSet();
-      _irrigationObstacles = newCoverageMap.obstacles;
-      _irrigationBarriers = newCoverageMap.barriers;
+      (EligibleTiles, _irrigationObstacles, _irrigationBarriers) = GetTiles(range: _irrigationRange, skipChecks: false);
       var newIrrigatedTiles = _irrigationRange == EffectiveRange
-          ? newCoverageMap.eligible
+          ? EligibleTiles
           : GetTiles(range: EffectiveRange, skipChecks: false).eligible;
       StopMoisturizing();
-      ReachableTiles = newIrrigatedTiles.ToImmutableHashSet();
+      ReachableTiles = newIrrigatedTiles;
       Coverage = (float)newIrrigatedTiles.Count / MaxCoveredTilesCount;
       HostedDebugLog.Fine(this, "Covered tiles updated: eligible={0}, irrigated={1}, utilization={2}, efficiency={3}",
                           EligibleTiles.Count, ReachableTiles.Count, Coverage, _currentEfficiency);
@@ -388,15 +387,18 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
     _baseZ = BlockObject.Placement.Coordinates.z;
 
     if (_irrigateFromGroundTilesOnly) {
-      _foundationTiles = BlockObject.PositionedBlocks.GetAllBlocks()
+      _startingTiles = BlockObject.PositionedBlocks.GetAllBlocks()
           .Where(x => x.MatterBelow == MatterBelow.Ground)
           .Select(x => x.Coordinates.XY())
           .ToList();
     } else {
-      _foundationTiles = BlockObject.PositionedBlocks.GetFoundationCoordinates()
+      _startingTiles = BlockObject.PositionedBlocks.GetFoundationCoordinates()
           .Select(x => x.XY())
           .ToList();
     }
+    _foundationTilesIndexes = BlockObject.PositionedBlocks.GetFoundationCoordinates()
+        .Select(c => _mapIndexService.CoordinatesToIndex(c.XY()))
+        .ToHashSet();
   }
 
   /// <summary>Calculates the tile's "moisture look" based on its distance from the tower.</summary>
@@ -415,60 +417,60 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   const float DesertLevelFadeInLength = HighestDesertLevel - LowerestDesertLevel;
 
   /// <summary>Get's square distance of the tile form the building's center.</summary>
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   float GetSqrtDistance(Vector2Int tile) {
     return (tile.x - _buildingCenter.x) * (tile.x - _buildingCenter.x)
         + (tile.y - _buildingCenter.y) * (tile.y - _buildingCenter.y);
   }
 
   /// <summary>Returns all the tiles in the irrigated range.</summary>
-  (HashSet<Vector2Int> eligible, HashSet<Vector2Int> obstacles, HashSet<Vector2Int> barriers) GetTiles(
+  (HashSet<Vector2Int> eligible, HashSet<int> obstacles, HashSet<int> barriers) GetTiles(
       float range, bool skipChecks) {
-    var tilesToVisit = new Queue<Vector2Int>();
-    var visitedTiles = new HashSet<Vector2Int>();
+    var tilesToVisit = new List<Vector2Int>(Mathf.RoundToInt(range * range));
+    var visitedTiles = new HashSet<int>();
     var result = new HashSet<Vector2Int>();
-    var obstacles = new HashSet<Vector2Int>();
-    var barriers = new HashSet<Vector2Int>();
+    var obstacles = new HashSet<int>();
+    var barriers = new HashSet<int>();
     var sqrRadius = (range + _radiusAdjuster) * (range + _radiusAdjuster);
+    var mapWidth = _mapIndexService.MapSize.x;
+    var mapHeight = _mapIndexService.MapSize.y;
 
-    _foundationTiles.ForEach(tile => tilesToVisit.Enqueue(tile));
-    while (!tilesToVisit.IsEmpty()) {
-      var tile = tilesToVisit.Dequeue();
-      if (!skipChecks) {
-        if (tile.x < 0 || tile.x >= _mapIndexService.MapSize.x || tile.y < 0 || tile.y >= _mapIndexService.MapSize.y) {
-          continue; // Reject the out of map tiles.
-        }
-      }
-      if (!visitedTiles.Add(tile)) {
+    _startingTiles.ForEach(tile => tilesToVisit.Add(tile));
+    for (var i = 0; i < tilesToVisit.Count; i++) {
+      var tile = tilesToVisit[i];
+      var index = _mapIndexService.CoordinatesToIndex(tile);
+      if (!visitedTiles.Add(index)) {
         continue; // Already checked, skip it.
       }
-      var index = _mapIndexService.CoordinatesToIndex(tile);
       if (GetSqrtDistance(tile) > sqrRadius) {
         continue;
       }
       if (!skipChecks) {
+        if (tile.x < 0 || tile.x >= mapWidth || tile.y < 0 || tile.y >= mapHeight) {
+          continue;
+        }
         if (_terrainService.UnsafeCellHeight(index) != _baseZ) {
-          obstacles.Add(tile);
+          obstacles.Add(index);
           continue;
         }
         if (_soilBarrierMap.FullMoistureBarriers[index]) {
-          barriers.Add(tile);
+          barriers.Add(index);
           continue;
         }
       }
-      result.Add(tile);
+      if (!_foundationTilesIndexes.Contains(index)) {
+        result.Add(tile);
+      }
       var up = new Vector2Int(tile.x, tile.y - 1);
-      tilesToVisit.Enqueue(up);
+      tilesToVisit.Add(up);
       var down = new Vector2Int(tile.x, tile.y + 1);
-      tilesToVisit.Enqueue(down);
+      tilesToVisit.Add(down);
       var left = new Vector2Int(tile.x - 1, tile.y);
-      tilesToVisit.Enqueue(left);
+      tilesToVisit.Add(left);
       var right = new Vector2Int(tile.x + 1, tile.y);
-      tilesToVisit.Enqueue(right);
+      tilesToVisit.Add(right);
     }
 
-    // The building itself is not being irrigated. Remove it from the tiles.
-    var foundation = BlockObject.PositionedBlocks.GetFoundationCoordinates().Select(c => c.XY()).ToHashSet();
-    result.RemoveWhere(x => foundation.Contains(x));
     return (result, obstacles, barriers);
   }
 
@@ -496,7 +498,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
     }
     var coordinates = e.Entity.GetComponentFast<BlockObject>().Coordinates.XY();
     var index = _mapIndexService.CoordinatesToIndex(coordinates);
-    if (_irrigationBarriers.Contains(coordinates) && !_soilBarrierMap.FullMoistureBarriers[index]) {
+    if (_irrigationBarriers.Contains(index) && !_soilBarrierMap.FullMoistureBarriers[index]) {
       HostedDebugLog.Fine(this, "Full moisture barrier removed: at={0}, barrier={1}", coordinates, e.Entity);
       _needMoistureSystemUpdate = true;
     }
@@ -504,7 +506,8 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   /// <summary>The terrain changes must trigger the irrigation coverage re-calculation.</summary>
   void OnTerrainHeightChanged(object sender, TerrainHeightChangedEventArgs e) {
-    if (e.NewHeight == _baseZ && _irrigationObstacles.Contains(e.Coordinates)
+    var index = _mapIndexService.CoordinatesToIndex(e.Coordinates);
+    if (e.NewHeight == _baseZ && _irrigationObstacles.Contains(index)
         || e.OldHeight == _baseZ && ReachableTiles.Contains(e.Coordinates)) {
       HostedDebugLog.Fine(this, "Terrain height change detected: coords={0}, from={1}, to={2}",
                           e.Coordinates, e.OldHeight, e.NewHeight);

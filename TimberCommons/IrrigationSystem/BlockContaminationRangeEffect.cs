@@ -2,7 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Collections.Immutable;
+using System.Collections.Generic;
 using Bindito.Core;
 using IgorZ.TimberCommons.WaterService;
 using Timberborn.BaseComponentSystem;
@@ -37,7 +37,7 @@ public sealed class BlockContaminationRangeEffect : BaseComponent, IRangeEffect 
   public string EffectGroup => _effectGroupName;
 
   /// <inheritdoc/>
-  public void ApplyEffect(ImmutableHashSet<Vector2Int> tiles) {
+  public void ApplyEffect(HashSet<Vector2Int> tiles) {
     ResetEffect();
     _contaminationOverrideIndex = _directSoilMoistureSystemAccessor.AddContaminationOverride(tiles);
   }
