@@ -82,16 +82,10 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   /// <seealso cref="RemoveContaminationOverride"/>
   public int AddContaminationOverride(IEnumerable<Vector2Int> tiles) {
     var tilesSet = tiles.ToHashSet();
-    var oldCacheSize = _contaminatedTilesCache.Count;
     var index = _nextContaminationOverrideId++;
     _contaminationOverrides.Add(index, tilesSet);
-    //FIXME: delay
-    _contaminatedTilesCache = _contaminationOverrides.SelectMany(item => item.Value).ToHashSet();
-    foreach (var barrierTile in tilesSet) {
-      _soilBarrierMap.AddContaminationBarrierAt(barrierTile);
-    }
-    DebugEx.Fine("Added contamination override: id={0}, tiles={1}. Cache size: {2} => {3}",
-                 index, tilesSet.Count, oldCacheSize, _contaminatedTilesCache.Count);
+    _needContaminationOverridesUpdate = true;
+    DebugEx.Fine("Added contamination override: id={0}, tiles={1}", index, tilesSet.Count);
     return index;
   }
 
@@ -102,23 +96,9 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
     if (!_contaminationOverrides.TryGetValue(overrideId, out var barriers)) {
       return;
     }
-    var oldTilesCache = _contaminatedTilesCache;
     _contaminationOverrides.Remove(overrideId);
-    //FIXME: delay
-    _contaminatedTilesCache = _contaminationOverrides.SelectMany(item => item.Value).ToHashSet();
-    var barriersToRemove = oldTilesCache.Where(x => !_contaminatedTilesCache.Contains(x));
-    foreach (var barrier in barriersToRemove) {
-      var skipIt = _blockService
-          .GetObjectsAt(new Vector3Int(barrier.x, barrier.y, _terrainService.CellHeight(barrier)))
-          .Any(IsContaminationBlocker);
-      if (skipIt) {
-        DebugEx.Fine("Don't affect contamination barrier at: {0}", barrier);
-        continue;
-      }
-      _soilBarrierMap.RemoveContaminationBarrierAt(barrier);
-    }
-    DebugEx.Fine("Removed contamination override: id={0}, tiles={1}. Cache size: {2} => {3}",
-                 overrideId, barriers.Count, oldTilesCache.Count, _contaminatedTilesCache.Count);
+    _needContaminationOverridesUpdate = true;
+    DebugEx.Fine("Removed contamination override: id={0}, tiles={1}", overrideId, barriers.Count);
   }
 
   // ReSharper restore UnusedMember.Global
@@ -141,6 +121,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   /// <inheritdoc/>
   public void Tick() {
     UpdateMoistureOverrides();
+    UpdateContaminationOverrides();
   }
 
   #endregion
@@ -186,7 +167,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
     _sceneLoader = sceneLoader;
   }
 
-  /// <summary>Checks if there were changes and rebuilds caches.</summary>
+  /// <summary>Checks if there were changes and rebuilds moisture overrides caches.</summary>
   void UpdateMoistureOverrides() {
     if (!_needMoistureOverridesUpdate) {
       return;
@@ -211,6 +192,34 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
     }
   }
   bool _needMoistureOverridesUpdate;
+
+  /// <summary>Checks if there were changes and rebuilds contamination overrides cache.</summary>
+  void UpdateContaminationOverrides() {
+    if (!_needContaminationOverridesUpdate) {
+      return;
+    }
+    _needContaminationOverridesUpdate = false;
+
+    var newOverrides = _contaminationOverrides.SelectMany(item => item.Value).ToHashSet();
+    foreach (var tile in newOverrides) {
+      _soilBarrierMap.AddContaminationBarrierAt(tile);
+    }
+    var clearOverrides = _contaminatedTilesCache.Where(t => !newOverrides.Contains(t));
+    foreach (var tile in clearOverrides) {
+      var skipIt = _blockService
+          .GetObjectsAt(new Vector3Int(tile.x, tile.y, _terrainService.CellHeight(tile)))
+          .Any(IsContaminationBlocker);
+      if (skipIt) {
+        DebugEx.Fine("Don't affect contamination barrier at: {0}", tile);
+        continue;
+      }
+      _soilBarrierMap.RemoveContaminationBarrierAt(tile);
+    }
+    DebugEx.Fine("Update contamination overrides: oldActive={0}, newActive={1}",
+                 _contaminatedTilesCache.Count, newOverrides.Count);
+    _contaminatedTilesCache = newOverrides;
+  }
+  bool _needContaminationOverridesUpdate;
 
   /// <summary>Requests the terrain appearance update to reflect the overriden desert levels.</summary>
   /// <seealso cref="TerrainTextureLevelsOverrides"/>
@@ -262,13 +271,11 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   /// <summary>Refreshes terrain texture if when teh game is loaded and there are active overrides.</summary>
   void OnSceneLoaded(object sender, EventArgs e) {
     _sceneLoader.SceneLoaded -= OnSceneLoaded;
-    if (!_needMoistureOverridesUpdate) {
-      return;
-    }
+    var needTextureUpdate = _needMoistureOverridesUpdate;
+    Tick();
 
     // Refresh the texture on game load.
-    UpdateMoistureOverrides();
-    if (Features.OverrideDesertLevelsForWaterTowers) {
+    if (needTextureUpdate && Features.OverrideDesertLevelsForWaterTowers) {
       _terrainMaterialMap.ProcessDesertTextureChanges();
       _terrainMaterialMap.ProcessDesertTextureChanges(); // Intentionally.
     }
