@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Bindito.Core;
@@ -45,11 +44,6 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   [SerializeField]
   [Tooltip("The max distance from the building boundaries at which the tiles can get water.")]
   internal int _irrigationRange = 10;
-
-  /// <summary>The moisture level of the tiles in range.</summary>
-  [SerializeField]
-  [Tooltip("Values above 1.0 will extend the effective irrigated range beyond the IrrigationRange setting.")]
-  internal float _moistureLevel = 1.0f;
 
   /// <summary>The optional name to use to group irrigation ranges in preview.</summary>
   [SerializeField]
@@ -352,7 +346,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
       return;
     }
     _moistureOverrideIndex = _directSoilMoistureSystemAccessor.AddMoistureOverride(
-        ReachableTiles, _moistureLevel, tile => CalculateDesertLevel(tile, EffectiveRange));
+        ReachableTiles, 1.0f, tile => CalculateDesertLevel(tile, EffectiveRange));
     IrrigationStarted();
   }
 
@@ -403,18 +397,10 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   /// <summary>Calculates the tile's "moisture look" based on its distance from the tower.</summary>
   float CalculateDesertLevel(Vector2Int tile, float range) {
-    var desertLevelFadeInLength = range * DesertLevelFadeInRangePct;
-    var bestMoistureRadius = range + _radiusAdjuster - desertLevelFadeInLength;
-    var dist = Mathf.Sqrt(GetSqrtDistance(tile));
-    if (dist <= bestMoistureRadius) {
-      return LowerestDesertLevel;
-    }
-    return LowerestDesertLevel + DesertLevelFadeInLength * ((dist - bestMoistureRadius) / desertLevelFadeInLength);
+    var maxIrrigatedDistance = range + _radiusAdjuster;
+    var distance = new Vector2(_buildingCenter.x - tile.x, _buildingCenter.y - tile.y).magnitude;
+    return maxIrrigatedDistance - distance + 1f;  // The farthest tile gets moisture level 1.0f.
   }
-  const float DesertLevelFadeInRangePct = 0.25f;
-  const float LowerestDesertLevel = DirectSoilMoistureSystemAccessor.DesertLevelWellMoisturized;
-  const float HighestDesertLevel = DirectSoilMoistureSystemAccessor.DesertLevelAlmostDry;
-  const float DesertLevelFadeInLength = HighestDesertLevel - LowerestDesertLevel;
 
   /// <summary>Get's square distance of the tile form the building's center.</summary>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]

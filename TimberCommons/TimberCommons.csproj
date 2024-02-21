@@ -102,7 +102,7 @@
       <Compile Include="WaterService\DirectSoilMoistureSystemAccessor.cs" />
       <Compile Include="WaterService\DirectWaterServiceAccessor.cs" />
       <Compile Include="WaterService\SoilMoistureSimulatorGetUpdatedMoisturePatch.cs" />
-      <Compile Include="WaterService\TerrainMaterialMapSetDesertIntensityPatch.cs" />
+      <Compile Include="WaterService\SoilMoistureMapUpdateDesertIntensityPatch.cs" />
       <Compile Include="WaterValveComponent\Configurator.cs" />
       <Compile Include="WaterValveComponent\WaterValve.cs" />
       <Compile Include="WaterValveComponent\WaterValveFragment.cs" />
@@ -213,6 +213,9 @@
       </Reference>
       <Reference Include="Timberborn.PrefabSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.PrefabSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.SceneLoading, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.SceneLoading.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.SingletonSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.SingletonSystem.dll</HintPath>

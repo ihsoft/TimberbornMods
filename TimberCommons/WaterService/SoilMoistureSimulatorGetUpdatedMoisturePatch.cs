@@ -16,10 +16,7 @@ static class SoilMoistureSimulatorGetUpdatedMoisturePatch {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!
     }
-
-    // Get a reference since the overrides instance can be updated from another thread.
-    var overrides = DirectSoilMoistureSystemAccessor.MoistureLevelOverrides;
-    if (overrides != null && overrides.TryGetValue(index, out var newLevel)) {
+    if (DirectSoilMoistureSystemAccessor.MoistureLevelOverrides.TryGetValue(index, out var newLevel)) {
       __result = __result < newLevel ? newLevel : __result;
     }
   }
