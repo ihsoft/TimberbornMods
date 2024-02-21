@@ -17,6 +17,7 @@ using Timberborn.Common;
 using Timberborn.ConstructibleSystem;
 using Timberborn.EntitySystem;
 using Timberborn.MapIndexSystem;
+using Timberborn.Persistence;
 using Timberborn.SingletonSystem;
 using Timberborn.SoilBarrierSystem;
 using Timberborn.TerrainSystem;
@@ -34,7 +35,8 @@ namespace IgorZ.TimberCommons.IrrigationSystem {
 /// blocked for irrigation (e.g. via a moisture blocker), then it's not eligible for irrigation. 
 /// </remarks>
 public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateListener,
-                                        IPostTransformChangeListener, IPausableComponent, ILateTickable {
+                                        IPostTransformChangeListener, IPausableComponent, ILateTickable,
+                                        IPersistentEntity {
 
   #region Unity conrolled fields
   // ReSharper disable InconsistentNaming
@@ -273,6 +275,10 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <summary>The last calculated efficiency modifier.</summary>
   float _currentEfficiency = 1.0f;
 
+  /// <summary>The loaded efficiency from teh save state.</summary>
+  /// <remarks>It's only saved for the active towers. Used to restore the initial irrigated state.</remarks>
+  float _savedEfficiency = -1;
+
   /// <summary>Cached positioned blocks to start searching for the eligible tiles.</summary>
   List<Vector2Int> _startingTiles;
 
@@ -310,7 +316,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <seealso cref="_needMoistureSystemUpdate"/>
   void UpdateState() {
     // Efficiency affects the irrigated radius.
-    var newEfficiency = GetEfficiency();
+    var newEfficiency = _savedEfficiency >= 0 ? _savedEfficiency : GetEfficiency();
     if (Mathf.Abs(_currentEfficiency - newEfficiency) > float.Epsilon) {
       HostedDebugLog.Fine(this, "Efficiency changed: {0} => {1}", _currentEfficiency, newEfficiency);
       _currentEfficiency = newEfficiency;
@@ -333,10 +339,15 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
       GetComponentFast<BuildingWithRangeUpdater>().OnPostTransformChanged();
     }
 
-    if (BlockableBuilding.IsUnblocked && CanMoisturize()) {
-      StartMoisturizing();
+    if (_savedEfficiency >= 0) {
+      _savedEfficiency = -1;
+      StartMoisturizing();  // This only happens on initialization of a formerly active tower. 
     } else {
-      StopMoisturizing();
+      if (BlockableBuilding.IsUnblocked && CanMoisturize()) {
+        StartMoisturizing();
+      } else {
+        StopMoisturizing();
+      }
     }
   }
 
@@ -511,8 +522,34 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
     UpdateState();
   }
 
-  #endregion  
+  #endregion
 
+  #region IPersistentEntity implemenatation
+
+  static readonly ComponentKey IrrigationTowerKey = new(typeof(IrrigationTower).FullName);
+  static readonly PropertyKey<float> CurrentEfficiencyKey = new("CurrentEfficiency");
+
+  /// <inheritdoc/>
+  public void Save(IEntitySaver entitySaver) {
+    if (!IsIrrigating) {
+      return;
+    }
+    var component = entitySaver.GetComponent(IrrigationTowerKey);
+    component.Set(CurrentEfficiencyKey, _currentEfficiency);
+  }
+
+  /// <inheritdoc/>
+  public void Load(IEntityLoader entityLoader) {
+    if (!entityLoader.HasComponent(IrrigationTowerKey)) {
+      return;
+    }
+    var component = entityLoader.GetComponent(IrrigationTowerKey);
+    if (component.Has(CurrentEfficiencyKey)) {
+      _savedEfficiency = component.Get(CurrentEfficiencyKey);
+    }
+  }
+
+  #endregion
 }
 
 }
