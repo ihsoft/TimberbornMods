@@ -13,9 +13,9 @@ using UnityEngine.UIElements;
 
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
-namespace IgorZ.TimberCommons.IrrigationSystemUI {
+namespace IgorZ.TimberCommons.CommonUIPatches {
 
-/// <summary>Deals with too low fuel ingredient consumption rate in the recipe UIs.</summary>
+/// <summary>Harmony patch to show low fuel ingredient consumption rate in the recipe UIs.</summary>
 [HarmonyPatch(typeof(ManufactoryDescriber), nameof(ManufactoryDescriber.GetInputs))]
 static class ManufactoryDescriberGetInputsPatch {
   static void Postfix(RecipeSpecification productionRecipe, bool __runOriginal,

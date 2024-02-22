@@ -1,3 +1,15 @@
+# v1.6 (21 Feb 2024):
+* [Fix #33] Water valve doesn't handle contamination correctly.
+* [Fix #38] "Supply will last for" text disappeared in UI.
+* [Feature] Make WaterValve pausable.
+* [Feature] Show the tiles, irrigated by the `WaterTower`, as *green* on the map instead of
+  "barely green, maybe dying".
+* [Enhancement] Show duration values below `0.01` as zero.
+* [Enhancement] In the IrrigationTower, consider all foundation tiles to find the irrigated area.
+* [Enhancement] Improve irrigated area calculation and update performance.
+* [Enhancement] Add feature `CommonUI.DisableAllPatches` to disable all UI related Harmony patches
+  from the mod. It's disabled by default.
+
 # v1.5 (3 Feb 2024):
 * Relase irrigation towers code.
 * Introduce the irrigation tower components: `GoodConsumingIrrigationTower` and `ManufactoryIrrigationTower`.

@@ -2,7 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Collections.Immutable;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace IgorZ.TimberCommons.IrrigationSystem {
@@ -22,7 +22,7 @@ public interface IRangeEffect {
 
   /// <summary>Applies affect to the specified tiles.</summary>
   /// <param name="tiles">The tiles to apply effect to.</param>
-  public void ApplyEffect(ImmutableHashSet<Vector2Int> tiles);
+  public void ApplyEffect(HashSet<Vector2Int> tiles);
 
   /// <summary>Resets all effects that were applied in the last call to <see cref="ApplyEffect"/></summary>
   public void ResetEffect();

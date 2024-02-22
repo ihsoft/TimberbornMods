@@ -2,23 +2,23 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Threading;
 using Bindito.Core;
-using HarmonyLib;
-using IgorZ.TimberDev.Utils;
+using IgorZ.TimberCommons.Common;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.Common;
 using Timberborn.ConstructibleSystem;
 using Timberborn.EntitySystem;
 using Timberborn.MapIndexSystem;
+using Timberborn.SceneLoading;
 using Timberborn.SingletonSystem;
 using Timberborn.SoilBarrierSystem;
 using Timberborn.SoilMoistureSystem;
 using Timberborn.TerrainSystem;
+using Timberborn.TickSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
@@ -28,25 +28,37 @@ namespace IgorZ.TimberCommons.WaterService {
 /// <remarks>
 /// This code uses HarmonyX patches to access internal game's logic. Significant changes to it may break the mod.
 /// </remarks>
-public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton {
+public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickableSingleton {
   #region API
+  // ReSharper disable UnusedMember.Global
+
   /// <summary>Creates moisture level overrides for a set of tiles.</summary>
   /// <remarks>
   /// The same tiles can be listed in multiple overrides. In this case the maximum level will be used.
   /// </remarks>
   /// <param name="tiles">The tiles to apply the override to.</param>
-  /// <param name="moisture">The moister level.</param>
+  /// <param name="moistureLevel">The moister level.</param>
+  /// <param name="moistureLevelForTextureFn">
+  /// Optional function that provides moisture level that is only used to count the desert intensity on the terrain map.
+  /// It won't affect moisture simulation. 
+  /// </param>
   /// <returns>Unique ID of the created override. Use it to delete the overrides.</returns>
   /// <seealso cref="RemoveMoistureOverride"/>
-  public int AddMoistureOverride(IEnumerable<Vector2Int> tiles, float moisture) {
+  public int AddMoistureOverride(IEnumerable<Vector2Int> tiles, float moistureLevel,
+                                 Func<Vector2Int, float> moistureLevelForTextureFn = null) {
     var index = _nextMoistureOverrideId++;
-    var tilesDict = tiles.Select(c => _mapIndexService.CoordinatesToIndex(c))
-        .ToDictionary(k => k, _ => moisture);
-    _moistureOverrides.Add(index,tilesDict);
-    var oldCacheSize = SoilMoistureSimulatorPatch.MoistureOverrides?.Count;
-    UpdateMoistureMap();
-    DebugEx.Fine("Added moisture override: id={0}, tiles={1}. Cache size: {2} => {3}",
-                 index, tilesDict.Count, oldCacheSize, SoilMoistureSimulatorPatch.MoistureOverrides?.Count);
+    var moistureLevelDict = new Dictionary<int, float>();
+    var desertLevelDict = new Dictionary<Vector2Int, float>();
+    foreach (var tile in tiles) {
+      moistureLevelDict.Add(_mapIndexService.CoordinatesToIndex(tile), moistureLevel);
+      if (moistureLevelForTextureFn != null) {
+        desertLevelDict.Add(tile, moistureLevelForTextureFn.Invoke(tile));
+      }
+    }
+    _moistureLevelOverrides.Add(index, moistureLevelDict);
+    _desertLevelOverrides.Add(index, desertLevelDict);
+    _needMoistureOverridesUpdate = true;
+    DebugEx.Fine("Added moisture override: id={0}, tiles={1}", index, moistureLevelDict.Count);
     return index;
   }
 
@@ -54,14 +66,13 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton {
   /// <param name="overrideId">The ID of the override to remove.</param>
   /// <seealso cref="AddMoistureOverride"/>
   public void RemoveMoistureOverride(int overrideId) {
-    if (!_moistureOverrides.TryGetValue(overrideId, out var tilesDict)) {
+    if (!_desertLevelOverrides.TryGetValue(overrideId, out var tilesDict)) {
       return;
     }
-    _moistureOverrides.Remove(overrideId);
-    var oldCacheSize = SoilMoistureSimulatorPatch.MoistureOverrides?.Count;
-    UpdateMoistureMap();
-    DebugEx.Fine("Removed moisture override: id={0}, tiles={1}. Cache size: {2} => {3}",
-                 overrideId, tilesDict.Count, oldCacheSize, SoilMoistureSimulatorPatch.MoistureOverrides?.Count);
+    _moistureLevelOverrides.Remove(overrideId);
+    _desertLevelOverrides.Remove(overrideId);
+    _needMoistureOverridesUpdate = true;
+    DebugEx.Fine("Removed moisture override: id={0}, tiles={1}", overrideId, tilesDict.Count);
   }
 
   /// <summary>Sets contamination blockers for a set of tiles.</summary>
@@ -71,15 +82,10 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton {
   /// <seealso cref="RemoveContaminationOverride"/>
   public int AddContaminationOverride(IEnumerable<Vector2Int> tiles) {
     var tilesSet = tiles.ToHashSet();
-    var oldCacheSize = _contaminatedTilesCache.Count;
     var index = _nextContaminationOverrideId++;
     _contaminationOverrides.Add(index, tilesSet);
-    _contaminatedTilesCache = _contaminationOverrides.SelectMany(item => item.Value).ToHashSet();
-    foreach (var barrierTile in tilesSet) {
-      _soilBarrierMap.AddContaminationBarrierAt(barrierTile);
-    }
-    DebugEx.Fine("Added contamination override: id={0}, tiles={1}. Cache size: {2} => {3}",
-                 index, tilesSet.Count, oldCacheSize, _contaminatedTilesCache.Count);
+    _needContaminationOverridesUpdate = true;
+    DebugEx.Fine("Added contamination override: id={0}, tiles={1}", index, tilesSet.Count);
     return index;
   }
 
@@ -90,37 +96,46 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton {
     if (!_contaminationOverrides.TryGetValue(overrideId, out var barriers)) {
       return;
     }
-    var oldTilesCache = _contaminatedTilesCache;
     _contaminationOverrides.Remove(overrideId);
-    _contaminatedTilesCache = _contaminationOverrides.SelectMany(item => item.Value).ToHashSet();
-    var barriersToRemove = oldTilesCache.Where(x => !_contaminatedTilesCache.Contains(x));
-    foreach (var barrier in barriersToRemove) {
-      var skipIt = _blockService
-          .GetObjectsAt(new Vector3Int(barrier.x, barrier.y, _terrainService.CellHeight(barrier)))
-          .Any(IsContaminationBlocker);
-      if (skipIt) {
-        DebugEx.Fine("Don't affect contamination barrier at: {0}", barrier);
-        continue;
-      }
-      _soilBarrierMap.RemoveContaminationBarrierAt(barrier);
-    }
-    DebugEx.Fine("Removed contamination override: id={0}, tiles={1}. Cache size: {2} => {3}",
-                 overrideId, barriers.Count, oldTilesCache.Count, _contaminatedTilesCache.Count);
+    _needContaminationOverridesUpdate = true;
+    DebugEx.Fine("Removed contamination override: id={0}, tiles={1}", overrideId, barriers.Count);
   }
+
+  // ReSharper restore UnusedMember.Global
   #endregion
 
   #region IPostLoadableSingleton implementation
+
   /// <summary>Sets up the moisture override logic.</summary>
   public void PostLoad() {
-    DebugEx.Fine("Initializing direct access to SoilMoistureSystem...");
-    HarmonyPatcher.PatchRepeated(GetType().AssemblyQualifiedName, typeof(SoilMoistureSimulatorPatch));
-    SoilMoistureSimulatorPatch.MoistureOverrides = null;
+    MoistureLevelOverrides = new Dictionary<int, float>();
+    TerrainTextureLevelsOverrides = new Dictionary<Vector2Int, float>();
     _eventBus.Register(this);
+    _sceneLoader.SceneLoaded += OnSceneLoaded;
   }
+
+  #endregion
+
+  #region ITickableSingleton implementation
+
+  /// <inheritdoc/>
+  public void Tick() {
+    UpdateMoistureOverrides();
+    UpdateContaminationOverrides();
+  }
+
   #endregion
 
   #region Implementation
-  readonly Dictionary<int, Dictionary<int, float>> _moistureOverrides = new();
+
+  /// <summary>Map of the overriden moisture levels.</summary>
+  internal static Dictionary<int, float> MoistureLevelOverrides = new();
+
+  /// <summary>Map of the overriden desert levels.</summary>
+  internal static Dictionary<Vector2Int, float> TerrainTextureLevelsOverrides = new();
+
+  readonly Dictionary<int, Dictionary<int, float>> _moistureLevelOverrides = new();
+  readonly Dictionary<int, Dictionary<Vector2Int, float>> _desertLevelOverrides = new();
   int _nextMoistureOverrideId = 1;
 
   readonly Dictionary<int, HashSet<Vector2Int>> _contaminationOverrides = new();
@@ -129,34 +144,103 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton {
 
   MapIndexService _mapIndexService;
   SoilBarrierMap _soilBarrierMap;
+  SoilMoistureMap _soilMoistureMap;
   BlockService _blockService;
   ITerrainService _terrainService;
   EventBus _eventBus;
+  SceneLoader _sceneLoader;
+  TerrainMaterialMap _terrainMaterialMap;
 
   /// <summary>Injects run-time dependencies.</summary>
   [Inject]
   public void InjectDependencies(MapIndexService mapIndexService, SoilBarrierMap soilBarrierMap,
-                                 BlockService blockService, ITerrainService terrainService, EventBus eventBus) {
+                                 BlockService blockService, ITerrainService terrainService, EventBus eventBus,
+                                 TerrainMaterialMap terrainMaterialMap, SoilMoistureMap soilMoistureMap,
+                                 SceneLoader sceneLoader) {
     _mapIndexService = mapIndexService;
     _soilBarrierMap = soilBarrierMap;
     _blockService = blockService;
     _terrainService = terrainService;
     _eventBus = eventBus;
+    _terrainMaterialMap = terrainMaterialMap;
+    _soilMoistureMap = soilMoistureMap;
+    _sceneLoader = sceneLoader;
   }
 
+  /// <summary>Checks if there were changes and rebuilds moisture overrides caches.</summary>
+  void UpdateMoistureOverrides() {
+    if (!_needMoistureOverridesUpdate) {
+      return;
+    }
+    _needMoistureOverridesUpdate = false;
 
-  /// <summary>Recalculates moisture override cache.</summary>
-  void UpdateMoistureMap() {
-    var overridesCache = new Dictionary<int, float>();
-    foreach (var value in _moistureOverrides.Values.SelectMany(item => item)) {
-      if (overridesCache.TryGetValue(value.Key, out var existingValue)) {
-        overridesCache[value.Key] = Mathf.Max(value.Value, existingValue);
+    // Moisture levels. This affects the moisture simulation engine.
+    MoistureLevelOverrides = new Dictionary<int, float>();
+    foreach (var value in _moistureLevelOverrides.Values.SelectMany(item => item)) {
+      var tile = value.Key;
+      var level = value.Value;
+      if (MoistureLevelOverrides.TryGetValue(tile, out var existingValue)) {
+        MoistureLevelOverrides[tile] = Mathf.Max(level, existingValue);
       } else {
-        overridesCache.Add(value.Key, value.Value);
+        MoistureLevelOverrides.Add(tile, level);
       }
     }
-    // Must be thread-safe.
-    Interlocked.Exchange(ref SoilMoistureSimulatorPatch.MoistureOverrides, overridesCache);
+    DebugEx.Fine("Updated moisture level overrides: tiles={0}", MoistureLevelOverrides.Keys.Count);
+
+    if (Features.OverrideDesertLevelsForWaterTowers) {
+      UpdateTilesAppearance();
+    }
+  }
+  bool _needMoistureOverridesUpdate;
+
+  /// <summary>Checks if there were changes and rebuilds contamination overrides cache.</summary>
+  void UpdateContaminationOverrides() {
+    if (!_needContaminationOverridesUpdate) {
+      return;
+    }
+    _needContaminationOverridesUpdate = false;
+
+    var newOverrides = _contaminationOverrides.SelectMany(item => item.Value).ToHashSet();
+    foreach (var tile in newOverrides) {
+      _soilBarrierMap.AddContaminationBarrierAt(tile);
+    }
+    var clearOverrides = _contaminatedTilesCache.Where(t => !newOverrides.Contains(t));
+    foreach (var tile in clearOverrides) {
+      var skipIt = _blockService
+          .GetObjectsAt(new Vector3Int(tile.x, tile.y, _terrainService.CellHeight(tile)))
+          .Any(IsContaminationBlocker);
+      if (skipIt) {
+        DebugEx.Fine("Don't affect contamination barrier at: {0}", tile);
+        continue;
+      }
+      _soilBarrierMap.RemoveContaminationBarrierAt(tile);
+    }
+    DebugEx.Fine("Update contamination overrides: oldActive={0}, newActive={1}",
+                 _contaminatedTilesCache.Count, newOverrides.Count);
+    _contaminatedTilesCache = newOverrides;
+  }
+  bool _needContaminationOverridesUpdate;
+
+  /// <summary>Requests the terrain appearance update to reflect the overriden desert levels.</summary>
+  /// <seealso cref="TerrainTextureLevelsOverrides"/>
+  void UpdateTilesAppearance() {
+    // Moisture levels for the terrain texture. It only affects UI appearance.
+    TerrainTextureLevelsOverrides = new Dictionary<Vector2Int, float>();
+    foreach (var value in _desertLevelOverrides.Values.SelectMany(item => item)) {
+      var tile = value.Key;
+      var level = value.Value;
+      var index = _mapIndexService.CoordinatesToIndex(tile);
+      if (TerrainTextureLevelsOverrides.TryGetValue(tile, out var existingValue)) {
+        TerrainTextureLevelsOverrides[tile] = Mathf.Max(level, existingValue);
+      } else {
+        TerrainTextureLevelsOverrides.Add(tile, level);
+      }
+    }
+    foreach (var tile in TerrainTextureLevelsOverrides.Keys) {
+      var index = _mapIndexService.CoordinatesToIndex(tile);
+      _soilMoistureMap.UpdateDesertIntensity(tile, _soilMoistureMap.SoilMoisture(index));
+    }
+    DebugEx.Fine("Updated tiles appearance: tiles={0}", TerrainTextureLevelsOverrides.Keys.Count);
   }
 
   /// <summary>Reacts on contamination blockers removal.</summary>
@@ -179,28 +263,24 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton {
     var barrier = component.GetComponentFast<SoilBarrier>();
     return barrier != null && barrier._blockContamination;
   }
+
   #endregion
 
-  #region Harmony patch to override mosture levels.
-  [HarmonyPatch(typeof(SoilMoistureSimulator), nameof(SoilMoistureSimulator.GetUpdatedMoisture))]
-  static class SoilMoistureSimulatorPatch {
-    // It will be accessed from the threads, so don't modify the dict once assigned.
-    public static Dictionary<int, float> MoistureOverrides;
+  #region Game load callbacks
 
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    // ReSharper disable once UnusedMember.Local
-    static void Postfix(int index, bool __runOriginal, ref float __result) {
-      if (!__runOriginal) {
-        return;  // The other patches must follow the same style to properly support the skip logic!
-      }
+  /// <summary>Refreshes terrain texture if when teh game is loaded and there are active overrides.</summary>
+  void OnSceneLoaded(object sender, EventArgs e) {
+    _sceneLoader.SceneLoaded -= OnSceneLoaded;
+    var needTextureUpdate = _needMoistureOverridesUpdate;
+    Tick();
 
-      // Get a reference since the overrides instance can be updated for another thread.
-      var overrides = MoistureOverrides;
-      if (overrides != null && overrides.TryGetValue(index, out var newLevel)) {
-        __result = __result < newLevel ? newLevel : __result;
-      }
+    // Refresh the texture on game load.
+    if (needTextureUpdate && Features.OverrideDesertLevelsForWaterTowers) {
+      _terrainMaterialMap.ProcessDesertTextureChanges();
+      _terrainMaterialMap.ProcessDesertTextureChanges(); // Intentionally.
     }
   }
+
   #endregion
 }
 

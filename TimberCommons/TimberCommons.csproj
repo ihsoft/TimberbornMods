@@ -29,7 +29,7 @@
         <DebugType>pdbonly</DebugType>
         <Optimize>true</Optimize>
         <OutputPath>bin\Release\</OutputPath>
-        <DefineConstants>TRACE</DefineConstants>
+        <DefineConstants></DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
         <DebugSymbols>true</DebugSymbols>
@@ -72,17 +72,20 @@
       <Compile Include="..\UnityDevLite\TypeUtils.cs">
         <Link>UnityDevLite\TypeUtils.cs</Link>
       </Compile>
+      <Compile Include="CommonUIPatches\Configurator.cs" />
+      <Compile Include="CommonUIPatches\GoodConsumingBuildingDescriberPatch.cs" />
+      <Compile Include="CommonUIPatches\GoodConsumingBuildingFragmentPatch.cs" />
+      <Compile Include="CommonUIPatches\GrowableFragmentPatch.cs" />
+      <Compile Include="CommonUIPatches\GrowableToolPanelItemFactoryPatch.cs" />
+      <Compile Include="CommonUIPatches\ManufactoryDescriberGetCraftingTimePatch.cs" />
+      <Compile Include="CommonUIPatches\ManufactoryDescriberGetInputsPatch.cs" />
+      <Compile Include="CommonUIPatches\ManufactoryInventoryFragmentInitializeFragmentPatch.cs" />
+      <Compile Include="CommonUIPatches\ManufactoryInventoryFragmentUpdateFragmentPatch.cs" />
       <Compile Include="Common\Configurator.cs" />
       <Compile Include="Common\Features.cs" />
       <Compile Include="Common\IConsumptionRateFormatter.cs" />
       <Compile Include="Common\ISupplyLeftProvider.cs" />
-      <Compile Include="IrrigationSystemUI\GrowableFragmentPatch.cs" />
-      <Compile Include="IrrigationSystemUI\GrowableToolPanelItemFactoryPatch.cs" />
       <Compile Include="IrrigationSystemUI\GrowthRateModifierFragment.cs" />
-      <Compile Include="IrrigationSystemUI\ManufactoryDescriberGetCraftingTimePatch.cs" />
-      <Compile Include="IrrigationSystemUI\ManufactoryDescriberGetInputsPatch.cs" />
-      <Compile Include="IrrigationSystemUI\ManufactoryInventoryFragmentInitializeFragmentPatch.cs" />
-      <Compile Include="IrrigationSystemUI\ManufactoryInventoryFragmentUpdateFragmentPatch.cs" />
       <Compile Include="IrrigationSystem\BlockContaminationRangeEffect.cs" />
       <Compile Include="IrrigationSystem\ModifyGrowableGrowthRangeEffect.cs" />
       <Compile Include="IrrigationSystem\Configurator.cs" />
@@ -93,12 +96,12 @@
       <Compile Include="IrrigationSystem\ManufactoryIrrigationTower.cs" />
       <Compile Include="Properties\AssemblyInfo.cs" />
       <Compile Include="IrrigationSystemUI\Configurator.cs" />
-      <Compile Include="IrrigationSystemUI\GoodConsumingBuildingDescriberPatch.cs" />
-      <Compile Include="IrrigationSystemUI\GoodConsumingBuildingFragmentPatch.cs" />
       <Compile Include="IrrigationSystemUI\IrrigationTowerFragment.cs" />
       <Compile Include="WaterService\Configurator.cs" />
       <Compile Include="WaterService\DirectSoilMoistureSystemAccessor.cs" />
       <Compile Include="WaterService\DirectWaterServiceAccessor.cs" />
+      <Compile Include="WaterService\SoilMoistureSimulatorGetUpdatedMoisturePatch.cs" />
+      <Compile Include="WaterService\SoilMoistureMapUpdateDesertIntensityPatch.cs" />
       <Compile Include="WaterValveComponent\Configurator.cs" />
       <Compile Include="WaterValveComponent\WaterValve.cs" />
       <Compile Include="WaterValveComponent\WaterValveFragment.cs" />
@@ -210,6 +213,9 @@
       <Reference Include="Timberborn.PrefabSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.PrefabSystem.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.SceneLoading, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.SceneLoading.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.SingletonSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.SingletonSystem.dll</HintPath>
       </Reference>
@@ -256,6 +262,7 @@
       <Reference Include="..\Dependencies\Timberborn\Timberborn.Growing.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.GrowingUI.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.WorkshopsUI.dll" Publicize="true" />
+      <Reference Include="Timberborn.TerrainSystem" Publicize="true" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

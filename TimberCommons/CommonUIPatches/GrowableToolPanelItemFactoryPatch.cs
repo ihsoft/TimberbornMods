@@ -10,8 +10,9 @@ using Timberborn.Localization;
 using UnityEngine.UIElements;
 
 // ReSharper disable InconsistentNaming
-namespace IgorZ.TimberCommons.IrrigationSystemUI {
+namespace IgorZ.TimberCommons.CommonUIPatches {
 
+/// <summary>Harmony patch to show growth time in days and hours.</summary>
 [HarmonyPatch(typeof(GrowableToolPanelItemFactory), nameof(GrowableToolPanelItemFactory.Create))]
 static class GrowableToolPanelItemFactoryPatch {
   // ReSharper disable once UnusedMember.Local

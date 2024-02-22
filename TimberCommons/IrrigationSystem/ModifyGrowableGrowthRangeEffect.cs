@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using Bindito.Core;
 using Timberborn.BaseComponentSystem;
@@ -15,7 +14,6 @@ using Timberborn.EntitySystem;
 using Timberborn.PrefabSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.TerrainSystem;
-using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
 namespace IgorZ.TimberCommons.IrrigationSystem {
@@ -99,7 +97,7 @@ public sealed class ModifyGrowableGrowthRangeEffect : BaseComponent, IRangeEffec
   public string EffectGroup => _effectGroupName;
 
   /// <inheritdoc/>
-  public void ApplyEffect(ImmutableHashSet<Vector2Int> tiles) {
+  public void ApplyEffect(HashSet<Vector2Int> tiles) {
     ResetEffect();
     _allTiles = tiles;
     _coordsWithBoost = new List<Vector3Int>();
@@ -135,7 +133,7 @@ public sealed class ModifyGrowableGrowthRangeEffect : BaseComponent, IRangeEffec
   HashSet<string> _requiredComponents;
   HashSet<string> _requiredPrefabNames;
 
-  ImmutableHashSet<Vector2Int> _allTiles;
+  HashSet<Vector2Int> _allTiles;
   List<Vector3Int> _coordsWithBoost;
 
   /// <inheritdoc/>

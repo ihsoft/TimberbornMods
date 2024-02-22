@@ -40,6 +40,19 @@ static class Features {
   /// <summary>Overrides the maximum registry size for PrefabOptimizer to suppress log complaints.</summary>
   public static int PrefabOptimizerMaxExpectedRegistrySize = -1;
 
+  /// <summary>
+  /// Specifies whether the terrain view should be adjusted to present irrigated tiles as "well moisturized". Otherwise,
+  /// the stock logic will decide based on the moisture level.
+  /// </summary>
+  public static bool OverrideDesertLevelsForWaterTowers;
+
+  /// <summary>Specifies whether no UI changes to the stock logic must be made by the mod.</summary>
+  /// <remarks>
+  /// It's a super setting to any UI affecting Harmony patches. If the game doesn't work well or the mod doesn't load,
+  /// enable this feature and only the stock UI will be in action.
+  /// </remarks>
+  public static bool DisableAllUiPatches;
+
   static Features() {
     FeatureController.ReadFeatures(Consume);
   }
@@ -48,6 +61,8 @@ static class Features {
     return name switch {
         "DebugEx.VerboseLogging" =>
             FeatureController.SetFlag(ref DebugExVerboseLogging, name, enabled, value),
+        "CommonUI.DisableAllPatches" =>
+            FeatureController.SetFlag(ref DisableAllUiPatches, name, enabled, value),
         "GoodConsumingBuildingUI.DaysHoursViewForAllBuildings" =>
             FeatureController.SetFlag(ref GoodConsumingBuildingUIDaysHoursForAll, name, enabled, value),
         "GrowableGrowthTimeUI.DaysHoursViewForAllGrowables" =>
@@ -58,6 +73,8 @@ static class Features {
             FeatureController.SetFlag(ref ShowLongValueForLowFuelConsumptionRecipes, name, enabled, value),
         "PrefabOptimizer.MaxExpectedRegistrySize" =>
             FeatureController.SetValue(ref PrefabOptimizerMaxExpectedRegistrySize, name, enabled, value),
+        "WaterTowers.OverrideDesertLevels" =>
+            FeatureController.SetFlag(ref OverrideDesertLevelsForWaterTowers, name, enabled, value),
         _ => false
     };
   }

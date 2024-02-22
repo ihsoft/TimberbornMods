@@ -10,9 +10,9 @@ using Timberborn.Localization;
 using UnityEngine.UIElements;
 
 // ReSharper disable InconsistentNaming
-namespace IgorZ.TimberCommons.IrrigationSystemUI {
+namespace IgorZ.TimberCommons.CommonUIPatches {
 
-/// Harmony patch to show fractional grow days for growables.
+/// Harmony patch to show grow rate as days/hours.
 [HarmonyPatch(typeof(GrowableFragment), nameof(GrowableFragment.UpdateFragment))]
 static class GrowableFragmentPatch {
   // ReSharper disable once UnusedMember.Local
