@@ -1,4 +1,4 @@
-# v1.6 (started on 2/7/2024):
+# v1.6 (21 Feb 2024):
 * [Fix #33] Water valve doesn't handle contamination correctly.
 * [Fix #38] "Supply will last for" text disappeared in UI.
 * [Feature] Make WaterValve pausable.
