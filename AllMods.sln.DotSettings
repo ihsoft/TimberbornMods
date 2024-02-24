@@ -10,5 +10,6 @@
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=manufactories/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=manufactory/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=pausable/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Prioritizable/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Timberborn/@EntryIndexedValue">True</s:Boolean>
 </wpf:ResourceDictionary>
