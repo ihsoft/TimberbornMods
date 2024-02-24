@@ -1,3 +1,5 @@
+# v0.14 (started at 2/23/2024):
+
 # v0.13 (18 Feb 2024):
 * Add "finish now" debug tool to immediatelty complete construction of the selected objects.
 * Fix detecting current drought state condition.
