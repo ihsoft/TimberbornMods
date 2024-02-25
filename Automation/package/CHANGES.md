@@ -1,5 +1,6 @@
 # v0.14 (started at 2/23/2024):
 * [Fix #41] Dynamite drill down doesn't work on the new tools.
+* [Fix #35] Dynamite drill down action should respect the priority.
 
 # v0.13 (18 Feb 2024):
 * Add "finish now" debug tool to immediatelty complete construction of the selected objects.

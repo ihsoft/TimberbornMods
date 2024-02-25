@@ -46,6 +46,10 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
       {3 , "TripleDynamite."},
   };
 
+  /// <summary>Builder priority of the behavior owner object.</summary>
+  /// <remarks>It must be captured before construction completes.</remarks>
+  Priority _builderPriority;
+
   #region AutomationActionBase overrides
 
   /// <inheritdoc/>
@@ -87,12 +91,20 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
   protected override void OnBehaviorAssigned() {
     base.OnBehaviorAssigned();
     var builderPrioritizable = Behavior.GetComponentFast<BuilderPrioritizable>();
+    _builderPriority = builderPrioritizable.Priority;
+    builderPrioritizable.PriorityChanged += OnPriorityChanged;
   }
 
   /// <inheritdoc/>
   protected override void OnBehaviorToBeCleared() {
     base.OnBehaviorToBeCleared();
     var builderPrioritizable = Behavior.GetComponentFast<BuilderPrioritizable>();
+    builderPrioritizable.PriorityChanged -= OnPriorityChanged;
+  }
+
+  /// <summary>Reacts on the builder's priority change while the object is in preview.</summary>
+  void OnPriorityChanged(object sender, PriorityChangedEventArgs args) {
+    _builderPriority = Behavior.GetComponentFast<BuilderPrioritizable>().Priority;
   }
 
   #endregion
@@ -173,6 +185,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
         yield return null;
         newDynamite = _blockService.GetBottomObjectAt(coordinates);
       } while (newDynamite == null);
+      newDynamite.GetComponentFast<BuilderPrioritizable>().SetPriority(builderPriority);
       newDynamite.GetComponentFast<AutomationBehavior>().AddRule(
           new ObjectFinishedCondition(),
           new DetonateDynamiteAction { RepeatCount = repeatCount - 1 });
