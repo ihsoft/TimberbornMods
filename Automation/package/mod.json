@@ -9,8 +9,7 @@
     {
       "Prefix": "igorz.automation",
       "Scenes": [
-        "InGame",
-	"MapEditor",
+        "All"
       ]
     }
   ],
