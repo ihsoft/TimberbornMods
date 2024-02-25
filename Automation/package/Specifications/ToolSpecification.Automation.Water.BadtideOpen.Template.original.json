@@ -10,8 +10,8 @@
     "TemplateFamilyName": "Water.FloodgateManagement",
     "Rules": [
       {
-        "Condition": { "TypeId": "Automation.Conditions.BadtideEndedCondition" },
-        "Action": { "TypeId": "Automation.Actions.SetFloodgateHeightAction", "StepsDown": 1 }
+        "Condition": { "TypeId": "Automation.Conditions.BadtideStartedCondition" },
+        "Action": { "TypeId": "Automation.Actions.SetFloodgateHeightAction", "StepsDown": 100 }
       },
       {
         "Condition": { "TypeId": "Automation.Conditions.BadtideEndedCondition" },
