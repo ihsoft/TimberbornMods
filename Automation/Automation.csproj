@@ -280,6 +280,9 @@
       <Reference Include="Timberborn.TemplateSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.TemplateSystem.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.TerrainSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\TimberCommons\obj\Release\publicized\Timberborn.TerrainSystem.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.TickSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.TickSystem.dll</HintPath>
       </Reference>
