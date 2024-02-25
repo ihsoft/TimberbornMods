@@ -14,8 +14,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Data:
   - {fileID: 5982789984318011147}
+  - {fileID: 4638459436819016352}
   identity: {fileID: 5982789984318011147}
   QuickAccess: 0
+--- !u!114 &4638459436819016352
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17d1008b78cb6e846889b7778282fbef, type: 3}
+  m_Name: AssetBundleDefinitions
+  m_EditorClassIdentifier: 
+  StagingPaths: []
+  assetBundles:
+  - assetBundleName: automation/cursors
+    assets:
+    - {fileID: 102900000, guid: 3ed4685ba8e1ea443b4f6f7950b594b6, type: 3}
+  - assetBundleName: automation/ui_icons
+    assets:
+    - {fileID: 102900000, guid: db2538aa5b63ae14e8483b46c36a032a, type: 3}
 --- !u!114 &5982789984318011147
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33,6 +54,4 @@ MonoBehaviour:
   Name: 
   Description: 
   Version: 
-  Dependencies:
-  - {fileID: 11400000, guid: 1af1b4a6717858842a0e5e57ceb0fe36, type: 2}
-  - {fileID: 11400000, guid: 1055caa6d0a284f4280468d1180b8c1b, type: 2}
+  Dependencies: []

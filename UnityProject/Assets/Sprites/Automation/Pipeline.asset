@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-2383341906349593742
+--- !u!114 &-6932147863352934595
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9,16 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f22bb7fd1d3b56a48bc52f8e407901d6, type: 3}
-  m_Name: ManifestIdentity
+  m_Script: {fileID: 11500000, guid: 924ee63e6c016f14d8a1560b288f15a3, type: 3}
+  m_Name: StageAssetBundles
   m_EditorClassIdentifier: 
-  StagingPaths: []
-  Author: IgorZ
-  Name: TimberbornMods
-  Description: 
-  Version: 
-  Dependencies:
-  - {fileID: 11400000, guid: 8eb46b725fabcb042a1725920d7c157e, type: 2}
+  Active: 1
+  AssetBundleBuildOptions: 0
+  buildTarget: 5
+  recurseDirectories: 0
+  simulate: 0
+  BundleArtifactPath: AssetBundles
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28,10 +27,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e563561e08b6a3642a487177f5cfbb37, type: 3}
-  m_Name: Manifest
+  m_Script: {fileID: 11500000, guid: a3695521163bdd74fa2845bbd3438240, type: 3}
+  m_Name: Pipeline
   m_EditorClassIdentifier: 
   Data:
-  - {fileID: -2383341906349593742}
-  identity: {fileID: -2383341906349593742}
+  - {fileID: -6932147863352934595}
   QuickAccess: 0
+  manifest: {fileID: 11400000, guid: 98fd4e567eaad3e428a7cb6e0f66adeb, type: 2}
