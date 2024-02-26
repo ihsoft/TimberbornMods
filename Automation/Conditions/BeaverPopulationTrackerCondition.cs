@@ -75,10 +75,9 @@ public abstract class BeaverPopulationTrackerCondition : PopulationTrackerCondit
   /// <inheritdoc/>
   public override void LoadFrom(IObjectLoader objectLoader) {
     base.LoadFrom(objectLoader);
-    if (!objectLoader.Has(DifferenceKey)) {
-      return;
+    if (objectLoader.Has(DifferenceKey)) {
+      Difference = objectLoader.Get(DifferenceKey);
     }
-    Difference = objectLoader.Get(DifferenceKey);
     RelativeToCurrentLevel = objectLoader.Has(RelativeToCurrentLevelKey) && objectLoader.Get(RelativeToCurrentLevelKey);
     RelativeToMaxLevel = objectLoader.Has(RelativeToMaxLevelKey) && objectLoader.Get(RelativeToMaxLevelKey);
     if (objectLoader.Has(ThresholdKey)) {
