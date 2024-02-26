@@ -7,7 +7,7 @@ using Timberborn.GameDistricts;
 
 namespace Automation.Conditions {
 
-/// <summary>Triggers when current beavers population goes above the threshold.</summary>
+/// <summary>Triggers when the current beavers population goes above the threshold.</summary>
 // ReSharper disable once UnusedType.Global
 public sealed class BeaverPopulationBelowThresholdCondition : BeaverPopulationTrackerCondition {
   const string DescriptionLocKey = "IgorZ.Automation.BeaverPopulationBelowThresholdCondition.Description";
