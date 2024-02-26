@@ -150,9 +150,10 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
     }
 
     IEnumerator WaitAndPlace() {
+      var coordinates = blockObject.Coordinates;
       var dynamite = blockObject.GetComponentFast<Dynamite>();
       var dynamiteDepth = dynamite.Depth;
-      yield return null; // Act on the next frame to avoid synchronous complications.
+      yield return null;  // Act on the next frame to avoid synchronous complications.
 
       // Detonate the dynamite.
       yield return new WaitUntil(NoCharactersOnBlock);
@@ -165,7 +166,6 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
       }
 
       // Wait for the old object to clean up.
-      var coordinates = blockObject.Coordinates;
       yield return new WaitUntil(() => blockObject == null);
       coordinates.z = _terrainService.CellHeight(coordinates.XY());
       if (coordinates.z <= 0) {
