@@ -82,9 +82,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
 
     // The behavior object will get destroyed on detonate, so create am independent component.
     var component = new GameObject("#Automation_PlaceDynamiteAction").AddComponent<DetonateAndMaybeRepeatRule>();
-    component.blockObject = Behavior.BlockObject;
-    component.repeatCount = RepeatCount;
-    component.builderPriority = _builderPriority;
+    component.Setup(Behavior.BlockObject, RepeatCount, _builderPriority);
   }
 
   /// <inheritdoc/>
@@ -137,21 +135,28 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
     ITerrainService _terrainService;
     BlockService _blockService;
 
-    public BlockObject blockObject;
-    public int repeatCount;
-    public Priority builderPriority;
+    BlockObject _blockObject;
+    int _repeatCount;
+    Priority _builderPriority;
+
+    /// <summary>Sets up the component and starts the actual monitoring of the object.</summary>
+    public void Setup(BlockObject blockObject, int repeatCount, Priority builderPriority) {
+      _blockObject = blockObject;
+      _repeatCount = repeatCount;
+      _builderPriority = builderPriority;
+      StartCoroutine(WaitAndPlace());
+    }
 
     void Awake() {
       _blockOccupancyService = DependencyContainer.GetInstance<IBlockOccupancyService>();
       _toolButtonService = DependencyContainer.GetInstance<ToolButtonService>();
       _terrainService = DependencyContainer.GetInstance<ITerrainService>();
       _blockService = DependencyContainer.GetInstance<BlockService>();
-      StartCoroutine(WaitAndPlace());
     }
 
     IEnumerator WaitAndPlace() {
-      var coordinates = blockObject.Coordinates;
-      var dynamite = blockObject.GetComponentFast<Dynamite>();
+      var coordinates = _blockObject.Coordinates;
+      var dynamite = _blockObject.GetComponentFast<Dynamite>();
       var dynamiteDepth = dynamite.Depth;
       yield return null;  // Act on the next frame to avoid synchronous complications.
 
@@ -161,12 +166,12 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
         HostedDebugLog.Fine(dynamite, "Detonate from automation!");
         dynamite.Trigger();
       }
-      if (repeatCount <= 0) {
+      if (_repeatCount <= 0) {
         yield return YieldAbort();
       }
 
       // Wait for the old object to clean up.
-      yield return new WaitUntil(() => blockObject == null);
+      yield return new WaitUntil(() => _blockObject == null);
       coordinates.z = _terrainService.CellHeight(coordinates.XY());
       if (coordinates.z <= 0) {
         DebugEx.Fine("Reached the bottom of the map at {0}", coordinates.XY());
@@ -185,11 +190,11 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
         yield return null;
         newDynamite = _blockService.GetBottomObjectAt(coordinates);
       } while (newDynamite == null);
-      newDynamite.GetComponentFast<BuilderPrioritizable>().SetPriority(builderPriority);
+      newDynamite.GetComponentFast<BuilderPrioritizable>().SetPriority(_builderPriority);
       newDynamite.GetComponentFast<AutomationBehavior>().AddRule(
           new ObjectFinishedCondition(),
-          new DetonateDynamiteAction { RepeatCount = repeatCount - 1 });
-      HostedDebugLog.Fine(newDynamite, "Placed new item: priority={0}, tries={1}", builderPriority, repeatCount - 1);
+          new DetonateDynamiteAction { RepeatCount = _repeatCount - 1 });
+      HostedDebugLog.Fine(newDynamite, "Placed new item: priority={0}, tries={1}", _builderPriority, _repeatCount - 1);
 
       yield return YieldAbort();
     }
@@ -200,10 +205,10 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
     }
 
     bool NoCharactersOnBlock() {
-      if (blockObject == null || !blockObject.enabled) {
+      if (_blockObject == null || !_blockObject.enabled) {
         return true; // Terminate the check.
       }
-      return !_blockOccupancyService.OccupantPresentOnArea(blockObject, MinDistanceToCheckOccupants);
+      return !_blockOccupancyService.OccupantPresentOnArea(_blockObject, MinDistanceToCheckOccupants);
     }
   }
 
