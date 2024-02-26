@@ -76,6 +76,9 @@
       <Compile Include="Conditions\BeaverPopulationAboveThresholdCondition.cs" />
       <Compile Include="Conditions\BeaverPopulationTrackerCondition.cs" />
       <Compile Include="Conditions\BeaverPopulationBelowThresholdCondition.cs" />
+      <Compile Include="Conditions\BotPopulationAboveThresholdCondition.cs" />
+      <Compile Include="Conditions\BotPopulationBelowThresholdCondition.cs" />
+      <Compile Include="Conditions\BotPopulationTrackerCondition.cs" />
       <Compile Include="Conditions\CheckAccessBlockCondition.cs" />
       <Compile Include="Conditions\PathCheckingController.cs" />
       <Compile Include="Conditions\Configurator.cs" />
