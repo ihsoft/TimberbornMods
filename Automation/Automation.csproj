@@ -73,12 +73,16 @@
       <Compile Include="Conditions\AutomationConditionBase.cs" />
       <Compile Include="Conditions\BadtideEndedCondition.cs" />
       <Compile Include="Conditions\BadtideStartedCondition.cs" />
+      <Compile Include="Conditions\BeaverPopulationAboveThresholdCondition.cs" />
+      <Compile Include="Conditions\BeaverPopulationTrackerCondition.cs" />
+      <Compile Include="Conditions\BeaverPopulationBelowThresholdCondition.cs" />
       <Compile Include="Conditions\CheckAccessBlockCondition.cs" />
       <Compile Include="Conditions\PathCheckingController.cs" />
       <Compile Include="Conditions\Configurator.cs" />
       <Compile Include="Conditions\OutputStockAboveThresholdCondition.cs" />
       <Compile Include="Conditions\OutputStockBelowThresholdCondition.cs" />
       <Compile Include="Conditions\OutputStockThresholdConditionBase.cs" />
+      <Compile Include="Conditions\PopulationTrackerConditionBase.cs" />
       <Compile Include="Conditions\WeatherTrackerConditionBase.cs" />
       <Compile Include="Conditions\DroughtEndedCondition.cs" />
       <Compile Include="Conditions\DroughtStartedCondition.cs" />
@@ -205,6 +209,9 @@
       <Reference Include="Timberborn.CoreUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.CoreUI.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.DwellingSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.DwellingSystem.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.Emptying, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.Emptying.dll</HintPath>
       </Reference>
@@ -255,6 +262,9 @@
       </Reference>
       <Reference Include="Timberborn.PlantingUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.PlantingUI.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.PopulationStatisticsSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.PopulationStatisticsSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.PowerGenerating, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.PowerGenerating.dll</HintPath>
