@@ -60,6 +60,10 @@ public abstract class AutomationConditionBase : IAutomationCondition {
   bool _conditionState;
 
   /// <inheritdoc/>
+  /// <remarks>
+  /// If custom code sets it to <c>true</c>, then it must call <see cref="AutomationBehavior.CollectCleanedRules"/> to
+  /// trigger the update handling.
+  /// </remarks>
   public bool IsMarkedForCleanup { get; protected set; }
   #endregion
 
