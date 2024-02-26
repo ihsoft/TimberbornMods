@@ -4,7 +4,6 @@
 
 using Timberborn.DwellingSystem;
 using Timberborn.Persistence;
-using UnityDev.Utils.LogUtilsLite;
 
 namespace Automation.Conditions {
 
@@ -44,7 +43,6 @@ public abstract class BeaverPopulationTrackerCondition : PopulationTrackerCondit
   protected override void OnBehaviorAssigned() {
     base.OnBehaviorAssigned();
     if (Threshold != -1) {
-      HostedDebugLog.Warning(Behavior, "*** got saved threshold: {0}", Threshold);
       return;  // Was loaded.
     }
     if (DistrictPopulation == null) {
