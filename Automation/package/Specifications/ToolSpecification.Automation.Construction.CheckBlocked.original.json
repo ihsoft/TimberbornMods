@@ -1,0 +1,22 @@
+{
+  "Id": "Automation.Tmpl.Construction.CheckBlockedAccess",
+  "GroupId": "AutomationTerrainToolGroupId",
+  "Type": "Automation.Templates.ApplyTemplateTool",
+  "Order": 0,
+  "Icon": "igorz.automation/ui_icons/tool-dynamite-x6",
+  "NameLocKey": "IgorZ.Automation.DummyTitle",
+  "DescriptionLocKey": "IgorZ.Automation.DummyDescirption",
+  "ToolInformation": {
+    "TemplateFamilyName": "Construction.CheckBlockedAccess",
+    "Rules": [
+      {
+        "Condition": { "TypeId": "Automation.Conditions.CheckAccessBlockCondition" },
+        "Action": { "TypeId": "Automation.Actions.PauseAction" }
+      },
+      {
+        "Condition": { "TypeId": "Automation.Conditions.CheckAccessBlockCondition", "ReversedCondition": true },
+        "Action": { "TypeId": "Automation.Actions.UnpauseAction" }
+      }
+    ]
+  }
+}
