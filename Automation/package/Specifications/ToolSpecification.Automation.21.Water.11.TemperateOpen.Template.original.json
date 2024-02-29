@@ -2,7 +2,7 @@
   "Id": "Automation.Tmpl.Water.OpenFloodgateTemperate",
   "GroupId": "AutomationWaterToolGroupId",
   "Type": "Automation.Templates.ApplyTemplateTool",
-  "Order": 20,
+  "Order": 11,
   "Icon": "igorz.automation/ui_icons/icon-temperate-open",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.TemperateOpenFloodgate.DisplayName",
   "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.TemperateOpenFloodgate.Description",

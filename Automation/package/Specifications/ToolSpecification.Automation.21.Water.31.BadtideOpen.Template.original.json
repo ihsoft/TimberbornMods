@@ -2,7 +2,7 @@
   "Id": "Automation.Tmpl.Water.OpenFloodgateBadtide",
   "GroupId": "AutomationWaterToolGroupId",
   "Type": "Automation.Templates.ApplyTemplateTool",
-  "Order": 40,
+  "Order": 31,
   "Icon": "igorz.automation/ui_icons/icon-badtide-open",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.BadtideOpenFloodgate.DisplayName",
   "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.BadtideOpenFloodgate.Description",
