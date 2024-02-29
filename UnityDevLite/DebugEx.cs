@@ -82,26 +82,39 @@ static class DebugEx {
     if (obj is string || obj.GetType().IsPrimitive) {
       return obj;  // Skip types don't override ToString() and don't have special representation.
     }
-    return obj switch {
-        BaseComponent baseComponent => BaseComponentToString(baseComponent),
-        Component componentHost => $"[{componentHost.GetType().Name}]",
-        Vector3 vec => $"[Vector3:{vec.x:0.0###},{vec.y:0.0###},{vec.z:0.0###}]",
-        Quaternion rot => $"[Quaternion:{rot.x:0.0###}, {rot.y:0.0###}, {rot.z:0.0###}, {rot.w:0.0###}]",
-        _ => obj.ToString()
-    };
+    if (obj is Vector3 vec) {
+      return $"[Vector3:{vec.x:0.0###},{vec.y:0.0###},{vec.z:0.0###}]";
+    }
+    if (obj is Quaternion rot) {
+      return $"[Quaternion:{rot.x:0.0###}, {rot.y:0.0###}, {rot.z:0.0###}, {rot.w:0.0###}]";
+    }
+    if (obj is not Component) {
+      return obj.ToString();
+    }
+    var unityComponent = (Component)obj;
+    if (!unityComponent) {  // It's important to use the "!" notion to catch the destroyed objects!
+      return "[DestroyedComponent]";
+    }
+    if (obj is BaseComponent baseComponent) {
+      return BaseComponentToString(baseComponent);
+    }
+    return $"[{unityComponent.GetType().Name}]";
   }
 
   /// <summary>Helper method to make a user friendly object name for the logs.</summary>
   public static string BaseComponentToString(BaseComponent component) {
+    if (component != null && !component) {  // It's important to use the "!" notion to catch the destroyed objects!
+      return "[DestroyedComponent]";
+    }
     var prefab = component.GetComponentFast<Prefab>();
     var blockObj = component.GetComponentFast<BlockObject>();
-    if (prefab != null && blockObj != null) {
+    if (prefab && blockObj) {
       return $"[{prefab.Name}@{blockObj.Coordinates}]";
     }
-    if (prefab != null) {
+    if (prefab) {
       return $"[Prefab:{prefab.Name}]";
     }
-    if (blockObj != null) {
+    if (blockObj) {
       return $"[BlockObject@{blockObj.Coordinates}]";
     }
     return $"[{component.GetType().Name}]";
