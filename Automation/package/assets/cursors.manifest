@@ -20,13 +20,13 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/Resources/Automation/Cursors/pause-cursor.asset
 - Assets/Resources/Automation/Cursors/cog-cursor-large.png
 - Assets/Resources/Automation/Cursors/cog-cursor-small.png
-- Assets/Resources/Automation/Cursors/pause-cursor-small.png
-- Assets/Resources/Automation/Cursors/play-cursor-small.png
-- Assets/Resources/Automation/Cursors/pause-cursor-large.png
-- Assets/Resources/Automation/Cursors/play-cursor-large.png
-- Assets/Resources/Automation/Cursors/play-cursor.asset
 - Assets/Resources/Automation/Cursors/cog-cursor.asset
+- Assets/Resources/Automation/Cursors/pause-cursor-large.png
+- Assets/Resources/Automation/Cursors/pause-cursor-small.png
+- Assets/Resources/Automation/Cursors/pause-cursor.asset
+- Assets/Resources/Automation/Cursors/play-cursor-large.png
+- Assets/Resources/Automation/Cursors/play-cursor-small.png
+- Assets/Resources/Automation/Cursors/play-cursor.asset
 Dependencies: []
