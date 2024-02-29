@@ -12,6 +12,7 @@ IgorZ.Automation.ToolGroup.Terrain.DisplayName,"Terrain changing"
 IgorZ.Automation.ToolGroup.Water.DisplayName,"Water conditions"
 IgorZ.Automation.ToolGroup.Power.DisplayName,"Power conditions"
 IgorZ.Automation.ToolGroup.Storage.DisplayName,"Storages conditions"
+IgorZ.Automation.ToolGroup.Population.DisplayName,"Population conditions"
 
 IgorZ.Automation.Tool.tmpl.2LevelsDynamite.DisplayName,"Explode dynamite 2 times"
 IgorZ.Automation.Tool.tmpl.3LevelsDynamite.DisplayName,"Explode dynamite 3 times"
@@ -49,6 +50,26 @@ IgorZ.Automation.Tool.tmpl.TemperateCloseFloodgate.Description,"Apply this templ
 IgorZ.Automation.Tool.tmpl.TemperateOpenFloodgate.DisplayName,"Open floodgate during temperate weather"
 IgorZ.Automation.Tool.tmpl.TemperateOpenFloodgate.Description,"Apply this template on floodgates that need to slowly drain water during temperate weather, or be closed otherwise."
 
+IgorZ.Automation.Tool.tmpl.BotsAtPlus10.DisplayName,"Bot population at +10 level"
+IgorZ.Automation.Tool.tmpl.BotsAtPlus10.Description,"Apply this template to buildings that should be running until the bot population exceeds the current level by 10 bots."
+IgorZ.Automation.Tool.tmpl.BotsAtPlus20.DisplayName,"Bot population at +20 level"
+IgorZ.Automation.Tool.tmpl.BotsAtPlus20.Description,"Apply this template to buildings that should be running until the bot population exceeds the current level by 20 bots."
+IgorZ.Automation.Tool.tmpl.BotsAtMinus10.DisplayName,"Bot population at -10 level"
+IgorZ.Automation.Tool.tmpl.BotsAtMinus10.Description,"Apply this template to buildings that must remain paused until the bot population drops 10 beavers below the current level."
+IgorZ.Automation.Tool.tmpl.BotsAtMinus20.DisplayName,"Bot population at -20 level"
+IgorZ.Automation.Tool.tmpl.BotsAtMinus20.Description,"Apply this template to buildings that must remain paused until the bot population drops 20 beavers below the current level."
+
+IgorZ.Automation.Tool.tmpl.BeaversAtMax.DisplayName,"Run until beaver population is at max"
+IgorZ.Automation.Tool.tmpl.BeaversAtMax.Description,"Apply this template to buildings that should be running as long as there are unoccupied beds."
+IgorZ.Automation.Tool.tmpl.BeaversAtPlus10.DisplayName,"Beaver population at +10 level"
+IgorZ.Automation.Tool.tmpl.BeaversAtPlus10.Description,"Apply this template to buildings that should be running until the beaver population exceeds the current level by 10 beavers."
+IgorZ.Automation.Tool.tmpl.BeaversAtPlus20.DisplayName,"Beaver population at +20 level"
+IgorZ.Automation.Tool.tmpl.BeaversAtPlus20.Description,"Apply this template to buildings that should be running until the beaver population exceeds the current level by 20 beavers."
+IgorZ.Automation.Tool.tmpl.BeaversAtMinus10.DisplayName,"Beaver population at -10 level"
+IgorZ.Automation.Tool.tmpl.BeaversAtMinus10.Description,"Apply this template to buildings that should remain paused until the beaver population drops 10 beavers below the current level."
+IgorZ.Automation.Tool.tmpl.BeaversAtMinus20.DisplayName,"Beaver population at -20 level"
+IgorZ.Automation.Tool.tmpl.BeaversAtMinus20.Description,"Apply this template to buildings that should remain paused until the beaver population drops 20 beavers below the current level."
+
 IgorZ.Automation.CancelTool.Title,"Cancel automation"
 IgorZ.Automation.CancelTool.Description,"Use this tool to cleanup any automation on the buildings or construction sites."
 IgorZ.Automation.PauseTool.Title,"Pause buildings"
@@ -82,3 +103,8 @@ IgorZ.Automation.UnpauseAction.Description,"<SolidHighlight>unpause building</So
 
 IgorZ.Automation.BadtideEndedCondition.Description,"<SolidHighlight>badtide ended</SolidHighlight>"
 IgorZ.Automation.BadtideStartedCondition.Description,"<SolidHighlight>badtide started</SolidHighlight>"
+
+IgorZ.Automation.BeaverPopulationBelowThresholdCondition.Description,"<SolidHighlight>less than {0} beavers in district</SolidHighlight>"
+IgorZ.Automation.BeaverPopulationAboveThresholdCondition.Description,"<SolidHighlight>more than {0} beavers in district</SolidHighlight>"
+IgorZ.Automation.BotPopulationBelowThresholdCondition.Description,"<SolidHighlight>less than {0} bots in district</SolidHighlight>"
+IgorZ.Automation.BotPopulationAboveThresholdCondition.Description,"<SolidHighlight>more than {0} bots in district</SolidHighlight>"
