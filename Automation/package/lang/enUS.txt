@@ -100,6 +100,8 @@ IgorZ.Automation.PauseAction.Description,"<SolidHighlight>pause building</SolidH
 IgorZ.Automation.SetFloodgateHeightAction.Description,"<SolidHighlight>set height to {0}</SolidHighlight>"
 IgorZ.Automation.UnmarkForEmptyingAction.Description,"<SolidHighlight>stop emptying storage</SolidHighlight>"
 IgorZ.Automation.UnpauseAction.Description,"<SolidHighlight>unpause building</SolidHighlight>"
+IgorZ.Automation.WaterRegulatorStateActionClose.Description,"<SolidHighlight>close water regulator</SolidHighlight>"
+IgorZ.Automation.WaterRegulatorStateActionOpen.Description,"<SolidHighlight>open water regulator</SolidHighlight>"
 
 IgorZ.Automation.BadtideEndedCondition.Description,"<SolidHighlight>badtide ended</SolidHighlight>"
 IgorZ.Automation.BadtideStartedCondition.Description,"<SolidHighlight>badtide started</SolidHighlight>"

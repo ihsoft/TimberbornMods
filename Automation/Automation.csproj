@@ -70,6 +70,7 @@
       <Compile Include="Actions\SetFloodgateHeightAction.cs" />
       <Compile Include="Actions\UnmarkForEmptyingAction.cs" />
       <Compile Include="Actions\UnpauseAction.cs" />
+      <Compile Include="Actions\WaterRegulatorStateAction.cs" />
       <Compile Include="Conditions\AutomationConditionBase.cs" />
       <Compile Include="Conditions\BadtideEndedCondition.cs" />
       <Compile Include="Conditions\BadtideStartedCondition.cs" />
@@ -307,6 +308,9 @@
       </Reference>
       <Reference Include="Timberborn.WaterBuildings, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.WaterBuildings.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.WaterSourceSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.WaterSourceSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.WeatherSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.WeatherSystem.dll</HintPath>
