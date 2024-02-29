@@ -12,6 +12,7 @@ namespace Automation.Conditions {
 public sealed class BeaverPopulationBelowThresholdCondition : BeaverPopulationTrackerCondition {
   const string DescriptionLocKey = "IgorZ.Automation.BeaverPopulationBelowThresholdCondition.Description";
 
+  /// <inheritdoc/>
   public override string UiDescription => Behavior.Loc.T(DescriptionLocKey, Threshold);
 
   /// <inheritdoc/>
