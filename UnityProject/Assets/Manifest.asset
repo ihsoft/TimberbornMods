@@ -18,7 +18,6 @@ MonoBehaviour:
   Description: 
   Version: 
   Dependencies:
-  - {fileID: 11400000, guid: 98fd4e567eaad3e428a7cb6e0f66adeb, type: 2}
   - {fileID: 11400000, guid: 8eb46b725fabcb042a1725920d7c157e, type: 2}
 --- !u!114 &11400000
 MonoBehaviour:

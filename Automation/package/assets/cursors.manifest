@@ -1,0 +1,32 @@
+ManifestFileVersion: 0
+CRC: 3516357669
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 93d6ea84b7275ffc61080b528803c3c0
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: be39bd8c3e5a747bef3a3b96f5418f9e
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 81858c8f0847491dcba4472e506cc4e4
+HashAppended: 0
+ClassTypes:
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: -384587693, guid: 6c83f14598db6589a8cefd1092f1e018, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Resources/Automation/Cursors/cog-cursor-large.png
+- Assets/Resources/Automation/Cursors/cog-cursor-small.png
+- Assets/Resources/Automation/Cursors/cog-cursor.asset
+- Assets/Resources/Automation/Cursors/pause-cursor-large.png
+- Assets/Resources/Automation/Cursors/pause-cursor-small.png
+- Assets/Resources/Automation/Cursors/pause-cursor.asset
+- Assets/Resources/Automation/Cursors/play-cursor-large.png
+- Assets/Resources/Automation/Cursors/play-cursor-small.png
+- Assets/Resources/Automation/Cursors/play-cursor.asset
+Dependencies: []

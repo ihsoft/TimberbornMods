@@ -1,0 +1,22 @@
+{
+  "Id": "Automation.Tmpl.Water.OpenFloodgateDrought",
+  "GroupId": "AutomationWaterToolGroupId",
+  "Type": "Automation.Templates.ApplyTemplateTool",
+  "Order": 21,
+  "Icon": "igorz.automation/ui_icons/icon-drought-open",
+  "NameLocKey": "IgorZ.Automation.Tool.tmpl.DroughtOpenFloodgate.DisplayName",
+  "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.DroughtOpenFloodgate.Description",
+  "ToolInformation": {
+    "TemplateFamilyName": "Water.FloodgateManagement",
+    "Rules": [
+      {
+        "Condition": { "TypeId": "Automation.Conditions.DroughtStartedCondition" },
+        "Action": { "TypeId": "Automation.Actions.SetFloodgateHeightAction", "StepsDown": 1 }
+      },
+      {
+        "Condition": { "TypeId": "Automation.Conditions.DroughtEndedCondition" },
+        "Action": { "TypeId": "Automation.Actions.SetFloodgateHeightAction", "StepsDown": 0 }
+      }
+    ]
+  }
+}

@@ -4,16 +4,19 @@
 
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Automation.Conditions;
 using Automation.Core;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.BlockObjectTools;
 using Timberborn.BlockSystem;
+using Timberborn.BuilderPrioritySystem;
+using Timberborn.Common;
 using Timberborn.Coordinates;
 using Timberborn.Explosions;
 using Timberborn.Persistence;
+using Timberborn.PrioritySystem;
+using Timberborn.TerrainSystem;
 using Timberborn.ToolSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
@@ -22,7 +25,6 @@ namespace Automation.Actions {
 
 /// <summary>Action that triggers the dynamite and then (optionally) places new one at the same spot.</summary>
 /// <remarks>Use it to drill down deep holes in terrain.</remarks>
-[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public sealed class DetonateDynamiteAction : AutomationActionBase {
   const string DescriptionLocKey = "IgorZ.Automation.DetonateDynamiteAction.Description";
   const string RepeatCountLocKey = "IgorZ.Automation.DetonateDynamiteAction.RepeatCountInfo";
@@ -33,9 +35,23 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
   /// <remarks>
   /// A too big value is not a problem. When the bottom of the map is reached, the dynamite simply won't get placed.
   /// </remarks>
+  // ReSharper disable once MemberCanBePrivate.Global
   public int RepeatCount { get; private set; }
 
+  /// <summary>Names of the tools to place various depths.</summary>
+  /// <remarks>Action will only apply if the dynamite is of the known depth.</remarks>
+  static readonly Dictionary<int, string> DynamiteDepthToToolNamePrefix = new() {
+      {1 , "Dynamite."},
+      {2 , "DoubleDynamite."},
+      {3 , "TripleDynamite."},
+  };
+
+  /// <summary>Builder priority of the behavior owner object.</summary>
+  /// <remarks>It must be captured before construction completes.</remarks>
+  Priority _builderPriority;
+
   #region AutomationActionBase overrides
+
   /// <inheritdoc/>
   public override string UiDescription {
     get {
@@ -54,7 +70,8 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
-    return behavior.GetComponentFast<Dynamite>() != null;
+    var dynamite = behavior.GetComponentFast<Dynamite>();
+    return dynamite != null && DynamiteDepthToToolNamePrefix.ContainsKey(dynamite.Depth);
   }
 
   /// <inheritdoc/>
@@ -62,14 +79,36 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
     if (!Condition.ConditionState) {
       return;
     }
-    // This object will get destroyed on detonate, so create am independent component.
-    var component = new GameObject("#Automation_PlaceDynamiteAction").AddComponent<DetonateAndRepeatRule>();
-    component.blockObject = Behavior.BlockObject;
-    component.repeatCount = RepeatCount;
+
+    // The behavior object will get destroyed on detonate, so create am independent component.
+    var component = new GameObject("#Automation_PlaceDynamiteAction").AddComponent<DetonateAndMaybeRepeatRule>();
+    component.Setup(Behavior.BlockObject, RepeatCount, _builderPriority);
   }
+
+  /// <inheritdoc/>
+  protected override void OnBehaviorAssigned() {
+    base.OnBehaviorAssigned();
+    var builderPrioritizable = Behavior.GetComponentFast<BuilderPrioritizable>();
+    _builderPriority = builderPrioritizable.Priority;
+    builderPrioritizable.PriorityChanged += OnPriorityChanged;
+  }
+
+  /// <inheritdoc/>
+  protected override void OnBehaviorToBeCleared() {
+    base.OnBehaviorToBeCleared();
+    var builderPrioritizable = Behavior.GetComponentFast<BuilderPrioritizable>();
+    builderPrioritizable.PriorityChanged -= OnPriorityChanged;
+  }
+
+  /// <summary>Reacts on the builder's priority change while the object is in preview.</summary>
+  void OnPriorityChanged(object sender, PriorityChangedEventArgs args) {
+    _builderPriority = Behavior.GetComponentFast<BuilderPrioritizable>().Priority;
+  }
+
   #endregion
 
   #region IGameSerializable implemenation
+
   static readonly PropertyKey<int> RepeatPropertyKey = new("Repeat");
 
   /// <summary>Loads action state and declaration.</summary>
@@ -83,78 +122,96 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
     base.SaveTo(objectSaver);
     objectSaver.Set(RepeatPropertyKey, RepeatCount);
   }
+
   #endregion
 
-  #region MonoBehavior object to handle action repeat
-  class DetonateAndRepeatRule : MonoBehaviour {
+  #region MonoBehaviour object to repeat the action
+
+  class DetonateAndMaybeRepeatRule : MonoBehaviour {
     const float MinDistanceToCheckOccupants = 2.0f;
 
     IBlockOccupancyService _blockOccupancyService;
+    ToolButtonService _toolButtonService;
+    ITerrainService _terrainService;
+    BlockService _blockService;
 
-    public BlockObject blockObject;
-    public int repeatCount;
+    BlockObject _blockObject;
+    int _repeatCount;
+    Priority _builderPriority;
 
-    void Awake() {
-      _blockOccupancyService = DependencyContainer.GetInstance<IBlockOccupancyService>();
+    /// <summary>Sets up the component and starts the actual monitoring of the object.</summary>
+    public void Setup(BlockObject blockObject, int repeatCount, Priority builderPriority) {
+      _blockObject = blockObject;
+      _repeatCount = repeatCount;
+      _builderPriority = builderPriority;
       StartCoroutine(WaitAndPlace());
     }
 
-    IEnumerator WaitAndPlace() {
-      yield return null; // Act on the next frame to avoid synchronous complications.
+    void Awake() {
+      _blockOccupancyService = DependencyContainer.GetInstance<IBlockOccupancyService>();
+      _toolButtonService = DependencyContainer.GetInstance<ToolButtonService>();
+      _terrainService = DependencyContainer.GetInstance<ITerrainService>();
+      _blockService = DependencyContainer.GetInstance<BlockService>();
+    }
 
+    IEnumerator WaitAndPlace() {
+      var coordinates = _blockObject.Coordinates;
+      var dynamite = _blockObject.GetComponentFast<Dynamite>();
+      var dynamiteDepth = dynamite.Depth;
+      yield return null;  // Act on the next frame to avoid synchronous complications.
+
+      // Detonate the dynamite.
       yield return new WaitUntil(NoCharactersOnBlock);
-      if (blockObject != null && blockObject.enabled) {
-        var dynamite = blockObject.GetComponentFast<Dynamite>();
-        if (dynamite == null) {
-          DebugEx.Warning("Dynamite prefab not found on block object");
-          yield break;
-        }
-        DebugEx.Fine("Detonate dynamite: coordinates={0}, tries={1}", blockObject.Coordinates, repeatCount);
+      if (dynamite != null && dynamite.enabled) {
+        HostedDebugLog.Fine(dynamite, "Detonate from automation!");
         dynamite.Trigger();
       }
-      if (repeatCount <= 0) {
-        yield break;
-      }
-      if (blockObject.Coordinates.z <= 1) {
-        DebugEx.Fine("Reached the bottom of the map. Abort placing dynamite.");
-        yield break;
-      }
-      
-      var dynamiteTool = DependencyContainer.GetInstance<ToolButtonService>()
-          .ToolButtons.Select(x => x.Tool)
-          .OfType<BlockObjectTool>()
-          .FirstOrDefault(x => x.Prefab.name.StartsWith("Dynamite"));
-      if (dynamiteTool == null) {
-        DebugEx.Error("Cannot execute dynamite place tool");
-        Destroy(gameObject);
-        yield break;
+      if (_repeatCount <= 0) {
+        yield return YieldAbort();
       }
 
-      // Wait for the old object to clean up and place another one.
-      var coordinates = blockObject.Coordinates;
-      yield return new WaitUntil(() => blockObject == null);
-      coordinates.z = coordinates.z - 1;
+      // Wait for the old object to clean up.
+      yield return new WaitUntil(() => _blockObject == null);
+      coordinates.z = _terrainService.CellHeight(coordinates.XY());
+      if (coordinates.z <= 0) {
+        DebugEx.Fine("Reached the bottom of the map at {0}", coordinates.XY());
+        yield return YieldAbort();
+      }
+
+      // Place another dynamite of the same type and building priority.
+      var toolNamePrefix = DynamiteDepthToToolNamePrefix[dynamiteDepth];
+      var dynamiteTool = _toolButtonService
+          .ToolButtons.Select(x => x.Tool)
+          .OfType<BlockObjectTool>()
+          .First(x => x.Prefab.name.StartsWith(toolNamePrefix));
       dynamiteTool.Place(new List<Placement> { new(coordinates) });
-      var blockService = DependencyContainer.GetInstance<BlockService>();
       BlockObject newDynamite;
       do {
         yield return null;
-        newDynamite = blockService.GetBottomObjectAt(coordinates);
+        newDynamite = _blockService.GetBottomObjectAt(coordinates);
       } while (newDynamite == null);
-
+      newDynamite.GetComponentFast<BuilderPrioritizable>().SetPriority(_builderPriority);
       newDynamite.GetComponentFast<AutomationBehavior>().AddRule(
           new ObjectFinishedCondition(),
-          new DetonateDynamiteAction { RepeatCount = repeatCount - 1 });
+          new DetonateDynamiteAction { RepeatCount = _repeatCount - 1 });
+      HostedDebugLog.Fine(newDynamite, "Placed new item: priority={0}, tries={1}", _builderPriority, _repeatCount - 1);
+
+      yield return YieldAbort();
+    }
+
+    IEnumerator YieldAbort() {
       Destroy(gameObject);
+      yield break;
     }
 
     bool NoCharactersOnBlock() {
-      if (blockObject == null || !blockObject.enabled) {
+      if (_blockObject == null || !_blockObject.enabled) {
         return true; // Terminate the check.
       }
-      return !_blockOccupancyService.OccupantPresentOnArea(blockObject, MinDistanceToCheckOccupants);
+      return !_blockOccupancyService.OccupantPresentOnArea(_blockObject, MinDistanceToCheckOccupants);
     }
   }
+
   #endregion
 }
 

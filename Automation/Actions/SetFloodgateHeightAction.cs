@@ -14,6 +14,7 @@ public sealed class SetFloodgateHeightAction : AutomationActionBase {
   const string DescriptionLocKey = "IgorZ.Automation.SetFloodgateHeightAction.Description";
 
   /// <summary>Number of 0.5m steps down from the maximum floodgate height.</summary>
+  // ReSharper disable once MemberCanBePrivate.Global
   public int StepsDown { get; private set; }
 
   Floodgate Floodgate => Behavior.GetComponentFast<Floodgate>();

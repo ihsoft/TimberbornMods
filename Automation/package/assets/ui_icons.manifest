@@ -1,0 +1,62 @@
+ManifestFileVersion: 0
+CRC: 1415258543
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 45e3943bddd83a82d929b59e9fab82a2
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 1dadf3ffe9bb0f47a51fdf1cdd350c05
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 4f74be60e5d6664254ebbbaa477b2fda
+HashAppended: 0
+ClassTypes:
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Resources/Automation/Icons/tool-beavers-20.png
+- Assets/Resources/Automation/Icons/automation-power.png
+- Assets/Resources/Automation/Icons/debug-finish-all.png
+- Assets/Resources/Automation/Icons/icon-temperate-close.png
+- Assets/Resources/Automation/Icons/tool-dynamite-x6.png
+- Assets/Resources/Automation/Icons/tool-dynamite-x4.png
+- Assets/Resources/Automation/Icons/tool-beavers-max.png
+- Assets/Resources/Automation/Icons/debug-inspect.png
+- Assets/Resources/Automation/Icons/icon-badtide-close.png
+- Assets/Resources/Automation/Icons/icon-empty-70pct.png
+- Assets/Resources/Automation/Icons/tool-dynamite-x5.png
+- Assets/Resources/Automation/Icons/tool-bots-20.png
+- Assets/Resources/Automation/Icons/tool-dynamite-x2.png
+- Assets/Resources/Automation/Icons/cancel.png
+- Assets/Resources/Automation/Icons/tool-bots+10.png
+- Assets/Resources/Automation/Icons/tool-beavers-10.png
+- Assets/Resources/Automation/Icons/tool-bots-10.png
+- Assets/Resources/Automation/Icons/tool-beavers+20.png
+- Assets/Resources/Automation/Icons/icon-temperate-open.png
+- Assets/Resources/Automation/Icons/automation-dynamite.png
+- Assets/Resources/Automation/Icons/tool-bots+20.png
+- Assets/Resources/Automation/Icons/status-icon-emptying.png
+- Assets/Resources/Automation/Icons/tool-dynamite-x3.png
+- Assets/Resources/Automation/Icons/tool-group-population.png
+- Assets/Resources/Automation/Icons/automation-group-storage.png
+- Assets/Resources/Automation/Icons/icon-empty-50pct.png
+- Assets/Resources/Automation/Icons/automation-water.png
+- Assets/Resources/Automation/Icons/automation-group.png
+- Assets/Resources/Automation/Icons/icon-temperate-pause.png
+- Assets/Resources/Automation/Icons/icon-drought-open.png
+- Assets/Resources/Automation/Icons/icon-drought-pause.png
+- Assets/Resources/Automation/Icons/icon-empty-90pct.png
+- Assets/Resources/Automation/Icons/icon-drought-close.png
+- Assets/Resources/Automation/Icons/tool-beavers+10.png
+- Assets/Resources/Automation/Icons/player-play.png
+- Assets/Resources/Automation/Icons/icon-badtide-pause.png
+- Assets/Resources/Automation/Icons/icon-empty-60pct.png
+- Assets/Resources/Automation/Icons/icon-empty-80pct.png
+- Assets/Resources/Automation/Icons/icon-badtide-open.png
+- Assets/Resources/Automation/Icons/player-pause.png
+- Assets/Resources/Automation/Icons/tool-drought-water-regulator-open.png
+Dependencies: []

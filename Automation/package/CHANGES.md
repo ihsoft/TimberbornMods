@@ -1,3 +1,11 @@
+# v0.14 (29 Feb 2024):
+* [New] Add population control templates.
+* [New] Add water regulator control template.
+* [Change] Re-arrange water template tools in the menu.
+* [Fix #41] Dynamite drill down doesn't work on the new tools.
+* [Fix #35] Dynamite drill down action should respect the priority.
+* [Fix #12] Automation mod crashes in the editor.
+
 # v0.13 (18 Feb 2024):
 * Add "finish now" debug tool to immediatelty complete construction of the selected objects.
 * Fix detecting current drought state condition.
