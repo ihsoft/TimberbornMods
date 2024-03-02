@@ -305,6 +305,12 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <summary>Indicates if any tower is selected. This enables the highlighting range update.</summary>
   static bool _towerSelected;
 
+  /// <summary>
+  /// Indicates how many ticks need to be skipped before actually updating the state due to the efficiency change.
+  /// </summary>
+  /// <remarks>Value of <c>-1</c> means this setting should be disregarded.</remarks>
+  int _delayEfficiencyChangeUpdateTicks = -1;
+
   /// <summary>It must be public for the injection logic to work.</summary>
   [Inject]
   public void InjectDependencies(ITerrainService terrainService, SoilBarrierMap soilBarrierMap,
@@ -327,12 +333,24 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <remarks>If case of there are changes in the irrigating tiles, the moisturising will be stopped.</remarks>
   /// <seealso cref="_needMoistureSystemUpdate"/>
   void UpdateState() {
-    // Efficiency affects the irrigated radius.
+    // Efficiency affects the irrigated radius. It can fluctuate during one tick, so delay the decision.
     var newEfficiency = _savedEfficiency >= 0 ? _savedEfficiency : GetEfficiency();
-    if (Mathf.Abs(_currentEfficiency - newEfficiency) > float.Epsilon) {
-      HostedDebugLog.Fine(this, "Efficiency changed: {0} => {1}", _currentEfficiency, newEfficiency);
-      _currentEfficiency = newEfficiency;
-      _needMoistureSystemUpdate = true;
+    if (Mathf.Abs(_currentEfficiency - newEfficiency) >= float.Epsilon) {
+      if (_delayEfficiencyChangeUpdateTicks < 0) {  // Skip, if there is another request pending.
+        _delayEfficiencyChangeUpdateTicks = 2;  // The code right below will expend 1 tick. Thus, we set delay to 2 ticks.
+      }
+    } else {
+      // The efficiency is back to normal, cancel any requests for the update.
+      _delayEfficiencyChangeUpdateTicks = -1;
+    }
+
+    // Check for the delayed efficiency change.
+    if (_delayEfficiencyChangeUpdateTicks > 0) {
+      if (--_delayEfficiencyChangeUpdateTicks == 0) {
+        HostedDebugLog.Fine(this, "Efficiency changed: {0} => {1}", _currentEfficiency, newEfficiency);
+        _currentEfficiency = newEfficiency;
+        _needMoistureSystemUpdate = true;
+      }
     }
 
     // Sync the state.
