@@ -216,6 +216,9 @@
       <Reference Include="Timberborn.SceneLoading, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.SceneLoading.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.SelectionSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.SelectionSystem.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.SingletonSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.SingletonSystem.dll</HintPath>
       </Reference>

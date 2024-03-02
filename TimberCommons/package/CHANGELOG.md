@@ -1,4 +1,5 @@
 # v1.7 (started on 3/1/2024):
+* [Fix #43] Water towers override the highlighted range of other buildings.
 
 # v1.6 (21 Feb 2024):
 * [Fix #33] Water valve doesn't handle contamination correctly.

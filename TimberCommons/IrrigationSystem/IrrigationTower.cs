@@ -18,6 +18,7 @@ using Timberborn.ConstructibleSystem;
 using Timberborn.EntitySystem;
 using Timberborn.MapIndexSystem;
 using Timberborn.Persistence;
+using Timberborn.SelectionSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.SoilBarrierSystem;
 using Timberborn.TerrainSystem;
@@ -36,7 +37,7 @@ namespace IgorZ.TimberCommons.IrrigationSystem {
 /// </remarks>
 public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateListener,
                                         IPostTransformChangeListener, IPausableComponent, ILateTickable,
-                                        IPersistentEntity {
+                                        IPersistentEntity, ISelectionListener {
 
   #region Unity conrolled fields
   // ReSharper disable InconsistentNaming
@@ -46,12 +47,6 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   [SerializeField]
   [Tooltip("The max distance from the building boundaries at which the tiles can get water.")]
   internal int _irrigationRange = 10;
-
-  /// <summary>The optional name to use to group irrigation ranges in preview.</summary>
-  [SerializeField]
-  [Tooltip("When a building with range is selected, the ranges with the same name will be shown for all other"
-      + " buildings. Leave this field empty to let all towers of any kind to show their ranges at the same time.")]
-  internal string _rangeName = "";
 
   /// <summary>
   /// Indicates that only foundation tiles with "ground only" setting will be considered when searching for the eligible
@@ -138,7 +133,21 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   /// <inheritdoc />
   public IEnumerable<string> RangeNames() {
-    yield return _rangeName.Length > 0 ? _rangeName : typeof(IrrigationTower).FullName;
+    yield return typeof(IrrigationTower).FullName;
+  }
+
+  #endregion
+
+  #region IPostTransformChangeListener implementation
+  
+  /// <inheritdoc />
+  public void OnSelect() {
+    _towerSelected = true;
+  }
+
+  /// <inheritdoc />
+  public void OnUnselect() {
+    _towerSelected = false;
   }
 
   #endregion
@@ -293,6 +302,9 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <seealso cref="GetTiles"/>
   HashSet<int> _irrigationBarriers = new();
 
+  /// <summary>Indicates if any tower is selected. This enables the highlighting range update.</summary>
+  static bool _towerSelected;
+
   /// <summary>It must be public for the injection logic to work.</summary>
   [Inject]
   public void InjectDependencies(ITerrainService terrainService, SoilBarrierMap soilBarrierMap,
@@ -336,7 +348,9 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
       HostedDebugLog.Fine(this, "Covered tiles updated: eligible={0}, irrigated={1}, utilization={2}, efficiency={3}",
                           EligibleTiles.Count, ReachableTiles.Count, Coverage, _currentEfficiency);
       UpdateConsumptionRate();
-      GetComponentFast<BuildingWithRangeUpdater>().OnPostTransformChanged();
+      if (_towerSelected) {
+        GetComponentFast<BuildingWithRangeUpdater>().OnPostTransformChanged();
+      }
     }
 
     if (_savedEfficiency >= 0) {
