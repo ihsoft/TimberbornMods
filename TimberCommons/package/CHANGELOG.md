@@ -1,3 +1,5 @@
+# v1.7 (started on 3/1/2024):
+
 # v1.6 (21 Feb 2024):
 * [Fix #33] Water valve doesn't handle contamination correctly.
 * [Fix #38] "Supply will last for" text disappeared in UI.
