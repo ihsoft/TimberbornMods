@@ -1,5 +1,6 @@
 # v1.7 (started on 3/1/2024):
 * [Fix #43] Water towers override the highlighted range of other buildings.
+* [Fix #45] Mechanical towers don't properly update the effective range.
 * [Enhancement] Improved powered irrigation towers performance when the Power Grid gets fluctuations.
 
 # v1.6 (21 Feb 2024):

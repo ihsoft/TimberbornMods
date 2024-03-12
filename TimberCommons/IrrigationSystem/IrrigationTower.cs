@@ -337,18 +337,15 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
     var newEfficiency = _savedEfficiency >= 0 ? _savedEfficiency : GetEfficiency();
     if (Mathf.Abs(_currentEfficiency - newEfficiency) >= float.Epsilon) {
       if (_delayEfficiencyChangeUpdateTicks < 0) {  // Skip, if there is another request pending.
-        _delayEfficiencyChangeUpdateTicks = 2;  // The code right below will expend 1 tick. Thus, we set delay to 2 ticks.
+        _delayEfficiencyChangeUpdateTicks = 2;  // The code right below will expend 1 tick.
       }
     } else {
-      // The efficiency is back to normal, cancel any requests for the update.
-      _delayEfficiencyChangeUpdateTicks = -1;
+      _delayEfficiencyChangeUpdateTicks = -1;  // The efficiency is back to normal, no update needed.
     }
 
     // Check for the delayed efficiency change.
     if (_delayEfficiencyChangeUpdateTicks > 0) {
       if (--_delayEfficiencyChangeUpdateTicks == 0) {
-        HostedDebugLog.Fine(this, "Efficiency changed: {0} => {1}", _currentEfficiency, newEfficiency);
-        _currentEfficiency = newEfficiency;
         _needMoistureSystemUpdate = true;
       }
     }
@@ -356,6 +353,8 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
     // Sync the state.
     if (_needMoistureSystemUpdate) {
       _needMoistureSystemUpdate = false;
+      _currentEfficiency = newEfficiency;
+      _delayEfficiencyChangeUpdateTicks = -1; 
       (EligibleTiles, _irrigationObstacles, _irrigationBarriers) = GetTiles(range: _irrigationRange, skipChecks: false);
       var newIrrigatedTiles = _irrigationRange == EffectiveRange
           ? EligibleTiles
