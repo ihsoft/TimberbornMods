@@ -25,10 +25,9 @@ sealed class Configurator : IConfigurator {
         typeof(GoodConsumingBuildingDescriberPatch),
         typeof(ManufactoryInventoryFragmentInitializeFragmentPatch),
         typeof(ManufactoryInventoryFragmentUpdateFragmentPatch),
+        typeof(GoodConsumingBuildingFragmentPatch),
     };
-    if (Features.GoodConsumingBuildingUIDaysHoursForAll) {
-      patches.Add(typeof(GoodConsumingBuildingFragmentPatch));
-    }
+    GoodConsumingBuildingFragmentPatch.Reset();
     if (Features.GrowableGrowthTimeUIDaysHoursViewForAll) {
       patches.Add(typeof(GrowableToolPanelItemFactoryPatch));
       patches.Add(typeof(GrowableFragmentPatch));

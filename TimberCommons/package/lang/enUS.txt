@@ -8,6 +8,7 @@ IgorZ.TimberCommons.WaterValve.DisableLevelCheckAtOutput,"Don't check water leve
 IgorZ.TimberCommons.WaterTower.Utilization,"Utilized potential: {0:0.#}%"
 IgorZ.TimberCommons.WaterTower.IrrigatedArea,"Covered area: {0}"
 IgorZ.TimberCommons.WaterTower.EffectiveRange,"Effective range: {0}"
+IgorZ.TimberCommons.WaterTower.NoTilesToIrrigate,"No reachable tiles to irrigate"
 
 IgorZ.TimberCommons.GrowthRateModifier.BoostPercentile,"Growth boost: <GreenHighlight>🡅</GreenHighlight>{0:0.#}%","It indicates growth boost, it's a good effect."
 IgorZ.TimberCommons.GrowthRateModifier.SlowdownPercentile,"Growth slowdown: <RedHighlight>🡇</RedHighlight>{0:0.#}%","It indicates growth penalty, it's a bad effect."

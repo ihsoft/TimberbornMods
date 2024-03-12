@@ -60,11 +60,11 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
 
   /// <inheritdoc/>
   protected override void UpdateConsumptionRate() {
+    _goodConsumingBuilding._goodPerHour = _prefabGoodPerHour * Coverage;
     if (Coverage > 0) {
-      _goodConsumingBuilding._goodPerHour = _prefabGoodPerHour * Coverage;
+      _goodConsumingToggle.ResumeConsumption();
     } else {
-      // Zero consumption rate causes troubles to the consuming building component.
-      _goodConsumingBuilding._goodPerHour = _prefabGoodPerHour;
+      _goodConsumingToggle.PauseConsumption();
     }
   }
 
@@ -88,6 +88,7 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
 
   ILoc _loc;
   GoodConsumingBuilding _goodConsumingBuilding;
+  GoodConsumingToggle _goodConsumingToggle;
   readonly List<IBuildingEfficiencyProvider> _efficiencyProviders = new();
   readonly List<IRangeEffect> _rangeEffects = new();
   float _prefabGoodPerHour;
@@ -105,6 +106,7 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
     _prefabGoodPerHour = _goodConsumingBuilding._goodPerHour;
     GetComponentsFast(_efficiencyProviders);
     GetComponentsFast(_rangeEffects);
+    _goodConsumingToggle = _goodConsumingBuilding.GetGoodConsumingToggle();
   }
 
   #endregion
