@@ -1,7 +1,7 @@
 {
   "Id": "Automation.Tmpl.Population.BotsAtPlus20",
   "GroupId": "AutomationPopulationToolGroupId",
-  "Type": "Automation.Templates.ApplyTemplateTool",
+  "Type": "Automation.Tools.ApplyTemplateTool",
   "Order": 30,
   "Icon": "igorz.automation/ui_icons/tool-bots+20",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.BotsAtPlus20.DisplayName",

@@ -1,7 +1,7 @@
 {
   "Id": "Automation.Tmpl.Water.DroughtOpenWaterRegulator",
   "GroupId": "AutomationWaterToolGroupId",
-  "Type": "Automation.Templates.ApplyTemplateTool",
+  "Type": "Automation.Tools.ApplyTemplateTool",
   "Order": 23,
   "Icon": "igorz.automation/ui_icons/tool-drought-water-regulator-open",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.DroughtOpenWaterRegulator.DisplayName",

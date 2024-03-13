@@ -1,7 +1,7 @@
 {
   "Id": "Automation.Tmpl.Population.BeaversAtMax",
   "GroupId": "AutomationPopulationToolGroupId",
-  "Type": "Automation.Templates.ApplyTemplateTool",
+  "Type": "Automation.Tools.ApplyTemplateTool",
   "Order": 10,
   "Icon": "igorz.automation/ui_icons/tool-beavers-max",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.BeaversAtMax.DisplayName",

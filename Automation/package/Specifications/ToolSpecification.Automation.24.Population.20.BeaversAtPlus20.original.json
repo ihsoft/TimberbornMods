@@ -1,7 +1,7 @@
 {
   "Id": "Automation.Tmpl.Population.BeaversAtPlus20",
   "GroupId": "AutomationPopulationToolGroupId",
-  "Type": "Automation.Templates.ApplyTemplateTool",
+  "Type": "Automation.Tools.ApplyTemplateTool",
   "Order": 20,
   "Icon": "igorz.automation/ui_icons/tool-beavers+20",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.BeaversAtPlus20.DisplayName",
