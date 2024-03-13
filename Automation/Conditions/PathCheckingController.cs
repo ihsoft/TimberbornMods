@@ -157,20 +157,14 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
         BuildOccupiedTilesIndex();
       }
       var isBlocked = _occupiedTiles.Contains(checkCoords);
-      // //FIXME
-      // DebugEx.Warning("*** occupant block state: site={0}, isBlocked={1}", site, isBlocked);
       if (!isBlocked) {
         foreach (var pair in _allAvailablePaths) {
           if (pair.Key == site) {
             continue;
           }
           isBlocked |= pair.Value.All(x => x.Contains(checkCoords));
-          // //FIXME
-          // DebugEx.Warning("*** tile block state: site={0}, isBlocked={1}, target={2}", site, isBlocked, pair.Key);
           if (isBlocked) {
             if (IsNonBlockingPathSite(site, pair.Key)) {
-              //FIXME
-              DebugEx.Warning("*** override non blocking path: {0}, to={1}", site, pair.Key);
               isBlocked = false;  // The path site can be completed w/o blocking the target.
             } else {
               break;
@@ -187,19 +181,14 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   /// </summary>
   /// <remarks>It only checks cases when the two sites are neighbours. Otherwise, the result is always false.</remarks>
   bool IsNonBlockingPathSite(ConstructionSite pathSite, ConstructionSite testSite) {
-    //FIXME
-    //DebugEx.Warning("*** check for path: {0} => {1}", pathSite, testSite);
-
     var testSiteCoords = testSite.GetComponentFast<BlockObject>().Coordinates;
     var pathSiteCoords = pathSite.GetComponentFast<BlockObject>().Coordinates;
     var coordsDelta = pathSiteCoords - testSiteCoords;
     var sqrMagnitude2d = coordsDelta.x * coordsDelta.x + coordsDelta.y * coordsDelta.y;
     if (sqrMagnitude2d > 1) {
-      //DebugEx.Warning("*** too far: {0}", coordsDelta);
       return false;  // Not adjacent blocks.
     }
     var building = pathSite.GetComponentFast<Building>();
-      //DebugEx.Warning("*** not a path: bld={0}, isPath={1}", building, building?.Path);
     if (!building || !building.Path) {
       return false;  // It's not a path.
     }
@@ -210,7 +199,6 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
     }
     var edges = new List<Edge>(settings.ManuallySetEdges());
     if (edges.Count == 0 || edges.All(x => x.End != testSiteCoords)) {
-      DebugEx.Warning("*** no edge matches: count={0}, distance={1}", edges.Count, coordsDelta);
       return false;  // No edge from the path site. 
     }
     // If any edge is connected to any district, than it's a "pass through" path to the test site.
@@ -221,7 +209,6 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
         return true;
       }
     }
-    DebugEx.Warning("*** nothing matched in {0} edges", edges.Count);
     return false;
   }
 
@@ -382,10 +369,6 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
 
   /// <summary>Forces the path indexes to rebuild on the next tick.</summary>
   void MarkIndexesDirty() {
-    //FIXME
-    if (_allAvailablePaths != null) {
-      DebugEx.Warning("*** index dirty");
-    }
     _allAvailablePaths = null;
     _occupiedTiles = null;
   }
