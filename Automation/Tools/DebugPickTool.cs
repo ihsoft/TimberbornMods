@@ -56,7 +56,7 @@ public class DebugPickTool : AbstractAreaSelectionTool {
 
   internal static void PrintAccessible(BaseComponent component) {
     var accessible = component.GetComponentFast<Accessible>();
-    if (accessible == null) {
+    if (!accessible) {
       HostedDebugLog.Error(component, "No accessible component found");
       return;
     }
@@ -72,7 +72,7 @@ public class DebugPickTool : AbstractAreaSelectionTool {
 
   internal static void PrintNavMesh(BaseComponent component) {
     var settings = component.GetComponentFast<BlockObjectNavMeshSettings>();
-    if (settings == null) {
+    if (!settings) {
       HostedDebugLog.Error(component, "No BlockObjectNavMeshSettings component found");
       return;
     }

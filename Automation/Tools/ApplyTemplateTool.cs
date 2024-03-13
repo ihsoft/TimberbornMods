@@ -46,7 +46,7 @@ sealed class ApplyTemplateTool : AbstractAreaSelectionTool, IAutomationModeEnabl
   /// <inheritdoc/>
   protected override bool ObjectFilterExpression(BlockObject blockObject) {
     var behavior = blockObject.GetComponentFast<AutomationBehavior>();
-    if (behavior == null || !behavior.enabled) {
+    if (!behavior || !behavior.enabled) {
       return false;
     }
     var info = (ToolInfo) ToolInformation;

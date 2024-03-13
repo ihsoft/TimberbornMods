@@ -49,7 +49,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   public void RemoveCondition(CheckAccessBlockCondition condition) {
     var site = condition.Behavior.GetComponentFast<ConstructionSite>();
     var customStatus = condition.Behavior.GetComponentFast<UnreachableStatus>();
-    if (customStatus != null) {
+    if (customStatus) {
       customStatus.StatusToggle.Deactivate();
     }
     if (_conditionsIndex.TryGetValue(site, out var valueList)) {
@@ -120,7 +120,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
       return;
     }
     foreach (var condition in conditions.ToArray()) {  // Work on copy, since it may get modified!
-      if (condition.Behavior != null) {
+      if (condition.Behavior) {
         condition.CancelCondition();
       }
     }
@@ -199,12 +199,12 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
       return false;  // Not adjacent blocks.
     }
     var building = pathSite.GetComponentFast<Building>();
-    if (building == null || !building.Path) {
       //DebugEx.Warning("*** not a path: bld={0}, isPath={1}", building, building?.Path);
+    if (!building || !building.Path) {
       return false;  // It's not a path.
     }
     var settings = pathSite.GetComponentFast<BlockObjectNavMeshSettings>();
-    if (settings == null || settings.BlockAllEdges) {
+    if (!settings || settings.BlockAllEdges) {
       DebugEx.Warning("*** not edges: settings={0}, allBlocked={1}", settings, settings?.BlockAllEdges);
       return false;  // No edges on the path (wtf?).
     }
@@ -294,7 +294,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   }
 
   void UpdateUnreachableForBuilders(ConstructionSite site, Accessible accessible) {
-    var needRemove = accessible == null || _districtService.IsOnInstantDistrictRoadSpill(accessible);
+    var needRemove = !accessible || _districtService.IsOnInstantDistrictRoadSpill(accessible);
     if (needRemove) {
       if (_unreachableForBuildersSites.Remove(site)) {
         site.GetComponentFast<UnreachableStatus>().StatusToggle.Deactivate();
@@ -305,7 +305,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
       return;
     }
     var status = site.GetComponentFast<UnreachableStatus>();
-    if (status == null) {
+    if (!status) {
       status = _baseInstantiator.AddComponent<UnreachableStatus>(site.GameObjectFast);
       status.Initialize(_loc);
     }
@@ -368,7 +368,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   /// <param name="obj">Any object. If it's a known site, the indexes will be updated. Otherwise, it's a no-op.</param>
   void RemoveSite(BaseComponent obj) {
     var site = obj.GetComponentFast<ConstructionSite>();
-    if (site == null) {
+    if (!site) {
       return;
     }
     if (!_conditionsIndex.Remove(site)) {

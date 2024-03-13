@@ -32,7 +32,7 @@ public sealed class SetFloodgateHeightAction : AutomationActionBase {
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
     var component = behavior.GetComponentFast<Floodgate>();
-    return component != null && component.enabled;
+    return component && component.enabled;
   }
 
   /// <inheritdoc/>

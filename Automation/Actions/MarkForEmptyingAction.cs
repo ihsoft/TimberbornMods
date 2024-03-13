@@ -38,7 +38,7 @@ public sealed class MarkForEmptyingAction : AutomationActionBase {
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
-    return behavior.GetComponentFast<Emptiable>() != null;
+    return behavior.GetComponentFast<Emptiable>();
   }
 
   /// <inheritdoc/>

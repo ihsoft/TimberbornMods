@@ -29,7 +29,7 @@ public class WaterRegulatorStateAction : AutomationActionBase {
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
-    return behavior.GetComponentFast<WaterSourceRegulator>() != null;
+    return behavior.GetComponentFast<WaterSourceRegulator>();
   }
 
   /// <inheritdoc/>

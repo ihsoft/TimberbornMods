@@ -28,7 +28,7 @@ public abstract class PopulationTrackerConditionBase : AutomationConditionBase {
     var districtBuilding = Behavior.GetComponentFast<DistrictBuilding>();
     districtBuilding.ReassignedDistrict += OnReassignedDistrict;
     DistrictCenter = districtBuilding.District;
-    if (DistrictCenter == null) {
+    if (!DistrictCenter) {
       return;
     }
     DistrictCenter.DistrictPopulation.CitizenAssigned += OnCitizenAssigned;
@@ -39,7 +39,7 @@ public abstract class PopulationTrackerConditionBase : AutomationConditionBase {
   protected override void OnBehaviorToBeCleared() {
     var districtBuilding = Behavior.GetComponentFast<DistrictBuilding>();
     districtBuilding.ReassignedDistrict -= OnReassignedDistrict;
-    if (DistrictCenter == null) {
+    if (!DistrictCenter) {
       return;
     }
     DistrictCenter.DistrictPopulation.CitizenAssigned -= OnCitizenAssigned;
@@ -54,7 +54,7 @@ public abstract class PopulationTrackerConditionBase : AutomationConditionBase {
   protected DistrictCenter DistrictCenter { get; private set; }
 
   /// <summary>District population of the district or <c>null</c> if no district assigned to the building.</summary>
-  protected DistrictPopulation DistrictPopulation => DistrictCenter != null ? DistrictCenter.DistrictPopulation : null;
+  protected DistrictPopulation DistrictPopulation => DistrictCenter ? DistrictCenter.DistrictPopulation : null;
 
   /// <summary>A callback that is called every time the citizen's list on the district is changed.</summary>
   protected abstract void OnPopulationChanged();
@@ -78,11 +78,11 @@ public abstract class PopulationTrackerConditionBase : AutomationConditionBase {
   void OnReassignedDistrict(object sender, EventArgs e) {
     var oldDistrict = DistrictCenter;
     DistrictCenter = Behavior.GetComponentFast<DistrictBuilding>().District;
-    if (oldDistrict != null) {
+    if (oldDistrict) {
       oldDistrict.DistrictPopulation.CitizenAssigned -= OnCitizenAssigned;
       oldDistrict.DistrictPopulation.CitizenUnassigned -= OnCitizenUnassigned;
     }
-    if (DistrictCenter != null) {
+    if (DistrictCenter) {
       DistrictCenter.DistrictPopulation.CitizenAssigned += OnCitizenAssigned;
       DistrictCenter.DistrictPopulation.CitizenUnassigned += OnCitizenUnassigned;
     }

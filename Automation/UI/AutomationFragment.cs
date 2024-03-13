@@ -46,7 +46,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
   public void ShowFragment(BaseComponent entity) {
     var component = entity.GetComponentFast<AutomationBehavior>();
-    if (component == null || !component.HasActions) {
+    if (!component || !component.HasActions) {
       return;
     }
     var sortedActions = new List<IAutomationAction>();

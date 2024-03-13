@@ -37,7 +37,7 @@ public abstract class BotPopulationTrackerCondition : PopulationTrackerCondition
     if (Threshold != -1) {
       return;  // Was loaded.
     }
-    if (DistrictPopulation == null) {
+    if (!DistrictPopulation) {
       Threshold = 0;
       return;
     }

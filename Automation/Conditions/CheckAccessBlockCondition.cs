@@ -33,7 +33,7 @@ public sealed class CheckAccessBlockCondition : AutomationConditionBase {
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
-    return !behavior.BlockObject.Finished && behavior.GetComponentFast<ConstructionSiteAccessible>() != null;
+    return !behavior.BlockObject.Finished && behavior.GetComponentFast<ConstructionSiteAccessible>();
   }
 
   /// <inheritdoc/>

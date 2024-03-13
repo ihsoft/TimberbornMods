@@ -33,11 +33,11 @@ public abstract class AutomationConditionBase : IAutomationCondition {
       if (value == _behavior) {
         return;
       }
-      if (value == null || _behavior != null) {
+      if (_behavior) {
         OnBehaviorToBeCleared();
       }
       _behavior = value;
-      if (_behavior != null) {
+      if (_behavior) {
         OnBehaviorAssigned();
       }
     }

@@ -24,7 +24,7 @@ public class UnpauseAction : AutomationActionBase {
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
     var component = behavior.GetComponentFast<PausableBuilding>();
-    return component != null && component.IsPausable();
+    return component && component.IsPausable();
   }
 
   /// <inheritdoc/>
