@@ -198,7 +198,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   #region Overridable methods
 
-  /// <summary>Indicates if the tower has everything to moisturizing the tiles.</summary>
+  /// <summary>Indicates if the tower has everything to moisturize the tiles.</summary>
   protected abstract bool CanMoisturize();
 
   /// <summary>Notifies that the irrigation started.</summary>
