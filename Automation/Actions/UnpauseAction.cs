@@ -9,6 +9,7 @@ namespace Automation.Actions {
 
 /// <summary>Action that resumes a pausable building.</summary>
 /// <remarks>Due to any construction site is pausable, this action can only be applied to a finished building.</remarks>
+// ReSharper disable once UnusedType.Global
 public class UnpauseAction : AutomationActionBase {
   const string DescriptionLocKey = "IgorZ.Automation.UnpauseAction.Description";
 

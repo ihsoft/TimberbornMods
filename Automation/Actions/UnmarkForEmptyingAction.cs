@@ -9,6 +9,7 @@ using UnityDev.Utils.LogUtilsLite;
 namespace Automation.Actions {
 
 /// <summary>Action that disables the storage empty mode.</summary>
+// ReSharper disable once UnusedType.Global
 public sealed class UnmarkForEmptyingAction : AutomationActionBase {
   const string DescriptionLocKey = "IgorZ.Automation.UnmarkForEmptyingAction.Description";
 

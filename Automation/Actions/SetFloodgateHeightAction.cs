@@ -10,6 +10,7 @@ using UnityEngine;
 namespace Automation.Actions {
 
 /// <summary>Adjusts flood gate height.</summary>
+// ReSharper disable once UnusedType.Global
 public sealed class SetFloodgateHeightAction : AutomationActionBase {
   const string DescriptionLocKey = "IgorZ.Automation.SetFloodgateHeightAction.Description";
 

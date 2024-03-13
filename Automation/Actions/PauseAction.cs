@@ -9,6 +9,7 @@ namespace Automation.Actions {
 
 /// <summary>Action that pauses a pausable building.</summary>
 /// <remarks>Due to any construction site is pausable, this action can only be applied to a finished building.</remarks>
+// ReSharper disable once UnusedType.Global
 public sealed class PauseAction : AutomationActionBase {
   const string DescriptionLocKey = "IgorZ.Automation.PauseAction.Description";
 

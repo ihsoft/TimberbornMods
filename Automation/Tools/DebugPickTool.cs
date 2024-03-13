@@ -44,7 +44,7 @@ public class DebugPickTool : AbstractAreaSelectionTool {
     }
   }
 
-  internal static void PrintAllComponents(BaseComponent component) {
+  static void PrintAllComponents(BaseComponent component) {
     var lines = new StringBuilder();
     lines.AppendLine(new string('*', 10));
     lines.AppendLine($"Components on {DebugEx.BaseComponentToString(component)}:");
@@ -54,7 +54,7 @@ public class DebugPickTool : AbstractAreaSelectionTool {
     DebugEx.Warning(lines.ToString());
   }
 
-  internal static void PrintAccessible(BaseComponent component) {
+  static void PrintAccessible(BaseComponent component) {
     var accessible = component.GetComponentFast<Accessible>();
     if (!accessible) {
       HostedDebugLog.Error(component, "No accessible component found");
@@ -70,7 +70,7 @@ public class DebugPickTool : AbstractAreaSelectionTool {
     DebugEx.Warning(lines.ToString());
   }
 
-  internal static void PrintNavMesh(BaseComponent component) {
+  static void PrintNavMesh(BaseComponent component) {
     var settings = component.GetComponentFast<BlockObjectNavMeshSettings>();
     if (!settings) {
       HostedDebugLog.Error(component, "No BlockObjectNavMeshSettings component found");

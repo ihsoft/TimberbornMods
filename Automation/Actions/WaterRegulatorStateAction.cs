@@ -9,6 +9,7 @@ using Timberborn.WaterSourceSystem;
 namespace Automation.Actions {
 
 /// <summary>Opens or closes water discharges.</summary>
+// ReSharper disable once UnusedType.Global
 public class WaterRegulatorStateAction : AutomationActionBase {
   const string OpenDescriptionLocKey = "IgorZ.Automation.WaterRegulatorStateActionOpen.Description";
   const string CloseDescriptionLocKey = "IgorZ.Automation.WaterRegulatorStateActionClose.Description";
