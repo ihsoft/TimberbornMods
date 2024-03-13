@@ -26,11 +26,6 @@ public sealed class BeaverPopulationAboveThresholdCondition : BeaverPopulationTr
   }
 
   /// <inheritdoc/>
-  public override void SyncState() {
-    OnPopulationChanged();
-  }
-
-  /// <inheritdoc/>
   protected override void OnPopulationChanged() {
     var currentPopulation = DistrictPopulation.NumberOfAdults + DistrictPopulation.NumberOfChildren;
     ConditionState = currentPopulation > Threshold;

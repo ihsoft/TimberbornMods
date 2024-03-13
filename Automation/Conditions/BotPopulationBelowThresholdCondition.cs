@@ -25,11 +25,6 @@ public sealed class BotPopulationBelowThresholdCondition : BotPopulationTrackerC
   }
 
   /// <inheritdoc/>
-  public override void SyncState() {
-    OnPopulationChanged();
-  }
-
-  /// <inheritdoc/>
   protected override void OnPopulationChanged() {
     ConditionState = DistrictPopulation.NumberOfBots < Threshold;
   }

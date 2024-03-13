@@ -5,7 +5,6 @@
 using System;
 using Automation.Core;
 using Timberborn.GameDistricts;
-using UnityDev.Utils.LogUtilsLite;
 
 namespace Automation.Conditions {
 
@@ -17,6 +16,11 @@ public abstract class PopulationTrackerConditionBase : AutomationConditionBase {
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
     return behavior.GetComponentFast<DistrictBuilding>() != null;
+  }
+
+  /// <inheritdoc/>
+  public override void SyncState() {
+    OnPopulationChanged();
   }
 
   /// <inheritdoc/>
