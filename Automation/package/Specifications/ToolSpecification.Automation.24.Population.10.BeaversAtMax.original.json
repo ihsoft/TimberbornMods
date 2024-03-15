@@ -10,11 +10,11 @@
     "TemplateFamilyName": "Population",
     "Rules": [
       {
-        "Condition": { "TypeId": "Automation.Conditions.BeaverPopulationBelowThresholdCondition", "Difference": 0, "RelativeToMaxLevel": true },
+        "Condition": { "TypeId": "Automation.Conditions.BeaverPopulationBelowThresholdCondition", "Value": 0, "RelativeTo": "MaxLevel" },
         "Action": { "TypeId": "Automation.Actions.UnpauseAction" }
       },
       {
-        "Condition": { "TypeId": "Automation.Conditions.BeaverPopulationAboveThresholdCondition", "Difference": -1, "RelativeToMaxLevel": true },
+        "Condition": { "TypeId": "Automation.Conditions.BeaverPopulationAboveThresholdCondition", "Value": -1, "RelativeTo": "MaxLevel" },
         "Action": { "TypeId": "Automation.Actions.PauseAction" }
       }
     ]

@@ -10,11 +10,11 @@
     "TemplateFamilyName": "Population",
     "Rules": [
       {
-        "Condition": { "TypeId": "Automation.Conditions.BotPopulationBelowThresholdCondition", "Difference": 10, "RelativeToCurrentLevel": true },
+        "Condition": { "TypeId": "Automation.Conditions.BotPopulationBelowThresholdCondition", "Value": 10, "RelativeTo": "CurrentLevel" },
         "Action": { "TypeId": "Automation.Actions.UnpauseAction" }
       },
       {
-        "Condition": { "TypeId": "Automation.Conditions.BotPopulationAboveThresholdCondition", "Difference": 9, "RelativeToCurrentLevel": true },
+        "Condition": { "TypeId": "Automation.Conditions.BotPopulationAboveThresholdCondition", "Value": 9, "RelativeTo": "CurrentLevel" },
         "Action": { "TypeId": "Automation.Actions.PauseAction" }
       }
     ]
