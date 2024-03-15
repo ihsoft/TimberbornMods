@@ -24,8 +24,9 @@ public sealed class PauseAction : AutomationActionBase {
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
+    //FIXME: in can become not pausable on building. React and dispose. 
     var component = behavior.GetComponentFast<PausableBuilding>();
-    return component != null && component.IsPausable();
+    return component && component.IsPausable();
   }
 
   /// <inheritdoc/>

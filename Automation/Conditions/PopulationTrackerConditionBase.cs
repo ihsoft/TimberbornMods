@@ -15,7 +15,7 @@ public abstract class PopulationTrackerConditionBase : AutomationConditionBase {
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
-    return behavior.GetComponentFast<DistrictBuilding>() != null;
+    return behavior.GetComponentFast<DistrictBuilding>();
   }
 
   /// <inheritdoc/>
