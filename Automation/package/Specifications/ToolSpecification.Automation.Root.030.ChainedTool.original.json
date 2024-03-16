@@ -1,0 +1,23 @@
+{
+  "Id": "Automation.Tmpl.Construction.CheckBlockedAccess",
+  "GroupId": "AutomationToolGroupId",
+  "Type": "Automation.Tools.ApplyTemplateTool",
+  "Order": 30,
+  "Icon": "igorz.automation/ui_icons/tool-chained",
+  "DevMode": true,
+  "NameLocKey": "IgorZ.Automation.Tool.tmpl.ChainedBuildeings.DisplayName",
+  "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.ChainedBuildeings.Description",
+  "ToolInformation": {
+    "TemplateFamilyName": "Construction.CheckBlockedAccess",
+    "Rules": [
+      {
+        "Condition": { "TypeId": "Automation.Conditions.CheckAccessBlockCondition" },
+        "Action": { "TypeId": "Automation.Actions.PauseAction" }
+      },
+      {
+        "Condition": { "TypeId": "Automation.Conditions.CheckAccessBlockCondition", "ReversedCondition": true },
+        "Action": { "TypeId": "Automation.Actions.UnpauseAction" }
+      }
+    ]
+  }
+}
