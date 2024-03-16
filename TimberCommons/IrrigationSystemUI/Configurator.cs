@@ -12,8 +12,7 @@ namespace IgorZ.TimberCommons.IrrigationSystemUI {
 [Configurator(SceneEntrypoint.InGame)]
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
-  static readonly string PatchId = typeof(Configurator).FullName;
-
+  /// <inheritdoc/>
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<IrrigationTowerFragment>().AsSingleton();
     containerDefinition.Bind<GrowthRateModifierFragment>().AsSingleton();
