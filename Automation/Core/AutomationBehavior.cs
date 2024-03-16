@@ -8,6 +8,7 @@ using Automation.Actions;
 using Bindito.Core;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
+using Timberborn.EntitySystem;
 using Timberborn.Localization;
 using Timberborn.Persistence;
 using Timberborn.SingletonSystem;
@@ -16,9 +17,11 @@ using UnityDev.Utils.LogUtilsLite;
 namespace Automation.Core {
 
 /// <summary>The component that keeps all teh automation state on the building.</summary>
-public sealed class AutomationBehavior : BaseComponent, IPersistentEntity {
+public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDeletableEntity {
   #region Injection shortcuts
+
   /// <summary>Shortcut to the <see cref="AutomationService"/>.</summary>
+  // ReSharper disable once MemberCanBePrivate.Global
   public AutomationService AutomationService { get; private set; }
 
   /// <summary>Shortcut to the <see cref="ILoc"/>.</summary>
@@ -29,6 +32,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity {
 
   /// <summary>Shortcut to the <see cref="BaseInstantiator"/>.</summary>
   public BaseInstantiator BaseInstantiator => AutomationService.BaseInstantiator;
+
   #endregion
 
   /// <summary>
@@ -44,6 +48,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity {
   List<IAutomationAction> _actions = new();
 
   #region API
+
   /// <summary>Creates a rule from the condition and action.</summary>
   /// <param name="condition">
   /// Condition definition. It will be owned by the behavior. Don't change or re-use it after adding.
@@ -89,7 +94,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity {
     }
   }
 
-  /// <summary>Removes all rules that depend on condition and/or action that is marked fro cleanup.</summary>
+  /// <summary>Removes all rules that depend on condition and/or action that is marked for cleanup.</summary>
   public void CollectCleanedRules() {
     for (int i = _actions.Count - 1; i >= 0; i--) {
       var action = _actions[i];
@@ -99,9 +104,11 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity {
       }
     }
   }
+
   #endregion
 
   #region IPersistentEntity implemenatation
+
   static readonly ComponentKey AutomationBehaviorKey = new(typeof(AutomationBehavior).FullName);
   static readonly ListKey<AutomationActionBase> ActionsKey = new("Actions");
 
@@ -132,21 +139,28 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity {
     }
     UpdateRegistration();
   }
+
+  #endregion
+
+  #region IDeletableEntity implementation
+
+  /// <inheritdoc/>
+  public void DeleteEntity() {
+    ClearAllRules();
+  }
+
   #endregion
 
   #region Implementation
+
   /// <summary>Injects the dependencies. It has to be public to work.</summary>
   [Inject]
   public void InjectDependencies(AutomationService automationService) {
     AutomationService = automationService;
   }
 
-  void Start() {
+  void Awake() {
     BlockObject = GetComponentFast<BlockObject>();
-  }
-
-  void OnDestroy() {
-    ClearAllRules();
   }
 
   void UpdateRegistration() {
@@ -156,6 +170,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity {
       AutomationService.UnregisterBehavior(this);
     }
   }
+
   #endregion
 }
 
