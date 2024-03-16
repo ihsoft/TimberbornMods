@@ -63,13 +63,6 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   }
   #endregion
 
-  #region ISingletonNavMeshListener implemenation
-  /// <inheritdoc/>
-  public void OnNavMeshUpdated(NavMeshUpdate navMeshUpdate) {
-    MarkIndexesDirty();
-  }
-  #endregion
-
   #region Implementation
   readonly DistrictCenterRegistry _districtCenterRegistry;
   readonly INavigationService _navigationService;
@@ -109,29 +102,6 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
     _baseInstantiator = baseInstantiator;
     _loc = loc;
     automationService.EventBus.Register(this);
-  }
-
-  /// <summary>Drops conditions from the finished objects and marks the path indexes dirty.</summary>
-  /// <remarks>Needs to be public to work.</remarks>
-  [OnEvent]
-  public void OnConstructibleEnteredFinishedStateEvent(ConstructibleEnteredFinishedStateEvent @event) {
-    var site = @event.Constructible.GetComponentFast<ConstructionSite>();
-    if (!_conditionsIndex.TryGetValue(site, out var conditions)) { 
-      return;
-    }
-    foreach (var condition in conditions.ToArray()) {  // Work on copy, since it may get modified!
-      if (condition.Behavior) {
-        condition.CancelCondition();
-      }
-    }
-    RemoveSite(@event.Constructible);
-  }
-
-  /// <summary>Marks the path indexes dirty.</summary>
-  /// <remarks>Needs to be public to work.</remarks>
-  [OnEvent]
-  public void OnEntityDeletedEvent(EntityDeletedEvent @event) {
-    RemoveSite(@event.Entity);
   }
 
   /// <summary>Sets the condition states based on the path access check.</summary>
@@ -392,6 +362,43 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
       GetComponentFast<StatusSubject>().RegisterStatus(StatusToggle);
     }
   }
+
+  #endregion
+
+  #region ISingletonNavMeshListener implemenation
+
+  /// <inheritdoc/>
+  public void OnNavMeshUpdated(NavMeshUpdate navMeshUpdate) {
+    MarkIndexesDirty();
+  }
+
+  #endregion
+
+  #region Events
+
+  /// <summary>Drops conditions from the finished objects and marks the path indexes dirty.</summary>
+  /// <remarks>Needs to be public to work.</remarks>
+  [OnEvent]
+  public void OnConstructibleEnteredFinishedStateEvent(ConstructibleEnteredFinishedStateEvent @event) {
+    var site = @event.Constructible.GetComponentFast<ConstructionSite>();
+    if (!_conditionsIndex.TryGetValue(site, out var conditions)) { 
+      return;
+    }
+    foreach (var condition in conditions.ToArray()) {  // Work on copy, since it may get modified!
+      if (condition.Behavior) {
+        condition.CancelCondition();
+      }
+    }
+    RemoveSite(@event.Constructible);
+  }
+
+  /// <summary>Marks the path indexes dirty.</summary>
+  /// <remarks>Needs to be public to work.</remarks>
+  [OnEvent]
+  public void OnEntityDeletedEvent(EntityDeletedEvent @event) {
+    RemoveSite(@event.Entity);
+  }
+
   #endregion
 }
 
