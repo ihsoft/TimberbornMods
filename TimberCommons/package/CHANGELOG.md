@@ -4,6 +4,7 @@
 * [Fix #45] Mechanical towers don't properly update the effective range.
 * [Enhancement] Improved powered irrigation towers performance when the Power Grid gets fluctuations.
 * [Enhancement] Update `deDE` localization (by @juf0816).
+* [Enhancement] Prevent beavers contamination when moving in tunnels under bad water.
 
 # v1.6 (21 Feb 2024):
 * [Fix #33] Water valve doesn't handle contamination correctly.

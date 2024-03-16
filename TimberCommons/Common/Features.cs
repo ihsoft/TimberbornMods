@@ -53,6 +53,13 @@ static class Features {
   /// </remarks>
   public static bool DisableAllUiPatches;
 
+  /// <summary>Specifies whether beavers that move underground should be checked for badwater exposure.</summary>
+  /// <remarks>
+  /// The stock game doesn't allow beavers to be underground, but there are mods that provide underground buildings like
+  /// tunnels (e.g. "Path Extention" mod).
+  /// </remarks>
+  public static bool NoContaminationUnderground;
+
   static Features() {
     FeatureController.ReadFeatures(Consume);
   }
@@ -75,6 +82,8 @@ static class Features {
             FeatureController.SetValue(ref PrefabOptimizerMaxExpectedRegistrySize, name, enabled, value),
         "WaterTowers.OverrideDesertLevels" =>
             FeatureController.SetFlag(ref OverrideDesertLevelsForWaterTowers, name, enabled, value),
+        "CommonQoL.NoContaminationUnderground" =>
+            FeatureController.SetFlag(ref NoContaminationUnderground, name, enabled, value),
         _ => false
     };
   }
