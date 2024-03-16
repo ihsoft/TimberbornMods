@@ -72,6 +72,9 @@ IgorZ.Automation.Tool.tmpl.BeaversAtMinus10.Description,"Apply this template to 
 IgorZ.Automation.Tool.tmpl.BeaversAtMinus20.DisplayName,"Beaver population at -20 level"
 IgorZ.Automation.Tool.tmpl.BeaversAtMinus20.Description,"Apply this template to buildings that should remain paused until the beaver population drops 20 beavers below the current level."
 
+IgorZ.Automation.Tool.tmpl.ChainedBuildeings.DisplayName,"Don't block builders"
+IgorZ.Automation.Tool.tmpl.ChainedBuildeings.Description,"Apply this template to construction sites that may block builders' paths. Note: Results not guaranteed, especially if buildings are not at the same level."
+
 IgorZ.Automation.CancelTool.Title,"Cancel automation"
 IgorZ.Automation.CancelTool.Description,"Use this tool to cleanup any automation on the buildings or construction sites."
 IgorZ.Automation.PauseTool.Title,"Pause buildings"
