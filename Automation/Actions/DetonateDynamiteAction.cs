@@ -39,7 +39,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
   public int RepeatCount { get; private set; }
 
   /// <summary>Names of the tools to place various depths.</summary>
-  /// <remarks>Action will only apply if the dynamite is of the known depth.</remarks>
+  /// <remarks>Action will only apply if the dynamite is of the known depths.</remarks>
   static readonly Dictionary<int, string> DynamiteDepthToToolNamePrefix = new() {
       {1 , "Dynamite."},
       {2 , "DoubleDynamite."},
