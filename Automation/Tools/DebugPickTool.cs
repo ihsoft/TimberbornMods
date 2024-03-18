@@ -9,6 +9,7 @@ using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BlockSystemNavigation;
 using Timberborn.Buildings;
+using Timberborn.BuildingsBlocking;
 using Timberborn.Navigation;
 using UnityDev.Utils.LogUtilsLite;
 
@@ -51,6 +52,14 @@ public class DebugPickTool : AbstractAreaSelectionTool {
     var names = component.AllComponents.Select(x => x.GetType().ToString()).OrderBy(x => x);
     lines.AppendLine(string.Join("\n", names));
     lines.AppendLine(new string('*', 10));
+
+    var blockable = component.GetComponentFast<BlockableBuilding>();
+    if (blockable && !blockable.IsUnblocked) {
+      lines.AppendLine($"Building is blocked by:");
+      var blockers = blockable._blockers.Select(x => x.ToString()).OrderBy(x => x);
+      lines.AppendLine(string.Join("\n", blockers));
+    }
+    
     DebugEx.Warning(lines.ToString());
   }
 
