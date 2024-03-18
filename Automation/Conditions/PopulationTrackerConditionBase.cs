@@ -75,9 +75,13 @@ public abstract class PopulationTrackerConditionBase : AutomationConditionBase {
       DistrictCenter.DistrictPopulation.CitizenAssigned -= OnCitizenAssigned;
       DistrictCenter.DistrictPopulation.CitizenUnassigned -= OnCitizenUnassigned;
     }
-    DistrictCenter = Behavior.GetComponentFast<DistrictBuilding>().District;
-    if (!DistrictCenter) {
-      DistrictCenter = Behavior.GetComponentFast<DistrictBuilding>().ConstructionDistrict;
+    if (Behavior) {
+      DistrictCenter = Behavior.GetComponentFast<DistrictBuilding>().District;
+      if (!DistrictCenter) {
+        DistrictCenter = Behavior.GetComponentFast<DistrictBuilding>().ConstructionDistrict;
+      }
+    } else {
+      DistrictCenter = null;
     }
     if (DistrictCenter) {
       DistrictCenter.DistrictPopulation.CitizenAssigned += OnCitizenAssigned;
