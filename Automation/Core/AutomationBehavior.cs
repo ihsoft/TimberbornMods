@@ -16,7 +16,7 @@ using UnityDev.Utils.LogUtilsLite;
 
 namespace Automation.Core {
 
-/// <summary>The component that keeps all teh automation state on the building.</summary>
+/// <summary>The component that keeps all the automation state on the building.</summary>
 public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDeletableEntity {
   #region Injection shortcuts
 

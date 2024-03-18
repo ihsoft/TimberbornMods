@@ -275,7 +275,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <summary>The last calculated efficiency modifier.</summary>
   float _currentEfficiency = 1.0f;
 
-  /// <summary>The loaded efficiency from teh save state.</summary>
+  /// <summary>The loaded efficiency from the save state.</summary>
   /// <remarks>It's only saved for the active towers. Used to restore the initial irrigated state.</remarks>
   float _savedEfficiency = -1;
 

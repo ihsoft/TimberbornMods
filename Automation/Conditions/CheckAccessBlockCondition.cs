@@ -13,7 +13,7 @@ namespace Automation.Conditions {
 /// This condition verifies if construction completion of the object would prevent accessing the other objects being
 /// constructed.
 /// </summary>
-/// <remarks>This logic works only on teh set of the objects that has this condition assigned to. It won't check all the
+/// <remarks>This logic works only on the set of the objects that has this condition assigned to. It won't check all the
 /// objects being constructed in the scene.
 /// </remarks>
 public sealed class CheckAccessBlockCondition : AutomationConditionBase {

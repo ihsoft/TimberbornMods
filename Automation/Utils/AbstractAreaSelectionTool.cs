@@ -15,7 +15,7 @@ using UnityEngine;
 
 namespace Automation.Utils {
 
-/// <summary>The base class to teh selection tool implementations.</summary>
+/// <summary>The base class to the selection tool implementations.</summary>
 /// <remarks>
 /// Implements the boilerplate of the selection logic. The descendants only need to react on the business logic related
 /// events to customize the behavior.
