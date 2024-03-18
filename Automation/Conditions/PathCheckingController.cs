@@ -3,18 +3,23 @@
 // License: Public Domain
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Automation.Core;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BlockSystemNavigation;
+using Timberborn.BuilderHubSystem;
 using Timberborn.Buildings;
+using Timberborn.BuildingsBlocking;
 using Timberborn.ConstructibleSystem;
 using Timberborn.ConstructionSites;
+using Timberborn.Coordinates;
 using Timberborn.EntitySystem;
 using Timberborn.GameDistricts;
 using Timberborn.Localization;
 using Timberborn.Navigation;
+using Timberborn.SelectionSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.StatusSystem;
 using Timberborn.TickSystem;
@@ -28,9 +33,23 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   const float MinDistanceFromConstructionSite = 3.0f;
 
   #region ITickableSingleton implementation
+
+  /// <inheritdoc/>
   public void Tick() {
+    _tickStopwatch.Start();
     CheckBlockedAccess();
+    _tickStopwatch.Stop();
+    if (--_ticksCount <= 0) {
+      _ticksCount = StatsLoggingTicks;
+      var elapsed = _tickStopwatch.ElapsedMilliseconds;
+      _tickStopwatch.Reset();
+      DebugEx.Warning("*** path controller cost: total={0}ms, avg={1:0.00}ms", elapsed, (float)elapsed / StatsLoggingTicks);
+    }
   }
+  readonly Stopwatch _tickStopwatch = new();
+  const int StatsLoggingTicks = 10;
+  int _ticksCount = StatsLoggingTicks;
+
   #endregion
 
   #region API
@@ -50,20 +69,19 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
     var site = condition.Behavior.GetComponentFast<ConstructionSite>();
     var customStatus = condition.Behavior.GetComponentFast<UnreachableStatus>();
     if (customStatus) {
-      customStatus.StatusToggle.Deactivate();
+      customStatus.Cleanup();
     }
     if (_conditionsIndex.TryGetValue(site, out var valueList)) {
       valueList.Remove(condition);
       if (valueList.Count == 0) {
         RemoveSite(site);
-      } else {
-        MarkIndexesDirty();
       }
     }
   }
   #endregion
 
   #region Implementation
+
   readonly DistrictCenterRegistry _districtCenterRegistry;
   readonly INavigationService _navigationService;
   readonly EntityComponentRegistry _entityComponentRegistry;
@@ -74,23 +92,23 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   /// <summary>All path checking conditions on the site.</summary>
   readonly Dictionary<ConstructionSite, List<CheckAccessBlockCondition>> _conditionsIndex = new();
 
-  /// <summary>
-  /// The sites that are reachable with the unlimited range, but are too far from the closest road for the builders to
-  /// reach it.
-  /// </summary>
-  readonly HashSet<ConstructionSite> _unreachableForBuildersSites = new();
+  /// <summary>Cache of tiles that are paths to the characters nearby.</summary>
+  HashSet<Vector3Int> _occupantsTiles;
 
-  /// <summary>Sites that cannot be reached due to there is no possible paths to them.</summary>
-  readonly List<ConstructionSite> _unreachableTileSites = new();
+  /// <summary>Exact locations of all occupants that cross the sites.</summary>
+  /// <remarks>Don't block such sites since the game will handle it better.</remarks>
+  HashSet<Vector3Int> _occupants;
 
-  /// <summary>Cache of tiles that have characters walking on them. It's updated each tick.</summary>
-  HashSet<Vector3Int> _occupiedTiles;
+  /// <summary>Cache of all possible paths to all the construction sites marked for the condition.</summary>
+  /// <remarks>
+  /// If this cache needs to be updated, call <see cref="MarkIndexesDirty"/>. Be wise and don't update the index
+  /// frequently as it's a very expensive operation. Navmesh updates and new sites would certainly need the index
+  /// update. Anything else is negotiable.
+  /// </remarks>
+  Dictionary<ConstructionSite, List<HashSet<Vector3Int>>> _allKnownPaths;
 
-  /// <summary>
-  /// Cache of all possible paths to all sites. It's only updated when a nav mesh change event happens or the monitored
-  /// sites are updated.
-  /// </summary>
-  Dictionary<ConstructionSite, List<HashSet<Vector3Int>>> _allAvailablePaths;
+  /// <summary>Sites that are either too far or don't have accessible at the same level.</summary>
+  HashSet<ConstructionSite> _unreachableSites;
 
   PathCheckingController(DistrictCenterRegistry districtCenterRegistry, INavigationService navigationService,
                          EntityComponentRegistry entityComponentRegistry, IDistrictService districtService,
@@ -106,41 +124,34 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
 
   /// <summary>Sets the condition states based on the path access check.</summary>
   void CheckBlockedAccess() {
-    _occupiedTiles = null;
+    _occupantsTiles = null;
     foreach (var indexPair in _conditionsIndex) {
-      if (_allAvailablePaths == null) {
+      if (_allKnownPaths == null) {
         BuildRestrictedTilesIndex();
       }
       var site = indexPair.Key;
       var conditions = indexPair.Value;
 
       // Incomplete sites don't block anything.
-      if (site.BuildTimeProgress < MaxCompletionProgress
-          || _unreachableForBuildersSites.Contains(site)) {
+      if (site.BuildTimeProgress < MaxCompletionProgress) {
         UpdateConditions(conditions, false);
         continue;
       }
 
       var checkCoords = site.GetComponentFast<BlockObject>().Coordinates;
-
-      if (_occupiedTiles == null) {
-        BuildOccupiedTilesIndex();
-      }
-      var isBlocked = _occupiedTiles.Contains(checkCoords);
-      if (!isBlocked) {
-        foreach (var pair in _allAvailablePaths) {
-          if (pair.Key == site) {
-            continue;
-          }
-          isBlocked |= pair.Value.All(x => x.Contains(checkCoords));
-          if (isBlocked) {
-            if (IsNonBlockingPathSite(site, pair.Key)) {
-              isBlocked = false;  // The path site can be completed w/o blocking the target.
-            } else {
-              break;
-            }
-          }
+      var isBlocked = false;
+      foreach (var pair in _allKnownPaths) {
+        if (pair.Key != site
+            && pair.Value.All(x => x.Contains(checkCoords)) && !IsNonBlockingPathSite(site, pair.Key, pair.Value)) {
+          isBlocked = true;
+          break;
         }
+      }
+      if (!isBlocked) {
+        if (_occupantsTiles == null) {
+          BuildOccupiedTilesIndex();
+        }
+        isBlocked = _occupantsTiles.Contains(checkCoords) && !_occupants.Contains(checkCoords);
       }
       UpdateConditions(conditions, isBlocked);
     }
@@ -149,14 +160,22 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   /// <summary>
   /// Checks if <paramref name="pathSite"/> is a path object that doesn't block access to <paramref name="testSite"/>.
   /// </summary>
-  /// <remarks>It only checks cases when the two sites are neighbours. Otherwise, the result is always false.</remarks>
-  bool IsNonBlockingPathSite(ConstructionSite pathSite, ConstructionSite testSite) {
-    var testSiteCoords = testSite.GetComponentFast<BlockObject>().Coordinates;
+  /// <remarks>
+  /// It only checks cases when the two sites are neighbours and at the same level. Otherwise, the result is always
+  /// negative.
+  /// </remarks>
+  bool IsNonBlockingPathSite(
+      ConstructionSite pathSite, ConstructionSite testSite, List<HashSet<Vector3Int>> testPaths) {
+    //FIXME: index all path builidngs in advance.
     var pathSiteCoords = pathSite.GetComponentFast<BlockObject>().Coordinates;
+    var testSiteCoords = testSite.GetComponentFast<BlockObject>().Coordinates;
     var coordsDelta = pathSiteCoords - testSiteCoords;
-    var sqrMagnitude2d = coordsDelta.x * coordsDelta.x + coordsDelta.y * coordsDelta.y;
-    if (sqrMagnitude2d > 1) {
-      return false;  // Not adjacent blocks.
+    if (coordsDelta.z > 0) {
+      DebugEx.Warning("*** skip vertical neighbours: pathSite={0}, testSite={1}", pathSite, testSite);
+      return false;
+    }
+    if (coordsDelta.x > 1 || coordsDelta.y > 1 || coordsDelta.x == coordsDelta.y) {
+      return false;
     }
     var building = pathSite.GetComponentFast<Building>();
     if (!building || !building.Path) {
@@ -164,34 +183,28 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
     }
     var settings = pathSite.GetComponentFast<BlockObjectNavMeshSettings>();
     if (!settings || settings.BlockAllEdges) {
-      DebugEx.Warning("*** not edges: settings={0}, allBlocked={1}", settings, settings?.BlockAllEdges);
       return false;  // No edges on the path (wtf?).
     }
     var edges = new List<Edge>(settings.ManuallySetEdges());
-    if (edges.Count == 0 || edges.All(x => x.End != testSiteCoords)) {
+    if (edges.Count == 0) {
       return false;  // No edge from the path site. 
     }
-    // If any edge is connected to any district, than it's a "pass through" path to the test site.
-    foreach (var district in _districtCenterRegistry.AllDistrictCenters) {
-      if (edges.Any(
-          x => _districtService.IsOnPreviewDistrictRoad(
-              district.District, NavigationCoordinateSystem.GridToWorld(x.End)))) {
-        return true;
-      }
-    }
-    return false;
+    return edges.Any(edge => testPaths.Any(x => x.Contains(edge.End) && x.Contains(edge.End)));
   }
 
   /// <summary>Gathers all coordinates that are taken by the paths to all the construction sites.</summary>
   void BuildRestrictedTilesIndex() {
-    _allAvailablePaths = new Dictionary<ConstructionSite, List<HashSet<Vector3Int>>>();
-    _unreachableTileSites.Clear();
+    var stopwatch = Stopwatch.StartNew();
+    _allKnownPaths = new Dictionary<ConstructionSite, List<HashSet<Vector3Int>>>();
+    _unreachableSites = new HashSet<ConstructionSite>();
 
     var pathCorners = new List<Vector3>();
     var allDistricts = _districtCenterRegistry.AllDistrictCenters;
     var skippedSites = 0;
     foreach (var site in _conditionsIndex.Keys) {
       var accessible = site.GetComponentFast<Accessible>();
+      var blockObject = site.GetComponentFast<BlockObject>();
+      var blockWorldCoords = CoordinateSystem.GridToWorld(blockObject.Coordinates);
       var allPaths = new List<HashSet<Vector3Int>>();
       if (!site.GetComponentFast<GroundedConstructionSite>().IsFullyGrounded) {
         skippedSites++;
@@ -200,6 +213,9 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
       foreach (var district in allDistricts) {
         var districtPos = district.TransformFast.position;
         foreach (var access in accessible.Accesses) {
+          if (access.y < blockWorldCoords.y) {
+            continue;
+          }
           pathCorners.Clear();
           var canDo = _navigationService.FindPathUnlimitedRange(districtPos, access, pathCorners, out _);
           if (!canDo) {
@@ -208,75 +224,47 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
           allPaths.Add(pathCorners.Select(NavigationCoordinateSystem.WorldToGridInt).ToHashSet());
         }
       }
+      // The site can be reachable, but too far from the road.
+      //FIXME: we can get road node via RoadSpillFlowField and check path against it? 
       if (allPaths.Count == 0) {
-        _unreachableTileSites.Add(site);
-        UpdateUnreachableForBuilders(site, null);
+        _unreachableSites.Add(site);
+        GetUnreachableStatus(site).SetUnreachable();
       } else {
-        _allAvailablePaths[site] = allPaths;
-        UpdateUnreachableForBuilders(site, accessible);
-      }
-    }
-
-    // Make a full cross-join of the unreachable sites since it's not known which one will get NavMesh first.
-    // FIXME: it's inefficient, so cache it.
-    var crossJoinCost = 0;
-    var crossJoins = 0;
-    var reachableSites = _allAvailablePaths.Keys.ToList();
-    foreach (var toSite in _unreachableTileSites) {
-      var accessible = toSite.GetComponentFast<Accessible>();
-      var allPaths = new List<HashSet<Vector3Int>>();
-      foreach (var fromSite in reachableSites) {
-        var fromPos = NavigationCoordinateSystem.GridToWorld(fromSite.GetComponentFast<BlockObject>().Coordinates);
-        foreach (var access in accessible.Accesses) {
-          ++crossJoinCost;
-          pathCorners.Clear();
-          var canDo = _navigationService.FindPathUnlimitedRange(fromPos, access, pathCorners, out _);
-          if (!canDo) {
-            continue;
+        if (!_districtService.IsOnInstantDistrictRoadSpill(accessible)) {
+          GetUnreachableStatus(site).SetTooFarFromRoad();
+        } else {
+          var status = site.GetComponentFast<UnreachableStatus>();
+          if (status) {
+            status.Cleanup();
           }
-          ++crossJoins;
-          allPaths.Add(pathCorners.Select(NavigationCoordinateSystem.WorldToGridInt).ToHashSet());
         }
-      }
-      //FIXME: update icons here?
-      if (allPaths.Count > 0) {
-        _allAvailablePaths[toSite] = allPaths;
+        _allKnownPaths[site] = allPaths;
       }
     }
+    stopwatch.Stop();
     //FIXME
-    DebugEx.Warning(
-        "New index: indexed={0}, unreachable={1}, farFromRoad={2}, skipped={3}, crossJoinCost={4}, crossJoins={5}",
-                    _allAvailablePaths.Count, _unreachableTileSites.Count, _unreachableForBuildersSites.Count,
-                    skippedSites, crossJoinCost, crossJoins);
+    DebugEx.Warning("New index: indexed={0}, unreachable={1}, skipped={2}, time={3}ms",
+                    _allKnownPaths.Count, _unreachableSites.Count, skippedSites, stopwatch.ElapsedMilliseconds);
   }
 
-  void UpdateUnreachableForBuilders(ConstructionSite site, Accessible accessible) {
-    var needRemove = !accessible || _districtService.IsOnInstantDistrictRoadSpill(accessible);
-    if (needRemove) {
-      if (_unreachableForBuildersSites.Remove(site)) {
-        site.GetComponentFast<UnreachableStatus>().StatusToggle.Deactivate();
-      }
-      return;
-    }
-    if (!_unreachableForBuildersSites.Add(site)) {
-      return;
-    }
+  UnreachableStatus GetUnreachableStatus(ConstructionSite site) {
     var status = site.GetComponentFast<UnreachableStatus>();
     if (!status) {
       status = _baseInstantiator.AddComponent<UnreachableStatus>(site.GameObjectFast);
       status.Initialize(_loc);
     }
-    status.StatusToggle.Activate();
+    return status;
   }
 
   /// <summary>
   /// Gathers all coordinates that are taken by the characters paths that are in proximity to the construction sites.
   /// </summary>
   void BuildOccupiedTilesIndex() {
-    _occupiedTiles = new HashSet<Vector3Int>();
+    var stopwatch = Stopwatch.StartNew();
+    _occupantsTiles = new HashSet<Vector3Int>();
+    _occupants = new HashSet<Vector3Int>();
 
     //FIXME: optimize by switching outer/inner loops: sites*districts vs occupants*districts
-    //FIXME: think about checking paths for the assigned district only.
     foreach (var site in _conditionsIndex.Keys) {
       var coords = site.GetComponentFast<BlockObject>().Coordinates;
       var occupants = _entityComponentRegistry
@@ -290,13 +278,17 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
           if (!canDo) {
             continue;
           }
+          _occupants.Add(NavigationCoordinateSystem.WorldToGridInt(occupant.TransformFast.position));
           foreach (var pathCorner in pathCorners) {
-            _occupiedTiles.Add(NavigationCoordinateSystem.WorldToGridInt(pathCorner));
+            _occupantsTiles.Add(NavigationCoordinateSystem.WorldToGridInt(pathCorner));
           }
         }
       }
     }
-    DebugEx.Fine("Created new index of occupied tiles: {0} elements", _occupiedTiles.Count);
+    stopwatch.Stop();
+    //FIXME
+    DebugEx.Warning("Created new index of occupied tiles: {0} elements, cost={1}ms",
+                    _occupantsTiles.Count, stopwatch.ElapsedMilliseconds);
   }
 
   /// <summary>Checks if the occupant is within a 3x3 block of the target coordinates.</summary>
@@ -315,6 +307,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
     return false;
   }
 
+  /// <summary>Triggers the provided path checking conditions.</summary>
   static void UpdateConditions(List<CheckAccessBlockCondition> conditions, bool isBlocked) {
     foreach (var condition in conditions) {
       condition.ConditionState = !condition.IsReversedCondition ? isBlocked : !isBlocked;
@@ -322,45 +315,100 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   }
 
   /// <summary>Removes the site from all indexes.</summary>
-  /// <param name="obj">Any object. If it's a known site, the indexes will be updated. Otherwise, it's a no-op.</param>
+  /// <param name="obj">If it's a known site, the indexes will be updated. Otherwise, it's a no-op.</param>
   void RemoveSite(BaseComponent obj) {
     var site = obj.GetComponentFast<ConstructionSite>();
     if (!site) {
       return;
     }
-    if (!_conditionsIndex.Remove(site)) {
-      return;
+    _conditionsIndex.Remove(site);
+    _allKnownPaths?.Remove(site);
+    var status = site.GetComponentFast<UnreachableStatus>();
+    if (status) {
+      status.Cleanup();
     }
-    DebugEx.Warning("*** Remove from index: {0}", site);
-    _unreachableTileSites.Remove(site);
-    _unreachableForBuildersSites.Remove(site);
-    MarkIndexesDirty();
   }
 
   /// <summary>Forces the path indexes to rebuild on the next tick.</summary>
   void MarkIndexesDirty() {
-    _allAvailablePaths = null;
-    _occupiedTiles = null;
+    _allKnownPaths = null;
   }
+
   #endregion
 
-  #region Helper component for custom unreachable status
-  sealed class UnreachableStatus : BaseComponent {
-    const string UnreachableBuilderJobLocKey = "Builders.UnreachableBuilderJob";
-    const string TooFarFromPathLocKey = "IgorZ.Automation.CheckAccessBlockCondition.TooFarFromRoadAlert";
-    const string StatusIconName = "UnreachableObject";
+  #region BaseComponent for custom unreachable status
 
-    public StatusToggle StatusToggle { get; private set; }
+  sealed class UnreachableStatus : BaseComponent, ISelectionListener {
+    const string UnreachableBuilderJobLocKey = "Builders.UnreachableBuilderJob";
+    const string UnreachableFromSameLevelLocKey = "IgorZ.Automation.CheckAccessBlockCondition.UnreachableFromSameLevel";
+    const string TooFarFromPathLocKey = "IgorZ.Automation.CheckAccessBlockCondition.TooFarFromRoadAlert";
+    const string UnreachableIconName = "UnreachableObject";
+
+    StatusToggle _tooFarFromRoadStatusToggle;
+    StatusToggle _unreachableStatusToggle;
+    BlockableBuilding _blockableBuilding;
+    BuilderJobReachabilityStatus _builderJobReachabilityStatus;
 
     void Awake() {
-      enabled = false;
+      _blockableBuilding = GetComponentFast<BlockableBuilding>();
+      _builderJobReachabilityStatus = GetComponentFast<BuilderJobReachabilityStatus>();
     }
 
+    /// <summary>Initializes the component since the normal Bindito logic doesn't work here.</summary>
     public void Initialize(ILoc loc) {
-      StatusToggle = StatusToggle.CreatePriorityStatusWithAlertAndFloatingIcon(
-          StatusIconName, loc.T(UnreachableBuilderJobLocKey), loc.T(TooFarFromPathLocKey));
-      GetComponentFast<StatusSubject>().RegisterStatus(StatusToggle);
+      _tooFarFromRoadStatusToggle = StatusToggle.CreateNormalStatusWithAlertAndFloatingIcon(
+          UnreachableIconName, loc.T(UnreachableBuilderJobLocKey), loc.T(TooFarFromPathLocKey));
+      GetComponentFast<StatusSubject>().RegisterStatus(_tooFarFromRoadStatusToggle);
+      _unreachableStatusToggle = StatusToggle.CreateNormalStatus(
+          UnreachableIconName, loc.T(UnreachableFromSameLevelLocKey));
+      GetComponentFast<StatusSubject>().RegisterStatus(_unreachableStatusToggle);
     }
+
+    /// <summary>
+    /// The too far sites cannot be built, but they are reachable and we want them to affect the conditions.
+    /// </summary>
+    public void SetTooFarFromRoad() {
+      _tooFarFromRoadStatusToggle.Activate();
+      _unreachableStatusToggle.Deactivate();
+      _blockableBuilding.Unblock(this);
+    }
+
+    /// <summary>
+    /// The unreachable sites cannot be built.
+    /// </summary>
+    /// <remarks>
+    /// Our meaning of "unreachable" can be different from the game's point of view. For teh algorithm, it's important
+    /// to not have such sites built. Thus, we block such sites to ensure the game won't start building them.
+    /// </remarks>
+    public void SetUnreachable() {
+      _tooFarFromRoadStatusToggle.Deactivate();
+      _unreachableStatusToggle.Activate();
+      _blockableBuilding.Block(this);
+    }
+
+    /// <summary>A cleanup method that resets all effect on the site.</summary>
+    public void Cleanup() {
+      _tooFarFromRoadStatusToggle.Deactivate();
+      _unreachableStatusToggle.Deactivate();
+      _blockableBuilding.Unblock(this);
+    }
+
+    #region ISelectionListener implemenation
+
+    /// <inheritdoc/>
+    public void OnSelect() {
+      if (!_builderJobReachabilityStatus) {
+        return;
+      }
+      if (_unreachableStatusToggle.IsActive || _tooFarFromRoadStatusToggle.IsActive) {
+        _builderJobReachabilityStatus.OnUnselect();  // We show our own status.
+      }
+    }
+
+    /// <inheritdoc/>
+    public void OnUnselect() {}
+
+    #endregion
   }
 
   #endregion
