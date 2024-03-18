@@ -64,6 +64,7 @@
         <Link>UnityDevLite\TypeUtils.cs</Link>
       </Compile>
       <Compile Include="Actions\AutomationActionBase.cs" />
+      <Compile Include="Actions\BlockableBuildingAction.cs" />
       <Compile Include="Actions\DetonateDynamiteAction.cs" />
       <Compile Include="Actions\MarkForEmptyingAction.cs" />
       <Compile Include="Actions\PauseAction.cs" />
