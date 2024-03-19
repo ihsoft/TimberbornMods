@@ -28,6 +28,11 @@ using UnityEngine;
 
 namespace Automation.Conditions {
 
+/// <summary>The component that handles all path checking conditions.</summary>
+/// <remarks>
+/// It cannot be handled in scope of just one condition due to all of them are interconnected (they can affect each
+/// other). This controller has "the full picture" and orchestrates all the conditions.
+/// </remarks>
 sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListener {
   const float MaxCompletionProgress = 0.8f;
   const float MinDistanceFromConstructionSite = 3.0f;
@@ -53,6 +58,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   #endregion
 
   #region API
+
   /// <summary>Add the path checking condition to monitor.</summary>
   public void AddCondition(CheckAccessBlockCondition condition) {
     var site = condition.Behavior.GetComponentFast<ConstructionSite>();
@@ -61,16 +67,12 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
       _conditionsIndex[site] = valueList;
     }
     valueList.Add(condition);
-    MarkIndexesDirty();
+    MaybeAddSite(site);
   }
 
   /// <summary>Removes the path checking condition from monitor and resets all caches.</summary>
   public void RemoveCondition(CheckAccessBlockCondition condition) {
     var site = condition.Behavior.GetComponentFast<ConstructionSite>();
-    var customStatus = condition.Behavior.GetComponentFast<UnreachableStatus>();
-    if (customStatus) {
-      customStatus.Cleanup();
-    }
     if (_conditionsIndex.TryGetValue(site, out var valueList)) {
       valueList.Remove(condition);
       if (valueList.Count == 0) {
@@ -78,6 +80,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
       }
     }
   }
+
   #endregion
 
   #region Implementation
@@ -98,6 +101,10 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   /// <summary>Exact locations of all occupants that cross the sites.</summary>
   /// <remarks>Don't block such sites since the game will handle it better.</remarks>
   HashSet<Vector3Int> _occupants;
+
+  /// <summary>Navmesh edges that the construction site provides on completion.</summary>
+  /// <remarks>Only exists on the path buildings.</remarks>
+  readonly Dictionary<ConstructionSite, List<Edge>> _pathBuildingEdges = new();
 
   /// <summary>Cache of all possible paths to all the construction sites marked for the condition.</summary>
   /// <remarks>
@@ -166,30 +173,39 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   /// </remarks>
   bool IsNonBlockingPathSite(
       ConstructionSite pathSite, ConstructionSite testSite, List<HashSet<Vector3Int>> testPaths) {
-    //FIXME: index all path builidngs in advance.
+    if (!_pathBuildingEdges.TryGetValue(pathSite, out var edges)) {
+      return false;
+    }
+    //FIXME: index all block objects?
     var pathSiteCoords = pathSite.GetComponentFast<BlockObject>().Coordinates;
     var testSiteCoords = testSite.GetComponentFast<BlockObject>().Coordinates;
     var coordsDelta = pathSiteCoords - testSiteCoords;
     if (coordsDelta.z > 0) {
-      DebugEx.Warning("*** skip vertical neighbours: pathSite={0}, testSite={1}", pathSite, testSite);
       return false;
     }
     if (coordsDelta.x > 1 || coordsDelta.y > 1 || coordsDelta.x == coordsDelta.y) {
       return false;
     }
-    var building = pathSite.GetComponentFast<Building>();
-    if (!building || !building.Path) {
-      return false;  // It's not a path.
-    }
-    var settings = pathSite.GetComponentFast<BlockObjectNavMeshSettings>();
-    if (!settings || settings.BlockAllEdges) {
-      return false;  // No edges on the path (wtf?).
-    }
-    var edges = new List<Edge>(settings.ManuallySetEdges());
-    if (edges.Count == 0) {
-      return false;  // No edge from the path site. 
-    }
     return edges.Any(edge => testPaths.Any(x => x.Contains(edge.End) && x.Contains(edge.End)));
+  }
+
+  void MaybeAddPathBuildingToIndex(BaseComponent behavior) {
+    var building = behavior.GetComponentFast<Building>();
+    if (!building || !building.Path) {
+      return;  // It's not a path.
+    }
+    var settings = behavior.GetComponentFast<BlockObjectNavMeshSettings>();
+    if (!settings || settings.BlockAllEdges) {
+      HostedDebugLog.Warning(behavior, "The path building has all edges blocked. It's unexpected.");
+      return;  // No edges on the path (wtf?).
+    }
+    var edges = settings.ManuallySetEdges().ToList();
+    if (edges.Count == 0) {
+      HostedDebugLog.Warning(behavior, "The path building has no edges blocked. It's unexpected.");
+      return;  // No edge from the path site. 
+    }
+    var site = behavior.GetComponentFast<ConstructionSite>();
+    _pathBuildingEdges.Add(site, edges);
   }
 
   /// <summary>Gathers all coordinates that are taken by the paths to all the construction sites.</summary>
@@ -314,15 +330,26 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
     }
   }
 
+  /// <summary>Adds the site from to the indexes.</summary>
+  void MaybeAddSite(ConstructionSite site) {
+    MaybeAddPathBuildingToIndex(site);
+    //FIXME: make it iterative
+    MarkIndexesDirty();
+  }
+
   /// <summary>Removes the site from all indexes.</summary>
   /// <param name="obj">If it's a known site, the indexes will be updated. Otherwise, it's a no-op.</param>
   void RemoveSite(BaseComponent obj) {
-    var site = obj.GetComponentFast<ConstructionSite>();
+    var site = obj is ConstructionSite constructionSite
+        ? constructionSite
+        : obj.GetComponentFast<ConstructionSite>();
     if (!site) {
       return;
     }
+ 
     _conditionsIndex.Remove(site);
     _allKnownPaths?.Remove(site);
+    _pathBuildingEdges.Remove(site);
     var status = site.GetComponentFast<UnreachableStatus>();
     if (status) {
       status.Cleanup();
