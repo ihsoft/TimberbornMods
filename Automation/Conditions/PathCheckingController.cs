@@ -74,8 +74,6 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
     MaybeAddSite(site);
   }
 
-  readonly Dictionary<Vector3Int, PathCheckingSite> _sitesByCoordinates = new();
-
   /// <summary>Removes the path checking condition from monitor and resets all caches.</summary>
   public void RemoveCondition(CheckAccessBlockCondition condition) {
     var site = PathCheckingSite.GetOrCreate(condition.Behavior);
@@ -221,6 +219,9 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
 
   /// <summary>Sites that are either too far or don't have accessible at the same level.</summary>
   HashSet<PathCheckingSite> _unreachableSites;
+
+  /// <summary>All path sites for all conditions.</summary>
+  readonly Dictionary<Vector3Int, PathCheckingSite> _sitesByCoordinates = new();
 
   PathCheckingController(DistrictCenterRegistry districtCenterRegistry, INavigationService navigationService,
                          EntityComponentRegistry entityComponentRegistry, IDistrictService districtService,
