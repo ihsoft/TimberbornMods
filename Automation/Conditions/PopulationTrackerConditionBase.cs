@@ -38,7 +38,11 @@ public abstract class PopulationTrackerConditionBase : AutomationConditionBase {
     var districtBuilding = Behavior.GetComponentFast<DistrictBuilding>();
     districtBuilding.ReassignedDistrict -= OnReassignedDistrict;
     districtBuilding.ReassignedConstructionDistrict -= OnReassignedConstructionDistrict;
-    UpdateDistrict();
+    if (DistrictCenter) {
+      DistrictCenter.DistrictPopulation.CitizenAssigned -= OnCitizenAssigned;
+      DistrictCenter.DistrictPopulation.CitizenUnassigned -= OnCitizenUnassigned;
+    }
+    DistrictCenter = null;
   }
 
   #endregion
@@ -75,13 +79,9 @@ public abstract class PopulationTrackerConditionBase : AutomationConditionBase {
       DistrictCenter.DistrictPopulation.CitizenAssigned -= OnCitizenAssigned;
       DistrictCenter.DistrictPopulation.CitizenUnassigned -= OnCitizenUnassigned;
     }
-    if (Behavior) {
-      DistrictCenter = Behavior.GetComponentFast<DistrictBuilding>().District;
-      if (!DistrictCenter) {
-        DistrictCenter = Behavior.GetComponentFast<DistrictBuilding>().ConstructionDistrict;
-      }
-    } else {
-      DistrictCenter = null;
+    DistrictCenter = Behavior.GetComponentFast<DistrictBuilding>().District;
+    if (!DistrictCenter) {
+      DistrictCenter = Behavior.GetComponentFast<DistrictBuilding>().ConstructionDistrict;
     }
     if (DistrictCenter) {
       DistrictCenter.DistrictPopulation.CitizenAssigned += OnCitizenAssigned;
