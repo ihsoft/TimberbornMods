@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -61,22 +62,25 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
 
   /// <summary>Add the path checking condition to monitor.</summary>
   public void AddCondition(CheckAccessBlockCondition condition) {
-    var site = condition.Behavior.GetComponentFast<ConstructionSite>();
+    var site = PathCheckingSite.GetOrCreate(condition.Behavior);
     if (!_conditionsIndex.TryGetValue(site, out var valueList)) {
       valueList = new List<CheckAccessBlockCondition>();
       _conditionsIndex[site] = valueList;
     }
     valueList.Add(condition);
+    //FIXME: here we can add to the index and sync the state
     MaybeAddSite(site);
   }
 
+  readonly Dictionary<Vector3Int, PathCheckingSite> _sitesByCoordinates = new();
+
   /// <summary>Removes the path checking condition from monitor and resets all caches.</summary>
   public void RemoveCondition(CheckAccessBlockCondition condition) {
-    var site = condition.Behavior.GetComponentFast<ConstructionSite>();
+    var site = PathCheckingSite.GetOrCreate(condition.Behavior);
     if (_conditionsIndex.TryGetValue(site, out var valueList)) {
       valueList.Remove(condition);
       if (valueList.Count == 0) {
-        RemoveSite(site);
+        RemoveSite(condition.Behavior);
       }
     }
   }
@@ -92,8 +96,115 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   readonly BaseInstantiator _baseInstantiator;
   readonly ILoc _loc;
 
+  /// <summary>Container for the path blocking site.</summary>
+  sealed class PathCheckingSite {
+    #region API
+
+    public readonly Vector3Int Coordinates;
+    public readonly ConstructionSite ConstructionSite;
+    public readonly GroundedConstructionSite GroundedSite;
+    public readonly Accessible Accessible;
+    public readonly List<Edge> Edges;
+
+    /// <summary>Find the existing construction site or creates a new one.</summary>
+    /// <returns>The site or <c>null</c> if the <paramref name="component"/> is not eligible to be a site.</returns>
+    public static PathCheckingSite GetOrCreate(BaseComponent component) {
+      var site = new PathCheckingSite(component);
+      if (!site._blockObject || !site.ConstructionSite || !site.GroundedSite || !site.Accessible) {
+        return null;
+      }
+      if (!_controller._sitesByCoordinates.TryGetValue(site.Coordinates, out var cachedSite)) {
+        _controller._sitesByCoordinates.Add(site.Coordinates, site);
+        cachedSite = site;
+      }
+      return cachedSite;
+    }
+
+    /// <summary>Tries to lookup the site by its coordinates.</summary>
+    public static bool TryGet(BaseComponent component, out PathCheckingSite cachedSite) {
+      var site = new PathCheckingSite(component);
+      if (!site._blockObject || !site.ConstructionSite || !site.GroundedSite || !site.Accessible) {
+        cachedSite = null;
+        return false;
+      }
+      return _controller._sitesByCoordinates.TryGetValue(site.Coordinates, out cachedSite);
+    }
+
+    /// <summary>Removes teh site from the caches.</summary>
+    public void Remove() {
+      _controller._sitesByCoordinates.Remove(Coordinates);
+      if (_unreachableStatus) {
+        _unreachableStatus.Cleanup();
+      }
+    }
+
+    #endregion
+
+    #region Object overrides
+
+    /// <inheritdoc/>
+    public override int GetHashCode() {
+      return Coordinates.GetHashCode();
+    }
+
+    /// <inheritdoc/>
+    public override bool Equals(object obj) {
+      return obj is PathCheckingSite checkingSite && checkingSite.Coordinates.Equals(Coordinates);
+    }
+
+    #endregion
+
+    #region Implementation
+
+    internal static PathCheckingController _controller;
+    readonly BlockObject _blockObject;
+    UnreachableStatus _unreachableStatus;
+
+    PathCheckingSite(BaseComponent component) {
+      _blockObject = component.GetComponentFast<BlockObject>();
+      if (!_blockObject) {
+        return;
+      }
+      Coordinates = _blockObject.Coordinates;
+      ConstructionSite = component.GetComponentFast<ConstructionSite>();
+      GroundedSite = component.GetComponentFast<GroundedConstructionSite>();
+      Accessible = component.GetComponentFast<Accessible>();
+      _unreachableStatus = component.GetComponentFast<UnreachableStatus>();
+
+      var building = component.GetComponentFast<Building>();
+      if (building && building.Path) {
+        var settings = component.GetComponentFast<BlockObjectNavMeshSettings>();
+        if (settings && !settings.BlockAllEdges) {
+          var manuallySetEdges = settings.ManuallySetEdges().ToList();
+          if (manuallySetEdges.Count > 0) {
+            Edges = manuallySetEdges;
+          }
+        }
+      }
+    }
+
+    /// <summary>Executes the action if there is a <see cref="UnreachableStatus"/> component on the building.</summary>
+    public void ActOnExistingUnreachable(Action<UnreachableStatus> fn) {
+      if (_unreachableStatus) {
+        fn.Invoke(_unreachableStatus);
+      }
+    }
+
+    /// <summary>Gets the existing or creates a new <see cref="UnreachableStatus"/> and executes the action.</summary>
+    public void ActOnRequiredUnreachable(Action<UnreachableStatus> fn) {
+      if (!_unreachableStatus) {
+        _unreachableStatus =
+            _controller._baseInstantiator.AddComponent<UnreachableStatus>(ConstructionSite.GameObjectFast);
+        _unreachableStatus.Initialize(_controller._loc);
+      }
+      fn.Invoke(_unreachableStatus);
+    }
+
+    #endregion
+  }
+
   /// <summary>All path checking conditions on the site.</summary>
-  readonly Dictionary<ConstructionSite, List<CheckAccessBlockCondition>> _conditionsIndex = new();
+  readonly Dictionary<PathCheckingSite, List<CheckAccessBlockCondition>> _conditionsIndex = new();
 
   /// <summary>Cache of tiles that are paths to the characters nearby.</summary>
   HashSet<Vector3Int> _occupantsTiles;
@@ -102,20 +213,16 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   /// <remarks>Don't block such sites since the game will handle it better.</remarks>
   HashSet<Vector3Int> _occupants;
 
-  /// <summary>Navmesh edges that the construction site provides on completion.</summary>
-  /// <remarks>Only exists on the path buildings.</remarks>
-  readonly Dictionary<ConstructionSite, List<Edge>> _pathBuildingEdges = new();
-
   /// <summary>Cache of all possible paths to all the construction sites marked for the condition.</summary>
   /// <remarks>
   /// If this cache needs to be updated, call <see cref="MarkIndexesDirty"/>. Be wise and don't update the index
   /// frequently as it's a very expensive operation. Navmesh updates and new sites would certainly need the index
   /// update. Anything else is negotiable.
   /// </remarks>
-  Dictionary<ConstructionSite, List<HashSet<Vector3Int>>> _allKnownPaths;
+  Dictionary<PathCheckingSite, List<HashSet<Vector3Int>>> _allKnownPaths;
 
   /// <summary>Sites that are either too far or don't have accessible at the same level.</summary>
-  HashSet<ConstructionSite> _unreachableSites;
+  HashSet<PathCheckingSite> _unreachableSites;
 
   PathCheckingController(DistrictCenterRegistry districtCenterRegistry, INavigationService navigationService,
                          EntityComponentRegistry entityComponentRegistry, IDistrictService districtService,
@@ -127,6 +234,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
     _baseInstantiator = baseInstantiator;
     _loc = loc;
     automationService.EventBus.Register(this);
+    PathCheckingSite._controller = this;
   }
 
   /// <summary>Sets the condition states based on the path access check.</summary>
@@ -140,16 +248,17 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
       var conditions = indexPair.Value;
 
       // Incomplete sites don't block anything.
-      if (site.BuildTimeProgress < MaxCompletionProgress) {
+      if (site.ConstructionSite.BuildTimeProgress < MaxCompletionProgress) {
         UpdateConditions(conditions, false);
         continue;
       }
 
-      var checkCoords = site.GetComponentFast<BlockObject>().Coordinates;
+      var checkCoords = site.Coordinates;
       var isBlocked = false;
       foreach (var pair in _allKnownPaths) {
-        if (pair.Key != site
-            && pair.Value.All(x => x.Contains(checkCoords)) && !IsNonBlockingPathSite(site, pair.Key, pair.Value)) {
+        if (!ReferenceEquals(pair.Key, site)
+            && pair.Value.All(x => x.Contains(checkCoords))
+            && !IsNonBlockingPathSite(site, pair.Key, pair.Value)) {
           isBlocked = true;
           break;
         }
@@ -172,57 +281,34 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   /// negative.
   /// </remarks>
   bool IsNonBlockingPathSite(
-      ConstructionSite pathSite, ConstructionSite testSite, List<HashSet<Vector3Int>> testPaths) {
-    if (!_pathBuildingEdges.TryGetValue(pathSite, out var edges)) {
-      return false;
+      PathCheckingSite pathSite, PathCheckingSite testSite, List<HashSet<Vector3Int>> testPaths) {
+    if (pathSite.Edges == null) {
+      return false;  // Not a path building.
     }
-    //FIXME: index all block objects?
-    var pathSiteCoords = pathSite.GetComponentFast<BlockObject>().Coordinates;
-    var testSiteCoords = testSite.GetComponentFast<BlockObject>().Coordinates;
-    var coordsDelta = pathSiteCoords - testSiteCoords;
+    var coordsDelta = pathSite.Coordinates - testSite.Coordinates;
     if (coordsDelta.z > 0) {
       return false;
     }
     if (coordsDelta.x > 1 || coordsDelta.y > 1 || coordsDelta.x == coordsDelta.y) {
       return false;
     }
-    return edges.Any(edge => testPaths.Any(x => x.Contains(edge.End) && x.Contains(edge.End)));
-  }
-
-  void MaybeAddPathBuildingToIndex(BaseComponent behavior) {
-    var building = behavior.GetComponentFast<Building>();
-    if (!building || !building.Path) {
-      return;  // It's not a path.
-    }
-    var settings = behavior.GetComponentFast<BlockObjectNavMeshSettings>();
-    if (!settings || settings.BlockAllEdges) {
-      HostedDebugLog.Warning(behavior, "The path building has all edges blocked. It's unexpected.");
-      return;  // No edges on the path (wtf?).
-    }
-    var edges = settings.ManuallySetEdges().ToList();
-    if (edges.Count == 0) {
-      HostedDebugLog.Warning(behavior, "The path building has no edges blocked. It's unexpected.");
-      return;  // No edge from the path site. 
-    }
-    var site = behavior.GetComponentFast<ConstructionSite>();
-    _pathBuildingEdges.Add(site, edges);
+    return pathSite.Edges.Any(edge => testPaths.Any(x => x.Contains(edge.End) && x.Contains(edge.End)));
   }
 
   /// <summary>Gathers all coordinates that are taken by the paths to all the construction sites.</summary>
   void BuildRestrictedTilesIndex() {
     var stopwatch = Stopwatch.StartNew();
-    _allKnownPaths = new Dictionary<ConstructionSite, List<HashSet<Vector3Int>>>();
-    _unreachableSites = new HashSet<ConstructionSite>();
+    _allKnownPaths = new Dictionary<PathCheckingSite, List<HashSet<Vector3Int>>>();
+    _unreachableSites = new HashSet<PathCheckingSite>();
 
     var pathCorners = new List<Vector3>();
     var allDistricts = _districtCenterRegistry.AllDistrictCenters;
     var skippedSites = 0;
     foreach (var site in _conditionsIndex.Keys) {
-      var accessible = site.GetComponentFast<Accessible>();
-      var blockObject = site.GetComponentFast<BlockObject>();
-      var blockWorldCoords = CoordinateSystem.GridToWorld(blockObject.Coordinates);
+      var accessible = site.Accessible;
+      var blockWorldCoords = CoordinateSystem.GridToWorld(site.Coordinates);
       var allPaths = new List<HashSet<Vector3Int>>();
-      if (!site.GetComponentFast<GroundedConstructionSite>().IsFullyGrounded) {
+      if (!site.GroundedSite.IsFullyGrounded) {
         skippedSites++;
         continue;  // Not ready to be built.
       }
@@ -244,15 +330,12 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
       //FIXME: we can get road node via RoadSpillFlowField and check path against it? 
       if (allPaths.Count == 0) {
         _unreachableSites.Add(site);
-        GetUnreachableStatus(site).SetUnreachable();
+        site.ActOnRequiredUnreachable(x => x.SetUnreachable());
       } else {
         if (!_districtService.IsOnInstantDistrictRoadSpill(accessible)) {
-          GetUnreachableStatus(site).SetTooFarFromRoad();
+          site.ActOnRequiredUnreachable(x => x.SetTooFarFromRoad());
         } else {
-          var status = site.GetComponentFast<UnreachableStatus>();
-          if (status) {
-            status.Cleanup();
-          }
+          site.ActOnExistingUnreachable(x => x.Cleanup());
         }
         _allKnownPaths[site] = allPaths;
       }
@@ -261,15 +344,6 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
     //FIXME
     DebugEx.Warning("New index: indexed={0}, unreachable={1}, skipped={2}, time={3}ms",
                     _allKnownPaths.Count, _unreachableSites.Count, skippedSites, stopwatch.ElapsedMilliseconds);
-  }
-
-  UnreachableStatus GetUnreachableStatus(ConstructionSite site) {
-    var status = site.GetComponentFast<UnreachableStatus>();
-    if (!status) {
-      status = _baseInstantiator.AddComponent<UnreachableStatus>(site.GameObjectFast);
-      status.Initialize(_loc);
-    }
-    return status;
   }
 
   /// <summary>
@@ -282,9 +356,8 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
 
     //FIXME: optimize by switching outer/inner loops: sites*districts vs occupants*districts
     foreach (var site in _conditionsIndex.Keys) {
-      var coords = site.GetComponentFast<BlockObject>().Coordinates;
       var occupants = _entityComponentRegistry
-          .GetEnabled<BlockOccupant>().Where(o => OccupantAtCoords(o, coords));
+          .GetEnabled<BlockOccupant>().Where(o => OccupantAtCoords(o, site.Coordinates));
       var pathCorners = new List<Vector3>();
       var allDistricts = _districtCenterRegistry.AllDistrictCenters;
       foreach (var occupant in occupants) {
@@ -331,8 +404,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   }
 
   /// <summary>Adds the site from to the indexes.</summary>
-  void MaybeAddSite(ConstructionSite site) {
-    MaybeAddPathBuildingToIndex(site);
+  void MaybeAddSite(PathCheckingSite site) {
     //FIXME: make it iterative
     MarkIndexesDirty();
   }
@@ -340,20 +412,12 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   /// <summary>Removes the site from all indexes.</summary>
   /// <param name="obj">If it's a known site, the indexes will be updated. Otherwise, it's a no-op.</param>
   void RemoveSite(BaseComponent obj) {
-    var site = obj is ConstructionSite constructionSite
-        ? constructionSite
-        : obj.GetComponentFast<ConstructionSite>();
-    if (!site) {
+    if (!PathCheckingSite.TryGet(obj, out var site)) {
       return;
     }
- 
     _conditionsIndex.Remove(site);
     _allKnownPaths?.Remove(site);
-    _pathBuildingEdges.Remove(site);
-    var status = site.GetComponentFast<UnreachableStatus>();
-    if (status) {
-      status.Cleanup();
-    }
+    site.Remove();
   }
 
   /// <summary>Forces the path indexes to rebuild on the next tick.</summary>
@@ -455,11 +519,11 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   /// <remarks>Needs to be public to work.</remarks>
   [OnEvent]
   public void OnConstructibleEnteredFinishedStateEvent(ConstructibleEnteredFinishedStateEvent @event) {
-    var site = @event.Constructible.GetComponentFast<ConstructionSite>();
-    if (!_conditionsIndex.TryGetValue(site, out var conditions)) { 
+    if (!PathCheckingSite.TryGet(@event.Constructible, out var site)) {
       return;
     }
-    foreach (var condition in conditions.ToArray()) {  // Work on copy, since it may get modified!
+    var conditions = _conditionsIndex[site];
+    foreach (var condition in conditions.ToArray()) {  // Work on copy, since it may get modified.
       if (condition.Behavior) {
         condition.CancelCondition();
       }
