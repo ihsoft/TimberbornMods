@@ -13,6 +13,7 @@ using Timberborn.BlockSystemNavigation;
 using Timberborn.BuilderHubSystem;
 using Timberborn.Buildings;
 using Timberborn.BuildingsBlocking;
+using Timberborn.Common;
 using Timberborn.ConstructibleSystem;
 using Timberborn.ConstructionSites;
 using Timberborn.Coordinates;
@@ -24,6 +25,7 @@ using Timberborn.SelectionSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.StatusSystem;
 using Timberborn.TickSystem;
+using Timberborn.WalkingSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
@@ -36,7 +38,6 @@ namespace Automation.Conditions {
 /// </remarks>
 sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListener {
   const float MaxCompletionProgress = 0.8f;
-  const float MinDistanceFromConstructionSite = 3.0f;
 
   #region ITickableSingleton implementation
 
@@ -49,6 +50,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
       _ticksCount = StatsLoggingTicks;
       var elapsed = _tickStopwatch.ElapsedMilliseconds;
       _tickStopwatch.Reset();
+      //FIXME
       DebugEx.Warning("*** path controller cost: total={0}ms, avg={1:0.00}ms", elapsed, (float)elapsed / StatsLoggingTicks);
     }
   }
@@ -206,12 +208,8 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   /// <summary>All path checking conditions on the site.</summary>
   readonly Dictionary<PathCheckingSite, List<CheckAccessBlockCondition>> _conditionsIndex = new();
 
-  /// <summary>Cache of tiles that are paths to the characters nearby.</summary>
-  HashSet<Vector3Int> _occupantsTiles;
-
-  /// <summary>Exact locations of all occupants that cross the sites.</summary>
-  /// <remarks>Don't block such sites since the game will handle it better.</remarks>
-  HashSet<Vector3Int> _occupants;
+  /// <summary>Cache of tiles that are paths to the characters on the map.</summary>
+  HashSet<Vector3Int> _walkersTakenTiles;
 
   /// <summary>Cache of all possible paths to all the construction sites marked for the condition.</summary>
   /// <remarks>
@@ -239,7 +237,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
 
   /// <summary>Sets the condition states based on the path access check.</summary>
   void CheckBlockedAccess() {
-    _occupantsTiles = null;
+    _walkersTakenTiles = null;
     foreach (var indexPair in _conditionsIndex) {
       if (_allKnownPaths == null) {
         BuildRestrictedTilesIndex();
@@ -264,10 +262,10 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
         }
       }
       if (!isBlocked) {
-        if (_occupantsTiles == null) {
-          BuildOccupiedTilesIndex();
+        if (_walkersTakenTiles == null) {
+          BuildWalkersIndex();
         }
-        isBlocked = _occupantsTiles.Contains(checkCoords) && !_occupants.Contains(checkCoords);
+        isBlocked = _walkersTakenTiles.Contains(checkCoords);
       }
       UpdateConditions(conditions, isBlocked);
     }
@@ -346,54 +344,23 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
                     _allKnownPaths.Count, _unreachableSites.Count, skippedSites, stopwatch.ElapsedMilliseconds);
   }
 
-  /// <summary>
-  /// Gathers all coordinates that are taken by the characters paths that are in proximity to the construction sites.
-  /// </summary>
-  void BuildOccupiedTilesIndex() {
-    var stopwatch = Stopwatch.StartNew();
-    _occupantsTiles = new HashSet<Vector3Int>();
-    _occupants = new HashSet<Vector3Int>();
-
-    //FIXME: optimize by switching outer/inner loops: sites*districts vs occupants*districts
-    foreach (var site in _conditionsIndex.Keys) {
-      var occupants = _entityComponentRegistry
-          .GetEnabled<BlockOccupant>().Where(o => OccupantAtCoords(o, site.Coordinates));
-      var pathCorners = new List<Vector3>();
-      var allDistricts = _districtCenterRegistry.AllDistrictCenters;
-      foreach (var occupant in occupants) {
-        foreach (var district in allDistricts) {
-          var canDo = _navigationService.FindPathUnlimitedRange(
-              district.TransformFast.position, occupant.TransformFast.position, pathCorners, out _);
-          if (!canDo) {
-            continue;
-          }
-          _occupants.Add(NavigationCoordinateSystem.WorldToGridInt(occupant.TransformFast.position));
-          foreach (var pathCorner in pathCorners) {
-            _occupantsTiles.Add(NavigationCoordinateSystem.WorldToGridInt(pathCorner));
-          }
-        }
+  /// <summary>Gathers all coordinates that are taken by the characters paths.</summary>
+  void BuildWalkersIndex() {
+    _walkersTakenTiles = new HashSet<Vector3Int>();
+    var walkers = _entityComponentRegistry
+        .GetEnabled<BlockOccupant>()
+        .Select(x => x.GetComponentFast<Walker>())
+        .Where(x => x);
+    foreach (var walker in walkers) {
+      var pathFollower = walker._pathFollower;
+      if (pathFollower._pathCorners == null) {
+        continue;  // No path, no problem.
       }
+      var activePathCorners = pathFollower._pathCorners
+          .Skip(pathFollower._nextCornerIndex - 1)
+          .Select(CoordinateSystem.WorldToGridInt);
+      _walkersTakenTiles.AddRange(activePathCorners);
     }
-    stopwatch.Stop();
-    //FIXME
-    DebugEx.Warning("Created new index of occupied tiles: {0} elements, cost={1}ms",
-                    _occupantsTiles.Count, stopwatch.ElapsedMilliseconds);
-  }
-
-  /// <summary>Checks if the occupant is within a 3x3 block of the target coordinates.</summary>
-  static bool OccupantAtCoords(BlockOccupant occupant, Vector3Int coordinates) {
-    var xMin = coordinates.x - MinDistanceFromConstructionSite;
-    var xMax = coordinates.x + 1 + MinDistanceFromConstructionSite;
-    var yMin = coordinates.y - MinDistanceFromConstructionSite;
-    var yMax = coordinates.y + 1 + MinDistanceFromConstructionSite;
-    var gridCoordinates = occupant.GridCoordinates;
-    var x = gridCoordinates.x;
-    var y = gridCoordinates.y;
-    var z = Mathf.FloorToInt(gridCoordinates.z);
-    if (x >= xMin && x <= xMax && y >= yMin && y <= yMax) {
-      return coordinates.z == z;
-    }
-    return false;
   }
 
   /// <summary>Triggers the provided path checking conditions.</summary>
