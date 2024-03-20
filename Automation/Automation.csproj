@@ -346,6 +346,7 @@
       <Reference Include="Timberborn.BuildingsBlocking" Publicize="true" />
       <Reference Include="Timberborn.BuilderHubSystem" Publicize="true" />
       <Reference Include="Timberborn.CharacterMovementSystem" Publicize="true" />
+      <Reference Include="Timberborn.Navigation" Publicize="true" />
       <Reference Include="Timberborn.WalkingSystem" Publicize="true" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

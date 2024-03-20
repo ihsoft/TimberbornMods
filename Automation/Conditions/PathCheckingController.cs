@@ -71,7 +71,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
     }
     valueList.Add(condition);
     //FIXME: here we can add to the index and sync the state
-    MaybeAddSite(site);
+    MaybeAddSite();
   }
 
   /// <summary>Removes the path checking condition from monitor and resets all caches.</summary>
@@ -92,9 +92,11 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   readonly DistrictCenterRegistry _districtCenterRegistry;
   readonly INavigationService _navigationService;
   readonly EntityComponentRegistry _entityComponentRegistry;
-  readonly IDistrictService _districtService;
   readonly BaseInstantiator _baseInstantiator;
   readonly ILoc _loc;
+  readonly NodeIdService _nodeIdService;
+  readonly DistrictMap _districtMap;
+  readonly InstantDistrictMap _instantDistrictMap;
 
   /// <summary>Container for the path blocking site.</summary>
   sealed class PathCheckingSite {
@@ -209,13 +211,19 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   /// <summary>Cache of tiles that are paths to the characters on the map.</summary>
   HashSet<Vector3Int> _walkersTakenTiles;
 
+  /// <summary>Cache of the walking characters positions.</summary>
+  /// <remarks>
+  /// If a character is at teh site being constructed, we don't block since the game checks it naturally.
+  /// </remarks>
+  HashSet<Vector3Int> _walkersCoords;
+
   /// <summary>Cache of all possible paths to all the construction sites marked for the condition.</summary>
   /// <remarks>
   /// If this cache needs to be updated, call <see cref="MarkIndexesDirty"/>. Be wise and don't update the index
   /// frequently as it's a very expensive operation. Navmesh updates and new sites would certainly need the index
   /// update. Anything else is negotiable.
   /// </remarks>
-  Dictionary<PathCheckingSite, List<HashSet<Vector3Int>>> _allKnownPaths;
+  Dictionary<PathCheckingSite, HashSet<Vector3Int>> _allKnownPaths;
 
   /// <summary>Sites that are either too far or don't have accessible at the same level.</summary>
   HashSet<PathCheckingSite> _unreachableSites;
@@ -224,14 +232,17 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   readonly Dictionary<Vector3Int, PathCheckingSite> _sitesByCoordinates = new();
 
   PathCheckingController(DistrictCenterRegistry districtCenterRegistry, INavigationService navigationService,
-                         EntityComponentRegistry entityComponentRegistry, IDistrictService districtService,
-                         AutomationService automationService, BaseInstantiator baseInstantiator, ILoc loc) {
+                         EntityComponentRegistry entityComponentRegistry, AutomationService automationService,
+                         BaseInstantiator baseInstantiator, ILoc loc, NodeIdService nodeIdService,
+                         DistrictMap districtMap, InstantDistrictMap instantDistrictMap) {
     _districtCenterRegistry = districtCenterRegistry;
     _navigationService = navigationService;
     _entityComponentRegistry = entityComponentRegistry;
-    _districtService = districtService;
     _baseInstantiator = baseInstantiator;
     _loc = loc;
+    _nodeIdService = nodeIdService;
+    _districtMap = districtMap;
+    _instantDistrictMap = instantDistrictMap;
     automationService.EventBus.Register(this);
     PathCheckingSite._controller = this;
   }
@@ -256,7 +267,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
       var isBlocked = false;
       foreach (var pair in _allKnownPaths) {
         if (!ReferenceEquals(pair.Key, site)
-            && pair.Value.All(x => x.Contains(checkCoords))
+            && pair.Value.Contains(checkCoords)
             && !IsNonBlockingPathSite(site, pair.Key, pair.Value)) {
           isBlocked = true;
           break;
@@ -266,7 +277,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
         if (_walkersTakenTiles == null) {
           BuildWalkersIndex();
         }
-        isBlocked = _walkersTakenTiles.Contains(checkCoords);
+        isBlocked = _walkersTakenTiles.Contains(checkCoords) && !_walkersCoords.Contains(checkCoords);
       }
       UpdateConditions(conditions, isBlocked);
     }
@@ -279,64 +290,81 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   /// It only checks cases when the two sites are neighbours and at the same level. Otherwise, the result is always
   /// negative.
   /// </remarks>
-  bool IsNonBlockingPathSite(
-      PathCheckingSite pathSite, PathCheckingSite testSite, List<HashSet<Vector3Int>> testPaths) {
+  static bool IsNonBlockingPathSite(
+      PathCheckingSite pathSite, PathCheckingSite testSite, HashSet<Vector3Int> testPath) {
     if (pathSite.Edges == null) {
       return false;  // Not a path building.
     }
     var coordsDelta = pathSite.Coordinates - testSite.Coordinates;
-    if (coordsDelta.z > 0) {
+    if (coordsDelta.z > 0 || coordsDelta.x > 1 || coordsDelta.y > 1 || coordsDelta.x == coordsDelta.y) {
       return false;
     }
-    if (coordsDelta.x > 1 || coordsDelta.y > 1 || coordsDelta.x == coordsDelta.y) {
-      return false;
-    }
-    return pathSite.Edges.Any(edge => testPaths.Any(x => x.Contains(edge.End) && x.Contains(edge.End)));
+    return pathSite.Edges.Any(edge => testPath.Contains(edge.End) && testPath.Contains(edge.End));
   }
 
-  /// <summary>Gathers all coordinates that are taken by the paths to all the construction sites.</summary>
+  /// <summary>Gets the best (the shortest) path to the site from the closets road node.</summary>
+  /// <remarks>
+  /// The site must be within the range from the road, which is currently 9 tiles. We intentionally ignore the accesses
+  /// below the site. Even though the game can construct sites this way (one tile above the road), the path checking
+  /// algo cannot deal with all the corners cases. Thus, just block such situations. It may limit players in their
+  /// construction methods, but that's the price to pay.
+  /// </remarks>
+  HashSet<Vector3Int> GetBestPath(PathCheckingSite site) {
+    var bestDistance = float.MaxValue;
+    var bestRoadNode = -1;
+    var bestAccess = Vector3.zero;
+    
+    var worldCoords = CoordinateSystem.GridToWorld(site.Coordinates);
+    var accesses = site.Accessible.Accesses
+        .Where(access => access.y >= worldCoords.y && _nodeIdService.Contains(access));
+    foreach (var access in accesses) {
+      var accessNode = _nodeIdService.WorldToId(access);
+      foreach (var district in _districtCenterRegistry.AllDistrictCenters) {
+        var flow = _districtMap.GetDistrictRoadSpillFlowField(district.District);
+        if (!flow.HasNode(accessNode)) {
+          continue;
+        }
+        var newDistance = flow.GetDistanceToRoad(accessNode);
+        if (newDistance >= bestDistance) {
+          continue;
+        }
+        bestDistance = newDistance;
+        bestRoadNode = flow.GetRoadParentNodeId(accessNode);
+        bestAccess = access;
+      }
+    }
+    if (bestRoadNode == -1) {
+      return null;  // The site is unreachable.
+    }
+
+    var bestRoadPosition = _nodeIdService.IdToWorld(bestRoadNode);
+    var pathCorners = new List<Vector3>();
+    _navigationService.FindPathUnlimitedRange(bestRoadPosition, bestAccess, pathCorners, out _);
+    return pathCorners.Select(NavigationCoordinateSystem.WorldToGridInt).ToHashSet();
+  }
+
+  /// <summary>Gathers all coordinates that are taken by the paths to the construction sites.</summary>
+  /// <remarks>
+  /// Don't consider sites that are not yet close to completion or are not blocking sites (like a path building).
+  /// </remarks>
   void BuildRestrictedTilesIndex() {
     var stopwatch = Stopwatch.StartNew();
-    _allKnownPaths = new Dictionary<PathCheckingSite, List<HashSet<Vector3Int>>>();
+    _allKnownPaths = new Dictionary<PathCheckingSite, HashSet<Vector3Int>>();
     _unreachableSites = new HashSet<PathCheckingSite>();
 
-    var pathCorners = new List<Vector3>();
-    var allDistricts = _districtCenterRegistry.AllDistrictCenters;
     var skippedSites = 0;
     foreach (var site in _conditionsIndex.Keys) {
-      var accessible = site.Accessible;
-      var blockWorldCoords = CoordinateSystem.GridToWorld(site.Coordinates);
-      var allPaths = new List<HashSet<Vector3Int>>();
       if (!site.GroundedSite.IsFullyGrounded) {
         skippedSites++;
         continue;  // Not ready to be built.
       }
-      foreach (var district in allDistricts) {
-        var districtPos = district.TransformFast.position;
-        foreach (var access in accessible.Accesses) {
-          if (access.y < blockWorldCoords.y) {
-            continue;
-          }
-          pathCorners.Clear();
-          var canDo = _navigationService.FindPathUnlimitedRange(districtPos, access, pathCorners, out _);
-          if (!canDo) {
-            continue;
-          }
-          allPaths.Add(pathCorners.Select(NavigationCoordinateSystem.WorldToGridInt).ToHashSet());
-        }
-      }
-      // The site can be reachable, but too far from the road.
-      //FIXME: we can get road node via RoadSpillFlowField and check path against it? 
-      if (allPaths.Count == 0) {
+      var path = GetBestPath(site);
+      if (path == null) {
         _unreachableSites.Add(site);
         site.ActOnRequiredUnreachable(x => x.SetUnreachable());
       } else {
-        if (!_districtService.IsOnInstantDistrictRoadSpill(accessible)) {
-          site.ActOnRequiredUnreachable(x => x.SetTooFarFromRoad());
-        } else {
-          site.ActOnExistingUnreachable(x => x.Cleanup());
-        }
-        _allKnownPaths[site] = allPaths;
+        site.ActOnExistingUnreachable(x => x.Cleanup());
+        _allKnownPaths[site] = path;
       }
     }
     stopwatch.Stop();
@@ -346,13 +374,16 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   }
 
   /// <summary>Gathers all coordinates that are taken by the characters paths.</summary>
+  /// <remarks>We don't want to let the builders get stranded.</remarks>
   void BuildWalkersIndex() {
     _walkersTakenTiles = new HashSet<Vector3Int>();
+    _walkersCoords = new HashSet<Vector3Int>();
     var walkers = _entityComponentRegistry
         .GetEnabled<BlockOccupant>()
         .Select(x => x.GetComponentFast<Walker>())
         .Where(x => x);
     foreach (var walker in walkers) {
+      _walkersCoords.Add(NavigationCoordinateSystem.WorldToGridInt(walker.TransformFast.position));
       var pathFollower = walker._pathFollower;
       if (pathFollower._pathCorners == null) {
         continue;  // No path, no problem.
@@ -372,7 +403,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   }
 
   /// <summary>Adds the site from to the indexes.</summary>
-  void MaybeAddSite(PathCheckingSite site) {
+  void MaybeAddSite() {
     //FIXME: make it iterative
     MarkIndexesDirty();
   }
@@ -398,15 +429,13 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   #region BaseComponent for custom unreachable status
 
   sealed class UnreachableStatus : BaseComponent, ISelectionListener {
-    const string UnreachableBuilderJobLocKey = "Builders.UnreachableBuilderJob";
-    const string UnreachableFromSameLevelLocKey = "IgorZ.Automation.CheckAccessBlockCondition.UnreachableFromSameLevel";
-    const string TooFarFromPathLocKey = "IgorZ.Automation.CheckAccessBlockCondition.TooFarFromRoadAlert";
+    const string NotYetReachableLocKey = "IgorZ.Automation.CheckAccessBlockCondition.NotYetReachable";
     const string UnreachableIconName = "UnreachableObject";
 
-    StatusToggle _tooFarFromRoadStatusToggle;
     StatusToggle _unreachableStatusToggle;
     BlockableBuilding _blockableBuilding;
     BuilderJobReachabilityStatus _builderJobReachabilityStatus;
+    bool _isSelected;
 
     void Awake() {
       _blockableBuilding = GetComponentFast<BlockableBuilding>();
@@ -415,57 +444,49 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
 
     /// <summary>Initializes the component since the normal Bindito logic doesn't work here.</summary>
     public void Initialize(ILoc loc) {
-      _tooFarFromRoadStatusToggle = StatusToggle.CreateNormalStatusWithAlertAndFloatingIcon(
-          UnreachableIconName, loc.T(UnreachableBuilderJobLocKey), loc.T(TooFarFromPathLocKey));
-      GetComponentFast<StatusSubject>().RegisterStatus(_tooFarFromRoadStatusToggle);
-      _unreachableStatusToggle = StatusToggle.CreateNormalStatus(
-          UnreachableIconName, loc.T(UnreachableFromSameLevelLocKey));
+      _unreachableStatusToggle = StatusToggle.CreateNormalStatusWithFloatingIcon(
+          UnreachableIconName, loc.T(NotYetReachableLocKey));
       GetComponentFast<StatusSubject>().RegisterStatus(_unreachableStatusToggle);
-    }
-
-    /// <summary>
-    /// The too far sites cannot be built, but they are reachable and we want them to affect the conditions.
-    /// </summary>
-    public void SetTooFarFromRoad() {
-      _tooFarFromRoadStatusToggle.Activate();
-      _unreachableStatusToggle.Deactivate();
-      _blockableBuilding.Unblock(this);
     }
 
     /// <summary>
     /// The unreachable sites cannot be built.
     /// </summary>
     /// <remarks>
-    /// Our meaning of "unreachable" can be different from the game's point of view. For teh algorithm, it's important
-    /// to not have such sites built. Thus, we block such sites to ensure the game won't start building them.
+    /// Our meaning of "unreachable" can be different from the game's point of view. For the algorithm, it's important
+    /// to not have such sites started until we allow it to. Thus, we block such sites.
     /// </remarks>
     public void SetUnreachable() {
-      _tooFarFromRoadStatusToggle.Deactivate();
       _unreachableStatusToggle.Activate();
       _blockableBuilding.Block(this);
     }
 
     /// <summary>A cleanup method that resets all effect on the site.</summary>
     public void Cleanup() {
-      _tooFarFromRoadStatusToggle.Deactivate();
       _unreachableStatusToggle.Deactivate();
       _blockableBuilding.Unblock(this);
+      if (_isSelected && _builderJobReachabilityStatus) {
+        _builderJobReachabilityStatus.OnSelect();
+      }
     }
 
     #region ISelectionListener implemenation
 
     /// <inheritdoc/>
     public void OnSelect() {
+      _isSelected = true;
       if (!_builderJobReachabilityStatus) {
         return;
       }
-      if (_unreachableStatusToggle.IsActive || _tooFarFromRoadStatusToggle.IsActive) {
+      if (_unreachableStatusToggle.IsActive) {
         _builderJobReachabilityStatus.OnUnselect();  // We show our own status.
       }
     }
 
     /// <inheritdoc/>
-    public void OnUnselect() {}
+    public void OnUnselect() {
+      _isSelected = false;
+    }
 
     #endregion
   }
