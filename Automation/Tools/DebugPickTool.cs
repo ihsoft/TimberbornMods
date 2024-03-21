@@ -10,6 +10,8 @@ using Timberborn.BlockSystem;
 using Timberborn.BlockSystemNavigation;
 using Timberborn.Buildings;
 using Timberborn.BuildingsBlocking;
+using Timberborn.BuildingsNavigation;
+using Timberborn.Coordinates;
 using Timberborn.Navigation;
 using UnityDev.Utils.LogUtilsLite;
 
@@ -65,15 +67,25 @@ public class DebugPickTool : AbstractAreaSelectionTool {
 
   static void PrintAccessible(BaseComponent component) {
     var accessible = component.GetComponentFast<Accessible>();
-    if (!accessible) {
-      HostedDebugLog.Error(component, "No accessible component found");
+    var siteAccessible = component.GetComponentFast<ConstructionSiteAccessible>()?.Accessible;
+    if (!accessible && !siteAccessible) {
+      HostedDebugLog.Error(component, "No accessible components found");
       return;
     }
     var lines = new StringBuilder();
     lines.AppendLine(new string('*', 10));
-    lines.AppendLine($"Accesses on {DebugEx.BaseComponentToString(component)}:");
-    foreach (var access in accessible.Accesses) {
-      lines.AppendLine(access.ToString());
+    lines.AppendLine($"Accesses on {DebugEx.BaseComponentToString(component)}");
+    if (accessible) {
+      lines.AppendLine($"From Accessible (enabled={accessible.enabled}):");
+      foreach (var access in accessible.Accesses) {
+        lines.AppendLine($"world: {access}, grid:{CoordinateSystem.WorldToGridInt(access)}");
+      }
+    }
+    if (siteAccessible) {
+      lines.AppendLine($"From ConstructionSiteAccessible (enabled={siteAccessible.enabled}):");
+      foreach (var access in siteAccessible.Accesses) {
+        lines.AppendLine($"world: {access}, grid:{CoordinateSystem.WorldToGridInt(access)}");
+      }
     }
     lines.AppendLine(new string('*', 10));
     DebugEx.Warning(lines.ToString());
