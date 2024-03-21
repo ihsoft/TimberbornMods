@@ -87,6 +87,7 @@
       <Compile Include="Conditions\OutputStockAboveThresholdCondition.cs" />
       <Compile Include="Conditions\OutputStockBelowThresholdCondition.cs" />
       <Compile Include="Conditions\OutputStockThresholdConditionBase.cs" />
+      <Compile Include="Conditions\PathCheckingSite.cs" />
       <Compile Include="Conditions\PopulationThresholdConditionBase.cs" />
       <Compile Include="Conditions\PopulationTrackerConditionBase.cs" />
       <Compile Include="Conditions\WeatherTrackerConditionBase.cs" />

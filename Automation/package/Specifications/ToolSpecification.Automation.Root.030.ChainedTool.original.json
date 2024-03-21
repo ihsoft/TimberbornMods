@@ -12,11 +12,11 @@
     "Rules": [
       {
         "Condition": { "TypeId": "Automation.Conditions.CheckAccessBlockCondition" },
-        "Action": { "TypeId": "Automation.Actions.PauseAction" }
+        "Action": { "TypeId": "Automation.Actions.BlockableBuildingAction", "ActionKind": "Block", "BlockToken": "ChainTool-1", "BlockIcon": "DirectionalBlocking", "BlockText": "IgorZ.Automation.BlockableBuildingAction.BlockText", "ShowIcon": true }
       },
       {
         "Condition": { "TypeId": "Automation.Conditions.CheckAccessBlockCondition", "ReversedCondition": true },
-        "Action": { "TypeId": "Automation.Actions.UnpauseAction" }
+        "Action": { "TypeId": "Automation.Actions.BlockableBuildingAction", "ActionKind": "Unblock", "BlockToken": "ChainTool-1" }
       }
     ]
   }
