@@ -56,6 +56,9 @@ sealed class PathCheckingSite {
   /// <seealso cref="BestBuildersPathCorners"/>
   public HashSet<Vector3Int> BestBuildersPath { get; private set; }
 
+  /// <summary>The access tha twas used to build <see cref="BestBuildersPathCorners"/>.</summary>
+  public Vector3Int BestAccess { get; private set; }
+
   /// <summary>Coordinates of the positions that are taken by the site.</summary>
   public List<Vector3Int> RestrictedCoordinates { get; private set; }
 
@@ -238,6 +241,7 @@ sealed class PathCheckingSite {
       var pathCorners = new List<Vector3>();
       _navigationService.FindPathUnlimitedRange(bestRoadPosition, bestAccess, pathCorners, out _);
       BestBuildersPathCorners = pathCorners.Select(NavigationCoordinateSystem.WorldToGridInt).ToList();
+      BestAccess = NavigationCoordinateSystem.WorldToGridInt(bestAccess);
       _bestPathNodeIds = pathCorners.Select(_nodeIdService.WorldToId).ToHashSet();
       BestBuildersPath = pathCorners.Select(NavigationCoordinateSystem.WorldToGridInt).ToHashSet();
       _bestPathRoadNodeId = bestRoadNode;

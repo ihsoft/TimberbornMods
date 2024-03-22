@@ -122,7 +122,11 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
       var isBlocked = false;
       // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
       foreach (var testSite in PathCheckingSite.SitesByCoordinates.Values) {
-        if (ReferenceEquals(testSite, site) || !testSite.IsFullyGrounded || IsNonBlockingPathSite(site, testSite)) {
+        testSite.MaybeUpdateNavMesh();
+        if (ReferenceEquals(testSite, site)
+            || !testSite.IsFullyGrounded
+            || testSite.BestBuildersPathCorners.Count == 0
+            || IsNonBlockingPathSite(site, testSite)) {
           continue;
         }
         isBlocked = true;
@@ -146,7 +150,6 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   /// negative.
   /// </remarks>
   static bool IsNonBlockingPathSite(PathCheckingSite pathSite, PathCheckingSite testSite) {
-    testSite.MaybeUpdateNavMesh();
     var testPath = testSite.BestBuildersPath;
     var testPathCorners = testSite.BestBuildersPathCorners;
     var edges = pathSite.Edges;
@@ -159,9 +162,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
 
       // If the blocking site is at the end of the path, then just check if there is an edge to the test site.
       if (pathPos == testPathCorners.Count - 1) {
-        //FIXME: check an edge to the accessible instead of the blockobject coords.
-        var testCoords = testSite.Coordinates;
-        if (edges.FastAny(e => e.Start == restrictedCoordinate && e.End == testCoords)) {
+        if (edges.FastAny(e => e.Start == restrictedCoordinate && e.End == testSite.BestAccess)) {
           continue;
         }
         return false;
