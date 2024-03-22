@@ -48,19 +48,20 @@ sealed class PathCheckingSite {
 
   /// <summary>The path from the closest road to the closets construction site's accessible.</summary>
   /// <seealso cref="MaybeUpdateNavMesh"/>
-  public List<Vector3Int> BestBuildersPathCorners => _bestBuildersPathCorners;
+  public List<Vector3Int> BestBuildersPathCorners { get; private set; }
 
   /// <summary>The best path index. If it's empty, then the site cannot be reached.</summary>
   /// <seealso cref="CanBeAccessedInPreview"/>
   /// <seealso cref="MaybeUpdateNavMesh"/>
   /// <seealso cref="BestBuildersPathCorners"/>
-  public HashSet<Vector3Int> BestBuildersPath => _bestBuildersPath;
+  public HashSet<Vector3Int> BestBuildersPath { get; private set; }
 
+  /// <summary>Coordinates of the positions that are taken by the site.</summary>
   public List<Vector3Int> RestrictedCoordinates { get; private set; }
 
   /// <summary>Indicates that all the fields related to path and NavMesh are invalid and need to be updated.</summary>
   /// <seealso cref="MaybeUpdateNavMesh"/>
-  public bool NeedsBestPathUpdate => _bestBuildersPath == null;
+  public bool NeedsBestPathUpdate => BestBuildersPath == null;
 
   /// <summary>Indicates that the site _may_ become reachable when all the preview buildings are built.</summary>
   /// <remarks>
@@ -133,8 +134,6 @@ sealed class PathCheckingSite {
 
   int _bestPathRoadNodeId = -1;
   HashSet<int> _bestPathNodeIds;
-  HashSet<Vector3Int> _bestBuildersPath;
-  List<Vector3Int> _bestBuildersPathCorners;
 
   /// <exception cref="InvalidOperationException"> if the site doesn't have all teh expected components.</exception>
   PathCheckingSite(BlockObject blockObject) {
@@ -180,8 +179,8 @@ sealed class PathCheckingSite {
   /// <summary>
   /// Resets <see cref="BestBuildersPath"/> and <see cref="BestBuildersPathCorners"/> to trigger the path rebuild.
   /// </summary>
-    _bestBuildersPath = null;
-    _bestBuildersPathCorners = null;
+    BestBuildersPath = null;
+    BestBuildersPathCorners = null;
   }
 
   /// <summary>Updates the <see cref="BestBuildersPath"/> to the site from the closets road node.</summary>
@@ -195,8 +194,8 @@ sealed class PathCheckingSite {
     if (RestrictedCoordinates == null) {
       InitializeNavMesh();
     }
-    _bestBuildersPath = new HashSet<Vector3Int>();
-    _bestBuildersPathCorners = new List<Vector3Int>();
+    BestBuildersPath = new HashSet<Vector3Int>();
+    BestBuildersPathCorners = new List<Vector3Int>();
     _bestPathRoadNodeId = -1;
     _bestPathNodeIds = new HashSet<int>();
     CanBeAccessedInPreview = false;
@@ -238,9 +237,9 @@ sealed class PathCheckingSite {
       var bestRoadPosition = _nodeIdService.IdToWorld(bestRoadNode);
       var pathCorners = new List<Vector3>();
       _navigationService.FindPathUnlimitedRange(bestRoadPosition, bestAccess, pathCorners, out _);
-      _bestBuildersPathCorners = pathCorners.Select(NavigationCoordinateSystem.WorldToGridInt).ToList();
+      BestBuildersPathCorners = pathCorners.Select(NavigationCoordinateSystem.WorldToGridInt).ToList();
       _bestPathNodeIds = pathCorners.Select(_nodeIdService.WorldToId).ToHashSet();
-      _bestBuildersPath = pathCorners.Select(NavigationCoordinateSystem.WorldToGridInt).ToHashSet();
+      BestBuildersPath = pathCorners.Select(NavigationCoordinateSystem.WorldToGridInt).ToHashSet();
       _bestPathRoadNodeId = bestRoadNode;
       _unreachableStatus.Cleanup();
     } else {
