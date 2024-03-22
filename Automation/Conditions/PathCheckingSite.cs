@@ -14,6 +14,7 @@ using Timberborn.Buildings;
 using Timberborn.BuildingsBlocking;
 using Timberborn.BuildingsNavigation;
 using Timberborn.Common;
+using Timberborn.ConstructibleSystem;
 using Timberborn.ConstructionSites;
 using Timberborn.Coordinates;
 using Timberborn.GameDistricts;
@@ -121,12 +122,14 @@ sealed class PathCheckingSite {
   int _bestPathRoadNodeId = -1;
   HashSet<int> _bestPathNodeIds;
   HashSet<Vector3Int> _bestBuildersPath;
+  bool _isFullyGrounded;
 
   /// <exception cref="InvalidOperationException"> if the site doesn't have all teh expected components.</exception>
   PathCheckingSite(BlockObject blockObject) {
     Coordinates = blockObject.Coordinates;
     ConstructionSite = blockObject.GetComponentFast<ConstructionSite>();
     _groundedSite = blockObject.GetComponentFast<GroundedConstructionSite>();
+    _isFullyGrounded = _groundedSite.IsFullyGrounded;
     _accessible = blockObject.GetComponentFast<ConstructionSiteAccessible>().Accessible;
     _unreachableStatus = blockObject.GetComponentFast<UnreachableStatus>();
     if (!_unreachableStatus) {
@@ -178,7 +181,7 @@ sealed class PathCheckingSite {
     _bestPathRoadNodeId = -1;
     _bestPathNodeIds = new HashSet<int>();
     CanBeAccessedInPreview = false;
-    if (!_groundedSite.IsFullyGrounded) {
+    if (!_isFullyGrounded) {
       return;
     }
     if (!_accessible.enabled) {
@@ -236,7 +239,7 @@ sealed class PathCheckingSite {
   /// <summary>It's expected to be called from <see cref="PathCheckingController"/> when the navmesh changes.</summary>
   /// <remarks>Don't do any logic here! Only mark the state invalid to get updated in the next tick.</remarks>
   internal void OnNavMeshUpdate(NavMeshUpdate navMeshUpdate) {
-    if (!_groundedSite.IsFullyGrounded) {
+    if (!_isFullyGrounded) {
       return;  // The ungrounded site just cannot start building.
     }
     if (_bestPathRoadNodeId == -1) {
@@ -248,6 +251,15 @@ sealed class PathCheckingSite {
         || navMeshUpdate.TerrainNodeIds.FastAny(_bestPathNodeIds.Contains)) {
       RequestBestPathUpdate();
     }
+  }
+
+  /// <summary>Reacts on construction complete and verifies if a non-grounded site can now start building.</summary>
+  internal void OnConstructibleCompleted(Constructible constructible) {
+    if (_isFullyGrounded || !_groundedSite.IsFullyGrounded) {
+      return;
+    }
+    _isFullyGrounded = true;
+    RequestBestPathUpdate();
   }
 
   #endregion

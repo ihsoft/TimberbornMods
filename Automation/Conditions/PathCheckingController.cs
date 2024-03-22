@@ -210,6 +210,9 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
     }
     _conditionsIndex.Remove(site);
     site.Destroy();
+    foreach (var updateSite in PathCheckingSite.SitesByCoordinates.Values) {
+      updateSite.OnConstructibleCompleted(@event.Constructible);
+    }
   }
 
   /// <summary>Marks the path indexes dirty.</summary>
