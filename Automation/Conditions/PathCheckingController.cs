@@ -55,7 +55,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
 
   /// <summary>Removes the path checking condition from monitor and resets all caches.</summary>
   public void RemoveCondition(CheckAccessBlockCondition condition) {
-    if (!PathCheckingSite.SitesByCoordinates.TryGetValue(condition.Behavior.BlockObject.Coordinates, out var site)) {
+    if (!PathCheckingSite.SitesByBlockObject.TryGetValue(condition.Behavior.BlockObject, out var site)) {
       DebugEx.Warning("Unknown condition {0} on behavior {1}", condition, condition.Behavior);
       return;
     }
@@ -119,7 +119,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
       var checkNodeId = site.SiteNodeId;
       var isBlocked = false;
       // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
-      foreach (var testSite in PathCheckingSite.SitesByCoordinates.Values) {
+      foreach (var testSite in PathCheckingSite.SitesByBlockObject.Values) {
         testSite.MaybeUpdateNavMesh();
         if (ReferenceEquals(testSite, site)
             || !testSite.IsFullyGrounded
@@ -227,7 +227,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   bool TryGetSite(BaseComponent component, out PathCheckingSite site) {
     var blockObject = component.GetComponentFast<BlockObject>();
     site = null;
-    return blockObject && PathCheckingSite.SitesByCoordinates.TryGetValue(blockObject.Coordinates, out site);
+    return blockObject && PathCheckingSite.SitesByBlockObject.TryGetValue(blockObject, out site);
   }
 
   #endregion
@@ -285,7 +285,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
 
   /// <inheritdoc/>
   public void OnNavMeshUpdated(NavMeshUpdate navMeshUpdate) {
-    foreach (var site in PathCheckingSite.SitesByCoordinates.Values) {
+    foreach (var site in PathCheckingSite.SitesByBlockObject.Values) {
       site.OnNavMeshUpdate(navMeshUpdate);
       if (site.NeedsBestPathUpdate) {
         _sitesUpdatedInTick++;
@@ -312,7 +312,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
     }
     _conditionsIndex.Remove(site);
     site.Destroy();
-    foreach (var updateSite in PathCheckingSite.SitesByCoordinates.Values) {
+    foreach (var updateSite in PathCheckingSite.SitesByBlockObject.Values) {
       updateSite.OnConstructibleCompleted(@event.Constructible);
       if (updateSite.NeedsBestPathUpdate) {
         _sitesUpdatedInTick++;

@@ -31,11 +31,8 @@ sealed class PathCheckingSite {
   #region API
   // ReSharper disable MemberCanBePrivate.Global
 
-  /// <summary>All path sites index by the grid coordinates.</summary>
-  public static readonly Dictionary<Vector3Int, PathCheckingSite> SitesByCoordinates = new();
-
-  /// <summary>Site's coordinates.</summary>
-  public readonly Vector3Int Coordinates;
+  /// <summary>All path sites index by blockobject.</summary>
+  public static readonly Dictionary<BlockObject, PathCheckingSite> SitesByBlockObject = new();
 
   /// <summary>Site's NavMesh node ID.</summary>
   public int SiteNodeId { get; private set; }
@@ -44,6 +41,10 @@ sealed class PathCheckingSite {
   // FIXME: It's temporary! Use site blockers instead.
   public readonly ConstructionSite ConstructionSite;
 
+  /// <summary>BlockObject of this site.</summary>
+  public readonly BlockObject BlockObject;
+
+  /// <summary>Tells if all the site's foundation blocks stay on top fo finished entities.</summary>
   public bool IsFullyGrounded => _groundedSite.IsFullyGrounded;
 
   /// <summary>NavMesh nodes version of the stock <see cref="NavMeshEdge"/>.</summary>
@@ -83,11 +84,12 @@ sealed class PathCheckingSite {
   public bool CanBeAccessedInPreview { get; private set; }
 
   /// <summary>Finds the existing construction site or creates a new one.</summary>
-  /// <seealso cref="SitesByCoordinates"/>
+  /// <seealso cref="SitesByBlockObject"/>
+  /// FIXME: move it to controller, it's not the site's role.
   public static PathCheckingSite GetOrCreate(BlockObject blockObject) {
-    if (!SitesByCoordinates.TryGetValue(blockObject.Coordinates, out var cachedSite)) {
+    if (!SitesByBlockObject.TryGetValue(blockObject, out var cachedSite)) {
       var site = new PathCheckingSite(blockObject);
-      SitesByCoordinates.Add(site.Coordinates, site);
+      SitesByBlockObject.Add(site.BlockObject, site);
       cachedSite = site;
     }
     return cachedSite;
@@ -95,7 +97,7 @@ sealed class PathCheckingSite {
 
   /// <summary>Drops the site and all internal caches associated with it.</summary>
   public void Destroy() {
-    SitesByCoordinates.Remove(Coordinates);
+    SitesByBlockObject.Remove(BlockObject);
     if (_unreachableStatus) {
       _unreachableStatus.Cleanup();
     }
@@ -113,20 +115,6 @@ sealed class PathCheckingSite {
   }
 
   // ReSharper restore MemberCanBePrivate.Global
-  #endregion
-
-  #region Object overrides
-
-  /// <inheritdoc/>
-  public override int GetHashCode() {
-    return Coordinates.GetHashCode();
-  }
-
-  /// <inheritdoc/>
-  public override bool Equals(object obj) {
-    return obj is PathCheckingSite checkingSite && checkingSite.Coordinates.Equals(Coordinates);
-  }
-
   #endregion
 
   #region Implementation
@@ -148,19 +136,19 @@ sealed class PathCheckingSite {
 
   /// <exception cref="InvalidOperationException"> if the site doesn't have all teh expected components.</exception>
   PathCheckingSite(BlockObject blockObject) {
-    Coordinates = blockObject.Coordinates;
-    ConstructionSite = blockObject.GetComponentFast<ConstructionSite>();
-    _groundedSite = blockObject.GetComponentFast<GroundedConstructionSite>();
-    _accessible = blockObject.GetComponentFast<ConstructionSiteAccessible>().Accessible;
-    _unreachableStatus = blockObject.GetComponentFast<UnreachableStatus>();
-    _blockObjectNavMesh = blockObject.GetComponentFast<BlockObjectNavMesh>();
+    BlockObject = blockObject;
+    ConstructionSite = BlockObject.GetComponentFast<ConstructionSite>();
+    _groundedSite = BlockObject.GetComponentFast<GroundedConstructionSite>();
+    _accessible = BlockObject.GetComponentFast<ConstructionSiteAccessible>().Accessible;
+    _unreachableStatus = BlockObject.GetComponentFast<UnreachableStatus>();
+    _blockObjectNavMesh = BlockObject.GetComponentFast<BlockObjectNavMesh>();
     if (!_unreachableStatus) {
-      _unreachableStatus = _baseInstantiator.AddComponent<UnreachableStatus>(blockObject.GameObjectFast);
+      _unreachableStatus = _baseInstantiator.AddComponent<UnreachableStatus>(BlockObject.GameObjectFast);
       _unreachableStatus.Initialize(_loc);
     }
     if (!ConstructionSite || !_groundedSite || !_accessible) {
       throw new InvalidOperationException(
-          $"{DebugEx.BaseComponentToString(blockObject)} is not a valid construction site");
+          $"{DebugEx.BaseComponentToString(BlockObject)} is not a valid construction site");
     }
   }
 
