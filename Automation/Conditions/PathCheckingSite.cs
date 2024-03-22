@@ -67,7 +67,7 @@ sealed class PathCheckingSite {
   /// <remarks>
   /// It's a best effort check. There is no guarantee the preview buildings are actually providing access.
   /// </remarks>
-  public bool CanBeAccessedInPreview;
+  public bool CanBeAccessedInPreview { get; private set; }
 
   /// <summary>Finds the existing construction site or creates a new one.</summary>
   /// <seealso cref="SitesByCoordinates"/>
@@ -138,7 +138,7 @@ sealed class PathCheckingSite {
     }
     if (!ConstructionSite || !_groundedSite || !_accessible) {
       throw new InvalidOperationException(
-          DebugEx.BaseComponentToString(blockObject) + " is not a valid construction site");
+          $"{DebugEx.BaseComponentToString(blockObject)} is not a valid construction site");
     }
 
     var building = blockObject.GetComponentFast<Building>();
@@ -246,7 +246,7 @@ sealed class PathCheckingSite {
       RequestBestPathUpdate();  // For an unreachable site, _any_ update to navmesh can make it reachable.
       return;
     }
-    // Otherwise, if the navmesh change affects at least one of the road nodes of teh site, then it's a trigger.
+    // Otherwise, if the navmesh change affects at least one of the road nodes of the site, then it's a trigger.
     if (navMeshUpdate.RoadNodeIds.FastContains(_bestPathRoadNodeId)
         || navMeshUpdate.TerrainNodeIds.FastAny(_bestPathNodeIds.Contains)) {
       RequestBestPathUpdate();

@@ -74,7 +74,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
 
   /// <summary>Cache of the walking characters positions.</summary>
   /// <remarks>
-  /// If a character is at teh site being constructed, we don't block since the game checks it naturally.
+  /// If a character is at the site being constructed, we don't block since the game checks it naturally.
   /// </remarks>
   HashSet<Vector3Int> _walkersCoords;
 
