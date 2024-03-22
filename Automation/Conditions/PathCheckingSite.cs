@@ -37,39 +37,48 @@ sealed class PathCheckingSite {
   /// <summary>Site's coordinates.</summary>
   public readonly Vector3Int Coordinates;
 
+  /// <summary>Site's NavMesh node ID.</summary>
+  public int SiteNodeId { get; private set; }
+
   /// <summary>Construction site cached instance.</summary>
   // FIXME: It's temporary! Use site blockers instead.
   public readonly ConstructionSite ConstructionSite;
 
   public bool IsFullyGrounded => _groundedSite.IsFullyGrounded;
 
-  /// <summary>Path edges from the site if there are any or <c>null</c>.</summary>
-  public List<NavMeshEdge> Edges { get; private set; }
+  /// <summary>NavMesh nodes version of the stock <see cref="NavMeshEdge"/>.</summary>
+  public struct NodeEdge {
+    public int Start;
+    public int End;
+  }
+
+  /// <summary>Path edges from the site if there are any.</summary>
+  public List<NodeEdge> NodeEdges { get; private set; }
 
   /// <summary>The path from the closest road to the closets construction site's accessible.</summary>
   /// <seealso cref="MaybeUpdateNavMesh"/>
-  public List<Vector3Int> BestBuildersPathCorners { get; private set; }
+  public List<int> BestBuildersPathCornerNodes { get; private set; }
 
   /// <summary>The best path index. If it's empty, then the site cannot be reached.</summary>
   /// <seealso cref="CanBeAccessedInPreview"/>
   /// <seealso cref="MaybeUpdateNavMesh"/>
-  /// <seealso cref="BestBuildersPathCorners"/>
-  public HashSet<Vector3Int> BestBuildersPath { get; private set; }
+  /// <seealso cref="BestBuildersPathCornerNodes"/>
+  public HashSet<int> BestBuildersPathNodeIndex { get; private set; }
 
-  /// <summary>The access tha twas used to build <see cref="BestBuildersPathCorners"/>.</summary>
-  public Vector3Int BestAccess { get; private set; }
+  /// <summary>The access that was used to build <see cref="BestBuildersPathCornerNodes"/>.</summary>
+  public int BestAccessNode { get; private set; }
 
   /// <summary>Coordinates of the positions that are taken by the site.</summary>
-  public List<Vector3Int> RestrictedCoordinates { get; private set; }
+  public List<int> RestrictedNodes { get; private set; }
 
   /// <summary>Indicates that all the fields related to path and NavMesh are invalid and need to be updated.</summary>
   /// <seealso cref="MaybeUpdateNavMesh"/>
-  public bool NeedsBestPathUpdate => BestBuildersPath == null;
+  public bool NeedsBestPathUpdate => BestBuildersPathNodeIndex == null;
 
   /// <summary>Indicates that the site _may_ become reachable when all the preview buildings are built.</summary>
   /// <remarks>
   /// It's a best effort check. There is no guarantee the preview buildings are actually providing access. The
-  /// <see cref="BestBuildersPathCorners"/> can be absent for such sites.
+  /// <see cref="BestBuildersPathCornerNodes"/> can be absent for such sites.
   /// </remarks>
   public bool CanBeAccessedInPreview { get; private set; }
 
@@ -95,8 +104,8 @@ sealed class PathCheckingSite {
   /// <summary>Verifies that the all NavMesh related things are up to date on the site.</summary>
   /// <remarks>If no updates needed, it is a very cheap call.</remarks>
   /// <seealso cref="NeedsBestPathUpdate"/>
-  /// <seealso cref="BestBuildersPath"/>
-  /// <seealso cref="BestBuildersPathCorners"/>
+  /// <seealso cref="BestBuildersPathNodeIndex"/>
+  /// <seealso cref="BestBuildersPathCornerNodes"/>
   public void MaybeUpdateNavMesh() {
     if (NeedsBestPathUpdate) {
       UpdateBestPath();
@@ -136,7 +145,6 @@ sealed class PathCheckingSite {
   readonly BlockObjectNavMesh _blockObjectNavMesh;
 
   int _bestPathRoadNodeId = -1;
-  HashSet<int> _bestPathNodeIds;
 
   /// <exception cref="InvalidOperationException"> if the site doesn't have all teh expected components.</exception>
   PathCheckingSite(BlockObject blockObject) {
@@ -160,10 +168,13 @@ sealed class PathCheckingSite {
   /// <remarks>This must be done on an object hat is already added to the game's NavMesh.</remarks>
   void InitializeNavMesh() {
     var navMeshObject = _blockObjectNavMesh.NavMeshObject;
-    RestrictedCoordinates = navMeshObject._restrictedCoordinates;
-    Edges = navMeshObject._addingChanges
+    RestrictedNodes = navMeshObject._restrictedCoordinates.Select(_nodeIdService.GridToId).ToList();
+    NodeEdges = navMeshObject._addingChanges
         .Where(x => x.NavMeshChangeType == NavMeshChangeType.AddEdge)
-        .Select(x => x.NavMeshEdge)
+        .Select(x => new NodeEdge {
+            Start = _nodeIdService.GridToId(x.NavMeshEdge.Start),
+            End = _nodeIdService.GridToId(x.NavMeshEdge.End),
+        })
         .ToList();
   }
 
@@ -180,13 +191,14 @@ sealed class PathCheckingSite {
 
   void RequestBestPathUpdate() {
   /// <summary>
-  /// Resets <see cref="BestBuildersPath"/> and <see cref="BestBuildersPathCorners"/> to trigger the path rebuild.
+  /// Resets <see cref="BestBuildersPathNodeIndex"/> and <see cref="BestBuildersPathCornerNodes"/> to trigger the path
+  /// rebuild.
   /// </summary>
-    BestBuildersPath = null;
-    BestBuildersPathCorners = null;
+    BestBuildersPathNodeIndex = null;
+    BestBuildersPathCornerNodes = null;
   }
 
-  /// <summary>Updates the <see cref="BestBuildersPath"/> to the site from the closets road node.</summary>
+  /// <summary>Updates the <see cref="BestBuildersPathNodeIndex"/> to the site from the closets road node.</summary>
   /// <remarks>
   /// The site must be within the range from the road, which is currently 9 tiles. We intentionally ignore the accesses
   /// below the site level: even though the game can construct sites this way (one tile above the road), the path
@@ -194,13 +206,13 @@ sealed class PathCheckingSite {
   /// that's the price to pay.
   /// </remarks>
   void UpdateBestPath() {
-    if (RestrictedCoordinates == null) {
+    if (RestrictedNodes == null) {
+      SiteNodeId = _nodeIdService.GridToId(Coordinates);
       InitializeNavMesh();
     }
-    BestBuildersPath = new HashSet<Vector3Int>();
-    BestBuildersPathCorners = new List<Vector3Int>();
+    BestBuildersPathNodeIndex = new HashSet<int>();
+    BestBuildersPathCornerNodes = new List<int>();
     _bestPathRoadNodeId = -1;
-    _bestPathNodeIds = new HashSet<int>();
     CanBeAccessedInPreview = false;
     if (!_groundedSite.IsFullyGrounded) {
       return;
@@ -240,10 +252,9 @@ sealed class PathCheckingSite {
       var bestRoadPosition = _nodeIdService.IdToWorld(bestRoadNode);
       var pathCorners = new List<Vector3>();
       _navigationService.FindPathUnlimitedRange(bestRoadPosition, bestAccess, pathCorners, out _);
-      BestBuildersPathCorners = pathCorners.Select(NavigationCoordinateSystem.WorldToGridInt).ToList();
-      BestAccess = NavigationCoordinateSystem.WorldToGridInt(bestAccess);
-      _bestPathNodeIds = pathCorners.Select(_nodeIdService.WorldToId).ToHashSet();
-      BestBuildersPath = pathCorners.Select(NavigationCoordinateSystem.WorldToGridInt).ToHashSet();
+      BestAccessNode = _nodeIdService.WorldToId(bestAccess);
+      BestBuildersPathCornerNodes = pathCorners.Select(_nodeIdService.WorldToId).ToList();
+      BestBuildersPathNodeIndex = pathCorners.Select(_nodeIdService.WorldToId).ToHashSet();
       _bestPathRoadNodeId = bestRoadNode;
       _unreachableStatus.Cleanup();
     } else {
@@ -271,7 +282,7 @@ sealed class PathCheckingSite {
     }
     // Otherwise, if the navmesh change affects at least one of the road nodes of the site, then it's a trigger.
     if (navMeshUpdate.RoadNodeIds.FastContains(_bestPathRoadNodeId)
-        || navMeshUpdate.TerrainNodeIds.FastAny(_bestPathNodeIds.Contains)) {
+        || navMeshUpdate.TerrainNodeIds.FastAny(BestBuildersPathNodeIndex.Contains)) {
       RequestBestPathUpdate();
     }
   }

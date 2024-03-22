@@ -12,14 +12,12 @@ using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.Common;
 using Timberborn.ConstructibleSystem;
-using Timberborn.Coordinates;
 using Timberborn.EntitySystem;
 using Timberborn.Navigation;
 using Timberborn.SingletonSystem;
 using Timberborn.TickSystem;
 using Timberborn.WalkingSystem;
 using UnityDev.Utils.LogUtilsLite;
-using UnityEngine;
 
 namespace Automation.Conditions {
 
@@ -106,7 +104,8 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
 
       // Get it sooner to trigger path creation even on the nonblocking sites.
       site.MaybeUpdateNavMesh();
-      if (site.BestBuildersPath.Count == 0) {  // The unreachable sites cannot get built and trigger the condition.
+      if (site.BestBuildersPathNodeIndex.Count == 0) {
+        // The unreachable sites cannot get built and trigger the condition.
         UpdateConditions(conditions, false);
         continue;
       }
@@ -117,15 +116,14 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
         continue;
       }
 
-      var checkCoords = site.Coordinates;
-      var checkNodeId = _nodeIdService.GridToId(checkCoords);
+      var checkNodeId = site.SiteNodeId;
       var isBlocked = false;
       // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
       foreach (var testSite in PathCheckingSite.SitesByCoordinates.Values) {
         testSite.MaybeUpdateNavMesh();
         if (ReferenceEquals(testSite, site)
             || !testSite.IsFullyGrounded
-            || testSite.BestBuildersPathCorners.Count == 0
+            || testSite.BestBuildersPathCornerNodes.Count == 0
             || IsNonBlockingPathSite(site, testSite)) {
           continue;
         }
@@ -149,20 +147,20 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   /// It only checks cases when the two sites are neighbours and at the same level. Otherwise, the result is always
   /// negative.
   /// </remarks>
-  static bool IsNonBlockingPathSite(PathCheckingSite pathSite, PathCheckingSite testSite) {
-    var testPath = testSite.BestBuildersPath;
-    var testPathCorners = testSite.BestBuildersPathCorners;
-    var edges = pathSite.Edges;
-    for (var i = pathSite.RestrictedCoordinates.Count - 1; i >= 0; i--) {
-      var restrictedCoordinate = pathSite.RestrictedCoordinates[i];
-      if (!testPath.Contains(restrictedCoordinate)) {
+  bool IsNonBlockingPathSite(PathCheckingSite pathSite, PathCheckingSite testSite) {
+    var testPathNodes = testSite.BestBuildersPathNodeIndex;
+    var testPathCorners = testSite.BestBuildersPathCornerNodes;
+    var edges = pathSite.NodeEdges;
+    for (var i = pathSite.RestrictedNodes.Count - 1; i >= 0; i--) {
+      var restrictedCoordinate = pathSite.RestrictedNodes[i];
+      if (!testPathNodes.Contains(restrictedCoordinate)) {
         continue;
       }
-      var pathPos = testPathCorners.IndexOf(pathSite.Coordinates);
+      var pathPos = testPathCorners.IndexOf(pathSite.SiteNodeId);
 
       // If the blocking site is at the end of the path, then just check if there is an edge to the test site.
       if (pathPos == testPathCorners.Count - 1) {
-        if (edges.FastAny(e => e.Start == restrictedCoordinate && e.End == testSite.BestAccess)) {
+        if (edges.FastAny(e => e.Start == restrictedCoordinate && e.End == testSite.BestAccessNode)) {
           continue;
         }
         return false;
