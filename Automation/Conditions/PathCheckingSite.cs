@@ -10,7 +10,6 @@ using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BlockSystemNavigation;
 using Timberborn.BuilderHubSystem;
-using Timberborn.Buildings;
 using Timberborn.BuildingsBlocking;
 using Timberborn.BuildingsNavigation;
 using Timberborn.Common;
@@ -42,30 +41,31 @@ sealed class PathCheckingSite {
   // FIXME: It's temporary! Use site blockers instead.
   public readonly ConstructionSite ConstructionSite;
 
-  /// <summary>Path edges of this site if it's a path building. It's <c>null</c> for non-path buildings.</summary>
-  public readonly List<Edge> Edges;
+  public bool IsFullyGrounded => _groundedSite.IsFullyGrounded;
 
-  /// <summary>The path from the closest road. If it's empty, then the site cannot be reached.</summary>
+  /// <summary>Path edges from the site if there are any or <c>null</c>.</summary>
+  public List<NavMeshEdge> Edges { get; private set; }
+
+  /// <summary>The path from the closest road to the closets construction site's accessible.</summary>
+  /// <seealso cref="MaybeUpdateNavMesh"/>
+  public List<Vector3Int> BestBuildersPathCorners => _bestBuildersPathCorners;
+
+  /// <summary>The best path index. If it's empty, then the site cannot be reached.</summary>
   /// <seealso cref="CanBeAccessedInPreview"/>
-  public HashSet<Vector3Int> BestBuildersPath {
-    get {
-      if (_bestBuildersPath == null) {
-        UpdateBestPath();
-      }
-      return _bestBuildersPath;
-    }
-  }
+  /// <seealso cref="MaybeUpdateNavMesh"/>
+  /// <seealso cref="BestBuildersPathCorners"/>
+  public HashSet<Vector3Int> BestBuildersPath => _bestBuildersPath;
 
-  /// <summary>Indicates that the <see cref="BestBuildersPath"/> is dirty and will be updated if accessed.</summary>
-  /// <remarks>
-  /// The other properties that depend on the path (e.g. <see cref="CanBeAccessedInPreview"/>) should be treated as
-  /// invalid when this state is ON.
-  /// </remarks>
+  public List<Vector3Int> RestrictedCoordinates { get; private set; }
+
+  /// <summary>Indicates that all the fields related to path and NavMesh are invalid and need to be updated.</summary>
+  /// <seealso cref="MaybeUpdateNavMesh"/>
   public bool NeedsBestPathUpdate => _bestBuildersPath == null;
 
   /// <summary>Indicates that the site _may_ become reachable when all the preview buildings are built.</summary>
   /// <remarks>
-  /// It's a best effort check. There is no guarantee the preview buildings are actually providing access.
+  /// It's a best effort check. There is no guarantee the preview buildings are actually providing access. The
+  /// <see cref="BestBuildersPathCorners"/> can be absent for such sites.
   /// </remarks>
   public bool CanBeAccessedInPreview { get; private set; }
 
@@ -85,6 +85,17 @@ sealed class PathCheckingSite {
     SitesByCoordinates.Remove(Coordinates);
     if (_unreachableStatus) {
       _unreachableStatus.Cleanup();
+    }
+  }
+
+  /// <summary>Verifies that the all NavMesh related things are up to date on the site.</summary>
+  /// <remarks>If no updates needed, it is a very cheap call.</remarks>
+  /// <seealso cref="NeedsBestPathUpdate"/>
+  /// <seealso cref="BestBuildersPath"/>
+  /// <seealso cref="BestBuildersPathCorners"/>
+  public void MaybeUpdateNavMesh() {
+    if (NeedsBestPathUpdate) {
+      UpdateBestPath();
     }
   }
 
@@ -118,20 +129,21 @@ sealed class PathCheckingSite {
   readonly Accessible _accessible;
   readonly UnreachableStatus _unreachableStatus;
   readonly GroundedConstructionSite _groundedSite;
+  readonly BlockObjectNavMesh _blockObjectNavMesh;
 
   int _bestPathRoadNodeId = -1;
   HashSet<int> _bestPathNodeIds;
   HashSet<Vector3Int> _bestBuildersPath;
-  bool _isFullyGrounded;
+  List<Vector3Int> _bestBuildersPathCorners;
 
   /// <exception cref="InvalidOperationException"> if the site doesn't have all teh expected components.</exception>
   PathCheckingSite(BlockObject blockObject) {
     Coordinates = blockObject.Coordinates;
     ConstructionSite = blockObject.GetComponentFast<ConstructionSite>();
     _groundedSite = blockObject.GetComponentFast<GroundedConstructionSite>();
-    _isFullyGrounded = _groundedSite.IsFullyGrounded;
     _accessible = blockObject.GetComponentFast<ConstructionSiteAccessible>().Accessible;
     _unreachableStatus = blockObject.GetComponentFast<UnreachableStatus>();
+    _blockObjectNavMesh = blockObject.GetComponentFast<BlockObjectNavMesh>();
     if (!_unreachableStatus) {
       _unreachableStatus = _baseInstantiator.AddComponent<UnreachableStatus>(blockObject.GameObjectFast);
       _unreachableStatus.Initialize(_loc);
@@ -140,17 +152,17 @@ sealed class PathCheckingSite {
       throw new InvalidOperationException(
           $"{DebugEx.BaseComponentToString(blockObject)} is not a valid construction site");
     }
+  }
 
-    var building = blockObject.GetComponentFast<Building>();
-    if (building && building.Path) {
-      var settings = blockObject.GetComponentFast<BlockObjectNavMeshSettings>();
-      if (settings && !settings.BlockAllEdges) {
-        var manuallySetEdges = settings.ManuallySetEdges().ToList();
-        if (manuallySetEdges.Count > 0) {
-          Edges = manuallySetEdges;
-        }
-      }
-    }
+  /// <summary>Initializes the NavMesh related things.</summary>
+  /// <remarks>This must be done on an object hat is already added to the game's NavMesh.</remarks>
+  void InitializeNavMesh() {
+    var navMeshObject = _blockObjectNavMesh.NavMeshObject;
+    RestrictedCoordinates = navMeshObject._restrictedCoordinates;
+    Edges = navMeshObject._addingChanges
+        .Where(x => x.NavMeshChangeType == NavMeshChangeType.AddEdge)
+        .Select(x => x.NavMeshEdge)
+        .ToList();
   }
 
   /// <summary>Gets all the needed injections from the dependency container.</summary>
@@ -164,9 +176,12 @@ sealed class PathCheckingSite {
     _navigationService = DependencyContainer.GetInstance<INavigationService>();
   }
 
-  /// <summary>Forces the <see cref="BestBuildersPath"/> update on the next access to it.</summary>
   void RequestBestPathUpdate() {
+  /// <summary>
+  /// Resets <see cref="BestBuildersPath"/> and <see cref="BestBuildersPathCorners"/> to trigger the path rebuild.
+  /// </summary>
     _bestBuildersPath = null;
+    _bestBuildersPathCorners = null;
   }
 
   /// <summary>Updates the <see cref="BestBuildersPath"/> to the site from the closets road node.</summary>
@@ -177,11 +192,15 @@ sealed class PathCheckingSite {
   /// that's the price to pay.
   /// </remarks>
   void UpdateBestPath() {
+    if (RestrictedCoordinates == null) {
+      InitializeNavMesh();
+    }
     _bestBuildersPath = new HashSet<Vector3Int>();
+    _bestBuildersPathCorners = new List<Vector3Int>();
     _bestPathRoadNodeId = -1;
     _bestPathNodeIds = new HashSet<int>();
     CanBeAccessedInPreview = false;
-    if (!_isFullyGrounded) {
+    if (!_groundedSite.IsFullyGrounded) {
       return;
     }
     if (!_accessible.enabled) {
@@ -219,6 +238,7 @@ sealed class PathCheckingSite {
       var bestRoadPosition = _nodeIdService.IdToWorld(bestRoadNode);
       var pathCorners = new List<Vector3>();
       _navigationService.FindPathUnlimitedRange(bestRoadPosition, bestAccess, pathCorners, out _);
+      _bestBuildersPathCorners = pathCorners.Select(NavigationCoordinateSystem.WorldToGridInt).ToList();
       _bestPathNodeIds = pathCorners.Select(_nodeIdService.WorldToId).ToHashSet();
       _bestBuildersPath = pathCorners.Select(NavigationCoordinateSystem.WorldToGridInt).ToHashSet();
       _bestPathRoadNodeId = bestRoadNode;
@@ -239,7 +259,7 @@ sealed class PathCheckingSite {
   /// <summary>It's expected to be called from <see cref="PathCheckingController"/> when the navmesh changes.</summary>
   /// <remarks>Don't do any logic here! Only mark the state invalid to get updated in the next tick.</remarks>
   internal void OnNavMeshUpdate(NavMeshUpdate navMeshUpdate) {
-    if (!_isFullyGrounded) {
+    if (!_groundedSite.IsFullyGrounded) {
       return;  // The ungrounded site just cannot start building.
     }
     if (_bestPathRoadNodeId == -1) {
@@ -255,11 +275,9 @@ sealed class PathCheckingSite {
 
   /// <summary>Reacts on construction complete and verifies if a non-grounded site can now start building.</summary>
   internal void OnConstructibleCompleted(Constructible constructible) {
-    if (_isFullyGrounded || !_groundedSite.IsFullyGrounded) {
-      return;
+    if (_groundedSite.IsFullyGrounded && _bestPathRoadNodeId == -1) {
+      RequestBestPathUpdate();
     }
-    _isFullyGrounded = true;
-    RequestBestPathUpdate();
   }
 
   #endregion

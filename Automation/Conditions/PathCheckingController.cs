@@ -101,9 +101,9 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
       var site = indexPair.Key;
       var conditions = indexPair.Value;
 
-      // Get it sooner to trigger path checking even on the nonblocking sites. 
-      var bestPath = site.BestBuildersPath;
-      if (bestPath.Count == 0) {  // Unreachable sites cannot get build and block, so give them a green light.
+      // Get it sooner to trigger path creation even on the nonblocking sites.
+      site.MaybeUpdateNavMesh();
+      if (site.BestBuildersPath.Count == 0) {  // The unreachable sites cannot get built and trigger the condition.
         UpdateConditions(conditions, false);
         continue;
       }
@@ -116,14 +116,13 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
 
       var checkCoords = site.Coordinates;
       var isBlocked = false;
-      var testSites = PathCheckingSite.SitesByCoordinates.Values
-          .Where(testSite => !ReferenceEquals(testSite, site));
-      foreach (var testSite in testSites) {
-        bestPath = testSite.BestBuildersPath;  // This may force the path update.
-        if (bestPath.Contains(checkCoords) && !IsNonBlockingPathSite(site, testSite)) {
-          isBlocked = true;
-          break;
+      // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
+      foreach (var testSite in PathCheckingSite.SitesByCoordinates.Values) {
+        if (ReferenceEquals(testSite, site) || !testSite.IsFullyGrounded || IsNonBlockingPathSite(site, testSite)) {
+          continue;
         }
+        isBlocked = true;
+        break;
       }
       if (!isBlocked) {
         if (_walkersTakenTiles == null) {
@@ -143,15 +142,52 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   /// negative.
   /// </remarks>
   static bool IsNonBlockingPathSite(PathCheckingSite pathSite, PathCheckingSite testSite) {
-    if (pathSite.Edges == null) {
-      return false;  // Not a path building.
-    }
-    var coordsDelta = pathSite.Coordinates - testSite.Coordinates;
-    if (coordsDelta.z > 0 || coordsDelta.x > 1 || coordsDelta.y > 1 || coordsDelta.x == coordsDelta.y) {
-      return false;
-    }
+    testSite.MaybeUpdateNavMesh();
     var testPath = testSite.BestBuildersPath;
-    return pathSite.Edges.Count(edge => testPath.Contains(edge.End)) >= 2;
+    var testPathCorners = testSite.BestBuildersPathCorners;
+    var edges = pathSite.Edges;
+    for (var i = pathSite.RestrictedCoordinates.Count - 1; i >= 0; i--) {
+      var restrictedCoordinate = pathSite.RestrictedCoordinates[i];
+      if (!testPath.Contains(restrictedCoordinate)) {
+        continue;
+      }
+      var pathPos = testPathCorners.IndexOf(pathSite.Coordinates);
+
+      // If the blocking site is at the end of the path, then just check if there is an edge to the test site.
+      if (pathPos == testPathCorners.Count - 1) {
+        var testCoords = testSite.Coordinates;
+        if (edges.FastAny(e => e.Start == restrictedCoordinate && e.End == testCoords)) {
+          continue;
+        }
+        return false;
+      }
+
+      // If the blocking site is in the middle of the path, then verify if the nodes before and after are connected by
+      // any edge.
+      var nodeAfter = testPathCorners[pathPos + 1];
+      var nodeBefore = testPathCorners[pathPos - 1];
+      var isConnectedToTestSite = false;
+      var isConnectedToTheTestPath = false;
+      for (var j = edges.Count - 1; j >= 0; j--) {
+        var edge = edges[i];
+        if (edge.Start != restrictedCoordinate) {
+          continue;
+        }
+        if (!isConnectedToTestSite && edge.End == nodeAfter) {
+          isConnectedToTestSite = true;
+        }
+        if (!isConnectedToTheTestPath && edge.End == nodeBefore) {
+          isConnectedToTheTestPath = true;
+        }
+        if (isConnectedToTestSite && isConnectedToTheTestPath) {
+          break;
+        }
+      }
+      if (!isConnectedToTestSite || !isConnectedToTheTestPath) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /// <summary>Gathers all coordinates that are taken by the characters paths.</summary>
