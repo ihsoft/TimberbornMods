@@ -155,6 +155,7 @@ sealed class PathCheckingSite {
   /// <summary>Initializes the NavMesh related things.</summary>
   /// <remarks>This must be done on an object hat is already added to the game's NavMesh.</remarks>
   void InitializeNavMesh() {
+    SiteNodeId = _nodeIdService.GridToId(BlockObject.Coordinates);
     var navMeshObject = _blockObjectNavMesh.NavMeshObject;
     RestrictedNodes = navMeshObject._restrictedCoordinates.Select(_nodeIdService.GridToId).ToList();
     NodeEdges = navMeshObject._addingChanges
@@ -195,7 +196,6 @@ sealed class PathCheckingSite {
   /// </remarks>
   void UpdateBestPath() {
     if (RestrictedNodes == null) {
-      SiteNodeId = _nodeIdService.GridToId(Coordinates);
       InitializeNavMesh();
     }
     BestBuildersPathNodeIndex = new HashSet<int>();
@@ -213,9 +213,9 @@ sealed class PathCheckingSite {
     var bestDistance = float.MaxValue;
     var bestRoadNode = -1;
     var bestAccess = Vector3.zero;
-    var worldCoords = CoordinateSystem.GridToWorld(Coordinates);
+    var minAccessHeight = CoordinateSystem.GridToWorld(BlockObject.Coordinates).y;
     var accesses = _accessible.Accesses
-        .Where(access => access.y >= worldCoords.y && _nodeIdService.Contains(access));
+        .Where(access => access.y >= minAccessHeight && _nodeIdService.Contains(access));
     foreach (var access in accesses) {
       var accessNode = _nodeIdService.WorldToId(access);
       foreach (var district in _districtCenterRegistry.AllDistrictCenters) {

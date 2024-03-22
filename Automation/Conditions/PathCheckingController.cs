@@ -147,7 +147,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   /// It only checks cases when the two sites are neighbours and at the same level. Otherwise, the result is always
   /// negative.
   /// </remarks>
-  bool IsNonBlockingPathSite(PathCheckingSite pathSite, PathCheckingSite testSite) {
+  static bool IsNonBlockingPathSite(PathCheckingSite pathSite, PathCheckingSite testSite) {
     var testPathNodes = testSite.BestBuildersPathNodeIndex;
     var testPathCorners = testSite.BestBuildersPathCornerNodes;
     var edges = pathSite.NodeEdges;
