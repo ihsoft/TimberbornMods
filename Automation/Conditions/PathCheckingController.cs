@@ -75,28 +75,31 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   #region Implementation
 
   readonly EntityComponentRegistry _entityComponentRegistry;
+  readonly NodeIdService _nodeIdService;
 
   /// <summary>All path checking conditions on the sites.</summary>
   readonly Dictionary<PathCheckingSite, List<CheckAccessBlockCondition>> _conditionsIndex = new();
 
   /// <summary>Cache of tiles that are paths to the characters on the map.</summary>
-  HashSet<Vector3Int> _walkersTakenTiles;
+  HashSet<int> _walkersTakenNodes;
 
   /// <summary>Cache of the walking characters positions.</summary>
   /// <remarks>
   /// If a character is at the site being constructed, we don't block since the game checks it naturally.
   /// </remarks>
-  HashSet<Vector3Int> _walkersCoords;
+  HashSet<int> _walkersNodes;
 
-  PathCheckingController(EntityComponentRegistry entityComponentRegistry, AutomationService automationService) {
+  PathCheckingController(EntityComponentRegistry entityComponentRegistry, AutomationService automationService,
+                         NodeIdService nodeIdService) {
     _entityComponentRegistry = entityComponentRegistry;
+    _nodeIdService = nodeIdService;
     PathCheckingSite.InjectDependencies(); // FIXME pass the values instead?
     automationService.EventBus.Register(this);
   }
 
   /// <summary>Sets the condition states based on the path access check.</summary>
   void CheckBlockedAccess() {
-    _walkersTakenTiles = null;
+    _walkersTakenNodes = null;
     foreach (var indexPair in _conditionsIndex) {
       var site = indexPair.Key;
       var conditions = indexPair.Value;
@@ -115,6 +118,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
       }
 
       var checkCoords = site.Coordinates;
+      var checkNodeId = _nodeIdService.GridToId(checkCoords);
       var isBlocked = false;
       // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
       foreach (var testSite in PathCheckingSite.SitesByCoordinates.Values) {
@@ -125,10 +129,10 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
         break;
       }
       if (!isBlocked) {
-        if (_walkersTakenTiles == null) {
+        if (_walkersTakenNodes == null) {
           BuildWalkersIndex();
         }
-        isBlocked = _walkersTakenTiles.Contains(checkCoords) && !_walkersCoords.Contains(checkCoords);
+        isBlocked = _walkersTakenNodes.Contains(checkNodeId) && !_walkersNodes.Contains(checkNodeId);
       }
       UpdateConditions(conditions, isBlocked);
     }
@@ -155,6 +159,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
 
       // If the blocking site is at the end of the path, then just check if there is an edge to the test site.
       if (pathPos == testPathCorners.Count - 1) {
+        //FIXME: check an edge to the accessible instead of the blockobject coords.
         var testCoords = testSite.Coordinates;
         if (edges.FastAny(e => e.Start == restrictedCoordinate && e.End == testCoords)) {
           continue;
@@ -193,22 +198,22 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   /// <summary>Gathers all coordinates that are taken by the characters paths.</summary>
   /// <remarks>We don't want to let the builders get stranded.</remarks>
   void BuildWalkersIndex() {
-    _walkersTakenTiles = new HashSet<Vector3Int>();
-    _walkersCoords = new HashSet<Vector3Int>();
+    _walkersTakenNodes = new HashSet<int>();
+    _walkersNodes = new HashSet<int>();
     var walkers = _entityComponentRegistry
         .GetEnabled<BlockOccupant>()
         .Select(x => x.GetComponentFast<Walker>())
         .Where(x => x);
     foreach (var walker in walkers) {
-      _walkersCoords.Add(NavigationCoordinateSystem.WorldToGridInt(walker.TransformFast.position));
+      _walkersNodes.Add(_nodeIdService.WorldToId(walker.TransformFast.position));
       var pathFollower = walker._pathFollower;
       if (pathFollower._pathCorners == null) {
         continue;  // No path, no problem.
       }
       var activePathCorners = pathFollower._pathCorners
           .Skip(pathFollower._nextCornerIndex - 1)
-          .Select(CoordinateSystem.WorldToGridInt);
-      _walkersTakenTiles.AddRange(activePathCorners);
+          .Select(_nodeIdService.WorldToId);
+      _walkersTakenNodes.AddRange(activePathCorners);
     }
   }
 
