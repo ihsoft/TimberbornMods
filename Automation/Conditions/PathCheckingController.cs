@@ -2,8 +2,11 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using Automation.Core;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
@@ -32,7 +35,14 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
 
   /// <inheritdoc/>
   public void Tick() {
+    if (Features.PathCheckingControllerProfiling) {
+      _stopwatch.Start();
+    }
     CheckBlockedAccess();
+    if (Features.PathCheckingControllerProfiling) {
+      _stopwatch.Stop();
+      Profile();
+    }
   }
 
   #endregion
@@ -182,12 +192,64 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
 
   #endregion
 
+  #region Profiling tools
+
+  readonly Stopwatch _stopwatch = new();
+  const int StatsTicksThreshold = 20;
+
+  int _tickTillStat = StatsTicksThreshold;
+  int _totalSites;
+  int _maxSites;
+  int _totalSitesUpdated;
+  int _maxSitesUpdated;
+  int _sitesUpdatedInTick;
+  long _totalStopwatchTicks;
+  long _maxStopwatchTicks;
+
+  static string FormatMillis(long stopwatchTicks) {
+    return $"{1000f * stopwatchTicks / Stopwatch.Frequency:0.###}ms";
+  }
+
+  void Profile() {
+    _maxStopwatchTicks = Math.Max(_maxStopwatchTicks, _stopwatch.ElapsedTicks);
+    _totalStopwatchTicks += _maxStopwatchTicks;
+    _totalSites += _conditionsIndex.Count;
+    _maxSites = Math.Max(_maxSites, _conditionsIndex.Count);
+    _maxSitesUpdated = Math.Max(_maxSitesUpdated, _sitesUpdatedInTick);
+    _totalSitesUpdated += _sitesUpdatedInTick;
+    _sitesUpdatedInTick = 0;
+    if (--_tickTillStat <= 0) {
+      _tickTillStat = StatsTicksThreshold;
+      var info = new StringBuilder();
+      info.AppendFormat("**** Stats for PathCheckingController, {0} ticks window:\n", StatsTicksThreshold);
+      info.AppendFormat(
+          "Cost: avg={0}, total={1}, max={2}\n", FormatMillis(_totalStopwatchTicks / StatsTicksThreshold),
+          FormatMillis(_totalStopwatchTicks), FormatMillis(_maxStopwatchTicks));
+      info.AppendFormat("Sites: avg={0:0.##}, max={1}\n", (float)_totalSites / StatsTicksThreshold, _maxSites);
+      info.AppendFormat("Updates: avg={0}, total={1}, max={2}\n",
+                        (float)_totalSitesUpdated / StatsTicksThreshold, _totalSitesUpdated, _maxSitesUpdated);
+      DebugEx.Info(info.ToString());
+      _totalSites = 0;
+      _maxSites = 0;
+      _totalSitesUpdated = 0;
+      _maxSitesUpdated = 0;
+      _totalStopwatchTicks = 0;
+      _maxStopwatchTicks = 0;
+      _stopwatch.Reset();
+    }
+  }
+
+  #endregion
+
   #region ISingletonNavMeshListener implemenation
 
   /// <inheritdoc/>
   public void OnNavMeshUpdated(NavMeshUpdate navMeshUpdate) {
     foreach (var site in PathCheckingSite.SitesByCoordinates.Values) {
       site.OnNavMeshUpdate(navMeshUpdate);
+      if (site.NeedsBestPathUpdate) {
+        _sitesUpdatedInTick++;
+      }
     }
   }
 
@@ -212,6 +274,9 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
     site.Destroy();
     foreach (var updateSite in PathCheckingSite.SitesByCoordinates.Values) {
       updateSite.OnConstructibleCompleted(@event.Constructible);
+      if (updateSite.NeedsBestPathUpdate) {
+        _sitesUpdatedInTick++;
+      }
     }
   }
 
