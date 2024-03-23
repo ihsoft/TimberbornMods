@@ -4,7 +4,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using Automation.AutomationSystem;
 using Bindito.Core;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
@@ -100,11 +102,25 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   /// <seealso cref="BestBuildersPathCornerNodes"/>
   public void MaybeUpdateNavMesh() {
     if (NeedsBestPathUpdate) {
+      if (Features.PathCheckingControllerProfiling) {
+        SitePathsUpdated++;
+        UpdatePathsStopWatch.Start();
+      }
       UpdateBestPath();
+      if (Features.PathCheckingControllerProfiling) {
+        UpdatePathsStopWatch.Stop();
+      }
     }
   }
 
   // ReSharper restore MemberCanBePrivate.Global
+  #endregion
+
+  #region Profiling support
+
+  internal static int SitePathsUpdated;
+  internal static readonly Stopwatch UpdatePathsStopWatch = new();
+
   #endregion
 
   #region Implementation

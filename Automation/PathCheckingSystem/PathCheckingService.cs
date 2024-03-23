@@ -258,42 +258,53 @@ sealed class PathCheckingService : ITickableSingleton {
   int _tickTillStat = StatsTicksThreshold;
   int _totalSites;
   int _maxSites;
+  long _totalUpdatesTicks;
+  long _maxUpdatesTicks;
   int _totalSitesUpdated;
   int _maxSitesUpdated;
-  int _sitesUpdatedInTick;
   long _totalStopwatchTicks;
   long _maxStopwatchTicks;
 
-  static string FormatMillis(long stopwatchTicks) {
+  static string FormatTicksAsMs(long stopwatchTicks) {
     return $"{1000f * stopwatchTicks / Stopwatch.Frequency:0.###}ms";
   }
 
   void Profile() {
     _maxStopwatchTicks = Math.Max(_maxStopwatchTicks, _stopwatch.ElapsedTicks);
     _totalStopwatchTicks += _maxStopwatchTicks;
+    _maxUpdatesTicks = Math.Max(_maxUpdatesTicks, PathCheckingSite.UpdatePathsStopWatch.ElapsedTicks);
+    _totalUpdatesTicks += PathCheckingSite.UpdatePathsStopWatch.ElapsedTicks;
     _totalSites += _conditionsIndex.Count;
     _maxSites = Math.Max(_maxSites, _conditionsIndex.Count);
-    _maxSitesUpdated = Math.Max(_maxSitesUpdated, _sitesUpdatedInTick);
-    _totalSitesUpdated += _sitesUpdatedInTick;
-    _sitesUpdatedInTick = 0;
+    _maxSitesUpdated = Math.Max(_maxSitesUpdated, PathCheckingSite.SitePathsUpdated);
+    _totalSitesUpdated += PathCheckingSite.SitePathsUpdated;
+    PathCheckingSite.SitePathsUpdated = 0;
     if (--_tickTillStat <= 0) {
       _tickTillStat = StatsTicksThreshold;
       var info = new StringBuilder();
       info.AppendFormat("**** Stats for PathCheckingController, {0} ticks window:\n", StatsTicksThreshold);
       info.AppendFormat(
-          "Cost: avg={0}, total={1}, max={2}\n", FormatMillis(_totalStopwatchTicks / StatsTicksThreshold),
-          FormatMillis(_totalStopwatchTicks), FormatMillis(_maxStopwatchTicks));
+          "PathCheckingService cost: avg={0}, total={1}, max={2}\n",
+          FormatTicksAsMs(_totalStopwatchTicks / StatsTicksThreshold),
+          FormatTicksAsMs(_totalStopwatchTicks), FormatTicksAsMs(_maxStopwatchTicks));
+      info.AppendFormat(
+          "PathCheckingSite cost: avg={0}, total={1}, max={2}\n",
+          FormatTicksAsMs(_totalUpdatesTicks / StatsTicksThreshold),
+          FormatTicksAsMs(_totalUpdatesTicks), FormatTicksAsMs(_maxUpdatesTicks));
       info.AppendFormat("Sites: avg={0:0.##}, max={1}\n", (float)_totalSites / StatsTicksThreshold, _maxSites);
       info.AppendFormat("Updates: avg={0}, total={1}, max={2}\n",
                         (float)_totalSitesUpdated / StatsTicksThreshold, _totalSitesUpdated, _maxSitesUpdated);
       DebugEx.Info(info.ToString());
       _totalSites = 0;
       _maxSites = 0;
+      _totalUpdatesTicks = 0;
+      _maxUpdatesTicks = 0;
       _totalSitesUpdated = 0;
       _maxSitesUpdated = 0;
       _totalStopwatchTicks = 0;
       _maxStopwatchTicks = 0;
       _stopwatch.Reset();
+      PathCheckingSite.UpdatePathsStopWatch.Reset();
     }
   }
 
