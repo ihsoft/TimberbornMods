@@ -178,11 +178,11 @@ sealed class PathCheckingSite {
     _navigationService = DependencyContainer.GetInstance<INavigationService>();
   }
 
-  void RequestBestPathUpdate() {
   /// <summary>
   /// Resets <see cref="BestBuildersPathNodeIndex"/> and <see cref="BestBuildersPathCornerNodes"/> to trigger the path
   /// rebuild.
   /// </summary>
+  void RequestBestPathUpdate() {
     BestBuildersPathNodeIndex = null;
     BestBuildersPathCornerNodes = null;
   }
