@@ -18,6 +18,7 @@ using Timberborn.ConstructibleSystem;
 using Timberborn.EntitySystem;
 using Timberborn.MapIndexSystem;
 using Timberborn.Persistence;
+using Timberborn.SelectionSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.SoilBarrierSystem;
 using Timberborn.TerrainSystem;
@@ -36,7 +37,7 @@ namespace IgorZ.TimberCommons.IrrigationSystem {
 /// </remarks>
 public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateListener,
                                         IPostTransformChangeListener, IPausableComponent, ILateTickable,
-                                        IPersistentEntity {
+                                        IPersistentEntity, ISelectionListener {
 
   #region Unity conrolled fields
   // ReSharper disable InconsistentNaming
@@ -46,12 +47,6 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   [SerializeField]
   [Tooltip("The max distance from the building boundaries at which the tiles can get water.")]
   internal int _irrigationRange = 10;
-
-  /// <summary>The optional name to use to group irrigation ranges in preview.</summary>
-  [SerializeField]
-  [Tooltip("When a building with range is selected, the ranges with the same name will be shown for all other"
-      + " buildings. Leave this field empty to let all towers of any kind to show their ranges at the same time.")]
-  internal string _rangeName = "";
 
   /// <summary>
   /// Indicates that only foundation tiles with "ground only" setting will be considered when searching for the eligible
@@ -138,7 +133,21 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   /// <inheritdoc />
   public IEnumerable<string> RangeNames() {
-    yield return _rangeName.Length > 0 ? _rangeName : typeof(IrrigationTower).FullName;
+    yield return typeof(IrrigationTower).FullName;
+  }
+
+  #endregion
+
+  #region IPostTransformChangeListener implementation
+  
+  /// <inheritdoc />
+  public void OnSelect() {
+    _towerSelected = true;
+  }
+
+  /// <inheritdoc />
+  public void OnUnselect() {
+    _towerSelected = false;
   }
 
   #endregion
@@ -189,7 +198,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   #region Overridable methods
 
-  /// <summary>Indicates if the tower has everything to moisturizing the tiles.</summary>
+  /// <summary>Indicates if the tower has everything to moisturize the tiles.</summary>
   protected abstract bool CanMoisturize();
 
   /// <summary>Notifies that the irrigation started.</summary>
@@ -293,6 +302,15 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <seealso cref="GetTiles"/>
   HashSet<int> _irrigationBarriers = new();
 
+  /// <summary>Indicates if any tower is selected. This enables the highlighting range update.</summary>
+  static bool _towerSelected;
+
+  /// <summary>
+  /// Indicates how many ticks need to be skipped before actually updating the state due to the efficiency change.
+  /// </summary>
+  /// <remarks>Value of <c>-1</c> means this setting should be disregarded.</remarks>
+  int _delayEfficiencyChangeUpdateTicks = -1;
+
   /// <summary>It must be public for the injection logic to work.</summary>
   [Inject]
   public void InjectDependencies(ITerrainService terrainService, SoilBarrierMap soilBarrierMap,
@@ -315,17 +333,28 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <remarks>If case of there are changes in the irrigating tiles, the moisturising will be stopped.</remarks>
   /// <seealso cref="_needMoistureSystemUpdate"/>
   void UpdateState() {
-    // Efficiency affects the irrigated radius.
+    // Efficiency affects the irrigated radius. It can fluctuate during one tick, so delay the decision.
     var newEfficiency = _savedEfficiency >= 0 ? _savedEfficiency : GetEfficiency();
-    if (Mathf.Abs(_currentEfficiency - newEfficiency) > float.Epsilon) {
-      HostedDebugLog.Fine(this, "Efficiency changed: {0} => {1}", _currentEfficiency, newEfficiency);
-      _currentEfficiency = newEfficiency;
-      _needMoistureSystemUpdate = true;
+    if (Mathf.Abs(_currentEfficiency - newEfficiency) >= float.Epsilon) {
+      if (_delayEfficiencyChangeUpdateTicks < 0) {  // Skip, if there is another request pending.
+        _delayEfficiencyChangeUpdateTicks = 2;  // The code right below will expend 1 tick.
+      }
+    } else {
+      _delayEfficiencyChangeUpdateTicks = -1;  // The efficiency is back to normal, no update needed.
+    }
+
+    // Check for the delayed efficiency change.
+    if (_delayEfficiencyChangeUpdateTicks > 0) {
+      if (--_delayEfficiencyChangeUpdateTicks == 0) {
+        _needMoistureSystemUpdate = true;
+      }
     }
 
     // Sync the state.
     if (_needMoistureSystemUpdate) {
       _needMoistureSystemUpdate = false;
+      _currentEfficiency = newEfficiency;
+      _delayEfficiencyChangeUpdateTicks = -1; 
       (EligibleTiles, _irrigationObstacles, _irrigationBarriers) = GetTiles(range: _irrigationRange, skipChecks: false);
       var newIrrigatedTiles = _irrigationRange == EffectiveRange
           ? EligibleTiles
@@ -336,7 +365,9 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
       HostedDebugLog.Fine(this, "Covered tiles updated: eligible={0}, irrigated={1}, utilization={2}, efficiency={3}",
                           EligibleTiles.Count, ReachableTiles.Count, Coverage, _currentEfficiency);
       UpdateConsumptionRate();
-      GetComponentFast<BuildingWithRangeUpdater>().OnPostTransformChanged();
+      if (_towerSelected) {
+        GetComponentFast<BuildingWithRangeUpdater>().OnPostTransformChanged();
+      }
     }
 
     if (_savedEfficiency >= 0) {

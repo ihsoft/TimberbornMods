@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using Bindito.Core;
 using IgorZ.TimberCommons.Common;
+using IgorZ.TimberDev.UI;
 using IgorZ.TimberDev.Utils;
 using TimberApi.SceneSystem;
 using TimberApi.ConfiguratorSystem;
@@ -25,10 +26,9 @@ sealed class Configurator : IConfigurator {
         typeof(GoodConsumingBuildingDescriberPatch),
         typeof(ManufactoryInventoryFragmentInitializeFragmentPatch),
         typeof(ManufactoryInventoryFragmentUpdateFragmentPatch),
+        typeof(GoodConsumingBuildingFragmentPatch),
     };
-    if (Features.GoodConsumingBuildingUIDaysHoursForAll) {
-      patches.Add(typeof(GoodConsumingBuildingFragmentPatch));
-    }
+    CommonFormats.ResetCachedLocStrings();
     if (Features.GrowableGrowthTimeUIDaysHoursViewForAll) {
       patches.Add(typeof(GrowableToolPanelItemFactoryPatch));
       patches.Add(typeof(GrowableFragmentPatch));

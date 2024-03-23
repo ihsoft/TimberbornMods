@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using Timberborn.Localization;
 using UnityEngine;
 
@@ -13,11 +14,30 @@ namespace IgorZ.TimberDev.UI {
 public static class CommonFormats {
   const string DaysLocKey = "Time.DaysShort";
   const string HoursLocKey = "Time.HoursShort";
-  const string SupplyRemainingLocKey = "IgorZ.TimberCommons.WaterTower.SupplyRemaining";
+  const string SupplyRemainingLocKey = "GoodConsuming.SupplyRemaining";
+  static string _localizedSupplyRemainingTmpl;
+
+  /// <summary>Reset static caches of localized strings.</summary>
+  /// <remarks>
+  /// Call it from the configurator to pickup the current game language. If not called, then the cached strings won't
+  /// change until next game restart.
+  /// </remarks>
+  public static void ResetCachedLocStrings() {
+    _localizedSupplyRemainingTmpl = null;
+  }
 
   /// <summary>Formats a string for the "supply last" case.</summary>
+  /// <remarks>
+  /// It makes "supply lasts" localized string from the stock message. The cached value won;t update until game restart
+  /// or <see cref="ResetCachedLocStrings"/> is called.
+  /// </remarks>
+  /// <seealso cref="ResetCachedLocStrings"/>
   public static string FormatSupplyLeft(ILoc loc, float hours) {
-    return loc.T(SupplyRemainingLocKey, DaysHoursFormat(loc, hours));
+    if (_localizedSupplyRemainingTmpl == null) {
+      var original = loc.T(SupplyRemainingLocKey, "###");
+      _localizedSupplyRemainingTmpl = original.Substring(0, original.IndexOf("###", StringComparison.Ordinal)) + "{0}";
+    }
+    return string.Format(_localizedSupplyRemainingTmpl, DaysHoursFormat(loc, hours));
   }
 
   /// <summary>Gives a VERY short form of the "hours amount".</summary>

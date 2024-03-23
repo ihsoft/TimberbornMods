@@ -5,3 +5,11 @@ IgorZ.TimberCommons.WaterValve.WaterDepthAtIntake,"Tiefe am Zufluss: {0:0.00}"
 IgorZ.TimberCommons.WaterValve.WaterDepthAtOuttake,"Tiefe am Abfluss: {0:0.00}"
 IgorZ.TimberCommons.WaterValve.DisableLevelCheckAtOutput,"Keine Überprüfung des Wasserstands
 am Abfluss"
+
+IgorZ.TimberCommons.WaterTower.Utilization,"Genutztes Potenzial: {0:0.#}%"
+IgorZ.TimberCommons.WaterTower.IrrigatedArea,"Abgedeckte Fläche: {0}"
+IgorZ.TimberCommons.WaterTower.EffectiveRange,"Wirksamer Bereich: {0}"
+IgorZ.TimberCommons.WaterTower.NoTilesToIrrigate,"Keine erreichbaren Flächen zum Bewässern"
+
+IgorZ.TimberCommons.GrowthRateModifier.BoostPercentile,"Wachstumsförderung: <GreenHighlight>🡅</GreenHighlight>{0:0.#}%","Wachstumsförderung ist ein positiver Effekt."
+IgorZ.TimberCommons.GrowthRateModifier.SlowdownPercentile,"Wachstumsminderung: <RedHighlight>🡇</RedHighlight>{0:0.#}%","Wachstumsminderung ist ein negativer Effekt."

@@ -72,6 +72,8 @@
       <Compile Include="..\UnityDevLite\TypeUtils.cs">
         <Link>UnityDevLite\TypeUtils.cs</Link>
       </Compile>
+      <Compile Include="CommonQoLPatches\Configurator.cs" />
+      <Compile Include="CommonQoLPatches\ContaminationApplierTryApplyContaminationPatch.cs" />
       <Compile Include="CommonUIPatches\Configurator.cs" />
       <Compile Include="CommonUIPatches\GoodConsumingBuildingDescriberPatch.cs" />
       <Compile Include="CommonUIPatches\GoodConsumingBuildingFragmentPatch.cs" />
@@ -201,6 +203,9 @@
       <Reference Include="Timberborn.MapIndexSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.MapIndexSystem.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.Navigation, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.Navigation.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.Particles, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.Particles.dll</HintPath>
       </Reference>
@@ -216,8 +221,14 @@
       <Reference Include="Timberborn.SceneLoading, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.SceneLoading.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.SelectionSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.SelectionSystem.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.SingletonSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.SingletonSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.StatusSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.StatusSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.TemplateSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.TemplateSystem.dll</HintPath>
@@ -263,6 +274,7 @@
       <Reference Include="..\Dependencies\Timberborn\Timberborn.GrowingUI.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.WorkshopsUI.dll" Publicize="true" />
       <Reference Include="Timberborn.TerrainSystem" Publicize="true" />
+      <Reference Include="Timberborn.BeaverContaminationSystem" Publicize="true" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
