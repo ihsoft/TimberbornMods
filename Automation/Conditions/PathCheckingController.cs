@@ -116,7 +116,6 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
         continue;
       }
 
-      var checkNodeId = site.SiteNodeId;
       var isBlocked = false;
       // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
       foreach (var testSite in PathCheckingSite.SitesByBlockObject.Values) {
@@ -134,7 +133,7 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
         if (_walkersTakenNodes == null) {
           BuildWalkersIndex();
         }
-        isBlocked = _walkersTakenNodes.Contains(checkNodeId) && !_walkersNodes.Contains(checkNodeId);
+        isBlocked = site.RestrictedNodes.FastAny(x => _walkersTakenNodes.Contains(x));
       }
       UpdateConditions(conditions, isBlocked);
     }
@@ -213,6 +212,10 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
           .Skip(pathFollower._nextCornerIndex - 1)
           .Select(_nodeIdService.WorldToId);
       _walkersTakenNodes.AddRange(activePathCorners);
+    }
+    // Remove nodes that the walkers are currently at due to it's checked by the stock logic.
+    foreach (var walkersNode in _walkersNodes) {
+      _walkersTakenNodes.Remove(walkersNode);
     }
   }
 
