@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using Automation.Core;
+using Automation.PathCheckingSystem;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.BuildingsNavigation;
 using Timberborn.Persistence;
@@ -48,12 +49,12 @@ public sealed class CheckAccessBlockCondition : AutomationConditionBase {
 
   /// <inheritdoc/>
   protected override void OnBehaviorAssigned() {
-    DependencyContainer.GetInstance<PathCheckingController>().AddCondition(this);
+    DependencyContainer.GetInstance<PathCheckingService>().AddCondition(this);
   }
 
   /// <inheritdoc/>
   protected override void OnBehaviorToBeCleared() {
-    DependencyContainer.GetInstance<PathCheckingController>().RemoveCondition(this);
+    DependencyContainer.GetInstance<PathCheckingService>().RemoveCondition(this);
   }
   #endregion
 

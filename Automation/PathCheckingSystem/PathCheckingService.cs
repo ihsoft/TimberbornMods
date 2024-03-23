@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using Automation.Conditions;
 using Automation.Core;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
@@ -19,14 +20,14 @@ using Timberborn.TickSystem;
 using Timberborn.WalkingSystem;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace Automation.Conditions {
+namespace Automation.PathCheckingSystem {
 
 /// <summary>The component that handles all path checking conditions.</summary>
 /// <remarks>
 /// It cannot be handled in scope of just one condition due to all of them are interconnected (they can affect each
 /// other). This controller has "the full picture" and orchestrates all the conditions.
 /// </remarks>
-sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListener {
+sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener {
   const float MaxCompletionProgress = 0.8f;
 
   #region ITickableSingleton implementation
@@ -87,8 +88,8 @@ sealed class PathCheckingController : ITickableSingleton, ISingletonNavMeshListe
   /// </remarks>
   HashSet<int> _walkersNodes;
 
-  PathCheckingController(EntityComponentRegistry entityComponentRegistry, AutomationService automationService,
-                         NodeIdService nodeIdService) {
+  PathCheckingService(EntityComponentRegistry entityComponentRegistry, AutomationService automationService,
+                      NodeIdService nodeIdService) {
     _entityComponentRegistry = entityComponentRegistry;
     _nodeIdService = nodeIdService;
     PathCheckingSite.InjectDependencies(); // FIXME pass the values instead?

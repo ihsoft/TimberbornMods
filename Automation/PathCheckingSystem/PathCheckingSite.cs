@@ -24,7 +24,7 @@ using Timberborn.StatusSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
-namespace Automation.Conditions {
+namespace Automation.PathCheckingSystem {
 
 /// <summary>Container for the path blocking site.</summary>
 sealed class PathCheckingSite {
@@ -258,7 +258,7 @@ sealed class PathCheckingSite {
 
   #region Callbacks for the state update
 
-  /// <summary>It's expected to be called from <see cref="PathCheckingController"/> when the navmesh changes.</summary>
+  /// <summary>It's expected to be called from <see cref="PathCheckingService"/> when the navmesh changes.</summary>
   /// <remarks>Don't do any logic here! Only mark the state invalid to get updated in the next tick.</remarks>
   internal void OnNavMeshUpdate(NavMeshUpdate navMeshUpdate) {
     if (!_groundedSite.IsFullyGrounded) {

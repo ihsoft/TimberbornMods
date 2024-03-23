@@ -6,13 +6,13 @@ using Bindito.Core;
 using TimberApi.ConfiguratorSystem;
 using TimberApi.SceneSystem;
 
-namespace Automation.Conditions {
+namespace Automation.PathCheckingSystem {
 
 // ReSharper disable once UnusedType.Global
 [Configurator(SceneEntrypoint.InGame)]
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
-    containerDefinition.Bind<PathCheckingController>().AsSingleton();
+    containerDefinition.Bind<PathCheckingService>().AsSingleton();
   }
 }
 
