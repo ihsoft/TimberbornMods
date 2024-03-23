@@ -9,8 +9,6 @@ using TimberApi.DependencyContainerSystem;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BlockSystemNavigation;
-using Timberborn.BuilderHubSystem;
-using Timberborn.BuildingsBlocking;
 using Timberborn.BuildingsNavigation;
 using Timberborn.Common;
 using Timberborn.ConstructibleSystem;
@@ -19,8 +17,6 @@ using Timberborn.Coordinates;
 using Timberborn.GameDistricts;
 using Timberborn.Localization;
 using Timberborn.Navigation;
-using Timberborn.SelectionSystem;
-using Timberborn.StatusSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
@@ -82,7 +78,7 @@ sealed class PathCheckingSite {
 
   /// <summary>Drops the site and all internal caches associated with it.</summary>
   public void Destroy() {
-    _unreachableStatus.Cleanup();
+    _statusTracker.Cleanup();
   }
 
   /// <summary>Verifies that the all NavMesh related things are up to date on the site.</summary>
@@ -110,7 +106,7 @@ sealed class PathCheckingSite {
   static INavigationService _navigationService;
 
   readonly Accessible _accessible;
-  readonly UnreachableStatus _unreachableStatus;
+  readonly PathCheckingSiteStatusTracker _statusTracker;
   readonly GroundedConstructionSite _groundedSite;
   readonly BlockObjectNavMesh _blockObjectNavMesh;
 
@@ -122,11 +118,11 @@ sealed class PathCheckingSite {
     ConstructionSite = BlockObject.GetComponentFast<ConstructionSite>();
     _groundedSite = BlockObject.GetComponentFast<GroundedConstructionSite>();
     _accessible = BlockObject.GetComponentFast<ConstructionSiteAccessible>().Accessible;
-    _unreachableStatus = BlockObject.GetComponentFast<UnreachableStatus>();
     _blockObjectNavMesh = BlockObject.GetComponentFast<BlockObjectNavMesh>();
-    if (!_unreachableStatus) {
-      _unreachableStatus = _baseInstantiator.AddComponent<UnreachableStatus>(BlockObject.GameObjectFast);
-      _unreachableStatus.Initialize(_loc);
+    _statusTracker = BlockObject.GetComponentFast<PathCheckingSiteStatusTracker>();
+    if (!_statusTracker) {
+      _statusTracker = _baseInstantiator.AddComponent<PathCheckingSiteStatusTracker>(BlockObject.GameObjectFast);
+      _statusTracker.Initialize(_loc);
     }
     if (!ConstructionSite || !_groundedSite || !_accessible) {
       throw new InvalidOperationException(
@@ -226,12 +222,12 @@ sealed class PathCheckingSite {
       BestBuildersPathCornerNodes = pathCorners.Select(_nodeIdService.WorldToId).ToList();
       BestBuildersPathNodeIndex = pathCorners.Select(_nodeIdService.WorldToId).ToHashSet();
       _bestPathRoadNodeId = bestRoadNode;
-      _unreachableStatus.Cleanup();
+      _statusTracker.Cleanup();
     } else {
       if (CanBeAccessedInPreview) {
-        _unreachableStatus.SetMaybeReachable();
+        _statusTracker.SetMaybeReachable();
       } else {
-        _unreachableStatus.SetUnreachable();
+        _statusTracker.SetUnreachable();
       }
     }
   }
@@ -262,86 +258,6 @@ sealed class PathCheckingSite {
     if (_groundedSite.IsFullyGrounded && _bestPathRoadNodeId == -1) {
       RequestBestPathUpdate();
     }
-  }
-
-  #endregion
-
-  #region BaseComponent for custom unreachable status
-
-  internal sealed class UnreachableStatus : BaseComponent, ISelectionListener {
-    const string NotYetReachableLocKey = "IgorZ.Automation.CheckAccessBlockCondition.NotYetReachable";
-    const string UnreachableStatusLocKey = "IgorZ.Automation.CheckAccessBlockCondition.UnreachableStatus";
-    const string UnreachableAlertLocKey = "IgorZ.Automation.CheckAccessBlockCondition.UnreachableAlert";
-    const string UnreachableIconName = "UnreachableObject";
-
-    StatusToggle _unreachableStatusToggle;
-    StatusToggle _maybeReachableStatusToggle;
-    BlockableBuilding _blockableBuilding;
-    BuilderJobReachabilityStatus _builderJobReachabilityStatus;
-    bool _isSelected;
-
-    void Awake() {
-      _blockableBuilding = GetComponentFast<BlockableBuilding>();
-      _builderJobReachabilityStatus = GetComponentFast<BuilderJobReachabilityStatus>();
-    }
-
-    /// <summary>Initializes the component since the normal Bindito logic doesn't work here.</summary>
-    public void Initialize(ILoc loc) {
-      _unreachableStatusToggle = StatusToggle.CreatePriorityStatusWithAlertAndFloatingIcon(
-          UnreachableIconName, loc.T(UnreachableStatusLocKey), loc.T(UnreachableAlertLocKey));
-      GetComponentFast<StatusSubject>().RegisterStatus(_unreachableStatusToggle);
-      _maybeReachableStatusToggle = StatusToggle.CreateNormalStatus(UnreachableIconName, loc.T(NotYetReachableLocKey));
-      GetComponentFast<StatusSubject>().RegisterStatus(_maybeReachableStatusToggle);
-    }
-
-    /// <summary>
-    /// The unreachable sites cannot be built.
-    /// </summary>
-    /// <remarks>
-    /// Our meaning of "unreachable" can be different from the game's point of view. For the algorithm, it's important
-    /// to not have such sites started until we allow it to. Thus, we block such sites.
-    /// </remarks>
-    public void SetUnreachable() {
-      _unreachableStatusToggle.Activate();
-      _maybeReachableStatusToggle.Deactivate();
-      _blockableBuilding.Block(this);
-    }
-
-    public void SetMaybeReachable() {
-      _unreachableStatusToggle.Deactivate();
-      _maybeReachableStatusToggle.Activate();
-      _blockableBuilding.Block(this);
-    }
-
-    /// <summary>A cleanup method that resets all effect on the site.</summary>
-    public void Cleanup() {
-      _unreachableStatusToggle.Deactivate();
-      _maybeReachableStatusToggle.Deactivate();
-      _blockableBuilding.Unblock(this);
-      if (_isSelected && _builderJobReachabilityStatus) {
-        _builderJobReachabilityStatus.OnSelect();
-      }
-    }
-
-    #region ISelectionListener implemenation
-
-    /// <inheritdoc/>
-    public void OnSelect() {
-      _isSelected = true;
-      if (!_builderJobReachabilityStatus) {
-        return;
-      }
-      if (_unreachableStatusToggle.IsActive || _maybeReachableStatusToggle.IsActive) {
-        _builderJobReachabilityStatus.OnUnselect();  // We show our own status.
-      }
-    }
-
-    /// <inheritdoc/>
-    public void OnUnselect() {
-      _isSelected = false;
-    }
-
-    #endregion
   }
 
   #endregion
