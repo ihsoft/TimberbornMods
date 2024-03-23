@@ -358,9 +358,13 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
 
   #endregion
 
+  #region IDeletableEntity implementation
+
   public void DeleteEntity() {
     CleanupComponent();
   }
+
+  #endregion
 }
 
 }
