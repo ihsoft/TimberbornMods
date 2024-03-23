@@ -50,13 +50,13 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
 
   /// <summary>Add the path checking condition to monitor.</summary>
   public void AddCondition(CheckAccessBlockCondition condition) {
-    var site = PathCheckingSite.GetOrCreate(condition.Behavior.BlockObject);
+    var site = GetOrCreate(condition.Behavior.BlockObject);
     _conditionsIndex.GetOrAdd(site).Add(condition);
   }
 
   /// <summary>Removes the path checking condition from monitor and resets all caches.</summary>
   public void RemoveCondition(CheckAccessBlockCondition condition) {
-    if (!PathCheckingSite.SitesByBlockObject.TryGetValue(condition.Behavior.BlockObject, out var site)) {
+    if (!_sitesByBlockObject.TryGetValue(condition.Behavior.BlockObject, out var site)) {
       DebugEx.Warning("Unknown condition {0} on behavior {1}", condition, condition.Behavior);
       return;
     }
@@ -65,6 +65,7 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
       if (valueList.Count == 0) {
         _conditionsIndex.Remove(site);
         site.Destroy();
+        _sitesByBlockObject.Remove(condition.Behavior.BlockObject);
       }
     }
   }
@@ -78,6 +79,9 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
 
   /// <summary>All path checking conditions on the sites.</summary>
   readonly Dictionary<PathCheckingSite, List<CheckAccessBlockCondition>> _conditionsIndex = new();
+
+  /// <summary>All path sites index by blockobject.</summary>
+  readonly Dictionary<BlockObject, PathCheckingSite> _sitesByBlockObject = new();
 
   /// <summary>Cache of tiles that are paths to the characters on the map.</summary>
   HashSet<int> _walkersTakenNodes;
@@ -119,7 +123,7 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
 
       var isBlocked = false;
       // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
-      foreach (var testSite in PathCheckingSite.SitesByBlockObject.Values) {
+      foreach (var testSite in _sitesByBlockObject.Values) {
         testSite.MaybeUpdateNavMesh();
         if (ReferenceEquals(testSite, site)
             || !testSite.IsFullyGrounded
@@ -231,7 +235,17 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
   bool TryGetSite(BaseComponent component, out PathCheckingSite site) {
     var blockObject = component.GetComponentFast<BlockObject>();
     site = null;
-    return blockObject && PathCheckingSite.SitesByBlockObject.TryGetValue(blockObject, out site);
+    return blockObject && _sitesByBlockObject.TryGetValue(blockObject, out site);
+  }
+
+  /// <summary>Finds the existing construction site or creates a new one.</summary>
+  PathCheckingSite GetOrCreate(BlockObject blockObject) {
+    if (!_sitesByBlockObject.TryGetValue(blockObject, out var cachedSite)) {
+      var site = new PathCheckingSite(blockObject);
+      _sitesByBlockObject.Add(blockObject, site);
+      cachedSite = site;
+    }
+    return cachedSite;
   }
 
   #endregion
@@ -289,7 +303,7 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
 
   /// <inheritdoc/>
   public void OnNavMeshUpdated(NavMeshUpdate navMeshUpdate) {
-    foreach (var site in PathCheckingSite.SitesByBlockObject.Values) {
+    foreach (var site in _sitesByBlockObject.Values) {
       site.OnNavMeshUpdate(navMeshUpdate);
       if (site.NeedsBestPathUpdate) {
         _sitesUpdatedInTick++;
@@ -316,7 +330,7 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
     }
     _conditionsIndex.Remove(site);
     site.Destroy();
-    foreach (var updateSite in PathCheckingSite.SitesByBlockObject.Values) {
+    foreach (var updateSite in _sitesByBlockObject.Values) {
       updateSite.OnConstructibleCompleted(@event.Constructible);
       if (updateSite.NeedsBestPathUpdate) {
         _sitesUpdatedInTick++;

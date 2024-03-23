@@ -31,9 +31,6 @@ sealed class PathCheckingSite {
   #region API
   // ReSharper disable MemberCanBePrivate.Global
 
-  /// <summary>All path sites index by blockobject.</summary>
-  public static readonly Dictionary<BlockObject, PathCheckingSite> SitesByBlockObject = new();
-
   /// <summary>Site's NavMesh node ID.</summary>
   public int SiteNodeId { get; private set; }
 
@@ -83,24 +80,9 @@ sealed class PathCheckingSite {
   /// </remarks>
   public bool CanBeAccessedInPreview { get; private set; }
 
-  /// <summary>Finds the existing construction site or creates a new one.</summary>
-  /// <seealso cref="SitesByBlockObject"/>
-  /// FIXME: move it to controller, it's not the site's role.
-  public static PathCheckingSite GetOrCreate(BlockObject blockObject) {
-    if (!SitesByBlockObject.TryGetValue(blockObject, out var cachedSite)) {
-      var site = new PathCheckingSite(blockObject);
-      SitesByBlockObject.Add(site.BlockObject, site);
-      cachedSite = site;
-    }
-    return cachedSite;
-  }
-
   /// <summary>Drops the site and all internal caches associated with it.</summary>
   public void Destroy() {
-    SitesByBlockObject.Remove(BlockObject);
-    if (_unreachableStatus) {
-      _unreachableStatus.Cleanup();
-    }
+    _unreachableStatus.Cleanup();
   }
 
   /// <summary>Verifies that the all NavMesh related things are up to date on the site.</summary>
@@ -135,7 +117,7 @@ sealed class PathCheckingSite {
   int _bestPathRoadNodeId = -1;
 
   /// <exception cref="InvalidOperationException"> if the site doesn't have all teh expected components.</exception>
-  PathCheckingSite(BlockObject blockObject) {
+  public PathCheckingSite(BlockObject blockObject) {
     BlockObject = blockObject;
     ConstructionSite = BlockObject.GetComponentFast<ConstructionSite>();
     _groundedSite = BlockObject.GetComponentFast<GroundedConstructionSite>();
