@@ -3,6 +3,8 @@
 // This software is distributed under Public domain license.
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Timberborn.BaseComponentSystem;
@@ -118,6 +120,16 @@ static class DebugEx {
       return $"[BlockObject@{blockObj.Coordinates}]";
     }
     return $"[{component.GetType().Name}]";
+  }
+
+  /// <summary>Collection-to-string - it makes a comma separated string from the enumerable.</summary>
+  public static string C2S(IEnumerable enumerable) {
+    return string.Join(",", enumerable);
+  }
+
+  /// <summary>Collection-to-string - it makes a comma separated string from the enumerable.</summary>
+  public static string C2S<T>(IEnumerable<T> enumerable) {
+    return string.Join(",", enumerable);
   }
 
   /// <summary>Lightweight version of the full log settings.</summary>
