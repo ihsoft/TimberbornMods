@@ -27,7 +27,7 @@ namespace Automation.PathCheckingSystem {
 /// It cannot be handled in scope of just one condition due to all of them are interconnected (they can affect each
 /// other). This controller has "the full picture" and orchestrates all the conditions.
 /// </remarks>
-sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener {
+sealed class PathCheckingService : ITickableSingleton {
   const float MaxCompletionProgress = 0.8f;
 
   #region ITickableSingleton implementation
@@ -64,8 +64,8 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
       valueList.Remove(condition);
       if (valueList.Count == 0) {
         _conditionsIndex.Remove(site);
-        site.Destroy();
         _sitesByBlockObject.Remove(condition.Behavior.BlockObject);
+        site.CleanupComponent();
       }
     }
   }
@@ -76,6 +76,7 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
 
   readonly EntityComponentRegistry _entityComponentRegistry;
   readonly NodeIdService _nodeIdService;
+  readonly BaseInstantiator _baseInstantiator;
 
   /// <summary>All path checking conditions on the sites.</summary>
   readonly Dictionary<PathCheckingSite, List<CheckAccessBlockCondition>> _conditionsIndex = new();
@@ -93,10 +94,10 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
   HashSet<int> _walkersNodes;
 
   PathCheckingService(EntityComponentRegistry entityComponentRegistry, AutomationService automationService,
-                      NodeIdService nodeIdService) {
+                      NodeIdService nodeIdService, BaseInstantiator baseInstantiator) {
     _entityComponentRegistry = entityComponentRegistry;
     _nodeIdService = nodeIdService;
-    PathCheckingSite.InjectDependencies(); // FIXME pass the values instead?
+    _baseInstantiator = baseInstantiator;
     automationService.EventBus.Register(this);
   }
 
@@ -241,9 +242,8 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
   /// <summary>Finds the existing construction site or creates a new one.</summary>
   PathCheckingSite GetOrCreate(BlockObject blockObject) {
     if (!_sitesByBlockObject.TryGetValue(blockObject, out var cachedSite)) {
-      var site = new PathCheckingSite(blockObject);
-      _sitesByBlockObject.Add(blockObject, site);
-      cachedSite = site;
+      cachedSite = _baseInstantiator.AddComponent<PathCheckingSite>(blockObject.GameObjectFast);
+      _sitesByBlockObject.Add(blockObject, cachedSite);
     }
     return cachedSite;
   }
@@ -299,20 +299,6 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
 
   #endregion
 
-  #region ISingletonNavMeshListener implemenation
-
-  /// <inheritdoc/>
-  public void OnNavMeshUpdated(NavMeshUpdate navMeshUpdate) {
-    foreach (var site in _sitesByBlockObject.Values) {
-      site.OnNavMeshUpdate(navMeshUpdate);
-      if (site.NeedsBestPathUpdate) {
-        _sitesUpdatedInTick++;
-      }
-    }
-  }
-
-  #endregion
-
   #region Events
 
   /// <summary>Drops conditions from the finished objects and marks the path indexes dirty.</summary>
@@ -329,13 +315,6 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
       }
     }
     _conditionsIndex.Remove(site);
-    site.Destroy();
-    foreach (var updateSite in _sitesByBlockObject.Values) {
-      updateSite.OnConstructibleCompleted(@event.Constructible);
-      if (updateSite.NeedsBestPathUpdate) {
-        _sitesUpdatedInTick++;
-      }
-    }
   }
 
   /// <summary>Marks the path indexes dirty.</summary>
@@ -346,7 +325,6 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
       return;
     }
     _conditionsIndex.Remove(site);
-    site.Destroy();
   }
 
   #endregion

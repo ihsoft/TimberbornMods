@@ -101,7 +101,6 @@
       <Compile Include="PathCheckingSystem\Configurator.cs" />
       <Compile Include="PathCheckingSystem\PathCheckingService.cs" />
       <Compile Include="PathCheckingSystem\PathCheckingSite.cs" />
-      <Compile Include="PathCheckingSystem\PathCheckingSiteStatusTracker.cs" />
       <Compile Include="Properties\AssemblyInfo.cs" />
       <Compile Include="Tools\ApplyTemplateTool.cs" />
       <Compile Include="Tools\AutomationRule.cs" />

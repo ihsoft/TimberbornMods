@@ -5,25 +5,34 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TimberApi.DependencyContainerSystem;
+using Bindito.Core;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BlockSystemNavigation;
+using Timberborn.BuilderHubSystem;
+using Timberborn.BuildingsBlocking;
 using Timberborn.BuildingsNavigation;
 using Timberborn.Common;
 using Timberborn.ConstructibleSystem;
 using Timberborn.ConstructionSites;
 using Timberborn.Coordinates;
+using Timberborn.EntitySystem;
 using Timberborn.GameDistricts;
 using Timberborn.Localization;
 using Timberborn.Navigation;
+using Timberborn.SelectionSystem;
+using Timberborn.SingletonSystem;
+using Timberborn.StatusSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
 namespace Automation.PathCheckingSystem {
 
 /// <summary>Container for the path blocking site.</summary>
-sealed class PathCheckingSite {
+/// <remarks>It must only be applied to the preview sites.</remarks>
+sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListener, IFinishedStateListener,
+                                IDeletableEntity {
+
   #region API
   // ReSharper disable MemberCanBePrivate.Global
 
@@ -32,10 +41,10 @@ sealed class PathCheckingSite {
 
   /// <summary>Construction site cached instance.</summary>
   // FIXME: It's temporary! Use site blockers instead.
-  public readonly ConstructionSite ConstructionSite;
+  public ConstructionSite ConstructionSite { get; private set; }
 
   /// <summary>BlockObject of this site.</summary>
-  public readonly BlockObject BlockObject;
+  public BlockObject BlockObject { get; private set; }
 
   /// <summary>Tells if all the site's foundation blocks stay on top fo finished entities.</summary>
   public bool IsFullyGrounded => _groundedSite.IsFullyGrounded;
@@ -76,9 +85,12 @@ sealed class PathCheckingSite {
   /// </remarks>
   public bool CanBeAccessedInPreview { get; private set; }
 
-  /// <summary>Drops the site and all internal caches associated with it.</summary>
-  public void Destroy() {
-    _statusTracker.Cleanup();
+  /// <summary>Completely removes this component from the object.</summary>
+  public void CleanupComponent() {
+    ClearAllStates();
+    _eventBus.Unregister(this);
+    _navMeshListenerEntityRegistry.UnregisterNavMeshListener(this);
+    Destroy(this);
   }
 
   /// <summary>Verifies that the all NavMesh related things are up to date on the site.</summary>
@@ -97,37 +109,68 @@ sealed class PathCheckingSite {
 
   #region Implementation
 
-  static BaseInstantiator _baseInstantiator;
-  static ILoc _loc;
-  static NodeIdService _nodeIdService;
-  static DistrictCenterRegistry _districtCenterRegistry;
-  static DistrictMap _districtMap;
-  static PreviewDistrictMap _previewDistrictMap;
-  static INavigationService _navigationService;
+  const string NotYetReachableLocKey = "IgorZ.Automation.CheckAccessBlockCondition.NotYetReachable";
+  const string UnreachableStatusLocKey = "IgorZ.Automation.CheckAccessBlockCondition.UnreachableStatus";
+  const string UnreachableAlertLocKey = "IgorZ.Automation.CheckAccessBlockCondition.UnreachableAlert";
+  const string UnreachableIconName = "UnreachableObject";
 
-  readonly Accessible _accessible;
-  readonly PathCheckingSiteStatusTracker _statusTracker;
-  readonly GroundedConstructionSite _groundedSite;
-  readonly BlockObjectNavMesh _blockObjectNavMesh;
+  ILoc _loc;
+  NodeIdService _nodeIdService;
+  DistrictCenterRegistry _districtCenterRegistry;
+  DistrictMap _districtMap;
+  PreviewDistrictMap _previewDistrictMap;
+  INavigationService _navigationService;
+  EventBus _eventBus;
+  NavMeshListenerEntityRegistry _navMeshListenerEntityRegistry;
 
+  BlockableBuilding _blockableBuilding;
+  BuilderJobReachabilityStatus _builderJobReachabilityStatus;
+  GroundedConstructionSite _groundedSite;
+  Accessible _accessible;
+  BlockObjectNavMesh _blockObjectNavMesh;
+
+  StatusToggle _unreachableStatusToggle;
+  StatusToggle _maybeReachableStatusToggle;
   int _bestPathRoadNodeId = -1;
+  bool _isCurrentlySelected;
 
-  /// <exception cref="InvalidOperationException"> if the site doesn't have all teh expected components.</exception>
-  public PathCheckingSite(BlockObject blockObject) {
-    BlockObject = blockObject;
-    ConstructionSite = BlockObject.GetComponentFast<ConstructionSite>();
-    _groundedSite = BlockObject.GetComponentFast<GroundedConstructionSite>();
-    _accessible = BlockObject.GetComponentFast<ConstructionSiteAccessible>().Accessible;
-    _blockObjectNavMesh = BlockObject.GetComponentFast<BlockObjectNavMesh>();
-    _statusTracker = BlockObject.GetComponentFast<PathCheckingSiteStatusTracker>();
-    if (!_statusTracker) {
-      _statusTracker = _baseInstantiator.AddComponent<PathCheckingSiteStatusTracker>(BlockObject.GameObjectFast);
-      _statusTracker.Initialize(_loc);
+  void Awake() {
+    BlockObject = GetComponentFast<BlockObject>();
+    if (BlockObject.Preview) {
+      throw new InvalidOperationException($"{DebugEx.BaseComponentToString(BlockObject)} must be in preview");
     }
-    if (!ConstructionSite || !_groundedSite || !_accessible) {
-      throw new InvalidOperationException(
-          $"{DebugEx.BaseComponentToString(BlockObject)} is not a valid construction site");
-    }
+    ConstructionSite = GetComponentFast<ConstructionSite>();
+    _blockableBuilding = GetComponentFast<BlockableBuilding>();
+    _builderJobReachabilityStatus = GetComponentFast<BuilderJobReachabilityStatus>();
+    _groundedSite = GetComponentFast<GroundedConstructionSite>();
+    _accessible = GetComponentFast<ConstructionSiteAccessible>().Accessible;
+    _blockObjectNavMesh = GetComponentFast<BlockObjectNavMesh>();
+  }
+
+  void Start() {
+    _unreachableStatusToggle = StatusToggle.CreatePriorityStatusWithAlertAndFloatingIcon(
+        UnreachableIconName, _loc.T(UnreachableStatusLocKey), _loc.T(UnreachableAlertLocKey));
+    GetComponentFast<StatusSubject>().RegisterStatus(_unreachableStatusToggle);
+    _maybeReachableStatusToggle = StatusToggle.CreateNormalStatus(UnreachableIconName, _loc.T(NotYetReachableLocKey));
+    GetComponentFast<StatusSubject>().RegisterStatus(_maybeReachableStatusToggle);
+    _eventBus.Register(this);
+    _navMeshListenerEntityRegistry.RegisterNavMeshListener(this);
+  }
+
+  /// <summary>It must be public to work.</summary>
+  [Inject]
+  public void InjectDependencies(
+      ILoc loc, NodeIdService nodeIdService, DistrictCenterRegistry districtCenterRegistry, DistrictMap districtMap,
+      PreviewDistrictMap previewDistrictMap, INavigationService navigationService, EventBus eventBus,
+      NavMeshListenerEntityRegistry navMeshListenerEntityRegistry) {
+    _loc = loc;
+    _nodeIdService = nodeIdService;
+    _districtCenterRegistry = districtCenterRegistry;
+    _districtMap = districtMap;
+    _previewDistrictMap = previewDistrictMap;
+    _navigationService = navigationService;
+    _eventBus = eventBus;
+    _navMeshListenerEntityRegistry = navMeshListenerEntityRegistry;
   }
 
   /// <summary>Initializes the NavMesh related things.</summary>
@@ -143,17 +186,6 @@ sealed class PathCheckingSite {
             End = _nodeIdService.GridToId(x.NavMeshEdge.End),
         })
         .ToList();
-  }
-
-  /// <summary>Gets all the needed injections from the dependency container.</summary>
-  internal static void InjectDependencies() {
-    _baseInstantiator = DependencyContainer.GetInstance<BaseInstantiator>();
-    _loc = DependencyContainer.GetInstance<ILoc>();
-    _nodeIdService = DependencyContainer.GetInstance<NodeIdService>();
-    _districtCenterRegistry = DependencyContainer.GetInstance<DistrictCenterRegistry>();
-    _districtMap = DependencyContainer.GetInstance<DistrictMap>();
-    _previewDistrictMap = DependencyContainer.GetInstance<PreviewDistrictMap>();
-    _navigationService = DependencyContainer.GetInstance<INavigationService>();
   }
 
   /// <summary>
@@ -222,25 +254,64 @@ sealed class PathCheckingSite {
       BestBuildersPathCornerNodes = pathCorners.Select(_nodeIdService.WorldToId).ToList();
       BestBuildersPathNodeIndex = pathCorners.Select(_nodeIdService.WorldToId).ToHashSet();
       _bestPathRoadNodeId = bestRoadNode;
-      _statusTracker.Cleanup();
+      ClearAllStates();
     } else {
       if (CanBeAccessedInPreview) {
-        _statusTracker.SetMaybeReachable();
+        SetMaybeReachableStatus();
       } else {
-        _statusTracker.SetUnreachable();
+        SetUnreachableStatus();
       }
+    }
+  }
+
+  /// <summary>Blocks the site since there is no controllable ways to reach it.</summary>
+  /// <remarks>
+  /// The site can actually be reachable for the stock game, but the algo may not be aware of it. So, just block the
+  /// site to not get unexpected blocks in teh other chains.
+  /// </remarks>
+  void SetUnreachableStatus() {
+    _unreachableStatusToggle.Activate();
+    _maybeReachableStatusToggle.Deactivate();
+    _blockableBuilding.Block(this);
+  }
+
+  /// <summary>Blocks site, but indicates that there can be path being built.</summary>
+  void SetMaybeReachableStatus() {
+    _unreachableStatusToggle.Deactivate();
+    _maybeReachableStatusToggle.Activate();
+    _blockableBuilding.Block(this);
+  }
+
+  /// <summary>A cleanup method that resets all effects on the site and resumes the stock one.</summary>
+  void ClearAllStates() {
+    _unreachableStatusToggle.Deactivate();
+    _maybeReachableStatusToggle.Deactivate();
+    _blockableBuilding.Unblock(this);
+    if (_isCurrentlySelected && _builderJobReachabilityStatus) {
+      _builderJobReachabilityStatus.OnSelect();
     }
   }
 
   #endregion
 
-  #region Callbacks for the state update
+  #region Events for the state update
 
-  /// <summary>It's expected to be called from <see cref="PathCheckingService"/> when the navmesh changes.</summary>
-  /// <remarks>Don't do any logic here! Only mark the state invalid to get updated in the next tick.</remarks>
-  internal void OnNavMeshUpdate(NavMeshUpdate navMeshUpdate) {
+  /// <summary>Reacts on construction complete and verifies if a non-grounded site can now start building.</summary>
+  [OnEvent]
+  public void OnConstructibleEnteredFinishedStateEvent(ConstructibleEnteredFinishedStateEvent @event) {
+    if (_groundedSite.IsFullyGrounded && _bestPathRoadNodeId == -1) {
+      RequestBestPathUpdate();  // We're now grounded, but no path created.
+    }
+  }
+
+  #endregion
+
+  #region ISingletonNavMeshListener implemenation
+
+  /// <inheritdoc/>
+  public void OnNavMeshUpdated(NavMeshUpdate navMeshUpdate) {
     if (!_groundedSite.IsFullyGrounded) {
-      return;  // The ungrounded site just cannot start building.
+      return;  // The ungrounded site cannot have path.
     }
     if (_bestPathRoadNodeId == -1) {
       RequestBestPathUpdate();  // For an unreachable site, _any_ update to navmesh can make it reachable.
@@ -253,14 +324,43 @@ sealed class PathCheckingSite {
     }
   }
 
-  /// <summary>Reacts on construction complete and verifies if a non-grounded site can now start building.</summary>
-  internal void OnConstructibleCompleted(Constructible constructible) {
-    if (_groundedSite.IsFullyGrounded && _bestPathRoadNodeId == -1) {
-      RequestBestPathUpdate();
+  #endregion
+
+  #region ISelectionListener implemenation
+
+  /// <inheritdoc/>
+  public void OnSelect() {
+    _isCurrentlySelected = true;
+    if (!_builderJobReachabilityStatus) {
+      return;
+    }
+    if (_unreachableStatusToggle.IsActive || _maybeReachableStatusToggle.IsActive) {
+      _builderJobReachabilityStatus.OnUnselect();  // We show our own status.
     }
   }
 
+  /// <inheritdoc/>
+  public void OnUnselect() {
+    _isCurrentlySelected = false;
+  }
+
   #endregion
+
+  #region IFinishedStateListener implementation
+
+  /// <inheritdoc/>
+  public void OnEnterFinishedState() {
+    CleanupComponent();
+  }
+
+  /// <inheritdoc/>
+  public void OnExitFinishedState() {}
+
+  #endregion
+
+  public void DeleteEntity() {
+    CleanupComponent();
+  }
 }
 
 }
