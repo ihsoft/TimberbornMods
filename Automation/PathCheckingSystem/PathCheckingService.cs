@@ -104,45 +104,45 @@ sealed class PathCheckingService : ITickableSingleton {
   /// <summary>Sets the condition states based on the path access check.</summary>
   void CheckBlockedAccess() {
     _walkersTakenNodes = null;
-    foreach (var indexPair in _conditionsIndex) {
-      var site = indexPair.Key;
-      var conditions = indexPair.Value;
-
-      // Get it sooner to trigger path creation even on the nonblocking sites.
-      site.MaybeUpdateNavMesh();
-      if (site.BestBuildersPathNodeIndex.Count == 0) {
-        // The unreachable sites cannot get built and trigger the condition.
-        UpdateConditions(conditions, false);
-        continue;
-      }
-
-      // Incomplete sites don't block anything.
-      if (site.ConstructionSite.BuildTimeProgress < MaxCompletionProgress) {
-        UpdateConditions(conditions, false);
-        continue;
-      }
-
-      var isBlocked = false;
-      // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
-      foreach (var testSite in _sitesByBlockObject.Values) {
-        testSite.MaybeUpdateNavMesh();
-        if (ReferenceEquals(testSite, site)
-            || !testSite.IsFullyGrounded
-            || testSite.BestBuildersPathCornerNodes.Count == 0
-            || IsNonBlockingPathSite(site, testSite)) {
-          continue;
-        }
-        isBlocked = true;
-        break;
-      }
-      if (!isBlocked) {
-        if (_walkersTakenNodes == null) {
-          BuildWalkersIndex();
-        }
-        isBlocked = site.RestrictedNodes.FastAny(x => _walkersTakenNodes.Contains(x));
-      }
-      UpdateConditions(conditions, isBlocked);
+    foreach (var site in _conditionsIndex.Keys) {
+      var canComplete = CheckIfSiteCanComplete(site);
+      var conditions = _conditionsIndex[site];
+      UpdateConditions(conditions, !canComplete);
     }
+  }
+
+  /// <summary>Determines if the site construction can complete without obstructing any other site.</summary>
+  bool CheckIfSiteCanComplete(PathCheckingSite site) {
+    site.MaybeUpdateNavMesh();
+    if (site.BestBuildersPathNodeIndex.Count == 0) {
+      return true;  // The unreachable sites cannot get built and trigger the condition.
+    }
+
+    // Incomplete sites don't block anything.
+    if (site.ConstructionSite.BuildTimeProgress < MaxCompletionProgress) {
+      return true;
+    }
+
+    var isBlocked = false;
+    foreach (var testSite in _sitesByBlockObject.Values) {
+      testSite.MaybeUpdateNavMesh();
+      if (ReferenceEquals(testSite, site)
+          || !testSite.IsFullyGrounded
+          || testSite.BestBuildersPathCornerNodes.Count == 0
+          || IsNonBlockingPathSite(site, testSite)) {
+        continue;
+      }
+      isBlocked = true;
+      break;
+    }
+    if (isBlocked) {
+      return false;
+    }
+    if (_walkersTakenNodes == null) {
+      BuildWalkersIndex();
+    }
+    isBlocked = site.RestrictedNodes.FastAny(x => _walkersTakenNodes.Contains(x));
+    return !isBlocked;
   }
 
   /// <summary>
