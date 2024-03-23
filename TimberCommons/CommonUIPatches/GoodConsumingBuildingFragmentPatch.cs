@@ -21,13 +21,7 @@ namespace IgorZ.TimberCommons.CommonUIPatches {
 /// </remarks>
 [HarmonyPatch(typeof(GoodConsumingBuildingFragment), nameof(GoodConsumingBuildingFragment.UpdateProgressBar))]
 static class GoodConsumingBuildingFragmentPatch {
-  const string SupplyRemainingLocKey = "GoodConsuming.SupplyRemaining";
   const string NoTilesToIrrigateLocKey = "IgorZ.TimberCommons.WaterTower.NoTilesToIrrigate";
-  static string _localizedSupplyRemainingTmpl;
-
-  internal static void Reset() {
-    _localizedSupplyRemainingTmpl = null;
-  }
 
   // ReSharper disable once UnusedMember.Local
   static bool Prefix(bool __runOriginal, ILoc ____loc,
@@ -53,13 +47,7 @@ static class GoodConsumingBuildingFragmentPatch {
     if (!Features.GoodConsumingBuildingUIDaysHoursForAll) {
       return;
     }
-    if (_localizedSupplyRemainingTmpl == null) {
-      var original = ____loc.T(SupplyRemainingLocKey, "###");
-      _localizedSupplyRemainingTmpl = original.Substring(0, original.IndexOf("###", StringComparison.Ordinal)) + "{0}";
-    }
-    ____hoursLeft.text = string.Format(
-        _localizedSupplyRemainingTmpl,
-        CommonFormats.DaysHoursFormat(____loc, ____goodConsumingBuilding.HoursUntilNoSupply));
+    ____hoursLeft.text = CommonFormats.FormatSupplyLeft(____loc, ____goodConsumingBuilding.HoursUntilNoSupply);
   }
 }
 

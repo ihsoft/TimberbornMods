@@ -2,6 +2,7 @@
 * [Fix #37] Water tower with zero coverage consumes water.
 * [Fix #43] Water towers override the highlighted range of other buildings.
 * [Fix #45] Mechanical towers don't properly update the effective range.
+* [Fix #49] Manufacture water tower misses localization string.
 * [Enhancement] Improved powered irrigation towers performance when the Power Grid gets fluctuations.
 * [Enhancement] Update `deDE` localization (by @juf0816).
 * [Enhancement] Prevent beavers contamination when moving in tunnels under bad water.
