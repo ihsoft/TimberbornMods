@@ -17,7 +17,6 @@ namespace IgorZ.TimberCommons.WaterService {
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
-
     var patches = new List<Type> { typeof(SoilMoistureSimulatorGetUpdatedMoisturePatch) };
     if (Features.OverrideDesertLevelsForWaterTowers) {
       patches.Add(typeof(SoilMoistureMapUpdateDesertIntensityPatch));
@@ -25,6 +24,7 @@ sealed class Configurator : IConfigurator {
     HarmonyPatcher.PatchRepeated(GetType().AssemblyQualifiedName, patches.ToArray());
 
     containerDefinition.Bind<DirectWaterServiceAccessor>().AsSingleton();
+    DirectSoilMoistureSystemAccessor.ResetStaticState();
     containerDefinition.Bind<DirectSoilMoistureSystemAccessor>().AsSingleton();
     containerDefinition.Bind<ThreadedLogsRecorder>().AsSingleton();
   }

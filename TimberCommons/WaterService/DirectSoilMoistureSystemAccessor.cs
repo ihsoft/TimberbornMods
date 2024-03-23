@@ -29,6 +29,7 @@ namespace IgorZ.TimberCommons.WaterService {
 /// This code uses HarmonyX patches to access internal game's logic. Significant changes to it may break the mod.
 /// </remarks>
 public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickableSingleton {
+
   #region API
   // ReSharper disable UnusedMember.Global
 
@@ -108,8 +109,6 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
 
   /// <summary>Sets up the moisture override logic.</summary>
   public void PostLoad() {
-    MoistureLevelOverrides = new Dictionary<int, float>();
-    TerrainTextureLevelsOverrides = new Dictionary<Vector2Int, float>();
     _eventBus.Register(this);
     _sceneLoader.SceneLoaded += OnSceneLoaded;
   }
@@ -129,9 +128,11 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   #region Implementation
 
   /// <summary>Map of the overriden moisture levels.</summary>
+  /// <seealso cref="ResetStaticState"/>
   internal static Dictionary<int, float> MoistureLevelOverrides = new();
 
   /// <summary>Map of the overriden desert levels.</summary>
+  /// <seealso cref="ResetStaticState"/>
   internal static Dictionary<Vector2Int, float> TerrainTextureLevelsOverrides = new();
 
   readonly Dictionary<int, Dictionary<int, float>> _moistureLevelOverrides = new();
@@ -150,6 +151,12 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   EventBus _eventBus;
   SceneLoader _sceneLoader;
   TerrainMaterialMap _terrainMaterialMap;
+
+  /// <summary>Resets all cached static state. Must be called from configurator.</summary>
+  internal static void ResetStaticState() {
+    MoistureLevelOverrides = new Dictionary<int, float>();
+    TerrainTextureLevelsOverrides = new Dictionary<Vector2Int, float>();
+  }
 
   /// <summary>Injects run-time dependencies.</summary>
   [Inject]
