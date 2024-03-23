@@ -3,7 +3,7 @@
 // License: Public Domain
 
 using System;
-using Automation.Core;
+using Automation.AutomationSystem;
 using Timberborn.BaseComponentSystem;
 using Timberborn.Emptying;
 using Timberborn.Persistence;

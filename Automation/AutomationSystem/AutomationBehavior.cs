@@ -14,7 +14,7 @@ using Timberborn.Persistence;
 using Timberborn.SingletonSystem;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace Automation.Core {
+namespace Automation.AutomationSystem {
 
 /// <summary>The component that keeps all the automation state on the building.</summary>
 public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDeletableEntity {

@@ -3,7 +3,7 @@
 // License: Public Domain
 
 using System.Diagnostics.CodeAnalysis;
-using Automation.Core;
+using Automation.AutomationSystem;
 using Automation.Utils;
 using Timberborn.Persistence;
 

@@ -3,8 +3,8 @@
 // License: Public Domain
 
 using System.Diagnostics.CodeAnalysis;
+using Automation.AutomationSystem;
 using Automation.Conditions;
-using Automation.Core;
 using Automation.Utils;
 using Timberborn.Persistence;
 

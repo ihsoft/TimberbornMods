@@ -12,7 +12,7 @@ using Timberborn.SingletonSystem;
 using Timberborn.ToolSystem;
 using UnityEngine;
 
-namespace Automation.Core {
+namespace Automation.AutomationSystem {
 
 /// <summary>Central point for all the automation related logic.</summary>
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]

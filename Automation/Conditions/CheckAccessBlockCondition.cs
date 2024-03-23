@@ -2,7 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using Automation.Core;
+using Automation.AutomationSystem;
 using Automation.PathCheckingSystem;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.BuildingsNavigation;

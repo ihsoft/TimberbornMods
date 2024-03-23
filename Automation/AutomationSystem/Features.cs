@@ -8,7 +8,7 @@ using TimberApi.ConfiguratorSystem;
 using TimberApi.SceneSystem;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace Automation.Core {
+namespace Automation.AutomationSystem {
 
 [Configurator(SceneEntrypoint.All)]
 sealed class Features : IConfigurator {

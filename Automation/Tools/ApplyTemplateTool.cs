@@ -4,7 +4,7 @@
 
 using System.Collections.ObjectModel;
 using System.Linq;
-using Automation.Core;
+using Automation.AutomationSystem;
 using Automation.Utils;
 using Timberborn.BlockSystem;
 using Timberborn.Persistence;
