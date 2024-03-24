@@ -4,7 +4,7 @@
   "Type": "Automation.Tools.ApplyTemplateTool",
   "Order": 30,
   "Icon": "igorz.automation/ui_icons/tool-chained",
-  "DevMode": true,
+  "DevMode": false,
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.ChainedBuildeings.DisplayName",
   "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.ChainedBuildeings.Description",
   "ToolInformation": {
@@ -12,11 +12,24 @@
     "Rules": [
       {
         "Condition": { "TypeId": "Automation.Conditions.CheckAccessBlockCondition" },
-        "Action": { "TypeId": "Automation.Actions.BlockableBuildingAction", "ActionKind": "Block", "BlockToken": "ChainTool-1", "BlockIcon": "DirectionalBlocking", "BlockText": "IgorZ.Automation.BlockableBuildingAction.BlockText", "ShowIcon": true }
+        "Action": {
+          "TypeId": "Automation.Actions.StatusToggleAction",
+          "ActionKind": "ShowStatus",
+          "StatusToken": "ChainTool-2",
+          "Description": "IgorZ.Automation.ShowStatusAction.HoldConstruction",
+          "StatusKind": "NormalStatusWithFloatingIcon",
+          "StatusIcon": "DirectionalBlocking",
+          "StatusText": "IgorZ.Automation.ShowStatusAction.HoldCompletionStatusText"
+        }
       },
       {
         "Condition": { "TypeId": "Automation.Conditions.CheckAccessBlockCondition", "ReversedCondition": true },
-        "Action": { "TypeId": "Automation.Actions.BlockableBuildingAction", "ActionKind": "Unblock", "BlockToken": "ChainTool-1" }
+        "Action": {
+          "TypeId": "Automation.Actions.StatusToggleAction",
+          "ActionKind": "HideStatus",
+          "StatusToken": "ChainTool-2",
+          "Description": "IgorZ.Automation.ShowStatusAction.ResumeConstruction",
+        }
       }
     ]
   }

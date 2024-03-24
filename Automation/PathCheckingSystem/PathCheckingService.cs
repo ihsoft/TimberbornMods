@@ -19,6 +19,7 @@ using Timberborn.SingletonSystem;
 using Timberborn.TickSystem;
 using Timberborn.WalkingSystem;
 using UnityDev.Utils.LogUtilsLite;
+using UnityEngine;
 
 namespace Automation.PathCheckingSystem {
 
@@ -28,18 +29,12 @@ namespace Automation.PathCheckingSystem {
 /// other). This controller has "the full picture" and orchestrates all the conditions.
 /// </remarks>
 sealed class PathCheckingService : ITickableSingleton {
-  const float MaxCompletionProgress = 0.8f;
 
   #region ITickableSingleton implementation
 
   /// <inheritdoc/>
   public void Tick() {
     if (Features.PathCheckingControllerProfiling) {
-      _stopwatch.Start();
-    }
-    CheckBlockedAccess();
-    if (Features.PathCheckingControllerProfiling) {
-      _stopwatch.Stop();
       Profile();
     }
   }
@@ -47,6 +42,10 @@ sealed class PathCheckingService : ITickableSingleton {
   #endregion
 
   #region API
+
+  /// <summary>Shortcut for the Harmony patches.</summary>
+  /// <remarks>All normal classes should inject the service.</remarks>
+  internal static PathCheckingService Instance;
 
   /// <summary>Add the path checking condition to monitor.</summary>
   public void AddCondition(CheckAccessBlockCondition condition) {
@@ -87,40 +86,32 @@ sealed class PathCheckingService : ITickableSingleton {
   /// <summary>Cache of tiles that are paths to the characters on the map.</summary>
   HashSet<int> _walkersTakenNodes;
 
-  /// <summary>Cache of the walking characters positions.</summary>
-  /// <remarks>
-  /// If a character is at the site being constructed, we don't block since the game checks it naturally.
-  /// </remarks>
-  HashSet<int> _walkersNodes;
-
   PathCheckingService(EntityComponentRegistry entityComponentRegistry, AutomationService automationService,
                       NodeIdService nodeIdService, BaseInstantiator baseInstantiator) {
+    Instance = this;
     _entityComponentRegistry = entityComponentRegistry;
     _nodeIdService = nodeIdService;
     _baseInstantiator = baseInstantiator;
     automationService.EventBus.Register(this);
   }
 
-  /// <summary>Sets the condition states based on the path access check.</summary>
-  void CheckBlockedAccess() {
-    _walkersTakenNodes = null;
-    foreach (var site in _conditionsIndex.Keys) {
-      var canComplete = CheckIfSiteCanComplete(site);
-      var conditions = _conditionsIndex[site];
-      UpdateConditions(conditions, !canComplete);
+  /// <summary>
+  /// Runs the checks to update <see cref="PathCheckingSite.CanFinish"/> and triggers the relevant conditions.
+  /// conditions.
+  /// </summary>
+  public void CheckBlockingStateAndTriggerActions(PathCheckingSite site) {
+    site.CanFinish = !IsBlockingSite(site);
+    var conditions = _conditionsIndex[site];
+    foreach (var condition in conditions) {
+      condition.ConditionState = condition.IsReversedCondition ? site.CanFinish : !site.CanFinish;
     }
   }
 
   /// <summary>Determines if the site construction can complete without obstructing any other site.</summary>
-  bool CheckIfSiteCanComplete(PathCheckingSite site) {
+  bool IsBlockingSite(PathCheckingSite site) {
     site.MaybeUpdateNavMesh();
     if (site.BestBuildersPathNodeIndex.Count == 0) {
       return true;  // The unreachable sites cannot get built and trigger the condition.
-    }
-
-    // Incomplete sites don't block anything.
-    if (site.ConstructionSite.BuildTimeProgress < MaxCompletionProgress) {
-      return true;
     }
 
     var isBlocked = false;
@@ -135,14 +126,11 @@ sealed class PathCheckingService : ITickableSingleton {
       isBlocked = true;
       break;
     }
-    if (isBlocked) {
-      return false;
+    if (!isBlocked) {
+      MaybeBuildWalkersIndex();
+      isBlocked = site.RestrictedNodes.FastAny(x => _walkersTakenNodes.Contains(x));
     }
-    if (_walkersTakenNodes == null) {
-      BuildWalkersIndex();
-    }
-    isBlocked = site.RestrictedNodes.FastAny(x => _walkersTakenNodes.Contains(x));
-    return !isBlocked;
+    return isBlocked;
   }
 
   /// <summary>
@@ -201,15 +189,20 @@ sealed class PathCheckingService : ITickableSingleton {
 
   /// <summary>Gathers all coordinates that are taken by the characters paths.</summary>
   /// <remarks>We don't want to let the builders get stranded.</remarks>
-  void BuildWalkersIndex() {
+  void MaybeBuildWalkersIndex() {
+    if (_lastCacheBuiltFrame == Time.frameCount) {
+      return;  // The cache is up to date.
+    }
+    if (Features.PathCheckingControllerProfiling) {
+      _walkersUpdateStopwatch.Start();
+    }
+    _lastCacheBuiltFrame = Time.frameCount;
     _walkersTakenNodes = new HashSet<int>();
-    _walkersNodes = new HashSet<int>();
     var walkers = _entityComponentRegistry
         .GetEnabled<BlockOccupant>()
         .Select(x => x.GetComponentFast<Walker>())
         .Where(x => x);
     foreach (var walker in walkers) {
-      _walkersNodes.Add(_nodeIdService.WorldToId(walker.TransformFast.position));
       var pathFollower = walker._pathFollower;
       if (pathFollower._pathCorners == null) {
         continue;  // No path, no problem.
@@ -219,18 +212,11 @@ sealed class PathCheckingService : ITickableSingleton {
           .Select(_nodeIdService.WorldToId);
       _walkersTakenNodes.AddRange(activePathCorners);
     }
-    // Remove nodes that the walkers are currently at due to it's checked by the stock logic.
-    foreach (var walkersNode in _walkersNodes) {
-      _walkersTakenNodes.Remove(walkersNode);
+    if (Features.PathCheckingControllerProfiling) {
+      _walkersUpdateStopwatch.Stop();
     }
   }
-
-  /// <summary>Triggers the provided path checking conditions.</summary>
-  static void UpdateConditions(List<CheckAccessBlockCondition> conditions, bool isBlocked) {
-    foreach (var condition in conditions) {
-      condition.ConditionState = !condition.IsReversedCondition ? isBlocked : !isBlocked;
-    }
-  }
+  int _lastCacheBuiltFrame;
 
   /// <summary>Tries finding a path checking site for the specified building.</summary>
   bool TryGetSite(BaseComponent component, out PathCheckingSite site) {
@@ -252,58 +238,59 @@ sealed class PathCheckingService : ITickableSingleton {
 
   #region Profiling tools
 
-  readonly Stopwatch _stopwatch = new();
   const int StatsTicksThreshold = 20;
 
+  readonly Stopwatch _walkersUpdateStopwatch = new Stopwatch();
   int _tickTillStat = StatsTicksThreshold;
   int _totalSites;
   int _maxSites;
-  long _totalSiteUpdateTicks;
-  long _maxUpdatesTicks;
+  long _totalSiteUpdatesTicks;
+  long _maxSiteUpdatesTicks;
   int _totalSitesUpdated;
   int _maxSitesUpdated;
-  long _totalServiceTicks;
-  long _maxStopwatchTicks;
+  long _totalWalkersUpdateTicks;
+  long _maxWalkersUpdateTicks;
 
   static string FormatTicksAsMs(long stopwatchTicks) {
     return $"{1000f * stopwatchTicks / Stopwatch.Frequency:0.###}ms";
   }
 
   void Profile() {
-    _maxStopwatchTicks = Math.Max(_maxStopwatchTicks, _stopwatch.ElapsedTicks);
-    _totalServiceTicks += _maxStopwatchTicks;
-    _maxUpdatesTicks = Math.Max(_maxUpdatesTicks, PathCheckingSite.UpdatePathsStopWatch.ElapsedTicks);
-    _totalSiteUpdateTicks += PathCheckingSite.UpdatePathsStopWatch.ElapsedTicks;
+    _maxSiteUpdatesTicks = Math.Max(_maxSiteUpdatesTicks, PathCheckingSite.UpdatePathsStopWatch.ElapsedTicks);
+    _totalSiteUpdatesTicks += PathCheckingSite.UpdatePathsStopWatch.ElapsedTicks;
     _totalSites += _conditionsIndex.Count;
     _maxSites = Math.Max(_maxSites, _conditionsIndex.Count);
     _maxSitesUpdated = Math.Max(_maxSitesUpdated, PathCheckingSite.SitePathsUpdated);
     _totalSitesUpdated += PathCheckingSite.SitePathsUpdated;
+    _maxWalkersUpdateTicks = Math.Max(_maxWalkersUpdateTicks, _walkersUpdateStopwatch.ElapsedTicks);
+    _totalWalkersUpdateTicks += _walkersUpdateStopwatch.ElapsedTicks;
+
     PathCheckingSite.SitePathsUpdated = 0;
     if (--_tickTillStat <= 0) {
       _tickTillStat = StatsTicksThreshold;
       var info = new StringBuilder();
       info.AppendFormat("**** Stats for PathCheckingController, {0} ticks window:\n", StatsTicksThreshold);
       info.AppendFormat(
-          "PathCheckingService cost: avg={0}, total={1}, max={2}\n",
-          FormatTicksAsMs(_totalServiceTicks / StatsTicksThreshold),
-          FormatTicksAsMs(_totalServiceTicks), FormatTicksAsMs(_maxStopwatchTicks));
+          "WalkersIndex cost: avg={0}, total={1}, max={2}\n",
+          FormatTicksAsMs(_totalWalkersUpdateTicks / StatsTicksThreshold),
+          FormatTicksAsMs(_totalWalkersUpdateTicks), FormatTicksAsMs(_maxWalkersUpdateTicks));
       info.AppendFormat(
           "PathCheckingSite cost: avg={0}, total={1}, max={2}\n",
-          FormatTicksAsMs(_totalSiteUpdateTicks / StatsTicksThreshold),
-          FormatTicksAsMs(_totalSiteUpdateTicks), FormatTicksAsMs(_maxUpdatesTicks));
+          FormatTicksAsMs(_totalSiteUpdatesTicks / StatsTicksThreshold),
+          FormatTicksAsMs(_totalSiteUpdatesTicks), FormatTicksAsMs(_maxSiteUpdatesTicks));
       info.AppendFormat("Sites: avg={0:0.##}, max={1}\n", (float)_totalSites / StatsTicksThreshold, _maxSites);
       info.AppendFormat("Updates: avg={0}, total={1}, max={2}\n",
                         (float)_totalSitesUpdated / StatsTicksThreshold, _totalSitesUpdated, _maxSitesUpdated);
       DebugEx.Info(info.ToString());
       _totalSites = 0;
       _maxSites = 0;
-      _totalSiteUpdateTicks = 0;
-      _maxUpdatesTicks = 0;
+      _totalSiteUpdatesTicks = 0;
+      _maxSiteUpdatesTicks = 0;
       _totalSitesUpdated = 0;
       _maxSitesUpdated = 0;
-      _totalServiceTicks = 0;
-      _maxStopwatchTicks = 0;
-      _stopwatch.Reset();
+      _totalWalkersUpdateTicks = 0;
+      _maxWalkersUpdateTicks = 0;
+      _walkersUpdateStopwatch.Reset();
       PathCheckingSite.UpdatePathsStopWatch.Reset();
     }
   }

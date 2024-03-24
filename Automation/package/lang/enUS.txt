@@ -124,6 +124,10 @@ IgorZ.Automation.CheckAccessBlockCondition.NotYetReachable,"Builders can't reach
 IgorZ.Automation.CheckAccessBlockCondition.UnreachableStatus,"The builders can't find the way to this site. Maybe nothing can be constructed here"
 IgorZ.Automation.CheckAccessBlockCondition.UnreachableAlert,"Unreachable construction site"
 
+IgorZ.Automation.ShowStatusAction.HoldConstruction,"<SolidHighlight>hold completion</SolidHighlight>"
+IgorZ.Automation.ShowStatusAction.ResumeConstruction,"<SolidHighlight>resume building</SolidHighlight>"
+IgorZ.Automation.ShowStatusAction.HoldCompletionStatusText,"Waiting for the other buildings to finish"
+
 IgorZ.Automation.BlockableBuildingAction.BlockDescription,"<SolidHighlight>block building</SolidHighlight>"
 IgorZ.Automation.BlockableBuildingAction.UnblockDescription,"<SolidHighlight>unblock building</SolidHighlight>"
 IgorZ.Automation.BlockableBuildingAction.BlockText,"Waiting for the other buildings to finish"

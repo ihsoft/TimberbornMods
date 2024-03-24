@@ -38,6 +38,10 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   #region API
   // ReSharper disable MemberCanBePrivate.Global
 
+  /// <summary>Tells whether this site can be finished without blocking other buildings.</summary>
+  /// <seealso cref="PathCheckingService.CheckBlockingStateAndTriggerActions"/>
+  public bool CanFinish { get; internal set; }
+
   /// <summary>Site's NavMesh node ID.</summary>
   public int SiteNodeId { get; private set; }
 
@@ -76,10 +80,6 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   /// <summary>Coordinates of the positions that are taken by the site.</summary>
   public List<int> RestrictedNodes { get; private set; }
 
-  /// <summary>Indicates that all the fields related to path and NavMesh are invalid and need to be updated.</summary>
-  /// <seealso cref="MaybeUpdateNavMesh"/>
-  public bool NeedsBestPathUpdate => BestBuildersPathNodeIndex == null;
-
   /// <summary>Indicates that the site _may_ become reachable when all the preview buildings are built.</summary>
   /// <remarks>
   /// It's a best effort check. There is no guarantee the preview buildings are actually providing access. The
@@ -97,19 +97,16 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
 
   /// <summary>Verifies that the all NavMesh related things are up to date on the site.</summary>
   /// <remarks>If no updates needed, it is a very cheap call.</remarks>
-  /// <seealso cref="NeedsBestPathUpdate"/>
   /// <seealso cref="BestBuildersPathNodeIndex"/>
   /// <seealso cref="BestBuildersPathCornerNodes"/>
   public void MaybeUpdateNavMesh() {
-    if (NeedsBestPathUpdate) {
-      if (Features.PathCheckingControllerProfiling) {
-        SitePathsUpdated++;
-        UpdatePathsStopWatch.Start();
-      }
-      UpdateBestPath();
-      if (Features.PathCheckingControllerProfiling) {
-        UpdatePathsStopWatch.Stop();
-      }
+    if (Features.PathCheckingControllerProfiling) {
+      SitePathsUpdated++;
+      UpdatePathsStopWatch.Start();
+    }
+    UpdateNavMesh();
+    if (Features.PathCheckingControllerProfiling) {
+      UpdatePathsStopWatch.Stop();
     }
   }
 
@@ -204,28 +201,20 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
         .ToList();
   }
 
-  /// <summary>
-  /// Resets <see cref="BestBuildersPathNodeIndex"/> and <see cref="BestBuildersPathCornerNodes"/> to trigger the path
-  /// rebuild.
-  /// </summary>
-  void RequestBestPathUpdate() {
-    BestBuildersPathNodeIndex = null;
-    BestBuildersPathCornerNodes = null;
-  }
-
-  /// <summary>Updates the <see cref="BestBuildersPathNodeIndex"/> to the site from the closets road node.</summary>
+  /// <summary>Updates the properties that depend on the district's NavMesh.</summary>
   /// <remarks>
   /// The site must be within the range from the road, which is currently 9 tiles. We intentionally ignore the accesses
   /// below the site level: even though the game can construct sites this way (one tile above the road), the path
   /// checking algo cannot deal with all the corners cases. It may limit players in their construction methods, but
   /// that's the price to pay.
   /// </remarks>
-  void UpdateBestPath() {
+  void UpdateNavMesh() {
     if (RestrictedNodes == null) {
       InitializeNavMesh();
     }
     BestBuildersPathNodeIndex = new HashSet<int>();
     BestBuildersPathCornerNodes = new List<int>();
+    BestAccessNode = -1;
     _bestPathRoadNodeId = -1;
     CanBeAccessedInPreview = false;
     if (!_groundedSite.IsFullyGrounded) {
@@ -283,7 +272,7 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   /// <summary>Blocks the site since there is no controllable ways to reach it.</summary>
   /// <remarks>
   /// The site can actually be reachable for the stock game, but the algo may not be aware of it. So, just block the
-  /// site to not get unexpected blocks in teh other chains.
+  /// site to not get unexpected blocks in the other chains.
   /// </remarks>
   void SetUnreachableStatus() {
     _unreachableStatusToggle.Activate();
@@ -313,12 +302,19 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   #region Events for the state update
 
   /// <summary>Reacts on construction complete and verifies if a non-grounded site can now start building.</summary>
+  /// <remarks>
+  /// No, we cannot cache the previous grounded state due to it's dynamic. There is no way to run the logic right after
+  /// the current state gets calculated by the stock component.
+  /// </remarks>
   [OnEvent]
   public void OnConstructibleEnteredFinishedStateEvent(ConstructibleEnteredFinishedStateEvent @event) {
-    if (_groundedSite.IsFullyGrounded && _bestPathRoadNodeId == -1) {
-      RequestBestPathUpdate();  // We're now grounded, but no path created.
+    if (_groundedSite.IsFullyGrounded && (!_previouslyWasGrounded.HasValue || !_previouslyWasGrounded.Value)) {
+      // The grounded state has changed or it's the first call ever. We need to update with the either case.
+      _previouslyWasGrounded = _groundedSite.IsFullyGrounded;
+      UpdateNavMesh();
     }
   }
+  bool? _previouslyWasGrounded;
 
   #endregion
 
@@ -330,13 +326,13 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
       return;  // The ungrounded site cannot have path.
     }
     if (_bestPathRoadNodeId == -1) {
-      RequestBestPathUpdate();  // For an unreachable site, _any_ update to navmesh can make it reachable.
+      UpdateNavMesh();  // For an unreachable site, _any_ update to navmesh can make it reachable.
       return;
     }
-    // Otherwise, if the navmesh change affects at least one of the road nodes of the site, then it's a trigger.
+    // If we have a path, then check if the navmesh change affects at least one of the nodes. No change, no problem.
     if (navMeshUpdate.RoadNodeIds.FastContains(_bestPathRoadNodeId)
         || navMeshUpdate.TerrainNodeIds.FastAny(BestBuildersPathNodeIndex.Contains)) {
-      RequestBestPathUpdate();
+      UpdateNavMesh();
     }
   }
 
