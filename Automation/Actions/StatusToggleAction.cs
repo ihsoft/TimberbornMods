@@ -89,9 +89,10 @@ public class StatusToggleAction : AutomationActionBase {
   /// <inheritdoc/>
   public override IAutomationAction CloneDefinition() {
     return new StatusToggleAction() {
-        ActionKind = ActionKind,
         StatusKind = StatusKind,
         Description = Description,
+        StatusToken = StatusToken,
+        ActionKind = ActionKind,
         StatusIcon = StatusIcon,
         StatusText = StatusText,
         AlertText = AlertText,
@@ -162,9 +163,9 @@ public class StatusToggleAction : AutomationActionBase {
   #region IGameSerializable implemenationsa
 
   static readonly PropertyKey<string> ActionKindKey = new("ActionKind");
-  static readonly PropertyKey<string> StatusKindKey = new("StatusKind");
   static readonly PropertyKey<string> DescriptionKey = new("Description");
   static readonly PropertyKey<string> StatusTokenKey = new("StatusToken");
+  static readonly PropertyKey<string> StatusKindKey = new("StatusKind");
   static readonly PropertyKey<string> StatusIconKey = new("StatusIcon");
   static readonly PropertyKey<string> StatusTextKey = new("StatusText");
   static readonly PropertyKey<string> AlertTextKey = new("AlertText");
@@ -193,11 +194,14 @@ public class StatusToggleAction : AutomationActionBase {
     objectSaver.Set(ActionKindKey, ActionKind.ToString());
     objectSaver.Set(DescriptionKey, Description);
     objectSaver.Set(StatusTokenKey, StatusToken);
-    if (StatusIcon != null) {
-      objectSaver.Set(StatusIconKey, StatusIcon);
-      objectSaver.Set(StatusTextKey, StatusText);
+    if (ActionKind == ActionKindEnum.HideStatus) {
+      return;
     }
-    if (AlertText != null) {
+    objectSaver.Set(StatusKindKey, StatusKind.ToString());
+    objectSaver.Set(StatusIconKey, StatusIcon);
+    objectSaver.Set(StatusTextKey, StatusText);
+    if (StatusKind == StatusKindEnum.NormalStatusWithAlertAndFloatingIcon
+        || StatusKind == StatusKindEnum.PriorityStatusWithAlertAndFloatingIcon) {
       objectSaver.Set(AlertTextKey, AlertText);
     }
   }
