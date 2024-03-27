@@ -4,9 +4,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using Automation.AutomationSystem;
 using Bindito.Core;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
@@ -33,7 +31,7 @@ namespace Automation.PathCheckingSystem {
 /// <summary>Container for the path blocking site.</summary>
 /// <remarks>It must only be applied to the preview sites.</remarks>
 sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListener, IFinishedStateListener,
-                                IDeletableEntity {
+                                IDeletableEntity, IInitializableEntity {
 
   #region API
   // ReSharper disable MemberCanBePrivate.Global
@@ -51,9 +49,6 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
 
   /// <summary>BlockObject of this site.</summary>
   public BlockObject BlockObject { get; private set; }
-
-  /// <summary>Tells if all the site's foundation blocks stay on top fo finished entities.</summary>
-  public bool IsFullyGrounded => _groundedSite.IsFullyGrounded;
 
   /// <summary>NavMesh nodes version of the stock <see cref="NavMeshEdge"/>.</summary>
   public struct NodeEdge {
@@ -75,7 +70,7 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   public HashSet<int> BestBuildersPathNodeIndex { get; private set; }
 
   /// <summary>The access that was used to build <see cref="BestBuildersPathCornerNodes"/>.</summary>
-  public int BestAccessNode { get; private set; }
+  public int BestAccessNode { get; private set; } = -1;
 
   /// <summary>Coordinates of the positions that are taken by the site.</summary>
   public List<int> RestrictedNodes { get; private set; }
@@ -87,36 +82,37 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   /// </remarks>
   public bool CanBeAccessedInPreview { get; private set; }
 
-  /// <summary>Completely removes this component from the object.</summary>
-  public void CleanupComponent() {
-    ClearAllStates();
-    _eventBus.Unregister(this);
-    _navMeshListenerEntityRegistry.UnregisterNavMeshListener(this);
-    Destroy(this);
+  /// <summary>Makes the component active on the game object. This resumes all side effects.</summary>
+  /// <remarks>
+  /// Only call it when re-suing an existing component. All new components, including the loaded ones, should get
+  /// initialized via <see cref="InitializeEntity"/>.
+  /// </remarks>
+  /// <seealso cref="DisableComponent"/>
+  public void EnableComponent() {
+    _eventBus.Register(this);
+    _navMeshListenerEntityRegistry.RegisterNavMeshListener(this);
+    enabled = true;
+    MaybeUpdateNavMesh();
   }
 
-  /// <summary>Verifies that the all NavMesh related things are up to date on the site.</summary>
-  /// <remarks>If no updates needed, it is a very cheap call.</remarks>
-  /// <seealso cref="BestBuildersPathNodeIndex"/>
-  /// <seealso cref="BestBuildersPathCornerNodes"/>
-  public void MaybeUpdateNavMesh() {
-    if (Features.PathCheckingControllerProfiling) {
-      SitePathsUpdated++;
-      UpdatePathsStopWatch.Start();
-    }
-    UpdateNavMesh();
-    if (Features.PathCheckingControllerProfiling) {
-      UpdatePathsStopWatch.Stop();
-    }
+  /// <summary>Disable the component and clan up all its side effects.</summary>
+  /// <remarks>
+  /// Once added to the game object, the component must not be destroyed. If the site is added to the building again,
+  /// the existing component must be re-used.
+  /// </remarks>
+  /// <seealso cref="EnableComponent"/>
+  public void DisableComponent() {
+    ClearAllStates();
+    ResetState();
+    _eventBus.Unregister(this);
+    _navMeshListenerEntityRegistry.UnregisterNavMeshListener(this);
+    enabled = false;
   }
 
   // ReSharper restore MemberCanBePrivate.Global
   #endregion
 
   #region Profiling support
-
-  internal static int SitePathsUpdated;
-  internal static readonly Stopwatch UpdatePathsStopWatch = new();
 
   #endregion
 
@@ -145,8 +141,10 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   StatusToggle _unreachableStatusToggle;
   StatusToggle _maybeReachableStatusToggle;
   int _bestPathRoadNodeId = -1;
+  bool _isFullyGrounded;
   bool _isCurrentlySelected;
 
+  /// <summary>It is called before <see cref="InjectDependencies"/>!</summary>
   void Awake() {
     BlockObject = GetComponentFast<BlockObject>();
     if (BlockObject.Preview) {
@@ -160,17 +158,8 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
     _blockObjectNavMesh = GetComponentFast<BlockObjectNavMesh>();
   }
 
-  void Start() {
-    _unreachableStatusToggle = StatusToggle.CreatePriorityStatusWithAlertAndFloatingIcon(
-        UnreachableIconName, _loc.T(UnreachableStatusLocKey), _loc.T(UnreachableAlertLocKey));
-    GetComponentFast<StatusSubject>().RegisterStatus(_unreachableStatusToggle);
-    _maybeReachableStatusToggle = StatusToggle.CreateNormalStatus(UnreachableIconName, _loc.T(NotYetReachableLocKey));
-    GetComponentFast<StatusSubject>().RegisterStatus(_maybeReachableStatusToggle);
-    _eventBus.Register(this);
-    _navMeshListenerEntityRegistry.RegisterNavMeshListener(this);
-  }
-
-  /// <summary>It must be public to work.</summary>
+  /// <summary>It is called after <see cref="Awake"/>!</summary>
+  /// <remarks>It must be public to work.</remarks>
   [Inject]
   public void InjectDependencies(
       ILoc loc, NodeIdService nodeIdService, DistrictCenterRegistry districtCenterRegistry, DistrictMap districtMap,
@@ -208,22 +197,15 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   /// checking algo cannot deal with all the corners cases. It may limit players in their construction methods, but
   /// that's the price to pay.
   /// </remarks>
-  void UpdateNavMesh() {
+  public void MaybeUpdateNavMesh() {
+    if (!_isFullyGrounded) {
+      return;  // If not grounded, then it cannot start building.
+    }
+    PathCheckingService.PathUpdateProfiler.StartNewHit();
     if (RestrictedNodes == null) {
       InitializeNavMesh();
     }
-    BestBuildersPathNodeIndex = new HashSet<int>();
-    BestBuildersPathCornerNodes = new List<int>();
-    BestAccessNode = -1;
-    _bestPathRoadNodeId = -1;
-    CanBeAccessedInPreview = false;
-    if (!_groundedSite.IsFullyGrounded) {
-      return;
-    }
-    if (!_accessible.enabled) {
-      HostedDebugLog.Error(ConstructionSite, "Disabled accessible in use");
-      return;
-    }
+    ResetState();
 
     var bestDistance = float.MaxValue;
     var bestRoadNode = -1;
@@ -267,6 +249,7 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
         SetUnreachableStatus();
       }
     }
+    PathCheckingService.PathUpdateProfiler.Stop();
   }
 
   /// <summary>Blocks the site since there is no controllable ways to reach it.</summary>
@@ -297,24 +280,43 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
     }
   }
 
+  /// <summary>Reset to unreachable site.</summary>
+  void ResetState() {
+    BestBuildersPathNodeIndex = new HashSet<int>();
+    BestBuildersPathCornerNodes = new List<int>();
+    BestAccessNode = -1;
+    _bestPathRoadNodeId = -1;
+    CanBeAccessedInPreview = false;
+  }
+
   #endregion
 
   #region Events for the state update
 
-  /// <summary>Reacts on construction complete and verifies if a non-grounded site can now start building.</summary>
-  /// <remarks>
-  /// No, we cannot cache the previous grounded state due to it's dynamic. There is no way to run the logic right after
-  /// the current state gets calculated by the stock component.
-  /// </remarks>
+  /// <summary>Reacts on construction complete and verifies if a non-grounded site became grounded.</summary>
+  /// <remarks>Needs to be public to work.</remarks>
   [OnEvent]
   public void OnConstructibleEnteredFinishedStateEvent(ConstructibleEnteredFinishedStateEvent @event) {
-    if (_groundedSite.IsFullyGrounded && (!_previouslyWasGrounded.HasValue || !_previouslyWasGrounded.Value)) {
-      // The grounded state has changed or it's the first call ever. We need to update with the either case.
-      _previouslyWasGrounded = _groundedSite.IsFullyGrounded;
-      UpdateNavMesh();
+    if (!_groundedSite.IsFullyGrounded || !enabled) {
+      return;
+    }
+    if (@event.Constructible.GetComponentFast<BlockObject>() == BlockObject) {
+      return;  // On self-construction the site will be removed.
+    }
+    _isFullyGrounded = true;
+    MaybeUpdateNavMesh();
+  }
+
+  /// <summary>Deleted entities can unblock unreachable sites.</summary>
+  /// <remarks>Needs to be public to work.</remarks>
+  [OnEvent]
+  public void OnEntityDeletedEvent(EntityDeletedEvent @event) {
+    if (BestAccessNode == -1 && @event.Entity.GetComponentFast<BlockObject>() != BlockObject) {
+      MaybeUpdateNavMesh();
+      //FIXME
+      HostedDebugLog.Warning(this, "*** unblocked");
     }
   }
-  bool? _previouslyWasGrounded;
 
   #endregion
 
@@ -322,17 +324,19 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
 
   /// <inheritdoc/>
   public void OnNavMeshUpdated(NavMeshUpdate navMeshUpdate) {
-    if (!_groundedSite.IsFullyGrounded) {
-      return;  // The ungrounded site cannot have path.
+    if (!_isFullyGrounded || !enabled) {
+      return;
     }
     if (_bestPathRoadNodeId == -1) {
-      UpdateNavMesh();  // For an unreachable site, _any_ update to navmesh can make it reachable.
+      // For an unreachable site, _any_ update to navmesh can make it reachable.
+      // Also, the road doesn't exists on the site were loaded just loaded.
+      MaybeUpdateNavMesh();
       return;
     }
     // If we have a path, then check if the navmesh change affects at least one of the nodes. No change, no problem.
     if (navMeshUpdate.RoadNodeIds.FastContains(_bestPathRoadNodeId)
         || navMeshUpdate.TerrainNodeIds.FastAny(BestBuildersPathNodeIndex.Contains)) {
-      UpdateNavMesh();
+      MaybeUpdateNavMesh();
     }
   }
 
@@ -362,7 +366,7 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
 
   /// <inheritdoc/>
   public void OnEnterFinishedState() {
-    CleanupComponent();
+    DisableComponent();
   }
 
   /// <inheritdoc/>
@@ -373,7 +377,25 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   #region IDeletableEntity implementation
 
   public void DeleteEntity() {
-    CleanupComponent();
+    DisableComponent();
+  }
+
+  #endregion
+
+  #region IInitializableEntity
+
+  /// <inheritdoc/>
+  public void InitializeEntity() {
+    if (_unreachableStatusToggle != null) {
+      return;  // Already initialized.
+    }
+    _unreachableStatusToggle = StatusToggle.CreatePriorityStatusWithAlertAndFloatingIcon(
+        UnreachableIconName, _loc.T(UnreachableStatusLocKey), _loc.T(UnreachableAlertLocKey));
+    _maybeReachableStatusToggle = StatusToggle.CreateNormalStatus(UnreachableIconName, _loc.T(NotYetReachableLocKey));
+    GetComponentFast<StatusSubject>().RegisterStatus(_unreachableStatusToggle);
+    GetComponentFast<StatusSubject>().RegisterStatus(_maybeReachableStatusToggle);
+    _isFullyGrounded = _groundedSite.IsFullyGrounded;
+    EnableComponent();
   }
 
   #endregion

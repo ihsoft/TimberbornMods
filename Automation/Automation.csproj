@@ -48,6 +48,12 @@
       <Compile Include="..\TimberDev\Utils\PrefabPatcher.cs">
         <Link>Utils\PrefabPatcher.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\Utils\PrefabPatcher.cs">
+        <Link>Utils\TicksProfiler.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\PrefabPatcher.cs">
+        <Link>Utils\CounterProfiler.cs</Link>
+      </Compile>
       <Compile Include="..\UnityDevLite\DebugEx.cs">
         <Link>UnityDevLite\DebugEx.cs</Link>
       </Compile>

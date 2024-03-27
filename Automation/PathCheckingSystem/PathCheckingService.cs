@@ -2,13 +2,11 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using Automation.AutomationSystem;
 using Automation.Conditions;
+using IgorZ.TimberDev.Utils;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.Common;
@@ -28,7 +26,7 @@ namespace Automation.PathCheckingSystem {
 /// It cannot be handled in scope of just one condition due to all of them are interconnected (they can affect each
 /// other). This controller has "the full picture" and orchestrates all the conditions.
 /// </remarks>
-sealed class PathCheckingService : ITickableSingleton {
+sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener {
 
   #region ITickableSingleton implementation
 
@@ -62,9 +60,7 @@ sealed class PathCheckingService : ITickableSingleton {
     if (_conditionsIndex.TryGetValue(site, out var valueList)) {
       valueList.Remove(condition);
       if (valueList.Count == 0) {
-        _conditionsIndex.Remove(site);
-        _sitesByBlockObject.Remove(condition.Behavior.BlockObject);
-        site.CleanupComponent();
+        DeleteSite(site);
       }
     }
   }
@@ -86,6 +82,9 @@ sealed class PathCheckingService : ITickableSingleton {
   /// <summary>Cache of tiles that are paths to the characters on the map.</summary>
   HashSet<int> _walkersTakenNodes;
 
+  /// <summary>Tells whether the NvaMesh is now initialized and ready to use.</summary>
+  bool _navMeshIsReady;
+
   PathCheckingService(EntityComponentRegistry entityComponentRegistry, AutomationService automationService,
                       NodeIdService nodeIdService, BaseInstantiator baseInstantiator) {
     Instance = this;
@@ -100,6 +99,7 @@ sealed class PathCheckingService : ITickableSingleton {
   /// conditions.
   /// </summary>
   public void CheckBlockingStateAndTriggerActions(PathCheckingSite site) {
+    //FIXME: account cost
     site.CanFinish = !IsBlockingSite(site);
     var conditions = _conditionsIndex[site];
     foreach (var condition in conditions) {
@@ -109,27 +109,26 @@ sealed class PathCheckingService : ITickableSingleton {
 
   /// <summary>Determines if the site construction can complete without obstructing any other site.</summary>
   bool IsBlockingSite(PathCheckingSite site) {
-    site.MaybeUpdateNavMesh();
-    if (site.BestBuildersPathNodeIndex.Count == 0) {
+    if (site.BestAccessNode == -1) {
+      HostedDebugLog.Warning(site, "*** unrechable site cannot block");
       return true;  // The unreachable sites cannot get built and trigger the condition.
     }
+    PathCheckProfiler.StartNewHit();
 
     var isBlocked = false;
     foreach (var testSite in _sitesByBlockObject.Values) {
-      testSite.MaybeUpdateNavMesh();
-      if (ReferenceEquals(testSite, site)
-          || !testSite.IsFullyGrounded
-          || testSite.BestBuildersPathCornerNodes.Count == 0
-          || IsNonBlockingPathSite(site, testSite)) {
-        continue;
+      if (testSite.BestAccessNode != -1 && !ReferenceEquals(testSite, site) && !IsNonBlockingPathSite(site, testSite)) {
+        isBlocked = true;
+        break;
       }
-      isBlocked = true;
-      break;
     }
     if (!isBlocked) {
+      PathCheckProfiler.Stop();
       MaybeBuildWalkersIndex();
+      PathCheckProfiler.Start();
       isBlocked = site.RestrictedNodes.FastAny(x => _walkersTakenNodes.Contains(x));
     }
+    PathCheckProfiler.Stop();
     return isBlocked;
   }
 
@@ -191,47 +190,61 @@ sealed class PathCheckingService : ITickableSingleton {
   /// <remarks>We don't want to let the builders get stranded.</remarks>
   void MaybeBuildWalkersIndex() {
     if (_lastCacheBuiltFrame == Time.frameCount) {
-      return;  // The cache is up to date.
+      return; // The cache is up to date.
     }
-    if (Features.PathCheckingControllerProfiling) {
-      _walkersUpdateStopwatch.Start();
-    }
+    WalkersCheckProfiler.StartNewHit();
     _lastCacheBuiltFrame = Time.frameCount;
     _walkersTakenNodes = new HashSet<int>();
-    var walkers = _entityComponentRegistry
-        .GetEnabled<BlockOccupant>()
-        .Select(x => x.GetComponentFast<Walker>())
+    var walkers = _entityComponentRegistry.GetEnabled<BlockOccupant>().Select(x => x.GetComponentFast<Walker>())
         .Where(x => x);
     foreach (var walker in walkers) {
       var pathFollower = walker._pathFollower;
       if (pathFollower._pathCorners == null) {
-        continue;  // No path, no problem.
+        continue; // No path, no problem.
       }
-      var activePathCorners = pathFollower._pathCorners
-          .Skip(pathFollower._nextCornerIndex - 1)
+      var activePathCorners = pathFollower._pathCorners.Skip(pathFollower._nextCornerIndex - 1)
           .Select(_nodeIdService.WorldToId);
       _walkersTakenNodes.AddRange(activePathCorners);
     }
-    if (Features.PathCheckingControllerProfiling) {
-      _walkersUpdateStopwatch.Stop();
-    }
+    WalkersCheckProfiler.Stop();
   }
+
   int _lastCacheBuiltFrame;
 
-  /// <summary>Tries finding a path checking site for the specified building.</summary>
-  bool TryGetSite(BaseComponent component, out PathCheckingSite site) {
+  /// <summary>Deletes site if the matching component is in index.</summary>
+  void TryDeleteSite(BaseComponent component) {
     var blockObject = component.GetComponentFast<BlockObject>();
-    site = null;
-    return blockObject && _sitesByBlockObject.TryGetValue(blockObject, out site);
+    if (blockObject && _sitesByBlockObject.TryGetValue(blockObject, out var site)) {
+      DeleteSite(site);
+    }
   }
 
   /// <summary>Finds the existing construction site or creates a new one.</summary>
   PathCheckingSite GetOrCreate(BlockObject blockObject) {
     if (!_sitesByBlockObject.TryGetValue(blockObject, out var cachedSite)) {
-      cachedSite = _baseInstantiator.AddComponent<PathCheckingSite>(blockObject.GameObjectFast);
+      cachedSite = blockObject.GetComponentFast<PathCheckingSite>();
+      if (cachedSite) {
+        cachedSite.EnableComponent();
+      } else {
+        cachedSite = _baseInstantiator.AddComponent<PathCheckingSite>(blockObject.GameObjectFast);
+        if (_navMeshIsReady) { // No mesh means it's a loading stage. The game will init the site. 
+          cachedSite.InitializeEntity();
+        }
+      }
       _sitesByBlockObject.Add(blockObject, cachedSite);
     }
     return cachedSite;
+  }
+
+  /// <summary>Removes the site and all the associated conditions.</summary>
+  void DeleteSite(PathCheckingSite site) {
+    var conditions = _conditionsIndex[site];
+    foreach (var condition in conditions.ToArray()) { // Work on copy, since it may get modified.
+      condition.CancelCondition();
+    }
+    _conditionsIndex.Remove(site);
+    _sitesByBlockObject.Remove(site.BlockObject);
+    site.DisableComponent();
   }
 
   #endregion
@@ -239,59 +252,25 @@ sealed class PathCheckingService : ITickableSingleton {
   #region Profiling tools
 
   const int StatsTicksThreshold = 20;
-
-  readonly Stopwatch _walkersUpdateStopwatch = new Stopwatch();
   int _tickTillStat = StatsTicksThreshold;
-  int _totalSites;
-  int _maxSites;
-  long _totalSiteUpdatesTicks;
-  long _maxSiteUpdatesTicks;
-  int _totalSitesUpdated;
-  int _maxSitesUpdated;
-  long _totalWalkersUpdateTicks;
-  long _maxWalkersUpdateTicks;
-
-  static string FormatTicksAsMs(long stopwatchTicks) {
-    return $"{1000f * stopwatchTicks / Stopwatch.Frequency:0.###}ms";
-  }
+  internal static readonly TicksProfiler PathUpdateProfiler = new();
+  static readonly TicksProfiler PathCheckProfiler = new();
+  static readonly TicksProfiler WalkersCheckProfiler = new();
+  static readonly CounterProfiler SitesProfiler = new();
 
   void Profile() {
-    _maxSiteUpdatesTicks = Math.Max(_maxSiteUpdatesTicks, PathCheckingSite.UpdatePathsStopWatch.ElapsedTicks);
-    _totalSiteUpdatesTicks += PathCheckingSite.UpdatePathsStopWatch.ElapsedTicks;
-    _totalSites += _conditionsIndex.Count;
-    _maxSites = Math.Max(_maxSites, _conditionsIndex.Count);
-    _maxSitesUpdated = Math.Max(_maxSitesUpdated, PathCheckingSite.SitePathsUpdated);
-    _totalSitesUpdated += PathCheckingSite.SitePathsUpdated;
-    _maxWalkersUpdateTicks = Math.Max(_maxWalkersUpdateTicks, _walkersUpdateStopwatch.ElapsedTicks);
-    _totalWalkersUpdateTicks += _walkersUpdateStopwatch.ElapsedTicks;
-
-    PathCheckingSite.SitePathsUpdated = 0;
+    PathUpdateProfiler.NextFrame();
+    PathCheckProfiler.NextFrame();
+    WalkersCheckProfiler.NextFrame();
+    SitesProfiler.Increment(_sitesByBlockObject.Count);
+    SitesProfiler.NextFrame();
     if (--_tickTillStat <= 0) {
       _tickTillStat = StatsTicksThreshold;
-      var info = new StringBuilder();
-      info.AppendFormat("**** Stats for PathCheckingController, {0} ticks window:\n", StatsTicksThreshold);
-      info.AppendFormat(
-          "WalkersIndex cost: avg={0}, total={1}, max={2}\n",
-          FormatTicksAsMs(_totalWalkersUpdateTicks / StatsTicksThreshold),
-          FormatTicksAsMs(_totalWalkersUpdateTicks), FormatTicksAsMs(_maxWalkersUpdateTicks));
-      info.AppendFormat(
-          "PathCheckingSite cost: avg={0}, total={1}, max={2}\n",
-          FormatTicksAsMs(_totalSiteUpdatesTicks / StatsTicksThreshold),
-          FormatTicksAsMs(_totalSiteUpdatesTicks), FormatTicksAsMs(_maxSiteUpdatesTicks));
-      info.AppendFormat("Sites: avg={0:0.##}, max={1}\n", (float)_totalSites / StatsTicksThreshold, _maxSites);
-      info.AppendFormat("Updates: avg={0}, total={1}, max={2}\n",
-                        (float)_totalSitesUpdated / StatsTicksThreshold, _totalSitesUpdated, _maxSitesUpdated);
-      DebugEx.Info(info.ToString());
-      _totalSites = 0;
-      _maxSites = 0;
-      _totalSiteUpdatesTicks = 0;
-      _maxSiteUpdatesTicks = 0;
-      _totalSitesUpdated = 0;
-      _maxSitesUpdated = 0;
-      _totalWalkersUpdateTicks = 0;
-      _maxWalkersUpdateTicks = 0;
-      _walkersUpdateStopwatch.Reset();
-      PathCheckingSite.UpdatePathsStopWatch.Reset();
+      DebugEx.Info("****** PROFILING STATS ******");
+      DebugEx.Info("PathUpdate  : {0}", PathUpdateProfiler.GetStatsAndReset());
+      DebugEx.Info("PathCheck   : {0}", PathCheckProfiler.GetStatsAndReset());
+      DebugEx.Info("WalkersCheck: {0}", WalkersCheckProfiler.GetStatsAndReset());
+      DebugEx.Info("Sites       : {0}", SitesProfiler.GetStatsAndReset());
     }
   }
 
@@ -303,26 +282,23 @@ sealed class PathCheckingService : ITickableSingleton {
   /// <remarks>Needs to be public to work.</remarks>
   [OnEvent]
   public void OnConstructibleEnteredFinishedStateEvent(ConstructibleEnteredFinishedStateEvent @event) {
-    if (!TryGetSite(@event.Constructible, out var site)) {
-      return;
-    }
-    var conditions = _conditionsIndex[site];
-    foreach (var condition in conditions.ToArray()) {  // Work on copy, since it may get modified.
-      if (condition.Behavior) {
-        condition.CancelCondition();
-      }
-    }
-    _conditionsIndex.Remove(site);
+    TryDeleteSite(@event.Constructible);
   }
 
   /// <summary>Marks the path indexes dirty.</summary>
   /// <remarks>Needs to be public to work.</remarks>
   [OnEvent]
   public void OnEntityDeletedEvent(EntityDeletedEvent @event) {
-    if (!TryGetSite(@event.Entity, out var site)) {
-      return;
-    }
-    _conditionsIndex.Remove(site);
+    TryDeleteSite(@event.Entity);
+  }
+
+  #endregion
+
+  #region ISingletonNavMeshListener implementation
+
+  /// <inheritdoc/>
+  public void OnNavMeshUpdated(NavMeshUpdate navMeshUpdate) {
+    _navMeshIsReady = true;
   }
 
   #endregion

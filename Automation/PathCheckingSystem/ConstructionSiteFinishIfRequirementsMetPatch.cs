@@ -3,13 +3,9 @@
 // License: Public Domain
 
 using HarmonyLib;
-using TimberApi.DependencyContainerSystem;
 using Timberborn.ConstructionSites;
-using UnityDev.Utils.LogUtilsLite;
-using UnityEngine.UIElements;
-using ProgressBar = Timberborn.CoreUI.ProgressBar;
-// ReSharper disable InconsistentNaming
 
+// ReSharper disable InconsistentNaming
 namespace Automation.PathCheckingSystem {
 
 /// <summary>Holds construction site finishing until the path checking service allows it.</summary>
@@ -24,7 +20,7 @@ static class ConstructionSiteFinishIfRequirementsMetPatch {
       return true;
     }
     var site = __instance.GetComponentFast<PathCheckingSite>();
-    if (site) {
+    if (site && site.enabled) {
       PathCheckingService.Instance.CheckBlockingStateAndTriggerActions(site);
       return site.CanFinish;
     }
