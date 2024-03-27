@@ -34,7 +34,7 @@ sealed class PathCheckingService : ITickableSingleton {
 
   /// <inheritdoc/>
   public void Tick() {
-    if (Features.PathCheckingControllerProfiling) {
+    if (Features.PathCheckingSystemProfiling) {
       Profile();
     }
   }

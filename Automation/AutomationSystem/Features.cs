@@ -15,8 +15,8 @@ sealed class Features : IConfigurator {
   /// <summary>Indicates that <see cref="DebugEx.Fine"/> methods should emit record to the log.</summary>
   public static bool DebugExVerboseLogging;
 
-  /// <summary>Specifies whether the path controller should periodically dump performance statistics.</summary>
-  public static bool PathCheckingControllerProfiling;
+  /// <summary>Specifies whether path checking system should periodically dump performance statistics.</summary>
+  public static bool PathCheckingSystemProfiling;
 
   public void Configure(IContainerDefinition containerDefinition) {
     if (DebugExVerboseLogging && DebugEx.LoggingSettings.VerbosityLevel < 5) {
@@ -30,8 +30,10 @@ sealed class Features : IConfigurator {
 
   static bool Consume(string name, bool enabled, string value) {
     return name switch {
-        "DebugEx.VerboseLogging" => FeatureController.SetFlag(ref DebugExVerboseLogging, name, enabled, value),
-        "PathCheckingController.Profiling" => FeatureController.SetFlag(ref PathCheckingControllerProfiling, name, enabled, value),
+        "DebugEx.VerboseLogging" =>
+            FeatureController.SetFlag(ref DebugExVerboseLogging, name, enabled, value),
+        "PathCheckingSystem.Profiling" =>
+            FeatureController.SetFlag(ref PathCheckingSystemProfiling, name, enabled, value),
         _ => false
     };
   }
