@@ -16,7 +16,7 @@ using Timberborn.StatusSystem;
 
 namespace Automation.Actions {
 
-/// <summary>This action only presents a status on teh building. It doesn't do anything else.</summary>
+/// <summary>This action only presents a status on the building. It doesn't do anything else.</summary>
 /// <remarks>The other actions that need a status can inherit from this action.</remarks>
 public class StatusToggleAction : AutomationActionBase {
 
@@ -61,11 +61,11 @@ public class StatusToggleAction : AutomationActionBase {
   /// <summary>Indicates how the status should be presented.</summary>
   public StatusKindEnum StatusKind { get; private set; }
 
-  /// <summary>Localization key for teh text that describes teh action in automation UI.</summary>
+  /// <summary>Localization key for the text that describes the action in automation UI.</summary>
   public string Description { get; private set; }
 
   /// <summary>This is an identifier to bind the status to.</summary>
-  /// <remarks>The show/hide actions must refer teh same token to control the same status.</remarks>
+  /// <remarks>The show/hide actions must refer the same token to control the same status.</remarks>
   public string StatusToken { get; private set; }
 
   /// <summary>Specifies the icon of the status.</summary>
