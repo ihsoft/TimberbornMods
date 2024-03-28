@@ -99,7 +99,6 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
   /// conditions.
   /// </summary>
   public void CheckBlockingStateAndTriggerActions(PathCheckingSite site) {
-    //FIXME: account cost
     site.CanFinish = !IsBlockingSite(site);
     var conditions = _conditionsIndex[site];
     foreach (var condition in conditions) {
@@ -135,10 +134,6 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
   /// <summary>
   /// Checks if <paramref name="pathSite"/> is a path object that doesn't block access to <paramref name="testSite"/>.
   /// </summary>
-  /// <remarks>
-  /// It only checks cases when the two sites are neighbours and at the same level. Otherwise, the result is always
-  /// negative.
-  /// </remarks>
   static bool IsNonBlockingPathSite(PathCheckingSite pathSite, PathCheckingSite testSite) {
     var testPathNodes = testSite.BestBuildersPathNodeIndex;
     var testPathCorners = testSite.BestBuildersPathCornerNodes;

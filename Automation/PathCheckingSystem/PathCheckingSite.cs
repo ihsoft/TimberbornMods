@@ -313,8 +313,6 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   public void OnEntityDeletedEvent(EntityDeletedEvent @event) {
     if (BestAccessNode == -1 && @event.Entity.GetComponentFast<BlockObject>() != BlockObject) {
       MaybeUpdateNavMesh();
-      //FIXME
-      HostedDebugLog.Warning(this, "*** unblocked");
     }
   }
 
@@ -376,6 +374,7 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
 
   #region IDeletableEntity implementation
 
+  /// <inheritdoc/>
   public void DeleteEntity() {
     DisableComponent();
   }
