@@ -112,7 +112,6 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
       return false;  // This site cannot block anything.
     }
     PathCheckProfiler.StartNewHit();
-
     var isBlocked = false;
     foreach (var testSite in _sitesByBlockObject.Values) {
       if (testSite.BestAccessNode != -1 && !ReferenceEquals(testSite, site) && !IsNonBlockingPathSite(site, testSite)) {
@@ -134,8 +133,11 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
   /// Checks if <paramref name="pathSite"/> is a path object that doesn't block access to <paramref name="testSite"/>.
   /// </summary>
   static bool IsNonBlockingPathSite(PathCheckingSite pathSite, PathCheckingSite testSite) {
-    var testPathNodes = testSite.BestBuildersPathNodeIndex;
     var testPathCorners = testSite.BestBuildersPathCornerNodes;
+    if (testPathCorners.Count == 1) {
+      return true;  // This site stays right at the road. Nothing can block it.
+    }
+    var testPathNodes = testSite.BestBuildersPathNodeIndex;
     var edges = pathSite.NodeEdges;
     for (var i = pathSite.RestrictedNodes.Count - 1; i >= 0; i--) {
       var restrictedCoordinate = pathSite.RestrictedNodes[i];
@@ -144,8 +146,8 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
       }
       var pathPos = testPathCorners.IndexOf(pathSite.SiteNodeId);
 
-      // If the blocking site is at the end of the path, then just check if there is an edge to the test site.
-      if (pathPos == testPathCorners.Count - 1) {
+      // If the blocking site is at the access, then just check if it has and an edge to the test site.
+      if (pathPos == 0) {
         if (edges.FastAny(e => e.Start == restrictedCoordinate && e.End == testSite.BestAccessNode)) {
           continue;
         }
@@ -153,9 +155,9 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
       }
 
       // If the blocking site is in the middle of the path, then verify if the nodes before and after are connected by
-      // any edge.
-      var nodeAfter = testPathCorners[pathPos + 1];
-      var nodeBefore = testPathCorners[pathPos - 1];
+      // any edge. This would mean that the site provides connectivity and doesn't block the path.
+      var nodeAfter = testPathCorners[pathPos - 1];
+      var nodeBefore = testPathCorners[pathPos + 1];
       var isConnectedToTestSite = false;
       var isConnectedToTheTestPath = false;
       for (var j = edges.Count - 1; j >= 0; j--) {

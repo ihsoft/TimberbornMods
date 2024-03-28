@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Bindito.Core;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
@@ -24,7 +25,6 @@ using Timberborn.SelectionSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.StatusSystem;
 using UnityDev.Utils.LogUtilsLite;
-using UnityEngine;
 
 namespace Automation.PathCheckingSystem {
 
@@ -59,7 +59,8 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   /// <summary>Path edges from the site if there are any.</summary>
   public List<NodeEdge> NodeEdges { get; private set; }
 
-  /// <summary>The path from the closest road to the closets construction site's accessible.</summary>
+  /// <summary>The path from the  construction site's accessible to the closest road.</summary>
+  /// <remarks>It's a directional list. It starts at the accessible coordinate and goes to the road.</remarks>
   /// <seealso cref="MaybeUpdateNavMesh"/>
   public List<int> BestBuildersPathCornerNodes { get; private set; }
 
@@ -128,7 +129,6 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   DistrictCenterRegistry _districtCenterRegistry;
   DistrictMap _districtMap;
   PreviewDistrictMap _previewDistrictMap;
-  INavigationService _navigationService;
   EventBus _eventBus;
   NavMeshListenerEntityRegistry _navMeshListenerEntityRegistry;
 
@@ -163,14 +163,13 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   [Inject]
   public void InjectDependencies(
       ILoc loc, NodeIdService nodeIdService, DistrictCenterRegistry districtCenterRegistry, DistrictMap districtMap,
-      PreviewDistrictMap previewDistrictMap, INavigationService navigationService, EventBus eventBus,
+      PreviewDistrictMap previewDistrictMap, EventBus eventBus,
       NavMeshListenerEntityRegistry navMeshListenerEntityRegistry) {
     _loc = loc;
     _nodeIdService = nodeIdService;
     _districtCenterRegistry = districtCenterRegistry;
     _districtMap = districtMap;
     _previewDistrictMap = previewDistrictMap;
-    _navigationService = navigationService;
     _eventBus = eventBus;
     _navMeshListenerEntityRegistry = navMeshListenerEntityRegistry;
   }
@@ -208,13 +207,12 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
     ResetState();
 
     var bestDistance = float.MaxValue;
-    var bestRoadNode = -1;
-    var bestAccess = Vector3.zero;
+    RoadSpillFlowField bestFlow = null;
     var minAccessHeight = CoordinateSystem.GridToWorld(BlockObject.Coordinates).y;
-    var accesses = _accessible.Accesses
-        .Where(access => access.y >= minAccessHeight && _nodeIdService.Contains(access));
-    foreach (var access in accesses) {
-      var accessNode = _nodeIdService.WorldToId(access);
+    var accessNodes = _accessible.Accesses
+        .Where(access => access.y >= minAccessHeight && _nodeIdService.Contains(access))
+        .Select(_nodeIdService.WorldToId);
+    foreach (var accessNode in accessNodes) {
       foreach (var district in _districtCenterRegistry.AllDistrictCenters) {
         var flow = _districtMap.GetDistrictRoadSpillFlowField(district.District);
         if (!flow.HasNode(accessNode)) {
@@ -229,18 +227,14 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
           continue;
         }
         bestDistance = newDistance;
-        bestRoadNode = flow.GetRoadParentNodeId(accessNode);
-        bestAccess = access;
+        BestAccessNode = accessNode;
+        bestFlow = flow;
       }
     }
-    if (bestRoadNode != -1) {
-      var bestRoadPosition = _nodeIdService.IdToWorld(bestRoadNode);
-      var pathCorners = new List<Vector3>();
-      _navigationService.FindPathUnlimitedRange(bestRoadPosition, bestAccess, pathCorners, out _);
-      BestAccessNode = _nodeIdService.WorldToId(bestAccess);
-      BestBuildersPathCornerNodes = pathCorners.Select(_nodeIdService.WorldToId).ToList();
-      BestBuildersPathNodeIndex = pathCorners.Select(_nodeIdService.WorldToId).ToHashSet();
-      _bestPathRoadNodeId = bestRoadNode;
+    if (bestFlow != null) {
+      _bestPathRoadNodeId = bestFlow.GetRoadParentNodeId(BestAccessNode);
+      BestBuildersPathCornerNodes = GetPathToRoadFast(BestAccessNode, bestFlow);
+      BestBuildersPathNodeIndex = BestBuildersPathCornerNodes.ToHashSet();
       ClearAllStates();
     } else {
       if (CanBeAccessedInPreview) {
@@ -250,6 +244,22 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
       }
     }
     PathCheckingService.PathUpdateProfiler.Stop();
+  }
+
+  /// <summary>Fast method of getting path to the closest road.</summary>
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  static List<int> GetPathToRoadFast(int nodeId, RoadSpillFlowField flow) {
+    var res = new List<int>(20);
+    res.Add(nodeId);
+    var roadParentId = flow.GetRoadParentNodeId(nodeId);
+    if (nodeId == roadParentId) {
+      return res;  // The access is at the road.
+    }
+    do {
+      nodeId = flow.GetParentId(nodeId);
+      res.Add(nodeId);
+    } while (nodeId != roadParentId);
+    return res;
   }
 
   /// <summary>Blocks the site since there is no controllable ways to reach it.</summary>
