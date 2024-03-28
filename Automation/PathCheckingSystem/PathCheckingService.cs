@@ -108,9 +108,8 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
 
   /// <summary>Determines if the site construction can complete without obstructing any other site.</summary>
   bool IsBlockingSite(PathCheckingSite site) {
-    if (site.BestAccessNode == -1) {
-      HostedDebugLog.Warning(site, "*** unrechable site cannot block");
-      return true;  // The unreachable sites cannot get built and trigger the condition.
+    if (site.BestAccessNode == -1 || site.RestrictedNodes.Count == 0) {
+      return false;  // This site cannot block anything.
     }
     PathCheckProfiler.StartNewHit();
 
