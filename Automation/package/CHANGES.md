@@ -1,3 +1,7 @@
+# v1.0 (started on 3/12/2024):
+* [New] Add template to prevent completed building blocking builders and other building sites.
+* [Fix #46] Mod crashes on applying population template to a non-complete building.
+
 # v0.14 (29 Feb 2024):
 * [New] Add population control templates.
 * [New] Add water regulator control template.

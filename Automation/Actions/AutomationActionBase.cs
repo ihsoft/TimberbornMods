@@ -3,8 +3,8 @@
 // License: Public Domain
 
 using System.Diagnostics.CodeAnalysis;
+using Automation.AutomationSystem;
 using Automation.Conditions;
-using Automation.Core;
 using Automation.Utils;
 using Timberborn.Persistence;
 
@@ -33,11 +33,11 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
       if (value == _behavior) {
         return;
       }
-      if (value == null || _behavior != null) {
+      if (_behavior) {
         OnBehaviorToBeCleared();
       }
       _behavior = value;
-      if (_behavior != null) {
+      if (_behavior) {
         OnBehaviorAssigned();
       }
     }

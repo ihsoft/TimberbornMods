@@ -1,7 +1,7 @@
 {
   "Id": "Automation.Tmpl.Water.CloseFloodgateDrought",
   "GroupId": "AutomationWaterToolGroupId",
-  "Type": "Automation.Templates.ApplyTemplateTool",
+  "Type": "Automation.Tools.ApplyTemplateTool",
   "Order": 22,
   "Icon": "igorz.automation/ui_icons/icon-drought-close",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.DroughtCloseFloodgate.DisplayName",

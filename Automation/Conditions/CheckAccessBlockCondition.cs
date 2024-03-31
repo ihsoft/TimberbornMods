@@ -2,7 +2,8 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using Automation.Core;
+using Automation.AutomationSystem;
+using Automation.PathCheckingSystem;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.BuildingsNavigation;
 using Timberborn.Persistence;
@@ -13,7 +14,7 @@ namespace Automation.Conditions {
 /// This condition verifies if construction completion of the object would prevent accessing the other objects being
 /// constructed.
 /// </summary>
-/// <remarks>This logic works only on teh set of the objects that has this condition assigned to. It won't check all the
+/// <remarks>This logic works only on the set of the objects that has this condition assigned to. It won't check all the
 /// objects being constructed in the scene.
 /// </remarks>
 public sealed class CheckAccessBlockCondition : AutomationConditionBase {
@@ -33,7 +34,7 @@ public sealed class CheckAccessBlockCondition : AutomationConditionBase {
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
-    return !behavior.BlockObject.Finished && behavior.GetComponentFast<ConstructionSiteAccessible>() != null;
+    return !behavior.BlockObject.Finished && behavior.GetComponentFast<ConstructionSiteAccessible>();
   }
 
   /// <inheritdoc/>
@@ -48,12 +49,12 @@ public sealed class CheckAccessBlockCondition : AutomationConditionBase {
 
   /// <inheritdoc/>
   protected override void OnBehaviorAssigned() {
-    DependencyContainer.GetInstance<PathCheckingController>().AddCondition(this);
+    DependencyContainer.GetInstance<PathCheckingService>().AddCondition(this);
   }
 
   /// <inheritdoc/>
   protected override void OnBehaviorToBeCleared() {
-    DependencyContainer.GetInstance<PathCheckingController>().RemoveCondition(this);
+    DependencyContainer.GetInstance<PathCheckingService>().RemoveCondition(this);
   }
   #endregion
 

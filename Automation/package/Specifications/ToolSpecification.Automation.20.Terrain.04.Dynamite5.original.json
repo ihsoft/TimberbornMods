@@ -1,7 +1,7 @@
 {
   "Id": "Automation.Tmpl.Terrain.5LevelsDynamite",
   "GroupId": "AutomationTerrainToolGroupId",
-  "Type": "Automation.Templates.ApplyTemplateTool",
+  "Type": "Automation.Tools.ApplyTemplateTool",
   "Order": 4,
   "Icon": "igorz.automation/ui_icons/tool-dynamite-x5",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.5LevelsDynamite.DisplayName",

@@ -2,13 +2,14 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using Automation.Core;
+using Automation.AutomationSystem;
 using Timberborn.BuildingsBlocking;
 
 namespace Automation.Actions {
 
 /// <summary>Action that pauses a pausable building.</summary>
 /// <remarks>Due to any construction site is pausable, this action can only be applied to a finished building.</remarks>
+// ReSharper disable once UnusedType.Global
 public sealed class PauseAction : AutomationActionBase {
   const string DescriptionLocKey = "IgorZ.Automation.PauseAction.Description";
 
@@ -23,8 +24,9 @@ public sealed class PauseAction : AutomationActionBase {
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
+    //FIXME: in can become not pausable on building. React and dispose. 
     var component = behavior.GetComponentFast<PausableBuilding>();
-    return component != null && component.IsPausable();
+    return component && component.IsPausable();
   }
 
   /// <inheritdoc/>

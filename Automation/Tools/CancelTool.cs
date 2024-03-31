@@ -2,7 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using Automation.Core;
+using Automation.AutomationSystem;
 using Automation.Utils;
 using Timberborn.BlockSystem;
 using UnityEngine;
@@ -25,8 +25,8 @@ sealed class CancelTool : AbstractAreaSelectionTool, IAutomationModeEnabler {
 
   /// <inheritdoc/>
   protected override bool ObjectFilterExpression(BlockObject blockObject) {
-    var automationBehavior = blockObject.GetComponentFast<AutomationBehavior>();
-    return automationBehavior != null && automationBehavior.enabled && automationBehavior.HasActions;
+    var component = blockObject.GetEnabledComponent<AutomationBehavior>();
+    return component && component.HasActions;
   }
 
   /// <inheritdoc/>

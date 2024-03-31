@@ -9,6 +9,9 @@ using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BlockSystemNavigation;
 using Timberborn.Buildings;
+using Timberborn.BuildingsBlocking;
+using Timberborn.BuildingsNavigation;
+using Timberborn.Coordinates;
 using Timberborn.Navigation;
 using UnityDev.Utils.LogUtilsLite;
 
@@ -44,35 +47,53 @@ public class DebugPickTool : AbstractAreaSelectionTool {
     }
   }
 
-  internal static void PrintAllComponents(BaseComponent component) {
+  static void PrintAllComponents(BaseComponent component) {
     var lines = new StringBuilder();
     lines.AppendLine(new string('*', 10));
     lines.AppendLine($"Components on {DebugEx.BaseComponentToString(component)}:");
     var names = component.AllComponents.Select(x => x.GetType().ToString()).OrderBy(x => x);
     lines.AppendLine(string.Join("\n", names));
     lines.AppendLine(new string('*', 10));
+
+    var blockable = component.GetComponentFast<BlockableBuilding>();
+    if (blockable && !blockable.IsUnblocked) {
+      lines.AppendLine($"Building is blocked by:");
+      var blockers = blockable._blockers.Select(x => x.ToString()).OrderBy(x => x);
+      lines.AppendLine(string.Join("\n", blockers));
+    }
+    
     DebugEx.Warning(lines.ToString());
   }
 
-  internal static void PrintAccessible(BaseComponent component) {
+  static void PrintAccessible(BaseComponent component) {
     var accessible = component.GetComponentFast<Accessible>();
-    if (accessible == null) {
-      HostedDebugLog.Error(component, "No accessible component found");
+    var siteAccessible = component.GetComponentFast<ConstructionSiteAccessible>()?.Accessible;
+    if (!accessible && !siteAccessible) {
+      HostedDebugLog.Error(component, "No accessible components found");
       return;
     }
     var lines = new StringBuilder();
     lines.AppendLine(new string('*', 10));
-    lines.AppendLine($"Accesses on {DebugEx.BaseComponentToString(component)}:");
-    foreach (var access in accessible.Accesses) {
-      lines.AppendLine(access.ToString());
+    lines.AppendLine($"Accesses on {DebugEx.BaseComponentToString(component)}");
+    if (accessible) {
+      lines.AppendLine($"From Accessible (enabled={accessible.enabled}):");
+      foreach (var access in accessible.Accesses) {
+        lines.AppendLine($"world: {access}, grid:{CoordinateSystem.WorldToGridInt(access)}");
+      }
+    }
+    if (siteAccessible) {
+      lines.AppendLine($"From ConstructionSiteAccessible (enabled={siteAccessible.enabled}):");
+      foreach (var access in siteAccessible.Accesses) {
+        lines.AppendLine($"world: {access}, grid:{CoordinateSystem.WorldToGridInt(access)}");
+      }
     }
     lines.AppendLine(new string('*', 10));
     DebugEx.Warning(lines.ToString());
   }
 
-  internal static void PrintNavMesh(BaseComponent component) {
+  static void PrintNavMesh(BaseComponent component) {
     var settings = component.GetComponentFast<BlockObjectNavMeshSettings>();
-    if (settings == null) {
+    if (!settings) {
       HostedDebugLog.Error(component, "No BlockObjectNavMeshSettings component found");
       return;
     }

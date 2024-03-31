@@ -4,7 +4,7 @@
 
 using Automation.Utils;
 
-namespace Automation.Core {
+namespace Automation.AutomationSystem {
 
 /// <summary>Base condition interface.</summary>
 /// <remarks>

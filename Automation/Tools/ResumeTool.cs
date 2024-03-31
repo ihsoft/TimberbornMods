@@ -29,7 +29,7 @@ sealed class ResumeTool : AbstractLockingTool {
       return false;
     }
     var component = GetCompatibleComponent(blockObject);
-    return component != null && component.Paused;
+    return component && component.Paused;
   }
 
   /// <inheritdoc/>
@@ -41,14 +41,14 @@ sealed class ResumeTool : AbstractLockingTool {
   #region AbstractLockingTool overries
   /// <inheritdoc/>
   protected override bool CheckCanLockOnComponent(BlockObject obj) {
-    return GetCompatibleComponent(obj) != null;
+    return GetCompatibleComponent(obj);
   }
   #endregion
 
   #region Implementation
   static PausableBuilding GetCompatibleComponent(BlockObject obj) {
-    var component = obj.GetComponentFast<PausableBuilding>();
-    if (component != null && component.enabled && component.IsPausable()) {
+    var component = obj.GetEnabledComponent<PausableBuilding>();
+    if (component && component.IsPausable()) {
       return component;
     }
     return null;

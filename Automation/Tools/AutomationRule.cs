@@ -5,8 +5,8 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using Automation.Actions;
+using Automation.AutomationSystem;
 using Automation.Conditions;
-using Automation.Core;
 using Automation.Utils;
 using Timberborn.BlockSystem;
 using Timberborn.Persistence;

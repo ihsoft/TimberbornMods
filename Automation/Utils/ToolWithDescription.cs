@@ -82,8 +82,7 @@ public abstract class ToolWithDescription : CustomToolSystem.CustomTool {
         descriptionText.Append("\n" + SpecialStrings.RowStarter + Loc.T(descriptionBullet));
       }
     }
-    // FIXME(IgorZ): Remove ColorizeText when Timberborn-Modding-Central#73 is fixed.
-    description.AddSection(TextColors.ColorizeText(descriptionText.ToString()));
+    description.AddSection(descriptionText.ToString());
     if (DescriptionVisualSections != null) {
       foreach (var visualSection in DescriptionVisualSections) {
         description.AddSection(visualSection);

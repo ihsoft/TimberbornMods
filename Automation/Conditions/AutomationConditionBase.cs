@@ -3,7 +3,7 @@
 // License: Public Domain
 
 using System.Diagnostics.CodeAnalysis;
-using Automation.Core;
+using Automation.AutomationSystem;
 using Automation.Utils;
 using Timberborn.Persistence;
 
@@ -33,11 +33,11 @@ public abstract class AutomationConditionBase : IAutomationCondition {
       if (value == _behavior) {
         return;
       }
-      if (value == null || _behavior != null) {
+      if (_behavior) {
         OnBehaviorToBeCleared();
       }
       _behavior = value;
-      if (_behavior != null) {
+      if (_behavior) {
         OnBehaviorAssigned();
       }
     }

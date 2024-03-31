@@ -6,14 +6,13 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Automation.Tools;
 using Timberborn.BaseComponentSystem;
-using Timberborn.Common;
 using Timberborn.Localization;
 using Timberborn.SelectionSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.ToolSystem;
 using UnityEngine;
 
-namespace Automation.Core {
+namespace Automation.AutomationSystem {
 
 /// <summary>Central point for all the automation related logic.</summary>
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
@@ -47,9 +46,6 @@ public sealed class AutomationService : IPostLoadableSingleton {
 
   /// <summary>Shortcut to EventBus.</summary>
   public readonly EventBus EventBus;
-
-  /// <summary>All automation behaviors that has at least one active condition.</summary>
-  public ReadOnlyHashSet<AutomationBehavior> AutomationBehaviors => _registeredBehaviors.AsReadOnly();
 
   /// <summary>Highlights all registered behaviours on the map.</summary>
   public void HighlightAutomationObjects(Color? useColor = null) {

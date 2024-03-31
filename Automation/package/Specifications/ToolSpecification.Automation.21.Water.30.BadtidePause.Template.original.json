@@ -1,7 +1,7 @@
 {
   "Id": "Automation.Tmpl.Water.PauseBadtide",
   "GroupId": "AutomationWaterToolGroupId",
-  "Type": "Automation.Templates.ApplyTemplateTool",
+  "Type": "Automation.Tools.ApplyTemplateTool",
   "Order": 30,
   "Icon": "igorz.automation/ui_icons/icon-badtide-pause",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.BadtidePause.DisplayName",

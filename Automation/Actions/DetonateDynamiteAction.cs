@@ -5,8 +5,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Automation.AutomationSystem;
 using Automation.Conditions;
-using Automation.Core;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.BlockObjectTools;
 using Timberborn.BlockSystem;
@@ -39,7 +39,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
   public int RepeatCount { get; private set; }
 
   /// <summary>Names of the tools to place various depths.</summary>
-  /// <remarks>Action will only apply if the dynamite is of the known depth.</remarks>
+  /// <remarks>Action will only apply if the dynamite is of the known depths.</remarks>
   static readonly Dictionary<int, string> DynamiteDepthToToolNamePrefix = new() {
       {1 , "Dynamite."},
       {2 , "DoubleDynamite."},
@@ -71,7 +71,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
     var dynamite = behavior.GetComponentFast<Dynamite>();
-    return dynamite != null && DynamiteDepthToToolNamePrefix.ContainsKey(dynamite.Depth);
+    return dynamite && DynamiteDepthToToolNamePrefix.ContainsKey(dynamite.Depth);
   }
 
   /// <inheritdoc/>
@@ -162,7 +162,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
 
       // Detonate the dynamite.
       yield return new WaitUntil(NoCharactersOnBlock);
-      if (dynamite != null && dynamite.enabled) {
+      if (dynamite && dynamite.enabled) {
         HostedDebugLog.Fine(dynamite, "Detonate from automation!");
         dynamite.Trigger();
       }
@@ -171,7 +171,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
       }
 
       // Wait for the old object to clean up.
-      yield return new WaitUntil(() => _blockObject == null);
+      yield return new WaitUntil(() => !_blockObject);
       coordinates.z = _terrainService.CellHeight(coordinates.XY());
       if (coordinates.z <= 0) {
         DebugEx.Fine("Reached the bottom of the map at {0}", coordinates.XY());
@@ -205,7 +205,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
     }
 
     bool NoCharactersOnBlock() {
-      if (_blockObject == null || !_blockObject.enabled) {
+      if (!_blockObject || !_blockObject.enabled) {
         return true; // Terminate the check.
       }
       return !_blockOccupancyService.OccupantPresentOnArea(_blockObject, MinDistanceToCheckOccupants);
