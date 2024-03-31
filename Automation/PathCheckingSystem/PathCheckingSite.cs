@@ -61,12 +61,12 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
 
   /// <summary>The path from the  construction site's accessible to the closest road.</summary>
   /// <remarks>It's a directional list. It starts at the accessible coordinate and goes to the road.</remarks>
-  /// <seealso cref="MaybeUpdateNavMesh"/>
+  /// <seealso cref="UpdateNavMesh"/>
   public List<int> BestBuildersPathCornerNodes { get; private set; }
 
   /// <summary>The best path index. If it's empty, then the site cannot be reached.</summary>
   /// <seealso cref="CanBeAccessedInPreview"/>
-  /// <seealso cref="MaybeUpdateNavMesh"/>
+  /// <seealso cref="UpdateNavMesh"/>
   /// <seealso cref="BestBuildersPathCornerNodes"/>
   public HashSet<int> BestBuildersPathNodeIndex { get; private set; }
 
@@ -93,7 +93,9 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
     _eventBus.Register(this);
     _navMeshListenerEntityRegistry.RegisterNavMeshListener(this);
     enabled = true;
-    MaybeUpdateNavMesh();
+    if (_isFullyGrounded) {
+      UpdateNavMesh();
+    }
   }
 
   /// <summary>Disable the component and clan up all its side effects.</summary>
@@ -196,10 +198,7 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   /// checking algo cannot deal with all the corners cases. It may limit players in their construction methods, but
   /// that's the price to pay.
   /// </remarks>
-  public void MaybeUpdateNavMesh() {
-    if (!_isFullyGrounded) {
-      return;  // If not grounded, then it cannot start building.
-    }
+  public void UpdateNavMesh() {
     PathCheckingService.PathUpdateProfiler.StartNewHit();
     if (RestrictedNodes == null) {
       InitializeNavMesh();
@@ -310,19 +309,21 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
     if (!_groundedSite.IsFullyGrounded || !enabled) {
       return;
     }
-    if (@event.Constructible.GetComponentFast<BlockObject>() == BlockObject) {
-      return;  // On self-construction the site will be removed.
+    if (!_isFullyGrounded) {
+      _isFullyGrounded = true;
+      UpdateNavMesh();
     }
-    _isFullyGrounded = true;
-    MaybeUpdateNavMesh();
   }
 
   /// <summary>Deleted entities can unblock unreachable sites.</summary>
   /// <remarks>Needs to be public to work.</remarks>
   [OnEvent]
   public void OnEntityDeletedEvent(EntityDeletedEvent @event) {
+    if (!_isFullyGrounded || !enabled) {
+      return;
+    }
     if (BestAccessNode == -1 && @event.Entity.GetComponentFast<BlockObject>() != BlockObject) {
-      MaybeUpdateNavMesh();
+      UpdateNavMesh();
     }
   }
 
@@ -338,13 +339,13 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
     if (_bestPathRoadNodeId == -1) {
       // For an unreachable site, _any_ update to navmesh can make it reachable.
       // Also, the road doesn't exists on the site were loaded just loaded.
-      MaybeUpdateNavMesh();
+      UpdateNavMesh();
       return;
     }
     // If we have a path, then check if the navmesh change affects at least one of the nodes. No change, no problem.
     if (navMeshUpdate.RoadNodeIds.FastContains(_bestPathRoadNodeId)
         || navMeshUpdate.TerrainNodeIds.FastAny(BestBuildersPathNodeIndex.Contains)) {
-      MaybeUpdateNavMesh();
+      UpdateNavMesh();
     }
   }
 

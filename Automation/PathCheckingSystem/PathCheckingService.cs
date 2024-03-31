@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Automation.AutomationSystem;
 using Automation.Conditions;
 using IgorZ.TimberDev.Utils;
@@ -12,10 +13,10 @@ using Timberborn.BlockSystem;
 using Timberborn.Common;
 using Timberborn.ConstructibleSystem;
 using Timberborn.EntitySystem;
+using Timberborn.GameDistricts;
 using Timberborn.Navigation;
 using Timberborn.SingletonSystem;
 using Timberborn.TickSystem;
-using Timberborn.WalkingSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
@@ -72,6 +73,7 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
   readonly EntityComponentRegistry _entityComponentRegistry;
   readonly NodeIdService _nodeIdService;
   readonly BaseInstantiator _baseInstantiator;
+  readonly DistrictMap _districtMap;
 
   /// <summary>All path checking conditions on the sites.</summary>
   readonly Dictionary<PathCheckingSite, List<CheckAccessBlockCondition>> _conditionsIndex = new();
@@ -86,11 +88,12 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
   bool _navMeshIsReady;
 
   PathCheckingService(EntityComponentRegistry entityComponentRegistry, AutomationService automationService,
-                      NodeIdService nodeIdService, BaseInstantiator baseInstantiator) {
+                      NodeIdService nodeIdService, BaseInstantiator baseInstantiator, DistrictMap districtMap) {
     Instance = this;
     _entityComponentRegistry = entityComponentRegistry;
     _nodeIdService = nodeIdService;
     _baseInstantiator = baseInstantiator;
+    _districtMap = districtMap;
     automationService.EventBus.Register(this);
   }
 
@@ -191,21 +194,40 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
     WalkersCheckProfiler.StartNewHit();
     _lastCacheBuiltFrame = Time.frameCount;
     _walkersTakenNodes = new HashSet<int>();
-    var walkers = _entityComponentRegistry.GetEnabled<BlockOccupant>().Select(x => x.GetComponentFast<Walker>())
-        .Where(x => x);
-    foreach (var walker in walkers) {
-      var pathFollower = walker._pathFollower;
-      if (pathFollower._pathCorners == null) {
-        continue; // No path, no problem.
+    var citizens = _entityComponentRegistry.GetEnabled<BlockOccupant>()
+        .Select(x => x.GetComponentFast<Citizen>())
+        .Where(x => x.HasAssignedDistrict);
+    foreach (var citizen in citizens) {
+      var pathNodes = GetPathToRoadFast(citizen.TransformFast.position, citizen.AssignedDistrict.District);
+      if (pathNodes != null) {
+        _walkersTakenNodes.AddRange(pathNodes);
       }
-      var activePathCorners = pathFollower._pathCorners.Skip(pathFollower._nextCornerIndex - 1)
-          .Select(_nodeIdService.WorldToId);
-      _walkersTakenNodes.AddRange(activePathCorners);
     }
     WalkersCheckProfiler.Stop();
   }
-
   int _lastCacheBuiltFrame;
+
+  /// <summary>Fast method of getting path to the closest road.</summary>
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  List<int> GetPathToRoadFast(Vector3 worldStart, District district) {
+    var flow = _districtMap.GetDistrictRoadSpillFlowField(district);
+    var nodeId = _nodeIdService.WorldToId(worldStart);
+    if (!flow.HasNode(nodeId)) {
+      return null;
+    }
+    var res = new List<int>(20) {
+        nodeId
+    };
+    var roadParentId = flow.GetRoadParentNodeId(nodeId);
+    if (nodeId == roadParentId) {
+      return res;  // Already on the road.
+    }
+    do {
+      nodeId = flow.GetParentId(nodeId);
+      res.Add(nodeId);
+    } while (nodeId != roadParentId);
+    return res;
+  }
 
   /// <summary>Deletes site if the matching component is in index.</summary>
   void TryDeleteSite(BaseComponent component) {

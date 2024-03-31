@@ -353,7 +353,6 @@
       <Reference Include="Timberborn.CharacterMovementSystem" Publicize="true" />
       <Reference Include="Timberborn.ConstructionSites" Publicize="true" />
       <Reference Include="Timberborn.Navigation" Publicize="true" />
-      <Reference Include="Timberborn.WalkingSystem" Publicize="true" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
