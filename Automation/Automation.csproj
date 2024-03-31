@@ -99,6 +99,9 @@
       <Compile Include="AutomationSystem\IAutomationConditionListener.cs" />
       <Compile Include="AutomationSystem\IAutomationCondition.cs" />
       <Compile Include="AutomationSystem\IAutomationAction.cs" />
+      <Compile Include="PathCheckingSystemUI\Configurator.cs" />
+      <Compile Include="PathCheckingSystemUI\PathCheckingSystemDebugger.cs" />
+      <Compile Include="PathCheckingSystemUI\PathCheckingSystemDebugPanel.cs" />
       <Compile Include="PathCheckingSystem\Configurator.cs" />
       <Compile Include="PathCheckingSystem\ConstructionSiteFinishIfRequirementsMetPatch.cs" />
       <Compile Include="PathCheckingSystem\PathCheckingService.cs" />
@@ -219,6 +222,12 @@
       </Reference>
       <Reference Include="Timberborn.CoreUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.CoreUI.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.Debugging, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.Debugging.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.DebuggingUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.DebuggingUI.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.DwellingSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.DwellingSystem.dll</HintPath>
@@ -353,6 +362,7 @@
       <Reference Include="Timberborn.CharacterMovementSystem" Publicize="true" />
       <Reference Include="Timberborn.ConstructionSites" Publicize="true" />
       <Reference Include="Timberborn.Navigation" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.WalkingSystemUI.dll" Publicize="true" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

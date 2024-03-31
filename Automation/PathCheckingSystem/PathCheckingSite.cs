@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Bindito.Core;
@@ -36,6 +37,9 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   #region API
   // ReSharper disable MemberCanBePrivate.Global
 
+  /// <summary>Timer for the debugger panel.</summary>
+  internal static readonly Stopwatch NavMeshUpdateTimer = new();
+
   /// <summary>Tells whether this site can be finished without blocking other buildings.</summary>
   /// <seealso cref="PathCheckingService.CheckBlockingStateAndTriggerActions"/>
   public bool CanFinish { get; internal set; }
@@ -43,8 +47,10 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   /// <summary>Site's NavMesh node ID.</summary>
   public int SiteNodeId { get; private set; }
 
+  /// <summary>The other site that blocks this one.</summary>
+  public PathCheckingSite BlockedSite { get; internal set; }
+
   /// <summary>Construction site cached instance.</summary>
-  // FIXME: It's temporary! Use site blockers instead.
   public ConstructionSite ConstructionSite { get; private set; }
 
   /// <summary>BlockObject of this site.</summary>
@@ -113,10 +119,6 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   }
 
   // ReSharper restore MemberCanBePrivate.Global
-  #endregion
-
-  #region Profiling support
-
   #endregion
 
   #region Implementation
@@ -199,6 +201,7 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   /// that's the price to pay.
   /// </remarks>
   public void UpdateNavMesh() {
+    NavMeshUpdateTimer.Start();
     PathCheckingService.PathUpdateProfiler.StartNewHit();
     if (RestrictedNodes == null) {
       InitializeNavMesh();
@@ -243,6 +246,7 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
       }
     }
     PathCheckingService.PathUpdateProfiler.Stop();
+    NavMeshUpdateTimer.Stop();
   }
 
   /// <summary>Fast method of getting path to the closest road.</summary>

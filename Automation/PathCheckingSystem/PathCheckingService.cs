@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Automation.AutomationSystem;
@@ -45,6 +46,12 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
   /// <summary>Shortcut for the Harmony patches.</summary>
   /// <remarks>All normal classes should inject the service.</remarks>
   internal static PathCheckingService Instance;
+
+  /// <summary>Total number of the sites under system control.</summary>
+  internal int NumberOfSites => _conditionsIndex.Count;
+
+  /// <summary>Timer for the debugger panel.</summary>
+  internal static readonly Stopwatch PatchCheckingTimer = new();
 
   /// <summary>Add the path checking condition to monitor.</summary>
   public void AddCondition(CheckAccessBlockCondition condition) {
@@ -102,11 +109,13 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
   /// conditions.
   /// </summary>
   public void CheckBlockingStateAndTriggerActions(PathCheckingSite site) {
+    PatchCheckingTimer.Start();
     site.CanFinish = !IsBlockingSite(site);
     var conditions = _conditionsIndex[site];
     foreach (var condition in conditions) {
       condition.ConditionState = condition.IsReversedCondition ? site.CanFinish : !site.CanFinish;
     }
+    PatchCheckingTimer.Stop();
   }
 
   /// <summary>Determines if the site construction can complete without obstructing any other site.</summary>
@@ -116,8 +125,10 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
     }
     PathCheckProfiler.StartNewHit();
     var isBlocked = false;
+    site.BlockedSite = null;
     foreach (var testSite in _sitesByBlockObject.Values) {
       if (testSite.BestAccessNode != -1 && !ReferenceEquals(testSite, site) && !IsNonBlockingPathSite(site, testSite)) {
+        site.BlockedSite = testSite;
         isBlocked = true;
         break;
       }
