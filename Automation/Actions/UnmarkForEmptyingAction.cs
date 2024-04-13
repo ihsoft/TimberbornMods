@@ -2,13 +2,14 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using Automation.Core;
+using Automation.AutomationSystem;
 using Timberborn.Emptying;
 using UnityDev.Utils.LogUtilsLite;
 
 namespace Automation.Actions {
 
 /// <summary>Action that disables the storage empty mode.</summary>
+// ReSharper disable once UnusedType.Global
 public sealed class UnmarkForEmptyingAction : AutomationActionBase {
   const string DescriptionLocKey = "IgorZ.Automation.UnmarkForEmptyingAction.Description";
 
@@ -23,7 +24,7 @@ public sealed class UnmarkForEmptyingAction : AutomationActionBase {
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
-    return behavior.GetComponentFast<Emptiable>() != null;
+    return behavior.GetComponentFast<Emptiable>();
   }
 
   /// <inheritdoc/>

@@ -17,7 +17,7 @@ public class DebugFinishNowTool : AbstractAreaSelectionTool {
   /// <inheritdoc/>
   protected override bool ObjectFilterExpression(BlockObject blockObject) {
     var component = blockObject.GetComponentFast<ConstructionSite>();
-    return component != null && !blockObject.Finished;
+    return component && !blockObject.Finished;
   }
 
   /// <inheritdoc/>

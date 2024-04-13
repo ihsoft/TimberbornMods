@@ -30,7 +30,7 @@ public class SmartMechanicalBuilding : MechanicalBuilding {
   public bool NeedsSmartLogic => _mechanicalNode.IsConsumer && !_mechanicalNode.IsGenerator;
 
   // ReSharper disable once MemberCanBePrivate.Global
-  /// <summary>Indicates that teh building has a working place that should have workers.</summary>
+  /// <summary>Indicates that the building has a working place that should have workers.</summary>
   public bool HasWorkingPlaces { get; private set; }
 
   /// <summary>

@@ -3,9 +3,8 @@
 // License: Public Domain
 
 using System;
-using Automation.Core;
+using Automation.AutomationSystem;
 using Timberborn.GameDistricts;
-using UnityDev.Utils.LogUtilsLite;
 
 namespace Automation.Conditions {
 
@@ -16,41 +15,49 @@ public abstract class PopulationTrackerConditionBase : AutomationConditionBase {
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
-    return behavior.GetComponentFast<DistrictBuilding>() != null;
+    return behavior.GetComponentFast<DistrictBuilding>();
+  }
+
+  /// <inheritdoc/>
+  public override void SyncState() {
+    if (DistrictCenter && !IsPreview) {
+      OnPopulationChanged();
+    }
   }
 
   /// <inheritdoc/>
   protected override void OnBehaviorAssigned() {
     var districtBuilding = Behavior.GetComponentFast<DistrictBuilding>();
     districtBuilding.ReassignedDistrict += OnReassignedDistrict;
-    DistrictCenter = districtBuilding.District;
-    if (DistrictCenter == null) {
-      return;
-    }
-    DistrictCenter.DistrictPopulation.CitizenAssigned += OnCitizenAssigned;
-    DistrictCenter.DistrictPopulation.CitizenUnassigned += OnCitizenUnassigned;
+    districtBuilding.ReassignedConstructionDistrict += OnReassignedConstructionDistrict;
+    UpdateDistrict();
   }
 
   /// <inheritdoc/>
   protected override void OnBehaviorToBeCleared() {
     var districtBuilding = Behavior.GetComponentFast<DistrictBuilding>();
     districtBuilding.ReassignedDistrict -= OnReassignedDistrict;
-    if (DistrictCenter == null) {
-      return;
+    districtBuilding.ReassignedConstructionDistrict -= OnReassignedConstructionDistrict;
+    if (DistrictCenter) {
+      DistrictCenter.DistrictPopulation.CitizenAssigned -= OnCitizenAssigned;
+      DistrictCenter.DistrictPopulation.CitizenUnassigned -= OnCitizenUnassigned;
     }
-    DistrictCenter.DistrictPopulation.CitizenAssigned -= OnCitizenAssigned;
-    DistrictCenter.DistrictPopulation.CitizenUnassigned -= OnCitizenUnassigned;
+    DistrictCenter = null;
   }
 
   #endregion
 
   #region API
+  // ReSharper disable MemberCanBePrivate.Global
 
   /// <summary>District center of the owning building. It can be <c>null</c>.</summary>
   protected DistrictCenter DistrictCenter { get; private set; }
 
   /// <summary>District population of the district or <c>null</c> if no district assigned to the building.</summary>
-  protected DistrictPopulation DistrictPopulation => DistrictCenter != null ? DistrictCenter.DistrictPopulation : null;
+  protected DistrictPopulation DistrictPopulation => DistrictCenter ? DistrictCenter.DistrictPopulation : null;
+
+  /// <summary>Tells if the owner objects is a preview building.</summary>
+  protected bool IsPreview => !Behavior.BlockObject.Finished;
 
   /// <summary>A callback that is called every time the citizen's list on the district is changed.</summary>
   protected abstract void OnPopulationChanged();
@@ -58,6 +65,30 @@ public abstract class PopulationTrackerConditionBase : AutomationConditionBase {
   /// <summary>A callback that is called when building is assigned to another district or is removed from any.</summary>
   /// <param name="oldDistrict">The district center that was previous known.</param>
   protected abstract void OnBuildingDistrictCenterChange(DistrictCenter oldDistrict);
+
+  // ReSharper restore MemberCanBePrivate.Global
+  #endregion
+
+  #region Implementation
+
+  /// <summary>Updates <see cref="DistrictCenter"/> to the current value. It handles the old center dispose.</summary>
+  /// <returns>The district center that was active before or <c>null</c>.</returns>
+  DistrictCenter UpdateDistrict() {
+    var oldDistrict = DistrictCenter;
+    if (DistrictCenter) {
+      DistrictCenter.DistrictPopulation.CitizenAssigned -= OnCitizenAssigned;
+      DistrictCenter.DistrictPopulation.CitizenUnassigned -= OnCitizenUnassigned;
+    }
+    DistrictCenter = Behavior.GetComponentFast<DistrictBuilding>().District;
+    if (!DistrictCenter) {
+      DistrictCenter = Behavior.GetComponentFast<DistrictBuilding>().ConstructionDistrict;
+    }
+    if (DistrictCenter) {
+      DistrictCenter.DistrictPopulation.CitizenAssigned += OnCitizenAssigned;
+      DistrictCenter.DistrictPopulation.CitizenUnassigned += OnCitizenUnassigned;
+    }
+    return oldDistrict;
+  }  
 
   #endregion
 
@@ -72,17 +103,14 @@ public abstract class PopulationTrackerConditionBase : AutomationConditionBase {
   }
 
   void OnReassignedDistrict(object sender, EventArgs e) {
-    var oldDistrict = DistrictCenter;
-    DistrictCenter = Behavior.GetComponentFast<DistrictBuilding>().District;
-    if (oldDistrict != null) {
-      oldDistrict.DistrictPopulation.CitizenAssigned -= OnCitizenAssigned;
-      oldDistrict.DistrictPopulation.CitizenUnassigned -= OnCitizenUnassigned;
+    OnBuildingDistrictCenterChange(UpdateDistrict());
+    if (DistrictCenter && !IsPreview) {
+      OnPopulationChanged();
     }
-    if (DistrictCenter != null) {
-      DistrictCenter.DistrictPopulation.CitizenAssigned += OnCitizenAssigned;
-      DistrictCenter.DistrictPopulation.CitizenUnassigned += OnCitizenUnassigned;
-    }
-    OnBuildingDistrictCenterChange(oldDistrict);
+  }
+
+  void OnReassignedConstructionDistrict(object sender, EventArgs e) {
+    OnBuildingDistrictCenterChange(UpdateDistrict());
   }
 
   #endregion

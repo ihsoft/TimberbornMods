@@ -3,7 +3,7 @@
 // License: Public Domain
 
 using System;
-using Automation.Core;
+using Automation.AutomationSystem;
 using Timberborn.BaseComponentSystem;
 using Timberborn.Emptying;
 using Timberborn.Persistence;
@@ -38,7 +38,7 @@ public sealed class MarkForEmptyingAction : AutomationActionBase {
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
-    return behavior.GetComponentFast<Emptiable>() != null;
+    return behavior.GetComponentFast<Emptiable>();
   }
 
   /// <inheritdoc/>

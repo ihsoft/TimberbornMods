@@ -1,7 +1,7 @@
 {
   "Id": "Automation.Tmpl.Storage.BoostEmptying50",
   "GroupId": "AutomationStorageToolGroupId",
-  "Type": "Automation.Templates.ApplyTemplateTool",
+  "Type": "Automation.Tools.ApplyTemplateTool",
   "Order": 10,
   "Icon": "igorz.automation/ui_icons/icon-empty-50pct",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.EmptyAt50pct.DisplayName",

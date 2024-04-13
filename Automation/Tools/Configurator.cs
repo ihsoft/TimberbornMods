@@ -2,7 +2,6 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using Automation.Templates;
 using Automation.Utils;
 using Bindito.Core;
 using TimberApi.ConfiguratorSystem;

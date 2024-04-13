@@ -2,40 +2,31 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using Automation.Core;
-using Timberborn.GameDistricts;
+using Automation.AutomationSystem;
 
 namespace Automation.Conditions {
 
 /// <summary>Triggers when the current bots population goes below the threshold.</summary>
 // ReSharper disable once UnusedType.Global
-public sealed class BotPopulationAboveThresholdCondition : BotPopulationTrackerCondition {
+public sealed class BotPopulationAboveThresholdCondition : BotPopulationThresholdCondition {
+
   const string DescriptionLocKey = "IgorZ.Automation.BotPopulationAboveThresholdCondition.Description";
 
   /// <inheritdoc/>
-  public override string UiDescription => Behavior.Loc.T(DescriptionLocKey, Threshold);
+  public override string UiDescription => Behavior.Loc.T(DescriptionLocKey, GetArgument());
 
   /// <inheritdoc/>
   public override IAutomationCondition CloneDefinition() {
     return new BotPopulationAboveThresholdCondition {
-        Difference = Difference,
-        RelativeToCurrentLevel = RelativeToCurrentLevel,
+        Value = Value,
+        RelativeTo = RelativeTo,
         Threshold = Threshold,
     };
   }
 
   /// <inheritdoc/>
-  public override void SyncState() {
-    OnPopulationChanged();
-  }
-
-  /// <inheritdoc/>
-  protected override void OnPopulationChanged() {
-    ConditionState = DistrictPopulation.NumberOfBots > Threshold;
-  }
-
-  /// <inheritdoc/>
-  protected override void OnBuildingDistrictCenterChange(DistrictCenter oldCenter) {
+  protected override bool CheckCondition() {
+    return DistrictPopulation.NumberOfBots > Threshold;
   }
 }
 

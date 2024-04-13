@@ -1,15 +1,15 @@
 ManifestFileVersion: 0
-CRC: 1415258543
+CRC: 4114870276
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 45e3943bddd83a82d929b59e9fab82a2
+    Hash: d559f789158c403ac8766ff897c92a89
   TypeTreeHash:
     serializedVersion: 2
     Hash: 1dadf3ffe9bb0f47a51fdf1cdd350c05
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: 4f74be60e5d6664254ebbbaa477b2fda
+    Hash: 074c604e525be05525e5860f417b75e1
 HashAppended: 0
 ClassTypes:
 - Class: 28
@@ -51,6 +51,7 @@ Assets:
 - Assets/Resources/Automation/Icons/icon-drought-pause.png
 - Assets/Resources/Automation/Icons/icon-empty-90pct.png
 - Assets/Resources/Automation/Icons/icon-drought-close.png
+- Assets/Resources/Automation/Icons/tool-chained.png
 - Assets/Resources/Automation/Icons/tool-beavers+10.png
 - Assets/Resources/Automation/Icons/player-play.png
 - Assets/Resources/Automation/Icons/icon-badtide-pause.png

@@ -1,7 +1,7 @@
 {
   "Id": "Automation.Tmpl.Water.PauseTemperate",
   "GroupId": "AutomationWaterToolGroupId",
-  "Type": "Automation.Templates.ApplyTemplateTool",
+  "Type": "Automation.Tools.ApplyTemplateTool",
   "Order": 10,
   "Icon": "igorz.automation/ui_icons/icon-temperate-pause",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.TemperatePause.DisplayName",

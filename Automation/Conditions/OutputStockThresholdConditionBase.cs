@@ -3,7 +3,7 @@
 // License: Public Domain
 
 using System.Diagnostics.CodeAnalysis;
-using Automation.Core;
+using Automation.AutomationSystem;
 using Timberborn.InventorySystem;
 using Timberborn.Persistence;
 
@@ -23,7 +23,7 @@ public abstract class OutputStockThresholdConditionBase : AutomationConditionBas
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
     var inventory = behavior.GetComponentFast<Inventory>();
-    return inventory != null && inventory.IsOutput && !inventory.IsInput && inventory.OutputGoods.Count == 1;
+    return inventory && inventory.IsOutput && !inventory.IsInput && inventory.OutputGoods.Count == 1;
   }
 
   /// <inheritdoc/>

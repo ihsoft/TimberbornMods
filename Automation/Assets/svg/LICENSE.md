@@ -9,6 +9,7 @@ License definition: https://www.svgrepo.com/page/licensing#CC0
 * https://www.svgrepo.com/svg/268703/music-player-pause-button
 * https://www.svgrepo.com/svg/268698/music-player-circle
 * https://www.svgrepo.com/svg/28307/automation
+* https://www.svgrepo.com/svg/193322/chain
 
 # PD (Public Domain) license
 

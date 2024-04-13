@@ -275,7 +275,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
 
   #region Game load callbacks
 
-  /// <summary>Refreshes terrain texture if when teh game is loaded and there are active overrides.</summary>
+  /// <summary>Refreshes terrain texture if when the game is loaded and there are active overrides.</summary>
   void OnSceneLoaded(object sender, EventArgs e) {
     _sceneLoader.SceneLoaded -= OnSceneLoaded;
     var needTextureUpdate = _needMoistureOverridesUpdate;

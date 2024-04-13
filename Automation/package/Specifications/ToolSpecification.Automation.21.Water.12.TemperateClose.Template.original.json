@@ -1,7 +1,7 @@
 {
   "Id": "Automation.Tmpl.Water.CloseFloodgateTemperate",
   "GroupId": "AutomationWaterToolGroupId",
-  "Type": "Automation.Templates.ApplyTemplateTool",
+  "Type": "Automation.Tools.ApplyTemplateTool",
   "Order": 12,
   "Icon": "igorz.automation/ui_icons/icon-temperate-close",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.TemperateCloseFloodgate.DisplayName",

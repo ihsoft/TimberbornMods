@@ -8,7 +8,7 @@ using TimberApi.SceneSystem;
 using Timberborn.Buildings;
 using Timberborn.TemplateSystem;
 
-namespace Automation.Core {
+namespace Automation.AutomationSystem {
 
 [Configurator(SceneEntrypoint.InGame)]
 // ReSharper disable once UnusedType.Global

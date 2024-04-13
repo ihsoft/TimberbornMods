@@ -4,14 +4,13 @@
 
 using System.Collections.ObjectModel;
 using System.Linq;
-using Automation.Core;
-using Automation.Tools;
+using Automation.AutomationSystem;
 using Automation.Utils;
 using Timberborn.BlockSystem;
 using Timberborn.Persistence;
 using UnityEngine;
 
-namespace Automation.Templates {
+namespace Automation.Tools {
 
 // ReSharper disable once ClassNeverInstantiated.Global
 sealed class ApplyTemplateTool : AbstractAreaSelectionTool, IAutomationModeEnabler {
@@ -46,7 +45,7 @@ sealed class ApplyTemplateTool : AbstractAreaSelectionTool, IAutomationModeEnabl
   /// <inheritdoc/>
   protected override bool ObjectFilterExpression(BlockObject blockObject) {
     var behavior = blockObject.GetComponentFast<AutomationBehavior>();
-    if (behavior == null || !behavior.enabled) {
+    if (!behavior || !behavior.enabled) {
       return false;
     }
     var info = (ToolInfo) ToolInformation;

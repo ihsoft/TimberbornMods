@@ -4,7 +4,7 @@
 
 using Automation.Utils;
 
-namespace Automation.Core {
+namespace Automation.AutomationSystem {
 
 /// <summary>Base action interface.</summary>
 /// <remarks>It defines what is expected from a regular action in scope of the automation system.</remarks>

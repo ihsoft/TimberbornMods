@@ -64,10 +64,12 @@
         <Link>UnityDevLite\TypeUtils.cs</Link>
       </Compile>
       <Compile Include="Actions\AutomationActionBase.cs" />
+      <Compile Include="Actions\BlockableBuildingAction.cs" />
       <Compile Include="Actions\DetonateDynamiteAction.cs" />
       <Compile Include="Actions\MarkForEmptyingAction.cs" />
       <Compile Include="Actions\PauseAction.cs" />
       <Compile Include="Actions\SetFloodgateHeightAction.cs" />
+      <Compile Include="Actions\StatusToggleAction.cs" />
       <Compile Include="Actions\UnmarkForEmptyingAction.cs" />
       <Compile Include="Actions\UnpauseAction.cs" />
       <Compile Include="Actions\WaterRegulatorStateAction.cs" />
@@ -75,29 +77,35 @@
       <Compile Include="Conditions\BadtideEndedCondition.cs" />
       <Compile Include="Conditions\BadtideStartedCondition.cs" />
       <Compile Include="Conditions\BeaverPopulationAboveThresholdCondition.cs" />
-      <Compile Include="Conditions\BeaverPopulationTrackerCondition.cs" />
+      <Compile Include="Conditions\BeaverPopulationThresholdCondition.cs" />
       <Compile Include="Conditions\BeaverPopulationBelowThresholdCondition.cs" />
       <Compile Include="Conditions\BotPopulationAboveThresholdCondition.cs" />
       <Compile Include="Conditions\BotPopulationBelowThresholdCondition.cs" />
-      <Compile Include="Conditions\BotPopulationTrackerCondition.cs" />
+      <Compile Include="Conditions\BotPopulationThresholdCondition.cs" />
       <Compile Include="Conditions\CheckAccessBlockCondition.cs" />
-      <Compile Include="Conditions\PathCheckingController.cs" />
-      <Compile Include="Conditions\Configurator.cs" />
       <Compile Include="Conditions\OutputStockAboveThresholdCondition.cs" />
       <Compile Include="Conditions\OutputStockBelowThresholdCondition.cs" />
       <Compile Include="Conditions\OutputStockThresholdConditionBase.cs" />
+      <Compile Include="Conditions\PopulationThresholdConditionBase.cs" />
       <Compile Include="Conditions\PopulationTrackerConditionBase.cs" />
       <Compile Include="Conditions\WeatherTrackerConditionBase.cs" />
       <Compile Include="Conditions\DroughtEndedCondition.cs" />
       <Compile Include="Conditions\DroughtStartedCondition.cs" />
       <Compile Include="Conditions\ObjectFinishedCondition.cs" />
-      <Compile Include="Core\AutomationBehavior.cs" />
-      <Compile Include="Core\AutomationService.cs" />
-      <Compile Include="Core\Configurator.cs" />
-      <Compile Include="Core\Features.cs" />
-      <Compile Include="Core\IAutomationConditionListener.cs" />
-      <Compile Include="Core\IAutomationCondition.cs" />
-      <Compile Include="Core\IAutomationAction.cs" />
+      <Compile Include="AutomationSystem\AutomationBehavior.cs" />
+      <Compile Include="AutomationSystem\AutomationService.cs" />
+      <Compile Include="AutomationSystem\Configurator.cs" />
+      <Compile Include="AutomationSystem\Features.cs" />
+      <Compile Include="AutomationSystem\IAutomationConditionListener.cs" />
+      <Compile Include="AutomationSystem\IAutomationCondition.cs" />
+      <Compile Include="AutomationSystem\IAutomationAction.cs" />
+      <Compile Include="PathCheckingSystemUI\Configurator.cs" />
+      <Compile Include="PathCheckingSystemUI\PathCheckingSystemDebugger.cs" />
+      <Compile Include="PathCheckingSystemUI\PathCheckingSystemDebugPanel.cs" />
+      <Compile Include="PathCheckingSystem\Configurator.cs" />
+      <Compile Include="PathCheckingSystem\ConstructionSiteFinishIfRequirementsMetPatch.cs" />
+      <Compile Include="PathCheckingSystem\PathCheckingService.cs" />
+      <Compile Include="PathCheckingSystem\PathCheckingSite.cs" />
       <Compile Include="Properties\AssemblyInfo.cs" />
       <Compile Include="Tools\ApplyTemplateTool.cs" />
       <Compile Include="Tools\AutomationRule.cs" />
@@ -112,10 +120,12 @@
       <Compile Include="UI\Configurator.cs" />
       <Compile Include="Utils\AbstractAreaSelectionTool.cs" />
       <Compile Include="Utils\AbstractLockingTool.cs" />
+      <Compile Include="Utils\CounterProfiler.cs" />
       <Compile Include="Utils\CustomToolSystem.cs" />
       <Compile Include="Utils\DynamicClassSerializer.cs" />
       <Compile Include="Utils\IGameSerializable.cs" />
       <Compile Include="Utils\StaticClassSerializer.cs" />
+      <Compile Include="Utils\TicksProfiler.cs" />
       <Compile Include="Utils\ToolWithDescription.cs" />
     </ItemGroup>
     <ItemGroup>
@@ -212,6 +222,12 @@
       </Reference>
       <Reference Include="Timberborn.CoreUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.CoreUI.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.Debugging, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.Debugging.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.DebuggingUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.DebuggingUI.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.DwellingSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.DwellingSystem.dll</HintPath>
@@ -341,6 +357,12 @@
       <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
       <!-- Publicize directly when referencing -->
       <Reference Include="..\Dependencies\Timberborn\Timberborn.BlockObjectTools.dll" Publicize="true" />
+      <Reference Include="Timberborn.BuildingsBlocking" Publicize="true" />
+      <Reference Include="Timberborn.BuilderHubSystem" Publicize="true" />
+      <Reference Include="Timberborn.CharacterMovementSystem" Publicize="true" />
+      <Reference Include="Timberborn.ConstructionSites" Publicize="true" />
+      <Reference Include="Timberborn.Navigation" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.WalkingSystemUI.dll" Publicize="true" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

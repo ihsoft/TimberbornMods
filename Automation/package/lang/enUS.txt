@@ -41,6 +41,8 @@ IgorZ.Automation.Tool.tmpl.DroughtCloseFloodgate.DisplayName,"Close floodgate du
 IgorZ.Automation.Tool.tmpl.DroughtCloseFloodgate.Description,"Apply this template on floodgates that need to be closed during droughs, or fully open otherwise."
 IgorZ.Automation.Tool.tmpl.DroughtOpenFloodgate.DisplayName,"Open floodgate during drought"
 IgorZ.Automation.Tool.tmpl.DroughtOpenFloodgate.Description,"Apply this template on floodgates that need to slowly drain water during droughs, or be closed otherwise."
+IgorZ.Automation.Tool.tmpl.DroughtOpenWaterRegulator.DisplayName,"Open water regulator during drought"
+IgorZ.Automation.Tool.tmpl.DroughtOpenWaterRegulator.Description,"Apply this template on water regulators that need to be open during droughts."
 IgorZ.Automation.Tool.tmpl.BadtideCloseFloodgate.DisplayName,"Close floodgate during badtide"
 IgorZ.Automation.Tool.tmpl.BadtideCloseFloodgate.Description,"Apply this template on floodgates that need to be closed during badtides, or fully open otherwise."
 IgorZ.Automation.Tool.tmpl.BadtideOpenFloodgate.DisplayName,"Fully open floodgate during badtide"
@@ -69,6 +71,9 @@ IgorZ.Automation.Tool.tmpl.BeaversAtMinus10.DisplayName,"Beaver population at -1
 IgorZ.Automation.Tool.tmpl.BeaversAtMinus10.Description,"Apply this template to buildings that should remain paused until the beaver population drops 10 beavers below the current level."
 IgorZ.Automation.Tool.tmpl.BeaversAtMinus20.DisplayName,"Beaver population at -20 level"
 IgorZ.Automation.Tool.tmpl.BeaversAtMinus20.Description,"Apply this template to buildings that should remain paused until the beaver population drops 20 beavers below the current level."
+
+IgorZ.Automation.Tool.tmpl.ChainedBuildeings.DisplayName,"Don't block builders"
+IgorZ.Automation.Tool.tmpl.ChainedBuildeings.Description,"Apply this template to construction sites that may block builders' paths. Note: Results not guaranteed, especially if buildings are not at the same level."
 
 IgorZ.Automation.CancelTool.Title,"Cancel automation"
 IgorZ.Automation.CancelTool.Description,"Use this tool to cleanup any automation on the buildings or construction sites."
@@ -110,3 +115,19 @@ IgorZ.Automation.BeaverPopulationBelowThresholdCondition.Description,"<SolidHigh
 IgorZ.Automation.BeaverPopulationAboveThresholdCondition.Description,"<SolidHighlight>more than {0} beavers in district</SolidHighlight>"
 IgorZ.Automation.BotPopulationBelowThresholdCondition.Description,"<SolidHighlight>less than {0} bots in district</SolidHighlight>"
 IgorZ.Automation.BotPopulationAboveThresholdCondition.Description,"<SolidHighlight>more than {0} bots in district</SolidHighlight>"
+IgorZ.Automation.PopulationRelativeToMaxArg,"MAX{0}","Text to show when an unconnected building has a RelativeTo=MaxLevel condition"
+IgorZ.Automation.PopulationRelativeToCurrentArg,"NOW{0}","Text to show when an unconnected building has a RelativeTo=CurrentLevel condition"
+
+IgorZ.Automation.CheckAccessBlockCondition.Blocking.Description,"<SolidHighlight>blocks path</SolidHighlight>"
+IgorZ.Automation.CheckAccessBlockCondition.NotBlocking.Description,"<SolidHighlight>doesn't block path</SolidHighlight>"
+IgorZ.Automation.CheckAccessBlockCondition.NotYetReachable,"Builders can't reach it yet, but a path is being constructed"
+IgorZ.Automation.CheckAccessBlockCondition.UnreachableStatus,"The builders can't find the way to this site. Maybe nothing can be constructed here"
+IgorZ.Automation.CheckAccessBlockCondition.UnreachableAlert,"Unreachable construction site"
+
+IgorZ.Automation.ShowStatusAction.HoldConstruction,"<SolidHighlight>hold completion</SolidHighlight>"
+IgorZ.Automation.ShowStatusAction.ResumeConstruction,"<SolidHighlight>resume building</SolidHighlight>"
+IgorZ.Automation.ShowStatusAction.HoldCompletionStatusText,"Waiting for the other buildings to finish"
+
+IgorZ.Automation.BlockableBuildingAction.BlockDescription,"<SolidHighlight>block building</SolidHighlight>"
+IgorZ.Automation.BlockableBuildingAction.UnblockDescription,"<SolidHighlight>unblock building</SolidHighlight>"
+IgorZ.Automation.BlockableBuildingAction.BlockText,"Waiting for the other buildings to finish"

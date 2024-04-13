@@ -2,13 +2,14 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using Automation.Core;
+using Automation.AutomationSystem;
 using Timberborn.Persistence;
 using Timberborn.WaterSourceSystem;
 
 namespace Automation.Actions {
 
 /// <summary>Opens or closes water discharges.</summary>
+// ReSharper disable once UnusedType.Global
 public class WaterRegulatorStateAction : AutomationActionBase {
   const string OpenDescriptionLocKey = "IgorZ.Automation.WaterRegulatorStateActionOpen.Description";
   const string CloseDescriptionLocKey = "IgorZ.Automation.WaterRegulatorStateActionClose.Description";
@@ -29,7 +30,7 @@ public class WaterRegulatorStateAction : AutomationActionBase {
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
-    return behavior.GetComponentFast<WaterSourceRegulator>() != null;
+    return behavior.GetComponentFast<WaterSourceRegulator>();
   }
 
   /// <inheritdoc/>

@@ -2,7 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using Automation.Core;
+using Automation.AutomationSystem;
 using Timberborn.Persistence;
 using Timberborn.WaterBuildings;
 using UnityEngine;
@@ -10,6 +10,7 @@ using UnityEngine;
 namespace Automation.Actions {
 
 /// <summary>Adjusts flood gate height.</summary>
+// ReSharper disable once UnusedType.Global
 public sealed class SetFloodgateHeightAction : AutomationActionBase {
   const string DescriptionLocKey = "IgorZ.Automation.SetFloodgateHeightAction.Description";
 
@@ -32,7 +33,7 @@ public sealed class SetFloodgateHeightAction : AutomationActionBase {
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
     var component = behavior.GetComponentFast<Floodgate>();
-    return component != null && component.enabled;
+    return component && component.enabled;
   }
 
   /// <inheritdoc/>
