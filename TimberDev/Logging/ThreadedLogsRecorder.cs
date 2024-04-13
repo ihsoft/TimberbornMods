@@ -16,7 +16,7 @@ namespace IgorZ.TimberDev.Logging {
 /// <summary>Helper to catch logs from the non-main threads and spitting them out to the main logger.</summary>
 /// <remarks>Bind this class via Bindito as singleton to make it working.</remarks>
 class ThreadedLogsRecorder : ILoadableSingleton, ITickableSingleton {
-  readonly ConcurrentQueue<string> _logRecords = new();
+  ConcurrentQueue<string> _logRecords = new();
   Thread _mainUnityThread;
 
   public void Load() {
@@ -29,7 +29,7 @@ class ThreadedLogsRecorder : ILoadableSingleton, ITickableSingleton {
     if (_logRecords.IsEmpty) {
       return;
     }
-    var logs = _logRecords.ToArray();
+    var logs = Interlocked.Exchange(ref _logRecords, new ConcurrentQueue<string>());
     foreach (var t in logs) {
       DebugEx.Warning(t);
     }
