@@ -100,8 +100,10 @@
       <Compile Include="WaterService\DirectSoilMoistureSystemAccessor.cs" />
       <Compile Include="WaterService\DirectWaterServiceAccessor.cs" />
       <Compile Include="WaterService\ParallelWaterSimulator.cs" />
+      <Compile Include="WaterService\ParallelWaterSimulatorPatch.cs" />
       <Compile Include="WaterService\SoilMoistureSimulatorGetUpdatedMoisturePatch.cs" />
       <Compile Include="WaterService\SoilMoistureMapUpdateDesertIntensityPatch.cs" />
+      <Compile Include="WaterService\WaterSourceFragmentDebug.cs" />
       <Compile Include="WaterValveComponent\Configurator.cs" />
       <Compile Include="WaterValveComponent\WaterValve.cs" />
       <Compile Include="WaterValveComponent\WaterValveFragment.cs" />

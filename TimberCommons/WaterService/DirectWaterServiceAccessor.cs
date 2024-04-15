@@ -187,8 +187,12 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
     _contaminationsBuffer = _waterSimulator._contaminationsBuffer;
     _surfaceHeights = _impermeableSurfaceService.Heights;
 
-    HarmonyPatcher.PatchRepeated(GetType().AssemblyQualifiedName, typeof(WaterSimulatorUpdateWaterParametersPatch));
+    HarmonyPatcher.PatchRepeated(
+        GetType().AssemblyQualifiedName,
+        typeof(WaterSimulatorUpdateWaterParametersPatch),
+        typeof(ParallelWaterSimulatorPatch));
     WaterSimulatorUpdateWaterParametersPatch.DirectWaterServiceAccessor = this;
+    ParallelWaterSimulatorPatch.Initialize();
   }
   #endregion
 
