@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using Bindito.Core;
 using IgorZ.TimberCommons.Common;
-using IgorZ.TimberDev.Logging;
 using IgorZ.TimberDev.Utils;
 using TimberApi.ConfiguratorSystem;
 using TimberApi.SceneSystem;
@@ -26,7 +25,6 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<DirectWaterServiceAccessor>().AsSingleton();
     DirectSoilMoistureSystemAccessor.ResetStaticState();
     containerDefinition.Bind<DirectSoilMoistureSystemAccessor>().AsSingleton();
-    containerDefinition.Bind<ThreadedLogsRecorder>().AsSingleton();
   }
 }
 
