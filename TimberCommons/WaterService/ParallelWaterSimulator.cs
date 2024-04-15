@@ -67,6 +67,7 @@ sealed class ParallelWaterSimulator {
     int index;
 
     // Update outflows.
+    var stageClock = Stopwatch.StartNew();
     index = _mapIndexService.StartingIndex;
     for (var i = 0; i < _mapSize.y; i++) {
       for (var j = 0; j < _mapSize.x; j++) {
@@ -75,8 +76,11 @@ sealed class ParallelWaterSimulator {
       }
       index += 2;
     }
+    stageClock.Stop();
+    DebugEx.Warning("Update flows cost: {0}ms", stageClock.ElapsedMilliseconds);
 
-    // Update water levels.
+    // Update water levels. The most expensive step.
+    stageClock.Restart();
     index = _mapIndexService.StartingIndex;
     for (var i = 0; i < _mapSize.y; i++) {
       for (var j = 0; j < _mapSize.x; j++) {
@@ -87,8 +91,11 @@ sealed class ParallelWaterSimulator {
       }
       index += 2;
     }
+    stageClock.Stop();
+    DebugEx.Warning("Process water depths: {0}ms", stageClock.ElapsedMilliseconds);
 
-    // Simulate contamination. 
+    // Simulate contamination.
+    stageClock.Restart();
     index = _mapIndexService.StartingIndex;
     for (var i = 0; i < _mapSize.y; i++) {
       for (var j = 0; j < _mapSize.x; j++) {
@@ -99,6 +106,10 @@ sealed class ParallelWaterSimulator {
       }
       index += 2;
     }
+    stageClock.Stop();
+    DebugEx.Warning("Update diffusion: {0}ms", stageClock.ElapsedMilliseconds);
+
+    stageClock.Restart();
     index = _mapIndexService.StartingIndex;
     for (var k = 0; k < _mapSize.y; k++) {
       for (var l = 0; l < _mapSize.x; l++) {
@@ -113,6 +124,8 @@ sealed class ParallelWaterSimulator {
       }
       index += 2;
     }
+    stageClock.Stop();
+    DebugEx.Warning("Update contamination map: {0}ms", stageClock.ElapsedMilliseconds);
 
     DebugEx.Warning("Patched tick simulation: cost={0}ms", clock.ElapsedMilliseconds);
   }
