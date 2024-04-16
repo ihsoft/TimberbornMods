@@ -2,14 +2,11 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Collections.Generic;
-using IgorZ.TimberCommons.IrrigationSystem;
 using IgorZ.TimberDev.UI;
 using TimberApi.UiBuilderSystem;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
-using Timberborn.Localization;
 using UnityEngine.UIElements;
 
 namespace IgorZ.TimberCommons.WaterService {
@@ -20,8 +17,6 @@ sealed class WaterSourceFragmentDebug : IEntityPanelFragment {
   VisualElement _root;
   Toggle _usePatchedSimulationToggle;
 
-  internal static bool UsePatchedSimulation { get; private set; }
-
   public WaterSourceFragmentDebug(UIBuilder builder) {
     _builder = builder;
   }
@@ -31,7 +26,7 @@ sealed class WaterSourceFragmentDebug : IEntityPanelFragment {
         .CheckmarkInverted(text: "Patched water simulation", color: UiFactory.PanelNormalColor);
     _usePatchedSimulationToggle.RegisterValueChangedCallback(
         _ => {
-          UsePatchedSimulation = _usePatchedSimulationToggle.value;
+          ParallelWaterSimulatorPatch.UsePatchedSimulator = _usePatchedSimulationToggle.value;
         });
 
     _root = _builder.CreateFragmentBuilder()
