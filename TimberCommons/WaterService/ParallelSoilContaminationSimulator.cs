@@ -140,8 +140,7 @@ sealed class ParallelSoilContaminationSimulator {
     if (newLevel < SoilContaminationSimulator.MinimumSoilContamination) {
       newLevel = 0f;
     }
-    // FIXME: Consider using a floating point friendly comparision.
-    if (newLevel != oldLevel) {
+    if (Mathf.Abs(newLevel - oldLevel) > float.Epsilon) {
       ContaminationLevels[index] = newLevel;
       _changedLevels[index] = true;
     }

@@ -117,8 +117,7 @@ sealed class ParallelSoilMoistureSimulator {
     index = _startingIndex;
     for (var i = 0; i < _tilesPerColumn; i++) {
       for (var j = 0; j < _tilesPerLine; j++) {
-        // FIXME: Consider using a floating point friendly comparision.
-        if (MoistureLevels[index] != _lastTickMoistureLevels[index]) {
+        if (Mathf.Abs(MoistureLevels[index] - _lastTickMoistureLevels[index]) > float.Epsilon) {
           _moistureLevelsChangedLastTick.Add(new Vector2Int(j, i));
         }
         index++;
