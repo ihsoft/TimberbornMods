@@ -22,7 +22,6 @@ namespace IgorZ.TimberCommons.WaterService {
 sealed class ParallelSoilContaminationSimulator {
 
   readonly SoilContaminationSimulator _instance;
-  //readonly MapIndexService _mapIndexService;
   readonly SoilContaminationSimulationSettings _soilContaminationSimulationSettings;
 
   readonly int _startingIndex;
