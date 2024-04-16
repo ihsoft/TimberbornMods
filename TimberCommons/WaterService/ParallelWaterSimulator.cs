@@ -3,18 +3,18 @@
 // License: Public Domain
 
 using System;
-using System.Diagnostics;
+using System.Threading;
 using Timberborn.Common;
 using Timberborn.MapIndexSystem;
 using Timberborn.WaterContaminationSystem;
 using Timberborn.WaterSystem;
-using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
 namespace IgorZ.TimberCommons.WaterService {
 
 sealed class ParallelWaterSimulator {
-  static readonly float MaxContamination = 1f;
+  const float MaxContamination = 1f;
+  const int ProcessWaterDepthsChunkSize = 100;
 
   readonly WaterSourceRegistry _waterSourceRegistry;
   readonly WaterMap _waterMap;
@@ -36,6 +36,8 @@ sealed class ParallelWaterSimulator {
   readonly Vector2Int _mapSize;
   readonly float _fixedDeltaTime;
   float _deltaTime;
+
+  readonly CountdownEvent _processWaterDepthsEvent = new(0);
 
   internal ParallelWaterSimulator(WaterSimulator instance) {
     _waterSimulator = instance;
@@ -59,7 +61,7 @@ sealed class ParallelWaterSimulator {
   }
 
   public void ProcessSimulation() {
-    var clock = Stopwatch.StartNew();
+    //var clock = Stopwatch.StartNew();
 
     _deltaTime = _fixedDeltaTime * _waterSimulationSettings.TimeScale;
     Array.Copy(_waterMap.WaterDepths, _initialWaterDepths, _initialWaterDepths.Length);
@@ -67,7 +69,7 @@ sealed class ParallelWaterSimulator {
     int index;
 
     // Update outflows.
-    var stageClock = Stopwatch.StartNew();
+    //var stageClock = Stopwatch.StartNew();
     index = _mapIndexService.StartingIndex;
     for (var i = 0; i < _mapSize.y; i++) {
       for (var j = 0; j < _mapSize.x; j++) {
@@ -76,26 +78,28 @@ sealed class ParallelWaterSimulator {
       }
       index += 2;
     }
-    stageClock.Stop();
-    DebugEx.Warning("Update flows cost: {0}ms", stageClock.ElapsedMilliseconds);
+    //stageClock.Stop();
+    //DebugEx.Warning("Update flows cost: {0}ms", stageClock.ElapsedMilliseconds);
 
     // Update water levels. The most expensive step.
-    stageClock.Restart();
+    //stageClock.Restart();
+    _processWaterDepthsEvent.Reset(_mapSize.y);
     index = _mapIndexService.StartingIndex;
-    for (var i = 0; i < _mapSize.y; i++) {
-      for (var j = 0; j < _mapSize.x; j++) {
-        var newDepth = _waterMap.WaterDepths[index] + ProcessWaterDepthChanges(index);
-        _waterMap.WaterDepths[index] = newDepth > 0f ? newDepth : 0f;
-        SimulateContaminationMovement(index);
-        index++;
-      }
-      index += 2;
+    for (var i = _mapSize.y - 1; i >= 0; i--) {
+      var index1 = index;
+      ThreadPool.QueueUserWorkItem(
+          _ => {
+            ProcessWaterDepthsChunk(index1, index1 + _mapSize.x);
+            _processWaterDepthsEvent.Signal();
+          });
+      index += _mapIndexService.Stride;
     }
-    stageClock.Stop();
-    DebugEx.Warning("Process water depths: {0}ms", stageClock.ElapsedMilliseconds);
+    _processWaterDepthsEvent.Wait();
+    // stageClock.Stop();
+    // DebugEx.Warning("Process water depths: {0}ms", stageClock.ElapsedMilliseconds);
 
     // Simulate contamination.
-    stageClock.Restart();
+    //stageClock.Restart();
     index = _mapIndexService.StartingIndex;
     for (var i = 0; i < _mapSize.y; i++) {
       for (var j = 0; j < _mapSize.x; j++) {
@@ -106,10 +110,10 @@ sealed class ParallelWaterSimulator {
       }
       index += 2;
     }
-    stageClock.Stop();
-    DebugEx.Warning("Update diffusion: {0}ms", stageClock.ElapsedMilliseconds);
+    //stageClock.Stop();
+    //DebugEx.Warning("Update diffusion: {0}ms", stageClock.ElapsedMilliseconds);
 
-    stageClock.Restart();
+    //stageClock.Restart();
     index = _mapIndexService.StartingIndex;
     for (var k = 0; k < _mapSize.y; k++) {
       for (var l = 0; l < _mapSize.x; l++) {
@@ -124,10 +128,20 @@ sealed class ParallelWaterSimulator {
       }
       index += 2;
     }
-    stageClock.Stop();
-    DebugEx.Warning("Update contamination map: {0}ms", stageClock.ElapsedMilliseconds);
+    //stageClock.Stop();
+    //DebugEx.Warning("Update contamination map: {0}ms", stageClock.ElapsedMilliseconds);
 
-    DebugEx.Warning("Patched tick simulation: cost={0}ms", clock.ElapsedMilliseconds);
+    //ThreadPool.GetMaxThreads(out var threads, out _);
+    //ThreadPool.GetAvailableThreads(out var availableThreads, out _);
+    //DebugEx.Warning("Patched tick simulation: cost={0}ms, threads={1}, avail={2}", clock.ElapsedMilliseconds, threads, availableThreads);
+  }
+
+  void ProcessWaterDepthsChunk(int start, int end) {
+    for (var index = start; index < end; index++) {
+      var newDepth = _waterMap.WaterDepths[index] + ProcessWaterDepthChanges(index);
+      _waterMap.WaterDepths[index] = newDepth > 0f ? newDepth : 0f;
+      SimulateContaminationMovement(index);
+    }
   }
 
   void UpdateOutflows(int index) {
