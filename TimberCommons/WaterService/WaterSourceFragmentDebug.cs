@@ -27,6 +27,7 @@ sealed class WaterSourceFragmentDebug : IEntityPanelFragment {
     _usePatchedSimulationToggle.RegisterValueChangedCallback(
         _ => {
           ParallelWaterSimulatorPatch.UsePatchedSimulator = _usePatchedSimulationToggle.value;
+          ParallelSoilMoistureSimulatorPatch.UsePatchedSimulator = _usePatchedSimulationToggle.value;
         });
 
     _root = _builder.CreateFragmentBuilder()

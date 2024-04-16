@@ -190,9 +190,11 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
     HarmonyPatcher.PatchRepeated(
         GetType().AssemblyQualifiedName,
         typeof(WaterSimulatorUpdateWaterParametersPatch),
-        typeof(ParallelWaterSimulatorPatch));
+        typeof(ParallelWaterSimulatorPatch),
+        typeof(ParallelSoilMoistureSimulatorPatch));
     WaterSimulatorUpdateWaterParametersPatch.DirectWaterServiceAccessor = this;
     ParallelWaterSimulatorPatch.Initialize();
+    ParallelSoilMoistureSimulatorPatch.Initialize();
   }
   #endregion
 
