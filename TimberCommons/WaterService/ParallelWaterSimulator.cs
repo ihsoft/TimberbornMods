@@ -14,17 +14,13 @@ namespace IgorZ.TimberCommons.WaterService {
 
 sealed class ParallelWaterSimulator {
   const float MaxContamination = 1f;
-  const int ProcessWaterDepthsChunkSize = 100;
 
-  readonly WaterSourceRegistry _waterSourceRegistry;
   readonly WaterMap _waterMap;
   readonly WaterContaminationMap _waterContaminationMap;
   readonly ImpermeableSurfaceService _impermeableSurfaceService;
   readonly MapIndexService _mapIndexService;
   readonly WaterSimulationSettings _waterSimulationSettings;
   readonly WaterContaminationSimulationSettings _waterContaminationSimulationSettings;
-  readonly TransientWaterMap _transientWaterMap;
-  readonly WaterChangeService _waterChangeService;
   readonly ThreadSafeWaterEvaporationMap _threadSafeWaterEvaporationMap;
 
   readonly WaterSimulator _waterSimulator;
@@ -38,18 +34,18 @@ sealed class ParallelWaterSimulator {
   float _deltaTime;
 
   readonly CountdownEvent _processWaterDepthsEvent = new(0);
+  readonly CountdownEvent _updateOutflowsEvent = new(0);
+  readonly CountdownEvent _updateDiffusionEvent = new(0);
+  readonly CountdownEvent _updateContaminationEvent = new(0);
 
   internal ParallelWaterSimulator(WaterSimulator instance) {
     _waterSimulator = instance;
-    _waterSourceRegistry = instance._waterSourceRegistry;
     _waterMap = instance._waterMap;
     _waterContaminationMap = instance._waterContaminationMap;
     _impermeableSurfaceService = instance._impermeableSurfaceService;
     _mapIndexService = instance._mapIndexService;
     _waterSimulationSettings = instance._waterSimulationSettings;
     _waterContaminationSimulationSettings = instance._waterContaminationSimulationSettings;
-    _transientWaterMap = instance._transientWaterMap;
-    _waterChangeService = instance._waterChangeService;
     _threadSafeWaterEvaporationMap = instance._threadSafeWaterEvaporationMap;
 
     _fixedDeltaTime = instance._fixedDeltaTime;
@@ -61,79 +57,65 @@ sealed class ParallelWaterSimulator {
   }
 
   public void ProcessSimulation() {
-    //var clock = Stopwatch.StartNew();
-
     _deltaTime = _fixedDeltaTime * _waterSimulationSettings.TimeScale;
     Array.Copy(_waterMap.WaterDepths, _initialWaterDepths, _initialWaterDepths.Length);
     Array.Copy(_waterContaminationMap.Contaminations, _contaminationsBuffer, _contaminationsBuffer.Length);
     int index;
 
     // Update outflows.
-    //var stageClock = Stopwatch.StartNew();
+    _updateOutflowsEvent.Reset(_mapSize.y);
     index = _mapIndexService.StartingIndex;
-    for (var i = 0; i < _mapSize.y; i++) {
-      for (var j = 0; j < _mapSize.x; j++) {
-        UpdateOutflows(index);
-        index++;
-      }
-      index += 2;
+    for (var i = _mapSize.y - 1; i >= 0; i--) {
+      var indexCopy = index;
+      ThreadPool.QueueUserWorkItem(
+          _ => {
+            UpdateOutflowsChunk(indexCopy, indexCopy + _mapSize.x);
+            _updateOutflowsEvent.Signal();
+          });
+      index += _mapIndexService.Stride;
     }
-    //stageClock.Stop();
-    //DebugEx.Warning("Update flows cost: {0}ms", stageClock.ElapsedMilliseconds);
+    _updateOutflowsEvent.Wait();
 
     // Update water levels. The most expensive step.
-    //stageClock.Restart();
     _processWaterDepthsEvent.Reset(_mapSize.y);
     index = _mapIndexService.StartingIndex;
     for (var i = _mapSize.y - 1; i >= 0; i--) {
-      var index1 = index;
+      var indexCopy = index;
       ThreadPool.QueueUserWorkItem(
           _ => {
-            ProcessWaterDepthsChunk(index1, index1 + _mapSize.x);
+            ProcessWaterDepthsChunk(indexCopy, indexCopy + _mapSize.x);
             _processWaterDepthsEvent.Signal();
           });
       index += _mapIndexService.Stride;
     }
     _processWaterDepthsEvent.Wait();
-    // stageClock.Stop();
-    // DebugEx.Warning("Process water depths: {0}ms", stageClock.ElapsedMilliseconds);
 
     // Simulate contamination.
-    //stageClock.Restart();
+    _updateDiffusionEvent.Reset(_mapSize.y);
     index = _mapIndexService.StartingIndex;
-    for (var i = 0; i < _mapSize.y; i++) {
-      for (var j = 0; j < _mapSize.x; j++) {
-        if (_waterMap.WaterDepths[index] > 0f) {
-          UpdateDiffusion(index);
-        }
-        index++;
-      }
-      index += 2;
+    for (var i = _mapSize.y - 1; i >= 0; i--) {
+      var indexCopy = index;
+      ThreadPool.QueueUserWorkItem(
+          _ => {
+            UpdateDiffusionChunk(indexCopy, indexCopy + _mapSize.x);
+            _updateDiffusionEvent.Signal();
+          });
+      index += _mapIndexService.Stride;
     }
-    //stageClock.Stop();
-    //DebugEx.Warning("Update diffusion: {0}ms", stageClock.ElapsedMilliseconds);
+    _updateDiffusionEvent.Wait();
 
-    //stageClock.Restart();
+    _updateContaminationEvent.Reset(_mapSize.y);
     index = _mapIndexService.StartingIndex;
-    for (var k = 0; k < _mapSize.y; k++) {
-      for (var l = 0; l < _mapSize.x; l++) {
-        if (_waterMap.WaterDepths[index] > 0f) {
-          var newContamination = _contaminationsBuffer[index] + GetContaminationDiffusionChange(index);
-          _waterContaminationMap.Contaminations[index] =
-              newContamination > MaxContamination ? MaxContamination : newContamination;
-        } else {
-          _waterContaminationMap.Contaminations[index] = 0f;
-        }
-        index++;
-      }
-      index += 2;
+    for (var i = _mapSize.y - 1; i >= 0; i--) {
+      var indexCopy = index;
+      ThreadPool.QueueUserWorkItem(
+          _ => {
+            UpdateContaminationChunk(indexCopy, indexCopy + _mapSize.x);
+            _updateContaminationEvent.Signal();
+          });
+      index += _mapIndexService.Stride;
     }
-    //stageClock.Stop();
-    //DebugEx.Warning("Update contamination map: {0}ms", stageClock.ElapsedMilliseconds);
-
-    //ThreadPool.GetMaxThreads(out var threads, out _);
-    //ThreadPool.GetAvailableThreads(out var availableThreads, out _);
-    //DebugEx.Warning("Patched tick simulation: cost={0}ms, threads={1}, avail={2}", clock.ElapsedMilliseconds, threads, availableThreads);
+    _updateContaminationEvent.Wait();
   }
 
   void ProcessWaterDepthsChunk(int start, int end) {
@@ -141,6 +123,34 @@ sealed class ParallelWaterSimulator {
       var newDepth = _waterMap.WaterDepths[index] + ProcessWaterDepthChanges(index);
       _waterMap.WaterDepths[index] = newDepth > 0f ? newDepth : 0f;
       SimulateContaminationMovement(index);
+    }
+  }
+
+  void UpdateOutflowsChunk(int start, int end) {
+    for (var index = start; index < end; index++) {
+      UpdateOutflows(index);
+    }
+  }
+
+  void UpdateDiffusionChunk(int start, int end) {
+    for (var index = start; index < end; index++) {
+      UpdateDiffusion(index);
+    }
+  }
+
+  void UpdateContaminationChunk(int start, int end) {
+    for (var index = start; index < end; index++) {
+      UpdateContamination(index);
+    }
+  }
+
+  void UpdateContamination(int index) {
+    if (_waterMap.WaterDepths[index] > 0f) {
+      var newContamination = _contaminationsBuffer[index] + GetContaminationDiffusionChange(index);
+      _waterContaminationMap.Contaminations[index] =
+          newContamination > MaxContamination ? MaxContamination : newContamination;
+    } else {
+      _waterContaminationMap.Contaminations[index] = 0f;
     }
   }
 
