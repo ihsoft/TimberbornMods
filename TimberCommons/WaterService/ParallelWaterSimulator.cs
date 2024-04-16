@@ -60,11 +60,15 @@ sealed class ParallelWaterSimulator {
     _deltaTime = _fixedDeltaTime * _waterSimulationSettings.TimeScale;
     Array.Copy(_waterMap.WaterDepths, _initialWaterDepths, _initialWaterDepths.Length);
     Array.Copy(_waterContaminationMap.Contaminations, _contaminationsBuffer, _contaminationsBuffer.Length);
-    int index;
+    
+    UpdateOutflows();
+    UpdateWaterParameters();
+    SimulateContaminationDiffusion();
+  }
 
-    // Update outflows.
+  void UpdateOutflows() {
     _updateOutflowsEvent.Reset(_mapSize.y);
-    index = _mapIndexService.StartingIndex;
+    var index = _mapIndexService.StartingIndex;
     for (var i = _mapSize.y - 1; i >= 0; i--) {
       var indexCopy = index;
       ThreadPool.QueueUserWorkItem(
@@ -75,10 +79,11 @@ sealed class ParallelWaterSimulator {
       index += _mapIndexService.Stride;
     }
     _updateOutflowsEvent.Wait();
+  }
 
-    // Update water levels. The most expensive step.
+  void UpdateWaterParameters() {
     _processWaterDepthsEvent.Reset(_mapSize.y);
-    index = _mapIndexService.StartingIndex;
+    var index = _mapIndexService.StartingIndex;
     for (var i = _mapSize.y - 1; i >= 0; i--) {
       var indexCopy = index;
       ThreadPool.QueueUserWorkItem(
@@ -89,10 +94,11 @@ sealed class ParallelWaterSimulator {
       index += _mapIndexService.Stride;
     }
     _processWaterDepthsEvent.Wait();
+  }
 
-    // Simulate contamination.
+  void SimulateContaminationDiffusion() {
     _updateDiffusionEvent.Reset(_mapSize.y);
-    index = _mapIndexService.StartingIndex;
+    var index = _mapIndexService.StartingIndex;
     for (var i = _mapSize.y - 1; i >= 0; i--) {
       var indexCopy = index;
       ThreadPool.QueueUserWorkItem(
