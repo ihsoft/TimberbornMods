@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using Timberborn.MapIndexSystem;
 using Timberborn.SoilMoistureSystem;
 using Timberborn.WaterSystem;
 using UnityEngine;
@@ -23,9 +22,13 @@ namespace IgorZ.TimberCommons.WaterService {
 /// </remarks>
 sealed class ParallelSoilMoistureSimulator {
   readonly SoilMoistureSimulator _instance;
-  readonly MapIndexService _mapIndexService;
   readonly IWaterService _waterService;
   readonly SoilMoistureSimulationSettings _soilMoistureSimulationSettings;
+
+  readonly int _startingIndex;
+  readonly int _stride;
+  readonly int _tilesPerLine;
+  readonly int _tilesPerColumn;
 
   // ReSharper disable once InconsistentNaming
   readonly float[] MoistureLevels;
@@ -33,7 +36,6 @@ sealed class ParallelSoilMoistureSimulator {
   readonly float[] _lastTickMoistureLevels;
   readonly int[] _wateredNeighbours;
   readonly int[] _clusterSaturation;
-  readonly Vector3Int _mapSize;
 
   readonly CountdownEvent _countWateredNeighborsEvent = new(0);
   readonly CountdownEvent _calculateClusterSaturationAndWaterEvaporationEvent = new(0);
@@ -41,16 +43,20 @@ sealed class ParallelSoilMoistureSimulator {
 
   internal ParallelSoilMoistureSimulator(SoilMoistureSimulator instance) {
     _instance = instance;
-    _mapIndexService = instance._mapIndexService;
     _waterService = instance._waterService;
     _soilMoistureSimulationSettings = instance._soilMoistureSimulationSettings;
+
+    var mapIndexService = instance._mapIndexService;
+    _startingIndex = mapIndexService.StartingIndex;
+    _stride = mapIndexService.Stride;
+    _tilesPerLine = mapIndexService.MapSize.x;
+    _tilesPerColumn = mapIndexService.MapSize.y;
 
     MoistureLevels = instance.MoistureLevels;
     _moistureLevelsChangedLastTick = instance._moistureLevelsChangedLastTick;
     _lastTickMoistureLevels = instance._lastTickMoistureLevels;
     _wateredNeighbours = instance._wateredNeighbours;
     _clusterSaturation = instance._clusterSaturation;
-    _mapSize = _mapIndexService.MapSize;
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -63,54 +69,54 @@ sealed class ParallelSoilMoistureSimulator {
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void CountWateredNeighbors() {
-    _countWateredNeighborsEvent.Reset(_mapSize.y);
-    var index = _mapIndexService.StartingIndex;
-    for (var i = _mapSize.y - 1; i >= 0; i--) {
+    _countWateredNeighborsEvent.Reset(_tilesPerColumn);
+    var index = _startingIndex;
+    for (var i = 0; i < _tilesPerColumn; i++) {
       var indexCopy = index;
       ThreadPool.QueueUserWorkItem(
           _ => {
-            CountWateredNeighborsChunk(indexCopy, indexCopy + _mapSize.x);
+            CountWateredNeighborsChunk(indexCopy, indexCopy + _tilesPerLine);
             _countWateredNeighborsEvent.Signal();
           });
-      index += _mapIndexService.Stride;
+      index += _stride;
     }
     _countWateredNeighborsEvent.Wait();
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void CalculateClusterSaturationAndWaterEvaporation() {
-    _calculateClusterSaturationAndWaterEvaporationEvent.Reset(_mapSize.y);
-    var index = _mapIndexService.StartingIndex;
-    for (var i = _mapSize.y - 1; i >= 0; i--) {
+    _calculateClusterSaturationAndWaterEvaporationEvent.Reset(_tilesPerColumn);
+    var index = _startingIndex;
+    for (var i = 0; i < _tilesPerColumn; i++) {
       var indexCopy = index;
       ThreadPool.QueueUserWorkItem(
           _ => {
-            CalculateClusterSaturationAndWaterEvaporationChunk(indexCopy, indexCopy + _mapSize.x);
+            CalculateClusterSaturationAndWaterEvaporationChunk(indexCopy, indexCopy + _tilesPerLine);
             _calculateClusterSaturationAndWaterEvaporationEvent.Signal();
           });
-      index += _mapIndexService.Stride;
+      index += _stride;
     }
     _calculateClusterSaturationAndWaterEvaporationEvent.Wait();
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void CalculateMoisture() {
-    _calculateMoistureEvent.Reset(_mapSize.y);
-    var index = _mapIndexService.StartingIndex;
-    for (var i = _mapSize.y - 1; i >= 0; i--) {
+    _calculateMoistureEvent.Reset(_tilesPerColumn);
+    var index = _startingIndex;
+    for (var i = 0; i < _tilesPerColumn; i++) {
       var indexCopy = index;
       ThreadPool.QueueUserWorkItem(
           _ => {
-            CalculateMoistureChunk(indexCopy, indexCopy + _mapSize.x);
+            CalculateMoistureChunk(indexCopy, indexCopy + _tilesPerLine);
             _calculateMoistureEvent.Signal();
           });
-      index += _mapIndexService.Stride;
+      index += _stride;
     }
     _calculateMoistureEvent.Wait();
 
-    index = _mapIndexService.StartingIndex;
-    for (var i = 0; i < _mapSize.y; i++) {
-      for (var j = 0; j < _mapSize.x; j++) {
+    index = _startingIndex;
+    for (var i = 0; i < _tilesPerColumn; i++) {
+      for (var j = 0; j < _tilesPerLine; j++) {
         // FIXME: Consider using a floating point friendly comparision.
         if (MoistureLevels[index] != _lastTickMoistureLevels[index]) {
           _moistureLevelsChangedLastTick.Add(new Vector2Int(j, i));
@@ -147,14 +153,14 @@ sealed class ParallelSoilMoistureSimulator {
     var count = 0;
     if (_waterService.WaterDepth(index) > 0f) {
       count++;
-      var num = index - _mapIndexService.Stride;
-      var num2 = index - _mapIndexService.Stride - 1;
+      var num = index - _stride;
+      var num2 = index - _stride - 1;
       var num3 = index - 1;
-      var num4 = index + _mapIndexService.Stride - 1;
-      var num5 = index + _mapIndexService.Stride;
-      var num6 = index + _mapIndexService.Stride + 1;
+      var num4 = index + _stride - 1;
+      var num5 = index + _stride;
+      var num6 = index + _stride + 1;
       var num7 = index + 1;
-      var num8 = index - _mapIndexService.Stride + 1;
+      var num8 = index - _stride + 1;
       count += _waterService.WaterDepth(num) > 0f ? 1 : 0;
       count += _waterService.WaterDepth(num2) > 0f ? 1 : 0;
       count += _waterService.WaterDepth(num3) > 0f ? 1 : 0;
@@ -174,9 +180,9 @@ sealed class ParallelSoilMoistureSimulator {
       _waterService.SetWaterEvaporationModifier(index, 1f);
       return;
     }
-    var num2 = index - _mapIndexService.Stride;
+    var num2 = index - _stride;
     var num3 = index - 1;
-    var num4 = index + _mapIndexService.Stride;
+    var num4 = index + _stride;
     var num5 = index + 1;
     var num6 = _wateredNeighbours[index];
     var num7 = _wateredNeighbours[num2];

@@ -24,6 +24,7 @@ namespace IgorZ.TimberCommons.WaterService {
 sealed class ParallelWaterSimulator {
   const float MaxContamination = 1f;
 
+  readonly WaterSimulator _instance;
   readonly WaterMap _waterMap;
   readonly WaterContaminationMap _waterContaminationMap;
   readonly ImpermeableSurfaceService _impermeableSurfaceService;
@@ -32,13 +33,15 @@ sealed class ParallelWaterSimulator {
   readonly WaterContaminationSimulationSettings _waterContaminationSimulationSettings;
   readonly ThreadSafeWaterEvaporationMap _threadSafeWaterEvaporationMap;
 
-  readonly WaterSimulator _waterSimulator;
+  readonly int _startingIndex;
+  readonly int _stride;
+  readonly int _tilesPerLine;
+  readonly int _tilesPerColumn;
 
   readonly WaterFlow[] _tempOutflows;
   readonly float[] _initialWaterDepths;
   readonly float[] _contaminationsBuffer;
   readonly WaterContaminationDiffusion[] _contaminationDiffusions;
-  readonly Vector2Int _mapSize;
   readonly float _fixedDeltaTime;
   float _deltaTime;
 
@@ -48,7 +51,7 @@ sealed class ParallelWaterSimulator {
   readonly CountdownEvent _updateContaminationEvent = new(0);
 
   internal ParallelWaterSimulator(WaterSimulator instance) {
-    _waterSimulator = instance;
+    _instance = instance;
     _waterMap = instance._waterMap;
     _waterContaminationMap = instance._waterContaminationMap;
     _impermeableSurfaceService = instance._impermeableSurfaceService;
@@ -57,12 +60,17 @@ sealed class ParallelWaterSimulator {
     _waterContaminationSimulationSettings = instance._waterContaminationSimulationSettings;
     _threadSafeWaterEvaporationMap = instance._threadSafeWaterEvaporationMap;
 
+    var mapIndexService = instance._mapIndexService;
+    _startingIndex = mapIndexService.StartingIndex;
+    _stride = mapIndexService.Stride;
+    _tilesPerLine = mapIndexService.MapSize.x;
+    _tilesPerColumn = mapIndexService.MapSize.y;
+
     _fixedDeltaTime = instance._fixedDeltaTime;
-    _mapSize = instance._mapSize;
-    _tempOutflows = new WaterFlow[_mapIndexService.TotalMapSize];
-    _initialWaterDepths = new float[_mapIndexService.TotalMapSize];
-    _contaminationsBuffer = new float[_mapIndexService.TotalMapSize];
-    _contaminationDiffusions = new WaterContaminationDiffusion[_mapIndexService.TotalMapSize];
+    _tempOutflows = instance._tempOutflows;
+    _initialWaterDepths = instance._initialWaterDepths;
+    _contaminationsBuffer = instance._contaminationsBuffer;
+    _contaminationDiffusions = instance._contaminationDiffusions;
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -78,61 +86,61 @@ sealed class ParallelWaterSimulator {
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void UpdateOutflows() {
-    _updateOutflowsEvent.Reset(_mapSize.y);
-    var index = _mapIndexService.StartingIndex;
-    for (var i = _mapSize.y - 1; i >= 0; i--) {
+    _updateOutflowsEvent.Reset(_tilesPerColumn);
+    var index = _startingIndex;
+    for (var i = 0; i < _tilesPerColumn; i++) {
       var indexCopy = index;
       ThreadPool.QueueUserWorkItem(
           _ => {
-            UpdateOutflowsChunk(indexCopy, indexCopy + _mapSize.x);
+            UpdateOutflowsChunk(indexCopy, indexCopy + _tilesPerLine);
             _updateOutflowsEvent.Signal();
           });
-      index += _mapIndexService.Stride;
+      index += _stride;
     }
     _updateOutflowsEvent.Wait();
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void UpdateWaterParameters() {
-    _processWaterDepthsEvent.Reset(_mapSize.y);
-    var index = _mapIndexService.StartingIndex;
-    for (var i = _mapSize.y - 1; i >= 0; i--) {
+    _processWaterDepthsEvent.Reset(_tilesPerColumn);
+    var index = _startingIndex;
+    for (var i = 0; i < _tilesPerColumn; i++) {
       var indexCopy = index;
       ThreadPool.QueueUserWorkItem(
           _ => {
-            ProcessWaterDepthsChunk(indexCopy, indexCopy + _mapSize.x);
+            ProcessWaterDepthsChunk(indexCopy, indexCopy + _tilesPerLine);
             _processWaterDepthsEvent.Signal();
           });
-      index += _mapIndexService.Stride;
+      index += _stride;
     }
     _processWaterDepthsEvent.Wait();
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void SimulateContaminationDiffusion() {
-    _updateDiffusionEvent.Reset(_mapSize.y);
-    var index = _mapIndexService.StartingIndex;
-    for (var i = _mapSize.y - 1; i >= 0; i--) {
+    _updateDiffusionEvent.Reset(_tilesPerColumn);
+    var index = _startingIndex;
+    for (var i = 0; i < _tilesPerColumn; i++) {
       var indexCopy = index;
       ThreadPool.QueueUserWorkItem(
           _ => {
-            UpdateDiffusionChunk(indexCopy, indexCopy + _mapSize.x);
+            UpdateDiffusionChunk(indexCopy, indexCopy + _tilesPerLine);
             _updateDiffusionEvent.Signal();
           });
-      index += _mapIndexService.Stride;
+      index += _stride;
     }
     _updateDiffusionEvent.Wait();
 
-    _updateContaminationEvent.Reset(_mapSize.y);
-    index = _mapIndexService.StartingIndex;
-    for (var i = _mapSize.y - 1; i >= 0; i--) {
+    _updateContaminationEvent.Reset(_tilesPerColumn);
+    index = _startingIndex;
+    for (var i = 0; i < _tilesPerColumn; i++) {
       var indexCopy = index;
       ThreadPool.QueueUserWorkItem(
           _ => {
-            UpdateContaminationChunk(indexCopy, indexCopy + _mapSize.x);
+            UpdateContaminationChunk(indexCopy, indexCopy + _tilesPerLine);
             _updateContaminationEvent.Signal();
           });
-      index += _mapIndexService.Stride;
+      index += _stride;
     }
     _updateContaminationEvent.Wait();
   }
@@ -185,9 +193,9 @@ sealed class ParallelWaterSimulator {
       _tempOutflows[index] = default;
       return;
     }
-    var bottomTarget = index - _mapIndexService.Stride;
+    var bottomTarget = index - _stride;
     var leftTarget = index - 1;
-    var topTarget = index + _mapIndexService.Stride;
+    var topTarget = index + _stride;
     var rightTarget = index + 1;
     ref var oldOutflow = ref _waterMap.Outflows[index];
     var bottomFlow = Outflow(index, bottomTarget, oldOutflow.Bottom);
@@ -249,9 +257,9 @@ sealed class ParallelWaterSimulator {
     var flowSlowerOutflowPenaltyThreshold = _waterSimulationSettings.FlowSlowerOutflowPenaltyThreshold;
     if (num14 > flowSlowerOutflowPenaltyThreshold
         && originWaterHeight >= _impermeableSurfaceService.MinFlowSlowers[origin]) {
-      var originBottom = origin - _mapIndexService.Stride;
+      var originBottom = origin - _stride;
       var originLeft = origin - 1;
-      var originTop = origin + _mapIndexService.Stride;
+      var originTop = origin + _stride;
       var originRight = origin + 1;
 
       var top = _waterMap.Outflows[originBottom].Top;
@@ -281,9 +289,9 @@ sealed class ParallelWaterSimulator {
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   float ProcessWaterDepthChanges(int index) {
-    var inBottom = index - _mapIndexService.Stride;
+    var inBottom = index - _stride;
     var inLeft = index - 1;
-    var inTop = index + _mapIndexService.Stride;
+    var inTop = index + _stride;
     var inRight = index + 1;
     var top = _tempOutflows[inBottom].Top;
     var right = _tempOutflows[inLeft].Right;
@@ -314,9 +322,9 @@ sealed class ParallelWaterSimulator {
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void SimulateContaminationMovement(int index) {
-    var num = index - _mapIndexService.Stride;
+    var num = index - _stride;
     var num2 = index - 1;
-    var num3 = index + _mapIndexService.Stride;
+    var num3 = index + _stride;
     var num4 = index + 1;
     ref var reference = ref _tempOutflows[index];
     var num5 = (_tempOutflows[num].Top - reference.Bottom) * _deltaTime;
@@ -373,9 +381,9 @@ sealed class ParallelWaterSimulator {
     ref var reference = ref _contaminationDiffusions[index];
     reference.DiffusionFraction = 0f;
     if (!_impermeableSurfaceService.PartialObstacles[index]) {
-      var num = index - _mapIndexService.Stride;
+      var num = index - _stride;
       var num2 = index - 1;
-      var num3 = index + _mapIndexService.Stride;
+      var num3 = index + _stride;
       var num4 = index + 1;
       ref var reference2 = ref _tempOutflows[index];
       var outflowToTarget = reference2.Bottom - _tempOutflows[num].Top;
@@ -383,10 +391,10 @@ sealed class ParallelWaterSimulator {
       var outflowToTarget3 = reference2.Top - _tempOutflows[num3].Bottom;
       var outflowToTarget4 = reference2.Right - _tempOutflows[num4].Left;
       var sourceWaterHeight = _waterMap.WaterDepths[index] + _impermeableSurfaceService.Heights[index];
-      var flag = _waterSimulator.CanDiffuse(sourceWaterHeight, num, outflowToTarget);
-      var flag2 = _waterSimulator.CanDiffuse(sourceWaterHeight, num2, outflowToTarget2);
-      var flag3 = _waterSimulator.CanDiffuse(sourceWaterHeight, num3, outflowToTarget3);
-      var flag4 = _waterSimulator.CanDiffuse(sourceWaterHeight, num4, outflowToTarget4);
+      var flag = _instance.CanDiffuse(sourceWaterHeight, num, outflowToTarget);
+      var flag2 = _instance.CanDiffuse(sourceWaterHeight, num2, outflowToTarget2);
+      var flag3 = _instance.CanDiffuse(sourceWaterHeight, num3, outflowToTarget3);
+      var flag4 = _instance.CanDiffuse(sourceWaterHeight, num4, outflowToTarget4);
       if (flag || flag2 || flag3 || flag4) {
         reference.CanDiffuseBottom = flag;
         reference.CanDiffuseLeft = flag2;
@@ -402,9 +410,9 @@ sealed class ParallelWaterSimulator {
   float GetContaminationDiffusionChange(int index) {
     var waterContaminationDiffusion = _contaminationDiffusions[index];
     if (waterContaminationDiffusion.DiffusionFraction > 0f) {
-      var targetIndex = index - _mapIndexService.Stride;
+      var targetIndex = index - _stride;
       var targetIndex2 = index - 1;
-      var targetIndex3 = index + _mapIndexService.Stride;
+      var targetIndex3 = index + _stride;
       var targetIndex4 = index + 1;
       var sourceContamination = _contaminationsBuffer[index];
       var sourceWaterDepth = _waterMap.WaterDepths[index];
