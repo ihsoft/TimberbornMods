@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using Timberborn.MapIndexSystem;
 using Timberborn.SoilMoistureSystem;
@@ -12,6 +13,14 @@ using UnityEngine;
 
 namespace IgorZ.TimberCommons.WaterService {
 
+/// <summary>
+/// This class intercepts the stock game simulator calls and runs the logic via thread-pool to get a benefit of multiple
+/// CPU cores.
+/// </summary>
+/// <remarks>
+/// The original simulator code is reused as much as possible, but some methods were copied and changed to fit the
+/// parallel computation logic.
+/// </remarks>
 sealed class ParallelSoilMoistureSimulator {
   readonly SoilMoistureSimulator _instance;
   readonly MapIndexService _mapIndexService;
@@ -44,6 +53,7 @@ sealed class ParallelSoilMoistureSimulator {
     _mapSize = _mapIndexService.MapSize;
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   internal void TickSimulation() {
     Array.Copy(MoistureLevels, _lastTickMoistureLevels, _instance.MoistureLevels.Length);
     CountWateredNeighbors();
@@ -51,6 +61,7 @@ sealed class ParallelSoilMoistureSimulator {
     CalculateMoisture();
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void CountWateredNeighbors() {
     _countWateredNeighborsEvent.Reset(_mapSize.y);
     var index = _mapIndexService.StartingIndex;
@@ -66,6 +77,7 @@ sealed class ParallelSoilMoistureSimulator {
     _countWateredNeighborsEvent.Wait();
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void CalculateClusterSaturationAndWaterEvaporation() {
     _calculateClusterSaturationAndWaterEvaporationEvent.Reset(_mapSize.y);
     var index = _mapIndexService.StartingIndex;
@@ -81,6 +93,7 @@ sealed class ParallelSoilMoistureSimulator {
     _calculateClusterSaturationAndWaterEvaporationEvent.Wait();
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void CalculateMoisture() {
     _calculateMoistureEvent.Reset(_mapSize.y);
     var index = _mapIndexService.StartingIndex;
@@ -98,6 +111,7 @@ sealed class ParallelSoilMoistureSimulator {
     index = _mapIndexService.StartingIndex;
     for (var i = 0; i < _mapSize.y; i++) {
       for (var j = 0; j < _mapSize.x; j++) {
+        // FIXME: Consider using a floating point friendly comparision.
         if (MoistureLevels[index] != _lastTickMoistureLevels[index]) {
           _moistureLevelsChangedLastTick.Add(new Vector2Int(j, i));
         }
@@ -107,24 +121,28 @@ sealed class ParallelSoilMoistureSimulator {
     }
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void CountWateredNeighborsChunk(int start, int end) {
     for (var index = start; index < end; index++) {
       CountWateredNeighbors(index);
     }
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void CalculateClusterSaturationAndWaterEvaporationChunk(int start, int end) {
     for (var index = start; index < end; index++) {
       CalculateClusterSaturationAndWaterEvaporation(index);
     }
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void CalculateMoistureChunk(int start, int end) {
     for (var index = start; index < end; index++) {
       MoistureLevels[index] = _instance.GetUpdatedMoisture(index);
     }
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void CountWateredNeighbors(int index) {
     var count = 0;
     if (_waterService.WaterDepth(index) > 0f) {
@@ -149,6 +167,7 @@ sealed class ParallelSoilMoistureSimulator {
     _wateredNeighbours[index] = count;
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void CalculateClusterSaturationAndWaterEvaporation(int index) {
     if (!(_waterService.WaterDepth(index) > 0f)) {
       _clusterSaturation[index] = 0;
