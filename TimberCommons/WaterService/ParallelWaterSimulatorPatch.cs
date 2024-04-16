@@ -10,11 +10,11 @@ namespace IgorZ.TimberCommons.WaterService {
 /// <summary>Intercepts stock game simulation thread to run a custom simulator.</summary>
 [HarmonyPatch(typeof(WaterSimulator), nameof(WaterSimulator.ProcessSimulation))]
 sealed class ParallelWaterSimulatorPatch {
-  static ParallelWaterSimulator _patchedWaterSimulator;
+  static ParallelWaterSimulator _patchedSimulator;
   internal static bool UsePatchedSimulator;
 
   internal static void Initialize() {
-    _patchedWaterSimulator = null;
+    _patchedSimulator = null;
   }
 
   // ReSharper disable once UnusedMember.Local
@@ -23,8 +23,8 @@ sealed class ParallelWaterSimulatorPatch {
     if (!UsePatchedSimulator) {
       return true;
     }
-    _patchedWaterSimulator ??= new ParallelWaterSimulator(__instance);
-    _patchedWaterSimulator.ProcessSimulation();
+    _patchedSimulator ??= new ParallelWaterSimulator(__instance);
+    _patchedSimulator.ProcessSimulation();
     return false;
   }
 }
