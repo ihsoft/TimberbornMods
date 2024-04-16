@@ -103,6 +103,8 @@
       <Compile Include="WaterService\ParallelSoilMoistureSimulatorPatch.cs" />
       <Compile Include="WaterService\ParallelWaterSimulator.cs" />
       <Compile Include="WaterService\ParallelWaterSimulatorPatch.cs" />
+      <Compile Include="WaterService\ParallelSoilContaminationSimulator.cs" />
+      <Compile Include="WaterService\ParallelSoilContaminationSimulatorPatch.cs" />
       <Compile Include="WaterService\SoilMoistureSimulatorGetUpdatedMoisturePatch.cs" />
       <Compile Include="WaterService\SoilMoistureMapUpdateDesertIntensityPatch.cs" />
       <Compile Include="WaterService\WaterSourceFragmentDebug.cs" />
@@ -267,6 +269,7 @@
       <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
       <!-- Publicize directly when referencing -->
       <Reference Include="..\Dependencies\Timberborn\Timberborn.SoilBarrierSystem.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.SoilContaminationSystem.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.SoilMoistureSystem.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.GoodConsumingBuildingSystemUI.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.GoodConsumingBuildingSystem.dll" Publicize="true" />

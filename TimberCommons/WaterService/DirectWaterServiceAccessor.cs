@@ -191,10 +191,12 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
         GetType().AssemblyQualifiedName,
         typeof(WaterSimulatorUpdateWaterParametersPatch),
         typeof(ParallelWaterSimulatorPatch),
-        typeof(ParallelSoilMoistureSimulatorPatch));
+        typeof(ParallelSoilMoistureSimulatorPatch),
+        typeof(ParallelSoilContaminationSimulatorPatch));
     WaterSimulatorUpdateWaterParametersPatch.DirectWaterServiceAccessor = this;
     ParallelWaterSimulatorPatch.Initialize();
     ParallelSoilMoistureSimulatorPatch.Initialize();
+    ParallelSoilContaminationSimulatorPatch.Initialize();
   }
   #endregion
 
