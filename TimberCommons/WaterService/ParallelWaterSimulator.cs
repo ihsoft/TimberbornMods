@@ -148,9 +148,9 @@ sealed class ParallelWaterSimulator {
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void ProcessWaterDepthsChunk(int start, int end) {
     for (var index = start; index < end; index++) {
-      var newDepth = _waterMap.WaterDepths[index] + ProcessWaterDepthChanges(index);
+      var newDepth = _waterMap.WaterDepths[index] + _instance.ProcessWaterDepthChanges(index);
       _waterMap.WaterDepths[index] = newDepth > 0f ? newDepth : 0f;
-      SimulateContaminationMovement(index);
+      _instance.SimulateContaminationMovement(index);
     }
   }
 
@@ -164,7 +164,7 @@ sealed class ParallelWaterSimulator {
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void UpdateDiffusionChunk(int start, int end) {
     for (var index = start; index < end; index++) {
-      UpdateDiffusion(index);
+      _instance.UpdateDiffusion(index);
     }
   }
 
@@ -178,7 +178,7 @@ sealed class ParallelWaterSimulator {
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void UpdateContamination(int index) {
     if (_waterMap.WaterDepths[index] > 0f) {
-      var newContamination = _contaminationsBuffer[index] + GetContaminationDiffusionChange(index);
+      var newContamination = _contaminationsBuffer[index] + _instance.GetContaminationDiffusionChange(index);
       _waterContaminationMap.Contaminations[index] =
           newContamination > MaxContamination ? MaxContamination : newContamination;
     } else {
@@ -186,6 +186,7 @@ sealed class ParallelWaterSimulator {
     }
   }
 
+  /// <summary>A copy of the stock method for the purpose of patching (see <see cref="Outflow"/>.</summary>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void UpdateOutflows(int index) {
     var waterDepth = _waterMap.WaterDepths[index];
@@ -218,6 +219,8 @@ sealed class ParallelWaterSimulator {
     tempOutflow.Right = rightFlow * moveScaler;
   }
 
+  /// <summary>A copy of the stock method for the purpose of patching. See the comments in the body.</summary>
+  /// <remarks>If no patching were needed,w e could just call this method from the stock code.</remarks>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   float Outflow(int origin, int target, float oldOutflow) {
     var originSurfaceHeight = _impermeableSurfaceService.Heights[origin];
@@ -262,6 +265,11 @@ sealed class ParallelWaterSimulator {
       var originTop = origin + _stride;
       var originRight = origin + 1;
 
+      // Here, the stock code gets outflows from _tempOutflows. Given this method is used to build _tempOutflows, it
+      // seems very questionable as it results in building _tempOutflows from an incomplete state. It also prevents
+      // parallelism, since the data being read is also being modified from the other workers. Based on all this, the
+      // code was fixed to use Outflows instead (immutable copy during the stage execution). Tests didn't reveal any
+      // obvious or noticeable artefacts.
       var top = _waterMap.Outflows[originBottom].Top;
       var right = _waterMap.Outflows[originLeft].Right;
       var bottom = _waterMap.Outflows[originTop].Bottom;
@@ -285,172 +293,6 @@ sealed class ParallelWaterSimulator {
       return num14;
     }
     return 0f;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  float ProcessWaterDepthChanges(int index) {
-    var inBottom = index - _stride;
-    var inLeft = index - 1;
-    var inTop = index + _stride;
-    var inRight = index + 1;
-    var top = _tempOutflows[inBottom].Top;
-    var right = _tempOutflows[inLeft].Right;
-    var bottom = _tempOutflows[inTop].Bottom;
-    var left = _tempOutflows[inRight].Left;
-    var inflowVol = top + right + bottom + left;
-    ref var outflowTmp = ref _tempOutflows[index];
-    var outflowVol = outflowTmp.Bottom + outflowTmp.Left + outflowTmp.Top + outflowTmp.Right;
-    var addVol = inflowVol - outflowVol;
-    var baseEvaporation = _waterMap.WaterDepths[index] < _waterSimulationSettings.FastEvaporationDepthThreshold
-        ? _waterSimulationSettings.FastEvaporationSpeed
-        : _waterSimulationSettings.NormalEvaporationSpeed;
-    var evaporationAdj = _threadSafeWaterEvaporationMap.EvaporationModifiers[index];
-    var evaporation = baseEvaporation * evaporationAdj;
-    var result = (addVol - evaporation) * _deltaTime;
-    ref var reference2 = ref _waterMap.Outflows[index];
-    var outflowBalancingScaler = _waterSimulationSettings.OutflowBalancingScaler;
-    var num11 = outflowTmp.Bottom - top * outflowBalancingScaler;
-    var num12 = outflowTmp.Left - right * outflowBalancingScaler;
-    var num13 = outflowTmp.Top - bottom * outflowBalancingScaler;
-    var num14 = outflowTmp.Right - left * outflowBalancingScaler;
-    reference2.Bottom = num11 > 0f ? num11 : 0f;
-    reference2.Left = num12 > 0f ? num12 : 0f;
-    reference2.Top = num13 > 0f ? num13 : 0f;
-    reference2.Right = num14 > 0f ? num14 : 0f;
-    return result;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  void SimulateContaminationMovement(int index) {
-    var num = index - _stride;
-    var num2 = index - 1;
-    var num3 = index + _stride;
-    var num4 = index + 1;
-    ref var reference = ref _tempOutflows[index];
-    var num5 = (_tempOutflows[num].Top - reference.Bottom) * _deltaTime;
-    var num6 = (_tempOutflows[num2].Right - reference.Left) * _deltaTime;
-    var num7 = (_tempOutflows[num3].Bottom - reference.Top) * _deltaTime;
-    var num8 = (_tempOutflows[num4].Left - reference.Right) * _deltaTime;
-    var num9 = 0f;
-    var num10 = 0f;
-    var num11 = 0f;
-    if (num5 > 0f) {
-      num11 = _waterContaminationMap.Contaminations[num];
-      num9 += num5;
-    } else {
-      num10 += num5;
-    }
-    var num12 = 0f;
-    if (num6 > 0f) {
-      num12 = _waterContaminationMap.Contaminations[num2];
-      num9 += num6;
-    } else {
-      num10 += num6;
-    }
-    var num13 = 0f;
-    if (num7 > 0f) {
-      num13 = _waterContaminationMap.Contaminations[num3];
-      num9 += num7;
-    } else {
-      num10 += num7;
-    }
-    var num14 = 0f;
-    if (num8 > 0f) {
-      num14 = _waterContaminationMap.Contaminations[num4];
-      num9 += num8;
-    } else {
-      num10 += num8;
-    }
-    if (num9 > 0f) {
-      var num15 = _initialWaterDepths[index];
-      var num16 = num15 + num6 + num7 + num8 + num5;
-      if (num16 != 0f) {
-        var value = (_waterContaminationMap.Contaminations[index] * (num15 + num10)
-                + num11 * num5
-                + num12 * num6
-                + num13 * num7
-                + num14 * num8)
-            / num16;
-        _contaminationsBuffer[index] = FastMath.Clamp(value, 0f, MaxContamination);
-      }
-    }
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  void UpdateDiffusion(int index) {
-    ref var reference = ref _contaminationDiffusions[index];
-    reference.DiffusionFraction = 0f;
-    if (!_impermeableSurfaceService.PartialObstacles[index]) {
-      var num = index - _stride;
-      var num2 = index - 1;
-      var num3 = index + _stride;
-      var num4 = index + 1;
-      ref var reference2 = ref _tempOutflows[index];
-      var outflowToTarget = reference2.Bottom - _tempOutflows[num].Top;
-      var outflowToTarget2 = reference2.Left - _tempOutflows[num2].Right;
-      var outflowToTarget3 = reference2.Top - _tempOutflows[num3].Bottom;
-      var outflowToTarget4 = reference2.Right - _tempOutflows[num4].Left;
-      var sourceWaterHeight = _waterMap.WaterDepths[index] + _impermeableSurfaceService.Heights[index];
-      var flag = _instance.CanDiffuse(sourceWaterHeight, num, outflowToTarget);
-      var flag2 = _instance.CanDiffuse(sourceWaterHeight, num2, outflowToTarget2);
-      var flag3 = _instance.CanDiffuse(sourceWaterHeight, num3, outflowToTarget3);
-      var flag4 = _instance.CanDiffuse(sourceWaterHeight, num4, outflowToTarget4);
-      if (flag || flag2 || flag3 || flag4) {
-        reference.CanDiffuseBottom = flag;
-        reference.CanDiffuseLeft = flag2;
-        reference.CanDiffuseTop = flag3;
-        reference.CanDiffuseRight = flag4;
-        var num5 = (flag ? 1 : 0) + (flag2 ? 1 : 0) + (flag3 ? 1 : 0) + (flag4 ? 1 : 0);
-        reference.DiffusionFraction = 1f / num5;
-      }
-    }
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  float GetContaminationDiffusionChange(int index) {
-    var waterContaminationDiffusion = _contaminationDiffusions[index];
-    if (waterContaminationDiffusion.DiffusionFraction > 0f) {
-      var targetIndex = index - _stride;
-      var targetIndex2 = index - 1;
-      var targetIndex3 = index + _stride;
-      var targetIndex4 = index + 1;
-      var sourceContamination = _contaminationsBuffer[index];
-      var sourceWaterDepth = _waterMap.WaterDepths[index];
-      var num = 0f;
-      var diffusionFraction = waterContaminationDiffusion.DiffusionFraction;
-      if (waterContaminationDiffusion.CanDiffuseBottom) {
-        num += CalculateDiffusion(sourceContamination, sourceWaterDepth, targetIndex, diffusionFraction);
-      }
-      if (waterContaminationDiffusion.CanDiffuseLeft) {
-        num += CalculateDiffusion(sourceContamination, sourceWaterDepth, targetIndex2, diffusionFraction);
-      }
-      if (waterContaminationDiffusion.CanDiffuseTop) {
-        num += CalculateDiffusion(sourceContamination, sourceWaterDepth, targetIndex3, diffusionFraction);
-      }
-      if (waterContaminationDiffusion.CanDiffuseRight) {
-        num += CalculateDiffusion(sourceContamination, sourceWaterDepth, targetIndex4, diffusionFraction);
-      }
-      return num * _deltaTime;
-    }
-    return 0f;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  float CalculateDiffusion(float sourceContamination, float sourceWaterDepth, int targetIndex,
-                           float diffusionFraction) {
-    var waterContaminationDiffusion = _contaminationDiffusions[targetIndex];
-    var num = _contaminationsBuffer[targetIndex];
-    var num2 = _waterMap.WaterDepths[targetIndex];
-    var num3 = num - sourceContamination;
-    float num5;
-    if (num3 > 0f) {
-      var num4 = waterContaminationDiffusion.DiffusionFraction * num;
-      num5 = num3 < num4 ? num3 : num4;
-    } else {
-      var num6 = (0f - diffusionFraction) * sourceContamination;
-      num5 = num3 > num6 ? num3 : num6;
-    }
-    return num2 / (sourceWaterDepth + num2) * num5 * _waterContaminationSimulationSettings.DiffusionRate;
   }
 }
 
