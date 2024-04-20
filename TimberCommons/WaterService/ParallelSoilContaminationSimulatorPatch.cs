@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using HarmonyLib;
+using IgorZ.TimberCommons.GpuSimulators;
 using Timberborn.SoilContaminationSystem;
 
 namespace IgorZ.TimberCommons.WaterService {
@@ -20,6 +21,9 @@ sealed class ParallelSoilContaminationSimulatorPatch {
   // ReSharper disable once UnusedMember.Local
   // ReSharper disable once InconsistentNaming
   static bool Prefix(SoilContaminationSimulator __instance) {
+    if (GpuSoilContaminationSimulator.Self.IsEnabled) {
+      return true;  // Give GPU a chance.
+    }
     if (!UsePatchedSimulator) {
       return true;
     }

@@ -66,6 +66,9 @@
       <Compile Include="..\UnityDevLite\ReflectedField.cs">
         <Link>UnityDevLite\ReflectedField.cs</Link>
       </Compile>
+      <Compile Include="..\UnityDevLite\ShaderPipeline.cs">
+        <Link>UnityDevLite\ShaderPipeline.cs</Link>
+      </Compile>
       <Compile Include="..\UnityDevLite\TypeUtils.cs">
         <Link>UnityDevLite\TypeUtils.cs</Link>
       </Compile>
@@ -84,6 +87,10 @@
       <Compile Include="Common\Features.cs" />
       <Compile Include="Common\IConsumptionRateFormatter.cs" />
       <Compile Include="Common\ISupplyLeftProvider.cs" />
+      <Compile Include="GpuSimulators\Configurator.cs" />
+      <Compile Include="GpuSimulators\GpuSimulatorsDebuggingPanel.cs" />
+      <Compile Include="GpuSimulators\GpuSoilContaminationSimulator.cs" />
+      <Compile Include="GpuSimulators\SoilContaminationSimulatorTickSimulationPatch.cs" />
       <Compile Include="IrrigationSystemUI\GrowthRateModifierFragment.cs" />
       <Compile Include="IrrigationSystem\BlockContaminationRangeEffect.cs" />
       <Compile Include="IrrigationSystem\ModifyGrowableGrowthRangeEffect.cs" />
@@ -153,6 +160,9 @@
       <Reference Include="TimberApi, Version=0.6.2.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\TimberApi.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.AssetSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.AssetSystem.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.BaseComponentSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.BaseComponentSystem.dll</HintPath>
       </Reference>
@@ -185,6 +195,9 @@
       </Reference>
       <Reference Include="Timberborn.Debugging, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.Debugging.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.DebuggingUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.DebuggingUI.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.EntityPanelSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.EntityPanelSystem.dll</HintPath>
@@ -252,6 +265,9 @@
       <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Unity\UnityEngine.CoreModule.dll</HintPath>
       </Reference>
+      <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\..\Unity\UnityDev_LogConsole\Dependencies\Unity\UnityEngine.IMGUIModule.dll</HintPath>
+      </Reference>
       <Reference Include="UnityEngine.ParticleSystemModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Unity\UnityEngine.ParticleSystemModule.dll</HintPath>
       </Reference>
@@ -271,6 +287,7 @@
       <Reference Include="..\Dependencies\Timberborn\Timberborn.SoilBarrierSystem.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.SoilContaminationSystem.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.SoilMoistureSystem.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.TerrainSystem.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.GoodConsumingBuildingSystemUI.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.GoodConsumingBuildingSystem.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.WaterSystem.dll" Publicize="true" />
@@ -280,6 +297,17 @@
       <Reference Include="..\Dependencies\Timberborn\Timberborn.WorkshopsUI.dll" Publicize="true" />
       <Reference Include="Timberborn.TerrainSystem" Publicize="true" />
       <Reference Include="Timberborn.BeaverContaminationSystem" Publicize="true" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\Unity\UnityDev_LogConsole\Source\UnityDev_LogConsole.csproj">
+        <Project>{55ad3765-51b3-4294-86f7-b6909c764ba3}</Project>
+        <Name>UnityDev_LogConsole</Name>
+      </ProjectReference>
+    </ItemGroup>
+    <ItemGroup>
+      <ClInclude Include="..\UnityProject\Assets\TimberCommons\Shaders\SoilContaminationSimulatorShader.compute">
+        <Link>GpuSimulators\Shaders\SoilContaminationSimulatorShader.compute</Link>
+      </ClInclude>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

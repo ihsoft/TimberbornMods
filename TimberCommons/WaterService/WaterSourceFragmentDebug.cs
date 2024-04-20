@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using IgorZ.TimberCommons.GpuSimulators;
 using IgorZ.TimberDev.UI;
 using TimberApi.UiBuilderSystem;
 using Timberborn.BaseComponentSystem;
@@ -16,6 +17,7 @@ sealed class WaterSourceFragmentDebug : IEntityPanelFragment {
   
   VisualElement _root;
   Toggle _usePatchedSimulationToggle;
+  Toggle _useGPUSimulationToggle;
 
   public WaterSourceFragmentDebug(UIBuilder builder) {
     _builder = builder;
@@ -30,9 +32,16 @@ sealed class WaterSourceFragmentDebug : IEntityPanelFragment {
           ParallelSoilMoistureSimulatorPatch.UsePatchedSimulator = _usePatchedSimulationToggle.value;
           ParallelSoilContaminationSimulatorPatch.UsePatchedSimulator = _usePatchedSimulationToggle.value;
         });
+    _useGPUSimulationToggle = _builder.Presets().Toggles()
+        .CheckmarkInverted(text: "Use GPU simulation", color: UiFactory.PanelNormalColor);
+    _useGPUSimulationToggle.RegisterValueChangedCallback(
+        _ => {
+          GpuSoilContaminationSimulator.Self.IsEnabled = _useGPUSimulationToggle.value;
+        });
 
     _root = _builder.CreateFragmentBuilder()
         .AddComponent(_usePatchedSimulationToggle)
+        .AddComponent(_useGPUSimulationToggle)
         .BuildAndInitialize();
     _root.ToggleDisplayStyle(visible: false);
     return _root;
