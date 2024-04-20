@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3695521163bdd74fa2845bbd3438240, type: 3}
+  m_Name: Pipeline
+  m_EditorClassIdentifier: 
+  Data:
+  - {fileID: 6290062112368691565}
+  QuickAccess: 0
+  manifest: {fileID: 11400000, guid: a3be79ba91b915c4daf263b4f53d93c3, type: 2}
+--- !u!114 &6290062112368691565
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 924ee63e6c016f14d8a1560b288f15a3, type: 3}
+  m_Name: StageAssetBundles
+  m_EditorClassIdentifier: 
+  Active: 1
+  AssetBundleBuildOptions: 0
+  buildTarget: 5
+  recurseDirectories: 0
+  simulate: 0
+  BundleArtifactPath: AssetBundles

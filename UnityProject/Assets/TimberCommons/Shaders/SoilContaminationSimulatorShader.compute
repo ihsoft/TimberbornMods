@@ -1,0 +1,194 @@
+// Shader that simulates soil contamination.
+
+// Constants. Set the values only once.
+uint Stride;
+
+float ContaminationDecayRate;
+float ContaminationNegativeEqualizationRate;
+float ContaminationPositiveEqualizationRate;
+float ContaminationScaler;
+float ContaminationSpreadingRate;
+float DiagonalSpreadCost;
+float MinimumWaterContamination;
+float RegularSpreadCost;
+float VerticalCostModifier;
+
+float MinimumSoilContamination;
+
+// INPUT: Update on every dispatch.
+float DeltaTime;
+StructuredBuffer<float> Contamination;
+StructuredBuffer<float> UnsafeCellHeight;
+StructuredBuffer<uint> ContaminationBarriers;
+StructuredBuffer<uint> AboveMoistureBarriers;
+StructuredBuffer<uint> CeiledWaterHeight;
+
+// OUTPUT: Read on every dispatch.
+RWStructuredBuffer<float> LastTickContaminationCandidates;
+RWStructuredBuffer<float> ContaminationCandidates;
+RWStructuredBuffer<float> ContaminationLevels;
+
+// Execution chain:
+// SavePreviousState(in ContaminationCandidates, out LastTickContaminationCandidates)
+// CalculateContaminationCandidates(
+//     in LastTickContaminationCandidates, in Contamination, in UnsafeCellHeight, in ContaminationBarriers
+//     in AboveMoistureBarriers, in CeiledWaterHeight, out ContaminationCandidates)
+// UpdateContaminationsFromCandidates(
+//     in ContaminationLevels, in ContaminationCandidates, out ContaminationLevels, out ContaminationsChangedLastTick)
+
+// Common functions.
+#define MAX(v1, v2, v3, v4) max(max(v1, v2), max(v3, v4))
+#define CoordinatesToIndex(coordinates) ((coordinates.y + 1) * Stride + coordinates.x + 1);
+#define IndexToCoordinates(index) int2((index % Stride) - 1, (index / Stride) - 1)
+
+// This shader specific forwards.
+float GetContaminationCandidate(uint index);
+float GetContaminationFromWater(int neighborIndex, int neighborTerrainHeight, int originTerrainHeight);
+float GetContaminationFromNeighbor(int neighborIndex, int neighborTerrainHeight, int originTerrainHeight, float spreadCost);
+float GetContaminationFromNeighbor(int neighborIndex, int neighborTerrainHeight, int originTerrainHeight, float spreadCost, bool firstBarrier, bool secondBarrier);
+
+#pragma kernel SavePreviousState
+
+[numthreads(64, 1, 1)]
+void SavePreviousState(uint3 id : SV_DispatchThreadID)
+{
+    LastTickContaminationCandidates[id.x] = ContaminationCandidates[id.x];
+}
+
+#pragma kernel CalculateContaminationCandidates
+
+[numthreads(8, 8, 1)]
+void CalculateContaminationCandidates(uint3 id : SV_DispatchThreadID)
+{
+    const uint index = CoordinatesToIndex(id.xy);
+    ContaminationCandidates[index] = GetContaminationCandidate(index);
+}
+
+#pragma kernel UpdateContaminationsFromCandidates
+
+[numthreads(8, 8, 1)]
+void UpdateContaminationsFromCandidates(uint3 id : SV_DispatchThreadID)
+{
+    const uint index = CoordinatesToIndex(id.xy);
+    float num2 = ContaminationLevels[index];
+    float num3 = ContaminationCandidates[index];
+    float num4 = num3 - num2;
+    float num5 = ((num4 > 0) ? ContaminationPositiveEqualizationRate : ContaminationNegativeEqualizationRate);
+    float num6 = DeltaTime * num5;
+    float num7 = ((num4 <= num6 && num4 >= 0 - num6) ? num3 : (num2 + (float)sign(num4) * num6));
+    if (num7 < MinimumSoilContamination)
+    {
+        num7 = 0;
+    }
+    //FIXME: Here, cheik if change and fill teh buffer? Or not. 
+    ContaminationLevels[index] = num7;
+}
+
+float GetContaminationCandidate(uint index)
+{
+    if (ContaminationBarriers[index])
+    {
+        return 0;
+    }
+    int num = index - Stride;
+    int num2 = index - Stride - 1;
+    int num3 = index - 1;
+    int num4 = index + Stride - 1;
+    int num5 = index + Stride;
+    int num6 = index + Stride + 1;
+    int num7 = index + 1;
+    int num8 = index - Stride + 1;
+    int neighborTerrainHeight = UnsafeCellHeight[num];
+    int neighborTerrainHeight2 = UnsafeCellHeight[num2];
+    int neighborTerrainHeight3 = UnsafeCellHeight[num3];
+    int neighborTerrainHeight4 = UnsafeCellHeight[num4];
+    int neighborTerrainHeight5 = UnsafeCellHeight[num5];
+    int neighborTerrainHeight6 = UnsafeCellHeight[num6];
+    int neighborTerrainHeight7 = UnsafeCellHeight[num7];
+    int neighborTerrainHeight8 = UnsafeCellHeight[num8];
+    int originTerrainHeight = UnsafeCellHeight[index];
+    bool flag = ContaminationBarriers[num];
+    bool flag2 = ContaminationBarriers[num3];
+    bool flag3 = ContaminationBarriers[num5];
+    bool flag4 = ContaminationBarriers[num7];
+    float num9 = MAX(
+        GetContaminationFromWater(num, neighborTerrainHeight, originTerrainHeight),
+        GetContaminationFromWater(num3, neighborTerrainHeight3, originTerrainHeight),
+        GetContaminationFromWater(num5, neighborTerrainHeight5, originTerrainHeight),
+        GetContaminationFromWater(num7, neighborTerrainHeight7, originTerrainHeight));
+    float num10 = max(
+        MAX(GetContaminationFromNeighbor(num, neighborTerrainHeight, originTerrainHeight, RegularSpreadCost),
+            GetContaminationFromNeighbor(num2, neighborTerrainHeight2, originTerrainHeight, DiagonalSpreadCost, flag, flag2),
+            GetContaminationFromNeighbor(num3, neighborTerrainHeight3, originTerrainHeight, RegularSpreadCost),
+            GetContaminationFromNeighbor(num4, neighborTerrainHeight4, originTerrainHeight, DiagonalSpreadCost, flag2, flag3)),
+        MAX(GetContaminationFromNeighbor(num5, neighborTerrainHeight5, originTerrainHeight, RegularSpreadCost),
+            GetContaminationFromNeighbor(num6, neighborTerrainHeight6, originTerrainHeight, DiagonalSpreadCost, flag3, flag4),
+            GetContaminationFromNeighbor(num7, neighborTerrainHeight7, originTerrainHeight, RegularSpreadCost),
+            GetContaminationFromNeighbor(num8, neighborTerrainHeight8, originTerrainHeight, DiagonalSpreadCost, flag4, flag)));
+    float num11 = LastTickContaminationCandidates[index];
+    float num12 = num11 - ContaminationDecayRate;
+    if (num12 < 0)
+    {
+        num12 = 0;
+    }
+    if (num9 > num12 && num9 >= num10)
+    {
+        float num13 = num11 + ContaminationSpreadingRate;
+        if (!(num9 > num13))
+        {
+            return num9;
+        }
+        return num13;
+    }
+    if (num10 > num12)
+    {
+        return num10;
+    }
+    return num12;
+}
+
+float GetContaminationFromWater(int neighborIndex, int neighborTerrainHeight, int originTerrainHeight)
+{
+    if (AboveMoistureBarriers[neighborIndex] && neighborTerrainHeight >= originTerrainHeight)
+    {
+        return 0;
+    }
+    int num = CeiledWaterHeight[neighborIndex];
+    if (num <= 0)
+    {
+        return 0;
+    }
+    float num2 = Contamination[neighborIndex] - MinimumWaterContamination;
+    if (num2 < 0)
+    {
+        return 0;
+    }
+    float num3 = num2 * ContaminationScaler;
+    int num4 = originTerrainHeight - num;
+    if (num4 < 0)
+    {
+        return num3;
+    }
+    float num5 = (float)num4 * VerticalCostModifier;
+    return num3 - num5;
+}
+
+float GetContaminationFromNeighbor(int neighborIndex, int neighborTerrainHeight, int originTerrainHeight, float spreadCost)
+{
+    int num = originTerrainHeight - neighborTerrainHeight;
+    if (num < 0)
+    {
+        num = 0;
+    }
+    float num2 = (float)num * VerticalCostModifier;
+    return LastTickContaminationCandidates[neighborIndex] - num2 - spreadCost;
+}
+
+float GetContaminationFromNeighbor(int neighborIndex, int neighborTerrainHeight, int originTerrainHeight, float spreadCost, bool firstBarrier, bool secondBarrier)
+{
+    if (firstBarrier && secondBarrier)
+    {
+        return 0;
+    }
+    return GetContaminationFromNeighbor(neighborIndex, neighborTerrainHeight, originTerrainHeight, spreadCost);
+}
