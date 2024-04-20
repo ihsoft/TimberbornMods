@@ -2,6 +2,7 @@
 
 // Constants. Set the values only once.
 uint Stride;
+float DeltaTime;
 
 float ContaminationDecayRate;
 float ContaminationNegativeEqualizationRate;
@@ -9,14 +10,12 @@ float ContaminationPositiveEqualizationRate;
 float ContaminationScaler;
 float ContaminationSpreadingRate;
 float DiagonalSpreadCost;
+float MinimumSoilContamination;
 float MinimumWaterContamination;
 float RegularSpreadCost;
 float VerticalCostModifier;
 
-float MinimumSoilContamination;
-
 // INPUT: Update on every dispatch.
-float DeltaTime;
 StructuredBuffer<float> Contamination;
 StructuredBuffer<float> UnsafeCellHeight;
 StructuredBuffer<uint> ContaminationBarriers;
