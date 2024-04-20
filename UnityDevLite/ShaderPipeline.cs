@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -14,14 +15,91 @@ namespace IgorZ.TimberCommons {
 
 /// <summary>Helper wrapper to sequentially run kernels in a shader.</summary>
 /// <remarks>
+/// <p>
 /// This wrapper allows declaring the execution order via a builder. Then, will automatically handle data preparation
 /// and stages synchronization.
+/// </p>
+/// <p>
+/// The concept assumes that you first set constants, then define buffers and, eventually, specify a sequence of kernel
+/// dispatches.
+/// <list type="bullet">
+/// <item>Constants are values that are applied to teh shader at the moment of building the pipeline.</item>
+/// <item>
+/// Buffers are used to exchange data between kernels and GPU/CPU. every buffer in teh shader must have a declaration in
+/// the pipeline. Even if the buffer is not transferred between CPU and GPU.
+/// </item>
+/// <item>
+/// Kernel dispatch is the actual handler of the work. You need to specify which buffers are needed by teh kernel and
+/// how are they used: fetch from CPU, get from other kernel, pass to other kernel, or pass to CPU.
+/// </item>
+/// </list>
+/// These calls have no mandatory order of calling and you can mix them to achieve a logical grouping. Just keep in mind
+/// that all constants are applied only once at the pipeline setup. And buffers need to be known before referring them
+/// in kernel dispatch definition.
+/// </p>
+/// <p>
+/// The pipeline does its best to optimize the time spend for data preparation and teh actual kernel running. The input
+/// data is not set to the buffers immediately, it happens only when a kernel that needs it is being dispatched. Thus,
+/// once the input data is prepared, don't modify it until the pipeline has finished.
+/// </p>
+/// <example>
+/// Here is an example of calling three kernels from a shader, each of which provides output for the child down below.
+/// Also, each stage gets extra data source that is provided by CPU.
+/// <p>
+/// <code><![CDATA[
+///     var simulationSpeed = 2f;
+///     var flatWorkSize = new Vector3Int(100, 1, 1);
+///     var cpuData1 = new float[flatWorkSize.x];
+///     var cpuData2 = new float[flatWorkSize.x];
+///     var cpuData3 = new float[flatWorkSize.x];
+///     var twoDWorkSize = new Vector3Int(256, 256, 1);
+///     var result = new float[twoDWorkSize.x * twoDWorkSize.y];
+///     
+///     var pipeline = ShaderPipeline.NewBuilder()
+///       // Constants.
+///       .WithConstantValue("Scale", 0.1f)
+///       .WithConstantValue("Speed", simulationSpeed) // It will be captured only once!
+///       // Buffers.
+///       .WithInputBuffer("dataFromCpu1", cpuData1)
+///       .WithInputBuffer("dataFromCpu2", cpuData2)
+///       .WithInputBuffer("dataFromCpu2", cpuData3)
+///       .WithIntermediateBuffer("outputForKernel-1", typeof(float), 1000) // Not bound to flatArraySize
+///       .WithIntermediateBuffer("outputForKernel-2", typeof(uint), 500) // Not bound to flatArraySize
+///       .WithOutputBuffer("Result", result)
+///       // Kernels.
+///       .DispatchKernel("stage0", flatWorkSize, "s:dataFromCpu1", "o:outputForKernel-1")
+///       .DispatchKernel("stage1", flatWorkSize, "s:dataFromCpu2", "i:outputForKernel-1", "o:outputForKernel-2")
+///       .DispatchKernel("stage2", twoDWorkSize, "s:dataFromCpu2", "i:outputForKernel-2", "r:Result")
+///       // Done!
+///       .Build();
+///     
+///       // Populate cpuData1, cpuData2, and cpuData3.
+///       SetInputData();  
+///       pipeline.RunBlocking();
+///       // The result array is now ready!
+///       foreach (var item in result) {
+///         // ...
+///       }
+/// ]]></code>
+/// </p>
+/// </example>
 /// </remarks>
 public sealed class ShaderPipeline {
 
   #region API
+  // ReSharper disable MemberCanBePrivate.Global
+  // ReSharper disable UnusedAutoPropertyAccessor.Global
+
+  /// <summary>Shader of this pipeline.</summary>
+  public ComputeShader Shader { get; }
+
+  /// <summary>Time, spent for running last <see cref="RunBlocking"/>.</summary>
+  public TimeSpan LastRunDuration { get; private set; }
 
   /// <summary>Starts builder for a new pipeline</summary>
+  /// <remarks>
+  /// Building is expensive step, but it usually needs to be done only once. Once pipeline created, just call
+  /// <see cref="RunBlocking"/> in every frame or physics update.</remarks>
   /// <param name="shader">
   /// The shader to make pipeline for. Do not re-use shaders! Each shader must be owned by exactly one pipeline.
   /// </param>
@@ -30,7 +108,12 @@ public sealed class ShaderPipeline {
   }
 
   /// <summary>Runs kernels and block until all the results are ready.</summary>
+  /// <remarks>
+  /// Ths method can be called as many times as needed. All source buffers will be updated and the result buffers
+  /// flushed.
+  /// </remarks>
   public void RunBlocking() {
+    var stopwatch = Stopwatch.StartNew();
     for (var i = _allSources.Count - 1; i >= 0; i--) {
       _allSources[i].Reset();
     }
@@ -41,7 +124,7 @@ public sealed class ShaderPipeline {
         var buffer = kernel.Sources[i];
         buffer.SetData();
       }
-      _shader.Dispatch(
+      Shader.Dispatch(
           kernel.Index, Mathf.CeilToInt((float)kernel.DataSize.x / kernel.GroupSize.x),
           Mathf.CeilToInt((float)kernel.DataSize.y / kernel.GroupSize.y),
           Mathf.CeilToInt((float)kernel.DataSize.z / kernel.GroupSize.z));
@@ -52,6 +135,8 @@ public sealed class ShaderPipeline {
         buffer.GetData();
       }
     }
+    stopwatch.Stop();
+    LastRunDuration = stopwatch.Elapsed;
   }
 
   /// <summary>Destroys shader and releases all resources.</summary>
@@ -59,9 +144,11 @@ public sealed class ShaderPipeline {
     foreach (var buffer in _allBuffers) {
       buffer.Release();
     }
-    UnityEngine.Object.DestroyImmediate(_shader);
+    UnityEngine.Object.DestroyImmediate(Shader);
   }
 
+  // ReSharper restore UnusedAutoPropertyAccessor.Global
+  // ReSharper restore MemberCanBePrivate.Global
   #endregion
 
   /// <summary>Builder to compose a pipeline.</summary>
@@ -328,13 +415,12 @@ public sealed class ShaderPipeline {
     public readonly List<BufferDecl> Results = new();
   }
 
-  readonly ComputeShader _shader;
   readonly List<KernelDecl> _dispatchQueue;
   readonly List<ComputeBuffer> _allBuffers;
   readonly List<BufferDecl> _allSources = new();
 
   ShaderPipeline(ComputeShader shader, List<KernelDecl> dispatchQueue, List<ComputeBuffer> allBuffers) {
-    _shader = shader;
+    Shader = shader;
     _dispatchQueue = dispatchQueue;
     _allBuffers = allBuffers;
     foreach (var kernel in _dispatchQueue) {
