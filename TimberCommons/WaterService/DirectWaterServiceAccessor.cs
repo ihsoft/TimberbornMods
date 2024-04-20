@@ -177,6 +177,7 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
   #endregion
 
   #region IPostLoadableSingleton implementation
+
   /// <summary>Gets accessors to the water system internal classes and properties.</summary>
   /// <remarks>It's expected to be called after all the game state is loaded and ready.</remarks>
   public void PostLoad() {
@@ -198,6 +199,7 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
     ParallelSoilMoistureSimulatorPatch.Initialize();
     ParallelSoilContaminationSimulatorPatch.Initialize();
   }
+
   #endregion
 
   #region ITickableSingleton implementation
