@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Timberborn.AssetSystem;
 using Timberborn.SingletonSystem;
@@ -31,6 +32,7 @@ sealed class GpuSoilContaminationSimulator : IPostLoadableSingleton {
   internal static GpuSoilContaminationSimulator Self;
   internal bool IsEnabled;
   internal static double _lastSimulationDurationTotal;
+  internal static double _lastSimulationShaderCost;
 
   ShaderPipeline _shaderPipeline;
 
@@ -105,6 +107,8 @@ sealed class GpuSoilContaminationSimulator : IPostLoadableSingleton {
   }
 
   void TickPipeline() {
+    var stopwatch = Stopwatch.StartNew();
+
     Array.Copy(_soilContaminationSimulator.ContaminationLevels, _contaminationLevels, _contaminationLevels.Length);
     PrepareInputData();
     _shaderPipeline.RunBlocking();
@@ -114,7 +118,10 @@ sealed class GpuSoilContaminationSimulator : IPostLoadableSingleton {
             _soilContaminationSimulator._mapIndexService.IndexToCoordinates(i));
       }
     }
-    _lastSimulationDurationTotal = _shaderPipeline.LastRunDuration.TotalSeconds;
+
+    stopwatch.Stop();
+    _lastSimulationShaderCost = _shaderPipeline.LastRunDuration.TotalSeconds;
+    _lastSimulationDurationTotal = stopwatch.Elapsed.TotalSeconds;
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]

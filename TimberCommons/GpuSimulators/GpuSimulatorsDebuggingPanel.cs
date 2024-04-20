@@ -25,7 +25,9 @@ public class GpuSimulatorsDebuggingPanel : ILoadableSingleton, IDebuggingPanel {
   public string GetText() {
     var text = new StringBuilder();
     var soilContaminationTotal = GpuSoilContaminationSimulator._lastSimulationDurationTotal * 1000;
-    text.Append($"Soil contamination total: {soilContaminationTotal:0.##} ms");
+    text.AppendLine($"Soil contamination total: {soilContaminationTotal:0.##} ms");
+    var soilContaminationShader = GpuSoilContaminationSimulator._lastSimulationShaderCost * 1000;
+    text.Append($"Soil contamination shader: {soilContaminationShader:0.##} ms");
     return text.ToString();
   }
 }
