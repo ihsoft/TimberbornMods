@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 
 // ReSharper disable once CheckNamespace
-namespace UnityDev.Utils.LogUtilsLite {
+namespace IgorZ.TimberCommons {
 
 /// <summary>Helper class to track a high frequency value change.</summary>
 /// <remarks>

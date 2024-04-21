@@ -24,10 +24,10 @@ public class GpuSimulatorsDebuggingPanel : ILoadableSingleton, IDebuggingPanel {
   /// <inheritdoc/>
   public string GetText() {
     var text = new StringBuilder();
-    var soilContaminationTotal = GpuSoilContaminationSimulator._lastSimulationDurationTotal * 1000;
-    text.AppendLine($"Soil contamination total: {soilContaminationTotal:0.##} ms");
-    var soilContaminationShader = GpuSoilContaminationSimulator._lastSimulationShaderCost * 1000;
-    text.Append($"Soil contamination shader: {soilContaminationShader:0.##} ms");
+    var (_, _, _, soilTotal) = GpuSoilContaminationSimulator.Self.TotalSimPerfSampler.GetStats();
+    text.AppendLine($"Soil contamination total: {soilTotal * 1000:0.##} ms");
+    var (_, _, _, soilShader) = GpuSoilContaminationSimulator.Self.ShaderPerfSampler.GetStats();
+    text.Append($"Soil contamination shader: {soilShader * 1000:0.##} ms");
     return text.ToString();
   }
 }

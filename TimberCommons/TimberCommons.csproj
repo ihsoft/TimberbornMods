@@ -60,6 +60,9 @@
       <Compile Include="..\UnityDevLite\HostedDebugLog.cs">
         <Link>UnityDevLite\HostedDebugLog.cs</Link>
       </Compile>
+      <Compile Include="..\UnityDevLite\ValueSampler.cs">
+        <Link>UnityDevLite\ValueSampler.cs</Link>
+      </Compile>
       <Compile Include="..\UnityDevLite\ReflectedAction.cs">
         <Link>UnityDevLite\ReflectedAction.cs</Link>
       </Compile>

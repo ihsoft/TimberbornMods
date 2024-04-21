@@ -31,9 +31,8 @@ sealed class GpuSoilContaminationSimulator : IPostLoadableSingleton {
 
   internal static GpuSoilContaminationSimulator Self;
   internal bool IsEnabled;
-  internal static double _lastSimulationDurationTotal;
-  internal static double _lastSimulationShaderCost;
-
+  internal readonly ValueSampler ShaderPerfSampler = new(10);
+  internal readonly ValueSampler TotalSimPerfSampler = new(10);
   ShaderPipeline _shaderPipeline;
 
   int[] _ceiledWaterHeight;
@@ -120,8 +119,9 @@ sealed class GpuSoilContaminationSimulator : IPostLoadableSingleton {
     }
 
     stopwatch.Stop();
-    _lastSimulationShaderCost = _shaderPipeline.LastRunDuration.TotalSeconds;
-    _lastSimulationDurationTotal = stopwatch.Elapsed.TotalSeconds;
+    TotalSimPerfSampler.AddSample(stopwatch.Elapsed.TotalSeconds);
+    stopwatch.Reset();
+    ShaderPerfSampler.AddSample(_shaderPipeline.LastRunDuration.TotalSeconds);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
