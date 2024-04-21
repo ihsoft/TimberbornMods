@@ -1,5 +1,9 @@
 // Shader that simulates soil contamination.
 
+// This constant is here only for the version counting. This makes Unity to refresh the shader.
+// Increase it each time you update the shader code. The actual value doesn't matter. It just needs to be different.
+float VERSION_1;
+
 // Constants. Set the values only once.
 uint Stride;
 float DeltaTime;
@@ -17,15 +21,17 @@ float VerticalCostModifier;
 
 // INPUT: Update on every dispatch.
 StructuredBuffer<float> Contamination;
-StructuredBuffer<float> UnsafeCellHeight;
 StructuredBuffer<uint> ContaminationBarriers;
 StructuredBuffer<uint> AboveMoistureBarriers;
-StructuredBuffer<uint> CeiledWaterHeight;
+StructuredBuffer<int> UnsafeCellHeight;
+StructuredBuffer<int> CeiledWaterHeight;
 
 // OUTPUT: Read on every dispatch.
-RWStructuredBuffer<float> LastTickContaminationCandidates;
 RWStructuredBuffer<float> ContaminationCandidates;
 RWStructuredBuffer<float> ContaminationLevels;
+
+// INTERMEDIATE: Only used between the kernels.
+RWStructuredBuffer<float> LastTickContaminationCandidates;
 
 // Execution chain:
 // SavePreviousState(in ContaminationCandidates, out LastTickContaminationCandidates)
@@ -37,7 +43,7 @@ RWStructuredBuffer<float> ContaminationLevels;
 
 // Common functions.
 #define MAX(v1, v2, v3, v4) max(max(v1, v2), max(v3, v4))
-#define CoordinatesToIndex(coordinates) ((coordinates.y + 1) * Stride + coordinates.x + 1);
+#define CoordinatesToIndex(coordinates) ((coordinates.y + 1) * Stride + coordinates.x + 1)
 #define IndexToCoordinates(index) int2((index % Stride) - 1, (index / Stride) - 1)
 
 // This shader specific forwards.
