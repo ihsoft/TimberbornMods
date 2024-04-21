@@ -67,6 +67,7 @@ sealed class GpuSoilContaminationSimulator : IPostLoadableSingleton {
 
     _shaderPipeline = ShaderPipeline.NewBuilder(shader)
         // Simulation settings.
+        .WithConstantValue("DeltaTime", Time.fixedDeltaTime)
         .WithConstantValue("ContaminationDecayRate", simulationSettings.ContaminationDecayRate)
         .WithConstantValue(
             "ContaminationNegativeEqualizationRate", simulationSettings.ContaminationNegativeEqualizationRate)
@@ -74,7 +75,6 @@ sealed class GpuSoilContaminationSimulator : IPostLoadableSingleton {
             "ContaminationPositiveEqualizationRate", simulationSettings.ContaminationPositiveEqualizationRate)
         .WithConstantValue("ContaminationScaler", _soilContaminationSimulator._contaminationScaler)
         .WithConstantValue("ContaminationSpreadingRate", simulationSettings.ContaminationSpreadingRate)
-        .WithConstantValue("DeltaTime", Time.fixedDeltaTime)
         .WithConstantValue("DiagonalSpreadCost", _soilContaminationSimulator._diagonalSpreadCost)
         .WithConstantValue("MinimumSoilContamination", SoilContaminationSimulator.MinimumSoilContamination)
         .WithConstantValue("MinimumWaterContamination", simulationSettings.MinimumWaterContamination)
