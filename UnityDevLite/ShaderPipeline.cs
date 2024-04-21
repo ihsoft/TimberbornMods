@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -124,10 +125,8 @@ public sealed class ShaderPipeline {
         var buffer = kernel.Sources[i];
         buffer.SetData();
       }
-      Shader.Dispatch(
-          kernel.Index, Mathf.CeilToInt((float)kernel.DataSize.x / kernel.GroupSize.x),
-          Mathf.CeilToInt((float)kernel.DataSize.y / kernel.GroupSize.y),
-          Mathf.CeilToInt((float)kernel.DataSize.z / kernel.GroupSize.z));
+      var executionSize = GetExecutionSize(kernel);
+      Shader.Dispatch(kernel.Index, executionSize.x, executionSize.y, executionSize.z);
       foreach (var buffer in kernel.Outputs) {
         AsyncGPUReadback.Request(buffer).WaitForCompletion();
       }
@@ -147,6 +146,53 @@ public sealed class ShaderPipeline {
     UnityEngine.Object.DestroyImmediate(Shader);
   }
 
+  /// <summary>
+  /// Returns a formatted string that explains how the pipeline will behave in <see cref="RunBlocking"/>.
+  /// </summary>
+  public string PrintExecutionPlan() {
+    var res = new StringBuilder();
+    if (_constants.Count > 0) {
+      res.AppendLine("Constants on the shader");
+      foreach (var constant in _constants) {
+        res.AppendLine($"+ {constant.Key} = {constant.Value}");
+      }
+    } else {
+      res.AppendLine("No constants for the shader\n");
+    }
+    if (_allSources.Count > 0) {
+      res.AppendLine("\nReset sources");
+      foreach (var source in _allSources) {
+        res.AppendLine($"+ Buffer '{source.Name}'");
+      }
+    } else {
+      res.AppendLine("\nNo sources to reset");
+    }
+    foreach (var kernel in _dispatchQueue) {
+      res.AppendLine($"\nKernel #{kernel.Index}:");
+      if (kernel.Sources.Count > 0) {
+        res.AppendLine($"+ Transfer {kernel.Sources.Count} source(s) data from CPU to GPU");
+        foreach (var source in kernel.Sources) {
+          res.AppendLine($"| + SetData on buffer '{source.Name}', length={source.Array.Length}");
+        }
+      } else {
+        res.AppendLine("+ No sources to handle");
+      }
+      //res.AppendLine($"+ Wait on {kernel.Inputs.Count} input(s)");
+      res.AppendLine($"+ Dispatch: groupSize={kernel.GroupSize}, dataSize={GetExecutionSize(kernel)}");
+      res.AppendLine($"+ Wait on {kernel.Outputs.Count} output(s)");
+      if (kernel.Results.Count > 0) {
+        res.AppendLine($"+ Transfer {kernel.Results.Count} result(s) from GPU to CPU");
+        foreach (var result in kernel.Results) {
+          res.AppendLine($"| + GetData on buffer '{result.Name}', length={result.Array.Length}");
+        }
+      } else {
+        res.AppendLine("+ No results to handle");
+      }
+      res.AppendLine("+ Kernel is DONE!");
+    }
+    return res.ToString();
+  }
+
   // ReSharper restore UnusedAutoPropertyAccessor.Global
   // ReSharper restore MemberCanBePrivate.Global
   #endregion
@@ -159,10 +205,10 @@ public sealed class ShaderPipeline {
     /// <summary>Binds a constant value to the shader.</summary>
     /// <remarks>The value is captured at the moment of the method call and never updated afterwards.</remarks>
     public Builder WithConstantValue(string name, float value) {
-      if (_constants.Contains(name)) {
+      if (_constants.Keys.Contains(name)) {
         throw new ArgumentException($"Constant '{name}' is already defined");
       }
-      _constants.Add(name);
+      _constants.Add(name, value);
       _shader.SetFloat(name, value);
       return this;
     }
@@ -170,10 +216,10 @@ public sealed class ShaderPipeline {
     /// <summary>Binds a constant value to the shader.</summary>
     /// <remarks>The value is captured at the moment of the method call and never updated afterwards.</remarks>
     public Builder WithConstantValue(string name, int value) {
-      if (_constants.Contains(name)) {
+      if (_constants.Keys.Contains(name)) {
         throw new ArgumentException($"Constant '{name}' is already defined");
       }
-      _constants.Add(name);
+      _constants.Add(name, value);
       _shader.SetInt(name, value);
       return this;
     }
@@ -181,10 +227,10 @@ public sealed class ShaderPipeline {
     /// <summary>Binds a constant value to the shader.</summary>
     /// <remarks>The value is captured at the moment of the method call and never updated afterwards.</remarks>
     public Builder WithConstantValue(string name, bool value) {
-      if (_constants.Contains(name)) {
+      if (_constants.Keys.Contains(name)) {
         throw new ArgumentException($"Constant '{name}' is already defined");
       }
-      _constants.Add(name);
+      _constants.Add(name, value);
       _shader.SetBool(name, value);
       return this;
     }
@@ -314,7 +360,7 @@ public sealed class ShaderPipeline {
       allBuffers.AddRange(_inputBuffers.Select(x => x.Value.Buffer));
       allBuffers.AddRange(_outputBuffers.Select(x => x.Value.Buffer));
       allBuffers.AddRange(_intermediateBuffers.Values);
-      return new ShaderPipeline(_shader, _dispatchQueue, allBuffers);
+      return new ShaderPipeline(_shader, _dispatchQueue, allBuffers, _constants);
     }
 
     #endregion
@@ -322,7 +368,7 @@ public sealed class ShaderPipeline {
     #region Implementation
 
     readonly ComputeShader _shader;
-    readonly HashSet<string> _constants = new();
+    readonly Dictionary<string, object> _constants = new();
     readonly HashSet<string> _allBufferNames = new();
     readonly Dictionary<string, BufferDecl> _inputBuffers = new();
     readonly Dictionary<string, ComputeBuffer> _intermediateBuffers = new();
@@ -391,7 +437,6 @@ public sealed class ShaderPipeline {
       if (_isReady) {
         return;
       }
-      //FIXME: here use begin/end write.
       Buffer.SetData(Array);
       _isReady = true;
     }
@@ -418,14 +463,24 @@ public sealed class ShaderPipeline {
   readonly List<KernelDecl> _dispatchQueue;
   readonly List<ComputeBuffer> _allBuffers;
   readonly List<BufferDecl> _allSources = new();
+  readonly Dictionary<string, object> _constants;
 
-  ShaderPipeline(ComputeShader shader, List<KernelDecl> dispatchQueue, List<ComputeBuffer> allBuffers) {
+  ShaderPipeline(ComputeShader shader, List<KernelDecl> dispatchQueue, List<ComputeBuffer> allBuffers,
+                 Dictionary<string, object> constants) {
     Shader = shader;
     _dispatchQueue = dispatchQueue;
     _allBuffers = allBuffers;
     foreach (var kernel in _dispatchQueue) {
       _allSources.AddRange(kernel.Sources);
     }
+    _constants = constants;
+  }
+
+  static Vector3Int GetExecutionSize(KernelDecl kernel) {
+    return new Vector3Int(
+        Mathf.CeilToInt((float)kernel.DataSize.x / kernel.GroupSize.x),
+        Mathf.CeilToInt((float)kernel.DataSize.y / kernel.GroupSize.y),
+        Mathf.CeilToInt((float)kernel.DataSize.z / kernel.GroupSize.z));
   }
 
   #endregion
