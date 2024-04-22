@@ -112,7 +112,7 @@ sealed class GpuSoilContaminationSimulator : IPostLoadableSingleton {
     PrepareInputData();
     _shaderPipeline.RunBlocking();
     for (var i = _contaminationLevels.Length - 1; i >= 0; i--) {
-      if (Mathf.Abs(_soilContaminationSimulator.ContaminationLevels[i] - _contaminationLevels[i]) > float.Epsilon) {
+      if (_soilContaminationSimulator.ContaminationLevels[i] != _contaminationLevels[i]) {
         _soilContaminationSimulator._contaminationsChangedLastTick.Add(
             _soilContaminationSimulator._mapIndexService.IndexToCoordinates(i));
       }
