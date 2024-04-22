@@ -172,7 +172,12 @@ public sealed class ShaderPipeline {
       if (kernel.Sources.Count > 0) {
         res.AppendLine($"+ Transfer {kernel.Sources.Count} source(s) data from CPU to GPU");
         foreach (var source in kernel.Sources) {
-          res.AppendLine($"| + SetData on buffer '{source.Name}', length={source.Array.Length}");
+          res.AppendFormat(
+              "| + SetData on buffer '{0}', count={1}, stride={2} bits\n",
+              source.Name, source.Buffer.count, source.Buffer.stride * 8);
+          if ((source.Buffer.stride * 8 % 128) != 0) {
+            res.AppendLine("| | + Unaligned buffer detected!");
+          }
         }
       } else {
         res.AppendLine("+ No sources to handle");
@@ -183,7 +188,12 @@ public sealed class ShaderPipeline {
       if (kernel.Results.Count > 0) {
         res.AppendLine($"+ Transfer {kernel.Results.Count} result(s) from GPU to CPU");
         foreach (var result in kernel.Results) {
-          res.AppendLine($"| + GetData on buffer '{result.Name}', length={result.Array.Length}");
+          res.AppendFormat(
+              "| + GetData on buffer '{0}', count={1}, stride={2} bits\n",
+              result.Name, result.Buffer.count, result.Buffer.stride * 8);
+          if ((result.Buffer.stride * 8 % 128) != 0) {
+            res.AppendLine("| | + Unaligned buffer detected!");
+          }
         }
       } else {
         res.AppendLine("+ No results to handle");
