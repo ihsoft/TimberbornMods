@@ -24,10 +24,21 @@ public class GpuSimulatorsDebuggingPanel : ILoadableSingleton, IDebuggingPanel {
   /// <inheritdoc/>
   public string GetText() {
     var text = new StringBuilder();
-    var (_, _, _, soilTotal) = GpuSoilContaminationSimulator.Self.TotalSimPerfSampler.GetStats();
-    text.AppendLine($"Soil contamination total: {soilTotal * 1000:0.##} ms");
-    var (_, _, _, soilShader) = GpuSoilContaminationSimulator.Self.ShaderPerfSampler.GetStats();
-    text.Append($"Soil contamination shader: {soilShader * 1000:0.##} ms");
+    IGpuSimulatorStats stats = null;
+    if (GpuSoilContaminationSimulator.Self.IsEnabled) {
+      stats = GpuSoilContaminationSimulator.Self;
+    } else if (GpuSoilContaminationSimulator2.Self.IsEnabled) {
+      stats = GpuSoilContaminationSimulator2.Self;
+    }
+    if (stats != null) {
+      var (_, _, _, soilTotal) = stats.GetTotalStats();
+      text.AppendLine($"Soil contamination total: {soilTotal * 1000:0.##} ms");
+      var (_, _, _, soilShader) = stats.GetShaderStats();
+      text.Append($"Soil contamination shader: {soilShader * 1000:0.##} ms");
+    } else {
+      text.Append("GPU simulation is disabled");
+    }
+    
     return text.ToString();
   }
 }

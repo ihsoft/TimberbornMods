@@ -17,7 +17,8 @@ sealed class WaterSourceFragmentDebug : IEntityPanelFragment {
   
   VisualElement _root;
   Toggle _usePatchedSimulationToggle;
-  Toggle _useGPUSimulationToggle;
+  Toggle _useGPUSimulationToggle1;
+  Toggle _useGPUSimulationToggle2;
 
   public WaterSourceFragmentDebug(UIBuilder builder) {
     _builder = builder;
@@ -32,16 +33,27 @@ sealed class WaterSourceFragmentDebug : IEntityPanelFragment {
           ParallelSoilMoistureSimulatorPatch.UsePatchedSimulator = _usePatchedSimulationToggle.value;
           ParallelSoilContaminationSimulatorPatch.UsePatchedSimulator = _usePatchedSimulationToggle.value;
         });
-    _useGPUSimulationToggle = _builder.Presets().Toggles()
-        .CheckmarkInverted(text: "Use GPU simulation", color: UiFactory.PanelNormalColor);
-    _useGPUSimulationToggle.RegisterValueChangedCallback(
+    _useGPUSimulationToggle1 = _builder.Presets().Toggles()
+        .CheckmarkInverted(text: "Use GPU simulation #1", color: UiFactory.PanelNormalColor);
+    _useGPUSimulationToggle1.RegisterValueChangedCallback(
         _ => {
-          GpuSoilContaminationSimulator.Self.IsEnabled = _useGPUSimulationToggle.value;
+          GpuSoilContaminationSimulator.Self.IsEnabled = _useGPUSimulationToggle1.value;
+          GpuSoilContaminationSimulator2.Self.IsEnabled = false;
+          _useGPUSimulationToggle2.SetValueWithoutNotify(false);
+        });
+    _useGPUSimulationToggle2 = _builder.Presets().Toggles()
+        .CheckmarkInverted(text: "Use GPU simulation #2", color: UiFactory.PanelNormalColor);
+    _useGPUSimulationToggle2.RegisterValueChangedCallback(
+        _ => {
+          GpuSoilContaminationSimulator.Self.IsEnabled = false;
+          _useGPUSimulationToggle1.SetValueWithoutNotify(false);
+          GpuSoilContaminationSimulator2.Self.IsEnabled = _useGPUSimulationToggle2.value;
         });
 
     _root = _builder.CreateFragmentBuilder()
         .AddComponent(_usePatchedSimulationToggle)
-        .AddComponent(_useGPUSimulationToggle)
+        .AddComponent(_useGPUSimulationToggle1)
+        .AddComponent(_useGPUSimulationToggle2)
         .BuildAndInitialize();
     _root.ToggleDisplayStyle(visible: false);
     return _root;

@@ -92,7 +92,9 @@
       <Compile Include="Common\ISupplyLeftProvider.cs" />
       <Compile Include="GpuSimulators\Configurator.cs" />
       <Compile Include="GpuSimulators\GpuSimulatorsDebuggingPanel.cs" />
+      <Compile Include="GpuSimulators\IGpuSimulatorStats.cs" />
       <Compile Include="GpuSimulators\GpuSoilContaminationSimulator.cs" />
+      <Compile Include="GpuSimulators\GpuSoilContaminationSimulator2.cs" />
       <Compile Include="GpuSimulators\SoilContaminationSimulatorTickSimulationPatch.cs" />
       <Compile Include="IrrigationSystemUI\GrowthRateModifierFragment.cs" />
       <Compile Include="IrrigationSystem\BlockContaminationRangeEffect.cs" />
@@ -310,6 +312,9 @@
     <ItemGroup>
       <ClInclude Include="..\UnityProject\Assets\TimberCommons\Shaders\SoilContaminationSimulatorShader.compute">
         <Link>GpuSimulators\Shaders\SoilContaminationSimulatorShader.compute</Link>
+      </ClInclude>
+      <ClInclude Include="..\UnityProject\Assets\TimberCommons\Shaders\SoilContaminationSimulatorShaderPacked.compute">
+        <Link>GpuSimulators\Shaders\SoilContaminationSimulatorShaderPacked.compute</Link>
       </ClInclude>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

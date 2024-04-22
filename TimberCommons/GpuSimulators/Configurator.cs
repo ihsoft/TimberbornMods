@@ -17,6 +17,7 @@ sealed class Configurator : IConfigurator {
         GetType().AssemblyQualifiedName, typeof(SoilContaminationSimulatorTickSimulationPatch));
 
     containerDefinition.Bind<GpuSoilContaminationSimulator>().AsSingleton();
+    containerDefinition.Bind<GpuSoilContaminationSimulator2>().AsSingleton();
     containerDefinition.Bind<GpuSimulatorsDebuggingPanel>().AsSingleton();
   }
 }

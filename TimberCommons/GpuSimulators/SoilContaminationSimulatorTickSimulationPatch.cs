@@ -12,7 +12,7 @@ namespace IgorZ.TimberCommons.GpuSimulators {
 public class SoilContaminationSimulatorTickSimulationPatch {
   // ReSharper disable once UnusedMember.Local
   static bool Prefix() {
-    return !GpuSoilContaminationSimulator.Self.IsEnabled;
+    return !GpuSoilContaminationSimulator.Self.IsEnabled && !GpuSoilContaminationSimulator2.Self.IsEnabled;
   }
 }
 
