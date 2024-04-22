@@ -21,7 +21,7 @@ sealed class ParallelSoilContaminationSimulatorPatch {
   // ReSharper disable once UnusedMember.Local
   // ReSharper disable once InconsistentNaming
   static bool Prefix(SoilContaminationSimulator __instance) {
-    if (GpuSoilContaminationSimulator.Self.IsEnabled) {
+    if (GpuSoilContaminationSimulator.Self.IsEnabled || GpuSoilContaminationSimulator2.Self.IsEnabled) {
       return true;  // Give GPU a chance.
     }
     if (!UsePatchedSimulator) {
