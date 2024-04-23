@@ -1,8 +1,8 @@
 // Shader that simulates soil contamination.
 
 // This constant is here only for the version counting. This makes Unity to refresh the shader.
-// Increase it each time you update the shader code. The actual value doesn't matter. It just needs to be different.
-float VERSION_1;
+// Increase it each time you update the shader code. The actual name doesn't matter, it just needs to be different.
+float VERSION_3;
 
 // Constants. Set the values only once.
 uint Stride;
@@ -41,6 +41,7 @@ StructuredBuffer<InputStruct1> PackedInput1;
 // OUTPUT: Read on every dispatch.
 RWStructuredBuffer<float> ContaminationCandidates;
 RWStructuredBuffer<float> ContaminationLevels;
+AppendStructuredBuffer<int> ContaminationsChangedLastTick;
 
 // INTERMEDIATE: Only used between the kernels.
 RWStructuredBuffer<float> LastTickContaminationCandidates;
@@ -57,6 +58,9 @@ RWStructuredBuffer<float> LastTickContaminationCandidates;
 #define MAX(v1, v2, v3, v4) max(max(v1, v2), max(v3, v4))
 #define CoordinatesToIndex(coordinates) ((coordinates.y + 1) * Stride + coordinates.x + 1)
 #define IndexToCoordinates(index) int2((index % Stride) - 1, (index / Stride) - 1)
+
+// Constants.
+#define MIN_LEVEL_CHANGE 0.000001
 
 // This shader specific forwards.
 float GetContaminationCandidate(uint index);
@@ -97,8 +101,11 @@ void UpdateContaminationsFromCandidates(uint3 id : SV_DispatchThreadID)
     {
         num7 = 0;
     }
-    //FIXME: Here, cheik if change and fill teh buffer? Or not. 
-    ContaminationLevels[index] = num7;
+    if (abs(num7 - num2) > MIN_LEVEL_CHANGE)
+    {
+        ContaminationLevels[index] = num7;
+        ContaminationsChangedLastTick.Append(index);
+    }
 }
 
 float GetContaminationCandidate(uint index)
