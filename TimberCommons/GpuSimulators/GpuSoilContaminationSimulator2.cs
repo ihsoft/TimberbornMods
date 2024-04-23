@@ -9,6 +9,7 @@ using Timberborn.AssetSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.SoilContaminationSystem;
 using UnityDev.Utils.LogUtilsLite;
+using UnityDev.Utils.ShaderPipeline;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -108,7 +109,7 @@ sealed class GpuSoilContaminationSimulator2 : IPostLoadableSingleton, IGpuSimula
         // All buffers.
         .WithInputBuffer("PackedInput1", _packedInput1)
         .WithIntermediateBuffer("LastTickContaminationCandidates", typeof(float), totalMapSize)
-        .WithOutputBuffer("ContaminationCandidates", _soilContaminationSimulator._contaminationCandidates, true)
+        .WithOutputBuffer("ContaminationCandidates", _soilContaminationSimulator._contaminationCandidates)
         .WithOutputBuffer("ContaminationLevels", _soilContaminationSimulator.ContaminationLevels)
         // The kernel chain!
         .DispatchKernel(

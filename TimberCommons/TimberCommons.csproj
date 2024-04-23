@@ -60,6 +60,21 @@
       <Compile Include="..\UnityDevLite\HostedDebugLog.cs">
         <Link>UnityDevLite\HostedDebugLog.cs</Link>
       </Compile>
+      <Compile Include="..\UnityDevLite\ShaderPipeline\AppendBuffer.cs">
+        <Link>UnityDevLite\ShaderPipeline\AppendBuffer.cs</Link>
+      </Compile>
+      <Compile Include="..\UnityDevLite\ShaderPipeline\IAbstractBuffer.cs">
+        <Link>UnityDevLite\ShaderPipeline\IAbstractBuffer.cs</Link>
+      </Compile>
+      <Compile Include="..\UnityDevLite\ShaderPipeline\IntermediateBuffer.cs">
+        <Link>UnityDevLite\ShaderPipeline\IntermediateBuffer.cs</Link>
+      </Compile>
+      <Compile Include="..\UnityDevLite\ShaderPipeline\ShaderPipeline.cs">
+        <Link>UnityDevLite\ShaderPipeline\ShaderPipeline.cs</Link>
+      </Compile>
+      <Compile Include="..\UnityDevLite\ShaderPipeline\SimpleBuffer.cs">
+        <Link>UnityDevLite\ShaderPipeline\SimpleBuffer.cs</Link>
+      </Compile>
       <Compile Include="..\UnityDevLite\ValueSampler.cs">
         <Link>UnityDevLite\ValueSampler.cs</Link>
       </Compile>
@@ -68,9 +83,6 @@
       </Compile>
       <Compile Include="..\UnityDevLite\ReflectedField.cs">
         <Link>UnityDevLite\ReflectedField.cs</Link>
-      </Compile>
-      <Compile Include="..\UnityDevLite\ShaderPipeline.cs">
-        <Link>UnityDevLite\ShaderPipeline.cs</Link>
       </Compile>
       <Compile Include="..\UnityDevLite\TypeUtils.cs">
         <Link>UnityDevLite\TypeUtils.cs</Link>
