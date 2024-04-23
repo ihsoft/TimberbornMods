@@ -2,7 +2,7 @@
 
 // This constant is here only for the version counting. This makes Unity to refresh the shader.
 // Increase it each time you update the shader code. The actual name doesn't matter, it just needs to be different.
-float VERSION_3;
+float VERSION_7 = 7;
 
 // Constants. Set the values only once.
 uint Stride;
@@ -21,6 +21,7 @@ float VerticalCostModifier;
 
 // Persistent shader state.
 RWStructuredBuffer<float> ContaminationCandidates; // Set one time on shader init. 
+RWStructuredBuffer<float> ContaminationLevels; // Set one time on shader init.
 
 // INPUT: Update on every dispatch.
 // For better performance, pack all data to the aligned structures (128-bit multiples).
@@ -42,8 +43,6 @@ StructuredBuffer<InputStruct1> PackedInput1;
 #define AboveMoistureBarriers(index) (PackedInput1[index].Bitmap & InputStruct1::AboveMoistureBarrierBit)
 
 // OUTPUT: Read on every dispatch.
-
-RWStructuredBuffer<float> ContaminationLevels;
 AppendStructuredBuffer<int> ContaminationsChangedLastTick;
 
 // INTERMEDIATE: Only used between the kernels.

@@ -84,6 +84,7 @@ sealed class GpuSoilContaminationSimulator2 : IPostLoadableSingleton, IGpuSimula
   AppendBuffer<int> _contaminationsChangedLastTickBuffer;
   int[] _contaminationsChangedLastTick;
   SimpleBuffer<float> _contaminationCandidatesBuffer;
+  SimpleBuffer<float> _contaminationLevelsBuffer;
 
   void SetupShaderPipeline() {
     var simulationSettings = _soilContaminationSimulator._soilContaminationSimulationSettings;
@@ -96,6 +97,8 @@ sealed class GpuSoilContaminationSimulator2 : IPostLoadableSingleton, IGpuSimula
         "ContaminationsChangedLastTick", _contaminationsChangedLastTick);
     _contaminationCandidatesBuffer = new SimpleBuffer<float>(
         "ContaminationCandidates", _soilContaminationSimulator._contaminationCandidates);
+    _contaminationLevelsBuffer = new SimpleBuffer<float>(
+        "ContaminationLevels", _soilContaminationSimulator.ContaminationLevels);
 
     var prefab = _resourceAssetLoader.Load<ComputeShader>(SimulatorShaderName);
     var shader = Object.Instantiate(prefab);
@@ -120,7 +123,7 @@ sealed class GpuSoilContaminationSimulator2 : IPostLoadableSingleton, IGpuSimula
         .WithInputBuffer("PackedInput1", _packedInput1)
         .WithIntermediateBuffer(_contaminationCandidatesBuffer)
         .WithIntermediateBuffer("LastTickContaminationCandidates", typeof(float), totalMapSize)
-        .WithOutputBuffer("ContaminationLevels", _soilContaminationSimulator.ContaminationLevels)
+        .WithOutputBuffer(_contaminationLevelsBuffer)
         .WithOutputBuffer(_contaminationsChangedLastTickBuffer)
         // The kernel chain! They will execute in the order they are declared.
         .DispatchKernel(
@@ -132,7 +135,7 @@ sealed class GpuSoilContaminationSimulator2 : IPostLoadableSingleton, IGpuSimula
             "o:ContaminationCandidates")
         .DispatchKernel(
             "UpdateContaminationsFromCandidates", mapDataSize,
-            "s:ContaminationLevels", "i:ContaminationCandidates",
+            "i:ContaminationLevels", "i:ContaminationCandidates",
             "r:ContaminationLevels", "r:ContaminationsChangedLastTick")
         .Build();
     DebugEx.Warning("*** Shader execution plan:\n{0}", _shaderPipeline.PrintExecutionPlan());
@@ -178,6 +181,7 @@ sealed class GpuSoilContaminationSimulator2 : IPostLoadableSingleton, IGpuSimula
   void EnableSimulator() {
     DebugEx.Warning("*** Enabling GPU sim-2");
     _contaminationCandidatesBuffer.PushToGpu();
+    _contaminationLevelsBuffer.PushToGpu();
   }
 
   void DisableSimulator() {
