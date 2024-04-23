@@ -19,6 +19,9 @@ float MinimumWaterContamination;
 float RegularSpreadCost;
 float VerticalCostModifier;
 
+// Persistent shader state.
+RWStructuredBuffer<float> ContaminationCandidates; // Set one time on shader init. 
+
 // INPUT: Update on every dispatch.
 // For better performance, pack all data to the aligned structures (128-bit multiples).
 struct InputStruct1 {
@@ -39,7 +42,7 @@ StructuredBuffer<InputStruct1> PackedInput1;
 #define AboveMoistureBarriers(index) (PackedInput1[index].Bitmap & InputStruct1::AboveMoistureBarrierBit)
 
 // OUTPUT: Read on every dispatch.
-RWStructuredBuffer<float> ContaminationCandidates;
+
 RWStructuredBuffer<float> ContaminationLevels;
 AppendStructuredBuffer<int> ContaminationsChangedLastTick;
 

@@ -7,12 +7,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 using UnityEngine.Rendering;
-using UnityEngine.UIElements;
 
 // ReSharper disable once CheckNamespace
 namespace UnityDev.Utils.ShaderPipeline {
@@ -88,6 +85,9 @@ namespace UnityDev.Utils.ShaderPipeline {
 /// </p>
 /// </example>
 /// </remarks>
+/// <seealso cref="SimpleBuffer{T}"/>
+/// <seealso cref="AppendBuffer{T}"/>
+/// <seealso cref="IntermediateBuffer"/>
 public sealed class ShaderPipeline {
 
   #region API
@@ -257,14 +257,26 @@ public sealed class ShaderPipeline {
       return this;
     }
 
-    /// <summary>Declares a buffer that is only used internally by the kernels.</summary>
-    /// <remarks>The data in this buffer won't be transferred between CPU and GPU.</remarks>
+    /// <summary>Binds a buffer that is used internally by the kernels or is handled outside of the pipeline.</summary>
+    /// <remarks>It's a syntax sugar for <see cref="WithIntermediateBuffer(IAbstractBuffer)"/> method.</remarks>
     /// <param name="name">The name as specified in the shader.</param>
     /// <param name="type">Type of the data in the buffer.</param>
     /// <param name="count">Number of elements in the buffer.</param>
     public Builder WithIntermediateBuffer(string name, Type type, int count) {
       AddNewBufferName(name);
       _intermediateBuffers.Add(name, new IntermediateBuffer(name, type, count));
+      return this;
+    }
+
+    /// <summary>Binds a buffer that is used internally by the kernels or is handled outside of the pipeline.</summary>
+    /// <remarks>
+    /// The pipeline will only verify the completion state of such buffers to sync between the kernels. If needed, the
+    /// data still can be transferred, but this should be done by the client's code.
+    /// </remarks>
+    /// <param name="buffer">The buffer to use for state completion checking.</param>
+    public Builder WithIntermediateBuffer(IAbstractBuffer buffer) {
+      AddNewBufferName(buffer.Name);
+      _intermediateBuffers.Add(buffer.Name, buffer);
       return this;
     }
 

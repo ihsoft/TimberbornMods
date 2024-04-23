@@ -83,6 +83,7 @@ sealed class GpuSoilContaminationSimulator2 : IPostLoadableSingleton, IGpuSimula
 
   AppendBuffer<int> _contaminationsChangedLastTickBuffer;
   int[] _contaminationsChangedLastTick;
+  SimpleBuffer<float> _contaminationCandidatesBuffer;
 
   void SetupShaderPipeline() {
     var simulationSettings = _soilContaminationSimulator._soilContaminationSimulationSettings;
@@ -93,6 +94,8 @@ sealed class GpuSoilContaminationSimulator2 : IPostLoadableSingleton, IGpuSimula
     _contaminationsChangedLastTick = new int[totalMapSize];
     _contaminationsChangedLastTickBuffer = new AppendBuffer<int>(
         "ContaminationsChangedLastTick", _contaminationsChangedLastTick);
+    _contaminationCandidatesBuffer = new SimpleBuffer<float>(
+        "ContaminationCandidates", _soilContaminationSimulator._contaminationCandidates);
 
     var prefab = _resourceAssetLoader.Load<ComputeShader>(SimulatorShaderName);
     var shader = Object.Instantiate(prefab);
@@ -115,18 +118,18 @@ sealed class GpuSoilContaminationSimulator2 : IPostLoadableSingleton, IGpuSimula
         .WithConstantValue("VerticalCostModifier", _soilContaminationSimulator._verticalCostModifier)
         // All buffers.
         .WithInputBuffer("PackedInput1", _packedInput1)
+        .WithIntermediateBuffer(_contaminationCandidatesBuffer)
         .WithIntermediateBuffer("LastTickContaminationCandidates", typeof(float), totalMapSize)
-        .WithOutputBuffer("ContaminationCandidates", _soilContaminationSimulator._contaminationCandidates)
         .WithOutputBuffer("ContaminationLevels", _soilContaminationSimulator.ContaminationLevels)
         .WithOutputBuffer(_contaminationsChangedLastTickBuffer)
         // The kernel chain! They will execute in the order they are declared.
         .DispatchKernel(
             "SavePreviousState", new Vector3Int(totalMapSize, 1, 1),
-            "s:ContaminationCandidates", "o:LastTickContaminationCandidates")
+            "i:ContaminationCandidates", "o:LastTickContaminationCandidates")
         .DispatchKernel(
             "CalculateContaminationCandidates", mapDataSize,
             "i:LastTickContaminationCandidates", "s:PackedInput1",
-            "r:ContaminationCandidates")
+            "o:ContaminationCandidates")
         .DispatchKernel(
             "UpdateContaminationsFromCandidates", mapDataSize,
             "s:ContaminationLevels", "i:ContaminationCandidates",
@@ -174,10 +177,12 @@ sealed class GpuSoilContaminationSimulator2 : IPostLoadableSingleton, IGpuSimula
 
   void EnableSimulator() {
     DebugEx.Warning("*** Enabling GPU sim-2");
+    _contaminationCandidatesBuffer.PushToGpu();
   }
 
   void DisableSimulator() {
     DebugEx.Warning("*** Disabling GPU sim-2");
+    _contaminationCandidatesBuffer.PullFromGpu();
   }
 
   #region A helper class whose sole role is to deliver FixedUpdate to the singleton.
