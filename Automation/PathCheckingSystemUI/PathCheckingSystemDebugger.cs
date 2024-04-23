@@ -15,7 +15,7 @@ using UnityEngine;
 
 namespace Automation.PathCheckingSystemUI {
 
-/// <summary>Shows corner markers for the path from teh road to the accessible of the selected site.</summary>
+/// <summary>Shows corner markers for the path from the road to the accessible of the selected site.</summary>
 sealed class PathCheckingSystemDebugger : ILoadableSingleton, IUpdatableSingleton {
 
   #region ILoadableSingleton implementation

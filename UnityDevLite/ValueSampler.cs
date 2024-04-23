@@ -27,7 +27,7 @@ public sealed class ValueSampler {
 
   /// <summary>Creates a sampler of value for the given number of samples.</summary>
   /// <remarks>
-  /// This sampler only tracks N last samples. Having more samples makes teh stats more flat, but it also consumes CPU.
+  /// This sampler only tracks N last samples. Having more samples makes the stats more flat, but it also consumes CPU.
   /// And it can also hide the real problems in the perf values. This value must be appropriate for the task.
   /// </remarks>
   /// <param name="samplingSize">The maximum number of samples to keep at time.</param>

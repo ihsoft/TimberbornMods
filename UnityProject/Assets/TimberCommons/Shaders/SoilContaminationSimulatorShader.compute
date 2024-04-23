@@ -85,7 +85,7 @@ void UpdateContaminationsFromCandidates(uint3 id : SV_DispatchThreadID)
     {
         num7 = 0;
     }
-    //FIXME: Here, cheik if change and fill teh buffer? Or not. 
+    //FIXME: Here, cheik if change and fill the buffer? Or not. 
     ContaminationLevels[index] = num7;
 }
 
