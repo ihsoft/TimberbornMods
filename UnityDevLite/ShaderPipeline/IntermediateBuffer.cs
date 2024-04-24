@@ -19,7 +19,7 @@ public sealed class IntermediateBuffer : IAbstractBuffer {
   public ComputeBuffer Buffer { get; }
 
   /// <inheritdoc/>
-  public void MarkIncomplete() {
+  public void Initialize() {
     throw new InvalidOperationException("Unsupported in IntermediateBuffer");
   }
 

@@ -32,7 +32,7 @@ public sealed class SimpleBuffer<T> : IAbstractBuffer where T : struct {
   public readonly T[] Values;
 
   /// <inheritdoc/>
-  public void MarkIncomplete() {
+  public void Initialize() {
     _isReady = false;
   }
 

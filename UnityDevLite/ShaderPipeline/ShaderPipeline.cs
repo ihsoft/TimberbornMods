@@ -119,7 +119,7 @@ public sealed class ShaderPipeline {
   public void RunBlocking() {
     var stopwatch = Stopwatch.StartNew();
     for (var i = _allSources.Count - 1; i >= 0; i--) {
-      _allSources[i].MarkIncomplete();
+      _allSources[i].Initialize();
     }
     var queueSize = _dispatchQueue.Count;
     for (var index = 0; index < queueSize; index++) {
@@ -128,7 +128,7 @@ public sealed class ShaderPipeline {
         kernel.Sources[i].PushToGpu();
       }
       for (var i = kernel.Results.Count - 1; i >= 0; i--) {
-        kernel.Results[i].MarkIncomplete();
+        kernel.Results[i].Initialize();
       }
       var executionSize = GetExecutionSize(kernel);
       Shader.Dispatch(kernel.Index, executionSize.x, executionSize.y, executionSize.z);

@@ -14,10 +14,9 @@ namespace UnityDev.Utils.ShaderPipeline {
 /// </summary>
 /// <remarks>Use this buffer when you need to collect a variable number of elements from the kernel.</remarks>
 /// <typeparam name="T">The element type of the underlying array. It determines the buffer's stride size.</typeparam>
-class AppendBuffer<T> : IAbstractBuffer where T : struct {
+public sealed class AppendBuffer<T> : IAbstractBuffer where T : struct {
 
   readonly ComputeBuffer _argsBuffer = new ComputeBuffer(4, sizeof(int), ComputeBufferType.IndirectArguments);
-  //readonly int[] _args = { 0, 1, 0, 0 }; // FIXME no need fro inital value?
   readonly int[] _args = new int[4];
   bool _isReady;
 
@@ -44,7 +43,7 @@ class AppendBuffer<T> : IAbstractBuffer where T : struct {
   public int DataLength => _args[0];
 
   /// <inheritdoc/>
-  public void MarkIncomplete() {
+  public void Initialize() {
     _isReady = false;
     _args[0] = 0;
     Buffer.SetCounterValue(0);
@@ -62,7 +61,6 @@ class AppendBuffer<T> : IAbstractBuffer where T : struct {
   /// <inheritdoc/>
   public void PullFromGpu() {
     Buffer.GetData(Values);
-    //_argsBuffer.SetData(_args);
     ComputeBuffer.CopyCount(Buffer, _argsBuffer, 0);
     _argsBuffer.GetData(_args);
   }

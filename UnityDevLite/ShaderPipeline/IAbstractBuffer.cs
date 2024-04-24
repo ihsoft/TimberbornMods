@@ -19,12 +19,9 @@ public interface IAbstractBuffer {
   /// <summary>The underlying <see cref="ComputeBuffer"/> object.</summary>
   public ComputeBuffer Buffer { get; }
 
-  /// <summary>Sets this buffer to an incomplete state.</summary>
-  /// <remarks>
-  /// The buffer cannot be trusted in this state. For inout buffers this means data needs tio be uploaded to GPU. For
-  /// the output buffer it means the data needs to be downloaded. 
-  /// </remarks>
-  public void MarkIncomplete();
+  /// <summary>Prepares the buffer for the usage.</summary>
+  /// <remarks>The current data of the buffer should be invalided.</remarks>
+  public void Initialize();
 
   /// <summary>Gets data from GPU.</summary>
   /// <remarks>The buffer implementation specifies where the data is fetched and how it can be accessed.</remarks>
