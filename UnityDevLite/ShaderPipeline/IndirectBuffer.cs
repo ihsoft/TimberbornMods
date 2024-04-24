@@ -4,17 +4,13 @@
 
 using System;
 using System.Runtime.InteropServices;
+using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
 // ReSharper disable once CheckNamespace
 namespace UnityDev.Utils.ShaderPipeline {
 
-/// <summary>
-/// Simple data buffer that can be used for transferring data between CPU and GPU. It can do both: push and pull.
-/// </summary>
-/// <remarks>Use this buffer when you need transfer flat arrays of data of a constant size.</remarks>
-/// <typeparam name="T">The element type of the underlying array. It determines the buffer's stride size.</typeparam>
-public sealed class SimpleBuffer<T> : IAbstractBuffer where T : struct {
+public sealed class IndirectBuffer<T> : IAbstractBuffer where T : struct {
 
   #region API
   // ReSharper disable MemberCanBePrivate.Global
@@ -54,13 +50,12 @@ public sealed class SimpleBuffer<T> : IAbstractBuffer where T : struct {
   #endregion
 
   /// <summary>Creates a buffer and binds it to the array.</summary>
-  /// <param name="name">The name of the buffer as specified in the shader.</param>
-  /// <param name="values">The array to bind the data to.</param>
-  /// <exception cref="ArgumentException">if <paramref name="values"/> is null.</exception>
-  public SimpleBuffer(string name, T[] values) {
+  /// <param name="name">The name of the buffer, which is only used for the purpose of logging.</param>
+  /// <param name="count">The number of items in the buffer.</param>
+  public IndirectBuffer(string name, int count) {
     Name = name;
-    Values = values ?? throw new ArgumentException("Array mut exist", nameof(values));
-    Buffer = new ComputeBuffer(values.Length, Marshal.SizeOf(typeof(T)));
+    Values = new T[count];
+    Buffer = new ComputeBuffer(count, Marshal.SizeOf(typeof(T)), ComputeBufferType.IndirectArguments);
   }
 }
 

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -100,6 +101,16 @@ public sealed class ShaderPipeline {
   /// <summary>Time, spent for running last <see cref="RunBlocking"/>.</summary>
   public TimeSpan LastRunDuration { get; private set; }
 
+  /// <summary>Indicates if execution logs should be captured during <see cref="RunBlocking"/> calls.</summary>
+  /// <remarks>These logs cane be used for tracking the execution sequence.</remarks>
+  /// <seealso cref="ExecutionLog"/>
+  public bool RecordExecutionLog = false;
+
+  /// <summary>The execution lod, captured during the last call to <see cref="RunBlocking"/>.</summary>
+  /// <returns>The log or <c>null</c> if no log was captured.</returns>
+  /// <see cref="RecordExecutionLog"/>
+  public ExecutionLog ExecutionLog { get; private set; }
+
   /// <summary>Starts builder for a new pipeline</summary>
   /// <remarks>
   /// Building is expensive step, but it usually needs to be done only once. Once pipeline created, just call
@@ -118,27 +129,34 @@ public sealed class ShaderPipeline {
   /// </remarks>
   public void RunBlocking() {
     var stopwatch = Stopwatch.StartNew();
+    ExecutionLog executionLog = null;
+    if (RecordExecutionLog) {
+      executionLog = new ExecutionLog();
+      executionLog.Records.AddRange(_constantsLog);
+    }
     for (var i = _allSources.Count - 1; i >= 0; i--) {
-      _allSources[i].Initialize();
+      _allSources[i].PushToGpu(executionLog);
     }
     var queueSize = _dispatchQueue.Count;
     for (var index = 0; index < queueSize; index++) {
       var kernel = _dispatchQueue[index];
-      for (var i = kernel.Sources.Count - 1; i >= 0; i--) {
-        kernel.Sources[i].PushToGpu();
-      }
+      executionLog?.Records.Add($"Kernel #{index}: groupSize={kernel.GroupSize}, dataSize={kernel.DataSize}");
       for (var i = kernel.Results.Count - 1; i >= 0; i--) {
-        kernel.Results[i].Initialize();
+        kernel.Results[i].Initialize(executionLog);
       }
       var executionSize = GetExecutionSize(kernel);
+      executionLog?.Records.Add($"Dispatch({executionSize})");
       Shader.Dispatch(kernel.Index, executionSize.x, executionSize.y, executionSize.z);
       foreach (var buffer in kernel.Outputs) {
+        executionLog?.Records.Add($"Waiting on buffer '{buffer.Name}'...");
         AsyncGPUReadback.Request(buffer.Buffer).WaitForCompletion();
       }
       foreach (var buffer in kernel.Results) {
-        buffer.PullFromGpu();
+        buffer.PullFromGpu(executionLog);
       }
+      executionLog?.Records.Add($"Kernel #{kernel.Index} finished");
     }
+    ExecutionLog = executionLog;
     stopwatch.Stop();
     LastRunDuration = stopwatch.Elapsed;
   }
@@ -149,70 +167,6 @@ public sealed class ShaderPipeline {
       buffer.Dispose();
     }
     UnityEngine.Object.DestroyImmediate(Shader);
-  }
-
-  /// <summary>
-  /// Returns a formatted string that explains how the pipeline will behave in <see cref="RunBlocking"/>.
-  /// </summary>
-  public string PrintExecutionPlan() {
-    var res = new StringBuilder();
-    if (_constants.Count > 0) {
-      res.AppendLine("Constants on the shader");
-      foreach (var constant in _constants) {
-        res.AppendLine($"+ {constant.Key} = {constant.Value}");
-      }
-    } else {
-      res.AppendLine("No constants for the shader\n");
-    }
-    if (_allSources.Count > 0) {
-      res.AppendLine("\nReset sources");
-      foreach (var source in _allSources) {
-        res.AppendLine($"+ Buffer '{source.Name}'");
-      }
-    } else {
-      res.AppendLine("\nNo sources to reset");
-    }
-    foreach (var kernel in _dispatchQueue) {
-      res.AppendLine($"\nKernel #{kernel.Index}:");
-      if (kernel.Sources.Count > 0) {
-        res.AppendLine($"+ Transfer {kernel.Sources.Count} source(s) data from CPU to GPU");
-        foreach (var source in kernel.Sources) {
-          res.AppendFormat(
-              "| + SetData on buffer '{0}', count={1}, stride={2} bits\n",
-              source.Name, source.Buffer.count, source.Buffer.stride * 8);
-          CheckForAlignedBuffer(res, source);
-        }
-      } else {
-        res.AppendLine("+ No sources to handle");
-      }
-      // if (kernel.Results.Count > 0) {
-      //   res.AppendLine($"+ Prepare result buffer(s)");
-      //   foreach (var result in kernel.Results) {
-      //     if (result is AppendBuffer<> != null) {
-      //       res.AppendFormat(
-      //           "| + Reset counter on append buffer '{0}', count={1}, stride={2} bits\n",
-      //           result.Name, result.Buffer.count, result.Buffer.stride * 8);
-      //     }
-      //   }
-      // } else {
-      //   res.AppendLine("+ No result buffers to prepare");
-      // }
-      //res.AppendLine($"+ Wait on {kernel.Inputs.Count} input(s)");
-      res.AppendLine($"+ Dispatch: groupSize={kernel.GroupSize}, dataSize={GetExecutionSize(kernel)}");
-      res.AppendLine($"+ Wait on {kernel.Outputs.Count} output(s)");
-      if (kernel.Results.Count > 0) {
-        res.AppendLine($"+ Transfer {kernel.Results.Count} result(s) from GPU to CPU");
-        foreach (var result in kernel.Results) {
-          res.AppendFormat(
-              "| + GetData on buffer '{0}', count={1}, stride={2} bits\n",
-              result.Name, result.Buffer.count, result.Buffer.stride * 8);
-          CheckForAlignedBuffer(res, result);        }
-      } else {
-        res.AppendLine("+ No results to handle");
-      }
-      res.AppendLine("+ Kernel is DONE!");
-    }
-    return res.ToString();
   }
 
   // ReSharper restore UnusedAutoPropertyAccessor.Global
@@ -457,7 +411,7 @@ public sealed class ShaderPipeline {
   readonly List<KernelDecl> _dispatchQueue;
   readonly List<IAbstractBuffer> _allBuffers;
   readonly List<IAbstractBuffer> _allSources = new();
-  readonly Dictionary<string, object> _constants;
+  readonly List<string> _constantsLog = new();
 
   ShaderPipeline(ComputeShader shader, List<KernelDecl> dispatchQueue, List<IAbstractBuffer> allBuffers,
                  Dictionary<string, object> constants) {
@@ -467,7 +421,13 @@ public sealed class ShaderPipeline {
     foreach (var kernel in _dispatchQueue) {
       _allSources.AddRange(kernel.Sources);
     }
-    _constants = constants;
+    if (constants.Count > 0) {
+      foreach (var constant in constants) {
+        _constantsLog.Add($"Constant: {constant.Key} = {constant.Value}");
+      }
+    } else {
+      _constantsLog.Add("No constants in the pipeline");
+    }
   }
 
   static Vector3Int GetExecutionSize(KernelDecl kernel) {
@@ -475,12 +435,6 @@ public sealed class ShaderPipeline {
         Mathf.CeilToInt((float)kernel.DataSize.x / kernel.GroupSize.x),
         Mathf.CeilToInt((float)kernel.DataSize.y / kernel.GroupSize.y),
         Mathf.CeilToInt((float)kernel.DataSize.z / kernel.GroupSize.z));
-  }
-
-  static void CheckForAlignedBuffer(StringBuilder builder, IAbstractBuffer buffer) {
-    if (buffer.Buffer.stride * 8 % 128 != 0) {
-      builder.AppendLine("| | + Unaligned buffer detected!");
-    }
   }
 
   #endregion

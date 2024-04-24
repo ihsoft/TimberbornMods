@@ -4,6 +4,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
 // ReSharper disable once CheckNamespace
@@ -16,9 +17,7 @@ namespace UnityDev.Utils.ShaderPipeline {
 /// <typeparam name="T">The element type of the underlying array. It determines the buffer's stride size.</typeparam>
 public sealed class AppendBuffer<T> : IAbstractBuffer where T : struct {
 
-  readonly ComputeBuffer _argsBuffer = new ComputeBuffer(4, sizeof(int), ComputeBufferType.IndirectArguments);
-  readonly int[] _args = new int[4];
-  bool _isReady;
+  readonly IndirectBuffer<int> _argsBuffer = new("_IndirectArguments", 4);  // Keep the length of multiple of 16.
 
   #region API
   // ReSharper disable MemberCanBePrivate.Global
@@ -40,35 +39,33 @@ public sealed class AppendBuffer<T> : IAbstractBuffer where T : struct {
 
   /// <summary>Actual data size. It's only contain relevant value after <see cref="PullFromGpu"/>.</summary>
   /// <seealso cref="Values"/>
-  public int DataLength => _args[0];
+  public int DataLength => _argsBuffer.Values[0];
 
   /// <inheritdoc/>
-  public void Initialize() {
-    _isReady = false;
-    _args[0] = 0;
+  public void Initialize(ExecutionLog executionLog) {
+    _argsBuffer.Values[0] = 0;
+    executionLog?.Records.Add($"Reset append buffer '{Name}'");
     Buffer.SetCounterValue(0);
   }
 
   /// <inheritdoc/>
-  public void PushToGpu() {
-    if (_isReady) {
-      return;
-    }
+  public void PushToGpu(ExecutionLog executionLog) {
+    executionLog?.RecordBufferSet(this);
     Buffer.SetData(Values);
-    _isReady = true;
   }
 
   /// <inheritdoc/>
-  public void PullFromGpu() {
+  public void PullFromGpu(ExecutionLog executionLog) {
+    executionLog?.RecordBufferGet(this);
     Buffer.GetData(Values);
-    ComputeBuffer.CopyCount(Buffer, _argsBuffer, 0);
-    _argsBuffer.GetData(_args);
+    ComputeBuffer.CopyCount(Buffer, _argsBuffer.Buffer, 0);
+    _argsBuffer.PullFromGpu(executionLog);
   }
 
   /// <inheritdoc/>
   public void Dispose() {
     Buffer.Release();
-    _argsBuffer.Release();
+    _argsBuffer.Dispose();
   }
 
   // ReSharper restore MemberCanBePrivate.Global

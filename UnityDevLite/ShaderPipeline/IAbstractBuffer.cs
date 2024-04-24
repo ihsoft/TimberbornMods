@@ -21,15 +21,27 @@ public interface IAbstractBuffer {
 
   /// <summary>Prepares the buffer for the usage.</summary>
   /// <remarks>The current data of the buffer should be invalided.</remarks>
-  public void Initialize();
+  /// <param name="executionLog">
+  /// If not <c>null</c>, then the buffer should record key actions being performed on the buffer. This information is
+  /// used to produce execution plans.
+  /// </param>
+  public void Initialize(ExecutionLog executionLog);
 
   /// <summary>Gets data from GPU.</summary>
   /// <remarks>The buffer implementation specifies where the data is fetched and how it can be accessed.</remarks>
-  public void PullFromGpu();
+  /// <param name="executionLog">
+  /// If not <c>null</c>, then the buffer should record key actions being performed on the buffer. This information is
+  /// used to produce execution plans.
+  /// </param>
+  public void PullFromGpu(ExecutionLog executionLog);
 
   /// <summary>Sends data to GPU.</summary>
   /// <remarks>The buffer implementation specifies where the data is copied from and how to modify it.</remarks>
-  public void PushToGpu();
+  /// <param name="executionLog">
+  /// If not <c>null</c>, then the buffer should record key actions being performed on the buffer. This information is
+  /// used to produce execution plans.
+  /// </param>
+  public void PushToGpu(ExecutionLog executionLog);
 
   /// <summary>Releases all resources and destroys the buffer.</summary>
   public void Dispose();

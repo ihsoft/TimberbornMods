@@ -63,8 +63,14 @@
       <Compile Include="..\UnityDevLite\ShaderPipeline\AppendBuffer.cs">
         <Link>UnityDevLite\ShaderPipeline\AppendBuffer.cs</Link>
       </Compile>
+      <Compile Include="..\UnityDevLite\ShaderPipeline\ExecutionLog.cs">
+        <Link>UnityDevLite\ShaderPipeline\ExecutionLog.cs</Link>
+      </Compile>
       <Compile Include="..\UnityDevLite\ShaderPipeline\IAbstractBuffer.cs">
         <Link>UnityDevLite\ShaderPipeline\IAbstractBuffer.cs</Link>
+      </Compile>
+      <Compile Include="..\UnityDevLite\ShaderPipeline\IndirectBuffer.cs">
+        <Link>UnityDevLite\ShaderPipeline\IndirectBuffer.cs</Link>
       </Compile>
       <Compile Include="..\UnityDevLite\ShaderPipeline\IntermediateBuffer.cs">
         <Link>UnityDevLite\ShaderPipeline\IntermediateBuffer.cs</Link>

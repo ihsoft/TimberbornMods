@@ -138,7 +138,10 @@ sealed class GpuSoilContaminationSimulator2 : IPostLoadableSingleton, IGpuSimula
             "i:ContaminationLevels", "i:ContaminationCandidates",
             "r:ContaminationLevels", "r:ContaminationsChangedLastTick")
         .Build();
-    DebugEx.Warning("*** Shader execution plan:\n{0}", _shaderPipeline.PrintExecutionPlan());
+    _shaderPipeline.RecordExecutionLog = true;
+    _shaderPipeline.RunBlocking();
+    _shaderPipeline.RecordExecutionLog = false;
+    DebugEx.Warning("*** Shader execution plan:\n{0}", string.Join("\n", _shaderPipeline.ExecutionLog.Records));
   }
 
   void TickPipeline() {
@@ -180,13 +183,13 @@ sealed class GpuSoilContaminationSimulator2 : IPostLoadableSingleton, IGpuSimula
 
   void EnableSimulator() {
     DebugEx.Warning("*** Enabling GPU sim-2");
-    _contaminationCandidatesBuffer.PushToGpu();
-    _contaminationLevelsBuffer.PushToGpu();
+    _contaminationCandidatesBuffer.PushToGpu(null);
+    _contaminationLevelsBuffer.PushToGpu(null);
   }
 
   void DisableSimulator() {
     DebugEx.Warning("*** Disabling GPU sim-2");
-    _contaminationCandidatesBuffer.PullFromGpu();
+    _contaminationCandidatesBuffer.PullFromGpu(null);
   }
 
   #region A helper class whose sole role is to deliver FixedUpdate to the singleton.

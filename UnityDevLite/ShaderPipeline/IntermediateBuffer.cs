@@ -19,17 +19,17 @@ public sealed class IntermediateBuffer : IAbstractBuffer {
   public ComputeBuffer Buffer { get; }
 
   /// <inheritdoc/>
-  public void Initialize() {
+  public void Initialize(ExecutionLog executionLog) {
     throw new InvalidOperationException("Unsupported in IntermediateBuffer");
   }
 
   /// <inheritdoc/>
-  public void PushToGpu() {
+  public void PushToGpu(ExecutionLog executionLog) {
     throw new InvalidOperationException("Unsupported in IntermediateBuffer");
   }
 
   /// <inheritdoc/>
-  public void PullFromGpu() {
+  public void PullFromGpu(ExecutionLog executionLog) {
     throw new InvalidOperationException("Unsupported in IntermediateBuffer");
   }
 
