@@ -148,7 +148,7 @@ public sealed class ShaderPipeline {
       executionLog?.Records.Add($"Dispatch({executionSize})");
       Shader.Dispatch(kernel.Index, executionSize.x, executionSize.y, executionSize.z);
       foreach (var buffer in kernel.Outputs) {
-        executionLog?.Records.Add($"Waiting on buffer '{buffer.Name}'...");
+        executionLog?.Records.Add($"Waiting on output buffer '{buffer.Name}'...");
         AsyncGPUReadback.Request(buffer.Buffer).WaitForCompletion();
       }
       foreach (var buffer in kernel.Results) {
