@@ -3,16 +3,16 @@
 // License: Public Domain
 
 using HarmonyLib;
-using Timberborn.SoilContaminationSystem;
+using Timberborn.SoilMoistureSystem;
 
 namespace IgorZ.TimberCommons.GpuSimulators {
 
 /// <summary>Intercepts stock game simulation thread to run a custom simulator.</summary>
-[HarmonyPatch(typeof(SoilContaminationSimulator), nameof(SoilContaminationSimulator.TickSimulation))]
-public class SoilContaminationSimulatorTickSimulationPatch {
+[HarmonyPatch(typeof(SoilMoistureSimulator), nameof(SoilMoistureSimulator.TickSimulation))]
+public class SoilMoistureSimulatorTickSimulationPatch {
   // ReSharper disable once UnusedMember.Local
   static bool Prefix() {
-    return !GpuSimulatorsController.Self.ContaminationSimulatorEnabled;
+    return !GpuSimulatorsController.Self.MoistureSimulatorEnabled;
   }
 }
 

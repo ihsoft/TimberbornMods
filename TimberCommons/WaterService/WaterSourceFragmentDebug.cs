@@ -16,44 +16,40 @@ sealed class WaterSourceFragmentDebug : IEntityPanelFragment {
   readonly UIBuilder _builder;
   
   VisualElement _root;
-  Toggle _usePatchedSimulationToggle;
-  Toggle _useGPUSimulationToggle1;
-  Toggle _useGPUSimulationToggle2;
+  Toggle _useMultiThreadSimulationToggle;
+  Toggle _useGpuForContaminationSimulator;
+  Toggle _useGpuForMoistureSimulation;
 
   public WaterSourceFragmentDebug(UIBuilder builder) {
     _builder = builder;
   }
 
   public VisualElement InitializeFragment() {
-    _usePatchedSimulationToggle = _builder.Presets().Toggles()
-        .CheckmarkInverted(text: "Patched water simulation", color: UiFactory.PanelNormalColor);
-    _usePatchedSimulationToggle.RegisterValueChangedCallback(
+    _useMultiThreadSimulationToggle = _builder.Presets().Toggles()
+        .CheckmarkInverted(text: "Multi-thread water simulation", color: UiFactory.PanelNormalColor);
+    _useMultiThreadSimulationToggle.RegisterValueChangedCallback(
         _ => {
-          ParallelWaterSimulatorPatch.UsePatchedSimulator = _usePatchedSimulationToggle.value;
-          ParallelSoilMoistureSimulatorPatch.UsePatchedSimulator = _usePatchedSimulationToggle.value;
-          ParallelSoilContaminationSimulatorPatch.UsePatchedSimulator = _usePatchedSimulationToggle.value;
+          ParallelWaterSimulatorPatch.UsePatchedSimulator = _useMultiThreadSimulationToggle.value;
+          ParallelSoilMoistureSimulatorPatch.UsePatchedSimulator = _useMultiThreadSimulationToggle.value;
+          ParallelSoilContaminationSimulatorPatch.UsePatchedSimulator = _useMultiThreadSimulationToggle.value;
         });
-    _useGPUSimulationToggle1 = _builder.Presets().Toggles()
-        .CheckmarkInverted(text: "Use GPU simulation #1", color: UiFactory.PanelNormalColor);
-    _useGPUSimulationToggle1.RegisterValueChangedCallback(
+    _useGpuForContaminationSimulator = _builder.Presets().Toggles()
+        .CheckmarkInverted(text: "Simulate soil contamination on GPU", color: UiFactory.PanelNormalColor);
+    _useGpuForContaminationSimulator.RegisterValueChangedCallback(
         _ => {
-          GpuSoilContaminationSimulator.Self.IsEnabled = _useGPUSimulationToggle1.value;
-          GpuSoilContaminationSimulator2.Self.IsEnabled = false;
-          _useGPUSimulationToggle2.SetValueWithoutNotify(false);
+          GpuSimulatorsController.Self.EnableSoilContaminationSim(_useGpuForContaminationSimulator.value);
         });
-    _useGPUSimulationToggle2 = _builder.Presets().Toggles()
-        .CheckmarkInverted(text: "Use GPU simulation #2", color: UiFactory.PanelNormalColor);
-    _useGPUSimulationToggle2.RegisterValueChangedCallback(
+    _useGpuForMoistureSimulation = _builder.Presets().Toggles()
+        .CheckmarkInverted(text: "Simulate soil moisture on GPU", color: UiFactory.PanelNormalColor);
+    _useGpuForMoistureSimulation.RegisterValueChangedCallback(
         _ => {
-          GpuSoilContaminationSimulator.Self.IsEnabled = false;
-          _useGPUSimulationToggle1.SetValueWithoutNotify(false);
-          GpuSoilContaminationSimulator2.Self.IsEnabled = _useGPUSimulationToggle2.value;
+          GpuSimulatorsController.Self.EnableSoilMoistureSim(_useGpuForMoistureSimulation.value);
         });
 
     _root = _builder.CreateFragmentBuilder()
-        .AddComponent(_usePatchedSimulationToggle)
-        .AddComponent(_useGPUSimulationToggle1)
-        .AddComponent(_useGPUSimulationToggle2)
+        .AddComponent(_useMultiThreadSimulationToggle)
+        .AddComponent(_useGpuForContaminationSimulator)
+        .AddComponent(_useGpuForMoistureSimulation)
         .BuildAndInitialize();
     _root.ToggleDisplayStyle(visible: false);
     return _root;

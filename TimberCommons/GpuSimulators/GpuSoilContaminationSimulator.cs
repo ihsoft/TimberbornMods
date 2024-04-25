@@ -2,12 +2,12 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Timberborn.AssetSystem;
-using Timberborn.SingletonSystem;
+using Timberborn.MapIndexSystem;
 using Timberborn.SoilContaminationSystem;
+using UnityDev.Utils.LogUtilsLite;
 using UnityDev.Utils.ShaderPipeline;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -23,52 +23,85 @@ namespace IgorZ.TimberCommons.GpuSimulators {
 /// `FixedUpdate` method. The stock code is not used at all!
 /// </remarks>
 /// <seealso cref="SoilContaminationSimulatorTickSimulationPatch"/>
-sealed class GpuSoilContaminationSimulator : IPostLoadableSingleton, IGpuSimulatorStats {
+sealed class GpuSoilContaminationSimulator : IGpuSimulatorStats {
 
-  const string SimulatorShaderName = "igorz.timbercommons/shaders/SoilContaminationSimulatorShader";
+  const string SimulatorShaderName = "igorz.timbercommons/shaders/SoilContaminationSimulatorShaderPacked";
 
   readonly SoilContaminationSimulator _soilContaminationSimulator;
   readonly IResourceAssetLoader _resourceAssetLoader;
+  readonly MapIndexService _mapIndexService;
 
   readonly ValueSampler _shaderPerfSampler = new(10);
   readonly ValueSampler _totalSimPerfSampler = new(10);
 
-  internal static GpuSoilContaminationSimulator Self;
-  internal bool IsEnabled;
+  #region API
+
+  public bool IsEnabled {
+    get => _isEnabled;
+    set {
+      if (value == _isEnabled) {
+        return;
+      }
+      _isEnabled = value;
+      if (value) {
+        EnableSimulator();
+      } else {
+        DisableSimulator();
+      }
+    }
+  }
+  bool _isEnabled;
+
+  #endregion
 
   ShaderPipeline _shaderPipeline;
-  int[] _ceiledWaterHeight;
-  int[] _unsafeCellHeight;
-  float[] _contamination;
-  uint[] _contaminationBarriers;
-  uint[] _aboveMoistureBarriers;
-  float[] _contaminationLevels;
 
   GpuSoilContaminationSimulator(SoilContaminationSimulator soilContaminationSimulator,
-                                IResourceAssetLoader resourceAssetLoader) {
+                                 IResourceAssetLoader resourceAssetLoader, MapIndexService mapIndexService) {
     _soilContaminationSimulator = soilContaminationSimulator;
     _resourceAssetLoader = resourceAssetLoader;
-    Self = this;
+    _mapIndexService = mapIndexService;
   }
 
-  void SetupShaderPipeline() {
-    var simulationSettings = _soilContaminationSimulator._soilContaminationSimulationSettings;
-    var indexService = _soilContaminationSimulator._mapIndexService;
-    var totalMapSize = indexService.TotalMapSize;
-    var mapDataSize = new Vector3Int(indexService.MapSize.x, indexService.MapSize.y, 1);
+  // ReSharper disable NotAccessedField.Local
+  struct InputStruct1 {
+    public float Contamination;
+    public int UnsafeCellHeight;
+    public int CeiledWaterHeight;
+    public uint Bitmap;
 
-    _contaminationLevels = new float[totalMapSize];
-    _ceiledWaterHeight = new int[totalMapSize];
-    _unsafeCellHeight = new int[totalMapSize];
-    _contamination = new float[totalMapSize];
-    _contaminationBarriers = new uint[totalMapSize];
-    _aboveMoistureBarriers = new uint[totalMapSize];
+    public const uint ContaminationBarrierBit = 0x0001;
+    public const uint AboveMoistureBarrierBit = 0x0002;
+  };
+  // ReSharper restore NotAccessedField.Local
+
+  InputStruct1[] _packedInput1;
+
+  AppendBuffer<int> _contaminationsChangedLastTickBuffer;
+  int[] _contaminationsChangedLastTick;
+  SimpleBuffer<float> _contaminationCandidatesBuffer;
+  SimpleBuffer<float> _contaminationLevelsBuffer;
+
+  public void Initialize() {
+    var simulationSettings = _soilContaminationSimulator._soilContaminationSimulationSettings;
+    var totalMapSize = _mapIndexService.TotalMapSize;
+    var mapDataSize = new Vector3Int(_mapIndexService.MapSize.x, _mapIndexService.MapSize.y, 1);
+
+    _packedInput1 = new InputStruct1[totalMapSize];
+    _contaminationsChangedLastTick = new int[totalMapSize];
+    _contaminationsChangedLastTickBuffer = new AppendBuffer<int>(
+        "ContaminationsChangedLastTick", _contaminationsChangedLastTick);
+    _contaminationCandidatesBuffer = new SimpleBuffer<float>(
+        "ContaminationCandidates", _soilContaminationSimulator._contaminationCandidates);
+    _contaminationLevelsBuffer = new SimpleBuffer<float>(
+        "ContaminationLevels", _soilContaminationSimulator.ContaminationLevels);
 
     var prefab = _resourceAssetLoader.Load<ComputeShader>(SimulatorShaderName);
     var shader = Object.Instantiate(prefab);
 
     _shaderPipeline = ShaderPipeline.NewBuilder(shader)
         // Simulation settings.
+        .WithConstantValue("Stride", _mapIndexService.Stride)
         .WithConstantValue("DeltaTime", Time.fixedDeltaTime)
         .WithConstantValue("ContaminationDecayRate", simulationSettings.ContaminationDecayRate)
         .WithConstantValue(
@@ -81,44 +114,34 @@ sealed class GpuSoilContaminationSimulator : IPostLoadableSingleton, IGpuSimulat
         .WithConstantValue("MinimumSoilContamination", SoilContaminationSimulator.MinimumSoilContamination)
         .WithConstantValue("MinimumWaterContamination", simulationSettings.MinimumWaterContamination)
         .WithConstantValue("RegularSpreadCost", _soilContaminationSimulator._regularSpreadCost)
-        .WithConstantValue("Stride", indexService.Stride)
         .WithConstantValue("VerticalCostModifier", _soilContaminationSimulator._verticalCostModifier)
         // All buffers.
-        .WithInputBuffer("Contamination", _contamination)
-        .WithInputBuffer("ContaminationBarriers", _contaminationBarriers)
-        .WithInputBuffer("AboveMoistureBarriers", _aboveMoistureBarriers)
-        .WithInputBuffer("CeiledWaterHeight", _ceiledWaterHeight)
-        .WithInputBuffer("UnsafeCellHeight", _unsafeCellHeight)
+        .WithInputBuffer("PackedInput1", _packedInput1)
+        .WithIntermediateBuffer(_contaminationCandidatesBuffer)
         .WithIntermediateBuffer("LastTickContaminationCandidates", typeof(float), totalMapSize)
-        .WithOutputBuffer("ContaminationCandidates", _soilContaminationSimulator._contaminationCandidates)
-        .WithOutputBuffer("ContaminationLevels", _soilContaminationSimulator.ContaminationLevels)
-        // The kernel chain!
+        .WithOutputBuffer(_contaminationLevelsBuffer)
+        .WithOutputBuffer(_contaminationsChangedLastTickBuffer)
+        // The kernel chain! They will execute in the order they are declared.
         .DispatchKernel(
             "SavePreviousState", new Vector3Int(totalMapSize, 1, 1),
-            "s:ContaminationCandidates", "o:LastTickContaminationCandidates")
+            "i:ContaminationCandidates", "o:LastTickContaminationCandidates")
         .DispatchKernel(
             "CalculateContaminationCandidates", mapDataSize,
-            "i:LastTickContaminationCandidates", "s:Contamination", "s:ContaminationBarriers", "s:UnsafeCellHeight",
-            "s:AboveMoistureBarriers", "s:CeiledWaterHeight",
-            "r:ContaminationCandidates")
+            "i:LastTickContaminationCandidates", "s:PackedInput1",
+            "o:ContaminationCandidates")
         .DispatchKernel(
             "UpdateContaminationsFromCandidates", mapDataSize,
-            "i:ContaminationCandidates", "r:ContaminationLevels")
+            "i:ContaminationLevels", "i:ContaminationCandidates",
+            "r:ContaminationLevels", "r:ContaminationsChangedLastTick")
         .Build();
   }
 
-  void TickPipeline() {
+  public void TickPipeline() {
     var stopwatch = Stopwatch.StartNew();
 
-    Array.Copy(_soilContaminationSimulator.ContaminationLevels, _contaminationLevels, _contaminationLevels.Length);
     PrepareInputData();
     _shaderPipeline.RunBlocking();
-    for (var i = _contaminationLevels.Length - 1; i >= 0; i--) {
-      if (_soilContaminationSimulator.ContaminationLevels[i] != _contaminationLevels[i]) {
-        _soilContaminationSimulator._contaminationsChangedLastTick.Add(
-            _soilContaminationSimulator._mapIndexService.IndexToCoordinates(i));
-      }
-    }
+    FlushOutputData();
 
     stopwatch.Stop();
     _totalSimPerfSampler.AddSample(stopwatch.Elapsed.TotalSeconds);
@@ -128,40 +151,38 @@ sealed class GpuSoilContaminationSimulator : IPostLoadableSingleton, IGpuSimulat
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void PrepareInputData() {
-    for (var i = _contamination.Length - 1; i >= 0; i--) {
-      _contamination[i] = _soilContaminationSimulator._waterContaminationService.Contamination(i);
-      _unsafeCellHeight[i] = _soilContaminationSimulator._terrainService.UnsafeCellHeight(i);
-      _contaminationBarriers[i] = _soilContaminationSimulator._soilBarrierMap.ContaminationBarriers[i] ? 1u : 0u;
-      _aboveMoistureBarriers[i] = _soilContaminationSimulator._soilBarrierMap.AboveMoistureBarriers[i] ? 1u : 0u;
-      _ceiledWaterHeight[i] = _soilContaminationSimulator._waterService.CeiledWaterHeight(i);
+    var sim = _soilContaminationSimulator;
+    for (var i = _packedInput1.Length - 1; i >= 0; i--) {
+      var bitmap =
+          (sim._soilBarrierMap.ContaminationBarriers[i] ? InputStruct1.ContaminationBarrierBit : 0)
+          | (sim._soilBarrierMap.AboveMoistureBarriers[i] ? InputStruct1.AboveMoistureBarrierBit : 0);
+      _packedInput1[i] = new InputStruct1 {
+          Contamination = sim._waterContaminationService.Contamination(i),
+          UnsafeCellHeight = sim._terrainService.UnsafeCellHeight(i),
+          CeiledWaterHeight = sim._waterService.CeiledWaterHeight(i),
+          Bitmap = bitmap,
+      };
     }
   }
 
-  #region A helper class whose sole role is to deliver FixedUpdate to the singleton.
-
-  sealed class FixedUpdateListener : MonoBehaviour {
-    void FixedUpdate() {
-      if (Self.IsEnabled){
-        Self.TickPipeline();
-      }
-    }
-
-    void OnDestroy() {
-      Self._shaderPipeline.Dispose();
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  void FlushOutputData() {
+    for (var i = _contaminationsChangedLastTickBuffer.DataLength - 1; i >= 0; i--) {
+      _soilContaminationSimulator._contaminationsChangedLastTick.Add(
+          _mapIndexService.IndexToCoordinates(_contaminationsChangedLastTick[i]));
     }
   }
 
-  #endregion
-
-  #region IPostLoadableSingleton
-
-  /// <summary>Creates a fixed update listener and initializes shader.</summary>
-  public void PostLoad() {
-    new GameObject(GetType().FullName + "#FixedTicker").AddComponent<FixedUpdateListener>();
-    SetupShaderPipeline();
+  void EnableSimulator() {
+    DebugEx.Warning("*** Enabling GPU sim-2");
+    _contaminationCandidatesBuffer.PushToGpu(null);
+    _contaminationLevelsBuffer.PushToGpu(null);
   }
 
-  #endregion
+  void DisableSimulator() {
+    DebugEx.Warning("*** Disabling GPU sim-2");
+    _contaminationCandidatesBuffer.PullFromGpu(null);
+  }
 
   #region GpuSimulatorStats
 

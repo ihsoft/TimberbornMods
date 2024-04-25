@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using HarmonyLib;
+using IgorZ.TimberCommons.GpuSimulators;
 using Timberborn.SoilMoistureSystem;
 
 
@@ -21,6 +22,9 @@ sealed class ParallelSoilMoistureSimulatorPatch {
   // ReSharper disable once UnusedMember.Local
   // ReSharper disable once InconsistentNaming
   static bool Prefix(SoilMoistureSimulator __instance) {
+    if (GpuSimulatorsController.Self.MoistureSimulatorEnabled) {
+      return true;
+    }
     if (!UsePatchedSimulator) {
       return true;
     }

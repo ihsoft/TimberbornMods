@@ -14,10 +14,13 @@ namespace IgorZ.TimberCommons.GpuSimulators {
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     HarmonyPatcher.PatchRepeated(
-        GetType().AssemblyQualifiedName, typeof(SoilContaminationSimulatorTickSimulationPatch));
+        GetType().AssemblyQualifiedName,
+        typeof(SoilContaminationSimulatorTickSimulationPatch),
+        typeof(SoilMoistureSimulatorTickSimulationPatch));
 
+    containerDefinition.Bind<GpuSimulatorsController>().AsSingleton();
     containerDefinition.Bind<GpuSoilContaminationSimulator>().AsSingleton();
-    containerDefinition.Bind<GpuSoilContaminationSimulator2>().AsSingleton();
+    containerDefinition.Bind<GpuSoilMoistureSimulator>().AsSingleton();
     containerDefinition.Bind<GpuSimulatorsDebuggingPanel>().AsSingleton();
   }
 }
