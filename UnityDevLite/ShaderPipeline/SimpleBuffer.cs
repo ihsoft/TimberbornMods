@@ -35,14 +35,20 @@ public sealed class SimpleBuffer<T> : IAbstractBuffer where T : struct {
 
   /// <inheritdoc/>
   public void PushToGpu(ExecutionLog executionLog) {
-    executionLog?.RecordBufferSet(this);
-    Buffer.SetData(Values);
+    if (executionLog != null) {
+      executionLog.RecordBufferSet(this);
+    } else {
+      Buffer.SetData(Values);
+    }
   }
 
   /// <inheritdoc/>
   public void PullFromGpu(ExecutionLog executionLog) {
-    executionLog?.RecordBufferGet(this);
-    Buffer.GetData(Values);
+    if (executionLog != null) {
+      executionLog?.RecordBufferGet(this);
+    } else {
+      Buffer.GetData(Values);
+    }
   }
 
   /// <inheritdoc/>

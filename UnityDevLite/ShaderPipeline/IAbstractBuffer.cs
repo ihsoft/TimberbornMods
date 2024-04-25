@@ -25,6 +25,7 @@ public interface IAbstractBuffer {
   /// If not <c>null</c>, then the buffer should record key actions being performed on the buffer. This information is
   /// used to produce execution plans.
   /// </param>
+  /// FIXME docs
   public void Initialize(ExecutionLog executionLog);
 
   /// <summary>Gets data from GPU.</summary>

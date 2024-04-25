@@ -11,7 +11,7 @@ namespace UnityDev.Utils.ShaderPipeline {
 
 /// <summary>Helper class that is used to obtain execution logs from the shader pipeline buffers.</summary>
 /// <remarks>
-/// When this object is passed to teh buffer action, the action is expected to add all important steps and information
+/// When this object is passed to the buffer action, the action is expected to add all important steps and information
 /// into the log. The idea is to get a clear view of how the pipeline is being executed. The log iis refreshed on every
 /// pipeline call.
 /// </remarks>
@@ -43,6 +43,7 @@ public sealed class ExecutionLog {
     var buffer = abstractBuffer.Buffer;
     var aligned = buffer.stride % 16 == 0 ? "aligned" : "not aligned";
     var optimal = (buffer.stride * buffer.count) % 16 == 0 ? "size is optimal" : "size is not optimal";
+    //FIXME: pull data type 
     return $"name={abstractBuffer.Name}, stride={buffer.stride}, count={buffer.count}, {aligned}, {optimal}";
   }
 }

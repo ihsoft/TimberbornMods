@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Timberborn.Common;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -101,16 +102,6 @@ public sealed class ShaderPipeline {
   /// <summary>Time, spent for running last <see cref="RunBlocking"/>.</summary>
   public TimeSpan LastRunDuration { get; private set; }
 
-  /// <summary>Indicates if execution logs should be captured during <see cref="RunBlocking"/> calls.</summary>
-  /// <remarks>These logs cane be used for tracking the execution sequence.</remarks>
-  /// <seealso cref="ExecutionLog"/>
-  public bool RecordExecutionLog = false;
-
-  /// <summary>The execution lod, captured during the last call to <see cref="RunBlocking"/>.</summary>
-  /// <returns>The log or <c>null</c> if no log was captured.</returns>
-  /// <see cref="RecordExecutionLog"/>
-  public ExecutionLog ExecutionLog { get; private set; }
-
   /// <summary>Starts builder for a new pipeline</summary>
   /// <remarks>
   /// Building is expensive step, but it usually needs to be done only once. Once pipeline created, just call
@@ -129,36 +120,47 @@ public sealed class ShaderPipeline {
   /// </remarks>
   public void RunBlocking() {
     var stopwatch = Stopwatch.StartNew();
-    ExecutionLog executionLog = null;
-    if (RecordExecutionLog) {
-      executionLog = new ExecutionLog();
-      executionLog.Records.AddRange(_constantsLog);
-    }
+    _executionLog?.Records.AddRange(_constantsLog);
     for (var i = _allSources.Count - 1; i >= 0; i--) {
-      _allSources[i].PushToGpu(executionLog);
+      _allSources[i].PushToGpu(_executionLog);
     }
     var queueSize = _dispatchQueue.Count;
     for (var index = 0; index < queueSize; index++) {
       var kernel = _dispatchQueue[index];
-      executionLog?.Records.Add($"Kernel #{index}: groupSize={kernel.GroupSize}, dataSize={kernel.DataSize}");
+      RecordKernelStart(_executionLog, kernel);
       for (var i = kernel.Results.Count - 1; i >= 0; i--) {
-        kernel.Results[i].Initialize(executionLog);
+        kernel.Results[i].Initialize(_executionLog);
       }
       var executionSize = GetExecutionSize(kernel);
-      executionLog?.Records.Add($"Dispatch({executionSize})");
-      Shader.Dispatch(kernel.Index, executionSize.x, executionSize.y, executionSize.z);
-      foreach (var buffer in kernel.Outputs) {
-        executionLog?.Records.Add($"Waiting on output buffer '{buffer.Name}'...");
-        AsyncGPUReadback.Request(buffer.Buffer).WaitForCompletion();
+      if (_executionLog != null) {
+        RecordKernelDispatch(_executionLog, kernel, executionSize);
+      } else {
+        Shader.Dispatch(kernel.Index, executionSize.x, executionSize.y, executionSize.z);
       }
       foreach (var buffer in kernel.Results) {
-        buffer.PullFromGpu(executionLog);
+        buffer.PullFromGpu(_executionLog);
       }
-      executionLog?.Records.Add($"Kernel #{kernel.Index} finished");
+      foreach (var buffer in kernel.Outputs) {
+        if (_executionLog != null) {
+          RecordWaitForBuffer(_executionLog, buffer);
+        } else {
+          AsyncGPUReadback.Request(buffer.Buffer).WaitForCompletion(); //FIXME to abstract?
+        }
+      }
+      RecordKernelEnd(_executionLog, kernel);
     }
-    ExecutionLog = executionLog;
     stopwatch.Stop();
     LastRunDuration = stopwatch.Elapsed;
+  }
+
+  /// <summary>Returns a trace of what the pipeline would execute.</summary>
+  /// <remarks>No actual changes to the buffers or kernels are made.</remarks>
+  public List<string> GetExecutionPlan() {
+    _executionLog = new ExecutionLog();
+    RunBlocking();
+    var res = _executionLog.Records;
+    _executionLog = null;
+    return res;
   }
 
   /// <summary>Destroys shader and releases all resources.</summary>
@@ -290,8 +292,9 @@ public sealed class ShaderPipeline {
         throw new ArgumentException($"Unknown kernel name '{kernelName}'");
       }
       var kernel = new KernelDecl {
+          Name = kernelName,
+          Index = _shader.FindKernel(kernelName),
           DataSize = dataSize,
-          Index = _shader.FindKernel(kernelName)
       };
       _shader.GetKernelThreadGroupSizes(kernel.Index, out var xSize, out var ySize, out var zSize);
       kernel.GroupSize = new Vector3Int(Convert.ToInt32(xSize), Convert.ToInt32(ySize), Convert.ToInt32(zSize));
@@ -399,6 +402,7 @@ public sealed class ShaderPipeline {
   #region Implementation
 
   sealed class KernelDecl {
+    public string Name;
     public int Index;
     public Vector3Int DataSize;
     public Vector3Int GroupSize;
@@ -410,24 +414,29 @@ public sealed class ShaderPipeline {
 
   readonly List<KernelDecl> _dispatchQueue;
   readonly List<IAbstractBuffer> _allBuffers;
-  readonly List<IAbstractBuffer> _allSources = new();
+  readonly List<IAbstractBuffer> _allSources;
   readonly List<string> _constantsLog = new();
+  ExecutionLog _executionLog;
 
   ShaderPipeline(ComputeShader shader, List<KernelDecl> dispatchQueue, List<IAbstractBuffer> allBuffers,
                  Dictionary<string, object> constants) {
     Shader = shader;
     _dispatchQueue = dispatchQueue;
     _allBuffers = allBuffers;
+    var allSources = new HashSet<IAbstractBuffer>();
     foreach (var kernel in _dispatchQueue) {
-      _allSources.AddRange(kernel.Sources);
+      allSources.AddRange(kernel.Sources);
     }
+    _allSources = allSources.OrderByDescending(x => x.Name).ToList();  // We iterate reverse.
     if (constants.Count > 0) {
-      foreach (var constant in constants) {
+      var ordered = constants.OrderBy(x => x.Key);
+      foreach (var constant in ordered) {
         _constantsLog.Add($"Constant: {constant.Key} = {constant.Value}");
       }
     } else {
       _constantsLog.Add("No constants in the pipeline");
     }
+    _constantsLog.Add("");
   }
 
   static Vector3Int GetExecutionSize(KernelDecl kernel) {
@@ -435,6 +444,25 @@ public sealed class ShaderPipeline {
         Mathf.CeilToInt((float)kernel.DataSize.x / kernel.GroupSize.x),
         Mathf.CeilToInt((float)kernel.DataSize.y / kernel.GroupSize.y),
         Mathf.CeilToInt((float)kernel.DataSize.z / kernel.GroupSize.z));
+  }
+
+
+  static void RecordKernelStart(ExecutionLog log, KernelDecl kernel) {
+    log?.Records.Add("");
+    log?.Records.Add(
+        $"Kernel #{kernel.Index} ({kernel.Name}): groupSize={kernel.GroupSize}, dataSize={kernel.DataSize}");
+  }
+
+  static void RecordKernelEnd(ExecutionLog log, KernelDecl kernel) {
+    log?.Records.Add($"Kernel #{kernel.Index} finished");
+  }
+
+  static void RecordKernelDispatch(ExecutionLog log, KernelDecl kernel, Vector3Int executionSize) {
+    log.Records.Add($"Dispatch(size={executionSize})");
+  }
+
+  static void RecordWaitForBuffer(ExecutionLog log, IAbstractBuffer buffer) {
+    log.Records.Add($"Waiting on output buffer '{buffer.Name}'...");
   }
 
   #endregion

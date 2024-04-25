@@ -43,22 +43,31 @@ public sealed class AppendBuffer<T> : IAbstractBuffer where T : struct {
 
   /// <inheritdoc/>
   public void Initialize(ExecutionLog executionLog) {
-    _argsBuffer.Values[0] = 0;
-    executionLog?.Records.Add($"Reset append buffer '{Name}'");
-    Buffer.SetCounterValue(0);
+    if (executionLog != null) {
+      executionLog.Records.Add($"Reset append buffer '{Name}'");
+    } else {
+      _argsBuffer.Values[0] = 0;
+      Buffer.SetCounterValue(0);
+    }
   }
 
   /// <inheritdoc/>
   public void PushToGpu(ExecutionLog executionLog) {
-    executionLog?.RecordBufferSet(this);
-    Buffer.SetData(Values);
+    if (executionLog != null) {
+      executionLog.RecordBufferSet(this);
+    } else {
+      Buffer.SetData(Values);
+    }
   }
 
   /// <inheritdoc/>
   public void PullFromGpu(ExecutionLog executionLog) {
-    executionLog?.RecordBufferGet(this);
-    Buffer.GetData(Values);
-    ComputeBuffer.CopyCount(Buffer, _argsBuffer.Buffer, 0);
+    if (executionLog != null) {
+      executionLog.RecordBufferGet(this);
+    } else {
+      Buffer.GetData(Values);
+      ComputeBuffer.CopyCount(Buffer, _argsBuffer.Buffer, 0);
+    }
     _argsBuffer.PullFromGpu(executionLog);
   }
 
