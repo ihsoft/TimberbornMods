@@ -21,7 +21,6 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<GpuSimulatorsController>().AsSingleton();
     containerDefinition.Bind<GpuSoilContaminationSimulator>().AsSingleton();
     containerDefinition.Bind<GpuSoilMoistureSimulator>().AsSingleton();
-    containerDefinition.Bind<GpuSoilMoistureSimulator2>().AsSingleton();
     containerDefinition.Bind<GpuSimulatorsDebuggingPanel>().AsSingleton();
   }
 }

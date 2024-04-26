@@ -112,7 +112,6 @@
       <Compile Include="GpuSimulators\GpuSimulatorsController.cs" />
       <Compile Include="GpuSimulators\GpuSimulatorsDebuggingPanel.cs" />
       <Compile Include="GpuSimulators\GpuSoilMoistureSimulator.cs" />
-      <Compile Include="GpuSimulators\GpuSoilMoistureSimulator2.cs" />
       <Compile Include="GpuSimulators\IGpuSimulatorStats.cs" />
       <Compile Include="GpuSimulators\GpuSoilContaminationSimulator.cs" />
       <Compile Include="GpuSimulators\SoilContaminationSimulatorTickSimulationPatch.cs" />
@@ -333,9 +332,6 @@
     <ItemGroup>
       <ClInclude Include="..\UnityProject\Assets\TimberCommons\Shaders\SoilContaminationSimulatorShaderPacked.compute">
         <Link>GpuSimulators\Shaders\SoilContaminationSimulatorShaderPacked.compute</Link>
-      </ClInclude>
-      <ClInclude Include="..\UnityProject\Assets\TimberCommons\Shaders\SoilMoistureSimulator.compute">
-        <Link>GpuSimulators\Shaders\SoilMoistureSimulator.compute</Link>
       </ClInclude>
       <ClInclude Include="..\UnityProject\Assets\TimberCommons\Shaders\SoilMoistureSimulatorPacked.compute">
         <Link>GpuSimulators\Shaders\SoilMoistureSimulatorPacked.compute</Link>

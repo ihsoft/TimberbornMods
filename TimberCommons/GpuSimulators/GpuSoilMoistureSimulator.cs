@@ -58,7 +58,7 @@ sealed class GpuSoilMoistureSimulator : IGpuSimulatorStats {
 
   #region Implementation
 
-  const string SimulatorShaderName = "igorz.timbercommons/shaders/SoilMoistureSimulator";
+  const string SimulatorShaderName = "igorz.timbercommons/shaders/SoilMoistureSimulatorPacked";
   const float MinLevelChangePrecision = 0.0001f;
 
   readonly SoilMoistureSimulator _soilMoistureSimulator;
@@ -69,12 +69,20 @@ sealed class GpuSoilMoistureSimulator : IGpuSimulatorStats {
   readonly ValueSampler _totalSimPerfSampler = new(10);
 
   // Inputs.
-  float[] _contaminationBuff;
-  float[] _waterDepthBuff;
-  int[] _aboveMoistureBarriersBuff; //bool
-  int[] _fullMoistureBarriersBuff; //bool
-  int[] _ceiledWaterHeightBuff;
-  int[] _unsafeCellHeightBuff;
+  // ReSharper disable NotAccessedField.Local
+  struct InputStruct1 {
+    public float Contamination;
+    public float WaterDepth;
+    public int UnsafeCellHeight;
+    public uint BitmapFlags;
+
+    public const uint ContaminationBarrierBit = 0x0001;
+    public const uint AboveMoistureBarrierBit = 0x0002;
+    public const uint FullMoistureBarrierBit = 0x0004;
+  };
+  // ReSharper restore NotAccessedField.Local
+
+  InputStruct1[] _packedInput1;
 
   // Outputs.
   float[] _waterEvaporationModifier;
@@ -97,12 +105,7 @@ sealed class GpuSoilMoistureSimulator : IGpuSimulatorStats {
     var totalMapSize = _mapIndexService.TotalMapSize;
     var mapDataSize = new Vector3Int(_mapIndexService.MapSize.x, _mapIndexService.MapSize.y, 1);
 
-    _contaminationBuff = new float[totalMapSize];
-    _waterDepthBuff = new float[totalMapSize];
-    _aboveMoistureBarriersBuff = new int[totalMapSize];
-    _fullMoistureBarriersBuff = new int[totalMapSize];
-    _ceiledWaterHeightBuff = new int[totalMapSize];
-    _unsafeCellHeightBuff = new int[totalMapSize];
+    _packedInput1 = new InputStruct1[totalMapSize];
     _waterEvaporationModifier = new float[totalMapSize];
     _moistureLevelsChangedLastTick = new int[totalMapSize];
 
@@ -129,12 +132,7 @@ sealed class GpuSoilMoistureSimulator : IGpuSimulatorStats {
         // Sim calculated.
         .WithConstantValue("WaterContaminationScaler", _soilMoistureSimulator._waterContaminationScaler)
         // All buffers.
-        .WithInputBuffer("ContaminationBuff", _contaminationBuff)
-        .WithInputBuffer("WaterDepthBuff", _waterDepthBuff)
-        .WithInputBuffer("AboveMoistureBarriersBuff", _aboveMoistureBarriersBuff)
-        .WithInputBuffer("CeiledWaterHeightBuff", _ceiledWaterHeightBuff)
-        .WithInputBuffer("FullMoistureBarriersBuff", _fullMoistureBarriersBuff)
-        .WithInputBuffer("UnsafeCellHeightBuff", _unsafeCellHeightBuff)
+        .WithInputBuffer("PackedInput1", _packedInput1)
         .WithIntermediateBuffer("LastTickMoistureLevelsBuff", typeof(float), totalMapSize)
         .WithIntermediateBuffer("WateredNeighboursBuff", typeof(float), totalMapSize)
         .WithIntermediateBuffer("ClusterSaturationBuff", typeof(float), totalMapSize)
@@ -143,23 +141,22 @@ sealed class GpuSoilMoistureSimulator : IGpuSimulatorStats {
         .WithOutputBuffer("WaterEvaporationModifierBuff", _waterEvaporationModifier)
         // The kernel chain! They will execute in the order they are declared.
         .DispatchKernel(
-            "SavePreviousState997", new Vector3Int(totalMapSize, 1, 1),
+            "SavePreviousState", new Vector3Int(totalMapSize, 1, 1),
             "i:MoistureLevelsBuff",
             "o:LastTickMoistureLevelsBuff")
         .DispatchKernel(
             "CountWateredNeighbors", mapDataSize,
-            "s:WaterDepthBuff",
+            "s:PackedInput1",
             "i:LastTickMoistureLevelsBuff",
             "o:WateredNeighboursBuff")
         .DispatchKernel(
             "CalculateClusterSaturationAndWaterEvaporation", mapDataSize,
-            "s:WaterDepthBuff",
+            "s:PackedInput1",
             "i:WateredNeighboursBuff",
             "o:ClusterSaturationBuff", "r:WaterEvaporationModifierBuff")
         .DispatchKernel(
             "CalculateMoisture", mapDataSize,
-            "s:AboveMoistureBarriersBuff", "s:FullMoistureBarriersBuff", "s:UnsafeCellHeightBuff",
-            "s:WaterDepthBuff", "s:ContaminationBuff", "s:CeiledWaterHeightBuff",
+            "s:PackedInput1",
             "i:LastTickMoistureLevelsBuff", "i:ClusterSaturationBuff",
             "r:MoistureLevelsBuff", "r:MoistureLevelsChangedLastTickBuff")
         .Build();
@@ -169,13 +166,17 @@ sealed class GpuSoilMoistureSimulator : IGpuSimulatorStats {
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void PrepareInputData() {
     var sim = _soilMoistureSimulator;
-    for (var index = sim.MoistureLevels.Length - 1; index >= 0; index--) {
-      _contaminationBuff[index] = sim._waterContaminationService.Contamination(index);
-      _waterDepthBuff[index] = sim._waterService.WaterDepth(index);
-      _aboveMoistureBarriersBuff[index] = sim._soilBarrierMap.AboveMoistureBarriers[index] ? 1 : 0;
-      _fullMoistureBarriersBuff[index] = sim._soilBarrierMap.FullMoistureBarriers[index] ? 1 : 0;
-      _ceiledWaterHeightBuff[index] = sim._waterService.CeiledWaterHeight(index);
-      _unsafeCellHeightBuff[index] = sim._terrainService.UnsafeCellHeight(index);
+    for (var index = _packedInput1.Length - 1; index >= 0; index--) {
+      var bitmapFlags =
+          (sim._soilBarrierMap.ContaminationBarriers[index] ? InputStruct1.ContaminationBarrierBit : 0)
+          | (sim._soilBarrierMap.AboveMoistureBarriers[index] ? InputStruct1.AboveMoistureBarrierBit : 0)
+          | (sim._soilBarrierMap.FullMoistureBarriers[index] ? InputStruct1.FullMoistureBarrierBit : 0);
+      _packedInput1[index] = new InputStruct1 {
+          Contamination = sim._waterContaminationService.Contamination(index),
+          WaterDepth = sim._waterService.WaterDepth(index),
+          UnsafeCellHeight = sim._terrainService.UnsafeCellHeight(index),
+          BitmapFlags = bitmapFlags,
+      };
     }
   }
 
@@ -191,12 +192,12 @@ sealed class GpuSoilMoistureSimulator : IGpuSimulatorStats {
   }
 
   void EnableSimulator() {
-    DebugEx.Warning("*** Enabling moisture GPU sim");
+    DebugEx.Warning("*** Enabling moisture GPU sim-2");
     _moistureLevelsBuff.PushToGpu(null);
   }
 
   void DisableSimulator() {
-    DebugEx.Warning("*** Disabling moisture GPU sim");
+    DebugEx.Warning("*** Disabling moisture GPU sim-2");
   }
 
   #endregion
