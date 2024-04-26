@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using Timberborn.SingletonSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
@@ -26,6 +27,8 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
 
   readonly GpuSoilContaminationSimulator _contaminationSimulator;
   readonly GpuSoilMoistureSimulator _moistureSimulator;
+  readonly Stopwatch _stopwatch = new();
+  readonly ValueSampler _fixedUpdateSampler = new(10);
 
   internal static GpuSimulatorsController Self;
   internal bool ContaminationSimulatorEnabled => _contaminationSimulator.IsEnabled;
@@ -65,19 +68,29 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
     } else {
       text.Add("Soil moisture simulation disabled");
     }
+    var (_, _, _, totalPhysics) = _fixedUpdateSampler.GetStats();
+    text.Add($"Total physics cost: {totalPhysics * 1000:0.##} ms");
     return string.Join("\n", text);
+  }
+
+  void FixedUpdate() {
+    _stopwatch.Start();
+    if (Self._contaminationSimulator.IsEnabled){
+      Self._contaminationSimulator.TickPipeline();
+    }
+    if (Self._moistureSimulator.IsEnabled) {
+      Self._moistureSimulator.TickPipeline();
+    }
+    _stopwatch.Stop();
+    _fixedUpdateSampler.AddSample(_stopwatch.Elapsed.TotalSeconds);
+    _stopwatch.Reset();
   }
 
   #region A helper class whose sole role is to deliver FixedUpdate to the singleton.
 
   sealed class FixedUpdateListener : MonoBehaviour {
     void FixedUpdate() {
-      if (Self._contaminationSimulator.IsEnabled){
-        Self._contaminationSimulator.TickPipeline();
-      }
-      if (Self._moistureSimulator.IsEnabled) {
-        Self._moistureSimulator.TickPipeline();
-      }
+      Self.FixedUpdate();
     }
   }
 
