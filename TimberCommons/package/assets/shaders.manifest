@@ -1,22 +1,21 @@
 ManifestFileVersion: 0
-CRC: 414213487
+CRC: 1019341453
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: ef3398d6bf7eb96be13bfee11b49eea7
+    Hash: fc275c21b15f2fe887adec56eb4873fa
   TypeTreeHash:
     serializedVersion: 2
     Hash: 17a3557cae3d0f9916dbe762213cf068
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: 3d601ad46917b1eba5fd8a759a4ce008
+    Hash: d785a4b7a7811575694b5a445ca733d4
 HashAppended: 0
 ClassTypes:
 - Class: 72
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/TimberCommons/Shaders/SoilContaminationSimulatorShader.compute
 - Assets/TimberCommons/Shaders/SoilContaminationSimulatorShaderPacked.compute
-- Assets/TimberCommons/Shaders/profile-shader.compute
+- Assets/TimberCommons/Shaders/SoilMoistureSimulator.compute
 Dependencies: []

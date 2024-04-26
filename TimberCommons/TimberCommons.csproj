@@ -330,9 +330,6 @@
       </ProjectReference>
     </ItemGroup>
     <ItemGroup>
-      <ClInclude Include="..\UnityProject\Assets\TimberCommons\Shaders\SoilContaminationSimulatorShader.compute">
-        <Link>GpuSimulators\Shaders\SoilContaminationSimulatorShader.compute</Link>
-      </ClInclude>
       <ClInclude Include="..\UnityProject\Assets\TimberCommons\Shaders\SoilContaminationSimulatorShaderPacked.compute">
         <Link>GpuSimulators\Shaders\SoilContaminationSimulatorShaderPacked.compute</Link>
       </ClInclude>
