@@ -19,6 +19,7 @@ sealed class WaterSourceFragmentDebug : IEntityPanelFragment {
   Toggle _useMultiThreadSimulationToggle;
   Toggle _useGpuForContaminationSimulator;
   Toggle _useGpuForMoistureSimulation;
+  Toggle _useGpuForMoistureSimulation2;
 
   public WaterSourceFragmentDebug(UIBuilder builder) {
     _builder = builder;
@@ -40,16 +41,27 @@ sealed class WaterSourceFragmentDebug : IEntityPanelFragment {
           GpuSimulatorsController.Self.EnableSoilContaminationSim(_useGpuForContaminationSimulator.value);
         });
     _useGpuForMoistureSimulation = _builder.Presets().Toggles()
-        .CheckmarkInverted(text: "Simulate soil moisture on GPU", color: UiFactory.PanelNormalColor);
+        .CheckmarkInverted(text: "Simulate soil moisture on GPU#1", color: UiFactory.PanelNormalColor);
     _useGpuForMoistureSimulation.RegisterValueChangedCallback(
         _ => {
+          GpuSimulatorsController.Self.EnableSoilMoistureSim2(false);
+          _useGpuForMoistureSimulation2.SetValueWithoutNotify(false);
           GpuSimulatorsController.Self.EnableSoilMoistureSim(_useGpuForMoistureSimulation.value);
+        });
+    _useGpuForMoistureSimulation2 = _builder.Presets().Toggles()
+        .CheckmarkInverted(text: "Simulate soil moisture on GPU#2", color: UiFactory.PanelNormalColor);
+    _useGpuForMoistureSimulation2.RegisterValueChangedCallback(
+        _ => {
+          GpuSimulatorsController.Self.EnableSoilMoistureSim(false);
+          _useGpuForMoistureSimulation.SetValueWithoutNotify(false);
+          GpuSimulatorsController.Self.EnableSoilMoistureSim2(_useGpuForMoistureSimulation2.value);
         });
 
     _root = _builder.CreateFragmentBuilder()
         .AddComponent(_useMultiThreadSimulationToggle)
         .AddComponent(_useGpuForContaminationSimulator)
         .AddComponent(_useGpuForMoistureSimulation)
+        .AddComponent(_useGpuForMoistureSimulation2)
         .BuildAndInitialize();
     _root.ToggleDisplayStyle(visible: false);
     return _root;

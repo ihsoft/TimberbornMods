@@ -27,17 +27,20 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
 
   readonly GpuSoilContaminationSimulator _contaminationSimulator;
   readonly GpuSoilMoistureSimulator _moistureSimulator;
+  readonly GpuSoilMoistureSimulator2 _moistureSimulator2;
   readonly Stopwatch _stopwatch = new();
   readonly ValueSampler _fixedUpdateSampler = new(10);
 
   internal static GpuSimulatorsController Self;
   internal bool ContaminationSimulatorEnabled => _contaminationSimulator.IsEnabled;
-  internal bool MoistureSimulatorEnabled => _moistureSimulator.IsEnabled;
+  internal bool MoistureSimulatorEnabled => _moistureSimulator.IsEnabled || _moistureSimulator2.IsEnabled;
 
   GpuSimulatorsController(
-      GpuSoilContaminationSimulator contaminationSimulator, GpuSoilMoistureSimulator moistureSimulator) {
+      GpuSoilContaminationSimulator contaminationSimulator,
+      GpuSoilMoistureSimulator moistureSimulator, GpuSoilMoistureSimulator2 moistureSimulator2) {
     _contaminationSimulator = contaminationSimulator;
     _moistureSimulator = moistureSimulator;
+    _moistureSimulator2 = moistureSimulator2;
     Self = this;
   }
 
@@ -46,8 +49,11 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
   }
 
   internal void EnableSoilMoistureSim(bool state) {
-    DebugEx.Warning("*** loh!aw");
     _moistureSimulator.IsEnabled = state;
+  }
+
+  internal void EnableSoilMoistureSim2(bool state) {
+    _moistureSimulator2.IsEnabled = state;
   }
 
   internal string GetStatsText() {
@@ -68,6 +74,14 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
     } else {
       text.Add("Soil moisture simulation disabled");
     }
+    if (_moistureSimulator2.IsEnabled) {
+      var (_, _, _, total) = _moistureSimulator2.GetTotalStats();
+      text.Add($"2Soil moisture total: {total * 1000:0.##} ms");
+      var (_, _, _, shader) = _moistureSimulator2.GetShaderStats();
+      text.Add($"2Soil moisture shader: {shader * 1000:0.##} ms");
+    } else {
+      text.Add("2Soil moisture simulation disabled");
+    }
     var (_, _, _, totalPhysics) = _fixedUpdateSampler.GetStats();
     text.Add($"Total physics cost: {totalPhysics * 1000:0.##} ms");
     return string.Join("\n", text);
@@ -80,6 +94,9 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
     }
     if (Self._moistureSimulator.IsEnabled) {
       Self._moistureSimulator.TickPipeline();
+    }
+    if (Self._moistureSimulator2.IsEnabled) {
+      Self._moistureSimulator2.TickPipeline();
     }
     _stopwatch.Stop();
     _fixedUpdateSampler.AddSample(_stopwatch.Elapsed.TotalSeconds);
@@ -103,6 +120,7 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
     new GameObject(GetType().FullName + "#FixedTicker").AddComponent<FixedUpdateListener>();
     _contaminationSimulator.Initialize();
     _moistureSimulator.Initialize();
+    _moistureSimulator2.Initialize();
   }
 
   #endregion
