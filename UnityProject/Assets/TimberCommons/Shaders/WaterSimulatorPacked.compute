@@ -43,10 +43,10 @@ float DiffusionRate;
 // This structure must be aligned!
 struct WaterFlow
 {
-    float Left;
-    float Right;
-    float Top;
     float Bottom;
+    float Left;
+    float Top;
+    float Right;
 };
 static WaterFlow DefaultWaterFlow = { 0, 0, 0, 0};
 
@@ -217,7 +217,7 @@ void UpdateOutflow(int index)
     reference2.Left = num3 * num7;
     reference2.Top = num4 * num7;
     reference2.Right = num5 * num7;
-    TempOutflows(index) = reference2;    
+    TempOutflows(index) = reference2;
 }
 
 float CalculateOutflow(int origin, int target, float oldOutflow)
