@@ -47,7 +47,6 @@ sealed class GpuWaterSimulator : IGpuSimulatorStats {
 
     // Constant staring part from the original sim.
     _simulator._deltaTime = _simulator._fixedDeltaTime * _simulator._waterSimulationSettings.TimeScale;
-    DebugEx.Warning("*** tick deltaTime: fixed={0}, actual={1}", Time.fixedDeltaTime, _simulator._deltaTime);
     _simulator.UpdateWaterSources();
     _simulator.UpdateWaterChanges();
 
