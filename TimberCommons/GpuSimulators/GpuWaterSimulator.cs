@@ -47,6 +47,7 @@ sealed class GpuWaterSimulator : IGpuSimulatorStats {
 
     // Constant staring part from the original sim.
     _simulator._deltaTime = _simulator._fixedDeltaTime * _simulator._waterSimulationSettings.TimeScale;
+    DebugEx.Warning("*** tick deltaTime: fixed={0}, actual={1}", Time.fixedDeltaTime, _simulator._deltaTime);
     _simulator.UpdateWaterSources();
     _simulator.UpdateWaterChanges();
 
@@ -148,7 +149,7 @@ sealed class GpuWaterSimulator : IGpuSimulatorStats {
         .WithOutputBuffer("ContaminationsBuff", _simulator._waterContaminationMap.Contaminations)
         // The kernel chain! They will execute in the order they are declared.
         .DispatchKernel(
-            "SavePreviousState997", new Vector3Int(_totalMapSize, 1, 1),
+            "SavePreviousState995", new Vector3Int(_totalMapSize, 1, 1),
             "s:WaterDepthsBuff", "s:ContaminationsBuff",
             "o:InitialWaterDepthsBuff", "o:ContaminationsBufferBuff")
         .DispatchKernel(

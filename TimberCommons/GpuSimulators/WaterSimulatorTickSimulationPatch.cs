@@ -4,6 +4,7 @@
 
 using HarmonyLib;
 using Timberborn.WaterSystem;
+using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.TimberCommons.GpuSimulators {
 
