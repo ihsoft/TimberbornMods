@@ -43,12 +43,13 @@ public sealed class IntermediateBuffer : IAbstractBuffer {
 
   /// <summary>Creates a buffer that is not bound to any dara source.</summary>
   /// <param name="name">The name of the buffer as specified in the shader.</param>
-  /// <param name="type">The type of elements. This will define the stride size.</param>
+  /// <param name="stride">Size type of an element.</param>
   /// <param name="count">The size of the buffer.</param>
-  public IntermediateBuffer(string name, Type type, int count) {
+  public IntermediateBuffer(string name, int stride, int count) {
     Name = name;
-    Buffer = new ComputeBuffer(count, Marshal.SizeOf(type));
+    Buffer = new ComputeBuffer(count, stride);
   }
+
 }
 
 }

@@ -118,7 +118,7 @@ sealed class GpuSoilContaminationSimulator : IGpuSimulatorStats {
         // All buffers.
         .WithInputBuffer("PackedInput1", _packedInput1)
         .WithIntermediateBuffer(_contaminationCandidatesBuffer)
-        .WithIntermediateBuffer("LastTickContaminationCandidates", typeof(float), totalMapSize)
+        .WithIntermediateBuffer("LastTickContaminationCandidates", sizeof(float), totalMapSize)
         .WithOutputBuffer(_contaminationLevelsBuffer)
         .WithOutputBuffer(_contaminationsChangedLastTickBuffer)
         // The kernel chain! They will execute in the order they are declared.

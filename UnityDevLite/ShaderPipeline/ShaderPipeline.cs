@@ -216,11 +216,11 @@ public sealed class ShaderPipeline {
     /// <summary>Binds a buffer that is used internally by the kernels or is handled outside of the pipeline.</summary>
     /// <remarks>It's a syntax sugar for <see cref="WithIntermediateBuffer(IAbstractBuffer)"/> method.</remarks>
     /// <param name="name">The name as specified in the shader.</param>
-    /// <param name="type">Type of the data in the buffer.</param>
+    /// <param name="stride">Size of the item in the buffer.</param>
     /// <param name="count">Number of elements in the buffer.</param>
-    public Builder WithIntermediateBuffer(string name, Type type, int count) {
+    public Builder WithIntermediateBuffer(string name, int stride, int count) {
       AddNewBufferName(name);
-      _intermediateBuffers.Add(name, new IntermediateBuffer(name, type, count));
+      _intermediateBuffers.Add(name, new IntermediateBuffer(name, stride, count));
       return this;
     }
 

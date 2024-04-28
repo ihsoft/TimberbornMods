@@ -139,10 +139,10 @@ sealed class GpuWaterSimulator : IGpuSimulatorStats {
         // All buffers.
         .WithInputBuffer("PackedInput1", _packedInput1)
         //FIXME: use actual types? or fuck it?
-        .WithIntermediateBuffer("TempOutflowsBuff", typeof(Vector4), _totalMapSize)  // Aligned
-        .WithIntermediateBuffer("InitialWaterDepthsBuff", typeof(float), _totalMapSize)
-        .WithIntermediateBuffer("ContaminationsBufferBuff", typeof(float), _totalMapSize)
-        .WithIntermediateBuffer("ContaminationDiffusionsBuff", typeof(Vector4), _totalMapSize)  // Aligned
+        .WithIntermediateBuffer("TempOutflowsBuff", sizeof(float) * 4, _totalMapSize)
+        .WithIntermediateBuffer("InitialWaterDepthsBuff", sizeof(float), _totalMapSize)
+        .WithIntermediateBuffer("ContaminationsBufferBuff", sizeof(float), _totalMapSize)
+        .WithIntermediateBuffer("ContaminationDiffusionsBuff", sizeof(float) + 4*4, _totalMapSize)
         .WithOutputBuffer("OutflowsBuff", _simulator._waterMap.Outflows)
         .WithOutputBuffer("WaterDepthsBuff", _simulator._waterMap.WaterDepths)
         .WithOutputBuffer("ContaminationsBuff", _simulator._waterContaminationMap.Contaminations)

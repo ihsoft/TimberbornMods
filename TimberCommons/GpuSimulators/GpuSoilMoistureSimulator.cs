@@ -133,9 +133,9 @@ sealed class GpuSoilMoistureSimulator : IGpuSimulatorStats {
         .WithConstantValue("WaterContaminationScaler", _soilMoistureSimulator._waterContaminationScaler)
         // All buffers.
         .WithInputBuffer("PackedInput1", _packedInput1)
-        .WithIntermediateBuffer("LastTickMoistureLevelsBuff", typeof(float), totalMapSize)
-        .WithIntermediateBuffer("WateredNeighboursBuff", typeof(float), totalMapSize)
-        .WithIntermediateBuffer("ClusterSaturationBuff", typeof(float), totalMapSize)
+        .WithIntermediateBuffer("LastTickMoistureLevelsBuff", sizeof(float), totalMapSize)
+        .WithIntermediateBuffer("WateredNeighboursBuff", sizeof(float), totalMapSize)
+        .WithIntermediateBuffer("ClusterSaturationBuff", sizeof(float), totalMapSize)
         .WithOutputBuffer(_moistureLevelsBuff)
         .WithOutputBuffer(_moistureLevelsChangedLastTickBuffer)
         .WithOutputBuffer("WaterEvaporationModifierBuff", _waterEvaporationModifier)
