@@ -9,7 +9,6 @@ using IgorZ.TimberCommons.Common;
 using IgorZ.TimberDev.Utils;
 using TimberApi.ConfiguratorSystem;
 using TimberApi.SceneSystem;
-using Timberborn.EntityPanelSystem;
 
 namespace IgorZ.TimberCommons.WaterService {
 
@@ -26,22 +25,6 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<DirectWaterServiceAccessor>().AsSingleton();
     DirectSoilMoistureSystemAccessor.ResetStaticState();
     containerDefinition.Bind<DirectSoilMoistureSystemAccessor>().AsSingleton();
-    containerDefinition.Bind<WaterSourceFragmentDebug>().AsSingleton();
-    containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
-  }
-
-  sealed class EntityPanelModuleProvider : IProvider<EntityPanelModule> {
-    readonly WaterSourceFragmentDebug _fragment;
-
-    public EntityPanelModuleProvider(WaterSourceFragmentDebug fragment) {
-      _fragment = fragment;
-    }
-
-    public EntityPanelModule Get() {
-      var builder = new EntityPanelModule.Builder();
-      builder.AddBottomFragment(_fragment);
-      return builder.Build();
-    }
   }
 }
 

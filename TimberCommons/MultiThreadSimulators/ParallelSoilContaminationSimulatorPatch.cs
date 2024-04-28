@@ -6,7 +6,7 @@ using HarmonyLib;
 using IgorZ.TimberCommons.GpuSimulators;
 using Timberborn.SoilContaminationSystem;
 
-namespace IgorZ.TimberCommons.WaterService {
+namespace IgorZ.TimberCommons.MultiThreadSimulators {
 
 /// <summary>Intercepts stock game simulation thread to run a custom simulator.</summary>
 [HarmonyPatch(typeof(SoilContaminationSimulator), nameof(SoilContaminationSimulator.TickSimulation))]
@@ -21,10 +21,7 @@ sealed class ParallelSoilContaminationSimulatorPatch {
   // ReSharper disable once UnusedMember.Local
   // ReSharper disable once InconsistentNaming
   static bool Prefix(SoilContaminationSimulator __instance) {
-    if (GpuSimulatorsController.Self.ContaminationSimulatorEnabled) {
-      return true;  // Give GPU a chance.
-    }
-    if (!UsePatchedSimulator) {
+    if (!UsePatchedSimulator || GpuSimulatorsController.Self.ContaminationSimulatorEnabled) {
       return true;
     }
     _patchedSimulator ??= new ParallelSoilContaminationSimulator(__instance);

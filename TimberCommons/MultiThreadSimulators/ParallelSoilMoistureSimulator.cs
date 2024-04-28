@@ -10,7 +10,7 @@ using Timberborn.SoilMoistureSystem;
 using Timberborn.WaterSystem;
 using UnityEngine;
 
-namespace IgorZ.TimberCommons.WaterService {
+namespace IgorZ.TimberCommons.MultiThreadSimulators {
 
 /// <summary>
 /// This class intercepts the stock game simulator calls and runs the logic via thread-pool to get a benefit of multiple

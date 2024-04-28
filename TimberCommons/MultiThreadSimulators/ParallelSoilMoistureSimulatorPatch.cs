@@ -6,8 +6,7 @@ using HarmonyLib;
 using IgorZ.TimberCommons.GpuSimulators;
 using Timberborn.SoilMoistureSystem;
 
-
-namespace IgorZ.TimberCommons.WaterService {
+namespace IgorZ.TimberCommons.MultiThreadSimulators {
 
 /// <summary>Intercepts stock game simulation thread to run a custom simulator.</summary>
 [HarmonyPatch(typeof(SoilMoistureSimulator), nameof(SoilMoistureSimulator.TickSimulation))]
@@ -22,10 +21,7 @@ sealed class ParallelSoilMoistureSimulatorPatch {
   // ReSharper disable once UnusedMember.Local
   // ReSharper disable once InconsistentNaming
   static bool Prefix(SoilMoistureSimulator __instance) {
-    if (GpuSimulatorsController.Self.MoistureSimulatorEnabled) {
-      return true;
-    }
-    if (!UsePatchedSimulator) {
+    if (!UsePatchedSimulator || GpuSimulatorsController.Self.MoistureSimulatorEnabled) {
       return true;
     }
     _patchedSimulator ??= new ParallelSoilMoistureSimulator(__instance);

@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using IgorZ.TimberCommons.GpuSimulators;
+using IgorZ.TimberCommons.MultiThreadSimulators;
 using IgorZ.TimberDev.UI;
 using TimberApi.UiBuilderSystem;
 using Timberborn.BaseComponentSystem;
@@ -10,7 +11,7 @@ using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
 using UnityEngine.UIElements;
 
-namespace IgorZ.TimberCommons.WaterService {
+namespace IgorZ.TimberCommons.CommonUI {
 
 sealed class WaterSourceFragmentDebug : IEntityPanelFragment {
   readonly UIBuilder _builder;

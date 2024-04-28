@@ -3,9 +3,10 @@
 // License: Public Domain
 
 using HarmonyLib;
+using IgorZ.TimberCommons.GpuSimulators;
 using Timberborn.WaterSystem;
 
-namespace IgorZ.TimberCommons.WaterService {
+namespace IgorZ.TimberCommons.MultiThreadSimulators {
 
 /// <summary>Intercepts stock game simulation thread to run a custom simulator.</summary>
 [HarmonyPatch(typeof(WaterSimulator), nameof(WaterSimulator.ProcessSimulation))]
@@ -20,7 +21,7 @@ sealed class ParallelWaterSimulatorPatch {
   // ReSharper disable once UnusedMember.Local
   // ReSharper disable once InconsistentNaming
   static bool Prefix(WaterSimulator __instance) {
-    if (!UsePatchedSimulator) {
+    if (!UsePatchedSimulator || GpuSimulatorsController.Self.WaterSimulatorEnabled) {
       return true;
     }
     _patchedSimulator ??= new ParallelWaterSimulator(__instance);
