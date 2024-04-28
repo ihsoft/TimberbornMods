@@ -41,7 +41,7 @@ StructuredBuffer<InputStruct1> PackedInput1;
 #define FullMoistureBarriers(index) (PackedInput1[index].BitmapFlags & InputStruct1::AboveMoistureBarrierBit)
 
 // OUTPUT: fetch on every dispatch.
-RWStructuredBuffer<float> MoistureLevelsBuff;  // Init once.
+RWStructuredBuffer<float> MoistureLevelsBuff;  // Init once. TimberCommons doesn't like it.
 RWStructuredBuffer<float> WaterEvaporationModifierBuff;
 AppendStructuredBuffer<int> MoistureLevelsChangedLastTickBuff;
 
@@ -58,13 +58,12 @@ RWStructuredBuffer<int> ClusterSaturationBuff;
 #define WateredNeighbours(index) WateredNeighboursBuff[index]
 
 // Execution chain:
-// SavePreviousState999(in MoistureLevels, out LastTickMoistureLevels)
-// CountWateredNeighbors(in LastTickMoistureLevels, in WaterDepth, out WateredNeighbours)
+// SavePreviousState(in MoistureLevels, out LastTickMoistureLevels)
+// CountWateredNeighbors(in LastTickMoistureLevels, in PackedInput1, out WateredNeighbours)
 // CalculateClusterSaturationAndWaterEvaporation(
-//     in WaterDepth, in WateredNeighbours, out ClusterSaturation, out WaterEvaporationModifier)
-// CalculateMoisture(in AboveMoistureBarriers, in FullMoistureBarriers, in UnsafeCellHeight, in LastTickMoistureLevels,
-//     in WaterDepth, in Contamination, in CeiledWaterHeight, in ClusterSaturation,
-//     out MoistureLevels,
+//     in PackedInput1, in WateredNeighbours, out ClusterSaturation, out WaterEvaporationModifier)
+// CalculateMoisture(
+//     in PackedInput1, in LastTickMoistureLevels, in ClusterSaturation, out MoistureLevels)
 
 // Forward functions declarations.
 float GetUpdatedMoisture(int index);
