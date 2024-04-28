@@ -19,6 +19,7 @@ sealed class WaterSourceFragmentDebug : IEntityPanelFragment {
   Toggle _useMultiThreadSimulationToggle;
   Toggle _useGpuForContaminationSimulator;
   Toggle _useGpuForMoistureSimulation;
+  Toggle _useGpuForWaterSimulation;
   
   public WaterSourceFragmentDebug(UIBuilder builder) {
     _builder = builder;
@@ -45,11 +46,18 @@ sealed class WaterSourceFragmentDebug : IEntityPanelFragment {
         _ => {
           GpuSimulatorsController.Self.EnableSoilMoistureSim(_useGpuForMoistureSimulation.value);
         });
+    _useGpuForWaterSimulation = _builder.Presets().Toggles()
+        .CheckmarkInverted(text: "Water simulation on GPU", color: UiFactory.PanelNormalColor);
+    _useGpuForWaterSimulation.RegisterValueChangedCallback(
+        _ => {
+          GpuSimulatorsController.Self.EnableWaterSimulator(_useGpuForWaterSimulation.value);
+        });
 
     _root = _builder.CreateFragmentBuilder()
         .AddComponent(_useMultiThreadSimulationToggle)
         .AddComponent(_useGpuForContaminationSimulator)
         .AddComponent(_useGpuForMoistureSimulation)
+        .AddComponent(_useGpuForWaterSimulation)
         .BuildAndInitialize();
     _root.ToggleDisplayStyle(visible: false);
     return _root;

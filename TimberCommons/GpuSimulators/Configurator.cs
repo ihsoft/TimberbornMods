@@ -16,11 +16,13 @@ sealed class Configurator : IConfigurator {
     HarmonyPatcher.PatchRepeated(
         GetType().AssemblyQualifiedName,
         typeof(SoilContaminationSimulatorTickSimulationPatch),
-        typeof(SoilMoistureSimulatorTickSimulationPatch));
+        typeof(SoilMoistureSimulatorTickSimulationPatch),
+        typeof(WaterSimulatorTickSimulationPatch));
 
     containerDefinition.Bind<GpuSimulatorsController>().AsSingleton();
     containerDefinition.Bind<GpuSoilContaminationSimulator>().AsSingleton();
     containerDefinition.Bind<GpuSoilMoistureSimulator>().AsSingleton();
+    containerDefinition.Bind<GpuWaterSimulator>().AsSingleton();
     containerDefinition.Bind<GpuSimulatorsDebuggingPanel>().AsSingleton();
   }
 }
