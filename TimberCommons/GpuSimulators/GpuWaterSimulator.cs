@@ -154,21 +154,23 @@ sealed class GpuWaterSimulator : IGpuSimulatorStats {
             "o:InitialWaterDepthsBuff", "o:ContaminationsBufferBuff")
         .DispatchKernel(
             "UpdateOutflows", mapDataSize,
-            "s:PackedInput1", "s:OutflowsBuff", "s:ContaminationsBuff", "s:WaterDepthsBuff",
+            "s:PackedInput1", "s:WaterDepthsBuff", "s:OutflowsBuff", "s:ContaminationsBuff",
             "o:TempOutflowsBuff")
         .DispatchKernel(
             "UpdateWaterParameters", mapDataSize,
-            "s:PackedInput1", "s:WaterDepthsBuff", "s:ContaminationsBuff",
-            "i:TempOutflowsBuff", "i:InitialWaterDepthsBuff", "i:ContaminationsBufferBuff",
+            "s:PackedInput1", "s:WaterDepthsBuff", "s:ContaminationsBuff", "s:OutflowsBuff",
+            "i:TempOutflowsBuff", "i:InitialWaterDepthsBuff",
+            "o:ContaminationsBufferBuff",
             "r:OutflowsBuff", "r:WaterDepthsBuff")
         .DispatchKernel(
             "SimulateContaminationDiffusion1", mapDataSize,
-            "s:PackedInput1",
-            "i:WaterDepthsBuff", "i:TempOutflowsBuff",
+            "s:PackedInput1", "s:WaterDepthsBuff",
+            "i:TempOutflowsBuff",
             "o:ContaminationDiffusionsBuff")
         .DispatchKernel(
             "SimulateContaminationDiffusion2", mapDataSize,
-            "i:WaterDepthsBuff", "i:ContaminationsBufferBuff", "i:ContaminationDiffusionsBuff",
+            "s:WaterDepthsBuff",
+            "i:ContaminationsBufferBuff", "i:ContaminationDiffusionsBuff",
             "r:ContaminationsBuff")
         .Build();
     DebugEx.Warning("*** Shader execution plan:\n{0}", string.Join("\n", _shaderPipeline.GetExecutionPlan()));
