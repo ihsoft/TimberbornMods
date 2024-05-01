@@ -29,7 +29,7 @@ MonoBehaviour:
   m_Name: StageAssetBundles
   m_EditorClassIdentifier: 
   Active: 1
-  AssetBundleBuildOptions: 0
+  AssetBundleBuildOptions: 32
   buildTarget: 5
   recurseDirectories: 0
   simulate: 0

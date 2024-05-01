@@ -116,7 +116,7 @@ sealed class GpuWaterSimulator : IGpuSimulatorStats {
         // Simulation settings.
         // Common.
         .WithConstantValue("Stride", _mapIndexService.Stride)
-        .WithConstantValue("DeltaTime", Time.fixedDeltaTime * waterSimulationSettings.TimeScale)//FIXME: every frame?
+        .WithConstantValue("DeltaTime", Time.fixedDeltaTime * waterSimulationSettings.TimeScale)
         .WithConstantValue("MaxContamination", WaterSimulator.MaxContamination)
         // WaterSimulationSettings
         .WithConstantValue("FastEvaporationDepthThreshold", waterSimulationSettings.FastEvaporationDepthThreshold)
@@ -139,7 +139,6 @@ sealed class GpuWaterSimulator : IGpuSimulatorStats {
         .WithConstantValue("DiffusionRate", waterContaminationSimulationSettings.DiffusionRate)
         // All buffers.
         .WithInputBuffer("PackedInput1", _packedInput1)
-        //FIXME: use actual types? or fuck it?
         .WithIntermediateBuffer("TempOutflowsBuff", sizeof(float) * 4, _totalMapSize)
         .WithIntermediateBuffer("InitialWaterDepthsBuff", sizeof(float), _totalMapSize)
         .WithIntermediateBuffer("ContaminationsBufferBuff", sizeof(float), _totalMapSize)

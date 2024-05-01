@@ -184,6 +184,7 @@ sealed class GpuSoilMoistureSimulator : IGpuSimulatorStats {
   void FlushOutputData() {
     var sim = _soilMoistureSimulator;
     for (var index = sim.MoistureLevels.Length - 1; index >= 0; index--) {
+      //FIXME: maybe write it directly?
       sim._waterService.SetWaterEvaporationModifier(index, _waterEvaporationModifier[index]);
     }
     for (var i = _moistureLevelsChangedLastTickBuffer.DataLength - 1; i >= 0; i--) {
