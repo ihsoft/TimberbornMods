@@ -186,7 +186,7 @@
       <Reference Include="System.Collections.Immutable, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
         <HintPath>..\Dependencies\Timberborn\System.Collections.Immutable.dll</HintPath>
       </Reference>
-      <Reference Include="TimberApi, Version=0.6.2.0, Culture=neutral, PublicKeyToken=null">
+      <Reference Include="TimberApi, Version=0.6.3.1, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\TimberApi.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.AssetSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
@@ -294,9 +294,6 @@
       <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Unity\UnityEngine.CoreModule.dll</HintPath>
       </Reference>
-      <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\..\..\Unity\UnityDev_LogConsole\Dependencies\Unity\UnityEngine.IMGUIModule.dll</HintPath>
-      </Reference>
       <Reference Include="UnityEngine.ParticleSystemModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Unity\UnityEngine.ParticleSystemModule.dll</HintPath>
       </Reference>
@@ -324,14 +321,8 @@
       <Reference Include="..\Dependencies\Timberborn\Timberborn.Growing.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.GrowingUI.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.WorkshopsUI.dll" Publicize="true" />
-      <Reference Include="Timberborn.TerrainSystem" Publicize="true" />
-      <Reference Include="Timberborn.BeaverContaminationSystem" Publicize="true" />
-    </ItemGroup>
-    <ItemGroup>
-      <ProjectReference Include="..\..\..\Unity\UnityDev_LogConsole\Source\UnityDev_LogConsole.csproj">
-        <Project>{55ad3765-51b3-4294-86f7-b6909c764ba3}</Project>
-        <Name>UnityDev_LogConsole</Name>
-      </ProjectReference>
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.TerrainSystem.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.BeaverContaminationSystem.dll" Publicize="true" />
     </ItemGroup>
     <ItemGroup>
       <ClInclude Include="..\UnityProject\Assets\TimberCommons\Shaders\SoilContaminationSimulatorShaderPacked.compute">
