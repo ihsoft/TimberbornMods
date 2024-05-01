@@ -117,6 +117,7 @@ sealed class GpuWaterSimulator : IGpuSimulatorStats {
         // Common.
         .WithConstantValue("Stride", _mapIndexService.Stride)
         .WithConstantValue("DeltaTime", Time.fixedDeltaTime * waterSimulationSettings.TimeScale)//FIXME: every frame?
+        .WithConstantValue("MaxContamination", WaterSimulator.MaxContamination)
         // WaterSimulationSettings
         .WithConstantValue("FastEvaporationDepthThreshold", waterSimulationSettings.FastEvaporationDepthThreshold)
         .WithConstantValue("FastEvaporationSpeed", waterSimulationSettings.FastEvaporationSpeed)

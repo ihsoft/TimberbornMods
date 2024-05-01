@@ -15,7 +15,7 @@
 // Constants. Set the values only once.
 uint Stride;
 float DeltaTime;
-float MaxContamination = 1;
+float MaxContamination;
 
 // WaterSimulationSettings
 float FastEvaporationDepthThreshold;
