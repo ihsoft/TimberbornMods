@@ -104,13 +104,12 @@
       <Compile Include="CommonUIPatches\ManufactoryDescriberGetInputsPatch.cs" />
       <Compile Include="CommonUIPatches\ManufactoryInventoryFragmentInitializeFragmentPatch.cs" />
       <Compile Include="CommonUIPatches\ManufactoryInventoryFragmentUpdateFragmentPatch.cs" />
-      <Compile Include="CommonUI\Configurator.cs" />
-      <Compile Include="CommonUI\WaterSourceFragmentDebug.cs" />
       <Compile Include="Common\Configurator.cs" />
       <Compile Include="Common\Features.cs" />
       <Compile Include="Common\IConsumptionRateFormatter.cs" />
       <Compile Include="Common\ISupplyLeftProvider.cs" />
       <Compile Include="GpuSimulators\Configurator.cs" />
+      <Compile Include="GpuSimulators\DebugUiFragment.cs" />
       <Compile Include="GpuSimulators\GpuSimulatorsController.cs" />
       <Compile Include="GpuSimulators\GpuSimulatorsDebuggingPanel.cs" />
       <Compile Include="GpuSimulators\GpuSoilMoistureSimulator.cs" />
@@ -136,6 +135,7 @@
       <Compile Include="MultiThreadSimulators\ParallelSoilMoistureSimulatorPatch.cs" />
       <Compile Include="MultiThreadSimulators\ParallelWaterSimulator.cs" />
       <Compile Include="MultiThreadSimulators\ParallelWaterSimulatorPatch.cs" />
+      <Compile Include="MultiThreadSimulators\DebugUiFragment.cs" />
       <Compile Include="Properties\AssemblyInfo.cs" />
       <Compile Include="IrrigationSystemUI\Configurator.cs" />
       <Compile Include="IrrigationSystemUI\IrrigationTowerFragment.cs" />

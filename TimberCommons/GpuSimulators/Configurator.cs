@@ -6,6 +6,7 @@ using Bindito.Core;
 using IgorZ.TimberDev.Utils;
 using TimberApi.ConfiguratorSystem;
 using TimberApi.SceneSystem;
+using Timberborn.EntityPanelSystem;
 
 namespace IgorZ.TimberCommons.GpuSimulators {
 
@@ -24,6 +25,23 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<GpuSoilMoistureSimulator>().AsSingleton();
     containerDefinition.Bind<GpuWaterSimulator>().AsSingleton();
     containerDefinition.Bind<GpuSimulatorsDebuggingPanel>().AsSingleton();
+
+    containerDefinition.Bind<DebugUiFragment>().AsSingleton();
+    containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
+  }
+
+  sealed class EntityPanelModuleProvider : IProvider<EntityPanelModule> {
+    readonly DebugUiFragment _fragment;
+
+    public EntityPanelModuleProvider(DebugUiFragment fragment) {
+      _fragment = fragment;
+    }
+
+    public EntityPanelModule Get() {
+      var builder = new EntityPanelModule.Builder();
+      builder.AddBottomFragment(_fragment);
+      return builder.Build();
+    }
   }
 }
 

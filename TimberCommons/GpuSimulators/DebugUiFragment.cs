@@ -2,8 +2,6 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using IgorZ.TimberCommons.GpuSimulators;
-using IgorZ.TimberCommons.MultiThreadSimulators;
 using IgorZ.TimberDev.UI;
 using TimberApi.UiBuilderSystem;
 using Timberborn.BaseComponentSystem;
@@ -11,30 +9,22 @@ using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
 using UnityEngine.UIElements;
 
-namespace IgorZ.TimberCommons.CommonUI {
+namespace IgorZ.TimberCommons.GpuSimulators {
 
-sealed class WaterSourceFragmentDebug : IEntityPanelFragment {
+// ReSharper disable once ClassNeverInstantiated.Global
+sealed class DebugUiFragment : IEntityPanelFragment {
   readonly UIBuilder _builder;
   
   VisualElement _root;
-  Toggle _useMultiThreadSimulationToggle;
   Toggle _useGpuForContaminationSimulator;
   Toggle _useGpuForMoistureSimulation;
   Toggle _useGpuForWaterSimulation;
   
-  public WaterSourceFragmentDebug(UIBuilder builder) {
+  public DebugUiFragment(UIBuilder builder) {
     _builder = builder;
   }
 
   public VisualElement InitializeFragment() {
-    _useMultiThreadSimulationToggle = _builder.Presets().Toggles()
-        .CheckmarkInverted(text: "Multi-thread water simulation", color: UiFactory.PanelNormalColor);
-    _useMultiThreadSimulationToggle.RegisterValueChangedCallback(
-        _ => {
-          ParallelWaterSimulatorPatch.UsePatchedSimulator = _useMultiThreadSimulationToggle.value;
-          ParallelSoilMoistureSimulatorPatch.UsePatchedSimulator = _useMultiThreadSimulationToggle.value;
-          ParallelSoilContaminationSimulatorPatch.UsePatchedSimulator = _useMultiThreadSimulationToggle.value;
-        });
     _useGpuForContaminationSimulator = _builder.Presets().Toggles()
         .CheckmarkInverted(text: "Simulate soil contamination on GPU", color: UiFactory.PanelNormalColor);
     _useGpuForContaminationSimulator.RegisterValueChangedCallback(
@@ -55,7 +45,6 @@ sealed class WaterSourceFragmentDebug : IEntityPanelFragment {
         });
 
     _root = _builder.CreateFragmentBuilder()
-        .AddComponent(_useMultiThreadSimulationToggle)
         .AddComponent(_useGpuForContaminationSimulator)
         .AddComponent(_useGpuForMoistureSimulation)
         .AddComponent(_useGpuForWaterSimulation)
@@ -75,4 +64,5 @@ sealed class WaterSourceFragmentDebug : IEntityPanelFragment {
   public void UpdateFragment() {
   }
 }
+
 }
