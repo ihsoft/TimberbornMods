@@ -1,3 +1,6 @@
+# v1.8.5 (2 May 2024):
+* Experimental version for Mutli-threaded and GPU simulators.
+
 # v1.7.3 (22 Mar 2024):
 * [Fix #37] Water tower with zero coverage consumes water.
 * [Fix #43] Water towers override the highlighted range of other buildings.
