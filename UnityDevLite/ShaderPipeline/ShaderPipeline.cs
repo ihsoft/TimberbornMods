@@ -10,6 +10,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Timberborn.Common;
+using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -120,15 +121,36 @@ public sealed class ShaderPipeline {
   /// </remarks>
   public void RunBlocking() {
     var stopwatch = Stopwatch.StartNew();
-    _executionLog?.Records.AddRange(_constantsLog);
+    _executionLog?.Records.AddRange(_parametersLog);
+
+    _executionLog?.RecordPushDataToGpu(_allSources.Count);
     for (var i = _allSources.Count - 1; i >= 0; i--) {
       _allSources[i].PushToGpu(_executionLog);
     }
+
     var queueSize = _dispatchQueue.Count;
     for (var index = 0; index < queueSize; index++) {
       var kernel = _dispatchQueue[index];
       RecordKernelStart(_executionLog, kernel);
+      for (var i = kernel.Sources.Count - 1; i >= 0; i--) {
+        var buffer = kernel.Sources[i];
+        _executionLog?.RecordSetupBuffer("source", buffer);
+        Shader.SetBuffer(kernel.Index, buffer.Name, buffer.Buffer);
+      }
+      for (var i = kernel.Inputs.Count - 1; i >= 0; i--) {
+        var buffer = kernel.Inputs[i];
+        _executionLog?.RecordSetupBuffer("input", buffer);
+        Shader.SetBuffer(kernel.Index, buffer.Name, buffer.Buffer);
+      }
+      for (var i = kernel.Outputs.Count - 1; i >= 0; i--) {
+        var buffer = kernel.Outputs[i];
+        _executionLog?.RecordSetupBuffer("output", buffer);
+        Shader.SetBuffer(kernel.Index, buffer.Name, buffer.Buffer);
+      }
       for (var i = kernel.Results.Count - 1; i >= 0; i--) {
+        var buffer = kernel.Results[i];
+        _executionLog?.RecordSetupBuffer("result", buffer);
+        Shader.SetBuffer(kernel.Index, buffer.Name, buffer.Buffer);
         kernel.Results[i].Initialize(_executionLog);
       }
       var executionSize = GetExecutionSize(kernel);
@@ -137,18 +159,14 @@ public sealed class ShaderPipeline {
       } else {
         Shader.Dispatch(kernel.Index, executionSize.x, executionSize.y, executionSize.z);
       }
-      foreach (var buffer in kernel.Results) {
-        buffer.PullFromGpu(_executionLog);
-      }
-      foreach (var buffer in kernel.Outputs) {
-        if (_executionLog != null) {
-          RecordWaitForBuffer(_executionLog, buffer);
-        } else {
-          AsyncGPUReadback.Request(buffer.Buffer).WaitForCompletion(); //FIXME to abstract?
-        }
-      }
       RecordKernelEnd(_executionLog, kernel);
     }
+
+    _executionLog?.RecordPullDataFromGpu(_allResults.Count);
+    for (var index = _allResults.Count - 1; index >= 0; index--) {
+      _allResults[index].PullFromGpu(_executionLog);
+    }
+
     stopwatch.Stop();
     LastRunDuration = stopwatch.Elapsed;
   }
@@ -214,7 +232,7 @@ public sealed class ShaderPipeline {
     }
 
     /// <summary>Binds a buffer that is used internally by the kernels or is handled outside of the pipeline.</summary>
-    /// <remarks>It's a syntax sugar for <see cref="WithIntermediateBuffer(IAbstractBuffer)"/> method.</remarks>
+    /// <remarks>It's a syntax sugar for <see cref="WithIntermediateBuffer(BaseBuffer)"/> method.</remarks>
     /// <param name="name">The name as specified in the shader.</param>
     /// <param name="stride">Size of the item in the buffer.</param>
     /// <param name="count">Number of elements in the buffer.</param>
@@ -230,7 +248,7 @@ public sealed class ShaderPipeline {
     /// data still can be transferred, but this should be done by the client's code.
     /// </remarks>
     /// <param name="buffer">The buffer to use for state completion checking.</param>
-    public Builder WithIntermediateBuffer(IAbstractBuffer buffer) {
+    public Builder WithIntermediateBuffer(BaseBuffer buffer) {
       AddNewBufferName(buffer.Name);
       _intermediateBuffers.Add(buffer.Name, buffer);
       return this;
@@ -251,7 +269,7 @@ public sealed class ShaderPipeline {
     /// <param name="buffer">The buffer to add.</param>
     /// <seealso cref="SimpleBuffer{T}"/>
     /// <seealso cref="AppendBuffer{T}"/>
-    public Builder WithOutputBuffer(IAbstractBuffer buffer) {
+    public Builder WithOutputBuffer(BaseBuffer buffer) {
       AddNewBufferName(buffer.Name);
       _outputBuffers.Add(buffer.Name, buffer);
       return this;
@@ -301,7 +319,7 @@ public sealed class ShaderPipeline {
       foreach (var bufferDef in buffersDefs) {
         var prefix = bufferDef.Substring(0, 2);
         var name = bufferDef.Substring(2);
-        IAbstractBuffer buffer;
+        BaseBuffer buffer;
         if (prefix == "s:") {
           buffer = GetInDependency(name);
           kernel.Sources.Add(buffer);
@@ -317,7 +335,6 @@ public sealed class ShaderPipeline {
         } else {
           throw new ArgumentException($"Cannot parse buffer declaration: {bufferDef}");
         }
-        _shader.SetBuffer(kernel.Index, name, buffer.Buffer);
         _usedBuffers.Add(name);
       }
       _dispatchQueue.Add(kernel);
@@ -335,11 +352,7 @@ public sealed class ShaderPipeline {
       if (_outputBuffers.Count == 0) {
         throw new InvalidDataException($"At least one output buffer must exist");
       }
-      var allBuffers = new List<IAbstractBuffer>();
-      allBuffers.AddRange(_inputBuffers.Select(x => x.Value));
-      allBuffers.AddRange(_outputBuffers.Select(x => x.Value));
-      allBuffers.AddRange(_intermediateBuffers.Values);
-      return new ShaderPipeline(_shader, _dispatchQueue, allBuffers, _constants);
+      return new ShaderPipeline(_shader, _dispatchQueue, _constants);
     }
 
     #endregion
@@ -349,9 +362,9 @@ public sealed class ShaderPipeline {
     readonly ComputeShader _shader;
     readonly Dictionary<string, object> _constants = new();
     readonly HashSet<string> _allBufferNames = new();
-    readonly Dictionary<string, IAbstractBuffer> _inputBuffers = new();
-    readonly Dictionary<string, IAbstractBuffer> _intermediateBuffers = new();
-    readonly Dictionary<string, IAbstractBuffer> _outputBuffers = new();
+    readonly Dictionary<string, BaseBuffer> _inputBuffers = new();
+    readonly Dictionary<string, BaseBuffer> _intermediateBuffers = new();
+    readonly Dictionary<string, BaseBuffer> _outputBuffers = new();
     readonly List<KernelDecl> _dispatchQueue = new();
     readonly HashSet<string> _usedBuffers = new();
 
@@ -359,14 +372,14 @@ public sealed class ShaderPipeline {
       _shader = shader;
     }
 
-    IAbstractBuffer GetIntermediateBuffer(string name) {
+    BaseBuffer GetIntermediateBuffer(string name) {
       if (!_intermediateBuffers.TryGetValue(name, out var buffer)) {
         throw new ArgumentException($"Intermediate buffer with name '{name}' was not declared");
       }
       return buffer;
     }
 
-    IAbstractBuffer GetInDependency(string name) {
+    BaseBuffer GetInDependency(string name) {
       if (_inputBuffers.TryGetValue(name, out var inputBuffer)) {
         return inputBuffer;
       }
@@ -376,14 +389,14 @@ public sealed class ShaderPipeline {
       throw new ArgumentException($"Input/output buffer with name '{name}' was not declared");
     }
 
-    IAbstractBuffer GetOutputBufferDecl(string name) {
+    BaseBuffer GetOutputBufferDecl(string name) {
       if (!_outputBuffers.TryGetValue(name, out var bufferDecl)) {
         throw new ArgumentException($"Output buffer with name '{name}' was not declared");
       }
       return bufferDecl;
     }
 
-    IAbstractBuffer GetAnyBuffer(string name) {
+    BaseBuffer GetAnyBuffer(string name) {
       if (_inputBuffers.TryGetValue(name, out var inputBuffer)) {
         return inputBuffer;
       }
@@ -406,39 +419,48 @@ public sealed class ShaderPipeline {
     public int Index;
     public Vector3Int DataSize;
     public Vector3Int GroupSize;
-    public readonly List<IAbstractBuffer> Sources = new();
-    public readonly List<IAbstractBuffer> Inputs = new();
-    public readonly List<IAbstractBuffer> Outputs = new();
-    public readonly List<IAbstractBuffer> Results = new();
+    public readonly List<BaseBuffer> Sources = new();
+    public readonly List<BaseBuffer> Inputs = new();
+    public readonly List<BaseBuffer> Outputs = new();
+    public readonly List<BaseBuffer> Results = new();
   }
 
   readonly List<KernelDecl> _dispatchQueue;
-  readonly List<IAbstractBuffer> _allBuffers;
-  readonly List<IAbstractBuffer> _allSources;
-  readonly List<string> _constantsLog = new();
+  readonly List<BaseBuffer> _allBuffers;
+  readonly List<BaseBuffer> _allSources;
+  readonly List<BaseBuffer> _allResults;
+  readonly List<string> _parametersLog = new();
   ExecutionLog _executionLog;
 
-  ShaderPipeline(ComputeShader shader, List<KernelDecl> dispatchQueue, List<IAbstractBuffer> allBuffers,
-                 Dictionary<string, object> constants) {
+  ShaderPipeline(ComputeShader shader, List<KernelDecl> dispatchQueue, Dictionary<string, object> parameters) {
     Shader = shader;
     _dispatchQueue = dispatchQueue;
-    _allBuffers = allBuffers;
-    var allSources = new HashSet<IAbstractBuffer>();
+    var allBuffers = new HashSet<BaseBuffer>();
+    var allSources = new HashSet<BaseBuffer>();
+    var allResults = new HashSet<BaseBuffer>();
     foreach (var kernel in _dispatchQueue) {
       allSources.AddRange(kernel.Sources);
+      allResults.AddRange(kernel.Results);
+      allBuffers.AddRange(kernel.Sources);
+      allBuffers.AddRange(kernel.Inputs);
+      allBuffers.AddRange(kernel.Outputs);
+      allBuffers.AddRange(kernel.Results);
     }
-    _allSources = allSources.OrderByDescending(x => x.Name).ToList();  // We iterate reverse.
-    if (constants.Count > 0) {
-      var ordered = constants.OrderBy(x => x.Key);
-      foreach (var constant in ordered) {
-        _constantsLog.Add($"Constant: {constant.Key} = {constant.Value}");
+    // Order buffers by name to keep execution log consistent. keep in mind that we iterate them in reverse.  
+    _allSources = allSources.OrderByDescending(x => x.Name).ToList();
+    _allResults = allResults.OrderByDescending(x => x.Name).ToList();
+    _allBuffers = allBuffers.ToList();
+    if (parameters.Count > 0) {
+      var ordered = parameters.OrderBy(x => x.Key);
+      foreach (var pair in ordered) {
+        _parametersLog.Add($"Parameter: {pair.Key} = {pair.Value}");
       }
     } else {
-      _constantsLog.Add("No constants in the pipeline");
+      _parametersLog.Add("No parameters in the pipeline");
     }
-    _constantsLog.Add("");
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   static Vector3Int GetExecutionSize(KernelDecl kernel) {
     return new Vector3Int(
         Mathf.CeilToInt((float)kernel.DataSize.x / kernel.GroupSize.x),
@@ -446,23 +468,21 @@ public sealed class ShaderPipeline {
         Mathf.CeilToInt((float)kernel.DataSize.z / kernel.GroupSize.z));
   }
 
-
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   static void RecordKernelStart(ExecutionLog log, KernelDecl kernel) {
     log?.Records.Add("");
     log?.Records.Add(
         $"Kernel #{kernel.Index} ({kernel.Name}): groupSize={kernel.GroupSize}, dataSize={kernel.DataSize}");
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   static void RecordKernelEnd(ExecutionLog log, KernelDecl kernel) {
     log?.Records.Add($"Kernel #{kernel.Index} finished");
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   static void RecordKernelDispatch(ExecutionLog log, KernelDecl kernel, Vector3Int executionSize) {
     log.Records.Add($"Dispatch(size={executionSize})");
-  }
-
-  static void RecordWaitForBuffer(ExecutionLog log, IAbstractBuffer buffer) {
-    log.Records.Add($"Waiting on output buffer '{buffer.Name}'...");
   }
 
   #endregion

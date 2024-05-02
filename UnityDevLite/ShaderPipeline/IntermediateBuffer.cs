@@ -1,5 +1,8 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿// Unity Development tools.
+// Author: igor.zavoychinskiy@gmail.com
+// This software is distributed under Public domain license.
+
+using System;
 using UnityEngine;
 
 // ReSharper disable once CheckNamespace
@@ -7,39 +10,25 @@ namespace UnityDev.Utils.ShaderPipeline {
 
 /// <summary>Container for a buffer that is not used for data transfer between CPu and GPU.</summary>
 /// <remarks>Such buffers are usually internal to the shader and used by kernels to share data.</remarks>
-public sealed class IntermediateBuffer : IAbstractBuffer {
-
-  #region API
-  // ReSharper disable MemberCanBePrivate.Global
+public sealed class IntermediateBuffer : BaseBuffer {
 
   /// <inheritdoc/>
-  public string Name { get; }
+  protected override Array ValuesArray => null;
 
   /// <inheritdoc/>
-  public ComputeBuffer Buffer { get; }
-
-  /// <inheritdoc/>
-  public void Initialize(ExecutionLog executionLog) {
+  public override void Initialize(ExecutionLog executionLog) {
     throw new InvalidOperationException("Unsupported in IntermediateBuffer");
   }
 
   /// <inheritdoc/>
-  public void PushToGpu(ExecutionLog executionLog) {
+  public override void PushToGpu(ExecutionLog executionLog) {
     throw new InvalidOperationException("Unsupported in IntermediateBuffer");
   }
 
   /// <inheritdoc/>
-  public void PullFromGpu(ExecutionLog executionLog) {
+  public override void PullFromGpu(ExecutionLog executionLog) {
     throw new InvalidOperationException("Unsupported in IntermediateBuffer");
   }
-
-  /// <inheritdoc/>
-  public void Dispose() {
-    Buffer.Release();
-  }
-
-  // ReSharper restore MemberCanBePrivate.Global
-  #endregion
 
   /// <summary>Creates a buffer that is not bound to any dara source.</summary>
   /// <param name="name">The name of the buffer as specified in the shader.</param>
@@ -49,7 +38,6 @@ public sealed class IntermediateBuffer : IAbstractBuffer {
     Name = name;
     Buffer = new ComputeBuffer(count, stride);
   }
-
 }
 
 }
