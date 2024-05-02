@@ -134,22 +134,22 @@ public sealed class ShaderPipeline {
       RecordKernelStart(_executionLog, kernel);
       for (var i = kernel.Sources.Count - 1; i >= 0; i--) {
         var buffer = kernel.Sources[i];
-        _executionLog?.RecordSetupBuffer("source", buffer);
+        _executionLog?.RecordSetupBuffer("Source", buffer);
         Shader.SetBuffer(kernel.Index, buffer.Name, buffer.Buffer);
       }
       for (var i = kernel.Inputs.Count - 1; i >= 0; i--) {
         var buffer = kernel.Inputs[i];
-        _executionLog?.RecordSetupBuffer("input", buffer);
+        _executionLog?.RecordSetupBuffer("Input", buffer);
         Shader.SetBuffer(kernel.Index, buffer.Name, buffer.Buffer);
       }
       for (var i = kernel.Outputs.Count - 1; i >= 0; i--) {
         var buffer = kernel.Outputs[i];
-        _executionLog?.RecordSetupBuffer("output", buffer);
+        _executionLog?.RecordSetupBuffer("Output", buffer);
         Shader.SetBuffer(kernel.Index, buffer.Name, buffer.Buffer);
       }
       for (var i = kernel.Results.Count - 1; i >= 0; i--) {
         var buffer = kernel.Results[i];
-        _executionLog?.RecordSetupBuffer("result", buffer);
+        _executionLog?.RecordSetupBuffer("Result", buffer);
         Shader.SetBuffer(kernel.Index, buffer.Name, buffer.Buffer);
         kernel.Results[i].Initialize(_executionLog);
       }

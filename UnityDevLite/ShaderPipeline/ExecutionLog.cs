@@ -40,7 +40,7 @@ public sealed class ExecutionLog {
   /// <summary>Logs a "SetBuffer" operation on the buffer.</summary>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public void RecordSetupBuffer(string group, BaseBuffer baseBuffer) {
-    Records.Add($"SetBuffer '{baseBuffer.Name}' to kernel as {group}");
+    Records.Add($"{group}: SetBuffer '{baseBuffer.Name}' to kernel");
   }
 
   /// <summary>Records a set of "SetData" operations.</summary>
