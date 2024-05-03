@@ -48,17 +48,22 @@ struct WaterFlow
     float Top;
     float Right;
 };
-static WaterFlow DefaultWaterFlow = { 0, 0, 0, 0};
+static WaterFlow DefaultWaterFlow = { 0, 0, 0, 0 };
 
 // This structure must be aligned!
 struct WaterContaminationDiffusion
 {
     float DiffusionFraction;
-    bool CanDiffuseBottom;
-    bool CanDiffuseLeft;
-    bool CanDiffuseTop;
-    bool CanDiffuseRight;
+    uint BitmapFlags;
+    int _unused1; // alignment.
+    int _unused2; // alignment.
+
+    static const uint CanDiffuseBottomBit = 0x0001;
+    static const uint CanDiffuseLeftBit = 0x0002;
+    static const uint CanDiffuseTopBit = 0x0004;
+    static const uint CanDiffuseRightBit = 0x0008;
 };
+static WaterContaminationDiffusion DefaultWaterContaminationDiffusion = { 0, 0, 0, 0 };
 
 // INPUT: Update on every dispatch.
 struct InputStruct1 {
@@ -98,14 +103,14 @@ RWStructuredBuffer<WaterContaminationDiffusion> ContaminationDiffusionsBuff;
 #define ContaminationsBuffer(index) ContaminationsBufferBuff[index]
 
 #define ContaminationDiffusions(index) ContaminationDiffusionsBuff[index]
-#define CheckCanDiffuseBottom(reference) reference.CanDiffuseBottom
-#define CheckCanDiffuseLeft(reference) reference.CanDiffuseLeft
-#define CheckCanDiffuseTop(reference) reference.CanDiffuseTop
-#define CheckCanDiffuseRight(reference) reference.CanDiffuseRight
-#define SetCanDiffuseBottom(reference, value) reference.CanDiffuseBottom = value
-#define SetCanDiffuseTop(reference, value) reference.CanDiffuseTop = value
-#define SetCanDiffuseLeft(reference, value) reference.CanDiffuseLeft = value
-#define SetCanDiffuseRight(reference, value) reference.CanDiffuseRight = value
+#define CheckCanDiffuseBottom(reference) CheckBitmapFlag(reference, WaterContaminationDiffusion::CanDiffuseBottomBit)
+#define CheckCanDiffuseLeft(reference) CheckBitmapFlag(reference, WaterContaminationDiffusion::CanDiffuseLeftBit)
+#define CheckCanDiffuseTop(reference) CheckBitmapFlag(reference, WaterContaminationDiffusion::CanDiffuseTopBit)
+#define CheckCanDiffuseRight(reference) CheckBitmapFlag(reference, WaterContaminationDiffusion::CanDiffuseRightBit)
+#define SetCanDiffuseBottom(reference, value) SetBitmapFlag(reference, WaterContaminationDiffusion::CanDiffuseBottomBit, value)
+#define SetCanDiffuseTop(reference, value) SetBitmapFlag(reference, WaterContaminationDiffusion::CanDiffuseTopBit, value)
+#define SetCanDiffuseLeft(reference, value) SetBitmapFlag(reference, WaterContaminationDiffusion::CanDiffuseLeftBit, value)
+#define SetCanDiffuseRight(reference, value) SetBitmapFlag(reference, WaterContaminationDiffusion::CanDiffuseRightBit, value)
 
 // Execution chain:
 // SavePreviousState(in WaterDepths, in Contaminations, out InitialWaterDepths, out ContaminationsBuffer)
@@ -131,9 +136,9 @@ bool CanDiffuse(float sourceWaterHeight, int targetIndex, float outflowToTarget)
 float CalculateDiffusion(float sourceContamination, float sourceWaterDepth, int targetIndex, float diffusionFraction);
 float GetContaminationDiffusionChange(int index);
 
-#pragma kernel SavePreviousState995
+#pragma kernel SavePreviousState991
 [numthreads(1024, 1, 1)]
-void SavePreviousState995(uint3 id : SV_DispatchThreadID)
+void SavePreviousState991(uint3 id : SV_DispatchThreadID)
 {
     InitialWaterDepths(id.x) = WaterDepths(id.x);
     ContaminationsBuffer(id.x) = Contaminations(id.x);
@@ -392,7 +397,7 @@ void SimulateContaminationMovement(int index)
 
 void UpdateDiffusion(int index)
 {
-    WaterContaminationDiffusion reference = { 0, false, false, false, false};
+    WaterContaminationDiffusion reference = DefaultWaterContaminationDiffusion;
     //reference.DiffusionFraction = 0;
     if (!ImpermeableSurfaceServicePartialObstacles(index))
     {

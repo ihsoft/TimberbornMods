@@ -39,7 +39,7 @@ sealed class GpuWaterSimulator {
   /// <summary>Sets up shader related stuff. Must be called when teh stock simulator is already set.</summary>
   public void Initialize() {
     SetupShader();
-  } 
+  }
 
   /// <summary>Executes the logic and updates the stock simulators with the processed data.</summary>
   public void TickPipeline() {
@@ -151,7 +151,7 @@ sealed class GpuWaterSimulator {
         .WithOutputBuffer("ContaminationsBuff", _simulator._waterContaminationMap.Contaminations)
         // The kernel chain! They will execute in the order they are declared.
         .DispatchKernel(
-            "SavePreviousState995", new Vector3Int(_totalMapSize, 1, 1),
+            "SavePreviousState991", new Vector3Int(_totalMapSize, 1, 1),
             "s:WaterDepthsBuff", "s:ContaminationsBuff",
             "o:InitialWaterDepthsBuff", "o:ContaminationsBufferBuff")
         .DispatchKernel(
