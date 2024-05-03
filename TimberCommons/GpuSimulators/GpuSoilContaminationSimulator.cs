@@ -23,16 +23,13 @@ namespace IgorZ.TimberCommons.GpuSimulators {
 /// `FixedUpdate` method. The stock code is not used at all!
 /// </remarks>
 /// <seealso cref="SoilContaminationSimulatorTickSimulationPatch"/>
-sealed class GpuSoilContaminationSimulator : IGpuSimulatorStats {
+sealed class GpuSoilContaminationSimulator {
 
   const string SimulatorShaderName = "igorz.timbercommons/shaders/SoilContaminationSimulatorShaderPacked";
 
   readonly SoilContaminationSimulator _soilContaminationSimulator;
   readonly IResourceAssetLoader _resourceAssetLoader;
   readonly MapIndexService _mapIndexService;
-
-  readonly ValueSampler _shaderPerfSampler = new(10);
-  readonly ValueSampler _totalSimPerfSampler = new(10);
 
   #region API
 
@@ -52,7 +49,29 @@ sealed class GpuSoilContaminationSimulator : IGpuSimulatorStats {
   }
   bool _isEnabled;
 
+  public void Initialize() {
+    SetupShader();
+  }
+
+  public void TickPipeline() {
+    _stopwatch.Restart();
+
+    PrepareInputData();
+    _shaderPipeline.RunBlocking();
+    FlushOutputData();
+
+    _stopwatch.Stop();
+    TotalSimPerfSampler.AddSample(_stopwatch.Elapsed.TotalSeconds);
+    ShaderPerfSampler.AddSample(_shaderPipeline.LastRunDuration.TotalSeconds);
+  }
+  readonly Stopwatch _stopwatch = new();
+
+  internal readonly ValueSampler ShaderPerfSampler = new(10);
+  internal readonly ValueSampler TotalSimPerfSampler = new(10);
+
   #endregion
+
+  #region Implementation
 
   ShaderPipeline _shaderPipeline;
 
@@ -82,7 +101,7 @@ sealed class GpuSoilContaminationSimulator : IGpuSimulatorStats {
   SimpleBuffer<float> _contaminationCandidatesBuffer;
   SimpleBuffer<float> _contaminationLevelsBuffer;
 
-  public void Initialize() {
+  void SetupShader() {
     var simulationSettings = _soilContaminationSimulator._soilContaminationSimulationSettings;
     var totalMapSize = _mapIndexService.TotalMapSize;
     var mapDataSize = new Vector3Int(_mapIndexService.MapSize.x, _mapIndexService.MapSize.y, 1);
@@ -136,19 +155,6 @@ sealed class GpuSoilContaminationSimulator : IGpuSimulatorStats {
         .Build();
   }
 
-  public void TickPipeline() {
-    var stopwatch = Stopwatch.StartNew();
-
-    PrepareInputData();
-    _shaderPipeline.RunBlocking();
-    FlushOutputData();
-
-    stopwatch.Stop();
-    _totalSimPerfSampler.AddSample(stopwatch.Elapsed.TotalSeconds);
-    stopwatch.Reset();
-    _shaderPerfSampler.AddSample(_shaderPipeline.LastRunDuration.TotalSeconds);
-  }
-
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void PrepareInputData() {
     var sim = _soilContaminationSimulator;
@@ -182,18 +188,6 @@ sealed class GpuSoilContaminationSimulator : IGpuSimulatorStats {
   void DisableSimulator() {
     DebugEx.Warning("*** Disabling GPU sim-2");
     _contaminationCandidatesBuffer.PullFromGpu(null);
-  }
-
-  #region GpuSimulatorStats
-
-  /// <inheritdoc/>
-  public (double min, double max, double avg, double mean) GetShaderStats() {
-    return _shaderPerfSampler.GetStats();
-  }
-
-  /// <inheritdoc/>
-  public (double min, double max, double avg, double mean) GetTotalStats() {
-    return _totalSimPerfSampler.GetStats();
   }
 
   #endregion

@@ -120,7 +120,7 @@ public sealed class ShaderPipeline {
   /// flushed.
   /// </remarks>
   public void RunBlocking() {
-    var stopwatch = Stopwatch.StartNew();
+    _stopwatch.Restart();
     _executionLog?.Records.AddRange(_parametersLog);
 
     _executionLog?.RecordPushDataToGpu(_allSources.Count);
@@ -167,9 +167,10 @@ public sealed class ShaderPipeline {
       _allResults[index].PullFromGpu(_executionLog);
     }
 
-    stopwatch.Stop();
-    LastRunDuration = stopwatch.Elapsed;
+    _stopwatch.Stop();
+    LastRunDuration = _stopwatch.Elapsed;
   }
+  readonly Stopwatch _stopwatch = new();
 
   /// <summary>Returns a trace of what the pipeline would execute.</summary>
   /// <remarks>No actual changes to the buffers or kernels are made.</remarks>

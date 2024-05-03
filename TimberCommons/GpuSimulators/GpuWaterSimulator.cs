@@ -15,7 +15,7 @@ using Object = UnityEngine.Object;
 
 namespace IgorZ.TimberCommons.GpuSimulators {
 
-sealed class GpuWaterSimulator : IGpuSimulatorStats {
+sealed class GpuWaterSimulator {
 
   #region API
 
@@ -43,7 +43,7 @@ sealed class GpuWaterSimulator : IGpuSimulatorStats {
 
   /// <summary>Executes the logic and updates the stock simulators with the processed data.</summary>
   public void TickPipeline() {
-    var stopwatch = Stopwatch.StartNew();
+    _stopwatch.Restart();
 
     // Constant staring part from the original sim.
     _simulator._deltaTime = _simulator._fixedDeltaTime * _simulator._waterSimulationSettings.TimeScale;
@@ -55,13 +55,17 @@ sealed class GpuWaterSimulator : IGpuSimulatorStats {
     FlushOutputData();
 
     // Constant ending part from the original sim.
+    // FIXME: Can be in shader too.
     _simulator._transientWaterMap.Refresh();
 
-    stopwatch.Stop();
-    _totalSimPerfSampler.AddSample(stopwatch.Elapsed.TotalSeconds);
-    stopwatch.Reset();
-    _shaderPerfSampler.AddSample(_shaderPipeline.LastRunDuration.TotalSeconds);
+    _stopwatch.Stop();
+    TotalSimPerfSampler.AddSample(_stopwatch.Elapsed.TotalSeconds);
+    ShaderPerfSampler.AddSample(_shaderPipeline.LastRunDuration.TotalSeconds);
   }
+  readonly Stopwatch _stopwatch = new();
+
+  internal readonly ValueSampler ShaderPerfSampler = new(10);
+  internal readonly ValueSampler TotalSimPerfSampler = new(10);
 
   #endregion
 
@@ -70,11 +74,9 @@ sealed class GpuWaterSimulator : IGpuSimulatorStats {
   const string SimulatorShaderName = "igorz.timbercommons/shaders/WaterSimulatorPacked";
 
   readonly WaterSimulator _simulator;
+  readonly WaterSimulationController _waterSimulationController;
   readonly IResourceAssetLoader _resourceAssetLoader;
   readonly MapIndexService _mapIndexService;
-
-  readonly ValueSampler _shaderPerfSampler = new(10);
-  readonly ValueSampler _totalSimPerfSampler = new(10);
 
   // Inputs.
   // ReSharper disable NotAccessedField.Local
@@ -94,9 +96,10 @@ sealed class GpuWaterSimulator : IGpuSimulatorStats {
   ShaderPipeline _shaderPipeline;
   int _totalMapSize;
 
-  GpuWaterSimulator(WaterSimulator simulator, IResourceAssetLoader resourceAssetLoader,
-                    MapIndexService mapIndexService) {
+  GpuWaterSimulator(WaterSimulator simulator, IWaterSimulationController waterSimulationController,
+                    IResourceAssetLoader resourceAssetLoader, MapIndexService mapIndexService) {
     _simulator = simulator;
+    _waterSimulationController = waterSimulationController as WaterSimulationController;
     _resourceAssetLoader = resourceAssetLoader;
     _mapIndexService = mapIndexService;
   }
@@ -197,24 +200,11 @@ sealed class GpuWaterSimulator : IGpuSimulatorStats {
 
   void EnableSimulator() {
     DebugEx.Warning("*** Enabling water GPU sim-1");
+    DebugEx.Warning("*** sim speed: {0}", _waterSimulationController._simulationSpeed);
   }
 
   void DisableSimulator() {
     DebugEx.Warning("*** Disabling water GPU sim-1");
-  }
-
-  #endregion
-
-  #region GpuSimulatorStats
-
-  /// <inheritdoc/>
-  public (double min, double max, double avg, double mean) GetShaderStats() {
-    return _shaderPerfSampler.GetStats();
-  }
-
-  /// <inheritdoc/>
-  public (double min, double max, double avg, double mean) GetTotalStats() {
-    return _totalSimPerfSampler.GetStats();
   }
 
   #endregion

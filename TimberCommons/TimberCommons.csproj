@@ -114,7 +114,6 @@
       <Compile Include="GpuSimulators\GpuSimulatorsDebuggingPanel.cs" />
       <Compile Include="GpuSimulators\GpuSoilMoistureSimulator.cs" />
       <Compile Include="GpuSimulators\GpuWaterSimulator.cs" />
-      <Compile Include="GpuSimulators\IGpuSimulatorStats.cs" />
       <Compile Include="GpuSimulators\GpuSoilContaminationSimulator.cs" />
       <Compile Include="GpuSimulators\SoilContaminationSimulatorTickSimulationPatch.cs" />
       <Compile Include="GpuSimulators\SoilMoistureSimulatorTickSimulationPatch.cs" />
@@ -323,6 +322,7 @@
       <Reference Include="..\Dependencies\Timberborn\Timberborn.WorkshopsUI.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.TerrainSystem.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.BeaverContaminationSystem.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.SimulationSystem.dll" Publicize="true" />
     </ItemGroup>
     <ItemGroup>
       <ClInclude Include="..\UnityProject\Assets\TimberCommons\Shaders\SoilContaminationSimulatorShaderPacked.compute">

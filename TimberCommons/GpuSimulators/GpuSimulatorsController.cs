@@ -60,25 +60,25 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
   internal string GetStatsText() {
     var text = new List<string>(15);
     if (_contaminationSimulator.IsEnabled) {
-      var (_, _, _, total) = _contaminationSimulator.GetTotalStats();
+      var (_, _, _, total) = _contaminationSimulator.TotalSimPerfSampler. GetStats();
       text.Add($"Soil contamination total: {total * 1000:0.##} ms");
-      var (_, _, _, shader) = _contaminationSimulator.GetShaderStats();
+      var (_, _, _, shader) = _contaminationSimulator.ShaderPerfSampler.GetStats();
       text.Add($"Soil contamination shader: {shader * 1000:0.##} ms");
     } else {
       text.Add("Soil contamination simulation disabled");
     }
     if (_moistureSimulator.IsEnabled) {
-      var (_, _, _, total) = _moistureSimulator.GetTotalStats();
+      var (_, _, _, total) = _moistureSimulator.TotalSimPerfSampler.GetStats();
       text.Add($"Soil moisture total: {total * 1000:0.##} ms");
-      var (_, _, _, shader) = _moistureSimulator.GetShaderStats();
+      var (_, _, _, shader) = _moistureSimulator.ShaderPerfSampler.GetStats();
       text.Add($"Soil moisture shader: {shader * 1000:0.##} ms");
     } else {
       text.Add("Soil moisture simulation disabled");
     }
     if (_waterSimulator.IsEnabled) {
-      var (_, _, _, total) = _waterSimulator.GetTotalStats();
+      var (_, _, _, total) = _waterSimulator.TotalSimPerfSampler.GetStats();
       text.Add($"Water simulator total: {total * 1000:0.##} ms");
-      var (_, _, _, shader) = _waterSimulator.GetShaderStats();
+      var (_, _, _, shader) = _waterSimulator.ShaderPerfSampler.GetStats();
       text.Add($"Water simulator shader: {shader * 1000:0.##} ms");
     } else {
       text.Add("Water simulation disabled");

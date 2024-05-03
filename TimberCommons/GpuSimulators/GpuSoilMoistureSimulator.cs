@@ -14,7 +14,7 @@ using Object = UnityEngine.Object;
 
 namespace IgorZ.TimberCommons.GpuSimulators {
 
-sealed class GpuSoilMoistureSimulator : IGpuSimulatorStats {
+sealed class GpuSoilMoistureSimulator {
 
   #region API
 
@@ -42,17 +42,20 @@ sealed class GpuSoilMoistureSimulator : IGpuSimulatorStats {
 
   /// <summary>Executes the logic and updates the stock simulators with the processed data.</summary>
   public void TickPipeline() {
-    var stopwatch = Stopwatch.StartNew();
+    _stopwatch.Restart();
 
     PrepareInputData();
     _shaderPipeline.RunBlocking();
     FlushOutputData();
 
-    stopwatch.Stop();
-    _totalSimPerfSampler.AddSample(stopwatch.Elapsed.TotalSeconds);
-    stopwatch.Reset();
-    _shaderPerfSampler.AddSample(_shaderPipeline.LastRunDuration.TotalSeconds);
+    _stopwatch.Stop();
+    TotalSimPerfSampler.AddSample(_stopwatch.Elapsed.TotalSeconds);
+    ShaderPerfSampler.AddSample(_shaderPipeline.LastRunDuration.TotalSeconds);
   }
+  readonly Stopwatch _stopwatch = new();
+
+  internal readonly ValueSampler ShaderPerfSampler = new(10);
+  internal readonly ValueSampler TotalSimPerfSampler = new(10);
 
   #endregion
 
@@ -64,9 +67,6 @@ sealed class GpuSoilMoistureSimulator : IGpuSimulatorStats {
   readonly SoilMoistureSimulator _soilMoistureSimulator;
   readonly IResourceAssetLoader _resourceAssetLoader;
   readonly MapIndexService _mapIndexService;
-
-  readonly ValueSampler _shaderPerfSampler = new(10);
-  readonly ValueSampler _totalSimPerfSampler = new(10);
 
   // Inputs.
   // ReSharper disable NotAccessedField.Local
@@ -199,20 +199,6 @@ sealed class GpuSoilMoistureSimulator : IGpuSimulatorStats {
 
   void DisableSimulator() {
     DebugEx.Warning("*** Disabling moisture GPU sim-2");
-  }
-
-  #endregion
-
-  #region GpuSimulatorStats
-
-  /// <inheritdoc/>
-  public (double min, double max, double avg, double mean) GetShaderStats() {
-    return _shaderPerfSampler.GetStats();
-  }
-
-  /// <inheritdoc/>
-  public (double min, double max, double avg, double mean) GetTotalStats() {
-    return _totalSimPerfSampler.GetStats();
   }
 
   #endregion
