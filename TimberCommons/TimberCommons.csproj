@@ -146,6 +146,12 @@
       <Compile Include="WaterValveComponent\Configurator.cs" />
       <Compile Include="WaterValveComponent\WaterValve.cs" />
       <Compile Include="WaterValveComponent\WaterValveFragment.cs" />
+      <Compile Include="WellbeingFirst\Configurator.cs" />
+      <Compile Include="WellbeingFirst\CustomNeedBehaviorService.cs" />
+      <Compile Include="WellbeingFirst\DebugUiFragment.cs" />
+      <Compile Include="WellbeingFirst\DistrictNeedBehaviorServicePatch.cs" />
+      <Compile Include="WellbeingFirst\GetBestNeedBehaviorPatch.cs" />
+      <Compile Include="WellbeingFirst\HaulerWellbeingOptimizer.cs" />
     </ItemGroup>
     <ItemGroup>
       <Reference Include="0Harmony, Version=2.9.0.0, Culture=neutral, PublicKeyToken=null">
@@ -194,6 +200,12 @@
       <Reference Include="Timberborn.BaseComponentSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.BaseComponentSystem.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.Beavers, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.Beavers.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.BehaviorSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.BehaviorSystem.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.BlockSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.BlockSystem.dll</HintPath>
       </Reference>
@@ -208,6 +220,9 @@
       </Reference>
       <Reference Include="Timberborn.BuildingsUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.BuildingsUI.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.Characters, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.Characters.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.Common, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.Common.dll</HintPath>
@@ -227,11 +242,17 @@
       <Reference Include="Timberborn.DebuggingUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.DebuggingUI.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.EnterableSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.EnterableSystem.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.EntityPanelSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.EntityPanelSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.EntitySystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.EntitySystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.GameDistricts, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.GameDistricts.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.Goods, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.Goods.dll</HintPath>
@@ -250,6 +271,12 @@
       </Reference>
       <Reference Include="Timberborn.Navigation, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.Navigation.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.NeedSpecifications, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.NeedSpecifications.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.NeedSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.NeedSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.Particles, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.Particles.dll</HintPath>
@@ -320,9 +347,20 @@
       <Reference Include="..\Dependencies\Timberborn\Timberborn.Growing.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.GrowingUI.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.WorkshopsUI.dll" Publicize="true" />
+      <Reference Include="Timberborn.TerrainSystem" Publicize="true" />
+      <Reference Include="Timberborn.BeaverContaminationSystem" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.TerrainSystem.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.BeaverContaminationSystem.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.SimulationSystem.dll" Publicize="true" />
+
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.NeedSystem.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.BeaverBehavior.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.BehaviorSystem.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.WalkingSystem.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.Carrying.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.RecoveredGoodSystem.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.Attractions.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.NeedBehaviorSystem.dll" Publicize="true" />
     </ItemGroup>
     <ItemGroup>
       <ClInclude Include="..\UnityProject\Assets\TimberCommons\Shaders\SoilContaminationSimulatorShaderPacked.compute">

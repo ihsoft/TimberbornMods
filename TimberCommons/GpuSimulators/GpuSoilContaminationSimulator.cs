@@ -138,7 +138,7 @@ sealed class GpuSoilContaminationSimulator {
         .WithInputBuffer("PackedInput1", _packedInput1)
         .WithIntermediateBuffer(_contaminationCandidatesBuffer)
         .WithIntermediateBuffer("LastTickContaminationCandidates", sizeof(float), totalMapSize)
-        .WithOutputBuffer(_contaminationLevelsBuffer)
+        .WithOutputBuffer("ContaminationLevels", _soilContaminationSimulator.ContaminationLevels)
         .WithOutputBuffer(_contaminationsChangedLastTickBuffer)
         // The kernel chain! They will execute in the order they are declared.
         .DispatchKernel(
@@ -150,7 +150,7 @@ sealed class GpuSoilContaminationSimulator {
             "o:ContaminationCandidates")
         .DispatchKernel(
             "UpdateContaminationsFromCandidates", mapDataSize,
-            "i:ContaminationLevels", "i:ContaminationCandidates",
+            "s:ContaminationLevels", "i:ContaminationCandidates",
             "r:ContaminationLevels", "r:ContaminationsChangedLastTick")
         .Build();
   }
@@ -182,7 +182,6 @@ sealed class GpuSoilContaminationSimulator {
   void EnableSimulator() {
     DebugEx.Warning("*** Enabling GPU sim-2");
     _contaminationCandidatesBuffer.PushToGpu(null);
-    _contaminationLevelsBuffer.PushToGpu(null);
   }
 
   void DisableSimulator() {

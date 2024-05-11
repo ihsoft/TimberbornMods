@@ -43,6 +43,12 @@ sealed class GpuWaterSimulator {
 
   /// <summary>Executes the logic and updates the stock simulators with the processed data.</summary>
   public void TickPipeline() {
+    for (var i = _waterSimulationController._simulationSpeed - 1; i >= 0; i--) {
+      TickPipeline2();
+    }
+  }
+
+  public void TickPipeline2() {
     _stopwatch.Restart();
 
     // Constant staring part from the original sim.

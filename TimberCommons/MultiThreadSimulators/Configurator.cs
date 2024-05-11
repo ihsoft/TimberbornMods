@@ -14,17 +14,17 @@ namespace IgorZ.TimberCommons.MultiThreadSimulators {
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
-    HarmonyPatcher.PatchRepeated(
-        GetType().AssemblyQualifiedName,
-        typeof(ParallelWaterSimulatorPatch),
-        typeof(ParallelSoilMoistureSimulatorPatch),
-        typeof(ParallelSoilContaminationSimulatorPatch));
-    ParallelWaterSimulatorPatch.Initialize();
-    ParallelSoilMoistureSimulatorPatch.Initialize();
-    ParallelSoilContaminationSimulatorPatch.Initialize();
-
-    containerDefinition.Bind<DebugUiFragment>().AsSingleton();
-    containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
+    // HarmonyPatcher.PatchRepeated(
+    //     GetType().AssemblyQualifiedName,
+    //     typeof(ParallelWaterSimulatorPatch),
+    //     typeof(ParallelSoilMoistureSimulatorPatch),
+    //     typeof(ParallelSoilContaminationSimulatorPatch));
+    // ParallelWaterSimulatorPatch.Initialize();
+    // ParallelSoilMoistureSimulatorPatch.Initialize();
+    // ParallelSoilContaminationSimulatorPatch.Initialize();
+    //
+    // containerDefinition.Bind<DebugUiFragment>().AsSingleton();
+    // containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
   }
 
   sealed class EntityPanelModuleProvider : IProvider<EntityPanelModule> {
