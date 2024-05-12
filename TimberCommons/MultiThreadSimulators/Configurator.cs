@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using Bindito.Core;
+using IgorZ.TimberCommons.Common;
 using IgorZ.TimberDev.Utils;
 using TimberApi.ConfiguratorSystem;
 using TimberApi.SceneSystem;
@@ -14,17 +15,21 @@ namespace IgorZ.TimberCommons.MultiThreadSimulators {
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
-    // HarmonyPatcher.PatchRepeated(
-    //     GetType().AssemblyQualifiedName,
-    //     typeof(ParallelWaterSimulatorPatch),
-    //     typeof(ParallelSoilMoistureSimulatorPatch),
-    //     typeof(ParallelSoilContaminationSimulatorPatch));
-    // ParallelWaterSimulatorPatch.Initialize();
-    // ParallelSoilMoistureSimulatorPatch.Initialize();
-    // ParallelSoilContaminationSimulatorPatch.Initialize();
-    //
-    // containerDefinition.Bind<DebugUiFragment>().AsSingleton();
-    // containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
+    if (!Features.ShowMultiThreadedSimulatorsPanel) {
+      return;
+    }
+
+    HarmonyPatcher.PatchRepeated(
+        GetType().AssemblyQualifiedName,
+        typeof(ParallelWaterSimulatorPatch),
+        typeof(ParallelSoilMoistureSimulatorPatch),
+        typeof(ParallelSoilContaminationSimulatorPatch));
+    ParallelWaterSimulatorPatch.Initialize();
+    ParallelSoilMoistureSimulatorPatch.Initialize();
+    ParallelSoilContaminationSimulatorPatch.Initialize();
+
+    containerDefinition.Bind<DebugUiFragment>().AsSingleton();
+    containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
   }
 
   sealed class EntityPanelModuleProvider : IProvider<EntityPanelModule> {

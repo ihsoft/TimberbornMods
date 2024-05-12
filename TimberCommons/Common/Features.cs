@@ -63,6 +63,9 @@ static class Features {
   /// <summary>Specifies whether GPU simulator controls shown be show on the panel.</summary>
   public static bool ShowGpuSimulatorsPanel;
 
+  /// <summary>Specifies whether multi-threaded simulator controls shown be show on the panel.</summary>
+  public static bool ShowMultiThreadedSimulatorsPanel;
+
   /// <summary>Specifies whether haulers and builders should satisfy their needs in priority.</summary>
   /// <remarks>
   /// Normally, beavers go to the storage that is closest to their housing location. With this option enabled, 
@@ -107,6 +110,8 @@ static class Features {
             FeatureController.SetFlag(ref NoContaminationUnderground, name, enabled, value),
         "Physics.ShowGpuSimulatorsPanel" => 
             FeatureController.SetFlag(ref ShowGpuSimulatorsPanel, name, enabled, value),
+        "Physics.ShowMultiThreadedSimulatorsPanel" => 
+            FeatureController.SetFlag(ref ShowMultiThreadedSimulatorsPanel, name, enabled, value),
         "HaulersAndBuilders.EnableOptimization" => 
             FeatureController.SetFlag(ref OptimizeHaulersAndBuilders, name, enabled, value),
         "HaulersAndBuilders.PathDurationDifferenceThreshold" => 

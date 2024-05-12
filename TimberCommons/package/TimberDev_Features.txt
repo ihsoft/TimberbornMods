@@ -38,6 +38,9 @@ CommonQoL.NoContaminationUnderground
 # Specifies whether GPU simulator controls shown be show on the panel.
 Physics.ShowGpuSimulatorsPanel
 
+# Specifies whether multi-threaded simulator controls shown be show on the panel.
+!Physics.ShowMultiThreadedSimulatorsPanel
+
 # Specifies whether haulers and builders should satisfy their needs in priority.
 # Normally, beavers go to the storage that is closest to their housing location. With this option enabled, 
 # they will pick the closest storage relative to their current position that can satisfy hunger or thirst need. The
