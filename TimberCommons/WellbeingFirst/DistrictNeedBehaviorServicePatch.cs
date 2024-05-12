@@ -83,6 +83,7 @@ static class DistrictNeedBehaviorServicePatch {
 
   const float DurationDifferenceThreshold = 1.0f;  // Hours.
 
+  //FIXME: get piosition from optimizer? 
   static (AppraisedAction? action, float durationDelta) GetBestActionForNeed(
       string need, SortedSet<DistrictNeedBehaviorService.AppraisedNeedBehaviorGroup> appraisedNeedBehaviors,
       HaulerWellbeingOptimizer optimizer, Vector3 essentialActionPosition) {
@@ -91,6 +92,9 @@ static class DistrictNeedBehaviorServicePatch {
     var needManager = optimizer.NeedManager;
     var minimumDuration = float.MaxValue;
     var firstDuration = -1f;
+
+    var restrictedGoods = optimizer.RestrictedGoods;
+    
     foreach (var appraisedNeedBehavior in appraisedNeedBehaviors) {
       if (appraisedNeedBehavior.NeedBehaviorGroup.Needs.First() != need) {
         continue;
@@ -105,6 +109,13 @@ static class DistrictNeedBehaviorServicePatch {
         }
         var duration = durationCalculator.DurationWithReturnInHours(actionPos.Value, essentialActionPosition);
         if (duration < minimumDuration) {
+          if (needBehaviorGroup.Needs.Any(x => restrictedGoods.Contains(x))) {
+            //FIXME
+            DebugEx.Warning("*** reject candidate due to good restriction: options={0}, restrictions={1}",
+                DebugEx.C2S(needBehaviorGroup.Needs), DebugEx.C2S(restrictedGoods));
+            continue;  // Optimizer doesn't want this good to be consumed.
+          }
+
           bestActionForNeed = new AppraisedAction(needBehavior, needBehaviorGroup.Needs, appraisedNeedBehavior.Points);
           minimumDuration = duration;
           if (firstDuration < 0) {

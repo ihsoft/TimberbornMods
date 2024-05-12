@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using Bindito.Core;
+using IgorZ.TimberCommons.Common;
 using IgorZ.TimberDev.Utils;
 using TimberApi.ConfiguratorSystem;
 using TimberApi.SceneSystem;
@@ -14,20 +15,24 @@ namespace IgorZ.TimberCommons.GpuSimulators {
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
-    // HarmonyPatcher.PatchRepeated(
-    //     GetType().AssemblyQualifiedName,
-    //     typeof(SoilContaminationSimulatorTickSimulationPatch),
-    //     typeof(SoilMoistureSimulatorTickSimulationPatch),
-    //     typeof(WaterSimulatorTickSimulationPatch));
-    //
-    // containerDefinition.Bind<GpuSimulatorsController>().AsSingleton();
-    // containerDefinition.Bind<GpuSoilContaminationSimulator>().AsSingleton();
-    // containerDefinition.Bind<GpuSoilMoistureSimulator>().AsSingleton();
-    // containerDefinition.Bind<GpuWaterSimulator>().AsSingleton();
-    // containerDefinition.Bind<GpuSimulatorsDebuggingPanel>().AsSingleton();
-    //
-    // containerDefinition.Bind<DebugUiFragment>().AsSingleton();
-    // containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
+    if (!Features.ShowGpuSimulatorsPanel) {
+      return;
+    }
+
+    HarmonyPatcher.PatchRepeated(
+        GetType().AssemblyQualifiedName,
+        typeof(SoilContaminationSimulatorTickSimulationPatch),
+        typeof(SoilMoistureSimulatorTickSimulationPatch),
+        typeof(WaterSimulatorTickSimulationPatch));
+
+    containerDefinition.Bind<GpuSimulatorsController>().AsSingleton();
+    containerDefinition.Bind<GpuSoilContaminationSimulator>().AsSingleton();
+    containerDefinition.Bind<GpuSoilMoistureSimulator>().AsSingleton();
+    containerDefinition.Bind<GpuWaterSimulator>().AsSingleton();
+    containerDefinition.Bind<GpuSimulatorsDebuggingPanel>().AsSingleton();
+
+    containerDefinition.Bind<DebugUiFragment>().AsSingleton();
+    containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
   }
 
   sealed class EntityPanelModuleProvider : IProvider<EntityPanelModule> {

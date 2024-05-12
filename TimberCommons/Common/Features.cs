@@ -60,6 +60,9 @@ static class Features {
   /// </remarks>
   public static bool NoContaminationUnderground;
 
+  /// <summary>Specifies whether GPU simulator controls shown be show on the panel.</summary>
+  public static bool ShowGpuSimulatorsPanel;
+
   static Features() {
     FeatureController.ReadFeatures(Consume);
   }
@@ -84,6 +87,8 @@ static class Features {
             FeatureController.SetFlag(ref OverrideDesertLevelsForWaterTowers, name, enabled, value),
         "CommonQoL.NoContaminationUnderground" =>
             FeatureController.SetFlag(ref NoContaminationUnderground, name, enabled, value),
+        "Physics.ShowGpuSimulatorsPanel" => 
+            FeatureController.SetFlag(ref ShowGpuSimulatorsPanel, name, enabled, value),
         _ => false
     };
   }
