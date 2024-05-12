@@ -1,5 +1,7 @@
-# v1.8.5 (2 May 2024):
-* Experimental version for Mutli-threaded and GPU simulators.
+# v1.8.7 (12 May 2024):
+* Experimental version for Mutli-threaded simulators. Enable via `Physics.ShowMultiThreadedSimulatorsPanel` feature flag.
+* Experimental version for Mutli-threaded and GPU simulators. Disable via `!Physics.ShowGpuSimulatorsPanel` feature flag.
+* Experimental version for haulers and builders optimization. Disable via `!HaulersAndBuilders.EnableOptimization` feature flag.
 
 # v1.7.3 (22 Mar 2024):
 * [Fix #37] Water tower with zero coverage consumes water.
