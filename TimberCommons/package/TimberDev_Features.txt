@@ -5,7 +5,7 @@
 !DebugEx.VerboseLogging
 
 # Overrides the maximum registry size for PrefabOptimizer to suppress log complaints.
-!PrefabOptimizer.MaxExpectedRegistrySize=500
+PrefabOptimizer.MaxExpectedRegistrySize=500
 
 # Indicates that duration in the "supply lasts for" message on GoodConsumingBuilding UI should be
 # formatted as "Xd Yh" instead of "XX hours".
@@ -34,3 +34,18 @@ WaterTowers.OverrideDesertLevels
 # The stock game doesn't allow beavers to be underground, but there are mods that provide underground buildings like
 # tunnels (e.g. "Path Extention" mod).
 CommonQoL.NoContaminationUnderground
+
+# Specifies whether GPU simulator controls shown be show on the panel.
+Physics.ShowGpuSimulatorsPanel
+
+# Specifies whether haulers and builders should satisfy their needs in priority.
+# Normally, beavers go to the storage that is closest to their housing location. With this option enabled, 
+# they will pick the closest storage relative to their current position that can satisfy hunger or thirst need. The
+# food type need will be disregarded, which may impact the overall wellbeing score. 
+HaulersAndBuilders.EnableOptimization
+
+# Specifies the minimum delta between the best and the alternative paths to the food supply to consider.
+# In terms of wellbeing, the alternative is always a worse choice, but it's closer to the beaver, so the need can be
+# satisfied quicker. This setting specifies the minimum benefit in the travel time that must be achieved for the
+# alternative choice to be accepted. The value is in hours of travel.
+HaulersAndBuilders.PathDurationDifferenceThreshold=1

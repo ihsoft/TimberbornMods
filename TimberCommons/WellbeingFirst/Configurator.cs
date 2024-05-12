@@ -5,10 +5,10 @@
 using System;
 using System.Collections.Generic;
 using Bindito.Core;
+using IgorZ.TimberCommons.Common;
 using IgorZ.TimberDev.Utils;
 using TimberApi.ConfiguratorSystem;
 using TimberApi.SceneSystem;
-using Timberborn.Beavers;
 using Timberborn.EntityPanelSystem;
 using Timberborn.GameDistricts;
 using Timberborn.TemplateSystem;
@@ -22,6 +22,10 @@ sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).FullName;
 
   public void Configure(IContainerDefinition containerDefinition) {
+    if (!Features.OptimizeHaulersAndBuilders) {
+      return;
+    }
+
     containerDefinition.Bind<DebugUiFragment>().AsSingleton();
     containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
     containerDefinition.MultiBind<TemplateModule>().ToProvider(ProvideTemplateModule).AsSingleton();

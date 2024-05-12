@@ -63,6 +63,24 @@ static class Features {
   /// <summary>Specifies whether GPU simulator controls shown be show on the panel.</summary>
   public static bool ShowGpuSimulatorsPanel;
 
+  /// <summary>Specifies whether haulers and builders should satisfy their needs in priority.</summary>
+  /// <remarks>
+  /// Normally, beavers go to the storage that is closest to their housing location. With this option enabled, 
+  /// they will pick the closest storage relative to their current position that can satisfy hunger or thirst need. The
+  /// food type need will be disregarded, which may impact the overall wellbeing score. 
+  /// </remarks>
+  public static bool OptimizeHaulersAndBuilders;
+
+  /// <summary>
+  /// Specifies the minimum delta between the best and the alternative paths to the food supply to consider.
+  /// </summary>
+  /// <remarks>
+  /// In terms of wellbeing, the alternative is always a worse choice, but it's closer to the beaver, so the need can be
+  /// satisfied quicker. This setting specifies the minimum benefit in the travel time that must be achieved for the
+  /// alternative choice to be accepted. The value is in hours of travel.
+  /// </remarks>
+  public static float HaulerPathDurationDifferenceThreshold = 1.0f;
+
   static Features() {
     FeatureController.ReadFeatures(Consume);
   }
@@ -89,6 +107,10 @@ static class Features {
             FeatureController.SetFlag(ref NoContaminationUnderground, name, enabled, value),
         "Physics.ShowGpuSimulatorsPanel" => 
             FeatureController.SetFlag(ref ShowGpuSimulatorsPanel, name, enabled, value),
+        "HaulersAndBuilders.EnableOptimization" => 
+            FeatureController.SetFlag(ref OptimizeHaulersAndBuilders, name, enabled, value),
+        "HaulersAndBuilders.PathDurationDifferenceThreshold" => 
+            FeatureController.SetValue(ref HaulerPathDurationDifferenceThreshold, name, enabled, value),
         _ => false
     };
   }

@@ -5,6 +5,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
+using IgorZ.TimberCommons.Common;
 using Timberborn.NeedBehaviorSystem;
 using Timberborn.NeedSystem;
 using UnityDev.Utils.LogUtilsLite;
@@ -65,7 +66,7 @@ static class DistrictNeedBehaviorServicePatch {
     // For hunger there can be may choices, check how different are the distances.
     var (alternative, durationDelta) = GetBestActionForNeed(
         criticalNeed, ____appraisedNeedBehaviors, optimizer, essentialActionPosition);
-    if (!alternative.HasValue || durationDelta < DurationDifferenceThreshold) {
+    if (!alternative.HasValue || durationDelta < Features.HaulerPathDurationDifferenceThreshold) {
       return;
     }
     var alternativeAction = alternative.Value;
@@ -80,8 +81,6 @@ static class DistrictNeedBehaviorServicePatch {
                     durationDelta, criticalNeed);
     __result = alternative.Value;
   }
-
-  const float DurationDifferenceThreshold = 1.0f;  // Hours.
 
   //FIXME: get piosition from optimizer? 
   static (AppraisedAction? action, float durationDelta) GetBestActionForNeed(
