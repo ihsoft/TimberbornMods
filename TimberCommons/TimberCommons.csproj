@@ -147,7 +147,6 @@
       <Compile Include="WaterValveComponent\WaterValve.cs" />
       <Compile Include="WaterValveComponent\WaterValveFragment.cs" />
       <Compile Include="WellbeingFirst\Configurator.cs" />
-      <Compile Include="WellbeingFirst\CustomNeedBehaviorService.cs" />
       <Compile Include="WellbeingFirst\DebugUiFragment.cs" />
       <Compile Include="WellbeingFirst\DistrictNeedBehaviorServicePatch.cs" />
       <Compile Include="WellbeingFirst\HaulerWellbeingOptimizer.cs" />
