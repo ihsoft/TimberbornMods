@@ -25,19 +25,16 @@ static class DistrictNeedBehaviorServicePatch {
     if (!optimizer.NeedsOptimization) {
       return;
     }
-    // if (optimizer.Character.FirstName is not "Alvemoh" or "Teja") {
-    //   return; // FIXME DEBUG
-    // }
 
     __state = optimizer;
-    var bestPosition = optimizer.TransformFast.position;
-    if (Vector3.Distance(essentialActionPosition, bestPosition) > 10) {
-      //FIXME
-      DebugEx.Warning(
-          "*** name={0}, essentialPos={1}, beaverPos={2} => use beavers pos", optimizer.Character.FirstName, essentialActionPosition,
-          optimizer.TransformFast.position);
-    }
-    essentialActionPosition = optimizer.TransformFast.position;
+    // var bestPosition = optimizer.GetEssentialPosition();
+    // if (Vector3.Distance(essentialActionPosition, bestPosition) > 10) {
+    //   //FIXME
+    //   DebugEx.Warning(
+    //       "*** name={0}, essentialPos={1}, beaverPos={2} => use characters pos",
+    //       optimizer.Character.FirstName, essentialActionPosition, bestPosition);
+    // }
+    essentialActionPosition = optimizer.GetEssentialPosition();
   }
 
   static void Postfix(bool __runOriginal,
@@ -56,14 +53,14 @@ static class DistrictNeedBehaviorServicePatch {
     var appraisedAction = __result.Value;
     var optimizer = __state;
     var criticalNeed = appraisedAction.AffectedNeeds.First();
-    if (optimizer.CriticalNeedsForRole.Contains(criticalNeed)) {
+    if (!optimizer.CriticalNeedsForRole.Contains(criticalNeed)) {
       return;  // Nothing to optimize.
     }
 
     //FIXME
-    DebugEx.Warning("*** Check for a second opinion: character={0}, criticalNeed={1}",
-                    optimizer.Character.FirstName, criticalNeed);
-    PrintAppraisedBehaviors(____appraisedNeedBehaviors, optimizer, essentialActionPosition);
+    // DebugEx.Warning("*** Check for a second opinion: character={0}, criticalNeed={1}",
+    //                 optimizer.Character.FirstName, criticalNeed);
+    // PrintAppraisedBehaviors(____appraisedNeedBehaviors, optimizer, essentialActionPosition);
 
     // For hunger there can be may choices, check how different are the distances.
     var (alternative, durationDelta) = GetBestActionForNeed(
@@ -76,7 +73,7 @@ static class DistrictNeedBehaviorServicePatch {
       return;  // We didn't improve it.
     }
 
-    DebugEx.Warning("*** Found a better alternative for {6]: name={0}, was={1} (wanted:{2}), now={3} (wanted:{4}), durationDelta={5}",
+    DebugEx.Warning("*** Found a better alternative for {6}: name={0}, was={1} (wanted:{2}), now={3} (wanted:{4}), durationDelta={5}",
                     optimizer.Character.FirstName,
                     DebugEx.ObjectToString(appraisedAction.NeedBehavior), DebugEx.C2S(appraisedAction.AffectedNeeds),
                     DebugEx.ObjectToString(alternative.Value.NeedBehavior), DebugEx.C2S(alternative.Value.AffectedNeeds),

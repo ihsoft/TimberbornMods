@@ -150,7 +150,6 @@
       <Compile Include="WellbeingFirst\CustomNeedBehaviorService.cs" />
       <Compile Include="WellbeingFirst\DebugUiFragment.cs" />
       <Compile Include="WellbeingFirst\DistrictNeedBehaviorServicePatch.cs" />
-      <Compile Include="WellbeingFirst\GetBestNeedBehaviorPatch.cs" />
       <Compile Include="WellbeingFirst\HaulerWellbeingOptimizer.cs" />
     </ItemGroup>
     <ItemGroup>
@@ -316,6 +315,9 @@
       </Reference>
       <Reference Include="Timberborn.WaterContaminationSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.WaterContaminationSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.WorkSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.WorkSystem.dll</HintPath>
       </Reference>
       <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Unity\UnityEngine.CoreModule.dll</HintPath>

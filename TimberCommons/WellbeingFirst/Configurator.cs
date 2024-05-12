@@ -27,8 +27,6 @@ sealed class Configurator : IConfigurator {
     containerDefinition.MultiBind<TemplateModule>().ToProvider(ProvideTemplateModule).AsSingleton();
 
     var patches = new List<Type> {
-        // typeof(GetBestNeedBehaviorPatch),
-        // typeof(GetBestNeedBehaviorPatch2),
         typeof(DistrictNeedBehaviorServicePatch),
     };
     DebugEx.Warning("*** patched for test!!!!");
