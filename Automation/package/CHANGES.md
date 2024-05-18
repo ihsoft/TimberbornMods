@@ -1,4 +1,5 @@
 # v1.1.0 (started on 5/17/2024):
+* [Fix #53] Incorrect loading of the population rules.
 
 # v1.0.3 (31 Mar 3/12/2024):
 * [New] Add template to prevent completed building blocking builders and other building sites.
