@@ -1,4 +1,4 @@
-# v1.1.0 (started on 5/17/2024):
+# v1.1.0 (preview 5/17/2024):
 * [Change] Refactor water templates. Now, open/close actions can be set differently per season.
 * [Fix #53] Incorrect loading of the population rules.
 
