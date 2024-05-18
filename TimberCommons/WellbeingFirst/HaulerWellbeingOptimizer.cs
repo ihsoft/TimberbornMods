@@ -37,15 +37,12 @@ sealed class HaulerWellbeingOptimizer : BaseComponent {
       if (IsBuilder()) {
         return BuilderCriticalNeeds;
       }
-      return NoNeeds;
+      return null;
     }
   }
 
-  public HashSet<string> RestrictedGoods => new() { "Berries" };
-
   static readonly HashSet<string> HaulerCriticalNeeds = new() { "Thirst" };
   static readonly HashSet<string> BuilderCriticalNeeds = new() { "Thirst", "Hunger" };
-  static readonly HashSet<string> NoNeeds = new();
 
   public IEnumerable<string> NeedsInCriticalState =>
       NeedManager._needs.AllNeeds.Where(x => x.IsInCriticalState).Select(x => x.Specification.Id);
@@ -57,7 +54,9 @@ sealed class HaulerWellbeingOptimizer : BaseComponent {
   Worker _worker;
   const string HaulWorkplaceBehaviorName = "HaulWorkplaceBehavior";
   const string BuilderHubWorkplaceBehaviorName = "BuilderHubWorkplaceBehavior";
-  
+  const float EmptyHandsTravelTimeThreshold = 2;
+  const float CarryingGoodTravelTimeThreshold = 6;
+
   void Awake() {
     Character = GetComponentFast<Character>();
     NeedManager = GetComponentFast<NeedManager>();
@@ -69,22 +68,40 @@ sealed class HaulerWellbeingOptimizer : BaseComponent {
   }
 
   void OnNeedChangedIsFavorable(object sender, NeedChangedIsFavorableEventArgs arg) {
+    if (!CheckCanCancelCurrentBehavior()) {
+      return;
+    }
+    HashSet<string> criticalNeeds = null;
     if (IsHauler()) {
-      if (HaulerCriticalNeeds.Contains(arg.NeedSpecification.Id)) {
-        //FIXME
-        //DebugEx.Warning("*** changed essential HAULER need: name={0}, id={1}", Character.FirstName, arg.NeedSpecification.Id);
-      }
+      criticalNeeds = HaulerCriticalNeeds;
     } else if (IsBuilder()) {
-      if (BuilderCriticalNeeds.Contains(arg.NeedSpecification.Id)) {
-        //FIXME
-        //DebugEx.Warning("*** changed essential BUILDER need: name={0}, id={1}", Character.FirstName, arg.NeedSpecification.Id);
+      criticalNeeds = BuilderCriticalNeeds;
+    } else {
+      return;  // Don't affect behavior of all other workers.
+    }
+    if (!criticalNeeds.Contains(arg.NeedSpecification.Id)) {
+      return;  // Not an affecting need.
+    }
+    var behavior = BehaviorManager._runningBehavior as CarryRootBehavior;
+    if (!behavior) {
+      return;
+    }
+    var timeThreshold = EmptyHandsTravelTimeThreshold;
+    var timeToDestination = TimeToDestination();
+    if (behavior._goodCarrier.IsCarrying) {
+      if (timeToDestination > CarryingGoodTravelTimeThreshold) {
+        timeThreshold = CarryingGoodTravelTimeThreshold;
+      } else {
+        return;
       }
     }
-  }
-
-  public bool IsWalkingToSite() {
-    //FIXME?
-    return true;
+    if (timeToDestination < timeThreshold) {
+      return;  // Don't cancel if the action can be completed soon enough.
+    }
+    //FIXME
+    DebugEx.Warning("*** {0}: Cancel action due to need turned critical: id={1}, timeToDestination={2}",
+                    Character.FirstName, arg.NeedSpecification.Id, timeToDestination);
+    CancelCurrentBehavior();
   }
 
   public bool CheckCanCancelCurrentBehavior() {
@@ -92,7 +109,8 @@ sealed class HaulerWellbeingOptimizer : BaseComponent {
   }
 
   public float TimeToDestination() {
-    return 0;
+    var destination = Walker._pathCorners[Walker._pathCorners.Count - 1];
+    return Walker.CalculateTravelTimeInHours(TransformFast.position, destination);
   }
 
   public void CancelCurrentBehavior() {
@@ -112,22 +130,24 @@ sealed class HaulerWellbeingOptimizer : BaseComponent {
   }
 
   public bool IsHauler() {
+    if (!_worker) {
+      return false;
+    }
     if (!_worker.Workplace) {
       return false;  // Unemployed?
     }
     var behaviors = _worker.Workplace.WorkplaceBehaviors.Select(x => x.ComponentName).ToList();
-    //FIXME
-    //DebugEx.Warning("*** workplace behaviors: {0}, name={1}", DebugEx.C2S(behaviors), Character.FirstName);
     return behaviors.Any(x => x == HaulWorkplaceBehaviorName);
   }
 
   public bool IsBuilder() {
+    if (!_worker) {
+      return false;
+    }
     if (!_worker.Workplace) {
       return false;  // Unemployed?
     }
     var behaviors = _worker.Workplace.WorkplaceBehaviors.Select(x => x.ComponentName).ToList();
-    //FIXME
-    //DebugEx.Warning("*** workplace behaviors: {0}, name={1}", DebugEx.C2S(behaviors), Character.FirstName);
     return behaviors.Any(x => x == BuilderHubWorkplaceBehaviorName);
   }
 
@@ -147,7 +167,7 @@ sealed class HaulerWellbeingOptimizer : BaseComponent {
   void CancelCarryRootBehavior(CarryRootBehavior behavior) {
     if (behavior._goodCarrier.IsCarrying) {
       var coord = FixedWorldToGridInt(TransformFast.position);
-      DebugEx.Warning("*** dropping: name={0}, amount={1}, pos={2}, coords={3}",
+      DebugEx.Warning("*** dropping carried good: name={0}, amount={1}, pos={2}, coords={3}",
                       behavior._goodCarrier.CarriedGoods.GoodId, behavior._goodCarrier.CarriedGoods.Amount,
                       TransformFast.position, coord);
       // FIXME: get it via injections.
@@ -157,14 +177,10 @@ sealed class HaulerWellbeingOptimizer : BaseComponent {
     }
     if (behavior._goodReserver.HasReservedStock) {
       var good = behavior._goodReserver.StockReservation.GoodAmount;
-      DebugEx.Warning("*** unreserve stock: name={0}, amount={1}, at={2}",
-                      good.GoodId, good.Amount, behavior._goodReserver.StockReservation.Inventory);
       behavior._goodReserver.UnreserveStock();
     }
     if (behavior._goodReserver.HasReservedCapacity) {
       var good = behavior._goodReserver.CapacityReservation.GoodAmount;
-      DebugEx.Warning("*** unreserve capacity: name={0}, amount={1}, at={2}",
-                      good.GoodId, good.Amount, behavior._goodReserver.CapacityReservation.Inventory);
       behavior._goodReserver.UnreserveCapacity();
     }
     AbortCurrentBehavior(behavior._walkToAccessibleExecutor._walker);
@@ -179,8 +195,6 @@ sealed class HaulerWellbeingOptimizer : BaseComponent {
   static Vector3Int FixedWorldToGridInt(Vector3 v) {
     return new Vector3(v.x + 0.1f, v.z + 0.1f, v.y + 0.1f).FloorToInt();
   }
-
-
 }
 
 }

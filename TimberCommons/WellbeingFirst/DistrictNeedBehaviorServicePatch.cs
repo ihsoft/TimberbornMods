@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
 using IgorZ.TimberCommons.Common;
+using Timberborn.InventorySystem;
 using Timberborn.NeedBehaviorSystem;
 using Timberborn.NeedSystem;
 using UnityDev.Utils.LogUtilsLite;
@@ -17,25 +18,19 @@ namespace IgorZ.TimberCommons.WellbeingFirst {
 // FIXME: the logic must go to a special component on character to avoid many get components calls.
 [HarmonyPatch(typeof(DistrictNeedBehaviorService), nameof(DistrictNeedBehaviorService.PickShortestAction))]
 static class DistrictNeedBehaviorServicePatch {
+  const string HungerNeedName = "Hunger";
+
   static void Prefix(bool __runOriginal, NeedManager needManager, ref Vector3 essentialActionPosition, ref HaulerWellbeingOptimizer __state) {
     if (!__runOriginal) {
       return; // The other patches must follow the same style to properly support the skip logic!
     }
     __state = null;
     var optimizer = needManager.GetComponentFast<HaulerWellbeingOptimizer>();
+    essentialActionPosition = optimizer.GetEssentialPosition();
     if (!optimizer.NeedsOptimization) {
       return;
     }
-
     __state = optimizer;
-    // var bestPosition = optimizer.GetEssentialPosition();
-    // if (Vector3.Distance(essentialActionPosition, bestPosition) > 10) {
-    //   //FIXME
-    //   DebugEx.Warning(
-    //       "*** name={0}, essentialPos={1}, beaverPos={2} => use characters pos",
-    //       optimizer.Character.FirstName, essentialActionPosition, bestPosition);
-    // }
-    essentialActionPosition = optimizer.GetEssentialPosition();
   }
 
   static void Postfix(bool __runOriginal,
@@ -54,7 +49,7 @@ static class DistrictNeedBehaviorServicePatch {
     var appraisedAction = __result.Value;
     var optimizer = __state;
     var criticalNeed = appraisedAction.AffectedNeeds.First();
-    if (!optimizer.CriticalNeedsForRole.Contains(criticalNeed)) {
+    if (optimizer.CriticalNeedsForRole == null || !optimizer.CriticalNeedsForRole.Contains(criticalNeed)) {
       return;  // Nothing to optimize.
     }
 
@@ -64,14 +59,10 @@ static class DistrictNeedBehaviorServicePatch {
     // PrintAppraisedBehaviors(____appraisedNeedBehaviors, optimizer, essentialActionPosition);
 
     // For hunger there can be may choices, check how different are the distances.
-    var (alternative, durationDelta) = GetBestActionForNeed(
+    var (alternative, durationDelta) = GetAlternativeForNeed(
         criticalNeed, ____appraisedNeedBehaviors, optimizer, essentialActionPosition);
     if (!alternative.HasValue || durationDelta < Features.HaulerPathDurationDifferenceThreshold) {
       return;
-    }
-    var alternativeAction = alternative.Value;
-    if (alternativeAction.NeedBehavior == appraisedAction.NeedBehavior) {
-      return;  // We didn't improve it.
     }
 
     DebugEx.Warning("*** Found a better alternative for {6}: name={0}, was={1} (wanted:{2}), now={3} (wanted:{4}), durationDelta={5}",
@@ -83,7 +74,7 @@ static class DistrictNeedBehaviorServicePatch {
   }
 
   //FIXME: get piosition from optimizer? 
-  static (AppraisedAction? action, float durationDelta) GetBestActionForNeed(
+  static (AppraisedAction? action, float durationDelta) GetAlternativeForNeed(
       string need, SortedSet<DistrictNeedBehaviorService.AppraisedNeedBehaviorGroup> appraisedNeedBehaviors,
       HaulerWellbeingOptimizer optimizer, Vector3 essentialActionPosition) {
     AppraisedAction? bestActionForNeed = null;
@@ -92,10 +83,23 @@ static class DistrictNeedBehaviorServicePatch {
     var minimumDuration = float.MaxValue;
     var firstDuration = -1f;
 
-    var restrictedGoods = optimizer.RestrictedGoods;
-    
     foreach (var appraisedNeedBehavior in appraisedNeedBehaviors) {
-      if (appraisedNeedBehavior.NeedBehaviorGroup.Needs.First() != need) {
+      var allNeeds = appraisedNeedBehavior.NeedBehaviorGroup.Needs.ToList();
+      if (allNeeds[0] != need) {
+        continue;
+      }
+      if (allNeeds.Count == 1 && allNeeds[0] == HungerNeedName) {
+        // // FIXME: only needed for logging
+        // var targetGoods = new HashSet<string>();
+        // foreach (var behavior in appraisedNeedBehavior.NeedBehaviorGroup.NeedBehaviors) {
+        //   var inventory = behavior.GetEnabledComponent<Inventory>();
+        //   foreach (var good in inventory.Stock) {
+        //     targetGoods.Add(good.GoodId);
+        //   }
+        // }
+        // //FIXME
+        // DebugEx.Warning("*** reject candidate due to good restriction: name={0}, targetOffers={1}, characterNeeds={2}",
+        //                 optimizer.Character.FirstName, DebugEx.C2S(targetGoods), DebugEx.C2S(allNeeds));
         continue;
       }
       var needBehaviorGroup = appraisedNeedBehavior.NeedBehaviorGroup;
@@ -108,12 +112,12 @@ static class DistrictNeedBehaviorServicePatch {
         }
         var duration = durationCalculator.DurationWithReturnInHours(actionPos.Value, essentialActionPosition);
         if (duration < minimumDuration) {
-          if (needBehaviorGroup.Needs.Any(x => restrictedGoods.Contains(x))) {
-            //FIXME
-            DebugEx.Warning("*** reject candidate due to good restriction: options={0}, restrictions={1}",
-                DebugEx.C2S(needBehaviorGroup.Needs), DebugEx.C2S(restrictedGoods));
-            continue;  // Optimizer doesn't want this good to be consumed.
-          }
+          // if (allNeeds.Any(x => restrictedGoods.Contains(x))) {
+          //   //FIXME
+          //   DebugEx.Warning("*** reject candidate due to good restriction: options={0}, restrictions={1}",
+          //       DebugEx.C2S(allNeeds), DebugEx.C2S(restrictedGoods));
+          //   continue;  // Optimizer doesn't want this good to be consumed.
+          // }
 
           bestActionForNeed = new AppraisedAction(needBehavior, needBehaviorGroup.Needs, appraisedNeedBehavior.Points);
           minimumDuration = duration;

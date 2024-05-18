@@ -258,6 +258,9 @@
       <Reference Include="Timberborn.GoodsUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.GoodsUI.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.InventoryNeedSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn\Timberborn.InventoryNeedSystem.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.InventorySystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.InventorySystem.dll</HintPath>
       </Reference>
@@ -362,6 +365,7 @@
       <Reference Include="..\Dependencies\Timberborn\Timberborn.RecoveredGoodSystem.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.Attractions.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.NeedBehaviorSystem.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.CharacterMovementSystem.dll" Publicize="true" />
     </ItemGroup>
     <ItemGroup>
       <ClInclude Include="..\UnityProject\Assets\TimberCommons\Shaders\SoilContaminationSimulatorShaderPacked.compute">
