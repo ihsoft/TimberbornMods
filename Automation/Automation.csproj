@@ -88,6 +88,7 @@
       <Compile Include="Conditions\OutputStockThresholdConditionBase.cs" />
       <Compile Include="Conditions\PopulationThresholdConditionBase.cs" />
       <Compile Include="Conditions\PopulationTrackerConditionBase.cs" />
+      <Compile Include="Conditions\ThresholdConditionBase.cs" />
       <Compile Include="Conditions\WeatherTrackerConditionBase.cs" />
       <Compile Include="Conditions\DroughtEndedCondition.cs" />
       <Compile Include="Conditions\DroughtStartedCondition.cs" />
