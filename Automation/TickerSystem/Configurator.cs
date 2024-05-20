@@ -10,7 +10,7 @@ namespace Automation.TickerSystem {
 
 // ReSharper disable once UnusedType.Global
 [Configurator(SceneEntrypoint.InGame)]
-public class Configurator : IConfigurator {
+sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<TickerService>().AsSingleton();
   }

@@ -62,6 +62,10 @@ public abstract class ThresholdConditionBase : AutomationConditionBase {
   /// <seealso cref="OnBeforeResetThreshold"/>
   protected abstract int CalculateThreshold();
 
+  /// <summary>Gets the string representation of the current <see cref="CheckType"/> for the UI purpose.</summary>
+  /// <remarks>The returned value must be localized.</remarks>
+  /// <exception cref="InvalidOperationException"></exception>
+  /// FIXME: Localize the strings.
   protected string GetCheckTypeString() {
     return CheckType switch {
         CheckTypeEnum.Below => "below",
