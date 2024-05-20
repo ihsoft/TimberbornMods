@@ -1,3 +1,5 @@
+# v1.8.0 (started on 5/19/2024)
+
 # v1.7 (1 Feb 2024)
 * [Fix #27] Smart Power does not work for buildings with supply.
 * [FIx #30] Manufactories without working places are handled incorrectly.
