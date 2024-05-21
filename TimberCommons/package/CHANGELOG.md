@@ -1,3 +1,6 @@
+# v1.8.8 (20 May 2024):
+* Fixed GPU moisture sim to properly handle ful mositure barriers.
+
 # v1.8.7 (12 May 2024):
 * Experimental version for Mutli-threaded simulators. Enable via `Physics.ShowMultiThreadedSimulatorsPanel` feature flag.
 * Experimental version for Mutli-threaded and GPU simulators. Disable via `!Physics.ShowGpuSimulatorsPanel` feature flag.

@@ -38,7 +38,7 @@ StructuredBuffer<InputStruct1> PackedInput1;
 #define CeiledWaterHeight(index) ceil(PackedInput1[index].WaterDepth + PackedInput1[index].UnsafeCellHeight)
 #define ContaminationBarriers(index) (PackedInput1[index].BitmapFlags & InputStruct1::ContaminationBarrierBit)
 #define AboveMoistureBarriers(index) (PackedInput1[index].BitmapFlags & InputStruct1::AboveMoistureBarrierBit)
-#define FullMoistureBarriers(index) (PackedInput1[index].BitmapFlags & InputStruct1::AboveMoistureBarrierBit)
+#define FullMoistureBarriers(index) (PackedInput1[index].BitmapFlags & InputStruct1::FullMoistureBarrierBit)
 
 // OUTPUT: fetch on every dispatch.
 RWStructuredBuffer<float> MoistureLevelsBuff;  // Init once. TimberCommons doesn't like it.
