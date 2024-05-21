@@ -14,7 +14,7 @@ public abstract class BeaverPopulationThresholdCondition : PopulationThresholdCo
   #region PopulationThresholdConditionBase overrides
 
   /// <inheritdoc/>
-  protected override void UpdateValues() {
+  protected override void CalculateInitialValues() {
     switch (RelativeTo) {
       case RelativeToEnum.None:
         Threshold = Value;

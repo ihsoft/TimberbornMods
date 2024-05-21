@@ -7,16 +7,12 @@
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.BadtideOpenFloodgate.DisplayName",
   "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.BadtideOpenFloodgate.Description",
   "ToolInformation": {
-    "TemplateFamilyName": "Water.FloodgateManagement",
+    "TemplateFamilyName": "Water.FloodgateManagement-badtide",
     "Rules": [
       {
         "Condition": { "TypeId": "Automation.Conditions.BadtideStartedCondition" },
         "Action": { "TypeId": "Automation.Actions.SetFloodgateHeightAction", "StepsDown": 100 }
       },
-      {
-        "Condition": { "TypeId": "Automation.Conditions.BadtideEndedCondition" },
-        "Action": { "TypeId": "Automation.Actions.SetFloodgateHeightAction", "StepsDown": 0 }
-      }
     ]
   }
 }

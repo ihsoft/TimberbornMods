@@ -11,10 +11,10 @@ namespace Automation.Conditions {
 
 /// <summary>A base condition class that check population for a threshold.</summary>
 /// <remarks>
-/// In descendants, implement <see cref="UpdateValues"/> to calculate <see cref="Threshold"/> and
+/// In descendants, implement <see cref="CalculateInitialValues"/> to calculate <see cref="Threshold"/> and
 /// <see cref="CheckCondition"/> to handle the check.
 /// </remarks>
-public abstract class PopulationThresholdConditionBase  : PopulationTrackerConditionBase {
+public abstract class PopulationThresholdConditionBase : PopulationTrackerConditionBase {
 
   const string RelativeToMaxArg = "IgorZ.Automation.PopulationRelativeToMaxArg";
   const string RelativeToCurrentArg = "IgorZ.Automation.PopulationRelativeToCurrentArg";
@@ -49,7 +49,7 @@ public abstract class PopulationThresholdConditionBase  : PopulationTrackerCondi
 
   /// <summary>Calculates <see cref="Threshold"/> based on the current district and the condition parameters.</summary>
   /// <remarks>The district must be set, or else it's NOOP.</remarks>
-  protected abstract void UpdateValues();
+  protected abstract void CalculateInitialValues();
 
   /// <summary>Returns a result of condition checking.</summary>
   protected abstract bool CheckCondition();
@@ -75,11 +75,11 @@ public abstract class PopulationThresholdConditionBase  : PopulationTrackerCondi
   #region AutomationConditionBase overrides
 
   /// <inheritdoc/>
-  protected override void OnBehaviorAssigned() {
-    base.OnBehaviorAssigned();
-    if (Threshold == -1 && DistrictCenter) {
-      UpdateValues();  // Calculate if not loaded from the saved state.
+  public override void SyncState() {
+    if (DistrictCenter) {
+      CalculateInitialValues();
     }
+    base.SyncState();
   }
 
   #endregion
@@ -88,8 +88,13 @@ public abstract class PopulationThresholdConditionBase  : PopulationTrackerCondi
 
   /// <inheritdoc/>
   protected override void OnBuildingDistrictCenterChange(DistrictCenter oldCenter) {
-    if (DistrictCenter) {
-      UpdateValues();
+    if (oldCenter && !DistrictCenter) {
+      // Detached from district.
+      Threshold = -1;
+    }
+    if (DistrictCenter && Threshold == -1) {
+      // Attached to district and haven't yet calculated values.
+      CalculateInitialValues();
     }
   }
 
