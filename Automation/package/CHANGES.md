@@ -1,4 +1,8 @@
-# v1.0 (started on 3/12/2024):
+# v1.1.1 (19 May 2024):
+* [Change] Refactor water templates. Now, open/close actions can be set differently per season.
+* [Fix #53] Incorrect loading of the population rules.
+
+# v1.0.3 (31 Mar 3/12/2024):
 * [New] Add template to prevent completed building blocking builders and other building sites.
 * [Fix #46] Mod crashes on applying population template to a non-complete building.
 

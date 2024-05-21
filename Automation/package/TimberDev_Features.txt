@@ -5,4 +5,4 @@
 !DebugEx.VerboseLogging
 
 # Specifies whether path checking system should periodically dump performance statistics.
-PathCheckingSystem.Profiling
+!PathCheckingSystem.Profiling
