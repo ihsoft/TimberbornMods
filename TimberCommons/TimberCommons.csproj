@@ -325,13 +325,13 @@
       <Reference Include="..\Dependencies\Timberborn\Timberborn.SimulationSystem.dll" Publicize="true" />
     </ItemGroup>
     <ItemGroup>
-      <ClInclude Include="..\UnityProject\Assets\TimberCommons\Shaders\SoilContaminationSimulatorShaderPacked.compute">
+      <ClInclude Include="..\UnityProject\Assets\igorz\TimberCommons\Shaders\SoilContaminationSimulatorShaderPacked.compute">
         <Link>GpuSimulators\Shaders\SoilContaminationSimulatorShaderPacked.compute</Link>
       </ClInclude>
-      <ClInclude Include="..\UnityProject\Assets\TimberCommons\Shaders\SoilMoistureSimulatorPacked.compute">
+      <ClInclude Include="..\UnityProject\Assets\igorz\TimberCommons\Shaders\SoilMoistureSimulatorPacked.compute">
         <Link>GpuSimulators\Shaders\SoilMoistureSimulatorPacked.compute</Link>
       </ClInclude>
-      <ClInclude Include="..\UnityProject\Assets\TimberCommons\Shaders\WaterSimulatorPacked.compute">
+      <ClInclude Include="..\UnityProject\Assets\igorz\TimberCommons\Shaders\WaterSimulatorPacked.compute">
         <Link>GpuSimulators\Shaders\WaterSimulatorPacked.compute</Link>
       </ClInclude>
     </ItemGroup>
