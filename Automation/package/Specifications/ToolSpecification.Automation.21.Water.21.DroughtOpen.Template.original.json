@@ -7,16 +7,12 @@
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.DroughtOpenFloodgate.DisplayName",
   "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.DroughtOpenFloodgate.Description",
   "ToolInformation": {
-    "TemplateFamilyName": "Water.FloodgateManagement",
+    "TemplateFamilyName": "Water.FloodgateManagement-drought",
     "Rules": [
       {
         "Condition": { "TypeId": "Automation.Conditions.DroughtStartedCondition" },
-        "Action": { "TypeId": "Automation.Actions.SetFloodgateHeightAction", "StepsDown": 1 }
+        "Action": { "TypeId": "Automation.Actions.SetFloodgateHeightAction", "StepsDown": 100 }
       },
-      {
-        "Condition": { "TypeId": "Automation.Conditions.DroughtEndedCondition" },
-        "Action": { "TypeId": "Automation.Actions.SetFloodgateHeightAction", "StepsDown": 0 }
-      }
     ]
   }
 }

@@ -7,7 +7,7 @@
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.DroughtOpenWaterRegulator.DisplayName",
   "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.DroughtOpenWaterRegulator.Description",
   "ToolInformation": {
-    "TemplateFamilyName": "Water.SeasonManagement",
+    "TemplateFamilyName": "Water.SeasonManagement-drought",
     "Rules": [
       {
         "Condition": { "TypeId": "Automation.Conditions.DroughtStartedCondition" },
