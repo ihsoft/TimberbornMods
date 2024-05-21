@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-8250532741351440377
+--- !u!114 &-4019864068502165228
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -17,8 +17,7 @@ MonoBehaviour:
   Name: 
   Description: 
   Version: 
-  Dependencies:
-  - {fileID: 11400000, guid: f8189e6e35959144abf1068be1f00a35, type: 2}
+  Dependencies: []
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32,6 +31,24 @@ MonoBehaviour:
   m_Name: SmartPower
   m_EditorClassIdentifier: 
   Data:
-  - {fileID: -8250532741351440377}
-  identity: {fileID: -8250532741351440377}
+  - {fileID: -4019864068502165228}
+  - {fileID: 2409455825564241393}
+  identity: {fileID: -4019864068502165228}
   QuickAccess: 0
+--- !u!114 &2409455825564241393
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17d1008b78cb6e846889b7778282fbef, type: 3}
+  m_Name: AssetBundleDefinitions
+  m_EditorClassIdentifier: 
+  StagingPaths: []
+  assetBundles:
+  - assetBundleName: smartpower/ui_icons
+    assets:
+    - {fileID: 102900000, guid: b0cc25e74bc71c444816a22446b89dc6, type: 3}
