@@ -35,9 +35,6 @@
         <DocumentationFile>bin\Release\SmartPower.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
-      <Compile Include="..\TimberDev\Logging\ThreadedLogsRecorder.cs">
-        <Link>TimberDev\Logging\ThreadedLogsRecorder.cs</Link>
-      </Compile>
       <Compile Include="..\TimberDev\UI\CommonFormats.cs">
         <Link>TimberDev\UI\CommonFormats.cs</Link>
       </Compile>
