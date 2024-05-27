@@ -45,9 +45,9 @@ sealed class GpuSoilMoistureSimulator {
   public void TickPipeline() {
     _stopwatch.Restart();
 
-    PrepareInputData();
+    PreparePipeline();
     _shaderPipeline.RunBlocking();
-    FlushOutputData();
+    ProcessOutput();
 
     _stopwatch.Stop();
     TotalSimPerfSampler.AddSample(_stopwatch.Elapsed.TotalSeconds);
@@ -168,7 +168,7 @@ sealed class GpuSoilMoistureSimulator {
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  void PrepareInputData() {
+  void PreparePipeline() {
     var sim = _soilMoistureSimulator;
     for (var index = _packedInput1.Length - 1; index >= 0; index--) {
       uint bitmapFlags = 0;
@@ -194,7 +194,7 @@ sealed class GpuSoilMoistureSimulator {
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  void FlushOutputData() {
+  void ProcessOutput() {
     var sim = _soilMoistureSimulator;
     for (var index = sim.MoistureLevels.Length - 1; index >= 0; index--) {
       //FIXME: maybe write it directly?

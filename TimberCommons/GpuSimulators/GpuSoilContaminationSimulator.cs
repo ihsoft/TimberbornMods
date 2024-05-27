@@ -56,9 +56,9 @@ sealed class GpuSoilContaminationSimulator {
   public void TickPipeline() {
     _stopwatch.Restart();
 
-    PrepareInputData();
+    PreparePipeline();
     _shaderPipeline.RunBlocking();
-    FlushOutputData();
+    ProcessOutput();
 
     _stopwatch.Stop();
     TotalSimPerfSampler.AddSample(_stopwatch.Elapsed.TotalSeconds);
@@ -156,7 +156,7 @@ sealed class GpuSoilContaminationSimulator {
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  void PrepareInputData() {
+  void PreparePipeline() {
     var sim = _soilContaminationSimulator;
     for (var i = _packedInput1.Length - 1; i >= 0; i--) {
       var bitmap =
@@ -172,7 +172,7 @@ sealed class GpuSoilContaminationSimulator {
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  void FlushOutputData() {
+  void ProcessOutput() {
     for (var i = _contaminationsChangedLastTickBuffer.DataLength - 1; i >= 0; i--) {
       _soilContaminationSimulator._contaminationsChangedLastTick.Add(
           _mapIndexService.IndexToCoordinates(_contaminationsChangedLastTick[i]));

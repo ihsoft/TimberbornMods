@@ -21,7 +21,6 @@ float VerticalCostModifier;
 
 // Persistent shader state.
 RWStructuredBuffer<float> ContaminationCandidates; // Set one time on shader init. 
-RWStructuredBuffer<float> ContaminationLevels; // Set one time on shader init.
 
 // INPUT: Update on every dispatch.
 // For better performance, pack all data to the aligned structures (128-bit multiples).
@@ -43,6 +42,7 @@ StructuredBuffer<InputStruct1> PackedInput1;
 #define AboveMoistureBarriers(index) (PackedInput1[index].Bitmap & InputStruct1::AboveMoistureBarrierBit)
 
 // OUTPUT: Read on every dispatch.
+RWStructuredBuffer<float> ContaminationLevels;
 AppendStructuredBuffer<int> ContaminationsChangedLastTick;
 
 // INTERMEDIATE: Only used between the kernels.
