@@ -6,12 +6,12 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Timberborn.AssetSystem;
 using Timberborn.MapIndexSystem;
-using Timberborn.SoilMoistureSystem;
 using Timberborn.WaterSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityDev.Utils.ShaderPipeline;
 using UnityEngine;
 using Object = UnityEngine.Object;
+using IgorZ.TimberCommons.WaterService;
 
 namespace IgorZ.TimberCommons.GpuSimulators {
 
@@ -51,18 +51,9 @@ sealed class GpuWaterSimulator {
   public void TickPipeline2() {
     _stopwatch.Restart();
 
-    // Constant staring part from the original sim.
-    _simulator._deltaTime = _simulator._fixedDeltaTime * _simulator._waterSimulationSettings.TimeScale;
-    _simulator.UpdateWaterSources();
-    _simulator.UpdateWaterChanges();
-
-    PrepareInputData();
+    PreparePipeline();
     _shaderPipeline.RunBlocking();
-    FlushOutputData();
-
-    // Constant ending part from the original sim.
-    // FIXME: Can be in shader too.
-    _simulator._transientWaterMap.Refresh();
+    ProcessOutput();
 
     _stopwatch.Stop();
     TotalSimPerfSampler.AddSample(_stopwatch.Elapsed.TotalSeconds);
@@ -83,6 +74,7 @@ sealed class GpuWaterSimulator {
   readonly WaterSimulationController _waterSimulationController;
   readonly IResourceAssetLoader _resourceAssetLoader;
   readonly MapIndexService _mapIndexService;
+  readonly DirectWaterServiceAccessor _directWaterServiceAccessor;
 
   // Inputs.
   // ReSharper disable NotAccessedField.Local
@@ -103,11 +95,13 @@ sealed class GpuWaterSimulator {
   int _totalMapSize;
 
   GpuWaterSimulator(WaterSimulator simulator, IWaterSimulationController waterSimulationController,
-                    IResourceAssetLoader resourceAssetLoader, MapIndexService mapIndexService) {
+                    IResourceAssetLoader resourceAssetLoader, MapIndexService mapIndexService,
+                    DirectWaterServiceAccessor directWaterServiceAccessor) {
     _simulator = simulator;
     _waterSimulationController = waterSimulationController as WaterSimulationController;
     _resourceAssetLoader = resourceAssetLoader;
     _mapIndexService = mapIndexService;
+    _directWaterServiceAccessor = directWaterServiceAccessor;
   }
 
   void SetupShader() {
@@ -157,7 +151,7 @@ sealed class GpuWaterSimulator {
         .WithOutputBuffer("ContaminationsBuff", _simulator._waterContaminationMap.Contaminations)
         // The kernel chain! They will execute in the order they are declared.
         .DispatchKernel(
-            "SavePreviousState991", new Vector3Int(_totalMapSize, 1, 1),
+            "SavePreviousState", new Vector3Int(_totalMapSize, 1, 1),
             "s:WaterDepthsBuff", "s:ContaminationsBuff",
             "o:InitialWaterDepthsBuff", "o:ContaminationsBufferBuff")
         .DispatchKernel(
@@ -185,12 +179,25 @@ sealed class GpuWaterSimulator {
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  void PrepareInputData() {
+  void PreparePipeline() {
     var sim = _simulator;
+
+    // Constant starting part from the original sim.
+    sim._deltaTime = sim._fixedDeltaTime * sim._waterSimulationSettings.TimeScale;
+    sim.UpdateWaterSources();
+    sim.UpdateWaterChanges();
+
+    // Load data.
+    // FIXME: This data is not updated every frame. Make it event driven.
     for (var index = 0; index < _totalMapSize; index++) {
-      var bitmapFlags =
-          (sim._impermeableSurfaceService.PartialObstacles[index] ? InputStruct1.PartialObstaclesBit : 0)
-          | (sim._mapIndexService.IndexIsInActualMap(index) ? InputStruct1.IsInActualMapBit : 0);
+      uint bitmapFlags = 0;
+      if (sim._impermeableSurfaceService.PartialObstacles[index]) {
+        bitmapFlags |= InputStruct1.PartialObstaclesBit;
+      }
+      if (sim._mapIndexService.IndexIsInActualMap(index)) {
+        // FIXME: This is a constant array that is filled once on game load.
+        bitmapFlags |= InputStruct1.IsInActualMapBit;
+      }
       _packedInput1[index] = new InputStruct1 {
           ImpermeableSurfaceServiceHeight = sim._impermeableSurfaceService.Heights[index],
           ImpermeableSurfaceServiceMinFlowSlower = sim._impermeableSurfaceService.MinFlowSlowers[index],
@@ -201,7 +208,9 @@ sealed class GpuWaterSimulator {
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  void FlushOutputData() {
+  void ProcessOutput() {
+    _directWaterServiceAccessor.UpdateDepthsCallback(_simulator._deltaTime);
+    _simulator._transientWaterMap.Refresh();
   }
 
   void EnableSimulator() {

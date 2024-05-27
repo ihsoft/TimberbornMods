@@ -136,9 +136,9 @@ bool CanDiffuse(float sourceWaterHeight, int targetIndex, float outflowToTarget)
 float CalculateDiffusion(float sourceContamination, float sourceWaterDepth, int targetIndex, float diffusionFraction);
 float GetContaminationDiffusionChange(int index);
 
-#pragma kernel SavePreviousState991
+#pragma kernel SavePreviousState
 [numthreads(1024, 1, 1)]
-void SavePreviousState991(uint3 id : SV_DispatchThreadID)
+void SavePreviousState(uint3 id : SV_DispatchThreadID)
 {
     InitialWaterDepths(id.x) = WaterDepths(id.x);
     ContaminationsBuffer(id.x) = Contaminations(id.x);

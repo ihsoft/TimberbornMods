@@ -1,3 +1,6 @@
+# v1.8.10 (started on 27 May 2024):
+* Implement water valves support in GPU sim.
+
 # v1.8.9 (26 May 2024):
 * Implement water towers support in GPU sim.
 

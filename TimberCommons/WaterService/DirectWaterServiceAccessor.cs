@@ -248,7 +248,7 @@ public class DirectWaterServiceAccessor : IPostLoadableSingleton, ITickableSingl
   /// This method is called from the water simulation threads at a very high frequency. Keep it simple and fast.
   /// </remarks>
   /// <param name="deltaTime">Simulation step delta.</param>
-  void UpdateDepthsCallback(float deltaTime) {
+  internal void UpdateDepthsCallback(float deltaTime) {
     for (var i = _threadSafeWaterMovers.Count - 1; i >= 0; i--) {
       var waterMover = _threadSafeWaterMovers[i];
       var inputIndex = waterMover.InputTileIndex;
