@@ -19,6 +19,9 @@ float QuadraticEvaporationCoefficient;
 int VerticalSpreadCostMultiplier;
 float WaterContaminationScaler;
 
+// DirectSoilMoistureSystemSettings
+float WaterTowerIrrigatedLevel;
+
 // INPUT: Update on every dispatch.
 struct InputStruct1 {
     float Contamination;
@@ -29,6 +32,7 @@ struct InputStruct1 {
     static const uint ContaminationBarrierBit = 0x0001;
     static const uint AboveMoistureBarrierBit = 0x0002;
     static const uint FullMoistureBarrierBit = 0x0004;
+    static const uint WaterTowerIrrigatedBit = 0x0008;
 };
 StructuredBuffer<InputStruct1> PackedInput1;
 
@@ -39,6 +43,7 @@ StructuredBuffer<InputStruct1> PackedInput1;
 #define ContaminationBarriers(index) (PackedInput1[index].BitmapFlags & InputStruct1::ContaminationBarrierBit)
 #define AboveMoistureBarriers(index) (PackedInput1[index].BitmapFlags & InputStruct1::AboveMoistureBarrierBit)
 #define FullMoistureBarriers(index) (PackedInput1[index].BitmapFlags & InputStruct1::FullMoistureBarrierBit)
+#define WaterTowerIrrigated(index) (PackedInput1[index].BitmapFlags & InputStruct1::WaterTowerIrrigatedBit)
 
 // OUTPUT: fetch on every dispatch.
 RWStructuredBuffer<float> MoistureLevelsBuff;  // Init once. TimberCommons doesn't like it.
@@ -160,9 +165,13 @@ void CalculateMoisture(uint3 id : SV_DispatchThreadID)
     const uint index = CoordinatesToIndex(id.xy);
     float oldLevel = MoistureLevels(index);
     float newLevel = GetUpdatedMoisture(index);
+    if (WaterTowerIrrigated(index) && newLevel < WaterTowerIrrigatedLevel)
+    {
+        newLevel = WaterTowerIrrigatedLevel;
+    }
     if (abs(oldLevel - newLevel) > MinLevelChange)
     {
-        MoistureLevels(index) = GetUpdatedMoisture(index);
+        MoistureLevels(index) = newLevel;
         MoistureLevelsChangedLastTickBuff.Append(index);
     }
 }

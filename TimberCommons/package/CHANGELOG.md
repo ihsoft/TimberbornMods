@@ -1,3 +1,6 @@
+# v1.8.9 (26 May 2024):
+* Implement water towers support in GPU sim.
+
 # v1.8.8 (20 May 2024):
 * Fixed GPU moisture sim to properly handle ful mositure barriers.
 

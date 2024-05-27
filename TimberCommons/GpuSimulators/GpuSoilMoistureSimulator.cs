@@ -4,6 +4,7 @@
 
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using IgorZ.TimberCommons.WaterService;
 using Timberborn.AssetSystem;
 using Timberborn.MapIndexSystem;
 using Timberborn.SoilMoistureSystem;
@@ -79,6 +80,7 @@ sealed class GpuSoilMoistureSimulator {
     public const uint ContaminationBarrierBit = 0x0001;
     public const uint AboveMoistureBarrierBit = 0x0002;
     public const uint FullMoistureBarrierBit = 0x0004;
+    public const uint WaterTowerIrrigatedBit = 0x0008;
   };
   // ReSharper restore NotAccessedField.Local
 
@@ -129,6 +131,8 @@ sealed class GpuSoilMoistureSimulator {
         .WithConstantValue("MinimumWaterContamination", simulationSettings.MinimumWaterContamination)
         .WithConstantValue("QuadraticEvaporationCoefficient", simulationSettings.QuadraticEvaporationCoefficient)
         .WithConstantValue("VerticalSpreadCostMultiplier", simulationSettings.VerticalSpreadCostMultiplier)
+        // DirectSoilMoistureSimulationSettings
+        .WithConstantValue("WaterTowerIrrigatedLevel", 1f)
         // Sim calculated.
         .WithConstantValue("WaterContaminationScaler", _soilMoistureSimulator._waterContaminationScaler)
         // All buffers.
@@ -167,10 +171,19 @@ sealed class GpuSoilMoistureSimulator {
   void PrepareInputData() {
     var sim = _soilMoistureSimulator;
     for (var index = _packedInput1.Length - 1; index >= 0; index--) {
-      var bitmapFlags =
-          (sim._soilBarrierMap.ContaminationBarriers[index] ? InputStruct1.ContaminationBarrierBit : 0)
-          | (sim._soilBarrierMap.AboveMoistureBarriers[index] ? InputStruct1.AboveMoistureBarrierBit : 0)
-          | (sim._soilBarrierMap.FullMoistureBarriers[index] ? InputStruct1.FullMoistureBarrierBit : 0);
+      uint bitmapFlags = 0;
+      if (sim._soilBarrierMap.ContaminationBarriers[index]) {
+        bitmapFlags |= InputStruct1.ContaminationBarrierBit;
+      }
+      if (sim._soilBarrierMap.AboveMoistureBarriers[index]) {
+        bitmapFlags |= InputStruct1.AboveMoistureBarrierBit;
+      }
+      if (sim._soilBarrierMap.FullMoistureBarriers[index]) {
+        bitmapFlags |= InputStruct1.FullMoistureBarrierBit;
+      }
+      if (DirectSoilMoistureSystemAccessor.MoistureLevelOverrides.ContainsKey(index)) {
+        bitmapFlags |= InputStruct1.WaterTowerIrrigatedBit;
+      }
       _packedInput1[index] = new InputStruct1 {
           Contamination = sim._waterContaminationService.Contamination(index),
           WaterDepth = sim._waterService.WaterDepth(index),
