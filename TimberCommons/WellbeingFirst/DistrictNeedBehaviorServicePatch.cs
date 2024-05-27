@@ -26,6 +26,9 @@ static class DistrictNeedBehaviorServicePatch {
     }
     __state = null;
     var optimizer = needManager.GetComponentFast<HaulerWellbeingOptimizer>();
+    
+    //DebugEx.Warning("*** Character {2}: replacing position: from {0} to {1}", essentialActionPosition, optimizer.GetEssentialPosition(), optimizer.Character.name);
+    
     essentialActionPosition = optimizer.GetEssentialPosition();
     if (!optimizer.NeedsOptimization) {
       return;
@@ -65,11 +68,11 @@ static class DistrictNeedBehaviorServicePatch {
       return;
     }
 
-    DebugEx.Warning("*** Found a better alternative for {6}: name={0}, was={1} (wanted:{2}), now={3} (wanted:{4}), durationDelta={5}",
-                    optimizer.Character.FirstName,
-                    DebugEx.ObjectToString(appraisedAction.NeedBehavior), DebugEx.C2S(appraisedAction.AffectedNeeds),
-                    DebugEx.ObjectToString(alternative.Value.NeedBehavior), DebugEx.C2S(alternative.Value.AffectedNeeds),
-                    durationDelta, criticalNeed);
+    // DebugEx.Warning("*** Found a better alternative for {6}: name={0}, was={1} (wanted:{2}), now={3} (wanted:{4}), durationDelta={5}",
+    //                 optimizer.Character.FirstName,
+    //                 DebugEx.ObjectToString(appraisedAction.NeedBehavior), DebugEx.C2S(appraisedAction.AffectedNeeds),
+    //                 DebugEx.ObjectToString(alternative.Value.NeedBehavior), DebugEx.C2S(alternative.Value.AffectedNeeds),
+    //                 durationDelta, criticalNeed);
     __result = alternative.Value;
   }
 
