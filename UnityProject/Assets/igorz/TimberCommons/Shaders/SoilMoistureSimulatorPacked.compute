@@ -5,6 +5,8 @@
 #define MAX8(v1, v2, v3, v4, v5, v6, v7, v8) max(MAX4(v1, v2, v3, v4), MAX4(v5, v6, v7, v8))
 #define CoordinatesToIndex(coordinates) ((coordinates.y + 1) * Stride + coordinates.x + 1)
 #define IndexToCoordinates(index) int2((index % Stride) - 1, (index / Stride) - 1)
+#define SetBitmapFlag(reference, flag, value) reference.BitmapFlags = value ? reference.BitmapFlags | flag : reference.BitmapFlags & ~flag
+#define CheckBitmapFlag(reference, flag) ((reference.BitmapFlags & flag) != 0)
 
 // Constants. Set the values only once.
 uint Stride;
@@ -40,10 +42,10 @@ StructuredBuffer<InputStruct1> PackedInput1;
 #define WaterDepth(index) PackedInput1[index].WaterDepth
 #define UnsafeCellHeight(index) PackedInput1[index].UnsafeCellHeight
 #define CeiledWaterHeight(index) ceil(PackedInput1[index].WaterDepth + PackedInput1[index].UnsafeCellHeight)
-#define ContaminationBarriers(index) (PackedInput1[index].BitmapFlags & InputStruct1::ContaminationBarrierBit)
-#define AboveMoistureBarriers(index) (PackedInput1[index].BitmapFlags & InputStruct1::AboveMoistureBarrierBit)
-#define FullMoistureBarriers(index) (PackedInput1[index].BitmapFlags & InputStruct1::FullMoistureBarrierBit)
-#define WaterTowerIrrigated(index) (PackedInput1[index].BitmapFlags & InputStruct1::WaterTowerIrrigatedBit)
+#define ContaminationBarriers(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::ContaminationBarrierBit)
+#define AboveMoistureBarriers(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::AboveMoistureBarrierBit)
+#define FullMoistureBarriers(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::FullMoistureBarrierBit)
+#define WaterTowerIrrigated(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::WaterTowerIrrigatedBit)
 
 // OUTPUT: fetch on every dispatch.
 RWStructuredBuffer<float> MoistureLevelsBuff;  // Init once. TimberCommons doesn't like it.
@@ -61,14 +63,6 @@ RWStructuredBuffer<int> ClusterSaturationBuff;
 #define ClusterSaturation(index) ClusterSaturationBuff[index]
 #define LastTickMoistureLevels(index) LastTickMoistureLevelsBuff[index]
 #define WateredNeighbours(index) WateredNeighboursBuff[index]
-
-// Execution chain:
-// SavePreviousState(in MoistureLevels, out LastTickMoistureLevels)
-// CountWateredNeighbors(in LastTickMoistureLevels, in PackedInput1, out WateredNeighbours)
-// CalculateClusterSaturationAndWaterEvaporation(
-//     in PackedInput1, in WateredNeighbours, out ClusterSaturation, out WaterEvaporationModifier)
-// CalculateMoisture(
-//     in PackedInput1, in LastTickMoistureLevels, in ClusterSaturation, out MoistureLevels)
 
 // Forward functions declarations.
 float GetUpdatedMoisture(int index);

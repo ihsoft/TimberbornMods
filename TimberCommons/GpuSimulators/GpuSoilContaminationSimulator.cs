@@ -85,9 +85,9 @@ sealed class GpuSoilContaminationSimulator {
   // ReSharper disable NotAccessedField.Local
   struct InputStruct1 {
     public float Contamination;
+    public float WaterDepth;
     public int UnsafeCellHeight;
-    public int CeiledWaterHeight;
-    public uint Bitmap;
+    public uint BitmapFlags;
 
     public const uint ContaminationBarrierBit = 0x0001;
     public const uint AboveMoistureBarrierBit = 0x0002;
@@ -158,15 +158,19 @@ sealed class GpuSoilContaminationSimulator {
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void PreparePipeline() {
     var sim = _soilContaminationSimulator;
-    for (var i = _packedInput1.Length - 1; i >= 0; i--) {
-      var bitmap =
-          (sim._soilBarrierMap.ContaminationBarriers[i] ? InputStruct1.ContaminationBarrierBit : 0)
-          | (sim._soilBarrierMap.AboveMoistureBarriers[i] ? InputStruct1.AboveMoistureBarrierBit : 0);
-      _packedInput1[i] = new InputStruct1 {
-          Contamination = sim._waterContaminationService.Contamination(i),
-          UnsafeCellHeight = sim._terrainService.UnsafeCellHeight(i),
-          CeiledWaterHeight = sim._waterService.CeiledWaterHeight(i),
-          Bitmap = bitmap,
+    for (var index = _packedInput1.Length - 1; index >= 0; index--) {
+      uint bitmapFlags = 0;
+      if (sim._soilBarrierMap.ContaminationBarriers[index]) {
+        bitmapFlags |= InputStruct1.ContaminationBarrierBit;
+      }
+      if (sim._soilBarrierMap.AboveMoistureBarriers[index]) {
+        bitmapFlags |= InputStruct1.AboveMoistureBarrierBit;
+      }
+      _packedInput1[index] = new InputStruct1 {
+          Contamination = sim._waterContaminationService.Contamination(index),
+          WaterDepth = sim._waterService.WaterDepth(index),
+          UnsafeCellHeight = sim._terrainService.UnsafeCellHeight(index),
+          BitmapFlags = bitmapFlags,
       };
     }
   }

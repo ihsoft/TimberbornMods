@@ -112,20 +112,6 @@ RWStructuredBuffer<WaterContaminationDiffusion> ContaminationDiffusionsBuff;
 #define SetCanDiffuseLeft(reference, value) SetBitmapFlag(reference, WaterContaminationDiffusion::CanDiffuseLeftBit, value)
 #define SetCanDiffuseRight(reference, value) SetBitmapFlag(reference, WaterContaminationDiffusion::CanDiffuseRightBit, value)
 
-// Execution chain:
-// SavePreviousState(in WaterDepths, in Contaminations, out InitialWaterDepths, out ContaminationsBuffer)
-// UpdateOutflows(
-//     in Outflows, in WaterDepths, in ImpermeableSurfaceServiceHeights, in ImpermeableSurfaceServicePartialObstacles,
-//     in ImpermeableSurfaceServiceMinFlowSlowers, in IndexIsInActualMap, out TempOutflows)
-// UpdateWaterParameters(
-//     in WaterDepths, in TempOutflows, in Contaminations, in InitialWaterDepths, in ContaminationsBuffer
-//     in EvaporationModifiers, out Outflows, out WaterDepths)
-// SimulateContaminationDiffusion1(
-//     in WaterDepths, in ImpermeableSurfaceServicePartialObstacles, in TempOutflows, in WaterDepths,
-//     in ImpermeableSurfaceServiceHeights, out ContaminationDiffusions)
-// SimulateContaminationDiffusion2(
-//     in WaterDepths, in ContaminationsBuffer, in ContaminationDiffusions, out Contaminations)
-
 // Forward functions declarations.
 float CalculateOutflow(int origin, int target, float oldOutflow);
 void UpdateOutflow(int index);

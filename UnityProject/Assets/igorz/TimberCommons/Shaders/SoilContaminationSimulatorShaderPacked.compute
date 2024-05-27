@@ -1,5 +1,13 @@
 // Shader that simulates soil contamination.
 
+// Common functions.
+#define MAX4(v1, v2, v3, v4) max(max(v1, v2), max(v3, v4))
+#define MAX8(v1, v2, v3, v4, v5, v6, v7, v8) max(MAX4(v1, v2, v3, v4), MAX4(v5, v6, v7, v8))
+#define CoordinatesToIndex(coordinates) ((coordinates.y + 1) * Stride + coordinates.x + 1)
+#define IndexToCoordinates(index) int2((index % Stride) - 1, (index / Stride) - 1)
+#define SetBitmapFlag(reference, flag, value) reference.BitmapFlags = value ? reference.BitmapFlags | flag : reference.BitmapFlags & ~flag
+#define CheckBitmapFlag(reference, flag) ((reference.BitmapFlags & flag) != 0)
+
 // This constant is here only for the version counting. This makes Unity to refresh the shader.
 // Increase it each time you update the shader code. The actual name doesn't matter, it just needs to be different.
 float VERSION_7 = 7;
@@ -26,9 +34,9 @@ RWStructuredBuffer<float> ContaminationCandidates; // Set one time on shader ini
 // For better performance, pack all data to the aligned structures (128-bit multiples).
 struct InputStruct1 {
     float Contamination;
+    float WaterDepth;
     int UnsafeCellHeight;
-    int CeiledWaterHeight;
-    uint Bitmap;
+    uint BitmapFlags;
 
     static const uint ContaminationBarrierBit = 0x0001;
     static const uint AboveMoistureBarrierBit = 0x0002;
@@ -37,9 +45,9 @@ StructuredBuffer<InputStruct1> PackedInput1;
 
 #define Contamination(index) PackedInput1[index].Contamination
 #define UnsafeCellHeight(index) PackedInput1[index].UnsafeCellHeight
-#define CeiledWaterHeight(index) PackedInput1[index].CeiledWaterHeight
-#define ContaminationBarriers(index) (PackedInput1[index].Bitmap & InputStruct1::ContaminationBarrierBit)
-#define AboveMoistureBarriers(index) (PackedInput1[index].Bitmap & InputStruct1::AboveMoistureBarrierBit)
+#define CeiledWaterHeight(index) ceil(PackedInput1[index].WaterDepth + PackedInput1[index].UnsafeCellHeight)
+#define ContaminationBarriers(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::ContaminationBarrierBit)
+#define AboveMoistureBarriers(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::AboveMoistureBarrierBit)
 
 // OUTPUT: Read on every dispatch.
 RWStructuredBuffer<float> ContaminationLevels;
@@ -48,23 +56,10 @@ AppendStructuredBuffer<int> ContaminationsChangedLastTick;
 // INTERMEDIATE: Only used between the kernels.
 RWStructuredBuffer<float> LastTickContaminationCandidates;
 
-// Execution chain:
-// SavePreviousState(in ContaminationCandidates, out LastTickContaminationCandidates)
-// CalculateContaminationCandidates(
-//     in LastTickContaminationCandidates, in Contamination, in UnsafeCellHeight, in ContaminationBarriers
-//     in AboveMoistureBarriers, in CeiledWaterHeight, out ContaminationCandidates)
-// UpdateContaminationsFromCandidates(
-//     in ContaminationLevels, in ContaminationCandidates, out ContaminationLevels, out ContaminationsChangedLastTick)
-
-// Common functions.
-#define MAX(v1, v2, v3, v4) max(max(v1, v2), max(v3, v4))
-#define CoordinatesToIndex(coordinates) ((coordinates.y + 1) * Stride + coordinates.x + 1)
-#define IndexToCoordinates(index) int2((index % Stride) - 1, (index / Stride) - 1)
-
 // Constants.
 #define MIN_LEVEL_CHANGE 0.000001
 
-// This shader specific forwards.
+// Forward functions declarations.
 float GetContaminationCandidate(uint index);
 float GetContaminationFromWater(int neighborIndex, int neighborTerrainHeight, int originTerrainHeight);
 float GetContaminationFromNeighbor(int neighborIndex, int neighborTerrainHeight, int originTerrainHeight, float spreadCost);
@@ -137,20 +132,20 @@ float GetContaminationCandidate(uint index)
     bool flag2 = ContaminationBarriers(num3);
     bool flag3 = ContaminationBarriers(num5);
     bool flag4 = ContaminationBarriers(num7);
-    float num9 = MAX(
+    float num9 = MAX4(
         GetContaminationFromWater(num, neighborTerrainHeight, originTerrainHeight),
         GetContaminationFromWater(num3, neighborTerrainHeight3, originTerrainHeight),
         GetContaminationFromWater(num5, neighborTerrainHeight5, originTerrainHeight),
         GetContaminationFromWater(num7, neighborTerrainHeight7, originTerrainHeight));
-    float num10 = max(
-        MAX(GetContaminationFromNeighbor(num, neighborTerrainHeight, originTerrainHeight, RegularSpreadCost),
-            GetContaminationFromNeighbor(num2, neighborTerrainHeight2, originTerrainHeight, DiagonalSpreadCost, flag, flag2),
-            GetContaminationFromNeighbor(num3, neighborTerrainHeight3, originTerrainHeight, RegularSpreadCost),
-            GetContaminationFromNeighbor(num4, neighborTerrainHeight4, originTerrainHeight, DiagonalSpreadCost, flag2, flag3)),
-        MAX(GetContaminationFromNeighbor(num5, neighborTerrainHeight5, originTerrainHeight, RegularSpreadCost),
-            GetContaminationFromNeighbor(num6, neighborTerrainHeight6, originTerrainHeight, DiagonalSpreadCost, flag3, flag4),
-            GetContaminationFromNeighbor(num7, neighborTerrainHeight7, originTerrainHeight, RegularSpreadCost),
-            GetContaminationFromNeighbor(num8, neighborTerrainHeight8, originTerrainHeight, DiagonalSpreadCost, flag4, flag)));
+    float num10 = MAX8(
+        GetContaminationFromNeighbor(num, neighborTerrainHeight, originTerrainHeight, RegularSpreadCost),
+        GetContaminationFromNeighbor(num2, neighborTerrainHeight2, originTerrainHeight, DiagonalSpreadCost, flag, flag2),
+        GetContaminationFromNeighbor(num3, neighborTerrainHeight3, originTerrainHeight, RegularSpreadCost),
+        GetContaminationFromNeighbor(num4, neighborTerrainHeight4, originTerrainHeight, DiagonalSpreadCost, flag2, flag3),
+        GetContaminationFromNeighbor(num5, neighborTerrainHeight5, originTerrainHeight, RegularSpreadCost),
+        GetContaminationFromNeighbor(num6, neighborTerrainHeight6, originTerrainHeight, DiagonalSpreadCost, flag3, flag4),
+        GetContaminationFromNeighbor(num7, neighborTerrainHeight7, originTerrainHeight, RegularSpreadCost),
+        GetContaminationFromNeighbor(num8, neighborTerrainHeight8, originTerrainHeight, DiagonalSpreadCost, flag4, flag));
     float num11 = LastTickContaminationCandidates[index];
     float num12 = num11 - ContaminationDecayRate;
     if (num12 < 0)
