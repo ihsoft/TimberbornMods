@@ -1,8 +1,37 @@
 // Shader that simulates water.
 
+// Kernels and execution order:
+// 1. SavePreviousState
+// 2. UpdateOutflows
+// 3. UpdateWaterParameters
+// 4. SimulateContaminationDiffusion1
+// 5. SimulateContaminationDiffusion2
+
+#pragma kernel SavePreviousState
+// IN: WaterDepthsBuff, ContaminationsBuff.
+// OUT: InitialWaterDepthsBuff, ContaminationsBufferBuff.
+
+#pragma kernel UpdateOutflows
+// IN: OutflowsBuff, WaterDepthsBuff,
+//     InputStruct1.ImpermeableSurfaceServiceHeights, InputStruct1.IndexIsInActualMap,
+//     InputStruct1.ImpermeableSurfaceServiceMinFlowSlowers, InputStruct1.BitmapFlags.
+// OUT: TempOutflowsBuff
+
+#pragma kernel UpdateWaterParameters
+// IN: WaterDepthsBuff, TempOutflowsBuff, ContaminationsBuff, InitialWaterDepthsBuff,
+//     InputStruct1.EvaporationModifiers
+// OUT: WaterDepthsBuff, OutflowsBuff, ContaminationsBufferBuff.
+
+#pragma kernel SimulateContaminationDiffusion1
+// IN: WaterDepthsBuff, TempOutflowsBuff,
+//     InputStruct1.ImpermeableSurfaceServiceHeights, InputStruct1.BitmapFlags.
+// OUT: ContaminationDiffusionsBuff.
+
+#pragma kernel SimulateContaminationDiffusion2
+// IN: WaterDepthsBuff, ContaminationsBufferBuff, ContaminationDiffusionsBuff.
+// OUT: ContaminationsBuff.
+
 // Common functions.
-// FIXME: Get back to it and try renaming to const.
-// ReSharper disable CppLocalVariableMayBeConst
 #define MAX4(v1, v2, v3, v4) max(max(v1, v2), max(v3, v4))
 #define MAX8(v1, v2, v3, v4, v5, v6, v7, v8) max(MAX4(v1, v2, v3, v4), MAX4(v5, v6, v7, v8))
 #define CoordinatesToIndex(coordinates) ((coordinates.y + 1) * Stride + coordinates.x + 1)
@@ -122,7 +151,6 @@ bool CanDiffuse(float sourceWaterHeight, int targetIndex, float outflowToTarget)
 float CalculateDiffusion(float sourceContamination, float sourceWaterDepth, int targetIndex, float diffusionFraction);
 float GetContaminationDiffusionChange(int index);
 
-#pragma kernel SavePreviousState
 [numthreads(1024, 1, 1)]
 void SavePreviousState(uint3 id : SV_DispatchThreadID)
 {
@@ -130,7 +158,6 @@ void SavePreviousState(uint3 id : SV_DispatchThreadID)
     ContaminationsBuffer(id.x) = Contaminations(id.x);
 }
 
-#pragma kernel UpdateOutflows
 [numthreads(8, 8, 1)]
 void UpdateOutflows(uint3 id : SV_DispatchThreadID)
 {
@@ -138,7 +165,6 @@ void UpdateOutflows(uint3 id : SV_DispatchThreadID)
     UpdateOutflow(index);
 }
 
-#pragma kernel UpdateWaterParameters
 [numthreads(8, 8, 1)]
 void UpdateWaterParameters(uint3 id : SV_DispatchThreadID)
 {
@@ -148,7 +174,6 @@ void UpdateWaterParameters(uint3 id : SV_DispatchThreadID)
     SimulateContaminationMovement(num);
 }
 
-#pragma kernel SimulateContaminationDiffusion1
 [numthreads(8, 8, 1)]
 void SimulateContaminationDiffusion1(uint3 id : SV_DispatchThreadID)
 {
@@ -159,7 +184,6 @@ void SimulateContaminationDiffusion1(uint3 id : SV_DispatchThreadID)
     }
 }
 
-#pragma kernel SimulateContaminationDiffusion2
 [numthreads(8, 8, 1)]
 void SimulateContaminationDiffusion2(uint3 id : SV_DispatchThreadID)
 {

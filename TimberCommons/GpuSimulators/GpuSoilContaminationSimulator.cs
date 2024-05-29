@@ -84,9 +84,9 @@ sealed class GpuSoilContaminationSimulator {
 
   // ReSharper disable NotAccessedField.Local
   struct InputStruct1 {
-    public float Contamination;
-    public float WaterDepth;
-    public int UnsafeCellHeight;
+    public float Contaminations;
+    public float WaterDepths;
+    public int UnsafeCellHeights;
     public uint BitmapFlags;
 
     public const uint ContaminationBarrierBit = 0x0001;
@@ -109,11 +109,11 @@ sealed class GpuSoilContaminationSimulator {
     _packedInput1 = new InputStruct1[totalMapSize];
     _contaminationsChangedLastTick = new int[totalMapSize];
     _contaminationsChangedLastTickBuffer = new AppendBuffer<int>(
-        "ContaminationsChangedLastTick", _contaminationsChangedLastTick);
+        "ContaminationsChangedLastTickBuff", _contaminationsChangedLastTick);
     _contaminationCandidatesBuffer = new SimpleBuffer<float>(
-        "ContaminationCandidates", _soilContaminationSimulator._contaminationCandidates);
+        "ContaminationCandidatesBuff", _soilContaminationSimulator._contaminationCandidates);
     _contaminationLevelsBuffer = new SimpleBuffer<float>(
-        "ContaminationLevels", _soilContaminationSimulator.ContaminationLevels);
+        "ContaminationLevelsBuff", _soilContaminationSimulator.ContaminationLevels);
 
     var prefab = _resourceAssetLoader.Load<ComputeShader>(SimulatorShaderName);
     var shader = Object.Instantiate(prefab);
@@ -137,21 +137,21 @@ sealed class GpuSoilContaminationSimulator {
         // All buffers.
         .WithInputBuffer("PackedInput1", _packedInput1)
         .WithIntermediateBuffer(_contaminationCandidatesBuffer)
-        .WithIntermediateBuffer("LastTickContaminationCandidates", sizeof(float), totalMapSize)
-        .WithOutputBuffer("ContaminationLevels", _soilContaminationSimulator.ContaminationLevels)
+        .WithIntermediateBuffer("LastTickContaminationCandidatesBuff", sizeof(float), totalMapSize)
+        .WithOutputBuffer("ContaminationLevelsBuff", _soilContaminationSimulator.ContaminationLevels)
         .WithOutputBuffer(_contaminationsChangedLastTickBuffer)
         // The kernel chain! They will execute in the order they are declared.
         .DispatchKernel(
             "SavePreviousState", new Vector3Int(totalMapSize, 1, 1),
-            "i:ContaminationCandidates", "o:LastTickContaminationCandidates")
+            "i:ContaminationCandidatesBuff", "o:LastTickContaminationCandidatesBuff")
         .DispatchKernel(
             "CalculateContaminationCandidates", mapDataSize,
-            "i:LastTickContaminationCandidates", "s:PackedInput1",
-            "o:ContaminationCandidates")
+            "i:LastTickContaminationCandidatesBuff", "s:PackedInput1",
+            "o:ContaminationCandidatesBuff")
         .DispatchKernel(
             "UpdateContaminationsFromCandidates", mapDataSize,
-            "s:ContaminationLevels", "i:ContaminationCandidates",
-            "r:ContaminationLevels", "r:ContaminationsChangedLastTick")
+            "s:ContaminationLevelsBuff", "i:ContaminationCandidatesBuff",
+            "r:ContaminationLevelsBuff", "r:ContaminationsChangedLastTickBuff")
         .Build();
   }
 
@@ -167,9 +167,9 @@ sealed class GpuSoilContaminationSimulator {
         bitmapFlags |= InputStruct1.AboveMoistureBarrierBit;
       }
       _packedInput1[index] = new InputStruct1 {
-          Contamination = sim._waterContaminationService.Contamination(index),
-          WaterDepth = sim._waterService.WaterDepth(index),
-          UnsafeCellHeight = sim._terrainService.UnsafeCellHeight(index),
+          Contaminations = sim._waterContaminationService.Contamination(index),
+          WaterDepths = sim._waterService.WaterDepth(index),
+          UnsafeCellHeights = sim._terrainService.UnsafeCellHeight(index),
           BitmapFlags = bitmapFlags,
       };
     }

@@ -63,7 +63,6 @@ sealed class GpuSoilMoistureSimulator {
   #region Implementation
 
   const string SimulatorShaderName = "igorz.timbercommons/shaders/SoilMoistureSimulatorPacked";
-  const float MinLevelChangePrecision = 0.0001f;
 
   readonly SoilMoistureSimulator _soilMoistureSimulator;
   readonly IResourceAssetLoader _resourceAssetLoader;
@@ -72,9 +71,9 @@ sealed class GpuSoilMoistureSimulator {
   // Inputs.
   // ReSharper disable NotAccessedField.Local
   struct InputStruct1 {
-    public float Contamination;
-    public float WaterDepth;
-    public int UnsafeCellHeight;
+    public float Contaminations;
+    public float WaterDepths;
+    public int UnsafeCellHeights;
     public uint BitmapFlags;
 
     public const uint ContaminationBarrierBit = 0x0001;
@@ -122,7 +121,6 @@ sealed class GpuSoilMoistureSimulator {
     _shaderPipeline = ShaderPipeline.NewBuilder(shader)
         // Simulation settings.
         // Common.
-        .WithConstantValue("MinLevelChange", MinLevelChangePrecision)
         .WithConstantValue("Stride", _mapIndexService.Stride)
         // SoilMoistureSimulationSettings
         .WithConstantValue("ConstantQuadraticCoefficient", simulationSettings.ConstantQuadraticCoefficient)
@@ -185,9 +183,9 @@ sealed class GpuSoilMoistureSimulator {
         bitmapFlags |= InputStruct1.WaterTowerIrrigatedBit;
       }
       _packedInput1[index] = new InputStruct1 {
-          Contamination = sim._waterContaminationService.Contamination(index),
-          WaterDepth = sim._waterService.WaterDepth(index),
-          UnsafeCellHeight = sim._terrainService.UnsafeCellHeight(index),
+          Contaminations = sim._waterContaminationService.Contamination(index),
+          WaterDepths = sim._waterService.WaterDepth(index),
+          UnsafeCellHeights = sim._terrainService.UnsafeCellHeight(index),
           BitmapFlags = bitmapFlags,
       };
     }

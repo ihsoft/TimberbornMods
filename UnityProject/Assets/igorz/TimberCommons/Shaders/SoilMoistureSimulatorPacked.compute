@@ -1,5 +1,28 @@
 // Shader that simulates soil moisture.
 
+// Kernels and execution order:
+// 1. SavePreviousState
+// 2. CountWateredNeighbors
+// 3. CalculateClusterSaturationAndWaterEvaporation
+// 4. CalculateMoisture
+
+#pragma kernel SavePreviousState
+// IN: MoistureLevelsBuff
+// OUT: LastTickMoistureLevelsBuff
+
+#pragma kernel CountWateredNeighbors
+// IN: InputStruct1.WaterDepths
+// OUT: WateredNeighboursBuff
+
+#pragma kernel CalculateClusterSaturationAndWaterEvaporation
+// IN: InputStruct1.WaterDepths, WateredNeighboursBuff
+// OUT: ClusterSaturationBuff, WaterEvaporationModifierBuff
+
+#pragma kernel CalculateMoisture
+// IN: InputStruct1.WaterDepths, InputStruct1.Contaminations, InputStruct1.UnsafeCellHeights, InputStruct1.BitmapFlags,
+//     MoistureLevelsBuff, LastTickMoistureLevelsBuff, ClusterSaturationBuff
+// OUT: MoistureLevelsBuff, MoistureLevelsChangedLastTickBuff
+
 // Common functions.
 #define MAX4(v1, v2, v3, v4) max(max(v1, v2), max(v3, v4))
 #define MAX8(v1, v2, v3, v4, v5, v6, v7, v8) max(MAX4(v1, v2, v3, v4), MAX4(v5, v6, v7, v8))
@@ -10,7 +33,6 @@
 
 // Constants. Set the values only once.
 uint Stride;
-float MinLevelChange;
 
 // SoilMoistureSimulationSettings
 float ConstantQuadraticCoefficient;
@@ -24,11 +46,14 @@ float WaterContaminationScaler;
 // DirectSoilMoistureSystemSettings
 float WaterTowerIrrigatedLevel;
 
+// Floating point comparison tolerance.
+#define MIN_LEVEL_CHANGE 0.0001
+
 // INPUT: Update on every dispatch.
 struct InputStruct1 {
-    float Contamination;
-    float WaterDepth;
-    int UnsafeCellHeight;
+    float Contaminations;
+    float WaterDepths;
+    int UnsafeCellHeights;
     uint BitmapFlags;
 
     static const uint ContaminationBarrierBit = 0x0001;
@@ -38,22 +63,22 @@ struct InputStruct1 {
 };
 StructuredBuffer<InputStruct1> PackedInput1;
 
-#define Contamination(index) PackedInput1[index].Contamination
-#define WaterDepth(index) PackedInput1[index].WaterDepth
-#define UnsafeCellHeight(index) PackedInput1[index].UnsafeCellHeight
-#define CeiledWaterHeight(index) ceil(PackedInput1[index].WaterDepth + PackedInput1[index].UnsafeCellHeight)
+#define Contaminations(index) PackedInput1[index].Contaminations
+#define WaterDepths(index) PackedInput1[index].WaterDepths
+#define UnsafeCellHeights(index) PackedInput1[index].UnsafeCellHeights
+#define CeiledWaterHeights(index) ceil(PackedInput1[index].WaterDepths + PackedInput1[index].UnsafeCellHeights)
 #define ContaminationBarriers(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::ContaminationBarrierBit)
 #define AboveMoistureBarriers(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::AboveMoistureBarrierBit)
 #define FullMoistureBarriers(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::FullMoistureBarrierBit)
 #define WaterTowerIrrigated(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::WaterTowerIrrigatedBit)
 
 // OUTPUT: fetch on every dispatch.
-RWStructuredBuffer<float> MoistureLevelsBuff;  // Init once. TimberCommons doesn't like it.
+RWStructuredBuffer<float> MoistureLevelsBuff;
 RWStructuredBuffer<float> WaterEvaporationModifierBuff;
 AppendStructuredBuffer<int> MoistureLevelsChangedLastTickBuff;
 
 #define MoistureLevels(index) MoistureLevelsBuff[index]
-#define SetWaterEvaporationModifier(index, value) WaterEvaporationModifierBuff[index] = value
+#define WaterEvaporationModifier(index) WaterEvaporationModifierBuff[index]
 
 // INTERMEDIATE: Only used between the kernels.
 RWStructuredBuffer<float> LastTickMoistureLevelsBuff; 
@@ -74,21 +99,17 @@ float MoistureSpreadByMoistCell(
 float MoistureSpreadByMoistCell(
     int neighborIndex, int neighborTerrainHeight, int originTerrainHeight, float spreadCost);
 
-#pragma kernel SavePreviousState
-
 [numthreads(1024, 1, 1)]
 void SavePreviousState(uint3 id : SV_DispatchThreadID)
 {
     LastTickMoistureLevels(id.x) = MoistureLevels(id.x);
 }
 
-#pragma kernel CountWateredNeighbors
-
 [numthreads(8, 8, 1)]
 void CountWateredNeighbors(uint3 id : SV_DispatchThreadID) {
     const uint index = CoordinatesToIndex(id.xy);
     int count = 0;
-    if (WaterDepth(index) > 0) {
+    if (WaterDepths(index) > 0) {
         count++;
         int num = index - Stride;
         int num2 = index - Stride - 1;
@@ -98,26 +119,24 @@ void CountWateredNeighbors(uint3 id : SV_DispatchThreadID) {
         int num6 = index + Stride + 1;
         int num7 = index + 1;
         int num8 = index - Stride + 1;
-        count += WaterDepth(num) > 0 ? 1 : 0;
-        count += WaterDepth(num2) > 0 ? 1 : 0;
-        count += WaterDepth(num3) > 0 ? 1 : 0;
-        count += WaterDepth(num4) > 0 ? 1 : 0;
-        count += WaterDepth(num5) > 0 ? 1 : 0;
-        count += WaterDepth(num6) > 0 ? 1 : 0;
-        count += WaterDepth(num7) > 0 ? 1 : 0;
-        count += WaterDepth(num8) > 0 ? 1 : 0;
+        count += WaterDepths(num) > 0 ? 1 : 0;
+        count += WaterDepths(num2) > 0 ? 1 : 0;
+        count += WaterDepths(num3) > 0 ? 1 : 0;
+        count += WaterDepths(num4) > 0 ? 1 : 0;
+        count += WaterDepths(num5) > 0 ? 1 : 0;
+        count += WaterDepths(num6) > 0 ? 1 : 0;
+        count += WaterDepths(num7) > 0 ? 1 : 0;
+        count += WaterDepths(num8) > 0 ? 1 : 0;
     }
     WateredNeighbours(index) = count;
 }
 
-#pragma kernel CalculateClusterSaturationAndWaterEvaporation
-
 [numthreads(8, 8, 1)]
 void CalculateClusterSaturationAndWaterEvaporation(uint3 id : SV_DispatchThreadID) {
     const uint index = CoordinatesToIndex(id.xy);
-    if (!(WaterDepth(index) > 0)) {
+    if (!(WaterDepths(index) > 0)) {
         ClusterSaturation(index) = 0;
-        SetWaterEvaporationModifier(index, 1);
+        WaterEvaporationModifier(index) = 1;
         return;
     }
     int num2 = index - Stride;
@@ -148,10 +167,8 @@ void CalculateClusterSaturationAndWaterEvaporation(uint3 id : SV_DispatchThreadI
     float modifier = QuadraticEvaporationCoefficient * num11 * num11
         + LinearQuadraticCoefficient * num11
         + ConstantQuadraticCoefficient;
-    SetWaterEvaporationModifier(index, modifier);
+    WaterEvaporationModifier(index) = modifier;
 }
-
-#pragma kernel CalculateMoisture
 
 [numthreads(8, 8, 1)]
 void CalculateMoisture(uint3 id : SV_DispatchThreadID)
@@ -163,7 +180,7 @@ void CalculateMoisture(uint3 id : SV_DispatchThreadID)
     {
         newLevel = WaterTowerIrrigatedLevel;
     }
-    if (abs(oldLevel - newLevel) > MinLevelChange)
+    if (abs(oldLevel - newLevel) > MIN_LEVEL_CHANGE)
     {
         MoistureLevels(index) = newLevel;
         MoistureLevelsChangedLastTickBuff.Append(index);
@@ -177,22 +194,22 @@ float GetUpdatedMoisture(int index)
         return 0;
     }
     int num = index - Stride;
-    int num2 = UnsafeCellHeight(num);
+    int num2 = UnsafeCellHeights(num);
     int num3 = index - Stride - 1;
-    int num4 = UnsafeCellHeight(num3);
+    int num4 = UnsafeCellHeights(num3);
     int num5 = index - 1;
-    int num6 = UnsafeCellHeight(num5);
+    int num6 = UnsafeCellHeights(num5);
     int num7 = index + Stride - 1;
-    int num8 = UnsafeCellHeight(num7);
+    int num8 = UnsafeCellHeights(num7);
     int num9 = index + Stride;
-    int num10 = UnsafeCellHeight(num9);
+    int num10 = UnsafeCellHeights(num9);
     int num11 = index + Stride + 1;
-    int num12 = UnsafeCellHeight(num11);
+    int num12 = UnsafeCellHeights(num11);
     int num13 = index + 1;
-    int num14 = UnsafeCellHeight(num13);
+    int num14 = UnsafeCellHeights(num13);
     int num15 = index - Stride + 1;
-    int num16 = UnsafeCellHeight(num15);
-    int originTerrainHeight = UnsafeCellHeight(index);
+    int num16 = UnsafeCellHeights(num15);
+    int originTerrainHeight = UnsafeCellHeights(index);
     float num17 = LastTickMoistureLevels(index);
     bool flag = FullMoistureBarriers(num);
     bool flag2 = FullMoistureBarriers(num5);
@@ -203,14 +220,14 @@ float GetUpdatedMoisture(int index)
         MoistureSpreadByWateredCell(num5, num6, originTerrainHeight),
         MoistureSpreadByWateredCell(num9, num10, originTerrainHeight),
         MoistureSpreadByWateredCell(num13, num14, originTerrainHeight));
-    int num19 = (int)ceil(WaterDepth(num));
-    int num20 = (int)ceil(WaterDepth(num3));
-    int num21 = (int)ceil(WaterDepth(num5));
-    int num22 = (int)ceil(WaterDepth(num7));
-    int num23 = (int)ceil(WaterDepth(num9));
-    int num24 = (int)ceil(WaterDepth(num11));
-    int num25 = (int)ceil(WaterDepth(num13));
-    int num26 = (int)ceil(WaterDepth(num15));
+    int num19 = (int)ceil(WaterDepths(num));
+    int num20 = (int)ceil(WaterDepths(num3));
+    int num21 = (int)ceil(WaterDepths(num5));
+    int num22 = (int)ceil(WaterDepths(num7));
+    int num23 = (int)ceil(WaterDepths(num9));
+    int num24 = (int)ceil(WaterDepths(num11));
+    int num25 = (int)ceil(WaterDepths(num13));
+    int num26 = (int)ceil(WaterDepths(num15));
     float num27 = MAX8(
         MoistureSpreadByMoistCell(num, num2 + num19, originTerrainHeight, 1),
         MoistureSpreadByMoistCell(num3, num4 + num20, originTerrainHeight, 1.414f, flag, flag2),
@@ -235,7 +252,7 @@ float GetUpdatedMoisture(int index)
     {
         num29 = num27;
     }
-    return num29 * (1 - Contamination(index));
+    return num29 * (1 - Contaminations(index));
 }
 
 int MoistureSpreadByWateredCell(int neighborIndex, int neighborTerrainHeight, int originTerrainHeight)
@@ -244,7 +261,7 @@ int MoistureSpreadByWateredCell(int neighborIndex, int neighborTerrainHeight, in
     {
         return 0;
     }
-    int num = CeiledWaterHeight(neighborIndex);
+    int num = CeiledWaterHeights(neighborIndex);
     if (num <= 0)
     {
         return 0;
@@ -261,7 +278,7 @@ int MoistureSpreadByWateredCell(int neighborIndex, int neighborTerrainHeight, in
 int GetMoistureOfWateredCell(int indexAtOrigin)
 {
     float num = 2 * (float)ClusterSaturation(indexAtOrigin);
-    float num2 = Contamination(indexAtOrigin);
+    float num2 = Contaminations(indexAtOrigin);
     if (num2 < MinimumWaterContamination)
     {
         return (int)num;

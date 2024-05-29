@@ -1,5 +1,23 @@
 // Shader that simulates soil contamination.
 
+// Kernels and execution order:
+// 1. SavePreviousState
+// 2. CalculateContaminationCandidates
+// 3. UpdateContaminationsFromCandidates
+
+#pragma kernel SavePreviousState
+// IN: ContaminationCandidatesBuff
+// OUT: LastTickContaminationCandidatesBuff
+
+#pragma kernel CalculateContaminationCandidates
+// IN: LastTickContaminationCandidatesBuff,
+//     InputStruct1.UnsafeCellHeights, InputStruct1.BitmapFlags, InputStruct1.WaterDepths,
+// OUT: ContaminationCandidatesBuff
+
+#pragma kernel UpdateContaminationsFromCandidates
+// IN: ContaminationCandidatesBuff, ContaminationLevelsBuff
+// OUT: ContaminationLevelsBuff, ContaminationsChangedLastTickBuff
+
 // Common functions.
 #define MAX4(v1, v2, v3, v4) max(max(v1, v2), max(v3, v4))
 #define MAX8(v1, v2, v3, v4, v5, v6, v7, v8) max(MAX4(v1, v2, v3, v4), MAX4(v5, v6, v7, v8))
@@ -7,10 +25,6 @@
 #define IndexToCoordinates(index) int2((index % Stride) - 1, (index / Stride) - 1)
 #define SetBitmapFlag(reference, flag, value) reference.BitmapFlags = value ? reference.BitmapFlags | flag : reference.BitmapFlags & ~flag
 #define CheckBitmapFlag(reference, flag) ((reference.BitmapFlags & flag) != 0)
-
-// This constant is here only for the version counting. This makes Unity to refresh the shader.
-// Increase it each time you update the shader code. The actual name doesn't matter, it just needs to be different.
-float VERSION_7 = 7;
 
 // Constants. Set the values only once.
 uint Stride;
@@ -27,15 +41,20 @@ float MinimumWaterContamination;
 float RegularSpreadCost;
 float VerticalCostModifier;
 
+// Floating point comparison tolerance.
+#define MIN_LEVEL_CHANGE 0.000001
+
 // Persistent shader state.
-RWStructuredBuffer<float> ContaminationCandidates; // Set one time on shader init. 
+RWStructuredBuffer<float> ContaminationCandidatesBuff; // Set one time on shader init.
+
+#define ContaminationCandidates(index) ContaminationCandidatesBuff[index]
 
 // INPUT: Update on every dispatch.
 // For better performance, pack all data to the aligned structures (128-bit multiples).
 struct InputStruct1 {
-    float Contamination;
-    float WaterDepth;
-    int UnsafeCellHeight;
+    float Contaminations;
+    float WaterDepths;
+    int UnsafeCellHeights;
     uint BitmapFlags;
 
     static const uint ContaminationBarrierBit = 0x0001;
@@ -43,21 +62,23 @@ struct InputStruct1 {
 };
 StructuredBuffer<InputStruct1> PackedInput1;
 
-#define Contamination(index) PackedInput1[index].Contamination
-#define UnsafeCellHeight(index) PackedInput1[index].UnsafeCellHeight
-#define CeiledWaterHeight(index) ceil(PackedInput1[index].WaterDepth + PackedInput1[index].UnsafeCellHeight)
+#define Contaminations(index) PackedInput1[index].Contaminations
+#define UnsafeCellHeights(index) PackedInput1[index].UnsafeCellHeights
+#define CeiledWaterHeights(index) ceil(PackedInput1[index].WaterDepths + PackedInput1[index].UnsafeCellHeights)
 #define ContaminationBarriers(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::ContaminationBarrierBit)
 #define AboveMoistureBarriers(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::AboveMoistureBarrierBit)
 
 // OUTPUT: Read on every dispatch.
-RWStructuredBuffer<float> ContaminationLevels;
-AppendStructuredBuffer<int> ContaminationsChangedLastTick;
+RWStructuredBuffer<float> ContaminationLevelsBuff;
+AppendStructuredBuffer<int> ContaminationsChangedLastTickBuff;
+
+#define ContaminationLevels(index) ContaminationLevelsBuff[index]
+#define AddContaminationsChangedLastTick(index) ContaminationsChangedLastTickBuff.Append(index)
 
 // INTERMEDIATE: Only used between the kernels.
-RWStructuredBuffer<float> LastTickContaminationCandidates;
+RWStructuredBuffer<float> LastTickContaminationCandidatesBuff;
 
-// Constants.
-#define MIN_LEVEL_CHANGE 0.000001
+#define LastTickContaminationCandidates(index) LastTickContaminationCandidatesBuff[index]
 
 // Forward functions declarations.
 float GetContaminationCandidate(uint index);
@@ -65,31 +86,25 @@ float GetContaminationFromWater(int neighborIndex, int neighborTerrainHeight, in
 float GetContaminationFromNeighbor(int neighborIndex, int neighborTerrainHeight, int originTerrainHeight, float spreadCost);
 float GetContaminationFromNeighbor(int neighborIndex, int neighborTerrainHeight, int originTerrainHeight, float spreadCost, bool firstBarrier, bool secondBarrier);
 
-#pragma kernel SavePreviousState
-
 [numthreads(64, 1, 1)]
 void SavePreviousState(uint3 id : SV_DispatchThreadID)
 {
-    LastTickContaminationCandidates[id.x] = ContaminationCandidates[id.x];
+    LastTickContaminationCandidates(id.x) = ContaminationCandidates(id.x);
 }
-
-#pragma kernel CalculateContaminationCandidates
 
 [numthreads(8, 8, 1)]
 void CalculateContaminationCandidates(uint3 id : SV_DispatchThreadID)
 {
     const uint index = CoordinatesToIndex(id.xy);
-    ContaminationCandidates[index] = GetContaminationCandidate(index);
+    ContaminationCandidates(index) = GetContaminationCandidate(index);
 }
-
-#pragma kernel UpdateContaminationsFromCandidates
 
 [numthreads(8, 8, 1)]
 void UpdateContaminationsFromCandidates(uint3 id : SV_DispatchThreadID)
 {
     const uint index = CoordinatesToIndex(id.xy);
-    float num2 = ContaminationLevels[index];
-    float num3 = ContaminationCandidates[index];
+    float num2 = ContaminationLevels(index);
+    float num3 = ContaminationCandidates(index);
     float num4 = num3 - num2;
     float num5 = ((num4 > 0) ? ContaminationPositiveEqualizationRate : ContaminationNegativeEqualizationRate);
     float num6 = DeltaTime * num5;
@@ -100,8 +115,8 @@ void UpdateContaminationsFromCandidates(uint3 id : SV_DispatchThreadID)
     }
     if (abs(num7 - num2) > MIN_LEVEL_CHANGE)
     {
-        ContaminationLevels[index] = num7;
-        ContaminationsChangedLastTick.Append(index);
+        ContaminationLevels(index) = num7;
+        AddContaminationsChangedLastTick(index);
     }
 }
 
@@ -119,15 +134,15 @@ float GetContaminationCandidate(uint index)
     int num6 = index + Stride + 1;
     int num7 = index + 1;
     int num8 = index - Stride + 1;
-    int neighborTerrainHeight = UnsafeCellHeight(num);
-    int neighborTerrainHeight2 = UnsafeCellHeight(num2);
-    int neighborTerrainHeight3 = UnsafeCellHeight(num3);
-    int neighborTerrainHeight4 = UnsafeCellHeight(num4);
-    int neighborTerrainHeight5 = UnsafeCellHeight(num5);
-    int neighborTerrainHeight6 = UnsafeCellHeight(num6);
-    int neighborTerrainHeight7 = UnsafeCellHeight(num7);
-    int neighborTerrainHeight8 = UnsafeCellHeight(num8);
-    int originTerrainHeight = UnsafeCellHeight(index);
+    int neighborTerrainHeight = UnsafeCellHeights(num);
+    int neighborTerrainHeight2 = UnsafeCellHeights(num2);
+    int neighborTerrainHeight3 = UnsafeCellHeights(num3);
+    int neighborTerrainHeight4 = UnsafeCellHeights(num4);
+    int neighborTerrainHeight5 = UnsafeCellHeights(num5);
+    int neighborTerrainHeight6 = UnsafeCellHeights(num6);
+    int neighborTerrainHeight7 = UnsafeCellHeights(num7);
+    int neighborTerrainHeight8 = UnsafeCellHeights(num8);
+    int originTerrainHeight = UnsafeCellHeights(index);
     bool flag = ContaminationBarriers(num);
     bool flag2 = ContaminationBarriers(num3);
     bool flag3 = ContaminationBarriers(num5);
@@ -146,7 +161,7 @@ float GetContaminationCandidate(uint index)
         GetContaminationFromNeighbor(num6, neighborTerrainHeight6, originTerrainHeight, DiagonalSpreadCost, flag3, flag4),
         GetContaminationFromNeighbor(num7, neighborTerrainHeight7, originTerrainHeight, RegularSpreadCost),
         GetContaminationFromNeighbor(num8, neighborTerrainHeight8, originTerrainHeight, DiagonalSpreadCost, flag4, flag));
-    float num11 = LastTickContaminationCandidates[index];
+    float num11 = LastTickContaminationCandidates(index);
     float num12 = num11 - ContaminationDecayRate;
     if (num12 < 0)
     {
@@ -174,12 +189,12 @@ float GetContaminationFromWater(int neighborIndex, int neighborTerrainHeight, in
     {
         return 0;
     }
-    int num = CeiledWaterHeight(neighborIndex);
+    int num = CeiledWaterHeights(neighborIndex);
     if (num <= 0)
     {
         return 0;
     }
-    float num2 = Contamination(neighborIndex) - MinimumWaterContamination;
+    float num2 = Contaminations(neighborIndex) - MinimumWaterContamination;
     if (num2 < 0)
     {
         return 0;
@@ -202,7 +217,7 @@ float GetContaminationFromNeighbor(int neighborIndex, int neighborTerrainHeight,
         num = 0;
     }
     float num2 = (float)num * VerticalCostModifier;
-    return LastTickContaminationCandidates[neighborIndex] - num2 - spreadCost;
+    return LastTickContaminationCandidates(neighborIndex) - num2 - spreadCost;
 }
 
 float GetContaminationFromNeighbor(int neighborIndex, int neighborTerrainHeight, int originTerrainHeight, float spreadCost, bool firstBarrier, bool secondBarrier)
