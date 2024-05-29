@@ -78,7 +78,7 @@ sealed class GpuWaterSimulator {
 
   // Inputs.
   // ReSharper disable NotAccessedField.Local
-  struct InputStruct1 {
+  struct InputStruct2 {
     public int ImpermeableSurfaceServiceHeight;
     public int ImpermeableSurfaceServiceMinFlowSlower;
     public float EvaporationModifier;
@@ -89,7 +89,7 @@ sealed class GpuWaterSimulator {
   };
   // ReSharper restore NotAccessedField.Local
 
-  InputStruct1[] _packedInput1;
+  InputStruct2[] _packedInput2;
 
   ShaderPipeline _shaderPipeline;
   int _totalMapSize;
@@ -110,7 +110,7 @@ sealed class GpuWaterSimulator {
     var waterSimulationSettings = _simulator._waterSimulationSettings;
     var waterContaminationSimulationSettings = _simulator._waterContaminationSimulationSettings;
 
-    _packedInput1 = new InputStruct1[_totalMapSize];
+    _packedInput2 = new InputStruct2[_totalMapSize];
 
     var prefab = _resourceAssetLoader.Load<ComputeShader>(SimulatorShaderName);
     var shader = Object.Instantiate(prefab);
@@ -141,7 +141,7 @@ sealed class GpuWaterSimulator {
         .WithConstantValue("DiffusionOutflowLimit", waterContaminationSimulationSettings.DiffusionOutflowLimit)
         .WithConstantValue("DiffusionRate", waterContaminationSimulationSettings.DiffusionRate)
         // All buffers.
-        .WithInputBuffer("PackedInput1", _packedInput1)
+        .WithInputBuffer("PackedInput2", _packedInput2)
         .WithIntermediateBuffer("TempOutflowsBuff", sizeof(float) * 4, _totalMapSize)
         .WithIntermediateBuffer("InitialWaterDepthsBuff", sizeof(float), _totalMapSize)
         .WithIntermediateBuffer("ContaminationsBufferBuff", sizeof(float), _totalMapSize)
@@ -156,17 +156,17 @@ sealed class GpuWaterSimulator {
             "o:InitialWaterDepthsBuff", "o:ContaminationsBufferBuff")
         .DispatchKernel(
             "UpdateOutflows", mapDataSize,
-            "s:PackedInput1", "s:WaterDepthsBuff", "s:OutflowsBuff", "s:ContaminationsBuff",
+            "s:PackedInput2", "s:WaterDepthsBuff", "s:OutflowsBuff", "s:ContaminationsBuff",
             "o:TempOutflowsBuff")
         .DispatchKernel(
             "UpdateWaterParameters", mapDataSize,
-            "s:PackedInput1", "s:WaterDepthsBuff", "s:ContaminationsBuff", "s:OutflowsBuff",
+            "s:PackedInput2", "s:WaterDepthsBuff", "s:ContaminationsBuff", "s:OutflowsBuff",
             "i:TempOutflowsBuff", "i:InitialWaterDepthsBuff",
             "o:ContaminationsBufferBuff",
             "r:OutflowsBuff", "r:WaterDepthsBuff")
         .DispatchKernel(
             "SimulateContaminationDiffusion1", mapDataSize,
-            "s:PackedInput1", "s:WaterDepthsBuff",
+            "s:PackedInput2", "s:WaterDepthsBuff",
             "i:TempOutflowsBuff",
             "o:ContaminationDiffusionsBuff")
         .DispatchKernel(
@@ -192,13 +192,13 @@ sealed class GpuWaterSimulator {
     for (var index = 0; index < _totalMapSize; index++) {
       uint bitmapFlags = 0;
       if (sim._impermeableSurfaceService.PartialObstacles[index]) {
-        bitmapFlags |= InputStruct1.PartialObstaclesBit;
+        bitmapFlags |= InputStruct2.PartialObstaclesBit;
       }
       if (sim._mapIndexService.IndexIsInActualMap(index)) {
         // FIXME: This is a constant array that is filled once on game load.
-        bitmapFlags |= InputStruct1.IsInActualMapBit;
+        bitmapFlags |= InputStruct2.IsInActualMapBit;
       }
-      _packedInput1[index] = new InputStruct1 {
+      _packedInput2[index] = new InputStruct2 {
           ImpermeableSurfaceServiceHeight = sim._impermeableSurfaceService.Heights[index],
           ImpermeableSurfaceServiceMinFlowSlower = sim._impermeableSurfaceService.MinFlowSlowers[index],
           EvaporationModifier = sim._threadSafeWaterEvaporationMap.EvaporationModifiers[index],

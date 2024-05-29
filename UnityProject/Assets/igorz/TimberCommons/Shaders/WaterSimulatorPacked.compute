@@ -31,18 +31,9 @@
 // IN: WaterDepthsBuff, ContaminationsBufferBuff, ContaminationDiffusionsBuff.
 // OUT: ContaminationsBuff.
 
-// Common functions.
-#define MAX4(v1, v2, v3, v4) max(max(v1, v2), max(v3, v4))
-#define MAX8(v1, v2, v3, v4, v5, v6, v7, v8) max(MAX4(v1, v2, v3, v4), MAX4(v5, v6, v7, v8))
-#define CoordinatesToIndex(coordinates) ((coordinates.y + 1) * Stride + coordinates.x + 1)
-#define IndexToCoordinates(index) int2((index % Stride) - 1, (index / Stride) - 1)
-#define Clamp01(value) clamp(value, 0.0, 1.0)
-#define InverseLerp(a, b, value) (a != b ? Clamp01((value - a) / (b - a)) : 0.0) 
-#define SetBitmapFlag(reference, flag, value) reference.BitmapFlags = value ? reference.BitmapFlags | flag : reference.BitmapFlags & ~flag
-#define CheckBitmapFlag(reference, flag) ((reference.BitmapFlags & flag) != 0)
+#include "common.hlsl"
 
 // Constants. Set the values only once.
-uint Stride;
 float DeltaTime;
 float MaxContamination;
 
@@ -95,7 +86,7 @@ struct WaterContaminationDiffusion
 static WaterContaminationDiffusion DefaultWaterContaminationDiffusion = { 0, 0, 0, 0 };
 
 // INPUT: Update on every dispatch.
-struct InputStruct1 {
+struct InputStruct2 {
     int ImpermeableSurfaceServiceHeight;
     int ImpermeableSurfaceServiceMinFlowSlower;
     float EvaporationModifier;
@@ -104,13 +95,13 @@ struct InputStruct1 {
     static const uint PartialObstaclesBit = 0x0001;
     static const uint IsInActualMapBit = 0x0002;
 };
-StructuredBuffer<InputStruct1> PackedInput1;
+StructuredBuffer<InputStruct2> PackedInput2;
 
-#define ImpermeableSurfaceServiceHeights(index) PackedInput1[index].ImpermeableSurfaceServiceHeight
-#define ImpermeableSurfaceServiceMinFlowSlowers(index) PackedInput1[index].ImpermeableSurfaceServiceMinFlowSlower
-#define EvaporationModifiers(index) PackedInput1[index].EvaporationModifier
-#define ImpermeableSurfaceServicePartialObstacles(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::PartialObstaclesBit)
-#define IndexIsInActualMap(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::IsInActualMapBit)
+#define ImpermeableSurfaceServiceHeights(index) PackedInput2[index].ImpermeableSurfaceServiceHeight
+#define ImpermeableSurfaceServiceMinFlowSlowers(index) PackedInput2[index].ImpermeableSurfaceServiceMinFlowSlower
+#define EvaporationModifiers(index) PackedInput2[index].EvaporationModifier
+#define ImpermeableSurfaceServicePartialObstacles(index) CheckBitmapFlag(PackedInput2[index], InputStruct2::PartialObstaclesBit)
+#define IndexIsInActualMap(index) CheckBitmapFlag(PackedInput2[index], InputStruct2::IsInActualMapBit)
 
 // OUTPUT: fetch on every dispatch.
 RWStructuredBuffer<WaterFlow> OutflowsBuff; // Flush only.

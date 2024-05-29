@@ -378,6 +378,11 @@
         <Link>GpuSimulators\Shaders\WaterSimulatorPacked.compute</Link>
       </ClInclude>
     </ItemGroup>
+    <ItemGroup>
+      <ClCompile Include="..\UnityProject\Assets\igorz\TimberCommons\Shaders\common.hlsl">
+        <Link>GpuSimulators\Shaders\common.hlsl</Link>
+      </ClCompile>
+    </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.
