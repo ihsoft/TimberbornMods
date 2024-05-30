@@ -10,8 +10,8 @@
 // OUT: LastTickContaminationCandidatesBuff
 
 #pragma kernel CalculateContaminationCandidates
-// IN: LastTickContaminationCandidatesBuff,
-//     InputStruct1.UnsafeCellHeights, InputStruct1.BitmapFlags, InputStruct1.WaterDepths,
+// IN: PackedInput1 (UnsafeCellHeights, InputStruct1.WaterDepths, InputStruct1.BitmapFlags),
+//     LastTickContaminationCandidatesBuff
 // OUT: ContaminationCandidatesBuff
 
 #pragma kernel UpdateContaminationsFromCandidates
@@ -38,53 +38,66 @@ float VerticalCostModifier;
 // FIXME: it actually has precision 0.01
 #define MIN_LEVEL_CHANGE 0.000001
 
-// Persistent shader state.
-RWStructuredBuffer<float> ContaminationCandidatesBuff; // Set one time on shader init.
-
+// Buffer access abstraction functions.    
+#define AppendContaminationsChangedLastTick(index) ContaminationsChangedLastTickBuff.Append(index)
+#define CeiledWaterHeights(index) ceil(PackedInput1[index].WaterDepths + UnsafeCellHeights(index))
 #define ContaminationCandidates(index) ContaminationCandidatesBuff[index]
-
-// INPUT: Update on every dispatch.
-StructuredBuffer<InputStruct1> PackedInput1;
-
-#define Contaminations(index) PackedInput1[index].Contaminations
-#define UnsafeCellHeights(index) PackedInput1[index].UnsafeCellHeights
-#define CeiledWaterHeights(index) ceil(PackedInput1[index].WaterDepths + PackedInput1[index].UnsafeCellHeights)
-#define ContaminationBarriers(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::ContaminationBarrierBit)
-#define AboveMoistureBarriers(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::AboveMoistureBarrierBit)
-
-// OUTPUT: Read on every dispatch.
-RWStructuredBuffer<float> ContaminationLevelsBuff;
-AppendStructuredBuffer<int> ContaminationsChangedLastTickBuff;
-
 #define ContaminationLevels(index) ContaminationLevelsBuff[index]
-#define AddContaminationsChangedLastTick(index) ContaminationsChangedLastTickBuff.Append(index)
-
-// INTERMEDIATE: Only used between the kernels.
-RWStructuredBuffer<float> LastTickContaminationCandidatesBuff;
-
+#define Contaminations(index) PackedInput1[index].Contaminations
 #define LastTickContaminationCandidates(index) LastTickContaminationCandidatesBuff[index]
 
 // Forward functions declarations.
-float GetContaminationCandidate(uint index);
-float GetContaminationFromWater(int neighborIndex, int neighborTerrainHeight, int originTerrainHeight);
-float GetContaminationFromNeighbor(int neighborIndex, int neighborTerrainHeight, int originTerrainHeight, float spreadCost);
-float GetContaminationFromNeighbor(int neighborIndex, int neighborTerrainHeight, int originTerrainHeight, float spreadCost, bool firstBarrier, bool secondBarrier);
+float GetContaminationCandidate(
+    StructuredBuffer<InputStruct1> PackedInput1,
+    StructuredBuffer<float> LastTickContaminationCandidatesBuff,
+    uint index);
 
-[numthreads(64, 1, 1)]
-void SavePreviousState(uint3 id : SV_DispatchThreadID)
+float GetContaminationFromWater(
+    StructuredBuffer<InputStruct1> PackedInput1,
+    int neighborIndex, int neighborTerrainHeight, int originTerrainHeight);
+
+float GetContaminationFromNeighbor(
+    StructuredBuffer<float> LastTickContaminationCandidatesBuff,
+    int neighborIndex, int neighborTerrainHeight, int originTerrainHeight, float spreadCost);
+
+float GetContaminationFromNeighbor(
+    StructuredBuffer<float> LastTickContaminationCandidatesBuff,
+    int neighborIndex, int neighborTerrainHeight, int originTerrainHeight, float spreadCost, bool firstBarrier, bool secondBarrier);
+
+// Kernels and functions.
+
+[numthreads(1024, 1, 1)]
+void SavePreviousState(
+    uint3 id : SV_DispatchThreadID,
+    // Input.
+    StructuredBuffer<float> ContaminationCandidatesBuff,
+    // Output.
+    RWStructuredBuffer<float> LastTickContaminationCandidatesBuff)
 {
     LastTickContaminationCandidates(id.x) = ContaminationCandidates(id.x);
 }
 
 [numthreads(8, 8, 1)]
-void CalculateContaminationCandidates(uint3 id : SV_DispatchThreadID)
+void CalculateContaminationCandidates(
+    uint3 id : SV_DispatchThreadID,
+    // Input.
+    StructuredBuffer<InputStruct1> PackedInput1,
+    StructuredBuffer<float> LastTickContaminationCandidatesBuff,
+    // Output.
+    RWStructuredBuffer<float> ContaminationCandidatesBuff)
 {
     const uint index = CoordinatesToIndex(id.xy);
-    ContaminationCandidates(index) = GetContaminationCandidate(index);
+    ContaminationCandidates(index) = GetContaminationCandidate(PackedInput1, LastTickContaminationCandidatesBuff, index);
 }
 
 [numthreads(8, 8, 1)]
-void UpdateContaminationsFromCandidates(uint3 id : SV_DispatchThreadID)
+void UpdateContaminationsFromCandidates(
+    uint3 id : SV_DispatchThreadID,
+    // Input.
+    StructuredBuffer<float> ContaminationCandidatesBuff,
+    // Output.
+    RWStructuredBuffer<float> ContaminationLevelsBuff,
+    AppendStructuredBuffer<int> ContaminationsChangedLastTickBuff)
 {
     const uint index = CoordinatesToIndex(id.xy);
     float num2 = ContaminationLevels(index);
@@ -100,11 +113,14 @@ void UpdateContaminationsFromCandidates(uint3 id : SV_DispatchThreadID)
     if (abs(num7 - num2) > MIN_LEVEL_CHANGE)
     {
         ContaminationLevels(index) = num7;
-        AddContaminationsChangedLastTick(index);
+        AppendContaminationsChangedLastTick(index);
     }
 }
 
-float GetContaminationCandidate(uint index)
+float GetContaminationCandidate(
+    StructuredBuffer<InputStruct1> PackedInput1,
+    StructuredBuffer<float> LastTickContaminationCandidatesBuff,
+    uint index)
 {
     if (ContaminationBarriers(index))
     {
@@ -132,19 +148,19 @@ float GetContaminationCandidate(uint index)
     bool flag3 = ContaminationBarriers(num5);
     bool flag4 = ContaminationBarriers(num7);
     float num9 = MAX4(
-        GetContaminationFromWater(num, neighborTerrainHeight, originTerrainHeight),
-        GetContaminationFromWater(num3, neighborTerrainHeight3, originTerrainHeight),
-        GetContaminationFromWater(num5, neighborTerrainHeight5, originTerrainHeight),
-        GetContaminationFromWater(num7, neighborTerrainHeight7, originTerrainHeight));
+        GetContaminationFromWater(PackedInput1,num, neighborTerrainHeight, originTerrainHeight),
+        GetContaminationFromWater(PackedInput1,num3, neighborTerrainHeight3, originTerrainHeight),
+        GetContaminationFromWater(PackedInput1,num5, neighborTerrainHeight5, originTerrainHeight),
+        GetContaminationFromWater(PackedInput1,num7, neighborTerrainHeight7, originTerrainHeight));
     float num10 = MAX8(
-        GetContaminationFromNeighbor(num, neighborTerrainHeight, originTerrainHeight, RegularSpreadCost),
-        GetContaminationFromNeighbor(num2, neighborTerrainHeight2, originTerrainHeight, DiagonalSpreadCost, flag, flag2),
-        GetContaminationFromNeighbor(num3, neighborTerrainHeight3, originTerrainHeight, RegularSpreadCost),
-        GetContaminationFromNeighbor(num4, neighborTerrainHeight4, originTerrainHeight, DiagonalSpreadCost, flag2, flag3),
-        GetContaminationFromNeighbor(num5, neighborTerrainHeight5, originTerrainHeight, RegularSpreadCost),
-        GetContaminationFromNeighbor(num6, neighborTerrainHeight6, originTerrainHeight, DiagonalSpreadCost, flag3, flag4),
-        GetContaminationFromNeighbor(num7, neighborTerrainHeight7, originTerrainHeight, RegularSpreadCost),
-        GetContaminationFromNeighbor(num8, neighborTerrainHeight8, originTerrainHeight, DiagonalSpreadCost, flag4, flag));
+        GetContaminationFromNeighbor(LastTickContaminationCandidatesBuff, num, neighborTerrainHeight, originTerrainHeight, RegularSpreadCost),
+        GetContaminationFromNeighbor(LastTickContaminationCandidatesBuff, num2, neighborTerrainHeight2, originTerrainHeight, DiagonalSpreadCost, flag, flag2),
+        GetContaminationFromNeighbor(LastTickContaminationCandidatesBuff, num3, neighborTerrainHeight3, originTerrainHeight, RegularSpreadCost),
+        GetContaminationFromNeighbor(LastTickContaminationCandidatesBuff, num4, neighborTerrainHeight4, originTerrainHeight, DiagonalSpreadCost, flag2, flag3),
+        GetContaminationFromNeighbor(LastTickContaminationCandidatesBuff, num5, neighborTerrainHeight5, originTerrainHeight, RegularSpreadCost),
+        GetContaminationFromNeighbor(LastTickContaminationCandidatesBuff, num6, neighborTerrainHeight6, originTerrainHeight, DiagonalSpreadCost, flag3, flag4),
+        GetContaminationFromNeighbor(LastTickContaminationCandidatesBuff, num7, neighborTerrainHeight7, originTerrainHeight, RegularSpreadCost),
+        GetContaminationFromNeighbor(LastTickContaminationCandidatesBuff, num8, neighborTerrainHeight8, originTerrainHeight, DiagonalSpreadCost, flag4, flag));
     float num11 = LastTickContaminationCandidates(index);
     float num12 = num11 - ContaminationDecayRate;
     if (num12 < 0)
@@ -167,7 +183,9 @@ float GetContaminationCandidate(uint index)
     return num12;
 }
 
-float GetContaminationFromWater(int neighborIndex, int neighborTerrainHeight, int originTerrainHeight)
+float GetContaminationFromWater(
+    StructuredBuffer<InputStruct1> PackedInput1,
+    int neighborIndex, int neighborTerrainHeight, int originTerrainHeight)
 {
     if (AboveMoistureBarriers(neighborIndex) && neighborTerrainHeight >= originTerrainHeight)
     {
@@ -193,7 +211,7 @@ float GetContaminationFromWater(int neighborIndex, int neighborTerrainHeight, in
     return num3 - num5;
 }
 
-float GetContaminationFromNeighbor(int neighborIndex, int neighborTerrainHeight, int originTerrainHeight, float spreadCost)
+float GetContaminationFromNeighbor(StructuredBuffer<float> LastTickContaminationCandidatesBuff, int neighborIndex, int neighborTerrainHeight, int originTerrainHeight, float spreadCost)
 {
     int num = originTerrainHeight - neighborTerrainHeight;
     if (num < 0)
@@ -204,11 +222,11 @@ float GetContaminationFromNeighbor(int neighborIndex, int neighborTerrainHeight,
     return LastTickContaminationCandidates(neighborIndex) - num2 - spreadCost;
 }
 
-float GetContaminationFromNeighbor(int neighborIndex, int neighborTerrainHeight, int originTerrainHeight, float spreadCost, bool firstBarrier, bool secondBarrier)
+float GetContaminationFromNeighbor(StructuredBuffer<float> LastTickContaminationCandidatesBuff, int neighborIndex, int neighborTerrainHeight, int originTerrainHeight, float spreadCost, bool firstBarrier, bool secondBarrier)
 {
     if (firstBarrier && secondBarrier)
     {
         return 0;
     }
-    return GetContaminationFromNeighbor(neighborIndex, neighborTerrainHeight, originTerrainHeight, spreadCost);
+    return GetContaminationFromNeighbor(LastTickContaminationCandidatesBuff, neighborIndex, neighborTerrainHeight, originTerrainHeight, spreadCost);
 }

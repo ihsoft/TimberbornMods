@@ -45,12 +45,7 @@ StructuredBuffer<InputStruct1> PackedInput1;
 
 #define Contaminations(index) PackedInput1[index].Contaminations
 #define WaterDepths(index) PackedInput1[index].WaterDepths
-#define UnsafeCellHeights(index) PackedInput1[index].UnsafeCellHeights
-#define CeiledWaterHeights(index) ceil(PackedInput1[index].WaterDepths + PackedInput1[index].UnsafeCellHeights)
-#define ContaminationBarriers(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::ContaminationBarrierBit)
-#define AboveMoistureBarriers(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::AboveMoistureBarrierBit)
-#define FullMoistureBarriers(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::FullMoistureBarrierBit)
-#define WaterTowerIrrigated(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::WaterTowerIrrigatedBit)
+#define CeiledWaterHeights(index) ceil(PackedInput1[index].WaterDepths + UnsafeCellHeights(index))
 
 // OUTPUT: fetch on every dispatch.
 RWStructuredBuffer<float> MoistureLevelsBuff;

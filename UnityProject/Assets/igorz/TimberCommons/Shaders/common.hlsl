@@ -23,3 +23,9 @@ struct InputStruct1 {
     static const uint FullMoistureBarrierBit = 0x0004;
     static const uint WaterTowerIrrigatedBit = 0x0008;
 };
+
+#define AboveMoistureBarriers(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::AboveMoistureBarrierBit)
+#define ContaminationBarriers(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::ContaminationBarrierBit)
+#define FullMoistureBarriers(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::FullMoistureBarrierBit)
+#define WaterTowerIrrigated(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::WaterTowerIrrigatedBit)
+#define UnsafeCellHeights(index) PackedInput1[index].UnsafeCellHeights
