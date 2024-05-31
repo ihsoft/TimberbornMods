@@ -25,8 +25,11 @@ public abstract class BaseBuffer {
   /// <remarks>It will be used to transfer the data between CPU and GPU.</remarks>
   protected abstract Array ValuesArray { get; } 
 
-  /// <summary>Prepares the buffer for the usage.</summary>
-  /// <remarks>The current data of the buffer should be invalided.</remarks>
+  /// <summary>Prepares the buffer for the usage by bringing it to the initial state.</summary>
+  /// <remarks>
+  /// What's "initial state" depends on the buffer implementation. The main point is that any existing data in the
+  /// buffer should be invalided.
+  /// </remarks>
   /// <param name="executionLog">
   /// If not <c>null</c>, then the buffer should record key actions being performed on the buffer. This information is
   /// used to produce execution plans.

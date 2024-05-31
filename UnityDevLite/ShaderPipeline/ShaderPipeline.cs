@@ -114,10 +114,16 @@ public sealed class ShaderPipeline {
     return new Builder(shader);
   }
 
-  /// <summary>Runs kernels and block until all the results are ready.</summary>
+  /// <summary>Runs kernels and block until all the results (buffers, marked as "r") are ready.</summary>
   /// <remarks>
+  /// <p>
   /// Ths method can be called as many times as needed. All source buffers will be updated and the result buffers
   /// flushed.
+  /// </p>
+  /// <p>
+  /// The method will only "block" if there are kernels with "r" (result) buffers. Otherwise, it will return immediately,
+  /// before the kernels actually complete their work. The client code will be responsible to deal with it further.
+  /// </p>
   /// </remarks>
   public void RunBlocking() {
     _stopwatch.Restart();
@@ -338,6 +344,9 @@ public sealed class ShaderPipeline {
         }
         _usedBuffers.Add(name);
       }
+      if (kernel.Outputs.Count == 0 && kernel.Results.Count == 0) {
+        throw new ArgumentException($"Kernel '{kernelName}' must have at least one output buffer");
+      }
       _dispatchQueue.Add(kernel);
       return this;
     }
@@ -349,9 +358,6 @@ public sealed class ShaderPipeline {
         if (!_usedBuffers.Contains(bufferName)) {
           throw new InvalidDataException($"Unused buffer: {bufferName}");
         }
-      }
-      if (_outputBuffers.Count == 0) {
-        throw new InvalidDataException($"At least one output buffer must exist");
       }
       return new ShaderPipeline(_shader, _dispatchQueue, _constants);
     }
