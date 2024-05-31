@@ -11,15 +11,15 @@
 // OUT: LastTickMoistureLevelsBuff
 
 #pragma kernel CountWateredNeighbors
-// IN: InputStruct1.WaterDepths
+// IN: InputStruct1 (WaterDepths)
 // OUT: WateredNeighboursBuff
 
 #pragma kernel CalculateClusterSaturationAndWaterEvaporation
-// IN: InputStruct1.WaterDepths, WateredNeighboursBuff
+// IN: InputStruct1 (WaterDepths), WateredNeighboursBuff
 // OUT: ClusterSaturationBuff, WaterEvaporationModifierBuff
 
 #pragma kernel CalculateMoisture
-// IN: InputStruct1.WaterDepths, InputStruct1.Contaminations, InputStruct1.UnsafeCellHeights, InputStruct1.BitmapFlags,
+// IN: InputStruct1 (WaterDepths, Contaminations, UnsafeCellHeights, BitmapFlags),
 //     MoistureLevelsBuff, LastTickMoistureLevelsBuff, ClusterSaturationBuff
 // OUT: MoistureLevelsBuff, MoistureLevelsChangedLastTickBuff
 
@@ -40,48 +40,180 @@ float WaterTowerIrrigatedLevel;
 // Floating point comparison tolerance.
 #define MIN_LEVEL_CHANGE 0.0001
 
-// INPUT: Update on every dispatch.
-StructuredBuffer<InputStruct1> PackedInput1;
-
-#define Contaminations(index) PackedInput1[index].Contaminations
-#define WaterDepths(index) PackedInput1[index].WaterDepths
+// Buffer access abstraction functions.    
+#define AppendMoistureLevelsChangedLastTick(index) MoistureLevelsChangedLastTickBuff.Append(index)
 #define CeiledWaterHeights(index) ceil(PackedInput1[index].WaterDepths + UnsafeCellHeights(index))
-
-// OUTPUT: fetch on every dispatch.
-RWStructuredBuffer<float> MoistureLevelsBuff;
-RWStructuredBuffer<float> WaterEvaporationModifierBuff;
-AppendStructuredBuffer<int> MoistureLevelsChangedLastTickBuff;
-
-#define MoistureLevels(index) MoistureLevelsBuff[index]
-#define WaterEvaporationModifier(index) WaterEvaporationModifierBuff[index]
-
-// INTERMEDIATE: Only used between the kernels.
-RWStructuredBuffer<float> LastTickMoistureLevelsBuff; 
-RWStructuredBuffer<float> WateredNeighboursBuff;
-RWStructuredBuffer<int> ClusterSaturationBuff;
-
 #define ClusterSaturation(index) ClusterSaturationBuff[index]
+#define Contaminations(index) PackedInput1[index].Contaminations
 #define LastTickMoistureLevels(index) LastTickMoistureLevelsBuff[index]
+#define MoistureLevels(index) MoistureLevelsBuff[index]
+#define WaterDepths(index) PackedInput1[index].WaterDepths
+#define WaterEvaporationModifier(index) WaterEvaporationModifierBuff[index]
 #define WateredNeighbours(index) WateredNeighboursBuff[index]
 
-// Forward functions declarations.
-float GetUpdatedMoisture(int index);
-int MoistureSpreadByWateredCell(int neighborIndex, int neighborTerrainHeight, int originTerrainHeight);
-int GetMoistureOfWateredCell(int indexAtOrigin);
-float MoistureSpreadByMoistCell(
-    int neighborIndex, int neighborTerrainHeight, int originTerrainHeight,
-    float spreadCost, bool firstBarrier, bool secondBarrier);
-float MoistureSpreadByMoistCell(
-    int neighborIndex, int neighborTerrainHeight, int originTerrainHeight, float spreadCost);
+/************************************************************************/
+/* Functions                                                            */
+/************************************************************************/
+int GetMoistureOfWateredCell(
+    StructuredBuffer<InputStruct1> PackedInput1,
+    StructuredBuffer<int> ClusterSaturationBuff,
+    int indexAtOrigin)
+{
+    float num = 2 * (float)ClusterSaturation(indexAtOrigin);
+    float num2 = Contaminations(indexAtOrigin);
+    if (num2 < MinimumWaterContamination)
+    {
+        return (int)num;
+    }
+    float num3 = num2 * WaterContaminationScaler;
+    if (num3 >= 1)
+    {
+        return 0;
+    }
+    return (int)(num * (1 - num3));
+}
 
+int MoistureSpreadByWateredCell(
+    StructuredBuffer<InputStruct1> PackedInput1,
+    StructuredBuffer<int> ClusterSaturationBuff,
+    int neighborIndex, int neighborTerrainHeight, int originTerrainHeight)
+{
+    if (AboveMoistureBarriers(neighborIndex) && neighborTerrainHeight >= originTerrainHeight)
+    {
+        return 0;
+    }
+    int num = CeiledWaterHeights(neighborIndex);
+    if (num <= 0)
+    {
+        return 0;
+    }
+    int moistureOfWateredCell = GetMoistureOfWateredCell(PackedInput1, ClusterSaturationBuff, neighborIndex);
+    int num2 = originTerrainHeight - num;
+    if (num2 < 0)
+    {
+        num2 = 0;
+    }
+    return moistureOfWateredCell - num2 * VerticalSpreadCostMultiplier;
+}
+
+float MoistureSpreadByMoistCell(
+    StructuredBuffer<float> LastTickMoistureLevelsBuff,
+    int neighborIndex, int neighborTerrainHeight, int originTerrainHeight, float spreadCost)
+{
+    int num = originTerrainHeight - neighborTerrainHeight;
+    if (num < 0)
+    {
+        num = 0;
+    }
+    return LastTickMoistureLevels(neighborIndex) - (float)(num * VerticalSpreadCostMultiplier) - spreadCost;
+}
+
+float MoistureSpreadByMoistCell(
+    StructuredBuffer<float> LastTickMoistureLevelsBuff,
+    int neighborIndex, int neighborTerrainHeight, int originTerrainHeight,
+    float spreadCost, bool firstBarrier, bool secondBarrier)
+{
+    if (firstBarrier && secondBarrier)
+    {
+        return 0;
+    }
+    return MoistureSpreadByMoistCell(LastTickMoistureLevelsBuff, neighborIndex, neighborTerrainHeight, originTerrainHeight, spreadCost);
+}
+
+float GetUpdatedMoisture(
+    StructuredBuffer<InputStruct1> PackedInput1,
+    StructuredBuffer<float> LastTickMoistureLevelsBuff,
+    StructuredBuffer<int> ClusterSaturationBuff,
+    int index)
+{
+    if (FullMoistureBarriers(index))
+    {
+        return 0;
+    }
+    int num = index - Stride;
+    int num2 = UnsafeCellHeights(num);
+    int num3 = index - Stride - 1;
+    int num4 = UnsafeCellHeights(num3);
+    int num5 = index - 1;
+    int num6 = UnsafeCellHeights(num5);
+    int num7 = index + Stride - 1;
+    int num8 = UnsafeCellHeights(num7);
+    int num9 = index + Stride;
+    int num10 = UnsafeCellHeights(num9);
+    int num11 = index + Stride + 1;
+    int num12 = UnsafeCellHeights(num11);
+    int num13 = index + 1;
+    int num14 = UnsafeCellHeights(num13);
+    int num15 = index - Stride + 1;
+    int num16 = UnsafeCellHeights(num15);
+    int originTerrainHeight = UnsafeCellHeights(index);
+    float num17 = LastTickMoistureLevels(index);
+    bool flag = FullMoistureBarriers(num);
+    bool flag2 = FullMoistureBarriers(num5);
+    bool flag3 = FullMoistureBarriers(num9);
+    bool flag4 = FullMoistureBarriers(num13);
+    int num18 = MAX4(
+        MoistureSpreadByWateredCell(PackedInput1, ClusterSaturationBuff, num, num2, originTerrainHeight),
+        MoistureSpreadByWateredCell(PackedInput1, ClusterSaturationBuff, num5, num6, originTerrainHeight),
+        MoistureSpreadByWateredCell(PackedInput1, ClusterSaturationBuff, num9, num10, originTerrainHeight),
+        MoistureSpreadByWateredCell(PackedInput1, ClusterSaturationBuff, num13, num14, originTerrainHeight));
+    int num19 = (int)ceil(WaterDepths(num));
+    int num20 = (int)ceil(WaterDepths(num3));
+    int num21 = (int)ceil(WaterDepths(num5));
+    int num22 = (int)ceil(WaterDepths(num7));
+    int num23 = (int)ceil(WaterDepths(num9));
+    int num24 = (int)ceil(WaterDepths(num11));
+    int num25 = (int)ceil(WaterDepths(num13));
+    int num26 = (int)ceil(WaterDepths(num15));
+    float num27 = MAX8(
+        MoistureSpreadByMoistCell(LastTickMoistureLevelsBuff, num, num2 + num19, originTerrainHeight, 1),
+        MoistureSpreadByMoistCell(LastTickMoistureLevelsBuff, num3, num4 + num20, originTerrainHeight, 1.414f, flag, flag2),
+        MoistureSpreadByMoistCell(LastTickMoistureLevelsBuff, num5, num6 + num21, originTerrainHeight, 1),
+        MoistureSpreadByMoistCell(LastTickMoistureLevelsBuff, num7, num8 + num22, originTerrainHeight, 1.414f, flag2, flag3),
+        MoistureSpreadByMoistCell(LastTickMoistureLevelsBuff, num9, num10 + num23, originTerrainHeight, 1),
+        MoistureSpreadByMoistCell(LastTickMoistureLevelsBuff, num11, num12 + num24, originTerrainHeight, 1.414f, flag3, flag4),
+        MoistureSpreadByMoistCell(LastTickMoistureLevelsBuff, num13, num14 + num25, originTerrainHeight, 1),
+        MoistureSpreadByMoistCell(LastTickMoistureLevelsBuff, num15, num16 + num26, originTerrainHeight, 1.414f, flag4, flag));
+    float num28 = num17 - 0.5;
+    if (num28 < 0)
+    {
+        num28 = 0;
+    }
+    float num29 = num28;
+    if ((float)num18 > num28 && (float)num18 >= num27)
+    {
+        float num30 = num17 + 1;
+        num29 = (((float)num18 > num30) ? num30 : ((float)num18));
+    }
+    else if (num27 > num28)
+    {
+        num29 = num27;
+    }
+    return num29 * (1 - Contaminations(index));
+}
+
+/************************************************************************/
+/* Kernels                                                              */
+/************************************************************************/
 [numthreads(1024, 1, 1)]
-void SavePreviousState(uint3 id : SV_DispatchThreadID)
+void SavePreviousState(
+    uint3 id : SV_DispatchThreadID,
+    // Input.
+    StructuredBuffer<float> MoistureLevelsBuff,
+    // Output.
+    RWStructuredBuffer<float> LastTickMoistureLevelsBuff)
 {
     LastTickMoistureLevels(id.x) = MoistureLevels(id.x);
 }
 
 [numthreads(8, 8, 1)]
-void CountWateredNeighbors(uint3 id : SV_DispatchThreadID) {
+void CountWateredNeighbors(
+    uint3 id : SV_DispatchThreadID,
+    // Input.
+    StructuredBuffer<InputStruct1> PackedInput1,
+    // Output.
+    RWStructuredBuffer<float> WateredNeighboursBuff)
+{
     const uint index = CoordinatesToIndex(id.xy);
     int count = 0;
     if (WaterDepths(index) > 0) {
@@ -107,7 +239,15 @@ void CountWateredNeighbors(uint3 id : SV_DispatchThreadID) {
 }
 
 [numthreads(8, 8, 1)]
-void CalculateClusterSaturationAndWaterEvaporation(uint3 id : SV_DispatchThreadID) {
+void CalculateClusterSaturationAndWaterEvaporation(
+    uint3 id : SV_DispatchThreadID,
+    // Input.
+    StructuredBuffer<InputStruct1> PackedInput1,
+    StructuredBuffer<float> WateredNeighboursBuff,
+    // Output.
+    RWStructuredBuffer<int> ClusterSaturationBuff,
+    RWStructuredBuffer<float> WaterEvaporationModifierBuff)
+{
     const uint index = CoordinatesToIndex(id.xy);
     if (!(WaterDepths(index) > 0)) {
         ClusterSaturation(index) = 0;
@@ -146,11 +286,20 @@ void CalculateClusterSaturationAndWaterEvaporation(uint3 id : SV_DispatchThreadI
 }
 
 [numthreads(8, 8, 1)]
-void CalculateMoisture(uint3 id : SV_DispatchThreadID)
+void CalculateMoisture(
+    uint3 id : SV_DispatchThreadID,
+    // Input.
+    StructuredBuffer<InputStruct1> PackedInput1,
+    StructuredBuffer<float> LastTickMoistureLevelsBuff,
+    StructuredBuffer<int> ClusterSaturationBuff,
+    // Output.
+    AppendStructuredBuffer<int> MoistureLevelsChangedLastTickBuff,
+    // References.
+    RWStructuredBuffer<float> MoistureLevelsBuff)
 {
     const uint index = CoordinatesToIndex(id.xy);
     float oldLevel = MoistureLevels(index);
-    float newLevel = GetUpdatedMoisture(index);
+    float newLevel = GetUpdatedMoisture(PackedInput1, LastTickMoistureLevelsBuff, ClusterSaturationBuff, index);
     if (WaterTowerIrrigated(index) && newLevel < WaterTowerIrrigatedLevel)
     {
         newLevel = WaterTowerIrrigatedLevel;
@@ -158,131 +307,6 @@ void CalculateMoisture(uint3 id : SV_DispatchThreadID)
     if (abs(oldLevel - newLevel) > MIN_LEVEL_CHANGE)
     {
         MoistureLevels(index) = newLevel;
-        MoistureLevelsChangedLastTickBuff.Append(index);
+        AppendMoistureLevelsChangedLastTick(index);
     }
-}
-
-float GetUpdatedMoisture(int index)
-{
-    if (FullMoistureBarriers(index))
-    {
-        return 0;
-    }
-    int num = index - Stride;
-    int num2 = UnsafeCellHeights(num);
-    int num3 = index - Stride - 1;
-    int num4 = UnsafeCellHeights(num3);
-    int num5 = index - 1;
-    int num6 = UnsafeCellHeights(num5);
-    int num7 = index + Stride - 1;
-    int num8 = UnsafeCellHeights(num7);
-    int num9 = index + Stride;
-    int num10 = UnsafeCellHeights(num9);
-    int num11 = index + Stride + 1;
-    int num12 = UnsafeCellHeights(num11);
-    int num13 = index + 1;
-    int num14 = UnsafeCellHeights(num13);
-    int num15 = index - Stride + 1;
-    int num16 = UnsafeCellHeights(num15);
-    int originTerrainHeight = UnsafeCellHeights(index);
-    float num17 = LastTickMoistureLevels(index);
-    bool flag = FullMoistureBarriers(num);
-    bool flag2 = FullMoistureBarriers(num5);
-    bool flag3 = FullMoistureBarriers(num9);
-    bool flag4 = FullMoistureBarriers(num13);
-    int num18 = MAX4(
-        MoistureSpreadByWateredCell(num, num2, originTerrainHeight),
-        MoistureSpreadByWateredCell(num5, num6, originTerrainHeight),
-        MoistureSpreadByWateredCell(num9, num10, originTerrainHeight),
-        MoistureSpreadByWateredCell(num13, num14, originTerrainHeight));
-    int num19 = (int)ceil(WaterDepths(num));
-    int num20 = (int)ceil(WaterDepths(num3));
-    int num21 = (int)ceil(WaterDepths(num5));
-    int num22 = (int)ceil(WaterDepths(num7));
-    int num23 = (int)ceil(WaterDepths(num9));
-    int num24 = (int)ceil(WaterDepths(num11));
-    int num25 = (int)ceil(WaterDepths(num13));
-    int num26 = (int)ceil(WaterDepths(num15));
-    float num27 = MAX8(
-        MoistureSpreadByMoistCell(num, num2 + num19, originTerrainHeight, 1),
-        MoistureSpreadByMoistCell(num3, num4 + num20, originTerrainHeight, 1.414f, flag, flag2),
-        MoistureSpreadByMoistCell(num5, num6 + num21, originTerrainHeight, 1),
-        MoistureSpreadByMoistCell(num7, num8 + num22, originTerrainHeight, 1.414f, flag2, flag3),
-        MoistureSpreadByMoistCell(num9, num10 + num23, originTerrainHeight, 1),
-        MoistureSpreadByMoistCell(num11, num12 + num24, originTerrainHeight, 1.414f, flag3, flag4),
-        MoistureSpreadByMoistCell(num13, num14 + num25, originTerrainHeight, 1),
-        MoistureSpreadByMoistCell(num15, num16 + num26, originTerrainHeight, 1.414f, flag4, flag));
-    float num28 = num17 - 0.5;
-    if (num28 < 0)
-    {
-        num28 = 0;
-    }
-    float num29 = num28;
-    if ((float)num18 > num28 && (float)num18 >= num27)
-    {
-        float num30 = num17 + 1;
-        num29 = (((float)num18 > num30) ? num30 : ((float)num18));
-    }
-    else if (num27 > num28)
-    {
-        num29 = num27;
-    }
-    return num29 * (1 - Contaminations(index));
-}
-
-int MoistureSpreadByWateredCell(int neighborIndex, int neighborTerrainHeight, int originTerrainHeight)
-{
-    if (AboveMoistureBarriers(neighborIndex) && neighborTerrainHeight >= originTerrainHeight)
-    {
-        return 0;
-    }
-    int num = CeiledWaterHeights(neighborIndex);
-    if (num <= 0)
-    {
-        return 0;
-    }
-    int moistureOfWateredCell = GetMoistureOfWateredCell(neighborIndex);
-    int num2 = originTerrainHeight - num;
-    if (num2 < 0)
-    {
-        num2 = 0;
-    }
-    return moistureOfWateredCell - num2 * VerticalSpreadCostMultiplier;
-}
-
-int GetMoistureOfWateredCell(int indexAtOrigin)
-{
-    float num = 2 * (float)ClusterSaturation(indexAtOrigin);
-    float num2 = Contaminations(indexAtOrigin);
-    if (num2 < MinimumWaterContamination)
-    {
-        return (int)num;
-    }
-    float num3 = num2 * WaterContaminationScaler;
-    if (num3 >= 1)
-    {
-        return 0;
-    }
-    return (int)(num * (1 - num3));
-}
-
-float MoistureSpreadByMoistCell(
-    int neighborIndex, int neighborTerrainHeight, int originTerrainHeight,
-    float spreadCost, bool firstBarrier, bool secondBarrier)
-{
-    if (firstBarrier && secondBarrier)
-    {
-        return 0;
-    }
-    return MoistureSpreadByMoistCell(neighborIndex, neighborTerrainHeight, originTerrainHeight, spreadCost);
-}
-
-float MoistureSpreadByMoistCell(int neighborIndex, int neighborTerrainHeight, int originTerrainHeight, float spreadCost)
-{
-    int num = originTerrainHeight - neighborTerrainHeight;
-    if (num < 0)
-    {
-        num = 0;
-    }
-    return LastTickMoistureLevels(neighborIndex) - (float)(num * VerticalSpreadCostMultiplier) - spreadCost;
 }

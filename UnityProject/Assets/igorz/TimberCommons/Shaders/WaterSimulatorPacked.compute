@@ -95,7 +95,6 @@ struct InputStruct2 {
     static const uint PartialObstaclesBit = 0x0001;
     static const uint IsInActualMapBit = 0x0002;
 };
-StructuredBuffer<InputStruct2> PackedInput2;
 
 #define ImpermeableSurfaceServiceHeights(index) PackedInput2[index].ImpermeableSurfaceServiceHeight
 #define ImpermeableSurfaceServiceMinFlowSlowers(index) PackedInput2[index].ImpermeableSurfaceServiceMinFlowSlower
@@ -103,20 +102,10 @@ StructuredBuffer<InputStruct2> PackedInput2;
 #define ImpermeableSurfaceServicePartialObstacles(index) CheckBitmapFlag(PackedInput2[index], InputStruct2::PartialObstaclesBit)
 #define IndexIsInActualMap(index) CheckBitmapFlag(PackedInput2[index], InputStruct2::IsInActualMapBit)
 
-// OUTPUT: fetch on every dispatch.
-RWStructuredBuffer<WaterFlow> OutflowsBuff; // Flush only.
-RWStructuredBuffer<float> WaterDepthsBuff; // Flush only.
-RWStructuredBuffer<float> ContaminationsBuff; // Flush only.
 
 #define WaterDepths(index) WaterDepthsBuff[index]
 #define Contaminations(index) ContaminationsBuff[index]
 #define Outflows(index) OutflowsBuff[index]
-
-// INTERMEDIATE: Only used between the kernels.
-RWStructuredBuffer<WaterFlow> TempOutflowsBuff;
-RWStructuredBuffer<float> InitialWaterDepthsBuff;
-RWStructuredBuffer<float> ContaminationsBufferBuff;
-RWStructuredBuffer<WaterContaminationDiffusion> ContaminationDiffusionsBuff;
 
 #define TempOutflows(index) TempOutflowsBuff[index]
 #define InitialWaterDepths(index) InitialWaterDepthsBuff[index]
@@ -132,101 +121,14 @@ RWStructuredBuffer<WaterContaminationDiffusion> ContaminationDiffusionsBuff;
 #define SetCanDiffuseLeft(reference, value) SetBitmapFlag(reference, WaterContaminationDiffusion::CanDiffuseLeftBit, value)
 #define SetCanDiffuseRight(reference, value) SetBitmapFlag(reference, WaterContaminationDiffusion::CanDiffuseRightBit, value)
 
-// Forward functions declarations.
-float CalculateOutflow(int origin, int target, float oldOutflow);
-void UpdateOutflow(int index);
-float ProcessWaterDepthChanges(int index);
-void SimulateContaminationMovement(int index);
-void UpdateDiffusion(int index);
-bool CanDiffuse(float sourceWaterHeight, int targetIndex, float outflowToTarget);
-float CalculateDiffusion(float sourceContamination, float sourceWaterDepth, int targetIndex, float diffusionFraction);
-float GetContaminationDiffusionChange(int index);
-
-[numthreads(1024, 1, 1)]
-void SavePreviousState(uint3 id : SV_DispatchThreadID)
-{
-    InitialWaterDepths(id.x) = WaterDepths(id.x);
-    ContaminationsBuffer(id.x) = Contaminations(id.x);
-}
-
-[numthreads(8, 8, 1)]
-void UpdateOutflows(uint3 id : SV_DispatchThreadID)
-{
-    const int index = CoordinatesToIndex(id.xy);
-    UpdateOutflow(index);
-}
-
-[numthreads(8, 8, 1)]
-void UpdateWaterParameters(uint3 id : SV_DispatchThreadID)
-{
-    const int num = CoordinatesToIndex(id.xy);
-    float num2 = WaterDepths(num) + ProcessWaterDepthChanges(num);
-    WaterDepths(num) = ((num2 > 0) ? num2 : 0);
-    SimulateContaminationMovement(num);
-}
-
-[numthreads(8, 8, 1)]
-void SimulateContaminationDiffusion1(uint3 id : SV_DispatchThreadID)
-{
-    const int index = CoordinatesToIndex(id.xy);
-    if (WaterDepths(index) > 0)
-    {
-        UpdateDiffusion(index);
-    }
-}
-
-[numthreads(8, 8, 1)]
-void SimulateContaminationDiffusion2(uint3 id : SV_DispatchThreadID)
-{
-    const int num = CoordinatesToIndex(id.xy);
-    if (WaterDepths(num) > 0)
-    {
-        float num2 = ContaminationsBuffer(num) + GetContaminationDiffusionChange(num);
-        Contaminations(num) = ((num2 > MaxContamination) ? MaxContamination : num2);
-    }
-    else
-    {
-        Contaminations(num) = 0;
-    }
-}
-
-void UpdateOutflow(int index)
-{
-    float num = WaterDepths(index);
-    if (num == 0)
-    {
-        TempOutflows(index) = DefaultWaterFlow;
-        return;
-    }
-    int target = index - Stride;
-    int target2 = index - 1;
-    int target3 = index + Stride;
-    int target4 = index + 1;
-    WaterFlow reference = Outflows(index);
-    float num2 = CalculateOutflow(index, target, reference.Bottom);
-    float num3 = CalculateOutflow(index, target2, reference.Left);
-    float num4 = CalculateOutflow(index, target3, reference.Top);
-    float num5 = CalculateOutflow(index, target4, reference.Right);
-    float num6 = num2 + num3 + num4 + num5;
-    if (num6 == 0)
-    {
-        TempOutflows(index) = DefaultWaterFlow;
-        return;
-    }
-    float num7 = num / (num6 * DeltaTime);
-    if (num7 > 1)
-    {
-        num7 = 1;
-    }
-    WaterFlow reference2;
-    reference2.Bottom = num2 * num7;
-    reference2.Left = num3 * num7;
-    reference2.Top = num4 * num7;
-    reference2.Right = num5 * num7;
-    TempOutflows(index) = reference2;
-}
-
-float CalculateOutflow(int origin, int target, float oldOutflow)
+/************************************************************************/
+/* Functions                                                            */
+/************************************************************************/
+float CalculateOutflow(
+    StructuredBuffer<InputStruct2> PackedInput2,
+    StructuredBuffer<float> WaterDepthsBuff,
+    StructuredBuffer<WaterFlow> OutflowsBuff,
+    int origin, int target, float oldOutflow)
 {
     int num = ImpermeableSurfaceServiceHeights(origin);
     float num2 = WaterDepths(origin);
@@ -299,7 +201,53 @@ float CalculateOutflow(int origin, int target, float oldOutflow)
     return 0;
 }
 
-float ProcessWaterDepthChanges(int index)
+void UpdateOutflow(
+    StructuredBuffer<InputStruct2> PackedInput2,
+    StructuredBuffer<float> WaterDepthsBuff,
+    StructuredBuffer<WaterFlow> OutflowsBuff,
+    RWStructuredBuffer<WaterFlow> TempOutflowsBuff,
+    int index)
+{
+    float num = WaterDepths(index);
+    if (num == 0)
+    {
+        TempOutflows(index) = DefaultWaterFlow;
+        return;
+    }
+    int target = index - Stride;
+    int target2 = index - 1;
+    int target3 = index + Stride;
+    int target4 = index + 1;
+    WaterFlow reference = Outflows(index);
+    float num2 = CalculateOutflow(PackedInput2, WaterDepthsBuff, OutflowsBuff, index, target, reference.Bottom);
+    float num3 = CalculateOutflow(PackedInput2, WaterDepthsBuff, OutflowsBuff, index, target2, reference.Left);
+    float num4 = CalculateOutflow(PackedInput2, WaterDepthsBuff, OutflowsBuff, index, target3, reference.Top);
+    float num5 = CalculateOutflow(PackedInput2, WaterDepthsBuff, OutflowsBuff, index, target4, reference.Right);
+    float num6 = num2 + num3 + num4 + num5;
+    if (num6 == 0)
+    {
+        TempOutflows(index) = DefaultWaterFlow;
+        return;
+    }
+    float num7 = num / (num6 * DeltaTime);
+    if (num7 > 1)
+    {
+        num7 = 1;
+    }
+    WaterFlow reference2;
+    reference2.Bottom = num2 * num7;
+    reference2.Left = num3 * num7;
+    reference2.Top = num4 * num7;
+    reference2.Right = num5 * num7;
+    TempOutflows(index) = reference2;
+}
+
+float ProcessWaterDepthChanges(
+    StructuredBuffer<WaterFlow> TempOutflowsBuff,
+    RWStructuredBuffer<float> WaterDepthsBuff,
+    StructuredBuffer<InputStruct2> PackedInput2,
+    RWStructuredBuffer<WaterFlow> OutflowsBuff,
+    int index)
 {
     int num = index - Stride;
     int num2 = index - 1;
@@ -331,7 +279,12 @@ float ProcessWaterDepthChanges(int index)
     return result;
 }
 
-void SimulateContaminationMovement(int index)
+void SimulateContaminationMovement(
+    StructuredBuffer<WaterFlow> TempOutflowsBuff,
+    StructuredBuffer<float> ContaminationsBuff,
+    StructuredBuffer<float> InitialWaterDepthsBuff,
+    RWStructuredBuffer<float> ContaminationsBufferBuff,
+    int index)
 {
     int num = index - Stride;
     int num2 = index - 1;
@@ -396,40 +349,10 @@ void SimulateContaminationMovement(int index)
     }
 }
 
-void UpdateDiffusion(int index)
-{
-    WaterContaminationDiffusion reference = DefaultWaterContaminationDiffusion;
-    //reference.DiffusionFraction = 0;
-    if (!ImpermeableSurfaceServicePartialObstacles(index))
-    {
-        int num = index - Stride;
-        int num2 = index - 1;
-        int num3 = index + Stride;
-        int num4 = index + 1;
-        WaterFlow reference2 = TempOutflows(index);
-        float outflowToTarget = reference2.Bottom - TempOutflows(num).Top;
-        float outflowToTarget2 = reference2.Left - TempOutflows(num2).Right;
-        float outflowToTarget3 = reference2.Top - TempOutflows(num3).Bottom;
-        float outflowToTarget4 = reference2.Right - TempOutflows(num4).Left;
-        float sourceWaterHeight = WaterDepths(index) + (float)ImpermeableSurfaceServiceHeights(index);
-        bool flag = CanDiffuse(sourceWaterHeight, num, outflowToTarget);
-        bool flag2 = CanDiffuse(sourceWaterHeight, num2, outflowToTarget2);
-        bool flag3 = CanDiffuse(sourceWaterHeight, num3, outflowToTarget3);
-        bool flag4 = CanDiffuse(sourceWaterHeight, num4, outflowToTarget4);
-        if (flag || flag2 || flag3 || flag4)
-        {
-            SetCanDiffuseBottom(reference, flag);
-            SetCanDiffuseLeft(reference, flag2);
-            SetCanDiffuseTop(reference, flag3);
-            SetCanDiffuseRight(reference, flag4);
-            int num5 = (flag ? 1 : 0) + (flag2 ? 1 : 0) + (flag3 ? 1 : 0) + (flag4 ? 1 : 0);
-            reference.DiffusionFraction = 1 / (float)num5;
-        }
-    }
-    ContaminationDiffusions(index) = reference;
-}
-
-bool CanDiffuse(float sourceWaterHeight, int targetIndex, float outflowToTarget)
+bool CanDiffuse(
+    StructuredBuffer<InputStruct2> PackedInput2,
+    StructuredBuffer<float> WaterDepthsBuff,
+    float sourceWaterHeight, int targetIndex, float outflowToTarget)
 {
     float num = WaterDepths(targetIndex);
     if (num <= 0)
@@ -451,41 +374,49 @@ bool CanDiffuse(float sourceWaterHeight, int targetIndex, float outflowToTarget)
     return false;
 }
 
-float GetContaminationDiffusionChange(int index)
+void UpdateDiffusion(
+    StructuredBuffer<InputStruct2> PackedInput2,
+    StructuredBuffer<WaterFlow> TempOutflowsBuff,
+    StructuredBuffer<float> WaterDepthsBuff,
+    RWStructuredBuffer<WaterContaminationDiffusion> ContaminationDiffusionsBuff,
+    int index)
 {
-    WaterContaminationDiffusion waterContaminationDiffusion = ContaminationDiffusions(index);
-    if (waterContaminationDiffusion.DiffusionFraction > 0)
+    WaterContaminationDiffusion reference = DefaultWaterContaminationDiffusion;
+    //reference.DiffusionFraction = 0;
+    if (!ImpermeableSurfaceServicePartialObstacles(index))
     {
-        int targetIndex = index - Stride;
-        int targetIndex2 = index - 1;
-        int targetIndex3 = index + Stride;
-        int targetIndex4 = index + 1;
-        float sourceContamination = ContaminationsBuffer(index);
-        float sourceWaterDepth = WaterDepths(index);
-        float num = 0;
-        float diffusionFraction = waterContaminationDiffusion.DiffusionFraction;
-        if (CheckCanDiffuseBottom(waterContaminationDiffusion))
+        int num = index - Stride;
+        int num2 = index - 1;
+        int num3 = index + Stride;
+        int num4 = index + 1;
+        WaterFlow reference2 = TempOutflows(index);
+        float outflowToTarget = reference2.Bottom - TempOutflows(num).Top;
+        float outflowToTarget2 = reference2.Left - TempOutflows(num2).Right;
+        float outflowToTarget3 = reference2.Top - TempOutflows(num3).Bottom;
+        float outflowToTarget4 = reference2.Right - TempOutflows(num4).Left;
+        float sourceWaterHeight = WaterDepths(index) + (float)ImpermeableSurfaceServiceHeights(index);
+        bool flag = CanDiffuse(PackedInput2, WaterDepthsBuff, sourceWaterHeight, num, outflowToTarget);
+        bool flag2 = CanDiffuse(PackedInput2, WaterDepthsBuff, sourceWaterHeight, num2, outflowToTarget2);
+        bool flag3 = CanDiffuse(PackedInput2, WaterDepthsBuff, sourceWaterHeight, num3, outflowToTarget3);
+        bool flag4 = CanDiffuse(PackedInput2, WaterDepthsBuff, sourceWaterHeight, num4, outflowToTarget4);
+        if (flag || flag2 || flag3 || flag4)
         {
-            num += CalculateDiffusion(sourceContamination, sourceWaterDepth, targetIndex, diffusionFraction);
+            SetCanDiffuseBottom(reference, flag);
+            SetCanDiffuseLeft(reference, flag2);
+            SetCanDiffuseTop(reference, flag3);
+            SetCanDiffuseRight(reference, flag4);
+            int num5 = (flag ? 1 : 0) + (flag2 ? 1 : 0) + (flag3 ? 1 : 0) + (flag4 ? 1 : 0);
+            reference.DiffusionFraction = 1 / (float)num5;
         }
-        if (CheckCanDiffuseLeft(waterContaminationDiffusion))
-        {
-            num += CalculateDiffusion(sourceContamination, sourceWaterDepth, targetIndex2, diffusionFraction);
-        }
-        if (CheckCanDiffuseTop(waterContaminationDiffusion))
-        {
-            num += CalculateDiffusion(sourceContamination, sourceWaterDepth, targetIndex3, diffusionFraction);
-        }
-        if (CheckCanDiffuseRight(waterContaminationDiffusion))
-        {
-            num += CalculateDiffusion(sourceContamination, sourceWaterDepth, targetIndex4, diffusionFraction);
-        }
-        return num * DeltaTime;
     }
-    return 0;
+    ContaminationDiffusions(index) = reference;
 }
 
-float CalculateDiffusion(float sourceContamination, float sourceWaterDepth, int targetIndex, float diffusionFraction)
+float CalculateDiffusion(
+    StructuredBuffer<WaterContaminationDiffusion> ContaminationDiffusionsBuff,
+    StructuredBuffer<float> ContaminationsBufferBuff,
+    StructuredBuffer<float> WaterDepthsBuff,
+    float sourceContamination, float sourceWaterDepth, int targetIndex, float diffusionFraction)
 {
     WaterContaminationDiffusion waterContaminationDiffusion = ContaminationDiffusions(targetIndex);
     float num = ContaminationsBuffer(targetIndex);
@@ -503,4 +434,140 @@ float CalculateDiffusion(float sourceContamination, float sourceWaterDepth, int 
         num5 = ((num3 > num6) ? num3 : num6);
     }
     return num2 / (sourceWaterDepth + num2) * num5 * DiffusionRate;
+}
+
+float GetContaminationDiffusionChange(
+    StructuredBuffer<WaterContaminationDiffusion> ContaminationDiffusionsBuff,
+    StructuredBuffer<float> ContaminationsBufferBuff,
+    StructuredBuffer<float> WaterDepthsBuff,
+    int index)
+{
+    WaterContaminationDiffusion waterContaminationDiffusion = ContaminationDiffusions(index);
+    if (waterContaminationDiffusion.DiffusionFraction > 0)
+    {
+        int targetIndex = index - Stride;
+        int targetIndex2 = index - 1;
+        int targetIndex3 = index + Stride;
+        int targetIndex4 = index + 1;
+        float sourceContamination = ContaminationsBuffer(index);
+        float sourceWaterDepth = WaterDepths(index);
+        float num = 0;
+        float diffusionFraction = waterContaminationDiffusion.DiffusionFraction;
+        if (CheckCanDiffuseBottom(waterContaminationDiffusion))
+        {
+            num += CalculateDiffusion(
+                ContaminationDiffusionsBuff, ContaminationsBufferBuff, WaterDepthsBuff,
+                sourceContamination, sourceWaterDepth, targetIndex, diffusionFraction);
+        }
+        if (CheckCanDiffuseLeft(waterContaminationDiffusion))
+        {
+            num += CalculateDiffusion(
+                ContaminationDiffusionsBuff, ContaminationsBufferBuff, WaterDepthsBuff,
+                sourceContamination, sourceWaterDepth, targetIndex2, diffusionFraction);
+        }
+        if (CheckCanDiffuseTop(waterContaminationDiffusion))
+        {
+            num += CalculateDiffusion(
+                ContaminationDiffusionsBuff, ContaminationsBufferBuff, WaterDepthsBuff,
+                sourceContamination, sourceWaterDepth, targetIndex3, diffusionFraction);
+        }
+        if (CheckCanDiffuseRight(waterContaminationDiffusion))
+        {
+            num += CalculateDiffusion(
+                ContaminationDiffusionsBuff, ContaminationsBufferBuff, WaterDepthsBuff,
+                sourceContamination, sourceWaterDepth, targetIndex4, diffusionFraction);
+        }
+        return num * DeltaTime;
+    }
+    return 0;
+}
+
+/************************************************************************/
+/* Kernels                                                              */
+/************************************************************************/
+[numthreads(1024, 1, 1)]
+void SavePreviousState(
+    uint3 id : SV_DispatchThreadID,
+    // Input.
+    StructuredBuffer<float> WaterDepthsBuff,
+    StructuredBuffer<float> ContaminationsBuff,
+    // Output.
+    RWStructuredBuffer<float> InitialWaterDepthsBuff,
+    RWStructuredBuffer<float> ContaminationsBufferBuff)
+{
+    InitialWaterDepths(id.x) = WaterDepths(id.x);
+    ContaminationsBuffer(id.x) = Contaminations(id.x);
+}
+
+[numthreads(8, 8, 1)]
+void UpdateOutflows(
+    uint3 id : SV_DispatchThreadID,
+    // Input.
+    StructuredBuffer<InputStruct2> PackedInput2,
+    StructuredBuffer<float> WaterDepthsBuff,
+    StructuredBuffer<WaterFlow> OutflowsBuff,
+    // Output.
+    RWStructuredBuffer<WaterFlow> TempOutflowsBuff)
+{
+    const int index = CoordinatesToIndex(id.xy);
+    UpdateOutflow(PackedInput2, WaterDepthsBuff, OutflowsBuff, TempOutflowsBuff, index);
+}
+
+[numthreads(8, 8, 1)]
+void UpdateWaterParameters(
+    uint3 id : SV_DispatchThreadID,
+    // Input.
+    StructuredBuffer<InputStruct2> PackedInput2,
+    StructuredBuffer<WaterFlow> TempOutflowsBuff,
+    StructuredBuffer<float> ContaminationsBuff,
+    StructuredBuffer<float> InitialWaterDepthsBuff,
+    // Output.
+    RWStructuredBuffer<WaterFlow> OutflowsBuff,
+    RWStructuredBuffer<float> ContaminationsBufferBuff,
+    // Reference.
+    RWStructuredBuffer<float> WaterDepthsBuff)
+{
+    const int num = CoordinatesToIndex(id.xy);
+    float num2 = WaterDepths(num) + ProcessWaterDepthChanges(TempOutflowsBuff, WaterDepthsBuff, PackedInput2, OutflowsBuff, num);
+    WaterDepths(num) = ((num2 > 0) ? num2 : 0);
+    SimulateContaminationMovement(TempOutflowsBuff, ContaminationsBuff, InitialWaterDepthsBuff, ContaminationsBufferBuff, num);
+}
+
+[numthreads(8, 8, 1)]
+void SimulateContaminationDiffusion1(
+    uint3 id : SV_DispatchThreadID,
+    // Input.
+    StructuredBuffer<InputStruct2> PackedInput2,
+    StructuredBuffer<float> WaterDepthsBuff,
+    StructuredBuffer<WaterFlow> TempOutflowsBuff,
+    // Output.
+    RWStructuredBuffer<WaterContaminationDiffusion> ContaminationDiffusionsBuff)
+{
+    const int index = CoordinatesToIndex(id.xy);
+    if (WaterDepths(index) > 0)
+    {
+        UpdateDiffusion(PackedInput2, TempOutflowsBuff, WaterDepthsBuff, ContaminationDiffusionsBuff, index);
+    }
+}
+
+[numthreads(8, 8, 1)]
+void SimulateContaminationDiffusion2(
+    uint3 id : SV_DispatchThreadID,
+    // Input.
+    StructuredBuffer<float> WaterDepthsBuff,
+    StructuredBuffer<float> ContaminationsBufferBuff,
+    StructuredBuffer<WaterContaminationDiffusion> ContaminationDiffusionsBuff,
+    // Output.
+    RWStructuredBuffer<float> ContaminationsBuff)
+{
+    const int num = CoordinatesToIndex(id.xy);
+    if (WaterDepths(num) > 0)
+    {
+        float num2 = ContaminationsBuffer(num) + GetContaminationDiffusionChange(ContaminationDiffusionsBuff, ContaminationsBufferBuff, WaterDepthsBuff, num);
+        Contaminations(num) = ((num2 > MaxContamination) ? MaxContamination : num2);
+    }
+    else
+    {
+        Contaminations(num) = 0;
+    }
 }

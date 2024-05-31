@@ -1,4 +1,7 @@
-﻿// Common functions.
+﻿// This file is shared between multiple simulation shaders. It contains common functions, parameters, and structures.
+// The actual logic of running kernels is implemented in the Unity code. See GpuSimulatorsController.cs.
+
+// Common functions.
 #define MAX4(v1, v2, v3, v4) max(max(v1, v2), max(v3, v4))
 #define MAX8(v1, v2, v3, v4, v5, v6, v7, v8) max(MAX4(v1, v2, v3, v4), MAX4(v5, v6, v7, v8))
 #define CoordinatesToIndex(coordinates) ((coordinates.y + 1) * Stride + coordinates.x + 1)
