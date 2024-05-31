@@ -4,7 +4,14 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using IgorZ.TimberCommons.WaterService;
+using Timberborn.MapIndexSystem;
 using Timberborn.SingletonSystem;
+using Timberborn.SoilBarrierSystem;
+using Timberborn.TerrainSystem;
+using Timberborn.WaterContaminationSystem;
+using Timberborn.WaterSystem;
+using UnityDev.Utils.ShaderPipeline;
 using UnityEngine;
 
 namespace IgorZ.TimberCommons.GpuSimulators {
@@ -27,6 +34,12 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
   readonly GpuSoilContaminationSimulator _contaminationSimulator;
   readonly GpuSoilMoistureSimulator _moistureSimulator;
   readonly GpuWaterSimulator _waterSimulator;
+  readonly MapIndexService _mapIndexService;
+  readonly SoilBarrierMap _soilBarrierMap;
+  readonly ITerrainService _terrainService;
+  readonly IWaterContaminationService _waterContaminationService;
+  readonly IWaterService _waterService;
+
   readonly Stopwatch _stopwatch = new();
   readonly ValueSampler _fixedUpdateSampler = new(10);
 
@@ -38,13 +51,23 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
   GpuSimulatorsController(
       GpuSoilContaminationSimulator contaminationSimulator,
       GpuSoilMoistureSimulator moistureSimulator,
-      GpuWaterSimulator waterSimulator) {
+      GpuWaterSimulator waterSimulator,
+      MapIndexService mapIndexService,
+      SoilBarrierMap soilBarrierMap,
+      ITerrainService terrainService,
+      IWaterContaminationService waterContaminationService,
+      IWaterService waterService) {
     _contaminationSimulator = contaminationSimulator;
     _moistureSimulator = moistureSimulator;
     _waterSimulator = waterSimulator;
+    _mapIndexService = mapIndexService;
+    _soilBarrierMap = soilBarrierMap;
+    _terrainService = terrainService;
+    _waterContaminationService = waterContaminationService;
+    _waterService = waterService;
     Self = this;
   }
-
+  
   internal void EnableSoilContaminationSim(bool state) {
     _contaminationSimulator.IsEnabled = state;
   }
@@ -90,6 +113,9 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
 
   void FixedUpdate() {
     _stopwatch.Start();
+
+    PreparePersistentValues();
+
     if (Self._contaminationSimulator.IsEnabled){
       Self._contaminationSimulator.TickPipeline();
     }
@@ -99,9 +125,66 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
     if (Self._waterSimulator.IsEnabled) {
       Self._waterSimulator.TickPipeline();
     }
+
+    if (Self._contaminationSimulator.IsEnabled){
+      Self._contaminationSimulator.ProcessOutput();
+    }
+    if (Self._moistureSimulator.IsEnabled) {
+      Self._moistureSimulator.ProcessOutput();
+    }
+
     _stopwatch.Stop();
     _fixedUpdateSampler.AddSample(_stopwatch.Elapsed.TotalSeconds);
     _stopwatch.Reset();
+  }
+
+  void PreparePersistentValues() {
+    //FIXME: React on the change events and don't update everything.
+    //FIXME: Maybe deprecate packed inout all together? Need AMD testing.
+    var packedInput1 = _packedPersistentValuesBuffer1.Values;
+    for (var index = packedInput1.Length - 1; index >= 0; index--) {
+      uint bitmapFlags = 0;
+      if (_soilBarrierMap.ContaminationBarriers[index]) {
+        bitmapFlags |= InputStruct1.ContaminationBarrierBit;
+      }
+      if (_soilBarrierMap.AboveMoistureBarriers[index]) {
+        bitmapFlags |= InputStruct1.AboveMoistureBarrierBit;
+      }
+      if (_soilBarrierMap.FullMoistureBarriers[index]) {
+        bitmapFlags |= InputStruct1.FullMoistureBarrierBit;
+      }
+      if (DirectSoilMoistureSystemAccessor.MoistureLevelOverrides.ContainsKey(index)) {
+        bitmapFlags |= InputStruct1.WaterTowerIrrigatedBit;
+      }
+      packedInput1[index] = new InputStruct1 {
+          Contaminations = _waterContaminationService.Contamination(index),
+          WaterDepths = _waterService.WaterDepth(index),
+          UnsafeCellHeights = _terrainService.UnsafeCellHeight(index),
+          BitmapFlags = bitmapFlags,
+      };
+    }
+    _packedPersistentValuesBuffer1.PushToGpu(null);
+  }
+
+  struct InputStruct1 {
+    public float Contaminations;
+    public float WaterDepths;
+    public int UnsafeCellHeights;
+    public uint BitmapFlags;
+
+    public const uint ContaminationBarrierBit = 0x0001;
+    public const uint AboveMoistureBarrierBit = 0x0002;
+    public const uint FullMoistureBarrierBit = 0x0004;
+    public const uint WaterTowerIrrigatedBit = 0x0008;
+  };
+
+  public BaseBuffer PackedPersistentValuesBuffer1 => _packedPersistentValuesBuffer1;
+  SimpleBuffer<InputStruct1> _packedPersistentValuesBuffer1;
+
+  void SetupPersistentValues() {
+    var totalMapSize = _mapIndexService.TotalMapSize;
+    _packedPersistentValuesBuffer1 = new SimpleBuffer<InputStruct1>(
+        "PackedInput1", new InputStruct1[totalMapSize]);
   }
 
   #region A helper class whose sole role is to deliver FixedUpdate to the singleton.
@@ -118,9 +201,10 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
 
   /// <inheritdoc/>
   public void PostLoad() {
+    SetupPersistentValues();
     new GameObject(GetType().FullName + "#FixedTicker").AddComponent<FixedUpdateListener>();
-    _contaminationSimulator.Initialize();
-    _moistureSimulator.Initialize();
+    _contaminationSimulator.Initialize(this);
+    _moistureSimulator.Initialize(this);
     _waterSimulator.Initialize();
   }
 

@@ -37,18 +37,14 @@ sealed class GpuSoilMoistureSimulator {
   bool _isEnabled;
 
   /// <summary>Sets up shader related stuff. Must be called when teh stock simulator is already set.</summary>
-  public void Initialize() {
-    SetupShader();
+  public void Initialize(GpuSimulatorsController gpuSimulatorsController) {
+    SetupShader(gpuSimulatorsController);
   } 
 
   /// <summary>Executes the logic and updates the stock simulators with the processed data.</summary>
   public void TickPipeline() {
     _stopwatch.Restart();
-
-    PreparePipeline();
     _shaderPipeline.RunBlocking();
-    ProcessOutput();
-
     _stopwatch.Stop();
     TotalSimPerfSampler.AddSample(_stopwatch.Elapsed.TotalSeconds);
     ShaderPerfSampler.AddSample(_shaderPipeline.LastRunDuration.TotalSeconds);
@@ -68,29 +64,10 @@ sealed class GpuSoilMoistureSimulator {
   readonly IResourceAssetLoader _resourceAssetLoader;
   readonly MapIndexService _mapIndexService;
 
-  // Inputs.
-  // ReSharper disable NotAccessedField.Local
-  struct InputStruct1 {
-    public float Contaminations;
-    public float WaterDepths;
-    public int UnsafeCellHeights;
-    public uint BitmapFlags;
-
-    public const uint ContaminationBarrierBit = 0x0001;
-    public const uint AboveMoistureBarrierBit = 0x0002;
-    public const uint FullMoistureBarrierBit = 0x0004;
-    public const uint WaterTowerIrrigatedBit = 0x0008;
-  };
-  // ReSharper restore NotAccessedField.Local
-
-  InputStruct1[] _packedInput1;
-
-  // Outputs.
-  float[] _waterEvaporationModifier;
-  int[] _moistureLevelsChangedLastTick;
-
   SimpleBuffer<float> _moistureLevelsBuff;
+  SimpleBuffer<float> _waterEvaporationModifierBuff;
   AppendBuffer<int> _moistureLevelsChangedLastTickBuffer;
+  BaseBuffer _packedInputBuffer;
 
   ShaderPipeline _shaderPipeline;
 
@@ -101,14 +78,10 @@ sealed class GpuSoilMoistureSimulator {
     _mapIndexService = mapIndexService;
   }
 
-  void SetupShader() {
+  void SetupShader(GpuSimulatorsController gpuSimulatorsController) {
     var simulationSettings = _soilMoistureSimulator._soilMoistureSimulationSettings;
     var totalMapSize = _mapIndexService.TotalMapSize;
     var mapDataSize = new Vector3Int(_mapIndexService.MapSize.x, _mapIndexService.MapSize.y, 1);
-
-    _packedInput1 = new InputStruct1[totalMapSize];
-    _waterEvaporationModifier = new float[totalMapSize];
-    _moistureLevelsChangedLastTick = new int[totalMapSize];
 
     var prefab = _resourceAssetLoader.Load<ComputeShader>(SimulatorShaderName);
     var shader = Object.Instantiate(prefab);
@@ -116,7 +89,10 @@ sealed class GpuSoilMoistureSimulator {
     _moistureLevelsBuff = new SimpleBuffer<float>(
         "MoistureLevelsBuff", _soilMoistureSimulator.MoistureLevels);
     _moistureLevelsChangedLastTickBuffer = new AppendBuffer<int>(
-        "MoistureLevelsChangedLastTickBuff", _moistureLevelsChangedLastTick);
+        "MoistureLevelsChangedLastTickBuff", new int[totalMapSize]);
+    _packedInputBuffer = gpuSimulatorsController.PackedPersistentValuesBuffer1;
+    _waterEvaporationModifierBuff = new SimpleBuffer<float>(
+        "WaterEvaporationModifierBuff", new float[totalMapSize]);
 
     _shaderPipeline = ShaderPipeline.NewBuilder(shader)
         // Simulation settings.
@@ -133,14 +109,16 @@ sealed class GpuSoilMoistureSimulator {
         .WithConstantValue("WaterTowerIrrigatedLevel", 1f)
         // Sim calculated.
         .WithConstantValue("WaterContaminationScaler", _soilMoistureSimulator._waterContaminationScaler)
-        // All buffers.
-        .WithInputBuffer("PackedInput1", _packedInput1)
+        // Intermediate buffers.
         .WithIntermediateBuffer("LastTickMoistureLevelsBuff", sizeof(float), totalMapSize)
         .WithIntermediateBuffer("WateredNeighboursBuff", sizeof(float), totalMapSize)
         .WithIntermediateBuffer("ClusterSaturationBuff", sizeof(float), totalMapSize)
-        .WithOutputBuffer(_moistureLevelsBuff)
-        .WithOutputBuffer(_moistureLevelsChangedLastTickBuffer)
-        .WithOutputBuffer("WaterEvaporationModifierBuff", _waterEvaporationModifier)
+        // Input buffers. They are pushed to the GPU every frame.
+        .WithIntermediateBuffer(_packedInputBuffer)
+        // Output buffers. They are read from the GPU every frame.
+        .WithIntermediateBuffer(_moistureLevelsBuff)  // Must be pushed on init.
+        .WithIntermediateBuffer(_moistureLevelsChangedLastTickBuffer)
+        .WithIntermediateBuffer(_waterEvaporationModifierBuff)
         // The kernel chain! They will execute in the order they are declared.
         .DispatchKernel(
             "SavePreviousState", new Vector3Int(totalMapSize, 1, 1),
@@ -148,59 +126,41 @@ sealed class GpuSoilMoistureSimulator {
             "o:LastTickMoistureLevelsBuff")
         .DispatchKernel(
             "CountWateredNeighbors", mapDataSize,
-            "s:PackedInput1",
+            "i:PackedInput1",
             "i:LastTickMoistureLevelsBuff",
             "o:WateredNeighboursBuff")
         .DispatchKernel(
             "CalculateClusterSaturationAndWaterEvaporation", mapDataSize,
-            "s:PackedInput1",
+            "i:PackedInput1",
             "i:WateredNeighboursBuff",
-            "o:ClusterSaturationBuff", "r:WaterEvaporationModifierBuff")
+            "o:ClusterSaturationBuff", "o:WaterEvaporationModifierBuff")
         .DispatchKernel(
             "CalculateMoisture", mapDataSize,
-            "s:PackedInput1",
+            "i:PackedInput1",
             "i:LastTickMoistureLevelsBuff", "i:ClusterSaturationBuff",
-            "r:MoistureLevelsBuff", "r:MoistureLevelsChangedLastTickBuff")
+            "o:MoistureLevelsBuff", "o:MoistureLevelsChangedLastTickBuff")
         .Build();
     DebugEx.Warning("*** Shader execution plan:\n{0}", string.Join("\n", _shaderPipeline.GetExecutionPlan()));
   }
 
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  void PreparePipeline() {
+  public void ProcessOutput() {
     var sim = _soilMoistureSimulator;
-    for (var index = _packedInput1.Length - 1; index >= 0; index--) {
-      uint bitmapFlags = 0;
-      if (sim._soilBarrierMap.ContaminationBarriers[index]) {
-        bitmapFlags |= InputStruct1.ContaminationBarrierBit;
-      }
-      if (sim._soilBarrierMap.AboveMoistureBarriers[index]) {
-        bitmapFlags |= InputStruct1.AboveMoistureBarrierBit;
-      }
-      if (sim._soilBarrierMap.FullMoistureBarriers[index]) {
-        bitmapFlags |= InputStruct1.FullMoistureBarrierBit;
-      }
-      if (DirectSoilMoistureSystemAccessor.MoistureLevelOverrides.ContainsKey(index)) {
-        bitmapFlags |= InputStruct1.WaterTowerIrrigatedBit;
-      }
-      _packedInput1[index] = new InputStruct1 {
-          Contaminations = sim._waterContaminationService.Contamination(index),
-          WaterDepths = sim._waterService.WaterDepth(index),
-          UnsafeCellHeights = sim._terrainService.UnsafeCellHeight(index),
-          BitmapFlags = bitmapFlags,
-      };
-    }
-  }
 
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  void ProcessOutput() {
-    var sim = _soilMoistureSimulator;
+    _moistureLevelsBuff.PullFromGpu(null);
+
+    _waterEvaporationModifierBuff.PullFromGpu(null);
+    var waterEvaporationModifier = _waterEvaporationModifierBuff.Values;
     for (var index = sim.MoistureLevels.Length - 1; index >= 0; index--) {
       //FIXME: maybe write it directly?
-      sim._waterService.SetWaterEvaporationModifier(index, _waterEvaporationModifier[index]);
+      sim._waterService.SetWaterEvaporationModifier(index, waterEvaporationModifier[index]);
     }
-    for (var i = _moistureLevelsChangedLastTickBuffer.DataLength - 1; i >= 0; i--) {
-      sim._moistureLevelsChangedLastTick.Add(_mapIndexService.IndexToCoordinates(_moistureLevelsChangedLastTick[i]));
+
+    _moistureLevelsChangedLastTickBuffer.PullFromGpu(null);
+    var moistureLevelsChangedLastTick = _moistureLevelsChangedLastTickBuffer.Values;
+    for (var index = _moistureLevelsChangedLastTickBuffer.DataLength - 1; index >= 0; index--) {
+      sim._moistureLevelsChangedLastTick.Add(_mapIndexService.IndexToCoordinates(moistureLevelsChangedLastTick[index]));
     }
+    _moistureLevelsChangedLastTickBuffer.Initialize(null);
   }
 
   void EnableSimulator() {

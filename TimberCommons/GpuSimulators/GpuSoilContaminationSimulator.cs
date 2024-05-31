@@ -49,17 +49,13 @@ sealed class GpuSoilContaminationSimulator {
   }
   bool _isEnabled;
 
-  public void Initialize() {
-    SetupShader();
+  public void Initialize(GpuSimulatorsController gpuSimulatorsController) {
+    SetupShader(gpuSimulatorsController);
   }
 
   public void TickPipeline() {
     _stopwatch.Restart();
-
-    PreparePipeline();
     _shaderPipeline.RunBlocking();
-    ProcessOutput();
-
     _stopwatch.Stop();
     TotalSimPerfSampler.AddSample(_stopwatch.Elapsed.TotalSeconds);
     ShaderPerfSampler.AddSample(_shaderPipeline.LastRunDuration.TotalSeconds);
@@ -82,36 +78,21 @@ sealed class GpuSoilContaminationSimulator {
     _mapIndexService = mapIndexService;
   }
 
-  // ReSharper disable NotAccessedField.Local
-  struct InputStruct1 {
-    public float Contaminations;
-    public float WaterDepths;
-    public int UnsafeCellHeights;
-    public uint BitmapFlags;
-
-    public const uint ContaminationBarrierBit = 0x0001;
-    public const uint AboveMoistureBarrierBit = 0x0002;
-  };
-  // ReSharper restore NotAccessedField.Local
-
-  InputStruct1[] _packedInput1;
-
   AppendBuffer<int> _contaminationsChangedLastTickBuffer;
-  int[] _contaminationsChangedLastTick;
   SimpleBuffer<float> _contaminationCandidatesBuffer;
+  BaseBuffer _packedInputBuffer;
   SimpleBuffer<float> _contaminationLevelsBuffer;
 
-  void SetupShader() {
+  void SetupShader(GpuSimulatorsController gpuSimulatorsController) {
     var simulationSettings = _soilContaminationSimulator._soilContaminationSimulationSettings;
     var totalMapSize = _mapIndexService.TotalMapSize;
     var mapDataSize = new Vector3Int(_mapIndexService.MapSize.x, _mapIndexService.MapSize.y, 1);
 
-    _packedInput1 = new InputStruct1[totalMapSize];
-    _contaminationsChangedLastTick = new int[totalMapSize];
     _contaminationsChangedLastTickBuffer = new AppendBuffer<int>(
-        "ContaminationsChangedLastTickBuff", _contaminationsChangedLastTick);
+        "ContaminationsChangedLastTickBuff", new int[totalMapSize]);
     _contaminationCandidatesBuffer = new SimpleBuffer<float>(
         "ContaminationCandidatesBuff", _soilContaminationSimulator._contaminationCandidates);
+    _packedInputBuffer = gpuSimulatorsController.PackedPersistentValuesBuffer1;
     _contaminationLevelsBuffer = new SimpleBuffer<float>(
         "ContaminationLevelsBuff", _soilContaminationSimulator.ContaminationLevels);
 
@@ -134,58 +115,45 @@ sealed class GpuSoilContaminationSimulator {
         .WithConstantValue("MinimumWaterContamination", simulationSettings.MinimumWaterContamination)
         .WithConstantValue("RegularSpreadCost", _soilContaminationSimulator._regularSpreadCost)
         .WithConstantValue("VerticalCostModifier", _soilContaminationSimulator._verticalCostModifier)
-        // All buffers.
-        .WithInputBuffer("PackedInput1", _packedInput1)
-        .WithIntermediateBuffer(_contaminationCandidatesBuffer)
+        // Intermediate buffers.
         .WithIntermediateBuffer("LastTickContaminationCandidatesBuff", sizeof(float), totalMapSize)
-        .WithOutputBuffer("ContaminationLevelsBuff", _soilContaminationSimulator.ContaminationLevels)
-        .WithOutputBuffer(_contaminationsChangedLastTickBuffer)
+        .WithIntermediateBuffer(_contaminationCandidatesBuffer)  // Must be pulled/pushed on (de)init.
+        // Input buffers. They are pushed to the GPU every frame.
+        .WithIntermediateBuffer(_packedInputBuffer)
+        // Output buffers. They are pulled from the GPU every frame.
+        .WithIntermediateBuffer(_contaminationLevelsBuffer)   // Must be pushed on init.
+        .WithIntermediateBuffer(_contaminationsChangedLastTickBuffer)
         // The kernel chain! They will execute in the order they are declared.
         .DispatchKernel(
             "SavePreviousState", new Vector3Int(totalMapSize, 1, 1),
             "i:ContaminationCandidatesBuff", "o:LastTickContaminationCandidatesBuff")
         .DispatchKernel(
             "CalculateContaminationCandidates", mapDataSize,
-            "i:LastTickContaminationCandidatesBuff", "s:PackedInput1",
+            "i:PackedInput1", "i:LastTickContaminationCandidatesBuff",
             "o:ContaminationCandidatesBuff")
         .DispatchKernel(
             "UpdateContaminationsFromCandidates", mapDataSize,
-            "s:ContaminationLevelsBuff", "i:ContaminationCandidatesBuff",
-            "r:ContaminationLevelsBuff", "r:ContaminationsChangedLastTickBuff")
+            "i:ContaminationLevelsBuff", "i:ContaminationCandidatesBuff",
+            "o:ContaminationLevelsBuff", "o:ContaminationsChangedLastTickBuff")
         .Build();
   }
 
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  void PreparePipeline() {
-    var sim = _soilContaminationSimulator;
-    for (var index = _packedInput1.Length - 1; index >= 0; index--) {
-      uint bitmapFlags = 0;
-      if (sim._soilBarrierMap.ContaminationBarriers[index]) {
-        bitmapFlags |= InputStruct1.ContaminationBarrierBit;
-      }
-      if (sim._soilBarrierMap.AboveMoistureBarriers[index]) {
-        bitmapFlags |= InputStruct1.AboveMoistureBarrierBit;
-      }
-      _packedInput1[index] = new InputStruct1 {
-          Contaminations = sim._waterContaminationService.Contamination(index),
-          WaterDepths = sim._waterService.WaterDepth(index),
-          UnsafeCellHeights = sim._terrainService.UnsafeCellHeight(index),
-          BitmapFlags = bitmapFlags,
-      };
-    }
-  }
+  public void ProcessOutput() {
+    _contaminationLevelsBuffer.PullFromGpu(null);
 
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  void ProcessOutput() {
-    for (var i = _contaminationsChangedLastTickBuffer.DataLength - 1; i >= 0; i--) {
+    _contaminationsChangedLastTickBuffer.PullFromGpu(null);
+    var contaminationsChangedLastTick = _contaminationsChangedLastTickBuffer.Values;
+    for (var index = _contaminationsChangedLastTickBuffer.DataLength - 1; index >= 0; index--) {
       _soilContaminationSimulator._contaminationsChangedLastTick.Add(
-          _mapIndexService.IndexToCoordinates(_contaminationsChangedLastTick[i]));
+          _mapIndexService.IndexToCoordinates(contaminationsChangedLastTick[index]));
     }
+    _contaminationsChangedLastTickBuffer.Initialize(null);
   }
 
   void EnableSimulator() {
     DebugEx.Warning("*** Enabling GPU sim-2");
     _contaminationCandidatesBuffer.PushToGpu(null);
+    _contaminationLevelsBuffer.PushToGpu(null);
   }
 
   void DisableSimulator() {
