@@ -21,7 +21,7 @@ sealed class ParallelSoilMoistureSimulatorPatch {
   // ReSharper disable once UnusedMember.Local
   // ReSharper disable once InconsistentNaming
   static bool Prefix(SoilMoistureSimulator __instance) {
-    if (!UsePatchedSimulator || GpuSimulatorsController.Self.MoistureSimulatorEnabled) {
+    if (!UsePatchedSimulator) {
       return true;
     }
     _patchedSimulator ??= new ParallelSoilMoistureSimulator(__instance);

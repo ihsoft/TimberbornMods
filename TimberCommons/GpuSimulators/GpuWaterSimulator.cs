@@ -43,12 +43,6 @@ sealed class GpuWaterSimulator {
 
   /// <summary>Executes the logic and updates the stock simulators with the processed data.</summary>
   public void TickPipeline() {
-    for (var i = _waterSimulationController._simulationSpeed - 1; i >= 0; i--) {
-      TickPipeline2();
-    }
-  }
-
-  public void TickPipeline2() {
     _stopwatch.Restart();
 
     PreparePipeline();
@@ -156,7 +150,7 @@ sealed class GpuWaterSimulator {
             "o:InitialWaterDepthsBuff", "o:ContaminationsBufferBuff")
         .DispatchKernel(
             "UpdateOutflows", mapDataSize,
-            "s:PackedInput2", "s:WaterDepthsBuff", "s:OutflowsBuff", "s:ContaminationsBuff",
+            "s:PackedInput2", "s:WaterDepthsBuff", "s:OutflowsBuff",
             "o:TempOutflowsBuff")
         .DispatchKernel(
             "UpdateWaterParameters", mapDataSize,
@@ -201,6 +195,7 @@ sealed class GpuWaterSimulator {
       _packedInput2[index] = new InputStruct2 {
           ImpermeableSurfaceServiceHeight = sim._impermeableSurfaceService.Heights[index],
           ImpermeableSurfaceServiceMinFlowSlower = sim._impermeableSurfaceService.MinFlowSlowers[index],
+          // FIXME: It's us who fills it (moisture sims). It's output only.
           EvaporationModifier = sim._threadSafeWaterEvaporationMap.EvaporationModifiers[index],
           BitmapFlags = bitmapFlags,
       };

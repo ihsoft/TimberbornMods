@@ -8,9 +8,12 @@ using IgorZ.TimberCommons.WaterService;
 using Timberborn.MapIndexSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.SoilBarrierSystem;
+using Timberborn.SoilContaminationSystem;
+using Timberborn.SoilMoistureSystem;
 using Timberborn.TerrainSystem;
 using Timberborn.WaterContaminationSystem;
 using Timberborn.WaterSystem;
+using UnityDev.Utils.LogUtilsLite;
 using UnityDev.Utils.ShaderPipeline;
 using UnityEngine;
 
@@ -40,13 +43,15 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
   readonly IWaterContaminationService _waterContaminationService;
   readonly IWaterService _waterService;
 
+  readonly WaterSimulationController _waterSimulationController;
+  readonly SoilMoistureSimulationController _soilMoistureSimulationController;
+  readonly SoilContaminationSimulationController _soilContaminationSimulationController;
+
   readonly Stopwatch _stopwatch = new();
   readonly ValueSampler _fixedUpdateSampler = new(10);
 
   internal static GpuSimulatorsController Self;
-  internal bool ContaminationSimulatorEnabled => _contaminationSimulator.IsEnabled;
-  internal bool MoistureSimulatorEnabled => _moistureSimulator.IsEnabled;
-  internal bool WaterSimulatorEnabled => _waterSimulator.IsEnabled;
+  internal bool SimulatorEnabled { get; private set; }
 
   GpuSimulatorsController(
       GpuSoilContaminationSimulator contaminationSimulator,
@@ -56,7 +61,10 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
       SoilBarrierMap soilBarrierMap,
       ITerrainService terrainService,
       IWaterContaminationService waterContaminationService,
-      IWaterService waterService) {
+      IWaterService waterService,
+      IWaterSimulationController waterSimulationController,
+      ISoilMoistureSimulationController soilMoistureSimulationController,
+      ISoilContaminationSimulationController soilContaminationSimulationController) {
     _contaminationSimulator = contaminationSimulator;
     _moistureSimulator = moistureSimulator;
     _waterSimulator = waterSimulator;
@@ -65,46 +73,49 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
     _terrainService = terrainService;
     _waterContaminationService = waterContaminationService;
     _waterService = waterService;
+    _waterSimulationController = (WaterSimulationController) waterSimulationController;
+    _soilMoistureSimulationController = (SoilMoistureSimulationController) soilMoistureSimulationController;
+    _soilContaminationSimulationController =
+        (SoilContaminationSimulationController) soilContaminationSimulationController;
     Self = this;
   }
   
-  internal void EnableSoilContaminationSim(bool state) {
-    _contaminationSimulator.IsEnabled = state;
-  }
-
-  internal void EnableSoilMoistureSim(bool state) {
-    _moistureSimulator.IsEnabled = state;
-  }
-
-  internal void EnableWaterSimulator(bool state) {
+  internal void EnableSimulator(bool state) {
+    SimulatorEnabled = state;
+    DebugEx.Warning("*** now sim state: {0}", SimulatorEnabled);
     _waterSimulator.IsEnabled = state;
+    _moistureSimulator.IsEnabled = state;
+    _contaminationSimulator.IsEnabled = state;
+
+    if (state) {
+      _waterSimulationController.LastTickDurationMs = 0;
+      _soilMoistureSimulationController.LastTickDurationMs = 0;
+      _soilContaminationSimulationController.LastTickDurationMs = 0;
+    }
   }
 
   internal string GetStatsText() {
+    if (!SimulatorEnabled) {
+      return "GPU simulation disabled.";
+    }
     var text = new List<string>(15);
-    if (_contaminationSimulator.IsEnabled) {
-      var (_, _, _, total) = _contaminationSimulator.TotalSimPerfSampler. GetStats();
+    {
+      var (_, _, _, total) = _contaminationSimulator.TotalSimPerfSampler.GetStats();
       text.Add($"Soil contamination total: {total * 1000:0.##} ms");
       var (_, _, _, shader) = _contaminationSimulator.ShaderPerfSampler.GetStats();
       text.Add($"Soil contamination shader: {shader * 1000:0.##} ms");
-    } else {
-      text.Add("Soil contamination simulation disabled");
     }
-    if (_moistureSimulator.IsEnabled) {
+    {
       var (_, _, _, total) = _moistureSimulator.TotalSimPerfSampler.GetStats();
       text.Add($"Soil moisture total: {total * 1000:0.##} ms");
       var (_, _, _, shader) = _moistureSimulator.ShaderPerfSampler.GetStats();
       text.Add($"Soil moisture shader: {shader * 1000:0.##} ms");
-    } else {
-      text.Add("Soil moisture simulation disabled");
     }
-    if (_waterSimulator.IsEnabled) {
+    {
       var (_, _, _, total) = _waterSimulator.TotalSimPerfSampler.GetStats();
       text.Add($"Water simulator total: {total * 1000:0.##} ms");
       var (_, _, _, shader) = _waterSimulator.ShaderPerfSampler.GetStats();
       text.Add($"Water simulator shader: {shader * 1000:0.##} ms");
-    } else {
-      text.Add("Water simulation disabled");
     }
     var (_, _, _, totalPhysics) = _fixedUpdateSampler.GetStats();
     text.Add($"Total physics cost: {totalPhysics * 1000:0.##} ms");
@@ -112,26 +123,19 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
   }
 
   void FixedUpdate() {
+    if (!SimulatorEnabled) {
+      return;
+    }
+    
     _stopwatch.Start();
 
+    Self._waterSimulator.TickPipeline();
+
     PreparePersistentValues();
-
-    if (Self._contaminationSimulator.IsEnabled){
-      Self._contaminationSimulator.TickPipeline();
-    }
-    if (Self._moistureSimulator.IsEnabled) {
-      Self._moistureSimulator.TickPipeline();
-    }
-    if (Self._waterSimulator.IsEnabled) {
-      Self._waterSimulator.TickPipeline();
-    }
-
-    if (Self._contaminationSimulator.IsEnabled){
-      Self._contaminationSimulator.ProcessOutput();
-    }
-    if (Self._moistureSimulator.IsEnabled) {
-      Self._moistureSimulator.ProcessOutput();
-    }
+    Self._contaminationSimulator.TickPipeline();
+    Self._moistureSimulator.TickPipeline();
+    Self._contaminationSimulator.ProcessOutput();
+    Self._moistureSimulator.ProcessOutput();
 
     _stopwatch.Stop();
     _fixedUpdateSampler.AddSample(_stopwatch.Elapsed.TotalSeconds);

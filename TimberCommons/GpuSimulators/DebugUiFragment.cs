@@ -16,38 +16,22 @@ sealed class DebugUiFragment : IEntityPanelFragment {
   readonly UIBuilder _builder;
   
   VisualElement _root;
-  Toggle _useGpuForContaminationSimulator;
-  Toggle _useGpuForMoistureSimulation;
-  Toggle _useGpuForWaterSimulation;
+  Toggle _gpuSimulator;
   
   public DebugUiFragment(UIBuilder builder) {
     _builder = builder;
   }
 
   public VisualElement InitializeFragment() {
-    _useGpuForContaminationSimulator = _builder.Presets().Toggles()
-        .CheckmarkInverted(text: "Simulate soil contamination on GPU", color: UiFactory.PanelNormalColor);
-    _useGpuForContaminationSimulator.RegisterValueChangedCallback(
+    _gpuSimulator = _builder.Presets().Toggles()
+        .CheckmarkInverted(text: "Simulate physics on GPU", color: UiFactory.PanelNormalColor);
+    _gpuSimulator.RegisterValueChangedCallback(
         _ => {
-          GpuSimulatorsController.Self.EnableSoilContaminationSim(_useGpuForContaminationSimulator.value);
-        });
-    _useGpuForMoistureSimulation = _builder.Presets().Toggles()
-        .CheckmarkInverted(text: "Simulate soil moisture on GPU", color: UiFactory.PanelNormalColor);
-    _useGpuForMoistureSimulation.RegisterValueChangedCallback(
-        _ => {
-          GpuSimulatorsController.Self.EnableSoilMoistureSim(_useGpuForMoistureSimulation.value);
-        });
-    _useGpuForWaterSimulation = _builder.Presets().Toggles()
-        .CheckmarkInverted(text: "Water simulation on GPU", color: UiFactory.PanelNormalColor);
-    _useGpuForWaterSimulation.RegisterValueChangedCallback(
-        _ => {
-          GpuSimulatorsController.Self.EnableWaterSimulator(_useGpuForWaterSimulation.value);
+          GpuSimulatorsController.Self.EnableSimulator(_gpuSimulator.value);
         });
 
     _root = _builder.CreateFragmentBuilder()
-        .AddComponent(_useGpuForContaminationSimulator)
-        .AddComponent(_useGpuForMoistureSimulation)
-        .AddComponent(_useGpuForWaterSimulation)
+        .AddComponent(_gpuSimulator)
         .BuildAndInitialize();
     _root.ToggleDisplayStyle(visible: false);
     return _root;

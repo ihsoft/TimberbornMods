@@ -115,9 +115,7 @@
       <Compile Include="GpuSimulators\GpuSoilMoistureSimulator.cs" />
       <Compile Include="GpuSimulators\GpuWaterSimulator.cs" />
       <Compile Include="GpuSimulators\GpuSoilContaminationSimulator.cs" />
-      <Compile Include="GpuSimulators\SoilContaminationSimulatorTickSimulationPatch.cs" />
-      <Compile Include="GpuSimulators\SoilMoistureSimulatorTickSimulationPatch.cs" />
-      <Compile Include="GpuSimulators\WaterSimulatorTickSimulationPatch.cs" />
+      <Compile Include="GpuSimulators\StockSimulatorDisabler.cs" />
       <Compile Include="IrrigationSystemUI\GrowthRateModifierFragment.cs" />
       <Compile Include="IrrigationSystem\BlockContaminationRangeEffect.cs" />
       <Compile Include="IrrigationSystem\ModifyGrowableGrowthRangeEffect.cs" />

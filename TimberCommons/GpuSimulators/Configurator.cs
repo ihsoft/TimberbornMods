@@ -18,12 +18,12 @@ sealed class Configurator : IConfigurator {
     if (!Features.ShowGpuSimulatorsPanel) {
       return;
     }
-
+    //HarmonyPatcher.PatchRepeated(GetType().AssemblyQualifiedName, typeof(SimulationControllerPatch));
     HarmonyPatcher.PatchRepeated(
         GetType().AssemblyQualifiedName,
-        typeof(SoilContaminationSimulatorTickSimulationPatch),
-        typeof(SoilMoistureSimulatorTickSimulationPatch),
-        typeof(WaterSimulatorTickSimulationPatch));
+        typeof(SoilMoistureSimulatorPatch),
+        typeof(SoilContaminationSimulatorPatch),
+        typeof(WaterSimulatorPatch));
 
     containerDefinition.Bind<GpuSimulatorsController>().AsSingleton();
     containerDefinition.Bind<GpuSoilContaminationSimulator>().AsSingleton();

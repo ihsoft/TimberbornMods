@@ -22,7 +22,6 @@ namespace IgorZ.TimberCommons.GpuSimulators {
 /// <see cref="SoilContaminationSimulator"/> class is that the simulation now occurs within the Unity 
 /// `FixedUpdate` method. The stock code is not used at all!
 /// </remarks>
-/// <seealso cref="SoilContaminationSimulatorTickSimulationPatch"/>
 sealed class GpuSoilContaminationSimulator {
 
   const string SimulatorShaderName = "igorz.timbercommons/shaders/SoilContaminationSimulatorShaderPacked";

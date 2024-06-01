@@ -21,7 +21,7 @@ sealed class ParallelWaterSimulatorPatch {
   // ReSharper disable once UnusedMember.Local
   // ReSharper disable once InconsistentNaming
   static bool Prefix(WaterSimulator __instance) {
-    if (!UsePatchedSimulator || GpuSimulatorsController.Self.WaterSimulatorEnabled) {
+    if (!UsePatchedSimulator) {
       return true;
     }
     _patchedSimulator ??= new ParallelWaterSimulator(__instance);
