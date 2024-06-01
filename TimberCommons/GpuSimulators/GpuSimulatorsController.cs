@@ -136,8 +136,10 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
     Self._waterSimulator.TickPipeline();
 
     PreparePersistentValues();
+
     Self._contaminationSimulator.TickPipeline();
     Self._moistureSimulator.TickPipeline();
+
     Self._contaminationSimulator.ProcessOutput();
     Self._moistureSimulator.ProcessOutput();
 
