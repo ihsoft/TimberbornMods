@@ -1,5 +1,23 @@
 // Shader that simulates soil contamination.
 
+/************************************************************************/
+/* Types which this shader operates                                     */
+/************************************************************************/
+#include "common.hlsl"
+
+// Input only types.
+typedef StructuredBuffer<InputStruct1> TPackedInput1;
+typedef StructuredBuffer<float> TContaminationCandidatesBuff;
+typedef StructuredBuffer<float> TLastTickContaminationCandidatesBuff;
+
+// Input/output types.
+typedef RWStructuredBuffer<float> TRWContaminationCandidatesBuff;
+typedef RWStructuredBuffer<float> TRWContaminationLevelsBuff;
+typedef RWStructuredBuffer<float> TRWLastTickContaminationCandidatesBuff;
+
+// Output only types.
+typedef AppendStructuredBuffer<int> TAContaminationsChangedLastTickBuff;
+
 // Kernels and execution order:
 // 1. SavePreviousState
 // 2. CalculateContaminationCandidates
@@ -17,8 +35,6 @@
 #pragma kernel UpdateContaminationsFromCandidates
 // IN: ContaminationCandidatesBuff, ContaminationLevelsBuff
 // OUT: ContaminationLevelsBuff, ContaminationsChangedLastTickBuff
-
-#include "common.hlsl"
 
 // Constants. Set the values only once.
 float DeltaTime;
@@ -50,7 +66,7 @@ float VerticalCostModifier;
 /* Functions                                                            */
 /************************************************************************/
 float GetContaminationFromNeighbor(
-    StructuredBuffer<float> LastTickContaminationCandidatesBuff,
+    TLastTickContaminationCandidatesBuff LastTickContaminationCandidatesBuff,
     int neighborIndex, int neighborTerrainHeight, int originTerrainHeight, float spreadCost)
 {
     int num = originTerrainHeight - neighborTerrainHeight;
@@ -63,7 +79,7 @@ float GetContaminationFromNeighbor(
 }
 
 float GetContaminationFromNeighbor(
-    StructuredBuffer<float> LastTickContaminationCandidatesBuff,
+    TLastTickContaminationCandidatesBuff LastTickContaminationCandidatesBuff,
     int neighborIndex, int neighborTerrainHeight, int originTerrainHeight, float spreadCost, bool firstBarrier, bool secondBarrier)
 {
     if (firstBarrier && secondBarrier)
@@ -74,7 +90,7 @@ float GetContaminationFromNeighbor(
 }
 
 float GetContaminationFromWater(
-    StructuredBuffer<InputStruct1> PackedInput1,
+    TPackedInput1 PackedInput1,
     int neighborIndex, int neighborTerrainHeight, int originTerrainHeight)
 {
     if (AboveMoistureBarriers(neighborIndex) && neighborTerrainHeight >= originTerrainHeight)
@@ -102,8 +118,8 @@ float GetContaminationFromWater(
 }
 
 float GetContaminationCandidate(
-    StructuredBuffer<InputStruct1> PackedInput1,
-    StructuredBuffer<float> LastTickContaminationCandidatesBuff,
+    TPackedInput1 PackedInput1,
+    TLastTickContaminationCandidatesBuff LastTickContaminationCandidatesBuff,
     uint index)
 {
     if (ContaminationBarriers(index))
@@ -174,9 +190,9 @@ float GetContaminationCandidate(
 void SavePreviousState(
     uint3 id : SV_DispatchThreadID,
     // Input.
-    StructuredBuffer<float> ContaminationCandidatesBuff,
+    TContaminationCandidatesBuff ContaminationCandidatesBuff,
     // Output.
-    RWStructuredBuffer<float> LastTickContaminationCandidatesBuff)
+    TRWLastTickContaminationCandidatesBuff LastTickContaminationCandidatesBuff)
 {
     LastTickContaminationCandidates(id.x) = ContaminationCandidates(id.x);
 }
@@ -185,10 +201,10 @@ void SavePreviousState(
 void CalculateContaminationCandidates(
     uint3 id : SV_DispatchThreadID,
     // Input.
-    StructuredBuffer<InputStruct1> PackedInput1,
-    StructuredBuffer<float> LastTickContaminationCandidatesBuff,
+    TPackedInput1 PackedInput1,
+    TLastTickContaminationCandidatesBuff LastTickContaminationCandidatesBuff,
     // Output.
-    RWStructuredBuffer<float> ContaminationCandidatesBuff)
+    TRWContaminationCandidatesBuff ContaminationCandidatesBuff)
 {
     const uint index = CoordinatesToIndex(id.xy);
     ContaminationCandidates(index) = GetContaminationCandidate(PackedInput1, LastTickContaminationCandidatesBuff, index);
@@ -198,10 +214,10 @@ void CalculateContaminationCandidates(
 void UpdateContaminationsFromCandidates(
     uint3 id : SV_DispatchThreadID,
     // Input.
-    StructuredBuffer<float> ContaminationCandidatesBuff,
+    TContaminationCandidatesBuff ContaminationCandidatesBuff,
     // Output.
-    RWStructuredBuffer<float> ContaminationLevelsBuff,
-    AppendStructuredBuffer<int> ContaminationsChangedLastTickBuff)
+    TRWContaminationLevelsBuff ContaminationLevelsBuff,
+    TAContaminationsChangedLastTickBuff ContaminationsChangedLastTickBuff)
 {
     const uint index = CoordinatesToIndex(id.xy);
     float num2 = ContaminationLevels(index);

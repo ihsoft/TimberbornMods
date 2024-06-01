@@ -1,5 +1,27 @@
 // Shader that simulates soil moisture.
 
+/************************************************************************/
+/* Types which this shader operates                                     */
+/************************************************************************/
+#include "common.hlsl"
+
+// Input only types.
+typedef StructuredBuffer<InputStruct1> TPackedInput1;
+typedef StructuredBuffer<float> TLastTickMoistureLevelsBuff;
+typedef StructuredBuffer<float> TMoistureLevelsBuff;
+typedef StructuredBuffer<float> TWateredNeighboursBuff;
+typedef StructuredBuffer<int> TClusterSaturationBuff;
+
+// Input/output types.
+typedef RWStructuredBuffer<float> TRWLastTickMoistureLevelsBuff;
+typedef RWStructuredBuffer<float> TRWMoistureLevelsBuff;
+typedef RWStructuredBuffer<float> TRWWaterEvaporationModifierBuff;
+typedef RWStructuredBuffer<float> TRWWateredNeighboursBuff;
+typedef RWStructuredBuffer<int> TRWClusterSaturationBuff;
+
+// Output only types.
+typedef AppendStructuredBuffer<int> TAMoistureLevelsChangedLastTickBuff;
+
 // Kernels and execution order:
 // 1. SavePreviousState
 // 2. CountWateredNeighbors
@@ -22,8 +44,6 @@
 // IN: InputStruct1 (WaterDepths, Contaminations, UnsafeCellHeights, BitmapFlags),
 //     MoistureLevelsBuff, LastTickMoistureLevelsBuff, ClusterSaturationBuff
 // OUT: MoistureLevelsBuff, MoistureLevelsChangedLastTickBuff
-
-#include "common.hlsl"
 
 // SoilMoistureSimulationSettings
 float ConstantQuadraticCoefficient;
@@ -55,8 +75,8 @@ float WaterTowerIrrigatedLevel;
 /* Functions                                                            */
 /************************************************************************/
 int GetMoistureOfWateredCell(
-    StructuredBuffer<InputStruct1> PackedInput1,
-    StructuredBuffer<int> ClusterSaturationBuff,
+    TPackedInput1 PackedInput1,
+    TClusterSaturationBuff ClusterSaturationBuff,
     int indexAtOrigin)
 {
     float num = 2 * (float)ClusterSaturation(indexAtOrigin);
@@ -74,8 +94,8 @@ int GetMoistureOfWateredCell(
 }
 
 int MoistureSpreadByWateredCell(
-    StructuredBuffer<InputStruct1> PackedInput1,
-    StructuredBuffer<int> ClusterSaturationBuff,
+    TPackedInput1 PackedInput1,
+    TClusterSaturationBuff ClusterSaturationBuff,
     int neighborIndex, int neighborTerrainHeight, int originTerrainHeight)
 {
     if (AboveMoistureBarriers(neighborIndex) && neighborTerrainHeight >= originTerrainHeight)
@@ -97,7 +117,7 @@ int MoistureSpreadByWateredCell(
 }
 
 float MoistureSpreadByMoistCell(
-    StructuredBuffer<float> LastTickMoistureLevelsBuff,
+    TLastTickMoistureLevelsBuff LastTickMoistureLevelsBuff,
     int neighborIndex, int neighborTerrainHeight, int originTerrainHeight, float spreadCost)
 {
     int num = originTerrainHeight - neighborTerrainHeight;
@@ -109,7 +129,7 @@ float MoistureSpreadByMoistCell(
 }
 
 float MoistureSpreadByMoistCell(
-    StructuredBuffer<float> LastTickMoistureLevelsBuff,
+    TLastTickMoistureLevelsBuff LastTickMoistureLevelsBuff,
     int neighborIndex, int neighborTerrainHeight, int originTerrainHeight,
     float spreadCost, bool firstBarrier, bool secondBarrier)
 {
@@ -121,9 +141,9 @@ float MoistureSpreadByMoistCell(
 }
 
 float GetUpdatedMoisture(
-    StructuredBuffer<InputStruct1> PackedInput1,
-    StructuredBuffer<float> LastTickMoistureLevelsBuff,
-    StructuredBuffer<int> ClusterSaturationBuff,
+    TPackedInput1 PackedInput1,
+    TLastTickMoistureLevelsBuff LastTickMoistureLevelsBuff,
+    TClusterSaturationBuff ClusterSaturationBuff,
     int index)
 {
     if (FullMoistureBarriers(index))
@@ -199,9 +219,9 @@ float GetUpdatedMoisture(
 void SavePreviousState(
     uint3 id : SV_DispatchThreadID,
     // Input.
-    StructuredBuffer<float> MoistureLevelsBuff,
+    TMoistureLevelsBuff MoistureLevelsBuff,
     // Output.
-    RWStructuredBuffer<float> LastTickMoistureLevelsBuff)
+    TRWLastTickMoistureLevelsBuff LastTickMoistureLevelsBuff)
 {
     LastTickMoistureLevels(id.x) = MoistureLevels(id.x);
 }
@@ -210,9 +230,9 @@ void SavePreviousState(
 void CountWateredNeighbors(
     uint3 id : SV_DispatchThreadID,
     // Input.
-    StructuredBuffer<InputStruct1> PackedInput1,
+    TPackedInput1 PackedInput1,
     // Output.
-    RWStructuredBuffer<float> WateredNeighboursBuff)
+    TRWWateredNeighboursBuff WateredNeighboursBuff)
 {
     const uint index = CoordinatesToIndex(id.xy);
     int count = 0;
@@ -242,11 +262,11 @@ void CountWateredNeighbors(
 void CalculateClusterSaturationAndWaterEvaporation(
     uint3 id : SV_DispatchThreadID,
     // Input.
-    StructuredBuffer<InputStruct1> PackedInput1,
-    StructuredBuffer<float> WateredNeighboursBuff,
+    TPackedInput1 PackedInput1,
+    TWateredNeighboursBuff WateredNeighboursBuff,
     // Output.
-    RWStructuredBuffer<int> ClusterSaturationBuff,
-    RWStructuredBuffer<float> WaterEvaporationModifierBuff)
+    TRWClusterSaturationBuff ClusterSaturationBuff,
+    TRWWaterEvaporationModifierBuff WaterEvaporationModifierBuff)
 {
     const uint index = CoordinatesToIndex(id.xy);
     if (!(WaterDepths(index) > 0)) {
@@ -289,13 +309,13 @@ void CalculateClusterSaturationAndWaterEvaporation(
 void CalculateMoisture(
     uint3 id : SV_DispatchThreadID,
     // Input.
-    StructuredBuffer<InputStruct1> PackedInput1,
-    StructuredBuffer<float> LastTickMoistureLevelsBuff,
-    StructuredBuffer<int> ClusterSaturationBuff,
+    TPackedInput1 PackedInput1,
+    TLastTickMoistureLevelsBuff LastTickMoistureLevelsBuff,
+    TClusterSaturationBuff ClusterSaturationBuff,
     // Output.
-    AppendStructuredBuffer<int> MoistureLevelsChangedLastTickBuff,
+    TAMoistureLevelsChangedLastTickBuff MoistureLevelsChangedLastTickBuff,
     // References.
-    RWStructuredBuffer<float> MoistureLevelsBuff)
+    TRWMoistureLevelsBuff MoistureLevelsBuff)
 {
     const uint index = CoordinatesToIndex(id.xy);
     float oldLevel = MoistureLevels(index);
