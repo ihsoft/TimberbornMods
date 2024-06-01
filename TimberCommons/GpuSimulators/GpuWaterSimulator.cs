@@ -19,23 +19,6 @@ sealed class GpuWaterSimulator {
 
   #region API
 
-  /// <summary>Tells whether that simulator is running.</summary>
-  public bool IsEnabled {
-    get => _isEnabled;
-    set {
-      if (value == _isEnabled) {
-        return;
-      }
-      _isEnabled = value;
-      if (value) {
-        EnableSimulator();
-      } else {
-        DisableSimulator();
-      }
-    }
-  }
-  bool _isEnabled;
-
   /// <summary>Sets up shader related stuff. Must be called when teh stock simulator is already set.</summary>
   public void Initialize() {
     SetupShader();
@@ -208,12 +191,12 @@ sealed class GpuWaterSimulator {
     _simulator._transientWaterMap.Refresh();
   }
 
-  void EnableSimulator() {
+  public void EnableSimulator() {
     DebugEx.Warning("*** Enabling water GPU sim-1");
     DebugEx.Warning("*** sim speed: {0}", _waterSimulationController._simulationSpeed);
   }
 
-  void DisableSimulator() {
+  public void DisableSimulator() {
     DebugEx.Warning("*** Disabling water GPU sim-1");
   }
 

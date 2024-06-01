@@ -19,23 +19,6 @@ sealed class GpuSoilMoistureSimulator {
 
   #region API
 
-  /// <summary>Tells whether that simulator is running.</summary>
-  public bool IsEnabled {
-    get => _isEnabled;
-    set {
-      if (value == _isEnabled) {
-        return;
-      }
-      _isEnabled = value;
-      if (value) {
-        EnableSimulator();
-      } else {
-        DisableSimulator();
-      }
-    }
-  }
-  bool _isEnabled;
-
   /// <summary>Sets up shader related stuff. Must be called when teh stock simulator is already set.</summary>
   public void Initialize(GpuSimulatorsController gpuSimulatorsController) {
     SetupShader(gpuSimulatorsController);
@@ -163,12 +146,12 @@ sealed class GpuSoilMoistureSimulator {
     _moistureLevelsChangedLastTickBuffer.Initialize(null);
   }
 
-  void EnableSimulator() {
+  public void EnableSimulator() {
     DebugEx.Warning("*** Enabling moisture GPU sim-2");
     _moistureLevelsBuff.PushToGpu(null);
   }
 
-  void DisableSimulator() {
+  public void DisableSimulator() {
     DebugEx.Warning("*** Disabling moisture GPU sim-2");
   }
 

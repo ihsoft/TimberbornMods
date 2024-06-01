@@ -82,15 +82,19 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
   
   internal void EnableSimulator(bool state) {
     SimulatorEnabled = state;
-    DebugEx.Warning("*** now sim state: {0}", SimulatorEnabled);
-    _waterSimulator.IsEnabled = state;
-    _moistureSimulator.IsEnabled = state;
-    _contaminationSimulator.IsEnabled = state;
+    DebugEx.Warning("*** GPU simulator state: {0}", SimulatorEnabled);
 
     if (state) {
       _waterSimulationController.LastTickDurationMs = 0;
       _soilMoistureSimulationController.LastTickDurationMs = 0;
       _soilContaminationSimulationController.LastTickDurationMs = 0;
+      _contaminationSimulator.EnableSimulator();
+      _moistureSimulator.EnableSimulator();
+      _waterSimulator.EnableSimulator();
+    } else {
+      _contaminationSimulator.DisableSimulator();
+      _moistureSimulator.DisableSimulator();
+      _waterSimulator.DisableSimulator();
     }
   }
 

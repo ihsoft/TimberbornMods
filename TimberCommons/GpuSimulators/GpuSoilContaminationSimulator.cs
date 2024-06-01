@@ -32,22 +32,6 @@ sealed class GpuSoilContaminationSimulator {
 
   #region API
 
-  public bool IsEnabled {
-    get => _isEnabled;
-    set {
-      if (value == _isEnabled) {
-        return;
-      }
-      _isEnabled = value;
-      if (value) {
-        EnableSimulator();
-      } else {
-        DisableSimulator();
-      }
-    }
-  }
-  bool _isEnabled;
-
   public void Initialize(GpuSimulatorsController gpuSimulatorsController) {
     SetupShader(gpuSimulatorsController);
   }
@@ -149,13 +133,13 @@ sealed class GpuSoilContaminationSimulator {
     _contaminationsChangedLastTickBuffer.Initialize(null);
   }
 
-  void EnableSimulator() {
+  public void EnableSimulator() {
     DebugEx.Warning("*** Enabling GPU sim-2");
     _contaminationCandidatesBuffer.PushToGpu(null);
     _contaminationLevelsBuffer.PushToGpu(null);
   }
 
-  void DisableSimulator() {
+  public void DisableSimulator() {
     DebugEx.Warning("*** Disabling GPU sim-2");
     _contaminationCandidatesBuffer.PullFromGpu(null);
   }
