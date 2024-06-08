@@ -28,8 +28,8 @@ typedef AppendStructuredBuffer<int> TAContaminationsChangedLastTickBuff;
 // OUT: LastTickContaminationCandidatesBuff
 
 #pragma kernel CalculateContaminationCandidates
-// IN: PackedInput1 (UnsafeCellHeights, InputStruct1.WaterDepths, InputStruct1.BitmapFlags),
-//     LastTickContaminationCandidatesBuff
+// IN: PackedInput1 (UnsafeCellHeights, InputStruct1.BitmapFlags),
+//     WaterDepthsBuff, ContaminationsBuff, LastTickContaminationCandidatesBuff
 // OUT: ContaminationCandidatesBuff
 
 #pragma kernel UpdateContaminationsFromCandidates
@@ -56,10 +56,8 @@ float VerticalCostModifier;
 
 // Buffer access abstraction functions.    
 #define AppendContaminationsChangedLastTick(index) ContaminationsChangedLastTickBuff.Append(index)
-#define CeiledWaterHeights(index) ceil(PackedInput1[index].WaterDepths + UnsafeCellHeights(index))
 #define ContaminationCandidates(index) ContaminationCandidatesBuff[index]
 #define ContaminationLevels(index) ContaminationLevelsBuff[index]
-#define Contaminations(index) PackedInput1[index].Contaminations
 #define LastTickContaminationCandidates(index) LastTickContaminationCandidatesBuff[index]
 
 /************************************************************************/
@@ -91,6 +89,8 @@ float GetContaminationFromNeighbor(
 
 float GetContaminationFromWater(
     TPackedInput1 PackedInput1,
+    TWaterDepthsBuff WaterDepthsBuff,
+    TContaminationsBuff ContaminationsBuff,
     int neighborIndex, int neighborTerrainHeight, int originTerrainHeight)
 {
     if (AboveMoistureBarriers(neighborIndex) && neighborTerrainHeight >= originTerrainHeight)
@@ -119,6 +119,8 @@ float GetContaminationFromWater(
 
 float GetContaminationCandidate(
     TPackedInput1 PackedInput1,
+    TWaterDepthsBuff WaterDepthsBuff,
+    TContaminationsBuff ContaminationsBuff,
     TLastTickContaminationCandidatesBuff LastTickContaminationCandidatesBuff,
     uint index)
 {
@@ -148,10 +150,18 @@ float GetContaminationCandidate(
     bool flag3 = ContaminationBarriers(num5);
     bool flag4 = ContaminationBarriers(num7);
     float num9 = MAX4(
-        GetContaminationFromWater(PackedInput1,num, neighborTerrainHeight, originTerrainHeight),
-        GetContaminationFromWater(PackedInput1,num3, neighborTerrainHeight3, originTerrainHeight),
-        GetContaminationFromWater(PackedInput1,num5, neighborTerrainHeight5, originTerrainHeight),
-        GetContaminationFromWater(PackedInput1,num7, neighborTerrainHeight7, originTerrainHeight));
+        GetContaminationFromWater(
+            PackedInput1, ContaminationsBuff, WaterDepthsBuff,
+            num, neighborTerrainHeight, originTerrainHeight),
+        GetContaminationFromWater(
+            PackedInput1, ContaminationsBuff, WaterDepthsBuff,num3,
+            neighborTerrainHeight3, originTerrainHeight),
+        GetContaminationFromWater(
+            PackedInput1, ContaminationsBuff, WaterDepthsBuff,
+            num5, neighborTerrainHeight5, originTerrainHeight),
+        GetContaminationFromWater(
+            PackedInput1, ContaminationsBuff, WaterDepthsBuff,
+            num7, neighborTerrainHeight7, originTerrainHeight));
     float num10 = MAX8(
         GetContaminationFromNeighbor(LastTickContaminationCandidatesBuff, num, neighborTerrainHeight, originTerrainHeight, RegularSpreadCost),
         GetContaminationFromNeighbor(LastTickContaminationCandidatesBuff, num2, neighborTerrainHeight2, originTerrainHeight, DiagonalSpreadCost, flag, flag2),
@@ -202,12 +212,16 @@ void CalculateContaminationCandidates(
     uint3 id : SV_DispatchThreadID,
     // Input.
     TPackedInput1 PackedInput1,
+    TWaterDepthsBuff WaterDepthsBuff,
+    TContaminationsBuff ContaminationsBuff,
     TLastTickContaminationCandidatesBuff LastTickContaminationCandidatesBuff,
     // Output.
     TRWContaminationCandidatesBuff ContaminationCandidatesBuff)
 {
     const uint index = CoordinatesToIndex(id.xy);
-    ContaminationCandidates(index) = GetContaminationCandidate(PackedInput1, LastTickContaminationCandidatesBuff, index);
+    ContaminationCandidates(index) = GetContaminationCandidate(
+        PackedInput1, ContaminationsBuff, WaterDepthsBuff, LastTickContaminationCandidatesBuff,
+        index);
 }
 
 [numthreads(8, 8, 1)]

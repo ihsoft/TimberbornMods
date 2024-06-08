@@ -313,9 +313,6 @@
       <Reference Include="Timberborn.TimeSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.TimeSystem.dll</HintPath>
       </Reference>
-      <Reference Include="Timberborn.WaterContaminationSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.WaterContaminationSystem.dll</HintPath>
-      </Reference>
       <Reference Include="Timberborn.WorkSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn\Timberborn.WorkSystem.dll</HintPath>
       </Reference>
@@ -364,6 +361,7 @@
       <Reference Include="..\Dependencies\Timberborn\Timberborn.Attractions.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.NeedBehaviorSystem.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn\Timberborn.CharacterMovementSystem.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn\Timberborn.WaterContaminationSystem.dll" Publicize="true" />
     </ItemGroup>
     <ItemGroup>
       <ClInclude Include="..\UnityProject\Assets\igorz\TimberCommons\Shaders\SoilContaminationSimulatorShaderPacked.compute">

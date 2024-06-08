@@ -33,17 +33,18 @@ typedef AppendStructuredBuffer<int> TAMoistureLevelsChangedLastTickBuff;
 // OUT: LastTickMoistureLevelsBuff
 
 #pragma kernel CountWateredNeighbors
-// IN: InputStruct1 (WaterDepths)
+// IN: WaterDepthsBuff
 // OUT: WateredNeighboursBuff
 
 #pragma kernel CalculateClusterSaturationAndWaterEvaporation
-// IN: InputStruct1 (WaterDepths), WateredNeighboursBuff
+// IN: WaterDepthsBuff, WateredNeighboursBuff
 // OUT: ClusterSaturationBuff, WaterEvaporationModifierBuff
 
 #pragma kernel CalculateMoisture
-// IN: InputStruct1 (WaterDepths, Contaminations, UnsafeCellHeights, BitmapFlags),
-//     MoistureLevelsBuff, LastTickMoistureLevelsBuff, ClusterSaturationBuff
-// OUT: MoistureLevelsBuff, MoistureLevelsChangedLastTickBuff
+// IN: InputStruct1 (UnsafeCellHeights, BitmapFlags),
+//     WaterDepthsBuff, ContaminationsBuff, LastTickMoistureLevelsBuff, ClusterSaturationBuff,
+// OUT: MoistureLevelsChangedLastTickBuff
+// RFE: MoistureLevelsBuff
 
 // SoilMoistureSimulationSettings
 float ConstantQuadraticCoefficient;
@@ -62,12 +63,9 @@ float WaterTowerIrrigatedLevel;
 
 // Buffer access abstraction functions.    
 #define AppendMoistureLevelsChangedLastTick(index) MoistureLevelsChangedLastTickBuff.Append(index)
-#define CeiledWaterHeights(index) ceil(PackedInput1[index].WaterDepths + UnsafeCellHeights(index))
 #define ClusterSaturation(index) ClusterSaturationBuff[index]
-#define Contaminations(index) PackedInput1[index].Contaminations
 #define LastTickMoistureLevels(index) LastTickMoistureLevelsBuff[index]
 #define MoistureLevels(index) MoistureLevelsBuff[index]
-#define WaterDepths(index) PackedInput1[index].WaterDepths
 #define WaterEvaporationModifier(index) WaterEvaporationModifierBuff[index]
 #define WateredNeighbours(index) WateredNeighboursBuff[index]
 
@@ -75,7 +73,7 @@ float WaterTowerIrrigatedLevel;
 /* Functions                                                            */
 /************************************************************************/
 int GetMoistureOfWateredCell(
-    TPackedInput1 PackedInput1,
+    TContaminationsBuff ContaminationsBuff,
     TClusterSaturationBuff ClusterSaturationBuff,
     int indexAtOrigin)
 {
@@ -95,6 +93,8 @@ int GetMoistureOfWateredCell(
 
 int MoistureSpreadByWateredCell(
     TPackedInput1 PackedInput1,
+    TWaterDepthsBuff WaterDepthsBuff,
+    TContaminationsBuff ContaminationsBuff,
     TClusterSaturationBuff ClusterSaturationBuff,
     int neighborIndex, int neighborTerrainHeight, int originTerrainHeight)
 {
@@ -107,7 +107,7 @@ int MoistureSpreadByWateredCell(
     {
         return 0;
     }
-    int moistureOfWateredCell = GetMoistureOfWateredCell(PackedInput1, ClusterSaturationBuff, neighborIndex);
+    int moistureOfWateredCell = GetMoistureOfWateredCell(ContaminationsBuff, ClusterSaturationBuff, neighborIndex);
     int num2 = originTerrainHeight - num;
     if (num2 < 0)
     {
@@ -142,6 +142,8 @@ float MoistureSpreadByMoistCell(
 
 float GetUpdatedMoisture(
     TPackedInput1 PackedInput1,
+    TWaterDepthsBuff WaterDepthsBuff,
+    TContaminationsBuff ContaminationsBuff,
     TLastTickMoistureLevelsBuff LastTickMoistureLevelsBuff,
     TClusterSaturationBuff ClusterSaturationBuff,
     int index)
@@ -173,10 +175,18 @@ float GetUpdatedMoisture(
     bool flag3 = FullMoistureBarriers(num9);
     bool flag4 = FullMoistureBarriers(num13);
     int num18 = MAX4(
-        MoistureSpreadByWateredCell(PackedInput1, ClusterSaturationBuff, num, num2, originTerrainHeight),
-        MoistureSpreadByWateredCell(PackedInput1, ClusterSaturationBuff, num5, num6, originTerrainHeight),
-        MoistureSpreadByWateredCell(PackedInput1, ClusterSaturationBuff, num9, num10, originTerrainHeight),
-        MoistureSpreadByWateredCell(PackedInput1, ClusterSaturationBuff, num13, num14, originTerrainHeight));
+        MoistureSpreadByWateredCell(
+            PackedInput1, WaterDepthsBuff, ContaminationsBuff, ClusterSaturationBuff,
+            num, num2, originTerrainHeight),
+        MoistureSpreadByWateredCell(
+            PackedInput1, WaterDepthsBuff, ContaminationsBuff, ClusterSaturationBuff,
+            num5, num6, originTerrainHeight),
+        MoistureSpreadByWateredCell(
+            PackedInput1, WaterDepthsBuff, ContaminationsBuff, ClusterSaturationBuff,
+            num9, num10, originTerrainHeight),
+        MoistureSpreadByWateredCell(
+            PackedInput1, WaterDepthsBuff, ContaminationsBuff, ClusterSaturationBuff,
+            num13, num14, originTerrainHeight));
     int num19 = (int)ceil(WaterDepths(num));
     int num20 = (int)ceil(WaterDepths(num3));
     int num21 = (int)ceil(WaterDepths(num5));
@@ -230,7 +240,7 @@ void SavePreviousState(
 void CountWateredNeighbors(
     uint3 id : SV_DispatchThreadID,
     // Input.
-    TPackedInput1 PackedInput1,
+    TWaterDepthsBuff WaterDepthsBuff,
     // Output.
     TRWWateredNeighboursBuff WateredNeighboursBuff)
 {
@@ -262,7 +272,7 @@ void CountWateredNeighbors(
 void CalculateClusterSaturationAndWaterEvaporation(
     uint3 id : SV_DispatchThreadID,
     // Input.
-    TPackedInput1 PackedInput1,
+    TWaterDepthsBuff WaterDepthsBuff,
     TWateredNeighboursBuff WateredNeighboursBuff,
     // Output.
     TRWClusterSaturationBuff ClusterSaturationBuff,
@@ -310,6 +320,8 @@ void CalculateMoisture(
     uint3 id : SV_DispatchThreadID,
     // Input.
     TPackedInput1 PackedInput1,
+    TWaterDepthsBuff WaterDepthsBuff,
+    TContaminationsBuff ContaminationsBuff,
     TLastTickMoistureLevelsBuff LastTickMoistureLevelsBuff,
     TClusterSaturationBuff ClusterSaturationBuff,
     // Output.
@@ -319,7 +331,9 @@ void CalculateMoisture(
 {
     const uint index = CoordinatesToIndex(id.xy);
     float oldLevel = MoistureLevels(index);
-    float newLevel = GetUpdatedMoisture(PackedInput1, LastTickMoistureLevelsBuff, ClusterSaturationBuff, index);
+    float newLevel = GetUpdatedMoisture(
+        PackedInput1, WaterDepthsBuff, ContaminationsBuff, LastTickMoistureLevelsBuff, ClusterSaturationBuff,
+        index);
     if (WaterTowerIrrigated(index) && newLevel < WaterTowerIrrigatedLevel)
     {
         newLevel = WaterTowerIrrigatedLevel;

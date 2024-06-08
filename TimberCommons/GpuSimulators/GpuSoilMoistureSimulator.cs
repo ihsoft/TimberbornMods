@@ -62,68 +62,70 @@ sealed class GpuSoilMoistureSimulator {
   }
 
   void SetupShader(GpuSimulatorsController gpuSimulatorsController) {
-    var simulationSettings = _soilMoistureSimulator._soilMoistureSimulationSettings;
-    var totalMapSize = _mapIndexService.TotalMapSize;
-    var mapDataSize = new Vector3Int(_mapIndexService.MapSize.x, _mapIndexService.MapSize.y, 1);
-
-    var prefab = _resourceAssetLoader.Load<ComputeShader>(SimulatorShaderName);
-    var shader = Object.Instantiate(prefab);
-
-    _moistureLevelsBuff = new SimpleBuffer<float>(
-        "MoistureLevelsBuff", _soilMoistureSimulator.MoistureLevels);
-    _moistureLevelsChangedLastTickBuffer = new AppendBuffer<int>(
-        "MoistureLevelsChangedLastTickBuff", new int[totalMapSize]);
-    _packedInputBuffer = gpuSimulatorsController.PackedPersistentValuesBuffer1;
-    _waterEvaporationModifierBuff = new SimpleBuffer<float>(
-        "WaterEvaporationModifierBuff", new float[totalMapSize]);
-
-    _shaderPipeline = ShaderPipeline.NewBuilder(shader)
-        // Simulation settings.
-        // Common.
-        .WithConstantValue("Stride", _mapIndexService.Stride)
-        // SoilMoistureSimulationSettings
-        .WithConstantValue("ConstantQuadraticCoefficient", simulationSettings.ConstantQuadraticCoefficient)
-        .WithConstantValue("LinearQuadraticCoefficient", simulationSettings.LinearQuadraticCoefficient)
-        .WithConstantValue("MaxClusterSaturation", simulationSettings.MaxClusterSaturation)
-        .WithConstantValue("MinimumWaterContamination", simulationSettings.MinimumWaterContamination)
-        .WithConstantValue("QuadraticEvaporationCoefficient", simulationSettings.QuadraticEvaporationCoefficient)
-        .WithConstantValue("VerticalSpreadCostMultiplier", simulationSettings.VerticalSpreadCostMultiplier)
-        // DirectSoilMoistureSimulationSettings
-        .WithConstantValue("WaterTowerIrrigatedLevel", 1f)
-        // Sim calculated.
-        .WithConstantValue("WaterContaminationScaler", _soilMoistureSimulator._waterContaminationScaler)
-        // Intermediate buffers.
-        .WithIntermediateBuffer("LastTickMoistureLevelsBuff", sizeof(float), totalMapSize)
-        .WithIntermediateBuffer("WateredNeighboursBuff", sizeof(float), totalMapSize)
-        .WithIntermediateBuffer("ClusterSaturationBuff", sizeof(float), totalMapSize)
-        // Input buffers. They are pushed to the GPU every frame.
-        .WithIntermediateBuffer(_packedInputBuffer)
-        // Output buffers. They are read from the GPU every frame.
-        .WithIntermediateBuffer(_moistureLevelsBuff)  // Must be pushed on init.
-        .WithIntermediateBuffer(_moistureLevelsChangedLastTickBuffer)
-        .WithIntermediateBuffer(_waterEvaporationModifierBuff)
-        // The kernel chain! They will execute in the order they are declared.
-        .DispatchKernel(
-            "SavePreviousState", new Vector3Int(totalMapSize, 1, 1),
-            "i:MoistureLevelsBuff",
-            "o:LastTickMoistureLevelsBuff")
-        .DispatchKernel(
-            "CountWateredNeighbors", mapDataSize,
-            "i:PackedInput1",
-            "i:LastTickMoistureLevelsBuff",
-            "o:WateredNeighboursBuff")
-        .DispatchKernel(
-            "CalculateClusterSaturationAndWaterEvaporation", mapDataSize,
-            "i:PackedInput1",
-            "i:WateredNeighboursBuff",
-            "o:ClusterSaturationBuff", "o:WaterEvaporationModifierBuff")
-        .DispatchKernel(
-            "CalculateMoisture", mapDataSize,
-            "i:PackedInput1",
-            "i:LastTickMoistureLevelsBuff", "i:ClusterSaturationBuff",
-            "o:MoistureLevelsBuff", "o:MoistureLevelsChangedLastTickBuff")
-        .Build();
-    DebugEx.Warning("*** Shader execution plan:\n{0}", string.Join("\n", _shaderPipeline.GetExecutionPlan()));
+    // var simulationSettings = _soilMoistureSimulator._soilMoistureSimulationSettings;
+    // var totalMapSize = _mapIndexService.TotalMapSize;
+    // var mapDataSize = new Vector3Int(_mapIndexService.MapSize.x, _mapIndexService.MapSize.y, 1);
+    //
+    // var prefab = _resourceAssetLoader.Load<ComputeShader>(SimulatorShaderName);
+    // var shader = Object.Instantiate(prefab);
+    //
+    // _moistureLevelsBuff = new SimpleBuffer<float>(
+    //     "MoistureLevelsBuff", _soilMoistureSimulator.MoistureLevels);
+    // _moistureLevelsChangedLastTickBuffer = new AppendBuffer<int>(
+    //     "MoistureLevelsChangedLastTickBuff", new int[totalMapSize]);
+    // _packedInputBuffer = gpuSimulatorsController.PackedPersistentValuesBuffer1;
+    // _waterEvaporationModifierBuff = new SimpleBuffer<float>(
+    //     "WaterEvaporationModifierBuff", new float[totalMapSize]);
+    //
+    // _shaderPipeline = ShaderPipeline.NewBuilder(shader)
+    //     // Simulation settings.
+    //     // Common.
+    //     .WithConstantValue("Stride", _mapIndexService.Stride)
+    //     // SoilMoistureSimulationSettings
+    //     .WithConstantValue("ConstantQuadraticCoefficient", simulationSettings.ConstantQuadraticCoefficient)
+    //     .WithConstantValue("LinearQuadraticCoefficient", simulationSettings.LinearQuadraticCoefficient)
+    //     .WithConstantValue("MaxClusterSaturation", simulationSettings.MaxClusterSaturation)
+    //     .WithConstantValue("MinimumWaterContamination", simulationSettings.MinimumWaterContamination)
+    //     .WithConstantValue("QuadraticEvaporationCoefficient", simulationSettings.QuadraticEvaporationCoefficient)
+    //     .WithConstantValue("VerticalSpreadCostMultiplier", simulationSettings.VerticalSpreadCostMultiplier)
+    //     // DirectSoilMoistureSimulationSettings
+    //     .WithConstantValue("WaterTowerIrrigatedLevel", 1f)
+    //     // Sim calculated.
+    //     .WithConstantValue("WaterContaminationScaler", _soilMoistureSimulator._waterContaminationScaler)
+    //     // Intermediate buffers.
+    //     .WithIntermediateBuffer("LastTickMoistureLevelsBuff", sizeof(float), totalMapSize)
+    //     .WithIntermediateBuffer("WateredNeighboursBuff", sizeof(float), totalMapSize)
+    //     .WithIntermediateBuffer("ClusterSaturationBuff", sizeof(float), totalMapSize)
+    //     // Input buffers. They are pushed to the GPU every frame.
+    //     .WithIntermediateBuffer(_packedInputBuffer)
+    //     .WithIntermediateBuffer(gpuSimulatorsController.WaterDepthsBuffer)
+    //     .WithIntermediateBuffer(gpuSimulatorsController.ContaminationsBuffer)
+    //     // Output buffers. They are read from the GPU every frame.
+    //     .WithIntermediateBuffer(_moistureLevelsBuff)  // Must be pushed on init.
+    //     .WithIntermediateBuffer(_moistureLevelsChangedLastTickBuffer)
+    //     .WithIntermediateBuffer(_waterEvaporationModifierBuff)
+    //     // The kernel chain! They will execute in the order they are declared.
+    //     .DispatchKernel(
+    //         "SavePreviousState", new Vector3Int(totalMapSize, 1, 1),
+    //         "i:MoistureLevelsBuff",
+    //         "o:LastTickMoistureLevelsBuff")
+    //     .DispatchKernel(
+    //         "CountWateredNeighbors", mapDataSize,
+    //         "i:PackedInput1",
+    //         "i:WaterDepthsBuff", "i:LastTickMoistureLevelsBuff",
+    //         "o:WateredNeighboursBuff")
+    //     .DispatchKernel(
+    //         "CalculateClusterSaturationAndWaterEvaporation", mapDataSize,
+    //         "i:PackedInput1",
+    //         "i:WaterDepthsBuff", "i:WateredNeighboursBuff",
+    //         "o:ClusterSaturationBuff", "o:WaterEvaporationModifierBuff")
+    //     .DispatchKernel(
+    //         "CalculateMoisture", mapDataSize,
+    //         "i:PackedInput1",
+    //         "i:WaterDepthsBuff", "i:ContaminationsBuff", "i:LastTickMoistureLevelsBuff", "i:ClusterSaturationBuff",
+    //         "o:MoistureLevelsBuff", "o:MoistureLevelsChangedLastTickBuff")
+    //     .Build();
+    // DebugEx.Warning("*** Shader execution plan:\n{0}", string.Join("\n", _shaderPipeline.GetExecutionPlan()));
   }
 
   public void ProcessOutput() {

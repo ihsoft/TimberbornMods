@@ -16,8 +16,8 @@ uint Stride;
 
 // Common structures.
 struct InputStruct1 {
-    float Contaminations;
-    float WaterDepths;
+    float Contaminations_remove;
+    float WaterDepths_remove;
     int UnsafeCellHeights;
     uint BitmapFlags;
 
@@ -32,3 +32,12 @@ struct InputStruct1 {
 #define FullMoistureBarriers(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::FullMoistureBarrierBit)
 #define WaterTowerIrrigated(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::WaterTowerIrrigatedBit)
 #define UnsafeCellHeights(index) PackedInput1[index].UnsafeCellHeights
+
+//#define CeiledWaterHeights(index) ceil(PackedInput1[index].WaterDepths + UnsafeCellHeights(index))
+#define CeiledWaterHeights(index) ceil(WaterDepths(index) + UnsafeCellHeights(index))
+
+typedef StructuredBuffer<float> TContaminationsBuff;
+typedef StructuredBuffer<float> TWaterDepthsBuff;
+
+#define WaterDepths(index) WaterDepthsBuff[index]
+#define Contaminations(index) ContaminationsBuff[index]

@@ -41,10 +41,8 @@ typedef StructuredBuffer<InputStruct2> TPackedInput2;
 typedef StructuredBuffer<WaterContaminationDiffusion> TContaminationDiffusionsBuff;
 typedef StructuredBuffer<WaterFlow> TOutflowsBuff;
 typedef StructuredBuffer<WaterFlow> TTempOutflowsBuff;
-typedef StructuredBuffer<float> TContaminationsBuff;
 typedef StructuredBuffer<float> TContaminationsBufferBuff;
 typedef StructuredBuffer<float> TInitialWaterDepthsBuff;
-typedef StructuredBuffer<float> TWaterDepthsBuff;
 
 // Input/output types.
 typedef RWStructuredBuffer<WaterContaminationDiffusion> TRWContaminationDiffusionsBuff;
@@ -120,7 +118,6 @@ float DiffusionRate;
 #define EvaporationModifiers(index) PackedInput2[index].EvaporationModifier
 #define ImpermeableSurfaceServicePartialObstacles(index) CheckBitmapFlag(PackedInput2[index], InputStruct2::PartialObstaclesBit)
 #define IndexIsInActualMap(index) CheckBitmapFlag(PackedInput2[index], InputStruct2::IsInActualMapBit)
-
 
 #define WaterDepths(index) WaterDepthsBuff[index]
 #define Contaminations(index) ContaminationsBuff[index]

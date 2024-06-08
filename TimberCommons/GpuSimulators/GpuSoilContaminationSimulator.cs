@@ -67,58 +67,60 @@ sealed class GpuSoilContaminationSimulator {
   SimpleBuffer<float> _contaminationLevelsBuffer;
 
   void SetupShader(GpuSimulatorsController gpuSimulatorsController) {
-    var simulationSettings = _soilContaminationSimulator._soilContaminationSimulationSettings;
-    var totalMapSize = _mapIndexService.TotalMapSize;
-    var mapDataSize = new Vector3Int(_mapIndexService.MapSize.x, _mapIndexService.MapSize.y, 1);
-
-    _contaminationsChangedLastTickBuffer = new AppendBuffer<int>(
-        "ContaminationsChangedLastTickBuff", new int[totalMapSize]);
-    _contaminationCandidatesBuffer = new SimpleBuffer<float>(
-        "ContaminationCandidatesBuff", _soilContaminationSimulator._contaminationCandidates);
-    _packedInputBuffer = gpuSimulatorsController.PackedPersistentValuesBuffer1;
-    _contaminationLevelsBuffer = new SimpleBuffer<float>(
-        "ContaminationLevelsBuff", _soilContaminationSimulator.ContaminationLevels);
-
-    var prefab = _resourceAssetLoader.Load<ComputeShader>(SimulatorShaderName);
-    var shader = Object.Instantiate(prefab);
-
-    _shaderPipeline = ShaderPipeline.NewBuilder(shader)
-        // Simulation settings.
-        .WithConstantValue("Stride", _mapIndexService.Stride)
-        .WithConstantValue("DeltaTime", Time.fixedDeltaTime)
-        .WithConstantValue("ContaminationDecayRate", simulationSettings.ContaminationDecayRate)
-        .WithConstantValue(
-            "ContaminationNegativeEqualizationRate", simulationSettings.ContaminationNegativeEqualizationRate)
-        .WithConstantValue(
-            "ContaminationPositiveEqualizationRate", simulationSettings.ContaminationPositiveEqualizationRate)
-        .WithConstantValue("ContaminationScaler", _soilContaminationSimulator._contaminationScaler)
-        .WithConstantValue("ContaminationSpreadingRate", simulationSettings.ContaminationSpreadingRate)
-        .WithConstantValue("DiagonalSpreadCost", _soilContaminationSimulator._diagonalSpreadCost)
-        .WithConstantValue("MinimumSoilContamination", SoilContaminationSimulator.MinimumSoilContamination)
-        .WithConstantValue("MinimumWaterContamination", simulationSettings.MinimumWaterContamination)
-        .WithConstantValue("RegularSpreadCost", _soilContaminationSimulator._regularSpreadCost)
-        .WithConstantValue("VerticalCostModifier", _soilContaminationSimulator._verticalCostModifier)
-        // Intermediate buffers.
-        .WithIntermediateBuffer("LastTickContaminationCandidatesBuff", sizeof(float), totalMapSize)
-        .WithIntermediateBuffer(_contaminationCandidatesBuffer)  // Must be pulled/pushed on (de)init.
-        // Input buffers. They are pushed to the GPU every frame.
-        .WithIntermediateBuffer(_packedInputBuffer)
-        // Output buffers. They are pulled from the GPU every frame.
-        .WithIntermediateBuffer(_contaminationLevelsBuffer)   // Must be pushed on init.
-        .WithIntermediateBuffer(_contaminationsChangedLastTickBuffer)
-        // The kernel chain! They will execute in the order they are declared.
-        .DispatchKernel(
-            "SavePreviousState", new Vector3Int(totalMapSize, 1, 1),
-            "i:ContaminationCandidatesBuff", "o:LastTickContaminationCandidatesBuff")
-        .DispatchKernel(
-            "CalculateContaminationCandidates", mapDataSize,
-            "i:PackedInput1", "i:LastTickContaminationCandidatesBuff",
-            "o:ContaminationCandidatesBuff")
-        .DispatchKernel(
-            "UpdateContaminationsFromCandidates", mapDataSize,
-            "i:ContaminationLevelsBuff", "i:ContaminationCandidatesBuff",
-            "o:ContaminationLevelsBuff", "o:ContaminationsChangedLastTickBuff")
-        .Build();
+    // var simulationSettings = _soilContaminationSimulator._soilContaminationSimulationSettings;
+    // var totalMapSize = _mapIndexService.TotalMapSize;
+    // var mapDataSize = new Vector3Int(_mapIndexService.MapSize.x, _mapIndexService.MapSize.y, 1);
+    //
+    // _contaminationsChangedLastTickBuffer = new AppendBuffer<int>(
+    //     "ContaminationsChangedLastTickBuff", new int[totalMapSize]);
+    // _contaminationCandidatesBuffer = new SimpleBuffer<float>(
+    //     "ContaminationCandidatesBuff", _soilContaminationSimulator._contaminationCandidates);
+    // _packedInputBuffer = gpuSimulatorsController.PackedPersistentValuesBuffer1;
+    // _contaminationLevelsBuffer = new SimpleBuffer<float>(
+    //     "ContaminationLevelsBuff", _soilContaminationSimulator.ContaminationLevels);
+    //
+    // var prefab = _resourceAssetLoader.Load<ComputeShader>(SimulatorShaderName);
+    // var shader = Object.Instantiate(prefab);
+    //
+    // _shaderPipeline = ShaderPipeline.NewBuilder(shader)
+    //     // Simulation settings.
+    //     .WithConstantValue("Stride", _mapIndexService.Stride)
+    //     .WithConstantValue("DeltaTime", Time.fixedDeltaTime)
+    //     .WithConstantValue("ContaminationDecayRate", simulationSettings.ContaminationDecayRate)
+    //     .WithConstantValue(
+    //         "ContaminationNegativeEqualizationRate", simulationSettings.ContaminationNegativeEqualizationRate)
+    //     .WithConstantValue(
+    //         "ContaminationPositiveEqualizationRate", simulationSettings.ContaminationPositiveEqualizationRate)
+    //     .WithConstantValue("ContaminationScaler", _soilContaminationSimulator._contaminationScaler)
+    //     .WithConstantValue("ContaminationSpreadingRate", simulationSettings.ContaminationSpreadingRate)
+    //     .WithConstantValue("DiagonalSpreadCost", _soilContaminationSimulator._diagonalSpreadCost)
+    //     .WithConstantValue("MinimumSoilContamination", SoilContaminationSimulator.MinimumSoilContamination)
+    //     .WithConstantValue("MinimumWaterContamination", simulationSettings.MinimumWaterContamination)
+    //     .WithConstantValue("RegularSpreadCost", _soilContaminationSimulator._regularSpreadCost)
+    //     .WithConstantValue("VerticalCostModifier", _soilContaminationSimulator._verticalCostModifier)
+    //     // Intermediate buffers. They are used to exchange data between the stages. 
+    //     .WithIntermediateBuffer("LastTickContaminationCandidatesBuff", sizeof(float), totalMapSize)
+    //     .WithIntermediateBuffer(_contaminationCandidatesBuffer)  // Must be pulled/pushed on (de)init.
+    //     // Input buffers. They are pushed to the GPU every frame.
+    //     .WithIntermediateBuffer(_packedInputBuffer)
+    //     .WithIntermediateBuffer(gpuSimulatorsController.WaterDepthsBuffer)
+    //     .WithIntermediateBuffer(gpuSimulatorsController.ContaminationsBuffer)
+    //     // Output buffers. They are pulled from the GPU every frame.
+    //     .WithIntermediateBuffer(_contaminationLevelsBuffer)  // Must be pushed on init.
+    //     .WithIntermediateBuffer(_contaminationsChangedLastTickBuffer)
+    //     // The kernel chain! They will execute in the order they are declared.
+    //     .DispatchKernel(
+    //         "SavePreviousState", new Vector3Int(totalMapSize, 1, 1),
+    //         "i:ContaminationCandidatesBuff", "o:LastTickContaminationCandidatesBuff")
+    //     .DispatchKernel(
+    //         "CalculateContaminationCandidates", mapDataSize,
+    //         "i:PackedInput1", "i:WaterDepthsBuff", "i:ContaminationsBuff", "i:LastTickContaminationCandidatesBuff",
+    //         "o:ContaminationCandidatesBuff")
+    //     .DispatchKernel(
+    //         "UpdateContaminationsFromCandidates", mapDataSize,
+    //         "i:ContaminationLevelsBuff", "i:ContaminationCandidatesBuff",
+    //         "o:ContaminationLevelsBuff", "o:ContaminationsChangedLastTickBuff")
+    //     .Build();
   }
 
   public void ProcessOutput() {
