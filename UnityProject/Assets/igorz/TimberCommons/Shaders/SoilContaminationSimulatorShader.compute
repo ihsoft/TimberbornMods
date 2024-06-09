@@ -23,16 +23,16 @@ typedef AppendStructuredBuffer<int> TAContaminationsChangedLastTickBuff;
 // 3. UpdateContaminationsFromCandidates
 
 #pragma kernel SavePreviousState
-// IN: ContaminationCandidatesBuff
-// OUT: LastTickContaminationCandidatesBuff
+// IN: ContaminationCandidatesBuff.
+// OUT: LastTickContaminationCandidatesBuff.
 
 #pragma kernel CalculateContaminationCandidates
-// IN: WaterDepthsBuff, ContaminationsBuff, UnsafeCellHeights, BitmapFlags, LastTickContaminationCandidatesBuff
-// OUT: ContaminationCandidatesBuff
+// IN: WaterDepthsBuff, ContaminationsBuff, UnsafeCellHeights, BitmapFlags, LastTickContaminationCandidatesBuff.
+// OUT: ContaminationCandidatesBuff.
 
 #pragma kernel UpdateContaminationsFromCandidates
-// IN: ContaminationCandidatesBuff, ContaminationLevelsBuff
-// OUT: ContaminationLevelsBuff, ContaminationsChangedLastTickBuff
+// IN: ContaminationCandidatesBuff, ContaminationLevelsBuff.
+// OUT: ContaminationLevelsBuff, ContaminationsChangedLastTickBuff.
 
 // Constants. Set the values only once.
 float DeltaTime;

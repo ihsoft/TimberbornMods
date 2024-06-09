@@ -27,22 +27,22 @@ typedef AppendStructuredBuffer<int> TAMoistureLevelsChangedLastTickBuff;
 // 4. CalculateMoisture
 
 #pragma kernel SavePreviousState
-// IN: MoistureLevelsBuff
-// OUT: LastTickMoistureLevelsBuff
+// IN: MoistureLevelsBuff.
+// OUT: LastTickMoistureLevelsBuff.
 
 #pragma kernel CountWateredNeighbors
-// IN: WaterDepthsBuff
-// OUT: WateredNeighboursBuff
+// IN: WaterDepthsBuff.
+// OUT: WateredNeighboursBuff.
 
 #pragma kernel CalculateClusterSaturationAndWaterEvaporation
-// IN: WaterDepthsBuff, WateredNeighboursBuff
-// OUT: ClusterSaturationBuff, EvaporationModifierBuff
+// IN: WaterDepthsBuff, WateredNeighboursBuff.
+// OUT: ClusterSaturationBuff, EvaporationModifierBuff.
 
 #pragma kernel CalculateMoisture
 // IN: WaterDepthsBuff, ContaminationsBuff, UnsafeCellHeights, BitmapFlagsBuff, LastTickMoistureLevelsBuff,
-//     ClusterSaturationBuff,
-// OUT: MoistureLevelsChangedLastTickBuff
-// RFE: MoistureLevelsBuff
+//     ClusterSaturationBuff.
+// OUT: MoistureLevelsChangedLastTickBuff.
+// RFE: MoistureLevelsBuff.
 
 // SoilMoistureSimulationSettings
 float ConstantQuadraticCoefficient;

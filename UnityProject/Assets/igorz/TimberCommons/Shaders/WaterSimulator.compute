@@ -55,11 +55,11 @@ typedef RWStructuredBuffer<float> TRWInitialWaterDepthsBuff;
 
 #pragma kernel UpdateOutflows
 // IN: OutflowsBuff, WaterDepthsBuff, BitmapFlagsBuff,
-//     ImpermeableSurfaceServiceHeights, ImpermeableSurfaceServiceMinFlowSlowers,
-// OUT: TempOutflowsBuff
+//     ImpermeableSurfaceServiceHeights, ImpermeableSurfaceServiceMinFlowSlowers.
+// OUT: TempOutflowsBuff.
 
 #pragma kernel UpdateWaterParameters
-// IN: WaterDepthsBuff, TempOutflowsBuff, ContaminationsBuff, InitialWaterDepthsBuff, EvaporationModifiersBuff
+// IN: WaterDepthsBuff, TempOutflowsBuff, ContaminationsBuff, InitialWaterDepthsBuff, EvaporationModifiersBuff.
 // OUT: WaterDepthsBuff, OutflowsBuff, ContaminationsBufferBuff.
 
 #pragma kernel SimulateContaminationDiffusion1
