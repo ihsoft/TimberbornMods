@@ -41,8 +41,8 @@ typedef AppendStructuredBuffer<int> TAMoistureLevelsChangedLastTickBuff;
 // OUT: ClusterSaturationBuff, WaterEvaporationModifierBuff
 
 #pragma kernel CalculateMoisture
-// IN: InputStruct1 (UnsafeCellHeights, BitmapFlags),
-//     WaterDepthsBuff, ContaminationsBuff, LastTickMoistureLevelsBuff, ClusterSaturationBuff,
+// IN: InputStruct1 (BitmapFlags),
+//     WaterDepthsBuff, ContaminationsBuff, UnsafeCellHeights, LastTickMoistureLevelsBuff, ClusterSaturationBuff,
 // OUT: MoistureLevelsChangedLastTickBuff
 // RFE: MoistureLevelsBuff
 
@@ -95,6 +95,7 @@ int MoistureSpreadByWateredCell(
     TPackedInput1 PackedInput1,
     TWaterDepthsBuff WaterDepthsBuff,
     TContaminationsBuff ContaminationsBuff,
+    TUnsafeCellHeightsBuff UnsafeCellHeightsBuff,
     TClusterSaturationBuff ClusterSaturationBuff,
     int neighborIndex, int neighborTerrainHeight, int originTerrainHeight)
 {
@@ -144,6 +145,7 @@ float GetUpdatedMoisture(
     TPackedInput1 PackedInput1,
     TWaterDepthsBuff WaterDepthsBuff,
     TContaminationsBuff ContaminationsBuff,
+    TUnsafeCellHeightsBuff UnsafeCellHeightsBuff,
     TLastTickMoistureLevelsBuff LastTickMoistureLevelsBuff,
     TClusterSaturationBuff ClusterSaturationBuff,
     int index)
@@ -176,16 +178,16 @@ float GetUpdatedMoisture(
     bool flag4 = FullMoistureBarriers(num13);
     int num18 = MAX4(
         MoistureSpreadByWateredCell(
-            PackedInput1, WaterDepthsBuff, ContaminationsBuff, ClusterSaturationBuff,
+            PackedInput1, WaterDepthsBuff, ContaminationsBuff, UnsafeCellHeightsBuff, ClusterSaturationBuff,
             num, num2, originTerrainHeight),
         MoistureSpreadByWateredCell(
-            PackedInput1, WaterDepthsBuff, ContaminationsBuff, ClusterSaturationBuff,
+            PackedInput1, WaterDepthsBuff, ContaminationsBuff, UnsafeCellHeightsBuff, ClusterSaturationBuff,
             num5, num6, originTerrainHeight),
         MoistureSpreadByWateredCell(
-            PackedInput1, WaterDepthsBuff, ContaminationsBuff, ClusterSaturationBuff,
+            PackedInput1, WaterDepthsBuff, ContaminationsBuff, UnsafeCellHeightsBuff, ClusterSaturationBuff,
             num9, num10, originTerrainHeight),
         MoistureSpreadByWateredCell(
-            PackedInput1, WaterDepthsBuff, ContaminationsBuff, ClusterSaturationBuff,
+            PackedInput1, WaterDepthsBuff, ContaminationsBuff, UnsafeCellHeightsBuff, ClusterSaturationBuff,
             num13, num14, originTerrainHeight));
     int num19 = (int)ceil(WaterDepths(num));
     int num20 = (int)ceil(WaterDepths(num3));
@@ -322,6 +324,7 @@ void CalculateMoisture(
     TPackedInput1 PackedInput1,
     TWaterDepthsBuff WaterDepthsBuff,
     TContaminationsBuff ContaminationsBuff,
+    TUnsafeCellHeightsBuff UnsafeCellHeightsBuff,
     TLastTickMoistureLevelsBuff LastTickMoistureLevelsBuff,
     TClusterSaturationBuff ClusterSaturationBuff,
     // Output.
@@ -332,7 +335,8 @@ void CalculateMoisture(
     const uint index = CoordinatesToIndex(id.xy);
     float oldLevel = MoistureLevels(index);
     float newLevel = GetUpdatedMoisture(
-        PackedInput1, WaterDepthsBuff, ContaminationsBuff, LastTickMoistureLevelsBuff, ClusterSaturationBuff,
+        PackedInput1, WaterDepthsBuff, ContaminationsBuff, UnsafeCellHeightsBuff, LastTickMoistureLevelsBuff,
+        ClusterSaturationBuff,
         index);
     if (WaterTowerIrrigated(index) && newLevel < WaterTowerIrrigatedLevel)
     {

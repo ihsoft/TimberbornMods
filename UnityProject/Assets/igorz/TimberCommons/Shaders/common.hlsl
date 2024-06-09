@@ -18,7 +18,7 @@ uint Stride;
 struct InputStruct1 {
     float Contaminations_remove;
     float WaterDepths_remove;
-    int UnsafeCellHeights;
+    int UnsafeCellHeights_remove;
     uint BitmapFlags;
 
     static const uint ContaminationBarrierBit = 0x0001;
@@ -31,13 +31,12 @@ struct InputStruct1 {
 #define ContaminationBarriers(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::ContaminationBarrierBit)
 #define FullMoistureBarriers(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::FullMoistureBarrierBit)
 #define WaterTowerIrrigated(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::WaterTowerIrrigatedBit)
-#define UnsafeCellHeights(index) PackedInput1[index].UnsafeCellHeights
-
-//#define CeiledWaterHeights(index) ceil(PackedInput1[index].WaterDepths + UnsafeCellHeights(index))
+#define UnsafeCellHeights(index) UnsafeCellHeightsBuff[index]
 #define CeiledWaterHeights(index) ceil(WaterDepths(index) + UnsafeCellHeights(index))
 
 typedef StructuredBuffer<float> TContaminationsBuff;
 typedef StructuredBuffer<float> TWaterDepthsBuff;
+typedef StructuredBuffer<int> TUnsafeCellHeightsBuff;
 
 #define WaterDepths(index) WaterDepthsBuff[index]
 #define Contaminations(index) ContaminationsBuff[index]
