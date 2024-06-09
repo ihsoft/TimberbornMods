@@ -26,9 +26,6 @@ sealed class Configurator : IConfigurator {
         typeof(WaterSimulatorPatch));
 
     containerDefinition.Bind<GpuSimulatorsController>().AsSingleton();
-    containerDefinition.Bind<GpuSoilContaminationSimulator>().AsSingleton();
-    containerDefinition.Bind<GpuSoilMoistureSimulator>().AsSingleton();
-    containerDefinition.Bind<GpuWaterSimulator>().AsSingleton();
     containerDefinition.Bind<GpuSimulatorsDebuggingPanel>().AsSingleton();
 
     containerDefinition.Bind<DebugUiFragment>().AsSingleton();

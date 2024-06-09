@@ -341,9 +341,9 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
 
   #region Shaders setup
 
-  const string WaterSimulatorShaderName = "igorz.timbercommons/shaders/WaterSimulatorPacked";
-  const string SoilMoistureSimulatorShaderName = "igorz.timbercommons/shaders/SoilMoistureSimulatorPacked";
-  const string SoilContaminationSimulatorShaderName = "igorz.timbercommons/shaders/SoilContaminationSimulatorShaderPacked";
+  const string WaterSimulatorShaderName = "igorz.timbercommons/shaders/WaterSimulator";
+  const string SoilMoistureSimulatorShaderName = "igorz.timbercommons/shaders/SoilMoistureSimulator";
+  const string SoilContaminationSimulatorShaderName = "igorz.timbercommons/shaders/SoilContaminationSimulatorShader";
 
   ShaderPipeline _waterSimShaderPipeline;
   ShaderPipeline _soilMoistureSimShaderPipeline;

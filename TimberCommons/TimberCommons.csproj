@@ -112,9 +112,6 @@
       <Compile Include="GpuSimulators\DebugUiFragment.cs" />
       <Compile Include="GpuSimulators\GpuSimulatorsController.cs" />
       <Compile Include="GpuSimulators\GpuSimulatorsDebuggingPanel.cs" />
-      <Compile Include="GpuSimulators\GpuSoilMoistureSimulator.cs" />
-      <Compile Include="GpuSimulators\GpuWaterSimulator.cs" />
-      <Compile Include="GpuSimulators\GpuSoilContaminationSimulator.cs" />
       <Compile Include="GpuSimulators\StockSimulatorDisabler.cs" />
       <Compile Include="IrrigationSystemUI\GrowthRateModifierFragment.cs" />
       <Compile Include="IrrigationSystem\BlockContaminationRangeEffect.cs" />
@@ -364,20 +361,20 @@
       <Reference Include="..\Dependencies\Timberborn\Timberborn.WaterContaminationSystem.dll" Publicize="true" />
     </ItemGroup>
     <ItemGroup>
-      <ClInclude Include="..\UnityProject\Assets\igorz\TimberCommons\Shaders\SoilContaminationSimulatorShaderPacked.compute">
-        <Link>GpuSimulators\Shaders\SoilContaminationSimulatorShaderPacked.compute</Link>
-      </ClInclude>
-      <ClInclude Include="..\UnityProject\Assets\igorz\TimberCommons\Shaders\SoilMoistureSimulatorPacked.compute">
-        <Link>GpuSimulators\Shaders\SoilMoistureSimulatorPacked.compute</Link>
-      </ClInclude>
-      <ClInclude Include="..\UnityProject\Assets\igorz\TimberCommons\Shaders\WaterSimulatorPacked.compute">
-        <Link>GpuSimulators\Shaders\WaterSimulatorPacked.compute</Link>
-      </ClInclude>
-    </ItemGroup>
-    <ItemGroup>
       <ClCompile Include="..\UnityProject\Assets\igorz\TimberCommons\Shaders\common.hlsl">
         <Link>GpuSimulators\Shaders\common.hlsl</Link>
       </ClCompile>
+    </ItemGroup>
+    <ItemGroup>
+      <ClInclude Include="..\UnityProject\Assets\igorz\TimberCommons\Shaders\SoilContaminationSimulatorShader.compute">
+        <Link>GpuSimulators\Shaders\SoilContaminationSimulatorShader.compute</Link>
+      </ClInclude>
+      <ClInclude Include="..\UnityProject\Assets\igorz\TimberCommons\Shaders\SoilMoistureSimulator.compute">
+        <Link>GpuSimulators\Shaders\SoilMoistureSimulator.compute</Link>
+      </ClInclude>
+      <ClInclude Include="..\UnityProject\Assets\igorz\TimberCommons\Shaders\WaterSimulator.compute">
+        <Link>GpuSimulators\Shaders\WaterSimulator.compute</Link>
+      </ClInclude>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
