@@ -17,6 +17,7 @@ using Timberborn.WaterSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityDev.Utils.ShaderPipeline;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace IgorZ.TimberCommons.GpuSimulators {
 
@@ -50,8 +51,12 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
   readonly SoilMoistureSimulationController _soilMoistureSimulationController;
   readonly SoilContaminationSimulationController _soilContaminationSimulationController;
 
-  readonly Stopwatch _stopwatch = new();
-  readonly ValueSampler _fixedUpdateSampler = new(10);
+  readonly Stopwatch _runShadersStopwatch = new();
+  readonly ValueSampler _runShadersSampler = new(10);
+  readonly Stopwatch _prepareInputsStopwatch = new();
+  readonly ValueSampler _prepareInputsSampler = new(10);
+  readonly Stopwatch _updateOutputsStopwatch = new();
+  readonly ValueSampler _updateOutputsSampler = new(10);
 
   internal static GpuSimulatorsController Self;
   internal bool SimulatorEnabled { get; private set; }
@@ -112,26 +117,23 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
       return "GPU simulation disabled.";
     }
     var text = new List<string>(15);
-    // {
-    //   var (_, _, _, total) = _contaminationSimulator.TotalSimPerfSampler.GetStats();
-    //   text.Add($"Soil contamination total: {total * 1000:0.##} ms");
-    //   var (_, _, _, shader) = _contaminationSimulator.ShaderPerfSampler.GetStats();
-    //   text.Add($"Soil contamination shader: {shader * 1000:0.##} ms");
-    // }
-    // {
-    //   var (_, _, _, total) = _moistureSimulator.TotalSimPerfSampler.GetStats();
-    //   text.Add($"Soil moisture total: {total * 1000:0.##} ms");
-    //   var (_, _, _, shader) = _moistureSimulator.ShaderPerfSampler.GetStats();
-    //   text.Add($"Soil moisture shader: {shader * 1000:0.##} ms");
-    // }
-    // {
-    //   var (_, _, _, total) = _waterSimulator.TotalSimPerfSampler.GetStats();
-    //   text.Add($"Water simulator total: {total * 1000:0.##} ms");
-    //   var (_, _, _, shader) = _waterSimulator.ShaderPerfSampler.GetStats();
-    //   text.Add($"Water simulator shader: {shader * 1000:0.##} ms");
-    // }
-    var (_, _, _, totalPhysics) = _fixedUpdateSampler.GetStats();
-    text.Add($"Total physics cost: {totalPhysics * 1000:0.##} ms");
+    var totalCost = 0.0;
+    {
+      var (_, _, _, total) = _prepareInputsSampler.GetStats();
+      totalCost += total;
+      text.Add($"Prepare input cost: {total * 1000:0.##} ms");
+    }
+    {
+      var (_, _, _, total) = _updateOutputsSampler.GetStats();
+      totalCost += total;
+      text.Add($"Handle output cost: {total * 1000:0.##} ms");
+    }
+    {
+      var (_, _, _, total) = _runShadersSampler.GetStats();
+      totalCost += total;
+      text.Add($"Shaders run cost: {total * 1000:0.##} ms");
+    }
+    text.Add($"Cost per fixed frame: {totalCost * 1000:0.##} ms");
     return string.Join("\n", text);
   }
 
@@ -208,19 +210,18 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
   #region Pipeline running logic
 
   void TickSimulation() {
-    _stopwatch.Start();
-    
     PrepareInputs();
 
+    _runShadersStopwatch.Start();
     _waterSimShaderPipeline.RunBlocking();
     _soilContaminationSimShaderPipeline.RunBlocking();
     _soilMoistureSimShaderPipeline.RunBlocking();
+    AsyncGPUReadback.WaitAllRequests();
+    
+    _runShadersSampler.AddSample(_runShadersStopwatch.Elapsed.TotalSeconds);
+    _runShadersStopwatch.Reset();
 
     UpdateOutputs();
-
-    _stopwatch.Stop();
-    _fixedUpdateSampler.AddSample(_stopwatch.Elapsed.TotalSeconds);
-    _stopwatch.Reset();
   }
 
   void OnSimulationEnabled() {
@@ -236,6 +237,8 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
   }
 
   void PrepareInputs() {
+    _prepareInputsStopwatch.Start();
+
     // Handle CPU part fo teh water simulator.
     _waterSimulator._deltaTime = _waterSimulator._fixedDeltaTime * _waterSimulator._waterSimulationSettings.TimeScale;
     _waterSimulator.UpdateWaterSources();
@@ -291,9 +294,14 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
 
     _moistureLevelsChangedLastTickBuffer.Initialize(null);
     _contaminationsChangedLastTickBuffer.Initialize(null);
+
+    _prepareInputsSampler.AddSample(_prepareInputsStopwatch.Elapsed.TotalSeconds);
+    _prepareInputsStopwatch.Reset();
   }
 
   void UpdateOutputs() {
+    _updateOutputsStopwatch.Start();
+
     // Water sim.
     _waterDepthsBuffer.PullFromGpu(null);
     _contaminationsBuffer.PullFromGpu(null);
@@ -325,6 +333,9 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
       _soilContaminationSimulator._contaminationsChangedLastTick.Add(
           _mapIndexService.IndexToCoordinates(contaminationsChangedLastTick[index]));
     }
+
+    _updateOutputsSampler.AddSample(_updateOutputsStopwatch.Elapsed.TotalSeconds);
+    _updateOutputsStopwatch.Reset();
   }
 
   #endregion
