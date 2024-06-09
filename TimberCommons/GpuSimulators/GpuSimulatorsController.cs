@@ -46,6 +46,7 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
   readonly WaterMap _waterMap;
   readonly WaterContaminationMap _waterContaminationMap;
   readonly WaterEvaporationMap _waterEvaporationMap;
+  readonly ImpermeableSurfaceService _impermeableSurfaceService;
   readonly DirectWaterServiceAccessor _directWaterServiceAccessor;
 
   readonly WaterSimulationController _waterSimulationController;
@@ -76,6 +77,7 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
       WaterMap waterMap,
       WaterContaminationMap waterContaminationMap,
       WaterEvaporationMap waterEvaporationMap,
+      ImpermeableSurfaceService impermeableSurfaceService,
       DirectWaterServiceAccessor directWaterServiceAccessor,
       // Stock sims.
       WaterSimulator waterSimulator,
@@ -92,6 +94,7 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
     _waterMap = waterMap;
     _waterContaminationMap = waterContaminationMap;
     _waterEvaporationMap = waterEvaporationMap;
+    _impermeableSurfaceService = impermeableSurfaceService;
     _directWaterServiceAccessor = directWaterServiceAccessor;
     _waterSimulator = waterSimulator;
     _soilMoistureSimulator = soilMoistureSimulator;
@@ -152,15 +155,6 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
     public const uint PartialObstaclesBit = 0x0010;
     public const uint IsInActualMapBit = 0x0020;
   }
-
-  struct InputStruct2 {
-    public int ImpermeableSurfaceServiceHeight;
-    public int ImpermeableSurfaceServiceMinFlowSlower;
-    public float unused2;  // EvaporationModifier
-    public uint unused3;   // BitmapFlags
-  };
-
-  SimpleBuffer<InputStruct2> _packedInput2Buffer;
   SimpleBuffer<uint> _bitmapFlagsBuffer;
 
   SimpleBuffer<float> _moistureLevelsBuff;
@@ -175,10 +169,10 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
   SimpleBuffer<float> _contaminationsBuffer;
   SimpleBuffer<WaterFlow> _outflowsBuffer;
   SimpleBuffer<int> _unsafeCellHeightsBuffer;
+  SimpleBuffer<int> _impermeableSurfaceServiceHeightsBuffer;
+  SimpleBuffer<int> _impermeableSurfaceServiceMinFlowSlowersBuffer;
 
   void SetupBuffers() {
-    _packedInput2Buffer = new SimpleBuffer<InputStruct2>(
-        "PackedInput2", new InputStruct2[_totalMapSize]);
     _bitmapFlagsBuffer = new SimpleBuffer<uint>(
         "BitmapFlagsBuff", new uint[_totalMapSize]);
 
@@ -190,6 +184,10 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
         "OutflowsBuff", _waterMap.Outflows);
     _unsafeCellHeightsBuffer = new SimpleBuffer<int>(
         "UnsafeCellHeightsBuff", _terrainMap._heights);
+    _impermeableSurfaceServiceHeightsBuffer = new SimpleBuffer<int>(
+        "ImpermeableSurfaceServiceHeightsBuff", _impermeableSurfaceService.Heights);
+    _impermeableSurfaceServiceMinFlowSlowersBuffer = new SimpleBuffer<int>(
+        "ImpermeableSurfaceServiceMinFlowSlowersBuff", _impermeableSurfaceService.MinFlowSlowers);
 
     _moistureLevelsBuff = new SimpleBuffer<float>(
         "MoistureLevelsBuff", _soilMoistureSimulator.MoistureLevels);
@@ -254,9 +252,10 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
 
     _outflowsBuffer.PushToGpu(null);
     _unsafeCellHeightsBuffer.PushToGpu(null);
+    _impermeableSurfaceServiceHeightsBuffer.PushToGpu(null);
+    _impermeableSurfaceServiceMinFlowSlowersBuffer.PushToGpu(null);
 
     //FIXME: React on the change events and don't update everything.
-    //FIXME: Maybe deprecate packed inout all together? Need AMD testing.
     var bitmapFlagsValues = _bitmapFlagsBuffer.Values;
     for (var index = bitmapFlagsValues.Length - 1; index >= 0; index--) {
       uint bitmapFlags = 0;
@@ -272,7 +271,7 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
       if (DirectSoilMoistureSystemAccessor.MoistureLevelOverrides.ContainsKey(index)) {
         bitmapFlags |= BitmapFlags.WaterTowerIrrigatedBit;
       }
-      if (_waterSimulator._impermeableSurfaceService.PartialObstacles[index]) {
+      if (_impermeableSurfaceService.PartialObstacles[index]) {
         bitmapFlags |= BitmapFlags.PartialObstaclesBit;
       }
       if (_waterSimulator._mapIndexService.IndexIsInActualMap(index)) {
@@ -282,17 +281,6 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
       bitmapFlagsValues[index] = bitmapFlags;
     }
     _bitmapFlagsBuffer.PushToGpu(null);
-
-    // FIXME: This data is not updated every frame. Make it event driven.
-    for (var index = 0; index < _totalMapSize; index++) {
-      _packedInput2Buffer.Values[index] = new InputStruct2 {
-          ImpermeableSurfaceServiceHeight = _waterSimulator._impermeableSurfaceService.Heights[index],
-          ImpermeableSurfaceServiceMinFlowSlower = _waterSimulator._impermeableSurfaceService.MinFlowSlowers[index],
-          // EvaporationModifier = _waterSimulator._threadSafeWaterEvaporationMap.EvaporationModifiers[index],
-          // BitmapFlags = bitmapFlags,
-      };
-    }
-    _packedInput2Buffer.PushToGpu(null);
 
     _moistureLevelsChangedLastTickBuffer.Initialize(null);
     _contaminationsChangedLastTickBuffer.Initialize(null);
@@ -397,7 +385,8 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
         .WithIntermediateBuffer("ContaminationDiffusionsBuff", sizeof(float) * 4, _totalMapSize)
         .WithIntermediateBuffer(_evaporationModifiersBuff)  // Must be pushed on enable.
         // Input buffers. They are written to the GPU every frame.
-        .WithIntermediateBuffer(_packedInput2Buffer)
+        .WithIntermediateBuffer(_impermeableSurfaceServiceHeightsBuffer)
+        .WithIntermediateBuffer(_impermeableSurfaceServiceMinFlowSlowersBuffer)
         .WithIntermediateBuffer(_bitmapFlagsBuffer)
         // Output buffers. They are read from the GPU every frame.
         .WithIntermediateBuffer(_outflowsBuffer)
@@ -410,7 +399,8 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
             "o:InitialWaterDepthsBuff", "o:ContaminationsBufferBuff")
         .DispatchKernel(
             "UpdateOutflows", _mapDataSize,
-            "i:PackedInput2", "i:WaterDepthsBuff", "i:BitmapFlagsBuff", "i:OutflowsBuff",
+            "i:WaterDepthsBuff", "i:BitmapFlagsBuff", "i:ImpermeableSurfaceServiceHeightsBuff",
+            "i:ImpermeableSurfaceServiceMinFlowSlowersBuff", "i:OutflowsBuff",
             "o:TempOutflowsBuff")
         .DispatchKernel(
             "UpdateWaterParameters", _mapDataSize,
@@ -420,8 +410,7 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
             "o:OutflowsBuff", "o:WaterDepthsBuff")
         .DispatchKernel(
             "SimulateContaminationDiffusion1", _mapDataSize,
-            "i:PackedInput2",
-            "i:WaterDepthsBuff","i:BitmapFlagsBuff", "i:TempOutflowsBuff",
+            "i:WaterDepthsBuff","i:BitmapFlagsBuff", "i:ImpermeableSurfaceServiceHeightsBuff", "i:TempOutflowsBuff",
             "o:ContaminationDiffusionsBuff")
         .DispatchKernel(
             "SimulateContaminationDiffusion2", _mapDataSize,
