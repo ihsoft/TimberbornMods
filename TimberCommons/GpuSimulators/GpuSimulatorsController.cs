@@ -222,7 +222,11 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
     _waterSimShaderPipeline.RunBlocking();
     _soilContaminationSimShaderPipeline.RunBlocking();
     _soilMoistureSimShaderPipeline.RunBlocking();
-    AsyncGPUReadback.WaitAllRequests();
+
+    // Wait for the GPU to finish the simulation. Only needed for accurate profiling.
+    AsyncGPUReadback.Request(_waterDepthsBuffer.Buffer).WaitForCompletion();
+    AsyncGPUReadback.Request(_moistureLevelsBuff.Buffer).WaitForCompletion();
+    AsyncGPUReadback.Request(_contaminationsBuffer.Buffer).WaitForCompletion();
     
     _runShadersSampler.AddSample(_runShadersStopwatch.Elapsed.TotalSeconds);
     _runShadersStopwatch.Reset();
