@@ -14,23 +14,22 @@
 // Common parameters. Set the values only once.
 uint Stride;
 
-// Common structures.
-struct InputStruct1 {
-    float Contaminations_remove;
-    float WaterDepths_remove;
-    int UnsafeCellHeights_remove;
-    uint BitmapFlags;
-
+// Common structures and types.
+struct BitmapFlags {
     static const uint ContaminationBarrierBit = 0x0001;
     static const uint AboveMoistureBarrierBit = 0x0002;
     static const uint FullMoistureBarrierBit = 0x0004;
     static const uint WaterTowerIrrigatedBit = 0x0008;
+    static const uint PartialObstaclesBit = 0x0010;
+    static const uint IsInActualMapBit = 0x0020;
 };
 
-#define AboveMoistureBarriers(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::AboveMoistureBarrierBit)
-#define ContaminationBarriers(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::ContaminationBarrierBit)
-#define FullMoistureBarriers(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::FullMoistureBarrierBit)
-#define WaterTowerIrrigated(index) CheckBitmapFlag(PackedInput1[index], InputStruct1::WaterTowerIrrigatedBit)
+#define AboveMoistureBarriers(index) (BitmapFlagsBuff[index] & BitmapFlags::AboveMoistureBarrierBit) != 0
+#define ContaminationBarriers(index) (BitmapFlagsBuff[index] & BitmapFlags::ContaminationBarrierBit) != 0
+#define FullMoistureBarriers(index) (BitmapFlagsBuff[index] & BitmapFlags::FullMoistureBarrierBit) != 0
+#define WaterTowerIrrigated(index) (BitmapFlagsBuff[index] & BitmapFlags::WaterTowerIrrigatedBit) != 0
+#define ImpermeableSurfaceServicePartialObstacles(index) (BitmapFlagsBuff[index] & BitmapFlags::PartialObstaclesBit) != 0
+#define IndexIsInActualMap(index) (BitmapFlagsBuff[index] & BitmapFlags::IsInActualMapBit) != 0
 
 typedef StructuredBuffer<float> TContaminationsBuff;
 typedef RWStructuredBuffer<float> TRWContaminationsBuff;
@@ -39,6 +38,7 @@ typedef RWStructuredBuffer<float> TRWWaterDepthsBuff;
 typedef StructuredBuffer<int> TUnsafeCellHeightsBuff;
 typedef StructuredBuffer<float> TEvaporationModifiersBuff;
 typedef RWStructuredBuffer<float> TRWEvaporationModifiersBuff;
+typedef StructuredBuffer<uint> TBitmapFlagsBuff;
 
 #define Contaminations(index) ContaminationsBuff[index]
 #define WaterDepths(index) WaterDepthsBuff[index]

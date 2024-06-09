@@ -144,31 +144,24 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
 
   #region Buffers
 
-  // FIXME: Unwrap it and update each buffer on event.
-  struct InputStruct1 {
-    public float unused0; // Contaminations
-    public float unused1; // WaterDepths
-    public int unused2;   // UnsafeCellHeights
-    public uint BitmapFlags;
-
+  struct BitmapFlags {
     public const uint ContaminationBarrierBit = 0x0001;
     public const uint AboveMoistureBarrierBit = 0x0002;
     public const uint FullMoistureBarrierBit = 0x0004;
     public const uint WaterTowerIrrigatedBit = 0x0008;
-  };
+    public const uint PartialObstaclesBit = 0x0010;
+    public const uint IsInActualMapBit = 0x0020;
+  }
 
   struct InputStruct2 {
     public int ImpermeableSurfaceServiceHeight;
     public int ImpermeableSurfaceServiceMinFlowSlower;
     public float unused2;  // EvaporationModifier
-    public uint BitmapFlags;
-
-    public const uint PartialObstaclesBit = 0x0001;
-    public const uint IsInActualMapBit = 0x0002;
+    public uint unused3;   // BitmapFlags
   };
 
-  SimpleBuffer<InputStruct1> _packedInput1Buffer;
   SimpleBuffer<InputStruct2> _packedInput2Buffer;
+  SimpleBuffer<uint> _bitmapFlagsBuffer;
 
   SimpleBuffer<float> _moistureLevelsBuff;
   SimpleBuffer<float> _evaporationModifiersBuff;
@@ -184,11 +177,10 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
   SimpleBuffer<int> _unsafeCellHeightsBuffer;
 
   void SetupBuffers() {
-    _packedInput1Buffer = new SimpleBuffer<InputStruct1>(
-        "PackedInput1", new InputStruct1[_totalMapSize]);
     _packedInput2Buffer = new SimpleBuffer<InputStruct2>(
         "PackedInput2", new InputStruct2[_totalMapSize]);
-    //_packedInput2 = new InputStruct2[_totalMapSize];
+    _bitmapFlagsBuffer = new SimpleBuffer<uint>(
+        "BitmapFlagsBuff", new uint[_totalMapSize]);
 
     _waterDepthsBuffer = new SimpleBuffer<float>(
         "WaterDepthsBuff", _waterMap.WaterDepths);
@@ -265,45 +257,39 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
 
     //FIXME: React on the change events and don't update everything.
     //FIXME: Maybe deprecate packed inout all together? Need AMD testing.
-    var packedInput1 = _packedInput1Buffer.Values;
-    for (var index = packedInput1.Length - 1; index >= 0; index--) {
+    var bitmapFlagsValues = _bitmapFlagsBuffer.Values;
+    for (var index = bitmapFlagsValues.Length - 1; index >= 0; index--) {
       uint bitmapFlags = 0;
       if (_soilBarrierMap.ContaminationBarriers[index]) {
-        bitmapFlags |= InputStruct1.ContaminationBarrierBit;
+        bitmapFlags |= BitmapFlags.ContaminationBarrierBit;
       }
       if (_soilBarrierMap.AboveMoistureBarriers[index]) {
-        bitmapFlags |= InputStruct1.AboveMoistureBarrierBit;
+        bitmapFlags |= BitmapFlags.AboveMoistureBarrierBit;
       }
       if (_soilBarrierMap.FullMoistureBarriers[index]) {
-        bitmapFlags |= InputStruct1.FullMoistureBarrierBit;
+        bitmapFlags |= BitmapFlags.FullMoistureBarrierBit;
       }
       if (DirectSoilMoistureSystemAccessor.MoistureLevelOverrides.ContainsKey(index)) {
-        bitmapFlags |= InputStruct1.WaterTowerIrrigatedBit;
+        bitmapFlags |= BitmapFlags.WaterTowerIrrigatedBit;
       }
-      packedInput1[index] = new InputStruct1 {
-          // Contaminations = _waterContaminationService.Contamination(index),
-          // WaterDepths = _waterService.WaterDepth(index),
-          // UnsafeCellHeights = _terrainService.UnsafeCellHeight(index),
-          BitmapFlags = bitmapFlags,
-      };
-    }
-    _packedInput1Buffer.PushToGpu(null);
-
-    // FIXME: This data is not updated every frame. Make it event driven.
-    for (var index = 0; index < _totalMapSize; index++) {
-      uint bitmapFlags = 0;
       if (_waterSimulator._impermeableSurfaceService.PartialObstacles[index]) {
-        bitmapFlags |= InputStruct2.PartialObstaclesBit;
+        bitmapFlags |= BitmapFlags.PartialObstaclesBit;
       }
       if (_waterSimulator._mapIndexService.IndexIsInActualMap(index)) {
         // FIXME: This is a constant array that is filled once on game load.
-        bitmapFlags |= InputStruct2.IsInActualMapBit;
+        bitmapFlags |= BitmapFlags.IsInActualMapBit;
       }
+      bitmapFlagsValues[index] = bitmapFlags;
+    }
+    _bitmapFlagsBuffer.PushToGpu(null);
+
+    // FIXME: This data is not updated every frame. Make it event driven.
+    for (var index = 0; index < _totalMapSize; index++) {
       _packedInput2Buffer.Values[index] = new InputStruct2 {
           ImpermeableSurfaceServiceHeight = _waterSimulator._impermeableSurfaceService.Heights[index],
           ImpermeableSurfaceServiceMinFlowSlower = _waterSimulator._impermeableSurfaceService.MinFlowSlowers[index],
           // EvaporationModifier = _waterSimulator._threadSafeWaterEvaporationMap.EvaporationModifiers[index],
-          BitmapFlags = bitmapFlags,
+          // BitmapFlags = bitmapFlags,
       };
     }
     _packedInput2Buffer.PushToGpu(null);
@@ -404,15 +390,16 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
         .WithConstantValue("DiffusionDepthLimit", waterContaminationSimulationSettings.DiffusionDepthLimit)
         .WithConstantValue("DiffusionOutflowLimit", waterContaminationSimulationSettings.DiffusionOutflowLimit)
         .WithConstantValue("DiffusionRate", waterContaminationSimulationSettings.DiffusionRate)
-        // All buffers.
-        // FIXME: make it input.
-        //.WithInputBuffer("PackedInput2", _packedInput2)
-        .WithIntermediateBuffer(_packedInput2Buffer) // INPUT
+        // Intermediate buffers. They are not used by the CPU.
         .WithIntermediateBuffer("TempOutflowsBuff", sizeof(float) * 4, _totalMapSize)
         .WithIntermediateBuffer("InitialWaterDepthsBuff", sizeof(float), _totalMapSize)
         .WithIntermediateBuffer("ContaminationsBufferBuff", sizeof(float), _totalMapSize)
         .WithIntermediateBuffer("ContaminationDiffusionsBuff", sizeof(float) * 4, _totalMapSize)
         .WithIntermediateBuffer(_evaporationModifiersBuff)  // Must be pushed on enable.
+        // Input buffers. They are written to the GPU every frame.
+        .WithIntermediateBuffer(_packedInput2Buffer)
+        .WithIntermediateBuffer(_bitmapFlagsBuffer)
+        // Output buffers. They are read from the GPU every frame.
         .WithIntermediateBuffer(_outflowsBuffer)
         .WithIntermediateBuffer(_waterDepthsBuffer)
         .WithIntermediateBuffer(_contaminationsBuffer)
@@ -423,7 +410,7 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
             "o:InitialWaterDepthsBuff", "o:ContaminationsBufferBuff")
         .DispatchKernel(
             "UpdateOutflows", _mapDataSize,
-            "i:PackedInput2", "i:WaterDepthsBuff", "i:OutflowsBuff",
+            "i:PackedInput2", "i:WaterDepthsBuff", "i:BitmapFlagsBuff", "i:OutflowsBuff",
             "o:TempOutflowsBuff")
         .DispatchKernel(
             "UpdateWaterParameters", _mapDataSize,
@@ -433,8 +420,8 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
             "o:OutflowsBuff", "o:WaterDepthsBuff")
         .DispatchKernel(
             "SimulateContaminationDiffusion1", _mapDataSize,
-            "i:PackedInput2", "i:WaterDepthsBuff",
-            "i:TempOutflowsBuff",
+            "i:PackedInput2",
+            "i:WaterDepthsBuff","i:BitmapFlagsBuff", "i:TempOutflowsBuff",
             "o:ContaminationDiffusionsBuff")
         .DispatchKernel(
             "SimulateContaminationDiffusion2", _mapDataSize,
@@ -465,12 +452,12 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
         .WithConstantValue("WaterTowerIrrigatedLevel", 1f)
         // Sim calculated.
         .WithConstantValue("WaterContaminationScaler", _soilMoistureSimulator._waterContaminationScaler)
-        // Intermediate buffers.
+        // Intermediate buffers. They are not used by the CPU.
         .WithIntermediateBuffer("LastTickMoistureLevelsBuff", sizeof(float), _totalMapSize)
         .WithIntermediateBuffer("WateredNeighboursBuff", sizeof(float), _totalMapSize)
         .WithIntermediateBuffer("ClusterSaturationBuff", sizeof(float), _totalMapSize)
         // Input buffers. They are pushed to the GPU every frame.
-        .WithIntermediateBuffer(_packedInput1Buffer)
+        .WithIntermediateBuffer(_bitmapFlagsBuffer)
         .WithIntermediateBuffer(_waterDepthsBuffer)
         .WithIntermediateBuffer(_contaminationsBuffer)
         .WithIntermediateBuffer(_unsafeCellHeightsBuffer)
@@ -485,19 +472,16 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
             "o:LastTickMoistureLevelsBuff")
         .DispatchKernel(
             "CountWateredNeighbors", _mapDataSize,
-            "i:PackedInput1",
-            "i:WaterDepthsBuff", "i:LastTickMoistureLevelsBuff",
+            "i:WaterDepthsBuff", "i:LastTickMoistureLevelsBuff", "i:BitmapFlagsBuff",
             "o:WateredNeighboursBuff")
         .DispatchKernel(
             "CalculateClusterSaturationAndWaterEvaporation", _mapDataSize,
-            "i:PackedInput1",
-            "i:WaterDepthsBuff", "i:WateredNeighboursBuff",
+            "i:WaterDepthsBuff", "i:WateredNeighboursBuff", "i:BitmapFlagsBuff",
             "o:ClusterSaturationBuff", "o:EvaporationModifiersBuff")
         .DispatchKernel(
             "CalculateMoisture", _mapDataSize,
-            "i:PackedInput1",
-            "i:WaterDepthsBuff", "i:ContaminationsBuff", "i:UnsafeCellHeightsBuff", "i:LastTickMoistureLevelsBuff",
-            "i:ClusterSaturationBuff",
+            "i:WaterDepthsBuff", "i:ContaminationsBuff", "i:UnsafeCellHeightsBuff", "i:BitmapFlagsBuff",
+            "i:LastTickMoistureLevelsBuff", "i:ClusterSaturationBuff",
             "o:MoistureLevelsBuff", "o:MoistureLevelsChangedLastTickBuff")
         .Build();
 
@@ -524,11 +508,11 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
         .WithConstantValue("MinimumWaterContamination", simulationSettings.MinimumWaterContamination)
         .WithConstantValue("RegularSpreadCost", _soilContaminationSimulator._regularSpreadCost)
         .WithConstantValue("VerticalCostModifier", _soilContaminationSimulator._verticalCostModifier)
-        // Intermediate buffers. They are used to exchange data between the stages.
+        // Intermediate buffers. They are not used by the CPU.
         .WithIntermediateBuffer("LastTickContaminationCandidatesBuff", sizeof(float), _totalMapSize)
         .WithIntermediateBuffer(_contaminationCandidatesBuffer)  // Must be pulled/pushed on (de)init.
         // Input buffers. They are pushed to the GPU every frame.
-        .WithIntermediateBuffer(_packedInput1Buffer)
+        .WithIntermediateBuffer(_bitmapFlagsBuffer)
         .WithIntermediateBuffer(_waterDepthsBuffer)
         .WithIntermediateBuffer(_contaminationsBuffer)
         .WithIntermediateBuffer(_unsafeCellHeightsBuffer)
@@ -541,7 +525,7 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
             "i:ContaminationCandidatesBuff", "o:LastTickContaminationCandidatesBuff")
         .DispatchKernel(
             "CalculateContaminationCandidates", _mapDataSize,
-            "i:PackedInput1", "i:WaterDepthsBuff", "i:ContaminationsBuff", "i:UnsafeCellHeightsBuff",
+            "i:WaterDepthsBuff", "i:ContaminationsBuff", "i:UnsafeCellHeightsBuff", "i:BitmapFlagsBuff",
             "i:LastTickContaminationCandidatesBuff",
             "o:ContaminationCandidatesBuff")
         .DispatchKernel(

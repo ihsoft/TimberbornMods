@@ -6,7 +6,6 @@
 #include "common.hlsl"
 
 // Input only types.
-typedef StructuredBuffer<InputStruct1> TPackedInput1;
 typedef StructuredBuffer<float> TContaminationCandidatesBuff;
 typedef StructuredBuffer<float> TLastTickContaminationCandidatesBuff;
 
@@ -28,8 +27,7 @@ typedef AppendStructuredBuffer<int> TAContaminationsChangedLastTickBuff;
 // OUT: LastTickContaminationCandidatesBuff
 
 #pragma kernel CalculateContaminationCandidates
-// IN: PackedInput1 (InputStruct1.BitmapFlags),
-//     WaterDepthsBuff, ContaminationsBuff, UnsafeCellHeights, LastTickContaminationCandidatesBuff
+// IN: WaterDepthsBuff, ContaminationsBuff, UnsafeCellHeights, BitmapFlags, LastTickContaminationCandidatesBuff
 // OUT: ContaminationCandidatesBuff
 
 #pragma kernel UpdateContaminationsFromCandidates
@@ -88,10 +86,10 @@ float GetContaminationFromNeighbor(
 }
 
 float GetContaminationFromWater(
-    TPackedInput1 PackedInput1,
     TWaterDepthsBuff WaterDepthsBuff,
     TContaminationsBuff ContaminationsBuff,
     TUnsafeCellHeightsBuff UnsafeCellHeightsBuff,
+    TBitmapFlagsBuff BitmapFlagsBuff,
     int neighborIndex, int neighborTerrainHeight, int originTerrainHeight)
 {
     if (AboveMoistureBarriers(neighborIndex) && neighborTerrainHeight >= originTerrainHeight)
@@ -119,10 +117,10 @@ float GetContaminationFromWater(
 }
 
 float GetContaminationCandidate(
-    TPackedInput1 PackedInput1,
     TWaterDepthsBuff WaterDepthsBuff,
     TContaminationsBuff ContaminationsBuff,
     TUnsafeCellHeightsBuff UnsafeCellHeightsBuff,
+    TBitmapFlagsBuff BitmapFlagsBuff,
     TLastTickContaminationCandidatesBuff LastTickContaminationCandidatesBuff,
     uint index)
 {
@@ -153,16 +151,16 @@ float GetContaminationCandidate(
     bool flag4 = ContaminationBarriers(num7);
     float num9 = MAX4(
         GetContaminationFromWater(
-            PackedInput1, WaterDepthsBuff, ContaminationsBuff, UnsafeCellHeightsBuff,
+            WaterDepthsBuff, ContaminationsBuff, UnsafeCellHeightsBuff, BitmapFlagsBuff,
             num, neighborTerrainHeight, originTerrainHeight),
         GetContaminationFromWater(
-            PackedInput1, WaterDepthsBuff, ContaminationsBuff, UnsafeCellHeightsBuff,
+            WaterDepthsBuff, ContaminationsBuff, UnsafeCellHeightsBuff, BitmapFlagsBuff,
             num3, neighborTerrainHeight3, originTerrainHeight),
         GetContaminationFromWater(
-            PackedInput1, WaterDepthsBuff, ContaminationsBuff, UnsafeCellHeightsBuff,
+            WaterDepthsBuff, ContaminationsBuff, UnsafeCellHeightsBuff, BitmapFlagsBuff,
             num5, neighborTerrainHeight5, originTerrainHeight),
         GetContaminationFromWater(
-            PackedInput1, WaterDepthsBuff, ContaminationsBuff, UnsafeCellHeightsBuff,
+            WaterDepthsBuff, ContaminationsBuff, UnsafeCellHeightsBuff, BitmapFlagsBuff,
             num7, neighborTerrainHeight7, originTerrainHeight));
     float num10 = MAX8(
         GetContaminationFromNeighbor(LastTickContaminationCandidatesBuff, num, neighborTerrainHeight, originTerrainHeight, RegularSpreadCost),
@@ -213,17 +211,17 @@ void SavePreviousState(
 void CalculateContaminationCandidates(
     uint3 id : SV_DispatchThreadID,
     // Input.
-    TPackedInput1 PackedInput1,
     TWaterDepthsBuff WaterDepthsBuff,
     TContaminationsBuff ContaminationsBuff,
     TUnsafeCellHeightsBuff UnsafeCellHeightsBuff,
+    TBitmapFlagsBuff BitmapFlagsBuff,
     TLastTickContaminationCandidatesBuff LastTickContaminationCandidatesBuff,
     // Output.
     TRWContaminationCandidatesBuff ContaminationCandidatesBuff)
 {
     const uint index = CoordinatesToIndex(id.xy);
     ContaminationCandidates(index) = GetContaminationCandidate(
-        PackedInput1, WaterDepthsBuff, ContaminationsBuff, UnsafeCellHeightsBuff, LastTickContaminationCandidatesBuff, 
+        WaterDepthsBuff, ContaminationsBuff, UnsafeCellHeightsBuff, BitmapFlagsBuff, LastTickContaminationCandidatesBuff, 
         index);
 }
 

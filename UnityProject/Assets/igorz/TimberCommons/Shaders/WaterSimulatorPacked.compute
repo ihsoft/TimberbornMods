@@ -30,10 +30,10 @@ struct InputStruct2 {
     int ImpermeableSurfaceServiceHeight;
     int ImpermeableSurfaceServiceMinFlowSlower;
     float unused2;
-    uint BitmapFlags;
+    uint unused3;
 
-    static const uint PartialObstaclesBit = 0x0001;
-    static const uint IsInActualMapBit = 0x0002;
+    // static const uint PartialObstaclesBit = 0x0001;
+    // static const uint IsInActualMapBit = 0x0002;
 };
 
 // Input only types.
@@ -63,9 +63,8 @@ typedef RWStructuredBuffer<float> TRWInitialWaterDepthsBuff;
 // OUT: InitialWaterDepthsBuff, ContaminationsBufferBuff.
 
 #pragma kernel UpdateOutflows
-// IN: OutflowsBuff, WaterDepthsBuff,
-//     InputStruct1.ImpermeableSurfaceServiceHeights, InputStruct1.IndexIsInActualMap,
-//     InputStruct1.ImpermeableSurfaceServiceMinFlowSlowers, InputStruct1.BitmapFlags.
+// IN: OutflowsBuff, WaterDepthsBuff, BitmapFlagsBuff,
+//     InputStruct1.ImpermeableSurfaceServiceHeights, InputStruct1.ImpermeableSurfaceServiceMinFlowSlowers,
 // OUT: TempOutflowsBuff
 
 #pragma kernel UpdateWaterParameters
@@ -73,8 +72,8 @@ typedef RWStructuredBuffer<float> TRWInitialWaterDepthsBuff;
 // OUT: WaterDepthsBuff, OutflowsBuff, ContaminationsBufferBuff.
 
 #pragma kernel SimulateContaminationDiffusion1
-// IN: WaterDepthsBuff, TempOutflowsBuff,
-//     InputStruct1.ImpermeableSurfaceServiceHeights, InputStruct1.BitmapFlags.
+// IN: WaterDepthsBuff, BitmapFlagsBuff, TempOutflowsBuff,
+//     InputStruct1.ImpermeableSurfaceServiceHeights,
 // OUT: ContaminationDiffusionsBuff.
 
 #pragma kernel SimulateContaminationDiffusion2
@@ -112,8 +111,6 @@ float DiffusionRate;
 
 #define ImpermeableSurfaceServiceHeights(index) PackedInput2[index].ImpermeableSurfaceServiceHeight
 #define ImpermeableSurfaceServiceMinFlowSlowers(index) PackedInput2[index].ImpermeableSurfaceServiceMinFlowSlower
-#define ImpermeableSurfaceServicePartialObstacles(index) CheckBitmapFlag(PackedInput2[index], InputStruct2::PartialObstaclesBit)
-#define IndexIsInActualMap(index) CheckBitmapFlag(PackedInput2[index], InputStruct2::IsInActualMapBit)
 
 #define Outflows(index) OutflowsBuff[index]
 
@@ -137,6 +134,7 @@ float DiffusionRate;
 float CalculateOutflow(
     TPackedInput2 PackedInput2,
     TWaterDepthsBuff WaterDepthsBuff,
+    TBitmapFlagsBuff BitmapFlagsBuff,
     TOutflowsBuff OutflowsBuff,
     int origin, int target, float oldOutflow)
 {
@@ -214,6 +212,7 @@ float CalculateOutflow(
 void UpdateOutflow(
     TPackedInput2 PackedInput2,
     TWaterDepthsBuff WaterDepthsBuff,
+    TBitmapFlagsBuff BitmapFlagsBuff,
     TOutflowsBuff OutflowsBuff,
     TRWTempOutflowsBuff TempOutflowsBuff,
     int index)
@@ -229,10 +228,18 @@ void UpdateOutflow(
     int target3 = index + Stride;
     int target4 = index + 1;
     WaterFlow reference = Outflows(index);
-    float num2 = CalculateOutflow(PackedInput2, WaterDepthsBuff, OutflowsBuff, index, target, reference.Bottom);
-    float num3 = CalculateOutflow(PackedInput2, WaterDepthsBuff, OutflowsBuff, index, target2, reference.Left);
-    float num4 = CalculateOutflow(PackedInput2, WaterDepthsBuff, OutflowsBuff, index, target3, reference.Top);
-    float num5 = CalculateOutflow(PackedInput2, WaterDepthsBuff, OutflowsBuff, index, target4, reference.Right);
+    float num2 = CalculateOutflow(
+        PackedInput2, WaterDepthsBuff, BitmapFlagsBuff, OutflowsBuff,
+        index, target, reference.Bottom);
+    float num3 = CalculateOutflow(
+        PackedInput2, WaterDepthsBuff, BitmapFlagsBuff, OutflowsBuff,
+        index, target2, reference.Left);
+    float num4 = CalculateOutflow(
+        PackedInput2, WaterDepthsBuff, BitmapFlagsBuff, OutflowsBuff,
+        index, target3, reference.Top);
+    float num5 = CalculateOutflow(
+        PackedInput2, WaterDepthsBuff, BitmapFlagsBuff, OutflowsBuff,
+        index, target4, reference.Right);
     float num6 = num2 + num3 + num4 + num5;
     if (num6 == 0)
     {
@@ -362,6 +369,7 @@ void SimulateContaminationMovement(
 bool CanDiffuse(
     TPackedInput2 PackedInput2,
     TWaterDepthsBuff WaterDepthsBuff,
+    TBitmapFlagsBuff BitmapFlagsBuff,
     float sourceWaterHeight, int targetIndex, float outflowToTarget)
 {
     float num = WaterDepths(targetIndex);
@@ -388,6 +396,7 @@ void UpdateDiffusion(
     TPackedInput2 PackedInput2,
     TTempOutflowsBuff TempOutflowsBuff,
     TWaterDepthsBuff WaterDepthsBuff,
+    TBitmapFlagsBuff BitmapFlagsBuff,
     TRWContaminationDiffusionsBuff ContaminationDiffusionsBuff,
     int index)
 {
@@ -405,10 +414,18 @@ void UpdateDiffusion(
         float outflowToTarget3 = reference2.Top - TempOutflows(num3).Bottom;
         float outflowToTarget4 = reference2.Right - TempOutflows(num4).Left;
         float sourceWaterHeight = WaterDepths(index) + (float)ImpermeableSurfaceServiceHeights(index);
-        bool flag = CanDiffuse(PackedInput2, WaterDepthsBuff, sourceWaterHeight, num, outflowToTarget);
-        bool flag2 = CanDiffuse(PackedInput2, WaterDepthsBuff, sourceWaterHeight, num2, outflowToTarget2);
-        bool flag3 = CanDiffuse(PackedInput2, WaterDepthsBuff, sourceWaterHeight, num3, outflowToTarget3);
-        bool flag4 = CanDiffuse(PackedInput2, WaterDepthsBuff, sourceWaterHeight, num4, outflowToTarget4);
+        bool flag = CanDiffuse(
+            PackedInput2, WaterDepthsBuff, BitmapFlagsBuff,
+            sourceWaterHeight, num, outflowToTarget);
+        bool flag2 = CanDiffuse(
+            PackedInput2, WaterDepthsBuff, BitmapFlagsBuff,
+            sourceWaterHeight, num2, outflowToTarget2);
+        bool flag3 = CanDiffuse(
+            PackedInput2, WaterDepthsBuff, BitmapFlagsBuff,
+            sourceWaterHeight, num3, outflowToTarget3);
+        bool flag4 = CanDiffuse(
+            PackedInput2, WaterDepthsBuff, BitmapFlagsBuff,
+            sourceWaterHeight, num4, outflowToTarget4);
         if (flag || flag2 || flag3 || flag4)
         {
             SetCanDiffuseBottom(reference, flag);
@@ -516,12 +533,15 @@ void UpdateOutflows(
     // Input.
     TPackedInput2 PackedInput2,
     TWaterDepthsBuff WaterDepthsBuff,
+    TBitmapFlagsBuff BitmapFlagsBuff,
     TOutflowsBuff OutflowsBuff,
     // Output.
     TRWTempOutflowsBuff TempOutflowsBuff)
 {
     const int index = CoordinatesToIndex(id.xy);
-    UpdateOutflow(PackedInput2, WaterDepthsBuff, OutflowsBuff, TempOutflowsBuff, index);
+    UpdateOutflow(
+        PackedInput2, WaterDepthsBuff, BitmapFlagsBuff, OutflowsBuff, TempOutflowsBuff,
+        index);
 }
 
 [numthreads(8, 8, 1)]
@@ -552,6 +572,7 @@ void SimulateContaminationDiffusion1(
     // Input.
     TPackedInput2 PackedInput2,
     TWaterDepthsBuff WaterDepthsBuff,
+    TBitmapFlagsBuff BitmapFlagsBuff,
     TTempOutflowsBuff TempOutflowsBuff,
     // Output.
     TRWContaminationDiffusionsBuff ContaminationDiffusionsBuff)
@@ -559,7 +580,9 @@ void SimulateContaminationDiffusion1(
     const int index = CoordinatesToIndex(id.xy);
     if (WaterDepths(index) > 0)
     {
-        UpdateDiffusion(PackedInput2, TempOutflowsBuff, WaterDepthsBuff, ContaminationDiffusionsBuff, index);
+        UpdateDiffusion(
+            PackedInput2, TempOutflowsBuff, WaterDepthsBuff, BitmapFlagsBuff, ContaminationDiffusionsBuff,
+            index);
     }
 }
 
