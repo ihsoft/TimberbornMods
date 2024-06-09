@@ -15,7 +15,6 @@ typedef StructuredBuffer<int> TClusterSaturationBuff;
 // Input/output types.
 typedef RWStructuredBuffer<float> TRWLastTickMoistureLevelsBuff;
 typedef RWStructuredBuffer<float> TRWMoistureLevelsBuff;
-typedef RWStructuredBuffer<float> TRWWaterEvaporationModifierBuff;
 typedef RWStructuredBuffer<float> TRWWateredNeighboursBuff;
 typedef RWStructuredBuffer<int> TRWClusterSaturationBuff;
 
@@ -38,7 +37,7 @@ typedef AppendStructuredBuffer<int> TAMoistureLevelsChangedLastTickBuff;
 
 #pragma kernel CalculateClusterSaturationAndWaterEvaporation
 // IN: WaterDepthsBuff, WateredNeighboursBuff
-// OUT: ClusterSaturationBuff, WaterEvaporationModifierBuff
+// OUT: ClusterSaturationBuff, EvaporationModifierBuff
 
 #pragma kernel CalculateMoisture
 // IN: InputStruct1 (BitmapFlags),
@@ -66,7 +65,6 @@ float WaterTowerIrrigatedLevel;
 #define ClusterSaturation(index) ClusterSaturationBuff[index]
 #define LastTickMoistureLevels(index) LastTickMoistureLevelsBuff[index]
 #define MoistureLevels(index) MoistureLevelsBuff[index]
-#define WaterEvaporationModifier(index) WaterEvaporationModifierBuff[index]
 #define WateredNeighbours(index) WateredNeighboursBuff[index]
 
 /************************************************************************/
@@ -278,12 +276,12 @@ void CalculateClusterSaturationAndWaterEvaporation(
     TWateredNeighboursBuff WateredNeighboursBuff,
     // Output.
     TRWClusterSaturationBuff ClusterSaturationBuff,
-    TRWWaterEvaporationModifierBuff WaterEvaporationModifierBuff)
+    TRWEvaporationModifiersBuff EvaporationModifiersBuff)
 {
     const uint index = CoordinatesToIndex(id.xy);
     if (!(WaterDepths(index) > 0)) {
         ClusterSaturation(index) = 0;
-        WaterEvaporationModifier(index) = 1;
+        EvaporationModifiers(index) = 1;
         return;
     }
     int num2 = index - Stride;
@@ -314,7 +312,7 @@ void CalculateClusterSaturationAndWaterEvaporation(
     float modifier = QuadraticEvaporationCoefficient * num11 * num11
         + LinearQuadraticCoefficient * num11
         + ConstantQuadraticCoefficient;
-    WaterEvaporationModifier(index) = modifier;
+    EvaporationModifiers(index) = modifier;
 }
 
 [numthreads(8, 8, 1)]

@@ -29,7 +29,7 @@ static WaterFlow DefaultWaterFlow = { 0, 0, 0, 0 };
 struct InputStruct2 {
     int ImpermeableSurfaceServiceHeight;
     int ImpermeableSurfaceServiceMinFlowSlower;
-    float EvaporationModifier;
+    float unused2;
     uint BitmapFlags;
 
     static const uint PartialObstaclesBit = 0x0001;
@@ -48,10 +48,8 @@ typedef StructuredBuffer<float> TInitialWaterDepthsBuff;
 typedef RWStructuredBuffer<WaterContaminationDiffusion> TRWContaminationDiffusionsBuff;
 typedef RWStructuredBuffer<WaterFlow> TRWOutflowsBuff;
 typedef RWStructuredBuffer<WaterFlow> TRWTempOutflowsBuff;
-typedef RWStructuredBuffer<float> TRWContaminationsBuff;
 typedef RWStructuredBuffer<float> TRWContaminationsBufferBuff;
 typedef RWStructuredBuffer<float> TRWInitialWaterDepthsBuff;
-typedef RWStructuredBuffer<float> TRWWaterDepthsBuff;
 
 // Kernels and execution order:
 // 1. SavePreviousState
@@ -71,8 +69,7 @@ typedef RWStructuredBuffer<float> TRWWaterDepthsBuff;
 // OUT: TempOutflowsBuff
 
 #pragma kernel UpdateWaterParameters
-// IN: WaterDepthsBuff, TempOutflowsBuff, ContaminationsBuff, InitialWaterDepthsBuff,
-//     InputStruct1.EvaporationModifiers
+// IN: WaterDepthsBuff, TempOutflowsBuff, ContaminationsBuff, InitialWaterDepthsBuff, EvaporationModifiersBuff
 // OUT: WaterDepthsBuff, OutflowsBuff, ContaminationsBufferBuff.
 
 #pragma kernel SimulateContaminationDiffusion1
@@ -115,12 +112,9 @@ float DiffusionRate;
 
 #define ImpermeableSurfaceServiceHeights(index) PackedInput2[index].ImpermeableSurfaceServiceHeight
 #define ImpermeableSurfaceServiceMinFlowSlowers(index) PackedInput2[index].ImpermeableSurfaceServiceMinFlowSlower
-#define EvaporationModifiers(index) PackedInput2[index].EvaporationModifier
 #define ImpermeableSurfaceServicePartialObstacles(index) CheckBitmapFlag(PackedInput2[index], InputStruct2::PartialObstaclesBit)
 #define IndexIsInActualMap(index) CheckBitmapFlag(PackedInput2[index], InputStruct2::IsInActualMapBit)
 
-#define WaterDepths(index) WaterDepthsBuff[index]
-#define Contaminations(index) ContaminationsBuff[index]
 #define Outflows(index) OutflowsBuff[index]
 
 #define TempOutflows(index) TempOutflowsBuff[index]
@@ -260,9 +254,9 @@ void UpdateOutflow(
 
 float ProcessWaterDepthChanges(
     TTempOutflowsBuff TempOutflowsBuff,
-    TPackedInput2 PackedInput2,
     TRWWaterDepthsBuff WaterDepthsBuff,  // Reference, not actual output.
     TRWOutflowsBuff OutflowsBuff,
+    TEvaporationModifiersBuff EvaporationModifiersBuff,
     int index)
 {
     int num = index - Stride;
@@ -534,10 +528,10 @@ void UpdateOutflows(
 void UpdateWaterParameters(
     uint3 id : SV_DispatchThreadID,
     // Input.
-    TPackedInput2 PackedInput2,
     TTempOutflowsBuff TempOutflowsBuff,
     TContaminationsBuff ContaminationsBuff,
     TInitialWaterDepthsBuff InitialWaterDepthsBuff,
+    TEvaporationModifiersBuff EvaporationModifiersBuff,
     // Output.
     TRWContaminationsBufferBuff ContaminationsBufferBuff,
     // Reference.
@@ -545,7 +539,9 @@ void UpdateWaterParameters(
     TRWOutflowsBuff OutflowsBuff)
 {
     const int num = CoordinatesToIndex(id.xy);
-    float num2 = WaterDepths(num) + ProcessWaterDepthChanges(TempOutflowsBuff, PackedInput2, WaterDepthsBuff, OutflowsBuff, num);
+    float num2 = WaterDepths(num) + ProcessWaterDepthChanges(
+        TempOutflowsBuff, WaterDepthsBuff, OutflowsBuff, EvaporationModifiersBuff,
+        num);
     WaterDepths(num) = ((num2 > 0) ? num2 : 0);
     SimulateContaminationMovement(TempOutflowsBuff, ContaminationsBuff, InitialWaterDepthsBuff, ContaminationsBufferBuff, num);
 }

@@ -45,6 +45,7 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
   readonly SoilContaminationSimulator _soilContaminationSimulator;
   readonly WaterMap _waterMap;
   readonly WaterContaminationMap _waterContaminationMap;
+  readonly WaterEvaporationMap _waterEvaporationMap;
   readonly DirectWaterServiceAccessor _directWaterServiceAccessor;
 
   readonly WaterSimulationController _waterSimulationController;
@@ -74,6 +75,7 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
       IResourceAssetLoader resourceAssetLoader,
       WaterMap waterMap,
       WaterContaminationMap waterContaminationMap,
+      WaterEvaporationMap waterEvaporationMap,
       DirectWaterServiceAccessor directWaterServiceAccessor,
       // Stock sims.
       WaterSimulator waterSimulator,
@@ -89,8 +91,9 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
     _resourceAssetLoader = resourceAssetLoader;
     _waterMap = waterMap;
     _waterContaminationMap = waterContaminationMap;
-    _waterSimulator = waterSimulator;
+    _waterEvaporationMap = waterEvaporationMap;
     _directWaterServiceAccessor = directWaterServiceAccessor;
+    _waterSimulator = waterSimulator;
     _soilMoistureSimulator = soilMoistureSimulator;
     _soilContaminationSimulator = soilContaminationSimulator;
     _waterSimulationController = (WaterSimulationController) waterSimulationController;
@@ -145,7 +148,7 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
   struct InputStruct1 {
     public float unused0; // Contaminations
     public float unused1; // WaterDepths
-    public int unused2;   // UnsafeCellHeights;
+    public int unused2;   // UnsafeCellHeights
     public uint BitmapFlags;
 
     public const uint ContaminationBarrierBit = 0x0001;
@@ -157,7 +160,7 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
   struct InputStruct2 {
     public int ImpermeableSurfaceServiceHeight;
     public int ImpermeableSurfaceServiceMinFlowSlower;
-    public float EvaporationModifier;
+    public float unused2;  // EvaporationModifier
     public uint BitmapFlags;
 
     public const uint PartialObstaclesBit = 0x0001;
@@ -168,7 +171,7 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
   SimpleBuffer<InputStruct2> _packedInput2Buffer;
 
   SimpleBuffer<float> _moistureLevelsBuff;
-  SimpleBuffer<float> _waterEvaporationModifierBuff;
+  SimpleBuffer<float> _evaporationModifiersBuff;
   AppendBuffer<int> _moistureLevelsChangedLastTickBuffer;
 
   AppendBuffer<int> _contaminationsChangedLastTickBuffer;
@@ -200,8 +203,8 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
         "MoistureLevelsBuff", _soilMoistureSimulator.MoistureLevels);
     _moistureLevelsChangedLastTickBuffer = new AppendBuffer<int>(
         "MoistureLevelsChangedLastTickBuff", new int[_totalMapSize]);
-    _waterEvaporationModifierBuff = new SimpleBuffer<float>(
-        "WaterEvaporationModifierBuff", new float[_totalMapSize]);
+    _evaporationModifiersBuff = new SimpleBuffer<float>(
+        "EvaporationModifiersBuff", _waterEvaporationMap._evaporationModifiers);
 
     _contaminationsChangedLastTickBuffer = new AppendBuffer<int>(
         "ContaminationsChangedLastTickBuff", new int[_totalMapSize]);
@@ -239,6 +242,7 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
     _moistureLevelsBuff.PushToGpu(null);
     _contaminationCandidatesBuffer.PushToGpu(null);
     _contaminationLevelsBuffer.PushToGpu(null);
+    _evaporationModifiersBuff.PushToGpu(null);
   }
 
   void OnSimulationDisabled() {
@@ -298,8 +302,7 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
       _packedInput2Buffer.Values[index] = new InputStruct2 {
           ImpermeableSurfaceServiceHeight = _waterSimulator._impermeableSurfaceService.Heights[index],
           ImpermeableSurfaceServiceMinFlowSlower = _waterSimulator._impermeableSurfaceService.MinFlowSlowers[index],
-          // FIXME: It's us who fills it (moisture sims). It's output only.
-          EvaporationModifier = _waterSimulator._threadSafeWaterEvaporationMap.EvaporationModifiers[index],
+          // EvaporationModifier = _waterSimulator._threadSafeWaterEvaporationMap.EvaporationModifiers[index],
           BitmapFlags = bitmapFlags,
       };
     }
@@ -316,22 +319,14 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
     _updateOutputsStopwatch.Start();
 
     // Water sim.
-    _waterDepthsBuffer.PullFromGpu(null);
+    _waterDepthsBuffer.PullFromGpu(null);  // ~0.3ms cost
     _contaminationsBuffer.PullFromGpu(null);
     _directWaterServiceAccessor.UpdateDepthsCallback(_waterSimulator._deltaTime);
-    _waterSimulator._transientWaterMap.Refresh();
+    _waterSimulator._transientWaterMap.Refresh();  // ~0.5ms cost
     _outflowsBuffer.PullFromGpu(null);
 
     // Soil moisture sim.
     _moistureLevelsBuff.PullFromGpu(null);
-
-    _waterEvaporationModifierBuff.PullFromGpu(null);
-    var waterEvaporationModifier = _waterEvaporationModifierBuff.Values;
-    for (var index = waterEvaporationModifier.Length - 1; index >= 0; index--) {
-      //FIXME: maybe write it directly?
-      _soilMoistureSimulator._waterService.SetWaterEvaporationModifier(index, waterEvaporationModifier[index]);
-    }
-
     _moistureLevelsChangedLastTickBuffer.PullFromGpu(null);
     var moistureLevelsChangedLastTick = _moistureLevelsChangedLastTickBuffer.Values;
     for (var i = _moistureLevelsChangedLastTickBuffer.DataLength - 1; i >= 0; i--) {
@@ -341,7 +336,6 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
 
     // Soil contamination sim.
     _contaminationLevelsBuffer.PullFromGpu(null);
-
     _contaminationsChangedLastTickBuffer.PullFromGpu(null);
     var contaminationsChangedLastTick = _contaminationsChangedLastTickBuffer.Values;
     for (var i = _contaminationsChangedLastTickBuffer.DataLength - 1; i >= 0; i--) {
@@ -418,6 +412,7 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
         .WithIntermediateBuffer("InitialWaterDepthsBuff", sizeof(float), _totalMapSize)
         .WithIntermediateBuffer("ContaminationsBufferBuff", sizeof(float), _totalMapSize)
         .WithIntermediateBuffer("ContaminationDiffusionsBuff", sizeof(float) * 4, _totalMapSize)
+        .WithIntermediateBuffer(_evaporationModifiersBuff)  // Must be pushed on enable.
         .WithIntermediateBuffer(_outflowsBuffer)
         .WithIntermediateBuffer(_waterDepthsBuffer)
         .WithIntermediateBuffer(_contaminationsBuffer)
@@ -432,7 +427,7 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
             "o:TempOutflowsBuff")
         .DispatchKernel(
             "UpdateWaterParameters", _mapDataSize,
-            "i:PackedInput2", "i:WaterDepthsBuff", "i:ContaminationsBuff", "i:OutflowsBuff",
+            "i:WaterDepthsBuff", "i:ContaminationsBuff", "i:OutflowsBuff", "i:EvaporationModifiersBuff",
             "i:TempOutflowsBuff", "i:InitialWaterDepthsBuff",
             "o:ContaminationsBufferBuff",
             "o:OutflowsBuff", "o:WaterDepthsBuff")
@@ -482,7 +477,7 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
         // Output buffers. They are read from the GPU every frame.
         .WithIntermediateBuffer(_moistureLevelsBuff)  // Must be pushed on init.
         .WithIntermediateBuffer(_moistureLevelsChangedLastTickBuffer)
-        .WithIntermediateBuffer(_waterEvaporationModifierBuff)
+        .WithIntermediateBuffer(_evaporationModifiersBuff)
         // The kernel chain! They will execute in the order they are declared.
         .DispatchKernel(
             "SavePreviousState", new Vector3Int(_totalMapSize, 1, 1),
@@ -497,7 +492,7 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
             "CalculateClusterSaturationAndWaterEvaporation", _mapDataSize,
             "i:PackedInput1",
             "i:WaterDepthsBuff", "i:WateredNeighboursBuff",
-            "o:ClusterSaturationBuff", "o:WaterEvaporationModifierBuff")
+            "o:ClusterSaturationBuff", "o:EvaporationModifiersBuff")
         .DispatchKernel(
             "CalculateMoisture", _mapDataSize,
             "i:PackedInput1",
