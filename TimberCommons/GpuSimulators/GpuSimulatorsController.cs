@@ -177,6 +177,7 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
 
   SimpleBuffer<float> _waterDepthsBuffer;
   SimpleBuffer<float> _contaminationsBuffer;
+  SimpleBuffer<WaterFlow> _outflowsBuffer;
   SimpleBuffer<int> _unsafeCellHeightsBuffer;
 
   void SetupBuffers() {
@@ -190,6 +191,8 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
         "WaterDepthsBuff", _waterMap.WaterDepths);
     _contaminationsBuffer = new SimpleBuffer<float>(
         "ContaminationsBuff", _waterContaminationMap.Contaminations);
+    _outflowsBuffer = new SimpleBuffer<WaterFlow>(
+        "OutflowsBuff", _waterMap.Outflows);
     _unsafeCellHeightsBuffer = new SimpleBuffer<int>(
         "UnsafeCellHeightsBuff", _terrainMap._heights);
 
@@ -249,6 +252,7 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
     _waterDepthsBuffer.PushToGpu(null);
     _contaminationsBuffer.PushToGpu(null);
 
+    _outflowsBuffer.PushToGpu(null);
     _unsafeCellHeightsBuffer.PushToGpu(null);
 
     //FIXME: React on the change events and don't update everything.
@@ -312,13 +316,14 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
     _contaminationsBuffer.PullFromGpu(null);
     _directWaterServiceAccessor.UpdateDepthsCallback(_waterSimulator._deltaTime);
     _waterSimulator._transientWaterMap.Refresh();
+    _outflowsBuffer.PullFromGpu(null);
 
     // Soil moisture sim.
     _moistureLevelsBuff.PullFromGpu(null);
 
     _waterEvaporationModifierBuff.PullFromGpu(null);
     var waterEvaporationModifier = _waterEvaporationModifierBuff.Values;
-    for (var index = _soilMoistureSimulator.MoistureLevels.Length - 1; index >= 0; index--) {
+    for (var index = waterEvaporationModifier.Length - 1; index >= 0; index--) {
       //FIXME: maybe write it directly?
       _soilMoistureSimulator._waterService.SetWaterEvaporationModifier(index, waterEvaporationModifier[index]);
     }
@@ -408,9 +413,8 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
         .WithIntermediateBuffer("TempOutflowsBuff", sizeof(float) * 4, _totalMapSize)
         .WithIntermediateBuffer("InitialWaterDepthsBuff", sizeof(float), _totalMapSize)
         .WithIntermediateBuffer("ContaminationsBufferBuff", sizeof(float), _totalMapSize)
-        .WithIntermediateBuffer("ContaminationDiffusionsBuff", sizeof(float) + 4*4, _totalMapSize)
-        // FIXME: Handle it manually, but only when stabilized since it adds synchronization on blocked call.
-        .WithOutputBuffer("OutflowsBuff", _waterMap.Outflows)
+        .WithIntermediateBuffer("ContaminationDiffusionsBuff", sizeof(float) * 4, _totalMapSize)
+        .WithIntermediateBuffer(_outflowsBuffer)
         .WithIntermediateBuffer(_waterDepthsBuffer)
         .WithIntermediateBuffer(_contaminationsBuffer)
         // The kernel chain! They will execute in the order they are declared.
@@ -420,14 +424,14 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
             "o:InitialWaterDepthsBuff", "o:ContaminationsBufferBuff")
         .DispatchKernel(
             "UpdateOutflows", _mapDataSize,
-            "i:PackedInput2", "i:WaterDepthsBuff", "s:OutflowsBuff",
+            "i:PackedInput2", "i:WaterDepthsBuff", "i:OutflowsBuff",
             "o:TempOutflowsBuff")
         .DispatchKernel(
             "UpdateWaterParameters", _mapDataSize,
-            "i:PackedInput2", "i:WaterDepthsBuff", "i:ContaminationsBuff", "s:OutflowsBuff",
+            "i:PackedInput2", "i:WaterDepthsBuff", "i:ContaminationsBuff", "i:OutflowsBuff",
             "i:TempOutflowsBuff", "i:InitialWaterDepthsBuff",
             "o:ContaminationsBufferBuff",
-            "r:OutflowsBuff", "o:WaterDepthsBuff")
+            "o:OutflowsBuff", "o:WaterDepthsBuff")
         .DispatchKernel(
             "SimulateContaminationDiffusion1", _mapDataSize,
             "i:PackedInput2", "i:WaterDepthsBuff",
