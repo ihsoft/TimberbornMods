@@ -59,6 +59,8 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
   readonly ValueSampler _prepareInputsSampler = new(10);
   readonly Stopwatch _updateOutputsStopwatch = new();
   readonly ValueSampler _updateOutputsSampler = new(10);
+  readonly Stopwatch _fixedUpdateStopwatch = new();
+  readonly ValueSampler _fixedUpdateSampler = new(10);
 
   internal static GpuSimulatorsController Self;
   internal bool SimulatorEnabled { get; private set; }
@@ -123,23 +125,22 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
       return "GPU simulation disabled.";
     }
     var text = new List<string>(15);
-    var totalCost = 0.0;
     {
       var (_, _, _, total) = _prepareInputsSampler.GetStats();
-      totalCost += total;
       text.Add($"Prepare input cost: {total * 1000:0.##} ms");
     }
     {
       var (_, _, _, total) = _updateOutputsSampler.GetStats();
-      totalCost += total;
       text.Add($"Handle output cost: {total * 1000:0.##} ms");
     }
     {
       var (_, _, _, total) = _runShadersSampler.GetStats();
-      totalCost += total;
       text.Add($"Shaders run cost: {total * 1000:0.##} ms");
     }
-    text.Add($"Cost per fixed frame: {totalCost * 1000:0.##} ms");
+    {
+      var (_, _, _, total) = _fixedUpdateSampler.GetStats();
+      text.Add($"Cost per fixed frame: {total * 1000:0.##} ms");
+    }
     return string.Join("\n", text);
   }
 
@@ -209,6 +210,8 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
   #region Pipeline running logic
 
   void TickSimulation() {
+    _fixedUpdateStopwatch.Start();
+   
     PrepareInputs();
 
     _runShadersStopwatch.Start();
@@ -220,11 +223,14 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
     AsyncGPUReadback.Request(_waterDepthsBuffer.Buffer).WaitForCompletion();
     AsyncGPUReadback.Request(_moistureLevelsBuff.Buffer).WaitForCompletion();
     AsyncGPUReadback.Request(_contaminationsBuffer.Buffer).WaitForCompletion();
-    
+
     _runShadersSampler.AddSample(_runShadersStopwatch.Elapsed.TotalSeconds);
     _runShadersStopwatch.Reset();
 
     UpdateOutputs();
+
+    _fixedUpdateSampler.AddSample(_fixedUpdateStopwatch.Elapsed.TotalSeconds);
+    _fixedUpdateStopwatch.Reset();
   }
 
   void OnSimulationEnabled() {
@@ -293,7 +299,7 @@ sealed class GpuSimulatorsController : IPostLoadableSingleton {
     _updateOutputsStopwatch.Start();
 
     // Water sim.
-    _waterDepthsBuffer.PullFromGpu(null);  // ~0.3ms cost
+    _waterDepthsBuffer.PullFromGpu(null); // ~0.3ms cost
     _contaminationsBuffer.PullFromGpu(null);
     _directWaterServiceAccessor.UpdateDepthsCallback(_waterSimulator._deltaTime);
     _waterSimulator._transientWaterMap.Refresh();  // ~0.5ms cost
