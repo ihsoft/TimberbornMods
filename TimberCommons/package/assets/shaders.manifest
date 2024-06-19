@@ -1,22 +1,22 @@
 ManifestFileVersion: 0
-CRC: 2674441728
+CRC: 3653677458
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 6a6ca12f5ba1d7ff77c1559de531e7bf
+    Hash: 94b4da63338bbf8b9902f3adc96b0224
   TypeTreeHash:
     serializedVersion: 2
     Hash: 17a3557cae3d0f9916dbe762213cf068
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: dec5231acd52d2f13230003e55b90279
+    Hash: 58c64b8395f47972625b384dd7e6b6a7
 HashAppended: 0
 ClassTypes:
 - Class: 72
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/igorz/TimberCommons/Shaders/SoilContaminationSimulatorShaderPacked.compute
-- Assets/igorz/TimberCommons/Shaders/WaterSimulatorPacked.compute
-- Assets/igorz/TimberCommons/Shaders/SoilMoistureSimulatorPacked.compute
+- Assets/igorz/TimberCommons/Shaders/SoilContaminationSimulatorShader.compute
+- Assets/igorz/TimberCommons/Shaders/WaterSimulator.compute
+- Assets/igorz/TimberCommons/Shaders/SoilMoistureSimulator.compute
 Dependencies: []
