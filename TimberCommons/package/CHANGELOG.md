@@ -1,3 +1,6 @@
+# v1.8.11 (18 June 2024):
+* [Fix #56] Flooded Irrigation tower fails on load.
+
 # v1.8.10 (1 June 2024):
 * Implement water valves support in GPU sim.
 * Big changes to the shaders performance and layout.
