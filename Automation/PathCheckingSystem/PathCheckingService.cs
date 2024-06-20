@@ -172,7 +172,7 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
       var isConnectedToTheTestPath = nodeBefore == -1;  // Path site can stay at the road.
       // FIXME: error prone checking. Need to consider height change within the path site.
       for (var j = edges.Count - 1; j >= 0; j--) {
-        var edge = edges[i];
+        var edge = edges[j];
         if (edge.Start != restrictedCoordinate) {
           continue;
         }
