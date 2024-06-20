@@ -44,9 +44,6 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   /// <seealso cref="PathCheckingService.CheckBlockingStateAndTriggerActions"/>
   public bool CanFinish { get; internal set; }
 
-  /// <summary>Site's NavMesh node ID.</summary>
-  public int SiteNodeId { get; private set; }
-
   /// <summary>The other site that blocks this one.</summary>
   public PathCheckingSite BlockedSite { get; internal set; }
 
@@ -179,18 +176,20 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   }
 
   /// <summary>Initializes the NavMesh related things.</summary>
-  /// <remarks>This must be done on an object hat is already added to the game's NavMesh.</remarks>
+  /// <remarks>This must be done on an object that is already added to the game's NavMesh.</remarks>
   void InitializeNavMesh() {
-    SiteNodeId = _nodeIdService.GridToId(BlockObject.Coordinates);
     var navMeshObject = _blockObjectNavMesh.NavMeshObject;
     RestrictedNodes = navMeshObject._restrictedCoordinates.Select(_nodeIdService.GridToId).ToList();
-    NodeEdges = navMeshObject._addingChanges
-        .Where(x => x.NavMeshChangeType == NavMeshChangeType.AddEdge)
-        .Select(x => new NodeEdge {
-            Start = _nodeIdService.GridToId(x.NavMeshEdge.Start),
-            End = _nodeIdService.GridToId(x.NavMeshEdge.End),
-        })
-        .ToList();
+    var settings = BlockObject.GetComponentFast<BlockObjectNavMeshSettings>();
+    if (!settings) {
+      NodeEdges = new List<NodeEdge>();
+    } else {
+      NodeEdges = BlockObject.GetComponentFast<BlockObjectNavMeshSettings>().ManuallySetEdges().Select(
+          x => new NodeEdge {
+              Start = _nodeIdService.GridToId(x.Start),
+              End = _nodeIdService.GridToId(x.End),
+          }).ToList();
+    }
   }
 
   /// <summary>Updates the properties that depend on the district's NavMesh.</summary>
