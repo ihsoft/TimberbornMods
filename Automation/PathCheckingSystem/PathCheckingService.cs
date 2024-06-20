@@ -158,22 +158,19 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
       if (!testPathNodes.Contains(restrictedCoordinate)) {
         continue;
       }
-      var pathPos = testPathCorners.IndexOf(pathSite.SiteNodeId);
+      var pathPos = testPathCorners.IndexOf(restrictedCoordinate);
 
-      // If the blocking site is at the access, then just check if it has and an edge to the test site.
-      if (pathPos == 0) {
-        if (edges.FastAny(e => e.Start == restrictedCoordinate && e.End == testSite.BestAccessNode)) {
-          continue;
-        }
-        return false;
-      }
-
-      // If the blocking site is in the middle of the path, then verify if the nodes before and after are connected by
-      // any edge. This would mean that the site provides connectivity and doesn't block the path.
-      var nodeAfter = testPathCorners[pathPos - 1];
-      var nodeBefore = testPathCorners[pathPos + 1];
+      // 1. If the path site is in the middle of the test path, then verify if the nodes before and after are connected
+      //    by any edge.
+      // 2. If the path site is at the end of the test path, then it's staying at the road. Skip road-to-path
+      //    connectivity check.
+      // 3. If the path site is at the start of the test path, then check if it has an edge to the access to ensure the
+      //    builders can pass.  
+      var nodeAfter = pathPos > 0 ? testPathCorners[pathPos - 1] : testSite.BestAccessNode;
+      var nodeBefore = pathPos < testPathCorners.Count - 1 ? testPathCorners[pathPos + 1] : -1;
       var isConnectedToTestSite = false;
-      var isConnectedToTheTestPath = false;
+      var isConnectedToTheTestPath = nodeBefore == -1;  // Path site can stay at the road.
+      // FIXME: error prone checking. Need to consider height change within the path site.
       for (var j = edges.Count - 1; j >= 0; j--) {
         var edge = edges[i];
         if (edge.Start != restrictedCoordinate) {
