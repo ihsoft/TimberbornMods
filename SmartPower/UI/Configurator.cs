@@ -4,17 +4,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Bindito.Core;
 using IgorZ.TimberDev.Utils;
-using TimberApi.ConfiguratorSystem;
-using TimberApi.SceneSystem;
 using Timberborn.EntityPanelSystem;
 
 // ReSharper disable once CheckNamespace
 namespace IgorZ.SmartPower.UI {
 
-[Configurator(SceneEntrypoint.InGame)]
+[Context("Game")]
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).FullName;

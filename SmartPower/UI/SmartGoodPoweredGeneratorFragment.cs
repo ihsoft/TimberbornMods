@@ -3,11 +3,9 @@
 // License: Public Domain
 
 using IgorZ.TimberDev.UI;
-using TimberApi.UiBuilderSystem;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
-using Timberborn.Localization;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -20,9 +18,7 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
   const string ChargeLevelLocKey = "IgorZ.SmartPower.PoweredGenerator.ChargeBatteriesRangeText";
   const float BatteriesChargeRangeSize = 0.25f;
 
-  readonly UIBuilder _builder;
-  readonly ILoc _loc;
-  readonly VisualElementLoader _visualElementLoader;
+  readonly UiFactory _uiFactory;
 
   VisualElement _root;
   Toggle _neverShutdownCheckbox;
@@ -30,36 +26,32 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
   Slider _chargeBatteriesSlider;
   SmartGoodPoweredGenerator _generator;
 
-  public SmartGoodPoweredGeneratorFragment(UIBuilder builder, ILoc loc, VisualElementLoader visualElementLoader) {
-    _builder = builder;
-    _loc = loc;
-    _visualElementLoader = visualElementLoader;
+  public SmartGoodPoweredGeneratorFragment(UiFactory uiFactory) {
+    _uiFactory = uiFactory;
   }
 
   public VisualElement InitializeFragment() {
-    _neverShutdownCheckbox = _builder.Presets().Toggles()
-        .CheckmarkInverted(locKey: NeverStopThisGeneratorLocKey, color: UiFactory.PanelNormalColor);
-    _neverShutdownCheckbox.RegisterValueChangedCallback(
-        _ => {
+    _neverShutdownCheckbox = _uiFactory.CreateToggle(
+        NeverStopThisGeneratorLocKey, _ => {
           _generator.NeverShutdown = _neverShutdownCheckbox.value;
           UpdateControls();
         });
 
-    _chargeBatteriesSlider = UiFactory.CreateSlider(
-        _visualElementLoader, value => {
+    _chargeBatteriesSlider = _uiFactory.CreateSlider(
+        value => {
           _generator.DischargeBatteriesThreshold = value;
           _generator.ChargeBatteriesThreshold = value + BatteriesChargeRangeSize;
           UpdateControls();
         }, lowValue: 0.1f, highValue: 0.9f - BatteriesChargeRangeSize);
 
-    _chargeBatteriesText = _builder.Presets().Labels().Label(color: UiFactory.PanelNormalColor);
+    _chargeBatteriesText = _uiFactory.CreateLabel();
     _chargeBatteriesText.style.marginTop = 5;
 
-    _root = _builder.CreateFragmentBuilder()
-        .AddComponent(_neverShutdownCheckbox)
-        .AddComponent(_chargeBatteriesText)
-        .AddComponent(_chargeBatteriesSlider)
-        .BuildAndInitialize();
+    _root = _uiFactory.CreateFragmentPanel();
+    _root.Add(_neverShutdownCheckbox);
+    _root.Add(_chargeBatteriesText);
+    _root.Add(_chargeBatteriesSlider);
+
     _root.ToggleDisplayStyle(visible: false);
     return _root;
   }
@@ -71,8 +63,6 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
       _chargeBatteriesSlider.SetValueWithoutNotify(_generator.DischargeBatteriesThreshold);
       UpdateControls();
       _root.ToggleDisplayStyle(visible: true);
-    } else {
-      _root.ToggleDisplayStyle(visible: false);
     }
   }
 
@@ -85,7 +75,7 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
   }
 
   void UpdateControls() {
-    _chargeBatteriesText.text = _loc.T(
+    _chargeBatteriesText.text = _uiFactory.Loc.T(
         ChargeLevelLocKey, Mathf.RoundToInt(_generator.DischargeBatteriesThreshold * 100),
         Mathf.RoundToInt(_generator.ChargeBatteriesThreshold * 100));
   }

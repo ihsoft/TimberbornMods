@@ -4,22 +4,28 @@
 
 using System;
 using Timberborn.CoreUI;
+using Timberborn.Localization;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-// ReSharper disable UnusedMember.Local
-// ReSharper disable MemberCanBePrivate.Global
 namespace IgorZ.TimberDev.UI {
 
-static class UiFactory {
-  /// <summary>Color for the normal text in building details panel.</summary>
-  public static readonly Color PanelNormalColor = new(0.8f, 0.8f, 0.8f);
+/// <summary>Factory for making standard fragment panel elements.</summary>
+public class UiFactory {
+  readonly VisualElementLoader _visualElementLoader;
+
+  /// <summary>The localization service to use for the UI elements.</summary>
+  public ILoc Loc { get; }
+
+  UiFactory(VisualElementLoader visualElementLoader, ILoc loc) {
+    _visualElementLoader = visualElementLoader;
+    Loc = loc;
+  }
 
   /// <summary>Creates a slider in a theme suitable for the right side panel.</summary>
   /// <remarks>
   /// TAPI offers the sliders builder, but in the recent updates it got broken. Use this factory as a quick workaround.
   /// </remarks>
-  /// <param name="visualElementLoader">The loader to access the game's assets.</param>
   /// <param name="onValueChangedFn">
   /// A callback method that will be called on the value change. The only argument is the new value.
   /// </param>
@@ -28,9 +34,9 @@ static class UiFactory {
   /// </param>
   /// <param name="lowValue">The lowest possible value.</param>
   /// <param name="highValue">The highest possible value.</param>
-  public static Slider CreateSlider(VisualElementLoader visualElementLoader, Action<float> onValueChangedFn,
-                                    float stepSize = 0.05f, float lowValue = 0, float highValue = 1.0f) {
-    var slider = visualElementLoader.LoadVisualElement("Common/IntegerSlider").Q<Slider>("Slider");
+  public Slider CreateSlider(Action<float> onValueChangedFn,
+                             float stepSize = 0.05f, float lowValue = 0, float highValue = 1.0f) {
+    var slider = _visualElementLoader.LoadVisualElement("Common/IntegerSlider").Q<Slider>("Slider");
     slider.lowValue = lowValue;
     slider.highValue = highValue;
     slider.RegisterValueChangedCallback(
@@ -40,7 +46,42 @@ static class UiFactory {
           onValueChangedFn(value);
         });
     return slider;
-  }  
+  }
+  
+  /// <summary>Creates a toggle in a theme suitable for the right side panel.</summary>
+  /// <param name="locKey">Loc key for the caption.</param>
+  /// <param name="onValueChangedFn">
+  /// A callback method that will be called on the value change. The only argument is the new value.
+  /// </param>
+  public Toggle CreateToggle(string locKey, Action<bool> onValueChangedFn) {
+    var toggle = _visualElementLoader.LoadVisualElement("Game/EntityPanel/HaulCandidateFragment").Q<Toggle>("Toggle");
+    toggle.text = Loc.T(locKey);
+    toggle.RegisterValueChangedCallback(
+        _ => {
+          onValueChangedFn(toggle.value);
+        });
+    return toggle;
+  }
+
+  /// <summary>Creates a label in a theme suitable for the right side panel.</summary>
+  /// <param name="locKey">Optional loc key for the caption.</param>
+  public Label CreateLabel(string locKey = null) {
+    var label = _visualElementLoader.LoadVisualElement("Game/EntityPanel/MechanicalNodeFragment").Q<Label>("Generator");
+    if (locKey != null) {
+      label.text = Loc.T(locKey);
+    }
+    return label;
+  }
+
+  /// <summary>Creates a panel that can be used as a fragment in the right side panel.</summary>
+  /// <remarks>
+  /// This is a root element for the fragment's panel. Add controls to it via <see cref="VisualElement.Add"/>
+  /// </remarks>
+  public VisualElement CreateFragmentPanel() {
+    var panel = _visualElementLoader.LoadVisualElement("Game/EntityPanel/HaulCandidateFragment");
+    panel.Clear();
+    return panel;
+  }
 }
 
 }

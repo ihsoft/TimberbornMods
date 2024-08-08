@@ -1,4 +1,5 @@
 # v1.8.0 (started on 5/19/2024)
+* Migrate to Update 6 mods model. Incompatible with the previous versions of Timberborn!
 
 # v1.7 (1 Feb 2024)
 * [Fix #27] Smart Power does not work for buildings with supply.

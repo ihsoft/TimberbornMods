@@ -3,8 +3,6 @@
 // License: Public Domain
 
 using Bindito.Core;
-using TimberApi.ConfiguratorSystem;
-using TimberApi.SceneSystem;
 using Timberborn.Attractions;
 using Timberborn.EnterableSystem;
 using Timberborn.MechanicalSystem;
@@ -18,7 +16,7 @@ using UnityDev.Utils.LogUtilsLite;
 // ReSharper disable once CheckNamespace
 namespace IgorZ.SmartPower {
 
-[Configurator(SceneEntrypoint.All)]
+[Context("Game")]
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
   static readonly PrefabPatcher.RequiredComponentsDep SmartAttractionDeps =

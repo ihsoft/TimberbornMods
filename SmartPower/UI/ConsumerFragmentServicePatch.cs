@@ -16,10 +16,7 @@ namespace IgorZ.SmartPower.UI {
 [HarmonyPatch(typeof(ConsumerFragmentService), nameof(ConsumerFragmentService.Update))]
 static class ConsumerFragmentServicePatch {
   // ReSharper disable once UnusedMember.Local
-  static void Postfix(ref bool __runOriginal, MechanicalNode mechanicalNode, Label ____label, ILoc ____loc) {
-    if (!__runOriginal) {
-      return;  // The other patches must follow the same style to properly support the skip logic!
-    }
+  static void Postfix(MechanicalNode mechanicalNode, Label ____label, ILoc ____loc) {
     if (____label.style.display == DisplayStyle.None) {
       return;
     }
