@@ -144,6 +144,9 @@ static class DebugEx {
 
     static LoggingSettings() {
       var assembly = typeof(DebugEx).Assembly;
+      if (assembly.Location == "") {
+        return;
+      }
       var settingsFile = Path.Combine(Path.GetDirectoryName(assembly.Location)!, LogLevelVerbosityFile);
       VerbosityLevel = File.Exists(settingsFile) ? 5 : 0;
       if (VerbosityLevel > 0) {
