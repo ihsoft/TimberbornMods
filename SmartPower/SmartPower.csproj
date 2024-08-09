@@ -213,7 +213,7 @@
     </Target>
     -->
     <Target Name="AfterBuild">
-        <Exec Command="xcopy /i /Y $(TargetPath) &quot;C:\Documents and Settings\IH\Documents\Timberborn\Mods\SmartPower\Scripts&quot;" />
+        <Exec Command="xcopy /i /Y $(TargetPath) &quot;u:\Mods\SmartPower\Scripts&quot;" />
     </Target>
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
       <PropertyGroup>
