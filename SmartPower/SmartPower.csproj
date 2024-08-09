@@ -119,30 +119,6 @@
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Bindito.Unity.dll</HintPath>
       </Reference>
       <Reference Include="System" />
-      <Reference Include="TimberApi.BottomBarSystem, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn.u6\Workshop\TimberApi\TimberApi.BottomBarSystem.dll</HintPath>
-      </Reference>
-      <Reference Include="TimberApi.EntityLinkerSystem, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn.u6\Workshop\TimberApi\TimberApi.EntityLinkerSystem.dll</HintPath>
-      </Reference>
-      <Reference Include="TimberApi.ObjectSelectionSystem, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn.u6\Workshop\TimberApi\TimberApi.ObjectSelectionSystem.dll</HintPath>
-      </Reference>
-      <Reference Include="TimberApi.SpecificationPatcher, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn.u6\Workshop\TimberApi\TimberApi.SpecificationPatcher.dll</HintPath>
-      </Reference>
-      <Reference Include="TimberApi.SpecificationSystem, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn.u6\Workshop\TimberApi\TimberApi.SpecificationSystem.dll</HintPath>
-      </Reference>
-      <Reference Include="TimberApi.Tools, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn.u6\Workshop\TimberApi\TimberApi.Tools.dll</HintPath>
-      </Reference>
-      <Reference Include="TimberApi.UIBuilderSystem, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn.u6\Workshop\TimberApi\TimberApi.UIBuilderSystem.dll</HintPath>
-      </Reference>
-      <Reference Include="TimberApi.UIPresets, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn.u6\Workshop\TimberApi\TimberApi.UIPresets.dll</HintPath>
-      </Reference>
       <Reference Include="Timberborn.Attractions, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Attractions.dll</HintPath>
       </Reference>
