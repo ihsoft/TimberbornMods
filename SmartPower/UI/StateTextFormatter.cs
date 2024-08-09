@@ -76,17 +76,14 @@ public static class StateTextFormatter {
       return null;
     }
     var lines = new List<string>();
-    if (smartMechanicalBuilding.AllWorkersOut) {
-      lines.Add(loc.T(NoWorkersLocKey));
-    }
     if (smartMechanicalBuilding.NoFuel) {
       lines.Add(loc.T(NoFuelLocKey));
-    }
-    if (smartMechanicalBuilding.MissingIngredients) {
+    } else if (smartMechanicalBuilding.MissingIngredients) {
       lines.Add(loc.T(NoInputModeLocKey));
-    }
-    if (smartMechanicalBuilding.BlockedOutput) {
+    } else if (smartMechanicalBuilding.BlockedOutput) {
       lines.Add(loc.T(BlockedOutputLocKey));
+    } else if (smartMechanicalBuilding.AllWorkersOut) {
+      lines.Add(loc.T(NoWorkersLocKey));
     }
     return string.Join("\n", lines);
   }
