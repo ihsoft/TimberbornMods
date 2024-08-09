@@ -32,6 +32,8 @@ public sealed class SmartPoweredAttraction : TickableComponent, IPostInitializab
 
   /// <inheritdoc/>
   public override void Tick() {
+    // Don't use Enterable events since other components can override the state. This component will be added last, so
+    // it will tick the last.
     UpdateConsumingState();
   }
 
