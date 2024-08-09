@@ -20,7 +20,7 @@ namespace IgorZ.SmartPower {
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
   static readonly PrefabPatcher.RequiredComponentsDep SmartAttractionDeps =
-      new(typeof(Enterable), typeof(Attraction), typeof(MechanicalBuilding));
+      new(typeof(EnterableSpecification), typeof(Attraction), typeof(MechanicalBuilding));
   static readonly PrefabPatcher.RequiredComponentsDep SmartMechBuildingDeps =
       new(typeof(Manufactory), typeof(MechanicalBuilding));
   static readonly string PatchId = typeof(Configurator).FullName;
