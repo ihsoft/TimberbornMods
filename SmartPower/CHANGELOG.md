@@ -1,4 +1,4 @@
-# v1.8.0 (started on 5/19/2024)
+# v1.8.0 (8 Aug 2024)
 * Migrate to Update 6 mods model. Incompatible with the previous versions of Timberborn!
 
 # v1.7 (1 Feb 2024)
