@@ -27,15 +27,15 @@ sealed class Configurator : IConfigurator {
   }
 
   sealed class EntityPanelModuleProvider : IProvider<EntityPanelModule> {
-    readonly SmartGoodPoweredGeneratorFragment _automationFragment;
+    readonly SmartGoodPoweredGeneratorFragment _goodPoweredGeneratorFragment;
 
-    public EntityPanelModuleProvider(SmartGoodPoweredGeneratorFragment automationFragment) {
-      _automationFragment = automationFragment;
+    public EntityPanelModuleProvider(SmartGoodPoweredGeneratorFragment goodPoweredGeneratorFragment) {
+      _goodPoweredGeneratorFragment = goodPoweredGeneratorFragment;
     }
 
     public EntityPanelModule Get() {
       var builder = new EntityPanelModule.Builder();
-      builder.AddBottomFragment(_automationFragment);
+      builder.AddMiddleFragment(_goodPoweredGeneratorFragment);
       return builder.Build();
     }
   }
