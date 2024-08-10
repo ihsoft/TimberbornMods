@@ -1,5 +1,6 @@
 # v1.9.0 (started on 8/8/2024)
-* Move power generator UI fragment to the middle of the panel.
+* [Update] Change `deDE` strings.
+* [Enhancement] Move power generator UI fragment to the middle of the panel.
 
 # v1.8.0 (8 Aug 2024)
 * Migrate to Update 6 mods model. Incompatible with the previous versions of Timberborn!

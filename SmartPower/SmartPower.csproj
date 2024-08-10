@@ -42,6 +42,7 @@
       <Compile Include="..\TimberDev\UI\Configurator.cs">
         <Link>TimberDev\UI\Configurator.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\UI\FragmentPanel.cs">
       <Compile Include="..\TimberDev\UI\UiFactory.cs">
         <Link>TimberDev\UI\UiFactory.cs</Link>
       </Compile>
