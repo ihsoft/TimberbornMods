@@ -14,6 +14,7 @@ namespace IgorZ.TimberDev.UI {
 
 /// <summary>Fragment for the UI panel.</summary>
 public class PanelFragment : PanelFragmentBuilder<PanelFragment> {
+  /// <inheritdoc />
   protected override PanelFragment BuilderInstance => this;
 }
 
@@ -25,6 +26,7 @@ public abstract class PanelFragmentBuilder<TBuilder> : BaseBuilder<TBuilder, Nin
 
   VisualElementBuilder _visualElementBuilder;
 
+  /// <inheritdoc />
   protected override NineSliceVisualElement InitializeRoot() {
     _visualElementBuilder = UIBuilder.Create<VisualElementBuilder>();
     _visualElementBuilder.AddClass(BackgroundClass);
@@ -32,26 +34,31 @@ public abstract class PanelFragmentBuilder<TBuilder> : BaseBuilder<TBuilder, Nin
     return _visualElementBuilder.Build();
   }
 
+  /// <summary>Adds a component to the panel.</summary>
   public TBuilder AddComponent(VisualElement visualElement) {
     Root.Add(visualElement);
     return BuilderInstance;
   }
 
+  /// <summary>Sets the flex direction of the panel.</summary>
   public TBuilder SetFlexDirection(FlexDirection direction) {
     Root.style.flexDirection = direction;
     return BuilderInstance;
   }
 
+  /// <summary>Sets the height of the panel.</summary>
   public TBuilder SetWidth(Length width) {
     Root.style.width = width;
     return BuilderInstance;
   }
 
+  /// <summary>Sets the height of the panel.</summary>
   public TBuilder SetJustifyContent(Justify justify) {
     Root.style.justifyContent = justify;
     return BuilderInstance;
   }
 
+  /// <inheritdoc />
   protected override void InitializeStyleSheet(StyleSheetBuilder styleSheetBuilder) {
     styleSheetBuilder.AddNineSlicedBackgroundClass(BackgroundClass, "ui/images/backgrounds/bg-3", 9f, 0.5f);
   }
