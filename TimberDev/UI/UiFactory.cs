@@ -110,7 +110,8 @@ public class UiFactory {
 
   /// <summary>Creates a panel builder that can be used as a fragment in the right side panel.</summary>
   /// <remarks>
-  /// This is a root element for the fragment's panel. Add controls to it via <see cref="PanelFrPanelFragmentponent"/>
+  /// This is a root element for the fragment's panel. Add controls to it via
+  /// <see cref="PanelFragmentBuilder{PanelFragment}.AddComponent(UnityEngine.UIElements.VisualElement)"/>.
   /// </remarks>
   public PanelFragment CreateCenteredPanelFragmentBuilder() {
     return _uiBuilder.Create<PanelFragment>()
