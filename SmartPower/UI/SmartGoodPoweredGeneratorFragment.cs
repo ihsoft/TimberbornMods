@@ -16,14 +16,13 @@ namespace IgorZ.SmartPower.UI {
 sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
   const string NeverStopThisGeneratorLocKey = "IgorZ.SmartPower.PoweredGenerator.NeverStop";
   const string ChargeLevelLocKey = "IgorZ.SmartPower.PoweredGenerator.ChargeBatteriesRangeText";
-  const float BatteriesChargeRangeSize = 0.25f;
 
   readonly UiFactory _uiFactory;
 
   VisualElement _root;
   Toggle _neverShutdownCheckbox;
   Label _chargeBatteriesText;
-  Slider _chargeBatteriesSlider;
+  MinMaxSlider _chargeBatteriesSlider;
   SmartGoodPoweredGenerator _generator;
 
   public SmartGoodPoweredGeneratorFragment(UiFactory uiFactory) {
@@ -37,20 +36,21 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
           UpdateControls();
         });
 
-    _chargeBatteriesSlider = _uiFactory.CreateSlider(
-        value => {
-          _generator.DischargeBatteriesThreshold = value;
-          _generator.ChargeBatteriesThreshold = value + BatteriesChargeRangeSize;
+    _chargeBatteriesSlider = _uiFactory.CreateMinMaxSlider(
+        evt => {
+          _generator.DischargeBatteriesThreshold = evt.newValue.x;
+          _generator.ChargeBatteriesThreshold = evt.newValue.y;
           UpdateControls();
-        }, lowValue: 0.1f, highValue: 0.9f - BatteriesChargeRangeSize);
+        }, 0f, 1.0f, 0.10f, stepSize: 0.01f);
 
     _chargeBatteriesText = _uiFactory.CreateLabel();
     _chargeBatteriesText.style.marginTop = 5;
 
-    _root = _uiFactory.CreateFragmentPanel();
-    _root.Add(_neverShutdownCheckbox);
-    _root.Add(_chargeBatteriesText);
-    _root.Add(_chargeBatteriesSlider);
+    _root = _uiFactory.CreateCenteredPanelFragmentBuilder()
+        .AddComponent(_neverShutdownCheckbox)
+        .AddComponent(_chargeBatteriesText)
+        .AddComponent(_chargeBatteriesSlider)
+        .BuildAndInitialize();
 
     _root.ToggleDisplayStyle(visible: false);
     return _root;
@@ -60,7 +60,8 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
     _generator = entity.GetComponentFast<SmartGoodPoweredGenerator>();
     if (_generator != null) {
       _neverShutdownCheckbox.SetValueWithoutNotify(_generator.NeverShutdown);
-      _chargeBatteriesSlider.SetValueWithoutNotify(_generator.DischargeBatteriesThreshold);
+      _chargeBatteriesSlider.SetValueWithoutNotify(
+          new Vector2(_generator.DischargeBatteriesThreshold, _generator.ChargeBatteriesThreshold));
       UpdateControls();
       _root.ToggleDisplayStyle(visible: true);
     }

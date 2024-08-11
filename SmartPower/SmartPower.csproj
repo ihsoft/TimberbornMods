@@ -43,6 +43,8 @@
         <Link>TimberDev\UI\Configurator.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\UI\FragmentPanel.cs">
+        <Link>TimberDev\UI\FragmentPanel.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\UI\UiFactory.cs">
         <Link>TimberDev\UI\UiFactory.cs</Link>
       </Compile>
@@ -120,6 +122,12 @@
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Bindito.Unity.dll</HintPath>
       </Reference>
       <Reference Include="System" />
+      <Reference Include="TimberApi.UIBuilderSystem, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn.u6\Workshop\TimberApi\TimberApi.UIBuilderSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="TimberApi.UIPresets, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn.u6\Workshop\TimberApi\TimberApi.UIPresets.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.Attractions, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Attractions.dll</HintPath>
       </Reference>
@@ -204,6 +212,7 @@
       <!-- Publicize directly when referencing -->
       <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.MechanicalSystem.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.MechanicalSystemUI.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.CoreUI.dll" Publicize="true" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

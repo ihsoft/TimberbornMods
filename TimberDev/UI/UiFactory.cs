@@ -3,6 +3,9 @@
 // License: Public Domain
 
 using System;
+using TimberApi.UIBuilderSystem;
+using TimberApi.UIPresets.Sliders;
+using TimberApi.UIPresets.Toggles;
 using Timberborn.CoreUI;
 using Timberborn.Localization;
 using UnityEngine;
@@ -13,12 +16,14 @@ namespace IgorZ.TimberDev.UI {
 /// <summary>Factory for making standard fragment panel elements.</summary>
 public class UiFactory {
   readonly VisualElementLoader _visualElementLoader;
+  readonly UIBuilder _uiBuilder;
 
   /// <summary>The localization service to use for the UI elements.</summary>
   public ILoc Loc { get; }
 
-  UiFactory(VisualElementLoader visualElementLoader, ILoc loc) {
+  UiFactory(VisualElementLoader visualElementLoader, UIBuilder uiBuilder, ILoc loc) {
     _visualElementLoader = visualElementLoader;
+    _uiBuilder = uiBuilder;
     Loc = loc;
   }
 
@@ -34,32 +39,64 @@ public class UiFactory {
   /// </param>
   /// <param name="lowValue">The lowest possible value.</param>
   /// <param name="highValue">The highest possible value.</param>
-  public Slider CreateSlider(Action<float> onValueChangedFn,
-                             float stepSize = 0.05f, float lowValue = 0, float highValue = 1.0f) {
-    var slider = _visualElementLoader.LoadVisualElement("Common/IntegerSlider").Q<Slider>("Slider");
+  public Slider CreateSlider(
+      Action<ChangeEvent<float>> onValueChangedFn, float lowValue, float highValue, float stepSize = 0) {
+    var slider = _uiBuilder.Create<GameTextSlider>().Small().Build();
     slider.lowValue = lowValue;
     slider.highValue = highValue;
     slider.RegisterValueChangedCallback(
-        _ => {
-          var value = Mathf.Round(slider.value / stepSize) * stepSize;
-          slider.SetValueWithoutNotify(value);
-          onValueChangedFn(value);
+        evt => {
+          if (stepSize > 0) {
+            var newValue = Mathf.Round(slider.value / stepSize) * stepSize;
+            slider.SetValueWithoutNotify(newValue);
+            evt = ChangeEvent<float>.GetPooled(evt.previousValue, newValue);
+          }
+          onValueChangedFn(evt);
         });
     return slider;
   }
-  
+
+  /// <summary>Creates a min/max slider in a theme suitable for the right side panel.</summary>
+  /// <param name="onValueChangedFn">A callback method that will be called on the value change.</param>
+  /// <param name="lowValue">The minimum value limit.</param>
+  /// <param name="highValue">The maximum value limit.</param>
+  /// <param name="minDelta">The minimum delta between min/max values.</param>
+  /// <param name="stepSize">If greater than zero, then the values are rounded to the step.</param>
+  public MinMaxSlider CreateMinMaxSlider(Action<ChangeEvent<Vector2>> onValueChangedFn, float lowValue, float highValue,
+                                         float minDelta, float stepSize = 0) {
+    var slider = _uiBuilder.Create<GameTextMinMaxSlider>()
+        .SetLowLimit(lowValue)
+        .SetHighLimit(highValue)
+        .Small().Build();
+    slider.RegisterValueChangedCallback(
+        evt => {
+          var newValue = evt.newValue;
+          if (stepSize > 0) {
+            newValue = new Vector2(
+                Mathf.Round(evt.newValue.x / stepSize) * stepSize, Mathf.Round(evt.newValue.y / stepSize) * stepSize);
+          }
+          if (newValue.y - newValue.x < minDelta) {
+            if (Math.Abs(evt.previousValue.x - newValue.x) < float.Epsilon) {
+              newValue.y = newValue.x + minDelta;
+            } else {
+              newValue.x = newValue.y - minDelta;
+            }
+          }
+          slider.SetValueWithoutNotify(newValue);
+          evt = ChangeEvent<Vector2>.GetPooled(evt.previousValue, newValue);
+          onValueChangedFn(evt);
+        });
+    return slider;
+  }
+
   /// <summary>Creates a toggle in a theme suitable for the right side panel.</summary>
   /// <param name="locKey">Loc key for the caption.</param>
   /// <param name="onValueChangedFn">
   /// A callback method that will be called on the value change. The only argument is the new value.
   /// </param>
-  public Toggle CreateToggle(string locKey, Action<bool> onValueChangedFn) {
-    var toggle = _visualElementLoader.LoadVisualElement("Game/EntityPanel/HaulCandidateFragment").Q<Toggle>("Toggle");
-    toggle.text = Loc.T(locKey);
-    toggle.RegisterValueChangedCallback(
-        _ => {
-          onValueChangedFn(toggle.value);
-        });
+  public Toggle CreateToggle(string locKey, Action<ChangeEvent<bool>> onValueChangedFn) {
+    var toggle = _uiBuilder.Create<GameToggle>().SetLocKey(locKey).Build();
+    toggle.RegisterValueChangedCallback(evt => onValueChangedFn(evt));
     return toggle;
   }
 
@@ -67,20 +104,19 @@ public class UiFactory {
   /// <param name="locKey">Optional loc key for the caption.</param>
   public Label CreateLabel(string locKey = null) {
     var label = _visualElementLoader.LoadVisualElement("Game/EntityPanel/MechanicalNodeFragment").Q<Label>("Generator");
-    if (locKey != null) {
-      label.text = Loc.T(locKey);
-    }
+    label.text = locKey != null ? Loc.T(locKey) : "";
     return label;
   }
 
-  /// <summary>Creates a panel that can be used as a fragment in the right side panel.</summary>
+  /// <summary>Creates a panel builder that can be used as a fragment in the right side panel.</summary>
   /// <remarks>
-  /// This is a root element for the fragment's panel. Add controls to it via <see cref="VisualElement.Add"/>
+  /// This is a root element for the fragment's panel. Add controls to it via <see cref="PanelFrPanelFragmentponent"/>
   /// </remarks>
-  public VisualElement CreateFragmentPanel() {
-    var panel = _visualElementLoader.LoadVisualElement("Game/EntityPanel/HaulCandidateFragment");
-    panel.Clear();
-    return panel;
+  public PanelFragment CreateCenteredPanelFragmentBuilder() {
+    return _uiBuilder.Create<PanelFragment>()
+        .SetFlexDirection(FlexDirection.Column)
+        .SetWidth(new Length(100f, LengthUnit.Percent))
+        .SetJustifyContent(Justify.Center);
   }
 }
 
