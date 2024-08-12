@@ -1,0 +1,9 @@
+{
+  "Id": "Automation.CancelTool",
+  "GroupId": "AutomationToolGroupId",
+  "Type": "Automation.Tools.CancelTool",
+  "Order": 200,
+  "Icon": "AutomationResources/Icons/cancel",
+  "NameLocKey": "IgorZ.Automation.CancelTool.Title",
+  "DescriptionLocKey": "IgorZ.Automation.CancelTool.Description"
+}

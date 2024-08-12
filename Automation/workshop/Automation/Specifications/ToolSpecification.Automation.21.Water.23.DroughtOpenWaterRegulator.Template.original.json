@@ -1,0 +1,22 @@
+{
+  "Id": "Automation.Tmpl.Water.DroughtOpenWaterRegulator",
+  "GroupId": "AutomationWaterToolGroupId",
+  "Type": "Automation.Tools.ApplyTemplateTool",
+  "Order": 23,
+  "Icon": "AutomationResources/Icons/tool-drought-water-regulator-open",
+  "NameLocKey": "IgorZ.Automation.Tool.tmpl.DroughtOpenWaterRegulator.DisplayName",
+  "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.DroughtOpenWaterRegulator.Description",
+  "ToolInformation": {
+    "TemplateFamilyName": "Water.SeasonManagement-drought",
+    "Rules": [
+      {
+        "Condition": { "TypeId": "Automation.Conditions.DroughtStartedCondition" },
+        "Action": { "TypeId": "Automation.Actions.WaterRegulatorStateAction", "Open": true }
+      },
+      {
+        "Condition": { "TypeId": "Automation.Conditions.DroughtEndedCondition" },
+        "Action": { "TypeId": "Automation.Actions.WaterRegulatorStateAction", "Open": false }
+      }
+    ]
+  }
+}

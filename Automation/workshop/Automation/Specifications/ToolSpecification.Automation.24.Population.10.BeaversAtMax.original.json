@@ -1,0 +1,22 @@
+{
+  "Id": "Automation.Tmpl.Population.BeaversAtMax",
+  "GroupId": "AutomationPopulationToolGroupId",
+  "Type": "Automation.Tools.ApplyTemplateTool",
+  "Order": 10,
+  "Icon": "AutomationResources/Icons/tool-beavers-max",
+  "NameLocKey": "IgorZ.Automation.Tool.tmpl.BeaversAtMax.DisplayName",
+  "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.BeaversAtMax.Description",
+  "ToolInformation": {
+    "TemplateFamilyName": "Population",
+    "Rules": [
+      {
+        "Condition": { "TypeId": "Automation.Conditions.BeaverPopulationBelowThresholdCondition", "Value": 0, "RelativeTo": "MaxLevel" },
+        "Action": { "TypeId": "Automation.Actions.UnpauseAction" }
+      },
+      {
+        "Condition": { "TypeId": "Automation.Conditions.BeaverPopulationAboveThresholdCondition", "Value": -1, "RelativeTo": "MaxLevel" },
+        "Action": { "TypeId": "Automation.Actions.PauseAction" }
+      }
+    ]
+  }
+}

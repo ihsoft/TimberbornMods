@@ -1,0 +1,18 @@
+{
+  "Id": "Automation.Tmpl.Water.CloseFloodgateBadtide",
+  "GroupId": "AutomationWaterToolGroupId",
+  "Type": "Automation.Tools.ApplyTemplateTool",
+  "Order": 32,
+  "Icon": "AutomationResources/Icons/icon-badtide-close",
+  "NameLocKey": "IgorZ.Automation.Tool.tmpl.BadtideCloseFloodgate.DisplayName",
+  "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.BadtideCloseFloodgate.Description",
+  "ToolInformation": {
+    "TemplateFamilyName": "Water.FloodgateManagement-badtide",
+    "Rules": [
+      {
+        "Condition": { "TypeId": "Automation.Conditions.BadtideStartedCondition" },
+        "Action": { "TypeId": "Automation.Actions.SetFloodgateHeightAction", "StepsDown": 0 }
+      },
+    ]
+  }
+}

@@ -36,17 +36,29 @@
         <DocumentationFile>bin\Release\Automation.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
+      <Compile Include="..\TimberDev\UI\CommonFormats.cs">
+        <Link>TimberDev\UI\CommonFormats.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UI\Configurator.cs">
+        <Link>TimberDev\UI\Configurator.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UI\PanelFragment.cs">
+        <Link>TimberDev\UI\PanelFragment.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UI\UiFactory.cs">
+        <Link>TimberDev\UI\UiFactory.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\Utils\CustomizableInstantiator.cs">
-        <Link>Utils\CustomizableInstantiator.cs</Link>
+        <Link>TimberDev\Utils\CustomizableInstantiator.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\Utils\FeatureController.cs">
-        <Link>Utils\FeatureController.cs</Link>
+        <Link>TimberDev\Utils\FeatureController.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\Utils\HarmonyPatcher.cs">
-        <Link>Utils\HarmonyPatcher.cs</Link>
+        <Link>TimberDev\Utils\HarmonyPatcher.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\Utils\PrefabPatcher.cs">
-        <Link>Utils\PrefabPatcher.cs</Link>
+        <Link>TimberDev\Utils\PrefabPatcher.cs</Link>
       </Compile>
       <Compile Include="..\UnityDevLite\DebugEx.cs">
         <Link>UnityDevLite\DebugEx.cs</Link>
@@ -133,10 +145,7 @@
     </ItemGroup>
     <ItemGroup>
       <Reference Include="0Harmony, Version=2.9.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\0Harmony.dll</HintPath>
-      </Reference>
-      <Reference Include="BepInEx, Version=5.4.21.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\BepInEx.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\Workshop\Harmony\0Harmony.dll</HintPath>
       </Reference>
       <Reference Include="AsmResolver, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\lib\net472\AsmResolver.dll</HintPath>
@@ -163,179 +172,191 @@
         <Private>True</Private>
       </Reference>
       <Reference Include="Bindito.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Bindito.Core.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Bindito.Core.dll</HintPath>
       </Reference>
       <Reference Include="Bindito.Unity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Bindito.Unity.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Bindito.Unity.dll</HintPath>
       </Reference>
       <Reference Include="System" />
       <Reference Include="System.Collections.Immutable, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-        <HintPath>..\Dependencies\Timberborn\System.Collections.Immutable.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\System.Collections.Immutable.dll</HintPath>
       </Reference>
-      <Reference Include="TimberApi, Version=0.6.3.1, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\TimberApi.dll</HintPath>
+      <Reference Include="TimberApi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn.u6\Workshop\TimberApi\TimberApi.dll</HintPath>
+      </Reference>
+      <Reference Include="TimberApi.Tools, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn.u6\Workshop\TimberApi\TimberApi.Tools.dll</HintPath>
+      </Reference>
+      <Reference Include="TimberApi.UIBuilderSystem, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn.u6\Workshop\TimberApi\TimberApi.UIBuilderSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="TimberApi.UIPresets, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn.u6\Workshop\TimberApi\TimberApi.UIPresets.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.AreaSelectionSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.AreaSelectionSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.AreaSelectionSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.AssetSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.AssetSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.AssetSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.Attractions, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.Attractions.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Attractions.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.BaseComponentSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.BaseComponentSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.BaseComponentSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.BlockSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.BlockSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.BlockSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.BlockSystemNavigation, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.BlockSystemNavigation.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.BlockSystemNavigation.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.BottomBarSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.BottomBarSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.BottomBarSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.BuilderPrioritySystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.BuilderPrioritySystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.BuilderPrioritySystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.Buildings, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.Buildings.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Buildings.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.BuildingsBlocking, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.BuildingsBlocking.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.BuildingsBlocking.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.BuildingsNavigation, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.BuildingsNavigation.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.BuildingsNavigation.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.Common, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.Common.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Common.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.ConstructibleSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.ConstructibleSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.ConstructibleSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.ConstructionMode, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.ConstructionMode.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.ConstructionMode.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.ConstructionSites, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.ConstructionSites.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.ConstructionSites.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.Coordinates, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.Coordinates.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Coordinates.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.CoreUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.CoreUI.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.CoreUI.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.Debugging, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.Debugging.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Debugging.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.DebuggingUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.DebuggingUI.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.DebuggingUI.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.DwellingSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.DwellingSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.DwellingSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.Emptying, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.Emptying.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Emptying.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.EnterableSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.EnterableSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.EnterableSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.EntityPanelSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.EntityPanelSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.EntityPanelSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.EntitySystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.EntitySystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.EntitySystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.Explosions, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.Explosions.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Explosions.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.GameDistricts, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.GameDistricts.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.GameDistricts.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.GameSaveRuntimeSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.GameSaveRuntimeSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.GameSaveRuntimeSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.GoodConsumingBuildingSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.GoodConsumingBuildingSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.GoodConsumingBuildingSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.Goods, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.Goods.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Goods.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.HazardousWeatherSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.HazardousWeatherSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.HazardousWeatherSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.InputSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.InputSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.InputSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.InventorySystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.InventorySystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.InventorySystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.Localization, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.Localization.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Localization.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.MechanicalSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.MechanicalSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.MechanicalSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.ModManagerScene, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.ModManagerScene.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.Navigation, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.Navigation.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Navigation.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.Persistence, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.Persistence.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Persistence.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.PlantingUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.PlantingUI.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.PlantingUI.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.PopulationStatisticsSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.PopulationStatisticsSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.PopulationStatisticsSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.PowerGenerating, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.PowerGenerating.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.PowerGenerating.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.PrefabSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.PrefabSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.PrefabSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.PrioritySystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.PrioritySystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.PrioritySystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.SelectionSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.SelectionSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.SelectionSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.SelectionToolSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.SelectionToolSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.SelectionToolSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.SerializationSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.SerializationSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.SerializationSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.SingletonSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.SingletonSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.SingletonSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.StatusSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.StatusSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.StatusSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.TemplateSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.TemplateSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.TemplateSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.TerrainSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\TimberCommons\obj\Release\publicized\Timberborn.TerrainSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.TerrainSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.TickSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.TickSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.TickSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.ToolSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.ToolSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.ToolSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.WaterBuildings, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.WaterBuildings.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.WaterBuildings.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.WaterSourceSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.WaterSourceSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.WaterSourceSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.WeatherSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.WeatherSystem.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.WeatherSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.WorldSerialization, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn\Timberborn.WorldSerialization.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.WorldSerialization.dll</HintPath>
       </Reference>
       <Reference Include="Unity.InputSystem, Version=1.7.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Unity\Unity.InputSystem.dll</HintPath>
@@ -359,13 +380,14 @@
     <ItemGroup>
       <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
       <!-- Publicize directly when referencing -->
-      <Reference Include="..\Dependencies\Timberborn\Timberborn.BlockObjectTools.dll" Publicize="true" />
-      <Reference Include="Timberborn.BuildingsBlocking" Publicize="true" />
-      <Reference Include="Timberborn.BuilderHubSystem" Publicize="true" />
-      <Reference Include="Timberborn.CharacterMovementSystem" Publicize="true" />
-      <Reference Include="Timberborn.ConstructionSites" Publicize="true" />
-      <Reference Include="Timberborn.Navigation" Publicize="true" />
-      <Reference Include="..\Dependencies\Timberborn\Timberborn.WalkingSystemUI.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.BlockObjectTools.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.BuildingsBlocking.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.BuilderHubSystem.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.CharacterMovementSystem.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.ConstructionSites.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.Navigation.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.WalkingSystemUI.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.CoreUI.dll" Publicize="true" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -376,7 +398,7 @@
     </Target>
     -->
     <Target Name="AfterBuild">
-        <Exec Command="xcopy /i /Y $(TargetPath) u:\BepInEx\plugins\Automation" />
+        <Exec Command="xcopy /i /Y $(TargetPath) u:\Mods\Automation\Scripts" />
     </Target>
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
       <PropertyGroup>

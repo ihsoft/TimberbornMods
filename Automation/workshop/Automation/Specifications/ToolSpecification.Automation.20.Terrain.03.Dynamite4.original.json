@@ -1,0 +1,18 @@
+{
+  "Id": "Automation.Tmpl.Terrain.4LevelsDynamite",
+  "GroupId": "AutomationTerrainToolGroupId",
+  "Type": "Automation.Tools.ApplyTemplateTool",
+  "Order": 3,
+  "Icon": "AutomationResources/Icons/tool-dynamite-x4",
+  "NameLocKey": "IgorZ.Automation.Tool.tmpl.4LevelsDynamite.DisplayName",
+  "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.XLevelsDynamite.Description",
+  "ToolInformation": {
+    "TemplateFamilyName": "Terrain.DynamiteDigging",
+    "Rules": [
+      {
+        "Condition": { "TypeId": "Automation.Conditions.ObjectFinishedCondition" },
+        "Action": { "TypeId": "Automation.Actions.DetonateDynamiteAction", "Repeat": 3 }
+      }
+    ]
+  }
+}

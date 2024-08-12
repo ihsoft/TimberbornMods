@@ -40,7 +40,7 @@ sealed class ApplyTemplateTool : AbstractAreaSelectionTool, IAutomationModeEnabl
 
   #region AbstractAreaSelectionTool overries
   /// <inheritdoc/>
-  protected override string CursorName => "igorz.automation/cursors/cog-cursor";
+  protected override string CursorName => "Automation/cog-cursor";
 
   /// <inheritdoc/>
   protected override bool ObjectFilterExpression(BlockObject blockObject) {

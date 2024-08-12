@@ -4,12 +4,10 @@
 
 using Automation.Utils;
 using Bindito.Core;
-using TimberApi.ConfiguratorSystem;
-using TimberApi.SceneSystem;
 
 namespace Automation.Tools {
 
-[Configurator(SceneEntrypoint.InGame)]
+[Context("Game")]
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
 

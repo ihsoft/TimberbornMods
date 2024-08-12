@@ -1,0 +1,13 @@
+{
+  "Id": "AutomationTerrainToolGroupId",
+  "GroupId": "AutomationToolGroupId",
+  "Type": "AutomationToolGroup",
+  "Layout": "Green",
+  "Order": 20,
+  "Icon": "AutomationResources/Icons/automation-dynamite",
+  "NameLocKey": "IgorZ.Automation.ToolGroup.Terrain.DisplayName",
+  "FallbackGroup": false,
+  "GroupInformation": {
+    "BottomBarSection": 0
+  }
+}

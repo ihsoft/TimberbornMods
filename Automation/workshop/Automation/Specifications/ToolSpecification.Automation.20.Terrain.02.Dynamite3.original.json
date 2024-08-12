@@ -1,0 +1,18 @@
+{
+  "Id": "Automation.Tmpl.Terrain.3LevelsDynamite",
+  "GroupId": "AutomationTerrainToolGroupId",
+  "Type": "Automation.Tools.ApplyTemplateTool",
+  "Order": 2,
+  "Icon": "AutomationResources/Icons/tool-dynamite-x3",
+  "NameLocKey": "IgorZ.Automation.Tool.tmpl.3LevelsDynamite.DisplayName",
+  "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.XLevelsDynamite.Description",
+  "ToolInformation": {
+    "TemplateFamilyName": "Terrain.DynamiteDigging",
+    "Rules": [
+      {
+        "Condition": { "TypeId": "Automation.Conditions.ObjectFinishedCondition" },
+        "Action": { "TypeId": "Automation.Actions.DetonateDynamiteAction", "Repeat": 2 }
+      }
+    ]
+  }
+}

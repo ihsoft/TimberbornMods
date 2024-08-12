@@ -1,0 +1,76 @@
+ManifestFileVersion: 0
+UnityVersion: 6000.0.7f1
+CRC: 875566721
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 398e3e7dc9361646650bd8f84b1eceb7
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 6160683d00f522ae3dcc0ab190d5f9e5
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 9af1a4c9ffdc5f02c19e0a6c18919d46
+HashAppended: 0
+ClassTypes:
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: -384587693, guid: 6c83f14598db6589a8cefd1092f1e018, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Cursors/Automation/pause-cursor.asset
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Cursors/Automation/cog-cursor-large.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/automation-group-storage.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/icon-badtide-pause.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/player-play.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/tool-group-population.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/tool-dynamite-x4.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/tool-bots-20.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/icon-drought-close.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/icon-badtide-close.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Cursors/Automation/cog-cursor-small.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/debug-finish-all.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Cursors/Automation/play-cursor-small.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/tool-dynamite-x6.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/icon-temperate-close.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/icon-drought-open.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/icon-empty-60pct.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/status-icon-emptying.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/icon-empty-70pct.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/tool-beavers-max.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/tool-dynamite-x2.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/tool-bots+10.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/tool-chained.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/tool-drought-water-regulator-open.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/tool-beavers+10.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/icon-badtide-open.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/automation-water.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/icon-empty-90pct.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/automation-dynamite.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/tool-bots+20.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/icon-empty-50pct.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/icon-temperate-open.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/debug-inspect.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/cancel.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/tool-dynamite-x5.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Cursors/Automation/pause-cursor-small.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Cursors/Automation/pause-cursor-large.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/icon-drought-pause.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/icon-temperate-semiopen.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/tool-dynamite-x3.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Cursors/Automation/play-cursor-large.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/tool-beavers-10.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/automation-group.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/player-pause.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/tool-beavers-20.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/tool-bots-10.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/icon-temperate-pause.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/tool-beavers+20.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/icon-empty-80pct.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Icons/automation-power.png
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Cursors/Automation/play-cursor.asset
+- Assets/Mods/Automation/AssetBundles/Resources/UI/Cursors/Automation/cog-cursor.asset
+Dependencies: []

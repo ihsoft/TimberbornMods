@@ -1,0 +1,17 @@
+{
+  "Name": "Automation",
+  "Version": "1.2.0",
+  "Id": "Timberborn.IgorZ.Automation",
+  "MinimumGameVersion": "0.6.4.0",
+  "Description": "This mod that automates a lot of things!",
+  "RequiredMods": [
+    {
+      "Id": "Harmony",
+      "MinimumVersion": "2.3.3"
+    },
+    {
+      "Id": "TimberApi",
+      "MinimumVersion": "0.7.2.0"
+    }
+  ]
+}

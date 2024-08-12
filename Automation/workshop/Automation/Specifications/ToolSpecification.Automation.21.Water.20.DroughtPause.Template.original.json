@@ -1,0 +1,22 @@
+{
+  "Id": "Automation.Tmpl.Water.PauseDrought",
+  "GroupId": "AutomationWaterToolGroupId",
+  "Type": "Automation.Tools.ApplyTemplateTool",
+  "Order": 20,
+  "Icon": "AutomationResources/Icons/icon-drought-pause",
+  "NameLocKey": "IgorZ.Automation.Tool.tmpl.DroughtPause.DisplayName",
+  "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.DroughtPause.Description",
+  "ToolInformation": {
+    "TemplateFamilyName": "Water.SeasonManagement",
+    "Rules": [
+      {
+        "Condition": { "TypeId": "Automation.Conditions.DroughtStartedCondition" },
+        "Action": { "TypeId": "Automation.Actions.PauseAction" }
+      },
+      {
+        "Condition": { "TypeId": "Automation.Conditions.DroughtEndedCondition" },
+        "Action": { "TypeId": "Automation.Actions.UnpauseAction" }
+      }
+    ]
+  }
+}
