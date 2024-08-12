@@ -1,4 +1,4 @@
-# v1.1.2 (started on 6/20/2024):
+# v1.2.0 (started on 6/20/2024):
 * [Fix #57] Pathfidning service fails under an edge case condition.
 
 # v1.1.1 (19 May 2024):
