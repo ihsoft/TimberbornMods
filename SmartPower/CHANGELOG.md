@@ -1,4 +1,6 @@
-# v1.9.0 (started on 8/8/2024)
+# v1.9.1 (15 Aug 2024)
+
+# v1.9.0 (preview)
 * [Update] Change `deDE` strings.
 * [Enhancement] Move power generator UI fragment to the middle of the panel.
 * [Enhancement] Give a MinMax slider to adjust the battery charging range.
