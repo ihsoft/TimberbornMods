@@ -4,6 +4,7 @@
 
 using System;
 using TimberApi.UIBuilderSystem;
+using TimberApi.UIPresets.Buttons;
 using TimberApi.UIPresets.Sliders;
 using TimberApi.UIPresets.Toggles;
 using Timberborn.CoreUI;
@@ -16,14 +17,16 @@ namespace IgorZ.TimberDev.UI {
 /// <summary>Factory for making standard fragment panel elements.</summary>
 public class UiFactory {
   readonly VisualElementLoader _visualElementLoader;
-  readonly UIBuilder _uiBuilder;
+
+  /// <summary>The TAPI UI builder.</summary>
+  public readonly UIBuilder UiBuilder;
 
   /// <summary>The localization service to use for the UI elements.</summary>
-  public ILoc Loc { get; }
+  public readonly ILoc Loc;
 
   UiFactory(VisualElementLoader visualElementLoader, UIBuilder uiBuilder, ILoc loc) {
     _visualElementLoader = visualElementLoader;
-    _uiBuilder = uiBuilder;
+    UiBuilder = uiBuilder;
     Loc = loc;
   }
 
@@ -41,7 +44,7 @@ public class UiFactory {
   /// <param name="highValue">The highest possible value.</param>
   public Slider CreateSlider(
       Action<ChangeEvent<float>> onValueChangedFn, float lowValue, float highValue, float stepSize = 0) {
-    var slider = _uiBuilder.Create<GameTextSlider>().Small().Build();
+    var slider = UiBuilder.Create<GameTextSlider>().Small().Build();
     slider.lowValue = lowValue;
     slider.highValue = highValue;
     slider.RegisterValueChangedCallback(
@@ -64,7 +67,7 @@ public class UiFactory {
   /// <param name="stepSize">If greater than zero, then the values are rounded to the step.</param>
   public MinMaxSlider CreateMinMaxSlider(Action<ChangeEvent<Vector2>> onValueChangedFn, float lowValue, float highValue,
                                          float minDelta, float stepSize = 0) {
-    var slider = _uiBuilder.Create<GameTextMinMaxSlider>()
+    var slider = UiBuilder.Create<GameTextMinMaxSlider>()
         .SetLowLimit(lowValue)
         .SetHighLimit(highValue)
         .Small().Build();
@@ -95,7 +98,7 @@ public class UiFactory {
   /// A callback method that will be called on the value change. The only argument is the new value.
   /// </param>
   public Toggle CreateToggle(string locKey, Action<ChangeEvent<bool>> onValueChangedFn) {
-    var toggle = _uiBuilder.Create<GameToggle>().SetLocKey(locKey).Build();
+    var toggle = UiBuilder.Create<GameToggle>().SetLocKey(locKey).Build();
     toggle.RegisterValueChangedCallback(evt => onValueChangedFn(evt));
     return toggle;
   }
@@ -114,7 +117,7 @@ public class UiFactory {
   /// <see cref="PanelFragmentBuilder{PanelFragment}.AddComponent(UnityEngine.UIElements.VisualElement)"/>.
   /// </remarks>
   public PanelFragment CreateCenteredPanelFragmentBuilder() {
-    return _uiBuilder.Create<PanelFragment>()
+    return UiBuilder.Create<PanelFragment>()
         .SetFlexDirection(FlexDirection.Column)
         .SetWidth(new Length(100f, LengthUnit.Percent))
         .SetJustifyContent(Justify.Center);
