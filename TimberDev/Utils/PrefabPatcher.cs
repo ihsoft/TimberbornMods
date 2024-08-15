@@ -35,9 +35,11 @@ static class PrefabPatcher {
   /// <param name="checkDeps">Filter condition.</param>
   /// <typeparam name="TSource">type of the component to remove.</typeparam>
   /// <typeparam name="TTarget">type of the component to add.</typeparam>
-  public static void ReplaceComponent<TSource, TTarget>(GameObject prefab, Func<GameObject, bool> checkDeps)
+  public static void ReplaceComponent<TSource, TTarget>(GameObject prefab, Func<GameObject, bool> checkDeps = null)
       where TSource : BaseComponent where TTarget : BaseComponent {
-    if (prefab.GetComponent<TTarget>() != null || prefab.GetComponent<TSource>() == null || !checkDeps(prefab)) {
+    if (prefab.GetComponent<TTarget>() != null
+        || prefab.GetComponent<TSource>() == null
+        || checkDeps != null && !checkDeps(prefab)) {
       return;
     }
     DebugEx.Fine("Replace component on prefab: name={0}, oldComponent={1}, newComponent={2}",

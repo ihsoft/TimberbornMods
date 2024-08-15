@@ -1,4 +1,5 @@
 # v1.9.1 (15 Aug 2024)
+* [Change] Idle attractions now consume 1hp. It solves the edge case with the unpowered networks.
 
 # v1.9.0 (preview)
 * [Update] Change `deDE` strings.

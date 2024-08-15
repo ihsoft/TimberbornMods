@@ -3,31 +3,26 @@
 // License: Public Domain
 
 using Bindito.Core;
+using Timberborn.BaseComponentSystem;
+using Timberborn.BuildingsBlocking;
 using Timberborn.EnterableSystem;
 using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
 using Timberborn.StatusSystem;
 using Timberborn.Workshops;
 using UnityDev.Utils.LogUtilsLite;
+using UnityEngine;
 
 // ReSharper disable once CheckNamespace
 namespace IgorZ.SmartPower {
 
 /// <summary>
-/// Component that extends the stock <see cref="MechanicalBuilding"/> behavior to lower power consumption when the
-/// building is not actually making any product.
+/// Component that extends the <see cref="MechanicalBuilding"/> behavior to conserve energy when manufactory cannot
+/// produce product.
 /// </summary>
-/// <remarks>
-/// When the building cannot produce product, then the building goes into <see cref="StandbyMode"/>. In this mode it
-/// consumes only a fraction of the nominal power.
-/// </remarks>
-public class SmartMechanicalBuilding : MechanicalBuilding {
+public class SmartManufactory : BaseComponent, IAdjustablePowerInput {
 
   #region API
-
-  /// <summary>Indicates that this building logic must is handled by the smart behavior.</summary>
-  // ReSharper disable once MemberCanBePrivate.Global
-  public bool NeedsSmartLogic => _mechanicalNode.IsConsumer && !_mechanicalNode.IsGenerator;
 
   // ReSharper disable once MemberCanBePrivate.Global
   /// <summary>Indicates that the building has a working place that should have workers.</summary>
@@ -70,24 +65,22 @@ public class SmartMechanicalBuilding : MechanicalBuilding {
 
   #endregion
 
-  #region TickableComponent overrides
+  #region IAdjustablePowerInput implementation
 
   /// <inheritdoc/>
-  public override void StartTickable() {
-    base.StartTickable();
-    if (NeedsSmartLogic) {
-      SmartUpdateNodeCharacteristics();
+  public int UpdateAndGetPowerInput(int nominalPowerInput) {
+    if (_mechanicalBuilding.ConsumptionDisabled || _blockableBuilding && !_blockableBuilding.IsUnblocked) {
+      AllWorkersOut = MissingIngredients = BlockedOutput = NoFuel = StandbyMode = false;
+      return 0;
     }
-  }
 
-  /// <inheritdoc/>
-  public override void Tick() {
-    if (!NeedsSmartLogic) {
-      base.Tick();
-      return;
-    }
-    SmartUpdateNodeCharacteristics();
-    UpdateActiveAndPowered();
+    AllWorkersOut = HasWorkingPlaces && _enterable.NumberOfEnterersInside == 0;
+    MissingIngredients = !_manufactory.HasAllIngredients;
+    BlockedOutput = !_manufactory.Inventory.HasUnreservedCapacity(_manufactory.CurrentRecipe.Products);
+    NoFuel = !_manufactory.HasFuel;
+    StandbyMode = AllWorkersOut || MissingIngredients || NoFuel || BlockedOutput;
+    var newInput = nominalPowerInput * (StandbyMode ? NonFuelRecipeIdleStateConsumption : 1f);
+    return Mathf.Max(Mathf.RoundToInt(newInput), 1);
   }
 
   #endregion
@@ -98,21 +91,12 @@ public class SmartMechanicalBuilding : MechanicalBuilding {
   const float NonFuelRecipeIdleStateConsumption = 0.1f;
   const string PowerSavingModeLocKey = "IgorZ.SmartPower.MechanicalBuilding.PowerSavingModeStatus";
 
+  ILoc _loc;
+  MechanicalBuilding _mechanicalBuilding;
+  BlockableBuilding _blockableBuilding;
   Manufactory _manufactory;
   Enterable _enterable;
-  ILoc _loc;
   StatusToggle _standbyStatus;
-
-  /// <inheritdoc cref="MechanicalBuilding.Awake" />
-  public new void Awake() {
-    base.Awake();
-    _manufactory = GetComponentFast<Manufactory>();
-    _enterable = GetComponentFast<Enterable>();
-    _standbyStatus = StatusToggle.CreateNormalStatus(StandbyStatusIcon, _loc.T(PowerSavingModeLocKey));
-    var subject = GetComponentFast<StatusSubject>();
-    subject.RegisterStatus(_standbyStatus);
-    HasWorkingPlaces = GetComponentFast<Workshop>() != null;
-  }
 
   /// <summary>It must be public for the injection logic to work.</summary>
   [Inject]
@@ -120,19 +104,15 @@ public class SmartMechanicalBuilding : MechanicalBuilding {
     _loc = loc;
   }
 
-  void SmartUpdateNodeCharacteristics() {
-    if (ConsumptionDisabled) {
-      _mechanicalNode.UpdateInput(0);
-      AllWorkersOut = MissingIngredients = BlockedOutput = NoFuel = StandbyMode = false;
-      return;
-    }
-    var hasRecipe = _manufactory.HasCurrentRecipe;
-    AllWorkersOut = HasWorkingPlaces && hasRecipe && _enterable != null && _enterable.NumberOfEnterersInside == 0;
-    MissingIngredients = hasRecipe && !_manufactory.HasAllIngredients;
-    BlockedOutput = hasRecipe && !_manufactory.Inventory.HasUnreservedCapacity(_manufactory.CurrentRecipe.Products);
-    NoFuel = hasRecipe && !_manufactory.HasFuel;
-    StandbyMode = AllWorkersOut || MissingIngredients || NoFuel || BlockedOutput;
-    _mechanicalNode.UpdateInput(StandbyMode ? NonFuelRecipeIdleStateConsumption : 1.0f);
+  void Awake() {
+    _mechanicalBuilding = GetComponentFast<MechanicalBuilding>();
+    _blockableBuilding = GetComponentFast<BlockableBuilding>();
+    _manufactory = GetComponentFast<Manufactory>();
+    _enterable = GetComponentFast<Enterable>();
+    _standbyStatus = StatusToggle.CreateNormalStatus(StandbyStatusIcon, _loc.T(PowerSavingModeLocKey));
+    var subject = GetComponentFast<StatusSubject>();
+    subject.RegisterStatus(_standbyStatus);
+    HasWorkingPlaces = GetComponentFast<Workshop>() != null;
   }
 
   #endregion

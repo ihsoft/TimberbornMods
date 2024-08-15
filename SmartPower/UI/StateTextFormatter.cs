@@ -71,18 +71,18 @@ public static class StateTextFormatter {
     if (!mechanicalNode.IsConsumer) {
       return null;
     }
-    var smartMechanicalBuilding = mechanicalNode.GetComponentFast<SmartMechanicalBuilding>();
-    if (smartMechanicalBuilding == null || !smartMechanicalBuilding.StandbyMode) {
+    var smartManufactory = mechanicalNode.GetComponentFast<SmartManufactory>();
+    if (smartManufactory == null || !smartManufactory.StandbyMode) {
       return null;
     }
     var lines = new List<string>();
-    if (smartMechanicalBuilding.NoFuel) {
+    if (smartManufactory.NoFuel) {
       lines.Add(loc.T(NoFuelLocKey));
-    } else if (smartMechanicalBuilding.MissingIngredients) {
+    } else if (smartManufactory.MissingIngredients) {
       lines.Add(loc.T(NoInputModeLocKey));
-    } else if (smartMechanicalBuilding.BlockedOutput) {
+    } else if (smartManufactory.BlockedOutput) {
       lines.Add(loc.T(BlockedOutputLocKey));
-    } else if (smartMechanicalBuilding.AllWorkersOut) {
+    } else if (smartManufactory.AllWorkersOut) {
       lines.Add(loc.T(NoWorkersLocKey));
     }
     return string.Join("\n", lines);

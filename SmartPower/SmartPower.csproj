@@ -77,8 +77,10 @@
       </Compile>
       <Compile Include="Core\Configurator.cs" />
       <Compile Include="Core\Features.cs" />
+      <Compile Include="Core\IAdjustablePowerInput.cs" />
+      <Compile Include="Core\MechanicalBuildingPatch.cs" />
       <Compile Include="Core\SmartGoodPoweredGenerator.cs" />
-      <Compile Include="Core\SmartMechanicalBuilding.cs" />
+      <Compile Include="Core\SmartManufactory.cs" />
       <Compile Include="Core\SmartPoweredAttraction.cs" />
       <Compile Include="Properties\AssemblyInfo.cs" />
       <Compile Include="UI\Configurator.cs" />

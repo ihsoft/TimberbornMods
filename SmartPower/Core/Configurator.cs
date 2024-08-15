@@ -4,7 +4,6 @@
 
 using Bindito.Core;
 using Timberborn.Attractions;
-using Timberborn.EnterableSystem;
 using Timberborn.MechanicalSystem;
 using Timberborn.PowerGenerating;
 using IgorZ.TimberDev.Utils;
@@ -19,23 +18,24 @@ namespace IgorZ.SmartPower {
 [Context("Game")]
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
-  static readonly PrefabPatcher.RequiredComponentsDep SmartAttractionDeps =
-      new(typeof(EnterableSpecification), typeof(Attraction), typeof(MechanicalBuilding));
-  static readonly PrefabPatcher.RequiredComponentsDep SmartMechBuildingDeps =
-      new(typeof(Manufactory), typeof(MechanicalBuilding));
-  static readonly string PatchId = typeof(Configurator).FullName;
+  static readonly PrefabPatcher.RequiredComponentsDep PoweredAttractionDeps =
+      new(typeof(Attraction), typeof(MechanicalBuilding));
+  static readonly PrefabPatcher.RequiredComponentsDep ManufactoryDeps =
+      new(typeof(Manufactory));
+  static readonly string PatchId = typeof(Configurator).AssemblyQualifiedName;
 
   public void Configure(IContainerDefinition containerDefinition) {
     if (Features.DebugExVerboseLogging && DebugEx.LoggingSettings.VerbosityLevel < 5) {
       DebugEx.LoggingSettings.VerbosityLevel = 5;
     }
+    HarmonyPatcher.PatchRepeated(PatchId + "-core", typeof(MechanicalBuildingPatch));
+
     CustomizableInstantiator.AddPatcher(
-        PatchId,
+        PatchId + "-instantiator",
         prefab => {
-          PrefabPatcher.ReplaceComponent<GoodPoweredGenerator, SmartGoodPoweredGenerator>(prefab, _ => true);
-          PrefabPatcher.ReplaceComponent<MechanicalBuilding, SmartMechanicalBuilding>(
-              prefab, SmartMechBuildingDeps.Check);
-          PrefabPatcher.AddComponent<SmartPoweredAttraction>(prefab, SmartAttractionDeps.Check);
+          PrefabPatcher.ReplaceComponent<GoodPoweredGenerator, SmartGoodPoweredGenerator>(prefab);
+          PrefabPatcher.AddComponent<SmartManufactory>(prefab, ManufactoryDeps.Check);
+          PrefabPatcher.AddComponent<SmartPoweredAttraction>(prefab, PoweredAttractionDeps.Check);
         });
   }
 }
