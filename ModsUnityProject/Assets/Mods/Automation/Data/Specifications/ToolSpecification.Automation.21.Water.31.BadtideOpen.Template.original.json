@@ -3,7 +3,7 @@
   "GroupId": "AutomationWaterToolGroupId",
   "Type": "Automation.Tools.ApplyTemplateTool",
   "Order": 31,
-  "Icon": "AutomationResources/Icons/icon-badtide-open",
+  "Icon": "IgorZ-automation/Sprites/icon-badtide-open",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.BadtideOpenFloodgate.DisplayName",
   "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.BadtideOpenFloodgate.Description",
   "ToolInformation": {

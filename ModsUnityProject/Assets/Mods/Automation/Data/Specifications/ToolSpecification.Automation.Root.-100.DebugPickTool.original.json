@@ -3,7 +3,7 @@
   "GroupId": "AutomationToolGroupId",
   "Type": "Automation.Tools.DebugPickTool",
   "Order": -100,
-  "Icon": "AutomationResources/Icons/debug-inspect",
+  "Icon": "IgorZ-automation/Sprites/debug-inspect",
   "DevMode": true,
   "NameLocKey": "IgorZ.Automation.DebugPickTool.Title",
   "DescriptionLocKey": "IgorZ.Automation.DebugPickTool.Description"

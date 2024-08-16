@@ -3,7 +3,7 @@
   "GroupId": "AutomationToolGroupId",
   "Type": "Automation.Tools.PauseTool",
   "Order": 10,
-  "Icon": "AutomationResources/Icons/player-pause",
+  "Icon": "IgorZ-automation/Sprites/player-pause",
   "NameLocKey": "IgorZ.Automation.PauseTool.Title",
   "DescriptionLocKey": "IgorZ.Automation.PauseTool.Description"
 }

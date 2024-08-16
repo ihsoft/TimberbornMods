@@ -3,7 +3,7 @@
   "GroupId": "AutomationWaterToolGroupId",
   "Type": "Automation.Tools.ApplyTemplateTool",
   "Order": 23,
-  "Icon": "AutomationResources/Icons/tool-drought-water-regulator-open",
+  "Icon": "IgorZ-automation/Sprites/tool-drought-water-regulator-open",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.DroughtOpenWaterRegulator.DisplayName",
   "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.DroughtOpenWaterRegulator.Description",
   "ToolInformation": {

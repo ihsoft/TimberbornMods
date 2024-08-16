@@ -4,7 +4,7 @@
   "Type": "AutomationToolGroup",
   "Layout": "Green",
   "Order": 24,
-  "Icon": "AutomationResources/Icons/tool-group-population",
+  "Icon": "IgorZ-automation/Sprites/tool-group-population",
   "NameLocKey": "IgorZ.Automation.ToolGroup.Population.DisplayName",
   "FallbackGroup": false,
   "GroupInformation": {
