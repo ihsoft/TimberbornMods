@@ -1,8 +1,0 @@
-# This file allows enabling and disabling various features that can affect the whole game.
-# To disable a feature, add prefix "!" to the feature name.
-
-# Enables extra logging. Usefull for the debugging issues, but creates a nosie in the logs.
-!DebugEx.VerboseLogging
-
-# Indicates that the power network UI should show the battery vitals (capacity/charge and flow).
-Network.ShowBatteryVitals

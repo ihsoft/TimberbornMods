@@ -87,7 +87,7 @@ public class SmartManufactory : BaseComponent, IAdjustablePowerInput {
 
   #region Implementation
 
-  const string StandbyStatusIcon = "status-icon-standby";
+  const string StandbyStatusIcon = "SmartPower/status-icon-standby";
   const float NonFuelRecipeIdleStateConsumption = 0.1f;
   const string PowerSavingModeLocKey = "IgorZ.SmartPower.MechanicalBuilding.PowerSavingModeStatus";
 
