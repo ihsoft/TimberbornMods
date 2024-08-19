@@ -214,7 +214,6 @@
       <!-- Publicize directly when referencing -->
       <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.MechanicalSystem.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.MechanicalSystemUI.dll" Publicize="true" />
-      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.CoreUI.dll" Publicize="true" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
