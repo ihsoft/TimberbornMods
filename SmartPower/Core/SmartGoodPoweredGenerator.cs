@@ -29,6 +29,7 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
   int _skipTicks;
 
   #region TickableComponent implementation
+
   /// <inheritdoc/>
   public override void Tick() {
     if ((_pausable == null || !_pausable.Paused) && _mechanicalNode.Graph != null) {
@@ -61,9 +62,11 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
     ChargeBatteriesThreshold = state.GetValueOrNullable(ChargeBatteriesThresholdKey) ?? MaxBatteryChargeRatio;
     DischargeBatteriesThreshold = state.GetValueOrNullable(DischargeBatteriesThresholdKey) ?? MinBatteryChargeRatio;
   }
+
   #endregion
 
   #region API
+
   /// <summary>Tells the smart logic to never shutdown this generator.</summary>
   public bool NeverShutdown { get; set; }
 
@@ -72,6 +75,10 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
 
   /// <summary>The minimum level to let the batteries to discharge to.</summary>
   public float DischargeBatteriesThreshold { get; set; } = MinBatteryChargeRatio;
+
+  /// <summary>Returns the mechanical graph this generator is connected to.</summary>
+  public MechanicalGraph MechanicalGraph => _mechanicalNode.Graph;
+
   #endregion
 
   #region Implementation

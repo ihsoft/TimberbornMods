@@ -1,4 +1,5 @@
 # v1.9.2 (18 Aug 2024)
+* [Update] Allow applying generator settings to all generators in the network.
 
 # v1.9.1 (preview)
 * [Change] Idle attractions now consume 1hp. It solves the edge case with the unpowered networks.

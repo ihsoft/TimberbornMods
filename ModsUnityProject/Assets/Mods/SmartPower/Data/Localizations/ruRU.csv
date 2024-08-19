@@ -4,6 +4,8 @@ IgorZ.SmartPower.BatteryCharging,"Батареи заряжаются: <GreenHig
 IgorZ.SmartPower.BatteryDischarging,"Батареи рязряжаются: <RedHighlight>🡇</RedHighlight>{0} ({1})",
 IgorZ.SmartPower.PoweredGenerator.NeverStop,"Никогда не выключать этот генератор",
 IgorZ.SmartPower.PoweredGenerator.ChargeBatteriesRangeText,"Заряжать батареи в диапазоне {0}% - {1}%",
+IgorZ.SmartPower.PoweredGenerator.ApplyToAllEngines,"Применить ко всем генераторам",
+IgorZ.SmartPower.PoweredGenerator.AppliedToEngines,"Применено к {0} генераторам",
 IgorZ.SmartPower.MechanicalBuilding.NoWorkersStatus,"<SolidHighlight>⏻</SolidHighlight> Никого нет на рабочем месте",
 IgorZ.SmartPower.MechanicalBuilding.NoFuelStatus,"<SolidHighlight>⏻</SolidHighlight> Закончилось топливо",
 IgorZ.SmartPower.MechanicalBuilding.NoInputStatus,"<SolidHighlight>⏻</SolidHighlight> Не хватает ингредиентов",
