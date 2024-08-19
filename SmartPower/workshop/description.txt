@@ -6,17 +6,12 @@ This mod modifies some power generating and consuming buildings to optimize powe
 [*] Engines automatically turn on and off to minimize the wood consumption while providing enough power supply to the network.
 [*] If there are batteries in the network, then the engines will only produce energy to keep the total network charge reserve within a specified range. E.g. "not less than 10%, but not greater than 35%. This can be configured per engine.
 [/list]
-[b]Known issue[/b]: if all consumers in the network become idle, then all Engines will stop (no demand, no supply). This will mark such network as "unpowered" and attractions (including Ironteeth bot chargers) won't accept attendees. The ways to overcome (one of):
-[list]
-[*] Add a battery into the network.
-[*] Pick any engine in the networks and set it to the "run always" mode.
-[/list]
 
 [h1]Ironteeth bot charging station[/h1]
-The charging station consumes power only when charging a bot. In the idle state it's not taking power. The "known issue" with the engines can affect this behavior: if the network is unpowered, then bots won't come to the charger.
+The charging station consumes full power only when charging a bot. In the idle state, it's only taking 1hp.
 
 [h1]Powered attractions[/h1]
-If an attraction needs energy, but have no attendees, then it will stop consuming power. The "known issue" with the engines can affect this behavior: if the network is unpowered, then beavers won't come to the attraction.
+If an attraction needs energy, but have no attendees, then it will go into low power mode and only consumes 1hp.
 
 [h1]Powered manufactories[/h1]
 If a manufactory has assigned worker, but the product cannot be produced for any reason, then the building goes into power saving mode in which it only consumes 10% of the nominal power. Buildings in this mode will have a special notification icon and an explanation of why the mode was activated.
