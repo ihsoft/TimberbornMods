@@ -1,4 +1,6 @@
-# v1.9.1 (15 Aug 2024)
+# v1.9.2 (18 Aug 2024)
+
+# v1.9.1 (preview)
 * [Change] Idle attractions now consume 1hp. It solves the edge case with the unpowered networks.
 * [Update] Set 5% steps for the charge battery slider.
 * [Update] Add "less charge" / "more charge" buttons to quickly set slider presets.
