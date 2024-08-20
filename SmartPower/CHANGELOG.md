@@ -1,3 +1,6 @@
+# v1.9.3 (19 Aug 2024)
+* [Fix] Game crashes on powered buildings with no recipe selected.
+
 # v1.9.2 (18 Aug 2024)
 * [Update] Allow applying generator settings to all generators in the network.
 
