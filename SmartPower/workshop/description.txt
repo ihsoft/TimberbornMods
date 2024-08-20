@@ -14,7 +14,7 @@ The charging station consumes full power only when charging a bot. In the idle s
 If an attraction needs energy, but have no attendees, then it will go into low power mode and only consumes 1hp.
 
 [h1]Powered manufactories[/h1]
-If a manufactory has assigned worker, but the product cannot be produced for any reason, then the building goes into power saving mode in which it only consumes 10% of the nominal power. Buildings in this mode will have a special notification icon and an explanation of why the mode was activated.
+If a manufactory has assigned worker, but the product cannot be produced for any reason, then the building goes into power saving mode in which it only consumes 10% of the nominal power. Buildings in this mode will have a special notification icon and an explanation of why the mode was activated. Also, if no recipe selected, the building doesn't consume power at all.
 
 [h1]Mechanical nodes[/h1]
 All buildings with a mechanical node like shafts or generators get a UI extension. They will show information about batteries in the network: remaining charge, charge/discharge rate, and the remaining time estimation.
