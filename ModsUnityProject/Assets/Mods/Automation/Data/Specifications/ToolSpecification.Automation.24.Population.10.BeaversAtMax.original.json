@@ -3,7 +3,7 @@
   "GroupId": "AutomationPopulationToolGroupId",
   "Type": "Automation.Tools.ApplyTemplateTool",
   "Order": 10,
-  "Icon": "IgorZ-automation/Sprites/tool-beavers-max",
+  "Icon": "Sprites/IgorZ/tool-beavers-max",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.BeaversAtMax.DisplayName",
   "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.BeaversAtMax.Description",
   "ToolInformation": {

@@ -3,7 +3,7 @@
   "Type": "AutomationToolGroup",
   "Layout": "Blue",
   "Order": 10000,
-  "Icon": "IgorZ-automation/Sprites/automation-group",
+  "Icon": "Sprites/IgorZ/automation-group",
   "NameLocKey": "IgorZ.Automation.ToolGroup.Main.DisplayName",
   "FallbackGroup": false,
   "GroupInformation": {

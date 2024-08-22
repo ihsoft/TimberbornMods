@@ -3,7 +3,7 @@
   "GroupId": "AutomationToolGroupId",
   "Type": "Automation.Tools.ResumeTool",
   "Order": 11,
-  "Icon": "IgorZ-automation/Sprites/player-play",
+  "Icon": "Sprites/IgorZ/player-play",
   "NameLocKey": "IgorZ.Automation.ResumeTool.Title",
   "DescriptionLocKey": "IgorZ.Automation.ResumeTool.Description"
 }

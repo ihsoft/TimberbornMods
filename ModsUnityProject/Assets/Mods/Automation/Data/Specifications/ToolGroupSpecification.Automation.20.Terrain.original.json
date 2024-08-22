@@ -4,7 +4,7 @@
   "Type": "AutomationToolGroup",
   "Layout": "Green",
   "Order": 20,
-  "Icon": "IgorZ-automation/Sprites/automation-dynamite",
+  "Icon": "Sprites/IgorZ/automation-dynamite",
   "NameLocKey": "IgorZ.Automation.ToolGroup.Terrain.DisplayName",
   "FallbackGroup": false,
   "GroupInformation": {

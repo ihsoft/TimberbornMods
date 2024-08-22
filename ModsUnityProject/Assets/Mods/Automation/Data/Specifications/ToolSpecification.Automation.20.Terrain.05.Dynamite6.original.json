@@ -3,7 +3,7 @@
   "GroupId": "AutomationTerrainToolGroupId",
   "Type": "Automation.Tools.ApplyTemplateTool",
   "Order": 5,
-  "Icon": "IgorZ-automation/Sprites/tool-dynamite-x6",
+  "Icon": "Sprites/IgorZ/tool-dynamite-x6",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.6LevelsDynamite.DisplayName",
   "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.XLevelsDynamite.Description",
   "ToolInformation": {

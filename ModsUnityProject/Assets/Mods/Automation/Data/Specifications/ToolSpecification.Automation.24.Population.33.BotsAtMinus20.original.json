@@ -3,7 +3,7 @@
   "GroupId": "AutomationPopulationToolGroupId",
   "Type": "Automation.Tools.ApplyTemplateTool",
   "Order": 33,
-  "Icon": "IgorZ-automation/Sprites/tool-bots-20",
+  "Icon": "Sprites/IgorZ/tool-bots-20",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.BotsAtMinus20.DisplayName",
   "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.BotsAtMinus20.Description",
   "ToolInformation": {

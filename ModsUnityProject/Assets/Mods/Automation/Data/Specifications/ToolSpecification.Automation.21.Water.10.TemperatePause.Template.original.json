@@ -3,7 +3,7 @@
   "GroupId": "AutomationWaterToolGroupId",
   "Type": "Automation.Tools.ApplyTemplateTool",
   "Order": 10,
-  "Icon": "IgorZ-automation/Sprites/icon-temperate-pause",
+  "Icon": "Sprites/IgorZ/icon-temperate-pause",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.TemperatePause.DisplayName",
   "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.TemperatePause.Description",
   "ToolInformation": {

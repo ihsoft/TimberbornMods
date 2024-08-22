@@ -3,7 +3,7 @@
   "GroupId": "AutomationPopulationToolGroupId",
   "Type": "Automation.Tools.ApplyTemplateTool",
   "Order": 23,
-  "Icon": "IgorZ-automation/Sprites/tool-beavers-20",
+  "Icon": "Sprites/IgorZ/tool-beavers-20",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.BeaversAtMinus20.DisplayName",
   "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.BeaversAtMinus20.Description",
   "ToolInformation": {

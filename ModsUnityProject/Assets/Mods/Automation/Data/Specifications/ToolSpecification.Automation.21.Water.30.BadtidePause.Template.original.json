@@ -3,7 +3,7 @@
   "GroupId": "AutomationWaterToolGroupId",
   "Type": "Automation.Tools.ApplyTemplateTool",
   "Order": 30,
-  "Icon": "IgorZ-automation/Sprites/icon-badtide-pause",
+  "Icon": "Sprites/IgorZ/icon-badtide-pause",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.BadtidePause.DisplayName",
   "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.BadtidePause.Description",
   "ToolInformation": {
