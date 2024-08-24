@@ -215,6 +215,11 @@
       <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.MechanicalSystem.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.MechanicalSystemUI.dll" Publicize="true" />
     </ItemGroup>
+    <ItemGroup>
+      <Content Include="..\ModsUnityProject\Assets\Mods\SmartPower\manifest.json">
+        <Link>manifest.json</Link>
+      </Content>
+    </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.
@@ -225,6 +230,7 @@
     -->
     <Target Name="AfterBuild">
         <Exec Command="xcopy /i /Y $(TargetPath) &quot;u:\Mods\SmartPower\Scripts&quot;" />
+        <Exec Command="xcopy /i /Y ..\ModsUnityProject\Assets\Mods\SmartPower\manifest.json &quot;u:\Mods\SmartPower&quot;" />
     </Target>
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
       <PropertyGroup>

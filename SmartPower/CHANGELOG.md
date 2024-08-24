@@ -1,3 +1,5 @@
+# v1.10.0 (started on 8/24/2024)
+
 # v1.9.3 (19 Aug 2024)
 * [Fix] Game crashes on powered buildings with no recipe selected.
 
