@@ -632,6 +632,9 @@
       <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.Root.200.CancelTool.original.json.meta">
         <Link>Specifications\ToolSpecification.Automation.Root.200.CancelTool.original.json.meta</Link>
       </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\manifest.json">
+        <Link>manifest.json</Link>
+      </Content>
     </ItemGroup>
     <ItemGroup>
       <None Include="packages.config" />
@@ -646,6 +649,7 @@
     -->
     <Target Name="AfterBuild">
         <Exec Command="xcopy /i /Y $(TargetPath) u:\Mods\Automation\Scripts" />
+        <Exec Command="xcopy /i /Y ..\ModsUnityProject\Assets\Mods\Automation\manifest.json u:\Mods\Automation" />
     </Target>
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
       <PropertyGroup>
