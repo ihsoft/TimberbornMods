@@ -6,8 +6,10 @@ using IgorZ.TimberDev.UI;
 using TimberApi.UIBuilderSystem.StylingElements;
 using TimberApi.UIPresets.Buttons;
 using Timberborn.BaseComponentSystem;
+using Timberborn.BlockSystem;
 using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
+using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -97,6 +99,7 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
   }
 
   public void UpdateFragment() {
+    _applyToAllEnginesButton.ToggleDisplayStyle(visible: _generator.enabled);
     if (_resetButtonCaptionTimestamp < 0 || _resetButtonCaptionTimestamp > Time.unscaledTime) {
       return;
     }
