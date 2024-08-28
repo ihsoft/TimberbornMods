@@ -99,6 +99,9 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
   }
 
   public void UpdateFragment() {
+    if (!_generator) {
+      return;
+    }
     _applyToAllEnginesButton.ToggleDisplayStyle(visible: _generator.enabled);
     if (_resetButtonCaptionTimestamp < 0 || _resetButtonCaptionTimestamp > Time.unscaledTime) {
       return;

@@ -1,4 +1,4 @@
-# v1.10.0 (started on 8/24/2024)
+# v1.10.1 (started on 8/24/2024)
 * [Fix] Game crashes when trying to apply settings on incomplete engine. 
 
 # v1.9.3 (19 Aug 2024)
