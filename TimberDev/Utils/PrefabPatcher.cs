@@ -18,13 +18,16 @@ static class PrefabPatcher {
   /// <summary>Adds a new component to prefab based in the filter condition.</summary>
   /// <param name="prefab">Prefab to add the component to.</param>
   /// <param name="checkDeps">Filter condition.</param>
+  /// <param name="onNewComponent">Called when a new component is added.</param>
   /// <typeparam name="T">type of the component to add.</typeparam>
-  public static void AddComponent<T>(GameObject prefab, Func<GameObject, bool> checkDeps) where T : BaseComponent {
-    if (prefab.GetComponent<T>() != null || !checkDeps(prefab)) {
+  public static void AddComponent<T>(
+      GameObject prefab, Func<GameObject, bool> checkDeps, Action<T> onNewComponent = null) where T : BaseComponent {
+    if (prefab.GetComponent<T>() || !checkDeps(prefab)) {
       return;
     }
     DebugEx.Fine("Add component to prefab: name={0}, component={1}", prefab.name, typeof(T));
-    prefab.AddComponent<T>();
+    var component = prefab.AddComponent<T>();
+    onNewComponent?.Invoke(component);
   }
 
   /// <summary>Replaces an existing component with a new one.</summary>
