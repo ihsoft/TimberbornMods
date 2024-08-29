@@ -82,6 +82,7 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
   #endregion
 
   #region Implementation
+
   new void Awake() {
     base.Awake();
     _goodConsumingBuilding = GetComponentFast<GoodConsumingBuilding>();
@@ -116,7 +117,7 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
     if (_goodConsumingBuilding.ConsumptionPaused) {
       // Resume if need power to charge batteries or cover shortage.
       if (!hasBatteries && demand > supply
-          || hasBatteries && batteriesChargeRatio < DischargeBatteriesThreshold
+          || hasBatteries && batteriesChargeRatio <= DischargeBatteriesThreshold
           || NeverShutdown) {
         HostedDebugLog.Fine(
             this, "Start good consumption: demand={0}, supply={1}, batteries={2:0.00}, threshold={3}",
@@ -131,7 +132,7 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
     } else if (!NeverShutdown) {
       // Pause if no ways to spend the excess power from the generator.
       if (!hasBatteries && supply - _maxPower >= demand 
-          || hasBatteries && batteriesChargeRatio > ChargeBatteriesThreshold) {
+          || hasBatteries && batteriesChargeRatio >= ChargeBatteriesThreshold) {
         HostedDebugLog.Fine(
             this, "Stop good consumption: demand={0}, supply={1}, batteries={2:0.00}, check={3}",
             demand, supply, batteriesChargeRatio, ChargeBatteriesThreshold);
