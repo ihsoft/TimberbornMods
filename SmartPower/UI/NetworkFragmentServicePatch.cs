@@ -21,6 +21,7 @@ static class NetworkFragmentServicePatch {
   const float UpdateThreshold = 0.2f;
   static float _lastUpdate;
   static string _lastState = "";
+  static MechanicalNode _lastMechanicalNode;
 
   static MethodBase TargetMethod() {
     return AccessTools.DeclaredMethod("Timberborn.MechanicalSystemUI.NetworkFragmentService:Update");
@@ -30,8 +31,9 @@ static class NetworkFragmentServicePatch {
     if (____label.style.display == DisplayStyle.None) {
       return;
     }
-    if (_lastUpdate + UpdateThreshold < Time.time) {
-      _lastUpdate = Time.time;
+    if (_lastUpdate + UpdateThreshold < Time.unscaledTime || _lastMechanicalNode != mechanicalNode) {
+      _lastUpdate = Time.unscaledTime;
+      _lastMechanicalNode = mechanicalNode;
       _lastState = StateTextFormatter.FormatBatteryText(mechanicalNode, ____loc);
     }
     if (_lastState != null) {
