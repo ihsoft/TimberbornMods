@@ -2,18 +2,16 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using IgorZ.SmartPower.Core;
 using IgorZ.TimberDev.UI;
 using TimberApi.UIBuilderSystem.StylingElements;
 using TimberApi.UIPresets.Buttons;
 using Timberborn.BaseComponentSystem;
-using Timberborn.BlockSystem;
 using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
-using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-// ReSharper disable once CheckNamespace
 namespace IgorZ.SmartPower.UI {
 
 /// <summary>UI fragment that controls <see cref="SmartGoodPoweredGenerator"/> settings.</summary>

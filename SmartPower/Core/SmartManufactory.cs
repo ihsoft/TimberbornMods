@@ -13,8 +13,7 @@ using Timberborn.Workshops;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
-// ReSharper disable once CheckNamespace
-namespace IgorZ.SmartPower {
+namespace IgorZ.SmartPower.Core {
 
 /// <summary>
 /// Component that extends the <see cref="MechanicalBuilding"/> behavior to conserve energy when manufactory cannot

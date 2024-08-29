@@ -4,11 +4,11 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using IgorZ.SmartPower.Core;
 using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
 
-// ReSharper disable once CheckNamespace
-namespace IgorZ.SmartPower {
+namespace IgorZ.SmartPower.UI {
 
 /// <summary>Provides formatting methods for the various states.</summary>
 public static class StateTextFormatter {

@@ -11,8 +11,7 @@ using UnityDev.Utils.LogUtilsLite;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
 
-// ReSharper disable once CheckNamespace
-namespace IgorZ.SmartPower {
+namespace IgorZ.SmartPower.Core {
 
 [HarmonyPatch]
 static class MechanicalBuildingPatch {

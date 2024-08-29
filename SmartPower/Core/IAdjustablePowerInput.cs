@@ -4,8 +4,7 @@
 
 using Timberborn.MechanicalSystem;
 
-// ReSharper disable once CheckNamespace
-namespace IgorZ.SmartPower {
+namespace IgorZ.SmartPower.Core {
 
 /// <summary>Interface for components that can adjust the power input of the building.</summary>
 /// <remarks>

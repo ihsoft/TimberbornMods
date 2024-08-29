@@ -4,19 +4,18 @@
 
 using Bindito.Core;
 using HarmonyLib;
-using IgorZ.SmartPower.Core;
+using IgorZ.TimberDev.Utils;
 using Timberborn.Attractions;
 using Timberborn.MechanicalSystem;
 using Timberborn.PowerGenerating;
-using IgorZ.TimberDev.Utils;
 using Timberborn.Workshops;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Local
-// ReSharper disable once CheckNamespace
-namespace IgorZ.SmartPower {
+
+namespace IgorZ.SmartPower.Core {
 
 [Context("Game")]
 // ReSharper disable once UnusedType.Global

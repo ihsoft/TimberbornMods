@@ -5,10 +5,10 @@
 using System;
 using System.Collections.Generic;
 using Bindito.Core;
+using IgorZ.SmartPower.Core;
 using IgorZ.TimberDev.Utils;
 using Timberborn.EntityPanelSystem;
 
-// ReSharper disable once CheckNamespace
 namespace IgorZ.SmartPower.UI {
 
 [Context("Game")]

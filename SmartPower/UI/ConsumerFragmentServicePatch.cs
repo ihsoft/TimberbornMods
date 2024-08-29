@@ -11,7 +11,6 @@ using UnityEngine.UIElements;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
 
-// ReSharper disable once CheckNamespace
 namespace IgorZ.SmartPower.UI {
 
 /// <summary>Adds smart mechanical building status to the stock consumer building UI fragment.</summary>

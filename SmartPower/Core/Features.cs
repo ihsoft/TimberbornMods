@@ -7,9 +7,9 @@ using IgorZ.TimberDev.Utils;
 using Timberborn.ModManagerScene;
 using UnityDev.Utils.LogUtilsLite;
 
-// ReSharper disable once CheckNamespace
-namespace IgorZ.SmartPower {
+namespace IgorZ.SmartPower.Core {
 
+// ReSharper disable once ClassNeverInstantiated.Global
 sealed class Features : IModStarter {
   /// <summary>Indicates that <see cref="DebugEx.Fine"/> methods should emit record to the log.</summary>
   public static bool DebugExVerboseLogging;

@@ -7,8 +7,7 @@ using Timberborn.BuildingsBlocking;
 using Timberborn.EnterableSystem;
 using Timberborn.MechanicalSystem;
 
-// ReSharper disable once CheckNamespace
-namespace IgorZ.SmartPower {
+namespace IgorZ.SmartPower.Core {
 
 /// <summary>
 /// Component that extends the <see cref="MechanicalBuilding"/> behavior to conserve energy when powered attraction has
