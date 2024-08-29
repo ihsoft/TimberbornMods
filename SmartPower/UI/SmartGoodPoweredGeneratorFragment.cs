@@ -20,8 +20,8 @@ namespace IgorZ.SmartPower.UI {
 sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
   const string NeverStopThisGeneratorLocKey = "IgorZ.SmartPower.PoweredGenerator.NeverStop";
   const string ChargeLevelLocKey = "IgorZ.SmartPower.PoweredGenerator.ChargeBatteriesRangeText";
-  const string ApplyToAllEnginesLocKey = "IgorZ.SmartPower.PoweredGenerator.ApplyToAllEngines";
-  const string AppliedToEnginesLocKey = "IgorZ.SmartPower.PoweredGenerator.AppliedToEngines";
+  const string ApplyToAllGeneratorsLocKey = "IgorZ.SmartPower.PoweredGenerator.ApplyToAllGenerators";
+  const string AppliedToGeneratorsLocKey = "IgorZ.SmartPower.PoweredGenerator.AppliedToGenerators";
 
   readonly UiFactory _uiFactory;
 
@@ -57,7 +57,7 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
     _chargeBatteriesText = _uiFactory.CreateLabel();
     
     _applyToAllEnginesButton = _uiFactory.UiBuilder.Create<GameButton>()
-        .SetLocKey(ApplyToAllEnginesLocKey)
+        .SetLocKey(ApplyToAllGeneratorsLocKey)
         .ModifyRoot(builder => builder.SetPadding(new Padding(2, 10, 2, 10)))
         .Build();
     _applyToAllEnginesButton.clicked += ApplyToAllEngines;
@@ -107,7 +107,7 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
       return;
     }
     _resetButtonCaptionTimestamp = -1;
-    _applyToAllEnginesButton.text = _uiFactory.Loc.T(ApplyToAllEnginesLocKey);
+    _applyToAllEnginesButton.text = _uiFactory.Loc.T(ApplyToAllGeneratorsLocKey);
     _applyToAllEnginesButton.SetEnabled(true);
   }
 
@@ -129,7 +129,7 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
       smartGenerator.DischargeBatteriesThreshold = _generator.DischargeBatteriesThreshold;
     }
     _resetButtonCaptionTimestamp = Time.unscaledTime + 1.0f;
-    _applyToAllEnginesButton.text = _uiFactory.Loc.T(AppliedToEnginesLocKey, affectedGenerators);
+    _applyToAllEnginesButton.text = _uiFactory.Loc.T(AppliedToGeneratorsLocKey, affectedGenerators);
     _applyToAllEnginesButton.SetEnabled(false);
   }
 }
