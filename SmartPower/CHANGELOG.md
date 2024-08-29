@@ -1,4 +1,4 @@
-# v1.10.1 (started on 8/24/2024)
+# v1.10.1 (28 Aug 2024)
 * [Enhancement] Add smart power control for power wheels.
 * [Fix] Game crashes when trying to apply settings on incomplete engine. 
 * [Fix] Properly handle 0% and 100% setting in Engine settings.
