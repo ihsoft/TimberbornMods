@@ -8,7 +8,7 @@
         <ProjectGuid>{8E118562-AF70-4754-8746-D8B39E94DF73}</ProjectGuid>
         <OutputType>Library</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>SmartPower</RootNamespace>
+        <RootNamespace>IgorZ.SmartPower</RootNamespace>
         <AssemblyName>SmartPower</AssemblyName>
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
@@ -75,17 +75,21 @@
       <Compile Include="..\UnityDevLite\TypeUtils.cs">
         <Link>UnityDevLite\TypeUtils.cs</Link>
       </Compile>
+      <Compile Include="Core\AutoPausePowerGenerator.cs" />
       <Compile Include="Core\Configurator.cs" />
       <Compile Include="Core\Features.cs" />
       <Compile Include="Core\IAdjustablePowerInput.cs" />
       <Compile Include="Core\MechanicalBuildingPatch.cs" />
+      <Compile Include="Core\PowerOutputBalancer.cs" />
       <Compile Include="Core\SmartGoodPoweredGenerator.cs" />
       <Compile Include="Core\SmartManufactory.cs" />
       <Compile Include="Core\SmartPoweredAttraction.cs" />
+      <Compile Include="Core\WalkerPoweredGeneratorPatch.cs" />
       <Compile Include="Properties\AssemblyInfo.cs" />
       <Compile Include="UI\Configurator.cs" />
       <Compile Include="UI\ConsumerFragmentServicePatch.cs" />
       <Compile Include="UI\NetworkFragmentServicePatch.cs" />
+      <Compile Include="UI\PowerOutputBalancerFragment.cs" />
       <Compile Include="UI\SmartGoodPoweredGeneratorFragment.cs" />
       <Compile Include="UI\StateTextFormatter.cs" />
     </ItemGroup>
@@ -216,6 +220,24 @@
       <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.MechanicalSystemUI.dll" Publicize="true" />
     </ItemGroup>
     <ItemGroup>
+      <Content Include="..\ModsUnityProject\Assets\Mods\SmartPower\Data\Localizations\deDE.csv">
+        <Link>Localizations\deDE.csv</Link>
+      </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\SmartPower\Data\Localizations\deDE.csv.meta">
+        <Link>Localizations\deDE.csv.meta</Link>
+      </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\SmartPower\Data\Localizations\enUS.csv">
+        <Link>Localizations\enUS.csv</Link>
+      </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\SmartPower\Data\Localizations\enUS.csv.meta">
+        <Link>Localizations\enUS.csv.meta</Link>
+      </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\SmartPower\Data\Localizations\ruRU.csv">
+        <Link>Localizations\ruRU.csv</Link>
+      </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\SmartPower\Data\Localizations\ruRU.csv.meta">
+        <Link>Localizations\ruRU.csv.meta</Link>
+      </Content>
       <Content Include="..\ModsUnityProject\Assets\Mods\SmartPower\manifest.json">
         <Link>manifest.json</Link>
       </Content>

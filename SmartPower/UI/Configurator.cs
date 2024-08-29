@@ -23,19 +23,25 @@ sealed class Configurator : IConfigurator {
     }
     HarmonyPatcher.PatchRepeated(PatchId, patches.ToArray());
     containerDefinition.Bind<SmartGoodPoweredGeneratorFragment>().AsSingleton();
+    containerDefinition.Bind<PowerOutputBalancerFragment>().AsSingleton();
     containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
   }
 
   sealed class EntityPanelModuleProvider : IProvider<EntityPanelModule> {
     readonly SmartGoodPoweredGeneratorFragment _goodPoweredGeneratorFragment;
+    readonly PowerOutputBalancerFragment _powerOutputBalancerFragment;
 
-    public EntityPanelModuleProvider(SmartGoodPoweredGeneratorFragment goodPoweredGeneratorFragment) {
+    public EntityPanelModuleProvider(
+        SmartGoodPoweredGeneratorFragment goodPoweredGeneratorFragment,
+        PowerOutputBalancerFragment powerOutputBalancerFragment) {
       _goodPoweredGeneratorFragment = goodPoweredGeneratorFragment;
+      _powerOutputBalancerFragment = powerOutputBalancerFragment;
     }
 
     public EntityPanelModule Get() {
       var builder = new EntityPanelModule.Builder();
       builder.AddMiddleFragment(_goodPoweredGeneratorFragment);
+      builder.AddMiddleFragment(_powerOutputBalancerFragment);
       return builder.Build();
     }
   }
