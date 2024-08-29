@@ -2,18 +2,25 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System.Reflection;
 using HarmonyLib;
 using Timberborn.BaseComponentSystem;
 using Timberborn.MechanicalSystem;
 using UnityDev.Utils.LogUtilsLite;
 
+// ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
+
 // ReSharper disable once CheckNamespace
 namespace IgorZ.SmartPower {
 
-[HarmonyPatch(typeof(MechanicalBuilding), nameof(MechanicalBuilding.UpdateNodeCharacteristics))]
-sealed class MechanicalBuildingPatch {
-  // ReSharper disable once UnusedMember.Local
+[HarmonyPatch]
+static class MechanicalBuildingPatch {
+  static MethodBase TargetMethod() {
+    return AccessTools.DeclaredMethod("Timberborn.MechanicalSystem.MechanicalBuilding:UpdateNodeCharacteristics");
+  }
+
+  // This method needs publicized Timberborn.MechanicalSystem.
   static bool Prefix(BaseComponent __instance, MechanicalNode ____mechanicalNode) {
     var adjustablePowerInput = __instance.GetComponentFast<IAdjustablePowerInput>();
     if (adjustablePowerInput == null) {

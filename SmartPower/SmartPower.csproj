@@ -217,7 +217,6 @@
       <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
       <!-- Publicize directly when referencing -->
       <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.MechanicalSystem.dll" Publicize="true" />
-      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.MechanicalSystemUI.dll" Publicize="true" />
     </ItemGroup>
     <ItemGroup>
       <Content Include="..\ModsUnityProject\Assets\Mods\SmartPower\Data\Localizations\deDE.csv">
