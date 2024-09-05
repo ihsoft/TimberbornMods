@@ -1,4 +1,4 @@
-# v1.10.1 (28 Aug 2024)
+# v1.10.2 (5 Sep 2024)
 * [Enhancement] Add smart power control for power wheels.
 * [Update] Change `deDE` strings.
 * [Fix] Game crashes when trying to apply settings on incomplete engine. 
