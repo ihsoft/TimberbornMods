@@ -2,16 +2,15 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using Bindito.Core;
 using IgorZ.TimberDev.Utils;
-using TimberApi.ConfiguratorSystem;
-using TimberApi.SceneSystem;
+using Timberborn.ModManagerScene;
 using UnityDev.Utils.LogUtilsLite;
 
 namespace Automation.AutomationSystem {
 
-[Configurator(SceneEntrypoint.All)]
-sealed class Features : IConfigurator {
+sealed class Features : IModStarter {
   /// <summary>Indicates that <see cref="DebugEx.Fine"/> methods should emit record to the log.</summary>
   public static bool DebugExVerboseLogging;
 
@@ -24,8 +23,14 @@ sealed class Features : IConfigurator {
     }
   }
 
-  static Features() {
-    FeatureController.ReadFeatures(Consume);
+  /// <inheritdoc/>
+  public void StartMod() {
+    throw new Exception("We're not supposed to be here!");
+  }
+
+  /// <inheritdoc/>
+  public void StartMod(IModEnvironment modEnvironment) {
+    FeatureController.ReadFeatures(modEnvironment.ModPath, Consume);
   }
 
   static bool Consume(string name, bool enabled, string value) {

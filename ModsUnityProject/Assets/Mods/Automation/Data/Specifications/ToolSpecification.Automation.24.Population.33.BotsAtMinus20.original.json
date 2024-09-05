@@ -1,0 +1,22 @@
+{
+  "Id": "Automation.Tmpl.Population.BotsAtMinus20",
+  "GroupId": "AutomationPopulationToolGroupId",
+  "Type": "Automation.Tools.ApplyTemplateTool",
+  "Order": 33,
+  "Icon": "Sprites/IgorZ/tool-bots-20",
+  "NameLocKey": "IgorZ.Automation.Tool.tmpl.BotsAtMinus20.DisplayName",
+  "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.BotsAtMinus20.Description",
+  "ToolInformation": {
+    "TemplateFamilyName": "Population",
+    "Rules": [
+      {
+        "Condition": { "TypeId": "Automation.Conditions.BotPopulationBelowThresholdCondition", "Value": -20, "RelativeTo": "CurrentLevel" },
+        "Action": { "TypeId": "Automation.Actions.UnpauseAction" }
+      },
+      {
+        "Condition": { "TypeId": "Automation.Conditions.BotPopulationAboveThresholdCondition", "Value": -19, "RelativeTo": "CurrentLevel" },
+        "Action": { "TypeId": "Automation.Actions.PauseAction" }
+      }
+    ]
+  }
+}

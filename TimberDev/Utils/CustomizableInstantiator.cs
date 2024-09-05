@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using Bindito.Unity;
 using HarmonyLib;
-using IgorZ.TimberDev.Utils;
 using UnityEngine;
 
 // ReSharper disable UnusedMember.Local
