@@ -1,7 +1,8 @@
-// Timberborn Mod: SmartPower
+﻿// Timberborn Mod: SmartPower
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System.Linq;
 using IgorZ.SmartPower.Core;
 using IgorZ.TimberDev.UI;
 using TimberApi.UIBuilderSystem.StylingElements;
@@ -14,9 +15,8 @@ using UnityEngine.UIElements;
 
 namespace IgorZ.SmartPower.UI {
 
-/// <summary>UI fragment that controls <see cref="SmartGoodPoweredGenerator"/> settings.</summary>
-sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
-  const string NeverStopThisGeneratorLocKey = "IgorZ.SmartPower.PoweredGenerator.NeverStop";
+sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
+  const string AutomateLocKey = "IgorZ.SmartPower.PoweredGenerator.Automated";
   const string ChargeLevelLocKey = "IgorZ.SmartPower.PoweredGenerator.ChargeBatteriesRangeText";
   const string ApplyToAllGeneratorsLocKey = "IgorZ.SmartPower.PoweredGenerator.ApplyToAllGenerators";
   const string AppliedToGeneratorsLocKey = "IgorZ.SmartPower.PoweredGenerator.AppliedToGenerators";
@@ -24,41 +24,41 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
   readonly UiFactory _uiFactory;
 
   VisualElement _root;
-  Toggle _neverShutdownCheckbox;
+  Toggle _automateCheckbox;
   Label _chargeBatteriesText;
   MinMaxSlider _chargeBatteriesSlider;
-  SmartGoodPoweredGenerator _generator;
-  Button _applyToAllEnginesButton;
+  Button _applyToAllGeneratorsButton;
 
+  PowerOutputBalancer _balancer;
   float _resetButtonCaptionTimestamp = -1;
 
-  public SmartGoodPoweredGeneratorFragment(UiFactory uiFactory) {
+  public PowerOutputBalancerFragment(UiFactory uiFactory) {
     _uiFactory = uiFactory;
   }
 
   public VisualElement InitializeFragment() {
-    _neverShutdownCheckbox = _uiFactory.CreateToggle(
-        NeverStopThisGeneratorLocKey, _ => {
-          _generator.NeverShutdown = _neverShutdownCheckbox.value;
+    _automateCheckbox = _uiFactory.CreateToggle(
+        AutomateLocKey, _ => {
+          _balancer.Automate = _automateCheckbox.value;
           UpdateControls();
         });
-    _neverShutdownCheckbox.style.marginBottom = 5;
+    _automateCheckbox.style.marginBottom = 5;
 
     _chargeBatteriesSlider = _uiFactory.CreateMinMaxSlider(
         evt => {
-          _generator.DischargeBatteriesThreshold = evt.newValue.x;
-          _generator.ChargeBatteriesThreshold = evt.newValue.y;
+          _balancer.DischargeBatteriesThreshold = evt.newValue.x;
+          _balancer.ChargeBatteriesThreshold = evt.newValue.y;
           UpdateControls();
         }, 0f, 1.0f, 0.10f, stepSize: 0.05f);
     _chargeBatteriesSlider.style.marginBottom = 5;
 
     _chargeBatteriesText = _uiFactory.CreateLabel();
-    
-    _applyToAllEnginesButton = _uiFactory.UiBuilder.Create<GameButton>()
+
+    _applyToAllGeneratorsButton = _uiFactory.UiBuilder.Create<GameButton>()
         .SetLocKey(ApplyToAllGeneratorsLocKey)
         .ModifyRoot(builder => builder.SetPadding(new Padding(2, 10, 2, 10)))
         .Build();
-    _applyToAllEnginesButton.clicked += ApplyToAllEngines;
+    _applyToAllGeneratorsButton.clicked += ApplyToAllGenerators;
 
     var center = new VisualElement {
         style = {
@@ -66,10 +66,10 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
             flexDirection = FlexDirection.Row
         }
     };
-    center.Add(_applyToAllEnginesButton);
+    center.Add(_applyToAllGeneratorsButton);
 
     _root = _uiFactory.CreateCenteredPanelFragmentBuilder()
-        .AddComponent(_neverShutdownCheckbox)
+        .AddComponent(_automateCheckbox)
         .AddComponent(_chargeBatteriesText)
         .AddComponent(_chargeBatteriesSlider)
         .AddComponent(center)
@@ -80,55 +80,52 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
   }
 
   public void ShowFragment(BaseComponent entity) {
-    _generator = entity.GetComponentFast<SmartGoodPoweredGenerator>();
-    if (_generator == null) {
+    _balancer = entity.GetComponentFast<PowerOutputBalancer>();
+    if (_balancer == null) {
       return;
     }
-    _neverShutdownCheckbox.SetValueWithoutNotify(_generator.NeverShutdown);
+    _automateCheckbox.SetValueWithoutNotify(_balancer.Automate);
     _chargeBatteriesSlider.SetValueWithoutNotify(
-        new Vector2(_generator.DischargeBatteriesThreshold, _generator.ChargeBatteriesThreshold));
+        new Vector2(_balancer.DischargeBatteriesThreshold, _balancer.ChargeBatteriesThreshold));
     UpdateControls();
     _root.ToggleDisplayStyle(visible: true);
+    _applyToAllGeneratorsButton.ToggleDisplayStyle(visible: _balancer.enabled);
   }
 
   public void ClearFragment() {
     _root.ToggleDisplayStyle(visible: false);
-    _generator = null;
+    _balancer = null;
   }
 
   public void UpdateFragment() {
-    if (!_generator) {
+    if (!_balancer) {
       return;
     }
-    _applyToAllEnginesButton.ToggleDisplayStyle(visible: _generator.enabled);
+    _applyToAllGeneratorsButton.ToggleDisplayStyle(visible: _balancer.enabled);
     if (_resetButtonCaptionTimestamp < 0 || _resetButtonCaptionTimestamp > Time.unscaledTime) {
       return;
     }
     _resetButtonCaptionTimestamp = -1;
-    _applyToAllEnginesButton.text = _uiFactory.Loc.T(ApplyToAllGeneratorsLocKey);
-    _applyToAllEnginesButton.SetEnabled(true);
+    _applyToAllGeneratorsButton.text = _uiFactory.Loc.T(ApplyToAllGeneratorsLocKey);
+    _applyToAllGeneratorsButton.SetEnabled(true);
   }
 
   void UpdateControls() {
     _chargeBatteriesText.text = _uiFactory.Loc.T(
-        ChargeLevelLocKey, Mathf.RoundToInt(_generator.DischargeBatteriesThreshold * 100),
-        Mathf.RoundToInt(_generator.ChargeBatteriesThreshold * 100));
+        ChargeLevelLocKey, Mathf.RoundToInt(_balancer.DischargeBatteriesThreshold * 100),
+        Mathf.RoundToInt(_balancer.ChargeBatteriesThreshold * 100));
   }
 
-  void ApplyToAllEngines() {
+  void ApplyToAllGenerators() {
     var affectedGenerators = 0;
-    foreach (var mechanicalNode in _generator.MechanicalGraph.Nodes) {
-      var smartGenerator = mechanicalNode.GetComponentFast<SmartGoodPoweredGenerator>();
-      if (!smartGenerator || smartGenerator == _generator) {
-        continue;
-      }
+    foreach (var balancer in _balancer.AllBalancers.Where(x => x != _balancer)) {
       affectedGenerators++;
-      smartGenerator.ChargeBatteriesThreshold = _generator.ChargeBatteriesThreshold;
-      smartGenerator.DischargeBatteriesThreshold = _generator.DischargeBatteriesThreshold;
+      balancer.ChargeBatteriesThreshold = _balancer.ChargeBatteriesThreshold;
+      balancer.DischargeBatteriesThreshold = _balancer.DischargeBatteriesThreshold;
     }
     _resetButtonCaptionTimestamp = Time.unscaledTime + 1.0f;
-    _applyToAllEnginesButton.text = _uiFactory.Loc.T(AppliedToGeneratorsLocKey, affectedGenerators);
-    _applyToAllEnginesButton.SetEnabled(false);
+    _applyToAllGeneratorsButton.text = _uiFactory.Loc.T(AppliedToGeneratorsLocKey, affectedGenerators);
+    _applyToAllGeneratorsButton.SetEnabled(false);
   }
 }
 

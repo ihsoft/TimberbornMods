@@ -4,17 +4,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Bindito.Core;
+using IgorZ.SmartPower.Core;
 using IgorZ.TimberDev.Utils;
-using TimberApi.ConfiguratorSystem;
-using TimberApi.SceneSystem;
 using Timberborn.EntityPanelSystem;
 
-// ReSharper disable once CheckNamespace
 namespace IgorZ.SmartPower.UI {
 
-[Configurator(SceneEntrypoint.InGame)]
+[Context("Game")]
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).FullName;
@@ -26,19 +23,25 @@ sealed class Configurator : IConfigurator {
     }
     HarmonyPatcher.PatchRepeated(PatchId, patches.ToArray());
     containerDefinition.Bind<SmartGoodPoweredGeneratorFragment>().AsSingleton();
+    containerDefinition.Bind<PowerOutputBalancerFragment>().AsSingleton();
     containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
   }
 
   sealed class EntityPanelModuleProvider : IProvider<EntityPanelModule> {
-    readonly SmartGoodPoweredGeneratorFragment _automationFragment;
+    readonly SmartGoodPoweredGeneratorFragment _goodPoweredGeneratorFragment;
+    readonly PowerOutputBalancerFragment _powerOutputBalancerFragment;
 
-    public EntityPanelModuleProvider(SmartGoodPoweredGeneratorFragment automationFragment) {
-      _automationFragment = automationFragment;
+    public EntityPanelModuleProvider(
+        SmartGoodPoweredGeneratorFragment goodPoweredGeneratorFragment,
+        PowerOutputBalancerFragment powerOutputBalancerFragment) {
+      _goodPoweredGeneratorFragment = goodPoweredGeneratorFragment;
+      _powerOutputBalancerFragment = powerOutputBalancerFragment;
     }
 
     public EntityPanelModule Get() {
       var builder = new EntityPanelModule.Builder();
-      builder.AddBottomFragment(_automationFragment);
+      builder.AddMiddleFragment(_goodPoweredGeneratorFragment);
+      builder.AddMiddleFragment(_powerOutputBalancerFragment);
       return builder.Build();
     }
   }

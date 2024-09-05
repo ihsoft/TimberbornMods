@@ -1,0 +1,26 @@
+[h1]Overview[/h1]
+This mod modifies some power generating and consuming buildings to optimize power usage. It also adds some UI sugar to the existing components.
+
+[h1]Ironteeth Engine[/h1]
+[list]
+[*] Engines automatically turn on and off to minimize the wood consumption while providing enough power supply to the network.
+[*] If there are batteries in the network, then the engines will only produce energy to keep the total network charge reserve within a specified range. E.g. "not less than 10%, but not greater than 35%. This can be configured per engine.
+[/list]
+
+[h1]Ironteeth bot charging station[/h1]
+The charging station consumes full power only when charging a bot. In the idle state, it's only taking 1hp.
+
+[h1]Powered attractions[/h1]
+If an attraction needs energy, but have no attendees, then it will go into low power mode and only consumes 1hp.
+
+[h1]Powered manufactories[/h1]
+If a manufactory has assigned worker, but the product cannot be produced for any reason, then the building goes into power saving mode in which it only consumes 10% of the nominal power. Buildings in this mode will have a special notification icon and an explanation of why the mode was activated. Also, if no recipe selected, the building doesn't consume power at all.
+
+[h1]Mechanical nodes[/h1]
+All buildings with a mechanical node like shafts or generators get a UI extension. They will show information about batteries in the network: remaining charge, charge/discharge rate, and the remaining time estimation.
+
+
+Discord: https://discord.com/channels/558398674389172225/1129907373155291258
+See more details in Wiki: https://github.com/ihsoft/TimberbornMods/wiki/Smart-Power
+Report a bug: https://github.com/ihsoft/TimberbornMods/labels/smartpower
+GitHub repository: https://github.com/ihsoft/TimberbornMods

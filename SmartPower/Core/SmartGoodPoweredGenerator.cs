@@ -9,8 +9,7 @@ using Timberborn.Persistence;
 using Timberborn.PowerGenerating;
 using UnityDev.Utils.LogUtilsLite;
 
-// ReSharper disable once CheckNamespace
-namespace IgorZ.SmartPower {
+namespace IgorZ.SmartPower.Core {
 
 /// <summary>Smart version of the stock power generator.</summary>
 /// <remarks>
@@ -29,6 +28,7 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
   int _skipTicks;
 
   #region TickableComponent implementation
+
   /// <inheritdoc/>
   public override void Tick() {
     if ((_pausable == null || !_pausable.Paused) && _mechanicalNode.Graph != null) {
@@ -61,9 +61,11 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
     ChargeBatteriesThreshold = state.GetValueOrNullable(ChargeBatteriesThresholdKey) ?? MaxBatteryChargeRatio;
     DischargeBatteriesThreshold = state.GetValueOrNullable(DischargeBatteriesThresholdKey) ?? MinBatteryChargeRatio;
   }
+
   #endregion
 
   #region API
+
   /// <summary>Tells the smart logic to never shutdown this generator.</summary>
   public bool NeverShutdown { get; set; }
 
@@ -72,9 +74,14 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
 
   /// <summary>The minimum level to let the batteries to discharge to.</summary>
   public float DischargeBatteriesThreshold { get; set; } = MinBatteryChargeRatio;
+
+  /// <summary>Returns the mechanical graph this generator is connected to.</summary>
+  public MechanicalGraph MechanicalGraph => _mechanicalNode.Graph;
+
   #endregion
 
   #region Implementation
+
   new void Awake() {
     base.Awake();
     _goodConsumingBuilding = GetComponentFast<GoodConsumingBuilding>();
@@ -109,7 +116,7 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
     if (_goodConsumingBuilding.ConsumptionPaused) {
       // Resume if need power to charge batteries or cover shortage.
       if (!hasBatteries && demand > supply
-          || hasBatteries && batteriesChargeRatio < DischargeBatteriesThreshold
+          || hasBatteries && batteriesChargeRatio <= DischargeBatteriesThreshold
           || NeverShutdown) {
         HostedDebugLog.Fine(
             this, "Start good consumption: demand={0}, supply={1}, batteries={2:0.00}, threshold={3}",
@@ -124,7 +131,7 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
     } else if (!NeverShutdown) {
       // Pause if no ways to spend the excess power from the generator.
       if (!hasBatteries && supply - _maxPower >= demand 
-          || hasBatteries && batteriesChargeRatio > ChargeBatteriesThreshold) {
+          || hasBatteries && batteriesChargeRatio >= ChargeBatteriesThreshold) {
         HostedDebugLog.Fine(
             this, "Stop good consumption: demand={0}, supply={1}, batteries={2:0.00}, check={3}",
             demand, supply, batteriesChargeRatio, ChargeBatteriesThreshold);

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: ThunderKitSettings
   m_EditorClassIdentifier: 
   FirstLoad: 1
-  ShowOnStartup: 1
+  ShowOnStartup: 0
   GameExecutable: 
   GamePath: 
   Is64Bit: 0

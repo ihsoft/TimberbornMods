@@ -18,13 +18,16 @@ static class PrefabPatcher {
   /// <summary>Adds a new component to prefab based in the filter condition.</summary>
   /// <param name="prefab">Prefab to add the component to.</param>
   /// <param name="checkDeps">Filter condition.</param>
+  /// <param name="onNewComponent">Called when a new component is added.</param>
   /// <typeparam name="T">type of the component to add.</typeparam>
-  public static void AddComponent<T>(GameObject prefab, Func<GameObject, bool> checkDeps) where T : BaseComponent {
-    if (prefab.GetComponent<T>() != null || !checkDeps(prefab)) {
+  public static void AddComponent<T>(
+      GameObject prefab, Func<GameObject, bool> checkDeps, Action<T> onNewComponent = null) where T : BaseComponent {
+    if (prefab.GetComponent<T>() || !checkDeps(prefab)) {
       return;
     }
     DebugEx.Fine("Add component to prefab: name={0}, component={1}", prefab.name, typeof(T));
-    prefab.AddComponent<T>();
+    var component = prefab.AddComponent<T>();
+    onNewComponent?.Invoke(component);
   }
 
   /// <summary>Replaces an existing component with a new one.</summary>
@@ -35,9 +38,11 @@ static class PrefabPatcher {
   /// <param name="checkDeps">Filter condition.</param>
   /// <typeparam name="TSource">type of the component to remove.</typeparam>
   /// <typeparam name="TTarget">type of the component to add.</typeparam>
-  public static void ReplaceComponent<TSource, TTarget>(GameObject prefab, Func<GameObject, bool> checkDeps)
+  public static void ReplaceComponent<TSource, TTarget>(GameObject prefab, Func<GameObject, bool> checkDeps = null)
       where TSource : BaseComponent where TTarget : BaseComponent {
-    if (prefab.GetComponent<TTarget>() != null || prefab.GetComponent<TSource>() == null || !checkDeps(prefab)) {
+    if (prefab.GetComponent<TTarget>() != null
+        || prefab.GetComponent<TSource>() == null
+        || checkDeps != null && !checkDeps(prefab)) {
       return;
     }
     DebugEx.Fine("Replace component on prefab: name={0}, oldComponent={1}, newComponent={2}",
