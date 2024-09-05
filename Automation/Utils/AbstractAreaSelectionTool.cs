@@ -10,7 +10,6 @@ using Timberborn.AreaSelectionSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BuilderPrioritySystem;
 using Timberborn.InputSystem;
-using Timberborn.SelectionToolSystem;
 using UnityEngine;
 
 namespace Automation.Utils {

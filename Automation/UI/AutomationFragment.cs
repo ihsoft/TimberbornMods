@@ -5,7 +5,8 @@
 using System.Collections.Generic;
 using System.Text;
 using Automation.AutomationSystem;
-using TimberApi.UiBuilderSystem;
+using IgorZ.TimberDev.UI;
+using TimberApi.UIBuilderSystem;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
@@ -19,27 +20,35 @@ sealed class AutomationFragment : IEntityPanelFragment {
   const string RulesAreaCaptionTextLocKey = "IgorZ.Automation.AutomationFragment.RulesAreaCaptionTextLocKey";
   const string RuleTextLocKey = "IgorZ.Automation.AutomationFragment.RuleTextLocKey";
 
-  readonly UIBuilder _builder;
-  readonly ILoc _loc;
+  readonly UiFactory _uiFactory;
 
   VisualElement _root;
   Label _caption;
   Label _rulesList;
 
-  public AutomationFragment(UIBuilder builder, ILoc loc) {
-    _builder = builder;
-    _loc = loc;
+  public AutomationFragment(UiFactory uiFactory) {
+    _uiFactory = uiFactory;
   }
 
   public VisualElement InitializeFragment() {
-    var presets = _builder.Presets();
-    _caption = presets.Labels().Label(color: Color.cyan);
-    _rulesList = presets.Labels().GameText();
+    // var presets = _builder.Presets();
+    // _caption = presets.Labels().Label(color: Color.cyan);
+    // _rulesList = presets.Labels().GameText();
+    //
+    // UIFragmentBuilder uIFragmentBuilder = _builder.CreateFragmentBuilder()
+    //     .AddComponent(_caption)
+    //     .AddComponent(_rulesList);
+    // _root = uIFragmentBuilder.BuildAndInitialize();
+    // _root.ToggleDisplayStyle(visible: false);
+    // return _root;
+    _caption = _uiFactory.CreateLabel();
+    _caption.style.color = Color.cyan;
 
-    UIFragmentBuilder uIFragmentBuilder = _builder.CreateFragmentBuilder()
-        .AddComponent(_caption)
-        .AddComponent(_rulesList);
-    _root = uIFragmentBuilder.BuildAndInitialize();
+    _rulesList = _uiFactory.CreateLabel();
+
+    _root = _uiFactory.CreateCenteredPanelFragmentBuilder()
+        .AddComponent(_caption).AddComponent(_rulesList)
+        .BuildAndInitialize();
     _root.ToggleDisplayStyle(visible: false);
     return _root;
   }
@@ -67,9 +76,9 @@ sealed class AutomationFragment : IEntityPanelFragment {
         rules.AppendLine();
       }
       rules.Append(SpecialStrings.RowStarter);
-      rules.Append(_loc.T(RuleTextLocKey, action.Condition.UiDescription, action.UiDescription));
+      rules.Append(_uiFactory.Loc.T(RuleTextLocKey, action.Condition.UiDescription, action.UiDescription));
     }
-    _caption.text = _loc.T(RulesAreaCaptionTextLocKey);
+    _caption.text = _uiFactory.Loc.T(RulesAreaCaptionTextLocKey);
     _rulesList.text = rules.ToString();
     _root.ToggleDisplayStyle(visible: true);
   }

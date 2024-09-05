@@ -1,0 +1,13 @@
+{
+  "Id": "AutomationPopulationToolGroupId",
+  "GroupId": "AutomationToolGroupId",
+  "Type": "AutomationToolGroup",
+  "Layout": "Green",
+  "Order": 24,
+  "Icon": "Sprites/IgorZ/tool-group-population",
+  "NameLocKey": "IgorZ.Automation.ToolGroup.Population.DisplayName",
+  "FallbackGroup": false,
+  "GroupInformation": {
+    "BottomBarSection": 0
+  }
+}

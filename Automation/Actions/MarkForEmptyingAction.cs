@@ -19,7 +19,7 @@ namespace Automation.Actions {
 /// </remarks>
 public sealed class MarkForEmptyingAction : AutomationActionBase {
   const string DescriptionLocKey = "IgorZ.Automation.MarkForEmptyingAction.Description";
-  const string CustomStatusIcon = "igorz.automation/ui_icons/status-icon-emptying";
+  const string CustomStatusIcon = "IgorZ/status-icon-emptying";
   const string CustomStatusDescriptionKey = "IgorZ.Automation.EmptyOutputStore.CustomStatus";
 
   /// <summary>
