@@ -7,6 +7,13 @@ This mod modifies some power generating and consuming buildings to optimize powe
 [*] If there are batteries in the network, then the engines will only produce energy to keep the total network charge reserve within a specified range. E.g. "not less than 10%, but not greater than 35%. This can be configured per engine.
 [/list]
 
+[h1]Power Wheel[/h1]
+[list]
+[*] If automation is turned on for the wheel, it will pause and resume based on the demand/supply.
+[*] The same approach to battery charging applies as for the Engine. Engine and Power Wheel settings are not shared.
+[/list]
+Wheels differ slightly from Engines in terms of how they compensate for supply shortages. It may take a significant amount of time before an unpaused wheel starts producing energy. Therefore, when a shortage is detected, all the wheels in the network will start. Then, some of them that are not needed will pause.
+
 [h1]Ironteeth bot charging station[/h1]
 The charging station consumes full power only when charging a bot. In the idle state, it's only taking 1hp.
 
