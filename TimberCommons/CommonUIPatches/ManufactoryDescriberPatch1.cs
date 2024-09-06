@@ -13,7 +13,7 @@ namespace IgorZ.TimberCommons.CommonUIPatches {
 
 /// <summary>Harmony patch to show days and hours for the slow recipes.</summary>
 [HarmonyPatch(typeof(ManufactoryDescriber), nameof(ManufactoryDescriber.GetCraftingTime))]
-static class ManufactoryDescriberGetCraftingTimePatch {
+static class ManufactoryDescriberPatch1 {
   // ReSharper disable once UnusedMember.Local
   static bool Prefix(RecipeSpecification productionRecipe, float workers,
                      ILoc ____loc, bool __runOriginal, ref string __result) {

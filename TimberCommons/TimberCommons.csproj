@@ -76,16 +76,16 @@
         <Link>UnityDevLite\TypeUtils.cs</Link>
       </Compile>
       <Compile Include="CommonQoLPatches\Configurator.cs" />
-      <Compile Include="CommonQoLPatches\ContaminationApplierTryApplyContaminationPatch.cs" />
+      <Compile Include="CommonQoLPatches\ContaminationApplierPatch.cs" />
       <Compile Include="CommonUIPatches\Configurator.cs" />
       <Compile Include="CommonUIPatches\GoodConsumingBuildingDescriberPatch.cs" />
       <Compile Include="CommonUIPatches\GoodConsumingBuildingFragmentPatch.cs" />
       <Compile Include="CommonUIPatches\GrowableFragmentPatch.cs" />
       <Compile Include="CommonUIPatches\GrowableToolPanelItemFactoryPatch.cs" />
-      <Compile Include="CommonUIPatches\ManufactoryDescriberGetCraftingTimePatch.cs" />
-      <Compile Include="CommonUIPatches\ManufactoryDescriberGetInputsPatch.cs" />
-      <Compile Include="CommonUIPatches\ManufactoryInventoryFragmentInitializeFragmentPatch.cs" />
-      <Compile Include="CommonUIPatches\ManufactoryInventoryFragmentUpdateFragmentPatch.cs" />
+      <Compile Include="CommonUIPatches\ManufactoryDescriberPatch1.cs" />
+      <Compile Include="CommonUIPatches\ManufactoryDescriberPatch2.cs" />
+      <Compile Include="CommonUIPatches\ManufactoryInventoryFragmentPatch1.cs" />
+      <Compile Include="CommonUIPatches\ManufactoryInventoryFragmentPatch2.cs" />
       <Compile Include="Common\Configurator.cs" />
       <Compile Include="Common\Features.cs" />
       <Compile Include="Common\IConsumptionRateFormatter.cs" />
@@ -105,7 +105,7 @@
       <Compile Include="WaterService\Configurator.cs" />
       <Compile Include="WaterService\DirectSoilMoistureSystemAccessor.cs" />
       <Compile Include="WaterService\SoilMoistureSimulatorPatch.cs" />
-      <Compile Include="WaterService\SoilMoistureMapUpdateDesertIntensityPatch.cs" />
+      <Compile Include="WaterService\SoilMoistureMapPatch.cs" />
     </ItemGroup>
     <ItemGroup>
       <Reference Include="0Harmony, Version=2.3.3.0, Culture=neutral, PublicKeyToken=null">

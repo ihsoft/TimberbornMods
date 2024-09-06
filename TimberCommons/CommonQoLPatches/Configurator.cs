@@ -18,8 +18,8 @@ sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     var patches = new List<Type>();
     if (Features.NoContaminationUnderground) {
-      patches.Add(typeof(ContaminationApplierTryApplyContaminationPatch));
-      ContaminationApplierTryApplyContaminationPatch.Initialize();
+      patches.Add(typeof(ContaminationApplierPatch));
+      ContaminationApplierPatch.Initialize();
     }
     if (patches.Count == 0) {
       return;

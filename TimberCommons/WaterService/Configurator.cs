@@ -16,7 +16,7 @@ sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     var patches = new List<Type> { typeof(SoilMoistureSimulatorPatch) };
     if (Features.OverrideDesertLevelsForWaterTowers) {
-      patches.Add(typeof(SoilMoistureMapUpdateDesertIntensityPatch));
+      patches.Add(typeof(SoilMoistureMapPatch));
     }
     HarmonyPatcher.PatchRepeated(GetType().AssemblyQualifiedName, patches.ToArray());
 

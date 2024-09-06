@@ -2,7 +2,6 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System;
 using HarmonyLib;
 using IgorZ.TimberCommons.Common;
 using IgorZ.TimberDev.UI;

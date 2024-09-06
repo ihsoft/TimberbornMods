@@ -14,9 +14,9 @@ namespace IgorZ.TimberCommons.CommonUIPatches {
 
 /// <summary>Harmony patch that adds "supply left" element to the manufactory UI fragment.</summary>
 /// <remarks>It only adds an element, but the actual handling is not made here.</remarks>
-/// <seealso cref="ManufactoryInventoryFragmentUpdateFragmentPatch"/>
+/// <seealso cref="ManufactoryInventoryFragmentPatch2"/>
 [HarmonyPatch(typeof(ManufactoryInventoryFragment), nameof(ManufactoryInventoryFragment.InitializeFragment))]
-static class ManufactoryInventoryFragmentInitializeFragmentPatch {
+static class ManufactoryInventoryFragmentPatch1 {
   const string GoodConsumingFragmentElementName = "Game/EntityPanel/GoodConsumingBuildingFragment";
 
   // ReSharper disable once UnusedMember.Local
@@ -31,8 +31,8 @@ static class ManufactoryInventoryFragmentInitializeFragmentPatch {
     }
     var hoursLeftBar = element.Q<ProgressBar>("ProgressBar");
     var hoursLeftLabel = element.Q<Label>("HoursLeft");
-    ManufactoryInventoryFragmentUpdateFragmentPatch.HoursLeftBar = hoursLeftBar;
-    ManufactoryInventoryFragmentUpdateFragmentPatch.HoursLeftLabel = hoursLeftLabel;
+    ManufactoryInventoryFragmentPatch2.HoursLeftBar = hoursLeftBar;
+    ManufactoryInventoryFragmentPatch2.HoursLeftLabel = hoursLeftLabel;
     if (hoursLeftBar == null || hoursLeftLabel == null) {
       DebugEx.Warning("Cannot copy GoodsConsumingBuildingFragment UI into ManufactoryInventoryFragment");
       return;

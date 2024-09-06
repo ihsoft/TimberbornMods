@@ -22,8 +22,8 @@ sealed class Configurator : IConfigurator {
     }
     var patches = new List<Type> {
         typeof(GoodConsumingBuildingDescriberPatch),
-        typeof(ManufactoryInventoryFragmentInitializeFragmentPatch),
-        typeof(ManufactoryInventoryFragmentUpdateFragmentPatch),
+        typeof(ManufactoryInventoryFragmentPatch1),
+        typeof(ManufactoryInventoryFragmentPatch2),
         typeof(GoodConsumingBuildingFragmentPatch),
     };
     CommonFormats.ResetCachedLocStrings();
@@ -32,10 +32,10 @@ sealed class Configurator : IConfigurator {
       patches.Add(typeof(GrowableFragmentPatch));
     }
     if (Features.ShowDaysHoursForSlowRecipes) {
-      patches.Add(typeof(ManufactoryDescriberGetCraftingTimePatch));
+      patches.Add(typeof(ManufactoryDescriberPatch1));
     }
     if (Features.ShowLongValueForLowFuelConsumptionRecipes) {
-      patches.Add(typeof(ManufactoryDescriberGetInputsPatch));
+      patches.Add(typeof(ManufactoryDescriberPatch2));
     }
     HarmonyPatcher.PatchRepeated(PatchId, patches.ToArray());
   }

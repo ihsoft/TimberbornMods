@@ -10,7 +10,7 @@ using UnityEngine;
 namespace IgorZ.TimberCommons.WaterService {
 
 [HarmonyPatch(typeof(SoilMoistureMap), nameof(SoilMoistureMap.UpdateDesertIntensity))]
-static class SoilMoistureMapUpdateDesertIntensityPatch {
+static class SoilMoistureMapPatch {
   // ReSharper disable once UnusedMember.Local
   static void Prefix(Vector2Int coordinates, ref float moistureLevel, bool __runOriginal) {
     if (!__runOriginal) {

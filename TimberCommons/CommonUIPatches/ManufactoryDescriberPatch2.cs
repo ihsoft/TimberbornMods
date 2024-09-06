@@ -17,7 +17,7 @@ namespace IgorZ.TimberCommons.CommonUIPatches {
 
 /// <summary>Harmony patch to show low fuel ingredient consumption rate in the recipe UIs.</summary>
 [HarmonyPatch(typeof(ManufactoryDescriber), nameof(ManufactoryDescriber.GetInputs))]
-static class ManufactoryDescriberGetInputsPatch {
+static class ManufactoryDescriberPatch2 {
   static void Postfix(RecipeSpecification productionRecipe, bool __runOriginal,
                       ref IEnumerable<VisualElement> __result) {
     if (!__runOriginal) {

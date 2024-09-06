@@ -14,9 +14,9 @@ using ProgressBar = Timberborn.CoreUI.ProgressBar;
 namespace IgorZ.TimberCommons.CommonUIPatches {
 
 /// <summary>Harmony patch to display "supply left" element in the manufactory UI fragment.</summary>
-/// <seealso cref="ManufactoryInventoryFragmentInitializeFragmentPatch"/>
+/// <seealso cref="ManufactoryInventoryFragmentPatch1"/>
 [HarmonyPatch(typeof(ManufactoryInventoryFragment), nameof(ManufactoryInventoryFragment.UpdateFragment))]
-static class ManufactoryInventoryFragmentUpdateFragmentPatch {
+static class ManufactoryInventoryFragmentPatch2 {
   internal static ProgressBar HoursLeftBar;
   internal static Label HoursLeftLabel;
 

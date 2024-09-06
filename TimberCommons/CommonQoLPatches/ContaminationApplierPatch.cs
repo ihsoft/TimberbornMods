@@ -14,7 +14,7 @@ using Timberborn.TerrainSystem;
 namespace IgorZ.TimberCommons.CommonQoLPatches {
 
 [HarmonyPatch(typeof(ContaminationApplier), nameof(ContaminationApplier.TryApplyContamination))]
-static class ContaminationApplierTryApplyContaminationPatch {
+static class ContaminationApplierPatch {
   static ITerrainService _terrainService;
 
   // ReSharper disable once UnusedMember.Local
