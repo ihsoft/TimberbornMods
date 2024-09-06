@@ -190,11 +190,17 @@
       <Reference Include="Timberborn.EntitySystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.EntitySystem.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.GoodConsumingBuildingSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.GoodConsumingBuildingSystem.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.Goods, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Goods.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.GoodsUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.GoodsUI.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.Growing, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Growing.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.InventorySystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.InventorySystem.dll</HintPath>
@@ -238,11 +244,17 @@
       <Reference Include="Timberborn.SingletonSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.SingletonSystem.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.SoilBarrierSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.SoilBarrierSystem.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.StatusSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.StatusSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.TemplateSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.TemplateSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.TerrainSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.TerrainSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.TerrainSystemRendering, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.TerrainSystemRendering.dll</HintPath>
@@ -252,6 +264,9 @@
       </Reference>
       <Reference Include="Timberborn.TimeSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.TimeSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.Workshops, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Workshops.dll</HintPath>
       </Reference>
       <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Unity\UnityEngine.CoreModule.dll</HintPath>
@@ -272,17 +287,18 @@
     <ItemGroup>
       <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
       <!-- Publicize directly when referencing -->
-      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.SoilBarrierSystem.dll" Publicize="true" />
-      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.SoilMoistureSystem.dll" Publicize="true" />
-      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.GoodConsumingBuildingSystemUI.dll" Publicize="true" />
+      <!-- Timberborn.GoodConsumingBuildingSystem.GoodConsumingBuilding -->
       <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.GoodConsumingBuildingSystem.dll" Publicize="true" />
-      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.WaterSystem.dll" Publicize="true" />
-      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.Workshops.dll" Publicize="true" />
+      <!-- Timberborn.Growing.Growable -->
+      <!-- Timberborn.Growing.GrowableSpec -->
       <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.Growing.dll" Publicize="true" />
-      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.GrowingUI.dll" Publicize="true" />
-      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.WorkshopsUI.dll" Publicize="true" />
-      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.TerrainSystem.dll" Publicize="true" />
-      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.BeaverContaminationSystem.dll" Publicize="true" />
+      <!-- Timberborn.Workshops.Manufactory -->
+      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.Workshops.dll" Publicize="true" />
+      <!-- Timberborn.SoilMoistureSystem.SoilMoistureMap -->
+      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.SoilMoistureSystem.dll" Publicize="true" />
+      <!-- Timberborn.SoilBarrierSystem.SoilBarrierSpec -->
+      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.SoilBarrierSystem.dll" Publicize="true" />
+      <!-- Timberborn.TerrainSystemRendering.TerrainMaterialMap -->
       <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.TerrainSystemRendering.dll" Publicize="true" />
     </ItemGroup>
     <ItemGroup>

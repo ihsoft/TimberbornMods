@@ -282,6 +282,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
 
     // Refresh the texture on game load.
     if (needTextureUpdate && Features.OverrideDesertLevelsForWaterTowers) {
+      // FIXME: Consider calling Tick() instead. It's public.
       _terrainMaterialMap.ProcessDesertTextureChanges();
       _terrainMaterialMap.ProcessDesertTextureChanges(); // Intentionally.
     }

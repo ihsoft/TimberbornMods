@@ -98,7 +98,7 @@ public sealed class GrowthRateModifier : BaseComponent {
 
   void Awake() {
     _growable = GetComponentFast<Growable>();
-    _originalGrowthTimeInDays = _growable._growableSpec._growthTimeInDays;
+    _originalGrowthTimeInDays = _growable._growableSpec.GrowthTimeInDays;
   }
 
   /// <summary>Calculates the effective multiplier and updates the growable settings.</summary>

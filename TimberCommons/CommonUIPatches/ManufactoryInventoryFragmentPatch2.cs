@@ -2,26 +2,30 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System.Reflection;
 using HarmonyLib;
 using IgorZ.TimberCommons.Common;
+using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
-using Timberborn.Workshops;
-using Timberborn.WorkshopsUI;
 using UnityEngine.UIElements;
-using ProgressBar = Timberborn.CoreUI.ProgressBar;
 
+// ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
+
 namespace IgorZ.TimberCommons.CommonUIPatches {
 
 /// <summary>Harmony patch to display "supply left" element in the manufactory UI fragment.</summary>
 /// <seealso cref="ManufactoryInventoryFragmentPatch1"/>
-[HarmonyPatch(typeof(ManufactoryInventoryFragment), nameof(ManufactoryInventoryFragment.UpdateFragment))]
+[HarmonyPatch]
 static class ManufactoryInventoryFragmentPatch2 {
-  internal static ProgressBar HoursLeftBar;
+  internal static Timberborn.CoreUI.ProgressBar HoursLeftBar;
   internal static Label HoursLeftLabel;
 
-  // ReSharper disable once UnusedMember.Local
-  static void Postfix(bool __runOriginal, Manufactory ____manufactory) {
+  static MethodBase TargetMethod() {
+    return AccessTools.DeclaredMethod("Timberborn.WorkshopsUI.ManufactoryInventoryFragment:UpdateFragment");
+  }
+
+  static void Postfix(bool __runOriginal, BaseComponent ____manufactory) {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!
     }

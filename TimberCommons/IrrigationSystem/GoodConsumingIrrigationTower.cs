@@ -103,7 +103,7 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
   protected override void Awake() {
     base.Awake();
     _goodConsumingBuilding = GetComponentFast<GoodConsumingBuilding>();
-    _prefabGoodPerHour = _goodConsumingBuilding._goodPerHour;
+    _prefabGoodPerHour = _goodConsumingBuilding.GoodPerHour;
     GetComponentsFast(_efficiencyProviders);
     GetComponentsFast(_rangeEffects);
     _goodConsumingToggle = _goodConsumingBuilding.GetGoodConsumingToggle();

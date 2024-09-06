@@ -2,16 +2,21 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System.Reflection;
 using HarmonyLib;
-using Timberborn.SoilMoistureSystem;
 using UnityEngine;
 
+// ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
+
 namespace IgorZ.TimberCommons.WaterService {
 
-[HarmonyPatch(typeof(SoilMoistureMap), nameof(SoilMoistureMap.UpdateDesertIntensity))]
+[HarmonyPatch]
 static class SoilMoistureMapPatch {
-  // ReSharper disable once UnusedMember.Local
+  static MethodBase TargetMethod() {
+    return AccessTools.DeclaredMethod("Timberborn.SoilMoistureSystem.SoilMoistureMap:UpdateDesertIntensity");
+  }
+
   static void Prefix(Vector2Int coordinates, ref float moistureLevel, bool __runOriginal) {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!

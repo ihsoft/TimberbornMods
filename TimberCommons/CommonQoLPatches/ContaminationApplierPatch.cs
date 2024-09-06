@@ -2,22 +2,28 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System.Reflection;
 using HarmonyLib;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.BaseComponentSystem;
-using Timberborn.BeaverContaminationSystem;
 using Timberborn.Common;
 using Timberborn.Navigation;
 using Timberborn.TerrainSystem;
 
+// ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
+
 namespace IgorZ.TimberCommons.CommonQoLPatches {
 
-[HarmonyPatch(typeof(ContaminationApplier), nameof(ContaminationApplier.TryApplyContamination))]
+[HarmonyPatch]
 static class ContaminationApplierPatch {
   static ITerrainService _terrainService;
 
-  // ReSharper disable once UnusedMember.Local
+  static MethodBase TargetMethod() {
+    return AccessTools.DeclaredMethod(
+        "Timberborn.BeaverContaminationSystem.ContaminationApplier:TryApplyContamination");
+  }
+
   static bool Prefix(bool __runOriginal, BaseComponent __instance) {
     if (!__runOriginal) {
       return false;  // The other patches must follow the same style to properly support the skip logic!
