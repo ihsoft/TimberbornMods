@@ -2,7 +2,7 @@
   "ItemId": "3324234282",
   "Name": "Automation",
   "Visibility": "Private",
-  "UpdateDescription": true,
-  "UpdateVisibility": true,
-  "UpdatePreview": true
+  "UpdateDescription": false,
+  "UpdateVisibility": false,
+  "UpdatePreview": false
 }
