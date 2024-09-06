@@ -1,4 +1,4 @@
-ID,Text,
+ID,Text,Comment
 IgorZ.TimberCommons.WaterTower.Utilization,Genutztes Potenzial: {0:0.#}%,
 IgorZ.TimberCommons.WaterTower.IrrigatedArea,Abgedeckte Fläche: {0},
 IgorZ.TimberCommons.WaterTower.EffectiveRange,Wirksamer Bereich: {0},

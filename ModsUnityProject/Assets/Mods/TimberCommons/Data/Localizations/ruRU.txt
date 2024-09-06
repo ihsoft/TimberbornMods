@@ -1,4 +1,4 @@
-ID,Text
+ID,Text,Comment
 IgorZ.TimberCommons.WaterTower.Utilization,"Используемый потенциал: {0:0.#}%",
 IgorZ.TimberCommons.WaterTower.IrrigatedArea,"Площадь покрытия: {0}",
 IgorZ.TimberCommons.WaterTower.EffectiveRange,"Дистанция орошения: {0}",
