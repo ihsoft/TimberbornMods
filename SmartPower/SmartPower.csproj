@@ -220,25 +220,25 @@
     </ItemGroup>
     <ItemGroup>
       <Content Include="..\ModsUnityProject\Assets\Mods\SmartPower\Data\Localizations\deDE.csv">
-        <Link>Localizations\deDE.csv</Link>
+        <Link>Mod\Localizations\deDE.csv</Link>
       </Content>
       <Content Include="..\ModsUnityProject\Assets\Mods\SmartPower\Data\Localizations\deDE.csv.meta">
-        <Link>Localizations\deDE.csv.meta</Link>
+        <Link>Mod\Localizations\deDE.csv.meta</Link>
       </Content>
       <Content Include="..\ModsUnityProject\Assets\Mods\SmartPower\Data\Localizations\enUS.csv">
-        <Link>Localizations\enUS.csv</Link>
+        <Link>Mod\Localizations\enUS.csv</Link>
       </Content>
       <Content Include="..\ModsUnityProject\Assets\Mods\SmartPower\Data\Localizations\enUS.csv.meta">
-        <Link>Localizations\enUS.csv.meta</Link>
+        <Link>Mod\Localizations\enUS.csv.meta</Link>
       </Content>
       <Content Include="..\ModsUnityProject\Assets\Mods\SmartPower\Data\Localizations\ruRU.csv">
-        <Link>Localizations\ruRU.csv</Link>
+        <Link>Mod\Localizations\ruRU.csv</Link>
       </Content>
       <Content Include="..\ModsUnityProject\Assets\Mods\SmartPower\Data\Localizations\ruRU.csv.meta">
-        <Link>Localizations\ruRU.csv.meta</Link>
+        <Link>Mod\Localizations\ruRU.csv.meta</Link>
       </Content>
       <Content Include="..\ModsUnityProject\Assets\Mods\SmartPower\manifest.json">
-        <Link>manifest.json</Link>
+        <Link>Mod\manifest.json</Link>
       </Content>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

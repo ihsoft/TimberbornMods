@@ -285,6 +285,29 @@
       <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.BeaverContaminationSystem.dll" Publicize="true" />
       <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.TerrainSystemRendering.dll" Publicize="true" />
     </ItemGroup>
+    <ItemGroup>
+      <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\deDE.txt">
+        <Link>Mod\Localizations\deDE.txt</Link>
+      </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\deDE.txt.meta">
+        <Link>Mod\Localizations\deDE.txt.meta</Link>
+      </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\enUS.txt">
+        <Link>Mod\Localizations\enUS.txt</Link>
+      </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\enUS.txt.meta">
+        <Link>Mod\Localizations\enUS.txt.meta</Link>
+      </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\ruRU.txt">
+        <Link>Mod\Localizations\ruRU.txt</Link>
+      </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\ruRU.txt.meta">
+        <Link>Mod\Localizations\ruRU.txt.meta</Link>
+      </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\manifest.json">
+        <Link>Mod\manifest.json</Link>
+      </Content>
+    </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.
