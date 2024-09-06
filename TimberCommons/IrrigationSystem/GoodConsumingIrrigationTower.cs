@@ -70,7 +70,7 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
 
   /// <inheritdoc/>
   protected override float GetEfficiency() {
-    if (!BlockObject.Finished) {
+    if (!BlockObject.IsFinished) {
       return 1f;
     }
     var efficiency = 1f;

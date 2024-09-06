@@ -4,14 +4,12 @@
 
 using System.Reflection;
 using Bindito.Core;
-using TimberApi.ConfiguratorSystem;
-using TimberApi.SceneSystem;
 using Timberborn.PrefabOptimization;
 using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.TimberCommons.Common {
 
-[Configurator(SceneEntrypoint.All)]
+[Context("Game")]
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {

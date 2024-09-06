@@ -16,11 +16,11 @@ namespace IgorZ.TimberCommons.CommonUIPatches {
 [HarmonyPatch(typeof(GrowableToolPanelItemFactory), nameof(GrowableToolPanelItemFactory.Create))]
 static class GrowableToolPanelItemFactoryPatch {
   // ReSharper disable once UnusedMember.Local
-  static void Postfix(Growable growable, bool __runOriginal, ref VisualElement __result, ILoc ____loc) {
+  static void Postfix(GrowableSpec growableSpec, bool __runOriginal, ref VisualElement __result, ILoc ____loc) {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!
     }
-    __result.Q<Label>("GrowthTime").text = CommonFormats.DaysHoursFormat(____loc, growable.GrowthTimeInDays * 24f);
+    __result.Q<Label>("GrowthTime").text = CommonFormats.DaysHoursFormat(____loc, growableSpec.GrowthTimeInDays * 24f);
   }
 }
 

@@ -1,3 +1,7 @@
+# v1.8.1 (Started on 5 Sep 2024):
+* Migrate to Update 6. Not compatible with the previous versions.
+* [Change] Water valve building is depercated.
+
 # v1.7.3 (22 Mar 2024):
 * [Fix #37] Water tower with zero coverage consumes water.
 * [Fix #43] Water towers override the highlighted range of other buildings.

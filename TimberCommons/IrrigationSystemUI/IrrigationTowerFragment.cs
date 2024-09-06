@@ -5,7 +5,6 @@
 using System.Collections.Generic;
 using IgorZ.TimberCommons.IrrigationSystem;
 using IgorZ.TimberDev.UI;
-using TimberApi.UiBuilderSystem;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
@@ -19,7 +18,7 @@ sealed class IrrigationTowerFragment : IEntityPanelFragment {
   const string IrrigatedAreaLocKey = "IgorZ.TimberCommons.WaterTower.IrrigatedArea";
   const string EffectiveRangeLocKey = "IgorZ.TimberCommons.WaterTower.EffectiveRange";
 
-  readonly UIBuilder _builder;
+  readonly UiFactory _uiFactory;
   readonly ILoc _loc;
   
   VisualElement _root;
@@ -27,14 +26,14 @@ sealed class IrrigationTowerFragment : IEntityPanelFragment {
 
   IrrigationTower _irrigationTower;
 
-  public IrrigationTowerFragment(UIBuilder builder, ILoc loc) {
-    _builder = builder;
+  public IrrigationTowerFragment(UiFactory uiFactory, ILoc loc) {
+    _uiFactory = uiFactory;
     _loc = loc;
   }
 
   public VisualElement InitializeFragment() {
-    _infoLabel = _builder.Presets().Labels().Label(color: UiFactory.PanelNormalColor);
-    _root = _builder.CreateFragmentBuilder().AddComponent(_infoLabel).BuildAndInitialize();
+    _infoLabel = _uiFactory.CreateLabel();
+    _root = _uiFactory.CreateCenteredPanelFragmentBuilder().AddComponent(_infoLabel).BuildAndInitialize();
     _root.ToggleDisplayStyle(visible: false);
     return _root;
   }

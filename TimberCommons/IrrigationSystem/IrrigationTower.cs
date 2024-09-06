@@ -12,12 +12,11 @@ using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BuildingRange;
 using Timberborn.BuildingsBlocking;
-using Timberborn.BuildingsUI;
 using Timberborn.Common;
-using Timberborn.ConstructibleSystem;
 using Timberborn.EntitySystem;
 using Timberborn.MapIndexSystem;
 using Timberborn.Persistence;
+using Timberborn.RangedEffectBuildingUI;
 using Timberborn.SelectionSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.SoilBarrierSystem;
@@ -117,7 +116,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   /// <inheritdoc />
   public IEnumerable<Vector3Int> GetBlocksInRange() {
-    if (!BlockObject.Finished) {
+    if (!BlockObject.IsFinished) {
       return GetTiles(range: _irrigationRange, skipChecks: false).eligible
           .Select(v => new Vector3Int(v.x, v.y, _baseZ));
     }
@@ -244,6 +243,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   MapIndexService _mapIndexService;
   EventBus _eventBus;
   DirectSoilMoistureSystemAccessor _directSoilMoistureSystemAccessor;
+  BuildingWithRangeUpdateService _buildingWithRangeUpdateService;
   HashSet<int> _foundationTilesIndexes = new();
 
   /// <summary>This is a delta to be added to any distance value to account the building's boundaries.</summary>
@@ -315,12 +315,14 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   [Inject]
   public void InjectDependencies(ITerrainService terrainService, SoilBarrierMap soilBarrierMap,
                                  MapIndexService mapIndexService, EventBus eventBus,
-                                 DirectSoilMoistureSystemAccessor directSoilMoistureSystemAccessor) {
+                                 DirectSoilMoistureSystemAccessor directSoilMoistureSystemAccessor,
+                                 BuildingWithRangeUpdateService buildingWithRangeUpdateService) {
     _terrainService = terrainService;
     _soilBarrierMap = soilBarrierMap;
     _mapIndexService = mapIndexService;
     _eventBus = eventBus;
     _directSoilMoistureSystemAccessor = directSoilMoistureSystemAccessor;
+    _buildingWithRangeUpdateService = buildingWithRangeUpdateService;
   }
 
   /// <summary>Awake is called when the script instance is being loaded.</summary>
@@ -365,9 +367,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
       HostedDebugLog.Fine(this, "Covered tiles updated: eligible={0}, irrigated={1}, utilization={2}, efficiency={3}",
                           EligibleTiles.Count, ReachableTiles.Count, Coverage, _currentEfficiency);
       UpdateConsumptionRate();
-      if (_towerSelected) {
-        GetComponentFast<BuildingWithRangeUpdater>().OnPostTransformChanged();
-      }
+      MaybeRefreshRangeHighlight();
     }
 
     if (_savedEfficiency >= 0) {
@@ -460,8 +460,8 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
     var obstacles = new HashSet<int>();
     var barriers = new HashSet<int>();
     var sqrRadius = (range + _radiusAdjuster) * (range + _radiusAdjuster);
-    var mapWidth = _mapIndexService.MapSize.x;
-    var mapHeight = _mapIndexService.MapSize.y;
+    var mapWidth = _mapIndexService.TerrainSize.x;
+    var mapHeight = _mapIndexService.TerrainSize.y;
 
     _startingTiles.ForEach(tile => tilesToVisit.Add(tile));
     for (var i = 0; i < tilesToVisit.Count; i++) {
@@ -502,17 +502,27 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
     return (result, obstacles, barriers);
   }
 
+  /// <summary>Refreshes the range highlight if the tower is selected.</summary>
+  void MaybeRefreshRangeHighlight() {
+    if (!_towerSelected) {
+      return;
+    }
+    var thisSelectable = GetComponentFast<SelectableObject>();
+    _buildingWithRangeUpdateService.OnSelectableObjectUnselected(new SelectableObjectUnselectedEvent(thisSelectable));
+    _buildingWithRangeUpdateService.OnSelectableObjectSelected(new SelectableObjectSelectedEvent(thisSelectable));
+  }
+
   #endregion
 
   #region Terrain and buildings change callbacks
 
   /// <summary>Triggers the tiles update if something is built within the range.</summary>
   [OnEvent]
-  public void OnConstructibleEnteredFinishedStateEvent(ConstructibleEnteredFinishedStateEvent e) {
-    var coordinates = e.Constructible.GetComponentFast<BlockObject>().Coordinates.XY();
+  public void OnBlockObjectEnteredFinishedStateEvent(EnteredFinishedStateEvent e) {
+    var coordinates = e.BlockObject.Coordinates.XY();
     var index = _mapIndexService.CoordinatesToIndex(coordinates);
     if (EligibleTiles.Contains(coordinates) && _soilBarrierMap.FullMoistureBarriers[index]) {
-      HostedDebugLog.Fine(this, "Full moisture barrier added: coords={0}, barrier={1}", coordinates, e.Constructible);
+      HostedDebugLog.Fine(this, "Full moisture barrier added: coords={0}, barrier={1}", coordinates, e.BlockObject);
       _needMoistureSystemUpdate = true;
     }
   }
@@ -520,11 +530,11 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <summary>Triggers the tiles update if something has been destroyed within the range.</summary>
   [OnEvent]
   public void OnEntityDeletedEvent(EntityDeletedEvent e) {
-    var constructable = e.Entity.GetComponentFast<Constructible>();
-    if (constructable == null || !constructable.IsFinished) {
+    var blockObject = e.Entity.GetComponentFast<BlockObject>();
+    if (!blockObject || !blockObject.IsFinished) {
       return; // The preview objects cannot affect irrigation.
     }
-    var coordinates = e.Entity.GetComponentFast<BlockObject>().Coordinates.XY();
+    var coordinates = blockObject.Coordinates.XY();
     var index = _mapIndexService.CoordinatesToIndex(coordinates);
     if (_irrigationBarriers.Contains(index) && !_soilBarrierMap.FullMoistureBarriers[index]) {
       HostedDebugLog.Fine(this, "Full moisture barrier removed: at={0}, barrier={1}", coordinates, e.Entity);
@@ -549,7 +559,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   /// <summary>Updates range selection since blocked towers can show different tiles.</summary>
   void OnBlockedStateChanged(object sender, EventArgs e) {
-    GetComponentFast<BuildingWithRangeUpdater>().OnPostTransformChanged();
+    MaybeRefreshRangeHighlight();
     UpdateState();
   }
 

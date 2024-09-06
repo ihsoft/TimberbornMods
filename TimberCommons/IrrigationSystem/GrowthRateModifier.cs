@@ -33,7 +33,7 @@ public sealed class GrowthRateModifier : BaseComponent {
   public float EffectiveModifier { get; private set; }
 
   /// <summary>Indicates that growable is actively growing, so the rate modifier makes sense.</summary>
-  public bool IsLiveAndGrowing => !_growable.IsGrown && !_growable.IsDead;
+  public bool IsLiveAndGrowing => !_growable.IsGrown && !_growable._livingNaturalResource.IsDead;
 
   /// <summary>Specifies if the growable is growing or has grown at the non-stock rate.</summary>
   public bool RateIsModified { get; private set; }
@@ -98,7 +98,7 @@ public sealed class GrowthRateModifier : BaseComponent {
 
   void Awake() {
     _growable = GetComponentFast<Growable>();
-    _originalGrowthTimeInDays = _growable._growthTimeInDays;
+    _originalGrowthTimeInDays = _growable._growableSpec._growthTimeInDays;
   }
 
   /// <summary>Calculates the effective multiplier and updates the growable settings.</summary>
@@ -118,7 +118,7 @@ public sealed class GrowthRateModifier : BaseComponent {
     _growable._timeTrigger = newTrigger;
     _growable._timeTrigger.Resume();
     RateIsModified = Mathf.Abs(_originalGrowthTimeInDays - newGrowthTime) > float.Epsilon;
-    _growable._growthTimeInDays = newGrowthTime;
+    _growable._growableSpec._growthTimeInDays = newGrowthTime;
   }  
 
   #endregion

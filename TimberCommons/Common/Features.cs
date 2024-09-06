@@ -2,14 +2,16 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using IgorZ.TimberDev.UI;
 using IgorZ.TimberDev.Utils;
 using Timberborn.GoodConsumingBuildingSystem;
+using Timberborn.ModManagerScene;
 using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.TimberCommons.Common {
 
-static class Features {
+sealed class Features : IModStarter {
   /// <summary>Indicates that <see cref="DebugEx.Fine"/> methods should emit record to the log.</summary>
   public static bool DebugExVerboseLogging;
 
@@ -60,8 +62,14 @@ static class Features {
   /// </remarks>
   public static bool NoContaminationUnderground;
 
-  static Features() {
-    FeatureController.ReadFeatures(Consume);
+  /// <inheritdoc/>
+  public void StartMod() {
+      throw new Exception("We're not supposed to be here!");
+  }
+
+  /// <inheritdoc/>
+  public void StartMod(IModEnvironment modEnvironment) {
+      FeatureController.ReadFeatures(modEnvironment.ModPath, Consume);
   }
 
   static bool Consume(string name, bool enabled, string value) {

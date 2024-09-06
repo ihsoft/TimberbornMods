@@ -8,13 +8,11 @@ using Bindito.Core;
 using IgorZ.TimberCommons.Common;
 using IgorZ.TimberDev.UI;
 using IgorZ.TimberDev.Utils;
-using TimberApi.SceneSystem;
-using TimberApi.ConfiguratorSystem;
 
 namespace IgorZ.TimberCommons.CommonUIPatches {
 
+[Context("Game")]
 // ReSharper disable once UnusedType.Global
-[Configurator(SceneEntrypoint.InGame)]
 sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).FullName;
 
