@@ -15,7 +15,6 @@ using Timberborn.BuilderHubSystem;
 using Timberborn.BuildingsBlocking;
 using Timberborn.BuildingsNavigation;
 using Timberborn.Common;
-using Timberborn.ConstructibleSystem;
 using Timberborn.ConstructionSites;
 using Timberborn.Coordinates;
 using Timberborn.EntitySystem;
@@ -148,8 +147,8 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   /// <summary>It is called before <see cref="InjectDependencies"/>!</summary>
   void Awake() {
     BlockObject = GetComponentFast<BlockObject>();
-    if (BlockObject.Preview) {
-      throw new InvalidOperationException($"{DebugEx.BaseComponentToString(BlockObject)} must be in preview");
+    if (BlockObject.IsPreview) {
+      throw new InvalidOperationException($"{DebugEx.BaseComponentToString(BlockObject)} must not be in preview");
     }
     ConstructionSite = GetComponentFast<ConstructionSite>();
     _blockableBuilding = GetComponentFast<BlockableBuilding>();
@@ -308,7 +307,7 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   /// <summary>Reacts on construction complete and verifies if a non-grounded site became grounded.</summary>
   /// <remarks>Needs to be public to work.</remarks>
   [OnEvent]
-  public void OnConstructibleEnteredFinishedStateEvent(ConstructibleEnteredFinishedStateEvent @event) {
+  public void OnBlockObjectEnteredFinishedStateEvent(EnteredFinishedStateEvent e) {
     if (!_groundedSite.IsFullyGrounded || !enabled) {
       return;
     }

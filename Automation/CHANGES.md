@@ -1,3 +1,6 @@
+# v1.2.2 (5 Sep 2024):
+* [Change] Support Timberborn 0.6.5.1.
+
 # v1.2.1 (4 Sep 2024):
 * Migrate to Update 6. Incompatible with the older versions of Timberborn.
 * [Fix #57] Pathfidning service fails under an edge case condition.

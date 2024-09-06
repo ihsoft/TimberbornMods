@@ -229,9 +229,6 @@
       <Reference Include="Timberborn.Common, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Common.dll</HintPath>
       </Reference>
-      <Reference Include="Timberborn.ConstructibleSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.ConstructibleSystem.dll</HintPath>
-      </Reference>
       <Reference Include="Timberborn.ConstructionMode, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.ConstructionMode.dll</HintPath>
       </Reference>
@@ -300,6 +297,9 @@
       </Reference>
       <Reference Include="Timberborn.Navigation, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Navigation.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.PathSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.PathSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.Persistence, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Persistence.dll</HintPath>

@@ -12,7 +12,6 @@ using IgorZ.TimberDev.Utils;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.Common;
-using Timberborn.ConstructibleSystem;
 using Timberborn.EntitySystem;
 using Timberborn.GameDistricts;
 using Timberborn.Navigation;
@@ -307,8 +306,8 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
   /// <summary>Drops conditions from the finished objects and marks the path indexes dirty.</summary>
   /// <remarks>Needs to be public to work.</remarks>
   [OnEvent]
-  public void OnConstructibleEnteredFinishedStateEvent(ConstructibleEnteredFinishedStateEvent @event) {
-    TryDeleteSite(@event.Constructible);
+  public void OnBlockObjectEnteredFinishedStateEvent(EnteredFinishedStateEvent e) {
+    TryDeleteSite(e.BlockObject);
   }
 
   /// <summary>Marks the path indexes dirty.</summary>

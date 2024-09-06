@@ -57,7 +57,7 @@ public abstract class PopulationTrackerConditionBase : AutomationConditionBase {
   protected DistrictPopulation DistrictPopulation => DistrictCenter ? DistrictCenter.DistrictPopulation : null;
 
   /// <summary>Tells if the owner objects is a preview building.</summary>
-  protected bool IsPreview => !Behavior.BlockObject.Finished;
+  protected bool IsPreview => !Behavior.BlockObject.IsFinished;
 
   /// <summary>A callback that is called every time the citizen's list on the district is changed.</summary>
   protected abstract void OnPopulationChanged();
