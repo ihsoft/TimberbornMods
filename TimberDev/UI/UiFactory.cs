@@ -4,6 +4,7 @@
 
 using System;
 using TimberApi.UIBuilderSystem;
+using TimberApi.UIPresets.Labels;
 using TimberApi.UIPresets.Sliders;
 using TimberApi.UIPresets.Toggles;
 using Timberborn.CoreUI;
@@ -14,7 +15,7 @@ using UnityEngine.UIElements;
 namespace IgorZ.TimberDev.UI {
 
 /// <summary>Factory for making standard fragment panel elements.</summary>
-public class UiFactory {
+public sealed class UiFactory {
   readonly VisualElementLoader _visualElementLoader;
 
   /// <summary>The TAPI UI builder.</summary>
@@ -105,9 +106,7 @@ public class UiFactory {
   /// <summary>Creates a label in a theme suitable for the right side panel.</summary>
   /// <param name="locKey">Optional loc key for the caption.</param>
   public Label CreateLabel(string locKey = null) {
-    var label = _visualElementLoader.LoadVisualElement("Game/EntityPanel/MechanicalNodeFragment").Q<Label>("Generator");
-    label.text = locKey != null ? Loc.T(locKey) : "";
-    return label;
+    return UiBuilder.Create<GameTextLabel>().SetText(locKey != null ? Loc.T(locKey) : "").Build();
   }
 
   /// <summary>Creates a panel builder that can be used as a fragment in the right side panel.</summary>
