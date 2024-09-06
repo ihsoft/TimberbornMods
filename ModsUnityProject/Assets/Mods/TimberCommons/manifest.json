@@ -1,0 +1,17 @@
+{
+  "Name": "TimberCommons",
+  "Version": "1.8.1",
+  "Id": "Timberborn.IgorZ.TimberCommons",
+  "MinimumGameVersion": "0.6.5.1",
+  "Description": "Various tweaks and modules for making buildings.",
+  "RequiredMods": [
+    {
+      "Id": "Harmony",
+      "MinimumVersion": "2.3.3"
+    },
+    {
+      "Id": "TimberApi",
+      "MinimumVersion": "0.7.4.0"
+    }
+  ]
+}
