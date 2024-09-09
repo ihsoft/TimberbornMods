@@ -1,5 +1,6 @@
 # v1.8.1 (Started on 5 Sep 2024):
 * Migrate to Update 6. Not compatible with the previous versions.
+* [Enhancement] Show current strength on sluice.
 * [Change] Water valve building is depercated.
 
 # v1.7.3 (22 Mar 2024):

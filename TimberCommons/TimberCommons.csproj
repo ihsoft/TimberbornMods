@@ -86,6 +86,8 @@
       <Compile Include="CommonUIPatches\ManufactoryDescriberPatch2.cs" />
       <Compile Include="CommonUIPatches\ManufactoryInventoryFragmentPatch1.cs" />
       <Compile Include="CommonUIPatches\ManufactoryInventoryFragmentPatch2.cs" />
+      <Compile Include="CommonUIPatches\SluiceFragmentPatch1.cs" />
+      <Compile Include="CommonUIPatches\SluiceFragmentPatch2.cs" />
       <Compile Include="Common\Configurator.cs" />
       <Compile Include="Common\Features.cs" />
       <Compile Include="Common\IConsumptionRateFormatter.cs" />
@@ -264,6 +266,12 @@
       </Reference>
       <Reference Include="Timberborn.TimeSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.TimeSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.WaterBuildings, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.WaterBuildings.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.WaterSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.WaterSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.Workshops, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Workshops.dll</HintPath>

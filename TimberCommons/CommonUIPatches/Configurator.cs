@@ -25,6 +25,8 @@ sealed class Configurator : IConfigurator {
         typeof(ManufactoryInventoryFragmentPatch1),
         typeof(ManufactoryInventoryFragmentPatch2),
         typeof(GoodConsumingBuildingFragmentPatch),
+        typeof(SluiceFragmentPatch1),
+        typeof(SluiceFragmentPatch2),
     };
     CommonFormats.ResetCachedLocStrings();
     if (Features.GrowableGrowthTimeUIDaysHoursViewForAll) {
