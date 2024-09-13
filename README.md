@@ -4,6 +4,10 @@ are made via Unity. See ModsUnityProject
 
 ## Development and building
 
+The mods are compiled with C# v12 compiler. Ensure your bvironment has it. If not, download .NET8.
+Ensure that the proper MSBuild version is used by IDE. In Rider:
+"Build, Execution, Deployment | Toolset and Build".
+
 1. Open Unity project and do "Import Timberborn DLLs".
 2. Copy DLLs from "plugins" folder into "Dependencies/Timberborn/plugins".
 3. Install dependencies in Steam Workshop: TimberAPI and Harmony.
@@ -13,4 +17,4 @@ are made via Unity. See ModsUnityProject
 6. Map a logical disk "U:" to Timberborn local storage: C:/Users/<username>/Documents/Timberborn.
 
 All, but the code changes are made in Unity. Once done, build mod in unity via Timberborn
-extension. Then, compile the relevant C# rpoject. The suggested IDE is JetBrains Rider.
+extension. Then, compile the relevant C# project. The suggested IDE is JetBrains Rider.
