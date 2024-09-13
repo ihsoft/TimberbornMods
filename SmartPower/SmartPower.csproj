@@ -44,6 +44,9 @@
       <Compile Include="..\TimberDev\UI\PanelFragment.cs">
         <Link>TimberDev\UI\PanelFragment.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\UI\PreciseSliderWrapper.cs">
+        <Link>TimberDev\UI\PreciseSliderWrapper.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\UI\UiFactory.cs">
         <Link>TimberDev\UI\UiFactory.cs</Link>
       </Compile>

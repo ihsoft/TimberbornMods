@@ -92,6 +92,22 @@ public sealed class UiFactory {
     return slider;
   }
 
+  /// <summary>
+  /// Creates a slider with plus/minus buttons and discrete value changes in a theme suitable for the right side panel.
+  /// </summary>
+  /// <param name="stepSize">
+  /// The minimum delta for the value changes. All positions on the slider will be multiples of this value.
+  /// </param>
+  /// <param name="onValueChangedFn">
+  /// A callback method that will be called on the value change. The only argument is the new value.
+  /// </param>
+  /// <returns>A wrapper for the precise slider.</returns>
+  public PreciseSliderWrapper CreatePreciseSlider(float stepSize, Action<float> onValueChangedFn) {
+    var root = _visualElementLoader.LoadVisualElement("Game/EntityPanel/SluiceFragment");
+    var slider = root.Q<PreciseSlider>("WaterLevelSlider");
+    return new PreciseSliderWrapper(slider, onValueChangedFn, stepSize);
+  }
+
   /// <summary>Creates a toggle in a theme suitable for the right side panel.</summary>
   /// <param name="locKey">Loc key for the caption.</param>
   /// <param name="onValueChangedFn">
@@ -109,7 +125,7 @@ public sealed class UiFactory {
     return UiBuilder.Create<GameTextLabel>().SetText(locKey != null ? Loc.T(locKey) : "").Build();
   }
 
-  /// <summary>Creates a panel builder that can be used as a fragment in the right side panel.</summary>
+  /// <summary>Creates a panel builder that can be used as a fragment on the right side panel.</summary>
   /// <remarks>
   /// This is a root element for the fragment's panel. Add controls to it via
   /// <see cref="PanelFragmentBuilder{PanelFragment}.AddComponent(UnityEngine.UIElements.VisualElement)"/>.
