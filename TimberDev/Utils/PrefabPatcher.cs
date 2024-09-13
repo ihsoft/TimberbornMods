@@ -18,16 +18,16 @@ static class PrefabPatcher {
   /// <summary>Adds a new component to prefab based in the filter condition.</summary>
   /// <param name="prefab">Prefab to add the component to.</param>
   /// <param name="checkDeps">Filter condition.</param>
-  /// <param name="onNewComponent">Called when a new component is added.</param>
+  /// <param name="onAdd">Called when a new component is added.</param>
   /// <typeparam name="T">type of the component to add.</typeparam>
   public static void AddComponent<T>(
-      GameObject prefab, Func<GameObject, bool> checkDeps, Action<T> onNewComponent = null) where T : BaseComponent {
+      GameObject prefab, Func<GameObject, bool> checkDeps, Action<T> onAdd = null) where T : BaseComponent {
     if (prefab.GetComponent<T>() || !checkDeps(prefab)) {
       return;
     }
     DebugEx.Fine("Add component to prefab: name={0}, component={1}", prefab.name, typeof(T));
     var component = prefab.AddComponent<T>();
-    onNewComponent?.Invoke(component);
+    onAdd?.Invoke(component);
   }
 
   /// <summary>Replaces an existing component with a new one.</summary>
@@ -36,19 +36,23 @@ static class PrefabPatcher {
   /// </remarks>
   /// <param name="prefab">Prefab to replace the component on.</param>
   /// <param name="checkDeps">Filter condition.</param>
+  /// <param name="onReplace">Callback that is called on the new instance creation.</param>
   /// <typeparam name="TSource">type of the component to remove.</typeparam>
   /// <typeparam name="TTarget">type of the component to add.</typeparam>
-  public static void ReplaceComponent<TSource, TTarget>(GameObject prefab, Func<GameObject, bool> checkDeps = null)
+  public static void ReplaceComponent<TSource, TTarget>(GameObject prefab, Func<GameObject, bool> checkDeps = null,
+                                                        Action<TSource, TTarget> onReplace = null)
       where TSource : BaseComponent where TTarget : BaseComponent {
-    if (prefab.GetComponent<TTarget>() != null
-        || prefab.GetComponent<TSource>() == null
+    if (prefab.GetComponent<TSource>() == null
+        || prefab.GetComponent<TTarget>() != null
         || checkDeps != null && !checkDeps(prefab)) {
       return;
     }
     DebugEx.Fine("Replace component on prefab: name={0}, oldComponent={1}, newComponent={2}",
                  prefab.name, typeof(TSource), typeof(TTarget));
-    Object.DestroyImmediate(prefab.GetComponent<TSource>());
-    prefab.AddComponent<TTarget>();
+    var oldComponent = prefab.GetComponent<TSource>();
+    var newComponent = prefab.AddComponent<TTarget>();
+    onReplace?.Invoke(oldComponent, newComponent);
+    Object.DestroyImmediate(oldComponent);
   }
 
   /// <summary>Helper filter class to check the existing and required components on prefab.</summary>
