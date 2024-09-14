@@ -11,7 +11,6 @@ using IgorZ.TimberDev.Utils;
 namespace IgorZ.TimberCommons.CommonQoLPatches {
 
 [Context("Game")]
-// ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).FullName;
 
