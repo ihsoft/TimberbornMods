@@ -12,11 +12,7 @@ using UnityEngine;
 namespace IgorZ.TimberCommons.WaterBuildings;
 
 [Context("Game")]
-// ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
-  static readonly PrefabPatcher.RequiredComponentsDep AdjustableWaterOutputDeps =
-      new(typeof(AdjustableWaterOutput));
-
   static readonly string PatchId = typeof(Configurator).FullName;
 
   public void Configure(IContainerDefinition containerDefinition) {
@@ -24,7 +20,7 @@ sealed class Configurator : IConfigurator {
       return;
     }
     containerDefinition.MultiBind<TemplateModule>().ToProvider<AttractionTemplateModuleProvider>().AsSingleton();
-    HarmonyPatcher.PatchRepeated(PatchId, [typeof(WaterOutputPatch)]);
+    HarmonyPatcher.PatchRepeated(PatchId, typeof(WaterOutputPatch));
     CustomizableInstantiator.AddPatcher(PatchId + "-instantiator", PatchMethod);
   }
 
@@ -33,7 +29,6 @@ sealed class Configurator : IConfigurator {
         obj, onReplace: (stockComponent, newComponent) => {
           newComponent._waterCoordinates = stockComponent._waterCoordinates;
         });
-    //PrefabPatcher.AddComponent<AdjustableWaterOutputMarker>(obj, AdjustableWaterOutputDeps.Check); 
   }
 
   class AttractionTemplateModuleProvider : IProvider<TemplateModule> {
