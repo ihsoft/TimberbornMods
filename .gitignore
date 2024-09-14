@@ -1,6 +1,4 @@
 .idea
-AllMods.sln.DotSettings.user
-_LOGS!
-_MODS!
-_WORKSHOP!
-_GAME!
+*.DotSettings.user
+_*
+Timberborn/
