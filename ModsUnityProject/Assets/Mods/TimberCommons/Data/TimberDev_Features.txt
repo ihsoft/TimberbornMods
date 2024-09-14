@@ -25,6 +25,9 @@ RecipesUI.ShowLongValueForLowFuelConsumptionRecipes
 # the stock logic will decide based on the moisture level.
 WaterTowers.OverrideDesertLevels
 
+# Specifies whether the water output depth at the spillway should be adjustable.
+WaterBuildings.AdjustableWaterOutput
+
 # Specifies whether no UI changes to the stock logic must be made by the mod.
 # It's a super setting to any UI affecting Harmony patches. If the game doesn't work well or the mod doesn't load,
 # enable this feature and only the stock UI will be in action.

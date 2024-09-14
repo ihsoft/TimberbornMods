@@ -48,6 +48,9 @@ sealed class Features : IModStarter {
   /// </summary>
   public static bool OverrideDesertLevelsForWaterTowers;
 
+  /// <summary>Specifies whether the water output depth at the spillway should be adjustable.</summary>
+  public static bool AdjustWaterOutputWaterDepthAtSpillway;
+
   /// <summary>Specifies whether no UI changes to the stock logic must be made by the mod.</summary>
   /// <remarks>
   /// It's a super setting to any UI affecting Harmony patches. If the game doesn't work well or the mod doesn't load,
@@ -63,13 +66,13 @@ sealed class Features : IModStarter {
   public static bool NoContaminationUnderground;
 
   /// <inheritdoc/>
-  public void StartMod() {
-      throw new Exception("We're not supposed to be here!");
+  public void StartMod() { 
+    throw new Exception("We're not supposed to be here!");
   }
 
   /// <inheritdoc/>
   public void StartMod(IModEnvironment modEnvironment) {
-      FeatureController.ReadFeatures(modEnvironment.ModPath, Consume);
+    FeatureController.ReadFeatures(modEnvironment.ModPath, Consume);
   }
 
   static bool Consume(string name, bool enabled, string value) {
@@ -88,6 +91,8 @@ sealed class Features : IModStarter {
             FeatureController.SetFlag(ref ShowLongValueForLowFuelConsumptionRecipes, name, enabled, value),
         "PrefabOptimizer.MaxExpectedRegistrySize" =>
             FeatureController.SetValue(ref PrefabOptimizerMaxExpectedRegistrySize, name, enabled, value),
+        "WaterBuildings.AdjustableWaterOutput" =>
+                FeatureController.SetFlag(ref AdjustWaterOutputWaterDepthAtSpillway, name, enabled, value),
         "WaterTowers.OverrideDesertLevels" =>
             FeatureController.SetFlag(ref OverrideDesertLevelsForWaterTowers, name, enabled, value),
         "CommonQoL.NoContaminationUnderground" =>

@@ -107,6 +107,12 @@
       <Compile Include="Properties\AssemblyInfo.cs" />
       <Compile Include="IrrigationSystemUI\Configurator.cs" />
       <Compile Include="IrrigationSystemUI\IrrigationTowerFragment.cs" />
+      <Compile Include="WaterBuildingsUI\AdjustableWaterOutputFragment.cs" />
+      <Compile Include="WaterBuildingsUI\Configurator.cs" />
+      <Compile Include="WaterBuildings\AdjustableWaterOutput.cs" />
+      <Compile Include="WaterBuildings\AdjustableWaterOutputMarker.cs" />
+      <Compile Include="WaterBuildings\Configurator.cs" />
+      <Compile Include="WaterBuildings\WaterOutputPatch.cs" />
       <Compile Include="WaterService\Configurator.cs" />
       <Compile Include="WaterService\DirectSoilMoistureSystemAccessor.cs" />
       <Compile Include="WaterService\SoilMoistureSimulatorPatch.cs" />
@@ -240,6 +246,9 @@
       <Reference Include="Timberborn.RangedEffectBuildingUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.RangedEffectBuildingUI.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.Rendering, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Rendering.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.SceneLoading, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.SceneLoading.dll</HintPath>
       </Reference>
@@ -311,8 +320,28 @@
       <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.SoilBarrierSystem.dll" Publicize="true" />
       <!-- Timberborn.TerrainSystemRendering.TerrainMaterialMap -->
       <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.TerrainSystemRendering.dll" Publicize="true" />
+      <!-- Timberborn.WaterBuildings.WaterMover -->
+      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.WaterBuildings.dll" Publicize="true" />
     </ItemGroup>
     <ItemGroup>
+      <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\deDE.txt">
+        <Link>Mod\Localizations\deDE.txt</Link>
+      </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\deDE.txt.meta">
+        <Link>Mod\Localizations\deDE.txt.meta</Link>
+      </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\enUS.txt">
+        <Link>Mod\Localizations\enUS.txt</Link>
+      </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\enUS.txt.meta">
+        <Link>Mod\Localizations\enUS.txt.meta</Link>
+      </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\ruRU.txt">
+        <Link>Mod\Localizations\ruRU.txt</Link>
+      </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\ruRU.txt.meta">
+        <Link>Mod\Localizations\ruRU.txt.meta</Link>
+      </Content>
       <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\manifest.json">
         <Link>Mod\manifest.json</Link>
       </Content>
