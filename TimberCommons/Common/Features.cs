@@ -39,9 +39,6 @@ sealed class Features : IModStarter {
   /// <seealso cref="CommonFormats.FormatSmallValue"/>
   public static bool ShowLongValueForLowFuelConsumptionRecipes;
 
-  /// <summary>Overrides the maximum registry size for PrefabOptimizer to suppress log complaints.</summary>
-  public static int PrefabOptimizerMaxExpectedRegistrySize = -1;
-
   /// <summary>
   /// Specifies whether the terrain view should be adjusted to present irrigated tiles as "well moisturized". Otherwise,
   /// the stock logic will decide based on the moisture level.
@@ -89,8 +86,6 @@ sealed class Features : IModStarter {
             FeatureController.SetFlag(ref ShowDaysHoursForSlowRecipes, name, enabled, value),
         "RecipesUI.ShowLongValueForLowFuelConsumptionRecipes" =>
             FeatureController.SetFlag(ref ShowLongValueForLowFuelConsumptionRecipes, name, enabled, value),
-        "PrefabOptimizer.MaxExpectedRegistrySize" =>
-            FeatureController.SetValue(ref PrefabOptimizerMaxExpectedRegistrySize, name, enabled, value),
         "WaterBuildings.AdjustableWaterOutput" =>
                 FeatureController.SetFlag(ref AdjustWaterOutputWaterDepthAtSpillway, name, enabled, value),
         "WaterTowers.OverrideDesertLevels" =>

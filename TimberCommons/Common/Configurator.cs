@@ -16,15 +16,6 @@ sealed class Configurator : IConfigurator {
     if (Features.DebugExVerboseLogging && DebugEx.LoggingSettings.VerbosityLevel < 5) {
       DebugEx.LoggingSettings.VerbosityLevel = 5;
     }
-    if (Features.PrefabOptimizerMaxExpectedRegistrySize != -1) {
-      var fieldInfo = typeof(EnvironmentVertexColorPrefabOptimizer).GetField(
-          "MaxExpectedRegistrySize", BindingFlags.Static | BindingFlags.NonPublic);
-      if (fieldInfo != null) {
-        fieldInfo.SetValue(null, Features.PrefabOptimizerMaxExpectedRegistrySize);
-      } else {
-        DebugEx.Warning("Cannot override EnvironmentVertexColorPrefabOptimizer.MaxExpectedRegistrySize");
-      }
-    }
   }
 }
 
