@@ -29,8 +29,3 @@ WaterBuildings.AdjustableWaterOutput
 # It's a super setting to any UI affecting Harmony patches. If the game doesn't work well or the mod doesn't load,
 # enable this feature and only the stock UI will be in action.
 !CommonUI.DisableAllPatches
-
-# Specifies whether beavers that move underground should be checked for badwater exposure.
-# The stock game doesn't allow beavers to be underground, but there are mods that provide underground buildings like
-# tunnels (e.g. "Path Extention" mod).
-CommonQoL.NoContaminationUnderground

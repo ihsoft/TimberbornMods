@@ -55,13 +55,6 @@ sealed class Features : IModStarter {
   /// </remarks>
   public static bool DisableAllUiPatches;
 
-  /// <summary>Specifies whether beavers that move underground should be checked for badwater exposure.</summary>
-  /// <remarks>
-  /// The stock game doesn't allow beavers to be underground, but there are mods that provide underground buildings like
-  /// tunnels (e.g. "Path Extention" mod).
-  /// </remarks>
-  public static bool NoContaminationUnderground;
-
   /// <inheritdoc/>
   public void StartMod() { 
     throw new Exception("We're not supposed to be here!");
@@ -90,8 +83,6 @@ sealed class Features : IModStarter {
                 FeatureController.SetFlag(ref AdjustWaterOutputWaterDepthAtSpillway, name, enabled, value),
         "WaterTowers.OverrideDesertLevels" =>
             FeatureController.SetFlag(ref OverrideDesertLevelsForWaterTowers, name, enabled, value),
-        "CommonQoL.NoContaminationUnderground" =>
-            FeatureController.SetFlag(ref NoContaminationUnderground, name, enabled, value),
         _ => false
     };
   }
