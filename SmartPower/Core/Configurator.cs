@@ -5,10 +5,8 @@
 using Bindito.Core;
 using HarmonyLib;
 using IgorZ.TimberDev.Utils;
-using Timberborn.Attractions;
 using Timberborn.MechanicalSystem;
 using Timberborn.PowerGenerating;
-using Timberborn.Workshops;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
@@ -21,9 +19,9 @@ namespace IgorZ.SmartPower.Core {
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
   static readonly PrefabPatcher.RequiredComponentsDep PoweredAttractionDeps =
-      new(typeof(Attraction), typeof(MechanicalBuilding));
+      new(AccessTools.TypeByName("Timberborn.Attractions.AttractionSpec"), typeof(MechanicalBuilding));
   static readonly PrefabPatcher.RequiredComponentsDep ManufactoryDeps =
-      new(typeof(Manufactory));
+      new(AccessTools.TypeByName("Timberborn.Workshops.ManufactorySpec"));
   static readonly PrefabPatcher.RequiredComponentsDep WalkerPoweredGeneratorDeps =
       new(AccessTools.TypeByName("Timberborn.PowerGenerating.WalkerPoweredGenerator"));
   static readonly string PatchId = typeof(Configurator).AssemblyQualifiedName;
