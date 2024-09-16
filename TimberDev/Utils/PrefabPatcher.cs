@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Timberborn.BaseComponentSystem;
 using UnityDev.Utils.LogUtilsLite;
@@ -42,8 +43,8 @@ static class PrefabPatcher {
   public static void ReplaceComponent<TSource, TTarget>(GameObject prefab, Func<GameObject, bool> checkDeps = null,
                                                         Action<TSource, TTarget> onReplace = null)
       where TSource : BaseComponent where TTarget : BaseComponent {
-    if (prefab.GetComponent<TSource>() == null
-        || prefab.GetComponent<TTarget>() != null
+    if (!prefab.GetComponent<TSource>()
+        || prefab.GetComponent<TTarget>()
         || checkDeps != null && !checkDeps(prefab)) {
       return;
     }
@@ -68,6 +69,13 @@ static class PrefabPatcher {
     public bool Check(GameObject prefab) {
       var components = prefab.GetComponents<BaseComponent>().Select(x => x.GetType()).ToArray();
       return _requiredComponents.All(components.Contains);
+    }
+  }
+
+  static void DumpAllComponents(GameObject prefab) {
+    DebugEx.Warning("*** Dumping components of prefab: name={0} ***", prefab.name);
+    foreach (var component in prefab.GetComponents<BaseComponent>()) {
+      DebugEx.Warning("  - {0}", component.GetType());
     }
   }
 }
