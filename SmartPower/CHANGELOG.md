@@ -1,3 +1,6 @@
+# v1.11.0 (started on 9/15/24)
+* [Enhancement] Add `frFR` locale file. Thanks to Erazil@Discord.
+
 # v1.10.2 (5 Sep 2024)
 * [Enhancement] Add smart power control for power wheels.
 * [Update] Change `deDE` strings.

@@ -233,6 +233,9 @@
       <Content Include="..\ModsUnityProject\Assets\Mods\SmartPower\Data\Localizations\enUS.csv.meta">
         <Link>Mod\Localizations\enUS.csv.meta</Link>
       </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\SmartPower\Data\Localizations\frFR.csv">
+        <Link>Mod\Localizations\frFR.csv</Link>
+      </Content>
       <Content Include="..\ModsUnityProject\Assets\Mods\SmartPower\Data\Localizations\ruRU.csv">
         <Link>Mod\Localizations\ruRU.csv</Link>
       </Content>
