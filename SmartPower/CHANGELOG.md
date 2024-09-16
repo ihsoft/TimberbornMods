@@ -1,4 +1,4 @@
-# v1.11.0 (started on 9/15/24)
+# v1.11.0 (15 Sep 2024)
 * [Enhancement] Add `frFR` locale file. Thanks to Erazil@Discord.
 * [Fix] Smart logic doesn't work on powered attractions and manufactories.
 
