@@ -5,8 +5,6 @@
 using System.Linq;
 using IgorZ.SmartPower.Core;
 using IgorZ.TimberDev.UI;
-using TimberApi.UIBuilderSystem.StylingElements;
-using TimberApi.UIPresets.Buttons;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
@@ -32,7 +30,7 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
   PowerOutputBalancer _balancer;
   float _resetButtonCaptionTimestamp = -1;
 
-  public PowerOutputBalancerFragment(UiFactory uiFactory) {
+  PowerOutputBalancerFragment(UiFactory uiFactory) {
     _uiFactory = uiFactory;
   }
 
@@ -53,12 +51,7 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
     _chargeBatteriesSlider.style.marginBottom = 5;
 
     _chargeBatteriesText = _uiFactory.CreateLabel();
-
-    _applyToAllGeneratorsButton = _uiFactory.UiBuilder.Create<GameButton>()
-        .SetLocKey(ApplyToAllGeneratorsLocKey)
-        .ModifyRoot(builder => builder.SetPadding(new Padding(2, 10, 2, 10)))
-        .Build();
-    _applyToAllGeneratorsButton.clicked += ApplyToAllGenerators;
+    _applyToAllGeneratorsButton = _uiFactory.CreateButton(ApplyToAllGeneratorsLocKey, ApplyToAllGenerators);
 
     var center = new VisualElement {
         style = {

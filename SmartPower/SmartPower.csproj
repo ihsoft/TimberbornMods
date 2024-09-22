@@ -35,11 +35,17 @@
         <DocumentationFile>bin\Release\SmartPower.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
+      <Compile Include="..\TimberDev\UI\ButtonGameDeprecated.cs">
+        <Link>TimberDev\UI\ButtonGameDeprecated.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\UI\CommonFormats.cs">
         <Link>TimberDev\UI\CommonFormats.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\UI\Configurator.cs">
         <Link>TimberDev\UI\Configurator.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UI\GameButtonDeprecated.cs">
+        <Link>TimberDev\UI\GameButtonDeprecated.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\UI\PanelFragment.cs">
         <Link>TimberDev\UI\PanelFragment.cs</Link>
@@ -245,6 +251,7 @@
       <Content Include="..\ModsUnityProject\Assets\Mods\SmartPower\manifest.json">
         <Link>Mod\manifest.json</Link>
       </Content>
+      <Content Include="CHANGELOG.md" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

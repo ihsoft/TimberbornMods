@@ -1,3 +1,6 @@
+# v1.11.1 (21 Sep 2024)
+* [Update] Some internal changes in preparation of upcoming TAPI update.
+
 # v1.11.0 (15 Sep 2024)
 * [Enhancement] Add `frFR` locale file. Thanks to Erazil@Discord.
 * [Fix] Smart logic doesn't work on powered attractions and manufactories.

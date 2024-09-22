@@ -4,8 +4,6 @@
 
 using IgorZ.SmartPower.Core;
 using IgorZ.TimberDev.UI;
-using TimberApi.UIBuilderSystem.StylingElements;
-using TimberApi.UIPresets.Buttons;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
@@ -32,7 +30,7 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
 
   float _resetButtonCaptionTimestamp = -1;
 
-  public SmartGoodPoweredGeneratorFragment(UiFactory uiFactory) {
+  SmartGoodPoweredGeneratorFragment(UiFactory uiFactory) {
     _uiFactory = uiFactory;
   }
 
@@ -53,12 +51,7 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
     _chargeBatteriesSlider.style.marginBottom = 5;
 
     _chargeBatteriesText = _uiFactory.CreateLabel();
-    
-    _applyToAllEnginesButton = _uiFactory.UiBuilder.Create<GameButton>()
-        .SetLocKey(ApplyToAllGeneratorsLocKey)
-        .ModifyRoot(builder => builder.SetPadding(new Padding(2, 10, 2, 10)))
-        .Build();
-    _applyToAllEnginesButton.clicked += ApplyToAllEngines;
+    _applyToAllEnginesButton = _uiFactory.CreateButton(ApplyToAllGeneratorsLocKey, ApplyToAllEngines);
 
     var center = new VisualElement {
         style = {
