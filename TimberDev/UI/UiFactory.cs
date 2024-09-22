@@ -4,6 +4,7 @@
 
 using System;
 using TimberApi.UIBuilderSystem;
+using TimberApi.UIBuilderSystem.StylingElements;
 using TimberApi.UIPresets.Labels;
 using TimberApi.UIPresets.Sliders;
 using TimberApi.UIPresets.Toggles;
@@ -12,11 +13,15 @@ using Timberborn.Localization;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+// ReSharper disable MemberCanBePrivate.Global
 namespace IgorZ.TimberDev.UI {
 
 /// <summary>Factory for making standard fragment panel elements.</summary>
 public sealed class UiFactory {
   readonly VisualElementLoader _visualElementLoader;
+
+  /// <summary>Common padding around the button text on the right side panel.</summary>
+  public static readonly Padding StandardButtonPadding = new(2, 10, 2, 10);
 
   /// <summary>The TAPI UI builder.</summary>
   public readonly UIBuilder UiBuilder;
@@ -123,6 +128,21 @@ public sealed class UiFactory {
   /// <param name="locKey">Optional loc key for the caption.</param>
   public Label CreateLabel(string locKey = null) {
     return UiBuilder.Create<GameTextLabel>().SetText(locKey != null ? Loc.T(locKey) : "").Build();
+  }
+
+  /// <summary>Creates a button in a theme suitable for the right side panel.</summary>
+  /// <param name="locKey">Loc key for the игеещт caption.</param>
+  /// <param name="onClickFn">Callback to call when the button is clicked.</param>
+  /// <param name="padding">
+  /// Optional padding around the button text. If not set, then <see cref="StandardButtonPadding"/> will be used.
+  /// </param>
+  public Button CreateButton(string locKey, Action onClickFn, Padding? padding = null) {
+    var button = UiBuilder.Create<GameButtonDeprecated>()
+        .SetLocKey(locKey)
+        .ModifyRoot(builder => builder.SetPadding(padding ?? StandardButtonPadding))
+        .Build();
+    button.clicked += onClickFn;
+    return button;
   }
 
   /// <summary>Creates a panel builder that can be used as a fragment on the right side panel.</summary>

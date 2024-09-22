@@ -13,6 +13,7 @@ sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<UiFactory>().AsSingleton();
     containerDefinition.Bind<PanelFragment>().AsSingleton();
+    containerDefinition.Bind<GameButtonDeprecated>().AsSingleton();
   }
 }
 
