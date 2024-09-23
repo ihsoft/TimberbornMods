@@ -4,6 +4,7 @@
 
 using System.Reflection;
 using HarmonyLib;
+using IgorZ.TimberCommons.Settings;
 using IgorZ.TimberDev.UI;
 using Timberborn.Growing;
 using Timberborn.Localization;
@@ -22,8 +23,11 @@ static class GrowableFragmentPatch {
   }
 
   static void Postfix(bool __runOriginal, ILoc ____loc, Label ____growthTime, Growable ____growable) {
-    if (!__runOriginal || !____growable) {
+    if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!
+    }
+    if (!____growable || !TimeAndDurationSettings.DaysHoursGrowingTime) {
+      return;
     }
     ____growthTime.text = CommonFormats.DaysHoursFormat(____loc, ____growable.GrowthTimeInDays * 24f);
   }

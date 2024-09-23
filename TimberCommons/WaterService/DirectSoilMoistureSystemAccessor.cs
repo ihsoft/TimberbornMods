@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Bindito.Core;
 using IgorZ.TimberCommons.Common;
+using IgorZ.TimberCommons.Settings;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.Common;
@@ -194,7 +195,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
     }
     DebugEx.Fine("Updated moisture level overrides: tiles={0}", MoistureLevelOverrides.Keys.Count);
 
-    if (Features.OverrideDesertLevelsForWaterTowers) {
+    if (IrrigationSystemSettings.OverrideDesertLevelsForWaterTowers) {
       UpdateTilesAppearance();
     }
   }
@@ -281,7 +282,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
     Tick();
 
     // Refresh the texture on game load.
-    if (needTextureUpdate && Features.OverrideDesertLevelsForWaterTowers) {
+    if (needTextureUpdate && IrrigationSystemSettings.OverrideDesertLevelsForWaterTowers) {
       // FIXME: Consider calling Tick() instead. It's public.
       _terrainMaterialMap.ProcessDesertTextureChanges();
       _terrainMaterialMap.ProcessDesertTextureChanges(); // Intentionally.

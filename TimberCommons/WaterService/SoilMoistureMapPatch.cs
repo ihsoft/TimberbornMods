@@ -4,6 +4,7 @@
 
 using System.Reflection;
 using HarmonyLib;
+using IgorZ.TimberCommons.Settings;
 using UnityEngine;
 
 // ReSharper disable UnusedMember.Local
@@ -20,6 +21,9 @@ static class SoilMoistureMapPatch {
   static void Prefix(Vector2Int coordinates, ref float moistureLevel, bool __runOriginal) {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!
+    }
+    if (!IrrigationSystemSettings.OverrideDesertLevelsForWaterTowers) {
+      return;
     }
     if (DirectSoilMoistureSystemAccessor.TerrainTextureLevelsOverrides.TryGetValue(coordinates, out var newLevel)) {
       moistureLevel = Mathf.Max(moistureLevel, newLevel);

@@ -36,11 +36,17 @@
         <DocumentationFile>bin\Release\TimberCommons.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
+      <Compile Include="..\TimberDev\UI\ButtonGameDeprecated.cs">
+        <Link>TimberDev\UI\ButtonGameDeprecated.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\UI\CommonFormats.cs">
         <Link>TimberDev\UI\CommonFormats.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\UI\Configurator.cs">
         <Link>TimberDev\UI\Configurator.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UI\GameButtonDeprecated.cs">
+        <Link>TimberDev\UI\GameButtonDeprecated.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\UI\PanelFragment.cs">
         <Link>TimberDev\UI\PanelFragment.cs</Link>
@@ -78,8 +84,6 @@
       <Compile Include="..\UnityDevLite\TypeUtils.cs">
         <Link>UnityDevLite\TypeUtils.cs</Link>
       </Compile>
-      <Compile Include="CommonQoLPatches\Configurator.cs" />
-      <Compile Include="CommonQoLPatches\ContaminationApplierPatch.cs" />
       <Compile Include="CommonUIPatches\Configurator.cs" />
       <Compile Include="CommonUIPatches\GoodConsumingBuildingDescriberPatch.cs" />
       <Compile Include="CommonUIPatches\GoodConsumingBuildingFragmentPatch.cs" />
@@ -91,8 +95,6 @@
       <Compile Include="CommonUIPatches\ManufactoryInventoryFragmentPatch2.cs" />
       <Compile Include="CommonUIPatches\SluiceFragmentPatch1.cs" />
       <Compile Include="CommonUIPatches\SluiceFragmentPatch2.cs" />
-      <Compile Include="Common\Configurator.cs" />
-      <Compile Include="Common\Features.cs" />
       <Compile Include="Common\IConsumptionRateFormatter.cs" />
       <Compile Include="Common\ISupplyLeftProvider.cs" />
       <Compile Include="IrrigationSystemUI\GrowthRateModifierFragment.cs" />
@@ -107,6 +109,14 @@
       <Compile Include="Properties\AssemblyInfo.cs" />
       <Compile Include="IrrigationSystemUI\Configurator.cs" />
       <Compile Include="IrrigationSystemUI\IrrigationTowerFragment.cs" />
+      <Compile Include="SettingsUI\Configurator.cs" />
+      <Compile Include="SettingsUI\DistrictCenterFragment.cs" />
+      <Compile Include="Settings\DebugSettings.cs" />
+      <Compile Include="Settings\IrrigationSystemSettings.cs" />
+      <Compile Include="Settings\TimeAndDurationSettings.cs" />
+      <Compile Include="Settings\Configurator.cs" />
+      <Compile Include="Settings\WaterBuildingsSettings.cs" />
+      <Compile Include="Stockpiles\RecipeGoodAmountTransformHeight.cs" />
       <Compile Include="WaterBuildingsUI\AdjustableWaterOutputFragment.cs" />
       <Compile Include="WaterBuildingsUI\Configurator.cs" />
       <Compile Include="WaterBuildings\AdjustableWaterOutput.cs" />
@@ -151,6 +161,18 @@
       </Reference>
       <Reference Include="Bindito.Unity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Bindito.Unity.dll</HintPath>
+      </Reference>
+      <Reference Include="ModSettings.Common">
+        <HintPath>..\Dependencies\Timberborn.u6\Workshop\ModSettings\Scripts\ModSettings.Common.dll</HintPath>
+      </Reference>
+      <Reference Include="ModSettings.CommonUI">
+        <HintPath>..\Dependencies\Timberborn.u6\Workshop\ModSettings\Scripts\ModSettings.CommonUI.dll</HintPath>
+      </Reference>
+      <Reference Include="ModSettings.Core">
+        <HintPath>..\Dependencies\Timberborn.u6\Workshop\ModSettings\Scripts\ModSettings.Core.dll</HintPath>
+      </Reference>
+      <Reference Include="ModSettings.CoreUI">
+        <HintPath>..\Dependencies\Timberborn.u6\Workshop\ModSettings\Scripts\ModSettings.CoreUI.dll</HintPath>
       </Reference>
       <Reference Include="System" />
       <Reference Include="System.Collections.Immutable, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -201,6 +223,9 @@
       <Reference Include="Timberborn.EntitySystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.EntitySystem.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.GameDistricts">
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.GameDistricts.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.GoodConsumingBuildingSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.GoodConsumingBuildingSystem.dll</HintPath>
       </Reference>
@@ -221,6 +246,12 @@
       </Reference>
       <Reference Include="Timberborn.MapIndexSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.MapIndexSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.Modding">
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Modding.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.ModdingUI">
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.ModdingUI.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.ModManagerScene, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.ModManagerScene.dll</HintPath>
@@ -255,6 +286,9 @@
       <Reference Include="Timberborn.SelectionSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.SelectionSystem.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.SettingsSystem">
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.SettingsSystem.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.SingletonSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.SingletonSystem.dll</HintPath>
       </Reference>
@@ -263,6 +297,9 @@
       </Reference>
       <Reference Include="Timberborn.StatusSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.StatusSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.Stockpiles">
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Stockpiles.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.TemplateSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.TemplateSystem.dll</HintPath>

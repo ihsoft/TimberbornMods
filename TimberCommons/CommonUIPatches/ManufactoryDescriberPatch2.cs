@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
+using IgorZ.TimberCommons.Settings;
 using IgorZ.TimberDev.UI;
 using Timberborn.Goods;
 using UnityDev.Utils.LogUtilsLite;
@@ -28,7 +29,7 @@ static class ManufactoryDescriberPatch2 {
     if (!__runOriginal) {
       return; // The other patches must follow the same style to properly support the skip logic!
     }
-    if (!productionRecipe.ConsumesFuel) {
+    if (!productionRecipe.ConsumesFuel || !TimeAndDurationSettings.HigherPrecisionForFuelConsumingRecipes) {
       return;
     }
     var inputs = __result.ToList();

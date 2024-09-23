@@ -4,6 +4,7 @@
 
 using System.Reflection;
 using HarmonyLib;
+using IgorZ.TimberCommons.Settings;
 using IgorZ.TimberDev.UI;
 using Timberborn.Goods;
 using Timberborn.Localization;
@@ -24,6 +25,9 @@ static class ManufactoryDescriberPatch1 {
                      ILoc ____loc, bool __runOriginal, ref string __result) {
     if (!__runOriginal) {
       return false; // The other patches must follow the same style to properly support the skip logic!
+    }
+    if (!TimeAndDurationSettings.DaysHoursForRecipeDuration) {
+      return true;
     }
     var duration = productionRecipe.CycleDurationInHours / workers;
     __result = CommonFormats.DaysHoursFormat(____loc, duration);

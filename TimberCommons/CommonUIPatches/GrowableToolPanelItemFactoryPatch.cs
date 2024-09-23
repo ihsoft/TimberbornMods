@@ -4,6 +4,7 @@
 
 using System.Reflection;
 using HarmonyLib;
+using IgorZ.TimberCommons.Settings;
 using IgorZ.TimberDev.UI;
 using Timberborn.Growing;
 using Timberborn.Localization;
@@ -24,6 +25,9 @@ static class GrowableToolPanelItemFactoryPatch {
   static void Postfix(GrowableSpec growableSpec, bool __runOriginal, ref VisualElement __result, ILoc ____loc) {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!
+    }
+    if (!TimeAndDurationSettings.DaysHoursGrowingTime) {
+      return;
     }
     __result.Q<Label>("GrowthTime").text = CommonFormats.DaysHoursFormat(____loc, growableSpec.GrowthTimeInDays * 24f);
   }

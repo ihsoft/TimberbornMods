@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using IgorZ.TimberCommons.Settings;
 using IgorZ.TimberCommons.WaterBuildings;
 using IgorZ.TimberDev.UI;
 using Timberborn.BaseComponentSystem;
@@ -45,10 +46,10 @@ sealed class AdjustableWaterOutputFragment : IEntityPanelFragment {
   /// <inheritdoc/>
   public void ShowFragment(BaseComponent entity) {
     _adjustableWaterOutput = entity.GetComponentFast<AdjustableWaterOutput>();
-    if (!_adjustableWaterOutput) {
+    if (!_adjustableWaterOutput || !_adjustableWaterOutput.AllowAdjustmentsInGame) {
+      _adjustableWaterOutput = null;
       return;
     }
-    _waterLevelSlider.ToggleDisplayStyle(visible: _adjustableWaterOutput.AllowAdjustmentsInGame);
     _root.ToggleDisplayStyle(visible: true);
     _waterLevelSlider.UpdateValuesWithoutNotify(WaterLevelSliderValue, Range);
   }

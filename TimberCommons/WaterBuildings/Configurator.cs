@@ -16,9 +16,6 @@ sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).FullName;
 
   public void Configure(IContainerDefinition containerDefinition) {
-    if (!Features.AdjustWaterOutputWaterDepthAtSpillway) {
-      return;
-    }
     containerDefinition.MultiBind<TemplateModule>().ToProvider<AttractionTemplateModuleProvider>().AsSingleton();
     HarmonyPatcher.PatchRepeated(PatchId, typeof(WaterOutputPatch));
     CustomizableInstantiator.AddPatcher(PatchId + "-instantiator", PatchMethod);

@@ -5,6 +5,7 @@
 using System.Reflection;
 using HarmonyLib;
 using IgorZ.TimberCommons.Common;
+using IgorZ.TimberCommons.Settings;
 using IgorZ.TimberDev.UI;
 using Timberborn.GoodConsumingBuildingSystem;
 using Timberborn.Localization;
@@ -48,7 +49,7 @@ static class GoodConsumingBuildingFragmentPatch {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!
     }
-    if (!Features.GoodConsumingBuildingUIDaysHoursForAll) {
+    if (!TimeAndDurationSettings.DaysHoursSupplyLeft) {
       return;
     }
     ____hoursLeft.text = CommonFormats.FormatSupplyLeft(____loc, ____goodConsumingBuilding.HoursUntilNoSupply);

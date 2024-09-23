@@ -2,8 +2,11 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using IgorZ.TimberCommons.Settings;
 using Timberborn.Persistence;
+using Timberborn.PrefabSystem;
 using Timberborn.WaterBuildings;
+using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
 namespace IgorZ.TimberCommons.WaterBuildings;
@@ -54,10 +57,16 @@ sealed class AdjustableWaterOutput : WaterOutput, IPersistentEntity {
   public float SpillwayHeightDelta { get; private set; }
 
   /// <summary>Tells if the height marker should be shown when the building is selected.</summary>
-  public bool ShowHeightMarker => _showHeightMarker;
+  public bool ShowHeightMarker =>
+      _showHeightMarker
+      && (!_isFluidDump && WaterBuildingsSettings.AdjustWaterDepthAtSpillwayOnMechanicalPumps
+          || _isFluidDump && WaterBuildingsSettings.AdjustWaterDepthAtSpillwayOnFluidDumps);
 
   /// <summary>Tells if GUI should be presented to change the limit in the game.</summary>
-  public bool AllowAdjustmentsInGame => _allowAdjustmentsInGame;
+  public bool AllowAdjustmentsInGame =>
+      _allowAdjustmentsInGame
+      && (!_isFluidDump && WaterBuildingsSettings.AdjustWaterDepthAtSpillwayOnMechanicalPumps
+          || _isFluidDump && WaterBuildingsSettings.AdjustWaterDepthAtSpillwayOnFluidDumps);
 
   /// <summary>Transformed coordinates of the water spillway.</summary>
   public Vector3Int TargetCoordinates => _waterCoordinatesTransformed;
@@ -65,7 +74,7 @@ sealed class AdjustableWaterOutput : WaterOutput, IPersistentEntity {
   /// <summary>Sets a new spillway delta.</summary>
   /// <remarks>
   /// The new value must make sense in terms of the building Z-coordinate and the water level at teh spillway
-  /// coordinates. If it doesn't. it will be corrected on teh next call to <see cref="CalculateAvailableSpace"/>.
+  /// coordinates. If it doesn't, it will be corrected on the next call to <see cref="CalculateAvailableSpace"/>.
   /// </remarks>
   /// <param name="spillwayDelta"></param>
   /// <seealso cref="SpillwayHeightDelta"/>
@@ -77,13 +86,17 @@ sealed class AdjustableWaterOutput : WaterOutput, IPersistentEntity {
 
   #region Implementation
 
+  bool _isFluidDump;
+
   /// <summary>
   /// Called via a Harmony patch to provide  <see cref="WaterOutput.AvailableSpace"/>. Normally happens at least once
   /// per tick. Can be called multiple times, so keep it simple.
   /// </summary>
   internal float CalculateAvailableSpace() {
     if (SpillwayHeightDelta < MinHeight - MaxHeight) {
+      var oldDelta = SpillwayHeightDelta;
       SetSpillwayHeightDelta(MinHeight - MaxHeight);
+      HostedDebugLog.Fine(this, "SpillwayHeightDelta corrected: {0} => {1}", oldDelta, SpillwayHeightDelta);
     }
     return MaxHeight + SpillwayHeightDelta - _threadSafeWaterMap.WaterHeightOrFloor(_waterCoordinatesTransformed);
   }
@@ -91,6 +104,8 @@ sealed class AdjustableWaterOutput : WaterOutput, IPersistentEntity {
   new void Awake() {
     SpillwayHeightDelta = -_spillwayHeightDelta;
     base.Awake();
+    //FIXME
+    _isFluidDump = GetComponentFast<Prefab>().name.StartsWith("FluidDump");
   }
 
   #endregion
