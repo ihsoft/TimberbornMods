@@ -3,8 +3,8 @@
 // License: Public Domain
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Timberborn.BaseComponentSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
@@ -12,7 +12,7 @@ using Object = UnityEngine.Object;
 
 // ReSharper disable UnusedMember.Local
 // ReSharper disable MemberCanBePrivate.Global
-namespace IgorZ.TimberDev.Utils {
+namespace IgorZ.TimberDev.Utils;
 
 /// <summary>Helper class for managing prefab components.</summary>
 static class PrefabPatcher {
@@ -72,12 +72,27 @@ static class PrefabPatcher {
     }
   }
 
-  static void DumpAllComponents(GameObject prefab) {
+  /// <summary>Dumps all Unity components on the game object.</summary>
+  public static void DumpAllComponents(GameObject prefab) {
     DebugEx.Warning("*** Dumping components of prefab: name={0} ***", prefab.name);
     foreach (var component in prefab.GetComponents<BaseComponent>()) {
       DebugEx.Warning("  - {0}", component.GetType());
     }
   }
-}
 
+  /// <summary>Prints the hierarchy of the model on the game object.</summary>
+  public static void PrintHierarchy(GameObject gameObject) {
+    var items = new StringBuilder();
+    PrintChildRecursive(items, gameObject.transform, 0);
+    DebugEx.Warning("*** Hierarchy on {0}:\n{1}", gameObject.name, items.ToString());
+  }
+
+  static Transform PrintChildRecursive(StringBuilder sb, Transform transform, int depth) {
+    for (var index = 0; index < transform.childCount; ++index) {
+      var child = transform.GetChild(index);
+      sb.Append(new string(' ', depth * 2)).Append("+ ").Append(child.name).Append("\n");
+      PrintChildRecursive(sb, child, depth + 1);
+    }
+    return null;
+  }
 }
