@@ -24,6 +24,12 @@ sealed class WaterBuildingsSettings : ModSettingsOwner {
   public ModSetting<bool> _adjustWaterDepthAtSpillwayOnFluidDumps { get; } = 
     new(true, ModSettingDescriptor.Create("Allow setting maximum water level at the spillway of the liquid drops"));
 
+  public static bool ShowCurrentStrengthInSluice =>
+      _instance._showCurrentStrengthInSluice.Value;
+
+  public ModSetting<bool> _showCurrentStrengthInSluice { get; } = 
+    new(true, ModSettingDescriptor.Create("Show current strength in sluice"));
+
   // ReSharper restore InconsistentNaming
   // ReSharper restore MemberCanBePrivate.Global
   #endregion

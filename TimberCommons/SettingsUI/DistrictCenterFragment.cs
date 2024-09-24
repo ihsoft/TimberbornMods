@@ -31,6 +31,7 @@ sealed class DistrictCenterFragment : IEntityPanelFragment {
   Toggle _higherPrecisionForFuelConsumingRecipesToggle;
   Toggle _adjustWaterDepthAtSpillwayOnMechanicalPumpsToggle;
   Toggle _adjustWaterDepthAtSpillwayOnFluidDumpsToggle;
+  Toggle _showCurrentStrengthInSluiceToggle;
   Toggle _verboseLoggingToggle;
 
   DistrictCenterFragment(DevModeManager devModeManager,
@@ -64,6 +65,8 @@ sealed class DistrictCenterFragment : IEntityPanelFragment {
         _waterBuildingsSettings._adjustWaterDepthAtSpillwayOnMechanicalPumps);
     _adjustWaterDepthAtSpillwayOnFluidDumpsToggle = MakeSettingToggle(
         "AdjustWaterDepthAtSpillwayOnFluidDumps", _waterBuildingsSettings._adjustWaterDepthAtSpillwayOnFluidDumps);
+    _showCurrentStrengthInSluiceToggle = MakeSettingToggle(
+        "ShowCurrentStrengthInSluice", _waterBuildingsSettings._showCurrentStrengthInSluice);
     _verboseLoggingToggle = MakeSettingToggle("VerboseLogging", _debugSettings._verboseLogging);
 
     _root = _uiFactory.CreateCenteredPanelFragmentBuilder()

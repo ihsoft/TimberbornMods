@@ -4,6 +4,7 @@
 
 using System.Reflection;
 using HarmonyLib;
+using IgorZ.TimberCommons.Settings;
 using IgorZ.TimberDev.UI;
 using Timberborn.BlockSystem;
 using Timberborn.Localization;
@@ -27,7 +28,7 @@ static class SluiceFragmentPatch2 {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!
     }
-    if (!____sluice) {
+    if (!____sluice || !WaterBuildingsSettings.ShowCurrentStrengthInSluice) {
       return;
     }
 

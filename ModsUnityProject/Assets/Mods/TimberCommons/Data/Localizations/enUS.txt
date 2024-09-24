@@ -8,5 +8,5 @@ IgorZ.TimberCommons.GrowthRateModifier.SlowdownPercentile,"Growth slowdown: <Red
 IgorZ.TimberCommons.AdjustableWaterOutput.StopAboveDownstream,"Close above depth at spillway: {0}",
 IgorZ.TimberCommons.Settings.TimeAndDurationSection,"Time and duration representation",
 IgorZ.TimberCommons.Settings.IrrigationSystemSection,"Irrigation system",
-IgorZ.TimberCommons.Settings.WaterBuildingsSection,"Water pumps",
+IgorZ.TimberCommons.Settings.WaterBuildingsSection,"Water buildings",
 IgorZ.TimberCommons.Settings.DebugSection,"Debug and troubleshooting",

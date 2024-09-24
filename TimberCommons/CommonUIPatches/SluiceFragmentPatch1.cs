@@ -4,6 +4,7 @@
 
 using System.Reflection;
 using HarmonyLib;
+using IgorZ.TimberCommons.Settings;
 using IgorZ.TimberDev.UI;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.WaterSystem;
@@ -26,6 +27,9 @@ static class SluiceFragmentPatch1 {
   static void Postfix(bool __runOriginal, VisualElement ____contaminationLabel) {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!
+    }
+    if (!WaterBuildingsSettings.ShowCurrentStrengthInSluice) {
+      return;
     }
     ThreadSafeWaterMap = DependencyContainer.GetInstance<IThreadSafeWaterMap>();
     var uiFactory = DependencyContainer.GetInstance<UiFactory>();
