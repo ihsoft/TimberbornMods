@@ -43,7 +43,7 @@ sealed class Configurator : IConfigurator {
     PrefabPatcher.AddComponent<SmartPoweredAttraction>(prefab, PoweredAttractionDeps.Check);
 
     PrefabPatcher.AddComponent<PowerOutputBalancer>(
-        prefab, WalkerPoweredGeneratorDeps.Check, balancer => {
+        prefab, WalkerPoweredGeneratorDeps.Check, onAdd: balancer => {
           balancer.runWhenPaused = true;
           balancer.waitTicks = 3;
         });
