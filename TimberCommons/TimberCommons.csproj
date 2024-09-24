@@ -116,7 +116,7 @@
       <Compile Include="Settings\TimeAndDurationSettings.cs" />
       <Compile Include="Settings\Configurator.cs" />
       <Compile Include="Settings\WaterBuildingsSettings.cs" />
-      <Compile Include="Stockpiles\RecipeGoodAmountTransformHeight.cs" />
+      <Compile Include="Stockpiles\GoodAmountTransformHeight.cs" />
       <Compile Include="WaterBuildingsUI\AdjustableWaterOutputFragment.cs" />
       <Compile Include="WaterBuildingsUI\Configurator.cs" />
       <Compile Include="WaterBuildings\AdjustableWaterOutput.cs" />
