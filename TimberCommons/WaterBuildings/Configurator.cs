@@ -3,7 +3,6 @@
 // License: Public Domain
 
 using Bindito.Core;
-using IgorZ.TimberCommons.Common;
 using IgorZ.TimberDev.Utils;
 using Timberborn.TemplateSystem;
 using Timberborn.WaterBuildings;
@@ -29,9 +28,8 @@ sealed class Configurator : IConfigurator {
   }
 
   class AttractionTemplateModuleProvider : IProvider<TemplateModule> {
-    public TemplateModule Get()
-    {
-      TemplateModule.Builder builder = new TemplateModule.Builder();
+    public TemplateModule Get() {
+      var builder = new TemplateModule.Builder();
       builder.AddDecorator<AdjustableWaterOutput, AdjustableWaterOutputMarker>();
       return builder.Build();
     }
