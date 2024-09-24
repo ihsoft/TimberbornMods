@@ -12,7 +12,7 @@ namespace IgorZ.TimberCommons.SettingsUI;
 sealed class Configurator : IConfigurator {
   class EntityPanelModuleProvider(DistrictCenterFragment districtCenterFragment) : IProvider<EntityPanelModule> {
     public EntityPanelModule Get() {
-      EntityPanelModule.Builder builder = new EntityPanelModule.Builder();
+      var builder = new EntityPanelModule.Builder();
       builder.AddDiagnosticFragment(districtCenterFragment);
       return builder.Build();
     }
