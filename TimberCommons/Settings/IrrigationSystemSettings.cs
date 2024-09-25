@@ -27,7 +27,7 @@ sealed class IrrigationSystemSettings : ModSettingsOwner {
   #region ModSettingsOwner overrides
 
   /// <inheritdoc />
-  protected override string ModId => "Timberborn.IgorZ.TimberCommons";
+  protected override string ModId => Configurator.ModId;
 
   /// <inheritdoc />
   public override string HeaderLocKey => "IgorZ.TimberCommons.Settings.IrrigationSystemSection";

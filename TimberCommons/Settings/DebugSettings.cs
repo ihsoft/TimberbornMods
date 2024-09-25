@@ -16,7 +16,7 @@ sealed class DebugSettings : ModSettingsOwner {
 
   public ModSetting<bool> _verboseLogging { get; } = 
     new(
-        true,
+        false,
         ModSettingDescriptor.Create("Verbose logging")
             .SetTooltip("Logs will have more details, but it may impact game performance."));
 
@@ -27,7 +27,7 @@ sealed class DebugSettings : ModSettingsOwner {
   #region ModSettingsOwner overrides
 
   /// <inheritdoc />
-  protected override string ModId => "Timberborn.IgorZ.TimberCommons";
+  protected override string ModId => Configurator.ModId;
 
   /// <inheritdoc />
   public override string HeaderLocKey => "IgorZ.TimberCommons.Settings.DebugSection";
