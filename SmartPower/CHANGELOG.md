@@ -1,3 +1,6 @@
+# v1.11.2 (25 Sep 2024)
+* [Fix] "Apply to all generators" button is not resized.
+
 # v1.11.1 (21 Sep 2024)
 * [Update] Some internal changes in preparation of upcoming TAPI update.
 
