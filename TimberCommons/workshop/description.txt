@@ -1,0 +1,32 @@
+[h1]Overview[/h1]
+For a regular player, this mod implements a lot of small changes to UI and QoL. They won't change your gameplay, but they may be helpful.
+
+For a mod developer, this mod offers components that allow the creation of completely new buildings with unique logic!
+
+[h1]For the players[/h1]
+Check out the image slideshow above to get a picture of what the mod provides. But long story short, you get:
+[list]
+[*] [b]UI[/b]. Expressing time durations as "days/hours". For a human, the duration of "2d 4h" is clearer than "52 hours", isn't it?
+[*] [b]UI[/b]. Increased precision in displaying small durations. Did you know Birch doesn't need a full 9 days to grow? It actually grows in "8d 12h", or 8.5 days.
+[*] [b]UI[/b]. The sluice will tell you what water flow is going through it. This may help in planning your infrastructure.
+[*] [b]QoL[/b]. You can now adjust the water level at fluid dump buildings, like Mechanical Pump or Fluid Dump. Not only can you change the "0.9m" default, but you can also now place a fluid dump building at any level above the surface and set it up so that it doesn't flood the output!
+[*] [Feature] If you install a mod that uses `TimberCommons`, like [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3285720709]Water Extension[/url], you will get a set of irrigation tower buildings!
+[/list]
+
+[h1]For the mod makers[/h1]
+You can use the components that `TimberCommons` offers to create your own buildings. Consider these:
+[list]
+[*] `GoodConsumingIrrigationTower` - a simple tower that consumes just one resource (usually water).
+[*] `ManufactoryIrrigationTower` - a tower that can use the power of the manufactory recipes! You can use multiple ingredients and also define "effects" which would be applied to the growables based on the selected recipe.
+[/list]
+See more details on the provided components in Wiki: https://github.com/ihsoft/TimberbornMods/wiki/Timber-Commons.
+
+[h1]Mods that provide Water Towers[/h1]
+https://steamcommunity.com/sharedfiles/filedetails/?id=3285720709
+
+[hr][/hr]
+
+Discord: https://discord.com/channels/558398674389172225/1242339605634875432
+Report a bug: https://github.com/ihsoft/TimberbornMods/labels/timbercommons
+GitHub repository: https://github.com/ihsoft/TimberbornMods
+
