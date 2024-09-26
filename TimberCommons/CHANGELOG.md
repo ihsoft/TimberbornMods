@@ -1,7 +1,7 @@
-# v1.8.1 (Started on 5 Sep 2024):
+# v1.8.3 (25 Sep 2024):
 * Migrate to Update 6. Not compatible with the previous versions.
-* [Feature] Add a relacement to the stock `GoodAmountTransformHeight` component that cannot work with manufactures.
-* [Enhancement] Aloow changing settings via Mods UI.
+* [Feature] Add a replacement to the stock `GoodAmountTransformHeight` component that cannot work with manufactures.
+* [Enhancement] Allow changing settings via Mods UI.
 * [Enhancement] Show current strength on sluice.
 * [Enhancement] Allow adjusting water level at spillway for mechanical pumps and fluid pumps.
 * [Change] Water valve building is depercated.
