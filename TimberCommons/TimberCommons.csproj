@@ -36,17 +36,11 @@
         <DocumentationFile>bin\Release\TimberCommons.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
-      <Compile Include="..\TimberDev\UI\ButtonGameDeprecated.cs">
-        <Link>TimberDev\UI\ButtonGameDeprecated.cs</Link>
-      </Compile>
       <Compile Include="..\TimberDev\UI\CommonFormats.cs">
         <Link>TimberDev\UI\CommonFormats.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\UI\Configurator.cs">
         <Link>TimberDev\UI\Configurator.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\UI\GameButtonDeprecated.cs">
-        <Link>TimberDev\UI\GameButtonDeprecated.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\UI\PanelFragment.cs">
         <Link>TimberDev\UI\PanelFragment.cs</Link>
