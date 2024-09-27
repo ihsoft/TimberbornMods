@@ -8,7 +8,7 @@ IgorZ.TimberCommons.GrowthRateModifier.SlowdownPercentile,"Growth slowdown: <Red
 IgorZ.TimberCommons.AdjustableWaterOutput.StopAboveDownstream,"Close above depth at spillway: {0}",
 IgorZ.TimberCommons.InjuryProbability,"Injury probability: {0} every hour",
 IgorZ.TimberCommons.Settings.TimeAndDurationSection,"Time and duration representation",
-IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursSupplyLeft,"Show 'supply left' as days/hours",
+IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursSupplyLeft,"Show 'supply lasts' as days/hours",
 IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursGrowingTime,"Show grow time as days/hours",
 IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursForRecipeDuration,"Show recipes time as days/hours",
 IgorZ.TimberCommons.Settings.TimeAndDuration.HigherPrecisionForFuelConsumingRecipes,"Show recipe fuel consumption with a higher precision",
@@ -21,9 +21,9 @@ IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnMechanic
 IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnFluidDumps,"Allow setting maximum water level at the spillway of the liquid drops",
 IgorZ.TimberCommons.Settings.WaterBuildings.ShowCurrentStrengthInSluice,"Show current strength in sluice",
 IgorZ.TimberCommons.Settings.InjuryProbabilitySection,"Injury probability",
-IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,"Show string on the right panel",
+IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,"Show injury probability in the right panel",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,"Show indicator on the building avatar",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHintTooltip,"Hover over the indicator to see the injury probability",
 IgorZ.TimberCommons.Settings.DebugSection,"Debug and troubleshooting",
 IgorZ.TimberCommons.Settings.Debug.VerboseLogging,"Verbose logging",
-IgorZ.TimberCommons.Settings.Debug.VerboseLoggingTooltip,"Logs will have more details, but it may impact game performance."
+IgorZ.TimberCommons.Settings.Debug.VerboseLoggingTooltip,"Logs will have more useful details, but it may impact game performance."
