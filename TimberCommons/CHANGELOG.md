@@ -1,5 +1,6 @@
 # v1.9.0 (started on 9/26/2024):
 * [Feature] Show injury probability on the buildings that can cause injury.
+* [Update] `deDE` localization from @juf0816.
 
 # v1.8.3 (25 Sep 2024):
 * Migrate to Update 6. Not compatible with the previous versions.
