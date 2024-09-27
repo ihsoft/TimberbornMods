@@ -21,7 +21,10 @@ sealed class InjuryProbabilitySettings(
       false, ModSettingDescriptor.CreateLocalized("IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment"));
 
   public ModSetting<bool> ShowAvatarHint { get; } = new(
-      true, ModSettingDescriptor.CreateLocalized("IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint"));
+      true,
+      ModSettingDescriptor
+          .CreateLocalized("IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint")
+          .SetLocalizedTooltip("IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHintTooltip"));
 
   // ReSharper restore InconsistentNaming
   // ReSharper restore MemberCanBePrivate.Global
