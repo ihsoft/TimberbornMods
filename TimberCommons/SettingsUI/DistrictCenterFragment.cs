@@ -20,6 +20,7 @@ sealed class DistrictCenterFragment : IEntityPanelFragment {
   readonly TimeAndDurationSettings _timeAndDurationSettings;
   readonly IrrigationSystemSettings _irrigationSystemSettings;
   readonly WaterBuildingsSettings _waterBuildingsSettings;
+  readonly InjuryProbabilitySettings _injuryProbabilitySettings;
   readonly DebugSettings _debugSettings;
 
   DistrictCenter _districtCenter;
@@ -32,6 +33,8 @@ sealed class DistrictCenterFragment : IEntityPanelFragment {
   Toggle _adjustWaterDepthAtSpillwayOnMechanicalPumpsToggle;
   Toggle _adjustWaterDepthAtSpillwayOnFluidDumpsToggle;
   Toggle _showCurrentStrengthInSluiceToggle;
+  Toggle _showInFragmentToggle;
+  Toggle _showAvatarHintToggle;
   Toggle _verboseLoggingToggle;
 
   DistrictCenterFragment(DevModeManager devModeManager,
@@ -39,12 +42,14 @@ sealed class DistrictCenterFragment : IEntityPanelFragment {
                          TimeAndDurationSettings timeAndDurationSettings,
                          IrrigationSystemSettings irrigationSystemSettings,
                          WaterBuildingsSettings waterBuildingsSettings,
+                         InjuryProbabilitySettings injuryProbabilitySettings,
                          DebugSettings debugSettings) {
     _devModeManager = devModeManager;
     _uiFactory = uiFactory;
     _timeAndDurationSettings = timeAndDurationSettings;
     _irrigationSystemSettings = irrigationSystemSettings;
     _waterBuildingsSettings = waterBuildingsSettings;
+    _injuryProbabilitySettings = injuryProbabilitySettings;
     _debugSettings = debugSettings;
   }
 
@@ -67,6 +72,8 @@ sealed class DistrictCenterFragment : IEntityPanelFragment {
         "AdjustWaterDepthAtSpillwayOnFluidDumps", _waterBuildingsSettings._adjustWaterDepthAtSpillwayOnFluidDumps);
     _showCurrentStrengthInSluiceToggle = MakeSettingToggle(
         "ShowCurrentStrengthInSluice", _waterBuildingsSettings._showCurrentStrengthInSluice);
+    _showInFragmentToggle = MakeSettingToggle("ShowInFragment", _injuryProbabilitySettings.ShowInFragment);
+    _showAvatarHintToggle = MakeSettingToggle("ShowAvatarHint", _injuryProbabilitySettings.ShowAvatarHint);
     _verboseLoggingToggle = MakeSettingToggle("VerboseLogging", _debugSettings._verboseLogging);
 
     _root = _uiFactory.CreateCenteredPanelFragmentBuilder()
@@ -77,6 +84,9 @@ sealed class DistrictCenterFragment : IEntityPanelFragment {
         .AddComponent(_higherPrecisionForFuelConsumingRecipesToggle)
         .AddComponent(_adjustWaterDepthAtSpillwayOnMechanicalPumpsToggle)
         .AddComponent(_adjustWaterDepthAtSpillwayOnFluidDumpsToggle)
+        .AddComponent(_showCurrentStrengthInSluiceToggle)
+        .AddComponent(_showInFragmentToggle)
+        .AddComponent(_showAvatarHintToggle)
         .AddComponent(_verboseLoggingToggle)
         .BuildAndInitialize();
     _root.ToggleDisplayStyle(visible: false);

@@ -33,7 +33,7 @@ sealed class DebugSettings : ModSettingsOwner {
   public override string HeaderLocKey => "IgorZ.TimberCommons.Settings.DebugSection";
 
   /// <inheritdoc />
-  public override int Order => 4;
+  public override int Order => 100;  // Always last.
 
   #endregion
 

@@ -91,6 +91,8 @@
       <Compile Include="CommonUIPatches\SluiceFragmentPatch2.cs" />
       <Compile Include="Common\IConsumptionRateFormatter.cs" />
       <Compile Include="Common\ISupplyLeftProvider.cs" />
+      <Compile Include="NeedApplierUI\Configurator.cs" />
+      <Compile Include="NeedApplierUI\InjuryProbabilityFragment.cs" />
       <Compile Include="IrrigationSystemUI\GrowthRateModifierFragment.cs" />
       <Compile Include="IrrigationSystem\BlockContaminationRangeEffect.cs" />
       <Compile Include="IrrigationSystem\ModifyGrowableGrowthRangeEffect.cs" />
@@ -106,6 +108,7 @@
       <Compile Include="SettingsUI\Configurator.cs" />
       <Compile Include="SettingsUI\DistrictCenterFragment.cs" />
       <Compile Include="Settings\DebugSettings.cs" />
+      <Compile Include="Settings\InjuryProbabilitySettings.cs" />
       <Compile Include="Settings\IrrigationSystemSettings.cs" />
       <Compile Include="Settings\TimeAndDurationSettings.cs" />
       <Compile Include="Settings\Configurator.cs" />
@@ -256,6 +259,9 @@
       <Reference Include="Timberborn.Navigation, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Navigation.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.NeedApplication">
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.NeedApplication.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.Particles, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Particles.dll</HintPath>
       </Reference>
@@ -310,6 +316,9 @@
       <Reference Include="Timberborn.TimeSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.TimeSystem.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.TooltipSystem">
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.TooltipSystem.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.WaterBuildings, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.WaterBuildings.dll</HintPath>
       </Reference>
@@ -353,6 +362,8 @@
       <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.TerrainSystemRendering.dll" Publicize="true" />
       <!-- Timberborn.WaterBuildings.WaterMover -->
       <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.WaterBuildings.dll" Publicize="true" />
+      <!-- Timberborn.NeedApplication.WorkshopRandomNeedApplierSpec -->
+      <Reference Include="..\Dependencies\Timberborn.u6\plugins\Timberborn.NeedApplication.dll" Publicize="true" />
     </ItemGroup>
     <ItemGroup>
       <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\deDE.txt">

@@ -6,3 +6,7 @@ IgorZ.TimberCommons.WaterTower.NoTilesToIrrigate,"Нет доступных кл
 IgorZ.TimberCommons.GrowthRateModifier.BoostPercentile,"Ускорение роста: <GreenHighlight>🡅</GreenHighlight>{0:0.#}%",
 IgorZ.TimberCommons.GrowthRateModifier.SlowdownPercentile,"Замедление роста: <RedHighlight>🡇</RedHighlight>{0:0.#}%",
 IgorZ.TimberCommons.AdjustableWaterOutput.StopAboveDownstream,"Остановить при глубине на водосбросе: {0}",
+IgorZ.TimberCommons.InjuryProbability,"Вероятность ранения: {0} каждый час",
+IgorZ.TimberCommons.Settings.InjuryProbabilitySection,"Вероятность ранения",
+IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,"Показывать строку на панели справа",
+IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,"Отображать индикатор на аватаре строения",
