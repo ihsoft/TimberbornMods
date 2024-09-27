@@ -15,20 +15,23 @@ sealed class TimeAndDurationSettings : ModSettingsOwner {
   // ReSharper disable MemberCanBePrivate.Global
 
   public static bool DaysHoursSupplyLeft => _instance._daysHoursSupplyLeft.Value;
-  public ModSetting<bool> _daysHoursSupplyLeft { get; } = 
-      new(true, ModSettingDescriptor.Create("Show \"supply left\" as days/hours"));
+  public ModSetting<bool> _daysHoursSupplyLeft { get; } = new(
+      true, ModSettingDescriptor.CreateLocalized("IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursSupplyLeft"));
 
   public static bool DaysHoursGrowingTime => _instance._daysHoursGrowingTime.Value;
-  public ModSetting<bool> _daysHoursGrowingTime { get; } = 
-      new(true, ModSettingDescriptor.Create("Show grow time as days/hours"));
+  public ModSetting<bool> _daysHoursGrowingTime { get; } = new(
+      true, ModSettingDescriptor.CreateLocalized("IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursGrowingTime"));
 
   public static bool DaysHoursForRecipeDuration => _instance._daysHoursForSlowRecipes.Value;
-  public ModSetting<bool> _daysHoursForSlowRecipes { get; } = 
-      new(true, ModSettingDescriptor.Create("Show recipes time as days/hours"));
+  public ModSetting<bool> _daysHoursForSlowRecipes { get; } = new(
+      true,
+      ModSettingDescriptor.CreateLocalized("IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursForRecipeDuration"));
 
   public static bool HigherPrecisionForFuelConsumingRecipes => _instance._higherPrecisionForFuelConsumingRecipes.Value;
-  public ModSetting<bool> _higherPrecisionForFuelConsumingRecipes { get; } = 
-      new(true, ModSettingDescriptor.Create("Show recipe fuel consumption with a higher precision"));
+  public ModSetting<bool> _higherPrecisionForFuelConsumingRecipes { get; } = new(
+      true,
+      ModSettingDescriptor.CreateLocalized(
+          "IgorZ.TimberCommons.Settings.TimeAndDuration.HigherPrecisionForFuelConsumingRecipes"));
 
   // ReSharper restore MemberCanBePrivate.Global
   // ReSharper restore InconsistentNaming

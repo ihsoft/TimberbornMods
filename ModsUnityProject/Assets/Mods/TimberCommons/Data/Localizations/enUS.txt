@@ -8,9 +8,21 @@ IgorZ.TimberCommons.GrowthRateModifier.SlowdownPercentile,"Growth slowdown: <Red
 IgorZ.TimberCommons.AdjustableWaterOutput.StopAboveDownstream,"Close above depth at spillway: {0}",
 IgorZ.TimberCommons.InjuryProbability,"Injury probability: {0} every hour",
 IgorZ.TimberCommons.Settings.TimeAndDurationSection,"Time and duration representation",
+IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursSupplyLeft,"Show 'supply left' as days/hours",
+IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursGrowingTime,"Show grow time as days/hours",
+IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursForRecipeDuration,"Show recipes time as days/hours",
+IgorZ.TimberCommons.Settings.TimeAndDuration.HigherPrecisionForFuelConsumingRecipes,"Show recipe fuel consumption with a higher precision",
 IgorZ.TimberCommons.Settings.IrrigationSystemSection,"Irrigation system",
+IgorZ.TimberCommons.Settings.IrrigationSystem.OverrideDesertLevelsForWaterTowers,"Show irrigated tiles as well moisturized",
+IgorZ.TimberCommons.Settings.IrrigationSystem.OverrideDesertLevelsForWaterTowersTooltip,"Specifies whether the tiles should look shiny green (well moisturized). Otherwise, the stock logic
+will show them as 'barely moisturized' since the irrigation towers give only the base moisture level."
 IgorZ.TimberCommons.Settings.WaterBuildingsSection,"Water buildings",
+IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnMechanicalPumps,"Allow setting maximum water level at the spillway of the mechanical pumps",
+IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnFluidDumps,"Allow setting maximum water level at the spillway of the liquid drops",
+IgorZ.TimberCommons.Settings.WaterBuildings.ShowCurrentStrengthInSluice,"Show current strength in sluice",
 IgorZ.TimberCommons.Settings.InjuryProbabilitySection,"Injury probability",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,"Show string on the right panel",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,"Show indicator on the building avatar",
 IgorZ.TimberCommons.Settings.DebugSection,"Debug and troubleshooting",
+IgorZ.TimberCommons.Settings.Debug.VerboseLogging,"Verbose logging",
+IgorZ.TimberCommons.Settings.Debug.VerboseLoggingTooltip,"Logs will have more details, but it may impact game performance."

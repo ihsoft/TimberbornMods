@@ -17,11 +17,11 @@ sealed class InjuryProbabilitySettings(
   // ReSharper disable MemberCanBePrivate.Global
   // ReSharper disable InconsistentNaming
 
-  public ModSetting<bool> ShowInFragment { get; } = 
-      new(false, ModSettingDescriptor.CreateLocalized("IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment"));
+  public ModSetting<bool> ShowInFragment { get; } = new(
+      false, ModSettingDescriptor.CreateLocalized("IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment"));
 
-  public ModSetting<bool> ShowAvatarHint { get; } = 
-      new(true, ModSettingDescriptor.CreateLocalized("IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint"));
+  public ModSetting<bool> ShowAvatarHint { get; } = new(
+      true, ModSettingDescriptor.CreateLocalized("IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint"));
 
   // ReSharper restore InconsistentNaming
   // ReSharper restore MemberCanBePrivate.Global

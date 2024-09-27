@@ -14,11 +14,12 @@ sealed class IrrigationSystemSettings : ModSettingsOwner {
   // ReSharper disable MemberCanBePrivate.Global
 
   public static bool OverrideDesertLevelsForWaterTowers => _instance._overrideDesertLevelsForWaterTowers.Value;
-  public ModSetting<bool> _overrideDesertLevelsForWaterTowers { get; } = 
-    new(
-          true,
-          ModSettingDescriptor.Create("Show irrigated tiles as well moisturized").SetTooltip(
-              "Specifies whether the terrain view should be adjusted to present irrigated tiles as \"well moisturized\".\nOtherwise, the stock logic will shown them as \"barely moisturized\" since the irrigation towers give only the base moisture level."));
+  public ModSetting<bool> _overrideDesertLevelsForWaterTowers { get; } = new(
+    true,
+    ModSettingDescriptor
+        .CreateLocalized("IgorZ.TimberCommons.Settings.IrrigationSystem.OverrideDesertLevelsForWaterTowers")
+        .SetLocalizedTooltip(
+            "IgorZ.TimberCommons.Settings.IrrigationSystem.OverrideDesertLevelsForWaterTowersTooltip"));
 
   // ReSharper restore MemberCanBePrivate.Global
   // ReSharper restore InconsistentNaming

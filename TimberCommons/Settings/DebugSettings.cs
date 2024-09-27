@@ -14,11 +14,11 @@ sealed class DebugSettings : ModSettingsOwner {
   // ReSharper disable InconsistentNaming
   // ReSharper disable MemberCanBePrivate.Global
 
-  public ModSetting<bool> _verboseLogging { get; } = 
-    new(
-        false,
-        ModSettingDescriptor.Create("Verbose logging")
-            .SetTooltip("Logs will have more details, but it may impact game performance."));
+  public ModSetting<bool> _verboseLogging { get; } = new(
+    false,
+    ModSettingDescriptor
+        .CreateLocalized("IgorZ.TimberCommons.Settings.Debug.VerboseLogging")
+        .SetLocalizedTooltip("IgorZ.TimberCommons.Settings.Debug.VerboseLoggingTooltip"));
 
   // ReSharper restore MemberCanBePrivate.Global
   // ReSharper restore InconsistentNaming
