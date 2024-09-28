@@ -64,7 +64,6 @@ sealed class InjuryProbabilityFragment : IEntityPanelFragment {
     }
     if (!_indicatorAttached) {
       AttachIndicator();
-      _indicatorAttached = true;
     }
     UpdateInjuryProbability();
   }
@@ -108,6 +107,7 @@ sealed class InjuryProbabilityFragment : IEntityPanelFragment {
       var avatarElement = rootElement.Q<VisualElement>("EntityAvatar");
       if (avatarElement != null) {
         avatarElement.Add(_injuryProbabilityAvatarHint);
+        _indicatorAttached = true;
         break;
       }
       rootElement = rootElement.parent;
