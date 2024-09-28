@@ -14,11 +14,11 @@ namespace IgorZ.SmartPower.Core {
 public interface IAdjustablePowerInput {
   /// <summary>Updates the internal component state and returns the latest value of the power input.</summary>
   /// <remarks>
-  /// The callback is responsible to check all the conditions. The returned value will be used as is to update the node
-  /// input power. This, even the paused buildings will consume power if the callback returns a non-zero value.
+  /// The callback is responsible to check all the conditions. The returned value will be used "as-is" to update the
+  /// node input power. Thus, even the paused buildings will consume power if the callback returns a non-zero value.
   /// </remarks>
   /// <param name="nominalPowerInput">The power that's the building normally consumes.</param>
-  /// <returns>The actual power than teh building should consume.</returns>
+  /// <returns>The actual power than the building should consume.</returns>
   int UpdateAndGetPowerInput(int nominalPowerInput);
 }
 

@@ -14,7 +14,8 @@ using UnityEngine;
 namespace IgorZ.SmartPower.Core {
 
 /// <summary>
-/// A component that tracks the network demand and supply provides a decision on whether to start or stop making power.
+/// A component that tracks the network demand and supply and provides a decision on whether to start or stop making
+/// power.
 /// </summary>
 /// <remarks>
 /// This component doesn't affect anything by itself. It provides the <see cref="GetDecision"/> method tells what's the
@@ -67,13 +68,13 @@ public sealed class PowerOutputBalancer : BaseComponent, IPersistentEntity {
   [Tooltip("Delay in ticks to attempt the next power distribution check.")]
   public int waitTicks = 1;
 
-  /// <summary>Tells the generator should automatically paused/unpaused based on the power demand.</summary>
+  /// <summary>Tells the generator should automatically pause/unpause based on the power demand.</summary>
   public bool Automate { get; set; }
 
   /// <summary>The maximum level to which this generator should charge the batteries.</summary>
   public float ChargeBatteriesThreshold { get; set; } = MaxBatteryChargeRatio;
 
-  /// <summary>The minimum level to let the batteries to discharge to.</summary>
+  /// <summary>The minimum level to let the batteries discharge to.</summary>
   public float DischargeBatteriesThreshold { get; set; } = MinBatteryChargeRatio;
 
   /// <summary>Returns regulators in the same network.</summary>
