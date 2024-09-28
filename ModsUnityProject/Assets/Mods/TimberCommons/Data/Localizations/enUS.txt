@@ -15,7 +15,7 @@ IgorZ.TimberCommons.Settings.TimeAndDuration.HigherPrecisionForFuelConsumingReci
 IgorZ.TimberCommons.Settings.IrrigationSystemSection,"Irrigation system",
 IgorZ.TimberCommons.Settings.IrrigationSystem.OverrideDesertLevelsForWaterTowers,"Show irrigated tiles as well moisturized",
 IgorZ.TimberCommons.Settings.IrrigationSystem.OverrideDesertLevelsForWaterTowersTooltip,"Specifies whether the tiles should look shiny green (well moisturized). Otherwise, the stock logic
-will show them as 'barely moisturized' since the irrigation towers give only the base moisture level."
+will show them as 'barely moisturized' since the irrigation towers give only the base moisture level.",
 IgorZ.TimberCommons.Settings.WaterBuildingsSection,"Water buildings",
 IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnMechanicalPumps,"Allow setting maximum water level at the spillway of the mechanical pumps",
 IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnFluidDumps,"Allow setting maximum water level at the spillway of the liquid drops",
