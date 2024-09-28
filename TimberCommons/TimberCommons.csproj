@@ -387,6 +387,18 @@
       <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\manifest.json">
         <Link>Mod\manifest.json</Link>
       </Content>
+      <Content Include="workshop\description.txt" />
+      <Content Include="workshop\Slideshow\CurrentStrengthInSluiceDemo.jpg" />
+      <Content Include="workshop\Slideshow\FluidDumpLevelDemo.jpg" />
+      <Content Include="workshop\Slideshow\GrowthTimeDemo.jpg" />
+      <Content Include="workshop\Slideshow\InjuryPorbabilityRightPanelDemo.jpg" />
+      <Content Include="workshop\Slideshow\InjuryProbabilityAvatarHintDemo.jpg" />
+      <Content Include="workshop\Slideshow\MechanicalPumpLevelDemo.jpg" />
+      <Content Include="workshop\Slideshow\SettingsDemo.jpg" />
+      <Content Include="workshop\Slideshow\SupplyLeftTimeDemo.jpg" />
+      <Content Include="workshop\Slideshow\thumbnail.jpg" />
+      <Content Include="workshop\Slideshow\UntitledSlowRecipeTimeDemo.jpg" />
+      <Content Include="workshop\Slideshow\WaterTowerV2Demo.jpg" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
