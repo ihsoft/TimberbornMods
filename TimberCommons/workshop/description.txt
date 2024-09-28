@@ -9,6 +9,7 @@ Check out the image slideshow above to get a picture of what the mod provides. B
 [*] [b]UI[/b]. Expressing time durations as "days/hours". For a human, the duration of "2d 4h" is clearer than "52 hours", isn't it?
 [*] [b]UI[/b]. Increased precision in displaying small durations. Did you know Birch doesn't need a full 9 days to grow? It actually grows in "8d 12h", or 8.5 days.
 [*] [b]UI[/b]. The sluice will tell you what water flow is going through it. This may help in planning your infrastructure.
+[*] [b]UI[/b]. If workers can get hurt in a building, the probability of injury will be displayed on the right panel. It can appear as an indicator with a tooltip or as regular text in the building details. This is configurable through the settings. 
 [*] [b]QoL[/b]. You can now adjust the water level at fluid dump buildings, like Mechanical Pump or Fluid Dump. Not only can you change the "0.9m" default, but you can also now place a fluid dump building at any level above the surface and set it up so that it doesn't flood the output!
 [*] [Feature] If you install a mod that uses `TimberCommons`, like [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3285720709]Water Extension[/url], you will get a set of irrigation tower buildings!
 [/list]
