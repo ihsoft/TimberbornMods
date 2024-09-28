@@ -106,7 +106,7 @@
       <Compile Include="IrrigationSystemUI\Configurator.cs" />
       <Compile Include="IrrigationSystemUI\IrrigationTowerFragment.cs" />
       <Compile Include="SettingsUI\Configurator.cs" />
-      <Compile Include="SettingsUI\DistrictCenterFragment.cs" />
+      <Compile Include="SettingsUI\DebugFragment.cs" />
       <Compile Include="Settings\DebugSettings.cs" />
       <Compile Include="Settings\InjuryProbabilitySettings.cs" />
       <Compile Include="Settings\IrrigationSystemSettings.cs" />

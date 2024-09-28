@@ -14,7 +14,7 @@ using ModSettings.CoreUI;
 
 namespace IgorZ.TimberCommons.SettingsUI;
 
-sealed class DistrictCenterFragment : IEntityPanelFragment {
+sealed class DebugFragment : IEntityPanelFragment {
   readonly DevModeManager _devModeManager;
   readonly DebugFragmentFactory _debugFragmentFactory;
   readonly ModRepository _modRepository;
@@ -23,10 +23,10 @@ sealed class DistrictCenterFragment : IEntityPanelFragment {
   DistrictCenter _districtCenter;
   VisualElement _root;
 
-  DistrictCenterFragment(DevModeManager devModeManager,
-                         DebugFragmentFactory debugFragmentFactory,
-                         ModRepository modRepository,
-                         ModSettingsBox modSettingsBox) {
+  DebugFragment(DevModeManager devModeManager,
+                DebugFragmentFactory debugFragmentFactory,
+                ModRepository modRepository,
+                ModSettingsBox modSettingsBox) {
     _devModeManager = devModeManager;
     _debugFragmentFactory = debugFragmentFactory;
     _modRepository = modRepository;

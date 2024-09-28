@@ -10,16 +10,16 @@ namespace IgorZ.TimberCommons.SettingsUI;
 // Uncomment to be able to change settings without game reload. 
 [Context("Game")]
 sealed class Configurator : IConfigurator {
-  class EntityPanelModuleProvider(DistrictCenterFragment districtCenterFragment) : IProvider<EntityPanelModule> {
+  class EntityPanelModuleProvider(DebugFragment debugFragment) : IProvider<EntityPanelModule> {
     public EntityPanelModule Get() {
       var builder = new EntityPanelModule.Builder();
-      builder.AddDiagnosticFragment(districtCenterFragment);
+      builder.AddDiagnosticFragment(debugFragment);
       return builder.Build();
     }
   }
 
   public void Configure(IContainerDefinition containerDefinition) {
-    containerDefinition.Bind<DistrictCenterFragment>().AsSingleton();
+    containerDefinition.Bind<DebugFragment>().AsSingleton();
     containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
   }
 }
