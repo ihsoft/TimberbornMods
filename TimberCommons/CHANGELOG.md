@@ -1,4 +1,4 @@
-# v1.9.0 (started on 9/26/2024):
+# v1.9.1 (27 Sep 2024):
 * [Feature] Show injury probability on the buildings that can cause injury.
 * [Update] `deDE` localization from @juf0816.
 
