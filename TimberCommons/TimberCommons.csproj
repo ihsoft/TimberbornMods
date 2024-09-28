@@ -387,6 +387,7 @@
       <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\manifest.json">
         <Link>Mod\manifest.json</Link>
       </Content>
+      <Content Include="CHANGELOG.md" />
       <Content Include="workshop\description.txt" />
       <Content Include="workshop\Slideshow\CurrentStrengthInSluiceDemo.jpg" />
       <Content Include="workshop\Slideshow\FluidDumpLevelDemo.jpg" />

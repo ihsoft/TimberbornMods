@@ -1,0 +1,29 @@
+ID,Text,Comment
+IgorZ.TimberCommons.WaterTower.Utilization,"Potentiel utilisé : {0:0.#}%",
+IgorZ.TimberCommons.WaterTower.IrrigatedArea,"Zone couverte : {0}",
+IgorZ.TimberCommons.WaterTower.EffectiveRange,"Portée effective : {0}",
+IgorZ.TimberCommons.WaterTower.NoTilesToIrrigate,"Pas de tuiles atteignables pour irriguer",
+IgorZ.TimberCommons.GrowthRateModifier.BoostPercentile,"Stimulation de croissance : <GreenHighlight>🡅</GreenHighlight>{0:0.#}%","It indicates growth boost, it's a good effect."
+IgorZ.TimberCommons.GrowthRateModifier.SlowdownPercentile,"Ralentissement de croissance : <RedHighlight>🡇</RedHighlight>{0:0.#}%","It indicates growth penalty, it's a bad effect."
+IgorZ.TimberCommons.AdjustableWaterOutput.StopAboveDownstream,"Près du niveau de profondeur du déversoir : {0}",
+IgorZ.TimberCommons.InjuryProbability,"Probabilité de blessure : {0} toutes les heures",
+IgorZ.TimberCommons.Settings.TimeAndDurationSection,"Représentation durée et temps",
+IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursSupplyLeft,"Afficher la « durée de l'approvisionnement » en jours/heures",
+IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursGrowingTime,"Afficher le temps de croissance en jours/heures",
+IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursForRecipeDuration,"Afficher la durée des recettes en jours/heures",
+IgorZ.TimberCommons.Settings.TimeAndDuration.HigherPrecisionForFuelConsumingRecipes,"Afficher la consommation de carburant des recettes avec une plus grande précision",
+IgorZ.TimberCommons.Settings.IrrigationSystemSection,"Système d'irrigation",
+IgorZ.TimberCommons.Settings.IrrigationSystem.OverrideDesertLevelsForWaterTowers,"Montrer des tuiles irriguées et bien hydratées",
+IgorZ.TimberCommons.Settings.IrrigationSystem.OverrideDesertLevelsForWaterTowersTooltip,"Spécifie si les tuiles doivent avoir un aspect vert brillant (bien hydraté). Sinon, la logique du stock
+les montrera comme « à peine hydratées » puisque les tours d'irrigation ne donnent que le niveau d'humidité de base.",
+IgorZ.TimberCommons.Settings.WaterBuildingsSection,"Bâtiments hydrauliques",
+IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnMechanicalPumps,"Permettre de fixer le niveau d'eau maximum au déversoir des pompes mécaniques",
+IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnFluidDumps,"Permet de fixer le niveau d'eau maximum au déversoir d'écoulement de liquide",
+IgorZ.TimberCommons.Settings.WaterBuildings.ShowCurrentStrengthInSluice,"Afficher la force actuelle dans la vanne",
+IgorZ.TimberCommons.Settings.InjuryProbabilitySection,"Probabilité de blessure",
+IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,"Afficher la probabilité de blessure dans le panneau de droite",
+IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,"Afficher l'indicateur sur l'icône du bâtiment",
+IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHintTooltip,"Survolez l'indicateur pour connaître la probabilité de blessure.",
+IgorZ.TimberCommons.Settings.DebugSection,"Débogage et dépannage",
+IgorZ.TimberCommons.Settings.Debug.VerboseLogging,"Journalisation verbeuse",
+IgorZ.TimberCommons.Settings.Debug.VerboseLoggingTooltip,"Les journaux contiendront plus de détails utiles, mais cela peut avoir un impact sur les performances du jeu."
