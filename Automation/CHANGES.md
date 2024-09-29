@@ -1,3 +1,6 @@
+# v1.2.3 (29 Sep 2024):
+* [Fix] Mod crashes in map editor.
+
 # v1.2.2 (5 Sep 2024):
 * [Change] Support Timberborn 0.6.5.1.
 

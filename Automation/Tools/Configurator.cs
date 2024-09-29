@@ -5,9 +5,10 @@
 using Automation.Utils;
 using Bindito.Core;
 
-namespace Automation.Tools {
+namespace Automation.Tools;
 
 [Context("Game")]
+[Context("MapEditor")]
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
 
@@ -23,6 +24,4 @@ sealed class Configurator : IConfigurator {
     CustomToolSystem.BindTool<DebugPickTool>(containerDefinition);
     CustomToolSystem.BindTool<DebugFinishNowTool>(containerDefinition);
   }
-}
-
 }

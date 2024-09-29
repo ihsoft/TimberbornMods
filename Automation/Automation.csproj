@@ -644,6 +644,7 @@
       <Content Include="..\ModsUnityProject\Assets\Mods\Automation\manifest.json">
         <Link>Mod\manifest.json</Link>
       </Content>
+      <Content Include="CHANGES.md" />
     </ItemGroup>
     <ItemGroup>
       <None Include="packages.config" />
