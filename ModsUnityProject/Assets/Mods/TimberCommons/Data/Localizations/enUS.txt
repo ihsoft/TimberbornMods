@@ -26,4 +26,4 @@ IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,"Show indicator on
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHintTooltip,"Hover over the indicator to see the injury probability",
 IgorZ.TimberCommons.Settings.DebugSection,"Debug and troubleshooting",
 IgorZ.TimberCommons.Settings.Debug.VerboseLogging,"Verbose logging",
-IgorZ.TimberCommons.Settings.Debug.VerboseLoggingTooltip,"Logs will have more useful details, but it may impact game performance."
+IgorZ.TimberCommons.Settings.Debug.VerboseLoggingTooltip,"Logs will have more useful details, but it may impact game performance.",
