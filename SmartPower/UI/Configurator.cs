@@ -9,7 +9,7 @@ using IgorZ.SmartPower.Core;
 using IgorZ.TimberDev.Utils;
 using Timberborn.EntityPanelSystem;
 
-namespace IgorZ.SmartPower.UI {
+namespace IgorZ.SmartPower.UI;
 
 [Context("Game")]
 // ReSharper disable once UnusedType.Global
@@ -27,24 +27,15 @@ sealed class Configurator : IConfigurator {
     containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
   }
 
-  sealed class EntityPanelModuleProvider : IProvider<EntityPanelModule> {
-    readonly SmartGoodPoweredGeneratorFragment _goodPoweredGeneratorFragment;
-    readonly PowerOutputBalancerFragment _powerOutputBalancerFragment;
-
-    public EntityPanelModuleProvider(
-        SmartGoodPoweredGeneratorFragment goodPoweredGeneratorFragment,
-        PowerOutputBalancerFragment powerOutputBalancerFragment) {
-      _goodPoweredGeneratorFragment = goodPoweredGeneratorFragment;
-      _powerOutputBalancerFragment = powerOutputBalancerFragment;
-    }
-
+  sealed class EntityPanelModuleProvider(
+      SmartGoodPoweredGeneratorFragment goodPoweredGeneratorFragment,
+      PowerOutputBalancerFragment powerOutputBalancerFragment)
+      : IProvider<EntityPanelModule> {
     public EntityPanelModule Get() {
       var builder = new EntityPanelModule.Builder();
-      builder.AddMiddleFragment(_goodPoweredGeneratorFragment);
-      builder.AddMiddleFragment(_powerOutputBalancerFragment);
+      builder.AddMiddleFragment(goodPoweredGeneratorFragment);
+      builder.AddMiddleFragment(powerOutputBalancerFragment);
       return builder.Build();
     }
   }
-}
-
 }
