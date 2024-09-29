@@ -68,7 +68,8 @@ public class SmartManufactory : BaseComponent, IAdjustablePowerInput {
 
   /// <inheritdoc/>
   public int UpdateAndGetPowerInput(int nominalPowerInput) {
-    if (_mechanicalBuilding.ConsumptionDisabled || _blockableBuilding && !_blockableBuilding.IsUnblocked
+    if (_mechanicalBuilding.ConsumptionDisabled
+        || _blockableBuilding && !_blockableBuilding.IsUnblocked
         || !_manufactory.HasCurrentRecipe) {
       AllWorkersOut = MissingIngredients = BlockedOutput = NoFuel = StandbyMode = false;
       return 0;

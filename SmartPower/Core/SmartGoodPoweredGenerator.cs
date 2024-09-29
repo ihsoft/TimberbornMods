@@ -72,7 +72,7 @@ public sealed class SmartGoodPoweredGenerator : GoodPoweredGenerator, IPersisten
   /// <summary>The maximum level to which this generator should charge the batteries.</summary>
   public float ChargeBatteriesThreshold { get; set; } = MaxBatteryChargeRatio;
 
-  /// <summary>The minimum level to let the batteries to discharge to.</summary>
+  /// <summary>The minimum level to let the batteries discharge to.</summary>
   public float DischargeBatteriesThreshold { get; set; } = MinBatteryChargeRatio;
 
   /// <summary>Returns the mechanical graph this generator is connected to.</summary>
