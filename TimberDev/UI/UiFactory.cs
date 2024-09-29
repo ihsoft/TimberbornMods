@@ -15,7 +15,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 // ReSharper disable MemberCanBePrivate.Global
-namespace IgorZ.TimberDev.UI {
+namespace IgorZ.TimberDev.UI;
 
 /// <summary>Factory for making standard fragment panel elements.</summary>
 public sealed class UiFactory {
@@ -48,8 +48,9 @@ public sealed class UiFactory {
   /// </param>
   /// <param name="lowValue">The lowest possible value.</param>
   /// <param name="highValue">The highest possible value.</param>
-  public Slider CreateSlider(
-      Action<ChangeEvent<float>> onValueChangedFn, float lowValue, float highValue, float stepSize = 0) {
+  /// <param name="spacing">If a non-negative value, then the bottom margin will be set.</param>
+  public Slider CreateSlider(Action<ChangeEvent<float>> onValueChangedFn, float lowValue, float highValue,
+                             float stepSize = 0, int spacing = 5) {
     var slider = UiBuilder.Create<GameTextSlider>().Small().Build();
     slider.lowValue = lowValue;
     slider.highValue = highValue;
@@ -62,6 +63,9 @@ public sealed class UiFactory {
           }
           onValueChangedFn(evt);
         });
+    if (spacing >= 0) {
+      slider.style.marginBottom = spacing;
+    }
     return slider;
   }
 
@@ -71,8 +75,9 @@ public sealed class UiFactory {
   /// <param name="highValue">The maximum value limit.</param>
   /// <param name="minDelta">The minimum delta between min/max values.</param>
   /// <param name="stepSize">If greater than zero, then the values are rounded to the step.</param>
+  /// <param name="spacing">If a non-negative value, then the bottom margin will be set.</param>
   public MinMaxSlider CreateMinMaxSlider(Action<ChangeEvent<Vector2>> onValueChangedFn, float lowValue, float highValue,
-                                         float minDelta, float stepSize = 0) {
+                                         float minDelta, float stepSize = 0, int spacing = 5) {
     var slider = UiBuilder.Create<GameTextMinMaxSlider>()
         .SetLowLimit(lowValue)
         .SetHighLimit(highValue)
@@ -95,6 +100,9 @@ public sealed class UiFactory {
           evt = ChangeEvent<Vector2>.GetPooled(evt.previousValue, newValue);
           onValueChangedFn(evt);
         });
+    if (spacing >= 0) {
+      slider.style.marginBottom = spacing;
+    }
     return slider;
   }
 
@@ -115,13 +123,19 @@ public sealed class UiFactory {
   }
 
   /// <summary>Creates a toggle in a theme suitable for the right side panel.</summary>
-  /// <param name="locKey">Loc key for the caption.</param>
+  /// <param name="locKey">Loc key for the caption. If null or empty, then there will be no caption.</param>
   /// <param name="onValueChangedFn">
   /// A callback method that will be called on the value change. The only argument is the new value.
   /// </param>
-  public Toggle CreateToggle(string locKey, Action<ChangeEvent<bool>> onValueChangedFn) {
-    var toggle = UiBuilder.Create<GameToggle>().SetLocKey(locKey).Build();
+  /// <param name="spacing">If a non-negative value, then the bottom margin will be set.</param>
+  public Toggle CreateToggle(string locKey, Action<ChangeEvent<bool>> onValueChangedFn, int spacing = 5) {
+    var toggle = !string.IsNullOrEmpty(locKey)
+        ? UiBuilder.Create<GameToggle>().SetLocKey(locKey).Build()
+        : UiBuilder.Create<GameTextToggle>().Build();
     toggle.RegisterValueChangedCallback(evt => onValueChangedFn(evt));
+    if (spacing >= 0) {
+      toggle.style.marginBottom = spacing;
+    }
     return toggle;
   }
 
@@ -146,6 +160,18 @@ public sealed class UiFactory {
     return button;
   }
 
+  /// <summary>Wraps the element to make it centered in the UI fragment.</summary>
+  public VisualElement CenterElement(VisualElement element) {
+    var center = new VisualElement {
+        style = {
+            justifyContent = Justify.Center,
+            flexDirection = FlexDirection.Row
+        }
+    };
+    center.Add(element);
+    return center;
+  }
+
   /// <summary>Creates a panel builder that can be used as a fragment on the right side panel.</summary>
   /// <remarks>
   /// This is a root element for the fragment's panel. Add controls to it via
@@ -157,6 +183,4 @@ public sealed class UiFactory {
         .SetWidth(new Length(100f, LengthUnit.Percent))
         .SetJustifyContent(Justify.Center);
   }
-}
-
 }

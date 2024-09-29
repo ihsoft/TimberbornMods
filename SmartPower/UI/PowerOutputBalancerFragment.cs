@@ -40,7 +40,6 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
           _balancer.Automate = _automateCheckbox.value;
           UpdateControls();
         });
-    _automateCheckbox.style.marginBottom = 5;
 
     _chargeBatteriesSlider = _uiFactory.CreateMinMaxSlider(
         evt => {
@@ -48,24 +47,15 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
           _balancer.ChargeBatteriesThreshold = evt.newValue.y;
           UpdateControls();
         }, 0f, 1.0f, 0.10f, stepSize: 0.05f);
-    _chargeBatteriesSlider.style.marginBottom = 5;
 
     _chargeBatteriesText = _uiFactory.CreateLabel();
     _applyToAllGeneratorsButton = _uiFactory.CreateButton(ApplyToAllGeneratorsLocKey, ApplyToAllGenerators);
-
-    var center = new VisualElement {
-        style = {
-            justifyContent = Justify.Center,
-            flexDirection = FlexDirection.Row
-        }
-    };
-    center.Add(_applyToAllGeneratorsButton);
 
     _root = _uiFactory.CreateCenteredPanelFragmentBuilder()
         .AddComponent(_automateCheckbox)
         .AddComponent(_chargeBatteriesText)
         .AddComponent(_chargeBatteriesSlider)
-        .AddComponent(center)
+        .AddComponent(_uiFactory.CenterElement(_applyToAllGeneratorsButton))
         .BuildAndInitialize();
 
     _root.ToggleDisplayStyle(visible: false);

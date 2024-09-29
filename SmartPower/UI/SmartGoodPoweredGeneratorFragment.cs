@@ -10,7 +10,7 @@ using Timberborn.EntityPanelSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace IgorZ.SmartPower.UI {
+namespace IgorZ.SmartPower.UI;
 
 /// <summary>UI fragment that controls <see cref="SmartGoodPoweredGenerator"/> settings.</summary>
 sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
@@ -40,7 +40,6 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
           _generator.NeverShutdown = _neverShutdownCheckbox.value;
           UpdateControls();
         });
-    _neverShutdownCheckbox.style.marginBottom = 5;
 
     _chargeBatteriesSlider = _uiFactory.CreateMinMaxSlider(
         evt => {
@@ -48,24 +47,15 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
           _generator.ChargeBatteriesThreshold = evt.newValue.y;
           UpdateControls();
         }, 0f, 1.0f, 0.10f, stepSize: 0.05f);
-    _chargeBatteriesSlider.style.marginBottom = 5;
 
     _chargeBatteriesText = _uiFactory.CreateLabel();
     _applyToAllEnginesButton = _uiFactory.CreateButton(ApplyToAllGeneratorsLocKey, ApplyToAllEngines);
-
-    var center = new VisualElement {
-        style = {
-            justifyContent = Justify.Center,
-            flexDirection = FlexDirection.Row
-        }
-    };
-    center.Add(_applyToAllEnginesButton);
 
     _root = _uiFactory.CreateCenteredPanelFragmentBuilder()
         .AddComponent(_neverShutdownCheckbox)
         .AddComponent(_chargeBatteriesText)
         .AddComponent(_chargeBatteriesSlider)
-        .AddComponent(center)
+        .AddComponent(_uiFactory.CenterElement(_applyToAllEnginesButton))
         .BuildAndInitialize();
 
     _root.ToggleDisplayStyle(visible: false);
@@ -123,6 +113,4 @@ sealed class SmartGoodPoweredGeneratorFragment : IEntityPanelFragment {
     _applyToAllEnginesButton.text = _uiFactory.Loc.T(AppliedToGeneratorsLocKey, affectedGenerators);
     _applyToAllEnginesButton.SetEnabled(false);
   }
-}
-
 }
