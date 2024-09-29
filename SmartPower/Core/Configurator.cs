@@ -21,7 +21,7 @@ sealed class Configurator : IConfigurator {
   static readonly PrefabPatcher.RequiredComponentsDep PoweredAttractionDeps =
       new(AccessTools.TypeByName("Timberborn.Attractions.AttractionSpec"), typeof(MechanicalBuilding));
   static readonly PrefabPatcher.RequiredComponentsDep ManufactoryDeps =
-      new(AccessTools.TypeByName("Timberborn.Workshops.ManufactorySpec"));
+      new(AccessTools.TypeByName("Timberborn.Workshops.ManufactorySpec"), typeof(MechanicalBuilding));
   static readonly PrefabPatcher.RequiredComponentsDep WalkerPoweredGeneratorDeps =
       new(AccessTools.TypeByName("Timberborn.PowerGenerating.WalkerPoweredGenerator"));
   static readonly string PatchId = typeof(Configurator).AssemblyQualifiedName;
