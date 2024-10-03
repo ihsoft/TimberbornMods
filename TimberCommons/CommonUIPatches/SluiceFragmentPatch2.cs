@@ -7,6 +7,7 @@ using HarmonyLib;
 using IgorZ.TimberCommons.Settings;
 using IgorZ.TimberDev.UI;
 using Timberborn.BlockSystem;
+using Timberborn.CoreUI;
 using Timberborn.Localization;
 using Timberborn.WaterBuildings;
 using UnityEngine;
@@ -14,7 +15,7 @@ using UnityEngine;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
 
-namespace IgorZ.TimberCommons.CommonUIPatches {
+namespace IgorZ.TimberCommons.CommonUIPatches;
 
 [HarmonyPatch]
 static class SluiceFragmentPatch2 {
@@ -28,20 +29,19 @@ static class SluiceFragmentPatch2 {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!
     }
-    if (!____sluice || !WaterBuildingsSettings.ShowCurrentStrengthInSluice) {
+    if (!____sluice) {
+      return;
+    }
+    if (!WaterBuildingsSettings.ShowCurrentStrengthInSluice) {
+      SluiceFragmentPatch1.FlowLabel.ToggleDisplayStyle(visible: false);
       return;
     }
 
-    if (SluiceFragmentPatch1.FlowLabel == null) {
-      return;
-    }
-
+    SluiceFragmentPatch1.FlowLabel.ToggleDisplayStyle(visible: true);
     var val = SluiceFragmentPatch1.ThreadSafeWaterMap.WaterFlowDirection(
         ____sluice.GetComponentFast<BlockObject>().Coordinates);
     var currentStrength = Mathf.Max(Mathf.Abs(val.x), Mathf.Abs(val.y));
     SluiceFragmentPatch1.FlowLabel.text =
         ____loc.T(WaterCurrentLocKey, CommonFormats.FormatSmallValue(currentStrength));
   }
-}
-
 }

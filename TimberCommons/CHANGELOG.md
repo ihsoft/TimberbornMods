@@ -1,5 +1,6 @@
 # v1.10.0 (started on 9/28/2024):
 * [Enhancement] Add `frFR` localization (by @Erazil). 
+* [Fix] The current strength of the sluice is not shown.
 
 # v1.9.1 (27 Sep 2024):
 * [Feature] Show injury probability on the buildings that can cause injury.
