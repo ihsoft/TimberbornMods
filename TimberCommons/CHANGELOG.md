@@ -1,5 +1,5 @@
-# v1.10.0 (started on 9/28/2024):
-* [Enhancement] Add `frFR` localization (by @Erazil). 
+# v1.10.0 (3 Oct 2024):
+* [Enhancement] Add `frFR` localization (by @Erazil).
 * [Fix] The current strength of the sluice is not shown.
 
 # v1.9.1 (27 Sep 2024):
