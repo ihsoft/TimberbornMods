@@ -131,9 +131,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   }
 
   /// <inheritdoc />
-  public IEnumerable<string> RangeNames() {
-    yield return typeof(IrrigationTower).FullName;
-  }
+  public string RangeName => typeof(IrrigationTower).FullName;
 
   #endregion
 
