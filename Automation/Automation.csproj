@@ -147,7 +147,7 @@
       <Compile Include="Utils\ToolWithDescription.cs" />
     </ItemGroup>
     <ItemGroup>
-      <Reference Include="0Harmony, Version=2.9.0.0, Culture=neutral, PublicKeyToken=null">
+      <Reference Include="0Harmony">
         <HintPath>..\Dependencies\Timberborn.u6\Workshop\Harmony\0Harmony.dll</HintPath>
       </Reference>
       <Reference Include="AsmResolver, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
@@ -361,20 +361,20 @@
       <Reference Include="Timberborn.WorldSerialization, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.WorldSerialization.dll</HintPath>
       </Reference>
-      <Reference Include="Unity.InputSystem, Version=1.7.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Unity\Unity.InputSystem.dll</HintPath>
+      <Reference Include="Unity.InputSystem">
+        <HintPath>..\Dependencies\Timberborn.u6\Unity\Unity.InputSystem.dll</HintPath>
       </Reference>
       <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Unity\UnityEngine.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\Unity\UnityEngine.dll</HintPath>
       </Reference>
       <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Unity\UnityEngine.CoreModule.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\Unity\UnityEngine.CoreModule.dll</HintPath>
       </Reference>
       <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Unity\UnityEngine.TextRenderingModule.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\Unity\UnityEngine.TextRenderingModule.dll</HintPath>
       </Reference>
       <Reference Include="UnityEngine.UIElementsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Unity\UnityEngine.UIElementsModule.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\Unity\UnityEngine.UIElementsModule.dll</HintPath>
       </Reference>
     </ItemGroup>
     <ItemGroup>
