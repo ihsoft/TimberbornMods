@@ -23,7 +23,6 @@ sealed class Configurator : IConfigurator {
     }
     HarmonyPatcher.PatchRepeated(PatchId, patches.ToArray());
     containerDefinition.Bind<SmartGoodPoweredGeneratorFragment>().AsSingleton();
-    containerDefinition.Bind<PowerOutputBalancerFragment>().AsSingleton();
     containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
   }
 

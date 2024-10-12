@@ -1,3 +1,5 @@
+# v1.12.0 (started on 9/28/2024)
+
 # v1.11.2 (25 Sep 2024)
 * [Fix] "Apply to all generators" button is not resized.
 
