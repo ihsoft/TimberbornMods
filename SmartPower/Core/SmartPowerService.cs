@@ -4,7 +4,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Timberborn.BaseComponentSystem;
 using Timberborn.MechanicalSystem;
 using Timberborn.TickSystem;
 using UnityDev.Utils.LogUtilsLite;
@@ -25,11 +24,30 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
   #region API
 
   public void RegisterConsumer(ISuspendableConsumer consumer) {
-    throw  new System.NotImplementedException();
+    if (_allRegisteredConsumers.TryGetValue(consumer, out var graph)) {
+      if (graph != consumer.MechanicalNode.Graph) {
+        throw new System.InvalidOperationException("Consumer already registered in another graph: " + consumer);
+      }
+      return;
+    }
+    graph = consumer.MechanicalNode.Graph;
+    _allRegisteredConsumers[consumer] = graph;
+    var setup = GetSetup(graph);
+    setup.AllConsumers.Add(consumer);
+    AddSorted(consumer.IsSuspended ? setup.SuspendedConsumers : setup.ActiveConsumers, consumer);
   }
 
+  /// <summary>Unregisters the consumer from the service. If the consumer is not registered, does nothing.</summary>
   public void UnregisterConsumer(ISuspendableConsumer consumer) {
-    throw  new System.NotImplementedException();
+    if (!_allRegisteredConsumers.TryGetValue(consumer, out var graph)) {
+      return;
+    }
+    _allRegisteredConsumers.Remove(consumer);
+    var setup = _setupsPerGraph[graph];
+    setup.AllConsumers.Remove(consumer);
+    setup.ActiveConsumers.Remove(consumer);
+    setup.SuspendedConsumers.Remove(consumer);
+    CheckRemoveGraph(graph, setup);
   }
 
   /// <summary>
@@ -43,21 +61,8 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
       return;
     }
     graph = generator.MechanicalNode.Graph;
-    DebugEx.Fine(
-      "Registering generator {0}, isSuspended={1}, graph={2}", generator, generator.IsSuspended, graph.GetHashCode());
     _allRegisteredGenerators[generator] = graph;
-    if (!_setupsPerGraph.TryGetValue(graph, out var setup)) {
-      setup = new GraphSetup {
-          AllGenerators = [],
-          ActiveGenerators = [],
-          SpareGenerators = [],
-          AllConsumers = [],
-          ActiveConsumers = [],
-          SuspendedConsumers = [],
-      };
-      DebugEx.Fine("Adding graph {0} to setups", graph.GetHashCode());
-      _setupsPerGraph[graph] = setup;
-    }
+    var setup = GetSetup(graph);
     setup.AllGenerators.Add(generator);
     AddSorted(generator.IsSuspended ? setup.SpareGenerators : setup.ActiveGenerators, generator);
   }
@@ -67,16 +72,12 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
     if (!_allRegisteredGenerators.TryGetValue(generator, out var graph)) {
       return;
     }
-    DebugEx.Fine("UnRegistering generator {0}, graph={1}", generator, graph.GetHashCode());
     _allRegisteredGenerators.Remove(generator);
     var setup = _setupsPerGraph[graph];
     setup.AllGenerators.Remove(generator);
     setup.ActiveGenerators.Remove(generator);
     setup.SpareGenerators.Remove(generator);
-    if (setup.AllGenerators.Count == 0) {
-      DebugEx.Fine("Removing graph {0} from setups", graph.GetHashCode());
-      _setupsPerGraph.Remove(graph);
-    }
+    CheckRemoveGraph(graph, setup);
   }
 
   #endregion
@@ -103,7 +104,9 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
 
   readonly Dictionary<MechanicalGraph, GraphSetup> _setupsPerGraph = new();
   readonly HashSet<ISuspendableGenerator> _dirtyGenerators = new();
+  readonly HashSet<ISuspendableConsumer> _dirtyConsumers = new();
   readonly Dictionary<ISuspendableGenerator, MechanicalGraph> _allRegisteredGenerators = new();
+  readonly Dictionary<ISuspendableConsumer, MechanicalGraph> _allRegisteredConsumers = new();
 
   SmartPowerService() {
     _instance = this;
@@ -152,11 +155,11 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
     foreach (var consumer in _allConsumers) {
       if (consumer.IsSuspended) {
         if (batteriesChargeRatio >= consumer.MinBatteriesCharge) {
-          //ActivateConsumer(consumer);
+          ActivateConsumer(consumer);
         }
       } else {
         if (batteriesChargeRatio <= consumer.MinBatteriesCharge) {
-          //SuspendConsumer(consumer);
+          SuspendConsumer(consumer);
         }
       }
     }
@@ -177,18 +180,15 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
     DebugEx.Fine("Suspend generator {0}, power={1}", generator, power);
   }
 
-  void ActivateConsumer() {
-    var index = _suspendedConsumers.Count - 1;
-    var consumer = _suspendedConsumers[index];
-    _suspendedConsumers.RemoveAt(index);
+  void ActivateConsumer(ISuspendableConsumer consumer) {
+    _suspendedConsumers.Remove(consumer);
     AddSorted(_activeConsumers, consumer);
     consumer.Resume();
     DebugEx.Fine("Activate consumer {0}, power={1}", consumer, consumer.MechanicalNode.PowerOutput);
   }
 
-  void SuspendConsumer() {
-    var consumer = _activeConsumers[0];
-    _activeConsumers.RemoveAt(0);
+  void SuspendConsumer(ISuspendableConsumer consumer) {
+    _activeConsumers.Remove(consumer);
     AddSorted(_suspendedConsumers, consumer);
     var power = consumer.MechanicalNode.PowerOutput;
     consumer.Suspend();
@@ -202,7 +202,7 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
 
     if (graph.CurrentPower.PowerDemand > graph.CurrentPower.PowerSupply && _spareGenerators.Count == 0) {
       while (graph.CurrentPower.PowerDemand > graph.CurrentPower.PowerSupply && _activeConsumers.Count > 0) {
-        SuspendConsumer();
+        SuspendConsumer(_activeConsumers[0]);
       }
     }
 
@@ -242,17 +242,17 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
         ActivateGenerator(_spareGenerators[_spareGenerators.Count - 1]);
       }
       while (_suspendedConsumers.Count >= skipConsumersCount) {
-        ActivateConsumer();
+        ActivateConsumer(_suspendedConsumers[_suspendedConsumers.Count - 1]);
       }
     }
   }
 
   void UpdateGenerator(ISuspendableGenerator generator) {
     if (_dirtyGenerators.Contains(generator)) {
-      HostedDebugLog.Fine(
-        generator as BaseComponent, "Mechanical graph changed: {1}", generator.MechanicalNode.Graph.GetHashCode());
-      RegisterGenerator(generator);
       _dirtyGenerators.Remove(generator);
+      DebugEx.Fine("Mechanical graph changed: generator={0}, newGraph={1}",
+                   generator, generator.MechanicalNode.Graph.GetHashCode());
+      RegisterGenerator(generator);
       return;
     }
     
@@ -260,6 +260,21 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
         && generator.MechanicalNode.Graph != oldGraph) {
       UnregisterGenerator(generator);
       _dirtyGenerators.Add(generator);
+    }
+  }
+
+  void UpdateConsumer(ISuspendableConsumer consumer) {
+    if (_dirtyConsumers.Contains(consumer)) {
+      _dirtyConsumers.Remove(consumer);
+      DebugEx.Fine("Mechanical graph changed: consumer={0}, newGraph={1}",
+                   consumer, consumer.MechanicalNode.Graph.GetHashCode());
+      RegisterConsumer(consumer);
+      return;
+    }
+    if (_allRegisteredConsumers.TryGetValue(consumer, out var oldGraph)
+        && consumer.MechanicalNode.Graph != oldGraph) {
+      UnregisterConsumer(consumer);
+      _dirtyConsumers.Add(consumer);
     }
   }
 
@@ -273,10 +288,38 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
     list.Insert(index, item);
   }
 
+
+  static GraphSetup GetSetup(MechanicalGraph graph) {
+    if (_instance._setupsPerGraph.TryGetValue(graph, out var setup)) {
+      return setup;
+    }
+    setup = new GraphSetup {
+        AllGenerators = [],
+        ActiveGenerators = [],
+        SpareGenerators = [],
+        AllConsumers = [],
+        ActiveConsumers = [],
+        SuspendedConsumers = [],
+    };
+    _instance._setupsPerGraph[graph] = setup;
+    return setup;
+  }
+
+  static void CheckRemoveGraph(MechanicalGraph graph, GraphSetup setup) {
+    if (setup.AllGenerators.Count == 0 && setup.AllConsumers.Count == 0) {
+      _instance._setupsPerGraph.Remove(graph);
+    }
+  }
+
   internal static void OnMechanicalNodeGraphChanged(MechanicalNode node) {
     var generator = node.GetComponentFast<ISuspendableGenerator>();
     if (generator != null) {
       _instance.UpdateGenerator(generator);
+      return;
+    }
+    var consumer = node.GetComponentFast<ISuspendableConsumer>();
+    if (consumer != null) {
+      _instance.UpdateConsumer(consumer);
     }
   }
 
