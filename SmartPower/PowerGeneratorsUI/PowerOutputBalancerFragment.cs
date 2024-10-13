@@ -15,10 +15,10 @@ using UnityEngine.UIElements;
 namespace IgorZ.SmartPower.PowerGeneratorsUI;
 
 sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
-  const string AutomateLocKey = "IgorZ.SmartPower.PoweredGenerator.AutomateGenerator";
-  const string ChargeLevelLocKey = "IgorZ.SmartPower.PoweredGenerator.ChargeBatteriesRangeText";
-  const string ApplyToAllGeneratorsLocKey = "IgorZ.SmartPower.PoweredGenerator.ApplyToAllGenerators";
-  const string AppliedToGeneratorsLocKey = "IgorZ.SmartPower.PoweredGenerator.AppliedToGenerators";
+  const string AutomateLocKey = "IgorZ.SmartPower.PowerOutputBalancer.AutomateGenerator";
+  const string ChargeLevelLocKey = "IgorZ.SmartPower.PowerOutputBalancer.ChargeBatteriesRangeText";
+  const string ApplyToAllGeneratorsLocKey = "IgorZ.SmartPower.PowerOutputBalancer.ApplyToAllGenerators";
+  const string AppliedToGeneratorsLocKey = "IgorZ.SmartPower.PowerOutputBalancer.AppliedToGenerators";
 
   readonly UiFactory _uiFactory;
 
