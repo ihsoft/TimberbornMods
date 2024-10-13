@@ -26,7 +26,10 @@ static class NetworkFragmentServicePatch {
     return AccessTools.DeclaredMethod("Timberborn.MechanicalSystemUI.NetworkFragmentService:Update");
   }
 
-  static void Postfix(MechanicalNode mechanicalNode, Label ____label, ILoc ____loc) {
+  static void Postfix(bool __runOriginal, MechanicalNode mechanicalNode, Label ____label, ILoc ____loc) {
+    if (!__runOriginal) {
+      return;  // The other patches must follow the same style to properly support the skip logic!
+    }
     if (____label.style.display == DisplayStyle.None) {
       return;
     }
