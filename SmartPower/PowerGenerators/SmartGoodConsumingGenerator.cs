@@ -5,6 +5,7 @@
 using Timberborn.BuildingsBlocking;
 using Timberborn.GoodConsumingBuildingSystem;
 using Timberborn.MechanicalSystem;
+using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.SmartPower.PowerGenerators;
 
@@ -32,25 +33,27 @@ sealed class SmartGoodConsumingGenerator : PowerOutputBalancer {
   GoodConsumingBuilding _goodConsumingBuilding;
   GoodConsumingToggle _goodConsumingToggle;
   MechanicalNode _mechanicalNode;
-  PausableBuilding _pausable;
+  PausableBuilding _pausableBuilding;
 
   protected override void Awake() {
     base.Awake();
     _goodConsumingBuilding = GetComponentFast<GoodConsumingBuilding>();
     _goodConsumingToggle = _goodConsumingBuilding.GetGoodConsumingToggle();
     _mechanicalNode = GetComponentFast<MechanicalNode>();
-    _pausable = GetComponentFast<PausableBuilding>();
-    _pausable.PausedChanged += (_, _) => UpdateRegistration();
+    _pausableBuilding = GetComponentFast<PausableBuilding>();
+    _pausableBuilding.PausedChanged += (_, _) => UpdateRegistration();
   }
 
   protected override void UpdateRegistration() {
-    if (Automate && !_pausable.Paused) {
+    if (Automate && !_pausableBuilding.Paused && !SmartPowerService.IsGeneratorRegistered(this)) {
+      HostedDebugLog.Fine(this, "Registering in SmartPowerService");
       SmartPowerService.RegisterGenerator(this);
     }
-    if (!Automate || _pausable.Paused) {
+    if ((!Automate || _pausableBuilding.Paused) && SmartPowerService.IsGeneratorRegistered(this)) {
       if (IsSuspended) {
         Resume();
       }
+      HostedDebugLog.Fine(this, "Unregistering from SmartPowerService");
       SmartPowerService.UnregisterGenerator(this);
     }
   }
