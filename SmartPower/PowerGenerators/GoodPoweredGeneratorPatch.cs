@@ -4,6 +4,7 @@
 
 using System.Reflection;
 using HarmonyLib;
+using Timberborn.BaseComponentSystem;
 
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
@@ -16,8 +17,11 @@ static class GoodPoweredGeneratorPatch {
     return AccessTools.Method("Timberborn.PowerGenerating.GoodPoweredGenerator:Tick");
   }
 
-  static bool Prefix() {
-    // All power saving logic is run by the SmartPowerService.
-    return false;
+  static bool Prefix(bool __runOriginal, BaseComponent __instance) {
+    if (!__runOriginal) {
+      return false;  // The other patches must follow the same style to properly support the skip logic!
+    }
+    var balancer = __instance.GetComponentFast<PowerOutputBalancer>();
+    return !balancer.Automate;
   }
 }
