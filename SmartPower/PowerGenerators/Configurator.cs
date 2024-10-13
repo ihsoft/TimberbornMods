@@ -6,7 +6,6 @@ using Bindito.Core;
 using IgorZ.TimberDev.Utils;
 using Timberborn.PowerGenerating;
 using Timberborn.TemplateSystem;
-using UnityDev.Utils.LogUtilsLite;
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Local
@@ -26,9 +25,6 @@ sealed class Configurator : IConfigurator {
   static TemplateModule ProvideTemplateModule() {
     var builder = new TemplateModule.Builder();
     builder.AddDecorator<GoodPoweredGenerator, SmartGoodConsumingGenerator>();
-
-    DebugEx.Warning("*** SmartPower: Configured ***");
-    
     return builder.Build();
   }
 }
