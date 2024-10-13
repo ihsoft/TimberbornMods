@@ -27,6 +27,9 @@ sealed class Features : IModStarter {
   /// <inheritdoc/>
   public void StartMod(IModEnvironment modEnvironment) {
     FeatureController.ReadFeatures(modEnvironment.ModPath, Consume);
+    if (DebugExVerboseLogging && DebugEx.LoggingSettings.VerbosityLevel < 5) {
+      DebugEx.LoggingSettings.VerbosityLevel = 5;
+    }
   }
 
   static bool Consume(string name, bool enabled, string value) {
