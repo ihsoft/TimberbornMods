@@ -329,16 +329,16 @@
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Workshops.dll</HintPath>
       </Reference>
       <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Unity\UnityEngine.CoreModule.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\Unity\UnityEngine.CoreModule.dll</HintPath>
       </Reference>
       <Reference Include="UnityEngine.ParticleSystemModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Unity\UnityEngine.ParticleSystemModule.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\Unity\UnityEngine.ParticleSystemModule.dll</HintPath>
       </Reference>
       <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Unity\UnityEngine.TextRenderingModule.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\Unity\UnityEngine.TextRenderingModule.dll</HintPath>
       </Reference>
       <Reference Include="UnityEngine.UIElementsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Dependencies\Unity\UnityEngine.UIElementsModule.dll</HintPath>
+        <HintPath>..\Dependencies\Timberborn.u6\Unity\UnityEngine.UIElementsModule.dll</HintPath>
       </Reference>
     </ItemGroup>
     <ItemGroup>

@@ -1,3 +1,6 @@
+# v1.10.1 (8 Oct 2024):
+* [Fix] `IrrigationTower` component crashes on game `0.6.8.3`.
+
 # v1.10.0 (3 Oct 2024):
 * [Enhancement] Add `frFR` localization (by @Erazil).
 * [Fix] The current strength of the sluice is not shown.
