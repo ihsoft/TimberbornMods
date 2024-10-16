@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using Bindito.Core;
 using IgorZ.SmartPower.Core;
 using IgorZ.TimberDev.Utils;
-using Timberborn.EntityPanelSystem;
 
 namespace IgorZ.SmartPower.UI;
 
@@ -22,20 +21,5 @@ sealed class Configurator : IConfigurator {
       patches.Add(typeof(NetworkFragmentServicePatch));
     }
     HarmonyPatcher.PatchRepeated(PatchId, patches.ToArray());
-    containerDefinition.Bind<SmartGoodPoweredGeneratorFragment>().AsSingleton();
-    containerDefinition.Bind<PowerOutputBalancerFragment>().AsSingleton();
-    containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
-  }
-
-  sealed class EntityPanelModuleProvider(
-      SmartGoodPoweredGeneratorFragment goodPoweredGeneratorFragment,
-      PowerOutputBalancerFragment powerOutputBalancerFragment)
-      : IProvider<EntityPanelModule> {
-    public EntityPanelModule Get() {
-      var builder = new EntityPanelModule.Builder();
-      builder.AddMiddleFragment(goodPoweredGeneratorFragment);
-      builder.AddMiddleFragment(powerOutputBalancerFragment);
-      return builder.Build();
-    }
   }
 }

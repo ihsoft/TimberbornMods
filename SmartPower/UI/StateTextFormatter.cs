@@ -5,6 +5,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using IgorZ.SmartPower.Core;
+using IgorZ.SmartPower.PowerConsumers;
 using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
 
@@ -24,6 +25,7 @@ public static class StateTextFormatter {
   const string NoFuelLocKey = "IgorZ.SmartPower.MechanicalBuilding.NoFuelStatus";
   const string NoInputModeLocKey = "IgorZ.SmartPower.MechanicalBuilding.NoInputStatus";
   const string BlockedOutputLocKey = "IgorZ.SmartPower.MechanicalBuilding.BlockedOutputStatus";
+  const string NotEnoughPowerLocKey = "IgorZ.SmartPower.PowerInputLimiter.NotEnoughPowerStatus";
 
   /// <summary>Makes a formatted string that describes the current state of the batteries in the graph.</summary>
   /// <returns><c>null</c> if there are no batteries in the graph.</returns>
@@ -71,11 +73,17 @@ public static class StateTextFormatter {
     if (!mechanicalNode.IsConsumer) {
       return null;
     }
+    var inputLimiter = mechanicalNode.GetComponentFast<PowerInputLimiter>();
+    if (inputLimiter && inputLimiter.IsSuspended) {
+      return loc.T(NotEnoughPowerLocKey);
+    }
+
     var smartManufactory = mechanicalNode.GetComponentFast<SmartManufactory>();
     if (smartManufactory == null || !smartManufactory.StandbyMode) {
       return null;
     }
     var lines = new List<string>();
+
     if (smartManufactory.NoFuel) {
       lines.Add(loc.T(NoFuelLocKey));
     } else if (smartManufactory.MissingIngredients) {

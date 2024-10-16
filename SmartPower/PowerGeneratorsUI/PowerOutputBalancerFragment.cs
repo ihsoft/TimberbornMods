@@ -3,21 +3,22 @@
 // License: Public Domain
 
 using System.Linq;
-using IgorZ.SmartPower.Core;
+using IgorZ.SmartPower.PowerGenerators;
 using IgorZ.TimberDev.UI;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
+using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace IgorZ.SmartPower.UI {
+namespace IgorZ.SmartPower.PowerGeneratorsUI;
 
 sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
-  const string AutomateLocKey = "IgorZ.SmartPower.PoweredGenerator.Automated";
-  const string ChargeLevelLocKey = "IgorZ.SmartPower.PoweredGenerator.ChargeBatteriesRangeText";
-  const string ApplyToAllGeneratorsLocKey = "IgorZ.SmartPower.PoweredGenerator.ApplyToAllGenerators";
-  const string AppliedToGeneratorsLocKey = "IgorZ.SmartPower.PoweredGenerator.AppliedToGenerators";
+  const string AutomateLocKey = "IgorZ.SmartPower.PowerOutputBalancer.AutomateGenerator";
+  const string ChargeLevelLocKey = "IgorZ.SmartPower.PowerOutputBalancer.ChargeBatteriesRangeText";
+  const string ApplyToAllGeneratorsLocKey = "IgorZ.SmartPower.PowerOutputBalancer.ApplyToAllGenerators";
+  const string AppliedToGeneratorsLocKey = "IgorZ.SmartPower.PowerOutputBalancer.AppliedToGenerators";
 
   readonly UiFactory _uiFactory;
 
@@ -42,9 +43,9 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
         });
 
     _chargeBatteriesSlider = _uiFactory.CreateMinMaxSlider(
-        evt => {
-          _balancer.DischargeBatteriesThreshold = evt.newValue.x;
-          _balancer.ChargeBatteriesThreshold = evt.newValue.y;
+        _ => {
+          _balancer.DischargeBatteriesThreshold = _chargeBatteriesSlider.value.x;
+          _balancer.ChargeBatteriesThreshold = _chargeBatteriesSlider.value.y;
           UpdateControls();
         }, 0f, 1.0f, 0.10f, stepSize: 0.05f);
 
@@ -64,7 +65,7 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
 
   public void ShowFragment(BaseComponent entity) {
     _balancer = entity.GetComponentFast<PowerOutputBalancer>();
-    if (_balancer == null) {
+    if (!_balancer) {
       return;
     }
     _automateCheckbox.SetValueWithoutNotify(_balancer.Automate);
@@ -110,6 +111,4 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
     _applyToAllGeneratorsButton.text = _uiFactory.Loc.T(AppliedToGeneratorsLocKey, affectedGenerators);
     _applyToAllGeneratorsButton.SetEnabled(false);
   }
-}
-
 }

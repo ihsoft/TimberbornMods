@@ -77,22 +77,30 @@
       <Compile Include="..\UnityDevLite\TypeUtils.cs">
         <Link>UnityDevLite\TypeUtils.cs</Link>
       </Compile>
-      <Compile Include="Core\AutoPausePowerGenerator.cs" />
       <Compile Include="Core\Configurator.cs" />
       <Compile Include="Core\Features.cs" />
       <Compile Include="Core\IAdjustablePowerInput.cs" />
+      <Compile Include="Core\ISuspendableConsumer.cs" />
+      <Compile Include="Core\ISuspendableGenerator.cs" />
       <Compile Include="Core\MechanicalBuildingPatch.cs" />
-      <Compile Include="Core\PowerOutputBalancer.cs" />
-      <Compile Include="Core\SmartGoodPoweredGenerator.cs" />
+      <Compile Include="Core\MechanicalNodePatch.cs" />
+      <Compile Include="Core\SmartPowerService.cs" />
       <Compile Include="Core\SmartManufactory.cs" />
       <Compile Include="Core\SmartPoweredAttraction.cs" />
-      <Compile Include="Core\WalkerPoweredGeneratorPatch.cs" />
+      <Compile Include="PowerConsumersUI\Configurator.cs" />
+      <Compile Include="PowerConsumersUI\PowerInputLimiterFragment.cs" />
+      <Compile Include="PowerConsumers\Configurator.cs" />
+      <Compile Include="PowerConsumers\PowerInputLimiter.cs" />
+      <Compile Include="PowerGeneratorsUI\Configurator.cs" />
+      <Compile Include="PowerGeneratorsUI\PowerOutputBalancerFragment.cs" />
+      <Compile Include="PowerGenerators\Configurator.cs" />
+      <Compile Include="PowerGenerators\GoodPoweredGeneratorPatch.cs" />
+      <Compile Include="PowerGenerators\PowerOutputBalancer.cs" />
+      <Compile Include="PowerGenerators\SmartGoodConsumingGenerator.cs" />
       <Compile Include="Properties\AssemblyInfo.cs" />
       <Compile Include="UI\Configurator.cs" />
       <Compile Include="UI\ConsumerFragmentServicePatch.cs" />
       <Compile Include="UI\NetworkFragmentServicePatch.cs" />
-      <Compile Include="UI\PowerOutputBalancerFragment.cs" />
-      <Compile Include="UI\SmartGoodPoweredGeneratorFragment.cs" />
       <Compile Include="UI\StateTextFormatter.cs" />
     </ItemGroup>
     <ItemGroup>
@@ -175,6 +183,9 @@
       <Reference Include="Timberborn.Localization, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.Localization.dll</HintPath>
       </Reference>
+      <Reference Include="Timberborn.MechanicalSystem">
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.MechanicalSystem.dll</HintPath>
+      </Reference>
       <Reference Include="Timberborn.ModManagerScene, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.ModManagerScene.dll</HintPath>
       </Reference>
@@ -192,6 +203,9 @@
       </Reference>
       <Reference Include="Timberborn.StatusSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.StatusSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="Timberborn.TemplateSystem">
+        <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.TemplateSystem.dll</HintPath>
       </Reference>
       <Reference Include="Timberborn.TickSystem, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Dependencies\Timberborn.u6\plugins\Timberborn.TickSystem.dll</HintPath>

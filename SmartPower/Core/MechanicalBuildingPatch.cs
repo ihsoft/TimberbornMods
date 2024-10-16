@@ -20,7 +20,10 @@ static class MechanicalBuildingPatch {
   }
 
   // This method needs publicized Timberborn.MechanicalSystem.
-  static bool Prefix(BaseComponent __instance, MechanicalNode ____mechanicalNode) {
+  static bool Prefix(bool __runOriginal, BaseComponent __instance, MechanicalNode ____mechanicalNode) {
+    if (!__runOriginal) {
+      return false;  // The other patches must follow the same style to properly support the skip logic!
+    }
     var adjustablePowerInput = __instance.GetComponentFast<IAdjustablePowerInput>();
     if (adjustablePowerInput == null) {
       return true;

@@ -1,4 +1,4 @@
-// Timberborn Mod: SmartPower
+﻿// Timberborn Mod: SmartPower
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
@@ -10,8 +10,7 @@ using UnityEngine;
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Local
-
-namespace IgorZ.SmartPower.Core;
+namespace IgorZ.SmartPower.PowerConsumers;
 
 [Context("Game")]
 // ReSharper disable once UnusedType.Global
@@ -23,15 +22,11 @@ sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).AssemblyQualifiedName;
 
   public void Configure(IContainerDefinition containerDefinition) {
-    HarmonyPatcher.PatchRepeated(
-        PatchId + "-core",
-        typeof(MechanicalBuildingPatch), typeof(MechanicalNodePatch));
-    containerDefinition.Bind<SmartPowerService>().AsSingleton();
     CustomizableInstantiator.AddPatcher(PatchId + "-instantiator", PatchMethod);
   }
 
   static void PatchMethod(GameObject prefab) {
-    PrefabPatcher.AddComponent<SmartManufactory>(prefab, PoweredManufactoryDep.Check);
-    PrefabPatcher.AddComponent<SmartPoweredAttraction>(prefab, PoweredAttractionDep.Check);
+    PrefabPatcher.AddComponent<PowerInputLimiter>(prefab, PoweredManufactoryDep.Check);
+    PrefabPatcher.AddComponent<PowerInputLimiter>(prefab, PoweredAttractionDep.Check);
   }
 }
