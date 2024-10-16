@@ -2,12 +2,12 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Collections.Generic;
+using System;
 using Timberborn.MechanicalSystem;
 
 namespace IgorZ.SmartPower.Core;
 
-public interface ISuspendableConsumer : IComparer<ISuspendableConsumer> {
+public interface ISuspendableConsumer : IComparable<ISuspendableConsumer> {
   /// <summary>
   /// The priority in which the consumer should be suspended and resumed. Consumers with higher priority will be
   /// resumed first and suspended last.

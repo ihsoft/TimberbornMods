@@ -77,22 +77,19 @@
       <Compile Include="..\UnityDevLite\TypeUtils.cs">
         <Link>UnityDevLite\TypeUtils.cs</Link>
       </Compile>
-      <Compile Include="Core\AutoPausePowerGenerator.cs" />
       <Compile Include="Core\Configurator.cs" />
       <Compile Include="Core\Features.cs" />
       <Compile Include="Core\IAdjustablePowerInput.cs" />
       <Compile Include="Core\ISuspendableConsumer.cs" />
       <Compile Include="Core\ISuspendableGenerator.cs" />
       <Compile Include="Core\MechanicalBuildingPatch.cs" />
-      <Compile Include="Core\PowerOutputBalancer.cs" />
-      <Compile Include="Core\SmartGoodPoweredGenerator.cs" />
       <Compile Include="Core\MechanicalNodePatch.cs" />
       <Compile Include="Core\SmartPowerService.cs" />
       <Compile Include="Core\SmartManufactory.cs" />
       <Compile Include="Core\SmartPoweredAttraction.cs" />
-      <Compile Include="Core\WalkerPoweredGeneratorPatch.cs" />
       <Compile Include="PowerConsumersUI\Configurator.cs" />
       <Compile Include="PowerConsumersUI\PowerInputLimiterFragment.cs" />
+      <Compile Include="PowerConsumers\Configurator.cs" />
       <Compile Include="PowerConsumers\PowerInputLimiter.cs" />
       <Compile Include="PowerGeneratorsUI\Configurator.cs" />
       <Compile Include="PowerGeneratorsUI\PowerOutputBalancerFragment.cs" />
@@ -104,8 +101,6 @@
       <Compile Include="UI\Configurator.cs" />
       <Compile Include="UI\ConsumerFragmentServicePatch.cs" />
       <Compile Include="UI\NetworkFragmentServicePatch.cs" />
-      <Compile Include="UI\PowerOutputBalancerFragment.cs" />
-      <Compile Include="UI\SmartGoodPoweredGeneratorFragment.cs" />
       <Compile Include="UI\StateTextFormatter.cs" />
     </ItemGroup>
     <ItemGroup>

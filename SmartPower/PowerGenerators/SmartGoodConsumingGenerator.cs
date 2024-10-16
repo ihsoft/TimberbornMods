@@ -46,14 +46,12 @@ sealed class SmartGoodConsumingGenerator : PowerOutputBalancer {
 
   protected override void UpdateRegistration() {
     if (Automate && !_pausableBuilding.Paused && !SmartPowerService.IsGeneratorRegistered(this)) {
-      HostedDebugLog.Fine(this, "Registering in SmartPowerService");
       SmartPowerService.RegisterGenerator(this);
     }
     if ((!Automate || _pausableBuilding.Paused) && SmartPowerService.IsGeneratorRegistered(this)) {
       if (IsSuspended) {
         Resume();
       }
-      HostedDebugLog.Fine(this, "Unregistering from SmartPowerService");
       SmartPowerService.UnregisterGenerator(this);
     }
   }

@@ -23,73 +23,75 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
 
   #region API
 
+  /// <summary>Tells whether the generator is registered in the system.</summary>
+  public bool IsGeneratorRegistered(ISuspendableGenerator generator) {
+    return _allRegisteredGenerators.ContainsKey(generator) || _pendingGenerators.Contains(generator);
+  }
+
+  /// <summary>Tells whether the consumer is registered in the system.</summary>
+  public bool IsConsumerRegistered(ISuspendableConsumer consumer) {
+    return _allRegisteredConsumers.ContainsKey(consumer) || _pendingConsumers.Contains(consumer);
+  }
+
+  /// <summary>
+  /// Registers the consumer in the service. If the generator is already registered, throws an error.
+  /// </summary>
   public void RegisterConsumer(ISuspendableConsumer consumer) {
-    if (_allRegisteredConsumers.TryGetValue(consumer, out var graph)) {
-      if (graph != consumer.MechanicalNode.Graph) {
-        throw new System.InvalidOperationException("Consumer already registered in another graph: " + consumer);
-      }
-      return;
+    if (_allRegisteredConsumers.ContainsKey(consumer) || _pendingConsumers.Contains(consumer)) {
+      throw new System.InvalidOperationException("Consumer already registered: " + DebugEx.ObjectToString(consumer));
     }
-    graph = consumer.MechanicalNode.Graph;
-    _allRegisteredConsumers[consumer] = graph;
-    var setup = GetSetup(graph);
-    setup.AllConsumers.Add(consumer);
-    AddSorted(consumer.IsSuspended ? setup.SuspendedConsumers : setup.ActiveConsumers, consumer);
+    _pendingConsumers.Add(consumer);
+    DebugEx.Fine("Schedule consumer registration: {0}", consumer);
   }
 
   /// <summary>Unregisters the consumer from the service. If the consumer is not registered, does nothing.</summary>
   public void UnregisterConsumer(ISuspendableConsumer consumer) {
-    if (!_allRegisteredConsumers.TryGetValue(consumer, out var graph)) {
-      return;
+    var unregistered = _pendingConsumers.Remove(consumer);
+    if (_allRegisteredConsumers.TryGetValue(consumer, out var graph)) {
+      _allRegisteredConsumers.Remove(consumer);
+      var setup = _setupsPerGraph[graph];
+      setup.AllConsumers.Remove(consumer);
+      setup.ActiveConsumers.Remove(consumer);
+      setup.SuspendedConsumers.Remove(consumer);
+      CheckRemoveGraph(graph, setup);
+      unregistered = true;
     }
-    _allRegisteredConsumers.Remove(consumer);
-    var setup = _setupsPerGraph[graph];
-    setup.AllConsumers.Remove(consumer);
-    setup.ActiveConsumers.Remove(consumer);
-    setup.SuspendedConsumers.Remove(consumer);
-    CheckRemoveGraph(graph, setup);
+    if (unregistered) {
+      DebugEx.Fine("Unregistered consumer {0}", consumer);
+    }
   }
 
   /// <summary>
   /// Registers the generator in the service. If the generator is already registered, throws an error.
   /// </summary>
   public void RegisterGenerator(ISuspendableGenerator generator) {
-    if (_allRegisteredGenerators.TryGetValue(generator, out var graph)) {
-      if (graph != generator.MechanicalNode.Graph) {
-        throw new System.InvalidOperationException("Generator already registered in another graph: " + generator);
-      }
-      return;
+    if (_allRegisteredGenerators.ContainsKey(generator) || _pendingGenerators.Contains(generator)) {
+      throw new System.InvalidOperationException("Generator already registered: " + DebugEx.ObjectToString(generator));
     }
-    graph = generator.MechanicalNode.Graph;
-    _allRegisteredGenerators[generator] = graph;
-    var setup = GetSetup(graph);
-    setup.AllGenerators.Add(generator);
-    AddSorted(generator.IsSuspended ? setup.SpareGenerators : setup.ActiveGenerators, generator);
+    _pendingGenerators.Add(generator);
+    DebugEx.Fine("Schedule generator registration: {0}", generator);
   }
 
   /// <summary>Unregisters the generator from the service. If the generator is not registered, does nothing.</summary>
   public void UnregisterGenerator(ISuspendableGenerator generator) {
-    if (!_allRegisteredGenerators.TryGetValue(generator, out var graph)) {
-      return;
+    var unregistered = _pendingGenerators.Remove(generator);
+    if (_allRegisteredGenerators.TryGetValue(generator, out var graph)) {
+      _allRegisteredGenerators.Remove(generator);
+      var setup = _setupsPerGraph[graph];
+      setup.AllGenerators.Remove(generator);
+      setup.ActiveGenerators.Remove(generator);
+      setup.SpareGenerators.Remove(generator);
+      CheckRemoveGraph(graph, setup);
+      unregistered = true;
     }
-    _allRegisteredGenerators.Remove(generator);
-    var setup = _setupsPerGraph[graph];
-    setup.AllGenerators.Remove(generator);
-    setup.ActiveGenerators.Remove(generator);
-    setup.SpareGenerators.Remove(generator);
-    CheckRemoveGraph(graph, setup);
+    if (unregistered) {
+      DebugEx.Fine("Unregistered generator {0}", generator);
+    }
   }
 
   #endregion
 
   #region Implementation
-
-  List<ISuspendableGenerator> _allGenerators;
-  List<ISuspendableGenerator> _activeGenerators;
-  List<ISuspendableGenerator> _spareGenerators;
-  List<ISuspendableConsumer> _allConsumers;
-  List<ISuspendableConsumer> _activeConsumers;
-  List<ISuspendableConsumer> _suspendedConsumers;
 
   static SmartPowerService _instance;
 
@@ -103,25 +105,30 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
   }
 
   readonly Dictionary<MechanicalGraph, GraphSetup> _setupsPerGraph = new();
-  readonly HashSet<ISuspendableGenerator> _dirtyGenerators = new();
-  readonly HashSet<ISuspendableConsumer> _dirtyConsumers = new();
+  readonly HashSet<ISuspendableGenerator> _dirtyGenerators = [];
+  readonly HashSet<ISuspendableConsumer> _dirtyConsumers = [];
   readonly Dictionary<ISuspendableGenerator, MechanicalGraph> _allRegisteredGenerators = new();
   readonly Dictionary<ISuspendableConsumer, MechanicalGraph> _allRegisteredConsumers = new();
+  readonly List<ISuspendableGenerator> _pendingGenerators = [];
+  readonly List<ISuspendableConsumer> _pendingConsumers = [];
+
+  int _skipUpdates = 2;  // How many updates after the game load to skip before starting the logic.
 
   SmartPowerService() {
     _instance = this;
   }
 
   void HandleSmartLogic() {
+    if (_skipUpdates > 0) {
+      DebugEx.Fine("Skipping updates countdown: {0}", _skipUpdates);
+      _skipUpdates--;
+      return;
+    }
+    RegisterPendingBuildings();
+
     foreach (var pair in _setupsPerGraph) {
       var graph = pair.Key;
       var setup = pair.Value;
-      _allGenerators = setup.AllGenerators;
-      _activeGenerators = setup.ActiveGenerators;
-      _spareGenerators = setup.SpareGenerators;
-      _allConsumers = setup.AllConsumers;
-      _activeConsumers = setup.ActiveConsumers;
-      _suspendedConsumers = setup.SuspendedConsumers;
 
       var batteryCapacity = 0;
       var batteryCharge = 0f;
@@ -133,118 +140,123 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
         hasBatteries = true;
       }
       if (hasBatteries) {
-        BalanceNetworkWithBatteries(batteryCharge / batteryCapacity);
+        BalanceNetworkWithBatteries(setup, batteryCharge / batteryCapacity);
       } else {
-        BalanceNetworkWithoutBatteries(pair.Key);
+        BalanceNetworkWithoutBatteries(setup, graph);
       }
     }
   }
 
-  void BalanceNetworkWithBatteries(float batteriesChargeRatio) {
-    foreach (var generator in _allGenerators) {
+  void BalanceNetworkWithBatteries(GraphSetup setup, float batteriesChargeRatio) {
+    foreach (var generator in setup.AllGenerators) {
       if (generator.IsSuspended) {
         if (batteriesChargeRatio <= generator.DischargeBatteriesThreshold) {
-          ActivateGenerator(generator);
+          ActivateGenerator(setup, generator);
         }
       } else {
         if (batteriesChargeRatio >= generator.ChargeBatteriesThreshold) {
-          SuspendGenerator(generator);
+          SuspendGenerator(setup, generator);
         }
       }
     }
-    foreach (var consumer in _allConsumers) {
+    foreach (var consumer in setup.AllConsumers) {
       if (consumer.IsSuspended) {
         if (batteriesChargeRatio >= consumer.MinBatteriesCharge) {
-          ActivateConsumer(consumer);
+          ActivateConsumer(setup, consumer);
         }
       } else {
         if (batteriesChargeRatio <= consumer.MinBatteriesCharge) {
-          SuspendConsumer(consumer);
+          SuspendConsumer(setup, consumer);
         }
       }
     }
   }
 
-  void ActivateGenerator(ISuspendableGenerator generator) {
-    _spareGenerators.Remove(generator);
-    AddSorted(_activeGenerators, generator);
+  void ActivateGenerator(GraphSetup setup, ISuspendableGenerator generator) {
+    setup.SpareGenerators.Remove(generator);
+    AddSorted(setup.ActiveGenerators, generator);
     generator.Resume();
     DebugEx.Fine("Activate generator {0}, power={1}", generator, generator.MechanicalNode.PowerOutput);
   }
 
-  void SuspendGenerator(ISuspendableGenerator generator) {
-    _activeGenerators.Remove(generator);
-    AddSorted(_spareGenerators, generator);
+  void SuspendGenerator(GraphSetup setup, ISuspendableGenerator generator) {
+    setup.ActiveGenerators.Remove(generator);
+    AddSorted(setup.SpareGenerators, generator);
     var power = generator.MechanicalNode.PowerOutput;
     generator.Suspend();
     DebugEx.Fine("Suspend generator {0}, power={1}", generator, power);
   }
 
-  void ActivateConsumer(ISuspendableConsumer consumer) {
-    _suspendedConsumers.Remove(consumer);
-    AddSorted(_activeConsumers, consumer);
+  void ActivateConsumer(GraphSetup setup, ISuspendableConsumer consumer) {
+    setup.SuspendedConsumers.Remove(consumer);
+    AddSorted(setup.ActiveConsumers, consumer);
     consumer.Resume();
-    DebugEx.Fine("Activate consumer {0}, power={1}", consumer, consumer.MechanicalNode.PowerOutput);
+    DebugEx.Fine("Activate consumer {0}: currentPower={1}, desiredPower={2}",
+                 consumer, consumer.MechanicalNode.PowerOutput, consumer.DesiredPower);
   }
 
-  void SuspendConsumer(ISuspendableConsumer consumer) {
-    _activeConsumers.Remove(consumer);
-    AddSorted(_suspendedConsumers, consumer);
-    var power = consumer.MechanicalNode.PowerOutput;
+  void SuspendConsumer(GraphSetup setup, ISuspendableConsumer consumer) {
+    setup.ActiveConsumers.Remove(consumer);
+    AddSorted(setup.SuspendedConsumers, consumer);
+    var power = consumer.MechanicalNode.PowerInput;
     consumer.Suspend();
-    DebugEx.Fine("Suspend consumer {0}, power={1}", consumer, power);
+    DebugEx.Fine("Suspend consumer {0}, currentPower={1}, desiredPower={2}", consumer, power, consumer.DesiredPower);
   }
 
-  void BalanceNetworkWithoutBatteries(MechanicalGraph graph) {
-    while (graph.CurrentPower.PowerDemand > graph.CurrentPower.PowerSupply && _spareGenerators.Count > 0) {
-      ActivateGenerator(_spareGenerators[_spareGenerators.Count - 1]);
+  void BalanceNetworkWithoutBatteries(GraphSetup setup, MechanicalGraph graph) {
+    var activeGenerators = setup.ActiveGenerators;
+    var spareGenerators = setup.SpareGenerators;
+    var activeConsumers = setup.ActiveConsumers;
+    var suspendedConsumers = setup.SuspendedConsumers;
+
+    while (graph.CurrentPower.PowerDemand > graph.CurrentPower.PowerSupply && spareGenerators.Count > 0) {
+      ActivateGenerator(setup, spareGenerators[spareGenerators.Count - 1]);
     }
 
-    if (graph.CurrentPower.PowerDemand > graph.CurrentPower.PowerSupply && _spareGenerators.Count == 0) {
-      while (graph.CurrentPower.PowerDemand > graph.CurrentPower.PowerSupply && _activeConsumers.Count > 0) {
-        SuspendConsumer(_activeConsumers[0]);
+    if (graph.CurrentPower.PowerDemand > graph.CurrentPower.PowerSupply && spareGenerators.Count == 0) {
+      while (graph.CurrentPower.PowerDemand > graph.CurrentPower.PowerSupply && activeConsumers.Count > 0) {
+        SuspendConsumer(setup, activeConsumers[0]);
       }
     }
 
-    if (graph.CurrentPower.PowerDemand < graph.CurrentPower.PowerSupply && _suspendedConsumers.Count == 0) {
-      while (graph.CurrentPower.PowerDemand < graph.CurrentPower.PowerSupply && _activeGenerators.Count > 0) {
-        var generator = _activeGenerators[0];
+    if (graph.CurrentPower.PowerDemand < graph.CurrentPower.PowerSupply) {
+      while (graph.CurrentPower.PowerDemand < graph.CurrentPower.PowerSupply && activeGenerators.Count > 0) {
+        var generator = activeGenerators[0];
         var power = generator.MechanicalNode.PowerOutput;
         if (graph.CurrentPower.PowerSupply - power < graph.CurrentPower.PowerDemand) {
           break;
         }
-        SuspendGenerator(generator);
+        SuspendGenerator(setup, generator);
       }
     }
 
-    if (graph.CurrentPower.PowerDemand <= graph.CurrentPower.PowerSupply
-        && _suspendedConsumers.Count > 0 && _spareGenerators.Count > 0) {
+    if (graph.CurrentPower.PowerDemand <= graph.CurrentPower.PowerSupply && suspendedConsumers.Count > 0) {
       var maximumSupply = graph.CurrentPower.PowerSupply
-          + _spareGenerators.Sum(x => x.MechanicalNode._nominalPowerOutput);
-      var desiredDemand = graph.CurrentPower.PowerDemand
-          + _suspendedConsumers.Sum(x => x.DesiredPower);
+          + spareGenerators.Sum(x => x.MechanicalNode._nominalPowerOutput);
+      var totalDemand = graph.CurrentPower.PowerDemand
+          + suspendedConsumers.Sum(x => x.DesiredPower);
       var skipConsumersCount = 0;
-      while (desiredDemand > maximumSupply && skipConsumersCount < _suspendedConsumers.Count) {
+      while (totalDemand > maximumSupply && skipConsumersCount < suspendedConsumers.Count) {
+        totalDemand -= suspendedConsumers[skipConsumersCount].DesiredPower;
         skipConsumersCount++;
-        //FIXME: re-balance suspended collection by the current DesiredPower onchange.
-        desiredDemand -= _suspendedConsumers[skipConsumersCount - 1].DesiredPower;
       }
       var skipGeneratorsCount = 0;
-      while (desiredDemand < maximumSupply && skipGeneratorsCount < _spareGenerators.Count) {
-        var power = _spareGenerators[skipGeneratorsCount].MechanicalNode._nominalPowerOutput;
-        if (maximumSupply - power < desiredDemand) {
+      while (totalDemand < maximumSupply && skipGeneratorsCount < spareGenerators.Count) {
+        var power = spareGenerators[skipGeneratorsCount].NominalOutput;
+        if (maximumSupply - power < totalDemand) {
           break;
         }
         skipGeneratorsCount++;
         maximumSupply -= power;
       }
-      while (_spareGenerators.Count >= skipGeneratorsCount) {
-        ActivateGenerator(_spareGenerators[_spareGenerators.Count - 1]);
+      while (spareGenerators.Count > skipGeneratorsCount) {
+        ActivateGenerator(setup, spareGenerators[spareGenerators.Count - 1]);
       }
-      while (_suspendedConsumers.Count >= skipConsumersCount) {
-        ActivateConsumer(_suspendedConsumers[_suspendedConsumers.Count - 1]);
+      while (suspendedConsumers.Count > skipConsumersCount) {
+        ActivateConsumer(setup, suspendedConsumers[suspendedConsumers.Count - 1]);
       }
     }
+    //FIXME: do re-balancing to fill unused power with lower priority consumers of small power.
   }
 
   void UpdateGenerator(ISuspendableGenerator generator) {
@@ -278,6 +290,36 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
     }
   }
 
+  void RegisterPendingBuildings() {
+    foreach (var generator in _pendingGenerators) {
+      var graph = generator.MechanicalNode.Graph;
+      if (graph == null) {
+        throw new System.InvalidOperationException(
+          "Generator is not connected to the graph: " + DebugEx.ObjectToString(generator));
+      }
+      _allRegisteredGenerators[generator] = graph;
+      var setup = GetSetup(graph);
+      setup.AllGenerators.Add(generator);
+      AddSorted(generator.IsSuspended ? setup.SpareGenerators : setup.ActiveGenerators, generator);
+      DebugEx.Fine("Registered generator {0}: isSuspended={1}", generator, generator.IsSuspended);
+    }
+    _pendingGenerators.Clear();
+
+    foreach (var consumer in _pendingConsumers) {
+      var graph = consumer.MechanicalNode.Graph;
+      if (graph == null) {
+        throw new System.InvalidOperationException(
+          "Consumer is not connected to the graph: " + DebugEx.ObjectToString(consumer));
+      }
+      _allRegisteredConsumers[consumer] = graph;
+      var setup = GetSetup(graph);
+      setup.AllConsumers.Add(consumer);
+      AddSorted(consumer.IsSuspended ? setup.SuspendedConsumers : setup.ActiveConsumers, consumer);
+      DebugEx.Fine("Registered consumer {0}: isSuspended={1}", consumer, consumer.IsSuspended);
+    }
+    _pendingConsumers.Clear();
+  }
+
   static void AddSorted<T>(List<T> list, T item) {
     var index = list.BinarySearch(item);
     if (index < 0) {
@@ -287,7 +329,6 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
     }
     list.Insert(index, item);
   }
-
 
   static GraphSetup GetSetup(MechanicalGraph graph) {
     if (_instance._setupsPerGraph.TryGetValue(graph, out var setup)) {

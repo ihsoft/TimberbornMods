@@ -1,4 +1,5 @@
 # v1.12.0 (started on 9/28/2024)
+* Full refactoring of the power balancing logic. Now, all the generators and cosumers within the network work as whole.
 
 # v1.11.2 (25 Sep 2024)
 * [Fix] "Apply to all generators" button is not resized.

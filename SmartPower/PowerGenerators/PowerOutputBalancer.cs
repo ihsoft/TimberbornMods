@@ -10,15 +10,47 @@ using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.MechanicalSystem;
 using Timberborn.Persistence;
-using UnityDev.Utils.LogUtilsLite;
+using UnityEngine;
 
 namespace IgorZ.SmartPower.PowerGenerators;
 
-abstract class PowerOutputBalancer : BaseComponent, IPersistentEntity, ISuspendableGenerator, IFinishedStateListener {
+abstract class PowerOutputBalancer
+    : BaseComponent, IPersistentEntity, ISuspendableGenerator, IFinishedStateListener, IPostInitializableLoadedEntity {
   const float MaxBatteryChargeRatio = 0.9f;
   const float MinBatteryChargeRatio = 0.65f;
 
+  #region Unity conrolled fields
+  // ReSharper disable InconsistentNaming
+  // ReSharper disable RedundantDefaultMemberInitializer
+
+  /// <summary>Tells if the generator should be automatically enrolled to be automated once created.</summary>
+  [SerializeField]
+  [Tooltip("Tells if the generator should be automatically enrolled to the SmartPower automation on creation.")]
+  internal bool _automatedByDefault = false;
+
+  // ReSharper restore InconsistentNaming
+  // ReSharper restore RedundantDefaultMemberInitializer
+  #endregion
+
   #region API
+
+  /// <inheritdoc/>
+  public abstract int Priority { get; }
+
+  /// <inheritdoc/>
+  public MechanicalNode MechanicalNode { get; private set; }
+
+  /// <inheritdoc/>
+  public int NominalOutput { get; private set; }
+
+  /// <inheritdoc/>
+  public bool IsSuspended { get; private set; }
+
+  /// <inheritdoc/>
+  public float DischargeBatteriesThreshold { get; set; } = MinBatteryChargeRatio;
+
+  /// <inheritdoc/>
+  public float ChargeBatteriesThreshold { get; set; } = MaxBatteryChargeRatio;
 
   /// <summary>Tells the generator should automatically pause/unpause based on the power demand.</summary>
   public bool Automate {
@@ -30,30 +62,10 @@ abstract class PowerOutputBalancer : BaseComponent, IPersistentEntity, ISuspenda
   }
   bool _automate;
 
-  /// <inheritdoc/>
-  public float ChargeBatteriesThreshold { get; set; } = MaxBatteryChargeRatio;
-
-  /// <inheritdoc/>
-  public float DischargeBatteriesThreshold { get; set; } = MinBatteryChargeRatio;
-
-  /// <inheritdoc/>
-  //public MechanicalNode MechanicalNode => _mechanicalNode;
-  public MechanicalNode MechanicalNode { get; private set; }
-
-  /// <inheritdoc/>
-  public int NominalOutput { get; private set; }
-
-  /// <inheritdoc/>
-  public bool IsSuspended { get; private set; }
-
   /// <summary>Returns balancers in the same network.</summary>
-  // FIXME: also check buildings name.
   public IEnumerable<PowerOutputBalancer> AllBalancers => MechanicalNode.Graph.Nodes
       .Select(x => x.GetComponentFast<PowerOutputBalancer>())
-      .Where(x => x != null);
-
-  /// <inheritdoc/>
-  public abstract int Priority { get; }
+      .Where(x => x != null && x.name == name);
 
   /// <inheritdoc/>
   public virtual void Suspend() {
@@ -75,15 +87,16 @@ abstract class PowerOutputBalancer : BaseComponent, IPersistentEntity, ISuspenda
   /// <summary>
   /// Called when generator state changes, and it may be needed to register or unregister it in the system.
   /// </summary>
+  /// <remarks>Must not be called before the mechanical graph is initialized.</remarks>
   /// <seealso cref="Automate"/>
   /// <seealso cref="SmartPowerService"/>
-  /// FIXME
   protected abstract void UpdateRegistration();
 
   #endregion
   
   #region IComparable implementation
 
+  /// <inheritdoc/>
   public int CompareTo(ISuspendableGenerator other) {
     var priorityCheck = Priority.CompareTo(other.Priority);
     if (priorityCheck != 0) {
@@ -95,16 +108,29 @@ abstract class PowerOutputBalancer : BaseComponent, IPersistentEntity, ISuspenda
 
   #endregion
 
-  #region IFinalizableStateListener implementation
+  #region IFinishedStateListener implementation
 
   /// <inheritdoc/>
   public void OnEnterFinishedState() {
+    enabled = true;
     UpdateRegistration();
   }
 
   /// <inheritdoc/>
   public void OnExitFinishedState() {
+    enabled = false;
     SmartPowerService.UnregisterGenerator(this);
+  }
+
+  #endregion
+
+  #region IPostInitializableLoadedEntity implementation
+
+  /// <inheritdoc/>
+  public void PostInitializeLoadedEntity() {
+    if (enabled && IsSuspended) {
+      Suspend();
+    }
   }
 
   #endregion
@@ -132,7 +158,7 @@ abstract class PowerOutputBalancer : BaseComponent, IPersistentEntity, ISuspenda
       return;
     }
     var state = entityLoader.GetComponent(AutomationBehaviorKey);
-    _automate = state.GetValueOrNullable(AutomateKey) ?? false;
+    _automate = state.GetValueOrNullable(AutomateKey) ?? _automatedByDefault;
     ChargeBatteriesThreshold = state.GetValueOrNullable(ChargeBatteriesThresholdKey) ?? MaxBatteryChargeRatio;
     DischargeBatteriesThreshold = state.GetValueOrNullable(DischargeBatteriesThresholdKey) ?? MinBatteryChargeRatio;
     IsSuspended = state.GetValueOrNullable(IsSuspendedKey) ?? false;
@@ -151,6 +177,8 @@ abstract class PowerOutputBalancer : BaseComponent, IPersistentEntity, ISuspenda
   protected virtual void Awake() {
     MechanicalNode = GetComponentFast<MechanicalNode>();
     NominalOutput = GetComponentFast<MechanicalNodeSpecification>().PowerOutput;
+    _automate = _automatedByDefault;
+    enabled = false;
   }
 
   #endregion
