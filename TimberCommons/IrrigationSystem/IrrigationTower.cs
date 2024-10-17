@@ -127,7 +127,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   /// <inheritdoc />
   public IEnumerable<BaseComponent> GetObjectsInRange() {
-    return Enumerable.Empty<BaseComponent>();
+    return [];
   }
 
   /// <inheritdoc />
