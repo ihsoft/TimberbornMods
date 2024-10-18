@@ -15,7 +15,7 @@ using Timberborn.SingletonSystem;
 using Timberborn.TerrainSystem;
 using UnityEngine;
 
-namespace IgorZ.TimberCommons.IrrigationSystem {
+namespace IgorZ.TimberCommons.IrrigationSystem;
 
 /// <summary>A range effect that changes the growables growth rate.</summary>
 /// <remarks>
@@ -39,7 +39,7 @@ public sealed class ModifyGrowableGrowthRangeEffect : BaseComponent, IRangeEffec
   /// <inheritdoc cref="EffectGroup"/>
   [SerializeField]
   [Tooltip(
-      "The name by which this effect can be found by the other components. Multiple effects can have the same name.")]
+    "The name by which this effect can be found by the other components. Multiple effects can have the same name.")]
   internal string _effectGroupName = "ModifyGrowthRate";
 
   /// <summary>
@@ -63,7 +63,7 @@ public sealed class ModifyGrowableGrowthRangeEffect : BaseComponent, IRangeEffec
   /// </remarks>
   [SerializeField]
   [Tooltip(
-      "Full names of components that must be present on the growable. Leave empty to not check for the components.")]
+    "Full names of components that must be present on the growable. Leave empty to not check for the components.")]
   internal string[] _componentsFilter = {};
 
   /// <summary>The exact names of the prefabs to be selected to this effect.</summary>
@@ -210,6 +210,4 @@ public sealed class ModifyGrowableGrowthRangeEffect : BaseComponent, IRangeEffec
   }
 
   #endregion
-}
-
 }

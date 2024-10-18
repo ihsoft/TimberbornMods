@@ -8,7 +8,7 @@ using HarmonyLib;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
 
-namespace IgorZ.TimberCommons.WaterService {
+namespace IgorZ.TimberCommons.WaterService;
 
 /// <summary>Harmony patch to override moisture levels.</summary>
 [HarmonyPatch]
@@ -26,6 +26,4 @@ static class SoilMoistureSimulatorPatch {
       __result = newLevel;
     }
   }
-}
-
 }

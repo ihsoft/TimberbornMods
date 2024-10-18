@@ -12,7 +12,7 @@ using Timberborn.BlockSystem;
 using Timberborn.Persistence;
 using Timberborn.PrefabSystem;
 
-namespace IgorZ.Automation.Tools {
+namespace IgorZ.Automation.Tools;
 
 /// <summary>Definition of an automation rule.</summary>
 /// <remarks>
@@ -73,6 +73,4 @@ sealed class AutomationRule : IGameSerializable {
     return $"[Rule:condition=[{Condition}];action=[{Action}];at={prefabName}@{coords}]";
   }
   #endregion
-}
-
 }

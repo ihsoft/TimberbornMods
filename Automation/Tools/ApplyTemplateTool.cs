@@ -10,7 +10,7 @@ using Timberborn.BlockSystem;
 using Timberborn.Persistence;
 using UnityEngine;
 
-namespace IgorZ.Automation.Tools {
+namespace IgorZ.Automation.Tools;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 sealed class ApplyTemplateTool : AbstractAreaSelectionTool, IAutomationModeEnabler {
@@ -70,6 +70,4 @@ sealed class ApplyTemplateTool : AbstractAreaSelectionTool, IAutomationModeEnabl
     base.Initialize();
   }
   #endregion
-}
-
 }

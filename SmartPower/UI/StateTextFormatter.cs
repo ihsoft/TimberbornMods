@@ -9,7 +9,7 @@ using IgorZ.SmartPower.PowerConsumers;
 using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
 
-namespace IgorZ.SmartPower.UI {
+namespace IgorZ.SmartPower.UI;
 
 /// <summary>Provides formatting methods for the various states.</summary>
 public static class StateTextFormatter {
@@ -45,9 +45,9 @@ public static class StateTextFormatter {
     if (currentPower.BatteryPower > 0) {
       var timeLeft = currentPower.BatteryCharge / currentPower.BatteryPower;
       var flowStr = loc.T(
-          BatteryDischarging,
-          $"{currentPower.BatteryPower} {loc.T(PowerSymbolLocKey)}",
-          $"{timeLeft:0.0}{loc.T(HourShortLocKey)}");
+        BatteryDischarging,
+        $"{currentPower.BatteryPower} {loc.T(PowerSymbolLocKey)}",
+        $"{timeLeft:0.0}{loc.T(HourShortLocKey)}");
       return $"{batteryCapacityStr}\n{flowStr}";
     }
 
@@ -57,9 +57,9 @@ public static class StateTextFormatter {
       var flow = currentPower.PowerSupply - currentPower.PowerDemand;
       var timeLeft = dischargedCapacity / flow;
       var flowStr = loc.T(
-          BatteryCharging,
-          $"{flow} {loc.T(PowerSymbolLocKey)}",
-          $"{timeLeft:0.0}{loc.T(HourShortLocKey)}");
+        BatteryCharging,
+        $"{flow} {loc.T(PowerSymbolLocKey)}",
+        $"{timeLeft:0.0}{loc.T(HourShortLocKey)}");
       return $"{batteryCapacityStr}\n{flowStr}";
     }
 
@@ -95,6 +95,4 @@ public static class StateTextFormatter {
     }
     return string.Join("\n", lines);
   }
-}
-
 }

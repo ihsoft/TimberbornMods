@@ -4,7 +4,7 @@
 
 using IgorZ.Automation.AutomationSystem;
 
-namespace IgorZ.Automation.Conditions {
+namespace IgorZ.Automation.Conditions;
 
 /// <summary>
 /// Condition that checks if the output inventory fill-rate is above the
@@ -28,6 +28,4 @@ public sealed class OutputStockAboveThresholdCondition : OutputStockThresholdCon
     var storageFillRatio = Inventory.TotalAmountInStock * 100 / Inventory.Capacity;
     ConditionState = storageFillRatio > Threshold;
   }
-}
-
 }

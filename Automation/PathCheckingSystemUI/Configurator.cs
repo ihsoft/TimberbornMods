@@ -4,7 +4,7 @@
 
 using Bindito.Core;
 
-namespace IgorZ.Automation.PathCheckingSystemUI {
+namespace IgorZ.Automation.PathCheckingSystemUI;
 
 // ReSharper disable once UnusedType.Global
 [Context("Game")]
@@ -13,6 +13,4 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<PathCheckingSystemDebugPanel>().AsSingleton();
     containerDefinition.Bind<PathCheckingSystemDebugger>().AsSingleton();
   }
-}
-
 }

@@ -7,7 +7,7 @@ using System.Linq;
 using Timberborn.Persistence;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace IgorZ.Automation.Utils {
+namespace IgorZ.Automation.Utils;
 
 /// <summary>Serializer that can handle the descendant classes.</summary>
 /// <remarks>
@@ -70,6 +70,4 @@ public sealed class DynamicClassSerializer<T> : IObjectSerializer<T> where T : c
     instance.LoadFrom(objectLoader);
     return instance;
   }
-}
-
 }

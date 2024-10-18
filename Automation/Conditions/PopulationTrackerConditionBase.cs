@@ -6,7 +6,7 @@ using System;
 using IgorZ.Automation.AutomationSystem;
 using Timberborn.GameDistricts;
 
-namespace IgorZ.Automation.Conditions {
+namespace IgorZ.Automation.Conditions;
 
 /// <summary>A base condition class that tracks population changes in the district.</summary>
 public abstract class PopulationTrackerConditionBase : AutomationConditionBase {
@@ -114,6 +114,4 @@ public abstract class PopulationTrackerConditionBase : AutomationConditionBase {
   }
 
   #endregion
-}
-
 }

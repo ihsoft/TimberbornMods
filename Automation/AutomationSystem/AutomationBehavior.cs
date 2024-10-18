@@ -14,7 +14,7 @@ using Timberborn.Persistence;
 using Timberborn.SingletonSystem;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace IgorZ.Automation.AutomationSystem {
+namespace IgorZ.Automation.AutomationSystem;
 
 /// <summary>The component that keeps all the automation state on the building.</summary>
 public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDeletableEntity {
@@ -172,6 +172,4 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
   }
 
   #endregion
-}
-
 }

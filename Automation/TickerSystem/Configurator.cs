@@ -4,7 +4,7 @@
 
 using Bindito.Core;
 
-namespace IgorZ.Automation.TickerSystem {
+namespace IgorZ.Automation.TickerSystem;
 
 // ReSharper disable once UnusedType.Global
 [Context("Game")]
@@ -12,6 +12,4 @@ sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<TickerService>().AsSingleton();
   }
-}
-
 }

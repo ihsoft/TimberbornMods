@@ -12,7 +12,7 @@ using Timberborn.SingletonSystem;
 using Timberborn.ToolSystem;
 using UnityEngine;
 
-namespace IgorZ.Automation.AutomationSystem {
+namespace IgorZ.Automation.AutomationSystem;
 
 /// <summary>Central point for all the automation related logic.</summary>
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
@@ -96,6 +96,4 @@ public sealed class AutomationService : IPostLoadableSingleton {
     UnhighlightAutomationObjects();
   }
   #endregion
-}
-
 }

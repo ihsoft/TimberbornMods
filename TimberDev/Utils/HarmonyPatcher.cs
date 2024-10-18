@@ -8,7 +8,7 @@ using UnityDev.Utils.LogUtilsLite;
 
 // ReSharper disable UnusedMember.Local
 // ReSharper disable MemberCanBePrivate.Global
-namespace IgorZ.TimberDev.Utils {
+namespace IgorZ.TimberDev.Utils;
 
 /// <summary>Helper class to safely apply harmony patches.</summary>
 static class HarmonyPatcher {
@@ -44,6 +44,4 @@ static class HarmonyPatcher {
       DebugEx.Fine("Harmony patch applied: {0}", type);
     }
   }
-}
-
 }

@@ -11,7 +11,7 @@ using Timberborn.TimeSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
-namespace IgorZ.TimberCommons.IrrigationSystem {
+namespace IgorZ.TimberCommons.IrrigationSystem;
 
 /// <summary>Component that can change the growth rate on the "growable" entities.</summary>
 /// <remarks>
@@ -122,6 +122,4 @@ public sealed class GrowthRateModifier : BaseComponent {
   }  
 
   #endregion
-}
-
 }

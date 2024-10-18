@@ -5,7 +5,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace IgorZ.TimberCommons.IrrigationSystem {
+namespace IgorZ.TimberCommons.IrrigationSystem;
 
 /// <summary>Effect that is applied or removed based of the <see cref="IrrigationTower.IsIrrigating"/> state.</summary>
 /// <remarks>
@@ -26,6 +26,4 @@ public interface IRangeEffect {
 
   /// <summary>Resets all effects that were applied in the last call to <see cref="ApplyEffect"/></summary>
   public void ResetEffect();
-}
-
 }

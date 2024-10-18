@@ -7,7 +7,7 @@ using Timberborn.Persistence;
 using Timberborn.WaterBuildings;
 using UnityEngine;
 
-namespace IgorZ.Automation.Actions {
+namespace IgorZ.Automation.Actions;
 
 /// <summary>Adjusts floodgate height.</summary>
 // ReSharper disable once UnusedType.Global
@@ -60,6 +60,4 @@ public sealed class SetFloodgateHeightAction : AutomationActionBase {
     objectSaver.Set(StepsDownPropertyKey, StepsDown);
   }
   #endregion
-}
-
 }

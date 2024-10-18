@@ -4,7 +4,7 @@
 
 using Timberborn.Persistence;
 
-namespace IgorZ.Automation.Utils {
+namespace IgorZ.Automation.Utils;
 
 /// <summary>Simple generic serializer for a class that implements <see cref="IGameSerializable"/>.</summary>
 /// <remarks>
@@ -32,6 +32,4 @@ public sealed class StaticClassSerializer<T> : IObjectSerializer<T> where T : IG
     instance.LoadFrom(objectLoader);
     return instance;
   }
-}
-
 }

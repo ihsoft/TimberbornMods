@@ -8,18 +8,18 @@ using IgorZ.Automation.Conditions;
 using IgorZ.Automation.Utils;
 using Timberborn.Persistence;
 
-namespace IgorZ.Automation.Actions {
+namespace IgorZ.Automation.Actions;
 
 /// <summary>The base class for all automation actions.</summary>
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public abstract class AutomationActionBase : IAutomationAction, IAutomationConditionListener {
   /// <summary>Serializer that handles persistence of all the action types.</summary>
-  /// <remarks>Loading will fail if the action cannot be loaded.</remarks>
+  /// <remarks>Loading will fail if the action can't be loaded.</remarks>
   public static readonly DynamicClassSerializer<AutomationActionBase> ActionSerializer = new();
 
   /// <summary>Serializer that handles persistence of all the action types.</summary>
-  /// <remarks>This version returns <c>null</c> if the action cannot be loaded.</remarks>
+  /// <remarks>This version returns <c>null</c> if the action can't be loaded.</remarks>
   public static readonly DynamicClassSerializer<AutomationActionBase> ActionSerializerNullable = new(false);
 
   #region IAutomationAction implementation
@@ -127,6 +127,4 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
     return $"TypeId={GetType()},Condition={Condition?.GetType()}";
   }
   #endregion
-}
-
 }

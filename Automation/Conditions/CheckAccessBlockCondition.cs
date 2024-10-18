@@ -8,7 +8,7 @@ using TimberApi.DependencyContainerSystem;
 using Timberborn.BuildingsNavigation;
 using Timberborn.Persistence;
 
-namespace IgorZ.Automation.Conditions {
+namespace IgorZ.Automation.Conditions;
 
 /// <summary>
 /// This condition verifies if construction completion of the object prevents accessing the other objects being
@@ -81,6 +81,4 @@ public sealed class CheckAccessBlockCondition : AutomationConditionBase {
     Behavior.CollectCleanedRules();
   }
   #endregion
-}
-
 }

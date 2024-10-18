@@ -4,7 +4,7 @@
 
 using IgorZ.Automation.AutomationSystem;
 
-namespace IgorZ.Automation.Conditions {
+namespace IgorZ.Automation.Conditions;
 
 /// <summary>Triggers when the current bots population goes below the threshold.</summary>
 // ReSharper disable once UnusedType.Global
@@ -28,6 +28,4 @@ public sealed class BotPopulationAboveThresholdCondition : BotPopulationThreshol
   protected override bool CheckCondition() {
     return DistrictPopulation.NumberOfBots > Threshold;
   }
-}
-
 }

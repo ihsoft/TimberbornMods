@@ -2,7 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-namespace IgorZ.TimberCommons.Common {
+namespace IgorZ.TimberCommons.Common;
 
 /// <summary>Interface that enables "supply lasts for XX" progress bar in UI for manufactories.</summary>
 /// <remarks>
@@ -22,6 +22,4 @@ public interface ISupplyLeftProvider {
   /// hidden in the UI.
   /// </returns>
   public (float progress, string progressBarMsg) GetStats();
-}
-
 }

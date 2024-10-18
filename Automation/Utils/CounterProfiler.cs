@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace IgorZ.Automation.Utils {
+namespace IgorZ.Automation.Utils;
 
 /// <summary>Helper class to profile execution timings.</summary>
 public sealed class CounterProfiler {
@@ -55,6 +55,4 @@ public sealed class CounterProfiler {
     _values = new List<int>(20);
     return result.ToString();
   }
-}
-
 }

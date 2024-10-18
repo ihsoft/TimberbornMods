@@ -12,7 +12,7 @@ using UnityEngine.UIElements;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
 
-namespace IgorZ.TimberCommons.CommonUIPatches {
+namespace IgorZ.TimberCommons.CommonUIPatches;
 
 [HarmonyPatch]
 static class SluiceFragmentPatch1 {
@@ -32,6 +32,4 @@ static class SluiceFragmentPatch1 {
     FlowLabel = uiFactory.CreateLabel();
     ____contaminationLabel.parent.Add(FlowLabel);
   }
-}
-
 }

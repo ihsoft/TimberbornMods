@@ -7,7 +7,7 @@ using IgorZ.Automation.Utils;
 using Timberborn.BlockSystem;
 using UnityEngine;
 
-namespace IgorZ.Automation.Tools {
+namespace IgorZ.Automation.Tools;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 sealed class CancelTool : AbstractAreaSelectionTool, IAutomationModeEnabler {
@@ -34,6 +34,4 @@ sealed class CancelTool : AbstractAreaSelectionTool, IAutomationModeEnabler {
     blockObject.GetComponentFast<AutomationBehavior>().ClearAllRules();
   }
   #endregion
-}
-
 }

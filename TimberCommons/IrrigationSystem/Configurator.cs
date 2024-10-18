@@ -6,7 +6,7 @@ using Bindito.Core;
 using Timberborn.Growing;
 using Timberborn.TemplateSystem;
 
-namespace IgorZ.TimberCommons.IrrigationSystem {
+namespace IgorZ.TimberCommons.IrrigationSystem;
 
 [Context("Game")]
 sealed class Configurator : IConfigurator {
@@ -19,6 +19,4 @@ sealed class Configurator : IConfigurator {
     builder.AddDecorator<Growable, GrowthRateModifier>();
     return builder.Build();
   }
-}
-
 }

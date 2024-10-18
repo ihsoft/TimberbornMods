@@ -10,7 +10,7 @@ using Timberborn.CoreUI;
 using UnityEngine.UIElements;
 
 // ReSharper disable once CheckNamespace
-namespace IgorZ.TimberDev.UI {
+namespace IgorZ.TimberDev.UI;
 
 /// <summary>Fragment for the UI panel.</summary>
 public class PanelFragment : PanelFragmentBuilder<PanelFragment> {
@@ -62,6 +62,4 @@ public abstract class PanelFragmentBuilder<TBuilder> : BaseBuilder<TBuilder, Nin
   protected override void InitializeStyleSheet(StyleSheetBuilder styleSheetBuilder) {
     styleSheetBuilder.AddNineSlicedBackgroundClass(BackgroundClass, "ui/images/backgrounds/bg-3", 9f, 0.5f);
   }
-}
-
 }

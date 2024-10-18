@@ -13,7 +13,7 @@ using UnityEngine.UIElements;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
 
-namespace IgorZ.TimberCommons.CommonUIPatches {
+namespace IgorZ.TimberCommons.CommonUIPatches;
 
 /// <summary>Harmony patch to support <see cref="IConsumptionRateFormatter"/> on buildings.</summary>
 /// <remarks>
@@ -24,7 +24,7 @@ namespace IgorZ.TimberCommons.CommonUIPatches {
 static class GoodConsumingBuildingDescriberPatch {
   static MethodBase TargetMethod() {
     return AccessTools.DeclaredMethod(
-        "Timberborn.GoodConsumingBuildingSystemUI.GoodConsumingBuildingDescriber:DescribeSupply");
+      "Timberborn.GoodConsumingBuildingSystemUI.GoodConsumingBuildingDescriber:DescribeSupply");
   }
 
   static void Postfix(bool __runOriginal, ref EntityDescription __result, BaseComponent ____goodConsumingBuilding) {
@@ -43,6 +43,4 @@ static class GoodConsumingBuildingDescriberPatch {
       DebugEx.Warning("Cannot override GoodConsumingBuilding description");
     }
   }
-}
-
 }

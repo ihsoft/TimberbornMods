@@ -7,7 +7,7 @@ using Timberborn.HazardousWeatherSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.WeatherSystem;
 
-namespace IgorZ.Automation.Conditions {
+namespace IgorZ.Automation.Conditions;
 
 /// <summary>The base class for the conditions that need to react on the weather season change.</summary>
 /// <remarks>The state change only happens when a notification is sent from the game.</remarks>
@@ -74,6 +74,4 @@ public abstract class WeatherTrackerConditionBase : AutomationConditionBase {
     }
   }
   #endregion
-}
-
 }

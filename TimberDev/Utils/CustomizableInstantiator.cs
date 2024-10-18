@@ -10,7 +10,7 @@ using UnityEngine;
 
 // ReSharper disable UnusedMember.Local
 // ReSharper disable MemberCanBePrivate.Global
-namespace IgorZ.TimberDev.Utils {
+namespace IgorZ.TimberDev.Utils;
 
 /// <summary>Class that allows customizing components on prefabs.</summary>
 /// <remarks>
@@ -51,6 +51,4 @@ static class CustomizableInstantiator {
       }
     }
   }
-}
-
 }

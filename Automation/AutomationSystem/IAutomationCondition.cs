@@ -4,7 +4,7 @@
 
 using IgorZ.Automation.Utils;
 
-namespace IgorZ.Automation.AutomationSystem {
+namespace IgorZ.Automation.AutomationSystem;
 
 /// <summary>Base condition interface.</summary>
 /// <remarks>
@@ -72,6 +72,4 @@ public interface IAutomationCondition : IGameSerializable {
   /// <seealso cref="Listener"/>
   /// <seealso cref="ConditionState"/>
   public void SyncState();
-}
-
 }

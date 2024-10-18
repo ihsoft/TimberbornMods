@@ -4,7 +4,7 @@
 
 using IgorZ.Automation.AutomationSystem;
 
-namespace IgorZ.Automation.Conditions {
+namespace IgorZ.Automation.Conditions;
 
 /// <summary>Triggers when the current beavers population goes above the threshold.</summary>
 // ReSharper disable once UnusedType.Global
@@ -29,7 +29,5 @@ public sealed class BeaverPopulationBelowThresholdCondition : BeaverPopulationTh
     var currentPopulation = DistrictPopulation.NumberOfAdults + DistrictPopulation.NumberOfChildren;
     return currentPopulation < Threshold;
   }
-
-}
 
 }

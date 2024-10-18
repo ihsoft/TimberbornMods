@@ -7,7 +7,7 @@ using Timberborn.BlockSystem;
 using Timberborn.BuildingsBlocking;
 using UnityEngine;
 
-namespace IgorZ.Automation.Tools {
+namespace IgorZ.Automation.Tools;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 sealed class ResumeTool : AbstractLockingTool {
@@ -54,6 +54,4 @@ sealed class ResumeTool : AbstractLockingTool {
     return null;
   }
   #endregion
-}
-
 }

@@ -16,7 +16,7 @@ using Timberborn.Workshops;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
-namespace IgorZ.TimberCommons.IrrigationSystem {
+namespace IgorZ.TimberCommons.IrrigationSystem;
 
 /// <summary>Irrigation tower that runs on top of <see cref="Manufactory"/>.</summary>
 /// <remarks>
@@ -212,15 +212,15 @@ public class ManufactoryIrrigationTower : IrrigationTower, ISupplyLeftProvider {
     var adjustingRatio = Coverage > 0 ? Coverage : 1f;
     var adjustedCycleDurationInHours = originalRecipe.CycleDurationInHours / adjustingRatio;
     var modifiedRecipe = new RecipeSpecification(
-        originalRecipe.Id, originalRecipe.BackwardCompatibleIds, originalRecipe.DisplayLocKey,
-        adjustedCycleDurationInHours, originalRecipe.CyclesCapacity, originalRecipe.Ingredients,
-        originalRecipe.Products, originalRecipe.ProducedSciencePoints, originalRecipe.Fuel,
-        originalRecipe.CyclesFuelLasts, originalRecipe.FuelCapacity, originalRecipe.Icon,
-        originalRecipe.RequiredFeatureToggle);
+      originalRecipe.Id, originalRecipe.BackwardCompatibleIds, originalRecipe.DisplayLocKey,
+      adjustedCycleDurationInHours, originalRecipe.CyclesCapacity, originalRecipe.Ingredients,
+      originalRecipe.Products, originalRecipe.ProducedSciencePoints, originalRecipe.Fuel,
+      originalRecipe.CyclesFuelLasts, originalRecipe.FuelCapacity, originalRecipe.Icon,
+      originalRecipe.RequiredFeatureToggle);
     _manufactory.CurrentRecipe = modifiedRecipe;
     HostedDebugLog.Fine(
-        this, "Adjusted recipe duration: id={0}, original={1}, new={2}", originalRecipe.Id,
-        originalRecipe.CycleDurationInHours, adjustedCycleDurationInHours);
+      this, "Adjusted recipe duration: id={0}, original={1}, new={2}", originalRecipe.Id,
+      originalRecipe.CycleDurationInHours, adjustedCycleDurationInHours);
     UpdateConsumptionStats();
   }
 
@@ -272,6 +272,4 @@ public class ManufactoryIrrigationTower : IrrigationTower, ISupplyLeftProvider {
   string _originalRecipeId;
 
   #endregion
-}
-
 }

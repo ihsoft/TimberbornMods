@@ -5,7 +5,7 @@
 using IgorZ.Automation.AutomationSystem;
 using Timberborn.BuildingsBlocking;
 
-namespace IgorZ.Automation.Actions {
+namespace IgorZ.Automation.Actions;
 
 /// <summary>Action that pauses a pausable building.</summary>
 /// <remarks>Due to any construction site is pausable, this action can only be applied to a finished building.</remarks>
@@ -40,6 +40,4 @@ public sealed class PauseAction : AutomationActionBase {
     }
   }
   #endregion
-}
-
 }

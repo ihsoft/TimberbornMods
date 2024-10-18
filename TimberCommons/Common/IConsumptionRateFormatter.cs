@@ -2,7 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-namespace IgorZ.TimberCommons.Common {
+namespace IgorZ.TimberCommons.Common;
 
 /// <summary>Interface that helps to customize the tooltip.</summary>
 /// <remarks>
@@ -16,6 +16,4 @@ public interface IConsumptionRateFormatter {
   /// <summary>Returns formatted time for which the rate is counted.</summary>
   /// <remarks>E.g. "10h" or "1d".</remarks>
   string GetTime();
-}
-
 }

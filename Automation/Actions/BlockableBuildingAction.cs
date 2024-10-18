@@ -13,7 +13,7 @@ using Timberborn.Persistence;
 using Timberborn.StatusSystem;
 using UnityEngine;
 
-namespace IgorZ.Automation.Actions {
+namespace IgorZ.Automation.Actions;
 
 /// <summary>Blocks the building when the state triggers. Optionally, adds a normal status.</summary>
 public sealed class BlockableBuildingAction : AutomationActionBase {
@@ -223,6 +223,4 @@ public sealed class BlockableBuildingAction : AutomationActionBase {
   }
 
   #endregion
-}
-
 }

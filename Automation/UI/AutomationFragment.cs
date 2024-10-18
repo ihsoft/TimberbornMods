@@ -12,7 +12,7 @@ using Timberborn.EntityPanelSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace IgorZ.Automation.UI {
+namespace IgorZ.Automation.UI;
 
 sealed class AutomationFragment : IEntityPanelFragment {
   const string RulesAreaCaptionTextLocKey = "IgorZ.Automation.AutomationFragment.RulesAreaCaptionTextLocKey";
@@ -77,5 +77,4 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
   public void UpdateFragment() {
   }
-}
 }

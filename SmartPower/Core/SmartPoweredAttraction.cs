@@ -7,7 +7,7 @@ using Timberborn.BuildingsBlocking;
 using Timberborn.EnterableSystem;
 using Timberborn.MechanicalSystem;
 
-namespace IgorZ.SmartPower.Core {
+namespace IgorZ.SmartPower.Core;
 
 /// <summary>
 /// Component that extends the <see cref="MechanicalBuilding"/> behavior to conserve energy when powered attraction has
@@ -43,6 +43,4 @@ public sealed class SmartPoweredAttraction : BaseComponent, IAdjustablePowerInpu
   }
 
   #endregion
-}
-
 }

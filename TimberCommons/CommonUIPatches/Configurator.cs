@@ -7,7 +7,7 @@ using Bindito.Core;
 using IgorZ.TimberDev.UI;
 using IgorZ.TimberDev.Utils;
 
-namespace IgorZ.TimberCommons.CommonUIPatches {
+namespace IgorZ.TimberCommons.CommonUIPatches;
 
 [Context("Game")]
 // ReSharper disable once UnusedType.Global
@@ -30,6 +30,4 @@ sealed class Configurator : IConfigurator {
     CommonFormats.ResetCachedLocStrings();
     HarmonyPatcher.PatchRepeated(PatchId, Patches);
   }
-}
-
 }

@@ -5,7 +5,7 @@
 using Bindito.Core;
 using Timberborn.EntityPanelSystem;
 
-namespace IgorZ.Automation.UI {
+namespace IgorZ.Automation.UI;
 
 [Context("Game")]
 // ReSharper disable once UnusedType.Global
@@ -28,6 +28,4 @@ sealed class Configurator : IConfigurator {
       return builder.Build();
     }
   }
-}
-
 }

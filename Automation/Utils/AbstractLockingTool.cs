@@ -12,7 +12,7 @@ using Timberborn.EntitySystem;
 using Timberborn.PrefabSystem;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace IgorZ.Automation.Utils {
+namespace IgorZ.Automation.Utils;
 
 /// <summary>Tool that can select objects by user criteria.</summary>
 /// <remarks>
@@ -136,6 +136,4 @@ public abstract class AbstractLockingTool : AbstractAreaSelectionTool {
     _entityBadgeService = entityBadgeService;
   }
   #endregion
-}
-
 }

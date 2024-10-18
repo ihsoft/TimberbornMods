@@ -7,7 +7,7 @@ using System.Reflection;
 using UnityDev.Utils.LogUtilsLite;
 
 // ReSharper disable once CheckNamespace
-namespace UnityDev.Utils.Reflections {
+namespace UnityDev.Utils.Reflections;
 
 /// <summary>Wrapper to implement an efficient access to the class method via reflection.</summary>
 /// <remarks>Implements access to a method that returns <c>void</c> and accepts no arguments.</remarks>
@@ -82,6 +82,4 @@ sealed class ReflectedAction<T, TArg0> {
       _methodInfo.Invoke(instance, new object[] { arg0 });
     }
   }
-}
-
 }

@@ -8,7 +8,7 @@ using System.Reflection;
 using UnityDev.Utils.LogUtilsLite;
 
 // ReSharper disable once CheckNamespace
-namespace UnityDev.Utils.Reflections {
+namespace UnityDev.Utils.Reflections;
 
 /// <summary>Wrapper to implement efficient access to the class fields via reflection.</summary>
 /// <remarks>It ignores access scope.</remarks>
@@ -110,7 +110,7 @@ sealed class ReflectedField<TV> {
   /// </param>
   /// <seealso cref="IsValid"/>
   public ReflectedField(string fullTypeName, string fieldName, bool throwOnFailure = false)
-    : this(TypeUtils.GetInternalType(fullTypeName), fieldName, throwOnFailure) {
+      : this(TypeUtils.GetInternalType(fullTypeName), fieldName, throwOnFailure) {
   }
 
   /// <summary>Indicates if the target field was found and ready to use.</summary>
@@ -134,6 +134,4 @@ sealed class ReflectedField<TV> {
       _fieldInfo.SetValue(instance, value);
     }
   }
-}
-
 }

@@ -12,7 +12,7 @@ using UnityEngine.UIElements;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
 
-namespace IgorZ.SmartPower.UI {
+namespace IgorZ.SmartPower.UI;
 
 /// <summary>Add battery status information to the stock mechanical node UI fragment.</summary>
 [HarmonyPatch]
@@ -42,6 +42,4 @@ static class NetworkFragmentServicePatch {
       ____label.text += "\n" + _lastState;
     }
   }
-}
-
 }

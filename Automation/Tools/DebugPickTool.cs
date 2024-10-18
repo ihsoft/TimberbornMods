@@ -15,7 +15,7 @@ using Timberborn.Navigation;
 using Timberborn.PathSystem;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace IgorZ.Automation.Tools {
+namespace IgorZ.Automation.Tools;
 
 /// <summary>Debug tool to show various information about block objects.</summary>
 // ReSharper disable once ClassNeverInstantiated.Global
@@ -119,6 +119,4 @@ public class DebugPickTool : AbstractAreaSelectionTool {
     lines.AppendLine(new string('*', 10));
     DebugEx.Warning(lines.ToString());
   }
-}
-
 }

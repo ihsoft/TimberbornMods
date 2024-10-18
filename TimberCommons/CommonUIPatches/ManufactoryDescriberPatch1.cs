@@ -12,7 +12,7 @@ using Timberborn.Localization;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
 
-namespace IgorZ.TimberCommons.CommonUIPatches {
+namespace IgorZ.TimberCommons.CommonUIPatches;
 
 /// <summary>Harmony patch to show days and hours for the slow recipes.</summary>
 [HarmonyPatch]
@@ -33,6 +33,4 @@ static class ManufactoryDescriberPatch1 {
     __result = CommonFormats.DaysHoursFormat(____loc, duration);
     return false;
   }
-}
-
 }

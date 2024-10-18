@@ -11,7 +11,7 @@ using UnityEngine;
 
 // ReSharper disable UnusedMember.Local
 // ReSharper disable MemberCanBePrivate.Global
-namespace IgorZ.TimberDev.Utils {
+namespace IgorZ.TimberDev.Utils;
 
 /// <summary>Helper class to control enabling/disabling of specific features in the plugin.</summary>
 /// <remarks>
@@ -156,6 +156,4 @@ public static class FeatureController {
     }
     return true;
   }
-}
-
 }

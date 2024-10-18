@@ -20,7 +20,7 @@ using Timberborn.TickSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
-namespace IgorZ.Automation.PathCheckingSystem {
+namespace IgorZ.Automation.PathCheckingSystem;
 
 /// <summary>The component that handles all path checking conditions.</summary>
 /// <remarks>
@@ -327,6 +327,4 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
   }
 
   #endregion
-}
-
 }

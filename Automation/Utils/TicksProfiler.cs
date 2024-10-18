@@ -6,7 +6,7 @@ using System;
 using System.Diagnostics;
 using System.Text;
 
-namespace IgorZ.Automation.Utils {
+namespace IgorZ.Automation.Utils;
 
 /// <summary>Helper class to profile execution timings.</summary>
 public sealed class TicksProfiler {
@@ -63,6 +63,4 @@ public sealed class TicksProfiler {
     _stopwatch.Reset();
     return result.ToString();
   }
-}
-
 }

@@ -6,7 +6,7 @@ using IgorZ.Automation.AutomationSystem;
 using Timberborn.Emptying;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace IgorZ.Automation.Actions {
+namespace IgorZ.Automation.Actions;
 
 /// <summary>Action that disables the storage empty mode.</summary>
 // ReSharper disable once UnusedType.Global
@@ -39,6 +39,4 @@ public sealed class UnmarkForEmptyingAction : AutomationActionBase {
     }
   }
   #endregion
-}
-
 }

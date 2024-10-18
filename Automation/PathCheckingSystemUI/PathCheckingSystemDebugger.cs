@@ -13,7 +13,7 @@ using Timberborn.SingletonSystem;
 using Timberborn.WalkingSystemUI;
 using UnityEngine;
 
-namespace IgorZ.Automation.PathCheckingSystemUI {
+namespace IgorZ.Automation.PathCheckingSystemUI;
 
 /// <summary>Shows corner markers for the path from the road to the accessible of the selected site.</summary>
 sealed class PathCheckingSystemDebugger : ILoadableSingleton, IUpdatableSingleton {
@@ -107,6 +107,4 @@ sealed class PathCheckingSystemDebugger : ILoadableSingleton, IUpdatableSingleto
   }
 
   #endregion
-}
-
 }

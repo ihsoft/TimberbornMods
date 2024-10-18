@@ -5,7 +5,7 @@
 using System;
 using Timberborn.Persistence;
 
-namespace IgorZ.Automation.Conditions {
+namespace IgorZ.Automation.Conditions;
 
 /// <summary>A base class for the conditions that checks a single value against the constant.</summary>
 /// <remarks>
@@ -135,7 +135,5 @@ public abstract class ThresholdConditionBase : AutomationConditionBase {
   }
 
   #endregion
-
-}
 
 }

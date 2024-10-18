@@ -7,7 +7,7 @@ using Timberborn.GameDistricts;
 using Timberborn.Persistence;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace IgorZ.Automation.Conditions {
+namespace IgorZ.Automation.Conditions;
 
 /// <summary>A base condition class that check population for a threshold.</summary>
 /// <remarks>
@@ -138,6 +138,4 @@ public abstract class PopulationThresholdConditionBase : PopulationTrackerCondit
   }
 
   #endregion
-}
-
 }

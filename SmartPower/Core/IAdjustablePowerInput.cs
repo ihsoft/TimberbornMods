@@ -4,7 +4,7 @@
 
 using Timberborn.MechanicalSystem;
 
-namespace IgorZ.SmartPower.Core {
+namespace IgorZ.SmartPower.Core;
 
 /// <summary>Interface for components that can adjust the power input of the building.</summary>
 /// <remarks>
@@ -20,6 +20,4 @@ public interface IAdjustablePowerInput {
   /// <param name="nominalPowerInput">The power that's the building normally consumes.</param>
   /// <returns>The actual power than the building should consume.</returns>
   int UpdateAndGetPowerInput(int nominalPowerInput);
-}
-
 }

@@ -11,7 +11,7 @@ using UnityDev.Utils.LogUtilsLite;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
 
-namespace IgorZ.SmartPower.Core {
+namespace IgorZ.SmartPower.Core;
 
 [HarmonyPatch]
 static class MechanicalBuildingPatch {
@@ -33,13 +33,11 @@ static class MechanicalBuildingPatch {
       return false;
     }
     HostedDebugLog.Fine(
-        __instance, "Adjusting power input from {0} to {1}", ____mechanicalNode.PowerInput, newPowerInput);
+      __instance, "Adjusting power input from {0} to {1}", ____mechanicalNode.PowerInput, newPowerInput);
     var graph = ____mechanicalNode.Graph;
     graph?.DeactivateNode(____mechanicalNode);
     ____mechanicalNode.PowerInput = newPowerInput;
     graph?.ActivateNode(____mechanicalNode);
     return false;
   }
-}
-
 }

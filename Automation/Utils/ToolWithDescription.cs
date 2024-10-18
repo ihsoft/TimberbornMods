@@ -10,7 +10,7 @@ using Timberborn.ToolSystem;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
-namespace IgorZ.Automation.Utils {
+namespace IgorZ.Automation.Utils;
 
 /// <summary>Abstract tool that has description.</summary>
 /// <remarks>
@@ -100,6 +100,4 @@ public abstract class ToolWithDescription : CustomToolSystem.CustomTool {
     return _cachedDescription;
   }
   #endregion
-}
-
 }

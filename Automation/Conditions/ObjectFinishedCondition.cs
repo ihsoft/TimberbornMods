@@ -6,7 +6,7 @@ using IgorZ.Automation.AutomationSystem;
 using Timberborn.BlockSystem;
 using Timberborn.SingletonSystem;
 
-namespace IgorZ.Automation.Conditions {
+namespace IgorZ.Automation.Conditions;
 
 /// <summary>Condition that triggers when the object enters the finished state.</summary>
 /// <remarks>This condition must be used with caution. Any finished building gets this event during the load.</remarks>
@@ -55,6 +55,4 @@ public sealed class ObjectFinishedCondition : AutomationConditionBase {
     Behavior.CollectCleanedRules();
   }
   #endregion
-}
-
 }

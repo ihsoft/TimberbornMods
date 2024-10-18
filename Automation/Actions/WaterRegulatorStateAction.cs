@@ -6,7 +6,7 @@ using IgorZ.Automation.AutomationSystem;
 using Timberborn.Persistence;
 using Timberborn.WaterSourceSystem;
 
-namespace IgorZ.Automation.Actions {
+namespace IgorZ.Automation.Actions;
 
 /// <summary>Opens or closes water discharges.</summary>
 // ReSharper disable once UnusedType.Global
@@ -62,6 +62,4 @@ public class WaterRegulatorStateAction : AutomationActionBase {
     objectSaver.Set(OpenPropertyKey, Open);
   }
   #endregion
-}
-
 }

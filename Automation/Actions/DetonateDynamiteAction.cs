@@ -21,7 +21,7 @@ using Timberborn.ToolSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
-namespace IgorZ.Automation.Actions {
+namespace IgorZ.Automation.Actions;
 
 /// <summary>Action that triggers the dynamite and then (optionally) places new one at the same spot.</summary>
 /// <remarks>Use it to drill down deep holes in terrain.</remarks>
@@ -192,8 +192,8 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
       } while (newDynamite == null);
       newDynamite.GetComponentFast<BuilderPrioritizable>().SetPriority(_builderPriority);
       newDynamite.GetComponentFast<AutomationBehavior>().AddRule(
-          new ObjectFinishedCondition(),
-          new DetonateDynamiteAction { RepeatCount = _repeatCount - 1 });
+        new ObjectFinishedCondition(),
+        new DetonateDynamiteAction { RepeatCount = _repeatCount - 1 });
       HostedDebugLog.Fine(newDynamite, "Placed new item: priority={0}, tries={1}", _builderPriority, _repeatCount - 1);
 
       yield return YieldAbort();
@@ -213,6 +213,4 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
   }
 
   #endregion
-}
-
 }

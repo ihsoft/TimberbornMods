@@ -11,7 +11,7 @@ using UnityEngine.UIElements;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
 
-namespace IgorZ.SmartPower.UI {
+namespace IgorZ.SmartPower.UI;
 
 /// <summary>Adds smart mechanical building status to the stock consumer building UI fragment.</summary>
 [HarmonyPatch]
@@ -32,6 +32,4 @@ static class ConsumerFragmentServicePatch {
       ____label.text += "\n" + text;
     }
   }
-}
-
 }

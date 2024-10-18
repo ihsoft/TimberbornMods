@@ -7,7 +7,7 @@ using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.Utils;
 using Timberborn.Persistence;
 
-namespace IgorZ.Automation.Conditions {
+namespace IgorZ.Automation.Conditions;
 
 /// <summary>The base class of any automation condition.</summary>
 /// <remarks>
@@ -116,6 +116,4 @@ public abstract class AutomationConditionBase : IAutomationCondition {
     return $"TypeId={GetType()},Listener={Listener?.GetType()}";
   }
   #endregion
-}
-
 }

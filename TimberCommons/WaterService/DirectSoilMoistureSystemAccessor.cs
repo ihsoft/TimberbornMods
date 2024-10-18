@@ -22,7 +22,7 @@ using Timberborn.TickSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
-namespace IgorZ.TimberCommons.WaterService {
+namespace IgorZ.TimberCommons.WaterService;
 
 /// <summary>Class that allows setting overrides to the soil moisture levels.</summary>
 /// <remarks>
@@ -289,6 +289,4 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   }
 
   #endregion
-}
-
 }

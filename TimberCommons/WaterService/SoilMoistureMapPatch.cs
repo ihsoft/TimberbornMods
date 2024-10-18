@@ -10,7 +10,7 @@ using UnityEngine;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
 
-namespace IgorZ.TimberCommons.WaterService {
+namespace IgorZ.TimberCommons.WaterService;
 
 [HarmonyPatch]
 static class SoilMoistureMapPatch {
@@ -29,6 +29,4 @@ static class SoilMoistureMapPatch {
       moistureLevel = Mathf.Max(moistureLevel, newLevel);
     }
   }
-}
-
 }

@@ -4,7 +4,7 @@
 
 using IgorZ.Automation.AutomationSystem;
 
-namespace IgorZ.Automation.Conditions {
+namespace IgorZ.Automation.Conditions;
 
 /// <summary>Condition that checks if the badtide season has started.</summary>
 /// <remarks>The state change only happens when a notification is sent from the game.</remarks>
@@ -33,6 +33,4 @@ public sealed class BadtideStartedCondition : WeatherTrackerConditionBase {
     }
   }
   #endregion
-}
-
 }

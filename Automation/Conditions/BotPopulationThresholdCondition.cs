@@ -4,7 +4,7 @@
 
 using System;
 
-namespace IgorZ.Automation.Conditions {
+namespace IgorZ.Automation.Conditions;
 
 /// <summary>A base condition class for the bot population related conditions.</summary>
 /// <remarks>It tracks the population change and does basic value calculations.</remarks>
@@ -32,7 +32,5 @@ public abstract class BotPopulationThresholdCondition : PopulationThresholdCondi
   }
 
   #endregion
-
-}
 
 }

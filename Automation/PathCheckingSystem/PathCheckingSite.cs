@@ -26,7 +26,7 @@ using Timberborn.SingletonSystem;
 using Timberborn.StatusSystem;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace IgorZ.Automation.PathCheckingSystem {
+namespace IgorZ.Automation.PathCheckingSystem;
 
 /// <summary>Container for the path blocking site.</summary>
 /// <remarks>It must only be applied to the preview sites.</remarks>
@@ -162,9 +162,9 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   /// <remarks>It must be public to work.</remarks>
   [Inject]
   public void InjectDependencies(
-      ILoc loc, NodeIdService nodeIdService, DistrictCenterRegistry districtCenterRegistry, DistrictMap districtMap,
-      PreviewDistrictMap previewDistrictMap, EventBus eventBus,
-      NavMeshListenerEntityRegistry navMeshListenerEntityRegistry) {
+    ILoc loc, NodeIdService nodeIdService, DistrictCenterRegistry districtCenterRegistry, DistrictMap districtMap,
+    PreviewDistrictMap previewDistrictMap, EventBus eventBus,
+    NavMeshListenerEntityRegistry navMeshListenerEntityRegistry) {
     _loc = loc;
     _nodeIdService = nodeIdService;
     _districtCenterRegistry = districtCenterRegistry;
@@ -184,10 +184,10 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
       NodeEdges = new List<NodeEdge>();
     } else {
       NodeEdges = BlockObject.GetComponentFast<BlockObjectNavMeshSettings>().ManuallySetEdges().Select(
-          x => new NodeEdge {
-              Start = _nodeIdService.GridToId(x.Start),
-              End = _nodeIdService.GridToId(x.End),
-          }).ToList();
+        x => new NodeEdge {
+            Start = _nodeIdService.GridToId(x.Start),
+            End = _nodeIdService.GridToId(x.End),
+        }).ToList();
     }
   }
 
@@ -402,7 +402,7 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
       return;  // Already initialized.
     }
     _unreachableStatusToggle = StatusToggle.CreatePriorityStatusWithAlertAndFloatingIcon(
-        UnreachableIconName, _loc.T(UnreachableStatusLocKey), _loc.T(UnreachableAlertLocKey));
+      UnreachableIconName, _loc.T(UnreachableStatusLocKey), _loc.T(UnreachableAlertLocKey));
     _maybeReachableStatusToggle = StatusToggle.CreateNormalStatus(UnreachableIconName, _loc.T(NotYetReachableLocKey));
     GetComponentFast<StatusSubject>().RegisterStatus(_unreachableStatusToggle);
     GetComponentFast<StatusSubject>().RegisterStatus(_maybeReachableStatusToggle);
@@ -411,6 +411,4 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   }
 
   #endregion
-}
-
 }

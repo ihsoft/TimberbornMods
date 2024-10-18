@@ -11,7 +11,7 @@ using Timberborn.DebuggingUI;
 using Timberborn.SingletonSystem;
 using Timberborn.TickSystem;
 
-namespace IgorZ.Automation.PathCheckingSystemUI {
+namespace IgorZ.Automation.PathCheckingSystemUI;
 
 /// <summary>Shows various stat and debug information for the path checking system.</summary>
 sealed class PathCheckingSystemDebugPanel : ILoadableSingleton, IDebuggingPanel, ITickableSingleton {
@@ -60,6 +60,4 @@ sealed class PathCheckingSystemDebugPanel : ILoadableSingleton, IDebuggingPanel,
     _navMeshUpdateMaxCostMs = _navMeshUpdateTicks.Max();
     PathCheckingSite.NavMeshUpdateTimer.Reset();
   }
-}
-
 }

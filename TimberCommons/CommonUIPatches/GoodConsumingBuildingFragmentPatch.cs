@@ -13,7 +13,7 @@ using UnityEngine.UIElements;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
 
-namespace IgorZ.TimberCommons.CommonUIPatches {
+namespace IgorZ.TimberCommons.CommonUIPatches;
 
 /// <summary>Harmony patch to show supply in days and hours.</summary>
 /// <remarks>
@@ -26,7 +26,7 @@ static class GoodConsumingBuildingFragmentPatch {
 
   static MethodBase TargetMethod() {
     return AccessTools.DeclaredMethod(
-        "Timberborn.GoodConsumingBuildingSystemUI.GoodConsumingBuildingFragment:UpdateProgressBar");
+      "Timberborn.GoodConsumingBuildingSystemUI.GoodConsumingBuildingFragment:UpdateProgressBar");
   }
 
   static bool Prefix(bool __runOriginal, ILoc ____loc,
@@ -53,6 +53,4 @@ static class GoodConsumingBuildingFragmentPatch {
     }
     ____hoursLeft.text = CommonFormats.FormatSupplyLeft(____loc, ____goodConsumingBuilding.HoursUntilNoSupply);
   }
-}
-
 }

@@ -10,7 +10,7 @@ using Timberborn.Persistence;
 using Timberborn.StatusSystem;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace IgorZ.Automation.Actions {
+namespace IgorZ.Automation.Actions;
 
 /// <summary>Action that turns the storage into the empty mode.</summary>
 /// <remarks>
@@ -104,8 +104,8 @@ public sealed class MarkForEmptyingAction : AutomationActionBase {
 
     void Start() {
       _statusToggle = StatusToggle.CreatePriorityStatusWithFloatingIcon(
-          CustomStatusIcon,
-          GetComponentFast<AutomationBehavior>().Loc.T(CustomStatusDescriptionKey));
+        CustomStatusIcon,
+        GetComponentFast<AutomationBehavior>().Loc.T(CustomStatusDescriptionKey));
       GetComponentFast<Emptiable>().UnmarkedForEmptying += OnUnmarkedForEmptying;
       var subject = GetComponentFast<StatusSubject>();
       subject.RegisterStatus(_statusToggle);
@@ -127,6 +127,4 @@ public sealed class MarkForEmptyingAction : AutomationActionBase {
     status.StatusReset += (sender, args) => ShowCustomStatus = false;
   }
   #endregion
-}
-
 }

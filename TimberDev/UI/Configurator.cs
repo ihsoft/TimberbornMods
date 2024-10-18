@@ -5,7 +5,7 @@
 using Bindito.Core;
 
 // ReSharper disable once CheckNamespace
-namespace IgorZ.TimberDev.UI {
+namespace IgorZ.TimberDev.UI;
 
 [Context("Game")]
 // ReSharper disable once UnusedType.Global
@@ -14,6 +14,4 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<UiFactory>().AsSingleton();
     containerDefinition.Bind<PanelFragment>().AsSingleton();
   }
-}
-
 }

@@ -7,7 +7,7 @@ using IgorZ.TimberDev.Utils;
 using Timberborn.ModManagerScene;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace IgorZ.SmartPower.Core {
+namespace IgorZ.SmartPower.Core;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 sealed class Features : IModStarter {
@@ -39,6 +39,4 @@ sealed class Features : IModStarter {
         _ => false
     };
   }
-}
-
 }

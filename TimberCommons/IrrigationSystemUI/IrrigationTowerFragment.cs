@@ -11,7 +11,7 @@ using Timberborn.EntityPanelSystem;
 using Timberborn.Localization;
 using UnityEngine.UIElements;
 
-namespace IgorZ.TimberCommons.IrrigationSystemUI {
+namespace IgorZ.TimberCommons.IrrigationSystemUI;
 
 sealed class IrrigationTowerFragment : IEntityPanelFragment {
   const string TowerUtilizationLocKey = "IgorZ.TimberCommons.WaterTower.Utilization";
@@ -63,6 +63,4 @@ sealed class IrrigationTowerFragment : IEntityPanelFragment {
     }
     _infoLabel.ToggleDisplayStyle(visible: _irrigationTower.enabled);
   }
-}
-
 }

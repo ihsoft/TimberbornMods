@@ -12,7 +12,7 @@ using Timberborn.Persistence;
 using Timberborn.ToolSystem;
 using ToolGroupSpecification = TimberApi.Tools.ToolGroupSystem.ToolGroupSpecification;
 
-namespace IgorZ.Automation.Utils {
+namespace IgorZ.Automation.Utils;
 
 /// <summary>System that manages bindings to support TimberAPI tools and groups specifications.</summary>
 /// <remarks>Use this system to keep code short and clear when no fancy setups are needed.</remarks>
@@ -263,6 +263,4 @@ public static class CustomToolSystem {
     }
   }
   #endregion
-}
-
 }

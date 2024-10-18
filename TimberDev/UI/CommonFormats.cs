@@ -8,7 +8,7 @@ using UnityEngine;
 
 // ReSharper disable UnusedMember.Local
 // ReSharper disable MemberCanBePrivate.Global
-namespace IgorZ.TimberDev.UI {
+namespace IgorZ.TimberDev.UI;
 
 /// <summary>Utility class to format strings for UI.</summary>
 public static class CommonFormats {
@@ -73,6 +73,4 @@ public static class CommonFormats {
         _ => value.ToString("0.00#")
     };
   }
-}
-
 }

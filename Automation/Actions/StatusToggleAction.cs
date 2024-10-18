@@ -14,7 +14,7 @@ using Timberborn.Localization;
 using Timberborn.Persistence;
 using Timberborn.StatusSystem;
 
-namespace IgorZ.Automation.Actions {
+namespace IgorZ.Automation.Actions;
 
 /// <summary>This action only presents a status on the building. It doesn't do anything else.</summary>
 /// <remarks>The other actions that need a status can inherit from this action.</remarks>
@@ -233,12 +233,12 @@ public class StatusToggleAction : AutomationActionBase {
               StatusToggle.CreateNormalStatusWithFloatingIcon(toggleAction.StatusIcon, _loc.T(toggleAction.StatusText)),
           StatusKindEnum.NormalStatusWithAlertAndFloatingIcon =>
               StatusToggle.CreateNormalStatusWithAlertAndFloatingIcon(
-                  toggleAction.StatusIcon, _loc.T(toggleAction.StatusText), _loc.T(toggleAction.AlertText)),
+                toggleAction.StatusIcon, _loc.T(toggleAction.StatusText), _loc.T(toggleAction.AlertText)),
           StatusKindEnum.PriorityStatusWithFloatingIcon =>
               StatusToggle.CreatePriorityStatusWithFloatingIcon(toggleAction.StatusIcon, _loc.T(toggleAction.StatusText)),
           StatusKindEnum.PriorityStatusWithAlertAndFloatingIcon =>
               StatusToggle.CreatePriorityStatusWithAlertAndFloatingIcon(
-                  toggleAction.StatusIcon, _loc.T(toggleAction.StatusText), _loc.T(toggleAction.AlertText)),
+                toggleAction.StatusIcon, _loc.T(toggleAction.StatusText), _loc.T(toggleAction.AlertText)),
           _ => throw new InvalidDataException("Unknown status kind: " + toggleAction.StatusKind)
       };
       GetComponentFast<StatusSubject>().RegisterStatus(_statusToggle);
@@ -255,6 +255,4 @@ public class StatusToggleAction : AutomationActionBase {
   }
 
   #endregion
-}
-
 }

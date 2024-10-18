@@ -6,7 +6,7 @@ using System;
 using System.Linq;
 
 // ReSharper disable once CheckNamespace
-namespace UnityDev.Utils.Reflections {
+namespace UnityDev.Utils.Reflections;
 
 /// <summary>Various utils to deal with the types via reflections.</summary>
 static class TypeUtils {
@@ -28,6 +28,4 @@ static class TypeUtils {
     }
     return type;
   }
-}
-
 }

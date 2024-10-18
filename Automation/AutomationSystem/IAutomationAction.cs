@@ -4,7 +4,7 @@
 
 using IgorZ.Automation.Utils;
 
-namespace IgorZ.Automation.AutomationSystem {
+namespace IgorZ.Automation.AutomationSystem;
 
 /// <summary>Base action interface.</summary>
 /// <remarks>It defines what is expected from a regular action in scope of the automation system.</remarks>
@@ -55,6 +55,4 @@ public interface IAutomationAction : IGameSerializable {
 
   /// <summary>Verifies that the action can be used on the provided automation behavior.</summary>
   public bool IsValidAt(AutomationBehavior behavior);
-}
-
 }

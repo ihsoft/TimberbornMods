@@ -10,7 +10,7 @@ using Timberborn.EntityPanelSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace IgorZ.TimberCommons.IrrigationSystemUI {
+namespace IgorZ.TimberCommons.IrrigationSystemUI;
 
 sealed class GrowthRateModifierFragment : IEntityPanelFragment {
   const string BoostPercentileLocKey = "IgorZ.TimberCommons.GrowthRateModifier.BoostPercentile";
@@ -56,6 +56,4 @@ sealed class GrowthRateModifierFragment : IEntityPanelFragment {
   bool IsModifierVisible() {
     return _growthModifier != null && _growthModifier.IsLiveAndGrowing && _growthModifier.RateIsModified;
   }
-}
-
 }

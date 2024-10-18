@@ -13,7 +13,7 @@ using UnityEngine.UIElements;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
 
-namespace IgorZ.TimberCommons.CommonUIPatches {
+namespace IgorZ.TimberCommons.CommonUIPatches;
 
 /// Harmony patch to show grow rate as days/hours.
 [HarmonyPatch]
@@ -31,6 +31,4 @@ static class GrowableFragmentPatch {
     }
     ____growthTime.text = CommonFormats.DaysHoursFormat(____loc, ____growable.GrowthTimeInDays * 24f);
   }
-}
-
 }

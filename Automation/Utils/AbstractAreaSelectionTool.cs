@@ -12,7 +12,7 @@ using Timberborn.BuilderPrioritySystem;
 using Timberborn.InputSystem;
 using UnityEngine;
 
-namespace IgorZ.Automation.Utils {
+namespace IgorZ.Automation.Utils;
 
 /// <summary>The base class to the selection tool implementations.</summary>
 /// <remarks>
@@ -155,7 +155,7 @@ public abstract class AbstractAreaSelectionTool : ToolWithDescription, IInputPro
   /// <inheritdoc/>
   public virtual bool ProcessInput() {
     return _areaBlockObjectPicker.PickBlockObjects<BuilderPrioritizable>(
-        PreviewCallback, ActionCallback, ShowNoneCallback);
+      PreviewCallback, ActionCallback, ShowNoneCallback);
   }
   #endregion
 
@@ -224,6 +224,4 @@ public abstract class AbstractAreaSelectionTool : ToolWithDescription, IInputPro
     _actionSelectionDrawer = _blockObjectSelectionDrawerFactory.Create(_actionColor, _tileColor, _sideColor);
   }
   #endregion
-}
-
 }

@@ -13,7 +13,7 @@ using UnityEngine.UIElements;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
 
-namespace IgorZ.TimberCommons.CommonUIPatches {
+namespace IgorZ.TimberCommons.CommonUIPatches;
 
 /// <summary>Harmony patch to show growth time in days and hours.</summary>
 [HarmonyPatch]
@@ -31,6 +31,4 @@ static class GrowableToolPanelItemFactoryPatch {
     }
     __result.Q<Label>("GrowthTime").text = CommonFormats.DaysHoursFormat(____loc, growableSpec.GrowthTimeInDays * 24f);
   }
-}
-
 }

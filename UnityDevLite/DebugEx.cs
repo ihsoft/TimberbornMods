@@ -13,7 +13,7 @@ using Timberborn.PrefabSystem;
 using UnityEngine;
 
 // ReSharper disable once CheckNamespace
-namespace UnityDev.Utils.LogUtilsLite {
+namespace UnityDev.Utils.LogUtilsLite;
 
 /// <summary>A light version of logging utils from UnityDev specialized for Timberborn.</summary>
 /// <remarks>https://github.com/ihsoft/UnityDev_Utils</remarks>
@@ -154,6 +154,4 @@ static class DebugEx {
       }
     }
   }
-}
-
 }

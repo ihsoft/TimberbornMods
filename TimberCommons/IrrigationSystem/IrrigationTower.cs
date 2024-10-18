@@ -25,7 +25,7 @@ using Timberborn.TickSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
-namespace IgorZ.TimberCommons.IrrigationSystem {
+namespace IgorZ.TimberCommons.IrrigationSystem;
 
 /// <summary>Base component for the irrigation towers.</summary>
 /// <remarks>
@@ -228,7 +228,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
       coverage = GetTiles(range: _irrigationRange, skipChecks: true).eligible.Count;
       coverages.Add(_irrigationRange, coverage);
       DebugEx.Fine(
-          "Calculated max coverage: size={0}, range={1}, coverage={2}", _foundationSize, _irrigationRange, coverage);
+        "Calculated max coverage: size={0}, range={1}, coverage={2}", _foundationSize, _irrigationRange, coverage);
     }
     MaxCoveredTilesCount = coverage;
   }
@@ -389,7 +389,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
       return;
     }
     _moistureOverrideIndex = _directSoilMoistureSystemAccessor.AddMoistureOverride(
-        ReachableTiles, 1.0f, tile => CalculateDesertLevel(tile, EffectiveRange));
+      ReachableTiles, 1.0f, tile => CalculateDesertLevel(tile, EffectiveRange));
     IrrigationStarted();
   }
 
@@ -454,7 +454,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   /// <summary>Returns all the tiles in the irrigated range.</summary>
   (HashSet<Vector2Int> eligible, HashSet<int> obstacles, HashSet<int> barriers) GetTiles(
-      float range, bool skipChecks) {
+    float range, bool skipChecks) {
     var tilesToVisit = new List<Vector2Int>(Mathf.RoundToInt(range * range));
     var visitedTiles = new HashSet<int>();
     var result = new HashSet<Vector2Int>();
@@ -592,6 +592,4 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   }
 
   #endregion
-}
-
 }

@@ -12,7 +12,7 @@ using UnityEngine.UIElements;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
 
-namespace IgorZ.TimberCommons.CommonUIPatches {
+namespace IgorZ.TimberCommons.CommonUIPatches;
 
 /// <summary>Harmony patch to display "supply left" element in the manufactory UI fragment.</summary>
 /// <seealso cref="ManufactoryInventoryFragmentPatch1"/>
@@ -47,6 +47,4 @@ static class ManufactoryInventoryFragmentPatch2 {
     HoursLeftBar.SetProgress(progress);
     HoursLeftLabel.text = supplyLeft;
   }
-}
-
 }

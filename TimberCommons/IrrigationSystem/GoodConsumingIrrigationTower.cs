@@ -9,7 +9,7 @@ using Timberborn.Buildings;
 using Timberborn.GoodConsumingBuildingSystem;
 using Timberborn.Localization;
 
-namespace IgorZ.TimberCommons.IrrigationSystem {
+namespace IgorZ.TimberCommons.IrrigationSystem;
 
 /// <summary>Irrigation tower that runs on top of <see cref="GoodConsumingBuilding"/>.</summary>
 /// <remarks>
@@ -110,6 +110,4 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
   }
 
   #endregion
-}
-
 }

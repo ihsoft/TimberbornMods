@@ -5,7 +5,7 @@
 using Bindito.Core;
 using Timberborn.EntityPanelSystem;
 
-namespace IgorZ.TimberCommons.IrrigationSystemUI {
+namespace IgorZ.TimberCommons.IrrigationSystemUI;
 
 [Context("Game")]
 // ReSharper disable once UnusedType.Global
@@ -36,6 +36,4 @@ sealed class Configurator : IConfigurator {
       return builder.Build();
     }
   }
-}
-
 }

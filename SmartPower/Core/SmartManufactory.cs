@@ -13,7 +13,7 @@ using Timberborn.Workshops;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
-namespace IgorZ.SmartPower.Core {
+namespace IgorZ.SmartPower.Core;
 
 /// <summary>
 /// Component that extends the <see cref="MechanicalBuilding"/> behavior to conserve energy when manufactory cannot
@@ -51,8 +51,8 @@ public class SmartManufactory : BaseComponent, IAdjustablePowerInput {
       }
       _idleState = value;
       HostedDebugLog.Fine(
-          this, "Change power consumption mode: noWorkers={0}, noIngredients={1}, noFuel={2}, blockedOutput={3}",
-          AllWorkersOut, MissingIngredients, NoFuel, BlockedOutput);
+        this, "Change power consumption mode: noWorkers={0}, noIngredients={1}, noFuel={2}, blockedOutput={3}",
+        AllWorkersOut, MissingIngredients, NoFuel, BlockedOutput);
       if (value) {
         _standbyStatus.Activate();
       } else {
@@ -117,6 +117,4 @@ public class SmartManufactory : BaseComponent, IAdjustablePowerInput {
   }
 
   #endregion
-}
-
 }

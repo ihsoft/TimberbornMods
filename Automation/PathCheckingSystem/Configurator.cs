@@ -5,7 +5,7 @@
 using Bindito.Core;
 using IgorZ.TimberDev.Utils;
 
-namespace IgorZ.Automation.PathCheckingSystem {
+namespace IgorZ.Automation.PathCheckingSystem;
 
 // ReSharper disable once UnusedType.Global
 [Context("Game")]
@@ -17,6 +17,4 @@ sealed class Configurator : IConfigurator {
 
     HarmonyPatcher.PatchRepeated(PatchId, typeof(ConstructionSiteFinishIfRequirementsMetPatch));
   }
-}
-
 }
