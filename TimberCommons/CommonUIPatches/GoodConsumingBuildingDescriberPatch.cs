@@ -17,7 +17,7 @@ namespace IgorZ.TimberCommons.CommonUIPatches {
 
 /// <summary>Harmony patch to support <see cref="IConsumptionRateFormatter"/> on buildings.</summary>
 /// <remarks>
-/// Instead of doing own logic on the formatting, it let's the components decide via
+/// Instead of doing own logic on the formatting, it lets the components decide via
 /// <see cref="IConsumptionRateFormatter"/>.
 /// </remarks>
 [HarmonyPatch]
