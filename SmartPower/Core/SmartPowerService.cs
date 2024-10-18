@@ -10,6 +10,11 @@ using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.SmartPower.Core;
 
+/// <summary>Service that manages the smart power consumption and production.</summary>
+/// <remarks>
+/// Consumers and generators that register themselves in the service will be dynamically paused/resumed to optimize
+/// power production and consumption.
+/// </remarks>
 public class SmartPowerService : ITickableSingleton, ILateTickable {
 
   #region ITickableSingleton implementation

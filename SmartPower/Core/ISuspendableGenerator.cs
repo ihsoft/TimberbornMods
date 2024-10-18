@@ -7,6 +7,7 @@ using Timberborn.MechanicalSystem;
 
 namespace IgorZ.SmartPower.Core;
 
+/// <summary>Interface for the generators that can be suspended and resumed.</summary>
 public interface ISuspendableGenerator : IComparable<ISuspendableGenerator> {
   /// <summary>
   /// The priority in which the generator should be suspended and resumed. Generators with higher priority will be

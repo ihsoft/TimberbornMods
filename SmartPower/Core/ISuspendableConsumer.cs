@@ -7,6 +7,7 @@ using Timberborn.MechanicalSystem;
 
 namespace IgorZ.SmartPower.Core;
 
+/// <summary>Interface for the consumers that can be suspended and resumed.</summary>
 public interface ISuspendableConsumer : IComparable<ISuspendableConsumer> {
   /// <summary>
   /// The priority in which the consumer should be suspended and resumed. Consumers with higher priority will be
