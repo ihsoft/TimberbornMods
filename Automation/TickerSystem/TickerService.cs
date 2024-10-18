@@ -3,9 +3,7 @@
 // License: Public Domain
 
 using System.Collections.Generic;
-using System.Linq;
 using Timberborn.TickSystem;
-using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
 namespace Automation.TickerSystem {
@@ -19,7 +17,7 @@ namespace Automation.TickerSystem {
 /// <p>
 /// Listeners are called in the undefined order. They must register via <see cref="AddListener"/> and de-register via
 /// <see cref="RemoveListener"/>. For the MonoBehaviour objects it's allowed to not de-register, but it's recommended to
-/// do so for the well defined life cycle. 
+/// do so for the well-defined life cycle. 
 /// </p>
 /// </remarks>
 public class TickerService : ITickableSingleton {
