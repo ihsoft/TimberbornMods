@@ -33,9 +33,6 @@
         <DocumentationFile>bin\Release\Automation.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
-        <Folder Include="workshop"/>
-    </ItemGroup>
-    <ItemGroup>
       <Reference Include="0Harmony">
         <HintPath>..\Dependencies\Workshop\3284904751\0Harmony.dll</HintPath>
       </Reference>
@@ -317,7 +314,6 @@
       <Content Include="..\ModsUnityProject\Assets\Mods\Automation\manifest.json">
         <Link>Mod\manifest.json</Link>
       </Content>
-      <Content Include="CHANGES.md" />
     </ItemGroup>
     <ItemGroup>
       <Compile Include="..\TimberDev\UI\CommonFormats.cs">
