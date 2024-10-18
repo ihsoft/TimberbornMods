@@ -2,13 +2,15 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using IgorZ.TimberDev.Utils;
+using Timberborn.ModManagerScene;
 using UnityDev.Utils.LogUtilsLite;
 
-// ReSharper disable once CheckNamespace
-namespace IgorZ.SmartPower {
+namespace IgorZ.SmartPower.Core {
 
-static class Features {
+// ReSharper disable once ClassNeverInstantiated.Global
+sealed class Features : IModStarter {
   /// <summary>Indicates that <see cref="DebugEx.Fine"/> methods should emit record to the log.</summary>
   public static bool DebugExVerboseLogging;
 
@@ -17,8 +19,17 @@ static class Features {
   /// </summary>
   public static bool NetworkShowBatteryStats;
 
-  static Features() {
-    FeatureController.ReadFeatures(Consume);
+  /// <inheritdoc/>
+  public void StartMod() {
+    throw new Exception("We're not supposed to be here!");
+  }
+
+  /// <inheritdoc/>
+  public void StartMod(IModEnvironment modEnvironment) {
+    FeatureController.ReadFeatures(modEnvironment.ModPath, Consume);
+    if (DebugExVerboseLogging && DebugEx.LoggingSettings.VerbosityLevel < 5) {
+      DebugEx.LoggingSettings.VerbosityLevel = 5;
+    }
   }
 
   static bool Consume(string name, bool enabled, string value) {

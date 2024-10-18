@@ -3,13 +3,11 @@
 // License: Public Domain
 
 using Bindito.Core;
-using TimberApi.ConfiguratorSystem;
-using TimberApi.SceneSystem;
 using Timberborn.EntityPanelSystem;
 
 namespace Automation.UI {
 
-[Configurator(SceneEntrypoint.InGame)]
+[Context("Game")]
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {

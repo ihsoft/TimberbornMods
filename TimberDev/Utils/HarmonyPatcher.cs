@@ -38,8 +38,9 @@ static class HarmonyPatcher {
 
   static void Patch(string patchId, Type[] patchTypes) {
     var harmony = new Harmony(patchId);
+
     foreach (var type in patchTypes) {
-      harmony.PatchAll(type);
+      harmony.CreateClassProcessor(type).Patch();
       DebugEx.Fine("Harmony patch applied: {0}", type);
     }
   }

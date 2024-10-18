@@ -7,10 +7,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Bindito.Core;
 using IgorZ.TimberCommons.Common;
+using IgorZ.TimberCommons.Settings;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.Common;
-using Timberborn.ConstructibleSystem;
 using Timberborn.EntitySystem;
 using Timberborn.MapIndexSystem;
 using Timberborn.SceneLoading;
@@ -18,6 +18,7 @@ using Timberborn.SingletonSystem;
 using Timberborn.SoilBarrierSystem;
 using Timberborn.SoilMoistureSystem;
 using Timberborn.TerrainSystem;
+using Timberborn.TerrainSystemRendering;
 using Timberborn.TickSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
@@ -194,7 +195,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
     }
     DebugEx.Fine("Updated moisture level overrides: tiles={0}", MoistureLevelOverrides.Keys.Count);
 
-    if (Features.OverrideDesertLevelsForWaterTowers) {
+    if (IrrigationSystemSettings.OverrideDesertLevelsForWaterTowers) {
       UpdateTilesAppearance();
     }
   }
@@ -236,7 +237,6 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
     foreach (var value in _desertLevelOverrides.Values.SelectMany(item => item)) {
       var tile = value.Key;
       var level = value.Value;
-      var index = _mapIndexService.CoordinatesToIndex(tile);
       if (TerrainTextureLevelsOverrides.TryGetValue(tile, out var existingValue)) {
         TerrainTextureLevelsOverrides[tile] = Mathf.Max(level, existingValue);
       } else {
@@ -254,12 +254,12 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   /// <remarks>If there are overriden blocker for the tile, then the barrier is restored.</remarks>
   [OnEvent]
   public void OnEntityDeletedEvent(EntityDeletedEvent e) {
-    var constructible = e.Entity.GetComponentFast<Constructible>();
-    if (constructible == null || !constructible.IsFinished) {
+    var blockObject = e.Entity.GetComponentFast<BlockObject>();
+    if (blockObject == null || !blockObject.IsFinished) {
       return; // Ignore preview objects.
     }
-    var tile = constructible.GetComponentFast<BlockObject>().Coordinates.XY();
-    if (_contaminatedTilesCache.Contains(tile) && IsContaminationBlocker(constructible)) {
+    var tile = blockObject.Coordinates.XY();
+    if (_contaminatedTilesCache.Contains(tile) && IsContaminationBlocker(blockObject)) {
       DebugEx.Fine("Restore contamination barrier at: {0}", tile);
       _soilBarrierMap.AddContaminationBarrierAt(tile);
     }
@@ -267,8 +267,8 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
 
   /// <summary>Tells if the building blocks soil contamination.</summary>
   static bool IsContaminationBlocker(BaseComponent component) {
-    var barrier = component.GetComponentFast<SoilBarrier>();
-    return barrier != null && barrier._blockContamination;
+    var soilBarrierSpec = component.GetComponentFast<SoilBarrierSpec>();
+    return soilBarrierSpec && soilBarrierSpec.BlockContamination;
   }
 
   #endregion
@@ -282,7 +282,8 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
     Tick();
 
     // Refresh the texture on game load.
-    if (needTextureUpdate && Features.OverrideDesertLevelsForWaterTowers) {
+    if (needTextureUpdate && IrrigationSystemSettings.OverrideDesertLevelsForWaterTowers) {
+      // FIXME: Consider calling Tick() instead. It's public.
       _terrainMaterialMap.ProcessDesertTextureChanges();
       _terrainMaterialMap.ProcessDesertTextureChanges(); // Intentionally.
     }

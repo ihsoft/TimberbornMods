@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityDev.Utils.LogUtilsLite;
+using UnityEngine;
 
 // ReSharper disable UnusedMember.Local
 // ReSharper disable MemberCanBePrivate.Global
@@ -68,6 +69,7 @@ public static class FeatureController {
   public const string FeaturesFilename = "TimberDev_Features.txt";
 
   /// <summary>Reads feature config file located at <see cref="FeaturesFilename"/>.</summary>
+  /// <param name="basePath">The path to look for teh features file at.</param>
   /// <param name="consumeFn">
   /// The function that takes the parsed feature name, it's state and an optional value. The function must return
   /// <c>true</c> if it recognized the feature name and accepted it.
@@ -75,9 +77,8 @@ public static class FeatureController {
   /// <returns><c>false</c> if no file were found.</returns>
   /// <seealso cref="SetFlag"/>
   /// <seealso cref="SetValue{T}"/>
-  public static bool ReadFeatures(Func<string, bool, string, bool> consumeFn) {
-    var assembly = typeof(FeatureController).Assembly;
-    var featuresFile = Path.Combine(Path.GetDirectoryName(assembly.Location)!, FeaturesFilename);
+  public static bool ReadFeatures(string basePath, Func<string, bool, string, bool> consumeFn) {
+    var featuresFile = Path.Combine(basePath, FeaturesFilename);
     if (!File.Exists(featuresFile)) {
       return false;
     }
@@ -85,7 +86,8 @@ public static class FeatureController {
         .Select(x => x.Trim())
         .Where(x => x.Length > 0 && x[0] != '#')
         .ToList();
-    DebugEx.Info("Loaded {0} feature definitions for {1}", features.Count, assembly.FullName);
+    DebugEx.Info("Loaded {0} feature definitions for {1} from {2}",
+                 features.Count, typeof(FeatureController).Assembly.FullName, featuresFile);
     foreach (var feature in features) {
       var featureName = feature;
       var isEnabled = true;

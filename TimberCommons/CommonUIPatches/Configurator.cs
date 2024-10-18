@@ -3,43 +3,32 @@
 // License: Public Domain
 
 using System;
-using System.Collections.Generic;
 using Bindito.Core;
-using IgorZ.TimberCommons.Common;
 using IgorZ.TimberDev.UI;
 using IgorZ.TimberDev.Utils;
-using TimberApi.SceneSystem;
-using TimberApi.ConfiguratorSystem;
 
 namespace IgorZ.TimberCommons.CommonUIPatches {
 
+[Context("Game")]
 // ReSharper disable once UnusedType.Global
-[Configurator(SceneEntrypoint.InGame)]
 sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).FullName;
+  static readonly Type[] Patches = [
+      typeof(GoodConsumingBuildingDescriberPatch),
+      typeof(ManufactoryInventoryFragmentPatch1),
+      typeof(ManufactoryInventoryFragmentPatch2),
+      typeof(GoodConsumingBuildingFragmentPatch),
+      typeof(SluiceFragmentPatch1),
+      typeof(SluiceFragmentPatch2),
+      typeof(GrowableToolPanelItemFactoryPatch),
+      typeof(GrowableFragmentPatch),
+      typeof(ManufactoryDescriberPatch1),
+      typeof(ManufactoryDescriberPatch2)
+  ];
 
   public void Configure(IContainerDefinition containerDefinition) {
-    if (Features.DisableAllUiPatches) {
-      return;
-    }
-    var patches = new List<Type> {
-        typeof(GoodConsumingBuildingDescriberPatch),
-        typeof(ManufactoryInventoryFragmentInitializeFragmentPatch),
-        typeof(ManufactoryInventoryFragmentUpdateFragmentPatch),
-        typeof(GoodConsumingBuildingFragmentPatch),
-    };
     CommonFormats.ResetCachedLocStrings();
-    if (Features.GrowableGrowthTimeUIDaysHoursViewForAll) {
-      patches.Add(typeof(GrowableToolPanelItemFactoryPatch));
-      patches.Add(typeof(GrowableFragmentPatch));
-    }
-    if (Features.ShowDaysHoursForSlowRecipes) {
-      patches.Add(typeof(ManufactoryDescriberGetCraftingTimePatch));
-    }
-    if (Features.ShowLongValueForLowFuelConsumptionRecipes) {
-      patches.Add(typeof(ManufactoryDescriberGetInputsPatch));
-    }
-    HarmonyPatcher.PatchRepeated(PatchId, patches.ToArray());
+    HarmonyPatcher.PatchRepeated(PatchId, Patches);
   }
 }
 

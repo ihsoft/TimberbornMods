@@ -4,12 +4,11 @@
 
 using Automation.Utils;
 using Bindito.Core;
-using TimberApi.ConfiguratorSystem;
-using TimberApi.SceneSystem;
 
-namespace Automation.Tools {
+namespace Automation.Tools;
 
-[Configurator(SceneEntrypoint.InGame)]
+[Context("Game")]
+[Context("MapEditor")]
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
 
@@ -25,6 +24,4 @@ sealed class Configurator : IConfigurator {
     CustomToolSystem.BindTool<DebugPickTool>(containerDefinition);
     CustomToolSystem.BindTool<DebugFinishNowTool>(containerDefinition);
   }
-}
-
 }

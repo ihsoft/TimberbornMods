@@ -2,37 +2,30 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using Timberborn.BaseComponentSystem;
+using Timberborn.BuildingsBlocking;
 using Timberborn.EnterableSystem;
 using Timberborn.MechanicalSystem;
-using Timberborn.Persistence;
-using Timberborn.TickSystem;
-using UnityDev.Utils.LogUtilsLite;
 
-// ReSharper disable once CheckNamespace
-namespace IgorZ.SmartPower {
+namespace IgorZ.SmartPower.Core {
 
-/// <summary>Smart version of the stock game powered attraction.</summary>
-/// <remarks>It only consumes power if there are attendees in the building.</remarks>
-public sealed class SmartPoweredAttraction : TickableComponent, IPostInitializableLoadedEntity {
+/// <summary>
+/// Component that extends the <see cref="MechanicalBuilding"/> behavior to conserve energy when powered attraction has
+/// no attendees.
+/// </summary>
+public sealed class SmartPoweredAttraction : BaseComponent, IAdjustablePowerInput {
 
-  /// <summary>Indicates if the power consumption has been disabled due to no attendees.</summary>
-  // ReSharper disable once MemberCanBePrivate.Global
-  public bool ConsumptionDisabled { get; private set; }
+  #region IAdjustablePowerInput implementation
 
-  #region IPostInitializableLoadedEntity implementation
+  // Don't set it to 0 as it can disable the network.
+  const int NonAttendeesPowerConsumption = 1;  // hp
 
   /// <inheritdoc/>
-  public void PostInitializeLoadedEntity() {
-    UpdateConsumingState();
-  }
-
-  #endregion
-
-  #region TickableComponent overrides
-
-  /// <inheritdoc/>
-  public override void Tick() {
-    UpdateConsumingState();
+  public int UpdateAndGetPowerInput(int nominalPowerInput) {
+    if (_mechanicalBuilding.ConsumptionDisabled || _blockableBuilding && !_blockableBuilding.IsUnblocked) {
+      return 0;
+    }
+    return _enterable.NumberOfEnterersInside == 0 ? NonAttendeesPowerConsumption : nominalPowerInput;
   }
 
   #endregion
@@ -40,20 +33,13 @@ public sealed class SmartPoweredAttraction : TickableComponent, IPostInitializab
   #region Implementation
 
   MechanicalBuilding _mechanicalBuilding;
+  BlockableBuilding _blockableBuilding;
   Enterable _enterable;
 
   void Awake() {
     _mechanicalBuilding = GetComponentFast<MechanicalBuilding>();
+    _blockableBuilding = GetComponentFast<BlockableBuilding>();
     _enterable = GetComponentFast<Enterable>();
-  }
-
-  void UpdateConsumingState() {
-    var newState = _enterable.NumberOfEnterersInside == 0;
-    if (newState != ConsumptionDisabled) {
-      HostedDebugLog.Fine(this, newState ? "Disable power consumption" : "Enable power consumption");
-      ConsumptionDisabled = newState;
-    }
-    _mechanicalBuilding.ConsumptionDisabled = ConsumptionDisabled;
   }
 
   #endregion

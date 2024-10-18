@@ -3,7 +3,7 @@
 // License: Public Domain
 
 using Automation.AutomationSystem;
-using Timberborn.ConstructibleSystem;
+using Timberborn.BlockSystem;
 using Timberborn.SingletonSystem;
 
 namespace Automation.Conditions {
@@ -24,7 +24,7 @@ public sealed class ObjectFinishedCondition : AutomationConditionBase {
 
   /// <inheritdoc/>
   public override void SyncState() {
-    ConditionState = Behavior.BlockObject.Finished;
+    ConditionState = Behavior.BlockObject.IsFinished;
   }
 
   /// <inheritdoc/>
@@ -46,8 +46,8 @@ public sealed class ObjectFinishedCondition : AutomationConditionBase {
   #region Implementation
   /// <summary>Triggers when the object or building becomes a "constructed" entity.</summary>
   [OnEvent]
-  public void OnConstructibleEnteredFinishedStateEvent(ConstructibleEnteredFinishedStateEvent @event) {
-    if (@event.Constructible.GameObjectFast != Behavior.GameObjectFast) {
+  public void OnBlockObjectEnteredFinishedStateEvent(EnteredFinishedStateEvent e) {
+    if (e.BlockObject.GameObjectFast != Behavior.GameObjectFast) {
       return;
     }
     ConditionState = true;

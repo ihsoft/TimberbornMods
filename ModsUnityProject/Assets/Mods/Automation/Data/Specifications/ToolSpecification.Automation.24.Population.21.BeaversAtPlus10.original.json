@@ -1,0 +1,22 @@
+{
+  "Id": "Automation.Tmpl.Population.BeaversAtPlus10",
+  "GroupId": "AutomationPopulationToolGroupId",
+  "Type": "Automation.Tools.ApplyTemplateTool",
+  "Order": 21,
+  "Icon": "Sprites/IgorZ/tool-beavers+10",
+  "NameLocKey": "IgorZ.Automation.Tool.tmpl.BeaversAtPlus10.DisplayName",
+  "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.BeaversAtPlus10.Description",
+  "ToolInformation": {
+    "TemplateFamilyName": "Population",
+    "Rules": [
+      {
+        "Condition": { "TypeId": "Automation.Conditions.BeaverPopulationBelowThresholdCondition", "Value": 10, "RelativeTo": "CurrentLevel" },
+        "Action": { "TypeId": "Automation.Actions.UnpauseAction" }
+      },
+      {
+        "Condition": { "TypeId": "Automation.Conditions.BeaverPopulationAboveThresholdCondition", "Value": 9, "RelativeTo": "CurrentLevel" },
+        "Action": { "TypeId": "Automation.Actions.PauseAction" }
+      }
+    ]
+  }
+}

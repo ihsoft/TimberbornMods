@@ -1,8 +1,0 @@
-{
-  "IgnoreDirectoryPrefixes": [
-    "Sprites/StatusIcons/",
-    "Sprites/StatusIcons\\",
-    "UI/Cursors/",
-    "UI/Cursors\\"
-  ]
-}

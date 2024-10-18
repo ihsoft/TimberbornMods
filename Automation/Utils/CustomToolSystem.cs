@@ -4,13 +4,13 @@
 
 using Bindito.Core;
 using TimberApi.DependencyContainerSystem;
-using TimberApi.ToolGroupSystem;
-using TimberApi.ToolSystem;
+using TimberApi.Tools.ToolGroupSystem;
+using TimberApi.Tools.ToolSystem;
 using Timberborn.ConstructionMode;
 using Timberborn.Localization;
 using Timberborn.Persistence;
 using Timberborn.ToolSystem;
-using ToolGroupSpecification = TimberApi.ToolGroupSystem.ToolGroupSpecification;
+using ToolGroupSpecification = TimberApi.Tools.ToolGroupSystem.ToolGroupSpecification;
 
 namespace Automation.Utils {
 

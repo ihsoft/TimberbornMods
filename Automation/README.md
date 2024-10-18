@@ -1,7 +1,10 @@
-# Timberborn game: Automation
+# Overview
 
-This plugin allows defining rules in a form: if &lt;condition> then &lt;action>. The actions are
-When conditions triggers, the action gest excuted. This way an advanced automation can be setup in
-the game for the routine actions.
+This project only creates a binary for the Unity Mod Project. See `../ModsUnityProject/Assets/Mods/Automation`.
 
-See more details in [Wiki](https://github.com/ihsoft/TimberbornMods/wiki/Automation).
+# Building and releasing
+
+1. Use the mod builder from Unity to make the main hierarchy of the mod.
+2. Build DLL via this project. Make sure it's copied to the target destiantion.
+3. Update CHANGE LOG.md in the mods folder.
+3. Update the mod in Workshop via the game's UI. Copy the latest changes from CHANGELOG.

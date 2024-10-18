@@ -8,11 +8,11 @@ using Automation.Utils;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BlockSystemNavigation;
-using Timberborn.Buildings;
 using Timberborn.BuildingsBlocking;
 using Timberborn.BuildingsNavigation;
 using Timberborn.Coordinates;
 using Timberborn.Navigation;
+using Timberborn.PathSystem;
 using UnityDev.Utils.LogUtilsLite;
 
 namespace Automation.Tools {
@@ -100,7 +100,7 @@ public class DebugPickTool : AbstractAreaSelectionTool {
     var lines = new StringBuilder();
     lines.AppendLine(new string('*', 10));
     lines.AppendLine($"NavMesh edges on {DebugEx.BaseComponentToString(component)}:");
-    var isPath = component.GetComponentFast<Building>().Path;
+    var isPath = (bool) component.GetComponentFast<Path>();
     var blockObject = component.GetComponentFast<BlockObject>();
     var isSolid = blockObject.Solid;
     lines.AppendLine($"Building: isPath={isPath}, isSolid={isSolid}");

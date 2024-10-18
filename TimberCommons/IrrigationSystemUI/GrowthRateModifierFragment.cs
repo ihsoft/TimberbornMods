@@ -4,11 +4,9 @@
 
 using IgorZ.TimberCommons.IrrigationSystem;
 using IgorZ.TimberDev.UI;
-using TimberApi.UiBuilderSystem;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
-using Timberborn.Localization;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -18,22 +16,20 @@ sealed class GrowthRateModifierFragment : IEntityPanelFragment {
   const string BoostPercentileLocKey = "IgorZ.TimberCommons.GrowthRateModifier.BoostPercentile";
   const string SlowdownPercentileLocKey = "IgorZ.TimberCommons.GrowthRateModifier.SlowdownPercentile";
 
-  readonly UIBuilder _builder;
-  readonly ILoc _loc;
+  readonly UiFactory _uiFactory;
   
   VisualElement _root;
   Label _infoLabel;
 
   GrowthRateModifier _growthModifier;
 
-  public GrowthRateModifierFragment(UIBuilder builder, ILoc loc) {
-    _builder = builder;
-    _loc = loc;
+  public GrowthRateModifierFragment(UiFactory uiFactory) {
+    _uiFactory = uiFactory;
   }
 
   public VisualElement InitializeFragment() {
-    _infoLabel = _builder.Presets().Labels().Label(color: UiFactory.PanelNormalColor);
-    _root = _builder.CreateFragmentBuilder().AddComponent(_infoLabel).BuildAndInitialize();
+    _infoLabel = _uiFactory.CreateLabel();
+    _root = _uiFactory.CreateCenteredPanelFragmentBuilder().AddComponent(_infoLabel).BuildAndInitialize();
     _root.ToggleDisplayStyle(visible: false);
     return _root;
   }
@@ -54,7 +50,7 @@ sealed class GrowthRateModifierFragment : IEntityPanelFragment {
     }
     _root.ToggleDisplayStyle(visible: IsModifierVisible());
     var locKey = _growthModifier.EffectiveModifier > 0f ? BoostPercentileLocKey : SlowdownPercentileLocKey;
-    _infoLabel.text = _loc.T(locKey, Mathf.Abs(_growthModifier.EffectiveModifier));
+    _infoLabel.text = _uiFactory.Loc.T(locKey, Mathf.Abs(_growthModifier.EffectiveModifier));
   }
 
   bool IsModifierVisible() {

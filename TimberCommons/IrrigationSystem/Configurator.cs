@@ -3,15 +3,12 @@
 // License: Public Domain
 
 using Bindito.Core;
-using TimberApi.ConfiguratorSystem;
-using TimberApi.SceneSystem;
 using Timberborn.Growing;
 using Timberborn.TemplateSystem;
 
 namespace IgorZ.TimberCommons.IrrigationSystem {
 
-[Configurator(SceneEntrypoint.InGame)]
-// ReSharper disable once UnusedType.Global
+[Context("Game")]
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.MultiBind<TemplateModule>().ToProvider(ProvideTemplateModule).AsSingleton();

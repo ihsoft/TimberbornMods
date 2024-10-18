@@ -1,0 +1,54 @@
+[h1]Overview[/h1]
+This mod allows assigning a set of rules to a building. The rules execute logic "If This Then That" (a.k.a. IFTTT). Each rule has a condition to check and an action to execute if the condition evaluates to "true". The automation engine allows creating any combination of conditions and actions. The system can easily be extended with extra conditions and actions by the players since it's controlled via JSON files located in the mods folder.
+
+[h1]UI concept[/h1]
+To keep the UI simple, a set of selection tools is implemented that applies a set of rules (or "a template") to the selected objects. The templates are made for the most common cases, but they may not fit all the player's needs. Players can adjust and create new templates as they need by changing files in the "Specification" folder. If you have questions on how to do it, join the Timberborn Discord and drop a message in the pinned mod channel (see the link below).
+
+[h1]Tool groups[/h1]
+All templates are grouped by their purpose. The root menu has an icon for each group.
+
+[img]https://image.modcdn.io/members/604b/23201987/profile/mainmenudemo.png[/img]
+
+There are also special actions available, not related to the rules:
+[list]
+[*] Pause/resume tool. Use it to quickly change the state of a set of buildings.
+[*] [Dev mode only] Immediate completion of the selected buildings. Select buildings to complete, and they all will instantly finish.
+[*] [DevMode] Inspect components and navmeshes on the buildings. Useful for those who make mods.
+[/list]
+[i]* Press Shift+Alt+Z to activate dev mode[/i]
+
+[h1]Dynamite templates[/h1]
+Templates to create rules that automatically detonate a dynamite and place a new one in the same place. This action is repeated multiple times. It can be handy when doing massive terraforming. Be careful not to kill your workers! Once one dynamite is activated, the whole field will explode. The safest usage is to dig holes below the surface (e.g., from the bridges or at the cliff).
+
+[img]https://image.modcdn.io/members/604b/23201987/profile/terrainmenudemo.png[/img]
+
+[h1]Water templates[/h1]
+Templates to create rules that trigger on the weather season change:
+[list]
+[*] Pause/resume a building on the season change.
+[*] Close/open floodgates based on the current season.
+[*] Open/close the water regulator during the drought season.
+[/list]
+
+[img]https://image.modcdn.io/members/604b/23201987/profile/watermenudemo.png[/img]
+
+[h1]Storage templates[/h1]
+Templates to create rules that trigger based on the building's storage capacity. If there is too much product in the inventory, then the building is turned into the "emptying mode". In this mode, all the available workers, including the ones from the idle buildings, will rush to help move the goods out of the building to the appropriate storage with spare capacity. This rule can only be used on a few buildings, like pumps. This is how the building's efficiency can be raised up to 100%, as the worker doesn't need to spend time on delivering the goods!
+
+[img]https://image.modcdn.io/members/604b/23201987/profile/storagemenudemo.png[/img]
+
+[h1]Population templates[/h1]
+Templates to create rules that trigger based on the current beaver or bot population size. The buildings will pause if the population is too high and resume if it's too low. It's a good way to control the bot population. Also, it will work well for the Ironteeth faction to control the beaver population.
+
+[img]https://image.modcdn.io/members/604b/23201987/profile/populationmenudemo.png[/img]
+
+[h1]Chained construction tool[/h1]
+This tool applies a special rule to a set of unfinished buildings to [i]try[/i] building them so that the workers do not get blocked. Normally, the builders in the game don't care if what they build right now will block access to the other construction site. With this tool, most cases can be resolved as the rules will temporarily pause those buildings that would block access if completed. Keep in mind that this is only an assisting tool. It won't work in all cases, so try to keep the construction sites simple.
+
+[h1]Questions and discussions[/h1]
+Note that Steam has a special tab called "Discussions". It's a better place to ask questions or discuss features than doing so in the comments. I'll do my best to answer all questions there, so don't hesitate to ask.
+
+Discord: https://discord.com/channels/558398674389172225/1190169064383991858
+See more details in the Wiki: https://github.com/ihsoft/TimberbornMods/wiki/Automation
+Report a bug: https://github.com/ihsoft/TimberbornMods/labels/automation
+GitHub repository: https://github.com/ihsoft/TimberbornMods
