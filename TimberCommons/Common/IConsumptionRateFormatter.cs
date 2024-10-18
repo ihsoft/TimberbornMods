@@ -4,10 +4,10 @@
 
 namespace IgorZ.TimberCommons.Common {
 
-/// <summary>Interface that helps customizing the tooltip.</summary>
+/// <summary>Interface that helps to customize the tooltip.</summary>
 /// <remarks>
 /// Any component can provide this interface to show consumption rate in a custom form. If there are multiple components
-/// that provide the interface, then only one is used and it's unspecified which.
+/// that provide the interface, then only one is used, and it's unspecified which.
 /// </remarks>
 public interface IConsumptionRateFormatter {
   /// <summary>Returns formatted string of the good consumption rate.</summary>

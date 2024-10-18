@@ -2,7 +2,6 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using IgorZ.TimberCommons.Settings;
 using IgorZ.TimberCommons.WaterBuildings;
 using IgorZ.TimberDev.UI;
 using Timberborn.BaseComponentSystem;
