@@ -12,11 +12,11 @@ using Timberborn.BuilderPrioritySystem;
 using Timberborn.InputSystem;
 using UnityEngine;
 
-namespace Automation.Utils {
+namespace IgorZ.Automation.Utils {
 
 /// <summary>The base class to the selection tool implementations.</summary>
 /// <remarks>
-/// Implements the boilerplate of the selection logic. The descendants only need to react on the business logic related
+/// Implements the boilerplate of the selection logic. The descendants only need to react to the business logic related
 /// events to customize the behavior.
 /// </remarks>
 /// <seealso cref="ObjectFilterExpression"/>

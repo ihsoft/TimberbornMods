@@ -5,7 +5,7 @@
 using Bindito.Core;
 using IgorZ.TimberDev.Utils;
 
-namespace Automation.PathCheckingSystem {
+namespace IgorZ.Automation.PathCheckingSystem {
 
 // ReSharper disable once UnusedType.Global
 [Context("Game")]

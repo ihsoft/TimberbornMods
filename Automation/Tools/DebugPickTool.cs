@@ -4,7 +4,7 @@
 
 using System.Linq;
 using System.Text;
-using Automation.Utils;
+using IgorZ.Automation.Utils;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BlockSystemNavigation;
@@ -15,7 +15,7 @@ using Timberborn.Navigation;
 using Timberborn.PathSystem;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace Automation.Tools {
+namespace IgorZ.Automation.Tools {
 
 /// <summary>Debug tool to show various information about block objects.</summary>
 // ReSharper disable once ClassNeverInstantiated.Global

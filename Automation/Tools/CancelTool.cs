@@ -2,12 +2,12 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using Automation.AutomationSystem;
-using Automation.Utils;
+using IgorZ.Automation.AutomationSystem;
+using IgorZ.Automation.Utils;
 using Timberborn.BlockSystem;
 using UnityEngine;
 
-namespace Automation.Tools {
+namespace IgorZ.Automation.Tools {
 
 // ReSharper disable once ClassNeverInstantiated.Global
 sealed class CancelTool : AbstractAreaSelectionTool, IAutomationModeEnabler {

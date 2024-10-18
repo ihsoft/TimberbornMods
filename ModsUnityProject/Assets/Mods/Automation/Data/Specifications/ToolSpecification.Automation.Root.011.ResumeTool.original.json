@@ -1,7 +1,7 @@
 {
   "Id": "Automation.ResumeTool",
   "GroupId": "AutomationToolGroupId",
-  "Type": "Automation.Tools.ResumeTool",
+  "Type": "IgorZ.Automation.Tools.ResumeTool",
   "Order": 11,
   "Icon": "Sprites/IgorZ/player-play",
   "NameLocKey": "IgorZ.Automation.ResumeTool.Title",

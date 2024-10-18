@@ -4,7 +4,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Automation.Tools;
+using IgorZ.Automation.Tools;
 using Timberborn.BaseComponentSystem;
 using Timberborn.Localization;
 using Timberborn.SelectionSystem;
@@ -12,7 +12,7 @@ using Timberborn.SingletonSystem;
 using Timberborn.ToolSystem;
 using UnityEngine;
 
-namespace Automation.AutomationSystem {
+namespace IgorZ.Automation.AutomationSystem {
 
 /// <summary>Central point for all the automation related logic.</summary>
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]

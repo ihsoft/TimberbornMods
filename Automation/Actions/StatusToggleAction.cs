@@ -6,15 +6,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Automation.AutomationSystem;
 using Bindito.Core;
+using IgorZ.Automation.AutomationSystem;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.BaseComponentSystem;
 using Timberborn.Localization;
 using Timberborn.Persistence;
 using Timberborn.StatusSystem;
 
-namespace Automation.Actions {
+namespace IgorZ.Automation.Actions {
 
 /// <summary>This action only presents a status on the building. It doesn't do anything else.</summary>
 /// <remarks>The other actions that need a status can inherit from this action.</remarks>

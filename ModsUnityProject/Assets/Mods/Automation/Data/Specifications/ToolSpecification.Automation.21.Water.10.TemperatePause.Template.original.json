@@ -1,7 +1,7 @@
 {
   "Id": "Automation.Tmpl.Water.PauseTemperate",
   "GroupId": "AutomationWaterToolGroupId",
-  "Type": "Automation.Tools.ApplyTemplateTool",
+  "Type": "IgorZ.Automation.Tools.ApplyTemplateTool",
   "Order": 10,
   "Icon": "Sprites/IgorZ/icon-temperate-pause",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.TemperatePause.DisplayName",
@@ -10,12 +10,12 @@
     "TemplateFamilyName": "Water.SeasonManagement",
     "Rules": [
       {
-        "Condition": { "TypeId": "Automation.Conditions.DroughtStartedCondition" },
-        "Action": { "TypeId": "Automation.Actions.UnpauseAction" }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.DroughtStartedCondition" },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.UnpauseAction" }
       },
       {
-        "Condition": { "TypeId": "Automation.Conditions.DroughtEndedCondition" },
-        "Action": { "TypeId": "Automation.Actions.PauseAction" }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.DroughtEndedCondition" },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.PauseAction" }
       }
     ]
   }

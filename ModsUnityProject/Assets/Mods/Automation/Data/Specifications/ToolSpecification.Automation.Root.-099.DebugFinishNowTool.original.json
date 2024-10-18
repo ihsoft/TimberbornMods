@@ -1,7 +1,7 @@
 {
   "Id": "Automation.DebugFinishNowTool",
   "GroupId": "AutomationToolGroupId",
-  "Type": "Automation.Tools.DebugFinishNowTool",
+  "Type": "IgorZ.Automation.Tools.DebugFinishNowTool",
   "Order": -99,
   "Icon": "Sprites/IgorZ/debug-finish-all",
   "DevMode": true,

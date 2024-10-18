@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace IgorZ.TimberDev.Utils {
+namespace IgorZ.Automation.Utils {
 
 /// <summary>Helper class to profile execution timings.</summary>
 public sealed class CounterProfiler {

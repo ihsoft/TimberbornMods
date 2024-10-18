@@ -3,11 +3,11 @@
 // License: Public Domain
 
 using System.Diagnostics.CodeAnalysis;
-using Automation.AutomationSystem;
+using IgorZ.Automation.AutomationSystem;
 using Timberborn.InventorySystem;
 using Timberborn.Persistence;
 
-namespace Automation.Conditions {
+namespace IgorZ.Automation.Conditions {
 
 /// <summary>Base class for conditions that check output goods in inventories for a specific threshold.</summary>
 /// <remarks>This condition only triggers on the inventory changes.</remarks>

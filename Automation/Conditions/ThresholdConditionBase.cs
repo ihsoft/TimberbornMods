@@ -5,12 +5,12 @@
 using System;
 using Timberborn.Persistence;
 
-namespace Automation.Conditions {
+namespace IgorZ.Automation.Conditions {
 
 /// <summary>A base class for the conditions that checks a single value against the constant.</summary>
 /// <remarks>
 /// The descendants must define the threshold to check against via <see cref="CalculateThreshold"/>. Then, when the
-/// value in question is available, the condition can be checked via <see cref="CheckValue"/>.
+/// value has changed, the condition can be checked via <see cref="CheckValue"/>.
 /// </remarks>
 public abstract class ThresholdConditionBase : AutomationConditionBase {
 

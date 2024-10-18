@@ -1,7 +1,7 @@
 {
   "Id": "Automation.Tmpl.Construction.CheckBlockedAccess",
   "GroupId": "AutomationToolGroupId",
-  "Type": "Automation.Tools.ApplyTemplateTool",
+  "Type": "IgorZ.Automation.Tools.ApplyTemplateTool",
   "Order": 30,
   "Icon": "Sprites/IgorZ/tool-chained",
   "DevMode": false,
@@ -11,9 +11,9 @@
     "TemplateFamilyName": "Construction.CheckBlockedAccess",
     "Rules": [
       {
-        "Condition": { "TypeId": "Automation.Conditions.CheckAccessBlockCondition" },
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.CheckAccessBlockCondition" },
         "Action": {
-          "TypeId": "Automation.Actions.StatusToggleAction",
+          "TypeId": "IgorZ.Automation.Actions.StatusToggleAction",
           "ActionKind": "ShowStatus",
           "StatusToken": "ChainTool-2",
           "Description": "IgorZ.Automation.ShowStatusAction.HoldConstruction",
@@ -23,9 +23,9 @@
         }
       },
       {
-        "Condition": { "TypeId": "Automation.Conditions.CheckAccessBlockCondition", "ReversedCondition": true },
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.CheckAccessBlockCondition", "ReversedCondition": true },
         "Action": {
-          "TypeId": "Automation.Actions.StatusToggleAction",
+          "TypeId": "IgorZ.Automation.Actions.StatusToggleAction",
           "ActionKind": "HideStatus",
           "StatusToken": "ChainTool-2",
           "Description": "IgorZ.Automation.ShowStatusAction.ResumeConstruction",

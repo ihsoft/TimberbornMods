@@ -2,9 +2,9 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using Automation.Utils;
+using IgorZ.Automation.Utils;
 
-namespace Automation.AutomationSystem {
+namespace IgorZ.Automation.AutomationSystem {
 
 /// <summary>Base action interface.</summary>
 /// <remarks>It defines what is expected from a regular action in scope of the automation system.</remarks>

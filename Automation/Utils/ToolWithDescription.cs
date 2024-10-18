@@ -10,11 +10,11 @@ using Timberborn.ToolSystem;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
-namespace Automation.Utils {
+namespace IgorZ.Automation.Utils {
 
 /// <summary>Abstract tool that has description.</summary>
 /// <remarks>
-/// With no tweaking this class simply uses values from the TimberAPI specification. If more advanced logic is needed,
+/// With no tweaking, this class simply uses values from the TimberAPI specification. If more advanced logic is needed,
 /// then the descendants can add more sections. Dynamic descriptions are also supported.
 /// </remarks>
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]

@@ -6,7 +6,7 @@ using Bindito.Core;
 using Timberborn.Buildings;
 using Timberborn.TemplateSystem;
 
-namespace Automation.AutomationSystem {
+namespace IgorZ.Automation.AutomationSystem {
 
 [Context("Game")]
 // ReSharper disable once UnusedType.Global

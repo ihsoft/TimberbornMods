@@ -2,11 +2,11 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using Automation.AutomationSystem;
+using IgorZ.Automation.AutomationSystem;
 using Timberborn.BlockSystem;
 using Timberborn.SingletonSystem;
 
-namespace Automation.Conditions {
+namespace IgorZ.Automation.Conditions {
 
 /// <summary>Condition that triggers when the object enters the finished state.</summary>
 /// <remarks>This condition must be used with caution. Any finished building gets this event during the load.</remarks>

@@ -2,16 +2,16 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using Automation.AutomationSystem;
-using Automation.PathCheckingSystem;
+using IgorZ.Automation.AutomationSystem;
+using IgorZ.Automation.PathCheckingSystem;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.BuildingsNavigation;
 using Timberborn.Persistence;
 
-namespace Automation.Conditions {
+namespace IgorZ.Automation.Conditions {
 
 /// <summary>
-/// This condition verifies if construction completion of the object would prevent accessing the other objects being
+/// This condition verifies if construction completion of the object prevents accessing the other objects being
 /// constructed.
 /// </summary>
 /// <remarks>This logic works only on the set of the objects that has this condition assigned to. It won't check all the
@@ -22,7 +22,7 @@ public sealed class CheckAccessBlockCondition : AutomationConditionBase {
   const string NotBlockingPathNameLocKey = "IgorZ.Automation.CheckAccessBlockCondition.NotBlocking.Description"; 
 
   /// <summary>
-  /// Indicates that the the action should be triggered on an inversed condition. That is: the object will not block the
+  /// Indicates that the action should be triggered on an inversed condition. That is: the object will not block the
   /// access on completion.
   /// </summary>
   public bool IsReversedCondition { get; private set; }

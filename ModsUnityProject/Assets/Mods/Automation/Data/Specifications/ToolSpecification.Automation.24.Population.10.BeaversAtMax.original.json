@@ -1,7 +1,7 @@
 {
   "Id": "Automation.Tmpl.Population.BeaversAtMax",
   "GroupId": "AutomationPopulationToolGroupId",
-  "Type": "Automation.Tools.ApplyTemplateTool",
+  "Type": "IgorZ.Automation.Tools.ApplyTemplateTool",
   "Order": 10,
   "Icon": "Sprites/IgorZ/tool-beavers-max",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.BeaversAtMax.DisplayName",
@@ -10,12 +10,12 @@
     "TemplateFamilyName": "Population",
     "Rules": [
       {
-        "Condition": { "TypeId": "Automation.Conditions.BeaverPopulationBelowThresholdCondition", "Value": 0, "RelativeTo": "MaxLevel" },
-        "Action": { "TypeId": "Automation.Actions.UnpauseAction" }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BeaverPopulationBelowThresholdCondition", "Value": 0, "RelativeTo": "MaxLevel" },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.UnpauseAction" }
       },
       {
-        "Condition": { "TypeId": "Automation.Conditions.BeaverPopulationAboveThresholdCondition", "Value": -1, "RelativeTo": "MaxLevel" },
-        "Action": { "TypeId": "Automation.Actions.PauseAction" }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BeaverPopulationAboveThresholdCondition", "Value": -1, "RelativeTo": "MaxLevel" },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.PauseAction" }
       }
     ]
   }

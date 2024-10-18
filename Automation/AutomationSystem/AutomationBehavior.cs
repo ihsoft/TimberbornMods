@@ -4,8 +4,8 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Automation.Actions;
 using Bindito.Core;
+using IgorZ.Automation.Actions;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.EntitySystem;
@@ -14,7 +14,7 @@ using Timberborn.Persistence;
 using Timberborn.SingletonSystem;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace Automation.AutomationSystem {
+namespace IgorZ.Automation.AutomationSystem {
 
 /// <summary>The component that keeps all the automation state on the building.</summary>
 public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDeletableEntity {

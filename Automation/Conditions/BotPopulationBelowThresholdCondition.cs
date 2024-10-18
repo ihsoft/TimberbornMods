@@ -2,9 +2,9 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using Automation.AutomationSystem;
+using IgorZ.Automation.AutomationSystem;
 
-namespace Automation.Conditions {
+namespace IgorZ.Automation.Conditions {
 
 /// <summary>Triggers when the current bots population goes above the threshold.</summary>
 // ReSharper disable once UnusedType.Global

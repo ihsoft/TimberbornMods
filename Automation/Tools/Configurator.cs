@@ -2,10 +2,10 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using Automation.Utils;
 using Bindito.Core;
+using IgorZ.Automation.Utils;
 
-namespace Automation.Tools;
+namespace IgorZ.Automation.Tools;
 
 [Context("Game")]
 [Context("MapEditor")]

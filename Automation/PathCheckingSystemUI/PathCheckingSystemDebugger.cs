@@ -4,7 +4,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Automation.PathCheckingSystem;
+using IgorZ.Automation.PathCheckingSystem;
 using Timberborn.Coordinates;
 using Timberborn.Debugging;
 using Timberborn.Navigation;
@@ -13,9 +13,9 @@ using Timberborn.SingletonSystem;
 using Timberborn.WalkingSystemUI;
 using UnityEngine;
 
-namespace Automation.PathCheckingSystemUI {
+namespace IgorZ.Automation.PathCheckingSystemUI {
 
-/// <summary>Shows corner markers for the path from teh road to the accessible of the selected site.</summary>
+/// <summary>Shows corner markers for the path from the road to the accessible of the selected site.</summary>
 sealed class PathCheckingSystemDebugger : ILoadableSingleton, IUpdatableSingleton {
 
   #region ILoadableSingleton implementation

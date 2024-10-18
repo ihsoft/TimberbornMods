@@ -2,11 +2,11 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using Automation.Utils;
+using IgorZ.Automation.Utils;
 using Timberborn.BlockSystem;
 using Timberborn.ConstructionSites;
 
-namespace Automation.Tools {
+namespace IgorZ.Automation.Tools {
 
 /// <summary>Debug tool to immediately complete unfinished constructibles.</summary>
 // ReSharper disable once ClassNeverInstantiated.Global

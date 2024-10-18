@@ -2,14 +2,14 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using Automation.AutomationSystem;
+using IgorZ.Automation.AutomationSystem;
 using Timberborn.Persistence;
 using Timberborn.WaterBuildings;
 using UnityEngine;
 
-namespace Automation.Actions {
+namespace IgorZ.Automation.Actions {
 
-/// <summary>Adjusts flood gate height.</summary>
+/// <summary>Adjusts floodgate height.</summary>
 // ReSharper disable once UnusedType.Global
 public sealed class SetFloodgateHeightAction : AutomationActionBase {
   const string DescriptionLocKey = "IgorZ.Automation.SetFloodgateHeightAction.Description";

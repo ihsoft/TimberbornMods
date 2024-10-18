@@ -4,13 +4,13 @@
 
 using System.Collections.ObjectModel;
 using System.Linq;
-using Automation.AutomationSystem;
-using Automation.Utils;
+using IgorZ.Automation.AutomationSystem;
+using IgorZ.Automation.Utils;
 using Timberborn.BlockSystem;
 using Timberborn.Persistence;
 using UnityEngine;
 
-namespace Automation.Tools {
+namespace IgorZ.Automation.Tools {
 
 // ReSharper disable once ClassNeverInstantiated.Global
 sealed class ApplyTemplateTool : AbstractAreaSelectionTool, IAutomationModeEnabler {

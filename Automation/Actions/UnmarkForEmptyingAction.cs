@@ -2,11 +2,11 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using Automation.AutomationSystem;
+using IgorZ.Automation.AutomationSystem;
 using Timberborn.Emptying;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace Automation.Actions {
+namespace IgorZ.Automation.Actions {
 
 /// <summary>Action that disables the storage empty mode.</summary>
 // ReSharper disable once UnusedType.Global

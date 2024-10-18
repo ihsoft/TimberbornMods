@@ -2,9 +2,9 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using Automation.AutomationSystem;
+using IgorZ.Automation.AutomationSystem;
 
-namespace Automation.Conditions {
+namespace IgorZ.Automation.Conditions {
 
 /// <summary>Condition that checks if the drought season has started.</summary>
 /// <remarks>The state change only happens when a notification is sent from the game.</remarks>

@@ -1,7 +1,7 @@
 {
   "Id": "Automation.Tmpl.Water.OpenFloodgateBadtide",
   "GroupId": "AutomationWaterToolGroupId",
-  "Type": "Automation.Tools.ApplyTemplateTool",
+  "Type": "IgorZ.Automation.Tools.ApplyTemplateTool",
   "Order": 31,
   "Icon": "Sprites/IgorZ/icon-badtide-open",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.BadtideOpenFloodgate.DisplayName",
@@ -10,8 +10,8 @@
     "TemplateFamilyName": "Water.FloodgateManagement-badtide",
     "Rules": [
       {
-        "Condition": { "TypeId": "Automation.Conditions.BadtideStartedCondition" },
-        "Action": { "TypeId": "Automation.Actions.SetFloodgateHeightAction", "StepsDown": 100 }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BadtideStartedCondition" },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.SetFloodgateHeightAction", "StepsDown": 100 }
       },
     ]
   }

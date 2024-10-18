@@ -8,7 +8,7 @@ using IgorZ.TimberDev.Utils;
 using Timberborn.ModManagerScene;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace Automation.AutomationSystem {
+namespace IgorZ.Automation.AutomationSystem {
 
 sealed class Features : IModStarter {
   /// <summary>Indicates that <see cref="DebugEx.Fine"/> methods should emit record to the log.</summary>

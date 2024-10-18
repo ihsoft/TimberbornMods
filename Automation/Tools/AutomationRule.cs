@@ -4,15 +4,15 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-using Automation.Actions;
-using Automation.AutomationSystem;
-using Automation.Conditions;
-using Automation.Utils;
+using IgorZ.Automation.Actions;
+using IgorZ.Automation.AutomationSystem;
+using IgorZ.Automation.Conditions;
+using IgorZ.Automation.Utils;
 using Timberborn.BlockSystem;
 using Timberborn.Persistence;
 using Timberborn.PrefabSystem;
 
-namespace Automation.Tools {
+namespace IgorZ.Automation.Tools {
 
 /// <summary>Definition of an automation rule.</summary>
 /// <remarks>

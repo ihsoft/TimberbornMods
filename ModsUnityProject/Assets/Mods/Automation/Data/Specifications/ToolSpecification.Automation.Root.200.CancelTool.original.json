@@ -1,7 +1,7 @@
 {
   "Id": "Automation.CancelTool",
   "GroupId": "AutomationToolGroupId",
-  "Type": "Automation.Tools.CancelTool",
+  "Type": "IgorZ.Automation.Tools.CancelTool",
   "Order": 200,
   "Icon": "Sprites/IgorZ/cancel",
   "NameLocKey": "IgorZ.Automation.CancelTool.Title",

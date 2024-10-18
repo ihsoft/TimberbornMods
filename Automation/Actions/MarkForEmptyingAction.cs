@@ -3,14 +3,14 @@
 // License: Public Domain
 
 using System;
-using Automation.AutomationSystem;
+using IgorZ.Automation.AutomationSystem;
 using Timberborn.BaseComponentSystem;
 using Timberborn.Emptying;
 using Timberborn.Persistence;
 using Timberborn.StatusSystem;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace Automation.Actions {
+namespace IgorZ.Automation.Actions {
 
 /// <summary>Action that turns the storage into the empty mode.</summary>
 /// <remarks>

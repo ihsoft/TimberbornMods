@@ -4,7 +4,7 @@
 
 using Timberborn.Persistence;
 
-namespace Automation.Utils {
+namespace IgorZ.Automation.Utils {
 
 /// <summary>Base interface for the game object that can save/load game state.</summary>
 public interface IGameSerializable {

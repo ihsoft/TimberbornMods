@@ -2,7 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-namespace Automation.AutomationSystem {
+namespace IgorZ.Automation.AutomationSystem {
 
 /// <summary>Targets that want to react on a condition state change must implement this interface.</summary>
 public interface IAutomationConditionListener {

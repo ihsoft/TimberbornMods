@@ -3,10 +3,10 @@
 // License: Public Domain
 
 using System;
-using Automation.AutomationSystem;
+using IgorZ.Automation.AutomationSystem;
 using Timberborn.GameDistricts;
 
-namespace Automation.Conditions {
+namespace IgorZ.Automation.Conditions {
 
 /// <summary>A base condition class that tracks population changes in the district.</summary>
 public abstract class PopulationTrackerConditionBase : AutomationConditionBase {

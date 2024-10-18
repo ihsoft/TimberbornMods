@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Automation.AutomationSystem;
-using Automation.Conditions;
-using IgorZ.TimberDev.Utils;
+using IgorZ.Automation.AutomationSystem;
+using IgorZ.Automation.Conditions;
+using IgorZ.Automation.Utils;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.Common;
@@ -20,11 +20,11 @@ using Timberborn.TickSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
-namespace Automation.PathCheckingSystem {
+namespace IgorZ.Automation.PathCheckingSystem {
 
 /// <summary>The component that handles all path checking conditions.</summary>
 /// <remarks>
-/// It cannot be handled in scope of just one condition due to all of them are interconnected (they can affect each
+/// It can't be handled in the scope of one condition due to all of them are interconnected (they can affect each
 /// other). This controller has "the full picture" and orchestrates all the conditions.
 /// </remarks>
 sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener {

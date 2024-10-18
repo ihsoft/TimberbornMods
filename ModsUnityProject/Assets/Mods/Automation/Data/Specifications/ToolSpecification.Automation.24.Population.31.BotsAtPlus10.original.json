@@ -1,7 +1,7 @@
 {
   "Id": "Automation.Tmpl.Population.BotsAtPlus10",
   "GroupId": "AutomationPopulationToolGroupId",
-  "Type": "Automation.Tools.ApplyTemplateTool",
+  "Type": "IgorZ.Automation.Tools.ApplyTemplateTool",
   "Order": 31,
   "Icon": "Sprites/IgorZ/tool-bots+10",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.BotsAtPlus10.DisplayName",
@@ -10,12 +10,12 @@
     "TemplateFamilyName": "Population",
     "Rules": [
       {
-        "Condition": { "TypeId": "Automation.Conditions.BotPopulationBelowThresholdCondition", "Value": 10, "RelativeTo": "CurrentLevel" },
-        "Action": { "TypeId": "Automation.Actions.UnpauseAction" }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BotPopulationBelowThresholdCondition", "Value": 10, "RelativeTo": "CurrentLevel" },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.UnpauseAction" }
       },
       {
-        "Condition": { "TypeId": "Automation.Conditions.BotPopulationAboveThresholdCondition", "Value": 9, "RelativeTo": "CurrentLevel" },
-        "Action": { "TypeId": "Automation.Actions.PauseAction" }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BotPopulationAboveThresholdCondition", "Value": 9, "RelativeTo": "CurrentLevel" },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.PauseAction" }
       }
     ]
   }

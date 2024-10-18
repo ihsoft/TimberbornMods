@@ -2,11 +2,11 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using Automation.AutomationSystem;
+using IgorZ.Automation.AutomationSystem;
 using Timberborn.Persistence;
 using Timberborn.WaterSourceSystem;
 
-namespace Automation.Actions {
+namespace IgorZ.Automation.Actions {
 
 /// <summary>Opens or closes water discharges.</summary>
 // ReSharper disable once UnusedType.Global

@@ -4,7 +4,7 @@
 
 using Bindito.Core;
 
-namespace Automation.TickerSystem {
+namespace IgorZ.Automation.TickerSystem {
 
 // ReSharper disable once UnusedType.Global
 [Context("Game")]

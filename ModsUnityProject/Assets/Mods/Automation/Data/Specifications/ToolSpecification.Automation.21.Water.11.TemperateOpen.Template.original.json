@@ -1,7 +1,7 @@
 {
   "Id": "Automation.Tmpl.Water.OpenFloodgateTemperate",
   "GroupId": "AutomationWaterToolGroupId",
-  "Type": "Automation.Tools.ApplyTemplateTool",
+  "Type": "IgorZ.Automation.Tools.ApplyTemplateTool",
   "Order": 11,
   "Icon": "Sprites/IgorZ/icon-temperate-open",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.TemperateOpenFloodgate.DisplayName",
@@ -10,12 +10,12 @@
     "TemplateFamilyName": "Water.FloodgateManagement-temperate",
     "Rules": [
       {
-        "Condition": { "TypeId": "Automation.Conditions.DroughtEndedCondition" },
-        "Action": { "TypeId": "Automation.Actions.SetFloodgateHeightAction", "StepsDown": 100 }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.DroughtEndedCondition" },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.SetFloodgateHeightAction", "StepsDown": 100 }
       },
       {
-        "Condition": { "TypeId": "Automation.Conditions.BadtideEndedCondition" },
-        "Action": { "TypeId": "Automation.Actions.SetFloodgateHeightAction", "StepsDown": 100 }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BadtideEndedCondition" },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.SetFloodgateHeightAction", "StepsDown": 100 }
       },
     ]
   }

@@ -26,7 +26,7 @@ using Timberborn.SingletonSystem;
 using Timberborn.StatusSystem;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace Automation.PathCheckingSystem {
+namespace IgorZ.Automation.PathCheckingSystem {
 
 /// <summary>Container for the path blocking site.</summary>
 /// <remarks>It must only be applied to the preview sites.</remarks>

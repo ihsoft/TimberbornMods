@@ -4,7 +4,7 @@
 
 using Bindito.Core;
 
-namespace Automation.PathCheckingSystemUI {
+namespace IgorZ.Automation.PathCheckingSystemUI {
 
 // ReSharper disable once UnusedType.Global
 [Context("Game")]

@@ -7,32 +7,32 @@ using System.Linq;
 using Timberborn.Persistence;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace Automation.Utils {
+namespace IgorZ.Automation.Utils {
 
 /// <summary>Serializer that can handle the descendant classes.</summary>
 /// <remarks>
 /// <p>
 /// This serializer stores the actual type info into the state and uses it during the load. Serializer for type
-/// <typeparamref name="T"/> can load any type that is descendant of <typeparamref name="T"/>. In order to get the final
+/// <typeparamref name="T"/> can load any type that is descendant of <typeparamref name="T"/>. To get the final
 /// type, make the upcast from the loaded instance.
 /// </p>
 /// <p>
-/// Even though the <typeparamref name="T"/> type can be abstract, the actual type that was serialized, must not be
-/// abstract and has to have a public default constructor in order to be loaded.
+/// Even though the <typeparamref name="T"/> type can be abstract, the actual type that was serialized mustn't be
+/// abstract and has to have a public default constructor to be loaded.
 /// </p>
 /// </remarks>
 /// <typeparam name="T">the type of the base class. It can be abstract.</typeparam>
 /// <seealso cref="DynamicClassSerializer{T}"/>
 public sealed class DynamicClassSerializer<T> : IObjectSerializer<T> where T : class, IGameSerializable {
   /// <summary>Property name that identifies the actual tape in the saved state.</summary>
-  public static readonly PropertyKey<string> TypeIdPropertyKey = new("TypeId");
+  static readonly PropertyKey<string> TypeIdPropertyKey = new("TypeId");
 
   readonly bool _failFast;
 
   /// <summary>Creates the serializer.</summary>
   /// <param name="failFast">
   /// Indicates if the type loading errors must result into an exception. If set to <c>false</c>, then the errors will
-  /// be logged, but instead of failing, a <c>null</c> value will be returned. This let's the clients to handle the
+  /// be logged, but instead of failing, a <c>null</c> value will be returned. This lets the clients handle the
   /// broken states.
   /// </param>
   public DynamicClassSerializer(bool failFast = true) {

@@ -6,13 +6,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using Automation.PathCheckingSystem;
+using IgorZ.Automation.PathCheckingSystem;
 using Timberborn.DebuggingUI;
 using Timberborn.SingletonSystem;
 using Timberborn.TickSystem;
-using UnityEngine;
 
-namespace Automation.PathCheckingSystemUI {
+namespace IgorZ.Automation.PathCheckingSystemUI {
 
 /// <summary>Shows various stat and debug information for the path checking system.</summary>
 sealed class PathCheckingSystemDebugPanel : ILoadableSingleton, IDebuggingPanel, ITickableSingleton {
@@ -21,8 +20,8 @@ sealed class PathCheckingSystemDebugPanel : ILoadableSingleton, IDebuggingPanel,
   readonly DebuggingPanel _debuggingPanel;
   readonly PathCheckingService _pathCheckingService;
 
-  List<float> _stateCheckUpdateTicks = new(TicksHistoryWindow);
-  List<float> _navMeshUpdateTicks = new(TicksHistoryWindow);
+  readonly List<float> _stateCheckUpdateTicks = new(TicksHistoryWindow);
+  readonly List<float> _navMeshUpdateTicks = new(TicksHistoryWindow);
   float _navMeshUpdateTickCostMs;
   float _navMeshUpdateMaxCostMs;
   float _stateCheckTickCostMs;

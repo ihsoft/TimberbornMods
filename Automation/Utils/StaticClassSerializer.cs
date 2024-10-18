@@ -4,13 +4,13 @@
 
 using Timberborn.Persistence;
 
-namespace Automation.Utils {
+namespace IgorZ.Automation.Utils {
 
 /// <summary>Simple generic serializer for a class that implements <see cref="IGameSerializable"/>.</summary>
 /// <remarks>
 /// <p>
 /// This serializer simply passes the control to the serializable object. On load, an instance of type
-/// <typeparamref name="T"/> is created and loaded, so in order to load descendant classes, a specialized serializer is
+/// <typeparamref name="T"/> is created and loaded, so to load descendant classes, a specialized serializer is
 /// needed for each type.
 /// </p>
 /// <p>

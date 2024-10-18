@@ -3,12 +3,12 @@
 // License: Public Domain
 
 using System.Diagnostics.CodeAnalysis;
-using Automation.AutomationSystem;
-using Automation.Conditions;
-using Automation.Utils;
+using IgorZ.Automation.AutomationSystem;
+using IgorZ.Automation.Conditions;
+using IgorZ.Automation.Utils;
 using Timberborn.Persistence;
 
-namespace Automation.Actions {
+namespace IgorZ.Automation.Actions {
 
 /// <summary>The base class for all automation actions.</summary>
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]

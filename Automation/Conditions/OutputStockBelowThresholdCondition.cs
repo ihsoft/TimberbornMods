@@ -2,12 +2,12 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using Automation.AutomationSystem;
+using IgorZ.Automation.AutomationSystem;
 
-namespace Automation.Conditions {
+namespace IgorZ.Automation.Conditions {
 
 /// <summary>
-/// Condition that checks if the output inventory fill rate is below the
+/// Condition that checks if the output inventory fill-rate is below the
 /// <see cref="OutputStockThresholdConditionBase.Threshold"/>.
 /// </summary>
 /// <remarks>This condition only triggers on the inventory changes.</remarks>

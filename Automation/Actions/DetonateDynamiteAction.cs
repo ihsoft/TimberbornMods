@@ -5,8 +5,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Automation.AutomationSystem;
-using Automation.Conditions;
+using IgorZ.Automation.AutomationSystem;
+using IgorZ.Automation.Conditions;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.BlockObjectTools;
 using Timberborn.BlockSystem;
@@ -21,7 +21,7 @@ using Timberborn.ToolSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
-namespace Automation.Actions {
+namespace IgorZ.Automation.Actions {
 
 /// <summary>Action that triggers the dynamite and then (optionally) places new one at the same spot.</summary>
 /// <remarks>Use it to drill down deep holes in terrain.</remarks>

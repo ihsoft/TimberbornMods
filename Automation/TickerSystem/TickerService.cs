@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using Timberborn.TickSystem;
 using UnityEngine;
 
-namespace Automation.TickerSystem {
+namespace IgorZ.Automation.TickerSystem {
 
 /// <summary>Simple service that ticks all listeners.</summary>
 /// <remarks>

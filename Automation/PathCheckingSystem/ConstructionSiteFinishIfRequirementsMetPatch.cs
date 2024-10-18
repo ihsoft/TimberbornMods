@@ -6,7 +6,7 @@ using HarmonyLib;
 using Timberborn.ConstructionSites;
 
 // ReSharper disable InconsistentNaming
-namespace Automation.PathCheckingSystem {
+namespace IgorZ.Automation.PathCheckingSystem {
 
 /// <summary>Holds construction site finishing until the path checking service allows it.</summary>
 [HarmonyPatch(typeof(ConstructionSite), nameof(ConstructionSite.FinishIfRequirementsMet))]

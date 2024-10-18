@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Automation.AutomationSystem;
+using IgorZ.Automation.AutomationSystem;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BuildingsBlocking;
@@ -13,7 +13,7 @@ using Timberborn.Persistence;
 using Timberborn.StatusSystem;
 using UnityEngine;
 
-namespace Automation.Actions {
+namespace IgorZ.Automation.Actions {
 
 /// <summary>Blocks the building when the state triggers. Optionally, adds a normal status.</summary>
 public sealed class BlockableBuildingAction : AutomationActionBase {

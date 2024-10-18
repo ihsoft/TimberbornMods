@@ -6,7 +6,7 @@ using System;
 using System.Diagnostics;
 using System.Text;
 
-namespace IgorZ.TimberDev.Utils {
+namespace IgorZ.Automation.Utils {
 
 /// <summary>Helper class to profile execution timings.</summary>
 public sealed class TicksProfiler {
@@ -25,7 +25,7 @@ public sealed class TicksProfiler {
   }
 
   /// <summary>Starts the stopped timer, but doesn't count it as a "hit".</summary>
-  /// <remarks>Use it to resume a temporarily paused timer to not affect the hits stats.</remarks>
+  /// <remarks>Use it to resume a temporarily paused timer to not affect the hit stats.</remarks>
   public void Start() {
     _stopwatch.Start();
   }

@@ -4,17 +4,15 @@
 
 using System.Collections.Generic;
 using System.Text;
-using Automation.AutomationSystem;
+using IgorZ.Automation.AutomationSystem;
 using IgorZ.TimberDev.UI;
-using TimberApi.UIBuilderSystem;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
-using Timberborn.Localization;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Automation.UI {
+namespace IgorZ.Automation.UI {
 
 sealed class AutomationFragment : IEntityPanelFragment {
   const string RulesAreaCaptionTextLocKey = "IgorZ.Automation.AutomationFragment.RulesAreaCaptionTextLocKey";
@@ -26,21 +24,11 @@ sealed class AutomationFragment : IEntityPanelFragment {
   Label _caption;
   Label _rulesList;
 
-  public AutomationFragment(UiFactory uiFactory) {
+  AutomationFragment(UiFactory uiFactory) {
     _uiFactory = uiFactory;
   }
 
   public VisualElement InitializeFragment() {
-    // var presets = _builder.Presets();
-    // _caption = presets.Labels().Label(color: Color.cyan);
-    // _rulesList = presets.Labels().GameText();
-    //
-    // UIFragmentBuilder uIFragmentBuilder = _builder.CreateFragmentBuilder()
-    //     .AddComponent(_caption)
-    //     .AddComponent(_rulesList);
-    // _root = uIFragmentBuilder.BuildAndInitialize();
-    // _root.ToggleDisplayStyle(visible: false);
-    // return _root;
     _caption = _uiFactory.CreateLabel();
     _caption.style.color = Color.cyan;
 

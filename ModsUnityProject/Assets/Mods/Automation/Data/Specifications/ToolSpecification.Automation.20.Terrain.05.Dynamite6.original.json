@@ -1,7 +1,7 @@
 {
   "Id": "Automation.Tmpl.Terrain.6LevelsDynamite",
   "GroupId": "AutomationTerrainToolGroupId",
-  "Type": "Automation.Tools.ApplyTemplateTool",
+  "Type": "IgorZ.Automation.Tools.ApplyTemplateTool",
   "Order": 5,
   "Icon": "Sprites/IgorZ/tool-dynamite-x6",
   "NameLocKey": "IgorZ.Automation.Tool.tmpl.6LevelsDynamite.DisplayName",
@@ -10,8 +10,8 @@
     "TemplateFamilyName": "Terrain.DynamiteDigging",
     "Rules": [
       {
-        "Condition": { "TypeId": "Automation.Conditions.ObjectFinishedCondition" },
-        "Action": { "TypeId": "Automation.Actions.DetonateDynamiteAction", "Repeat": 5 }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.ObjectFinishedCondition" },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.DetonateDynamiteAction", "Repeat": 5 }
       }
     ]
   }
