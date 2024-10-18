@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <Import Project="..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\build\BepInEx.AssemblyPublicizer.MSBuild.props" Condition="Exists('..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\build\BepInEx.AssemblyPublicizer.MSBuild.props')" />
-    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
         <ProjectGuid>{355F4AD6-697F-483A-B8BF-69AE410A168A}</ProjectGuid>
         <OutputType>Library</OutputType>
-        <AppDesignerFolder>Properties</AppDesignerFolder>
         <RootNamespace>IgorZ.TimberCommons</RootNamespace>
         <AssemblyName>TimberCommons</AssemblyName>
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-        <FileAlignment>512</FileAlignment>
+        <TargetFramework>netstandard2.1</TargetFramework>
         <LangVersion>12</LangVersion>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -36,122 +33,8 @@
         <DocumentationFile>bin\Release\TimberCommons.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
-      <Compile Include="..\TimberDev\UI\CommonFormats.cs">
-        <Link>TimberDev\UI\CommonFormats.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\UI\Configurator.cs">
-        <Link>TimberDev\UI\Configurator.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\UI\PanelFragment.cs">
-        <Link>TimberDev\UI\PanelFragment.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\UI\PreciseSliderWrapper.cs">
-        <Link>TimberDev\UI\PreciseSliderWrapper.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\UI\UiFactory.cs">
-        <Link>TimberDev\UI\UiFactory.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\Utils\CustomizableInstantiator.cs">
-        <Link>TimberDev\Utils\CustomizableInstantiator.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\Utils\FeatureController.cs">
-        <Link>TimberDev\Utils\FeatureController.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\Utils\HarmonyPatcher.cs">
-        <Link>TimberDev\Utils\HarmonyPatcher.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\Utils\PrefabPatcher.cs">
-        <Link>TimberDev\Utils\PrefabPatcher.cs</Link>
-      </Compile>
-      <Compile Include="..\UnityDevLite\DebugEx.cs">
-        <Link>UnityDevLite\DebugEx.cs</Link>
-      </Compile>
-      <Compile Include="..\UnityDevLite\HostedDebugLog.cs">
-        <Link>UnityDevLite\HostedDebugLog.cs</Link>
-      </Compile>
-      <Compile Include="..\UnityDevLite\ReflectedAction.cs">
-        <Link>UnityDevLite\ReflectedAction.cs</Link>
-      </Compile>
-      <Compile Include="..\UnityDevLite\ReflectedField.cs">
-        <Link>UnityDevLite\ReflectedField.cs</Link>
-      </Compile>
-      <Compile Include="..\UnityDevLite\TypeUtils.cs">
-        <Link>UnityDevLite\TypeUtils.cs</Link>
-      </Compile>
-      <Compile Include="CommonUIPatches\Configurator.cs" />
-      <Compile Include="CommonUIPatches\GoodConsumingBuildingDescriberPatch.cs" />
-      <Compile Include="CommonUIPatches\GoodConsumingBuildingFragmentPatch.cs" />
-      <Compile Include="CommonUIPatches\GrowableFragmentPatch.cs" />
-      <Compile Include="CommonUIPatches\GrowableToolPanelItemFactoryPatch.cs" />
-      <Compile Include="CommonUIPatches\ManufactoryDescriberPatch1.cs" />
-      <Compile Include="CommonUIPatches\ManufactoryDescriberPatch2.cs" />
-      <Compile Include="CommonUIPatches\ManufactoryInventoryFragmentPatch1.cs" />
-      <Compile Include="CommonUIPatches\ManufactoryInventoryFragmentPatch2.cs" />
-      <Compile Include="CommonUIPatches\SluiceFragmentPatch1.cs" />
-      <Compile Include="CommonUIPatches\SluiceFragmentPatch2.cs" />
-      <Compile Include="Common\IConsumptionRateFormatter.cs" />
-      <Compile Include="Common\ISupplyLeftProvider.cs" />
-      <Compile Include="NeedApplierUI\Configurator.cs" />
-      <Compile Include="NeedApplierUI\InjuryProbabilityFragment.cs" />
-      <Compile Include="IrrigationSystemUI\GrowthRateModifierFragment.cs" />
-      <Compile Include="IrrigationSystem\BlockContaminationRangeEffect.cs" />
-      <Compile Include="IrrigationSystem\ModifyGrowableGrowthRangeEffect.cs" />
-      <Compile Include="IrrigationSystem\Configurator.cs" />
-      <Compile Include="IrrigationSystem\GoodConsumingIrrigationTower.cs" />
-      <Compile Include="IrrigationSystem\GrowthRateModifier.cs" />
-      <Compile Include="IrrigationSystem\IRangeEffect.cs" />
-      <Compile Include="IrrigationSystem\IrrigationTower.cs" />
-      <Compile Include="IrrigationSystem\ManufactoryIrrigationTower.cs" />
-      <Compile Include="Properties\AssemblyInfo.cs" />
-      <Compile Include="IrrigationSystemUI\Configurator.cs" />
-      <Compile Include="IrrigationSystemUI\IrrigationTowerFragment.cs" />
-      <Compile Include="SettingsUI\Configurator.cs" />
-      <Compile Include="SettingsUI\DebugFragment.cs" />
-      <Compile Include="Settings\DebugSettings.cs" />
-      <Compile Include="Settings\InjuryProbabilitySettings.cs" />
-      <Compile Include="Settings\IrrigationSystemSettings.cs" />
-      <Compile Include="Settings\TimeAndDurationSettings.cs" />
-      <Compile Include="Settings\Configurator.cs" />
-      <Compile Include="Settings\WaterBuildingsSettings.cs" />
-      <Compile Include="Stockpiles\GoodAmountTransformHeight.cs" />
-      <Compile Include="WaterBuildingsUI\AdjustableWaterOutputFragment.cs" />
-      <Compile Include="WaterBuildingsUI\Configurator.cs" />
-      <Compile Include="WaterBuildings\AdjustableWaterOutput.cs" />
-      <Compile Include="WaterBuildings\AdjustableWaterOutputMarker.cs" />
-      <Compile Include="WaterBuildings\Configurator.cs" />
-      <Compile Include="WaterBuildings\WaterOutputPatch.cs" />
-      <Compile Include="WaterService\Configurator.cs" />
-      <Compile Include="WaterService\DirectSoilMoistureSystemAccessor.cs" />
-      <Compile Include="WaterService\SoilMoistureSimulatorPatch.cs" />
-      <Compile Include="WaterService\SoilMoistureMapPatch.cs" />
-    </ItemGroup>
-    <ItemGroup>
       <Reference Include="0Harmony">
         <HintPath>..\Dependencies\Workshop\3284904751\0Harmony.dll</HintPath>
-      </Reference>
-      <Reference Include="AsmResolver, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\lib\net472\AsmResolver.dll</HintPath>
-        <Private>True</Private>
-      </Reference>
-      <Reference Include="AsmResolver.DotNet, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\lib\net472\AsmResolver.DotNet.dll</HintPath>
-        <Private>True</Private>
-      </Reference>
-      <Reference Include="AsmResolver.PE, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\lib\net472\AsmResolver.PE.dll</HintPath>
-        <Private>True</Private>
-      </Reference>
-      <Reference Include="AsmResolver.PE.File, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\lib\net472\AsmResolver.PE.File.dll</HintPath>
-        <Private>True</Private>
-      </Reference>
-      <Reference Include="BepInEx.AssemblyPublicizer, Version=0.4.1.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\lib\net472\BepInEx.AssemblyPublicizer.dll</HintPath>
-        <Private>True</Private>
-      </Reference>
-      <Reference Include="BepInEx.AssemblyPublicizer.MSBuild, Version=0.4.1.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\lib\net472\BepInEx.AssemblyPublicizer.MSBuild.dll</HintPath>
-        <Private>True</Private>
       </Reference>
       <Reference Include="ModSettings.Common">
         <HintPath>..\Dependencies\Workshop\3283831040\Scripts\ModSettings.Common.dll</HintPath>
@@ -180,10 +63,7 @@
       </Reference>
     </ItemGroup>
     <ItemGroup>
-      <None Include="packages.config" />
-    </ItemGroup>
-    <ItemGroup>
-      <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
+      <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Timberborn.*.dll" Publicize="true" />
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Unity*.dll" Publicize="false"/>
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Bindito.*.dll" Publicize="false"/>
@@ -210,19 +90,53 @@
       <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\manifest.json">
         <Link>Mod\manifest.json</Link>
       </Content>
-      <Content Include="CHANGELOG.md" />
-      <Content Include="workshop\description.txt" />
-      <Content Include="workshop\Slideshow\CurrentStrengthInSluiceDemo.jpg" />
-      <Content Include="workshop\Slideshow\FluidDumpLevelDemo.jpg" />
-      <Content Include="workshop\Slideshow\GrowthTimeDemo.jpg" />
-      <Content Include="workshop\Slideshow\InjuryPorbabilityRightPanelDemo.jpg" />
-      <Content Include="workshop\Slideshow\InjuryProbabilityAvatarHintDemo.jpg" />
-      <Content Include="workshop\Slideshow\MechanicalPumpLevelDemo.jpg" />
-      <Content Include="workshop\Slideshow\SettingsDemo.jpg" />
-      <Content Include="workshop\Slideshow\SupplyLeftTimeDemo.jpg" />
-      <Content Include="workshop\Slideshow\thumbnail.jpg" />
-      <Content Include="workshop\Slideshow\UntitledSlowRecipeTimeDemo.jpg" />
-      <Content Include="workshop\Slideshow\WaterTowerV2Demo.jpg" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Include="..\TimberDev\UI\CommonFormats.cs">
+        <Link>TimberDev\UI\CommonFormats.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UI\Configurator.cs">
+        <Link>TimberDev\UI\Configurator.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UI\PanelFragment.cs">
+        <Link>TimberDev\UI\PanelFragment.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UI\PreciseSliderWrapper.cs">
+        <Link>TimberDev\UI\PreciseSliderWrapper.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UI\UiFactory.cs">
+        <Link>TimberDev\UI\UiFactory.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\CustomizableInstantiator.cs">
+        <Link>TimberDev\Utils\CustomizableInstantiator.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\FeatureController.cs">
+        <Link>TimberDev\Utils\FeatureController.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\HarmonyPatcher.cs">
+        <Link>TimberDev\Utils\HarmonyPatcher.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\ModTextAssetConverterPatch.cs">
+        <Link>TimberDev\Utils\ModTextAssetConverterPatch.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\PrefabPatcher.cs">
+        <Link>TimberDev\Utils\PrefabPatcher.cs</Link>
+      </Compile>
+      <Compile Include="..\UnityDevLite\DebugEx.cs">
+        <Link>UnityDevLite\DebugEx.cs</Link>
+      </Compile>
+      <Compile Include="..\UnityDevLite\HostedDebugLog.cs">
+        <Link>UnityDevLite\HostedDebugLog.cs</Link>
+      </Compile>
+      <Compile Include="..\UnityDevLite\ReflectedAction.cs">
+        <Link>UnityDevLite\ReflectedAction.cs</Link>
+      </Compile>
+      <Compile Include="..\UnityDevLite\ReflectedField.cs">
+        <Link>UnityDevLite\ReflectedField.cs</Link>
+      </Compile>
+      <Compile Include="..\UnityDevLite\TypeUtils.cs">
+        <Link>UnityDevLite\TypeUtils.cs</Link>
+      </Compile>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <PropertyGroup>
@@ -236,6 +150,5 @@
       <PropertyGroup>
         <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
       </PropertyGroup>
-      <Error Condition="!Exists('..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\build\BepInEx.AssemblyPublicizer.MSBuild.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\BepInEx.AssemblyPublicizer.MSBuild.0.4.1\build\BepInEx.AssemblyPublicizer.MSBuild.props'))" />
     </Target>
 </Project>
