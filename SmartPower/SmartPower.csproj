@@ -176,16 +176,12 @@
       <Content Include="CHANGELOG.md" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-    <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-         Other similar extension points exist, see Microsoft.Common.targets.
-    <Target Name="BeforeBuild">
-    </Target>
-    <Target Name="AfterBuild">
-    </Target>
-    -->
-    <Target Name="AfterBuild">
-        <Exec Command="xcopy /i /Y $(TargetPath) &quot;u:\Mods\SmartPower\Scripts&quot;" />
-        <Exec Command="xcopy /i /Y ..\ModsUnityProject\Assets\Mods\SmartPower\manifest.json &quot;u:\Mods\SmartPower&quot;" />
+    <PropertyGroup>
+        <ModPath>u:\Mods</ModPath>
+    </PropertyGroup>
+    <Target Name="AfterBuild" Condition="Exists('$(ModPath)')">
+        <Message Text="### Copying DLL to the game's mods folder... ###" Importance="high"/>
+        <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\Scripts"/>
     </Target>
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
       <PropertyGroup>
