@@ -1,20 +1,18 @@
 # TimberbornMods
-This solution only contains C# projects to build scripts (DLLs) for the mods. The mod themseves
-are made via Unity. See ModsUnityProject
+This solution only contains C# projects to build scripts (DLLs) for the mods. The mod themselves
+are made via Unity.
+
+## Prerequisites
+
+1. Read `README.md` in `ModsUnityProject` and folow the steps to prepare the Unity project.
+2. Read `README.md` in `Dependencies` and folow the steps to prepare the dependency assemblies.
+3. Install .NET8 or a more fresh version. The minimum supported C# compiler version is 12.
+4. Ensure that the proper MSBuild version is used by IDE. In JetBrains Rider it's located in:
+   "Build, Execution, Deployment | Toolset and Build".
+5. Setup a logical drive `u:` pointing to `C:\Users\<user>\Documents\Timberborn` to have the built
+   binaries copied automatically into the Timberborn mods folder.
 
 ## Development and building
 
-The mods are compiled with C# v12 compiler. Ensure your bvironment has it. If not, download .NET8.
-Ensure that the proper MSBuild version is used by IDE. In Rider:
-"Build, Execution, Deployment | Toolset and Build".
-
-1. Open Unity project and do "Import Timberborn DLLs".
-2. Copy DLLs from "plugins" folder into "Dependencies/Timberborn/plugins".
-3. Install dependencies in Steam Workshop: TimberAPI and Harmony.
-4. Find depenecies in Steam folder and copy them to "Dependencies/workshop", renaming accordingly.
-5. Copy needed Unity DLLs into "Dependencies/Timberborn/Unity" folder. Open C# projects to see
-   what's missing.
-6. Map a logical disk "U:" to Timberborn local storage: C:/Users/<username>/Documents/Timberborn.
-
-All, but the code changes are made in Unity. Once done, build mod in unity via Timberborn
-extension. Then, compile the relevant C# project. The suggested IDE is JetBrains Rider.
+Make the mod from teh Unity project. Then, compile the script. This will create a fully complete
+mod setup at the target path.
