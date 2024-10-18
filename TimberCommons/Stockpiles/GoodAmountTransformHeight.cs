@@ -23,28 +23,30 @@ public sealed class GoodAmountTransformHeight : BaseComponent, IFinishedStateLis
   // ReSharper disable InconsistentNaming
 
   [SerializeField]
-  public string _targetName;
+  string _targetName= "";
 
   [SerializeField]
-  public float _maxHeight;
+  float _maxHeight = 0f;
 
   [SerializeField]
-  public string _good;
+  string _good = "";
 
   [SerializeField]
-  public float _nonLinearity;
+  float _nonLinearity = 0f;
 
   // ReSharper restore InconsistentNaming
   #endregion
 
   #region IFinishedStateListener implementation
 
+  /// <inheritdoc/>
   public void OnEnterFinishedState() {
     Inventory.InventoryChanged += OnInventoryChanged;
     _maxGoodAmount = Inventory.AllowedGoods.Single(goodAmount => goodAmount.StorableGood.GoodId == _good).Amount;
     UpdateTargetHeight();
   }
 
+  /// <inheritdoc/>
   public void OnExitFinishedState() {
     Inventory.InventoryChanged -= OnInventoryChanged;
   }
