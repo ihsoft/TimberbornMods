@@ -26,7 +26,7 @@ If a manufactory has assigned worker, but the product cannot be produced for any
 [h1]Mechanical nodes[/h1]
 All buildings with a mechanical node like shafts or generators get a UI extension. They will show information about batteries in the network: remaining charge, charge/discharge rate, and the remaining time estimation.
 
-
+[hr][/hr]
 Discord: https://discord.com/channels/558398674389172225/1129907373155291258
 See more details in Wiki: https://github.com/ihsoft/TimberbornMods/wiki/Smart-Power
 Report a bug: https://github.com/ihsoft/TimberbornMods/labels/smartpower
