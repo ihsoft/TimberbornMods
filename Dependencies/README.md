@@ -10,7 +10,7 @@ projects.
 
 The `1062090` ID is likely fixed and assosciated with the game.
 
-The projects refer subscribed mods (dependencies) by their IDs:
+The projects refer the subscribed mods (dependencies) by their IDs:
 
 * `3284904751` - Harmony.
 * `3288241660` - TimberApi.

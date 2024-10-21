@@ -14,5 +14,5 @@ are made via Unity.
 
 ## Development and building
 
-Make the mod from teh Unity project. Then, compile the script. This will create a fully complete
+Make the mod from the Unity project. Then, compile the script. This will create a fully complete
 mod setup at the target path.
