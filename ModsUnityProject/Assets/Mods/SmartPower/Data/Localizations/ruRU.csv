@@ -14,6 +14,8 @@ IgorZ.SmartPower.MechanicalBuilding.BlockedOutputStatus,"<SolidHighlight>⏻</So
 IgorZ.SmartPower.MechanicalBuilding.PowerSavingModeStatus,"Режим сбережения энергии",
 IgorZ.SmartPower.Settings.NetworkUISection,"Сеть",
 IgorZ.SmartPower.Settings.NetworkUI.ShowBatteryVitals,"Показывать состояние батарей",
+IgorZ.SmartPower.Settings.NetworkUI.BatteryRatioHysteresis,"Гистерезис заряда батарей (часы)",
+IgorZ.SmartPower.Settings.NetworkUI.BatteryRatioHysteresisTooltip,"Потребители не будут включаться если не смогут проработать на батареях не менее указанного значения.",
 IgorZ.TimberCommons.Settings.DebugSection,"Отладка и устранение неполадок",
 IgorZ.TimberCommons.Settings.Debug.VerboseLogging,"Детальные журналы",
 IgorZ.TimberCommons.Settings.Debug.VerboseLoggingTooltip,"В журналы игры будет записываться больше полезной информации, но это может повлиять на производительность игры."

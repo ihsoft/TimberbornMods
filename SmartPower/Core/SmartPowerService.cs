@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using IgorZ.SmartPower.Settings;
 using Timberborn.MechanicalSystem;
 using Timberborn.TickSystem;
 using UnityDev.Utils.LogUtilsLite;
@@ -145,14 +146,17 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
         hasBatteries = true;
       }
       if (hasBatteries) {
-        BalanceNetworkWithBatteries(setup, batteryCharge / batteryCapacity);
+        BalanceNetworkWithBatteries(setup, graph, batteryCharge, batteryCapacity);
       } else {
         BalanceNetworkWithoutBatteries(setup, graph);
       }
     }
   }
 
-  static void BalanceNetworkWithBatteries(GraphSetup setup, float batteriesChargeRatio) {
+  static void BalanceNetworkWithBatteries(GraphSetup setup, MechanicalGraph graph,
+                                          float batteryCharge, int batteryCapacity) {
+    var batteryRatioHysteresis = NetworkUISettings.BatteryRatioHysteresis;
+    var batteriesChargeRatio = batteryCharge / batteryCapacity;
     foreach (var generator in setup.AllGenerators) {
       if (generator.IsSuspended) {
         if (batteriesChargeRatio <= generator.DischargeBatteriesThreshold) {
@@ -166,8 +170,18 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
     }
     foreach (var consumer in setup.AllConsumers) {
       if (consumer.IsSuspended) {
-        if (batteriesChargeRatio >= consumer.MinBatteriesCharge) {
+        if (batteriesChargeRatio < consumer.MinBatteriesCharge) {
+          continue;
+        }
+        var sparePower = graph.CurrentPower.PowerSupply - graph.CurrentPower.PowerDemand;
+        if (sparePower >= consumer.DesiredPower) {
           ActivateConsumer(setup, consumer);
+        } else {
+          // Try to predict if the consumer is able to work long enough after being activated.
+          var hysteresisCharge = batteryCharge + (sparePower - consumer.DesiredPower) * batteryRatioHysteresis;
+          if (hysteresisCharge / batteryCapacity >= consumer.MinBatteriesCharge) {
+            ActivateConsumer(setup, consumer);
+          }
         }
       } else {
         if (batteriesChargeRatio <= consumer.MinBatteriesCharge) {

@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using ModSettings.Common;
 using ModSettings.Core;
 using Timberborn.Modding;
 using Timberborn.SettingsSystem;
@@ -15,8 +16,15 @@ sealed class NetworkUISettings : ModSettingsOwner {
 
   public static bool ShowBatteryVitals => _instance._showBatteryVitals.Value;
   public ModSetting<bool> _showBatteryVitals { get; } = new(
-    true,
-    ModSettingDescriptor.CreateLocalized("IgorZ.SmartPower.Settings.NetworkUI.ShowBatteryVitals"));
+      true,
+      ModSettingDescriptor.CreateLocalized("IgorZ.SmartPower.Settings.NetworkUI.ShowBatteryVitals"));
+
+  public static float BatteryRatioHysteresis => _instance._batteryRatioHysteresis.Value;
+  public ModSetting<int> _batteryRatioHysteresis { get; } = new RangeIntModSetting(
+      1, 0, 5,
+      ModSettingDescriptor
+          .CreateLocalized("IgorZ.SmartPower.Settings.NetworkUI.BatteryRatioHysteresis")
+          .SetLocalizedTooltip("IgorZ.SmartPower.Settings.NetworkUI.BatteryRatioHysteresisTooltip"));
 
   // ReSharper restore MemberCanBePrivate.Global
   // ReSharper restore InconsistentNaming
