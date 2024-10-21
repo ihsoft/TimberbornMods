@@ -7,7 +7,6 @@ using Timberborn.EntityPanelSystem;
 
 namespace IgorZ.TimberCommons.SettingsUI;
 
-// Uncomment to be able to change settings without game reload. 
 [Context("Game")]
 sealed class Configurator : IConfigurator {
   class EntityPanelModuleProvider(DebugFragment debugFragment) : IProvider<EntityPanelModule> {

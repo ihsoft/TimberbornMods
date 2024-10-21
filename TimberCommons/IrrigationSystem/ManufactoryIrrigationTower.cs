@@ -28,7 +28,7 @@ namespace IgorZ.TimberCommons.IrrigationSystem;
 /// </p>
 /// <p>
 /// If building has components, implementing <see cref="IRangeEffect"/>, then they will be applied based on the
-/// currently selected recipe (<see cref="Manufactory.CurrentRecipe"/>). For this, define the effects field.
+/// currently selected recipe (<see cref="Manufactory.CurrentRecipe"/>). For this, define the effect field.
 /// </p>
 /// </remarks>
 public class ManufactoryIrrigationTower : IrrigationTower, ISupplyLeftProvider {
@@ -42,7 +42,7 @@ public class ManufactoryIrrigationTower : IrrigationTower, ISupplyLeftProvider {
   /// <see cref="IRangeEffect.EffectGroup"/>
   [SerializeField]
   [Tooltip("Format: RecipeId=EffectName. Recipe IDs in the list must be unique.")]
-  internal string[] _effects = {};
+  internal string[] _effects = [];
 
   // ReSharper restore InconsistentNaming
   // ReSharper restore RedundantDefaultMemberInitializer
@@ -148,12 +148,13 @@ public class ManufactoryIrrigationTower : IrrigationTower, ISupplyLeftProvider {
         .Select(pair => pair.Split(new[] {'='}, 2))
         .ToDictionary(k => k[0], v => v[1]);
 
-    // Make effects cache.
+    // Make effect cache.
     var rangeEffects = new List<IRangeEffect>();
     GetComponentsFast(rangeEffects);
     _availableEffectsDict = rangeEffects
         .Where(x => _effectsRulesDict.ContainsValue(x.EffectGroup))
-        .GroupBy(x => x.EffectGroup).ToDictionary(x => x.Key, x => x.ToList());
+        .GroupBy(x => x.EffectGroup)
+        .ToDictionary(x => x.Key, x => x.ToList());
   }
 
   /// <summary>Returns all effects that should be active for the recipe.</summary>
