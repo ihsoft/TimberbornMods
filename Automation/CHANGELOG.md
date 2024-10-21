@@ -1,3 +1,6 @@
+# v1.2.4 (20 Oct 2024):
+* [Fix #63] Mod crashes on path checking under undetermined conditions.
+
 # v1.2.3 (29 Sep 2024):
 * [Fix] Mod crashes in map editor.
 
