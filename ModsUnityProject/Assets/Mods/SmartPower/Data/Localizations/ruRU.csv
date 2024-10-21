@@ -2,6 +2,7 @@ ID,Text,Comment
 IgorZ.SmartPower.BatteryCapacity,"Заряд батарей: {0} / {1}",
 IgorZ.SmartPower.BatteryCharging,"Батареи заряжаются: <GreenHighlight>🡅</GreenHighlight>{0} ({1})",
 IgorZ.SmartPower.BatteryDischarging,"Батареи рязряжаются: <RedHighlight>🡇</RedHighlight>{0} ({1})",
+IgorZ.SmartPower.BatteryNotUsed,"<GreenHighlight>Батареи не используются</GreenHighlight>",
 IgorZ.SmartPower.PowerOutputBalancer.AutomateGenerator,"Автоматически управлять генератором",
 IgorZ.SmartPower.PowerOutputBalancer.ChargeBatteriesRangeText,"Заряжать батареи в диапазоне {0}% - {1}%",
 IgorZ.SmartPower.PowerOutputBalancer.ApplyToAllGenerators,"Применить ко всем генераторам",

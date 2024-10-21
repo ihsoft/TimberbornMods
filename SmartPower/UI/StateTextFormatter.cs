@@ -20,6 +20,7 @@ public static class StateTextFormatter {
   const string BatteryCapacityLocKey = "IgorZ.SmartPower.BatteryCapacity";
   const string BatteryCharging = "IgorZ.SmartPower.BatteryCharging";
   const string BatteryDischarging = "IgorZ.SmartPower.BatteryDischarging";
+  const string BatteryNotUsedLocKey = "IgorZ.SmartPower.BatteryNotUsed";
 
   const string NoWorkersLocKey = "IgorZ.SmartPower.MechanicalBuilding.NoWorkersStatus";
   const string NoFuelLocKey = "IgorZ.SmartPower.MechanicalBuilding.NoFuelStatus";
@@ -41,7 +42,7 @@ public static class StateTextFormatter {
     var totalChargeStr = $"{currentPower.BatteryCharge:0} {loc.T(PowerCapacitySymbolLocKey)}";
     var batteryCapacityStr = loc.T(BatteryCapacityLocKey, batteryTotalCapacity, totalChargeStr);
 
-    // Battery power is being consumed by the network.
+    // The network is consuming battery power.
     if (currentPower.BatteryPower > 0) {
       var timeLeft = currentPower.BatteryCharge / currentPower.BatteryPower;
       var flowStr = loc.T(
@@ -64,7 +65,7 @@ public static class StateTextFormatter {
     }
 
     // Idle battery state.
-    return $"{batteryCapacityStr}";
+    return $"{batteryCapacityStr}\n{loc.T(BatteryNotUsedLocKey)}";
   }
 
   /// <summary>Makes a formatted string that describes the power saving mode reason(s).</summary>
