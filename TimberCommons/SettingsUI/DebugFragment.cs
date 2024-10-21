@@ -37,7 +37,7 @@ sealed class DebugFragment : IEntityPanelFragment {
   public VisualElement InitializeFragment() {
     var debugFragmentButton = new DebugFragmentButton(
       () => {
-        var mod = _modRepository.EnabledMods.FirstOrDefault(m => m.Manifest.Id == Settings.Configurator.ModId);
+        var mod = _modRepository.EnabledMods.First(m => m.Manifest.Id == Settings.Configurator.ModId);
         _modSettingsBox.Open(mod);
       }, "TimberCommons Settings");
     _root = _debugFragmentFactory.Create("TimberCommons", debugFragmentButton);
