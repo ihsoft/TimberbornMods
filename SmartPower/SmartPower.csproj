@@ -106,6 +106,9 @@
       <Compile Include="..\TimberDev\Utils\PrefabPatcher.cs">
         <Link>TimberDev\Utils\PrefabPatcher.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\Utils\TimedUpdater.cs">
+        <Link>TimberDev\Utils\TimedUpdater.cs</Link>
+      </Compile>
       <Compile Include="..\UnityDevLite\DebugEx.cs">
         <Link>UnityDevLite\DebugEx.cs</Link>
       </Compile>

@@ -5,10 +5,10 @@
 using System.Linq;
 using IgorZ.SmartPower.PowerGenerators;
 using IgorZ.TimberDev.UI;
+using IgorZ.TimberDev.Utils;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
-using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -29,7 +29,7 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
   Button _applyToAllGeneratorsButton;
 
   PowerOutputBalancer _balancer;
-  float _resetButtonCaptionTimestamp = -1;
+  TimedUpdater _applyToAllUpdater;
 
   PowerOutputBalancerFragment(UiFactory uiFactory) {
     _uiFactory = uiFactory;
@@ -86,12 +86,11 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
       return;
     }
     _applyToAllGeneratorsButton.ToggleDisplayStyle(visible: _balancer.enabled);
-    if (_resetButtonCaptionTimestamp < 0 || _resetButtonCaptionTimestamp > Time.unscaledTime) {
-      return;
-    }
-    _resetButtonCaptionTimestamp = -1;
-    _applyToAllGeneratorsButton.text = _uiFactory.Loc.T(ApplyToAllGeneratorsLocKey);
-    _applyToAllGeneratorsButton.SetEnabled(true);
+    _applyToAllUpdater?.Update(
+        () => {
+          _applyToAllGeneratorsButton.text = _uiFactory.Loc.T(ApplyToAllGeneratorsLocKey);
+          _applyToAllGeneratorsButton.SetEnabled(true);
+        });
   }
 
   void UpdateControls() {
@@ -107,7 +106,7 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
       balancer.ChargeBatteriesThreshold = _balancer.ChargeBatteriesThreshold;
       balancer.DischargeBatteriesThreshold = _balancer.DischargeBatteriesThreshold;
     }
-    _resetButtonCaptionTimestamp = Time.unscaledTime + 1.0f;
+    _applyToAllUpdater = new TimedUpdater(1.0f, startNow: true);
     _applyToAllGeneratorsButton.text = _uiFactory.Loc.T(AppliedToGeneratorsLocKey, affectedGenerators);
     _applyToAllGeneratorsButton.SetEnabled(false);
   }
