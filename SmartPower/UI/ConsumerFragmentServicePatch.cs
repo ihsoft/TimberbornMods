@@ -2,10 +2,10 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Reflection;
 using HarmonyLib;
 using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
+using Timberborn.MechanicalSystemUI;
 using UnityEngine.UIElements;
 
 // ReSharper disable UnusedMember.Local
@@ -14,12 +14,8 @@ using UnityEngine.UIElements;
 namespace IgorZ.SmartPower.UI;
 
 /// <summary>Adds smart mechanical building status to the stock consumer building UI fragment.</summary>
-[HarmonyPatch]
+[HarmonyPatch(typeof(ConsumerFragmentService), nameof(ConsumerFragmentService.Update))]
 static class ConsumerFragmentServicePatch {
-  static MethodBase TargetMethod() {
-    return AccessTools.DeclaredMethod("Timberborn.MechanicalSystemUI.ConsumerFragmentService:Update");
-  }
-
   static void Postfix(bool __runOriginal, MechanicalNode mechanicalNode, Label ____label, ILoc ____loc) {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!

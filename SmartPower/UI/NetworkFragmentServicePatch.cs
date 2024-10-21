@@ -2,13 +2,12 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Reflection;
 using HarmonyLib;
 using IgorZ.SmartPower.Settings;
 using IgorZ.TimberDev.Utils;
 using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
-using UnityEngine;
+using Timberborn.MechanicalSystemUI;
 using UnityEngine.UIElements;
 
 // ReSharper disable UnusedMember.Local
@@ -17,15 +16,11 @@ using UnityEngine.UIElements;
 namespace IgorZ.SmartPower.UI;
 
 /// <summary>Add battery status information to the stock mechanical node UI fragment.</summary>
-[HarmonyPatch]
+[HarmonyPatch(typeof(NetworkFragmentService), nameof(NetworkFragmentService.Update))]
 static class NetworkFragmentServicePatch {
   static string _lastState = "";
   static MechanicalNode _lastMechanicalNode;
   static readonly TimedUpdater _updater = new(0.2f);
-
-  static MethodBase TargetMethod() {
-    return AccessTools.DeclaredMethod("Timberborn.MechanicalSystemUI.NetworkFragmentService:Update");
-  }
 
   static void Postfix(bool __runOriginal, MechanicalNode mechanicalNode, Label ____label, ILoc ____loc) {
     if (!__runOriginal) {

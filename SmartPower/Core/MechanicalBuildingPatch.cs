@@ -2,7 +2,6 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Reflection;
 using HarmonyLib;
 using Timberborn.BaseComponentSystem;
 using Timberborn.MechanicalSystem;
@@ -13,12 +12,8 @@ using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.SmartPower.Core;
 
-[HarmonyPatch]
+[HarmonyPatch(typeof(MechanicalBuilding), nameof(MechanicalBuilding.UpdateNodeCharacteristics))]
 static class MechanicalBuildingPatch {
-  static MethodBase TargetMethod() {
-    return AccessTools.DeclaredMethod("Timberborn.MechanicalSystem.MechanicalBuilding:UpdateNodeCharacteristics");
-  }
-
   // This method needs publicized Timberborn.MechanicalSystem.
   static bool Prefix(bool __runOriginal, BaseComponent __instance, MechanicalNode ____mechanicalNode) {
     if (!__runOriginal) {
