@@ -4,6 +4,7 @@
 
 using System.Reflection;
 using HarmonyLib;
+using IgorZ.SmartPower.Settings;
 using IgorZ.TimberDev.Utils;
 using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
@@ -30,7 +31,7 @@ static class NetworkFragmentServicePatch {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!
     }
-    if (____label.style.display == DisplayStyle.None) {
+    if (!NetworkUISettings.ShowBatteryVitals || ____label.style.display == DisplayStyle.None) {
       return;
     }
     _updater.Update(

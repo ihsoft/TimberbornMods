@@ -18,3 +18,8 @@ IgorZ.SmartPower.PowerInputLimiter.ApplyToAllBuildings,"Apply to all such buildi
 IgorZ.SmartPower.PowerInputLimiter.AppliedToBuildings,"Applied to {0} buildings",
 IgorZ.SmartPower.PowerInputLimiter.PowerShutdownModeStatus,"Shutdown to conserve energy",
 IgorZ.SmartPower.PowerInputLimiter.NotEnoughPowerStatus,"<RedHighlight>⏻</RedHighlight> Not enough power",
+IgorZ.SmartPower.Settings.NetworkUISection,"Network",
+IgorZ.SmartPower.Settings.NetworkUI.ShowBatteryVitals,"Show battery stats",
+IgorZ.SmartPower.Settings.DebugSection,"Debug and troubleshooting",
+IgorZ.SmartPower.Settings.Debug.VerboseLogging,"Verbose logging",
+IgorZ.SmartPower.Settings.Debug.VerboseLoggingTooltip,"Logs will have more useful details, but it may impact game performance.",

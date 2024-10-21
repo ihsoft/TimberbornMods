@@ -11,3 +11,6 @@ IgorZ.SmartPower.MechanicalBuilding.NoFuelStatus,<SolidHighlight>⏻</SolidHighl
 IgorZ.SmartPower.MechanicalBuilding.NoInputStatus,<SolidHighlight>⏻</SolidHighlight> Fehlende Materialien,
 IgorZ.SmartPower.MechanicalBuilding.BlockedOutputStatus,<SolidHighlight>⏻</SolidHighlight> Fehlende Lagerplätze,
 IgorZ.SmartPower.MechanicalBuilding.PowerSavingModeStatus,Energiesparmodus,
+IgorZ.TimberCommons.Settings.DebugSection,Fehlersuche und Fehlerbehebung,
+IgorZ.TimberCommons.Settings.Debug.VerboseLogging,Ausführliches Loggen,
+IgorZ.TimberCommons.Settings.Debug.VerboseLoggingTooltip,"Die Logs enthalten mehr nützliche Details, aber das kann die Spielleistung beeinträchtigen.",
