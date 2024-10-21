@@ -152,7 +152,7 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
     }
   }
 
-  void BalanceNetworkWithBatteries(GraphSetup setup, float batteriesChargeRatio) {
+  static void BalanceNetworkWithBatteries(GraphSetup setup, float batteriesChargeRatio) {
     foreach (var generator in setup.AllGenerators) {
       if (generator.IsSuspended) {
         if (batteriesChargeRatio <= generator.DischargeBatteriesThreshold) {
@@ -177,14 +177,14 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
     }
   }
 
-  void ActivateGenerator(GraphSetup setup, ISuspendableGenerator generator) {
+  static void ActivateGenerator(GraphSetup setup, ISuspendableGenerator generator) {
     setup.SpareGenerators.Remove(generator);
     AddSorted(setup.ActiveGenerators, generator);
     generator.Resume();
     DebugEx.Fine("Activate generator {0}, power={1}", generator, generator.MechanicalNode.PowerOutput);
   }
 
-  void SuspendGenerator(GraphSetup setup, ISuspendableGenerator generator) {
+  static void SuspendGenerator(GraphSetup setup, ISuspendableGenerator generator) {
     setup.ActiveGenerators.Remove(generator);
     AddSorted(setup.SpareGenerators, generator);
     var power = generator.MechanicalNode.PowerOutput;
@@ -192,7 +192,7 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
     DebugEx.Fine("Suspend generator {0}, power={1}", generator, power);
   }
 
-  void ActivateConsumer(GraphSetup setup, ISuspendableConsumer consumer) {
+  static void ActivateConsumer(GraphSetup setup, ISuspendableConsumer consumer) {
     setup.SuspendedConsumers.Remove(consumer);
     AddSorted(setup.ActiveConsumers, consumer);
     consumer.Resume();
@@ -200,7 +200,7 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
                  consumer, consumer.MechanicalNode.PowerOutput, consumer.DesiredPower);
   }
 
-  void SuspendConsumer(GraphSetup setup, ISuspendableConsumer consumer) {
+  static void SuspendConsumer(GraphSetup setup, ISuspendableConsumer consumer) {
     setup.ActiveConsumers.Remove(consumer);
     AddSorted(setup.SuspendedConsumers, consumer);
     var power = consumer.MechanicalNode.PowerInput;
@@ -208,7 +208,7 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
     DebugEx.Fine("Suspend consumer {0}, currentPower={1}, desiredPower={2}", consumer, power, consumer.DesiredPower);
   }
 
-  void BalanceNetworkWithoutBatteries(GraphSetup setup, MechanicalGraph graph) {
+  static void BalanceNetworkWithoutBatteries(GraphSetup setup, MechanicalGraph graph) {
     var activeGenerators = setup.ActiveGenerators;
     var spareGenerators = setup.SpareGenerators;
     var activeConsumers = setup.ActiveConsumers;
