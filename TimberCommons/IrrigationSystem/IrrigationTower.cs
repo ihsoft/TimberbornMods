@@ -31,12 +31,12 @@ namespace IgorZ.TimberCommons.IrrigationSystem;
 /// <remarks>
 /// The tower irrigates tiles (sets moisture level to a constant value) within a certain range. The ground level of the
 /// eligible tiles must be the same as the tower itself. Only the "connected" tiles are eligible for irrigation.
-/// Connected tiles must be immediately adjusted to each other on left, right, top or bottom side. If the tile is
-/// blocked for irrigation (e.g. via a moisture blocker), then it's not eligible for irrigation. 
+/// Connected tiles must be immediately adjusted to each other on the left, right, top or bottom side. If the tile is
+/// blocked for irrigation (for example, via a moisture blocker), then it is not eligible for irrigation. 
 /// </remarks>
 public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateListener,
                                         IPostTransformChangeListener, IPausableComponent, ILateTickable,
-                                        IPersistentEntity, ISelectionListener {
+                                        IPersistentEntity, ISelectionListener, IPostInitializableLoadedEntity {
 
   #region Unity conrolled fields
   // ReSharper disable InconsistentNaming
@@ -181,6 +181,15 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   #endregion
 
+  #region IPostInitializableLoadedEntity implementation
+
+  /// <inheritdoc/>
+  public void PostInitializeLoadedEntity() {
+    UpdateBuildingPositioning();
+  }
+
+  #endregion
+
   #region TickableComponent implementation
 
   /// <inheritdoc/>
@@ -219,7 +228,6 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   /// <summary>Initializes the component right before the first tick.</summary>
   protected virtual void Initialize() {
-    UpdateBuildingPositioning();
     if (!MaxCoverageByRadius.TryGetValue(_foundationSize, out var coverages)) {
       coverages = new Dictionary<int, int>();
       MaxCoverageByRadius.Add(_foundationSize, coverages);
@@ -244,7 +252,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   EventBus _eventBus;
   DirectSoilMoistureSystemAccessor _directSoilMoistureSystemAccessor;
   BuildingWithRangeUpdateService _buildingWithRangeUpdateService;
-  HashSet<int> _foundationTilesIndexes = new();
+  HashSet<int> _foundationTilesIndexes = [];
 
   /// <summary>This is a delta to be added to any distance value to account the building's boundaries.</summary>
   /// <remarks>
@@ -262,7 +270,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   /// <summary>If set to <c>true</c>, then the irrigated tiles set will be updated on the next tick.</summary>
   /// <remarks>
-  /// Set this flag each time when something that may affect irrigate has happen. The update is is not cheap, so don't
+  /// Set this flag each time when something that may affect irrigating has happened. The update is not cheap, so don't
   /// trigger it on every tick.
   /// </remarks>
   /// <seealso cref="UpdateState"/>
@@ -285,7 +293,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   float _currentEfficiency = 1.0f;
 
   /// <summary>The loaded efficiency from the save state.</summary>
-  /// <remarks>It's only saved for the active towers. Used to restore the initial irrigated state.</remarks>
+  /// <remarks>It is only saved for the active towers. Used to restore the initially irrigated state.</remarks>
   float _savedEfficiency = -1;
 
   /// <summary>Cached positioned blocks to start searching for the eligible tiles.</summary>
@@ -295,12 +303,12 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <remarks>React on the terrain changes to these tiles only.</remarks>
   /// <seealso cref="_baseZ"/>
   /// <seealso cref="GetTiles"/>
-  HashSet<int> _irrigationObstacles = new();
+  HashSet<int> _irrigationObstacles = [];
 
   /// <summary>All tiles that had an irrigation barrier set during the last eligible tiles refresh.</summary>
   /// <remarks>When en entity is deleted, only react to it if was a barrier.</remarks>
   /// <seealso cref="GetTiles"/>
-  HashSet<int> _irrigationBarriers = new();
+  HashSet<int> _irrigationBarriers = [];
 
   /// <summary>Indicates if any tower is selected. This enables the highlighting range update.</summary>
   static bool _towerSelected;
@@ -333,7 +341,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   }
 
   /// <summary>Updates the eligible tiles and moisture system.</summary>
-  /// <remarks>If case of there are changes in the irrigating tiles, the moisturising will be stopped.</remarks>
+  /// <remarks>If case of there are changes in the irrigating tiles, the moisturizing will be stopped.</remarks>
   /// <seealso cref="_needMoistureSystemUpdate"/>
   void UpdateState() {
     // Efficiency affects the irrigated radius. It can fluctuate during one tick, so delay the decision.
@@ -445,7 +453,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
     return maxIrrigatedDistance - distance + 1f;  // The farthest tile gets moisture level 1.0f.
   }
 
-  /// <summary>Get's square distance of the tile form the building's center.</summary>
+  /// <summary>Gets square distance of the tile form the building's center.</summary>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   float GetSqrtDistance(Vector2Int tile) {
     return (tile.x - _buildingCenter.x) * (tile.x - _buildingCenter.x)
@@ -503,7 +511,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
     return (result, obstacles, barriers);
   }
 
-  /// <summary>Refreshes the range highlight if the tower is selected.</summary>
+  /// <summary>Refreshes the range highlights if the tower is selected.</summary>
   void MaybeRefreshRangeHighlight() {
     if (!_towerSelected) {
       return;
