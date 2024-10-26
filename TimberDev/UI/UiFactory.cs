@@ -115,10 +115,14 @@ public sealed class UiFactory {
   /// <param name="onValueChangedFn">
   /// A callback method that will be called on the value change. The only argument is the new value.
   /// </param>
+  /// <param name="spacing">If a non-negative value, then the bottom margin will be set.</param>
   /// <returns>A wrapper for the precise slider.</returns>
-  public PreciseSliderWrapper CreatePreciseSlider(float stepSize, Action<float> onValueChangedFn) {
+  public PreciseSliderWrapper CreatePreciseSlider(float stepSize, Action<float> onValueChangedFn, int spacing = 5) {
     var root = _visualElementLoader.LoadVisualElement("Game/EntityPanel/SluiceFragment");
     var slider = root.Q<PreciseSlider>("WaterLevelSlider");
+    if (spacing >= 0) {
+      slider.style.marginBottom = spacing;
+    }
     return new PreciseSliderWrapper(slider, onValueChangedFn, stepSize);
   }
 
