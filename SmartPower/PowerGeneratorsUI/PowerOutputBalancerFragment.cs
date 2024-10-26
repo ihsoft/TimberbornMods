@@ -90,6 +90,7 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
         () => {
           _applyToAllGeneratorsButton.text = _uiFactory.Loc.T(ApplyToAllGeneratorsLocKey);
           _applyToAllGeneratorsButton.SetEnabled(true);
+          _applyToAllUpdater = null;
         });
   }
 
