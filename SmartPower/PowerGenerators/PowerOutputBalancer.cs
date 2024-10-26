@@ -68,7 +68,7 @@ abstract class PowerOutputBalancer
       .Where(x => x != null && x.name == name);
 
   /// <inheritdoc/>
-  public virtual void Suspend() {
+  public virtual void Suspend(bool forceStop) {
     IsSuspended = true;
   }
 
@@ -85,9 +85,9 @@ abstract class PowerOutputBalancer
   protected SmartPowerService SmartPowerService { get; private set; }
 
   /// <summary>
-  /// Called when generator state changes, and it may be needed to register or unregister it in the system.
+  /// Called when generator state changes, and it may be necessary to register or unregister it in the system.
   /// </summary>
-  /// <remarks>Must not be called before the mechanical graph is initialized.</remarks>
+  /// <remarks>Mustn't be called before the mechanical graph is initialized.</remarks>
   /// <seealso cref="Automate"/>
   /// <seealso cref="SmartPowerService"/>
   protected abstract void UpdateRegistration();
@@ -129,7 +129,7 @@ abstract class PowerOutputBalancer
   /// <inheritdoc/>
   public void PostInitializeLoadedEntity() {
     if (enabled && IsSuspended) {
-      Suspend();
+      Suspend(true);
     }
   }
 
