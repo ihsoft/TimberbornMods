@@ -8,6 +8,7 @@ using IgorZ.SmartPower.Core;
 using IgorZ.SmartPower.PowerConsumers;
 using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
+using UnityEngine;
 
 namespace IgorZ.SmartPower.UI;
 
@@ -21,6 +22,7 @@ public static class StateTextFormatter {
   const string BatteryCharging = "IgorZ.SmartPower.BatteryCharging";
   const string BatteryDischarging = "IgorZ.SmartPower.BatteryDischarging";
   const string BatteryNotUsedLocKey = "IgorZ.SmartPower.BatteryNotUsed";
+  const string BatteryDepletedLocKey = "IgorZ.SmartPower.BatteryDepleted";
 
   const string NoWorkersLocKey = "IgorZ.SmartPower.MechanicalBuilding.NoWorkersStatus";
   const string NoFuelLocKey = "IgorZ.SmartPower.MechanicalBuilding.NoFuelStatus";
@@ -34,34 +36,42 @@ public static class StateTextFormatter {
     if (mechanicalNode.Graph.BatteryControllers.IsEmpty()) {
       return null;
     }
-    var currentPower = mechanicalNode.Graph.CurrentPower;
     var batteryTotalCapacity = mechanicalNode.Graph.BatteryControllers
         .Where(x => x.Operational)
         .Select(x => x.Capacity)
         .Sum();
+    if (batteryTotalCapacity == 0) {
+      return null;
+    }
+
+    var currentPower = mechanicalNode.Graph.CurrentPower;
     var totalChargeStr = $"{currentPower.BatteryCharge:0} {loc.T(PowerCapacitySymbolLocKey)}";
     var batteryCapacityStr = loc.T(BatteryCapacityLocKey, batteryTotalCapacity, totalChargeStr);
+    var batteryPowerNeed = currentPower.PowerDemand - currentPower.PowerSupply;
 
     // The network is consuming battery power.
-    if (currentPower.BatteryPower > 0) {
-      var timeLeft = currentPower.BatteryCharge / currentPower.BatteryPower;
+    if (batteryPowerNeed > 0 && currentPower.BatteryCharge > float.Epsilon) {
+      var timeLeft = currentPower.BatteryCharge / batteryPowerNeed;
       var flowStr = loc.T(
-        BatteryDischarging,
-        $"{currentPower.BatteryPower} {loc.T(PowerSymbolLocKey)}",
-        $"{timeLeft:0.0}{loc.T(HourShortLocKey)}");
+          BatteryDischarging,
+          $"{batteryPowerNeed} {loc.T(PowerSymbolLocKey)}",
+          $"{timeLeft:0.0}{loc.T(HourShortLocKey)}");
       return $"{batteryCapacityStr}\n{flowStr}";
     }
 
     // Some discharged batteries being charged using the excess power.
-    var dischargedCapacity = batteryTotalCapacity - currentPower.BatteryCharge;
-    if (currentPower.PowerSupply > currentPower.PowerDemand && dischargedCapacity > float.Epsilon) {
-      var flow = currentPower.PowerSupply - currentPower.PowerDemand;
-      var timeLeft = dischargedCapacity / flow;
+    if (batteryPowerNeed < 0 && currentPower.BatteryCharge < batteryTotalCapacity) {
+      var timeLeft = (batteryTotalCapacity - currentPower.BatteryCharge) / -batteryPowerNeed;
       var flowStr = loc.T(
-        BatteryCharging,
-        $"{flow} {loc.T(PowerSymbolLocKey)}",
-        $"{timeLeft:0.0}{loc.T(HourShortLocKey)}");
+          BatteryCharging,
+          $"{-batteryPowerNeed} {loc.T(PowerSymbolLocKey)}",
+          $"{timeLeft:0.0}{loc.T(HourShortLocKey)}");
       return $"{batteryCapacityStr}\n{flowStr}";
+    }
+
+    // Batteries depleted.
+    if (batteryPowerNeed > 0 && currentPower.BatteryCharge < float.Epsilon) {
+      return $"{batteryCapacityStr}\n{loc.T(BatteryDepletedLocKey)}";
     }
 
     // Idle battery state.
