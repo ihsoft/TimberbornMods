@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using Bindito.Core;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BuildingsBlocking;
@@ -16,7 +17,7 @@ using UnityEngine;
 namespace IgorZ.SmartPower.Core;
 
 /// <summary>
-/// Component that extends the <see cref="MechanicalBuilding"/> behavior to conserve energy when manufactory cannot
+/// Component that extends the <see cref="MechanicalBuilding"/> behavior to conserve energy when manufactory can't
 /// produce product.
 /// </summary>
 public class SmartManufactory : BaseComponent, IAdjustablePowerInput {
@@ -29,17 +30,17 @@ public class SmartManufactory : BaseComponent, IAdjustablePowerInput {
 
   /// <summary>
   /// Indicates that the building is expected to be staffed and working, but no workers are currently at the working
-  /// place(s).
+  /// place.
   /// </summary>
   public bool AllWorkersOut { get; private set; }
 
-  /// <summary>Indicates that the required ingredients are missing and the work cannot start.</summary>
+  /// <summary>Indicates that the required ingredients are missing and the work can't start.</summary>
   public bool MissingIngredients { get; private set; }
 
   /// <summary>Indicates that there is now fuel to execute the recipe.</summary>
   public bool NoFuel { get; private set; }
 
-  /// <summary>Indicates that there is no free space in inventory to stock the product(s).</summary>
+  /// <summary>Indicates that there is no free space in inventory to stock the product.</summary>
   public bool BlockedOutput { get; private set; }
 
   /// <summary>Tells if the building is not consuming full power due to the conditions.</summary>
@@ -67,11 +68,12 @@ public class SmartManufactory : BaseComponent, IAdjustablePowerInput {
   #region IAdjustablePowerInput implementation
 
   /// <inheritdoc/>
-  public int UpdateAndGetPowerInput(int nominalPowerInput) {
+  public int UpdateAndGetPowerInput() {
     if (_mechanicalBuilding.ConsumptionDisabled
         || _blockableBuilding && !_blockableBuilding.IsUnblocked
         || !_manufactory.HasCurrentRecipe) {
       AllWorkersOut = MissingIngredients = BlockedOutput = NoFuel = StandbyMode = false;
+      _suspendableConsumer?.OverrideValues(power: -1);
       return 0;
     }
 
@@ -80,8 +82,10 @@ public class SmartManufactory : BaseComponent, IAdjustablePowerInput {
     BlockedOutput = !_manufactory.Inventory.HasUnreservedCapacity(_manufactory.CurrentRecipe.Products);
     NoFuel = !_manufactory.HasFuel;
     StandbyMode = AllWorkersOut || MissingIngredients || NoFuel || BlockedOutput;
-    var newInput = nominalPowerInput * (StandbyMode ? NonFuelRecipeIdleStateConsumption : 1f);
-    return Mathf.Max(Mathf.RoundToInt(newInput), 1);
+    var newInput = Math.Max(
+        Mathf.RoundToInt(_nominalPowerInput * (StandbyMode ? NonFuelRecipeIdleStateConsumption : 1f)), 1);
+    _suspendableConsumer?.OverrideValues(power: newInput);
+    return newInput;
   }
 
   #endregion
@@ -97,7 +101,10 @@ public class SmartManufactory : BaseComponent, IAdjustablePowerInput {
   BlockableBuilding _blockableBuilding;
   Manufactory _manufactory;
   Enterable _enterable;
+  ISuspendableConsumer _suspendableConsumer;
   StatusToggle _standbyStatus;
+
+  int _nominalPowerInput;
 
   /// <summary>It must be public for the injection logic to work.</summary>
   [Inject]
@@ -107,9 +114,11 @@ public class SmartManufactory : BaseComponent, IAdjustablePowerInput {
 
   void Awake() {
     _mechanicalBuilding = GetComponentFast<MechanicalBuilding>();
+    _nominalPowerInput = GetComponentFast<MechanicalNodeSpecification>().PowerInput;
     _blockableBuilding = GetComponentFast<BlockableBuilding>();
     _manufactory = GetComponentFast<Manufactory>();
     _enterable = GetComponentFast<Enterable>();
+    _suspendableConsumer = GetComponentFast<ISuspendableConsumer>();
     _standbyStatus = StatusToggle.CreateNormalStatus(StandbyStatusIcon, _loc.T(PowerSavingModeLocKey));
     var subject = GetComponentFast<StatusSubject>();
     subject.RegisterStatus(_standbyStatus);

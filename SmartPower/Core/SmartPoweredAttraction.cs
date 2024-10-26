@@ -17,15 +17,18 @@ public sealed class SmartPoweredAttraction : BaseComponent, IAdjustablePowerInpu
 
   #region IAdjustablePowerInput implementation
 
-  // Don't set it to 0 as it can disable the network.
-  const int NonAttendeesPowerConsumption = 1;  // hp
+  // Don't set it to 0 as it may disable the network.
+  const int NoAttendeesPowerConsumption = 1;  // hp
 
   /// <inheritdoc/>
-  public int UpdateAndGetPowerInput(int nominalPowerInput) {
+  public int UpdateAndGetPowerInput() {
     if (_mechanicalBuilding.ConsumptionDisabled || _blockableBuilding && !_blockableBuilding.IsUnblocked) {
+      _suspendableConsumer?.OverrideValues(power: -1);
       return 0;
     }
-    return _enterable.NumberOfEnterersInside == 0 ? NonAttendeesPowerConsumption : nominalPowerInput;
+    var newInput = _enterable.NumberOfEnterersInside == 0 ? NoAttendeesPowerConsumption : _nominalPowerInput;
+    _suspendableConsumer?.OverrideValues(power: newInput);
+    return newInput;
   }
 
   #endregion
@@ -35,11 +38,16 @@ public sealed class SmartPoweredAttraction : BaseComponent, IAdjustablePowerInpu
   MechanicalBuilding _mechanicalBuilding;
   BlockableBuilding _blockableBuilding;
   Enterable _enterable;
+  ISuspendableConsumer _suspendableConsumer;
+
+  int _nominalPowerInput;
 
   void Awake() {
     _mechanicalBuilding = GetComponentFast<MechanicalBuilding>();
     _blockableBuilding = GetComponentFast<BlockableBuilding>();
     _enterable = GetComponentFast<Enterable>();
+    _suspendableConsumer = GetComponentFast<ISuspendableConsumer>();
+    _nominalPowerInput = GetComponentFast<MechanicalNodeSpecification>().PowerInput;
   }
 
   #endregion

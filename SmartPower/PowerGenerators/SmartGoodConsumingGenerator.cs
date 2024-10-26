@@ -5,7 +5,6 @@
 using Timberborn.BuildingsBlocking;
 using Timberborn.GoodConsumingBuildingSystem;
 using Timberborn.MechanicalSystem;
-using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.SmartPower.PowerGenerators;
 
@@ -14,8 +13,8 @@ sealed class SmartGoodConsumingGenerator : PowerOutputBalancer {
   public override int Priority => 10;
 
   /// <inheritdoc/>
-  public override void Suspend() {
-    base.Suspend();
+  public override void Suspend(bool forceStop) {
+    base.Suspend(forceStop);
     _goodConsumingToggle.PauseConsumption();
     _mechanicalNode.UpdateOutput(0);
   }
@@ -45,6 +44,9 @@ sealed class SmartGoodConsumingGenerator : PowerOutputBalancer {
   }
 
   protected override void UpdateRegistration() {
+    if (!enabled) {
+      return;
+    }
     if (Automate && !_pausableBuilding.Paused && !SmartPowerService.IsGeneratorRegistered(this)) {
       SmartPowerService.RegisterGenerator(this);
     }

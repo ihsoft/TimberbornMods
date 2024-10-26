@@ -23,7 +23,7 @@ static class MechanicalBuildingPatch {
     if (adjustablePowerInput == null) {
       return true;
     }
-    var newPowerInput = adjustablePowerInput.UpdateAndGetPowerInput(____mechanicalNode._nominalPowerInput);
+    var newPowerInput = adjustablePowerInput.UpdateAndGetPowerInput();
     if (newPowerInput == ____mechanicalNode.PowerInput) {
       return false;
     }
