@@ -111,7 +111,57 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
 
   #region Implementation
 
+  /// <summary>
+  /// Orders the generators so that the generators with the lowest priority and the lowest power output are first.
+  /// </summary>
+  /// <remarks>
+  /// The idea is to activate generators from the end of the list (the highest priority) and suspend from the beginning
+  /// of the list (the least priority).
+  /// </remarks>
+  sealed class GeneratorsComparerClass : IComparer<ISuspendableGenerator> {
+    public int Compare(ISuspendableGenerator x, ISuspendableGenerator y) {
+      if (x == null || y == null) {
+        throw new ArgumentNullException("Generator is null: x=" + x + ", y=" + y);
+      }
+      var priorityCheck = x.Priority.CompareTo(y.Priority);
+      if (priorityCheck != 0) {
+        return priorityCheck;
+      }
+      var powerCheck = x.NominalOutput.CompareTo(y.NominalOutput);
+      return powerCheck == 0
+          ? string.Compare(x.StableUniqueId, y.StableUniqueId, StringComparison.Ordinal)
+          : powerCheck;
+    }
+  }
+
+  /// <summary>
+  /// Orders the consumers so that the generators with the lowest priority and the highest power demand are first.
+  /// </summary>
+  /// <remarks>
+  /// The idea is to activate consumers from the end of the list: they have high priority and demand less power, which
+  /// allows activating more consumers. The consumers are suspended from the beginning of the list (the least priority)
+  /// – it allows releasing more power with fewer buildings deactivated.
+  /// </remarks>
+  sealed class ConsumersComparerClass : IComparer<ISuspendableConsumer> {
+    public int Compare(ISuspendableConsumer x, ISuspendableConsumer y) {
+      if (x == null || y == null) {
+        throw new ArgumentNullException("Consumer is null: x=" + x + ", y=" + y);
+      }
+      var priorityCheck = x.Priority.CompareTo(y.Priority);
+      if (priorityCheck != 0) {
+        return priorityCheck;
+      }
+      // Reverse check the power to have the highest power consumers disabled first.
+      var powerCheck = y.DesiredPower.CompareTo(x.DesiredPower);
+      return powerCheck == 0
+          ? string.Compare(x.StableUniqueId, y.StableUniqueId, StringComparison.Ordinal)
+          : powerCheck;
+    }
+  }
+
   static SmartPowerService _instance;
+  static readonly GeneratorsComparerClass GeneratorsComparer = new();
+  static readonly ConsumersComparerClass ConsumersComparer = new();
 
   struct GraphSetup {
     public List<ISuspendableGenerator> AllGenerators;  //FIXME: deperecate
@@ -160,9 +210,9 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
         var setup = GetSetup(graph);
         setup.AllGenerators.Add(generator);
         if (generator.IsSuspended) {
-          AddSorted(setup.SpareGenerators, generator);
+          AddSortedGenerator(setup.SpareGenerators, generator);
         } else {
-          AddSorted(setup.ActiveGenerators, generator);
+          AddSortedGenerator(setup.ActiveGenerators, generator);
           if (generator.MechanicalNode.PowerOutput == 0) {
             setup.WarmingUpGenerators.Add(generator);
           }
@@ -185,9 +235,9 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
         var setup = GetSetup(graph);
         setup.AllConsumers.Add(consumer);
         if (consumer.IsSuspended) {
-          AddSorted(setup.SuspendedConsumers, consumer);
+          AddSortedConsumer(setup.SuspendedConsumers, consumer);
         } else {
-          AddSorted(setup.ActiveConsumers, consumer);
+          AddSortedConsumer(setup.ActiveConsumers, consumer);
           if (consumer.MechanicalNode.PowerInput == 0) {
             setup.WarmingUpConsumers.Add(consumer);
           }
@@ -207,12 +257,12 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
           if (!setup.SuspendedConsumers.Remove(consumer)) {
             throw new InvalidDataException("Consumer is not in the suspended list: " + DebugEx.ObjectToString(consumer));
           }
-          AddSorted(setup.SuspendedConsumers, consumer);
+          AddSortedConsumer(setup.SuspendedConsumers, consumer);
         } else {
           if (!setup.ActiveConsumers.Remove(consumer)) {
             throw new InvalidDataException("Consumer is not in the active list: " + DebugEx.ObjectToString(consumer));
           }
-          AddSorted(setup.ActiveConsumers, consumer);
+          AddSortedConsumer(setup.ActiveConsumers, consumer);
         }
       }
       _changedConsumers.Clear();
@@ -359,7 +409,7 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
     if (!setup.SpareGenerators.Remove(generator)) {
       throw new InvalidDataException("Generator is not in the spare list: " + DebugEx.ObjectToString(generator));
     }
-    AddSorted(setup.ActiveGenerators, generator);
+    AddSortedGenerator(setup.ActiveGenerators, generator);
     if (generator.MechanicalNode.PowerOutput == 0) {
       setup.WarmingUpGenerators.Add(generator);
     }
@@ -377,7 +427,7 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
     if (!setup.ActiveGenerators.Remove(generator)) {
       throw new InvalidDataException("Generator is not in the active list: " + DebugEx.ObjectToString(generator));
     }
-    AddSorted(setup.SpareGenerators, generator);
+    AddSortedGenerator(setup.SpareGenerators, generator);
     setup.WarmingUpGenerators.Remove(generator);
     return true;
   }
@@ -392,7 +442,7 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
     if (!setup.SuspendedConsumers.Remove(consumer)) {
       throw new InvalidDataException("Consumer is not in the suspended list: " + DebugEx.ObjectToString(consumer));
     }
-    AddSorted(setup.ActiveConsumers, consumer);
+    AddSortedConsumer(setup.ActiveConsumers, consumer);
     if (consumer.MechanicalNode.PowerInput == 0) {
       setup.WarmingUpConsumers.Add(consumer);
     }
@@ -410,7 +460,7 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
     if (!setup.ActiveConsumers.Remove(consumer)) {
       throw new InvalidDataException("Consumer is not in the active list: " + DebugEx.ObjectToString(consumer));
     }
-    AddSorted(setup.SuspendedConsumers, consumer);
+    AddSortedConsumer(setup.SuspendedConsumers, consumer);
     setup.WarmingUpConsumers.Remove(consumer);
     return true;
   }
@@ -469,14 +519,24 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
     }
   }
 
-  static void AddSorted<T>(List<T> list, T item) {
-    var index = list.BinarySearch(item);
+  static void AddSortedGenerator(List<ISuspendableGenerator> list, ISuspendableGenerator generator) {
+    var index = list.BinarySearch(generator, GeneratorsComparer);
     if (index < 0) {
       index = ~index;
     } else {
-      throw new InvalidOperationException("Item already exists in the list: " + item);
+      throw new InvalidOperationException("Generator already exists in the list: " + generator);
     }
-    list.Insert(index, item);
+    list.Insert(index, generator);
+  }
+
+  static void AddSortedConsumer(List<ISuspendableConsumer> list, ISuspendableConsumer cosumer) {
+    var index = list.BinarySearch(cosumer, ConsumersComparer);
+    if (index < 0) {
+      index = ~index;
+    } else {
+      throw new InvalidOperationException("Consumer already exists in the list: " + cosumer);
+    }
+    list.Insert(index, cosumer);
   }
 
   #endregion

@@ -2,13 +2,15 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System;
 using Timberborn.MechanicalSystem;
 
 namespace IgorZ.SmartPower.Core;
 
 /// <summary>Interface for the generators that can be suspended and resumed.</summary>
-public interface ISuspendableGenerator : IComparable<ISuspendableGenerator> {
+public interface ISuspendableGenerator {
+  /// <summary>The unique identifier of the generator that doesn't change between the game loads.</summary>
+  public string StableUniqueId { get; }
+
   /// <summary>
   /// The priority in which the generator should be suspended and resumed. Generators with higher priority will be
   /// resumed first and suspended last.

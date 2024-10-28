@@ -56,6 +56,9 @@ sealed class PowerInputLimiter : BaseComponent, ISuspendableConsumer, IPersisten
   public bool CheckBatteryCharge { get; set; }
 
   /// <inheritdoc/>
+  public string StableUniqueId => name;
+
+  /// <inheritdoc/>
   public int Priority => _priority;
 
   /// <inheritdoc/>
@@ -97,20 +100,6 @@ sealed class PowerInputLimiter : BaseComponent, ISuspendableConsumer, IPersisten
         _smartPowerService.UpdateConsumerOverrides(this);
       }
     }
-  }
-
-  #endregion
-
-  #region IComparable implementation
-
-  public int CompareTo(ISuspendableConsumer other) {
-    var priorityCheck = Priority.CompareTo(other.Priority);
-    if (priorityCheck != 0) {
-      return priorityCheck;
-    }
-    // Reverse check the power to have the highest power consumers disabled first.
-    var powerCheck = other.DesiredPower.CompareTo(DesiredPower);
-    return powerCheck == 0 ? GetHashCode().CompareTo(other.GetHashCode()) : powerCheck;
   }
 
   #endregion

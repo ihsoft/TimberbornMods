@@ -35,6 +35,9 @@ abstract class PowerOutputBalancer
   #region API
 
   /// <inheritdoc/>
+  public string StableUniqueId => name;
+
+  /// <inheritdoc/>
   public abstract int Priority { get; }
 
   /// <inheritdoc/>
@@ -94,20 +97,6 @@ abstract class PowerOutputBalancer
 
   #endregion
   
-  #region IComparable implementation
-
-  /// <inheritdoc/>
-  public int CompareTo(ISuspendableGenerator other) {
-    var priorityCheck = Priority.CompareTo(other.Priority);
-    if (priorityCheck != 0) {
-      return priorityCheck;
-    }
-    var powerCheck = NominalOutput.CompareTo(other.NominalOutput);
-    return powerCheck == 0 ? GetHashCode().CompareTo(other.GetHashCode()) : powerCheck;
-  }
-
-  #endregion
-
   #region IFinishedStateListener implementation
 
   /// <inheritdoc/>

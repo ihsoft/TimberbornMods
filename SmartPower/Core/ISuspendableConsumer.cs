@@ -2,13 +2,15 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System;
 using Timberborn.MechanicalSystem;
 
 namespace IgorZ.SmartPower.Core;
 
 /// <summary>Interface for the consumers that can be suspended and resumed.</summary>
-public interface ISuspendableConsumer : IComparable<ISuspendableConsumer> {
+public interface ISuspendableConsumer {
+  /// <summary>The unique identifier of the consumer that doesn't change between the game loads.</summary>
+  public string StableUniqueId { get; }
+
   /// <summary>
   /// The priority in which the consumer should be suspended and resumed. Consumers with higher priority will be
   /// resumed first and suspended last.
@@ -21,7 +23,11 @@ public interface ISuspendableConsumer : IComparable<ISuspendableConsumer> {
   public MechanicalNode MechanicalNode { get; }
 
   /// <summary>Power that the consumer normally consumes.</summary>
-  /// <remarks>This value mustn't change while the consumer is under control of SmartPowerSystem.</remarks>
+  /// <remarks>
+  /// If this value changes while the consumer is under control of SmartPowerService, then the service must be notified
+  /// via <see cref="SmartPowerService.UpdateConsumerOverrides"/>.
+  /// </remarks>
+  /// <seealso cref="OverrideValues"/>
   public int DesiredPower { get; }
 
   /// <summary>Indicates whether the consumer is currently suspended.</summary>
