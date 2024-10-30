@@ -56,7 +56,8 @@ sealed class PowerInputLimiter : BaseComponent, ISuspendableConsumer, IPersisten
   public bool CheckBatteryCharge { get; set; }
 
   /// <inheritdoc/>
-  public string StableUniqueId => name;
+  public string StableUniqueId => _stableUniqueId ??= DebugEx.BaseComponentToString(this);
+  string _stableUniqueId;
 
   /// <inheritdoc/>
   public int Priority => _priority;

@@ -10,6 +10,7 @@ using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.MechanicalSystem;
 using Timberborn.Persistence;
+using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
 namespace IgorZ.SmartPower.PowerGenerators;
@@ -35,7 +36,8 @@ abstract class PowerOutputBalancer
   #region API
 
   /// <inheritdoc/>
-  public string StableUniqueId => name;
+  public string StableUniqueId => _stableUniqueId ??= DebugEx.BaseComponentToString(this);
+  string _stableUniqueId;
 
   /// <inheritdoc/>
   public abstract int Priority { get; }
