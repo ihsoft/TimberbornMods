@@ -13,5 +13,7 @@ sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<UiFactory>().AsSingleton();
     containerDefinition.Bind<PanelFragment>().AsSingleton();
+    containerDefinition.Bind<GameTextMinMaxSlider2>().AsTransient();
+    containerDefinition.Bind<MinMaxSliderBuilder2>().AsTransient();
   }
 }

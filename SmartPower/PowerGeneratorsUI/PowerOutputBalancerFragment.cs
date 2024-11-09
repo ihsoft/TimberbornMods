@@ -25,7 +25,7 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
   VisualElement _root;
   Toggle _automateCheckbox;
   Label _chargeBatteriesText;
-  MinMaxSlider _chargeBatteriesSlider;
+  MinMaxSlider2 _chargeBatteriesSlider;
   Button _applyToAllGeneratorsButton;
 
   PowerOutputBalancer _balancer;

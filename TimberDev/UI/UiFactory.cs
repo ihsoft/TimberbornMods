@@ -76,9 +76,9 @@ public sealed class UiFactory {
   /// <param name="minDelta">The minimum delta between min/max values.</param>
   /// <param name="stepSize">If greater than zero, then the values are rounded to the step.</param>
   /// <param name="spacing">If a non-negative value, then the bottom margin will be set.</param>
-  public MinMaxSlider CreateMinMaxSlider(Action<ChangeEvent<Vector2>> onValueChangedFn, float lowValue, float highValue,
+  public MinMaxSlider2 CreateMinMaxSlider(Action<ChangeEvent<Vector2>> onValueChangedFn, float lowValue, float highValue,
                                          float minDelta, float stepSize = 0, int spacing = 5) {
-    var slider = UiBuilder.Create<GameTextMinMaxSlider>()
+    var slider = UiBuilder.Create<GameTextMinMaxSlider2>()
         .SetLowLimit(lowValue)
         .SetHighLimit(highValue)
         .Small().Build();
