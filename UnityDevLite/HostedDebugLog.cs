@@ -11,7 +11,7 @@ namespace UnityDev.Utils.LogUtilsLite;
 
 /// <summary>A light version of logging utils from UnityDev specialized for Timberborn.</summary>
 /// <remarks>https://github.com/ihsoft/UnityDev_Utils</remarks>
-/// <seealso cref="DebugEx.LoggingSettings"/>
+/// <seealso cref="DebugEx.VerbosityLevel"/>
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 static class HostedDebugLog {
   /// <summary>Logs a formatted INFO message with a host identifier.</summary>
@@ -23,7 +23,7 @@ static class HostedDebugLog {
   /// Logs a formatted INFO message with a host identifier when the <i>verbose</i> logging mode is enabled.
   /// </summary>
   public static void Fine(BaseComponent host, string format, params object[] args) {
-    if (DebugEx.LoggingSettings.VerbosityLevel > 0) {
+    if (DebugEx.VerbosityLevel >= DebugEx.LogLevel.Fine) {
       Log(LogType.Log, host, format, args);
     }
   }

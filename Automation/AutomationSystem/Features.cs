@@ -14,12 +14,12 @@ sealed class Features : IModStarter {
   /// <summary>Indicates that <see cref="DebugEx.Fine"/> methods should emit record to the log.</summary>
   public static bool DebugExVerboseLogging;
 
-  /// <summary>Specifies whether path checking system should periodically dump performance statistics.</summary>
+  /// <summary>Specifies whether a path checking system should periodically dump performance statistics.</summary>
   public static bool PathCheckingSystemProfiling;
 
   public void Configure(IContainerDefinition containerDefinition) {
-    if (DebugExVerboseLogging && DebugEx.LoggingSettings.VerbosityLevel < 5) {
-      DebugEx.LoggingSettings.VerbosityLevel = 5;
+    if (DebugExVerboseLogging && DebugEx.VerbosityLevel < DebugEx.LogLevel.Finer) {
+      DebugEx.VerbosityLevel = DebugEx.LogLevel.Finer;
     }
   }
 

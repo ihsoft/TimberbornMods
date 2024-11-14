@@ -17,27 +17,42 @@ namespace UnityDev.Utils.LogUtilsLite;
 
 /// <summary>A light version of logging utils from UnityDev specialized for Timberborn.</summary>
 /// <remarks>https://github.com/ihsoft/UnityDev_Utils</remarks>
-/// <seealso cref="LoggingSettings"/>
 static class DebugEx {
+
+  /// <summary>The levels of log record.</summary>
+  public enum LogLevel {
+    None = -1,
+    Error = 0,
+    Warning = 1,
+    Info = 2,
+    Fine = 3,
+    Finer = 4,
+  }
+
+  /// <summary>The current verbosity level for the logging.</summary>
+  public static LogLevel VerbosityLevel = LogLevel.Info;
+
   /// <summary>
   /// Logs a formatted INFO message giving a better context on the objects in the parameters.
   /// </summary>
   /// <remarks>
-  /// The arguments are not just transformed into the strings by using their <c>ToString</c> method. Instead, this
-  /// method tries to make a best guess of what the object is, and gives more context when possible.
+  /// The arguments aren't transformed into the strings by using their <c>ToString</c> method. Instead, this
+  /// method tries to make the best guess of what the object is, and gives more context when possible.
   /// </remarks>
   /// <param name="format">The format string for the log message.</param>
   /// <param name="args">The arguments for the format string.</param>
   /// <seealso cref="ObjectToString"/>
   /// <seealso cref="Log"/>
   public static void Info(string format, params object[] args) {
-    Log(LogType.Log, format, args);
+    if (VerbosityLevel >= LogLevel.Info) {
+      Log(LogType.Log, format, args);
+    }
   }
 
   /// <summary>Logs a formatted INFO message when the <i>verbose</i> logging mode is enabled.</summary>
   /// <inheritdoc cref="Info"/>
   public static void Fine(string format, params object[] args) {
-    if (LoggingSettings.VerbosityLevel > 0) {
+    if (VerbosityLevel >= LogLevel.Fine) {
       Log(LogType.Log, format, args);
     }
   }
@@ -45,13 +60,17 @@ static class DebugEx {
   /// <summary>Logs a formatted WARNING message with a host identifier.</summary>
   /// <inheritdoc cref="Info"/>
   public static void Warning(string format, params object[] args) {
-    Log(LogType.Warning, format, args);
+    if (VerbosityLevel >= LogLevel.Warning) {
+      Log(LogType.Warning, format, args);
+    }
   }
 
   /// <summary>Logs a formatted ERROR message with a host identifier.</summary>
   /// <inheritdoc cref="Info"/>
   public static void Error(string format, params object[] args) {
-    Log(LogType.Error, format, args);
+    if (VerbosityLevel >= LogLevel.Error) {
+      Log(LogType.Error, format, args);
+    }
   }
 
   /// <summary>Generic method to emit a log record.</summary>
@@ -105,7 +124,7 @@ static class DebugEx {
 
   /// <summary>Helper method to make a user friendly object name for the logs.</summary>
   public static string BaseComponentToString(BaseComponent component) {
-    if (component != null && !component) {  // It's important to use the "!" notion to catch the destroyed objects!
+    if (component != null && !component) {  // It is important to use the "!" notion to catch the destroyed objects!
       return "[DestroyedComponent]";
     }
     var prefab = component.GetComponentFast<Prefab>();
@@ -122,36 +141,13 @@ static class DebugEx {
     return $"[{component.GetType().Name}]";
   }
 
-  /// <summary>Collection-to-string - it makes a comma separated string from the enumerable.</summary>
+  /// <summary>Collection-to-string – it makes a comma separated string from the enumerable.</summary>
   public static string C2S(IEnumerable enumerable) {
     return string.Join(",", enumerable);
   }
 
-  /// <summary>Collection-to-string - it makes a comma separated string from the enumerable.</summary>
+  /// <summary>Collection-to-string – it makes a comma separated string from the enumerable.</summary>
   public static string C2S<T>(IEnumerable<T> enumerable) {
     return string.Join(",", enumerable);
-  }
-
-  /// <summary>Lightweight version of the full log settings.</summary>
-  /// <remarks>
-  /// Only supports verbose level setting. To enable verbose logging, create an empty file "UnityDev_verboselogging" in
-  /// the folder where the parent assembly file lives.
-  /// </remarks>
-  public static class LoggingSettings {
-    const string LogLevelVerbosityFile = "UnityDev_verboselogging";
-
-    public static int VerbosityLevel;
-
-    static LoggingSettings() {
-      var assembly = typeof(DebugEx).Assembly;
-      if (assembly.Location == "") {
-        return;
-      }
-      var settingsFile = Path.Combine(Path.GetDirectoryName(assembly.Location)!, LogLevelVerbosityFile);
-      VerbosityLevel = File.Exists(settingsFile) ? 5 : 0;
-      if (VerbosityLevel > 0) {
-        Info("Verbose logging level 5 is enabled for: {0}", assembly.FullName);
-      }
-    }
   }
 }

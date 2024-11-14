@@ -50,7 +50,7 @@ sealed class DebugSettings : ModSettingsOwner {
   }
 
   void UpdateVerbosityLevel() {
-    DebugEx.LoggingSettings.VerbosityLevel = _verboseLogging.Value ? 5 : 0;
+    DebugEx.VerbosityLevel = _verboseLogging.Value ? DebugEx.LogLevel.Finer : DebugEx.LogLevel.Info;
   }
 
   #endregion
