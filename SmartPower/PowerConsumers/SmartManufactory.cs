@@ -4,7 +4,7 @@
 
 using System;
 using Bindito.Core;
-using IgorZ.SmartPower.PowerConsumers;
+using IgorZ.SmartPower.Core;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BuildingsBlocking;
 using Timberborn.EnterableSystem;
@@ -15,7 +15,7 @@ using Timberborn.Workshops;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
-namespace IgorZ.SmartPower.Core;
+namespace IgorZ.SmartPower.PowerConsumers;
 
 /// <summary>
 /// Component that extends the <see cref="MechanicalBuilding"/> behavior to conserve energy when manufactory can't

@@ -2,13 +2,13 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using IgorZ.SmartPower.PowerConsumers;
+using IgorZ.SmartPower.Core;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BuildingsBlocking;
 using Timberborn.EnterableSystem;
 using Timberborn.MechanicalSystem;
 
-namespace IgorZ.SmartPower.Core;
+namespace IgorZ.SmartPower.PowerConsumers;
 
 /// <summary>
 /// Component that extends the <see cref="MechanicalBuilding"/> behavior to conserve energy when powered attraction has
