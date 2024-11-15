@@ -7,10 +7,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using IgorZ.SmartPower.Settings;
+using IgorZ.SmartPower.Utils;
 using Timberborn.MechanicalSystem;
 using Timberborn.TickSystem;
 using Timberborn.TimeSystem;
 using UnityDev.Utils.LogUtilsLite;
+using UnityEngine;
 
 namespace IgorZ.SmartPower.Core;
 
@@ -26,11 +28,83 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
   /// <inheritdoc/>
   public void Tick() {
     HandleSmartLogic();
+    CurrentTick++;
+    _networkCache.Clear();
   }
 
   #endregion
 
   #region API
+
+  /// <summary>Gets the current tick number.</summary>
+  public int CurrentTick { get; private set; }
+
+  /// <summary>Tells if the smart logic can now start.</summary>
+  public bool SmartLogicStarted => CurrentTick > 1;
+
+  /// <summary>Gets the delayed action that will be executed after the specified number of ticks.</summary>
+  public TickDelayedAction GetTickDelayedAction(int skipTicks) {
+    return new TickDelayedAction(skipTicks, () => CurrentTick);
+  }
+
+  /// <summary>Gets the delayed action that will be executed after the specified number of game hours.</summary>
+  public TickDelayedAction GetTimeDelayedAction(float skipHours) {
+    var skipTicks = Mathf.CeilToInt(skipHours / _fixedDeltaTimeInHours);
+    return new TickDelayedAction(skipTicks, () => CurrentTick);
+  }
+
+  /// <summary>Gets batteries total charge and capacity.</summary>
+  public void GetBatteriesStat(MechanicalGraph graph, out int capacity, out float charge) {
+    var paused = Time.timeScale < float.Epsilon;
+    if (paused) {
+      _networkCache.Clear();
+    }
+    if (!_networkCache.TryGetValue(graph, out var cache)) {
+      cache = new NetworkCache();
+      foreach (var batteryCtrl in graph.BatteryControllers.Where(x => x.Operational)) {
+        cache.BatteriesCapacity += batteryCtrl.Capacity;
+        cache.BatteriesCharge += batteryCtrl.Charge;
+      }
+      if (!paused) {
+        _networkCache[graph] = cache;
+      }
+    }
+    capacity = cache.BatteriesCapacity;
+    charge = cache.BatteriesCharge;
+  }
+
+  /// <summary>Gets power reservation in the network.</summary>
+  public int GetReservedPower(MechanicalGraph graph) {
+    if (!_reservedPowerCache.TryGetValue(graph, out var reserved)) {
+      reserved = _powerReservations.Where(x => x.Node.Graph == graph).Sum(x => x.Reserved);
+      _reservedPowerCache.Add(graph, reserved);
+      DebugEx.Fine("Power reservation updated: graph={0}", graph.GetHashCode(), reserved);
+    }
+    return reserved;
+  }
+
+  /// <summary>Reserves power for the node.</summary>
+  /// <param name="node">The node to reserve power for.</param>
+  /// <param name="newReserved">The new amount of power to reserve. If negative, remove the reservation.</param>
+  public void ReservePower(MechanicalNode node, int newReserved) {
+    if (newReserved < 0) {
+      DebugEx.Fine("Remove power reservation: node={0}", node);
+      _powerReservations.RemoveAll(x => x.Node == node);
+      _reservedPowerCache.Remove(node.Graph);
+      return;
+    }
+    var reservation = _powerReservations.FirstOrDefault(x => x.Node == node);
+    if (reservation == null) {
+      DebugEx.Fine("Add power reservation: node={0}, reserved={1}", node, newReserved);
+      reservation = new PowerReservation { Node = node, Reserved = newReserved };
+      _powerReservations.Add(reservation);
+    } else {
+      DebugEx.Fine("Update power reservation: node={0}, oldReserved={1}, newReserved={2}",
+                   node, reservation.Reserved, newReserved);
+      reservation.Reserved = newReserved;
+    }
+    _reservedPowerCache.Remove(node.Graph);
+  }
 
   /// <summary>Tells whether the generator is registered in the system.</summary>
   public bool IsGeneratorRegistered(ISuspendableGenerator generator) {
@@ -110,6 +184,20 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
   #endregion
 
   #region Implementation
+
+  struct NetworkCache {
+    public int BatteriesCapacity;
+    public float BatteriesCharge;
+  }
+  readonly Dictionary<MechanicalGraph, NetworkCache> _networkCache = [];
+
+  class PowerReservation {
+    public MechanicalNode Node;
+    public int Reserved;
+  }
+  readonly List<PowerReservation> _powerReservations = [];
+
+  readonly Dictionary<MechanicalGraph, int> _reservedPowerCache = [];
 
   /// <summary>
   /// Orders the generators so that the generators with the lowest priority and the lowest power output are first.
