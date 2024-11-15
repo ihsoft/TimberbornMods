@@ -47,10 +47,9 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
     return new TickDelayedAction(skipTicks, () => CurrentTick);
   }
 
-  /// <summary>Gets the delayed action that will be executed after the specified number of game hours.</summary>
-  public TickDelayedAction GetTimeDelayedAction(float skipHours) {
-    var skipTicks = Mathf.CeilToInt(skipHours / _fixedDeltaTimeInHours);
-    return new TickDelayedAction(skipTicks, () => CurrentTick);
+  /// <summary>Gets the delayed action that will be executed after the specified number of game minutes.</summary>
+  public TickDelayedAction GetTimeDelayedAction(int skipMinutes) {
+    return new TickDelayedAction(Mathf.CeilToInt(skipMinutes / _fixedDeltaTimeInHours), () => CurrentTick);
   }
 
   /// <summary>Gets batteries total charge and capacity.</summary>
