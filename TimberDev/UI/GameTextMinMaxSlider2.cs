@@ -6,6 +6,10 @@ using TimberApi.UIBuilderSystem.StyleSheetSystem.Extensions;
 using TimberApi.UIBuilderSystem.StyleSheetSystem.PropertyEnums;
 using UnityEngine;
 
+// ReSharper disable MemberCanBePrivate.Global
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 namespace IgorZ.TimberDev.UI;
 
 // TimberAPI preset for the fixed MinMaxSlider2 control.

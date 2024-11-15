@@ -13,6 +13,14 @@ using UnityEngine;
 using UnityEngine.Internal;
 using UnityEngine.UIElements;
 
+// ReSharper disable RedundantDefaultMemberInitializer
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable InconsistentNaming
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable LocalVariableHidesMember
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 namespace IgorZ.TimberDev.UI;
 
 public class MinMaxSlider2 : BaseField<Vector2> {
@@ -432,15 +440,15 @@ public class MinMaxSlider2 : BaseField<Vector2> {
   [Serializable]
   public new class
       UxmlSerializedData : BaseField<Vector2>.UxmlSerializedData, IUxmlSerializedDataCustomAttributeHandler {
-    [SerializeField] float lowLimit;
+    [SerializeField] float lowLimit = 0;
 
     [HideInInspector] [UxmlIgnore] [SerializeField]
-    UxmlAttributeFlags lowLimit_UxmlAttributeFlags;
+    UxmlAttributeFlags lowLimit_UxmlAttributeFlags = UxmlAttributeFlags.DefaultValue;
 
-    [SerializeField] float highLimit;
+    [SerializeField] float highLimit = 0;
 
     [UxmlIgnore] [SerializeField] [HideInInspector]
-    UxmlAttributeFlags highLimit_UxmlAttributeFlags;
+    UxmlAttributeFlags highLimit_UxmlAttributeFlags = UxmlAttributeFlags.DefaultValue;
 
     void IUxmlSerializedDataCustomAttributeHandler.SerializeCustomAttributes(
         IUxmlAttributes bag, HashSet<string> handledAttributes) {
