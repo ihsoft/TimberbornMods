@@ -24,9 +24,7 @@ sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).AssemblyQualifiedName;
 
   public void Configure(IContainerDefinition containerDefinition) {
-    HarmonyPatcher.PatchRepeated(
-        PatchId + "-core",
-        typeof(MechanicalBuildingPatch), typeof(MechanicalNodePatch));
+    HarmonyPatcher.PatchRepeated(PatchId + "-core", typeof(MechanicalBuildingPatch));
     containerDefinition.Bind<SmartPowerService>().AsSingleton();
     CustomizableInstantiator.AddPatcher(PatchId + "-instantiator", PatchMethod);
   }

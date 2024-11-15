@@ -8,6 +8,7 @@ IgorZ.SmartPower.PowerOutputBalancer.AutomateGenerator,"Автоматическ
 IgorZ.SmartPower.PowerOutputBalancer.ChargeBatteriesRangeText,"Заряжать батареи в диапазоне {0}% - {1}%",
 IgorZ.SmartPower.PowerOutputBalancer.ApplyToAllGenerators,"Применить ко всем генераторам",
 IgorZ.SmartPower.PowerOutputBalancer.AppliedToGenerators,"Применено к {0} генераторам",
+IgorZ.SmartPower.PowerOutputBalancer.SuspendedModeStatus,"Остановлено из-за избытка энергии",
 IgorZ.SmartPower.MechanicalBuilding.NoWorkersStatus,"<SolidHighlight>⏻</SolidHighlight> Никого нет на рабочем месте",
 IgorZ.SmartPower.MechanicalBuilding.NoFuelStatus,"<SolidHighlight>⏻</SolidHighlight> Закончилось топливо",
 IgorZ.SmartPower.MechanicalBuilding.NoInputStatus,"<SolidHighlight>⏻</SolidHighlight> Не хватает ингредиентов",

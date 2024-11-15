@@ -6,39 +6,32 @@ using System.Collections.Generic;
 using System.Linq;
 using Bindito.Core;
 using IgorZ.SmartPower.Core;
-using Timberborn.BaseComponentSystem;
+using IgorZ.SmartPower.Settings;
+using IgorZ.SmartPower.Utils;
+using Timberborn.Attractions;
 using Timberborn.BlockSystem;
 using Timberborn.BuildingsBlocking;
 using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
 using Timberborn.Persistence;
 using Timberborn.StatusSystem;
+using Timberborn.TickSystem;
+using Timberborn.Workshops;
 using UnityDev.Utils.LogUtilsLite;
-using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace IgorZ.SmartPower.PowerConsumers;
 
-sealed class PowerInputLimiter : BaseComponent, ISuspendableConsumer, IPersistentEntity, IFinishedStateListener, IPostInitializableLoadedEntity {
-  const string ShutdownStatusIcon = "IgorZ/status-icon-standby";
-  const string PowerShutdownModeLocKey = "IgorZ.SmartPower.PowerInputLimiter.PowerShutdownModeStatus";
-
-  #region Unity conrolled fields
-  // ReSharper disable InconsistentNaming
-  // ReSharper disable RedundantDefaultMemberInitializer
-
-  /// <summary>Tells if the generator should be automatically enrolled to be automated once created.</summary>
-  [SerializeField]
-  [Tooltip("Consumers with higher priority will be resumed first and suspended last.")]
-  internal int _priority = 0;
-
-  // ReSharper restore InconsistentNaming
-  // ReSharper restore RedundantDefaultMemberInitializer
-  #endregion
+sealed class PowerInputLimiter
+    : TickableComponent, IPersistentEntity, IFinishedStateListener, IPostInitializableLoadedEntity {
 
   #region API
 
+  /// <summary>Indicates if the generator is currently suspended.</summary>
+  public bool IsSuspended { get; private set; }
+
   /// <summary>Returns balancers in the same network.</summary>
-  public IEnumerable<PowerInputLimiter> AllLimiters => MechanicalNode.Graph.Nodes
+  public IEnumerable<PowerInputLimiter> AllLimiters => _mechanicalNode.Graph.Nodes
       .Select(x => x.GetComponentFast<PowerInputLimiter>())
       .Where(x => x != null && x.name == name);
 
@@ -47,59 +40,53 @@ sealed class PowerInputLimiter : BaseComponent, ISuspendableConsumer, IPersisten
     get => _automate;
     set {
       _automate = value;
-      UpdateRegistration();
+      UpdateState();
     }
   }
   bool _automate;
 
-  /// <inheritdoc/>
-  public bool CheckBatteryCharge { get; set; }
-
-  /// <inheritdoc/>
-  public string StableUniqueId => _stableUniqueId ??= DebugEx.BaseComponentToString(this);
-  string _stableUniqueId;
-
-  /// <inheritdoc/>
-  public int Priority => _priority;
-
-  /// <inheritdoc/>
-  public MechanicalNode MechanicalNode { get; private set; }
-
-  /// <inheritdoc/>
-  public int DesiredPower { get; private set; }
-
-  /// <inheritdoc/>
-  public bool IsSuspended { get; private set; }
-
-  /// <inheritdoc/>
+  /// <summary>The minimum network efficiency to keep the consumer working.</summary>
+  /// <remarks>This value can change in runtime without notifying SmartPowerSystem.</remarks>
   public float MinPowerEfficiency { get; set; } = 0.9f;
 
-  /// <inheritdoc/>
+  /// <summary>Tells the consumer should suspend if batteries charge drops below the threshold.</summary>
+  /// <remarks>This value can change in runtime without notifying SmartPowerSystem.</remarks>
+  /// <seealso cref="MinBatteriesCharge"/>
+  public bool CheckBatteryCharge { get; set; }
+
+  /// <summary>The minimum level of the batteries to keep the consumer working.</summary>
+  /// <remarks>This value can change in runtime without notifying SmartPowerSystem.</remarks>
+  /// <seealso cref="CheckBatteryCharge"/>
   public float MinBatteriesCharge { get; set; } = 0.3f;
 
+  /// <summary>
+  /// Sets the new desired power of the consumer. If the value is negative, then the nominal power input is used.
+  /// </summary>
+  public void SetDesiredPower(int power) {
+    var newPower = power < 0 ? _nominalPowerInput : power;
+    if (_desiredPower == newPower) {
+      return;
+    }
+    _desiredPower = newPower;
+    if (IsSuspended) {
+      _smartPowerService.ReservePower(_mechanicalNode, _desiredPower);
+    }
+  }
+
+  #endregion
+
+  #region TickableComponent overrides
+
   /// <inheritdoc/>
-  public void Suspend(bool forceStop) {
-    IsSuspended = true;
-    _blockableBuilding.Block(this);
-    _shutdownStatus.Activate();
+  public override void StartTickable() {
+    SetupDelays();
+    base.StartTickable();
   }
 
   /// <inheritdoc/>
-  public void Resume() {
-    IsSuspended = false;
-    _blockableBuilding.Unblock(this);
-    _shutdownStatus.Deactivate();
-  }
-
-  /// <inheritdoc/>
-  public void OverrideValues(int? power=null) {
-    if (power.HasValue && power.Value != DesiredPower) {
-      var newValue = power.Value >= 0 ? power.Value : _nominalPowerInput;
-      if (newValue != DesiredPower) {
-        HostedDebugLog.Fine(this, "Override power: {0} -> {1}", DesiredPower, newValue);
-        DesiredPower = newValue;
-        _smartPowerService.UpdateConsumerOverrides(this);
-      }
+  public override void Tick() {
+    if (_smartPowerService.SmartLogicStarted) {
+      UpdateState();
     }
   }
 
@@ -110,22 +97,21 @@ sealed class PowerInputLimiter : BaseComponent, ISuspendableConsumer, IPersisten
   /// <inheritdoc/>
   public void OnEnterFinishedState() {
     enabled = true;
-    UpdateRegistration();
   }
 
   /// <inheritdoc/>
   public void OnExitFinishedState() {
     enabled = false;
-    _smartPowerService.UnregisterConsumer(this);
   }
 
   #endregion
 
   #region IPostInitializableLoadedEntity implementation
 
+  /// <inheritdoc/>
   public void PostInitializeLoadedEntity() {
     if (enabled && IsSuspended) {
-      Suspend(true);
+      Suspend();
     }
   }
 
@@ -167,13 +153,24 @@ sealed class PowerInputLimiter : BaseComponent, ISuspendableConsumer, IPersisten
 
   #region Implementation
 
+  const string ShutdownStatusIcon = "IgorZ/status-icon-standby";
+  const string PowerShutdownModeLocKey = "IgorZ.SmartPower.PowerInputLimiter.PowerShutdownModeStatus";
+
   ILoc _loc;
+  SmartPowerService _smartPowerService;
+
   BlockableBuilding _blockableBuilding;
   PausableBuilding _pausableBuilding;
   StatusToggle _shutdownStatus;
-  SmartPowerService _smartPowerService;
 
   int _nominalPowerInput;
+  MechanicalNode _mechanicalNode;
+  TickDelayedAction _resumeDelayedAction;
+  TickDelayedAction _suspendDelayedAction;
+
+  int _desiredPower;
+
+  bool SmartLogicActive => enabled && Automate && !_pausableBuilding.Paused;
 
   /// <summary>It must be public for the injection logic to work.</summary>
   [Inject]
@@ -183,31 +180,105 @@ sealed class PowerInputLimiter : BaseComponent, ISuspendableConsumer, IPersisten
   }
 
   void Awake() {
-    MechanicalNode = GetComponentFast<MechanicalNode>();
+    _mechanicalNode = GetComponentFast<MechanicalNode>();
     _nominalPowerInput = GetComponentFast<MechanicalNodeSpecification>().PowerInput;
-    DesiredPower = _nominalPowerInput;
+    _desiredPower = _nominalPowerInput;
     _blockableBuilding = GetComponentFast<BlockableBuilding>();
     _pausableBuilding = GetComponentFast<PausableBuilding>();
-    _pausableBuilding.PausedChanged += (_, _) => UpdateRegistration();
+    _pausableBuilding.PausedChanged += (_, _) => UpdateState();
+    //FIXME: Control via settings.
     _shutdownStatus =
         StatusToggle.CreateNormalStatusWithFloatingIcon(ShutdownStatusIcon, _loc.T(PowerShutdownModeLocKey));
     GetComponentFast<StatusSubject>().RegisterStatus(_shutdownStatus);
+
     enabled = false;
   }
 
-  void UpdateRegistration() {
-    if (!enabled) {
+  void UpdateState() {
+    if (IsSuspended && !SmartLogicActive) {
+      Resume();
+    }
+    if (SmartLogicActive) {
+      HandleSmartLogic();
+    }
+  }
+
+  void HandleSmartLogic() {
+    _smartPowerService.GetBatteriesStat(_mechanicalNode.Graph, out var capacity, out var charge);
+
+    // Shutdown if batteries are low (and present in the network).
+    if (CheckBatteryCharge && capacity > 0) {
+      var chargeRatio = charge / capacity;
+      if (chargeRatio < MinBatteriesCharge) {
+        if (!IsSuspended) {
+          Suspend(); // Suspend to not drain batteries.
+        }
+        return;
+      }
+    }
+
+    var currentPower = _mechanicalNode.Graph.CurrentPower;
+    var demand = (float) currentPower.PowerDemand;
+    var supply = (float) currentPower.PowerSupply;
+
+    // Resume if power efficiency has improved.
+    if (IsSuspended) {
+      var newFlow = supply - demand - _desiredPower;
+      var estimatedCharge = charge + newFlow * NetworkUISettings.BatteryRatioHysteresis;
+      if (CheckBatteryCharge && capacity > 0 && estimatedCharge / capacity < MinBatteriesCharge) {
+        return; // If resumed, batteries will be drained too fast (a hysteresis check).
+      }
+      var noBatteryEfficiency = supply / (demand + _desiredPower);
+      if (noBatteryEfficiency < MinPowerEfficiency && (capacity == 0 || estimatedCharge < 0)) {
+        return; // No batteries and not enough supply.
+      }
+      _resumeDelayedAction.Execute(Resume);
       return;
     }
-    if (_automate && !_pausableBuilding.Paused && !_smartPowerService.IsConsumerRegistered(this)) {
-      _smartPowerService.RegisterConsumer(this);
+
+    // Suspend if power efficiency has dropped.
+    if (currentPower.PowerEfficiency < MinPowerEfficiency) {
+      _suspendDelayedAction.Execute(Suspend);
     }
-    if ((!_automate || _pausableBuilding.Paused) && _smartPowerService.IsConsumerRegistered(this)) {
-      if (IsSuspended) {
-        Resume();
-      }
-      _smartPowerService.UnregisterConsumer(this);
+  }
+
+  void Suspend() {
+    HostedDebugLog.Fine(
+        this, "Suspend consumer: currentPower={0}, desiredPower={1}", _mechanicalNode.PowerInput, _desiredPower);
+    IsSuspended = true;
+    _blockableBuilding.Block(this);
+    _shutdownStatus.Activate();
+    _smartPowerService.ReservePower(_mechanicalNode, _desiredPower);
+  }
+
+  void Resume() {
+    HostedDebugLog.Fine(this, "Resume consumer: desiredPower={0}, nominalPower={1}", _desiredPower, _nominalPowerInput);
+    IsSuspended = false;
+    _blockableBuilding.Unblock(this);
+    _shutdownStatus.Deactivate();
+    _smartPowerService.ReservePower(_mechanicalNode, -1);
+  }
+
+  // FIXME: Get delays from settings
+  void SetupDelays() {
+    var manufactory = GetComponentFast<Manufactory>();
+    if (manufactory
+        && (manufactory.ProductionRecipes.Length > 1
+            || manufactory.ProductionRecipes[0].Ingredients.Count > 0
+            || manufactory.ProductionRecipes[0].ConsumesFuel)) {
+      _suspendDelayedAction = _smartPowerService.GetTimeDelayedAction(60);
+      _resumeDelayedAction = _smartPowerService.GetTimeDelayedAction(60);
+      return;
     }
+
+    if (GetComponentFast<Attraction>()) {
+      _suspendDelayedAction = _smartPowerService.GetTimeDelayedAction(60);
+      _resumeDelayedAction = _smartPowerService.GetTimeDelayedAction(30);
+      return;
+    }
+
+    _suspendDelayedAction = _smartPowerService.GetTickDelayedAction(1);
+    _resumeDelayedAction = _smartPowerService.GetTickDelayedAction(1);
   }
 
   #endregion

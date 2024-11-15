@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using IgorZ.SmartPower.PowerConsumers;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BuildingsBlocking;
 using Timberborn.EnterableSystem;
@@ -23,11 +24,15 @@ public sealed class SmartPoweredAttraction : BaseComponent, IAdjustablePowerInpu
   /// <inheritdoc/>
   public int UpdateAndGetPowerInput() {
     if (_mechanicalBuilding.ConsumptionDisabled || _blockableBuilding && !_blockableBuilding.IsUnblocked) {
-      _suspendableConsumer?.OverrideValues(power: -1);
+      if (_powerInputLimiter) {
+        _powerInputLimiter.SetDesiredPower(-1);
+      }
       return 0;
     }
     var newInput = _enterable.NumberOfEnterersInside == 0 ? NoAttendeesPowerConsumption : _nominalPowerInput;
-    _suspendableConsumer?.OverrideValues(power: newInput);
+    if (_powerInputLimiter) {
+      _powerInputLimiter.SetDesiredPower(newInput);
+    }
     return newInput;
   }
 
@@ -38,7 +43,7 @@ public sealed class SmartPoweredAttraction : BaseComponent, IAdjustablePowerInpu
   MechanicalBuilding _mechanicalBuilding;
   BlockableBuilding _blockableBuilding;
   Enterable _enterable;
-  ISuspendableConsumer _suspendableConsumer;
+  PowerInputLimiter _powerInputLimiter;
 
   int _nominalPowerInput;
 
@@ -46,7 +51,7 @@ public sealed class SmartPoweredAttraction : BaseComponent, IAdjustablePowerInpu
     _mechanicalBuilding = GetComponentFast<MechanicalBuilding>();
     _blockableBuilding = GetComponentFast<BlockableBuilding>();
     _enterable = GetComponentFast<Enterable>();
-    _suspendableConsumer = GetComponentFast<ISuspendableConsumer>();
+    _powerInputLimiter = GetComponentFast<PowerInputLimiter>();
     _nominalPowerInput = GetComponentFast<MechanicalNodeSpecification>().PowerInput;
   }
 

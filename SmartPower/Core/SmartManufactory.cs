@@ -4,6 +4,7 @@
 
 using System;
 using Bindito.Core;
+using IgorZ.SmartPower.PowerConsumers;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BuildingsBlocking;
 using Timberborn.EnterableSystem;
@@ -73,7 +74,9 @@ public class SmartManufactory : BaseComponent, IAdjustablePowerInput {
         || _blockableBuilding && !_blockableBuilding.IsUnblocked
         || !_manufactory.HasCurrentRecipe) {
       AllWorkersOut = MissingIngredients = BlockedOutput = NoFuel = StandbyMode = false;
-      _suspendableConsumer?.OverrideValues(power: -1);
+      if (_powerInputLimiter) {
+        _powerInputLimiter.SetDesiredPower(-1);
+      }
       return 0;
     }
 
@@ -84,7 +87,9 @@ public class SmartManufactory : BaseComponent, IAdjustablePowerInput {
     StandbyMode = AllWorkersOut || MissingIngredients || NoFuel || BlockedOutput;
     var newInput = Math.Max(
         Mathf.RoundToInt(_nominalPowerInput * (StandbyMode ? NonFuelRecipeIdleStateConsumption : 1f)), 1);
-    _suspendableConsumer?.OverrideValues(power: newInput);
+    if (_powerInputLimiter) {
+      _powerInputLimiter.SetDesiredPower(newInput);
+    }
     return newInput;
   }
 
@@ -101,7 +106,7 @@ public class SmartManufactory : BaseComponent, IAdjustablePowerInput {
   BlockableBuilding _blockableBuilding;
   Manufactory _manufactory;
   Enterable _enterable;
-  ISuspendableConsumer _suspendableConsumer;
+  PowerInputLimiter _powerInputLimiter;
   StatusToggle _standbyStatus;
 
   int _nominalPowerInput;
@@ -118,7 +123,7 @@ public class SmartManufactory : BaseComponent, IAdjustablePowerInput {
     _blockableBuilding = GetComponentFast<BlockableBuilding>();
     _manufactory = GetComponentFast<Manufactory>();
     _enterable = GetComponentFast<Enterable>();
-    _suspendableConsumer = GetComponentFast<ISuspendableConsumer>();
+    _powerInputLimiter = GetComponentFast<PowerInputLimiter>();
     _standbyStatus = StatusToggle.CreateNormalStatus(StandbyStatusIcon, _loc.T(PowerSavingModeLocKey));
     var subject = GetComponentFast<StatusSubject>();
     subject.RegisterStatus(_standbyStatus);

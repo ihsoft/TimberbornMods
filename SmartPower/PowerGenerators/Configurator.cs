@@ -18,6 +18,8 @@ namespace IgorZ.SmartPower.PowerGenerators;
 sealed class Configurator : IConfigurator {
   static readonly PrefabPatcher.RequiredComponentsDep GoodConsumingGeneratorDep =
       new(typeof(MechanicalBuilding), typeof(GoodPoweredGenerator));
+  static readonly PrefabPatcher.RequiredComponentsDep WalkerPoweredGeneratorDep =
+      new(typeof(MechanicalBuilding), typeof(WalkerPoweredGenerator));
   static readonly string PatchId = typeof(Configurator).AssemblyQualifiedName;
 
   public void Configure(IContainerDefinition containerDefinition) {
@@ -26,9 +28,7 @@ sealed class Configurator : IConfigurator {
   }
 
   static void PatchMethod(GameObject prefab) {
-    PrefabPatcher.AddComponent<SmartGoodConsumingGenerator>(
-      prefab, GoodConsumingGeneratorDep.Check, onAdd: balancer => {
-        balancer._automatedByDefault = true;
-      });
+    PrefabPatcher.AddComponent<SmartGoodConsumingGenerator>(prefab, GoodConsumingGeneratorDep.Check);
+    PrefabPatcher.AddComponent<SmartWalkerPoweredGenerator>(prefab, WalkerPoweredGeneratorDep.Check);
   }
 }
