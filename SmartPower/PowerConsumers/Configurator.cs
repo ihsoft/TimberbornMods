@@ -3,9 +3,10 @@
 // License: Public Domain
 
 using Bindito.Core;
-using HarmonyLib;
 using IgorZ.TimberDev.Utils;
+using Timberborn.Attractions;
 using Timberborn.MechanicalSystem;
+using Timberborn.Workshops;
 using UnityEngine;
 
 // ReSharper disable InconsistentNaming
@@ -16,9 +17,9 @@ namespace IgorZ.SmartPower.PowerConsumers;
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
   static readonly PrefabPatcher.RequiredComponentsDep PoweredManufactoryDep =
-      new(typeof(MechanicalBuilding), AccessTools.TypeByName("Timberborn.Workshops.ManufactorySpec"));
+      new(typeof(MechanicalBuilding), typeof(ManufactorySpec));
   static readonly PrefabPatcher.RequiredComponentsDep PoweredAttractionDep =
-      new(typeof(MechanicalBuilding), AccessTools.TypeByName("Timberborn.Attractions.AttractionSpec"));
+      new(typeof(MechanicalBuilding), typeof(AttractionSpec));
   static readonly string PatchId = typeof(Configurator).AssemblyQualifiedName;
 
   public void Configure(IContainerDefinition containerDefinition) {

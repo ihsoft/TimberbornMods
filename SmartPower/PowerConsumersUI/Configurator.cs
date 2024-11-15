@@ -10,8 +10,6 @@ namespace IgorZ.SmartPower.PowerConsumersUI;
 [Context("Game")]
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
-  static readonly string PatchId = typeof(Configurator).FullName;
-
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<PowerInputLimiterFragment>().AsSingleton();
     containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
