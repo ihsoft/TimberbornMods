@@ -21,10 +21,10 @@ IgorZ.SmartPower.PowerInputLimiter.ApplyToAllBuildings,"Применить ко 
 IgorZ.SmartPower.PowerInputLimiter.AppliedToBuildings,"Применено к {0} зданиям",
 IgorZ.SmartPower.PowerInputLimiter.PowerShutdownModeStatus,"Остановлено для экономии энергии",
 IgorZ.SmartPower.PowerInputLimiter.NotEnoughPowerStatus,"<RedHighlight>⏻</RedHighlight> Недостаточно энергии",
+IgorZ.SmartPower.Settings.DebugSection,"Отладка и устранение неполадок",
+IgorZ.SmartPower.Settings.Debug.VerboseLogging,"Детальные журналы",
+IgorZ.SmartPower.Settings.Debug.VerboseLoggingTooltip,"В журналы игры будет записываться больше полезной информации, но это может повлиять на производительность игры."
 IgorZ.SmartPower.Settings.NetworkUISection,"Сеть",
 IgorZ.SmartPower.Settings.NetworkUI.ShowBatteryVitals,"Показывать состояние батарей",
 IgorZ.SmartPower.Settings.NetworkUI.BatteryRatioHysteresis,"Гистерезис актвиации потребителей (часы)",
 IgorZ.SmartPower.Settings.NetworkUI.BatteryRatioHysteresisTooltip,"Потребители не будут включаться если не смогут поддерживать условия по энергии не менее указанного значения.",
-IgorZ.SmartPower.Settings.DebugSection,"Отладка и устранение неполадок",
-IgorZ.SmartPower.Settings.Debug.VerboseLogging,"Детальные журналы",
-IgorZ.SmartPower.Settings.Debug.VerboseLoggingTooltip,"В журналы игры будет записываться больше полезной информации, но это может повлиять на производительность игры."
