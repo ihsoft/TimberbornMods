@@ -12,7 +12,12 @@ sealed class Configurator : IConfigurator {
   internal static string ModId => "Timberborn.IgorZ.SmartPower";
 
   public void Configure(IContainerDefinition containerDefinition) {
-    containerDefinition.Bind<DebugSettings>().AsSingleton();
     containerDefinition.Bind<NetworkUISettings>().AsSingleton();
+    containerDefinition.Bind<WalkerPoweredGeneratorSettings>().AsSingleton();
+    containerDefinition.Bind<GoodConsumingGeneratorSettings>().AsSingleton();
+    containerDefinition.Bind<WorkplaceConsumerSettings>().AsSingleton();
+    containerDefinition.Bind<UnmannedConsumerSettings>().AsSingleton();
+    containerDefinition.Bind<AttractionConsumerSettings>().AsSingleton();
+    containerDefinition.Bind<DebugSettings>().AsSingleton();
   }
 }

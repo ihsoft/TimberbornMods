@@ -2,18 +2,13 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using IgorZ.SmartPower.Utils;
+using Bindito.Core;
+using IgorZ.SmartPower.Settings;
 using Timberborn.GoodConsumingBuildingSystem;
 
 namespace IgorZ.SmartPower.PowerGenerators;
 
 sealed class SmartGoodConsumingGenerator : PowerOutputBalancer {
-
-  /// <inheritdoc/>
-  protected override void GetActionDelays(out TickDelayedAction resumeAction, out TickDelayedAction suspendAction) {
-    resumeAction = SmartPowerService.GetTickDelayedAction(0);
-    suspendAction = SmartPowerService.GetTickDelayedAction(0);
-  }
 
   /// <inheritdoc/>
   protected override void Suspend() {
@@ -32,11 +27,19 @@ sealed class SmartGoodConsumingGenerator : PowerOutputBalancer {
     base.Resume();
   }
 
+  GoodConsumingGeneratorSettings _settings;
   GoodConsumingBuilding _goodConsumingBuilding;
   GoodConsumingToggle _goodConsumingToggle;
 
+  [Inject]
+  public void InjectDependencies(GoodConsumingGeneratorSettings settings) {
+    _settings = settings;
+  }
+
   protected override void Awake() {
+    ShowFloatingIcon = _settings.ShowFloatingIcon.Value;
     base.Awake();
+
     _goodConsumingBuilding = GetComponentFast<GoodConsumingBuilding>();
     _goodConsumingToggle = _goodConsumingBuilding.GetGoodConsumingToggle();
     Automate = true;

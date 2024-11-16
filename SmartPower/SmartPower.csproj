@@ -48,6 +48,9 @@
       <Reference Include="System.Collections.Immutable">
         <HintPath>..\Dependencies\GameRoot\Timberborn_Data\Managed\System.Collections.Immutable.dll</HintPath>
       </Reference>
+      <Reference Include="TimberApi">
+        <HintPath>..\Dependencies\Workshop\3288241660\core\TimberApi.dll</HintPath>
+      </Reference>
       <Reference Include="TimberApi.UIBuilderSystem">
         <HintPath>..\Dependencies\Workshop\3288241660\core\TimberApi.UIBuilderSystem.dll</HintPath>
       </Reference>

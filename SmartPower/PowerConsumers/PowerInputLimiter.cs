@@ -16,9 +16,8 @@ using Timberborn.MechanicalSystem;
 using Timberborn.Persistence;
 using Timberborn.StatusSystem;
 using Timberborn.TickSystem;
-using Timberborn.Workshops;
+using Timberborn.WorkSystem;
 using UnityDev.Utils.LogUtilsLite;
-using UnityEngine.Serialization;
 
 namespace IgorZ.SmartPower.PowerConsumers;
 
@@ -76,12 +75,6 @@ sealed class PowerInputLimiter
   #endregion
 
   #region TickableComponent overrides
-
-  /// <inheritdoc/>
-  public override void StartTickable() {
-    SetupDelays();
-    base.StartTickable();
-  }
 
   /// <inheritdoc/>
   public override void Tick() {
@@ -158,6 +151,9 @@ sealed class PowerInputLimiter
 
   ILoc _loc;
   SmartPowerService _smartPowerService;
+  AttractionConsumerSettings _attractionConsumerSettings;
+  UnmannedConsumerSettings _unmannedConsumerSettings;
+  WorkplaceConsumerSettings _workplaceConsumerSettings;
 
   BlockableBuilding _blockableBuilding;
   PausableBuilding _pausableBuilding;
@@ -174,9 +170,15 @@ sealed class PowerInputLimiter
 
   /// <summary>It must be public for the injection logic to work.</summary>
   [Inject]
-  public void InjectDependencies(ILoc loc, SmartPowerService smartPowerService) {
+  public void InjectDependencies(ILoc loc, SmartPowerService smartPowerService,
+                                 AttractionConsumerSettings attractionConsumerSettings,
+                                 UnmannedConsumerSettings unmannedConsumerSettings,
+                                 WorkplaceConsumerSettings workplaceConsumerSettings) {
     _loc = loc;
     _smartPowerService = smartPowerService;
+    _attractionConsumerSettings = attractionConsumerSettings;
+    _unmannedConsumerSettings = unmannedConsumerSettings;
+    _workplaceConsumerSettings = workplaceConsumerSettings;
   }
 
   void Awake() {
@@ -186,9 +188,29 @@ sealed class PowerInputLimiter
     _blockableBuilding = GetComponentFast<BlockableBuilding>();
     _pausableBuilding = GetComponentFast<PausableBuilding>();
     _pausableBuilding.PausedChanged += (_, _) => UpdateState();
-    //FIXME: Control via settings.
-    _shutdownStatus =
-        StatusToggle.CreateNormalStatusWithFloatingIcon(ShutdownStatusIcon, _loc.T(PowerShutdownModeLocKey));
+    
+    bool showFloatingIcon;
+    if (GetComponentFast<Attraction>()) {
+      showFloatingIcon = _attractionConsumerSettings.ShowFloatingIcon.Value;
+      _suspendDelayedAction =
+          _smartPowerService.GetTimeDelayedAction(_attractionConsumerSettings.SuspendDelayMinutes.Value);
+      _resumeDelayedAction =
+          _smartPowerService.GetTimeDelayedAction(_attractionConsumerSettings.ResumeDelayMinutes.Value);
+    } else if (GetComponentFast<Workplace>()) {
+      showFloatingIcon = _workplaceConsumerSettings.ShowFloatingIcon.Value;
+      _suspendDelayedAction =
+          _smartPowerService.GetTimeDelayedAction(_workplaceConsumerSettings.SuspendDelayMinutes.Value);
+      _resumeDelayedAction =
+          _smartPowerService.GetTimeDelayedAction(_workplaceConsumerSettings.ResumeDelayMinutes.Value);
+    } else {
+      showFloatingIcon = _unmannedConsumerSettings.ShowFloatingIcon.Value;
+      _suspendDelayedAction = _smartPowerService.GetTickDelayedAction(1);
+      _resumeDelayedAction = _smartPowerService.GetTickDelayedAction(1);
+    }
+    
+    _shutdownStatus = showFloatingIcon
+        ? StatusToggle.CreateNormalStatusWithFloatingIcon(ShutdownStatusIcon, _loc.T(PowerShutdownModeLocKey))
+        : StatusToggle.CreateNormalStatus(ShutdownStatusIcon, _loc.T(PowerShutdownModeLocKey));
     GetComponentFast<StatusSubject>().RegisterStatus(_shutdownStatus);
 
     enabled = false;
@@ -257,28 +279,6 @@ sealed class PowerInputLimiter
     _blockableBuilding.Unblock(this);
     _shutdownStatus.Deactivate();
     _smartPowerService.ReservePower(_mechanicalNode, -1);
-  }
-
-  // FIXME: Get delays from settings
-  void SetupDelays() {
-    var manufactory = GetComponentFast<Manufactory>();
-    if (manufactory
-        && (manufactory.ProductionRecipes.Length > 1
-            || manufactory.ProductionRecipes[0].Ingredients.Count > 0
-            || manufactory.ProductionRecipes[0].ConsumesFuel)) {
-      _suspendDelayedAction = _smartPowerService.GetTimeDelayedAction(60);
-      _resumeDelayedAction = _smartPowerService.GetTimeDelayedAction(60);
-      return;
-    }
-
-    if (GetComponentFast<Attraction>()) {
-      _suspendDelayedAction = _smartPowerService.GetTimeDelayedAction(60);
-      _resumeDelayedAction = _smartPowerService.GetTimeDelayedAction(30);
-      return;
-    }
-
-    _suspendDelayedAction = _smartPowerService.GetTickDelayedAction(1);
-    _resumeDelayedAction = _smartPowerService.GetTickDelayedAction(1);
   }
 
   #endregion

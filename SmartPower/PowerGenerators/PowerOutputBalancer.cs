@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Bindito.Core;
 using IgorZ.SmartPower.Core;
-using IgorZ.SmartPower.Settings;
 using IgorZ.SmartPower.Utils;
 using Timberborn.BlockSystem;
 using Timberborn.BuildingsBlocking;
@@ -41,7 +40,7 @@ abstract class PowerOutputBalancer
     get => _automate;
     set {
       _automate = value;
-      UpdateStatus();
+      UpdateState();
     }
   }
   bool _automate;
@@ -56,15 +55,9 @@ abstract class PowerOutputBalancer
   #region TickableComponent overrides
 
   /// <inheritdoc/>
-  public override void StartTickable() {
-    SetupDelays();
-    base.StartTickable();
-  }
-
-  /// <inheritdoc/>
   public override void Tick() {
     if (SmartPowerService.SmartLogicStarted) {
-      UpdateStatus();
+      UpdateState();
     }
   }
 
@@ -138,15 +131,32 @@ abstract class PowerOutputBalancer
   /// <summary>The service to get the power stats and manage the power network.</summary>
   protected SmartPowerService SmartPowerService { get; private set; }
 
+  /// <summary>Indicates if a floating icon should be shown when the generator is suspended.</summary>
+  /// <remarks>Must be set before the base `Awake` method is executed.</remarks>
+  protected bool ShowFloatingIcon = true;
+
+  /// <summary>Action that is used to resume generator.</summary>
+  /// <remarks>If not set before the base `Awake` method is executed, then there will be no delay.</remarks>
+  protected TickDelayedAction ResumeDelayedAction;
+
+  /// <summary>Action that is used to resume generator.</summary>
+  /// <remarks>If not set before the base `Awake` method is executed, then there will be no delay.</remarks>
+  protected TickDelayedAction SuspendDelayedAction;
+
   /// <summary>The place where all components get their dependencies.</summary>
   protected virtual void Awake() {
     MechanicalNode = GetComponentFast<MechanicalNode>();
     _pausableBuilding = GetComponentFast<PausableBuilding>();
-    _pausableBuilding.PausedChanged += (_, _) => UpdateStatus();
-    //FIXME: Make show status and float icon configurable via settings or descendant class. 
-    _shutdownStatus =
-        StatusToggle.CreateNormalStatusWithFloatingIcon(ShutdownStatusIcon, _loc.T(PowerShutdownModeLocKey));
+    _pausableBuilding.PausedChanged += (_, _) => UpdateState();
+
+    _shutdownStatus = ShowFloatingIcon
+        ? StatusToggle.CreateNormalStatusWithFloatingIcon(ShutdownStatusIcon, _loc.T(PowerShutdownModeLocKey))
+        : StatusToggle.CreateNormalStatus(ShutdownStatusIcon, _loc.T(PowerShutdownModeLocKey));
     GetComponentFast<StatusSubject>().RegisterStatus(_shutdownStatus);
+
+    SuspendDelayedAction ??= SmartPowerService.GetTickDelayedAction(0);
+    ResumeDelayedAction ??= SmartPowerService.GetTickDelayedAction(0);
+
     enabled = false;
   }
 
@@ -170,9 +180,6 @@ abstract class PowerOutputBalancer
     _shutdownStatus.Activate();
   }
 
-  /// <summary>Gets the delays for the suspend and resume actions in ticks.</summary>
-  protected abstract void GetActionDelays(out TickDelayedAction resumeAction, out TickDelayedAction suspendAction);
-
   #endregion
 
   #region Implementation
@@ -183,8 +190,6 @@ abstract class PowerOutputBalancer
   ILoc _loc;
   PausableBuilding _pausableBuilding;
   StatusToggle _shutdownStatus;
-  TickDelayedAction _resumeDelayedAction;
-  TickDelayedAction _suspendDelayedAction;
 
   /// <summary>It must be public for the injection logic to work.</summary>
   [Inject]
@@ -193,7 +198,7 @@ abstract class PowerOutputBalancer
     SmartPowerService = smartPowerService;
   }
 
-  void UpdateStatus() {
+  void UpdateState() {
     if (!enabled) {
       return;
     }
@@ -228,7 +233,7 @@ abstract class PowerOutputBalancer
     // If the generator is suspended, then it should be resumed only if the demand is greater than the supply.
     if (IsSuspended) {
       if (demand > supply) {
-        _resumeDelayedAction.Execute(Resume);
+        ResumeDelayedAction.Execute(Resume);
       }
       return;
     }
@@ -236,15 +241,11 @@ abstract class PowerOutputBalancer
     // Suspend the generator if the supply is greater than the demand.
     if (supply - MechanicalNode.PowerOutput >= demand) {
       if (MechanicalNode.PowerOutput > 0) {
-        _suspendDelayedAction.Execute(Suspend);
+        SuspendDelayedAction.Execute(Suspend);
       } else {
         Suspend();  // Inactive generators don't need hysteresis.
       }
     }
-  }
-
-  void SetupDelays() {
-    GetActionDelays(out _resumeDelayedAction, out _suspendDelayedAction);
   }
 
   #endregion
