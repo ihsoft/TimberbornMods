@@ -9,7 +9,7 @@ using Timberborn.SettingsSystem;
 
 namespace IgorZ.SmartPower.Settings;
 
-sealed class NetworkUISettings : ModSettingsOwner {
+sealed class BatteriesSettings : ModSettingsOwner {
   #region Settings
   // ReSharper disable InconsistentNaming
   // ReSharper disable MemberCanBePrivate.Global
@@ -17,14 +17,14 @@ sealed class NetworkUISettings : ModSettingsOwner {
   public static bool ShowBatteryVitals => _instance._showBatteryVitals.Value;
   public ModSetting<bool> _showBatteryVitals { get; } = new(
       true,
-      ModSettingDescriptor.CreateLocalized("IgorZ.SmartPower.Settings.NetworkUI.ShowBatteryVitals"));
+      ModSettingDescriptor.CreateLocalized("IgorZ.SmartPower.Settings.Batteries.ShowBatteryVitals"));
 
   public static float BatteryRatioHysteresis => _instance._batteryRatioHysteresis.Value;
   public ModSetting<int> _batteryRatioHysteresis { get; } = new RangeIntModSetting(
       1, 0, 5,
       ModSettingDescriptor
-          .CreateLocalized("IgorZ.SmartPower.Settings.NetworkUI.BatteryRatioHysteresis")
-          .SetLocalizedTooltip("IgorZ.SmartPower.Settings.NetworkUI.BatteryRatioHysteresisTooltip"));
+          .CreateLocalized("IgorZ.SmartPower.Settings.Batteries.BatteryRatioHysteresis")
+          .SetLocalizedTooltip("IgorZ.SmartPower.Settings.Batteries.BatteryRatioHysteresisTooltip"));
 
   // ReSharper restore MemberCanBePrivate.Global
   // ReSharper restore InconsistentNaming
@@ -36,7 +36,7 @@ sealed class NetworkUISettings : ModSettingsOwner {
   protected override string ModId => Configurator.ModId;
 
   /// <inheritdoc />
-  public override string HeaderLocKey => "IgorZ.SmartPower.Settings.NetworkUISection";
+  public override string HeaderLocKey => "IgorZ.SmartPower.Settings.BatteriesSection";
 
   /// <inheritdoc />
   public override int Order => 1;
@@ -45,9 +45,9 @@ sealed class NetworkUISettings : ModSettingsOwner {
 
   #region Implementation
 
-  static NetworkUISettings _instance;
+  static BatteriesSettings _instance;
 
-  public NetworkUISettings(
+  public BatteriesSettings(
     ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry, ModRepository modRepository)
       : base(settings, modSettingsOwnerRegistry, modRepository) {
     _instance = this;

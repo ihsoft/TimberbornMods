@@ -26,7 +26,7 @@ static class NetworkFragmentServicePatch {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!
     }
-    if (!NetworkUISettings.ShowBatteryVitals || ____label.style.display == DisplayStyle.None) {
+    if (!BatteriesSettings.ShowBatteryVitals || ____label.style.display == DisplayStyle.None) {
       return;
     }
     _updater.Update(

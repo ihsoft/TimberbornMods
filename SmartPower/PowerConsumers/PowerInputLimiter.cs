@@ -246,7 +246,7 @@ sealed class PowerInputLimiter
     // Resume if power efficiency has improved.
     if (IsSuspended) {
       var newFlow = supply - demand - _desiredPower;
-      var estimatedCharge = charge + newFlow * NetworkUISettings.BatteryRatioHysteresis;
+      var estimatedCharge = charge + newFlow * BatteriesSettings.BatteryRatioHysteresis;
       if (CheckBatteryCharge && capacity > 0 && estimatedCharge / capacity < MinBatteriesCharge) {
         return; // If resumed, batteries will be drained too fast (a hysteresis check).
       }
