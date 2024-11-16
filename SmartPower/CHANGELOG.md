@@ -1,5 +1,5 @@
 # v1.12.1 (started on 9/28/2024)
-* Full refactoring of the power balancing logic. Now, all the generators and consumers within the network work as a whole.
+* Full refactoring of the power balancing logic.
 * [Enhancement] Consumers can be configured to stop/start if there is not enough power in the network.
 * [Enhancement] Display status for when the batteries aren't used (a positive balance) or are depleted (a negative balance and no charge). 
 
