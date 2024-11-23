@@ -35,6 +35,9 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
   /// <summary>Tells if the smart logic can now start.</summary>
   public bool SmartLogicStarted => CurrentTick > 1;
 
+  /// <summary>Gets the fixed delta time in minutes.</summary>
+  public float FixedDeltaTimeInMinutes => _fixedDeltaTimeInHours * 60f;
+
   /// <summary>Gets the delayed action that will be executed after the specified number of ticks.</summary>
   public TickDelayedAction GetTickDelayedAction(int skipTicks) {
     return new TickDelayedAction(skipTicks, () => CurrentTick);
@@ -42,7 +45,7 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
 
   /// <summary>Gets the delayed action that will be executed after the specified number of game minutes.</summary>
   public TickDelayedAction GetTimeDelayedAction(int skipMinutes) {
-    return new TickDelayedAction(Mathf.CeilToInt(skipMinutes / 60f / _fixedDeltaTimeInHours), () => CurrentTick);
+    return new TickDelayedAction(Mathf.CeilToInt(skipMinutes / FixedDeltaTimeInMinutes), () => CurrentTick);
   }
 
   /// <summary>Gets batteries total charge and capacity.</summary>
