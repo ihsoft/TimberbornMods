@@ -140,7 +140,7 @@ public class StatusToggleAction : AutomationActionBase {
       status.SetStatusToken(StatusToken);
     }
     if (ActionKind == ActionKindEnum.ShowStatus) {
-      // The blocker could get created from the hide action which doesn't have status setting.
+      // The blocker could get created from the hide action which doesn't have a status setting.
       status.SetStatus(this);
     }
     return status;

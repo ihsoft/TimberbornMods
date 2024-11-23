@@ -84,7 +84,7 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
   /// <summary>All path checking conditions on the sites.</summary>
   readonly Dictionary<PathCheckingSite, List<CheckAccessBlockCondition>> _conditionsIndex = new();
 
-  /// <summary>All path sites index by blockobject.</summary>
+  /// <summary>All path sites indexed by blockobject.</summary>
   readonly Dictionary<BlockObject, PathCheckingSite> _sitesByBlockObject = new();
 
   /// <summary>Cache of tiles that are paths to the characters on the map.</summary>
@@ -105,7 +105,6 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
 
   /// <summary>
   /// Runs the checks to update <see cref="PathCheckingSite.CanFinish"/> and triggers the relevant conditions.
-  /// conditions.
   /// </summary>
   public void CheckBlockingStateAndTriggerActions(PathCheckingSite site) {
     PatchCheckingTimer.Start();
@@ -120,7 +119,7 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
   /// <summary>Determines if the site construction can complete without obstructing any other site.</summary>
   bool IsBlockingSite(PathCheckingSite site) {
     if (site.BestAccessNode == -1 || site.RestrictedNodes.Count == 0) {
-      return false;  // This site cannot block anything.
+      return false;  // This site can't block anything.
     }
     PathCheckProfiler.StartNewHit();
     var isBlocked = false;

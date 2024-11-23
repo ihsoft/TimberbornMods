@@ -40,7 +40,7 @@ public static class CommonFormats {
     return string.Format(_localizedSupplyRemainingTmpl, DaysHoursFormat(loc, hours));
   }
 
-  /// <summary>Gives a VERY short form of the "hours amount".</summary>
+  /// <summary>Gives a VERY short form of the "hour amount".</summary>
   public static string DaysHoursFormat(ILoc loc, float hoursAmount) {
     switch (hoursAmount) {
       case <= 0.01f:

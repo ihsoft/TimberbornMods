@@ -162,9 +162,9 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   /// <remarks>It must be public to work.</remarks>
   [Inject]
   public void InjectDependencies(
-    ILoc loc, NodeIdService nodeIdService, DistrictCenterRegistry districtCenterRegistry, DistrictMap districtMap,
-    PreviewDistrictMap previewDistrictMap, EventBus eventBus,
-    NavMeshListenerEntityRegistry navMeshListenerEntityRegistry) {
+      ILoc loc, NodeIdService nodeIdService, DistrictCenterRegistry districtCenterRegistry, DistrictMap districtMap,
+      PreviewDistrictMap previewDistrictMap, EventBus eventBus,
+      NavMeshListenerEntityRegistry navMeshListenerEntityRegistry) {
     _loc = loc;
     _nodeIdService = nodeIdService;
     _districtCenterRegistry = districtCenterRegistry;
@@ -293,8 +293,8 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
 
   /// <summary>Reset to unreachable site.</summary>
   void ResetState() {
-    BestBuildersPathNodeIndex = new HashSet<int>();
-    BestBuildersPathCornerNodes = new List<int>();
+    BestBuildersPathNodeIndex = [];
+    BestBuildersPathCornerNodes = [];
     BestAccessNode = -1;
     _bestPathRoadNodeId = -1;
     CanBeAccessedInPreview = false;
@@ -402,7 +402,7 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
       return;  // Already initialized.
     }
     _unreachableStatusToggle = StatusToggle.CreatePriorityStatusWithAlertAndFloatingIcon(
-      UnreachableIconName, _loc.T(UnreachableStatusLocKey), _loc.T(UnreachableAlertLocKey));
+        UnreachableIconName, _loc.T(UnreachableStatusLocKey), _loc.T(UnreachableAlertLocKey));
     _maybeReachableStatusToggle = StatusToggle.CreateNormalStatus(UnreachableIconName, _loc.T(NotYetReachableLocKey));
     GetComponentFast<StatusSubject>().RegisterStatus(_unreachableStatusToggle);
     GetComponentFast<StatusSubject>().RegisterStatus(_maybeReachableStatusToggle);
