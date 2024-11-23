@@ -39,6 +39,7 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
     _automateCheckbox = _uiFactory.CreateToggle(
         AutomateLocKey, _ => {
           _balancer.Automate = _automateCheckbox.value;
+          _balancer.UpdateState();
           UpdateControls();
         });
 
@@ -46,6 +47,7 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
         _ => {
           _balancer.DischargeBatteriesThreshold = _chargeBatteriesSlider.value.x;
           _balancer.ChargeBatteriesThreshold = _chargeBatteriesSlider.value.y;
+          _balancer.UpdateState();
           UpdateControls();
         }, 0f, 1.0f, 0.10f, stepSize: 0.05f);
 
@@ -106,6 +108,7 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
       affectedGenerators++;
       balancer.ChargeBatteriesThreshold = _balancer.ChargeBatteriesThreshold;
       balancer.DischargeBatteriesThreshold = _balancer.DischargeBatteriesThreshold;
+      balancer.UpdateState();
     }
     _applyToAllUpdater = new TimedUpdater(1.0f, startNow: true);
     _applyToAllGeneratorsButton.text = _uiFactory.Loc.T(AppliedToGeneratorsLocKey, affectedGenerators);

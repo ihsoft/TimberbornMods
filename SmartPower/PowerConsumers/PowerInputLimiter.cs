@@ -18,6 +18,7 @@ using Timberborn.StatusSystem;
 using Timberborn.TickSystem;
 using Timberborn.WorkSystem;
 using UnityDev.Utils.LogUtilsLite;
+using UnityEngine;
 
 namespace IgorZ.SmartPower.PowerConsumers;
 
@@ -29,33 +30,43 @@ sealed class PowerInputLimiter
   /// <summary>Indicates if the generator is currently suspended.</summary>
   public bool IsSuspended { get; private set; }
 
+  /// <summary>Indicates that the consumer was suspended due to low batteries charge in the network.</summary>
+  /// <seealso cref="CheckBatteryCharge"/>
+  public bool LowBatteriesCharge { get; private set; }
+
+  /// <summary>Indicates the number of minutes till the consumer will resume.</summary>
+  /// <value>-1 if not applicable in the current state.</value>
+  public int MinutesTillResume => IsSuspended && _resumeDelayedAction.IsTicking()
+      ? Mathf.RoundToInt(_resumeDelayedAction.TicksLeft * _smartPowerService.FixedDeltaTimeInMinutes)
+      : -1;
+
+  /// <summary>Indicates the number of minutes till the consumer will suspend.</summary>
+  /// <value>-1 if not applicable in the current state.</value>
+  public int MinutesTillSuspend => !IsSuspended && _suspendDelayedAction.IsTicking()
+      ? Mathf.RoundToInt(_suspendDelayedAction.TicksLeft * _smartPowerService.FixedDeltaTimeInMinutes)
+      : -1;
+
   /// <summary>Returns balancers in the same network.</summary>
   public IEnumerable<PowerInputLimiter> AllLimiters => _mechanicalNode.Graph.Nodes
       .Select(x => x.GetComponentFast<PowerInputLimiter>())
       .Where(x => x != null && x.name == name);
 
   /// <summary>Tells the consumer should automatically pause/unpause based on the power supply.</summary>
-  public bool Automate {
-    get => _automate;
-    set {
-      _automate = value;
-      UpdateState();
-    }
-  }
-  bool _automate;
+  /// <seealso cref="UpdateState"/>
+  public bool Automate { get; set; }
 
   /// <summary>The minimum network efficiency to keep the consumer working.</summary>
-  /// <remarks>This value can change in runtime without notifying SmartPowerSystem.</remarks>
+  /// <seealso cref="UpdateState"/>
   public float MinPowerEfficiency { get; set; } = 0.9f;
 
   /// <summary>Tells the consumer should suspend if batteries charge drops below the threshold.</summary>
-  /// <remarks>This value can change in runtime without notifying SmartPowerSystem.</remarks>
   /// <seealso cref="MinBatteriesCharge"/>
+  /// <seealso cref="UpdateState"/>
   public bool CheckBatteryCharge { get; set; }
 
   /// <summary>The minimum level of the batteries to keep the consumer working.</summary>
-  /// <remarks>This value can change in runtime without notifying SmartPowerSystem.</remarks>
   /// <seealso cref="CheckBatteryCharge"/>
+  /// <seealso cref="UpdateState"/>
   public float MinBatteriesCharge { get; set; } = 0.3f;
 
   /// <summary>
@@ -69,6 +80,17 @@ sealed class PowerInputLimiter
     _desiredPower = newPower;
     if (IsSuspended) {
       _smartPowerService.ReservePower(_mechanicalNode, _desiredPower);
+    }
+  }
+
+  /// <summary>Updates the suspend state of the consumer to the current power state.</summary>
+  /// <remarks>Call it when settings have been changed.</remarks>
+  public void UpdateState() {
+    if (IsSuspended && !SmartLogicActive) {
+      Resume();
+    }
+    if (SmartLogicActive) {
+      HandleSmartLogic();
     }
   }
 
@@ -135,7 +157,7 @@ sealed class PowerInputLimiter
       return;
     }
     var state = entityLoader.GetComponent(PowerInputLimiterKey);
-    _automate = state.GetValueOrNullable(AutomateKey) ?? false;
+    Automate = state.GetValueOrNullable(AutomateKey) ?? false;
     MinPowerEfficiency = state.GetValueOrNullable(MinPowerEfficiencyKey) ?? MinPowerEfficiency;
     CheckBatteryCharge = state.GetValueOrNullable(CheckBatteryChargeKey) ?? false;
     MinBatteriesCharge = state.GetValueOrNullable(MinBatteriesChargeKey) ?? MinBatteriesCharge;
@@ -216,28 +238,19 @@ sealed class PowerInputLimiter
     enabled = false;
   }
 
-  void UpdateState() {
-    if (IsSuspended && !SmartLogicActive) {
-      Resume();
-    }
-    if (SmartLogicActive) {
-      HandleSmartLogic();
-    }
-  }
-
   void HandleSmartLogic() {
     _smartPowerService.GetBatteriesStat(_mechanicalNode.Graph, out var capacity, out var charge);
 
     // Shutdown if batteries are low (and present in the network).
-    if (CheckBatteryCharge && capacity > 0) {
-      var chargeRatio = charge / capacity;
-      if (chargeRatio < MinBatteriesCharge) {
-        if (!IsSuspended) {
-          Suspend(); // Suspend to not drain batteries.
-        }
-        return;
+    if (CheckBatteryCharge && capacity > 0 && charge / capacity < MinBatteriesCharge) {
+      LowBatteriesCharge = true;
+      if (!IsSuspended) {
+        _suspendDelayedAction.Execute(Suspend, true); // Immediately suspend to not drain batteries.
       }
+      _resumeDelayedAction.Reset();
+      return;
     }
+    LowBatteriesCharge = false;
 
     var currentPower = _mechanicalNode.Graph.CurrentPower;
     var demand = (float) currentPower.PowerDemand;
@@ -254,12 +267,14 @@ sealed class PowerInputLimiter
       if (noBatteryEfficiency < MinPowerEfficiency && (capacity == 0 || estimatedCharge < 0)) {
         return; // No batteries and not enough supply.
       }
+      _suspendDelayedAction.Reset();
       _resumeDelayedAction.Execute(Resume);
       return;
     }
 
     // Suspend if power efficiency has dropped.
     if (currentPower.PowerEfficiency < MinPowerEfficiency) {
+      _resumeDelayedAction.Reset();
       _suspendDelayedAction.Execute(Suspend);
     }
   }

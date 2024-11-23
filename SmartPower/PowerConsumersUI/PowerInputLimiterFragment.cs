@@ -42,6 +42,7 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
     _automateCheckbox = _uiFactory.CreateToggle(
         SuspendIfNoPowerLocKey, e => {
           _powerInputLimiter.Automate = e.newValue;
+          _powerInputLimiter.UpdateState();
           UpdateControls();
         });
     _suspendIfLowEfficiencyLabel = _uiFactory.CreateLabel();
@@ -49,16 +50,19 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
         0.01f,
         newValue => {
           _powerInputLimiter.MinPowerEfficiency = newValue;
+          _powerInputLimiter.UpdateState();
           UpdateControls();
         });
     _suspendIfBatteryLowCheckbox = _uiFactory.CreateToggle(
         null, e => {
           _powerInputLimiter.CheckBatteryCharge = e.newValue;
+          _powerInputLimiter.UpdateState();
           UpdateControls();
         });
     _minBatteriesChargeSlider = _uiFactory.CreateSlider(
         e => {
           _powerInputLimiter.MinBatteriesCharge = e.newValue;
+          _powerInputLimiter.UpdateState();
           UpdateControls();
         }, 0f, 1.0f, stepSize: 0.05f);
 
@@ -127,6 +131,7 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
       balancer.MinPowerEfficiency = _powerInputLimiter.MinPowerEfficiency;
       balancer.CheckBatteryCharge = _powerInputLimiter.CheckBatteryCharge;
       balancer.MinBatteriesCharge = _powerInputLimiter.MinBatteriesCharge;
+      balancer.UpdateState();
     }
     _applyToAllUpdater = new TimedUpdater(1.0f, startNow: true);
     _applyToAllBuildingsButton.text = _uiFactory.Loc.T(AppliedToBuildingsLocKey, affectedBuildings);

@@ -1,4 +1,4 @@
-// Timberborn Mod: SmartPower
+﻿// Timberborn Mod: SmartPower
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
@@ -13,9 +13,9 @@ using UnityEngine.UIElements;
 
 namespace IgorZ.SmartPower.UI;
 
-/// <summary>Adds smart mechanical building status to the stock consumer building UI fragment.</summary>
-[HarmonyPatch(typeof(ConsumerFragmentService), nameof(ConsumerFragmentService.Update))]
-static class ConsumerFragmentServicePatch {
+/// <summary>Adds smart generator status to the stock generator building UI fragment.</summary>
+[HarmonyPatch(typeof(GeneratorFragmentService), nameof(GeneratorFragmentService.Update))]
+static class GeneratorFragmentServicePatch {
   static void Postfix(bool __runOriginal, MechanicalNode mechanicalNode, Label ____label, ILoc ____loc) {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!
@@ -23,7 +23,7 @@ static class ConsumerFragmentServicePatch {
     if (____label.style.display == DisplayStyle.None) {
       return;
     }
-    var text = StateTextFormatter.FormatConsumerBuildingText(mechanicalNode, ____loc);
+    var text = StateTextFormatter.FormatGeneratorBuildingText(mechanicalNode, ____loc);
     if (text != null) {
       ____label.text += "\n" + text;
     }

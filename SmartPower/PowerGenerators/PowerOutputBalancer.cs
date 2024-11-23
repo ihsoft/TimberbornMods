@@ -15,6 +15,7 @@ using Timberborn.Persistence;
 using Timberborn.StatusSystem;
 using Timberborn.TickSystem;
 using UnityDev.Utils.LogUtilsLite;
+using UnityEngine;
 
 namespace IgorZ.SmartPower.PowerGenerators;
 
@@ -26,29 +27,51 @@ abstract class PowerOutputBalancer
 
   #region API
 
+  /// <summary>Indicates the number of minutes till the generator will resume.</summary>
+  /// <value>-1 if not applicable in the current state.</value>
+  public int MinutesTillResume => IsSuspended && ResumeDelayedAction.IsTicking()
+      ? Mathf.RoundToInt(ResumeDelayedAction.TicksLeft * SmartPowerService.FixedDeltaTimeInMinutes)
+      : -1;
+
+  /// <summary>Indicates the number of minutes till the generator will suspend.</summary>
+  /// <value>-1 if not applicable in the current state.</value>
+  public int MinutesTillSuspend => !IsSuspended && SuspendDelayedAction.IsTicking()
+      ? Mathf.RoundToInt(SuspendDelayedAction.TicksLeft * SmartPowerService.FixedDeltaTimeInMinutes)
+      : -1;
+
   /// <summary>Indicates if the generator is currently suspended.</summary>
   public bool IsSuspended { get; private set; }
 
   /// <summary>The minimum level to let the batteries discharge to.</summary>
+  /// <seealso cref="UpdateState"/>
   public float DischargeBatteriesThreshold { get; set; } = MinBatteryChargeRatio;
 
   /// <summary>The maximum level to which this generator should charge the batteries.</summary>
+  /// <seealso cref="UpdateState"/>
   public float ChargeBatteriesThreshold { get; set; } = MaxBatteryChargeRatio;
 
   /// <summary>Indicates whether the generator should automatically pause/unpause based on power demand.</summary>
-  public bool Automate {
-    get => _automate;
-    set {
-      _automate = value;
-      UpdateState();
-    }
-  }
-  bool _automate;
+  /// <seealso cref="UpdateState"/>
+  public bool Automate { get; set; }
 
   /// <summary>Returns the same balancers in the network.</summary>
   public IEnumerable<PowerOutputBalancer> AllBalancers => MechanicalNode.Graph.Nodes
       .Select(x => x.GetComponentFast<PowerOutputBalancer>())
       .Where(x => x != null && x.name == name);
+
+  /// <summary>Updates the suspend state of the consumer to the current power state.</summary>
+  /// <remarks>Call it when settings have been changed.</remarks>
+  public void UpdateState() {
+    if (!enabled) {
+      return;
+    }
+    if (Automate && _pausableBuilding.Paused && IsSuspended) {
+      Resume();
+    }
+    if (Automate && !_pausableBuilding.Paused) {
+      HandleSmartLogic();
+    }
+  }
 
   #endregion
 
@@ -111,7 +134,7 @@ abstract class PowerOutputBalancer
       return;
     }
     var state = entityLoader.GetComponent(AutomationBehaviorKey);
-    _automate = state.GetValueOrNullable(AutomateKey) ?? _automate;
+    Automate = state.GetValueOrNullable(AutomateKey) ?? Automate;
     ChargeBatteriesThreshold = state.GetValueOrNullable(ChargeBatteriesThresholdKey) ?? MaxBatteryChargeRatio;
     DischargeBatteriesThreshold = state.GetValueOrNullable(DischargeBatteriesThresholdKey) ?? MinBatteryChargeRatio;
     IsSuspended = state.GetValueOrNullable(IsSuspendedKey) ?? false;
@@ -198,18 +221,6 @@ abstract class PowerOutputBalancer
     SmartPowerService = smartPowerService;
   }
 
-  void UpdateState() {
-    if (!enabled) {
-      return;
-    }
-    if (Automate && _pausableBuilding.Paused && IsSuspended) {
-      Resume();
-    }
-    if (Automate && !_pausableBuilding.Paused) {
-      HandleSmartLogic();
-    }
-  }
-
   void HandleSmartLogic() {
     SmartPowerService.GetBatteriesStat(MechanicalNode.Graph, out var capacity, out var charge);
     var reservedPower = SmartPowerService.GetReservedPower(MechanicalNode.Graph);
@@ -217,12 +228,17 @@ abstract class PowerOutputBalancer
     // Keep the batteries charged if there are any. Disregard the supply/demand balance if no suspended consumers.
     if (capacity > 0 && reservedPower == 0) {
       var chargeRatio = charge / capacity;
-      if (!IsSuspended && chargeRatio > ChargeBatteriesThreshold - float.Epsilon) {  // >=
-        Suspend();
+      if (IsSuspended) {
+        if (chargeRatio < DischargeBatteriesThreshold + float.Epsilon) {  // <=
+          Resume();
+        }
+      } else {
+        if (chargeRatio > ChargeBatteriesThreshold - float.Epsilon) {  // >=
+          Suspend();
+        }
       }
-      if (IsSuspended && chargeRatio < DischargeBatteriesThreshold + float.Epsilon) {  // <=
-        Resume();
-      }
+      ResumeDelayedAction.Reset();
+      SuspendDelayedAction.Reset();
       return;
     }
 
@@ -233,6 +249,7 @@ abstract class PowerOutputBalancer
     // If the generator is suspended, then it should be resumed only if the demand is greater than the supply.
     if (IsSuspended) {
       if (demand > supply) {
+        SuspendDelayedAction.Reset();
         ResumeDelayedAction.Execute(Resume);
       }
       return;
@@ -240,11 +257,9 @@ abstract class PowerOutputBalancer
 
     // Suspend the generator if the supply is greater than the demand.
     if (supply - MechanicalNode.PowerOutput >= demand) {
-      if (MechanicalNode.PowerOutput > 0) {
-        SuspendDelayedAction.Execute(Suspend);
-      } else {
-        Suspend();  // Inactive generators don't need hysteresis.
-      }
+      ResumeDelayedAction.Reset();
+      // Inactive generators don't need hysteresis.
+      SuspendDelayedAction.Execute(Suspend, MechanicalNode.PowerOutput == 0);
     }
   }
 

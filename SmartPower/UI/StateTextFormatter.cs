@@ -4,11 +4,10 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using IgorZ.SmartPower.Core;
 using IgorZ.SmartPower.PowerConsumers;
+using IgorZ.SmartPower.PowerGenerators;
 using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
-using UnityEngine;
 
 namespace IgorZ.SmartPower.UI;
 
@@ -29,6 +28,9 @@ public static class StateTextFormatter {
   const string NoInputModeLocKey = "IgorZ.SmartPower.MechanicalBuilding.NoInputStatus";
   const string BlockedOutputLocKey = "IgorZ.SmartPower.MechanicalBuilding.BlockedOutputStatus";
   const string NotEnoughPowerLocKey = "IgorZ.SmartPower.PowerInputLimiter.NotEnoughPowerStatus";
+  const string LowBatteriesChargeLocKey = "IgorZ.SmartPower.PowerInputLimiter.LowBatteriesChargeStatus";
+  const string MinutesTillResumeLocKey = "IgorZ.SmartPower.Common.MinutesTillResume";
+  const string MinutesTillSuspendLocKey = "IgorZ.SmartPower.Common.MinutesTillSuspend";
 
   /// <summary>Makes a formatted string that describes the current state of the batteries in the graph.</summary>
   /// <returns><c>null</c> if there are no batteries in the graph.</returns>
@@ -78,32 +80,60 @@ public static class StateTextFormatter {
     return $"{batteryCapacityStr}\n{loc.T(BatteryNotUsedLocKey)}";
   }
 
-  /// <summary>Makes a formatted string that describes the power saving mode reason(s).</summary>
-  /// <returns><c>null</c> if the building is not in power saving mode or if the building is not compatible.</returns>
-  public static string FormatBuildingText(MechanicalNode mechanicalNode, ILoc loc) {
+  /// <summary>Makes a formatted string that describes the power saving mode reason.</summary>
+  /// <returns><c>null</c> if the building is not in power-saving mode or if the building is not compatible.</returns>
+  public static string FormatConsumerBuildingText(MechanicalNode mechanicalNode, ILoc loc) {
     if (!mechanicalNode.IsConsumer) {
-      return null;
-    }
-    var inputLimiter = mechanicalNode.GetComponentFast<PowerInputLimiter>();
-    if (inputLimiter && inputLimiter.IsSuspended) {
-      return loc.T(NotEnoughPowerLocKey);
-    }
-
-    var smartManufactory = mechanicalNode.GetComponentFast<SmartManufactory>();
-    if (smartManufactory == null || !smartManufactory.StandbyMode) {
       return null;
     }
     var lines = new List<string>();
 
-    if (smartManufactory.NoFuel) {
-      lines.Add(loc.T(NoFuelLocKey));
-    } else if (smartManufactory.MissingIngredients) {
-      lines.Add(loc.T(NoInputModeLocKey));
-    } else if (smartManufactory.BlockedOutput) {
-      lines.Add(loc.T(BlockedOutputLocKey));
-    } else if (smartManufactory.AllWorkersOut) {
-      lines.Add(loc.T(NoWorkersLocKey));
+    var inputLimiter = mechanicalNode.GetComponentFast<PowerInputLimiter>();
+    if (inputLimiter) {
+      if (inputLimiter.IsSuspended) {
+        lines.Add(inputLimiter.LowBatteriesCharge ? loc.T(LowBatteriesChargeLocKey) : loc.T(NotEnoughPowerLocKey));
+        if (inputLimiter.MinutesTillResume > 0) {
+          lines.Add(loc.T(MinutesTillResumeLocKey, inputLimiter.MinutesTillResume));
+        }
+        return string.Join("\n", lines);
+      }
+      if (inputLimiter.MinutesTillSuspend > 0) {
+        lines.Add(loc.T(MinutesTillSuspendLocKey, inputLimiter.MinutesTillSuspend));
+      }
     }
-    return string.Join("\n", lines);
+
+    var smartManufactory = mechanicalNode.GetComponentFast<SmartManufactory>();
+    if (smartManufactory && smartManufactory.StandbyMode) {
+      if (smartManufactory.NoFuel) {
+        lines.Add(loc.T(NoFuelLocKey));
+      } else if (smartManufactory.MissingIngredients) {
+        lines.Add(loc.T(NoInputModeLocKey));
+      } else if (smartManufactory.BlockedOutput) {
+        lines.Add(loc.T(BlockedOutputLocKey));
+      } else if (smartManufactory.AllWorkersOut) {
+        lines.Add(loc.T(NoWorkersLocKey));
+      }
+    }
+
+    return lines.Count > 0 ? string.Join("\n", lines) : null;
+  }
+
+  /// <summary>Makes a formatted string that gives hints of the generator activation/suspension states.</summary>
+  /// <returns><c>null</c> if the building is not in power-saving mode or if the building is not compatible.</returns>
+  public static string FormatGeneratorBuildingText(MechanicalNode mechanicalNode, ILoc loc) {
+    if (!mechanicalNode.IsGenerator) {
+      return null;
+    }
+    var outputBalancer = mechanicalNode.GetComponentFast<PowerOutputBalancer>();
+    if (!outputBalancer) {
+      return null;
+    }
+    if (outputBalancer.MinutesTillResume > 0) {
+      return loc.T(MinutesTillResumeLocKey, outputBalancer.MinutesTillResume);
+    }
+    if (outputBalancer.MinutesTillSuspend > 0) {
+      return loc.T(MinutesTillSuspendLocKey, outputBalancer.MinutesTillSuspend);
+    }
+    return null;
   }
 }
