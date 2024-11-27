@@ -22,12 +22,8 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
   const string AppliedToBuildingsLocKey = "IgorZ.SmartPower.PowerInputLimiter.AppliedToBuildings";
 
   readonly UiFactory _uiFactory;
+  readonly ConsumerFragmentPatcher _consumerFragmentPatcher;
 
-  Label _stateProgressLabel;  // It is patched in the stock UI.
-  PanelFragmentPatcher _stateProgressPatcher;
-  Label _suspendReasonLabel;  // It is patched in the stock UI.
-  PanelFragmentPatcher _suspendReasonPatcher;
-  
   VisualElement _root;
   Toggle _automateCheckbox;
   Label _suspendIfLowEfficiencyLabel;
@@ -39,8 +35,9 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
   PowerInputLimiter _powerInputLimiter;
   TimedUpdater _applyToAllUpdater;
 
-  PowerInputLimiterFragment(UiFactory uiFactory) {
+  PowerInputLimiterFragment(UiFactory uiFactory, ConsumerFragmentPatcher consumerFragmentPatcher) {
     _uiFactory = uiFactory;
+    _consumerFragmentPatcher = consumerFragmentPatcher;
   }
 
   public VisualElement InitializeFragment() {
@@ -82,16 +79,6 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
         .AddComponent(_uiFactory.CenterElement(_applyToAllBuildingsButton))
         .BuildAndInitialize();
 
-    _suspendReasonLabel = _uiFactory.CreateLabel();
-    _suspendReasonLabel.ToggleDisplayStyle(visible: false);
-    _suspendReasonPatcher = new PanelFragmentPatcher(
-        _suspendReasonLabel, _root, PanelFragmentPatcher.MechanicalNodeFragmentName, "Consumer");
-
-    _stateProgressLabel = _uiFactory.CreateLabel();
-    _stateProgressLabel.ToggleDisplayStyle(visible: false);
-    _stateProgressPatcher = new PanelFragmentPatcher(
-        _stateProgressLabel, _root, PanelFragmentPatcher.MechanicalNodeFragmentName, "Consumer", 1);
-
     _root.ToggleDisplayStyle(visible: false);
     return _root;
   }
@@ -101,8 +88,7 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
     if (_powerInputLimiter == null) {
       return;
     }
-    _suspendReasonPatcher.Patch();
-    _stateProgressPatcher.Patch();
+    _consumerFragmentPatcher.InitializePatch(_root);
     _automateCheckbox.SetValueWithoutNotify(_powerInputLimiter.Automate);
     _minEfficiencySlider.UpdateValuesWithoutNotify(_powerInputLimiter.MinPowerEfficiency, 1f);
     _suspendIfBatteryLowCheckbox.SetValueWithoutNotify(_powerInputLimiter.CheckBatteryCharge);
@@ -113,8 +99,7 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
 
   public void ClearFragment() {
     _root.ToggleDisplayStyle(visible: false);
-    _suspendReasonLabel.ToggleDisplayStyle(visible: false);
-    _stateProgressLabel.ToggleDisplayStyle(visible: false);
+    _consumerFragmentPatcher.HideAllElements();
     _powerInputLimiter = null;
   }
 
@@ -129,7 +114,7 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
           _applyToAllBuildingsButton.SetEnabled(true);
           _applyToAllUpdater = null;
         });
-    UpdateConsumerBuildingText();
+    _consumerFragmentPatcher.UpdatePowerInputLimiter(_powerInputLimiter);
   }
 
   void UpdateControls() {
@@ -156,34 +141,5 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
     _applyToAllUpdater = new TimedUpdater(1.0f, startNow: true);
     _applyToAllBuildingsButton.text = _uiFactory.Loc.T(AppliedToBuildingsLocKey, affectedBuildings);
     _applyToAllBuildingsButton.SetEnabled(false);
-  }
-
-  const string NotEnoughPowerLocKey = "IgorZ.SmartPower.PowerInputLimiter.NotEnoughPowerStatus";
-  const string LowBatteriesChargeLocKey = "IgorZ.SmartPower.PowerInputLimiter.LowBatteriesChargeStatus";
-  const string MinutesTillResumeLocKey = "IgorZ.SmartPower.Common.MinutesTillResume";
-  const string MinutesTillSuspendLocKey = "IgorZ.SmartPower.Common.MinutesTillSuspend";
-
-  void UpdateConsumerBuildingText() {
-    if (_powerInputLimiter.IsSuspended) {
-      _suspendReasonLabel.text = _powerInputLimiter.LowBatteriesCharge
-          ? _uiFactory.Loc.T(LowBatteriesChargeLocKey)
-          : _uiFactory.Loc.T(NotEnoughPowerLocKey);
-      _suspendReasonLabel.ToggleDisplayStyle(visible: true);
-      if (_powerInputLimiter.MinutesTillResume > 0) {
-        _stateProgressLabel.text = _uiFactory.Loc.T(MinutesTillResumeLocKey, _powerInputLimiter.MinutesTillResume);
-        _stateProgressLabel.ToggleDisplayStyle(visible: true);
-      } else {
-        _stateProgressLabel.ToggleDisplayStyle(visible: false);
-      }
-      return;
-    }
-
-    _suspendReasonLabel.ToggleDisplayStyle(visible: false);
-    if (_powerInputLimiter.MinutesTillSuspend > 0) {
-      _stateProgressLabel.text = _uiFactory.Loc.T(MinutesTillSuspendLocKey, _powerInputLimiter.MinutesTillSuspend);
-      _stateProgressLabel.ToggleDisplayStyle(visible: true);
-    } else {
-      _stateProgressLabel.ToggleDisplayStyle(visible: false);
-    }
   }
 }

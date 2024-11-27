@@ -12,6 +12,7 @@ namespace IgorZ.SmartPower.PowerConsumersUI;
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<PowerInputLimiterFragment>().AsSingleton();
+    containerDefinition.Bind<ConsumerFragmentPatcher>().AsSingleton();
     containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
   }
 
