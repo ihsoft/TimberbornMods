@@ -9,9 +9,12 @@ using UnityEngine.UIElements;
 namespace IgorZ.TimberDev.UI;
 
 /// <summary>Utility class to patch the stock UI panel fragments with custom elements.</summary>
-public class PanelFragmentPatcher<T> where T : VisualElement {
+public sealed class PanelFragmentPatcher {
 
-  readonly T _element;
+  /// <summary>Fragment name for the mechanical node (generator/consumer/network).</summary>
+  public const string MechanicalNodeFragmentName = "MechanicalNodeFragment";
+
+  readonly VisualElement _element;
   readonly VisualElement _fragmentPanelRoot;
   readonly string _fragmentName;
   readonly string _afterElementName;
@@ -23,15 +26,15 @@ public class PanelFragmentPatcher<T> where T : VisualElement {
   /// <param name="element">The element to add.</param>
   /// <param name="fragmentPanelRoot">Root of a panel fragment.</param>
   /// <param name="fragmentName">
-  /// The stock fragment name to attach the element to. See <see cref="PanelFragmentNames"/>.
+  /// The stock fragment name to attach the element to. For example <see cref="MechanicalNodeFragmentName"/>.
   /// </param>
   /// <param name="afterElementName">
   /// The optional name of the stock element to add the custom element after. If set to empty string, then the custom
   /// element will be inserted at the top, before any other stock elements.
   /// </param>
   /// <param name="offset">Offset, relative to the <paramref name="afterElementName"/>.</param>
-  public PanelFragmentPatcher(
-      T element, VisualElement fragmentPanelRoot, string fragmentName, string afterElementName = null, int offset = 0) {
+  public PanelFragmentPatcher(VisualElement element, VisualElement fragmentPanelRoot, string fragmentName,
+                              string afterElementName = null, int offset = 0) {
     _element = element;
     _fragmentPanelRoot = fragmentPanelRoot;
     _fragmentName = fragmentName;

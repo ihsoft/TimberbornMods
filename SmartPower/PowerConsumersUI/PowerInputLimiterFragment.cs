@@ -24,9 +24,9 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
   readonly UiFactory _uiFactory;
 
   Label _stateProgressLabel;  // It is patched in the stock UI.
-  PanelFragmentPatcher<Label> _stateProgressPatcher;
+  PanelFragmentPatcher _stateProgressPatcher;
   Label _suspendReasonLabel;  // It is patched in the stock UI.
-  PanelFragmentPatcher<Label> _suspendReasonPatcher;
+  PanelFragmentPatcher _suspendReasonPatcher;
   
   VisualElement _root;
   Toggle _automateCheckbox;
@@ -84,13 +84,13 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
 
     _suspendReasonLabel = _uiFactory.CreateLabel();
     _suspendReasonLabel.ToggleDisplayStyle(visible: false);
-    _suspendReasonPatcher = new PanelFragmentPatcher<Label>(
-        _suspendReasonLabel, _root, PanelFragmentNames.MechanicalNodeFragmentName, "Consumer");
+    _suspendReasonPatcher = new PanelFragmentPatcher(
+        _suspendReasonLabel, _root, PanelFragmentPatcher.MechanicalNodeFragmentName, "Consumer");
 
     _stateProgressLabel = _uiFactory.CreateLabel();
     _stateProgressLabel.ToggleDisplayStyle(visible: false);
-    _stateProgressPatcher = new PanelFragmentPatcher<Label>(
-        _stateProgressLabel, _root, PanelFragmentNames.MechanicalNodeFragmentName, "Consumer", 1);
+    _stateProgressPatcher = new PanelFragmentPatcher(
+        _stateProgressLabel, _root, PanelFragmentPatcher.MechanicalNodeFragmentName, "Consumer", 1);
 
     _root.ToggleDisplayStyle(visible: false);
     return _root;
@@ -180,7 +180,6 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
 
     _suspendReasonLabel.ToggleDisplayStyle(visible: false);
     if (_powerInputLimiter.MinutesTillSuspend > 0) {
-      //FIXME: moveT() to the factory
       _stateProgressLabel.text = _uiFactory.Loc.T(MinutesTillSuspendLocKey, _powerInputLimiter.MinutesTillSuspend);
       _stateProgressLabel.ToggleDisplayStyle(visible: true);
     } else {

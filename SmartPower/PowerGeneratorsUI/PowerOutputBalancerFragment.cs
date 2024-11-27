@@ -23,7 +23,7 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
   readonly UiFactory _uiFactory;
 
   Label _suspendStatusLabel;  // It is patched in the stock UI.
-  PanelFragmentPatcher<Label> _panelFragmentPatcher;
+  PanelFragmentPatcher _panelFragmentPatcher;
 
   VisualElement _root;
   Toggle _automateCheckbox;
@@ -66,8 +66,8 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
 
     _suspendStatusLabel = _uiFactory.CreateLabel();
     _suspendStatusLabel.ToggleDisplayStyle(visible: false);
-    _panelFragmentPatcher = new PanelFragmentPatcher<Label>(
-        _suspendStatusLabel, _root, PanelFragmentNames.MechanicalNodeFragmentName, "Generator");
+    _panelFragmentPatcher = new PanelFragmentPatcher(
+        _suspendStatusLabel, _root, PanelFragmentPatcher.MechanicalNodeFragmentName, "Generator");
 
     _root.ToggleDisplayStyle(visible: false);
     return _root;
