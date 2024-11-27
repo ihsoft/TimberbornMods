@@ -117,23 +117,4 @@ public static class StateTextFormatter {
 
     return lines.Count > 0 ? string.Join("\n", lines) : null;
   }
-
-  /// <summary>Makes a formatted string that gives hints of the generator activation/suspension states.</summary>
-  /// <returns><c>null</c> if the building is not in power-saving mode or if the building is not compatible.</returns>
-  public static string FormatGeneratorBuildingText(MechanicalNode mechanicalNode, ILoc loc) {
-    if (!mechanicalNode.IsGenerator) {
-      return null;
-    }
-    var outputBalancer = mechanicalNode.GetComponentFast<PowerOutputBalancer>();
-    if (!outputBalancer) {
-      return null;
-    }
-    if (outputBalancer.MinutesTillResume > 0) {
-      return loc.T(MinutesTillResumeLocKey, outputBalancer.MinutesTillResume);
-    }
-    if (outputBalancer.MinutesTillSuspend > 0) {
-      return loc.T(MinutesTillSuspendLocKey, outputBalancer.MinutesTillSuspend);
-    }
-    return null;
-  }
 }

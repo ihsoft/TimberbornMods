@@ -107,6 +107,12 @@
       <Compile Include="..\TimberDev\UI\PanelFragment.cs">
         <Link>TimberDev\UI\PanelFragment.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\UI\PanelFragmentPatcher.cs">
+        <Link>TimberDev\UI\PanelFragmentPatcher.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UI\PanelFragmentNames.cs">
+        <Link>TimberDev\UI\PanelFragmentNames.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\UI\PreciseSliderWrapper.cs">
         <Link>TimberDev\UI\PreciseSliderWrapper.cs</Link>
       </Compile>

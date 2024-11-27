@@ -4,11 +4,13 @@
 
 using System.Linq;
 using IgorZ.SmartPower.PowerGenerators;
+using IgorZ.SmartPower.UI;
 using IgorZ.TimberDev.UI;
 using IgorZ.TimberDev.Utils;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
+using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -21,6 +23,9 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
   const string AppliedToGeneratorsLocKey = "IgorZ.SmartPower.PowerOutputBalancer.AppliedToGenerators";
 
   readonly UiFactory _uiFactory;
+
+  Label _suspendStatusLabel;  // It is patched in the stock UI.
+  PanelFragmentPatcher<Label> _panelFragmentPatcher;
 
   VisualElement _root;
   Toggle _automateCheckbox;
@@ -61,6 +66,11 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
         .AddComponent(_uiFactory.CenterElement(_applyToAllGeneratorsButton))
         .BuildAndInitialize();
 
+    _suspendStatusLabel = _uiFactory.CreateLabel();
+    _suspendStatusLabel.ToggleDisplayStyle(visible: false);
+    _panelFragmentPatcher = new PanelFragmentPatcher<Label>(
+        _suspendStatusLabel, _root, PanelFragmentNames.MechanicalNodeFragmentName, "Generator");
+
     _root.ToggleDisplayStyle(visible: false);
     return _root;
   }
@@ -70,6 +80,7 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
     if (!_balancer) {
       return;
     }
+    _panelFragmentPatcher.Patch();
     _automateCheckbox.SetValueWithoutNotify(_balancer.Automate);
     _chargeBatteriesSlider.SetValueWithoutNotify(
         new Vector2(_balancer.DischargeBatteriesThreshold, _balancer.ChargeBatteriesThreshold));
@@ -80,6 +91,7 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
 
   public void ClearFragment() {
     _root.ToggleDisplayStyle(visible: false);
+    _suspendStatusLabel.ToggleDisplayStyle(visible: false);
     _balancer = null;
   }
 
@@ -94,6 +106,7 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
           _applyToAllGeneratorsButton.SetEnabled(true);
           _applyToAllUpdater = null;
         });
+    UpdateGeneratorBuildingText();
   }
 
   void UpdateControls() {
@@ -113,5 +126,20 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
     _applyToAllUpdater = new TimedUpdater(1.0f, startNow: true);
     _applyToAllGeneratorsButton.text = _uiFactory.Loc.T(AppliedToGeneratorsLocKey, affectedGenerators);
     _applyToAllGeneratorsButton.SetEnabled(false);
+  }
+
+  const string MinutesTillResumeLocKey = "IgorZ.SmartPower.Common.MinutesTillResume";
+  const string MinutesTillSuspendLocKey = "IgorZ.SmartPower.Common.MinutesTillSuspend";
+
+  void UpdateGeneratorBuildingText() {
+    if (_balancer.MinutesTillResume > 0) {
+      _suspendStatusLabel.text = _uiFactory.Loc.T(MinutesTillResumeLocKey, _balancer.MinutesTillResume);
+      _suspendStatusLabel.ToggleDisplayStyle(visible: true);
+    } else if (_balancer.MinutesTillSuspend > 0) {
+      _suspendStatusLabel.text = _uiFactory.Loc.T(MinutesTillSuspendLocKey, _balancer.MinutesTillSuspend);
+      _suspendStatusLabel.ToggleDisplayStyle(visible: true);
+    } else {
+      _suspendStatusLabel.ToggleDisplayStyle(visible: false);
+    }
   }
 }
