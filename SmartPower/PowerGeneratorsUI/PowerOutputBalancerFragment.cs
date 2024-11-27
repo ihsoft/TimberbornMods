@@ -4,13 +4,11 @@
 
 using System.Linq;
 using IgorZ.SmartPower.PowerGenerators;
-using IgorZ.SmartPower.UI;
 using IgorZ.TimberDev.UI;
 using IgorZ.TimberDev.Utils;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
-using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -133,10 +131,10 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
 
   void UpdateGeneratorBuildingText() {
     if (_balancer.MinutesTillResume > 0) {
-      _suspendStatusLabel.text = _uiFactory.Loc.T(MinutesTillResumeLocKey, _balancer.MinutesTillResume);
+      _suspendStatusLabel.text = _uiFactory.T(MinutesTillResumeLocKey, _balancer.MinutesTillResume);
       _suspendStatusLabel.ToggleDisplayStyle(visible: true);
     } else if (_balancer.MinutesTillSuspend > 0) {
-      _suspendStatusLabel.text = _uiFactory.Loc.T(MinutesTillSuspendLocKey, _balancer.MinutesTillSuspend);
+      _suspendStatusLabel.text = _uiFactory.T(MinutesTillSuspendLocKey, _balancer.MinutesTillSuspend);
       _suspendStatusLabel.ToggleDisplayStyle(visible: true);
     } else {
       _suspendStatusLabel.ToggleDisplayStyle(visible: false);

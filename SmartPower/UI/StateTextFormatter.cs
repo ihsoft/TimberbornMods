@@ -88,20 +88,6 @@ public static class StateTextFormatter {
     }
     var lines = new List<string>();
 
-    var inputLimiter = mechanicalNode.GetComponentFast<PowerInputLimiter>();
-    if (inputLimiter) {
-      if (inputLimiter.IsSuspended) {
-        lines.Add(inputLimiter.LowBatteriesCharge ? loc.T(LowBatteriesChargeLocKey) : loc.T(NotEnoughPowerLocKey));
-        if (inputLimiter.MinutesTillResume > 0) {
-          lines.Add(loc.T(MinutesTillResumeLocKey, inputLimiter.MinutesTillResume));
-        }
-        return string.Join("\n", lines);
-      }
-      if (inputLimiter.MinutesTillSuspend > 0) {
-        lines.Add(loc.T(MinutesTillSuspendLocKey, inputLimiter.MinutesTillSuspend));
-      }
-    }
-
     var smartManufactory = mechanicalNode.GetComponentFast<SmartManufactory>();
     if (smartManufactory && smartManufactory.StandbyMode) {
       if (smartManufactory.NoFuel) {
