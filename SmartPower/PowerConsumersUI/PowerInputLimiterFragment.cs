@@ -110,7 +110,7 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
     _applyToAllBuildingsButton.ToggleDisplayStyle(visible: _powerInputLimiter.enabled);
     _applyToAllUpdater?.Update(
         () => {
-          _applyToAllBuildingsButton.text = _uiFactory.Loc.T(ApplyToAllBuildingsLocKey);
+          _applyToAllBuildingsButton.text = _uiFactory.T(ApplyToAllBuildingsLocKey);
           _applyToAllBuildingsButton.SetEnabled(true);
           _applyToAllUpdater = null;
         });
@@ -118,9 +118,9 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
   }
 
   void UpdateControls() {
-    _suspendIfLowEfficiencyLabel.text = _uiFactory.Loc.T(
+    _suspendIfLowEfficiencyLabel.text = _uiFactory.T(
         SuspendIfLowEfficiencyLocKey, Mathf.RoundToInt(_minEfficiencySlider.Value * 100));
-    _suspendIfBatteryLowCheckbox.text = _uiFactory.Loc.T(
+    _suspendIfBatteryLowCheckbox.text = _uiFactory.T(
         MinBatteriesRatioLocKey, Mathf.RoundToInt(_powerInputLimiter.MinBatteriesCharge * 100));
 
     _suspendIfLowEfficiencyLabel.SetEnabled(_automateCheckbox.value);
@@ -139,7 +139,7 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
       balancer.UpdateState();
     }
     _applyToAllUpdater = new TimedUpdater(1.0f, startNow: true);
-    _applyToAllBuildingsButton.text = _uiFactory.Loc.T(AppliedToBuildingsLocKey, affectedBuildings);
+    _applyToAllBuildingsButton.text = _uiFactory.T(AppliedToBuildingsLocKey, affectedBuildings);
     _applyToAllBuildingsButton.SetEnabled(false);
   }
 }

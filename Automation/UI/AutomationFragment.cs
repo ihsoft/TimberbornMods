@@ -64,9 +64,9 @@ sealed class AutomationFragment : IEntityPanelFragment {
         rules.AppendLine();
       }
       rules.Append(SpecialStrings.RowStarter);
-      rules.Append(_uiFactory.Loc.T(RuleTextLocKey, action.Condition.UiDescription, action.UiDescription));
+      rules.Append(_uiFactory.T(RuleTextLocKey, action.Condition.UiDescription, action.UiDescription));
     }
-    _caption.text = _uiFactory.Loc.T(RulesAreaCaptionTextLocKey);
+    _caption.text = _uiFactory.T(RulesAreaCaptionTextLocKey);
     _rulesList.text = rules.ToString();
     _root.ToggleDisplayStyle(visible: true);
   }

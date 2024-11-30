@@ -94,7 +94,7 @@ sealed class InjuryProbabilityFragment : IEntityPanelFragment {
     _injuryProbabilityAvatarHint.style.color = color;
 
     var coloredText = $"<color=#{ColorUtility.ToHtmlStringRGB(color)}>{probabilityPct:0.###}%</color>";
-    _injuryProbabilityText = _uiFactory.Loc.T(InjuryProbabilityLocKey, coloredText);
+    _injuryProbabilityText = _uiFactory.T(InjuryProbabilityLocKey, coloredText);
     _injuryProbabilityLabel.text = _injuryProbabilityText;
 
     _injuryProbabilityAvatarHint.ToggleDisplayStyle(visible: _settings.ShowAvatarHint.Value);

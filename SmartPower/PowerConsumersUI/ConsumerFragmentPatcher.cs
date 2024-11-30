@@ -82,11 +82,11 @@ sealed class ConsumerFragmentPatcher {
 
     if (powerInputLimiter.IsSuspended) {
       _suspendReasonLabel.text = powerInputLimiter.LowBatteriesCharge
-          ? _uiFactory.Loc.T(LowBatteriesChargeLocKey)
-          : _uiFactory.Loc.T(NotEnoughPowerLocKey);
+          ? _uiFactory.T(LowBatteriesChargeLocKey)
+          : _uiFactory.T(NotEnoughPowerLocKey);
       _suspendReasonLabel.ToggleDisplayStyle(visible: true);
       if (powerInputLimiter.MinutesTillResume > 0) {
-        _suspendStateProgressLabel.text = _uiFactory.Loc.T(MinutesTillResumeLocKey, powerInputLimiter.MinutesTillResume);
+        _suspendStateProgressLabel.text = _uiFactory.T(MinutesTillResumeLocKey, powerInputLimiter.MinutesTillResume);
         _suspendStateProgressLabel.ToggleDisplayStyle(visible: true);
       } else {
         _suspendStateProgressLabel.ToggleDisplayStyle(visible: false);
@@ -96,7 +96,7 @@ sealed class ConsumerFragmentPatcher {
 
     _suspendReasonLabel.ToggleDisplayStyle(visible: false);
     if (powerInputLimiter.MinutesTillSuspend > 0) {
-      _suspendStateProgressLabel.text = _uiFactory.Loc.T(MinutesTillSuspendLocKey, powerInputLimiter.MinutesTillSuspend);
+      _suspendStateProgressLabel.text = _uiFactory.T(MinutesTillSuspendLocKey, powerInputLimiter.MinutesTillSuspend);
       _suspendStateProgressLabel.ToggleDisplayStyle(visible: true);
     } else {
       _suspendStateProgressLabel.ToggleDisplayStyle(visible: false);
@@ -108,13 +108,13 @@ sealed class ConsumerFragmentPatcher {
     string idleState = null;
     if (smartManufactory.StandbyMode) {
       if (smartManufactory.NoFuel) {
-        idleState = _uiFactory.Loc.T(NoFuelLocKey);
+        idleState = _uiFactory.T(NoFuelLocKey);
       } else if (smartManufactory.MissingIngredients) {
-        idleState = _uiFactory.Loc.T(NoInputModeLocKey);
+        idleState = _uiFactory.T(NoInputModeLocKey);
       } else if (smartManufactory.BlockedOutput) {
-        idleState = _uiFactory.Loc.T(BlockedOutputLocKey);
+        idleState = _uiFactory.T(BlockedOutputLocKey);
       } else if (smartManufactory.AllWorkersOut) {
-        idleState = _uiFactory.Loc.T(NoWorkersLocKey);
+        idleState = _uiFactory.T(NoWorkersLocKey);
       }
     }
     if (idleState != null) {

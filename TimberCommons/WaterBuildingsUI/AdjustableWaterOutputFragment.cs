@@ -64,7 +64,7 @@ sealed class AdjustableWaterOutputFragment : IEntityPanelFragment {
     if (!_adjustableWaterOutput) {
       return;
     }
-    _infoLabel.text = _uiFactory.Loc.T(StopAboveDownstreamDepthLocKey, _waterLevelSlider.Value.ToString("0.00"));
+    _infoLabel.text = _uiFactory.T(StopAboveDownstreamDepthLocKey, _waterLevelSlider.Value.ToString("0.00"));
     _waterLevelSlider.UpdateValuesWithoutNotify(WaterLevelSliderValue, Range);
   }
 }

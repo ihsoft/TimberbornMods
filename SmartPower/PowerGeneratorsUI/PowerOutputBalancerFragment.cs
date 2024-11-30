@@ -100,7 +100,7 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
     _applyToAllGeneratorsButton.ToggleDisplayStyle(visible: _balancer.enabled);
     _applyToAllUpdater?.Update(
         () => {
-          _applyToAllGeneratorsButton.text = _uiFactory.Loc.T(ApplyToAllGeneratorsLocKey);
+          _applyToAllGeneratorsButton.text = _uiFactory.T(ApplyToAllGeneratorsLocKey);
           _applyToAllGeneratorsButton.SetEnabled(true);
           _applyToAllUpdater = null;
         });
@@ -108,7 +108,7 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
   }
 
   void UpdateControls() {
-    _chargeBatteriesText.text = _uiFactory.Loc.T(
+    _chargeBatteriesText.text = _uiFactory.T(
         ChargeLevelLocKey, Mathf.RoundToInt(_balancer.DischargeBatteriesThreshold * 100),
         Mathf.RoundToInt(_balancer.ChargeBatteriesThreshold * 100));
   }
@@ -122,7 +122,7 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
       balancer.UpdateState();
     }
     _applyToAllUpdater = new TimedUpdater(1.0f, startNow: true);
-    _applyToAllGeneratorsButton.text = _uiFactory.Loc.T(AppliedToGeneratorsLocKey, affectedGenerators);
+    _applyToAllGeneratorsButton.text = _uiFactory.T(AppliedToGeneratorsLocKey, affectedGenerators);
     _applyToAllGeneratorsButton.SetEnabled(false);
   }
 

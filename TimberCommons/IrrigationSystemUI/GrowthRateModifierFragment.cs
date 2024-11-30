@@ -50,7 +50,7 @@ sealed class GrowthRateModifierFragment : IEntityPanelFragment {
     }
     _root.ToggleDisplayStyle(visible: IsModifierVisible());
     var locKey = _growthModifier.EffectiveModifier > 0f ? BoostPercentileLocKey : SlowdownPercentileLocKey;
-    _infoLabel.text = _uiFactory.Loc.T(locKey, Mathf.Abs(_growthModifier.EffectiveModifier));
+    _infoLabel.text = _uiFactory.T(locKey, Mathf.Abs(_growthModifier.EffectiveModifier));
   }
 
   bool IsModifierVisible() {

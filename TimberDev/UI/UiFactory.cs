@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System;
+using System.Runtime.CompilerServices;
 using TimberApi.UIBuilderSystem;
 using TimberApi.UIBuilderSystem.StylingElements;
 using TimberApi.UIPresets.Buttons;
@@ -20,6 +21,7 @@ namespace IgorZ.TimberDev.UI;
 /// <summary>Factory for making standard fragment panel elements.</summary>
 public sealed class UiFactory {
   readonly VisualElementLoader _visualElementLoader;
+  readonly ILoc _loc;
 
   /// <summary>Common padding around the button text on the right side panel.</summary>
   public static readonly Padding StandardButtonPadding = new(2, 10, 2, 10);
@@ -27,14 +29,27 @@ public sealed class UiFactory {
   /// <summary>The TAPI UI builder.</summary>
   public readonly UIBuilder UiBuilder;
 
-  /// <summary>The localization service to use for the UI elements.</summary>
-  public readonly ILoc Loc;
-
   UiFactory(VisualElementLoader visualElementLoader, UIBuilder uiBuilder, ILoc loc) {
     _visualElementLoader = visualElementLoader;
     UiBuilder = uiBuilder;
-    Loc = loc;
+    _loc = loc;
   }
+
+  /// <summary>A shortcut to "ILoc.T()".</summary>
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public string T(string key) => _loc.T(key);
+
+  /// <summary>A shortcut to "ILoc.T()".</summary>
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public string T<T1>(string key, T1 param1) => _loc.T(key, param1);
+
+  /// <summary>A shortcut to "ILoc.T()".</summary>
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public string T<T1, T2>(string key, T1 param1, T2 param2) => _loc.T(key, param1, param2);
+
+  /// <summary>A shortcut to "ILoc.T()".</summary>
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public string T<T1, T2, T3>(string key, T1 param1, T2 param2, T3 param3) => _loc.T(key, param1, param2, param3);
 
   /// <summary>Creates a slider in a theme suitable for the right side panel.</summary>
   /// <remarks>
@@ -146,7 +161,7 @@ public sealed class UiFactory {
   /// <summary>Creates a label in a theme suitable for the right side panel.</summary>
   /// <param name="locKey">Optional loc key for the caption.</param>
   public Label CreateLabel(string locKey = null) {
-    return UiBuilder.Create<GameTextLabel>().SetText(locKey != null ? Loc.T(locKey) : "").Build();
+    return UiBuilder.Create<GameTextLabel>().SetText(locKey != null ? T(locKey) : "").Build();
   }
 
   /// <summary>Creates a button in a theme suitable for the right side panel.</summary>
