@@ -13,7 +13,6 @@ namespace IgorZ.SmartPower.UI;
 sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).FullName;
   static readonly Type[] Patches = [
-      typeof(ConsumerFragmentServicePatch),
       typeof(NetworkFragmentServicePatch)
   ];
 

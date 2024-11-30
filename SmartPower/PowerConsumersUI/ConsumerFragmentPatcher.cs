@@ -16,6 +16,11 @@ sealed class ConsumerFragmentPatcher {
   const string MinutesTillResumeLocKey = "IgorZ.SmartPower.Common.MinutesTillResume";
   const string MinutesTillSuspendLocKey = "IgorZ.SmartPower.Common.MinutesTillSuspend";
 
+  const string NoWorkersLocKey = "IgorZ.SmartPower.MechanicalBuilding.NoWorkersStatus";
+  const string NoFuelLocKey = "IgorZ.SmartPower.MechanicalBuilding.NoFuelStatus";
+  const string NoInputModeLocKey = "IgorZ.SmartPower.MechanicalBuilding.NoInputStatus";
+  const string BlockedOutputLocKey = "IgorZ.SmartPower.MechanicalBuilding.BlockedOutputStatus";
+
   readonly UiFactory _uiFactory;
 
   Label _suspendReasonLabel;  // It is patched in the stock UI.
@@ -95,6 +100,28 @@ sealed class ConsumerFragmentPatcher {
       _suspendStateProgressLabel.ToggleDisplayStyle(visible: true);
     } else {
       _suspendStateProgressLabel.ToggleDisplayStyle(visible: false);
+    }
+  }
+
+  /// <summary>Updates the smart manufactory idle state description (if any).</summary>
+  public void UpdateSmartManufactory(SmartManufactory smartManufactory) {
+    string idleState = null;
+    if (smartManufactory.StandbyMode) {
+      if (smartManufactory.NoFuel) {
+        idleState = _uiFactory.Loc.T(NoFuelLocKey);
+      } else if (smartManufactory.MissingIngredients) {
+        idleState = _uiFactory.Loc.T(NoInputModeLocKey);
+      } else if (smartManufactory.BlockedOutput) {
+        idleState = _uiFactory.Loc.T(BlockedOutputLocKey);
+      } else if (smartManufactory.AllWorkersOut) {
+        idleState = _uiFactory.Loc.T(NoWorkersLocKey);
+      }
+    }
+    if (idleState != null) {
+      _idleStateLabel.text = idleState;
+      _idleStateLabel.ToggleDisplayStyle(visible: true);
+    } else {
+      _idleStateLabel.ToggleDisplayStyle(visible: false);
     }
   }
 }

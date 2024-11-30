@@ -12,15 +12,18 @@ namespace IgorZ.SmartPower.PowerConsumersUI;
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<PowerInputLimiterFragment>().AsSingleton();
+    containerDefinition.Bind<SmartManufactoryFragment>().AsSingleton();
     containerDefinition.Bind<ConsumerFragmentPatcher>().AsSingleton();
     containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
   }
 
-  sealed class EntityPanelModuleProvider(
-      PowerInputLimiterFragment powerInputLimiterFragment) : IProvider<EntityPanelModule> {
+  sealed class EntityPanelModuleProvider(PowerInputLimiterFragment powerInputLimiterFragment,
+                                         SmartManufactoryFragment smartManufactoryFragment)
+      : IProvider<EntityPanelModule> {
     public EntityPanelModule Get() {
       var builder = new EntityPanelModule.Builder();
       builder.AddMiddleFragment(powerInputLimiterFragment);
+      builder.AddMiddleFragment(smartManufactoryFragment);
       return builder.Build();
     }
   }
