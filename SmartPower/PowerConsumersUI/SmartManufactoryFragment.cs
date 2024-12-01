@@ -28,10 +28,8 @@ sealed class SmartManufactoryFragment : IEntityPanelFragment {
   }
 
   public void ShowFragment(BaseComponent entity) {
+    _consumerFragmentPatcher.InitializePatch(_root);
     _smartManufactory = entity.GetComponentFast<SmartManufactory>();
-    if (_smartManufactory) {
-      _consumerFragmentPatcher.InitializePatch(_root);
-    }
   }
 
   public void ClearFragment() {

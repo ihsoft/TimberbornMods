@@ -84,11 +84,11 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
   }
 
   public void ShowFragment(BaseComponent entity) {
+    _consumerFragmentPatcher.InitializePatch(_root);
     _powerInputLimiter = entity.GetComponentFast<PowerInputLimiter>();
-    if (_powerInputLimiter == null) {
+    if (!_powerInputLimiter) {
       return;
     }
-    _consumerFragmentPatcher.InitializePatch(_root);
     _automateCheckbox.SetValueWithoutNotify(_powerInputLimiter.Automate);
     _minEfficiencySlider.UpdateValuesWithoutNotify(_powerInputLimiter.MinPowerEfficiency, 1f);
     _suspendIfBatteryLowCheckbox.SetValueWithoutNotify(_powerInputLimiter.CheckBatteryCharge);

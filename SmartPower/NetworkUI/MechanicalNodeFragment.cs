@@ -71,16 +71,14 @@ sealed class MechanicalNodeFragment : IEntityPanelFragment {
   }
 
   public void UpdateFragment() {
-    if (_mechanicalNode) {
+    if (_mechanicalNode && _mechanicalNode.Graph != null) {
       UpdateBatteryText();
+    } else {
+      _batteryTextLabel.ToggleDisplayStyle(visible: false);
     }
   }
 
   void UpdateBatteryText() {
-    // var batteryTotalCapacity = _mechanicalNode.Graph.BatteryControllers
-    //     .Where(x => x.Operational)
-    //     .Select(x => x.Capacity)
-    //     .Sum();
     _smartPowerService.GetBatteriesStat(_mechanicalNode.Graph, out var batteryTotalCapacity, out _);
     if (batteryTotalCapacity == 0) {
       _batteryTextLabel.ToggleDisplayStyle(visible: false);
