@@ -1,7 +1,8 @@
-# v1.12.1 (started on 9/28/2024)
+# v1.12.4 (3 Dec 2024)
 * Full refactoring of the power balancing logic.
 * [Enhancement] Consumers can be configured to stop/start if there is not enough power in the network.
 * [Enhancement] Display status for when the batteries aren't used (a positive balance) or are depleted (a negative balance and no charge). 
+* [Enhancement] Show a floating icon over the suspended buildings. Configurable via settings.
 
 # v1.11.2 (25 Sep 2024)
 * [Fix] "Apply to all generators" button is not resized.
