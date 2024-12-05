@@ -23,6 +23,13 @@ Wheels differ slightly from Engines in terms of how they compensate for supply s
 [h1]Ironteeth bot charging station[/h1]
 The charging station consumes full power only when charging a bot. In the idle state, it is only taking 1 hp.
 
+[h1]All power consumers[/h1]
+[list]
+[*] The minimum power effectiveness can be set to suspend the building if there is insufficient power in the network.
+[*] The building suspension can be configured to activate when the battery charge in the network is too low.
+[/list]
+The suspended building will release the workers (if any), and any ingredients will be removed (if applicable). It is similar to a paused building, but the status is different, and the building will activate automatically when there is enough power.  
+
 [h1]Powered attractions[/h1]
 If an attraction needs energy, but has no attendees, then it will go into low power mode and only consumes 1 hp.
 

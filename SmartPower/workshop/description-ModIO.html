@@ -1,25 +1,31 @@
 <h2>Overview</h2>
 <p>This mod modifies some power generating and consuming buildings to optimize power usage. It also adds some UI sugar to the existing components.</p>
 <h2>Supported languages</h2>
-<p><img src="https://raw.githubusercontent.com/ihsoft/TimberbornMods/main/Assets/enUS-banner.png" alt="" width="30" height="16" /> English<br /><img src="https://raw.githubusercontent.com/ihsoft/TimberbornMods/main/Assets/ruRU-banner.png" alt="" width="30" height="20" /> Русский<br /><img src="https://raw.githubusercontent.com/ihsoft/TimberbornMods/main/Assets/frFR-banner.png" alt="" width="30" height="20" />&nbsp;Fran&ccedil;ais (Erazil@Discord)<br /><img src="https://raw.githubusercontent.com/ihsoft/TimberbornMods/main/Assets/deDE-banner.png" alt="" width="30" height="20" /> Deutsch (juf0816@Discord)</p>
+<p><img src="https://raw.githubusercontent.com/ihsoft/TimberbornMods/main/Assets/enUS-banner.png" alt="" width="30" height="16"> English<br><img src="https://raw.githubusercontent.com/ihsoft/TimberbornMods/main/Assets/ruRU-banner.png" alt="" width="30" height="20"> Русский<br><img src="https://raw.githubusercontent.com/ihsoft/TimberbornMods/main/Assets/frFR-banner.png" alt="" width="30" height="20"> Français (Erazil@Discord)<br><img src="https://raw.githubusercontent.com/ihsoft/TimberbornMods/main/Assets/deDE-banner.png" alt="" width="30" height="20"> Deutsch (juf0816@Discord)</p>
 <h2>Ironteeth Engine</h2>
 <ul>
-    <li>Engines automatically turn on and off to minimize the wood consumption while providing enough power supply to the network.</li>
-    <li>If there are batteries in the network, then the engines will only produce energy to keep the total network charge reserve within a specified range. For example, "not less than 10%, but not greater than 35%." This can be configured per engine.</li>
+<li>Engines automatically turn on and off to minimize the wood consumption while providing enough power supply to the network.</li>
+<li>If there are batteries in the network, then the engines will only produce energy to keep the total network charge reserve within a specified range. For example, "not less than 10%, but not greater than 35%." This can be configured per engine.</li>
 </ul>
 <h2>Power Wheel</h2>
 <ul>
-    <li>If automation is turned on for the wheel, it will pause and resume based on the demand/supply.</li>
-    <li>The same approach to battery charging applies as for the Engine. Engine and Power Wheel settings aren't shared.</li>
+<li>If automation is turned on for the wheel, it will pause and resume based on the demand/supply.</li>
+<li>The same approach to battery charging applies as for the Engine. Engine and Power Wheel settings aren't shared.</li>
 </ul>
 <p>Wheels differ slightly from Engines in terms of how they compensate for supply shortages. It may take a significant amount of time before an unpaused wheel starts producing energy. Therefore, when a shortage is detected, all the wheels in the network will start. Then, some of them that are not needed will pause.</p>
 <h2>Ironteeth bot charging station</h2>
-<p>The charging station consumes full power only when charging a bot. In the idle state, it is only taking 1 hp.</p>
+<p>The charging station consumes full power only when charging a bot. In the idle state, it is only taking 1&Acirc;&nbsp;hp.</p>
+<h2>All power consumers</h2>
+<ul>
+<li>The minimum power effectiveness can be set to suspend the building if there is insufficient power in the network.</li>
+<li>The building suspension can be configured to activate when the battery charge in the network is too low.</li>
+</ul>
+<p>The suspended building will release the workers (if any), and any ingredients will be removed (if applicable). It is similar to a paused building, but the status is different, and the building will activate automatically when there is enough power.</p>
 <h2>Powered attractions</h2>
-<p>If an attraction needs energy, but has no attendees, then it will go into low power mode and only consumes 1 hp.</p>
+<p>If an attraction needs energy, but has no attendees, then it will go into low power mode and only consumes 1&Acirc;&nbsp;hp.</p>
 <h2>Powered manufactories</h2>
 <p>If a manufactory has assigned worker, but the product can't be produced for any reason, then the building goes into power-saving mode in which it only consumes 10% of the nominal power. Buildings in this mode will have a special notification icon and an explanation of why the mode was activated. Also, if no recipe selected, the building doesn't consume power at all.</p>
 <h2>Mechanical nodes</h2>
 <p>All buildings with a mechanical node like shafts or generators get a UI extension. They will show information about batteries in the network: the remaining charge, charge/discharge rate, and the remaining time estimation.</p>
-<hr />
-<p>Discord: <a href="https://discord.com/channels/558398674389172225/1129907373155291258">https://discord.com/channels/558398674389172225/1129907373155291258</a><br />See more details in Wiki: <a href="https://github.com/ihsoft/TimberbornMods/wiki/Smart-Power">https://github.com/ihsoft/TimberbornMods/wiki/Smart-Power</a><br />Report a bug: <a href="https://github.com/ihsoft/TimberbornMods/labels/smartpower">https://github.com/ihsoft/TimberbornMods/labels/smartpower</a><br />GitHub repository: <a href="https://github.com/ihsoft/TimberbornMods">https://github.com/ihsoft/TimberbornMods</a></p>
+<hr>
+<p>Discord: <a href="https://discord.com/channels/558398674389172225/1129907373155291258">https://discord.com/channels/558398674389172225/1129907373155291258</a><br>See more details in Wiki: <a href="https://github.com/ihsoft/TimberbornMods/wiki/Smart-Power">https://github.com/ihsoft/TimberbornMods/wiki/Smart-Power</a><br>Report a bug: <a href="https://github.com/ihsoft/TimberbornMods/labels/smartpower">https://github.com/ihsoft/TimberbornMods/labels/smartpower</a><br>GitHub repository: <a href="https://github.com/ihsoft/TimberbornMods">https://github.com/ihsoft/TimberbornMods</a></p>
