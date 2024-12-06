@@ -4,7 +4,7 @@
 
 using UnityEngine;
 
-namespace IgorZ.Automation.ScriptingEngine;
+namespace IgorZ.Automation.ScriptingEngine.Values;
 
 /// <summary>Value that represents a number.</summary>
 /// <remarks>

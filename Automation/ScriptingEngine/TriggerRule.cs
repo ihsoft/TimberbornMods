@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System.Collections.Generic;
+using IgorZ.Automation.ScriptingEngine.Nodes;
 
 namespace IgorZ.Automation.ScriptingEngine;
 

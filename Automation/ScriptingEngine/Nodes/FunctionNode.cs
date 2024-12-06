@@ -5,8 +5,9 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using IgorZ.Automation.ScriptingEngine.Values;
 
-namespace IgorZ.Automation.ScriptingEngine;
+namespace IgorZ.Automation.ScriptingEngine.Nodes;
 
 class FunctionNode : ExpressionNode {
 

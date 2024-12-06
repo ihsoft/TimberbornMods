@@ -4,6 +4,9 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using IgorZ.Automation.ScriptingEngine.Nodes;
+using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
+using IgorZ.Automation.ScriptingEngine.Values;
 using Timberborn.BaseComponentSystem;
 using UnityDev.Utils.LogUtilsLite;
 

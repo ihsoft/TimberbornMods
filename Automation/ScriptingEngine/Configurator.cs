@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using Bindito.Core;
+using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 using IgorZ.TimberDev.Utils;
 using Timberborn.Buildings;
 using Timberborn.TemplateSystem;

@@ -5,7 +5,7 @@
 using System;
 using UnityEngine;
 
-namespace IgorZ.Automation.ScriptingEngine;
+namespace IgorZ.Automation.ScriptingEngine.Values;
 
 /// <summary>Expression value that represents a constant string.</summary>
 sealed class StringValue : IExpressionValue {

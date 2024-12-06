@@ -4,13 +4,14 @@
 
 using System;
 using System.Collections.Generic;
+using IgorZ.Automation.ScriptingEngine.Values;
 using Timberborn.BaseComponentSystem;
 using Timberborn.EntitySystem;
 using Timberborn.Persistence;
 using Timberborn.WaterBuildings;
 using UnityEngine;
 
-namespace IgorZ.Automation.ScriptingEngine;
+namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
 sealed class FloodgateScriptableComponent : BaseComponent, ITrigger, IScriptableInstance,
                                             IDeletableEntity, IPostInitializableLoadedEntity {

@@ -4,7 +4,7 @@
 
 using UnityDev.Utils.LogUtilsLite;
 
-namespace IgorZ.Automation.ScriptingEngine;
+namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
 sealed class DebugScriptableComponent : IScriptableInstance {
 
