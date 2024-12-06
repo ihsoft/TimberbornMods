@@ -1,3 +1,6 @@
+# v1.2.5 (5 Dec 2024):
+* Fix crashes in some edge cases when Choo-Choo mod is installed.
+
 # v1.2.4 (20 Oct 2024):
 * [Fix #63] Mod crashes on path checking under undetermined conditions.
 

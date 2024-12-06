@@ -191,7 +191,7 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
     return true;
   }
 
-  /// <summary>Gathers all coordinates that are taken by the characters paths.</summary>
+  /// <summary>Gathers all coordinates that are taken by the character paths.</summary>
   /// <remarks>We don't want to let the builders get stranded.</remarks>
   void MaybeBuildWalkersIndex() {
     if (_lastCacheBuiltFrame == Time.frameCount) {
@@ -202,7 +202,7 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
     _walkersTakenNodes = new HashSet<int>();
     var citizens = _entityComponentRegistry.GetEnabled<BlockOccupant>()
         .Select(x => x.GetComponentFast<Citizen>())
-        .Where(x => x.HasAssignedDistrict);
+        .Where(x => x && x.HasAssignedDistrict);
     foreach (var citizen in citizens) {
       var pathNodes = GetPathToRoadFast(citizen.TransformFast.position, citizen.AssignedDistrict.District);
       if (pathNodes != null) {
