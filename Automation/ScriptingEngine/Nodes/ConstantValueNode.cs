@@ -7,4 +7,7 @@ namespace IgorZ.Automation.ScriptingEngine.Nodes;
 sealed class ConstantValueNode(IExpressionValue value) : ExpressionNode {
   /// <inheritdoc/>
   public override IExpressionValue Eval() => value;
+
+  /// <inheritdoc/>
+  public override string ToString() => "Constant value: " + value;
 }

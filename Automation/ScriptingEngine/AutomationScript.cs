@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Bindito.Core;
 using IgorZ.Automation.ScriptingEngine.Nodes;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 using IgorZ.Automation.ScriptingEngine.Values;
@@ -19,8 +20,6 @@ sealed class AutomationScript : BaseComponent {
 
   public TriggerRule[] TriggerRules { get; private set; } = [];
 
-  DebugScriptableComponent _debug = new DebugScriptableComponent();
-
   string ScriptableObjectName = null;
 
   Dictionary<string, ITrigger> SelfTriggers => _triggers ??= GetTriggers(this);
@@ -28,6 +27,13 @@ sealed class AutomationScript : BaseComponent {
 
   Dictionary<string, IScriptableInstance> SelfInstances => _instances ??= GetInstances(this);
   Dictionary<string, IScriptableInstance> _instances;
+
+  ScriptingService _scriptingService;
+
+  [Inject]
+  public void InjectDependencies(ScriptingService scriptingService) {
+    _scriptingService = scriptingService;
+  }
 
   public void Compile(string code) {
     try {
@@ -71,7 +77,8 @@ sealed class AutomationScript : BaseComponent {
       throw new ScriptError($"Type {instanceTypeName} not found on: {DebugEx.ObjectToString(self)}");
     }
     ExpressionNode arg2 = new FunctionNode(floodgateInstance, "GetHeight", []);
-    IScriptableInstance debug = _debug;//FIXME: from global pull
+    var globalName = "Debug";
+    IScriptableInstance debug = _scriptingService.GetGlobalInstance(globalName);
     ExpressionNode statement = new FunctionNode(debug, "Log1", [arg1, arg2]);
     triggerNode.AddStatement(statement);
 

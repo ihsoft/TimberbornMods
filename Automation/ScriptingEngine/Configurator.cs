@@ -15,10 +15,12 @@ namespace IgorZ.Automation.ScriptingEngine;
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.MultiBind<TemplateModule>().ToProvider(ProvideTemplateModule).AsSingleton();
+    containerDefinition.Bind<ScriptingService>().AsSingleton();
   }
 
   static TemplateModule ProvideTemplateModule() {
     var builder = new TemplateModule.Builder();
+    //FIXME: optimize and only add to the buildings that can be automated or provide triggers.
     builder.AddDecorator<Building, AutomationScript>();
     builder.AddDecorator<Floodgate, FloodgateScriptableComponent>();
     return builder.Build();

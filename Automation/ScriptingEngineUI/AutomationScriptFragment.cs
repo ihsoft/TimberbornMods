@@ -10,6 +10,7 @@ using IgorZ.TimberDev.UI;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
+using Timberborn.Localization;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -33,7 +34,6 @@ sealed class AutomationScriptFragment : IEntityPanelFragment {
   public VisualElement InitializeFragment() {
     _caption = _uiFactory.CreateLabel();
     _caption.style.color = Color.cyan;
-    _caption.text = "Automation Script";
 
     _stats = _uiFactory.CreateLabel();
     //_stats.ToggleDisplayStyle(false);
@@ -64,11 +64,38 @@ sealed class AutomationScriptFragment : IEntityPanelFragment {
       return;
     }
 
+    string status;
+    if (_automationScript.LastError != null) {
+      status = HasErrors;
+    } else if (_automationScript.TriggerRules.Length > 0) {
+      status = CompiledSuccessfully;
+    } else {
+      status = NoAutomation;
+    }
+    _caption.text = TextColors.ColorizeText(string.Format(AutomationScriptStatus, status));
+
+    if (_automationScript.TriggerRules.Length == 0 || _automationScript.LastError != null) {
+      _stats.text = "";
+      return;
+    }
+
     var stats = new StringBuilder();
-    stats.AppendLine("Last error: " + _automationScript.LastError);
-    stats.AppendLine("Triggers: " + _automationScript.TriggerRules.Length);
+    stats.AppendLine("Triggers: ");
+    foreach (var trigger in _automationScript.TriggerRules) {
+      stats.Append(SpecialStrings.RowStarter);
+      stats.Append(trigger.Trigger.ScriptableTypeName + "." + trigger.Name + ":");
+      foreach (var target in trigger.AffectedTargets) {
+        stats.Append(trigger.AffectedTargets.Length > 1 ? SpecialStrings.RowStarter : " ");
+        stats.AppendLine(target);
+      }
+    }
     _stats.text = stats.ToString();
   }
+
+  const string HasErrors = "<RedHighlight>ERRORS</RedHighlight>";
+  const string CompiledSuccessfully = "<GreenHighlight>RUNNING</GreenHighlight>";
+  const string NoAutomation = "No script";
+  const string AutomationScriptStatus = "Automation Script status: {0}";
 
   void AddTestScript() {
     //FIXME

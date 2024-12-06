@@ -22,6 +22,9 @@ class FunctionNode : ExpressionNode {
   /// <summary>Name of the method to call. It is a real name of the method in the C# class.</summary>
   public string MethodName { get; }
 
+  /// <summary>Instance of the scriptable object that contains the method to call.</summary>
+  public IScriptableInstance Instance => _instance;
+
   #endregion
 
   #region ExpressionNode implementation
@@ -61,6 +64,13 @@ class FunctionNode : ExpressionNode {
         _ => throw new InvalidOperationException("Unsupported return type: " + result.GetType())
     };
   }
+
+  #endregion
+
+  #region Object overrides
+
+  /// <inheritdoc/>
+  public override string ToString() => $"Function: {Instance.ScriptableTypeName}{MethodName}({_argNodes.Length} args)";
 
   #endregion
 

@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System.Collections.Generic;
+using System.Linq;
 using IgorZ.Automation.ScriptingEngine.Nodes;
 
 namespace IgorZ.Automation.ScriptingEngine;
@@ -37,9 +38,20 @@ class TriggerRule : ITriggerEventListener {
 
   #region API
 
+  /// <summary>Names of the scriptable types that are affected by the rule.</summary>
+  public string[] AffectedTargets { get; private set; } = [];
+
   /// <summary>Adds a statement to the rule. They're executed in order when the trigger sends an event.</summary>
   public void AddStatement(ExpressionNode statement) {
+    if (statement is not FunctionNode) {
+      throw new System.ArgumentException("cannot be a statement: " + statement);
+    }
     _statements.Add(statement);
+    //FIXME: somehow determine if the function has side effects.
+    AffectedTargets = _statements.Cast<FunctionNode>()
+        .Select(x => x.Instance.ScriptableTypeName)
+        .Distinct()
+        .ToArray();
   }
 
   #endregion
