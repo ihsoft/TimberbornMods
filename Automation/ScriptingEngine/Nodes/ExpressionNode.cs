@@ -4,6 +4,7 @@
 
 namespace IgorZ.Automation.ScriptingEngine.Nodes;
 
+/// <summary>Base class for expression nodes.</summary>
 abstract class ExpressionNode {
   /// <summary>Evaluates the expression node.</summary>
   public abstract IExpressionValue Eval();

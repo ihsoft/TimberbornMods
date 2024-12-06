@@ -9,31 +9,22 @@ using IgorZ.Automation.ScriptingEngine.Values;
 
 namespace IgorZ.Automation.ScriptingEngine.Nodes;
 
+/// <summary>Expression node that represents a function call.</summary>
+/// <remarks>
+/// The function must be declared in a class that implements <see cref="IScriptableInstance"/> and be annotated with
+/// <see cref="IScriptableInstance.ScriptFunctionAttribute"/> attribute. Function can accept and return basic C# types
+/// or <see cref="IExpressionValue"/>. Methods are treated as functions returning <c>null</c>.
+/// </remarks>
 class FunctionNode : ExpressionNode {
 
+  #region API
+
+  /// <summary>Name of the method to call. It is a real name of the method in the C# class.</summary>
   public string MethodName { get; }
 
-  readonly ExpressionNode[] _argNodes;
-  readonly MethodInfo _methodInfo;
-  readonly IScriptableInstance _instance;
+  #endregion
 
-  //FIXME: check here or in parser if there is a return value
-  public FunctionNode(IScriptableInstance instance, string methodName, ExpressionNode[] argNodes) {
-    MethodName = methodName;
-    _instance = instance;
-    _argNodes = argNodes;
-
-    _methodInfo = instance.GetType().GetMethod(methodName);
-    var attribute = _methodInfo?.GetCustomAttribute<IScriptableInstance.ScriptFunctionAttribute>();
-    if (_methodInfo == null || attribute == null) {
-      throw new ScriptError($"Method {methodName} not found");
-    }
-
-    var numArgs = _methodInfo.GetParameters().Length;
-    if (numArgs != argNodes.Length) {
-      throw new ScriptError($"Expected {numArgs} arguments, got {argNodes.Length}");
-    }
-  }
+  #region ExpressionNode implementation
 
   /// <inheritdoc />
   public override IExpressionValue Eval() {
@@ -70,4 +61,34 @@ class FunctionNode : ExpressionNode {
         _ => throw new InvalidOperationException("Unsupported return type: " + result.GetType())
     };
   }
+
+  #endregion
+
+  #region Implementation
+
+  readonly ExpressionNode[] _argNodes;
+  readonly MethodInfo _methodInfo;
+  readonly IScriptableInstance _instance;
+
+  //FIXME: check here or in parser if there is a return value
+  public FunctionNode(IScriptableInstance instance, string methodName, ExpressionNode[] argNodes) {
+    MethodName = methodName;
+    _instance = instance;
+    _argNodes = argNodes;
+
+    _methodInfo = instance.GetType().GetMethod(methodName);
+    var attribute = _methodInfo?.GetCustomAttribute<IScriptableInstance.ScriptFunctionAttribute>();
+    if (_methodInfo == null || attribute == null) {
+      throw new ScriptError($"Method {methodName} not found");
+    }
+
+    var numArgs = _methodInfo.GetParameters().Length;
+    if (numArgs != argNodes.Length) {
+      throw new ScriptError($"Expected {numArgs} arguments, got {argNodes.Length}");
+    }
+    //FIXME: check if all arguyments types are correct
+    //FIXME: check if no variable parameters. 
+  }
+
+  #endregion
 }

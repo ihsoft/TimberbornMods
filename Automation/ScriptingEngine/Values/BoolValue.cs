@@ -4,6 +4,7 @@
 
 namespace IgorZ.Automation.ScriptingEngine.Values;
 
+/// <summary>Value that represents a constant boolean.</summary>
 sealed class BoolValue(bool value) : IExpressionValue {
 
   /// <inheritdoc/>

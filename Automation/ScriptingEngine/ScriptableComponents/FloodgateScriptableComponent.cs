@@ -13,6 +13,8 @@ using UnityEngine;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
+/// <summary>Scriptable component for the Floodgate building.</summary>
+/// <remarks>It contains both the triggers and the scripting methods.</remarks>
 sealed class FloodgateScriptableComponent : BaseComponent, ITrigger, IScriptableInstance,
                                             IDeletableEntity, IPostInitializableLoadedEntity {
 
@@ -20,8 +22,6 @@ sealed class FloodgateScriptableComponent : BaseComponent, ITrigger, IScriptable
   public string ScriptableTypeName => "Floodgate";
 
   #region AbstractTrigger implementation
-
-  readonly HashSet<ITriggerEventListener> _heightChangeListeners = [];
 
   /// <inheritdoc/>
   public void RegisterListener(ITriggerEventListener listener) {
@@ -66,7 +66,8 @@ sealed class FloodgateScriptableComponent : BaseComponent, ITrigger, IScriptable
 
   #endregion
 
-  #region Script methods
+  #region Methods availabel to the scripts
+  // ReSharper disable UnusedMember.Global
 
   [IScriptableInstance.ScriptFunction]
   public NumberValue GetHeight() => NumberValue.FromRawValue(_lastHeight);
@@ -84,16 +85,21 @@ sealed class FloodgateScriptableComponent : BaseComponent, ITrigger, IScriptable
     _floodgate.SetHeight(_floodgate.MaxHeight);
   }
 
+  // ReSharper restore UnusedMember.Global
   #endregion
+
+  #region Implementation
 
   Floodgate _floodgate;
   int _lastHeight = -1;  // 2-digits fixed point float.
+  readonly HashSet<ITriggerEventListener> _heightChangeListeners = [];
 
   void Awake() {
     _floodgate = GetComponentFast<Floodgate>();
   }
 
   /// <summary>Called from the patch to notify about the height change.</summary>
+  /// <seealso cref="FloodgateSetHeightPatch"/>
   internal void OnSetHeight(float height) {
     var newHeight = Mathf.RoundToInt(height * 100);
     if (_lastHeight == newHeight) {
@@ -104,4 +110,6 @@ sealed class FloodgateScriptableComponent : BaseComponent, ITrigger, IScriptable
       listener.OnEvent();
     }
   }
+
+  #endregion
 }

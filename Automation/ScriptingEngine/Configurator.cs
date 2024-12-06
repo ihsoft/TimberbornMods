@@ -4,7 +4,6 @@
 
 using Bindito.Core;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
-using IgorZ.TimberDev.Utils;
 using Timberborn.Buildings;
 using Timberborn.TemplateSystem;
 using Timberborn.WaterBuildings;
@@ -14,11 +13,8 @@ namespace IgorZ.Automation.ScriptingEngine;
 // ReSharper disable once UnusedType.Global
 [Context("Game")]
 sealed class Configurator : IConfigurator {
-  static readonly string PatchId = typeof(Configurator).FullName;
-
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.MultiBind<TemplateModule>().ToProvider(ProvideTemplateModule).AsSingleton();
-    HarmonyPatcher.PatchRepeated(PatchId, typeof(FloodgateSetHeightPatch));
   }
 
   static TemplateModule ProvideTemplateModule() {

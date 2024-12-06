@@ -4,11 +4,10 @@
 
 using System.Diagnostics.CodeAnalysis;
 using HarmonyLib;
-using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 using Timberborn.BaseComponentSystem;
 using Timberborn.WaterBuildings;
 
-namespace IgorZ.Automation.ScriptingEngine;
+namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
 /// <summary>Delivers height change events into the scriptable component.</summary>
 [HarmonyPatch(typeof(Floodgate), nameof(Floodgate.Height), MethodType.Setter)]
