@@ -12,7 +12,7 @@ sealed class DebugScriptableComponent : IScriptableInstance {
   /// <inheritdoc/>
   public string ScriptableTypeName => "Debug";
 
-  #region Methods availabel to the scripts
+  #region Methods available to the scripts
   // ReSharper disable UnusedMember.Global
 
   [IScriptableInstance.ScriptFunction]

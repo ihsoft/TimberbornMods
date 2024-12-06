@@ -66,7 +66,7 @@ sealed class FloodgateScriptableComponent : BaseComponent, ITrigger, IScriptable
 
   #endregion
 
-  #region Methods availabel to the scripts
+  #region Methods available to the scripts
   // ReSharper disable UnusedMember.Global
 
   [IScriptableInstance.ScriptFunction]
