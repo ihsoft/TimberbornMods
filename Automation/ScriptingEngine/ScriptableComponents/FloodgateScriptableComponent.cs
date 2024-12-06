@@ -9,6 +9,7 @@ using Timberborn.BaseComponentSystem;
 using Timberborn.EntitySystem;
 using Timberborn.Persistence;
 using Timberborn.WaterBuildings;
+using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
@@ -92,6 +93,8 @@ sealed class FloodgateScriptableComponent : BaseComponent, ITrigger, IScriptable
 
   Floodgate _floodgate;
   int _lastHeight = -1;  // 2-digits fixed point float.
+  bool _isRunning;
+
   readonly HashSet<ITriggerEventListener> _heightChangeListeners = [];
 
   void Awake() {
@@ -106,9 +109,19 @@ sealed class FloodgateScriptableComponent : BaseComponent, ITrigger, IScriptable
       return;
     }
     _lastHeight = newHeight;
+
+    // Prevent cyclic calls when the height being changed on the Self object.
+    if (_isRunning) {
+      _isRunning = false;
+      HostedDebugLog.Warning(this, "Height change on Self is detected. Skipping the event.");
+      return;
+    }
+
+    _isRunning = true;
     foreach (var listener in _heightChangeListeners) {
       listener.OnEvent();
     }
+    _isRunning = false;
   }
 
   #endregion
