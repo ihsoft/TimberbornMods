@@ -16,13 +16,13 @@ sealed class DebugScriptableComponent : IScriptableInstance {
   // ReSharper disable UnusedMember.Global
 
   [IScriptableInstance.ScriptFunction]
-  public void Log(string message) {
-    DebugEx.Info(message);
+  public void Log(IExpressionValue message) {
+    DebugEx.Info(message.AsString());
   }
 
   [IScriptableInstance.ScriptFunction]
-  public void Log1(string message, string arg1) {
-    DebugEx.Info(message, arg1);
+  public void Log1(IExpressionValue message, IExpressionValue arg1) {
+    DebugEx.Info(message.AsString(), arg1.AsRawObject());
   }
 
   // ReSharper enable UnusedMember.Global

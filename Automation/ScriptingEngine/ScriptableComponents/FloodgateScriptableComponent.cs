@@ -74,9 +74,10 @@ sealed class FloodgateScriptableComponent : BaseComponent, ITrigger, IScriptable
   public NumberValue GetHeight() => NumberValue.FromRawValue(_lastHeight);
 
   [IScriptableInstance.ScriptFunction]
-  public void SetHeight(int height) {
+  public void SetHeight(IExpressionValue varHeight) {
+    var height = varHeight.AsNumber();
     if (height < 0) {
-      height = _floodgate.MaxHeight - height;
+      height = _floodgate.MaxHeight * 100 + height;
     }
     _floodgate.SetHeight(height / 100f);
   }
