@@ -20,7 +20,7 @@ sealed class FloodgateScriptableComponent : BaseComponent, ITrigger, IScriptable
                                             IDeletableEntity, IPostInitializableLoadedEntity {
 
   /// <inheritdoc/>
-  public string ScriptableTypeName => "Floodgate";
+  public string ScriptableTypeName => ComponentsIndex.TypeToName[typeof(FloodgateScriptableComponent)];
 
   #region AbstractTrigger implementation
 

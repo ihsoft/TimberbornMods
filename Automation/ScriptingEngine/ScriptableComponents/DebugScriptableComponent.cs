@@ -10,7 +10,7 @@ namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 sealed class DebugScriptableComponent : IScriptableInstance {
 
   /// <inheritdoc/>
-  public string ScriptableTypeName => "Debug";
+  public string ScriptableTypeName => ComponentsIndex.TypeToName[typeof(DebugScriptableComponent)];
 
   #region Methods available to the scripts
   // ReSharper disable UnusedMember.Global
