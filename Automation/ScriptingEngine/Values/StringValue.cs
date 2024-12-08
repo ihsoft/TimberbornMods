@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace IgorZ.Automation.ScriptingEngine.Values;
 
-/// <summary>Expression value that represents a constant string.</summary>
+/// <summary>Expression value that represents a constant array of values.</summary>
 sealed class StringValue : IExpressionValue {
 
   readonly string _value;
@@ -63,6 +63,12 @@ sealed class StringValue : IExpressionValue {
         }
     }
   }
+
+  /// <inheritdoc/>
+  public object AsRawObject() => _value;
+
+  /// <inheritdoc/>
+  public IExpressionValue[] AsArray() => throw new ScriptError("Cannot convert number to array");
 
   #endregion
 

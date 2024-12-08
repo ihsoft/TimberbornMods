@@ -30,5 +30,11 @@ sealed class BoolValue(bool value) : IExpressionValue {
   public bool AsBool() => value;
 
   /// <inheritdoc/>
+  public object AsRawObject() => value;
+
+  /// <inheritdoc/>
+  public IExpressionValue[] AsArray() => throw new ScriptError("Cannot convert number to array");
+
+  /// <inheritdoc/>
   public override string ToString() => $"{ValueType}#{AsString()}";
 }

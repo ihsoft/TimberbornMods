@@ -13,6 +13,10 @@ interface IExpressionValue {
     Number,
     /// <summary>Boolean.</summary>
     Bool,
+    /// <summary>Raw C# object.</summary>
+    RawObject,
+    /// <summary>Array of values.</summary>
+    Array,
   }
 
   /// <summary>The original type of the node's value. All other values will be converted from this type.</summary>
@@ -39,10 +43,18 @@ interface IExpressionValue {
   /// </remarks>
   public int AsNumber();
 
+  /// <summary>Returns the value as a raw C# object.</summary>
+  /// <remarks>This is a very specific type, and it mustn't get exposed to the script.</remarks>
+  public object AsRawObject();
+
   /// <summary>Returns a boolean value.</summary>
   /// <remarks>
   /// When parsed from a string, recognizes 'true/false' keywords case-insensitive, or uses the number casting rules
   /// otherwise. When cast from a number, then anything that is not '0' is 'true', otherwise – 'false'.  
   /// </remarks>
   public bool AsBool();
+
+  /// <summary>Returns the value as an array of values.</summary>
+  /// <remarks>Every element of the array can be of any type, including other arrays.</remarks>
+  public IExpressionValue[] AsArray();
 }

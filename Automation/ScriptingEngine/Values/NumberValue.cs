@@ -59,6 +59,12 @@ sealed class NumberValue : IExpressionValue {
     return _value != 0;
   }
 
+  /// <inheritdoc/>
+  public object AsRawObject() => _value;
+
+  /// <inheritdoc/>
+  public IExpressionValue[] AsArray() => throw new ScriptError("Cannot convert number to array");
+
   #endregion
 
   #region Object overrides
