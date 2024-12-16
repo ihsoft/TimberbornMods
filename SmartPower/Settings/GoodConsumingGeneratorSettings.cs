@@ -3,7 +3,6 @@
 // License: Public Domain
 
 using ModSettings.Core;
-using TimberApi;
 using Timberborn.Modding;
 using Timberborn.SettingsSystem;
 
@@ -20,9 +19,7 @@ sealed class GoodConsumingGeneratorSettings(
 
   public ModSetting<bool> ShowFloatingIcon { get; } = new(
       true,
-      ModSettingDescriptor
-          .CreateLocalized("IgorZ.SmartPower.Settings.UI.ShowFloatingIcon")
-          .SetEnableCondition(IsMenuMode));
+      ModSettingDescriptor.CreateLocalized("IgorZ.SmartPower.Settings.UI.ShowFloatingIcon"));
 
   // ReSharper restore MemberCanBePrivate.Global
   // ReSharper restore InconsistentNaming
@@ -38,12 +35,6 @@ sealed class GoodConsumingGeneratorSettings(
 
   /// <inheritdoc />
   public override int Order => 3;
-
-  #endregion
-
-  #region Implementation
-
-  static bool IsMenuMode() => SceneManager.CurrentScene == Scene.MainMenu;
 
   #endregion
 }

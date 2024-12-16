@@ -4,7 +4,6 @@
 
 using ModSettings.Common;
 using ModSettings.Core;
-using TimberApi;
 using Timberborn.Modding;
 using Timberborn.SettingsSystem;
 
@@ -21,21 +20,15 @@ sealed class WorkplaceConsumerSettings(
 
   public ModSetting<bool> ShowFloatingIcon { get; } = new(
       true,
-      ModSettingDescriptor
-          .CreateLocalized("IgorZ.SmartPower.Settings.UI.ShowFloatingIcon")
-          .SetEnableCondition(IsMenuMode));
+      ModSettingDescriptor.CreateLocalized("IgorZ.SmartPower.Settings.UI.ShowFloatingIcon"));
 
   public ModSetting<int> SuspendDelayMinutes { get; } = new RangeIntModSetting(
       60, 0, 120,
-      ModSettingDescriptor
-          .CreateLocalized("IgorZ.SmartPower.Settings.Hysteresis.SuspendDelay")
-          .SetEnableCondition(IsMenuMode));
+      ModSettingDescriptor.CreateLocalized("IgorZ.SmartPower.Settings.Hysteresis.SuspendDelay"));
 
   public ModSetting<int> ResumeDelayMinutes { get; } = new RangeIntModSetting(
       60, 0, 120,
-      ModSettingDescriptor
-          .CreateLocalized("IgorZ.SmartPower.Settings.Hysteresis.ResumeDelay")
-          .SetEnableCondition(IsMenuMode));
+      ModSettingDescriptor.CreateLocalized("IgorZ.SmartPower.Settings.Hysteresis.ResumeDelay"));
 
   // ReSharper restore MemberCanBePrivate.Global
   // ReSharper restore InconsistentNaming
@@ -51,12 +44,6 @@ sealed class WorkplaceConsumerSettings(
 
   /// <inheritdoc />
   public override int Order => 4;
-
-  #endregion
-
-  #region Implementation
-
-  static bool IsMenuMode() => SceneManager.CurrentScene == Scene.MainMenu;
 
   #endregion
 }
