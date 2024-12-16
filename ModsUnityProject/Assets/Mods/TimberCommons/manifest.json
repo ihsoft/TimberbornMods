@@ -1,6 +1,6 @@
 {
   "Name": "TimberCommons",
-  "Version": "1.10.2",
+  "Version": "1.10.3",
   "Id": "Timberborn.IgorZ.TimberCommons",
   "MinimumGameVersion": "0.6.8.3",
   "Description": "Various tweaks and modules for making buildings.",
@@ -15,7 +15,7 @@
     },
     {
       "Id": "eMka.ModSettings",
-      "MinimumVersion": "0.6.8.0"
+      "MinimumVersion": "0.6.9.4"
     }
   ]
 }

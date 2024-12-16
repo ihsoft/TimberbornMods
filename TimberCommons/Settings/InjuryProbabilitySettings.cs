@@ -41,5 +41,8 @@ sealed class InjuryProbabilitySettings(
   /// <inheritdoc />
   public override int Order => 4;
 
+  /// <inheritdoc />
+  public override ModSettingsContext ChangeableOn => ModSettingsContext.MainMenu | ModSettingsContext.Game;
+
   #endregion
 }

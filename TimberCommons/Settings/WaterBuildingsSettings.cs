@@ -50,6 +50,9 @@ sealed class WaterBuildingsSettings : ModSettingsOwner {
   /// <inheritdoc />
   public override int Order => 3;
 
+  /// <inheritdoc />
+  public override ModSettingsContext ChangeableOn => ModSettingsContext.MainMenu | ModSettingsContext.Game;
+
   #endregion
 
   #region Implementation

@@ -35,6 +35,9 @@ sealed class DebugSettings : ModSettingsOwner {
   /// <inheritdoc />
   public override int Order => 100;  // Always last.
 
+  /// <inheritdoc />
+  public override ModSettingsContext ChangeableOn => ModSettingsContext.MainMenu | ModSettingsContext.Game;
+
   #endregion
 
   #region Implementation

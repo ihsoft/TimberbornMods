@@ -41,6 +41,9 @@ sealed class BatteriesSettings : ModSettingsOwner {
   /// <inheritdoc />
   public override int Order => 1;
 
+  /// <inheritdoc />
+  public override ModSettingsContext ChangeableOn => ModSettingsContext.MainMenu | ModSettingsContext.Game;
+
   #endregion
 
   #region Implementation

@@ -1,3 +1,6 @@
+# v1.10.3 (15 Dec 2024)
+* [Enhancement] Allow changing settings in the game.
+
 # v1.10.2 (22 Oct 2024):
 * [Fix] Game crashes on selecting a tower after the game was loaded with unfinished towers.
 

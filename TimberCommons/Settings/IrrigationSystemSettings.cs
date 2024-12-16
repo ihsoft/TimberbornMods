@@ -36,6 +36,9 @@ sealed class IrrigationSystemSettings : ModSettingsOwner {
   /// <inheritdoc />
   public override int Order => 2;
 
+  /// <inheritdoc />
+  public override ModSettingsContext ChangeableOn => ModSettingsContext.MainMenu | ModSettingsContext.Game;
+
   #endregion
 
   #region Implementation
