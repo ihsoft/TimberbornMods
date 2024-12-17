@@ -9,8 +9,10 @@ using TimberApi.UIBuilderSystem.StylingElements;
 using TimberApi.UIPresets.Buttons;
 using TimberApi.UIPresets.Labels;
 using TimberApi.UIPresets.Sliders;
+using TimberApi.UIPresets.TextFields;
 using TimberApi.UIPresets.Toggles;
 using Timberborn.CoreUI;
+using Timberborn.DropdownSystem;
 using Timberborn.Localization;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -22,6 +24,7 @@ namespace IgorZ.TimberDev.UI;
 public sealed class UiFactory {
   readonly VisualElementLoader _visualElementLoader;
   readonly ILoc _loc;
+  readonly DropdownItemsSetter _dropdownItemsSetter;
 
   /// <summary>Common padding around the button text on the right side panel.</summary>
   public static readonly Padding StandardButtonPadding = new(2, 10, 2, 10);
@@ -29,10 +32,12 @@ public sealed class UiFactory {
   /// <summary>The TAPI UI builder.</summary>
   public readonly UIBuilder UiBuilder;
 
-  UiFactory(VisualElementLoader visualElementLoader, UIBuilder uiBuilder, ILoc loc) {
+  UiFactory(VisualElementLoader visualElementLoader, UIBuilder uiBuilder, ILoc loc,
+            DropdownItemsSetter dropdownItemsSetter) {
     _visualElementLoader = visualElementLoader;
     UiBuilder = uiBuilder;
     _loc = loc;
+    _dropdownItemsSetter = dropdownItemsSetter;
   }
 
   /// <summary>A shortcut to "ILoc.T()".</summary>
@@ -190,6 +195,24 @@ public sealed class UiFactory {
     center.Add(element);
     return center;
   }
+
+  /// <summary>Creates a simple dropdown in a theme suitable for the right side panel.</summary>
+  public SimpleDropdown<T> CreateValueDropdown<T>(Action<T, T> onValueChanged, int? width = null) where T : notnull {
+    var dropdown = new SimpleDropdown<T>(this, _dropdownItemsSetter, onValueChanged);
+    if (width.HasValue) {
+      dropdown.DropdownElement.style.width = width.Value;
+    }
+    return dropdown;
+  }
+
+  /// <summary>Creates a text field in a theme suitable for the right side panel.</summary>
+  public TextField CreateTextField(int? width = null) {
+    var textField = UiBuilder.Create<DefaultTextField>().BuildAndInitialize();
+    if (width.HasValue) {
+      textField.style.width = width.Value;
+    }
+    return textField;
+  } 
 
   /// <summary>Creates a panel builder that can be used as a fragment on the right side panel.</summary>
   /// <remarks>
