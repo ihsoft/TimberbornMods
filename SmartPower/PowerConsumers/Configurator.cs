@@ -27,9 +27,11 @@ sealed class Configurator : IConfigurator {
   }
 
   static void PatchMethod(GameObject prefab) {
-    PrefabPatcher.AddComponent<PowerInputLimiter>(prefab, PoweredManufactoryDep.Check);
     PrefabPatcher.AddComponent<SmartManufactory>(prefab, PoweredManufactoryDep.Check);
-    PrefabPatcher.AddComponent<PowerInputLimiter>(prefab, PoweredAttractionDep.Check);
     PrefabPatcher.AddComponent<SmartPoweredAttraction>(prefab, PoweredAttractionDep.Check);
+    PrefabPatcher.AddComponent<PowerInputLimiter>(prefab, o => {
+      var node = o.GetComponent<MechanicalNodeSpecification>();
+      return node && node.PowerInput > 0 && node.PowerOutput == 0;
+    });
   }
 }

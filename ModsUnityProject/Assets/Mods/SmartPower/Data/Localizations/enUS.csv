@@ -34,7 +34,7 @@ IgorZ.SmartPower.Settings.Batteries.BatteryRatioHysteresisTooltip,"Suspended con
 IgorZ.SmartPower.Settings.WalkerPoweredGeneratorSection,"Beaver-powered generators",
 IgorZ.SmartPower.Settings.GoodConsumingGeneratorSection,"Good-consuming generators",
 IgorZ.SmartPower.Settings.WorkplaceConsumerSection,"Workshops with a workplace",
-IgorZ.SmartPower.Settings.UnmannedConsumerSection,"Unmanned workshops",
+IgorZ.SmartPower.Settings.UnmannedConsumerSection,"Unmanned buildings",
 IgorZ.SmartPower.Settings.AttractionConsumerSection,"Attractions",
 IgorZ.SmartPower.Settings.UI.ShowFloatingIcon,"Show floating icon",
 IgorZ.SmartPower.Settings.Hysteresis.ResumeDelay,"Resume delay (minutes)",

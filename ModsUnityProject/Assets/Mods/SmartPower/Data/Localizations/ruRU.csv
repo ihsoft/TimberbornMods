@@ -34,7 +34,7 @@ IgorZ.SmartPower.Settings.Batteries.BatteryRatioHysteresisTooltip,"Выключ�
 IgorZ.SmartPower.Settings.WalkerPoweredGeneratorSection,"Генераторы на бобровой тяге",
 IgorZ.SmartPower.Settings.GoodConsumingGeneratorSection,"Генераторы, потребляющие ресурсы",
 IgorZ.SmartPower.Settings.WorkplaceConsumerSection,"Мастерские с рабочими местами",
-IgorZ.SmartPower.Settings.UnmannedConsumerSection,"Мастерские без персонала",
+IgorZ.SmartPower.Settings.UnmannedConsumerSection,"Здания без персонала",
 IgorZ.SmartPower.Settings.AttractionConsumerSection,"Аттракционы",
 IgorZ.SmartPower.Settings.UI.ShowFloatingIcon,"Отображать плавающую иконку",
 IgorZ.SmartPower.Settings.Hysteresis.ResumeDelay,"Задержка включения (минуты)",

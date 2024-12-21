@@ -1,3 +1,6 @@
+# v1.12.6 (19 Dec 2024)
+* [Fix] Enable power regulation for non-workshop buildings.
+
 # v1.12.5 (15 Dec 2024)
 * [Enhancement] Allow changing settings in the game.
 

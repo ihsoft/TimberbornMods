@@ -21,6 +21,8 @@ sealed class ConsumerFragmentPatcher {
   const string NoInputModeLocKey = "IgorZ.SmartPower.MechanicalBuilding.NoInputStatus";
   const string BlockedOutputLocKey = "IgorZ.SmartPower.MechanicalBuilding.BlockedOutputStatus";
 
+  const int ActivationStatusThreshold = 5;
+
   readonly UiFactory _uiFactory;
 
   Label _suspendReasonLabel;  // It is patched in the stock UI.
@@ -85,7 +87,8 @@ sealed class ConsumerFragmentPatcher {
           ? _uiFactory.T(LowBatteriesChargeLocKey)
           : _uiFactory.T(NotEnoughPowerLocKey);
       _suspendReasonLabel.ToggleDisplayStyle(visible: true);
-      if (powerInputLimiter.MinutesTillResume > 0) {
+      if (powerInputLimiter.MinutesTillResume > ActivationStatusThreshold
+          || powerInputLimiter.MinutesTillResume > 0 && IsVisible(_suspendStateProgressLabel)) {
         _suspendStateProgressLabel.text = _uiFactory.T(MinutesTillResumeLocKey, powerInputLimiter.MinutesTillResume);
         _suspendStateProgressLabel.ToggleDisplayStyle(visible: true);
       } else {
@@ -95,7 +98,8 @@ sealed class ConsumerFragmentPatcher {
     }
 
     _suspendReasonLabel.ToggleDisplayStyle(visible: false);
-    if (powerInputLimiter.MinutesTillSuspend > 0) {
+    if (powerInputLimiter.MinutesTillSuspend > ActivationStatusThreshold
+        || powerInputLimiter.MinutesTillSuspend > 0 && IsVisible(_suspendStateProgressLabel)) {
       _suspendStateProgressLabel.text = _uiFactory.T(MinutesTillSuspendLocKey, powerInputLimiter.MinutesTillSuspend);
       _suspendStateProgressLabel.ToggleDisplayStyle(visible: true);
     } else {
@@ -124,4 +128,6 @@ sealed class ConsumerFragmentPatcher {
       _idleStateLabel.ToggleDisplayStyle(visible: false);
     }
   }
+
+  static bool IsVisible(VisualElement element) => element.style.display != DisplayStyle.None;
 }
