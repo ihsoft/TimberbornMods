@@ -4,6 +4,7 @@
 # v1.12.5 (15 Dec 2024)
 * [Enhancement] Allow changing settings in the game.
 
+# v1.12.4 (3 Dec 2024)
 * Full refactoring of the power balancing logic.
 * [Enhancement] Consumers can be configured to stop/start if there is not enough power in the network.
 * [Enhancement] Display status for when the batteries aren't used (a positive balance) or are depleted (a negative balance and no charge). 
