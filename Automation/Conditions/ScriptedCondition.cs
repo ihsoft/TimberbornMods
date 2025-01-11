@@ -10,6 +10,7 @@ using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine;
 using Timberborn.Localization;
 using Timberborn.Persistence;
+using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
 namespace IgorZ.Automation.Conditions;
@@ -31,7 +32,12 @@ sealed class ScriptedCondition : AutomationConditionBase {
 
   /// <inheritdoc/>
   protected override void OnBehaviorAssigned() {
-    ParseConditions();
+    try {
+      ParseConditions();
+    } catch (ScriptError e) {
+      HostedDebugLog.Error(Behavior, "Failed to parse conditions: " + e.Message);
+      IsMarkedForCleanup = true;
+    }
   }
 
   /// <inheritdoc/>
@@ -106,12 +112,8 @@ sealed class ScriptedCondition : AutomationConditionBase {
     var operandsDescriptions = new List<string>();
     foreach (var serializedOperand in Conditions) {
       var (name, op, argument) = ParseCondition(serializedOperand);
+
       var triggerDef = ScriptingService.Instance.GetTriggerDefinition(name);
-      var trigger = ScriptingService.Instance.GetTriggerSource(name, Behavior, CheckOperands);
-      var operand = triggerDef.ValueType.ArgumentType == IScriptable.ArgumentDef.Type.String
-          ? Operand.ForStringArgument(trigger, op, argument)
-          : Operand.ForNumberArgument(trigger, op, argument);
-      _operands.Add(operand);
       var argumentValue = argument;
       if (triggerDef.ValueType.Options != null) {
         argumentValue = triggerDef.ValueType.Options
@@ -122,6 +124,17 @@ sealed class ScriptedCondition : AutomationConditionBase {
           throw new ScriptError($"Cannot find option for '{argument}' in {triggerDef.Name}");
         }
       }
+
+      var trigger = ScriptingService.Instance.GetTriggerSource(name, Behavior, CheckOperands);
+      try {
+        var operand = triggerDef.ValueType.ArgumentType == IScriptable.ArgumentDef.Type.String
+            ? Operand.ForStringArgument(trigger, op, argument)
+            : Operand.ForNumberArgument(trigger, op, argument);
+        _operands.Add(operand);
+      } catch (ScriptError) {
+        trigger.Dispose();
+        throw;
+      }
       operandsDescriptions.Add($"<SolidHighlight>{triggerDef.DisplayName} {op} {argumentValue}</SolidHighlight>");
     }
     _uiDescription = TextColors.ColorizeText(string.Join(Behavior.Loc.T(AndOperatorLocString), operandsDescriptions));
@@ -131,6 +144,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
     foreach (var op in _operands) {
       op.TriggerSourceSource.Dispose();
     }
+    _operands.Clear();
   }
 
   void CheckOperands() {
@@ -153,10 +167,14 @@ sealed class ScriptedCondition : AutomationConditionBase {
     public readonly ITriggerSource TriggerSourceSource;
     public readonly Func<bool> Execute;
 
+    /// <summary>Creates operand where rvalue is a text constant.</summary>
+    /// <exception cref="ScriptError">if the op is not recognized.</exception>
     public static Operand ForStringArgument(ITriggerSource triggerSource, string op, string argument) {
       return new Operand(triggerSource, op, argument);
     }
 
+    /// <summary>Creates operand where rvalue is a numeric constant.</summary>
+    /// <exception cref="ScriptError">if argument cannot be parsed as number or the op is not recognized.</exception>
     public static Operand ForNumberArgument(ITriggerSource triggerSource, string op, string argument) {
       int fixedFloat;
       try {
@@ -168,6 +186,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
     }
 
     Operand(ITriggerSource triggerSource, string op, string argument) {
+      TriggerSourceSource = triggerSource;
       Execute = op switch {
           "=" => () => triggerSource.StringValue == argument,
           "<>" => () => triggerSource.StringValue != argument,
