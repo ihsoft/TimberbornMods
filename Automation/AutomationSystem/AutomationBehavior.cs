@@ -63,6 +63,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
     condition.SyncState();
     _actions.Add(action);
     HostedDebugLog.Fine(this, "Adding rule: {0}", action);
+    CollectCleanedRules();
     UpdateRegistration();
   }
 
@@ -137,6 +138,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
       action.Condition.Behavior = this;
       action.Behavior = this;
     }
+    CollectCleanedRules();
     UpdateRegistration();
   }
 
