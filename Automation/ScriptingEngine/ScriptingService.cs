@@ -2,49 +2,64 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
+using Timberborn.BaseComponentSystem;
+using Timberborn.SingletonSystem;
 
 namespace IgorZ.Automation.ScriptingEngine;
 
-/// <summary>Service that provides access to scripting components and the other global stuff.</summary>
-sealed class ScriptingService {
+sealed class ScriptingService : ILoadableSingleton {
 
   #region API
 
-  /// <summary>Gets a global instance by its name.</summary>
-  public IScriptableInstance GetGlobalInstance(string name) {
-    if (!InstancesDict.TryGetValue(name, out var instance)) {
-      throw new ScriptError($"Global instance {name} not found");
+  /// <summary>Instance of the service for accessing from a static context.</summary>
+  public static ScriptingService Instance;
+
+  /// <summary>Returns a trigger source by its name.</summary>
+  /// <remarks>
+  /// Different buildings have different triggers. If requested for a wrong building, an error will be thrown.
+  /// </remarks>
+  /// <param name="name">The full dotted name of the trigger. For example, "Weather.Season".</param>
+  /// <param name="building">
+  /// The building to get the trigger for. Ignored for the global triggers (like "Weather").
+  /// </param>
+  /// <param name="onValueChanged">The callback to call when the trigger value changes.</param>
+  /// <exception cref="ScriptError">if the trigger is not found for the building.</exception>
+  public ITriggerSource GetTriggerSource(string name, BaseComponent building, Action onValueChanged) {
+    var nameItems = name.Split('.');
+    if (_globalScriptables.TryGetValue(nameItems[0], out var scriptable)) {
+      return scriptable.GetTriggerSource(nameItems[1], building, onValueChanged);
     }
-    return instance;
+    throw new ScriptError("Unknown trigger: " + name);
   }
 
-  /// <summary>Gets a global trigger by its name.</summary>
-  public ITrigger GetGlobalTrigger(string name) {
-    if (!TriggersDict.TryGetValue(name, out var trigger)) {
-      throw new ScriptError($"Global trigger {name} not found");
+  public IScriptable.TriggerDef GetTriggerDefinition(string name) {
+    var nameItems = name.Split('.');
+    if (_globalScriptables.TryGetValue(nameItems[0], out var scriptable)) {
+      return scriptable.GetTriggerDefinition(nameItems[1]);
     }
-    return trigger;
+    throw new ScriptError("Unknown trigger: " + name);
   }
+
+  #endregion
+
+  #region ILoadableSingleton implementation
+
+  /// <inheritdoc/>
+  public void Load() {}
 
   #endregion
 
   #region Implementation
 
-  static readonly IScriptableInstance[] AllInstances = [
-      new DebugScriptableComponent(),
-  ];
+  readonly Dictionary<string,IScriptable> _globalScriptables = new(); 
 
-  static readonly ITrigger[] AllTriggers = [
-  ];
-  
-  static readonly Dictionary<string, IScriptableInstance> InstancesDict =
-      AllInstances.ToDictionary(x => x.ScriptableTypeName, x => x);
-
-  static readonly Dictionary<string, ITrigger> TriggersDict =
-      AllTriggers.ToDictionary(x => x.ScriptableTypeName, x => x);
+  ScriptingService(WeatherScriptableComponent weatherScriptableComponent) {
+    Instance = this;
+    _globalScriptables.Add(weatherScriptableComponent.Name, weatherScriptableComponent);
+  }
 
   #endregion
 }
