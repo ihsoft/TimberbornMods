@@ -46,7 +46,7 @@ public abstract class OutputStockThresholdConditionBase : AutomationConditionBas
   protected Inventory Inventory { get; private set; }
 
   /// <summary>A callback that verifies inventory state and sets the condition state.</summary>
-  /// <remarks>It's only called if inventory stock has changed.</remarks>
+  /// <remarks>It is only called if inventory stock has changed.</remarks>
   protected abstract void CheckInventory();
   #endregion
 
