@@ -18,9 +18,9 @@ sealed class WeatherScriptableComponent : ILoadableSingleton, IScriptable {
 
   const string TriggerNameLocKeyPrefix = "IgorZ.Automation.Scripting.Weather.Trigger.";
   const string SeasonTriggerName = "Season";
-  const string DroughtSeason = "drought";//Weather.Drought
-  const string BadTideSeason = "badtide";//Weather.Badtide
-  const string TemperateSeason = "temperate";//Weather.Temperate
+  const string DroughtSeason = "drought";
+  const string BadTideSeason = "badtide";
+  const string TemperateSeason = "temperate";
 
   #region IScriptable implementation
 
@@ -92,6 +92,10 @@ sealed class WeatherScriptableComponent : ILoadableSingleton, IScriptable {
     return (value, _loc.T(TriggerNameLocKeyPrefix + triggerName + "." + value));
   }
 
+  /// <summary>
+  /// Gets the current season based on the weather conditions. Don't use it in the weather change event handlers!
+  /// </summary>
+  /// <exception cref="InvalidOperationException">if the weather season can't be recognized.</exception>
   string GetCurrentSeason() {
     if (!_weatherService.IsHazardousWeather) {
       return TemperateSeason;
@@ -111,16 +115,18 @@ sealed class WeatherScriptableComponent : ILoadableSingleton, IScriptable {
   sealed class SeasonTrigger : ITriggerSource {
 
     readonly WeatherScriptableComponent _parent;
+    internal static string CurrentSeason;
 
     public SeasonTrigger(WeatherScriptableComponent parent, Action onValueChanged) {
       _parent = parent;
       _parent._seasonChangeTriggers.Add(this, onValueChanged);
+      CurrentSeason = _parent.GetCurrentSeason();
     }
 
     /// <inheritdoc/>
     public int NumberValue => throw new ScriptError("Season cannot be represented as a number");
     /// <inheritdoc/>
-    public string StringValue => _parent.GetCurrentSeason();
+    public string StringValue => CurrentSeason;
     /// <inheritdoc/>
     public void Dispose() => _parent._seasonChangeTriggers.Remove(this);
   }
@@ -130,14 +136,20 @@ sealed class WeatherScriptableComponent : ILoadableSingleton, IScriptable {
   #region Event listeners
 
   [OnEvent]
-  public void OnDroughtStartedEvent(HazardousWeatherStartedEvent @event) {
+  public void OnHazardousWeatherStartedEvent(HazardousWeatherStartedEvent @event) {
+    SeasonTrigger.CurrentSeason = @event.HazardousWeather switch {
+        DroughtWeather => DroughtSeason,
+        BadtideWeather => BadTideSeason,
+        _ => throw new InvalidOperationException("Unknown hazardous weather type: " + @event.HazardousWeather),
+    };
     foreach (var action in _seasonChangeTriggers.Values) {
       action();
     }
   }
 
   [OnEvent]
-  public void OnDroughtStartedEvent(HazardousWeatherEndedEvent @event) {
+  public void OnHazardousWeatherEndedEvent(HazardousWeatherEndedEvent @event) {
+    SeasonTrigger.CurrentSeason = TemperateSeason;
     foreach (var action in _seasonChangeTriggers.Values) {
       action();
     }
