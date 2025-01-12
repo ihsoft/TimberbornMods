@@ -7,7 +7,7 @@ using IgorZ.TimberDev.UI;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
 
-public static class Operands {
+static class Operands {
   public enum Type {
     Equal,
     NotEqual,
