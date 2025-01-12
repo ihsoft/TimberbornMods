@@ -112,7 +112,8 @@ sealed class AutomationFragment : IEntityPanelFragment {
   void AddTestRule() {
     var condition = new ScriptedCondition();
     condition.SetConditions(["Weather.Season=drought"]);
-    var action = new DebugLogAction();
+    var action = new ScriptedAction();
+    action.SetAction("Floodgate.SetHeight(150)");
     _automationBehavior.AddRule(condition, action);
     UpdateView();
   }
