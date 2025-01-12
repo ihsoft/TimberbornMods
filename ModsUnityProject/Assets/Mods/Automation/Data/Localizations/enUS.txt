@@ -119,8 +119,6 @@ IgorZ.Automation.AutomationFragment.AddRulesBtn,"Add automation rules",
 IgorZ.Automation.Scripting.Floodgate.SetHeight,"выставить высоту затвора в",
 IgorZ.Automation.Scripting.Editor.AddRuleBtn,"Добавить правило",
 IgorZ.Automation.Scripting.Editor.DeleteRuleBtn,"Удалить правило",
+IgorZ.Automation.Scripting.Floodgate.Action.SetHeight,"выставить высоту затвора в","Change the floodgate height to the specified value"
 IgorZ.Automation.Scripting.Weather.Trigger.Season,"сезон","Name of the condition for the current season checking"
-IgorZ.Automation.Scripting.Weather.Trigger.Season.drought,"засуха","Name of drought season for the current season checking"
-IgorZ.Automation.Scripting.Weather.Trigger.Season.badtide,"плохой прилив","Name of badtide season for the current season checking"
-IgorZ.Automation.Scripting.Weather.Trigger.Season.temperate,"умеренная погода","Name of temperate season for the current season checking"
 IgorZ.Automation.Conditions.ScriptedCondition.AndOperator," и ","String to join components of the expression with condition AND. Used to represent the condition in the panel"

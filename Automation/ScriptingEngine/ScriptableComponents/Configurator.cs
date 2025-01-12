@@ -11,5 +11,6 @@ namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<WeatherScriptableComponent>().AsSingleton();
+    containerDefinition.Bind<FloodgateScriptableComponent>().AsSingleton();
   }
 }
