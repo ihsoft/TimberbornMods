@@ -66,6 +66,12 @@
       <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Localizations\enUS.txt.meta">
         <Link>Mod\Localizations\enUS.txt.meta</Link>
       </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Localizations\ruRU.txt">
+        <Link>Mod\Localizations\ruRU.txt</Link>
+      </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Localizations\ruRU.txt.meta">
+        <Link>Mod\Localizations\ruRU.txt.meta</Link>
+      </Content>
       <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolGroupSpecification.Automation.20.Terrain.original.json">
         <Link>Mod\Specifications\ToolGroupSpecification.Automation.20.Terrain.original.json</Link>
       </Content>
@@ -323,6 +329,9 @@
       <Compile Include="..\TimberDev\UI\Configurator.cs">
         <Link>TimberDev\UI\Configurator.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\UI\DropdownItem.cs">
+        <Link>TimberDev\UI\DropdownItem.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\UI\GameTextMinMaxSlider2.cs">
         <Link>TimberDev\UI\GameTextMinMaxSlider2.cs</Link>
       </Compile>
@@ -334,6 +343,9 @@
       </Compile>
       <Compile Include="..\TimberDev\UI\PreciseSliderWrapper.cs">
         <Link>TimberDev\UI\PreciseSliderWrapper.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UI\SimpleDropdown.cs">
+        <Link>TimberDev\UI\SimpleDropdown.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\UI\UiFactory.cs">
         <Link>TimberDev\UI\UiFactory.cs</Link>

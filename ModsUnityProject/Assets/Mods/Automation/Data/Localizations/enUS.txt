@@ -79,8 +79,6 @@ TimberDev_Utils.Tools.LockSelectTool.SelectingNObjects,"Selecting: {0} (x{1})",
 TimberDev_Utils.Tools.LockSelectTool.StartSelectingPrompt,"Point to an entity and click to start selecting",
 TimberDev_Utils.Tools.LockSelectTool.StartObjectSelectingPrompt,"Click to start selecting: {0}",
 TimberDev_Utils.Tools.LockSelectTool.DescriptionHint,"Hold <i>SHIFT</i> to select items of one type only.",
-IgorZ.Automation.AutomationFragment.RulesAreaCaptionTextLocKey,"Automation rules:",
-IgorZ.Automation.AutomationFragment.RuleTextLocKey,"If {0}, then {1}",
 IgorZ.Automation.DetonateDynamiteAction.Description,"<SolidHighlight>detonate dynamite</SolidHighlight>",
 IgorZ.Automation.DetonateDynamiteAction.RepeatCountInfo," and add another <GreenHighlight>{0} times</GreenHighlight>",
 IgorZ.Automation.DroughtEndedCondition.Description,"<SolidHighlight>drought ended</SolidHighlight>",
@@ -114,3 +112,15 @@ IgorZ.Automation.ShowStatusAction.HoldCompletionStatusText,"Waiting for the othe
 IgorZ.Automation.BlockableBuildingAction.BlockDescription,"<SolidHighlight>block building</SolidHighlight>",
 IgorZ.Automation.BlockableBuildingAction.UnblockDescription,"<SolidHighlight>unblock building</SolidHighligh>",
 IgorZ.Automation.BlockableBuildingAction.BlockText,"Waiting for the other buildings to finish",
+=,=,=
+IgorZ.Automation.AutomationFragment.RulesAreaCaptionTextLocKey,"Automation rules:",
+IgorZ.Automation.AutomationFragment.RuleTextLocKey,"If {0}, then {1}",
+IgorZ.Automation.AutomationFragment.AddRulesBtn,"Add automation rules",
+IgorZ.Automation.Scripting.Floodgate.SetHeight,"выставить высоту затвора в",
+IgorZ.Automation.Scripting.Editor.AddRuleBtn,"Добавить правило",
+IgorZ.Automation.Scripting.Editor.DeleteRuleBtn,"Удалить правило",
+IgorZ.Automation.Scripting.Weather.Trigger.Season,"сезон","Name of the condition for the current season checking"
+IgorZ.Automation.Scripting.Weather.Trigger.Season.drought,"засуха","Name of drought season for the current season checking"
+IgorZ.Automation.Scripting.Weather.Trigger.Season.badtide,"плохой прилив","Name of badtide season for the current season checking"
+IgorZ.Automation.Scripting.Weather.Trigger.Season.temperate,"умеренная погода","Name of temperate season for the current season checking"
+IgorZ.Automation.Conditions.ScriptedCondition.AndOperator," и ","String to join components of the expression with condition AND. Used to represent the condition in the panel"

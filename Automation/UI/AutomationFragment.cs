@@ -4,11 +4,15 @@
 
 using System.Collections.Generic;
 using System.Text;
+using IgorZ.Automation.Actions;
 using IgorZ.Automation.AutomationSystem;
+using IgorZ.Automation.Conditions;
+using IgorZ.Automation.ScriptingEngineUI;
 using IgorZ.TimberDev.UI;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
+using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -17,15 +21,24 @@ namespace IgorZ.Automation.UI;
 sealed class AutomationFragment : IEntityPanelFragment {
   const string RulesAreaCaptionTextLocKey = "IgorZ.Automation.AutomationFragment.RulesAreaCaptionTextLocKey";
   const string RuleTextLocKey = "IgorZ.Automation.AutomationFragment.RuleTextLocKey";
+  const string AddRulesBtnCaptionLocKey = "IgorZ.Automation.AutomationFragment.AddRulesBtn";
 
   readonly UiFactory _uiFactory;
+  readonly DialogBoxShower _dialogBoxShower;
+  readonly RulesEditorDialog _rulesEditorDialog;
 
   VisualElement _root;
   Label _caption;
   Label _rulesList;
+  Button _addRulesButton;
+  Button _addTestRuleButton;
 
-  AutomationFragment(UiFactory uiFactory) {
+  AutomationBehavior _automationBehavior;
+
+  AutomationFragment(UiFactory uiFactory, DialogBoxShower dialogBoxShower, RulesEditorDialog rulesEditorDialog) {
     _uiFactory = uiFactory;
+    _dialogBoxShower = dialogBoxShower;
+    _rulesEditorDialog = rulesEditorDialog;
   }
 
   public VisualElement InitializeFragment() {
@@ -33,21 +46,46 @@ sealed class AutomationFragment : IEntityPanelFragment {
     _caption.style.color = Color.cyan;
 
     _rulesList = _uiFactory.CreateLabel();
+    _addRulesButton = _uiFactory.CreateButton(AddRulesBtnCaptionLocKey, OpenRulesEditor);
+    //FIXME: this is a debug
+    _addTestRuleButton = _uiFactory.CreateButton("AddTestRuleButton", AddTestRule);
 
     _root = _uiFactory.CreateCenteredPanelFragmentBuilder()
-        .AddComponent(_caption).AddComponent(_rulesList)
+        .AddComponent(_caption)
+        .AddComponent(_rulesList)
+        .AddComponent(_addRulesButton)
+        .AddComponent(_addTestRuleButton)
         .BuildAndInitialize();
     _root.ToggleDisplayStyle(visible: false);
     return _root;
   }
 
   public void ShowFragment(BaseComponent entity) {
-    var component = entity.GetComponentFast<AutomationBehavior>();
-    if (!component || !component.HasActions) {
+    _automationBehavior = entity.GetComponentFast<AutomationBehavior>();
+    UpdateView();
+  }
+
+  public void ClearFragment() {
+    _root.ToggleDisplayStyle(visible: false);
+  }
+
+  public void UpdateFragment() {
+  }
+
+  void UpdateView() {
+    if (!_automationBehavior) {
+      _root.ToggleDisplayStyle(false);
+      return;
+    }
+    _root.ToggleDisplayStyle(visible: true);
+    _caption.ToggleDisplayStyle(_automationBehavior.HasActions);
+    _rulesList.ToggleDisplayStyle(_automationBehavior.HasActions);
+    _addRulesButton.ToggleDisplayStyle(!_automationBehavior.HasActions);
+    if (!_automationBehavior.HasActions) {
       return;
     }
     var sortedActions = new List<IAutomationAction>();
-    foreach (var action in component.Actions) {
+    foreach (var action in _automationBehavior.Actions) {
       var insertPos = 0;
       while (insertPos < sortedActions.Count) {
         if (string.CompareOrdinal(sortedActions[insertPos].TemplateFamily, action.TemplateFamily) > 0) {
@@ -71,10 +109,25 @@ sealed class AutomationFragment : IEntityPanelFragment {
     _root.ToggleDisplayStyle(visible: true);
   }
 
-  public void ClearFragment() {
-    _root.ToggleDisplayStyle(visible: false);
+  void AddTestRule() {
+    var condition = new ScriptedCondition();
+    condition.SetConditions(["Weather.Season=drought"]);
+    var action = new DebugLogAction();
+    _automationBehavior.AddRule(condition, action);
+    UpdateView();
   }
 
-  public void UpdateFragment() {
+  void OpenRulesEditor() {
+    DebugEx.Warning("*** Before addding test script ***");
+    var dialogWidth = 1200;//FIXME: get it from teh screen resolution.
+    //FIXME: we need a scroll view here.
+    var builder = _dialogBoxShower.Create()
+        .SetMaxWidth(dialogWidth)
+        .SetConfirmButton(() => {}, "Save rules")
+        .SetCancelButton(() => {}, "Close without saving")
+        .SetInfoButton(() => {}, "Read tutorial!")
+        .AddContent(_rulesEditorDialog.Content);
+    builder._root.Q<VisualElement>("Box").style.width = dialogWidth;
+    builder.Show();
   }
 }
