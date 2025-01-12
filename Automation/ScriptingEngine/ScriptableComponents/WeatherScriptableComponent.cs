@@ -5,12 +5,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Bindito.Core;
 using IgorZ.TimberDev.UI;
 using Timberborn.BaseComponentSystem;
 using Timberborn.HazardousWeatherSystem;
 using Timberborn.Localization;
 using Timberborn.SingletonSystem;
 using Timberborn.WeatherSystem;
+using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
@@ -26,6 +28,9 @@ sealed class WeatherScriptableComponent : ILoadableSingleton, IScriptable {
 
   /// <inheritdoc/>
   public string Name => "Weather";
+
+  /// <inheritdoc/>
+  public Type InstanceType => null;
 
   /// <inheritdoc/>
   public ITriggerSource GetTriggerSource(string name, BaseComponent building, Action onValueChanged) {
@@ -45,31 +50,22 @@ sealed class WeatherScriptableComponent : ILoadableSingleton, IScriptable {
     return triggerDef;
   }
 
+  /// <inheritdoc/>
+  public Action GetActionExecutor(string name, BaseComponent building, string[] args) {
+    throw new NotImplementedException();
+  }
+
+  /// <inheritdoc/>
+  public IScriptable.ActionDef GetActionDefinition(string name) {
+    throw new NotImplementedException();
+  }
+
   #endregion
 
   #region ILoadableSingleton implementation
 
   /// <inheritdoc/>
-  public void Load() {}
-
-  #endregion
-
-  #region Implementation
-
-  readonly ILoc _loc;
-  readonly WeatherService _weatherService;
-  readonly HazardousWeatherService _hazardousWeatherService;
-
-  readonly Dictionary<ITriggerSource, Action> _seasonChangeTriggers = new();
-  readonly List<IScriptable.TriggerDef> _conditions = [];
-
-  WeatherScriptableComponent(ILoc loc, WeatherService weatherService, HazardousWeatherService hazardousWeatherService,
-                             EventBus eventBus) {
-    _loc = loc;
-    _weatherService = weatherService;
-    _hazardousWeatherService = hazardousWeatherService;
-    eventBus.Register(this);
-
+  public void Load() {
     _conditions.Add(new IScriptable.TriggerDef {
         Name = SeasonTriggerName,
         DisplayName = LocTrigger(SeasonTriggerName),
@@ -82,6 +78,32 @@ sealed class WeatherScriptableComponent : ILoadableSingleton, IScriptable {
             ],
         },
     });
+  }
+
+  #endregion
+
+  #region Implementation
+
+  readonly ILoc _loc;
+  readonly WeatherService _weatherService;
+  readonly HazardousWeatherService _hazardousWeatherService;
+
+  readonly Dictionary<ITriggerSource, Action> _seasonChangeTriggers = new();
+  readonly List<IScriptable.TriggerDef> _conditions = [];
+
+  WeatherScriptableComponent(ILoc loc, ScriptingService scriptingService, EventBus eventBus,
+                             WeatherService weatherService, HazardousWeatherService hazardousWeatherService) {
+    _loc = loc;
+    _weatherService = weatherService;
+    _hazardousWeatherService = hazardousWeatherService;
+    eventBus.Register(this);
+    scriptingService.RegisterScriptable(this);
+  }
+
+  //FIXME: drop
+  [Inject]
+  public void InjectDependencies(ILoc loc) {
+    DebugEx.Warning("*** INJECT: " + loc);
   }
 
   string LocTrigger(string name) {
