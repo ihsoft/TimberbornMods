@@ -176,10 +176,9 @@ public sealed class UiFactory {
   /// Optional padding around the button text. If not set, then <see cref="StandardButtonPadding"/> will be used.
   /// </param>
   public Button CreateButton(string locKey, Action onClickFn, Padding? padding = null) {
-    var button = UiBuilder.Create<GameButton>()
-        .SetLocKey(locKey)
+    var button = UiBuilder.Create<GameButton>().SetLocKey(locKey)
         .ModifyRoot(builder => builder.SetPadding(padding ?? StandardButtonPadding))
-        .Build();
+        .BuildAndInitialize();
     button.clicked += onClickFn;
     return button;
   }
