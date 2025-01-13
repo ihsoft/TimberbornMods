@@ -41,9 +41,9 @@ interface IScriptable {
   /// <summary>The type of the component that this scriptable works on. Global scriptables can have it NULL.</summary>
   public Type InstanceType { get; }
 
-  //FIXME: bad consept since defs can be dynamic (based on the building, e.g. recipies or inventory)
-  //[NotNull] LOH
-  //public TriggerDef[] Triggers { get; }
+  /// <summary>Returns the names of triggers that can be monitored on the specified building.</summary>
+  /// <remarks>It is an expensive call. Don't execute it in the tick handlers.</remarks>
+  public string[] GetTriggerNamesForBuilding(BaseComponent building);
 
   /// <summary>Returns a trigger source that can be used to monitor the specified trigger.</summary>
   /// <param name="name">The name of the trigger.</param>
@@ -60,6 +60,10 @@ interface IScriptable {
   /// </param>
   /// <exception cref="ScriptError">if trigger is not found.</exception>
   public TriggerDef GetTriggerDefinition(string name, BaseComponent building);
+
+  /// <summary>Returns the names of actions that can be executed on the specified building.</summary>
+  /// <remarks>It is an expensive call. Don't execute it in the tick handlers.</remarks>
+  public string[] GetActionNamesForBuilding(BaseComponent building);
 
   /// <summary>Returns an executor that executes the specified action with the provided arguments.</summary>
   /// <param name="name">The name of the action.</param>

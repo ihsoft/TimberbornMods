@@ -27,7 +27,12 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
   public override Type InstanceType => null;
 
   /// <inheritdoc/>
-  public override ITriggerSource GetTriggerSource(string name, BaseComponent building, Action onValueChanged) {
+  public override string[] GetTriggerNamesForBuilding(BaseComponent _) {
+    return [SeasonTriggerName]; 
+  }
+
+  /// <inheritdoc/>
+  public override ITriggerSource GetTriggerSource(string name, BaseComponent _, Action onValueChanged) {
     var trigger = name switch {
         SeasonTriggerName => new SeasonTrigger(this, onValueChanged),
         _ => throw new ScriptError("Unknown trigger: " + name),

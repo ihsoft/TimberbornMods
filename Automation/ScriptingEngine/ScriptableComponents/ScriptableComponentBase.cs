@@ -24,6 +24,9 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
   public abstract Type InstanceType { get; }
 
   /// <inheritdoc/>
+  public virtual string[] GetTriggerNamesForBuilding(BaseComponent building) => [];
+
+  /// <inheritdoc/>
   public virtual ITriggerSource GetTriggerSource(string name, BaseComponent building, Action onValueChanged) {
     throw new NotImplementedException();
   }
@@ -32,6 +35,9 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
   public virtual IScriptable.TriggerDef GetTriggerDefinition(string name, BaseComponent building) {
     throw new NotImplementedException();
   }
+
+  /// <inheritdoc/>
+  public virtual string[] GetActionNamesForBuilding(BaseComponent building) => [];
 
   /// <inheritdoc/>
   public virtual Action GetActionExecutor(string name, BaseComponent instance, string[] args) {

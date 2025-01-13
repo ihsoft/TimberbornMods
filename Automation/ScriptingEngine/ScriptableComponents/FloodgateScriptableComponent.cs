@@ -21,6 +21,11 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   public override Type InstanceType => typeof(Floodgate);
 
   /// <inheritdoc/>
+  public override string[] GetActionNamesForBuilding(BaseComponent building) {
+    return [SetHeightActionName];
+  }
+
+  /// <inheritdoc/>
   public override Action GetActionExecutor(string name, BaseComponent instance, string[] args) {
     var floodgate = instance as Floodgate;
     switch (name) {
