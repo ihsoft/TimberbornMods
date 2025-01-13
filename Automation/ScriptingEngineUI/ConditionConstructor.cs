@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System.Collections.Generic;
 using System.Linq;
 using IgorZ.TimberDev.UI;
 using Timberborn.CoreUI;
@@ -14,12 +15,12 @@ class ConditionConstructor : BaseConstructor {
 
   public struct ConditionDefinition {
     public DropdownItem<string> Argument;
-    public DropdownItem<Operands.Type>[] Operands;
+    public DropdownItem<Operands.OperandType>[] Operands;
     public DropdownItem<string>[] ArgTypes;
   }
 
   readonly ArgumentConstructor _argumentSelector;
-  readonly SimpleDropdown<Operands.Type> _operand;
+  readonly SimpleDropdown<Operands.OperandType> _operand;
   readonly ArgumentConstructor _valueSelector;
 
   ConditionDefinition[] _lvalueDefinitions;
@@ -27,7 +28,7 @@ class ConditionConstructor : BaseConstructor {
   public ConditionConstructor(UiFactory uiFactory) : base(uiFactory) {
     _argumentSelector = new ArgumentConstructor(uiFactory);
     _argumentSelector.OnStringValueChanged += (_, _) => SetArgument(_argumentSelector.StringValue);
-    _operand = uiFactory.CreateValueDropdown<Operands.Type>((_, _) => {});
+    _operand = uiFactory.CreateValueDropdown<Operands.OperandType>((_, _) => {});
     _valueSelector = new ArgumentConstructor(uiFactory);
 
     Root = MakeRow("Если", _argumentSelector.Root, _operand.DropdownElement, _valueSelector.Root);

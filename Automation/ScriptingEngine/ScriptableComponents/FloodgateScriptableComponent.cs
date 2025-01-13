@@ -3,42 +3,26 @@
 // License: Public Domain
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Timberborn.BaseComponentSystem;
-using Timberborn.Localization;
-using Timberborn.SingletonSystem;
 using Timberborn.WaterBuildings;
-using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
-sealed class FloodgateScriptableComponent : ILoadableSingleton, IScriptable {
+sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
-  const string ActionNameLocKeyPrefix = "IgorZ.Automation.Scripting.Floodgate.Action.";
   const string SetHeightActionName = "SetHeight";
 
   #region IScriptable implementation
 
   /// <inheritdoc/>
-  public string Name => "Floodgate";
+  public override string Name => "Floodgate";
 
   /// <inheritdoc/>
-  public Type InstanceType => typeof(Floodgate);
+  public override Type InstanceType => typeof(Floodgate);
 
   /// <inheritdoc/>
-  public ITriggerSource GetTriggerSource(string name, BaseComponent building, Action onValueChanged) {
-    throw new NotImplementedException();
-  }
-
-  /// <inheritdoc/>
-  public IScriptable.TriggerDef GetTriggerDefinition(string name) {
-    throw new NotImplementedException();
-  }
-
-  /// <inheritdoc/>
-  public Action GetActionExecutor(string name, BaseComponent building, string[] args) {
-    var floodgate = building as Floodgate;
+  public override Action GetActionExecutor(string name, BaseComponent instance, string[] args) {
+    var floodgate = instance as Floodgate;
     switch (name) {
       case SetHeightActionName:
         if (args.Length != 1) {
@@ -52,46 +36,20 @@ sealed class FloodgateScriptableComponent : ILoadableSingleton, IScriptable {
   }
 
   /// <inheritdoc/>
-  public IScriptable.ActionDef GetActionDefinition(string name) {
-    return _actions.FirstOrDefault(a => a.Name == name) ?? throw new ScriptError("Unknown action: " + name);
+  public override IScriptable.ActionDef GetActionDefinition(string name, BaseComponent instance) {
+    return name switch {
+        SetHeightActionName => new IScriptable.ActionDef {
+            FullName = $"{Name}.{SetHeightActionName}",
+            DisplayName = LocAction(SetHeightActionName),
+            ArgumentTypes = [
+                new IScriptable.ArgumentDef {
+                    ArgumentType = IScriptable.ArgumentDef.Type.Float,
+                },
+            ],
+        },
+        _ => throw new ScriptError("Unknown action: " + name)
+    };
   }
 
   #endregion
-
-  #region ILoadableSingleton implementation
-
-  /// <inheritdoc/>
-  public void Load() {
-    _actions.Add(new IScriptable.ActionDef {
-        Name = SetHeightActionName,
-        DisplayName = LocAction(SetHeightActionName),
-        ArgumentTypes = [
-            new IScriptable.ArgumentDef {
-                ArgumentType = IScriptable.ArgumentDef.Type.Float,
-            },
-        ],
-    });
-  }
-
-  #endregion
-
-  readonly ILoc _loc;
-
-  readonly List<IScriptable.ActionDef> _actions = [];
-
-  FloodgateScriptableComponent(ILoc loc, ScriptingService scriptingService) {
-    _loc = loc;
-    scriptingService.RegisterScriptable(this);
-  }
-
-  string LocAction(string name) {
-    return _loc.T(ActionNameLocKeyPrefix + name);
-  }
-
-  static float ParseFloat(string value) {
-    if (!int.TryParse(value, out var result)) {
-      throw new ScriptError("Failed to parse number argument: " + value);
-    }
-    return result / 100f;
-  }
 }

@@ -12,15 +12,12 @@ sealed class RuleConstructor : BaseConstructor {
 
   public readonly ConditionConstructor ConditionConstructor;
   public readonly ActionConstructor ThenActionConstructor;
-  public readonly ActionConstructor ElseActionConstructor;
 
   public RuleConstructor(UiFactory uiFactory) : base(uiFactory) {
     ConditionConstructor = new ConditionConstructor(uiFactory);
     ThenActionConstructor = new ActionConstructor(uiFactory, false);
-    ElseActionConstructor = new ActionConstructor(uiFactory, true);
     Root = new VisualElement();
     Root.Add(ConditionConstructor.Root);
     Root.Add(ThenActionConstructor.Root);
-    Root.Add(ElseActionConstructor.Root);
   }
 }

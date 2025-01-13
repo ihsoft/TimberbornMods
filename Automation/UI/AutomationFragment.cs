@@ -22,6 +22,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
   const string RulesAreaCaptionTextLocKey = "IgorZ.Automation.AutomationFragment.RulesAreaCaptionTextLocKey";
   const string RuleTextLocKey = "IgorZ.Automation.AutomationFragment.RuleTextLocKey";
   const string AddRulesBtnCaptionLocKey = "IgorZ.Automation.AutomationFragment.AddRulesBtn";
+  const string EditRulesBtnCaptionLocKey = "IgorZ.Automation.AutomationFragment.EditRulesBtn";
 
   readonly UiFactory _uiFactory;
   readonly DialogBoxShower _dialogBoxShower;
@@ -31,6 +32,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
   Label _caption;
   Label _rulesList;
   Button _addRulesButton;
+  Button _editRulesButton;
   Button _addTestRuleButton;
 
   AutomationBehavior _automationBehavior;
@@ -82,8 +84,10 @@ sealed class AutomationFragment : IEntityPanelFragment {
     _rulesList.ToggleDisplayStyle(_automationBehavior.HasActions);
     _addRulesButton.ToggleDisplayStyle(!_automationBehavior.HasActions);
     if (!_automationBehavior.HasActions) {
+      _addRulesButton.text = _uiFactory.T(AddRulesBtnCaptionLocKey);
       return;
     }
+    _addRulesButton.text = _uiFactory.T(EditRulesBtnCaptionLocKey);
     var sortedActions = new List<IAutomationAction>();
     foreach (var action in _automationBehavior.Actions) {
       var insertPos = 0;
@@ -120,6 +124,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
   void OpenRulesEditor() {
     DebugEx.Warning("*** Before addding test script ***");
+    _rulesEditorDialog.SetActiveBuilding(_automationBehavior);
     var dialogWidth = 1200;//FIXME: get it from teh screen resolution.
     //FIXME: we need a scroll view here.
     var builder = _dialogBoxShower.Create()

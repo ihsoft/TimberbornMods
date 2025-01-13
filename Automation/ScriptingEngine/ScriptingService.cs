@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Timberborn.BaseComponentSystem;
 using Timberborn.SingletonSystem;
@@ -34,23 +35,16 @@ sealed class ScriptingService : ILoadableSingleton {
   /// <exception cref="ScriptError">if the trigger is not found.</exception>
   public ITriggerSource GetTriggerSource(string name, BaseComponent building, Action onValueChanged) {
     var nameItems = name.Split('.');
-    if (!_registedScriptables.TryGetValue(nameItems[0], out var scriptable)) {
-      throw new ScriptError("Unknown trigger: " + name);
-    }
-    if (scriptable.InstanceType != null) {
-      building = GetComponentFast(building, scriptable.InstanceType);
-    }
-    return scriptable.GetTriggerSource(nameItems[1], building, onValueChanged);
+    var (scriptable, instance) = GetScriptable(nameItems[0], building);
+    return scriptable.GetTriggerSource(nameItems[1], instance, onValueChanged);
   }
 
   /// <summary>Returns a trigger definition by its name.</summary>
   /// <exception cref="ScriptError">if the trigger is not found.</exception>
-  public IScriptable.TriggerDef GetTriggerDefinition(string name) {
+  public IScriptable.TriggerDef GetTriggerDefinition(string name, BaseComponent building) {
     var nameItems = name.Split('.');
-    if (!_registedScriptables.TryGetValue(nameItems[0], out var scriptable)) {
-      throw new ScriptError("Unknown trigger: " + name);
-    }
-    return scriptable.GetTriggerDefinition(nameItems[1]);
+    var (scriptable, instance) = GetScriptable(nameItems[0], building);
+    return scriptable.GetTriggerDefinition(nameItems[1], instance);
   }
 
   /// <summary>Returns an executor that executes the specified action with the provided arguments.</summary>
@@ -63,23 +57,21 @@ sealed class ScriptingService : ILoadableSingleton {
   /// <exception cref="ScriptError">if action is not found.</exception>
   public Action GetActionExecutor(string name, BaseComponent building, string[] args) {
     var nameItems = name.Split('.');
-    if (!_registedScriptables.TryGetValue(nameItems[0], out var scriptable)) {
-      throw new ScriptError("Unknown action: " + name);
-    }
-    if (scriptable.InstanceType != null) {
-      building = GetComponentFast(building, scriptable.InstanceType);
-    }
-    return scriptable.GetActionExecutor(nameItems[1], building, args);
+    var (scriptable, instance) = GetScriptable(nameItems[0], building);
+    return scriptable.GetActionExecutor(nameItems[1], instance, args);
   }
 
   /// <summary>Returns the definition of the action by its name.</summary>
+  /// <param name="name">The name of the action.</param>
+  /// <param name="building">
+  /// The building on which the action is to be executed. It must have the component that the action is bound to.
+  /// See <see cref="IScriptable.InstanceType"/>.
+  /// </param>
   /// <exception cref="ScriptError">if action is not found.</exception>
-  public IScriptable.ActionDef GetActionDefinition(string name) {
+  public IScriptable.ActionDef GetActionDefinition(string name, BaseComponent building) {
     var nameItems = name.Split('.');
-    if (!_registedScriptables.TryGetValue(nameItems[0], out var scriptable)) {
-      throw new ScriptError("Unknown action: " + name);
-    }
-    return scriptable.GetActionDefinition(nameItems[1]);
+    var (scriptable, instance) = GetScriptable(nameItems[0], building);
+    return scriptable.GetActionDefinition(nameItems[1], instance);
   }
 
   #endregion
@@ -104,6 +96,19 @@ sealed class ScriptingService : ILoadableSingleton {
     if (_getComponentFastMethod == null) {
       throw new ScriptError("Cannot find GetComponentFast method in BaseComponent");
     }
+  }
+
+  (IScriptable, BaseComponent) GetScriptable(string name, BaseComponent building) {
+    if (!_registedScriptables.TryGetValue(name, out var scriptable)) {
+      throw new ScriptError("Unknown scriptable component: " + name);
+    }
+    if (scriptable.InstanceType != null) {
+      building = GetComponentFast(building, scriptable.InstanceType);
+      if (!building) {
+        throw new ScriptError("The building doesn't have component: " + scriptable.InstanceType.FullName);
+      }
+    }
+    return (scriptable, building);
   }
 
   static BaseComponent GetComponentFast(BaseComponent building, Type type) {

@@ -103,10 +103,10 @@ sealed class ScriptedAction : AutomationActionBase {
     var argument = match.Groups[2].Value;
     _actionExecutor = ScriptingService.Instance.GetActionExecutor(actionName, Behavior, argument.Split(','));
 
-    var actionDef = ScriptingService.Instance.GetActionDefinition(actionName);
+    var actionDef = ScriptingService.Instance.GetActionDefinition(actionName, Behavior);
     if (actionDef.ArgumentTypes.Length > 1) {
       //FIXME: support multiple arguments one day.
-      throw new ScriptError("Cannot handle multiple arguments in action: " + actionDef.Name);
+      throw new ScriptError("Cannot handle multiple arguments in action: " + actionDef.FullName);
     }
     var description = actionDef.DisplayName;
     if (actionDef.ArgumentTypes.Length > 0) {
@@ -118,7 +118,7 @@ sealed class ScriptedAction : AutomationActionBase {
             .Select(x => x.Text)
             .FirstOrDefault();
         if (argumentValue == null) {
-          throw new ScriptError($"Cannot find option for '{argument}' in {actionDef.Name}");
+          throw new ScriptError($"Cannot find option for '{argument}' in {actionDef.FullName}");
         }
       }
       if (argumentDef.ArgumentType != IScriptable.ArgumentDef.Type.String) {

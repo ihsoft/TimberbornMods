@@ -3,12 +3,15 @@
 // License: Public Domain
 
 using System.Collections.Generic;
-using IgorZ.Automation.ScriptingEngine;
+using System.Linq;
+using IgorZ.Automation.AutomationSystem;
+
 using IgorZ.TimberDev.UI;
 using TimberApi.UIPresets.Buttons;
 using Timberborn.BaseComponentSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.TooltipSystem;
+using UnityDev.Utils.LogUtilsLite;
 using UnityEngine.UIElements;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
@@ -20,6 +23,7 @@ sealed class RulesEditorDialog : ILoadableSingleton {
 
   readonly UiFactory _uiFactory;
   readonly ITooltipRegistrar _tooltipRegistrar;
+
   RulesEditorDialog(UiFactory uiFactory, ITooltipRegistrar tooltipRegistrar) {
     _uiFactory = uiFactory;
     _tooltipRegistrar = tooltipRegistrar;
@@ -39,24 +43,18 @@ sealed class RulesEditorDialog : ILoadableSingleton {
   ConditionConstructor.ConditionDefinition[] _lvalueDefinitions;
   ActionConstructor.ActionDefinition[] _actionDefinitions;
 
-  public void SetActiveBuilding(BaseComponent building) {
-    var scriptables = new List<IScriptable>();
-    building.GetComponentsFast(scriptables);
-    var conditions = new List<ConditionConstructor.ConditionDefinition>();
-    var actions = new List<ActionConstructor.ActionDefinition>();
-    //FIXME: no 1-to-1, UI has more options.
-    // LOH!
-    // foreach (var scriptable in scriptables) {
-     //  actions.AddRange(scriptable.Actions.Select(x => new ActionConstructor.ActionDefinition {
-      // 	  Action = (x.Name, x.DisplayName),
-      // 	  ArgTypes = x.Arguments.Select(y = > (y.Type, y.Name)).ToArray(),
-     //  }));
-    // }
+  public void SetActiveBuilding(AutomationBehavior behavior) {
+    _activeBuilding = behavior;
   }
+
+  AutomationBehavior _activeBuilding;
 
   void AddNewRule() {
     var ruleConstructor = new RuleConstructor(_uiFactory);
     PopulateTestData(ruleConstructor);
+    //FIXME:
+    DebugEx.Warning("*** setting conditions");
+    PopulateConstructor(ruleConstructor);
     Rules.Add(ruleConstructor);
 
     var wrapper = new VisualElement {
@@ -78,13 +76,25 @@ sealed class RulesEditorDialog : ILoadableSingleton {
     Content.Insert(Content.childCount - 1, wrapper);
   }
 
+  void PopulateConstructor(RuleConstructor ruleConstructor) {
+    // var triggers = ScriptingService.Instance.GetTriggersForBuilding(_activeBuilding);
+    // var conditions = triggers.Select(t => new ConditionConstructor.ConditionDefinition {
+    //     Argument = (t.FullName, t.DisplayName),
+    //     Operands = t.ValueType.ArgumentType == IScriptable.ArgumentDef.Type.String
+    //         ? Operands.ToDropdownItems([Operands.OperandType.Equal, Operands.OperandType.NotEqual])
+    //         : Operands.ToDropdownItems(Operands.All),
+    //     ArgTypes = t.ValueType.Options, //FIXME: can be number?
+    // });
+    // ruleConstructor.ConditionConstructor.SetDefinitions(conditions.ToArray());
+  }
+
   //FIXME: make it real!
   void PopulateTestData(RuleConstructor ruleConstructor) {
     ruleConstructor.ConditionConstructor.SetDefinitions([
         new ConditionConstructor.ConditionDefinition {
             Argument = ("Weather.IsDrought", "сезон: засуха"),
             Operands = [
-                Operands.ToDropdownItem(Operands.Type.Equal),
+                Operands.ToDropdownItem(Operands.OperandType.Equal),
             ],
             ArgTypes = [
                 ("True", "true"),
@@ -93,7 +103,7 @@ sealed class RulesEditorDialog : ILoadableSingleton {
         new ConditionConstructor.ConditionDefinition {
             Argument = ("Weather.IsBadtide", "сезон: плохая вода"),
             Operands = [
-                Operands.ToDropdownItem(Operands.Type.Equal),
+                Operands.ToDropdownItem(Operands.OperandType.Equal),
             ],
             ArgTypes = [
                 ("True", "true"),
@@ -102,7 +112,7 @@ sealed class RulesEditorDialog : ILoadableSingleton {
         new ConditionConstructor.ConditionDefinition {
             Argument = ("Weather.IsTemperate", "сезон: умеренный"),
             Operands = [
-                Operands.ToDropdownItem(Operands.Type.Equal),
+                Operands.ToDropdownItem(Operands.OperandType.Equal),
             ],
             ArgTypes = [
                 ("True", "true"),
@@ -138,38 +148,20 @@ sealed class RulesEditorDialog : ILoadableSingleton {
         },
     ]);
 
-  //FIXME: get this from the building via interfaces/annotated methods.
-  ruleConstructor.ThenActionConstructor.SetDefinitions([
-      new ActionConstructor.ActionDefinition {
-          Action = ("Floodgate.SetHeight", "выставить высоту затвора в"),
-          ArgTypes = [
-              (ArgumentConstructor.NumberTypeName, "number-loc"),
-          ],
-      },
-      new ActionConstructor.ActionDefinition {
-          Action = ("Pausable.Pause", "остановить работу здания"),
-      },
-      new ActionConstructor.ActionDefinition {
-          Action = ("Pausable.Resume", "продолжить работу здания"),
-      },
-  ]);
-
-  ruleConstructor.ElseActionConstructor.SetDefinitions([
-      new ActionConstructor.ActionDefinition {
-          Action = ("Nothing", "НЕ НАЗНАЧЕНО"),
-      },
-      new ActionConstructor.ActionDefinition {
-          Action = ("Floodgate.SetHeight", "выставить высоту затвора в"),
-          ArgTypes = [
-              (ArgumentConstructor.NumberTypeName, "number-loc"),
-          ],
-      },
-      new ActionConstructor.ActionDefinition {
-          Action = ("Pausable.Pause", "остановить работу здания"),
-      },
-      new ActionConstructor.ActionDefinition {
-          Action = ("Pausable.Resume", "возобновить работу здания"),
-      },
-  ]);
+    //FIXME: get this from the building via interfaces/annotated methods.
+    ruleConstructor.ThenActionConstructor.SetDefinitions([
+        new ActionConstructor.ActionDefinition {
+            Action = ("Floodgate.SetHeight", "выставить высоту затвора в"),
+            ArgTypes = [
+                (ArgumentConstructor.NumberTypeName, "number-loc"),
+            ],
+        },
+        new ActionConstructor.ActionDefinition {
+            Action = ("Pausable.Pause", "остановить работу здания"),
+        },
+        new ActionConstructor.ActionDefinition {
+            Action = ("Pausable.Resume", "продолжить работу здания"),
+        },
+    ]);
   }
 }

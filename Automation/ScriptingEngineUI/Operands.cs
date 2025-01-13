@@ -8,7 +8,7 @@ using IgorZ.TimberDev.UI;
 namespace IgorZ.Automation.ScriptingEngineUI;
 
 static class Operands {
-  public enum Type {
+  public enum OperandType {
     Equal,
     NotEqual,
     Greater,
@@ -18,32 +18,32 @@ static class Operands {
   }
 
   //FIXME: translate
-  public static string ToString(Type type) {
-    return type switch {
-      Type.Equal => "равно",
-      Type.NotEqual => "не равно",
-      Type.Greater => "больше",
-      Type.GreaterOrEqual => "больше или равно",
-      Type.Less => "меньше",
-      Type.LessOrEqual => "меньше или равно",
-      _ => throw new System.ArgumentOutOfRangeException(nameof(type), type, null)
+  public static string ToString(OperandType operandType) {
+    return operandType switch {
+      OperandType.Equal => "равно",
+      OperandType.NotEqual => "не равно",
+      OperandType.Greater => "больше",
+      OperandType.GreaterOrEqual => "больше или равно",
+      OperandType.Less => "меньше",
+      OperandType.LessOrEqual => "меньше или равно",
+      _ => throw new System.ArgumentOutOfRangeException(nameof(operandType), operandType, null)
     };
   }
 
-  public static DropdownItem<Type> ToDropdownItem(Type type) {
-    return new DropdownItem<Type> { Value = type, Text = ToString(type) };
+  public static DropdownItem<OperandType> ToDropdownItem(OperandType operandType) {
+    return new DropdownItem<OperandType> { Value = operandType, Text = ToString(operandType) };
   }
 
-  public static DropdownItem<Type>[] ToDropdownItems(Type[] types) {
+  public static DropdownItem<OperandType>[] ToDropdownItems(OperandType[] types) {
     return types.Select(ToDropdownItem).ToArray();
   }
 
-  public static readonly Type[] All = [
-      Type.Equal,
-      Type.NotEqual,
-      Type.Greater,
-      Type.GreaterOrEqual,
-      Type.Less,
-      Type.LessOrEqual
+  public static readonly OperandType[] All = [
+      OperandType.Equal,
+      OperandType.NotEqual,
+      OperandType.Greater,
+      OperandType.GreaterOrEqual,
+      OperandType.Less,
+      OperandType.LessOrEqual
   ];
 }

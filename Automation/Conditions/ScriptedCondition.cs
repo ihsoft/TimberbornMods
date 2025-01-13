@@ -17,7 +17,7 @@ namespace IgorZ.Automation.Conditions;
 
 sealed class ScriptedCondition : AutomationConditionBase {
 
-  const string AndOperatorLocString = "IgorZ.Automation.Conditions.ScriptedCondition.AndOperator";
+  const string AndOperatorLocString = "IgorZ.Automation.Conditions.AndOperator";
 
   #region AutomationConditionBase overrides
 
@@ -113,7 +113,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
     foreach (var serializedOperand in Conditions) {
       var (name, op, argument) = ParseCondition(serializedOperand);
 
-      var triggerDef = ScriptingService.Instance.GetTriggerDefinition(name);
+      var triggerDef = ScriptingService.Instance.GetTriggerDefinition(name, Behavior);
       var argumentValue = argument;
       if (triggerDef.ValueType.Options != null) {
         argumentValue = triggerDef.ValueType.Options
@@ -121,7 +121,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
             .Select(x => x.Text)
             .FirstOrDefault();
         if (argumentValue == null) {
-          throw new ScriptError($"Cannot find option for '{argument}' in {triggerDef.Name}");
+          throw new ScriptError($"Cannot find option for '{argument}' in {triggerDef.FullName}");
         }
       }
 
