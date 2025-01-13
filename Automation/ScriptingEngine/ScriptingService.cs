@@ -74,6 +74,35 @@ sealed class ScriptingService : ILoadableSingleton {
     return scriptable.GetActionDefinition(nameItems[1], instance);
   }
 
+  /// <summary>Returns all trigger names for the specified building.</summary>
+  /// <remarks>This can be an expensive call. Avoid making it in the ticks.</remarks>
+  public string[] GetTriggersForBuilding(BaseComponent building) {
+    return _registedScriptables.Values
+        .Where(s => s.InstanceType == null || GetComponentFast(building, s.InstanceType))
+        .SelectMany(s => s.GetTriggerNamesForBuilding(building))
+        .ToArray();
+  }
+
+  /// <summary>Returns all action names for the specified building.</summary>
+  /// <remarks>This can be an expensive call. Avoid making it in the ticks.</remarks>
+  public string[] GetActionForBuilding(BaseComponent building) {
+    return _registedScriptables.Values
+        .Where(s => s.InstanceType == null || GetComponentFast(building, s.InstanceType))
+        .SelectMany(s => s.GetActionNamesForBuilding(building))
+        .ToArray();
+  }
+
+  /// <summary>Returns a component of the specified type from the building.</summary>
+  /// <remarks>It is a counter-part to the <see cref="BaseComponent.GetComponentFast{T}"/>.</remarks>
+  public static BaseComponent GetComponentFast(BaseComponent building, Type type) {
+    var genericMethodInfo = _getComponentFastMethod.MakeGenericMethod(type);
+    var component = genericMethodInfo.Invoke(building, []) as BaseComponent;
+    if (!component) {
+      throw new ScriptError($"The building doesn't have component: " + type);
+    }
+    return component;
+  }
+
   #endregion
 
   #region ILoadableSingleton implementation
@@ -109,15 +138,6 @@ sealed class ScriptingService : ILoadableSingleton {
       }
     }
     return (scriptable, building);
-  }
-
-  static BaseComponent GetComponentFast(BaseComponent building, Type type) {
-    var genericMethodInfo = _getComponentFastMethod.MakeGenericMethod(type);
-    var component = genericMethodInfo.Invoke(building, []) as BaseComponent;
-    if (!component) {
-      throw new ScriptError($"The building doesn't have component: " + type);
-    }
-    return component;
   }
 
   #endregion
