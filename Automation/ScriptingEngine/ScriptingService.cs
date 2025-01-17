@@ -53,12 +53,11 @@ sealed class ScriptingService : ILoadableSingleton {
   /// The building on which the action is to be executed. It must have the component that the action is bound to.
   /// See <see cref="IScriptable.InstanceType"/>.
   /// </param>
-  /// <param name="args">The arguments for the action. The number, type, and meaning depend on the action.</param>
   /// <exception cref="ScriptError">if action is not found.</exception>
-  public Action GetActionExecutor(string name, BaseComponent building, string[] args) {
+  public Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
     var nameItems = name.Split('.');
     var (scriptable, instance) = GetScriptable(nameItems[0], building);
-    return scriptable.GetActionExecutor(nameItems[1], instance, args);
+    return scriptable.GetActionExecutor(nameItems[1], instance);
   }
 
   /// <summary>Returns the definition of the action by its name.</summary>

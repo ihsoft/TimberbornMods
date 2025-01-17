@@ -107,6 +107,8 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
     }
 
     /// <inheritdoc/>
+    public ITriggerSource.ValueType Type => ITriggerSource.ValueType.String;
+    /// <inheritdoc/>
     public int NumberValue => throw new ScriptError("Season cannot be represented as a number");
     /// <inheritdoc/>
     public string StringValue => CurrentSeason;

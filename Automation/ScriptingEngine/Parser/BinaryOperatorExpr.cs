@@ -26,18 +26,18 @@ class BinaryOperatorExpr : BoolOperatorExpr {
       throw new ScriptError($"Arguments type mismatch: {left.Type} != {right.Type}");
     }
     Execute = left.Type switch {
-        IValueExpr.ValueType.String => name switch {
-            "eq" => () => left.GetStringValue() == right.GetStringValue(),
-            "ne" => () => left.GetStringValue() != right.GetStringValue(),
+        ScriptValue.ValueType.String => name switch {
+            "eq" => () => left.ValueFn().AsString == right.ValueFn().AsString,
+            "ne" => () => left.ValueFn().AsString != right.ValueFn().AsString,
             _ => throw new ScriptError("Unsupported operator for string operands: " + name),
         },
-        IValueExpr.ValueType.Number => name switch {
-            "eq" => () => left.GetNumberValue() == right.GetNumberValue(),
-            "ne" => () => left.GetNumberValue() != right.GetNumberValue(),
-            "gt" => () => left.GetNumberValue() > right.GetNumberValue(),
-            "lt" => () => left.GetNumberValue() < right.GetNumberValue(),
-            "ge" => () => left.GetNumberValue() >= right.GetNumberValue(),
-            "le" => () => left.GetNumberValue() <= right.GetNumberValue(),
+        ScriptValue.ValueType.Number => name switch {
+            "eq" => () => left.ValueFn().AsNumber == right.ValueFn().AsNumber,
+            "ne" => () => left.ValueFn().AsNumber != right.ValueFn().AsNumber,
+            "gt" => () => left.ValueFn().AsNumber > right.ValueFn().AsNumber,
+            "lt" => () => left.ValueFn().AsNumber < right.ValueFn().AsNumber,
+            "ge" => () => left.ValueFn().AsNumber >= right.ValueFn().AsNumber,
+            "le" => () => left.ValueFn().AsNumber <= right.ValueFn().AsNumber,
             _ => throw new InvalidOperationException("Unknown operator: " + name),
         },
         _ => throw new InvalidOperationException($"Value type is unspecified: {left}, {right}"),

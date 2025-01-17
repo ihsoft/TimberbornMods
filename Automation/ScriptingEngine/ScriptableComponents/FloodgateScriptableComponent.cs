@@ -26,18 +26,12 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   }
 
   /// <inheritdoc/>
-  public override Action GetActionExecutor(string name, BaseComponent instance, string[] args) {
+  public override Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent instance) {
     var floodgate = instance as Floodgate;
-    switch (name) {
-      case SetHeightActionName:
-        if (args.Length != 1) {
-          throw new ScriptError($"{SetHeightActionName} action requires 1 argument");
-        }
-        var value = ParseFloat(args[0]);
-        return () => floodgate!.SetHeight(value);
-      default:
-        throw new ScriptError("Unknown action: " + name);
-    }
+    return name switch {
+        SetHeightActionName => args => SetHeight(floodgate, args),
+        _ => throw new ScriptError("Unknown action: " + name),
+    };
   }
 
   /// <inheritdoc/>
@@ -52,8 +46,19 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
                 },
             ],
         },
-        _ => throw new ScriptError("Unknown action: " + name)
+        _ => throw new ScriptError("Unknown action: " + name),
     };
+  }
+
+  #endregion
+
+  #region Actions
+
+  static void SetHeight(Floodgate floodgate, ScriptValue[] args) {
+    if (args.Length != 1) {
+      throw new ScriptError($"{SetHeightActionName} action requires 1 argument");
+    }
+    floodgate.SetHeight(args[0].AsNumber / 100f);
   }
 
   #endregion

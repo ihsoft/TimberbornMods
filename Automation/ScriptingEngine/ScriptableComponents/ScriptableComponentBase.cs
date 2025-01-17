@@ -40,7 +40,7 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
   public virtual string[] GetActionNamesForBuilding(BaseComponent building) => [];
 
   /// <inheritdoc/>
-  public virtual Action GetActionExecutor(string name, BaseComponent instance, string[] args) {
+  public virtual Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent instance) {
     throw new NotImplementedException();
   }
 
@@ -55,13 +55,6 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
 
   protected string LocAction(string name) {
     return Loc.T($"{ScriptableLocKeyPrefix}.{Name}.Action.{name}");
-  }
-
-  protected static float ParseFloat(string value) {
-    if (!int.TryParse(value, out var result)) {
-      throw new ScriptError("Failed to parse number argument: " + value);
-    }
-    return result / 100f;
   }
 
   #endregion

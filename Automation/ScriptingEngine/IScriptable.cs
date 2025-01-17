@@ -4,7 +4,6 @@
 
 using System;
 using IgorZ.TimberDev.UI;
-using JetBrains.Annotations;
 using Timberborn.BaseComponentSystem;
 
 namespace IgorZ.Automation.ScriptingEngine;
@@ -70,9 +69,8 @@ interface IScriptable {
   /// <param name="instance">
   /// The component on which the action is to be executed. It must be of type <see cref="InstanceType"/>.
   /// </param>
-  /// <param name="args">The arguments for the action. The number, type, and meaning depend on the action.</param>
   /// <exception cref="ScriptError">if action is not found.</exception>
-  public Action GetActionExecutor(string name, BaseComponent instance, string[] args);
+  public Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent instance);
 
   /// <summary>Returns the definition of the action with the specified name.</summary>
   /// <param name="name">The name of the action.</param>

@@ -11,6 +11,15 @@ namespace IgorZ.Automation.ScriptingEngine;
 /// </remarks>
 /// <see cref="ScriptingService.GetTriggerSource"/>
 interface ITriggerSource {
+  //FIXME: use ScriptValue.ValueType instead
+  public enum ValueType {
+    Number,
+    String,
+  }
+
+  /// <summary>The type of the signal value.</summary>
+  public ValueType Type { get; }
+
   /// <summary>Current numeric value of the trigger.</summary>
   /// <remarks>All numbers are 2-digits fixed point numbers. Value "1234" should be treated as "12.34f".</remarks>
   /// <exception cref="ScriptError">if the trigger doesn't provide numeric values.</exception>

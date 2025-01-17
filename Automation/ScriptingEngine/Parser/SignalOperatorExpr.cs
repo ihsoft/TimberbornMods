@@ -9,16 +9,12 @@ using System.Text.RegularExpressions;
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
 class SignalOperatorExpr : AbstractOperandExpr, IValueExpr {
-  public IValueExpr.ValueType Type => _source.Type == ITriggerSource.ValueType.String
-      ? IValueExpr.ValueType.String
-      : IValueExpr.ValueType.Number;
+  public ScriptValue.ValueType Type => _source.Type == ITriggerSource.ValueType.String
+      ? ScriptValue.ValueType.String
+      : ScriptValue.ValueType.Number;
 
-  public Func<string> GetStringValue {
-    get { return () => _source.StringValue; }
-  }
-
-  public Func<int> GetNumberValue {
-    get { return () => _source.NumberValue; }
+  public Func<ScriptValue> ValueFn {
+    get { return () => ScriptValue.Of(_source.NumberValue); }
   }
 
   readonly ITriggerSource _source;

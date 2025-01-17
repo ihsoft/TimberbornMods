@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿// Timberborn Mod: Automation
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+
+using System.Collections.Generic;
 using System.Text;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
