@@ -8,6 +8,7 @@ using Timberborn.BaseComponentSystem;
 using Timberborn.HazardousWeatherSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.WeatherSystem;
+using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
@@ -102,7 +103,9 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
 
     public SeasonTrigger(WeatherScriptableComponent parent, Action onValueChanged) {
       _parent = parent;
-      _parent._seasonChangeTriggers.Add(this, onValueChanged);
+      if (onValueChanged != null) {
+        _parent._seasonChangeTriggers.Add(this, onValueChanged);
+      }
       CurrentSeason = _parent.GetCurrentSeason();
     }
 

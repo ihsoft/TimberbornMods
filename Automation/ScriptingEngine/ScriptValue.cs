@@ -19,6 +19,9 @@ sealed class ScriptValue {
     return new ScriptValue { _number = number };
   }
 
+  /// <summary>Current numeric value.</summary>
+  /// <remarks>All numbers are 2-digits fixed point numbers. Value "1234" should be treated as "12.34f".</remarks>
+  /// <exception cref="ScriptError">if the value is not numeric.</exception>
   public int AsNumber {
     get {
       if (!_number.HasValue) {
@@ -28,6 +31,8 @@ sealed class ScriptValue {
     }
   }
 
+  /// <summary>Current string value.</summary>
+  /// <exception cref="ScriptError">if the value is a string.</exception>
   public string AsString {
     get {
       if (_string == null) {
