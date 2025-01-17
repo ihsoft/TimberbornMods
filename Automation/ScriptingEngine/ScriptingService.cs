@@ -77,7 +77,7 @@ sealed class ScriptingService : ILoadableSingleton {
   /// <remarks>This can be an expensive call. Avoid making it in the ticks.</remarks>
   public string[] GetTriggersForBuilding(BaseComponent building) {
     return _registedScriptables.Values
-        .Where(s => s.InstanceType == null || GetComponentFast(building, s.InstanceType))
+        .Where(s => s.InstanceType == null || TryGetComponentFast(building, s.InstanceType, out _))
         .SelectMany(s => s.GetTriggerNamesForBuilding(building))
         .ToArray();
   }
@@ -86,7 +86,7 @@ sealed class ScriptingService : ILoadableSingleton {
   /// <remarks>This can be an expensive call. Avoid making it in the ticks.</remarks>
   public string[] GetActionForBuilding(BaseComponent building) {
     return _registedScriptables.Values
-        .Where(s => s.InstanceType == null || GetComponentFast(building, s.InstanceType))
+        .Where(s => s.InstanceType == null || TryGetComponentFast(building, s.InstanceType, out _))
         .SelectMany(s => s.GetActionNamesForBuilding(building))
         .ToArray();
   }
@@ -99,6 +99,12 @@ sealed class ScriptingService : ILoadableSingleton {
     if (!component) {
       throw new ScriptError($"The building doesn't have component: " + type);
     }
+    return component;
+  }
+
+  public static bool TryGetComponentFast(BaseComponent building, Type type, out BaseComponent component) {
+    var genericMethodInfo = _getComponentFastMethod.MakeGenericMethod(type);
+    component = genericMethodInfo.Invoke(building, []) as BaseComponent;
     return component;
   }
 
