@@ -5,4 +5,5 @@
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
 interface IExpression {
+  public string Serialize();
 }

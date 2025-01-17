@@ -8,6 +8,7 @@ namespace IgorZ.Automation.ScriptingEngine.Parser;
 
 interface IValueExpr {
    public enum ValueType {
+     Undefined,
      Number,
      String,
    }

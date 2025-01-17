@@ -24,4 +24,16 @@ class ConstantValueExpr : IExpression, IValueExpr {
     }
     return null;
   }
+
+  public string Serialize() {
+    return Type switch {
+      IValueExpr.ValueType.String => $"'{GetStringValue()}",
+      IValueExpr.ValueType.Number => GetNumberValue().ToString(),
+      _ => $"ERROR:{Type}",
+    };
+  }
+
+  public override string ToString() {
+    return $"{GetType().Name}#{Serialize()}";
+  }
 }

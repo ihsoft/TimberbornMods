@@ -1,11 +1,27 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
 abstract class AbstractOperandExpr(string name, IList<IExpression> operands) : IExpression {
   public string Name { get; } = name;
+  public readonly IList<IExpression> Operands = operands;
 
-  protected readonly IList<IExpression> Operands = operands;
+  public string Serialize() {
+    var sb = new StringBuilder();
+    sb.Append("(");
+    sb.Append(Name);
+    foreach (var operand in Operands) {
+      sb.Append(" ");
+      sb.Append(operand.Serialize());
+    }
+    sb.Append(")");
+    return sb.ToString();
+  }
+
+  public override string ToString() {
+    return $"{GetType().Name}#{Serialize()}";
+  }
 
   protected void AsserNumberOfOperandsExact(int expected) {
     var count = Operands.Count;

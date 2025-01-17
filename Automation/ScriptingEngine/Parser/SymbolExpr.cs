@@ -6,5 +6,12 @@ namespace IgorZ.Automation.ScriptingEngine.Parser;
 
 class SymbolExpr : IExpression {
   public string Value { get; init; }
-  public override string ToString() => Value;
+
+  public string Serialize() {
+    return Value;
+  }
+
+  public override string ToString() {
+    return $"{GetType().Name}#{Serialize()}";
+  }
 }
