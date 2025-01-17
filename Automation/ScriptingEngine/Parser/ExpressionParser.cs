@@ -6,16 +6,25 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Timberborn.BaseComponentSystem;
 using Timberborn.Common;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
-class ExpressionParser(Func<string, ITriggerSource> signalSourceProvider) {
+class ExpressionParser(Func<string, ITriggerSource> signalSourceProvider, ScriptingService scriptingService, BaseComponent scriptHost) {
 
   static readonly Regex OperatorNameRegex = new(@"^\[a-zA-Z]+$");
 
   public IExpression ParsedExpression { get; private set; }
   public string Source { get; private set; }
+
+  internal IScriptable.ActionDef GetActionDefinition(string actionName) {
+    return scriptingService.GetActionDefinition(actionName, scriptHost);
+  }
+
+  internal Action<ScriptValue[]> GetAction(string actionName) {
+    return scriptingService.GetActionExecutor(actionName, scriptHost);
+  }
 
   public void Parse(string input) {
     ParsedExpression = ReadFromTokens(Tokenize(input));
@@ -56,7 +65,8 @@ class ExpressionParser(Func<string, ITriggerSource> signalSourceProvider) {
       var result =
           BinaryOperatorExpr.TryCreateFrom(operatorName, operands)
           ?? LogicalOperatorExpr.TryCreateFrom(operatorName, operands)
-          ?? SignalOperatorExpr.TryCreateFrom(operatorName, operands, signalSourceProvider);
+          ?? SignalOperatorExpr.TryCreateFrom(operatorName, operands, signalSourceProvider)
+          ?? ActionExpr.TryCreateFrom(operatorName, operands, this);
       if (result == null) {
         throw new ScriptError("Unknown operator: " + operatorName);
       }
