@@ -28,7 +28,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override string[] GetTriggerNamesForBuilding(BaseComponent _) {
-    return [SeasonTriggerName]; 
+    return [$"{Name}.{SeasonTriggerName}"]; 
   }
 
   /// <inheritdoc/>

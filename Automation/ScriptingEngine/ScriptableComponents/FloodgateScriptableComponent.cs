@@ -22,7 +22,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override string[] GetActionNamesForBuilding(BaseComponent building) {
-    return [SetHeightActionName];
+    return [$"{Name}.{SetHeightActionName}"];
   }
 
   /// <inheritdoc/>
