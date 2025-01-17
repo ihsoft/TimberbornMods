@@ -5,15 +5,14 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using IgorZ.Automation.UI;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
-abstract class BoolOperatorExpr : IExpression {
-  public string Name  { get; protected init; }
+//FIXME: deprecate. work with number expressions instead
+abstract class BoolOperatorExpr(string name, IList<IExpression> operands) : AbstractOperandExpr(name, operands) {
   public Func<bool> Execute { get; protected init; }
-  public IList<IExpression> Operands { get; init; }
 
+  //FIXME: make serialize method
   public override string ToString() {
     var sb = new StringBuilder();
     sb.Append("(");
@@ -24,11 +23,5 @@ abstract class BoolOperatorExpr : IExpression {
     }
     sb.Append(")");
     return sb.ToString();
-  }
-
-  protected BoolOperatorExpr(string name, IList<IExpression> operands, int numberOfOperands) {
-    AsserNumberOfOperands(name, operands, numberOfOperands);
-    Name = name;
-    Operands = operands;
   }
 }

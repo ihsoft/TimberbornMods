@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using IgorZ.Automation.UI;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
@@ -15,31 +14,33 @@ class BinaryOperatorExpr : BoolOperatorExpr {
     return Names.Contains(name) ? new BinaryOperatorExpr(name, arguments) : null;
   }
 
-  BinaryOperatorExpr(string name, IList<IExpression> operands) : base(name, operands, 2) {
-    var left = GetOperand<SignalOperatorExpr>(Operands[0]);
-    var right = GetOperand<ValueExpr>(Operands[1]);
+  BinaryOperatorExpr(string name, IList<IExpression> operands) : base(name, operands) {
+    AsserNumberOfOperandsExact(2);
+    if (Operands[0] is not SignalOperatorExpr left) {
+      throw new ScriptError("Left operand must be a signal: " + Operands[0]);
+    }
+    if (Operands[1] is not IValueExpr right) {
+      throw new ScriptError("Right operand must be a value: " + Operands[1]);
+    }
     if (left.Type != right.Type) {
-      throw new ScriptError("Arguments type mismatch: " + left.Type + " != " + right.Type);
+      throw new ScriptError($"Arguments type mismatch: {left.Type} != {right.Type}");
     }
-    if (left.Type == ValueExpr.ValueType.String) {
-      Execute = name switch {
-          "eq" => () => left.GetStringValue() == right.GetStringValue(),
-          "ne" => () => left.GetStringValue() != right.GetStringValue(),
-          _ => throw new ScriptError("Unsupported operator for string operands: " + name),
-      };
-    }
-    if (left.Type == ValueExpr.ValueType.Number) {
-      Execute = name switch {
-          "eq" => () => left.GetNumberValue() == right.GetNumberValue(),
-          "ne" => () => left.GetNumberValue() != right.GetNumberValue(),
-          "gt" => () => left.GetNumberValue() > right.GetNumberValue(),
-          "lt" => () => left.GetNumberValue() < right.GetNumberValue(),
-          "ge" => () => left.GetNumberValue() >= right.GetNumberValue(),
-          "le" => () => left.GetNumberValue() <= right.GetNumberValue(),
-          _ => throw new InvalidOperationException("Unknown operator: " + name),
-      };
-    } else {
-      throw new InvalidOperationException($"Value type is unspecified: {left}, {right}");
-    }
+    Execute = left.Type switch {
+        IValueExpr.ValueType.String => name switch {
+            "eq" => () => left.GetStringValue() == right.GetStringValue(),
+            "ne" => () => left.GetStringValue() != right.GetStringValue(),
+            _ => throw new ScriptError("Unsupported operator for string operands: " + name),
+        },
+        IValueExpr.ValueType.Number => name switch {
+            "eq" => () => left.GetNumberValue() == right.GetNumberValue(),
+            "ne" => () => left.GetNumberValue() != right.GetNumberValue(),
+            "gt" => () => left.GetNumberValue() > right.GetNumberValue(),
+            "lt" => () => left.GetNumberValue() < right.GetNumberValue(),
+            "ge" => () => left.GetNumberValue() >= right.GetNumberValue(),
+            "le" => () => left.GetNumberValue() <= right.GetNumberValue(),
+            _ => throw new InvalidOperationException("Unknown operator: " + name),
+        },
+        _ => throw new InvalidOperationException($"Value type is unspecified: {left}, {right}"),
+    };
   }
 }

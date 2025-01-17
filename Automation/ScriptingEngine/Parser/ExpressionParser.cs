@@ -6,12 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using IgorZ.Automation.UI;
 using Timberborn.Common;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
-class ExpressionParser {
+class ExpressionParser(Func<string, ITriggerSource> signalSourceProvider) {
 
   static readonly Regex OperatorNameRegex = new(@"^\[a-zA-Z]+$");
 
@@ -35,7 +34,6 @@ class ExpressionParser {
 
   IExpression ReadFromTokens(Queue<string> tokens) {
     if (!tokens.Any()) {
-      //FIXME: one day provide position.
       throw new ScriptError("Unexpected EOF while reading expression");
     }
     var token = tokens.Dequeue();
@@ -58,7 +56,7 @@ class ExpressionParser {
       var result =
           BinaryOperatorExpr.TryCreateFrom(operatorName, operands)
           ?? LogicalOperatorExpr.TryCreateFrom(operatorName, operands)
-          ?? SignalOperatorExpr.TryCreate(operatorName, operands);
+          ?? SignalOperatorExpr.TryCreateFrom(operatorName, operands, signalSourceProvider);
       if (result == null) {
         throw new ScriptError("Unknown operator: " + operatorName);
       }
@@ -67,12 +65,6 @@ class ExpressionParser {
     if (token == ")") {
       throw new ScriptError("Unexpected ')' while reading expression");
     }
-    if (token[0] >= '0' && token[0] <= '9') {
-      return ValueExpr.CreateNumberConstant(token);
-    }
-    if (token.StartsWith("'")) {
-      return ValueExpr.CreateStringConstant(token);
-    }
-    return new SymbolExpr { Value = token };
+    return ConstantValueExpr.TryCreateFrom(token) ?? new SymbolExpr { Value = token };
   }
 }
