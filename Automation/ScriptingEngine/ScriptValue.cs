@@ -43,7 +43,11 @@ sealed class ScriptValue {
   }
 
   public override string ToString() {
-    return _number.HasValue ? _number.Value.ToString() : _string;
+    return ValueType switch {
+        TypeEnum.Number => $"ScriptValue#Number:{AsNumber.ToString()}",
+        TypeEnum.String => $"ScriptValue#String:{AsString}",
+        _ => $"ScriptValue#{ValueType}:UNKNOWN",
+    };
   }
 
   int? _number;
