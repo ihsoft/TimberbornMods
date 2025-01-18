@@ -35,7 +35,9 @@ sealed class ScriptedAction : AutomationActionBase {
   /// <inheritdoc/>
   public override void OnConditionState(IAutomationCondition automationCondition) {
     if (Condition.ConditionState) {
-      _actionExecutor();
+      HostedDebugLog.Fine(Behavior, "Condition triggered: {0}", automationCondition);
+      //FIXME: implement action execution with params
+      _actionExecutor([]);
     }
   }
 
@@ -92,7 +94,7 @@ sealed class ScriptedAction : AutomationActionBase {
   #region Implementation
 
   static readonly Regex ActionRegex = new(@"^([a-zA-Z.]+)\((.*)\)$");
-  Action _actionExecutor;
+  Action<string[]> _actionExecutor;
 
   void ParseAction() {
     var match = ActionRegex.Match(SerializedAction);
@@ -101,7 +103,7 @@ sealed class ScriptedAction : AutomationActionBase {
     }
     var actionName = match.Groups[1].Value;
     var argument = match.Groups[2].Value;
-    _actionExecutor = ScriptingService.Instance.GetActionExecutor(actionName, Behavior, argument.Split(','));
+    //_actionExecutor = ScriptingService.Instance.GetActionExecutor(actionName, Behavior);
 
     var actionDef = ScriptingService.Instance.GetActionDefinition(actionName, Behavior);
     if (actionDef.ArgumentTypes.Length > 1) {
@@ -121,7 +123,7 @@ sealed class ScriptedAction : AutomationActionBase {
           throw new ScriptError($"Cannot find option for '{argument}' in {actionDef.FullName}");
         }
       }
-      if (argumentDef.ArgumentType != IScriptable.ArgumentDef.Type.String) {
+      if (argumentDef.ValueType != ScriptValue.TypeEnum.String) {
         argumentValue = (int.Parse(argument) / 100f).ToString("0.##");
       }
       description += " " + argumentValue;

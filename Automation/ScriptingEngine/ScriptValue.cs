@@ -5,11 +5,11 @@
 namespace IgorZ.Automation.ScriptingEngine;
 
 sealed class ScriptValue {
-  public enum ValueType {
+  public enum TypeEnum {
     Number,
     String,
   }
-  public ValueType Type => _number.HasValue ? ValueType.Number : ValueType.String;
+  public TypeEnum ValueType => _number.HasValue ? TypeEnum.Number : TypeEnum.String;
 
   public static ScriptValue Of(string literal) {
     return new ScriptValue { _string = literal };

@@ -52,6 +52,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
+    //FIXME: somehow check condition?
     return true;
   }
 
@@ -115,8 +116,8 @@ sealed class ScriptedCondition : AutomationConditionBase {
 
       var triggerDef = ScriptingService.Instance.GetTriggerDefinition(name, Behavior);
       var argumentValue = argument;
-      if (triggerDef.ValueType.Options != null) {
-        argumentValue = triggerDef.ValueType.Options
+      if (triggerDef.ArgumentType.Options != null) {
+        argumentValue = triggerDef.ArgumentType.Options
             .Where(x => x.Value == argument)
             .Select(x => x.Text)
             .FirstOrDefault();
@@ -127,7 +128,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
 
       var trigger = ScriptingService.Instance.GetTriggerSource(name, Behavior, CheckOperands);
       try {
-        var operand = triggerDef.ValueType.ArgumentType == IScriptable.ArgumentDef.Type.String
+        var operand = triggerDef.ArgumentType.ValueType == ScriptValue.TypeEnum.String
             ? Operand.ForStringArgument(trigger, op, argument)
             : Operand.ForNumberArgument(trigger, op, argument);
         _operands.Add(operand);

@@ -9,9 +9,9 @@ using System.Text.RegularExpressions;
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
 class SignalOperatorExpr : AbstractOperandExpr, IValueExpr {
-  public ScriptValue.ValueType Type => _source.Type == ITriggerSource.ValueType.String
-      ? ScriptValue.ValueType.String
-      : ScriptValue.ValueType.Number;
+  public ScriptValue.TypeEnum ValueType => _source.Type == ITriggerSource.ValueType.String
+      ? ScriptValue.TypeEnum.String
+      : ScriptValue.TypeEnum.Number;
 
   //FIXME: type depends on the signal. should be dynamic
   //FIXME: get script value from the soucre directly.

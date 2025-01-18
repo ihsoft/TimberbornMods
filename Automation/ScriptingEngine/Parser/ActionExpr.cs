@@ -32,12 +32,10 @@ class ActionExpr : AbstractOperandExpr {
         throw new ScriptError($"Operand #{i + 1} must be a value: {operand}");
       }
       var argDef = def.ArgumentTypes[i];
-      if (argDef.ArgumentType == IScriptable.ArgumentDef.Type.String && valueExpr.Type == ScriptValue.ValueType.String
-          || argDef.ArgumentType == IScriptable.ArgumentDef.Type.Number && valueExpr.Type == ScriptValue.ValueType.Number) {
-        argValues[i] = valueExpr.ValueFn;
-      } else {
-        throw new ScriptError($"Incompatible argument type: {valueExpr.Type} is not {argDef.ArgumentType}");
+      if (argDef.ValueType != valueExpr.ValueType) {
+        throw new ScriptError($"Incompatible argument type #{i + 1}: {valueExpr.ValueType} is not {argDef.ValueType}");
       }
+      argValues[i] = valueExpr.ValueFn;
     }
     var action = parser.GetAction(actionName);
     Execute = () => action(argValues.Select(v => v()).ToArray());

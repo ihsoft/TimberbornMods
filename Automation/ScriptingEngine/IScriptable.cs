@@ -9,31 +9,6 @@ using Timberborn.BaseComponentSystem;
 namespace IgorZ.Automation.ScriptingEngine;
 
 interface IScriptable {
-  public struct ArgumentDef {
-    public enum Type {
-      Number,
-      Percentage,
-      Float,
-      String,
-    }
-
-    public Type ArgumentType { get; init; }
-    public string Units { get; init; }
-    public DropdownItem<string>[] Options { get; init; }
-  }
-
-  public struct TriggerDef {
-    public string FullName { get; init; }
-    public string DisplayName { get; init; }
-    public ArgumentDef ValueType { get; init; }
-  }
-
-  public class ActionDef {
-    public string FullName { get; init; }
-    public string DisplayName { get; init; }
-    public ArgumentDef[] ArgumentTypes { get; init; }
-  }
-
   /// <summary>The name of the scriptable component.</summary>
   public string Name { get; }
 

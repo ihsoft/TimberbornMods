@@ -32,7 +32,7 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
   }
 
   /// <inheritdoc/>
-  public virtual IScriptable.TriggerDef GetTriggerDefinition(string name, BaseComponent building) {
+  public virtual TriggerDef GetTriggerDefinition(string name, BaseComponent building) {
     throw new NotImplementedException();
   }
 
@@ -45,7 +45,7 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
   }
 
   /// <inheritdoc/>
-  public virtual IScriptable.ActionDef GetActionDefinition(string name, BaseComponent instance) {
+  public virtual ActionDef GetActionDefinition(string name, BaseComponent instance) {
     throw new NotImplementedException();
   }
 

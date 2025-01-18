@@ -42,13 +42,13 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
   }
 
   /// <inheritdoc/>
-  public override IScriptable.TriggerDef GetTriggerDefinition(string name, BaseComponent _) {
+  public override TriggerDef GetTriggerDefinition(string name, BaseComponent _) {
     return name switch {
-        SeasonTriggerName => new IScriptable.TriggerDef {
+        SeasonTriggerName => new TriggerDef {
             FullName = $"{Name}.{SeasonTriggerName}",
             DisplayName = LocTrigger(SeasonTriggerName),
-            ValueType = new IScriptable.ArgumentDef {
-                ArgumentType = IScriptable.ArgumentDef.Type.String,
+            ArgumentType = new ArgumentDef {
+                ValueType = ScriptValue.TypeEnum.String,
                 Options = [
                     (TemperateSeason, Loc.T("Weather.Temperate")),
                     (DroughtSeason, Loc.T("Weather.Drought")),

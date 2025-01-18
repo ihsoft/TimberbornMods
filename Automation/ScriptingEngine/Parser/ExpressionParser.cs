@@ -76,7 +76,7 @@ class ExpressionParser(ScriptingService scriptingService, BaseComponent scriptHo
   static readonly Regex OperatorNameRegex = new(@"^\[a-zA-Z]+$");
   Context _currentContext;
 
-  internal IScriptable.ActionDef GetActionDefinition(string actionName) {
+  internal ActionDef GetActionDefinition(string actionName) {
     return scriptingService.GetActionDefinition(actionName, scriptHost);
   }
 

@@ -22,16 +22,16 @@ class BinaryOperatorExpr : BoolOperatorExpr {
     if (Operands[1] is not IValueExpr right) {
       throw new ScriptError("Right operand must be a value: " + Operands[1]);
     }
-    if (left.Type != right.Type) {
-      throw new ScriptError($"Arguments type mismatch: {left.Type} != {right.Type}");
+    if (left.ValueType != right.ValueType) {
+      throw new ScriptError($"Arguments type mismatch: {left.ValueType} != {right.ValueType}");
     }
-    Execute = left.Type switch {
-        ScriptValue.ValueType.String => name switch {
+    Execute = left.ValueType switch {
+        ScriptValue.TypeEnum.String => name switch {
             "eq" => () => left.ValueFn().AsString == right.ValueFn().AsString,
             "ne" => () => left.ValueFn().AsString != right.ValueFn().AsString,
             _ => throw new ScriptError("Unsupported operator for string operands: " + name),
         },
-        ScriptValue.ValueType.Number => name switch {
+        ScriptValue.TypeEnum.Number => name switch {
             "eq" => () => left.ValueFn().AsNumber == right.ValueFn().AsNumber,
             "ne" => () => left.ValueFn().AsNumber != right.ValueFn().AsNumber,
             "gt" => () => left.ValueFn().AsNumber > right.ValueFn().AsNumber,

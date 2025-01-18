@@ -41,7 +41,7 @@ sealed class ScriptingService : ILoadableSingleton {
 
   /// <summary>Returns a trigger definition by its name.</summary>
   /// <exception cref="ScriptError">if the trigger is not found.</exception>
-  public IScriptable.TriggerDef GetTriggerDefinition(string name, BaseComponent building) {
+  public TriggerDef GetTriggerDefinition(string name, BaseComponent building) {
     var nameItems = name.Split('.');
     var (scriptable, instance) = GetScriptable(nameItems[0], building);
     return scriptable.GetTriggerDefinition(nameItems[1], instance);
@@ -67,7 +67,7 @@ sealed class ScriptingService : ILoadableSingleton {
   /// See <see cref="IScriptable.InstanceType"/>.
   /// </param>
   /// <exception cref="ScriptError">if action is not found.</exception>
-  public IScriptable.ActionDef GetActionDefinition(string name, BaseComponent building) {
+  public ActionDef GetActionDefinition(string name, BaseComponent building) {
     var nameItems = name.Split('.');
     var (scriptable, instance) = GetScriptable(nameItems[0], building);
     return scriptable.GetActionDefinition(nameItems[1], instance);

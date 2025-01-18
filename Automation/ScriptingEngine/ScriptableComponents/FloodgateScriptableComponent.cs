@@ -35,14 +35,14 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   }
 
   /// <inheritdoc/>
-  public override IScriptable.ActionDef GetActionDefinition(string name, BaseComponent instance) {
+  public override ActionDef GetActionDefinition(string name, BaseComponent instance) {
     return name switch {
-        SetHeightActionName => new IScriptable.ActionDef {
+        SetHeightActionName => new ActionDef {
             FullName = $"{Name}.{SetHeightActionName}",
             DisplayName = LocAction(SetHeightActionName),
             ArgumentTypes = [
-                new IScriptable.ArgumentDef {
-                    ArgumentType = IScriptable.ArgumentDef.Type.Float,
+                new ArgumentDef {
+                    ValueType = ScriptValue.TypeEnum.Number,
                 },
             ],
         },
