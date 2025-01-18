@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine;
+using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.Localization;
 using Timberborn.Persistence;
 using UnityDev.Utils.LogUtilsLite;
@@ -34,101 +35,94 @@ sealed class ScriptedAction : AutomationActionBase {
 
   /// <inheritdoc/>
   public override void OnConditionState(IAutomationCondition automationCondition) {
-    if (Condition.ConditionState) {
+    //FIXME
+    HostedDebugLog.Warning(Behavior, "Conditions update: {0}", Condition.ConditionState);
+    if (!Condition.ConditionState) {
+      return;
+    }
+    if (_parsedExpression != null) {
       HostedDebugLog.Fine(Behavior, "Condition triggered: {0}", automationCondition);
-      //FIXME: implement action execution with params
-      _actionExecutor([]);
+      _parsedExpression.Execute();
+    } else {
+      HostedDebugLog.Error(Behavior, "Condition triggered, but the action was broken: {0}", Expression);
     }
   }
 
   /// <inheritdoc/>
   protected override void OnBehaviorAssigned() {
     base.OnBehaviorAssigned();
-    try {
-      ParseAction();
-    } catch (ScriptError e) {
-      HostedDebugLog.Error(Behavior, "Failed to parse action: " + e.Message);
-      IsMarkedForCleanup = true;
-    }
+    ParseAction();
   }
 
   #endregion
 
   #region API
 
-  /// <summary>Action to execute.</summary>
-  /// <remarks>It is a string representation of the action setup. For example, "Floodgate.SetHeight(150)".</remarks>
+  /// <summary>Script code for expression to execute.</summary>
+  /// <remarks>
+  /// It must be <see cref="ActionExpr"/> expression. Example of an action: "(act Floodgate.SetHeight 150)". 
+  /// </remarks>
+  /// <seealso cref="ActionExpr"/>
   // ReSharper disable once MemberCanBePrivate.Global
-  public string SerializedAction { get; private set; }
+  public string Expression { get; private set; }
 
-  /// <summary>Sets the expression conditions.</summary>
+  /// <summary>Sets the action expression.</summary>
   /// <remarks>Can only be set on the non-active condition.</remarks>
-  /// <seealso cref="SerializedAction"/>
-  public void SetAction(string action) {
+  /// <seealso cref="Expression"/>
+  public void SetExpression(string expression) {
     if (Behavior) {
       throw new InvalidOperationException("Cannot change action when the behavior is assigned.");
     }
-    SerializedAction = action;
+    Expression = expression;
   }
 
   #endregion
 
   #region IGameSerializable implemenation
 
-  static readonly PropertyKey<string> SerializedActionKey = new("SerializedAction");
+  static readonly PropertyKey<string> ExpressionKey = new("Expression");
 
   /// <inheritdoc/>
   public override void LoadFrom(IObjectLoader objectLoader) {
     base.LoadFrom(objectLoader);
-    SerializedAction = objectLoader.Get(SerializedActionKey);
+    Expression = objectLoader.Get(ExpressionKey);
   }
 
   /// <inheritdoc/>
   public override void SaveTo(IObjectSaver objectSaver) {
     base.SaveTo(objectSaver);
-    objectSaver.Set(SerializedActionKey, SerializedAction);
+    objectSaver.Set(ExpressionKey, Expression);
   }
 
   #endregion
 
   #region Implementation
 
-  static readonly Regex ActionRegex = new(@"^([a-zA-Z.]+)\((.*)\)$");
-  Action<string[]> _actionExecutor;
+  ExpressionParser.Context _parserContext;
+  ActionExpr _parsedExpression;
 
-  void ParseAction() {
-    var match = ActionRegex.Match(SerializedAction);
-    if (!match.Success) {
-      throw new ScriptError("Invalid action format: " + SerializedAction);
+  bool ParseAction() {
+    _parserContext = new ExpressionParser.Context();
+    //FIXME: inject it.
+    var parser = new ExpressionParser(ScriptingService.Instance, Behavior);
+    var res = parser.Parse(Expression, _parserContext);
+    if (!res) {
+      HostedDebugLog.Error(Behavior, "Failed to parse action: {0}\nError: {1}", Expression, _parserContext.LastError);
+      //FIXME: localize
+      _uiDescription = TextColors.ColorizeText($"<RedHighlight>ERROR</RedHighlight>");
+      return false;
     }
-    var actionName = match.Groups[1].Value;
-    var argument = match.Groups[2].Value;
-    //_actionExecutor = ScriptingService.Instance.GetActionExecutor(actionName, Behavior);
-
-    var actionDef = ScriptingService.Instance.GetActionDefinition(actionName, Behavior);
-    if (actionDef.ArgumentTypes.Length > 1) {
-      //FIXME: support multiple arguments one day.
-      throw new ScriptError("Cannot handle multiple arguments in action: " + actionDef.FullName);
+    //FIXME: process expression to get the descirption
+    _parsedExpression = _parserContext.ParsedExpression as ActionExpr;
+    if (_parsedExpression == null) {
+      HostedDebugLog.Error(
+          Behavior, "Expression is not an action operator: {0}", _parserContext.ParsedExpression.Serialize());
+      //FIXME: localize
+      _uiDescription = TextColors.ColorizeText($"<RedHighlight>ERROR</RedHighlight>");
+      return false;
     }
-    var description = actionDef.DisplayName;
-    if (actionDef.ArgumentTypes.Length > 0) {
-      var argumentDef = actionDef.ArgumentTypes[0];
-      var argumentValue = argument;
-      if (argumentDef.Options != null) {
-        argumentValue = argumentDef.Options
-            .Where(x => x.Value == argument)
-            .Select(x => x.Text)
-            .FirstOrDefault();
-        if (argumentValue == null) {
-          throw new ScriptError($"Cannot find option for '{argument}' in {actionDef.FullName}");
-        }
-      }
-      if (argumentDef.ValueType != ScriptValue.TypeEnum.String) {
-        argumentValue = (int.Parse(argument) / 100f).ToString("0.##");
-      }
-      description += " " + argumentValue;
-    }
-    _uiDescription = TextColors.ColorizeText($"<SolidHighlight>{description}</SolidHighlight>");
+    _uiDescription = TextColors.ColorizeText($"<SolidHighlight>{Expression}</SolidHighlight>");
+    return true;
   }
 
   #endregion
