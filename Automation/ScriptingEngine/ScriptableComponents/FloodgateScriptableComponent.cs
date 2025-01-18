@@ -55,9 +55,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   #region Actions
 
   static void SetHeight(Floodgate floodgate, ScriptValue[] args) {
-    if (args.Length != 1) {
-      throw new ScriptError($"{SetHeightActionName} action requires 1 argument");
-    }
+    AssertArgsCount(SetHeightActionName, args, 1);
     floodgate.SetHeight(args[0].AsNumber / 100f);
   }
 

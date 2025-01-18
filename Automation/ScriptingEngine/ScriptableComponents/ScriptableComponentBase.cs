@@ -57,6 +57,12 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
     return Loc.T($"{ScriptableLocKeyPrefix}.{Name}.Action.{name}");
   }
 
+  protected static void AssertArgsCount(string actionName, ScriptValue[] args, int expectedCount) {
+    if (args.Length != expectedCount) {
+      throw new ScriptError($"{actionName} action requires {expectedCount} argument(s)");
+    }
+  }
+
   #endregion
 
   #region ILoadableSingleton implementation
