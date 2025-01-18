@@ -9,14 +9,12 @@ using System.Text.RegularExpressions;
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
 class SignalOperatorExpr : AbstractOperandExpr, IValueExpr {
-  public ScriptValue.TypeEnum ValueType => _source.Type == ITriggerSource.ValueType.String
-      ? ScriptValue.TypeEnum.String
-      : ScriptValue.TypeEnum.Number;
+  /// <inheritdoc/>
+  public ScriptValue.TypeEnum ValueType { get; private set; }
 
-  //FIXME: type depends on the signal. should be dynamic
-  //FIXME: get script value from the soucre directly.
+  /// <inheritdoc/>
   public Func<ScriptValue> ValueFn {
-    get { return () => ScriptValue.Of(_source.NumberValue); }
+    get { return () => _source.CurrentValue; }
   }
 
   readonly ITriggerSource _source;
@@ -35,5 +33,6 @@ class SignalOperatorExpr : AbstractOperandExpr, IValueExpr {
       throw new ScriptError("Bad signal name: " + Operands[0]);
     }
     _source = parser.GetSignalSource(symbol.Value);
+    ValueType = _source.CurrentValue.ValueType;
   }
 }

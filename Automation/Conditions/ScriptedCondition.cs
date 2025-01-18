@@ -116,8 +116,8 @@ sealed class ScriptedCondition : AutomationConditionBase {
 
       var triggerDef = ScriptingService.Instance.GetTriggerDefinition(name, Behavior);
       var argumentValue = argument;
-      if (triggerDef.ArgumentType.Options != null) {
-        argumentValue = triggerDef.ArgumentType.Options
+      if (triggerDef.ResultType.Options != null) {
+        argumentValue = triggerDef.ResultType.Options
             .Where(x => x.Value == argument)
             .Select(x => x.Text)
             .FirstOrDefault();
@@ -128,7 +128,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
 
       var trigger = ScriptingService.Instance.GetTriggerSource(name, Behavior, CheckOperands);
       try {
-        var operand = triggerDef.ArgumentType.ValueType == ScriptValue.TypeEnum.String
+        var operand = triggerDef.ResultType.ValueType == ScriptValue.TypeEnum.String
             ? Operand.ForStringArgument(trigger, op, argument)
             : Operand.ForNumberArgument(trigger, op, argument);
         _operands.Add(operand);
@@ -189,8 +189,8 @@ sealed class ScriptedCondition : AutomationConditionBase {
     Operand(ITriggerSource triggerSource, string op, string argument) {
       TriggerSourceSource = triggerSource;
       Execute = op switch {
-          "=" => () => triggerSource.StringValue == argument,
-          "<>" => () => triggerSource.StringValue != argument,
+          "=" => () => triggerSource.CurrentValue.AsString == argument,
+          "<>" => () => triggerSource.CurrentValue.AsString != argument,
           _ => throw new ScriptError("Unsupported string operand: " + op),
       };
     }
@@ -198,12 +198,12 @@ sealed class ScriptedCondition : AutomationConditionBase {
     Operand(ITriggerSource triggerSource, string op, int argument) {
       TriggerSourceSource = triggerSource;
       Execute = op switch {
-          "=" => () => triggerSource.NumberValue == argument,
-          "<>" => () => triggerSource.NumberValue != argument,
-          "<" => () => triggerSource.NumberValue < argument,
-          "<=" => () => triggerSource.NumberValue <= argument,
-          ">" => () => triggerSource.NumberValue > argument,
-          ">=" => () => triggerSource.NumberValue >= argument,
+          "=" => () => triggerSource.CurrentValue.AsNumber == argument,
+          "<>" => () => triggerSource.CurrentValue.AsNumber != argument,
+          "<" => () => triggerSource.CurrentValue.AsNumber < argument,
+          "<=" => () => triggerSource.CurrentValue.AsNumber <= argument,
+          ">" => () => triggerSource.CurrentValue.AsNumber > argument,
+          ">=" => () => triggerSource.CurrentValue.AsNumber >= argument,
           _ => throw new ScriptError("Unsupported numeric operand: " + op),
       };
     }

@@ -47,7 +47,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
         SeasonTriggerName => new TriggerDef {
             FullName = $"{Name}.{SeasonTriggerName}",
             DisplayName = LocTrigger(SeasonTriggerName),
-            ArgumentType = new ArgumentDef {
+            ResultType = new ArgumentDef {
                 ValueType = ScriptValue.TypeEnum.String,
                 Options = [
                     (TemperateSeason, Loc.T("Weather.Temperate")),
@@ -110,11 +110,8 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
     }
 
     /// <inheritdoc/>
-    public ITriggerSource.ValueType Type => ITriggerSource.ValueType.String;
-    /// <inheritdoc/>
-    public int NumberValue => throw new ScriptError("Season cannot be represented as a number");
-    /// <inheritdoc/>
-    public string StringValue => CurrentSeason;
+    public ScriptValue CurrentValue => ScriptValue.Of(CurrentSeason);
+
     /// <inheritdoc/>
     public void Dispose() => _parent._seasonChangeTriggers.Remove(this);
   }

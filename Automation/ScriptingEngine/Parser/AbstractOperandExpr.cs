@@ -11,6 +11,7 @@ abstract class AbstractOperandExpr(string name, IList<IExpression> operands) : I
   public string Name { get; } = name;
   public readonly IList<IExpression> Operands = operands;
 
+  /// <inheritdoc/>
   public string Serialize() {
     var sb = new StringBuilder();
     sb.Append("(");
@@ -23,6 +24,7 @@ abstract class AbstractOperandExpr(string name, IList<IExpression> operands) : I
     return sb.ToString();
   }
 
+  /// <inheritdoc/>
   public override string ToString() {
     return $"{GetType().Name}#{Serialize()}";
   }
