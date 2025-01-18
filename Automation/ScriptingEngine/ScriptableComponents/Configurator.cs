@@ -12,5 +12,7 @@ sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<WeatherScriptableComponent>().AsSingleton();
     containerDefinition.Bind<FloodgateScriptableComponent>().AsSingleton();
+    containerDefinition.Bind<DebugScriptableComponent>().AsSingleton();
+    containerDefinition.Bind<InventoryScriptableComponent>().AsSingleton();
   }
 }

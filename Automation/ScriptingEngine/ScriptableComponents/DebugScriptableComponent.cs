@@ -1,0 +1,62 @@
+﻿// Timberborn Mod: Automation
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+
+using System;
+using Timberborn.BaseComponentSystem;
+using UnityDev.Utils.LogUtilsLite;
+
+namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
+
+class DebugScriptableComponent : ScriptableComponentBase {
+  
+  const string LogActionName = "Log";
+
+  #region IScriptable implementation
+
+  /// <inheritdoc/>
+  public override string Name => "Debug";
+
+  /// <inheritdoc/>
+  public override Type InstanceType => null;
+
+  /// <inheritdoc/>
+  public override string[] GetActionNamesForBuilding(BaseComponent building) {
+    return [$"{Name}.{LogActionName}"];
+  }
+
+  /// <inheritdoc/>
+  public override Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent instance) {
+    return name switch {
+        LogActionName => args => LogAction(instance, args),
+        _ => throw new ScriptError("Unknown action: " + name),
+    };
+  }
+
+  /// <inheritdoc/>
+  public override ActionDef GetActionDefinition(string name, BaseComponent instance) {
+    return name switch {
+        LogActionName => new ActionDef {
+            FullName = $"{Name}.{LogActionName}",
+            DisplayName = LocAction(LogActionName),
+            ArgumentTypes = [
+                new ArgumentDef {
+                    ValueType = ScriptValue.TypeEnum.String,
+                },
+            ],
+        },
+        _ => throw new ScriptError("Unknown action: " + name),
+    };
+  }
+
+  #endregion
+
+  #region Actions
+
+  static void LogAction(BaseComponent instance, ScriptValue[] args) {
+    AssertArgsCount(LogActionName, args, 1);
+    HostedDebugLog.Info(instance, "[Debug action]: {0}", args[0]);
+  }
+
+  #endregion
+}
