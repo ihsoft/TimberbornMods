@@ -34,8 +34,6 @@ sealed class ScriptedAction : AutomationActionBase {
 
   /// <inheritdoc/>
   public override void OnConditionState(IAutomationCondition automationCondition) {
-    //FIXME
-    HostedDebugLog.Warning(Behavior, "Conditions update: {0}", Condition.ConditionState);
     if (!Condition.ConditionState) {
       return;
     }

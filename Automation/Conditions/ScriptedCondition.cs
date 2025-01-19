@@ -134,8 +134,6 @@ sealed class ScriptedCondition : AutomationConditionBase {
 
   void CheckOperands() {
     if (_parsedExpression != null) {
-      //FIXME
-      HostedDebugLog.Warning(Behavior, "Conditions update");
       ConditionState = _parsedExpression.Execute();
       
     } else {
