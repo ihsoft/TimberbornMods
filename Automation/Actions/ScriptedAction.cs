@@ -3,8 +3,7 @@
 // License: Public Domain
 
 using System;
-using System.Linq;
-using System.Text.RegularExpressions;
+using Bindito.Unity;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
@@ -98,31 +97,31 @@ sealed class ScriptedAction : AutomationActionBase {
 
   #region Implementation
 
-  ExpressionParser.Context _parserContext;
+  ParserContext _parserParserContext;
   ActionExpr _parsedExpression;
 
-  bool ParseAction() {
-    _parserContext = new ExpressionParser.Context();
-    //FIXME: inject it.
-    var parser = new ExpressionParser(ScriptingService.Instance, Behavior);
-    var res = parser.Parse(Expression, _parserContext);
+  void ParseAction() {
+    _parserParserContext = new ParserContext {
+        ScriptHost = Behavior,
+    };
+    var res = Behavior.AutomationService.ExpressionParser.Parse(Expression, _parserParserContext);
     if (!res) {
-      HostedDebugLog.Error(Behavior, "Failed to parse action: {0}\nError: {1}", Expression, _parserContext.LastError);
+      HostedDebugLog.Error(Behavior, "Failed to parse action: {0}\nError: {1}", Expression, _parserParserContext.LastError);
       //FIXME: localize
       _uiDescription = TextColors.ColorizeText($"<RedHighlight>ERROR</RedHighlight>");
-      return false;
+      return;
     }
     //FIXME: process expression to get the descirption
-    _parsedExpression = _parserContext.ParsedExpression as ActionExpr;
+    _parsedExpression = _parserParserContext.ParsedExpression as ActionExpr;
     if (_parsedExpression == null) {
       HostedDebugLog.Error(
-          Behavior, "Expression is not an action operator: {0}", _parserContext.ParsedExpression.Serialize());
+          Behavior, "Expression is not an action operator: {0}", _parserParserContext.ParsedExpression.Serialize());
       //FIXME: localize
       _uiDescription = TextColors.ColorizeText($"<RedHighlight>ERROR</RedHighlight>");
-      return false;
+      return;
     }
     _uiDescription = TextColors.ColorizeText($"<SolidHighlight>{Expression}</SolidHighlight>");
-    return true;
+    return;
   }
 
   #endregion

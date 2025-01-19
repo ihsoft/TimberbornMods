@@ -18,6 +18,7 @@ namespace IgorZ.Automation.AutomationSystem;
 
 /// <summary>The component that keeps all the automation state on the building.</summary>
 public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDeletableEntity {
+
   #region Injection shortcuts
 
   /// <summary>Shortcut to the <see cref="AutomationService"/>.</summary>

@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.Automation.Tools;
 using Timberborn.BaseComponentSystem;
 using Timberborn.Localization;
@@ -17,16 +18,21 @@ namespace IgorZ.Automation.AutomationSystem;
 /// <summary>Central point for all the automation related logic.</summary>
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public sealed class AutomationService : IPostLoadableSingleton {
+
   #region Internal fields
+
   readonly HashSet<AutomationBehavior> _registeredBehaviors = new();
   readonly Color _highlightColor = Color.cyan * 0.5f;
   readonly Highlighter _highlighter;
   bool _highlightingEnabled;
+
   #endregion
 
-  AutomationService(EventBus eventBus, Highlighter highlighter, BaseInstantiator baseInstantiator, ILoc loc) {
+  AutomationService(EventBus eventBus, Highlighter highlighter, BaseInstantiator baseInstantiator,
+                    ExpressionParser expressionParser, ILoc loc) {
     EventBus = eventBus;
     BaseInstantiator = baseInstantiator;
+    ExpressionParser = expressionParser;
     Loc = loc;
     eventBus.Register(this);
     _highlighter = highlighter;
@@ -38,16 +44,20 @@ public sealed class AutomationService : IPostLoadableSingleton {
   #endregion
 
   #region API
+
   /// <summary>Shortcut to the instantiator.</summary>
   public readonly BaseInstantiator BaseInstantiator;
 
   /// <summary>Shortcut to the localizator.</summary>
   public readonly ILoc Loc;
 
+  /// <summary>Shortcut to the expression parser.</summary>
+  internal readonly ExpressionParser ExpressionParser;
+
   /// <summary>Shortcut to EventBus.</summary>
   public readonly EventBus EventBus;
 
-  /// <summary>Highlights all registered behaviours on the map.</summary>
+  /// <summary>Highlights all registered behaviors on the map.</summary>
   public void HighlightAutomationObjects(Color? useColor = null) {
     _highlightingEnabled = true;
     foreach (var behavior in _registeredBehaviors) {
@@ -60,9 +70,11 @@ public sealed class AutomationService : IPostLoadableSingleton {
     _highlightingEnabled = false;
     _highlighter.UnhighlightAllSecondary();
   }
+
   #endregion
 
   #region Implementation
+
   internal void RegisterBehavior(AutomationBehavior behavior) {
     _registeredBehaviors.Add(behavior);
     if (_highlightingEnabled) {
@@ -95,5 +107,6 @@ public sealed class AutomationService : IPostLoadableSingleton {
   public void OnToolExited(ToolExitedEvent toolExitedEvent) {
     UnhighlightAutomationObjects();
   }
+
   #endregion
 }

@@ -6,88 +6,47 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Timberborn.BaseComponentSystem;
 using Timberborn.Common;
-using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
-class ExpressionParser(ScriptingService scriptingService, BaseComponent scriptHost) {
+class ExpressionParser(ScriptingService scriptingService) {
 
-  public sealed class Context {
-    /// <summary>All the signal sources that are referenced in the parsed expression.</summary>
-    /// <remarks>
-    /// If there was <see cref="OnSignalChanged"/> action specified, then the sources must be disposed before cleaning
-    /// up the parsed expression.
-    /// </remarks>
-    public readonly Dictionary<string, ITriggerSource> SignalSources = new();
-
-    /// <summary>On successful parsing, this property will contain the parsed expression.</summary>
-    public IExpression ParsedExpression { get; internal set; }
-
-    /// <summary>On parsing error, this property will contain the error message.</summary>
-    public string LastError { get; internal set; }
-
-    /// <summary>
-    /// Callback to call when any of the signal sources change their value. If set to null, then no callbacks will be
-    /// registered
-    /// </summary>
-    //public Action OnSignalChanged { get; init; }
-    public Action OnSignalChanged;
-
-    /// <summary>
-    /// Clears all internal states in the scripting engine. Must be called if the parsed expression is no more needed.
-    /// </summary>
-    public void Release() {
-      foreach (var source in SignalSources.Values) {
-        source.Dispose();
-      }
-      SignalSources.Clear();
-    }
-
-    ~Context() {
-      if (OnSignalChanged == null || SignalSources.Count <= 0) {
-        return;
-      }
-      DebugEx.Error("Context was not cleared before being garbage collected: {0}", ParsedExpression);
-      Release();
-    }
-  }
-
-  public bool Parse(string input, Context context) {
-    if (context.SignalSources.Count > 0 || context.ParsedExpression != null) {
+  public bool Parse(string input, ParserContext parserContext) {
+    if (parserContext.SignalSources.Count > 0 || parserContext.ParsedExpression != null) {
       throw new InvalidOperationException("Context is already in use");
     }
     try {
-      _currentContext = context;
-      _currentContext.ParsedExpression = ReadFromTokens(Tokenize(input));
-      _currentContext.LastError = null;
+      _currentParserContext = parserContext;
+      _currentParserContext.ParsedExpression = ReadFromTokens(Tokenize(input));
+      _currentParserContext.LastError = null;
     } catch (ScriptError e) {
-      _currentContext.LastError = e.Message;
-      _currentContext.ParsedExpression = null;
-      _currentContext.Release();
+      _currentParserContext.LastError = e.Message;
+      _currentParserContext.ParsedExpression = null;
+      _currentParserContext.Release();
       return false;
     } finally {
-      _currentContext = null;
+      _currentParserContext = null;
     }
     return true;
   }
 
   static readonly Regex OperatorNameRegex = new(@"^\[a-zA-Z]+$");
-  Context _currentContext;
+  ParserContext _currentParserContext;
 
   internal ActionDef GetActionDefinition(string actionName) {
-    return scriptingService.GetActionDefinition(actionName, scriptHost);
+    return scriptingService.GetActionDefinition(actionName, _currentParserContext.ScriptHost);
   }
 
   internal Action<ScriptValue[]> GetAction(string actionName) {
-    return scriptingService.GetActionExecutor(actionName, scriptHost);
+    return scriptingService.GetActionExecutor(actionName, _currentParserContext.ScriptHost);
   }
 
   internal ITriggerSource GetSignalSource(string name) {
-    if (!_currentContext.SignalSources.TryGetValue(name, out var source)) {
-      source = scriptingService.GetTriggerSource(name, scriptHost, _currentContext.OnSignalChanged);
-      _currentContext.SignalSources[name] = source;
+    if (!_currentParserContext.SignalSources.TryGetValue(name, out var source)) {
+      source = scriptingService.GetTriggerSource(
+          name, _currentParserContext.ScriptHost, _currentParserContext.OnSignalChanged);
+      _currentParserContext.SignalSources[name] = source;
     }
     return source;
   }

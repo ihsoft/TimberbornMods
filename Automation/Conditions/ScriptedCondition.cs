@@ -28,15 +28,14 @@ sealed class ScriptedCondition : AutomationConditionBase {
 
   /// <inheritdoc/>
   public override void SyncState() {
-    CheckOperands();
+    if (_parsedExpression != null) {
+      CheckOperands();
+    }
   }
 
   /// <inheritdoc/>
   protected override void OnBehaviorAssigned() {
-    if (!ParseConditions()) {
-      HostedDebugLog.Error(Behavior, "Failed to parse conditions: {0}", _parserContext.LastError);
-      IsMarkedForCleanup = true;
-    }
+    ParseConditions();
   }
 
   /// <inheritdoc/>
@@ -61,15 +60,15 @@ sealed class ScriptedCondition : AutomationConditionBase {
 
   /// <summary>Script code for expression to check.</summary>
   /// <remarks>
-  /// It must abe a boolean operator. See <see cref="BoolOperatorExpr"/> for the list of conditions. Example of a
-  /// condition: (and (eq (sig Weather.Season) 'drought') (gt Floodgate.Height 0.5)). 
+  /// It must be a boolean operator. See <see cref="BoolOperatorExpr"/> for the list of conditions. Example of a
+  /// condition: "(and (eq (sig Weather.Season) 'drought') (gt Floodgate.Height 0.5))". 
   /// </remarks>
   // ReSharper disable once MemberCanBePrivate.Global
   public string Expression { get; private set; }
 
-  /// <summary>Sets the expression conditions.</summary>
+  /// <summary>Sets the condition expression.</summary>
   /// <remarks>Can only be set on the non-active condition.</remarks>
-  /// <seealso cref="Conditions"/>
+  /// <seealso cref="Expression"/>
   public void SetExpression(string expression) {
     if (Behavior) {
       throw new InvalidOperationException("Cannot change conditions when the behavior is assigned.");
@@ -99,35 +98,49 @@ sealed class ScriptedCondition : AutomationConditionBase {
 
   #region Implementation
 
-  ExpressionParser.Context _parserContext;
+  ParserContext _parserParserContext;
   BoolOperatorExpr _parsedExpression;
 
-  bool ParseConditions() {
-    _parserContext = new ExpressionParser.Context();
-    _parserContext.OnSignalChanged = CheckOperands;
-    //FIXME: inject it.
-    var parser = new ExpressionParser(ScriptingService.Instance, Behavior);
-    var res = parser.Parse(Expression, _parserContext);
-    //FIXME: process expression to get the descirption
-    _uiDescription = TextColors.ColorizeText($"<SolidHighlight>{Expression}</SolidHighlight>");
-    if (res) {
-      _parsedExpression = _parserContext.ParsedExpression as BoolOperatorExpr;
-      if (_parsedExpression == null) {
-        HostedDebugLog.Error(Behavior, "Expression is not a boolean operator: {0}", Expression);
-        _uiDescription = TextColors.ColorizeText($"<RedHighlight>ERROR</RedHighlight>: ") + _uiDescription;
-        res = false;
-      }
+  void ParseConditions() {
+    _parserParserContext = new ParserContext {
+        OnSignalChanged = CheckOperands,
+        ScriptHost = Behavior,
+    };
+    var res = Behavior.AutomationService.ExpressionParser.Parse(Expression, _parserParserContext);
+    if (!res) {
+      HostedDebugLog.Error(
+          Behavior, "Failed to parse condition: {0}\nError: {1}", Expression, _parserParserContext.LastError);
+      //FIXME: localize
+      _uiDescription = TextColors.ColorizeText($"<RedHighlight>ERROR</RedHighlight>");
+      return;
     }
-    return res;
+    //FIXME: process expression to get the descirption
+    _parsedExpression = _parserParserContext.ParsedExpression as BoolOperatorExpr;
+    if (_parsedExpression == null) {
+      HostedDebugLog.Error(
+          Behavior, "Expression is not a boolean operator: {0}", _parserParserContext.ParsedExpression.Serialize());
+      //FIXME: localize
+      _uiDescription = TextColors.ColorizeText($"<RedHighlight>ERROR</RedHighlight>");
+      return;
+    }
+    _uiDescription = TextColors.ColorizeText($"<SolidHighlight>{Expression}</SolidHighlight>");
+    return;
   }
 
   void Dispose() {
-    _parserContext.Release();
+    _parserParserContext.Release();
     _parsedExpression = null;
   }
 
   void CheckOperands() {
-    ConditionState = _parsedExpression.Execute();
+    if (_parsedExpression != null) {
+      //FIXME
+      HostedDebugLog.Warning(Behavior, "Conditions update");
+      ConditionState = _parsedExpression.Execute();
+      
+    } else {
+      HostedDebugLog.Error(Behavior, "Signal change triggered, but the condition was broken: {0}", Expression);
+    }
   }
 
   #endregion
