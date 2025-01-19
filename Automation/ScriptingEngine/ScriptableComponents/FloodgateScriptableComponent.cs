@@ -37,15 +37,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   /// <inheritdoc/>
   public override ActionDef GetActionDefinition(string name, BaseComponent instance) {
     return name switch {
-        SetHeightActionName => new ActionDef {
-            FullName = $"{Name}.{SetHeightActionName}",
-            DisplayName = LocAction(SetHeightActionName),
-            ArgumentTypes = [
-                new ArgumentDef {
-                    ValueType = ScriptValue.TypeEnum.Number,
-                },
-            ],
-        },
+        SetHeightActionName => SetHeightActionDef,
         _ => throw new ScriptError("Unknown action: " + name),
     };
   }
@@ -54,9 +46,24 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
   #region Actions
 
+  ActionDef SetHeightActionDef => _setHeightActionDef ??= MakeSetHeightActionDef();
+  ActionDef? _setHeightActionDef;
+
   static void SetHeight(Floodgate floodgate, ScriptValue[] args) {
     AssertArgsCount(SetHeightActionName, args, 1);
     floodgate.SetHeight(args[0].AsNumber / 100f);
+  }
+
+  ActionDef MakeSetHeightActionDef() {
+    return new ActionDef {
+        FullName = $"{Name}.{SetHeightActionName}",
+        DisplayName = LocAction(SetHeightActionName),
+        ArgumentTypes = [
+            new ArgumentDef {
+                ValueType = ScriptValue.TypeEnum.Number,
+            },
+        ],
+    };
   }
 
   #endregion
