@@ -13,6 +13,8 @@ namespace IgorZ.Automation.Actions;
 
 sealed class ScriptedAction : AutomationActionBase {
 
+  const string ParseErrorLocKey = "IgorZ.Automation.Scripting.Expressions.ParseError";
+
   #region AutomationActionBase overrides
 
   /// <inheritdoc/>
@@ -96,8 +98,6 @@ sealed class ScriptedAction : AutomationActionBase {
   ParserContext _parserParserContext;
   ActionExpr _parsedExpression;
 
-  const string ErrorUiDescriptionLocKey = "IgorZ.Automation.Scriptable.ExpressionParseError";
-
   void ParseAction() {
     _parserParserContext = new ParserContext {
         ScriptHost = Behavior,
@@ -106,14 +106,14 @@ sealed class ScriptedAction : AutomationActionBase {
     if (!res) {
       HostedDebugLog.Error(
           Behavior, "Failed to parse action: {0}\nError: {1}", Expression, _parserParserContext.LastError);
-      _uiDescription = TextColors.ColorizeText(Behavior.Loc.T(ErrorUiDescriptionLocKey));
+      _uiDescription = TextColors.ColorizeText(Behavior.Loc.T(ParseErrorLocKey));
       return;
     }
     _parsedExpression = _parserParserContext.ParsedExpression as ActionExpr;
     if (_parsedExpression == null) {
       HostedDebugLog.Error(
           Behavior, "Expression is not an action operator: {0}", _parserParserContext.ParsedExpression);
-      _uiDescription = TextColors.ColorizeText(Behavior.Loc.T(ErrorUiDescriptionLocKey));
+      _uiDescription = TextColors.ColorizeText(Behavior.Loc.T(ParseErrorLocKey));
       return;
     }
     var description = ExpressionParser.Instance.GetDescription(_parserParserContext);

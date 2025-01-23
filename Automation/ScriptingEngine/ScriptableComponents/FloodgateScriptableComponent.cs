@@ -10,6 +10,8 @@ namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
 sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
+  const string SetHeightActionLocKey = "IgorZ.Automation.Scriptable.Floodgate.Action.SetHeight";
+
   const string SetHeightActionName = "SetHeight";
 
   #region IScriptable implementation
@@ -48,7 +50,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
   ActionDef SetHeightActionDef => _setHeightActionDef ??= new ActionDef {
       FullName = $"{Name}.{SetHeightActionName}",
-      DisplayName = LocAction(SetHeightActionName),
+      DisplayName = SetHeightActionLocKey,
       ArgumentTypes = [
           new ArgumentDef {
               ValueType = ScriptValue.TypeEnum.Number,

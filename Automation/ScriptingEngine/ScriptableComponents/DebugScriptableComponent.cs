@@ -9,7 +9,9 @@ using UnityDev.Utils.LogUtilsLite;
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
 class DebugScriptableComponent : ScriptableComponentBase {
-  
+
+  const string LogActionLocKey = "IgorZ.Automation.Scriptable.Debug.Action.Log";
+
   const string LogActionName = "Log";
 
   #region IScriptable implementation
@@ -38,7 +40,7 @@ class DebugScriptableComponent : ScriptableComponentBase {
     return name switch {
         LogActionName => new ActionDef {
             FullName = $"{Name}.{LogActionName}",
-            DisplayName = LocAction(LogActionName),
+            DisplayName = LogActionLocKey,
             ArgumentTypes = [
                 new ArgumentDef {
                     ValueType = ScriptValue.TypeEnum.String,

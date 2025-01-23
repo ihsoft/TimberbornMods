@@ -49,14 +49,6 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
     throw new NotImplementedException();
   }
 
-  protected string LocTrigger(string name) {
-    return Loc.T($"{ScriptableLocKeyPrefix}.{Name}.Trigger.{name}");
-  }
-
-  protected string LocAction(string name) {
-    return Loc.T($"{ScriptableLocKeyPrefix}.{Name}.Action.{name}");
-  }
-
   protected static void AssertArgsCount(string actionName, ScriptValue[] args, int expectedCount) {
     if (args.Length != expectedCount) {
       throw new ScriptError($"{actionName} action requires {expectedCount} argument(s)");

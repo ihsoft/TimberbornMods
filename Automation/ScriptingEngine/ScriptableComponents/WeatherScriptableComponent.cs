@@ -13,6 +13,8 @@ namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
 sealed class WeatherScriptableComponent : ScriptableComponentBase {
 
+  const string SeasonTriggerLocKey = "IgorZ.Automation.Scriptable.Weather.Trigger.Season";
+
   const string SeasonTriggerName = "Season";
   const string DroughtSeason = "drought";
   const string BadTideSeason = "badtide";
@@ -45,7 +47,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
     return name switch {
         SeasonTriggerName => new TriggerDef {
             FullName = $"{Name}.{SeasonTriggerName}",
-            DisplayName = LocTrigger(SeasonTriggerName),
+            DisplayName = SeasonTriggerLocKey,
             ResultType = new ArgumentDef {
                 ValueType = ScriptValue.TypeEnum.String,
                 Options = [

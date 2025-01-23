@@ -3,22 +3,17 @@
 // License: Public Domain
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 using IgorZ.Automation.AutomationSystem;
-using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.Localization;
 using Timberborn.Persistence;
 using UnityDev.Utils.LogUtilsLite;
-using UnityEngine;
 
 namespace IgorZ.Automation.Conditions;
 
 sealed class ScriptedCondition : AutomationConditionBase {
 
-  const string AndOperatorLocString = "IgorZ.Automation.Conditions.AndOperator";
+  const string ParseErrorLocKey = "IgorZ.Automation.Scripting.Expressions.ParseError";
 
   #region AutomationConditionBase overrides
 
@@ -110,17 +105,14 @@ sealed class ScriptedCondition : AutomationConditionBase {
     if (!res) {
       HostedDebugLog.Error(
           Behavior, "Failed to parse condition: {0}\nError: {1}", Expression, _parserParserContext.LastError);
-      //FIXME: localize
-      _uiDescription = TextColors.ColorizeText($"<RedHighlight>ERROR</RedHighlight>");
+      _uiDescription = TextColors.ColorizeText(Behavior.Loc.T(ParseErrorLocKey));
       return;
     }
-    //FIXME: process expression to get the descirption
     _parsedExpression = _parserParserContext.ParsedExpression as BoolOperatorExpr;
     if (_parsedExpression == null) {
       HostedDebugLog.Error(
           Behavior, "Expression is not a boolean operator: {0}", _parserParserContext.ParsedExpression.Serialize());
-      //FIXME: localize
-      _uiDescription = TextColors.ColorizeText($"<RedHighlight>ERROR</RedHighlight>");
+      _uiDescription = TextColors.ColorizeText(Behavior.Loc.T(ParseErrorLocKey));
       return;
     }
     var description = ExpressionParser.Instance.GetDescription(_parserParserContext);
