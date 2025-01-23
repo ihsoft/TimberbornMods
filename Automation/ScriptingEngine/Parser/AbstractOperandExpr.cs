@@ -8,6 +8,7 @@ using System.Text;
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
 abstract class AbstractOperandExpr(string name, IList<IExpression> operands) : IExpression {
+
   public readonly string Name = name;
   public readonly IList<IExpression> Operands = operands;
 
@@ -23,6 +24,9 @@ abstract class AbstractOperandExpr(string name, IList<IExpression> operands) : I
     sb.Append(")");
     return sb.ToString();
   }
+
+  /// <inheritdoc/>
+  public abstract string Describe();
 
   /// <inheritdoc/>
   public override string ToString() {

@@ -3,9 +3,7 @@
 // License: Public Domain
 
 using System;
-using Bindito.Unity;
 using IgorZ.Automation.AutomationSystem;
-using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.Localization;
 using Timberborn.Persistence;
@@ -98,6 +96,8 @@ sealed class ScriptedAction : AutomationActionBase {
   ParserContext _parserParserContext;
   ActionExpr _parsedExpression;
 
+  const string ErrorUiDescriptionLocKey = "IgorZ.Automation.Scriptable.ExpressionParseError";
+
   void ParseAction() {
     _parserParserContext = new ParserContext {
         ScriptHost = Behavior,
@@ -109,17 +109,15 @@ sealed class ScriptedAction : AutomationActionBase {
       _uiDescription = TextColors.ColorizeText(Behavior.Loc.T(ErrorUiDescriptionLocKey));
       return;
     }
-    //FIXME: process expression to get the descirption
     _parsedExpression = _parserParserContext.ParsedExpression as ActionExpr;
     if (_parsedExpression == null) {
       HostedDebugLog.Error(
-          Behavior, "Expression is not an action operator: {0}", _parserParserContext.ParsedExpression.Serialize());
-      //FIXME: localize
-      _uiDescription = TextColors.ColorizeText($"<RedHighlight>ERROR</RedHighlight>");
+          Behavior, "Expression is not an action operator: {0}", _parserParserContext.ParsedExpression);
+      _uiDescription = TextColors.ColorizeText(Behavior.Loc.T(ErrorUiDescriptionLocKey));
       return;
     }
-    _uiDescription = TextColors.ColorizeText($"<SolidHighlight>{Expression}</SolidHighlight>");
-    return;
+    var description = ExpressionParser.Instance.GetDescription(_parserParserContext);
+    _uiDescription = TextColors.ColorizeText($"<SolidHighlight>{description}</SolidHighlight>");
   }
 
   #endregion

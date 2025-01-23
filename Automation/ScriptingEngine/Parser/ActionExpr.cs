@@ -10,21 +10,37 @@ using System.Text.RegularExpressions;
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
 sealed class ActionExpr : AbstractOperandExpr {
+
   public string ActionName => ((SymbolExpr)Operands[0]).Value;
   public readonly Action Execute;
 
-  public static IExpression TryCreateFrom(string name, IList<IExpression> operands, ExpressionParser parser) {
-    return name == "act" ? new ActionExpr(name, operands, parser) : null;
+  public static IExpression TryCreateFrom(string name, IList<IExpression> operands) {
+    return name == "act" ? new ActionExpr(name, operands) : null;
+  }
+
+  /// <inheritdoc/>
+  public override string Describe() {
+    var def = ExpressionParser.Instance.GetActionDefinition(ActionName);
+    var args = new List<object>();
+    for (var i = 0; i < def.ArgumentTypes.Length; i++) {
+      var argValue = Operands[i + 1];
+      if (argValue is ConstantValueExpr constantValueExpr) {
+        args.Add(constantValueExpr.FormatValue(def.ArgumentTypes[i]));
+      } else {
+        args.Add(argValue.Describe());
+      }
+    }
+    return string.Format(def.DisplayName, args.ToArray());
   }
 
   static readonly Regex SignalNameRegexp = new("^([a-zA-Z][a-zA-Z0-9]+)(.[a-zA-Z][a-zA-Z0-9]+)*$");
 
-  ActionExpr(string name, IList<IExpression> operands, ExpressionParser parser) : base(name, operands) {
+  ActionExpr(string name, IList<IExpression> operands) : base(name, operands) {
     if (Operands[0] is not SymbolExpr symbol || !SignalNameRegexp.IsMatch(symbol.Value)) {
       throw new ScriptError("Bad action name: " + Operands[0]);
     }
     var actionName = symbol.Value;
-    var def = parser.GetActionDefinition(actionName);
+    var def = ExpressionParser.Instance.GetActionDefinition(actionName);
     AsserNumberOfOperandsExact(def.ArgumentTypes.Length + 1);
     var argValues = new Func<ScriptValue>[def.ArgumentTypes.Length];
     for (var i = 0; i < def.ArgumentTypes.Length; i++) {
@@ -38,7 +54,7 @@ sealed class ActionExpr : AbstractOperandExpr {
       }
       argValues[i] = valueExpr.ValueFn;
     }
-    var action = parser.GetAction(actionName);
+    var action = ExpressionParser.Instance.GetActionExecutor(actionName);
     Execute = () => action(argValues.Select(v => v()).ToArray());
   }
 }

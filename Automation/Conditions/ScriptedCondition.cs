@@ -123,8 +123,8 @@ sealed class ScriptedCondition : AutomationConditionBase {
       _uiDescription = TextColors.ColorizeText($"<RedHighlight>ERROR</RedHighlight>");
       return;
     }
-    _uiDescription = TextColors.ColorizeText($"<SolidHighlight>{Expression}</SolidHighlight>");
-    return;
+    var description = ExpressionParser.Instance.GetDescription(_parserParserContext);
+    _uiDescription = TextColors.ColorizeText($"<SolidHighlight>{description}</SolidHighlight>");
   }
 
   void Dispose() {

@@ -5,12 +5,20 @@
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
 class SymbolExpr : IExpression {
+
   public string Value { get; init; }
 
+  /// <inheritdoc/>
   public string Serialize() {
     return Value;
   }
 
+  /// <inheritdoc/>
+  public string Describe() {
+    throw new System.NotImplementedException();
+  }
+
+  /// <inheritdoc/>
   public override string ToString() {
     return $"{GetType().Name}#{Serialize()}";
   }

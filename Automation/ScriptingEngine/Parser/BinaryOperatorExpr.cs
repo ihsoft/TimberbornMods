@@ -4,14 +4,41 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
-class BinaryOperatorExpr : BoolOperatorExpr {
-  static readonly HashSet<string> Names = [ "eq", "ne", "gt", "lt", "ge", "le"]; 
+sealed class BinaryOperatorExpr : BoolOperatorExpr {
+
+  static readonly HashSet<string> Names = [ "eq", "ne", "gt", "lt", "ge", "le"];
+
+  public SignalOperatorExpr Left => (SignalOperatorExpr)Operands[0];
+  public IValueExpr Right => (IValueExpr)Operands[1];
 
   public static IExpression TryCreateFrom(string name, IList<IExpression> arguments) {
     return Names.Contains(name) ? new BinaryOperatorExpr(name, arguments) : null;
+  }
+
+  /// <inheritdoc/>
+  public override string Describe() {
+    var sb = new StringBuilder();
+    sb.Append(Left.Describe());
+    sb.Append(Name switch {
+        "eq" => " = ",
+        "ne" => " <> ",
+        "gt" => " > ",
+        "lt" => " < ",
+        "ge" => " >= ",
+        "le" => " <= ",
+        _ => throw new InvalidOperationException("Unknown operator: " + Name),
+    });
+    if (Right is ConstantValueExpr constantValueExpr) {
+      var def = ExpressionParser.Instance.GetTriggerDefinition(Left.SignalName);
+      sb.Append(constantValueExpr.FormatValue(def.ResultType));
+    } else {
+      sb.Append(Right.Describe());
+    }
+    return sb.ToString();
   }
 
   BinaryOperatorExpr(string name, IList<IExpression> operands) : base(name, operands) {

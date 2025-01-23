@@ -2,16 +2,20 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using System.Collections.Generic;
 using System.Text;
 using IgorZ.Automation.Actions;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.Conditions;
+using IgorZ.Automation.ScriptingEngine;
+using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.Automation.ScriptingEngineUI;
 using IgorZ.TimberDev.UI;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
+using Unity.Burst;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -115,9 +119,9 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
   void AddTestRule() {
     var condition = new ScriptedCondition();
-    condition.SetConditions(["Weather.Season=drought"]);
+    condition.SetExpression("(and (eq (sig Weather.Season) 'drought') (or (eq (sig Weather.Season) 'temperate') (eq (sig Weather.Season) 'badtide')))");
     var action = new ScriptedAction();
-    action.SetAction("Floodgate.SetHeight(150)");
+    action.SetExpression("(act Floodgate.SetHeight 120)");
     _automationBehavior.AddRule(condition, action);
     UpdateView();
   }
@@ -129,8 +133,8 @@ sealed class AutomationFragment : IEntityPanelFragment {
     //FIXME: we need a scroll view here.
     var builder = _dialogBoxShower.Create()
         .SetMaxWidth(dialogWidth)
-        .SetConfirmButton(() => {}, "Save rules")
-        .SetCancelButton(() => {}, "Close without saving")
+        .SetConfirmButton(() => {}, "Save and close")
+        .SetCancelButton(() => {}, "Discard changes")
         .SetInfoButton(() => {}, "Read tutorial!")
         .AddContent(_rulesEditorDialog.Content);
     builder._root.Q<VisualElement>("Box").style.width = dialogWidth;

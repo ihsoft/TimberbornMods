@@ -3,10 +3,12 @@
 // License: Public Domain
 
 using System;
+using System.Linq;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
-sealed class ConstantValueExpr : IExpression, IValueExpr {
+sealed class ConstantValueExpr : IValueExpr {
+
   public ScriptValue.TypeEnum ValueType { get; private init; }
   public Func<ScriptValue> ValueFn { get; private init; }
 
@@ -24,6 +26,18 @@ sealed class ConstantValueExpr : IExpression, IValueExpr {
     return null;
   }
 
+  public string FormatValue(ArgumentDef argumentDef) {
+    if (ValueType == ScriptValue.TypeEnum.String) {
+      var text = argumentDef.Options != null
+          ? argumentDef.Options.FirstOrDefault(x => x.Value == ValueFn().AsString).Text
+          : "";
+      return text != "" ? text : Describe();
+    }
+    var value = ValueFn().AsNumber / 100f;
+    return value.ToString(argumentDef.Format ?? "0.##");
+  }
+
+  /// <inheritdoc/>
   public string Serialize() {
     return ValueType switch {
         ScriptValue.TypeEnum.String => $"'{ValueFn().AsString}'",
@@ -32,6 +46,12 @@ sealed class ConstantValueExpr : IExpression, IValueExpr {
     };
   }
 
+  /// <inheritdoc/>
+  public string Describe() {
+    return Serialize();
+  }
+
+  /// <inheritdoc/>
   public override string ToString() {
     return $"{GetType().Name}#{Serialize()}";
   }

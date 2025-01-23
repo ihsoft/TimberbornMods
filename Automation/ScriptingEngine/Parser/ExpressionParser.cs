@@ -7,14 +7,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Timberborn.Common;
+using Timberborn.Localization;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
-class ExpressionParser(ScriptingService scriptingService) {
+class ExpressionParser {
 
   public bool Parse(string input, ParserContext parserContext) {
     if (parserContext.SignalSources.Count > 0 || parserContext.ParsedExpression != null) {
-      throw new InvalidOperationException("Context is already in use");
+      throw new InvalidOperationException("Parser context is already in use");
     }
     try {
       _currentParserContext = parserContext;
@@ -31,20 +32,45 @@ class ExpressionParser(ScriptingService scriptingService) {
     return true;
   }
 
+  public string GetDescription(ParserContext parserContext) {
+    if (parserContext.ParsedExpression == null) {
+      throw new InvalidOperationException("Parser context is not initialized");
+    }
+    _currentParserContext = parserContext;
+    var result = _currentParserContext.ParsedExpression.Describe();
+    _currentParserContext = null;
+    return result;
+  }
+
   static readonly Regex OperatorNameRegex = new(@"^\[a-zA-Z]+$");
   ParserContext _currentParserContext;
 
-  internal ActionDef GetActionDefinition(string actionName) {
-    return scriptingService.GetActionDefinition(actionName, _currentParserContext.ScriptHost);
+  readonly ScriptingService _scriptingService;
+
+  internal readonly ILoc Loc;
+  internal static ExpressionParser Instance;
+
+  ExpressionParser(ScriptingService scriptingService, ILoc loc) {
+    _scriptingService = scriptingService;
+    Loc = loc;
+    Instance = this;
   }
 
-  internal Action<ScriptValue[]> GetAction(string actionName) {
-    return scriptingService.GetActionExecutor(actionName, _currentParserContext.ScriptHost);
+  internal ActionDef GetActionDefinition(string actionName) {
+    return _scriptingService.GetActionDefinition(actionName, _currentParserContext.ScriptHost);
+  }
+
+  internal Action<ScriptValue[]> GetActionExecutor(string actionName) {
+    return _scriptingService.GetActionExecutor(actionName, _currentParserContext.ScriptHost);
+  }
+
+  internal TriggerDef GetTriggerDefinition(string signalName) {
+    return _scriptingService.GetTriggerDefinition(signalName, _currentParserContext.ScriptHost);
   }
 
   internal ITriggerSource GetSignalSource(string name) {
     if (!_currentParserContext.SignalSources.TryGetValue(name, out var source)) {
-      source = scriptingService.GetTriggerSource(
+      source = _scriptingService.GetTriggerSource(
           name, _currentParserContext.ScriptHost, _currentParserContext.OnSignalChanged);
       _currentParserContext.SignalSources[name] = source;
     }
@@ -86,8 +112,8 @@ class ExpressionParser(ScriptingService scriptingService) {
       var result =
           BinaryOperatorExpr.TryCreateFrom(operatorName, operands)
           ?? LogicalOperatorExpr.TryCreateFrom(operatorName, operands)
-          ?? SignalOperatorExpr.TryCreateFrom(operatorName, operands, this)
-          ?? ActionExpr.TryCreateFrom(operatorName, operands, this);
+          ?? SignalOperatorExpr.TryCreateFrom(operatorName, operands)
+          ?? ActionExpr.TryCreateFrom(operatorName, operands);
       if (result == null) {
         throw new ScriptError("Unknown operator: " + operatorName);
       }

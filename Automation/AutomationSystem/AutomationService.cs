@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.Automation.Tools;
 using Timberborn.BaseComponentSystem;
@@ -29,7 +30,7 @@ public sealed class AutomationService : IPostLoadableSingleton {
   #endregion
 
   AutomationService(EventBus eventBus, Highlighter highlighter, BaseInstantiator baseInstantiator,
-                    ExpressionParser expressionParser, ILoc loc) {
+                    ExpressionParser expressionParser, ScriptingService scriptingService, ILoc loc) {
     EventBus = eventBus;
     BaseInstantiator = baseInstantiator;
     ExpressionParser = expressionParser;
@@ -39,8 +40,10 @@ public sealed class AutomationService : IPostLoadableSingleton {
   }
 
   #region IPostLoadableSingleton implemetation 
+
   /// <inheritdoc/>
   public void PostLoad() {}
+
   #endregion
 
   #region API

@@ -6,7 +6,7 @@ using System;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
-interface IValueExpr {
+interface IValueExpr : IExpression {
    public ScriptValue.TypeEnum ValueType { get; }
    public Func<ScriptValue> ValueFn { get; }
 }
