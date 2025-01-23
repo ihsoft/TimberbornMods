@@ -9,7 +9,8 @@ using System.Text.RegularExpressions;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
-class ActionExpr : AbstractOperandExpr {
+sealed class ActionExpr : AbstractOperandExpr {
+  public string ActionName => ((SymbolExpr)Operands[0]).Value;
   public readonly Action Execute;
 
   public static IExpression TryCreateFrom(string name, IList<IExpression> operands, ExpressionParser parser) {

@@ -8,7 +8,9 @@ using System.Text.RegularExpressions;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
-class SignalOperatorExpr : AbstractOperandExpr, IValueExpr {
+sealed class SignalOperatorExpr : AbstractOperandExpr, IValueExpr {
+  public string SignalName => ((SymbolExpr)Operands[0]).Value;
+
   /// <inheritdoc/>
   public ScriptValue.TypeEnum ValueType { get; private set; }
 

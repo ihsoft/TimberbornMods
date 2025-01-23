@@ -4,7 +4,7 @@
 
 using System;
 using System.Collections.Generic;
-using Timberborn.BaseComponentSystem;
+using IgorZ.Automation.AutomationSystem;
 using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
@@ -22,12 +22,11 @@ sealed class ParserContext {
 
   /// <summary>Host object that will own this expression.</summary>
   /// <remarks>This must be set before the parser is called.</remarks>
-  public BaseComponent ScriptHost;
+  public AutomationBehavior ScriptHost;
 
   #endregion
 
   #region Output data
-
 
   /// <summary>All the signal sources that are referenced in the parsed expression.</summary>
   /// <remarks>

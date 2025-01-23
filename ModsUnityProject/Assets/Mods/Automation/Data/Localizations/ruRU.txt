@@ -9,6 +9,7 @@ IgorZ.Automation.Conditions.AndOperator," и ","String to join components of the
 =,=,"Scriptable components strings"
 IgorZ.Automation.Scriptable.Debug.Action.Log,"сделать запись в журнале","Name of the action that write to teh log an arbitrary string."
 IgorZ.Automation.Scriptable.Floodgate.Action.SetHeight,"выставить высоту затвора в","Change the floodgate height to the specified value"
+IgorZ.Automation.Scriptable.ExpressionParseError,"<RedHighlight>ОШИБКА</RedHighlight>","String to show when the scriptable condition or action cannot be parsed"
 IgorZ.Automation.Scriptable.Weather.Trigger.Season,"сезон","Name of the condition for the current season checking"
 =,=,"Rules editor strings"
 IgorZ.Automation.Scripting.Editor.AddRuleBtn,"Добавить правило",

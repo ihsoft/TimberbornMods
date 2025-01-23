@@ -104,9 +104,9 @@ sealed class ScriptedAction : AutomationActionBase {
     };
     var res = Behavior.AutomationService.ExpressionParser.Parse(Expression, _parserParserContext);
     if (!res) {
-      HostedDebugLog.Error(Behavior, "Failed to parse action: {0}\nError: {1}", Expression, _parserParserContext.LastError);
-      //FIXME: localize
-      _uiDescription = TextColors.ColorizeText($"<RedHighlight>ERROR</RedHighlight>");
+      HostedDebugLog.Error(
+          Behavior, "Failed to parse action: {0}\nError: {1}", Expression, _parserParserContext.LastError);
+      _uiDescription = TextColors.ColorizeText(Behavior.Loc.T(ErrorUiDescriptionLocKey));
       return;
     }
     //FIXME: process expression to get the descirption

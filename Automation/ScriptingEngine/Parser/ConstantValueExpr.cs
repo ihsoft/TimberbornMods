@@ -6,7 +6,7 @@ using System;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
-class ConstantValueExpr : IExpression, IValueExpr {
+sealed class ConstantValueExpr : IExpression, IValueExpr {
   public ScriptValue.TypeEnum ValueType { get; private init; }
   public Func<ScriptValue> ValueFn { get; private init; }
 
@@ -26,7 +26,7 @@ class ConstantValueExpr : IExpression, IValueExpr {
 
   public string Serialize() {
     return ValueType switch {
-        ScriptValue.TypeEnum.String => $"'{ValueFn().AsString}",
+        ScriptValue.TypeEnum.String => $"'{ValueFn().AsString}'",
         ScriptValue.TypeEnum.Number => ValueFn().AsNumber.ToString(),
         _ => $"ERROR:{ValueType}",
     };
