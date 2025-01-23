@@ -15,25 +15,25 @@ interface IScriptable {
   /// <summary>The type of the component that this scriptable works on. Global scriptables can have it NULL.</summary>
   public Type InstanceType { get; }
 
-  /// <summary>Returns the names of triggers that can be monitored on the specified building.</summary>
+  /// <summary>Returns the names of singals that the specified building provides.</summary>
   /// <remarks>It is an expensive call. Don't execute it in the tick handlers.</remarks>
-  public string[] GetTriggerNamesForBuilding(BaseComponent building);
+  public string[] GetSignalNamesForBuilding(BaseComponent building);
 
-  /// <summary>Returns a trigger source that can be used to monitor the specified trigger.</summary>
-  /// <param name="name">The name of the trigger.</param>
+  /// <summary>Returns a signal source that can be used to monitor the specified signal value.</summary>
+  /// <param name="name">The name of the signal.</param>
   /// <param name="building">
   /// The component on which the action is to be executed. It must be of type <see cref="InstanceType"/>.
   /// </param>
-  /// <param name="onValueChanged">The callback that si called when the trigger value changes.</param>
-  public ITriggerSource GetTriggerSource(string name, BaseComponent building, Action onValueChanged);
+  /// <param name="onValueChanged">The callback that is called when the singal value changes.</param>
+  public ISignalSource GetSignalSource(string name, BaseComponent building, Action onValueChanged);
 
-  /// <summary>Returns the definition of the trigger with the specified name.</summary>
-  /// <param name="name">The name of the trigger.</param>
+  /// <summary>Returns the definition of the signal with the specified name.</summary>
+  /// <param name="name">The name of the signal.</param>
   /// <param name="building">
   /// The component on which the action is to be executed. It must be of type <see cref="InstanceType"/>.
   /// </param>
-  /// <exception cref="ScriptError">if trigger is not found.</exception>
-  public TriggerDef GetTriggerDefinition(string name, BaseComponent building);
+  /// <exception cref="ScriptError">if signal is not found.</exception>
+  public SignalDef GetSignalDefinition(string name, BaseComponent building);
 
   /// <summary>Returns the names of actions that can be executed on the specified building.</summary>
   /// <remarks>It is an expensive call. Don't execute it in the tick handlers.</remarks>

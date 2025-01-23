@@ -4,7 +4,7 @@
 
 namespace IgorZ.Automation.ScriptingEngine;
 
-record struct TriggerDef {
+record struct SignalDef {
   public string FullName { get; init; }
   public string DisplayName { get; init; }
   public ArgumentDef ResultType { get; init; }

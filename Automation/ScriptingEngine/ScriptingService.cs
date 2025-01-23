@@ -23,28 +23,28 @@ sealed class ScriptingService : ILoadableSingleton {
     _registedScriptables.Add(scriptable.Name, scriptable);
   }
 
-  /// <summary>Returns a trigger source by its name.</summary>
+  /// <summary>Returns a signal source by its name.</summary>
   /// <remarks>
-  /// Different buildings have different triggers. If requested for a wrong building, an error will be thrown.
+  /// Different buildings have different signals. If requested for a wrong building, an error will be thrown.
   /// </remarks>
-  /// <param name="name">The full dotted name of the trigger. For example, "Weather.Season".</param>
+  /// <param name="name">The full dotted name of the signal. For example, "Weather.Season".</param>
   /// <param name="building">
-  /// The building to get the trigger for. Ignored for the global triggers (like "Weather").
+  /// The building to get the signal for. Ignored for the global signals (like "Weather").
   /// </param>
-  /// <param name="onValueChanged">The callback to call when the trigger value changes.</param>
-  /// <exception cref="ScriptError">if the trigger is not found.</exception>
-  public ITriggerSource GetTriggerSource(string name, BaseComponent building, Action onValueChanged) {
+  /// <param name="onValueChanged">The callback to call when the signal value changes.</param>
+  /// <exception cref="ScriptError">if the signal is not found.</exception>
+  public ISignalSource GetSignalSource(string name, BaseComponent building, Action onValueChanged) {
     var nameItems = name.Split('.');
     var (scriptable, instance) = GetScriptable(nameItems[0], building);
-    return scriptable.GetTriggerSource(nameItems[1], instance, onValueChanged);
+    return scriptable.GetSignalSource(nameItems[1], instance, onValueChanged);
   }
 
-  /// <summary>Returns a trigger definition by its name.</summary>
-  /// <exception cref="ScriptError">if the trigger is not found.</exception>
-  public TriggerDef GetTriggerDefinition(string name, BaseComponent building) {
+  /// <summary>Returns a signal definition by its name.</summary>
+  /// <exception cref="ScriptError">if the signal is not found.</exception>
+  public SignalDef GetSignalDefinition(string name, BaseComponent building) {
     var nameItems = name.Split('.');
     var (scriptable, instance) = GetScriptable(nameItems[0], building);
-    return scriptable.GetTriggerDefinition(nameItems[1], instance);
+    return scriptable.GetSignalDefinition(nameItems[1], instance);
   }
 
   /// <summary>Returns an executor that executes the specified action with the provided arguments.</summary>
@@ -73,12 +73,12 @@ sealed class ScriptingService : ILoadableSingleton {
     return scriptable.GetActionDefinition(nameItems[1], instance);
   }
 
-  /// <summary>Returns all trigger names for the specified building.</summary>
+  /// <summary>Returns all signal names for the specified building.</summary>
   /// <remarks>This can be an expensive call. Avoid making it in the ticks.</remarks>
-  public string[] GetTriggersForBuilding(BaseComponent building) {
+  public string[] GetSignalsForBuilding(BaseComponent building) {
     return _registedScriptables.Values
         .Where(s => s.InstanceType == null || TryGetComponentFast(building, s.InstanceType, out _))
-        .SelectMany(s => s.GetTriggerNamesForBuilding(building))
+        .SelectMany(s => s.GetSignalNamesForBuilding(building))
         .ToArray();
   }
 

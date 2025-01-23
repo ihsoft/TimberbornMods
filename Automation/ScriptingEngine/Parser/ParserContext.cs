@@ -33,7 +33,7 @@ sealed class ParserContext {
   /// If there was <see cref="OnSignalChanged"/> action specified, then the sources must be disposed before cleaning
   /// up the parsed expression.
   /// </remarks>
-  public readonly Dictionary<string, ITriggerSource> SignalSources = new();
+  public readonly Dictionary<string, ISignalSource> SignalSources = new();
 
   /// <summary>On successful parsing, this property will contain the parsed expression.</summary>
   public IExpression ParsedExpression { get; internal set; }

@@ -22,14 +22,14 @@ sealed class SignalOperatorExpr : AbstractOperandExpr, IValueExpr {
 
   /// <inheritdoc/>
   public override string Describe() {
-    return ExpressionParser.Instance.GetTriggerDefinition(SignalName).DisplayName;
+    return ExpressionParser.Instance.GetSignalDefinition(SignalName).DisplayName;
   }
 
   public static IExpression TryCreateFrom(string name, IList<IExpression> operands) {
     return name == "sig" ? new SignalOperatorExpr(name, operands) : null;
   }
 
-  readonly ITriggerSource _source;
+  readonly ISignalSource _source;
   static readonly Regex SignalNameRegexp = new("^([a-zA-Z][a-zA-Z0-9]+)(.[a-zA-Z][a-zA-Z0-9]+)*$");
 
   SignalOperatorExpr(string name, IList<IExpression> operands) : base(name, operands) {

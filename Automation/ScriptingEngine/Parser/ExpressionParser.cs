@@ -64,13 +64,13 @@ class ExpressionParser {
     return _scriptingService.GetActionExecutor(actionName, _currentParserContext.ScriptHost);
   }
 
-  internal TriggerDef GetTriggerDefinition(string signalName) {
-    return _scriptingService.GetTriggerDefinition(signalName, _currentParserContext.ScriptHost);
+  internal SignalDef GetSignalDefinition(string signalName) {
+    return _scriptingService.GetSignalDefinition(signalName, _currentParserContext.ScriptHost);
   }
 
-  internal ITriggerSource GetSignalSource(string name) {
+  internal ISignalSource GetSignalSource(string name) {
     if (!_currentParserContext.SignalSources.TryGetValue(name, out var source)) {
-      source = _scriptingService.GetTriggerSource(
+      source = _scriptingService.GetSignalSource(
           name, _currentParserContext.ScriptHost, _currentParserContext.OnSignalChanged);
       _currentParserContext.SignalSources[name] = source;
     }

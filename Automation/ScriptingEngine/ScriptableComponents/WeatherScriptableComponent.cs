@@ -13,9 +13,9 @@ namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
 sealed class WeatherScriptableComponent : ScriptableComponentBase {
 
-  const string SeasonTriggerLocKey = "IgorZ.Automation.Scriptable.Weather.Trigger.Season";
+  const string SeasonSignalLocKey = "IgorZ.Automation.Scriptable.Weather.Signal.Season";
 
-  const string SeasonTriggerName = "Season";
+  const string SeasonSignalName = "Season";
   const string DroughtSeason = "drought";
   const string BadTideSeason = "badtide";
   const string TemperateSeason = "temperate";
@@ -29,25 +29,25 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
   public override Type InstanceType => null;
 
   /// <inheritdoc/>
-  public override string[] GetTriggerNamesForBuilding(BaseComponent _) {
-    return [$"{Name}.{SeasonTriggerName}"]; 
+  public override string[] GetSignalNamesForBuilding(BaseComponent _) {
+    return [$"{Name}.{SeasonSignalName}"]; 
   }
 
   /// <inheritdoc/>
-  public override ITriggerSource GetTriggerSource(string name, BaseComponent _, Action onValueChanged) {
-    var trigger = name switch {
-        SeasonTriggerName => new SeasonTrigger(this, onValueChanged),
-        _ => throw new ScriptError("Unknown trigger: " + name),
+  public override ISignalSource GetSignalSource(string name, BaseComponent _, Action onValueChanged) {
+    var signal = name switch {
+        SeasonSignalName => new SeasonSignal(this, onValueChanged),
+        _ => throw new ScriptError("Unknown signal: " + name),
     };
-    return trigger;
+    return signal;
   }
 
   /// <inheritdoc/>
-  public override TriggerDef GetTriggerDefinition(string name, BaseComponent _) {
+  public override SignalDef GetSignalDefinition(string name, BaseComponent _) {
     return name switch {
-        SeasonTriggerName => new TriggerDef {
-            FullName = $"{Name}.{SeasonTriggerName}",
-            DisplayName = SeasonTriggerLocKey,
+        SeasonSignalName => new SignalDef {
+            FullName = $"{Name}.{SeasonSignalName}",
+            DisplayName = SeasonSignalLocKey,
             ResultType = new ArgumentDef {
                 ValueType = ScriptValue.TypeEnum.String,
                 Options = [
@@ -57,7 +57,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
                 ],
             },
         },
-        _ => throw new ScriptError("Unknown trigger: " + name)
+        _ => throw new ScriptError("Unknown signal: " + name)
     };
   }
 
@@ -68,7 +68,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
   readonly WeatherService _weatherService;
   readonly HazardousWeatherService _hazardousWeatherService;
 
-  readonly Dictionary<ITriggerSource, Action> _seasonChangeTriggers = [];
+  readonly Dictionary<ISignalSource, Action> _seasonChangeSignals = [];
 
   WeatherScriptableComponent(
       EventBus eventBus, WeatherService weatherService, HazardousWeatherService hazardousWeatherService) {
@@ -95,17 +95,17 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
 
   #endregion
 
-  #region Season trigger implementation
+  #region Season signal implementation
 
-  sealed class SeasonTrigger : ITriggerSource {
+  sealed class SeasonSignal : ISignalSource {
 
     readonly WeatherScriptableComponent _parent;
     internal static string CurrentSeason;
 
-    public SeasonTrigger(WeatherScriptableComponent parent, Action onValueChanged) {
+    public SeasonSignal(WeatherScriptableComponent parent, Action onValueChanged) {
       _parent = parent;
       if (onValueChanged != null) {
-        _parent._seasonChangeTriggers.Add(this, onValueChanged);
+        _parent._seasonChangeSignals.Add(this, onValueChanged);
       }
       CurrentSeason = _parent.GetCurrentSeason();
     }
@@ -114,7 +114,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
     public ScriptValue CurrentValue => ScriptValue.Of(CurrentSeason);
 
     /// <inheritdoc/>
-    public void Dispose() => _parent._seasonChangeTriggers.Remove(this);
+    public void Dispose() => _parent._seasonChangeSignals.Remove(this);
   }
 
   #endregion
@@ -123,20 +123,20 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
 
   [OnEvent]
   public void OnHazardousWeatherStartedEvent(HazardousWeatherStartedEvent @event) {
-    SeasonTrigger.CurrentSeason = @event.HazardousWeather switch {
+    SeasonSignal.CurrentSeason = @event.HazardousWeather switch {
         DroughtWeather => DroughtSeason,
         BadtideWeather => BadTideSeason,
         _ => throw new InvalidOperationException("Unknown hazardous weather type: " + @event.HazardousWeather),
     };
-    foreach (var action in _seasonChangeTriggers.Values) {
+    foreach (var action in _seasonChangeSignals.Values) {
       action();
     }
   }
 
   [OnEvent]
   public void OnHazardousWeatherEndedEvent(HazardousWeatherEndedEvent @event) {
-    SeasonTrigger.CurrentSeason = TemperateSeason;
-    foreach (var action in _seasonChangeTriggers.Values) {
+    SeasonSignal.CurrentSeason = TemperateSeason;
+    foreach (var action in _seasonChangeSignals.Values) {
       action();
     }
   }

@@ -33,7 +33,7 @@ sealed class BinaryOperatorExpr : BoolOperatorExpr {
         _ => throw new InvalidOperationException("Unknown operator: " + Name),
     });
     if (Right is ConstantValueExpr constantValueExpr) {
-      var def = ExpressionParser.Instance.GetTriggerDefinition(Left.SignalName);
+      var def = ExpressionParser.Instance.GetSignalDefinition(Left.SignalName);
       sb.Append(constantValueExpr.FormatValue(def.ResultType));
     } else {
       sb.Append(Right.Describe());
