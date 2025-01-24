@@ -19,7 +19,7 @@ sealed class ScriptedAction : AutomationActionBase {
 
   /// <inheritdoc/>
   public override IAutomationAction CloneDefinition() {
-    return new ScriptedAction { TemplateFamily = TemplateFamily };
+    return new ScriptedAction { TemplateFamily = TemplateFamily, Expression = Expression };
   }
 
   /// <inheritdoc/>
