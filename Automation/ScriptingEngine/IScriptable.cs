@@ -3,12 +3,11 @@
 // License: Public Domain
 
 using System;
-using IgorZ.TimberDev.UI;
 using Timberborn.BaseComponentSystem;
 
 namespace IgorZ.Automation.ScriptingEngine;
 
-interface IScriptable {
+public interface IScriptable {
   /// <summary>The name of the scriptable component.</summary>
   public string Name { get; }
 
@@ -24,8 +23,7 @@ interface IScriptable {
   /// <param name="building">
   /// The component on which the action is to be executed. It must be of type <see cref="InstanceType"/>.
   /// </param>
-  /// <param name="onValueChanged">The callback that is called when the singal value changes.</param>
-  public ISignalSource GetSignalSource(string name, BaseComponent building, Action onValueChanged);
+  public Func<ScriptValue> GetSignalSource(string name, BaseComponent building);
 
   /// <summary>Returns the definition of the signal with the specified name.</summary>
   /// <param name="name">The name of the signal.</param>

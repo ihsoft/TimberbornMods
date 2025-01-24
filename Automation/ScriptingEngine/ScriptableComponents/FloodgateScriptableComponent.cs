@@ -50,7 +50,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
   ActionDef SetHeightActionDef => _setHeightActionDef ??= new ActionDef {
       FullName = $"{Name}.{SetHeightActionName}",
-      DisplayName = SetHeightActionLocKey,
+      DisplayName = Loc.T(SetHeightActionLocKey),
       ArgumentTypes = [
           new ArgumentDef {
               ValueType = ScriptValue.TypeEnum.Number,

@@ -4,7 +4,7 @@
 
 namespace IgorZ.Automation.ScriptingEngine;
 
-sealed class ScriptValue {
+public sealed class ScriptValue {
   public enum TypeEnum {
     Number,
     String,

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Bindito.Core;
 using IgorZ.Automation.Actions;
+using IgorZ.Automation.ScriptingEngine;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.EntitySystem;
@@ -24,6 +25,9 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
   /// <summary>Shortcut to the <see cref="AutomationService"/>.</summary>
   // ReSharper disable once MemberCanBePrivate.Global
   public AutomationService AutomationService { get; private set; }
+
+  /// <summary>Shortcut to the <see cref="ScriptingService"/>.</summary>
+  public ScriptingService ScriptingService { get; private set; }
 
   /// <summary>Shortcut to the <see cref="ILoc"/>.</summary>
   public ILoc Loc => AutomationService.Loc;
@@ -158,8 +162,9 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
 
   /// <summary>Injects the dependencies. It has to be public to work.</summary>
   [Inject]
-  public void InjectDependencies(AutomationService automationService) {
+  public void InjectDependencies(AutomationService automationService, ScriptingService scriptingService) {
     AutomationService = automationService;
+    ScriptingService = scriptingService;
   }
 
   void Awake() {

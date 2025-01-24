@@ -14,7 +14,7 @@ namespace IgorZ.Automation.ScriptingEngine.Parser;
 class ExpressionParser {
 
   public bool Parse(string input, ParserContext parserContext) {
-    if (parserContext.SignalSources.Count > 0 || parserContext.ParsedExpression != null) {
+    if (parserContext.ReferencedSignals.Count > 0 || parserContext.ParsedExpression != null) {
       throw new InvalidOperationException("Parser context is already in use");
     }
     try {
@@ -24,7 +24,6 @@ class ExpressionParser {
     } catch (ScriptError e) {
       _currentParserContext.LastError = e.Message;
       _currentParserContext.ParsedExpression = null;
-      _currentParserContext.Release();
       return false;
     } finally {
       _currentParserContext = null;
@@ -36,10 +35,12 @@ class ExpressionParser {
     if (parserContext.ParsedExpression == null) {
       throw new InvalidOperationException("Parser context is not initialized");
     }
-    _currentParserContext = parserContext;
-    var result = _currentParserContext.ParsedExpression.Describe();
-    _currentParserContext = null;
-    return result;
+    try {
+      _currentParserContext = parserContext;
+      return _currentParserContext.ParsedExpression.Describe();
+    } finally {
+      _currentParserContext = null;
+    }
   }
 
   static readonly Regex OperatorNameRegex = new(@"^\[a-zA-Z]+$");
@@ -68,13 +69,9 @@ class ExpressionParser {
     return _scriptingService.GetSignalDefinition(signalName, _currentParserContext.ScriptHost);
   }
 
-  internal ISignalSource GetSignalSource(string name) {
-    if (!_currentParserContext.SignalSources.TryGetValue(name, out var source)) {
-      source = _scriptingService.GetSignalSource(
-          name, _currentParserContext.ScriptHost, _currentParserContext.OnSignalChanged);
-      _currentParserContext.SignalSources[name] = source;
-    }
-    return source;
+  internal Func<ScriptValue> GetSignalSource(string name) {
+    _currentParserContext.ReferencedSignals.Add(name);
+    return _scriptingService.GetSignalSource(name, _currentParserContext.ScriptHost);
   }
 
   Queue<string> Tokenize(string input) {

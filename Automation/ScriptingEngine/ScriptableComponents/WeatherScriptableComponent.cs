@@ -3,7 +3,6 @@
 // License: Public Domain
 
 using System;
-using System.Collections.Generic;
 using Timberborn.BaseComponentSystem;
 using Timberborn.HazardousWeatherSystem;
 using Timberborn.SingletonSystem;
@@ -34,12 +33,11 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
   }
 
   /// <inheritdoc/>
-  public override ISignalSource GetSignalSource(string name, BaseComponent _, Action onValueChanged) {
-    var signal = name switch {
-        SeasonSignalName => new SeasonSignal(this, onValueChanged),
+  public override Func<ScriptValue> GetSignalSource(string name, BaseComponent _) {
+    return name switch {
+        SeasonSignalName => () => ScriptValue.Of(_currentSeason),
         _ => throw new ScriptError("Unknown signal: " + name),
     };
-    return signal;
   }
 
   /// <inheritdoc/>
@@ -47,7 +45,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
     return name switch {
         SeasonSignalName => new SignalDef {
             FullName = $"{Name}.{SeasonSignalName}",
-            DisplayName = SeasonSignalLocKey,
+            DisplayName = Loc.T(SeasonSignalLocKey),
             ResultType = new ArgumentDef {
                 ValueType = ScriptValue.TypeEnum.String,
                 Options = [
@@ -61,14 +59,17 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
     };
   }
 
+  public override void Load() {
+    base.Load();
+    _currentSeason = GetCurrentSeason();
+  }
+
   #endregion
 
   #region Implementation
 
   readonly WeatherService _weatherService;
   readonly HazardousWeatherService _hazardousWeatherService;
-
-  readonly Dictionary<ISignalSource, Action> _seasonChangeSignals = [];
 
   WeatherScriptableComponent(
       EventBus eventBus, WeatherService weatherService, HazardousWeatherService hazardousWeatherService) {
@@ -95,50 +96,24 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
 
   #endregion
 
-  #region Season signal implementation
-
-  sealed class SeasonSignal : ISignalSource {
-
-    readonly WeatherScriptableComponent _parent;
-    internal static string CurrentSeason;
-
-    public SeasonSignal(WeatherScriptableComponent parent, Action onValueChanged) {
-      _parent = parent;
-      if (onValueChanged != null) {
-        _parent._seasonChangeSignals.Add(this, onValueChanged);
-      }
-      CurrentSeason = _parent.GetCurrentSeason();
-    }
-
-    /// <inheritdoc/>
-    public ScriptValue CurrentValue => ScriptValue.Of(CurrentSeason);
-
-    /// <inheritdoc/>
-    public void Dispose() => _parent._seasonChangeSignals.Remove(this);
-  }
-
-  #endregion
-
   #region Event listeners
+
+  string _currentSeason;
 
   [OnEvent]
   public void OnHazardousWeatherStartedEvent(HazardousWeatherStartedEvent @event) {
-    SeasonSignal.CurrentSeason = @event.HazardousWeather switch {
+    _currentSeason = @event.HazardousWeather switch {
         DroughtWeather => DroughtSeason,
         BadtideWeather => BadTideSeason,
         _ => throw new InvalidOperationException("Unknown hazardous weather type: " + @event.HazardousWeather),
     };
-    foreach (var action in _seasonChangeSignals.Values) {
-      action();
-    }
+    ScriptingService.NotifySignalChanged($"{Name}.{SeasonSignalName}");
   }
 
   [OnEvent]
   public void OnHazardousWeatherEndedEvent(HazardousWeatherEndedEvent @event) {
-    SeasonSignal.CurrentSeason = TemperateSeason;
-    foreach (var action in _seasonChangeSignals.Values) {
-      action();
-    }
+    _currentSeason = TemperateSeason;
+    ScriptingService.NotifySignalChanged($"{Name}.{SeasonSignalName}");
   }
 
   #endregion

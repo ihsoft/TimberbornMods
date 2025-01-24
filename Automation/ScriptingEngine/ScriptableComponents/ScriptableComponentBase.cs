@@ -25,7 +25,7 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
   public virtual string[] GetSignalNamesForBuilding(BaseComponent building) => [];
 
   /// <inheritdoc/>
-  public virtual ISignalSource GetSignalSource(string name, BaseComponent building, Action onValueChanged) {
+  public virtual Func<ScriptValue> GetSignalSource(string name, BaseComponent building) {
     throw new NotImplementedException();
   }
 

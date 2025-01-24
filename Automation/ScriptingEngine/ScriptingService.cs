@@ -11,7 +11,7 @@ using Timberborn.SingletonSystem;
 
 namespace IgorZ.Automation.ScriptingEngine;
 
-sealed class ScriptingService : ILoadableSingleton {
+public sealed class ScriptingService : ILoadableSingleton {
 
   #region API
 
@@ -31,12 +31,11 @@ sealed class ScriptingService : ILoadableSingleton {
   /// <param name="building">
   /// The building to get the signal for. Ignored for the global signals (like "Weather").
   /// </param>
-  /// <param name="onValueChanged">The callback to call when the signal value changes.</param>
   /// <exception cref="ScriptError">if the signal is not found.</exception>
-  public ISignalSource GetSignalSource(string name, BaseComponent building, Action onValueChanged) {
+  public Func<ScriptValue> GetSignalSource(string name, BaseComponent building) {
     var nameItems = name.Split('.');
     var (scriptable, instance) = GetScriptable(nameItems[0], building);
-    return scriptable.GetSignalSource(nameItems[1], instance, onValueChanged);
+    return scriptable.GetSignalSource(nameItems[1], instance);
   }
 
   /// <summary>Returns a signal definition by its name.</summary>
@@ -58,6 +57,37 @@ sealed class ScriptingService : ILoadableSingleton {
     var nameItems = name.Split('.');
     var (scriptable, instance) = GetScriptable(nameItems[0], building);
     return scriptable.GetActionExecutor(nameItems[1], instance);
+  }
+
+  /// <summary>Registers a callback that is called when the signal value changes.</summary>
+  /// <param name="name">The name of the signal.</param>
+  /// <param name="onValueChanged">The callback that is called when the signal value changes.</param>
+  public void RegisterSignalChangeCallback(string name, Action onValueChanged) {
+    if (!_signalChangeCallbacks.TryGetValue(name, out var callbacks)) {
+      callbacks = [];
+      _signalChangeCallbacks[name] = callbacks;
+    }
+    callbacks.Add(onValueChanged);
+  }
+
+  /// <summary>Unregisters a signal value change callback.</summary>
+  /// <param name="name">The name of the signal.</param>
+  /// <param name="onValueChanged">The callback that was registered for updates.</param>
+  public void UnregisterSignalChangeCallback(string name, Action onValueChanged) {
+    if (_signalChangeCallbacks.TryGetValue(name, out var callbacks)) {
+      callbacks.Remove(onValueChanged);
+    }
+  }
+
+  /// <summary>Notifies all registered callbacks about a signal change.</summary>
+  /// <param name="name"></param>
+  public void NotifySignalChanged(string name) {
+    if (!_signalChangeCallbacks.TryGetValue(name, out var callbacks)) {
+      return;
+    }
+    foreach (var callback in callbacks) {
+      callback();
+    }
   }
 
   /// <summary>Returns the definition of the action by its name.</summary>
@@ -120,6 +150,8 @@ sealed class ScriptingService : ILoadableSingleton {
   #region Implementation
 
   readonly Dictionary<string, IScriptable> _registedScriptables = [];
+  readonly Dictionary<string, List<Action>> _signalChangeCallbacks = new();
+
   static MethodInfo _getComponentFastMethod = typeof(BaseComponent).GetMethod(
       nameof(BaseComponent.GetComponentFast), BindingFlags.Instance | BindingFlags.Public);
 

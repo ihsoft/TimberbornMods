@@ -13,12 +13,10 @@ sealed class SignalOperatorExpr : AbstractOperandExpr, IValueExpr {
   public string SignalName => ((SymbolExpr)Operands[0]).Value;
 
   /// <inheritdoc/>
-  public ScriptValue.TypeEnum ValueType { get; private set; }
+  public ScriptValue.TypeEnum ValueType { get; }
 
   /// <inheritdoc/>
-  public Func<ScriptValue> ValueFn {
-    get { return () => _source.CurrentValue; }
-  }
+  public Func<ScriptValue> ValueFn { get; }
 
   /// <inheritdoc/>
   public override string Describe() {
@@ -29,7 +27,6 @@ sealed class SignalOperatorExpr : AbstractOperandExpr, IValueExpr {
     return name == "sig" ? new SignalOperatorExpr(name, operands) : null;
   }
 
-  readonly ISignalSource _source;
   static readonly Regex SignalNameRegexp = new("^([a-zA-Z][a-zA-Z0-9]+)(.[a-zA-Z][a-zA-Z0-9]+)*$");
 
   SignalOperatorExpr(string name, IList<IExpression> operands) : base(name, operands) {
@@ -37,7 +34,7 @@ sealed class SignalOperatorExpr : AbstractOperandExpr, IValueExpr {
     if (Operands[0] is not SymbolExpr symbol || !SignalNameRegexp.IsMatch(symbol.Value)) {
       throw new ScriptError("Bad signal name: " + Operands[0]);
     }
-    _source = ExpressionParser.Instance.GetSignalSource(symbol.Value);
-    ValueType = _source.CurrentValue.ValueType;
+    ValueFn = ExpressionParser.Instance.GetSignalSource(symbol.Value);
+    ValueType = ValueFn().ValueType;
   }
 }

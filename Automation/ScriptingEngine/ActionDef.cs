@@ -4,7 +4,7 @@
 
 namespace IgorZ.Automation.ScriptingEngine;
 
-record struct ActionDef {
+public record struct ActionDef {
   public string FullName { get; init; }
   public string DisplayName { get; init; }
   public ArgumentDef[] ArgumentTypes { get; init; }

@@ -35,7 +35,9 @@ sealed class ScriptedCondition : AutomationConditionBase {
 
   /// <inheritdoc/>
   protected override void OnBehaviorToBeCleared() {
-    Dispose();
+    foreach (var signal in _parserParserContext.ReferencedSignals) {
+      Behavior.ScriptingService.UnregisterSignalChangeCallback(signal, CheckOperands);
+    }
   }
 
   /// <inheritdoc/>
@@ -98,7 +100,6 @@ sealed class ScriptedCondition : AutomationConditionBase {
 
   void ParseConditions() {
     _parserParserContext = new ParserContext {
-        OnSignalChanged = CheckOperands,
         ScriptHost = Behavior,
     };
     var res = Behavior.AutomationService.ExpressionParser.Parse(Expression, _parserParserContext);
@@ -117,11 +118,9 @@ sealed class ScriptedCondition : AutomationConditionBase {
     }
     var description = ExpressionParser.Instance.GetDescription(_parserParserContext);
     _uiDescription = TextColors.ColorizeText($"<SolidHighlight>{description}</SolidHighlight>");
-  }
-
-  void Dispose() {
-    _parserParserContext.Release();
-    _parsedExpression = null;
+    foreach (var signal in _parserParserContext.ReferencedSignals) {
+      Behavior.ScriptingService.RegisterSignalChangeCallback(signal, CheckOperands);
+    }
   }
 
   void CheckOperands() {
