@@ -10,7 +10,7 @@ using Timberborn.WeatherSystem;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
-sealed class WeatherScriptableComponent : ScriptableComponentBase {
+sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadableSingleton {
 
   const string SeasonSignalLocKey = "IgorZ.Automation.Scriptable.Weather.Signal.Season";
 
@@ -45,8 +45,11 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
     };
   }
 
-  public override void Load() {
-    base.Load();
+  #endregion
+
+  #region IPostLoadableSingleton implementation
+
+  public void PostLoad() {
     _currentSeason = GetCurrentSeason();
   }
 
