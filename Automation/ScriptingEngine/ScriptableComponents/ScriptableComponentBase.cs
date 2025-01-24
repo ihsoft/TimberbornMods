@@ -47,7 +47,7 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
     throw new NotImplementedException();
   }
 
-  protected static void AssertArgsCount(string actionName, ScriptValue[] args, int expectedCount) {
+  protected static void AssertActionArgsCount(string actionName, ScriptValue[] args, int expectedCount) {
     if (args.Length != expectedCount) {
       throw new ScriptError($"{actionName} action requires {expectedCount} argument(s)");
     }

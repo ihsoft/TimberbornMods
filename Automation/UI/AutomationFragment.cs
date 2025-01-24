@@ -119,7 +119,8 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
   void AddTestRule() {
     var condition = new ScriptedCondition();
-    condition.SetExpression("(and (eq (sig Weather.Season) 'drought') (or (eq (sig Weather.Season) 'temperate') (eq (sig Weather.Season) 'badtide')))");
+    //condition.SetExpression("(and (eq (sig Weather.Season) 'drought') (or (eq (sig Weather.Season) 'temperate') (eq (sig Weather.Season) 'badtide')))");
+    condition.SetExpression("(eq (sig Weather.Season) 'drought')");
     var action = new ScriptedAction();
     action.SetExpression("(act Floodgate.SetHeight 120)");
     _automationBehavior.AddRule(condition, action);

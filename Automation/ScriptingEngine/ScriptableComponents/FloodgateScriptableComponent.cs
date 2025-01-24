@@ -12,7 +12,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
   const string SetHeightActionLocKey = "IgorZ.Automation.Scriptable.Floodgate.Action.SetHeight";
 
-  const string SetHeightActionName = "SetHeight";
+  const string SetHeightActionName = "Floodgate.SetHeight";
 
   #region IScriptable implementation
 
@@ -24,7 +24,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override string[] GetActionNamesForBuilding(BaseComponent building) {
-    return [$"{Name}.{SetHeightActionName}"];
+    return [SetHeightActionName];
   }
 
   /// <inheritdoc/>
@@ -49,7 +49,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   #region Actions
 
   ActionDef SetHeightActionDef => _setHeightActionDef ??= new ActionDef {
-      FullName = $"{Name}.{SetHeightActionName}",
+      FullName = SetHeightActionName,
       DisplayName = Loc.T(SetHeightActionLocKey),
       ArgumentTypes = [
           new ArgumentDef {
@@ -61,7 +61,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   ActionDef? _setHeightActionDef;
 
   static void SetHeight(Floodgate floodgate, ScriptValue[] args) {
-    AssertArgsCount(SetHeightActionName, args, 1);
+    AssertActionArgsCount(SetHeightActionName, args, 1);
     floodgate.SetHeight(args[0].AsNumber / 100f);
   }
 

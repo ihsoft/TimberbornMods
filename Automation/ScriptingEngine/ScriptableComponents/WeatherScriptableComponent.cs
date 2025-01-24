@@ -14,7 +14,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
 
   const string SeasonSignalLocKey = "IgorZ.Automation.Scriptable.Weather.Signal.Season";
 
-  const string SeasonSignalName = "Season";
+  const string SeasonSignalName = "Weather.Season";
   const string DroughtSeason = "drought";
   const string BadTideSeason = "badtide";
   const string TemperateSeason = "temperate";
@@ -29,7 +29,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override string[] GetSignalNamesForBuilding(BaseComponent _) {
-    return [$"{Name}.{SeasonSignalName}"]; 
+    return [SeasonSignalName]; 
   }
 
   /// <inheritdoc/>
@@ -44,7 +44,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
   public override SignalDef GetSignalDefinition(string name, BaseComponent _) {
     return name switch {
         SeasonSignalName => new SignalDef {
-            FullName = $"{Name}.{SeasonSignalName}",
+            FullName = SeasonSignalName,
             DisplayName = Loc.T(SeasonSignalLocKey),
             ResultType = new ArgumentDef {
                 ValueType = ScriptValue.TypeEnum.String,
@@ -107,13 +107,13 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
         BadtideWeather => BadTideSeason,
         _ => throw new InvalidOperationException("Unknown hazardous weather type: " + @event.HazardousWeather),
     };
-    ScriptingService.NotifySignalChanged($"{Name}.{SeasonSignalName}");
+    ScriptingService.NotifySignalChanged(SeasonSignalName);
   }
 
   [OnEvent]
   public void OnHazardousWeatherEndedEvent(HazardousWeatherEndedEvent @event) {
     _currentSeason = TemperateSeason;
-    ScriptingService.NotifySignalChanged($"{Name}.{SeasonSignalName}");
+    ScriptingService.NotifySignalChanged(SeasonSignalName);
   }
 
   #endregion

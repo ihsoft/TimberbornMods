@@ -35,7 +35,7 @@ public sealed class ScriptingService : ILoadableSingleton {
   public Func<ScriptValue> GetSignalSource(string name, BaseComponent building) {
     var nameItems = name.Split('.');
     var (scriptable, instance) = GetScriptable(nameItems[0], building);
-    return scriptable.GetSignalSource(nameItems[1], instance);
+    return scriptable.GetSignalSource(name, instance);
   }
 
   /// <summary>Returns a signal definition by its name.</summary>
@@ -43,20 +43,7 @@ public sealed class ScriptingService : ILoadableSingleton {
   public SignalDef GetSignalDefinition(string name, BaseComponent building) {
     var nameItems = name.Split('.');
     var (scriptable, instance) = GetScriptable(nameItems[0], building);
-    return scriptable.GetSignalDefinition(nameItems[1], instance);
-  }
-
-  /// <summary>Returns an executor that executes the specified action with the provided arguments.</summary>
-  /// <param name="name">The name of the action.</param>
-  /// <param name="building">
-  /// The building on which the action is to be executed. It must have the component that the action is bound to.
-  /// See <see cref="IScriptable.InstanceType"/>.
-  /// </param>
-  /// <exception cref="ScriptError">if action is not found.</exception>
-  public Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
-    var nameItems = name.Split('.');
-    var (scriptable, instance) = GetScriptable(nameItems[0], building);
-    return scriptable.GetActionExecutor(nameItems[1], instance);
+    return scriptable.GetSignalDefinition(name, instance);
   }
 
   /// <summary>Registers a callback that is called when the signal value changes.</summary>
@@ -90,6 +77,19 @@ public sealed class ScriptingService : ILoadableSingleton {
     }
   }
 
+  /// <summary>Returns an executor that executes the specified action with the provided arguments.</summary>
+  /// <param name="name">The name of the action.</param>
+  /// <param name="building">
+  /// The building on which the action is to be executed. It must have the component that the action is bound to.
+  /// See <see cref="IScriptable.InstanceType"/>.
+  /// </param>
+  /// <exception cref="ScriptError">if action is not found.</exception>
+  public Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
+    var nameItems = name.Split('.');
+    var (scriptable, instance) = GetScriptable(nameItems[0], building);
+    return scriptable.GetActionExecutor(name, instance);
+  }
+
   /// <summary>Returns the definition of the action by its name.</summary>
   /// <param name="name">The name of the action.</param>
   /// <param name="building">
@@ -100,12 +100,12 @@ public sealed class ScriptingService : ILoadableSingleton {
   public ActionDef GetActionDefinition(string name, BaseComponent building) {
     var nameItems = name.Split('.');
     var (scriptable, instance) = GetScriptable(nameItems[0], building);
-    return scriptable.GetActionDefinition(nameItems[1], instance);
+    return scriptable.GetActionDefinition(name, instance);
   }
 
   /// <summary>Returns all signal names for the specified building.</summary>
   /// <remarks>This can be an expensive call. Avoid making it in the ticks.</remarks>
-  public string[] GetSignalsForBuilding(BaseComponent building) {
+  public string[] GetSignalNamesForBuilding(BaseComponent building) {
     return _registedScriptables.Values
         .Where(s => s.InstanceType == null || TryGetComponentFast(building, s.InstanceType, out _))
         .SelectMany(s => s.GetSignalNamesForBuilding(building))
@@ -114,7 +114,7 @@ public sealed class ScriptingService : ILoadableSingleton {
 
   /// <summary>Returns all action names for the specified building.</summary>
   /// <remarks>This can be an expensive call. Avoid making it in the ticks.</remarks>
-  public string[] GetActionForBuilding(BaseComponent building) {
+  public string[] GetActionNamesForBuilding(BaseComponent building) {
     return _registedScriptables.Values
         .Where(s => s.InstanceType == null || TryGetComponentFast(building, s.InstanceType, out _))
         .SelectMany(s => s.GetActionNamesForBuilding(building))
@@ -132,6 +132,7 @@ public sealed class ScriptingService : ILoadableSingleton {
     return component;
   }
 
+  /// <summary>Returns a component of the specified type from the building.</summary>
   public static bool TryGetComponentFast(BaseComponent building, Type type, out BaseComponent component) {
     var genericMethodInfo = _getComponentFastMethod.MakeGenericMethod(type);
     component = genericMethodInfo.Invoke(building, []) as BaseComponent;

@@ -12,7 +12,7 @@ class DebugScriptableComponent : ScriptableComponentBase {
 
   const string LogActionLocKey = "IgorZ.Automation.Scriptable.Debug.Action.Log";
 
-  const string LogActionName = "Log";
+  const string LogActionName = "Debug.Log";
 
   #region IScriptable implementation
 
@@ -24,7 +24,7 @@ class DebugScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override string[] GetActionNamesForBuilding(BaseComponent building) {
-    return [$"{Name}.{LogActionName}"];
+    return [LogActionName];
   }
 
   /// <inheritdoc/>
@@ -39,7 +39,7 @@ class DebugScriptableComponent : ScriptableComponentBase {
   public override ActionDef GetActionDefinition(string name, BaseComponent instance) {
     return name switch {
         LogActionName => new ActionDef {
-            FullName = $"{Name}.{LogActionName}",
+            FullName = LogActionName,
             DisplayName = LogActionLocKey,
             ArgumentTypes = [
                 new ArgumentDef {
@@ -56,7 +56,7 @@ class DebugScriptableComponent : ScriptableComponentBase {
   #region Actions
 
   static void LogAction(BaseComponent instance, ScriptValue[] args) {
-    AssertArgsCount(LogActionName, args, 1);
+    AssertActionArgsCount(LogActionName, args, 1);
     HostedDebugLog.Info(instance, "[Debug action]: {0}", args[0]);
   }
 
