@@ -33,8 +33,9 @@ sealed class ConstantValueExpr : IValueExpr {
           : "";
       return text != "" ? text : Describe();
     }
-    var value = ValueFn().AsNumber / 100f;
-    return value.ToString(valueDef.Format ?? "0.##");
+    return valueDef.FormatNumber == null
+        ? (ValueFn().AsNumber / 100f).ToString("0.##")
+        : valueDef.FormatNumber(ValueFn().AsNumber);
   }
 
   /// <inheritdoc/>

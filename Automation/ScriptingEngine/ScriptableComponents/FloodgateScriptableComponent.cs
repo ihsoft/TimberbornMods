@@ -3,8 +3,10 @@
 // License: Public Domain
 
 using System;
+using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.BaseComponentSystem;
 using Timberborn.WaterBuildings;
+using UnityEngine;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
@@ -54,7 +56,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
       Arguments = [
           new ValueDef {
               ValueType = ScriptValue.TypeEnum.Number,
-              Format = "0.00",
+              FormatNumber = FormatHeight,
           },
       ],
   };
@@ -62,7 +64,21 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
   static void SetHeight(Floodgate floodgate, ScriptValue[] args) {
     AssertActionArgsCount(SetHeightActionName, args, 1);
-    floodgate.SetHeight(args[0].AsNumber / 100f);
+    var height = args[0].AsNumber / 100f;
+    if (height < 0) {
+      height = floodgate.MaxHeight + height;
+    }
+    floodgate.SetHeight(height);
+  }
+
+  static string FormatHeight(int value) {
+    var floodgate = ExpressionParser.Instance.CurrentParserContext.ScriptHost.GetComponentFast<Floodgate>();
+    var height = value / 100f;
+    if (height < 0) {
+      height = floodgate.MaxHeight + height;
+    }
+    height = Mathf.Clamp(height, 0, floodgate.MaxHeight);
+    return height.ToString("0.00");
   }
 
   #endregion

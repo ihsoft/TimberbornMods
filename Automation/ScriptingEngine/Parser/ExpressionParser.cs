@@ -13,20 +13,22 @@ namespace IgorZ.Automation.ScriptingEngine.Parser;
 
 class ExpressionParser {
 
+  public ParserContext CurrentParserContext { get; private set; }
+
   public bool Parse(string input, ParserContext parserContext) {
     if (parserContext.ReferencedSignals.Count > 0 || parserContext.ParsedExpression != null) {
       throw new InvalidOperationException("Parser context is already in use");
     }
     try {
-      _currentParserContext = parserContext;
-      _currentParserContext.ParsedExpression = ReadFromTokens(Tokenize(input));
-      _currentParserContext.LastError = null;
+      CurrentParserContext = parserContext;
+      CurrentParserContext.ParsedExpression = ReadFromTokens(Tokenize(input));
+      CurrentParserContext.LastError = null;
     } catch (ScriptError e) {
-      _currentParserContext.LastError = e.Message;
-      _currentParserContext.ParsedExpression = null;
+      CurrentParserContext.LastError = e.Message;
+      CurrentParserContext.ParsedExpression = null;
       return false;
     } finally {
-      _currentParserContext = null;
+      CurrentParserContext = null;
     }
     return true;
   }
@@ -36,16 +38,14 @@ class ExpressionParser {
       throw new InvalidOperationException("Parser context is not initialized");
     }
     try {
-      _currentParserContext = parserContext;
-      return _currentParserContext.ParsedExpression.Describe();
+      CurrentParserContext = parserContext;
+      return CurrentParserContext.ParsedExpression.Describe();
     } finally {
-      _currentParserContext = null;
+      CurrentParserContext = null;
     }
   }
 
   static readonly Regex OperatorNameRegex = new(@"^\[a-zA-Z]+$");
-  ParserContext _currentParserContext;
-
   readonly ScriptingService _scriptingService;
 
   internal readonly ILoc Loc;
@@ -58,20 +58,20 @@ class ExpressionParser {
   }
 
   internal ActionDef GetActionDefinition(string actionName) {
-    return _scriptingService.GetActionDefinition(actionName, _currentParserContext.ScriptHost);
+    return _scriptingService.GetActionDefinition(actionName, CurrentParserContext.ScriptHost);
   }
 
   internal Action<ScriptValue[]> GetActionExecutor(string actionName) {
-    return _scriptingService.GetActionExecutor(actionName, _currentParserContext.ScriptHost);
+    return _scriptingService.GetActionExecutor(actionName, CurrentParserContext.ScriptHost);
   }
 
   internal SignalDef GetSignalDefinition(string signalName) {
-    return _scriptingService.GetSignalDefinition(signalName, _currentParserContext.ScriptHost);
+    return _scriptingService.GetSignalDefinition(signalName, CurrentParserContext.ScriptHost);
   }
 
   internal Func<ScriptValue> GetSignalSource(string name) {
-    _currentParserContext.ReferencedSignals.Add(name);
-    return _scriptingService.GetSignalSource(name, _currentParserContext.ScriptHost);
+    CurrentParserContext.ReferencedSignals.Add(name);
+    return _scriptingService.GetSignalSource(name, CurrentParserContext.ScriptHost);
   }
 
   Queue<string> Tokenize(string input) {

@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using IgorZ.TimberDev.UI;
 
 namespace IgorZ.Automation.ScriptingEngine;
@@ -11,12 +12,9 @@ public sealed record ValueDef {
   /// <summary>The type of the argument.</summary>
   public ScriptValue.TypeEnum ValueType { get; init; }
 
-  /// <summary>Optional formatting string.</summary>
-  /// <remarks>
-  /// Should be a one-argument formatting string, for example, "value={0.##}". If omitted, then simple "ToString" will
-  /// be used to produce a string value.
-  /// </remarks>
-  public string Format { get; init; }
+  /// <summary>Optional formatting function for the number type of the constant value.</summary>
+  /// <remarks>If not provided, then the value is transformed to float and formatted with "0.##".</remarks>
+  public Func<int, string> FormatNumber { get; init; }
 
   /// <summary>Optional list of pre-defined values for the argument.</summary>
   public DropdownItem<string>[] Options { get; init; }
