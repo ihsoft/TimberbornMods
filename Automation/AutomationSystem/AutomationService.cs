@@ -4,8 +4,6 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using IgorZ.Automation.ScriptingEngine;
-using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.Automation.Tools;
 using Timberborn.BaseComponentSystem;
 using Timberborn.Localization;
@@ -29,11 +27,9 @@ public sealed class AutomationService : IPostLoadableSingleton {
 
   #endregion
 
-  AutomationService(EventBus eventBus, Highlighter highlighter, BaseInstantiator baseInstantiator,
-                    ExpressionParser expressionParser, ScriptingService scriptingService, ILoc loc) {
+  AutomationService(EventBus eventBus, Highlighter highlighter, BaseInstantiator baseInstantiator, ILoc loc) {
     EventBus = eventBus;
     BaseInstantiator = baseInstantiator;
-    ExpressionParser = expressionParser;
     Loc = loc;
     eventBus.Register(this);
     _highlighter = highlighter;
@@ -53,9 +49,6 @@ public sealed class AutomationService : IPostLoadableSingleton {
 
   /// <summary>Shortcut to the localizator.</summary>
   public readonly ILoc Loc;
-
-  /// <summary>Shortcut to the expression parser.</summary>
-  internal readonly ExpressionParser ExpressionParser;
 
   /// <summary>Shortcut to EventBus.</summary>
   public readonly EventBus EventBus;

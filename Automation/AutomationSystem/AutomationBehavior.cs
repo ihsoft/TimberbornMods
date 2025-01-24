@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Bindito.Core;
 using IgorZ.Automation.Actions;
-using IgorZ.Automation.ScriptingEngine;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.EntitySystem;
@@ -25,9 +24,6 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
   /// <summary>Shortcut to the <see cref="AutomationService"/>.</summary>
   // ReSharper disable once MemberCanBePrivate.Global
   public AutomationService AutomationService { get; private set; }
-
-  /// <summary>Shortcut to the <see cref="ScriptingService"/>.</summary>
-  public ScriptingService ScriptingService { get; private set; }
 
   /// <summary>Shortcut to the <see cref="ILoc"/>.</summary>
   public ILoc Loc => AutomationService.Loc;
@@ -102,7 +98,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
 
   /// <summary>Removes all rules that depend on condition and/or action that is marked for cleanup.</summary>
   public void CollectCleanedRules() {
-    for (int i = _actions.Count - 1; i >= 0; i--) {
+    for (var i = _actions.Count - 1; i >= 0; i--) {
       var action = _actions[i];
       if (action.IsMarkedForCleanup || action.Condition.IsMarkedForCleanup) {
         HostedDebugLog.Fine(this, "Cleaning up action: {0}", action);
@@ -162,9 +158,8 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
 
   /// <summary>Injects the dependencies. It has to be public to work.</summary>
   [Inject]
-  public void InjectDependencies(AutomationService automationService, ScriptingService scriptingService) {
+  public void InjectDependencies(AutomationService automationService) {
     AutomationService = automationService;
-    ScriptingService = scriptingService;
   }
 
   void Awake() {

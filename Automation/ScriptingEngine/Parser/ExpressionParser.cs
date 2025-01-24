@@ -11,10 +11,16 @@ using Timberborn.Localization;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
-class ExpressionParser {
+/// <summary>Parser for the expressions in the scripting engine.</summary>
+sealed class ExpressionParser {
 
+  #region API
+
+  /// <summary>Current parser context.</summary>
+  /// <remarks>It is set during parsing an expression or building a descriptions.</remarks>
   public ParserContext CurrentParserContext { get; private set; }
 
+  /// <summary>Parses expression for the given context.</summary>
   public bool Parse(string input, ParserContext parserContext) {
     if (parserContext.ReferencedSignals.Count > 0 || parserContext.ParsedExpression != null) {
       throw new InvalidOperationException("Parser context is already in use");
@@ -33,6 +39,7 @@ class ExpressionParser {
     return true;
   }
 
+  /// <summary>Builds a human-readable description for the parsed expression.</summary>
   public string GetDescription(ParserContext parserContext) {
     if (parserContext.ParsedExpression == null) {
       throw new InvalidOperationException("Parser context is not initialized");
@@ -44,6 +51,10 @@ class ExpressionParser {
       CurrentParserContext = null;
     }
   }
+
+  #endregion
+
+  #region Implementation
 
   static readonly Regex OperatorNameRegex = new(@"^\[a-zA-Z]+$");
   readonly ScriptingService _scriptingService;
@@ -74,7 +85,7 @@ class ExpressionParser {
     return _scriptingService.GetSignalSource(name, CurrentParserContext.ScriptHost);
   }
 
-  Queue<string> Tokenize(string input) {
+  static Queue<string> Tokenize(string input) {
     if (input == null) {
       throw new ArgumentNullException(nameof(input));
     }
@@ -85,7 +96,7 @@ class ExpressionParser {
     return new Queue<string>(tokens);
   }
 
-  IExpression ReadFromTokens(Queue<string> tokens) {
+  static IExpression ReadFromTokens(Queue<string> tokens) {
     if (!tokens.Any()) {
       throw new ScriptError("Unexpected EOF while reading expression");
     }
@@ -121,4 +132,6 @@ class ExpressionParser {
     }
     return ConstantValueExpr.TryCreateFrom(token) ?? new SymbolExpr { Value = token };
   }
+
+  #endregion
 }

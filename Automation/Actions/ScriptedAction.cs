@@ -102,7 +102,7 @@ sealed class ScriptedAction : AutomationActionBase {
     _parserParserContext = new ParserContext {
         ScriptHost = Behavior,
     };
-    var res = Behavior.AutomationService.ExpressionParser.Parse(Expression, _parserParserContext);
+    var res = ExpressionParser.Instance.Parse(Expression, _parserParserContext);
     if (!res) {
       HostedDebugLog.Error(
           Behavior, "Failed to parse action: {0}\nError: {1}", Expression, _parserParserContext.LastError);

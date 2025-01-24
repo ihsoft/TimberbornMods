@@ -4,6 +4,7 @@
 
 using System;
 using IgorZ.Automation.AutomationSystem;
+using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.Localization;
 using Timberborn.Persistence;
@@ -36,7 +37,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
   /// <inheritdoc/>
   protected override void OnBehaviorToBeCleared() {
     foreach (var signal in _parserParserContext.ReferencedSignals) {
-      Behavior.ScriptingService.UnregisterSignalChangeCallback(signal, CheckOperands);
+      ScriptingService.Instance.UnregisterSignalChangeCallback(signal, CheckOperands);
     }
   }
 
@@ -102,7 +103,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
     _parserParserContext = new ParserContext {
         ScriptHost = Behavior,
     };
-    var res = Behavior.AutomationService.ExpressionParser.Parse(Expression, _parserParserContext);
+    var res = ExpressionParser.Instance.Parse(Expression, _parserParserContext);
     if (!res) {
       HostedDebugLog.Error(
           Behavior, "Failed to parse condition: {0}\nError: {1}", Expression, _parserParserContext.LastError);
@@ -119,7 +120,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
     var description = ExpressionParser.Instance.GetDescription(_parserParserContext);
     _uiDescription = TextColors.ColorizeText($"<SolidHighlight>{description}</SolidHighlight>");
     foreach (var signal in _parserParserContext.ReferencedSignals) {
-      Behavior.ScriptingService.RegisterSignalChangeCallback(signal, CheckOperands);
+      ScriptingService.Instance.RegisterSignalChangeCallback(signal, CheckOperands);
     }
   }
 
