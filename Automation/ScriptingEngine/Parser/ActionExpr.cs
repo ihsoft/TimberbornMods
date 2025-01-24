@@ -22,10 +22,10 @@ sealed class ActionExpr : AbstractOperandExpr {
   public override string Describe() {
     var def = ExpressionParser.Instance.GetActionDefinition(ActionName);
     var args = new List<object>();
-    for (var i = 0; i < def.ArgumentTypes.Length; i++) {
+    for (var i = 0; i < def.Arguments.Length; i++) {
       var argValue = Operands[i + 1];
       if (argValue is ConstantValueExpr constantValueExpr) {
-        args.Add(constantValueExpr.FormatValue(def.ArgumentTypes[i]));
+        args.Add(constantValueExpr.FormatValue(def.Arguments[i]));
       } else {
         args.Add(argValue.Describe());
       }
@@ -41,14 +41,14 @@ sealed class ActionExpr : AbstractOperandExpr {
     }
     var actionName = symbol.Value;
     var def = ExpressionParser.Instance.GetActionDefinition(actionName);
-    AsserNumberOfOperandsExact(def.ArgumentTypes.Length + 1);
-    var argValues = new Func<ScriptValue>[def.ArgumentTypes.Length];
-    for (var i = 0; i < def.ArgumentTypes.Length; i++) {
+    AsserNumberOfOperandsExact(def.Arguments.Length + 1);
+    var argValues = new Func<ScriptValue>[def.Arguments.Length];
+    for (var i = 0; i < def.Arguments.Length; i++) {
       var operand = Operands[i + 1];
       if (operand is not IValueExpr valueExpr) {
         throw new ScriptError($"Operand #{i + 1} must be a value: {operand}");
       }
-      var argDef = def.ArgumentTypes[i];
+      var argDef = def.Arguments[i];
       if (argDef.ValueType != valueExpr.ValueType) {
         throw new ScriptError($"Incompatible argument type #{i + 1}: {valueExpr.ValueType} is not {argDef.ValueType}");
       }

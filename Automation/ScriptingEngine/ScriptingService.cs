@@ -11,6 +11,7 @@ using Timberborn.SingletonSystem;
 
 namespace IgorZ.Automation.ScriptingEngine;
 
+/// <summary>Service that provides access to the scripting engine.</summary>
 public sealed class ScriptingService : ILoadableSingleton {
 
   #region API

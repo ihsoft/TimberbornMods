@@ -49,16 +49,16 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   #region Actions
 
   ActionDef SetHeightActionDef => _setHeightActionDef ??= new ActionDef {
-      FullName = SetHeightActionName,
+      ScriptName = SetHeightActionName,
       DisplayName = Loc.T(SetHeightActionLocKey),
-      ArgumentTypes = [
-          new ArgumentDef {
+      Arguments = [
+          new ValueDef {
               ValueType = ScriptValue.TypeEnum.Number,
               Format = "0.00",
           },
       ],
   };
-  ActionDef? _setHeightActionDef;
+  ActionDef _setHeightActionDef;
 
   static void SetHeight(Floodgate floodgate, ScriptValue[] args) {
     AssertActionArgsCount(SetHeightActionName, args, 1);

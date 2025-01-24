@@ -34,7 +34,7 @@ sealed class BinaryOperatorExpr : BoolOperatorExpr {
     });
     if (Right is ConstantValueExpr constantValueExpr) {
       var def = ExpressionParser.Instance.GetSignalDefinition(Left.SignalName);
-      sb.Append(constantValueExpr.FormatValue(def.ResultType));
+      sb.Append(constantValueExpr.FormatValue(def.Result));
     } else {
       sb.Append(Right.Describe());
     }

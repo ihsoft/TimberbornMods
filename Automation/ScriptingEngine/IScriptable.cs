@@ -7,6 +7,7 @@ using Timberborn.BaseComponentSystem;
 
 namespace IgorZ.Automation.ScriptingEngine;
 
+/// <summary>Interface for a component that can be used in the scripting engine.</summary>
 public interface IScriptable {
   /// <summary>The name of the scriptable component.</summary>
   public string Name { get; }
@@ -14,7 +15,7 @@ public interface IScriptable {
   /// <summary>The type of the component that this scriptable works on. Global scriptables can have it NULL.</summary>
   public Type InstanceType { get; }
 
-  /// <summary>Returns the names of singals that the specified building provides.</summary>
+  /// <summary>Return the names of signals that the specified building provides.</summary>
   /// <remarks>It is an expensive call. Don't execute it in the tick handlers.</remarks>
   public string[] GetSignalNamesForBuilding(BaseComponent building);
 
@@ -30,7 +31,7 @@ public interface IScriptable {
   /// <param name="building">
   /// The component on which the action is to be executed. It must be of type <see cref="InstanceType"/>.
   /// </param>
-  /// <exception cref="ScriptError">if signal is not found.</exception>
+  /// <exception cref="ScriptError">if the signal is not found.</exception>
   public SignalDef GetSignalDefinition(string name, BaseComponent building);
 
   /// <summary>Returns the names of actions that can be executed on the specified building.</summary>

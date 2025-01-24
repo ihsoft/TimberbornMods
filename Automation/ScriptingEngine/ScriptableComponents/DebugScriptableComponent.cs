@@ -38,15 +38,7 @@ class DebugScriptableComponent : ScriptableComponentBase {
   /// <inheritdoc/>
   public override ActionDef GetActionDefinition(string name, BaseComponent instance) {
     return name switch {
-        LogActionName => new ActionDef {
-            FullName = LogActionName,
-            DisplayName = LogActionLocKey,
-            ArgumentTypes = [
-                new ArgumentDef {
-                    ValueType = ScriptValue.TypeEnum.String,
-                },
-            ],
-        },
+        LogActionName => LogActionDef,
         _ => throw new ScriptError("Unknown action: " + name),
     };
   }
@@ -54,6 +46,17 @@ class DebugScriptableComponent : ScriptableComponentBase {
   #endregion
 
   #region Actions
+
+  ActionDef LogActionDef => _logActionDef ??= new ActionDef {
+      ScriptName = LogActionName,
+      DisplayName = Loc.T(LogActionLocKey),
+      Arguments = [
+          new ValueDef {
+              ValueType = ScriptValue.TypeEnum.String,
+          },
+      ],
+  };
+  ActionDef _logActionDef;
 
   static void LogAction(BaseComponent instance, ScriptValue[] args) {
     AssertActionArgsCount(LogActionName, args, 1);

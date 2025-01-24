@@ -4,17 +4,28 @@
 
 namespace IgorZ.Automation.ScriptingEngine;
 
-public sealed class ScriptValue {
+/// <summary>Value that can be passed around in the scripting engine.</summary>
+public record ScriptValue {
+  /// <summary>Type of the value.</summary>
   public enum TypeEnum {
+    /// <summary>
+    /// An integer that represents a 2-digit fixed precision float. For example, "1.5f" would be represented as "150".
+    /// </summary>
     Number,
+
+    /// <summary>A string value.</summary>
     String,
   }
+
+  /// <summary>Value type.</summary>
   public TypeEnum ValueType => _number.HasValue ? TypeEnum.Number : TypeEnum.String;
 
+  /// <summary>Creates a new value that represents a string literal.</summary>
   public static ScriptValue Of(string literal) {
     return new ScriptValue { _string = literal };
   }
 
+  /// <summary>Creates a new value that represents a number. It is a 2-digit fixed precision float.</summary>
   public static ScriptValue Of(int number) {
     return new ScriptValue { _number = number };
   }
@@ -42,6 +53,7 @@ public sealed class ScriptValue {
     }
   }
 
+  /// <inheritdoc/>
   public override string ToString() {
     return ValueType switch {
         TypeEnum.Number => $"ScriptValue#Number:{AsNumber.ToString()}",

@@ -26,15 +26,15 @@ sealed class ConstantValueExpr : IValueExpr {
     return null;
   }
 
-  public string FormatValue(ArgumentDef argumentDef) {
+  public string FormatValue(ValueDef valueDef) {
     if (ValueType == ScriptValue.TypeEnum.String) {
-      var text = argumentDef.Options != null
-          ? argumentDef.Options.FirstOrDefault(x => x.Value == ValueFn().AsString).Text
+      var text = valueDef.Options != null
+          ? valueDef.Options.FirstOrDefault(x => x.Value == ValueFn().AsString).Text
           : "";
       return text != "" ? text : Describe();
     }
     var value = ValueFn().AsNumber / 100f;
-    return value.ToString(argumentDef.Format ?? "0.##");
+    return value.ToString(valueDef.Format ?? "0.##");
   }
 
   /// <inheritdoc/>

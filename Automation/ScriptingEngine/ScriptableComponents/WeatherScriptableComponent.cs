@@ -43,18 +43,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
   /// <inheritdoc/>
   public override SignalDef GetSignalDefinition(string name, BaseComponent _) {
     return name switch {
-        SeasonSignalName => new SignalDef {
-            FullName = SeasonSignalName,
-            DisplayName = Loc.T(SeasonSignalLocKey),
-            ResultType = new ArgumentDef {
-                ValueType = ScriptValue.TypeEnum.String,
-                Options = [
-                    (TemperateSeason, Loc.T("Weather.Temperate")),
-                    (DroughtSeason, Loc.T("Weather.Drought")),
-                    (BadTideSeason, Loc.T("Weather.Badtide")),
-                ],
-            },
-        },
+        SeasonSignalName => SeasonSignalDef,
         _ => throw new ScriptError("Unknown signal: " + name)
     };
   }
@@ -66,16 +55,37 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
 
   #endregion
 
+  #region Signals
+
+  SignalDef SeasonSignalDef => _seasonSignalDef ??= new SignalDef {
+      ScriptName = SeasonSignalName,
+      DisplayName = Loc.T(SeasonSignalLocKey),
+      Result = new ValueDef {
+          ValueType = ScriptValue.TypeEnum.String,
+          Options = [
+              (TemperateSeason, Loc.T("Weather.Temperate")),
+              (DroughtSeason, Loc.T("Weather.Drought")),
+              (BadTideSeason, Loc.T("Weather.Badtide")),
+          ],
+      },
+  };
+  SignalDef _seasonSignalDef;
+
+  #endregion
+
   #region Implementation
 
   readonly WeatherService _weatherService;
   readonly HazardousWeatherService _hazardousWeatherService;
+
+  string _currentSeason;
 
   WeatherScriptableComponent(
       EventBus eventBus, WeatherService weatherService, HazardousWeatherService hazardousWeatherService) {
     _weatherService = weatherService;
     _hazardousWeatherService = hazardousWeatherService;
     eventBus.Register(this);
+    _currentSeason = GetCurrentSeason();
   }
 
   /// <summary>
@@ -97,8 +107,6 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
   #endregion
 
   #region Event listeners
-
-  string _currentSeason;
 
   [OnEvent]
   public void OnHazardousWeatherStartedEvent(HazardousWeatherStartedEvent @event) {
