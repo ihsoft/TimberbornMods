@@ -170,13 +170,14 @@ public sealed class UiFactory {
   }
 
   /// <summary>Creates a button in a theme suitable for the right side panel.</summary>
-  /// <param name="locKey">Loc key for the игеещт caption.</param>
+  /// <param name="locKey">Loc key for the caption.</param>
   /// <param name="onClickFn">Callback to call when the button is clicked.</param>
   /// <param name="padding">
   /// Optional padding around the button text. If not set, then <see cref="StandardButtonPadding"/> will be used.
   /// </param>
   public Button CreateButton(string locKey, Action onClickFn, Padding? padding = null) {
-    var button = UiBuilder.Create<GameButton>().SetLocKey(locKey)
+    var button = UiBuilder.Create<GameButton>()
+        .SetLocKey(locKey)
         .ModifyRoot(builder => builder.SetPadding(padding ?? StandardButtonPadding))
         .BuildAndInitialize();
     button.clicked += onClickFn;
