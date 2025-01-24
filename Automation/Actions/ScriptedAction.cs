@@ -28,9 +28,19 @@ sealed class ScriptedAction : AutomationActionBase {
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
-    //FIXME: parse te scriptable anme and check rtestricted type if any.
-    return true;
+    if (_lastValidatedBehavior == behavior) {
+      return _lastValidationResult;
+    }
+    _lastValidatedBehavior = behavior;
+    _parserParserContext = new ParserContext {
+      ScriptHost = behavior,
+    };
+    _lastValidationResult = ExpressionParser.Instance.Parse(Expression, _parserParserContext);
+    return _lastValidationResult;
   }
+
+  AutomationBehavior _lastValidatedBehavior;
+  bool _lastValidationResult;
 
   /// <inheritdoc/>
   public override void OnConditionState(IAutomationCondition automationCondition) {

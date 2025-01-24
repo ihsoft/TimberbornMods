@@ -48,9 +48,19 @@ sealed class ScriptedCondition : AutomationConditionBase {
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
-    //FIXME: somehow check condition?
-    return true;
+    if (_lastValidatedBehavior == behavior) {
+      return _lastValidationResult;
+    }
+    _lastValidatedBehavior = behavior;
+    _parserParserContext = new ParserContext {
+      ScriptHost = behavior,
+    };
+    _lastValidationResult = ExpressionParser.Instance.Parse(Expression, _parserParserContext);
+    return _lastValidationResult;
   }
+
+  AutomationBehavior _lastValidatedBehavior;
+  bool _lastValidationResult;
 
   #endregion
 
