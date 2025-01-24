@@ -17,7 +17,7 @@ sealed class ConstantValueExpr : IValueExpr {
       var literal = token.Substring(1, token.Length - 2);
       return new ConstantValueExpr { ValueType = ScriptValue.TypeEnum.String, ValueFn = () => ScriptValue.Of(literal) };
     }
-    if (token[0] >= '0' && token[0] <= '9') {
+    if (token[0] >= '0' && token[0] <= '9' || token[0] == '-') {
       if (!int.TryParse(token, out var number)) {
         throw new ScriptError($"Invalid number literal: {token}");
       }
