@@ -6,6 +6,7 @@ using System;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.BaseComponentSystem;
 using Timberborn.WaterBuildings;
+using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
@@ -22,16 +23,16 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   public override string Name => "Floodgate";
 
   /// <inheritdoc/>
-  public override Type InstanceType => typeof(Floodgate);
-
-  /// <inheritdoc/>
   public override string[] GetActionNamesForBuilding(BaseComponent building) {
-    return [SetHeightActionName];
+    return building.GetComponentFast<Floodgate>() ? [SetHeightActionName] : [];
   }
 
   /// <inheritdoc/>
-  public override Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent instance) {
-    var floodgate = instance as Floodgate;
+  public override Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
+    var floodgate = building.GetComponentFast<Floodgate>();
+    if (!floodgate) {
+      throw new ScriptError("Floodgate component not found");
+    }
     return name switch {
         SetHeightActionName => args => SetHeight(floodgate, args),
         _ => throw new ScriptError("Unknown action: " + name),
@@ -39,7 +40,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   }
 
   /// <inheritdoc/>
-  public override ActionDef GetActionDefinition(string name, BaseComponent instance) {
+  public override ActionDef GetActionDefinition(string name, BaseComponent _) {
     return name switch {
         SetHeightActionName => SetHeightActionDef,
         _ => throw new ScriptError("Unknown action: " + name),

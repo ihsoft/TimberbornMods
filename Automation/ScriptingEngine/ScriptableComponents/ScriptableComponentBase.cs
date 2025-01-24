@@ -19,9 +19,6 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
   public abstract string Name { get; }
 
   /// <inheritdoc/>
-  public abstract Type InstanceType { get; }
-
-  /// <inheritdoc/>
   public virtual string[] GetSignalNamesForBuilding(BaseComponent building) => [];
 
   /// <inheritdoc/>
@@ -38,12 +35,12 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
   public virtual string[] GetActionNamesForBuilding(BaseComponent building) => [];
 
   /// <inheritdoc/>
-  public virtual Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent instance) {
+  public virtual Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
     throw new NotImplementedException();
   }
 
   /// <inheritdoc/>
-  public virtual ActionDef GetActionDefinition(string name, BaseComponent instance) {
+  public virtual ActionDef GetActionDefinition(string name, BaseComponent building) {
     throw new NotImplementedException();
   }
 

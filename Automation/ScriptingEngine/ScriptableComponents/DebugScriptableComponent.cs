@@ -20,23 +20,20 @@ class DebugScriptableComponent : ScriptableComponentBase {
   public override string Name => "Debug";
 
   /// <inheritdoc/>
-  public override Type InstanceType => null;
-
-  /// <inheritdoc/>
-  public override string[] GetActionNamesForBuilding(BaseComponent building) {
+  public override string[] GetActionNamesForBuilding(BaseComponent _) {
     return [LogActionName];
   }
 
   /// <inheritdoc/>
-  public override Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent instance) {
+  public override Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
     return name switch {
-        LogActionName => args => LogAction(instance, args),
+        LogActionName => args => LogAction(building, args),
         _ => throw new ScriptError("Unknown action: " + name),
     };
   }
 
   /// <inheritdoc/>
-  public override ActionDef GetActionDefinition(string name, BaseComponent instance) {
+  public override ActionDef GetActionDefinition(string name, BaseComponent _) {
     return name switch {
         LogActionName => LogActionDef,
         _ => throw new ScriptError("Unknown action: " + name),

@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Timberborn.BaseComponentSystem;
 using Timberborn.SingletonSystem;
 
@@ -35,19 +34,23 @@ public sealed class ScriptingService : ILoadableSingleton {
   /// <exception cref="ScriptError">if the signal is not found.</exception>
   public Func<ScriptValue> GetSignalSource(string name, BaseComponent building) {
     var nameItems = name.Split('.');
-    var (scriptable, instance) = GetScriptable(nameItems[0], building);
-    return scriptable.GetSignalSource(name, instance);
+    if (!_registedScriptables.TryGetValue(nameItems[0], out var scriptable)) {
+      throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
+    }
+    return scriptable.GetSignalSource(name, building);
   }
 
   /// <summary>Returns a signal definition by its name.</summary>
   /// <exception cref="ScriptError">if the signal is not found.</exception>
   public SignalDef GetSignalDefinition(string name, BaseComponent building) {
     var nameItems = name.Split('.');
-    var (scriptable, instance) = GetScriptable(nameItems[0], building);
-    return scriptable.GetSignalDefinition(name, instance);
+    if (!_registedScriptables.TryGetValue(nameItems[0], out var scriptable)) {
+      throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
+    }
+    return scriptable.GetSignalDefinition(name, building);
   }
 
-  /// <summary>Registers a callback that is called when the signal value changes.</summary>
+  /// <summary>Registers a callback called when the signal value changes.</summary>
   /// <param name="name">The name of the signal.</param>
   /// <param name="onValueChanged">The callback that is called when the signal value changes.</param>
   public void RegisterSignalChangeCallback(string name, Action onValueChanged) {
@@ -80,35 +83,32 @@ public sealed class ScriptingService : ILoadableSingleton {
 
   /// <summary>Returns an executor that executes the specified action with the provided arguments.</summary>
   /// <param name="name">The name of the action.</param>
-  /// <param name="building">
-  /// The building on which the action is to be executed. It must have the component that the action is bound to.
-  /// See <see cref="IScriptable.InstanceType"/>.
-  /// </param>
+  /// <param name="building">The building on which the action is to be executed.</param>
   /// <exception cref="ScriptError">if action is not found.</exception>
   public Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
     var nameItems = name.Split('.');
-    var (scriptable, instance) = GetScriptable(nameItems[0], building);
-    return scriptable.GetActionExecutor(name, instance);
+    if (!_registedScriptables.TryGetValue(nameItems[0], out var scriptable)) {
+      throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
+    }
+    return scriptable.GetActionExecutor(name, building);
   }
 
   /// <summary>Returns the definition of the action by its name.</summary>
   /// <param name="name">The name of the action.</param>
-  /// <param name="building">
-  /// The building on which the action is to be executed. It must have the component that the action is bound to.
-  /// See <see cref="IScriptable.InstanceType"/>.
-  /// </param>
+  /// <param name="building">The building on which the action is to be executed.</param>
   /// <exception cref="ScriptError">if action is not found.</exception>
   public ActionDef GetActionDefinition(string name, BaseComponent building) {
     var nameItems = name.Split('.');
-    var (scriptable, instance) = GetScriptable(nameItems[0], building);
-    return scriptable.GetActionDefinition(name, instance);
+    if (!_registedScriptables.TryGetValue(nameItems[0], out var scriptable)) {
+      throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
+    }
+    return scriptable.GetActionDefinition(name, building);
   }
 
   /// <summary>Returns all signal names for the specified building.</summary>
   /// <remarks>This can be an expensive call. Avoid making it in the ticks.</remarks>
   public string[] GetSignalNamesForBuilding(BaseComponent building) {
     return _registedScriptables.Values
-        .Where(s => s.InstanceType == null || TryGetComponentFast(building, s.InstanceType, out _))
         .SelectMany(s => s.GetSignalNamesForBuilding(building))
         .ToArray();
   }
@@ -117,27 +117,8 @@ public sealed class ScriptingService : ILoadableSingleton {
   /// <remarks>This can be an expensive call. Avoid making it in the ticks.</remarks>
   public string[] GetActionNamesForBuilding(BaseComponent building) {
     return _registedScriptables.Values
-        .Where(s => s.InstanceType == null || TryGetComponentFast(building, s.InstanceType, out _))
         .SelectMany(s => s.GetActionNamesForBuilding(building))
         .ToArray();
-  }
-
-  /// <summary>Returns a component of the specified type from the building.</summary>
-  /// <remarks>It is a counter-part to the <see cref="BaseComponent.GetComponentFast{T}"/>.</remarks>
-  public static BaseComponent GetComponentFast(BaseComponent building, Type type) {
-    var genericMethodInfo = _getComponentFastMethod.MakeGenericMethod(type);
-    var component = genericMethodInfo.Invoke(building, []) as BaseComponent;
-    if (!component) {
-      throw new ScriptError($"The building doesn't have component: " + type);
-    }
-    return component;
-  }
-
-  /// <summary>Returns a component of the specified type from the building.</summary>
-  public static bool TryGetComponentFast(BaseComponent building, Type type, out BaseComponent component) {
-    var genericMethodInfo = _getComponentFastMethod.MakeGenericMethod(type);
-    component = genericMethodInfo.Invoke(building, []) as BaseComponent;
-    return component;
   }
 
   #endregion
@@ -154,29 +135,8 @@ public sealed class ScriptingService : ILoadableSingleton {
   readonly Dictionary<string, IScriptable> _registedScriptables = [];
   readonly Dictionary<string, List<Action>> _signalChangeCallbacks = new();
 
-  static MethodInfo _getComponentFastMethod = typeof(BaseComponent).GetMethod(
-      nameof(BaseComponent.GetComponentFast), BindingFlags.Instance | BindingFlags.Public);
-
   ScriptingService() {
     Instance = this;
-    _getComponentFastMethod = typeof(BaseComponent).GetMethod(
-        nameof(BaseComponent.GetComponentFast), BindingFlags.Instance | BindingFlags.Public);
-    if (_getComponentFastMethod == null) {
-      throw new ScriptError("Cannot find GetComponentFast method in BaseComponent");
-    }
-  }
-
-  (IScriptable, BaseComponent) GetScriptable(string name, BaseComponent building) {
-    if (!_registedScriptables.TryGetValue(name, out var scriptable)) {
-      throw new ScriptError("Unknown scriptable component: " + name);
-    }
-    if (scriptable.InstanceType != null) {
-      building = GetComponentFast(building, scriptable.InstanceType);
-      if (!building) {
-        throw new ScriptError("The building doesn't have component: " + scriptable.InstanceType.FullName);
-      }
-    }
-    return (scriptable, building);
   }
 
   #endregion

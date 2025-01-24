@@ -25,9 +25,6 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase {
   public override string Name => "Weather";
 
   /// <inheritdoc/>
-  public override Type InstanceType => null;
-
-  /// <inheritdoc/>
   public override string[] GetSignalNamesForBuilding(BaseComponent _) {
     return [SeasonSignalName]; 
   }
