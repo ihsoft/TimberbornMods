@@ -10,8 +10,8 @@
     "TemplateFamilyName": "Water.FloodgateManagement-badtide",
     "Rules": [
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BadtideStartedCondition" },
-        "Action": { "TypeId": "IgorZ.Automation.Actions.SetFloodgateHeightAction", "StepsDown": 100 }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition", "Expression": "(eq (sig Weather.Season) 'badtide')" },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.ScriptedAction", "Expression": "(act Floodgate.SetHeight 0)" }
       },
     ]
   }

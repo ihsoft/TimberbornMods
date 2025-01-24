@@ -10,8 +10,8 @@
     "TemplateFamilyName": "Water.FloodgateManagement-drought",
     "Rules": [
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.DroughtStartedCondition" },
-        "Action": { "TypeId": "IgorZ.Automation.Actions.SetFloodgateHeightAction", "StepsDown": 100 }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition", "Expression": "(eq (sig Weather.Season) 'drought')" },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.ScriptedAction", "Expression": "(act Floodgate.SetHeight 0)" }
       },
     ]
   }
