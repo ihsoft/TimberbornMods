@@ -89,11 +89,44 @@ sealed class ExpressionParser {
     if (input == null) {
       throw new ArgumentNullException(nameof(input));
     }
-    var source = input.Replace("(", " ( ").Replace(")", " ) ");
-    var tokens = Regex.Matches(source, "['].+?[']|[^ ]+")
-        .Cast<Match>()
-        .Select(m => m.Value);
-    return new Queue<string>(tokens);
+    var currentPos = 0;
+    var tokens = new Queue<string>();
+    while (currentPos < input.Length) {
+      // Skip the leading spaces.
+      if (input[currentPos] == ' ') {
+        while (currentPos < input.Length && input[currentPos] == ' ') {
+          currentPos++;
+        }
+        continue;
+      }
+
+      // Capture the string literal.
+      if (input[currentPos] == '\'') {
+        var literalEndPos = input.IndexOf('\'', currentPos + 1);
+        if (literalEndPos == -1) {
+          throw new ScriptError("Unmatched quote");
+        }
+        tokens.Enqueue(input.Substring(currentPos, literalEndPos - currentPos + 1));
+        currentPos = literalEndPos + 1;
+        continue;
+      }
+
+      // Capture the statment separator.
+      if (input[currentPos] == '(' || input[currentPos] == ')') {
+        tokens.Enqueue(input.Substring(currentPos, 1));
+        currentPos++;
+        continue;
+      }
+      
+      // Capture the token.
+      var tokenEndPos = currentPos + 1;
+      while (tokenEndPos < input.Length && input[tokenEndPos] != ' ' && input[tokenEndPos] != '(' && input[tokenEndPos] != ')') {
+        tokenEndPos++;
+      }
+      tokens.Enqueue(input.Substring(currentPos, tokenEndPos - currentPos));
+      currentPos = tokenEndPos;
+    }
+    return tokens;
   }
 
   static IExpression ReadFromTokens(Queue<string> tokens) {
@@ -126,9 +159,6 @@ sealed class ExpressionParser {
         throw new ScriptError("Unknown operator: " + operatorName);
       }
       return result;
-    }
-    if (token == ")") {
-      throw new ScriptError("Unexpected ')' while reading expression");
     }
     return ConstantValueExpr.TryCreateFrom(token) ?? new SymbolExpr { Value = token };
   }
