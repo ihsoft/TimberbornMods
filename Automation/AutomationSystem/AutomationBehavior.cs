@@ -45,7 +45,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
   public bool HasActions => _actions.Count > 0;
 
   /// <summary>All actions on the building.</summary>
-  public IEnumerable<IAutomationAction> Actions => _actions.AsReadOnly();
+  public IList<IAutomationAction> Actions => _actions.AsReadOnly();
   List<IAutomationAction> _actions = [];
 
   #region API
