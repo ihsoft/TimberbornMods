@@ -122,9 +122,9 @@ class RulesEditorDialog : IPostLoadableSingleton {
 
   const int TestScriptStatusHighlightDurationMs = 1000;
 
+  readonly List<RuleDefinition> _pendingEditorRules = [];
   VisualElement _ruleRowsContainer;
   AutomationBehavior _activeBuilding;
-  List<RuleDefinition> _pendingEditorRules = [];
   Button _confirmButton;
 
   RulesEditorDialog(UiFactory uiFactory, ITooltipRegistrar tooltipRegistrar) {
@@ -133,7 +133,7 @@ class RulesEditorDialog : IPostLoadableSingleton {
   }
 
   void AddScript() {
-    var rule = new RuleDefinition();
+    var rule = new RuleDefinition { ConditionExpression = "", ActionExpression = "" };
     Rules.Add(rule);
     var ruleRow = MakeRuleRow();
     _ruleRowsContainer.Add(ruleRow);
