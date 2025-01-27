@@ -2,20 +2,16 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System;
 using System.Collections.Generic;
 using System.Text;
 using IgorZ.Automation.Actions;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.Conditions;
-using IgorZ.Automation.ScriptingEngine;
-using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.Automation.ScriptingEngineUI;
 using IgorZ.TimberDev.UI;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
-using Unity.Burst;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -36,7 +32,6 @@ sealed class AutomationFragment : IEntityPanelFragment {
   Label _caption;
   Label _rulesList;
   Button _addRulesButton;
-  Button _editRulesButton;
   Button _addTestRuleButton;
 
   AutomationBehavior _automationBehavior;
@@ -86,7 +81,6 @@ sealed class AutomationFragment : IEntityPanelFragment {
     _root.ToggleDisplayStyle(visible: true);
     _caption.ToggleDisplayStyle(_automationBehavior.HasActions);
     _rulesList.ToggleDisplayStyle(_automationBehavior.HasActions);
-    _addRulesButton.ToggleDisplayStyle(!_automationBehavior.HasActions);
     if (!_automationBehavior.HasActions) {
       _addRulesButton.text = _uiFactory.T(AddRulesBtnCaptionLocKey);
       return;
@@ -119,26 +113,42 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
   void AddTestRule() {
     var condition = new ScriptedCondition();
-    //condition.SetExpression("(and (eq (sig Weather.Season) 'drought') (or (eq (sig Weather.Season) 'temperate') (eq (sig Weather.Season) 'badtide')))");
-    condition.SetExpression("(eq (sig Weather.Season) 'drought')");
+    condition.SetExpression("(and (eq (sig Weather.Season) 'drought') (or (eq (sig Weather.Season) 'temperate') (eq (sig Weather.Season) 'badtide')))");
+    //condition.SetExpression("(eq (sig Weather.Season) 'drought')");
     var action = new ScriptedAction();
-    action.SetExpression("(act Floodgate.SetHeight 120)");
+    //action.SetExpression("(act Floodgate.SetHeight 120)");
+    action.SetExpression("(act Floodgate.SetHeight -500)");
     _automationBehavior.AddRule(condition, action);
     UpdateView();
   }
 
   void OpenRulesEditor() {
-    DebugEx.Warning("*** Before addding test script ***");
     _rulesEditorDialog.SetActiveBuilding(_automationBehavior);
     var dialogWidth = 1200;//FIXME: get it from teh screen resolution.
     //FIXME: we need a scroll view here.
     var builder = _dialogBoxShower.Create()
         .SetMaxWidth(dialogWidth)
-        .SetConfirmButton(() => {}, "Save and close")
+        .SetConfirmButton(SaveRules, "Save and close")
         .SetCancelButton(() => {}, "Discard changes")
         .SetInfoButton(() => {}, "Read tutorial!")
-        .AddContent(_rulesEditorDialog.Content);
+        .AddContent(_rulesEditorDialog.Root);
     builder._root.Q<VisualElement>("Box").style.width = dialogWidth;
     builder.Show();
+  }
+
+  void SaveRules() {
+    _automationBehavior.ClearAllRules();
+    foreach (var rule in _rulesEditorDialog.Rules) {
+      if (rule.LegacyRule != null) {
+        _automationBehavior.AddRule(rule.LegacyRule.Condition, rule.LegacyRule);
+      } else {
+        var condition = new ScriptedCondition();
+        condition.SetExpression(rule.ConditionExpression);
+        var action = new ScriptedAction();
+        action.SetExpression(rule.ActionExpression);
+        _automationBehavior.AddRule(condition, action);
+      }
+    }
+    UpdateView();
   }
 }

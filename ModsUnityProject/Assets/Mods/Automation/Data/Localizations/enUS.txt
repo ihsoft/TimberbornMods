@@ -127,5 +127,15 @@ IgorZ.Automation.Scriptable.Floodgate.Action.SetHeight,"выставить вы�
 IgorZ.Automation.Scriptable.Inventory.Signal.GoodPct,"запасы {0}","Name of the condition for the current good stock level checking"
 IgorZ.Automation.Scriptable.Weather.Signal.Season,"сезон","Name of the condition for the current season checking"
 =,=,"Rules editor strings"
-IgorZ.Automation.Scripting.Editor.AddRuleBtn,"Добавить правило",
+IgorZ.Automation.Scripting.Editor.AddRuleFromScriptBtn,"Добавить скрипт",
+IgorZ.Automation.Scripting.Editor.AddRuleViaConstructorBtn,"Создать правило через конструктор",
 IgorZ.Automation.Scripting.Editor.DeleteRuleBtn,"Удалить правило",
+IgorZ.Automation.Scripting.Editor.EditAsScriptBtn,"Редактировать скрипт",
+IgorZ.Automation.Scripting.Editor.EditInConstructorBtn,"Редактировать в конструкторе",
+IgorZ.Automation.Scripting.Editor.TestScriptBtn,"Проверить",
+IgorZ.Automation.Scripting.Editor.SaveScriptBtn,"Сохранить",
+IgorZ.Automation.Scripting.Editor.DiscardScriptBtn,"Отменить",
+IgorZ.Automation.Scripting.Editor.ConditionLabel,"Если",
+IgorZ.Automation.Scripting.Editor.ActionLabel,"Тогда",
+IgorZ.Automation.Scripting.Editor.ConditionMustBeBoolean,"Условие должно быть логическим выражением","A message to show when the condition is not a boolean expression"
+IgorZ.Automation.Scripting.Editor.ActionMustBeAction,"Действие должно быть оператором 'act'","A message to show when the action is not an action"

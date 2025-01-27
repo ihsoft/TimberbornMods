@@ -2,166 +2,430 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using IgorZ.Automation.Actions;
 using IgorZ.Automation.AutomationSystem;
-
+using IgorZ.Automation.Conditions;
+using IgorZ.Automation.ScriptingEngine;
+using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.TimberDev.UI;
+using TimberApi.UIBuilderSystem.StylingElements;
 using TimberApi.UIPresets.Buttons;
-using Timberborn.BaseComponentSystem;
+using Timberborn.CoreUI;
+using Timberborn.Localization;
 using Timberborn.SingletonSystem;
 using Timberborn.TooltipSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine.UIElements;
+using UnityEngine;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
 
-sealed class RulesEditorDialog : ILoadableSingleton {
+class RulesEditorDialog : IPostLoadableSingleton {
 
-  public List<RuleConstructor> Rules { get; } = [];
-  public VisualElement Content { get; private set; }
+  const string ConditionLabelLocKey = "IgorZ.Automation.Scripting.Editor.ConditionLabel";
+  const string ActionLabelLocKey = "IgorZ.Automation.Scripting.Editor.ActionLabel";
+  const string AddRuleFromScriptBtnLocKey = "IgorZ.Automation.Scripting.Editor.AddRuleFromScriptBtn";
+  const string AddRuleViaConstructorBtnLocKey = "IgorZ.Automation.Scripting.Editor.AddRuleViaConstructorBtn";
+  const string DeleteRuleBtnLocKey = "IgorZ.Automation.Scripting.Editor.DeleteRuleBtn";
+  const string EditAsScriptBtnLocKey = "IgorZ.Automation.Scripting.Editor.EditAsScriptBtn";
+  const string EditInConstructorBtnLocKey = "IgorZ.Automation.Scripting.Editor.EditInConstructorBtn";
+  const string TestScriptBtnLocKey = "IgorZ.Automation.Scripting.Editor.TestScriptBtn";
+  const string SaveScriptBtnLocKey = "IgorZ.Automation.Scripting.Editor.SaveScriptBtn";
+  const string DiscardScriptBtnLocKey = "IgorZ.Automation.Scripting.Editor.DiscardScriptBtn";
+  const string ConditionMustBeBoolLocKey = "IgorZ.Automation.Scripting.Editor.ConditionMustBeBoolean";
+  const string ActionMustBeActionLocKey = "IgorZ.Automation.Scripting.Editor.ActionMustBeAction";
+
+  #region API
+
+  public VisualElement Root { get; private set; }
+  public readonly List<RuleDefinition> Rules = []; 
+
+  public sealed class RuleDefinition {
+    public string ConditionExpression;
+    public string ActionExpression;
+    public IAutomationAction LegacyRule { get; init; }
+  }
+
+  public void SetActiveBuilding(AutomationBehavior behavior) {
+    _activeBuilding = behavior;
+    Rules.Clear();
+
+    foreach (var action in behavior.Actions) {
+      if (action is ScriptedAction { Condition: ScriptedCondition scriptedCondition } scriptedAction) {
+        Rules.Add(new RuleDefinition {
+            ConditionExpression = scriptedCondition.Expression,
+            ActionExpression = scriptedAction.Expression,
+        });
+      } else {
+        Rules.Add(new RuleDefinition {
+            ConditionExpression = action.Condition.UiDescription,
+            ActionExpression = action.UiDescription,
+            LegacyRule = action,
+        });
+      }
+    }
+
+    _ruleRowsContainer.Clear();
+    foreach (var rule in Rules) {
+      var ruleRow = MakeRuleRow();
+      _ruleRowsContainer.Add(ruleRow);
+      ViewRulePlain(ruleRow, rule);
+    }
+  }
+
+  #endregion
+
+  #region IPostLoadableSingleton implementation
+
+  /// <inheritdoc/>
+  public void PostLoad() {
+    //FIXME: wrap into a scroll view.
+    Root = new VisualElement {
+        style = {
+            minHeight = 600,//FIXME: make it dynamic from the resolution.
+        },
+    };
+    _ruleRowsContainer = new VisualElement();
+    Root.Add(_ruleRowsContainer);
+    var buttons = new VisualElement {
+        style = {
+            flexDirection = FlexDirection.Row,
+            marginTop = 10,
+        },
+    };
+    Root.Add(buttons);
+
+    var addRuleFromScriptBtn = _uiFactory.CreateButton(AddRuleFromScriptBtnLocKey, AddScript);
+    addRuleFromScriptBtn.style.marginRight = 5;
+    buttons.Add(addRuleFromScriptBtn);
+    var addRuleViaConstructorBtn = _uiFactory.CreateButton(AddRuleViaConstructorBtnLocKey, () => {});
+    addRuleViaConstructorBtn.style.marginRight = 5;
+    addRuleViaConstructorBtn.SetEnabled(false);
+    buttons.Add(addRuleViaConstructorBtn);
+  }
+
+  #endregion
+
+  #region Implementation
 
   readonly UiFactory _uiFactory;
   readonly ITooltipRegistrar _tooltipRegistrar;
+
+  const int TestScriptStatusHighlightDurationMs = 1000;
+
+  VisualElement _ruleRowsContainer;
+  AutomationBehavior _activeBuilding;
 
   RulesEditorDialog(UiFactory uiFactory, ITooltipRegistrar tooltipRegistrar) {
     _uiFactory = uiFactory;
     _tooltipRegistrar = tooltipRegistrar;
   }
 
-  public void Load() {
-    var addRuleButton = _uiFactory.CreateButton("IgorZ.Automation.Scripting.Editor.AddRuleBtn", AddNewRule);
-    //FIXME: wrap into a scroll view.
-    Content = new VisualElement {
-        style = {
-            minHeight = 600,//FIXME: make it dynamic from the resolution.
-        },
+  void AddScript() {
+    var rule = new RuleDefinition();
+    Rules.Add(rule);
+    var ruleRow = MakeRuleRow();
+    _ruleRowsContainer.Add(ruleRow);
+    EditRuleAsScript(ruleRow, rule, isNew: true);
+  }
+
+  void ViewRulePlain(VisualElement ruleRow, RuleDefinition rule) {
+    // Side panel
+    var sidePanel = ruleRow.Q("SidePanel");
+    sidePanel.Clear();
+    sidePanel.ToggleDisplayStyle(true);
+    var deleteBtn = _uiFactory.UiBuilder.Create<CrossButton>().BuildAndInitialize();
+    _tooltipRegistrar.Register(deleteBtn, _uiFactory.T(DeleteRuleBtnLocKey));
+    deleteBtn.clicked += () => {
+      Rules.Remove(rule);
+      ruleRow.RemoveFromHierarchy();
     };
-    Content.Add(addRuleButton);
+    sidePanel.Add(deleteBtn);
+
+    // Rule content.
+    var content = ruleRow.Q("RuleContent");
+    content.Clear();
+    var label = _uiFactory.CreateLabel();
+    GetDescriptions(rule, out var conditionDesc, out var actionDesc);
+    label.text = _activeBuilding.Loc.T(ConditionLabelLocKey) + " " + conditionDesc
+        + "\n" + _activeBuilding.Loc.T(ActionLabelLocKey) + " " + actionDesc;
+    content.Add(label);
+
+    // Controls.
+    var buttons = ruleRow.Q("RuleButtons");
+    buttons.Clear();
+
+    if (rule.LegacyRule is not null) {
+      buttons.ToggleDisplayStyle(false);
+    } else {
+      buttons.ToggleDisplayStyle(true);
+      CreateButton(buttons, EditAsScriptBtnLocKey, _ => {
+        EditRuleAsScript(ruleRow, rule);
+        DebugEx.Warning("Edit script: {0}", rule);
+      });
+      var btn = CreateButton(buttons, EditInConstructorBtnLocKey, _ => {
+        DebugEx.Warning("Edit in constructor: {0}", rule);
+      });
+      btn.SetEnabled(VerifyIfEditableInConstructor(rule));
+    }
   }
 
-  ConditionConstructor.ConditionDefinition[] _lvalueDefinitions;
-  ActionConstructor.ActionDefinition[] _actionDefinitions;
-
-  public void SetActiveBuilding(AutomationBehavior behavior) {
-    _activeBuilding = behavior;
+  bool VerifyIfEditableInConstructor(RuleDefinition rule) {
+    var conditionParserContext = ParseExpression(rule.ConditionExpression);
+    if (conditionParserContext.LastError != null) {
+      return false;
+    }
+    var actionParserContext = ParseExpression(rule.ActionExpression);
+    if (actionParserContext.LastError != null) {
+      return false;
+    }
+    
+    if (conditionParserContext.ParsedExpression is not BinaryOperatorExpr) {
+      return false;
+    }
+    if (conditionParserContext.ParsedExpression is BinaryOperatorExpr { Right: not ConstantValueExpr }) {
+      return false;
+    }
+    if (actionParserContext.ParsedExpression is not ActionExpr actionExpr
+        || actionExpr.Operands.Count > 2 || actionExpr.Operands.Skip(1).Any(o => o is not ConstantValueExpr)) {
+      return false;
+    }
+    return true;
   }
 
-  AutomationBehavior _activeBuilding;
+  void GetDescriptions(RuleDefinition rule, out string condition, out string action) {
+    if (rule.LegacyRule is not null) {
+      condition = rule.ConditionExpression;
+      action = rule.ActionExpression;
+      return;
+    }
 
-  void AddNewRule() {
-    var ruleConstructor = new RuleConstructor(_uiFactory);
-    PopulateTestData(ruleConstructor);
-    //FIXME:
-    DebugEx.Warning("*** setting conditions");
-    PopulateConstructor(ruleConstructor);
-    Rules.Add(ruleConstructor);
+    var conditionParserContext = ParseExpression(rule.ConditionExpression);
+    if (conditionParserContext.LastError != null) {
+      condition = TextColors.ColorizeText($"<RedHighlight>ERROR</RedHighlight>");
+      DebugEx.Error("Failed to parse condition: {0}\nError: {1}", rule.ConditionExpression, conditionParserContext.LastError);
+    } else {
+      condition = ExpressionParser.Instance.GetDescription(conditionParserContext);
+      condition = TextColors.ColorizeText($"<SolidHighlight>{condition}</SolidHighlight>");
+    }
 
+    var actionParserContext = ParseExpression(rule.ActionExpression);
+
+    if (actionParserContext.LastError != null) {
+      action = TextColors.ColorizeText($"<RedHighlight>ERROR</RedHighlight>");
+      DebugEx.Error("Failed to parse action: {0}\nError: {1}", rule.ActionExpression, actionParserContext.LastError);
+    } else {
+      action = ExpressionParser.Instance.GetDescription(actionParserContext);
+      action = TextColors.ColorizeText($"<SolidHighlight>{action}</SolidHighlight>");
+    }
+  }
+
+  void EditRuleAsScript(VisualElement ruleRow, RuleDefinition rule, bool isNew = false) {
+    // Side panel
+    ruleRow.Q("SidePanel").ToggleDisplayStyle(false);
+
+    // Rule content.
+    var content = ruleRow.Q("RuleContent");
+    content.Clear();
+
+    var conditionEdit = _uiFactory.CreateTextField();
+    conditionEdit.style.flexGrow = 1;
+    conditionEdit.textInput.style.unityTextAlign = TextAnchor.MiddleLeft;
+    conditionEdit.value = rule.ConditionExpression;
+    content.Add(CreateRow(
+        _uiFactory.CreateLabel(ConditionLabelLocKey),
+        conditionEdit
+    ));
+
+    var actionEdit = _uiFactory.CreateTextField();
+    actionEdit.style.flexGrow = 1;
+    actionEdit.textInput.style.unityTextAlign = TextAnchor.MiddleLeft;
+    actionEdit.value = rule.ActionExpression;
+    content.Add(CreateRow(
+        _uiFactory.CreateLabel(ActionLabelLocKey),
+        actionEdit
+    ));
+
+    var buttons = ruleRow.Q("RuleButtons");
+    buttons.Clear();
+
+    CreateButton(buttons, TestScriptBtnLocKey, btn => {
+      VisualEffects.ScheduleSwitchEffect(
+          btn, TestScriptStatusHighlightDurationMs, false, true,
+          (b, v) => b.SetEnabled(v));
+      if (!RunRuleCheck(ruleRow, conditionEdit, actionEdit)) {
+        return;
+      }
+      VisualEffects.ScheduleSwitchEffect(
+          conditionEdit, TestScriptStatusHighlightDurationMs, Color.green, UiFactory.DefaultColor,
+          (c, v) => c.textInput.style.color = v);
+      VisualEffects.ScheduleSwitchEffect(
+          actionEdit, TestScriptStatusHighlightDurationMs, Color.green, UiFactory.DefaultColor,
+          (c, v) => c.textInput.style.color = v);
+    });
+    CreateButton(buttons, SaveScriptBtnLocKey, _ => {
+      if (RunRuleCheck(ruleRow, conditionEdit, actionEdit)) {
+        rule.ConditionExpression = conditionEdit.value;
+        rule.ActionExpression = actionEdit.value;
+        ViewRulePlain(ruleRow, rule);
+      }
+    });
+    CreateButton(buttons, DiscardScriptBtnLocKey, _ => {
+      if (isNew) {
+        Rules.Remove(rule);
+        ruleRow.RemoveFromHierarchy();
+      } else {
+        ruleRow.Q("NotificationArea").ToggleDisplayStyle(false);
+        ViewRulePlain(ruleRow, rule);
+      }
+    });
+  }
+
+  bool RunRuleCheck(VisualElement ruleRow, TextField conditionEdit, TextField actionEdit) {
+    conditionEdit.textInput.style.color = UiFactory.DefaultColor;
+    actionEdit.textInput.style.color = UiFactory.DefaultColor;
+    var notifications = ruleRow.Q("NotificationArea");
+    notifications.Clear();
+    if (CheckExpressionAndShowError(ruleRow, conditionEdit, true)
+        && CheckExpressionAndShowError(ruleRow, actionEdit, false)) {
+      notifications.ToggleDisplayStyle(false);
+      return true;
+    }
+    notifications.ToggleDisplayStyle(true);
+    return false;
+  }
+
+  bool CheckExpressionAndShowError(VisualElement ruleRow, TextField expressionField, bool isCondition) {
+    var parserContext = ParseExpression(expressionField.value);
+    var error = parserContext.LastError;
+    if (error == null) {
+      if (isCondition) {
+        if (parserContext.ParsedExpression is not BoolOperatorExpr) {
+          error = _activeBuilding.Loc.T(ConditionMustBeBoolLocKey);
+        }
+      } else {
+        if (parserContext.ParsedExpression is not ActionExpr) {
+          error = _activeBuilding.Loc.T(ActionMustBeActionLocKey);
+        }
+      }
+    }
+    if (error == null) {
+      return true;
+    }
+    ReportError(ruleRow, error);
+    VisualEffects.ScheduleSwitchEffect(
+        expressionField,
+        TestScriptStatusHighlightDurationMs, Color.red, UiFactory.DefaultColor,
+        (_, v) => expressionField.textInput.style.color = v);
+    return false;
+  }
+
+  ParserContext ParseExpression(string expression) {
+    var parserContext = new ParserContext() {
+      ScriptHost = _activeBuilding,
+    };
+    ExpressionParser.Instance.Parse(expression, parserContext);
+    return parserContext;
+  }
+
+  Button CreateButton(VisualElement parent, string locKey, Action<Button> onClick) {
+    var button = _uiFactory.CreateButton(locKey, onClick, new Padding(0, 5, 0, 5));
+    button.style.marginRight = 5;
+    parent.Add(button);
+    return button;
+  }
+
+  static VisualElement MakeRuleRow() {
     var wrapper = new VisualElement {
+      style = {
+        flexDirection = FlexDirection.Column,
+        backgroundColor = new Color(1, 1, 1, 0.05f),
+        paddingLeft = 5,
+        paddingRight = 5,
+        paddingTop = 5,
+        paddingBottom = 5,
+        marginBottom = 10,
+      },
+    };
+
+    var ruleWrapper = new VisualElement {
+      style = {
+        flexDirection = FlexDirection.Row,
+        alignItems = Align.Center,
+      },
+    };
+    wrapper.Add(ruleWrapper);
+
+    ruleWrapper.Add(new VisualElement {
+      name = "SidePanel",
+      style = {
+        flexShrink = 1,
+        alignItems = Align.Center,
+        marginRight = 5,
+      },
+    });
+
+    ruleWrapper.Add(new VisualElement {
+      name = "RuleContent",
+      style = {
+        flexGrow = 1,
+        alignItems = Align.Stretch,
+      },
+    });
+
+    wrapper.Add(new VisualElement {
+      name = "RuleButtons",
+      style = {
+        flexDirection = FlexDirection.Row,
+        alignItems = Align.FlexStart,
+        marginTop = 5,
+      },
+    });
+
+    wrapper.Add(new VisualElement {
+      name = "NotificationArea",
+      style = {
+        flexDirection = FlexDirection.Column,
+        alignItems = Align.FlexStart,
+        marginTop = 5,
+      },
+    });
+    wrapper.Q("NotificationArea").ToggleDisplayStyle(false);
+
+    return wrapper;
+  }
+
+  static VisualElement CreateRow(params VisualElement[] elements) {
+    var row = new VisualElement {
         style = {
             flexDirection = FlexDirection.Row,
             alignItems = Align.Center,
         },
     };
+    for (var i = 0; i < elements.Length; i++) {
+      var element = elements[i];
+      if (i != elements.Length - 1) {
+        element.style.marginRight = 5;
+      }
+      row.Add(element);
+    }
+    return row;
+  }
 
-    var deleteBtn = _uiFactory.UiBuilder.Create<CrossButton>().BuildAndInitialize();
-    deleteBtn.style.marginRight = 10;
-    _tooltipRegistrar.Register(deleteBtn, _uiFactory.T("IgorZ.Automation.Scripting.Editor.DeleteRuleBtn"));
-    deleteBtn.clicked += () => {
-      Rules.Remove(ruleConstructor);
-      wrapper.RemoveFromHierarchy();
+  static void ReportError(VisualElement ruleRow, string error) {
+    var notifications = ruleRow.Q("NotificationArea");
+    var errorLabel = new Label {
+        style = {
+            color = Color.red,
+        },
+        text = error,
     };
-    wrapper.Add(deleteBtn);
-    wrapper.Add(ruleConstructor.Root);
-    Content.Insert(Content.childCount - 1, wrapper);
+    notifications.Add(errorLabel);
+    notifications.ToggleDisplayStyle(true);
   }
 
-  void PopulateConstructor(RuleConstructor ruleConstructor) {
-    // var triggers = ScriptingService.Instance.GetTriggersForBuilding(_activeBuilding);
-    // var conditions = triggers.Select(t => new ConditionConstructor.ConditionDefinition {
-    //     Argument = (t.FullName, t.DisplayName),
-    //     Operands = t.ValueType.ArgumentType == IScriptable.ArgumentDef.Type.String
-    //         ? Operands.ToDropdownItems([Operands.OperandType.Equal, Operands.OperandType.NotEqual])
-    //         : Operands.ToDropdownItems(Operands.All),
-    //     ArgTypes = t.ValueType.Options, //FIXME: can be number?
-    // });
-    // ruleConstructor.ConditionConstructor.SetDefinitions(conditions.ToArray());
-  }
-
-  //FIXME: make it real!
-  void PopulateTestData(RuleConstructor ruleConstructor) {
-    ruleConstructor.ConditionConstructor.SetDefinitions([
-        new ConditionConstructor.ConditionDefinition {
-            Argument = ("Weather.IsDrought", "сезон: засуха"),
-            Operands = [
-                Operands.ToDropdownItem(Operands.OperandType.Equal),
-            ],
-            ArgTypes = [
-                ("True", "true"),
-            ],
-        },
-        new ConditionConstructor.ConditionDefinition {
-            Argument = ("Weather.IsBadtide", "сезон: плохая вода"),
-            Operands = [
-                Operands.ToDropdownItem(Operands.OperandType.Equal),
-            ],
-            ArgTypes = [
-                ("True", "true"),
-            ],
-        },
-        new ConditionConstructor.ConditionDefinition {
-            Argument = ("Weather.IsTemperate", "сезон: умеренный"),
-            Operands = [
-                Operands.ToDropdownItem(Operands.OperandType.Equal),
-            ],
-            ArgTypes = [
-                ("True", "true"),
-            ],
-        },
-        new ConditionConstructor.ConditionDefinition {
-            Argument = ("Population.Bots", "население: боты"),
-            Operands = Operands.ToDropdownItems(Operands.All),
-            ArgTypes = [
-                (ArgumentConstructor.NumberTypeName, "значение"),
-            ],
-        },
-        new ConditionConstructor.ConditionDefinition {
-            Argument = ("Population.Beavers", "население: бобры"),
-            Operands = Operands.ToDropdownItems(Operands.All),
-            ArgTypes = [
-                (ArgumentConstructor.NumberTypeName, "значение"),
-            ],
-        },
-        new ConditionConstructor.ConditionDefinition {
-            Argument = ("Inventory.GoodId.Water", "товар: 'Вода'"),
-            Operands = Operands.ToDropdownItems(Operands.All),
-            ArgTypes = [
-                (ArgumentConstructor.NumberTypeName, "значение"),
-            ],
-        },
-        new ConditionConstructor.ConditionDefinition {
-            Argument = ("Inventory.GoodId.Logs", "товар: 'Дерево'"),
-            Operands = Operands.ToDropdownItems(Operands.All),
-            ArgTypes = [
-                (ArgumentConstructor.NumberTypeName, "значение"),
-            ],
-        },
-    ]);
-
-    //FIXME: get this from the building via interfaces/annotated methods.
-    ruleConstructor.ThenActionConstructor.SetDefinitions([
-        new ActionConstructor.ActionDefinition {
-            Action = ("Floodgate.SetHeight", "выставить высоту затвора в"),
-            ArgTypes = [
-                (ArgumentConstructor.NumberTypeName, "number-loc"),
-            ],
-        },
-        new ActionConstructor.ActionDefinition {
-            Action = ("Pausable.Pause", "остановить работу здания"),
-        },
-        new ActionConstructor.ActionDefinition {
-            Action = ("Pausable.Resume", "продолжить работу здания"),
-        },
-    ]);
-  }
+  #endregion
 }

@@ -49,6 +49,6 @@ sealed class TestUI : IPanelController, ILoadableSingleton {
     _root = GetDialogBox();
     _root.style.position = Position.Absolute;
     _panelStack._root.Add(_root);
-    _root.Q<ScrollView>("Content").Add(_rulesEditorDialog.Content);
+    _root.Q<ScrollView>("Content").Add(_rulesEditorDialog.Root);
   }
 }
