@@ -46,7 +46,7 @@ sealed class ActionExpr : AbstractOperandExpr {
     for (var i = 0; i < def.Arguments.Length; i++) {
       var operand = Operands[i + 1];
       if (operand is not IValueExpr valueExpr) {
-        throw new ScriptError($"Operand #{i + 1} must be a value: {operand}");
+        throw new ScriptError($"Operand #{i + 1} must be a value, found: {operand}");
       }
       var argDef = def.Arguments[i];
       if (argDef.ValueType != valueExpr.ValueType) {

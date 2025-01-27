@@ -43,7 +43,7 @@ class LogicalOperatorExpr : BoolOperatorExpr {
     for (var i = 0; i < operands.Count; i++) {
       var op = Operands[i];
       if (op is not BoolOperatorExpr result) {
-        throw new ScriptError($"Operand #{i + 1} must be a boolean value: {op}");
+        throw new ScriptError($"Operand #{i + 1} must be a boolean value, found: {op}");
       }
       boolOperands.Add(result);
     }

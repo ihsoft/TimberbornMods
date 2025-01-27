@@ -27,7 +27,7 @@ sealed class ExpressionParser {
     }
     try {
       CurrentParserContext = parserContext;
-      CurrentParserContext.ParsedExpression = ReadFromTokens(Tokenize(input));
+      CurrentParserContext.ParsedExpression = ProcessString(input);
       CurrentParserContext.LastError = null;
     } catch (ScriptError e) {
       CurrentParserContext.LastError = e.Message;
@@ -129,22 +129,37 @@ sealed class ExpressionParser {
     return tokens;
   }
 
+  static IExpression ProcessString(string input) {
+    var tokens = Tokenize(input);
+    var result = ReadFromTokens(tokens);
+    if (tokens.Any()) {
+      throw new ScriptError("Unexpected token at the end of the expression: " + tokens.Peek());
+    }
+    return result;
+  }
+
+  static void CheckHasMoreTokens(Queue<string> tokens) {
+    if (tokens.IsEmpty()) {
+      throw new ScriptError("Unexpected EOF while reading expression");
+    }
+  }
+
   static IExpression ReadFromTokens(Queue<string> tokens) {
     if (!tokens.Any()) {
       throw new ScriptError("Unexpected EOF while reading expression");
     }
     var token = tokens.Dequeue();
     if (token == "(") {
-      if (tokens.IsEmpty()) {
-        throw new ScriptError("Unexpected EOF while reading expression");
-      }
+      CheckHasMoreTokens(tokens);
       var operatorName = tokens.Dequeue();
       if (OperatorNameRegex.IsMatch(operatorName)) {
         throw new ScriptError("Bad operator name: " + operatorName);
       }
+      CheckHasMoreTokens(tokens);
       var operands = new List<IExpression>();
       while (tokens.Peek() != ")") {
         operands.Add(ReadFromTokens(tokens));
+        CheckHasMoreTokens(tokens);
       }
       if (operands.Count == 0) {
         throw new ScriptError("Empty operator expression");

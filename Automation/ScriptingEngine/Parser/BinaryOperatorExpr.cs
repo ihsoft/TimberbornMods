@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
@@ -44,13 +45,20 @@ sealed class BinaryOperatorExpr : BoolOperatorExpr {
   BinaryOperatorExpr(string name, IList<IExpression> operands) : base(name, operands) {
     AsserNumberOfOperandsExact(2);
     if (Operands[0] is not SignalOperatorExpr left) {
-      throw new ScriptError("Left operand must be a signal: " + Operands[0]);
+      throw new ScriptError("Left operand must be a signal, found: " + Operands[0]);
     }
     if (Operands[1] is not IValueExpr right) {
-      throw new ScriptError("Right operand must be a value: " + Operands[1]);
+      throw new ScriptError("Right operand must be a value, found: " + Operands[1]);
     }
     if (left.ValueType != right.ValueType) {
       throw new ScriptError($"Arguments type mismatch: {left.ValueType} != {right.ValueType}");
+    }
+    if (right is ConstantValueExpr { ValueType: ScriptValue.TypeEnum.String } constantValueExpr) {
+      var def = ExpressionParser.Instance.GetSignalDefinition(left.SignalName);
+      var option = constantValueExpr.ValueFn().AsString;
+      if (def.Result.Options != null && def.Result.Options.All(x => x.Value != option)) {
+        throw new ScriptError($"Unexpected value: {option}");
+      }
     }
     Execute = left.ValueType switch {
         ScriptValue.TypeEnum.String => name switch {
