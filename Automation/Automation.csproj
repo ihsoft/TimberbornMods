@@ -350,6 +350,9 @@
       <Compile Include="..\TimberDev\UI\UiFactory.cs">
         <Link>TimberDev\UI\UiFactory.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\UI\VisualEffects.cs">
+        <Link>TimberDev\UI\VisualEffects.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\Utils\CustomizableInstantiator.cs">
         <Link>TimberDev\Utils\CustomizableInstantiator.cs</Link>
       </Compile>

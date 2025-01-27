@@ -29,6 +29,9 @@ public sealed class UiFactory {
   /// <summary>Common padding around the button text on the right side panel.</summary>
   public static readonly Padding StandardButtonPadding = new(2, 10, 2, 10);
 
+  /// <summary>Default color for the text in UI.</summary>
+  public static readonly Color DefaultColor = new Color(0.8f, 0.8f, 0.8f);
+
   /// <summary>The TAPI UI builder.</summary>
   public readonly UIBuilder UiBuilder;
 
@@ -175,13 +178,18 @@ public sealed class UiFactory {
   /// <param name="padding">
   /// Optional padding around the button text. If not set, then <see cref="StandardButtonPadding"/> will be used.
   /// </param>
-  public Button CreateButton(string locKey, Action onClickFn, Padding? padding = null) {
+  public Button CreateButton(string locKey, Action<Button> onClickFn, Padding? padding = null) {
     var button = UiBuilder.Create<GameButton>()
         .SetLocKey(locKey)
         .ModifyRoot(builder => builder.SetPadding(padding ?? StandardButtonPadding))
         .BuildAndInitialize();
-    button.clicked += onClickFn;
+    button.clicked += () => onClickFn(button);
     return button;
+  }
+
+  /// <inheritdoc cref="CreateButton(string,Action{Button},Padding?)"/>
+  public Button CreateButton(string locKey, Action onClickFn, Padding? padding = null) {
+    return CreateButton(locKey, _ => onClickFn(), padding);
   }
 
   /// <summary>Wraps the element to make it centered in the UI fragment.</summary>
