@@ -8,7 +8,6 @@ using System.Linq;
 using IgorZ.Automation.Actions;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.Conditions;
-using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.TimberDev.UI;
 using TimberApi.UIBuilderSystem.StylingElements;
@@ -76,6 +75,13 @@ class RulesEditorDialog : IPostLoadableSingleton {
     }
   }
 
+  public void OnBeforeShow() {
+    _confirmButton = Root.parent.parent.Q<Button>("ConfirmButton");
+    if (_confirmButton == null) {
+      throw new InvalidOperationException("Confirm button not found.");
+    }
+  }
+
   #endregion
 
   #region IPostLoadableSingleton implementation
@@ -118,6 +124,8 @@ class RulesEditorDialog : IPostLoadableSingleton {
 
   VisualElement _ruleRowsContainer;
   AutomationBehavior _activeBuilding;
+  List<RuleDefinition> _pendingEditorRules = [];
+  Button _confirmButton;
 
   RulesEditorDialog(UiFactory uiFactory, ITooltipRegistrar tooltipRegistrar) {
     _uiFactory = uiFactory;
@@ -223,7 +231,19 @@ class RulesEditorDialog : IPostLoadableSingleton {
     }
   }
 
+  void AddPendingEdit(RuleDefinition rule) {
+    _pendingEditorRules.Add(rule);
+    _confirmButton.SetEnabled(false);
+  }
+
+  void RemovePendingEdit(RuleDefinition rule) {
+    _pendingEditorRules.Remove(rule);
+    _confirmButton.SetEnabled(_pendingEditorRules.Count == 0);
+  }
+
   void EditRuleAsScript(VisualElement ruleRow, RuleDefinition rule, bool isNew = false) {
+    AddPendingEdit(rule);
+
     // Side panel
     ruleRow.Q("SidePanel").ToggleDisplayStyle(false);
 
@@ -268,6 +288,7 @@ class RulesEditorDialog : IPostLoadableSingleton {
     });
     CreateButton(buttons, SaveScriptBtnLocKey, _ => {
       if (RunRuleCheck(ruleRow, conditionEdit, actionEdit)) {
+        RemovePendingEdit(rule);
         rule.ConditionExpression = conditionEdit.value;
         rule.ActionExpression = actionEdit.value;
         ViewRulePlain(ruleRow, rule);
@@ -281,6 +302,7 @@ class RulesEditorDialog : IPostLoadableSingleton {
         ruleRow.Q("NotificationArea").ToggleDisplayStyle(false);
         ViewRulePlain(ruleRow, rule);
       }
+      RemovePendingEdit(rule);
     });
   }
 
