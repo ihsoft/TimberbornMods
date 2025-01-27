@@ -116,28 +116,27 @@ IgorZ.Automation.BlockableBuildingAction.BlockText,"Waiting for the other buildi
 IgorZ.Automation.AutomationFragment.RulesAreaCaptionTextLocKey,"Automation rules:",
 IgorZ.Automation.AutomationFragment.RuleTextLocKey,"If {0}, then {1}",
 IgorZ.Automation.AutomationFragment.AddRulesBtn,"Add automation rules",
-IgorZ.Automation.AutomationFragment.EditRulesBtn,"Редактировать",
-IgorZ.Automation.AutomationFragment.ClearRulesBtn,"Удалить всё",
+IgorZ.Automation.AutomationFragment.EditRulesBtn,"Edit rules",
 =,=,"Scriptable components strings"
-IgorZ.Automation.Scripting.Expressions.AndOperator," и ","String to join components of the expression with condition AND. Used to represent the condition in the panel"
-IgorZ.Automation.Scripting.Expressions.OrOperator," или ","String to join components of the expression with condition OR. Used to represent the condition in the panel"
+IgorZ.Automation.Scripting.Expressions.AndOperator," and ","String to join components of the expression with condition AND. Used to represent the condition in the panel"
+IgorZ.Automation.Scripting.Expressions.OrOperator," or ","String to join components of the expression with condition OR. Used to represent the condition in the panel"
 IgorZ.Automation.Scripting.Expressions.ParseError,"<RedHighlight>ERROR</RedHighlight>","String to show when the scriptable condition or action cannot be parsed"
-IgorZ.Automation.Scriptable.Debug.Action.Log,"записать в журнал: {0}","Name of the action that write to the log an arbitrary string."
-IgorZ.Automation.Scriptable.Floodgate.Action.SetHeight,"выставить высоту затвора в {0}","Change the floodgate height to the specified value"
-IgorZ.Automation.Scriptable.Inventory.Signal.GoodPct,"запасы {0}","Name of the condition for the current good stock level checking"
-IgorZ.Automation.Scriptable.Weather.Signal.Season,"сезон","Name of the condition for the current season checking"
+IgorZ.Automation.Scriptable.Debug.Action.Log,"write to logs: {0}","Name of the action that write to the log an arbitrary string."
+IgorZ.Automation.Scriptable.Floodgate.Action.SetHeight,"set gate height to {0}","Change the floodgate height to the specified value"
+IgorZ.Automation.Scriptable.Inventory.Signal.GoodPct,"amount {0}","Name of the condition for the current good stock level checking"
+IgorZ.Automation.Scriptable.Weather.Signal.Season,"season","Name of the condition for the current season checking"
 =,=,"Rules editor strings"
-IgorZ.Automation.Scripting.Editor.AddRuleFromScriptBtn,"Добавить скрипт",
-IgorZ.Automation.Scripting.Editor.AddRuleViaConstructorBtn,"Создать правило через конструктор",
-IgorZ.Automation.Scripting.Editor.DeleteRuleBtn,"Удалить правило",
-IgorZ.Automation.Scripting.Editor.EditAsScriptBtn,"Редактировать скрипт",
-IgorZ.Automation.Scripting.Editor.EditInConstructorBtn,"Редактировать в конструкторе",
-IgorZ.Automation.Scripting.Editor.TestScriptBtn,"Проверить",
-IgorZ.Automation.Scripting.Editor.SaveScriptBtn,"Сохранить",
-IgorZ.Automation.Scripting.Editor.DiscardScriptBtn,"Отменить",
-IgorZ.Automation.Scripting.Editor.ConditionLabel,"Если",
-IgorZ.Automation.Scripting.Editor.ActionLabel,"Тогда",
-IgorZ.Automation.Scripting.Editor.ConditionMustBeBoolean,"Условие должно быть логическим выражением","A message to show when the condition is not a boolean expression"
-IgorZ.Automation.Scripting.Editor.ActionMustBeAction,"Действие должно быть оператором 'act'","A message to show when the action is not an action"
-IgorZ.Automation.Scripting.Editor.SaveRules,"Сохранить и закрыть",
-IgorZ.Automation.Scripting.Editor.DiscardChanges,"Отменить изменения",
+IgorZ.Automation.Scripting.Editor.AddRuleFromScriptBtn,"Add script",
+IgorZ.Automation.Scripting.Editor.AddRuleViaConstructorBtn,"Create rule via constructor",
+IgorZ.Automation.Scripting.Editor.DeleteRuleBtn,"Delete rule",
+IgorZ.Automation.Scripting.Editor.EditAsScriptBtn,"Edit as script",
+IgorZ.Automation.Scripting.Editor.EditInConstructorBtn,"Edit in constructor",
+IgorZ.Automation.Scripting.Editor.TestScriptBtn,"Test",
+IgorZ.Automation.Scripting.Editor.SaveScriptBtn,"Save",
+IgorZ.Automation.Scripting.Editor.DiscardScriptBtn,"Discard",
+IgorZ.Automation.Scripting.Editor.ConditionLabel,"If",
+IgorZ.Automation.Scripting.Editor.ActionLabel,"Then",
+IgorZ.Automation.Scripting.Editor.ConditionMustBeBoolean,"Condition must be a boolean expression","A message to show when the condition is not a boolean expression"
+IgorZ.Automation.Scripting.Editor.ActionMustBeAction,"Action must be the 'act' operator","A message to show when the action is not an action"
+IgorZ.Automation.Scripting.Editor.SaveRules,"Save and close",
+IgorZ.Automation.Scripting.Editor.DiscardChanges,"Discard changes",
