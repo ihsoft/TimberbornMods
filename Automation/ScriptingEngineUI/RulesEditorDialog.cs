@@ -12,6 +12,7 @@ using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.TimberDev.UI;
 using TimberApi.UIBuilderSystem.StylingElements;
 using TimberApi.UIPresets.Buttons;
+using TimberApi.UIPresets.ScrollViews;
 using Timberborn.CoreUI;
 using Timberborn.Localization;
 using Timberborn.SingletonSystem;
@@ -36,50 +37,30 @@ class RulesEditorDialog : IPostLoadableSingleton {
   const string DiscardScriptBtnLocKey = "IgorZ.Automation.Scripting.Editor.DiscardScriptBtn";
   const string ConditionMustBeBoolLocKey = "IgorZ.Automation.Scripting.Editor.ConditionMustBeBoolean";
   const string ActionMustBeActionLocKey = "IgorZ.Automation.Scripting.Editor.ActionMustBeAction";
+  const string SaveRulesBtnLocKey = "IgorZ.Automation.Scripting.Editor.SaveRules";
+  const string DiscardChangesBtnLocKey = "IgorZ.Automation.Scripting.Editor.DiscardChanges";
 
   #region API
 
-  public VisualElement Root { get; private set; }
-  public readonly List<RuleDefinition> Rules = []; 
-
-  public sealed class RuleDefinition {
+  sealed class RuleDefinition {
     public string ConditionExpression;
     public string ActionExpression;
     public IAutomationAction LegacyRule { get; init; }
   }
 
-  public void SetActiveBuilding(AutomationBehavior behavior) {
-    _activeBuilding = behavior;
-    Rules.Clear();
+  public void Show(AutomationBehavior behavior, Action onClosed) {
+    var builder = _dialogBoxShower.Create()
+        .SetMaxWidth(_contentMaxWidth)
+        .SetConfirmButton(() => SaveRulesAndCloseDialog(onClosed), _uiFactory.T(SaveRulesBtnLocKey))
+        .SetCancelButton(() => {}, _uiFactory.T(DiscardChangesBtnLocKey))
+        .AddContent(CreateContent());
+    builder._root.Q<VisualElement>("Box").style.width = _contentMaxWidth;
 
-    foreach (var action in behavior.Actions) {
-      if (action is ScriptedAction { Condition: ScriptedCondition scriptedCondition } scriptedAction) {
-        Rules.Add(new RuleDefinition {
-            ConditionExpression = scriptedCondition.Expression,
-            ActionExpression = scriptedAction.Expression,
-        });
-      } else {
-        Rules.Add(new RuleDefinition {
-            ConditionExpression = action.Condition.UiDescription,
-            ActionExpression = action.UiDescription,
-            LegacyRule = action,
-        });
-      }
-    }
+    _ruleRowsContainer = UiFactory.FindElementUpstream<VisualElement>(builder._root, "RuleRowsContainer");
+    _confirmButton = UiFactory.FindElementUpstream<Button>(builder._root, "ConfirmButton");
 
-    _ruleRowsContainer.Clear();
-    foreach (var rule in Rules) {
-      var ruleRow = MakeRuleRow();
-      _ruleRowsContainer.Add(ruleRow);
-      ViewRulePlain(ruleRow, rule);
-    }
-  }
-
-  public void OnBeforeShow() {
-    _confirmButton = Root.parent.parent.Q<Button>("ConfirmButton");
-    if (_confirmButton == null) {
-      throw new InvalidOperationException("Confirm button not found.");
-    }
+    SetActiveBuilding(behavior);
+    builder.Show();
   }
 
   #endregion
@@ -87,22 +68,53 @@ class RulesEditorDialog : IPostLoadableSingleton {
   #region IPostLoadableSingleton implementation
 
   /// <inheritdoc/>
-  public void PostLoad() {
-    //FIXME: wrap into a scroll view.
-    Root = new VisualElement {
+  public void PostLoad() {}
+
+  #endregion
+
+  #region Implementation
+
+  readonly UiFactory _uiFactory;
+  readonly ITooltipRegistrar _tooltipRegistrar;
+  readonly DialogBoxShower _dialogBoxShower;
+  readonly int _contentMaxWidth;
+  readonly int _contentMaxHeight;
+
+  const int TestScriptStatusHighlightDurationMs = 1000;
+  const float ContentWidthRatio = 0.6f;
+  const float ContentHeightRatio = 0.6f;
+
+  readonly List<RuleDefinition> _rules = []; 
+  readonly List<RuleDefinition> _pendingEditorRules = [];
+
+  VisualElement _ruleRowsContainer;
+  AutomationBehavior _activeBuilding;
+  Button _confirmButton;
+
+  RulesEditorDialog(UiFactory uiFactory, ITooltipRegistrar tooltipRegistrar, DialogBoxShower dialogBoxShower) {
+    _uiFactory = uiFactory;
+    _tooltipRegistrar = tooltipRegistrar;
+    _dialogBoxShower = dialogBoxShower;
+    _contentMaxWidth = Mathf.RoundToInt(Screen.width * ContentWidthRatio);
+    _contentMaxHeight = Mathf.RoundToInt(Screen.height * ContentHeightRatio);
+  }
+
+  VisualElement CreateContent() {
+    var root = new VisualElement {
         style = {
-            minHeight = 600,//FIXME: make it dynamic from the resolution.
+            minHeight = _contentMaxHeight,
         },
     };
-    _ruleRowsContainer = new VisualElement();
-    Root.Add(_ruleRowsContainer);
+    root.Add(new VisualElement() {
+        name = "RuleRowsContainer",//FIXME: constant
+    });
     var buttons = new VisualElement {
         style = {
             flexDirection = FlexDirection.Row,
             marginTop = 10,
         },
     };
-    Root.Add(buttons);
+    root.Add(buttons);
 
     var addRuleFromScriptBtn = _uiFactory.CreateButton(AddRuleFromScriptBtnLocKey, AddScript);
     addRuleFromScriptBtn.style.marginRight = 5;
@@ -111,30 +123,62 @@ class RulesEditorDialog : IPostLoadableSingleton {
     addRuleViaConstructorBtn.style.marginRight = 5;
     addRuleViaConstructorBtn.SetEnabled(false);
     buttons.Add(addRuleViaConstructorBtn);
+
+    var scrollView = _uiFactory.UiBuilder.Create<DefaultScrollView>()
+        // .SetMaxWidth(_contentMaxWidth)
+        .SetMaxHeight(_contentMaxHeight)
+        .BuildAndInitialize();
+    scrollView.Add(root);
+
+    return scrollView;
   }
 
-  #endregion
+  void SetActiveBuilding(AutomationBehavior behavior) {
+    _activeBuilding = behavior;
+    _rules.Clear();
 
-  #region Implementation
+    foreach (var action in behavior.Actions) {
+      if (action is ScriptedAction { Condition: ScriptedCondition scriptedCondition } scriptedAction) {
+        _rules.Add(new RuleDefinition {
+            ConditionExpression = scriptedCondition.Expression,
+            ActionExpression = scriptedAction.Expression,
+        });
+      } else {
+        _rules.Add(new RuleDefinition {
+            ConditionExpression = action.Condition.UiDescription,
+            ActionExpression = action.UiDescription,
+            LegacyRule = action,
+        });
+      }
+    }
 
-  readonly UiFactory _uiFactory;
-  readonly ITooltipRegistrar _tooltipRegistrar;
+    _ruleRowsContainer.Clear();
+    foreach (var rule in _rules) {
+      var ruleRow = MakeRuleRow();
+      _ruleRowsContainer.Add(ruleRow);
+      ViewRulePlain(ruleRow, rule);
+    }
+  }
 
-  const int TestScriptStatusHighlightDurationMs = 1000;
-
-  readonly List<RuleDefinition> _pendingEditorRules = [];
-  VisualElement _ruleRowsContainer;
-  AutomationBehavior _activeBuilding;
-  Button _confirmButton;
-
-  RulesEditorDialog(UiFactory uiFactory, ITooltipRegistrar tooltipRegistrar) {
-    _uiFactory = uiFactory;
-    _tooltipRegistrar = tooltipRegistrar;
+  void SaveRulesAndCloseDialog(Action onClosed) {
+    _activeBuilding.ClearAllRules();
+    foreach (var rule in _rules) {
+      if (rule.LegacyRule != null) {
+        _activeBuilding.AddRule(rule.LegacyRule.Condition, rule.LegacyRule);
+      } else {
+        var condition = new ScriptedCondition();
+        condition.SetExpression(rule.ConditionExpression);
+        var action = new ScriptedAction();
+        action.SetExpression(rule.ActionExpression);
+        _activeBuilding.AddRule(condition, action);
+      }
+    }
+    onClosed?.Invoke();
   }
 
   void AddScript() {
     var rule = new RuleDefinition { ConditionExpression = "", ActionExpression = "" };
-    Rules.Add(rule);
+    _rules.Add(rule);
     var ruleRow = MakeRuleRow();
     _ruleRowsContainer.Add(ruleRow);
     EditRuleAsScript(ruleRow, rule, isNew: true);
@@ -148,7 +192,7 @@ class RulesEditorDialog : IPostLoadableSingleton {
     var deleteBtn = _uiFactory.UiBuilder.Create<CrossButton>().BuildAndInitialize();
     _tooltipRegistrar.Register(deleteBtn, _uiFactory.T(DeleteRuleBtnLocKey));
     deleteBtn.clicked += () => {
-      Rules.Remove(rule);
+      _rules.Remove(rule);
       ruleRow.RemoveFromHierarchy();
     };
     sidePanel.Add(deleteBtn);
@@ -296,7 +340,7 @@ class RulesEditorDialog : IPostLoadableSingleton {
     });
     CreateButton(buttons, DiscardScriptBtnLocKey, _ => {
       if (isNew) {
-        Rules.Remove(rule);
+        _rules.Remove(rule);
         ruleRow.RemoveFromHierarchy();
       } else {
         ruleRow.Q("NotificationArea").ToggleDisplayStyle(false);

@@ -12,7 +12,6 @@ using IgorZ.TimberDev.UI;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
-using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -24,11 +23,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
   const string AddRulesBtnCaptionLocKey = "IgorZ.Automation.AutomationFragment.AddRulesBtn";
   const string EditRulesBtnCaptionLocKey = "IgorZ.Automation.AutomationFragment.EditRulesBtn";
 
-  const string SaveRulesBtnLocKey = "IgorZ.Automation.Scripting.Editor.SaveRules";
-  const string DiscardChangesBtnLocKey = "IgorZ.Automation.Scripting.Editor.DiscardChanges";
-
   readonly UiFactory _uiFactory;
-  readonly DialogBoxShower _dialogBoxShower;
   readonly RulesEditorDialog _rulesEditorDialog;
 
   VisualElement _root;
@@ -39,9 +34,8 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
   AutomationBehavior _automationBehavior;
 
-  AutomationFragment(UiFactory uiFactory, DialogBoxShower dialogBoxShower, RulesEditorDialog rulesEditorDialog) {
+  AutomationFragment(UiFactory uiFactory, RulesEditorDialog rulesEditorDialog) {
     _uiFactory = uiFactory;
-    _dialogBoxShower = dialogBoxShower;
     _rulesEditorDialog = rulesEditorDialog;
   }
 
@@ -50,7 +44,9 @@ sealed class AutomationFragment : IEntityPanelFragment {
     _caption.style.color = Color.cyan;
 
     _rulesList = _uiFactory.CreateLabel();
-    _addRulesButton = _uiFactory.CreateButton(AddRulesBtnCaptionLocKey, OpenRulesEditor);
+
+    _addRulesButton = _uiFactory.CreateButton(
+        AddRulesBtnCaptionLocKey, () => _rulesEditorDialog.Show(_automationBehavior, UpdateView));
     //FIXME: this is a debug
     _addTestRuleButton = _uiFactory.CreateButton("AddTestRuleButton", AddTestRule);
 
@@ -122,37 +118,6 @@ sealed class AutomationFragment : IEntityPanelFragment {
     //action.SetExpression("(act Floodgate.SetHeight 120)");
     action.SetExpression("(act Floodgate.SetHeight -500)");
     _automationBehavior.AddRule(condition, action);
-    UpdateView();
-  }
-
-  void OpenRulesEditor() {
-    _rulesEditorDialog.SetActiveBuilding(_automationBehavior);
-    //FIXME: move builder into rules editor dialog.
-    var dialogWidth = 1200;//FIXME: get it from teh screen resolution.
-    //FIXME: we need a scroll view here.
-    var builder = _dialogBoxShower.Create()
-        .SetMaxWidth(dialogWidth)
-        .SetConfirmButton(SaveRules, _uiFactory.T(SaveRulesBtnLocKey))
-        .SetCancelButton(() => {}, _uiFactory.T(DiscardChangesBtnLocKey))
-        .AddContent(_rulesEditorDialog.Root);
-    builder._root.Q<VisualElement>("Box").style.width = dialogWidth;
-    _rulesEditorDialog.OnBeforeShow();
-    builder.Show();
-  }
-
-  void SaveRules() {
-    _automationBehavior.ClearAllRules();
-    foreach (var rule in _rulesEditorDialog.Rules) {
-      if (rule.LegacyRule != null) {
-        _automationBehavior.AddRule(rule.LegacyRule.Condition, rule.LegacyRule);
-      } else {
-        var condition = new ScriptedCondition();
-        condition.SetExpression(rule.ConditionExpression);
-        var action = new ScriptedAction();
-        action.SetExpression(rule.ActionExpression);
-        _automationBehavior.AddRule(condition, action);
-      }
-    }
     UpdateView();
   }
 }
