@@ -30,10 +30,22 @@ public sealed class UiFactory {
   public static readonly Padding StandardButtonPadding = new(2, 10, 2, 10);
 
   /// <summary>Default color for the text in UI.</summary>
-  public static readonly Color DefaultColor = new Color(0.8f, 0.8f, 0.8f);
+  public static readonly Color DefaultColor = new(0.8f, 0.8f, 0.8f);
 
   /// <summary>The TAPI UI builder.</summary>
   public readonly UIBuilder UiBuilder;
+
+  /// <summary>Find the specified element starting from the parent and upstream.</summary>
+  public static T FindElementUpstream<T>(VisualElement root, string name) where T : VisualElement {
+    while (root != null) {
+      var element = root.Q<T>(name);
+      if (element != null) {
+        return element;
+      }
+      root = root.parent;
+    }
+    throw new InvalidOperationException($"Element '{name}' not found.");
+  }
 
   UiFactory(VisualElementLoader visualElementLoader, UIBuilder uiBuilder, ILoc loc,
             DropdownItemsSetter dropdownItemsSetter) {
