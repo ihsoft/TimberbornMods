@@ -31,7 +31,7 @@ class ConditionConstructor : BaseConstructor {
   public ConditionConstructor(UiFactory uiFactory) : base(uiFactory) {
     SignalSelector = new ArgumentConstructor(uiFactory);
     SignalSelector.OnStringValueChanged += (_, _) => SetArgument(SignalSelector.Value);
-    OperatorSelector = uiFactory.CreateValueDropdown<string>((_, _) => {});
+    OperatorSelector = uiFactory.CreateValueDropdown<string>();
     ValueSelector = new ArgumentConstructor(uiFactory);
 
     Root = MakeRow(uiFactory.T(ConditionLabelLocKey),

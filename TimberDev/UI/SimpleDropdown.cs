@@ -27,9 +27,8 @@ public sealed class SimpleDropdown<T>  where T : notnull {
       if (value == dropdown.StringValue) {
         return;
       }
-      var oldValue = dropdown._value;
       dropdown._value = dropdown.Items.FirstOrDefault(x => x.Value.ToString() == value).Value;
-      dropdown._onValueChanged?.Invoke(oldValue, dropdown.Value);
+      dropdown._onValueChanged?.Invoke(dropdown.Value);
     }
   }
 
@@ -40,12 +39,8 @@ public sealed class SimpleDropdown<T>  where T : notnull {
   public T Value {
     get => _value;
     set {
-      if (Equals(_value, value)) {
-        return;
-      }
-      var oldValue = _value;
       _value = value;
-      _onValueChanged?.Invoke(oldValue, _value);
+      _onValueChanged?.Invoke(_value);
       DropdownElement.UpdateSelectedValue(StringValue);
     }
   }
@@ -58,16 +53,15 @@ public sealed class SimpleDropdown<T>  where T : notnull {
     get => _items;
     set {
       _items = value;
-      var oldValue = _value;
       _value = _items.FirstOrDefault().Value;
       _dropdownItemsSetter.SetItems(DropdownElement, _dropdownProvider);
-      _onValueChanged?.Invoke(oldValue, _value);
+      _onValueChanged?.Invoke(_value);
     }
   }
   DropdownItem<T>[] _items;
 
   readonly DropdownItemsSetter _dropdownItemsSetter;
-  readonly Action<T, T> _onValueChanged;
+  readonly Action<T> _onValueChanged;
   readonly DropdownProvider _dropdownProvider;
 
   /// <summary>Creates a new instance of the SimpleDropdown.</summary>
@@ -75,7 +69,7 @@ public sealed class SimpleDropdown<T>  where T : notnull {
   /// <param name="dropdownItemsSetter"></param>
   /// <param name="onValueChanged"></param>
   public SimpleDropdown(
-      UiFactory uiFactory, DropdownItemsSetter dropdownItemsSetter, Action<T, T> onValueChanged) {
+      UiFactory uiFactory, DropdownItemsSetter dropdownItemsSetter, Action<T> onValueChanged) {
     _dropdownItemsSetter = dropdownItemsSetter;
     _onValueChanged = onValueChanged;
     _dropdownProvider = new DropdownProvider(this);

@@ -40,7 +40,7 @@ sealed class ArgumentConstructor : BaseConstructor {
   readonly TextField _textField;
 
   public ArgumentConstructor(UiFactory uiFactory) : base(uiFactory) {
-    _typeSelectionDropdown = uiFactory.CreateValueDropdown<string>((_, _) => UpdateTypeSelection());
+    _typeSelectionDropdown = uiFactory.CreateValueDropdown<string>(_ => UpdateTypeSelection());
     //FIXME: pass text size.
     _textField = uiFactory.CreateTextField(width: 100);
     Root = MakeRow(_typeSelectionDropdown.DropdownElement, _textField);

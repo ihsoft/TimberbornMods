@@ -29,7 +29,7 @@ sealed class ActionConstructor : BaseConstructor {
 
   public ActionConstructor(UiFactory uiFactory) : base(uiFactory) {
     //FIXME; get width from caller.
-    ActionSelector = uiFactory.CreateValueDropdown<string>((_, action) => SetAction(action), width: 250);
+    ActionSelector = uiFactory.CreateValueDropdown<string>(SetAction, width: 250);
     ArgumentConstructor = new ArgumentConstructor(uiFactory);
     Root = MakeRow(uiFactory.T(ActionLabelLocKey), ActionSelector.DropdownElement, ArgumentConstructor.Root);
   }
