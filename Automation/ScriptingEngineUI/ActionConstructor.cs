@@ -2,62 +2,79 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using IgorZ.Automation.ScriptingEngine;
 using IgorZ.TimberDev.UI;
 using Timberborn.CoreUI;
+using UnityDev.Utils.LogUtilsLite;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
 
 sealed class ActionConstructor : BaseConstructor {
-  public string Action {
-    get => _selectedAction;
-    set => _actionSelector.Value = value;
-  }
-  readonly string _selectedAction = "";
 
-  public ArgumentValue ArgumentValue {
-    get {
-      if (_argumentConstructor.SelectedType == ArgumentConstructor.ArgumentType.Number) {
-        return new ArgumentValue { NumberValue = _argumentConstructor.NumberValue };
-      }
-      return new ArgumentValue { StringValue = _argumentConstructor.StringValue };
-    }
-    set => _argumentConstructor.StringValue = value.StringValue;
-  }
+  const string ActionLabelLocKey = "IgorZ.Automation.Scripting.Editor.ActionLabel";
 
-  public struct ActionDefinition {
-    public DropdownItem<string> Action;
-    public DropdownItem<string>[] ArgTypes;
-  }
+  #region API
 
-  ActionDefinition[] _actionDefinitions;
+
+  public record ActionDefinition {
+    public DropdownItem<string> Action { get; init; }
+    public ScriptValue.TypeEnum ArgumentType { get; init; }
+    public DropdownItem<string>[] ArgumentOptions { get; init; }
+  }
 
   public override VisualElement Root { get; }
+
+  public ActionConstructor(UiFactory uiFactory) : base(uiFactory) {
+    //FIXME; get width from caller.
+    _actionSelector = uiFactory.CreateValueDropdown<string>((_, action) => SetAction(action), width: 250);
+    _argumentConstructor = new ArgumentConstructor(uiFactory);
+    Root = MakeRow(uiFactory.T(ActionLabelLocKey), _actionSelector.DropdownElement, _argumentConstructor.Root);
+  }
+
+  public void SetDefinitions(IEnumerable<ActionDefinition> actionDefinitions) {
+    _actionDefinitions = actionDefinitions.ToArray();
+    _actionSelector.Items = _actionDefinitions.Select(def => def.Action).ToArray();
+    SetAction(_actionDefinitions[0].Action.Value);
+  }
+
+  public string Validate() {
+    if (_selectedAction.ArgumentType == ScriptValue.TypeEnum.Number) {
+      return _argumentConstructor.CheckInputForNumber();
+    }
+    if (_selectedAction.ArgumentType == ScriptValue.TypeEnum.String) {
+      return _argumentConstructor.CheckInputForString();
+    }
+    return null;
+  }
+
+  public string GetScript() {
+    var action = _actionSelector.Value;
+    var def = _actionDefinitions.First(x => x.Action.Value == action);
+    return def.ArgumentOptions == null
+        ? $"(act {action})"
+        : $"(act {action} {PrepareConstantValue(_argumentConstructor.Value, def.ArgumentType)})";
+  }
+
+  #endregion
+
+  ActionDefinition _selectedAction;
+  ActionDefinition[] _actionDefinitions;
 
   readonly SimpleDropdown<string> _actionSelector;
   readonly ArgumentConstructor _argumentConstructor;
 
-  public ActionConstructor(UiFactory uiFactory, bool isInvertedCondition) : base(uiFactory) {
-    _actionSelector = uiFactory.CreateValueDropdown<string>((_, action) => SetAction(action), width: 250);
-    _argumentConstructor = new ArgumentConstructor(uiFactory);
-    var actionText = isInvertedCondition ? "Иначе" : "Тогда";//FIXME: translate
-    Root = MakeRow(actionText, _actionSelector.DropdownElement, _argumentConstructor.Root);
-  }
-
-  public void SetDefinitions(ActionDefinition[] actionDefinitions) {
-    _actionDefinitions = actionDefinitions;
-    _actionSelector.Items = actionDefinitions.Select(def => def.Action).ToArray();
-    SetAction(actionDefinitions[0].Action.Value);
-  }
-
   void SetAction(string action) {
-    var actionDef = _actionDefinitions.First(def => def.Action.Value == action);
-    if (actionDef.ArgTypes == null) {
+    _selectedAction = _actionDefinitions.First(def => def.Action.Value == action);
+    if (_selectedAction.ArgumentOptions == null) {
       _argumentConstructor.Root.ToggleDisplayStyle(false);
     } else {
       _argumentConstructor.Root.ToggleDisplayStyle(true);
-      _argumentConstructor.SetDefinitions(actionDef.ArgTypes);
+      _argumentConstructor.SetDefinitions(_selectedAction.ArgumentOptions);
     }
   }
 }

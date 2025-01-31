@@ -3,102 +3,95 @@
 // License: Public Domain
 
 using System;
+using System.Linq;
 using IgorZ.TimberDev.UI;
 using Timberborn.CoreUI;
 using UnityDev.Utils.LogUtilsLite;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
 
 sealed class ArgumentConstructor : BaseConstructor {
 
-  public const string SignalTypeName = "-signal-";
-  public const string NumberTypeName = "-number";
+  public const string InputTypeName = "-input-";
+  const int ErrorStatusHighlightDurationMs = 1000;
 
   public override VisualElement Root { get; }
 
-  public enum ArgumentType {
-    Signal,
-    Number,
-    String,
-  }
+  public bool IsInput => _typeSelectionDropdown.Value == InputTypeName;
 
-  public ArgumentType SelectedType {
-    get {
-      return _typeSelectionDropdown.Value switch {
-          SignalTypeName => ArgumentType.Signal,
-          NumberTypeName => ArgumentType.Number,
-          _ => ArgumentType.String
-      };
-    }
+  public string Value {
+    get => IsInput ? _textField.value : _typeSelectionDropdown.Value;
     set {
-      _typeSelectionDropdown.Value = value switch {
-          ArgumentType.Signal => SignalTypeName,
-          ArgumentType.Number => NumberTypeName,
-          ArgumentType.String => StringValue,
-          _ => throw new InvalidOperationException("Unsupported argument type: " + value)
-      };
-    }
-  }
-
-  public string StringValue {
-    get => _stringValue;
-    set {
-      _stringValue = value;
-      if (SelectedType == ArgumentType.String) {
+      if (_typeSelectionDropdown.Items.Any(x => x.Value == value)) {
         _typeSelectionDropdown.Value = value;
-        OnStringValueChanged?.Invoke(this, EventArgs.Empty);
+        _textField.ToggleDisplayStyle(false);
+      } else {
+        _typeSelectionDropdown.Value = InputTypeName;
+        _textField.value = value;
+        _textField.ToggleDisplayStyle(true);
       }
     }
   }
-  string _stringValue;
 
-  public int NumberValue {
-    get => _numberValue;
-    set {
-      _numberValue = value;
-      if (SelectedType == ArgumentType.Number) {
-        _typeSelectionDropdown.Value = NumberTypeName;
-        _textField.value = value.ToString();
-      }
-    }
-  }
-  int _numberValue;
+  public event EventHandler OnStringValueChanged;
 
   readonly SimpleDropdown<string> _typeSelectionDropdown;
   readonly TextField _textField;
 
-  public event EventHandler OnStringValueChanged;
-
   public ArgumentConstructor(UiFactory uiFactory) : base(uiFactory) {
     _typeSelectionDropdown = uiFactory.CreateValueDropdown<string>((_, _) => UpdateTypeSelection());
-    _textField = uiFactory.CreateTextField(width: 50);
+    //FIXME: pass text size.
+    _textField = uiFactory.CreateTextField(width: 100);
     Root = MakeRow(_typeSelectionDropdown.DropdownElement, _textField);
   }
 
-  public void SetDefinitions(DropdownItem<string>[] types) {
-    _typeSelectionDropdown.Items = types;
-    _typeSelectionDropdown.DropdownElement.ToggleDisplayStyle(types.Length > 1);
+  public void SetDefinitions(DropdownItem<string>[] options) {
+    _typeSelectionDropdown.Items = options;
+    _typeSelectionDropdown.DropdownElement.SetEnabled(options.Length > 1 || options[0].Value != InputTypeName);
+  }
+
+  public string CheckInputForNumber(Func<float, string> check = null) {
+    string res = null;
+    var value = _textField.value.Trim();
+    if (value == "") {
+      res = "Argument must be a number";
+    } else if (!float.TryParse(value, out var val)) {
+      res = "Argument must be a number: " + value;
+    } else if (check != null) {
+      res = check(val);
+    }
+    if (res != null) {
+      VisualEffects.ScheduleSwitchEffect(
+          _textField, ErrorStatusHighlightDurationMs, new Color(1, 0, 0, 0.2f), Color.clear,
+          (f, c) => f.textInput.style.backgroundColor = c);
+    } else {
+      _textField.style.backgroundColor = UiFactory.DefaultColor;
+    }
+    return res;
+  }
+
+  public string CheckInputForString(Func<string, string> check = null) {
+    string res = null;
+    var value = _textField.value;
+    if (value.IndexOf('\'') >= 0) {
+      res = "String must not contain single quotes: " + value;
+    } else if (check != null) {
+      res = check(value);
+    }
+    if (res != null) {
+      VisualEffects.ScheduleSwitchEffect(
+          _textField, ErrorStatusHighlightDurationMs, Color.red, UiFactory.DefaultColor,
+          (f, c) => f.style.backgroundColor = c);
+    } else {
+      _textField.style.backgroundColor = UiFactory.DefaultColor;
+    }
+    return res;
   }
 
   void UpdateTypeSelection() {
-    DebugEx.Warning("*** UpdateTypeSelection: " + SelectedType);
-    switch (SelectedType) {
-      case ArgumentType.Signal:
-        _textField.ToggleDisplayStyle(false);
-        //FIXME: show signal selector
-        DebugEx.Warning("*** show signal selector");
-        break;
-      case ArgumentType.Number:
-        _textField.ToggleDisplayStyle(true);
-        _textField.value = "";
-        break;
-      case ArgumentType.String:
-        _textField.ToggleDisplayStyle(false);
-        StringValue = _typeSelectionDropdown.Value;
-        break;
-      default:
-        throw new InvalidOperationException("Unsupported argument type: " + SelectedType);
-    }
+    _textField.ToggleDisplayStyle(IsInput);
+    _textField.value = "";
   }
 }

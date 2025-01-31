@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using IgorZ.Automation.ScriptingEngine;
 using IgorZ.TimberDev.UI;
 using Timberborn.CoreUI;
 using UnityEngine.UIElements;
@@ -11,45 +12,95 @@ using UnityEngine.UIElements;
 namespace IgorZ.Automation.ScriptingEngineUI;
 
 class ConditionConstructor : BaseConstructor {
+  
+  const string ConditionLabelLocKey = "IgorZ.Automation.Scripting.Editor.ConditionLabel";
+
+  #region API
+
+  public record ConditionDefinition {
+    public DropdownItem<string> Argument { get; init; }
+    public ScriptValue.TypeEnum ArgumentType { get; init; }
+    public DropdownItem<string>[] ArgumentOptions { get; init; }
+  }
+
   public override VisualElement Root { get; }
 
-  public struct ConditionDefinition {
-    public DropdownItem<string> Argument;
-    public DropdownItem<Operands.OperandType>[] Operands;
-    public DropdownItem<string>[] ArgTypes;
-  }
-
-  readonly ArgumentConstructor _argumentSelector;
-  readonly SimpleDropdown<Operands.OperandType> _operand;
-  readonly ArgumentConstructor _valueSelector;
-
-  ConditionDefinition[] _lvalueDefinitions;
-
   public ConditionConstructor(UiFactory uiFactory) : base(uiFactory) {
-    _argumentSelector = new ArgumentConstructor(uiFactory);
-    _argumentSelector.OnStringValueChanged += (_, _) => SetArgument(_argumentSelector.StringValue);
-    _operand = uiFactory.CreateValueDropdown<Operands.OperandType>((_, _) => {});
+    _operatorSelector = new ArgumentConstructor(uiFactory);
+    _operatorSelector.OnStringValueChanged += (_, _) => SetArgument(_operatorSelector.Value);
+    _operandSelector = uiFactory.CreateValueDropdown<string>((_, _) => {});
     _valueSelector = new ArgumentConstructor(uiFactory);
 
-    Root = MakeRow("Если", _argumentSelector.Root, _operand.DropdownElement, _valueSelector.Root);
+    Root = MakeRow(uiFactory.T(ConditionLabelLocKey),
+                   _operatorSelector.Root, _operandSelector.DropdownElement, _valueSelector.Root);
   }
 
-  public void SetDefinitions(ConditionDefinition[] lvalueDef) {
-    _lvalueDefinitions = lvalueDef;
-    _argumentSelector.SetDefinitions(lvalueDef.Select(x => x.Argument).ToArray());
+  public void SetDefinitions(IEnumerable<ConditionDefinition> lvalueDef) {
+    _lvalueDefinitions = lvalueDef.ToArray();
+    _operatorSelector.SetDefinitions(_lvalueDefinitions.Select(x => x.Argument).ToArray());
     SetArgument(_lvalueDefinitions[0].Argument.Value);
   }
 
+  public string Validate() {
+    //var def = _lvalueDefinitions.First(x => x.Argument.Value == _operatorSelector.Value);
+    if (_selectedDefinition.ArgumentType == ScriptValue.TypeEnum.Number) {
+      return _valueSelector.CheckInputForNumber();
+    }
+    if (_selectedDefinition.ArgumentType == ScriptValue.TypeEnum.String) {
+      return _valueSelector.CheckInputForString();
+    }
+    return null;
+  }
+
+  public string GetScript() {
+    var arg = _operatorSelector.Value;
+    var op = _operandSelector.Value;
+    var val = _valueSelector.Value;
+    //var def = _lvalueDefinitions.First(x => x.Argument.Value == arg);
+    if (_selectedDefinition.ArgumentType == ScriptValue.TypeEnum.String) {
+      val = "'" + val + "'";
+    }
+    return $"({op} (sig {arg}) {val})";
+  }
+
+  #endregion
+
+  static readonly DropdownItem<string>[] StringOperators = [
+      new() { Value = "eq", Text = "=" },
+      new() { Value = "ne", Text = "<>" },
+  ];
+
+  static readonly DropdownItem<string>[] NumberOperators = [
+      new() { Value = "eq", Text = "=" },
+      new() { Value = "ne", Text = "<>" },
+      new() { Value = "gt", Text = ">" },
+      new() { Value = "lt", Text = "<" },
+      new() { Value = "ge", Text = ">=" },
+      new() { Value = "le", Text = "<=" },
+  ];
+
+  readonly ArgumentConstructor _operatorSelector;
+  readonly SimpleDropdown<string> _operandSelector;
+  readonly ArgumentConstructor _valueSelector;
+
+  ConditionDefinition _selectedDefinition;
+  ConditionDefinition[] _lvalueDefinitions;
+
   void SetArgument(string argument) {
     if (argument == null) {
-      _operand.DropdownElement.ToggleDisplayStyle(false);
+      _operandSelector.DropdownElement.ToggleDisplayStyle(false);
       _valueSelector.Root.ToggleDisplayStyle(false);
       return;
     }
-    var def = _lvalueDefinitions.FirstOrDefault(x => x.Argument.Value == argument);
-    _operand.Items = def.Operands;
-    _operand.DropdownElement.ToggleDisplayStyle(def.Operands.Length > 1);
-    _valueSelector.SetDefinitions(def.ArgTypes);
+    _selectedDefinition = _lvalueDefinitions.First(x => x.Argument.Value == argument);
+    if (_selectedDefinition.ArgumentOptions == null) {
+      _operandSelector.DropdownElement.ToggleDisplayStyle(false);
+      _valueSelector.Root.ToggleDisplayStyle(false);
+    }
+    _operandSelector.Items =
+        _selectedDefinition.ArgumentType == ScriptValue.TypeEnum.String ? StringOperators : NumberOperators;
+    _operandSelector.DropdownElement.ToggleDisplayStyle(true);
+    _valueSelector.SetDefinitions(_selectedDefinition.ArgumentOptions);
     _valueSelector.Root.ToggleDisplayStyle(true);
   }
 }

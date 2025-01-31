@@ -39,13 +39,23 @@ class RulesEditorDialog : IPostLoadableSingleton {
   const string ActionMustBeActionLocKey = "IgorZ.Automation.Scripting.Editor.ActionMustBeAction";
   const string SaveRulesBtnLocKey = "IgorZ.Automation.Scripting.Editor.SaveRules";
   const string DiscardChangesBtnLocKey = "IgorZ.Automation.Scripting.Editor.DiscardChanges";
+  const string ParseErrorLocKey = "IgorZ.Automation.Scripting.Expressions.ParseError";
 
   #region API
 
-  sealed class RuleDefinition {
+  internal sealed class RuleDefinition {
+    //public RulesEditorDialog EditorDialog { get; init; }
     public string ConditionExpression;
+    //FIXME: maybe keep parser context?
+    public BoolOperatorExpr ParsedCondition;
     public string ActionExpression;
+    public ActionExpr ParsedAction;
+    public VisualElement RuleRow { get; init; }
     public IAutomationAction LegacyRule { get; init; }
+
+    public bool Parse() {
+      return false;
+    }
   }
 
   public void Show(AutomationBehavior behavior, Action onClosed) {
@@ -77,6 +87,7 @@ class RulesEditorDialog : IPostLoadableSingleton {
   readonly UiFactory _uiFactory;
   readonly ITooltipRegistrar _tooltipRegistrar;
   readonly DialogBoxShower _dialogBoxShower;
+  readonly ConstructorEditorProvider _constructorEditorProvider;
   readonly int _contentMaxWidth;
   readonly int _contentMaxHeight;
 
@@ -91,10 +102,12 @@ class RulesEditorDialog : IPostLoadableSingleton {
   AutomationBehavior _activeBuilding;
   Button _confirmButton;
 
-  RulesEditorDialog(UiFactory uiFactory, ITooltipRegistrar tooltipRegistrar, DialogBoxShower dialogBoxShower) {
+  RulesEditorDialog(UiFactory uiFactory, ITooltipRegistrar tooltipRegistrar, DialogBoxShower dialogBoxShower,
+                    ConstructorEditorProvider constructorEditorProvider) {
     _uiFactory = uiFactory;
     _tooltipRegistrar = tooltipRegistrar;
     _dialogBoxShower = dialogBoxShower;
+    _constructorEditorProvider = constructorEditorProvider;
     _contentMaxWidth = Mathf.RoundToInt(Screen.width * ContentWidthRatio);
     _contentMaxHeight = Mathf.RoundToInt(Screen.height * ContentHeightRatio);
   }
@@ -119,13 +132,11 @@ class RulesEditorDialog : IPostLoadableSingleton {
     var addRuleFromScriptBtn = _uiFactory.CreateButton(AddRuleFromScriptBtnLocKey, AddScript);
     addRuleFromScriptBtn.style.marginRight = 5;
     buttons.Add(addRuleFromScriptBtn);
-    var addRuleViaConstructorBtn = _uiFactory.CreateButton(AddRuleViaConstructorBtnLocKey, () => {});
+    var addRuleViaConstructorBtn = _uiFactory.CreateButton(AddRuleViaConstructorBtnLocKey, AddViaConstructor);
     addRuleViaConstructorBtn.style.marginRight = 5;
-    addRuleViaConstructorBtn.SetEnabled(false);
     buttons.Add(addRuleViaConstructorBtn);
 
     var scrollView = _uiFactory.UiBuilder.Create<DefaultScrollView>()
-        // .SetMaxWidth(_contentMaxWidth)
         .SetMaxHeight(_contentMaxHeight)
         .BuildAndInitialize();
     scrollView.Add(root);
@@ -136,28 +147,41 @@ class RulesEditorDialog : IPostLoadableSingleton {
   void SetActiveBuilding(AutomationBehavior behavior) {
     _activeBuilding = behavior;
     _rules.Clear();
+    _ruleRowsContainer.Clear();
 
     foreach (var action in behavior.Actions) {
+      RuleDefinition rule;
       if (action is ScriptedAction { Condition: ScriptedCondition scriptedCondition } scriptedAction) {
-        _rules.Add(new RuleDefinition {
-            ConditionExpression = scriptedCondition.Expression,
-            ActionExpression = scriptedAction.Expression,
-        });
+        rule = AddRule(scriptedCondition.Expression, scriptedAction.Expression);
       } else {
-        _rules.Add(new RuleDefinition {
-            ConditionExpression = action.Condition.UiDescription,
-            ActionExpression = action.UiDescription,
-            LegacyRule = action,
-        });
+        rule = AddRule(action.Condition.UiDescription, action.UiDescription, action);
       }
+      ViewRulePlain(rule);
     }
+  }
 
-    _ruleRowsContainer.Clear();
-    foreach (var rule in _rules) {
-      var ruleRow = MakeRuleRow();
-      _ruleRowsContainer.Add(ruleRow);
-      ViewRulePlain(ruleRow, rule);
-    }
+  RuleDefinition AddRule(string condition, string action, IAutomationAction legacyRule = null) {
+    var rule = new RuleDefinition {
+        RuleRow = MakeRuleRow(),
+        ConditionExpression = condition ?? "",
+        ActionExpression = action ?? "",
+        LegacyRule = legacyRule,
+    };
+    ParseRule(rule);
+    _rules.Add(rule);
+    _ruleRowsContainer.Add(rule.RuleRow);
+    return rule;
+  }
+
+  void ParseRule(RuleDefinition rule) {
+    rule.ParsedCondition = ParseExpression(rule.ConditionExpression).ParsedExpression as BoolOperatorExpr;
+    rule.ParsedAction = ParseExpression(rule.ActionExpression).ParsedExpression as ActionExpr;
+  }
+
+  void RemoveRule(RuleDefinition rule) {
+    _rules.Remove(rule);
+    rule.RuleRow.RemoveFromHierarchy();
+    RemovePendingEdit(rule);
   }
 
   void SaveRulesAndCloseDialog(Action onClosed) {
@@ -177,28 +201,43 @@ class RulesEditorDialog : IPostLoadableSingleton {
   }
 
   void AddScript() {
-    var rule = new RuleDefinition { ConditionExpression = "", ActionExpression = "" };
-    _rules.Add(rule);
-    var ruleRow = MakeRuleRow();
-    _ruleRowsContainer.Add(ruleRow);
-    EditRuleAsScript(ruleRow, rule, isNew: true);
+    var rule = AddRule(null, null);
+    EditRuleAsScript(rule, isNew: true);
   }
 
-  void ViewRulePlain(VisualElement ruleRow, RuleDefinition rule) {
+  void AddViaConstructor() {
+    var rule = AddRule(null, null);
+    AddPendingEdit(rule);
+
+    var buttons = rule.RuleRow.Q("RuleButtons");
+    _constructorEditorProvider.MakeForRule(rule, _activeBuilding, out var applyFn);
+    CreateButton(buttons, SaveScriptBtnLocKey, _ => {
+      var error = applyFn?.Invoke();
+      if (error != null) {
+        ReportError(rule, error);
+        return;
+      }
+      RemovePendingEdit(rule);
+      ParseRule(rule);
+      ClearError(rule);
+      ViewRulePlain(rule);
+    });
+    CreateButton(buttons, DiscardScriptBtnLocKey, _ => RemoveRule(rule));
+  }
+
+  //FIXME: get row from rule.
+  void ViewRulePlain(RuleDefinition rule) {
     // Side panel
-    var sidePanel = ruleRow.Q("SidePanel");
+    var sidePanel = rule.RuleRow.Q("SidePanel");
     sidePanel.Clear();
     sidePanel.ToggleDisplayStyle(true);
     var deleteBtn = _uiFactory.UiBuilder.Create<CrossButton>().BuildAndInitialize();
     _tooltipRegistrar.Register(deleteBtn, _uiFactory.T(DeleteRuleBtnLocKey));
-    deleteBtn.clicked += () => {
-      _rules.Remove(rule);
-      ruleRow.RemoveFromHierarchy();
-    };
+    deleteBtn.clicked += () => RemoveRule(rule);
     sidePanel.Add(deleteBtn);
 
     // Rule content.
-    var content = ruleRow.Q("RuleContent");
+    var content = rule.RuleRow.Q("RuleContent");
     content.Clear();
     var label = _uiFactory.CreateLabel();
     GetDescriptions(rule, out var conditionDesc, out var actionDesc);
@@ -207,7 +246,7 @@ class RulesEditorDialog : IPostLoadableSingleton {
     content.Add(label);
 
     // Controls.
-    var buttons = ruleRow.Q("RuleButtons");
+    var buttons = rule.RuleRow.Q("RuleButtons");
     buttons.Clear();
 
     if (rule.LegacyRule is not null) {
@@ -215,8 +254,7 @@ class RulesEditorDialog : IPostLoadableSingleton {
     } else {
       buttons.ToggleDisplayStyle(true);
       CreateButton(buttons, EditAsScriptBtnLocKey, _ => {
-        EditRuleAsScript(ruleRow, rule);
-        DebugEx.Warning("Edit script: {0}", rule);
+        EditRuleAsScript(rule);
       });
       var btn = CreateButton(buttons, EditInConstructorBtnLocKey, _ => {
         DebugEx.Warning("Edit in constructor: {0}", rule);
@@ -255,9 +293,10 @@ class RulesEditorDialog : IPostLoadableSingleton {
       return;
     }
 
+    //FIXME: take parsed expressions from the rule
     var conditionParserContext = ParseExpression(rule.ConditionExpression);
     if (conditionParserContext.LastError != null) {
-      condition = TextColors.ColorizeText($"<RedHighlight>ERROR</RedHighlight>");
+      condition = _uiFactory.T(ParseErrorLocKey);
       DebugEx.Error("Failed to parse condition: {0}\nError: {1}", rule.ConditionExpression, conditionParserContext.LastError);
     } else {
       condition = ExpressionParser.Instance.GetDescription(conditionParserContext);
@@ -267,7 +306,7 @@ class RulesEditorDialog : IPostLoadableSingleton {
     var actionParserContext = ParseExpression(rule.ActionExpression);
 
     if (actionParserContext.LastError != null) {
-      action = TextColors.ColorizeText($"<RedHighlight>ERROR</RedHighlight>");
+      action = _uiFactory.T(ParseErrorLocKey);
       DebugEx.Error("Failed to parse action: {0}\nError: {1}", rule.ActionExpression, actionParserContext.LastError);
     } else {
       action = ExpressionParser.Instance.GetDescription(actionParserContext);
@@ -285,14 +324,14 @@ class RulesEditorDialog : IPostLoadableSingleton {
     _confirmButton.SetEnabled(_pendingEditorRules.Count == 0);
   }
 
-  void EditRuleAsScript(VisualElement ruleRow, RuleDefinition rule, bool isNew = false) {
+  void EditRuleAsScript(RuleDefinition rule, bool isNew = false) {
     AddPendingEdit(rule);
 
     // Side panel
-    ruleRow.Q("SidePanel").ToggleDisplayStyle(false);
+    rule.RuleRow.Q("SidePanel").ToggleDisplayStyle(false);
 
     // Rule content.
-    var content = ruleRow.Q("RuleContent");
+    var content = rule.RuleRow.Q("RuleContent");
     content.Clear();
 
     var conditionEdit = _uiFactory.CreateTextField();
@@ -313,14 +352,15 @@ class RulesEditorDialog : IPostLoadableSingleton {
         actionEdit
     ));
 
-    var buttons = ruleRow.Q("RuleButtons");
+    // Buttons
+    var buttons = rule.RuleRow.Q("RuleButtons");
     buttons.Clear();
 
     CreateButton(buttons, TestScriptBtnLocKey, btn => {
       VisualEffects.ScheduleSwitchEffect(
           btn, TestScriptStatusHighlightDurationMs, false, true,
           (b, v) => b.SetEnabled(v));
-      if (!RunRuleCheck(ruleRow, conditionEdit, actionEdit)) {
+      if (!RunRuleCheck(rule.RuleRow, conditionEdit, actionEdit)) {
         return;
       }
       VisualEffects.ScheduleSwitchEffect(
@@ -331,22 +371,23 @@ class RulesEditorDialog : IPostLoadableSingleton {
           (c, v) => c.textInput.style.color = v);
     });
     CreateButton(buttons, SaveScriptBtnLocKey, _ => {
-      if (RunRuleCheck(ruleRow, conditionEdit, actionEdit)) {
+      if (RunRuleCheck(rule.RuleRow, conditionEdit, actionEdit)) {
         RemovePendingEdit(rule);
         rule.ConditionExpression = conditionEdit.value;
         rule.ActionExpression = actionEdit.value;
-        ViewRulePlain(ruleRow, rule);
+        ParseRule(rule);
+        ClearError(rule);
+        ViewRulePlain(rule);
       }
     });
     CreateButton(buttons, DiscardScriptBtnLocKey, _ => {
       if (isNew) {
-        _rules.Remove(rule);
-        ruleRow.RemoveFromHierarchy();
+        RemoveRule(rule);
       } else {
-        ruleRow.Q("NotificationArea").ToggleDisplayStyle(false);
-        ViewRulePlain(ruleRow, rule);
+        RemovePendingEdit(rule);
+        ClearError(rule);
+        ViewRulePlain(rule);
       }
-      RemovePendingEdit(rule);
     });
   }
 
@@ -354,7 +395,7 @@ class RulesEditorDialog : IPostLoadableSingleton {
     conditionEdit.textInput.style.color = UiFactory.DefaultColor;
     actionEdit.textInput.style.color = UiFactory.DefaultColor;
     var notifications = ruleRow.Q("NotificationArea");
-    notifications.Clear();
+    notifications.Clear();//FIXME: clear on apply.
     if (CheckExpressionAndShowError(ruleRow, conditionEdit, true)
         && CheckExpressionAndShowError(ruleRow, actionEdit, false)) {
       notifications.ToggleDisplayStyle(false);
@@ -384,8 +425,8 @@ class RulesEditorDialog : IPostLoadableSingleton {
     ReportError(ruleRow, error);
     VisualEffects.ScheduleSwitchEffect(
         expressionField,
-        TestScriptStatusHighlightDurationMs, Color.red, UiFactory.DefaultColor,
-        (_, v) => expressionField.textInput.style.color = v);
+        TestScriptStatusHighlightDurationMs, new Color(1, 0, 0, 0.2f), Color.clear,
+        (f, c) => f.textInput.style.backgroundColor = c);
     return false;
   }
 
@@ -397,7 +438,7 @@ class RulesEditorDialog : IPostLoadableSingleton {
     return parserContext;
   }
 
-  Button CreateButton(VisualElement parent, string locKey, Action<Button> onClick) {
+  internal Button CreateButton(VisualElement parent, string locKey, Action<Button> onClick) {
     var button = _uiFactory.CreateButton(locKey, onClick, new Padding(0, 5, 0, 5));
     button.style.marginRight = 5;
     parent.Add(button);
@@ -481,8 +522,13 @@ class RulesEditorDialog : IPostLoadableSingleton {
     return row;
   }
 
+  static void ReportError(RuleDefinition rule, string error) {
+    ReportError(rule.RuleRow, error);
+  }
+
   static void ReportError(VisualElement ruleRow, string error) {
     var notifications = ruleRow.Q("NotificationArea");
+    notifications.Clear();
     var errorLabel = new Label {
         style = {
             color = Color.red,
@@ -491,6 +537,10 @@ class RulesEditorDialog : IPostLoadableSingleton {
     };
     notifications.Add(errorLabel);
     notifications.ToggleDisplayStyle(true);
+  }
+
+  static void ClearError(RuleDefinition rule) {
+    rule.RuleRow.Q("NotificationArea").ToggleDisplayStyle(false);
   }
 
   #endregion

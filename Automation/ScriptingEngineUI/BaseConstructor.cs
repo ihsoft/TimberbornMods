@@ -3,8 +3,10 @@
 // License: Public Domain
 
 using System;
+using IgorZ.Automation.ScriptingEngine;
 using IgorZ.TimberDev.UI;
 using TimberApi.UIPresets.Labels;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
@@ -18,7 +20,7 @@ abstract class BaseConstructor(UiFactory uiFactory) {
         style = {
             flexDirection = FlexDirection.Row,
             alignItems = Align.Center,
-        }
+        },
     };
     foreach (var arg in arguments) {
       switch (arg) {
@@ -35,5 +37,13 @@ abstract class BaseConstructor(UiFactory uiFactory) {
       }
     }
     return rowPanel;
+  }
+
+  protected static string PrepareConstantValue(string value, ScriptValue.TypeEnum type) {
+    return type switch {
+        ScriptValue.TypeEnum.Number => Mathf.RoundToInt(float.Parse(value) * 100).ToString(),
+        ScriptValue.TypeEnum.String => "'" + value + "'",
+        _ => throw new InvalidOperationException("Unknown argument type: " + type),
+    };
   }
 }

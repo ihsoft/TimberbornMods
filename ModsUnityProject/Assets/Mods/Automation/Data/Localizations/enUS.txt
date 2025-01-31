@@ -140,3 +140,5 @@ IgorZ.Automation.Scripting.Editor.ConditionMustBeBoolean,"Condition must be a bo
 IgorZ.Automation.Scripting.Editor.ActionMustBeAction,"Action must be the 'act' operator","A message to show when the action is not an action"
 IgorZ.Automation.Scripting.Editor.SaveRules,"Save and close",
 IgorZ.Automation.Scripting.Editor.DiscardChanges,"Discard changes",
+IgorZ.Automation.Scripting.Editor.StringConstantType,"строка","Name of the string constant type"
+IgorZ.Automation.Scripting.Editor.NumberConstantType,"число","Name of the number constant type"
