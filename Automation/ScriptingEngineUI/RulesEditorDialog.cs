@@ -44,18 +44,12 @@ class RulesEditorDialog : IPostLoadableSingleton {
   #region API
 
   internal sealed class RuleDefinition {
-    //public RulesEditorDialog EditorDialog { get; init; }
     public string ConditionExpression;
-    //FIXME: maybe keep parser context?
     public BoolOperatorExpr ParsedCondition;
     public string ActionExpression;
     public ActionExpr ParsedAction;
     public VisualElement RuleRow { get; init; }
     public IAutomationAction LegacyRule { get; init; }
-
-    public bool Parse() {
-      return false;
-    }
   }
 
   public void Show(AutomationBehavior behavior, Action onClosed) {
@@ -132,7 +126,8 @@ class RulesEditorDialog : IPostLoadableSingleton {
     var addRuleFromScriptBtn = _uiFactory.CreateButton(AddRuleFromScriptBtnLocKey, AddScript);
     addRuleFromScriptBtn.style.marginRight = 5;
     buttons.Add(addRuleFromScriptBtn);
-    var addRuleViaConstructorBtn = _uiFactory.CreateButton(AddRuleViaConstructorBtnLocKey, AddViaConstructor);
+    var addRuleViaConstructorBtn =
+        _uiFactory.CreateButton(AddRuleViaConstructorBtnLocKey, _ => EditInConstructor(null));
     addRuleViaConstructorBtn.style.marginRight = 5;
     buttons.Add(addRuleViaConstructorBtn);
 
@@ -147,6 +142,7 @@ class RulesEditorDialog : IPostLoadableSingleton {
   void SetActiveBuilding(AutomationBehavior behavior) {
     _activeBuilding = behavior;
     _rules.Clear();
+    _pendingEditorRules.Clear();
     _ruleRowsContainer.Clear();
 
     foreach (var action in behavior.Actions) {
@@ -205,12 +201,14 @@ class RulesEditorDialog : IPostLoadableSingleton {
     EditRuleAsScript(rule, isNew: true);
   }
 
-  void AddViaConstructor() {
-    var rule = AddRule(null, null);
+  void EditInConstructor(RuleDefinition rule) {
+    var isNew = rule == null;
+    rule ??= AddRule(null, null);
     AddPendingEdit(rule);
 
-    var buttons = rule.RuleRow.Q("RuleButtons");
     _constructorEditorProvider.MakeForRule(rule, _activeBuilding, out var applyFn);
+    var buttons = rule.RuleRow.Q("RuleButtons");
+    buttons.Clear();
     CreateButton(buttons, SaveScriptBtnLocKey, _ => {
       var error = applyFn?.Invoke();
       if (error != null) {
@@ -222,10 +220,17 @@ class RulesEditorDialog : IPostLoadableSingleton {
       ClearError(rule);
       ViewRulePlain(rule);
     });
-    CreateButton(buttons, DiscardScriptBtnLocKey, _ => RemoveRule(rule));
+    CreateButton(buttons, DiscardScriptBtnLocKey, _ => {
+      if (isNew) {
+        RemoveRule(rule);
+      } else {
+        RemovePendingEdit(rule);
+        ClearError(rule);
+        ViewRulePlain(rule);
+      }
+    });
   }
 
-  //FIXME: get row from rule.
   void ViewRulePlain(RuleDefinition rule) {
     // Side panel
     var sidePanel = rule.RuleRow.Q("SidePanel");
@@ -256,9 +261,7 @@ class RulesEditorDialog : IPostLoadableSingleton {
       CreateButton(buttons, EditAsScriptBtnLocKey, _ => {
         EditRuleAsScript(rule);
       });
-      var btn = CreateButton(buttons, EditInConstructorBtnLocKey, _ => {
-        DebugEx.Warning("Edit in constructor: {0}", rule);
-      });
+      var btn = CreateButton(buttons, EditInConstructorBtnLocKey, _ => EditInConstructor(rule));
       btn.SetEnabled(VerifyIfEditableInConstructor(rule));
     }
   }
@@ -434,11 +437,12 @@ class RulesEditorDialog : IPostLoadableSingleton {
     var parserContext = new ParserContext() {
       ScriptHost = _activeBuilding,
     };
+    //FIXME: inject
     ExpressionParser.Instance.Parse(expression, parserContext);
     return parserContext;
   }
 
-  internal Button CreateButton(VisualElement parent, string locKey, Action<Button> onClick) {
+  Button CreateButton(VisualElement parent, string locKey, Action<Button> onClick) {
     var button = _uiFactory.CreateButton(locKey, onClick, new Padding(0, 5, 0, 5));
     button.style.marginRight = 5;
     parent.Add(button);

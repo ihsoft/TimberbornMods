@@ -28,23 +28,26 @@ class ConstructorEditorProvider {
     var content = rule.RuleRow.Q("RuleContent");
     content.Clear();
 
-    var root = new RuleConstructor(_uiFactory);
-    PopulateConstructor(activeBuilding, root);
-    content.Add(root.Root);
+    var ruleConstructor = new RuleConstructor(_uiFactory);
+    PopulateConstructor(activeBuilding, ruleConstructor);
+    content.Add(ruleConstructor.Root);
 
     applyFn = () => {
-      if (root.ConditionConstructor.Validate() != null) {
-        DebugEx.Warning("Condition is not valid: {0}", root.ConditionConstructor.Validate());
+      if (ruleConstructor.ConditionConstructor.Validate() != null) {
+        DebugEx.Warning("Condition is not valid: {0}", ruleConstructor.ConditionConstructor.Validate());
         return null;
       }
-      var error = root.ActionConstructor.Validate();
+      var error = ruleConstructor.ActionConstructor.Validate();
       if (error != null) {
         return error;
       }
-      rule.ConditionExpression = root.ConditionConstructor.GetScript();
-      rule.ActionExpression = root.ActionConstructor.GetScript();
+      rule.ConditionExpression = ruleConstructor.ConditionConstructor.GetScript();
+      rule.ActionExpression = ruleConstructor.ActionConstructor.GetScript();
       return null;
     };
+
+    PopulateCondition(rule, ruleConstructor);
+    PopulateAction(rule, ruleConstructor);
   }
 
   public bool VerifyIfEditable(RulesEditorDialog.RuleDefinition rule) {
@@ -104,6 +107,43 @@ class ConstructorEditorProvider {
     return def.ValueType == ScriptValue.TypeEnum.Number
         ? [(ArgumentConstructor.InputTypeName, _uiFactory.T(NumberConstantTypeLocKey))]
         : [(ArgumentConstructor.InputTypeName, _uiFactory.T(StringConstantTypeLocKey))];
+  }
+
+  static void PopulateAction(RulesEditorDialog.RuleDefinition rule, RuleConstructor ruleConstructor) {
+    if (rule.ParsedCondition == null) {
+      return;
+    }
+    var actionConstructor = ruleConstructor.ActionConstructor;
+    if (rule.ParsedAction.Operands.Count != 2) {
+      throw new InvalidOperationException("Exactly two operands are expected");
+    }
+    actionConstructor.ActionSelector.Value = rule.ParsedAction.ActionName;
+    if (rule.ParsedAction.Operands[1] is not ConstantValueExpr constantValue) {
+      throw new InvalidOperationException("Constant value is expected");
+    }
+    var rightValue = constantValue.ValueFn();
+    actionConstructor.ArgumentConstructor.Value = rightValue.ValueType == ScriptValue.TypeEnum.Number
+        ? (rightValue.AsNumber / 100f).ToString("0.##")
+        : rightValue.AsString;
+  }
+
+  static void PopulateCondition(RulesEditorDialog.RuleDefinition rule, RuleConstructor ruleConstructor) {
+    if (rule.ParsedCondition == null) {
+      return;
+    }
+    var conditionConstructor = ruleConstructor.ConditionConstructor;
+    if (rule.ParsedCondition is not BinaryOperatorExpr binaryOperatorExpr) {
+      throw new InvalidOperationException("Binary operator is expected");
+    }
+    conditionConstructor.SignalSelector.Value = binaryOperatorExpr.Left.SignalName;
+    conditionConstructor.OperatorSelector.Value = binaryOperatorExpr.Name;
+    if (binaryOperatorExpr.Right is not ConstantValueExpr constantValue) {
+      throw new InvalidOperationException("Constant value is expected");
+    }
+    var rightValue = constantValue.ValueFn();
+    conditionConstructor.ValueSelector.Value = rightValue.ValueType == ScriptValue.TypeEnum.Number
+        ? (rightValue.AsNumber / 100f).ToString("0.##")
+        : rightValue.AsString;
   }
 
   #endregion

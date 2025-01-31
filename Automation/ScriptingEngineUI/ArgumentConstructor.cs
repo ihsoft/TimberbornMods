@@ -6,7 +6,6 @@ using System;
 using System.Linq;
 using IgorZ.TimberDev.UI;
 using Timberborn.CoreUI;
-using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -93,5 +92,6 @@ sealed class ArgumentConstructor : BaseConstructor {
   void UpdateTypeSelection() {
     _textField.ToggleDisplayStyle(IsInput);
     _textField.value = "";
+    OnStringValueChanged?.Invoke(this, EventArgs.Empty);
   }
 }
