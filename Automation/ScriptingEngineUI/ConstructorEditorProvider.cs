@@ -12,13 +12,23 @@ using IgorZ.TimberDev.UI;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
 
-class ConstructorEditorProvider : IEditorProvider {
+sealed class ConstructorEditorProvider : IEditorProvider {
+
+  const string AddRuleViaConstructorBtnLocKey = "IgorZ.Automation.Scripting.Editor.AddRuleViaConstructorBtn";
+  const string EditInConstructorBtnLocKey = "IgorZ.Automation.Scripting.Editor.EditInConstructorBtn";
 
   const string StringConstantTypeLocKey = "IgorZ.Automation.Scripting.Editor.StringConstantType";
   const string NumberConstantTypeLocKey = "IgorZ.Automation.Scripting.Editor.NumberConstantType";
 
-  #region API
+  #region IEditorProvider implementation
 
+  /// <inheritdoc/>
+  public string CreateRuleLocKey => AddRuleViaConstructorBtnLocKey;
+
+  /// <inheritdoc/>
+  public string EditRuleLocKey => EditInConstructorBtnLocKey;
+
+  /// <inheritdoc/>
   public void MakeForRule(RuleRow ruleRow) {
     var ruleConstructor = new RuleConstructor(_uiFactory);
     PopulateConstructor(ruleRow.ActiveBuilding, ruleConstructor);
@@ -38,6 +48,7 @@ class ConstructorEditorProvider : IEditorProvider {
     });
   }
 
+  /// <inheritdoc/>
   public bool VerifyIfEditable(RuleRow ruleRow) {
     if (ruleRow.ParsedCondition == null || ruleRow.ParsedAction == null) {
       return false;
@@ -52,7 +63,6 @@ class ConstructorEditorProvider : IEditorProvider {
   }
 
   #endregion
-
 
   #region Implementation
 

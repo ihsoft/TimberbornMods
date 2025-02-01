@@ -18,7 +18,7 @@ using UnityEngine.UIElements;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
 
-class RuleRow {
+sealed class RuleRow {
 
   const string ConditionLabelLocKey = "IgorZ.Automation.Scripting.Editor.ConditionLabel";
   const string ActionLabelLocKey = "IgorZ.Automation.Scripting.Editor.ActionLabel";
@@ -69,7 +69,7 @@ class RuleRow {
 
   public event EventHandler OnModeChanged;
 
-  public RuleRow(IEnumerable<(string, IEditorProvider)> editors,
+  public RuleRow(IEnumerable<IEditorProvider> editors,
                  UiFactory uiFactory, AutomationBehavior activeBuilding) {
     _uiFactory = uiFactory;
     ActiveBuilding = activeBuilding;
@@ -114,14 +114,16 @@ class RuleRow {
     _ruleContent.Add(label);
 
     // Controls.
-    if (LegacyAction is not null) {
-      _ruleButtons.ToggleDisplayStyle(false);
-    } else {
-      foreach (var (locKey, provider) in _editorProviders) {
-        var button = CreateButton(locKey, _ => provider.MakeForRule(this));
-        button.SetEnabled(provider.VerifyIfEditable(this));
+    var ruleEditable = false;
+    foreach (var provider in _editorProviders) {
+      var canEdit = provider.VerifyIfEditable(this);
+      if (!canEdit) {
+        continue;
       }
+      var button = CreateButton(provider.EditRuleLocKey, _ => provider.MakeForRule(this));
+      ruleEditable = true;
     }
+    _ruleButtons.ToggleDisplayStyle(ruleEditable);
 
     IsInEditMode = false;
     OnModeChanged?.Invoke(this, EventArgs.Empty);
@@ -157,7 +159,7 @@ class RuleRow {
   #region Implementation
 
   readonly UiFactory _uiFactory;
-  readonly (string, IEditorProvider)[] _editorProviders;
+  readonly IEditorProvider[] _editorProviders;
 
   readonly VisualElement _sidePanel;
   readonly VisualElement _ruleContent;

@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
 
-class ScriptEditorProvider : IEditorProvider {
+sealed class ScriptEditorProvider : IEditorProvider {
 
   const string ConditionLabelLocKey = "IgorZ.Automation.Scripting.Editor.ConditionLabel";
   const string ActionLabelLocKey = "IgorZ.Automation.Scripting.Editor.ActionLabel";
@@ -18,16 +18,22 @@ class ScriptEditorProvider : IEditorProvider {
   const string ConditionMustBeBoolLocKey = "IgorZ.Automation.Scripting.Editor.ConditionMustBeBoolean";
   const string ActionMustBeActionLocKey = "IgorZ.Automation.Scripting.Editor.ActionMustBeAction";
 
+  const string AddRuleFromScriptBtnLocKey = "IgorZ.Automation.Scripting.Editor.AddRuleFromScriptBtn";
+  const string EditAsScriptBtnLocKey = "IgorZ.Automation.Scripting.Editor.EditAsScriptBtn";
+
   const int TestScriptStatusHighlightDurationMs = 1000;
-  static readonly Color ErrorBackgroundColor = new Color(1, 0, 0, 0.2f);
+  static readonly Color ErrorBackgroundColor = new(1, 0, 0, 0.2f);
   static readonly Color GoodScriptTextColor = Color.green;
 
-  readonly UiFactory _uiFactory;
-  
-  ScriptEditorProvider(UiFactory uiFactory) {
-    _uiFactory = uiFactory;
-  }
+  #region IEditorProvider implementation
 
+  /// <inheritdoc/>
+  public string CreateRuleLocKey => AddRuleFromScriptBtnLocKey;
+
+  /// <inheritdoc/>
+  public string EditRuleLocKey => EditAsScriptBtnLocKey;
+
+  /// <inheritdoc/>
   public void MakeForRule(RuleRow ruleRow) {
     var root = new VisualElement();
 
@@ -67,8 +73,20 @@ class ScriptEditorProvider : IEditorProvider {
           (c, v) => c.textInput.style.color = v);
     }, addAtBeginning: true);
   }
+
+  /// <inheritdoc/>
   public bool VerifyIfEditable(RuleRow ruleRow) {
-    return true;
+    return ruleRow.LegacyAction == null;
+  }
+
+  #endregion
+
+  #region Implementation
+
+  readonly UiFactory _uiFactory;
+  
+  ScriptEditorProvider(UiFactory uiFactory) {
+    _uiFactory = uiFactory;
   }
 
   bool RunRuleCheck(RuleRow ruleRow, TextField conditionEdit, TextField actionEdit) {
@@ -123,4 +141,6 @@ class ScriptEditorProvider : IEditorProvider {
     }
     return row;
   }
+
+  #endregion
 }

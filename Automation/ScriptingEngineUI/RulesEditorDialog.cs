@@ -17,12 +17,8 @@ using UnityEngine;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
 
-class RulesEditorDialog : IPostLoadableSingleton {
+sealed class RulesEditorDialog : IPostLoadableSingleton {
 
-  const string AddRuleFromScriptBtnLocKey = "IgorZ.Automation.Scripting.Editor.AddRuleFromScriptBtn";
-  const string AddRuleViaConstructorBtnLocKey = "IgorZ.Automation.Scripting.Editor.AddRuleViaConstructorBtn";
-  const string EditAsScriptBtnLocKey = "IgorZ.Automation.Scripting.Editor.EditAsScriptBtn";
-  const string EditInConstructorBtnLocKey = "IgorZ.Automation.Scripting.Editor.EditInConstructorBtn";
   const string SaveRulesBtnLocKey = "IgorZ.Automation.Scripting.Editor.SaveRules";
   const string DiscardChangesBtnLocKey = "IgorZ.Automation.Scripting.Editor.DiscardChanges";
 
@@ -66,7 +62,7 @@ class RulesEditorDialog : IPostLoadableSingleton {
   readonly int _contentMaxHeight;
 
   readonly List<RuleRow> _ruleRows = []; 
-  readonly (string, IEditorProvider)[] _editorProviders;
+  readonly IEditorProvider[] _editorProviders;
 
   VisualElement _ruleRowsContainer;
   AutomationBehavior _activeBuilding;
@@ -81,10 +77,7 @@ class RulesEditorDialog : IPostLoadableSingleton {
     _constructorEditorProvider = constructorEditorProvider;
     _contentMaxWidth = Mathf.RoundToInt(Screen.width * ContentWidthRatio);
     _contentMaxHeight = Mathf.RoundToInt(Screen.height * ContentHeightRatio);
-    _editorProviders = [
-        (EditAsScriptBtnLocKey, scriptEditorProvider),
-        (EditInConstructorBtnLocKey, constructorEditorProvider),
-    ];
+    _editorProviders = [scriptEditorProvider, constructorEditorProvider];
   }
 
   VisualElement CreateContent() {
@@ -98,14 +91,12 @@ class RulesEditorDialog : IPostLoadableSingleton {
     buttons.style.marginTop = 10;
     root.Add(buttons);
 
-    var addRuleFromScriptBtn = _uiFactory.CreateButton(
-        AddRuleFromScriptBtnLocKey, _ => _scriptEditorProvider.MakeForRule(CreateScriptedRule()));
-    addRuleFromScriptBtn.style.marginRight = 5;
-    buttons.Add(addRuleFromScriptBtn);
-    var addRuleViaConstructorBtn = _uiFactory.CreateButton(
-        AddRuleViaConstructorBtnLocKey, _ => _constructorEditorProvider.MakeForRule(CreateScriptedRule()));
-    addRuleViaConstructorBtn.style.marginRight = 5;
-    buttons.Add(addRuleViaConstructorBtn);
+    foreach (var provider in _editorProviders) {
+      var btn = _uiFactory.CreateButton(
+          provider.CreateRuleLocKey, _ => provider.MakeForRule(CreateScriptedRule()));
+      btn.style.marginRight = 5;
+      buttons.Add(btn);
+    }
 
     var scrollView = _uiFactory.UiBuilder.Create<DefaultScrollView>()
         .SetMaxHeight(_contentMaxHeight)
