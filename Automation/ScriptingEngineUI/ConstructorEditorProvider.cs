@@ -9,55 +9,43 @@ using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.TimberDev.UI;
-using Timberborn.CoreUI;
-using UnityDev.Utils.LogUtilsLite;
-using UnityEngine.UIElements;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
 
-class ConstructorEditorProvider {
+class ConstructorEditorProvider : IEditorProvider {
 
   const string StringConstantTypeLocKey = "IgorZ.Automation.Scripting.Editor.StringConstantType";
   const string NumberConstantTypeLocKey = "IgorZ.Automation.Scripting.Editor.NumberConstantType";
 
   #region API
 
-  public void MakeForRule(RulesEditorDialog.RuleDefinition rule, AutomationBehavior activeBuilding,
-                          out Func<string> applyFn) {
-    rule.RuleRow.Q("SidePanel").ToggleDisplayStyle(false);
-    var content = rule.RuleRow.Q("RuleContent");
-    content.Clear();
-
+  public void MakeForRule(RuleRow ruleRow) {
     var ruleConstructor = new RuleConstructor(_uiFactory);
-    PopulateConstructor(activeBuilding, ruleConstructor);
-    content.Add(ruleConstructor.Root);
+    PopulateConstructor(ruleRow.ActiveBuilding, ruleConstructor);
+    PopulateCondition(ruleRow, ruleConstructor);
+    PopulateAction(ruleRow, ruleConstructor);
 
-    applyFn = () => {
-      if (ruleConstructor.ConditionConstructor.Validate() != null) {
-        DebugEx.Warning("Condition is not valid: {0}", ruleConstructor.ConditionConstructor.Validate());
-        return null;
-      }
-      var error = ruleConstructor.ActionConstructor.Validate();
+    ruleRow.CreateEditView(ruleConstructor.Root, () => {
+      ruleRow.ClearError();
+      var error = ruleConstructor.ConditionConstructor.Validate() ?? ruleConstructor.ActionConstructor.Validate();
       if (error != null) {
-        return error;
+        ruleRow.ReportError(error);
       }
-      rule.ConditionExpression = ruleConstructor.ConditionConstructor.GetScript();
-      rule.ActionExpression = ruleConstructor.ActionConstructor.GetScript();
-      return null;
-    };
-
-    PopulateCondition(rule, ruleConstructor);
-    PopulateAction(rule, ruleConstructor);
+      return error == null;
+    }, () => {
+      ruleRow.ConditionExpression = ruleConstructor.ConditionConstructor.GetScript();
+      ruleRow.ActionExpression = ruleConstructor.ActionConstructor.GetScript();
+    });
   }
 
-  public bool VerifyIfEditable(RulesEditorDialog.RuleDefinition rule) {
-    if (rule.ParsedCondition == null || rule.ParsedAction == null) {
+  public bool VerifyIfEditable(RuleRow ruleRow) {
+    if (ruleRow.ParsedCondition == null || ruleRow.ParsedAction == null) {
       return false;
     }
-    if (rule.ParsedCondition is BinaryOperatorExpr { Right: not ConstantValueExpr }) {
+    if (ruleRow.ParsedCondition is not BinaryOperatorExpr or BinaryOperatorExpr { Right: not ConstantValueExpr }) {
       return false;
     }
-    if (rule.ParsedAction.Operands.Count != 2 || rule.ParsedAction.Operands[1] is not ConstantValueExpr) {
+    if (ruleRow.ParsedAction.Operands.Count != 2 || ruleRow.ParsedAction.Operands[1] is not ConstantValueExpr) {
       return false;
     }
     return true;
@@ -109,41 +97,41 @@ class ConstructorEditorProvider {
         : [(ArgumentConstructor.InputTypeName, _uiFactory.T(StringConstantTypeLocKey))];
   }
 
-  static void PopulateAction(RulesEditorDialog.RuleDefinition rule, RuleConstructor ruleConstructor) {
-    if (rule.ParsedCondition == null) {
+  static void PopulateAction(RuleRow ruleRow, RuleConstructor ruleConstructor) {
+    if (ruleRow.ParsedCondition == null) {
       return;
     }
     var actionConstructor = ruleConstructor.ActionConstructor;
-    if (rule.ParsedAction.Operands.Count != 2) {
+    if (ruleRow.ParsedAction.Operands.Count != 2) {
       throw new InvalidOperationException("Exactly two operands are expected");
     }
-    actionConstructor.ActionSelector.Value = rule.ParsedAction.ActionName;
-    if (rule.ParsedAction.Operands[1] is not ConstantValueExpr constantValue) {
+    actionConstructor.ActionSelector.Value = ruleRow.ParsedAction.ActionName;
+    if (ruleRow.ParsedAction.Operands[1] is not ConstantValueExpr constantValue) {
       throw new InvalidOperationException("Constant value is expected");
     }
-    var rightValue = constantValue.ValueFn();
-    actionConstructor.ArgumentConstructor.Value = rightValue.ValueType == ScriptValue.TypeEnum.Number
-        ? (rightValue.AsNumber / 100f).ToString("0.##")
-        : rightValue.AsString;
+    actionConstructor.ArgumentConstructor.Value = PrepareConstantValue(constantValue.ValueFn());
   }
 
-  static void PopulateCondition(RulesEditorDialog.RuleDefinition rule, RuleConstructor ruleConstructor) {
-    if (rule.ParsedCondition == null) {
+  static void PopulateCondition(RuleRow ruleRow, RuleConstructor ruleConstructor) {
+    if (ruleRow.ParsedCondition == null) {
       return;
     }
     var conditionConstructor = ruleConstructor.ConditionConstructor;
-    if (rule.ParsedCondition is not BinaryOperatorExpr binaryOperatorExpr) {
-      throw new InvalidOperationException("Binary operator is expected");
+    if (ruleRow.ParsedCondition is not BinaryOperatorExpr binaryOperatorExpr) {
+      throw new InvalidOperationException("Binary operator is expected, but found: " + ruleRow.ParsedCondition);
     }
     conditionConstructor.SignalSelector.Value = binaryOperatorExpr.Left.SignalName;
     conditionConstructor.OperatorSelector.Value = binaryOperatorExpr.Name;
     if (binaryOperatorExpr.Right is not ConstantValueExpr constantValue) {
       throw new InvalidOperationException("Constant value is expected");
     }
-    var rightValue = constantValue.ValueFn();
-    conditionConstructor.ValueSelector.Value = rightValue.ValueType == ScriptValue.TypeEnum.Number
-        ? (rightValue.AsNumber / 100f).ToString("0.##")
-        : rightValue.AsString;
+    conditionConstructor.ValueSelector.Value = PrepareConstantValue(constantValue.ValueFn());
+  }
+
+  static string PrepareConstantValue(ScriptValue value) {
+    return value.ValueType == ScriptValue.TypeEnum.Number
+        ? (value.AsNumber / 100f).ToString("0.##")
+        : value.AsString;
   }
 
   #endregion
