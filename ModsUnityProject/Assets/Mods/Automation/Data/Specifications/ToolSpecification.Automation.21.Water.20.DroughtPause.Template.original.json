@@ -10,13 +10,13 @@
     "TemplateFamilyName": "Water.SeasonManagement",
     "Rules": [
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.DroughtStartedCondition" },
-        "Action": { "TypeId": "IgorZ.Automation.Actions.PauseAction" }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition", "Expression": "(eq (sig Weather.Season) 'drought')" },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.ScriptedAction", "Expression": "(act Pausable.Pause)" }
       },
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.DroughtEndedCondition" },
-        "Action": { "TypeId": "IgorZ.Automation.Actions.UnpauseAction" }
-      }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition", "Expression": "(ne (sig Weather.Season) 'drought')" },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.ScriptedAction", "Expression": "(act Pausable.Unpause)" }
+      },
     ]
   }
 }
