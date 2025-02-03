@@ -56,7 +56,8 @@ sealed class ConstructorEditorProvider : IEditorProvider {
     if (ruleRow.ParsedCondition is not BinaryOperatorExpr or BinaryOperatorExpr { Right: not ConstantValueExpr }) {
       return false;
     }
-    if (ruleRow.ParsedAction.Operands.Count != 2 || ruleRow.ParsedAction.Operands[1] is not ConstantValueExpr) {
+    if (ruleRow.ParsedAction.Operands.Count > 2
+        || ruleRow.ParsedAction.Operands.Count == 2 && ruleRow.ParsedAction.Operands[1] is not ConstantValueExpr) {
       return false;
     }
     return true;
@@ -86,19 +87,15 @@ sealed class ConstructorEditorProvider : IEditorProvider {
 
     var actions = _scriptingService.GetActionNamesForBuilding(behavior)
         .Select(t => _scriptingService.GetActionDefinition(t, behavior))
+        .Where(x => x.Arguments.Length <= 1)
         .Select(t => new ActionConstructor.ActionDefinition {
             Action = (t.ScriptName, t.DisplayName),
-            ArgumentType = t.Arguments[0].ValueType,
-            ArgumentOptions = GetArgumentOptions(t.Arguments),
+            Arguments = t.Arguments.Select(a => (a.ValueType, GetArgumentOptions(a))).ToArray(),
         });
     ruleConstructor.ActionConstructor.SetDefinitions(actions);
   }
 
-  DropdownItem<string>[] GetArgumentOptions(IList<ValueDef> valueDefs) {
-    if (valueDefs.Count != 1) {
-      throw new InvalidOperationException("Exactly one argument is expected");
-    }
-    var def = valueDefs[0];
+  DropdownItem<string>[] GetArgumentOptions(ValueDef def) {
     if (def.Options != null) {
       return def.Options;
     }

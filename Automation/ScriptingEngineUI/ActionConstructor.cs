@@ -19,8 +19,7 @@ sealed class ActionConstructor : BaseConstructor {
 
   public record ActionDefinition {
     public DropdownItem<string> Action { get; init; }
-    public ScriptValue.TypeEnum ArgumentType { get; init; }
-    public DropdownItem<string>[] ArgumentOptions { get; init; }
+    public (ScriptValue.TypeEnum ValueType, DropdownItem<string>[] Options)[] Arguments { get; init; }
   }
 
   public override VisualElement Root { get; }
@@ -41,21 +40,31 @@ sealed class ActionConstructor : BaseConstructor {
   }
 
   public string Validate() {
-    if (_selectedAction.ArgumentType == ScriptValue.TypeEnum.Number) {
-      return ArgumentConstructor.CheckInputForNumber();
+    string res = null;
+    for (var i = 0; i < _selectedAction.Arguments.Length && res == null; i++) {
+      switch (_selectedAction.Arguments[i].ValueType) {
+        case ScriptValue.TypeEnum.Number:
+          res = ArgumentConstructor.CheckInputForNumber();
+          continue;
+        case ScriptValue.TypeEnum.String:
+          res = ArgumentConstructor.CheckInputForString();
+          continue;
+      }
     }
-    if (_selectedAction.ArgumentType == ScriptValue.TypeEnum.String) {
-      return ArgumentConstructor.CheckInputForString();
-    }
-    return null;
+    return res;
   }
 
   public string GetScript() {
     var action = ActionSelector.Value;
     var def = _actionDefinitions.First(x => x.Action.Value == action);
-    return def.ArgumentOptions == null
-        ? $"(act {action})"
-        : $"(act {action} {PrepareConstantValue(ArgumentConstructor.Value, def.ArgumentType)})";
+    if (def.Arguments.Length == 0) {
+      return $"(act {action})";
+    }
+    var script = "(act " + action;
+    for (var i = 0; i < def.Arguments.Length; i++) {
+      script += " " + PrepareConstantValue(ArgumentConstructor.Value, def.Arguments[i].ValueType);
+    }
+    return script + ")";
   }
 
   #endregion
@@ -65,11 +74,13 @@ sealed class ActionConstructor : BaseConstructor {
 
   void SetAction(string action) {
     _selectedAction = _actionDefinitions.First(def => def.Action.Value == action);
-    if (_selectedAction.ArgumentOptions == null) {
+    if (_selectedAction.Arguments.Length == 0) {
       ArgumentConstructor.Root.ToggleDisplayStyle(false);
-    } else {
+    } else if (_selectedAction.Arguments.Length == 1) {
       ArgumentConstructor.Root.ToggleDisplayStyle(true);
-      ArgumentConstructor.SetDefinitions(_selectedAction.ArgumentOptions);
+      ArgumentConstructor.SetDefinitions(_selectedAction.Arguments[0].Options);
+    } else {
+      throw new System.NotImplementedException("Multiple arguments are not supported yet");
     }
   }
 }
