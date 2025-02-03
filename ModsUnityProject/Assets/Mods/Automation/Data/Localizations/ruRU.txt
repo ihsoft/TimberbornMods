@@ -12,6 +12,8 @@ IgorZ.Automation.Scriptable.Debug.Action.Log,"записать в журнал: 
 IgorZ.Automation.Scriptable.Floodgate.Action.SetHeight,"выставить высоту затвора в {0}","Change the floodgate height to the specified value"
 IgorZ.Automation.Scriptable.Inventory.Signal.GoodPct,"запасы {0}","Name of the condition for the current good stock level checking"
 IgorZ.Automation.Scriptable.Weather.Signal.Season,"сезон","Name of the condition for the current season checking"
+IgorZ.Automation.Scriptable.Pausable.Action.Pause,"остановить здание","Name of the action that pauses the building"
+IgorZ.Automation.Scriptable.Pausable.Action.Resume,"запустить здание","Name of the action that unpauses the building"
 =,=,"Rules editor strings"
 IgorZ.Automation.Scripting.Editor.AddRuleFromScriptBtn,"Добавить скрипт",
 IgorZ.Automation.Scripting.Editor.AddRuleViaConstructorBtn,"Создать правило через конструктор",
