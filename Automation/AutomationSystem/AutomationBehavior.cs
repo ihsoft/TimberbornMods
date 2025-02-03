@@ -17,7 +17,7 @@ using UnityDev.Utils.LogUtilsLite;
 namespace IgorZ.Automation.AutomationSystem;
 
 /// <summary>The component that keeps all the automation state on the building.</summary>
-public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDeletableEntity {
+public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDeletableEntity, IFinishedStateListener, IPostInitializableLoadedEntity {
 
   #region Injection shortcuts
 
@@ -135,12 +135,34 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
         .OfType<IAutomationAction>()
         .Where(a => !a.IsMarkedForCleanup && a.Condition is { IsMarkedForCleanup: false })
         .ToList();
+  }
+
+  #endregion
+
+  #region IPostInitializableLoadedEntity implementation
+
+  public void PostInitializeLoadedEntity() {
     foreach (var action in _actions) {
       action.Condition.Behavior = this;
       action.Behavior = this;
     }
     CollectCleanedRules();
     UpdateRegistration();
+  }
+
+  #endregion
+
+  #region IFinishedStateListener implementation
+
+  /// <inheritdoc/>
+  public void OnEnterFinishedState() {
+    foreach (var action in _actions) {
+      action.Condition.SyncState();
+    }
+  }
+
+  /// <inheritdoc/>
+  public void OnExitFinishedState() {
   }
 
   #endregion

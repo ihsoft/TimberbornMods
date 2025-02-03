@@ -135,9 +135,11 @@ sealed class ScriptedCondition : AutomationConditionBase {
   }
 
   void CheckOperands() {
+    if (!Behavior.BlockObject.IsFinished) {
+      return;
+    }
     if (_parsedExpression != null) {
       ConditionState = _parsedExpression.Execute();
-      
     } else {
       HostedDebugLog.Error(Behavior, "Signal change triggered, but the condition was broken: {0}", Expression);
     }
