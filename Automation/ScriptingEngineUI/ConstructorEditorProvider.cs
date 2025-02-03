@@ -109,10 +109,13 @@ sealed class ConstructorEditorProvider : IEditorProvider {
       return;
     }
     var actionConstructor = ruleConstructor.ActionConstructor;
-    if (ruleRow.ParsedAction.Operands.Count != 2) {
-      throw new InvalidOperationException("Exactly two operands are expected");
-    }
     actionConstructor.ActionSelector.Value = ruleRow.ParsedAction.ActionName;
+    if (ruleRow.ParsedAction.Operands.Count == 1) {
+      return;
+    }
+    if (ruleRow.ParsedAction.Operands.Count > 2) {
+      throw new InvalidOperationException("At most one argument is expected");
+    }
     if (ruleRow.ParsedAction.Operands[1] is not ConstantValueExpr constantValue) {
       throw new InvalidOperationException("Constant value is expected");
     }
