@@ -8,13 +8,13 @@ using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
-class DebugScriptableComponent : ScriptableComponentBase {
+sealed class DebugScriptableComponent : ScriptableComponentBase {
 
   const string LogActionLocKey = "IgorZ.Automation.Scriptable.Debug.Action.Log";
 
   const string LogActionName = "Debug.Log";
 
-  #region IScriptable implementation
+  #region ScriptableComponentBase implementation
 
   /// <inheritdoc/>
   public override string Name => "Debug";

@@ -17,7 +17,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
   const string SetHeightActionName = "Floodgate.SetHeight";
 
-  #region IScriptable implementation
+  #region ScriptableComponentBase implementation
 
   /// <inheritdoc/>
   public override string Name => "Floodgate";
