@@ -81,7 +81,7 @@ sealed class ConstructorEditorProvider : IEditorProvider {
         .Select(t => new ConditionConstructor.ConditionDefinition {
             Argument = (t.ScriptName, t.DisplayName),
             ArgumentType = t.Result.ValueType,
-            ArgumentOptions = t.Result.Options,
+            ArgumentOptions = GetArgumentOptions(t.Result),
         });
     ruleConstructor.ConditionConstructor.SetDefinitions(conditions);
 
