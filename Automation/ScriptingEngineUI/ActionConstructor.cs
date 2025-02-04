@@ -40,18 +40,15 @@ sealed class ActionConstructor : BaseConstructor {
   }
 
   public string Validate() {
-    string res = null;
-    for (var i = 0; i < _selectedAction.Arguments.Length && res == null; i++) {
-      switch (_selectedAction.Arguments[i].ValueType) {
-        case ScriptValue.TypeEnum.Number:
-          res = ArgumentConstructor.CheckInputForNumber();
-          continue;
-        case ScriptValue.TypeEnum.String:
-          res = ArgumentConstructor.CheckInputForString();
-          continue;
-      }
-    }
-    return res;
+    return _selectedAction.Arguments.Length switch {
+        0 => null,
+        1 => _selectedAction.Arguments[0].ValueType switch {
+            ScriptValue.TypeEnum.Number => ArgumentConstructor.CheckInputForNumber(),
+            ScriptValue.TypeEnum.String => ArgumentConstructor.CheckInputForString(),
+            _ => null,
+        },
+        _ => throw new System.NotImplementedException("Multiple arguments are not supported yet"),
+    };
   }
 
   public string GetScript() {
