@@ -45,22 +45,17 @@ class ConditionConstructor : BaseConstructor {
   }
 
   public string Validate() {
-    if (_selectedDefinition.ArgumentType == ScriptValue.TypeEnum.Number) {
-      return ValueSelector.CheckInputForNumber();
-    }
-    if (_selectedDefinition.ArgumentType == ScriptValue.TypeEnum.String) {
-      return ValueSelector.CheckInputForString();
-    }
-    return null;
+    return _selectedDefinition.ArgumentType switch {
+        ScriptValue.TypeEnum.Number => ValueSelector.CheckInputForNumber(),
+        ScriptValue.TypeEnum.String => ValueSelector.CheckInputForString(),
+        _ => null
+    };
   }
 
   public string GetScript() {
     var arg = SignalSelector.Value;
     var op = OperatorSelector.Value;
-    var val = ValueSelector.Value;
-    if (_selectedDefinition.ArgumentType == ScriptValue.TypeEnum.String) {
-      val = "'" + val + "'";
-    }
+    var val = PrepareConstantValue(ValueSelector.Value, _selectedDefinition.ArgumentType);
     return $"({op} (sig {arg}) {val})";
   }
 
