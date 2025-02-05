@@ -37,7 +37,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
   /// <inheritdoc/>
   protected override void OnBehaviorToBeCleared() {
     foreach (var signal in _parserParserContext.ReferencedSignals) {
-      ScriptingService.Instance.UnregisterSignalChangeCallback(signal, CheckOperands);
+      ScriptingService.Instance.UnregisterSignalChangeCallback(signal, Behavior, CheckOperands);
     }
   }
 
@@ -130,7 +130,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
     var description = ExpressionParser.Instance.GetDescription(_parserParserContext);
     _uiDescription = TextColors.ColorizeText($"<SolidHighlight>{description}</SolidHighlight>");
     foreach (var signal in _parserParserContext.ReferencedSignals) {
-      ScriptingService.Instance.RegisterSignalChangeCallback(signal, CheckOperands);
+      ScriptingService.Instance.RegisterSignalChangeCallback(signal, Behavior, CheckOperands);
     }
   }
 

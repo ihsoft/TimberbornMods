@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System;
+using IgorZ.Automation.AutomationSystem;
 using Timberborn.BaseComponentSystem;
 
 namespace IgorZ.Automation.ScriptingEngine;
@@ -42,4 +43,16 @@ public interface IScriptable {
   /// <param name="building">The component on which the action is to be executed.</param>
   /// <exception cref="ScriptError">if action is not found.</exception>
   public ActionDef GetActionDefinition(string name, BaseComponent building);
+
+  /// <summary>Registers a callback called when the signal value changes.</summary>
+  /// <param name="name">The name of the signal.</param>
+  /// <param name="behavior">The component on which the signal is to be registered.</param>
+  /// <param name="onValueChanged">The callback that is called when the signal value changes.</param>
+  public void RegisterSignalChangeCallback(string name, AutomationBehavior behavior, Action onValueChanged);
+
+  /// <summary>Unregisters a signal value change callback.</summary>
+  /// <param name="name">The name of the signal.</param>
+  /// <param name="behavior">The component on which the signal is registered.</param>
+  /// <param name="onValueChanged">The callback that was registered for updates.</param>
+  public void UnregisterSignalChangeCallback(string name, AutomationBehavior behavior, Action onValueChanged);
 }

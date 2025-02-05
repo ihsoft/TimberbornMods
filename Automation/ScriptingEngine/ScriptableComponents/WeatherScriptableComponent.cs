@@ -3,6 +3,8 @@
 // License: Public Domain
 
 using System;
+using System.Collections.Generic;
+using IgorZ.Automation.AutomationSystem;
 using Timberborn.BaseComponentSystem;
 using Timberborn.HazardousWeatherSystem;
 using Timberborn.SingletonSystem;
@@ -45,6 +47,22 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
     };
   }
 
+  /// <inheritdoc/>
+  public override void RegisterSignalChangeCallback(string name, AutomationBehavior behavior, Action onValueChanged) {
+    if (!_signalChangeCallbacks.TryGetValue(name, out var callbacks)) {
+      callbacks = [];
+      _signalChangeCallbacks[name] = callbacks;
+    }
+    callbacks.Add(onValueChanged);
+  }
+
+  /// <inheritdoc/>
+  public override void UnregisterSignalChangeCallback(string name, AutomationBehavior behavior, Action onValueChanged) {
+    if (_signalChangeCallbacks.TryGetValue(name, out var callbacks)) {
+      callbacks.Remove(onValueChanged);
+    }
+  }
+
   #endregion
 
   #region IPostLoadableSingleton implementation
@@ -79,6 +97,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   readonly HazardousWeatherService _hazardousWeatherService;
 
   string _currentSeason;
+  readonly Dictionary<string, List<Action>> _signalChangeCallbacks = new();
 
   WeatherScriptableComponent(
       EventBus eventBus, WeatherService weatherService, HazardousWeatherService hazardousWeatherService) {
@@ -104,6 +123,14 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
     };
   }
 
+  void NotifySignalChanged(string name) {
+    if (_signalChangeCallbacks.TryGetValue(name, out var callbacks)) {
+      foreach (var callback in callbacks) {
+        callback();
+      }
+    }
+  }
+
   #endregion
 
   #region Event listeners
@@ -115,13 +142,13 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
         BadtideWeather => BadTideSeason,
         _ => throw new InvalidOperationException("Unknown hazardous weather type: " + @event.HazardousWeather),
     };
-    ScriptingService.NotifySignalChanged(SeasonSignalName);
+    NotifySignalChanged(SeasonSignalName);
   }
 
   [OnEvent]
   public void OnHazardousWeatherEndedEvent(HazardousWeatherEndedEvent @event) {
     _currentSeason = TemperateSeason;
-    ScriptingService.NotifySignalChanged(SeasonSignalName);
+    NotifySignalChanged(SeasonSignalName);
   }
 
   #endregion

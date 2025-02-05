@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using IgorZ.Automation.AutomationSystem;
 using Timberborn.BaseComponentSystem;
 using Timberborn.SingletonSystem;
 
@@ -20,7 +21,7 @@ public sealed class ScriptingService : ILoadableSingleton {
 
   /// <summary>Registers a new scriptable component.</summary>
   public void RegisterScriptable(IScriptable scriptable) {
-    _registedScriptables.Add(scriptable.Name, scriptable);
+    _registeredScriptables.Add(scriptable.Name, scriptable);
   }
 
   /// <summary>Returns a signal source by its name.</summary>
@@ -34,7 +35,7 @@ public sealed class ScriptingService : ILoadableSingleton {
   /// <exception cref="ScriptError">if the signal is not found.</exception>
   public Func<ScriptValue> GetSignalSource(string name, BaseComponent building) {
     var nameItems = name.Split('.');
-    if (!_registedScriptables.TryGetValue(nameItems[0], out var scriptable)) {
+    if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
       throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
     }
     return scriptable.GetSignalSource(name, building);
@@ -44,41 +45,28 @@ public sealed class ScriptingService : ILoadableSingleton {
   /// <exception cref="ScriptError">if the signal is not found.</exception>
   public SignalDef GetSignalDefinition(string name, BaseComponent building) {
     var nameItems = name.Split('.');
-    if (!_registedScriptables.TryGetValue(nameItems[0], out var scriptable)) {
+    if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
       throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
     }
     return scriptable.GetSignalDefinition(name, building);
   }
 
-  /// <summary>Registers a callback called when the signal value changes.</summary>
-  /// <param name="name">The name of the signal.</param>
-  /// <param name="onValueChanged">The callback that is called when the signal value changes.</param>
-  public void RegisterSignalChangeCallback(string name, Action onValueChanged) {
-    if (!_signalChangeCallbacks.TryGetValue(name, out var callbacks)) {
-      callbacks = [];
-      _signalChangeCallbacks[name] = callbacks;
+  /// <inheritdoc cref="IScriptable.RegisterSignalChangeCallback"/>
+  public void RegisterSignalChangeCallback(string name, AutomationBehavior building, Action onValueChanged) {
+    var nameItems = name.Split('.');
+    if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
+      throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
     }
-    callbacks.Add(onValueChanged);
+    scriptable.RegisterSignalChangeCallback(name, building, onValueChanged);
   }
 
-  /// <summary>Unregisters a signal value change callback.</summary>
-  /// <param name="name">The name of the signal.</param>
-  /// <param name="onValueChanged">The callback that was registered for updates.</param>
-  public void UnregisterSignalChangeCallback(string name, Action onValueChanged) {
-    if (_signalChangeCallbacks.TryGetValue(name, out var callbacks)) {
-      callbacks.Remove(onValueChanged);
+  /// <inheritdoc cref="IScriptable.UnregisterSignalChangeCallback"/>
+  public void UnregisterSignalChangeCallback(string name, AutomationBehavior building, Action onValueChanged) {
+    var nameItems = name.Split('.');
+    if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
+      throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
     }
-  }
-
-  /// <summary>Notifies all registered callbacks about a signal change.</summary>
-  /// <param name="name"></param>
-  public void NotifySignalChanged(string name) {
-    if (!_signalChangeCallbacks.TryGetValue(name, out var callbacks)) {
-      return;
-    }
-    foreach (var callback in callbacks) {
-      callback();
-    }
+    scriptable.UnregisterSignalChangeCallback(name, building, onValueChanged);
   }
 
   /// <summary>Returns an executor that executes the specified action with the provided arguments.</summary>
@@ -87,7 +75,7 @@ public sealed class ScriptingService : ILoadableSingleton {
   /// <exception cref="ScriptError">if action is not found.</exception>
   public Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
     var nameItems = name.Split('.');
-    if (!_registedScriptables.TryGetValue(nameItems[0], out var scriptable)) {
+    if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
       throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
     }
     return scriptable.GetActionExecutor(name, building);
@@ -99,7 +87,7 @@ public sealed class ScriptingService : ILoadableSingleton {
   /// <exception cref="ScriptError">if action is not found.</exception>
   public ActionDef GetActionDefinition(string name, BaseComponent building) {
     var nameItems = name.Split('.');
-    if (!_registedScriptables.TryGetValue(nameItems[0], out var scriptable)) {
+    if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
       throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
     }
     return scriptable.GetActionDefinition(name, building);
@@ -108,7 +96,7 @@ public sealed class ScriptingService : ILoadableSingleton {
   /// <summary>Returns all signal names for the specified building.</summary>
   /// <remarks>This can be an expensive call. Avoid making it in the ticks.</remarks>
   public string[] GetSignalNamesForBuilding(BaseComponent building) {
-    return _registedScriptables.Values
+    return _registeredScriptables.Values
         .SelectMany(s => s.GetSignalNamesForBuilding(building))
         .ToArray();
   }
@@ -116,7 +104,7 @@ public sealed class ScriptingService : ILoadableSingleton {
   /// <summary>Returns all action names for the specified building.</summary>
   /// <remarks>This can be an expensive call. Avoid making it in the ticks.</remarks>
   public string[] GetActionNamesForBuilding(BaseComponent building) {
-    return _registedScriptables.Values
+    return _registeredScriptables.Values
         .SelectMany(s => s.GetActionNamesForBuilding(building))
         .ToArray();
   }
@@ -132,8 +120,7 @@ public sealed class ScriptingService : ILoadableSingleton {
 
   #region Implementation
 
-  readonly Dictionary<string, IScriptable> _registedScriptables = [];
-  readonly Dictionary<string, List<Action>> _signalChangeCallbacks = new();
+  readonly Dictionary<string, IScriptable> _registeredScriptables = [];
 
   ScriptingService() {
     Instance = this;

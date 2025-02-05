@@ -4,6 +4,7 @@
 
 using System;
 using Bindito.Core;
+using IgorZ.Automation.AutomationSystem;
 using Timberborn.BaseComponentSystem;
 using Timberborn.Localization;
 using Timberborn.SingletonSystem;
@@ -42,6 +43,15 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
   /// <inheritdoc/>
   public virtual ActionDef GetActionDefinition(string name, BaseComponent building) {
     throw new ScriptError("Action not found: " + name);
+  }
+
+  /// <inheritdoc/>
+  public virtual void RegisterSignalChangeCallback(string name, AutomationBehavior behavior, Action onValueChanged) {
+    throw new ScriptError("Unknown signal: " + name);
+  }
+
+  /// <inheritdoc/>
+  public virtual void UnregisterSignalChangeCallback(string name, AutomationBehavior behavior, Action onValueChanged) {
   }
 
   protected static void AssertActionArgsCount(string actionName, ScriptValue[] args, int expectedCount) {
