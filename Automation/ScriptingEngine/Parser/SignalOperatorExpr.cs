@@ -34,7 +34,8 @@ sealed class SignalOperatorExpr : AbstractOperandExpr, IValueExpr {
     if (Operands[0] is not SymbolExpr symbol || !SignalNameRegexp.IsMatch(symbol.Value)) {
       throw new ScriptError("Bad signal name: " + Operands[0]);
     }
+    var def = ExpressionParser.Instance.GetSignalDefinition(symbol.Value);
+    ValueType = def.Result.ValueType;
     ValueFn = ExpressionParser.Instance.GetSignalSource(symbol.Value);
-    ValueType = ValueFn().ValueType;
   }
 }
