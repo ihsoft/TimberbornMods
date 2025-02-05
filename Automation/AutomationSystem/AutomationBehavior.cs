@@ -141,6 +141,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
 
   #region IPostInitializableLoadedEntity implementation
 
+  /// <inheritdoc/>
   public void PostInitializeLoadedEntity() {
     foreach (var action in _actions) {
       action.Condition.Behavior = this;
