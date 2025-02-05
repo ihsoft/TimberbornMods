@@ -24,15 +24,14 @@ public sealed class ScriptingService : ILoadableSingleton {
     _registeredScriptables.Add(scriptable.Name, scriptable);
   }
 
-  /// <summary>Returns a signal source by its name.</summary>
-  /// <remarks>
-  /// Different buildings have different signals. If requested for a wrong building, an error will be thrown.
-  /// </remarks>
-  /// <param name="name">The full dotted name of the signal. For example, "Weather.Season".</param>
-  /// <param name="building">
-  /// The building to get the signal for. Ignored for the global signals (like "Weather").
-  /// </param>
-  /// <exception cref="ScriptError">if the signal is not found.</exception>
+  /// <inheritdoc cref="IScriptable.GetSignalNamesForBuilding"/>
+  public string[] GetSignalNamesForBuilding(BaseComponent building) {
+    return _registeredScriptables.Values
+        .SelectMany(s => s.GetSignalNamesForBuilding(building))
+        .ToArray();
+  }
+
+  /// <inheritdoc cref="IScriptable.GetSignalSource"/>
   public Func<ScriptValue> GetSignalSource(string name, BaseComponent building) {
     var nameItems = name.Split('.');
     if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
@@ -41,14 +40,38 @@ public sealed class ScriptingService : ILoadableSingleton {
     return scriptable.GetSignalSource(name, building);
   }
 
-  /// <summary>Returns a signal definition by its name.</summary>
-  /// <exception cref="ScriptError">if the signal is not found.</exception>
+  /// <inheritdoc cref="IScriptable.GetSignalDefinition"/>
   public SignalDef GetSignalDefinition(string name, BaseComponent building) {
     var nameItems = name.Split('.');
     if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
       throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
     }
     return scriptable.GetSignalDefinition(name, building);
+  }
+
+  /// <inheritdoc cref="IScriptable.GetActionNamesForBuilding"/>
+  public string[] GetActionNamesForBuilding(BaseComponent building) {
+    return _registeredScriptables.Values
+        .SelectMany(s => s.GetActionNamesForBuilding(building))
+        .ToArray();
+  }
+
+  /// <inheritdoc cref="IScriptable.GetActionExecutor"/>
+  public Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
+    var nameItems = name.Split('.');
+    if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
+      throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
+    }
+    return scriptable.GetActionExecutor(name, building);
+  }
+
+  /// <inheritdoc cref="IScriptable.GetActionDefinition"/>
+  public ActionDef GetActionDefinition(string name, BaseComponent building) {
+    var nameItems = name.Split('.');
+    if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
+      throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
+    }
+    return scriptable.GetActionDefinition(name, building);
   }
 
   /// <inheritdoc cref="IScriptable.RegisterSignalChangeCallback"/>
@@ -67,46 +90,6 @@ public sealed class ScriptingService : ILoadableSingleton {
       throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
     }
     scriptable.UnregisterSignalChangeCallback(name, building, onValueChanged);
-  }
-
-  /// <summary>Returns an executor that executes the specified action with the provided arguments.</summary>
-  /// <param name="name">The name of the action.</param>
-  /// <param name="building">The building on which the action is to be executed.</param>
-  /// <exception cref="ScriptError">if action is not found.</exception>
-  public Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
-    var nameItems = name.Split('.');
-    if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
-      throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
-    }
-    return scriptable.GetActionExecutor(name, building);
-  }
-
-  /// <summary>Returns the definition of the action by its name.</summary>
-  /// <param name="name">The name of the action.</param>
-  /// <param name="building">The building on which the action is to be executed.</param>
-  /// <exception cref="ScriptError">if action is not found.</exception>
-  public ActionDef GetActionDefinition(string name, BaseComponent building) {
-    var nameItems = name.Split('.');
-    if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
-      throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
-    }
-    return scriptable.GetActionDefinition(name, building);
-  }
-
-  /// <summary>Returns all signal names for the specified building.</summary>
-  /// <remarks>This can be an expensive call. Avoid making it in the ticks.</remarks>
-  public string[] GetSignalNamesForBuilding(BaseComponent building) {
-    return _registeredScriptables.Values
-        .SelectMany(s => s.GetSignalNamesForBuilding(building))
-        .ToArray();
-  }
-
-  /// <summary>Returns all action names for the specified building.</summary>
-  /// <remarks>This can be an expensive call. Avoid making it in the ticks.</remarks>
-  public string[] GetActionNamesForBuilding(BaseComponent building) {
-    return _registeredScriptables.Values
-        .SelectMany(s => s.GetActionNamesForBuilding(building))
-        .ToArray();
   }
 
   #endregion

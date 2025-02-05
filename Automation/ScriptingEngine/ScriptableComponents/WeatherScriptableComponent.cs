@@ -48,7 +48,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   }
 
   /// <inheritdoc/>
-  public override void RegisterSignalChangeCallback(string name, AutomationBehavior behavior, Action onValueChanged) {
+  public override void RegisterSignalChangeCallback(string name, BaseComponent building, Action onValueChanged) {
     if (!_signalChangeCallbacks.TryGetValue(name, out var callbacks)) {
       callbacks = [];
       _signalChangeCallbacks[name] = callbacks;
@@ -57,7 +57,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   }
 
   /// <inheritdoc/>
-  public override void UnregisterSignalChangeCallback(string name, AutomationBehavior behavior, Action onValueChanged) {
+  public override void UnregisterSignalChangeCallback(string name, BaseComponent building, Action onValueChanged) {
     if (_signalChangeCallbacks.TryGetValue(name, out var callbacks)) {
       callbacks.Remove(onValueChanged);
     }

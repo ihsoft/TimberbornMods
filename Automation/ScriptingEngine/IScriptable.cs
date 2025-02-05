@@ -20,6 +20,7 @@ public interface IScriptable {
   /// <summary>Returns a signal source that can be used to monitor the specified signal value.</summary>
   /// <param name="name">The name of the signal.</param>
   /// <param name="building">The component on which the action is to be executed.</param>
+  /// <exception cref="ScriptError">if the signal is not found.</exception>
   public Func<ScriptValue> GetSignalSource(string name, BaseComponent building);
 
   /// <summary>Returns the definition of the signal with the specified name.</summary>
@@ -46,13 +47,13 @@ public interface IScriptable {
 
   /// <summary>Registers a callback called when the signal value changes.</summary>
   /// <param name="name">The name of the signal.</param>
-  /// <param name="behavior">The component on which the signal is to be registered.</param>
+  /// <param name="building">The component on which the signal is to be registered.</param>
   /// <param name="onValueChanged">The callback that is called when the signal value changes.</param>
-  public void RegisterSignalChangeCallback(string name, AutomationBehavior behavior, Action onValueChanged);
+  public void RegisterSignalChangeCallback(string name, BaseComponent building, Action onValueChanged);
 
   /// <summary>Unregisters a signal value change callback.</summary>
   /// <param name="name">The name of the signal.</param>
-  /// <param name="behavior">The component on which the signal is registered.</param>
+  /// <param name="building">The component on which the signal is registered.</param>
   /// <param name="onValueChanged">The callback that was registered for updates.</param>
-  public void UnregisterSignalChangeCallback(string name, AutomationBehavior behavior, Action onValueChanged);
+  public void UnregisterSignalChangeCallback(string name, BaseComponent building, Action onValueChanged);
 }
