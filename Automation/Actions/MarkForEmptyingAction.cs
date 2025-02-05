@@ -104,8 +104,7 @@ public sealed class MarkForEmptyingAction : AutomationActionBase {
 
     void Start() {
       _statusToggle = StatusToggle.CreatePriorityStatusWithFloatingIcon(
-        CustomStatusIcon,
-        GetComponentFast<AutomationBehavior>().Loc.T(CustomStatusDescriptionKey));
+          CustomStatusIcon, GetComponentFast<AutomationBehavior>().Loc.T(CustomStatusDescriptionKey));
       GetComponentFast<Emptiable>().UnmarkedForEmptying += OnUnmarkedForEmptying;
       var subject = GetComponentFast<StatusSubject>();
       subject.RegisterStatus(_statusToggle);
