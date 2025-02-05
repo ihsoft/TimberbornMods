@@ -139,7 +139,11 @@ sealed class ScriptedCondition : AutomationConditionBase {
       return;
     }
     if (_parsedExpression != null) {
-      ConditionState = _parsedExpression.Execute();
+      try {
+        ConditionState = _parsedExpression.Execute();
+      } catch (ExecutionInterrupted e) {
+        HostedDebugLog.Error(Behavior, "Condition execution interrupted: {0}\nReason: {1}", Expression, e.Reason);
+      }
     } else {
       HostedDebugLog.Error(Behavior, "Signal change triggered, but the condition was broken: {0}", Expression);
     }

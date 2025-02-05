@@ -4,6 +4,7 @@
 
 using System;
 using IgorZ.Automation.AutomationSystem;
+using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.Localization;
 using Timberborn.Persistence;
@@ -48,8 +49,11 @@ sealed class ScriptedAction : AutomationActionBase {
       return;
     }
     if (_parsedExpression != null) {
-      HostedDebugLog.Fine(Behavior, "Condition triggered: {0}", automationCondition);
-      _parsedExpression.Execute();
+      try {
+        _parsedExpression.Execute();
+      } catch (ExecutionInterrupted e) {
+        HostedDebugLog.Error(Behavior, "Action execution interrupted: {0}\nReason: {1}", Expression, e.Reason);
+      }
     } else {
       HostedDebugLog.Error(Behavior, "Condition triggered, but the action was broken: {0}", Expression);
     }
