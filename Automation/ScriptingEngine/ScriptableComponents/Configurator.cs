@@ -14,5 +14,6 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<FloodgateScriptableComponent>().AsSingleton();
     containerDefinition.Bind<DebugScriptableComponent>().AsSingleton();
     containerDefinition.Bind<PausableScriptableComponent>().AsSingleton();
+    containerDefinition.Bind<InventoryScriptableComponent>().AsSingleton();
   }
 }
