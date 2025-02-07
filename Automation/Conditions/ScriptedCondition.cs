@@ -15,6 +15,7 @@ namespace IgorZ.Automation.Conditions;
 sealed class ScriptedCondition : AutomationConditionBase {
 
   const string ParseErrorLocKey = "IgorZ.Automation.Scripting.Expressions.ParseError";
+  const string RuntimeErrorLocKey = "IgorZ.Automation.Scripting.Expressions.RuntimeError";
 
   #region AutomationConditionBase overrides
 
@@ -142,7 +143,11 @@ sealed class ScriptedCondition : AutomationConditionBase {
       try {
         ConditionState = _parsedExpression.Execute();
       } catch (ExecutionInterrupted e) {
-        HostedDebugLog.Error(Behavior, "Condition execution interrupted: {0}\nReason: {1}", Expression, e.Reason);
+        HostedDebugLog.Fine(Behavior, "Condition execution interrupted: {0}\nReason: {1}", Expression, e.Reason);
+      } catch (ScriptError e) {
+        HostedDebugLog.Error(Behavior, "Error in condition execution: {0}\nReason: {1}", Expression, e.Message);
+        _parsedExpression = null;
+        _uiDescription = TextColors.ColorizeText(Behavior.Loc.T(RuntimeErrorLocKey));
       }
     } else {
       HostedDebugLog.Error(Behavior, "Signal change triggered, but the condition was broken: {0}", Expression);

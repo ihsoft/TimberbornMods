@@ -15,6 +15,7 @@ namespace IgorZ.Automation.Actions;
 sealed class ScriptedAction : AutomationActionBase {
 
   const string ParseErrorLocKey = "IgorZ.Automation.Scripting.Expressions.ParseError";
+  const string RuntimeErrorLocKey = "IgorZ.Automation.Scripting.Expressions.RuntimeError";
 
   #region AutomationActionBase overrides
 
@@ -52,7 +53,11 @@ sealed class ScriptedAction : AutomationActionBase {
       try {
         _parsedExpression.Execute();
       } catch (ExecutionInterrupted e) {
-        HostedDebugLog.Error(Behavior, "Action execution interrupted: {0}\nReason: {1}", Expression, e.Reason);
+        HostedDebugLog.Fine(Behavior, "Action execution interrupted: {0}\nReason: {1}", Expression, e.Reason);
+      } catch (ScriptError e) {
+        HostedDebugLog.Error(Behavior, "Action failed: {0}\nError: {1}", Expression, e.Message);
+        _parsedExpression = null;
+        _uiDescription = TextColors.ColorizeText(Behavior.Loc.T(RuntimeErrorLocKey));
       }
     } else {
       HostedDebugLog.Error(Behavior, "Condition triggered, but the action was broken: {0}", Expression);
