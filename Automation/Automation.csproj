@@ -350,9 +350,6 @@
       <Compile Include="..\TimberDev\UI\ResizableDropdownElement.cs">
         <Link>TimberDev\UI\ResizableDropdownElement.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\UI\SimpleDropdown.cs">
-        <Link>TimberDev\UI\SimpleDropdown.cs</Link>
-      </Compile>
       <Compile Include="..\TimberDev\UI\UiFactory.cs">
         <Link>TimberDev\UI\UiFactory.cs</Link>
       </Compile>

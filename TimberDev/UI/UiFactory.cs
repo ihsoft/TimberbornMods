@@ -217,10 +217,10 @@ public sealed class UiFactory {
   }
 
   /// <summary>Creates a simple dropdown in a theme suitable for the right side panel.</summary>
-  public SimpleDropdown<T> CreateValueDropdown<T>(Action<T> onValueChanged = null, int? width = null) where T : notnull {
-    var dropdown = new SimpleDropdown<T>(this, _dropdownItemsSetter, onValueChanged);
-    if (width.HasValue) {
-      dropdown.DropdownElement.style.width = width.Value;
+  public ResizableDropdownElement CreateSimpleDropdown(Action<string> onValueChanged = null) {
+    var dropdown = UiBuilder.Create<ResizableDropdown>().BuildAndInitialize();
+    if (onValueChanged != null) {
+      dropdown.OnValueChanged += (_, _) => onValueChanged(dropdown.SelectedValue);
     }
     return dropdown;
   }

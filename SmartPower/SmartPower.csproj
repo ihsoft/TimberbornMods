@@ -116,8 +116,11 @@
       <Compile Include="..\TimberDev\UI\PreciseSliderWrapper.cs">
         <Link>TimberDev\UI\PreciseSliderWrapper.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\UI\SimpleDropdown.cs">
-        <Link>TimberDev\UI\SimpleDropdown.cs</Link>
+      <Compile Include="..\TimberDev\UI\ResizableDropdownBuilder.cs">
+        <Link>TimberDev\UI\ResizableDropdownBuilder.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UI\ResizableDropdownElement.cs">
+        <Link>TimberDev\UI\ResizableDropdownElement.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\UI\UiFactory.cs">
         <Link>TimberDev\UI\UiFactory.cs</Link>
