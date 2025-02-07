@@ -20,5 +20,4 @@ sealed class RuleConstructor : BaseConstructor {
     Root.Add(ConditionConstructor.Root);
     Root.Add(ActionConstructor.Root);
   }
-  
 }

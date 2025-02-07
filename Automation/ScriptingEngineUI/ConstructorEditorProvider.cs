@@ -3,7 +3,6 @@
 // License: Public Domain
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine;

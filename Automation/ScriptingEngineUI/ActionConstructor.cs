@@ -26,12 +26,6 @@ sealed class ActionConstructor : BaseConstructor {
   public readonly ResizableDropdownElement ActionSelector;
   public readonly ArgumentConstructor ArgumentConstructor;
 
-  public ActionConstructor(UiFactory uiFactory) : base(uiFactory) {
-    ActionSelector = uiFactory.CreateSimpleDropdown(SetAction);
-    ArgumentConstructor = new ArgumentConstructor(uiFactory);
-    Root = MakeRow(uiFactory.T(ActionLabelLocKey), ActionSelector, ArgumentConstructor.Root);
-  }
-
   public void SetDefinitions(IEnumerable<ActionDefinition> actionDefinitions) {
     _actionDefinitions = actionDefinitions.ToArray();
     ActionSelector.Items = _actionDefinitions.Select(def => def.Action).ToArray();
@@ -65,8 +59,16 @@ sealed class ActionConstructor : BaseConstructor {
 
   #endregion
 
+  #region Implementation
+
   ActionDefinition _selectedAction;
   ActionDefinition[] _actionDefinitions;
+
+  public ActionConstructor(UiFactory uiFactory) : base(uiFactory) {
+    ActionSelector = uiFactory.CreateSimpleDropdown(SetAction);
+    ArgumentConstructor = new ArgumentConstructor(uiFactory);
+    Root = MakeRow(uiFactory.T(ActionLabelLocKey), ActionSelector, ArgumentConstructor.Root);
+  }
 
   void SetAction(string action) {
     _selectedAction = _actionDefinitions.First(def => def.Action.Value == action);
@@ -79,4 +81,6 @@ sealed class ActionConstructor : BaseConstructor {
       throw new System.NotImplementedException("Multiple arguments are not supported yet");
     }
   }
+
+  #endregion
 }

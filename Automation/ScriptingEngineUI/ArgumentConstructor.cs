@@ -15,8 +15,14 @@ sealed class ArgumentConstructor : BaseConstructor {
 
   public const string InputTypeName = "-input-";
   const int ErrorStatusHighlightDurationMs = 1000;
+  static readonly Color ErrorTextColor = Color.red;
+  static readonly Color ErrorBackgroundColor = new Color(1, 0, 0, 0.2f);
+
+  #region API
 
   public override VisualElement Root { get; }
+
+  public event EventHandler OnStringValueChanged;
 
   public bool IsInput => _typeSelectionDropdown.SelectedValue == InputTypeName;
 
@@ -32,18 +38,6 @@ sealed class ArgumentConstructor : BaseConstructor {
         _textField.ToggleDisplayStyle(true);
       }
     }
-  }
-
-  public event EventHandler OnStringValueChanged;
-
-  readonly ResizableDropdownElement _typeSelectionDropdown;
-  readonly TextField _textField;
-
-  public ArgumentConstructor(UiFactory uiFactory) : base(uiFactory) {
-    _typeSelectionDropdown = uiFactory.CreateSimpleDropdown(_ => UpdateTypeSelection());
-    //FIXME: pass text size.
-    _textField = uiFactory.CreateTextField(width: 100);
-    Root = MakeRow(_typeSelectionDropdown, _textField);
   }
 
   public void SetDefinitions(DropdownItem<string>[] options) {
@@ -63,7 +57,7 @@ sealed class ArgumentConstructor : BaseConstructor {
     }
     if (res != null) {
       VisualEffects.ScheduleSwitchEffect(
-          _textField, ErrorStatusHighlightDurationMs, new Color(1, 0, 0, 0.2f), Color.clear,
+          _textField, ErrorStatusHighlightDurationMs, ErrorBackgroundColor, Color.clear,
           (f, c) => f.textInput.style.backgroundColor = c);
     } else {
       _textField.style.backgroundColor = UiFactory.DefaultColor;
@@ -81,7 +75,7 @@ sealed class ArgumentConstructor : BaseConstructor {
     }
     if (res != null) {
       VisualEffects.ScheduleSwitchEffect(
-          _textField, ErrorStatusHighlightDurationMs, Color.red, UiFactory.DefaultColor,
+          _textField, ErrorStatusHighlightDurationMs, ErrorTextColor, UiFactory.DefaultColor,
           (f, c) => f.style.backgroundColor = c);
     } else {
       _textField.style.backgroundColor = UiFactory.DefaultColor;
@@ -89,9 +83,24 @@ sealed class ArgumentConstructor : BaseConstructor {
     return res;
   }
 
+  #endregion
+
+  #region Implementation 
+
+  readonly ResizableDropdownElement _typeSelectionDropdown;
+  readonly TextField _textField;
+
+  public ArgumentConstructor(UiFactory uiFactory) : base(uiFactory) {
+    _typeSelectionDropdown = uiFactory.CreateSimpleDropdown(_ => UpdateTypeSelection());
+    _textField = uiFactory.CreateTextField(width: 100);
+    Root = MakeRow(_typeSelectionDropdown, _textField);
+  }
+
   void UpdateTypeSelection() {
     _textField.ToggleDisplayStyle(IsInput);
     _textField.value = "";
     OnStringValueChanged?.Invoke(this, EventArgs.Empty);
   }
+
+  #endregion
 }

@@ -17,7 +17,8 @@ using UnityEngine;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
 
-sealed class RulesEditorDialog : IPostLoadableSingleton {
+//sealed class RulesEditorDialog : IPostLoadableSingleton {
+sealed class RulesEditorDialog {
 
   const string SaveRulesBtnLocKey = "IgorZ.Automation.Scripting.Editor.SaveRules";
   const string DiscardChangesBtnLocKey = "IgorZ.Automation.Scripting.Editor.DiscardChanges";
@@ -47,7 +48,7 @@ sealed class RulesEditorDialog : IPostLoadableSingleton {
   #region IPostLoadableSingleton implementation
 
   /// <inheritdoc/>
-  public void PostLoad() {}
+  //public void PostLoad() {}
 
   #endregion
 
@@ -55,8 +56,6 @@ sealed class RulesEditorDialog : IPostLoadableSingleton {
 
   readonly UiFactory _uiFactory;
   readonly DialogBoxShower _dialogBoxShower;
-  readonly ScriptEditorProvider _scriptEditorProvider;
-  readonly ConstructorEditorProvider _constructorEditorProvider;
 
   readonly int _contentMaxWidth;
   readonly int _contentMaxHeight;
@@ -73,8 +72,6 @@ sealed class RulesEditorDialog : IPostLoadableSingleton {
                     ConstructorEditorProvider constructorEditorProvider) {
     _uiFactory = uiFactory;
     _dialogBoxShower = dialogBoxShower;
-    _scriptEditorProvider = scriptEditorProvider;
-    _constructorEditorProvider = constructorEditorProvider;
     _contentMaxWidth = Mathf.RoundToInt(Screen.width * ContentWidthRatio);
     _contentMaxHeight = Mathf.RoundToInt(Screen.height * ContentHeightRatio);
     _editorProviders = [scriptEditorProvider, constructorEditorProvider];

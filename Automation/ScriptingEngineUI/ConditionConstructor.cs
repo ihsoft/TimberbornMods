@@ -28,15 +28,6 @@ class ConditionConstructor : BaseConstructor {
   public readonly ResizableDropdownElement OperatorSelector;
   public readonly ArgumentConstructor ValueSelector;
 
-  public ConditionConstructor(UiFactory uiFactory) : base(uiFactory) {
-    SignalSelector = new ArgumentConstructor(uiFactory);
-    SignalSelector.OnStringValueChanged += (_, _) => SetArgument(SignalSelector.Value);
-    OperatorSelector = uiFactory.CreateSimpleDropdown();
-    ValueSelector = new ArgumentConstructor(uiFactory);
-
-    Root = MakeRow(uiFactory.T(ConditionLabelLocKey), SignalSelector.Root, OperatorSelector, ValueSelector.Root);
-  }
-
   public void SetDefinitions(IEnumerable<ConditionDefinition> lvalueDef) {
     _lvalueDefinitions = lvalueDef.ToArray();
     SignalSelector.SetDefinitions(_lvalueDefinitions.Select(x => x.Argument).ToArray());
@@ -47,7 +38,7 @@ class ConditionConstructor : BaseConstructor {
     return _selectedDefinition.ArgumentType switch {
         ScriptValue.TypeEnum.Number => ValueSelector.CheckInputForNumber(),
         ScriptValue.TypeEnum.String => ValueSelector.CheckInputForString(),
-        _ => null
+        _ => null,
     };
   }
 
@@ -59,6 +50,8 @@ class ConditionConstructor : BaseConstructor {
   }
 
   #endregion
+
+  #region Implementation
 
   static readonly DropdownItem<string>[] StringOperators = [
       new() { Value = "eq", Text = "=" },
@@ -77,6 +70,15 @@ class ConditionConstructor : BaseConstructor {
   ConditionDefinition _selectedDefinition;
   ConditionDefinition[] _lvalueDefinitions;
 
+  public ConditionConstructor(UiFactory uiFactory) : base(uiFactory) {
+    SignalSelector = new ArgumentConstructor(uiFactory);
+    SignalSelector.OnStringValueChanged += (_, _) => SetArgument(SignalSelector.Value);
+    OperatorSelector = uiFactory.CreateSimpleDropdown();
+    ValueSelector = new ArgumentConstructor(uiFactory);
+
+    Root = MakeRow(uiFactory.T(ConditionLabelLocKey), SignalSelector.Root, OperatorSelector, ValueSelector.Root);
+  }
+
   void SetArgument(string argument) {
     if (argument == null) {
       OperatorSelector.ToggleDisplayStyle(false);
@@ -94,4 +96,6 @@ class ConditionConstructor : BaseConstructor {
     ValueSelector.SetDefinitions(_selectedDefinition.ArgumentOptions);
     ValueSelector.Root.ToggleDisplayStyle(true);
   }
+
+  #endregion
 }
