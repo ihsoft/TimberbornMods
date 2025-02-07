@@ -2,6 +2,8 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using UnityEngine;
+
 namespace IgorZ.Automation.ScriptingEngine;
 
 /// <summary>Value that can be passed around in the scripting engine.</summary>
@@ -25,13 +27,20 @@ public record ScriptValue {
     return new ScriptValue { _string = literal };
   }
 
-  /// <summary>Creates a new value that represents a number. It is a 2-digit fixed precision float.</summary>
+  /// <summary>Creates a new value that represents a number.</summary>
+  /// <remarks>All numbers are 2-digits fixed precision numbers. Value "1234" should be treated as "12.34f".</remarks>
   public static ScriptValue Of(int number) {
     return new ScriptValue { _number = number };
   }
 
+  /// <summary>Creates a new value that represents a normal float value.</summary>
+  /// <remarks>Value "12.34f" will be transformed in to a 2-digit fixed precision number "1234".</remarks>
+  public static ScriptValue FromFloat(float value) {
+    return new ScriptValue { _number = Mathf.RoundToInt(value * 100f) };
+  }
+
   /// <summary>Current numeric value.</summary>
-  /// <remarks>All numbers are 2-digits fixed point numbers. Value "1234" should be treated as "12.34f".</remarks>
+  /// <remarks>All numbers are 2-digits fixed precision numbers. Value "1234" should be treated as "12.34f".</remarks>
   /// <exception cref="ScriptError">if the value is not numeric.</exception>
   public int AsNumber {
     get {

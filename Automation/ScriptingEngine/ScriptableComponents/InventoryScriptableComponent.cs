@@ -50,14 +50,14 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
       if (!inventory.InputGoods.Contains(goodId)) {
         throw new ScriptError($"Input good '{goodId}' not found in: {DebugEx.ObjectToString(inventory)}");
       }
-      return () => ScriptValue.Of(inventory.AmountInStock(goodId) * 100);
+      return () => ScriptValue.FromFloat(inventory.AmountInStock(goodId));
     }
     if (name.StartsWith(OutputGoodSignalNamePrefix)) {
       var goodId = name.Substring(OutputGoodSignalNamePrefix.Length);
       if (!inventory.OutputGoods.Contains(goodId)) {
         throw new ScriptError($"Output good '{goodId}' not found in: {DebugEx.ObjectToString(inventory)}");
       }
-      return () => ScriptValue.Of(inventory.AmountInStock(goodId) * 100);
+      return () => ScriptValue.FromFloat(inventory.AmountInStock(goodId));
     }
     throw new ScriptError("Unknown signal: " + name);
   }
