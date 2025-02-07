@@ -25,17 +25,16 @@ class ConditionConstructor : BaseConstructor {
 
   public override VisualElement Root { get; }
   public readonly ArgumentConstructor SignalSelector;
-  public readonly SimpleDropdown<string> OperatorSelector;
+  public readonly ResizableDropdownElement OperatorSelector;
   public readonly ArgumentConstructor ValueSelector;
 
   public ConditionConstructor(UiFactory uiFactory) : base(uiFactory) {
     SignalSelector = new ArgumentConstructor(uiFactory);
     SignalSelector.OnStringValueChanged += (_, _) => SetArgument(SignalSelector.Value);
-    OperatorSelector = uiFactory.CreateValueDropdown<string>();
+    OperatorSelector = uiFactory.CreateSimpleDropdown();
     ValueSelector = new ArgumentConstructor(uiFactory);
 
-    Root = MakeRow(uiFactory.T(ConditionLabelLocKey),
-                   SignalSelector.Root, OperatorSelector.DropdownElement, ValueSelector.Root);
+    Root = MakeRow(uiFactory.T(ConditionLabelLocKey), SignalSelector.Root, OperatorSelector, ValueSelector.Root);
   }
 
   public void SetDefinitions(IEnumerable<ConditionDefinition> lvalueDef) {
@@ -54,7 +53,7 @@ class ConditionConstructor : BaseConstructor {
 
   public string GetScript() {
     var arg = SignalSelector.Value;
-    var op = OperatorSelector.Value;
+    var op = OperatorSelector.SelectedValue;
     var val = PrepareConstantValue(ValueSelector.Value, _selectedDefinition.ArgumentType);
     return $"({op} (sig {arg}) {val})";
   }
@@ -80,18 +79,18 @@ class ConditionConstructor : BaseConstructor {
 
   void SetArgument(string argument) {
     if (argument == null) {
-      OperatorSelector.DropdownElement.ToggleDisplayStyle(false);
+      OperatorSelector.ToggleDisplayStyle(false);
       ValueSelector.Root.ToggleDisplayStyle(false);
       return;
     }
     _selectedDefinition = _lvalueDefinitions.First(x => x.Argument.Value == argument);
     if (_selectedDefinition.ArgumentOptions == null) {
-      OperatorSelector.DropdownElement.ToggleDisplayStyle(false);
+      OperatorSelector.ToggleDisplayStyle(false);
       ValueSelector.Root.ToggleDisplayStyle(false);
     }
     OperatorSelector.Items =
         _selectedDefinition.ArgumentType == ScriptValue.TypeEnum.String ? StringOperators : NumberOperators;
-    OperatorSelector.DropdownElement.ToggleDisplayStyle(true);
+    OperatorSelector.ToggleDisplayStyle(true);
     ValueSelector.SetDefinitions(_selectedDefinition.ArgumentOptions);
     ValueSelector.Root.ToggleDisplayStyle(true);
   }

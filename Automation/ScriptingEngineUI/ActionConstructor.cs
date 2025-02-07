@@ -23,14 +23,13 @@ sealed class ActionConstructor : BaseConstructor {
   }
 
   public override VisualElement Root { get; }
-  public readonly SimpleDropdown<string> ActionSelector;
+  public readonly ResizableDropdownElement ActionSelector;
   public readonly ArgumentConstructor ArgumentConstructor;
 
   public ActionConstructor(UiFactory uiFactory) : base(uiFactory) {
-    //FIXME; get width from caller.
-    ActionSelector = uiFactory.CreateValueDropdown<string>(SetAction, width: 250);
+    ActionSelector = uiFactory.CreateSimpleDropdown(SetAction);
     ArgumentConstructor = new ArgumentConstructor(uiFactory);
-    Root = MakeRow(uiFactory.T(ActionLabelLocKey), ActionSelector.DropdownElement, ArgumentConstructor.Root);
+    Root = MakeRow(uiFactory.T(ActionLabelLocKey), ActionSelector, ArgumentConstructor.Root);
   }
 
   public void SetDefinitions(IEnumerable<ActionDefinition> actionDefinitions) {
@@ -52,7 +51,7 @@ sealed class ActionConstructor : BaseConstructor {
   }
 
   public string GetScript() {
-    var action = ActionSelector.Value;
+    var action = ActionSelector.SelectedValue;
     var def = _actionDefinitions.First(x => x.Action.Value == action);
     if (def.Arguments.Length == 0) {
       return $"(act {action})";

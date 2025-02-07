@@ -109,7 +109,7 @@ sealed class ConstructorEditorProvider : IEditorProvider {
       return;
     }
     var actionConstructor = ruleConstructor.ActionConstructor;
-    actionConstructor.ActionSelector.Value = ruleRow.ParsedAction.ActionName;
+    actionConstructor.ActionSelector.SelectedValue = ruleRow.ParsedAction.ActionName;
     if (ruleRow.ParsedAction.Operands.Count == 1) {
       return;
     }
@@ -131,7 +131,7 @@ sealed class ConstructorEditorProvider : IEditorProvider {
       throw new InvalidOperationException("Binary operator is expected, but found: " + ruleRow.ParsedCondition);
     }
     conditionConstructor.SignalSelector.Value = binaryOperatorExpr.Left.SignalName;
-    conditionConstructor.OperatorSelector.Value = binaryOperatorExpr.Name;
+    conditionConstructor.OperatorSelector.SelectedValue = binaryOperatorExpr.Name;
     if (binaryOperatorExpr.Right is not ConstantValueExpr constantValue) {
       throw new InvalidOperationException("Constant value is expected");
     }

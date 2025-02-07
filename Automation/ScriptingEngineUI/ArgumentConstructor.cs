@@ -18,16 +18,16 @@ sealed class ArgumentConstructor : BaseConstructor {
 
   public override VisualElement Root { get; }
 
-  public bool IsInput => _typeSelectionDropdown.Value == InputTypeName;
+  public bool IsInput => _typeSelectionDropdown.SelectedValue == InputTypeName;
 
   public string Value {
-    get => IsInput ? _textField.value : _typeSelectionDropdown.Value;
+    get => IsInput ? _textField.value : _typeSelectionDropdown.SelectedValue;
     set {
       if (_typeSelectionDropdown.Items.Any(x => x.Value == value)) {
-        _typeSelectionDropdown.Value = value;
+        _typeSelectionDropdown.SelectedValue = value;
         _textField.ToggleDisplayStyle(false);
       } else {
-        _typeSelectionDropdown.Value = InputTypeName;
+        _typeSelectionDropdown.SelectedValue = InputTypeName;
         _textField.value = value;
         _textField.ToggleDisplayStyle(true);
       }
@@ -36,19 +36,19 @@ sealed class ArgumentConstructor : BaseConstructor {
 
   public event EventHandler OnStringValueChanged;
 
-  readonly SimpleDropdown<string> _typeSelectionDropdown;
+  readonly ResizableDropdownElement _typeSelectionDropdown;
   readonly TextField _textField;
 
   public ArgumentConstructor(UiFactory uiFactory) : base(uiFactory) {
-    _typeSelectionDropdown = uiFactory.CreateValueDropdown<string>(_ => UpdateTypeSelection());
+    _typeSelectionDropdown = uiFactory.CreateSimpleDropdown(_ => UpdateTypeSelection());
     //FIXME: pass text size.
     _textField = uiFactory.CreateTextField(width: 100);
-    Root = MakeRow(_typeSelectionDropdown.DropdownElement, _textField);
+    Root = MakeRow(_typeSelectionDropdown, _textField);
   }
 
   public void SetDefinitions(DropdownItem<string>[] options) {
     _typeSelectionDropdown.Items = options;
-    _typeSelectionDropdown.DropdownElement.SetEnabled(options.Length > 1 || options[0].Value != InputTypeName);
+    _typeSelectionDropdown.SetEnabled(options.Length > 1 || options[0].Value != InputTypeName);
   }
 
   public string CheckInputForNumber(Func<float, string> check = null) {
