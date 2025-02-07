@@ -19,5 +19,3 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<ResizableDropdown>().AsTransient();
   }
 }
-  }
-}
