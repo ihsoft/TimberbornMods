@@ -15,5 +15,9 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<PanelFragment>().AsSingleton();
     containerDefinition.Bind<GameTextMinMaxSlider2>().AsTransient();
     containerDefinition.Bind<MinMaxSliderBuilder2>().AsTransient();
+    containerDefinition.Bind<ResizableDropdownElement>().AsTransient();
+    containerDefinition.Bind<ResizableDropdown>().AsTransient();
+  }
+}
   }
 }
