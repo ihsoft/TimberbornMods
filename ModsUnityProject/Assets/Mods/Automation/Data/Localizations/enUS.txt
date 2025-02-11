@@ -128,6 +128,9 @@ IgorZ.Automation.Scriptable.District.Signal.Bots,"bots in district","Name of the
 IgorZ.Automation.Scriptable.Floodgate.Action.SetHeight,"set gate height to {0}","Change the floodgate height to the specified value"
 IgorZ.Automation.Scriptable.Inventory.Signal.InputGood,"inout: {0}","Name of the condition for the inventory input goods"
 IgorZ.Automation.Scriptable.Inventory.Signal.OutputGood,"output: {0}","Name of the condition for the inventory output goods"
+IgorZ.Automation.Scriptable.Inventory.Action.StartEmptyingStock,"start emptying storage","Name of the action that starts emptying the storage"
+IgorZ.Automation.Scriptable.Inventory.Action.StopEmptyingStock,"stop emptying storage","Name of the action that stops emptying the storage"
+IgorZ.Automation.Scriptable.Inventory.Action.EmptyingStatus,"The storage is being emptied on a priority basis.",
 IgorZ.Automation.Scriptable.Pausable.Action.Pause,"pause building","Name of the action that pauses the building"
 IgorZ.Automation.Scriptable.Pausable.Action.Resume,"resume building","Name of the action that unpauses the building"
 IgorZ.Automation.Scriptable.Weather.Signal.Season,"season","Name of the condition for the current season checking"
