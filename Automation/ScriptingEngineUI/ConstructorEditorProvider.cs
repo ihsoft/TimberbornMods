@@ -48,11 +48,15 @@ sealed class ConstructorEditorProvider : IEditorProvider {
   }
 
   /// <inheritdoc/>
-  public bool VerifyIfEditable(RuleRow ruleRow) {
+  public bool VerifyIfEditable(RuleRow ruleRow, AutomationBehavior behavior) {
     if (ruleRow.ParsedCondition == null || ruleRow.ParsedAction == null) {
       return false;
     }
-    if (ruleRow.ParsedCondition is not BinaryOperatorExpr or BinaryOperatorExpr { Right: not ConstantValueExpr }) {
+    if (ruleRow.ParsedCondition is not BinaryOperatorExpr { Right: ConstantValueExpr } condition) {
+      return false;
+    }
+    if (!_scriptingService.GetSignalNamesForBuilding(behavior).Contains(condition.Left.SignalName)
+        || !_scriptingService.GetActionNamesForBuilding(behavior).Contains(ruleRow.ParsedAction.ActionName)) {
       return false;
     }
     if (ruleRow.ParsedAction.Operands.Count > 2

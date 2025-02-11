@@ -116,11 +116,11 @@ sealed class RuleRow {
     // Controls.
     var ruleEditable = false;
     foreach (var provider in _editorProviders) {
-      var canEdit = provider.VerifyIfEditable(this);
+      var canEdit = provider.VerifyIfEditable(this, ActiveBuilding);
       if (!canEdit) {
         continue;
       }
-      var button = CreateButton(provider.EditRuleLocKey, _ => provider.MakeForRule(this));
+      CreateButton(provider.EditRuleLocKey, _ => provider.MakeForRule(this));
       ruleEditable = true;
     }
     _ruleButtons.ToggleDisplayStyle(ruleEditable);
@@ -129,7 +129,7 @@ sealed class RuleRow {
     OnModeChanged?.Invoke(this, EventArgs.Empty);
   }
 
-  public Button CreateButton(string locKey, Action<Button> onClick, bool addAtBeginning = false) {
+  public void CreateButton(string locKey, Action<Button> onClick, bool addAtBeginning = false) {
     var button = _uiFactory.CreateButton(locKey, onClick, new Padding(0, 5, 0, 5));
     button.style.marginRight = 5;
     if (addAtBeginning) {
@@ -137,7 +137,6 @@ sealed class RuleRow {
     } else {
       _ruleButtons.Add(button);
     }
-    return button;
   }
 
   public void ReportError(string error) {
