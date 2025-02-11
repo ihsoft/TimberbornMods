@@ -33,7 +33,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
       throw new ScriptError("Floodgate component not found");
     }
     return name switch {
-        SetHeightActionName => args => SetHeight(floodgate, args),
+        SetHeightActionName => args => SetHeightAction(floodgate, args),
         _ => throw new ScriptError("Unknown action: " + name),
     };
   }
@@ -62,7 +62,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   };
   ActionDef _setHeightActionDef;
 
-  static void SetHeight(Floodgate floodgate, ScriptValue[] args) {
+  static void SetHeightAction(Floodgate floodgate, ScriptValue[] args) {
     AssertActionArgsCount(SetHeightActionName, args, 1);
     var height = args[0].AsNumber / 100f;
     if (height < 0) {
