@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.TimberDev.UI;
 using UnityEngine;
@@ -75,7 +76,7 @@ sealed class ScriptEditorProvider : IEditorProvider {
   }
 
   /// <inheritdoc/>
-  public bool VerifyIfEditable(RuleRow ruleRow) {
+  public bool VerifyIfEditable(RuleRow ruleRow, AutomationBehavior _) {
     return ruleRow.LegacyAction == null;
   }
 
