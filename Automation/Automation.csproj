@@ -359,6 +359,9 @@
       <Compile Include="..\TimberDev\Utils\CustomizableInstantiator.cs">
         <Link>TimberDev\Utils\CustomizableInstantiator.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\Utils\Extensions.cs">
+        <Link>TimberDev\Utils\Extensions.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\Utils\FeatureController.cs">
         <Link>TimberDev\Utils\FeatureController.cs</Link>
       </Compile>
