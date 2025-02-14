@@ -8,9 +8,11 @@ using Bindito.Core;
 using IgorZ.SmartPower.Core;
 using IgorZ.SmartPower.Settings;
 using IgorZ.SmartPower.Utils;
+using IgorZ.TimberDev.Utils;
 using Timberborn.Attractions;
 using Timberborn.BlockSystem;
 using Timberborn.BuildingsBlocking;
+using Timberborn.EntitySystem;
 using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
 using Timberborn.Persistence;
@@ -23,7 +25,7 @@ using UnityEngine;
 namespace IgorZ.SmartPower.PowerConsumers;
 
 sealed class PowerInputLimiter
-    : TickableComponent, IPersistentEntity, IFinishedStateListener, IPostInitializableLoadedEntity {
+    : TickableComponent, IPersistentEntity, IFinishedStateListener, IPostInitializableEntity {
 
   #region API
 
@@ -124,7 +126,7 @@ sealed class PowerInputLimiter
   #region IPostInitializableLoadedEntity implementation
 
   /// <inheritdoc/>
-  public void PostInitializeLoadedEntity() {
+  public void PostInitializeEntity() {
     if (enabled && IsSuspended) {
       Suspend();
     }
@@ -205,7 +207,7 @@ sealed class PowerInputLimiter
 
   void Awake() {
     _mechanicalNode = GetComponentFast<MechanicalNode>();
-    _nominalPowerInput = GetComponentFast<MechanicalNodeSpecification>().PowerInput;
+    _nominalPowerInput = GetComponentFast<MechanicalNodeSpec>().PowerInput;
     _desiredPower = _nominalPowerInput;
     _blockableBuilding = GetComponentFast<BlockableBuilding>();
     _pausableBuilding = GetComponentFast<PausableBuilding>();

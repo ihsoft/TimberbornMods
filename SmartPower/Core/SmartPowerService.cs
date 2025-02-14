@@ -36,7 +36,8 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
   public bool SmartLogicStarted => CurrentTick > 1;
 
   /// <summary>Gets the fixed delta time in minutes.</summary>
-  public float FixedDeltaTimeInMinutes => _fixedDeltaTimeInHours * 60f;
+  public float FixedDeltaTimeInMinutes => _fixedDeltaTimeInMinutes ??= _dayNightCycle.FixedDeltaTimeInHours * 60f;
+  float? _fixedDeltaTimeInMinutes;
 
   /// <summary>Gets the delayed action that will be executed after the specified number of ticks.</summary>
   public TickDelayedAction GetTickDelayedAction(int skipTicks) {
@@ -119,10 +120,10 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
 
   readonly Dictionary<MechanicalGraph, int> _reservedPowerCache = [];
 
-  readonly float _fixedDeltaTimeInHours;
+  readonly IDayNightCycle _dayNightCycle;
 
   SmartPowerService(IDayNightCycle dayNightCycle) {
-    _fixedDeltaTimeInHours = dayNightCycle.FixedDeltaTimeInHours;
+    _dayNightCycle = dayNightCycle;
   }
 
   #endregion

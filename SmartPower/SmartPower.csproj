@@ -48,15 +48,6 @@
       <Reference Include="System.Collections.Immutable">
         <HintPath>..\Dependencies\GameRoot\Timberborn_Data\Managed\System.Collections.Immutable.dll</HintPath>
       </Reference>
-      <Reference Include="TimberApi">
-        <HintPath>..\Dependencies\Workshop\3288241660\core\TimberApi.dll</HintPath>
-      </Reference>
-      <Reference Include="TimberApi.UIBuilderSystem">
-        <HintPath>..\Dependencies\Workshop\3288241660\core\TimberApi.UIBuilderSystem.dll</HintPath>
-      </Reference>
-      <Reference Include="TimberApi.UIPresets">
-        <HintPath>..\Dependencies\Workshop\3288241660\core\TimberApi.UIPresets.dll</HintPath>
-      </Reference>
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />
@@ -90,6 +81,9 @@
       <Content Include="..\ModsUnityProject\Assets\Mods\SmartPower\manifest.json">
         <Link>Mod\manifest.json</Link>
       </Content>
+      <Content Include="..\TimberDev\UI\TimberbornStyle.uss">
+        <Link>TimberDev\UI\TimberbornStyle.uss</Link>
+      </Content>
     </ItemGroup>
     <ItemGroup>
       <Compile Include="..\TimberDev\UI\CommonFormats.cs">
@@ -115,6 +109,9 @@
       </Compile>
       <Compile Include="..\TimberDev\Utils\HarmonyPatcher.cs">
         <Link>TimberDev\Utils\HarmonyPatcher.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\IObjectLoaderExtensions.cs">
+        <Link>TimberDev\Utils\IObjectLoaderExtensions.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\Utils\ModTextAssetConverterPatch.cs">
         <Link>TimberDev\Utils\ModTextAssetConverterPatch.cs</Link>

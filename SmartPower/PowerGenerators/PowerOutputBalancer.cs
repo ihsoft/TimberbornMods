@@ -7,8 +7,10 @@ using System.Linq;
 using Bindito.Core;
 using IgorZ.SmartPower.Core;
 using IgorZ.SmartPower.Utils;
+using IgorZ.TimberDev.Utils;
 using Timberborn.BlockSystem;
 using Timberborn.BuildingsBlocking;
+using Timberborn.EntitySystem;
 using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
 using Timberborn.Persistence;
@@ -20,7 +22,7 @@ using UnityEngine;
 namespace IgorZ.SmartPower.PowerGenerators;
 
 abstract class PowerOutputBalancer
-    : TickableComponent, IPersistentEntity, IFinishedStateListener, IPostInitializableLoadedEntity {
+    : TickableComponent, IPersistentEntity, IFinishedStateListener, IPostInitializableEntity {
 
   const float MaxBatteryChargeRatio = 0.9f;
   const float MinBatteryChargeRatio = 0.65f;
@@ -103,7 +105,7 @@ abstract class PowerOutputBalancer
   #region IPostInitializableLoadedEntity implementation
 
   /// <inheritdoc/>
-  public void PostInitializeLoadedEntity() {
+  public void PostInitializeEntity() {
     if (enabled && IsSuspended) {
       Suspend();
     }

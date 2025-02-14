@@ -17,9 +17,9 @@ namespace IgorZ.SmartPower.PowerConsumers;
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
   static readonly PrefabPatcher.RequiredComponentsDep PoweredManufactoryDep =
-      new(typeof(MechanicalBuilding), typeof(ManufactorySpec));
+      new(typeof(MechanicalBuildingSpec), typeof(ManufactorySpec));
   static readonly PrefabPatcher.RequiredComponentsDep PoweredAttractionDep =
-      new(typeof(MechanicalBuilding), typeof(AttractionSpec));
+      new(typeof(MechanicalBuildingSpec), typeof(AttractionSpec));
   static readonly string PatchId = typeof(Configurator).AssemblyQualifiedName;
 
   public void Configure(IContainerDefinition containerDefinition) {
@@ -30,7 +30,7 @@ sealed class Configurator : IConfigurator {
     PrefabPatcher.AddComponent<SmartManufactory>(prefab, PoweredManufactoryDep.Check);
     PrefabPatcher.AddComponent<SmartPoweredAttraction>(prefab, PoweredAttractionDep.Check);
     PrefabPatcher.AddComponent<PowerInputLimiter>(prefab, o => {
-      var node = o.GetComponent<MechanicalNodeSpecification>();
+      var node = o.GetComponent<MechanicalNodeSpec>();
       return node && node.PowerInput > 0 && node.PowerOutput == 0;
     });
   }

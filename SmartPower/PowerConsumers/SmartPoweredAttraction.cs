@@ -52,7 +52,7 @@ public sealed class SmartPoweredAttraction : BaseComponent, IAdjustablePowerInpu
     _blockableBuilding = GetComponentFast<BlockableBuilding>();
     _enterable = GetComponentFast<Enterable>();
     _powerInputLimiter = GetComponentFast<PowerInputLimiter>();
-    _nominalPowerInput = GetComponentFast<MechanicalNodeSpecification>().PowerInput;
+    _nominalPowerInput = GetComponentFast<MechanicalNodeSpec>().PowerInput;
   }
 
   #endregion

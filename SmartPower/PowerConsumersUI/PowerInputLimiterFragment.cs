@@ -70,14 +70,13 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
 
     _applyToAllBuildingsButton = _uiFactory.CreateButton(ApplyToAllBuildingsLocKey, ApplyToAllBuildings);
 
-    _root = _uiFactory.CreateCenteredPanelFragmentBuilder()
-        .AddComponent(_automateCheckbox)
-        .AddComponent(_suspendIfLowEfficiencyLabel)
-        .AddComponent(_minEfficiencySlider)
-        .AddComponent(_suspendIfBatteryLowCheckbox)
-        .AddComponent(_minBatteriesChargeSlider)
-        .AddComponent(_uiFactory.CenterElement(_applyToAllBuildingsButton))
-        .BuildAndInitialize();
+    _root = _uiFactory.CreateCenteredPanelFragment();
+    _root.Add(_automateCheckbox);
+    _root.Add(_suspendIfLowEfficiencyLabel);
+    _root.Add(_minEfficiencySlider);
+    _root.Add(_suspendIfBatteryLowCheckbox);
+    _root.Add(_minBatteriesChargeSlider);
+    _root.Add(_uiFactory.CenterElement(_applyToAllBuildingsButton));
 
     _root.ToggleDisplayStyle(visible: false);
     return _root;

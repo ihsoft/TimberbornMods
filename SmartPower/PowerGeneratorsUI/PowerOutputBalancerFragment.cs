@@ -19,6 +19,8 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
   const string ChargeLevelLocKey = "IgorZ.SmartPower.PowerOutputBalancer.ChargeBatteriesRangeText";
   const string ApplyToAllGeneratorsLocKey = "IgorZ.SmartPower.PowerOutputBalancer.ApplyToAllGenerators";
   const string AppliedToGeneratorsLocKey = "IgorZ.SmartPower.PowerOutputBalancer.AppliedToGenerators";
+  const string MinutesTillResumeLocKey = "IgorZ.SmartPower.Common.MinutesTillResume";
+  const string MinutesTillSuspendLocKey = "IgorZ.SmartPower.Common.MinutesTillSuspend";
 
   readonly UiFactory _uiFactory;
 
@@ -28,7 +30,7 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
   VisualElement _root;
   Toggle _automateCheckbox;
   Label _chargeBatteriesText;
-  MinMaxSlider2 _chargeBatteriesSlider;
+  MinMaxSlider _chargeBatteriesSlider;
   Button _applyToAllGeneratorsButton;
 
   PowerOutputBalancer _balancer;
@@ -57,12 +59,11 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
     _chargeBatteriesText = _uiFactory.CreateLabel();
     _applyToAllGeneratorsButton = _uiFactory.CreateButton(ApplyToAllGeneratorsLocKey, ApplyToAllGenerators);
 
-    _root = _uiFactory.CreateCenteredPanelFragmentBuilder()
-        .AddComponent(_automateCheckbox)
-        .AddComponent(_chargeBatteriesText)
-        .AddComponent(_chargeBatteriesSlider)
-        .AddComponent(_uiFactory.CenterElement(_applyToAllGeneratorsButton))
-        .BuildAndInitialize();
+    _root = _uiFactory.CreateCenteredPanelFragment();
+    _root.Add(_automateCheckbox);
+    _root.Add(_chargeBatteriesText);
+    _root.Add(_chargeBatteriesSlider);
+    _root.Add(_uiFactory.CenterElement(_applyToAllGeneratorsButton));
 
     _suspendStatusLabel = _uiFactory.CreateLabel();
     _suspendStatusLabel.ToggleDisplayStyle(visible: false);
@@ -125,9 +126,6 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
     _applyToAllGeneratorsButton.text = _uiFactory.T(AppliedToGeneratorsLocKey, affectedGenerators);
     _applyToAllGeneratorsButton.SetEnabled(false);
   }
-
-  const string MinutesTillResumeLocKey = "IgorZ.SmartPower.Common.MinutesTillResume";
-  const string MinutesTillSuspendLocKey = "IgorZ.SmartPower.Common.MinutesTillSuspend";
 
   void UpdateGeneratorBuildingText() {
     if (_balancer.MinutesTillResume > 0) {
