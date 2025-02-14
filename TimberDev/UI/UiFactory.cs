@@ -60,8 +60,9 @@ public class UiFactory {
   public string T<T1, T2, T3>(string key, T1 param1, T2 param2, T3 param3) => _loc.T(key, param1, param2, param3);
 
   /// <summary>Stylesheet for the Timberborn UI.</summary>
+  /// <remarks>Has styles for a limited set of controls.</remarks>
   public StyleSheet TimberbornStylesheet =>
-      _timberbornStylesheet ??= _assetLoader.Load<StyleSheet>("UI/Views/TimberbornStyle");
+      _timberbornStylesheet ??= _assetLoader.Load<StyleSheet>("UI/TimberbornStyle");
   StyleSheet _timberbornStylesheet;
 
   /// <summary>Creates a panel builder that can be used as a fragment on the right side panel.</summary>
@@ -168,7 +169,7 @@ public class UiFactory {
   /// <summary>Creates a min/max slider in a theme suitable for the right side panel.</summary>
   /// <remarks>
   /// For this method to work, "TimberbornStyle.uss" should be compiled into the mod asset bundle at path
-  /// "UI/Views/TimberbornStyle".
+  /// "UI/TimberbornStyle".
   /// </remarks>
   /// <param name="onValueChangedFn">A callback method that will be called on the value change.</param>
   /// <param name="lowValue">The minimum value limit.</param>
@@ -176,6 +177,7 @@ public class UiFactory {
   /// <param name="minDelta">The minimum delta between min/max values.</param>
   /// <param name="stepSize">If greater than zero, then the values are rounded to the step.</param>
   /// <param name="spacing">If a non-negative value, then the bottom margin will be set.</param>
+  /// <seealso cref="TimberbornStylesheet"/>
   public MinMaxSlider CreateMinMaxSlider(Action<ChangeEvent<Vector2>> onValueChangedFn, float lowValue, float highValue,
                                           float minDelta, float stepSize = 0, int spacing = 5) {
     var slider = new MinMaxSlider(lowValue, highValue, lowValue, highValue);
