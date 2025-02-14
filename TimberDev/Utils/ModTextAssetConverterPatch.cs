@@ -7,7 +7,7 @@ using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
 
-namespace IgorZ.SmartPower.Utils;
+namespace IgorZ.TimberDev.Utils;
 
 /// <summary>Install this patch to improve localization errors logs (there will be a file name).</summary>
 /// <remarks>This patch must be applied from the "MainMenu" context.</remarks>
