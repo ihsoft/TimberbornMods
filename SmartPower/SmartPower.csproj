@@ -98,15 +98,6 @@
       <Compile Include="..\TimberDev\UI\Configurator.cs">
         <Link>TimberDev\UI\Configurator.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\UI\GameTextMinMaxSlider2.cs">
-        <Link>TimberDev\UI\GameTextMinMaxSlider2.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\UI\MinMaxSlider2.cs">
-        <Link>TimberDev\UI\MinMaxSlider2.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\UI\PanelFragment.cs">
-        <Link>TimberDev\UI\PanelFragment.cs</Link>
-      </Compile>
       <Compile Include="..\TimberDev\UI\PanelFragmentPatcher.cs">
         <Link>TimberDev\UI\PanelFragmentPatcher.cs</Link>
       </Compile>
