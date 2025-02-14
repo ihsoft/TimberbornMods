@@ -1,3 +1,8 @@
+# v1.13.0 (2 Feb 2025)
+* Support Update 7.
+* Incompatible with Update 6.
+* Doesn't require TimberAPI.
+
 # v1.12.6 (19 Dec 2024)
 * [Fix] Enable power regulation for non-workshop buildings.
 
