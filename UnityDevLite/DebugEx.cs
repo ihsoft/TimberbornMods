@@ -5,7 +5,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
@@ -113,7 +112,7 @@ static class DebugEx {
       return obj.ToString();
     }
     var unityComponent = (Component)obj;
-    if (!unityComponent) {  // It's important to use the "!" notion to catch the destroyed objects!
+    if (!unityComponent) {  // It is important to use the "!" notion to catch the destroyed objects!
       return "[DestroyedComponent]";
     }
     if (obj is BaseComponent baseComponent) {
@@ -122,12 +121,12 @@ static class DebugEx {
     return $"[{unityComponent.GetType().Name}]";
   }
 
-  /// <summary>Helper method to make a user friendly object name for the logs.</summary>
+  /// <summary>Helper method to make a user-friendly object name for the logs.</summary>
   public static string BaseComponentToString(BaseComponent component) {
     if (component != null && !component) {  // It is important to use the "!" notion to catch the destroyed objects!
       return "[DestroyedComponent]";
     }
-    var prefab = component.GetComponentFast<Prefab>();
+    var prefab = component.GetComponentFast<PrefabSpec>();
     var blockObj = component.GetComponentFast<BlockObject>();
     if (prefab && blockObj) {
       return $"[{prefab.Name}@{blockObj.Coordinates}]";
