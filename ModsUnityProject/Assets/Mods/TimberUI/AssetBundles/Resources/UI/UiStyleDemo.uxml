@@ -7,4 +7,5 @@
     <engine:Toggle text="test toggle" class="tb-toggle" />
     <Timberborn.CoreUI.LocalizableLabel name="LocalizableLabel" text="test label" class="tb-label" />
     <Timberborn.CoreUI.LocalizableButton text="loc button" enabled="true" class="tb-button" />
+    <Timberborn.CoreUI.PreciseSlider enabled="true" usage-hints="None" tabindex="0" focusable="false" language-direction="Inherit" class="tb-precise-slider" />
 </engine:UXML>

@@ -186,3 +186,74 @@
 .tb-button:disabled {
     background-image: resource('UI/Images/Buttons/button-game-disabled');
 }
+
+.tb-button-minus {
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    background-image: resource('UI/Images/Buttons/minus');
+    color: rgb(255, 255, 255);
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.tb-button-minus:hover {
+    background-image: resource('UI/Images/Buttons/minus-hover');
+}
+
+.tb-button-minus:active {
+    background-image: resource('UI/Images/Buttons/minus-active');
+}
+
+.tb-button-minus:disabled {
+    background-image: resource('UI/Images/Buttons/minus-inverted');
+}
+
+.tb-button-small {
+    height: 18px;
+    width: 18px;
+}
+
+.tb-button-plus {
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    background-image: resource('UI/Images/Buttons/plus');
+    color: rgb(255, 255, 255);
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.tb-button-plus:hover {
+    background-image: resource('UI/Images/Buttons/plus-hover');
+}
+
+.tb-button-plus:active {
+    background-image: resource('UI/Images/Buttons/plus-active');
+}
+
+.tb-button-plus:disabled {
+    background-image: resource('UI/Images/Buttons/plus-inverted');
+}
