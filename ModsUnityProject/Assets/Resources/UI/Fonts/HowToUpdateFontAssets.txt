@@ -1,0 +1,43 @@
+Perform check if anything is missing:
+1. Start the game in Unity Editor and go to Settings.
+2. Use Test languages button in Developer part and let it run until main menu reloads.
+3. Close Unity Editor completely.
+4. Check if any Dynamic font asset was altered. If yes, discard changes and perform Static asset update.
+
+Full Static asset update - best to perform after bigger translation changes, like before a new update:
+1. Perform update of asian files - described below.
+2. Copy all texts from all languages except asian to a single file.
+3. Perform update of 'NotoSansDisplay-Medium SDF - Static' in analogical way as described for asian languages.
+4. All characters that are marked as missing during 'Generate Font Atlas' need to be added to other Static font assets
+   in a similar way as described Find missing characters point 5 below.
+5. Perform check if anything is missing.
+6. Dynamic assets should be unaltered. If any was altered, use Find missing characters procedure described below.
+
+Short Static asset update:
+1. Perform update of asian files - described below.
+2. Find missing characters - described below.
+
+Update of asian files - japanese, korean, chinese. It should be performed for each language separately:
+1. Copy all texts to a single file.
+2. Select appropriate 'NotoSansCJKxx-Medium SDF - Static' file in Unity Editor.
+3. From the Inspector click Update Atlas Texture.
+4. In a window that opens, from dropdown 'Character Set' select 'Characters from File'.
+5. Drag and drop file from point 1 to 'Character File' field.
+6. Click 'Generate Font Atlas' button and after it generates, click 'Save' button.
+7. Close the window, commit changes.
+
+Find missing characters:
+1. Make sure Dynamic font assets have no uncommitted changes. If they have - discard them.
+2. Perform check if anything is missing - described above.
+3. If any Dynamic font asset was altered, find characters that were added to it:
+    - Select appropriate Dynamic file in Unity Editor and find Characters Table in Inspector.
+5. Copy all characters listed in the Characters Table to appropriate Static font asset:
+    - Select appropriate Static file in Unity Editor.
+    - From the Inspector click Update Atlas Texture.
+    - In a window that opens, from dropdown 'Character Set' select 'Unicode range (hex)'.
+    - Copy all characters from the Characters Table to 'Unicode range (hex)' field. 
+      Use values from the Unicode field in the Characters Table, but without 'Ux' prefix.
+      Don't delete any characters that are already there. 
+    - Click 'Generate Font Atlas' button and after it generates, click 'Save' button.
+    - Close the window, commit changes.
+6. Repeat point 1 and 2 to make sure no characters are missing.

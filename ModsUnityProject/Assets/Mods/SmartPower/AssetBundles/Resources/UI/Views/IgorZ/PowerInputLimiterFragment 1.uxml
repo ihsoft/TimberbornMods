@@ -1,0 +1,11 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Mods/SmartPower/AssetBundles/Resources/UI/Views/IgorZ/TimberbornStyle.uss?fileID=7433441132597879392&amp;guid=67ecca827082a9140ae44af5c893f23d&amp;type=3#TimberbornStyle" />
+    <engine:VisualElement style="flex-grow: 1;">
+        <Timberborn.CoreUI.LocalizableToggle text-loc-key="IgorZ.SmartPower.PowerInputLimiter.SuspendIfNoPower" text="Останавливать если недостаточно энергии" class="tb-toggle game-toggle entity-panel__single-line-text" />
+        <engine:Label text="Минимальное обеспечение энергией: {0}%" class="tb-label" />
+        <Timberborn.CoreUI.PreciseSlider />
+        <engine:Toggle text="Остановить если заряд батарей ниже {0}%" class="tb-toggle" />
+        <engine:Slider value="42" high-value="100" class="tb-slider slider" />
+        <Timberborn.CoreUI.LocalizableButton text="Применить ко всем генераторам" text-loc-key="IgorZ.SmartPower.PowerOutputBalancer.ApplyToAllGenerators" class="tb-button tb-button-standard-padding entity-panel__text button-game debug-fragment__button" style="align-self: center;" />
+    </engine:VisualElement>
+</engine:UXML>

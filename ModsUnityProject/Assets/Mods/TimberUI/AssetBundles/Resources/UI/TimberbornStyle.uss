@@ -187,6 +187,13 @@
     background-image: resource('UI/Images/Buttons/button-game-disabled');
 }
 
+.tb-button-standard-padding {
+    padding-top: 2px;
+    padding-right: 10px;
+    padding-bottom: 2px;
+    padding-left: 10px;
+}
+
 .tb-button-minus {
     border-top-width: 0;
     border-right-width: 0;

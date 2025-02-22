@@ -1,0 +1,8 @@
+Slider: slider
+Minus button: button-square,button-minus,button-square--small
+Plus button: button-square,button-plus,button-square--small
+Button: entity-panel__text,button-game,debug-fragment__button
+Button more?
+Toggle: game-toggle,entity-panel__single-line-text
+Label: entity-panel__text
+
