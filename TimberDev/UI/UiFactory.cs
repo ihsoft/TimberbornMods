@@ -218,9 +218,7 @@ public class UiFactory {
   /// <param name="spacing">If a non-negative value, then the bottom margin will be set.</param>
   /// <returns>A wrapper for the precise slider.</returns>
   public PreciseSliderWrapper CreatePreciseSlider(float stepSize, Action<float> onValueChangedFn, int spacing = 5) {
-    var root = _visualElementLoader.LoadVisualElement("Game/EntityPanel/SluiceFragment");
-    var slider = root.Q<PreciseSlider>("WaterLevelSlider");
-    slider.RemoveFromHierarchy();
+    var slider = new PreciseSlider();
     if (spacing >= 0) {
       slider.style.marginBottom = spacing;
     }
