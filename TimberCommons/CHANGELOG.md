@@ -1,5 +1,6 @@
-# v1.11.0 (started on 2/22/2025)
+# v1.11.0 (22 Feb 2025)
 * [Enhancement] Update 7 support. Incompatible with the previous versions.
+* [Change] No more dependency to TimberAPI. 
 
 # v1.10.3 (15 Dec 2024)
 * [Enhancement] Allow changing settings in the game.
