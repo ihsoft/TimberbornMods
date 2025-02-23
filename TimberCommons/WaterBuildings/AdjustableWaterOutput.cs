@@ -105,7 +105,7 @@ sealed class AdjustableWaterOutput : WaterOutput, IPersistentEntity {
     SpillwayHeightDelta = -_spillwayHeightDelta;
     base.Awake();
     //FIXME
-    _isFluidDump = GetComponentFast<Prefab>().name.StartsWith("FluidDump");
+    _isFluidDump = GetComponentFast<PrefabSpec>().name.StartsWith("FluidDump");
   }
 
   #endregion

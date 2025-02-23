@@ -163,7 +163,8 @@ public sealed class ModifyGrowableGrowthRangeEffect : BaseComponent, IRangeEffec
     if (modifier == null || !modifier.IsLiveAndGrowing) {
       return null;
     }
-    if (_requiredPrefabNames.Count > 0 && !_requiredPrefabNames.Contains(modifier.GetComponentFast<Prefab>().Name)) {
+    if (_requiredPrefabNames.Count > 0
+        && !_requiredPrefabNames.Contains(modifier.GetComponentFast<PrefabSpec>().Name)) {
       return null;
     }
     var hasComponents = _requiredComponents.IsEmpty()

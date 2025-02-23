@@ -49,9 +49,8 @@ sealed class InjuryProbabilityFragment : IEntityPanelFragment {
     _injuryProbabilityAvatarHint.ToggleDisplayStyle(visible: false);
 
     _injuryProbabilityLabel = _uiFactory.CreateLabel();
-    _root = _uiFactory.CreateCenteredPanelFragmentBuilder()
-        .AddComponent(_injuryProbabilityLabel)
-        .BuildAndInitialize();
+    _root = _uiFactory.CreateCenteredPanelFragment();
+    _root.Add(_injuryProbabilityLabel);
     _root.ToggleDisplayStyle(visible: false);
     return _root;
   }
