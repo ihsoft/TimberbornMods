@@ -1,3 +1,6 @@
+# v1.11.0 (started on 2/22/2025)
+* [Enhancement] Update 7 support. Incompatible with the previous versions.
+
 # v1.10.3 (15 Dec 2024)
 * [Enhancement] Allow changing settings in the game.
 
