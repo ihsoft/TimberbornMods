@@ -5,7 +5,7 @@
 using System.Reflection;
 using HarmonyLib;
 using IgorZ.TimberDev.UI;
-using TimberApi.DependencyContainerSystem;
+using IgorZ.TimberDev.Utils;
 using Timberborn.WaterSystem;
 using UnityEngine.UIElements;
 
@@ -27,8 +27,8 @@ static class SluiceFragmentPatch1 {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!
     }
-    ThreadSafeWaterMap = DependencyContainer.GetInstance<IThreadSafeWaterMap>();
-    var uiFactory = DependencyContainer.GetInstance<UiFactory>();
+    ThreadSafeWaterMap = StaticBindings.DependencyContainer.GetInstance<IThreadSafeWaterMap>();
+    var uiFactory = StaticBindings.DependencyContainer.GetInstance<UiFactory>();
     FlowLabel = uiFactory.CreateLabel();
     ____contaminationLabel.parent.Add(FlowLabel);
   }

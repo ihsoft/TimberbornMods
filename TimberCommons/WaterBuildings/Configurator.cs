@@ -5,8 +5,6 @@
 using Bindito.Core;
 using IgorZ.TimberDev.Utils;
 using Timberborn.TemplateSystem;
-using Timberborn.WaterBuildings;
-using UnityEngine;
 
 namespace IgorZ.TimberCommons.WaterBuildings;
 
@@ -15,19 +13,11 @@ sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).FullName;
 
   public void Configure(IContainerDefinition containerDefinition) {
-    containerDefinition.MultiBind<TemplateModule>().ToProvider<AttractionTemplateModuleProvider>().AsSingleton();
-    HarmonyPatcher.PatchRepeated(PatchId, typeof(WaterOutputPatch));
-    CustomizableInstantiator.AddPatcher(PatchId + "-instantiator", PatchMethod);
+    containerDefinition.MultiBind<TemplateModule>().ToProvider<WaterOutputTemplateModuleProvider>().AsSingleton();
+    HarmonyPatcher.PatchRepeated(PatchId, typeof(WaterOutputPatch), typeof(DecoratorDefinitionPatch));
   }
 
-  static void PatchMethod(GameObject obj) {
-    PrefabPatcher.ReplaceComponent<WaterOutput, AdjustableWaterOutput>(
-        obj, onReplace: (stockComponent, newComponent) => {
-          newComponent._waterCoordinates = stockComponent._waterCoordinates;
-        });
-  }
-
-  class AttractionTemplateModuleProvider : IProvider<TemplateModule> {
+  class WaterOutputTemplateModuleProvider : IProvider<TemplateModule> {
     public TemplateModule Get() {
       var builder = new TemplateModule.Builder();
       builder.AddDecorator<AdjustableWaterOutput, AdjustableWaterOutputMarker>();

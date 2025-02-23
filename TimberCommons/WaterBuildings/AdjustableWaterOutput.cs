@@ -29,7 +29,7 @@ sealed class AdjustableWaterOutput : WaterOutput, IPersistentEntity {
   float _spillwayHeightDelta = 0.1f;
   
   [SerializeField]
-  [Tooltip("Tells if there should be a controls in the game GUI to change the depth limit. Ths GUI is always available"
+  [Tooltip("Tells if there should be controls in the game GUI to change the depth limit. Ths GUI is always available"
       + " in DEV mode.")]
   bool _allowAdjustmentsInGame = true;
 
@@ -104,7 +104,6 @@ sealed class AdjustableWaterOutput : WaterOutput, IPersistentEntity {
   new void Awake() {
     SpillwayHeightDelta = -_spillwayHeightDelta;
     base.Awake();
-    //FIXME
     _isFluidDump = GetComponentFast<PrefabSpec>().name.StartsWith("FluidDump");
   }
 

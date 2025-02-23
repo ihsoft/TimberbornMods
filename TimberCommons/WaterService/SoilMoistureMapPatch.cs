@@ -2,9 +2,9 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Reflection;
 using HarmonyLib;
 using IgorZ.TimberCommons.Settings;
+using Timberborn.SoilMoistureSystem;
 using UnityEngine;
 
 // ReSharper disable UnusedMember.Local
@@ -12,13 +12,9 @@ using UnityEngine;
 
 namespace IgorZ.TimberCommons.WaterService;
 
-[HarmonyPatch]
+[HarmonyPatch(typeof(SoilMoistureMap), nameof(SoilMoistureMap.UpdateDesertIntensity))]
 static class SoilMoistureMapPatch {
-  static MethodBase TargetMethod() {
-    return AccessTools.DeclaredMethod("Timberborn.SoilMoistureSystem.SoilMoistureMap:UpdateDesertIntensity");
-  }
-
-  static void Prefix(Vector2Int coordinates, ref float moistureLevel, bool __runOriginal) {
+  static void Prefix(Vector3Int coordinates, ref float moistureLevel, bool __runOriginal) {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!
     }

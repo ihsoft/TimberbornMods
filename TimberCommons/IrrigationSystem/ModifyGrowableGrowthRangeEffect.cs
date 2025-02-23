@@ -12,7 +12,6 @@ using Timberborn.Common;
 using Timberborn.EntitySystem;
 using Timberborn.PrefabSystem;
 using Timberborn.SingletonSystem;
-using Timberborn.TerrainSystem;
 using UnityEngine;
 
 namespace IgorZ.TimberCommons.IrrigationSystem;
@@ -20,12 +19,12 @@ namespace IgorZ.TimberCommons.IrrigationSystem;
 /// <summary>A range effect that changes the growables growth rate.</summary>
 /// <remarks>
 /// <p>
-/// The modifier can increase or decrease the growth rate: if <i>less</i> than <c>0</c>, then it's "a moderator";
-/// if <i>greater</i> than <c>0</c>, then it's a booster.
+/// The modifier can increase or decrease the growth rate: if <i>less</i> than <c>0</c>, then it is "a moderator";
+/// if <i>greater</i> than <c>0</c>, then it is a booster.
 /// </p>
 /// <p>
 /// The ranges can intersect. If tile is in range of multiple growth affects, then the effective rate is found between
-/// the minimum growth moderator and the maximum growth booster. The modifiers of the same type do not add up.  
+/// the minimum growth moderator and the maximum growth booster. The modifiers of the same type don't add up.  
 /// </p>
 /// </remarks>
 /// <seealso cref="GoodConsumingIrrigationTower"/>
@@ -64,13 +63,13 @@ public sealed class ModifyGrowableGrowthRangeEffect : BaseComponent, IRangeEffec
   [SerializeField]
   [Tooltip(
     "Full names of components that must be present on the growable. Leave empty to not check for the components.")]
-  internal string[] _componentsFilter = {};
+  internal string[] _componentsFilter = [];
 
   /// <summary>The exact names of the prefabs to be selected to this effect.</summary>
   /// <remarks>If the list is empty, then no restriction by the prefab name is applied.</remarks>
   [SerializeField]
   [Tooltip("The exact prefab names to apply the effect to.")]
-  internal string[] _prefabNamesFilter = {};
+  internal string[] _prefabNamesFilter = [];
 
   // ReSharper restore InconsistentNaming
   // ReSharper restore RedundantDefaultMemberInitializer
@@ -96,10 +95,10 @@ public sealed class ModifyGrowableGrowthRangeEffect : BaseComponent, IRangeEffec
   public string EffectGroup => _effectGroupName;
 
   /// <inheritdoc/>
-  public void ApplyEffect(HashSet<Vector2Int> tiles) {
+  public void ApplyEffect(HashSet<Vector3Int> tiles) {
     ResetEffect();
     _allTiles = tiles;
-    _coordsWithBoost = new List<Vector3Int>();
+    _coordsWithBoost = [];
     // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
     foreach (var tile in _allTiles) {
       var coords = AddModifierToTile(tile);
@@ -125,14 +124,13 @@ public sealed class ModifyGrowableGrowthRangeEffect : BaseComponent, IRangeEffec
 
   #region Implementation
 
-  ITerrainService _terrainService;
   BlockService _blockService;
   EventBus _eventBus;
   string _modifierOwnerId;
   HashSet<string> _requiredComponents;
   HashSet<string> _requiredPrefabNames;
 
-  HashSet<Vector2Int> _allTiles;
+  HashSet<Vector3Int> _allTiles;
   List<Vector3Int> _coordsWithBoost;
 
   /// <inheritdoc/>
@@ -142,8 +140,7 @@ public sealed class ModifyGrowableGrowthRangeEffect : BaseComponent, IRangeEffec
 
   /// <summary>It must be public for the injection logic to work.</summary>
   [Inject]
-  public void InjectDependencies(ITerrainService terrainService, BlockService blockService, EventBus eventBus) {
-    _terrainService = terrainService;
+  public void InjectDependencies(BlockService blockService, EventBus eventBus) {
     _blockService = blockService;
     _eventBus = eventBus;
   }
@@ -156,9 +153,7 @@ public sealed class ModifyGrowableGrowthRangeEffect : BaseComponent, IRangeEffec
 
   /// <summary>Adds the rate modifier at the tile, given there is an eligible growable.</summary>
   /// <returns>The exact coordinates of the growable or <c>null</c> if there is none.</returns>
-  Vector3Int? AddModifierToTile(Vector2Int tile) {
-    var height = _terrainService.CellHeight(tile);
-    var coords = new Vector3Int(tile.x, tile.y, height);
+  Vector3Int? AddModifierToTile(Vector3Int coords) {
     var modifier = _blockService.GetBottomObjectComponentAt<GrowthRateModifier>(coords);
     if (modifier == null || !modifier.IsLiveAndGrowing) {
       return null;
@@ -177,7 +172,7 @@ public sealed class ModifyGrowableGrowthRangeEffect : BaseComponent, IRangeEffec
     return coords;
   }
 
-  /// <summary>Removes the modifier a the coordinates or NOOP if no <see cref="GrowthRateModifier"/> is there.</summary>
+  /// <summary>Removes the modifier at coordinates or NOOP if no <see cref="GrowthRateModifier"/> is there.</summary>
   void RemoveModifierAtCoords(Vector3Int coords) {
     var modifier = _blockService.GetBottomObjectComponentAt<GrowthRateModifier>(coords);
     if (modifier == null) {
@@ -200,7 +195,7 @@ public sealed class ModifyGrowableGrowthRangeEffect : BaseComponent, IRangeEffec
     if (modifier == null) {
       return;
     }
-    var affectedTile = modifier.GetComponentFast<BlockObject>().Coordinates.XY();
+    var affectedTile = modifier.GetComponentFast<BlockObject>().Coordinates;
     if (!_allTiles.Contains(affectedTile)) {
       return;
     }

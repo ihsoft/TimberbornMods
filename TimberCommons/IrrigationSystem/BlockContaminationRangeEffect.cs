@@ -37,7 +37,7 @@ public sealed class BlockContaminationRangeEffect : BaseComponent, IRangeEffect 
   public string EffectGroup => _effectGroupName;
 
   /// <inheritdoc/>
-  public void ApplyEffect(HashSet<Vector2Int> tiles) {
+  public void ApplyEffect(HashSet<Vector3Int> tiles) {
     ResetEffect();
     _contaminationOverrideIndex = _directSoilMoistureSystemAccessor.AddContaminationOverride(tiles);
   }

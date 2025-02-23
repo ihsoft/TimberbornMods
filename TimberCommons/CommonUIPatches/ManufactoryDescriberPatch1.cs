@@ -2,12 +2,12 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Reflection;
 using HarmonyLib;
 using IgorZ.TimberCommons.Settings;
 using IgorZ.TimberDev.UI;
-using Timberborn.Goods;
 using Timberborn.Localization;
+using Timberborn.Workshops;
+using Timberborn.WorkshopsUI;
 
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
@@ -15,13 +15,9 @@ using Timberborn.Localization;
 namespace IgorZ.TimberCommons.CommonUIPatches;
 
 /// <summary>Harmony patch to show days and hours for the slow recipes.</summary>
-[HarmonyPatch]
+[HarmonyPatch(typeof(ManufactoryDescriber), nameof(ManufactoryDescriber.GetCraftingTime))]
 static class ManufactoryDescriberPatch1 {
-  static MethodBase TargetMethod() {
-    return AccessTools.DeclaredMethod("Timberborn.WorkshopsUI.ManufactoryDescriber:GetCraftingTime");
-  }
-
-  static bool Prefix(RecipeSpecification productionRecipe, float workers,
+  static bool Prefix(RecipeSpec productionRecipe, float workers,
                      ILoc ____loc, bool __runOriginal, ref string __result) {
     if (!__runOriginal) {
       return false; // The other patches must follow the same style to properly support the skip logic!

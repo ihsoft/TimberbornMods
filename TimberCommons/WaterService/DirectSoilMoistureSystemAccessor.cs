@@ -9,7 +9,6 @@ using Bindito.Core;
 using IgorZ.TimberCommons.Settings;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
-using Timberborn.Common;
 using Timberborn.EntitySystem;
 using Timberborn.MapIndexSystem;
 using Timberborn.SceneLoading;
@@ -45,13 +44,13 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   /// </param>
   /// <returns>Unique ID of the created override. Use it to delete the overrides.</returns>
   /// <seealso cref="RemoveMoistureOverride"/>
-  public int AddMoistureOverride(IEnumerable<Vector2Int> tiles, float moistureLevel,
-                                 Func<Vector2Int, float> moistureLevelForTextureFn = null) {
+  public int AddMoistureOverride(IEnumerable<Vector3Int> tiles, float moistureLevel,
+                                 Func<Vector3Int, float> moistureLevelForTextureFn = null) {
     var index = _nextMoistureOverrideId++;
     var moistureLevelDict = new Dictionary<int, float>();
-    var desertLevelDict = new Dictionary<Vector2Int, float>();
+    var desertLevelDict = new Dictionary<Vector3Int, float>();
     foreach (var tile in tiles) {
-      moistureLevelDict.Add(_mapIndexService.CoordinatesToIndex(tile), moistureLevel);
+      moistureLevelDict.Add(_mapIndexService.CoordinatesToIndex3D(tile), moistureLevel);
       if (moistureLevelForTextureFn != null) {
         desertLevelDict.Add(tile, moistureLevelForTextureFn.Invoke(tile));
       }
@@ -81,7 +80,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   /// <param name="tiles">The tiles to set the blocker at.</param>
   /// <returns>Unique ID of the created override. Use it to delete the overrides.</returns>
   /// <seealso cref="RemoveContaminationOverride"/>
-  public int AddContaminationOverride(IEnumerable<Vector2Int> tiles) {
+  public int AddContaminationOverride(IEnumerable<Vector3Int> tiles) {
     var tilesSet = tiles.ToHashSet();
     var index = _nextContaminationOverrideId++;
     _contaminationOverrides.Add(index, tilesSet);
@@ -133,14 +132,14 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
 
   /// <summary>Map of the overriden desert levels.</summary>
   /// <seealso cref="ResetStaticState"/>
-  internal static Dictionary<Vector2Int, float> TerrainTextureLevelsOverrides = new();
+  internal static Dictionary<Vector3Int, float> TerrainTextureLevelsOverrides = new();
 
   readonly Dictionary<int, Dictionary<int, float>> _moistureLevelOverrides = new();
-  readonly Dictionary<int, Dictionary<Vector2Int, float>> _desertLevelOverrides = new();
+  readonly Dictionary<int, Dictionary<Vector3Int, float>> _desertLevelOverrides = new();
   int _nextMoistureOverrideId = 1;
 
-  readonly Dictionary<int, HashSet<Vector2Int>> _contaminationOverrides = new();
-  HashSet<Vector2Int> _contaminatedTilesCache = new();
+  readonly Dictionary<int, HashSet<Vector3Int>> _contaminationOverrides = new();
+  HashSet<Vector3Int> _contaminatedTilesCache = new();
   int _nextContaminationOverrideId = 1;
 
   MapIndexService _mapIndexService;
@@ -155,7 +154,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   /// <summary>Resets all cached static state. Must be called from configurator.</summary>
   internal static void ResetStaticState() {
     MoistureLevelOverrides = new Dictionary<int, float>();
-    TerrainTextureLevelsOverrides = new Dictionary<Vector2Int, float>();
+    TerrainTextureLevelsOverrides = new Dictionary<Vector3Int, float>();
   }
 
   /// <summary>Injects run-time dependencies.</summary>
@@ -214,7 +213,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
     var clearOverrides = _contaminatedTilesCache.Where(t => !newOverrides.Contains(t));
     foreach (var tile in clearOverrides) {
       var skipIt = _blockService
-          .GetObjectsAt(new Vector3Int(tile.x, tile.y, _terrainService.CellHeight(tile)))
+          .GetObjectsAt(tile)
           .Any(IsContaminationBlocker);
       if (skipIt) {
         DebugEx.Fine("Don't affect contamination barrier at: {0}", tile);
@@ -232,7 +231,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   /// <seealso cref="TerrainTextureLevelsOverrides"/>
   void UpdateTilesAppearance() {
     // Moisture levels for the terrain texture. It only affects UI appearance.
-    TerrainTextureLevelsOverrides = new Dictionary<Vector2Int, float>();
+    TerrainTextureLevelsOverrides = new Dictionary<Vector3Int, float>();
     foreach (var value in _desertLevelOverrides.Values.SelectMany(item => item)) {
       var tile = value.Key;
       var level = value.Value;
@@ -243,7 +242,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
       }
     }
     foreach (var tile in TerrainTextureLevelsOverrides.Keys) {
-      var index = _mapIndexService.CoordinatesToIndex(tile);
+      var index = _mapIndexService.CoordinatesToIndex3D(tile);
       _soilMoistureMap.UpdateDesertIntensity(tile, _soilMoistureMap.SoilMoisture(index));
     }
     DebugEx.Fine("Updated tiles appearance: tiles={0}", TerrainTextureLevelsOverrides.Keys.Count);
@@ -257,7 +256,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
     if (blockObject == null || !blockObject.IsFinished) {
       return; // Ignore preview objects.
     }
-    var tile = blockObject.Coordinates.XY();
+    var tile = blockObject.Coordinates;
     if (_contaminatedTilesCache.Contains(tile) && IsContaminationBlocker(blockObject)) {
       DebugEx.Fine("Restore contamination barrier at: {0}", tile);
       _soilBarrierMap.AddContaminationBarrierAt(tile);
