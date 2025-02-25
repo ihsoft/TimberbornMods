@@ -5,13 +5,11 @@
     <Style src="project://database/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss?fileID=7433441132597879392&amp;guid=65cc3b01c73f9d845b1cd8d615d4bc5f&amp;type=3#EntityPanelCommonStyle" />
     <Style src="project://database/Assets/Mods/SmartPower/AssetBundles/Resources/UI/TimberDevStyle.uss?fileID=7433441132597879392&amp;guid=808d244c0e14ad849862ff35711b8b1f&amp;type=3#TimberDevStyle" />
     <tb:NineSliceVisualElement class="bg-sub-box--green entity-sub-panel">
-        <tb:LocalizableToggle text-loc-key="IgorZ.SmartPower.PowerInputLimiter.SuspendIfNoPower" text="Останавливать если недостаточно энергии" name="AutomateCheckbox" class="entity-panel__toggle entity-panel__text game-toggle" />
-        <engine:Label text="Минимальное обеспечение энергией: {0}%" name="SuspendIfLowEfficiencyLabel" class="entity-panel__text" />
-        <tb:PreciseSlider name="MinEfficiencySlider" />
-        <engine:Toggle text="Остановить если заряд батарей ниже {0}%" name="SuspendIfBatteryLowCheckbox" class="game-toggle entity-panel__toggle entity-panel__text" />
-        <engine:Slider value="0.5" high-value="1" name="MinBatteriesChargeSlider" class="slider" />
+        <tb:LocalizableToggle text-loc-key="IgorZ.SmartPower.PowerOutputBalancer.AutomateGenerator" text="Автоматически управлять генератором" name="AutomateCheckbox" class="entity-panel__toggle entity-panel__text game-toggle" />
+        <engine:Label text="Заряжать батареи в диапазоне {0}% - {1}%" name="ChargeBatteriesText" class="entity-panel__text" />
+        <engine:MinMaxSlider value="0.2,0.5" low-limit="0" high-limit="1" name="ChargeBatteriesSlider" class="timberdev-minmax-slider" />
         <engine:VisualElement name="VisualElement" style="flex-grow: 1; align-items: center;">
-            <tb:LocalizableButton text="Применить ко всем таким же зданиям" text-loc-key="IgorZ.SmartPower.PowerInputLimiter.ApplyToAllBuildings" name="ApplyToAllBuildingsButton" class="button-game debug-fragment__button entity-panel__text timberdev-button-small" />
+            <tb:LocalizableButton text="Применить ко всем генераторам" text-loc-key="IgorZ.SmartPower.PowerOutputBalancer.ApplyToAllGenerators" name="ApplyToAllGeneratorsButton" class="button-game debug-fragment__button entity-panel__text timberdev-button-small" />
         </engine:VisualElement>
     </tb:NineSliceVisualElement>
 </engine:UXML>

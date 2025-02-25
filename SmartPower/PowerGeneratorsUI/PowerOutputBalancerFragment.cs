@@ -15,7 +15,6 @@ using UnityEngine.UIElements;
 namespace IgorZ.SmartPower.PowerGeneratorsUI;
 
 sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
-  const string AutomateLocKey = "IgorZ.SmartPower.PowerOutputBalancer.AutomateGenerator";
   const string ChargeLevelLocKey = "IgorZ.SmartPower.PowerOutputBalancer.ChargeBatteriesRangeText";
   const string ApplyToAllGeneratorsLocKey = "IgorZ.SmartPower.PowerOutputBalancer.ApplyToAllGenerators";
   const string AppliedToGeneratorsLocKey = "IgorZ.SmartPower.PowerOutputBalancer.AppliedToGenerators";
@@ -41,29 +40,26 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
   }
 
   public VisualElement InitializeFragment() {
-    _automateCheckbox = _uiFactory.CreateToggle(
-        AutomateLocKey, _ => {
-          _balancer.Automate = _automateCheckbox.value;
+    _root = _uiFactory.LoadTimberDevElement("IgorZ/PowerOutputBalancerFragment");
+    _automateCheckbox = _root.Q<Toggle>("AutomateCheckbox");
+    _automateCheckbox.RegisterValueChangedCallback(
+        e => {
+          _balancer.Automate = e.newValue;
           _balancer.UpdateState();
           UpdateControls();
         });
-
-    _chargeBatteriesSlider = _uiFactory.CreateMinMaxSlider(
-        _ => {
-          _balancer.DischargeBatteriesThreshold = _chargeBatteriesSlider.value.x;
-          _balancer.ChargeBatteriesThreshold = _chargeBatteriesSlider.value.y;
+    _chargeBatteriesText = _root.Q<Label>("ChargeBatteriesText");
+    _chargeBatteriesSlider = _root.Q<MinMaxSlider>("ChargeBatteriesSlider");
+    _uiFactory.AddFixedStepChangeHandler(
+        _chargeBatteriesSlider, 0.05f, 0.10f,
+        newValue => {
+          _balancer.DischargeBatteriesThreshold = newValue.x;
+          _balancer.ChargeBatteriesThreshold = newValue.y;
           _balancer.UpdateState();
           UpdateControls();
-        }, 0f, 1.0f, 0.10f, stepSize: 0.05f);
-
-    _chargeBatteriesText = _uiFactory.CreateLabel();
-    _applyToAllGeneratorsButton = _uiFactory.CreateButton(ApplyToAllGeneratorsLocKey, ApplyToAllGenerators);
-
-    _root = _uiFactory.CreateCenteredPanelFragment();
-    _root.Add(_automateCheckbox);
-    _root.Add(_chargeBatteriesText);
-    _root.Add(_chargeBatteriesSlider);
-    _root.Add(_uiFactory.CenterElement(_applyToAllGeneratorsButton));
+        });
+    _applyToAllGeneratorsButton = _root.Q<Button>("ApplyToAllGeneratorsButton");
+    _applyToAllGeneratorsButton.clicked += ApplyToAllGenerators;
 
     _suspendStatusLabel = _uiFactory.CreateLabel();
     _suspendStatusLabel.ToggleDisplayStyle(visible: false);
