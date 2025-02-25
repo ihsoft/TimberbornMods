@@ -31,6 +31,7 @@ sealed class AdjustableWaterOutputFragment : IEntityPanelFragment {
 
   /// <inheritdoc/>
   public VisualElement InitializeFragment() {
+    //FIXME: create an asset
     _waterLevelSlider = _uiFactory.CreatePreciseSlider(
         WaterLevelChangeStep, v => _adjustableWaterOutput.SetSpillwayHeightDelta(v - Range));
     _infoLabel = _uiFactory.CreateLabel();

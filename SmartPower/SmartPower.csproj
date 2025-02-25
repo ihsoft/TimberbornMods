@@ -81,8 +81,8 @@
       <Content Include="..\ModsUnityProject\Assets\Mods\SmartPower\manifest.json">
         <Link>Mod\manifest.json</Link>
       </Content>
-      <Content Include="..\TimberDev\UI\TimberbornStyle.uss">
-        <Link>TimberDev\UI\TimberbornStyle.uss</Link>
+      <Content Include="..\TimberDev\UI\TimberDevStyle.uss">
+        <Link>TimberDev\UI\TimberDevStyle.uss</Link>
       </Content>
     </ItemGroup>
     <ItemGroup>
