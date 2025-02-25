@@ -14,13 +14,15 @@ sealed class SmartGoodConsumingGenerator : PowerOutputBalancer {
   protected override void Suspend() {
     base.Suspend();
     _goodConsumingToggle.PauseConsumption();
-    MechanicalNode.UpdateOutput(0);
+    if (MechanicalNode.Graph != null) {
+      MechanicalNode.UpdateOutput(0);
+    }
   }
 
   /// <inheritdoc/>
   protected override void Resume() {
     _goodConsumingToggle.ResumeConsumption();
-    if (_goodConsumingBuilding.HoursUntilNoSupply > 0) {
+    if (MechanicalNode.Graph != null && _goodConsumingBuilding.HoursUntilNoSupply > 0) {
       MechanicalNode.Active = true;
       MechanicalNode.UpdateOutput(1.0f);
     }

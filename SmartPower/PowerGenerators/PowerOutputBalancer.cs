@@ -106,7 +106,7 @@ abstract class PowerOutputBalancer
 
   /// <inheritdoc/>
   public void PostInitializeEntity() {
-    if (enabled && IsSuspended) {
+    if (IsSuspended) {
       Suspend();
     }
   }
