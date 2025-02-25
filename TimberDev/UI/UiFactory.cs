@@ -59,11 +59,11 @@ public class UiFactory {
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public string T<T1, T2, T3>(string key, T1 param1, T2 param2, T3 param3) => _loc.T(key, param1, param2, param3);
 
-  /// <summary>Stylesheet for the Timberborn UI.</summary>
-  /// <remarks>Has styles for a limited set of controls.</remarks>
-  public StyleSheet TimberbornStylesheet =>
-      _timberbornStylesheet ??= _assetLoader.Load<StyleSheet>("UI/TimberbornStyle");
-  StyleSheet _timberbornStylesheet;
+  /// <summary>Stylesheet for the TimberDev UI elements.</summary>
+  /// <remarks>The stylesheet should be built-in to the mod asset file. See "README.txt".</remarks>
+  public StyleSheet TimberDevStylesheet =>
+      _timberDevStylesheet ??= _assetLoader.Load<StyleSheet>("UI/Views/TimberDevStyle");
+  StyleSheet _timberDevStylesheet;
 
   /// <summary>Creates a panel builder that can be used as a fragment on the right side panel.</summary>
   public VisualElement CreateCenteredPanelFragment() {
@@ -167,39 +167,14 @@ public class UiFactory {
   }
 
   /// <summary>Creates a min/max slider in a theme suitable for the right side panel.</summary>
-  /// <remarks>
-  /// For this method to work, "TimberbornStyle.uss" should be compiled into the mod asset bundle at path
-  /// "UI/TimberbornStyle".
-  /// </remarks>
-  /// <param name="onValueChangedFn">A callback method that will be called on the value change.</param>
+  /// <remarks>This method requires <see cref="TimberDevStylesheet"/>.</remarks>
   /// <param name="lowValue">The minimum value limit.</param>
   /// <param name="highValue">The maximum value limit.</param>
-  /// <param name="minDelta">The minimum delta between min/max values.</param>
-  /// <param name="stepSize">If greater than zero, then the values are rounded to the step.</param>
   /// <param name="spacing">If a non-negative value, then the bottom margin will be set.</param>
-  /// <seealso cref="TimberbornStylesheet"/>
-  public MinMaxSlider CreateMinMaxSlider(Action<ChangeEvent<Vector2>> onValueChangedFn, float lowValue, float highValue,
-                                          float minDelta, float stepSize = 0, int spacing = 5) {
+  public MinMaxSlider CreateMinMaxSlider(float lowValue, float highValue, int spacing = 5) {
     var slider = new MinMaxSlider(lowValue, highValue, lowValue, highValue);
-    slider.styleSheets.Add(TimberbornStylesheet);
-    slider.RegisterValueChangedCallback(
-        evt => {
-          var newValue = evt.newValue;
-          if (stepSize > 0) {
-            newValue = new Vector2(
-                Mathf.Round(evt.newValue.x / stepSize) * stepSize, Mathf.Round(evt.newValue.y / stepSize) * stepSize);
-          }
-          if (newValue.y - newValue.x < minDelta) {
-            if (Math.Abs(evt.previousValue.x - newValue.x) < float.Epsilon) {
-              newValue.y = newValue.x + minDelta;
-            } else {
-              newValue.x = newValue.y - minDelta;
-            }
-          }
-          slider.SetValueWithoutNotify(newValue);
-          evt = ChangeEvent<Vector2>.GetPooled(evt.previousValue, newValue);
-          onValueChangedFn(evt);
-        });
+    slider.AddToClassList("timberdev-minmax-slider");
+    slider.styleSheets.Add(TimberDevStylesheet);
     if (spacing >= 0) {
       slider.style.marginBottom = spacing;
     }
@@ -223,5 +198,53 @@ public class UiFactory {
       slider.style.marginBottom = spacing;
     }
     return new PreciseSliderWrapper(slider, onValueChangedFn, stepSize);
+  }
+
+  /// <summary>Adds a handler to the slider that will round the value to the step size.</summary>
+  public void AddFixedStepChangeHandler(Slider slider, float stepSize, Action<float> onValueChangedFn) {
+    slider.RegisterValueChangedCallback(evt => {
+      var adjustedValue = Mathf.Round(evt.newValue / stepSize) * stepSize;
+      slider.SetValueWithoutNotify(adjustedValue);
+      onValueChangedFn(adjustedValue);
+    });
+  }
+
+  /// <summary>Adds a handler to the slider that will round the value to the step size.</summary>
+  public void AddFixedStepChangeHandler(PreciseSlider slider, float stepSize, Action<float> onValueChangedFn) {
+    slider.Initialize(newValue => {
+      var adjustedValue = Mathf.Round(newValue / stepSize) * stepSize;
+      slider.SetValueWithoutNotify(adjustedValue);
+      onValueChangedFn(adjustedValue);
+    }, stepSize);
+  }
+
+  /// <summary>Adds a handler to the slider that will round the value to the step size.</summary>
+  public void AddFixedStepChangeHandler(MinMaxSlider slider, float stepSize, float minDelta,
+                                        Action<Vector2> onValueChangedFn) {
+    slider.RegisterValueChangedCallback(
+        e => {
+          var newValue = e.newValue;
+          if (stepSize > 0) {
+            newValue = new Vector2(
+                Mathf.Round(e.newValue.x / stepSize) * stepSize, Mathf.Round(e.newValue.y / stepSize) * stepSize);
+          }
+          if (newValue.y - newValue.x < minDelta) {
+            if (Math.Abs(e.previousValue.x - newValue.x) < float.Epsilon) {
+              newValue.y = newValue.x + minDelta;
+            } else {
+              newValue.x = newValue.y - minDelta;
+            }
+          }
+          slider.SetValueWithoutNotify(newValue);
+          onValueChangedFn(newValue);
+        });
+  }
+
+  /// <summary>Loads the visual elements that may use TimberDev stylesheet.</summary>
+  /// <remarks>This method requires <see cref="TimberDevStylesheet"/>.</remarks>
+  public VisualElement LoadTimberDevElement(string name) {
+    var element = _visualElementLoader.LoadVisualElement(name);
+    element.styleSheets.Add(TimberDevStylesheet);
+    return element;
   }
 }
