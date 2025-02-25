@@ -2,7 +2,7 @@
    <PropertyGroup>
       <Product>SmartPower: Plugin for Timberborn game</Product>
       <Authors>IgorZ</Authors>
-      <Version>1.13.0</Version>
+      <Version>1.13.1</Version>
       <Copyright>Public domain</Copyright>
    </PropertyGroup>
 </Project>
