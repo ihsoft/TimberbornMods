@@ -52,97 +52,100 @@
 }
 
 .bg-box--green {
-    --background-image: resource("UI/Images/Backgrounds/bg-square-1");
+    --background-image: resource('UI/Images/Backgrounds/bg-square-1');
     --background-slice-scale: 0.5;
     --background-slice: 10;
 }
 
 .bg-box--red {
-    --background-image: resource("UI/Images/Backgrounds/bg-square-2");
+    --background-image: resource('UI/Images/Backgrounds/bg-square-2');
     --background-slice-scale: 0.5;
     --background-slice: 10;
 }
 
 .bg-box--brown {
-    --background-image: resource("UI/Images/Backgrounds/bg-square-3");
+    --background-image: resource('UI/Images/Backgrounds/bg-square-3');
     --background-slice-scale: 0.5;
     --background-slice: 10;
 }
 
 .bg-sub-box--pale-purple {
-    --background-image: resource("UI/Images/Backgrounds/bg-1");
+    --background-image: resource('UI/Images/Backgrounds/bg-1');
     --background-slice-scale: 0.5;
     --background-slice: 9;
 }
 
 .bg-sub-box--purple-striped {
-    --background-image: resource("UI/Images/Backgrounds/bg-2-striped");
+    --background-image: resource('UI/Images/Backgrounds/bg-2-striped');
     --background-slice-scale: 0.5;
     --background-slice: 9;
 }
 
 .bg-sub-box--green {
-    --background-image: resource("UI/Images/Backgrounds/bg-3");
-    --background-slice-scale: 0.5;
-    --background-slice: 9;
+    background-image: resource('UI/Images/Backgrounds/bg-3');
+    -unity-slice-scale: 0.5px;
+    -unity-slice-left: 9;
+    -unity-slice-top: 9;
+    -unity-slice-right: 9;
+    -unity-slice-bottom: 9;
 }
 
 .bg-sub-box--red-striped {
-    --background-image: resource("UI/Images/Backgrounds/bg-6-striped");
+    --background-image: resource('UI/Images/Backgrounds/bg-6-striped');
     --background-slice-scale: 0.5;
     --background-slice: 9;
 }
 
 .bg-sub-box--blue {
-    --background-image: resource("UI/Images/Backgrounds/bg-7");
+    --background-image: resource('UI/Images/Backgrounds/bg-7');
     --background-slice-scale: 0.5;
     --background-slice: 9;
 }
 
 .bg-sub-box--frame {
-    --background-image: resource("UI/Images/Backgrounds/bg-4");
+    --background-image: resource('UI/Images/Backgrounds/bg-4');
     --background-slice-scale: 0.5;
     --background-slice: 16;
 }
 
 .square-large--light-red {
-    --background-image: resource("UI/Images/Backgrounds/bg-square-large-1");
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-1');
     --background-slice-scale: 0.5;
     --background-slice: 16;
 }
 
 .square-large--green {
-    --background-image: resource("UI/Images/Backgrounds/bg-square-large-2");
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-2');
     --background-slice-scale: 0.5;
     --background-slice: 16;
 }
 
 .square-large--brown {
-    --background-image: resource("UI/Images/Backgrounds/bg-square-large-8");
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-8');
     --background-slice-scale: 0.5;
     --background-slice: 16;
 }
 
 .square-large--red {
-    --background-image: resource("UI/Images/Backgrounds/bg-square-large-3");
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-3');
     --background-slice-scale: 0.5;
     --background-slice: 16;
 }
 
 .square-large--dark-red {
-    --background-image: resource("UI/Images/Backgrounds/bg-square-large-5");
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-5');
     --background-slice-scale: 0.5;
     --background-slice: 16;
 }
 
 .square-large--transparent-purple {
-    --background-image: resource("UI/Images/Backgrounds/bg-square-large-6");
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-6');
     --background-slice-scale: 0.5;
     --background-slice: 16;
 }
 
 .bg-striped--green {
-    --background-image: resource("UI/Images/Backgrounds/bg-striped-1");
+    --background-image: resource('UI/Images/Backgrounds/bg-striped-1');
     --background-slice-scale: 0.5;
     --background-slice-top: 8;
     --background-slice-right: 13;
@@ -151,7 +154,7 @@
 }
 
 .bg-striped--red {
-    --background-image: resource("UI/Images/Backgrounds/bg-striped-2");
+    --background-image: resource('UI/Images/Backgrounds/bg-striped-2');
     --background-slice-scale: 0.5;
     --background-slice-top: 8;
     --background-slice-right: 13;
@@ -160,18 +163,21 @@
 }
 
 .button-game {
-    --background-image: resource("UI/Images/Buttons/button-game");
-    --background-slice-scale: 0.5;
-    --background-slice: 24;
+    background-image: resource('UI/Images/Buttons/button-game');
     --click-sound: "UI.Click";
+    -unity-slice-left: 24;
+    -unity-slice-top: 24;
+    -unity-slice-right: 24;
+    -unity-slice-bottom: 24;
+    -unity-slice-scale: 0.5px;
 }
 
 .button-game:hover:enabled {
-    --background-image: resource("UI/Images/Buttons/button-game-hover");
+    background-image: resource('UI/Images/Buttons/button-game-hover');
 }
 
 .button-game:hover:enabled:active {
-    --background-image: resource("UI/Images/Buttons/button-game-active");
+    background-image: resource('UI/Images/Buttons/button-game-active');
 }
 
 .button-wrapper {
@@ -196,27 +202,27 @@
 }
 
 .button-plus {
-    background-image: resource("UI/Images/Buttons/plus");
+    background-image: resource('UI/Images/Buttons/plus');
 }
 
 .button-plus:hover:enabled {
-    background-image: resource("UI/Images/Buttons/plus-hover");
+    background-image: resource('UI/Images/Buttons/plus-hover');
 }
 
 .button-plus:hover:enabled:active {
-    background-image: resource("UI/Images/Buttons/plus-active");
+    background-image: resource('UI/Images/Buttons/plus-active');
 }
 
 .button-plus--inverted {
-    background-image: resource("UI/Images/Buttons/plus-inverted");
+    background-image: resource('UI/Images/Buttons/plus-inverted');
 }
 
 .button-plus--bare {
-    background-image: resource("UI/Images/Buttons/plus-bare");
+    background-image: resource('UI/Images/Buttons/plus-bare');
 }
 
 .button-plus--bare:hover:enabled {
-    background-image: resource("UI/Images/Buttons/plus-bare-hover");
+    background-image: resource('UI/Images/Buttons/plus-bare-hover');
 }
 
 .button-plus--margin {
@@ -224,153 +230,153 @@
 }
 
 .button-minus {
-    background-image: resource("UI/Images/Buttons/minus");
+    background-image: resource('UI/Images/Buttons/minus');
 }
 
 .button-minus--inverted {
-    background-image: resource("UI/Images/Buttons/minus-inverted");
+    background-image: resource('UI/Images/Buttons/minus-inverted');
 }
 
 .button-minus:hover:enabled {
-    background-image: resource("UI/Images/Buttons/minus-hover");
+    background-image: resource('UI/Images/Buttons/minus-hover');
 }
 
 .button-minus:hover:enabled:active {
-    background-image: resource("UI/Images/Buttons/minus-active");
+    background-image: resource('UI/Images/Buttons/minus-active');
 }
 
 .button-minus--bare {
-    background-image: resource("UI/Images/Buttons/minus-bare");
+    background-image: resource('UI/Images/Buttons/minus-bare');
 }
 
 .button-minus--bare:hover:enabled {
-    background-image: resource("UI/Images/Buttons/minus-bare-hover");
+    background-image: resource('UI/Images/Buttons/minus-bare-hover');
 }
 
 .button-arrow-down {
-    background-image: resource("UI/Images/Buttons/arrow-down");
+    background-image: resource('UI/Images/Buttons/arrow-down');
 }
 
 .button-arrow-down--inverted {
-    background-image: resource("UI/Images/Buttons/arrow-down-inverted");
+    background-image: resource('UI/Images/Buttons/arrow-down-inverted');
 }
 
 .button-arrow-down:hover:enabled {
-    background-image: resource("UI/Images/Buttons/arrow-down-hover");
+    background-image: resource('UI/Images/Buttons/arrow-down-hover');
 }
 
 .button-arrow-down:hover:enabled:active {
-    background-image: resource("UI/Images/Buttons/arrow-down-active");
+    background-image: resource('UI/Images/Buttons/arrow-down-active');
 }
 
 .button-arrow-left {
-    background-image: resource("UI/Images/Buttons/arrow-left");
+    background-image: resource('UI/Images/Buttons/arrow-left');
 }
 
 .button-arrow-left--inverted {
-    background-image: resource("UI/Images/Buttons/arrow-left-inverted");
+    background-image: resource('UI/Images/Buttons/arrow-left-inverted');
 }
 
 .button-arrow-left:hover:enabled {
-    background-image: resource("UI/Images/Buttons/arrow-left-hover");
+    background-image: resource('UI/Images/Buttons/arrow-left-hover');
 }
 
 .button-arrow-left:hover:enabled:active {
-    background-image: resource("UI/Images/Buttons/arrow-left-active");
+    background-image: resource('UI/Images/Buttons/arrow-left-active');
 }
 
 .button-arrow-right {
-    background-image: resource("UI/Images/Buttons/arrow-right");
+    background-image: resource('UI/Images/Buttons/arrow-right');
 }
 
 .button-arrow-right--inverted {
-    background-image: resource("UI/Images/Buttons/arrow-right-inverted");
+    background-image: resource('UI/Images/Buttons/arrow-right-inverted');
 }
 
 .button-arrow-right:hover:enabled {
-    background-image: resource("UI/Images/Buttons/arrow-right-hover");
+    background-image: resource('UI/Images/Buttons/arrow-right-hover');
 }
 
 .button-arrow-right:hover:enabled:active {
-    background-image: resource("UI/Images/Buttons/arrow-right-active");
+    background-image: resource('UI/Images/Buttons/arrow-right-active');
 }
 
 .button-arrow-up {
-    background-image: resource("UI/Images/Buttons/arrow-up");
+    background-image: resource('UI/Images/Buttons/arrow-up');
 }
 
 .button-arrow-up--inverted {
-    background-image: resource("UI/Images/Buttons/arrow-up-inverted");
+    background-image: resource('UI/Images/Buttons/arrow-up-inverted');
 }
 
 .button-arrow-up:hover:enabled {
-    background-image: resource("UI/Images/Buttons/arrow-up-hover");
+    background-image: resource('UI/Images/Buttons/arrow-up-hover');
 }
 
 .button-arrow-up:hover:enabled:active {
-    background-image: resource("UI/Images/Buttons/arrow-up-active");
+    background-image: resource('UI/Images/Buttons/arrow-up-active');
 }
 
 .button-cross {
-    background-image: resource("UI/Images/Buttons/cross");
+    background-image: resource('UI/Images/Buttons/cross');
 }
 
 .button-cross:hover:enabled {
-    background-image: resource("UI/Images/Buttons/cross-hover");
+    background-image: resource('UI/Images/Buttons/cross-hover');
 }
 
 .button-cross:hover:enabled:active {
-    background-image: resource("UI/Images/Buttons/cross-active");
+    background-image: resource('UI/Images/Buttons/cross-active');
 }
 
 .button-cross--bare {
-    background-image: resource("UI/Images/Buttons/cross-bare");
+    background-image: resource('UI/Images/Buttons/cross-bare');
 }
 
 .button-cross--bare:hover:enabled {
-    background-image: resource("UI/Images/Buttons/cross-bare-hover");
+    background-image: resource('UI/Images/Buttons/cross-bare-hover');
 }
 
 .button-checkmark--bare {
-    background-image: resource("UI/Images/Buttons/checkmark-bare");
+    background-image: resource('UI/Images/Buttons/checkmark-bare');
 }
 
 .button-checkmark--bare:hover:enabled {
-    background-image: resource("UI/Images/Buttons/checkmark-bare-hover");
+    background-image: resource('UI/Images/Buttons/checkmark-bare-hover');
 }
 
 .button-reset--bare {
-    background-image: resource("UI/Images/Buttons/reset-bare");
+    background-image: resource('UI/Images/Buttons/reset-bare');
 }
 
 .button-reset--bare:hover:enabled {
-    background-image: resource("UI/Images/Buttons/reset-bare-hover");
+    background-image: resource('UI/Images/Buttons/reset-bare-hover');
 }
 
 .arrow--right {
-    background-image: resource("UI/Images/Buttons/right_arrow");
+    background-image: resource('UI/Images/Buttons/right_arrow');
     width: 34px;
     height: 57px;
     --click-sound: "UI.Click";
 }
 
 .arrow--left {
-    background-image: resource("UI/Images/Buttons/left_arrow");
+    background-image: resource('UI/Images/Buttons/left_arrow');
     width: 34px;
     height: 57px;
     --click-sound: "UI.Click";
 }
 
 .arrow--right:hover:enabled {
-    background-image: resource("UI/Images/Buttons/right_arrow_hover");
+    background-image: resource('UI/Images/Buttons/right_arrow_hover');
 }
 
 .arrow--left:hover:enabled {
-    background-image: resource("UI/Images/Buttons/left_arrow_hover");
+    background-image: resource('UI/Images/Buttons/left_arrow_hover');
 }
 
 .editable-hint {
-    background-image: resource("UI/Images/Game/edit");
+    background-image: resource('UI/Images/Game/edit');
     width: 24px;
     height: 24px;
 }
@@ -387,22 +393,22 @@
 }
 
 .game-toggle > .unity-toggle__input > .unity-toggle__checkmark {
-    background-image: resource("UI/Images/Buttons/empty-inverted");
+    background-image: resource('UI/Images/Buttons/empty-inverted');
     width: 20px;
     height: 20px;
     margin-right: 4px;
 }
 
 .game-toggle > .unity-toggle__input:checked > .unity-toggle__checkmark {
-    background-image: resource("UI/Images/Buttons/checkmark-inverted");
+    background-image: resource('UI/Images/Buttons/checkmark-inverted');
 }
 
 .game-toggle > .unity-toggle__input:hover:enabled > .unity-toggle__checkmark {
-    background-image: resource("UI/Images/Buttons/empty-hover");
+    background-image: resource('UI/Images/Buttons/empty-hover');
 }
 
 .game-toggle > .unity-toggle__input:checked:hover:enabled > .unity-toggle__checkmark {
-    background-image: resource("UI/Images/Buttons/checkmark-hover");
+    background-image: resource('UI/Images/Buttons/checkmark-hover');
 }
 
 .game-toggle > .unity-toggle__input > .unity-toggle__text {
@@ -439,13 +445,13 @@
 }
 
 .dropdown__selection {
-    --background-image: resource("UI/Images/Backgrounds/bg-square-1");
+    --background-image: resource('UI/Images/Backgrounds/bg-square-1');
     --background-slice-scale: 0.5;
     --background-slice: 10;
 }
 
 .dropdown__selectable.dropdown__selection:enabled:hover {
-    --background-image: resource("UI/Images/Backgrounds/bg-square-4");
+    --background-image: resource('UI/Images/Backgrounds/bg-square-4');
 }
 
 .dropdown__label {
@@ -492,14 +498,14 @@
 }
 
 .camera-action-marker {
-    background-image: resource("UI/Images/Core/dragging-icon");
+    background-image: resource('UI/Images/Core/dragging-icon');
     height: 32px;
     width: 32px;
     position: absolute;
 }
 
 .thumbnail {
-    background-image: resource("UI/Images/Core/default-thumbnail");
+    background-image: resource('UI/Images/Core/default-thumbnail');
     flex-shrink: 0;
     flex-grow: 1;
     align-self: stretch;
@@ -523,7 +529,7 @@
     flex-shrink: 0;
     flex-grow: 1;
     margin: -8px;
-    --background-image: resource("UI/Images/Core/border_frameonly");
+    --background-image: resource('UI/Images/Core/border_frameonly');
     --background-slice-scale: 0.25;
     --background-slice: 64;
 }
@@ -572,7 +578,7 @@
 }
 
 .map-item__icon--recommended {
-    background-image: resource("UI/Images/Core/recommended-map-icon");
+    background-image: resource('UI/Images/Core/recommended-map-icon');
 }
 
 .map-item-faction-icon {
@@ -618,12 +624,12 @@
 
 .map-selection__download-icon {
     margin-left: 0;
-    background-image: resource("UI/Images/Core/cloud-file-icon");
+    background-image: resource('UI/Images/Core/cloud-file-icon');
 }
 
 .map-selection__browse-icon {
     margin-left: 0;
-    background-image: resource("UI/Images/Core/local-file-icon");
+    background-image: resource('UI/Images/Core/local-file-icon');
 }
 
 .map-selection__selected-map {
@@ -683,7 +689,7 @@
 .map-selection__description-background {
     flex-grow: 1;
     flex-shrink: 1;
-    --background-image: resource("UI/Images/Backgrounds/bg-8");
+    --background-image: resource('UI/Images/Backgrounds/bg-8');
     --background-slice-scale: 0.5;
     --background-slice: 10;
 }
@@ -715,7 +721,7 @@
 }
 
 .map-selection__map-type-button {
-    --background-image: resource("UI/Images/Buttons/toggle-button");
+    --background-image: resource('UI/Images/Buttons/toggle-button');
     --background-slice-scale: 0.5;
     --background-slice: 88;
     --click-sound: "UI.Click";
@@ -726,11 +732,11 @@
 }
 
 .map-selection__map-type-button.selected {
-    --background-image: resource("UI/Images/Buttons/toggle-button-selected");
+    --background-image: resource('UI/Images/Buttons/toggle-button-selected');
 }
 
 .map-selection__map-type-button:hover {
-    --background-image: resource("UI/Images/Buttons/toggle-button-hover");
+    --background-image: resource('UI/Images/Buttons/toggle-button-hover');
 }
 
 .map-selection__map-type-button:hover > .map-selection__map-type-button-label {
@@ -750,5 +756,8 @@
 }
 
 .flexible-start-icon {
-    background-image: resource("UI/Images/Core/flexible-start-icon");
+    background-image: resource('UI/Images/Core/flexible-start-icon');
+}
+
+.timberdev-button-standard-padding {
 }

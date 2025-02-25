@@ -1,11 +1,11 @@
 * {
-    -unity-font-definition: resource("UI/Fonts/NotoSansDisplay-Medium SDF - Static");
     margin: 0;
     padding: 0;
     border-width: 0;
     border-radius: 0;
     background-color: transparent;
     -unity-background-image-tint-color: white;
+    -unity-font-definition: resource('UI/Fonts/NotoSansDisplay-Medium');
 }
 
 TextField {
@@ -95,17 +95,17 @@ NineSliceTextField {
 }
 
 .sliced-border {
-    --background-image: resource("UI/Images/Core/border_transparent");
+    --background-image: resource('UI/Images/Core/border_transparent');
     --background-slice-scale: 0.5;
     --background-slice: 64;
 }
 
 .sliced-border--nontransparent {
-    --background-image: resource("UI/Images/Core/border_nontransparent");
+    --background-image: resource('UI/Images/Core/border_nontransparent');
 }
 
 .menu-button {
-    --background-image: resource("UI/Images/Buttons/button");
+    --background-image: resource('UI/Images/Buttons/button');
     --background-slice-scale: 0.5;
     --background-slice-top: 0;
     --background-slice-right: 65;
@@ -121,12 +121,12 @@ NineSliceTextField {
 }
 
 .menu-button:hover:enabled {
-    --background-image: resource("UI/Images/Buttons/button-hover");
+    --background-image: resource('UI/Images/Buttons/button-hover');
     color: rgb(0, 0, 0);
 }
 
 .menu-button:hover:enabled:active {
-    --background-image: resource("UI/Images/Buttons/button-hover");
+    --background-image: resource('UI/Images/Buttons/button-hover');
     color: rgb(0, 0, 0);
 }
 
@@ -147,7 +147,7 @@ NineSliceTextField {
 .wide-menu-button {
     --background-slice-scale: 0.5;
     --background-slice: 20;
-    --background-image: resource("UI/Images/Buttons/wide");
+    --background-image: resource('UI/Images/Buttons/wide');
     min-width: 130px;
     height: 32px;
     padding-left: 15px;
@@ -163,7 +163,7 @@ NineSliceTextField {
 
 .wide-menu-button:hover {
     color: rgb(0, 0, 0);
-    --background-image: resource("UI/Images/Buttons/wide-hover");
+    --background-image: resource('UI/Images/Buttons/wide-hover');
 }
 
 .experimental-info {
@@ -174,7 +174,7 @@ NineSliceTextField {
 }
 
 .text-field {
-    --background-image: resource("UI/Images/Backgrounds/bg-input");
+    --background-image: resource('UI/Images/Backgrounds/bg-input');
     --background-slice-scale: 0.5;
     --background-slice: 8;
 }
@@ -188,12 +188,12 @@ NineSliceTextField {
 }
 
 .text-field:disabled {
-    --background-image: resource("UI/Images/Backgrounds/bg-input-disabled");
+    --background-image: resource('UI/Images/Backgrounds/bg-input-disabled');
     opacity: 1;
 }
 
 .text-field:hover:enabled {
-    --background-image: resource("UI/Images/Backgrounds/bg-input-hover");
+    --background-image: resource('UI/Images/Backgrounds/bg-input-hover');
 }
 
 .text-field--large {
@@ -206,7 +206,7 @@ NineSliceTextField {
 }
 
 .text-field--large:hover:enabled {
-    --background-image: resource("UI/Images/Backgrounds/bg-input");
+    --background-image: resource('UI/Images/Backgrounds/bg-input');
 }
 
 .box {
@@ -262,7 +262,7 @@ NineSliceTextField {
 .capsule-header {
     min-width: 237px;
     height: 51px;
-    --background-image: resource("UI/Images/Core/header");
+    --background-image: resource('UI/Images/Core/header');
     --background-slice-scale: 0.5;
     --background-slice-top: 0;
     --background-slice-right: 65;
@@ -305,7 +305,7 @@ NineSliceTextField {
 }
 
 .list-view__item-background:hover:enabled {
-    --background-image: resource("UI/Images/Core/scroll_tab");
+    --background-image: resource('UI/Images/Core/scroll_tab');
     --background-slice-scale: 0.5;
     --background-slice-top: 15;
     --background-slice-right: 142;
@@ -314,7 +314,7 @@ NineSliceTextField {
 }
 
 .list-view__item-background:checked {
-    --background-image: resource("UI/Images/Core/scroll_tab");
+    --background-image: resource('UI/Images/Core/scroll_tab');
     --background-slice-scale: 0.5;
     --background-slice-top: 15;
     --background-slice-right: 142;
@@ -336,7 +336,7 @@ NineSliceTextField {
 }
 
 .close-button {
-    background-image: resource("UI/Images/Buttons/close");
+    background-image: resource('UI/Images/Buttons/close');
     width: 40px;
     height: 40px;
     position: absolute;
@@ -346,13 +346,13 @@ NineSliceTextField {
 }
 
 .close-button:hover:enabled {
-    background-image: resource("UI/Images/Buttons/close_hover");
+    background-image: resource('UI/Images/Buttons/close_hover');
 }
 
 .tooltip {
     padding: 4px 6px;
     -unity-text-align: middle-left;
-    --background-image: resource("UI/Images/Backgrounds/bg-square-3");
+    --background-image: resource('UI/Images/Backgrounds/bg-square-3');
     --background-slice-scale: 0.5;
     --background-slice: 10;
     align-self: center;
@@ -376,19 +376,19 @@ NineSliceTextField {
     height: 16px;
     width: 16px;
     margin-top: -7px;
-    background-image: resource("UI/Images/Buttons/circle-off");
+    background-image: resource('UI/Images/Buttons/circle-off');
 }
 
 .slider > .unity-slider__input > .unity-base-slider__drag-container > .unity-base-slider__dragger:hover:enabled {
-    background-image: resource("UI/Images/Buttons/circle-hover");
+    background-image: resource('UI/Images/Buttons/circle-hover');
 }
 
 .slider > .unity-slider__input > .unity-base-slider__drag-container:hover:enabled:active > .unity-base-slider__dragger {
-    background-image: resource("UI/Images/Buttons/circle-on");
+    background-image: resource('UI/Images/Buttons/circle-on');
 }
 
 .slider > .unity-slider__input > .unity-base-slider__drag-container > .unity-base-slider__tracker {
-    background-image: resource("UI/Images/Backgrounds/bg-pixel-2");
+    background-image: resource('UI/Images/Backgrounds/bg-pixel-2');
     -unity-background-scale-mode: stretch-to-fill;
     height: 2px;
 }
@@ -407,14 +407,14 @@ NineSliceTextField {
 }
 
 .science-cost-section__lock-icon {
-    background-image: resource("UI/Images/Game/lock-icon-yellow");
+    background-image: resource('UI/Images/Game/lock-icon-yellow');
     width: 24px;
     height: 24px;
     margin: 5px;
 }
 
 .science-cost-section__science-icon {
-    background-image: resource("UI/Images/Game/science-icon");
+    background-image: resource('UI/Images/Game/science-icon');
     width: 24px;
     height: 24px;
     margin: 5px;
@@ -440,7 +440,7 @@ NineSliceTextField {
 }
 
 .scroll--green-decorated .scroll-view__nine-slice-dragger {
-    --background-image: resource("UI/Images/Core/scroll-button-nine-slice");
+    --background-image: resource('UI/Images/Core/scroll-button-nine-slice');
     --background-slice-scale: 0.5;
     --background-slice: 14;
     width: 100%;
@@ -448,7 +448,7 @@ NineSliceTextField {
 }
 
 .scroll--green-decorated .scroll-view__nine-slice-tracker {
-    --background-image: resource("UI/Images/Core/scroll-bar-nine-slice");
+    --background-image: resource('UI/Images/Core/scroll-bar-nine-slice');
     --background-slice-scale: 0.5;
     --background-slice-top: 16;
     --background-slice-right: 0;
@@ -459,11 +459,11 @@ NineSliceTextField {
 }
 
 .scroll--green-decorated .scroll-view__nine-slice-dragger:hover {
-    --background-image: resource("UI/Images/Core/scroll-button-nine-slice-highlight");
+    --background-image: resource('UI/Images/Core/scroll-button-nine-slice-highlight');
 }
 
 .scroll--green-decorated .unity-base-slider__drag-container:active .scroll-view__nine-slice-dragger {
-    --background-image: resource("UI/Images/Core/scroll-button-nine-slice-highlight");
+    --background-image: resource('UI/Images/Core/scroll-button-nine-slice-highlight');
 }
 
 .dropdown {
@@ -472,7 +472,7 @@ NineSliceTextField {
 }
 
 .dropdown-items__wrapper {
-    --background-image: resource("UI/Images/Backgrounds/bg-square-1");
+    --background-image: resource('UI/Images/Backgrounds/bg-square-1');
     --background-slice-scale: 0.5;
     --background-slice: 10;
     position: absolute;
@@ -575,43 +575,43 @@ NineSliceTextField {
 }
 
 .dropdown__arrow-down {
-    background-image: resource("UI/Images/Buttons/arrow-down-bare");
+    background-image: resource('UI/Images/Buttons/arrow-down-bare');
     margin: 0 8px;
 }
 
 .dropdown__arrow-left {
-    background-image: resource("UI/Images/Buttons/arrow-left-bare");
+    background-image: resource('UI/Images/Buttons/arrow-left-bare');
     margin-right: 4px;
     margin-left: 8px;
 }
 
 .dropdown__arrow-right {
-    background-image: resource("UI/Images/Buttons/arrow-right-bare");
+    background-image: resource('UI/Images/Buttons/arrow-right-bare');
     margin-right: -4px;
 }
 
 .dropdown__arrow-down:enabled:hover {
-    background-image: resource("UI/Images/Buttons/arrow-down-bare-hover");
+    background-image: resource('UI/Images/Buttons/arrow-down-bare-hover');
 }
 
 .dropdown__arrow-left:enabled:hover {
-    background-image: resource("UI/Images/Buttons/arrow-left-bare-hover");
+    background-image: resource('UI/Images/Buttons/arrow-left-bare-hover');
 }
 
 .dropdown__arrow-right:enabled:hover {
-    background-image: resource("UI/Images/Buttons/arrow-right-bare-hover");
+    background-image: resource('UI/Images/Buttons/arrow-right-bare-hover');
 }
 
 .dropdown__selectable:enabled:hover > .dropdown__arrow-down {
-    background-image: resource("UI/Images/Buttons/arrow-down-bare-hover");
+    background-image: resource('UI/Images/Buttons/arrow-down-bare-hover');
 }
 
 .dropdown__selectable:enabled:hover > .dropdown__arrow-left {
-    background-image: resource("UI/Images/Buttons/arrow-left-bare-hover");
+    background-image: resource('UI/Images/Buttons/arrow-left-bare-hover');
 }
 
 .dropdown__selectable:enabled:hover > .dropdown__arrow-right {
-    background-image: resource("UI/Images/Buttons/arrow-right-bare-hover");
+    background-image: resource('UI/Images/Buttons/arrow-right-bare-hover');
 }
 
 .progress-bar {
@@ -627,7 +627,7 @@ NineSliceTextField {
 }
 
 .progress-bar__frame {
-    --background-image: resource("UI/Images/Backgrounds/bg-square-frame");
+    --background-image: resource('UI/Images/Backgrounds/bg-square-frame');
     --background-slice-scale: 0.5;
     --background-slice: 10;
     position: absolute;
@@ -636,23 +636,23 @@ NineSliceTextField {
 }
 
 .progress-bar__background {
-    background-image: resource("UI/Images/Backgrounds/bg-pixel-1");
+    background-image: resource('UI/Images/Backgrounds/bg-pixel-1');
     width: 100%;
     height: 100%;
 }
 
 .progress-bar__progress {
-    --background-image: resource("UI/Images/Backgrounds/bg-pixel-4");
+    --background-image: resource('UI/Images/Backgrounds/bg-pixel-4');
     width: 100%;
     height: 100%;
 }
 
 .unity-text--shaded .unity-text-element {
-    text-shadow: 0px 1px 0px black;
+    text-shadow: 0 1px 0 black;
 }
 
 .unity-text--shaded.unity-text-element {
-    text-shadow: 0px 1px 0px black;
+    text-shadow: 0 1px 0 black;
 }
 
 .clickable-hierarchy {
@@ -664,15 +664,15 @@ NineSliceTextField {
 }
 
 .hazardous-weather-toggle__icon--temperate {
-    background-image: resource("UI/Images/Core/ico-weather-temperate");
+    background-image: resource('UI/Images/Core/ico-weather-temperate');
 }
 
 .hazardous-weather-toggle__icon--drought {
-    background-image: resource("UI/Images/Core/ico-weather-drought");
+    background-image: resource('UI/Images/Core/ico-weather-drought');
 }
 
 .hazardous-weather-toggle__icon--badtide {
-    background-image: resource("UI/Images/Core/ico-weather-badtide");
+    background-image: resource('UI/Images/Core/ico-weather-badtide');
 }
 
 .precise-slider {
