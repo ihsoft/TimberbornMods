@@ -10,10 +10,6 @@
       "MinimumVersion": "2.3.3"
     },
     {
-      "Id": "TimberApi",
-      "MinimumVersion": "0.7.9.1"
-    },
-    {
       "Id": "eMka.ModSettings",
       "MinimumVersion": "0.6.9.4"
     }
