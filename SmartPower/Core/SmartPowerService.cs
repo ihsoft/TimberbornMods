@@ -80,39 +80,41 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
   }
 
   /// <summary>Reserves power for the node.</summary>
+  /// <remarks>Reservation can be done on a non-initialized power graph.</remarks>
   /// <param name="node">The node to reserve power for.</param>
   /// <param name="newReserved">The new amount of power to reserve. If negative, remove the reservation.</param>
   public void ReservePower(MechanicalNode node, int newReserved) {
     if (newReserved < 0) {
       DebugEx.Fine("Remove power reservation: node={0}", node);
       _powerReservations.RemoveAll(x => x.Node == node);
-      _reservedPowerCache.Remove(node.Graph);
-      return;
-    }
-    var reservation = _powerReservations.FirstOrDefault(x => x.Node == node);
-    if (reservation == null) {
-      DebugEx.Fine("Add power reservation: node={0}, reserved={1}", node, newReserved);
-      reservation = new PowerReservation { Node = node, Reserved = newReserved };
-      _powerReservations.Add(reservation);
     } else {
-      DebugEx.Fine("Update power reservation: node={0}, oldReserved={1}, newReserved={2}",
-                   node, reservation.Reserved, newReserved);
-      reservation.Reserved = newReserved;
+      var reservation = _powerReservations.FirstOrDefault(x => x.Node == node);
+      if (reservation == null) {
+        DebugEx.Fine("Add power reservation: node={0}, reserved={1}", node, newReserved);
+        reservation = new PowerReservation { Node = node, Reserved = newReserved };
+        _powerReservations.Add(reservation);
+      } else {
+        DebugEx.Fine("Update power reservation: node={0}, oldReserved={1}, newReserved={2}", node, reservation.Reserved,
+                     newReserved);
+        reservation.Reserved = newReserved;
+      }
     }
-    _reservedPowerCache.Remove(node.Graph);
+    if (node.Graph != null) {
+      _reservedPowerCache.Remove(node.Graph);
+    }
   }
 
   #endregion
 
   #region Implementation
 
-  struct NetworkCache {
+  record struct NetworkCache {
     public int BatteriesCapacity;
     public float BatteriesCharge;
   }
   readonly Dictionary<MechanicalGraph, NetworkCache> _networkCache = [];
 
-  class PowerReservation {
+  record PowerReservation {
     public MechanicalNode Node;
     public int Reserved;
   }

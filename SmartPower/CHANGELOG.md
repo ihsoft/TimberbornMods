@@ -1,6 +1,7 @@
 # v1.13.1 (started on 24 Feb 2025)
 * [Fix] The Engines don't start on the game load if the automation was enabled.
 * [Fix] The Engines suspended state doesn't restore on the game load.
+* [Fix] The consumers suspended state doesn't restore on the game load.
 
 # v1.13.0 (2 Feb 2025)
 * Support Update 7.

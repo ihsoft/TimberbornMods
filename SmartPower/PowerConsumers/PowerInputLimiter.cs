@@ -127,7 +127,7 @@ sealed class PowerInputLimiter
 
   /// <inheritdoc/>
   public void PostInitializeEntity() {
-    if (enabled && IsSuspended) {
+    if (IsSuspended) {
       Suspend();
     }
   }
