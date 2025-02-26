@@ -1,0 +1,8 @@
+<Project>
+   <PropertyGroup>
+      <Product>TimberUI: Plugin for Timberborn Modding</Product>
+      <Authors>IgorZ</Authors>
+      <Version>0.1.0</Version>
+      <Copyright>Public domain</Copyright>
+   </PropertyGroup>
+</Project>

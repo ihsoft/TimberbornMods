@@ -1,0 +1,17 @@
+﻿// Timberborn Mod: TimberUI
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+
+using Bindito.Core;
+using IgorZ.TimberDev.UI;
+
+namespace IgorZ.TimberUI;
+
+[Context("MainMenu")]
+// ReSharper disable once UnusedType.Global
+sealed class Configurator : IConfigurator {
+  public void Configure(IContainerDefinition containerDefinition) {
+    containerDefinition.Bind<MainDialog>().AsSingleton();
+    containerDefinition.Bind<UiFactory>().AsSingleton();
+  }
+}

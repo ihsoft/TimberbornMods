@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+        <ProjectGuid>{3D744A82-514A-4BE8-99CF-39C3BCC6FD4F}</ProjectGuid>
+        <OutputType>Library</OutputType>
+        <RootNamespace>IgorZ.TimberUI</RootNamespace>
+        <AssemblyName>TimberUI</AssemblyName>
+        <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <LangVersion>12</LangVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <OutputPath>bin\Debug\</OutputPath>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugType>pdbonly</DebugType>
+        <Optimize>true</Optimize>
+        <OutputPath>bin\Release\</OutputPath>
+        <DefineConstants>TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+        <DocumentationFile>bin\Release\SmartPower.xml</DocumentationFile>
+    </PropertyGroup>
+    <ItemGroup>
+      <Reference Include="System" />
+    </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />
+      <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Timberborn.*.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Unity*.dll" Publicize="false"/>
+      <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Bindito.*.dll" Publicize="false"/>
+      <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\UnityEngine.UIElementsModule.dll" Publicize="true"/>
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Include="..\TimberDev\UI\Configurator.cs">
+        <Link>TimberDev\UI\Configurator.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UI\PreciseSliderWrapper.cs">
+        <Link>TimberDev\UI\PreciseSliderWrapper.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UI\UiFactory.cs">
+        <Link>TimberDev\UI\UiFactory.cs</Link>
+      </Compile>
+      <Compile Include="..\UnityDevLite\DebugEx.cs">
+        <Link>UnityDevLite\DebugEx.cs</Link>
+      </Compile>
+      <Compile Include="..\UnityDevLite\HostedDebugLog.cs">
+        <Link>UnityDevLite\HostedDebugLog.cs</Link>
+      </Compile>
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="..\ModsUnityProject\Assets\Mods\TimberUI\manifest.json">
+        <Link>Mod\manifest.json</Link>
+      </Content>
+    </ItemGroup>
+    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+    <PropertyGroup>
+        <ModPath>u:\Mods</ModPath>
+    </PropertyGroup>
+    <Target Name="AfterBuild" Condition="Exists('$(ModPath)')">
+        <Message Text="### Copying DLL to the game's mods folder... ###" Importance="high"/>
+        <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\Scripts"/>
+    </Target>
+    <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+      <PropertyGroup>
+        <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
+      </PropertyGroup>
+    </Target>
+</Project>

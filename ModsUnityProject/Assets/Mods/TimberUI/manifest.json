@@ -2,8 +2,8 @@
   "Name": "TimberUI",
   "Version": "0.1.0",
   "Id": "Timberborn.IgorZ.TimberUI",
-  "MinimumGameVersion": "0.7.0.0",
-  "Description": "Timberborn UI skin for the controls.",
+  "MinimumGameVersion": "0.7.1.0",
+  "Description": "Mod to extract various visual assets from the game.",
   "RequiredMods": [
   ]
 }
