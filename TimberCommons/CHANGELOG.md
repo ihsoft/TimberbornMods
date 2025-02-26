@@ -1,3 +1,6 @@
+# v1.11.1 (26 Feb 2025)
+* [Fix] The mod crashes on game version 0.7.1.0.
+
 # v1.11.0 (22 Feb 2025)
 * [Enhancement] Add Update 7 support. Incompatible with the previous versions.
 * [Change] No more dependency to TimberAPI.
