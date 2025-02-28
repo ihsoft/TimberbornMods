@@ -9,11 +9,11 @@
 }
 
 TextField {
-    -unity-font: resource("UI/Fonts/NotoSansDisplay-Medium");
+    -unity-font: resource('UI/Fonts/NotoSansDisplay-Medium');
 }
 
 NineSliceTextField {
-    -unity-font: resource("UI/Fonts/NotoSansDisplay-Medium");
+    -unity-font: resource('UI/Fonts/NotoSansDisplay-Medium');
 }
 
 .unity-scroll-view > .unity-scroll-view__content-and-vertical-scroll-container > .unity-scroller > .unity-repeat-button {
@@ -95,38 +95,41 @@ NineSliceTextField {
 }
 
 .sliced-border {
-    --background-image: resource('UI/Images/Core/border_transparent');
-    --background-slice-scale: 0.5;
-    --background-slice: 64;
+    background-image: resource('UI/Images/Core/border_transparent');
+    -unity-slice-scale: 0.5px;
+    -unity-slice-left: 64;
+    -unity-slice-top: 64;
+    -unity-slice-right: 64;
+    -unity-slice-bottom: 64;
 }
 
 .sliced-border--nontransparent {
-    --background-image: resource('UI/Images/Core/border_nontransparent');
+    background-image: resource('UI/Images/Core/border_nontransparent');
 }
 
 .menu-button {
-    --background-image: resource('UI/Images/Buttons/button');
-    --background-slice-scale: 0.5;
-    --background-slice-top: 0;
-    --background-slice-right: 65;
-    --background-slice-bottom: 0;
-    --background-slice-left: 65;
+    background-image: resource('UI/Images/Buttons/button');
+    -unity-slice-scale: 0.5px;
+    -unity-slice-top: 0;
+    -unity-slice-right: 65;
+    -unity-slice-bottom: 0;
+    -unity-slice-left: 65;
     height: 44px;
     min-width: 245px;
     padding: 0 20px;
     color: rgb(255, 255, 255);
     -unity-font-style: bold;
     font-size: 14px;
-    --click-sound: "UI.Click";
+    --click-sound: 'UI.Click';
 }
 
 .menu-button:hover:enabled {
-    --background-image: resource('UI/Images/Buttons/button-hover');
+    background-image: resource('UI/Images/Buttons/button-hover');
     color: rgb(0, 0, 0);
 }
 
 .menu-button:hover:enabled:active {
-    --background-image: resource('UI/Images/Buttons/button-hover');
+    background-image: resource('UI/Images/Buttons/button-hover');
     color: rgb(0, 0, 0);
 }
 
@@ -145,9 +148,12 @@ NineSliceTextField {
 }
 
 .wide-menu-button {
-    --background-slice-scale: 0.5;
-    --background-slice: 20;
-    --background-image: resource('UI/Images/Buttons/wide');
+    -unity-slice-scale: 0.5px;
+    -unity-slice-left: 20;
+    -unity-slice-top: 20;
+    -unity-slice-right: 20;
+    -unity-slice-bottom: 20;
+    background-image: resource('UI/Images/Buttons/wide');
     min-width: 130px;
     height: 32px;
     padding-left: 15px;
@@ -155,7 +161,7 @@ NineSliceTextField {
     font-size: 14px;
     align-self: center;
     color: rgb(255, 255, 255);
-    --click-sound: "UI.Click";
+    --click-sound: 'UI.Click';
     flex-direction: row;
     align-items: center;
     justify-content: center;
@@ -163,7 +169,7 @@ NineSliceTextField {
 
 .wide-menu-button:hover {
     color: rgb(0, 0, 0);
-    --background-image: resource('UI/Images/Buttons/wide-hover');
+    background-image: resource('UI/Images/Buttons/wide-hover');
 }
 
 .experimental-info {
@@ -174,9 +180,12 @@ NineSliceTextField {
 }
 
 .text-field {
-    --background-image: resource('UI/Images/Backgrounds/bg-input');
-    --background-slice-scale: 0.5;
-    --background-slice: 8;
+    background-image: resource('UI/Images/Backgrounds/bg-input');
+    -unity-slice-scale: 0.5px;
+    -unity-slice-left: 8;
+    -unity-slice-top: 8;
+    -unity-slice-right: 8;
+    -unity-slice-bottom: 8;
 }
 
 .text-field > .unity-base-field__input {
@@ -188,12 +197,12 @@ NineSliceTextField {
 }
 
 .text-field:disabled {
-    --background-image: resource('UI/Images/Backgrounds/bg-input-disabled');
+    background-image: resource('UI/Images/Backgrounds/bg-input-disabled');
     opacity: 1;
 }
 
 .text-field:hover:enabled {
-    --background-image: resource('UI/Images/Backgrounds/bg-input-hover');
+    background-image: resource('UI/Images/Backgrounds/bg-input-hover');
 }
 
 .text-field--large {
@@ -206,7 +215,7 @@ NineSliceTextField {
 }
 
 .text-field--large:hover:enabled {
-    --background-image: resource('UI/Images/Backgrounds/bg-input');
+    background-image: resource('UI/Images/Backgrounds/bg-input');
 }
 
 .box {
@@ -262,12 +271,12 @@ NineSliceTextField {
 .capsule-header {
     min-width: 237px;
     height: 51px;
-    --background-image: resource('UI/Images/Core/header');
-    --background-slice-scale: 0.5;
-    --background-slice-top: 0;
-    --background-slice-right: 65;
-    --background-slice-bottom: 0;
-    --background-slice-left: 65;
+    background-image: resource('UI/Images/Core/header');
+    -unity-slice-scale: 0.5px;
+    -unity-slice-top: 0;
+    -unity-slice-right: 65;
+    -unity-slice-bottom: 0;
+    -unity-slice-left: 65;
     position: absolute;
     top: -26px;
     align-self: center;
@@ -305,25 +314,25 @@ NineSliceTextField {
 }
 
 .list-view__item-background:hover:enabled {
-    --background-image: resource('UI/Images/Core/scroll_tab');
-    --background-slice-scale: 0.5;
-    --background-slice-top: 15;
-    --background-slice-right: 142;
-    --background-slice-bottom: 15;
-    --background-slice-left: 142;
+    background-image: resource('UI/Images/Core/scroll_tab');
+    -unity-slice-scale: 0.5px;
+    -unity-slice-top: 15;
+    -unity-slice-right: 142;
+    -unity-slice-bottom: 15;
+    -unity-slice-left: 142;
 }
 
 .list-view__item-background:checked {
-    --background-image: resource('UI/Images/Core/scroll_tab');
-    --background-slice-scale: 0.5;
-    --background-slice-top: 15;
-    --background-slice-right: 142;
-    --background-slice-bottom: 15;
-    --background-slice-left: 142;
+    background-image: resource('UI/Images/Core/scroll_tab');
+    -unity-slice-scale: 0.5px;
+    -unity-slice-top: 15;
+    -unity-slice-right: 142;
+    -unity-slice-bottom: 15;
+    -unity-slice-left: 142;
 }
 
 .list-view__label {
-    --click-sound: "UI.Click";
+    --click-sound: 'UI.Click';
     -unity-text-align: middle-left;
 }
 
@@ -342,7 +351,7 @@ NineSliceTextField {
     position: absolute;
     right: -3px;
     top: -3px;
-    --click-sound: "UI.Cancel";
+    --click-sound: 'UI.Cancel';
 }
 
 .close-button:hover:enabled {
@@ -352,9 +361,12 @@ NineSliceTextField {
 .tooltip {
     padding: 4px 6px;
     -unity-text-align: middle-left;
-    --background-image: resource('UI/Images/Backgrounds/bg-square-3');
-    --background-slice-scale: 0.5;
-    --background-slice: 10;
+    background-image: resource('UI/Images/Backgrounds/bg-square-3');
+    -unity-slice-scale: 0.5px;
+    -unity-slice-left: 10;
+    -unity-slice-top: 10;
+    -unity-slice-right: 10;
+    -unity-slice-bottom: 10;
     align-self: center;
 }
 
@@ -440,30 +452,33 @@ NineSliceTextField {
 }
 
 .scroll--green-decorated .scroll-view__nine-slice-dragger {
-    --background-image: resource('UI/Images/Core/scroll-button-nine-slice');
-    --background-slice-scale: 0.5;
-    --background-slice: 14;
+    background-image: resource('UI/Images/Core/scroll-button-nine-slice');
+    -unity-slice-scale: 0.5px;
+    -unity-slice-left: 14;
+    -unity-slice-top: 14;
+    -unity-slice-right: 14;
+    -unity-slice-bottom: 14;
     width: 100%;
     height: 100%;
 }
 
 .scroll--green-decorated .scroll-view__nine-slice-tracker {
-    --background-image: resource('UI/Images/Core/scroll-bar-nine-slice');
-    --background-slice-scale: 0.5;
-    --background-slice-top: 16;
-    --background-slice-right: 0;
-    --background-slice-bottom: 16;
-    --background-slice-left: 0;
+    background-image: resource('UI/Images/Core/scroll-bar-nine-slice');
+    -unity-slice-scale: 0.5px;
+    -unity-slice-top: 16;
+    -unity-slice-right: 0;
+    -unity-slice-bottom: 16;
+    -unity-slice-left: 0;
     width: 100%;
     height: 100%;
 }
 
 .scroll--green-decorated .scroll-view__nine-slice-dragger:hover {
-    --background-image: resource('UI/Images/Core/scroll-button-nine-slice-highlight');
+    background-image: resource('UI/Images/Core/scroll-button-nine-slice-highlight');
 }
 
 .scroll--green-decorated .unity-base-slider__drag-container:active .scroll-view__nine-slice-dragger {
-    --background-image: resource('UI/Images/Core/scroll-button-nine-slice-highlight');
+    background-image: resource('UI/Images/Core/scroll-button-nine-slice-highlight');
 }
 
 .dropdown {
@@ -472,9 +487,12 @@ NineSliceTextField {
 }
 
 .dropdown-items__wrapper {
-    --background-image: resource('UI/Images/Backgrounds/bg-square-1');
-    --background-slice-scale: 0.5;
-    --background-slice: 10;
+    background-image: resource('UI/Images/Backgrounds/bg-square-1');
+    -unity-slice-scale: 0.5px;
+    -unity-slice-left: 10;
+    -unity-slice-top: 10;
+    -unity-slice-right: 10;
+    -unity-slice-bottom: 10;
     position: absolute;
     margin: 4px 0;
 }
@@ -510,7 +528,7 @@ NineSliceTextField {
 .dropdown-item {
     padding: 0 6px;
     height: 28px;
-    --click-sound: "UI.Click";
+    --click-sound: 'UI.Click';
     flex-direction: row;
     align-items: center;
 }
@@ -546,7 +564,7 @@ NineSliceTextField {
 }
 
 .dropdown__selectable.dropdown__selection {
-    --click-sound: "UI.Click";
+    --click-sound: 'UI.Click';
 }
 
 .dropdown__selected-item {
@@ -571,7 +589,7 @@ NineSliceTextField {
     width: 14px;
     height: 14px;
     min-width: 14px;
-    --click-sound: "UI.Click";
+    --click-sound: 'UI.Click';
 }
 
 .dropdown__arrow-down {
@@ -627,9 +645,12 @@ NineSliceTextField {
 }
 
 .progress-bar__frame {
-    --background-image: resource('UI/Images/Backgrounds/bg-square-frame');
-    --background-slice-scale: 0.5;
-    --background-slice: 10;
+    background-image: resource('UI/Images/Backgrounds/bg-square-frame');
+    -unity-slice-scale: 0.5px;
+    -unity-slice-left: 10;
+    -unity-slice-top: 10;
+    -unity-slice-right: 10;
+    -unity-slice-bottom: 10;
     position: absolute;
     width: 100%;
     height: 100%;
@@ -642,25 +663,25 @@ NineSliceTextField {
 }
 
 .progress-bar__progress {
-    --background-image: resource('UI/Images/Backgrounds/bg-pixel-4');
+    background-image: resource('UI/Images/Backgrounds/bg-pixel-4');
     width: 100%;
     height: 100%;
 }
 
 .unity-text--shaded .unity-text-element {
-    text-shadow: 0 1px 0 black;
+    text-shadow: 0px 1px 0px black;
 }
 
 .unity-text--shaded.unity-text-element {
-    text-shadow: 0 1px 0 black;
+    text-shadow: 0px 1px 0px black;
 }
 
 .clickable-hierarchy {
-    --click-sound: "UI.Click";
+    --click-sound: 'UI.Click';
 }
 
 .clickable-hierarchy * {
-    --click-sound: "UI.Click";
+    --click-sound: 'UI.Click';
 }
 
 .hazardous-weather-toggle__icon--temperate {
