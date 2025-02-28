@@ -5,5 +5,9 @@
   "MinimumGameVersion": "0.7.1.0",
   "Description": "Mod to extract various visual assets from the game.",
   "RequiredMods": [
+    {
+      "Id": "eMka.ModSettings",
+      "MinimumVersion": "0.7.0.1"
+    }
   ]
 }

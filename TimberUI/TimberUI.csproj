@@ -32,6 +32,18 @@
         <DocumentationFile>bin\Release\SmartPower.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
+      <Reference Include="ModSettings.Common">
+        <HintPath>..\Dependencies\Workshop\3283831040\version-0.6\Scripts\ModSettings.Common.dll</HintPath>
+      </Reference>
+      <Reference Include="ModSettings.CommonUI">
+        <HintPath>..\Dependencies\Workshop\3283831040\version-0.6\Scripts\ModSettings.CommonUI.dll</HintPath>
+      </Reference>
+      <Reference Include="ModSettings.Core">
+        <HintPath>..\Dependencies\Workshop\3283831040\version-0.6\Scripts\ModSettings.Core.dll</HintPath>
+      </Reference>
+      <Reference Include="ModSettings.CoreUI">
+        <HintPath>..\Dependencies\Workshop\3283831040\version-0.6\Scripts\ModSettings.CoreUI.dll</HintPath>
+      </Reference>
       <Reference Include="System" />
     </ItemGroup>
     <ItemGroup>
