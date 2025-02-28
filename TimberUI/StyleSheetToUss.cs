@@ -201,13 +201,13 @@ namespace UnityEditor.StyleSheets
                     str = ToUssString(color, options.useColorCode);
                     break;
                 case StyleValueType.ResourcePath:
-                    str = $"resource(\"{sheet.ReadResourcePath(handle)}\")";
+                    str = $"resource('{sheet.ReadResourcePath(handle)}')";
                     break;
                 case StyleValueType.Enum:
                     str = sheet.ReadEnum(handle);
                     break;
                 case StyleValueType.String:
-                    str = $"\"{sheet.ReadString(handle)}\"";
+                    str = $"'{sheet.ReadString(handle)}'";
                     break;
                 case StyleValueType.Variable:
                     str = sheet.ReadVariable(handle);
