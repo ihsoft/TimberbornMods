@@ -1,0 +1,8 @@
+<UnityEngine.UIElements.UXML>
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <UnityEngine.UIElements.Button name="DropdownItem" class="dropdown-item">
+        <UnityEngine.UIElements.Image name="Icon" class="dropdown-item__icon" />
+        <UnityEngine.UIElements.Label name="Text" class="dropdown-item__text" />
+    </UnityEngine.UIElements.Button>
+</UnityEngine.UIElements.UXML>

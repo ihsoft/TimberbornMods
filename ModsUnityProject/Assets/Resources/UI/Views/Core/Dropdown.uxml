@@ -1,0 +1,12 @@
+<UnityEngine.UIElements.UXML>
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <UnityEngine.UIElements.VisualElement name="Dropdown" class="dropdown">
+        <UnityEngine.UIElements.Label name="Label" class="dropdown__label" />
+        <Timberborn.CoreUI.NineSliceButton name="Selection" class="dropdown__selection">
+            <UnityEngine.UIElements.VisualElement name="SelectedItem" class="dropdown__selected-item">
+                <UnityEngine.UIElements.VisualElement name="SelectedItemContent" class="dropdown__selected-item-content" />
+                <UnityEngine.UIElements.VisualElement name="SelectedItemOverlay" class="dropdown__selected-item-overlay" />
+            </UnityEngine.UIElements.VisualElement>
+        </Timberborn.CoreUI.NineSliceButton>
+    </UnityEngine.UIElements.VisualElement>
+</UnityEngine.UIElements.UXML>
