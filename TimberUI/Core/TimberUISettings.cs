@@ -6,7 +6,7 @@ using ModSettings.Core;
 using Timberborn.Modding;
 using Timberborn.SettingsSystem;
 
-namespace IgorZ.TimberUI;
+namespace IgorZ.TimberUI.Core;
 
 sealed class TimberUISettings(
     ISettings settings,
@@ -29,17 +29,7 @@ sealed class TimberUISettings(
   protected override string ModId => Configurator.ModId;
 
   /// <inheritdoc />
-  //public override string HeaderLocKey => "IgorZ.TimberCommons.Settings.WaterBuildingsSection";
-
-  /// <inheritdoc />
-  //public override int Order => 3;
-
-  /// <inheritdoc />
   public override ModSettingsContext ChangeableOn => ModSettingsContext.MainMenu;
-
-  #endregion
-
-  #region Implementation
 
   #endregion
 }

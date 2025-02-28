@@ -13,7 +13,7 @@ using UnityDev.Utils.LogUtilsLite;
 using UnityEditor.StyleSheets;
 using UnityEngine.UIElements;
 
-namespace IgorZ.TimberUI;
+namespace IgorZ.TimberUI.Core;
 
 sealed class MainDialog : IPanelController, ILoadableSingleton {
 

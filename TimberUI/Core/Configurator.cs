@@ -5,7 +5,7 @@
 using Bindito.Core;
 using IgorZ.TimberDev.UI;
 
-namespace IgorZ.TimberUI;
+namespace IgorZ.TimberUI.Core;
 
 [Context("MainMenu")]
 // ReSharper disable once UnusedType.Global
