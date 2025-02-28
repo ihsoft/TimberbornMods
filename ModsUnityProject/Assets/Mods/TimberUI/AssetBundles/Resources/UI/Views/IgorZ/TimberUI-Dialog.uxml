@@ -12,7 +12,7 @@
             <Timberborn.CoreUI.NineSliceButton text="Export UXML" name="ExportUXMLButton" class="button-game timberdev-button-small text--grey timberdev--center-spaced" style="flex-grow: 1;" />
             <Timberborn.CoreUI.NineSliceButton text="Print styles" name="PrintStylesButton" class="button-game timberdev-button-small text--grey" style="flex-grow: 1;" />
         </engine:VisualElement>
-        <engine:Label text="styles..." name="LogText" class="text--yellow" style="margin-top: 7px;" />
+        <engine:Label text="styles..." name="LogText" class="text--yellow" style="margin-top: 7px; white-space: normal;" />
         <engine:Label text="errors..." name="ErrorText" class="text--red game-text--red" style="margin-top: 7px;" />
     </engine:VisualElement>
 </engine:UXML>
