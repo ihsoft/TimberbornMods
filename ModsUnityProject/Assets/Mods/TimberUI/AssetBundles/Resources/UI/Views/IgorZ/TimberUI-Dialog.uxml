@@ -3,10 +3,10 @@
     <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle" />
     <Style src="project://database/Assets/Mods/TimberUI/AssetBundles/Resources/UI/Views/TimberDevStyle.uss?fileID=7433441132597879392&amp;guid=e36a54bd7e8ddea4f9a7b269a66517bf&amp;type=3#TimberDevStyle" />
     <engine:VisualElement style="flex-grow: 0;">
-        <engine:Label text="Stylesheet resource path:" class="game-text-big" />
-        <Timberborn.CoreUI.NineSliceTextField placeholder-text="resource path" name="ResourcePath" class="text-field" />
-        <engine:Label text="Disk path:" class="game-text-big" />
-        <Timberborn.CoreUI.NineSliceTextField placeholder-text="absolute path to disk file" name="Filename" class="text-field" />
+        <engine:Label text="Resource path:" class="game-text-big" />
+        <Timberborn.CoreUI.NineSliceTextField name="ResourcePath" class="text-field" />
+        <engine:Label text="Base path or filename" class="game-text-big" />
+        <Timberborn.CoreUI.NineSliceTextField name="Filename" class="text-field" />
         <engine:VisualElement style="flex-grow: 1; margin-top: 7px; flex-direction: row; justify-content: space-evenly;">
             <Timberborn.CoreUI.NineSliceButton text="Export USS" name="ExportUSSButton" class="button-game timberdev-button-small text--grey" style="flex-grow: 1;" />
             <Timberborn.CoreUI.NineSliceButton text="Export UXML" name="ExportUXMLButton" class="button-game timberdev-button-small text--grey timberdev--center-spaced" style="flex-grow: 1;" />
