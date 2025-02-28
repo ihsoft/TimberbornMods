@@ -1,8 +1,10 @@
-<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/Mods/TimberUI/AssetBundles/Resources/UI/TimberbornStyle.uss?fileID=7433441132597879392&amp;guid=6a4625ff55490ae49bc6f6522c7b0a32&amp;type=3#TimberbornStyle" />
-    <engine:VisualElement style="flex-grow: 0; flex-direction: row; flex-shrink: 0; align-items: center;">
-        <engine:Slider value="42" high-value="100" name="Slider" class="tb-slider" style="flex-grow: 1;" />
-        <engine:Button name="DecreaseButton" class="tb-button-minus tb-button-small" />
-        <engine:Button name="IncreaseButton" class="tb-button-plus tb-button-small" />
-    </engine:VisualElement>
-</engine:UXML>
+<UnityEngine.UIElements.UXML>
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <UnityEngine.UIElements.VisualElement name="PreciseSlider" class="precise-slider">
+        <UnityEngine.UIElements.Slider name="Slider" class="precise-slider__slider slider" />
+        <UnityEngine.UIElements.VisualElement name="Buttons" class="precise-slider__buttons">
+            <UnityEngine.UIElements.Button name="DecreaseButton" class="button-square button-minus button-square--small" />
+            <UnityEngine.UIElements.Button name="IncreaseButton" class="button-square button-plus button-square--small" />
+        </UnityEngine.UIElements.VisualElement>
+    </UnityEngine.UIElements.VisualElement>
+</UnityEngine.UIElements.UXML>
