@@ -1,0 +1,9 @@
+<UnityEngine.UIElements.UXML>
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="project://database/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="project://database/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <Timberborn.CoreUI.NineSliceVisualElement name="FarmHouseFragment" class="entity-sub-panel farmhouse-fragment bg-sub-box--green">
+        <Timberborn.CoreUI.LocalizableLabel name="Title" name="Title" class="entity-panel__text farmhouse-fragment__title" />
+    </Timberborn.CoreUI.NineSliceVisualElement>
+</UnityEngine.UIElements.UXML>

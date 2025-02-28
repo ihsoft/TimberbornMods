@@ -1,0 +1,5 @@
+<UnityEngine.UIElements.UXML>
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="OptionsStyle.uss" />
+    <UnityEngine.UIElements.VisualElement name="SettingsBox" class="content-row-centered" />
+</UnityEngine.UIElements.UXML>
