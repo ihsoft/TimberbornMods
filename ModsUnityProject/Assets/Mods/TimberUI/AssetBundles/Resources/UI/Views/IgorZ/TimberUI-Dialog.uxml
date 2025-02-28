@@ -2,7 +2,6 @@
     <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle" />
     <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle" />
     <Style src="project://database/Assets/Mods/TimberUI/AssetBundles/Resources/UI/Views/TimberDevStyle.uss?fileID=7433441132597879392&amp;guid=e36a54bd7e8ddea4f9a7b269a66517bf&amp;type=3#TimberDevStyle" />
-    <Style src="project://database/Assets/Mods/TimberUI/AssetBundles/Resources/UI/Views/SteamUpdateButtons.uss?fileID=7433441132597879392&amp;guid=d4f79cf0e19ba334987ab8c103167d6b&amp;type=3#SteamUpdateButtons" />
     <engine:VisualElement style="flex-grow: 0;">
         <engine:Label text="Stylesheet resource path:" class="game-text-big" />
         <Timberborn.CoreUI.NineSliceTextField placeholder-text="resource path" name="ResourcePath" class="text-field" />
