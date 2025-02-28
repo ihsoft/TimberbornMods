@@ -41,24 +41,24 @@
 .entity-panel__description-hider {
     display: flex;
     position: absolute;
-    background-image: resource("UI/Images/Buttons/circle-empty");
+    background-image: resource('UI/Images/Buttons/circle-empty');
     width: 22px;
     height: 22px;
     right: 16px;
     top: 82px;
-    --click-sound: "UI.Click";
+    --click-sound: 'UI.Click';
 }
 
 .entity-panel__description-hider:hover:enabled {
-    background-image: resource("UI/Images/Buttons/circle-empty-hover");
+    background-image: resource('UI/Images/Buttons/circle-empty-hover');
 }
 
 .entity-panel__description-hider:hover:enabled:active {
-    background-image: resource("UI/Images/Buttons/circle-empty-active");
+    background-image: resource('UI/Images/Buttons/circle-empty-active');
 }
 
 .entity-panel__description-hider-icon {
-    background-image: resource("UI/Images/Game/entity-description-hide");
+    background-image: resource('UI/Images/Game/entity-description-hide');
     width: 22px;
     height: 22px;
 }
@@ -76,7 +76,7 @@
 }
 
 .entity-panel__description-hider--show-icon > .entity-panel__description-hider-icon {
-    background-image: resource("UI/Images/Game/entity-description-show");
+    background-image: resource('UI/Images/Game/entity-description-show');
 }
 
 .entity-panel__clickable-subtitle-wrapper {
@@ -90,7 +90,7 @@
 }
 
 .entity-panel__subtitle-warning {
-    background-image: resource("UI/Images/Game/CriticalNeedState");
+    background-image: resource('UI/Images/Game/CriticalNeedState');
     width: 12px;
     height: 12px;
 }
@@ -105,7 +105,7 @@
 }
 
 .entity-panel-input > .unity-base-field__input {
-    background-image: resource("UI/Images/Backgrounds/bg-pixel-1");
+    background-image: resource('UI/Images/Backgrounds/bg-pixel-1');
     -unity-text-align: middle-right;
     color: rgb(204, 204, 204);
     --unity-cursor-color: rgb(204, 204, 204);
@@ -130,7 +130,7 @@
 .entity-fragment__button {
     min-width: 50%;
     padding: 4px;
-    --click-sound: "UI.Click";
+    --click-sound: 'UI.Click';
 }
 
 .entity-fragment__button--silent {
@@ -138,27 +138,39 @@
 }
 
 .entity-fragment__button--red {
-    --background-image: resource("UI/Images/Backgrounds/bg-square-2");
-    --background-slice-scale: 0.5;
-    --background-slice: 10;
+    background-image: resource('UI/Images/Backgrounds/bg-square-2');
+    -unity-slice-scale: 0.5px;
+    -unity-slice-left: 10;
+    -unity-slice-top: 10;
+    -unity-slice-right: 10;
+    -unity-slice-bottom: 10;
 }
 
 .entity-fragment__button--red:hover:enabled {
-    --background-image: resource("UI/Images/Backgrounds/bg-square-5");
-    --background-slice-scale: 0.5;
-    --background-slice: 10;
+    background-image: resource('UI/Images/Backgrounds/bg-square-5');
+    -unity-slice-scale: 0.5px;
+    -unity-slice-left: 10;
+    -unity-slice-top: 10;
+    -unity-slice-right: 10;
+    -unity-slice-bottom: 10;
 }
 
 .entity-fragment__button--green {
-    --background-image: resource("UI/Images/Backgrounds/bg-square-1");
-    --background-slice-scale: 0.5;
-    --background-slice: 10;
+    background-image: resource('UI/Images/Backgrounds/bg-square-1');
+    -unity-slice-scale: 0.5px;
+    -unity-slice-left: 10;
+    -unity-slice-top: 10;
+    -unity-slice-right: 10;
+    -unity-slice-bottom: 10;
 }
 
 .entity-fragment__button--green:hover:enabled {
-    --background-image: resource("UI/Images/Backgrounds/bg-square-4");
-    --background-slice-scale: 0.5;
-    --background-slice: 10;
+    background-image: resource('UI/Images/Backgrounds/bg-square-4');
+    -unity-slice-scale: 0.5px;
+    -unity-slice-left: 10;
+    -unity-slice-top: 10;
+    -unity-slice-right: 10;
+    -unity-slice-bottom: 10;
 }
 
 .entity-panel__top-wrapper {
@@ -200,7 +212,7 @@
 }
 
 .entity-panel__avatar {
-    background-image: resource("UI/Images/Backgrounds/bg-4");
+    background-image: resource('UI/Images/Backgrounds/bg-4');
     min-height: 56px;
     min-width: 56px;
     max-height: 56px;
@@ -232,23 +244,23 @@
 .entity-panel__button {
     width: 28px;
     height: 28px;
-    --click-sound: "UI.Click";
+    --click-sound: 'UI.Click';
 }
 
 .entity-panel__button--green {
-    background-image: resource("UI/Images/Backgrounds/bg-circle-small-1");
+    background-image: resource('UI/Images/Backgrounds/bg-circle-small-1');
 }
 
 Button.entity-panel__button--green:hover:enabled {
-    background-image: resource("UI/Images/Backgrounds/bg-circle-small-2");
+    background-image: resource('UI/Images/Backgrounds/bg-circle-small-2');
 }
 
 .entity-panel__button--red {
-    background-image: resource("UI/Images/Backgrounds/bg-circle-small-4");
+    background-image: resource('UI/Images/Backgrounds/bg-circle-small-4');
 }
 
 Button.entity-panel__button--red:hover:enabled {
-    background-image: resource("UI/Images/Backgrounds/bg-circle-small-6");
+    background-image: resource('UI/Images/Backgrounds/bg-circle-small-6');
 }
 
 .entity-panel-tooltip {
@@ -263,15 +275,15 @@ Button.entity-panel__button--red:hover:enabled {
 }
 
 .entity-panel__follow {
-    background-image: resource("UI/Images/Game/ico-eye");
+    background-image: resource('UI/Images/Game/ico-eye');
 }
 
 .clickable--alternate .entity-panel__follow {
-    background-image: resource("UI/Images/Game/ico-eye-cancel");
+    background-image: resource('UI/Images/Game/ico-eye-cancel');
 }
 
 .entity-panel__unselect {
-    background-image: resource("UI/Images/Game/ico-cancel");
+    background-image: resource('UI/Images/Game/ico-cancel');
 }
 
 .entity-panel__row {
@@ -289,7 +301,7 @@ Button.entity-panel__button--red:hover:enabled {
 }
 
 .delete-building__icon {
-    background-image: resource("UI/Images/Game/ico-trash");
+    background-image: resource('UI/Images/Game/ico-trash');
 }
 
 .game-toggle > .unity-toggle__input > .unity-toggle__text {
