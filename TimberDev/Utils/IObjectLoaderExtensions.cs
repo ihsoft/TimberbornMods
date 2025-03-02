@@ -24,4 +24,12 @@ public static class IObjectLoaderExtensions {
   public static string GetValueOrNullable(this IObjectLoader objectLoader, PropertyKey<string> key) {
     return objectLoader.Has(key) ? objectLoader.Get(key) : null;
   }
+
+  public static T GetValueOrNull<T>(
+      this IObjectLoader objectLoader, PropertyKey<T> key, IValueSerializer<T> serializer) {
+    if (!objectLoader.Has(key)) {
+      return default;
+    }
+    return objectLoader.Get(key, serializer);
+  }
 }
