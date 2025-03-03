@@ -21,19 +21,21 @@ namespace IgorZ.Automation.Utils;
 /// </remarks>
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public abstract class AbstractLockingTool : AbstractAreaSelectionTool {
-  #region Localization keys
+
   const string StartSelectingPromptLoc = "TimberDev_Utils.Tools.LockSelectTool.StartSelectingPrompt";
   const string StartObjectSelectingPromptLoc = "TimberDev_Utils.Tools.LockSelectTool.StartObjectSelectingPrompt";
   const string SelectingOneObjectLoc = "TimberDev_Utils.Tools.LockSelectTool.SelectingObject";
   const string SelectingNObjectsLoc = "TimberDev_Utils.Tools.LockSelectTool.SelectingNObjects";
   const string DescriptionHint = "TimberDev_Utils.Tools.LockSelectTool.DescriptionHint";
-  #endregion
-  
+
   #region Local fields and properties
+
   EntityBadgeService _entityBadgeService;
+
   #endregion
 
   #region CustomTool overrides
+
   /// <inheritdoc/>
   protected override void Initialize() {
     DescriptionBullets = new[] { DescriptionHint };
@@ -56,9 +58,11 @@ public abstract class AbstractLockingTool : AbstractAreaSelectionTool {
     }
     return Loc.T(StartSelectingPromptLoc);
   }
+
   #endregion
 
   #region AbstractAreaSelectionTool overries
+
   /// <inheritdoc/>
   protected override bool ObjectFilterExpression(BlockObject blockObject) {
     return CheckIfSimilar(blockObject);
@@ -82,12 +86,14 @@ public abstract class AbstractLockingTool : AbstractAreaSelectionTool {
       LockedEntityNiceName = null;
     }
   }
+
   #endregion
 
   #region API
+
   /// <summary>The reference block object to use in the current selection session.</summary>
   /// <remarks>
-  /// It's only set if user requested the appropriate mode and the object on mouse click passed the
+  /// It is only set if user requested the appropriate mode and the object on mouse click passed the
   /// <see cref="CheckCanLockOnComponent"/> check.
   /// </remarks>
   /// <seealso cref="AbstractAreaSelectionTool.SelectionModeActive"/>
@@ -97,12 +103,12 @@ public abstract class AbstractLockingTool : AbstractAreaSelectionTool {
   /// <seealso cref="LockedComponent"/>
   protected string LockedPrefabName { get; private set; }
 
-  /// <summary>User friendly name of the currently locked component.</summary>
+  /// <summary>User-friendly name of the currently locked component.</summary>
   /// <seealso cref="LockedComponent"/>
   protected string LockedEntityNiceName { get; private set; }
 
   /// <summary>Tells if the block object is a good target for the locking.</summary>
-  /// <param name="obj">The object to check. It's never <c>null</c>.</param>
+  /// <param name="obj">The object to check. It is never <c>null</c>.</param>
   protected abstract bool CheckCanLockOnComponent(BlockObject obj);
 
   /// <summary>Tells if the block object is "similar" to the currently locked component".</summary>
@@ -115,8 +121,8 @@ public abstract class AbstractLockingTool : AbstractAreaSelectionTool {
     return LockedComponent == null || obj.GetComponentFast<Prefab>().IsNamed(LockedPrefabName);
   }
 
-  /// <summary>Returns a user friendly localized name of the entity.</summary>
-  /// <remarks>If entity name cannot be obtained, then the prefab name is returned.</remarks>
+  /// <summary>Returns a user-friendly localized name of the entity.</summary>
+  /// <remarks>If entity name can't be obtained, then the prefab name is returned.</remarks>
   protected string GetEntityNiceName(BaseComponent obj) {
     string niceName;
     if (obj.TryGetComponentFast<EntityComponent>(out var component)) {
@@ -127,13 +133,16 @@ public abstract class AbstractLockingTool : AbstractAreaSelectionTool {
     }
     return niceName;
   }
+
   #endregion
 
   #region Local methods
+
   /// <summary>Injects the dependencies. It has to be public to work.</summary>
   [Inject]
   public void InjectDependencies(EntityBadgeService entityBadgeService) {
     _entityBadgeService = entityBadgeService;
   }
+
   #endregion
 }

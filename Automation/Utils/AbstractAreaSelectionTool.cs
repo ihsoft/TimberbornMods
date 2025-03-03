@@ -25,7 +25,9 @@ namespace IgorZ.Automation.Utils;
 /// <seealso cref="OnSelectionModeChange"/>
 /// <seealso cref="SetColorSchema"/>
 public abstract class AbstractAreaSelectionTool : ToolWithDescription, IInputProcessor {
+
   #region Internal fields
+
   BlockObjectSelectionDrawer _highlightSelectionDrawer;
   BlockObjectSelectionDrawer _actionSelectionDrawer;
   AreaBlockObjectPicker _areaBlockObjectPicker;
@@ -35,18 +37,22 @@ public abstract class AbstractAreaSelectionTool : ToolWithDescription, IInputPro
   Color _actionColor = Color.red;
   Color _tileColor = Color.blue;
   Color _sideColor = Color.blue;
+
   #endregion
 
   #region Injections
+
   /// <summary>Shortcut to the <see cref="InputService"/>.</summary>
   protected InputService InputService { get; private set; }
 
   AreaBlockObjectPickerFactory _areaBlockObjectPickerFactory;
   BlockObjectSelectionDrawerFactory _blockObjectSelectionDrawerFactory;
+
   #endregion
 
   #region Inhertable properties
-  /// <summary>Indicates if selection mode has started (mouse click in the map).</summary>
+
+  /// <summary>Indicates if selection mode has started (mouse clicks in the map).</summary>
   /// <value><c>true</c> if player clicks and holds LMB over a valid block object on the map.</value>
   /// <seealso cref="OnSelectionModeChange"/>
   protected bool SelectionModeActive {
@@ -88,9 +94,11 @@ public abstract class AbstractAreaSelectionTool : ToolWithDescription, IInputPro
   /// <remarks>The mod must have a resource of type <c>CustomCursor</c> in the assets with this name.</remarks>
   /// <value><c>null</c> if no custom cursor needed.</value>
   protected abstract string CursorName { get; }
+
   #endregion
 
   #region API
+
   /// <summary>Tells if object should be accepted to the selection.</summary>
   /// <remarks>The accepted objects will be passed into the action callback.</remarks>
   /// <param name="blockObject">The object to check the expression for.</param>
@@ -128,9 +136,11 @@ public abstract class AbstractAreaSelectionTool : ToolWithDescription, IInputPro
     _sideColor = sideColor;
     CreateDrawers();
   }
+
   #endregion
 
   #region Tool overrides
+
   /// <inheritdoc/>
   public override void Enter() {
     InputService.AddInputProcessor(this);
@@ -149,24 +159,30 @@ public abstract class AbstractAreaSelectionTool : ToolWithDescription, IInputPro
       _cursorService.ResetCursor();
     }
   }
+
   #endregion
 
   #region IInputProcessor implementation
+
   /// <inheritdoc/>
   public virtual bool ProcessInput() {
     return _areaBlockObjectPicker.PickBlockObjects<BuilderPrioritizable>(
       PreviewCallback, ActionCallback, ShowNoneCallback);
   }
+
   #endregion
 
   #region CustomTool overrides
+
   /// <inheritdoc/>
   protected override void Initialize() {
     CreateDrawers();
   }
+
   #endregion
 
-  #region Local methods
+  #region Implementation
+
   /// <summary>Creates the abstract tool.</summary>
   protected AbstractAreaSelectionTool() {
     DescriptionHintSectionLoc = "SelectionTool.ClickOrHoldTip";
@@ -223,5 +239,6 @@ public abstract class AbstractAreaSelectionTool : ToolWithDescription, IInputPro
     _highlightSelectionDrawer = _blockObjectSelectionDrawerFactory.Create(_highlightColor, _tileColor, _sideColor);
     _actionSelectionDrawer = _blockObjectSelectionDrawerFactory.Create(_actionColor, _tileColor, _sideColor);
   }
+
   #endregion
 }

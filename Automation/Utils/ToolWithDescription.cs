@@ -20,9 +20,11 @@ namespace IgorZ.Automation.Utils;
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Global")]
 public abstract class ToolWithDescription : CustomToolSystem.CustomTool {
+
   ToolDescription _cachedDescription;
 
   #region API
+
   /// <summary>
   /// The localization key of the text to present as the tool caption. If <c>null</c>,
   /// then <c>TimberApi.ToolSystem.ToolSpecification.NameLocKey</c> is used.
@@ -36,7 +38,7 @@ public abstract class ToolWithDescription : CustomToolSystem.CustomTool {
   protected string DescriptionMainSectionLoc = null;
 
   /// <summary>The localization key of the optional text that is presented at the bottom of the main stuff.</summary>
-  /// <remarks>If <c>null</c>, the it's not presented.</remarks>
+  /// <remarks>If <c>null</c>, then it is not presented.</remarks>
   protected string DescriptionHintSectionLoc = null;
 
   /// <summary>
@@ -67,9 +69,11 @@ public abstract class ToolWithDescription : CustomToolSystem.CustomTool {
 
   /// <summary>Tells if any of the alt keys is held.</summary>
   protected bool IsAltHeld => Keyboard.current.altKey.isPressed;
+
   #endregion
 
   #region Tool overrides
+
   /// <inheritdoc/>
   public override ToolDescription Description() {
     if (_cachedDescription != null) {
@@ -99,5 +103,6 @@ public abstract class ToolWithDescription : CustomToolSystem.CustomTool {
     _cachedDescription = description.Build();
     return _cachedDescription;
   }
+
   #endregion
 }

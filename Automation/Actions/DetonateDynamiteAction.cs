@@ -30,7 +30,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
   const string RepeatCountLocKey = "IgorZ.Automation.DetonateDynamiteAction.RepeatCountInfo";
 
   /// <summary>
-  /// Number of times to place a new dynamite. Any value less or equal to zero results in no extra actions on trigger.
+  /// Number of times to place new dynamite. Any value less or equal to zero results in no extra actions on trigger.
   /// </summary>
   /// <remarks>
   /// A too big value is not a problem. When the bottom of the map is reached, the dynamite simply won't get placed.

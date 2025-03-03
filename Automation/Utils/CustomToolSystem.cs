@@ -35,13 +35,14 @@ public static class CustomToolSystem {
   public class CustomToolGroup : ToolGroup, IToolGroup {
 
     #region IToolGroup implementation
-    /// <summary>The unique ID of the tool. It's defined in the specification.</summary>
+
+    /// <summary>The unique ID of the tool. It is defined in the specification.</summary>
     public string Id => _specification.Id;
 
-    /// <summary>The too group ID to attach this tool to. It's defined in the specification.</summary>
+    /// <summary>The tool group ID to attach this tool to. It is defined in the specification.</summary>
     public string GroupId => _specification.GroupId;
 
-    /// <summary>The tool order in the tool group. It's defined in the specification.</summary>
+    /// <summary>The tool order in the tool group. It is defined in the specification.</summary>
     public int Order => _specification.Order;
 
     /// <summary>The tool's section (whatever it is). It's defined in the specification.</summary>
@@ -51,6 +52,7 @@ public static class CustomToolSystem {
     /// Indicates if the tool must only be available in the dev mode. It's defined in the specification.
     /// </summary>
     public bool DevMode => _specification.DevMode;
+
     #endregion
 
     ToolGroupSpecification _specification;
@@ -73,7 +75,9 @@ public static class CustomToolSystem {
 
   /// <summary>Base class for all custom tools.</summary>
   public abstract class CustomTool : Tool {
+
     #region API
+
     /// <summary>TimberAPI tool specification.</summary>
     protected ToolSpecification ToolSpecification { get; private set; }
 
@@ -94,11 +98,14 @@ public static class CustomToolSystem {
     /// <summary>Initializes the tool. Do all logic here instead of the constructor.</summary>
     protected virtual void Initialize() {
     }
+
     #endregion
 
     #region Tool implementation
+
     /// <inheritdoc/>
     public override bool DevModeTool => ToolSpecification.DevMode;
+
     #endregion
 
     #region Implementation
@@ -134,7 +141,7 @@ public static class CustomToolSystem {
     containerDefinition.MultiBind<IToolGroupFactory>().ToInstance(new ToolGroupFactory<CustomToolGroup>(groupTypeName));
   }
 
-  /// <summary>Registers a tool group that enables constructions mode when opened.</summary>
+  /// <summary>Registers a tool group that enables construction mode when opened.</summary>
   /// <param name="containerDefinition">The configurator interface.</param>
   /// <param name="groupTypeName">The tool group type as specified in the TimberAPI specification.</param>
   /// <seealso cref="CustomToolGroupWithConstructionModeEnabler"/>
@@ -180,7 +187,7 @@ public static class CustomToolSystem {
   /// <param name="containerDefinition">The configurator interface.</param>
   /// <param name="typeName">
   /// The tool type as specified in the TimberAPI specification. Can be omitted, in which case the class full name will
-  /// be used. The same name cannot be bound to different classes.
+  /// be used. The same name can't be bound to different classes.
   /// </param>
   /// <typeparam name="TTool">the class that implements the tool.</typeparam>
   public static void BindTool<TTool>(IContainerDefinition containerDefinition, string typeName = null)
@@ -199,10 +206,10 @@ public static class CustomToolSystem {
   /// <param name="containerDefinition">The configurator interface.</param>
   /// <param name="typeName">
   /// The tool type as specified in the TimberAPI specification. Can be omitted, in which case the class full name will
-  /// be used. The same name cannot be bound to different classes.
+  /// be used. The same name can't be bound to different classes.
   /// </param>
   /// <typeparam name="TTool">the class that implements the tool.</typeparam>
-  /// <typeparam name="TInfo">tha class that implements holds the tool information</typeparam>
+  /// <typeparam name="TInfo">the class that holds the tool information</typeparam>
   public static void BindTool<TTool, TInfo>(IContainerDefinition containerDefinition, string typeName = null)
       where TTool : CustomTool where TInfo : ToolInformation, new() {
     containerDefinition.Bind<TTool>().AsTransient();

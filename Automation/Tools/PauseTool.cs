@@ -12,14 +12,17 @@ namespace IgorZ.Automation.Tools;
 // ReSharper disable once ClassNeverInstantiated.Global
 sealed class PauseTool : AbstractLockingTool {
   #region CustomTool overrides
+
   /// <inheritdoc/>
   protected override void Initialize() {
     SetColorSchema(Color.red, Color.red, Color.white, Color.white);
     base.Initialize();
   }
+
   #endregion
 
   #region AbstractAreaSelectionTool overries
+
   /// <inheritdoc/>
   protected override string CursorName => "IgorZ/pause-cursor";
 
@@ -36,16 +39,20 @@ sealed class PauseTool : AbstractLockingTool {
   protected override void OnObjectAction(BlockObject blockObject) {
     blockObject.GetComponentFast<PausableBuilding>().Pause();
   }
+
   #endregion
 
   #region AbstractLockingTool overries
+
   /// <inheritdoc/>
   protected override bool CheckCanLockOnComponent(BlockObject obj) {
     return GetCompatibleComponent(obj);
   }
+
   #endregion
 
   #region Implementation
+
   static PausableBuilding GetCompatibleComponent(BlockObject obj) {
     var component = obj.GetEnabledComponent<PausableBuilding>();
     if (component && component.IsPausable()) {
@@ -53,5 +60,6 @@ sealed class PauseTool : AbstractLockingTool {
     }
     return null;
   }
+
   #endregion
 }
