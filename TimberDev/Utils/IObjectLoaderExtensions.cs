@@ -32,4 +32,25 @@ public static class IObjectLoaderExtensions {
     }
     return objectLoader.Get(key, serializer);
   }
+
+  public static bool GetValueOrDefault(
+      this IObjectLoader objectLoader, PropertyKey<bool> key, bool defaultValue = false) {
+    return objectLoader.Has(key) ? objectLoader.Get(key) : defaultValue;
+  }
+
+  public static int GetValueOrDefault(
+      this IObjectLoader objectLoader, PropertyKey<int> key, int defaultValue = 0) {
+    return objectLoader.Has(key) ? objectLoader.Get(key) : defaultValue;
+  }
+
+  public static float GetValueOrDefault(
+      this IObjectLoader objectLoader, PropertyKey<int> key, float defaultValue = 0) {
+    return objectLoader.Has(key) ? objectLoader.Get(key) : defaultValue;
+  }
+
+  public static string GetValueOrDefault(
+      this IObjectLoader objectLoader, PropertyKey<string> key, string defaultValue = "") {
+    return objectLoader.Has(key) ? objectLoader.Get(key) : defaultValue;
+  }
+
 }
