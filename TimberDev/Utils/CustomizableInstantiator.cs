@@ -14,11 +14,10 @@ namespace IgorZ.TimberDev.Utils;
 
 /// <summary>Class that allows customizing components on prefabs.</summary>
 /// <remarks>
-/// For every prefab that is used in the game a custom code will be called before creating any instances. It allows
-/// customizing the prefab. E.g. a new component can be added, an existing component replaced, or the prefab components
-/// can be configured differently from their normal asset state.
+/// For every prefab used in the game, a custom code will be called before creating any instances. It allows
+/// customizing the prefab. For example, a new component can be added, an existing component replaced, or the prefab
+/// components can be configured differently from their normal asset state.
 /// </remarks>
-/// <seealso cref="PrefabPatcher"/>
 static class CustomizableInstantiator {
   static readonly string HarmonyPatchId = typeof(CustomizableInstantiator).AssemblyQualifiedName;
 
