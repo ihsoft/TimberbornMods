@@ -1,0 +1,24 @@
+{
+  "ToolSpec": {
+    "Id": "Automation.Tmpl.Population.BeaversAtMax",
+    "GroupId": "AutomationPopulationToolGroupId",
+    "Type": "IgorZ.Automation.Tools.ApplyTemplateTool",
+    "Order": 10,
+    "Icon": "Sprites/IgorZ/tool-beavers-max",
+    "NameLocKey": "IgorZ.Automation.Tool.tmpl.BeaversAtMax.DisplayName",
+    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.BeaversAtMax.Description",
+  },
+  "AutomationTemplateSpec": {
+    "TemplateFamilyName": "Population",
+    "Rules": [
+      {
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BeaverPopulationBelowThresholdCondition", "Parameters": [{"Name": "Value", "Value": "0"},{"Name": "RelativeTo", "Value": "'MaxLevel'"}] },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.UnpauseAction", "Parameters": [] }
+      },
+      {
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BeaverPopulationAboveThresholdCondition", "Parameters": [{"Name": "Value", "Value": "-1"},{"Name": "RelativeTo", "Value": "'MaxLevel'"}] },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.PauseAction", "Parameters": [] }
+      }
+    ]
+  }
+}

@@ -2,43 +2,58 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
+using IgorZ.Automation.Actions;
 using IgorZ.Automation.AutomationSystem;
+using IgorZ.Automation.Conditions;
 using IgorZ.Automation.Utils;
 using Timberborn.BlockSystem;
+using Timberborn.BlueprintSystem;
+using Timberborn.ConstructionMode;
 using Timberborn.Persistence;
+using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
 namespace IgorZ.Automation.Tools;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-sealed class ApplyTemplateTool : AbstractAreaSelectionTool, IAutomationModeEnabler {
+sealed class ApplyTemplateTool : AbstractAreaSelectionTool, IAutomationModeEnabler, IConstructionModeEnabler {
+
   static readonly Color ToolColor = new(0, 1, 1, 0.7f);
 
-  #region Tool information
-  /// <summary>Class that holds the template tool configuration.</summary>
-  public sealed class ToolInfo : CustomToolSystem.ToolInformation {
-    static readonly ListKey<AutomationRule> RulesListKey = new(nameof(Rules));
-    static readonly PropertyKey<string> TemplateFamilyNameKey = new(nameof(TemplateFamilyName));
+  #region Tool spec
 
-    /// <summary>Full list of the rules that this template should apply on the object.</summary>
-    public ReadOnlyCollection<AutomationRule> Rules { get; private set; }
+  /// <summary>Spec that holds the template tool configuration.</summary>
+  public sealed record AutomationTemplateSpec : ComponentSpec {
+    [Serialize]
+    public string TemplateFamilyName { get; init; }
 
-    /// <summary>
-    /// A logical rules group name. Rules from the same group will overwrite any existing rules from the same group.
-    /// </summary>
-    public string TemplateFamilyName { get; private set; }
+    public record DynamicTypeSpec {
+      [Serialize]
+      public string TypeId { get; init; }
 
-    /// <inheritdoc/>
-    public override void Load(IObjectLoader objectLoader) {
-      TemplateFamilyName = objectLoader.Get(TemplateFamilyNameKey);
-      Rules = objectLoader.Get(RulesListKey, AutomationRule.RuleSerializer).AsReadOnly();
+      [Serialize]
+      public ImmutableArray<SpecToSaveObjectConverter.AutomationParameterSpec> Parameters { get; init; }
     }
+
+    public record AutomationRuleSpec {
+      [Serialize]
+      public DynamicTypeSpec Condition { get; init; }
+
+      [Serialize]
+      public DynamicTypeSpec Action { get; init; }
+    }
+
+    [Serialize]
+    public ImmutableArray<AutomationRuleSpec> Rules { get; init; }
   }
+
   #endregion
 
   #region AbstractAreaSelectionTool overries
+
   /// <inheritdoc/>
   protected override string CursorName => "IgorZ/cog-cursor";
 
@@ -48,18 +63,16 @@ sealed class ApplyTemplateTool : AbstractAreaSelectionTool, IAutomationModeEnabl
     if (!behavior || !behavior.enabled) {
       return false;
     }
-    var info = (ToolInfo) ToolInformation;
-    return info.Rules.All(rule => rule.IsValidAt(behavior));
+    return _templateRules.All(rule => rule.IsValidAt(behavior));
   }
 
   /// <inheritdoc/>
   protected override void OnObjectAction(BlockObject blockObject) {
-    var info = (ToolInfo) ToolInformation;
     var behavior = blockObject.GetComponentFast<AutomationBehavior>();
-    behavior.RemoveRulesForTemplateFamily(info.TemplateFamilyName);
-    foreach (var rule in info.Rules) {
+    behavior.RemoveRulesForTemplateFamily(_templateFamilyName);
+    foreach (var rule in _templateRules) {
       var action = rule.Action.CloneDefinition();
-      action.TemplateFamily = info.TemplateFamilyName;
+      action.TemplateFamily = _templateFamilyName;
       behavior.AddRule(rule.Condition.CloneDefinition(), action);
     }
   }
@@ -68,6 +81,34 @@ sealed class ApplyTemplateTool : AbstractAreaSelectionTool, IAutomationModeEnabl
   protected override void Initialize() {
     SetColorSchema(ToolColor, ToolColor, Color.cyan, Color.cyan);
     base.Initialize();
+    DeserializeSpec();
   }
+
+  #endregion
+
+  #region Implementation
+
+  string _templateFamilyName;
+  readonly List<AutomationRule> _templateRules = [];
+
+  void DeserializeSpec() {
+    var templateSpec = ToolSpec.GetSpec<AutomationTemplateSpec>();
+    _templateFamilyName = templateSpec.TemplateFamilyName;
+    foreach (var rule in templateSpec.Rules) {
+      var condition = ParseAndInit<AutomationConditionBase>(rule.Condition);
+      var action = ParseAndInit<AutomationActionBase>(rule.Action);
+      _templateRules.Add(new AutomationRule(condition, action));
+    }
+  }
+
+  T ParseAndInit<T>(AutomationTemplateSpec.DynamicTypeSpec typeSpec) where T : class, IGameSerializable {
+    var instance = DynamicClassSerializer<T>.MakeInstance(typeSpec.TypeId);
+    if (typeSpec.Parameters.Length == 0) {
+      return instance;
+    }
+    instance.LoadFrom(new ObjectLoader(SpecToSaveObjectConverter.ParametersToSaveObject(typeSpec.Parameters)));
+    return instance;
+  }
+
   #endregion
 }

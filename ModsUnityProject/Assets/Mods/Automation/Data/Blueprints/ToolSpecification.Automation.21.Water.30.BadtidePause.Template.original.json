@@ -1,0 +1,24 @@
+{
+  "ToolSpec": {
+    "Id": "Automation.Tmpl.Water.PauseBadtide",
+    "GroupId": "AutomationWaterToolGroupId",
+    "Type": "IgorZ.Automation.Tools.ApplyTemplateTool",
+    "Order": 30,
+    "Icon": "Sprites/IgorZ/icon-badtide-pause",
+    "NameLocKey": "IgorZ.Automation.Tool.tmpl.BadtidePause.DisplayName",
+    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.BadtidePause.Description",
+  },
+  "AutomationTemplateSpec": {
+    "TemplateFamilyName": "Water.SeasonManagement",
+    "Rules": [
+      {
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BadtideStartedCondition", "Parameters": [] },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.PauseAction", "Parameters": [] }
+      },
+      {
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BadtideEndedCondition", "Parameters": [] },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.UnpauseAction", "Parameters": [] }
+      }
+    ]
+  }
+}

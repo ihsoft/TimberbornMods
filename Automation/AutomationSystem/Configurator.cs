@@ -18,7 +18,7 @@ sealed class Configurator : IConfigurator {
 
   static TemplateModule ProvideTemplateModule() {
     var builder = new TemplateModule.Builder();
-    builder.AddDecorator<Building, AutomationBehavior>();
+    builder.AddDecorator<BuildingSpec, AutomationBehavior>();
     return builder.Build();
   }
 }

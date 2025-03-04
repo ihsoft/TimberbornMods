@@ -4,6 +4,7 @@
 
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.PathCheckingSystem;
+using IgorZ.TimberDev.Utils;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.BuildingsNavigation;
 using Timberborn.Persistence;
@@ -64,7 +65,7 @@ public sealed class CheckAccessBlockCondition : AutomationConditionBase {
   /// <inheritdoc/>
   public override void LoadFrom(IObjectLoader objectLoader) {
     base.LoadFrom(objectLoader);
-    IsReversedCondition = objectLoader.GetValueOrNullable(IsReversedConditionKey) ?? false;
+    IsReversedCondition = objectLoader.GetValueOrDefault(IsReversedConditionKey);
   }
 
   /// <inheritdoc/>

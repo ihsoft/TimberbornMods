@@ -4,13 +4,15 @@
 
 using IgorZ.Automation.Utils;
 using Timberborn.BlockSystem;
+using Timberborn.ConstructionMode;
 using Timberborn.ConstructionSites;
 
 namespace IgorZ.Automation.Tools;
 
 /// <summary>Debug tool to immediately complete unfinished constructibles.</summary>
 // ReSharper disable once ClassNeverInstantiated.Global
-public class DebugFinishNowTool : AbstractAreaSelectionTool {
+public class DebugFinishNowTool : AbstractAreaSelectionTool, IConstructionModeEnabler {
+
   /// <inheritdoc/>
   protected override string CursorName => null;
 

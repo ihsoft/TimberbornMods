@@ -3,14 +3,13 @@
 // License: Public Domain
 
 using Bindito.Core;
+using IgorZ.TimberDev.Utils;
 using TimberApi.DependencyContainerSystem;
 using TimberApi.Tools.ToolGroupSystem;
 using TimberApi.Tools.ToolSystem;
 using Timberborn.ConstructionMode;
 using Timberborn.Localization;
-using Timberborn.Persistence;
 using Timberborn.ToolSystem;
-using ToolGroupSpecification = TimberApi.Tools.ToolGroupSystem.ToolGroupSpecification;
 
 namespace IgorZ.Automation.Utils;
 
@@ -45,23 +44,23 @@ public static class CustomToolSystem {
     /// <summary>The tool order in the tool group. It is defined in the specification.</summary>
     public int Order => _specification.Order;
 
-    /// <summary>The tool's section (whatever it is). It's defined in the specification.</summary>
+    /// <summary>The tool's section (whatever it is). It is defined in the specification.</summary>
     public string Section => _specification.Section;
 
     /// <summary>
-    /// Indicates if the tool must only be available in the dev mode. It's defined in the specification.
+    /// Indicates if the tool must only be available in the dev mode. It is defined in the specification.
     /// </summary>
     public bool DevMode => _specification.DevMode;
 
     #endregion
 
-    ToolGroupSpecification _specification;
+    TimberApiToolGroupSpec _specification;
 
     /// <summary>Initializes the tool group. Do all logic here instead of the constructor.</summary>
     protected virtual void Initialize() {
     }
 
-    internal void InitializeGroup(ToolGroupSpecification specification) {
+    internal void InitializeGroup(TimberApiToolGroupSpec specification) {
       Icon = specification.Icon;
       DisplayNameLocKey = specification.NameLocKey;
       _specification = specification;
@@ -79,18 +78,7 @@ public static class CustomToolSystem {
     #region API
 
     /// <summary>TimberAPI tool specification.</summary>
-    protected ToolSpecification ToolSpecification { get; private set; }
-
-    /// <summary>Parsed tool information from the specification.</summary>
-    /// <remarks>
-    /// The actual type of the tool information class is what was passed during the tool registration in
-    /// <see cref="CustomToolSystem.BindTool{TTool, TInfo}"/>. The descendant class can safely do the upcast.
-    /// </remarks>
-    /// <value>
-    /// The tool information or <c>null</c> if the tool was registered via
-    /// <see cref="CustomToolSystem.BindTool{TTool}"/>.
-    /// </value>
-    protected ToolInformation ToolInformation { get; private set; }
+    protected ToolSpec ToolSpec { get; private set; }
 
     /// <summary>Shortcut to <see cref="ILoc"/>.</summary>
     protected ILoc Loc { get; private set; }
@@ -104,35 +92,28 @@ public static class CustomToolSystem {
     #region Tool implementation
 
     /// <inheritdoc/>
-    public override bool DevModeTool => ToolSpecification.DevMode;
+    public override bool DevModeTool => ToolSpec.DevMode;
 
     #endregion
 
     #region Implementation
+
     /// <summary>Injects the dependencies. It has to be public to work.</summary>
     [Inject]
     public void InjectDependencies(ILoc loc) {
       Loc = loc;
     }
 
-    internal void InitializeTool(ToolGroup toolGroup, ToolSpecification toolSpecification,
-                                 ToolInformation toolInformation = null) {
+    internal void InitializeTool(ToolGroup toolGroup, ToolSpec toolSpec) {
       ToolGroup = toolGroup;
-      ToolSpecification = toolSpecification;
-      ToolInformation = toolInformation;
+      ToolSpec = toolSpec;
       Initialize();
     }
     #endregion
   }
 
-  /// <summary>Class base for the tool information classes.</summary>
-  /// <seealso cref="CustomToolSystem.BindTool{TTool, TInfo}"/>
-  public abstract class ToolInformation {
-    /// <summary>Loads the tool's custom information.</summary>
-    public abstract void Load(IObjectLoader objectLoader);
-  }
-
   #region API
+
   /// <summary>Registers a simple tool group that just contains other tools.</summary>
   /// <param name="containerDefinition">The configurator interface.</param>
   /// <param name="groupTypeName">The tool group type as specified in the TimberAPI specification.</param>
@@ -165,7 +146,7 @@ public static class CustomToolSystem {
   /// <param name="containerDefinition">The configurator interface.</param>
   /// <param name="groupTypeName">
   /// The tool group type as specified in the TimberAPI specification. Can be omitted, in which case the class full name
-  /// will be used. The same name cannot be bound to different classes.
+  /// will be used. The same name can't be bound to different classes.
   /// </param>
   /// <typeparam name="TToolGroup">the class that implements the tool group.</typeparam>
   /// <seealso cref="CustomToolGroup"/>
@@ -196,78 +177,38 @@ public static class CustomToolSystem {
     containerDefinition.MultiBind<IToolFactory>().ToInstance(new ToolFactory<TTool>(typeName ?? typeof(TTool).FullName));
   }
 
-  /// <summary>Registers a custom tool with tool information.</summary>
-  /// <remarks>
-  /// <p>Call this method from the configurator to define the tools of your mod. Each tool class can be bound only once,
-  /// or an exception will be thrown.</p>
-  /// <p>The registered class will be created via Bindito. Implement a method, attributed with <c>[Inject]</c>, to have
-  /// extra injections provided.</p>
-  /// </remarks>
-  /// <param name="containerDefinition">The configurator interface.</param>
-  /// <param name="typeName">
-  /// The tool type as specified in the TimberAPI specification. Can be omitted, in which case the class full name will
-  /// be used. The same name can't be bound to different classes.
-  /// </param>
-  /// <typeparam name="TTool">the class that implements the tool.</typeparam>
-  /// <typeparam name="TInfo">the class that holds the tool information</typeparam>
-  public static void BindTool<TTool, TInfo>(IContainerDefinition containerDefinition, string typeName = null)
-      where TTool : CustomTool where TInfo : ToolInformation, new() {
-    containerDefinition.Bind<TTool>().AsTransient();
-    containerDefinition.MultiBind<IToolFactory>()
-        .ToInstance(new ToolFactory<TTool, TInfo>(typeName ?? typeof(TTool).FullName));
-  }
   #endregion
 
   #region Implementation
-  sealed class ToolGroupFactory<TToolGroup> : IToolGroupFactory where TToolGroup : CustomToolGroup {
-    public string Id { get; }
 
-    public ToolGroupFactory(string id) {
-      Id = id;
-    }
+  sealed class ToolGroupFactory<TToolGroup>(string id) : IToolGroupFactory
+      where TToolGroup : CustomToolGroup {
+    public string Id { get; } = id;
 
-    public IToolGroup Create(ToolGroupSpecification toolGroupSpecification) {
+    public IToolGroup Create(TimberApiToolGroupSpec toolGroupSpecification) {
       CustomToolGroup group;
       if (typeof(TToolGroup) == typeof(CustomToolGroup)) {
         group = new CustomToolGroup();
       } else if (typeof(TToolGroup) == typeof(CustomToolGroupWithConstructionModeEnabler)) {
         group = new CustomToolGroupWithConstructionModeEnabler();
       } else {
-        group = DependencyContainer.GetInstance<TToolGroup>();
+        group = StaticBindings.DependencyContainer.GetInstance<TToolGroup>();
       }
       group.InitializeGroup(toolGroupSpecification);
       return group;
     }
   }
 
-  sealed class ToolFactory<TTool> : IToolFactory where TTool : CustomTool {
-    public string Id { get; }
-    
-    public ToolFactory(string id) {
-      Id = id;
-    }
+  sealed class ToolFactory<TTool>(string id) : IToolFactory
+      where TTool : CustomTool {
+    public string Id { get; } = id;
 
-    public Tool Create(ToolSpecification toolSpecification, ToolGroup toolGroup = null) {
+    public Tool Create(ToolSpec toolSpec, ToolGroup toolGroup = null) {
       var tool = DependencyContainer.GetInstance<TTool>();
-      tool.InitializeTool(toolGroup, toolSpecification);
+      tool.InitializeTool(toolGroup, toolSpec);
       return tool;
     }
   }
 
-  sealed class ToolFactory<TTool, TInfo> : IToolFactory where TTool : CustomTool where TInfo : ToolInformation, new() {
-    public string Id { get; }
-
-    public ToolFactory(string id) {
-      Id = id;
-    }
-
-    public Tool Create(ToolSpecification toolSpecification, ToolGroup toolGroup = null) {
-      var toolInformation = new TInfo();
-      toolInformation.Load(ObjectLoader.CreateBasicLoader(toolSpecification.ToolInformation));
-      var tool = DependencyContainer.GetInstance<TTool>();
-      tool.InitializeTool(toolGroup, toolSpecification, toolInformation: toolInformation);
-      return tool;
-    }
-  }
   #endregion
 }

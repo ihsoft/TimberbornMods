@@ -1,0 +1,24 @@
+{
+  "ToolSpec": {
+    "Id": "Automation.Tmpl.Water.DroughtOpenWaterRegulator",
+    "GroupId": "AutomationWaterToolGroupId",
+    "Type": "IgorZ.Automation.Tools.ApplyTemplateTool",
+    "Order": 23,
+    "Icon": "Sprites/IgorZ/tool-drought-water-regulator-open",
+    "NameLocKey": "IgorZ.Automation.Tool.tmpl.DroughtOpenWaterRegulator.DisplayName",
+    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.DroughtOpenWaterRegulator.Description",
+  },
+  "AutomationTemplateSpec": {
+    "TemplateFamilyName": "Water.SeasonManagement-drought",
+    "Rules": [
+      {
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.DroughtStartedCondition", "Parameters": [] },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.WaterRegulatorStateAction", "Parameters": [{"Name": "Open", "Value": "true"}] }
+      },
+      {
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.DroughtEndedCondition", "Parameters": [] },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.WaterRegulatorStateAction", "Parameters": [{"Name": "Open", "Value": "false"}] }
+      }
+    ]
+  }
+}

@@ -78,7 +78,7 @@ public abstract class AbstractLockingTool : AbstractAreaSelectionTool {
         return;
       }
       LockedComponent = HighlightedBlockObject;
-      LockedPrefabName = HighlightedBlockObject.GetComponentFast<Prefab>().Name;
+      LockedPrefabName = HighlightedBlockObject.GetComponentFast<PrefabSpec>().Name;
       LockedEntityNiceName = GetEntityNiceName(HighlightedBlockObject);
     } else {
       LockedComponent = null;
@@ -118,7 +118,7 @@ public abstract class AbstractLockingTool : AbstractAreaSelectionTool {
   /// <param name="obj">The object to check. It's never <c>null</c>.</param>
   /// <seealso cref="LockedComponent"/>
   protected virtual bool CheckIfSimilar(BlockObject obj) {
-    return LockedComponent == null || obj.GetComponentFast<Prefab>().IsNamed(LockedPrefabName);
+    return LockedComponent == null || obj.GetComponentFast<PrefabSpec>().IsNamed(LockedPrefabName);
   }
 
   /// <summary>Returns a user-friendly localized name of the entity.</summary>
@@ -129,7 +129,7 @@ public abstract class AbstractLockingTool : AbstractAreaSelectionTool {
       niceName = _entityBadgeService.GetEntityName(component);
     } else {
       DebugEx.Error("Cannot get entity for: {0}", obj);
-      niceName = obj.GetComponentFast<Prefab>().Name;
+      niceName = obj.GetComponentFast<PrefabSpec>().Name;
     }
     return niceName;
   }

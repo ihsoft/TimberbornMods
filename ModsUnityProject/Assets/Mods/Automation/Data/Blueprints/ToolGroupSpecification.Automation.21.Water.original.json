@@ -1,0 +1,12 @@
+{
+  "TimberApiToolGroupSpec": {
+    "Id": "AutomationWaterToolGroupId",
+    "GroupId": "AutomationToolGroupId",
+    "Type": "AutomationToolGroup",
+    "Layout": "Green",
+    "Order": 21,
+    "Icon": "Sprites/IgorZ/automation-water",
+    "NameLocKey": "IgorZ.Automation.ToolGroup.Water.DisplayName",
+    "FallbackGroup": false,
+  }
+}

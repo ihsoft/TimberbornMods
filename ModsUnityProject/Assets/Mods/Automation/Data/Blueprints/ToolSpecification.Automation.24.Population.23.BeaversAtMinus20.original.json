@@ -1,0 +1,24 @@
+{
+  "ToolSpec": {
+    "Id": "Automation.Tmpl.Population.BeaversAtMinus20",
+    "GroupId": "AutomationPopulationToolGroupId",
+    "Type": "IgorZ.Automation.Tools.ApplyTemplateTool",
+    "Order": 23,
+    "Icon": "Sprites/IgorZ/tool-beavers-20",
+    "NameLocKey": "IgorZ.Automation.Tool.tmpl.BeaversAtMinus20.DisplayName",
+    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.BeaversAtMinus20.Description",
+  },
+  "AutomationTemplateSpec": {
+    "TemplateFamilyName": "Population",
+    "Rules": [
+      {
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BeaverPopulationBelowThresholdCondition", "Parameters": [{"Name": "Value", "Value": "-20"},{"Name": "RelativeTo", "Value": "'CurrentLevel'"}] },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.UnpauseAction", "Parameters": [] }
+      },
+      {
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BeaverPopulationAboveThresholdCondition", "Parameters": [{"Name": "Value", "Value": "-19"},{"Name": "RelativeTo", "Value": "'CurrentLevel'"}] },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.PauseAction", "Parameters": [] }
+      }
+    ]
+  }
+}

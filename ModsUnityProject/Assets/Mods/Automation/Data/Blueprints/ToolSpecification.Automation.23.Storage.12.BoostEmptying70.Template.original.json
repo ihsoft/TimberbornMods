@@ -1,0 +1,24 @@
+{
+  "ToolSpec": {
+    "Id": "Automation.Tmpl.Storage.BoostEmptying70",
+    "GroupId": "AutomationStorageToolGroupId",
+    "Type": "IgorZ.Automation.Tools.ApplyTemplateTool",
+    "Order": 12,
+    "Icon": "Sprites/IgorZ/icon-empty-70pct",
+    "NameLocKey": "IgorZ.Automation.Tool.tmpl.EmptyAt70pct.DisplayName",
+    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.EmptyAtXpct.Description",
+  },
+  "AutomationTemplateSpec": {
+    "TemplateFamilyName": "Storage.BoostEmptying",
+    "Rules": [
+      {
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.OutputStockAboveThresholdCondition", "Parameters": [{"Name": "Threshold", "Value": "70"}] },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.MarkForEmptyingAction", "Parameters": [] }
+      },
+      {
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.OutputStockBelowThresholdCondition", "Parameters": [{"Name": "Threshold", "Value": "30"}] },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.UnmarkForEmptyingAction", "Parameters": [] }
+      }
+    ]
+  }
+}

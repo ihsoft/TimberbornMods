@@ -1,0 +1,20 @@
+{
+  "ToolSpec": {
+    "Id": "Automation.Tmpl.Water.CloseFloodgateDrought",
+    "GroupId": "AutomationWaterToolGroupId",
+    "Type": "IgorZ.Automation.Tools.ApplyTemplateTool",
+    "Order": 22,
+    "Icon": "Sprites/IgorZ/icon-drought-close",
+    "NameLocKey": "IgorZ.Automation.Tool.tmpl.DroughtCloseFloodgate.DisplayName",
+    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.DroughtCloseFloodgate.Description",
+  },
+  "AutomationTemplateSpec": {
+    "TemplateFamilyName": "Water.FloodgateManagement-drought",
+    "Rules": [
+      {
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.DroughtStartedCondition", "Parameters": [] },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.SetFloodgateHeightAction", "Parameters": [{"Name": "StepsDown", "Value": "0"}] }
+      },
+    ]
+  }
+}

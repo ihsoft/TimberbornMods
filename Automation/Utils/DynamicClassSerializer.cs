@@ -23,7 +23,7 @@ namespace IgorZ.Automation.Utils;
 /// </remarks>
 /// <typeparam name="T">the type of the base class. It can be abstract.</typeparam>
 /// <seealso cref="DynamicClassSerializer{T}"/>
-public sealed class DynamicClassSerializer<T> : IObjectSerializer<T> where T : class, IGameSerializable {
+public sealed class DynamicClassSerializer<T> : IValueSerializer<T> where T : class, IGameSerializable {
   /// <summary>Property name that identifies the actual tape in the saved state.</summary>
   static readonly PropertyKey<string> TypeIdPropertyKey = new("TypeId");
 
@@ -40,34 +40,45 @@ public sealed class DynamicClassSerializer<T> : IObjectSerializer<T> where T : c
   }
 
   /// <inheritdoc/>
-  public void Serialize(T value, IObjectSaver objectSaver) {
+  public void Serialize(T value, IValueSaver valueSaver) {
+    var objectSaver = valueSaver.AsObject();
     objectSaver.Set(TypeIdPropertyKey, value.GetType().FullName);
     value.SaveTo(objectSaver);
   }
 
   /// <inheritdoc/>
-  public Obsoletable<T> Deserialize(IObjectLoader objectLoader) {
+  public Obsoletable<T> Deserialize(IValueLoader valueLoader) {
+    var objectLoader = valueLoader.AsObject();
     var savedTypeId = objectLoader.Get(TypeIdPropertyKey);
+    var instance = MakeInstance(savedTypeId, _failFast);
+    if (instance != null) {
+      instance.LoadFrom(objectLoader);
+    }
+    return instance;
+  }
+
+  /// <summary>Creates an instance of the type <typeparamref name="T"/> from the provided type identifier.</summary>
+  /// <exception cref="InvalidOperationException">if the type can't be created, or it is incompatible</exception>
+  public static T MakeInstance(string typeId, bool failFast = true) {
     var objectType = AppDomain.CurrentDomain.GetAssemblies()
-        .Select(assembly => assembly.GetType(savedTypeId))
+        .Select(assembly => assembly.GetType(typeId))
         .FirstOrDefault(t => t != null);
     string err = null;
     if (objectType == null) {
-      err = $"Cannot find type for typeId: {savedTypeId}";
+      err = $"Cannot find type for typeId: {typeId}";
     } else if (objectType.GetConstructor(Type.EmptyTypes) == null) {
       err = $"No default constructor in: {objectType}";
     } else if (!typeof(T).IsAssignableFrom(objectType)) {
-      err = $"Incompatible types: saved={objectType}, serializer={typeof(T)}";
+      err = $"Incompatible types: {typeof(T)} is not assignable from {objectType}";
     }
     if (err != null) {
-      if (_failFast) {
+      if (failFast) {
         throw new InvalidOperationException(err);
       }
       DebugEx.Error(err);
       return null;
     }
     var instance = (T) Activator.CreateInstance(objectType);
-    instance.LoadFrom(objectLoader);
     return instance;
   }
 }

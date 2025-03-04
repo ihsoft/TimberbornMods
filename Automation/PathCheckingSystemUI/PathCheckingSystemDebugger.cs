@@ -5,6 +5,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using IgorZ.Automation.PathCheckingSystem;
+using Timberborn.AssetSystem;
 using Timberborn.Coordinates;
 using Timberborn.Debugging;
 using Timberborn.Navigation;
@@ -55,12 +56,12 @@ sealed class PathCheckingSystemDebugger : ILoadableSingleton, IUpdatableSingleto
   PathCheckingSite _selectedSite;
 
   PathCheckingSystemDebugger(EventBus eventBus, NodeIdService nodeIdService, WalkerDebugger walkerDebugger,
-                             DebugModeManager debugModeManager) {
+                             DebugModeManager debugModeManager, IAssetLoader assetLoader) {
     _eventBus = eventBus;
     _nodeIdService = nodeIdService;
     _debugModeManager = debugModeManager;
     _cornerMarkerPrefab = walkerDebugger._cornerMarkerPrefab;
-    _blockerMarker = Object.Instantiate(walkerDebugger._destinationMarker);
+    _blockerMarker = Object.Instantiate(assetLoader.Load<GameObject>(WalkerDebugger.DestinationMarkerPath));
   }
 
   void HideMarkers() {

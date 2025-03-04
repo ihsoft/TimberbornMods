@@ -68,7 +68,7 @@ sealed class AutomationRule : IGameSerializable {
   /// <inheritdoc/>
   [SuppressMessage("ReSharper", "Unity.NoNullPropagation")]
   public override string ToString() {
-    var prefabName = Action.Behavior?.GetComponentFast<Prefab>()?.Name;
+    var prefabName = Action.Behavior?.GetComponentFast<PrefabSpec>()?.Name;
     var coords = Action.Behavior?.GetComponentFast<BlockObject>().Coordinates;
     return $"[Rule:condition=[{Condition}];action=[{Action}];at={prefabName}@{coords}]";
   }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Bindito.Core;
+using IgorZ.TimberDev.Utils;
 using Timberborn.AreaSelectionSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BuilderPrioritySystem;
@@ -31,7 +32,7 @@ public abstract class AbstractAreaSelectionTool : ToolWithDescription, IInputPro
   BlockObjectSelectionDrawer _highlightSelectionDrawer;
   BlockObjectSelectionDrawer _actionSelectionDrawer;
   AreaBlockObjectPicker _areaBlockObjectPicker;
-  CursorService _cursorService;
+  CustomCursorService _cursorService;
 
   Color _highlightColor = Color.blue;
   Color _actionColor = Color.red;
@@ -185,14 +186,13 @@ public abstract class AbstractAreaSelectionTool : ToolWithDescription, IInputPro
 
   /// <summary>Creates the abstract tool.</summary>
   protected AbstractAreaSelectionTool() {
-    DescriptionHintSectionLoc = "SelectionTool.ClickOrHoldTip";
   }
 
   /// <summary>Injects the condition dependencies. It has to be public to work.</summary>
   [Inject]
   public void InjectDependencies(AreaBlockObjectPickerFactory areaBlockObjectPickerFactory, InputService inputService,
                                  BlockObjectSelectionDrawerFactory blockObjectSelectionDrawerFactory,
-                                 CursorService cursorService) {
+                                 CustomCursorService cursorService) {
     _areaBlockObjectPickerFactory = areaBlockObjectPickerFactory;
     InputService = inputService;
     _blockObjectSelectionDrawerFactory = blockObjectSelectionDrawerFactory;

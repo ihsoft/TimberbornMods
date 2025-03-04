@@ -10,6 +10,7 @@ using Timberborn.BlockSystem;
 using Timberborn.BlockSystemNavigation;
 using Timberborn.BuildingsBlocking;
 using Timberborn.BuildingsNavigation;
+using Timberborn.ConstructionMode;
 using Timberborn.Coordinates;
 using Timberborn.Navigation;
 using Timberborn.PathSystem;
@@ -19,14 +20,17 @@ namespace IgorZ.Automation.Tools;
 
 /// <summary>Debug tool to show various information about block objects.</summary>
 // ReSharper disable once ClassNeverInstantiated.Global
-public class DebugPickTool : AbstractAreaSelectionTool {
+public class DebugPickTool : AbstractAreaSelectionTool, IConstructionModeEnabler {
+
   /// <inheritdoc/>
   protected override string CursorName => null;
 
   /// <inheritdoc/>
   protected override void Initialize() {
-    DescriptionBullets = new[]
-        { "IgorZ.Automation.DebugPickTool.DescriptionHint1", "IgorZ.Automation.DebugPickTool.DescriptionHint2" };
+    DescriptionBullets = [
+        "IgorZ.Automation.DebugPickTool.DescriptionHint1",
+        "IgorZ.Automation.DebugPickTool.DescriptionHint2",
+    ];
     DescriptionHintSectionLoc = null;
     base.Initialize();
   }
@@ -92,7 +96,7 @@ public class DebugPickTool : AbstractAreaSelectionTool {
   }
 
   static void PrintNavMesh(BaseComponent component) {
-    var settings = component.GetComponentFast<BlockObjectNavMeshSettings>();
+    var settings = component.GetComponentFast<BlockObjectNavMeshSettingsSpec>();
     if (!settings) {
       HostedDebugLog.Error(component, "No BlockObjectNavMeshSettings component found");
       return;
@@ -100,7 +104,7 @@ public class DebugPickTool : AbstractAreaSelectionTool {
     var lines = new StringBuilder();
     lines.AppendLine(new string('*', 10));
     lines.AppendLine($"NavMesh edges on {DebugEx.BaseComponentToString(component)}:");
-    var isPath = (bool) component.GetComponentFast<Path>();
+    var isPath = (bool) component.GetComponentFast<PathSpec>();
     var blockObject = component.GetComponentFast<BlockObject>();
     var isSolid = blockObject.Solid;
     lines.AppendLine($"Building: isPath={isPath}, isSolid={isSolid}");
@@ -111,10 +115,14 @@ public class DebugPickTool : AbstractAreaSelectionTool {
         lines.AppendLine($"{block.Coordinates}, stackable={block.Stackable}");
       }
     }
-    var edges = settings.ManuallySetEdges().ToList();
-    lines.AppendLine($"{edges.Count} edges:");
+    var edges = settings.EdgeGroups.SelectMany(x => x.AddedEdges).ToList();
+    lines.AppendLine($"{edges.Count} added edges:");
     foreach (var edge in edges) {
       lines.AppendLine($"{edge.Start} => {edge.End}");
+    }
+    lines.AppendLine($"{settings.UnblockedCoordinates.Count} unblocked coordinates:");
+    foreach (var coords in settings.UnblockedCoordinates) {
+      lines.AppendLine($"Group={coords.Group}, coords={coords.Coordinates}");
     }
     lines.AppendLine(new string('*', 10));
     DebugEx.Warning(lines.ToString());

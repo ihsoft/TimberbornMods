@@ -36,28 +36,28 @@
       <Reference Include="0Harmony">
         <HintPath>..\Dependencies\Workshop\3284904751\0Harmony.dll</HintPath>
       </Reference>
-      <Reference Include="System.Collections.Immutable, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-        <HintPath>..\ModsUnityProject\Assets\Plugins\Timberborn\System.Collections.Immutable.dll</HintPath>
+      <Reference Include="System.Collections.Immutable">
+        <HintPath>..\Dependencies\GameRoot\Timberborn_Data\Managed\System.Collections.Immutable.dll</HintPath>
       </Reference>
       <Reference Include="TimberApi">
-        <HintPath>..\Dependencies\Workshop\3288241660\core\TimberApi.dll</HintPath>
+        <HintPath>..\Dependencies\Workshop\3288241660\version-0.7\core\TimberApi.dll</HintPath>
+      </Reference>
+      <Reference Include="TimberApi.BottomBarSystem">
+        <HintPath>..\Dependencies\Workshop\3288241660\version-0.7\core\TimberApi.BottomBarSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="TimberApi.SpecificationSystem">
+        <HintPath>..\Dependencies\Workshop\3288241660\version-0.7\core\TimberApi.SpecificationSystem.dll</HintPath>
       </Reference>
       <Reference Include="TimberApi.Tools">
-        <HintPath>..\Dependencies\Workshop\3288241660\core\TimberApi.Tools.dll</HintPath>
-      </Reference>
-      <Reference Include="TimberApi.UIBuilderSystem">
-        <HintPath>..\Dependencies\Workshop\3288241660\core\TimberApi.UIBuilderSystem.dll</HintPath>
-      </Reference>
-      <Reference Include="TimberApi.UIPresets">
-        <HintPath>..\Dependencies\Workshop\3288241660\core\TimberApi.UIPresets.dll</HintPath>
+        <HintPath>..\Dependencies\Workshop\3288241660\version-0.7\core\TimberApi.Tools.dll</HintPath>
       </Reference>
     </ItemGroup>
     <ItemGroup>
-      <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />
+      <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all" />
+      <PackageReference Include="IndexRange" Version="1.0.3" />
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Timberborn.*.dll" Publicize="true" />
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Unity*.dll" Publicize="false"/>
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Bindito.*.dll" Publicize="false"/>
-      <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\UnityEngine.UIElementsModule.dll" Publicize="true"/>
     </ItemGroup>
     <ItemGroup>
       <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Localizations\enUS.txt">
@@ -323,20 +323,20 @@
       <Compile Include="..\TimberDev\UI\Configurator.cs">
         <Link>TimberDev\UI\Configurator.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\UI\GameTextMinMaxSlider2.cs">
-        <Link>TimberDev\UI\GameTextMinMaxSlider2.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\UI\MinMaxSlider2.cs">
-        <Link>TimberDev\UI\MinMaxSlider2.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\UI\PanelFragment.cs">
-        <Link>TimberDev\UI\PanelFragment.cs</Link>
-      </Compile>
       <Compile Include="..\TimberDev\UI\PreciseSliderWrapper.cs">
         <Link>TimberDev\UI\PreciseSliderWrapper.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\UI\UiFactory.cs">
         <Link>TimberDev\UI\UiFactory.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\Configurator.cs">
+        <Link>TimberDev\Utils\Configurator.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\CustomCursorService.cs">
+        <Link>TimberDev\Utils\CustomCursorService.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\CustomCursorServiceConfigurator.cs">
+        <Link>TimberDev\Utils\CustomCursorServiceConfigurator.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\Utils\CustomizableInstantiator.cs">
         <Link>TimberDev\Utils\CustomizableInstantiator.cs</Link>
@@ -347,11 +347,11 @@
       <Compile Include="..\TimberDev\Utils\HarmonyPatcher.cs">
         <Link>TimberDev\Utils\HarmonyPatcher.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\Utils\ModTextAssetConverterPatch.cs">
-        <Link>TimberDev\Utils\ModTextAssetConverterPatch.cs</Link>
+      <Compile Include="..\TimberDev\Utils\IObjectLoaderExtensions.cs">
+        <Link>TimberDev\Utils\IObjectLoaderExtensions.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\Utils\PrefabPatcher.cs">
-        <Link>TimberDev\Utils\PrefabPatcher.cs</Link>
+      <Compile Include="..\TimberDev\Utils\StaticBindings.cs">
+        <Link>TimberDev\Utils\StaticBindings.cs</Link>
       </Compile>
       <Compile Include="..\UnityDevLite\DebugEx.cs">
         <Link>UnityDevLite\DebugEx.cs</Link>

@@ -5,12 +5,14 @@
 using IgorZ.Automation.Utils;
 using Timberborn.BlockSystem;
 using Timberborn.BuildingsBlocking;
+using Timberborn.ConstructionMode;
 using UnityEngine;
 
 namespace IgorZ.Automation.Tools;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-sealed class PauseTool : AbstractLockingTool {
+sealed class PauseTool : AbstractLockingTool, IConstructionModeEnabler {
+
   #region CustomTool overrides
 
   /// <inheritdoc/>

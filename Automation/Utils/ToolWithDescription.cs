@@ -79,8 +79,8 @@ public abstract class ToolWithDescription : CustomToolSystem.CustomTool {
     if (_cachedDescription != null) {
       return _cachedDescription;
     }
-    var description = new ToolDescription.Builder(Loc.T(DescriptionTitleLoc ?? ToolSpecification.NameLocKey));
-    var descriptionText = new StringBuilder(Loc.T(DescriptionMainSectionLoc ?? ToolSpecification.DescriptionLocKey));
+    var description = new ToolDescription.Builder(Loc.T(DescriptionTitleLoc ?? ToolSpec.NameLocKey));
+    var descriptionText = new StringBuilder(Loc.T(DescriptionMainSectionLoc ?? ToolSpec.DescriptionLocKey));
     if (DescriptionBullets != null) {
       foreach (var descriptionBullet in DescriptionBullets) {
         descriptionText.Append("\n" + SpecialStrings.RowStarter + Loc.T(descriptionBullet));

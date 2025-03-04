@@ -5,12 +5,13 @@
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.Utils;
 using Timberborn.BlockSystem;
+using Timberborn.ConstructionMode;
 using UnityEngine;
 
 namespace IgorZ.Automation.Tools;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-sealed class CancelTool : AbstractAreaSelectionTool, IAutomationModeEnabler {
+sealed class CancelTool : AbstractAreaSelectionTool, IAutomationModeEnabler, IConstructionModeEnabler {
 
   #region CustomTool overrides
 

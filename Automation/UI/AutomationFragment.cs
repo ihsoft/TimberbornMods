@@ -15,6 +15,7 @@ using UnityEngine.UIElements;
 namespace IgorZ.Automation.UI;
 
 sealed class AutomationFragment : IEntityPanelFragment {
+
   const string RulesAreaCaptionTextLocKey = "IgorZ.Automation.AutomationFragment.RulesAreaCaptionTextLocKey";
   const string RuleTextLocKey = "IgorZ.Automation.AutomationFragment.RuleTextLocKey";
 
@@ -31,12 +32,11 @@ sealed class AutomationFragment : IEntityPanelFragment {
   public VisualElement InitializeFragment() {
     _caption = _uiFactory.CreateLabel();
     _caption.style.color = Color.cyan;
-
     _rulesList = _uiFactory.CreateLabel();
 
-    _root = _uiFactory.CreateCenteredPanelFragmentBuilder()
-        .AddComponent(_caption).AddComponent(_rulesList)
-        .BuildAndInitialize();
+    _root = _uiFactory.CreateCenteredPanelFragment();
+    _root.Add(_caption);
+    _root.Add(_rulesList);
     _root.ToggleDisplayStyle(visible: false);
     return _root;
   }

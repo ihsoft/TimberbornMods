@@ -175,28 +175,30 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   }
 
   /// <summary>Initializes the NavMesh related things.</summary>
-  /// <remarks>This must be done on an object that is already added to the game's NavMesh.</remarks>
+  /// <remarks>This must be done on an object already added to the game's NavMesh.</remarks>
   void InitializeNavMesh() {
     var navMeshObject = _blockObjectNavMesh.NavMeshObject;
     RestrictedNodes = navMeshObject._restrictedCoordinates.Select(_nodeIdService.GridToId).ToList();
-    var settings = BlockObject.GetComponentFast<BlockObjectNavMeshSettings>();
+    var settings = BlockObject.GetComponentFast<BlockObjectNavMeshSettingsSpec>();
     if (!settings) {
-      NodeEdges = new List<NodeEdge>();
+      NodeEdges = [];
     } else {
-      NodeEdges = BlockObject.GetComponentFast<BlockObjectNavMeshSettings>().ManuallySetEdges().Select(
-        x => new NodeEdge {
-            Start = _nodeIdService.GridToId(x.Start),
-            End = _nodeIdService.GridToId(x.End),
-        }).ToList();
+      NodeEdges = settings.EdgeGroups
+          .SelectMany(x => x.AddedEdges)
+          .Select(x => new NodeEdge {
+              Start = _nodeIdService.GridToId(x.Start),
+              End = _nodeIdService.GridToId(x.End),
+          })
+          .ToList();
     }
   }
 
   /// <summary>Updates the properties that depend on the district's NavMesh.</summary>
   /// <remarks>
-  /// The site must be within the range from the road, which is currently 9 tiles. We intentionally ignore the accesses
-  /// below the site level: even though the game can construct sites this way (one tile above the road), the path
-  /// checking algo cannot deal with all the corners cases. It may limit players in their construction methods, but
-  /// that's the price to pay.
+  /// The site must be within the range from the road, which is currently nine tiles. We intentionally ignore the
+  /// accesses below the site level: even though the game can construct sites this way (one tile above the road), the
+  /// path checking algo can't deal with all the corner cases. It may limit players in their construction methods, but
+  /// that is the price to pay.
   /// </remarks>
   public void UpdateNavMesh() {
     NavMeshUpdateTimer.Start();
