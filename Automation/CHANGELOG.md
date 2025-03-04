@@ -1,4 +1,5 @@
-# v1.3.0 (started on 2/28/2025):
+# v1.3.0 (4 Mar 2025):
+* Add support for Update 7 (0.7.1.2).
 
 # v1.2.5 (5 Dec 2024):
 * Fix crashes in some edge cases when Choo-Choo mod is installed.
