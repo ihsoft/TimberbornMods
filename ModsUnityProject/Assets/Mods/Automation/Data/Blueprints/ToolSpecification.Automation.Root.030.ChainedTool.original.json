@@ -1,34 +1,40 @@
 {
-  "Id": "Automation.Tmpl.Construction.CheckBlockedAccess",
-  "GroupId": "AutomationToolGroupId",
-  "Type": "IgorZ.Automation.Tools.ApplyTemplateTool",
-  "Order": 30,
-  "Icon": "Sprites/IgorZ/tool-chained",
-  "DevMode": false,
-  "NameLocKey": "IgorZ.Automation.Tool.tmpl.ChainedBuildeings.DisplayName",
-  "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.ChainedBuildeings.Description",
-  "ToolInformation": {
+  "ToolSpec": {
+    "Id": "Automation.Tmpl.Construction.CheckBlockedAccess",
+    "GroupId": "AutomationToolGroupId",
+    "Type": "IgorZ.Automation.Tools.ApplyTemplateTool",
+    "Order": 30,
+    "Icon": "Sprites/IgorZ/tool-chained",
+    "DevMode": false,
+    "NameLocKey": "IgorZ.Automation.Tool.tmpl.ChainedBuildeings.DisplayName",
+    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.ChainedBuildeings.Description",
+  },
+  "AutomationTemplateSpec": {
     "TemplateFamilyName": "Construction.CheckBlockedAccess",
     "Rules": [
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.CheckAccessBlockCondition" },
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.CheckAccessBlockCondition", "Parameters": [] },
         "Action": {
           "TypeId": "IgorZ.Automation.Actions.StatusToggleAction",
-          "ActionKind": "ShowStatus",
-          "StatusToken": "ChainTool-2",
-          "Description": "IgorZ.Automation.ShowStatusAction.HoldConstruction",
-          "StatusKind": "NormalStatusWithFloatingIcon",
-          "StatusIcon": "DirectionalBlocking",
-          "StatusText": "IgorZ.Automation.ShowStatusAction.HoldCompletionStatusText"
+          "Parameters": [
+            {"Name": "ActionKind", "Value": "'ShowStatus'"},
+            {"Name": "StatusToken", "Value": "'ChainTool-2'"},
+            {"Name": "Description", "Value": "'IgorZ.Automation.ShowStatusAction.HoldConstruction'"},
+            {"Name": "StatusKind", "Value": "'NormalStatusWithFloatingIcon'"},
+            {"Name": "StatusIcon", "Value": "'DirectionalBlocking'"},
+            {"Name": "StatusText", "Value": "'IgorZ.Automation.ShowStatusAction.HoldCompletionStatusText'"},
+          ],
         }
       },
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.CheckAccessBlockCondition", "ReversedCondition": true },
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.CheckAccessBlockCondition", "Parameters": [{"Name": "ReversedCondition", "Value": "true"}] },
         "Action": {
           "TypeId": "IgorZ.Automation.Actions.StatusToggleAction",
-          "ActionKind": "HideStatus",
-          "StatusToken": "ChainTool-2",
-          "Description": "IgorZ.Automation.ShowStatusAction.ResumeConstruction",
+          "Parameters": [
+            {"Name": "ActionKind", "Value": "'HideStatus'"},
+            {"Name": "StatusToken", "Value": "'ChainTool-2'"},
+            {"Name": "Description", "Value": "'IgorZ.Automation.ShowStatusAction.ResumeConstruction'"},
+          ]
         }
       }
     ]
