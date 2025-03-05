@@ -11,13 +11,13 @@ namespace IgorZ.Automation.TickerSystem;
 /// <summary>Simple service that ticks all listeners.</summary>
 /// <remarks>
 /// <p>
-/// Use it for registering dynamic objects. The stock game <c>TickableComponent</c> registers once and cannot be
+/// Use it for registering dynamic objects. The stock game <c>TickableComponent</c> registers once and can't be
 /// unregistered until the Mono object died.
 /// </p>
 /// <p>
-/// Listeners are called in the undefined order. They must register via <see cref="AddListener"/> and de-register via
-/// <see cref="RemoveListener"/>. For the MonoBehaviour objects it's allowed to not de-register, but it's recommended to
-/// do so for the well-defined life cycle. 
+/// Listeners are called in the undefined order. They must register via <see cref="AddListener"/> and deregister via
+/// <see cref="RemoveListener"/>. For the MonoBehaviour objects, it is allowed to not deregister, but it is recommended
+/// to do so for the well-defined life cycle. 
 /// </p>
 /// </remarks>
 public class TickerService : ITickableSingleton {

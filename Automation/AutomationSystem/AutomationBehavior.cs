@@ -76,7 +76,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
     UpdateRegistration();
   }
 
-  /// <summary>Removes all rules that were defined for the specified template group.</summary>
+  /// <summary>Removes all rules defined for the specified template group.</summary>
   public void RemoveRulesForTemplateFamily(string templateFamily) {
     HostedDebugLog.Fine(this, "Removing all rules for template family: {0}", templateFamily);
     for (var i = _actions.Count - 1; i >= 0; i--) {

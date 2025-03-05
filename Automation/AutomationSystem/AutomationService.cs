@@ -17,11 +17,14 @@ namespace IgorZ.Automation.AutomationSystem;
 /// <summary>Central point for all the automation related logic.</summary>
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public sealed class AutomationService : IPostLoadableSingleton {
+
   #region Internal fields
+
   readonly HashSet<AutomationBehavior> _registeredBehaviors = new();
   readonly Color _highlightColor = Color.cyan * 0.5f;
   readonly Highlighter _highlighter;
   bool _highlightingEnabled;
+
   #endregion
 
   AutomationService(EventBus eventBus, Highlighter highlighter, BaseInstantiator baseInstantiator, ILoc loc) {
@@ -33,11 +36,14 @@ public sealed class AutomationService : IPostLoadableSingleton {
   }
 
   #region IPostLoadableSingleton implemetation 
+
   /// <inheritdoc/>
   public void PostLoad() {}
+
   #endregion
 
   #region API
+
   /// <summary>Shortcut to the instantiator.</summary>
   public readonly BaseInstantiator BaseInstantiator;
 
@@ -47,7 +53,7 @@ public sealed class AutomationService : IPostLoadableSingleton {
   /// <summary>Shortcut to EventBus.</summary>
   public readonly EventBus EventBus;
 
-  /// <summary>Highlights all registered behaviours on the map.</summary>
+  /// <summary>Highlights all registered behaviors on the map.</summary>
   public void HighlightAutomationObjects(Color? useColor = null) {
     _highlightingEnabled = true;
     foreach (var behavior in _registeredBehaviors) {
@@ -60,9 +66,11 @@ public sealed class AutomationService : IPostLoadableSingleton {
     _highlightingEnabled = false;
     _highlighter.UnhighlightAllSecondary();
   }
+
   #endregion
 
   #region Implementation
+
   internal void RegisterBehavior(AutomationBehavior behavior) {
     _registeredBehaviors.Add(behavior);
     if (_highlightingEnabled) {
@@ -95,5 +103,6 @@ public sealed class AutomationService : IPostLoadableSingleton {
   public void OnToolExited(ToolExitedEvent toolExitedEvent) {
     UnhighlightAutomationObjects();
   }
+
   #endregion
 }
