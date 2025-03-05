@@ -17,7 +17,9 @@ using UnityDev.Utils.LogUtilsLite;
 namespace IgorZ.Automation.AutomationSystem;
 
 /// <summary>The component that keeps all the automation state on the building.</summary>
-public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDeletableEntity {
+public sealed class AutomationBehavior
+    : BaseComponent, IPersistentEntity, IDeletableEntity, IFinishedStateListener, IPostInitializableEntity {
+
   #region Injection shortcuts
 
   /// <summary>Shortcut to the <see cref="AutomationService"/>.</summary>
@@ -44,8 +46,8 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
   public bool HasActions => _actions.Count > 0;
 
   /// <summary>All actions on the building.</summary>
-  public IEnumerable<IAutomationAction> Actions => _actions.AsReadOnly();
-  List<IAutomationAction> _actions = new();
+  public IList<IAutomationAction> Actions => _actions.AsReadOnly();
+  List<IAutomationAction> _actions = [];
 
   #region API
 
@@ -63,6 +65,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
     condition.SyncState();
     _actions.Add(action);
     HostedDebugLog.Fine(this, "Adding rule: {0}", action);
+    CollectCleanedRules();
     UpdateRegistration();
   }
 
@@ -96,7 +99,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
 
   /// <summary>Removes all rules that depend on condition and/or action that is marked for cleanup.</summary>
   public void CollectCleanedRules() {
-    for (int i = _actions.Count - 1; i >= 0; i--) {
+    for (var i = _actions.Count - 1; i >= 0; i--) {
       var action = _actions[i];
       if (action.IsMarkedForCleanup || action.Condition.IsMarkedForCleanup) {
         HostedDebugLog.Fine(this, "Cleaning up action: {0}", action);
@@ -133,11 +136,35 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
         .OfType<IAutomationAction>()
         .Where(a => !a.IsMarkedForCleanup && a.Condition is { IsMarkedForCleanup: false })
         .ToList();
+  }
+
+  #endregion
+
+  #region IPostInitializableEntity implementation
+
+  /// <inheritdoc/>
+  public void PostInitializeEntity() {
     foreach (var action in _actions) {
       action.Condition.Behavior = this;
       action.Behavior = this;
     }
+    CollectCleanedRules();
     UpdateRegistration();
+  }
+
+  #endregion
+
+  #region IFinishedStateListener implementation
+
+  /// <inheritdoc/>
+  public void OnEnterFinishedState() {
+    foreach (var action in _actions) {
+      action.Condition.SyncState();
+    }
+  }
+
+  /// <inheritdoc/>
+  public void OnExitFinishedState() {
   }
 
   #endregion
