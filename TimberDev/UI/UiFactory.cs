@@ -15,9 +15,13 @@ namespace IgorZ.TimberDev.UI;
 /// <summary>Factory for creating UI elements without using TAPI.</summary>
 /// <remarks>Normally, should be used for the times when TAPI is broken.</remarks>
 public class UiFactory {
+
+  const string UIViewsPath = "UI/Views/";
+
   readonly VisualElementLoader _visualElementLoader;
   readonly ILoc _loc;
   readonly IAssetLoader _assetLoader;
+  readonly VisualElementInitializer _visualElementInitializer;
 
   /// <summary>Common padding around the button text on the right side panel.</summary>
   public static readonly (int top, int left, int bottom, int right) StandardButtonPadding = new(2, 10, 2, 10);
@@ -37,10 +41,12 @@ public class UiFactory {
     throw new InvalidOperationException($"Element '{name}' not found.");
   }
 
-  UiFactory(VisualElementLoader visualElementLoader, ILoc loc, IAssetLoader assetLoader) {
+  UiFactory(VisualElementLoader visualElementLoader, ILoc loc, IAssetLoader assetLoader,
+            VisualElementInitializer visualElementInitializer) {
     _visualElementLoader = visualElementLoader;
     _loc = loc;
     _assetLoader = assetLoader;
+    _visualElementInitializer = visualElementInitializer;
   }
 
   /// <summary>A shortcut to "ILoc.T()".</summary>
@@ -246,5 +252,32 @@ public class UiFactory {
     var element = _visualElementLoader.LoadVisualElement(name);
     element.styleSheets.Add(TimberDevStylesheet);
     return element;
+  }
+
+  /// <summary>Loads a visual tree asset from the "UI/Views" folder.</summary>
+  /// <remarks>
+  /// The template gets properly transformed into VisualElement, and the game controls get initialized. All the
+  /// stylesheets on the template will be preserved. Use this method when a dialog or a panel is being loaded.
+  /// </remarks>
+  public VisualElement LoadVisualTreeAsset(string name) {
+    var element = _assetLoader.Load<VisualTreeAsset>(UIViewsPath + name).Instantiate();
+    _visualElementInitializer.InitializeVisualElement(element);
+    return element;
+  }
+
+  /// <summary>Loads a visual element from the "UI/Views" folder.</summary>
+  /// <remarks>
+  /// The first visual element from the template gets extracted, and all the others (if any) will be ignored. The game
+  /// controls will be properly initialized. The stylesheets aren't preserved! The element, once added to the hierarchy,
+  /// will inherit the styles from its parent.
+  /// </remarks>
+  /// <seealso cref="LoadVisualTreeAsset"/>
+  public T LoadVisualElement<T>(string name) where T : VisualElement {
+    return _visualElementLoader.LoadVisualElement(name).Q<T>();
+  }
+
+  /// <inheritdoc cref="LoadVisualElement{T}"/>
+  public VisualElement LoadVisualElement(string name) {
+    return _visualElementLoader.LoadVisualElement(name);
   }
 }
