@@ -71,7 +71,7 @@ sealed class MainDialog : IPanelController, ILoadableSingleton {
   }
 
   public void Load() {
-    var panel = _uiFactory.LoadTimberDevElement("IgorZ/TimberUI-Dialog");
+    var panel = _uiFactory.LoadVisualTreeAsset("IgorZ/TimberUI-Dialog");
     _resourcePathTextField = panel.Q2<TextField>("ResourcePath");
     _resourcePathTextField.text = "UI/Views/";
     _filenameTextField = panel.Q2<TextField>("Filename");

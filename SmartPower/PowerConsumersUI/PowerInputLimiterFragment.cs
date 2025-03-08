@@ -40,7 +40,7 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
   }
 
   public VisualElement InitializeFragment() {
-    _root = _uiFactory.LoadTimberDevElement("IgorZ/PowerInputLimiterFragment");
+    _root = _uiFactory.LoadVisualTreeAsset("IgorZ/PowerInputLimiterFragment");
     _automateCheckbox = _root.Q<Toggle>("AutomateCheckbox");
     _automateCheckbox.RegisterValueChangedCallback(
         e => {

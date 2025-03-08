@@ -40,7 +40,7 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
   }
 
   public VisualElement InitializeFragment() {
-    _root = _uiFactory.LoadTimberDevElement("IgorZ/PowerOutputBalancerFragment");
+    _root = _uiFactory.LoadVisualTreeAsset("IgorZ/PowerOutputBalancerFragment");
     _automateCheckbox = _root.Q<Toggle>("AutomateCheckbox");
     _automateCheckbox.RegisterValueChangedCallback(
         e => {

@@ -6,22 +6,32 @@ using System;
 using System.Runtime.CompilerServices;
 using Timberborn.AssetSystem;
 using Timberborn.CoreUI;
+using Timberborn.DropdownSystem;
 using Timberborn.Localization;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+// ReSharper disable MemberCanBePrivate.Global
 namespace IgorZ.TimberDev.UI;
 
 /// <summary>Factory for creating UI elements without using TAPI.</summary>
 /// <remarks>Normally, should be used for the times when TAPI is broken.</remarks>
 public class UiFactory {
 
-  const string UIViewsPath = "UI/Views/";
+  /// <summary>Path to the UI views in the game assets.</summary>
+  public const string UIViewsPath = "UI/Views/";
 
-  readonly VisualElementLoader _visualElementLoader;
-  readonly ILoc _loc;
-  readonly IAssetLoader _assetLoader;
-  readonly VisualElementInitializer _visualElementInitializer;
+  /// <summary>Class name for the text elements on the right side panel.</summary>
+  public const string EntityPanelTextClass = "entity-panel__text";
+
+  /// <summary>Class name for the big text elements.</summary>
+  public const string GameTextBigClass = "game-text-big";
+
+  /// <summary>Class name for the small text elements.</summary>
+  public const string GameTextSmallClass = "game-text-small";
+
+  /// <summary>Class name for the normal text elements.</summary>
+  public const string GameTextNormalClass = "game-text-small";
 
   /// <summary>Common padding around the button text on the right side panel.</summary>
   public static readonly (int top, int left, int bottom, int right) StandardButtonPadding = new(2, 10, 2, 10);
@@ -39,14 +49,6 @@ public class UiFactory {
       root = root.parent;
     }
     throw new InvalidOperationException($"Element '{name}' not found.");
-  }
-
-  UiFactory(VisualElementLoader visualElementLoader, ILoc loc, IAssetLoader assetLoader,
-            VisualElementInitializer visualElementInitializer) {
-    _visualElementLoader = visualElementLoader;
-    _loc = loc;
-    _assetLoader = assetLoader;
-    _visualElementInitializer = visualElementInitializer;
   }
 
   /// <summary>A shortcut to "ILoc.T()".</summary>
@@ -73,29 +75,60 @@ public class UiFactory {
 
   /// <summary>Creates a panel builder that can be used as a fragment on the right side panel.</summary>
   public VisualElement CreateCenteredPanelFragment() {
-    var root = _visualElementLoader.LoadVisualElement("Game/EntityPanel/BatteryFragment");
+    var root = new NineSliceVisualElement();
+    root.AddToClassList("bg-sub-box--green");
+    root.AddToClassList("entity-sub-panel");
     root.Clear();
     return root;
   }
 
   /// <summary>Wraps the element to make it centered in the UI fragment.</summary>
   public VisualElement CenterElement(VisualElement element) {
-    var center = new VisualElement();
-    center.style.justifyContent = Justify.Center;
-    center.style.flexDirection = FlexDirection.Row;
+    var center = new VisualElement {
+        style = {
+            justifyContent = Justify.Center,
+            flexDirection = FlexDirection.Row,
+        },
+    };
     center.Add(element);
     return center;
   }
 
-  /// <summary>Creates a label in a theme suitable for the right side panel.</summary>
+  /// <summary>Creates a label in the game's UI theme.</summary>
   /// <param name="locKey">Optional loc key for the caption.</param>
-  public Label CreateLabel(string locKey = null) {
-    var label = _visualElementLoader.LoadVisualElement("Game/EntityPanel/SluiceFragment").Q<Label>("DepthLabel");
-    label.RemoveFromHierarchy();
+  /// <param name="classes">
+  /// Classes to add to the control. If not set, then the component will be set up for the entity panel.
+  /// </param>
+  public Label CreateLabel(string locKey = null, string[] classes = null) {
+    var label = new Label();
     if (locKey != null) {
       label.text = T(locKey);
     }
+    if (classes != null) {
+      foreach (var cls in classes) {
+        label.AddToClassList(cls);
+      }
+    } else {
+      label.AddToClassList(EntityPanelTextClass);
+    }
     return label;
+  }
+
+  /// <summary>Creates a text field in the game's UI theme.</summary>
+  /// <param name="width">Optional width override.</param>
+  /// <param name="classes">Optional classes to add to the control.</param>
+  public TextField CreateTextField(int? width = null, string[] classes = null) {
+    var textField = new TextField();
+    textField.AddToClassList("text-field");
+    if (width.HasValue) {
+      textField.style.width = width.Value;
+    }
+    if (classes != null) {
+      foreach (var cls in classes) {
+        textField.AddToClassList(cls);
+      }
+    }
+    return textField;
   }
 
   /// <summary>Creates a button in a theme suitable for the right side panel.</summary>
@@ -104,34 +137,55 @@ public class UiFactory {
   /// <param name="padding">
   /// Optional padding around the button text. If not set, then <see cref="StandardButtonPadding"/> will be used.
   /// </param>
-  public Button CreateButton(string locKey, Action onClickFn,
-                             (int top, int left, int bottom, int right)? padding = null) {
-    var button = _visualElementLoader.LoadVisualElement("Game/EntityPanel/DebugFragment").Q<Button>("Button");
-    button.RemoveFromHierarchy();
-    button.text = T(locKey);
-    button.style.marginTop = 0;
-    button.style.fontSize = 14;
-    button.style.color = Color.white;
+  /// <param name="classes">
+  /// Classes to add to the control. If not set, then the component will be set up for the entity panel.
+  /// </param>
+  public Button CreateButton(string locKey, Action<Button> onClickFn,
+                             (int top, int left, int bottom, int right)? padding = null,
+                             string[] classes = null) {
+    var button = new NineSliceButton {
+        text = T(locKey),
+    };
+    button.AddToClassList("button-game");
+    if (classes != null) {
+      foreach (var cls in classes) {
+        button.AddToClassList(cls);
+      }
+    } else {
+      button.AddToClassList(EntityPanelTextClass);
+    }
     var setPadding = padding ?? StandardButtonPadding;
     button.style.paddingTop = setPadding.top;
     button.style.paddingLeft = setPadding.left;
     button.style.paddingBottom = setPadding.bottom;
     button.style.paddingRight = setPadding.right;
-    button.clicked += onClickFn;
+    button.clicked += () => onClickFn(button);
     return button;
   }
 
-  /// <summary>Creates a toggle in a theme suitable for the right side panel.</summary>
+  /// <summary>Creates a toggle in the game's UI theme.</summary>
   /// <param name="locKey">Loc key for the caption. If null or empty, then there will be no caption.</param>
   /// <param name="onValueChangedFn">
   /// A callback method that will be called on the value change. The only argument is the new value.
   /// </param>
   /// <param name="spacing">If a non-negative value, then the bottom margin will be set.</param>
-  public Toggle CreateToggle(string locKey, Action<ChangeEvent<bool>> onValueChangedFn, int spacing = 5) {
-    var toggle = _visualElementLoader.LoadVisualElement("Game/EntityPanel/HaulCandidateFragment").Q<Toggle>("Toggle");
-    toggle.RemoveFromHierarchy();
+  /// <param name="classes">
+  /// Classes to add to the control. If not set, then the component will be set up for the entity panel.
+  /// </param>
+  public Toggle CreateToggle(string locKey, Action<ChangeEvent<bool>> onValueChangedFn,
+                             int spacing = 5, string[] classes = null) {
+    var toggle = new Toggle();
+    toggle.AddToClassList("game-toggle");
     if (locKey != null) {
       toggle.text = T(locKey);
+    }
+    if (classes != null) {
+      foreach (var cls in classes) {
+        toggle.AddToClassList(cls);
+      }
+    } else {
+      toggle.AddToClassList(EntityPanelTextClass);
+      toggle.AddToClassList("entity-panel__toggle");
     }
     toggle.RegisterValueChangedCallback(evt => onValueChangedFn(evt));
     if (spacing >= 0) {
@@ -150,13 +204,19 @@ public class UiFactory {
   /// <param name="lowValue">The lowest possible value.</param>
   /// <param name="highValue">The highest possible value.</param>
   /// <param name="spacing">If a non-negative value, then the bottom margin will be set.</param>
+  /// <param name="classes">Optional classes to add to the control.</param>
   public Slider CreateSlider(Action<ChangeEvent<float>> onValueChangedFn, float lowValue, float highValue,
-                             float stepSize = 0, int spacing = 5) {
-    var slider = _visualElementLoader.LoadVisualElement("Game/EntityPanel/BatteryFragment").Q<Slider>("ChargeSlider");
-    slider.RemoveFromHierarchy();
-    slider.style.marginTop = 0;
-    slider.lowValue = lowValue;
-    slider.highValue = highValue;
+                             float stepSize = 0, int spacing = 5, string[] classes = null) {
+    var slider = new Slider(lowValue, highValue);
+    slider.AddToClassList("slider");
+    if (spacing >= 0) {
+      slider.style.marginBottom = spacing;
+    }
+    if (classes != null) {
+      foreach (var cls in classes) {
+        slider.AddToClassList(cls);
+      }
+    }
     slider.RegisterValueChangedCallback(
         evt => {
           if (stepSize > 0) {
@@ -166,9 +226,6 @@ public class UiFactory {
           }
           onValueChangedFn(evt);
         });
-    if (spacing >= 0) {
-      slider.style.marginBottom = spacing;
-    }
     return slider;
   }
 
@@ -246,12 +303,18 @@ public class UiFactory {
         });
   }
 
-  /// <summary>Loads the visual elements that may use TimberDev stylesheet.</summary>
-  /// <remarks>This method requires <see cref="TimberDevStylesheet"/>.</remarks>
-  public VisualElement LoadTimberDevElement(string name) {
-    var element = _visualElementLoader.LoadVisualElement(name);
-    element.styleSheets.Add(TimberDevStylesheet);
-    return element;
+  /// <summary>Creates a simple dropdown in a theme suitable for the right side panel.</summary>
+  /// <remarks>
+  /// This dropdown will resize itself to the largest item, assigned via
+  /// <see cref="ResizableDropdownElement.SetItems"/>. If the maximum width is needed, then set it manually.
+  /// </remarks>
+  public ResizableDropdownElement CreateSimpleDropdown(Action<string> onValueChanged = null) {
+    var dropdown = new ResizableDropdownElement();
+    dropdown.Initialize(_dropdownListDrawer, _visualElementLoader);
+    if (onValueChanged != null) {
+      dropdown.OnValueChanged += (_, _) => onValueChanged(dropdown.SelectedValue);
+    }
+    return dropdown;
   }
 
   /// <summary>Loads a visual tree asset from the "UI/Views" folder.</summary>
@@ -267,9 +330,9 @@ public class UiFactory {
 
   /// <summary>Loads a visual element from the "UI/Views" folder.</summary>
   /// <remarks>
-  /// The first visual element from the template gets extracted, and all the others (if any) will be ignored. The game
-  /// controls will be properly initialized. The stylesheets aren't preserved! The element, once added to the hierarchy,
-  /// will inherit the styles from its parent.
+  /// If the name is a template, then the first visual element gets extracted adn returned, and all the others (if any)
+  /// will be ignored. The game controls will be properly initialized. The stylesheets aren't preserved! The element,
+  /// once added to the hierarchy, will inherit the styles from its parent.
   /// </remarks>
   /// <seealso cref="LoadVisualTreeAsset"/>
   public T LoadVisualElement<T>(string name) where T : VisualElement {
@@ -280,4 +343,23 @@ public class UiFactory {
   public VisualElement LoadVisualElement(string name) {
     return _visualElementLoader.LoadVisualElement(name);
   }
+
+  #region Implementation
+
+  readonly VisualElementLoader _visualElementLoader;
+  readonly ILoc _loc;
+  readonly IAssetLoader _assetLoader;
+  readonly VisualElementInitializer _visualElementInitializer;
+  readonly DropdownListDrawer _dropdownListDrawer;
+
+  UiFactory(VisualElementLoader visualElementLoader, ILoc loc, IAssetLoader assetLoader,
+            VisualElementInitializer visualElementInitializer, DropdownListDrawer dropdownListDrawer) {
+    _visualElementLoader = visualElementLoader;
+    _loc = loc;
+    _assetLoader = assetLoader;
+    _visualElementInitializer = visualElementInitializer;
+    _dropdownListDrawer = dropdownListDrawer;
+  }
+
+  #endregion
 }
