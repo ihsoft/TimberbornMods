@@ -63,7 +63,7 @@ sealed class MainDialog : IPanelController, ILoadableSingleton {
   }
 
   VisualElement GetDialogBox() {
-      var dialogBox = _visualElementLoader.LoadVisualElement("Options/SettingsBox");
+    var dialogBox = _visualElementLoader.LoadVisualElement("Options/SettingsBox");
     dialogBox.Q<Label>("DeveloperTestLabel").ToggleDisplayStyle(false);
     dialogBox.Q<VisualElement>("Developer").ToggleDisplayStyle(false);
     dialogBox.Q<ScrollView>("Content").Clear();
