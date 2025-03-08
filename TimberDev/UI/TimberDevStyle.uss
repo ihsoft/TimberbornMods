@@ -70,9 +70,78 @@
     background-image: resource('UI/Images/Buttons/circle-on');
 }
 
+.timberdev-scroll-view {
+    flex-grow: 1;
+}
+
+.timberdev-scroll-view .unity-scroll-view__content-and-vertical-scroll-container > .unity-scroll-view__content-viewport {
+    padding-top: 3px;
+    padding-right: 3px;
+    padding-bottom: 3px;
+    padding-left: 3px;
+}
+
+.timberdev-scroll-view .unity-scroll-view__content-and-vertical-scroll-container > .unity-scroller > .unity-slider {
+    max-width: 20px;
+    min-width: 20px;
+}
+
+.timberdev-scroll-view .unity-scroll-view__content-and-vertical-scroll-container > .unity-scroller .unity-base-slider__dragger {
+    max-height: 58px;
+    left: 2px;
+    background-image: resource('UI/Images/Core/scroll-button-nine-slice');
+    -unity-slice-left: 14;
+    -unity-slice-top: 14;
+    -unity-slice-right: 14;
+    -unity-slice-bottom: 14;
+    -unity-slice-scale: 0.5px;
+    width: 100%;
+    height: 100%;
+}
+
+.timberdev-scroll-view .unity-scroll-view__content-and-vertical-scroll-container > .unity-scroller .unity-base-slider__dragger:hover {
+    background-image: resource('UI/Images/Core/scroll-button-nine-slice-highlight');
+}
+
+.timberdev-scroll-view .unity-scroll-view__content-and-vertical-scroll-container > .unity-scroller :active .unity-base-slider__dragger {
+    background-image: resource('UI/Images/Core/scroll-button-nine-slice-highlight');
+}
+
+.timberdev-scroll-view .unity-scroll-view__content-and-vertical-scroll-container > .unity-scroller .unity-base-slider__tracker {
+    left: 2px;
+    background-image: resource('UI/Images/Core/scroll-bar-nine-slice');
+    -unity-slice-left: 14;
+    -unity-slice-top: 14;
+    -unity-slice-right: 14;
+    -unity-slice-bottom: 14;
+    -unity-slice-scale: 0.5px;
+}
+
 .timberdev-button-small {
+    padding-top: 1px;
+    padding-right: 5px;
+    padding-bottom: 1px;
+    padding-left: 5px;
+}
+
+.timberdev-button-small--left-aligned {
+    padding-top: 1px;
+    padding-right: 5px;
+    padding-bottom: 1px;
+    padding-left: 5px;
+    margin-right: 5px;
+}
+
+.timberdev-button-normal {
     padding-top: 2px;
     padding-right: 10px;
     padding-bottom: 2px;
     padding-left: 10px;
+}
+
+.timberdev-button-big {
+    padding-top: 5px;
+    padding-right: 15px;
+    padding-bottom: 5px;
+    padding-left: 15px;
 }

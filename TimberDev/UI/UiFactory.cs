@@ -67,10 +67,23 @@ public class UiFactory {
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public string T<T1, T2, T3>(string key, T1 param1, T2 param2, T3 param3) => _loc.T(key, param1, param2, param3);
 
+  /// <summary>Sets an alternative path to <see cref="TimberDevStylesheet"/>.</summary>
+  /// <remarks>If the path wasn't set, then stylesheet will be loaded from "UI/Views/TimberDevStyle".</remarks>
+  public string TimberDevStylesheetPath {
+    get => _timberDevStylesheetPath;
+    set {
+      if (_timberDevStylesheetPath != value) {
+        _timberDevStylesheetPath = value;
+        _timberDevStylesheet = null;
+      }
+    }
+  }
+  string _timberDevStylesheetPath = "UI/Views/TimberDevStyle";
+
   /// <summary>Stylesheet for the TimberDev UI elements.</summary>
   /// <remarks>The stylesheet should be built-in to the mod asset file. See "README.txt".</remarks>
-  public StyleSheet TimberDevStylesheet =>
-      _timberDevStylesheet ??= _assetLoader.Load<StyleSheet>("UI/Views/TimberDevStyle");
+  public StyleSheet TimberDevStylesheet => _timberDevStylesheet
+      ??= _assetLoader.Load<StyleSheet>(TimberDevStylesheetPath);
   StyleSheet _timberDevStylesheet;
 
   /// <summary>Creates a panel builder that can be used as a fragment on the right side panel.</summary>
@@ -229,19 +242,33 @@ public class UiFactory {
     return slider;
   }
 
-  /// <summary>Creates a min/max slider in a theme suitable for the right side panel.</summary>
-  /// <remarks>This method requires <see cref="TimberDevStylesheet"/>.</remarks>
+  /// <summary>Creates a min/max slider in the game's UI theme.</summary>
+  /// <remarks>
+  /// This method requires TimberDev stylesheet. It should either be attached to the element that will become a parent
+  /// of the slider, or the stylesheet can be added specifically to the slider via <see cref="AddTimberDevStylesheet"/>.
+  /// </remarks>
   /// <param name="lowValue">The minimum value limit.</param>
   /// <param name="highValue">The maximum value limit.</param>
   /// <param name="spacing">If a non-negative value, then the bottom margin will be set.</param>
+  /// <seealso cref="AddTimberDevStylesheet"/>
   public MinMaxSlider CreateMinMaxSlider(float lowValue, float highValue, int spacing = 5) {
     var slider = new MinMaxSlider(lowValue, highValue, lowValue, highValue);
     slider.AddToClassList("timberdev-minmax-slider");
-    slider.styleSheets.Add(TimberDevStylesheet);
     if (spacing >= 0) {
       slider.style.marginBottom = spacing;
     }
     return slider;
+  }
+
+  /// <summary>Creates a scroll view in a theme suitable for the right side panel.</summary>
+  /// <remarks>
+  /// This method requires TimberDev stylesheet. It should either be attached to the element that will become a parent
+  /// of the slider, or the stylesheet can be added specifically to the slider via <see cref="AddTimberDevStylesheet"/>.
+  /// </remarks>
+  public ScrollView CreateScrollView() {
+    var scrollView = new ScrollView();
+    scrollView.AddToClassList("timberdev-scroll-view");
+    return scrollView;
   }
 
   /// <summary>
@@ -315,6 +342,15 @@ public class UiFactory {
       dropdown.OnValueChanged += (_, _) => onValueChanged(dropdown.SelectedValue);
     }
     return dropdown;
+  }
+
+  /// <summary>Adds the TimberDev stylesheet to the elements that needs it.</summary>
+  /// <remarks>
+  /// The stylesheet can be added to a specific element that needs it, or it can be added once to the root element.
+  /// </remarks>
+  /// <seealso cref="CreateMinMaxSlider"/>
+  public void AddTimberDevStylesheet(VisualElement element) {
+    element.styleSheets.Add(TimberDevStylesheet);
   }
 
   /// <summary>Loads a visual tree asset from the "UI/Views" folder.</summary>
