@@ -1,3 +1,5 @@
+# v2.0.0 (started on 3/7/2025):
+
 # v1.3.0 (4 Mar 2025):
 * Add support for Update 7 (0.7.1.2).
 
