@@ -66,6 +66,9 @@
       <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Localizations\enUS.txt.meta">
         <Link>Mod\Localizations\enUS.txt.meta</Link>
       </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Localizations\ruRU.txt">
+        <Link>Mod\Localizations\ruRU.txt</Link>
+      </Content>
       <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolGroupSpecification.Automation.20.Terrain.original.json">
         <Link>Mod\Specifications\ToolGroupSpecification.Automation.20.Terrain.original.json</Link>
       </Content>
@@ -334,6 +337,9 @@
       </Compile>
       <Compile Include="..\TimberDev\UI\UiFactory.cs">
         <Link>TimberDev\UI\UiFactory.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UI\VisualEffects.cs">
+        <Link>TimberDev\UI\VisualEffects.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\Utils\Configurator.cs">
         <Link>TimberDev\Utils\Configurator.cs</Link>

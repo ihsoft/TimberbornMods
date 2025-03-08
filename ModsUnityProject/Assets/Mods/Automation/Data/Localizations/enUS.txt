@@ -79,8 +79,6 @@ TimberDev_Utils.Tools.LockSelectTool.SelectingNObjects,"Selecting: {0} (x{1})",
 TimberDev_Utils.Tools.LockSelectTool.StartSelectingPrompt,"Point to an entity and click to start selecting",
 TimberDev_Utils.Tools.LockSelectTool.StartObjectSelectingPrompt,"Click to start selecting: {0}",
 TimberDev_Utils.Tools.LockSelectTool.DescriptionHint,"Hold <i>SHIFT</i> to select items of one type only.",
-IgorZ.Automation.AutomationFragment.RulesAreaCaptionTextLocKey,"Automation rules:",
-IgorZ.Automation.AutomationFragment.RuleTextLocKey,"If {0}, then {1}",
 IgorZ.Automation.DetonateDynamiteAction.Description,"<SolidHighlight>detonate dynamite</SolidHighlight>",
 IgorZ.Automation.DetonateDynamiteAction.RepeatCountInfo," and add another <GreenHighlight>{0} times</GreenHighlight>",
 IgorZ.Automation.DroughtEndedCondition.Description,"<SolidHighlight>drought ended</SolidHighlight>",
@@ -114,3 +112,44 @@ IgorZ.Automation.ShowStatusAction.HoldCompletionStatusText,"Waiting for the othe
 IgorZ.Automation.BlockableBuildingAction.BlockDescription,"<SolidHighlight>block building</SolidHighlight>",
 IgorZ.Automation.BlockableBuildingAction.UnblockDescription,"<SolidHighlight>unblock building</SolidHighligh>",
 IgorZ.Automation.BlockableBuildingAction.BlockText,"Waiting for the other buildings to finish",
+=,=,"UI fragment strings"
+IgorZ.Automation.AutomationFragment.RulesAreaCaptionTextLocKey,"Automation rules:",
+IgorZ.Automation.AutomationFragment.RuleTextLocKey,"If {0}, then {1}",
+IgorZ.Automation.AutomationFragment.AddRulesBtn,"Add automation rules",
+IgorZ.Automation.AutomationFragment.EditRulesBtn,"Edit rules",
+=,=,"Scriptable components strings"
+IgorZ.Automation.Scripting.Expressions.AndOperator," and ","String to join components of the expression with condition AND. Used to represent the condition in the panel"
+IgorZ.Automation.Scripting.Expressions.OrOperator," or ","String to join components of the expression with condition OR. Used to represent the condition in the panel"
+IgorZ.Automation.Scripting.Expressions.ParseError,"<RedHighlight>PARSE ERROR</RedHighlight>","String to show when the scriptable condition or action cannot be parsed"
+IgorZ.Automation.Scripting.Expressions.RuntimeError,"<RedHighlight>RUNTIME ERROR</RedHighlight>","String to show when the scriptable condition or action cannot be executed"
+IgorZ.Automation.Scriptable.Debug.Action.Log,"write to logs: {0}","Name of the action that write to the log an arbitrary string."
+IgorZ.Automation.Scriptable.District.Signal.Beavers,"beavers in district","Name of the condition for the current beaver population checking"
+IgorZ.Automation.Scriptable.District.Signal.Bots,"bots in district","Name of the condition for the current bot population checking"
+IgorZ.Automation.Scriptable.Floodgate.Action.SetHeight,"set gate height to {0}","Change the floodgate height to the specified value"
+IgorZ.Automation.Scriptable.Inventory.Signal.InputGood,"inout: {0}","Name of the condition for the inventory input goods"
+IgorZ.Automation.Scriptable.Inventory.Signal.OutputGood,"output: {0}","Name of the condition for the inventory output goods"
+IgorZ.Automation.Scriptable.Inventory.Action.StartEmptyingStock,"start emptying storage","Name of the action that starts emptying the storage"
+IgorZ.Automation.Scriptable.Inventory.Action.StopEmptyingStock,"stop emptying storage","Name of the action that stops emptying the storage"
+IgorZ.Automation.Scriptable.Inventory.Action.EmptyingStatus,"The storage is being emptied on a priority basis.",
+IgorZ.Automation.Scriptable.Pausable.Action.Pause,"pause building","Name of the action that pauses the building"
+IgorZ.Automation.Scriptable.Pausable.Action.Resume,"resume building","Name of the action that unpauses the building"
+IgorZ.Automation.Scriptable.Weather.Signal.Season,"season","Name of the condition for the current season checking"
+=,=,"Rules editor strings"
+IgorZ.Automation.Scripting.Editor.DialogHeader,"Automation rules",
+IgorZ.Automation.Scripting.Editor.AddRuleFromScriptBtn,"Add script",
+IgorZ.Automation.Scripting.Editor.AddRuleViaConstructorBtn,"Create rule via constructor",
+IgorZ.Automation.Scripting.Editor.DeleteRuleBtn,"Delete rule",
+IgorZ.Automation.Scripting.Editor.EditAsScriptBtn,"Edit as script",
+IgorZ.Automation.Scripting.Editor.EditInConstructorBtn,"Edit in constructor",
+IgorZ.Automation.Scripting.Editor.TestScriptBtn,"Test",
+IgorZ.Automation.Scripting.Editor.SaveScriptBtn,"Save",
+IgorZ.Automation.Scripting.Editor.DiscardScriptBtn,"Discard",
+IgorZ.Automation.Scripting.Editor.ConditionLabel,"If",
+IgorZ.Automation.Scripting.Editor.ActionLabel,"Then",
+IgorZ.Automation.Scripting.Editor.ConditionMustBeBoolean,"Condition must be a boolean expression","A message to show when the condition is not a boolean expression"
+IgorZ.Automation.Scripting.Editor.ActionMustBeAction,"Action must be the 'act' operator","A message to show when the action is not an action"
+IgorZ.Automation.Scripting.Editor.SaveRulesBtn,"Save and close",
+IgorZ.Automation.Scripting.Editor.DiscardChangesBtn,"Discard changes",
+IgorZ.Automation.Scripting.Editor.MoreInfoBtn,"Read about scripting",
+IgorZ.Automation.Scripting.Editor.StringConstantType,"string","Name of the string constant type"
+IgorZ.Automation.Scripting.Editor.NumberConstantType,"number","Name of the number constant type"

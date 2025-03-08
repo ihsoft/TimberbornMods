@@ -1,0 +1,11 @@
+.text-field-error .unity-base-field__input {
+    background-color: rgba(255, 0, 0, 0.2);
+}
+
+.text-field .unity-base-field__input {
+    -unity-text-align: upper-left;
+}
+
+.text-field-green .unity-base-field__input {
+    color: rgb(0, 255, 0);
+}
