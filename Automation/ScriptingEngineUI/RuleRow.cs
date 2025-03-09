@@ -20,6 +20,7 @@ sealed class RuleRow {
   const string ConditionLabelLocKey = "IgorZ.Automation.Scripting.Editor.ConditionLabel";
   const string ActionLabelLocKey = "IgorZ.Automation.Scripting.Editor.ActionLabel";
   const string ParseErrorLocKey = "IgorZ.Automation.Scripting.Expressions.ParseError";
+  const string ResetChangesLocKey = "IgorZ.Automation.Scripting.Editor.ResetChangesBtn";
 
   #region API
 
@@ -34,9 +35,11 @@ sealed class RuleRow {
       }
       _conditionExpression = value;
       ParsedCondition = ParseExpression<BoolOperatorExpr>(value);
+      CheckIfModified();
     }
   }
   string _conditionExpression;
+  string _originalConditionExpression;
 
   public ActionExpr ParsedAction { get; private set; }
   public string ActionExpression {
@@ -47,18 +50,47 @@ sealed class RuleRow {
       }
       _actionExpression = value;
       ParsedAction = ParseExpression<ActionExpr>(value);
+      CheckIfModified();
     }
   }
   string _actionExpression;
+  string _originalActionExpression;
 
-  public IAutomationAction LegacyAction { get; init; }
+  public IAutomationAction LegacyAction {
+    get => _legacyAction;
+    private set {
+      if (_originalConditionExpression != null || _originalActionExpression != null) {
+        throw new InvalidOperationException(
+            "Cannot set legacy action if it already has expressions.");
+      }
+      _legacyAction = value;
+    }
+  }
+  IAutomationAction _legacyAction;
 
   public readonly AutomationBehavior ActiveBuilding;
 
-  public bool IsInEditMode { get; private set; }
+  public bool IsModified {
+    get => _isModified;
+    private set {
+      _isModified = value;
+      SetContainerClass();
+    }
+  }
+  bool _isModified;
+
+  public bool IsInEditMode {
+    get => _isInEditMode;
+    private set {
+      _isInEditMode = value;
+      SetContainerClass();
+    }
+  }
+  bool _isInEditMode;
+
   public bool IsDeleted { get; private set; }
 
-  public event EventHandler OnModeChanged;
+  public event EventHandler OnStateChanged;
 
   public RuleRow(IEnumerable<IEditorProvider> editors, UiFactory uiFactory, AutomationBehavior activeBuilding) {
     _uiFactory = uiFactory;
@@ -75,12 +107,23 @@ sealed class RuleRow {
     _notifications.ToggleDisplayStyle(false);
   }
 
+  public void Initialize(string condition, string action) {
+    _originalConditionExpression = condition;
+    ConditionExpression = condition;
+    _originalActionExpression = action;
+    ActionExpression = action;
+  }
+
+  public void Initialize(IAutomationAction legacyAction) {
+    LegacyAction = legacyAction;
+  }
+
   public void CreateEditView(VisualElement editorRoot) {
     Reset();
     _editView.Add(editorRoot);
     _editView.ToggleDisplayStyle(true);
     IsInEditMode = true;
-    OnModeChanged?.Invoke(this, EventArgs.Empty);
+    OnStateChanged?.Invoke(this, EventArgs.Empty);
   }
 
   public void SwitchToViewMode() {
@@ -97,6 +140,13 @@ sealed class RuleRow {
     _readonlyView.ToggleDisplayStyle(true);
 
     // Controls.
+    if (IsModified) {
+      CreateButton(ResetChangesLocKey, btn => {
+        ConditionExpression = _originalConditionExpression;
+        ActionExpression = _originalActionExpression;
+        SwitchToViewMode();
+      });
+    }
     var ruleEditable = false;
     foreach (var provider in _editorProviders) {
       var canEdit = provider.VerifyIfEditable(this, ActiveBuilding);
@@ -109,7 +159,12 @@ sealed class RuleRow {
     _ruleButtons.ToggleDisplayStyle(ruleEditable);
 
     IsInEditMode = false;
-    OnModeChanged?.Invoke(this, EventArgs.Empty);
+    OnStateChanged?.Invoke(this, EventArgs.Empty);
+  }
+
+  public void MarkDeleted() {
+    IsDeleted = true;
+    OnStateChanged?.Invoke(this, EventArgs.Empty);
   }
 
   void CreateButton(string locKey, Action<Button> onClick, bool addAtBeginning = false) {
@@ -156,10 +211,25 @@ sealed class RuleRow {
     _notifications.ToggleDisplayStyle(false);
   }
 
-  //FIXME: API + docs
-  public void MarkDeleted() {
-    IsDeleted = true;
-    OnModeChanged?.Invoke(this, EventArgs.Empty);
+  void SetContainerClass() {
+    var ruleContainer = Root.Q("RuleContainer");
+    if (IsInEditMode) {
+      ruleContainer.EnableInClassList("editmode-rule", true);
+      ruleContainer.EnableInClassList("original-rule", false);
+      ruleContainer.EnableInClassList("modified-rule", false);
+    } else if (IsModified) {
+      ruleContainer.EnableInClassList("editmode-rule", false);
+      ruleContainer.EnableInClassList("original-rule", false);
+      ruleContainer.EnableInClassList("modified-rule", true);
+    } else {
+      ruleContainer.EnableInClassList("editmode-rule", false);
+      ruleContainer.EnableInClassList("original-rule", true);
+      ruleContainer.EnableInClassList("modified-rule", false);
+    }
+  }
+
+  void CheckIfModified() {
+    IsModified = _originalConditionExpression != _conditionExpression || _originalActionExpression != _actionExpression;
   }
 
   T ParseExpression<T>(string expression) where T : class, IExpression {

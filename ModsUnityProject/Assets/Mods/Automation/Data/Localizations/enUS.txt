@@ -136,9 +136,11 @@ IgorZ.Automation.Scriptable.Pausable.Action.Resume,"resume building","Name of th
 IgorZ.Automation.Scriptable.Weather.Signal.Season,"season","Name of the condition for the current season checking"
 =,=,"Rules editor strings"
 IgorZ.Automation.Scripting.Editor.DialogHeader,"Automation rules",
+IgorZ.Automation.Scripting.Editor.PendingEditsNotification,"There are rules in the editing state. Complete them first.",
+IgorZ.Automation.Scripting.Editor.UnsavedChangesConfirmation,"There are unsaved changes. Do you want to discard them?",
 IgorZ.Automation.Scripting.Editor.AddRuleFromScriptBtn,"Add script",
 IgorZ.Automation.Scripting.Editor.AddRuleViaConstructorBtn,"Create rule via constructor",
-IgorZ.Automation.Scripting.Editor.DeleteRuleBtn,"Delete rule",
+IgorZ.Automation.Scripting.Editor.ResetChangesBtn,"Reset changes",
 IgorZ.Automation.Scripting.Editor.EditAsScriptBtn,"Edit as script",
 IgorZ.Automation.Scripting.Editor.EditInConstructorBtn,"Edit in constructor",
 IgorZ.Automation.Scripting.Editor.TestScriptBtn,"Test",

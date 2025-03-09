@@ -23,9 +23,11 @@ IgorZ.Automation.Scriptable.Pausable.Action.Resume,"запустить здан�
 IgorZ.Automation.Scriptable.Weather.Signal.Season,"сезон","Name of the condition for the current season checking"
 =,=,"Rules editor strings"
 IgorZ.Automation.Scripting.Editor.DialogHeader,"Правила автоматизации",
+IgorZ.Automation.Scripting.Editor.PendingEditsNotification,"Некоторые правила в режиме редактирования. Сначала завершите их.",
+IgorZ.Automation.Scripting.Editor.UnsavedChangesConfirmation,"Есть несохраненные изменения. Вы хотите их отменить?",
 IgorZ.Automation.Scripting.Editor.AddRuleFromScriptBtn,"Добавить скрипт",
 IgorZ.Automation.Scripting.Editor.AddRuleViaConstructorBtn,"Создать правило через конструктор",
-IgorZ.Automation.Scripting.Editor.DeleteRuleBtn,"Удалить правило",
+IgorZ.Automation.Scripting.Editor.ResetChangesBtn,"Сбросить изменения",
 IgorZ.Automation.Scripting.Editor.EditAsScriptBtn,"Редактировать скрипт",
 IgorZ.Automation.Scripting.Editor.EditInConstructorBtn,"Редактировать в конструкторе",
 IgorZ.Automation.Scripting.Editor.TestScriptBtn,"Проверить",

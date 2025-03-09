@@ -9,3 +9,43 @@
 .text-field-green .unity-base-field__input {
     color: rgb(0, 255, 0);
 }
+
+.original-rule {
+    background-color: rgba(255, 255, 255, 0.05);
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+}
+
+.modified-rule {
+    background-color: rgba(0, 255, 0, 0.05);
+    padding-top: 4px;
+    padding-right: 4px;
+    padding-bottom: 4px;
+    padding-left: 4px;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-left-color: rgb(0, 120, 0);
+    border-right-color: rgb(0, 120, 0);
+    border-top-color: rgb(0, 120, 0);
+    border-bottom-color: rgb(0, 120, 0);
+}
+
+.editmode-rule {
+    padding-top: 4px;
+    padding-right: 4px;
+    padding-bottom: 4px;
+    padding-left: 4px;
+    border-left-color: rgb(122, 122, 0);
+    border-right-color: rgb(122, 122, 0);
+    border-top-color: rgb(122, 122, 0);
+    border-bottom-color: rgb(122, 122, 0);
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    background-color: rgba(0, 255, 0, 0.05);
+}

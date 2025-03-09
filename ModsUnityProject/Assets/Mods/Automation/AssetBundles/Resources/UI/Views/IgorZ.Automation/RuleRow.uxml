@@ -5,7 +5,7 @@
     <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle" />
     <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/RulesEditorStyle.uss?fileID=7433441132597879392&amp;guid=82ba7710a5bad1b489b53edd629e2a56&amp;type=3#RulesEditorStyle" />
     <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/TimberDevStyle.uss?fileID=7433441132597879392&amp;guid=86824deb2a4bc844cbec48367a164254&amp;type=3#TimberDevStyle" />
-    <engine:VisualElement style="flex-grow: 0; background-color: rgba(255, 255, 255, 0.05); padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px; margin-bottom: 10px;">
+    <engine:VisualElement name="RuleContainer" class="original-rule" style="margin-bottom: 10px;">
         <engine:VisualElement style="flex-grow: 1; flex-direction: row; align-items: center;">
             <engine:VisualElement name="SidePanel" style="align-items: center; margin-right: 5px;">
                 <Timberborn.CoreUI.NineSliceButton name="DeleteRowBtn" class="button-square button-cross" />

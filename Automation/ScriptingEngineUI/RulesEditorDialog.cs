@@ -17,6 +17,9 @@ namespace IgorZ.Automation.ScriptingEngineUI;
 
 sealed class RulesEditorDialog : IPanelController {
 
+  const string PendingEditsNotificationLocKey = "IgorZ.Automation.Scripting.Editor.PendingEditsNotification";
+  const string UnsavedChangesConfirmationLocKey = "IgorZ.Automation.Scripting.Editor.UnsavedChangesConfirmation";
+
   #region IPanelController implementation
 
   /// <inheritdoc/>
@@ -26,22 +29,29 @@ sealed class RulesEditorDialog : IPanelController {
 
   /// <inheritdoc/>
   public bool OnUIConfirmed() {
+    if (EditsPending) {
+      ShowPendingEditsNotification();
+      return true;
+    }
+    SaveAndClose();
+    return false;
+  }
+
+  void SaveAndClose() {
     SaveRulesAndCloseDialog();
     Close();
     _onClosed?.Invoke();
-    return false;
   }
 
   /// <inheritdoc/>
   public void OnUICancelled() {
-    if (!_closingByButton && _hasUnsavedChanges) {
-      //FIXME: show a confirmation dialog
-      DebugEx.Warning("*** Has unsaved changes!");
+    if (RulesChanged || EditsPending) {
+      ShowUnsavedChangesConfirmation(Close);
+      return;
     }
     Close();
   }
   Action _onClosed;
-  bool _closingByButton;
 
   #endregion
 
@@ -52,11 +62,7 @@ sealed class RulesEditorDialog : IPanelController {
     _ruleRowsContainer = _root.Q<VisualElement>("RuleRowsContainer");
     _confirmButton = _root.Q<Button>("ConfirmButton");
     _confirmButton.clicked += () => OnUIConfirmed();
-    _root.Q<Button>("CancelButton").clicked += () => {
-      _closingByButton = true;
-      OnUICancelled();
-      _closingByButton = false;
-    };
+    _root.Q<Button>("CancelButton").clicked += Close;
     //FIXME: implement
     _root.Q<Button>("MoreInfoButton").ToggleDisplayStyle(false);
 
@@ -82,42 +88,56 @@ sealed class RulesEditorDialog : IPanelController {
 
   readonly UiFactory _uiFactory;
   readonly PanelStack _panelStack;
+  readonly DialogBoxShower _dialogBoxShower;
 
   VisualElement _root;
 
   readonly List<RuleRow> _ruleRows = []; 
   readonly IEditorProvider[] _editorProviders;
 
-  bool _hasUnsavedChanges;
+  bool RulesChanged => _ruleRows.Any(x => x.IsDeleted || x.IsModified);
+  bool EditsPending => _ruleRows.Any(x => x.IsInEditMode);
 
   VisualElement _ruleRowsContainer;
   AutomationBehavior _activeBuilding;
   Button _confirmButton;
 
-  RulesEditorDialog(UiFactory uiFactory, PanelStack panelStack,
+  RulesEditorDialog(UiFactory uiFactory, PanelStack panelStack, DialogBoxShower dialogBoxShower,
                     ScriptEditorProvider scriptEditorProvider,
                     ConstructorEditorProvider constructorEditorProvider) {
     _uiFactory = uiFactory;
     _panelStack = panelStack;
+    _dialogBoxShower = dialogBoxShower;
     _editorProviders = [scriptEditorProvider, constructorEditorProvider];
   }
 
-  void SetActiveBuilding(AutomationBehavior activeBuilding) {
-    _activeBuilding = activeBuilding;
-    _ruleRows.Clear();
+  void Reset() {
     _ruleRowsContainer.Clear();
+    _ruleRows.Clear();
+  }
+
+  void ShowUnsavedChangesConfirmation(Action confirmAction) {
+    _dialogBoxShower.Create()
+        .SetMessage(_uiFactory.T(UnsavedChangesConfirmationLocKey))
+        .SetConfirmButton(confirmAction)
+        .SetCancelButton(() => {})
+        .Show();
+  }
+
+  void ShowPendingEditsNotification() {
+    _dialogBoxShower.Create().SetMessage(_uiFactory.T(PendingEditsNotificationLocKey)).Show();
+  }
+
+  void SetActiveBuilding(AutomationBehavior activeBuilding) {
+    Reset();
+    _activeBuilding = activeBuilding;
 
     foreach (var action in activeBuilding.Actions) {
-      var legacyAction = action;
-      var scriptedAction = action as ScriptedAction;
-      var scriptedCondition = action.Condition as ScriptedCondition;
-      if (scriptedAction != null && scriptedCondition != null) {
-        legacyAction = null;
-      }
-      var ruleRow = CreateScriptedRule(legacyAction);
-      if (scriptedCondition != null && scriptedAction != null) {
-        ruleRow.ConditionExpression = scriptedCondition.Expression;
-        ruleRow.ActionExpression = scriptedAction.Expression;
+      var ruleRow = CreateScriptedRule();
+      if (action is ScriptedAction scriptedAction && action.Condition is ScriptedCondition scriptedCondition) {
+        ruleRow.Initialize(scriptedCondition.Expression, scriptedAction.Expression);
+      } else {
+        ruleRow.Initialize(action);
       }
       ruleRow.SwitchToViewMode();
     }
@@ -125,7 +145,7 @@ sealed class RulesEditorDialog : IPanelController {
 
   void SaveRulesAndCloseDialog() {
     _activeBuilding.ClearAllRules();
-    foreach (var rule in _ruleRows) {
+    foreach (var rule in _ruleRows.Where(x => !x.IsDeleted)) {
       if (rule.LegacyAction != null) {
         _activeBuilding.AddRule(rule.LegacyAction.Condition, rule.LegacyAction);
       } else {
@@ -138,24 +158,21 @@ sealed class RulesEditorDialog : IPanelController {
     }
   }
 
-  RuleRow CreateScriptedRule(IAutomationAction legacyAction = null) {
-    var ruleRow = new RuleRow(_editorProviders, _uiFactory, _activeBuilding) { LegacyAction = legacyAction };
-    ruleRow.OnModeChanged += UpdateButtonsState;
+  RuleRow CreateScriptedRule() {
+    var ruleRow = new RuleRow(_editorProviders, _uiFactory, _activeBuilding);
+    ruleRow.OnStateChanged += OnRuleStateChanged;
     _ruleRows.Add(ruleRow);
     _ruleRowsContainer.Add(ruleRow.Root);
     return ruleRow;
   }
 
-  void UpdateButtonsState(object obj, EventArgs args) {
+  void OnRuleStateChanged(object obj, EventArgs args) {
     for (var i = _ruleRows.Count - 1; i >= 0; i--) {
-      _hasUnsavedChanges |= _ruleRows[i].IsInEditMode;
-      if (_ruleRows[i].IsDeleted) {
-        _ruleRows[i].Root.RemoveFromHierarchy();
-        _ruleRows.RemoveAt(i);
-        _hasUnsavedChanges = true;
+      var ruleRow = _ruleRows[i];
+      if (ruleRow.IsDeleted) {
+        ruleRow.Root.RemoveFromHierarchy();
       }
     }
-    _confirmButton.SetEnabled(_ruleRows.All(r => !r.IsInEditMode));
   }
 
   #endregion
