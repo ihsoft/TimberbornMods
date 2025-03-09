@@ -136,6 +136,7 @@ IgorZ.Automation.Scriptable.Pausable.Action.Resume,"resume building","Name of th
 IgorZ.Automation.Scriptable.Weather.Signal.Season,"season","Name of the condition for the current season checking"
 =,=,"Rules editor strings"
 IgorZ.Automation.Scripting.Editor.DialogHeader,"Automation rules",
+IgorZ.Automation.Scripting.Editor.ReadMoreLink,"https://github.com/ihsoft/TimberbornMods/wiki/Automation-(scripting)","Link to the localized wiki page about scripting"
 IgorZ.Automation.Scripting.Editor.PendingEditsNotification,"There are rules in the editing state. Complete them first.",
 IgorZ.Automation.Scripting.Editor.UnsavedChangesConfirmation,"There are unsaved changes. Do you want to discard them?",
 IgorZ.Automation.Scripting.Editor.AddRuleFromScriptBtn,"Add script",

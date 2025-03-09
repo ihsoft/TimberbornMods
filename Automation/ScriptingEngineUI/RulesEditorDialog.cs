@@ -10,7 +10,7 @@ using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.Conditions;
 using IgorZ.TimberDev.UI;
 using Timberborn.CoreUI;
-using UnityDev.Utils.LogUtilsLite;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
@@ -19,6 +19,7 @@ sealed class RulesEditorDialog : IPanelController {
 
   const string PendingEditsNotificationLocKey = "IgorZ.Automation.Scripting.Editor.PendingEditsNotification";
   const string UnsavedChangesConfirmationLocKey = "IgorZ.Automation.Scripting.Editor.UnsavedChangesConfirmation";
+  const string ReadMoreLinkLocKey = "IgorZ.Automation.Scripting.Editor.ReadMoreLink";
 
   #region IPanelController implementation
 
@@ -63,8 +64,7 @@ sealed class RulesEditorDialog : IPanelController {
     _confirmButton = _root.Q<Button>("ConfirmButton");
     _confirmButton.clicked += () => OnUIConfirmed();
     _root.Q<Button>("CancelButton").clicked += Close;
-    //FIXME: implement
-    _root.Q<Button>("MoreInfoButton").ToggleDisplayStyle(false);
+    _root.Q<Button>("MoreInfoButton").clicked += () => Application.OpenURL(_uiFactory.T(ReadMoreLinkLocKey));
 
     var buttons = _root.Q("Buttons");
     buttons.Clear();
