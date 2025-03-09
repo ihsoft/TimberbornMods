@@ -1,0 +1,12 @@
+<UnityEngine.UIElements.UXML>
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <UnityEngine.UIElements.VisualElement name="DialogBox" class="content-row-centered">
+        <Timberborn.CoreUI.NineSliceVisualElement class="content-centered sliced-border sliced-border--nontransparent">
+            <UnityEngine.UIElements.VisualElement name="Box" class="box">
+                <UnityEngine.UIElements.VisualElement name="Content" class="box__content-margin">
+                    <UnityEngine.UIElements.Label name="Message" class="box__text box__text--centered" />
+                </UnityEngine.UIElements.VisualElement>
+            </UnityEngine.UIElements.VisualElement>
+        </Timberborn.CoreUI.NineSliceVisualElement>
+    </UnityEngine.UIElements.VisualElement>
+</UnityEngine.UIElements.UXML>

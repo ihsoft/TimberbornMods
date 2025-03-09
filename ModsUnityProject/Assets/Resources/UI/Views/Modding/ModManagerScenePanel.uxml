@@ -1,0 +1,16 @@
+<UnityEngine.UIElements.UXML>
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="MainMenuMiscStyle.uss" />
+    <Style src="ModdingStyle.uss" />
+    <Style src="OptionsStyle.uss" />
+    <UnityEngine.UIElements.VisualElement name="ModManagerScenePanel" class="title-screen content-row-centered">
+        <UnityEngine.UIElements.VisualElement name="ModManagerBox" class="mod-manager-box">
+            <UnityEngine.UIElements.VisualElement name="Content" class="mod-manager-scene-panel__content box__content-container">
+                <UnityEngine.UIElements.VisualElement name="HeaderWrapper" class="capsule-header capsule-header--lower content-centered mod-manager-scene-panel__header">
+                    <UnityEngine.UIElements.Label name="Mods" name="Header" class="capsule-header__text" />
+                </UnityEngine.UIElements.VisualElement>
+            </UnityEngine.UIElements.VisualElement>
+        </UnityEngine.UIElements.VisualElement>
+    </UnityEngine.UIElements.VisualElement>
+</UnityEngine.UIElements.UXML>

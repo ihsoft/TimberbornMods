@@ -1,0 +1,21 @@
+<UnityEngine.UIElements.UXML>
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="CommonMiscStyle.uss" />
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <UnityEngine.UIElements.VisualElement name="GameOptionsBox" class="grow-centered">
+        <Timberborn.CoreUI.NineSliceVisualElement name="OptionsBox" class="options-box sliced-border">
+            <Timberborn.CoreUI.LocalizableButton name="Resume" name="ResumeButton" class="menu-button menu-button--stretched" />
+            <Timberborn.CoreUI.LocalizableButton name="Save game" name="SaveGameButton" class="menu-button menu-button--stretched" />
+            <Timberborn.CoreUI.LocalizableButton name="Load game" name="LoadGameButton" class="menu-button menu-button--stretched" />
+            <Timberborn.CoreUI.LocalizableButton name="Key bindings" name="BindingsButton" class="menu-button menu-button--stretched" />
+            <Timberborn.CoreUI.LocalizableButton name="Settings" name="SettingsButton" class="menu-button menu-button--stretched" />
+            <Timberborn.CoreUI.LocalizableButton name="Go to feedback site" name="FeedbackButton" class="menu-button menu-button--stretched" />
+            <Timberborn.CoreUI.LocalizableButton name="Exit to main menu" name="ExitToMenuButton" class="menu-button menu-button--stretched" />
+            <Timberborn.CoreUI.LocalizableButton name="Exit to desktop" name="ExitToDesktopButton" class="menu-button menu-button--stretched" />
+            <UnityEngine.UIElements.Button name="DiscordButton" class="options-box__discord-button" />
+            <UnityEngine.UIElements.Label name="Version" name="GameVersion" class="options-box__version" />
+            <UnityEngine.UIElements.Label name="Early Access" name="EarlyAccess" class="options-box__version" />
+            <UnityEngine.UIElements.Label name="EXPERIMENTAL MODE" name="Experimental" class="experimental-info" />
+        </Timberborn.CoreUI.NineSliceVisualElement>
+    </UnityEngine.UIElements.VisualElement>
+</UnityEngine.UIElements.UXML>

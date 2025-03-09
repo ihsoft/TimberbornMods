@@ -1,0 +1,10 @@
+<UnityEngine.UIElements.UXML>
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Timberborn.CoreUI.NineSliceVisualElement name="IntegerSlider" class="integer-slider">
+        <UnityEngine.UIElements.Slider name="Slider" class="slider integer-slider__slider" />
+        <Timberborn.CoreUI.NineSliceIntegerField name="100" name="Value" class="game-text-normal text-field integer-slider__integer-field" />
+        <UnityEngine.UIElements.Label name="/" name="Separator" class="game-text-normal text--yellow game-text-separator" />
+        <UnityEngine.UIElements.Label name="10000" name="MaxValue" class="game-text-normal" />
+    </Timberborn.CoreUI.NineSliceVisualElement>
+</UnityEngine.UIElements.UXML>

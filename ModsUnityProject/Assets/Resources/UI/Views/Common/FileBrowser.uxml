@@ -1,0 +1,6 @@
+<UnityEngine.UIElements.UXML>
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="CommonMiscStyle.uss" />
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="OptionsStyle.uss" />
+</UnityEngine.UIElements.UXML>

@@ -1,0 +1,11 @@
+<UnityEngine.UIElements.UXML>
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="ModdingStyle.uss" />
+    <UnityEngine.UIElements.VisualElement name="GameSaveModBox">
+        <Timberborn.CoreUI.LocalizableLabel name="Saved mods:" name="SavedModsLabel" class="text--default text--centered" />
+        <Timberborn.CoreUI.NineSliceVisualElement name="SavedModsContainer" class="bg-box--green simple-mod-panel__container">
+            <UnityEngine.UIElements.ScrollView name="SavedMods" class="scroll--green-decorated" />
+        </Timberborn.CoreUI.NineSliceVisualElement>
+    </UnityEngine.UIElements.VisualElement>
+</UnityEngine.UIElements.UXML>

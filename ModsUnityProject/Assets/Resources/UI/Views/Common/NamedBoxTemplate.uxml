@@ -1,0 +1,11 @@
+<UnityEngine.UIElements.UXML>
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <UnityEngine.UIElements.VisualElement name="NamedBoxTemplate" class="content-row-centered">
+        <Timberborn.CoreUI.NineSliceVisualElement class="sliced-border box__content-container">
+            <Timberborn.CoreUI.NineSliceVisualElement name="HeaderWrapper" class="capsule-header capsule-header--lower content-centered">
+                <Timberborn.CoreUI.LocalizableLabel name="Title" name="Header" class="capsule-header__text" />
+            </Timberborn.CoreUI.NineSliceVisualElement>
+        </Timberborn.CoreUI.NineSliceVisualElement>
+    </UnityEngine.UIElements.VisualElement>
+</UnityEngine.UIElements.UXML>
