@@ -19,15 +19,6 @@ public static class SpecToSaveObjectConverter {
     [Serialize]
     public string Name { get; init; }
 
-    /// <summary>Parameter value.</summary>
-    /// <remarks>
-    /// The string values must be quoted in single quotes. Valid values for the boolean values are: "true" or "false".
-    /// In any register. Numbers must start from 0-9 symbol. The number is tried to be parsed as an integer first, then
-    /// as a float.
-    /// </remarks>
-    // [Serialize(isOptional: true)]
-    // public string Value { get; init; }
-
     /// <summary>String value.</summary>
     [Serialize(isOptional: true)]
     public string StrValue { get; init; }
@@ -36,9 +27,11 @@ public static class SpecToSaveObjectConverter {
     [Serialize(isOptional: true)]
     public int? IntValue { get; init; }
 
+    /// <summary>Float value.</summary>
     [Serialize(isOptional: true)]
     public int? FloatValue { get; init; }
 
+    /// <summary>Boolean value.</summary>
     [Serialize(isOptional: true)]
     public bool? BoolValue { get; init; }
   }
