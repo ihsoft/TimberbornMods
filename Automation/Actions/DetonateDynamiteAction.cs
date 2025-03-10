@@ -15,6 +15,7 @@ using Timberborn.Common;
 using Timberborn.Coordinates;
 using Timberborn.Explosions;
 using Timberborn.Persistence;
+using Timberborn.PrefabSystem;
 using Timberborn.PrioritySystem;
 using Timberborn.TerrainSystem;
 using Timberborn.ToolSystem;
@@ -30,21 +31,13 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
   const string RepeatCountLocKey = "IgorZ.Automation.DetonateDynamiteAction.RepeatCountInfo";
 
   /// <summary>
-  /// Number of times to place a new dynamite. Any value less or equal to zero results in no extra actions on trigger.
+  /// Number of times to place new dynamite. Any value less or equal to zero results in no extra actions on trigger.
   /// </summary>
   /// <remarks>
   /// A too big value is not a problem. When the bottom of the map is reached, the dynamite simply won't get placed.
   /// </remarks>
   // ReSharper disable once MemberCanBePrivate.Global
   public int RepeatCount { get; private set; }
-
-  /// <summary>Names of the tools to place various depths.</summary>
-  /// <remarks>Action will only apply if the dynamite is of the known depths.</remarks>
-  static readonly Dictionary<int, string> DynamiteDepthToToolNamePrefix = new() {
-      {1 , "Dynamite."},
-      {2 , "DoubleDynamite."},
-      {3 , "TripleDynamite."},
-  };
 
   /// <summary>Builder priority of the behavior owner object.</summary>
   /// <remarks>It must be captured before construction completes.</remarks>
@@ -70,8 +63,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
-    var dynamite = behavior.GetComponentFast<Dynamite>();
-    return dynamite && DynamiteDepthToToolNamePrefix.ContainsKey(dynamite.Depth);
+    return behavior.GetComponentFast<Dynamite>();
   }
 
   /// <inheritdoc/>
@@ -134,6 +126,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
     ToolButtonService _toolButtonService;
     ITerrainService _terrainService;
     BlockService _blockService;
+    string _prefabName;
 
     BlockObject _blockObject;
     int _repeatCount;
@@ -152,6 +145,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
       _toolButtonService = DependencyContainer.GetInstance<ToolButtonService>();
       _terrainService = DependencyContainer.GetInstance<ITerrainService>();
       _blockService = DependencyContainer.GetInstance<BlockService>();
+      _prefabName = GetComponent<PrefabSpec>().Name;
     }
 
     IEnumerator WaitAndPlace() {
@@ -179,11 +173,10 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
       }
 
       // Place another dynamite of the same type and building priority.
-      var toolNamePrefix = DynamiteDepthToToolNamePrefix[dynamiteDepth];
       var dynamiteTool = _toolButtonService
           .ToolButtons.Select(x => x.Tool)
           .OfType<BlockObjectTool>()
-          .First(x => x.Prefab.name.StartsWith(toolNamePrefix));
+          .First(x => x.Prefab.name.StartsWith(_prefabName));
       dynamiteTool.Place(new List<Placement> { new(coordinates) });
       BlockObject newDynamite;
       do {
