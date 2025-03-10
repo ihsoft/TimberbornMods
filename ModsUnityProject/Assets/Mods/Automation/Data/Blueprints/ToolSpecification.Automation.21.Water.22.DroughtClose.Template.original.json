@@ -12,8 +12,8 @@
     "TemplateFamilyName": "Water.FloodgateManagement-drought",
     "Rules": [
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.DroughtStartedCondition", "Parameters": [] },
-        "Action": { "TypeId": "IgorZ.Automation.Actions.SetFloodgateHeightAction", "Parameters": [{"Name": "StepsDown", "Value": "0"}] }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.DroughtStartedCondition" },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.SetFloodgateHeightAction", "Parameters": [{"Name": "StepsDown", "IntValue": 0}] }
       },
     ]
   }

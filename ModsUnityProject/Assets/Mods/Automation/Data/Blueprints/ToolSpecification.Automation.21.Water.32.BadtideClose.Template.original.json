@@ -12,8 +12,8 @@
     "TemplateFamilyName": "Water.FloodgateManagement-badtide",
     "Rules": [
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BadtideStartedCondition", "Parameters": [] },
-        "Action": { "TypeId": "IgorZ.Automation.Actions.SetFloodgateHeightAction", "Parameters": [{"Name": "StepsDown", "Value": "0"}] }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BadtideStartedCondition" },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.SetFloodgateHeightAction", "Parameters": [{"Name": "StepsDown", "IntValue": 0}] }
       },
     ]
   }

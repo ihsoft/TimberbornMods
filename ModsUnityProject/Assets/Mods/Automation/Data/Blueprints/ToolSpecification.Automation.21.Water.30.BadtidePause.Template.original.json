@@ -12,12 +12,12 @@
     "TemplateFamilyName": "Water.SeasonManagement",
     "Rules": [
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BadtideStartedCondition", "Parameters": [] },
-        "Action": { "TypeId": "IgorZ.Automation.Actions.PauseAction", "Parameters": [] }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BadtideStartedCondition" },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.PauseAction" }
       },
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BadtideEndedCondition", "Parameters": [] },
-        "Action": { "TypeId": "IgorZ.Automation.Actions.UnpauseAction", "Parameters": [] }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BadtideEndedCondition" },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.UnpauseAction" }
       }
     ]
   }

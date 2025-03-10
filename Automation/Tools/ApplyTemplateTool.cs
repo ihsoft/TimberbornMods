@@ -27,14 +27,14 @@ sealed class ApplyTemplateTool : AbstractAreaSelectionTool, IAutomationModeEnabl
 
   /// <summary>Spec that holds the template tool configuration.</summary>
   public sealed record AutomationTemplateSpec : ComponentSpec {
-    [Serialize]
-    public string TemplateFamilyName { get; init; }
+    [Serialize(isOptional: true)]
+    public string TemplateFamilyName { get; init; } = "";
 
     public record DynamicTypeSpec {
       [Serialize]
       public string TypeId { get; init; }
 
-      [Serialize]
+      [Serialize(isOptional: true)]
       public ImmutableArray<SpecToSaveObjectConverter.AutomationParameterSpec> Parameters { get; init; }
     }
 
@@ -103,10 +103,9 @@ sealed class ApplyTemplateTool : AbstractAreaSelectionTool, IAutomationModeEnabl
 
   T ParseAndInit<T>(AutomationTemplateSpec.DynamicTypeSpec typeSpec) where T : class, IGameSerializable {
     var instance = DynamicClassSerializer<T>.MakeInstance(typeSpec.TypeId);
-    if (typeSpec.Parameters.Length == 0) {
-      return instance;
+    if (typeSpec.Parameters != null && typeSpec.Parameters.Length > 0) {
+      instance.LoadFrom(new ObjectLoader(SpecToSaveObjectConverter.ParametersToSaveObject(typeSpec.Parameters)));
     }
-    instance.LoadFrom(new ObjectLoader(SpecToSaveObjectConverter.ParametersToSaveObject(typeSpec.Parameters)));
     return instance;
   }
 

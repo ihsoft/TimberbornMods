@@ -17,23 +17,23 @@
         "Action": {
           "TypeId": "IgorZ.Automation.Actions.StatusToggleAction",
           "Parameters": [
-            {"Name": "ActionKind", "Value": "'ShowStatus'"},
-            {"Name": "StatusToken", "Value": "'ChainTool-2'"},
-            {"Name": "Description", "Value": "'IgorZ.Automation.ShowStatusAction.HoldConstruction'"},
-            {"Name": "StatusKind", "Value": "'NormalStatusWithFloatingIcon'"},
-            {"Name": "StatusIcon", "Value": "'DirectionalBlocking'"},
-            {"Name": "StatusText", "Value": "'IgorZ.Automation.ShowStatusAction.HoldCompletionStatusText'"},
+            {"Name": "ActionKind", "StrValue": "ShowStatus"},
+            {"Name": "StatusToken", "StrValue": "ChainTool-2"},
+            {"Name": "Description", "StrValue": "IgorZ.Automation.ShowStatusAction.HoldConstruction"},
+            {"Name": "StatusKind", "StrValue": "NormalStatusWithFloatingIcon"},
+            {"Name": "StatusIcon", "StrValue": "DirectionalBlocking"},
+            {"Name": "StatusText", "StrValue": "IgorZ.Automation.ShowStatusAction.HoldCompletionStatusText"},
           ],
         }
       },
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.CheckAccessBlockCondition", "Parameters": [{"Name": "ReversedCondition", "Value": "true"}] },
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.CheckAccessBlockCondition", "Parameters": [{"Name": "ReversedCondition", "BoolValue": true}] },
         "Action": {
           "TypeId": "IgorZ.Automation.Actions.StatusToggleAction",
           "Parameters": [
-            {"Name": "ActionKind", "Value": "'HideStatus'"},
-            {"Name": "StatusToken", "Value": "'ChainTool-2'"},
-            {"Name": "Description", "Value": "'IgorZ.Automation.ShowStatusAction.ResumeConstruction'"},
+            {"Name": "ActionKind", "StrValue": "HideStatus"},
+            {"Name": "StatusToken", "StrValue": "ChainTool-2"},
+            {"Name": "Description", "StrValue": "IgorZ.Automation.ShowStatusAction.ResumeConstruction"},
           ]
         }
       }

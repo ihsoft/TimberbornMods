@@ -12,12 +12,12 @@
     "TemplateFamilyName": "Storage.BoostEmptying",
     "Rules": [
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.OutputStockAboveThresholdCondition", "Parameters": [{"Name": "Threshold", "Value": "70"}] },
-        "Action": { "TypeId": "IgorZ.Automation.Actions.MarkForEmptyingAction", "Parameters": [] }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.OutputStockAboveThresholdCondition", "Parameters": [{"Name": "Threshold", "IntValue": 70}] },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.MarkForEmptyingAction" }
       },
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.OutputStockBelowThresholdCondition", "Parameters": [{"Name": "Threshold", "Value": "30"}] },
-        "Action": { "TypeId": "IgorZ.Automation.Actions.UnmarkForEmptyingAction", "Parameters": [] }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.OutputStockBelowThresholdCondition", "Parameters": [{"Name": "Threshold", "IntValue": 30}] },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.UnmarkForEmptyingAction" }
       }
     ]
   }

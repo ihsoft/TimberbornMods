@@ -12,8 +12,8 @@
     "TemplateFamilyName": "Terrain.DynamiteDigging",
     "Rules": [
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.ObjectFinishedCondition", "Parameters": [] },
-        "Action": { "TypeId": "IgorZ.Automation.Actions.DetonateDynamiteAction", "Parameters": [{"Name": "Repeat", "Value": "2"}] }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.ObjectFinishedCondition" },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.DetonateDynamiteAction", "Parameters": [{"Name": "Repeat", "IntValue": 2}] }
       },
     ],
   }

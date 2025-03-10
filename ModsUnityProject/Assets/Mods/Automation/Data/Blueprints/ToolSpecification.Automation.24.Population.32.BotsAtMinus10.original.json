@@ -12,12 +12,12 @@
     "TemplateFamilyName": "Population",
     "Rules": [
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BotPopulationBelowThresholdCondition", "Parameters": [{"Name": "Value", "Value": "-10"},{"Name": "RelativeTo", "Value": "'CurrentLevel'"}] },
-        "Action": { "TypeId": "IgorZ.Automation.Actions.UnpauseAction", "Parameters": [] }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BotPopulationBelowThresholdCondition", "Parameters": [{"Name": "Value", "IntValue": -10},{"Name": "RelativeTo", "StrValue": "CurrentLevel"}] },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.UnpauseAction" }
       },
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BotPopulationAboveThresholdCondition", "Parameters": [{"Name": "Value", "Value": "-9"},{"Name": "RelativeTo", "Value": "'CurrentLevel'"}] },
-        "Action": { "TypeId": "IgorZ.Automation.Actions.PauseAction", "Parameters": [] }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BotPopulationAboveThresholdCondition", "Parameters": [{"Name": "Value", "IntValue": -9},{"Name": "RelativeTo", "StrValue": "CurrentLevel"}] },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.PauseAction" }
       }
     ]
   }

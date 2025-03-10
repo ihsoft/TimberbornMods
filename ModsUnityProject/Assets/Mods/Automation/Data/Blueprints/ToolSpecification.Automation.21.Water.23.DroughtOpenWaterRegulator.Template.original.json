@@ -12,12 +12,12 @@
     "TemplateFamilyName": "Water.SeasonManagement-drought",
     "Rules": [
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.DroughtStartedCondition", "Parameters": [] },
-        "Action": { "TypeId": "IgorZ.Automation.Actions.WaterRegulatorStateAction", "Parameters": [{"Name": "Open", "Value": "true"}] }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.DroughtStartedCondition" },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.WaterRegulatorStateAction", "Parameters": [{"Name": "Open", "BoolValue": true}] }
       },
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.DroughtEndedCondition", "Parameters": [] },
-        "Action": { "TypeId": "IgorZ.Automation.Actions.WaterRegulatorStateAction", "Parameters": [{"Name": "Open", "Value": "false"}] }
+        "Condition": { "TypeId": "IgorZ.Automation.Conditions.DroughtEndedCondition" },
+        "Action": { "TypeId": "IgorZ.Automation.Actions.WaterRegulatorStateAction", "Parameters": [{"Name": "Open", "BoolValue": false}] }
       }
     ]
   }
