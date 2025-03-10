@@ -31,7 +31,6 @@ sealed class AutomationFragment : IEntityPanelFragment {
   Label _caption;
   Label _rulesList;
   Button _addRulesButton;
-  Button _addTestRuleButton;
 
   AutomationBehavior _automationBehavior;
 
@@ -53,7 +52,6 @@ sealed class AutomationFragment : IEntityPanelFragment {
     _root.Add(_caption);
     _root.Add(_rulesList);
     _root.Add(_addRulesButton);
-    _root.Add(_addTestRuleButton);
     _root.ToggleDisplayStyle(visible: false);
     return _root;
   }
