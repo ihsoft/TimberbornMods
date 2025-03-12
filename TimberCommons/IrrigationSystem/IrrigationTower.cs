@@ -105,7 +105,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <summary>Shortcut to the building's block object.</summary>
   protected BlockObject BlockObject { get; private set; }
 
-  /// <summary>Tower is always a blockable building.</summary>
+  /// <summary>The tower is always a blockable building.</summary>
   protected BlockableBuilding BlockableBuilding { get; private set; }
 
   // ReSharper restore MemberCanBeProtected.Global
@@ -153,7 +153,8 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   /// <inheritdoc/>
   public virtual void OnEnterFinishedState() {
-    _terrainService.TerrainHeightChanged += OnTerrainHeightChanged;
+    _terrainMap.ColumnMovedDown += OnColumnTerrainMoved;
+    _terrainMap.ColumnMovedUp += OnColumnTerrainMoved;
     BlockableBuilding.BuildingBlocked += OnBlockedStateChanged;
     BlockableBuilding.BuildingUnblocked += OnBlockedStateChanged;
     _eventBus.Register(this);
@@ -163,7 +164,8 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <inheritdoc/>
   public virtual void OnExitFinishedState() {
     StopMoisturizing();
-    _terrainService.TerrainHeightChanged -= OnTerrainHeightChanged;
+    _terrainMap.ColumnMovedDown -= OnColumnTerrainMoved;
+    _terrainMap.ColumnMovedUp -= OnColumnTerrainMoved;
     BlockableBuilding.BuildingBlocked -= OnBlockedStateChanged;
     BlockableBuilding.BuildingUnblocked -= OnBlockedStateChanged;
     _eventBus.Unregister(this);
@@ -246,7 +248,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   #region Implemenation
 
-  ITerrainService _terrainService;
+  IThreadSafeColumnTerrainMap _terrainMap;
   SoilBarrierMap _soilBarrierMap;
   MapIndexService _mapIndexService;
   EventBus _eventBus;
@@ -263,7 +265,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   float _radiusAdjuster;
 
   /// <summary>The moisture override, registered in the direct moisture system component.</summary>
-  /// <remarks>Value <c>-1</c> means the moisture override was not setup.</remarks>
+  /// <remarks>Value <c>-1</c> means the moisture override wasn't setup.</remarks>
   /// <seealso cref="StartMoisturizing"/>
   /// <seealso cref="StopMoisturizing"/>
   int _moistureOverrideIndex = -1;
@@ -321,11 +323,11 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   /// <summary>It must be public for the injection logic to work.</summary>
   [Inject]
-  public void InjectDependencies(ITerrainService terrainService, SoilBarrierMap soilBarrierMap,
+  public void InjectDependencies(IThreadSafeColumnTerrainMap terrainMap, SoilBarrierMap soilBarrierMap,
                                  MapIndexService mapIndexService, EventBus eventBus,
                                  DirectSoilMoistureSystemAccessor directSoilMoistureSystemAccessor,
                                  BuildingWithRangeUpdateService buildingWithRangeUpdateService) {
-    _terrainService = terrainService;
+    _terrainMap = terrainMap;
     _soilBarrierMap = soilBarrierMap;
     _mapIndexService = mapIndexService;
     _eventBus = eventBus;
@@ -534,12 +536,12 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
     }
   }
 
-  /// <summary>Triggers the tiles update if something has been destroyed within the range.</summary>
+  /// <summary>Triggers the tile update if something has been destroyed within the range.</summary>
   [OnEvent]
   public void OnEntityDeletedEvent(EntityDeletedEvent e) {
     var blockObject = e.Entity.GetComponentFast<BlockObject>();
     if (!blockObject || !blockObject.IsFinished) {
-      return; // The preview objects cannot affect irrigation.
+      return; // The preview objects can't affect irrigation.
     }
     var coordinates = blockObject.Coordinates;
     var index = _mapIndexService.CoordinatesToIndex3D(coordinates);
@@ -550,12 +552,13 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   }
 
   /// <summary>The terrain changes must trigger the irrigation coverage re-calculation.</summary>
-  void OnTerrainHeightChanged(object sender, TerrainColumnChangedEventArgs e) {
-    var coordinates = new Vector3Int(e.Change.Coordinates.x, e.Change.Coordinates.y, _baseZ);
-    var index = _mapIndexService.CoordinatesToIndex3D(coordinates);
-    if (e.Change.To == _baseZ && _irrigationObstacles.Contains(index)
-        || e.Change.From == _baseZ && ReachableTiles.Contains(coordinates)) {
-      HostedDebugLog.Fine(this, "Terrain height change detected: {0}", e.Change);
+  void OnColumnTerrainMoved(object sender, int index3D) {
+    var changedCoordZ = index3D / _mapIndexService.VerticalStride;
+    var index2D = index3D % _mapIndexService.VerticalStride;
+    var coordinates = _mapIndexService.IndexToCoordinates(index2D, changedCoordZ);
+    if (changedCoordZ == _baseZ && _irrigationObstacles.Contains(index3D)
+        || changedCoordZ == _baseZ && ReachableTiles.Contains(coordinates)) {
+      HostedDebugLog.Fine(this, "Terrain height change detected: {0}", coordinates);
       _needMoistureSystemUpdate = true;
     }
   }
