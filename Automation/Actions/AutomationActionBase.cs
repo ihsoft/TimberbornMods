@@ -24,6 +24,7 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
   public static readonly DynamicClassSerializer<AutomationActionBase> ActionSerializerNullable = new(false);
 
   #region IAutomationAction implementation
+
   /// <inheritdoc/>
   public string TemplateFamily { get; set; } = "";
 
@@ -65,6 +66,7 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
 
   /// <inheritdoc/>
   public bool IsMarkedForCleanup { get; protected set; }
+
   #endregion
 
   #region IGameSerializable implemenation
@@ -90,6 +92,7 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
   #endregion
 
   #region API
+
   /// <inheritdoc/>
   public abstract string UiDescription { get; }
 
@@ -115,17 +118,22 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
   /// </summary>
   /// <seealso cref="Behavior"/>
   protected virtual void OnBehaviorToBeCleared() {}
+
   #endregion
 
   #region IAutomationConditionListener
+
   /// <inheritdoc/>
   public abstract void OnConditionState(IAutomationCondition automationCondition);
+
   #endregion
 
   #region Implementation
+
   /// <inheritdoc/>
   public override string ToString() {
     return $"TypeId={GetType()},Condition={Condition?.GetType()}";
   }
+
   #endregion
 }
