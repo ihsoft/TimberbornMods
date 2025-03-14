@@ -82,7 +82,18 @@ static class DebugEx {
   /// <seealso cref="ObjectToString"/>
   public static void Log(LogType type, string format, params object[] args) {
     try {
-      Debug.unityLogger.LogFormat(type, format, args.Select(ObjectToString).ToArray());
+      var objects = args.Select(x => {
+        switch (x) {
+          case IList list: {
+            List<object> res = [];
+            res.AddRange(from object item in list select ObjectToString(item));
+            return string.Join(",", res);
+          }
+          default:
+            return ObjectToString(x);
+        }
+      }).ToArray();
+      Debug.unityLogger.LogFormat(type, format, objects);
     } catch (Exception e) {
       Debug.LogErrorFormat("Failed to format logging string: {0}.\n{1}", format, e.StackTrace);
     }
