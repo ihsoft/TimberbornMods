@@ -31,13 +31,6 @@ sealed class MainDialog : IPanelController, ILoadableSingleton {
   TextField _resourcePathTextField;
   TextField _filenameTextField;
 
-  static readonly Dictionary<string, string> StandardStylesPaths = new() {
-      { "CommonStyle", "project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss" },
-      { "CoreStyle", "project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss" },
-      { "EntityPanelGameStyle", "project://database/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" },
-      { "EntityPanelCommonStyle", "project://database/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" },
-  };
-
   VisualElement _root;
 
   MainDialog(PanelStack panelStack, VisualElementLoader visualElementLoader, IAssetLoader assetLoader,
@@ -73,7 +66,7 @@ sealed class MainDialog : IPanelController, ILoadableSingleton {
   public void Load() {
     var panel = _uiFactory.LoadVisualTreeAsset("IgorZ/TimberUI-Dialog");
     _resourcePathTextField = panel.Q2<TextField>("ResourcePath");
-    _resourcePathTextField.text = "UI/Views/";
+    _resourcePathTextField.text = "UI/Views/IgorZ.Automation/RulesEditor";
     _filenameTextField = panel.Q2<TextField>("Filename");
     _filenameTextField.text = _settings.TargetPath.Value;
     panel.Q2<Button>("ExportUSSButton").clicked += ExportUss;
@@ -131,7 +124,9 @@ sealed class MainDialog : IPanelController, ILoadableSingleton {
     }
 
     var sb = new StringBuilder();
-    VisitTreeNode(sb, treeAsset, 0, 0);
+    VisitNodes2(sb, treeAsset);
+    //FIXME
+    DebugEx.Warning("Exported UXML:\n{0}", sb.ToString());
     using (var writer = new StreamWriter(fullPath)) {
       writer.Write(sb.ToString());
     }
@@ -140,38 +135,93 @@ sealed class MainDialog : IPanelController, ILoadableSingleton {
     _logTextLabel.ToggleDisplayStyle(true);
   }
 
-  static void VisitTreeNode(StringBuilder sb, VisualTreeAsset tree, int elementIdx, int depth) {
-    var element = tree.visualElementAssets[elementIdx];
-    sb.Append($"{new string(' ', depth * 4)}<{element.fullTypeName}");
-    if (element.TryGetAttributeValue("text", out var text)) {
-      sb.Append($" name=\"{text}\"");
+  static readonly Dictionary<string, VisualElement> STemporarySlotInsertionPoints = new();
+  static readonly List<int> SVeaIdsPath = [];
+
+  void VisitNodes2(StringBuilder sb, VisualTreeAsset tree) {
+    var dictionary = new Dictionary<int, List<VisualElementAsset>>();
+    var visualAssetsCount = tree.visualElementAssets?.Count ?? 0;
+    var templateAssetsCount = tree.templateAssets?.Count ?? 0;
+    for (var i = 0; i < visualAssetsCount + templateAssetsCount; i++) {
+      var visualElementAsset =
+          i < visualAssetsCount ? tree.visualElementAssets![i] : tree.templateAssets![i - visualAssetsCount];
+      if (!dictionary.TryGetValue(visualElementAsset.parentId, out var visualElementAssets)) {
+        visualElementAssets = [];
+        dictionary[visualElementAsset.parentId] = visualElementAssets;
+      }
+      visualElementAssets.Add(visualElementAsset);
     }
-    if (element.TryGetAttributeValue("name", out var name)) {
-      sb.Append($" name=\"{name}\"");
+    dictionary.TryGetValue(0, out var documentRoot);
+    if (documentRoot == null || documentRoot.Count == 0) {
+      //FIXME: report not that hard
+      throw new InvalidDataException("Cannot parse tree asset");
     }
-    if (element.classes.Length > 0) {
-      sb.Append($" class=\"{string.Join(" ", element.classes)}\"");
+    if (documentRoot.Count != 1 || documentRoot[0].fullTypeName != "UnityEngine.UIElements.UXML") {
+      //FIXME: report not that hard
+      throw new InvalidDataException("Cannot parse tree asset: not a UXML");
     }
-    if (element.TryGetAttributeValue("style", out var style)) {
-      sb.Append($" style=\"{style}\"");
-    }
-    if (elementIdx == tree.visualElementAssets.Count - 1
-        || elementIdx < tree.visualElementAssets.Count - 1 && element.stylesheets.Count == 0 
-           && tree.visualElementAssets[elementIdx + 1].parentId != element.id) {
-      sb.AppendLine(" />");
+    VisitTreeNode(sb, 0, tree, documentRoot[0], dictionary);
+  }
+
+  static void VisitTreeNode(StringBuilder sb, int depth, VisualTreeAsset tree, VisualElementAsset element, Dictionary<int, List<VisualElementAsset>> dictionary) {
+    var cc = new CreationContext(STemporarySlotInsertionPoints, null, null, null, null, SVeaIdsPath, null);
+    var target = new VisualElementRecord { Asset = element, TreeAsset = tree };
+    dictionary.TryGetValue(element.id, out var visualElementAssets);
+    if (visualElementAssets == null || visualElementAssets.Count == 0) {
       return;
     }
-    sb.AppendLine(">");
-    foreach (var styleSheet in element.stylesheets) {
-      var stylesheetPath =
-          StandardStylesPaths.TryGetValue(styleSheet.name, out var path) ? path : styleSheet.name + ".uss";
-      sb.AppendLine($"{new string(' ', (depth + 1) * 4)}<Style src=\"{stylesheetPath}\" />");
+    visualElementAssets.Sort(CompareForOrder);
+    foreach (var item in visualElementAssets) {
+      var flag = false;
+      if (item is TemplateAsset) {
+        cc.veaIdsPath.Add(item.id);
+        flag = true;
+      }
+      var context = new CreationContext(cc.slotInsertionPoints, cc.attributeOverrides, cc.serializedDataOverrides, tree, null /* target */, cc.veaIdsPath, null);
+      var visualElement = CloneSetupRecursively(item, dictionary, context);
+      if (flag) {
+        cc.veaIdsPath.Remove(item.id);
+      }
+      if (visualElement != null) {
+        target.Hierarchy.Add(visualElement);
+      }
     }
-    while (elementIdx < tree.visualElementAssets.Count - 1
-           && tree.visualElementAssets[elementIdx + 1].parentId == element.id) {
-      VisitTreeNode(sb, tree, ++elementIdx, depth + 1);
+    target.PrintTree(sb, depth);
+  }
+
+  static VisualElementRecord CloneSetupRecursively(
+      VisualElementAsset root, Dictionary<int, List<VisualElementAsset>> idToChildren, CreationContext context) {
+    if (root.skipClone) {
+      return null;
     }
-    sb.AppendLine($"{new string(' ', depth * 4)}</{element.fullTypeName}>");
+    var visualElement = new VisualElementRecord { Asset = root };
+    var templateAsset = root as TemplateAsset;
+    if (idToChildren.TryGetValue(root.id, out var children)) {
+      children.Sort(CompareForOrder);
+      foreach (var child in children) {
+        bool flag = false;
+        if (child is TemplateAsset) {
+          context.veaIdsPath.Add(child.id);
+          flag = true;
+        }
+        var visualElement2 = CloneSetupRecursively(child, idToChildren, context);
+        if (flag) {
+          context.veaIdsPath.Remove(child.id);
+        }
+        if (visualElement2 == null) {
+          continue;
+        }
+        visualElement.Hierarchy.Add(visualElement2);
+      }
+    }
+    if (templateAsset != null && context.slotInsertionPoints != null) {
+      context.slotInsertionPoints.Clear();
+    }
+    return visualElement;
+  }
+
+  static int CompareForOrder(VisualElementAsset a, VisualElementAsset b) {
+    return a.orderInDocument.CompareTo(b.orderInDocument);
   }
 
   void PrintStyles() {
