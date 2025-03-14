@@ -239,15 +239,9 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     public readonly List<Action> SignalChangeCallbacks = [];
 
     void Awake() {
-      //FIXME: somehow it fails. Hmm.
-      var inventory = GetEnabledComponent<Inventory>();
-      if (inventory) {
-        inventory.InventoryStockChanged += (_, _) => NotifyChange();
-      } else {
-        HostedDebugLog.Warning(this, "*** inventory is null!");
-      }
+      GetInventory(this).InventoryStockChanged += (_, _) => NotifyChange();
     }
-    
+
     void NotifyChange() {
       foreach (var callback in SignalChangeCallbacks) {
         callback();
