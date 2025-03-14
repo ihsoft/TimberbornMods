@@ -17,8 +17,7 @@ using UnityDev.Utils.LogUtilsLite;
 namespace IgorZ.Automation.AutomationSystem;
 
 /// <summary>The component that keeps all the automation state on the building.</summary>
-public sealed class AutomationBehavior
-    : BaseComponent, IPersistentEntity, IDeletableEntity, IFinishedStateListener, IPostInitializableEntity {
+public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDeletableEntity, IFinishedStateListener {
 
   #region Injection shortcuts
 
@@ -140,24 +139,11 @@ public sealed class AutomationBehavior
 
   #endregion
 
-  #region IPostInitializableEntity implementation
-
-  /// <inheritdoc/>
-  public void PostInitializeEntity() {
-    foreach (var action in _actions) {
-      action.Condition.Behavior = this;
-      action.Behavior = this;
-    }
-    CollectCleanedRules();
-    UpdateRegistration();
-  }
-
-  #endregion
-
   #region IFinishedStateListener implementation
 
   /// <inheritdoc/>
   public void OnEnterFinishedState() {
+    // Update rules that work on finished building only.
     foreach (var action in _actions) {
       action.Condition.SyncState();
     }
@@ -188,6 +174,17 @@ public sealed class AutomationBehavior
 
   void Awake() {
     BlockObject = GetComponentFast<BlockObject>();
+  }
+
+  void Start() {
+    // This needs to be executed after all the entity components are loaded and initialized.
+    foreach (var action in _actions) {
+      action.Condition.Behavior = this;
+      action.Behavior = this;
+      action.Condition.SyncState();
+    }
+    CollectCleanedRules();
+    UpdateRegistration();
   }
 
   void UpdateRegistration() {
