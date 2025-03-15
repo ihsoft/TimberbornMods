@@ -30,7 +30,6 @@ sealed class ConstructorEditorProvider : IEditorProvider {
 
   /// <inheritdoc/>
   public void MakeForRule(RuleRow ruleRow) {
-    var isNewRule = ruleRow.ConditionExpression == null;
     var root = _uiFactory.LoadVisualElement("IgorZ.Automation/ConstructorEditView");
     var ruleConstructor = new RuleConstructor(_uiFactory);
     root.Q("RuleConstructor").Add(ruleConstructor.Root);
@@ -50,13 +49,7 @@ sealed class ConstructorEditorProvider : IEditorProvider {
       ruleRow.ActionExpression = ruleConstructor.ActionConstructor.GetScript();
       ruleRow.SwitchToViewMode();
     };
-    root.Q<Button>("DiscardScriptBtn").clicked += () => {
-      if (isNewRule) {
-        ruleRow.MarkDeleted();
-      } else {
-        ruleRow.SwitchToViewMode();
-      }
-    };
+    root.Q<Button>("DiscardScriptBtn").clicked += ruleRow.DiscardChangesAndSwitchToViewMode;
 
     ruleRow.CreateEditView(root);
   }

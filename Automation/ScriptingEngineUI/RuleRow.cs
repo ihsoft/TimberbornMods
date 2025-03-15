@@ -70,6 +70,8 @@ sealed class RuleRow {
 
   public readonly AutomationBehavior ActiveBuilding;
 
+  public bool IsNew => _originalConditionExpression == null && _originalActionExpression == null;
+
   public bool IsModified {
     get => _isModified;
     private set {
@@ -141,11 +143,7 @@ sealed class RuleRow {
 
     // Controls.
     if (IsModified) {
-      CreateButton(ResetChangesLocKey, btn => {
-        ConditionExpression = _originalConditionExpression;
-        ActionExpression = _originalActionExpression;
-        SwitchToViewMode();
-      });
+      CreateButton(ResetChangesLocKey, _ => DiscardChangesAndSwitchToViewMode());
     }
     var ruleEditable = false;
     foreach (var provider in _editorProviders) {
@@ -162,9 +160,14 @@ sealed class RuleRow {
     OnStateChanged?.Invoke(this, EventArgs.Empty);
   }
 
-  public void MarkDeleted() {
-    IsDeleted = true;
-    OnStateChanged?.Invoke(this, EventArgs.Empty);
+  public void DiscardChangesAndSwitchToViewMode() {
+    if (IsNew) {
+      MarkDeleted();
+    } else {
+      ConditionExpression = _originalConditionExpression;
+      ActionExpression = _originalActionExpression;
+    }
+    SwitchToViewMode();
   }
 
   void CreateButton(string locKey, Action<Button> onClick, bool addAtBeginning = false) {
@@ -272,6 +275,11 @@ sealed class RuleRow {
       action = ExpressionParser.Instance.GetDescription(context);
       action = TextColors.ColorizeText($"<SolidHighlight>{action}</SolidHighlight>");
     }
+  }
+
+  void MarkDeleted() {
+    IsDeleted = true;
+    OnStateChanged?.Invoke(this, EventArgs.Empty);
   }
 
   #endregion

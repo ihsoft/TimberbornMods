@@ -31,7 +31,6 @@ sealed class ScriptEditorProvider : IEditorProvider {
 
   /// <inheritdoc/>
   public void MakeForRule(RuleRow ruleRow) {
-    var isNewRule = ruleRow.ConditionExpression == null;
     var root = _uiFactory.LoadVisualElement("IgorZ.Automation/ScriptEditView");
     var conditionEdit = root.Q<TextField>("ConditionScript");
     conditionEdit.SetValueWithoutNotify(ruleRow.ConditionExpression ?? "");
@@ -47,13 +46,7 @@ sealed class ScriptEditorProvider : IEditorProvider {
       ruleRow.ActionExpression = actionEdit.value;
       ruleRow.SwitchToViewMode();
     };
-    root.Q<Button>("DiscardScriptBtn").clicked += () => {
-      if (isNewRule) {
-        ruleRow.MarkDeleted();
-      } else {
-        ruleRow.SwitchToViewMode();
-      }
-    };
+    root.Q<Button>("DiscardScriptBtn").clicked += ruleRow.DiscardChangesAndSwitchToViewMode;
     root.Q<Button>("TestScriptBtn").clicked += () => {
       if (!RunRuleCheck(ruleRow, conditionEdit, actionEdit)) {
         return;
