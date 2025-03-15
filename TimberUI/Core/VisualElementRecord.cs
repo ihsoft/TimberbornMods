@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿// Timberborn Mod: TimberUI
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine.UIElements;
@@ -32,20 +36,12 @@ sealed record VisualElementRecord {
         sb.Append($" xmlns:{alias.Alias}=\"{alias.Prefix[..^1]}\"");
       }
     }
-    if (Asset is TemplateAsset templateAsset) {
-      sb.Append($" template=\"{templateAsset.templateAlias}\"");
-    }
-    if (Asset.TryGetAttributeValue("text", out var text)) {
-      sb.Append($" text=\"{text}\"");
-    }
-    if (Asset.TryGetAttributeValue("name", out var name)) {
-      sb.Append($" name=\"{name}\"");
-    }
-    if (Asset.classes.Length > 0) {
-      sb.Append($" class=\"{string.Join(" ", Asset.classes)}\"");
-    }
-    if (Asset.TryGetAttributeValue("style", out var style)) {
-      sb.Append($" style=\"{style}\"");
+    var properties = Asset.GetProperties();
+    if (properties != null) {
+      for (var i = 0; i < properties.Count; i++) {
+        sb.Append($" {properties[i]}=\"{EscapePropertyValue(properties[i + 1])}\"");
+        i++;
+      }
     }
     if (Hierarchy.Count == 0 && Asset.stylesheets.Count == 0 && Asset.stylesheetPaths.Count == 0) {
       sb.AppendLine(" />");
@@ -53,7 +49,7 @@ sealed record VisualElementRecord {
     }
     sb.AppendLine(">");
     var childIndentation = new string(' ', (depth + 1) * 4);
-    if (TreeAsset != null) {
+    if (Asset.fullTypeName == DocumentRootName) {
       var templates = TreeAsset.templateAssets.Select(x => x.templateAlias).Distinct().OrderBy(x => x).ToList();
       var engineAlias = TypesAliases.First(x => x.Prefix == "UnityEngine.UIElements.").Alias;
       foreach (var template in templates) {
@@ -72,6 +68,10 @@ sealed record VisualElementRecord {
       child.PrintTree(sb, depth + 1);
     }
     sb.AppendLine($"{parentIndentation}</{GetReducedTypeName(Asset)}>");
+  }
+
+  static string EscapePropertyValue(string value) {
+    return value.Replace("&", "&amp;").Replace("\"", "&quot;").Replace("<", "&lt;").Replace(">", "&gt;");
   }
 
   static string GetReducedTypeName(VisualElementAsset element) {

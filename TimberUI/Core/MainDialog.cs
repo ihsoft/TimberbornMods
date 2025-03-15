@@ -109,36 +109,23 @@ sealed class MainDialog : IPanelController, ILoadableSingleton {
     if (!fullPath.EndsWith(".uxml")) {
       fullPath = Path.Combine(fullPath, _resourcePathTextField.text + ".uxml");
     }
+    var sb = new StringBuilder();
     var error = TryLoadAsset<VisualTreeAsset>(_resourcePathTextField.text, out var treeAsset)
-        ?? VerifyTargetPath(fullPath);
+        ?? VerifyTargetPath(fullPath)
+        ?? VisitNodes(sb, treeAsset);
     if (error != null) {
       _errorText.text = error;
       _errorText.ToggleDisplayStyle(true);
       return;
     }
-    if (treeAsset.inlineSheet != null) {
-      var inlineSheetUss = StyleSheetToUss.ToUssString(treeAsset.inlineSheet);
-      if (inlineSheetUss != "") {
-        DebugEx.Warning("Non-empty inline style: {0}", inlineSheetUss);
-      }
-    }
-
-    var sb = new StringBuilder();
-    VisitNodes2(sb, treeAsset);
-    //FIXME
-    DebugEx.Warning("Exported UXML:\n{0}", sb.ToString());
     using (var writer = new StreamWriter(fullPath)) {
       writer.Write(sb.ToString());
     }
-
     _logTextLabel.text = $"Successfully exported {treeAsset.name} to {fullPath}";
     _logTextLabel.ToggleDisplayStyle(true);
   }
 
-  static readonly Dictionary<string, VisualElement> STemporarySlotInsertionPoints = new();
-  static readonly List<int> SVeaIdsPath = [];
-
-  void VisitNodes2(StringBuilder sb, VisualTreeAsset tree) {
+  static string VisitNodes(StringBuilder sb, VisualTreeAsset tree) {
     var dictionary = new Dictionary<int, List<VisualElementAsset>>();
     var visualAssetsCount = tree.visualElementAssets?.Count ?? 0;
     var templateAssetsCount = tree.templateAssets?.Count ?? 0;
@@ -153,69 +140,34 @@ sealed class MainDialog : IPanelController, ILoadableSingleton {
     }
     dictionary.TryGetValue(0, out var documentRoot);
     if (documentRoot == null || documentRoot.Count == 0) {
-      //FIXME: report not that hard
-      throw new InvalidDataException("Cannot parse tree asset");
+      return "Cannot parse tree asset";
     }
     if (documentRoot.Count != 1 || documentRoot[0].fullTypeName != "UnityEngine.UIElements.UXML") {
-      //FIXME: report not that hard
-      throw new InvalidDataException("Cannot parse tree asset: not a UXML");
+      return "Cannot parse tree asset: not a UXML";
     }
-    VisitTreeNode(sb, 0, tree, documentRoot[0], dictionary);
-  }
-
-  static void VisitTreeNode(StringBuilder sb, int depth, VisualTreeAsset tree, VisualElementAsset element, Dictionary<int, List<VisualElementAsset>> dictionary) {
-    var cc = new CreationContext(STemporarySlotInsertionPoints, null, null, null, null, SVeaIdsPath, null);
-    var target = new VisualElementRecord { Asset = element, TreeAsset = tree };
-    dictionary.TryGetValue(element.id, out var visualElementAssets);
-    if (visualElementAssets == null || visualElementAssets.Count == 0) {
-      return;
-    }
-    visualElementAssets.Sort(CompareForOrder);
-    foreach (var item in visualElementAssets) {
-      var flag = false;
-      if (item is TemplateAsset) {
-        cc.veaIdsPath.Add(item.id);
-        flag = true;
-      }
-      var context = new CreationContext(cc.slotInsertionPoints, cc.attributeOverrides, cc.serializedDataOverrides, tree, null /* target */, cc.veaIdsPath, null);
-      var visualElement = CloneSetupRecursively(item, dictionary, context);
-      if (flag) {
-        cc.veaIdsPath.Remove(item.id);
-      }
-      if (visualElement != null) {
-        target.Hierarchy.Add(visualElement);
-      }
-    }
-    target.PrintTree(sb, depth);
-  }
-
-  static VisualElementRecord CloneSetupRecursively(
-      VisualElementAsset root, Dictionary<int, List<VisualElementAsset>> idToChildren, CreationContext context) {
-    if (root.skipClone) {
+    var rootElement = documentRoot[0];
+    dictionary.TryGetValue(rootElement.id, out var elementAssets);
+    if (elementAssets == null || elementAssets.Count == 0) {
       return null;
     }
-    var visualElement = new VisualElementRecord { Asset = root };
-    var templateAsset = root as TemplateAsset;
-    if (idToChildren.TryGetValue(root.id, out var children)) {
-      children.Sort(CompareForOrder);
-      foreach (var child in children) {
-        bool flag = false;
-        if (child is TemplateAsset) {
-          context.veaIdsPath.Add(child.id);
-          flag = true;
-        }
-        var visualElement2 = CloneSetupRecursively(child, idToChildren, context);
-        if (flag) {
-          context.veaIdsPath.Remove(child.id);
-        }
-        if (visualElement2 == null) {
-          continue;
-        }
-        visualElement.Hierarchy.Add(visualElement2);
-      }
+    var target = new VisualElementRecord { Asset = rootElement, TreeAsset = tree };
+    elementAssets.Sort(CompareForOrder);
+    foreach (var item in elementAssets) {
+      target.Hierarchy.Add(VisitNodesRecursively(item, tree, dictionary));
     }
-    if (templateAsset != null && context.slotInsertionPoints != null) {
-      context.slotInsertionPoints.Clear();
+    target.PrintTree(sb, 0);
+    return null;
+  }
+
+  static VisualElementRecord VisitNodesRecursively(
+      VisualElementAsset root, VisualTreeAsset tree, Dictionary<int, List<VisualElementAsset>> idToChildren) {
+    var visualElement = new VisualElementRecord { Asset = root, TreeAsset = tree };
+    if (!idToChildren.TryGetValue(root.id, out var children)) {
+      return visualElement;
+    }
+    children.Sort(CompareForOrder);
+    foreach (var child in children) {
+      visualElement.Hierarchy.Add(VisitNodesRecursively(child, tree, idToChildren));
     }
     return visualElement;
   }
