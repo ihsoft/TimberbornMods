@@ -52,179 +52,195 @@
 }
 
 .bg-box--green {
-    background-image: resource('UI/Images/Backgrounds/bg-square-1');
-    -unity-slice-scale: 0.5px;
-    -unity-slice-left: 10;
-    -unity-slice-top: 10;
-    -unity-slice-right: 10;
-    -unity-slice-bottom: 10;
+    --background-image: resource('UI/Images/Backgrounds/bg-square-1');
+    --background-slice-scale: 0.5;
+    --background-slice: 10;
+    --background-slice-left: 10;
+    --background-slice-top: 10;
+    --background-slice-right: 10;
+    --background-slice-bottom: 10;
 }
 
 .bg-box--green.disabled {
-    background-image: resource('UI/Images/Backgrounds/bg-square-1-disabled');
+    --background-image: resource('UI/Images/Backgrounds/bg-square-1-disabled');
     opacity: 1;
 }
 
 .bg-box--red {
-    background-image: resource('UI/Images/Backgrounds/bg-square-2');
-    -unity-slice-scale: 0.5px;
-    -unity-slice-left: 10;
-    -unity-slice-top: 10;
-    -unity-slice-right: 10;
-    -unity-slice-bottom: 10;
+    --background-image: resource('UI/Images/Backgrounds/bg-square-2');
+    --background-slice-scale: 0.5;
+    --background-slice: 10;
+    --background-slice-left: 10;
+    --background-slice-top: 10;
+    --background-slice-right: 10;
+    --background-slice-bottom: 10;
 }
 
 .bg-box--brown {
-    background-image: resource('UI/Images/Backgrounds/bg-square-3');
-    -unity-slice-scale: 0.5px;
-    -unity-slice-left: 10;
-    -unity-slice-top: 10;
-    -unity-slice-right: 10;
-    -unity-slice-bottom: 10;
+    --background-image: resource('UI/Images/Backgrounds/bg-square-3');
+    --background-slice-scale: 0.5;
+    --background-slice: 10;
+    --background-slice-left: 10;
+    --background-slice-top: 10;
+    --background-slice-right: 10;
+    --background-slice-bottom: 10;
 }
 
 .bg-sub-box--pale-purple {
-    background-image: resource('UI/Images/Backgrounds/bg-1');
-    -unity-slice-scale: 0.5px;
-    -unity-slice-left: 9;
-    -unity-slice-top: 9;
-    -unity-slice-right: 9;
-    -unity-slice-bottom: 9;
+    --background-image: resource('UI/Images/Backgrounds/bg-1');
+    --background-slice-scale: 0.5;
+    --background-slice: 9;
+    --background-slice-left: 9;
+    --background-slice-top: 9;
+    --background-slice-right: 9;
+    --background-slice-bottom: 9;
 }
 
 .bg-sub-box--purple-striped {
-    background-image: resource('UI/Images/Backgrounds/bg-2-striped');
-    -unity-slice-scale: 0.5px;
-    -unity-slice-left: 9;
-    -unity-slice-top: 9;
-    -unity-slice-right: 9;
-    -unity-slice-bottom: 9;
+    --background-image: resource('UI/Images/Backgrounds/bg-2-striped');
+    --background-slice-scale: 0.5;
+    --background-slice: 9;
+    --background-slice-left: 9;
+    --background-slice-top: 9;
+    --background-slice-right: 9;
+    --background-slice-bottom: 9;
 }
 
 .bg-sub-box--green {
-    background-image: resource('UI/Images/Backgrounds/bg-3');
-    -unity-slice-scale: 0.5px;
-    -unity-slice-left: 9;
-    -unity-slice-top: 9;
-    -unity-slice-right: 9;
-    -unity-slice-bottom: 9;
+    --background-image: resource('UI/Images/Backgrounds/bg-3');
+    --background-slice-scale: 0.5;
+    --background-slice: 9;
+    --background-slice-left: 9;
+    --background-slice-top: 9;
+    --background-slice-right: 9;
+    --background-slice-bottom: 9;
 }
 
 .bg-sub-box--red-striped {
-    background-image: resource('UI/Images/Backgrounds/bg-6-striped');
-    -unity-slice-scale: 0.5px;
-    -unity-slice-left: 9;
-    -unity-slice-top: 9;
-    -unity-slice-right: 9;
-    -unity-slice-bottom: 9;
+    --background-image: resource('UI/Images/Backgrounds/bg-6-striped');
+    --background-slice-scale: 0.5;
+    --background-slice: 9;
+    --background-slice-left: 9;
+    --background-slice-top: 9;
+    --background-slice-right: 9;
+    --background-slice-bottom: 9;
 }
 
 .bg-sub-box--blue {
-    background-image: resource('UI/Images/Backgrounds/bg-7');
-    -unity-slice-scale: 0.5px;
-    -unity-slice-left: 9;
-    -unity-slice-top: 9;
-    -unity-slice-right: 9;
-    -unity-slice-bottom: 9;
+    --background-image: resource('UI/Images/Backgrounds/bg-7');
+    --background-slice-scale: 0.5;
+    --background-slice: 9;
+    --background-slice-left: 9;
+    --background-slice-top: 9;
+    --background-slice-right: 9;
+    --background-slice-bottom: 9;
 }
 
 .bg-sub-box--frame {
-    background-image: resource('UI/Images/Backgrounds/bg-4');
-    -unity-slice-scale: 0.5px;
-    -unity-slice-left: 16;
-    -unity-slice-top: 16;
-    -unity-slice-right: 16;
-    -unity-slice-bottom: 16;
+    --background-image: resource('UI/Images/Backgrounds/bg-4');
+    --background-slice-scale: 0.5;
+    --background-slice: 16;
+    --background-slice-left: 16;
+    --background-slice-top: 16;
+    --background-slice-right: 16;
+    --background-slice-bottom: 16;
 }
 
 .square-large--light-red {
-    background-image: resource('UI/Images/Backgrounds/bg-square-large-1');
-    -unity-slice-scale: 0.5px;
-    -unity-slice-left: 16;
-    -unity-slice-top: 16;
-    -unity-slice-right: 16;
-    -unity-slice-bottom: 16;
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-1');
+    --background-slice-scale: 0.5;
+    --background-slice: 16;
+    --background-slice-left: 16;
+    --background-slice-top: 16;
+    --background-slice-right: 16;
+    --background-slice-bottom: 16;
 }
 
 .square-large--green {
-    background-image: resource('UI/Images/Backgrounds/bg-square-large-2');
-    -unity-slice-scale: 0.5px;
-    -unity-slice-left: 16;
-    -unity-slice-top: 16;
-    -unity-slice-right: 16;
-    -unity-slice-bottom: 16;
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-2');
+    --background-slice-scale: 0.5;
+    --background-slice: 16;
+    --background-slice-left: 16;
+    --background-slice-top: 16;
+    --background-slice-right: 16;
+    --background-slice-bottom: 16;
 }
 
 .square-large--brown {
-    background-image: resource('UI/Images/Backgrounds/bg-square-large-8');
-    -unity-slice-scale: 0.5px;
-    -unity-slice-left: 16;
-    -unity-slice-top: 16;
-    -unity-slice-right: 16;
-    -unity-slice-bottom: 16;
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-8');
+    --background-slice-scale: 0.5;
+    --background-slice: 16;
+    --background-slice-left: 16;
+    --background-slice-top: 16;
+    --background-slice-right: 16;
+    --background-slice-bottom: 16;
 }
 
 .square-large--red {
-    background-image: resource('UI/Images/Backgrounds/bg-square-large-3');
-    -unity-slice-scale: 0.5px;
-    -unity-slice-left: 16;
-    -unity-slice-top: 16;
-    -unity-slice-right: 16;
-    -unity-slice-bottom: 16;
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-3');
+    --background-slice-scale: 0.5;
+    --background-slice: 16;
+    --background-slice-left: 16;
+    --background-slice-top: 16;
+    --background-slice-right: 16;
+    --background-slice-bottom: 16;
 }
 
 .square-large--dark-red {
-    background-image: resource('UI/Images/Backgrounds/bg-square-large-5');
-    -unity-slice-scale: 0.5px;
-    -unity-slice-left: 16;
-    -unity-slice-top: 16;
-    -unity-slice-right: 16;
-    -unity-slice-bottom: 16;
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-5');
+    --background-slice-scale: 0.5;
+    --background-slice: 16;
+    --background-slice-left: 16;
+    --background-slice-top: 16;
+    --background-slice-right: 16;
+    --background-slice-bottom: 16;
 }
 
 .square-large--transparent-purple {
-    background-image: resource('UI/Images/Backgrounds/bg-square-large-6');
-    -unity-slice-scale: 0.5px;
-    -unity-slice-left: 16;
-    -unity-slice-top: 16;
-    -unity-slice-right: 16;
-    -unity-slice-bottom: 16;
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-6');
+    --background-slice-scale: 0.5;
+    --background-slice: 16;
+    --background-slice-left: 16;
+    --background-slice-top: 16;
+    --background-slice-right: 16;
+    --background-slice-bottom: 16;
 }
 
 .bg-striped--green {
-    background-image: resource('UI/Images/Backgrounds/bg-striped-1');
-    -unity-slice-scale: 0.5px;
-    -unity-slice-top: 8;
-    -unity-slice-right: 13;
-    -unity-slice-bottom: 8;
-    -unity-slice-left: 81;
+    --background-image: resource('UI/Images/Backgrounds/bg-striped-1');
+    --background-slice-scale: 0.5;
+    --background-slice-top: 8;
+    --background-slice-right: 13;
+    --background-slice-bottom: 8;
+    --background-slice-left: 81;
 }
 
 .bg-striped--red {
-    background-image: resource('UI/Images/Backgrounds/bg-striped-2');
-    -unity-slice-scale: 0.5px;
-    -unity-slice-top: 8;
-    -unity-slice-right: 13;
-    -unity-slice-bottom: 8;
-    -unity-slice-left: 81;
+    --background-image: resource('UI/Images/Backgrounds/bg-striped-2');
+    --background-slice-scale: 0.5;
+    --background-slice-top: 8;
+    --background-slice-right: 13;
+    --background-slice-bottom: 8;
+    --background-slice-left: 81;
 }
 
 .button-game {
-    background-image: resource('UI/Images/Buttons/button-game');
-    -unity-slice-scale: 0.5px;
-    -unity-slice-left: 24;
-    -unity-slice-top: 24;
-    -unity-slice-right: 24;
-    -unity-slice-bottom: 24;
+    --background-image: resource('UI/Images/Buttons/button-game');
+    --background-slice-scale: 0.5;
+    --background-slice: 24;
+    --background-slice-left: 24;
+    --background-slice-top: 24;
+    --background-slice-right: 24;
+    --background-slice-bottom: 24;
     --click-sound: 'UI.Click';
 }
 
 .button-game:hover:enabled {
-    background-image: resource('UI/Images/Buttons/button-game-hover');
+    --background-image: resource('UI/Images/Buttons/button-game-hover');
 }
 
 .button-game:hover:enabled:active {
-    background-image: resource('UI/Images/Buttons/button-game-active');
+    --background-image: resource('UI/Images/Buttons/button-game-active');
 }
 
 .button-wrapper {
@@ -492,16 +508,17 @@
 }
 
 .dropdown__selection {
-    background-image: resource('UI/Images/Backgrounds/bg-square-1');
-    -unity-slice-scale: 0.5px;
-    -unity-slice-left: 10;
-    -unity-slice-top: 10;
-    -unity-slice-right: 10;
-    -unity-slice-bottom: 10;
+    --background-image: resource('UI/Images/Backgrounds/bg-square-1');
+    --background-slice-scale: 0.5;
+    --background-slice: 10;
+    --background-slice-left: 10;
+    --background-slice-top: 10;
+    --background-slice-right: 10;
+    --background-slice-bottom: 10;
 }
 
 .dropdown__selectable.dropdown__selection:enabled:hover {
-    background-image: resource('UI/Images/Backgrounds/bg-square-4');
+    --background-image: resource('UI/Images/Backgrounds/bg-square-4');
 }
 
 .dropdown__label {
@@ -579,12 +596,13 @@
     flex-shrink: 0;
     flex-grow: 1;
     margin: -8px;
-    background-image: resource('UI/Images/Core/border_frameonly');
-    -unity-slice-scale: 0.25px;
-    -unity-slice-left: 64;
-    -unity-slice-top: 64;
-    -unity-slice-right: 64;
-    -unity-slice-bottom: 64;
+    --background-image: resource('UI/Images/Core/border_frameonly');
+    --background-slice-scale: 0.25;
+    --background-slice: 64;
+    --background-slice-left: 64;
+    --background-slice-top: 64;
+    --background-slice-right: 64;
+    --background-slice-bottom: 64;
 }
 
 .map-item {
@@ -742,12 +760,13 @@
 .map-selection__description-background {
     flex-grow: 1;
     flex-shrink: 1;
-    background-image: resource('UI/Images/Backgrounds/bg-8');
-    -unity-slice-scale: 0.5px;
-    -unity-slice-left: 10;
-    -unity-slice-top: 10;
-    -unity-slice-right: 10;
-    -unity-slice-bottom: 10;
+    --background-image: resource('UI/Images/Backgrounds/bg-8');
+    --background-slice-scale: 0.5;
+    --background-slice: 10;
+    --background-slice-left: 10;
+    --background-slice-top: 10;
+    --background-slice-right: 10;
+    --background-slice-bottom: 10;
 }
 
 .map-selection__description-background > .unity-scroll-view > .unity-scroll-view__content-and-vertical-scroll-container {
@@ -777,12 +796,13 @@
 }
 
 .map-selection__map-type-button {
-    background-image: resource('UI/Images/Buttons/toggle-button');
-    -unity-slice-scale: 0.5px;
-    -unity-slice-left: 88;
-    -unity-slice-top: 88;
-    -unity-slice-right: 88;
-    -unity-slice-bottom: 88;
+    --background-image: resource('UI/Images/Buttons/toggle-button');
+    --background-slice-scale: 0.5;
+    --background-slice: 88;
+    --background-slice-left: 88;
+    --background-slice-top: 88;
+    --background-slice-right: 88;
+    --background-slice-bottom: 88;
     --click-sound: 'UI.Click';
     height: 34px;
     justify-content: center;
@@ -791,11 +811,11 @@
 }
 
 .map-selection__map-type-button.selected {
-    background-image: resource('UI/Images/Buttons/toggle-button-selected');
+    --background-image: resource('UI/Images/Buttons/toggle-button-selected');
 }
 
 .map-selection__map-type-button:hover {
-    background-image: resource('UI/Images/Buttons/toggle-button-hover');
+    --background-image: resource('UI/Images/Buttons/toggle-button-hover');
 }
 
 .map-selection__map-type-button:hover > .map-selection__map-type-button-label {
