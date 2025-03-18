@@ -279,39 +279,46 @@ namespace UnityEditor.StyleSheets
         {
             List<StyleProperty> expandedProperties = [];
             foreach (var property in rule.properties) {
+                if (property.name == "-unity-font-definition") {
+                    DebugEx.Warning("Font definition detected. This property is not supported in USS: {0}", property.values);
+                }
                 if (property.name.StartsWith("--")) {
                     switch (property.name) {
                         case "--background-image":
                             expandedProperties.Add(property);
-                            expandedProperties.Add(CloneProperty(property, "background-image"));
+                            //expandedProperties.Add(CloneProperty(property, "background-image"));
                             break;
                         case "--background-slice-scale":
                             expandedProperties.Add(property);
-                            var clone = CloneProperty(property, "-unity-slice-scale");
-                            expandedProperties.Add(clone);
+                            // var clone = CloneProperty(property, "-unity-slice-scale");
+                            // expandedProperties.Add(clone);
                             break;
                         case "--background-slice":
                             expandedProperties.Add(property);
-                            expandedProperties.Add(CloneProperty(property, "-unity-slice-left"));
-                            expandedProperties.Add(CloneProperty(property, "-unity-slice-top"));
-                            expandedProperties.Add(CloneProperty(property, "-unity-slice-right"));
-                            expandedProperties.Add(CloneProperty(property, "-unity-slice-bottom"));
+                            // expandedProperties.Add(CloneProperty(property, "-unity-slice-left"));
+                            // expandedProperties.Add(CloneProperty(property, "-unity-slice-top"));
+                            // expandedProperties.Add(CloneProperty(property, "-unity-slice-right"));
+                            // expandedProperties.Add(CloneProperty(property, "-unity-slice-bottom"));
+                            // expandedProperties.Add(CloneProperty(property, "--background-slice-left"));
+                            // expandedProperties.Add(CloneProperty(property, "--background-slice-top"));
+                            // expandedProperties.Add(CloneProperty(property, "--background-slice-right"));
+                            // expandedProperties.Add(CloneProperty(property, "--background-slice-bottom"));
                             break;
                         case "--background-slice-left":
                             expandedProperties.Add(property);
-                            expandedProperties.Add(CloneProperty(property, "-unity-slice-left"));
+                            // expandedProperties.Add(CloneProperty(property, "-unity-slice-left"));
                             break;
                         case "--background-slice-top":
                             expandedProperties.Add(property);
-                            expandedProperties.Add(CloneProperty(property, "-unity-slice-top"));
+                            // expandedProperties.Add(CloneProperty(property, "-unity-slice-top"));
                             break;
                         case "--background-slice-right":
                             expandedProperties.Add(property);
-                            expandedProperties.Add(CloneProperty(property, "-unity-slice-right"));
+                            // expandedProperties.Add(CloneProperty(property, "-unity-slice-right"));
                             break;
                         case "--background-slice-bottom":
                             expandedProperties.Add(property);
-                            expandedProperties.Add(CloneProperty(property, "-unity-slice-bottom"));
+                            // expandedProperties.Add(CloneProperty(property, "-unity-slice-bottom"));
                             break;
                         case "--click-sound":
                             expandedProperties.Add(property);
@@ -326,7 +333,6 @@ namespace UnityEditor.StyleSheets
                 }
             }
 
-            //foreach (var property in rule.properties)
             foreach (var property in expandedProperties)
             {
                 options.comments.TryGet(property, comment =>
