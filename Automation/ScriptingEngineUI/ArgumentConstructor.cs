@@ -81,7 +81,7 @@ sealed class ArgumentConstructor : BaseConstructor {
 
   public ArgumentConstructor(UiFactory uiFactory) : base(uiFactory) {
     _typeSelectionDropdown = uiFactory.CreateSimpleDropdown(_ => UpdateTypeSelection());
-    _textField = uiFactory.CreateTextField(width: 100);
+    _textField = uiFactory.CreateTextField(width: 100, classes: [UiFactory.GameTextBigClass]);
     Root = MakeRow(_typeSelectionDropdown, _textField);
   }
 
