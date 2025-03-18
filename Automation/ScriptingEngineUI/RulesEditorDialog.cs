@@ -60,10 +60,11 @@ sealed class RulesEditorDialog : IPanelController {
 
   public void Show(AutomationBehavior behavior, Action onClosed) {
     _root = _uiFactory.LoadVisualTreeAsset("IgorZ.Automation/RulesEditor");
+    _root.Q<Label>("Header").text = _uiFactory.T("IgorZ.Automation.Scripting.Editor.DialogHeader");
     _ruleRowsContainer = _root.Q<VisualElement>("RuleRowsContainer");
-    _confirmButton = _root.Q<Button>("ConfirmButton");
-    _confirmButton.clicked += () => OnUIConfirmed();
+    _root.Q<Button>("ConfirmButton").clicked += () => OnUIConfirmed();
     _root.Q<Button>("CancelButton").clicked += Close;
+    _root.Q<Button>("CloseButton").clicked += Close;
     _root.Q<Button>("MoreInfoButton").clicked += () => Application.OpenURL(_uiFactory.T(ReadMoreLinkLocKey));
 
     var buttons = _root.Q("Buttons");
@@ -100,7 +101,6 @@ sealed class RulesEditorDialog : IPanelController {
 
   VisualElement _ruleRowsContainer;
   AutomationBehavior _activeBuilding;
-  Button _confirmButton;
 
   RulesEditorDialog(UiFactory uiFactory, PanelStack panelStack, DialogBoxShower dialogBoxShower,
                     ScriptEditorProvider scriptEditorProvider,
