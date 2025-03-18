@@ -20,7 +20,7 @@ sealed record VisualElementRecord {
       { "EntityPanelCommonStyle", "project://database/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" },
   };
 
-  static readonly List<(string Prefix, string Alias)> TypesAliases = [
+  readonly List<(string Prefix, string Alias)> TypesAliases = [
       ("UnityEngine.UIElements.", "engine"),
   ];
 
@@ -31,16 +31,31 @@ sealed record VisualElementRecord {
   public void PrintTree(StringBuilder sb, int depth) {
     var parentIndentation = new string(' ', depth * 4);
     sb.Append($"{parentIndentation}<{GetReducedTypeName(Asset)}");
+    var properties = Asset.GetProperties();
     if (Asset.fullTypeName == DocumentRootName) {
+      if (properties != null) {
+        for (var i = 0; i < properties.Count; i++) {
+          var name = properties[i];
+          var value = properties[i + 1];
+          i++;
+          if (value.StartsWith("Unity") && TypesAliases.All(x => x.Alias != name)) {
+            TypesAliases.Add((value + ".", name));
+          }
+        }
+      }
       foreach (var alias in TypesAliases) {
         sb.Append($" xmlns:{alias.Alias}=\"{alias.Prefix[..^1]}\"");
       }
     }
-    var properties = Asset.GetProperties();
     if (properties != null) {
       for (var i = 0; i < properties.Count; i++) {
-        sb.Append($" {properties[i]}=\"{EscapePropertyValue(properties[i + 1])}\"");
+        var name = properties[i];
+        var value = properties[i + 1];
         i++;
+        if (Asset.fullTypeName == DocumentRootName && TypesAliases.Any(x => x.Alias == name)) {
+          continue;
+        }
+        sb.Append($" {name}=\"{EscapePropertyValue(value)}\"");
       }
     }
     if (Hierarchy.Count == 0 && Asset.stylesheets.Count == 0 && Asset.stylesheetPaths.Count == 0) {
@@ -74,7 +89,7 @@ sealed record VisualElementRecord {
     return value.Replace("&", "&amp;").Replace("\"", "&quot;").Replace("<", "&lt;").Replace(">", "&gt;");
   }
 
-  static string GetReducedTypeName(VisualElementAsset element) {
+  string GetReducedTypeName(VisualElementAsset element) {
     var fullTypeName = element.fullTypeName;
     foreach (var (prefix, alias) in TypesAliases) {
       if (fullTypeName.StartsWith(prefix)) {
