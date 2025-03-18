@@ -91,7 +91,7 @@ public class UiFactory {
     var root = new NineSliceVisualElement();
     root.AddToClassList("bg-sub-box--green");
     root.AddToClassList("entity-sub-panel");
-    root.Clear();
+    _visualElementInitializer.InitializeVisualElement(root);
     return root;
   }
 
@@ -113,7 +113,7 @@ public class UiFactory {
   /// Classes to add to the control. If not set, then the component will be set up for the entity panel.
   /// </param>
   public Label CreateLabel(string locKey = null, string[] classes = null) {
-    var label = new Label();
+    var label = new NineSliceLabel();
     if (locKey != null) {
       label.text = T(locKey);
     }
@@ -124,6 +124,7 @@ public class UiFactory {
     } else {
       label.AddToClassList(EntityPanelTextClass);
     }
+    _visualElementInitializer.InitializeVisualElement(label);
     return label;
   }
 
@@ -131,7 +132,7 @@ public class UiFactory {
   /// <param name="width">Optional width override.</param>
   /// <param name="classes">Optional classes to add to the control.</param>
   public TextField CreateTextField(int? width = null, string[] classes = null) {
-    var textField = new TextField();
+    var textField = new NineSliceTextField();
     textField.AddToClassList("text-field");
     if (width.HasValue) {
       textField.style.width = width.Value;
@@ -141,6 +142,7 @@ public class UiFactory {
         textField.AddToClassList(cls);
       }
     }
+    _visualElementInitializer.InitializeVisualElement(textField);
     return textField;
   }
 
@@ -167,6 +169,7 @@ public class UiFactory {
     } else {
       button.AddToClassList(EntityPanelTextClass);
     }
+    _visualElementInitializer.InitializeVisualElement(button);
     var setPadding = padding ?? StandardButtonPadding;
     button.style.paddingTop = setPadding.top;
     button.style.paddingLeft = setPadding.left;
@@ -200,6 +203,7 @@ public class UiFactory {
       toggle.AddToClassList(EntityPanelTextClass);
       toggle.AddToClassList("entity-panel__toggle");
     }
+    _visualElementInitializer.InitializeVisualElement(toggle);
     toggle.RegisterValueChangedCallback(evt => onValueChangedFn(evt));
     if (spacing >= 0) {
       toggle.style.marginBottom = spacing;
