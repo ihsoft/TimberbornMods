@@ -1,7 +1,28 @@
-<UnityEngine.UIElements.UXML>
+<engine:UXML xmlns:engine="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:Template name="Box" src="project://database/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml" />
     <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
     <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
-    <Style src="ModdingStyle.uss" />
-    <Style src="OptionsStyle.uss" />
-    <UnityEngine.UIElements.VisualElement name="ModManagerBox" class="content-row-centered" />
-</UnityEngine.UIElements.UXML>
+    <Style src="project://database/Assets/Resources/UI/Views/Modding/ModdingStyle.uss" />
+    <Style src="project://database/Assets/Resources/UI/Views//Options/OptionsStyle.uss" />
+    <engine:VisualElement name="ModManagerBox" class="content-row-centered" picking-mode="Ignore">
+        <engine:Instance template="Box" class="mod-manager-box">
+            <engine:VisualElement name="TopButtons" class="mod-manager-box__top-buttons">
+                <Timberborn.CoreUI.LocalizableButton name="ResetOrderButton" text="Reset order" text-loc-key="Modding.ResetOrder" focusable="false" class="mod-manager-box__top-button text--default text--bold" />
+                <Timberborn.CoreUI.LocalizableButton name="UploadButton" text="Upload" text-loc-key="Modding.ShowUploadPanel" focusable="false" class="mod-manager-box__top-button text--default text--bold" />
+            </engine:VisualElement>
+            <engine:ScrollView name="Items" class="scroll--green-decorated mod-manager-box__list" />
+            <engine:VisualElement name="BottomButtons" class="mod-manger-box__bottom-buttons">
+                <Timberborn.CoreUI.NineSliceButton name="DownloadButton" class="wide-menu-button">
+                    <engine:Image name="DownloadIcon" class="mod-manger-box__bottom-button-icon mod-manger-box__bottom-button-icon--download" />
+                    <Timberborn.CoreUI.LocalizableLabel name="DownloadModsLabel" text="Download mods" text-loc-key="Modding.DownloadMods" class="mod-manger-box__bottom-button" />
+                </Timberborn.CoreUI.NineSliceButton>
+                <Timberborn.CoreUI.NineSliceButton name="BrowseButton" class="wide-menu-button">
+                    <engine:Image name="BrowseIcon" class="mod-manger-box__bottom-button-icon mod-manger-box__bottom-button-icon--browse" />
+                    <Timberborn.CoreUI.LocalizableLabel name="BrowseModsLabel" text="Browse local mods" text-loc-key="Modding.BrowseMods" class="mod-manger-box__bottom-button" />
+                </Timberborn.CoreUI.NineSliceButton>
+            </engine:VisualElement>
+            <Timberborn.CoreUI.LocalizableButton name="ConfirmButton" text="OK" text-loc-key="Core.OK" class="mod-manger-box__confirm-button menu-button menu-button--medium" />
+            <Timberborn.CoreUI.LocalizableLabel name="RestartWarning" text="Changes will not take effect until restart" text-loc-key="Modding.RestartWarning" class="mod-manager-box__restart-label" />
+        </engine:Instance>
+    </engine:VisualElement>
+</engine:UXML>

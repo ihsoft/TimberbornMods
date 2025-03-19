@@ -60,7 +60,7 @@
     -unity-slice-top: 10;
     -unity-slice-left: 10;
     -unity-slice-right: 10;
-    -unity-slice-scale: 0.5pxpx;
+    -unity-slice-scale: 0.5px;
 }
 
 .mod-manager-box {
@@ -93,7 +93,7 @@
     -unity-slice-top: 10;
     -unity-slice-left: 10;
     -unity-slice-right: 10;
-    -unity-slice-scale: 0.5pxpx;
+    -unity-slice-scale: 0.5px;
 }
 
 .mod-manger-box__bottom-buttons {

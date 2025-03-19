@@ -1,0 +1,606 @@
+.background__main {
+    width: 100%;
+}
+
+.background__logo {
+    height: 104px;
+    align-items: center;
+    justify-content: center;
+}
+
+.background__timberborn-logo {
+    background-image: resource('UI/Images/MainMenu/logo');
+    width: 425px;
+    height: 65px;
+    justify-content: center;
+    position: absolute;
+    top: 19px;
+    align-self: center;
+}
+
+.background__logo > .triple-stretch__center {
+    background-image: resource('UI/Images/MainMenu/bg_top_bar');
+    min-width: 1920px;
+    max-width: 1920px;
+}
+
+.background__logo > .triple-stretch__side {
+    background-image: resource('UI/Images/MainMenu/bg_top_bar_stretch');
+}
+
+.background__top-bar {
+    height: 10px;
+    position: absolute;
+    top: -5px;
+    align-items: center;
+    justify-content: center;
+}
+
+.background__top-bar > .triple-stretch__center {
+    background-image: resource('UI/Images/MainMenu/bg_spacing_bar');
+    min-width: 1920px;
+    max-width: 1920px;
+    height: 100%;
+}
+
+.background__top-bar > .triple-stretch__side {
+    background-image: resource('UI/Images/MainMenu/bg_spacing_bar_stretch');
+}
+
+.background__content {
+    align-items: center;
+    justify-content: center;
+}
+
+.background__content > .triple-stretch__center {
+    background-image: resource('UI/Images/MainMenu/bg_main');
+    min-width: 1920px;
+    max-width: 1920px;
+    align-items: center;
+}
+
+.background__content > .triple-stretch__side {
+    background-image: resource('UI/Images/MainMenu/bg_main_stretch');
+}
+
+.background__bottom-bar {
+    position: absolute;
+    height: 10px;
+    bottom: -5px;
+    align-items: center;
+    justify-content: center;
+}
+
+.background__bottom-bar > .triple-stretch__center {
+    background-image: resource('UI/Images/MainMenu/bg_spacing_bar_flip');
+    min-width: 1920px;
+    max-width: 1920px;
+}
+
+.background__bottom-bar > .triple-stretch__side {
+    background-image: resource('UI/Images/MainMenu/bg_spacing_bar_stretch');
+}
+
+.main-menu-panel {
+    padding: 35px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.main-menu-panel__dev-mode-alert {
+    color: red;
+    font-size: 12px;
+}
+
+.menu-button--large-text {
+    font-size: 17px;
+}
+
+.welcome-screen-box {
+    padding: 45px;
+    width: 650px;
+}
+
+.welcome-screen-box--experimental {
+    position: absolute;
+    right: -360px;
+    padding: 45px;
+    width: 360px;
+    top: 0;
+}
+
+.welcome-screen-box__header--experimental {
+    -unity-text-align: middle-center;
+}
+
+.welcome-screen-box__body {
+    padding: 5px;
+    margin: 10px 0;
+    -unity-text-align: upper-left;
+}
+
+.menu-label {
+    color: rgb(255, 255, 255);
+    font-size: 14px;
+    white-space: normal;
+    padding: 5px;
+}
+
+.main-menu-panel__marketing-buttons {
+    flex-direction: row;
+}
+
+.main-menu-panel__marketing-button {
+    width: 40px;
+    height: 40px;
+    margin: 8px 4px 0 4px;
+    --click-sound: 'UI.Click';
+}
+
+.main-menu-panel__marketing-button:hover:enabled:active {
+    -unity-background-image-tint-color: rgb(153, 170, 181);
+}
+
+.main-menu-panel__marketing-button--discord {
+    background-image: resource('UI/Images/Branding/discord-logomark');
+}
+
+.main-menu-panel__marketing-button--discord:hover:enabled {
+    -unity-background-image-tint-color: rgb(88, 101, 242);
+}
+
+.main-menu-panel__marketing-button--merchandise {
+    background-image: resource('UI/Images/Branding/merchandise');
+}
+
+.main-menu-panel__marketing-button--merchandise:hover:enabled {
+    -unity-background-image-tint-color: rgb(245, 69, 69);
+}
+
+.title-screen {
+    background-image: resource('UI/Images/LoadingScreen/mainmenu_bg_Manual');
+    flex-grow: 1;
+    flex-shrink: 1;
+    -unity-background-scale-mode: scale-and-crop;
+}
+
+.title-screen__content {
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+.title-screen__footer {
+    width: 100%;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    padding: 0 10px 10px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.title-screen__footer-text {
+    font-size: 14px;
+    color: rgb(238, 238, 238);
+    -unity-text-align: middle-center;
+}
+
+.title-screen__footer-element {
+    width: 33%;
+}
+
+.title-screen__left-panel {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.title-screen__right-panel {
+    align-items: flex-end;
+}
+
+.title-screen__rosetta-warning-container {
+    background-color: rgba(0, 0, 0, 0.65);
+    padding: 6px;
+    flex-direction: row;
+    align-self: center;
+}
+
+.main-menu-panel__language-button {
+    background-color: rgba(0, 0, 0, 0.65);
+    padding: 5px 8px;
+    --click-sound: 'UI.Click';
+}
+
+.main-menu-panel__language-button:hover {
+    color: rgb(0, 0, 0);
+    background-color: rgba(205, 208, 181, 0.8);
+}
+
+.new-game-panel {
+    height: 720px;
+}
+
+.new-game_panel__content {
+    flex-grow: 1;
+}
+
+.new-game__logo-spacer {
+    height: 10px;
+    width: 100%;
+    background-image: resource('UI/Images/MainMenu/bg_top_bar_spacing');
+}
+
+.new-game__navigation-buttons {
+    flex-direction: row;
+    align-items: center;
+    position: absolute;
+    bottom: -22px;
+}
+
+.new-game__navigation-buttons > .menu-button {
+    margin: 0 2px;
+}
+
+.new-game__main-content {
+    padding: 25px;
+    flex-grow: 1;
+}
+
+.new-game__summary {
+    background-image: resource('UI/Images/MainMenu/faction_name');
+    width: 284px;
+    height: 46px;
+    margin-bottom: 20px;
+    margin-top: 10px;
+}
+
+.new-game__summary-text {
+    color: rgb(255, 255, 255);
+    font-size: 18px;
+    -unity-text-align: middle-center;
+}
+
+.faction-item__logo {
+    width: 48px;
+    height: 48px;
+    background-image: resource('UI/Images/Core/faction_icon_lock');
+}
+
+.faction-item-selected__logo {
+    position: absolute;
+    top: 5px;
+}
+
+.faction-item__logo-background {
+    width: 52px;
+    height: 52px;
+    background-image: resource('UI/Images/Backgrounds/bg-circle-big-1');
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.faction-item__avatar {
+    width: 156px;
+    height: 210px;
+    margin-top: 10px;
+    background-image: resource('UI/Images/MainMenu/faction_avatar_lock');
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.faction-item-selected__avatar {
+    width: 210px;
+    height: 280px;
+    margin-top: 30px;
+    background-image: resource('UI/Images/MainMenu/faction_avatar_lock');
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.faction-item__shadow {
+    width: 142px;
+    height: 34px;
+    background-image: resource('UI/Images/MainMenu/faction_select_shadow');
+    -unity-background-scale-mode: scale-to-fit;
+    position: absolute;
+    bottom: -5px;
+}
+
+.faction-item-selected__background {
+    background-image: resource('UI/Images/MainMenu/faction_characters_bg');
+    width: 352px;
+    height: 355px;
+    margin-bottom: 5px;
+}
+
+.faction-item-selected__name {
+    background-image: resource('UI/Images/MainMenu/faction_name');
+    width: 284px;
+    height: 46px;
+    position: absolute;
+    bottom: 0;
+}
+
+.name__text {
+    color: white;
+    font-size: 14px;
+}
+
+.unlock-condition__text {
+    color: yellow;
+    font-size: 14px;
+    min-height: 20px;
+}
+
+.faction-item-selected__left-arrow {
+    position: absolute;
+    left: 25px;
+}
+
+.faction-item-selected__right-arrow {
+    position: absolute;
+    right: 25px;
+}
+
+.selected-faction > .faction-item-normal {
+    display: none;
+}
+
+.normal-faction {
+    margin-bottom: 100px;
+}
+
+.normal-faction > .faction-item-selected {
+    display: none;
+}
+
+.faction-list {
+    margin-top: 20px;
+    flex-wrap: nowrap;
+}
+
+.faction-item-selected__description {
+    height: 135px;
+    margin: 0 -30px;
+}
+
+.faction-item-selected__description-text {
+    color: white;
+    font-size: 13px;
+    white-space: normal;
+    max-width: 325px;
+    -unity-text-align: middle-left;
+    flex-grow: 1;
+    margin-left: 5px;
+}
+
+.new-game-mode-panel__modes {
+    flex-direction: row;
+    margin: 30px;
+}
+
+.new-game-mode-panel__mode {
+    --background-slice-scale: 0.6;
+    --background-slice: 64;
+    min-width: 209px;
+    min-height: 92px;
+    margin: 0 20px;
+    padding: 10px 30px;
+    color: rgb(255, 255, 255);
+    font-size: 18px;
+    --click-sound: 'UI.Click';
+}
+
+.new-game-mode-panel__mode:hover {
+    color: rgb(0, 0, 0);
+}
+
+.new-game-mode-panel__mode--easy {
+    --background-image: resource('UI/Images/Buttons/Difficulty/easy');
+}
+
+.new-game-mode-panel__mode--normal {
+    --background-image: resource('UI/Images/Buttons/Difficulty/normal');
+}
+
+.new-game-mode-panel__mode--hard {
+    --background-image: resource('UI/Images/Buttons/Difficulty/hard');
+}
+
+.new-game-mode-panel__mode--easy.new-game-mode-panel__mode--selected {
+    --background-image: resource('UI/Images/Buttons/Difficulty/easy-active');
+}
+
+.new-game-mode-panel__mode--normal.new-game-mode-panel__mode--selected {
+    --background-image: resource('UI/Images/Buttons/Difficulty/normal-active');
+}
+
+.new-game-mode-panel__mode--hard.new-game-mode-panel__mode--selected {
+    --background-image: resource('UI/Images/Buttons/Difficulty/hard-active');
+}
+
+.new-game-mode-panel__mode--easy:hover {
+    --background-image: resource('UI/Images/Buttons/Difficulty/easy-hover');
+}
+
+.new-game-mode-panel__mode--normal:hover {
+    --background-image: resource('UI/Images/Buttons/Difficulty/normal-hover');
+}
+
+.new-game-mode-panel__mode--hard:hover {
+    --background-image: resource('UI/Images/Buttons/Difficulty/hard-hover');
+}
+
+.new-game-mode-panel__mode-description-and-settings {
+    height: 330px;
+}
+
+.new-game-mode-panel__mode-description {
+    -unity-text-align: upper-center;
+    color: rgb(255, 255, 255);
+    font-size: 14px;
+}
+
+.new-game-mode-panel__mode-customize-button {
+    margin: 16px 20px;
+}
+
+.new-game-mode-panel__scroll-view {
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.new-game-mode-panel__scroll-view > .unity-scroll-view > .unity-scroll-view__content-viewport {
+    align-items: center;
+    justify-content: center;
+    flex-grow: 0;
+}
+
+.new-game-mode-panel__scroll-view > .unity-scroll-view > .unity-scroll-view__content-viewport > .unity-scroll-view__content-container {
+    width: 100%;
+}
+
+.new-game-mode-panel__setting-wrapper {
+    flex-direction: row;
+    margin-bottom: 5px;
+}
+
+.new-game-mode-panel__setting-label {
+    color: rgb(255, 255, 255);
+    font-size: 14px;
+    width: 300px;
+    -unity-text-align: middle-left;
+}
+
+.new-game-mode-panel__setting-input {
+    width: 50px;
+    height: 25px;
+    margin: 0 2px;
+}
+
+.new-game-mode-panel__setting-toggle {
+    --click-sound: 'UI.Click';
+    padding-right: 3px;
+}
+
+.new-game-mode-panel__setting-toggle > .unity-toggle__input > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/checkbox_off');
+    width: 25px;
+    height: 25px;
+}
+
+.new-game-mode-panel__setting-toggle > .unity-toggle__input:checked > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/checkbox_on');
+}
+
+.new-game-mode-panel__setting-toggle > .unity-toggle__input:checked:hover:enabled > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/checkbox_on_hover');
+}
+
+.new-game-mode-panel__setting-toggle > .unity-toggle__input:hover:enabled > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/checkbox_off_hover');
+}
+
+.new-game-mode-panel__setting-input--invalid {
+    --background-tint: orangered;
+}
+
+.new-game-mode-panel__setting-input > .unity-base-field__input {
+    font-size: 14px;
+}
+
+.new-game-mode-panel__setting-additional-text {
+    color: rgb(255, 255, 255);
+    font-size: 14px;
+    margin: 0 5px;
+    -unity-text-align: middle-center;
+}
+
+.main-menu-spacer {
+    max-height: 50px;
+    height: 50px;
+    flex-shrink: 1;
+}
+
+.main-menu__content {
+    width: 100%;
+    height: 720px;
+}
+
+.main-menu__main-content {
+    flex-grow: 1;
+}
+
+.main-menu__panel-wrapper {
+    flex-grow: 1;
+    flex-shrink: 0;
+    justify-content: center;
+    flex-direction: row;
+}
+
+.update-info-panel {
+    position: absolute;
+    left: 350px;
+    width: 398px;
+    align-self: center;
+    align-items: center;
+    align-content: stretch;
+    padding: 35px;
+}
+
+.update-info-panel__header {
+    color: rgb(255, 255, 255);
+    font-size: 18px;
+    margin-bottom: 12px;
+    white-space: normal;
+    -unity-text-align: middle-center;
+}
+
+.update-info-panel__art {
+    width: 314px;
+    height: 177px;
+    margin-bottom: 12px;
+    background-image: resource('UI/Images/MainMenu/update_info_art');
+}
+
+.update-info-panel__summary {
+    color: rgb(255, 255, 255);
+    font-size: 13px;
+    white-space: normal;
+    margin-left: 15px;
+    margin-right: 15px;
+    margin-bottom: 8px;
+    align-self: flex-start;
+    -unity-paragraph-spacing: 15px;
+}
+
+.update-info-panel__link {
+    color: rgb(255, 255, 255);
+    font-size: 12px;
+    white-space: normal;
+    align-self: center;
+    margin-bottom: 4px;
+    margin-right: 15px;
+}
+
+.update-info-panel__link:hover {
+    color: yellow;
+}
+
+.corrupted-player-data-label {
+    margin-top: 24px;
+}
+
+.analytics-consent-box {
+    padding: 45px;
+    width: 650px;
+}
+
+.analytics-consent-box__info {
+    padding: 5px;
+    margin: 10px 0;
+    -unity-text-align: upper-left;
+}

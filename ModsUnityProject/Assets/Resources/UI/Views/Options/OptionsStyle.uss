@@ -60,7 +60,7 @@
 }
 
 .key-binding-row__input:hover:enabled {
-    background-image: resource('UI/Images/Backgrounds/bg-square-1-highlighted');
+    --background-image: resource('UI/Images/Backgrounds/bg-square-1-highlighted');
 }
 
 .credits__box {
@@ -423,7 +423,7 @@
 }
 
 .settings-dropdown .dropdown__selection {
-    background-image: resource('UI/Images/Backgrounds/bg-pixel-0');
+    --background-image: resource('UI/Images/Backgrounds/bg-pixel-0');
     background-image: resource('UI/Images/Buttons/dropdown');
     height: 36px;
     max-width: 245px;
@@ -436,7 +436,7 @@
 }
 
 .settings-dropdown .dropdown__selectable.dropdown__selection:enabled:hover {
-    background-image: resource('UI/Images/Backgrounds/bg-pixel-0');
+    --background-image: resource('UI/Images/Backgrounds/bg-pixel-0');
     background-image: resource('UI/Images/Buttons/dropdown-hover');
 }
 
