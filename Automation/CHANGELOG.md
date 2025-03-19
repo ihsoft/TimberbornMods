@@ -2,6 +2,7 @@
 * [Feature] Allow editing teh rules in the game.
 * [Feature] Add scripted conditions and action to compose the rules.
 * [Fix #69 ] Dynamite drilldown action crashes.
+* [Fix #70 ] Crashes in the editor mode.
 * [Fix] Improper dynamite drilldown action on the hangovers.
 * [Fix] Construction finished condition could crash on the game load.
 

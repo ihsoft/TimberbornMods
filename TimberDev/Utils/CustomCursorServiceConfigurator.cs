@@ -8,6 +8,7 @@ using Bindito.Core;
 namespace IgorZ.TimberDev.Utils;
 
 [Context("Game")]
+[Context("MapEditor")]
 class CustomCursorServiceConfigurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<CustomCursorService>().AsSingleton();
