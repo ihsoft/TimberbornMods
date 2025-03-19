@@ -145,6 +145,9 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
   public void OnEnterFinishedState() {
     // Update rules that work on finished building only.
     foreach (var action in _actions) {
+      if (!action.Behavior) {
+        break;  // Not initialized yet. It is likely a save game load.
+      }
       action.Condition.SyncState();
     }
   }

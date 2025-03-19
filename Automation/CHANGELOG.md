@@ -3,6 +3,7 @@
 * [Feature] Add scripted conditions and action to compose the rules.
 * [Fix #69 ] Dynamite drilldown action crashes.
 * [Fix] Improper dynamite drilldown action on the hangovers.
+* [Fix] Construction finished condition could crash on the game load.
 
 # v1.3.0 (4 Mar 2025):
 * Add support for Update 7 (0.7.1.2).
