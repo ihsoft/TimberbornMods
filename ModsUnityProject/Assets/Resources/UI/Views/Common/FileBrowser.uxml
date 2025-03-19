@@ -1,6 +1,20 @@
-<UnityEngine.UIElements.UXML>
+<engine:UXML xmlns:engine="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:Template name="Box" src="NamedBoxTemplate.uxml" />
     <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
     <Style src="CommonMiscStyle.uss" />
     <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
     <Style src="OptionsStyle.uss" />
-</UnityEngine.UIElements.UXML>
+    <engine:Instance name="FileBrowser" template="Box" class="file-browser">
+        <engine:Label text="Tip" name="Tip" class="text--default file-browser__tip" />
+        <engine:VisualElement class="file-browser__path-wrapper">
+            <Timberborn.CoreUI.NineSliceButton name="UpwardButton" class="button-square button-square--large file-browser__button-square">
+                <engine:VisualElement name="UpwardButtonIcon" class="file-browser__upward-icon" />
+            </Timberborn.CoreUI.NineSliceButton>
+            <Timberborn.CoreUI.NineSliceTextField name="PathField" class="text-field file-browser__path-field" />
+        </engine:VisualElement>
+        <engine:ListView name="DiskSystemEntries" class="panel-list-view text--default scroll--green-decorated" />
+        <engine:VisualElement class="box-buttons">
+            <Timberborn.CoreUI.LocalizableButton name="OpenButton" text="Open" text-loc-key="FileBrowser.Open" class="menu-button menu-button--medium" />
+        </engine:VisualElement>
+    </engine:Instance>
+</engine:UXML>

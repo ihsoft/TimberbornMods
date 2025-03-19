@@ -1,8 +1,8 @@
-<UnityEngine.UIElements.UXML>
+<engine:UXML xmlns:engine="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
     <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
-    <UnityEngine.UIElements.Button name="DropdownItem" class="dropdown-item">
-        <UnityEngine.UIElements.Image name="Icon" class="dropdown-item__icon" />
-        <UnityEngine.UIElements.Label name="Text" class="dropdown-item__text" />
-    </UnityEngine.UIElements.Button>
-</UnityEngine.UIElements.UXML>
+    <engine:Button name="DropdownItem" class="dropdown-item">
+        <engine:Image name="Icon" class="dropdown-item__icon" />
+        <engine:Label name="Text" class="dropdown-item__text" />
+    </engine:Button>
+</engine:UXML>

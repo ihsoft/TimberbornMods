@@ -1,7 +1,7 @@
-<UnityEngine.UIElements.UXML>
+<engine:UXML xmlns:engine="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
     <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
     <Timberborn.CoreUI.NineSliceVisualElement name="DropdownItemsWrapper" class="dropdown-items__wrapper">
-        <UnityEngine.UIElements.ScrollView name="DropdownItems" class="dropdown-items__items scroll--green-decorated" />
+        <engine:ScrollView name="DropdownItems" class="dropdown-items__items scroll--green-decorated" />
     </Timberborn.CoreUI.NineSliceVisualElement>
-</UnityEngine.UIElements.UXML>
+</engine:UXML>
