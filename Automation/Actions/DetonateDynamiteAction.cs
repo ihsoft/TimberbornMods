@@ -14,6 +14,7 @@ using Timberborn.BuilderPrioritySystem;
 using Timberborn.Common;
 using Timberborn.Coordinates;
 using Timberborn.Explosions;
+using Timberborn.MapIndexSystem;
 using Timberborn.Persistence;
 using Timberborn.PrefabSystem;
 using Timberborn.PrioritySystem;
@@ -72,7 +73,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
       return;
     }
 
-    // The behavior object will get destroyed on detonate, so create am independent component.
+    // The behavior object will get destroyed on detonate, so create an independent component.
     var component = new GameObject("#Automation_PlaceDynamiteAction").AddComponent<DetonateAndMaybeRepeatRule>();
     component.Setup(Behavior.BlockObject, RepeatCount, _builderPriority);
   }
@@ -126,6 +127,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
     ToolButtonService _toolButtonService;
     ITerrainService _terrainService;
     BlockService _blockService;
+    MapIndexService _mapIndexService;
     string _prefabName;
 
     BlockObject _blockObject;
@@ -137,6 +139,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
       _blockObject = blockObject;
       _repeatCount = repeatCount;
       _builderPriority = builderPriority;
+      _prefabName = _blockObject.GetComponentFast<PrefabSpec>().Name;
       StartCoroutine(WaitAndPlace());
     }
 
@@ -145,13 +148,12 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
       _toolButtonService = DependencyContainer.GetInstance<ToolButtonService>();
       _terrainService = DependencyContainer.GetInstance<ITerrainService>();
       _blockService = DependencyContainer.GetInstance<BlockService>();
-      _prefabName = GetComponent<PrefabSpec>().Name;
+      _mapIndexService = DependencyContainer.GetInstance<MapIndexService>();
     }
 
     IEnumerator WaitAndPlace() {
       var coordinates = _blockObject.Coordinates;
       var dynamite = _blockObject.GetComponentFast<Dynamite>();
-      var dynamiteDepth = dynamite.Depth;
       yield return null;  // Act on the next frame to avoid synchronous complications.
 
       // Detonate the dynamite.
@@ -164,11 +166,21 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
         yield return YieldAbort();
       }
 
+      var effectiveDepth = 0;
+      while (effectiveDepth < dynamite.Depth && coordinates.z >= effectiveDepth) {
+        var below = new Vector3Int(coordinates.x, coordinates.y, coordinates.z - effectiveDepth - 1);
+        if (!_terrainService.UnsafeCellIsTerrain(_mapIndexService.CoordinatesToIndex3D(below))) {
+          break;
+        }
+        effectiveDepth++;
+      }
+      
       // Wait for the old object to clean up.
       yield return new WaitUntil(() => !_blockObject);
-      coordinates.z = _terrainService.CellHeight(coordinates.XY());
-      if (coordinates.z <= 0) {
-        DebugEx.Fine("Reached the bottom of the map at {0}", coordinates.XY());
+      var expectedPlaceCoord = new Vector3Int(coordinates.x, coordinates.y, coordinates.z - effectiveDepth);
+      var newHeight = _terrainService.GetTerrainHeightBelow(expectedPlaceCoord);
+      if (newHeight == 0 || newHeight != expectedPlaceCoord.z) {
+        DebugEx.Info("Reached the bottom of the floor at {0}", coordinates.XY());
         yield return YieldAbort();
       }
 
@@ -177,11 +189,11 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
           .ToolButtons.Select(x => x.Tool)
           .OfType<BlockObjectTool>()
           .First(x => x.Prefab.name.StartsWith(_prefabName));
-      dynamiteTool.Place(new List<Placement> { new(coordinates) });
+      dynamiteTool.Place(new List<Placement> { new(expectedPlaceCoord) });
       BlockObject newDynamite;
       do {
         yield return null;
-        newDynamite = _blockService.GetBottomObjectAt(coordinates);
+        newDynamite = _blockService.GetBottomObjectAt(expectedPlaceCoord);
       } while (newDynamite == null);
       newDynamite.GetComponentFast<BuilderPrioritizable>().SetPriority(_builderPriority);
       newDynamite.GetComponentFast<AutomationBehavior>().AddRule(
