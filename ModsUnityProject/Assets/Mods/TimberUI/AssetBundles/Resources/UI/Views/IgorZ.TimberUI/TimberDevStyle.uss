@@ -70,14 +70,44 @@
     background-image: resource('UI/Images/Buttons/circle-on');
 }
 
+.timberdev-slider-int > .unity-slider-int__input > .unity-base-slider__drag-container > .unity-base-slider__dragger {
+    height: 16px;
+    width: 16px;
+    margin-top: -7px;
+    background-image: resource('UI/Images/Buttons/circle-off');
+}
+
+.timberdev-slider-int > .unity-slider-int__input > .unity-base-slider__drag-container > .unity-base-slider__dragger:hover:enabled {
+    background-image: resource('UI/Images/Buttons/circle-hover');
+}
+
+.timberdev-slider-int > .unity-slider-int__input > .unity-base-slider__drag-container:hover:enabled:active > .unity-base-slider__dragger {
+    background-image: resource('UI/Images/Buttons/circle-on');
+}
+
+.timberdev-slider-int > .unity-slider-int__input > .unity-base-slider__drag-container > .unity-base-slider__tracker {
+    background-image: resource('UI/Images/Backgrounds/bg-pixel-2');
+    -unity-background-scale-mode: stretch-to-fill;
+    height: 2px;
+}
+
 .timberdev-button-small {
+    padding-top: 1px;
+    padding-right: 5px;
+    padding-bottom: 1px;
+    padding-left: 5px;
+}
+
+.timberdev-button-normal {
     padding-top: 2px;
     padding-right: 10px;
     padding-bottom: 2px;
     padding-left: 10px;
 }
 
-.timberdev--center-spaced {
-    margin-right: 3px;
-    margin-left: 3px;
+.timberdev-button-big {
+    padding-top: 5px;
+    padding-right: 15px;
+    padding-bottom: 5px;
+    padding-left: 15px;
 }
