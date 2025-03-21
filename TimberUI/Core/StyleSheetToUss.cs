@@ -369,7 +369,10 @@ namespace UnityEditor.StyleSheets
                 }
 
                 if (property.name == "-unity-slice-scale") {
-                    sb.Append("px");
+                    var value = ToUssString(sheet, options, property.values[0]);
+                    if (!value.EndsWith("px")) {
+                        sb.Append("px");
+                    }
                 }
                 sb.Append(";\n");
             }
