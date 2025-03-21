@@ -64,9 +64,9 @@ sealed class MainDialog : IPanelController, ILoadableSingleton {
   }
 
   public void Load() {
-    var panel = _uiFactory.LoadVisualTreeAsset("IgorZ/TimberUI-Dialog");
+    var panel = _uiFactory.LoadVisualTreeAsset("IgorZ.TimberUI/MainDialog");
     _resourcePathTextField = panel.Q2<TextField>("ResourcePath");
-    _resourcePathTextField.text = "UI/Views/IgorZ.Automation/RulesEditor";
+    _resourcePathTextField.text = "UI/Views/";
     _filenameTextField = panel.Q2<TextField>("Filename");
     _filenameTextField.text = _settings.TargetPath.Value;
     panel.Q2<Button>("ExportUSSButton").clicked += ExportUss;
