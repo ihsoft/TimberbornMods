@@ -18,10 +18,9 @@ using Object = UnityEngine.Object;
 
 namespace IgorZ.TimberUI.Core;
 
-sealed class MainDialog : IPanelController, ILoadableSingleton {
+sealed class MainDialog : ILoadableSingleton {
 
   readonly PanelStack _panelStack;
-  readonly VisualElementLoader _visualElementLoader;
   readonly IAssetLoader _assetLoader;
   readonly UiFactory _uiFactory;
   readonly TimberUISettings _settings;
@@ -31,66 +30,41 @@ sealed class MainDialog : IPanelController, ILoadableSingleton {
   TextField _resourcePathTextField;
   TextField _filenameTextField;
 
-  VisualElement _root;
-
-  MainDialog(PanelStack panelStack, VisualElementLoader visualElementLoader, IAssetLoader assetLoader,
-             UiFactory uiFactory, TimberUISettings settings) {
+  MainDialog(PanelStack panelStack, IAssetLoader assetLoader, UiFactory uiFactory, TimberUISettings settings) {
     _panelStack = panelStack;
-    _visualElementLoader = visualElementLoader;
     _assetLoader = assetLoader;
     _uiFactory = uiFactory;
     _settings = settings;
   }
 
-  public VisualElement GetPanel() {
-    return _root;
-  }
-
-  public bool OnUIConfirmed() {
-    _panelStack._root.Remove(_root);
-    return true;
-  }
-
-  public void OnUICancelled() {
-    _panelStack._root.Remove(_root);
-  }
-
-  VisualElement GetDialogBox() {
-    var dialogBox = _visualElementLoader.LoadVisualElement("Options/SettingsBox");
-    dialogBox.Q<Label>("DeveloperTestLabel").ToggleDisplayStyle(false);
-    dialogBox.Q<VisualElement>("Developer").ToggleDisplayStyle(false);
-    dialogBox.Q<ScrollView>("Content").Clear();
-    return dialogBox;
-  }
-
   public void Load() {
-    var panel = _uiFactory.LoadVisualTreeAsset("IgorZ.TimberUI/MainDialog");
-    _resourcePathTextField = panel.Q2<TextField>("ResourcePath");
-    _resourcePathTextField.text = "UI/Views/";
-    _filenameTextField = panel.Q2<TextField>("Filename");
-    _filenameTextField.text = _settings.TargetPath.Value;
-    panel.Q2<Button>("ExportUSSButton").clicked += ExportUss;
-    panel.Q2<Button>("ExportUXMLButton").clicked += ExportUxml;
-    panel.Q2<Button>("PrintStylesButton").clicked += PrintStyles;
-    _logTextLabel = panel.Q2<Label>("LogText");
+    var dialog = _uiFactory.LoadVisualTreeAsset("IgorZ.TimberUI/MainDialog");
+    dialog.Q2<Label>("Header").text = "Timberborn UI Exporter";
+    dialog.Q2<Button>("CloseButton").clicked += () => _panelStack._root.Remove(dialog);
+    _resourcePathTextField = dialog.Q2<TextField>("ResourcePath");
+    _resourcePathTextField.value = "UI/Views/";
+    _filenameTextField = dialog.Q2<TextField>("Filename");
+    _filenameTextField.value = _settings.TargetPath.Value;
+    dialog.Q2<Button>("ExportUSSButton").clicked += ExportUss;
+    dialog.Q2<Button>("ExportUXMLButton").clicked += ExportUxml;
+    dialog.Q2<Button>("PrintStylesButton").clicked += PrintStyles;
+    _logTextLabel = dialog.Q2<Label>("LogText");
     _logTextLabel.ToggleDisplayStyle(false);
-    _errorText = panel.Q2<Label>("ErrorText");
+    _errorText = dialog.Q2<Label>("ErrorText");
     _errorText.ToggleDisplayStyle(false);
 
-    _root = GetDialogBox();
-    _root.style.position = Position.Absolute;
-    _root.Q2<ScrollView>("Content").Add(panel);
-    _panelStack._root.Add(_root);
+    dialog.style.position = Position.Absolute;
+    _panelStack._root.Add(dialog);
   }
 
   void ExportUss() {
     _errorText.ToggleDisplayStyle(false);
     _logTextLabel.ToggleDisplayStyle(false);
-    var fullPath = _filenameTextField.text;
+    var fullPath = _filenameTextField.value;
     if (!fullPath.EndsWith(".uss")) {
-      fullPath = Path.Combine(fullPath, _resourcePathTextField.text + ".uss");
+      fullPath = Path.Combine(fullPath, _resourcePathTextField.value + ".uss");
     }
-    var error = TryLoadAsset<StyleSheet>(_resourcePathTextField.text, out var style)
+    var error = TryLoadAsset<StyleSheet>(_resourcePathTextField.value, out var style)
         ?? VerifyTargetPath(fullPath);
     if (error != null) {
       _errorText.text = error;
@@ -105,12 +79,12 @@ sealed class MainDialog : IPanelController, ILoadableSingleton {
   void ExportUxml() {
     _errorText.ToggleDisplayStyle(false);
     _logTextLabel.ToggleDisplayStyle(false);
-    var fullPath = _filenameTextField.text;
+    var fullPath = _filenameTextField.value;
     if (!fullPath.EndsWith(".uxml")) {
-      fullPath = Path.Combine(fullPath, _resourcePathTextField.text + ".uxml");
+      fullPath = Path.Combine(fullPath, _resourcePathTextField.value + ".uxml");
     }
     var sb = new StringBuilder();
-    var error = TryLoadAsset<VisualTreeAsset>(_resourcePathTextField.text, out var treeAsset)
+    var error = TryLoadAsset<VisualTreeAsset>(_resourcePathTextField.value, out var treeAsset)
         ?? VerifyTargetPath(fullPath)
         ?? VisitNodes(sb, treeAsset);
     if (error != null) {
