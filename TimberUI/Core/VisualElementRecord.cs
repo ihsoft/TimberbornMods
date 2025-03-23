@@ -20,7 +20,17 @@ sealed record VisualElementRecord {
       { "EntityPanelCommonStyle", "project://database/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" },
   };
 
-  readonly List<(string Prefix, string Alias)> TypesAliases = [
+  static readonly Dictionary<string, string> StandardTemplatesPaths = new() {
+      { "Box", "project://database/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml" },
+      { "IntegerSlider", "project://database/Assets/Resources/UI/Views/Common/IntegerSlider.uxml" },
+      { "PreciseSlider", "project://database/Assets/Resources/UI/Views/Core/PreciseSlider.uxml" },
+      { "ProgressBar", "project://database/Assets/Resources/UI/Views/Core/ProgressBar.uxml" },
+      { "Dropdown", "project://database/Assets/Resources/UI/Views/Core/Dropdown.uxml" },
+      { "DropDownItem", "project://database/Assets/Resources/UI/Views/Core/DropDownItem.uxml" },
+      { "DropDownItems", "project://database/Assets/Resources/UI/Views/Core/DropDownItems.uxml" },
+  };
+
+  static readonly List<(string Prefix, string Alias)> TypesAliases = [
       ("UnityEngine.UIElements.", "engine"),
   ];
 
@@ -68,7 +78,10 @@ sealed record VisualElementRecord {
       var templates = TreeAsset.templateAssets.Select(x => x.templateAlias).Distinct().OrderBy(x => x).ToList();
       var engineAlias = TypesAliases.First(x => x.Prefix == "UnityEngine.UIElements.").Alias;
       foreach (var template in templates) {
-        sb.AppendLine($"{childIndentation}<{engineAlias}:Template name=\"{template}\" src=\"{template}.uxml\" />");
+        if (!StandardTemplatesPaths.TryGetValue(template, out var templatePath)) {
+          templatePath = template + ".uxml";
+        }
+        sb.AppendLine($"{childIndentation}<{engineAlias}:Template name=\"{template}\" src=\"{templatePath}\" />");
       }
     }
     foreach (var styleSheet in Asset.stylesheets) {
