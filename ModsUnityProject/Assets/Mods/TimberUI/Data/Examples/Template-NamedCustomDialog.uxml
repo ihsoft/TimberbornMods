@@ -3,6 +3,16 @@
     <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle" />
     <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle" />
     <engine:VisualElement class="content-row-centered">
-        <engine:Instance template="NamedBoxTemplate" style="width: 500px; height: 400px;" />
+        <engine:Instance template="NamedBoxTemplate" style="width: 700px; height: 400px;">
+            <engine:VisualElement style="flex-grow: 1;">
+                <engine:VisualElement name="Content" style="flex-grow: 1;">
+                    <engine:Label text="Some text..." class="game-text-big" />
+                </engine:VisualElement>
+                <engine:VisualElement style="flex-direction: row; justify-content: center;">
+                    <Timberborn.CoreUI.LocalizableButton text="Save" name="ConfirmButton" class="menu-button" />
+                    <Timberborn.CoreUI.LocalizableButton text="Cancel" name="CancelButton" class="menu-button" />
+                </engine:VisualElement>
+            </engine:VisualElement>
+        </engine:Instance>
     </engine:VisualElement>
 </engine:UXML>
