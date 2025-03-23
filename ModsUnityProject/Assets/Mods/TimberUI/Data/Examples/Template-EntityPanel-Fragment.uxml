@@ -4,7 +4,7 @@
     <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle" />
     <Style src="project://database/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss?fileID=7433441132597879392&amp;guid=02de7aec41a58a648bcb6d7db08fd2a8&amp;type=3#EntityPanelGameStyle" />
     <Style src="project://database/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss?fileID=7433441132597879392&amp;guid=65cc3b01c73f9d845b1cd8d615d4bc5f&amp;type=3#EntityPanelCommonStyle" />
-    <tb:NineSliceVisualElement name="EntitySubPanel2" class="bg-sub-box--green entity-sub-panel">
+    <tb:NineSliceVisualElement name="EntitySubPanel1" class="bg-sub-box--green entity-sub-panel">
         <tb:LocalizableLabel text="LocalizableLabel" class="entity-panel__text" />
         <tb:LocalizableToggle text="LocalizableToggle" class="entity-panel__toggle entity-panel__text game-toggle" />
         <engine:Slider value="0.5" high-value="1" class="slider" />
@@ -16,7 +16,7 @@
         <tb:ProgressBar />
         <Timberborn.DropdownSystem.Dropdown />
     </tb:NineSliceVisualElement>
-    <tb:NineSliceVisualElement name="EntitySubPanel1" class="bg-sub-box--green entity-sub-panel">
+    <tb:NineSliceVisualElement name="EntitySubPanel2" class="bg-sub-box--green entity-sub-panel">
         <tb:LocalizableLabel text="extra section in the same fragment" class="entity-panel__text" />
     </tb:NineSliceVisualElement>
 </engine:UXML>

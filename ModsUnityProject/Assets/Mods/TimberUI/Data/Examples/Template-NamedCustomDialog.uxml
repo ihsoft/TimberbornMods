@@ -1,0 +1,8 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:Template name="NamedBoxTemplate" src="project://database/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml?fileID=9197481963319205126&amp;guid=b27c549e9f96d7843b45412cf82a0c6a&amp;type=3#NamedBoxTemplate" />
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle" />
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle" />
+    <engine:VisualElement class="content-row-centered">
+        <engine:Instance template="NamedBoxTemplate" style="width: 500px; height: 400px;" />
+    </engine:VisualElement>
+</engine:UXML>
