@@ -1,5 +1,100 @@
-<UnityEngine.UIElements.UXML>
+<engine:UXML xmlns:engine="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:Template name="Box" src="project://database/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml" />
     <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
     <Style src="OptionsStyle.uss" />
-    <UnityEngine.UIElements.VisualElement name="SettingsBox" class="content-row-centered" />
-</UnityEngine.UIElements.UXML>
+    <engine:VisualElement name="SettingsBox" class="content-row-centered" picking-mode="Ignore">
+        <engine:Instance template="Box" class="options-panel settings-box">
+            <engine:VisualElement name="ScrollViewWrapper" class="panel-list-view scroll--green-decorated">
+                <engine:ScrollView name="Content">
+                    <engine:VisualElement name="Developer">
+                        <engine:Label text="Developer" name="DeveloperHeader" class="settings-header" />
+                        <engine:VisualElement name="DeveloperButtons" class="content-row-centered">
+                            <Timberborn.CoreUI.NineSliceButton text="Lock factions" name="LockFactions" focusable="false" class="menu-button" />
+                            <Timberborn.CoreUI.NineSliceButton text="Unlock factions" name="UnlockFactions" focusable="false" class="menu-button" />
+                            <Timberborn.CoreUI.NineSliceButton text="Clear PlayerPrefs" name="ClearPlayerPrefs" focusable="false" class="menu-button" />
+                            <Timberborn.CoreUI.NineSliceButton text="Test languages" name="TestLanguages" focusable="false" class="menu-button" />
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                    <Timberborn.CoreUI.LocalizableLabel text="Graphics" name="GraphicsHeader" text-loc-key="Settings.Screen.Header" class="settings-header" />
+                    <Timberborn.CoreUI.LocalizableToggle text="FullScreen" name="FullScreen" text-loc-key="Settings.Screen.FullScreen" focusable="false" class="settings-element settings-text settings-toggle" />
+                    <Timberborn.DropdownSystem.Dropdown name="ScreenResolution" label-loc-key="Settings.Screen.ScreenResolution" class="settings-element settings-dropdown" />
+                    <Timberborn.DropdownSystem.Dropdown name="GraphicsQuality" label-loc-key="Settings.Screen.GraphicsQuality" class="settings-element settings-dropdown" />
+                    <engine:VisualElement name="ResolutionScale" class="settings-element settings-slider settings-text">
+                        <Timberborn.CoreUI.LocalizableSliderInt name="Slider" label="ResolutionScale" text-loc-key="Settings.Screen.ResolutionScale" focusable="false" class="settings-slider__slider" />
+                        <engine:Label name="Value" text="0%" class="settings-slider__end-label" />
+                    </engine:VisualElement>
+                    <Timberborn.CoreUI.LocalizableToggle text="AntiAliasing" name="AntiAliasing" text-loc-key="Settings.Screen.AntiAliasing" focusable="false" class="settings-element settings-text settings-toggle" />
+                    <Timberborn.DropdownSystem.Dropdown name="VSync" label-loc-key="Settings.Screen.VSync" class="settings-element settings-dropdown" />
+                    <Timberborn.DropdownSystem.Dropdown name="FrameRateLimit" label-loc-key="Settings.Screen.FrameRateLimit" class="settings-element settings-dropdown" />
+                    <Timberborn.CoreUI.LocalizableLabel text="Interface" name="InterfaceHeader" text-loc-key="Settings.UI.Header" class="settings-header" />
+                    <engine:VisualElement class="settings-wrapper settings-element">
+                        <Timberborn.CoreUI.LocalizableLabel text="Current:" text-loc-key="Settings.Language.Current" class="settings-text change-language-label" />
+                        <engine:Label text="default" name="LanguageName" class="settings-text" />
+                        <Timberborn.CoreUI.LocalizableButton name="LanguageChange" text-loc-key="Settings.Language.Change" class="menu-button menu-button--medium change-language-button" />
+                    </engine:VisualElement>
+                    <Timberborn.CoreUI.LocalizableToggle text="ShowFPS" name="ShowFPS" text-loc-key="Settings.UI.ShowFps" focusable="false" class="settings-element settings-toggle settings-text" />
+                    <Timberborn.CoreUI.LocalizableToggle text="RunInBackground" name="RunInBackground" text-loc-key="Settings.UI.RunInBackground" focusable="false" class="settings-element settings-toggle settings-text" />
+                    <engine:VisualElement name="UIScaleFactor" class="settings-element settings-slider settings-text">
+                        <Timberborn.CoreUI.LocalizableSliderInt name="Slider" label="UIScaleFactor" text-loc-key="Settings.UI.UIScaleFactor" focusable="false" class="settings-slider__slider" />
+                        <engine:Label name="Value" text="0%" class="settings-slider__end-label" />
+                    </engine:VisualElement>
+                    <Timberborn.CoreUI.LocalizableLabel text="Tutorial" name="TutorialHeader" text-loc-key="Settings.Tutorial.Header" class="settings-header" />
+                    <Timberborn.CoreUI.LocalizableToggle text="DisableTutorial" name="DisableTutorial" text-loc-key="Settings.Tutorial.DisableTutorial" focusable="false" class="settings-element settings-toggle settings-text" />
+                    <Timberborn.CoreUI.LocalizableLabel text="Input" name="InputHeader" text-loc-key="Settings.Input.Header" class="settings-header" />
+                    <Timberborn.CoreUI.LocalizableButton text="Key bindings" name="BindingsButton" text-loc-key="Menu.KeyBindings" class="menu-button menu-button--medium menu-button--centered" />
+                    <Timberborn.CoreUI.LocalizableToggle text="InvertZoom" name="InvertZoom" text-loc-key="Settings.Input.InvertZoom" focusable="false" class="settings-element settings-toggle settings-text" />
+                    <Timberborn.CoreUI.LocalizableToggle text="SwapMouseCameraMovementWithRotation" name="SwapMouseCameraMovementWithRotation" text-loc-key="Settings.Input.SwapMouseCameraMovementWithRotation" focusable="false" class="settings-element settings-toggle settings-text" />
+                    <Timberborn.CoreUI.LocalizableToggle text="DragCamera" name="DragCamera" text-loc-key="Settings.Input.DragCamera" focusable="false" class="settings-element settings-toggle settings-text" />
+                    <Timberborn.CoreUI.LocalizableToggle text="LockCursorInWindow" name="LockCursorInWindow" text-loc-key="Settings.Input.LockCursorInWindow" focusable="false" class="settings-element settings-toggle settings-text" />
+                    <Timberborn.CoreUI.LocalizableToggle text="EdgePanCamera" name="EdgePanCamera" text-loc-key="Settings.Input.EdgePanCamera" focusable="false" class="settings-element settings-toggle settings-text" />
+                    <engine:VisualElement name="EdgePanCameraSpeed" class="settings-element settings-slider settings-text">
+                        <Timberborn.CoreUI.LocalizableSlider name="Slider" label="EdgePanCameraSpeed" text-loc-key="Settings.Input.EdgePanCameraSpeed" focusable="false" class="settings-slider__slider" />
+                        <engine:Label name="Value" text="0%" class="settings-slider__end-label" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="KeyboardCameraMovementSpeed" class="settings-element settings-slider settings-text">
+                        <Timberborn.CoreUI.LocalizableSlider name="Slider" label="KeyboardCameraMovementSpeed" text-loc-key="Settings.Input.KeyboardCameraMovementSpeed" focusable="false" class="settings-slider__slider" />
+                        <engine:Label name="Value" text="0%" class="settings-slider__end-label" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="KeyboardCameraRotationSpeed" class="settings-element settings-slider settings-text">
+                        <Timberborn.CoreUI.LocalizableSlider name="Slider" label="KeyboardCameraRotationSpeed" text-loc-key="Settings.Input.KeyboardCameraRotationSpeed" focusable="false" class="settings-slider__slider" />
+                        <engine:Label name="Value" text="0%" class="settings-slider__end-label" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="KeyboardCameraZoomSpeed" class="settings-element settings-slider settings-text">
+                        <Timberborn.CoreUI.LocalizableSlider name="Slider" label="KeyboardCameraZoomSpeed" text-loc-key="Settings.Input.KeyboardCameraZoomSpeed" focusable="false" class="settings-slider__slider" />
+                        <engine:Label name="Value" text="0%" class="settings-slider__end-label" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="MouseWheelCameraZoomSpeed" class="settings-element settings-slider settings-text">
+                        <Timberborn.CoreUI.LocalizableSlider name="Slider" label="MouseWheelCameraZoomSpeed" text-loc-key="Settings.Input.MouseWheelCameraZoomSpeed" focusable="false" class="settings-slider__slider" />
+                        <engine:Label name="Value" text="0%" class="settings-slider__end-label" />
+                    </engine:VisualElement>
+                    <Timberborn.CoreUI.LocalizableLabel text="Sound" name="SoundHeader" text-loc-key="Settings.Sound.Header" class="settings-header" />
+                    <engine:VisualElement name="MasterVolume" class="settings-element settings-slider settings-text">
+                        <Timberborn.CoreUI.LocalizableSlider name="Slider" label="MasterVolume" text-loc-key="Settings.Sound.MasterVolume" focusable="false" class="settings-slider__slider" />
+                        <engine:Label name="Value" text="0%" class="settings-slider__end-label" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="MusicVolume" class="settings-element settings-slider settings-text">
+                        <Timberborn.CoreUI.LocalizableSlider name="Slider" label="MusicVolume" text-loc-key="Settings.Sound.MusicVolume" focusable="false" class="settings-slider__slider" />
+                        <engine:Label name="Value" text="0%" class="settings-slider__end-label" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="EnvironmentVolume" class="settings-element settings-slider settings-text">
+                        <Timberborn.CoreUI.LocalizableSlider name="Slider" label="EnvironmentVolume" text-loc-key="Settings.Sound.EnvironmentVolume" focusable="false" class="settings-slider__slider" />
+                        <engine:Label name="Value" text="0%" class="settings-slider__end-label" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="UIVolume" class="settings-element settings-slider settings-text">
+                        <Timberborn.CoreUI.LocalizableSlider name="Slider" label="UIVolume" text-loc-key="Settings.Sound.UIVolume" focusable="false" class="settings-slider__slider" />
+                        <engine:Label name="Value" text="0%" class="settings-slider__end-label" />
+                    </engine:VisualElement>
+                    <Timberborn.CoreUI.LocalizableToggle text="MuteWhenMinimized" name="MuteWhenMinimized" text-loc-key="Settings.Sound.MuteWhenMinimized" focusable="false" class="settings-element settings-toggle settings-text" />
+                    <Timberborn.CoreUI.LocalizableLabel text="Saving" name="SavingHeader" text-loc-key="Settings.GameSaving.Header" class="settings-header" />
+                    <Timberborn.CoreUI.LocalizableToggle text="AutoSavingOn" name="AutoSavingOn" text-loc-key="Settings.GameSaving.AutoSavingOn" focusable="false" class="settings-element settings-toggle settings-text" />
+                    <Timberborn.CoreUI.LocalizableLabel text="Analytics" name="AnalyticsHeader" text-loc-key="Settings.Analytics.Header" class="settings-header" />
+                    <engine:VisualElement class="settings-wrapper bottom-padding--medium">
+                        <Timberborn.CoreUI.LocalizableToggle text="Analytics enabled" name="AnalyticsEnabled" text-loc-key="Settings.Analytics.ConsentToggle" focusable="false" class="settings-element settings-toggle settings-text" />
+                        <Timberborn.CoreUI.LocalizableButton name="DeleteAnalyticsData" text-loc-key="Settings.Analytics.DeleteData" class="menu-button menu-button--medium delete-analytics-data-button" />
+                    </engine:VisualElement>
+                </engine:ScrollView>
+            </engine:VisualElement>
+        </engine:Instance>
+        <engine:Label text="Developer" name="DeveloperTestLabel" class="text--default developer-test-label" />
+    </engine:VisualElement>
+</engine:UXML>
