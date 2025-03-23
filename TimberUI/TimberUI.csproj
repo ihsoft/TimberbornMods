@@ -78,6 +78,21 @@
       </Compile>
     </ItemGroup>
     <ItemGroup>
+      <Content Include="..\ModsUnityProject\Assets\Mods\TimberUI\Data\Examples\README.md">
+        <Link>Mod\Examples\README.md</Link>
+      </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\TimberUI\Data\Examples\Template-EntityPanel-Fragment.uxml">
+        <Link>Mod\Examples\Template-EntityPanel-Fragment.uxml</Link>
+      </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\TimberUI\Data\Examples\Template-NamedCustomDialog.uxml">
+        <Link>Mod\Examples\Template-NamedCustomDialog.uxml</Link>
+      </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\TimberUI\Data\Examples\Template-TimberDev.uxml">
+        <Link>Mod\Examples\Template-TimberDev.uxml</Link>
+      </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\TimberUI\Data\Examples\TimberDevStyle.uss">
+        <Link>Mod\Examples\TimberDevStyle.uss</Link>
+      </Content>
       <Content Include="..\ModsUnityProject\Assets\Mods\TimberUI\manifest.json">
         <Link>Mod\manifest.json</Link>
       </Content>
