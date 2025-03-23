@@ -4,7 +4,7 @@
     <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle" />
     <Style src="project://database/Assets/Mods/TimberUI/AssetBundles/Resources/UI/Views/IgorZ.TimberUI/TimberDevStyle.uss?fileID=7433441132597879392&amp;guid=36c17d6971ee17546b67650917e73cf4&amp;type=3#TimberDevStyle" />
     <engine:VisualElement>
-        <engine:Instance template="NamedBoxTemplate" style="width: 700px; height: 500px;">
+        <engine:Instance template="NamedBoxTemplate" style="width: 700px; height: 394px;">
             <engine:VisualElement style="flex-grow: 0;">
                 <engine:Label text="Resource path:" class="game-text-big" />
                 <Timberborn.CoreUI.NineSliceTextField name="ResourcePath" class="text-field" />
