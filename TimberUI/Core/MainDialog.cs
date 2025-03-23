@@ -54,6 +54,8 @@ sealed class MainDialog : ILoadableSingleton {
     _errorText.ToggleDisplayStyle(false);
 
     dialog.style.position = Position.Absolute;
+    dialog.style.top = 20;
+    dialog.style.left = 20;
     _panelStack._root.Add(dialog);
   }
 

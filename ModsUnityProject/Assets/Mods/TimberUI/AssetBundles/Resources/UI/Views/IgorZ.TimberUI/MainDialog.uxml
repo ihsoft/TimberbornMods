@@ -8,7 +8,7 @@
             <engine:VisualElement style="flex-grow: 0;">
                 <engine:Label text="Resource path:" class="game-text-big" />
                 <Timberborn.CoreUI.NineSliceTextField name="ResourcePath" class="text-field" />
-                <engine:Label text="Base path or filename" class="game-text-big" />
+                <engine:Label text="Base path or filename:" class="game-text-big" />
                 <Timberborn.CoreUI.NineSliceTextField name="Filename" class="text-field" />
                 <engine:VisualElement style="margin-top: 7px; flex-direction: row; align-self: flex-start;">
                     <Timberborn.CoreUI.NineSliceButton text="Export USS" name="ExportUSSButton" class="button-game timberdev-button-small text--grey" style="flex-grow: 1;" />
