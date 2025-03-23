@@ -1,0 +1,7 @@
+[h1]Not for the players![/h1]
+This mod is made for the mod's developers only. If you're a player, skip it!
+
+[h1]If you're a Timberborn mod developer[/h1]
+UI in Timberborn is made via Unity's UXML+USS approach. It's a common way of making UI in this framework. However, if you would try to go this way, the very first problem you meet, is: you don't have the common Timberborn stylesheets! Or templates for the common controls (like `PreciseSlider`). Making UI document assets in Unity Editor without these things is impossible.
+
+This mod covers the gap. You can export any UXML or USS resources from the game from the game's main menu. The mod also gives examples for the common UI elements that you may need as a mod developer. Read the details in: https://github.com/ihsoft/TimberbornMods/blob/update-7/ModsUnityProject/Assets/Mods/TimberUI/Data/Examples/README.md
