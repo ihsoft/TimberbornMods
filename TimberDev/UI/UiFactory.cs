@@ -18,9 +18,6 @@ namespace IgorZ.TimberDev.UI;
 /// <remarks>Normally, should be used for the times when TAPI is broken.</remarks>
 public class UiFactory {
 
-  /// <summary>Path to the UI views in the game assets.</summary>
-  public const string UIViewsPath = "UI/Views/";
-
   /// <summary>Class name for the text elements on the right side panel.</summary>
   public const string EntityPanelTextClass = "entity-panel__text";
 
@@ -31,7 +28,7 @@ public class UiFactory {
   public const string GameTextSmallClass = "game-text-small";
 
   /// <summary>Class name for the normal text elements.</summary>
-  public const string GameTextNormalClass = "game-text-small";
+  public const string GameTextNormalClass = "game-text-normal";
 
   /// <summary>Common padding around the button text on the right side panel.</summary>
   public static readonly (int top, int left, int bottom, int right) StandardButtonPadding = new(2, 10, 2, 10);
@@ -363,7 +360,7 @@ public class UiFactory {
   /// stylesheets on the template will be preserved. Use this method when a dialog or a panel is being loaded.
   /// </remarks>
   public VisualElement LoadVisualTreeAsset(string name) {
-    var element = _assetLoader.Load<VisualTreeAsset>(UIViewsPath + name).Instantiate();
+    var element = _visualElementLoader.LoadVisualTreeAsset(name).Instantiate();
     _visualElementInitializer.InitializeVisualElement(element);
     return element;
   }
