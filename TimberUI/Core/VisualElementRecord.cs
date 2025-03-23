@@ -13,14 +13,18 @@ sealed record VisualElementRecord {
 
   const string DocumentRootName = "UnityEngine.UIElements.UXML";
 
-  static readonly Dictionary<string, string> StandardStylesPaths = new() {
+  public static readonly Dictionary<string, string> StandardStylesPaths = new() {
       { "CommonStyle", "project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss" },
-      { "CoreStyle", "project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss" },
-      { "EntityPanelGameStyle", "project://database/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" },
-      { "EntityPanelCommonStyle", "project://database/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" },
+      { "CoreStyle", "project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss" }, {
+          "EntityPanelGameStyle",
+          "project://database/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss"
+      }, {
+          "EntityPanelCommonStyle",
+          "project://database/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss"
+      },
   };
 
-  static readonly Dictionary<string, string> StandardTemplatesPaths = new() {
+  public static readonly Dictionary<string, string> StandardTemplatesPaths = new() {
       { "Box", "project://database/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml" },
       { "IntegerSlider", "project://database/Assets/Resources/UI/Views/Common/IntegerSlider.uxml" },
       { "PreciseSlider", "project://database/Assets/Resources/UI/Views/Core/PreciseSlider.uxml" },

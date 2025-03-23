@@ -161,9 +161,28 @@ sealed class MainDialog : ILoadableSingleton {
       _errorText.ToggleDisplayStyle(true);
       return;
     }
-    var styles = asset.stylesheets.Select(x => x.name).ToList();
-    _logTextLabel.text = "Styles:\n" + string.Join("\n", styles);
+    var sb = new StringBuilder();
+    var styles = asset.stylesheets.Select(x => ResolveStyle(x.name)).ToList();
+    sb.AppendLine("Styles:\n" + string.Join("\n", styles));
+    sb.AppendLine();
+    var templates = asset.templateAssets.Select(x => ResolveTemplate(x.templateAlias)).ToList();
+    sb.AppendLine("Templates:\n" + string.Join("\n", templates));
+    _logTextLabel.text = sb.ToString();
     _logTextLabel.ToggleDisplayStyle(true);
+  }
+
+  static string ResolveStyle(string name) {
+    if (VisualElementRecord.StandardStylesPaths.TryGetValue(name, out var path)) {
+      return path;
+    }
+    return name + ".uss";
+  }
+
+  static string ResolveTemplate(string name) {
+    if (VisualElementRecord.StandardTemplatesPaths.TryGetValue(name, out var path)) {
+      return path;
+    }
+    return name + ".uxml";
   }
 
   string VerifyTargetPath(string path) {
