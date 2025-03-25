@@ -1,9 +1,11 @@
 ﻿ID,Text,Comment
 =,=,"UI fragment strings"
 IgorZ.Automation.AutomationFragment.RulesAreaCaptionTextLocKey,"Правила автоматизации:",
-IgorZ.Automation.AutomationFragment.RuleTextLocKey,"Если {0}, тогда {1}",
+IgorZ.Automation.AutomationFragment.RuleTextLocKey,"Если {0}
+Тогда {1}",
 IgorZ.Automation.AutomationFragment.AddRulesBtn,"Добавить правила автоматизации",
 IgorZ.Automation.AutomationFragment.EditRulesBtn,"Редактировать",
+IgorZ.Automation.AutomationFragment.CopyRulesBtn,"Копировать правила",
 =,=,"Scriptable components strings"
 IgorZ.Automation.Scripting.Expressions.AndOperator," и ","String to join components of the expression with condition AND. Used to represent the condition in the panel"
 IgorZ.Automation.Scripting.Expressions.OrOperator," или ","String to join components of the expression with condition OR. Used to represent the condition in the panel"

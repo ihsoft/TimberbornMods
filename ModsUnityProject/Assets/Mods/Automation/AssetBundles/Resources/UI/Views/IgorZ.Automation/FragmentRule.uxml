@@ -1,0 +1,6 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tb="Timberborn.CoreUI" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:VisualElement style="flex-direction: row; align-content: center;">
+        <engine:Label text="●" class="game-text-small" style="margin-right: 5px;" />
+        <engine:Label text="If CONDITION, then ACTION looong string looong string looong string looong string" name="Content" class="game-text-small" />
+    </engine:VisualElement>
+</engine:UXML>

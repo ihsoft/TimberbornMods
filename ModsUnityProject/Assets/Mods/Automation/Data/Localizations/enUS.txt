@@ -114,9 +114,11 @@ IgorZ.Automation.BlockableBuildingAction.UnblockDescription,"<SolidHighlight>unb
 IgorZ.Automation.BlockableBuildingAction.BlockText,"Waiting for the other buildings to finish",
 =,=,"UI fragment strings"
 IgorZ.Automation.AutomationFragment.RulesAreaCaptionTextLocKey,"Automation rules:",
-IgorZ.Automation.AutomationFragment.RuleTextLocKey,"If {0}, then {1}",
+IgorZ.Automation.AutomationFragment.RuleTextLocKey,"If {0}
+Then {1}",
 IgorZ.Automation.AutomationFragment.AddRulesBtn,"Add automation rules",
 IgorZ.Automation.AutomationFragment.EditRulesBtn,"Edit rules",
+IgorZ.Automation.AutomationFragment.CopyRulesBtn,"Copy rules",
 =,=,"Scriptable components strings"
 IgorZ.Automation.Scripting.Expressions.AndOperator," and ","String to join components of the expression with condition AND. Used to represent the condition in the panel"
 IgorZ.Automation.Scripting.Expressions.OrOperator," or ","String to join components of the expression with condition OR. Used to represent the condition in the panel"
