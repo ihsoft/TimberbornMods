@@ -1,5 +1,6 @@
-# v2.0.2 (started on 3/7/2025):
+# v2.0.3 (started on 3/7/2025):
 * [Feature] Allow editing the rules in the game.
+* [Feature] Allow copying rules from one building to another.
 * [Feature] Add scripted conditions and action to compose the rules.
 * [Fix #69 ] Dynamite drilldown action crashes.
 * [Fix #70 ] Crashes in the editor mode.
