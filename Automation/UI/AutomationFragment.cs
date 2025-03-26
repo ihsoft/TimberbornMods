@@ -28,6 +28,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
   readonly UiFactory _uiFactory;
   readonly RulesEditorDialog _rulesEditorDialog;
+  readonly CopyRulesTool _copyRulesTool;
 
   VisualElement _root;
   VisualElement _rulesList;
@@ -35,9 +36,10 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
   AutomationBehavior _automationBehavior;
 
-  AutomationFragment(UiFactory uiFactory, RulesEditorDialog rulesEditorDialog) {
+  AutomationFragment(UiFactory uiFactory, RulesEditorDialog rulesEditorDialog, CopyRulesTool copyRulesTool) {
     _uiFactory = uiFactory;
     _rulesEditorDialog = rulesEditorDialog;
+    _copyRulesTool = copyRulesTool;
   }
 
   public VisualElement InitializeFragment() {
@@ -47,10 +49,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
     _addRulesButton = _root.Q<Button>(AddRulesButtonName);
     _addRulesButton.clicked += () => _rulesEditorDialog.Show(_automationBehavior, UpdateView);
     _root.Q<Button>(EditRulesButtonName).clicked += () => _rulesEditorDialog.Show(_automationBehavior, UpdateView);
-    _root.Q<Button>(CopyRulesButtonName).clicked += () => {
-      //FIXME
-      DebugEx.Warning("*** Copying rules is not implemented yet.");
-    };
+    _root.Q<Button>(CopyRulesButtonName).clicked += () => _copyRulesTool.StartTool(_automationBehavior);
 
     _root.ToggleDisplayStyle(visible: false);
     return _root;

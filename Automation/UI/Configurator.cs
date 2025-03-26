@@ -12,6 +12,7 @@ namespace IgorZ.Automation.UI;
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<AutomationFragment>().AsSingleton();
+    containerDefinition.Bind<CopyRulesTool>().AsSingleton();
     containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
   }
 

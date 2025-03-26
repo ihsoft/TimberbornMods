@@ -119,6 +119,8 @@ Then {1}",
 IgorZ.Automation.AutomationFragment.AddRulesBtn,"Add automation rules",
 IgorZ.Automation.AutomationFragment.EditRulesBtn,"Edit rules",
 IgorZ.Automation.AutomationFragment.CopyRulesBtn,"Copy rules",
+IgorZ.Automation.Tool.CopyRules.Title,"Copy automation rules",
+IgorZ.Automation.Tool.CopyRules.Text,"Copy {0} rules",
 =,=,"Scriptable components strings"
 IgorZ.Automation.Scripting.Expressions.AndOperator," and ","String to join components of the expression with condition AND. Used to represent the condition in the panel"
 IgorZ.Automation.Scripting.Expressions.OrOperator," or ","String to join components of the expression with condition OR. Used to represent the condition in the panel"
