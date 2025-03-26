@@ -84,12 +84,6 @@
       <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\ToolGroupSpecification.Automation.24.Population.original.json.meta">
         <Link>Mod\Blueprints\ToolGroupSpecification.Automation.24.Population.original.json.meta</Link>
       </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\ToolGroupSpecification.Automation.25.Scripting.original.json">
-        <Link>Mod\Blueprints\ToolGroupSpecification.Automation.25.Scripting.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\ToolGroupSpecification.Automation.25.Scripting.original.json.meta">
-        <Link>Mod\Blueprints\ToolGroupSpecification.Automation.25.Scripting.original.json.meta</Link>
-      </Content>
       <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\ToolGroupSpecification.Automation.original.json">
         <Link>Mod\Blueprints\ToolGroupSpecification.Automation.original.json</Link>
       </Content>
@@ -275,12 +269,6 @@
       </Content>
       <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\ToolSpecification.Automation.24.Population.33.BotsAtMinus20.original.json.meta">
         <Link>Mod\Blueprints\ToolSpecification.Automation.24.Population.33.BotsAtMinus20.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\ToolSpecification.Automation.25.Scripting.01.WatherPause.original.json">
-        <Link>Mod\Blueprints\ToolSpecification.Automation.25.Scripting.01.WatherPause.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\ToolSpecification.Automation.25.Scripting.01.WatherPause.original.json.meta">
-        <Link>Mod\Blueprints\ToolSpecification.Automation.25.Scripting.01.WatherPause.original.json.meta</Link>
       </Content>
       <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\ToolSpecification.Automation.Root.-099.DebugFinishNowTool.original.json">
         <Link>Mod\Blueprints\ToolSpecification.Automation.Root.-099.DebugFinishNowTool.original.json</Link>

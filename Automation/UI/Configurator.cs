@@ -15,16 +15,10 @@ sealed class Configurator : IConfigurator {
     containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
   }
 
-  sealed class EntityPanelModuleProvider : IProvider<EntityPanelModule> {
-    readonly AutomationFragment _automationFragment;
-
-    public EntityPanelModuleProvider(AutomationFragment automationFragment) {
-      _automationFragment = automationFragment;
-    }
-
+  sealed class EntityPanelModuleProvider(AutomationFragment automationFragment) : IProvider<EntityPanelModule> {
     public EntityPanelModule Get() {
       var builder = new EntityPanelModule.Builder();
-      builder.AddBottomFragment(_automationFragment);
+      builder.AddBottomFragment(automationFragment);
       return builder.Build();
     }
   }

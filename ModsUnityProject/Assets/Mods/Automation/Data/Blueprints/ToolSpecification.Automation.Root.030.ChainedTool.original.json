@@ -6,8 +6,8 @@
     "Order": 30,
     "Icon": "Sprites/IgorZ/tool-chained",
     "DevMode": false,
-    "NameLocKey": "IgorZ.Automation.Tool.tmpl.ChainedBuildeings.DisplayName",
-    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.ChainedBuildeings.Description",
+    "NameLocKey": "IgorZ.Automation.Tool.tmpl.ChainedBuildings.DisplayName",
+    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.ChainedBuildings.Description"
   },
   "AutomationTemplateSpec": {
     "TemplateFamilyName": "Construction.CheckBlockedAccess",
@@ -22,8 +22,8 @@
             {"Name": "Description", "StrValue": "IgorZ.Automation.ShowStatusAction.HoldConstruction"},
             {"Name": "StatusKind", "StrValue": "NormalStatusWithFloatingIcon"},
             {"Name": "StatusIcon", "StrValue": "DirectionalBlocking"},
-            {"Name": "StatusText", "StrValue": "IgorZ.Automation.ShowStatusAction.HoldCompletionStatusText"},
-          ],
+            {"Name": "StatusText", "StrValue": "IgorZ.Automation.ShowStatusAction.HoldCompletionStatusText"}
+          ]
         }
       },
       {
@@ -33,7 +33,7 @@
           "Parameters": [
             {"Name": "ActionKind", "StrValue": "HideStatus"},
             {"Name": "StatusToken", "StrValue": "ChainTool-2"},
-            {"Name": "Description", "StrValue": "IgorZ.Automation.ShowStatusAction.ResumeConstruction"},
+            {"Name": "Description", "StrValue": "IgorZ.Automation.ShowStatusAction.ResumeConstruction"}
           ]
         }
       }

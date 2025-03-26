@@ -17,7 +17,7 @@ namespace IgorZ.Automation.Tools;
 /// <summary>Definition of an automation rule.</summary>
 /// <remarks>
 /// Each rule defines and executes a term: "if &lt;condition> is true, then execute this &lt;action>". This class is
-/// intended to be only a <i>definition</i> of the rule. Do not re-use it in the execution logic.
+/// intended to be only a <i>definition</i> of the rule. Don't re-use it in the execution logic.
 /// </remarks>
 /// <seealso cref="IAutomationAction"/>
 sealed class AutomationRule : IGameSerializable {

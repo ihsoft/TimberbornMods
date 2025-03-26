@@ -101,7 +101,7 @@ sealed class ApplyTemplateTool : AbstractAreaSelectionTool, IAutomationModeEnabl
     }
   }
 
-  T ParseAndInit<T>(AutomationTemplateSpec.DynamicTypeSpec typeSpec) where T : class, IGameSerializable {
+  static T ParseAndInit<T>(AutomationTemplateSpec.DynamicTypeSpec typeSpec) where T : class, IGameSerializable {
     var instance = DynamicClassSerializer<T>.MakeInstance(typeSpec.TypeId);
     if (typeSpec.Parameters != null && typeSpec.Parameters.Length > 0) {
       instance.LoadFrom(new ObjectLoader(SpecToSaveObjectConverter.ParametersToSaveObject(typeSpec.Parameters)));

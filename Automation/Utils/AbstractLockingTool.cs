@@ -38,7 +38,7 @@ public abstract class AbstractLockingTool : AbstractAreaSelectionTool {
 
   /// <inheritdoc/>
   protected override void Initialize() {
-    DescriptionBullets = new[] { DescriptionHint };
+    DescriptionBullets = [DescriptionHint];
     base.Initialize();
   }
 
@@ -115,7 +115,7 @@ public abstract class AbstractLockingTool : AbstractAreaSelectionTool {
   /// <remarks>
   /// By default, the prefab name is checked. If there is no locked component, then any object will be "similar". The
   /// descendants can extend or override this logic.</remarks>
-  /// <param name="obj">The object to check. It's never <c>null</c>.</param>
+  /// <param name="obj">The object to check. It is never <c>null</c>.</param>
   /// <seealso cref="LockedComponent"/>
   protected virtual bool CheckIfSimilar(BlockObject obj) {
     return LockedComponent == null || obj.GetComponentFast<PrefabSpec>().IsNamed(LockedPrefabName);
