@@ -8,15 +8,11 @@
     <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/TimberDevStyle.uss?fileID=7433441132597879392&amp;guid=86824deb2a4bc844cbec48367a164254&amp;type=3#TimberDevStyle" />
     <engine:VisualElement class="content-row-centered">
         <engine:Instance template="NamedBoxTemplate" style="width: 850px; height: 700px;">
+            <AttributeOverrides element-name="Header" text-loc-key="IgorZ.Automation.Scripting.Editor.DialogHeader" />
             <engine:VisualElement name="ScrollViewWrapper" class="scroll--green-decorated" style="flex-grow: 1; width: 100%;">
                 <engine:ScrollView name="Content">
                     <engine:VisualElement style="flex-grow: 1;">
                         <engine:VisualElement name="RuleRowsContainer">
-                            <engine:Instance template="RuleRow" />
-                            <engine:Instance template="RuleRow" />
-                            <engine:Instance template="RuleRow" />
-                            <engine:Instance template="RuleRow" />
-                            <engine:Instance template="RuleRow" />
                             <engine:Instance template="RuleRow" />
                             <engine:Instance template="RuleRow" />
                         </engine:VisualElement>

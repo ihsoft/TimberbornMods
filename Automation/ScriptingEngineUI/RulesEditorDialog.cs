@@ -20,7 +20,6 @@ sealed class RulesEditorDialog : IPanelController {
   const string PendingEditsNotificationLocKey = "IgorZ.Automation.Scripting.Editor.PendingEditsNotification";
   const string UnsavedChangesConfirmationLocKey = "IgorZ.Automation.Scripting.Editor.UnsavedChangesConfirmation";
   const string ReadMoreLinkLocKey = "IgorZ.Automation.Scripting.Editor.ReadMoreLink";
-  const string DialogTitleLocKey = "IgorZ.Automation.Scripting.Editor.DialogHeader";
 
   #region IPanelController implementation
 
@@ -61,7 +60,6 @@ sealed class RulesEditorDialog : IPanelController {
 
   public void Show(AutomationBehavior behavior, Action onClosed) {
     _root = _uiFactory.LoadVisualTreeAsset("IgorZ.Automation/RulesEditor");
-    _root.Q<Label>("Header").text = _uiFactory.T(DialogTitleLocKey);
     _ruleRowsContainer = _root.Q<VisualElement>("RuleRowsContainer");
     _root.Q<Button>("ConfirmButton").clicked += () => OnUIConfirmed();
     _root.Q<Button>("CancelButton").clicked += Close;
