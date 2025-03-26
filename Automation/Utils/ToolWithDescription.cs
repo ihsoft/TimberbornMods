@@ -26,19 +26,20 @@ public abstract class ToolWithDescription : CustomToolSystem.CustomTool {
   #region API
 
   /// <summary>
-  /// The localization key of the text to present as the tool caption. If <c>null</c>,
-  /// then <c>TimberApi.ToolSystem.ToolSpecification.NameLocKey</c> is used.
+  /// The localization key of the text to present as the tool caption. If not overriden, then the string from the
+  /// <see cref="CustomToolSystem.CustomTool.ToolSpec"/> is used.
   /// </summary>
-  protected string DescriptionTitleLoc = null;
+  /// <remarks>If <c>null</c> or empty, then the title will not be shown.</remarks>
+  protected virtual string DescriptionTitleLoc => ToolSpec?.NameLocKey;
 
   /// <summary>
-  /// The localization key of the text to present as the tool description. If <c>null</c>,
-  /// then <c>"TimberApi.ToolSystem.ToolSpecification.DescriptionLocKey</c> is used.
+  /// The localization key of the text to present as the tool description. If not overriden, then the string from the
+  /// <see cref="CustomToolSystem.CustomTool.ToolSpec"/> is used.
   /// </summary>
-  protected string DescriptionMainSectionLoc = null;
+  /// <remarks>If <c>null</c> or empty, then the description will not be shown.</remarks>
+  protected virtual string DescriptionMainSectionLoc => ToolSpec?.DescriptionLocKey;
 
   /// <summary>The localization key of the optional text that is presented at the bottom of the main stuff.</summary>
-  /// <remarks>If <c>null</c>, then it is not presented.</remarks>
   protected string DescriptionHintSectionLoc = null;
 
   /// <summary>
@@ -79,8 +80,12 @@ public abstract class ToolWithDescription : CustomToolSystem.CustomTool {
     if (_cachedDescription != null) {
       return _cachedDescription;
     }
-    var description = new ToolDescription.Builder(Loc.T(DescriptionTitleLoc ?? ToolSpec.NameLocKey));
-    var descriptionText = new StringBuilder(Loc.T(DescriptionMainSectionLoc ?? ToolSpec.DescriptionLocKey));
+    var description =
+        new ToolDescription.Builder(!string.IsNullOrEmpty(DescriptionTitleLoc) ? Loc.T(DescriptionTitleLoc) : null);
+    var descriptionText = new StringBuilder();
+    if (!string.IsNullOrEmpty(DescriptionMainSectionLoc)) {
+      descriptionText.Append(Loc.T(DescriptionMainSectionLoc));
+    }
     if (DescriptionBullets != null) {
       foreach (var descriptionBullet in DescriptionBullets) {
         descriptionText.Append("\n" + SpecialStrings.RowStarter + Loc.T(descriptionBullet));
