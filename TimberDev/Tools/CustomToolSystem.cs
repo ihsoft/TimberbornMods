@@ -11,7 +11,8 @@ using Timberborn.ConstructionMode;
 using Timberborn.Localization;
 using Timberborn.ToolSystem;
 
-namespace IgorZ.Automation.Utils;
+// ReSharper disable once CheckNamespace
+namespace IgorZ.TimberDev.Tools;
 
 /// <summary>System that manages bindings to support TimberAPI tools and groups specifications.</summary>
 /// <remarks>Use this system to keep code short and clear when no fancy setups are needed.</remarks>

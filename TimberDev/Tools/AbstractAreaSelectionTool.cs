@@ -13,7 +13,8 @@ using Timberborn.BuilderPrioritySystem;
 using Timberborn.InputSystem;
 using UnityEngine;
 
-namespace IgorZ.Automation.Utils;
+// ReSharper disable once CheckNamespace
+namespace IgorZ.TimberDev.Tools;
 
 /// <summary>The base class to the selection tool implementations.</summary>
 /// <remarks>

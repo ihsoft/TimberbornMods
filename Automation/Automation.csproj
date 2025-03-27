@@ -320,6 +320,18 @@
       </Content>
     </ItemGroup>
     <ItemGroup>
+      <Compile Include="..\TimberDev\Tools\AbstractAreaSelectionTool.cs">
+        <Link>TimberDev\Tools\AbstractAreaSelectionTool.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Tools\AbstractLockingTool.cs">
+        <Link>TimberDev\Tools\AbstractLockingTool.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Tools\CustomToolSystem.cs">
+        <Link>TimberDev\Tools\CustomToolSystem.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Tools\ToolWithDescription.cs">
+        <Link>TimberDev\Tools\ToolWithDescription.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\UI\CommonFormats.cs">
         <Link>TimberDev\UI\CommonFormats.cs</Link>
       </Compile>

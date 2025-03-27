@@ -12,7 +12,8 @@ using Timberborn.EntitySystem;
 using Timberborn.PrefabSystem;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace IgorZ.Automation.Utils;
+// ReSharper disable once CheckNamespace
+namespace IgorZ.TimberDev.Tools;
 
 /// <summary>Tool that can select objects by user criteria.</summary>
 /// <remarks>
