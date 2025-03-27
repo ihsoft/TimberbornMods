@@ -57,7 +57,7 @@ sealed class ScriptedAction : AutomationActionBase {
       } catch (ScriptError e) {
         HostedDebugLog.Error(Behavior, "Action failed: {0}\nError: {1}", Expression, e.Message);
         _parsedExpression = null;
-        _uiDescription = TextColors.ColorizeText(Behavior.Loc.T(RuntimeErrorLocKey));
+        _uiDescription = Behavior.Loc.T(RuntimeErrorLocKey);
       }
     } else {
       HostedDebugLog.Error(Behavior, "Condition triggered, but the action was broken: {0}", Expression);
@@ -125,14 +125,14 @@ sealed class ScriptedAction : AutomationActionBase {
     if (!res) {
       HostedDebugLog.Error(
           Behavior, "Failed to parse action: {0}\nError: {1}", Expression, _parserParserContext.LastError);
-      _uiDescription = TextColors.ColorizeText(Behavior.Loc.T(ParseErrorLocKey));
+      _uiDescription = Behavior.Loc.T(ParseErrorLocKey);
       return;
     }
     _parsedExpression = _parserParserContext.ParsedExpression as ActionExpr;
     if (_parsedExpression == null) {
       HostedDebugLog.Error(
           Behavior, "Expression is not an action operator: {0}", _parserParserContext.ParsedExpression);
-      _uiDescription = TextColors.ColorizeText(Behavior.Loc.T(ParseErrorLocKey));
+      _uiDescription = Behavior.Loc.T(ParseErrorLocKey);
       return;
     }
     var description = ExpressionParser.Instance.GetDescription(_parserParserContext);

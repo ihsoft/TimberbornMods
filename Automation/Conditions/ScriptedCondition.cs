@@ -118,14 +118,14 @@ sealed class ScriptedCondition : AutomationConditionBase {
     if (!res) {
       HostedDebugLog.Error(
           Behavior, "Failed to parse condition: {0}\nError: {1}", Expression, _parserParserContext.LastError);
-      _uiDescription = TextColors.ColorizeText(Behavior.Loc.T(ParseErrorLocKey));
+      _uiDescription = Behavior.Loc.T(ParseErrorLocKey);
       return;
     }
     _parsedExpression = _parserParserContext.ParsedExpression as BoolOperatorExpr;
     if (_parsedExpression == null) {
       HostedDebugLog.Error(
           Behavior, "Expression is not a boolean operator: {0}", _parserParserContext.ParsedExpression.Serialize());
-      _uiDescription = TextColors.ColorizeText(Behavior.Loc.T(ParseErrorLocKey));
+      _uiDescription = Behavior.Loc.T(ParseErrorLocKey);
       return;
     }
     var description = ExpressionParser.Instance.GetDescription(_parserParserContext);
@@ -147,7 +147,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
       } catch (ScriptError e) {
         HostedDebugLog.Error(Behavior, "Error in condition execution: {0}\nReason: {1}", Expression, e.Message);
         _parsedExpression = null;
-        _uiDescription = TextColors.ColorizeText(Behavior.Loc.T(RuntimeErrorLocKey));
+        _uiDescription = Behavior.Loc.T(RuntimeErrorLocKey);
       }
     } else {
       HostedDebugLog.Error(Behavior, "Signal change triggered, but the condition was broken: {0}", Expression);
