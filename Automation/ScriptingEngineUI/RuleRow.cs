@@ -264,6 +264,10 @@ sealed class RuleRow {
       };
       condition = ExpressionParser.Instance.GetDescription(context);
       condition = TextColors.ColorizeText($"<SolidHighlight>{condition}</SolidHighlight>");
+      if (context.LastError != null) {
+        DebugEx.Warning("Failed to get description for condition: {0}\nError: {1}",
+                        _conditionExpression, context.LastError);
+      }
     }
 
     if (ParsedAction == null) {
@@ -275,6 +279,10 @@ sealed class RuleRow {
       };
       action = ExpressionParser.Instance.GetDescription(context);
       action = TextColors.ColorizeText($"<SolidHighlight>{action}</SolidHighlight>");
+      if (context.LastError != null) {
+        DebugEx.Warning("Failed to get description for action: {0}\nError: {1}",
+                        _actionExpression, context.LastError);
+      }
     }
   }
 

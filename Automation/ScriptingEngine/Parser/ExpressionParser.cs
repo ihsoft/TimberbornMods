@@ -14,6 +14,8 @@ namespace IgorZ.Automation.ScriptingEngine.Parser;
 /// <summary>Parser for the expressions in the scripting engine.</summary>
 sealed class ExpressionParser {
 
+  const string RuntimeErrorLocKey = "IgorZ.Automation.Scripting.Expressions.RuntimeError";
+
   #region API
 
   /// <summary>Current parser context.</summary>
@@ -47,6 +49,9 @@ sealed class ExpressionParser {
     try {
       CurrentParserContext = parserContext;
       return CurrentParserContext.ParsedExpression.Describe();
+    } catch (ScriptError e) {
+      CurrentParserContext.LastError = e.Message;
+      return Loc.T(RuntimeErrorLocKey);
     } finally {
       CurrentParserContext = null;
     }
