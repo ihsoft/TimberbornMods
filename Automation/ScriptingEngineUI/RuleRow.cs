@@ -143,7 +143,11 @@ sealed class RuleRow {
 
     // Controls.
     if (IsModified) {
-      CreateButton(ResetChangesLocKey, _ => DiscardChangesAndSwitchToViewMode());
+      CreateButton(ResetChangesLocKey, _ => {
+        ConditionExpression = _originalConditionExpression;
+        ActionExpression = _originalActionExpression;
+        SwitchToViewMode();
+      });
     }
     var ruleEditable = false;
     foreach (var provider in _editorProviders) {
@@ -163,9 +167,6 @@ sealed class RuleRow {
   public void DiscardChangesAndSwitchToViewMode() {
     if (IsNew) {
       MarkDeleted();
-    } else {
-      ConditionExpression = _originalConditionExpression;
-      ActionExpression = _originalActionExpression;
     }
     SwitchToViewMode();
   }
