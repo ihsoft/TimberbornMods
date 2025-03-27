@@ -26,11 +26,11 @@ sealed class BinaryOperatorExpr : BoolOperatorExpr {
     sb.Append(Left.Describe());
     sb.Append(Name switch {
         "eq" => " = ",
-        "ne" => " <> ",
+        "ne" => " \u2260 ",
         "gt" => " > ",
         "lt" => " < ",
-        "ge" => " >= ",
-        "le" => " <= ",
+        "ge" => " \u2265 ",
+        "le" => " \u2264 ",
         _ => throw new InvalidOperationException("Unknown operator: " + Name),
     });
     if (Right is ConstantValueExpr constantValueExpr) {

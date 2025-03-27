@@ -55,16 +55,16 @@ class ConditionConstructor : BaseConstructor {
 
   static readonly DropdownItem<string>[] StringOperators = [
       new() { Value = "eq", Text = "=" },
-      new() { Value = "ne", Text = "<>" },
+      new() { Value = "ne", Text = "\u2260" },
   ];
 
   static readonly DropdownItem<string>[] NumberOperators = [
       new() { Value = "eq", Text = "=" },
-      new() { Value = "ne", Text = "<>" },
+      new() { Value = "ne", Text = "\u2260" },
       new() { Value = "gt", Text = ">" },
       new() { Value = "lt", Text = "<" },
-      new() { Value = "ge", Text = ">=" },
-      new() { Value = "le", Text = "<=" },
+      new() { Value = "ge", Text = "\u2265" },
+      new() { Value = "le", Text = "\u2264" },
   ];
 
   ConditionDefinition _selectedDefinition;
