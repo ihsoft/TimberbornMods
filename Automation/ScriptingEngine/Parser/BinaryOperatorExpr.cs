@@ -33,12 +33,7 @@ sealed class BinaryOperatorExpr : BoolOperatorExpr {
         "le" => " \u2264 ",
         _ => throw new InvalidOperationException("Unknown operator: " + Name),
     });
-    if (Right is ConstantValueExpr constantValueExpr) {
-      var def = ExpressionParser.Instance.GetSignalDefinition(Left.SignalName);
-      sb.Append(constantValueExpr.FormatValue(def.Result));
-    } else {
-      sb.Append(Right.Describe());
-    }
+    sb.Append(Right.ValueFn().FormatValue(ExpressionParser.Instance.GetSignalDefinition(Left.SignalName).Result));
     return sb.ToString();
   }
 

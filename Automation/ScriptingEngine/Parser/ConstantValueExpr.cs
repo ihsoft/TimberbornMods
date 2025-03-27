@@ -3,7 +3,6 @@
 // License: Public Domain
 
 using System;
-using System.Linq;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
@@ -24,18 +23,6 @@ sealed class ConstantValueExpr : IValueExpr {
       return new ConstantValueExpr { ValueType = ScriptValue.TypeEnum.Number, ValueFn = () => ScriptValue.Of(number) };
     }
     return null;
-  }
-
-  public string FormatValue(ValueDef valueDef) {
-    if (ValueType == ScriptValue.TypeEnum.String) {
-      var text = valueDef.Options != null
-          ? valueDef.Options.FirstOrDefault(x => x.Value == ValueFn().AsString).Text
-          : "";
-      return text != "" ? text : Describe();
-    }
-    return valueDef.FormatNumber == null
-        ? (ValueFn().AsNumber / 100f).ToString("0.##")
-        : valueDef.FormatNumber(ValueFn().AsNumber);
   }
 
   /// <inheritdoc/>

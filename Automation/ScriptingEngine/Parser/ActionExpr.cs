@@ -21,16 +21,12 @@ sealed class ActionExpr : AbstractOperandExpr {
   /// <inheritdoc/>
   public override string Describe() {
     var def = ExpressionParser.Instance.GetActionDefinition(ActionName);
-    var args = new List<object>();
+    var args = new string[def.Arguments.Length];
     for (var i = 0; i < def.Arguments.Length; i++) {
-      var argValue = Operands[i + 1];
-      if (argValue is ConstantValueExpr constantValueExpr) {
-        args.Add(constantValueExpr.FormatValue(def.Arguments[i]));
-      } else {
-        args.Add(argValue.Describe());
-      }
+      var value = (Operands[i + 1] as IValueExpr)!.ValueFn();
+      args[i] = value.FormatValue(def.Arguments[i]);
     }
-    return string.Format(def.DisplayName, args.ToArray());
+    return string.Format(def.DisplayName, args);
   }
 
   static readonly Regex SignalNameRegexp = new("^([a-zA-Z][a-zA-Z0-9]+)(.[a-zA-Z][a-zA-Z0-9]+)*$");

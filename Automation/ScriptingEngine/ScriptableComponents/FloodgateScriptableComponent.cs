@@ -56,7 +56,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
       Arguments = [
           new ValueDef {
               ValueType = ScriptValue.TypeEnum.Number,
-              FormatNumber = FormatHeight,
+              NumberFormat = "0.00",
           },
       ],
   };
@@ -69,16 +69,6 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
       height = floodgate.MaxHeight + height;
     }
     floodgate.SetHeight(height);
-  }
-
-  static string FormatHeight(int value) {
-    var floodgate = ExpressionParser.Instance.CurrentParserContext.ScriptHost.GetComponentFast<Floodgate>();
-    var height = value / 100f;
-    if (height < 0) {
-      height = floodgate.MaxHeight + height;
-    }
-    height = Mathf.Clamp(height, 0, floodgate.MaxHeight);
-    return height.ToString("0.00");
   }
 
   #endregion

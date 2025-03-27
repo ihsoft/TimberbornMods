@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System.Linq;
 using UnityEngine;
 
 namespace IgorZ.Automation.ScriptingEngine;
@@ -99,6 +100,21 @@ public record struct ScriptValue {
         TypeEnum.String => $"ScriptValue#String:{AsString}",
         _ => $"ScriptValue#{ValueType}:UNKNOWN",
     };
+  }
+
+  /// <summary>Formats the value according to the value definition.</summary>
+  public string FormatValue(ValueDef valueDef) {
+    if (ValueType != TypeEnum.String) {
+      return AsFloat.ToString(valueDef.NumberFormat ?? "0.##");
+    }
+    var stringValue = AsString;
+    if (valueDef.Options == null) {
+      return stringValue;
+    }
+    var resolvedValue = valueDef.Options.FirstOrDefault(x => x.Value == stringValue);
+    return resolvedValue.Text != ""
+        ? resolvedValue.Text
+        : $"<RedHighlight>?{stringValue}</RedHighlight>";
   }
 
   int? _number;
