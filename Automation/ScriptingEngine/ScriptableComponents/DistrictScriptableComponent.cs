@@ -41,8 +41,8 @@ class DistrictScriptableComponent : ScriptableComponentBase {
       throw new ScriptError("Not a district building");
     }
     return name switch {
-        BeaverPopulationSignalName => () => ScriptValue.FromFloat(GetPopulation(districtBuilding).Beavers.Count),
-        BotPopulationSignalName => () => ScriptValue.FromFloat(GetPopulation(districtBuilding).NumberOfBots),
+        BeaverPopulationSignalName => () => ScriptValue.FromInt(GetPopulation(districtBuilding).Beavers.Count),
+        BotPopulationSignalName => () => ScriptValue.FromInt(GetPopulation(districtBuilding).NumberOfBots),
         _ => throw new ScriptError("Unknown signal: " + name),
     };
   }

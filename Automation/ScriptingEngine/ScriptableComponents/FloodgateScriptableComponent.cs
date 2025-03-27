@@ -64,7 +64,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
   static void SetHeightAction(Floodgate floodgate, ScriptValue[] args) {
     AssertActionArgsCount(SetHeightActionName, args, 1);
-    var height = args[0].AsNumber / 100f;
+    var height = args[0].AsFloat;
     if (height < 0) {
       height = floodgate.MaxHeight + height;
     }
