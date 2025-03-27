@@ -7,12 +7,11 @@ using System.Collections.Generic;
 using System.Linq;
 using IgorZ.Automation.AutomationSystem;
 using Timberborn.BaseComponentSystem;
-using Timberborn.SingletonSystem;
 
 namespace IgorZ.Automation.ScriptingEngine;
 
 /// <summary>Service that provides access to the scripting engine.</summary>
-public sealed class ScriptingService : ILoadableSingleton {
+sealed class ScriptingService {
 
   #region API
 
@@ -88,13 +87,6 @@ public sealed class ScriptingService : ILoadableSingleton {
     }
     scriptable.UnregisterSignalChangeCallback(name, building, onValueChanged);
   }
-
-  #endregion
-
-  #region ILoadableSingleton implementation
-
-  /// <inheritdoc/>
-  public void Load() {}
 
   #endregion
 

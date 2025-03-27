@@ -116,7 +116,7 @@ sealed class ExpressionParser {
         continue;
       }
 
-      // Capture the statment separator.
+      // Capture the statement separator.
       if (input[currentPos] == '(' || input[currentPos] == ')') {
         tokens.Enqueue(input.Substring(currentPos, 1));
         currentPos++;

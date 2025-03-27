@@ -6,7 +6,6 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Bindito.Core;
-using IgorZ.Automation.Utils;
 using Timberborn.BaseComponentSystem;
 using Timberborn.ConstructionSites;
 using Timberborn.Emptying;
@@ -65,7 +64,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
       return () => ScriptValue.FromInt(inventory.AmountInStock(goodId));
     }
     if (name.StartsWith(OutputGoodSignalNamePrefix)) {
-      var goodId = name.Substring(OutputGoodSignalNamePrefix.Length);
+      var goodId = name[OutputGoodSignalNamePrefix.Length..];
       if (!inventory.OutputGoods.Contains(goodId)) {
         throw new ScriptError($"Output good '{goodId}' not found in: {DebugEx.ObjectToString(inventory)}");
       }
