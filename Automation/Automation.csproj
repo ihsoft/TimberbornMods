@@ -344,6 +344,9 @@
       <Compile Include="..\TimberDev\Utils\Configurator.cs">
         <Link>TimberDev\Utils\Configurator.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\Utils\CounterProfiler.cs">
+        <Link>TimberDev\Utils\CounterProfiler.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\Utils\CustomCursorService.cs">
         <Link>TimberDev\Utils\CustomCursorService.cs</Link>
       </Compile>
@@ -364,6 +367,9 @@
       </Compile>
       <Compile Include="..\TimberDev\Utils\StaticBindings.cs">
         <Link>TimberDev\Utils\StaticBindings.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\TicksProfiler.cs">
+        <Link>TimberDev\Utils\TicksProfiler.cs</Link>
       </Compile>
       <Compile Include="..\UnityDevLite\DebugEx.cs">
         <Link>UnityDevLite\DebugEx.cs</Link>

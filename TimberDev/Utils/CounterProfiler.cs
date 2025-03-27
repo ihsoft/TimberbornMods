@@ -6,7 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace IgorZ.Automation.Utils;
+// ReSharper disable once CheckNamespace
+namespace IgorZ.TimberDev.Utils;
 
 /// <summary>Helper class to profile execution timings.</summary>
 public sealed class CounterProfiler {
