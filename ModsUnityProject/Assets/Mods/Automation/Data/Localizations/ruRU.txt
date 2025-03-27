@@ -7,7 +7,7 @@ IgorZ.Automation.AutomationFragment.AddRulesBtn,"Добавить правила
 IgorZ.Automation.AutomationFragment.EditRulesBtn,"Редактировать",
 IgorZ.Automation.AutomationFragment.CopyRulesBtn,"Копировать правила",
 IgorZ.Automation.Tool.CopyRules.Title,"Копировать правила автоматизации",
-IgorZ.Automation.Tool.CopyRules.Text,"Копировать {0} правил",
+IgorZ.Automation.Tool.CopyRules.Text,"Копировать правила: {0}",
 =,=,"Scriptable components strings"
 IgorZ.Automation.Scripting.Expressions.AndOperator," и ","String to join components of the expression with condition AND. Used to represent the condition in the panel"
 IgorZ.Automation.Scripting.Expressions.OrOperator," или ","String to join components of the expression with condition OR. Used to represent the condition in the panel"
