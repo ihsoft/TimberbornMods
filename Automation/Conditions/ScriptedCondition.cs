@@ -6,6 +6,7 @@ using System;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
+using TimberApi.DependencyContainerSystem;
 using Timberborn.Localization;
 using Timberborn.Persistence;
 using UnityDev.Utils.LogUtilsLite;
@@ -38,7 +39,8 @@ sealed class ScriptedCondition : AutomationConditionBase {
   /// <inheritdoc/>
   protected override void OnBehaviorToBeCleared() {
     foreach (var signal in _parserParserContext.ReferencedSignals) {
-      ScriptingService.Instance.UnregisterSignalChangeCallback(signal, Behavior, CheckOperands);
+      DependencyContainer.GetInstance<ScriptingService>()
+          .UnregisterSignalChangeCallback(signal, Behavior, CheckOperands);
     }
   }
 
@@ -131,7 +133,8 @@ sealed class ScriptedCondition : AutomationConditionBase {
     var description = ExpressionParser.Instance.GetDescription(_parserParserContext);
     _uiDescription = TextColors.ColorizeText($"<SolidHighlight>{description}</SolidHighlight>");
     foreach (var signal in _parserParserContext.ReferencedSignals) {
-      ScriptingService.Instance.RegisterSignalChangeCallback(signal, Behavior, CheckOperands);
+      DependencyContainer.GetInstance<ScriptingService>()
+          .RegisterSignalChangeCallback(signal, Behavior, CheckOperands);
     }
   }
 

@@ -16,9 +16,6 @@ public sealed class ScriptingService : ILoadableSingleton {
 
   #region API
 
-  /// <summary>Instance of the service for accessing from a static context.</summary>
-  public static ScriptingService Instance;
-
   /// <summary>Registers a new scriptable component.</summary>
   public void RegisterScriptable(IScriptable scriptable) {
     _registeredScriptables.Add(scriptable.Name, scriptable);
@@ -104,10 +101,6 @@ public sealed class ScriptingService : ILoadableSingleton {
   #region Implementation
 
   readonly Dictionary<string, IScriptable> _registeredScriptables = [];
-
-  ScriptingService() {
-    Instance = this;
-  }
 
   #endregion
 }
