@@ -174,7 +174,8 @@ sealed class ExpressionParser {
           BinaryOperatorExpr.TryCreateFrom(operatorName, operands)
           ?? LogicalOperatorExpr.TryCreateFrom(operatorName, operands)
           ?? SignalOperatorExpr.TryCreateFrom(operatorName, operands)
-          ?? ActionExpr.TryCreateFrom(operatorName, operands);
+          ?? ActionExpr.TryCreateFrom(operatorName, operands)
+          ?? MathOperatorExpr.TryCreateFrom(operatorName, operands);
       if (result == null) {
         throw new ScriptError("Unknown operator: " + operatorName);
       }
