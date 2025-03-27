@@ -5,7 +5,7 @@
 using System.Linq;
 using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
-using IgorZ.Automation.Tools;
+using IgorZ.Automation.TemplateTools;
 using IgorZ.TimberDev.Tools;
 using Timberborn.BlockSystem;
 using Timberborn.ConstructionMode;

@@ -2,7 +2,7 @@
   "ToolSpec": {
     "Id": "Automation.Tmpl.Construction.CheckBlockedAccess",
     "GroupId": "AutomationToolGroupId",
-    "Type": "IgorZ.Automation.Tools.ApplyTemplateTool",
+    "Type": "IgorZ.Automation.TemplateTools.ApplyTemplateTool",
     "Order": 30,
     "Icon": "Sprites/IgorZ/tool-chained",
     "DevMode": false,

@@ -2,7 +2,7 @@
   "ToolSpec": {
     "Id": "Automation.Tmpl.Storage.BoostEmptying70",
     "GroupId": "AutomationStorageToolGroupId",
-    "Type": "IgorZ.Automation.Tools.ApplyTemplateTool",
+    "Type": "IgorZ.Automation.TemplateTools.ApplyTemplateTool",
     "Order": 12,
     "Icon": "Sprites/IgorZ/icon-empty-70pct",
     "NameLocKey": "IgorZ.Automation.Tool.tmpl.EmptyAt70pct.DisplayName",

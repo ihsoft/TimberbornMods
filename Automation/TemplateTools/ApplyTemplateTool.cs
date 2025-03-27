@@ -16,7 +16,7 @@ using Timberborn.ConstructionMode;
 using Timberborn.Persistence;
 using UnityEngine;
 
-namespace IgorZ.Automation.Tools;
+namespace IgorZ.Automation.TemplateTools;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 sealed class ApplyTemplateTool : AbstractAreaSelectionTool, IAutomationModeEnabler, IConstructionModeEnabler {

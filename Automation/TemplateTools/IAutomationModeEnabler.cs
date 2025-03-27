@@ -2,7 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-namespace IgorZ.Automation.Tools;
+namespace IgorZ.Automation.TemplateTools;
 
 /// <summary>
 /// Tool decoration interface that indicates that automation object should be highlighted on the map.

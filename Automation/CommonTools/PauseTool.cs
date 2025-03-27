@@ -8,16 +8,16 @@ using Timberborn.BuildingsBlocking;
 using Timberborn.ConstructionMode;
 using UnityEngine;
 
-namespace IgorZ.Automation.Tools;
+namespace IgorZ.Automation.CommonTools;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-sealed class ResumeTool : AbstractLockingTool, IConstructionModeEnabler {
+sealed class PauseTool : AbstractLockingTool, IConstructionModeEnabler {
 
   #region CustomTool overrides
 
   /// <inheritdoc/>
   protected override void Initialize() {
-    SetColorSchema(Color.green, Color.green, Color.white, Color.white);
+    SetColorSchema(Color.red, Color.red, Color.white, Color.white);
     base.Initialize();
   }
 
@@ -26,7 +26,7 @@ sealed class ResumeTool : AbstractLockingTool, IConstructionModeEnabler {
   #region AbstractAreaSelectionTool overries
 
   /// <inheritdoc/>
-  protected override string CursorName => "IgorZ/play-cursor";
+  protected override string CursorName => "IgorZ/pause-cursor";
 
   /// <inheritdoc/>
   protected override bool ObjectFilterExpression(BlockObject blockObject) {
@@ -34,12 +34,12 @@ sealed class ResumeTool : AbstractLockingTool, IConstructionModeEnabler {
       return false;
     }
     var component = GetCompatibleComponent(blockObject);
-    return component && component.Paused;
+    return component && !component.Paused;
   }
 
   /// <inheritdoc/>
   protected override void OnObjectAction(BlockObject blockObject) {
-    blockObject.GetComponentFast<PausableBuilding>().Resume();
+    blockObject.GetComponentFast<PausableBuilding>().Pause();
   }
 
   #endregion

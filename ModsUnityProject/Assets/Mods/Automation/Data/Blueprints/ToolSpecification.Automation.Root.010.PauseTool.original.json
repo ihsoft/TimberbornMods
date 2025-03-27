@@ -2,7 +2,7 @@
   "ToolSpec": {
     "Id": "Automation.PauseTool",
     "GroupId": "AutomationToolGroupId",
-    "Type": "IgorZ.Automation.Tools.PauseTool",
+    "Type": "IgorZ.Automation.CommonTools.PauseTool",
     "Order": 10,
     "Icon": "Sprites/IgorZ/player-pause",
     "NameLocKey": "IgorZ.Automation.PauseTool.Title",

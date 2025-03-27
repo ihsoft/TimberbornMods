@@ -2,7 +2,7 @@
   "ToolSpec": {
     "Id": "Automation.Tmpl.Water.PauseDrought",
     "GroupId": "AutomationWaterToolGroupId",
-    "Type": "IgorZ.Automation.Tools.ApplyTemplateTool",
+    "Type": "IgorZ.Automation.TemplateTools.ApplyTemplateTool",
     "Order": 20,
     "Icon": "Sprites/IgorZ/icon-drought-pause",
     "NameLocKey": "IgorZ.Automation.Tool.tmpl.DroughtPause.DisplayName",

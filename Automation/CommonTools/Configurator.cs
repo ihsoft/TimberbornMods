@@ -5,7 +5,7 @@
 using Bindito.Core;
 using IgorZ.TimberDev.Tools;
 
-namespace IgorZ.Automation.Tools;
+namespace IgorZ.Automation.CommonTools;
 
 [Context("Game")]
 [Context("MapEditor")]
@@ -20,8 +20,6 @@ sealed class Configurator : IConfigurator {
     CustomToolSystem.BindTool<PauseTool>(containerDefinition);
     CustomToolSystem.BindTool<ResumeTool>(containerDefinition);
     CustomToolSystem.BindTool<CancelTool>(containerDefinition);
-    containerDefinition.Bind<ApplyTemplateTool.AutomationTemplateSpec>().AsTransient();
-    CustomToolSystem.BindTool<ApplyTemplateTool>(containerDefinition);
     CustomToolSystem.BindTool<DebugPickTool>(containerDefinition);
     CustomToolSystem.BindTool<DebugFinishNowTool>(containerDefinition);
   }

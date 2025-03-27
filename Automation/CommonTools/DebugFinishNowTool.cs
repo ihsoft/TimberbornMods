@@ -7,7 +7,7 @@ using Timberborn.BlockSystem;
 using Timberborn.ConstructionMode;
 using Timberborn.ConstructionSites;
 
-namespace IgorZ.Automation.Tools;
+namespace IgorZ.Automation.CommonTools;
 
 /// <summary>Debug tool to immediately complete unfinished constructibles.</summary>
 // ReSharper disable once ClassNeverInstantiated.Global

@@ -2,7 +2,7 @@
   "ToolSpec": {
     "Id": "Automation.Tmpl.Population.BotsAtPlus10",
     "GroupId": "AutomationPopulationToolGroupId",
-    "Type": "IgorZ.Automation.Tools.ApplyTemplateTool",
+    "Type": "IgorZ.Automation.TemplateTools.ApplyTemplateTool",
     "Order": 31,
     "Icon": "Sprites/IgorZ/tool-bots+10",
     "NameLocKey": "IgorZ.Automation.Tool.tmpl.BotsAtPlus10.DisplayName",

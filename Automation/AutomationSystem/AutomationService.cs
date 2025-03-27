@@ -4,7 +4,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using IgorZ.Automation.Tools;
+using IgorZ.Automation.TemplateTools;
 using Timberborn.BaseComponentSystem;
 using Timberborn.Localization;
 using Timberborn.SelectionSystem;

@@ -3,12 +3,13 @@
 // License: Public Domain
 
 using IgorZ.Automation.AutomationSystem;
+using IgorZ.Automation.TemplateTools;
 using IgorZ.TimberDev.Tools;
 using Timberborn.BlockSystem;
 using Timberborn.ConstructionMode;
 using UnityEngine;
 
-namespace IgorZ.Automation.Tools;
+namespace IgorZ.Automation.CommonTools;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 sealed class CancelTool : AbstractAreaSelectionTool, IAutomationModeEnabler, IConstructionModeEnabler {

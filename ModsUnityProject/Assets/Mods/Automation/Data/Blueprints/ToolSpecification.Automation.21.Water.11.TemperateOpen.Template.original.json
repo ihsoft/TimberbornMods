@@ -2,7 +2,7 @@
   "ToolSpec": {
     "Id": "Automation.Tmpl.Water.OpenFloodgateTemperate",
     "GroupId": "AutomationWaterToolGroupId",
-    "Type": "IgorZ.Automation.Tools.ApplyTemplateTool",
+    "Type": "IgorZ.Automation.TemplateTools.ApplyTemplateTool",
     "Order": 11,
     "Icon": "Sprites/IgorZ/icon-temperate-open",
     "NameLocKey": "IgorZ.Automation.Tool.tmpl.TemperateOpenFloodgate.DisplayName",

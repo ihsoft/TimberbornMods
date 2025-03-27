@@ -12,7 +12,7 @@ using Timberborn.BlockSystem;
 using Timberborn.Persistence;
 using Timberborn.PrefabSystem;
 
-namespace IgorZ.Automation.Tools;
+namespace IgorZ.Automation.TemplateTools;
 
 /// <summary>Definition of an automation rule.</summary>
 /// <remarks>

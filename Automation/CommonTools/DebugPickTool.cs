@@ -16,7 +16,7 @@ using Timberborn.Navigation;
 using Timberborn.PathSystem;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace IgorZ.Automation.Tools;
+namespace IgorZ.Automation.CommonTools;
 
 /// <summary>Debug tool to show various information about block objects.</summary>
 // ReSharper disable once ClassNeverInstantiated.Global

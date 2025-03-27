@@ -2,7 +2,7 @@
   "ToolSpec": {
     "Id": "Automation.DebugPickTool",
     "GroupId": "AutomationToolGroupId",
-    "Type": "IgorZ.Automation.Tools.DebugPickTool",
+    "Type": "IgorZ.Automation.CommonTools.DebugPickTool",
     "Order": -100,
     "Icon": "Sprites/IgorZ/debug-inspect",
     "DevMode": true,
