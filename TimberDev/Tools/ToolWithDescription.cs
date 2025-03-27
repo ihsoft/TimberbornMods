@@ -96,7 +96,7 @@ public abstract class ToolWithDescription : CustomToolSystem.CustomTool {
       }
     }
     if (DescriptionHintSectionLoc != null) {
-      description.AddPrioritizedSection(TextColors.ColorizeText(Loc.T(DescriptionHintSectionLoc)));
+      description.AddPrioritizedSection(Loc.T(DescriptionHintSectionLoc));
     }
     if (DescriptionExternalSections != null) {
       foreach (var externalSection in DescriptionExternalSections) {
