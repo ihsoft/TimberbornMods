@@ -10,9 +10,11 @@ namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
 sealed class DebugScriptableComponent : ScriptableComponentBase {
 
-  const string LogActionLocKey = "IgorZ.Automation.Scriptable.Debug.Action.Log";
+  const string LogStrActionLocKey = "IgorZ.Automation.Scriptable.Debug.Action.LogStr";
+  const string LogNumActionLocKey = "IgorZ.Automation.Scriptable.Debug.Action.LogNum";
 
-  const string LogActionName = "Debug.Log";
+  const string LogStrActionName = "Debug.LogStr";
+  const string LogNumActionName = "Debug.LogNum";
 
   #region ScriptableComponentBase implementation
 
@@ -21,13 +23,14 @@ sealed class DebugScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override string[] GetActionNamesForBuilding(BaseComponent _) {
-    return [LogActionName];
+    return [LogStrActionName, LogNumActionName];
   }
 
   /// <inheritdoc/>
   public override Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
     return name switch {
-        LogActionName => args => LogAction(building, args),
+        LogStrActionName => args => LogStrAction(building, args),
+        LogNumActionName => args => LogNumAction(building, args),
         _ => throw new ScriptError("Unknown action: " + name),
     };
   }
@@ -35,7 +38,8 @@ sealed class DebugScriptableComponent : ScriptableComponentBase {
   /// <inheritdoc/>
   public override ActionDef GetActionDefinition(string name, BaseComponent _) {
     return name switch {
-        LogActionName => LogActionDef,
+        LogStrActionName => LogStrActionDef,
+        LogNumActionName => LogNumActionDef,
         _ => throw new ScriptError("Unknown action: " + name),
     };
   }
@@ -44,9 +48,9 @@ sealed class DebugScriptableComponent : ScriptableComponentBase {
 
   #region Actions
 
-  ActionDef LogActionDef => _logActionDef ??= new ActionDef {
-      ScriptName = LogActionName,
-      DisplayName = Loc.T(LogActionLocKey),
+  ActionDef LogStrActionDef => _logActionDef ??= new ActionDef {
+      ScriptName = LogStrActionName,
+      DisplayName = Loc.T(LogStrActionLocKey),
       Arguments = [
           new ValueDef {
               ValueType = ScriptValue.TypeEnum.String,
@@ -55,9 +59,25 @@ sealed class DebugScriptableComponent : ScriptableComponentBase {
   };
   ActionDef _logActionDef;
 
-  static void LogAction(BaseComponent instance, ScriptValue[] args) {
-    AssertActionArgsCount(LogActionName, args, 1);
-    HostedDebugLog.Info(instance, "[Debug action]: {0}", args[0]);
+  ActionDef LogNumActionDef => _logNumActionDef ??= new ActionDef {
+      ScriptName = LogNumActionName,
+      DisplayName = Loc.T(LogNumActionLocKey),
+      Arguments = [
+          new ValueDef {
+              ValueType = ScriptValue.TypeEnum.Number,
+          },
+      ],
+  };
+  ActionDef _logNumActionDef;
+
+  static void LogStrAction(BaseComponent instance, ScriptValue[] args) {
+    AssertActionArgsCount(LogStrActionName, args, 1);
+    HostedDebugLog.Info(instance, "[Debug action]: {0}", args[0].AsString);
+  }
+
+  static void LogNumAction(BaseComponent instance, ScriptValue[] args) {
+      AssertActionArgsCount(LogNumActionName, args, 1);
+      HostedDebugLog.Info(instance, "[Debug action]: {0}", args[0].AsNumber);
   }
 
   #endregion
