@@ -6,6 +6,7 @@ using System;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
+using IgorZ.TimberDev.UI;
 using Timberborn.Localization;
 using Timberborn.Persistence;
 using UnityDev.Utils.LogUtilsLite;
@@ -135,8 +136,7 @@ sealed class ScriptedAction : AutomationActionBase {
       _uiDescription = Behavior.Loc.T(ParseErrorLocKey);
       return;
     }
-    var description = ExpressionParser.Instance.GetDescription(_parserParserContext);
-    _uiDescription = TextColors.ColorizeText($"<SolidHighlight>{description}</SolidHighlight>");
+    _uiDescription = CommonFormats.HighlightYellow(ExpressionParser.Instance.GetDescription(_parserParserContext)); 
   }
 
   #endregion

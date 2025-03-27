@@ -9,7 +9,6 @@ using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.TimberDev.UI;
 using Timberborn.CoreUI;
-using Timberborn.Localization;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine.UIElements;
 
@@ -262,11 +261,10 @@ sealed class RuleRow {
           ScriptHost = ActiveBuilding,
           ParsedExpression = ParsedCondition,
       };
-      condition = ExpressionParser.Instance.GetDescription(context);
-      condition = TextColors.ColorizeText($"<SolidHighlight>{condition}</SolidHighlight>");
+      condition = CommonFormats.HighlightYellow(ExpressionParser.Instance.GetDescription(context));
       if (context.LastError != null) {
-        DebugEx.Warning("Failed to get description for condition: {0}\nError: {1}",
-                        _conditionExpression, context.LastError);
+        DebugEx.Warning(
+            "Failed to get description for condition: {0}\nError: {1}", _conditionExpression, context.LastError);
       }
     }
 
@@ -277,11 +275,9 @@ sealed class RuleRow {
           ScriptHost = ActiveBuilding,
           ParsedExpression = ParsedAction,
       };
-      action = ExpressionParser.Instance.GetDescription(context);
-      action = TextColors.ColorizeText($"<SolidHighlight>{action}</SolidHighlight>");
+      action = CommonFormats.HighlightYellow(ExpressionParser.Instance.GetDescription(context));
       if (context.LastError != null) {
-        DebugEx.Warning("Failed to get description for action: {0}\nError: {1}",
-                        _actionExpression, context.LastError);
+        DebugEx.Warning("Failed to get description for action: {0}\nError: {1}", _actionExpression, context.LastError);
       }
     }
   }

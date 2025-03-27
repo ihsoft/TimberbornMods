@@ -3,7 +3,7 @@
 // License: Public Domain
 
 using IgorZ.Automation.AutomationSystem;
-using Timberborn.Localization;
+using IgorZ.TimberDev.UI;
 using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.Actions;
@@ -19,8 +19,7 @@ public class DebugLogAction : AutomationActionBase {
   }
 
   /// <inheritdoc/>
-  public override string UiDescription =>
-      TextColors.ColorizeText("<SolidHighlight>write 'hello' into the log</SolidHighlight>");
+  public override string UiDescription => CommonFormats.HighlightYellow("write 'hello' into the log");
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
