@@ -8,10 +8,9 @@ using IgorZ.TimberDev.UI;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
-using UnityDev.Utils.LogUtilsLite;
 using UnityEngine.UIElements;
 
-namespace IgorZ.Automation.UI;
+namespace IgorZ.Automation.AutomationSystemUI;
 
 sealed class AutomationFragment : IEntityPanelFragment {
 

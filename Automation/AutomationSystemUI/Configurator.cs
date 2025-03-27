@@ -5,7 +5,7 @@
 using Bindito.Core;
 using Timberborn.EntityPanelSystem;
 
-namespace IgorZ.Automation.UI;
+namespace IgorZ.Automation.AutomationSystemUI;
 
 [Context("Game")]
 // ReSharper disable once UnusedType.Global

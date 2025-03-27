@@ -12,7 +12,7 @@ using Timberborn.ConstructionMode;
 using Timberborn.ToolSystem;
 using UnityEngine;
 
-namespace IgorZ.Automation.UI;
+namespace IgorZ.Automation.AutomationSystemUI;
 
 sealed class CopyRulesTool : AbstractAreaSelectionTool, IAutomationModeEnabler, IConstructionModeEnabler {
 
