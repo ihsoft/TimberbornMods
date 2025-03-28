@@ -18,8 +18,8 @@ sealed class RuleRow {
 
   const string ConditionLabelLocKey = "IgorZ.Automation.Scripting.Editor.ConditionLabel";
   const string ActionLabelLocKey = "IgorZ.Automation.Scripting.Editor.ActionLabel";
-  const string ParseErrorLocKey = "IgorZ.Automation.Scripting.Expressions.ParseError";
   const string ResetChangesLocKey = "IgorZ.Automation.Scripting.Editor.ResetChangesBtn";
+  const string ParseErrorLocKey = "IgorZ.Automation.Scripting.Expressions.ParseError";
 
   #region API
 
@@ -253,33 +253,20 @@ sealed class RuleRow {
       action = LegacyAction.UiDescription;
       return;
     }
+    condition = GetDescription(ParsedCondition);
+    action = GetDescription(ParsedAction);
+  }
 
-    if (ParsedCondition == null) {
-      condition = _uiFactory.T(ParseErrorLocKey);
-    } else {
-      var context = new ParserContext() {
-          ScriptHost = ActiveBuilding,
-          ParsedExpression = ParsedCondition,
-      };
-      condition = CommonFormats.HighlightYellow(ExpressionParser.Instance.GetDescription(context));
-      if (context.LastError != null) {
-        DebugEx.Warning(
-            "Failed to get description for condition: {0}\nError: {1}", _conditionExpression, context.LastError);
-      }
+  string GetDescription(IExpression expression) {
+    if (expression == null) {
+      return _uiFactory.T(ParseErrorLocKey);
     }
-
-    if (ParsedAction == null) {
-      action = _uiFactory.T(ParseErrorLocKey);
-    } else {
-      var context = new ParserContext() {
-          ScriptHost = ActiveBuilding,
-          ParsedExpression = ParsedAction,
-      };
-      action = CommonFormats.HighlightYellow(ExpressionParser.Instance.GetDescription(context));
-      if (context.LastError != null) {
-        DebugEx.Warning("Failed to get description for action: {0}\nError: {1}", _actionExpression, context.LastError);
-      }
-    }
+    var context = new ParserContext {
+        ScriptHost = ActiveBuilding,
+        ParsedExpression = expression,
+    };
+    var desc = ExpressionParser.Instance.GetDescription(context, logErrors: true);
+    return context.LastError == null ? CommonFormats.HighlightYellow(desc) : desc;
   }
 
   void MarkDeleted() {

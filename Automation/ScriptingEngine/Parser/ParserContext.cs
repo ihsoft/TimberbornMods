@@ -7,7 +7,7 @@ using IgorZ.Automation.AutomationSystem;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
-sealed class ParserContext {
+sealed record ParserContext {
 
   #region Input settings 
 
@@ -20,7 +20,7 @@ sealed class ParserContext {
   #region Output data
 
   /// <summary>All the signal that are referenced in the parsed expression.</summary>
-  public readonly HashSet<string> ReferencedSignals = [];
+  public HashSet<string> ReferencedSignals { get; } = [];
 
   /// <summary>On successful parsing, this property will contain the parsed expression.</summary>
   public IExpression ParsedExpression { get; internal set; }

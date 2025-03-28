@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Timberborn.Common;
 using Timberborn.Localization;
+using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
@@ -18,42 +19,47 @@ sealed class ExpressionParser {
 
   #region API
 
-  /// <summary>Current parser context.</summary>
-  /// <remarks>It is set during parsing an expression or building a descriptions.</remarks>
-  public ParserContext CurrentParserContext { get; private set; }
-
   /// <summary>Parses expression for the given context.</summary>
-  public bool Parse(string input, ParserContext parserContext) {
+  public void Parse(string input, ParserContext parserContext) {
+    if (parserContext.ScriptHost == null) {
+      throw new InvalidOperationException("Script host not set");
+    }
     if (parserContext.ReferencedSignals.Count > 0 || parserContext.ParsedExpression != null) {
       throw new InvalidOperationException("Parser context is already in use");
     }
+    _contextStack.Push(parserContext);
+    parserContext.LastError = null;
     try {
-      CurrentParserContext = parserContext;
-      CurrentParserContext.ParsedExpression = ProcessString(input);
-      CurrentParserContext.LastError = null;
+      if (input.Contains("{%")) {
+        input = Preprocess(input);
+      }
+      parserContext.ParsedExpression = ProcessString(input);
     } catch (ScriptError e) {
-      CurrentParserContext.LastError = e.Message;
-      CurrentParserContext.ParsedExpression = null;
-      return false;
-    } finally {
-      CurrentParserContext = null;
+      parserContext.LastError = e.Message;
     }
-    return true;
+    _contextStack.Pop();
   }
 
   /// <summary>Builds a human-readable description for the parsed expression.</summary>
-  public string GetDescription(ParserContext parserContext) {
+  public string GetDescription(ParserContext parserContext, bool logErrors = false) {
     if (parserContext.ParsedExpression == null) {
       throw new InvalidOperationException("Parser context is not initialized");
     }
+    _contextStack.Push(parserContext);
+    parserContext.LastError = null;
     try {
-      CurrentParserContext = parserContext;
-      return CurrentParserContext.ParsedExpression.Describe();
+      return parserContext.ParsedExpression.Describe();
     } catch (ScriptError e) {
-      CurrentParserContext.LastError = e.Message;
+      parserContext.LastError = e.Message;
+      if (logErrors) {
+        HostedDebugLog.Error(
+            parserContext.ScriptHost,
+            "Failed to get description on: {0}\nError: {1}",
+            parserContext.ParsedExpression.Serialize(), parserContext.LastError);
+      }
       return Loc.T(RuntimeErrorLocKey);
     } finally {
-      CurrentParserContext = null;
+      _contextStack.Pop();
     }
   }
 
@@ -66,6 +72,9 @@ sealed class ExpressionParser {
 
   internal readonly ILoc Loc;
   internal static ExpressionParser Instance;
+
+  ParserContext CurrentParserContext => _contextStack.Peek();
+  readonly Stack<ParserContext> _contextStack = new();
 
   ExpressionParser(ScriptingService scriptingService, ILoc loc) {
     _scriptingService = scriptingService;
@@ -88,6 +97,40 @@ sealed class ExpressionParser {
   internal Func<ScriptValue> GetSignalSource(string name) {
     CurrentParserContext.ReferencedSignals.Add(name);
     return _scriptingService.GetSignalSource(name, CurrentParserContext.ScriptHost);
+  }
+
+  string Preprocess(string input) {
+    _contextStack.Push(new ParserContext {
+        ScriptHost = CurrentParserContext.ScriptHost,
+    });
+    try {
+      var evaluator = new MatchEvaluator(PreprocessorMatcher);
+      return Regex.Replace(input, @"\{%([^%]*)%}", evaluator);
+    } finally {
+      _contextStack.Pop();
+    }
+  }
+
+  string PreprocessorMatcher(Match match) {
+    var expression = match.Groups[1].Value;
+    var context = new ParserContext {
+        ScriptHost = CurrentParserContext.ScriptHost,
+    };
+    _contextStack.Push(context);
+    try {
+      var parsedExpression = ProcessString(expression);
+      if (parsedExpression is not IValueExpr valueExpr) {
+        throw new ScriptError("Preprocessor: Not a value expression: " + expression);
+      }
+      var value = valueExpr.ValueFn();
+      return value.ValueType switch {
+          ScriptValue.TypeEnum.String => value.AsString,
+          ScriptValue.TypeEnum.Number => value.AsNumber.ToString(),
+          _ => throw new InvalidOperationException("Unsupported type: " + value.ValueType),
+      };
+    } finally {
+      _contextStack.Pop();
+    }
   }
 
   static Queue<string> Tokenize(string input) {

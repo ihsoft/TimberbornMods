@@ -7,7 +7,6 @@ using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.TimberDev.UI;
-using Timberborn.Localization;
 using Timberborn.Persistence;
 using UnityDev.Utils.LogUtilsLite;
 
@@ -36,9 +35,10 @@ sealed class ScriptedAction : AutomationActionBase {
     }
     _lastValidatedBehavior = behavior;
     _parserParserContext = new ParserContext {
-      ScriptHost = behavior,
+        ScriptHost = behavior,
     };
-    _lastValidationResult = ExpressionParser.Instance.Parse(Expression, _parserParserContext);
+    ExpressionParser.Instance.Parse(Expression, _parserParserContext);
+    _lastValidationResult = _parserParserContext.ParsedExpression != null;
     return _lastValidationResult;
   }
 
@@ -50,25 +50,25 @@ sealed class ScriptedAction : AutomationActionBase {
     if (!Condition.ConditionState) {
       return;
     }
-    if (_parsedExpression != null) {
-      try {
-        _parsedExpression.Execute();
-      } catch (ExecutionInterrupted e) {
-        HostedDebugLog.Fine(Behavior, "Action execution interrupted: {0}\nReason: {1}", Expression, e.Reason);
-      } catch (ScriptError e) {
-        HostedDebugLog.Error(Behavior, "Action failed: {0}\nError: {1}", Expression, e.Message);
-        _parsedExpression = null;
-        _uiDescription = Behavior.Loc.T(RuntimeErrorLocKey);
-      }
-    } else {
+    if (_parsedExpression == null) {
       HostedDebugLog.Error(Behavior, "Condition triggered, but the action was broken: {0}", Expression);
+      return;
+    }
+    try {
+      _parsedExpression.Execute();
+    } catch (ExecutionInterrupted e) {
+      HostedDebugLog.Fine(Behavior, "Action execution interrupted: {0}\nReason: {1}", Expression, e.Reason);
+    } catch (ScriptError e) {
+      HostedDebugLog.Error(Behavior, "Action failed: {0}\nError: {1}", Expression, e.Message);
+      _parsedExpression = null;
+      _uiDescription = Behavior.Loc.T(RuntimeErrorLocKey);
     }
   }
 
   /// <inheritdoc/>
   protected override void OnBehaviorAssigned() {
     base.OnBehaviorAssigned();
-    ParseAction();
+    ParseAndApply();
   }
 
   #endregion
@@ -118,12 +118,12 @@ sealed class ScriptedAction : AutomationActionBase {
   ParserContext _parserParserContext;
   ActionExpr _parsedExpression;
 
-  void ParseAction() {
+  void ParseAndApply() {
     _parserParserContext = new ParserContext {
         ScriptHost = Behavior,
     };
-    var res = ExpressionParser.Instance.Parse(Expression, _parserParserContext);
-    if (!res) {
+    ExpressionParser.Instance.Parse(Expression, _parserParserContext);
+    if (_parserParserContext.LastError != null) {
       HostedDebugLog.Error(
           Behavior, "Failed to parse action: {0}\nError: {1}", Expression, _parserParserContext.LastError);
       _uiDescription = Behavior.Loc.T(ParseErrorLocKey);
@@ -136,7 +136,12 @@ sealed class ScriptedAction : AutomationActionBase {
       _uiDescription = Behavior.Loc.T(ParseErrorLocKey);
       return;
     }
-    _uiDescription = CommonFormats.HighlightYellow(ExpressionParser.Instance.GetDescription(_parserParserContext)); 
+
+    var context = _parserParserContext with { };
+    var description = ExpressionParser.Instance.GetDescription(context);
+    _uiDescription = context.LastError == null ? CommonFormats.HighlightYellow(description) : description;
+
+    Expression = _parsedExpression.Serialize();
   }
 
   #endregion

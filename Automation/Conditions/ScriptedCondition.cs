@@ -33,7 +33,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
 
   /// <inheritdoc/>
   protected override void OnBehaviorAssigned() {
-    ParseConditions();
+    ParseAndApply();
   }
 
   /// <inheritdoc/>
@@ -55,10 +55,11 @@ sealed class ScriptedCondition : AutomationConditionBase {
       return _lastValidationResult;
     }
     _lastValidatedBehavior = behavior;
-    _parserParserContext = new ParserContext {
-      ScriptHost = behavior,
+    var context = new ParserContext {
+        ScriptHost = behavior,
     };
-    _lastValidationResult = ExpressionParser.Instance.Parse(Expression, _parserParserContext);
+    ExpressionParser.Instance.Parse(Expression, context);
+    _lastValidationResult = context.ParsedExpression != null;
     return _lastValidationResult;
   }
 
@@ -112,12 +113,12 @@ sealed class ScriptedCondition : AutomationConditionBase {
   ParserContext _parserParserContext;
   BoolOperatorExpr _parsedExpression;
 
-  void ParseConditions() {
+  void ParseAndApply() {
     _parserParserContext = new ParserContext {
-        ScriptHost = Behavior,
+      ScriptHost = Behavior,
     };
-    var res = ExpressionParser.Instance.Parse(Expression, _parserParserContext);
-    if (!res) {
+    ExpressionParser.Instance.Parse(Expression, _parserParserContext);
+    if (_parserParserContext.LastError != null) {
       HostedDebugLog.Error(
           Behavior, "Failed to parse condition: {0}\nError: {1}", Expression, _parserParserContext.LastError);
       _uiDescription = Behavior.Loc.T(ParseErrorLocKey);
@@ -130,29 +131,34 @@ sealed class ScriptedCondition : AutomationConditionBase {
       _uiDescription = Behavior.Loc.T(ParseErrorLocKey);
       return;
     }
-    _uiDescription = CommonFormats.HighlightYellow(ExpressionParser.Instance.GetDescription(_parserParserContext));
+
+    var context = _parserParserContext with { };
+    var description = ExpressionParser.Instance.GetDescription(context);
+    _uiDescription = context.LastError == null ? CommonFormats.HighlightYellow(description) : description;
+
     foreach (var signal in _parserParserContext.ReferencedSignals) {
       DependencyContainer.GetInstance<ScriptingService>()
           .RegisterSignalChangeCallback(signal, Behavior, CheckOperands);
     }
+    Expression = _parsedExpression.Serialize();
   }
 
   void CheckOperands() {
     if (!Behavior.BlockObject.IsFinished) {
       return;
     }
-    if (_parsedExpression != null) {
-      try {
-        ConditionState = _parsedExpression.Execute();
-      } catch (ExecutionInterrupted e) {
-        HostedDebugLog.Fine(Behavior, "Condition execution interrupted: {0}\nReason: {1}", Expression, e.Reason);
-      } catch (ScriptError e) {
-        HostedDebugLog.Error(Behavior, "Error in condition execution: {0}\nReason: {1}", Expression, e.Message);
-        _parsedExpression = null;
-        _uiDescription = Behavior.Loc.T(RuntimeErrorLocKey);
-      }
-    } else {
+    if (_parsedExpression == null) {
       HostedDebugLog.Error(Behavior, "Signal change triggered, but the condition was broken: {0}", Expression);
+      return;
+    }
+    try {
+      ConditionState = _parsedExpression.Execute();
+    } catch (ExecutionInterrupted e) {
+      HostedDebugLog.Fine(Behavior, "Condition execution interrupted: {0}\nReason: {1}", Expression, e.Reason);
+    } catch (ScriptError e) {
+      HostedDebugLog.Error(Behavior, "Error in condition execution: {0}\nReason: {1}", Expression, e.Message);
+      _parsedExpression = null;
+      _uiDescription = Behavior.Loc.T(RuntimeErrorLocKey);
     }
   }
 
