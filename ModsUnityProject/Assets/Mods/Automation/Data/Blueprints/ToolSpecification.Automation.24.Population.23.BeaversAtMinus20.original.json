@@ -12,12 +12,32 @@
     "TemplateFamilyName": "Population",
     "Rules": [
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BeaverPopulationBelowThresholdCondition", "Parameters": [{"Name": "Value", "IntValue": -20},{"Name": "RelativeTo", "StrValue": "CurrentLevel"}] },
-        "Action": { "TypeId": "IgorZ.Automation.Actions.UnpauseAction" }
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(lt (sig District.Beavers) {% (max 0 (sub (sig District.Beavers) 2000)) %})"}
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Pausable.Unpause)"}
+          ]
+        }
       },
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BeaverPopulationAboveThresholdCondition", "Parameters": [{"Name": "Value", "IntValue": -19},{"Name": "RelativeTo", "StrValue": "CurrentLevel"}] },
-        "Action": { "TypeId": "IgorZ.Automation.Actions.PauseAction" }
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(ge (sig District.Beavers) {% (max 0 (sub (sig District.Beavers) 2000)) %})"}
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Pausable.Pause)"}
+          ]
+        }
       }
     ]
   }

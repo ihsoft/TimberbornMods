@@ -12,12 +12,32 @@
     "TemplateFamilyName": "Water.SeasonManagement",
     "Rules": [
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BadtideStartedCondition" },
-        "Action": { "TypeId": "IgorZ.Automation.Actions.PauseAction" }
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(eq (sig Weather.Season) 'badtide')"}
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Pausable.Pause)"}
+          ]
+        }
       },
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BadtideEndedCondition" },
-        "Action": { "TypeId": "IgorZ.Automation.Actions.UnpauseAction" }
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(ne (sig Weather.Season) 'badtide')"}
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Pausable.Unpause)"}
+          ]
+        }
       }
     ]
   }

@@ -6,15 +6,25 @@
     "Order": 21,
     "Icon": "Sprites/IgorZ/icon-drought-open",
     "NameLocKey": "IgorZ.Automation.Tool.tmpl.DroughtOpenFloodgate.DisplayName",
-    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.DroughtOpenFloodgate.Description",
+    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.DroughtOpenFloodgate.Description"
   },
   "AutomationTemplateSpec": {
     "TemplateFamilyName": "Water.FloodgateManagement-drought",
     "Rules": [
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.DroughtStartedCondition" },
-        "Action": { "TypeId": "IgorZ.Automation.Actions.SetFloodgateHeightAction", "Parameters": [{"Name": "StepsDown", "IntValue": 100}] }
-      },
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(eq (sig Weather.Season) 'drought')"}
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Floodgate.SetHeight 0)"}
+          ]
+        }
+      }
     ]
   }
 }

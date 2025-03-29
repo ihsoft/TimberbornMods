@@ -14,7 +14,7 @@
       {
         "Condition": { "TypeId": "IgorZ.Automation.Conditions.BadtideStartedCondition" },
         "Action": { "TypeId": "IgorZ.Automation.Actions.SetFloodgateHeightAction", "Parameters": [{"Name": "StepsDown", "IntValue": 0}] }
-      },
+      }
     ]
   }
 }

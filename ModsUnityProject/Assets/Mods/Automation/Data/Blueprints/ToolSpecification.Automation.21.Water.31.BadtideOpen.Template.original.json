@@ -6,15 +6,25 @@
     "Order": 31,
     "Icon": "Sprites/IgorZ/icon-badtide-open",
     "NameLocKey": "IgorZ.Automation.Tool.tmpl.BadtideOpenFloodgate.DisplayName",
-    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.BadtideOpenFloodgate.Description",
+    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.BadtideOpenFloodgate.Description"
   },
   "AutomationTemplateSpec": {
     "TemplateFamilyName": "Water.FloodgateManagement-badtide",
     "Rules": [
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BadtideStartedCondition" },
-        "Action": { "TypeId": "IgorZ.Automation.Actions.SetFloodgateHeightAction", "Parameters": [{"Name": "StepsDown", "IntValue": 100}] }
-      },
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(eq (sig Weather.Season) 'badtide')"}
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Floodgate.SetHeight 0)"}
+          ]
+        }
+      }
     ]
   }
 }
