@@ -12,6 +12,7 @@ using Timberborn.EntitySystem;
 using Timberborn.Localization;
 using Timberborn.Persistence;
 using Timberborn.SingletonSystem;
+using Timberborn.WorldPersistence;
 using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.AutomationSystem;

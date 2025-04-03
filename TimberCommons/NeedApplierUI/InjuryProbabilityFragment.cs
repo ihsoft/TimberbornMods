@@ -79,7 +79,7 @@ sealed class InjuryProbabilityFragment : IEntityPanelFragment {
   }
 
   void UpdateInjuryProbability() {
-    var injuryEffect = _needApplierSpec.EffectSpecs.FirstOrDefault(e => e.NeedId == InjuryNeedId);
+    var injuryEffect = _needApplierSpec.Effects.FirstOrDefault(e => e.NeedId == InjuryNeedId);
     if (injuryEffect == null) {
       _injuryProbabilityAvatarHint.ToggleDisplayStyle(visible: false);
       _root.ToggleDisplayStyle(visible: false);

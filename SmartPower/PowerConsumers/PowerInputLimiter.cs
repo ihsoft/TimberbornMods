@@ -19,6 +19,7 @@ using Timberborn.Persistence;
 using Timberborn.StatusSystem;
 using Timberborn.TickSystem;
 using Timberborn.WorkSystem;
+using Timberborn.WorldPersistence;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
