@@ -141,7 +141,7 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   StatusToggle _unreachableStatusToggle;
   StatusToggle _maybeReachableStatusToggle;
   int _bestPathRoadNodeId = -1;
-  bool _isFullyGrounded;
+  bool _isFullyGrounded;  // FIXME: rename is IsValid
   bool _isCurrentlySelected;
 
   /// <summary>It is called before <see cref="InjectDependencies"/>!</summary>
@@ -249,11 +249,12 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
     NavMeshUpdateTimer.Stop();
   }
 
-  /// <summary>Fast method of getting path to the closest road.</summary>
+  /// <summary>Fast method of getting a path to the closest road.</summary>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   static List<int> GetPathToRoadFast(int nodeId, RoadSpillFlowField flow) {
-    var res = new List<int>(20);
-    res.Add(nodeId);
+    var res = new List<int>(20) {
+        nodeId,
+    };
     var roadParentId = flow.GetRoadParentNodeId(nodeId);
     if (nodeId == roadParentId) {
       return res;  // The access is at the road.
@@ -310,7 +311,7 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
   /// <remarks>Needs to be public to work.</remarks>
   [OnEvent]
   public void OnBlockObjectEnteredFinishedStateEvent(EnteredFinishedStateEvent e) {
-    if (!_groundedSite.IsFullyGrounded || !enabled) {
+    if (!_groundedSite.IsValid || !enabled) {
       return;
     }
     if (!_isFullyGrounded) {
@@ -408,7 +409,7 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
     _maybeReachableStatusToggle = StatusToggle.CreateNormalStatus(UnreachableIconName, _loc.T(NotYetReachableLocKey));
     GetComponentFast<StatusSubject>().RegisterStatus(_unreachableStatusToggle);
     GetComponentFast<StatusSubject>().RegisterStatus(_maybeReachableStatusToggle);
-    _isFullyGrounded = _groundedSite.IsFullyGrounded;
+    _isFullyGrounded = _groundedSite.IsValid;
     EnableComponent();
   }
 
