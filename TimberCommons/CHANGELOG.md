@@ -1,3 +1,6 @@
+# v1.11.3 (4 Apr 2025)
+* Update to support game version `0.7.2.0`.
+
 # v1.11.2 (11 Mar 2025)
 * [Fix] The mod crashes on game version `0.7.1.2`.
 
