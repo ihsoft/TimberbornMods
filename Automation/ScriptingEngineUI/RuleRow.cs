@@ -141,7 +141,7 @@ sealed class RuleRow {
     _readonlyView.ToggleDisplayStyle(true);
 
     // Controls.
-    if (IsModified) {
+    if (IsModified && !IsNew) {
       CreateButton(ResetChangesLocKey, _ => {
         ConditionExpression = _originalConditionExpression;
         ActionExpression = _originalActionExpression;
@@ -164,7 +164,7 @@ sealed class RuleRow {
   }
 
   public void DiscardChangesAndSwitchToViewMode() {
-    if (IsNew) {
+    if (IsNew && !IsModified) {
       MarkDeleted();
     }
     SwitchToViewMode();
