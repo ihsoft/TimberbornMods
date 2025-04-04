@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Timberborn.BlueprintSystem;
+using Timberborn.Persistence;
 using Timberborn.SerializationSystem;
 
 namespace IgorZ.Automation.Utils;
@@ -20,24 +21,24 @@ public static class SpecToSaveObjectConverter {
     public string Name { get; init; }
 
     /// <summary>String value.</summary>
-    [Serialize(isOptional: true)]
+    [Serialize]
     public string StrValue { get; init; }
 
     /// <summary>Integer value.</summary>
-    [Serialize(isOptional: true)]
+    [Serialize]
     public int? IntValue { get; init; }
 
     /// <summary>Float value.</summary>
-    [Serialize(isOptional: true)]
+    [Serialize]
     public int? FloatValue { get; init; }
 
     /// <summary>Boolean value.</summary>
-    [Serialize(isOptional: true)]
+    [Serialize]
     public bool? BoolValue { get; init; }
   }
 
   /// <summary>Converts the parameters to the object save.</summary>
-  public static ObjectSave ParametersToSaveObject(IEnumerable<AutomationParameterSpec> parameters) {
+  public static SerializedObject ParametersToSaveObject(IEnumerable<AutomationParameterSpec> parameters) {
     var dict = new Dictionary<string, object>();
     foreach (var parameter in parameters) {
       if (parameter.StrValue != null) {
@@ -52,6 +53,6 @@ public static class SpecToSaveObjectConverter {
         throw new InvalidDataException($"No value provided for the parameter: {parameter.Name}");
       }
     }
-    return new ObjectSave(dict);
+    return new SerializedObject(dict);
   }
 }

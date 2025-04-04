@@ -27,14 +27,14 @@ sealed class ApplyTemplateTool : AbstractAreaSelectionTool, IAutomationModeEnabl
 
   /// <summary>Spec that holds the template tool configuration.</summary>
   public sealed record AutomationTemplateSpec : ComponentSpec {
-    [Serialize(isOptional: true)]
+    [Serialize]
     public string TemplateFamilyName { get; init; } = "";
 
     public record DynamicTypeSpec {
       [Serialize]
       public string TypeId { get; init; }
 
-      [Serialize(isOptional: true)]
+      [Serialize]
       public ImmutableArray<SpecToSaveObjectConverter.AutomationParameterSpec> Parameters { get; init; }
     }
 
