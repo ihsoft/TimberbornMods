@@ -18,24 +18,27 @@ sealed class SignalOperatorExpr : AbstractOperandExpr, IValueExpr {
   /// <inheritdoc/>
   public Func<ScriptValue> ValueFn { get; }
 
+  readonly SignalDef _signalDef;
+
   /// <inheritdoc/>
   public override string Describe() {
-    return ExpressionParser.Instance.GetSignalDefinition(SignalName).DisplayName;
+    return _signalDef.DisplayName;
   }
 
-  public static IExpression TryCreateFrom(string name, IList<IExpression> operands) {
-    return name == "sig" ? new SignalOperatorExpr(name, operands) : null;
+  public static IExpression TryCreateFrom(ExpressionParser.Context context, string name, IList<IExpression> operands) {
+    return name == "sig" ? new SignalOperatorExpr(context, name, operands) : null;
   }
 
   static readonly Regex SignalNameRegexp = new("^([a-zA-Z][a-zA-Z0-9]+)(.[a-zA-Z][a-zA-Z0-9]+)*$");
 
-  SignalOperatorExpr(string name, IList<IExpression> operands) : base(name, operands) {
+  SignalOperatorExpr(ExpressionParser.Context context, string name, IList<IExpression> operands)
+      : base(name, operands) {
     AsserNumberOfOperandsExact(1);
     if (Operands[0] is not SymbolExpr symbol || !SignalNameRegexp.IsMatch(symbol.Value)) {
       throw new ScriptError("Bad signal name: " + Operands[0]);
     }
-    var def = ExpressionParser.Instance.GetSignalDefinition(symbol.Value);
-    ValueType = def.Result.ValueType;
-    ValueFn = ExpressionParser.Instance.GetSignalSource(symbol.Value);
+    _signalDef = context.ScriptingService.GetSignalDefinition(symbol.Value, context.ScriptHost);
+    ValueType = _signalDef.Result.ValueType;
+    ValueFn = context.ScriptingService.GetSignalSource(symbol.Value, context.ScriptHost);
   }
 }

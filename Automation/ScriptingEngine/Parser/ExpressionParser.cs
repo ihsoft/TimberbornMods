@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using IgorZ.Automation.AutomationSystem;
 using Timberborn.Common;
 using Timberborn.Localization;
 using UnityDev.Utils.LogUtilsLite;
@@ -27,6 +28,7 @@ sealed class ExpressionParser {
     if (parserContext.ReferencedSignals.Count > 0 || parserContext.ParsedExpression != null) {
       throw new InvalidOperationException("Parser context is already in use");
     }
+    _parsingContext = new Context { ScriptHost = parserContext.ScriptHost, ScriptingService = _scriptingService };
     _contextStack.Push(parserContext);
     parserContext.LastError = null;
     try {
@@ -38,6 +40,7 @@ sealed class ExpressionParser {
       parserContext.LastError = e.Message;
     }
     _contextStack.Pop();
+    _parsingContext = null;
   }
 
   /// <summary>Builds a human-readable description for the parsed expression.</summary>
@@ -67,6 +70,11 @@ sealed class ExpressionParser {
 
   #region Implementation
 
+  public record Context {
+    public AutomationBehavior ScriptHost { get; init; }
+    public ScriptingService ScriptingService { get; init; }
+  }
+
   static readonly Regex OperatorNameRegex = new(@"^\[a-zA-Z]+$");
   readonly ScriptingService _scriptingService;
 
@@ -76,27 +84,12 @@ sealed class ExpressionParser {
   ParserContext CurrentParserContext => _contextStack.Peek();
   readonly Stack<ParserContext> _contextStack = new();
 
+  Context _parsingContext;
+
   ExpressionParser(ScriptingService scriptingService, ILoc loc) {
     _scriptingService = scriptingService;
     Loc = loc;
     Instance = this;
-  }
-
-  internal ActionDef GetActionDefinition(string actionName) {
-    return _scriptingService.GetActionDefinition(actionName, CurrentParserContext.ScriptHost);
-  }
-
-  internal Action<ScriptValue[]> GetActionExecutor(string actionName) {
-    return _scriptingService.GetActionExecutor(actionName, CurrentParserContext.ScriptHost);
-  }
-
-  internal SignalDef GetSignalDefinition(string signalName) {
-    return _scriptingService.GetSignalDefinition(signalName, CurrentParserContext.ScriptHost);
-  }
-
-  internal Func<ScriptValue> GetSignalSource(string name) {
-    CurrentParserContext.ReferencedSignals.Add(name);
-    return _scriptingService.GetSignalSource(name, CurrentParserContext.ScriptHost);
   }
 
   string Preprocess(string input) {
@@ -177,7 +170,7 @@ sealed class ExpressionParser {
     return tokens;
   }
 
-  static IExpression ProcessString(string input) {
+  IExpression ProcessString(string input) {
     var tokens = Tokenize(input);
     var result = ReadFromTokens(tokens);
     if (tokens.Any()) {
@@ -192,7 +185,7 @@ sealed class ExpressionParser {
     }
   }
 
-  static IExpression ReadFromTokens(Queue<string> tokens) {
+  IExpression ReadFromTokens(Queue<string> tokens) {
     if (!tokens.Any()) {
       throw new ScriptError("Unexpected EOF while reading expression");
     }
@@ -213,12 +206,16 @@ sealed class ExpressionParser {
         throw new ScriptError("Empty operator expression");
       }
       tokens.Dequeue(); // ")"
+
+      // The sequence below should be ordered by the frequency of the usage. The operators that are more likely to be
+      // used in the game should come first.
       var result =
-          BinaryOperatorExpr.TryCreateFrom(operatorName, operands)
+          BinaryOperatorExpr.TryCreateFrom(_parsingContext, operatorName, operands)
+          ?? SignalOperatorExpr.TryCreateFrom(_parsingContext, operatorName, operands)
+          ?? ActionExpr.TryCreateFrom(_parsingContext, operatorName, operands)
           ?? LogicalOperatorExpr.TryCreateFrom(operatorName, operands)
-          ?? SignalOperatorExpr.TryCreateFrom(operatorName, operands)
-          ?? ActionExpr.TryCreateFrom(operatorName, operands)
-          ?? MathOperatorExpr.TryCreateFrom(operatorName, operands);
+          ?? MathOperatorExpr.TryCreateFrom(operatorName, operands)
+          ?? GetPropertyOperatorExpr.TryCreateFrom(_parsingContext, operatorName, operands);
       if (result == null) {
         throw new ScriptError("Unknown operator: " + operatorName);
       }

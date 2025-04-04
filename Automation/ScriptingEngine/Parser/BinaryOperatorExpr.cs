@@ -16,8 +16,10 @@ sealed class BinaryOperatorExpr : BoolOperatorExpr {
   public SignalOperatorExpr Left => (SignalOperatorExpr)Operands[0];
   public IValueExpr Right => (IValueExpr)Operands[1];
 
-  public static IExpression TryCreateFrom(string name, IList<IExpression> arguments) {
-    return Names.Contains(name) ? new BinaryOperatorExpr(name, arguments) : null;
+  readonly SignalDef _signalDef;
+
+  public static IExpression TryCreateFrom(ExpressionParser.Context context, string name, IList<IExpression> arguments) {
+    return Names.Contains(name) ? new BinaryOperatorExpr(context, name, arguments) : null;
   }
 
   /// <inheritdoc/>
@@ -33,11 +35,12 @@ sealed class BinaryOperatorExpr : BoolOperatorExpr {
         "le" => " \u2264 ",
         _ => throw new InvalidOperationException("Unknown operator: " + Name),
     });
-    sb.Append(Right.ValueFn().FormatValue(ExpressionParser.Instance.GetSignalDefinition(Left.SignalName).Result));
+    sb.Append(Right.ValueFn().FormatValue(_signalDef.Result));
     return sb.ToString();
   }
 
-  BinaryOperatorExpr(string name, IList<IExpression> operands) : base(name, operands) {
+  BinaryOperatorExpr(ExpressionParser.Context context, string name, IList<IExpression> operands)
+      : base(name, operands) {
     AsserNumberOfOperandsExact(2);
     if (Operands[0] is not SignalOperatorExpr left) {
       throw new ScriptError("Left operand must be a signal, found: " + Operands[0]);
@@ -48,10 +51,10 @@ sealed class BinaryOperatorExpr : BoolOperatorExpr {
     if (left.ValueType != right.ValueType) {
       throw new ScriptError($"Arguments type mismatch: {left.ValueType} != {right.ValueType}");
     }
+    _signalDef = context.ScriptingService.GetSignalDefinition(left.SignalName, context.ScriptHost);
     if (right is ConstantValueExpr { ValueType: ScriptValue.TypeEnum.String } constantValueExpr) {
-      var def = ExpressionParser.Instance.GetSignalDefinition(left.SignalName);
       var option = constantValueExpr.ValueFn().AsString;
-      if (def.Result.Options != null && def.Result.Options.All(x => x.Value != option)) {
+      if (_signalDef.Result.Options != null && _signalDef.Result.Options.All(x => x.Value != option)) {
         throw new ScriptError($"Unexpected value: {option}");
       }
     }
