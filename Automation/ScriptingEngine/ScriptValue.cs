@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System.Linq;
+using IgorZ.TimberDev.UI;
 using UnityEngine;
 
 namespace IgorZ.Automation.ScriptingEngine;
@@ -114,7 +115,7 @@ public record struct ScriptValue {
     var resolvedValue = valueDef.Options.FirstOrDefault(x => x.Value == stringValue);
     return resolvedValue.Text != ""
         ? resolvedValue.Text
-        : $"<RedHighlight>?{stringValue}</RedHighlight>";
+        : CommonFormats.HighlightRed("?{stringValue}");
   }
 
   int? _number;
