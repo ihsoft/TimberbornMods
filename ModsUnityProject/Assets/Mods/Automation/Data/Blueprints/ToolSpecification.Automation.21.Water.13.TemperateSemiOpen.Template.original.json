@@ -12,13 +12,19 @@
     "TemplateFamilyName": "Water.FloodgateManagement-temperate",
     "Rules": [
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.DroughtEndedCondition" },
-        "Action": { "TypeId": "IgorZ.Automation.Actions.SetFloodgateHeightAction", "Parameters": [{"Name": "StepsDown", "IntValue": 1}] }
-      },
-      {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.BadtideEndedCondition" },
-        "Action": { "TypeId": "IgorZ.Automation.Actions.SetFloodgateHeightAction", "Parameters": [{"Name": "StepsDown", "IntValue": 1}] }
-      },
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(eq (sig Weather.Season) 'temperate')"}
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Floodgate.SetHeight {% (sub (getnum Floodgate.MaxHeight) 50) %})"}
+          ]
+        }
+      }
     ]
   }
 }
