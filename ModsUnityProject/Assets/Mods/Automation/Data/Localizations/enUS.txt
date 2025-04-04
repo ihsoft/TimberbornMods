@@ -110,7 +110,7 @@ IgorZ.Automation.ShowStatusAction.HoldConstruction,"<YellowHighlight>hold comple
 IgorZ.Automation.ShowStatusAction.ResumeConstruction,"<YellowHighlight>resume building</YellowHighlight>",
 IgorZ.Automation.ShowStatusAction.HoldCompletionStatusText,"Waiting for the other buildings to finish",
 IgorZ.Automation.BlockableBuildingAction.BlockDescription,"<YellowHighlight>block building</YellowHighlight>",
-IgorZ.Automation.BlockableBuildingAction.UnblockDescription,"<YellowHighlight>unblock building</SolidHighligh>",
+IgorZ.Automation.BlockableBuildingAction.UnblockDescription,"<YellowHighlight>unblock building</YellowHighlight>",
 IgorZ.Automation.BlockableBuildingAction.BlockText,"Waiting for the other buildings to finish",
 =,=,"UI fragment strings"
 IgorZ.Automation.AutomationFragment.RulesAreaCaptionTextLocKey,"Automation rules:",
