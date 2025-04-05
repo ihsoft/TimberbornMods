@@ -7,7 +7,7 @@ using IgorZ.Automation.AutomationSystem;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
-sealed record ParserContext {
+sealed record ParserPayload {
 
   #region Input settings 
 

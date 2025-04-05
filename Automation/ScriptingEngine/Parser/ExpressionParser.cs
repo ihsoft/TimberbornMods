@@ -22,25 +22,25 @@ sealed class ExpressionParser {
   #region API
 
   /// <summary>Parses expression for the given context.</summary>
-  public void Parse(string input, ParserContext parserContext) {
-    if (parserContext.ScriptHost == null) {
+  public void Parse(string input, ParserPayload parserPayload) {
+    if (parserPayload.ScriptHost == null) {
       throw new InvalidOperationException("Script host not set");
     }
-    if (parserContext.ReferencedSignals.Count > 0 || parserContext.ParsedExpression != null) {
+    if (parserPayload.ReferencedSignals.Count > 0 || parserPayload.ParsedExpression != null) {
       throw new InvalidOperationException("Parser context is already in use");
     }
-    _parsingContext = new Context { ScriptHost = parserContext.ScriptHost, ScriptingService = _scriptingService };
-    _contextStack.Push(parserContext);
-    parserContext.LastError = null;
+    _parsingContext = new Context { ScriptHost = parserPayload.ScriptHost, ScriptingService = _scriptingService };
+    _resultsStack.Push(parserPayload);
+    parserPayload.LastError = null;
     try {
       if (input.Contains("{%")) {
         input = Preprocess(input);
       }
-      parserContext.ParsedExpression = ProcessString(input);
+      parserPayload.ParsedExpression = ProcessString(input);
     } catch (ScriptError e) {
-      parserContext.LastError = e.Message;
+      parserPayload.LastError = e.Message;
     }
-    _contextStack.Pop();
+    _resultsStack.Pop();
     _parsingContext = null;
   }
 
@@ -71,8 +71,8 @@ sealed class ExpressionParser {
   internal readonly ILoc Loc;
   internal static ExpressionParser Instance;
 
-  ParserContext CurrentParserContext => _contextStack.Peek();
-  readonly Stack<ParserContext> _contextStack = new();
+  ParserPayload CurrentParserPayload => _resultsStack.Peek();
+  readonly Stack<ParserPayload> _resultsStack = new();
 
   Context _parsingContext;
 
@@ -83,23 +83,23 @@ sealed class ExpressionParser {
   }
 
   string Preprocess(string input) {
-    _contextStack.Push(new ParserContext {
-        ScriptHost = CurrentParserContext.ScriptHost,
+    _resultsStack.Push(new ParserPayload {
+        ScriptHost = CurrentParserPayload.ScriptHost,
     });
     try {
       var evaluator = new MatchEvaluator(PreprocessorMatcher);
       return Regex.Replace(input, @"\{%([^%]*)%}", evaluator);
     } finally {
-      _contextStack.Pop();
+      _resultsStack.Pop();
     }
   }
 
   string PreprocessorMatcher(Match match) {
     var expression = match.Groups[1].Value;
-    var context = new ParserContext {
-        ScriptHost = CurrentParserContext.ScriptHost,
+    var context = new ParserPayload {
+        ScriptHost = CurrentParserPayload.ScriptHost,
     };
-    _contextStack.Push(context);
+    _resultsStack.Push(context);
     try {
       var parsedExpression = ProcessString(expression);
       if (parsedExpression is not IValueExpr valueExpr) {
@@ -112,7 +112,7 @@ sealed class ExpressionParser {
           _ => throw new InvalidOperationException("Unsupported type: " + value.ValueType),
       };
     } finally {
-      _contextStack.Pop();
+      _resultsStack.Pop();
     }
   }
 
@@ -201,7 +201,7 @@ sealed class ExpressionParser {
       // used in the game should come first.
       var signal = SignalOperatorExpr.TryCreateFrom(_parsingContext, operatorName, operands);
       if (signal != null) {
-        CurrentParserContext.ReferencedSignals.Add(signal.SignalName);
+        CurrentParserPayload.ReferencedSignals.Add(signal.SignalName);
         return signal;
       }
       var result =

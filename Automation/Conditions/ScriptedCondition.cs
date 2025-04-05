@@ -40,7 +40,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
 
   /// <inheritdoc/>
   protected override void OnBehaviorToBeCleared() {
-    foreach (var signal in _parserParserContext.ReferencedSignals) {
+    foreach (var signal in _parserPayload.ReferencedSignals) {
       DependencyContainer.GetInstance<ScriptingService>()
           .UnregisterSignalChangeCallback(signal, Behavior, CheckOperands);
     }
@@ -57,7 +57,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
       return _lastValidationResult;
     }
     _lastValidatedBehavior = behavior;
-    var context = new ParserContext {
+    var context = new ParserPayload {
         ScriptHost = behavior,
     };
     ExpressionParser.Instance.Parse(Expression, context);
@@ -112,30 +112,30 @@ sealed class ScriptedCondition : AutomationConditionBase {
 
   #region Implementation
 
-  ParserContext _parserParserContext;
+  ParserPayload _parserPayload;
   BoolOperatorExpr _parsedExpression;
 
   void ParseAndApply() {
     _uiDescription = null;
-    _parserParserContext = new ParserContext {
+    _parserPayload = new ParserPayload {
       ScriptHost = Behavior,
     };
-    DependencyContainer.GetInstance<ExpressionParser>().Parse(Expression, _parserParserContext);
-    if (_parserParserContext.LastError != null) {
+    DependencyContainer.GetInstance<ExpressionParser>().Parse(Expression, _parserPayload);
+    if (_parserPayload.LastError != null) {
       HostedDebugLog.Error(
-          Behavior, "Failed to parse condition: {0}\nError: {1}", Expression, _parserParserContext.LastError);
+          Behavior, "Failed to parse condition: {0}\nError: {1}", Expression, _parserPayload.LastError);
       _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
       return;
     }
-    _parsedExpression = _parserParserContext.ParsedExpression as BoolOperatorExpr;
+    _parsedExpression = _parserPayload.ParsedExpression as BoolOperatorExpr;
     if (_parsedExpression == null) {
       HostedDebugLog.Error(
-          Behavior, "Expression is not a boolean operator: {0}", _parserParserContext.ParsedExpression.Serialize());
+          Behavior, "Expression is not a boolean operator: {0}", _parserPayload.ParsedExpression.Serialize());
       _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
       return;
     }
 
-    foreach (var signal in _parserParserContext.ReferencedSignals) {
+    foreach (var signal in _parserPayload.ReferencedSignals) {
       DependencyContainer.GetInstance<ScriptingService>()
           .RegisterSignalChangeCallback(signal, Behavior, CheckOperands);
     }

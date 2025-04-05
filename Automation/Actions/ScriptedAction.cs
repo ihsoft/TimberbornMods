@@ -37,11 +37,11 @@ sealed class ScriptedAction : AutomationActionBase {
       return _lastValidationResult;
     }
     _lastValidatedBehavior = behavior;
-    _parserParserContext = new ParserContext {
+    _parserPayload = new ParserPayload {
         ScriptHost = behavior,
     };
-    ExpressionParser.Instance.Parse(Expression, _parserParserContext);
-    _lastValidationResult = _parserParserContext.ParsedExpression != null;
+    ExpressionParser.Instance.Parse(Expression, _parserPayload);
+    _lastValidationResult = _parserPayload.ParsedExpression != null;
     return _lastValidationResult;
   }
 
@@ -120,25 +120,25 @@ sealed class ScriptedAction : AutomationActionBase {
 
   #region Implementation
 
-  ParserContext _parserParserContext;
+  ParserPayload _parserPayload;
   ActionExpr _parsedExpression;
 
   void ParseAndApply() {
     _uiDescription = null;
-    _parserParserContext = new ParserContext {
+    _parserPayload = new ParserPayload {
         ScriptHost = Behavior,
     };
-    DependencyContainer.GetInstance<ExpressionParser>().Parse(Expression, _parserParserContext);
-    if (_parserParserContext.LastError != null) {
+    DependencyContainer.GetInstance<ExpressionParser>().Parse(Expression, _parserPayload);
+    if (_parserPayload.LastError != null) {
       HostedDebugLog.Error(
-          Behavior, "Failed to parse action: {0}\nError: {1}", Expression, _parserParserContext.LastError);
+          Behavior, "Failed to parse action: {0}\nError: {1}", Expression, _parserPayload.LastError);
       _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
       return;
     }
-    _parsedExpression = _parserParserContext.ParsedExpression as ActionExpr;
+    _parsedExpression = _parserPayload.ParsedExpression as ActionExpr;
     if (_parsedExpression == null) {
       HostedDebugLog.Error(
-          Behavior, "Expression is not an action operator: {0}", _parserParserContext.ParsedExpression);
+          Behavior, "Expression is not an action operator: {0}", _parserPayload.ParsedExpression);
       _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
       return;
     }
