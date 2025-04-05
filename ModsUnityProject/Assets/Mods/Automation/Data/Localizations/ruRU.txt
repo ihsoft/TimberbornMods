@@ -17,7 +17,7 @@ IgorZ.Automation.Scriptable.Debug.Action.LogStr,"записать в журна�
 IgorZ.Automation.Scriptable.Debug.Action.LogNum,"записать в журнал число: {0}","Name of the action that write to the log an arbitrary number or a result of computation."
 IgorZ.Automation.Scriptable.District.Signal.Beavers,"бобров в районе","Name of the condition for the current beaver population checking"
 IgorZ.Automation.Scriptable.District.Signal.Bots,"ботов в районе","Name of the condition for the current bot population checking"
-IgorZ.Automation.Scriptable.District.Signal.NumberOfBeds,"псотелей в районе","Name of the condition for the current number of beds checking"
+IgorZ.Automation.Scriptable.District.Signal.NumberOfBeds,"постелей в районе","Name of the condition for the current number of beds checking"
 IgorZ.Automation.Scriptable.Floodgate.Action.SetHeight,"выставить высоту затвора в {0}","Change the floodgate height to the specified value"
 IgorZ.Automation.Scriptable.Inventory.Signal.InputGood,"вход: {0}","Name of the condition for the inventory input goods"
 IgorZ.Automation.Scriptable.Inventory.Signal.OutputGood,"выход: {0}","Name of the condition for the inventory output goods"
