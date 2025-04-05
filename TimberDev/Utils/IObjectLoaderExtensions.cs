@@ -44,7 +44,7 @@ public static class IObjectLoaderExtensions {
   }
 
   public static float GetValueOrDefault(
-      this IObjectLoader objectLoader, PropertyKey<int> key, float defaultValue = 0) {
+      this IObjectLoader objectLoader, PropertyKey<float> key, float defaultValue = 0) {
     return objectLoader.Has(key) ? objectLoader.Get(key) : defaultValue;
   }
 
