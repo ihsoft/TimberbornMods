@@ -4,11 +4,24 @@
 
 using Bindito.Core;
 using IgorZ.SmartPower.Settings;
+using Timberborn.BlockSystem;
 using Timberborn.GoodConsumingBuildingSystem;
 
 namespace IgorZ.SmartPower.PowerGenerators;
 
-sealed class SmartGoodConsumingGenerator : PowerOutputBalancer {
+sealed class SmartGoodConsumingGenerator : PowerOutputBalancer, IUnfinishedStateListener {
+
+  #region IUnfinishedStateListener implementation
+
+  public void OnEnterUnfinishedState() {
+    Automate = true;  // Enable for all new generators.
+  }
+  public void OnExitUnfinishedState() {
+  }
+
+  #endregion
+
+  #region PowerOutputBalancer overrides
 
   /// <inheritdoc/>
   protected override void Suspend() {
@@ -29,6 +42,18 @@ sealed class SmartGoodConsumingGenerator : PowerOutputBalancer {
     base.Resume();
   }
 
+  protected override void Awake() {
+    ShowFloatingIcon = _settings.ShowFloatingIcon.Value;
+    base.Awake();
+
+    _goodConsumingBuilding = GetComponentFast<GoodConsumingBuilding>();
+    _goodConsumingToggle = _goodConsumingBuilding.GetGoodConsumingToggle();
+  }
+
+  #endregion
+
+  #region Implementation
+
   GoodConsumingGeneratorSettings _settings;
   GoodConsumingBuilding _goodConsumingBuilding;
   GoodConsumingToggle _goodConsumingToggle;
@@ -38,12 +63,5 @@ sealed class SmartGoodConsumingGenerator : PowerOutputBalancer {
     _settings = settings;
   }
 
-  protected override void Awake() {
-    ShowFloatingIcon = _settings.ShowFloatingIcon.Value;
-    base.Awake();
-
-    _goodConsumingBuilding = GetComponentFast<GoodConsumingBuilding>();
-    _goodConsumingToggle = _goodConsumingBuilding.GetGoodConsumingToggle();
-    Automate = true;
-  }
+  #endregion
 }
