@@ -50,9 +50,7 @@ sealed class ExpressionParser {
       return CommonFormats.HighlightYellow(expression.Describe());
     } catch (ScriptError e) {
       if (logErrors) {
-        DebugEx.Warning("Failed to get description from: {0}\nError: {1}", expression.Serialize(), e.Message);
-        //FIXME: check if showes the real cause
-        DebugEx.Error(e.ToString());
+        DebugEx.Error("Failed to get description from: {0}\n{1}", expression.Serialize(), e);
       }
       return CommonFormats.HighlightRed(Loc.T(RuntimeErrorLocKey));
     }
