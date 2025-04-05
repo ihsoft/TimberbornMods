@@ -68,8 +68,10 @@ public record struct ScriptValue {
   }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
-  /// <summary>Current numeric value as 2-digits fixed precision real number.</summary>
-  /// <remarks>For example, value "1234" means "12.34f".</remarks>
+  /// <summary>The numeric value is a 2-digits fixed precision real number multiplied by x100.</summary>
+  /// <remarks>
+  /// For example, value "1234" means "12.34f". The maximum possible precision is two digits after the point.
+  /// </remarks>
   /// <exception cref="ScriptError">if the value is not numeric.</exception>
   public int AsNumber {
     get {
@@ -82,6 +84,9 @@ public record struct ScriptValue {
 
   /// <summary>Current numeric value as a float.</summary>
   public float AsFloat => AsNumber / 100f;
+
+  /// <summary>Current numeric value as an integer.</summary>
+  public int AsInt => Mathf.RoundToInt(AsNumber / 100f);
 
   /// <summary>Current string value.</summary>
   /// <exception cref="ScriptError">if the value is a string.</exception>
