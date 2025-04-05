@@ -6,9 +6,8 @@ using System;
 using System.Collections.Generic;
 using Timberborn.BaseComponentSystem;
 using Timberborn.Bots;
+using Timberborn.DwellingSystem;
 using Timberborn.GameDistricts;
-using Timberborn.Navigation;
-using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
@@ -16,9 +15,11 @@ class DistrictScriptableComponent : ScriptableComponentBase {
 
   const string BotPopulationSignalLocKey = "IgorZ.Automation.Scriptable.District.Signal.Bots";
   const string BeaversPopulationSignalLocKey = "IgorZ.Automation.Scriptable.District.Signal.Beavers";
+  const string NumberOfBedsSignalLocKey = "IgorZ.Automation.Scriptable.District.Signal.NumberOfBeds";
 
   const string BotPopulationSignalName = "District.Bots";
   const string BeaverPopulationSignalName = "District.Beavers";
+  const string NumberOfBedsSignalName = "District.NumberOfBeds";
 
   #region ScriptableComponentBase implementation
 
@@ -31,7 +32,7 @@ class DistrictScriptableComponent : ScriptableComponentBase {
     if (!districtBuilding) {
       return [];
     }
-    return [BeaverPopulationSignalName, BotPopulationSignalName];
+    return [BeaverPopulationSignalName, BotPopulationSignalName, NumberOfBedsSignalName];
   }
 
   /// <inheritdoc/>
@@ -41,8 +42,18 @@ class DistrictScriptableComponent : ScriptableComponentBase {
       throw new ScriptError("Not a district building");
     }
     return name switch {
-        BeaverPopulationSignalName => () => ScriptValue.FromInt(GetPopulation(districtBuilding).Beavers.Count),
-        BotPopulationSignalName => () => ScriptValue.FromInt(GetPopulation(districtBuilding).NumberOfBots),
+        BeaverPopulationSignalName => () =>
+            ScriptValue.FromInt(districtBuilding.District?.DistrictPopulation.Beavers.Count ?? 0),
+        BotPopulationSignalName => () =>
+            ScriptValue.FromInt(districtBuilding.District?.DistrictPopulation.NumberOfBots ?? 0),
+        NumberOfBedsSignalName => () => {
+          if (!districtBuilding.District) {
+            return ScriptValue.FromInt(0);
+          }
+          var statistics =
+              districtBuilding.District.GetComponentFast<DistrictDwellingStatisticsProvider>().GetDwellingStatistics();
+          return ScriptValue.FromInt(statistics.FreeBeds + statistics.OccupiedBeds);
+        },
         _ => throw new ScriptError("Unknown signal: " + name),
     };
   }
@@ -56,6 +67,7 @@ class DistrictScriptableComponent : ScriptableComponentBase {
     return name switch {
         BeaverPopulationSignalName => BeaverPopulationSignalDef,
         BotPopulationSignalName => BotPopulationSignalDef,
+        NumberOfBedsSignalName => NumberOfBedsSignalDef,
         _ => throw new ScriptError("Unknown signal: " + name),
     };
   }
@@ -71,6 +83,9 @@ class DistrictScriptableComponent : ScriptableComponentBase {
       case BotPopulationSignalName:
         tracker.OnBotPopulationChanged.Add(onValueChanged);
         break;
+      case NumberOfBedsSignalName:
+        tracker.OnDwellerCounterChanged.Add(onValueChanged);
+        break;
       default:
         throw new ScriptError("Unknown signal: " + name);
     }
@@ -82,6 +97,7 @@ class DistrictScriptableComponent : ScriptableComponentBase {
     if (tracker) {
       tracker.OnBeaverPopulationChanged.Remove(onValueChanged);
       tracker.OnBotPopulationChanged.Remove(onValueChanged);
+      tracker.OnDwellerCounterChanged.Remove(onValueChanged);
     }
   }
 
@@ -107,6 +123,15 @@ class DistrictScriptableComponent : ScriptableComponentBase {
   };
   SignalDef _botPopulationSignalDef;
 
+  SignalDef NumberOfBedsSignalDef => _numberOfBedsSignalDef ??= new SignalDef {
+      ScriptName = NumberOfBedsSignalName,
+      DisplayName = Loc.T(NumberOfBedsSignalLocKey),
+      Result = new ValueDef {
+          ValueType = ScriptValue.TypeEnum.Number,
+      },
+  };
+  SignalDef _numberOfBedsSignalDef;
+
   #endregion
 
   #region Implementation
@@ -117,14 +142,6 @@ class DistrictScriptableComponent : ScriptableComponentBase {
     _instantiator = instantiator;
   }
 
-  static DistrictPopulation GetPopulation(DistrictBuilding districtBuilding, bool throwIfNotAttached = true) {
-    var district = districtBuilding.District;
-    if (!district && throwIfNotAttached) {
-      throw new ExecutionInterrupted("Not attached to a district");
-    }
-    return district?.DistrictPopulation;
-  }
-
   #endregion
 
   #region District citizens tracker
@@ -133,10 +150,11 @@ class DistrictScriptableComponent : ScriptableComponentBase {
 
     public readonly List<Action> OnBotPopulationChanged = [];
     public readonly List<Action> OnBeaverPopulationChanged = [];
+    public readonly List<Action> OnDwellerCounterChanged = [];
     
     DistrictCenter _currentDistrictCenter;
 
-    void Awake() {
+    void Start() {
       var districtBuilding = GetComponentFast<DistrictBuilding>();
       districtBuilding.ReassignedDistrict += OnDistrictChangedEvent;
       districtBuilding.ReassignedConstructionDistrict += OnDistrictChangedEvent;
@@ -147,21 +165,21 @@ class DistrictScriptableComponent : ScriptableComponentBase {
       if (_currentDistrictCenter) {
         _currentDistrictCenter.DistrictPopulation.CitizenAssigned -= OnCitizenAssigned;
         _currentDistrictCenter.DistrictPopulation.CitizenUnassigned -= OnCitizenUnassigned;
+        _currentDistrictCenter.DistrictBuildingRegistry.FinishedBuildingRegistered -= FinishedBuildingRegisteredEvent;
+        _currentDistrictCenter.DistrictBuildingRegistry.FinishedBuildingUnregistered -= FinishedBuildingUnregisteredEvent;
       }
       _currentDistrictCenter = GetComponentFast<DistrictBuilding>().District;
       if (_currentDistrictCenter) {
         _currentDistrictCenter.DistrictPopulation.CitizenAssigned += OnCitizenAssigned;
         _currentDistrictCenter.DistrictPopulation.CitizenUnassigned += OnCitizenUnassigned;
+        _currentDistrictCenter.DistrictBuildingRegistry.FinishedBuildingRegistered += FinishedBuildingRegisteredEvent;
+        _currentDistrictCenter.DistrictBuildingRegistry.FinishedBuildingUnregistered += FinishedBuildingUnregisteredEvent;
       }
     }
 
     void OnDistrictChangedEvent(object obj, EventArgs args) {
-      foreach (var action in OnBotPopulationChanged) {
-        action();
-      }
-      foreach (var action in OnBeaverPopulationChanged) {
-        action();
-      }
+      UpdateDistrictCenter();
+      OnPopulationChangedEvent();
     }
 
     void OnCitizenAssigned(object sender, CitizenAssignedEventArgs args) {
@@ -172,15 +190,30 @@ class DistrictScriptableComponent : ScriptableComponentBase {
       OnPopulationChangedEvent(args.Citizen);
     }
 
-    void OnPopulationChangedEvent(Citizen citizen) {
-      if (citizen.GetComponentFast<BotSpec>()) {
+    void OnPopulationChangedEvent(Citizen citizen = null) {
+      if (citizen == null || citizen.GetComponentFast<BotSpec>()) {
         foreach (var action in OnBotPopulationChanged) {
           action();
         }
-      } else {
+      }
+      if (citizen == null || !citizen.GetComponentFast<BotSpec>()) {
         foreach (var action in OnBeaverPopulationChanged) {
           action();
         }
+      }
+    }
+
+    void FinishedBuildingRegisteredEvent(object sender, FinishedBuildingRegisteredEventArgs arg) {
+      OnDwellerCounterChangedEvent();
+    }
+
+    void FinishedBuildingUnregisteredEvent(object sender, FinishedBuildingUnregisteredEventArgs arg) {
+      OnDwellerCounterChangedEvent();
+    }
+
+    void OnDwellerCounterChangedEvent() {
+      foreach (var action in OnDwellerCounterChanged) {
+        action();
       }
     }
   }
