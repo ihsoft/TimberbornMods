@@ -1,3 +1,8 @@
+# v1.13.2 (4 Apr 2025)
+* Update to support game version `0.7.2.0`.
+* [Fix] The suspended generator doesn't resume if paused or generator automation disabled.
+* [Fix] All generators get automation enabled once the mod is added to an existing game. The existing generators should stay "off" be default.
+
 # v1.13.1 (26 Feb 2025)
 * [Fix] The Engines don't start on the game load if the automation was enabled.
 * [Fix] The Engines suspended state doesn't restore on the game load.
