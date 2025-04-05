@@ -309,9 +309,6 @@
       <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Localizations\enUS.txt">
         <Link>Mod\Localizations\enUS.txt</Link>
       </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Localizations\enUS.txt.meta">
-        <Link>Mod\Localizations\enUS.txt.meta</Link>
-      </Content>
       <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Localizations\ruRU.txt">
         <Link>Mod\Localizations\ruRU.txt</Link>
       </Content>
