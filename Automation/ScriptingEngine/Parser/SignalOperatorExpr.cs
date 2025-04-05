@@ -25,7 +25,8 @@ sealed class SignalOperatorExpr : AbstractOperandExpr, IValueExpr {
     return _signalDef.DisplayName;
   }
 
-  public static IExpression TryCreateFrom(ExpressionParser.Context context, string name, IList<IExpression> operands) {
+  public static SignalOperatorExpr TryCreateFrom(
+      ExpressionParser.Context context, string name, IList<IExpression> operands) {
     return name == "sig" ? new SignalOperatorExpr(context, name, operands) : null;
   }
 
