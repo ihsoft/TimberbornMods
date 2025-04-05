@@ -68,7 +68,7 @@ abstract class PowerOutputBalancer
     if (!enabled) {
       return;
     }
-    if (Automate && _pausableBuilding.Paused && IsSuspended) {
+    if (IsSuspended && (!Automate || _pausableBuilding.Paused)) {
       Resume();
     }
     if (Automate && !_pausableBuilding.Paused) {
