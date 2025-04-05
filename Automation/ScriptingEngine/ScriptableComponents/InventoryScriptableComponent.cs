@@ -120,6 +120,9 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   /// <inheritdoc/>
   public override Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
     var emptiable = building.GetComponentFast<Emptiable>();
+    if (!emptiable) {
+      throw new ScriptError("Building is not pausable: " + DebugEx.ObjectToString(building));
+    }
     return name switch {
         StartEmptyingStockActionName => _ => StartEmptyingStockAction(emptiable),
         StopEmptyingStockActionName => _ => StopEmptyingStockAction(emptiable),
