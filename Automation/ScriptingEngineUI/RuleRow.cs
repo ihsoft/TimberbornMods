@@ -8,6 +8,7 @@ using System.Linq;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.TimberDev.UI;
+using TimberApi.DependencyContainerSystem;
 using Timberborn.CoreUI;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine.UIElements;
@@ -94,6 +95,7 @@ sealed class RuleRow {
   public event EventHandler OnStateChanged;
 
   public RuleRow(IEnumerable<IEditorProvider> editors, UiFactory uiFactory, AutomationBehavior activeBuilding) {
+    _expressionParser = DependencyContainer.GetInstance<ExpressionParser>();
     _uiFactory = uiFactory;
     ActiveBuilding = activeBuilding;
     _editorProviders = editors.ToArray();
@@ -196,6 +198,7 @@ sealed class RuleRow {
 
   readonly UiFactory _uiFactory;
   readonly IEditorProvider[] _editorProviders;
+  readonly ExpressionParser _expressionParser;
 
   readonly VisualElement _sidePanel;
   readonly VisualElement _ruleButtons;
@@ -239,7 +242,7 @@ sealed class RuleRow {
     var parserContext = new ParserContext {
         ScriptHost = ActiveBuilding,
     };
-    ExpressionParser.Instance.Parse(expression, parserContext);
+    _expressionParser.Parse(expression, parserContext);
     if (parserContext.LastError != null) {
       DebugEx.Warning("Failed to parse expression: {0}\nError: {1}",expression, parserContext.LastError);
       return null;
@@ -259,14 +262,9 @@ sealed class RuleRow {
 
   string GetDescription(IExpression expression) {
     if (expression == null) {
-      return _uiFactory.T(ParseErrorLocKey);
+      return CommonFormats.HighlightRed(_uiFactory.T(ParseErrorLocKey));
     }
-    var context = new ParserContext {
-        ScriptHost = ActiveBuilding,
-        ParsedExpression = expression,
-    };
-    var desc = ExpressionParser.Instance.GetDescription(context, logErrors: true);
-    return context.LastError == null ? CommonFormats.HighlightYellow(desc) : desc;
+    return CommonFormats.HighlightYellow(_expressionParser.GetDescription(expression, logErrors: true));
   }
 
   void MarkDeleted() {

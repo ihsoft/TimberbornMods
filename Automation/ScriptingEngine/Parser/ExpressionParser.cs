@@ -43,26 +43,17 @@ sealed class ExpressionParser {
     _parsingContext = null;
   }
 
-  /// <summary>Builds a human-readable description for the parsed expression.</summary>
-  public string GetDescription(ParserContext parserContext, bool logErrors = false) {
-    if (parserContext.ParsedExpression == null) {
-      throw new InvalidOperationException("Parser context is not initialized");
-    }
-    _contextStack.Push(parserContext);
-    parserContext.LastError = null;
+  /// <summary>Gets a human-readable description for the parsed expression.</summary>
+  public string GetDescription(IExpression expression, bool logErrors = false) {
     try {
-      return parserContext.ParsedExpression.Describe();
+      return CommonFormats.HighlightYellow(expression.Describe());
     } catch (ScriptError e) {
-      parserContext.LastError = e.Message;
       if (logErrors) {
-        HostedDebugLog.Error(
-            parserContext.ScriptHost,
-            "Failed to get description on: {0}\nError: {1}",
-            parserContext.ParsedExpression.Serialize(), parserContext.LastError);
+        DebugEx.Warning("Failed to get description from: {0}\nError: {1}", expression.Serialize(), e.Message);
+        //FIXME: check if showes the real cause
+        DebugEx.Error(e.ToString());
       }
-      return Loc.T(RuntimeErrorLocKey);
-    } finally {
-      _contextStack.Pop();
+      return CommonFormats.HighlightRed(Loc.T(RuntimeErrorLocKey));
     }
   }
 

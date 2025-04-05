@@ -7,6 +7,7 @@ using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.TimberDev.UI;
+using TimberApi.DependencyContainerSystem;
 using Timberborn.Persistence;
 using UnityDev.Utils.LogUtilsLite;
 
@@ -25,7 +26,9 @@ sealed class ScriptedAction : AutomationActionBase {
   }
 
   /// <inheritdoc/>
-  public override string UiDescription => _uiDescription;
+  public override string UiDescription => _uiDescription
+      ?? CommonFormats.HighlightYellow(
+          DependencyContainer.GetInstance<ExpressionParser>().GetDescription(_parsedExpression));
   string _uiDescription;
 
   /// <inheritdoc/>
@@ -55,13 +58,15 @@ sealed class ScriptedAction : AutomationActionBase {
       return;
     }
     try {
+      _uiDescription = null;
       _parsedExpression.Execute();
     } catch (ExecutionInterrupted e) {
       HostedDebugLog.Fine(Behavior, "Action execution interrupted: {0}\nReason: {1}", Expression, e.Reason);
+      _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(RuntimeErrorLocKey));
     } catch (ScriptError e) {
       HostedDebugLog.Error(Behavior, "Action failed: {0}\nError: {1}", Expression, e.Message);
+      _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(RuntimeErrorLocKey));
       _parsedExpression = null;
-      _uiDescription = Behavior.Loc.T(RuntimeErrorLocKey);
     }
   }
 
@@ -119,27 +124,24 @@ sealed class ScriptedAction : AutomationActionBase {
   ActionExpr _parsedExpression;
 
   void ParseAndApply() {
+    _uiDescription = null;
     _parserParserContext = new ParserContext {
         ScriptHost = Behavior,
     };
-    ExpressionParser.Instance.Parse(Expression, _parserParserContext);
+    DependencyContainer.GetInstance<ExpressionParser>().Parse(Expression, _parserParserContext);
     if (_parserParserContext.LastError != null) {
       HostedDebugLog.Error(
           Behavior, "Failed to parse action: {0}\nError: {1}", Expression, _parserParserContext.LastError);
-      _uiDescription = Behavior.Loc.T(ParseErrorLocKey);
+      _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
       return;
     }
     _parsedExpression = _parserParserContext.ParsedExpression as ActionExpr;
     if (_parsedExpression == null) {
       HostedDebugLog.Error(
           Behavior, "Expression is not an action operator: {0}", _parserParserContext.ParsedExpression);
-      _uiDescription = Behavior.Loc.T(ParseErrorLocKey);
+      _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
       return;
     }
-
-    var context = _parserParserContext with { };
-    var description = ExpressionParser.Instance.GetDescription(context);
-    _uiDescription = context.LastError == null ? CommonFormats.HighlightYellow(description) : description;
 
     Expression = _parsedExpression.Serialize();
   }

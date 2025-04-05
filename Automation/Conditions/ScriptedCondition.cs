@@ -21,7 +21,9 @@ sealed class ScriptedCondition : AutomationConditionBase {
   #region AutomationConditionBase overrides
 
   /// <inheritdoc/>
-  public override string UiDescription => _uiDescription;
+  public override string UiDescription => _uiDescription
+      ?? CommonFormats.HighlightYellow(
+          DependencyContainer.GetInstance<ExpressionParser>().GetDescription(_parsedExpression));
   string _uiDescription;
 
   /// <inheritdoc/>
@@ -114,27 +116,24 @@ sealed class ScriptedCondition : AutomationConditionBase {
   BoolOperatorExpr _parsedExpression;
 
   void ParseAndApply() {
+    _uiDescription = null;
     _parserParserContext = new ParserContext {
       ScriptHost = Behavior,
     };
-    ExpressionParser.Instance.Parse(Expression, _parserParserContext);
+    DependencyContainer.GetInstance<ExpressionParser>().Parse(Expression, _parserParserContext);
     if (_parserParserContext.LastError != null) {
       HostedDebugLog.Error(
           Behavior, "Failed to parse condition: {0}\nError: {1}", Expression, _parserParserContext.LastError);
-      _uiDescription = Behavior.Loc.T(ParseErrorLocKey);
+      _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
       return;
     }
     _parsedExpression = _parserParserContext.ParsedExpression as BoolOperatorExpr;
     if (_parsedExpression == null) {
       HostedDebugLog.Error(
           Behavior, "Expression is not a boolean operator: {0}", _parserParserContext.ParsedExpression.Serialize());
-      _uiDescription = Behavior.Loc.T(ParseErrorLocKey);
+      _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
       return;
     }
-
-    var context = _parserParserContext with { };
-    var description = ExpressionParser.Instance.GetDescription(context);
-    _uiDescription = context.LastError == null ? CommonFormats.HighlightYellow(description) : description;
 
     foreach (var signal in _parserParserContext.ReferencedSignals) {
       DependencyContainer.GetInstance<ScriptingService>()

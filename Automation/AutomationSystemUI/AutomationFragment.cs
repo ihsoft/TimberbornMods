@@ -64,6 +64,10 @@ sealed class AutomationFragment : IEntityPanelFragment {
   }
 
   public void UpdateFragment() {
+    //FIXME: Only update if there was a signal triggered.
+    if (_automationBehavior) {
+      UpdateView();
+    }
   }
 
   void UpdateView() {
