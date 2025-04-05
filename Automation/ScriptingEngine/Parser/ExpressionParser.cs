@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using IgorZ.Automation.AutomationSystem;
+using IgorZ.TimberDev.UI;
 using Timberborn.Common;
 using Timberborn.Localization;
 using UnityDev.Utils.LogUtilsLite;
@@ -200,9 +201,13 @@ sealed class ExpressionParser {
 
       // The sequence below should be ordered by the frequency of the usage. The operators that are more likely to be
       // used in the game should come first.
+      var signal = SignalOperatorExpr.TryCreateFrom(_parsingContext, operatorName, operands);
+      if (signal != null) {
+        CurrentParserContext.ReferencedSignals.Add(signal.SignalName);
+        return signal;
+      }
       var result =
           BinaryOperatorExpr.TryCreateFrom(_parsingContext, operatorName, operands)
-          ?? SignalOperatorExpr.TryCreateFrom(_parsingContext, operatorName, operands)
           ?? ActionExpr.TryCreateFrom(_parsingContext, operatorName, operands)
           ?? LogicalOperatorExpr.TryCreateFrom(operatorName, operands)
           ?? MathOperatorExpr.TryCreateFrom(operatorName, operands)
