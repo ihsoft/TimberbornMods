@@ -137,10 +137,11 @@ abstract class PowerOutputBalancer
       return;
     }
     var state = entityLoader.GetComponent(AutomationBehaviorKey);
-    Automate = state.GetValueOrNullable(AutomateKey) ?? Automate;
-    ChargeBatteriesThreshold = state.GetValueOrNullable(ChargeBatteriesThresholdKey) ?? MaxBatteryChargeRatio;
-    DischargeBatteriesThreshold = state.GetValueOrNullable(DischargeBatteriesThresholdKey) ?? MinBatteryChargeRatio;
-    IsSuspended = state.GetValueOrNullable(IsSuspendedKey) ?? false;
+
+    Automate = state.GetValueOrDefault(AutomateKey);
+    ChargeBatteriesThreshold = state.GetValueOrDefault(ChargeBatteriesThresholdKey, MaxBatteryChargeRatio);
+    DischargeBatteriesThreshold = state.GetValueOrDefault(DischargeBatteriesThresholdKey, MinBatteryChargeRatio);
+    IsSuspended = state.GetValueOrDefault(IsSuspendedKey);
   }
 
   #endregion

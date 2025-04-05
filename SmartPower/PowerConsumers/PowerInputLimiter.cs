@@ -160,11 +160,11 @@ sealed class PowerInputLimiter
       return;
     }
     var state = entityLoader.GetComponent(PowerInputLimiterKey);
-    Automate = state.GetValueOrNullable(AutomateKey) ?? false;
-    MinPowerEfficiency = state.GetValueOrNullable(MinPowerEfficiencyKey) ?? MinPowerEfficiency;
-    CheckBatteryCharge = state.GetValueOrNullable(CheckBatteryChargeKey) ?? false;
-    MinBatteriesCharge = state.GetValueOrNullable(MinBatteriesChargeKey) ?? MinBatteriesCharge;
-    IsSuspended = state.GetValueOrNullable(IsSuspendedKey) ?? false;
+    Automate = state.GetValueOrDefault(AutomateKey);
+    MinPowerEfficiency = state.GetValueOrDefault(MinPowerEfficiencyKey, MinPowerEfficiency);
+    CheckBatteryCharge = state.GetValueOrDefault(CheckBatteryChargeKey);
+    MinBatteriesCharge = state.GetValueOrDefault(MinBatteriesChargeKey, MinBatteriesCharge);
+    IsSuspended = state.GetValueOrDefault(IsSuspendedKey);
   }
 
   #endregion
