@@ -251,6 +251,9 @@
       <Compile Include="..\TimberDev\Utils\IObjectLoaderExtensions.cs">
         <Link>TimberDev\Utils\IObjectLoaderExtensions.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\Utils\PrefabPatcher.cs">
+        <Link>TimberDev\Utils\PrefabPatcher.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\Utils\StaticBindings.cs">
         <Link>TimberDev\Utils\StaticBindings.cs</Link>
       </Compile>
