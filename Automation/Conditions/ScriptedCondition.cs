@@ -7,6 +7,7 @@ using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.TimberDev.UI;
+using IgorZ.TimberDev.Utils;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.Persistence;
 using UnityDev.Utils.LogUtilsLite;
@@ -49,7 +50,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
 
   /// <inheritdoc/>
   public override IAutomationCondition CloneDefinition() {
-    return new ScriptedCondition { Expression = Expression };
+    return new ScriptedCondition { Expression = Expression, Precondition = Precondition };
   }
 
   /// <inheritdoc/>
@@ -58,6 +59,10 @@ sealed class ScriptedCondition : AutomationConditionBase {
       return _lastValidationResult;
     }
     _lastValidatedBehavior = behavior;
+    if (!CheckPrecondition(behavior)) {
+      _lastValidationResult = false;
+      return false;
+    }
     var result = DependencyContainer.GetInstance<ExpressionParser>().Parse(Expression, behavior);
     _lastValidationResult = result.ParsedExpression != null;
     if (!_lastValidationResult && Keyboard.current.ctrlKey.isPressed) {
@@ -76,10 +81,19 @@ sealed class ScriptedCondition : AutomationConditionBase {
   /// <summary>Script code for expression to check.</summary>
   /// <remarks>
   /// It must be a boolean operator. See <see cref="BoolOperatorExpr"/> for the list of conditions. Example of a
-  /// condition: "(and (eq (sig Weather.Season) 'drought') (gt Floodgate.Height 0.5))". 
+  /// condition: "(and (eq (sig Weather.Season) 'drought') (gt Floodgate.Height 0.5))".
   /// </remarks>
   // ReSharper disable once MemberCanBePrivate.Global
   public string Expression { get; private set; }
+
+  /// <summary>Script code for precondition to check.</summary>
+  /// <remarks>
+  /// It must be a boolean operator. See <see cref="BoolOperatorExpr"/> for the list of conditions. If the condition
+  /// evaluates to "false", then <see cref="Expression"/> cannot be applied to the selected entity. Note that any
+  /// parsing errors in the precondition will be silently ignored.
+  /// </remarks>
+  // ReSharper disable once MemberCanBePrivate.Global
+  public string Precondition { get; private set; }
 
   /// <summary>Sets the condition expression.</summary>
   /// <remarks>Can only be set on the non-active condition.</remarks>
@@ -96,17 +110,20 @@ sealed class ScriptedCondition : AutomationConditionBase {
   #region IGameSerializable implemenation
 
   static readonly PropertyKey<string> ExpressionKey = new("Expression");
+  static readonly PropertyKey<string> PreconditionKey = new("Precondition");
 
   /// <inheritdoc/>
   public override void LoadFrom(IObjectLoader objectLoader) {
     base.LoadFrom(objectLoader);
     Expression = objectLoader.Get(ExpressionKey);
+    Precondition = objectLoader.GetValueOrDefault(PreconditionKey, null);
   }
 
   /// <inheritdoc/>
   public override void SaveTo(IObjectSaver objectSaver) {
     base.SaveTo(objectSaver);
     objectSaver.Set(ExpressionKey, Expression);
+    objectSaver.Set(PreconditionKey, Precondition);
   }
 
   #endregion
@@ -143,6 +160,29 @@ sealed class ScriptedCondition : AutomationConditionBase {
           .RegisterSignalChangeCallback(signal, Behavior, CheckOperands);
     }
     Expression = _parsedExpression.Serialize();
+  }
+
+  bool CheckPrecondition(AutomationBehavior behavior) {
+    if (string.IsNullOrEmpty(Precondition)) {
+      return true;
+    }
+    var needLogs = Keyboard.current.ctrlKey.isPressed;
+    var result = DependencyContainer.GetInstance<ExpressionParser>().Parse(Precondition, behavior);
+    if (result.ParsedExpression == null) {
+      if (needLogs) {
+        HostedDebugLog.Error(behavior, "Failed to parse precondition: {0}\nError: {1}", Precondition, result.LastError);
+      }
+      return false;
+    }
+    if (result.ParsedExpression is not BoolOperatorExpr boolOperatorExpr) {
+      HostedDebugLog.Error(behavior, "Precondition is not a boolean operator: {0}", result.ParsedExpression);
+      return false;
+    }
+    var resultValue = boolOperatorExpr.Execute();
+    if (!resultValue && needLogs) {
+      HostedDebugLog.Warning(behavior, "Precondition didn't pass: {0}", boolOperatorExpr.Serialize());
+    }
+    return resultValue;
   }
 
   void CheckOperands() {
