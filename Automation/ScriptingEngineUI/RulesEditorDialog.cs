@@ -134,7 +134,7 @@ sealed class RulesEditorDialog : IPanelController {
     foreach (var action in activeBuilding.Actions) {
       var ruleRow = CreateScriptedRule();
       if (action is ScriptedAction scriptedAction && action.Condition is ScriptedCondition scriptedCondition) {
-        ruleRow.Initialize(scriptedCondition.Expression, scriptedAction.Expression);
+        ruleRow.Initialize(scriptedCondition.Expression, scriptedAction.Expression, scriptedAction.TemplateFamily);
       } else {
         ruleRow.Initialize(action);
       }
@@ -146,12 +146,16 @@ sealed class RulesEditorDialog : IPanelController {
     _activeBuilding.ClearAllRules();
     foreach (var rule in _ruleRows.Where(x => !x.IsDeleted)) {
       if (rule.LegacyAction != null) {
-        _activeBuilding.AddRule(rule.LegacyAction.Condition, rule.LegacyAction);
+        var condition = rule.LegacyAction.Condition.CloneDefinition();
+        var action = rule.LegacyAction.CloneDefinition();
+        action.TemplateFamily = rule.TemplateFamily;
+        _activeBuilding.AddRule(condition, action);
       } else {
         var condition = new ScriptedCondition();
         condition.SetExpression(rule.ConditionExpression);
         var action = new ScriptedAction();
         action.SetExpression(rule.ActionExpression);
+        action.TemplateFamily = rule.TemplateFamily;
         _activeBuilding.AddRule(condition, action);
       }
     }

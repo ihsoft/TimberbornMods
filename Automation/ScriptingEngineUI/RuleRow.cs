@@ -26,6 +26,8 @@ sealed class RuleRow {
 
   public readonly VisualElement Root;
 
+  public string TemplateFamily { get; private set; }
+
   public BoolOperatorExpr ParsedCondition { get; private set; }
   public string ConditionExpression {
     get => _conditionExpression;
@@ -110,15 +112,17 @@ sealed class RuleRow {
     _notifications.ToggleDisplayStyle(false);
   }
 
-  public void Initialize(string condition, string action) {
+  public void Initialize(string condition, string action, string templateFamily) {
     _originalConditionExpression = condition;
     ConditionExpression = condition;
     _originalActionExpression = action;
     ActionExpression = action;
+    TemplateFamily = templateFamily;
   }
 
   public void Initialize(IAutomationAction legacyAction) {
     LegacyAction = legacyAction;
+    TemplateFamily = legacyAction.TemplateFamily;
   }
 
   public void CreateEditView(VisualElement editorRoot) {
