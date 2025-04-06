@@ -38,8 +38,12 @@ sealed class SignalOperatorExpr : AbstractOperandExpr, IValueExpr {
     if (Operands[0] is not SymbolExpr symbol || !SignalNameRegexp.IsMatch(symbol.Value)) {
       throw new ScriptError("Bad signal name: " + Operands[0]);
     }
-    _signalDef = context.ScriptingService.GetSignalDefinition(symbol.Value, context.ScriptHost);
+    var signalName = symbol.Value;
+    if (!context.IsPreprocessor) {
+      context.ReferencedSignals.Add(signalName);
+    }
+    _signalDef = context.ScriptingService.GetSignalDefinition(signalName, context.ScriptHost);
     ValueType = _signalDef.Result.ValueType;
-    ValueFn = context.ScriptingService.GetSignalSource(symbol.Value, context.ScriptHost);
+    ValueFn = context.ScriptingService.GetSignalSource(signalName, context.ScriptHost);
   }
 }
