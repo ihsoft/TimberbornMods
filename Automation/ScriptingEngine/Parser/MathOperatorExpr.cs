@@ -16,6 +16,7 @@ class MathOperatorExpr : AbstractOperandExpr, IValueExpr {
   const string DivOperatorName = "div";
   const string MinOperatorName = "min";
   const string MaxOperatorName = "max";
+  const string RoundOperatorName = "round";
 
   /// <inheritdoc/>
   public ScriptValue.TypeEnum ValueType => ScriptValue.TypeEnum.Number;
@@ -29,8 +30,9 @@ class MathOperatorExpr : AbstractOperandExpr, IValueExpr {
         MinOperatorName or MaxOperatorName => $"{Name}({string.Join(", ", Operands.Select(x => x.Describe()))})",
         DivOperatorName => $"{Operands[0].Describe()} ÷ {Operands[1].Describe()}",
         MulOperatorName => $"{Operands[0].Describe()} × {Operands[1].Describe()}",
-        AddOperatorName => $"{Operands[0].Describe()} + {Operands[1].Describe()}",
-        SubOperatorName => $"{Operands[0].Describe()} - {Operands[1].Describe()}",
+        AddOperatorName => $"({Operands[0].Describe()} + {Operands[1].Describe()})",
+        SubOperatorName => $"({Operands[0].Describe()} - {Operands[1].Describe()})",
+        RoundOperatorName => $"Round({Operands[0].Describe()})",
         _ => throw new InvalidDataException("Unknown operator: " + Name),
     };
   }
@@ -45,6 +47,8 @@ class MathOperatorExpr : AbstractOperandExpr, IValueExpr {
             name, arguments, 2, 2, args => args[0].ValueFn() * args[1].ValueFn()),
         DivOperatorName => new MathOperatorExpr(
             name, arguments, 2, 2, args => args[0].ValueFn() / args[1].ValueFn()),
+        RoundOperatorName => new MathOperatorExpr(
+            name, arguments, 1, 1, args => ScriptValue.FromInt(args[0].ValueFn().AsInt)),
         MinOperatorName => new MathOperatorExpr(
             name, arguments, 2, -1,
             args => ScriptValue.Of(args.Min(x => x.ValueFn().AsNumber))),
