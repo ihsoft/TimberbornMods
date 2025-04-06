@@ -13,6 +13,7 @@ sealed class ScriptEditorProvider : IEditorProvider {
 
   const string ConditionMustBeBoolLocKey = "IgorZ.Automation.Scripting.Editor.ConditionMustBeBoolean";
   const string ActionMustBeActionLocKey = "IgorZ.Automation.Scripting.Editor.ActionMustBeAction";
+  const string ConditionMustHaveSignalsLocKey = "IgorZ.Automation.Scripting.Editor.ConditionMustHaveSignals";
 
   const string AddRuleFromScriptBtnLocKey = "IgorZ.Automation.Scripting.Editor.AddRuleFromScriptBtn";
   const string EditAsScriptBtnLocKey = "IgorZ.Automation.Scripting.Editor.EditAsScriptBtn";
@@ -59,7 +60,7 @@ sealed class ScriptEditorProvider : IEditorProvider {
   }
 
   /// <inheritdoc/>
-  public bool VerifyIfEditable(RuleRow ruleRow, AutomationBehavior _) {
+  public bool VerifyIfEditable(RuleRow ruleRow) {
     return ruleRow.LegacyAction == null;
   }
 
@@ -88,6 +89,8 @@ sealed class ScriptEditorProvider : IEditorProvider {
       if (isCondition) {
         if (result.ParsedExpression is not BoolOperatorExpr) {
           error = _uiFactory.T(ConditionMustBeBoolLocKey);
+        } else if (result.ReferencedSignals.Length == 0) {
+          error = _uiFactory.T(ConditionMustHaveSignalsLocKey);
         }
       } else {
         if (result.ParsedExpression is not ActionExpr) {

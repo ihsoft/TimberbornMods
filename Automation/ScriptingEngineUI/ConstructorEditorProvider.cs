@@ -55,19 +55,23 @@ sealed class ConstructorEditorProvider : IEditorProvider {
   }
 
   /// <inheritdoc/>
-  public bool VerifyIfEditable(RuleRow ruleRow, AutomationBehavior behavior) {
-    if (ruleRow.ParsedCondition == null || ruleRow.ParsedAction == null) {
+  public bool VerifyIfEditable(RuleRow ruleRow) {
+    var action = ruleRow.ParsedAction;
+    if (ruleRow.ParsedCondition == null || action == null) {
       return false;
     }
-    if (ruleRow.ParsedCondition is not BinaryOperatorExpr { Right: ConstantValueExpr } condition) {
+    if (ruleRow.ParsedCondition is not BinaryOperatorExpr condition) {
       return false;
     }
-    if (!_scriptingService.GetSignalNamesForBuilding(behavior).Contains(condition.Left.SignalName)
-        || !_scriptingService.GetActionNamesForBuilding(behavior).Contains(ruleRow.ParsedAction.ActionName)) {
+    if (condition.Left is not SignalOperatorExpr signal || condition.Right is not ConstantValueExpr) {
       return false;
     }
-    if (ruleRow.ParsedAction.Operands.Count > 2
-        || ruleRow.ParsedAction.Operands.Count == 2 && ruleRow.ParsedAction.Operands[1] is not ConstantValueExpr) {
+    if (!_scriptingService.GetSignalNamesForBuilding(ruleRow.ActiveBuilding).Contains(signal.SignalName)
+        || !_scriptingService.GetActionNamesForBuilding(ruleRow.ActiveBuilding).Contains(action.ActionName)) {
+      return false;
+    }
+    if (signal.Operands.Count != 1 || action.Operands.Count > 2
+        || action.Operands.Count == 2 && action.Operands[1] is not ConstantValueExpr) {
       return false;
     }
     return true;
@@ -140,7 +144,7 @@ sealed class ConstructorEditorProvider : IEditorProvider {
     if (ruleRow.ParsedCondition is not BinaryOperatorExpr binaryOperatorExpr) {
       throw new InvalidOperationException("Binary operator is expected, but found: " + ruleRow.ParsedCondition);
     }
-    conditionConstructor.SignalSelector.Value = binaryOperatorExpr.Left.SignalName;
+    conditionConstructor.SignalSelector.Value = (binaryOperatorExpr.Left as SignalOperatorExpr)!.SignalName;
     conditionConstructor.OperatorSelector.SelectedValue = binaryOperatorExpr.Name;
     if (binaryOperatorExpr.Right is not ConstantValueExpr constantValue) {
       throw new InvalidOperationException("Constant value is expected");

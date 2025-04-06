@@ -152,7 +152,7 @@ sealed class RuleRow {
     }
     var ruleEditable = false;
     foreach (var provider in _editorProviders) {
-      var canEdit = provider.VerifyIfEditable(this, ActiveBuilding);
+      var canEdit = provider.VerifyIfEditable(this);
       if (!canEdit) {
         continue;
       }

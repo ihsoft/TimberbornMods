@@ -132,6 +132,11 @@ sealed class ScriptedCondition : AutomationConditionBase {
       _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
       return;
     }
+    if (_parsingResult.ReferencedSignals.Length == 0) {
+      HostedDebugLog.Error(Behavior, "Condition has no signals: {0}", Expression);
+      _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
+      return;
+    }
 
     foreach (var signal in _parsingResult.ReferencedSignals) {
       DependencyContainer.GetInstance<ScriptingService>()

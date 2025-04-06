@@ -10,5 +10,5 @@ interface IEditorProvider {
   public string CreateRuleLocKey { get; }
   public string EditRuleLocKey { get; }
   public void MakeForRule(RuleRow ruleRow);
-  public bool VerifyIfEditable(RuleRow ruleRow, AutomationBehavior behavoir);
+  public bool VerifyIfEditable(RuleRow ruleRow);
 }
