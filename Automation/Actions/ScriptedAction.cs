@@ -10,6 +10,7 @@ using IgorZ.TimberDev.UI;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.Persistence;
 using UnityDev.Utils.LogUtilsLite;
+using UnityEngine.InputSystem;
 
 namespace IgorZ.Automation.Actions;
 
@@ -37,11 +38,11 @@ sealed class ScriptedAction : AutomationActionBase {
       return _lastValidationResult;
     }
     _lastValidatedBehavior = behavior;
-    _parserPayload = new ParserPayload {
-        ScriptHost = behavior,
-    };
-    ExpressionParser.Instance.Parse(Expression, _parserPayload);
-    _lastValidationResult = _parserPayload.ParsedExpression != null;
+    var result = ExpressionParser.Instance.Parse(Expression, behavior);
+    _lastValidationResult = result.ParsedExpression != null;
+    if (!_lastValidationResult && Keyboard.current.ctrlKey.isPressed) {
+      HostedDebugLog.Warning(behavior, "Validation didn't pass: {0}\n{1}", Expression, result.LastScriptError);
+    }
     return _lastValidationResult;
   }
 
@@ -120,25 +121,22 @@ sealed class ScriptedAction : AutomationActionBase {
 
   #region Implementation
 
-  ParserPayload _parserPayload;
+  ParsingResult _parsingResult;
   ActionExpr _parsedExpression;
 
   void ParseAndApply() {
     _uiDescription = null;
-    _parserPayload = new ParserPayload {
-        ScriptHost = Behavior,
-    };
-    DependencyContainer.GetInstance<ExpressionParser>().Parse(Expression, _parserPayload);
-    if (_parserPayload.LastError != null) {
+    _parsingResult = DependencyContainer.GetInstance<ExpressionParser>().Parse(Expression, Behavior);
+    if (_parsingResult.LastError != null) {
       HostedDebugLog.Error(
-          Behavior, "Failed to parse action: {0}\nError: {1}", Expression, _parserPayload.LastError);
+          Behavior, "Failed to parse action: {0}\nError: {1}", Expression, _parsingResult.LastError);
       _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
       return;
     }
-    _parsedExpression = _parserPayload.ParsedExpression as ActionExpr;
+    _parsedExpression = _parsingResult.ParsedExpression as ActionExpr;
     if (_parsedExpression == null) {
       HostedDebugLog.Error(
-          Behavior, "Expression is not an action operator: {0}", _parserPayload.ParsedExpression);
+          Behavior, "Expression is not an action operator: {0}", _parsingResult.ParsedExpression);
       _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
       return;
     }

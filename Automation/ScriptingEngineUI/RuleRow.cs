@@ -239,15 +239,12 @@ sealed class RuleRow {
   }
 
   T ParseExpression<T>(string expression) where T : class, IExpression {
-    var parserPayload = new ParserPayload {
-        ScriptHost = ActiveBuilding,
-    };
-    _expressionParser.Parse(expression, parserPayload);
-    if (parserPayload.LastError != null) {
-      DebugEx.Warning("Failed to parse expression: {0}\nError: {1}",expression, parserPayload.LastError);
+    var result = _expressionParser.Parse(expression, ActiveBuilding);
+    if (result.LastError != null) {
+      DebugEx.Warning("Failed to parse expression: {0}\nError: {1}", expression, result.LastError);
       return null;
     }
-    return parserPayload.ParsedExpression as T;
+    return result.ParsedExpression as T;
   }
 
   void GetDescriptions(out string condition, out string action) {

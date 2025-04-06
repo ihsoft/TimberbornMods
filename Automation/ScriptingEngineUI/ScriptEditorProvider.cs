@@ -80,18 +80,15 @@ sealed class ScriptEditorProvider : IEditorProvider {
   }
 
   bool CheckExpressionAndShowError(RuleRow ruleRow, TextField expressionField, bool isCondition) {
-    var parserPayload = new ParserPayload() {
-        ScriptHost = ruleRow.ActiveBuilding,
-    };
-    ExpressionParser.Instance.Parse(expressionField.value, parserPayload);
-    var error = parserPayload.LastError;
+    var result = ExpressionParser.Instance.Parse(expressionField.value, ruleRow.ActiveBuilding);
+    var error = result.LastError;
     if (error == null) {
       if (isCondition) {
-        if (parserPayload.ParsedExpression is not BoolOperatorExpr) {
+        if (result.ParsedExpression is not BoolOperatorExpr) {
           error = _uiFactory.T(ConditionMustBeBoolLocKey);
         }
       } else {
-        if (parserPayload.ParsedExpression is not ActionExpr) {
+        if (result.ParsedExpression is not ActionExpr) {
           error = _uiFactory.T(ActionMustBeActionLocKey);
         }
       }

@@ -10,6 +10,7 @@ using IgorZ.TimberDev.UI;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.Persistence;
 using UnityDev.Utils.LogUtilsLite;
+using UnityEngine.InputSystem;
 
 namespace IgorZ.Automation.Conditions;
 
@@ -40,7 +41,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
 
   /// <inheritdoc/>
   protected override void OnBehaviorToBeCleared() {
-    foreach (var signal in _parserPayload.ReferencedSignals) {
+    foreach (var signal in _parsingResult.ReferencedSignals) {
       DependencyContainer.GetInstance<ScriptingService>()
           .UnregisterSignalChangeCallback(signal, Behavior, CheckOperands);
     }
@@ -57,11 +58,11 @@ sealed class ScriptedCondition : AutomationConditionBase {
       return _lastValidationResult;
     }
     _lastValidatedBehavior = behavior;
-    var context = new ParserPayload {
-        ScriptHost = behavior,
-    };
-    ExpressionParser.Instance.Parse(Expression, context);
-    _lastValidationResult = context.ParsedExpression != null;
+    var result = ExpressionParser.Instance.Parse(Expression, behavior);
+    _lastValidationResult = result.ParsedExpression != null;
+    if (!_lastValidationResult && Keyboard.current.ctrlKey.isPressed) {
+      HostedDebugLog.Warning(behavior, "Validation didn't pass: {0}\n{1}", Expression, result.LastScriptError);
+    }
     return _lastValidationResult;
   }
 
@@ -112,30 +113,27 @@ sealed class ScriptedCondition : AutomationConditionBase {
 
   #region Implementation
 
-  ParserPayload _parserPayload;
+  ParsingResult _parsingResult;
   BoolOperatorExpr _parsedExpression;
 
   void ParseAndApply() {
     _uiDescription = null;
-    _parserPayload = new ParserPayload {
-      ScriptHost = Behavior,
-    };
-    DependencyContainer.GetInstance<ExpressionParser>().Parse(Expression, _parserPayload);
-    if (_parserPayload.LastError != null) {
+    _parsingResult = DependencyContainer.GetInstance<ExpressionParser>().Parse(Expression, Behavior);
+    if (_parsingResult.LastError != null) {
       HostedDebugLog.Error(
-          Behavior, "Failed to parse condition: {0}\nError: {1}", Expression, _parserPayload.LastError);
+          Behavior, "Failed to parse condition: {0}\nError: {1}", Expression, _parsingResult.LastError);
       _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
       return;
     }
-    _parsedExpression = _parserPayload.ParsedExpression as BoolOperatorExpr;
+    _parsedExpression = _parsingResult.ParsedExpression as BoolOperatorExpr;
     if (_parsedExpression == null) {
       HostedDebugLog.Error(
-          Behavior, "Expression is not a boolean operator: {0}", _parserPayload.ParsedExpression.Serialize());
+          Behavior, "Expression is not a boolean operator: {0}", _parsingResult.ParsedExpression.Serialize());
       _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
       return;
     }
 
-    foreach (var signal in _parserPayload.ReferencedSignals) {
+    foreach (var signal in _parsingResult.ReferencedSignals) {
       DependencyContainer.GetInstance<ScriptingService>()
           .RegisterSignalChangeCallback(signal, Behavior, CheckOperands);
     }

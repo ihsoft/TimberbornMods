@@ -22,26 +22,23 @@ sealed class ExpressionParser {
   #region API
 
   /// <summary>Parses expression for the given context.</summary>
-  public void Parse(string input, ParserPayload parserPayload) {
-    if (parserPayload.ScriptHost == null) {
-      throw new InvalidOperationException("Script host not set");
-    }
-    if (parserPayload.ReferencedSignals.Count > 0 || parserPayload.ParsedExpression != null) {
-      throw new InvalidOperationException("Parser context is already in use");
-    }
-    parserPayload.LastError = null;
-    var parsingContext = new Context { ScriptHost = parserPayload.ScriptHost, ScriptingService = _scriptingService };
+  public ParsingResult Parse(string input, AutomationBehavior scriptHost) {
+    var parsingContext = new Context { ScriptHost = scriptHost, ScriptingService = _scriptingService };
     _contextStack.Push(parsingContext);
     try {
       if (input.Contains("{%")) {
         input = Preprocess(input);
       }
-      parserPayload.ParsedExpression = ProcessString(input);
-      parserPayload.ReferencedSignals.AddRange(CurrentContext.ReferencedSignals);
+      var parsedExpression = ProcessString(input);
+      return new ParsingResult {
+          ParsedExpression = parsedExpression,
+          ReferencedSignals = CurrentContext.ReferencedSignals.ToArray(),
+      };
     } catch (ScriptError e) {
-      parserPayload.LastError = e.Message;
+      return new ParsingResult { LastScriptError = e };
+    } finally {
+      _contextStack.Pop();
     }
-    _contextStack.Pop();
   }
 
   /// <summary>Gets a human-readable description for the parsed expression.</summary>
@@ -63,7 +60,7 @@ sealed class ExpressionParser {
   public record Context {
     public AutomationBehavior ScriptHost { get; init; }
     public ScriptingService ScriptingService { get; init; }
-    public List<string> ReferencedSignals { get; } = [];
+    public HashSet<string> ReferencedSignals { get; } = [];
     public bool IsPreprocessor { get; init; }
   }
 
