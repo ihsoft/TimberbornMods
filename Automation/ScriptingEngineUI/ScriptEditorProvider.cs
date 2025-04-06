@@ -68,9 +68,11 @@ sealed class ScriptEditorProvider : IEditorProvider {
   #region Implementation
 
   readonly UiFactory _uiFactory;
+  readonly ExpressionParser _expressionParser;
   
-  ScriptEditorProvider(UiFactory uiFactory) {
+  ScriptEditorProvider(UiFactory uiFactory, ExpressionParser expressionParser) {
     _uiFactory = uiFactory;
+    _expressionParser = expressionParser;
   }
 
   bool RunRuleCheck(RuleRow ruleRow, TextField conditionEdit, TextField actionEdit) {
@@ -80,7 +82,7 @@ sealed class ScriptEditorProvider : IEditorProvider {
   }
 
   bool CheckExpressionAndShowError(RuleRow ruleRow, TextField expressionField, bool isCondition) {
-    var result = ExpressionParser.Instance.Parse(expressionField.value, ruleRow.ActiveBuilding);
+    var result = _expressionParser.Parse(expressionField.value, ruleRow.ActiveBuilding);
     var error = result.LastError;
     if (error == null) {
       if (isCondition) {

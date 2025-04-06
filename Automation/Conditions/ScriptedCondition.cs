@@ -58,7 +58,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
       return _lastValidationResult;
     }
     _lastValidatedBehavior = behavior;
-    var result = ExpressionParser.Instance.Parse(Expression, behavior);
+    var result = DependencyContainer.GetInstance<ExpressionParser>().Parse(Expression, behavior);
     _lastValidationResult = result.ParsedExpression != null;
     if (!_lastValidationResult && Keyboard.current.ctrlKey.isPressed) {
       HostedDebugLog.Warning(behavior, "Validation didn't pass: {0}\n{1}", Expression, result.LastScriptError);

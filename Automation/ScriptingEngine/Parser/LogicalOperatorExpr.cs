@@ -5,6 +5,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TimberApi.DependencyContainerSystem;
+using Timberborn.Localization;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
@@ -21,9 +23,10 @@ class LogicalOperatorExpr : BoolOperatorExpr {
 
   /// <inheritdoc/>
   public override string Describe() {
+    var loc = DependencyContainer.GetInstance<ILoc>();
     var displayName = Name switch {
-        AndOperatorName => ExpressionParser.Instance.Loc.T(AndOperatorLocKey),
-        OrOperatorName => ExpressionParser.Instance.Loc.T(OrOperatorLocKey),
+        AndOperatorName => loc.T(AndOperatorLocKey),
+        OrOperatorName => loc.T(OrOperatorLocKey),
         _ => throw new InvalidOperationException("Unknown operator: " + Name),
     };
     var descriptions = new List<string>();

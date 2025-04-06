@@ -49,7 +49,7 @@ sealed class ExpressionParser {
       if (logErrors) {
         DebugEx.Error("Failed to get description from: {0}\n{1}", expression.Serialize(), e);
       }
-      return CommonFormats.HighlightRed(Loc.T(RuntimeErrorLocKey));
+      return CommonFormats.HighlightRed(_loc.T(RuntimeErrorLocKey));
     }
   }
 
@@ -65,18 +65,16 @@ sealed class ExpressionParser {
   }
 
   static readonly Regex OperatorNameRegex = new(@"^\[a-zA-Z]+$");
-  readonly ScriptingService _scriptingService;
 
-  internal readonly ILoc Loc;
-  internal static ExpressionParser Instance;
+  readonly ScriptingService _scriptingService;
+  readonly ILoc _loc;
 
   Context CurrentContext => _contextStack.Peek();
   readonly Stack<Context> _contextStack = new();
 
   ExpressionParser(ScriptingService scriptingService, ILoc loc) {
     _scriptingService = scriptingService;
-    Loc = loc;
-    Instance = this;
+    _loc = loc;
   }
 
   string Preprocess(string input) {
