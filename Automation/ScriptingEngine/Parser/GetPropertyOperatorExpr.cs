@@ -3,7 +3,10 @@
 // License: Public Domain
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Timberborn.BaseComponentSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
@@ -28,7 +31,7 @@ class GetPropertyOperatorExpr : AbstractOperandExpr, IValueExpr {
   GetPropertyOperatorExpr(ScriptValue.TypeEnum valueType, ExpressionParser.Context context,
                           string name, IList<IExpression> operands)
       : base(name, operands) {
-    AsserNumberOfOperandsExact(1);
+    AsserNumberOfOperandsRange(1, -1);
     if (Operands[0] is not SymbolExpr symbol) {
       throw new ScriptError("Bad property name: " + Operands[0]);
     }
@@ -45,25 +48,56 @@ class GetPropertyOperatorExpr : AbstractOperandExpr, IValueExpr {
       throw new ScriptError($"{DebugEx.ObjectToString(component)} doesn't have property {parts[1]}");
     }
     var value = property.GetValue(component);
-    if (valueType == ScriptValue.TypeEnum.Number) {
-      if (value is int intVal){
-        ValueFn = () => ScriptValue.FromInt(intVal);
-      } else if (value is float floatVal) {
-        ValueFn = () => ScriptValue.FromFloat(floatVal);
-      } else if (value is bool boolVal) {
-        ValueFn = () => ScriptValue.Of(boolVal ? 100 : 0);
+    var listVal = GetAsList(value);
+    if (listVal != null) {
+      if (operands.Count == 1) {
+        value = listVal.Count;
       } else {
-        throw new ScriptError($"Property {symbol.Value} is of incompatible type: {value.GetType()}");
+        AsserNumberOfOperandsExact(2);
+        if (Operands[1] is not IValueExpr indexExpr) {
+          throw new ScriptError("Second operand must be a value, found: " + Operands[1]);
+        }
+        var index = indexExpr.ValueFn().AsInt;
+        if (index < 0 || index >= operands.Count) {
+          throw new ScriptError($"Index {index} is out of range: [{0}; {listVal.Count})");
+        }
+        value = listVal[indexExpr.ValueFn().AsInt];
       }
-    } else {
-      if (value is not string strVal) {
-        throw new ScriptError($"Property {symbol.Value} is of incompatible type: {value.GetType()}");
-      }
-      ValueFn = () => ScriptValue.Of(strVal);
     }
+    ValueFn = valueType switch {
+        ScriptValue.TypeEnum.Number => value switch {
+            int intVal => () => ScriptValue.FromInt(intVal),
+            float floatVal => () => ScriptValue.FromFloat(floatVal),
+            bool boolVal => () => ScriptValue.Of(boolVal ? 100 : 0),
+            _ => throw new ScriptError($"Property {symbol.Value} is of incompatible type: {value.GetType()}"),
+        },
+        ScriptValue.TypeEnum.String => value switch {
+            string strVal => () => ScriptValue.Of(strVal),
+            _ => throw new ScriptError($"Property {symbol.Value} is of incompatible type: {value.GetType()}"),
+        },
+        _ => throw new ScriptError($"Property {symbol.Value} is of incompatible type: {value.GetType()}"),
+    };
   }
 
   static BaseComponent GetComponentByName(GameObject obj, string name) {
-    return obj.GetComponent(name) as BaseComponent;
+    var components = obj.GetComponents<BaseComponent>();
+    return components.FirstOrDefault(x => x.enabled && x.GetType().Name == name);
+  }
+
+  static IList GetAsList(object value) {
+    var getEnumeratorMethod = value.GetType().GetMethod("GetEnumerator", BindingFlags.Public | BindingFlags.Instance);
+    if (getEnumeratorMethod == null) {
+      return null;
+    }
+    var enumerator = getEnumeratorMethod.Invoke(value, null);
+    if (enumerator is not IEnumerator enumeratorObj) {
+      return null;
+    }
+    var list = new List<object>();
+    while (enumeratorObj.MoveNext()) {
+      list.Add(enumeratorObj.Current);
+    }
+    list.Sort();
+    return list;
   }
 }
