@@ -13,7 +13,7 @@ sealed class BinaryOperatorExpr : BoolOperatorExpr {
 
   static readonly HashSet<string> Names = [ "eq", "ne", "gt", "lt", "ge", "le"];
 
-  public SignalOperatorExpr Left => (SignalOperatorExpr)Operands[0];
+  public IValueExpr Left => (IValueExpr)Operands[0];
   public IValueExpr Right => (IValueExpr)Operands[1];
 
   readonly SignalDef _signalDef;
@@ -25,7 +25,7 @@ sealed class BinaryOperatorExpr : BoolOperatorExpr {
   /// <inheritdoc/>
   public override string Describe() {
     var sb = new StringBuilder();
-    sb.Append(Left.Describe());
+    sb.Append(Left is SignalOperatorExpr ? Left.Describe() : Left.ValueFn().FormatValue(_signalDef?.Result));
     sb.Append(Name switch {
         "eq" => " = ",
         "ne" => " \u2260 ",
@@ -35,15 +35,15 @@ sealed class BinaryOperatorExpr : BoolOperatorExpr {
         "le" => " \u2264 ",
         _ => throw new InvalidOperationException("Unknown operator: " + Name),
     });
-    sb.Append(Right.ValueFn().FormatValue(_signalDef.Result));
+    sb.Append(Right is SignalOperatorExpr ? Right.Describe() : Right.ValueFn().FormatValue(_signalDef?.Result));
     return sb.ToString();
   }
 
   BinaryOperatorExpr(ExpressionParser.Context context, string name, IList<IExpression> operands)
       : base(name, operands) {
     AsserNumberOfOperandsExact(2);
-    if (Operands[0] is not SignalOperatorExpr left) {
-      throw new ScriptError("Left operand must be a signal, found: " + Operands[0]);
+    if (Operands[0] is not IValueExpr left) {
+      throw new ScriptError("Left operand must be a value, found: " + Operands[0]);
     }
     if (Operands[1] is not IValueExpr right) {
       throw new ScriptError("Right operand must be a value, found: " + Operands[1]);
@@ -51,11 +51,16 @@ sealed class BinaryOperatorExpr : BoolOperatorExpr {
     if (left.ValueType != right.ValueType) {
       throw new ScriptError($"Arguments type mismatch: {left.ValueType} != {right.ValueType}");
     }
-    _signalDef = context.ScriptingService.GetSignalDefinition(left.SignalName, context.ScriptHost);
-    if (right is ConstantValueExpr { ValueType: ScriptValue.TypeEnum.String } constantValueExpr) {
-      var option = constantValueExpr.ValueFn().AsString;
-      if (_signalDef.Result.Options != null && _signalDef.Result.Options.All(x => x.Value != option)) {
-        throw new ScriptError($"Unexpected value: {option}");
+    if (left is SignalOperatorExpr leftSignal) {
+      _signalDef = context.ScriptingService.GetSignalDefinition(leftSignal.SignalName, context.ScriptHost);
+    } else if (right is SignalOperatorExpr rightSignal) {
+      _signalDef = context.ScriptingService.GetSignalDefinition(rightSignal.SignalName, context.ScriptHost);
+    }
+    if (_signalDef?.Result.Options != null && right is ConstantValueExpr constantValueExpr) {
+      var value = constantValueExpr.ValueFn().AsString;
+      var allowedValues = _signalDef.Result.Options.Select(x => x.Value).ToArray();
+      if (!allowedValues.Contains(value)) {
+        throw new ScriptError($"Unexpected value: {value}. Allowed: {string.Join(", ", allowedValues)}");
       }
     }
     Execute = left.ValueType switch {
