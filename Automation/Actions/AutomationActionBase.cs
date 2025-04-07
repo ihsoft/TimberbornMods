@@ -26,7 +26,7 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
   #region IAutomationAction implementation
 
   /// <inheritdoc/>
-  public string TemplateFamily { get; set; } = "";
+  public string TemplateFamily { get; set; }
 
   /// <inheritdoc/>
   public virtual AutomationBehavior Behavior {
@@ -70,6 +70,7 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
   #endregion
 
   #region IGameSerializable implemenation
+
   static readonly PropertyKey<AutomationConditionBase> ConditionPropertyKey = new("Condition");
   static readonly PropertyKey<bool> IsMarkedForCleanupKey = new("IsMarkedForCleanup");
   static readonly PropertyKey<string> TemplateFamilyKey = new("TemplateFamily");
@@ -78,7 +79,7 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
   public virtual void LoadFrom(IObjectLoader objectLoader) {
     Condition = objectLoader.GetValueOrNull(ConditionPropertyKey, AutomationConditionBase.ConditionSerializerNullable);
     IsMarkedForCleanup = objectLoader.GetValueOrDefault(IsMarkedForCleanupKey);
-    TemplateFamily = objectLoader.GetValueOrDefault(TemplateFamilyKey);
+    TemplateFamily = objectLoader.GetValueOrDefault(TemplateFamilyKey, null);
   }
 
   /// <inheritdoc/>
@@ -86,9 +87,14 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
     if (Condition is AutomationConditionBase condition) {
       objectSaver.Set(ConditionPropertyKey, condition, AutomationConditionBase.ConditionSerializer);
     }
-    objectSaver.Set(IsMarkedForCleanupKey, IsMarkedForCleanup);
-    objectSaver.Set(TemplateFamilyKey, TemplateFamily);
+    if (IsMarkedForCleanup) {
+      objectSaver.Set(IsMarkedForCleanupKey, IsMarkedForCleanup);
+    }
+    if (!string.IsNullOrEmpty(TemplateFamily)) {
+      objectSaver.Set(TemplateFamilyKey, TemplateFamily);
+    }
   }
+
   #endregion
 
   #region API

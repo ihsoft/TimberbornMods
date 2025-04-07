@@ -123,7 +123,9 @@ sealed class ScriptedCondition : AutomationConditionBase {
   public override void SaveTo(IObjectSaver objectSaver) {
     base.SaveTo(objectSaver);
     objectSaver.Set(ExpressionKey, Expression);
-    objectSaver.Set(PreconditionKey, Precondition);
+    if (!string.IsNullOrEmpty(Precondition)) {
+      objectSaver.Set(PreconditionKey, Precondition);
+    }
   }
 
   #endregion
