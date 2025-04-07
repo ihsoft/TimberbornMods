@@ -86,4 +86,9 @@ public static class CommonFormats {
 
   /// <summary>Highlights the text in yellow color.</summary>
   public static string HighlightYellow(string text) => $"<color=#{YellowHighlight}>{text}</color>";
+
+  /// <summary>Adds a strikethrough effect to the text.</summary>
+  public static string Strikethrough(string text) {
+    return $"<s>{text}</s>";
+  }
 }
