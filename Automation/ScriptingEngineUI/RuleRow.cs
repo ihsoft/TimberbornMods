@@ -22,6 +22,10 @@ sealed class RuleRow {
   const string ResetChangesLocKey = "IgorZ.Automation.Scripting.Editor.ResetChangesBtn";
   const string ParseErrorLocKey = "IgorZ.Automation.Scripting.Expressions.ParseError";
 
+  const string EditModeStyle = "editmode-rule";
+  const string OriginalRuleStyle = "original-rule";
+  const string ModifiedRuleStyle = "modified-rule";
+
   #region API
 
   public readonly VisualElement Root;
@@ -224,17 +228,17 @@ sealed class RuleRow {
   void SetContainerClass() {
     var ruleContainer = Root.Q("RuleContainer");
     if (IsInEditMode) {
-      ruleContainer.EnableInClassList("editmode-rule", true);
-      ruleContainer.EnableInClassList("original-rule", false);
-      ruleContainer.EnableInClassList("modified-rule", false);
+      ruleContainer.EnableInClassList(EditModeStyle, true);
+      ruleContainer.EnableInClassList(OriginalRuleStyle, false);
+      ruleContainer.EnableInClassList(ModifiedRuleStyle, false);
     } else if (IsModified) {
-      ruleContainer.EnableInClassList("editmode-rule", false);
-      ruleContainer.EnableInClassList("original-rule", false);
-      ruleContainer.EnableInClassList("modified-rule", true);
+      ruleContainer.EnableInClassList(EditModeStyle, false);
+      ruleContainer.EnableInClassList(OriginalRuleStyle, false);
+      ruleContainer.EnableInClassList(ModifiedRuleStyle, true);
     } else {
-      ruleContainer.EnableInClassList("editmode-rule", false);
-      ruleContainer.EnableInClassList("original-rule", true);
-      ruleContainer.EnableInClassList("modified-rule", false);
+      ruleContainer.EnableInClassList(EditModeStyle, false);
+      ruleContainer.EnableInClassList(OriginalRuleStyle, true);
+      ruleContainer.EnableInClassList(ModifiedRuleStyle, false);
     }
   }
 
