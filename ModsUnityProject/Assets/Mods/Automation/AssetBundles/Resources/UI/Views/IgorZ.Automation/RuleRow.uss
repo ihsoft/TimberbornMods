@@ -13,3 +13,7 @@
 .automation-button-undo:hover:enabled:active {
     background-image: url('project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/UndoIcon-active.png');
 }
+
+.button-click {
+    --click-sound: 'UI.Click';
+}

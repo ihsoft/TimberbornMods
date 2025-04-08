@@ -24,8 +24,8 @@
                 <engine:Instance template="RuleRowButtonTmpl" />
             </engine:VisualElement>
             <engine:VisualElement name="TemplateFamilySection" style="flex-direction: row; align-items: center;">
-                <Timberborn.CoreUI.NineSliceButton name="RemoveTemplateBtn" class="button-cross" style="width: 16px; height: 16px;" />
-                <Timberborn.CoreUI.NineSliceButton name="RevertTemplateBtn" class="automation-button-undo" style="width: 16px; height: 16px;" />
+                <Timberborn.CoreUI.NineSliceButton name="RemoveTemplateBtn" class="button-cross button-click" style="width: 16px; height: 16px;" />
+                <Timberborn.CoreUI.NineSliceButton name="RevertTemplateBtn" class="automation-button-undo button-click" style="width: 16px; height: 16px;" />
                 <Timberborn.CoreUI.NineSliceLabel text="TemplateFamilyName" name="TemplateFamilyName" class="game-text-small automation-deleted-text" style="margin-left: 2px;" />
             </engine:VisualElement>
         </engine:VisualElement>
@@ -34,7 +34,7 @@
         </engine:VisualElement>
     </engine:VisualElement>
     <engine:VisualElement name="DeletedStateOverlay" style="align-items: center; justify-content: center; flex-direction: row; background-color: rgba(255, 48, 0, 0.15); padding-top: 5px; padding-bottom: 5px; margin-bottom: 10px;">
-        <Timberborn.CoreUI.NineSliceButton name="UndoDeleteBtn" class="automation-button-undo" style="width: 30px; height: 30px;" />
+        <Timberborn.CoreUI.NineSliceButton name="UndoDeleteBtn" class="automation-button-undo button-click" style="width: 30px; height: 30px;" />
         <Timberborn.CoreUI.LocalizableLabel text="DeletedRule" text-loc-key="IgorZ.Automation.Scripting.Editor.DeletedRule" class="automation-deleted-text" style="font-size: 20px; margin-left: 5px;" />
     </engine:VisualElement>
 </engine:UXML>
