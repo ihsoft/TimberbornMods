@@ -5,7 +5,7 @@
     <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/TimberDevStyle.uss?fileID=7433441132597879392&amp;guid=86824deb2a4bc844cbec48367a164254&amp;type=3#TimberDevStyle" />
     <engine:VisualElement>
         <engine:VisualElement style="flex-direction: row; align-items: center; justify-content: flex-start;">
-            <Timberborn.CoreUI.LocalizableLabel text="ConditionLabel" text-loc-key="IgorZ.Automation.Scripting.Editor.ConditionLabel" class="game-text-normal game-text-big" style="margin-right: 5px;" />
+            <Timberborn.CoreUI.LocalizableLabel text="ConditionLabel" text-loc-key="IgorZ.Automation.Scripting.Editor.ConditionLabel" class="game-text-big" style="margin-right: 5px;" />
             <Timberborn.CoreUI.NineSliceTextField value="(eq (sig Log) 1)  looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong string" name="ConditionScript" class="text-field game-text-big" style="flex-shrink: 1; flex-grow: 1;" />
         </engine:VisualElement>
         <engine:VisualElement style="flex-direction: row; align-items: center; margin-top: 1px;">
