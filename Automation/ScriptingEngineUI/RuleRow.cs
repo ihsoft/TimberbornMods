@@ -5,7 +5,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using IgorZ.Automation.Actions;
 using IgorZ.Automation.AutomationSystem;
+using IgorZ.Automation.Conditions;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.TimberDev.UI;
 using TimberApi.DependencyContainerSystem;
@@ -32,13 +34,6 @@ sealed class RuleRow {
 
   public readonly VisualElement Root;
 
-  public string TemplateFamily {
-    get => _templateFamily;
-    private set => SetTemplateFamily(value);
-  }
-  string _templateFamily;
-  string _originalTemplateFamily;
-
   public BoolOperatorExpr ParsedCondition { get; private set; }
   public string ConditionExpression {
     get => _conditionExpression;
@@ -52,7 +47,6 @@ sealed class RuleRow {
     }
   }
   string _conditionExpression;
-  string _originalConditionExpression;
 
   public ActionExpr ParsedAction { get; private set; }
   public string ActionExpression {
@@ -67,23 +61,12 @@ sealed class RuleRow {
     }
   }
   string _actionExpression;
-  string _originalActionExpression;
 
-  public IAutomationAction LegacyAction {
-    get => _legacyAction;
-    private set {
-      if (_originalConditionExpression != null || _originalActionExpression != null) {
-        throw new InvalidOperationException(
-            "Cannot set legacy action if it already has expressions.");
-      }
-      _legacyAction = value;
-    }
-  }
-  IAutomationAction _legacyAction;
+  public IAutomationAction LegacyAction { get; private set; }
 
   public readonly AutomationBehavior ActiveBuilding;
 
-  bool IsNew => _originalConditionExpression == null && _originalActionExpression == null;
+  public bool IsNew => _originalCondition == null && _originalAction == null;
 
   public bool IsModified {
     get => _isModified;
@@ -133,10 +116,10 @@ sealed class RuleRow {
     _templateFamilySection = Root.Q("TemplateFamilySection");
     _templateFamilySection.ToggleDisplayStyle(false);
     _templateFamilySection.Q<Button>("RemoveTemplateBtn").clicked += () => {
-      TemplateFamily = null;
+      SetTemplateFamily(null);
     };
     _templateFamilySection.Q<Button>("RevertTemplateBtn").clicked += () => {
-      TemplateFamily = _originalTemplateFamily;
+      SetTemplateFamily(_originalTemplateFamily);
     };
     _ruleContainer = Root.Q("RuleContainer");
     _deletedStateOverlay = Root.Q("DeletedStateOverlay");
@@ -146,19 +129,48 @@ sealed class RuleRow {
     };
   }
 
-  public void Initialize(string condition, string action, string templateFamily) {
-    _originalConditionExpression = condition;
-    ConditionExpression = condition;
-    _originalActionExpression = action;
-    ActionExpression = action;
-    _originalTemplateFamily = templateFamily;
-    TemplateFamily = templateFamily;
+  public void Initialize(ScriptedCondition condition, ScriptedAction action) {
+    _originalCondition = (ScriptedCondition) condition?.CloneDefinition();
+    ConditionExpression = _originalCondition != null ? _originalCondition.Expression : "";
+    _originalAction = (ScriptedAction) action?.CloneDefinition();
+    ActionExpression = _originalAction != null ? _originalAction.Expression : "";
+    _originalTemplateFamily = _originalAction?.TemplateFamily;
+    SetTemplateFamily(_originalTemplateFamily);
   }
 
   public void Initialize(IAutomationAction legacyAction) {
     LegacyAction = legacyAction;
     _originalTemplateFamily = legacyAction.TemplateFamily;
-    TemplateFamily = legacyAction.TemplateFamily;
+    SetTemplateFamily(_originalTemplateFamily);
+  }
+
+  public IAutomationCondition GetCondition() {
+    if (IsDeleted) {
+      throw new InvalidOperationException("Cannot get condition if deleted.");
+    }
+    if (LegacyAction != null) {
+      return LegacyAction.Condition.CloneDefinition();
+    }
+    var condition = _originalCondition != null
+        ? (ScriptedCondition)_originalCondition.CloneDefinition()
+        : new ScriptedCondition();
+    condition.SetExpression(ConditionExpression);
+    return condition;
+  }
+
+  public IAutomationAction GetAction() {
+    if (IsDeleted) {
+      throw new InvalidOperationException("Cannot get action if deleted.");
+    }
+    if (LegacyAction != null) {
+      return LegacyAction.CloneDefinition();
+    }
+    var action = _originalAction != null
+        ? (ScriptedAction)_originalAction.CloneDefinition()
+        : new ScriptedAction();
+    action.SetExpression(ActionExpression);
+    action.TemplateFamily = _templateFamily;
+    return action;
   }
 
   public void CreateEditView(VisualElement editorRoot) {
@@ -185,8 +197,8 @@ sealed class RuleRow {
     // Controls.
     if (IsModified && !IsNew) {
       CreateButton(ResetChangesLocKey, _ => {
-        ConditionExpression = _originalConditionExpression;
-        ActionExpression = _originalActionExpression;
+        ConditionExpression = _originalCondition.Expression;
+        ActionExpression = _originalAction.Expression;
         SwitchToViewMode();
       });
     }
@@ -250,6 +262,11 @@ sealed class RuleRow {
   readonly VisualElement _ruleContainer;
   readonly VisualElement _deletedStateOverlay;
 
+  ScriptedCondition _originalCondition;
+  ScriptedAction _originalAction;
+  string _templateFamily;
+  string _originalTemplateFamily;
+
   void Reset() {
     _editView.Clear();
     _editView.ToggleDisplayStyle(false);
@@ -278,8 +295,9 @@ sealed class RuleRow {
   }
 
   void CheckIfModified() {
-    IsModified = _originalConditionExpression != _conditionExpression || _originalActionExpression != _actionExpression
-        || _originalTemplateFamily != _templateFamily;
+    IsModified = _originalCondition?.Expression != _conditionExpression
+            || _originalAction?.Expression != _actionExpression
+            || _originalTemplateFamily != _templateFamily;
   }
 
   T ParseExpression<T>(string expression) where T : class, IExpression {

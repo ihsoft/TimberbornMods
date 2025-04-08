@@ -84,7 +84,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
   /// condition: "(and (eq (sig Weather.Season) 'drought') (gt Floodgate.Height 0.5))".
   /// </remarks>
   // ReSharper disable once MemberCanBePrivate.Global
-  public string Expression { get; private set; }
+  public string Expression { get; private set; } = "";
 
   /// <summary>Script code for precondition to check.</summary>
   /// <remarks>

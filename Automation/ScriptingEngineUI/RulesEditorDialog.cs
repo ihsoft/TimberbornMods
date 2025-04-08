@@ -134,7 +134,7 @@ sealed class RulesEditorDialog : IPanelController {
     foreach (var action in activeBuilding.Actions) {
       var ruleRow = CreateScriptedRule();
       if (action is ScriptedAction scriptedAction && action.Condition is ScriptedCondition scriptedCondition) {
-        ruleRow.Initialize(scriptedCondition.Expression, scriptedAction.Expression, scriptedAction.TemplateFamily);
+        ruleRow.Initialize(scriptedCondition, scriptedAction);
       } else {
         ruleRow.Initialize(action);
       }
@@ -145,27 +145,26 @@ sealed class RulesEditorDialog : IPanelController {
   void SaveRulesAndCloseDialog() {
     _activeBuilding.ClearAllRules();
     foreach (var rule in _ruleRows.Where(x => !x.IsDeleted)) {
-      if (rule.LegacyAction != null) {
-        var condition = rule.LegacyAction.Condition.CloneDefinition();
-        var action = rule.LegacyAction.CloneDefinition();
-        action.TemplateFamily = rule.TemplateFamily;
-        _activeBuilding.AddRule(condition, action);
-      } else {
-        var condition = new ScriptedCondition();
-        condition.SetExpression(rule.ConditionExpression);
-        var action = new ScriptedAction();
-        action.SetExpression(rule.ActionExpression);
-        action.TemplateFamily = rule.TemplateFamily;
-        _activeBuilding.AddRule(condition, action);
-      }
+      _activeBuilding.AddRule(rule.GetCondition(), rule.GetAction());
     }
   }
 
   RuleRow CreateScriptedRule() {
     var ruleRow = new RuleRow(_editorProviders, _uiFactory, _activeBuilding);
+    ruleRow.OnStateChanged += OnRuleStateChanged;
     _ruleRows.Add(ruleRow);
     _ruleRowsContainer.Add(ruleRow.Root);
     return ruleRow;
+  }
+
+  void OnRuleStateChanged(object obj, EventArgs args) {
+    for (var i = _ruleRows.Count - 1; i >= 0; i--) {
+      var ruleRow = _ruleRows[i];
+      if (ruleRow.IsDeleted && ruleRow.IsNew) {
+        _ruleRows.RemoveAt(i);
+        ruleRow.Root.RemoveFromHierarchy();
+      }
+    }
   }
 
   #endregion
