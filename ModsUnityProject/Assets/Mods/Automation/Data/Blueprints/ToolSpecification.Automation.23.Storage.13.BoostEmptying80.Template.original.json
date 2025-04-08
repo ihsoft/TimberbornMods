@@ -22,7 +22,8 @@
         "Action": {
           "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
           "Parameters": [
-            { "Name": "Expression", "StrValue": "(act Inventory.StartEmptying)"}
+            { "Name": "Expression", "StrValue": "(act Inventory.StartEmptying)"},
+            { "Name": "CleanupAction", "StrValue": "(act Inventory.StopEmptying)"}
           ]
         }
       },

@@ -7,6 +7,7 @@ using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.TimberDev.UI;
+using IgorZ.TimberDev.Utils;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.Persistence;
 using UnityDev.Utils.LogUtilsLite;
@@ -23,7 +24,9 @@ sealed class ScriptedAction : AutomationActionBase {
 
   /// <inheritdoc/>
   public override IAutomationAction CloneDefinition() {
-    return new ScriptedAction { TemplateFamily = TemplateFamily, Expression = Expression };
+    return new ScriptedAction {
+        TemplateFamily = TemplateFamily, Expression = Expression, CleanupAction = CleanupAction,
+    };
   }
 
   /// <inheritdoc/>
@@ -77,6 +80,18 @@ sealed class ScriptedAction : AutomationActionBase {
     ParseAndApply();
   }
 
+  /// <inheritdoc/>
+  protected override void OnBehaviorToBeCleared() {
+    base.OnBehaviorToBeCleared();
+    if (!string.IsNullOrEmpty(CleanupAction)) {
+      try {
+        ParseAction(CleanupAction).Execute();
+      } catch (ScriptError e) {
+        HostedDebugLog.Error(Behavior, "Cleanup action failed: {0}\nError: {1}", CleanupAction, e.Message);
+      }
+    }
+  }
+
   #endregion
 
   #region API
@@ -88,6 +103,10 @@ sealed class ScriptedAction : AutomationActionBase {
   /// <seealso cref="ActionExpr"/>
   // ReSharper disable once MemberCanBePrivate.Global
   public string Expression { get; private set; }
+
+  /// <summary>Action to execute when the rule is being cleaned up.</summary>
+  /// <remarks>Use it to restore the building state when needed.</remarks>
+  public string CleanupAction { get; private set; }
 
   /// <summary>Sets the action expression.</summary>
   /// <remarks>Can only be set on the non-active condition.</remarks>
@@ -104,44 +123,51 @@ sealed class ScriptedAction : AutomationActionBase {
   #region IGameSerializable implemenation
 
   static readonly PropertyKey<string> ExpressionKey = new("Expression");
+  static readonly PropertyKey<string> CleanupActionKey = new("CleanupAction");
 
   /// <inheritdoc/>
   public override void LoadFrom(IObjectLoader objectLoader) {
     base.LoadFrom(objectLoader);
     Expression = objectLoader.Get(ExpressionKey);
+    CleanupAction = objectLoader.GetValueOrDefault(CleanupActionKey, null);
   }
 
   /// <inheritdoc/>
   public override void SaveTo(IObjectSaver objectSaver) {
     base.SaveTo(objectSaver);
     objectSaver.Set(ExpressionKey, Expression);
+    if (!string.IsNullOrEmpty(CleanupAction)) {
+      objectSaver.Set(CleanupActionKey, CleanupAction);
+    }
   }
 
   #endregion
 
   #region Implementation
 
-  ParsingResult _parsingResult;
   ActionExpr _parsedExpression;
 
   void ParseAndApply() {
     _uiDescription = null;
-    _parsingResult = DependencyContainer.GetInstance<ExpressionParser>().Parse(Expression, Behavior);
-    if (_parsingResult.LastError != null) {
-      HostedDebugLog.Error(
-          Behavior, "Failed to parse action: {0}\nError: {1}", Expression, _parsingResult.LastError);
+    _parsedExpression = ParseAction(Expression);
+    if (_parsedExpression != null) {
+      Expression = _parsedExpression!.Serialize();
+    } else {
       _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
-      return;
     }
-    _parsedExpression = _parsingResult.ParsedExpression as ActionExpr;
-    if (_parsedExpression == null) {
-      HostedDebugLog.Error(
-          Behavior, "Expression is not an action operator: {0}", _parsingResult.ParsedExpression);
-      _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
-      return;
-    }
+  }
 
-    Expression = _parsedExpression.Serialize();
+  ActionExpr ParseAction(string expression) {
+    var parsingResult = DependencyContainer.GetInstance<ExpressionParser>().Parse(expression, Behavior);
+    if (parsingResult.LastError != null) {
+      HostedDebugLog.Error(Behavior, "Failed to parse action: {0}\nError: {1}", expression, parsingResult.LastError);
+      return null;
+    }
+    if (parsingResult.ParsedExpression is not ActionExpr parsedExpression) {
+      HostedDebugLog.Error(Behavior, "Expression is not an action operator: {0}", parsingResult.ParsedExpression);
+      return null;
+    }
+    return parsedExpression;
   }
 
   #endregion
