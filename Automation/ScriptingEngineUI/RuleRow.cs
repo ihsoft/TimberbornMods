@@ -21,16 +21,23 @@ sealed class RuleRow {
   const string ActionLabelLocKey = "IgorZ.Automation.Scripting.Editor.ActionLabel";
   const string ResetChangesLocKey = "IgorZ.Automation.Scripting.Editor.ResetChangesBtn";
   const string ParseErrorLocKey = "IgorZ.Automation.Scripting.Expressions.ParseError";
+  const string TemplateFamilyLocKey = "IgorZ.Automation.Scripting.Editor.TemplateFamilyLabel";
 
   const string EditModeStyle = "editmode-rule";
   const string OriginalRuleStyle = "original-rule";
   const string ModifiedRuleStyle = "modified-rule";
+  const string DeletedTextStyle = "automation-deleted-text";
 
   #region API
 
   public readonly VisualElement Root;
 
-  public string TemplateFamily { get; private set; }
+  public string TemplateFamily {
+    get => _templateFamily;
+    private set => SetTemplateFamily(value);
+  }
+  string _templateFamily;
+  string _originalTemplateFamily;
 
   public BoolOperatorExpr ParsedCondition { get; private set; }
   public string ConditionExpression {
@@ -114,6 +121,15 @@ sealed class RuleRow {
     _editView = Root.Q("EditRuleView");
     _notifications  = Root.Q("Notifications");
     _notifications.ToggleDisplayStyle(false);
+    _templateFamilySection = Root.Q("TemplateFamilySection");
+    _templateFamilySection.ToggleDisplayStyle(false);
+    _templateFamilyLabel = _templateFamilySection.Q<Label>("TemplateFamilyName");
+    _templateFamilySection.Q<Button>("RemoveTemplateBtn").clicked += () => {
+      TemplateFamily = null;
+    };
+    _templateFamilySection.Q<Button>("RevertTemplateBtn").clicked += () => {
+      TemplateFamily = _originalTemplateFamily;
+    };
   }
 
   public void Initialize(string condition, string action, string templateFamily) {
@@ -213,7 +229,8 @@ sealed class RuleRow {
   readonly VisualElement _notifications;
   readonly VisualElement _readonlyView;
   readonly VisualElement _editView;
-
+  readonly VisualElement _templateFamilySection;
+  readonly Label _templateFamilyLabel;
 
   void Reset() {
     _editView.Clear();
@@ -243,7 +260,8 @@ sealed class RuleRow {
   }
 
   void CheckIfModified() {
-    IsModified = _originalConditionExpression != _conditionExpression || _originalActionExpression != _actionExpression;
+    IsModified = _originalConditionExpression != _conditionExpression || _originalActionExpression != _actionExpression
+        || _originalTemplateFamily != _templateFamily;
   }
 
   T ParseExpression<T>(string expression) where T : class, IExpression {
@@ -275,6 +293,31 @@ sealed class RuleRow {
   void MarkDeleted() {
     IsDeleted = true;
     OnStateChanged?.Invoke(this, EventArgs.Empty);
+  }
+
+  void SetTemplateFamily(string templateFamily) {
+    _templateFamily = templateFamily;
+    if (templateFamily != null && (_originalTemplateFamily == null || templateFamily != _originalTemplateFamily)) {
+      // Editing the template family is not supported yet.
+      throw new NotImplementedException("Editing the template family is not supported yet.");
+    }
+    if (_originalTemplateFamily == null && templateFamily == null) {
+      _templateFamilySection.ToggleDisplayStyle(false);
+      return;
+    }
+    _templateFamilySection.ToggleDisplayStyle(true);
+    if (_originalTemplateFamily != templateFamily) {
+      _templateFamilyLabel.AddToClassList(DeletedTextStyle);
+      _templateFamilyLabel.text =
+          CommonFormats.Strikethrough(_uiFactory.T(TemplateFamilyLocKey, _originalTemplateFamily));
+      _templateFamilySection.Q("RemoveTemplateBtn").ToggleDisplayStyle(false);
+      _templateFamilySection.Q("RevertTemplateBtn").ToggleDisplayStyle(true);
+    } else {
+      _templateFamilyLabel.RemoveFromClassList(DeletedTextStyle);
+      _templateFamilyLabel.text = _uiFactory.T(TemplateFamilyLocKey, _originalTemplateFamily);
+      _templateFamilySection.Q("RemoveTemplateBtn").ToggleDisplayStyle(true);
+      _templateFamilySection.Q("RevertTemplateBtn").ToggleDisplayStyle(false);
+    }
   }
 
   #endregion

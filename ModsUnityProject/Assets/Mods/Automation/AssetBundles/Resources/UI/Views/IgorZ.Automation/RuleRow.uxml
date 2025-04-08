@@ -5,6 +5,7 @@
     <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle" />
     <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/RulesEditorStyle.uss?fileID=7433441132597879392&amp;guid=82ba7710a5bad1b489b53edd629e2a56&amp;type=3#RulesEditorStyle" />
     <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/TimberDevStyle.uss?fileID=7433441132597879392&amp;guid=86824deb2a4bc844cbec48367a164254&amp;type=3#TimberDevStyle" />
+    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/RuleRow.uss?fileID=7433441132597879392&amp;guid=5c205da07a34e7e4089155d8ffed192e&amp;type=3#RuleRow" />
     <engine:VisualElement name="RuleContainer" class="original-rule" style="margin-bottom: 10px;">
         <engine:VisualElement style="flex-grow: 1; flex-direction: row; align-items: center;">
             <engine:VisualElement name="SidePanel" style="align-items: center; margin-right: 5px;">
@@ -17,9 +18,16 @@
                 <engine:Label text="If &lt;color=#ff0&gt;condition&lt;/color&gt;&#10;Then &lt;color=#ff0&gt;action&lt;/color&gt;" name="ReadonlyRuleView" class="game-text-big" />
             </engine:VisualElement>
         </engine:VisualElement>
-        <engine:VisualElement name="RuleButtons" style="margin-top: 5px; align-items: flex-start; flex-direction: row;">
-            <engine:Instance template="RuleRowButtonTmpl" />
-            <engine:Instance template="RuleRowButtonTmpl" />
+        <engine:VisualElement style="margin-top: 5px; align-items: center; flex-direction: row;">
+            <engine:VisualElement name="RuleButtons" style="flex-grow: 1; flex-direction: row;">
+                <engine:Instance template="RuleRowButtonTmpl" />
+                <engine:Instance template="RuleRowButtonTmpl" />
+            </engine:VisualElement>
+            <engine:VisualElement name="TemplateFamilySection" style="flex-direction: row; align-items: center;">
+                <Timberborn.CoreUI.NineSliceButton name="RemoveTemplateBtn" class="button-cross" style="width: 16px; height: 16px;" />
+                <Timberborn.CoreUI.NineSliceButton name="RevertTemplateBtn" class="automation-button-undo" style="width: 16px; height: 16px;" />
+                <Timberborn.CoreUI.NineSliceLabel text="TemplateFamilyName" name="TemplateFamilyName" class="game-text-small automation-deleted-text" style="margin-left: 2px;" />
+            </engine:VisualElement>
         </engine:VisualElement>
         <engine:VisualElement name="Notifications" style="align-items: flex-start; margin-top: 5px;">
             <engine:Label text="Some error text" name="ErrorText" class="game-text-big" style="color: rgb(255, 0, 0);" />

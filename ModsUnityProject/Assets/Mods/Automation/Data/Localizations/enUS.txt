@@ -147,6 +147,7 @@ IgorZ.Automation.Scripting.Editor.PendingEditsNotification,"There are rules in t
 IgorZ.Automation.Scripting.Editor.UnsavedChangesConfirmation,"There are unsaved changes. Do you want to discard them?",
 IgorZ.Automation.Scripting.Editor.AddRuleFromScriptBtn,"Add script",
 IgorZ.Automation.Scripting.Editor.AddRuleViaConstructorBtn,"Create rule via constructor",
+IgorZ.Automation.Scripting.Editor.TemplateFamilyLabel,"Template family: {0}","Name of the template family the rule belongs to"
 IgorZ.Automation.Scripting.Editor.ResetChangesBtn,"Reset changes",
 IgorZ.Automation.Scripting.Editor.EditAsScriptBtn,"Edit as script",
 IgorZ.Automation.Scripting.Editor.EditInConstructorBtn,"Edit in constructor",
