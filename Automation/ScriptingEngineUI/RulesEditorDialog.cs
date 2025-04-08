@@ -163,19 +163,9 @@ sealed class RulesEditorDialog : IPanelController {
 
   RuleRow CreateScriptedRule() {
     var ruleRow = new RuleRow(_editorProviders, _uiFactory, _activeBuilding);
-    ruleRow.OnStateChanged += OnRuleStateChanged;
     _ruleRows.Add(ruleRow);
     _ruleRowsContainer.Add(ruleRow.Root);
     return ruleRow;
-  }
-
-  void OnRuleStateChanged(object obj, EventArgs args) {
-    for (var i = _ruleRows.Count - 1; i >= 0; i--) {
-      var ruleRow = _ruleRows[i];
-      if (ruleRow.IsDeleted) {
-        ruleRow.Root.RemoveFromHierarchy();
-      }
-    }
   }
 
   #endregion

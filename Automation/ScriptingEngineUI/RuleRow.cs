@@ -103,7 +103,15 @@ sealed class RuleRow {
   }
   bool _isInEditMode;
 
-  public bool IsDeleted { get; private set; }
+  public bool IsDeleted {
+    get => _isDeleted;
+    private set {
+      _isDeleted = value;
+      _deletedStateOverlay.ToggleDisplayStyle(value);
+      _ruleContainer.ToggleDisplayStyle(!value);
+    }
+  }
+  bool _isDeleted;
 
   public event EventHandler OnStateChanged;
 
@@ -130,6 +138,12 @@ sealed class RuleRow {
     _templateFamilySection.Q<Button>("RevertTemplateBtn").clicked += () => {
       TemplateFamily = _originalTemplateFamily;
     };
+    _ruleContainer = Root.Q("RuleContainer");
+    _deletedStateOverlay = Root.Q("DeletedStateOverlay");
+    _deletedStateOverlay.ToggleDisplayStyle(false);
+    _deletedStateOverlay.Q<Button>("UndoDeleteBtn").clicked += () => {
+      IsDeleted = false;
+    };
   }
 
   public void Initialize(string condition, string action, string templateFamily) {
@@ -137,6 +151,7 @@ sealed class RuleRow {
     ConditionExpression = condition;
     _originalActionExpression = action;
     ActionExpression = action;
+    _originalTemplateFamily = templateFamily;
     TemplateFamily = templateFamily;
   }
 
@@ -231,6 +246,8 @@ sealed class RuleRow {
   readonly VisualElement _editView;
   readonly VisualElement _templateFamilySection;
   readonly Label _templateFamilyLabel;
+  readonly VisualElement _ruleContainer;
+  readonly VisualElement _deletedStateOverlay;
 
   void Reset() {
     _editView.Clear();

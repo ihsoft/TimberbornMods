@@ -148,6 +148,7 @@ IgorZ.Automation.Scripting.Editor.UnsavedChangesConfirmation,"There are unsaved 
 IgorZ.Automation.Scripting.Editor.AddRuleFromScriptBtn,"Add script",
 IgorZ.Automation.Scripting.Editor.AddRuleViaConstructorBtn,"Create rule via constructor",
 IgorZ.Automation.Scripting.Editor.TemplateFamilyLabel,"Template family: {0}","Name of the template family the rule belongs to"
+IgorZ.Automation.Scripting.Editor.DeletedRule,"Rule removed","A message to show over the deleted rule"
 IgorZ.Automation.Scripting.Editor.ResetChangesBtn,"Reset changes",
 IgorZ.Automation.Scripting.Editor.EditAsScriptBtn,"Edit as script",
 IgorZ.Automation.Scripting.Editor.EditInConstructorBtn,"Edit in constructor",
