@@ -124,6 +124,7 @@ sealed class RuleRow {
     Root = _uiFactory.LoadVisualTreeAsset("IgorZ.Automation/RuleRow");
     _sidePanel = Root.Q("SidePanel");
     _sidePanel.Q<Button>("DeleteRowBtn").clicked += MarkDeleted;
+    _bottomRowSection = Root.Q("BottomRowSection");
     _ruleButtons = Root.Q("RuleButtons");
     _readonlyView = Root.Q("ReadonlyRuleView");
     _editView = Root.Q("EditRuleView");
@@ -131,7 +132,6 @@ sealed class RuleRow {
     _notifications.ToggleDisplayStyle(false);
     _templateFamilySection = Root.Q("TemplateFamilySection");
     _templateFamilySection.ToggleDisplayStyle(false);
-    _templateFamilyLabel = _templateFamilySection.Q<Label>("TemplateFamilyName");
     _templateFamilySection.Q<Button>("RemoveTemplateBtn").clicked += () => {
       TemplateFamily = null;
     };
@@ -157,6 +157,7 @@ sealed class RuleRow {
 
   public void Initialize(IAutomationAction legacyAction) {
     LegacyAction = legacyAction;
+    _originalTemplateFamily = legacyAction.TemplateFamily;
     TemplateFamily = legacyAction.TemplateFamily;
   }
 
@@ -198,7 +199,7 @@ sealed class RuleRow {
       CreateButton(provider.EditRuleLocKey, _ => provider.MakeForRule(this));
       ruleEditable = true;
     }
-    _ruleButtons.ToggleDisplayStyle(ruleEditable);
+    Root.Q("BottomRowSection").ToggleDisplayStyle(ruleEditable || _originalTemplateFamily != null);
 
     IsInEditMode = false;
     OnStateChanged?.Invoke(this, EventArgs.Empty);
@@ -241,11 +242,11 @@ sealed class RuleRow {
 
   readonly VisualElement _sidePanel;
   readonly VisualElement _ruleButtons;
+  readonly VisualElement _bottomRowSection;
   readonly VisualElement _notifications;
   readonly VisualElement _readonlyView;
   readonly VisualElement _editView;
   readonly VisualElement _templateFamilySection;
-  readonly Label _templateFamilyLabel;
   readonly VisualElement _ruleContainer;
   readonly VisualElement _deletedStateOverlay;
 
@@ -255,7 +256,7 @@ sealed class RuleRow {
     _readonlyView.ToggleDisplayStyle(false);
     _sidePanel.ToggleDisplayStyle(false);
     _ruleButtons.Clear();
-    _ruleButtons.ToggleDisplayStyle(false);
+    _bottomRowSection.ToggleDisplayStyle(false);
     _notifications.ToggleDisplayStyle(false);
   }
 
@@ -314,7 +315,7 @@ sealed class RuleRow {
 
   void SetTemplateFamily(string templateFamily) {
     _templateFamily = templateFamily;
-    if (templateFamily != null && (_originalTemplateFamily == null || templateFamily != _originalTemplateFamily)) {
+    if (templateFamily != null && _originalTemplateFamily != null && templateFamily != _originalTemplateFamily) {
       // Editing the template family is not supported yet.
       throw new NotImplementedException("Editing the template family is not supported yet.");
     }
@@ -323,15 +324,15 @@ sealed class RuleRow {
       return;
     }
     _templateFamilySection.ToggleDisplayStyle(true);
+    var label = _templateFamilySection.Q<Label>("TemplateFamilyName");
     if (_originalTemplateFamily != templateFamily) {
-      _templateFamilyLabel.AddToClassList(DeletedTextStyle);
-      _templateFamilyLabel.text =
-          CommonFormats.Strikethrough(_uiFactory.T(TemplateFamilyLocKey, _originalTemplateFamily));
+      label.AddToClassList(DeletedTextStyle);
+      label.text = CommonFormats.Strikethrough(_uiFactory.T(TemplateFamilyLocKey, _originalTemplateFamily));
       _templateFamilySection.Q("RemoveTemplateBtn").ToggleDisplayStyle(false);
       _templateFamilySection.Q("RevertTemplateBtn").ToggleDisplayStyle(true);
     } else {
-      _templateFamilyLabel.RemoveFromClassList(DeletedTextStyle);
-      _templateFamilyLabel.text = _uiFactory.T(TemplateFamilyLocKey, _originalTemplateFamily);
+      label.RemoveFromClassList(DeletedTextStyle);
+      label.text = _uiFactory.T(TemplateFamilyLocKey, _originalTemplateFamily);
       _templateFamilySection.Q("RemoveTemplateBtn").ToggleDisplayStyle(true);
       _templateFamilySection.Q("RevertTemplateBtn").ToggleDisplayStyle(false);
     }
