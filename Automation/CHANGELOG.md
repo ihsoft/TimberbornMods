@@ -2,10 +2,10 @@
 * [Feature] Allow editing the rules in the game.
 * [Feature] Allow copying rules from one building to another.
 * [Feature] Add scripted conditions and action to compose the rules.
-* [Fix #69 ] Dynamite drilldown action crashes.
-* [Fix #70 ] Crashes in the editor mode.
-* [Fix] Improper dynamite drilldown action on the hangovers.
-* [Fix] Construction finished condition could crash on the game load.
+* [Fix] U7: Dynamite drilldown action crashes.
+* [Fix] U7: Crashes in the editor mode.
+* [Fix] U7: Improper dynamite drilldown action on the hangovers.
+* [Fix] U7: Construction finished condition could crash on the game load.
 
 # v1.3.0 (4 Mar 2025):
 * Add support for Update 7 (0.7.1.2).
