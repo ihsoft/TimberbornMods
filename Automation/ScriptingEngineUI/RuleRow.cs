@@ -83,7 +83,7 @@ sealed class RuleRow {
 
   public readonly AutomationBehavior ActiveBuilding;
 
-  public bool IsNew => _originalConditionExpression == null && _originalActionExpression == null;
+  bool IsNew => _originalConditionExpression == null && _originalActionExpression == null;
 
   public bool IsModified {
     get => _isModified;
