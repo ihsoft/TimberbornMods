@@ -109,6 +109,8 @@ IgorZ.Automation.CheckAccessBlockCondition.UnreachableAlert,"Unreachable constru
 IgorZ.Automation.ShowStatusAction.HoldConstruction,"<YellowHighlight>hold completion</YellowHighlight>",
 IgorZ.Automation.ShowStatusAction.ResumeConstruction,"<YellowHighlight>resume building</YellowHighlight>",
 IgorZ.Automation.ShowStatusAction.HoldCompletionStatusText,"Waiting for the other buildings to finish",
+IgorZ.Automation.ShowStatusAction.AutomationErrorAlert,"Automation error",
+IgorZ.Automation.ShowStatusAction.AutomationErrorDescription,"Some automation rules cannot be executed",
 IgorZ.Automation.BlockableBuildingAction.BlockDescription,"<YellowHighlight>block building</YellowHighlight>",
 IgorZ.Automation.BlockableBuildingAction.UnblockDescription,"<YellowHighlight>unblock building</YellowHighlight>",
 IgorZ.Automation.BlockableBuildingAction.BlockText,"Waiting for the other buildings to finish",

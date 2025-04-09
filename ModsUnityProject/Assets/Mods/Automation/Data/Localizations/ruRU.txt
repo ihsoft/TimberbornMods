@@ -1,4 +1,6 @@
 ﻿ID,Text,Comment
+IgorZ.Automation.ShowStatusAction.AutomationErrorAlert,"Ошибка автоматизации",
+IgorZ.Automation.ShowStatusAction.AutomationErrorDescription,"Некоторые правила автоматизации не могут быть исполнены",
 =,=,"UI fragment strings"
 IgorZ.Automation.AutomationFragment.RulesAreaCaptionTextLocKey,"Правила автоматизации:",
 IgorZ.Automation.AutomationFragment.RuleTextLocKey,"Если {0}

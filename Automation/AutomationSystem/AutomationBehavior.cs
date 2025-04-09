@@ -12,6 +12,7 @@ using Timberborn.EntitySystem;
 using Timberborn.Localization;
 using Timberborn.Persistence;
 using Timberborn.SingletonSystem;
+using Timberborn.StatusSystem;
 using Timberborn.WorldPersistence;
 using UnityDev.Utils.LogUtilsLite;
 
@@ -19,6 +20,11 @@ namespace IgorZ.Automation.AutomationSystem;
 
 /// <summary>The component that keeps all the automation state on the building.</summary>
 public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDeletableEntity, IFinishedStateListener {
+
+  //FXIME: Make own icon!
+  const string AutomationErrorIcon = "NoPower";
+  const string AutomationErrorAlertLocKey = "IgorZ.Automation.ShowStatusAction.AutomationErrorAlert";
+  const string AutomationErrorDescriptionLocKey = "IgorZ.Automation.ShowStatusAction.AutomationErrorDescription";
 
   #region Injection shortcuts
 
@@ -105,6 +111,33 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
         HostedDebugLog.Fine(this, "Cleaning up action: {0}", action);
         DeleteRuleAt(i);
       }
+    }
+  }
+
+  StatusToggle _errorToggle;
+  readonly HashSet<object> _failingInstances = [];
+
+  /// <summary>Shows an error status for a building that has problems with the rules.</summary>
+  public void ReportError(object instance) {
+    HostedDebugLog.Fine(this, "Automation error reported by: {0}", instance);
+    if (_errorToggle == null) {
+      _errorToggle = StatusToggle.CreatePriorityStatusWithAlertAndFloatingIcon(
+          AutomationErrorIcon, Loc.T(AutomationErrorDescriptionLocKey), Loc.T(AutomationErrorAlertLocKey));
+      GetComponentFast<StatusSubject>().RegisterStatus(_errorToggle);
+    }
+    _errorToggle.Activate();
+    _failingInstances.Add(instance);
+  }
+
+  /// <summary>Clears the error status.</summary>
+  public void ClearError(object instance) {
+    if (!_failingInstances.Remove(instance)) {
+      DebugEx.Warning("Cannot clear error. It was never reported by: {0}", instance);
+      return;
+    }
+    HostedDebugLog.Fine(this, "Clearing error from: {0}", instance);
+    if (_failingInstances.Count == 0) {
+      _errorToggle?.Deactivate();
     }
   }
 

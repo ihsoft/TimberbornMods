@@ -7,7 +7,6 @@ using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.TimberDev.UI;
-using IgorZ.TimberDev.Utils;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.Persistence;
 using UnityDev.Utils.LogUtilsLite;
@@ -81,6 +80,10 @@ sealed class ScriptedAction : AutomationActionBase {
   /// <inheritdoc/>
   protected override void OnBehaviorToBeCleared() {
     base.OnBehaviorToBeCleared();
+    if (_parsedExpression == null) {
+      Behavior.ClearError(this);
+      return;
+    }
     var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
     foreach (var signal in _parsingResult.ReferencedActions) {
       scriptingService.UninstallAction(signal, Behavior);
@@ -134,21 +137,32 @@ sealed class ScriptedAction : AutomationActionBase {
   ParsingResult _parsingResult;
   ActionExpr _parsedExpression;
 
+  // Used by the RulesEditor dialog.
+  internal static ParsingResult? ParseAndValidate(string expression, AutomationBehavior behavior) {
+    var result = DependencyContainer.GetInstance<ExpressionParser>().Parse(expression, behavior);
+    if (result.LastError != null) {
+      HostedDebugLog.Error(behavior, "Failed to parse action: {0}\nError: {1}", expression, result.LastError);
+      return null;
+    }
+    if (result.ParsedExpression is not ActionExpr) {
+      HostedDebugLog.Error(behavior, "Expression is not an action operator: {0}", result.ParsedExpression.Serialize());
+      return null;
+    }
+    return result;
+  }
+
   void ParseAndApply() {
     _uiDescription = null;
-    _parsingResult = DependencyContainer.GetInstance<ExpressionParser>().Parse(Expression, Behavior);
-    _parsedExpression = _parsingResult.ParsedExpression as ActionExpr;
-    if (_parsingResult.LastError != null) {
-      HostedDebugLog.Error(Behavior, "Failed to parse action: {0}\nError: {1}", Expression, _parsingResult.LastError);
-    } else if (_parsedExpression == null) {
-      HostedDebugLog.Error(Behavior, "Expression is not an action operator: {0}", _parsingResult.ParsedExpression);
-    }
-    if (_parsedExpression == null) {
+    var result = ParseAndValidate(Expression, Behavior);
+    if (result == null) {
       _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
+      Behavior.ReportError(this);
       return;
     }
-    
+    _parsingResult = result.Value;
+    _parsedExpression = _parsingResult.ParsedExpression as ActionExpr;
     Expression = _parsedExpression!.Serialize();
+
     var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
     foreach (var action in _parsingResult.ReferencedActions) {
       scriptingService.InstallAction(action, Behavior);

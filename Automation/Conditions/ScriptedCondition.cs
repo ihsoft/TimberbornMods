@@ -42,6 +42,10 @@ sealed class ScriptedCondition : AutomationConditionBase {
 
   /// <inheritdoc/>
   protected override void OnBehaviorToBeCleared() {
+    if (_parsedExpression == null) {
+      Behavior.ClearError(this);
+      return;
+    }
     var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
     foreach (var signal in _parsingResult.ReferencedSignals) {
       scriptingService.UnregisterSignalChangeCallback(signal, Behavior, CheckOperands);
@@ -135,33 +139,40 @@ sealed class ScriptedCondition : AutomationConditionBase {
   ParsingResult _parsingResult;
   BoolOperatorExpr _parsedExpression;
 
+  // Used by the RulesEditor dialog.
+  internal static ParsingResult? ParseAndValidate(string expression, AutomationBehavior behavior) {
+    var result = DependencyContainer.GetInstance<ExpressionParser>().Parse(expression, behavior);
+    if (result.LastError != null) {
+      HostedDebugLog.Error(behavior, "Failed to parse condition: {0}\nError: {1}", expression, result.LastError);
+      return null;
+    }
+    if (result.ParsedExpression is not BoolOperatorExpr) {
+      HostedDebugLog.Error(behavior, "Expression is not a boolean operator: {0}", result.ParsedExpression.Serialize());
+      return null;
+    }
+    if (result.ReferencedSignals.Length == 0) {
+      HostedDebugLog.Error(behavior, "Condition has no signals: {0}", expression);
+      return null;
+    }
+    return result;
+  }
+
   void ParseAndApply() {
     _uiDescription = null;
-    _parsingResult = DependencyContainer.GetInstance<ExpressionParser>().Parse(Expression, Behavior);
-    if (_parsingResult.LastError != null) {
-      HostedDebugLog.Error(
-          Behavior, "Failed to parse condition: {0}\nError: {1}", Expression, _parsingResult.LastError);
+    var result = ParseAndValidate(Expression, Behavior);
+    if (result == null) {
       _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
+      Behavior.ReportError(this);
       return;
     }
+    _parsingResult = result.Value;
     _parsedExpression = _parsingResult.ParsedExpression as BoolOperatorExpr;
-    if (_parsedExpression == null) {
-      HostedDebugLog.Error(
-          Behavior, "Expression is not a boolean operator: {0}", _parsingResult.ParsedExpression.Serialize());
-      _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
-      return;
-    }
-    if (_parsingResult.ReferencedSignals.Length == 0) {
-      HostedDebugLog.Error(Behavior, "Condition has no signals: {0}", Expression);
-      _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
-      return;
-    }
+    Expression = _parsedExpression!.Serialize();
 
     var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
     foreach (var signal in _parsingResult.ReferencedSignals) {
       scriptingService.RegisterSignalChangeCallback(signal, Behavior, CheckOperands);
     }
-    Expression = _parsedExpression.Serialize();
   }
 
   bool CheckPrecondition(AutomationBehavior behavior) {

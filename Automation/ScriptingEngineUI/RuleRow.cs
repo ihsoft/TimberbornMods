@@ -42,7 +42,8 @@ sealed class RuleRow {
         throw new InvalidOperationException("Cannot set condition expression for legacy action.");
       }
       _conditionExpression = value;
-      ParsedCondition = ParseExpression<BoolOperatorExpr>(value);
+      var result = ScriptedCondition.ParseAndValidate(value, ActiveBuilding);
+      ParsedCondition = result?.ParsedExpression as BoolOperatorExpr;
       CheckIfModified();
     }
   }
@@ -56,7 +57,8 @@ sealed class RuleRow {
         throw new InvalidOperationException("Cannot set action expression for legacy action.");
       }
       _actionExpression = value;
-      ParsedAction = ParseExpression<ActionExpr>(value);
+      var result = ScriptedAction.ParseAndValidate(value, ActiveBuilding);
+      ParsedAction = result?.ParsedExpression as ActionExpr;
       CheckIfModified();
     }
   }
@@ -298,15 +300,6 @@ sealed class RuleRow {
     IsModified = _originalCondition?.Expression != _conditionExpression
             || _originalAction?.Expression != _actionExpression
             || _originalTemplateFamily != _templateFamily;
-  }
-
-  T ParseExpression<T>(string expression) where T : class, IExpression {
-    var result = _expressionParser.Parse(expression, ActiveBuilding);
-    if (result.LastError != null) {
-      DebugEx.Warning("Failed to parse expression: {0}\nError: {1}", expression, result.LastError);
-      return null;
-    }
-    return result.ParsedExpression as T;
   }
 
   void GetDescriptions(out string condition, out string action) {
