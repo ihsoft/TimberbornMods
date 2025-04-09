@@ -151,6 +151,8 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
       }
       action.Condition.SyncState();
     }
+    CollectCleanedRules();
+    UpdateRegistration();
   }
 
   /// <inheritdoc/>
