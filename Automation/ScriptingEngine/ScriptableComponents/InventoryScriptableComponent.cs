@@ -219,7 +219,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     return Loc.T(name, _goodService.GetGood(goodId).PluralDisplayName.Value);
   }
 
-  static Inventory GetInventory(BaseComponent building, bool throwIfNotFound = true) {
+  internal static Inventory GetInventory(BaseComponent building, bool throwIfNotFound = true) {
     var inventories = building.GetComponentFast<Inventories>();
     if (!inventories) {
       if (throwIfNotFound) {

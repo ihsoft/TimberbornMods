@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 using Timberborn.BaseComponentSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
@@ -80,6 +81,11 @@ class GetPropertyOperatorExpr : AbstractOperandExpr, IValueExpr {
   }
 
   static BaseComponent GetComponentByName(GameObject obj, string name) {
+    if (name == "Inventory") {
+      // Special case: the buildings can have more than one inventory. 
+      var baseComponent = obj.GetComponent<BaseComponent>();  // Any component is good.
+      return InventoryScriptableComponent.GetInventory(baseComponent);
+    }
     var components = obj.GetComponents<BaseComponent>();
     return components.FirstOrDefault(x => x.enabled && x.GetType().Name == name);
   }
