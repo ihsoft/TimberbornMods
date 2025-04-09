@@ -1,4 +1,4 @@
-# v2.0.3 (started on 3/7/2025):
+# v2.0.4 (8 Mar 2025):
 * [Change] Support Timberborn `0.7.2.0`.
 * [Feature] Allow editing the rules in the game.
 * [Feature] Allow copying rules from one building to another.
