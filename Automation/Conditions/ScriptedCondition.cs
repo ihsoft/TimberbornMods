@@ -42,9 +42,9 @@ sealed class ScriptedCondition : AutomationConditionBase {
 
   /// <inheritdoc/>
   protected override void OnBehaviorToBeCleared() {
+    var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
     foreach (var signal in _parsingResult.ReferencedSignals) {
-      DependencyContainer.GetInstance<ScriptingService>()
-          .UnregisterSignalChangeCallback(signal, Behavior, CheckOperands);
+      scriptingService.UnregisterSignalChangeCallback(signal, Behavior, CheckOperands);
     }
   }
 
@@ -157,9 +157,9 @@ sealed class ScriptedCondition : AutomationConditionBase {
       return;
     }
 
+    var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
     foreach (var signal in _parsingResult.ReferencedSignals) {
-      DependencyContainer.GetInstance<ScriptingService>()
-          .RegisterSignalChangeCallback(signal, Behavior, CheckOperands);
+      scriptingService.RegisterSignalChangeCallback(signal, Behavior, CheckOperands);
     }
     Expression = _parsedExpression.Serialize();
   }
