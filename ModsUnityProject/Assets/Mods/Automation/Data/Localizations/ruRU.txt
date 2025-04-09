@@ -34,11 +34,11 @@ IgorZ.Automation.Scripting.Editor.PendingEditsNotification,"Некоторые �
 IgorZ.Automation.Scripting.Editor.UnsavedChangesConfirmation,"Есть несохраненные изменения. Вы хотите их отменить?",
 IgorZ.Automation.Scripting.Editor.AddRuleFromScriptBtn,"Добавить скрипт",
 IgorZ.Automation.Scripting.Editor.AddRuleViaConstructorBtn,"Создать правило через конструктор",
-IgorZ.Automation.Scripting.Editor.TemplateFamilyLabel,"Шаблонная группа: {0}","Name of the template family the rule belongs to"
+IgorZ.Automation.Scripting.Editor.TemplateFamilyLabel,"Группа шаблонов: {0}","Name of the template group (family) the rule belongs to"
 IgorZ.Automation.Scripting.Editor.DeletedRule,"Правило удалено","A message to show over the deleted rule"
 IgorZ.Automation.Scripting.Editor.ResetChangesBtn,"Сбросить изменения",
-IgorZ.Automation.Scripting.Editor.EditAsScriptBtn,"Редактировать скрипт",
-IgorZ.Automation.Scripting.Editor.EditInConstructorBtn,"Редактировать в конструкторе",
+IgorZ.Automation.Scripting.Editor.EditAsScriptBtn,"Скрипт",
+IgorZ.Automation.Scripting.Editor.EditInConstructorBtn,"Конструктор",
 IgorZ.Automation.Scripting.Editor.TestScriptBtn,"Проверить",
 IgorZ.Automation.Scripting.Editor.SaveScriptBtn,"Сохранить",
 IgorZ.Automation.Scripting.Editor.DiscardScriptBtn,"Отменить",
