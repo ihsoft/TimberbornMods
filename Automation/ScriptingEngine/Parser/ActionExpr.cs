@@ -37,6 +37,10 @@ sealed class ActionExpr : AbstractOperandExpr {
       throw new ScriptError("Bad action name: " + Operands[0]);
     }
     var actionName = symbol.Value;
+    if (context.IsPreprocessor) {
+      throw new ScriptError("Actions are not allowed in preprocessor: " + actionName);
+    }
+    context.ReferencedActions.Add(actionName);
     _actionDef = context.ScriptingService.GetActionDefinition(actionName, context.ScriptHost);
     AsserNumberOfOperandsExact(_actionDef.Arguments.Length + 1);
     var argValues = new Func<ScriptValue>[_actionDef.Arguments.Length];

@@ -33,6 +33,7 @@ sealed class ExpressionParser {
       return new ParsingResult {
           ParsedExpression = parsedExpression,
           ReferencedSignals = CurrentContext.ReferencedSignals.ToArray(),
+          ReferencedActions = CurrentContext.ReferencedActions.ToArray(),
       };
     } catch (ScriptError e) {
       return new ParsingResult { LastScriptError = e };
@@ -61,6 +62,7 @@ sealed class ExpressionParser {
     public AutomationBehavior ScriptHost { get; init; }
     public ScriptingService ScriptingService { get; init; }
     public HashSet<string> ReferencedSignals { get; } = [];
+    public List<string> ReferencedActions { get; } = [];
     public bool IsPreprocessor { get; init; }
   }
 

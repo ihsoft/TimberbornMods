@@ -54,6 +54,14 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
   public virtual void UnregisterSignalChangeCallback(string name, BaseComponent building, Action onValueChanged) {
   }
 
+  /// <inheritdoc/>
+  public virtual void InstallAction(string name, BaseComponent building) {
+  }
+
+  /// <inheritdoc/>
+  public virtual void UninstallAction(string name, BaseComponent building) {
+  }
+
   protected static void AssertActionArgsCount(string actionName, ScriptValue[] args, int expectedCount) {
     if (args.Length != expectedCount) {
       throw new ScriptError($"{actionName} action requires {expectedCount} argument(s)");

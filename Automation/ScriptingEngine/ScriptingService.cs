@@ -88,11 +88,29 @@ sealed class ScriptingService {
     scriptable.UnregisterSignalChangeCallback(name, building, onValueChanged);
   }
 
+  /// <inheritdoc cref="IScriptable.InstallAction"/>
+  public void InstallAction(string name, BaseComponent building) {
+    ExecuteOnRegisteredComponent(name, scriptable => scriptable.InstallAction(name, building));
+  }
+
+  /// <inheritdoc cref="IScriptable.UninstallAction"/>
+  public void UninstallAction(string name, BaseComponent building) {
+    ExecuteOnRegisteredComponent(name, scriptable => scriptable.UninstallAction(name, building));
+  }
+
   #endregion
 
   #region Implementation
 
   readonly Dictionary<string, IScriptable> _registeredScriptables = [];
+
+  void ExecuteOnRegisteredComponent(string name, Action<IScriptable> action) {
+    var nameItems = name.Split('.');
+    if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
+      throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
+    }
+    action(scriptable);
+  }
 
   #endregion
 }

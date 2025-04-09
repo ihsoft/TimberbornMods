@@ -124,8 +124,8 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
       throw new ScriptError("Building is not emptiable: " + DebugEx.ObjectToString(building));
     }
     return name switch {
-        StartEmptyingStockActionName => _ => StartEmptyingStockAction(emptiable),
-        StopEmptyingStockActionName => _ => StopEmptyingStockAction(emptiable),
+        StartEmptyingStockActionName => _ => emptiable.MarkForEmptyingWithoutStatus(),
+        StopEmptyingStockActionName => _ => emptiable.UnmarkForEmptying(),
         _ => throw new ScriptError("Unknown action: " + name),
     };
   }
@@ -142,6 +142,32 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     var tracker = building.GetComponentFast<InventoryChangeTracker>();
     if (tracker) {
       tracker.SignalChangeCallbacks.Remove(onValueChanged);
+    }
+  }
+
+  /// <inheritdoc/>
+  public override void InstallAction(string name, BaseComponent building) {
+    if (name is StartEmptyingStockActionName or StopEmptyingStockActionName) {
+      var behavior = building.GetComponentFast<EmptyingStatusBehavior>();
+      if (behavior == null) {
+        behavior = _instantiator.AddComponent<EmptyingStatusBehavior>(building.GameObjectFast);
+      }
+      behavior.AddReference();
+    } else {
+      throw new ScriptError("Unknown action: " + name);
+    }
+  }
+
+  /// <inheritdoc/>
+  public override void UninstallAction(string name, BaseComponent building) {
+    if (name is StartEmptyingStockActionName or StopEmptyingStockActionName) {
+      var behavior = building.GetComponentFast<EmptyingStatusBehavior>();
+      if (behavior == null) {
+        throw new InvalidOperationException("Status behavior not found on: " + DebugEx.ObjectToString(building));
+      }
+      behavior.RemoveReference();
+    } else {
+      throw new ScriptError("Unknown action: " + name);
     }
   }
 
@@ -176,30 +202,6 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
       Arguments = [],
   };
   ActionDef _stopEmptyingStockActionDef;
-
-  void StartEmptyingStockAction(Emptiable emptiable) {
-    if (emptiable.IsMarkedForEmptying) {
-      return;
-    }
-    emptiable.MarkForEmptyingWithoutStatus();
-    var status = emptiable.GetComponentFast<EmptyingStatusBehavior>();
-    if (status) {
-      status.RefreshStatus();
-    } else {
-      _instantiator.AddComponent<EmptyingStatusBehavior>(emptiable.GameObjectFast);
-    }
-  }
-  
-  void StopEmptyingStockAction(Emptiable emptiable) {
-    if (!emptiable.IsMarkedForEmptying) {
-      return;
-    }
-    emptiable.UnmarkForEmptying();
-    var status = emptiable.GetComponentFast<EmptyingStatusBehavior>();
-    if (status) {
-      status.RefreshStatus();
-    }
-  }
 
   #endregion
 
@@ -260,35 +262,54 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   /// externally, then hides the status and notifies the action.
   /// </summary>
   sealed class EmptyingStatusBehavior : BaseComponent {
+    ILoc _loc;
+
     StatusToggle _statusToggle;
     Emptiable _emptiable;
-    ILoc _loc;
+    int _installedActions;
 
     [Inject]
     public void InjectDependencies(ILoc loc) {
       _loc = loc;
     }
 
-    public void RefreshStatus() {
+    void Start() {
+      _emptiable = GetComponentFast<Emptiable>();
+      _emptiable.UnmarkedForEmptying += (_, _) => RefreshStatus();
+      _emptiable.MarkedForEmptying += (_, _) => RefreshStatus();
+      _statusToggle =
+          StatusToggle.CreatePriorityStatusWithFloatingIcon(EmptyingStatusIcon, _loc.T(EmptyingStatusDescriptionKey));
+      GetComponentFast<StatusSubject>().RegisterStatus(_statusToggle);
+      RefreshStatus();
+    }
+
+    public void AddReference() {
+      _installedActions++;
+      if (_installedActions == 1 && _statusToggle != null) {  // On game load, it is called before the Start() event.
+        RefreshStatus();
+      }
+    }
+
+    public void RemoveReference() {
+      if (_installedActions == 0) {;
+        throw new InvalidOperationException("Uninstalling more actions than installed");
+      }
+      _installedActions--;
+      if (_installedActions == 0 && _emptiable.IsMarkedForEmptying) {
+        _emptiable.UnmarkForEmptying();
+      }
+    }
+
+    void RefreshStatus() {
+      if (_installedActions == 0) {
+        _statusToggle.Deactivate();
+        return;
+      }
       if (_emptiable.IsMarkedForEmptying) {
         _statusToggle.Activate();
       } else {
         _statusToggle.Deactivate();
       }
-    }
-
-    void Start() {
-      _statusToggle = StatusToggle.CreatePriorityStatusWithFloatingIcon(
-          EmptyingStatusIcon, _loc.T(EmptyingStatusDescriptionKey));
-      GetComponentFast<StatusSubject>().RegisterStatus(_statusToggle);
-
-      _emptiable = GetComponentFast<Emptiable>();
-      _emptiable.UnmarkedForEmptying += OnUnmarkedForEmptying;
-      RefreshStatus();
-    }
-
-    void OnUnmarkedForEmptying(object sender, EventArgs args) {
-      _statusToggle.Deactivate();
     }
   }
 
