@@ -29,20 +29,12 @@ sealed class ScriptingService {
 
   /// <inheritdoc cref="IScriptable.GetSignalSource"/>
   public Func<ScriptValue> GetSignalSource(string name, BaseComponent building) {
-    var nameItems = name.Split('.');
-    if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
-      throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
-    }
-    return scriptable.GetSignalSource(name, building);
+    return ExecuteOnRegisteredComponent(name, scriptable => scriptable.GetSignalSource(name, building));
   }
 
   /// <inheritdoc cref="IScriptable.GetSignalDefinition"/>
   public SignalDef GetSignalDefinition(string name, BaseComponent building) {
-    var nameItems = name.Split('.');
-    if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
-      throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
-    }
-    return scriptable.GetSignalDefinition(name, building);
+    return ExecuteOnRegisteredComponent(name, scriptable => scriptable.GetSignalDefinition(name, building));
   }
 
   /// <inheritdoc cref="IScriptable.GetActionNamesForBuilding"/>
@@ -54,38 +46,24 @@ sealed class ScriptingService {
 
   /// <inheritdoc cref="IScriptable.GetActionExecutor"/>
   public Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
-    var nameItems = name.Split('.');
-    if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
-      throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
-    }
-    return scriptable.GetActionExecutor(name, building);
+    return ExecuteOnRegisteredComponent(name, scriptable => scriptable.GetActionExecutor(name, building));
   }
 
   /// <inheritdoc cref="IScriptable.GetActionDefinition"/>
   public ActionDef GetActionDefinition(string name, BaseComponent building) {
-    var nameItems = name.Split('.');
-    if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
-      throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
-    }
-    return scriptable.GetActionDefinition(name, building);
+    return ExecuteOnRegisteredComponent(name, scriptable => scriptable.GetActionDefinition(name, building));
   }
 
   /// <inheritdoc cref="IScriptable.RegisterSignalChangeCallback"/>
   public void RegisterSignalChangeCallback(string name, AutomationBehavior building, Action onValueChanged) {
-    var nameItems = name.Split('.');
-    if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
-      throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
-    }
-    scriptable.RegisterSignalChangeCallback(name, building, onValueChanged);
+    ExecuteOnRegisteredComponent(
+        name, scriptable => scriptable.RegisterSignalChangeCallback(name, building, onValueChanged));
   }
 
   /// <inheritdoc cref="IScriptable.UnregisterSignalChangeCallback"/>
   public void UnregisterSignalChangeCallback(string name, AutomationBehavior building, Action onValueChanged) {
-    var nameItems = name.Split('.');
-    if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
-      throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
-    }
-    scriptable.UnregisterSignalChangeCallback(name, building, onValueChanged);
+    ExecuteOnRegisteredComponent(
+        name, scriptable => scriptable.UnregisterSignalChangeCallback(name, building, onValueChanged));
   }
 
   /// <inheritdoc cref="IScriptable.InstallAction"/>
@@ -110,6 +88,14 @@ sealed class ScriptingService {
       throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
     }
     action(scriptable);
+  }
+
+  T ExecuteOnRegisteredComponent<T>(string name, Func<IScriptable,T> action) {
+    var nameItems = name.Split('.');
+    if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
+      throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
+    }
+    return action(scriptable);
   }
 
   #endregion
