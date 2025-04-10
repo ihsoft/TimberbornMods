@@ -154,6 +154,14 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
     IEnumerator WaitAndPlace() {
       var coordinates = _blockObject.Coordinates;
       var dynamite = _blockObject.GetComponentFast<Dynamite>();
+      var effectiveDepth = 0;
+      while (effectiveDepth < dynamite.Depth && coordinates.z > effectiveDepth) {
+        var below = new Vector3Int(coordinates.x, coordinates.y, coordinates.z - effectiveDepth - 1);
+        if (!_terrainService.UnsafeCellIsTerrain(_mapIndexService.CoordinatesToIndex3D(below))) {
+          break;
+        }
+        effectiveDepth++;
+      }
       yield return null;  // Act on the next frame to avoid synchronous complications.
 
       // Detonate the dynamite.
@@ -164,15 +172,6 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
       }
       if (_repeatCount <= 0) {
         yield return YieldAbort();
-      }
-
-      var effectiveDepth = 0;
-      while (effectiveDepth < dynamite.Depth && coordinates.z >= effectiveDepth) {
-        var below = new Vector3Int(coordinates.x, coordinates.y, coordinates.z - effectiveDepth - 1);
-        if (!_terrainService.UnsafeCellIsTerrain(_mapIndexService.CoordinatesToIndex3D(below))) {
-          break;
-        }
-        effectiveDepth++;
       }
       
       // Wait for the old object to clean up.
@@ -190,11 +189,15 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
           .OfType<BlockObjectTool>()
           .First(x => x.Prefab.name.StartsWith(_prefabName));
       dynamiteTool.Place(new List<Placement> { new(expectedPlaceCoord) });
+      if (!dynamiteTool._placedAnythingThisFrame) {
+        DebugEx.Error("Cannot place new dynamite at {0}", expectedPlaceCoord);
+        yield return YieldAbort();
+      }
       BlockObject newDynamite;
       do {
         yield return null;
         newDynamite = _blockService.GetBottomObjectAt(expectedPlaceCoord);
-      } while (newDynamite == null);
+      } while (!newDynamite);
       newDynamite.GetComponentFast<BuilderPrioritizable>().SetPriority(_builderPriority);
       newDynamite.GetComponentFast<AutomationBehavior>().AddRule(
         new ObjectFinishedCondition(),
