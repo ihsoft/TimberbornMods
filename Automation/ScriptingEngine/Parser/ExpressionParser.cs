@@ -173,38 +173,38 @@ sealed class ExpressionParser {
       throw new ScriptError("Unexpected EOF while reading expression");
     }
     var token = tokens.Dequeue();
-    if (token == "(") {
-      CheckHasMoreTokens(tokens);
-      var operatorName = tokens.Dequeue();
-      if (OperatorNameRegex.IsMatch(operatorName)) {
-        throw new ScriptError("Bad operator name: " + operatorName);
-      }
-      CheckHasMoreTokens(tokens);
-      var operands = new List<IExpression>();
-      while (tokens.Peek() != ")") {
-        operands.Add(ReadFromTokens(tokens));
-        CheckHasMoreTokens(tokens);
-      }
-      if (operands.Count == 0) {
-        throw new ScriptError("Empty operator expression");
-      }
-      tokens.Dequeue(); // ")"
-
-      // The sequence below should be ordered by the frequency of the usage. The operators that are more likely to be
-      // used in the game should come first.
-      var result =
-          BinaryOperatorExpr.TryCreateFrom(CurrentContext, operatorName, operands)
-          ?? SignalOperatorExpr.TryCreateFrom(CurrentContext, operatorName, operands)
-          ?? ActionExpr.TryCreateFrom(CurrentContext, operatorName, operands)
-          ?? LogicalOperatorExpr.TryCreateFrom(operatorName, operands)
-          ?? MathOperatorExpr.TryCreateFrom(operatorName, operands)
-          ?? GetPropertyOperatorExpr.TryCreateFrom(CurrentContext, operatorName, operands);
-      if (result == null) {
-        throw new ScriptError("Unknown operator: " + operatorName);
-      }
-      return result;
+    if (token != "(") {
+      return ConstantValueExpr.TryCreateFrom(token) ?? new SymbolExpr { Value = token };
     }
-    return ConstantValueExpr.TryCreateFrom(token) ?? new SymbolExpr { Value = token };
+    CheckHasMoreTokens(tokens);
+    var operatorName = tokens.Dequeue();
+    if (OperatorNameRegex.IsMatch(operatorName)) {
+      throw new ScriptError("Bad operator name: " + operatorName);
+    }
+    CheckHasMoreTokens(tokens);
+    var operands = new List<IExpression>();
+    while (tokens.Peek() != ")") {
+      operands.Add(ReadFromTokens(tokens));
+      CheckHasMoreTokens(tokens);
+    }
+    if (operands.Count == 0) {
+      throw new ScriptError("Empty operator expression");
+    }
+    tokens.Dequeue(); // ")"
+
+    // The sequence below should be ordered by the frequency of the usage. The operators that are more likely to be
+    // used in the game should come first.
+    var result =
+        BinaryOperatorExpr.TryCreateFrom(CurrentContext, operatorName, operands)
+        ?? SignalOperatorExpr.TryCreateFrom(CurrentContext, operatorName, operands)
+        ?? ActionExpr.TryCreateFrom(CurrentContext, operatorName, operands)
+        ?? LogicalOperatorExpr.TryCreateFrom(operatorName, operands)
+        ?? MathOperatorExpr.TryCreateFrom(operatorName, operands)
+        ?? GetPropertyOperatorExpr.TryCreateFrom(CurrentContext, operatorName, operands);
+    if (result == null) {
+      throw new ScriptError("Unknown operator: " + operatorName);
+    }
+    return result;
   }
 
   #endregion
