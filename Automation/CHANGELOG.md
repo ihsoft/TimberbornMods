@@ -3,6 +3,7 @@
 * [Feature] Allow editing the rules in the game.
 * [Feature] Allow copying rules from one building to another.
 * [Feature] Add scripted conditions and action to compose the rules.
+* [Feature] Storage emptying is now applicable to the gathering flags! 
 * [Fix] U7: Dynamite drilldown action crashes.
 * [Fix] U7: Crashes in the editor mode.
 * [Fix] U7: Improper dynamite drilldown action on the hangovers.
