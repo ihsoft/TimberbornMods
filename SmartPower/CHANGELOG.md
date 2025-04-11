@@ -1,3 +1,6 @@
+# v1.13.2 (10 Apr 2025)
+* Update to support game version `0.7.3.1`.
+
 # v1.13.2 (4 Apr 2025)
 * Update to support game version `0.7.2.0`.
 * [Fix] The suspended generator doesn't resume if paused or generator automation disabled.

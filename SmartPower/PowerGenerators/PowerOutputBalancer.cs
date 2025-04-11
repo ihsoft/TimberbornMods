@@ -133,11 +133,9 @@ abstract class PowerOutputBalancer
 
   /// <inheritdoc/>
   public void Load(IEntityLoader entityLoader) {
-    if (!entityLoader.HasComponent(AutomationBehaviorKey)) {
+    if (!entityLoader.TryGetComponent(AutomationBehaviorKey, out var state)) {
       return;
     }
-    var state = entityLoader.GetComponent(AutomationBehaviorKey);
-
     Automate = state.GetValueOrDefault(AutomateKey);
     ChargeBatteriesThreshold = state.GetValueOrDefault(ChargeBatteriesThresholdKey, MaxBatteryChargeRatio);
     DischargeBatteriesThreshold = state.GetValueOrDefault(DischargeBatteriesThresholdKey, MinBatteryChargeRatio);

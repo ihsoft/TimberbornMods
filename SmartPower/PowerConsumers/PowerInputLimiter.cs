@@ -156,10 +156,9 @@ sealed class PowerInputLimiter
 
   /// <inheritdoc/>
   public void Load(IEntityLoader entityLoader) {
-    if (!entityLoader.HasComponent(PowerInputLimiterKey)) {
+    if (!entityLoader.TryGetComponent(PowerInputLimiterKey, out var state)) {
       return;
     }
-    var state = entityLoader.GetComponent(PowerInputLimiterKey);
     Automate = state.GetValueOrDefault(AutomateKey);
     MinPowerEfficiency = state.GetValueOrDefault(MinPowerEfficiencyKey, MinPowerEfficiency);
     CheckBatteryCharge = state.GetValueOrDefault(CheckBatteryChargeKey);
