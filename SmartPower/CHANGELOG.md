@@ -1,4 +1,4 @@
-# v1.13.2 (10 Apr 2025)
+# v1.13.3 (10 Apr 2025)
 * Update to support game version `0.7.3.1`.
 
 # v1.13.2 (4 Apr 2025)
