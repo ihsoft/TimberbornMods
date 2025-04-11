@@ -1,3 +1,6 @@
+# v2.0.6 (10 Apr 2025):
+* [Fix] Copy rules tool crashes when attempted to be used.
+
 # v2.0.5 (10 Apr 2025):
 * [Change] Support Timberborn `0.7.3.1`.
 * [Fix] Dynamite drilldown could crash when getting close to the map bottom.
@@ -13,7 +16,7 @@
 * [Fix] U7: Improper dynamite drilldown action on the hangovers.
 * [Fix] U7: Construction finished condition could crash on the game load.
 
-# v1.3.0 (4 Mar 2025):
+# v1.3.0 (4 Apr 2025):
 * Add support for Update 7 (0.7.1.2).
 
 # v1.2.5 (5 Dec 2024):

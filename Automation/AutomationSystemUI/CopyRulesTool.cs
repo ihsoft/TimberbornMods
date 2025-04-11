@@ -27,7 +27,7 @@ sealed class CopyRulesTool : AbstractAreaSelectionTool, IAutomationModeEnabler, 
   protected override string DescriptionTitleLoc => DescriptionTitleLocKey;
 
   /// <inheritdoc/>
-  protected override string CursorName => "IgorZ/cog-cursor";
+  protected override string CursorName => "AutomationCogCursor";
 
   /// <inheritdoc/>
   protected override bool ObjectFilterExpression(BlockObject blockObject) {
