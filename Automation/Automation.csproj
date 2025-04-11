@@ -233,12 +233,6 @@
       <Compile Include="..\TimberDev\Utils\CounterProfiler.cs">
         <Link>TimberDev\Utils\CounterProfiler.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\Utils\CustomCursorService.cs">
-        <Link>TimberDev\Utils\CustomCursorService.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\Utils\CustomCursorServiceConfigurator.cs">
-        <Link>TimberDev\Utils\CustomCursorServiceConfigurator.cs</Link>
-      </Compile>
       <Compile Include="..\TimberDev\Utils\CustomizableInstantiator.cs">
         <Link>TimberDev\Utils\CustomizableInstantiator.cs</Link>
       </Compile>

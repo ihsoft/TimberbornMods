@@ -26,7 +26,7 @@ sealed class PauseTool : AbstractLockingTool, IConstructionModeEnabler {
   #region AbstractAreaSelectionTool overries
 
   /// <inheritdoc/>
-  protected override string CursorName => "IgorZ/pause-cursor";
+  protected override string CursorName => "AutomationPauseCursor";
 
   /// <inheritdoc/>
   protected override bool ObjectFilterExpression(BlockObject blockObject) {

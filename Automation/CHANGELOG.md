@@ -1,4 +1,5 @@
 # v2.0.5 (started on 4/9/2025):
+* [Change] Support Timberborn `0.7.3.1`.
 * [Fix] Dynamite drilldown could crash when getting close to the map bottom.
 
 # v2.0.4 (8 Mar 2025):

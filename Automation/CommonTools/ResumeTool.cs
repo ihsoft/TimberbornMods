@@ -26,7 +26,7 @@ sealed class ResumeTool : AbstractLockingTool, IConstructionModeEnabler {
   #region AbstractAreaSelectionTool overries
 
   /// <inheritdoc/>
-  protected override string CursorName => "IgorZ/play-cursor";
+  protected override string CursorName => "AutomationPlayCursor";
 
   /// <inheritdoc/>
   protected override bool ObjectFilterExpression(BlockObject blockObject) {

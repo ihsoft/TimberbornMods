@@ -160,10 +160,9 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
 
   /// <inheritdoc/>
   public void Load(IEntityLoader entityLoader) {
-    if (!entityLoader.HasComponent(AutomationBehaviorKey)) {
+    if (!entityLoader.TryGetComponent(AutomationBehaviorKey, out var component)) {
       return;
     }
-    var component = entityLoader.GetComponent(AutomationBehaviorKey);
     _actions = component
         .Get(ActionsKey, AutomationActionBase.ActionSerializerNullable)
         .OfType<IAutomationAction>()
