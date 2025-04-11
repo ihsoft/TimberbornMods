@@ -592,10 +592,9 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   /// <inheritdoc/>
   public void Load(IEntityLoader entityLoader) {
-    if (!entityLoader.HasComponent(IrrigationTowerKey)) {
+    if (!entityLoader.TryGetComponent(IrrigationTowerKey, out var component)) {
       return;
     }
-    var component = entityLoader.GetComponent(IrrigationTowerKey);
     if (component.Has(CurrentEfficiencyKey)) {
       _savedEfficiency = component.Get(CurrentEfficiencyKey);
     }

@@ -123,10 +123,9 @@ sealed class AdjustableWaterOutput : WaterOutput, IPersistentEntity {
 
   /// <inheritdoc/>
   public void Load(IEntityLoader entityLoader) {
-    if (!entityLoader.HasComponent(AdjustableWaterOutputKey)) {
+    if (!entityLoader.TryGetComponent(AdjustableWaterOutputKey, out var component)) {
       return;
     }
-    var component = entityLoader.GetComponent(AdjustableWaterOutputKey);
     if (component.Has(SpillwayHeightDeltaKey)) {
       SpillwayHeightDelta = component.Get(SpillwayHeightDeltaKey);
     }
