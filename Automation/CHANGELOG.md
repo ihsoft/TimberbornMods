@@ -1,8 +1,8 @@
-# v2.0.5 (started on 4/9/2025):
+# v2.0.5 (10 Apr 2025):
 * [Change] Support Timberborn `0.7.3.1`.
 * [Fix] Dynamite drilldown could crash when getting close to the map bottom.
 
-# v2.0.4 (8 Mar 2025):
+# v2.0.4 (8 Apr 2025):
 * [Change] Support Timberborn `0.7.2.0`.
 * [Feature] Allow editing the rules in the game.
 * [Feature] Allow copying rules from one building to another.
