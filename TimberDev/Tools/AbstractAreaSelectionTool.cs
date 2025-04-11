@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Bindito.Core;
-using IgorZ.TimberDev.Utils;
 using Timberborn.AreaSelectionSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BuilderPrioritySystem;
@@ -33,7 +32,7 @@ public abstract class AbstractAreaSelectionTool : ToolWithDescription, IInputPro
   BlockObjectSelectionDrawer _highlightSelectionDrawer;
   BlockObjectSelectionDrawer _actionSelectionDrawer;
   AreaBlockObjectPicker _areaBlockObjectPicker;
-  CustomCursorService _cursorService;
+  CursorService _cursorService;
 
   Color _highlightColor = Color.blue;
   Color _actionColor = Color.red;
@@ -193,7 +192,7 @@ public abstract class AbstractAreaSelectionTool : ToolWithDescription, IInputPro
   [Inject]
   public void InjectDependencies(AreaBlockObjectPickerFactory areaBlockObjectPickerFactory, InputService inputService,
                                  BlockObjectSelectionDrawerFactory blockObjectSelectionDrawerFactory,
-                                 CustomCursorService cursorService) {
+                                 CursorService cursorService) {
     _areaBlockObjectPickerFactory = areaBlockObjectPickerFactory;
     InputService = inputService;
     _blockObjectSelectionDrawerFactory = blockObjectSelectionDrawerFactory;
