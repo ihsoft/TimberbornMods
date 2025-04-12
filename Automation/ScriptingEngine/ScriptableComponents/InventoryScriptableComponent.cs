@@ -30,7 +30,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   const string StartEmptyingStockActionName = "Inventory.StartEmptying";
   const string StopEmptyingStockActionName = "Inventory.StopEmptying";
 
-  const string EmptyingStatusIcon = "IgorZ/status-icon-emptying";
+  const string EmptyingStatusIcon = "IgorZ.Automation/status-icon-emptying";
 
   #region ScriptableComponentBase implementation
 

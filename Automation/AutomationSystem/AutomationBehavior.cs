@@ -22,7 +22,7 @@ namespace IgorZ.Automation.AutomationSystem;
 public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDeletableEntity, IFinishedStateListener {
 
   //FXIME: Make own icon!
-  const string AutomationErrorIcon = "IgorZ/error-icon-script-failed";
+  const string AutomationErrorIcon = "IgorZ.Automation/error-icon-script-failed";
   const string AutomationErrorAlertLocKey = "IgorZ.Automation.ShowStatusAction.AutomationErrorAlert";
   const string AutomationErrorDescriptionLocKey = "IgorZ.Automation.ShowStatusAction.AutomationErrorDescription";
 
