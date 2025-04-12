@@ -281,6 +281,30 @@
       <Compile Include="..\UnityDevLite\TypeUtils.cs">
         <Link>UnityDevLite\TypeUtils.cs</Link>
       </Compile>
+      <Compile Remove="Conditions\BadtideEndedCondition.cs" />
+      <Compile Remove="Conditions\BadtideStartedCondition.cs" />
+      <Compile Remove="Conditions\BeaverPopulationAboveThresholdCondition.cs" />
+      <Compile Remove="Conditions\BeaverPopulationBelowThresholdCondition.cs" />
+      <Compile Remove="Conditions\BeaverPopulationThresholdCondition.cs" />
+      <Compile Remove="Conditions\BotPopulationAboveThresholdCondition.cs" />
+      <Compile Remove="Conditions\BotPopulationBelowThresholdCondition.cs" />
+      <Compile Remove="Conditions\BotPopulationThresholdCondition.cs" />
+      <Compile Remove="Conditions\DroughtEndedCondition.cs" />
+      <Compile Remove="Conditions\DroughtStartedCondition.cs" />
+      <Compile Remove="Conditions\OutputStockAboveThresholdCondition.cs" />
+      <Compile Remove="Conditions\OutputStockBelowThresholdCondition.cs" />
+      <Compile Remove="Conditions\OutputStockThresholdConditionBase.cs" />
+      <Compile Remove="Conditions\PopulationThresholdConditionBase.cs" />
+      <Compile Remove="Conditions\PopulationTrackerConditionBase.cs" />
+      <Compile Remove="Conditions\WeatherTrackerConditionBase.cs" />
+      <Compile Remove="Actions\DebugLogAction.cs" />
+      <Compile Remove="Actions\MarkForEmptyingAction.cs" />
+      <Compile Remove="Actions\PauseAction.cs" />
+      <Compile Remove="Actions\SetFloodgateHeightAction.cs" />
+      <Compile Remove="Actions\UnmarkForEmptyingAction.cs" />
+      <Compile Remove="Actions\UnpauseAction.cs" />
+      <Compile Remove="Actions\BlockableBuildingAction.cs" />
+      <Compile Remove="Conditions\ThresholdConditionBase.cs" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <PropertyGroup>
