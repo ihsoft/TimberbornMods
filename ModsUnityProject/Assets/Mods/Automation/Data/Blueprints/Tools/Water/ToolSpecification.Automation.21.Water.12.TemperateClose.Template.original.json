@@ -9,7 +9,7 @@
     "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.TemperateCloseFloodgate.Description",
   },
   "AutomationTemplateSpec": {
-    "TemplateFamilyName": "Water.FloodgateManagement-temperate",
+    "TemplateFamilyName": "Floodgate-temperate",
     "Rules": [
       {
         "Condition": {

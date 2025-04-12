@@ -9,7 +9,7 @@
     "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.TemperatePause.Description",
    },
   "AutomationTemplateSpec": {
-    "TemplateFamilyName": "Water.SeasonManagement",
+    "TemplateFamilyName": "Season-Pause",
     "Rules": [
       {
         "Condition": {

@@ -9,7 +9,7 @@
     "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.BadtideOpenFloodgate.Description"
   },
   "AutomationTemplateSpec": {
-    "TemplateFamilyName": "Water.FloodgateManagement-badtide",
+    "TemplateFamilyName": "Floodgate-badtide",
     "Rules": [
       {
         "Condition": {
