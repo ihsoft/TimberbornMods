@@ -68,6 +68,7 @@ sealed class ScriptedAction : AutomationActionBase {
       HostedDebugLog.Error(Behavior, "Action failed: {0}\nError: {1}", Expression, e.Message);
       _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(RuntimeErrorLocKey));
       _parsedExpression = null;
+      Behavior.ReportError(this);
     }
   }
 

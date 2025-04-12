@@ -207,6 +207,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
       return;
     }
     try {
+      _uiDescription = null;
       ConditionState = _parsedExpression.Execute();
     } catch (ExecutionInterrupted e) {
       HostedDebugLog.Fine(Behavior, "Condition execution interrupted: {0}\nReason: {1}", Expression, e.Reason);
@@ -214,6 +215,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
       HostedDebugLog.Error(Behavior, "Error in condition execution: {0}\nReason: {1}", Expression, e.Message);
       _parsedExpression = null;
       _uiDescription = Behavior.Loc.T(RuntimeErrorLocKey);
+      Behavior.ReportError(this);
     }
   }
 
