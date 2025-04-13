@@ -132,6 +132,22 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override void RegisterSignalChangeCallback(string name, BaseComponent building, Action onValueChanged) {
+    if (!name.StartsWith(InputGoodSignalNamePrefix) && !name.StartsWith(OutputGoodSignalNamePrefix)) {
+      throw new ScriptError("Unknown signal: " + name);
+    }
+    var inventory = GetInventory(building);
+    if (name.StartsWith(InputGoodSignalNamePrefix)) {
+      var goodId = name[InputGoodSignalNamePrefix.Length..];
+      if (!inventory.InputGoods.Contains(goodId)) {
+        throw new ScriptError($"Input good '{goodId}' not found in: {DebugEx.ObjectToString(inventory)}");
+      }
+    }
+    if (name.StartsWith(OutputGoodSignalNamePrefix)) {
+      var goodId = name[OutputGoodSignalNamePrefix.Length..];
+      if (!inventory.OutputGoods.Contains(goodId)) {
+        throw new ScriptError($"Output good '{goodId}' not found in: {DebugEx.ObjectToString(inventory)}");
+      }
+    }
     var tracker = building.GetComponentFast<InventoryChangeTracker>()
         ?? _instantiator.AddComponent<InventoryChangeTracker>(building.GameObjectFast);
     tracker.SignalChangeCallbacks.Add(onValueChanged);

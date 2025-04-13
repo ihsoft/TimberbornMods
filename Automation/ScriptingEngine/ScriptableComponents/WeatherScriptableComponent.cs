@@ -49,6 +49,9 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
 
   /// <inheritdoc/>
   public override void RegisterSignalChangeCallback(string name, BaseComponent building, Action onValueChanged) {
+    if (name != SeasonSignalName) {
+      throw new ScriptError("Unknown signal: " + name);
+    }
     if (!_signalChangeCallbacks.TryGetValue(name, out var callbacks)) {
       callbacks = [];
       _signalChangeCallbacks[name] = callbacks;
