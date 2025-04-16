@@ -36,6 +36,9 @@
       <Reference Include="0Harmony">
         <HintPath>..\Dependencies\Workshop\3284904751\0Harmony.dll</HintPath>
       </Reference>
+      <Reference Include="ModSettings.Core">
+        <HintPath>..\_WORKSHOP!\3283831040\version-0.7\Scripts\ModSettings.Core.dll</HintPath>
+      </Reference>
       <Reference Include="System.Collections.Immutable">
         <HintPath>..\Dependencies\GameRoot\Timberborn_Data\Managed\System.Collections.Immutable.dll</HintPath>
       </Reference>
@@ -206,6 +209,9 @@
       </Content>
     </ItemGroup>
     <ItemGroup>
+      <Compile Include="..\TimberDev\Settings\DebugSettings.cs">
+        <Link>TimberDev\Settings\DebugSettings.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\Tools\AbstractAreaSelectionTool.cs">
         <Link>TimberDev\Tools\AbstractAreaSelectionTool.cs</Link>
       </Compile>
@@ -247,9 +253,6 @@
       </Compile>
       <Compile Include="..\TimberDev\Utils\CustomizableInstantiator.cs">
         <Link>TimberDev\Utils\CustomizableInstantiator.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\Utils\FeatureController.cs">
-        <Link>TimberDev\Utils\FeatureController.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\Utils\HarmonyPatcher.cs">
         <Link>TimberDev\Utils\HarmonyPatcher.cs</Link>

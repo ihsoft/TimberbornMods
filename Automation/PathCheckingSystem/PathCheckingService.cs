@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.Conditions;
+using IgorZ.Automation.Settings;
 using IgorZ.TimberDev.Utils;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
@@ -33,7 +34,7 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
 
   /// <inheritdoc/>
   public void Tick() {
-    if (Features.PathCheckingSystemProfiling) {
+    if (_automationDebugSettings.PathCheckingSystemProfiling.Value) {
       Profile();
     }
   }
@@ -80,6 +81,7 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
   readonly NodeIdService _nodeIdService;
   readonly BaseInstantiator _baseInstantiator;
   readonly DistrictMap _districtMap;
+  readonly AutomationDebugSettings _automationDebugSettings;
 
   /// <summary>All path checking conditions on the sites.</summary>
   readonly Dictionary<PathCheckingSite, List<CheckAccessBlockCondition>> _conditionsIndex = new();
@@ -94,12 +96,14 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
   bool _navMeshIsReady;
 
   PathCheckingService(EntityComponentRegistry entityComponentRegistry, AutomationService automationService,
-                      NodeIdService nodeIdService, BaseInstantiator baseInstantiator, DistrictMap districtMap) {
+                      NodeIdService nodeIdService, BaseInstantiator baseInstantiator, DistrictMap districtMap,
+                      AutomationDebugSettings automationDebugSettings) {
     Instance = this;
     _entityComponentRegistry = entityComponentRegistry;
     _nodeIdService = nodeIdService;
     _baseInstantiator = baseInstantiator;
     _districtMap = districtMap;
+    _automationDebugSettings = automationDebugSettings;
     automationService.EventBus.Register(this);
   }
 
