@@ -1,0 +1,4 @@
+﻿ID,Text,Comment
+TimberDev_Utils.Settings.DebugSection,"Debug and troubleshooting",
+TimberDev_Utils.Settings.Debug.VerboseLogging,"Verbose logging",
+TimberDev_Utils.Settings.Debug.VerboseLoggingTooltip,"Logs will have more useful details, but it may impact game performance.",

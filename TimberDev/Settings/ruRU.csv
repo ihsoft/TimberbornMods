@@ -1,0 +1,5 @@
+﻿ID,Text,Comment
+TimberDev_Utils.Settings.DebugSection,"Отладка и устранение неполадок",
+TimberDev_Utils.Settings.Debug.VerboseLogging,"Детальные журналы",
+TimberDev_Utils.Settings.Debug.VerboseLoggingTooltip,"В журналы игры будет записываться больше полезной информации,
+но это может повлиять на производительность игры."
