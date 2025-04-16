@@ -71,11 +71,6 @@ IgorZ.Automation.PauseTool.Title,"Pause buildings",
 IgorZ.Automation.PauseTool.Description,"Use this tool to pause buildings and construction sites.",
 IgorZ.Automation.ResumeTool.Title,"Unpause buildings",
 IgorZ.Automation.ResumeTool.Description,"Use this tool to unpause buildings and construction sites.",
-TimberDev_Utils.Tools.LockSelectTool.SelectingObject,"Selecting: {0}","Text to show the type of the selected building. It's shown when the selection tool is locked on the specific buildings."
-TimberDev_Utils.Tools.LockSelectTool.SelectingNObjects,"Selecting: {0} (x{1})","The plural form of TimberDev_Utils.Tools.LockSelectTool.SelectingObject"
-TimberDev_Utils.Tools.LockSelectTool.StartSelectingPrompt,"Point to an entity and click to start selecting",
-TimberDev_Utils.Tools.LockSelectTool.StartObjectSelectingPrompt,"Click to start selecting: {0}",
-TimberDev_Utils.Tools.LockSelectTool.DescriptionHint,"Hold <i>SHIFT</i> to select items of one type only.",
 IgorZ.Automation.DetonateDynamiteAction.Description,"<YellowHighlight>detonate dynamite</YellowHighlight>",
 IgorZ.Automation.DetonateDynamiteAction.RepeatCountInfo," and add another <GreenHighlight>{0} times</GreenHighlight>",
 IgorZ.Automation.ObjectFinishedCondition.Description,"<YellowHighlight>construction complete</YellowHighlight>",
@@ -144,3 +139,9 @@ IgorZ.Automation.Scripting.Editor.DiscardChangesBtn,"Discard changes",
 IgorZ.Automation.Scripting.Editor.MoreInfoBtn,"Read about scripting",
 IgorZ.Automation.Scripting.Editor.StringConstantType,"string","Name of the string constant type"
 IgorZ.Automation.Scripting.Editor.NumberConstantType,"number","Name of the number constant type"
+=,=,"TimberDev_Utils"
+TimberDev_Utils.Tools.LockSelectTool.SelectingObject,"Selecting: {0}","Text to show the type of the selected building. It's shown when the selection tool is locked on the specific buildings."
+TimberDev_Utils.Tools.LockSelectTool.SelectingNObjects,"Selecting: {0} (x{1})","The plural form of TimberDev_Utils.Tools.LockSelectTool.SelectingObject"
+TimberDev_Utils.Tools.LockSelectTool.StartSelectingPrompt,"Point to an entity and click to start selecting",
+TimberDev_Utils.Tools.LockSelectTool.StartObjectSelectingPrompt,"Click to start selecting: {0}",
+TimberDev_Utils.Tools.LockSelectTool.DescriptionHint,"Hold <i>SHIFT</i> to select items of one type only.",

@@ -72,11 +72,6 @@ IgorZ.Automation.PauseTool.Title,"Остановить здания",
 IgorZ.Automation.PauseTool.Description,"Используйте этот инструмент, чтобы остановить здания и строительные площадки.",
 IgorZ.Automation.ResumeTool.Title,"Возобновить здания",
 IgorZ.Automation.ResumeTool.Description,"Используйте этот инструмент, чтобы возобновить здания и строительные площадки.",
-TimberDev_Utils.Tools.LockSelectTool.SelectingObject,"Выделено: {0}","Text to show the type of the selected building. It's shown when the selection tool is locked on the specific buildings."
-TimberDev_Utils.Tools.LockSelectTool.SelectingNObjects,"Выделено: {0} (x{1})","The plural form of TimberDev_Utils.Tools.LockSelectTool.SelectingObject"
-TimberDev_Utils.Tools.LockSelectTool.StartSelectingPrompt,"Наведите курсор на объект и нажмите <i>ЛКМ</i> чтобы начать выделение.",
-TimberDev_Utils.Tools.LockSelectTool.StartObjectSelectingPrompt,"Выделять здания типа: {0}",
-TimberDev_Utils.Tools.LockSelectTool.DescriptionHint,"Удерживайте <i>SHIFT</i> чтобы выделять здания только одного типа.",
 IgorZ.Automation.DetonateDynamiteAction.Description,"<YellowHighlight>активировать динамит</YellowHighlight>",
 IgorZ.Automation.DetonateDynamiteAction.RepeatCountInfo," и повторить ещё <GreenHighlight>{0} раза</GreenHighlight>",
 IgorZ.Automation.ObjectFinishedCondition.Description,"<YellowHighlight>строительство завершено</YellowHighlight>",
@@ -145,3 +140,9 @@ IgorZ.Automation.Scripting.Editor.DiscardChangesBtn,"Отменить измен
 IgorZ.Automation.Scripting.Editor.MoreInfoBtn,"Читать о скриптах"
 IgorZ.Automation.Scripting.Editor.StringConstantType,"строка","Name of the string constant type"
 IgorZ.Automation.Scripting.Editor.NumberConstantType,"число","Name of the number constant type"
+=,=,"TimberDev_Utils"
+TimberDev_Utils.Tools.LockSelectTool.SelectingObject,"Выделено: {0}","Text to show the type of the selected building. It's shown when the selection tool is locked on the specific buildings."
+TimberDev_Utils.Tools.LockSelectTool.SelectingNObjects,"Выделено: {0} (x{1})","The plural form of TimberDev_Utils.Tools.LockSelectTool.SelectingObject"
+TimberDev_Utils.Tools.LockSelectTool.StartSelectingPrompt,"Наведите курсор на объект и нажмите <i>ЛКМ</i> чтобы начать выделение.",
+TimberDev_Utils.Tools.LockSelectTool.StartObjectSelectingPrompt,"Выделять здания типа: {0}",
+TimberDev_Utils.Tools.LockSelectTool.DescriptionHint,"Удерживайте <i>SHIFT</i> чтобы выделять здания только одного типа.",
