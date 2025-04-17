@@ -63,146 +63,26 @@
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Bindito.*.dll" Publicize="false"/>
     </ItemGroup>
     <ItemGroup>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Cursors.meta">
-        <Link>Mod\Blueprints\Cursors.meta</Link>
+      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Cursors\*.json">
+        <Link>Mod\Blueprints\Cursors\_</Link>
       </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Cursors\CustomCursor.AutomationCogCursor.json">
-        <Link>Mod\Blueprints\Cursors\CustomCursor.AutomationCogCursor.json</Link>
+      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Population\*.json">
+        <Link>Mod\Blueprints\Tools\Population\_</Link>
       </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Cursors\CustomCursor.PauseCursor.json">
-        <Link>Mod\Blueprints\Cursors\CustomCursor.PauseCursor.json</Link>
+      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Storage\*.json">
+        <Link>Mod\Blueprints\Tools\Storage\_</Link>
       </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Cursors\CustomCursor.PlayCursor.json">
-        <Link>Mod\Blueprints\Cursors\CustomCursor.PlayCursor.json</Link>
+      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Terrain\*.json">
+        <Link>Mod\Blueprints\Tools\Terrain\_</Link>
       </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Population\ToolGroupSpecification.Automation.24.Population.original.json">
-        <Link>Mod\Blueprints\Tools\Population\ToolGroupSpecification.Automation.24.Population.original.json</Link>
+      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\*.json">
+        <Link>Mod\Blueprints\Tools\_</Link>
       </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Population\ToolSpecification.Automation.24.Population.10.BeaversAtMax.original.json">
-        <Link>Mod\Blueprints\Tools\Population\ToolSpecification.Automation.24.Population.10.BeaversAtMax.original.json</Link>
+      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Water\*.json">
+        <Link>Mod\Blueprints\Tools\Water\_</Link>
       </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Population\ToolSpecification.Automation.24.Population.20.BeaversAtPlus20.original.json">
-        <Link>Mod\Blueprints\Tools\Population\ToolSpecification.Automation.24.Population.20.BeaversAtPlus20.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Population\ToolSpecification.Automation.24.Population.21.BeaversAtPlus10.original.json">
-        <Link>Mod\Blueprints\Tools\Population\ToolSpecification.Automation.24.Population.21.BeaversAtPlus10.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Population\ToolSpecification.Automation.24.Population.22.BeaversAtMinus10.original.json">
-        <Link>Mod\Blueprints\Tools\Population\ToolSpecification.Automation.24.Population.22.BeaversAtMinus10.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Population\ToolSpecification.Automation.24.Population.23.BeaversAtMinus20.original.json">
-        <Link>Mod\Blueprints\Tools\Population\ToolSpecification.Automation.24.Population.23.BeaversAtMinus20.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Population\ToolSpecification.Automation.24.Population.30.BotsAtPlus20.original.json">
-        <Link>Mod\Blueprints\Tools\Population\ToolSpecification.Automation.24.Population.30.BotsAtPlus20.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Population\ToolSpecification.Automation.24.Population.31.BotsAtPlus10.original.json">
-        <Link>Mod\Blueprints\Tools\Population\ToolSpecification.Automation.24.Population.31.BotsAtPlus10.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Population\ToolSpecification.Automation.24.Population.32.BotsAtMinus10.original.json">
-        <Link>Mod\Blueprints\Tools\Population\ToolSpecification.Automation.24.Population.32.BotsAtMinus10.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Population\ToolSpecification.Automation.24.Population.33.BotsAtMinus20.original.json">
-        <Link>Mod\Blueprints\Tools\Population\ToolSpecification.Automation.24.Population.33.BotsAtMinus20.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Storage\ToolGroupSpecification.Automation.23.Storage.original.json">
-        <Link>Mod\Blueprints\Tools\Storage\ToolGroupSpecification.Automation.23.Storage.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Storage\ToolSpecification.Automation.23.Storage.10.BoostEmptying50.Template.original.json">
-        <Link>Mod\Blueprints\Tools\Storage\ToolSpecification.Automation.23.Storage.10.BoostEmptying50.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Storage\ToolSpecification.Automation.23.Storage.11.BoostEmptying60.Template.original.json">
-        <Link>Mod\Blueprints\Tools\Storage\ToolSpecification.Automation.23.Storage.11.BoostEmptying60.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Storage\ToolSpecification.Automation.23.Storage.12.BoostEmptying70.Template.original.json">
-        <Link>Mod\Blueprints\Tools\Storage\ToolSpecification.Automation.23.Storage.12.BoostEmptying70.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Storage\ToolSpecification.Automation.23.Storage.13.BoostEmptying80.Template.original.json">
-        <Link>Mod\Blueprints\Tools\Storage\ToolSpecification.Automation.23.Storage.13.BoostEmptying80.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Storage\ToolSpecification.Automation.23.Storage.14.BoostEmptying90.Template.original.json">
-        <Link>Mod\Blueprints\Tools\Storage\ToolSpecification.Automation.23.Storage.14.BoostEmptying90.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Terrain\ToolGroupSpecification.Automation.20.Terrain.original.json">
-        <Link>Mod\Blueprints\Tools\Terrain\ToolGroupSpecification.Automation.20.Terrain.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Terrain\ToolSpecification.Automation.20.Terrain.01.Dynamite2.original.json">
-        <Link>Mod\Blueprints\Tools\Terrain\ToolSpecification.Automation.20.Terrain.01.Dynamite2.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Terrain\ToolSpecification.Automation.20.Terrain.01.Dynamite3.original.json">
-        <Link>Mod\Blueprints\Tools\Terrain\ToolSpecification.Automation.20.Terrain.01.Dynamite3.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Terrain\ToolSpecification.Automation.20.Terrain.01.Dynamite4.original.json">
-        <Link>Mod\Blueprints\Tools\Terrain\ToolSpecification.Automation.20.Terrain.01.Dynamite4.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Terrain\ToolSpecification.Automation.20.Terrain.01.Dynamite5.original.json">
-        <Link>Mod\Blueprints\Tools\Terrain\ToolSpecification.Automation.20.Terrain.01.Dynamite5.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Terrain\ToolSpecification.Automation.20.Terrain.01.Dynamite6.original.json">
-        <Link>Mod\Blueprints\Tools\Terrain\ToolSpecification.Automation.20.Terrain.01.Dynamite6.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\ToolGroupSpecification.Automation.original.json">
-        <Link>Mod\Blueprints\Tools\ToolGroupSpecification.Automation.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\ToolSpecification.Automation.Root.-099.DebugFinishNowTool.original.json">
-        <Link>Mod\Blueprints\Tools\ToolSpecification.Automation.Root.-099.DebugFinishNowTool.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\ToolSpecification.Automation.Root.-100.DebugPickTool.original.json">
-        <Link>Mod\Blueprints\Tools\ToolSpecification.Automation.Root.-100.DebugPickTool.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\ToolSpecification.Automation.Root.010.PauseTool.original.json">
-        <Link>Mod\Blueprints\Tools\ToolSpecification.Automation.Root.010.PauseTool.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\ToolSpecification.Automation.Root.011.ResumeTool.original.json">
-        <Link>Mod\Blueprints\Tools\ToolSpecification.Automation.Root.011.ResumeTool.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\ToolSpecification.Automation.Root.030.ChainedTool.original.json">
-        <Link>Mod\Blueprints\Tools\ToolSpecification.Automation.Root.030.ChainedTool.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\ToolSpecification.Automation.Root.200.CancelTool.original.json">
-        <Link>Mod\Blueprints\Tools\ToolSpecification.Automation.Root.200.CancelTool.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Water\ToolGroupSpecification.Automation.21.Water.original.json">
-        <Link>Mod\Blueprints\Tools\Water\ToolGroupSpecification.Automation.21.Water.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Water\ToolSpecification.Automation.21.Water.10.TemperatePause.Template.original.json">
-        <Link>Mod\Blueprints\Tools\Water\ToolSpecification.Automation.21.Water.10.TemperatePause.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Water\ToolSpecification.Automation.21.Water.11.TemperateOpen.Template.original.json">
-        <Link>Mod\Blueprints\Tools\Water\ToolSpecification.Automation.21.Water.11.TemperateOpen.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Water\ToolSpecification.Automation.21.Water.12.TemperateClose.Template.original.json">
-        <Link>Mod\Blueprints\Tools\Water\ToolSpecification.Automation.21.Water.12.TemperateClose.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Water\ToolSpecification.Automation.21.Water.13.TemperateSemiOpen.Template.original.json">
-        <Link>Mod\Blueprints\Tools\Water\ToolSpecification.Automation.21.Water.13.TemperateSemiOpen.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Water\ToolSpecification.Automation.21.Water.20.DroughtPause.Template.original.json">
-        <Link>Mod\Blueprints\Tools\Water\ToolSpecification.Automation.21.Water.20.DroughtPause.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Water\ToolSpecification.Automation.21.Water.21.DroughtOpen.Template.original.json">
-        <Link>Mod\Blueprints\Tools\Water\ToolSpecification.Automation.21.Water.21.DroughtOpen.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Water\ToolSpecification.Automation.21.Water.22.DroughtClose.Template.original.json">
-        <Link>Mod\Blueprints\Tools\Water\ToolSpecification.Automation.21.Water.22.DroughtClose.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Water\ToolSpecification.Automation.21.Water.23.DroughtOpenWaterRegulator.Template.original.json">
-        <Link>Mod\Blueprints\Tools\Water\ToolSpecification.Automation.21.Water.23.DroughtOpenWaterRegulator.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Water\ToolSpecification.Automation.21.Water.30.BadtidePause.Template.original.json">
-        <Link>Mod\Blueprints\Tools\Water\ToolSpecification.Automation.21.Water.30.BadtidePause.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Water\ToolSpecification.Automation.21.Water.31.BadtideOpen.Template.original.json">
-        <Link>Mod\Blueprints\Tools\Water\ToolSpecification.Automation.21.Water.31.BadtideOpen.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Water\ToolSpecification.Automation.21.Water.32.BadtideClose.Template.original.json">
-        <Link>Mod\Blueprints\Tools\Water\ToolSpecification.Automation.21.Water.32.BadtideClose.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Localizations\enUS.txt">
-        <Link>Mod\Localizations\enUS.txt</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Localizations\ruRU.txt">
-        <Link>Mod\Localizations\ruRU.txt</Link>
+      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Localizations\*.txt">
+        <Link>Mod\Localizations\_</Link>
       </Content>
       <Content Include="..\ModsUnityProject\Assets\Mods\Automation\manifest.json">
         <Link>Mod\manifest.json</Link>
