@@ -63,30 +63,30 @@
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Bindito.*.dll" Publicize="false"/>
     </ItemGroup>
     <ItemGroup>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Cursors\*.json">
+      <None Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Cursors\*.json">
         <Link>Mod\Blueprints\Cursors\_</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Population\*.json">
+      </None>
+      <None Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Population\*.json">
         <Link>Mod\Blueprints\Tools\Population\_</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Storage\*.json">
+      </None>
+      <None Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Storage\*.json">
         <Link>Mod\Blueprints\Tools\Storage\_</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Terrain\*.json">
+      </None>
+      <None Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Terrain\*.json">
         <Link>Mod\Blueprints\Tools\Terrain\_</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\*.json">
+      </None>
+      <None Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\*.json">
         <Link>Mod\Blueprints\Tools\_</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Water\*.json">
+      </None>
+      <None Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Water\*.json">
         <Link>Mod\Blueprints\Tools\Water\_</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Localizations\*.txt">
+      </None>
+      <None Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Localizations\*.txt">
         <Link>Mod\Localizations\_</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\manifest.json">
+      </None>
+      <None Include="..\ModsUnityProject\Assets\Mods\Automation\manifest.json">
         <Link>Mod\manifest.json</Link>
-      </Content>
+      </None>
     </ItemGroup>
     <ItemGroup>
       <Compile Include="..\TimberDev\Settings\DebugSettings.cs">
