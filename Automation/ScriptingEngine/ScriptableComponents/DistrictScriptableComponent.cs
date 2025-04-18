@@ -4,10 +4,12 @@
 
 using System;
 using System.Collections.Generic;
+using Bindito.Core;
 using Timberborn.BaseComponentSystem;
 using Timberborn.Bots;
 using Timberborn.DwellingSystem;
 using Timberborn.GameDistricts;
+using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
@@ -73,18 +75,25 @@ class DistrictScriptableComponent : ScriptableComponentBase {
   }
 
   /// <inheritdoc/>
-  public override void RegisterSignalChangeCallback(string name, BaseComponent building, Action onValueChanged) {
-    var tracker = building.GetComponentFast<DistrictChangeTracker>()
-        ?? _instantiator.AddComponent<DistrictChangeTracker>(building.GameObjectFast);
+  public override void RegisterSignalChangeCallback(string name, ISignalListener host) {
+    var tracker = host.Behavior.GetComponentFast<DistrictChangeTracker>()
+        ?? _instantiator.AddComponent<DistrictChangeTracker>(host.Behavior.GameObjectFast);
+    var callback = new ScriptingService.SignalCallback(name, host);
     switch (name) {
       case BeaverPopulationSignalName:
-        tracker.OnBeaverPopulationChanged.Add(onValueChanged);
+        if (!tracker.OnBeaverPopulationChanged.Add(callback)) {
+          throw new InvalidOperationException("Signal callback already registered: " + callback);
+        }
         break;
       case BotPopulationSignalName:
-        tracker.OnBotPopulationChanged.Add(onValueChanged);
+        if (!tracker.OnBotPopulationChanged.Add(callback)) {
+          throw new InvalidOperationException("Signal callback already registered: " + callback);
+        }
         break;
       case NumberOfBedsSignalName:
-        tracker.OnDwellerCounterChanged.Add(onValueChanged);
+        if (!tracker.OnDwellerCounterChanged.Add(callback)) {
+          throw new InvalidOperationException("Signal callback already registered: " + callback);
+        }
         break;
       default:
         throw new ScriptError("Unknown signal: " + name);
@@ -92,12 +101,17 @@ class DistrictScriptableComponent : ScriptableComponentBase {
   }
 
   /// <inheritdoc/>
-  public override void UnregisterSignalChangeCallback(string name, BaseComponent building, Action onValueChanged) {
-    var tracker = building.GetComponentFast<DistrictChangeTracker>();
-    if (tracker) {
-      tracker.OnBeaverPopulationChanged.Remove(onValueChanged);
-      tracker.OnBotPopulationChanged.Remove(onValueChanged);
-      tracker.OnDwellerCounterChanged.Remove(onValueChanged);
+  public override void UnregisterSignalChangeCallback(string name, ISignalListener host) {
+    var callback = new ScriptingService.SignalCallback(name, host);
+    var tracker = host.Behavior.GetComponentFast<DistrictChangeTracker>();
+    if (!tracker) {
+      DebugEx.Warning("Signal callback is not registered: {0}", callback);
+      return;
+    }
+    if (!tracker.OnBeaverPopulationChanged.Remove(callback)
+        && !tracker.OnBotPopulationChanged.Remove(callback)
+        && !tracker.OnDwellerCounterChanged.Remove(callback)) {
+      DebugEx.Warning("Signal callback is not registered: {0}", callback);
     }
   }
 
@@ -148,11 +162,17 @@ class DistrictScriptableComponent : ScriptableComponentBase {
 
   sealed class DistrictChangeTracker : BaseComponent {
 
-    public readonly List<Action> OnBotPopulationChanged = [];
-    public readonly List<Action> OnBeaverPopulationChanged = [];
-    public readonly List<Action> OnDwellerCounterChanged = [];
-    
+    public readonly HashSet<ScriptingService.SignalCallback> OnBotPopulationChanged = [];
+    public readonly HashSet<ScriptingService.SignalCallback> OnBeaverPopulationChanged = [];
+    public readonly HashSet<ScriptingService.SignalCallback> OnDwellerCounterChanged = [];
+
+    ScriptingService _scriptingService;
     DistrictCenter _currentDistrictCenter;
+
+    [Inject]
+    public void InjectDependencies(ScriptingService scriptingService) {
+      _scriptingService = scriptingService;
+    }
 
     void Start() {
       var districtBuilding = GetComponentFast<DistrictBuilding>();
@@ -192,13 +212,13 @@ class DistrictScriptableComponent : ScriptableComponentBase {
 
     void OnPopulationChangedEvent(Citizen citizen = null) {
       if (citizen == null || citizen.GetComponentFast<BotSpec>()) {
-        foreach (var action in OnBotPopulationChanged) {
-          action();
+        foreach (var callback in OnBotPopulationChanged) {
+          _scriptingService.ScheduleSignalCallback(callback);
         }
       }
       if (citizen == null || !citizen.GetComponentFast<BotSpec>()) {
-        foreach (var action in OnBeaverPopulationChanged) {
-          action();
+        foreach (var callback in OnBeaverPopulationChanged) {
+          _scriptingService.ScheduleSignalCallback(callback);
         }
       }
     }
@@ -212,8 +232,8 @@ class DistrictScriptableComponent : ScriptableComponentBase {
     }
 
     void OnDwellerCounterChangedEvent() {
-      foreach (var action in OnDwellerCounterChanged) {
-        action();
+      foreach (var callback in OnDwellerCounterChanged) {
+        _scriptingService.ScheduleSignalCallback(callback);
       }
     }
   }

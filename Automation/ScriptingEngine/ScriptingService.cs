@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using IgorZ.Automation.AutomationSystem;
 using Timberborn.BaseComponentSystem;
+using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine;
 
@@ -55,15 +56,13 @@ sealed class ScriptingService {
   }
 
   /// <inheritdoc cref="IScriptable.RegisterSignalChangeCallback"/>
-  public void RegisterSignalChangeCallback(string name, AutomationBehavior building, Action onValueChanged) {
-    ExecuteOnRegisteredComponent(
-        name, scriptable => scriptable.RegisterSignalChangeCallback(name, building, onValueChanged));
+  public void RegisterSignalChangeCallback(string name, ISignalListener host) {
+    ExecuteOnRegisteredComponent(name, scriptable => scriptable.RegisterSignalChangeCallback(name, host));
   }
 
   /// <inheritdoc cref="IScriptable.UnregisterSignalChangeCallback"/>
-  public void UnregisterSignalChangeCallback(string name, AutomationBehavior building, Action onValueChanged) {
-    ExecuteOnRegisteredComponent(
-        name, scriptable => scriptable.UnregisterSignalChangeCallback(name, building, onValueChanged));
+  public void UnregisterSignalChangeCallback(string name, ISignalListener host) {
+    ExecuteOnRegisteredComponent(name, scriptable => scriptable.UnregisterSignalChangeCallback(name, host));
   }
 
   /// <inheritdoc cref="IScriptable.InstallAction"/>
@@ -74,6 +73,37 @@ sealed class ScriptingService {
   /// <inheritdoc cref="IScriptable.UninstallAction"/>
   public void UninstallAction(string name, BaseComponent building) {
     ExecuteOnRegisteredComponent(name, scriptable => scriptable.UninstallAction(name, building));
+  }
+
+  internal void ScheduleSignalCallback(SignalCallback callback) {
+    if (_signalsQueue.Contains(callback)) {
+      DebugEx.Error("Circular execution of signal '{0}' on {1}. Execution log:\n{2}",
+                    callback.Name, DebugEx.ObjectToString(callback.SignalListener), GetExecutionLog());
+      throw new ScriptError(
+          $"Circular execution of signal '{callback.Name}' on {DebugEx.ObjectToString(callback.SignalListener)}");
+    }
+    _signalsQueue.Enqueue(callback);
+    try {
+      callback = _signalsQueue.Peek();
+      DebugEx.Fine("Executing signal callback: {0}", callback);
+      callback.SignalListener.OnValueChanged(callback.Name);
+      _signalsQueue.Dequeue();
+    } catch (ScriptError) {
+      DebugEx.Warning("Aborting signal chain execution while having queued items: {0}", GetExecutionLog());
+      _signalsQueue.Clear();
+    }
+  }
+
+  string GetExecutionLog() {
+    return string.Join("\n", _signalsQueue.Select(x => $"{DebugEx.ObjectToString(x.SignalListener.Behavior)}:{x.Name}"));
+  }
+
+  readonly Queue<SignalCallback> _signalsQueue = new();
+
+  public readonly record struct SignalCallback(string Name, ISignalListener SignalListener) {
+    public override string ToString() =>
+        string.Format("SignalCallback(Host={0},OwnerBuilding={1}, Name={2})",
+                      SignalListener.GetHashCode(), SignalListener.Behavior, Name);
   }
 
   #endregion

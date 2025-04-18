@@ -4,11 +4,11 @@
 
 using System;
 using System.Collections.Generic;
-using IgorZ.Automation.AutomationSystem;
 using Timberborn.BaseComponentSystem;
 using Timberborn.HazardousWeatherSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.WeatherSystem;
+using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
@@ -48,21 +48,21 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   }
 
   /// <inheritdoc/>
-  public override void RegisterSignalChangeCallback(string name, BaseComponent building, Action onValueChanged) {
+  public override void RegisterSignalChangeCallback(string name, ISignalListener host) {
     if (name != SeasonSignalName) {
       throw new ScriptError("Unknown signal: " + name);
     }
-    if (!_signalChangeCallbacks.TryGetValue(name, out var callbacks)) {
-      callbacks = [];
-      _signalChangeCallbacks[name] = callbacks;
+    var callback = new ScriptingService.SignalCallback(name, host);
+    if (!_signalChangeCallbacks.Add(callback)) {
+      throw new InvalidOperationException("Signal callback already registered: " + callback);
     }
-    callbacks.Add(onValueChanged);
   }
 
   /// <inheritdoc/>
-  public override void UnregisterSignalChangeCallback(string name, BaseComponent building, Action onValueChanged) {
-    if (_signalChangeCallbacks.TryGetValue(name, out var callbacks)) {
-      callbacks.Remove(onValueChanged);
+  public override void UnregisterSignalChangeCallback(string name, ISignalListener host) {
+    var callback = new ScriptingService.SignalCallback(name, host);
+    if (!_signalChangeCallbacks.Remove(callback)) {
+      DebugEx.Warning("Signal callback is not registered: {0}", callback);
     }
   }
 
@@ -100,7 +100,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   readonly HazardousWeatherService _hazardousWeatherService;
 
   string _currentSeason;
-  readonly Dictionary<string, List<Action>> _signalChangeCallbacks = new();
+  readonly HashSet<ScriptingService.SignalCallback> _signalChangeCallbacks = [];
 
   WeatherScriptableComponent(
       EventBus eventBus, WeatherService weatherService, HazardousWeatherService hazardousWeatherService) {
@@ -126,14 +126,6 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
     };
   }
 
-  void NotifySignalChanged(string name) {
-    if (_signalChangeCallbacks.TryGetValue(name, out var callbacks)) {
-      foreach (var callback in callbacks) {
-        callback();
-      }
-    }
-  }
-
   #endregion
 
   #region Event listeners
@@ -145,13 +137,17 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
         BadtideWeather => BadTideSeason,
         _ => throw new InvalidOperationException("Unknown hazardous weather type: " + @event.HazardousWeather),
     };
-    NotifySignalChanged(SeasonSignalName);
+    foreach (var callback in _signalChangeCallbacks) {
+      ScriptingService.ScheduleSignalCallback(callback);
+    }
   }
 
   [OnEvent]
   public void OnHazardousWeatherEndedEvent(HazardousWeatherEndedEvent @event) {
     _currentSeason = TemperateSeason;
-    NotifySignalChanged(SeasonSignalName);
+    foreach (var callback in _signalChangeCallbacks) {
+      ScriptingService.ScheduleSignalCallback(callback);
+    }
   }
 
   #endregion

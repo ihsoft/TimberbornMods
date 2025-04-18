@@ -15,7 +15,7 @@ using UnityEngine.InputSystem;
 
 namespace IgorZ.Automation.Conditions;
 
-sealed class ScriptedCondition : AutomationConditionBase {
+sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
 
   const string ParseErrorLocKey = "IgorZ.Automation.Scripting.Expressions.ParseError";
   const string RuntimeErrorLocKey = "IgorZ.Automation.Scripting.Expressions.RuntimeError";
@@ -31,7 +31,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
   /// <inheritdoc/>
   public override void SyncState() {
     if (_parsedExpression != null) {
-      CheckOperands();
+      OnValueChanged(null);
     }
   }
 
@@ -48,7 +48,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
     }
     var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
     foreach (var signal in _parsingResult.ReferencedSignals) {
-      scriptingService.UnregisterSignalChangeCallback(signal, Behavior, CheckOperands);
+      scriptingService.UnregisterSignalChangeCallback(signal, this);
     }
   }
 
@@ -134,6 +134,13 @@ sealed class ScriptedCondition : AutomationConditionBase {
 
   #endregion
 
+  #region ISignalListener implementation
+
+  /// <inheritdoc/>
+  public void OnValueChanged(string signalName) => CheckOperands();
+
+  #endregion
+
   #region Implementation
 
   ParsingResult _parsingResult;
@@ -171,7 +178,7 @@ sealed class ScriptedCondition : AutomationConditionBase {
 
     var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
     foreach (var signal in _parsingResult.ReferencedSignals) {
-      scriptingService.RegisterSignalChangeCallback(signal, Behavior, CheckOperands);
+      scriptingService.RegisterSignalChangeCallback(signal, this);
     }
   }
 

@@ -46,12 +46,12 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
   }
 
   /// <inheritdoc/>
-  public virtual void RegisterSignalChangeCallback(string name, BaseComponent building, Action onValueChanged) {
+  public virtual void RegisterSignalChangeCallback(string name, ISignalListener host) {
     throw new ScriptError("Unknown signal: " + name);
   }
 
   /// <inheritdoc/>
-  public virtual void UnregisterSignalChangeCallback(string name, BaseComponent building, Action onValueChanged) {
+  public virtual void UnregisterSignalChangeCallback(string name, ISignalListener host) {
   }
 
   /// <inheritdoc/>

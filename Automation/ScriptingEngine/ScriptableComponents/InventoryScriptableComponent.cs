@@ -131,10 +131,11 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   }
 
   /// <inheritdoc/>
-  public override void RegisterSignalChangeCallback(string name, BaseComponent building, Action onValueChanged) {
+  public override void RegisterSignalChangeCallback(string name, ISignalListener host) {
     if (!name.StartsWith(InputGoodSignalNamePrefix) && !name.StartsWith(OutputGoodSignalNamePrefix)) {
       throw new ScriptError("Unknown signal: " + name);
     }
+    var building = host.Behavior;
     var inventory = GetInventory(building);
     if (name.StartsWith(InputGoodSignalNamePrefix)) {
       var goodId = name[InputGoodSignalNamePrefix.Length..];
@@ -150,14 +151,21 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     }
     var tracker = building.GetComponentFast<InventoryChangeTracker>()
         ?? _instantiator.AddComponent<InventoryChangeTracker>(building.GameObjectFast);
-    tracker.SignalChangeCallbacks.Add(onValueChanged);
+    var callback = new ScriptingService.SignalCallback(name, host);
+    if (!tracker.SignalChangeCallbacks.Add(callback)) {
+      throw new InvalidOperationException("Signal callback already registered: " + callback);
+    }
   }
 
   /// <inheritdoc/>
-  public override void UnregisterSignalChangeCallback(string name, BaseComponent building, Action onValueChanged) {
-    var tracker = building.GetComponentFast<InventoryChangeTracker>();
-    if (tracker) {
-      tracker.SignalChangeCallbacks.Remove(onValueChanged);
+  public override void UnregisterSignalChangeCallback(string name, ISignalListener host) {
+    var tracker = host.Behavior.GetComponentFast<InventoryChangeTracker>();
+    if (!tracker) {
+      return;
+    }
+    var callback = new ScriptingService.SignalCallback(name, host);
+    if (!tracker.SignalChangeCallbacks.Remove(callback)) {
+      DebugEx.Warning("Signal callback is not registered: {0}", callback);
     }
   }
 
@@ -256,7 +264,14 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   #region Inventory change tracker component
 
   sealed class InventoryChangeTracker : BaseComponent {
-    public readonly List<Action> SignalChangeCallbacks = [];
+    public readonly HashSet<ScriptingService.SignalCallback> SignalChangeCallbacks = [];
+
+    ScriptingService _scriptingService;
+
+    [Inject]
+    public void InjectDependencies(ScriptingService scriptingService) {
+      _scriptingService = scriptingService;
+    }
 
     void Awake() {
       GetInventory(this).InventoryStockChanged += (_, _) => NotifyChange();
@@ -264,7 +279,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
 
     void NotifyChange() {
       foreach (var callback in SignalChangeCallbacks) {
-        callback();
+        _scriptingService.ScheduleSignalCallback(callback);
       }
     }
   }

@@ -8,7 +8,7 @@ using Timberborn.BaseComponentSystem;
 namespace IgorZ.Automation.ScriptingEngine;
 
 /// <summary>Interface for a component that can be used in the scripting engine.</summary>
-public interface IScriptable {
+interface IScriptable {
   /// <summary>The name of the scriptable component.</summary>
   public string Name { get; }
 
@@ -46,15 +46,13 @@ public interface IScriptable {
 
   /// <summary>Registers a callback called when the signal value changes.</summary>
   /// <param name="name">The name of the signal.</param>
-  /// <param name="building">The component on which the signal is to be registered.</param>
-  /// <param name="onValueChanged">The callback that is called when the signal value changes.</param>
-  public void RegisterSignalChangeCallback(string name, BaseComponent building, Action onValueChanged);
+  /// <param name="host">The signal changes handler to be registered.</param>
+  public void RegisterSignalChangeCallback(string name, ISignalListener host);
 
   /// <summary>Unregisters a signal value change callback.</summary>
   /// <param name="name">The name of the signal.</param>
-  /// <param name="building">The component on which the signal is registered.</param>
-  /// <param name="onValueChanged">The callback that was registered for updates.</param>
-  public void UnregisterSignalChangeCallback(string name, BaseComponent building, Action onValueChanged);
+  /// <param name="host">The signal changes handler to be unregistered.</param>
+  public void UnregisterSignalChangeCallback(string name, ISignalListener host);
 
   /// <summary>Installs the necessary components for the action to properly work on the specified building.</summary>
   /// <param name="name">The name of the action.</param>
