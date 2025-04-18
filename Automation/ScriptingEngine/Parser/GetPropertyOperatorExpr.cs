@@ -52,6 +52,9 @@ class GetPropertyOperatorExpr : AbstractOperandExpr, IValueExpr {
     var listVal = GetAsList(value);
     if (listVal != null) {
       if (operands.Count == 1) {
+        if (valueType != ScriptValue.TypeEnum.Number) {
+          throw new ScriptError("Number type required to return list count");
+        }
         value = listVal.Count;
       } else {
         AsserNumberOfOperandsExact(2);
