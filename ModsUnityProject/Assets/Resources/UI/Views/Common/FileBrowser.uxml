@@ -3,7 +3,7 @@
     <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
     <Style src="CommonMiscStyle.uss" />
     <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
-    <Style src="OptionsStyle.uss" />
+    <Style src="project://database/Assets/Resources/UI/Views/Options/OptionsStyle.uss" />
     <engine:Instance name="FileBrowser" template="Box" class="file-browser">
         <engine:Label text="Tip" name="Tip" class="text--default file-browser__tip" />
         <engine:VisualElement class="file-browser__path-wrapper">
