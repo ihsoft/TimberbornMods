@@ -11,6 +11,7 @@ using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.EntitySystem;
 using Timberborn.MapIndexSystem;
+using Timberborn.ModManagerScene;
 using Timberborn.SceneLoading;
 using Timberborn.SingletonSystem;
 using Timberborn.SoilBarrierSystem;
@@ -109,7 +110,8 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   /// <summary>Sets up the moisture override logic.</summary>
   public void PostLoad() {
     _eventBus.Register(this);
-    _sceneLoader.SceneLoaded += OnSceneLoaded;
+    // FIXME: doesn't work in 0.7.6.1
+    //_sceneLoader.SceneLoaded += OnSceneLoaded;
   }
 
   #endregion
@@ -148,7 +150,6 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   BlockService _blockService;
   ITerrainService _terrainService;
   EventBus _eventBus;
-  SceneLoader _sceneLoader;
   TerrainMaterialMap _terrainMaterialMap;
 
   /// <summary>Resets all cached static state. Must be called from configurator.</summary>
@@ -161,8 +162,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   [Inject]
   public void InjectDependencies(MapIndexService mapIndexService, SoilBarrierMap soilBarrierMap,
                                  BlockService blockService, ITerrainService terrainService, EventBus eventBus,
-                                 TerrainMaterialMap terrainMaterialMap, SoilMoistureMap soilMoistureMap,
-                                 SceneLoader sceneLoader) {
+                                 TerrainMaterialMap terrainMaterialMap, SoilMoistureMap soilMoistureMap) {
     _mapIndexService = mapIndexService;
     _soilBarrierMap = soilBarrierMap;
     _blockService = blockService;
@@ -170,7 +170,6 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
     _eventBus = eventBus;
     _terrainMaterialMap = terrainMaterialMap;
     _soilMoistureMap = soilMoistureMap;
-    _sceneLoader = sceneLoader;
   }
 
   /// <summary>Checks if there were changes and rebuilds moisture overrides caches.</summary>
@@ -273,19 +272,20 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
 
   #region Game load callbacks
 
+  // FIXME: doesn't work in 0.7.6.1
   /// <summary>Refreshes terrain texture if when the game is loaded and there are active overrides.</summary>
-  void OnSceneLoaded(object sender, EventArgs e) {
-    _sceneLoader.SceneLoaded -= OnSceneLoaded;
-    var needTextureUpdate = _needMoistureOverridesUpdate;
-    Tick();
-
-    // Refresh the texture on game load.
-    if (needTextureUpdate && IrrigationSystemSettings.OverrideDesertLevelsForWaterTowers) {
-      // FIXME: Consider calling Tick() instead. It's public.
-      _terrainMaterialMap.ProcessDesertTextureChanges();
-      _terrainMaterialMap.ProcessDesertTextureChanges(); // Intentionally.
-    }
-  }
+  // void OnSceneLoaded(object sender, EventArgs e) {
+  //   _sceneLoader.SceneLoaded -= OnSceneLoaded;
+  //   var needTextureUpdate = _needMoistureOverridesUpdate;
+  //   Tick();
+  //
+  //   // Refresh the texture on game load.
+  //   if (needTextureUpdate && IrrigationSystemSettings.OverrideDesertLevelsForWaterTowers) {
+  //     // FIXME: Consider calling Tick() instead. It's public.
+  //     _terrainMaterialMap.ProcessDesertTextureChanges();
+  //     _terrainMaterialMap.ProcessDesertTextureChanges(); // Intentionally.
+  //   }
+  // }
 
   #endregion
 }

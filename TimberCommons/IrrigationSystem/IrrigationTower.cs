@@ -36,7 +36,7 @@ namespace IgorZ.TimberCommons.IrrigationSystem;
 /// blocked for irrigation (for example, via a moisture blocker), then it is not eligible for irrigation. 
 /// </remarks>
 public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateListener,
-                                        IPostTransformChangeListener, IPausableComponent, ILateTickable,
+                                        IPostPlacementChangeListener, IPausableComponent, ILateTickable,
                                         IPersistentEntity, ISelectionListener, IPostInitializableEntity {
 
   #region Unity conrolled fields
@@ -175,10 +175,10 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   #endregion
 
-  #region IPostTransformChangeListener implementation
+  #region IPostPlacementChangeListener implementation
 
   /// <inheritdoc/>
-  public void OnPostTransformChanged() {
+  public void OnPostPlacementChanged() {
     UpdateBuildingPositioning(); // Recalculate the coverage during preview mode.
   }
 
