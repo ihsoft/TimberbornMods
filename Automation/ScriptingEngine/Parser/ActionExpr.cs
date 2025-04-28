@@ -34,12 +34,9 @@ sealed class ActionExpr : AbstractOperandExpr {
 
   ActionExpr(ExpressionParser.Context context, string name, IList<IExpression> operands) : base(name, operands) {
     if (Operands[0] is not SymbolExpr symbol || !SignalNameRegexp.IsMatch(symbol.Value)) {
-      throw new ScriptError("Bad action name: " + Operands[0]);
+      throw new ScriptError.ParsingError("Bad action name: " + Operands[0]);
     }
     var actionName = symbol.Value;
-    if (context.IsPreprocessor) {
-      throw new ScriptError("Actions are not allowed in preprocessor: " + actionName);
-    }
     context.ReferencedActions.Add(actionName);
     _actionDef = context.ScriptingService.GetActionDefinition(actionName, context.ScriptHost);
     AsserNumberOfOperandsExact(_actionDef.Arguments.Length + 1);
@@ -47,11 +44,12 @@ sealed class ActionExpr : AbstractOperandExpr {
     for (var i = 0; i < _actionDef.Arguments.Length; i++) {
       var operand = Operands[i + 1];
       if (operand is not IValueExpr valueExpr) {
-        throw new ScriptError($"Operand #{i + 1} must be a value, found: {operand}");
+        throw new ScriptError.ParsingError($"Operand #{i + 1} must be a value, found: {operand}");
       }
       var argDef = _actionDef.Arguments[i];
       if (argDef.ValueType != valueExpr.ValueType) {
-        throw new ScriptError($"Incompatible argument type #{i + 1}: {valueExpr.ValueType} is not {argDef.ValueType}");
+        throw new ScriptError.ParsingError(
+            $"Incompatible argument type #{i + 1}: {valueExpr.ValueType} is not {argDef.ValueType}");
       }
       argValues[i] = valueExpr.ValueFn;
     }

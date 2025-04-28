@@ -35,7 +35,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   public override Func<ScriptValue> GetSignalSource(string name, BaseComponent _) {
     return name switch {
         SeasonSignalName => () => ScriptValue.Of(_currentSeason),
-        _ => throw new ScriptError("Unknown signal: " + name),
+        _ => throw new ScriptError.ParsingError("Unknown signal: " + name),
     };
   }
 
@@ -43,14 +43,14 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   public override SignalDef GetSignalDefinition(string name, BaseComponent _) {
     return name switch {
         SeasonSignalName => SeasonSignalDef,
-        _ => throw new ScriptError("Unknown signal: " + name)
+        _ => throw new ScriptError.ParsingError("Unknown signal: " + name)
     };
   }
 
   /// <inheritdoc/>
   public override void RegisterSignalChangeCallback(string name, ISignalListener host) {
     if (name != SeasonSignalName) {
-      throw new ScriptError("Unknown signal: " + name);
+      throw new ScriptError.ParsingError("Unknown signal: " + name);
     }
     var callback = new ScriptingService.SignalCallback(name, host);
     if (!_signalChangeCallbacks.Add(callback)) {

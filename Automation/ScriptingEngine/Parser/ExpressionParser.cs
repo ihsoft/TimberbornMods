@@ -91,12 +91,12 @@ sealed class ExpressionParser {
       var parsedExpression = ProcessString(expression);
       if (parsedExpression is BinaryOperatorExpr binaryOperatorExpr) {
         if (!binaryOperatorExpr.Execute()) {
-          throw new ScriptError("Preprocessor: Expression is not true: " + expression);
+          throw new ScriptError.PreprocessorCheck("Expression is not true: " + expression);
         }
         return "";
       }
       if (parsedExpression is not IValueExpr valueExpr) {
-        throw new ScriptError("Preprocessor: Not a value expression: " + expression);
+        throw new ScriptError.ParsingError("Not a value expression: " + expression);
       }
       var value = valueExpr.ValueFn();
       return value.ValueType switch {
@@ -128,7 +128,7 @@ sealed class ExpressionParser {
       if (input[currentPos] == '\'') {
         var literalEndPos = input.IndexOf('\'', currentPos + 1);
         if (literalEndPos == -1) {
-          throw new ScriptError("Unmatched quote");
+          throw new ScriptError.ParsingError("Unmatched quote");
         }
         tokens.Enqueue(input.Substring(currentPos, literalEndPos - currentPos + 1));
         currentPos = literalEndPos + 1;
@@ -157,20 +157,20 @@ sealed class ExpressionParser {
     var tokens = Tokenize(input);
     var result = ReadFromTokens(tokens);
     if (tokens.Any()) {
-      throw new ScriptError("Unexpected token at the end of the expression: " + tokens.Peek());
+      throw new ScriptError.ParsingError("Unexpected token at the end of the expression: " + tokens.Peek());
     }
     return result;
   }
 
   static void CheckHasMoreTokens(Queue<string> tokens) {
     if (tokens.IsEmpty()) {
-      throw new ScriptError("Unexpected EOF while reading expression");
+      throw new ScriptError.ParsingError("Unexpected EOF while reading expression");
     }
   }
 
   IExpression ReadFromTokens(Queue<string> tokens) {
     if (!tokens.Any()) {
-      throw new ScriptError("Unexpected EOF while reading expression");
+      throw new ScriptError.ParsingError("Unexpected EOF while reading expression");
     }
     var token = tokens.Dequeue();
     if (token != "(") {
@@ -179,7 +179,7 @@ sealed class ExpressionParser {
     CheckHasMoreTokens(tokens);
     var operatorName = tokens.Dequeue();
     if (OperatorNameRegex.IsMatch(operatorName)) {
-      throw new ScriptError("Bad operator name: " + operatorName);
+      throw new ScriptError.ParsingError("Bad operator name: " + operatorName);
     }
     CheckHasMoreTokens(tokens);
     var operands = new List<IExpression>();
@@ -188,7 +188,7 @@ sealed class ExpressionParser {
       CheckHasMoreTokens(tokens);
     }
     if (operands.Count == 0) {
-      throw new ScriptError("Empty operator expression");
+      throw new ScriptError.ParsingError("Empty operator expression");
     }
     tokens.Dequeue(); // ")"
 
@@ -202,7 +202,7 @@ sealed class ExpressionParser {
         ?? MathOperatorExpr.TryCreateFrom(operatorName, operands)
         ?? GetPropertyOperatorExpr.TryCreateFrom(CurrentContext, operatorName, operands);
     if (result == null) {
-      throw new ScriptError("Unknown operator: " + operatorName);
+      throw new ScriptError.ParsingError("Unknown operator: " + operatorName);
     }
     return result;
   }

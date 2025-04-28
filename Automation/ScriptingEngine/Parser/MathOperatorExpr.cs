@@ -66,7 +66,7 @@ class MathOperatorExpr : AbstractOperandExpr, IValueExpr {
     for (var i = 0; i < operands.Count; i++) {
       var op = Operands[i];
       if (op is not IValueExpr { ValueType: ScriptValue.TypeEnum.Number } result) {
-        throw new ScriptError($"Operand #{i + 1} must be a numeric value, found: {op}");
+        throw new ScriptError.ParsingError($"Operand #{i + 1} must be a numeric value, found: {op}");
       }
       valueExprs.Add(result);
     }

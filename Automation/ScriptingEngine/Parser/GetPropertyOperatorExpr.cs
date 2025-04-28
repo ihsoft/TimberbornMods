@@ -9,7 +9,6 @@ using System.Linq;
 using System.Reflection;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 using Timberborn.BaseComponentSystem;
-using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
@@ -34,36 +33,38 @@ class GetPropertyOperatorExpr : AbstractOperandExpr, IValueExpr {
       : base(name, operands) {
     AsserNumberOfOperandsRange(1, -1);
     if (Operands[0] is not SymbolExpr symbol) {
-      throw new ScriptError("Bad property name: " + Operands[0]);
+      throw new ScriptError.ParsingError("Bad property name: " + Operands[0]);
     }
     var parts = symbol.Value.Split('.');
     if (parts.Length != 2) {
-      throw new ScriptError("Bad property name: " + Operands[0]);
+      throw new ScriptError.ParsingError("Bad property name: " + Operands[0]);
     }
-    var component = GetComponentByName(context.ScriptHost.GameObjectFast, parts[0]);
+    var componentName = parts[0];
+    var component = GetComponentByName(context.ScriptHost.GameObjectFast, componentName);
     if (!component) {
-      throw new ScriptError($"{DebugEx.ObjectToString(context.ScriptHost)} doesn't have component {parts[0]}");
+      throw new ScriptError.BadStateError(context.ScriptHost, $"Component {componentName} not found");
     }
-    var property = component.GetType().GetProperty(parts[1]);
+    var propertyName = parts[1];
+    var property = component.GetType().GetProperty(propertyName);
     if (property == null) {
-      throw new ScriptError($"{DebugEx.ObjectToString(component)} doesn't have property {parts[1]}");
+      throw new ScriptError.ParsingError($"Property {propertyName} not found on component {componentName}");
     }
     var value = property.GetValue(component);
     var listVal = GetAsList(value);
     if (listVal != null) {
       if (operands.Count == 1) {
         if (valueType != ScriptValue.TypeEnum.Number) {
-          throw new ScriptError("Number type required to return list count");
+          throw new ScriptError.ParsingError("Number type required to return list count");
         }
         value = listVal.Count;
       } else {
         AsserNumberOfOperandsExact(2);
         if (Operands[1] is not IValueExpr indexExpr) {
-          throw new ScriptError("Second operand must be a value, found: " + Operands[1]);
+          throw new ScriptError.ParsingError("Second operand must be a value, found: " + Operands[1]);
         }
         var index = indexExpr.ValueFn().AsInt;
         if (index < 0 || index >= operands.Count) {
-          throw new ScriptError($"Index {index} is out of range: [{0}; {listVal.Count})");
+          throw new ScriptError.RuntimeError($"Index {index} is out of range: [{0}; {listVal.Count})");
         }
         value = listVal[indexExpr.ValueFn().AsInt];
       }
@@ -73,13 +74,16 @@ class GetPropertyOperatorExpr : AbstractOperandExpr, IValueExpr {
             int intVal => () => ScriptValue.FromInt(intVal),
             float floatVal => () => ScriptValue.FromFloat(floatVal),
             bool boolVal => () => ScriptValue.Of(boolVal ? 100 : 0),
-            _ => throw new ScriptError($"Property {symbol.Value} is of incompatible type: {value.GetType()}"),
+            _ => throw new ScriptError.ParsingError(
+                $"Property {symbol.Value} is of incompatible type: {value.GetType()}"),
         },
         ScriptValue.TypeEnum.String => value switch {
             string strVal => () => ScriptValue.Of(strVal),
-            _ => throw new ScriptError($"Property {symbol.Value} is of incompatible type: {value.GetType()}"),
+            _ => throw new ScriptError.ParsingError(
+                $"Property {symbol.Value} is of incompatible type: {value.GetType()}"),
         },
-        _ => throw new ScriptError($"Property {symbol.Value} is of incompatible type: {value.GetType()}"),
+        _ => throw new ScriptError.ParsingError(
+            $"Property {symbol.Value} is of incompatible type: {value.GetType()}"),
     };
   }
 

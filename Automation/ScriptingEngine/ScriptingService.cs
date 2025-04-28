@@ -79,7 +79,7 @@ sealed class ScriptingService {
     if (_signalsQueue.Contains(callback)) {
       DebugEx.Error("Circular execution of signal '{0}' on {1}. Execution log:\n{2}",
                     callback.Name, DebugEx.ObjectToString(callback.SignalListener), GetExecutionLog());
-      throw new ScriptError(
+      throw new ScriptError.RuntimeError(
           $"Circular execution of signal '{callback.Name}' on {DebugEx.ObjectToString(callback.SignalListener)}");
     }
     _signalsQueue.Enqueue(callback);
@@ -115,7 +115,7 @@ sealed class ScriptingService {
   void ExecuteOnRegisteredComponent(string name, Action<IScriptable> action) {
     var nameItems = name.Split('.');
     if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
-      throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
+      throw new InvalidOperationException("Unknown scriptable component: " + nameItems[0]);
     }
     action(scriptable);
   }
@@ -123,7 +123,7 @@ sealed class ScriptingService {
   T ExecuteOnRegisteredComponent<T>(string name, Func<IScriptable,T> action) {
     var nameItems = name.Split('.');
     if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
-      throw new ScriptError("Unknown scriptable component: " + nameItems[0]);
+      throw new InvalidOperationException("Unknown scriptable component: " + nameItems[0]);
     }
     return action(scriptable);
   }

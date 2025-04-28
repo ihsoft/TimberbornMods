@@ -43,13 +43,13 @@ sealed class BinaryOperatorExpr : BoolOperatorExpr {
       : base(name, operands) {
     AsserNumberOfOperandsExact(2);
     if (Operands[0] is not IValueExpr left) {
-      throw new ScriptError("Left operand must be a value, found: " + Operands[0]);
+      throw new ScriptError.ParsingError("Left operand must be a value, found: " + Operands[0]);
     }
     if (Operands[1] is not IValueExpr right) {
-      throw new ScriptError("Right operand must be a value, found: " + Operands[1]);
+      throw new ScriptError.ParsingError("Right operand must be a value, found: " + Operands[1]);
     }
     if (left.ValueType != right.ValueType) {
-      throw new ScriptError($"Arguments type mismatch: {left.ValueType} != {right.ValueType}");
+      throw new ScriptError.ParsingError($"Arguments type mismatch: {left.ValueType} != {right.ValueType}");
     }
     if (left is SignalOperatorExpr leftSignal) {
       _signalDef = context.ScriptingService.GetSignalDefinition(leftSignal.SignalName, context.ScriptHost);
@@ -60,14 +60,14 @@ sealed class BinaryOperatorExpr : BoolOperatorExpr {
       var value = constantValueExpr.ValueFn().AsString;
       var allowedValues = _signalDef.Result.Options.Select(x => x.Value).ToArray();
       if (!allowedValues.Contains(value)) {
-        throw new ScriptError($"Unexpected value: {value}. Allowed: {string.Join(", ", allowedValues)}");
+        throw new ScriptError.ParsingError($"Unexpected value: {value}. Allowed: {string.Join(", ", allowedValues)}");
       }
     }
     Execute = left.ValueType switch {
         ScriptValue.TypeEnum.String => name switch {
             "eq" => () => left.ValueFn().AsString == right.ValueFn().AsString,
             "ne" => () => left.ValueFn().AsString != right.ValueFn().AsString,
-            _ => throw new ScriptError("Unsupported operator for string operands: " + name),
+            _ => throw new ScriptError.ParsingError("Unsupported operator for string operands: " + name),
         },
         ScriptValue.TypeEnum.Number => name switch {
             "eq" => () => left.ValueFn().AsNumber == right.ValueFn().AsNumber,

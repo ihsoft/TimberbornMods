@@ -61,8 +61,8 @@ sealed class ScriptedAction : AutomationActionBase {
     try {
       _uiDescription = null;
       _parsedExpression.Execute();
-    } catch (ExecutionInterrupted e) {
-      HostedDebugLog.Fine(Behavior, "Action execution interrupted: {0}\nReason: {1}", Expression, e.Reason);
+    } catch (ScriptError.Interrupted e) {
+      HostedDebugLog.Fine(Behavior, "Action execution interrupted: {0}\nReason: {1}", Expression, e.Message);
       _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(RuntimeErrorLocKey));
     } catch (ScriptError e) {
       HostedDebugLog.Error(Behavior, "Action failed: {0}\nError: {1}", Expression, e.Message);

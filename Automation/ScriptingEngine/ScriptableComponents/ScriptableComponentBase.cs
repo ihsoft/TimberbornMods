@@ -24,12 +24,12 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
 
   /// <inheritdoc/>
   public virtual Func<ScriptValue> GetSignalSource(string name, BaseComponent building) {
-    throw new ScriptError("Signal not found: " + name);
+    throw new ScriptError.ParsingError("Signal not found: " + name);
   }
 
   /// <inheritdoc/>
   public virtual SignalDef GetSignalDefinition(string name, BaseComponent building) {
-    throw new ScriptError("Signal not found: " + name);
+    throw new ScriptError.ParsingError("Signal not found: " + name);
   }
 
   /// <inheritdoc/>
@@ -37,17 +37,17 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
 
   /// <inheritdoc/>
   public virtual Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
-    throw new ScriptError("Action not found: " + name);
+    throw new ScriptError.ParsingError("Action not found: " + name);
   }
 
   /// <inheritdoc/>
   public virtual ActionDef GetActionDefinition(string name, BaseComponent building) {
-    throw new ScriptError("Action not found: " + name);
+    throw new ScriptError.ParsingError("Action not found: " + name);
   }
 
   /// <inheritdoc/>
   public virtual void RegisterSignalChangeCallback(string name, ISignalListener host) {
-    throw new ScriptError("Unknown signal: " + name);
+    throw new ScriptError.ParsingError("Unknown signal: " + name);
   }
 
   /// <inheritdoc/>
@@ -64,7 +64,7 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
 
   protected static void AssertActionArgsCount(string actionName, ScriptValue[] args, int expectedCount) {
     if (args.Length != expectedCount) {
-      throw new ScriptError($"{actionName} action requires {expectedCount} argument(s)");
+      throw new ScriptError.ParsingError($"{actionName} action requires {expectedCount} argument(s)");
     }
   }
 

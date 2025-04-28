@@ -59,18 +59,18 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     if (name.StartsWith(InputGoodSignalNamePrefix)) {
       var goodId = name[InputGoodSignalNamePrefix.Length..];
       if (!inventory.InputGoods.Contains(goodId)) {
-        throw new ScriptError($"Input good '{goodId}' not found in: {DebugEx.ObjectToString(inventory)}");
+        throw new ScriptError.BadStateError(inventory, $"Input good '{goodId}' not found");
       }
       return () => ScriptValue.FromInt(inventory.AmountInStock(goodId));
     }
     if (name.StartsWith(OutputGoodSignalNamePrefix)) {
       var goodId = name[OutputGoodSignalNamePrefix.Length..];
       if (!inventory.OutputGoods.Contains(goodId)) {
-        throw new ScriptError($"Output good '{goodId}' not found in: {DebugEx.ObjectToString(inventory)}");
+        throw new ScriptError.BadStateError(inventory, $"Output good '{goodId}' not found");
       }
       return () => ScriptValue.FromInt(inventory.AmountInStock(goodId));
     }
-    throw new ScriptError("Unknown signal: " + name);
+    throw new ScriptError.ParsingError("Unknown signal: " + name);
   }
 
   /// <inheritdoc/>
@@ -85,7 +85,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
       displayName = LocGoodSignal(OutputGoodSignalLocKey, name[OutputGoodSignalNamePrefix.Length..]);
     }
     if (displayName == null) {
-      throw new ScriptError("Unknown trigger: " + name);
+      throw new ScriptError.ParsingError("Unknown signal: " + name);
     }
 
     def = new SignalDef {
@@ -121,32 +121,32 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   public override Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
     var emptiable = building.GetComponentFast<Emptiable>();
     if (!emptiable) {
-      throw new ScriptError("Building is not emptiable: " + DebugEx.ObjectToString(building));
+      throw new ScriptError.BadStateError(building, "Building is not emptiable");
     }
     return name switch {
         StartEmptyingStockActionName => _ => emptiable.MarkForEmptyingWithoutStatus(),
         StopEmptyingStockActionName => _ => emptiable.UnmarkForEmptying(),
-        _ => throw new ScriptError("Unknown action: " + name),
+        _ => throw new ScriptError.ParsingError("Unknown action: " + name),
     };
   }
 
   /// <inheritdoc/>
   public override void RegisterSignalChangeCallback(string name, ISignalListener host) {
     if (!name.StartsWith(InputGoodSignalNamePrefix) && !name.StartsWith(OutputGoodSignalNamePrefix)) {
-      throw new ScriptError("Unknown signal: " + name);
+      throw new ScriptError.ParsingError("Unknown signal: " + name);
     }
     var building = host.Behavior;
     var inventory = GetInventory(building);
     if (name.StartsWith(InputGoodSignalNamePrefix)) {
       var goodId = name[InputGoodSignalNamePrefix.Length..];
       if (!inventory.InputGoods.Contains(goodId)) {
-        throw new ScriptError($"Input good '{goodId}' not found in: {DebugEx.ObjectToString(inventory)}");
+        throw new ScriptError.BadStateError(inventory, $"Input good '{goodId}' not found");
       }
     }
     if (name.StartsWith(OutputGoodSignalNamePrefix)) {
       var goodId = name[OutputGoodSignalNamePrefix.Length..];
       if (!inventory.OutputGoods.Contains(goodId)) {
-        throw new ScriptError($"Output good '{goodId}' not found in: {DebugEx.ObjectToString(inventory)}");
+        throw new ScriptError.BadStateError(inventory, $"Output good '{goodId}' not found");
       }
     }
     var tracker = building.GetComponentFast<InventoryChangeTracker>()
@@ -178,7 +178,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
       }
       behavior.AddReference();
     } else {
-      throw new ScriptError("Unknown action: " + name);
+      throw new ScriptError.ParsingError("Unknown action: " + name);
     }
   }
 
@@ -191,7 +191,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
       }
       behavior.RemoveReference();
     } else {
-      throw new ScriptError("Unknown action: " + name);
+      throw new ScriptError.ParsingError("Unknown action: " + name);
     }
   }
 
@@ -199,7 +199,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     return name switch {
         StartEmptyingStockActionName => StartEmptyingStockActionDef,
         StopEmptyingStockActionName => StopEmptyingStockActionDef,
-        _ => throw new ScriptError("Unknown action: " + name),
+        _ => throw new ScriptError.ParsingError("Unknown action: " + name),
     };
   }
 
@@ -247,14 +247,14 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     var inventories = building.GetComponentFast<Inventories>();
     if (!inventories) {
       if (throwIfNotFound) {
-        throw new ScriptError("Inventories component not found on: " + DebugEx.ObjectToString(building));
+        throw new ScriptError.BadStateError(building, "Inventories component not found");
       }
       return null;
     }
     var inventory = inventories.AllInventories
         .FirstOrDefault(x => x.ComponentName != ConstructionSiteInventoryInitializer.InventoryComponentName);
     if (inventory == null && throwIfNotFound) {
-      throw new ScriptError("Inventory component not found on: " + DebugEx.ObjectToString(building));
+      throw new ScriptError.BadStateError(building, "Inventory component not found");
     }
     return inventory;
   }
@@ -274,7 +274,11 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     }
 
     void Awake() {
-      GetInventory(this).InventoryStockChanged += (_, _) => NotifyChange();
+      var inventory = GetInventory(this, throwIfNotFound: false);
+      if (inventory == null) {
+        throw new InvalidOperationException("Inventory component not found on: " + DebugEx.ObjectToString(this));
+      }
+      inventory.InventoryStockChanged += (_, _) => NotifyChange();
     }
 
     void NotifyChange() {
@@ -322,7 +326,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     }
 
     public void RemoveReference() {
-      if (_installedActions == 0) {;
+      if (_installedActions == 0) {
         throw new InvalidOperationException("Uninstalling more actions than installed");
       }
       _installedActions--;

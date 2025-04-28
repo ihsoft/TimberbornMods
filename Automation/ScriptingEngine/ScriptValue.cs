@@ -62,7 +62,7 @@ public record struct ScriptValue {
   /// <exception cref="ScriptError">if dividing by zero.</exception>
   public static ScriptValue operator /(ScriptValue left, ScriptValue right) {
     if (right.AsNumber == 0) {
-      throw new ScriptError("Division by zero");
+      throw new ScriptError.RuntimeError("Division by zero");
     }
     return new ScriptValue { _number = left.AsNumber * 100 / right.AsNumber};
   }
@@ -76,7 +76,7 @@ public record struct ScriptValue {
   public int AsNumber {
     get {
       if (!_number.HasValue) {
-        throw new ScriptError("Value is not a number: " + ToString());
+        throw new ScriptError.RuntimeError("Value is not a number: " + ToString());
       }
       return _number.Value;
     }
@@ -93,7 +93,7 @@ public record struct ScriptValue {
   public string AsString {
     get {
       if (_string == null) {
-        throw new ScriptError("Value is not a string: " + ToString());
+        throw new ScriptError.RuntimeError("Value is not a string: " + ToString());
       }
       return _string;
     }

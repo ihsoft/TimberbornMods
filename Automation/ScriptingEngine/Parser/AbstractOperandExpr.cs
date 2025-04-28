@@ -36,17 +36,17 @@ abstract class AbstractOperandExpr(string name, IList<IExpression> operands) : I
   protected void AsserNumberOfOperandsExact(int expected) {
     var count = Operands.Count;
     if (expected != count) {
-      throw new ScriptError($"Operator '{Name}' requires {expected} arguments, but got {count}");
+      throw new ScriptError.ParsingError($"Operator '{Name}' requires {expected} arguments, but got {count}");
     }
   }
 
   protected void AsserNumberOfOperandsRange(int min, int max) {
     var count = Operands.Count;
     if (min >= 0 && count < min) {
-      throw new ScriptError($"Operator '{Name}' requires at least {min} arguments, but got {count}");
+      throw new ScriptError.ParsingError($"Operator '{Name}' requires at least {min} arguments, but got {count}");
     }
     if (max >= 0 && count > max) {
-      throw new ScriptError($"Operator '{Name}' requires at most {max} arguments, but got {count}");
+      throw new ScriptError.ParsingError($"Operator '{Name}' requires at most {max} arguments, but got {count}");
     }
   }
 }

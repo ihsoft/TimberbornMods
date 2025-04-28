@@ -30,11 +30,11 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   public override Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
     var floodgate = building.GetComponentFast<Floodgate>();
     if (!floodgate) {
-      throw new ScriptError("Floodgate component not found");
+      throw new ScriptError.BadStateError(building, "Floodgate component not found");
     }
     return name switch {
         SetHeightActionName => args => SetHeightAction(floodgate, args),
-        _ => throw new ScriptError("Unknown action: " + name),
+        _ => throw new ScriptError.ParsingError("Unknown action: " + name),
     };
   }
 
@@ -42,7 +42,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   public override ActionDef GetActionDefinition(string name, BaseComponent _) {
     return name switch {
         SetHeightActionName => SetHeightActionDef,
-        _ => throw new ScriptError("Unknown action: " + name),
+        _ => throw new ScriptError.ParsingError("Unknown action: " + name),
     };
   }
 

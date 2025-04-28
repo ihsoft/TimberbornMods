@@ -216,8 +216,8 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
     try {
       _uiDescription = null;
       ConditionState = _parsedExpression.Execute();
-    } catch (ExecutionInterrupted e) {
-      HostedDebugLog.Fine(Behavior, "Condition execution interrupted: {0}\nReason: {1}", Expression, e.Reason);
+    } catch (ScriptError.Interrupted e) {
+      HostedDebugLog.Fine(Behavior, "Condition execution interrupted: {0}\nReason: {1}", Expression, e.Message);
     } catch (ScriptError e) {
       HostedDebugLog.Error(Behavior, "Error in condition execution: {0}\nReason: {1}", Expression, e.Message);
       _parsedExpression = null;

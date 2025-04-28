@@ -41,7 +41,7 @@ class DistrictScriptableComponent : ScriptableComponentBase {
   public override Func<ScriptValue> GetSignalSource(string name, BaseComponent building) {
     var districtBuilding = building.GetComponentFast<DistrictBuilding>();
     if (!districtBuilding) {
-      throw new ScriptError("Not a district building");
+      throw new ScriptError.BadStateError(building, "Not a district building");
     }
     return name switch {
         BeaverPopulationSignalName => () =>
@@ -56,7 +56,7 @@ class DistrictScriptableComponent : ScriptableComponentBase {
               districtBuilding.District.GetComponentFast<DistrictDwellingStatisticsProvider>().GetDwellingStatistics();
           return ScriptValue.FromInt(statistics.FreeBeds + statistics.OccupiedBeds);
         },
-        _ => throw new ScriptError("Unknown signal: " + name),
+        _ => throw new ScriptError.ParsingError("Unknown signal: " + name),
     };
   }
 
@@ -64,13 +64,13 @@ class DistrictScriptableComponent : ScriptableComponentBase {
   public override SignalDef GetSignalDefinition(string name, BaseComponent building) {
     var districtBuilding = building.GetComponentFast<DistrictBuilding>();
     if (!districtBuilding) {
-      throw new ScriptError("Not a district building");
+      throw new ScriptError.BadStateError(building, "Not a district building");
     }
     return name switch {
         BeaverPopulationSignalName => BeaverPopulationSignalDef,
         BotPopulationSignalName => BotPopulationSignalDef,
         NumberOfBedsSignalName => NumberOfBedsSignalDef,
-        _ => throw new ScriptError("Unknown signal: " + name),
+        _ => throw new ScriptError.ParsingError("Unknown signal: " + name),
     };
   }
 
@@ -96,7 +96,7 @@ class DistrictScriptableComponent : ScriptableComponentBase {
         }
         break;
       default:
-        throw new ScriptError("Unknown signal: " + name);
+        throw new ScriptError.ParsingError("Unknown signal: " + name);
     }
   }
 

@@ -36,7 +36,7 @@ sealed class SignalOperatorExpr : AbstractOperandExpr, IValueExpr {
       : base(name, operands) {
     AsserNumberOfOperandsExact(1);
     if (Operands[0] is not SymbolExpr symbol || !SignalNameRegexp.IsMatch(symbol.Value)) {
-      throw new ScriptError("Bad signal name: " + Operands[0]);
+      throw new ScriptError.ParsingError("Bad signal name: " + Operands[0]);
     }
     var signalName = symbol.Value;
     if (!context.IsPreprocessor) {

@@ -18,7 +18,7 @@ sealed class ConstantValueExpr : IValueExpr {
     }
     if (token[0] >= '0' && token[0] <= '9' || token[0] == '-') {
       if (!int.TryParse(token, out var number)) {
-        throw new ScriptError($"Invalid number literal: {token}");
+        throw new ScriptError.ParsingError($"Invalid number literal: {token}");
       }
       return new ConstantValueExpr { ValueType = ScriptValue.TypeEnum.Number, ValueFn = () => ScriptValue.Of(number) };
     }

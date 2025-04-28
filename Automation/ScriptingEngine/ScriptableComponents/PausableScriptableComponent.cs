@@ -5,7 +5,6 @@
 using System;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BuildingsBlocking;
-using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
@@ -35,12 +34,12 @@ sealed class PausableScriptableComponent : ScriptableComponentBase {
   public override Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
     var pausableBuilding = building.GetComponentFast<PausableBuilding>();
     if (pausableBuilding == null || !pausableBuilding.IsPausable()) {
-      throw new ScriptError("Building is not pausable: " + DebugEx.ObjectToString(building));
+      throw new ScriptError.BadStateError(building, "Building is not pausable");
     }
     return name switch {
         PauseActionName => args => PauseAction(pausableBuilding, args),
         ResumeActionName => args => ResumeAction(pausableBuilding, args),
-        _ => throw new ScriptError("Unknown action: " + name),
+        _ => throw new ScriptError.ParsingError("Unknown action: " + name),
     };
   }
 
@@ -49,7 +48,7 @@ sealed class PausableScriptableComponent : ScriptableComponentBase {
     return name switch {
         PauseActionName => PauseActionDef,
         ResumeActionName => ResumeActionDef,
-        _ => throw new ScriptError("Unknown action: " + name),
+        _ => throw new ScriptError.ParsingError("Unknown action: " + name),
     };
   }
 
