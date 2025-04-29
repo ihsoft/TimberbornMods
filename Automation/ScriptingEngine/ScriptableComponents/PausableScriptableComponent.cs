@@ -34,7 +34,7 @@ sealed class PausableScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override string[] GetActionNamesForBuilding(BaseComponent building) {
-    var pausableBuilding = GetPausableBuilding(building);
+    var pausableBuilding = GetPausableBuilding(building, throwIfNotFound: false);
     return pausableBuilding ? [PauseActionName, ResumeActionName] : [];
   }
 
@@ -87,12 +87,15 @@ sealed class PausableScriptableComponent : ScriptableComponentBase {
 
   #region Implementation
 
-  static PausableBuilding GetPausableBuilding(BaseComponent building) {
+  static PausableBuilding GetPausableBuilding(BaseComponent building, bool throwIfNotFound = true) {
     var pausable = building.GetComponentFast<PausableBuilding>();
-    if (!pausable || !pausable.IsPausable()) {
+    if (pausable && pausable.IsPausable()) {
+      return pausable;
+    }
+    if (throwIfNotFound) {
       throw new ScriptError.BadStateError(building, "Building is not pausable");
     }
-    return pausable;
+    return null;
   }
 
   #endregion
