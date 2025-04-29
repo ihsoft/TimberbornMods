@@ -30,7 +30,7 @@ public record struct ScriptValue {
     return new ScriptValue { _string = literal };
   }
 
-  /// <summary>Creates a new value from, a raw number.</summary>
+  /// <summary>Creates a new value from a raw number.</summary>
   /// <param name="number">A 2-digits fixed precision real number.</param>
   public static ScriptValue Of(int number) {
     return new ScriptValue { _number = number };
@@ -44,6 +44,11 @@ public record struct ScriptValue {
   /// <summary>Creates a new value that represents an integer value.</summary>
   public static ScriptValue FromInt(int value) {
     return new ScriptValue { _number = value * 100 };
+  }
+
+  /// <summary>Creates a new value that represents a boolean value.</summary>
+  public static ScriptValue FromBool(bool flag) {
+    return new ScriptValue { _number = flag ? 100 : 0 };
   }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
