@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using IgorZ.Automation.AutomationSystem;
 using Timberborn.BaseComponentSystem;
 using UnityDev.Utils.LogUtilsLite;
 
@@ -15,6 +14,13 @@ namespace IgorZ.Automation.ScriptingEngine;
 sealed class ScriptingService {
 
   #region API
+
+  /// <summary>Signal callback wrapper.</summary>
+  public readonly record struct SignalCallback(string Name, ISignalListener SignalListener) {
+    public override string ToString() =>
+        string.Format("SignalCallback(Host={0},OwnerBuilding={1}, Name={2})",
+                      SignalListener.GetHashCode(), SignalListener.Behavior, Name);
+  }
 
   /// <summary>Registers a new scriptable component.</summary>
   public void RegisterScriptable(IScriptable scriptable) {
@@ -36,6 +42,14 @@ sealed class ScriptingService {
   /// <inheritdoc cref="IScriptable.GetSignalDefinition"/>
   public SignalDef GetSignalDefinition(string name, BaseComponent building) {
     return ExecuteOnRegisteredComponent(name, scriptable => scriptable.GetSignalDefinition(name, building));
+  }
+
+  public Func<object> GetPropertySource(string name, BaseComponent building) {
+    var nameItems = name.Split('.');
+    if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
+      throw new ScriptError.ParsingError("Unknown scriptable component: " + nameItems[0]);
+    }
+    return scriptable.GetPropertySource(name, building);
   }
 
   /// <inheritdoc cref="IScriptable.GetActionNamesForBuilding"/>
@@ -94,23 +108,16 @@ sealed class ScriptingService {
     }
   }
 
-  string GetExecutionLog() {
-    return string.Join("\n", _signalsQueue.Select(x => $"{DebugEx.ObjectToString(x.SignalListener.Behavior)}:{x.Name}"));
-  }
-
-  readonly Queue<SignalCallback> _signalsQueue = new();
-
-  public readonly record struct SignalCallback(string Name, ISignalListener SignalListener) {
-    public override string ToString() =>
-        string.Format("SignalCallback(Host={0},OwnerBuilding={1}, Name={2})",
-                      SignalListener.GetHashCode(), SignalListener.Behavior, Name);
-  }
-
   #endregion
 
   #region Implementation
 
   readonly Dictionary<string, IScriptable> _registeredScriptables = [];
+  readonly Queue<SignalCallback> _signalsQueue = new();
+
+  string GetExecutionLog() {
+    return string.Join("\n", _signalsQueue.Select(x => $"{DebugEx.ObjectToString(x.SignalListener.Behavior)}:{x.Name}"));
+  }
 
   void ExecuteOnRegisteredComponent(string name, Action<IScriptable> action) {
     var nameItems = name.Split('.');
