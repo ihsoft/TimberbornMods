@@ -44,12 +44,12 @@ sealed class ActionExpr : AbstractOperandExpr {
     for (var i = 0; i < _actionDef.Arguments.Length; i++) {
       var operand = Operands[i + 1];
       if (operand is not IValueExpr valueExpr) {
-        throw new ScriptError.ParsingError($"Operand #{i + 1} must be a value, found: {operand}");
+        throw new ScriptError.ParsingError($"Argument #{i + 1} must be a value, but found: {operand}");
       }
       var argDef = _actionDef.Arguments[i];
       if (argDef.ValueType != valueExpr.ValueType) {
         throw new ScriptError.ParsingError(
-            $"Incompatible argument type #{i + 1}: {valueExpr.ValueType} is not {argDef.ValueType}");
+            $"Argument #{i + 1} must be of type '{argDef.ValueType}', but found: {valueExpr.ValueType}");
       }
       argValues[i] = valueExpr.ValueFn;
     }
