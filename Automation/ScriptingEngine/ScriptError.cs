@@ -26,9 +26,6 @@ class ScriptError : Exception {
   /// <remarks>This indicated an unrecoverable error on the script.</remarks>
   public sealed class RuntimeError(string reason) : ScriptError(reason);
 
-  /// <summary>Binary operator returned "false" during preprocessor statement execution.</summary>
-  public sealed class PreprocessorCheck(string reason) : ScriptError(reason);
-
   /// <summary>The script source is invalid and can't be properly parsed.</summary>
   public sealed class ParsingError(string reason) : ScriptError(reason);
 
@@ -38,5 +35,5 @@ class ScriptError : Exception {
   /// parsing, then it should be reported as <see cref="ScriptError.RuntimeError"/>.
   /// </remarks>
   public sealed class BadStateError(BaseComponent component, string reason)
-      : ScriptError($"[{DebugEx.ObjectToString(component)}]: {reason}");
+      : ScriptError($"{DebugEx.ObjectToString(component)}: {reason}");
 }

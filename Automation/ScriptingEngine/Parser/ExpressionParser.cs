@@ -48,7 +48,7 @@ sealed class ExpressionParser {
       return CommonFormats.HighlightYellow(expression.Describe());
     } catch (ScriptError e) {
       if (logErrors) {
-        DebugEx.Error("Failed to get description from: {0}\n{1}", expression.Serialize(), e);
+        DebugEx.Error("Failed to get description from: {0}\n{1}", expression, e);
       }
       return CommonFormats.HighlightRed(_loc.T(RuntimeErrorLocKey));
     }
@@ -91,7 +91,8 @@ sealed class ExpressionParser {
       var parsedExpression = ProcessString(expression);
       if (parsedExpression is BinaryOperatorExpr binaryOperatorExpr) {
         if (!binaryOperatorExpr.Execute()) {
-          throw new ScriptError.PreprocessorCheck("Expression is not true: " + expression);
+          throw new ScriptError.BadStateError(
+              CurrentContext.ScriptHost, "Preprocessor expression is not true: " + expression);
         }
         return "";
       }
