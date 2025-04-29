@@ -115,7 +115,7 @@ sealed class ScriptingService {
   void ExecuteOnRegisteredComponent(string name, Action<IScriptable> action) {
     var nameItems = name.Split('.');
     if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
-      throw new InvalidOperationException("Unknown scriptable component: " + nameItems[0]);
+      throw new ScriptError.ParsingError("Unknown scriptable component: " + nameItems[0]);
     }
     action(scriptable);
   }
@@ -123,7 +123,7 @@ sealed class ScriptingService {
   T ExecuteOnRegisteredComponent<T>(string name, Func<IScriptable,T> action) {
     var nameItems = name.Split('.');
     if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
-      throw new InvalidOperationException("Unknown scriptable component: " + nameItems[0]);
+      throw new ScriptError.ParsingError("Unknown scriptable component: " + nameItems[0]);
     }
     return action(scriptable);
   }
