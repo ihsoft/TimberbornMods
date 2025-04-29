@@ -33,6 +33,11 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
   }
 
   /// <inheritdoc/>
+  public virtual Func<object> GetPropertySource(string name, BaseComponent building) {
+    throw new ScriptError.ParsingError("Property not found: " + name);
+  }
+
+  /// <inheritdoc/>
   public virtual string[] GetActionNamesForBuilding(BaseComponent building) => [];
 
   /// <inheritdoc/>

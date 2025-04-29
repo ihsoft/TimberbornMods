@@ -16,10 +16,11 @@ interface IScriptable {
   /// <remarks>It is an expensive call. Don't execute it in the tick handlers.</remarks>
   public string[] GetSignalNamesForBuilding(BaseComponent building);
 
-  /// <summary>Returns a signal source that can be used to monitor the specified signal value.</summary>
+  /// <summary>Returns a signal value source.</summary>
   /// <param name="name">The name of the signal.</param>
   /// <param name="building">The component on which the action is to be executed.</param>
   /// <exception cref="ScriptError">if the signal is not found.</exception>
+  /// <seealso cref="RegisterSignalChangeCallback"/>
   public Func<ScriptValue> GetSignalSource(string name, BaseComponent building);
 
   /// <summary>Returns the definition of the signal with the specified name.</summary>
@@ -27,6 +28,13 @@ interface IScriptable {
   /// <param name="building">The component on which the action is to be executed.</param>
   /// <exception cref="ScriptError">if the signal is not found.</exception>
   public SignalDef GetSignalDefinition(string name, BaseComponent building);
+
+  /// <summary>Returns a property value source.</summary>
+  /// <remarks>
+  /// It is a very basic value accessor. It is similar to a signal, but there are no callbacks and definitions.
+  /// Primarily used by the "GetProperty" operators.
+  /// </remarks>
+  public Func<object> GetPropertySource(string name, BaseComponent building);
 
   /// <summary>Returns the names of actions that can be executed on the specified building.</summary>
   /// <remarks>It is an expensive call. Don't execute it in the tick handlers.</remarks>
