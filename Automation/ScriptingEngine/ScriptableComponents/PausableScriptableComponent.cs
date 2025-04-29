@@ -15,6 +15,8 @@ sealed class PausableScriptableComponent : ScriptableComponentBase {
 
   const string PauseActionName = "Pausable.Pause";
   const string ResumeActionName = "Pausable.Unpause";
+  // FIXME: this is a workaround to let the precondition check. Drop it when "has" operator is implemented.
+  const string IsPausablePropertyName = "Pausable.IsPausable";
 
   #region ScriptableComponentBase implementation
 
@@ -22,24 +24,27 @@ sealed class PausableScriptableComponent : ScriptableComponentBase {
   public override string Name => "Pausable";
 
   /// <inheritdoc/>
+  public override Func<object> GetPropertySource(string name, BaseComponent building) {
+    var pausableBuilding = GetPausableBuilding(building);
+    return name switch {
+        IsPausablePropertyName => () => pausableBuilding.IsPausable(),
+        _ => base.GetPropertySource(name, building),
+    };
+  }
+
+  /// <inheritdoc/>
   public override string[] GetActionNamesForBuilding(BaseComponent building) {
-    var pausable = building.GetComponentFast<PausableBuilding>();
-    if (pausable && pausable.IsPausable()) {
-      return [PauseActionName, ResumeActionName];
-    }
-    return [];
+    var pausableBuilding = GetPausableBuilding(building);
+    return pausableBuilding ? [PauseActionName, ResumeActionName] : [];
   }
 
   /// <inheritdoc/>
   public override Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
-    var pausableBuilding = building.GetComponentFast<PausableBuilding>();
-    if (pausableBuilding == null || !pausableBuilding.IsPausable()) {
-      throw new ScriptError.BadStateError(building, "Building is not pausable");
-    }
+    var pausableBuilding = GetPausableBuilding(building);
     return name switch {
         PauseActionName => args => PauseAction(pausableBuilding, args),
         ResumeActionName => args => ResumeAction(pausableBuilding, args),
-        _ => throw new ScriptError.ParsingError("Unknown action: " + name),
+        _ => base.GetActionExecutor(name, building),
     };
   }
 
@@ -48,7 +53,7 @@ sealed class PausableScriptableComponent : ScriptableComponentBase {
     return name switch {
         PauseActionName => PauseActionDef,
         ResumeActionName => ResumeActionDef,
-        _ => throw new ScriptError.ParsingError("Unknown action: " + name),
+        _ => base.GetActionDefinition(name, _),
     };
   }
 
@@ -76,6 +81,18 @@ sealed class PausableScriptableComponent : ScriptableComponentBase {
 
   static void ResumeAction(PausableBuilding instance, ScriptValue[] _) {
     instance.Resume();
+  }
+
+  #endregion
+
+  #region Implementation
+
+  static PausableBuilding GetPausableBuilding(BaseComponent building) {
+    var pausable = building.GetComponentFast<PausableBuilding>();
+    if (!pausable || !pausable.IsPausable()) {
+      throw new ScriptError.BadStateError(building, "Building is not pausable");
+    }
+    return pausable;
   }
 
   #endregion
