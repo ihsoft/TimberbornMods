@@ -95,10 +95,10 @@ class GetPropertyOperatorExpr : AbstractOperandExpr, IValueExpr {
     };
   }
 
-  static BaseComponent GetComponentByName(BaseComponent baseComponent, string name) {
+  internal static BaseComponent GetComponentByName(BaseComponent baseComponent, string name) {
     if (name == "Inventory") {
       // Special case: the buildings can have more than one inventory. 
-      return InventoryScriptableComponent.GetInventory(baseComponent);
+      return InventoryScriptableComponent.GetInventory(baseComponent, throwIfNotFound: false);
     }
     var components = baseComponent.AllComponents.OfType<BaseComponent>();
     return components.FirstOrDefault(x => x.enabled && x.GetType().Name == name);

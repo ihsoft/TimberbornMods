@@ -15,22 +15,11 @@ sealed class PausableScriptableComponent : ScriptableComponentBase {
 
   const string PauseActionName = "Pausable.Pause";
   const string ResumeActionName = "Pausable.Unpause";
-  // FIXME: this is a workaround to let the precondition check. Drop it when "has" operator is implemented.
-  const string IsPausablePropertyName = "Pausable.IsPausable";
 
   #region ScriptableComponentBase implementation
 
   /// <inheritdoc/>
   public override string Name => "Pausable";
-
-  /// <inheritdoc/>
-  public override Func<object> GetPropertySource(string name, BaseComponent building) {
-    var pausableBuilding = GetPausableBuilding(building);
-    return name switch {
-        IsPausablePropertyName => () => pausableBuilding.IsPausable(),
-        _ => base.GetPropertySource(name, building),
-    };
-  }
 
   /// <inheritdoc/>
   public override string[] GetActionNamesForBuilding(BaseComponent building) {

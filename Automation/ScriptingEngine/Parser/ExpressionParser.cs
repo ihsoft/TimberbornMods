@@ -201,7 +201,8 @@ sealed class ExpressionParser {
         ?? ActionExpr.TryCreateFrom(CurrentContext, operatorName, operands)
         ?? LogicalOperatorExpr.TryCreateFrom(operatorName, operands)
         ?? MathOperatorExpr.TryCreateFrom(operatorName, operands)
-        ?? GetPropertyOperatorExpr.TryCreateFrom(CurrentContext, operatorName, operands);
+        ?? GetPropertyOperatorExpr.TryCreateFrom(CurrentContext, operatorName, operands)
+        ?? HasComponentOperatorExpr.TryCreateFrom(CurrentContext, operatorName, operands);
     if (result == null) {
       throw new ScriptError.ParsingError("Unknown operator: " + operatorName);
     }

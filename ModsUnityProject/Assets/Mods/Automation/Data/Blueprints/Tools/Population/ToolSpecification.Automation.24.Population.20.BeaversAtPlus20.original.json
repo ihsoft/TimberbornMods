@@ -15,7 +15,7 @@
         "Condition": {
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
-            { "Name": "Precondition", "StrValue": "(and (ge (sig District.Beavers) 0) (gt (getnum Pausable.IsPausable) 0))" },
+            { "Name": "Precondition", "StrValue": "(has 'District.' 'Pausable.')" },
             { "Name": "Expression", "StrValue": "(lt (sig District.Beavers) {% (add (sig District.Beavers) 2000) %})" }
           ]
         },
@@ -30,7 +30,7 @@
         "Condition": {
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
-            { "Name": "Precondition", "StrValue": "(and (ge (sig District.Beavers) 0) (gt (getnum Pausable.IsPausable) 0))" },
+            { "Name": "Precondition", "StrValue": "(has 'District.' 'Pausable.')" },
             { "Name": "Expression", "StrValue": "(ge (sig District.Beavers) {% (add (sig District.Beavers) 2000) %})" }
           ]
         },

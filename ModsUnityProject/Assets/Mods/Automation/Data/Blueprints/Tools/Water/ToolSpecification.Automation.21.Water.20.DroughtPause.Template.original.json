@@ -15,7 +15,7 @@
         "Condition": {
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
-            { "Name": "Precondition", "StrValue": "(ge (getnum Pausable.IsPausable) 0)" },
+            { "Name": "Precondition", "StrValue": "(has 'Pausable.')" },
             { "Name": "Expression", "StrValue": "(eq (sig Weather.Season) 'drought')" }
           ]
         },
@@ -30,7 +30,7 @@
         "Condition": {
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
-            { "Name": "Precondition", "StrValue": "(ge (getnum Pausable.IsPausable) 0)" },
+            { "Name": "Precondition", "StrValue": "(has 'Pausable.')" },
             { "Name": "Expression", "StrValue": "(ne (sig Weather.Season) 'drought')" }
           ]
         },
