@@ -15,13 +15,14 @@
         "Condition": {
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
-            { "Name": "Expression", "StrValue": "(eq (sig Weather.Season) 'temperate')"}
+            { "Name": "Precondition", "StrValue": "(ge (getnum Floodgate.MaxHeight) 0)" },
+            { "Name": "Expression", "StrValue": "(eq (sig Weather.Season) 'temperate')" }
           ]
         },
         "Action": {
           "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
           "Parameters": [
-            { "Name": "Expression", "StrValue": "(act Floodgate.SetHeight {% (sub (getnum Floodgate.MaxHeight) 50) %})"}
+            { "Name": "Expression", "StrValue": "(act Floodgate.SetHeight {% (sub (getnum Floodgate.MaxHeight) 50) %})" }
           ]
         }
       }

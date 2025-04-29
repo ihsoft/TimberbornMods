@@ -27,10 +27,11 @@ sealed class ScriptedAction : AutomationActionBase {
   }
 
   /// <inheritdoc/>
-  public override string UiDescription => _uiDescription
-      ?? CommonFormats.HighlightYellow(
-          DependencyContainer.GetInstance<ExpressionParser>().GetDescription(_parsedExpression));
-  string _uiDescription;
+  public override string UiDescription =>
+      _parsedExpression != null
+      ? DependencyContainer.GetInstance<ExpressionParser>().GetDescription(_parsedExpression)
+      : CommonFormats.HighlightRed(
+          Behavior.Loc.T(_parsingResult.ParsedExpression == null ? ParseErrorLocKey : RuntimeErrorLocKey));
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
@@ -38,11 +39,7 @@ sealed class ScriptedAction : AutomationActionBase {
       return _lastValidationResult;
     }
     _lastValidatedBehavior = behavior;
-    var result = DependencyContainer.GetInstance<ExpressionParser>().Parse(Expression, behavior);
-    _lastValidationResult = result.ParsedExpression != null;
-    if (!_lastValidationResult && Keyboard.current.ctrlKey.isPressed) {
-      HostedDebugLog.Warning(behavior, "Validation didn't pass: {0}\n{1}", Expression, result.LastScriptError);
-    }
+    _lastValidationResult = ParseAndValidate(Expression, behavior) is { ParsedExpression: not null };
     return _lastValidationResult;
   }
 
@@ -59,14 +56,11 @@ sealed class ScriptedAction : AutomationActionBase {
       return;
     }
     try {
-      _uiDescription = null;
       _parsedExpression.Execute();
     } catch (ScriptError.Interrupted e) {
-      HostedDebugLog.Fine(Behavior, "Action execution interrupted: {0}\nReason: {1}", Expression, e.Message);
-      _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(RuntimeErrorLocKey));
+      HostedDebugLog.Fine(Behavior, "Action execution interrupted: {0}\nError: {1}", Expression, e.Message);
     } catch (ScriptError e) {
-      HostedDebugLog.Error(Behavior, "Action failed: {0}\nError: {1}", Expression, e.Message);
-      _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(RuntimeErrorLocKey));
+      HostedDebugLog.Error(Behavior, "Action execution failed: {0}\nError: {1}", Expression, e.Message);
       _parsedExpression = null;
       Behavior.ReportError(this);
     }
@@ -81,13 +75,14 @@ sealed class ScriptedAction : AutomationActionBase {
   /// <inheritdoc/>
   protected override void OnBehaviorToBeCleared() {
     base.OnBehaviorToBeCleared();
+    if (_parsingResult.ReferencedActions != null) {
+      var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
+      foreach (var signal in _parsingResult.ReferencedActions) {
+        scriptingService.UninstallAction(signal, Behavior);
+      }
+    }
     if (_parsedExpression == null) {
       Behavior.ClearError(this);
-      return;
-    }
-    var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
-    foreach (var signal in _parsingResult.ReferencedActions) {
-      scriptingService.UninstallAction(signal, Behavior);
     }
   }
 
@@ -146,17 +141,15 @@ sealed class ScriptedAction : AutomationActionBase {
       return null;
     }
     if (result.ParsedExpression is not ActionExpr) {
-      HostedDebugLog.Error(behavior, "Expression is not an action operator: {0}", result.ParsedExpression.Serialize());
+      HostedDebugLog.Error(behavior, "Expression is not an action operator: {0}", result.ParsedExpression);
       return null;
     }
     return result;
   }
 
   void ParseAndApply() {
-    _uiDescription = null;
     var result = ParseAndValidate(Expression, Behavior);
     if (result == null) {
-      _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
       Behavior.ReportError(this);
       return;
     }

@@ -23,10 +23,11 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   #region AutomationConditionBase overrides
 
   /// <inheritdoc/>
-  public override string UiDescription => _uiDescription
-      ?? CommonFormats.HighlightYellow(
-          DependencyContainer.GetInstance<ExpressionParser>().GetDescription(_parsedExpression));
-  string _uiDescription;
+  public override string UiDescription =>
+      _parsedExpression != null
+      ? DependencyContainer.GetInstance<ExpressionParser>().GetDescription(_parsedExpression)
+      : CommonFormats.HighlightRed(
+          Behavior.Loc.T(_parsingResult.ParsedExpression == null ? ParseErrorLocKey : RuntimeErrorLocKey));
 
   /// <inheritdoc/>
   public override void SyncState() {
@@ -42,13 +43,14 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
 
   /// <inheritdoc/>
   protected override void OnBehaviorToBeCleared() {
+    if (_parsingResult.ReferencedSignals != null) {
+      var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
+      foreach (var signal in _parsingResult.ReferencedSignals) {
+        scriptingService.UnregisterSignalChangeCallback(signal, this);
+      }
+    }
     if (_parsedExpression == null) {
       Behavior.ClearError(this);
-      return;
-    }
-    var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
-    foreach (var signal in _parsingResult.ReferencedSignals) {
-      scriptingService.UnregisterSignalChangeCallback(signal, this);
     }
   }
 
@@ -63,14 +65,10 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
       return _lastValidationResult;
     }
     _lastValidatedBehavior = behavior;
-    if (!CheckPrecondition(behavior)) {
+    if (CheckPrecondition(behavior)) {
+      _lastValidationResult = ParseAndValidate(Expression, behavior) is { ParsedExpression: not null };
+    } else {
       _lastValidationResult = false;
-      return false;
-    }
-    var result = DependencyContainer.GetInstance<ExpressionParser>().Parse(Expression, behavior);
-    _lastValidationResult = result.ParsedExpression != null;
-    if (!_lastValidationResult && Keyboard.current.ctrlKey.isPressed) {
-      HostedDebugLog.Warning(behavior, "Validation didn't pass: {0}\n{1}", Expression, result.LastScriptError);
     }
     return _lastValidationResult;
   }
@@ -154,7 +152,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
       return null;
     }
     if (result.ParsedExpression is not BoolOperatorExpr) {
-      HostedDebugLog.Error(behavior, "Expression is not a boolean operator: {0}", result.ParsedExpression.Serialize());
+      HostedDebugLog.Error(behavior, "Expression is not a boolean operator: {0}", result.ParsedExpression);
       return null;
     }
     if (result.ReferencedSignals.Length == 0) {
@@ -165,10 +163,8 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   }
 
   void ParseAndApply() {
-    _uiDescription = null;
     var result = ParseAndValidate(Expression, Behavior);
     if (result == null) {
-      _uiDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
       Behavior.ReportError(this);
       return;
     }
@@ -189,8 +185,10 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
     var needLogs = Keyboard.current.ctrlKey.isPressed;
     var result = DependencyContainer.GetInstance<ExpressionParser>().Parse(Precondition, behavior);
     if (result.ParsedExpression == null) {
-      if (needLogs) {
+      if (result.LastScriptError is not ScriptError.BadStateError) {
         HostedDebugLog.Error(behavior, "Failed to parse precondition: {0}\nError: {1}", Precondition, result.LastError);
+      } else if (needLogs) {
+        HostedDebugLog.Info(behavior, "Precondition doesn't apply: {0}\nError: {1}", Precondition, result.LastError);
       }
       return false;
     }
@@ -200,7 +198,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
     }
     var resultValue = boolOperatorExpr.Execute();
     if (!resultValue && needLogs) {
-      HostedDebugLog.Warning(behavior, "Precondition didn't pass: {0}", boolOperatorExpr.Serialize());
+      HostedDebugLog.Info(behavior, "Precondition didn't pass: {0}", Precondition);
     }
     return resultValue;
   }
@@ -214,14 +212,12 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
       return;
     }
     try {
-      _uiDescription = null;
       ConditionState = _parsedExpression.Execute();
     } catch (ScriptError.Interrupted e) {
       HostedDebugLog.Fine(Behavior, "Condition execution interrupted: {0}\nReason: {1}", Expression, e.Message);
     } catch (ScriptError e) {
-      HostedDebugLog.Error(Behavior, "Error in condition execution: {0}\nReason: {1}", Expression, e.Message);
+      HostedDebugLog.Error(Behavior, "Condition execution failed: {0}\nReason: {1}", Expression, e.Message);
       _parsedExpression = null;
-      _uiDescription = Behavior.Loc.T(RuntimeErrorLocKey);
       Behavior.ReportError(this);
     }
   }

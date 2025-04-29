@@ -15,6 +15,7 @@
         "Condition": {
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
+            { "Name": "Precondition", "StrValue": "(ge (getnum Floodgate.MaxHeight) 0)" },
             { "Name": "Expression", "StrValue": "(eq (sig Weather.Season) 'temperate')"}
           ]
         },

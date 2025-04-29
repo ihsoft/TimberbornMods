@@ -15,7 +15,8 @@
         "Condition": {
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
-            { "Name": "Expression", "StrValue": "(lt (sig District.Beavers) (sig District.NumberOfBeds))"}
+            { "Name": "Precondition", "StrValue": "(and (ge (sig District.NumberOfBeds) 0) (gt (getnum Pausable.IsPausable) 0))" },
+            { "Name": "Expression", "StrValue": "(lt (sig District.Beavers) (sig District.NumberOfBeds))" }
           ]
         },
         "Action": {
@@ -29,7 +30,8 @@
         "Condition": {
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
-            { "Name": "Expression", "StrValue": "(ge (sig District.Beavers) (sig District.NumberOfBeds))"}
+            { "Name": "Precondition", "StrValue": "(and (ge (sig District.NumberOfBeds) 0) (gt (getnum Pausable.IsPausable) 0))" },
+            { "Name": "Expression", "StrValue": "(ge (sig District.Beavers) (sig District.NumberOfBeds))" }
           ]
         },
         "Action": {

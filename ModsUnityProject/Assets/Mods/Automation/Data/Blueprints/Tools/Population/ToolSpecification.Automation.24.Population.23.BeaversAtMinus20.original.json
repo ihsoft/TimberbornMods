@@ -15,13 +15,14 @@
         "Condition": {
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
-            { "Name": "Expression", "StrValue": "(lt (sig District.Beavers) {% (max 0 (sub (sig District.Beavers) 2000)) %})"}
+            { "Name": "Precondition", "StrValue": "(and (ge (sig District.Beavers) 0) (gt (getnum Pausable.IsPausable) 0))" },
+            { "Name": "Expression", "StrValue": "(lt (sig District.Beavers) {% (max 0 (sub (sig District.Beavers) 2000)) %})" }
           ]
         },
         "Action": {
           "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
           "Parameters": [
-            { "Name": "Expression", "StrValue": "(act Pausable.Unpause)"}
+            { "Name": "Expression", "StrValue": "(act Pausable.Unpause)" }
           ]
         }
       },
@@ -29,13 +30,14 @@
         "Condition": {
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
-            { "Name": "Expression", "StrValue": "(ge (sig District.Beavers) {% (max 0 (sub (sig District.Beavers) 2000)) %})"}
+            { "Name": "Precondition", "StrValue": "(and (ge (sig District.Beavers) 0) (gt (getnum Pausable.IsPausable) 0))" },
+            { "Name": "Expression", "StrValue": "(ge (sig District.Beavers) {% (max 0 (sub (sig District.Beavers) 2000)) %})" }
           ]
         },
         "Action": {
           "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
           "Parameters": [
-            { "Name": "Expression", "StrValue": "(act Pausable.Pause)"}
+            { "Name": "Expression", "StrValue": "(act Pausable.Pause)" }
           ]
         }
       }
