@@ -19,7 +19,7 @@ sealed class ScriptingService {
   public readonly record struct SignalCallback(string Name, ISignalListener SignalListener) {
     public override string ToString() =>
         string.Format("SignalCallback(Host={0},OwnerBuilding={1}, Name={2})",
-                      SignalListener.GetHashCode(), SignalListener.Behavior, Name);
+                      SignalListener.GetHashCode(), DebugEx.ObjectToString(SignalListener.Behavior), Name);
   }
 
   /// <summary>Registers a new scriptable component.</summary>
@@ -90,21 +90,17 @@ sealed class ScriptingService {
   }
 
   internal void ScheduleSignalCallback(SignalCallback callback) {
-    if (_signalsQueue.Contains(callback)) {
-      DebugEx.Error("Circular execution of signal '{0}' on {1}. Execution log:\n{2}",
-                    callback.Name, DebugEx.ObjectToString(callback.SignalListener), GetExecutionLog());
-      throw new ScriptError.RuntimeError(
-          $"Circular execution of signal '{callback.Name}' on {DebugEx.ObjectToString(callback.SignalListener)}");
+    if (_callbackStack.Contains(callback)) {
+      HostedDebugLog.Error(callback.SignalListener.Behavior, "Circular execution of signal '{0}'. Execution log:\n{1}",
+                           callback.Name, GetExecutionLog());
+      throw new ScriptError.RuntimeError($"Circular execution of signal '{callback.Name}'");
     }
-    _signalsQueue.Enqueue(callback);
     try {
-      callback = _signalsQueue.Peek();
       DebugEx.Fine("Executing signal callback: {0}", callback);
+      _callbackStack.Push(callback);
       callback.SignalListener.OnValueChanged(callback.Name);
-      _signalsQueue.Dequeue();
-    } catch (ScriptError) {
-      DebugEx.Warning("Aborting signal chain execution while having queued items: {0}", GetExecutionLog());
-      _signalsQueue.Clear();
+    } finally {
+      _callbackStack.Pop();
     }
   }
 
@@ -113,10 +109,10 @@ sealed class ScriptingService {
   #region Implementation
 
   readonly Dictionary<string, IScriptable> _registeredScriptables = [];
-  readonly Queue<SignalCallback> _signalsQueue = new();
+  readonly Stack<SignalCallback> _callbackStack = new();
 
   string GetExecutionLog() {
-    return string.Join("\n", _signalsQueue.Select(x => $"{DebugEx.ObjectToString(x.SignalListener.Behavior)}:{x.Name}"));
+    return string.Join("\n", _callbackStack.Select(x => $"{DebugEx.ObjectToString(x.SignalListener.Behavior)}:{x.Name}"));
   }
 
   void ExecuteOnRegisteredComponent(string name, Action<IScriptable> action) {
