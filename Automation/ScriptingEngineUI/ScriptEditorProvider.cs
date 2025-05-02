@@ -89,8 +89,12 @@ sealed class ScriptEditorProvider : IEditorProvider {
       if (isCondition) {
         if (result.ParsedExpression is not BoolOperatorExpr) {
           error = _uiFactory.T(ConditionMustBeBoolLocKey);
-        } else if (result.ReferencedSignals.Length == 0) {
-          error = _uiFactory.T(ConditionMustHaveSignalsLocKey);
+        } else {
+          var hasSignals = false;
+          result.ParsedExpression.VisitNodes(x => { hasSignals |= x is SignalOperatorExpr; });
+          if (!hasSignals) {
+            error = _uiFactory.T(ConditionMustHaveSignalsLocKey);
+          }
         }
       } else {
         if (result.ParsedExpression is not ActionExpr) {

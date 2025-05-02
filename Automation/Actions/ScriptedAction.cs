@@ -10,7 +10,6 @@ using IgorZ.TimberDev.UI;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.Persistence;
 using UnityDev.Utils.LogUtilsLite;
-using UnityEngine.InputSystem;
 
 namespace IgorZ.Automation.Actions;
 
@@ -61,7 +60,7 @@ sealed class ScriptedAction : AutomationActionBase {
       HostedDebugLog.Fine(Behavior, "Action execution interrupted: {0}\nError: {1}", Expression, e.Message);
     } catch (ScriptError e) {
       HostedDebugLog.Error(Behavior, "Action execution failed: {0}\nError: {1}", Expression, e.Message);
-      _parsedExpression = null;
+      SetParsedExpression(null);
       Behavior.ReportError(this);
     }
   }
@@ -75,13 +74,9 @@ sealed class ScriptedAction : AutomationActionBase {
   /// <inheritdoc/>
   protected override void OnBehaviorToBeCleared() {
     base.OnBehaviorToBeCleared();
-    if (_parsingResult.ReferencedActions != null) {
-      var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
-      foreach (var signal in _parsingResult.ReferencedActions) {
-        scriptingService.UninstallAction(signal, Behavior);
-      }
-    }
-    if (_parsedExpression == null) {
+    if (_parsedExpression != null) {
+      SetParsedExpression(null);
+    } else {
       Behavior.ClearError(this);
     }
   }
@@ -154,12 +149,18 @@ sealed class ScriptedAction : AutomationActionBase {
       return;
     }
     _parsingResult = result.Value;
-    _parsedExpression = _parsingResult.ParsedExpression as ActionExpr;
+    SetParsedExpression(_parsingResult.ParsedExpression);
     Expression = _parsedExpression!.Serialize();
+  }
 
+  void SetParsedExpression(IExpression expression) {
     var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
-    foreach (var action in _parsingResult.ReferencedActions) {
-      scriptingService.InstallAction(action, Behavior);
+    if (_parsedExpression != null) {
+      scriptingService.UninstallActions(_parsedExpression, Behavior);
+    }
+    _parsedExpression = expression as ActionExpr;
+    if (_parsedExpression != null) {
+      scriptingService.InstallActions(_parsedExpression, Behavior);
     }
   }
 

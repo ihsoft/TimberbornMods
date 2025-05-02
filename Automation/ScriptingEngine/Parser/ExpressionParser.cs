@@ -32,8 +32,6 @@ sealed class ExpressionParser {
       var parsedExpression = ProcessString(input);
       return new ParsingResult {
           ParsedExpression = parsedExpression,
-          ReferencedSignals = CurrentContext.ReferencedSignals.ToArray(),
-          ReferencedActions = CurrentContext.ReferencedActions.ToArray(),
       };
     } catch (ScriptError e) {
       return new ParsingResult { LastScriptError = e };

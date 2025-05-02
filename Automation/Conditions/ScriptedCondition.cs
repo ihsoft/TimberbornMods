@@ -43,13 +43,9 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
 
   /// <inheritdoc/>
   protected override void OnBehaviorToBeCleared() {
-    if (_parsingResult.ReferencedSignals != null) {
-      var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
-      foreach (var signal in _parsingResult.ReferencedSignals) {
-        scriptingService.UnregisterSignalChangeCallback(signal, this);
-      }
-    }
-    if (_parsedExpression == null) {
+    if (_parsedExpression != null) {
+      SetParsedExpression(null);
+    } else {
       Behavior.ClearError(this);
     }
   }
@@ -155,7 +151,9 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
       HostedDebugLog.Error(behavior, "Expression is not a boolean operator: {0}", result.ParsedExpression);
       return null;
     }
-    if (result.ReferencedSignals.Length == 0) {
+    var hasSignals = false;
+    result.ParsedExpression.VisitNodes(x => { hasSignals |= x is SignalOperatorExpr; });
+    if (!hasSignals) {
       HostedDebugLog.Error(behavior, "Condition has no signals: {0}", expression);
       return null;
     }
@@ -169,13 +167,8 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
       return;
     }
     _parsingResult = result.Value;
-    _parsedExpression = _parsingResult.ParsedExpression as BoolOperatorExpr;
+    SetParsedExpression(_parsingResult.ParsedExpression);
     Expression = _parsedExpression!.Serialize();
-
-    var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
-    foreach (var signal in _parsingResult.ReferencedSignals) {
-      scriptingService.RegisterSignalChangeCallback(signal, this);
-    }
   }
 
   bool CheckPrecondition(AutomationBehavior behavior) {
@@ -217,8 +210,19 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
       HostedDebugLog.Fine(Behavior, "Condition execution interrupted: {0}\nReason: {1}", Expression, e.Message);
     } catch (ScriptError e) {
       HostedDebugLog.Error(Behavior, "Condition execution failed: {0}\nReason: {1}", Expression, e.Message);
-      _parsedExpression = null;
+      SetParsedExpression(null);
       Behavior.ReportError(this);
+    }
+  }
+
+  void SetParsedExpression(IExpression expression) {
+    var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
+    if (_parsedExpression != null) {
+      scriptingService.UnregisterSignals(_parsedExpression, this);
+    }
+    _parsedExpression = expression as BoolOperatorExpr;
+    if (_parsedExpression != null) {
+      scriptingService.RegisterSignals(_parsedExpression, this);
     }
   }
 

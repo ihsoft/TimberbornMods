@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.BaseComponentSystem;
 using UnityDev.Utils.LogUtilsLite;
 
@@ -36,12 +37,12 @@ sealed class ScriptingService {
 
   /// <inheritdoc cref="IScriptable.GetSignalSource"/>
   public Func<ScriptValue> GetSignalSource(string name, BaseComponent building) {
-    return ExecuteOnRegisteredComponent(name, scriptable => scriptable.GetSignalSource(name, building));
+    return GetScriptable(name).GetSignalSource(name, building);
   }
 
   /// <inheritdoc cref="IScriptable.GetSignalDefinition"/>
   public SignalDef GetSignalDefinition(string name, BaseComponent building) {
-    return ExecuteOnRegisteredComponent(name, scriptable => scriptable.GetSignalDefinition(name, building));
+    return GetScriptable(name).GetSignalDefinition(name, building);
   }
 
   public Func<object> GetPropertySource(string name, BaseComponent building) {
@@ -61,32 +62,56 @@ sealed class ScriptingService {
 
   /// <inheritdoc cref="IScriptable.GetActionExecutor"/>
   public Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
-    return ExecuteOnRegisteredComponent(name, scriptable => scriptable.GetActionExecutor(name, building));
+    return GetScriptable(name).GetActionExecutor(name, building);
   }
 
   /// <inheritdoc cref="IScriptable.GetActionDefinition"/>
   public ActionDef GetActionDefinition(string name, BaseComponent building) {
-    return ExecuteOnRegisteredComponent(name, scriptable => scriptable.GetActionDefinition(name, building));
+    return GetScriptable(name).GetActionDefinition(name, building);
   }
 
   /// <inheritdoc cref="IScriptable.RegisterSignalChangeCallback"/>
-  public void RegisterSignalChangeCallback(string name, ISignalListener host) {
-    ExecuteOnRegisteredComponent(name, scriptable => scriptable.RegisterSignalChangeCallback(name, host));
+  public void RegisterSignals(IExpression expression, ISignalListener host) {
+    var signalNames = new HashSet<string>();
+    expression.VisitNodes(x => {
+      if (x is SignalOperatorExpr signal) {
+        signalNames.Add(signal.SignalName);
+      }
+    });
+    foreach (var signalName in signalNames) {
+      GetScriptable(signalName).RegisterSignalChangeCallback(signalName, host);
+    }
   }
 
   /// <inheritdoc cref="IScriptable.UnregisterSignalChangeCallback"/>
-  public void UnregisterSignalChangeCallback(string name, ISignalListener host) {
-    ExecuteOnRegisteredComponent(name, scriptable => scriptable.UnregisterSignalChangeCallback(name, host));
+  public void UnregisterSignals(IExpression expression, ISignalListener host) {
+    var signalNames = new HashSet<string>();
+    expression.VisitNodes(x => {
+      if (x is SignalOperatorExpr signal) {
+        signalNames.Add(signal.SignalName);
+      }
+    });
+    foreach (var signalName in signalNames) {
+      GetScriptable(signalName).UnregisterSignalChangeCallback(signalName, host);
+    }
   }
 
   /// <inheritdoc cref="IScriptable.InstallAction"/>
-  public void InstallAction(string name, BaseComponent building) {
-    ExecuteOnRegisteredComponent(name, scriptable => scriptable.InstallAction(name, building));
+  public void InstallActions(IExpression expression, BaseComponent building) {
+    expression.VisitNodes(x => {
+      if (x is ActionExpr action) {
+        GetScriptable(action.ActionName).InstallAction(action.ActionName, building);
+      }
+    });
   }
 
   /// <inheritdoc cref="IScriptable.UninstallAction"/>
-  public void UninstallAction(string name, BaseComponent building) {
-    ExecuteOnRegisteredComponent(name, scriptable => scriptable.UninstallAction(name, building));
+  public void UninstallActions(IExpression expression, BaseComponent building) {
+    expression.VisitNodes(x => {
+      if (x is ActionExpr action) {
+        GetScriptable(action.ActionName).UninstallAction(action.ActionName, building);
+      }
+    });
   }
 
   internal void ScheduleSignalCallback(SignalCallback callback) {
@@ -115,20 +140,12 @@ sealed class ScriptingService {
     return string.Join("\n", _callbackStack.Select(x => $"{DebugEx.ObjectToString(x.SignalListener.Behavior)}:{x.Name}"));
   }
 
-  void ExecuteOnRegisteredComponent(string name, Action<IScriptable> action) {
+  IScriptable GetScriptable(string name) {
     var nameItems = name.Split('.');
     if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
       throw new ScriptError.ParsingError("Unknown scriptable component: " + nameItems[0]);
     }
-    action(scriptable);
-  }
-
-  T ExecuteOnRegisteredComponent<T>(string name, Func<IScriptable,T> action) {
-    var nameItems = name.Split('.');
-    if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
-      throw new ScriptError.ParsingError("Unknown scriptable component: " + nameItems[0]);
-    }
-    return action(scriptable);
+    return scriptable;
   }
 
   #endregion

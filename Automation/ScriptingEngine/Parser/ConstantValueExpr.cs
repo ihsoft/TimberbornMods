@@ -40,6 +40,11 @@ sealed class ConstantValueExpr : IValueExpr {
   }
 
   /// <inheritdoc/>
+  public void VisitNodes(Action<IExpression> visitorFn) {
+    visitorFn(this);
+  }
+
+  /// <inheritdoc/>
   public override string ToString() {
     return $"{GetType().Name}#{Serialize()}";
   }

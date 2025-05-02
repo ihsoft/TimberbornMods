@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -27,6 +28,14 @@ abstract class AbstractOperandExpr(string name, IList<IExpression> operands) : I
 
   /// <inheritdoc/>
   public abstract string Describe();
+
+  /// <inheritdoc/>
+  public void VisitNodes(Action<IExpression> visitorFn) {
+    visitorFn(this);
+    foreach (var expression in Operands) {
+      expression.VisitNodes(visitorFn);
+    }
+  }
 
   /// <inheritdoc/>
   public override string ToString() {

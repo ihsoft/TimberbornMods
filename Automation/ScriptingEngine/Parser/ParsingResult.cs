@@ -5,12 +5,6 @@
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
 readonly record struct ParsingResult {
-  /// <summary>All the signal that are referenced in the parsed expression.</summary>
-  public string[] ReferencedSignals { get; init; }
-
-  /// <summary>All the actions that are referenced in the parsed expression.</summary>
-  public string[] ReferencedActions { get; init; }
-
   /// <summary>On successful parsing, this property will contain the parsed expression.</summary>
   public IExpression ParsedExpression { get; init; }
 

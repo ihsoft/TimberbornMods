@@ -2,6 +2,8 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
+
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
 class SymbolExpr : IExpression {
@@ -16,6 +18,11 @@ class SymbolExpr : IExpression {
   /// <inheritdoc/>
   public string Describe() {
     throw new System.NotImplementedException();
+  }
+
+  /// <inheritdoc/>
+  public void VisitNodes(Action<IExpression> visitorFn) {
+    visitorFn(this);
   }
 
   /// <inheritdoc/>
