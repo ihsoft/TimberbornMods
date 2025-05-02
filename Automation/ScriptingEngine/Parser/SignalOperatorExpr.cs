@@ -39,9 +39,6 @@ sealed class SignalOperatorExpr : AbstractOperandExpr, IValueExpr {
       throw new ScriptError.ParsingError("Bad signal name: " + Operands[0]);
     }
     var signalName = symbol.Value;
-    if (!context.IsPreprocessor) {
-      context.ReferencedSignals.Add(signalName);
-    }
     _signalDef = context.ScriptingService.GetSignalDefinition(signalName, context.ScriptHost);
     ValueType = _signalDef.Result.ValueType;
     ValueFn = context.ScriptingService.GetSignalSource(signalName, context.ScriptHost);

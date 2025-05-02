@@ -23,8 +23,7 @@ sealed class ExpressionParser {
 
   /// <summary>Parses expression for the given context.</summary>
   public ParsingResult Parse(string input, AutomationBehavior scriptHost) {
-    var parsingContext = new Context { ScriptHost = scriptHost, ScriptingService = _scriptingService };
-    _contextStack.Push(parsingContext);
+    _currentContext = new Context { ScriptHost = scriptHost, ScriptingService = _scriptingService };
     try {
       if (input.Contains("{%")) {
         input = Preprocess(input);
@@ -35,8 +34,6 @@ sealed class ExpressionParser {
       };
     } catch (ScriptError e) {
       return new ParsingResult { LastScriptError = e };
-    } finally {
-      _contextStack.Pop();
     }
   }
 
@@ -59,9 +56,6 @@ sealed class ExpressionParser {
   public record Context {
     public AutomationBehavior ScriptHost { get; init; }
     public ScriptingService ScriptingService { get; init; }
-    public HashSet<string> ReferencedSignals { get; } = [];
-    public List<string> ReferencedActions { get; } = [];
-    public bool IsPreprocessor { get; init; }
   }
 
   static readonly Regex OperatorNameRegex = new(@"^\[a-zA-Z]+$");
@@ -69,8 +63,7 @@ sealed class ExpressionParser {
   readonly ScriptingService _scriptingService;
   readonly ILoc _loc;
 
-  Context CurrentContext => _contextStack.Peek();
-  readonly Stack<Context> _contextStack = new();
+  Context _currentContext;
 
   ExpressionParser(ScriptingService scriptingService, ILoc loc) {
     _scriptingService = scriptingService;
@@ -84,28 +77,23 @@ sealed class ExpressionParser {
 
   string PreprocessorMatcher(Match match) {
     var expression = match.Groups[1].Value;
-    _contextStack.Push(CurrentContext with { IsPreprocessor = true });
-    try {
-      var parsedExpression = ProcessString(expression);
-      if (parsedExpression is BinaryOperatorExpr binaryOperatorExpr) {
-        if (!binaryOperatorExpr.Execute()) {
-          throw new ScriptError.BadStateError(
-              CurrentContext.ScriptHost, "Preprocessor expression is not true: " + expression);
-        }
-        return "";
+    var parsedExpression = ProcessString(expression);
+    if (parsedExpression is BinaryOperatorExpr binaryOperatorExpr) {
+      if (!binaryOperatorExpr.Execute()) {
+        throw new ScriptError.BadStateError(
+            _currentContext.ScriptHost, "Preprocessor expression is not true: " + expression);
       }
-      if (parsedExpression is not IValueExpr valueExpr) {
-        throw new ScriptError.ParsingError("Not a value expression: " + expression);
-      }
-      var value = valueExpr.ValueFn();
-      return value.ValueType switch {
-          ScriptValue.TypeEnum.String => value.AsString,
-          ScriptValue.TypeEnum.Number => value.AsNumber.ToString(),
-          _ => throw new InvalidOperationException("Unsupported type: " + value.ValueType),
-      };
-    } finally {
-      _contextStack.Pop();
+      return "";
     }
+    if (parsedExpression is not IValueExpr valueExpr) {
+      throw new ScriptError.ParsingError("Not a value expression: " + expression);
+    }
+    var value = valueExpr.ValueFn();
+    return value.ValueType switch {
+        ScriptValue.TypeEnum.String => value.AsString,
+        ScriptValue.TypeEnum.Number => value.AsNumber.ToString(),
+        _ => throw new InvalidOperationException("Unsupported type: " + value.ValueType),
+    };
   }
 
   static Queue<string> Tokenize(string input) {
@@ -194,13 +182,13 @@ sealed class ExpressionParser {
     // The sequence below should be ordered by the frequency of the usage. The operators that are more likely to be
     // used in the game should come first.
     var result =
-        BinaryOperatorExpr.TryCreateFrom(CurrentContext, operatorName, operands)
-        ?? SignalOperatorExpr.TryCreateFrom(CurrentContext, operatorName, operands)
-        ?? ActionExpr.TryCreateFrom(CurrentContext, operatorName, operands)
+        BinaryOperatorExpr.TryCreateFrom(_currentContext, operatorName, operands)
+        ?? SignalOperatorExpr.TryCreateFrom(_currentContext, operatorName, operands)
+        ?? ActionExpr.TryCreateFrom(_currentContext, operatorName, operands)
         ?? LogicalOperatorExpr.TryCreateFrom(operatorName, operands)
         ?? MathOperatorExpr.TryCreateFrom(operatorName, operands)
-        ?? GetPropertyOperatorExpr.TryCreateFrom(CurrentContext, operatorName, operands)
-        ?? HasComponentOperatorExpr.TryCreateFrom(CurrentContext, operatorName, operands);
+        ?? GetPropertyOperatorExpr.TryCreateFrom(_currentContext, operatorName, operands)
+        ?? HasComponentOperatorExpr.TryCreateFrom(_currentContext, operatorName, operands);
     if (result == null) {
       throw new ScriptError.ParsingError("Unknown operator: " + operatorName);
     }
