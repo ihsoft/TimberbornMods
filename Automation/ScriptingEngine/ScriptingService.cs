@@ -74,7 +74,7 @@ sealed class ScriptingService {
   public void RegisterSignals(IExpression expression, ISignalListener host) {
     var signalNames = new HashSet<string>();
     expression.VisitNodes(x => {
-      if (x is SignalOperatorExpr signal) {
+      if (x is SignalOperator signal) {
         signalNames.Add(signal.SignalName);
       }
     });
@@ -87,7 +87,7 @@ sealed class ScriptingService {
   public void UnregisterSignals(IExpression expression, ISignalListener host) {
     var signalNames = new HashSet<string>();
     expression.VisitNodes(x => {
-      if (x is SignalOperatorExpr signal) {
+      if (x is SignalOperator signal) {
         signalNames.Add(signal.SignalName);
       }
     });
@@ -99,7 +99,7 @@ sealed class ScriptingService {
   /// <inheritdoc cref="IScriptable.InstallAction"/>
   public void InstallActions(IExpression expression, BaseComponent building) {
     expression.VisitNodes(x => {
-      if (x is ActionExpr action) {
+      if (x is ActionOperator action) {
         GetScriptable(action.ActionName).InstallAction(action.ActionName, building);
       }
     });
@@ -108,7 +108,7 @@ sealed class ScriptingService {
   /// <inheritdoc cref="IScriptable.UninstallAction"/>
   public void UninstallActions(IExpression expression, BaseComponent building) {
     expression.VisitNodes(x => {
-      if (x is ActionExpr action) {
+      if (x is ActionOperator action) {
         GetScriptable(action.ActionName).UninstallAction(action.ActionName, building);
       }
     });

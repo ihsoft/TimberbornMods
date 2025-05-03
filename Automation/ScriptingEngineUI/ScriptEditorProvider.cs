@@ -87,17 +87,17 @@ sealed class ScriptEditorProvider : IEditorProvider {
     var error = result.LastError;
     if (error == null) {
       if (isCondition) {
-        if (result.ParsedExpression is not BoolOperatorExpr) {
+        if (result.ParsedExpression is not BoolOperator) {
           error = _uiFactory.T(ConditionMustBeBoolLocKey);
         } else {
           var hasSignals = false;
-          result.ParsedExpression.VisitNodes(x => { hasSignals |= x is SignalOperatorExpr; });
+          result.ParsedExpression.VisitNodes(x => { hasSignals |= x is SignalOperator; });
           if (!hasSignals) {
             error = _uiFactory.T(ConditionMustHaveSignalsLocKey);
           }
         }
       } else {
-        if (result.ParsedExpression is not ActionExpr) {
+        if (result.ParsedExpression is not ActionOperator) {
           error = _uiFactory.T(ActionMustBeActionLocKey);
         }
       }

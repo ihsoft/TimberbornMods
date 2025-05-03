@@ -9,7 +9,7 @@ using System.Text;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
-sealed class BinaryOperatorExpr : BoolOperatorExpr {
+sealed class BinaryOperator : BoolOperator {
 
   static readonly HashSet<string> Names = [ "eq", "ne", "gt", "lt", "ge", "le"];
 
@@ -19,13 +19,13 @@ sealed class BinaryOperatorExpr : BoolOperatorExpr {
   readonly SignalDef _signalDef;
 
   public static IExpression TryCreateFrom(ExpressionParser.Context context, string name, IList<IExpression> arguments) {
-    return Names.Contains(name) ? new BinaryOperatorExpr(context, name, arguments) : null;
+    return Names.Contains(name) ? new BinaryOperator(context, name, arguments) : null;
   }
 
   /// <inheritdoc/>
   public override string Describe() {
     var sb = new StringBuilder();
-    sb.Append(Left is SignalOperatorExpr ? Left.Describe() : Left.ValueFn().FormatValue(_signalDef?.Result));
+    sb.Append(Left is SignalOperator ? Left.Describe() : Left.ValueFn().FormatValue(_signalDef?.Result));
     sb.Append(Name switch {
         "eq" => " = ",
         "ne" => " \u2260 ",
@@ -35,11 +35,11 @@ sealed class BinaryOperatorExpr : BoolOperatorExpr {
         "le" => " \u2264 ",
         _ => throw new InvalidOperationException("Unknown operator: " + Name),
     });
-    sb.Append(Right is SignalOperatorExpr ? Right.Describe() : Right.ValueFn().FormatValue(_signalDef?.Result));
+    sb.Append(Right is SignalOperator ? Right.Describe() : Right.ValueFn().FormatValue(_signalDef?.Result));
     return sb.ToString();
   }
 
-  BinaryOperatorExpr(ExpressionParser.Context context, string name, IList<IExpression> operands)
+  BinaryOperator(ExpressionParser.Context context, string name, IList<IExpression> operands)
       : base(name, operands) {
     AsserNumberOfOperandsExact(2);
     if (Operands[0] is not IValueExpr left) {
@@ -51,9 +51,9 @@ sealed class BinaryOperatorExpr : BoolOperatorExpr {
     if (left.ValueType != right.ValueType) {
       throw new ScriptError.ParsingError($"Arguments type mismatch: {left.ValueType} != {right.ValueType}");
     }
-    if (left is SignalOperatorExpr leftSignal) {
+    if (left is SignalOperator leftSignal) {
       _signalDef = context.ScriptingService.GetSignalDefinition(leftSignal.SignalName, context.ScriptHost);
-    } else if (right is SignalOperatorExpr rightSignal) {
+    } else if (right is SignalOperator rightSignal) {
       _signalDef = context.ScriptingService.GetSignalDefinition(rightSignal.SignalName, context.ScriptHost);
     }
     if (_signalDef?.Result.Options != null && right is ConstantValueExpr constantValueExpr) {

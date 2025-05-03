@@ -8,7 +8,7 @@ using System.Text;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
-abstract class AbstractOperandExpr(string name, IList<IExpression> operands) : IExpression {
+abstract class AbstractOperator(string name, IList<IExpression> operands) : IExpression {
 
   public readonly string Name = name;
   public readonly IList<IExpression> Operands = operands;

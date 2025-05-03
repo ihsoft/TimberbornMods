@@ -7,6 +7,6 @@ using System.Collections.Generic;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
-abstract class BoolOperatorExpr(string name, IList<IExpression> operands) : AbstractOperandExpr(name, operands) {
+abstract class BoolOperator(string name, IList<IExpression> operands) : AbstractOperator(name, operands) {
   public Func<bool> Execute { get; protected init; }
 }

@@ -78,7 +78,7 @@ sealed class ExpressionParser {
   string PreprocessorMatcher(Match match) {
     var expression = match.Groups[1].Value;
     var parsedExpression = ProcessString(expression);
-    if (parsedExpression is BinaryOperatorExpr binaryOperatorExpr) {
+    if (parsedExpression is BinaryOperator binaryOperatorExpr) {
       if (!binaryOperatorExpr.Execute()) {
         throw new ScriptError.BadStateError(
             _currentContext.ScriptHost, "Preprocessor expression is not true: " + expression);
@@ -182,13 +182,13 @@ sealed class ExpressionParser {
     // The sequence below should be ordered by the frequency of the usage. The operators that are more likely to be
     // used in the game should come first.
     var result =
-        BinaryOperatorExpr.TryCreateFrom(_currentContext, operatorName, operands)
-        ?? SignalOperatorExpr.TryCreateFrom(_currentContext, operatorName, operands)
-        ?? ActionExpr.TryCreateFrom(_currentContext, operatorName, operands)
-        ?? LogicalOperatorExpr.TryCreateFrom(operatorName, operands)
-        ?? MathOperatorExpr.TryCreateFrom(operatorName, operands)
-        ?? GetPropertyOperatorExpr.TryCreateFrom(_currentContext, operatorName, operands)
-        ?? HasComponentOperatorExpr.TryCreateFrom(_currentContext, operatorName, operands);
+        BinaryOperator.TryCreateFrom(_currentContext, operatorName, operands)
+        ?? SignalOperator.TryCreateFrom(_currentContext, operatorName, operands)
+        ?? ActionOperator.TryCreateFrom(_currentContext, operatorName, operands)
+        ?? LogicalOperator.TryCreateFrom(operatorName, operands)
+        ?? MathOperator.TryCreateFrom(operatorName, operands)
+        ?? GetPropertyOperator.TryCreateFrom(_currentContext, operatorName, operands)
+        ?? HasComponentOperator.TryCreateFrom(_currentContext, operatorName, operands);
     if (result == null) {
       throw new ScriptError.ParsingError("Unknown operator: " + operatorName);
     }

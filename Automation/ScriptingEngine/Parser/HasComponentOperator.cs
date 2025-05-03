@@ -9,14 +9,14 @@ using Timberborn.BaseComponentSystem;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
-class HasComponentOperatorExpr : BoolOperatorExpr {
+class HasComponentOperator : BoolOperator {
   public override string Describe() {
     throw new NotImplementedException();
   }
 
   public static IExpression TryCreateFrom(ExpressionParser.Context context, string name, IList<IExpression> operands) {
     return name switch {
-        "has" => new HasComponentOperatorExpr(context, name, operands),
+        "has" => new HasComponentOperator(context, name, operands),
         _ => null,
     };
   }
@@ -24,7 +24,7 @@ class HasComponentOperatorExpr : BoolOperatorExpr {
   readonly BaseComponent _component;
   readonly ScriptingService _scriptingService;
 
-  HasComponentOperatorExpr(ExpressionParser.Context context, string name, IList<IExpression> operands)
+  HasComponentOperator(ExpressionParser.Context context, string name, IList<IExpression> operands)
       : base(name, operands) {
     AsserNumberOfOperandsRange(1, -1);
     _component = context.ScriptHost;
@@ -53,6 +53,6 @@ class HasComponentOperatorExpr : BoolOperatorExpr {
   }
 
   bool TryComponent(string componentName) {
-    return GetPropertyOperatorExpr.GetComponentByName(_component, componentName);
+    return GetPropertyOperator.GetComponentByName(_component, componentName);
   }
 }

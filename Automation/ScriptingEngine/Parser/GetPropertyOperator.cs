@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
-class GetPropertyOperatorExpr : AbstractOperandExpr, IValueExpr {
+class GetPropertyOperator : AbstractOperator, IValueExpr {
   public override string Describe() {
     throw new NotImplementedException();
   }
@@ -22,13 +22,13 @@ class GetPropertyOperatorExpr : AbstractOperandExpr, IValueExpr {
 
   public static IExpression TryCreateFrom(ExpressionParser.Context context, string name, IList<IExpression> operands) {
     return name switch {
-        "getstr" => new GetPropertyOperatorExpr(ScriptValue.TypeEnum.String, context, name, operands),
-        "getnum" => new GetPropertyOperatorExpr(ScriptValue.TypeEnum.Number, context, name, operands),
+        "getstr" => new GetPropertyOperator(ScriptValue.TypeEnum.String, context, name, operands),
+        "getnum" => new GetPropertyOperator(ScriptValue.TypeEnum.Number, context, name, operands),
         _ => null,
     };
   }
 
-  GetPropertyOperatorExpr(ScriptValue.TypeEnum valueType, ExpressionParser.Context context,
+  GetPropertyOperator(ScriptValue.TypeEnum valueType, ExpressionParser.Context context,
                           string name, IList<IExpression> operands)
       : base(name, operands) {
     AsserNumberOfOperandsRange(1, -1);

@@ -10,7 +10,7 @@ using Timberborn.Localization;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
-class LogicalOperatorExpr : BoolOperatorExpr {
+class LogicalOperator : BoolOperator {
 
   const string AndOperatorLocKey = "IgorZ.Automation.Scripting.Expressions.AndOperator";
   const string OrOperatorLocKey = "IgorZ.Automation.Scripting.Expressions.OrOperator";
@@ -18,7 +18,7 @@ class LogicalOperatorExpr : BoolOperatorExpr {
   const string OrOperatorName = "or";
 
   public static IExpression TryCreateFrom(string name, IList<IExpression> arguments) {
-    return name is AndOperatorName or OrOperatorName ? new LogicalOperatorExpr(name, arguments) : null;
+    return name is AndOperatorName or OrOperatorName ? new LogicalOperator(name, arguments) : null;
   }
 
   /// <inheritdoc/>
@@ -31,7 +31,7 @@ class LogicalOperatorExpr : BoolOperatorExpr {
     };
     var descriptions = new List<string>();
     foreach (var operand in Operands) {
-      if (Name == AndOperatorName && operand is LogicalOperatorExpr { Name: OrOperatorName } logicalOperatorExpr) {
+      if (Name == AndOperatorName && operand is LogicalOperator { Name: OrOperatorName } logicalOperatorExpr) {
         descriptions.Add($"({logicalOperatorExpr.Describe()})");
       } else {
         descriptions.Add(operand.Describe());
@@ -40,12 +40,12 @@ class LogicalOperatorExpr : BoolOperatorExpr {
     return string.Join(displayName, descriptions);
   }
 
-  LogicalOperatorExpr(string name, IList<IExpression> operands) : base(name, operands) {
+  LogicalOperator(string name, IList<IExpression> operands) : base(name, operands) {
     AsserNumberOfOperandsRange(2, -1);
-    var boolOperands = new List<BoolOperatorExpr>();
+    var boolOperands = new List<BoolOperator>();
     for (var i = 0; i < operands.Count; i++) {
       var op = Operands[i];
-      if (op is not BoolOperatorExpr result) {
+      if (op is not BoolOperator result) {
         throw new ScriptError.ParsingError($"Operand #{i + 1} must be a boolean value, found: {op}");
       }
       boolOperands.Add(result);

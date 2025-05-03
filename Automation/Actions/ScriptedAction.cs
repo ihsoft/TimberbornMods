@@ -87,9 +87,9 @@ sealed class ScriptedAction : AutomationActionBase {
 
   /// <summary>Script code for expression to execute.</summary>
   /// <remarks>
-  /// It must be <see cref="ActionExpr"/> expression. Example of an action: "(act Floodgate.SetHeight 150)". 
+  /// It must be <see cref="ActionOperator"/> expression. Example of an action: "(act Floodgate.SetHeight 150)". 
   /// </remarks>
-  /// <seealso cref="ActionExpr"/>
+  /// <seealso cref="ActionOperator"/>
   // ReSharper disable once MemberCanBePrivate.Global
   public string Expression { get; private set; }
 
@@ -126,7 +126,7 @@ sealed class ScriptedAction : AutomationActionBase {
   #region Implementation
 
   ParsingResult _parsingResult;
-  ActionExpr _parsedExpression;
+  ActionOperator _parsedExpression;
 
   // Used by the RulesEditor dialog.
   internal static ParsingResult? ParseAndValidate(string expression, AutomationBehavior behavior) {
@@ -135,7 +135,7 @@ sealed class ScriptedAction : AutomationActionBase {
       HostedDebugLog.Error(behavior, "Failed to parse action: {0}\nError: {1}", expression, result.LastError);
       return null;
     }
-    if (result.ParsedExpression is not ActionExpr) {
+    if (result.ParsedExpression is not ActionOperator) {
       HostedDebugLog.Error(behavior, "Expression is not an action operator: {0}", result.ParsedExpression);
       return null;
     }
@@ -158,7 +158,7 @@ sealed class ScriptedAction : AutomationActionBase {
     if (_parsedExpression != null) {
       scriptingService.UninstallActions(_parsedExpression, Behavior);
     }
-    _parsedExpression = expression as ActionExpr;
+    _parsedExpression = expression as ActionOperator;
     if (_parsedExpression != null) {
       scriptingService.InstallActions(_parsedExpression, Behavior);
     }

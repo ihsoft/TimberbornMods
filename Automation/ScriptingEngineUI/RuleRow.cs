@@ -34,7 +34,7 @@ sealed class RuleRow {
 
   public readonly VisualElement Root;
 
-  public BoolOperatorExpr ParsedCondition { get; private set; }
+  public BoolOperator ParsedCondition { get; private set; }
   public string ConditionExpression {
     get => _conditionExpression;
     set {
@@ -43,13 +43,13 @@ sealed class RuleRow {
       }
       _conditionExpression = value;
       var result = ScriptedCondition.ParseAndValidate(value, ActiveBuilding);
-      ParsedCondition = result?.ParsedExpression as BoolOperatorExpr;
+      ParsedCondition = result?.ParsedExpression as BoolOperator;
       CheckIfModified();
     }
   }
   string _conditionExpression;
 
-  public ActionExpr ParsedAction { get; private set; }
+  public ActionOperator ParsedAction { get; private set; }
   public string ActionExpression {
     get => _actionExpression;
     set {
@@ -58,7 +58,7 @@ sealed class RuleRow {
       }
       _actionExpression = value;
       var result = ScriptedAction.ParseAndValidate(value, ActiveBuilding);
-      ParsedAction = result?.ParsedExpression as ActionExpr;
+      ParsedAction = result?.ParsedExpression as ActionOperator;
       CheckIfModified();
     }
   }

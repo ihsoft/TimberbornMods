@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
-sealed class ActionExpr : AbstractOperandExpr {
+sealed class ActionOperator : AbstractOperator {
 
   public string ActionName => ((SymbolExpr)Operands[0]).Value;
   public readonly Action Execute;
@@ -17,7 +17,7 @@ sealed class ActionExpr : AbstractOperandExpr {
   readonly ActionDef _actionDef;
 
   public static IExpression TryCreateFrom(ExpressionParser.Context context, string name, IList<IExpression> operands) {
-    return name == "act" ? new ActionExpr(context, name, operands) : null;
+    return name == "act" ? new ActionOperator(context, name, operands) : null;
   }
 
   /// <inheritdoc/>
@@ -32,7 +32,7 @@ sealed class ActionExpr : AbstractOperandExpr {
 
   static readonly Regex SignalNameRegexp = new("^([a-zA-Z][a-zA-Z0-9]+)(.[a-zA-Z][a-zA-Z0-9]+)*$");
 
-  ActionExpr(ExpressionParser.Context context, string name, IList<IExpression> operands) : base(name, operands) {
+  ActionOperator(ExpressionParser.Context context, string name, IList<IExpression> operands) : base(name, operands) {
     if (Operands[0] is not SymbolExpr symbol || !SignalNameRegexp.IsMatch(symbol.Value)) {
       throw new ScriptError.ParsingError("Bad action name: " + Operands[0]);
     }

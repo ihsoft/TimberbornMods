@@ -78,7 +78,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
 
   /// <summary>Script code for expression to check.</summary>
   /// <remarks>
-  /// It must be a boolean operator. See <see cref="BoolOperatorExpr"/> for the list of conditions. Example of a
+  /// It must be a boolean operator. See <see cref="BoolOperator"/> for the list of conditions. Example of a
   /// condition: "(and (eq (sig Weather.Season) 'drought') (gt Floodgate.Height 0.5))".
   /// </remarks>
   // ReSharper disable once MemberCanBePrivate.Global
@@ -86,7 +86,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
 
   /// <summary>Script code for precondition to check.</summary>
   /// <remarks>
-  /// It must be a boolean operator. See <see cref="BoolOperatorExpr"/> for the list of conditions. If the condition
+  /// It must be a boolean operator. See <see cref="BoolOperator"/> for the list of conditions. If the condition
   /// evaluates to "false", then <see cref="Expression"/> cannot be applied to the selected entity. Note that any
   /// parsing errors in the precondition will be silently ignored.
   /// </remarks>
@@ -138,7 +138,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   #region Implementation
 
   ParsingResult _parsingResult;
-  BoolOperatorExpr _parsedExpression;
+  BoolOperator _parsedExpression;
 
   // Used by the RulesEditor dialog.
   internal static ParsingResult? ParseAndValidate(string expression, AutomationBehavior behavior) {
@@ -147,12 +147,12 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
       HostedDebugLog.Error(behavior, "Failed to parse condition: {0}\nError: {1}", expression, result.LastError);
       return null;
     }
-    if (result.ParsedExpression is not BoolOperatorExpr) {
+    if (result.ParsedExpression is not BoolOperator) {
       HostedDebugLog.Error(behavior, "Expression is not a boolean operator: {0}", result.ParsedExpression);
       return null;
     }
     var hasSignals = false;
-    result.ParsedExpression.VisitNodes(x => { hasSignals |= x is SignalOperatorExpr; });
+    result.ParsedExpression.VisitNodes(x => { hasSignals |= x is SignalOperator; });
     if (!hasSignals) {
       HostedDebugLog.Error(behavior, "Condition has no signals: {0}", expression);
       return null;
@@ -185,7 +185,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
       }
       return false;
     }
-    if (result.ParsedExpression is not BoolOperatorExpr boolOperatorExpr) {
+    if (result.ParsedExpression is not BoolOperator boolOperatorExpr) {
       HostedDebugLog.Error(behavior, "Precondition is not a boolean operator: {0}", result.ParsedExpression);
       return false;
     }
@@ -220,7 +220,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
     if (_parsedExpression != null) {
       scriptingService.UnregisterSignals(_parsedExpression, this);
     }
-    _parsedExpression = expression as BoolOperatorExpr;
+    _parsedExpression = expression as BoolOperator;
     if (_parsedExpression != null) {
       scriptingService.RegisterSignals(_parsedExpression, this);
     }

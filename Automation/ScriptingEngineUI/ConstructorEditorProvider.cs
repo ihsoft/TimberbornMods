@@ -60,10 +60,10 @@ sealed class ConstructorEditorProvider : IEditorProvider {
     if (ruleRow.ParsedCondition == null || action == null) {
       return false;
     }
-    if (ruleRow.ParsedCondition is not BinaryOperatorExpr condition) {
+    if (ruleRow.ParsedCondition is not BinaryOperator condition) {
       return false;
     }
-    if (condition.Left is not SignalOperatorExpr signal || condition.Right is not ConstantValueExpr) {
+    if (condition.Left is not SignalOperator signal || condition.Right is not ConstantValueExpr) {
       return false;
     }
     if (!_scriptingService.GetSignalNamesForBuilding(ruleRow.ActiveBuilding).Contains(signal.SignalName)
@@ -141,10 +141,10 @@ sealed class ConstructorEditorProvider : IEditorProvider {
       return;
     }
     var conditionConstructor = ruleConstructor.ConditionConstructor;
-    if (ruleRow.ParsedCondition is not BinaryOperatorExpr binaryOperatorExpr) {
+    if (ruleRow.ParsedCondition is not BinaryOperator binaryOperatorExpr) {
       throw new InvalidOperationException("Binary operator is expected, but found: " + ruleRow.ParsedCondition);
     }
-    conditionConstructor.SignalSelector.Value = (binaryOperatorExpr.Left as SignalOperatorExpr)!.SignalName;
+    conditionConstructor.SignalSelector.Value = (binaryOperatorExpr.Left as SignalOperator)!.SignalName;
     conditionConstructor.OperatorSelector.SelectedValue = binaryOperatorExpr.Name;
     if (binaryOperatorExpr.Right is not ConstantValueExpr constantValue) {
       throw new InvalidOperationException("Constant value is expected");

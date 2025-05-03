@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
-class MathOperatorExpr : AbstractOperandExpr, IValueExpr {
+class MathOperator : AbstractOperator, IValueExpr {
   const string AddOperatorName = "add";
   const string SubOperatorName = "sub";
   const string MulOperatorName = "mul";
@@ -39,27 +39,27 @@ class MathOperatorExpr : AbstractOperandExpr, IValueExpr {
 
   public static IExpression TryCreateFrom(string name, IList<IExpression> arguments) {
     return name switch {
-        AddOperatorName => new MathOperatorExpr(
+        AddOperatorName => new MathOperator(
             name, arguments, 2, 2, args => args[0].ValueFn() + args[1].ValueFn()),
-        SubOperatorName => new MathOperatorExpr(
+        SubOperatorName => new MathOperator(
             name, arguments, 2, 2, args => args[0].ValueFn() - args[1].ValueFn()),
-        MulOperatorName => new MathOperatorExpr(
+        MulOperatorName => new MathOperator(
             name, arguments, 2, 2, args => args[0].ValueFn() * args[1].ValueFn()),
-        DivOperatorName => new MathOperatorExpr(
+        DivOperatorName => new MathOperator(
             name, arguments, 2, 2, args => args[0].ValueFn() / args[1].ValueFn()),
-        MinOperatorName => new MathOperatorExpr(
+        MinOperatorName => new MathOperator(
             name, arguments, 2, -1,
             args => ScriptValue.Of(args.Min(x => x.ValueFn().AsNumber))),
-        MaxOperatorName => new MathOperatorExpr(
+        MaxOperatorName => new MathOperator(
             name, arguments, 2, -1,
             args => ScriptValue.Of(args.Max(x => x.ValueFn().AsNumber))),
-        RoundOperatorName => new MathOperatorExpr(
+        RoundOperatorName => new MathOperator(
             name, arguments, 1, 1, args => ScriptValue.FromInt(args[0].ValueFn().AsInt)),
         _ => null,
     };
   }
 
-  MathOperatorExpr(string name, IList<IExpression> operands, int minArgs, int maxArgs,
+  MathOperator(string name, IList<IExpression> operands, int minArgs, int maxArgs,
                          Func<IList<IValueExpr>, ScriptValue> function) : base(name, operands) {
     AsserNumberOfOperandsRange(minArgs, maxArgs);
     var valueExprs = new List<IValueExpr>();
