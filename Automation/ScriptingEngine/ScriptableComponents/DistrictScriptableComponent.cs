@@ -3,14 +3,12 @@
 // License: Public Domain
 
 using System;
-using System.Collections.Generic;
 using Bindito.Core;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.BaseComponentSystem;
 using Timberborn.Bots;
 using Timberborn.DwellingSystem;
 using Timberborn.GameDistricts;
-using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
@@ -80,41 +78,20 @@ class DistrictScriptableComponent : ScriptableComponentBase {
     var name = signalOperator.SignalName;
     var tracker = host.Behavior.GetComponentFast<DistrictChangeTracker>()
         ?? _instantiator.AddComponent<DistrictChangeTracker>(host.Behavior.GameObjectFast);
-    var callback = new ScriptingService.SignalCallback(name, host);
-    switch (name) {
-      case BeaverPopulationSignalName:
-        if (!tracker.OnBeaverPopulationChanged.Add(callback)) {
-          throw new InvalidOperationException("Signal callback already registered: " + callback);
-        }
-        break;
-      case BotPopulationSignalName:
-        if (!tracker.OnBotPopulationChanged.Add(callback)) {
-          throw new InvalidOperationException("Signal callback already registered: " + callback);
-        }
-        break;
-      case NumberOfBedsSignalName:
-        if (!tracker.OnDwellerCounterChanged.Add(callback)) {
-          throw new InvalidOperationException("Signal callback already registered: " + callback);
-        }
-        break;
-      default:
-        throw new ScriptError.ParsingError("Unknown signal: " + name);
+    if (name is BeaverPopulationSignalName or BotPopulationSignalName or NumberOfBedsSignalName) {
+      tracker.ReferenceManager.AddSignal(signalOperator, host);
+    } else {
+      throw new InvalidOperationException("Unknown signal: " + name);
     }
   }
 
   /// <inheritdoc/>
   public override void UnregisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
-    var callback = new ScriptingService.SignalCallback(signalOperator.SignalName, host);
     var tracker = host.Behavior.GetComponentFast<DistrictChangeTracker>();
     if (!tracker) {
-      DebugEx.Warning("Signal callback is not registered: {0}", callback);
-      return;
+      throw new InvalidOperationException("No district tracker found");
     }
-    if (!tracker.OnBeaverPopulationChanged.Remove(callback)
-        && !tracker.OnBotPopulationChanged.Remove(callback)
-        && !tracker.OnDwellerCounterChanged.Remove(callback)) {
-      DebugEx.Warning("Signal callback is not registered: {0}", callback);
-    }
+    tracker.ReferenceManager.RemoveSignal(signalOperator, host);
   }
 
   #endregion
@@ -164,9 +141,7 @@ class DistrictScriptableComponent : ScriptableComponentBase {
 
   sealed class DistrictChangeTracker : BaseComponent {
 
-    public readonly HashSet<ScriptingService.SignalCallback> OnBotPopulationChanged = [];
-    public readonly HashSet<ScriptingService.SignalCallback> OnBeaverPopulationChanged = [];
-    public readonly HashSet<ScriptingService.SignalCallback> OnDwellerCounterChanged = [];
+    public readonly ReferenceManager ReferenceManager = new();
 
     ScriptingService _scriptingService;
     DistrictCenter _currentDistrictCenter;
@@ -214,14 +189,10 @@ class DistrictScriptableComponent : ScriptableComponentBase {
 
     void OnPopulationChangedEvent(Citizen citizen = null) {
       if (citizen == null || citizen.GetComponentFast<BotSpec>()) {
-        foreach (var callback in OnBotPopulationChanged) {
-          _scriptingService.ScheduleSignalCallback(callback);
-        }
+        ReferenceManager.ScheduleSignal(BotPopulationSignalName, _scriptingService);
       }
       if (citizen == null || !citizen.GetComponentFast<BotSpec>()) {
-        foreach (var callback in OnBeaverPopulationChanged) {
-          _scriptingService.ScheduleSignalCallback(callback);
-        }
+        ReferenceManager.ScheduleSignal(BeaverPopulationSignalName, _scriptingService);
       }
     }
 
@@ -234,9 +205,7 @@ class DistrictScriptableComponent : ScriptableComponentBase {
     }
 
     void OnDwellerCounterChangedEvent() {
-      foreach (var callback in OnDwellerCounterChanged) {
-        _scriptingService.ScheduleSignalCallback(callback);
-      }
+      ReferenceManager.ScheduleSignal(NumberOfBedsSignalName, _scriptingService);
     }
   }
 
