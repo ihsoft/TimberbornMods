@@ -135,20 +135,20 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   public override void RegisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
     var name = signalOperator.SignalName;
     if (!name.StartsWith(InputGoodSignalNamePrefix) && !name.StartsWith(OutputGoodSignalNamePrefix)) {
-      throw new ScriptError.ParsingError("Unknown signal: " + name);
+      throw new InvalidOperationException("Unknown signal: " + name);
     }
     var building = host.Behavior;
     var inventory = GetInventory(building);
     if (name.StartsWith(InputGoodSignalNamePrefix)) {
       var goodId = name[InputGoodSignalNamePrefix.Length..];
       if (!inventory.InputGoods.Contains(goodId)) {
-        throw new ScriptError.BadStateError(inventory, $"Input good '{goodId}' not found");
+        throw new InvalidOperationException($"{DebugEx.ObjectToString(inventory)} Input good '{goodId}' not found");
       }
     }
     if (name.StartsWith(OutputGoodSignalNamePrefix)) {
       var goodId = name[OutputGoodSignalNamePrefix.Length..];
       if (!inventory.OutputGoods.Contains(goodId)) {
-        throw new ScriptError.BadStateError(inventory, $"Output good '{goodId}' not found");
+        throw new InvalidOperationException($"{DebugEx.ObjectToString(inventory)} Output good '{goodId}' not found");
       }
     }
     var tracker = building.GetComponentFast<InventoryChangeTracker>()
@@ -169,7 +169,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   /// <inheritdoc/>
   public override void InstallAction(ActionOperator actionOperator, BaseComponent building) {
     if (actionOperator.ActionName is not (StartEmptyingStockActionName or StopEmptyingStockActionName)) {
-      return;
+      throw new InvalidOperationException("Unknown action: " + actionOperator.ActionName);
     }
     var behavior = building.GetComponentFast<EmptyingStatusBehavior>()
         ?? _instantiator.AddComponent<EmptyingStatusBehavior>(building.GameObjectFast); 
