@@ -30,10 +30,10 @@ sealed class ActionOperator : AbstractOperator {
     return string.Format(_actionDef.DisplayName, args);
   }
 
-  static readonly Regex SignalNameRegexp = new("^([a-zA-Z][a-zA-Z0-9]+)(.[a-zA-Z][a-zA-Z0-9]+)*$");
+  static readonly Regex ActionNameRegexp = new("^([a-zA-Z][a-zA-Z0-9]+)(.[a-zA-Z][a-zA-Z0-9]+)*$");
 
   ActionOperator(ExpressionParser.Context context, string name, IList<IExpression> operands) : base(name, operands) {
-    if (Operands[0] is not SymbolExpr symbol || !SignalNameRegexp.IsMatch(symbol.Value)) {
+    if (Operands[0] is not SymbolExpr symbol || !ActionNameRegexp.IsMatch(symbol.Value)) {
       throw new ScriptError.ParsingError("Bad action name: " + Operands[0]);
     }
     var actionName = symbol.Value;
@@ -46,6 +46,7 @@ sealed class ActionOperator : AbstractOperator {
         throw new ScriptError.ParsingError($"Argument #{i + 1} must be a value, but found: {operand}");
       }
       var argDef = _actionDef.Arguments[i];
+      argDef.ValueValidator?.Invoke(valueExpr);
       if (argDef.ValueType != valueExpr.ValueType) {
         throw new ScriptError.ParsingError(
             $"Argument #{i + 1} must be of type '{argDef.ValueType}', but found: {valueExpr.ValueType}");
