@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Bindito.Core;
+using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.BaseComponentSystem;
 using Timberborn.ConstructionSites;
 using Timberborn.Emptying;
@@ -131,7 +132,8 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   }
 
   /// <inheritdoc/>
-  public override void RegisterSignalChangeCallback(string name, ISignalListener host) {
+  public override void RegisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
+    var name = signalOperator.SignalName;
     if (!name.StartsWith(InputGoodSignalNamePrefix) && !name.StartsWith(OutputGoodSignalNamePrefix)) {
       throw new ScriptError.ParsingError("Unknown signal: " + name);
     }
@@ -151,48 +153,39 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     }
     var tracker = building.GetComponentFast<InventoryChangeTracker>()
         ?? _instantiator.AddComponent<InventoryChangeTracker>(building.GameObjectFast);
-    var callback = new ScriptingService.SignalCallback(name, host);
-    if (!tracker.SignalChangeCallbacks.Add(callback)) {
-      throw new InvalidOperationException("Signal callback already registered: " + callback);
-    }
+    tracker.ReferenceManager.AddSignal(signalOperator, host);
   }
 
   /// <inheritdoc/>
-  public override void UnregisterSignalChangeCallback(string name, ISignalListener host) {
+  public override void UnregisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
     var tracker = host.Behavior.GetComponentFast<InventoryChangeTracker>();
     if (!tracker) {
+      throw new InvalidOperationException(
+          "Inventory change tracker not found on: " + DebugEx.ObjectToString(host.Behavior));
+    }
+    tracker.ReferenceManager.RemoveSignal(signalOperator, host);
+  }
+
+  /// <inheritdoc/>
+  public override void InstallAction(ActionOperator actionOperator, BaseComponent building) {
+    if (actionOperator.ActionName is not (StartEmptyingStockActionName or StopEmptyingStockActionName)) {
       return;
     }
-    var callback = new ScriptingService.SignalCallback(name, host);
-    if (!tracker.SignalChangeCallbacks.Remove(callback)) {
-      DebugEx.Warning("Signal callback is not registered: {0}", callback);
-    }
+    var behavior = building.GetComponentFast<EmptyingStatusBehavior>()
+        ?? _instantiator.AddComponent<EmptyingStatusBehavior>(building.GameObjectFast); 
+    behavior.AddReference(actionOperator);
   }
 
   /// <inheritdoc/>
-  public override void InstallAction(string name, BaseComponent building) {
-    if (name is StartEmptyingStockActionName or StopEmptyingStockActionName) {
-      var behavior = building.GetComponentFast<EmptyingStatusBehavior>();
-      if (behavior == null) {
-        behavior = _instantiator.AddComponent<EmptyingStatusBehavior>(building.GameObjectFast);
-      }
-      behavior.AddReference();
-    } else {
-      throw new ScriptError.ParsingError("Unknown action: " + name);
+  public override void UninstallAction(ActionOperator actionOperator, BaseComponent building) {
+    if (actionOperator.ActionName is not (StartEmptyingStockActionName or StopEmptyingStockActionName)) {
+      return;
     }
-  }
-
-  /// <inheritdoc/>
-  public override void UninstallAction(string name, BaseComponent building) {
-    if (name is StartEmptyingStockActionName or StopEmptyingStockActionName) {
-      var behavior = building.GetComponentFast<EmptyingStatusBehavior>();
-      if (behavior == null) {
-        throw new InvalidOperationException("Status behavior not found on: " + DebugEx.ObjectToString(building));
-      }
-      behavior.RemoveReference();
-    } else {
-      throw new ScriptError.ParsingError("Unknown action: " + name);
+    var behavior = building.GetComponentFast<EmptyingStatusBehavior>();
+    if (behavior == null) {
+      throw new InvalidOperationException("Status behavior not found on: " + DebugEx.ObjectToString(building));
     }
+    behavior.RemoveReference(actionOperator);
   }
 
   public override ActionDef GetActionDefinition(string name, BaseComponent _) {
@@ -264,9 +257,10 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   #region Inventory change tracker component
 
   sealed class InventoryChangeTracker : BaseComponent {
-    public readonly HashSet<ScriptingService.SignalCallback> SignalChangeCallbacks = [];
+    public readonly ReferenceManager ReferenceManager = new();
 
     ScriptingService _scriptingService;
+    Inventory _inventory;
 
     [Inject]
     public void InjectDependencies(ScriptingService scriptingService) {
@@ -274,17 +268,19 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     }
 
     void Awake() {
-      var inventory = GetInventory(this, throwIfNotFound: false);
-      if (inventory == null) {
+      _inventory = GetInventory(this, throwIfNotFound: false);
+      if (_inventory == null) {
         throw new InvalidOperationException("Inventory component not found on: " + DebugEx.ObjectToString(this));
       }
-      inventory.InventoryStockChanged += (_, _) => NotifyChange();
+      _inventory.InventoryStockChanged += NotifyChange;
     }
 
-    void NotifyChange() {
-      foreach (var callback in SignalChangeCallbacks) {
-        _scriptingService.ScheduleSignalCallback(callback);
-      }
+    void NotifyChange(object sender, InventoryAmountChangedEventArgs args) {
+      var goodId = args.GoodAmount.GoodId;
+      var prefix = _inventory.OutputGoods.Contains(goodId)
+          ? OutputGoodSignalNamePrefix
+          : InputGoodSignalNamePrefix;
+      ReferenceManager.ScheduleSignal(prefix + goodId, _scriptingService);
     }
   }
 
@@ -301,7 +297,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
 
     StatusToggle _statusToggle;
     Emptiable _emptiable;
-    int _installedActions;
+    readonly HashSet<ActionOperator> _installedActions = [];
 
     [Inject]
     public void InjectDependencies(ILoc loc) {
@@ -318,25 +314,26 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
       RefreshStatus();
     }
 
-    public void AddReference() {
-      _installedActions++;
-      if (_installedActions == 1 && _statusToggle != null) {  // On game load, it is called before the Start() event.
+    public void AddReference(ActionOperator actionOperator) {
+      if (!_installedActions.Add(actionOperator)) {
+        throw new InvalidOperationException("Installing the same action multiple times: " + actionOperator);
+      }
+      if (_statusToggle != null) {  // On game load, add ref is called before the Start() event gets executed.
         RefreshStatus();
       }
     }
 
-    public void RemoveReference() {
-      if (_installedActions == 0) {
-        throw new InvalidOperationException("Uninstalling more actions than installed");
+    public void RemoveReference(ActionOperator actionOperator) {
+      if (!_installedActions.Remove(actionOperator)) {
+        throw new InvalidOperationException("Uninstalling non-registered action: " + actionOperator);
       }
-      _installedActions--;
-      if (_installedActions == 0 && _emptiable.IsMarkedForEmptying) {
+      if (_installedActions.Count == 0 && _emptiable.IsMarkedForEmptying) {
         _emptiable.UnmarkForEmptying();
       }
     }
 
     void RefreshStatus() {
-      if (_installedActions == 0) {
+      if (_installedActions.Count == 0) {
         _statusToggle.Deactivate();
         return;
       }

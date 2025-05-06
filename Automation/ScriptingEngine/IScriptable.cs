@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System;
+using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.BaseComponentSystem;
 
 namespace IgorZ.Automation.ScriptingEngine;
@@ -53,22 +54,22 @@ interface IScriptable {
   public ActionDef GetActionDefinition(string name, BaseComponent building);
 
   /// <summary>Registers a callback called when the signal value changes.</summary>
-  /// <param name="name">The name of the signal.</param>
+  /// <param name="signalOperator">The signal to register.</param>
   /// <param name="host">The signal changes handler to be registered.</param>
-  public void RegisterSignalChangeCallback(string name, ISignalListener host);
+  public void RegisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host);
 
   /// <summary>Unregisters a signal value change callback.</summary>
-  /// <param name="name">The name of the signal.</param>
+  /// <param name="signalOperator">The signal to unregister.</param>
   /// <param name="host">The signal changes handler to be unregistered.</param>
-  public void UnregisterSignalChangeCallback(string name, ISignalListener host);
+  public void UnregisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host);
 
   /// <summary>Installs the necessary components for the action to properly work on the specified building.</summary>
-  /// <param name="name">The name of the action.</param>
+  /// <param name="actionOperator">The action to install.</param>
   /// <param name="building">The component on which the signal is registered.</param>
-  public void InstallAction(string name, BaseComponent building);
+  public void InstallAction(ActionOperator actionOperator, BaseComponent building);
 
   /// <summary>Uninstalls the components installed for the action to work on the specified building.</summary>
-  /// <param name="name">The name of the action.</param>
+  /// <param name="actionOperator">The action to uninstall.</param>
   /// <param name="building">The component on which the signal is registered.</param>
-  public void UninstallAction(string name, BaseComponent building);
+  public void UninstallAction(ActionOperator actionOperator, BaseComponent building);
 }

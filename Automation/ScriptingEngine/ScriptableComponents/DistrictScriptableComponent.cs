@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using Bindito.Core;
+using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.BaseComponentSystem;
 using Timberborn.Bots;
 using Timberborn.DwellingSystem;
@@ -75,7 +76,8 @@ class DistrictScriptableComponent : ScriptableComponentBase {
   }
 
   /// <inheritdoc/>
-  public override void RegisterSignalChangeCallback(string name, ISignalListener host) {
+  public override void RegisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
+    var name = signalOperator.SignalName;
     var tracker = host.Behavior.GetComponentFast<DistrictChangeTracker>()
         ?? _instantiator.AddComponent<DistrictChangeTracker>(host.Behavior.GameObjectFast);
     var callback = new ScriptingService.SignalCallback(name, host);
@@ -101,8 +103,8 @@ class DistrictScriptableComponent : ScriptableComponentBase {
   }
 
   /// <inheritdoc/>
-  public override void UnregisterSignalChangeCallback(string name, ISignalListener host) {
-    var callback = new ScriptingService.SignalCallback(name, host);
+  public override void UnregisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
+    var callback = new ScriptingService.SignalCallback(signalOperator.SignalName, host);
     var tracker = host.Behavior.GetComponentFast<DistrictChangeTracker>();
     if (!tracker) {
       DebugEx.Warning("Signal callback is not registered: {0}", callback);

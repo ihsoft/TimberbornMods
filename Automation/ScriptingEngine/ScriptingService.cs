@@ -72,35 +72,27 @@ sealed class ScriptingService {
 
   /// <inheritdoc cref="IScriptable.RegisterSignalChangeCallback"/>
   public void RegisterSignals(IExpression expression, ISignalListener host) {
-    var signalNames = new HashSet<string>();
     expression.VisitNodes(x => {
       if (x is SignalOperator signal) {
-        signalNames.Add(signal.SignalName);
+        GetScriptable(signal.SignalName).RegisterSignalChangeCallback(signal, host);
       }
     });
-    foreach (var signalName in signalNames) {
-      GetScriptable(signalName).RegisterSignalChangeCallback(signalName, host);
-    }
   }
 
   /// <inheritdoc cref="IScriptable.UnregisterSignalChangeCallback"/>
   public void UnregisterSignals(IExpression expression, ISignalListener host) {
-    var signalNames = new HashSet<string>();
     expression.VisitNodes(x => {
       if (x is SignalOperator signal) {
-        signalNames.Add(signal.SignalName);
+        GetScriptable(signal.SignalName).UnregisterSignalChangeCallback(signal, host);
       }
     });
-    foreach (var signalName in signalNames) {
-      GetScriptable(signalName).UnregisterSignalChangeCallback(signalName, host);
-    }
   }
 
   /// <inheritdoc cref="IScriptable.InstallAction"/>
   public void InstallActions(IExpression expression, BaseComponent building) {
     expression.VisitNodes(x => {
       if (x is ActionOperator action) {
-        GetScriptable(action.ActionName).InstallAction(action.ActionName, building);
+        GetScriptable(action.ActionName).InstallAction(action, building);
       }
     });
   }
@@ -109,7 +101,7 @@ sealed class ScriptingService {
   public void UninstallActions(IExpression expression, BaseComponent building) {
     expression.VisitNodes(x => {
       if (x is ActionOperator action) {
-        GetScriptable(action.ActionName).UninstallAction(action.ActionName, building);
+        GetScriptable(action.ActionName).UninstallAction(action, building);
       }
     });
   }

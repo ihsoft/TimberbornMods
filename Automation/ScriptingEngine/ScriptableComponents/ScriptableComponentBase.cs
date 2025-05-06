@@ -5,6 +5,7 @@
 using System;
 using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
+using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.BaseComponentSystem;
 using Timberborn.Localization;
 using Timberborn.SingletonSystem;
@@ -51,20 +52,20 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
   }
 
   /// <inheritdoc/>
-  public virtual void RegisterSignalChangeCallback(string name, ISignalListener host) {
-    throw new ScriptError.ParsingError("Unknown signal: " + name);
+  public virtual void RegisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
+    throw new ScriptError.ParsingError("Unknown signal: " + signalOperator.SignalName);
   }
 
   /// <inheritdoc/>
-  public virtual void UnregisterSignalChangeCallback(string name, ISignalListener host) {
+  public virtual void UnregisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
   }
 
   /// <inheritdoc/>
-  public virtual void InstallAction(string name, BaseComponent building) {
+  public virtual void InstallAction(ActionOperator actionOperator, BaseComponent building) {
   }
 
   /// <inheritdoc/>
-  public virtual void UninstallAction(string name, BaseComponent building) {
+  public virtual void UninstallAction(ActionOperator actionOperator, BaseComponent building) {
   }
 
   protected static void AssertActionArgsCount(string actionName, ScriptValue[] args, int expectedCount) {

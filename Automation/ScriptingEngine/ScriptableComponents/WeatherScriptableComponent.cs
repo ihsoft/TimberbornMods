@@ -3,12 +3,11 @@
 // License: Public Domain
 
 using System;
-using System.Collections.Generic;
+using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.BaseComponentSystem;
 using Timberborn.HazardousWeatherSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.WeatherSystem;
-using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
@@ -48,22 +47,19 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   }
 
   /// <inheritdoc/>
-  public override void RegisterSignalChangeCallback(string name, ISignalListener host) {
-    if (name != SeasonSignalName) {
-      throw new ScriptError.ParsingError("Unknown signal: " + name);
+  public override void RegisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
+    if (signalOperator.SignalName != SeasonSignalName) {
+      throw new ScriptError.ParsingError("Unknown signal: " + signalOperator.SignalName);
     }
-    var callback = new ScriptingService.SignalCallback(name, host);
-    if (!_signalChangeCallbacks.Add(callback)) {
-      throw new InvalidOperationException("Signal callback already registered: " + callback);
-    }
+    _referenceManager.AddSignal(signalOperator, host);
   }
 
   /// <inheritdoc/>
-  public override void UnregisterSignalChangeCallback(string name, ISignalListener host) {
-    var callback = new ScriptingService.SignalCallback(name, host);
-    if (!_signalChangeCallbacks.Remove(callback)) {
-      DebugEx.Warning("Signal callback is not registered: {0}", callback);
+  public override void UnregisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
+    if (signalOperator.SignalName != SeasonSignalName) {
+      throw new ScriptError.ParsingError("Unknown signal: " + signalOperator.SignalName);
     }
+    _referenceManager.RemoveSignal(signalOperator, host);
   }
 
   #endregion
@@ -100,7 +96,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   readonly HazardousWeatherService _hazardousWeatherService;
 
   string _currentSeason;
-  readonly HashSet<ScriptingService.SignalCallback> _signalChangeCallbacks = [];
+  readonly ReferenceManager _referenceManager = new();
 
   WeatherScriptableComponent(
       EventBus eventBus, WeatherService weatherService, HazardousWeatherService hazardousWeatherService) {
@@ -137,17 +133,13 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
         BadtideWeather => BadTideSeason,
         _ => throw new InvalidOperationException("Unknown hazardous weather type: " + @event.HazardousWeather),
     };
-    foreach (var callback in _signalChangeCallbacks) {
-      ScriptingService.ScheduleSignalCallback(callback);
-    }
+    _referenceManager.ScheduleSignal(SeasonSignalName, ScriptingService);
   }
 
   [OnEvent]
   public void OnHazardousWeatherEndedEvent(HazardousWeatherEndedEvent @event) {
     _currentSeason = TemperateSeason;
-    foreach (var callback in _signalChangeCallbacks) {
-      ScriptingService.ScheduleSignalCallback(callback);
-    }
+    _referenceManager.ScheduleSignal(SeasonSignalName, ScriptingService);
   }
 
   #endregion
