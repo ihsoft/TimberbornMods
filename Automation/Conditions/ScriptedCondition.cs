@@ -131,7 +131,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   #region ISignalListener implementation
 
   /// <inheritdoc/>
-  public void OnValueChanged(string signalName) => CheckOperands();
+  public void OnValueChanged(string _) => CheckOperands();
 
   #endregion
 
