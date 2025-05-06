@@ -3,7 +3,6 @@
 // License: Public Domain
 
 using IgorZ.Automation.AutomationSystem;
-using Timberborn.BaseComponentSystem;
 
 namespace IgorZ.Automation.ScriptingEngine;
 

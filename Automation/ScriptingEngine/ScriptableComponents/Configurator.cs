@@ -13,7 +13,7 @@ sealed class Configurator : IConfigurator {
     // The order of bindings is npt important for the scripting engine, but in the constructor the siganls/ and actions
     // will be shown in the order of bindings.
 
-    // Teh building specific components. Order them from the most to the less frequently needed. 
+    // The building specific components. Order them from the most to the less frequently needed. 
     containerDefinition.Bind<FloodgateScriptableComponent>().AsSingleton();
     containerDefinition.Bind<PausableScriptableComponent>().AsSingleton();
     containerDefinition.Bind<InventoryScriptableComponent>().AsSingleton();
