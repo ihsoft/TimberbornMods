@@ -21,6 +21,7 @@ sealed class Configurator : IConfigurator {
     // Global components. Order them from the most to the less frequently needed.
     containerDefinition.Bind<WeatherScriptableComponent>().AsSingleton();
     containerDefinition.Bind<DistrictScriptableComponent>().AsSingleton();
+    containerDefinition.Bind<SignalsScriptableComponent>().AsSingleton();
     containerDefinition.Bind<DebugScriptableComponent>().AsSingleton();
   }
 }

@@ -114,6 +114,8 @@ IgorZ.Automation.Scriptable.Inventory.Action.StopEmptyingStock,"прекрати
 IgorZ.Automation.Scriptable.Inventory.Action.EmptyingStatus,"Склад освобождается в приоритетном порядке.",
 IgorZ.Automation.Scriptable.Pausable.Action.Pause,"остановить здание","Name of the action that pauses the building"
 IgorZ.Automation.Scriptable.Pausable.Action.Resume,"запустить здание","Name of the action that unpauses the building"
+IgorZ.Automation.Scriptable.Signals.Action.Set,"сигнал: {0} = {1}","Name of the action that sets the signal to the specified value"
+IgorZ.Automation.Scriptable.Signals.Signal.Get,"сигнал: {0}","Name of the condition for the signal checking"
 IgorZ.Automation.Scriptable.Weather.Signal.Season,"сезон","Name of the condition for the current season checking"
 =,=,"Rules editor strings"
 IgorZ.Automation.Scripting.Editor.DialogHeader,"Правила автоматизации",
