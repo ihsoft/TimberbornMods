@@ -24,8 +24,13 @@ sealed class ActionOperator : AbstractOperator {
   public override string Describe() {
     var args = new string[_actionDef.Arguments.Length];
     for (var i = 0; i < _actionDef.Arguments.Length; i++) {
-      var value = (Operands[i + 1] as IValueExpr)!.ValueFn();
-      args[i] = value.FormatValue(_actionDef.Arguments[i]);
+      var operand = Operands[i + 1] as IValueExpr;
+      if (operand is SignalOperator) {
+        args[i] = operand.Describe();
+      } else {
+        var value = operand!.ValueFn();
+        args[i] = value.FormatValue(_actionDef.Arguments[i]);
+      }
     }
     return string.Format(_actionDef.DisplayName, args);
   }
