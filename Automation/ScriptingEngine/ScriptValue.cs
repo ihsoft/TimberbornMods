@@ -9,7 +9,7 @@ using UnityEngine;
 namespace IgorZ.Automation.ScriptingEngine;
 
 /// <summary>Value that can be passed around in the scripting engine.</summary>
-public record struct ScriptValue {
+record struct ScriptValue {
   /// <summary>Type of the value.</summary>
   public enum TypeEnum {
     /// <summary>

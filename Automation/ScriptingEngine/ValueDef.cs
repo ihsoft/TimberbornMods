@@ -7,7 +7,7 @@ using IgorZ.TimberDev.UI;
 namespace IgorZ.Automation.ScriptingEngine;
 
 /// <summary>Definition of an argument that can be passed to a script action or be returned from a signal.</summary>
-public sealed record ValueDef {
+sealed record ValueDef {
   /// <summary>The type of the argument.</summary>
   public ScriptValue.TypeEnum ValueType { get; init; }
 

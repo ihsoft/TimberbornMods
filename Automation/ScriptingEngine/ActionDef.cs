@@ -5,7 +5,7 @@
 namespace IgorZ.Automation.ScriptingEngine;
 
 /// <summary>Definition of an action that can be executed by a script.</summary>
-public record ActionDef {
+record ActionDef {
   /// <summary>Unique name of the action as it appears in the scripts.</summary>
   public string ScriptName { get; init; }
 

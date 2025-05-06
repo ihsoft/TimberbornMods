@@ -5,7 +5,7 @@
 namespace IgorZ.Automation.ScriptingEngine;
 
 /// <summary>Definition of a signal that can be used in the scripting engine.</summary>
-public sealed record SignalDef {
+sealed record SignalDef {
   /// <summary>Unique name of the signal as it appears in the scripts.</summary>
   public string ScriptName { get; init; }
 
