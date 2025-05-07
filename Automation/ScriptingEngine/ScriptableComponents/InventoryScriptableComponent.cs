@@ -42,7 +42,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   /// <inheritdoc/>
   public override string[] GetSignalNamesForBuilding(AutomationBehavior behavior) {
     var inventory = GetInventory(behavior, throwIfNotFound: false);
-    if (inventory == null) {
+    if (!inventory) {
       return [];
     }
     var res = new List<string>();
@@ -81,6 +81,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
       return def;
     }
     string displayName = null;
+    //FIXME: split and use switch
     if (name.StartsWith(InputGoodSignalNamePrefix)) {
       displayName = LocGoodSignal(InputGoodSignalLocKey, name[InputGoodSignalNamePrefix.Length..]);
     } else if (name.StartsWith(OutputGoodSignalNamePrefix)) {
@@ -178,15 +179,15 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   }
 
   /// <inheritdoc/>
-  public override void UninstallAction(ActionOperator actionOperator, AutomationBehavior behavior1) {
+  public override void UninstallAction(ActionOperator actionOperator, AutomationBehavior behavior) {
     if (actionOperator.ActionName is not (StartEmptyingStockActionName or StopEmptyingStockActionName)) {
       return;
     }
-    var behavior = behavior1.GetComponentFast<EmptyingStatusBehavior>();
-    if (behavior == null) {
-      throw new InvalidOperationException("Status behavior not found on: " + DebugEx.ObjectToString(behavior1));
+    var statusBehavior = behavior.GetComponentFast<EmptyingStatusBehavior>();
+    if (!statusBehavior) {
+      throw new InvalidOperationException("Status behavior not found on: " + DebugEx.ObjectToString(behavior));
     }
-    behavior.RemoveReference(actionOperator);
+    statusBehavior.RemoveReference(actionOperator);
   }
 
   public override ActionDef GetActionDefinition(string name, AutomationBehavior _) {

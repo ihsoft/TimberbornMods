@@ -77,13 +77,12 @@ class DistrictScriptableComponent : ScriptableComponentBase {
   /// <inheritdoc/>
   public override void RegisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
     var name = signalOperator.SignalName;
-    var tracker = host.Behavior.GetComponentFast<DistrictChangeTracker>()
-        ?? _instantiator.AddComponent<DistrictChangeTracker>(host.Behavior.GameObjectFast);
-    if (name is BeaverPopulationSignalName or BotPopulationSignalName or NumberOfBedsSignalName) {
-      tracker.ReferenceManager.AddSignal(signalOperator, host);
-    } else {
+    if (name is not (BeaverPopulationSignalName or BotPopulationSignalName or NumberOfBedsSignalName)) {
       throw new InvalidOperationException("Unknown signal: " + name);
     }
+    var tracker = host.Behavior.GetComponentFast<DistrictChangeTracker>()
+        ?? _instantiator.AddComponent<DistrictChangeTracker>(host.Behavior.GameObjectFast);
+    tracker.ReferenceManager.AddSignal(signalOperator, host);
   }
 
   /// <inheritdoc/>
