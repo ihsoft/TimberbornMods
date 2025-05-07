@@ -3,7 +3,6 @@
 // License: Public Domain
 
 using System;
-using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.BaseComponentSystem;
@@ -80,18 +79,12 @@ class DistrictScriptableComponent : ScriptableComponentBase {
     if (name is not (BeaverPopulationSignalName or BotPopulationSignalName or NumberOfBedsSignalName)) {
       throw new InvalidOperationException("Unknown signal: " + name);
     }
-    var tracker = host.Behavior.GetComponentFast<DistrictChangeTracker>()
-        ?? _instantiator.AddComponent<DistrictChangeTracker>(host.Behavior.GameObjectFast);
-    tracker.ReferenceManager.AddSignal(signalOperator, host);
+    host.Behavior.GetOrCreate<DistrictChangeTracker>().AddSignal(signalOperator, host);
   }
 
   /// <inheritdoc/>
   public override void UnregisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
-    var tracker = host.Behavior.GetComponentFast<DistrictChangeTracker>();
-    if (!tracker) {
-      throw new InvalidOperationException("No district tracker found");
-    }
-    tracker.ReferenceManager.RemoveSignal(signalOperator, host);
+    host.Behavior.GetOrThrow<DistrictChangeTracker>().RemoveSignal(signalOperator, host);
   }
 
   #endregion
@@ -139,17 +132,9 @@ class DistrictScriptableComponent : ScriptableComponentBase {
 
   #region District citizens tracker
 
-  sealed class DistrictChangeTracker : BaseComponent {
+  sealed class DistrictChangeTracker : AbstractStatusTracker {
 
-    public readonly ReferenceManager ReferenceManager = new();
-
-    ScriptingService _scriptingService;
     DistrictCenter _currentDistrictCenter;
-
-    [Inject]
-    public void InjectDependencies(ScriptingService scriptingService) {
-      _scriptingService = scriptingService;
-    }
 
     void Start() {
       var districtBuilding = GetComponentFast<DistrictBuilding>();
@@ -189,23 +174,19 @@ class DistrictScriptableComponent : ScriptableComponentBase {
 
     void OnPopulationChangedEvent(Citizen citizen = null) {
       if (citizen == null || citizen.GetComponentFast<BotSpec>()) {
-        ReferenceManager.ScheduleSignal(BotPopulationSignalName, _scriptingService);
+        ScheduleSignal(BotPopulationSignalName);
       }
       if (citizen == null || !citizen.GetComponentFast<BotSpec>()) {
-        ReferenceManager.ScheduleSignal(BeaverPopulationSignalName, _scriptingService);
+        ScheduleSignal(BeaverPopulationSignalName);
       }
     }
 
     void FinishedBuildingRegisteredEvent(object sender, FinishedBuildingRegisteredEventArgs arg) {
-      OnDwellerCounterChangedEvent();
+      ScheduleSignal(NumberOfBedsSignalName);
     }
 
     void FinishedBuildingUnregisteredEvent(object sender, FinishedBuildingUnregisteredEventArgs arg) {
-      OnDwellerCounterChangedEvent();
-    }
-
-    void OnDwellerCounterChangedEvent() {
-      ReferenceManager.ScheduleSignal(NumberOfBedsSignalName, _scriptingService);
+      ScheduleSignal(NumberOfBedsSignalName);
     }
   }
 

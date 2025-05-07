@@ -139,8 +139,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     if (!name.StartsWith(InputGoodSignalNamePrefix) && !name.StartsWith(OutputGoodSignalNamePrefix)) {
       throw new InvalidOperationException("Unknown signal: " + name);
     }
-    var building = host.Behavior;
-    var inventory = GetInventory(building);
+    var inventory = GetInventory(host.Behavior);
     if (name.StartsWith(InputGoodSignalNamePrefix)) {
       var goodId = name[InputGoodSignalNamePrefix.Length..];
       if (!inventory.InputGoods.Contains(goodId)) {
@@ -153,41 +152,25 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
         throw new InvalidOperationException($"{DebugEx.ObjectToString(inventory)} Output good '{goodId}' not found");
       }
     }
-    var tracker = building.GetComponentFast<InventoryChangeTracker>()
-        ?? _instantiator.AddComponent<InventoryChangeTracker>(building.GameObjectFast);
-    tracker.ReferenceManager.AddSignal(signalOperator, host);
+    host.Behavior.GetOrCreate<InventoryChangeTracker>().AddSignal(signalOperator, host);
   }
 
   /// <inheritdoc/>
   public override void UnregisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
-    var tracker = host.Behavior.GetComponentFast<InventoryChangeTracker>();
-    if (!tracker) {
-      throw new InvalidOperationException(
-          "Inventory change tracker not found on: " + DebugEx.ObjectToString(host.Behavior));
-    }
-    tracker.ReferenceManager.RemoveSignal(signalOperator, host);
+    host.Behavior.GetOrThrow<InventoryChangeTracker>().RemoveSignal(signalOperator, host);
   }
 
   /// <inheritdoc/>
-  public override void InstallAction(ActionOperator actionOperator, AutomationBehavior behavior1) {
+  public override void InstallAction(ActionOperator actionOperator, AutomationBehavior behavior) {
     if (actionOperator.ActionName is not (StartEmptyingStockActionName or StopEmptyingStockActionName)) {
       throw new InvalidOperationException("Unknown action: " + actionOperator.ActionName);
     }
-    var behavior = behavior1.GetComponentFast<EmptyingStatusBehavior>()
-        ?? _instantiator.AddComponent<EmptyingStatusBehavior>(behavior1.GameObjectFast); 
-    behavior.AddReference(actionOperator);
+    behavior.GetOrCreate<EmptyingStatusBehavior>().AddAction(actionOperator);
   }
 
   /// <inheritdoc/>
   public override void UninstallAction(ActionOperator actionOperator, AutomationBehavior behavior) {
-    if (actionOperator.ActionName is not (StartEmptyingStockActionName or StopEmptyingStockActionName)) {
-      return;
-    }
-    var statusBehavior = behavior.GetComponentFast<EmptyingStatusBehavior>();
-    if (!statusBehavior) {
-      throw new InvalidOperationException("Status behavior not found on: " + DebugEx.ObjectToString(behavior));
-    }
-    statusBehavior.RemoveReference(actionOperator);
+    behavior.GetOrThrow<EmptyingStatusBehavior>().RemoveAction(actionOperator);
   }
 
   public override ActionDef GetActionDefinition(string name, AutomationBehavior _) {
@@ -227,11 +210,9 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   #region Implementation
 
   readonly IGoodService _goodService;
-  readonly BaseInstantiator _instantiator;
 
   InventoryScriptableComponent(IGoodService goodService, BaseInstantiator instantiator) {
     _goodService = goodService;
-    _instantiator = instantiator;
   }
 
   string LocGoodSignal(string name, string goodId) {
@@ -258,16 +239,9 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
 
   #region Inventory change tracker component
 
-  sealed class InventoryChangeTracker : BaseComponent {
-    public readonly ReferenceManager ReferenceManager = new();
+  sealed class InventoryChangeTracker : AbstractStatusTracker {
 
-    ScriptingService _scriptingService;
     Inventory _inventory;
-
-    [Inject]
-    public void InjectDependencies(ScriptingService scriptingService) {
-      _scriptingService = scriptingService;
-    }
 
     void Awake() {
       _inventory = GetInventory(this, throwIfNotFound: false);
@@ -282,7 +256,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
       var prefix = _inventory.OutputGoods.Contains(goodId)
           ? OutputGoodSignalNamePrefix
           : InputGoodSignalNamePrefix;
-      ReferenceManager.ScheduleSignal(prefix + goodId, _scriptingService);
+      ScheduleSignal(prefix + goodId);
     }
   }
 
@@ -294,12 +268,25 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   /// Creates a custom status icon that indicates that the storage is being emptying. If the status is changed
   /// externally, then hides the status and notifies the action.
   /// </summary>
-  sealed class EmptyingStatusBehavior : BaseComponent {
-    ILoc _loc;
+  sealed class EmptyingStatusBehavior : AbstractStatusTracker {
 
+    ILoc _loc;
     StatusToggle _statusToggle;
     Emptiable _emptiable;
-    readonly HashSet<ActionOperator> _installedActions = [];
+
+    /// <inheritdoc/>
+    protected override void OnFirstReference() {
+      if (_statusToggle != null) {  // On game load, add ref is called before the Start() event gets executed.
+        RefreshStatus();
+      }
+    }
+
+    /// <inheritdoc/>
+    protected override void OnLastReference() {
+      if (_emptiable.IsMarkedForEmptying) {
+        _emptiable.UnmarkForEmptying();
+      }
+    }
 
     [Inject]
     public void InjectDependencies(ILoc loc) {
@@ -316,27 +303,8 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
       RefreshStatus();
     }
 
-    public void AddReference(ActionOperator actionOperator) {
-      if (!_installedActions.Add(actionOperator)) {
-        throw new InvalidOperationException("Installing the same action multiple times: " + actionOperator);
-      }
-      if (_statusToggle != null) {  // On game load, add ref is called before the Start() event gets executed.
-        RefreshStatus();
-      }
-    }
-
-    public void RemoveReference(ActionOperator actionOperator) {
-      //FIXME: use reference manager
-      if (!_installedActions.Remove(actionOperator)) {
-        throw new InvalidOperationException("Uninstalling non-registered action: " + actionOperator);
-      }
-      if (_installedActions.Count == 0 && _emptiable.IsMarkedForEmptying) {
-        _emptiable.UnmarkForEmptying();
-      }
-    }
-
     void RefreshStatus() {
-      if (_installedActions.Count == 0) {
+      if (!HasActions) {
         _statusToggle.Deactivate();
         return;
       }
