@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System;
+using IgorZ.Automation.AutomationSystem;
 using Timberborn.BaseComponentSystem;
 using UnityDev.Utils.LogUtilsLite;
 
@@ -22,21 +23,21 @@ sealed class DebugScriptableComponent : ScriptableComponentBase {
   public override string Name => "Debug";
 
   /// <inheritdoc/>
-  public override string[] GetActionNamesForBuilding(BaseComponent _) {
+  public override string[] GetActionNamesForBuilding(AutomationBehavior _) {
     return [LogStrActionName, LogNumActionName];
   }
 
   /// <inheritdoc/>
-  public override Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
+  public override Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
     return name switch {
-        LogStrActionName => args => LogStrAction(building, args),
-        LogNumActionName => args => LogNumAction(building, args),
+        LogStrActionName => args => LogStrAction(behavior, args),
+        LogNumActionName => args => LogNumAction(behavior, args),
         _ => throw new ScriptError.ParsingError("Unknown action: " + name),
     };
   }
 
   /// <inheritdoc/>
-  public override ActionDef GetActionDefinition(string name, BaseComponent _) {
+  public override ActionDef GetActionDefinition(string name, AutomationBehavior _) {
     return name switch {
         LogStrActionName => LogStrActionDef,
         LogNumActionName => LogNumActionDef,

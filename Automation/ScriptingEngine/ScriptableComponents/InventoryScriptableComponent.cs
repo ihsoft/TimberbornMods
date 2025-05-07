@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Bindito.Core;
+using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.BaseComponentSystem;
 using Timberborn.ConstructionSites;
@@ -39,8 +40,8 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   public override string Name => "Inventory";
 
   /// <inheritdoc/>
-  public override string[] GetSignalNamesForBuilding(BaseComponent building) {
-    var inventory = GetInventory(building, throwIfNotFound: false);
+  public override string[] GetSignalNamesForBuilding(AutomationBehavior behavior) {
+    var inventory = GetInventory(behavior, throwIfNotFound: false);
     if (inventory == null) {
       return [];
     }
@@ -55,8 +56,8 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   }
 
   /// <inheritdoc/>
-  public override Func<ScriptValue> GetSignalSource(string name, BaseComponent building) {
-    var inventory = GetInventory(building);
+  public override Func<ScriptValue> GetSignalSource(string name, AutomationBehavior behavior) {
+    var inventory = GetInventory(behavior);
     if (name.StartsWith(InputGoodSignalNamePrefix)) {
       var goodId = name[InputGoodSignalNamePrefix.Length..];
       if (!inventory.InputGoods.Contains(goodId)) {
@@ -75,7 +76,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   }
 
   /// <inheritdoc/>
-  public override SignalDef GetSignalDefinition(string name, BaseComponent _) {
+  public override SignalDef GetSignalDefinition(string name, AutomationBehavior _) {
     if (_signalDefs.TryGetValue(name, out var def)) {
       return def;
     }
@@ -101,11 +102,11 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   }
 
   /// <inheritdoc/>
-  public override string[] GetActionNamesForBuilding(BaseComponent building) {
-    if (!building.GetComponentFast<Emptiable>()) {
+  public override string[] GetActionNamesForBuilding(AutomationBehavior behavior) {
+    if (!behavior.GetComponentFast<Emptiable>()) {
       return [];
     }
-    var inventory = GetInventory(building, throwIfNotFound: false);
+    var inventory = GetInventory(behavior, throwIfNotFound: false);
     if (!inventory.IsOutput) {
       return [];
     }
@@ -119,10 +120,10 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   }
   
   /// <inheritdoc/>
-  public override Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
-    var emptiable = building.GetComponentFast<Emptiable>();
+  public override Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
+    var emptiable = behavior.GetComponentFast<Emptiable>();
     if (!emptiable) {
-      throw new ScriptError.BadStateError(building, "Building is not emptiable");
+      throw new ScriptError.BadStateError(behavior, "Building is not emptiable");
     }
     return name switch {
         StartEmptyingStockActionName => _ => emptiable.MarkForEmptyingWithoutStatus(),
@@ -167,28 +168,28 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   }
 
   /// <inheritdoc/>
-  public override void InstallAction(ActionOperator actionOperator, BaseComponent building) {
+  public override void InstallAction(ActionOperator actionOperator, AutomationBehavior behavior1) {
     if (actionOperator.ActionName is not (StartEmptyingStockActionName or StopEmptyingStockActionName)) {
       throw new InvalidOperationException("Unknown action: " + actionOperator.ActionName);
     }
-    var behavior = building.GetComponentFast<EmptyingStatusBehavior>()
-        ?? _instantiator.AddComponent<EmptyingStatusBehavior>(building.GameObjectFast); 
+    var behavior = behavior1.GetComponentFast<EmptyingStatusBehavior>()
+        ?? _instantiator.AddComponent<EmptyingStatusBehavior>(behavior1.GameObjectFast); 
     behavior.AddReference(actionOperator);
   }
 
   /// <inheritdoc/>
-  public override void UninstallAction(ActionOperator actionOperator, BaseComponent building) {
+  public override void UninstallAction(ActionOperator actionOperator, AutomationBehavior behavior1) {
     if (actionOperator.ActionName is not (StartEmptyingStockActionName or StopEmptyingStockActionName)) {
       return;
     }
-    var behavior = building.GetComponentFast<EmptyingStatusBehavior>();
+    var behavior = behavior1.GetComponentFast<EmptyingStatusBehavior>();
     if (behavior == null) {
-      throw new InvalidOperationException("Status behavior not found on: " + DebugEx.ObjectToString(building));
+      throw new InvalidOperationException("Status behavior not found on: " + DebugEx.ObjectToString(behavior1));
     }
     behavior.RemoveReference(actionOperator);
   }
 
-  public override ActionDef GetActionDefinition(string name, BaseComponent _) {
+  public override ActionDef GetActionDefinition(string name, AutomationBehavior _) {
     return name switch {
         StartEmptyingStockActionName => StartEmptyingStockActionDef,
         StopEmptyingStockActionName => StopEmptyingStockActionDef,
@@ -324,6 +325,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     }
 
     public void RemoveReference(ActionOperator actionOperator) {
+      //FIXME: use reference manager
       if (!_installedActions.Remove(actionOperator)) {
         throw new InvalidOperationException("Uninstalling non-registered action: " + actionOperator);
       }

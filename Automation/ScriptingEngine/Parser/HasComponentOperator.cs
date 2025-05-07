@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Timberborn.BaseComponentSystem;
+using IgorZ.Automation.AutomationSystem;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
@@ -21,7 +21,7 @@ class HasComponentOperator : BoolOperator {
     };
   }
 
-  readonly BaseComponent _component;
+  readonly AutomationBehavior _component;
   readonly ScriptingService _scriptingService;
 
   HasComponentOperator(ExpressionParser.Context context, string name, IList<IExpression> operands)

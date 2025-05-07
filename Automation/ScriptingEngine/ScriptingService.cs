@@ -5,8 +5,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
-using Timberborn.BaseComponentSystem;
 using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine;
@@ -29,45 +29,46 @@ sealed class ScriptingService {
   }
 
   /// <inheritdoc cref="IScriptable.GetSignalNamesForBuilding"/>
-  public string[] GetSignalNamesForBuilding(BaseComponent building) {
+  public string[] GetSignalNamesForBuilding(AutomationBehavior behavior) {
     return _registeredScriptables.Values
-        .SelectMany(s => s.GetSignalNamesForBuilding(building))
+        .SelectMany(s => s.GetSignalNamesForBuilding(behavior))
         .ToArray();
   }
 
   /// <inheritdoc cref="IScriptable.GetSignalSource"/>
-  public Func<ScriptValue> GetSignalSource(string name, BaseComponent building) {
-    return GetScriptable(name).GetSignalSource(name, building);
+  public Func<ScriptValue> GetSignalSource(string name, AutomationBehavior behavior) {
+    return GetScriptable(name).GetSignalSource(name, behavior);
   }
 
   /// <inheritdoc cref="IScriptable.GetSignalDefinition"/>
-  public SignalDef GetSignalDefinition(string name, BaseComponent building) {
-    return GetScriptable(name).GetSignalDefinition(name, building);
+  public SignalDef GetSignalDefinition(string name, AutomationBehavior behavior) {
+    return GetScriptable(name).GetSignalDefinition(name, behavior);
   }
 
-  public Func<object> GetPropertySource(string name, BaseComponent building) {
+  //FIXME: refgactor to accept full name and a behavior
+  public Func<object> GetPropertySource(string name, AutomationBehavior behavior) {
     var nameItems = name.Split('.');
     if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
       throw new ScriptError.ParsingError("Unknown scriptable component: " + nameItems[0]);
     }
-    return scriptable.GetPropertySource(name, building);
+    return scriptable.GetPropertySource(name, behavior);
   }
 
   /// <inheritdoc cref="IScriptable.GetActionNamesForBuilding"/>
-  public string[] GetActionNamesForBuilding(BaseComponent building) {
+  public string[] GetActionNamesForBuilding(AutomationBehavior behavior) {
     return _registeredScriptables.Values
-        .SelectMany(s => s.GetActionNamesForBuilding(building))
+        .SelectMany(s => s.GetActionNamesForBuilding(behavior))
         .ToArray();
   }
 
   /// <inheritdoc cref="IScriptable.GetActionExecutor"/>
-  public Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
-    return GetScriptable(name).GetActionExecutor(name, building);
+  public Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
+    return GetScriptable(name).GetActionExecutor(name, behavior);
   }
 
   /// <inheritdoc cref="IScriptable.GetActionDefinition"/>
-  public ActionDef GetActionDefinition(string name, BaseComponent building) {
-    return GetScriptable(name).GetActionDefinition(name, building);
+  public ActionDef GetActionDefinition(string name, AutomationBehavior behavior) {
+    return GetScriptable(name).GetActionDefinition(name, behavior);
   }
 
   /// <inheritdoc cref="IScriptable.RegisterSignalChangeCallback"/>
@@ -89,19 +90,19 @@ sealed class ScriptingService {
   }
 
   /// <inheritdoc cref="IScriptable.InstallAction"/>
-  public void InstallActions(IExpression expression, BaseComponent building) {
+  public void InstallActions(IExpression expression, AutomationBehavior behavior) {
     expression.VisitNodes(x => {
       if (x is ActionOperator action) {
-        GetScriptable(action.ActionName).InstallAction(action, building);
+        GetScriptable(action.ActionName).InstallAction(action, behavior);
       }
     });
   }
 
   /// <inheritdoc cref="IScriptable.UninstallAction"/>
-  public void UninstallActions(IExpression expression, BaseComponent building) {
+  public void UninstallActions(IExpression expression, AutomationBehavior behavior) {
     expression.VisitNodes(x => {
       if (x is ActionOperator action) {
-        GetScriptable(action.ActionName).UninstallAction(action, building);
+        GetScriptable(action.ActionName).UninstallAction(action, behavior);
       }
     });
   }

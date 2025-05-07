@@ -4,6 +4,7 @@
 
 using System;
 using Bindito.Core;
+using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.BaseComponentSystem;
 using Timberborn.Bots;
@@ -28,8 +29,8 @@ class DistrictScriptableComponent : ScriptableComponentBase {
   public override string Name => "District";
 
   /// <inheritdoc/>
-  public override string[] GetSignalNamesForBuilding(BaseComponent building) {
-    var districtBuilding = building.GetComponentFast<DistrictBuilding>();
+  public override string[] GetSignalNamesForBuilding(AutomationBehavior behavior) {
+    var districtBuilding = behavior.GetComponentFast<DistrictBuilding>();
     if (!districtBuilding) {
       return [];
     }
@@ -37,10 +38,10 @@ class DistrictScriptableComponent : ScriptableComponentBase {
   }
 
   /// <inheritdoc/>
-  public override Func<ScriptValue> GetSignalSource(string name, BaseComponent building) {
-    var districtBuilding = building.GetComponentFast<DistrictBuilding>();
+  public override Func<ScriptValue> GetSignalSource(string name, AutomationBehavior behavior) {
+    var districtBuilding = behavior.GetComponentFast<DistrictBuilding>();
     if (!districtBuilding) {
-      throw new ScriptError.BadStateError(building, "Not a district building");
+      throw new ScriptError.BadStateError(behavior, "Not a district building");
     }
     return name switch {
         BeaverPopulationSignalName => () =>
@@ -60,10 +61,10 @@ class DistrictScriptableComponent : ScriptableComponentBase {
   }
 
   /// <inheritdoc/>
-  public override SignalDef GetSignalDefinition(string name, BaseComponent building) {
-    var districtBuilding = building.GetComponentFast<DistrictBuilding>();
+  public override SignalDef GetSignalDefinition(string name, AutomationBehavior behavior) {
+    var districtBuilding = behavior.GetComponentFast<DistrictBuilding>();
     if (!districtBuilding) {
-      throw new ScriptError.BadStateError(building, "Not a district building");
+      throw new ScriptError.BadStateError(behavior, "Not a district building");
     }
     return name switch {
         BeaverPopulationSignalName => BeaverPopulationSignalDef,

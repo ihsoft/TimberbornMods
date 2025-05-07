@@ -21,33 +21,33 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
   public abstract string Name { get; }
 
   /// <inheritdoc/>
-  public virtual string[] GetSignalNamesForBuilding(BaseComponent building) => [];
+  public virtual string[] GetSignalNamesForBuilding(AutomationBehavior behavior) => [];
 
   /// <inheritdoc/>
-  public virtual Func<ScriptValue> GetSignalSource(string name, BaseComponent building) {
+  public virtual Func<ScriptValue> GetSignalSource(string name, AutomationBehavior behavior) {
     throw new ScriptError.ParsingError("Signal not found: " + name);
   }
 
   /// <inheritdoc/>
-  public virtual SignalDef GetSignalDefinition(string name, BaseComponent building) {
+  public virtual SignalDef GetSignalDefinition(string name, AutomationBehavior behavior) {
     throw new ScriptError.ParsingError("Signal not found: " + name);
   }
 
   /// <inheritdoc/>
-  public virtual Func<object> GetPropertySource(string name, BaseComponent building) {
+  public virtual Func<object> GetPropertySource(string name, BaseComponent component) {
     throw new ScriptError.ParsingError("Property not found: " + name);
   }
 
   /// <inheritdoc/>
-  public virtual string[] GetActionNamesForBuilding(BaseComponent building) => [];
+  public virtual string[] GetActionNamesForBuilding(AutomationBehavior behavior) => [];
 
   /// <inheritdoc/>
-  public virtual Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
+  public virtual Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
     throw new ScriptError.ParsingError("Action not found: " + name);
   }
 
   /// <inheritdoc/>
-  public virtual ActionDef GetActionDefinition(string name, BaseComponent building) {
+  public virtual ActionDef GetActionDefinition(string name, AutomationBehavior behavior) {
     throw new ScriptError.ParsingError("Action not found: " + name);
   }
 
@@ -61,11 +61,11 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
   }
 
   /// <inheritdoc/>
-  public virtual void InstallAction(ActionOperator actionOperator, BaseComponent building) {
+  public virtual void InstallAction(ActionOperator actionOperator, AutomationBehavior behavior) {
   }
 
   /// <inheritdoc/>
-  public virtual void UninstallAction(ActionOperator actionOperator, BaseComponent building) {
+  public virtual void UninstallAction(ActionOperator actionOperator, AutomationBehavior behavior) {
   }
 
   protected static void AssertActionArgsCount(string actionName, ScriptValue[] args, int expectedCount) {

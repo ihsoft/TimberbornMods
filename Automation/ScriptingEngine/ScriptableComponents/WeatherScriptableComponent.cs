@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System;
+using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.BaseComponentSystem;
 using Timberborn.HazardousWeatherSystem;
@@ -26,12 +27,12 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   public override string Name => "Weather";
 
   /// <inheritdoc/>
-  public override string[] GetSignalNamesForBuilding(BaseComponent _) {
+  public override string[] GetSignalNamesForBuilding(AutomationBehavior _) {
     return [SeasonSignalName]; 
   }
 
   /// <inheritdoc/>
-  public override Func<ScriptValue> GetSignalSource(string name, BaseComponent _) {
+  public override Func<ScriptValue> GetSignalSource(string name, AutomationBehavior _) {
     return name switch {
         SeasonSignalName => () => ScriptValue.Of(_currentSeason),
         _ => throw new ScriptError.ParsingError("Unknown signal: " + name),
@@ -39,7 +40,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   }
 
   /// <inheritdoc/>
-  public override SignalDef GetSignalDefinition(string name, BaseComponent _) {
+  public override SignalDef GetSignalDefinition(string name, AutomationBehavior _) {
     return name switch {
         SeasonSignalName => SeasonSignalDef,
         _ => throw new ScriptError.ParsingError("Unknown signal: " + name)

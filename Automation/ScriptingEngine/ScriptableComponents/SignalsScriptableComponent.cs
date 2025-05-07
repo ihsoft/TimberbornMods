@@ -6,8 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
-using Timberborn.BaseComponentSystem;
 using Timberborn.Persistence;
 using Timberborn.WorldPersistence;
 using UnityDev.Utils.LogUtilsLite;
@@ -28,13 +28,13 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
   public override string Name => "Signals";
 
   /// <inheritdoc/>
-  public override Func<ScriptValue> GetSignalSource(string name, BaseComponent _) {
+  public override Func<ScriptValue> GetSignalSource(string name, AutomationBehavior _) {
     return () => ScriptValue.Of(
         !_signalHandlers.TryGetValue(name, out var signalHandler) ? -1 : signalHandler.Value);
   }
 
   /// <inheritdoc/>
-  public override SignalDef GetSignalDefinition(string name, BaseComponent _) {
+  public override SignalDef GetSignalDefinition(string name, AutomationBehavior _) {
     if (!name.StartsWith(GetSignalSignalNamePrefix)) {
       throw new InvalidOperationException("Not a custom signal: " + name);
     }
@@ -63,23 +63,23 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
   }
 
   /// <inheritdoc/>
-  public override Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
+  public override Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
     return name switch {
         SetActionName => SetSignalAction,
-        _ => base.GetActionExecutor(name, building),
+        _ => base.GetActionExecutor(name, behavior),
     };
   }
 
   /// <inheritdoc/>
-  public override ActionDef GetActionDefinition(string name, BaseComponent building) {
+  public override ActionDef GetActionDefinition(string name, AutomationBehavior behavior) {
     return name switch {
         SetActionName => SetSignalActionDef,
-        _ => base.GetActionDefinition(name, building),
+        _ => base.GetActionDefinition(name, behavior),
     };
   }
 
   /// <inheritdoc/>
-  public override void InstallAction(ActionOperator actionOperator, BaseComponent building) {
+  public override void InstallAction(ActionOperator actionOperator, AutomationBehavior behavior) {
     if (actionOperator.ActionName != SetActionName) {
       throw new InvalidOperationException("Unknown action: " + actionOperator.ActionName);
     }
@@ -89,7 +89,7 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
   }
 
   /// <inheritdoc/>
-  public override void UninstallAction(ActionOperator actionOperator, BaseComponent _) {
+  public override void UninstallAction(ActionOperator actionOperator, AutomationBehavior _) {
     if (actionOperator.ActionName != SetActionName) {
       throw new InvalidOperationException("Unknown action: " + actionOperator.ActionName);
     }

@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System;
+using IgorZ.Automation.AutomationSystem;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BuildingsBlocking;
 
@@ -22,23 +23,23 @@ sealed class PausableScriptableComponent : ScriptableComponentBase {
   public override string Name => "Pausable";
 
   /// <inheritdoc/>
-  public override string[] GetActionNamesForBuilding(BaseComponent building) {
-    var pausableBuilding = GetPausableBuilding(building, throwIfNotFound: false);
+  public override string[] GetActionNamesForBuilding(AutomationBehavior behavior) {
+    var pausableBuilding = GetPausableBuilding(behavior, throwIfNotFound: false);
     return pausableBuilding ? [PauseActionName, ResumeActionName] : [];
   }
 
   /// <inheritdoc/>
-  public override Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
-    var pausableBuilding = GetPausableBuilding(building);
+  public override Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
+    var pausableBuilding = GetPausableBuilding(behavior);
     return name switch {
         PauseActionName => args => PauseAction(pausableBuilding, args),
         ResumeActionName => args => ResumeAction(pausableBuilding, args),
-        _ => base.GetActionExecutor(name, building),
+        _ => base.GetActionExecutor(name, behavior),
     };
   }
 
   /// <inheritdoc/>
-  public override ActionDef GetActionDefinition(string name, BaseComponent _) {
+  public override ActionDef GetActionDefinition(string name, AutomationBehavior _) {
     return name switch {
         PauseActionName => PauseActionDef,
         ResumeActionName => ResumeActionDef,

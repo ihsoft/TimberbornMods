@@ -3,10 +3,8 @@
 // License: Public Domain
 
 using System;
-using IgorZ.Automation.ScriptingEngine.Parser;
-using Timberborn.BaseComponentSystem;
+using IgorZ.Automation.AutomationSystem;
 using Timberborn.WaterBuildings;
-using UnityEngine;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
@@ -22,15 +20,15 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   public override string Name => "Floodgate";
 
   /// <inheritdoc/>
-  public override string[] GetActionNamesForBuilding(BaseComponent building) {
-    return building.GetComponentFast<Floodgate>() ? [SetHeightActionName] : [];
+  public override string[] GetActionNamesForBuilding(AutomationBehavior behavior) {
+    return behavior.GetComponentFast<Floodgate>() ? [SetHeightActionName] : [];
   }
 
   /// <inheritdoc/>
-  public override Action<ScriptValue[]> GetActionExecutor(string name, BaseComponent building) {
-    var floodgate = building.GetComponentFast<Floodgate>();
+  public override Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
+    var floodgate = behavior.GetComponentFast<Floodgate>();
     if (!floodgate) {
-      throw new ScriptError.BadStateError(building, "Floodgate component not found");
+      throw new ScriptError.BadStateError(behavior, "Floodgate component not found");
     }
     return name switch {
         SetHeightActionName => args => SetHeightAction(floodgate, args),
@@ -39,7 +37,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   }
 
   /// <inheritdoc/>
-  public override ActionDef GetActionDefinition(string name, BaseComponent _) {
+  public override ActionDef GetActionDefinition(string name, AutomationBehavior _) {
     return name switch {
         SetHeightActionName => SetHeightActionDef,
         _ => throw new ScriptError.ParsingError("Unknown action: " + name),
