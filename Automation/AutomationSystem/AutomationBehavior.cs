@@ -22,7 +22,6 @@ namespace IgorZ.Automation.AutomationSystem;
 /// <summary>The component that keeps all the automation state on the building.</summary>
 public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDeletableEntity, IFinishedStateListener {
 
-  //FXIME: Make own icon!
   const string AutomationErrorIcon = "IgorZ.Automation/error-icon-script-failed";
   const string AutomationErrorAlertLocKey = "IgorZ.Automation.ShowStatusAction.AutomationErrorAlert";
   const string AutomationErrorDescriptionLocKey = "IgorZ.Automation.ShowStatusAction.AutomationErrorDescription";
@@ -44,6 +43,8 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
 
   #endregion
 
+  #region API
+
   /// <summary>
   /// Automation can only work on the block objects. This is the object which this behavior is attached to.
   /// </summary>
@@ -55,8 +56,6 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
   /// <summary>All actions on the building.</summary>
   public IList<IAutomationAction> Actions => _actions.AsReadOnly();
   List<IAutomationAction> _actions = [];
-
-  #region API
 
   /// <summary>Creates a rule from the condition and action.</summary>
   /// <param name="condition">
