@@ -35,7 +35,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   public override Func<ScriptValue> GetSignalSource(string name, AutomationBehavior _) {
     return name switch {
         SeasonSignalName => () => ScriptValue.Of(_currentSeason),
-        _ => throw new ScriptError.ParsingError("Unknown signal: " + name),
+        _ => throw new UnknownSignalException(name),
     };
   }
 
@@ -43,7 +43,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   public override SignalDef GetSignalDefinition(string name, AutomationBehavior _) {
     return name switch {
         SeasonSignalName => SeasonSignalDef,
-        _ => throw new ScriptError.ParsingError("Unknown signal: " + name)
+        _ => throw new UnknownSignalException(name),
     };
   }
 

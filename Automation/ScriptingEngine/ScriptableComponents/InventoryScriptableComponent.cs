@@ -72,7 +72,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
       }
       return () => ScriptValue.FromInt(inventory.AmountInStock(goodId));
     }
-    throw new ScriptError.ParsingError("Unknown signal: " + name);
+    throw new UnknownSignalException(name);
   }
 
   /// <inheritdoc/>
@@ -87,7 +87,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
       displayName = LocGoodSignal(OutputGoodSignalLocKey, name[OutputGoodSignalNamePrefix.Length..]);
     }
     if (displayName == null) {
-      throw new ScriptError.ParsingError("Unknown signal: " + name);
+      throw new UnknownSignalException(name);
     }
 
     def = new SignalDef {
@@ -128,7 +128,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     return name switch {
         StartEmptyingStockActionName => _ => emptiable.MarkForEmptyingWithoutStatus(),
         StopEmptyingStockActionName => _ => emptiable.UnmarkForEmptying(),
-        _ => throw new ScriptError.ParsingError("Unknown action: " + name),
+        _ => throw new UnknownActionException(name),
     };
   }
 

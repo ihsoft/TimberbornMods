@@ -56,7 +56,7 @@ class DistrictScriptableComponent : ScriptableComponentBase {
               districtBuilding.District.GetComponentFast<DistrictDwellingStatisticsProvider>().GetDwellingStatistics();
           return ScriptValue.FromInt(statistics.FreeBeds + statistics.OccupiedBeds);
         },
-        _ => throw new ScriptError.ParsingError("Unknown signal: " + name),
+        _ => throw new UnknownSignalException(name),
     };
   }
 
@@ -70,7 +70,7 @@ class DistrictScriptableComponent : ScriptableComponentBase {
         BeaverPopulationSignalName => BeaverPopulationSignalDef,
         BotPopulationSignalName => BotPopulationSignalDef,
         NumberOfBedsSignalName => NumberOfBedsSignalDef,
-        _ => throw new ScriptError.ParsingError("Unknown signal: " + name),
+        _ => throw new UnknownSignalException(name),
     };
   }
 

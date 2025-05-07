@@ -66,7 +66,7 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
   public override Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
     return name switch {
         SetActionName => SetSignalAction,
-        _ => base.GetActionExecutor(name, behavior),
+        _ => throw new UnknownActionException(name),
     };
   }
 
@@ -74,7 +74,7 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
   public override ActionDef GetActionDefinition(string name, AutomationBehavior behavior) {
     return name switch {
         SetActionName => SetSignalActionDef,
-        _ => base.GetActionDefinition(name, behavior),
+        _ => throw new UnknownActionException(name),
     };
   }
 

@@ -17,6 +17,10 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
 
   #region API
 
+  protected class UnknownSignalException(string signalName) : ScriptError.ParsingError("Unknown signal: " + signalName);
+  
+  protected class UnknownActionException(string actionName) : ScriptError.ParsingError("Unknown action: " + actionName);
+
   /// <inheritdoc/>
   public abstract string Name { get; }
 
@@ -25,12 +29,12 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
 
   /// <inheritdoc/>
   public virtual Func<ScriptValue> GetSignalSource(string name, AutomationBehavior behavior) {
-    throw new ScriptError.ParsingError("Signal not found: " + name);
+    throw new UnknownSignalException(name);
   }
 
   /// <inheritdoc/>
   public virtual SignalDef GetSignalDefinition(string name, AutomationBehavior behavior) {
-    throw new ScriptError.ParsingError("Signal not found: " + name);
+    throw new UnknownSignalException(name);
   }
 
   /// <inheritdoc/>
@@ -43,21 +47,22 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
 
   /// <inheritdoc/>
   public virtual Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
-    throw new ScriptError.ParsingError("Action not found: " + name);
+    throw new UnknownActionException(name);
   }
 
   /// <inheritdoc/>
   public virtual ActionDef GetActionDefinition(string name, AutomationBehavior behavior) {
-    throw new ScriptError.ParsingError("Action not found: " + name);
+    throw new UnknownActionException(name);
   }
 
   /// <inheritdoc/>
   public virtual void RegisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
-    throw new ScriptError.ParsingError("Unknown signal: " + signalOperator.SignalName);
+    throw new InvalidOperationException("Unknown signal: " + signalOperator.SignalName);
   }
 
   /// <inheritdoc/>
   public virtual void UnregisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
+    throw new InvalidOperationException("Unknown signal: " + signalOperator.SignalName);
   }
 
   /// <inheritdoc/>

@@ -32,7 +32,7 @@ sealed class DebugScriptableComponent : ScriptableComponentBase {
     return name switch {
         LogStrActionName => args => LogStrAction(behavior, args),
         LogNumActionName => args => LogNumAction(behavior, args),
-        _ => throw new ScriptError.ParsingError("Unknown action: " + name),
+        _ => throw new UnknownActionException(name),
     };
   }
 
@@ -41,7 +41,7 @@ sealed class DebugScriptableComponent : ScriptableComponentBase {
     return name switch {
         LogStrActionName => LogStrActionDef,
         LogNumActionName => LogNumActionDef,
-        _ => throw new ScriptError.ParsingError("Unknown action: " + name),
+        _ => throw new UnknownActionException(name),
     };
   }
 

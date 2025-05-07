@@ -32,7 +32,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
     }
     return name switch {
         SetHeightActionName => args => SetHeightAction(floodgate, args),
-        _ => throw new ScriptError.ParsingError("Unknown action: " + name),
+        _ => throw new UnknownActionException(name),
     };
   }
 
@@ -40,7 +40,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   public override ActionDef GetActionDefinition(string name, AutomationBehavior _) {
     return name switch {
         SetHeightActionName => SetHeightActionDef,
-        _ => throw new ScriptError.ParsingError("Unknown action: " + name),
+        _ => throw new UnknownActionException(name),
     };
   }
 

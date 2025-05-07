@@ -34,7 +34,7 @@ sealed class PausableScriptableComponent : ScriptableComponentBase {
     return name switch {
         PauseActionName => _ => pausableBuilding.Pause(),
         ResumeActionName => _ => pausableBuilding.Resume(),
-        _ => base.GetActionExecutor(name, behavior),
+        _ => throw new UnknownActionException(name),
     };
   }
 
@@ -43,7 +43,7 @@ sealed class PausableScriptableComponent : ScriptableComponentBase {
     return name switch {
         PauseActionName => PauseActionDef,
         ResumeActionName => ResumeActionDef,
-        _ => base.GetActionDefinition(name, _),
+        _ => throw new UnknownActionException(name),
     };
   }
 
