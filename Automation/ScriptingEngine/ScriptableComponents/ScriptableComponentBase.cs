@@ -17,8 +17,12 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
 
   #region API
 
+  /// <summary>As script processing exception for the missing signal.</summary>
+  /// <remarks>This exception must be handled by the caller and not crash the game.</remarks>
   protected class UnknownSignalException(string signalName) : ScriptError.ParsingError("Unknown signal: " + signalName);
   
+  /// <summary>As script processing exception for the missing action.</summary>
+  /// <remarks>This exception must be handled by the caller and not crash the game.</remarks>
   protected class UnknownActionException(string actionName) : ScriptError.ParsingError("Unknown action: " + actionName);
 
   /// <inheritdoc/>
