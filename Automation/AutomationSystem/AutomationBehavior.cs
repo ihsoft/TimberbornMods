@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Bindito.Core;
@@ -139,6 +140,21 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
     if (_failingInstances.Count == 0) {
       _errorToggle?.Deactivate();
     }
+  }
+
+  /// <summary>Returns the component or creates it if none exists.</summary>
+  public T GetOrCreate<T>() where T : BaseComponent {
+    return GetComponentFast<T>() ?? BaseInstantiator.AddComponent<T>(GameObjectFast);
+  }
+
+  /// <summary>Returns the component or throws an exception if none exists.</summary>
+  /// <exception cref="InvalidOperationException">if the requested component not found.</exception>
+  public T GetOrThrow<T>() where T : BaseComponent {
+    var tracker = GetComponentFast<T>();
+    if (!tracker) {
+      throw new InvalidOperationException($"Component {typeof(T).Name} not found");
+    }
+    return tracker;
   }
 
   #endregion
