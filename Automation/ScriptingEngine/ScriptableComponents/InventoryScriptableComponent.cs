@@ -57,40 +57,18 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override Func<ScriptValue> GetSignalSource(string name, AutomationBehavior behavior) {
+    var parsed = ParseSignalName(name, behavior);
     var inventory = GetInventory(behavior);
-    if (name.StartsWith(InputGoodSignalNamePrefix)) {
-      var goodId = name[InputGoodSignalNamePrefix.Length..];
-      if (!inventory.InputGoods.Contains(goodId)) {
-        throw new ScriptError.BadStateError(inventory, $"Input good '{goodId}' not found");
-      }
-      return () => ScriptValue.FromInt(inventory.AmountInStock(goodId));
-    }
-    if (name.StartsWith(OutputGoodSignalNamePrefix)) {
-      var goodId = name[OutputGoodSignalNamePrefix.Length..];
-      if (!inventory.OutputGoods.Contains(goodId)) {
-        throw new ScriptError.BadStateError(inventory, $"Output good '{goodId}' not found");
-      }
-      return () => ScriptValue.FromInt(inventory.AmountInStock(goodId));
-    }
-    throw new UnknownSignalException(name);
+    return () => ScriptValue.FromInt(inventory.AmountInStock(parsed.goodId));
   }
 
   /// <inheritdoc/>
-  public override SignalDef GetSignalDefinition(string name, AutomationBehavior _) {
+  public override SignalDef GetSignalDefinition(string name, AutomationBehavior behavior) {
+    var parsed = ParseSignalName(name, behavior);
     if (_signalDefs.TryGetValue(name, out var def)) {
       return def;
     }
-    string displayName = null;
-    //FIXME: split and use switch
-    if (name.StartsWith(InputGoodSignalNamePrefix)) {
-      displayName = LocGoodSignal(InputGoodSignalLocKey, name[InputGoodSignalNamePrefix.Length..]);
-    } else if (name.StartsWith(OutputGoodSignalNamePrefix)) {
-      displayName = LocGoodSignal(OutputGoodSignalLocKey, name[OutputGoodSignalNamePrefix.Length..]);
-    }
-    if (displayName == null) {
-      throw new UnknownSignalException(name);
-    }
-
+    var displayName = LocGoodSignal(parsed.isInput ? InputGoodSignalLocKey : OutputGoodSignalLocKey, parsed.goodId);
     def = new SignalDef {
         ScriptName = name,
         DisplayName = displayName,
@@ -144,23 +122,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override void RegisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
-    var name = signalOperator.SignalName;
-    if (!name.StartsWith(InputGoodSignalNamePrefix) && !name.StartsWith(OutputGoodSignalNamePrefix)) {
-      throw new InvalidOperationException("Unknown signal: " + name);
-    }
-    var inventory = GetInventory(host.Behavior);
-    if (name.StartsWith(InputGoodSignalNamePrefix)) {
-      var goodId = name[InputGoodSignalNamePrefix.Length..];
-      if (!inventory.InputGoods.Contains(goodId)) {
-        throw new InvalidOperationException($"{DebugEx.ObjectToString(inventory)} Input good '{goodId}' not found");
-      }
-    }
-    if (name.StartsWith(OutputGoodSignalNamePrefix)) {
-      var goodId = name[OutputGoodSignalNamePrefix.Length..];
-      if (!inventory.OutputGoods.Contains(goodId)) {
-        throw new InvalidOperationException($"{DebugEx.ObjectToString(inventory)} Output good '{goodId}' not found");
-      }
-    }
+    ParseSignalName(signalOperator.SignalName, host.Behavior, throwErrors: true);
     host.Behavior.GetOrCreate<InventoryChangeTracker>().AddSignal(signalOperator, host);
   }
 
@@ -215,6 +177,26 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
 
   InventoryScriptableComponent(IGoodService goodService, BaseInstantiator instantiator) {
     _goodService = goodService;
+  }
+
+  static (bool isInput, string goodId) ParseSignalName(
+      string name, AutomationBehavior behavior, bool throwErrors = false) {
+    var inventory = GetInventory(behavior);
+    if (name.StartsWith(InputGoodSignalNamePrefix)) {
+      var goodId = name[InputGoodSignalNamePrefix.Length..];
+      if (inventory.InputGoods.Contains(goodId)) {
+        return (true, goodId);
+      }
+    } else if (name.StartsWith(OutputGoodSignalNamePrefix)) {
+      var goodId = name[OutputGoodSignalNamePrefix.Length..];
+      if (inventory.OutputGoods.Contains(goodId)) {
+        return (false, goodId);
+      }
+    }
+    if (throwErrors) {
+      throw new InvalidOperationException("Unknown signal: " + name);
+    }
+    throw new ScriptError.BadStateError(inventory, "Signal not supported: " + name);
   }
 
   string LocGoodSignal(string name, string goodId) {
