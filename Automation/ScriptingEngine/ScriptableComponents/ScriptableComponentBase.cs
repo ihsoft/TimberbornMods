@@ -42,8 +42,8 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
   }
 
   /// <inheritdoc/>
-  public virtual Func<object> GetPropertySource(string name, BaseComponent component) {
-    throw new ScriptError.ParsingError("Property not found: " + name);
+  public virtual Func<object> GetPropertySource(string name, AutomationBehavior behavior) {
+    return null;
   }
 
   /// <inheritdoc/>
