@@ -19,24 +19,6 @@ namespace IgorZ.Automation.AutomationSystem;
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public sealed class AutomationService : IPostLoadableSingleton {
 
-  #region Internal fields
-
-  readonly HashSet<AutomationBehavior> _registeredBehaviors = new();
-  readonly Color _highlightColor = Color.cyan * 0.5f;
-  readonly Highlighter _highlighter;
-  bool _highlightingEnabled;
-
-  #endregion
-
-  //FIXME: move to impl with the fields
-  AutomationService(EventBus eventBus, Highlighter highlighter, BaseInstantiator baseInstantiator, ILoc loc) {
-    EventBus = eventBus;
-    BaseInstantiator = baseInstantiator;
-    Loc = loc;
-    eventBus.Register(this);
-    _highlighter = highlighter;
-  }
-
   #region IPostLoadableSingleton implemetation 
 
   /// <inheritdoc/>
@@ -105,8 +87,21 @@ public sealed class AutomationService : IPostLoadableSingleton {
     }
   }
 
-  CleanupComponent _cleanupRulesComponent;
+  readonly HashSet<AutomationBehavior> _registeredBehaviors = [];
   readonly HashSet<AutomationBehavior> _behaviorsNeedsCleanup = [];
+  readonly Color _highlightColor = Color.cyan * 0.5f;
+  readonly Highlighter _highlighter;
+
+  bool _highlightingEnabled;
+  CleanupComponent _cleanupRulesComponent;
+
+  AutomationService(EventBus eventBus, Highlighter highlighter, BaseInstantiator baseInstantiator, ILoc loc) {
+    EventBus = eventBus;
+    BaseInstantiator = baseInstantiator;
+    Loc = loc;
+    eventBus.Register(this);
+    _highlighter = highlighter;
+  }
 
   internal void RegisterBehavior(AutomationBehavior behavior) {
     _registeredBehaviors.Add(behavior);
