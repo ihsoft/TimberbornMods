@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.Utils;
 using Timberborn.Persistence;
+using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.Conditions;
 
@@ -54,17 +55,25 @@ public abstract class AutomationConditionBase : IAutomationCondition {
     get => _conditionState;
     internal set {
       _conditionState = value;
-      Listener?.OnConditionState(this);
+      if (!IsMarkedForCleanup) {
+        Listener?.OnConditionState(this);
+      }
     }
   }
   bool _conditionState;
 
   /// <inheritdoc/>
-  /// <remarks>
-  /// If custom code sets it to <c>true</c>, then it must call <see cref="AutomationBehavior.CollectCleanedRules"/> to
-  /// trigger the update handling.
-  /// </remarks>
-  public bool IsMarkedForCleanup { get; protected set; }
+  public bool IsMarkedForCleanup {
+    get => _isMarkedForCleanup;
+    protected set {
+      _isMarkedForCleanup = value;
+      if (value) {
+        HostedDebugLog.Fine(Behavior, "Action marked for cleanup: {0}", this);
+        Behavior.AutomationService.MarkBehaviourForCleanup(Behavior);
+      }
+    }
+  }
+  bool _isMarkedForCleanup;
 
   #endregion
 

@@ -71,7 +71,6 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
     condition.SyncState();
     _actions.Add(action);
     HostedDebugLog.Fine(this, "Adding rule: {0}", action);
-    CollectCleanedRules();
     UpdateRegistration();
   }
 
@@ -100,17 +99,6 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
   public void ClearAllRules() {
     while (_actions.Count > 0) {
       DeleteRuleAt(0);
-    }
-  }
-
-  /// <summary>Removes all rules that depend on condition and/or action that is marked for cleanup.</summary>
-  public void CollectCleanedRules() {
-    for (var i = _actions.Count - 1; i >= 0; i--) {
-      var action = _actions[i];
-      if (action.IsMarkedForCleanup || action.Condition.IsMarkedForCleanup) {
-        HostedDebugLog.Fine(this, "Cleaning up action: {0}", action);
-        DeleteRuleAt(i);
-      }
     }
   }
 
@@ -198,7 +186,6 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
       }
       action.Condition.SyncState();
     }
-    CollectCleanedRules();
     UpdateRegistration();
   }
 
@@ -236,8 +223,18 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
       action.Behavior = this;
       action.Condition.SyncState();
     }
-    CollectCleanedRules();
     UpdateRegistration();
+  }
+
+  /// <summary>Removes all rules that depend on condition and/or action that is marked for cleanup.</summary>
+  internal void CollectCleanedRules() {
+    for (var i = _actions.Count - 1; i >= 0; i--) {
+      var action = _actions[i];
+      if (action.IsMarkedForCleanup || action.Condition.IsMarkedForCleanup) {
+        HostedDebugLog.Fine(this, "Cleaning up action: {0}", action);
+        DeleteRuleAt(i);
+      }
+    }
   }
 
   void UpdateRegistration() {

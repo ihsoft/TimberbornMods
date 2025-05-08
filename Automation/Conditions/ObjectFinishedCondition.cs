@@ -44,6 +44,7 @@ public sealed class ObjectFinishedCondition : AutomationConditionBase {
   #endregion
 
   #region Implementation
+
   /// <summary>Triggers when the object or building becomes a "constructed" entity.</summary>
   [OnEvent]
   public void OnBlockObjectEnteredFinishedStateEvent(EnteredFinishedStateEvent e) {
@@ -52,7 +53,7 @@ public sealed class ObjectFinishedCondition : AutomationConditionBase {
     }
     ConditionState = true;
     IsMarkedForCleanup = true;
-    Behavior.CollectCleanedRules();
   }
+
   #endregion
 }

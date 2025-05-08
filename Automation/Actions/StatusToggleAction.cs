@@ -147,7 +147,7 @@ public class StatusToggleAction : AutomationActionBase {
 
   /// <summary>Ensures that the building's block state is in sync with the rule condition.</summary>
   void UpdateStatusState() {
-    if (!Condition.ConditionState) {
+    if (!Condition.ConditionState || IsMarkedForCleanup) {
       return;
     }
     if (ActionKind == ActionKindEnum.ShowStatus) {

@@ -47,7 +47,7 @@ sealed class ScriptedAction : AutomationActionBase {
 
   /// <inheritdoc/>
   public override void OnConditionState(IAutomationCondition automationCondition) {
-    if (!Condition.ConditionState) {
+    if (!Condition.ConditionState || IsMarkedForCleanup) {
       return;
     }
     if (_parsedExpression == null) {

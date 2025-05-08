@@ -8,6 +8,7 @@ using IgorZ.Automation.Conditions;
 using IgorZ.Automation.Utils;
 using IgorZ.TimberDev.Utils;
 using Timberborn.Persistence;
+using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.Actions;
 
@@ -65,7 +66,17 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
   IAutomationCondition _condition;
 
   /// <inheritdoc/>
-  public bool IsMarkedForCleanup { get; protected set; }
+  public bool IsMarkedForCleanup {
+    get => _isMarkedForCleanup;
+    protected set {
+      _isMarkedForCleanup = value;
+      if (value) {
+        HostedDebugLog.Fine(Behavior, "Condition marked for cleanup: {0}", this);
+        Behavior.AutomationService.MarkBehaviourForCleanup(Behavior);
+      }
+    }
+  }
+  bool _isMarkedForCleanup;
 
   #endregion
 

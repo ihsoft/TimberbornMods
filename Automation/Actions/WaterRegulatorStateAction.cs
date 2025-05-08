@@ -35,7 +35,7 @@ public class WaterRegulatorStateAction : AutomationActionBase {
 
   /// <inheritdoc/>
   public override void OnConditionState(IAutomationCondition automationCondition) {
-    if (!Condition.ConditionState) {
+    if (!Condition.ConditionState || IsMarkedForCleanup) {
       return;
     }
     var regulator = Behavior.GetComponentFast<WaterSourceRegulator>();

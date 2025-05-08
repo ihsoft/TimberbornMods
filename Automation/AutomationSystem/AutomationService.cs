@@ -10,6 +10,7 @@ using Timberborn.Localization;
 using Timberborn.SelectionSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.ToolSystem;
+using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
 namespace IgorZ.Automation.AutomationSystem;
@@ -27,6 +28,7 @@ public sealed class AutomationService : IPostLoadableSingleton {
 
   #endregion
 
+  //FIXME: move to impl with the fields
   AutomationService(EventBus eventBus, Highlighter highlighter, BaseInstantiator baseInstantiator, ILoc loc) {
     EventBus = eventBus;
     BaseInstantiator = baseInstantiator;
@@ -67,9 +69,44 @@ public sealed class AutomationService : IPostLoadableSingleton {
     _highlighter.UnhighlightAllSecondary();
   }
 
+  /// <summary>Marks the behavior for removed rules verification.</summary>
+  /// <remarks>The verification and cleanup will be done at the late update.</remarks>
+  /// <seealso cref="CollectDeletedRules"/>
+  public void MarkBehaviourForCleanup(AutomationBehavior behavior) {
+    _behaviorsNeedsCleanup.Add(behavior);
+    if (!_cleanupRulesComponent) {
+      _cleanupRulesComponent = new GameObject("AutomationCleanupRules").AddComponent<CleanupComponent>();
+      _cleanupRulesComponent.AutomationService = this;
+    }
+  }
+
+  /// <summary>Removes the rules that are marked as deleted.</summary>
+  /// <remarks>
+  /// This method is automatically scheduled to the late update. However, it can be called directly to immediately
+  /// clean up the deleted rules. It can be expensive, so it should be used with caution.
+  /// </remarks>
+  public void CollectDeletedRules() {
+    DebugEx.Fine("Collecting deleted rules on {0} behaviors", _behaviorsNeedsCleanup.Count);
+    foreach (var behavior in _behaviorsNeedsCleanup) {
+      behavior.CollectCleanedRules();
+    }
+    _behaviorsNeedsCleanup.Clear();
+  }
+
   #endregion
 
   #region Implementation
+
+  sealed class CleanupComponent : MonoBehaviour {
+    public AutomationService AutomationService;
+    void LateUpdate() {
+      AutomationService.CollectDeletedRules();
+      Destroy(gameObject);
+    }
+  }
+
+  CleanupComponent _cleanupRulesComponent;
+  readonly HashSet<AutomationBehavior> _behaviorsNeedsCleanup = [];
 
   internal void RegisterBehavior(AutomationBehavior behavior) {
     _registeredBehaviors.Add(behavior);
