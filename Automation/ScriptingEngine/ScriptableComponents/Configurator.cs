@@ -17,6 +17,7 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<FloodgateScriptableComponent>().AsSingleton();
     containerDefinition.Bind<PausableScriptableComponent>().AsSingleton();
     containerDefinition.Bind<InventoryScriptableComponent>().AsSingleton();
+    containerDefinition.Bind<ConstructableScriptableComponent>().AsSingleton();
     containerDefinition.Bind<PrioritizableScriptableComponent>().AsSingleton();
 
     // Global components. Order them from the most to the less frequently needed.
