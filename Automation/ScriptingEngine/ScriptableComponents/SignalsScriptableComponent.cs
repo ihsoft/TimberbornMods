@@ -80,23 +80,21 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
 
   /// <inheritdoc/>
   public override void InstallAction(ActionOperator actionOperator, AutomationBehavior behavior) {
-    if (actionOperator.ActionName != SetActionName) {
-      throw new InvalidOperationException("Unknown action: " + actionOperator.ActionName);
+    if (actionOperator.ActionName == SetActionName) {
+      var shortSignalName = ((ConstantValueExpr)actionOperator.Operands[1]).ValueFn().AsString;
+      var signalHandler = GetSignalHandler(GetSignalSignalNamePrefix + shortSignalName, createIfNotFound: true);
+      signalHandler.References.AddAction(actionOperator);
     }
-    var shortSignalName = ((ConstantValueExpr)actionOperator.Operands[1]).ValueFn().AsString;
-    var signalHandler = GetSignalHandler(GetSignalSignalNamePrefix + shortSignalName, createIfNotFound: true);
-    signalHandler.References.AddAction(actionOperator);
   }
 
   /// <inheritdoc/>
   public override void UninstallAction(ActionOperator actionOperator, AutomationBehavior _) {
-    if (actionOperator.ActionName != SetActionName) {
-      throw new InvalidOperationException("Unknown action: " + actionOperator.ActionName);
+    if (actionOperator.ActionName == SetActionName) {
+      var shortSignalName = ((ConstantValueExpr)actionOperator.Operands[1]).ValueFn().AsString;
+      var signalHandler = GetSignalHandler(GetSignalSignalNamePrefix + shortSignalName);
+      signalHandler.References.RemoveAction(actionOperator);
+      MaybeRemoveSignal(signalHandler);
     }
-    var shortSignalName = ((ConstantValueExpr)actionOperator.Operands[1]).ValueFn().AsString;
-    var signalHandler = GetSignalHandler(GetSignalSignalNamePrefix + shortSignalName);
-    signalHandler.References.RemoveAction(actionOperator);
-    MaybeRemoveSignal(signalHandler);
   }
 
   #endregion

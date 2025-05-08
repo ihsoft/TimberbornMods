@@ -72,19 +72,22 @@ sealed class ScriptingService {
   }
 
   /// <inheritdoc cref="IScriptable.RegisterSignalChangeCallback"/>
-  public void RegisterSignals(IExpression expression, ISignalListener host) {
+  public List<SignalOperator> RegisterSignals(IExpression expression, ISignalListener host) {
+    var signals = new List<SignalOperator>();
     expression.VisitNodes(x => {
       if (x is SignalOperator signal) {
-        GetScriptable(signal.SignalName).RegisterSignalChangeCallback(signal, host);
+        signals.Add(signal);
+        GetScriptable(signal.SignalName, throwErrors: true).RegisterSignalChangeCallback(signal, host);
       }
     });
+    return signals;
   }
 
   /// <inheritdoc cref="IScriptable.UnregisterSignalChangeCallback"/>
   public void UnregisterSignals(IExpression expression, ISignalListener host) {
     expression.VisitNodes(x => {
       if (x is SignalOperator signal) {
-        GetScriptable(signal.SignalName).UnregisterSignalChangeCallback(signal, host);
+        GetScriptable(signal.SignalName, throwErrors: true).UnregisterSignalChangeCallback(signal, host);
       }
     });
   }
@@ -93,7 +96,7 @@ sealed class ScriptingService {
   public void InstallActions(IExpression expression, AutomationBehavior behavior) {
     expression.VisitNodes(x => {
       if (x is ActionOperator action) {
-        GetScriptable(action.ActionName).InstallAction(action, behavior);
+        GetScriptable(action.ActionName, throwErrors: true).InstallAction(action, behavior);
       }
     });
   }
@@ -102,7 +105,7 @@ sealed class ScriptingService {
   public void UninstallActions(IExpression expression, AutomationBehavior behavior) {
     expression.VisitNodes(x => {
       if (x is ActionOperator action) {
-        GetScriptable(action.ActionName).UninstallAction(action, behavior);
+        GetScriptable(action.ActionName, throwErrors: true).UninstallAction(action, behavior);
       }
     });
   }
@@ -133,12 +136,15 @@ sealed class ScriptingService {
     return string.Join("\n", _callbackStack.Select(x => $"{DebugEx.ObjectToString(x.SignalListener.Behavior)}:{x.Name}"));
   }
 
-  IScriptable GetScriptable(string name) {
+  IScriptable GetScriptable(string name, bool throwErrors = false) {
     var nameItems = name.Split('.');
-    if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
-      throw new ScriptError.ParsingError("Unknown scriptable component: " + nameItems[0]);
+    if (_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
+      return scriptable;
     }
-    return scriptable;
+    if (throwErrors) {
+      throw new InvalidOperationException($"Unknown scriptable component: {nameItems[0]}");
+    }
+    throw new ScriptError.ParsingError("Unknown scriptable component: " + nameItems[0]);
   }
 
   #endregion

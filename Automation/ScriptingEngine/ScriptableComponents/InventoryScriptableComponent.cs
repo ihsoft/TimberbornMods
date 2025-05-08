@@ -162,22 +162,23 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override void InstallAction(ActionOperator actionOperator, AutomationBehavior behavior) {
-    if (actionOperator.ActionName is not (StartEmptyingStockActionName or StopEmptyingStockActionName)) {
-      throw new InvalidOperationException("Unknown action: " + actionOperator.ActionName);
+    if (actionOperator.ActionName is StartEmptyingStockActionName or StopEmptyingStockActionName) {
+      behavior.GetOrCreate<EmptyingStatusBehavior>().AddAction(actionOperator);
     }
-    behavior.GetOrCreate<EmptyingStatusBehavior>().AddAction(actionOperator);
   }
 
   /// <inheritdoc/>
   public override void UninstallAction(ActionOperator actionOperator, AutomationBehavior behavior) {
-    behavior.GetOrThrow<EmptyingStatusBehavior>().RemoveAction(actionOperator);
+    if (actionOperator.ActionName is StartEmptyingStockActionName or StopEmptyingStockActionName) {
+      behavior.GetOrThrow<EmptyingStatusBehavior>().RemoveAction(actionOperator);
+    }
   }
 
   public override ActionDef GetActionDefinition(string name, AutomationBehavior _) {
     return name switch {
         StartEmptyingStockActionName => StartEmptyingStockActionDef,
         StopEmptyingStockActionName => StopEmptyingStockActionDef,
-        _ => throw new ScriptError.ParsingError("Unknown action: " + name),
+        _ => throw new UnknownActionException(name),
     };
   }
 
@@ -229,7 +230,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     }
     var inventory = inventories.AllInventories
         .FirstOrDefault(x => x.ComponentName != ConstructionSiteInventoryInitializer.InventoryComponentName);
-    if (inventory == null && throwIfNotFound) {
+    if (!inventory && throwIfNotFound) {
       throw new ScriptError.BadStateError(building, "Inventory component not found");
     }
     return inventory;

@@ -71,14 +71,14 @@ interface IScriptable {
   public void UnregisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host);
 
   /// <summary>Installs the necessary components for the action to properly work on the specified building.</summary>
+  /// <remarks>The default behavior is NOOP. The action names aren't validated.</remarks>
   /// <param name="actionOperator">The action to install.</param>
   /// <param name="behavior">The component on which the action is to be registered.</param>
-  /// <exception cref="InvalidOperationException">if the action is not found.</exception>
   public void InstallAction(ActionOperator actionOperator, AutomationBehavior behavior);
 
   /// <summary>Uninstalls the components installed for the action to work on the specified building.</summary>
+  /// <remarks>The default behavior is NOOP. The action names aren't validated.</remarks>
   /// <param name="actionOperator">The action to uninstall.</param>
   /// <param name="behavior">The component on which the action is to be unregistered.</param>
-  /// <exception cref="InvalidOperationException">if the action is not found.</exception>
   public void UninstallAction(ActionOperator actionOperator, AutomationBehavior behavior);
 }
