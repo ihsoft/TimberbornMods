@@ -184,7 +184,9 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
       if (!action.Behavior) {
         break;  // Not initialized yet. It is likely a save game load.
       }
-      action.Condition.SyncState();
+      if (!action.Condition.CanRunOnUnfinishedBuildings) {
+        action.Condition.SyncState();
+      }
     }
     UpdateRegistration();
   }

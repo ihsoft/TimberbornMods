@@ -13,7 +13,11 @@ namespace IgorZ.Automation.Conditions;
 public sealed class ObjectFinishedCondition : AutomationConditionBase {
   const string DescriptionLocKey = "IgorZ.Automation.ObjectFinishedCondition.Description";
 
-  #region BlockObjectConditionBase implementation
+  #region AutomationConditionBase overrides
+
+  /// <inheritdoc/>
+  public override bool CanRunOnUnfinishedBuildings => true;
+
   /// <inheritdoc/>
   public override string UiDescription => Behavior.Loc.T(DescriptionLocKey);
 
@@ -41,6 +45,7 @@ public sealed class ObjectFinishedCondition : AutomationConditionBase {
   protected override void OnBehaviorToBeCleared() {
     Behavior.EventBus.Unregister(this);
   }
+
   #endregion
 
   #region Implementation

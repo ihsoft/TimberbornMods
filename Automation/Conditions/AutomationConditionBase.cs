@@ -48,6 +48,9 @@ public abstract class AutomationConditionBase : IAutomationCondition {
   AutomationBehavior _behavior;
 
   /// <inheritdoc/>
+  public virtual bool CanRunOnUnfinishedBuildings => false;
+
+  /// <inheritdoc/>
   public virtual IAutomationConditionListener Listener { get; set; }
 
   /// <inheritdoc/>

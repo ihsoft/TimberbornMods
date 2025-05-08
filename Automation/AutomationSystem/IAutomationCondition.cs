@@ -25,6 +25,9 @@ public interface IAutomationCondition : IGameSerializable {
   /// <value><c>null</c> on the inactive condition.</value>
   public AutomationBehavior Behavior { get; set; }
 
+  /// <summary>Tells if the condition executes on a building, which construction is not yet finished.</summary>
+  public bool CanRunOnUnfinishedBuildings { get; }
+
   /// <summary>Listener that receives updates on the condition state changes.</summary>
   /// <remarks>
   /// The listener is responsible to decide on what to do next. It is basically "an action". The condition's role is

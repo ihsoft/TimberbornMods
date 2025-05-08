@@ -28,7 +28,11 @@ public sealed class CheckAccessBlockCondition : AutomationConditionBase {
   /// </summary>
   public bool IsReversedCondition { get; private set; }
 
-  #region AutomationConditionBase implementation
+  #region AutomationConditionBase overrides
+
+  /// <inheritdoc/>
+  public override bool CanRunOnUnfinishedBuildings => true;
+
   /// <inheritdoc/>
   public override string UiDescription =>
       Behavior.Loc.T(!IsReversedCondition ? BlockingPathNameLocKey : NotBlockingPathNameLocKey);
@@ -57,6 +61,7 @@ public sealed class CheckAccessBlockCondition : AutomationConditionBase {
   protected override void OnBehaviorToBeCleared() {
     DependencyContainer.GetInstance<PathCheckingService>().RemoveCondition(this);
   }
+
   #endregion
 
   #region IGameSerializable implemenation

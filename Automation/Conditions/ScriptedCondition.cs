@@ -23,6 +23,10 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   #region AutomationConditionBase overrides
 
   /// <inheritdoc/>
+  public override bool CanRunOnUnfinishedBuildings => _canRunOnUnfinishedBuildings;
+  bool _canRunOnUnfinishedBuildings;
+
+  /// <inheritdoc/>
   public override string UiDescription =>
       _parsedExpression != null
       ? DependencyContainer.GetInstance<ExpressionParser>().GetDescription(_parsedExpression)
@@ -148,7 +152,6 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
 
   ParsingResult _parsingResult;
   BoolOperator _parsedExpression;
-  bool _executeOnUnfinished;
   bool _hasOneShotSignal;
 
   // Used by the RulesEditor dialog.
@@ -208,7 +211,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   }
 
   void CheckOperands() {
-    if (!Behavior.BlockObject.IsFinished && !_executeOnUnfinished) {
+    if (!Behavior.BlockObject.IsFinished && !CanRunOnUnfinishedBuildings) {
       return;
     }
     if (_parsedExpression == null) {
@@ -240,7 +243,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
     }
     var signals = scriptingService.RegisterSignals(_parsedExpression, this);
     foreach (var signal in signals) {
-      _executeOnUnfinished |= signal.OnUnfinished;
+      _canRunOnUnfinishedBuildings |= signal.OnUnfinished;
       _hasOneShotSignal |= signal.OneShot;
     }
   }
