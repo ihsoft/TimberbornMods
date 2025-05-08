@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System;
+using System.Collections.Generic;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
@@ -140,9 +141,9 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   #region ISignalListener implementation
 
   /// <inheritdoc/>
-  public void OnValueChanged(string _) {
+  public void OnValueChanged(string signalName) {
     if (!IsMarkedForCleanup) {
-      CheckOperands();
+      CheckOperands(signalName);
     }
   }
 
@@ -152,7 +153,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
 
   ParsingResult _parsingResult;
   BoolOperator _parsedExpression;
-  bool _hasOneShotSignal;
+  readonly HashSet<string> _oneShotSignals = [];
 
   // Used by the RulesEditor dialog.
   internal static ParsingResult? ParseAndValidate(string expression, AutomationBehavior behavior) {
@@ -210,7 +211,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
     return resultValue;
   }
 
-  void CheckOperands() {
+  void CheckOperands(string signalName) {
     if (!Behavior.BlockObject.IsFinished && !CanRunOnUnfinishedBuildings) {
       return;
     }
@@ -220,7 +221,8 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
     }
     try {
       ConditionState = _parsedExpression.Execute();
-      if (_hasOneShotSignal && ConditionState) {
+      if (signalName != null && _oneShotSignals.Contains(signalName)) {
+        HostedDebugLog.Fine(Behavior, "OneShot signal '{0}' triggered. Cleanup the rule: {1}", signalName, Expression);
         IsMarkedForCleanup = true;
       }
     } catch (ScriptError.Interrupted e) {
@@ -244,7 +246,9 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
     var signals = scriptingService.RegisterSignals(_parsedExpression, this);
     foreach (var signal in signals) {
       _canRunOnUnfinishedBuildings |= signal.OnUnfinished;
-      _hasOneShotSignal |= signal.OneShot;
+      if (signal.OneShot) {
+        _oneShotSignals.Add(signal.SignalName);
+      }
     }
   }
 
