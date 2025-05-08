@@ -5,7 +5,6 @@
 using System;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
-using Timberborn.BaseComponentSystem;
 
 namespace IgorZ.Automation.ScriptingEngine;
 
@@ -35,12 +34,23 @@ interface IScriptable {
   /// <summary>Returns a property value source.</summary>
   /// <remarks>
   /// It is a very basic value accessor. It is similar to a signal, but there are no callbacks and definitions.
-  /// Primarily used by the "GetProperty" operators.
+  /// The main purpose is to override the stock component properties with some derived ones. For example, if the stock
+  /// component has a property of incompatible type, or there is no simple property that the rule preprocessor needs.
   /// </remarks>
-  /// <param name="name">The name of the property. It must be public.</param>
-  /// <param name="component">The component to get the value form.</param>
-  /// <returns>The property value "as-is", without any post-processing.</returns>
-  public Func<object> GetPropertySource(string name, BaseComponent component);
+  /// <param name="name">The full name of the property, including the scriptable component name.</param>
+  /// <param name="behavior">The component which the property should be resolved on.</param>
+  /// <returns>
+  /// <p>
+  /// A getter function that returns the property value as a native C# type. If the property value is NULL, then it
+  /// should be translated to a non-NULL value based on its type and semantics: null-strings become "NULL", numbers
+  /// become 0, etc.
+  /// </p>
+  /// <p>
+  /// If the property is not supported, then the method result should be <c>NULL</c>, and the caller should decide how
+  /// to react on it.
+  /// </p>
+  /// </returns>
+  public Func<object> GetPropertySource(string name, AutomationBehavior behavior);
 
   /// <summary>Returns the names of actions that can be executed on the specified building.</summary>
   /// <remarks>It is an expensive call. Don't execute it in the tick handlers.</remarks>

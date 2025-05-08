@@ -45,13 +45,12 @@ sealed class ScriptingService {
     return GetScriptable(name).GetSignalDefinition(name, behavior);
   }
 
-  //FIXME: refgactor to accept full name and a behavior
+  /// <inheritdoc cref="IScriptable.GetPropertySource"/>
   public Func<object> GetPropertySource(string name, AutomationBehavior behavior) {
     var nameItems = name.Split('.');
-    if (!_registeredScriptables.TryGetValue(nameItems[0], out var scriptable)) {
-      throw new ScriptError.ParsingError("Unknown scriptable component: " + nameItems[0]);
-    }
-    return scriptable.GetPropertySource(name, behavior);
+    return _registeredScriptables.TryGetValue(nameItems[0], out var scriptable)
+        ? scriptable.GetPropertySource(name, behavior)
+        : null;
   }
 
   /// <inheritdoc cref="IScriptable.GetActionNamesForBuilding"/>

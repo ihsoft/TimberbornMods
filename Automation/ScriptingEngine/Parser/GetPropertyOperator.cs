@@ -9,7 +9,6 @@ using System.Linq;
 using System.Reflection;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 using Timberborn.BaseComponentSystem;
-using UnityEngine;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
@@ -40,10 +39,11 @@ class GetPropertyOperator : AbstractOperator, IValueExpr {
       throw new ScriptError.ParsingError("Bad property name: " + Operands[0]);
     }
 
-    Func<object> propValueFn;
-    try {
-      propValueFn = context.ScriptingService.GetPropertySource(symbol.Value, context.ScriptHost);
-    } catch (ScriptError) {
+    Type propType;
+    var propValueFn = context.ScriptingService.GetPropertySource(symbol.Value, context.ScriptHost);
+    if (propValueFn != null) {
+      propType = propValueFn().GetType();
+    } else {
       var componentName = parts[0];
       var component = GetComponentByName(context.ScriptHost, componentName);
       if (!component) {
@@ -54,7 +54,9 @@ class GetPropertyOperator : AbstractOperator, IValueExpr {
       if (property == null) {
         throw new ScriptError.ParsingError($"Property {propertyName} not found on component {componentName}");
       }
-      propValueFn = () => property.GetValue(component);
+      propType = property.PropertyType;
+      propValueFn = () => property.GetValue(component)
+          ?? (propType == typeof(string) ? "NULL" : Activator.CreateInstance(propType));
     }
 
     var listObject = propValueFn();
@@ -62,7 +64,7 @@ class GetPropertyOperator : AbstractOperator, IValueExpr {
     if (listVal != null) {
       if (operands.Count == 1) {
         if (valueType != ScriptValue.TypeEnum.Number) {
-          throw new ScriptError.ParsingError("Number type required to return list count");
+          throw new ScriptError.ParsingError("The list type counter cannot be accessed as string");
         }
         propValueFn = () => GetAsList(listObject).Count;
       } else {
@@ -81,7 +83,6 @@ class GetPropertyOperator : AbstractOperator, IValueExpr {
       }
     }
 
-    var propType = propValueFn().GetType();
     ValueFn = valueType switch {
         ScriptValue.TypeEnum.Number when propType == typeof(int) => () => ScriptValue.FromInt((int)propValueFn()),
         ScriptValue.TypeEnum.Number when propType == typeof(float) => () => ScriptValue.FromFloat((float)propValueFn()),
@@ -104,7 +105,11 @@ class GetPropertyOperator : AbstractOperator, IValueExpr {
     return components.FirstOrDefault(x => x.enabled && x.GetType().Name == name);
   }
 
+  /// <summary>Converts an object to a list. The object must implement the GetEnumerator method.</summary>
   static IList GetAsList(object value) {
+    if (value is string) {
+      return null;  // Strings are enumerable, but they aren't lists.
+    }
     var getEnumeratorMethod = value.GetType().GetMethod("GetEnumerator", BindingFlags.Public | BindingFlags.Instance);
     if (getEnumeratorMethod == null) {
       return null;
