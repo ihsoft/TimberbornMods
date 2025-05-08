@@ -72,6 +72,11 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   AutomationBehavior _lastValidatedBehavior;
   bool _lastValidationResult;
 
+  /// <inheritdoc/>
+  public override string ToString() {
+    return $"{GetType()}(Pre=\"{Precondition}\";Expr=\"{Expression}\")";
+  }
+
   #endregion
 
   #region API

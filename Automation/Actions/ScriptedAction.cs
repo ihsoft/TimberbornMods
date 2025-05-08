@@ -81,6 +81,11 @@ sealed class ScriptedAction : AutomationActionBase {
     }
   }
 
+  /// <inheritdoc/>
+  public override string ToString() {
+    return $"{GetType()}(Expr=\"{Expression}\";Condition={Condition})";
+  }
+
   #endregion
 
   #region API
