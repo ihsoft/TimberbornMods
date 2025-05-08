@@ -134,6 +134,15 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   }
 
   /// <inheritdoc/>
+  public override ActionDef GetActionDefinition(string name, AutomationBehavior _) {
+    return name switch {
+        StartEmptyingStockActionName => StartEmptyingStockActionDef,
+        StopEmptyingStockActionName => StopEmptyingStockActionDef,
+        _ => throw new UnknownActionException(name),
+    };
+  }
+
+  /// <inheritdoc/>
   public override void RegisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
     var name = signalOperator.SignalName;
     if (!name.StartsWith(InputGoodSignalNamePrefix) && !name.StartsWith(OutputGoodSignalNamePrefix)) {
@@ -172,14 +181,6 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     if (actionOperator.ActionName is StartEmptyingStockActionName or StopEmptyingStockActionName) {
       behavior.GetOrThrow<EmptyingStatusBehavior>().RemoveAction(actionOperator);
     }
-  }
-
-  public override ActionDef GetActionDefinition(string name, AutomationBehavior _) {
-    return name switch {
-        StartEmptyingStockActionName => StartEmptyingStockActionDef,
-        StopEmptyingStockActionName => StopEmptyingStockActionDef,
-        _ => throw new UnknownActionException(name),
-    };
   }
 
   #endregion
