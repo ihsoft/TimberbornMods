@@ -10,7 +10,13 @@ namespace IgorZ.Automation.ScriptingEngine.Parser;
 
 sealed class SignalOperator : AbstractOperator, IValueExpr {
 
-  public string SignalName => ((SymbolExpr)Operands[0]).Value;
+  const string SigOneShotNameSuffix = ".OneShot";
+  const string OnUnfinishedNamePrefix = ".OnUnfinished.";
+
+  public string FullSignalName => ((SymbolExpr)Operands[0]).Value;
+  public readonly string SignalName;
+  public readonly bool OneShot;
+  public bool OnUnfinished => SignalName.Contains(OnUnfinishedNamePrefix);
 
   /// <inheritdoc/>
   public ScriptValue.TypeEnum ValueType { get; }
@@ -39,8 +45,13 @@ sealed class SignalOperator : AbstractOperator, IValueExpr {
       throw new ScriptError.ParsingError("Bad signal name: " + Operands[0]);
     }
     var signalName = symbol.Value;
-    _signalDef = context.ScriptingService.GetSignalDefinition(signalName, context.ScriptHost);
+    if (signalName.EndsWith(SigOneShotNameSuffix)) {
+      OneShot = true;
+      signalName = signalName[..^SigOneShotNameSuffix.Length];
+    }
+    SignalName = signalName;
+    _signalDef = context.ScriptingService.GetSignalDefinition(SignalName, context.ScriptHost);
     ValueType = _signalDef.Result.ValueType;
-    ValueFn = context.ScriptingService.GetSignalSource(signalName, context.ScriptHost);
+    ValueFn = context.ScriptingService.GetSignalSource(SignalName, context.ScriptHost);
   }
 }

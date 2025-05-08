@@ -148,6 +148,8 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
 
   ParsingResult _parsingResult;
   BoolOperator _parsedExpression;
+  bool _executeOnUnfinished;
+  bool _hasOneShotSignal;
 
   // Used by the RulesEditor dialog.
   internal static ParsingResult? ParseAndValidate(string expression, AutomationBehavior behavior) {
@@ -206,7 +208,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   }
 
   void CheckOperands() {
-    if (!Behavior.BlockObject.IsFinished) {
+    if (!Behavior.BlockObject.IsFinished && !_executeOnUnfinished) {
       return;
     }
     if (_parsedExpression == null) {
@@ -215,6 +217,9 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
     }
     try {
       ConditionState = _parsedExpression.Execute();
+      if (_hasOneShotSignal && ConditionState) {
+        IsMarkedForCleanup = true;
+      }
     } catch (ScriptError.Interrupted e) {
       HostedDebugLog.Fine(Behavior, "Condition execution interrupted: {0}\nReason: {1}", Expression, e.Message);
     } catch (ScriptError e) {
@@ -230,8 +235,13 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
       scriptingService.UnregisterSignals(_parsedExpression, this);
     }
     _parsedExpression = expression as BoolOperator;
-    if (_parsedExpression != null) {
-      scriptingService.RegisterSignals(_parsedExpression, this);
+    if (_parsedExpression == null) {
+      return;
+    }
+    var signals = scriptingService.RegisterSignals(_parsedExpression, this);
+    foreach (var signal in signals) {
+      _executeOnUnfinished |= signal.OnUnfinished;
+      _hasOneShotSignal |= signal.OneShot;
     }
   }
 

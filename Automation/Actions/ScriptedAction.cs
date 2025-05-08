@@ -56,6 +56,9 @@ sealed class ScriptedAction : AutomationActionBase {
     }
     try {
       _parsedExpression.Execute();
+      if (_parsedExpression.ExecuteOnce) {
+        IsMarkedForCleanup = true;
+      }
     } catch (ScriptError.Interrupted e) {
       HostedDebugLog.Fine(Behavior, "Action execution interrupted: {0}\nError: {1}", Expression, e.Message);
     } catch (ScriptError e) {

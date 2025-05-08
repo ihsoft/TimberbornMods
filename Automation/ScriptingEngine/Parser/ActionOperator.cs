@@ -11,7 +11,11 @@ namespace IgorZ.Automation.ScriptingEngine.Parser;
 
 sealed class ActionOperator : AbstractOperator {
 
-  public string ActionName => ((SymbolExpr)Operands[0]).Value;
+  const string ActOnceNameSuffix = ".Once";
+
+  public string FullActionName => ((SymbolExpr)Operands[0]).Value;
+  public readonly string ActionName;
+  public readonly bool ExecuteOnce; 
   public readonly Action Execute;
 
   readonly ActionDef _actionDef;
@@ -42,7 +46,12 @@ sealed class ActionOperator : AbstractOperator {
       throw new ScriptError.ParsingError("Bad action name: " + Operands[0]);
     }
     var actionName = symbol.Value;
-    _actionDef = context.ScriptingService.GetActionDefinition(actionName, context.ScriptHost);
+    if (actionName.EndsWith(ActOnceNameSuffix)) {
+      ExecuteOnce = true;
+      actionName = actionName[..^ActOnceNameSuffix.Length];
+    }
+    ActionName = actionName;
+    _actionDef = context.ScriptingService.GetActionDefinition(ActionName, context.ScriptHost);
     AsserNumberOfOperandsExact(_actionDef.Arguments.Length + 1);
     var argValues = new Func<ScriptValue>[_actionDef.Arguments.Length];
     for (var i = 0; i < _actionDef.Arguments.Length; i++) {
@@ -58,7 +67,7 @@ sealed class ActionOperator : AbstractOperator {
       }
       argValues[i] = valueExpr.ValueFn;
     }
-    var action = context.ScriptingService.GetActionExecutor(actionName, context.ScriptHost);
+    var action = context.ScriptingService.GetActionExecutor(ActionName, context.ScriptHost);
     Execute = () => action(argValues.Select(v => v()).ToArray());
   }
 }
