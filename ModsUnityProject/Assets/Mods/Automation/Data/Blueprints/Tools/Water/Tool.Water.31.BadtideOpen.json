@@ -1,22 +1,22 @@
 {
   "ToolSpec": {
-    "Id": "Automation.Tmpl.Water.OpenFloodgateDrought",
+    "Id": "Automation.Tmpl.Water.OpenFloodgateBadtide",
     "GroupId": "AutomationWaterToolGroupId",
     "Type": "IgorZ.Automation.TemplateTools.ApplyTemplateTool",
-    "Order": 21,
-    "Icon": "Sprites/IgorZ/icon-drought-open",
-    "NameLocKey": "IgorZ.Automation.Tool.tmpl.DroughtOpenFloodgate.DisplayName",
-    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.DroughtOpenFloodgate.Description"
+    "Order": 31,
+    "Icon": "Sprites/IgorZ/tool-badtide-open",
+    "NameLocKey": "IgorZ.Automation.Tool.tmpl.BadtideOpenFloodgate.DisplayName",
+    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.BadtideOpenFloodgate.Description"
   },
   "AutomationTemplateSpec": {
-    "TemplateFamilyName": "Floodgate-drought",
+    "TemplateFamilyName": "Floodgate-badtide",
     "Rules": [
       {
         "Condition": {
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
             { "Name": "Precondition", "StrValue": "(has 'Floodgate.')" },
-            { "Name": "Expression", "StrValue": "(eq (sig Weather.Season) 'drought')" }
+            { "Name": "Expression", "StrValue": "(eq (sig Weather.Season) 'badtide')" }
           ]
         },
         "Action": {

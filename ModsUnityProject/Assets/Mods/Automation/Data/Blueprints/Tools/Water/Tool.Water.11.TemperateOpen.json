@@ -1,12 +1,12 @@
 {
   "ToolSpec": {
-    "Id": "Automation.Tmpl.Water.CloseFloodgateTemperate",
+    "Id": "Automation.Tmpl.Water.OpenFloodgateTemperate",
     "GroupId": "AutomationWaterToolGroupId",
     "Type": "IgorZ.Automation.TemplateTools.ApplyTemplateTool",
-    "Order": 12,
-    "Icon": "Sprites/IgorZ/icon-temperate-close",
-    "NameLocKey": "IgorZ.Automation.Tool.tmpl.TemperateCloseFloodgate.DisplayName",
-    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.TemperateCloseFloodgate.Description",
+    "Order": 11,
+    "Icon": "Sprites/IgorZ/tool-temperate-open",
+    "NameLocKey": "IgorZ.Automation.Tool.tmpl.TemperateOpenFloodgate.DisplayName",
+    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.TemperateOpenFloodgate.Description"
   },
   "AutomationTemplateSpec": {
     "TemplateFamilyName": "Floodgate-temperate",
@@ -16,13 +16,13 @@
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
             { "Name": "Precondition", "StrValue": "(has 'Floodgate.')" },
-            { "Name": "Expression", "StrValue": "(eq (sig Weather.Season) 'temperate')" }
+            { "Name": "Expression", "StrValue": "(eq (sig Weather.Season) 'temperate')"}
           ]
         },
         "Action": {
           "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
           "Parameters": [
-            { "Name": "Expression", "StrValue": "(act Floodgate.SetHeight {% (getnum Floodgate.MaxHeight) %})" }
+            { "Name": "Expression", "StrValue": "(act Floodgate.SetHeight 0)"}
           ]
         }
       }

@@ -1,13 +1,13 @@
 {
   "ToolSpec": {
-    "Id": "Automation.Tmpl.Water.PauseDrought",
+    "Id": "Automation.Tmpl.Water.PauseTemperate",
     "GroupId": "AutomationWaterToolGroupId",
     "Type": "IgorZ.Automation.TemplateTools.ApplyTemplateTool",
-    "Order": 20,
-    "Icon": "Sprites/IgorZ/icon-drought-pause",
-    "NameLocKey": "IgorZ.Automation.Tool.tmpl.DroughtPause.DisplayName",
-    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.DroughtPause.Description",
-  },
+    "Order": 10,
+    "Icon": "Sprites/IgorZ/tool-temperate-pause",
+    "NameLocKey": "IgorZ.Automation.Tool.tmpl.TemperatePause.DisplayName",
+    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.TemperatePause.Description",
+   },
   "AutomationTemplateSpec": {
     "TemplateFamilyName": "Season-Pause",
     "Rules": [
@@ -16,7 +16,7 @@
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
             { "Name": "Precondition", "StrValue": "(has 'Pausable.')" },
-            { "Name": "Expression", "StrValue": "(eq (sig Weather.Season) 'drought')" }
+            { "Name": "Expression", "StrValue": "(eq (sig Weather.Season) 'temperate')" }
           ]
         },
         "Action": {
@@ -31,7 +31,7 @@
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
             { "Name": "Precondition", "StrValue": "(has 'Pausable.')" },
-            { "Name": "Expression", "StrValue": "(ne (sig Weather.Season) 'drought')" }
+            { "Name": "Expression", "StrValue": "(ne (sig Weather.Season) 'temperate')" }
           ]
         },
         "Action": {
