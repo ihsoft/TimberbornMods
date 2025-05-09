@@ -4,7 +4,7 @@
     "GroupId": "AutomationStorageToolGroupId",
     "Type": "IgorZ.Automation.TemplateTools.ApplyTemplateTool",
     "Order": 15,
-    "Icon": "Sprites/IgorZ/icon-prioritize-by-haulers",
+    "Icon": "Sprites/IgorZ/tool-prioritize-by-haulers",
     "NameLocKey": "IgorZ.Automation.Tool.tmpl.PrioritizeByHaulers.DisplayName",
     "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.PrioritizeByHaulers.Description"
   },
