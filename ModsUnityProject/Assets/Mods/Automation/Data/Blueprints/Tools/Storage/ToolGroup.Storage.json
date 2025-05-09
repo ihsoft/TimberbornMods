@@ -5,8 +5,8 @@
     "Type": "AutomationToolGroup",
     "Layout": "Green",
     "Order": 23,
-    "Icon": "Sprites/IgorZ/automation-group-storage",
+    "Icon": "Sprites/IgorZ/tool-group-storage",
     "NameLocKey": "IgorZ.Automation.ToolGroup.Storage.DisplayName",
-    "FallbackGroup": false,
+    "FallbackGroup": false
   }
 }

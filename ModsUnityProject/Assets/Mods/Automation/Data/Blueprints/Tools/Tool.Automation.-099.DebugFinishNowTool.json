@@ -4,7 +4,7 @@
     "GroupId": "AutomationToolGroupId",
     "Type": "IgorZ.Automation.CommonTools.DebugFinishNowTool",
     "Order": -99,
-    "Icon": "Sprites/IgorZ/debug-finish-all",
+    "Icon": "Sprites/IgorZ/tool-debug-finish-all",
     "DevMode": true,
     "NameLocKey": "IgorZ.Automation.DebugFinishNowTool.Title",
     "DescriptionLocKey": "IgorZ.Automation.DebugFinishNowTool.Description"

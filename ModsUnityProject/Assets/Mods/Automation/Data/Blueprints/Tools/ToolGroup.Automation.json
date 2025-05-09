@@ -4,9 +4,9 @@
     "Type": "AutomationToolGroup",
     "Layout": "Blue",
     "Order": 10000,
-    "Icon": "Sprites/IgorZ/automation-group",
+    "Icon": "Sprites/IgorZ/automation-tool-group",
     "NameLocKey": "IgorZ.Automation.ToolGroup.Main.DisplayName",
-    "FallbackGroup": false,
+    "FallbackGroup": false
   },
   "BottomBarSpec": {
     "Section": "0"
