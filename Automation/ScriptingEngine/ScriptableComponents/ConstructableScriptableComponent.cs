@@ -27,10 +27,7 @@ sealed class ConstructableScriptableComponent : ScriptableComponentBase {
   /// <inheritdoc/>
   public override string[] GetSignalNamesForBuilding(AutomationBehavior behavior) {
     var blockObject = behavior.GetComponentFast<BlockObject>();
-    if (!blockObject.IsFinished) {
-      return [StateSignalName, ProgressSignalName];
-    }
-    return [];
+    return !blockObject.IsFinished ? [StateSignalName, ProgressSignalName] : [];
   }
 
   /// <inheritdoc/>
