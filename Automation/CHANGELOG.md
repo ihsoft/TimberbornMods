@@ -1,5 +1,7 @@
 # v2.0.7 (pre-release):
 * [Feature] New scriptable components `Priritizable` and `Constructable`.
+* [Feature] New template tool that allows to prioritize by haulers a newly constructed building. 
+
 # v2.0.6 (10 Apr 2025):
 * [Fix] Copy rules tool crashes when attempted to be used.
 

@@ -66,6 +66,8 @@ IgorZ.Automation.Tool.tmpl.BeaversAtMinus20.DisplayName,"Количество б
 IgorZ.Automation.Tool.tmpl.BeaversAtMinus20.Description,"Примените этот шаблон к зданиям, которые должны оставаться в режиме 'остановлено' до тех пор, пока количество бобров не упадет ниже текущего значения на 10 бобров.",
 IgorZ.Automation.Tool.tmpl.ChainedBuildings.DisplayName,"Не блокировать пути строителей",
 IgorZ.Automation.Tool.tmpl.ChainedBuildings.Description,"Примените этот шаблон к строительным площадкам, которые могут блокировать пути строителей. Примечание: результат не гарантируются, особенно если здания не находятся на одном уровне.",
+IgorZ.Automation.Tool.tmpl.PrioritizeByHaulers.DisplayName,"Приоритет грузчиков этой постройке",
+IgorZ.Automation.Tool.tmpl.PrioritizeByHaulers.Description,"Примените этот шаблон к зданиям, которые должны стать приоритетными для грузчиков после завершения строительства.",
 IgorZ.Automation.CancelTool.Title,"Отменить автоматизацию",
 IgorZ.Automation.CancelTool.Description,"Используйте этот инструмент, чтобы отменить автоматизацию для зданий и строительных площадок.",
 IgorZ.Automation.PauseTool.Title,"Остановить здания",
@@ -117,6 +119,8 @@ IgorZ.Automation.Scriptable.Inventory.Action.StopEmptyingStock,"прекрати
 IgorZ.Automation.Scriptable.Inventory.Action.EmptyingStatus,"Склад освобождается в приоритетном порядке.",
 IgorZ.Automation.Scriptable.Pausable.Action.Pause,"остановить здание","Name of the action that pauses the building"
 IgorZ.Automation.Scriptable.Pausable.Action.Resume,"запустить здание","Name of the action that unpauses the building"
+IgorZ.Automation.Scriptable.Prioritizable.Action.SetHaulers,"+ приоритет грузчиков","Name of the action that sets the priority to the haulers"
+IgorZ.Automation.Scriptable.Prioritizable.Action.ResetHaulers,"- приоритет грузчиков","Name of the action that resets the priority to the haulers"
 IgorZ.Automation.Scriptable.Signals.Action.Set,"сигнал: {0} = {1}","Name of the action that sets the signal to the specified value"
 IgorZ.Automation.Scriptable.Signals.Signal.Get,"сигнал: {0}","Name of the condition for the signal checking"
 IgorZ.Automation.Scriptable.Weather.Signal.Season,"сезон","Name of the condition for the current season checking"
