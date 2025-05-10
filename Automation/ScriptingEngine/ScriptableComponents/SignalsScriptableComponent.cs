@@ -39,10 +39,7 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
       throw new InvalidOperationException("Not a custom signal: " + name);
     }
     var signalName = name[GetSignalSignalNamePrefix.Length..];
-    if (!SignalNameRegex.IsMatch(signalName)) {
-      throw new ScriptError.ParsingError(
-          $"Bad custom signal name: {signalName}. Must be alphanumeric and not start or end with a dot.");
-    }
+    SymbolExpr.CheckName(signalName);
     return GetSignalDef with {
         ScriptName = name,
         DisplayName = Loc.T(GetSignalLocKey, signalName),
@@ -185,8 +182,6 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
     public readonly ReferenceManager References = new();
   }
 
-  static readonly Regex SignalNameRegex = new(@"^(?!\.)([A-Za-z0-9]+\.?)*[A-Za-z0-9]$");
-
   readonly Dictionary<string, CustomSignalHandler> _signalHandlers = [];
   readonly ISingletonLoader _singletonLoader;
 
@@ -219,10 +214,7 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
       throw new ScriptError.ParsingError("Signal name must be a constant string: " + exp);
     }
     var name = constantValueExpr.ValueFn().AsString;
-    if (!SignalNameRegex.IsMatch(name)) {
-      throw new ScriptError.ParsingError(
-          $"Bad custom signal name: {name}. Must be alphanumeric and not start or end with a dot.");
-    }
+    SymbolExpr.CheckName(name);
   }
 
   #endregion
