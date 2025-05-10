@@ -45,7 +45,7 @@ public abstract class AbstractLockingTool : AbstractAreaSelectionTool {
 
   /// <inheritdoc/>
   public override string WarningText() {
-    if (SelectionModeActive && LockedComponent != null) {
+    if (SelectionModeActive && LockedComponent) {
       var goodObjectsSelectedCount = SelectedObjects.Count(ObjectFilterExpression);
       return goodObjectsSelectedCount == 1
           ? Loc.T(SelectingOneObjectLoc, LockedEntityNiceName)
@@ -54,7 +54,7 @@ public abstract class AbstractLockingTool : AbstractAreaSelectionTool {
     if (!IsShiftHeld || InputService.MouseOverUI || SelectionModeActive) {
       return "";
     }
-    if (HighlightedBlockObject != null && CheckCanLockOnComponent(HighlightedBlockObject)) {
+    if (HighlightedBlockObject && CheckCanLockOnComponent(HighlightedBlockObject)) {
       return Loc.T(StartObjectSelectingPromptLoc, GetEntityNiceName(HighlightedBlockObject));
     }
     return Loc.T(StartSelectingPromptLoc);
@@ -119,7 +119,7 @@ public abstract class AbstractLockingTool : AbstractAreaSelectionTool {
   /// <param name="obj">The object to check. It is never <c>null</c>.</param>
   /// <seealso cref="LockedComponent"/>
   protected virtual bool CheckIfSimilar(BlockObject obj) {
-    return LockedComponent == null || obj.GetComponentFast<PrefabSpec>().IsNamed(LockedPrefabName);
+    return !LockedComponent || obj.GetComponentFast<PrefabSpec>().IsNamed(LockedPrefabName);
   }
 
   /// <summary>Returns a user-friendly localized name of the entity.</summary>
