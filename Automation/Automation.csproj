@@ -69,6 +69,9 @@
       <None Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Population\*.json">
         <Link>Mod\Blueprints\Tools\Population\_</Link>
       </None>
+      <None Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Signals\*.json">
+        <Link>Mod\Blueprints\Tools\Signals\_</Link>
+      </None>
       <None Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Storage\*.json">
         <Link>Mod\Blueprints\Tools\Storage\_</Link>
       </None>

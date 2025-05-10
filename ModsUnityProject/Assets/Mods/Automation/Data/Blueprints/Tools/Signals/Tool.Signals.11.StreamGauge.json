@@ -1,0 +1,31 @@
+{
+  "ToolSpec": {
+    "Id": "Automation.Tmpl.Signals.StreamGauge",
+    "GroupId": "AutomationSignalsToolGroupId",
+    "Type": "IgorZ.Automation.TemplateTools.ApplyTemplateTool",
+    "Order": 11,
+    "Icon": "Sprites/IgorZ/tool-streamgauge-signals",
+    "NameLocKey": "IgorZ.Automation.Tool.tmpl.StreamGauge.DisplayName",
+    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.StreamGauge.Description"
+  },
+  "AutomationTemplateSpec": {
+    "TemplateFamilyName": "Storage.BoostEmptying",
+    "Rules": [
+      {
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Precondition", "StrValue": "(?sig StreamGauge.WaterLevel)" },
+            { "Name": "Expression", "StrValue": "(eq (sig StreamGauge.WaterLevel) (sig StreamGauge.WaterLevel))" }
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Signals.Set 'Gauge.blue1') (sig StreamGauge.WaterLevel))" }
+          ]
+        }
+      }
+    ]
+  }
+}

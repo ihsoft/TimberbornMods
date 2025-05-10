@@ -1,0 +1,31 @@
+{
+  "ToolSpec": {
+    "Id": "Automation.Tmpl.Signals.FloodgateGroup3",
+    "GroupId": "AutomationSignalsToolGroupId",
+    "Type": "IgorZ.Automation.TemplateTools.ApplyTemplateTool",
+    "Order": 22,
+    "Icon": "Sprites/IgorZ/tool-floodgate-group3",
+    "NameLocKey": "IgorZ.Automation.Tool.tmpl.FloodgateGroup.DisplayName",
+    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.FloodgateGroup.Description"
+  },
+  "AutomationTemplateSpec": {
+    "TemplateFamilyName": "Storage.BoostEmptying",
+    "Rules": [
+      {
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Precondition", "StrValue": "(?sig Floodgate.Height)" },
+            { "Name": "Expression", "StrValue": "(eq (sig Floodgate.Height) (sig Floodgate.Height))" }
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Signals.Set 'Floodgate.yellow1') (sig Floodgate.Height))" }
+          ]
+        }
+      }
+    ]
+  }
+}
