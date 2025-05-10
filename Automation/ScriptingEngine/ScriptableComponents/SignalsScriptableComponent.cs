@@ -28,6 +28,20 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
   public override string Name => "Signals";
 
   /// <inheritdoc/>
+  public override string[] GetSignalNamesForBuilding(AutomationBehavior _) {
+    var res = new List<string>();
+    foreach (var signal in _signalHandlers.Keys) {
+      if (!signal.StartsWith(GetSignalSignalNamePrefix)) {
+        //FIXME: Find out why!
+        DebugEx.Warning("Signal name does not start with prefix: " + signal);
+        continue;
+      }
+      res.Add(signal);
+    }
+    return res.ToArray();
+  }
+
+  /// <inheritdoc/>
   public override Func<ScriptValue> GetSignalSource(string name, AutomationBehavior _) {
     return () => ScriptValue.Of(
         !_signalHandlers.TryGetValue(name, out var signalHandler) ? -1 : signalHandler.Value);
