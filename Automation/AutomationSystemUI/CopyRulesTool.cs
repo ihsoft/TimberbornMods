@@ -59,7 +59,7 @@ sealed class CopyRulesTool : AbstractAreaSelectionTool, IAutomationModeEnabler, 
 
   /// <inheritdoc/>
   public override string WarningText() {
-    return Loc.T(CopyRulesTextLocKey, _copySource.Actions.Count());
+    return Loc.T(CopyRulesTextLocKey, _copySource.Actions.Count);
   }
 
   #endregion
