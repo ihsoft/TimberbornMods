@@ -39,11 +39,8 @@ class GetPropertyOperator : AbstractOperator, IValueExpr {
       throw new ScriptError.ParsingError("Bad property name: " + Operands[0]);
     }
 
-    Type propType;
     var propValueFn = context.ScriptingService.GetPropertySource(symbol.Value, context.ScriptHost);
-    if (propValueFn != null) {
-      propType = propValueFn().GetType();
-    } else {
+    if (propValueFn == null) {
       var componentName = parts[0];
       var component = GetComponentByName(context.ScriptHost, componentName);
       if (!component) {
@@ -54,9 +51,8 @@ class GetPropertyOperator : AbstractOperator, IValueExpr {
       if (property == null) {
         throw new ScriptError.ParsingError($"Property {propertyName} not found on component {componentName}");
       }
-      propType = property.PropertyType;
       propValueFn = () => property.GetValue(component)
-          ?? (propType == typeof(string) ? "NULL" : Activator.CreateInstance(propType));
+          ?? (property.PropertyType == typeof(string) ? "NULL" : Activator.CreateInstance(property.PropertyType));
     }
 
     var listObject = propValueFn();
@@ -83,6 +79,7 @@ class GetPropertyOperator : AbstractOperator, IValueExpr {
       }
     }
 
+    var propType = propValueFn().GetType();
     ValueFn = valueType switch {
         ScriptValue.TypeEnum.Number when propType == typeof(int) => () => ScriptValue.FromInt((int)propValueFn()),
         ScriptValue.TypeEnum.Number when propType == typeof(float) => () => ScriptValue.FromFloat((float)propValueFn()),
@@ -102,7 +99,7 @@ class GetPropertyOperator : AbstractOperator, IValueExpr {
       return InventoryScriptableComponent.GetInventory(baseComponent, throwIfNotFound: false);
     }
     var components = baseComponent.AllComponents.OfType<BaseComponent>();
-    return components.FirstOrDefault(x => x.enabled && x.GetType().Name == name);
+    return components.FirstOrDefault(x => x.GetType().Name == name);
   }
 
   /// <summary>Converts an object to a list. The object must implement the GetEnumerator method.</summary>
