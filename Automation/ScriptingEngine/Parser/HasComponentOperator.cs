@@ -37,16 +37,16 @@ class HasComponentOperator : BoolOperator {
       }
       testStrings.Add(componentName.ValueFn().AsString);
     }
-    Execute = () => testStrings.All(x => x.EndsWith(".") ? TryScriptable(x) : TryComponent(x));
+    Execute = () => testStrings.All(x => x.Contains(".") ? TryScriptable(x) : TryComponent(x));
   }
 
-  bool TryScriptable(string namePrefix) {
+  bool TryScriptable(string nameOrPrefix) {
     var actions = _scriptingService.GetActionNamesForBuilding(_component);
-    if (actions.Any(x => x.StartsWith(namePrefix))) {
+    if (actions.Any(x => x.StartsWith(nameOrPrefix) || x == nameOrPrefix)) {
       return true;
     }
     var signals = _scriptingService.GetSignalNamesForBuilding(_component);
-    if (signals.Any(x => x.StartsWith(namePrefix))) {
+    if (signals.Any(x => x.StartsWith(nameOrPrefix) || x == nameOrPrefix)) {
       return true;
     }
     return false;
