@@ -15,7 +15,7 @@
         "Condition": {
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
-            { "Name": "Precondition", "StrValue": "(has 'Prioritizable.' 'Constructable.')" },
+            { "Name": "Precondition", "StrValue": "(and (?sig Constructable.OnUnfinished.State) (?act Prioritizable.SetHaulers))" },
             { "Name": "Expression", "StrValue": "(eq (sig Constructable.OnUnfinished.State) 'finished')" }
           ]
         },

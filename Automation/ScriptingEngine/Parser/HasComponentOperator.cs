@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using IgorZ.Automation.AutomationSystem;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
@@ -16,10 +15,14 @@ class HasComponentOperator : BoolOperator {
 
   public static IExpression TryCreateFrom(ExpressionParser.Context context, string name, IList<IExpression> operands) {
     return name switch {
-        "has" => new HasComponentOperator(context, name, operands),
+        HasSigName => new HasComponentOperator(context, name, operands),
+        HasActName => new HasComponentOperator(context, name, operands),
         _ => null,
     };
   }
+
+  const string HasSigName = "?sig";
+  const string HasActName = "?act";
 
   readonly AutomationBehavior _component;
   readonly ScriptingService _scriptingService;
@@ -32,27 +35,37 @@ class HasComponentOperator : BoolOperator {
 
     var testStrings = new List<string>();
     foreach (var operand in operands) {
-      if (operand is not ConstantValueExpr { ValueType: ScriptValue.TypeEnum.String } componentName) {
-        throw new ScriptError.ParsingError("Expected a string literal: " + operand);
+      if (operand is not SymbolExpr { Value: var testName }) {
+        throw new ScriptError.ParsingError("Expected a symbol: " + operand);
       }
-      testStrings.Add(componentName.ValueFn().AsString);
+      testStrings.Add(testName);
     }
-    Execute = () => testStrings.All(x => x.Contains(".") ? TryScriptable(x) : TryComponent(x));
+    Execute = name switch {
+        HasSigName => () => TrySignals(testStrings),
+        HasActName => () => TryActions(testStrings),
+        _ => throw new InvalidOperationException("Unknown operator name: " + name),
+    };
   }
 
-  bool TryScriptable(string nameOrPrefix) {
-    var actions = _scriptingService.GetActionNamesForBuilding(_component);
-    if (actions.Any(x => x.StartsWith(nameOrPrefix) || x == nameOrPrefix)) {
+  bool TrySignals(IList<string> names) {
+    try {
+      foreach (var name in names) {
+        _scriptingService.GetSignalSource(name, _component);
+      }
       return true;
+    } catch (ScriptError) {
+      return false;
     }
-    var signals = _scriptingService.GetSignalNamesForBuilding(_component);
-    if (signals.Any(x => x.StartsWith(nameOrPrefix) || x == nameOrPrefix)) {
-      return true;
-    }
-    return false;
   }
 
-  bool TryComponent(string componentName) {
-    return GetPropertyOperator.GetComponentByName(_component, componentName);
+  bool TryActions(IList<string> names) {
+    try {
+      foreach (var name in names) {
+        _scriptingService.GetActionExecutor(name, _component);
+      }
+      return true;
+    } catch (ScriptError) {
+      return false;
+    }
   }
 }
