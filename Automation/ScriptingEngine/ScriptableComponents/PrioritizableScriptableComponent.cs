@@ -30,6 +30,9 @@ sealed class PrioritizableScriptableComponent : ScriptableComponentBase {
   /// <inheritdoc/>
   public override Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
     var haulPrioritizable = behavior.GetComponentFast<HaulPrioritizable>();
+    if (!haulPrioritizable) {
+      throw new ScriptError.BadStateError(behavior, "Building is not prioritizable");
+    }
     return name switch {
         SetHaulersActionName => _ => haulPrioritizable.Prioritized = true,
         ResetHaulersActionName => _ => haulPrioritizable.Prioritized = false,
