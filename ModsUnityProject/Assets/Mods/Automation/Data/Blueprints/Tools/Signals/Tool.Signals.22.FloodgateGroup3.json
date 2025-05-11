@@ -16,13 +16,28 @@
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
             { "Name": "Precondition", "StrValue": "(?sig Floodgate.Height)" },
-            { "Name": "Expression", "StrValue": "(eq (sig Floodgate.Height) (sig Floodgate.Height))" }
+            { "Name": "Expression", "StrValue": "(ge (sig Floodgate.Height) 0)" }
           ]
         },
         "Action": {
           "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
           "Parameters": [
-            { "Name": "Expression", "StrValue": "(act Signals.Set 'Floodgate.yellow1') (sig Floodgate.Height))" }
+            { "Name": "Expression", "StrValue": "(act Signals.Set 'Floodgate.yellow3') (sig Floodgate.Height))" }
+          ]
+        }
+      },
+      {
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Precondition", "StrValue": "(?act Floodgate.SetHeight)" },
+            { "Name": "Expression", "StrValue": "(ge (sig Signals.Floodgate.yellow1) 0)" }
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Floodgate.SetHeight (sig Signals.Floodgate.yellow3))" }
           ]
         }
       }
