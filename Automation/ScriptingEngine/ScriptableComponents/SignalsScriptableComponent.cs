@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.Persistence;
@@ -29,16 +28,8 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
 
   /// <inheritdoc/>
   public override string[] GetSignalNamesForBuilding(AutomationBehavior _) {
-    var res = new List<string>();
-    foreach (var signal in _signalHandlers.Keys) {
-      if (!signal.StartsWith(GetSignalSignalNamePrefix)) {
-        //FIXME: Find out why!
-        DebugEx.Warning("Signal name does not start with prefix: " + signal);
-        continue;
-      }
-      res.Add(signal);
-    }
-    return res.ToArray();
+    CleanupUnusedSignals();
+    return _signalHandlers.Keys.OrderBy(x => x).ToArray();
   }
 
   /// <inheritdoc/>
@@ -117,6 +108,7 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
 
   /// <inheritdoc/>
   public void Save(ISingletonSaver singletonSaver) {
+    CleanupUnusedSignals();
     var objectSaver = singletonSaver.GetSingleton(SignalsKey);
     var packedValues = _signalHandlers.Select(entry => $"{entry.Key}:{entry.Value.Value}").ToList();
     objectSaver.Set(CustomSignalsKey, packedValues);
@@ -221,6 +213,17 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
       }
     }
     return signalHandler;
+  }
+
+  void CleanupUnusedSignals() {
+    var names = _signalHandlers.Keys.ToList();  // Need a copy.
+    foreach (var name in names) {
+      var signal = _signalHandlers[name];
+      if (signal.References.Signals.Count == 0 && signal.References.Actions.Count == 0) {
+        DebugEx.Warning("Removing unused custom signal: name={0}, value={1}", signal.Name, signal.Value);
+        _signalHandlers.Remove(name);
+      }
+    }
   }
 
   static void SignalNameValidator(IValueExpr exp) {
