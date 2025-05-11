@@ -74,7 +74,7 @@ IgorZ.Automation.Tool.tmpl.EmitSelectedGood.Description,"Примените эт
 IgorZ.Automation.Tool.tmpl.StreamGauge.DisplayName,"Сигнал потокового датчика",
 IgorZ.Automation.Tool.tmpl.StreamGauge.Description,"Примените этот шаблон к потоковым датчикам, чтобы они установили и обновляли сигналы качества воды. Эти сигналы можно будет использовать в условиях на других зданиях.",
 IgorZ.Automation.Tool.tmpl.FloodgateGroup.DisplayName,"Создать группу шлюзов",
-IgorZ.Automation.Tool.tmpl.FloodgateGroup.Description,"Примените этот шаблон к шлюзам, чтобы они синхронно меняли высоту затвора.",
+IgorZ.Automation.Tool.tmpl.FloodgateGroup.Description,"Примените этот шаблон к шлюзам для одновременного изменения высоты затвора.",
 IgorZ.Automation.Tool.tmpl.PrioritizeByHaulers.DisplayName,"Приоритет грузчиков этой постройке",
 IgorZ.Automation.Tool.tmpl.PrioritizeByHaulers.Description,"Примените этот шаблон к зданиям, которые должны стать приоритетными для грузчиков после завершения строительства.",
 IgorZ.Automation.CancelTool.Title,"Отменить автоматизацию",
