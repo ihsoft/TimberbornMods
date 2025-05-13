@@ -65,6 +65,11 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
   }
 
   /// <inheritdoc/>
+  public override string[] GetActionNamesForBuilding(AutomationBehavior behavior) {
+    return [SetActionName];
+  }
+
+  /// <inheritdoc/>
   public override Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
     return name switch {
         SetActionName => SetSignalAction,
