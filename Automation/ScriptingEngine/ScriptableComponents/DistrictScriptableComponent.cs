@@ -29,11 +29,9 @@ class DistrictScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override string[] GetSignalNamesForBuilding(AutomationBehavior behavior) {
-    var districtBuilding = behavior.GetComponentFast<DistrictBuilding>();
-    if (!districtBuilding) {
-      return [];
-    }
-    return [BeaverPopulationSignalName, BotPopulationSignalName, NumberOfBedsSignalName];
+    return behavior.GetComponentFast<DistrictBuilding>() 
+        ? [BeaverPopulationSignalName, BotPopulationSignalName, NumberOfBedsSignalName]
+        : [];
   }
 
   /// <inheritdoc/>
