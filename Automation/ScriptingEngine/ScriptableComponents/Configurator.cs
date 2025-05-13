@@ -4,6 +4,8 @@
 
 using Bindito.Core;
 using IgorZ.TimberDev.Utils;
+using Timberborn.TemplateSystem;
+using Timberborn.WaterBuildings;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
@@ -24,11 +26,20 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<InventoryScriptableComponent>().AsSingleton();
     containerDefinition.Bind<ConstructableScriptableComponent>().AsSingleton();
     containerDefinition.Bind<PrioritizableScriptableComponent>().AsSingleton();
+    containerDefinition.Bind<StreamGaugeScriptableComponent>().AsSingleton();
 
     // Global components. Order them from the most to the less frequently needed.
     containerDefinition.Bind<WeatherScriptableComponent>().AsSingleton();
     containerDefinition.Bind<DistrictScriptableComponent>().AsSingleton();
     containerDefinition.Bind<SignalsScriptableComponent>().AsSingleton();
     containerDefinition.Bind<DebugScriptableComponent>().AsSingleton();
+
+    containerDefinition.MultiBind<TemplateModule>().ToProvider(ProvideTemplateModule).AsSingleton();
+  }
+
+  static TemplateModule ProvideTemplateModule() {
+    var builder = new TemplateModule.Builder();
+    builder.AddDecorator<StreamGauge, StreamGaugeScriptableComponent.StreamGaugeCheckTicker>();
+    return builder.Build();
   }
 }

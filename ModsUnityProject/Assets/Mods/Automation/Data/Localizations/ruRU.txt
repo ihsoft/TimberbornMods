@@ -133,6 +133,9 @@ IgorZ.Automation.Scriptable.Prioritizable.Action.SetHaulers,"+ приорите�
 IgorZ.Automation.Scriptable.Prioritizable.Action.ResetHaulers,"- приоритет грузчиков","Name of the action that resets the priority to the haulers"
 IgorZ.Automation.Scriptable.Signals.Action.Set,"сигнал: {0} = {1}","Name of the action that sets the signal to the specified value"
 IgorZ.Automation.Scriptable.Signals.Signal.Get,"сигнал: {0}","Name of the condition for the signal checking"
+IgorZ.Automation.Scriptable.StreamGauge.Signal.Depth,"глубина","Name of the condition for the current water level checking"
+IgorZ.Automation.Scriptable.StreamGauge.Signal.Contamination,"заражение","Name of the condition for the current water contamination level checking"
+IgorZ.Automation.Scriptable.StreamGauge.Signal.Current,"течение","Name of the condition for the current water current checking"
 IgorZ.Automation.Scriptable.Weather.Signal.Season,"сезон","Name of the condition for the current season checking"
 =,=,"Rules editor strings"
 IgorZ.Automation.Scripting.Editor.DialogHeader,"Правила автоматизации",

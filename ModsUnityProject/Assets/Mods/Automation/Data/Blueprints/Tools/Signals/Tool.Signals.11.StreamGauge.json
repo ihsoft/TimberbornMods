@@ -15,14 +15,44 @@
         "Condition": {
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
-            { "Name": "Precondition", "StrValue": "(?sig StreamGauge.WaterLevel)" },
-            { "Name": "Expression", "StrValue": "(eq (sig StreamGauge.WaterLevel) (sig StreamGauge.WaterLevel))" }
+            { "Name": "Precondition", "StrValue": "(?sig StreamGauge.Depth)" },
+            { "Name": "Expression", "StrValue": "(ge (sig StreamGauge.Depth) 0)" }
           ]
         },
         "Action": {
           "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
           "Parameters": [
-            { "Name": "Expression", "StrValue": "(act Signals.Set 'Gauge.blue1') (sig StreamGauge.WaterLevel))" }
+            { "Name": "Expression", "StrValue": "(act Signals.Set 'Gauge.blue1' (sig StreamGauge.Depth))" }
+          ]
+        }
+      },
+      {
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Precondition", "StrValue": "(?sig StreamGauge.Contamination)" },
+            { "Name": "Expression", "StrValue": "(ge (sig StreamGauge.Contamination) 0)" }
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Signals.Set 'Gauge.red1' (sig StreamGauge.Contamination))" }
+          ]
+        }
+      },
+      {
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Precondition", "StrValue": "(?sig StreamGauge.Current)" },
+            { "Name": "Expression", "StrValue": "(ge (sig StreamGauge.Current) 0)" }
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Signals.Set 'Gauge.yellow1' (sig StreamGauge.Current))" }
           ]
         }
       }

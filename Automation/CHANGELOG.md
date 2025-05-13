@@ -1,9 +1,10 @@
 # v2.1.0 (pre-release):
-* [Feature] New scriptable components `Priritizable` and `Constructable`.
+* [Feature] Buildings can now emit their state as global signals to be consumed by other buildings.
+* [Feature] New scriptable components `Prioritizable` and `Constructable`.
 * [Feature] New template tool that allows to prioritize by haulers a newly constructed building.
 * [Feature] New template tool to sync floodgate heights.
-* [Feature] Buildings can now emit their state as signals to be consumed by other buildings.
-* [Fix #71] Incorrect Good ID causes crash with scripting.
+* [Feature] New template tool to emit stream gauge state as signals.
+* [Fix #71] Incorrect Good ID in inventory signals causes crash with scripting.
 
 # v2.0.6 (10 Apr 2025):
 * [Fix] Copy rules tool crashes when attempted to be used.
