@@ -1,6 +1,7 @@
 # v2.1.0 (pre-release):
 * [Feature] New scriptable components `Priritizable` and `Constructable`.
 * [Feature] New template tool that allows to prioritize by haulers a newly constructed building.
+* [Feature] New template tool to sync floodgate heights.
 * [Feature] Buildings can now emit their state as signals to be consumed by other buildings.
 * [Fix #71] Incorrect Good ID causes crash with scripting.
 

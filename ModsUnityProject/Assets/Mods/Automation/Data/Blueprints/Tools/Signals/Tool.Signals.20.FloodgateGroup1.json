@@ -9,7 +9,7 @@
     "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.FloodgateGroup.Description"
   },
   "AutomationTemplateSpec": {
-    "TemplateFamilyName": "Storage.BoostEmptying",
+    "TemplateFamilyName": "Floodgate.Sync",
     "Rules": [
       {
         "Condition": {
@@ -22,7 +22,7 @@
         "Action": {
           "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
           "Parameters": [
-            { "Name": "Expression", "StrValue": "(act Signals.Set 'Floodgate.yellow1') (sig Floodgate.Height))" }
+            { "Name": "Expression", "StrValue": "(act Signals.Set 'Floodgate.yellow1' (sig Floodgate.Height))" }
           ]
         }
       },
