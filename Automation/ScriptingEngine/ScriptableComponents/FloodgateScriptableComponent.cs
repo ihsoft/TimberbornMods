@@ -67,7 +67,6 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
     };
   }
 
-
   /// <inheritdoc/>
   public override void RegisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
     host.Behavior.GetOrCreate<HeightChangeTracker>().AddSignal(signalOperator, host);
@@ -110,11 +109,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
   static void SetHeightAction(Floodgate floodgate, ScriptValue[] args) {
     AssertActionArgsCount(SetHeightActionName, args, 1);
-    var height = args[0].AsFloat;
-    if (height < 0) {
-      height = floodgate.MaxHeight + height;
-    }
-    floodgate.SetHeight(height);
+    floodgate.SetHeight(args[0].AsFloat);
   }
 
   #endregion
