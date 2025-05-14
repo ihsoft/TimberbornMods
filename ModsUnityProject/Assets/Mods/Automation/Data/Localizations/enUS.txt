@@ -75,7 +75,7 @@ IgorZ.Automation.Tool.tmpl.StreamGauge.Description,"Apply this template to strea
 IgorZ.Automation.Tool.tmpl.FloodgateGroup.DisplayName,"Floodgate group",
 IgorZ.Automation.Tool.tmpl.FloodgateGroup.Description,"Apply this template to floodgates to control their height in sync.",
 IgorZ.Automation.Tool.tmpl.PrioritizeByHaulers.DisplayName,"Prioritize by haulers",
-IgorZ.Automation.Tool.tmpl.PrioritizeByHaulers.Description,"Apply this template to buildings that should be prioritized by haulers once the construction is complete."
+IgorZ.Automation.Tool.tmpl.PrioritizeByHaulers.Description,"Apply this template to buildings that should be prioritized by haulers once the construction is complete.",
 IgorZ.Automation.CancelTool.Title,"Cancel automation",
 IgorZ.Automation.CancelTool.Description,"Use this tool to clean up any automation on the buildings or construction sites.",
 IgorZ.Automation.PauseTool.Title,"Pause buildings",
