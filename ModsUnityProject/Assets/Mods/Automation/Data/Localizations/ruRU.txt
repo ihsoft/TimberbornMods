@@ -122,6 +122,8 @@ IgorZ.Automation.Scriptable.District.Signal.Bots,"ботов в районе","N
 IgorZ.Automation.Scriptable.District.Signal.NumberOfBeds,"постелей в районе","Name of the condition for the current number of beds checking"
 IgorZ.Automation.Scriptable.Floodgate.Signal.Height,"высота затвора","Name of the condition for the floodgate height checking"
 IgorZ.Automation.Scriptable.Floodgate.Action.SetHeight,"выставить высоту затвора в {0}","Change the floodgate height to the specified value"
+IgorZ.Automation.Scriptable.FlowControl.Action.Open,"разрешить поток","Name of the action that opens the water flow through the building"
+IgorZ.Automation.Scriptable.FlowControl.Action.Close,"запретить поток","Name of the action that closes the water flow through the building"
 IgorZ.Automation.Scriptable.Inventory.Signal.InputGood,"вход: {0}","Name of the condition for the inventory input goods"
 IgorZ.Automation.Scriptable.Inventory.Signal.OutputGood,"выход: {0}","Name of the condition for the inventory output goods"
 IgorZ.Automation.Scriptable.Inventory.Action.StartEmptyingStock,"начать освобождать","Name of the action that starts emptying the storage"

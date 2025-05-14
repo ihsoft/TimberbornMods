@@ -27,6 +27,7 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<ConstructableScriptableComponent>().AsSingleton();
     containerDefinition.Bind<PrioritizableScriptableComponent>().AsSingleton();
     containerDefinition.Bind<StreamGaugeScriptableComponent>().AsSingleton();
+    containerDefinition.Bind<FlowControlScriptableComponent>().AsSingleton();
 
     // Global components. Order them from the most to the less frequently needed.
     containerDefinition.Bind<WeatherScriptableComponent>().AsSingleton();
