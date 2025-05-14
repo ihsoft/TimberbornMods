@@ -1,6 +1,7 @@
 # v2.1.1 (pre-release):
 * [Feature] Add settings to control how to show the rules on the building's panel.
 * [Feature] Add new scripting component `FlowControl` to allow scripting the water flow on sluices and badwater domes.
+* [Change] The "Open water regulator" template can now be applied to the sluices as well. 
 
 # v2.1.0 (12 May 2025):
 * [Feature] Buildings can now emit their state as global signals to be consumed by other buildings.
