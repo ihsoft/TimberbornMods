@@ -1,3 +1,5 @@
+# v2.1.1 (pre-release):
+
 # v2.1.0 (12 May 2025):
 * [Feature] Buildings can now emit their state as global signals to be consumed by other buildings.
 * [Feature] New scriptable components `Prioritizable` and `Constructable`.
