@@ -6,7 +6,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using IgorZ.Automation.AutomationSystem;
-using IgorZ.Automation.Conditions;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.BlockObjectTools;
 using Timberborn.BlockSystem;
@@ -75,7 +74,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
 
     // The behavior object will get destroyed on detonate, so create an independent component.
     var component = new GameObject("#Automation_PlaceDynamiteAction").AddComponent<DetonateAndMaybeRepeatRule>();
-    component.Setup(Behavior.BlockObject, RepeatCount, _builderPriority);
+    component.Setup(this, _builderPriority);
   }
 
   /// <inheritdoc/>
@@ -83,6 +82,7 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
     base.OnBehaviorAssigned();
     var builderPrioritizable = Behavior.GetComponentFast<BuilderPrioritizable>();
     _builderPriority = builderPrioritizable.Priority;
+    // The priority on a finished building is reset to "Normal", so track it while the object is in preview.
     builderPrioritizable.PriorityChanged += OnPriorityChanged;
   }
 
@@ -133,12 +133,14 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
     BlockObject _blockObject;
     int _repeatCount;
     Priority _builderPriority;
+    IAutomationCondition _condition; 
 
     /// <summary>Sets up the component and starts the actual monitoring of the object.</summary>
-    public void Setup(BlockObject blockObject, int repeatCount, Priority builderPriority) {
-      _blockObject = blockObject;
-      _repeatCount = repeatCount;
+    public void Setup(DetonateDynamiteAction action, Priority builderPriority) {
+      _blockObject = action.Behavior.BlockObject;
+      _repeatCount = action.RepeatCount;
       _builderPriority = builderPriority;
+      _condition = action.Condition.CloneDefinition();
       _prefabName = _blockObject.GetComponentFast<PrefabSpec>().Name;
       StartCoroutine(WaitAndPlace());
     }
@@ -200,8 +202,8 @@ public sealed class DetonateDynamiteAction : AutomationActionBase {
       } while (!newDynamite);
       newDynamite.GetComponentFast<BuilderPrioritizable>().SetPriority(_builderPriority);
       newDynamite.GetComponentFast<AutomationBehavior>().AddRule(
-        new ObjectFinishedCondition(),
-        new DetonateDynamiteAction { RepeatCount = _repeatCount - 1 });
+          _condition,
+          new DetonateDynamiteAction { RepeatCount = _repeatCount - 1 });
       HostedDebugLog.Fine(newDynamite, "Placed new item: priority={0}, tries={1}", _builderPriority, _repeatCount - 1);
 
       yield return YieldAbort();

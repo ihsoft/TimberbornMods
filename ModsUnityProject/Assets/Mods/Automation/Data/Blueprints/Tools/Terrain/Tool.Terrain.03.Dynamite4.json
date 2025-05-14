@@ -6,15 +6,21 @@
     "Order": 3,
     "Icon": "Sprites/IgorZ/tool-dynamite-x4",
     "NameLocKey": "IgorZ.Automation.Tool.tmpl.4LevelsDynamite.DisplayName",
-    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.XLevelsDynamite.Description",
+    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.XLevelsDynamite.Description"
   },
   "AutomationTemplateSpec": {
     "TemplateFamilyName": "DynamiteDigging",
     "Rules": [
       {
-        "Condition": { "TypeId": "IgorZ.Automation.Conditions.ObjectFinishedCondition" },
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Precondition", "StrValue": "(?sig Constructable.OnUnfinished.State)" },
+            { "Name": "Expression", "StrValue": "(eq (sig Constructable.OnUnfinished.State) 'finished')" }
+          ]
+        },
         "Action": { "TypeId": "IgorZ.Automation.Actions.DetonateDynamiteAction", "Parameters": [{"Name": "Repeat", "IntValue": 3}] }
-      },
-    ],
+      }
+    ]
   }
 }
