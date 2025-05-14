@@ -195,6 +195,7 @@
       <Compile Remove="Actions\BlockableBuildingAction.cs" />
       <Compile Remove="Conditions\ThresholdConditionBase.cs" />
       <Compile Remove="Actions\WaterRegulatorStateAction.cs" />
+      <Compile Remove="Conditions\ObjectFinishedCondition.cs" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <PropertyGroup>
