@@ -9,7 +9,7 @@
     "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.EmitSelectedGood.Description"
   },
   "AutomationTemplateSpec": {
-    "TemplateFamilyName": "Storage.BoostEmptying",
+    "TemplateFamilyName": "Storage.Signals",
     "Rules": [
       {
         "Condition": {

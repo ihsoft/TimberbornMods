@@ -9,7 +9,7 @@
     "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.StreamGauge.Description"
   },
   "AutomationTemplateSpec": {
-    "TemplateFamilyName": "Storage.BoostEmptying",
+    "TemplateFamilyName": "Gauge.Signals",
     "Rules": [
       {
         "Condition": {
