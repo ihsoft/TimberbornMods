@@ -163,6 +163,12 @@ IgorZ.Automation.Scripting.Editor.StringConstantType,"string","Name of the strin
 IgorZ.Automation.Scripting.Editor.NumberConstantType,"number","Name of the number constant type"
 =,=,"Mod settings"
 IgorZ.Automation.Settings.Debug.PathCheckingProfiling,"Log path checking engine statistics",
+IgorZ.Automation.Settings.EntityPanel.Header,"Controls on the building panel",
+IgorZ.Automation.Settings.EntityPanel.AlwaysShowAddRulesButton,"Always show 'Add rules' button",
+IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle,"Style of the rule description",
+IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.HumanReadable,"Text","Human readable style of the rule description."
+IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.Script,"Script","Script style of the rule description."
+IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.ScriptShort,"Pseudo-script","Shortened script style of the rule description."
 =,=,"TimberDev_Utils"
 TimberDev_Utils.Tools.LockSelectTool.SelectingObject,"Selecting: {0}","Text to show the type of the selected building. It's shown when the selection tool is locked on the specific buildings."
 TimberDev_Utils.Tools.LockSelectTool.SelectingNObjects,"Selecting: {0} (x{1})","The plural form of TimberDev_Utils.Tools.LockSelectTool.SelectingObject"

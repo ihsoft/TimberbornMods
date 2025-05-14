@@ -131,6 +131,10 @@ sealed class ScriptingService {
   readonly Dictionary<string, IScriptable> _registeredScriptables = [];
   readonly Stack<SignalCallback> _callbackStack = new();
 
+  internal IList<string> GetScriptableNames() {
+    return _registeredScriptables.Keys.ToList();
+  }
+
   string GetExecutionLog() {
     return string.Join("\n", _callbackStack.Select(x => $"{DebugEx.ObjectToString(x.SignalListener.Behavior)}:{x.Name}"));
   }

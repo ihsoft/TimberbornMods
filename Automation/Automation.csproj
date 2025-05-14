@@ -36,6 +36,9 @@
       <Reference Include="0Harmony">
         <HintPath>..\Dependencies\Workshop\3284904751\0Harmony.dll</HintPath>
       </Reference>
+      <Reference Include="ModSettings.Common">
+        <HintPath>..\Dependencies\Workshop\3283831040\version-0.6\Scripts\ModSettings.Common.dll</HintPath>
+      </Reference>
       <Reference Include="ModSettings.Core">
         <HintPath>..\_WORKSHOP!\3283831040\version-0.7\Scripts\ModSettings.Core.dll</HintPath>
       </Reference>

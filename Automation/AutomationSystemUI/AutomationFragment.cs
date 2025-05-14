@@ -2,8 +2,14 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System.Collections.Generic;
+using System.Linq;
+using IgorZ.Automation.Actions;
 using IgorZ.Automation.AutomationSystem;
+using IgorZ.Automation.Conditions;
+using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngineUI;
+using IgorZ.Automation.Settings;
 using IgorZ.TimberDev.UI;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
@@ -25,9 +31,16 @@ sealed class AutomationFragment : IEntityPanelFragment {
   const string EditRulesButtonName = "EditRulesButton";
   const string CopyRulesButtonName = "CopyRulesButton";
 
+  // Scriptable components to ignore when checking for the controls' visibility.
+  static readonly List<string> GlobalActions = [
+      "Debug.", "Weather.", "Signals.",
+  ];
+
   readonly UiFactory _uiFactory;
   readonly RulesEditorDialog _rulesEditorDialog;
   readonly CopyRulesTool _copyRulesTool;
+  readonly EntityPanelSettings _entityPanelSettings;
+  readonly ScriptingService _scriptingService;
 
   VisualElement _root;
   VisualElement _rulesList;
@@ -35,10 +48,13 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
   AutomationBehavior _automationBehavior;
 
-  AutomationFragment(UiFactory uiFactory, RulesEditorDialog rulesEditorDialog, CopyRulesTool copyRulesTool) {
+  AutomationFragment(UiFactory uiFactory, RulesEditorDialog rulesEditorDialog, CopyRulesTool copyRulesTool,
+                     EntityPanelSettings entityPanelSettings, ScriptingService scriptingService) {
     _uiFactory = uiFactory;
     _rulesEditorDialog = rulesEditorDialog;
     _copyRulesTool = copyRulesTool;
+    _entityPanelSettings = entityPanelSettings;
+    _scriptingService = scriptingService;
   }
 
   public VisualElement InitializeFragment() {
@@ -64,7 +80,6 @@ sealed class AutomationFragment : IEntityPanelFragment {
   }
 
   public void UpdateFragment() {
-    //FIXME: Only update if there was a signal triggered.
     if (_automationBehavior) {
       UpdateView();
     }
@@ -75,6 +90,17 @@ sealed class AutomationFragment : IEntityPanelFragment {
       _root.ToggleDisplayStyle(false);
       return;
     }
+    if (!_automationBehavior.HasActions && !_entityPanelSettings.AlwaysShowAddRulesButton.Value) {
+      var hasSignals = _scriptingService.GetSignalNamesForBuilding(_automationBehavior)
+          .Any(x => !GlobalActions.Any(x.StartsWith));
+      var hasActions = _scriptingService.GetActionNamesForBuilding(_automationBehavior)
+          .Any(x => !GlobalActions.Any(x.StartsWith));
+      if (!hasSignals && !hasActions) {
+        _root.ToggleDisplayStyle(false);
+        return;
+      }
+    }
+
     _root.ToggleDisplayStyle(visible: true);
     _root.Q(RulesPanelName).ToggleDisplayStyle(_automationBehavior.HasActions);
     _root.Q(RulesAdjustmentControlsName).ToggleDisplayStyle(_automationBehavior.HasActions);
@@ -85,8 +111,33 @@ sealed class AutomationFragment : IEntityPanelFragment {
     _rulesList.Clear();
     foreach (var action in _automationBehavior.Actions) {
       var row = _uiFactory.LoadVisualElement(RuleRowTemplate);
-      row.Q<Label>("Content").text = _uiFactory.T(RuleTextLocKey, action.Condition.UiDescription, action.UiDescription);
+      string conditionText;
+      if (_entityPanelSettings.RulesDescriptionStyle == EntityPanelSettings.DescriptionStyle.HumanReadable
+          || action.Condition is not ScriptedCondition scriptedCondition) {
+        conditionText = action.Condition.UiDescription;
+      } else {
+        conditionText = CommonFormats.HighlightYellow(scriptedCondition.Expression);
+        if (_entityPanelSettings.RulesDescriptionStyle == EntityPanelSettings.DescriptionStyle.ScriptShort) {
+          conditionText = ShortenNames(conditionText);
+        }
+      }
+      string actionText;
+      if (_entityPanelSettings.RulesDescriptionStyle == EntityPanelSettings.DescriptionStyle.HumanReadable
+          || action is not ScriptedAction scriptedAction) {
+        actionText = action.UiDescription;
+      } else {
+        actionText = CommonFormats.HighlightYellow(scriptedAction.Expression);
+        if (_entityPanelSettings.RulesDescriptionStyle == EntityPanelSettings.DescriptionStyle.ScriptShort) {
+          actionText = ShortenNames(actionText);
+        }
+      }
+      row.Q<Label>("Content").text = _uiFactory.T(RuleTextLocKey, conditionText, actionText);
       _rulesList.Add(row);
     }
+  }
+
+  string ShortenNames(string description) {
+    return _scriptingService.GetScriptableNames()
+        .Aggregate(description, (current, scriptableName) => current.Replace(" " + scriptableName + ".", " "));
   }
 }
