@@ -1,4 +1,5 @@
 # v2.1.1 (pre-release):
+* [Feature] Add settings to control how to show the rules on the building's panel.
 
 # v2.1.0 (12 May 2025):
 * [Feature] Buildings can now emit their state as global signals to be consumed by other buildings.
