@@ -229,7 +229,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
 
     void Awake() {
       _inventory = GetInventory(this, throwIfNotFound: false);
-      if (_inventory == null) {
+      if (!_inventory) {
         throw new InvalidOperationException("Inventory component not found on: " + DebugEx.ObjectToString(this));
       }
       _inventory.InventoryStockChanged += NotifyChange;
