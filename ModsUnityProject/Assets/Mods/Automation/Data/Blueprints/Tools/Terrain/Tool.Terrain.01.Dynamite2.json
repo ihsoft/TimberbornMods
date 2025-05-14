@@ -9,17 +9,22 @@
     "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.XLevelsDynamite.Description"
   },
   "AutomationTemplateSpec": {
-    "TemplateFamilyName": "DynamiteDigging",
+    "TemplateFamilyName": "Dynamite.Digging",
     "Rules": [
       {
         "Condition": {
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
-            { "Name": "Precondition", "StrValue": "(?sig Constructable.OnUnfinished.State)" },
+            { "Name": "Precondition", "StrValue": "(and (?sig Constructable.OnUnfinished.State) (?act Dynamite.Detonate))" },
             { "Name": "Expression", "StrValue": "(eq (sig Constructable.OnUnfinished.State) 'finished')" }
           ]
         },
-        "Action": { "TypeId": "IgorZ.Automation.Actions.DetonateDynamiteAction", "Parameters": [{"Name": "Repeat", "IntValue": 1}] }
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Dynamite.DetonateAndRepeat 100)" }
+          ]
+        }
       }
     ]
   }

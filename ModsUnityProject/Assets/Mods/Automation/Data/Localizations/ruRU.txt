@@ -83,8 +83,6 @@ IgorZ.Automation.PauseTool.Title,"Остановить здания",
 IgorZ.Automation.PauseTool.Description,"Используйте этот инструмент, чтобы остановить здания и строительные площадки.",
 IgorZ.Automation.ResumeTool.Title,"Возобновить здания",
 IgorZ.Automation.ResumeTool.Description,"Используйте этот инструмент, чтобы возобновить здания и строительные площадки.",
-IgorZ.Automation.DetonateDynamiteAction.Description,"<YellowHighlight>активировать динамит</YellowHighlight>",
-IgorZ.Automation.DetonateDynamiteAction.RepeatCountInfo," и повторить ещё <GreenHighlight>{0} раза</GreenHighlight>",
 IgorZ.Automation.ObjectFinishedCondition.Description,"<YellowHighlight>строительство завершено</YellowHighlight>",
 IgorZ.Automation.CheckAccessBlockCondition.Blocking.Description,"<YellowHighlight>блокирует путь</YellowHighlight>",
 IgorZ.Automation.CheckAccessBlockCondition.NotBlocking.Description,"<YellowHighlight>не блокирует путь</YellowHighlight>",
@@ -118,6 +116,8 @@ IgorZ.Automation.Scriptable.Debug.Action.LogNum,"записать в журна�
 IgorZ.Automation.Scriptable.District.Signal.Beavers,"бобров в районе","Name of the condition for the current beaver population checking"
 IgorZ.Automation.Scriptable.District.Signal.Bots,"ботов в районе","Name of the condition for the current bot population checking"
 IgorZ.Automation.Scriptable.District.Signal.NumberOfBeds,"постелей в районе","Name of the condition for the current number of beds checking"
+IgorZ.Automation.Scriptable.Dynamite.Action.Detonate,"активировать динамит","Name of the action that immediately detonates the dynamite"
+IgorZ.Automation.Scriptable.Dynamite.Action.DetonateAndRepeat,"активировать динамит и повторить ещё <GreenHighlight>{0} раза</GreenHighlight>","Name of the action that detonates the dynamite and places new dynamites the specified number of times"
 IgorZ.Automation.Scriptable.Floodgate.Signal.Height,"высота затвора","Name of the condition for the floodgate height checking"
 IgorZ.Automation.Scriptable.Floodgate.Action.SetHeight,"выставить высоту затвора в {0}","Change the floodgate height to the specified value"
 IgorZ.Automation.Scriptable.FlowControl.Action.Open,"разрешить поток","Name of the action that opens the water flow through the building"

@@ -82,8 +82,6 @@ IgorZ.Automation.PauseTool.Title,"Pause buildings",
 IgorZ.Automation.PauseTool.Description,"Use this tool to pause buildings and construction sites.",
 IgorZ.Automation.ResumeTool.Title,"Unpause buildings",
 IgorZ.Automation.ResumeTool.Description,"Use this tool to unpause buildings and construction sites.",
-IgorZ.Automation.DetonateDynamiteAction.Description,"<YellowHighlight>detonate dynamite</YellowHighlight>",
-IgorZ.Automation.DetonateDynamiteAction.RepeatCountInfo," and add another <GreenHighlight>{0} times</GreenHighlight>",
 IgorZ.Automation.ObjectFinishedCondition.Description,"<YellowHighlight>construction complete</YellowHighlight>",
 IgorZ.Automation.CheckAccessBlockCondition.Blocking.Description,"<YellowHighlight>blocks path</YellowHighlight>",
 IgorZ.Automation.CheckAccessBlockCondition.NotBlocking.Description,"<YellowHighlight>doesn't block path</YellowHighlight>",
@@ -117,6 +115,8 @@ IgorZ.Automation.Scriptable.Debug.Action.LogNum,"write a number to logs: {0}","N
 IgorZ.Automation.Scriptable.District.Signal.Beavers,"beavers in district","Name of the condition for the current beaver population checking"
 IgorZ.Automation.Scriptable.District.Signal.Bots,"bots in district","Name of the condition for the current bot population checking"
 IgorZ.Automation.Scriptable.District.Signal.NumberOfBeds,"beds in district","Name of the condition for the current number of beds checking"
+IgorZ.Automation.Scriptable.Dynamite.Action.Detonate,"detonate dynamite","Name of the action that immediately detonates the dynamite"
+IgorZ.Automation.Scriptable.Dynamite.Action.DetonateAndRepeat,"detonate dynamite and add another <GreenHighlight>{0} times</GreenHighlight>","Name of the action that detonates the dynamite and places new dynamites the specified number of times"
 IgorZ.Automation.Scriptable.Floodgate.Signal.Height,"floodgate height","Name of the condition for the floodgate height checking"
 IgorZ.Automation.Scriptable.Floodgate.Action.SetHeight,"set gate height to {0}","Change the floodgate height to the specified value"
 IgorZ.Automation.Scriptable.FlowControl.Action.Open,"enable flow","Name of the action that opens the water flow through the building"
