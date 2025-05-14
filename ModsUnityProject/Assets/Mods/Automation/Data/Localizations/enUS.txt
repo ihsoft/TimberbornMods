@@ -85,8 +85,6 @@ IgorZ.Automation.ResumeTool.Description,"Use this tool to unpause buildings and 
 IgorZ.Automation.DetonateDynamiteAction.Description,"<YellowHighlight>detonate dynamite</YellowHighlight>",
 IgorZ.Automation.DetonateDynamiteAction.RepeatCountInfo," and add another <GreenHighlight>{0} times</GreenHighlight>",
 IgorZ.Automation.ObjectFinishedCondition.Description,"<YellowHighlight>construction complete</YellowHighlight>",
-IgorZ.Automation.WaterRegulatorStateActionClose.Description,"<YellowHighlight>close the dome</YellowHighlight>",
-IgorZ.Automation.WaterRegulatorStateActionOpen.Description,"<YellowHighlight>open the dome</YellowHighlight>",
 IgorZ.Automation.CheckAccessBlockCondition.Blocking.Description,"<YellowHighlight>blocks path</YellowHighlight>",
 IgorZ.Automation.CheckAccessBlockCondition.NotBlocking.Description,"<YellowHighlight>doesn't block path</YellowHighlight>",
 IgorZ.Automation.CheckAccessBlockCondition.NotYetReachable,"Builders can't reach it yet, but a path is being constructed",

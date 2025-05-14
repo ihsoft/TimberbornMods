@@ -86,8 +86,6 @@ IgorZ.Automation.ResumeTool.Description,"Используйте этот инс�
 IgorZ.Automation.DetonateDynamiteAction.Description,"<YellowHighlight>активировать динамит</YellowHighlight>",
 IgorZ.Automation.DetonateDynamiteAction.RepeatCountInfo," и повторить ещё <GreenHighlight>{0} раза</GreenHighlight>",
 IgorZ.Automation.ObjectFinishedCondition.Description,"<YellowHighlight>строительство завершено</YellowHighlight>",
-IgorZ.Automation.WaterRegulatorStateActionClose.Description,"<YellowHighlight>закрыть купол</YellowHighlight>",
-IgorZ.Automation.WaterRegulatorStateActionOpen.Description,"<YellowHighlight>открыть купол</YellowHighlight>",
 IgorZ.Automation.CheckAccessBlockCondition.Blocking.Description,"<YellowHighlight>блокирует путь</YellowHighlight>",
 IgorZ.Automation.CheckAccessBlockCondition.NotBlocking.Description,"<YellowHighlight>не блокирует путь</YellowHighlight>",
 IgorZ.Automation.CheckAccessBlockCondition.NotYetReachable,"Строители не могут добраться до этого места, но дорога строится",
