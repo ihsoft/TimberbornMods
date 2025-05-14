@@ -82,7 +82,7 @@ public class SmartManufactory : BaseComponent, IAdjustablePowerInput {
 
     AllWorkersOut = HasWorkingPlaces && _enterable.NumberOfEnterersInside == 0;
     MissingIngredients = !_manufactory.HasAllIngredients;
-    BlockedOutput = !_manufactory.Inventory.HasUnreservedCapacity(_manufactory.CurrentRecipe.Products);
+    BlockedOutput = !_manufactory.HasUnreservedCapacity();
     NoFuel = !_manufactory.HasFuel;
     StandbyMode = AllWorkersOut || MissingIngredients || NoFuel || BlockedOutput;
     var newInput = Math.Max(
@@ -119,7 +119,7 @@ public class SmartManufactory : BaseComponent, IAdjustablePowerInput {
 
   void Awake() {
     _mechanicalBuilding = GetComponentFast<MechanicalBuilding>();
-    _nominalPowerInput = GetComponentFast<MechanicalNodeSpecification>().PowerInput;
+    _nominalPowerInput = GetComponentFast<MechanicalNodeSpec>().PowerInput;
     _blockableBuilding = GetComponentFast<BlockableBuilding>();
     _manufactory = GetComponentFast<Manufactory>();
     _enterable = GetComponentFast<Enterable>();

@@ -1,0 +1,851 @@
+.game-text-small {
+    color: rgb(204, 204, 204);
+    font-size: 12px;
+    white-space: normal;
+}
+
+.game-text-normal {
+    color: rgb(204, 204, 204);
+    font-size: 13px;
+    white-space: normal;
+}
+
+.game-text-big {
+    color: rgb(204, 204, 204);
+    font-size: 14px;
+    white-space: normal;
+}
+
+.game-text-heading {
+    color: rgb(204, 204, 204);
+    font-size: 15px;
+    white-space: normal;
+}
+
+.game-text-title {
+    color: rgb(204, 204, 204);
+    font-size: 18px;
+    white-space: normal;
+}
+
+.game-text--red {
+    color: red;
+}
+
+.game-text-separator {
+    max-width: 10px;
+    min-width: 10px;
+    -unity-text-align: middle-center;
+}
+
+.game-text-separator--small {
+    max-width: 5px;
+    min-width: 5px;
+}
+
+.text--centered {
+    -unity-text-align: middle-center;
+}
+
+.text--yellow {
+    color: rgb(188, 162, 108);
+}
+
+.bg-box--green {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-1');
+    --background-slice-scale: 0.5;
+    --background-slice: 10;
+    --background-slice-left: 10;
+    --background-slice-top: 10;
+    --background-slice-right: 10;
+    --background-slice-bottom: 10;
+}
+
+.bg-box--green.disabled {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-1-disabled');
+    opacity: 1;
+}
+
+.bg-box--red {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-2');
+    --background-slice-scale: 0.5;
+    --background-slice: 10;
+    --background-slice-left: 10;
+    --background-slice-top: 10;
+    --background-slice-right: 10;
+    --background-slice-bottom: 10;
+}
+
+.bg-box--brown {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-3');
+    --background-slice-scale: 0.5;
+    --background-slice: 10;
+    --background-slice-left: 10;
+    --background-slice-top: 10;
+    --background-slice-right: 10;
+    --background-slice-bottom: 10;
+}
+
+.bg-sub-box--pale-purple {
+    --background-image: resource('UI/Images/Backgrounds/bg-1');
+    --background-slice-scale: 0.5;
+    --background-slice: 9;
+    --background-slice-left: 9;
+    --background-slice-top: 9;
+    --background-slice-right: 9;
+    --background-slice-bottom: 9;
+}
+
+.bg-sub-box--purple-striped {
+    --background-image: resource('UI/Images/Backgrounds/bg-2-striped');
+    --background-slice-scale: 0.5;
+    --background-slice: 9;
+    --background-slice-left: 9;
+    --background-slice-top: 9;
+    --background-slice-right: 9;
+    --background-slice-bottom: 9;
+}
+
+.bg-sub-box--green {
+    --background-image: resource('UI/Images/Backgrounds/bg-3');
+    --background-slice-scale: 0.5;
+    --background-slice: 9;
+    --background-slice-left: 9;
+    --background-slice-top: 9;
+    --background-slice-right: 9;
+    --background-slice-bottom: 9;
+}
+
+.bg-sub-box--red-striped {
+    --background-image: resource('UI/Images/Backgrounds/bg-6-striped');
+    --background-slice-scale: 0.5;
+    --background-slice: 9;
+    --background-slice-left: 9;
+    --background-slice-top: 9;
+    --background-slice-right: 9;
+    --background-slice-bottom: 9;
+}
+
+.bg-sub-box--blue {
+    --background-image: resource('UI/Images/Backgrounds/bg-7');
+    --background-slice-scale: 0.5;
+    --background-slice: 9;
+    --background-slice-left: 9;
+    --background-slice-top: 9;
+    --background-slice-right: 9;
+    --background-slice-bottom: 9;
+}
+
+.bg-sub-box--frame {
+    --background-image: resource('UI/Images/Backgrounds/bg-4');
+    --background-slice-scale: 0.5;
+    --background-slice: 16;
+    --background-slice-left: 16;
+    --background-slice-top: 16;
+    --background-slice-right: 16;
+    --background-slice-bottom: 16;
+}
+
+.square-large--light-red {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-1');
+    --background-slice-scale: 0.5;
+    --background-slice: 16;
+    --background-slice-left: 16;
+    --background-slice-top: 16;
+    --background-slice-right: 16;
+    --background-slice-bottom: 16;
+}
+
+.square-large--green {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-2');
+    --background-slice-scale: 0.5;
+    --background-slice: 16;
+    --background-slice-left: 16;
+    --background-slice-top: 16;
+    --background-slice-right: 16;
+    --background-slice-bottom: 16;
+}
+
+.square-large--brown {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-8');
+    --background-slice-scale: 0.5;
+    --background-slice: 16;
+    --background-slice-left: 16;
+    --background-slice-top: 16;
+    --background-slice-right: 16;
+    --background-slice-bottom: 16;
+}
+
+.square-large--red {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-3');
+    --background-slice-scale: 0.5;
+    --background-slice: 16;
+    --background-slice-left: 16;
+    --background-slice-top: 16;
+    --background-slice-right: 16;
+    --background-slice-bottom: 16;
+}
+
+.square-large--dark-red {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-5');
+    --background-slice-scale: 0.5;
+    --background-slice: 16;
+    --background-slice-left: 16;
+    --background-slice-top: 16;
+    --background-slice-right: 16;
+    --background-slice-bottom: 16;
+}
+
+.square-large--transparent-purple {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-6');
+    --background-slice-scale: 0.5;
+    --background-slice: 16;
+    --background-slice-left: 16;
+    --background-slice-top: 16;
+    --background-slice-right: 16;
+    --background-slice-bottom: 16;
+}
+
+.bg-striped--green {
+    --background-image: resource('UI/Images/Backgrounds/bg-striped-1');
+    --background-slice-scale: 0.5;
+    --background-slice-top: 8;
+    --background-slice-right: 13;
+    --background-slice-bottom: 8;
+    --background-slice-left: 81;
+}
+
+.bg-striped--red {
+    --background-image: resource('UI/Images/Backgrounds/bg-striped-2');
+    --background-slice-scale: 0.5;
+    --background-slice-top: 8;
+    --background-slice-right: 13;
+    --background-slice-bottom: 8;
+    --background-slice-left: 81;
+}
+
+.button-game {
+    --background-image: resource('UI/Images/Buttons/button-game');
+    --background-slice-scale: 0.5;
+    --background-slice: 24;
+    --background-slice-left: 24;
+    --background-slice-top: 24;
+    --background-slice-right: 24;
+    --background-slice-bottom: 24;
+    --click-sound: 'UI.Click';
+}
+
+.button-game:hover:enabled {
+    --background-image: resource('UI/Images/Buttons/button-game-hover');
+}
+
+.button-game:hover:enabled:active {
+    --background-image: resource('UI/Images/Buttons/button-game-active');
+}
+
+.button-wrapper {
+    flex-direction: row;
+}
+
+.button-square {
+    width: 20px;
+    height: 20px;
+    --click-sound: 'UI.Click';
+    margin: 2px;
+}
+
+.button-square--small {
+    width: 18px;
+    height: 18px;
+}
+
+.button-square--large {
+    width: 24px;
+    height: 24px;
+}
+
+.button-plus {
+    background-image: resource('UI/Images/Buttons/plus');
+}
+
+.button-plus:hover:enabled {
+    background-image: resource('UI/Images/Buttons/plus-hover');
+}
+
+.button-plus:hover:enabled:active {
+    background-image: resource('UI/Images/Buttons/plus-active');
+}
+
+.button-plus--inverted {
+    background-image: resource('UI/Images/Buttons/plus-inverted');
+}
+
+.button-plus--bare {
+    background-image: resource('UI/Images/Buttons/plus-bare');
+}
+
+.button-plus--bare:hover:enabled {
+    background-image: resource('UI/Images/Buttons/plus-bare-hover');
+}
+
+.button-plus--margin {
+    margin-left: 4px;
+}
+
+.button-minus {
+    background-image: resource('UI/Images/Buttons/minus');
+}
+
+.button-minus--inverted {
+    background-image: resource('UI/Images/Buttons/minus-inverted');
+}
+
+.button-minus:hover:enabled {
+    background-image: resource('UI/Images/Buttons/minus-hover');
+}
+
+.button-minus:hover:enabled:active {
+    background-image: resource('UI/Images/Buttons/minus-active');
+}
+
+.button-minus--bare {
+    background-image: resource('UI/Images/Buttons/minus-bare');
+}
+
+.button-minus--bare:hover:enabled {
+    background-image: resource('UI/Images/Buttons/minus-bare-hover');
+}
+
+.button-arrow-down {
+    background-image: resource('UI/Images/Buttons/arrow-down');
+}
+
+.button-arrow-down--inverted {
+    background-image: resource('UI/Images/Buttons/arrow-down-inverted');
+}
+
+.button-arrow-down:hover:enabled {
+    background-image: resource('UI/Images/Buttons/arrow-down-hover');
+}
+
+.button-arrow-down:hover:enabled:active {
+    background-image: resource('UI/Images/Buttons/arrow-down-active');
+}
+
+.button-arrow-left {
+    background-image: resource('UI/Images/Buttons/arrow-left');
+}
+
+.button-arrow-left--inverted {
+    background-image: resource('UI/Images/Buttons/arrow-left-inverted');
+}
+
+.button-arrow-left:hover:enabled {
+    background-image: resource('UI/Images/Buttons/arrow-left-hover');
+}
+
+.button-arrow-left:hover:enabled:active {
+    background-image: resource('UI/Images/Buttons/arrow-left-active');
+}
+
+.button-arrow-right {
+    background-image: resource('UI/Images/Buttons/arrow-right');
+}
+
+.button-arrow-right--inverted {
+    background-image: resource('UI/Images/Buttons/arrow-right-inverted');
+}
+
+.button-arrow-right:hover:enabled {
+    background-image: resource('UI/Images/Buttons/arrow-right-hover');
+}
+
+.button-arrow-right:hover:enabled:active {
+    background-image: resource('UI/Images/Buttons/arrow-right-active');
+}
+
+.button-arrow-up {
+    background-image: resource('UI/Images/Buttons/arrow-up');
+}
+
+.button-arrow-up--inverted {
+    background-image: resource('UI/Images/Buttons/arrow-up-inverted');
+}
+
+.button-arrow-up:hover:enabled {
+    background-image: resource('UI/Images/Buttons/arrow-up-hover');
+}
+
+.button-arrow-up:hover:enabled:active {
+    background-image: resource('UI/Images/Buttons/arrow-up-active');
+}
+
+.button-cross {
+    background-image: resource('UI/Images/Buttons/cross');
+}
+
+.button-cross:hover:enabled {
+    background-image: resource('UI/Images/Buttons/cross-hover');
+}
+
+.button-cross:hover:enabled:active {
+    background-image: resource('UI/Images/Buttons/cross-active');
+}
+
+.button-cross--bare {
+    background-image: resource('UI/Images/Buttons/cross-bare');
+}
+
+.button-cross--bare:hover:enabled {
+    background-image: resource('UI/Images/Buttons/cross-bare-hover');
+}
+
+.button-checkmark--bare {
+    background-image: resource('UI/Images/Buttons/checkmark-bare');
+}
+
+.button-checkmark--bare:hover:enabled {
+    background-image: resource('UI/Images/Buttons/checkmark-bare-hover');
+}
+
+.button-reset--bare {
+    background-image: resource('UI/Images/Buttons/reset-bare');
+}
+
+.button-reset--bare:hover:enabled {
+    background-image: resource('UI/Images/Buttons/reset-bare-hover');
+}
+
+.arrow--right {
+    background-image: resource('UI/Images/Buttons/right_arrow');
+    width: 34px;
+    height: 57px;
+    --click-sound: 'UI.Click';
+}
+
+.arrow--left {
+    background-image: resource('UI/Images/Buttons/left_arrow');
+    width: 34px;
+    height: 57px;
+    --click-sound: 'UI.Click';
+}
+
+.arrow--right:hover:enabled {
+    background-image: resource('UI/Images/Buttons/right_arrow_hover');
+}
+
+.arrow--left:hover:enabled {
+    background-image: resource('UI/Images/Buttons/left_arrow_hover');
+}
+
+.editable-hint {
+    background-image: resource('UI/Images/Game/edit');
+    width: 24px;
+    height: 24px;
+}
+
+.game-toggle {
+    --click-sound: 'UI.Click';
+    align-self: center;
+    flex-grow: 0;
+    overflow: visible;
+}
+
+.game-toggle > .unity-toggle__input {
+    overflow: visible;
+}
+
+.game-toggle > .unity-toggle__input > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/empty-inverted');
+    width: 20px;
+    height: 20px;
+    margin-right: 4px;
+}
+
+.game-toggle > .unity-toggle__input:checked > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/checkmark-inverted');
+}
+
+.game-toggle > .unity-toggle__input:hover:enabled > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/empty-hover');
+}
+
+.game-toggle > .unity-toggle__input:checked:hover:enabled > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/checkmark-hover');
+}
+
+.game-toggle > .unity-toggle__input > .unity-toggle__text {
+    color: rgb(204, 204, 204);
+    white-space: normal;
+}
+
+.game-toggle--small > .unity-toggle__input > .unity-toggle__checkmark {
+    width: 15px;
+    height: 15px;
+}
+
+.integer-slider {
+    flex-grow: 1;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    flex-direction: row;
+}
+
+.integer-slider__slider {
+    flex-shrink: 1;
+    flex-grow: 1;
+    padding-right: 5px;
+}
+
+.integer-slider .unity-text-element--inner-input-field-component {
+    flex-grow: 0;
+}
+
+.integer-slider__integer-field > .unity-base-text-field__input--single-line {
+    -unity-text-align: middle-right;
+    white-space: nowrap;
+}
+
+.dropdown__selection {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-1');
+    --background-slice-scale: 0.5;
+    --background-slice: 10;
+    --background-slice-left: 10;
+    --background-slice-top: 10;
+    --background-slice-right: 10;
+    --background-slice-bottom: 10;
+}
+
+.dropdown__selectable.dropdown__selection:enabled:hover {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-4');
+}
+
+.dropdown__label {
+    color: rgb(204, 204, 204);
+    font-size: 13px;
+    white-space: normal;
+}
+
+.dropdown-item__text {
+    color: rgb(204, 204, 204);
+    font-size: 13px;
+    margin: 1px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    -unity-text-align: middle-left;
+    text-overflow: ellipsis;
+    flex-shrink: 1;
+}
+
+.dropdown-item--medium .dropdown-item__icon {
+    height: 26px;
+    width: 26px;
+    min-width: 26px;
+    min-height: 26px;
+    margin-top: -3px;
+    margin-bottom: -3px;
+}
+
+.dropdown-item--large .dropdown-item__icon {
+    height: 36px;
+    width: 36px;
+    margin-right: 3px;
+}
+
+.dropdown-item--large.dropdown-item {
+    height: auto;
+    padding-left: 4px;
+}
+
+.dropdown-item--large .dropdown-item__text {
+    -unity-font-style: bold;
+    color: rgb(204, 204, 204);
+    font-size: 14px;
+}
+
+.camera-action-marker {
+    background-image: resource('UI/Images/Core/dragging-icon');
+    height: 32px;
+    width: 32px;
+    position: absolute;
+}
+
+.thumbnail {
+    background-image: resource('UI/Images/Core/default-thumbnail');
+    flex-shrink: 0;
+    flex-grow: 1;
+    align-self: stretch;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.thumbnail__no-preview {
+    position: absolute;
+    align-self: center;
+    margin-top: 30px;
+    text-shadow: 0 0 4px black;
+}
+
+.thumbnail__image {
+    flex-shrink: 0;
+    flex-grow: 1;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.thumbnail__frame {
+    flex-shrink: 0;
+    flex-grow: 1;
+    margin: -8px;
+    --background-image: resource('UI/Images/Core/border_frameonly');
+    --background-slice-scale: 0.25;
+    --background-slice: 64;
+    --background-slice-left: 64;
+    --background-slice-top: 64;
+    --background-slice-right: 64;
+    --background-slice-bottom: 64;
+}
+
+.map-item {
+    min-height: 36px;
+    width: 390px;
+    flex-direction: row;
+    align-items: center;
+    flex-grow: 1;
+    padding: 4px 7px;
+}
+
+.map-item__map-name {
+    color: rgb(255, 255, 255);
+    font-size: 18px;
+    flex-shrink: 1;
+    flex-grow: 0;
+    flex-wrap: wrap;
+    -unity-text-align: middle-left;
+    white-space: normal;
+}
+
+.map-item__map-size {
+    font-size: 18px;
+    flex-shrink: 0;
+    flex-grow: 0;
+    margin-left: 5px;
+    min-width: 75px;
+    -unity-text-align: middle-right;
+}
+
+.map-item__factions-list {
+    flex-shrink: 0;
+    flex-grow: 0;
+    flex-direction: row-reverse;
+    margin: -6px 30px -6px auto;
+}
+
+.map-item__icon {
+    width: 24px;
+    height: 24px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    margin: 1px 4px 1px 1px;
+}
+
+.map-item__icon--recommended {
+    background-image: resource('UI/Images/Core/recommended-map-icon');
+}
+
+.map-item-faction-icon {
+    width: 40px;
+    height: 40px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    margin-right: -35px;
+}
+
+.map-selection__empty-text {
+    -unity-text-align: middle-center;
+    margin-top: 35px;
+}
+
+.map-selection__list-wrapper {
+    max-height: 470px;
+    height: 100%;
+    flex-grow: 0;
+}
+
+.map-selection__list {
+    width: 520px;
+}
+
+.map-selection__list .unity-scroll-view__content-and-vertical-scroll-container {
+    width: 415px;
+}
+
+.map-selection__list-buttons {
+    flex-direction: row;
+    justify-content: center;
+    max-width: 520px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+    margin-top: 5px;
+}
+
+.map-selection__wide-button-label {
+    height: 26px;
+    -unity-text-align: middle-left;
+}
+
+.map-selection__download-icon {
+    margin-left: 0;
+    background-image: resource('UI/Images/Core/cloud-file-icon');
+}
+
+.map-selection__browse-icon {
+    margin-left: 0;
+    background-image: resource('UI/Images/Core/local-file-icon');
+}
+
+.map-selection__selected-map {
+    flex-grow: 0;
+    height: 450px;
+    margin: 10px 0;
+    justify-content: center;
+    align-items: center;
+}
+
+.map-selection__map-name {
+    color: rgb(255, 255, 255);
+    font-size: 20px;
+    margin-bottom: 10px;
+    width: 480px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    flex-grow: 0;
+    flex-shrink: 0;
+    -unity-text-align: middle-center;
+}
+
+.map-selection__thumbnail {
+    width: 480px;
+    height: 270px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    margin-bottom: 12px;
+}
+
+.map-selection__recommended-map {
+    flex-direction: row;
+    margin-bottom: 7px;
+    justify-content: center;
+    -unity-text-align: middle-left;
+}
+
+.map-selection__flexible-start {
+    align-items: center;
+    max-width: 90%;
+    flex-direction: row;
+    justify-content: center;
+    -unity-text-align: middle-left;
+    bottom: 22px;
+    align-self: center;
+    position: absolute;
+    padding: 4px 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.map-selection__flexible-start-text {
+    flex-grow: 1;
+    flex-shrink: 1;
+    -unity-text-align: middle-center;
+}
+
+.map-selection__description-background {
+    flex-grow: 1;
+    flex-shrink: 1;
+    --background-image: resource('UI/Images/Backgrounds/bg-8');
+    --background-slice-scale: 0.5;
+    --background-slice: 10;
+    --background-slice-left: 10;
+    --background-slice-top: 10;
+    --background-slice-right: 10;
+    --background-slice-bottom: 10;
+}
+
+.map-selection__description-background > .unity-scroll-view > .unity-scroll-view__content-and-vertical-scroll-container {
+    width: 100%;
+}
+
+.map-selection__description {
+    width: 466px;
+    -unity-text-align: middle-center;
+}
+
+.map-selection__description.list-view {
+    margin: 10px;
+}
+
+.map-selection__description .unity-scroll-view__content-viewport {
+    justify-content: center;
+}
+
+.map-selection__map-type-buttons-wrapper {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    padding: 7px;
+}
+
+.map-selection__map-type-button {
+    --background-image: resource('UI/Images/Buttons/toggle-button');
+    --background-slice-scale: 0.5;
+    --background-slice: 88;
+    --background-slice-left: 88;
+    --background-slice-top: 88;
+    --background-slice-right: 88;
+    --background-slice-bottom: 88;
+    --click-sound: 'UI.Click';
+    height: 34px;
+    justify-content: center;
+    min-width: 170px;
+    padding: 3px 12px 4px 12px;
+}
+
+.map-selection__map-type-button.selected {
+    --background-image: resource('UI/Images/Buttons/toggle-button-selected');
+}
+
+.map-selection__map-type-button:hover {
+    --background-image: resource('UI/Images/Buttons/toggle-button-hover');
+}
+
+.map-selection__map-type-button:hover > .map-selection__map-type-button-label {
+    color: black;
+}
+
+.map-selection__map-type-button--flipped {
+    scale: -1 1 1;
+}
+
+.hyperlink-button {
+    --click-sound: 'UI.Click';
+}
+
+.hyperlink-button:hover:enabled {
+    color: yellow;
+}
+
+.flexible-start-icon {
+    background-image: resource('UI/Images/Core/flexible-start-icon');
+}
+
+.checkmark-green {
+    background-image: resource('UI/Images/Buttons/checkmark-green');
+    width: 18px;
+    height: 18px;
+}
+
+.cross-red {
+    background-image: resource('UI/Images/Buttons/cross-red');
+    width: 18px;
+    height: 18px;
+}

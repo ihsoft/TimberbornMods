@@ -36,322 +36,124 @@
       <Reference Include="0Harmony">
         <HintPath>..\Dependencies\Workshop\3284904751\0Harmony.dll</HintPath>
       </Reference>
-      <Reference Include="System.Collections.Immutable, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-        <HintPath>..\ModsUnityProject\Assets\Plugins\Timberborn\System.Collections.Immutable.dll</HintPath>
+      <Reference Include="ModSettings.Common">
+        <HintPath>..\Dependencies\Workshop\3283831040\version-0.6\Scripts\ModSettings.Common.dll</HintPath>
+      </Reference>
+      <Reference Include="ModSettings.Core">
+        <HintPath>..\_WORKSHOP!\3283831040\version-0.7\Scripts\ModSettings.Core.dll</HintPath>
+      </Reference>
+      <Reference Include="System.Collections.Immutable">
+        <HintPath>..\Dependencies\GameRoot\Timberborn_Data\Managed\System.Collections.Immutable.dll</HintPath>
       </Reference>
       <Reference Include="TimberApi">
-        <HintPath>..\Dependencies\Workshop\3288241660\core\TimberApi.dll</HintPath>
+        <HintPath>..\Dependencies\Workshop\3288241660\version-0.7\core\TimberApi.dll</HintPath>
+      </Reference>
+      <Reference Include="TimberApi.BottomBarSystem">
+        <HintPath>..\Dependencies\Workshop\3288241660\version-0.7\core\TimberApi.BottomBarSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="TimberApi.SpecificationSystem">
+        <HintPath>..\Dependencies\Workshop\3288241660\version-0.7\core\TimberApi.SpecificationSystem.dll</HintPath>
       </Reference>
       <Reference Include="TimberApi.Tools">
-        <HintPath>..\Dependencies\Workshop\3288241660\core\TimberApi.Tools.dll</HintPath>
-      </Reference>
-      <Reference Include="TimberApi.UIBuilderSystem">
-        <HintPath>..\Dependencies\Workshop\3288241660\core\TimberApi.UIBuilderSystem.dll</HintPath>
-      </Reference>
-      <Reference Include="TimberApi.UIPresets">
-        <HintPath>..\Dependencies\Workshop\3288241660\core\TimberApi.UIPresets.dll</HintPath>
+        <HintPath>..\Dependencies\Workshop\3288241660\version-0.7\core\TimberApi.Tools.dll</HintPath>
       </Reference>
     </ItemGroup>
     <ItemGroup>
-      <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />
+      <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all" />
+      <PackageReference Include="IndexRange" Version="1.0.3" />
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Timberborn.*.dll" Publicize="true" />
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Unity*.dll" Publicize="false"/>
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Bindito.*.dll" Publicize="false"/>
-      <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\UnityEngine.UIElementsModule.dll" Publicize="true"/>
     </ItemGroup>
     <ItemGroup>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Localizations\enUS.txt">
-        <Link>Mod\Localizations\enUS.txt</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Localizations\enUS.txt.meta">
-        <Link>Mod\Localizations\enUS.txt.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolGroupSpecification.Automation.20.Terrain.original.json">
-        <Link>Mod\Specifications\ToolGroupSpecification.Automation.20.Terrain.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolGroupSpecification.Automation.20.Terrain.original.json.meta">
-        <Link>Mod\Specifications\ToolGroupSpecification.Automation.20.Terrain.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolGroupSpecification.Automation.21.Water.original.json">
-        <Link>Mod\Specifications\ToolGroupSpecification.Automation.21.Water.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolGroupSpecification.Automation.21.Water.original.json.meta">
-        <Link>Mod\Specifications\ToolGroupSpecification.Automation.21.Water.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolGroupSpecification.Automation.23.Storage.original.json">
-        <Link>Mod\Specifications\ToolGroupSpecification.Automation.23.Storage.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolGroupSpecification.Automation.23.Storage.original.json.meta">
-        <Link>Mod\Specifications\ToolGroupSpecification.Automation.23.Storage.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolGroupSpecification.Automation.24.Population.original.json">
-        <Link>Mod\Specifications\ToolGroupSpecification.Automation.24.Population.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolGroupSpecification.Automation.24.Population.original.json.meta">
-        <Link>Mod\Specifications\ToolGroupSpecification.Automation.24.Population.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolGroupSpecification.Automation.original.json">
-        <Link>Mod\Specifications\ToolGroupSpecification.Automation.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolGroupSpecification.Automation.original.json.meta">
-        <Link>Mod\Specifications\ToolGroupSpecification.Automation.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.20.Terrain.01.Dynamite2.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.20.Terrain.01.Dynamite2.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.20.Terrain.01.Dynamite2.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.20.Terrain.01.Dynamite2.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.20.Terrain.02.Dynamite3.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.20.Terrain.02.Dynamite3.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.20.Terrain.02.Dynamite3.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.20.Terrain.02.Dynamite3.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.20.Terrain.03.Dynamite4.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.20.Terrain.03.Dynamite4.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.20.Terrain.03.Dynamite4.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.20.Terrain.03.Dynamite4.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.20.Terrain.04.Dynamite5.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.20.Terrain.04.Dynamite5.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.20.Terrain.04.Dynamite5.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.20.Terrain.04.Dynamite5.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.20.Terrain.05.Dynamite6.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.20.Terrain.05.Dynamite6.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.20.Terrain.05.Dynamite6.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.20.Terrain.05.Dynamite6.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.21.Water.10.TemperatePause.Template.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.21.Water.10.TemperatePause.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.21.Water.10.TemperatePause.Template.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.21.Water.10.TemperatePause.Template.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.21.Water.11.TemperateOpen.Template.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.21.Water.11.TemperateOpen.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.21.Water.11.TemperateOpen.Template.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.21.Water.11.TemperateOpen.Template.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.21.Water.12.TemperateClose.Template.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.21.Water.12.TemperateClose.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.21.Water.12.TemperateClose.Template.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.21.Water.12.TemperateClose.Template.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.21.Water.13.TemperateSemiOpen.Template.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.21.Water.13.TemperateSemiOpen.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.21.Water.13.TemperateSemiOpen.Template.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.21.Water.13.TemperateSemiOpen.Template.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.21.Water.20.DroughtPause.Template.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.21.Water.20.DroughtPause.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.21.Water.20.DroughtPause.Template.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.21.Water.20.DroughtPause.Template.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.21.Water.21.DroughtOpen.Template.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.21.Water.21.DroughtOpen.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.21.Water.21.DroughtOpen.Template.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.21.Water.21.DroughtOpen.Template.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.21.Water.22.DroughtClose.Template.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.21.Water.22.DroughtClose.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.21.Water.22.DroughtClose.Template.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.21.Water.22.DroughtClose.Template.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.21.Water.23.DroughtOpenWaterRegulator.Template.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.21.Water.23.DroughtOpenWaterRegulator.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.21.Water.23.DroughtOpenWaterRegulator.Template.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.21.Water.23.DroughtOpenWaterRegulator.Template.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.21.Water.30.BadtidePause.Template.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.21.Water.30.BadtidePause.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.21.Water.30.BadtidePause.Template.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.21.Water.30.BadtidePause.Template.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.21.Water.31.BadtideOpen.Template.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.21.Water.31.BadtideOpen.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.21.Water.31.BadtideOpen.Template.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.21.Water.31.BadtideOpen.Template.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.21.Water.32.BadtideClose.Template.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.21.Water.32.BadtideClose.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.21.Water.32.BadtideClose.Template.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.21.Water.32.BadtideClose.Template.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.23.Storage.10.BoostEmptying50.Template.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.23.Storage.10.BoostEmptying50.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.23.Storage.10.BoostEmptying50.Template.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.23.Storage.10.BoostEmptying50.Template.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.23.Storage.11.BoostEmptying60.Template.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.23.Storage.11.BoostEmptying60.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.23.Storage.11.BoostEmptying60.Template.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.23.Storage.11.BoostEmptying60.Template.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.23.Storage.12.BoostEmptying70.Template.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.23.Storage.12.BoostEmptying70.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.23.Storage.12.BoostEmptying70.Template.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.23.Storage.12.BoostEmptying70.Template.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.23.Storage.13.BoostEmptying80.Template.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.23.Storage.13.BoostEmptying80.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.23.Storage.13.BoostEmptying80.Template.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.23.Storage.13.BoostEmptying80.Template.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.23.Storage.14.BoostEmptying90.Template.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.23.Storage.14.BoostEmptying90.Template.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.23.Storage.14.BoostEmptying90.Template.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.23.Storage.14.BoostEmptying90.Template.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.24.Population.10.BeaversAtMax.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.24.Population.10.BeaversAtMax.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.24.Population.10.BeaversAtMax.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.24.Population.10.BeaversAtMax.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.24.Population.20.BeaversAtPlus20.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.24.Population.20.BeaversAtPlus20.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.24.Population.20.BeaversAtPlus20.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.24.Population.20.BeaversAtPlus20.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.24.Population.21.BeaversAtPlus10.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.24.Population.21.BeaversAtPlus10.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.24.Population.21.BeaversAtPlus10.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.24.Population.21.BeaversAtPlus10.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.24.Population.22.BeaversAtMinus10.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.24.Population.22.BeaversAtMinus10.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.24.Population.22.BeaversAtMinus10.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.24.Population.22.BeaversAtMinus10.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.24.Population.23.BeaversAtMinus20.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.24.Population.23.BeaversAtMinus20.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.24.Population.23.BeaversAtMinus20.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.24.Population.23.BeaversAtMinus20.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.24.Population.30.BotsAtPlus20.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.24.Population.30.BotsAtPlus20.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.24.Population.30.BotsAtPlus20.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.24.Population.30.BotsAtPlus20.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.24.Population.31.BotsAtPlus10.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.24.Population.31.BotsAtPlus10.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.24.Population.31.BotsAtPlus10.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.24.Population.31.BotsAtPlus10.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.24.Population.32.BotsAtMinus10.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.24.Population.32.BotsAtMinus10.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.24.Population.32.BotsAtMinus10.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.24.Population.32.BotsAtMinus10.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.24.Population.33.BotsAtMinus20.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.24.Population.33.BotsAtMinus20.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.24.Population.33.BotsAtMinus20.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.24.Population.33.BotsAtMinus20.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.Root.-099.DebugFinishNowTool.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.Root.-099.DebugFinishNowTool.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.Root.-099.DebugFinishNowTool.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.Root.-099.DebugFinishNowTool.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.Root.-100.DebugPickTool.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.Root.-100.DebugPickTool.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.Root.-100.DebugPickTool.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.Root.-100.DebugPickTool.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.Root.010.PauseTool.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.Root.010.PauseTool.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.Root.010.PauseTool.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.Root.010.PauseTool.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.Root.011.ResumeTool.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.Root.011.ResumeTool.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.Root.011.ResumeTool.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.Root.011.ResumeTool.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.Root.030.ChainedTool.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.Root.030.ChainedTool.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.Root.030.ChainedTool.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.Root.030.ChainedTool.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.Root.200.CancelTool.original.json">
-        <Link>Mod\Specifications\ToolSpecification.Automation.Root.200.CancelTool.original.json</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Specifications\ToolSpecification.Automation.Root.200.CancelTool.original.json.meta">
-        <Link>Mod\Specifications\ToolSpecification.Automation.Root.200.CancelTool.original.json.meta</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\Automation\manifest.json">
+      <None Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Cursors\*.json">
+        <Link>Mod\Blueprints\Cursors\_</Link>
+      </None>
+      <None Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Population\*.json">
+        <Link>Mod\Blueprints\Tools\Population\_</Link>
+      </None>
+      <None Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Signals\*.json">
+        <Link>Mod\Blueprints\Tools\Signals\_</Link>
+      </None>
+      <None Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Storage\*.json">
+        <Link>Mod\Blueprints\Tools\Storage\_</Link>
+      </None>
+      <None Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Terrain\*.json">
+        <Link>Mod\Blueprints\Tools\Terrain\_</Link>
+      </None>
+      <None Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\*.json">
+        <Link>Mod\Blueprints\Tools\_</Link>
+      </None>
+      <None Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Water\*.json">
+        <Link>Mod\Blueprints\Tools\Water\_</Link>
+      </None>
+      <None Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Localizations\*.txt">
+        <Link>Mod\Localizations\_</Link>
+      </None>
+      <None Include="..\ModsUnityProject\Assets\Mods\Automation\manifest.json">
         <Link>Mod\manifest.json</Link>
-      </Content>
+      </None>
     </ItemGroup>
     <ItemGroup>
+      <Compile Include="..\TimberDev\Settings\DebugSettings.cs">
+        <Link>TimberDev\Settings\DebugSettings.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Tools\AbstractAreaSelectionTool.cs">
+        <Link>TimberDev\Tools\AbstractAreaSelectionTool.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Tools\AbstractLockingTool.cs">
+        <Link>TimberDev\Tools\AbstractLockingTool.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Tools\CustomToolSystem.cs">
+        <Link>TimberDev\Tools\CustomToolSystem.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Tools\ToolWithDescription.cs">
+        <Link>TimberDev\Tools\ToolWithDescription.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\UI\CommonFormats.cs">
         <Link>TimberDev\UI\CommonFormats.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\UI\Configurator.cs">
         <Link>TimberDev\UI\Configurator.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\UI\GameTextMinMaxSlider2.cs">
-        <Link>TimberDev\UI\GameTextMinMaxSlider2.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\UI\MinMaxSlider2.cs">
-        <Link>TimberDev\UI\MinMaxSlider2.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\UI\PanelFragment.cs">
-        <Link>TimberDev\UI\PanelFragment.cs</Link>
+      <Compile Include="..\TimberDev\UI\DropdownItem.cs">
+        <Link>TimberDev\UI\DropdownItem.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\UI\PreciseSliderWrapper.cs">
         <Link>TimberDev\UI\PreciseSliderWrapper.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\UI\ResizableDropdownElement.cs">
+        <Link>TimberDev\UI\ResizableDropdownElement.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\UI\UiFactory.cs">
         <Link>TimberDev\UI\UiFactory.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UI\VisualEffects.cs">
+        <Link>TimberDev\UI\VisualEffects.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\Configurator.cs">
+        <Link>TimberDev\Utils\Configurator.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\CounterProfiler.cs">
+        <Link>TimberDev\Utils\CounterProfiler.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\Utils\CustomizableInstantiator.cs">
         <Link>TimberDev\Utils\CustomizableInstantiator.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\Utils\FeatureController.cs">
-        <Link>TimberDev\Utils\FeatureController.cs</Link>
-      </Compile>
       <Compile Include="..\TimberDev\Utils\HarmonyPatcher.cs">
         <Link>TimberDev\Utils\HarmonyPatcher.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\Utils\ModTextAssetConverterPatch.cs">
-        <Link>TimberDev\Utils\ModTextAssetConverterPatch.cs</Link>
+      <Compile Include="..\TimberDev\Utils\IObjectLoaderExtensions.cs">
+        <Link>TimberDev\Utils\IObjectLoaderExtensions.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\Utils\PrefabPatcher.cs">
         <Link>TimberDev\Utils\PrefabPatcher.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\StaticBindings.cs">
+        <Link>TimberDev\Utils\StaticBindings.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\TicksProfiler.cs">
+        <Link>TimberDev\Utils\TicksProfiler.cs</Link>
       </Compile>
       <Compile Include="..\UnityDevLite\DebugEx.cs">
         <Link>UnityDevLite\DebugEx.cs</Link>
@@ -368,6 +170,30 @@
       <Compile Include="..\UnityDevLite\TypeUtils.cs">
         <Link>UnityDevLite\TypeUtils.cs</Link>
       </Compile>
+      <Compile Remove="Conditions\BadtideEndedCondition.cs" />
+      <Compile Remove="Conditions\BadtideStartedCondition.cs" />
+      <Compile Remove="Conditions\BeaverPopulationAboveThresholdCondition.cs" />
+      <Compile Remove="Conditions\BeaverPopulationBelowThresholdCondition.cs" />
+      <Compile Remove="Conditions\BeaverPopulationThresholdCondition.cs" />
+      <Compile Remove="Conditions\BotPopulationAboveThresholdCondition.cs" />
+      <Compile Remove="Conditions\BotPopulationBelowThresholdCondition.cs" />
+      <Compile Remove="Conditions\BotPopulationThresholdCondition.cs" />
+      <Compile Remove="Conditions\DroughtEndedCondition.cs" />
+      <Compile Remove="Conditions\DroughtStartedCondition.cs" />
+      <Compile Remove="Conditions\OutputStockAboveThresholdCondition.cs" />
+      <Compile Remove="Conditions\OutputStockBelowThresholdCondition.cs" />
+      <Compile Remove="Conditions\OutputStockThresholdConditionBase.cs" />
+      <Compile Remove="Conditions\PopulationThresholdConditionBase.cs" />
+      <Compile Remove="Conditions\PopulationTrackerConditionBase.cs" />
+      <Compile Remove="Conditions\WeatherTrackerConditionBase.cs" />
+      <Compile Remove="Actions\DebugLogAction.cs" />
+      <Compile Remove="Actions\MarkForEmptyingAction.cs" />
+      <Compile Remove="Actions\PauseAction.cs" />
+      <Compile Remove="Actions\SetFloodgateHeightAction.cs" />
+      <Compile Remove="Actions\UnmarkForEmptyingAction.cs" />
+      <Compile Remove="Actions\UnpauseAction.cs" />
+      <Compile Remove="Actions\BlockableBuildingAction.cs" />
+      <Compile Remove="Conditions\ThresholdConditionBase.cs" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <PropertyGroup>
@@ -375,7 +201,7 @@
     </PropertyGroup>
     <Target Name="AfterBuild" Condition="Exists('$(ModPath)')">
         <Message Text="### Copying DLL to the game's mods folder... ###" Importance="high"/>
-        <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\Scripts"/>
+        <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\version-0.7\Scripts"/>
     </Target>
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
       <PropertyGroup>

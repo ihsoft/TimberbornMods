@@ -138,17 +138,16 @@ public class StatusToggleAction : AutomationActionBase {
       var baseInstantiator = DependencyContainer.GetInstance<BaseInstantiator>();
       status = baseInstantiator.AddComponent<StatusController>(Behavior.GameObjectFast);
       status.SetStatusToken(StatusToken);
-    }
-    if (ActionKind == ActionKindEnum.ShowStatus) {
-      // The blocker could get created from the hide action which doesn't have a status setting.
-      status.SetStatus(this);
+      if (ActionKind == ActionKindEnum.ShowStatus) {  // No status for the hide action.
+        status.SetStatus(this);
+      }
     }
     return status;
   }
 
   /// <summary>Ensures that the building's block state is in sync with the rule condition.</summary>
   void UpdateStatusState() {
-    if (!Condition.ConditionState) {
+    if (!Condition.ConditionState || IsMarkedForCleanup) {
       return;
     }
     if (ActionKind == ActionKindEnum.ShowStatus) {

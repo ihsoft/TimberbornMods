@@ -6,7 +6,9 @@ using System.Diagnostics.CodeAnalysis;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.Conditions;
 using IgorZ.Automation.Utils;
+using IgorZ.TimberDev.Utils;
 using Timberborn.Persistence;
+using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.Actions;
 
@@ -23,8 +25,9 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
   public static readonly DynamicClassSerializer<AutomationActionBase> ActionSerializerNullable = new(false);
 
   #region IAutomationAction implementation
+
   /// <inheritdoc/>
-  public string TemplateFamily { get; set; } = "";
+  public string TemplateFamily { get; set; }
 
   /// <inheritdoc/>
   public virtual AutomationBehavior Behavior {
@@ -63,10 +66,22 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
   IAutomationCondition _condition;
 
   /// <inheritdoc/>
-  public bool IsMarkedForCleanup { get; protected set; }
+  public bool IsMarkedForCleanup {
+    get => _isMarkedForCleanup;
+    protected set {
+      _isMarkedForCleanup = value;
+      if (value) {
+        HostedDebugLog.Fine(Behavior, "Condition marked for cleanup: {0}", this);
+        Behavior.AutomationService.MarkBehaviourForCleanup(Behavior);
+      }
+    }
+  }
+  bool _isMarkedForCleanup;
+
   #endregion
 
   #region IGameSerializable implemenation
+
   static readonly PropertyKey<AutomationConditionBase> ConditionPropertyKey = new("Condition");
   static readonly PropertyKey<bool> IsMarkedForCleanupKey = new("IsMarkedForCleanup");
   static readonly PropertyKey<string> TemplateFamilyKey = new("TemplateFamily");
@@ -74,8 +89,8 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
   /// <inheritdoc/>
   public virtual void LoadFrom(IObjectLoader objectLoader) {
     Condition = objectLoader.GetValueOrNull(ConditionPropertyKey, AutomationConditionBase.ConditionSerializerNullable);
-    IsMarkedForCleanup = objectLoader.Has(IsMarkedForCleanupKey) && objectLoader.Get(IsMarkedForCleanupKey);
-    TemplateFamily = objectLoader.GetValueOrNull(TemplateFamilyKey) ?? "";
+    IsMarkedForCleanup = objectLoader.GetValueOrDefault(IsMarkedForCleanupKey);
+    TemplateFamily = objectLoader.GetValueOrDefault(TemplateFamilyKey, null);
   }
 
   /// <inheritdoc/>
@@ -83,12 +98,18 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
     if (Condition is AutomationConditionBase condition) {
       objectSaver.Set(ConditionPropertyKey, condition, AutomationConditionBase.ConditionSerializer);
     }
-    objectSaver.Set(IsMarkedForCleanupKey, IsMarkedForCleanup);
-    objectSaver.Set(TemplateFamilyKey, TemplateFamily);
+    if (IsMarkedForCleanup) {
+      objectSaver.Set(IsMarkedForCleanupKey, IsMarkedForCleanup);
+    }
+    if (!string.IsNullOrEmpty(TemplateFamily)) {
+      objectSaver.Set(TemplateFamilyKey, TemplateFamily);
+    }
   }
+
   #endregion
 
   #region API
+
   /// <inheritdoc/>
   public abstract string UiDescription { get; }
 
@@ -114,17 +135,22 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
   /// </summary>
   /// <seealso cref="Behavior"/>
   protected virtual void OnBehaviorToBeCleared() {}
+
   #endregion
 
   #region IAutomationConditionListener
+
   /// <inheritdoc/>
   public abstract void OnConditionState(IAutomationCondition automationCondition);
+
   #endregion
 
   #region Implementation
+
   /// <inheritdoc/>
   public override string ToString() {
     return $"TypeId={GetType()},Condition={Condition?.GetType()}";
   }
+
   #endregion
 }

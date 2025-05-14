@@ -17,10 +17,14 @@ public static class CommonFormats {
   const string SupplyRemainingLocKey = "GoodConsuming.SupplyRemaining";
   static string _localizedSupplyRemainingTmpl;
 
+  static readonly string RedHighlight = ColorUtility.ToHtmlStringRGB(new Color(1f, 0.3f, 0.3f));
+  static readonly string GreenHighlight = ColorUtility.ToHtmlStringRGB(new Color(0.35f, 1f, 0.38f));
+  static readonly string YellowHighlight = ColorUtility.ToHtmlStringRGB(new Color(1f, 1f, 0.1f));
+
   /// <summary>Reset static caches of localized strings.</summary>
   /// <remarks>
-  /// Call it from the configurator to pickup the current game language. If not called, then the cached strings won't
-  /// change until next game restart.
+  /// Call it from the configurator to pick up the current game language. If not called, then the cached strings won't
+  /// change until the next game restart.
   /// </remarks>
   public static void ResetCachedLocStrings() {
     _localizedSupplyRemainingTmpl = null;
@@ -72,5 +76,24 @@ public static class CommonFormats {
         >= 0.1f => value.ToString("0.0#"),
         _ => value.ToString("0.00#")
     };
+  }
+
+  /// <summary>Highlights the text in red color.</summary>
+  public static string HighlightRed(string text) => $"<color=#{RedHighlight}>{text}</color>";
+
+  /// <summary>Highlights the text in green color.</summary>
+  public static string HighlightGreen(string text) => $"<color=#{GreenHighlight}>{text}</color>";
+
+  /// <summary>Highlights the text in yellow color.</summary>
+  public static string HighlightYellow(string text) => $"<color=#{YellowHighlight}>{text}</color>";
+
+  /// <summary>Highlights the text in the specified color.</summary>
+  public static string Highlight(string text, Color color) {
+    return $"<color=#{ColorUtility.ToHtmlStringRGB(color)}>{text}</color>";
+  }
+
+  /// <summary>Adds a strikethrough effect to the text.</summary>
+  public static string Strikethrough(string text) {
+    return $"<s>{text}</s>";
   }
 }

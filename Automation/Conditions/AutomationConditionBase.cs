@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.Utils;
 using Timberborn.Persistence;
+using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.Conditions;
 
@@ -17,6 +18,7 @@ namespace IgorZ.Automation.Conditions;
 [SuppressMessage("ReSharper", "MemberCanBeProtected.Global")]
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 public abstract class AutomationConditionBase : IAutomationCondition {
+
   /// <summary>Serializer that handles persistence of all the condition types.</summary>
   /// <remarks>Loading will fail if the condition can't be loaded.</remarks>
   public static readonly DynamicClassSerializer<AutomationConditionBase> ConditionSerializer = new();
@@ -26,6 +28,7 @@ public abstract class AutomationConditionBase : IAutomationCondition {
   public static readonly DynamicClassSerializer<AutomationConditionBase> ConditionSerializerNullable = new(false);
 
   #region ICondition implementation
+
   /// <inheritdoc/>
   public virtual AutomationBehavior Behavior {
     get => _behavior;
@@ -45,14 +48,17 @@ public abstract class AutomationConditionBase : IAutomationCondition {
   AutomationBehavior _behavior;
 
   /// <inheritdoc/>
+  public virtual bool CanRunOnUnfinishedBuildings => false;
+
+  /// <inheritdoc/>
   public virtual IAutomationConditionListener Listener { get; set; }
 
   /// <inheritdoc/>
   public virtual bool ConditionState {
     get => _conditionState;
     internal set {
-      if (_conditionState != value) {
-        _conditionState = value;
+      _conditionState = value;
+      if (!IsMarkedForCleanup) {
         Listener?.OnConditionState(this);
       }
     }
@@ -60,14 +66,22 @@ public abstract class AutomationConditionBase : IAutomationCondition {
   bool _conditionState;
 
   /// <inheritdoc/>
-  /// <remarks>
-  /// If custom code sets it to <c>true</c>, then it must call <see cref="AutomationBehavior.CollectCleanedRules"/> to
-  /// trigger the update handling.
-  /// </remarks>
-  public bool IsMarkedForCleanup { get; protected set; }
+  public bool IsMarkedForCleanup {
+    get => _isMarkedForCleanup;
+    protected set {
+      _isMarkedForCleanup = value;
+      if (value) {
+        HostedDebugLog.Fine(Behavior, "Action marked for cleanup: {0}", this);
+        Behavior.AutomationService.MarkBehaviourForCleanup(Behavior);
+      }
+    }
+  }
+  bool _isMarkedForCleanup;
+
   #endregion
 
   #region IGameSerializable implemenation
+
   static readonly PropertyKey<bool> ConditionStateKey = new("ConditionState");
   static readonly PropertyKey<bool> IsMarkedForCleanupKey = new("IsMarkedForCleanup");
 
@@ -82,9 +96,11 @@ public abstract class AutomationConditionBase : IAutomationCondition {
     objectSaver.Set(ConditionStateKey, ConditionState);
     objectSaver.Set(IsMarkedForCleanupKey, IsMarkedForCleanup);
   }
+
   #endregion
 
   #region API
+
   /// <inheritdoc/>
   public abstract string UiDescription { get; }
 
@@ -98,22 +114,25 @@ public abstract class AutomationConditionBase : IAutomationCondition {
   public abstract bool IsValidAt(AutomationBehavior behavior);
 
   /// <summary>
-  /// Notifies that a new behavior has been assigned to the condition. It's the time to setup the behaviors. 
+  /// Notifies that a new behavior has been assigned to the condition. It is the time to set up the behaviors. 
   /// </summary>
   /// <seealso cref="Behavior"/>
   protected abstract void OnBehaviorAssigned();
 
   /// <summary>
-  /// Notifies that the current behavior is about to be cleared. It's the time to cleanup the behaviors. 
+  /// Notifies that the current behavior is about to be cleared. It is the time to clean up the behaviors. 
   /// </summary>
   /// <seealso cref="Behavior"/>
   protected abstract void OnBehaviorToBeCleared();
+
   #endregion
 
   #region Implementation
+
   /// <inheritdoc/>
   public override string ToString() {
     return $"TypeId={GetType()},Listener={Listener?.GetType()}";
   }
+
   #endregion
 }

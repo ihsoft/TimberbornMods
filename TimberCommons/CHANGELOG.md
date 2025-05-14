@@ -1,3 +1,23 @@
+# v1.11.5 (27 Apr 2025)
+* Update to support game version `0.7.6.1`.
+
+# v1.11.4 (10 Apr 2025)
+* Update to support game version `0.7.3.1`.
+
+# v1.11.3 (4 Apr 2025)
+* Update to support game version `0.7.2.0`.
+
+# v1.11.2 (11 Mar 2025)
+* [Fix] The mod crashes on game version `0.7.1.2`.
+
+# v1.11.1 (26 Feb 2025)
+* [Fix] The mod crashes on game version `0.7.1.0`.
+
+# v1.11.0 (22 Feb 2025)
+* [Enhancement] Add Update 7 support. Incompatible with the previous versions.
+* [Change] No more dependency to TimberAPI.
+* For Update 6, v1.10.3 is included in the package.
+
 # v1.10.3 (15 Dec 2024)
 * [Enhancement] Allow changing settings in the game.
 

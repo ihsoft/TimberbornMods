@@ -1,0 +1,151 @@
+.square-toggle__wrapper {
+    background-image: resource("UI/Images/Game/square-toggle-base");
+    width: 26px;
+    height: 26px;
+}
+
+.square-toggle__wrapper:hover:enabled {
+    background-image: resource("UI/Images/Game/square-toggle-base-hover");
+}
+
+.square-toggle {
+    --click-sound: "UI.Click";
+}
+
+.square-toggle > .unity-toggle__input > .unity-toggle__checkmark {
+    width: 26px;
+    height: 26px;
+}
+
+.crash-info-panel {
+    background-color: black;
+    position: absolute;
+    padding: 5px;
+    align-self: center;
+    color: red;
+    font-size: 20px;
+}
+
+.quick-notification-panel {
+    top: 100px;
+    position: absolute;
+    padding: 5px 8px;
+    align-self: center;
+    max-width: 500px;
+}
+
+.save-box {
+    height: 500px;
+    width: 700px;
+}
+
+.save-box__input {
+    min-width: 200px;
+    margin-right: 20px;
+    flex-grow: 1;
+}
+
+.save-box__buttons {
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+
+.options-box {
+    padding: 35px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.options-box__version {
+    color: rgb(255, 255, 255);
+    font-size: 14px;
+    padding-top: 5px;
+}
+
+.options-box__discord-button {
+    background-image: resource("UI/Images/Branding/discord-logomark-and-logotype");
+    width: 146px;
+    height: 40px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    --click-sound: "UI.Click";
+}
+
+.options-box__discord-button:hover:enabled {
+    -unity-background-image-tint-color: rgb(88, 101, 242);
+}
+
+.options-box__discord-button:hover:enabled:active {
+    -unity-background-image-tint-color: rgb(153, 170, 181);
+}
+
+.file-browser {
+    height: 500px;
+    width: 700px;
+}
+
+.file-browser__path-wrapper {
+    flex-direction: row;
+    margin-bottom: 8px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.file-browser__button-square {
+    background-image: resource("UI/Images/Buttons/empty-batch");
+}
+
+.file-browser__button-square:hover:enabled {
+    background-image: resource("UI/Images/Buttons/empty-batch-hover");
+}
+
+.file-browser__upward-icon {
+    height: 24px;
+    width: 24px;
+    background-image: resource("UI/Images/Buttons/up-arrow-green");
+}
+
+.file-browser__path-field {
+    flex-grow: 1;
+    height: 24px;
+    margin: 0 5px;
+}
+
+.file-browser__path-field .unity-text-element {
+    -unity-text-align: middle-left;
+}
+
+.file-browser__tip {
+    -unity-text-align: middle-left;
+    margin-left: 2px;
+    margin-right: 5px;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+}
+
+.disk-system-entry-element {
+    flex-direction: row;
+    align-items: center;
+    flex-grow: 1;
+    padding: 2px;
+    min-height: 24px;
+}
+
+.disk-system-entry-element__name {
+    flex-shrink: 1;
+    flex-grow: 1;
+    flex-wrap: wrap;
+    -unity-text-align: middle-left;
+    white-space: normal;
+    margin-left: 2px;
+}
+
+.disk-system-entry-element__icon {
+    width: 24px;
+    height: 24px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    margin-right: 5px;
+}

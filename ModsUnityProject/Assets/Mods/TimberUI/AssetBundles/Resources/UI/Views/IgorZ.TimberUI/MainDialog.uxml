@@ -1,0 +1,23 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:Template name="NamedBoxTemplate" src="project://database/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml?fileID=9197481963319205126&amp;guid=b27c549e9f96d7843b45412cf82a0c6a&amp;type=3#NamedBoxTemplate" />
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle" />
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle" />
+    <Style src="project://database/Assets/Mods/TimberUI/AssetBundles/Resources/UI/Views/IgorZ.TimberUI/TimberDevStyle.uss?fileID=7433441132597879392&amp;guid=36c17d6971ee17546b67650917e73cf4&amp;type=3#TimberDevStyle" />
+    <engine:VisualElement>
+        <engine:Instance template="NamedBoxTemplate" style="width: 700px; height: 394px;">
+            <engine:VisualElement style="flex-grow: 0;">
+                <engine:Label text="Resource path:" class="game-text-big" />
+                <Timberborn.CoreUI.NineSliceTextField name="ResourcePath" class="text-field" />
+                <engine:Label text="Base path or filename:" class="game-text-big" />
+                <Timberborn.CoreUI.NineSliceTextField name="Filename" class="text-field" />
+                <engine:VisualElement style="margin-top: 7px; flex-direction: row; align-self: flex-start;">
+                    <Timberborn.CoreUI.NineSliceButton text="Export USS" name="ExportUSSButton" class="button-game timberdev-button-small text--grey" style="flex-grow: 1;" />
+                    <Timberborn.CoreUI.NineSliceButton text="Export UXML" name="ExportUXMLButton" class="button-game timberdev-button-small text--grey" style="flex-grow: 1; margin-right: 5px; margin-left: 5px;" />
+                    <Timberborn.CoreUI.NineSliceButton text="Print UXML dependencies" name="PrintStylesButton" class="button-game timberdev-button-small text--grey" style="flex-grow: 1;" />
+                </engine:VisualElement>
+                <engine:Label text="styles..." name="LogText" class="text--yellow" style="margin-top: 7px; white-space: normal;" />
+                <engine:Label text="errors..." name="ErrorText" class="text--red game-text--red" style="margin-top: 7px;" />
+            </engine:VisualElement>
+        </engine:Instance>
+    </engine:VisualElement>
+</engine:UXML>

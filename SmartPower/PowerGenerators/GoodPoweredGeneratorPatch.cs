@@ -11,7 +11,7 @@ using Timberborn.PowerGenerating;
 
 namespace IgorZ.SmartPower.PowerGenerators;
 
-[HarmonyPatch(typeof(GoodPoweredGenerator), nameof(GoodPoweredGenerator.Tick))]
+[HarmonyPatch(typeof(GoodPoweredGenerator), nameof(GoodPoweredGenerator.UpdateGoodConsumption))]
 static class GoodPoweredGeneratorPatch {
   static bool Prefix(bool __runOriginal, BaseComponent __instance) {
     if (!__runOriginal) {

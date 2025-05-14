@@ -1,0 +1,32 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:Template name="NamedBoxTemplate" src="project://database/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml?fileID=9197481963319205126&amp;guid=b27c549e9f96d7843b45412cf82a0c6a&amp;type=3#NamedBoxTemplate" />
+    <engine:Template name="RuleRow" src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/RuleRow.uxml?fileID=9197481963319205126&amp;guid=fc7b2c67f39d4d1478ae759720b97329&amp;type=3#RuleRow" />
+    <engine:Template name="RulesEditorButtonTmpl" src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/RulesEditorButtonTmpl.uxml?fileID=9197481963319205126&amp;guid=0fdc8b893c16cc547b70cb15198e6b42&amp;type=3#RulesEditorButtonTmpl" />
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle" />
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle" />
+    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/RulesEditorStyle.uss?fileID=7433441132597879392&amp;guid=82ba7710a5bad1b489b53edd629e2a56&amp;type=3#RulesEditorStyle" />
+    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/TimberDevStyle.uss?fileID=7433441132597879392&amp;guid=86824deb2a4bc844cbec48367a164254&amp;type=3#TimberDevStyle" />
+    <engine:VisualElement class="content-row-centered">
+        <engine:Instance template="NamedBoxTemplate" style="width: 850px; height: 700px;">
+            <AttributeOverrides element-name="Header" text-loc-key="IgorZ.Automation.Scripting.Editor.DialogHeader" />
+            <engine:VisualElement name="ScrollViewWrapper" class="scroll--green-decorated" style="flex-grow: 1; width: 100%;">
+                <engine:ScrollView name="Content">
+                    <engine:VisualElement style="flex-grow: 1;">
+                        <engine:VisualElement name="RuleRowsContainer">
+                            <engine:Instance template="RuleRow" />
+                            <engine:Instance template="RuleRow" />
+                        </engine:VisualElement>
+                        <engine:VisualElement name="Buttons" style="flex-direction: row; flex-shrink: 0;">
+                            <engine:Instance template="RulesEditorButtonTmpl" />
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                </engine:ScrollView>
+            </engine:VisualElement>
+            <engine:VisualElement style="flex-direction: row; align-items: center; justify-content: center; margin-top: 20px; flex-shrink: 0;">
+                <Timberborn.CoreUI.LocalizableButton text="DiscardChanges" name="CancelButton" text-loc-key="IgorZ.Automation.Scripting.Editor.DiscardChangesBtn" class="menu-button" />
+                <Timberborn.CoreUI.LocalizableButton text="MoreInfoBtn" name="MoreInfoButton" text-loc-key="IgorZ.Automation.Scripting.Editor.MoreInfoBtn" class="menu-button" />
+                <Timberborn.CoreUI.LocalizableButton text="SaveRules" name="ConfirmButton" text-loc-key="IgorZ.Automation.Scripting.Editor.SaveRulesBtn" class="menu-button" />
+            </engine:VisualElement>
+        </engine:Instance>
+    </engine:VisualElement>
+</engine:UXML>

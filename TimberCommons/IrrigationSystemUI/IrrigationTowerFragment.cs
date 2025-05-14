@@ -33,7 +33,8 @@ sealed class IrrigationTowerFragment : IEntityPanelFragment {
 
   public VisualElement InitializeFragment() {
     _infoLabel = _uiFactory.CreateLabel();
-    _root = _uiFactory.CreateCenteredPanelFragmentBuilder().AddComponent(_infoLabel).BuildAndInitialize();
+    _root = _uiFactory.CreateCenteredPanelFragment();
+    _root.Add(_infoLabel);
     _root.ToggleDisplayStyle(visible: false);
     return _root;
   }

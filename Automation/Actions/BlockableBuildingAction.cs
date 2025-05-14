@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using IgorZ.Automation.AutomationSystem;
+using IgorZ.TimberDev.Utils;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BuildingsBlocking;
@@ -165,9 +166,9 @@ public sealed class BlockableBuildingAction : AutomationActionBase {
     if (ActionKind != ActionKindEnum.Block) {
       return;
     }
-    BlockIcon = objectLoader.GetValueOrNull(BlockIconKey);
-    BlockText = objectLoader.GetValueOrNull(BlockTextKey);
-    ShowIcon = objectLoader.GetValueOrNullable(ShowIconKey) ?? false;
+    BlockIcon = objectLoader.GetValueOrDefault(BlockIconKey, null);
+    BlockText = objectLoader.GetValueOrDefault(BlockTextKey, null);
+    ShowIcon = objectLoader.GetValueOrDefault(ShowIconKey);
   }
 
   /// <inheritdoc/>

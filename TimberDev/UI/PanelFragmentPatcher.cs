@@ -42,7 +42,7 @@ public sealed class PanelFragmentPatcher {
     _afterElementName = afterElementName;
   }
 
-  /// <summary>Patches the UI fragment with the element. Actually does the patch the first call only.</summary>
+  /// <summary>Patches the UI fragment with the element. Actually does the patch in the first call only.</summary>
   public void Patch() {
     if (_isPatched) {
       return;

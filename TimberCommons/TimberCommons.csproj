@@ -49,17 +49,8 @@
         <HintPath>..\Dependencies\Workshop\3283831040\version-0.6\Scripts\ModSettings.CoreUI.dll</HintPath>
       </Reference>
       <Reference Include="System" />
-      <Reference Include="System.Collections.Immutable, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <Reference Include="System.Collections.Immutable">
         <HintPath>..\Dependencies\GameRoot\Timberborn_Data\Managed\System.Collections.Immutable.dll</HintPath>
-      </Reference>
-      <Reference Include="TimberApi">
-        <HintPath>..\Dependencies\Workshop\3288241660\core\TimberApi.dll</HintPath>
-      </Reference>
-      <Reference Include="TimberApi.UIBuilderSystem">
-        <HintPath>..\Dependencies\Workshop\3288241660\core\TimberApi.UIBuilderSystem.dll</HintPath>
-      </Reference>
-      <Reference Include="TimberApi.UIPresets">
-        <HintPath>..\Dependencies\Workshop\3288241660\core\TimberApi.UIPresets.dll</HintPath>
       </Reference>
     </ItemGroup>
     <ItemGroup>
@@ -73,20 +64,11 @@
       <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\deDE.txt">
         <Link>Mod\Localizations\deDE.txt</Link>
       </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\deDE.txt.meta">
-        <Link>Mod\Localizations\deDE.txt.meta</Link>
-      </Content>
       <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\enUS.txt">
         <Link>Mod\Localizations\enUS.txt</Link>
       </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\enUS.txt.meta">
-        <Link>Mod\Localizations\enUS.txt.meta</Link>
-      </Content>
       <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\ruRU.txt">
         <Link>Mod\Localizations\ruRU.txt</Link>
-      </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\ruRU.txt.meta">
-        <Link>Mod\Localizations\ruRU.txt.meta</Link>
       </Content>
       <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\manifest.json">
         <Link>Mod\manifest.json</Link>
@@ -99,50 +81,32 @@
       <Compile Include="..\TimberDev\UI\Configurator.cs">
         <Link>TimberDev\UI\Configurator.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\UI\GameTextMinMaxSlider2.cs">
-        <Link>TimberDev\UI\GameTextMinMaxSlider2.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\UI\MinMaxSlider2.cs">
-        <Link>TimberDev\UI\MinMaxSlider2.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\UI\PanelFragment.cs">
-        <Link>TimberDev\UI\PanelFragment.cs</Link>
+      <Compile Include="..\TimberDev\UI\DropdownItem.cs">
+        <Link>TimberDev\UI\DropdownItem.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\UI\PreciseSliderWrapper.cs">
         <Link>TimberDev\UI\PreciseSliderWrapper.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\UI\ResizableDropdownElement.cs">
+        <Link>TimberDev\UI\ResizableDropdownElement.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\UI\UiFactory.cs">
         <Link>TimberDev\UI\UiFactory.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\Utils\CustomizableInstantiator.cs">
-        <Link>TimberDev\Utils\CustomizableInstantiator.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\Utils\FeatureController.cs">
-        <Link>TimberDev\Utils\FeatureController.cs</Link>
+      <Compile Include="..\TimberDev\Utils\Configurator.cs">
+        <Link>TimberDev\Utils\Configurator.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\Utils\HarmonyPatcher.cs">
         <Link>TimberDev\Utils\HarmonyPatcher.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\Utils\ModTextAssetConverterPatch.cs">
-        <Link>TimberDev\Utils\ModTextAssetConverterPatch.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\Utils\PrefabPatcher.cs">
-        <Link>TimberDev\Utils\PrefabPatcher.cs</Link>
+      <Compile Include="..\TimberDev\Utils\StaticBindings.cs">
+        <Link>TimberDev\Utils\StaticBindings.cs</Link>
       </Compile>
       <Compile Include="..\UnityDevLite\DebugEx.cs">
         <Link>UnityDevLite\DebugEx.cs</Link>
       </Compile>
       <Compile Include="..\UnityDevLite\HostedDebugLog.cs">
         <Link>UnityDevLite\HostedDebugLog.cs</Link>
-      </Compile>
-      <Compile Include="..\UnityDevLite\ReflectedAction.cs">
-        <Link>UnityDevLite\ReflectedAction.cs</Link>
-      </Compile>
-      <Compile Include="..\UnityDevLite\ReflectedField.cs">
-        <Link>UnityDevLite\ReflectedField.cs</Link>
-      </Compile>
-      <Compile Include="..\UnityDevLite\TypeUtils.cs">
-        <Link>UnityDevLite\TypeUtils.cs</Link>
       </Compile>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -151,7 +115,7 @@
     </PropertyGroup>
     <Target Name="AfterBuild" Condition="Exists('$(ModPath)')">
         <Message Text="### Copying DLL to the game's mods folder... ###" Importance="high"/>
-        <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\Scripts"/>
+        <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\version-0.7\Scripts"/>
     </Target>
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
       <PropertyGroup>

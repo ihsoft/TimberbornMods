@@ -1,0 +1,13 @@
+{
+  "Name": "Timberborn UI Exporter",
+  "Version": "1.0.0",
+  "Id": "Timberborn.IgorZ.TimberUI",
+  "MinimumGameVersion": "0.7.1.0",
+  "Description": "Mod to extract USS & UXML assets from the game.",
+  "RequiredMods": [
+    {
+      "Id": "eMka.ModSettings",
+      "MinimumVersion": "0.7.0.1"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+﻿ID,Text,Comment
+TimberDev_Utils.Settings.DebugSection,Fehlersuche und Fehlerbehebung,
+TimberDev_Utils.Settings.Debug.VerboseLogging,Ausführliches Loggen,
+TimberDev_Utils.Settings.Debug.VerboseLoggingTooltip,"Die Logs enthalten mehr nützliche Details,
+aber das kann die Spielleistung beeinträchtigen.",

@@ -8,22 +8,25 @@ using Bindito.Core;
 using IgorZ.SmartPower.Core;
 using IgorZ.SmartPower.Settings;
 using IgorZ.SmartPower.Utils;
+using IgorZ.TimberDev.Utils;
 using Timberborn.Attractions;
 using Timberborn.BlockSystem;
 using Timberborn.BuildingsBlocking;
+using Timberborn.EntitySystem;
 using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
 using Timberborn.Persistence;
 using Timberborn.StatusSystem;
 using Timberborn.TickSystem;
 using Timberborn.WorkSystem;
+using Timberborn.WorldPersistence;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
 namespace IgorZ.SmartPower.PowerConsumers;
 
 sealed class PowerInputLimiter
-    : TickableComponent, IPersistentEntity, IFinishedStateListener, IPostInitializableLoadedEntity {
+    : TickableComponent, IPersistentEntity, IFinishedStateListener, IPostInitializableEntity {
 
   #region API
 
@@ -124,8 +127,8 @@ sealed class PowerInputLimiter
   #region IPostInitializableLoadedEntity implementation
 
   /// <inheritdoc/>
-  public void PostInitializeLoadedEntity() {
-    if (enabled && IsSuspended) {
+  public void PostInitializeEntity() {
+    if (IsSuspended) {
       Suspend();
     }
   }
@@ -153,15 +156,14 @@ sealed class PowerInputLimiter
 
   /// <inheritdoc/>
   public void Load(IEntityLoader entityLoader) {
-    if (!entityLoader.HasComponent(PowerInputLimiterKey)) {
+    if (!entityLoader.TryGetComponent(PowerInputLimiterKey, out var state)) {
       return;
     }
-    var state = entityLoader.GetComponent(PowerInputLimiterKey);
-    Automate = state.GetValueOrNullable(AutomateKey) ?? false;
-    MinPowerEfficiency = state.GetValueOrNullable(MinPowerEfficiencyKey) ?? MinPowerEfficiency;
-    CheckBatteryCharge = state.GetValueOrNullable(CheckBatteryChargeKey) ?? false;
-    MinBatteriesCharge = state.GetValueOrNullable(MinBatteriesChargeKey) ?? MinBatteriesCharge;
-    IsSuspended = state.GetValueOrNullable(IsSuspendedKey) ?? false;
+    Automate = state.GetValueOrDefault(AutomateKey);
+    MinPowerEfficiency = state.GetValueOrDefault(MinPowerEfficiencyKey, MinPowerEfficiency);
+    CheckBatteryCharge = state.GetValueOrDefault(CheckBatteryChargeKey);
+    MinBatteriesCharge = state.GetValueOrDefault(MinBatteriesChargeKey, MinBatteriesCharge);
+    IsSuspended = state.GetValueOrDefault(IsSuspendedKey);
   }
 
   #endregion
@@ -205,7 +207,7 @@ sealed class PowerInputLimiter
 
   void Awake() {
     _mechanicalNode = GetComponentFast<MechanicalNode>();
-    _nominalPowerInput = GetComponentFast<MechanicalNodeSpecification>().PowerInput;
+    _nominalPowerInput = GetComponentFast<MechanicalNodeSpec>().PowerInput;
     _desiredPower = _nominalPowerInput;
     _blockableBuilding = GetComponentFast<BlockableBuilding>();
     _pausableBuilding = GetComponentFast<PausableBuilding>();

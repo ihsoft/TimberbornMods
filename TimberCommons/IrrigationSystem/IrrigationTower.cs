@@ -22,6 +22,7 @@ using Timberborn.SingletonSystem;
 using Timberborn.SoilBarrierSystem;
 using Timberborn.TerrainSystem;
 using Timberborn.TickSystem;
+using Timberborn.WorldPersistence;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
@@ -35,8 +36,8 @@ namespace IgorZ.TimberCommons.IrrigationSystem;
 /// blocked for irrigation (for example, via a moisture blocker), then it is not eligible for irrigation. 
 /// </remarks>
 public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, IFinishedStateListener,
-                                        IPostTransformChangeListener, IPausableComponent, ILateTickable,
-                                        IPersistentEntity, ISelectionListener, IPostInitializableLoadedEntity {
+                                        IPostPlacementChangeListener, IPausableComponent, ILateTickable,
+                                        IPersistentEntity, ISelectionListener, IPostInitializableEntity {
 
   #region Unity conrolled fields
   // ReSharper disable InconsistentNaming
@@ -77,11 +78,11 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <summary>The tiles that can get water.</summary>
   /// <remarks>These tiles are in the effective range and can be reached from the tower.</remarks>
   /// <see cref="EffectiveRange"/>
-  public HashSet<Vector2Int> ReachableTiles { get; private set; } = new();
+  public HashSet<Vector3Int> ReachableTiles { get; private set; } = [];
 
   /// <summary>The tiles that can be irrigated at the 100% efficiency.</summary>
   /// <see cref="IrrigationRange"/>
-  public HashSet<Vector2Int> EligibleTiles { get; private set; } = new();
+  public HashSet<Vector3Int> EligibleTiles { get; private set; } = [];
 
   /// <summary>
   /// The maximum number of tiles which this component could irrigate on a flat surface if there were no irrigation
@@ -105,7 +106,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <summary>Shortcut to the building's block object.</summary>
   protected BlockObject BlockObject { get; private set; }
 
-  /// <summary>Tower is always a blockable building.</summary>
+  /// <summary>The tower is always a blockable building.</summary>
   protected BlockableBuilding BlockableBuilding { get; private set; }
 
   // ReSharper restore MemberCanBeProtected.Global
@@ -153,7 +154,8 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   /// <inheritdoc/>
   public virtual void OnEnterFinishedState() {
-    _terrainService.TerrainHeightChanged += OnTerrainHeightChanged;
+    _terrainMap.ColumnMovedDown += OnColumnTerrainMoved;
+    _terrainMap.ColumnMovedUp += OnColumnTerrainMoved;
     BlockableBuilding.BuildingBlocked += OnBlockedStateChanged;
     BlockableBuilding.BuildingUnblocked += OnBlockedStateChanged;
     _eventBus.Register(this);
@@ -163,7 +165,8 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <inheritdoc/>
   public virtual void OnExitFinishedState() {
     StopMoisturizing();
-    _terrainService.TerrainHeightChanged -= OnTerrainHeightChanged;
+    _terrainMap.ColumnMovedDown -= OnColumnTerrainMoved;
+    _terrainMap.ColumnMovedUp -= OnColumnTerrainMoved;
     BlockableBuilding.BuildingBlocked -= OnBlockedStateChanged;
     BlockableBuilding.BuildingUnblocked -= OnBlockedStateChanged;
     _eventBus.Unregister(this);
@@ -172,10 +175,10 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   #endregion
 
-  #region IPostTransformChangeListener implementation
+  #region IPostPlacementChangeListener implementation
 
   /// <inheritdoc/>
-  public void OnPostTransformChanged() {
+  public void OnPostPlacementChanged() {
     UpdateBuildingPositioning(); // Recalculate the coverage during preview mode.
   }
 
@@ -184,7 +187,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   #region IPostInitializableLoadedEntity implementation
 
   /// <inheritdoc/>
-  public void PostInitializeLoadedEntity() {
+  public void PostInitializeEntity() {
     UpdateBuildingPositioning();
   }
 
@@ -246,7 +249,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   #region Implemenation
 
-  ITerrainService _terrainService;
+  IThreadSafeColumnTerrainMap _terrainMap;
   SoilBarrierMap _soilBarrierMap;
   MapIndexService _mapIndexService;
   EventBus _eventBus;
@@ -263,7 +266,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   float _radiusAdjuster;
 
   /// <summary>The moisture override, registered in the direct moisture system component.</summary>
-  /// <remarks>Value <c>-1</c> means the moisture override was not setup.</remarks>
+  /// <remarks>Value <c>-1</c> means the moisture override wasn't setup.</remarks>
   /// <seealso cref="StartMoisturizing"/>
   /// <seealso cref="StopMoisturizing"/>
   int _moistureOverrideIndex = -1;
@@ -297,7 +300,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   float _savedEfficiency = -1;
 
   /// <summary>Cached positioned blocks to start searching for the eligible tiles.</summary>
-  List<Vector2Int> _startingTiles;
+  List<Vector3Int> _startingTiles;
 
   /// <summary>All tiles that had non-baseZ height during the last eligible tiles refresh.</summary>
   /// <remarks>React on the terrain changes to these tiles only.</remarks>
@@ -321,11 +324,11 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   /// <summary>It must be public for the injection logic to work.</summary>
   [Inject]
-  public void InjectDependencies(ITerrainService terrainService, SoilBarrierMap soilBarrierMap,
+  public void InjectDependencies(IThreadSafeColumnTerrainMap terrainMap, SoilBarrierMap soilBarrierMap,
                                  MapIndexService mapIndexService, EventBus eventBus,
                                  DirectSoilMoistureSystemAccessor directSoilMoistureSystemAccessor,
                                  BuildingWithRangeUpdateService buildingWithRangeUpdateService) {
-    _terrainService = terrainService;
+    _terrainMap = terrainMap;
     _soilBarrierMap = soilBarrierMap;
     _mapIndexService = mapIndexService;
     _eventBus = eventBus;
@@ -397,7 +400,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
       return;
     }
     _moistureOverrideIndex = _directSoilMoistureSystemAccessor.AddMoistureOverride(
-      ReachableTiles, 1.0f, tile => CalculateDesertLevel(tile, EffectiveRange));
+        ReachableTiles, 1.0f, tile => CalculateDesertLevel(tile.XY(), EffectiveRange));
     IrrigationStarted();
   }
 
@@ -434,15 +437,13 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
     if (_irrigateFromGroundTilesOnly) {
       _startingTiles = BlockObject.PositionedBlocks.GetAllBlocks()
           .Where(x => x.MatterBelow == MatterBelow.Ground)
-          .Select(x => x.Coordinates.XY())
+          .Select(x => x.Coordinates)
           .ToList();
     } else {
-      _startingTiles = BlockObject.PositionedBlocks.GetFoundationCoordinates()
-          .Select(x => x.XY())
-          .ToList();
+      _startingTiles = BlockObject.PositionedBlocks.GetFoundationCoordinates().ToList();
     }
     _foundationTilesIndexes = BlockObject.PositionedBlocks.GetFoundationCoordinates()
-        .Select(c => _mapIndexService.CoordinatesToIndex(c.XY()))
+        .Select(c => _mapIndexService.CoordinatesToIndex3D(c))
         .ToHashSet();
   }
 
@@ -461,32 +462,32 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   }
 
   /// <summary>Returns all the tiles in the irrigated range.</summary>
-  (HashSet<Vector2Int> eligible, HashSet<int> obstacles, HashSet<int> barriers) GetTiles(
+  (HashSet<Vector3Int> eligible, HashSet<int> obstacles, HashSet<int> barriers) GetTiles(
     float range, bool skipChecks) {
-    var tilesToVisit = new List<Vector2Int>(Mathf.RoundToInt(range * range));
+    var tilesToVisit = new List<Vector3Int>(Mathf.RoundToInt(range * range));
     var visitedTiles = new HashSet<int>();
-    var result = new HashSet<Vector2Int>();
+    var result = new HashSet<Vector3Int>();
     var obstacles = new HashSet<int>();
     var barriers = new HashSet<int>();
     var sqrRadius = (range + _radiusAdjuster) * (range + _radiusAdjuster);
     var mapWidth = _mapIndexService.TerrainSize.x;
     var mapHeight = _mapIndexService.TerrainSize.y;
 
-    _startingTiles.ForEach(tile => tilesToVisit.Add(tile));
+    tilesToVisit.AddRange(_startingTiles);
     for (var i = 0; i < tilesToVisit.Count; i++) {
       var tile = tilesToVisit[i];
-      var index = _mapIndexService.CoordinatesToIndex(tile);
+      var index = _mapIndexService.CoordinatesToIndex3D(tile);
       if (!visitedTiles.Add(index)) {
         continue; // Already checked, skip it.
       }
-      if (GetSqrtDistance(tile) > sqrRadius) {
+      if (GetSqrtDistance(tile.XY()) > sqrRadius) {
         continue;
       }
       if (!skipChecks) {
         if (tile.x < 0 || tile.x >= mapWidth || tile.y < 0 || tile.y >= mapHeight) {
           continue;
         }
-        if (_terrainService.UnsafeCellHeight(index) != _baseZ) {
+        if (tile.z != _baseZ) {
           obstacles.Add(index);
           continue;
         }
@@ -498,13 +499,13 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
       if (!_foundationTilesIndexes.Contains(index)) {
         result.Add(tile);
       }
-      var up = new Vector2Int(tile.x, tile.y - 1);
+      var up = new Vector3Int(tile.x, tile.y - 1, _baseZ);
       tilesToVisit.Add(up);
-      var down = new Vector2Int(tile.x, tile.y + 1);
+      var down = new Vector3Int(tile.x, tile.y + 1, _baseZ);
       tilesToVisit.Add(down);
-      var left = new Vector2Int(tile.x - 1, tile.y);
+      var left = new Vector3Int(tile.x - 1, tile.y, _baseZ);
       tilesToVisit.Add(left);
-      var right = new Vector2Int(tile.x + 1, tile.y);
+      var right = new Vector3Int(tile.x + 1, tile.y, _baseZ);
       tilesToVisit.Add(right);
     }
 
@@ -528,23 +529,23 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <summary>Triggers the tiles update if something is built within the range.</summary>
   [OnEvent]
   public void OnBlockObjectEnteredFinishedStateEvent(EnteredFinishedStateEvent e) {
-    var coordinates = e.BlockObject.Coordinates.XY();
-    var index = _mapIndexService.CoordinatesToIndex(coordinates);
+    var coordinates = e.BlockObject.Coordinates;
+    var index = _mapIndexService.CoordinatesToIndex3D(coordinates);
     if (EligibleTiles.Contains(coordinates) && _soilBarrierMap.FullMoistureBarriers[index]) {
       HostedDebugLog.Fine(this, "Full moisture barrier added: coords={0}, barrier={1}", coordinates, e.BlockObject);
       _needMoistureSystemUpdate = true;
     }
   }
 
-  /// <summary>Triggers the tiles update if something has been destroyed within the range.</summary>
+  /// <summary>Triggers the tile update if something has been destroyed within the range.</summary>
   [OnEvent]
   public void OnEntityDeletedEvent(EntityDeletedEvent e) {
     var blockObject = e.Entity.GetComponentFast<BlockObject>();
     if (!blockObject || !blockObject.IsFinished) {
-      return; // The preview objects cannot affect irrigation.
+      return; // The preview objects can't affect irrigation.
     }
-    var coordinates = blockObject.Coordinates.XY();
-    var index = _mapIndexService.CoordinatesToIndex(coordinates);
+    var coordinates = blockObject.Coordinates;
+    var index = _mapIndexService.CoordinatesToIndex3D(coordinates);
     if (_irrigationBarriers.Contains(index) && !_soilBarrierMap.FullMoistureBarriers[index]) {
       HostedDebugLog.Fine(this, "Full moisture barrier removed: at={0}, barrier={1}", coordinates, e.Entity);
       _needMoistureSystemUpdate = true;
@@ -552,12 +553,13 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   }
 
   /// <summary>The terrain changes must trigger the irrigation coverage re-calculation.</summary>
-  void OnTerrainHeightChanged(object sender, TerrainHeightChangedEventArgs e) {
-    var index = _mapIndexService.CoordinatesToIndex(e.Coordinates);
-    if (e.NewHeight == _baseZ && _irrigationObstacles.Contains(index)
-        || e.OldHeight == _baseZ && ReachableTiles.Contains(e.Coordinates)) {
-      HostedDebugLog.Fine(this, "Terrain height change detected: coords={0}, from={1}, to={2}",
-                          e.Coordinates, e.OldHeight, e.NewHeight);
+  void OnColumnTerrainMoved(object sender, int index3D) {
+    var changedCoordZ = index3D / _mapIndexService.VerticalStride;
+    var index2D = index3D % _mapIndexService.VerticalStride;
+    var coordinates = _mapIndexService.IndexToCoordinates(index2D, changedCoordZ);
+    if (changedCoordZ == _baseZ && _irrigationObstacles.Contains(index3D)
+        || changedCoordZ == _baseZ && ReachableTiles.Contains(coordinates)) {
+      HostedDebugLog.Fine(this, "Terrain height change detected: {0}", coordinates);
       _needMoistureSystemUpdate = true;
     }
   }
@@ -590,10 +592,9 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   /// <inheritdoc/>
   public void Load(IEntityLoader entityLoader) {
-    if (!entityLoader.HasComponent(IrrigationTowerKey)) {
+    if (!entityLoader.TryGetComponent(IrrigationTowerKey, out var component)) {
       return;
     }
-    var component = entityLoader.GetComponent(IrrigationTowerKey);
     if (component.Has(CurrentEfficiencyKey)) {
       _savedEfficiency = component.Get(CurrentEfficiencyKey);
     }

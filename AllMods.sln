@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartPower", "SmartPower\Sm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimberCommons", "TimberCommons\TimberCommons.csproj", "{355F4AD6-697F-483A-B8BF-69AE410A168A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimberUI", "TimberUI\TimberUI.csproj", "{3D744A82-514A-4BE8-99CF-39C3BCC6FD4F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{355F4AD6-697F-483A-B8BF-69AE410A168A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{355F4AD6-697F-483A-B8BF-69AE410A168A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{355F4AD6-697F-483A-B8BF-69AE410A168A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D744A82-514A-4BE8-99CF-39C3BCC6FD4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D744A82-514A-4BE8-99CF-39C3BCC6FD4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D744A82-514A-4BE8-99CF-39C3BCC6FD4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D744A82-514A-4BE8-99CF-39C3BCC6FD4F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

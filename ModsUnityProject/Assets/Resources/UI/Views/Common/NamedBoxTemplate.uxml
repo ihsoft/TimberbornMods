@@ -1,0 +1,12 @@
+<engine:UXML xmlns:engine="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <engine:VisualElement name="NamedBoxTemplate" class="content-row-centered">
+        <Timberborn.CoreUI.NineSliceVisualElement class="sliced-border box__content-container" content-container="true">
+            <Timberborn.CoreUI.NineSliceVisualElement name="HeaderWrapper" class="capsule-header capsule-header--lower content-centered">
+                <Timberborn.CoreUI.LocalizableLabel text="Title" name="Header" class="capsule-header__text" />
+            </Timberborn.CoreUI.NineSliceVisualElement>
+            <engine:Button name="CloseButton" class="close-button" />
+        </Timberborn.CoreUI.NineSliceVisualElement>
+    </engine:VisualElement>
+</engine:UXML>

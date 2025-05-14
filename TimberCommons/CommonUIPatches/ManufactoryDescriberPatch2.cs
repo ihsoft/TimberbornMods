@@ -4,11 +4,11 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using HarmonyLib;
 using IgorZ.TimberCommons.Settings;
 using IgorZ.TimberDev.UI;
-using Timberborn.Goods;
+using Timberborn.Workshops;
+using Timberborn.WorkshopsUI;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine.UIElements;
 
@@ -18,14 +18,9 @@ using UnityEngine.UIElements;
 namespace IgorZ.TimberCommons.CommonUIPatches;
 
 /// <summary>Harmony patch to show low fuel ingredient consumption rate in the recipe UIs.</summary>
-[HarmonyPatch]
+[HarmonyPatch(typeof(ManufactoryDescriber), nameof(ManufactoryDescriber.GetInputs))]
 static class ManufactoryDescriberPatch2 {
-  static MethodBase TargetMethod() {
-    return AccessTools.DeclaredMethod("Timberborn.WorkshopsUI.ManufactoryDescriber:GetInputs");
-  }
-
-  static void Postfix(RecipeSpecification productionRecipe, bool __runOriginal,
-                      ref IEnumerable<VisualElement> __result) {
+  static void Postfix(RecipeSpec productionRecipe, bool __runOriginal, ref IEnumerable<VisualElement> __result) {
     if (!__runOriginal) {
       return; // The other patches must follow the same style to properly support the skip logic!
     }

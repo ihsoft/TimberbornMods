@@ -7,20 +7,23 @@ using System.Linq;
 using Bindito.Core;
 using IgorZ.SmartPower.Core;
 using IgorZ.SmartPower.Utils;
+using IgorZ.TimberDev.Utils;
 using Timberborn.BlockSystem;
 using Timberborn.BuildingsBlocking;
+using Timberborn.EntitySystem;
 using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
 using Timberborn.Persistence;
 using Timberborn.StatusSystem;
 using Timberborn.TickSystem;
+using Timberborn.WorldPersistence;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
 namespace IgorZ.SmartPower.PowerGenerators;
 
 abstract class PowerOutputBalancer
-    : TickableComponent, IPersistentEntity, IFinishedStateListener, IPostInitializableLoadedEntity {
+    : TickableComponent, IPersistentEntity, IFinishedStateListener, IPostInitializableEntity {
 
   const float MaxBatteryChargeRatio = 0.9f;
   const float MinBatteryChargeRatio = 0.65f;
@@ -65,7 +68,7 @@ abstract class PowerOutputBalancer
     if (!enabled) {
       return;
     }
-    if (Automate && _pausableBuilding.Paused && IsSuspended) {
+    if (IsSuspended && (!Automate || _pausableBuilding.Paused)) {
       Resume();
     }
     if (Automate && !_pausableBuilding.Paused) {
@@ -103,8 +106,8 @@ abstract class PowerOutputBalancer
   #region IPostInitializableLoadedEntity implementation
 
   /// <inheritdoc/>
-  public void PostInitializeLoadedEntity() {
-    if (enabled && IsSuspended) {
+  public void PostInitializeEntity() {
+    if (IsSuspended) {
       Suspend();
     }
   }
@@ -130,14 +133,13 @@ abstract class PowerOutputBalancer
 
   /// <inheritdoc/>
   public void Load(IEntityLoader entityLoader) {
-    if (!entityLoader.HasComponent(AutomationBehaviorKey)) {
+    if (!entityLoader.TryGetComponent(AutomationBehaviorKey, out var state)) {
       return;
     }
-    var state = entityLoader.GetComponent(AutomationBehaviorKey);
-    Automate = state.GetValueOrNullable(AutomateKey) ?? Automate;
-    ChargeBatteriesThreshold = state.GetValueOrNullable(ChargeBatteriesThresholdKey) ?? MaxBatteryChargeRatio;
-    DischargeBatteriesThreshold = state.GetValueOrNullable(DischargeBatteriesThresholdKey) ?? MinBatteryChargeRatio;
-    IsSuspended = state.GetValueOrNullable(IsSuspendedKey) ?? false;
+    Automate = state.GetValueOrDefault(AutomateKey);
+    ChargeBatteriesThreshold = state.GetValueOrDefault(ChargeBatteriesThresholdKey, MaxBatteryChargeRatio);
+    DischargeBatteriesThreshold = state.GetValueOrDefault(DischargeBatteriesThresholdKey, MinBatteryChargeRatio);
+    IsSuspended = state.GetValueOrDefault(IsSuspendedKey);
   }
 
   #endregion

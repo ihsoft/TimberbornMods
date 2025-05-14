@@ -17,9 +17,9 @@ namespace IgorZ.SmartPower.PowerGenerators;
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
   static readonly PrefabPatcher.RequiredComponentsDep GoodConsumingGeneratorDep =
-      new(typeof(MechanicalBuilding), typeof(GoodPoweredGenerator));
+      new(typeof(MechanicalBuildingSpec), typeof(GoodPoweredGeneratorSpec));
   static readonly PrefabPatcher.RequiredComponentsDep WalkerPoweredGeneratorDep =
-      new(typeof(MechanicalBuilding), typeof(WalkerPoweredGenerator));
+      new(typeof(MechanicalBuildingSpec), typeof(WalkerPoweredGeneratorSpec));
   static readonly string PatchId = typeof(Configurator).AssemblyQualifiedName;
 
   public void Configure(IContainerDefinition containerDefinition) {

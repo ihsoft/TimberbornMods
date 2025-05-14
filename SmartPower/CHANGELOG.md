@@ -1,3 +1,21 @@
+# v1.13.3 (10 Apr 2025)
+* Update to support game version `0.7.3.1`.
+
+# v1.13.2 (4 Apr 2025)
+* Update to support game version `0.7.2.0`.
+* [Fix] The suspended generator doesn't resume if paused or generator automation disabled.
+* [Fix] All generators get automation enabled once the mod is added to an existing game. The existing generators should stay "off" be default.
+
+# v1.13.1 (26 Feb 2025)
+* [Fix] The Engines don't start on the game load if the automation was enabled.
+* [Fix] The Engines suspended state doesn't restore on the game load.
+* [Fix] The consumers suspended state doesn't restore on the game load.
+
+# v1.13.0 (2 Feb 2025)
+* Support Update 7.
+* Incompatible with Update 6.
+* Doesn't require TimberAPI.
+
 # v1.12.6 (19 Dec 2024)
 * [Fix] Enable power regulation for non-workshop buildings.
 

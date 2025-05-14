@@ -9,9 +9,9 @@ using Bindito.Core;
 using IgorZ.TimberCommons.Settings;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
-using Timberborn.Common;
 using Timberborn.EntitySystem;
 using Timberborn.MapIndexSystem;
+using Timberborn.ModManagerScene;
 using Timberborn.SceneLoading;
 using Timberborn.SingletonSystem;
 using Timberborn.SoilBarrierSystem;
@@ -45,13 +45,13 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   /// </param>
   /// <returns>Unique ID of the created override. Use it to delete the overrides.</returns>
   /// <seealso cref="RemoveMoistureOverride"/>
-  public int AddMoistureOverride(IEnumerable<Vector2Int> tiles, float moistureLevel,
-                                 Func<Vector2Int, float> moistureLevelForTextureFn = null) {
+  public int AddMoistureOverride(IEnumerable<Vector3Int> tiles, float moistureLevel,
+                                 Func<Vector3Int, float> moistureLevelForTextureFn = null) {
     var index = _nextMoistureOverrideId++;
     var moistureLevelDict = new Dictionary<int, float>();
-    var desertLevelDict = new Dictionary<Vector2Int, float>();
+    var desertLevelDict = new Dictionary<Vector3Int, float>();
     foreach (var tile in tiles) {
-      moistureLevelDict.Add(_mapIndexService.CoordinatesToIndex(tile), moistureLevel);
+      moistureLevelDict.Add(_mapIndexService.CoordinatesToIndex3D(tile), moistureLevel);
       if (moistureLevelForTextureFn != null) {
         desertLevelDict.Add(tile, moistureLevelForTextureFn.Invoke(tile));
       }
@@ -81,7 +81,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   /// <param name="tiles">The tiles to set the blocker at.</param>
   /// <returns>Unique ID of the created override. Use it to delete the overrides.</returns>
   /// <seealso cref="RemoveContaminationOverride"/>
-  public int AddContaminationOverride(IEnumerable<Vector2Int> tiles) {
+  public int AddContaminationOverride(IEnumerable<Vector3Int> tiles) {
     var tilesSet = tiles.ToHashSet();
     var index = _nextContaminationOverrideId++;
     _contaminationOverrides.Add(index, tilesSet);
@@ -110,7 +110,8 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   /// <summary>Sets up the moisture override logic.</summary>
   public void PostLoad() {
     _eventBus.Register(this);
-    _sceneLoader.SceneLoaded += OnSceneLoaded;
+    // FIXME: doesn't work in 0.7.6.1
+    //_sceneLoader.SceneLoaded += OnSceneLoaded;
   }
 
   #endregion
@@ -133,14 +134,14 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
 
   /// <summary>Map of the overriden desert levels.</summary>
   /// <seealso cref="ResetStaticState"/>
-  internal static Dictionary<Vector2Int, float> TerrainTextureLevelsOverrides = new();
+  internal static Dictionary<Vector3Int, float> TerrainTextureLevelsOverrides = new();
 
   readonly Dictionary<int, Dictionary<int, float>> _moistureLevelOverrides = new();
-  readonly Dictionary<int, Dictionary<Vector2Int, float>> _desertLevelOverrides = new();
+  readonly Dictionary<int, Dictionary<Vector3Int, float>> _desertLevelOverrides = new();
   int _nextMoistureOverrideId = 1;
 
-  readonly Dictionary<int, HashSet<Vector2Int>> _contaminationOverrides = new();
-  HashSet<Vector2Int> _contaminatedTilesCache = new();
+  readonly Dictionary<int, HashSet<Vector3Int>> _contaminationOverrides = new();
+  HashSet<Vector3Int> _contaminatedTilesCache = new();
   int _nextContaminationOverrideId = 1;
 
   MapIndexService _mapIndexService;
@@ -149,21 +150,19 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   BlockService _blockService;
   ITerrainService _terrainService;
   EventBus _eventBus;
-  SceneLoader _sceneLoader;
   TerrainMaterialMap _terrainMaterialMap;
 
   /// <summary>Resets all cached static state. Must be called from configurator.</summary>
   internal static void ResetStaticState() {
     MoistureLevelOverrides = new Dictionary<int, float>();
-    TerrainTextureLevelsOverrides = new Dictionary<Vector2Int, float>();
+    TerrainTextureLevelsOverrides = new Dictionary<Vector3Int, float>();
   }
 
   /// <summary>Injects run-time dependencies.</summary>
   [Inject]
   public void InjectDependencies(MapIndexService mapIndexService, SoilBarrierMap soilBarrierMap,
                                  BlockService blockService, ITerrainService terrainService, EventBus eventBus,
-                                 TerrainMaterialMap terrainMaterialMap, SoilMoistureMap soilMoistureMap,
-                                 SceneLoader sceneLoader) {
+                                 TerrainMaterialMap terrainMaterialMap, SoilMoistureMap soilMoistureMap) {
     _mapIndexService = mapIndexService;
     _soilBarrierMap = soilBarrierMap;
     _blockService = blockService;
@@ -171,7 +170,6 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
     _eventBus = eventBus;
     _terrainMaterialMap = terrainMaterialMap;
     _soilMoistureMap = soilMoistureMap;
-    _sceneLoader = sceneLoader;
   }
 
   /// <summary>Checks if there were changes and rebuilds moisture overrides caches.</summary>
@@ -214,7 +212,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
     var clearOverrides = _contaminatedTilesCache.Where(t => !newOverrides.Contains(t));
     foreach (var tile in clearOverrides) {
       var skipIt = _blockService
-          .GetObjectsAt(new Vector3Int(tile.x, tile.y, _terrainService.CellHeight(tile)))
+          .GetObjectsAt(tile)
           .Any(IsContaminationBlocker);
       if (skipIt) {
         DebugEx.Fine("Don't affect contamination barrier at: {0}", tile);
@@ -232,7 +230,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
   /// <seealso cref="TerrainTextureLevelsOverrides"/>
   void UpdateTilesAppearance() {
     // Moisture levels for the terrain texture. It only affects UI appearance.
-    TerrainTextureLevelsOverrides = new Dictionary<Vector2Int, float>();
+    TerrainTextureLevelsOverrides = new Dictionary<Vector3Int, float>();
     foreach (var value in _desertLevelOverrides.Values.SelectMany(item => item)) {
       var tile = value.Key;
       var level = value.Value;
@@ -243,7 +241,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
       }
     }
     foreach (var tile in TerrainTextureLevelsOverrides.Keys) {
-      var index = _mapIndexService.CoordinatesToIndex(tile);
+      var index = _mapIndexService.CoordinatesToIndex3D(tile);
       _soilMoistureMap.UpdateDesertIntensity(tile, _soilMoistureMap.SoilMoisture(index));
     }
     DebugEx.Fine("Updated tiles appearance: tiles={0}", TerrainTextureLevelsOverrides.Keys.Count);
@@ -257,7 +255,7 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
     if (blockObject == null || !blockObject.IsFinished) {
       return; // Ignore preview objects.
     }
-    var tile = blockObject.Coordinates.XY();
+    var tile = blockObject.Coordinates;
     if (_contaminatedTilesCache.Contains(tile) && IsContaminationBlocker(blockObject)) {
       DebugEx.Fine("Restore contamination barrier at: {0}", tile);
       _soilBarrierMap.AddContaminationBarrierAt(tile);
@@ -274,19 +272,20 @@ public class DirectSoilMoistureSystemAccessor : IPostLoadableSingleton, ITickabl
 
   #region Game load callbacks
 
+  // FIXME: doesn't work in 0.7.6.1
   /// <summary>Refreshes terrain texture if when the game is loaded and there are active overrides.</summary>
-  void OnSceneLoaded(object sender, EventArgs e) {
-    _sceneLoader.SceneLoaded -= OnSceneLoaded;
-    var needTextureUpdate = _needMoistureOverridesUpdate;
-    Tick();
-
-    // Refresh the texture on game load.
-    if (needTextureUpdate && IrrigationSystemSettings.OverrideDesertLevelsForWaterTowers) {
-      // FIXME: Consider calling Tick() instead. It's public.
-      _terrainMaterialMap.ProcessDesertTextureChanges();
-      _terrainMaterialMap.ProcessDesertTextureChanges(); // Intentionally.
-    }
-  }
+  // void OnSceneLoaded(object sender, EventArgs e) {
+  //   _sceneLoader.SceneLoaded -= OnSceneLoaded;
+  //   var needTextureUpdate = _needMoistureOverridesUpdate;
+  //   Tick();
+  //
+  //   // Refresh the texture on game load.
+  //   if (needTextureUpdate && IrrigationSystemSettings.OverrideDesertLevelsForWaterTowers) {
+  //     // FIXME: Consider calling Tick() instead. It's public.
+  //     _terrainMaterialMap.ProcessDesertTextureChanges();
+  //     _terrainMaterialMap.ProcessDesertTextureChanges(); // Intentionally.
+  //   }
+  // }
 
   #endregion
 }

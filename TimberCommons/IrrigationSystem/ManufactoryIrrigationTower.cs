@@ -212,12 +212,7 @@ public class ManufactoryIrrigationTower : IrrigationTower, ISupplyLeftProvider {
     var originalRecipe = _manufactory.ProductionRecipes.First(x => x.Id == currentRecipeId);
     var adjustingRatio = Coverage > 0 ? Coverage : 1f;
     var adjustedCycleDurationInHours = originalRecipe.CycleDurationInHours / adjustingRatio;
-    var modifiedRecipe = new RecipeSpecification(
-      originalRecipe.Id, originalRecipe.BackwardCompatibleIds, originalRecipe.DisplayLocKey,
-      adjustedCycleDurationInHours, originalRecipe.CyclesCapacity, originalRecipe.Ingredients,
-      originalRecipe.Products, originalRecipe.ProducedSciencePoints, originalRecipe.Fuel,
-      originalRecipe.CyclesFuelLasts, originalRecipe.FuelCapacity, originalRecipe.Icon,
-      originalRecipe.RequiredFeatureToggle);
+    var modifiedRecipe = originalRecipe with { CycleDurationInHours = adjustedCycleDurationInHours };
     _manufactory.CurrentRecipe = modifiedRecipe;
     HostedDebugLog.Fine(
       this, "Adjusted recipe duration: id={0}, original={1}, new={2}", originalRecipe.Id,
@@ -235,22 +230,22 @@ public class ManufactoryIrrigationTower : IrrigationTower, ISupplyLeftProvider {
       return; // Cannot estimate.
     }
     var inventory = _manufactory.Inventory;
-    var totalGoodsInRecipe = recipe.Ingredients.Count + (recipe.ConsumesFuel ? 1 : 0);
+    var totalGoodsInRecipe = recipe.Ingredients.Length + (recipe.ConsumesFuel ? 1 : 0);
     var supplyLeftHours = new float[totalGoodsInRecipe];
     var supplyAtMaxCapacity = new float[totalGoodsInRecipe];
-    for (var index = 0; index < recipe.Ingredients.Count; index++) {
+    for (var index = 0; index < recipe.Ingredients.Length; index++) {
       var ingredient = recipe.Ingredients[index];
-      var stock = inventory.AmountInStock(ingredient.GoodId);
+      var stock = inventory.AmountInStock(ingredient.Id);
       var consumePerHour = ingredient.Amount / recipe.CycleDurationInHours;
       supplyLeftHours[index] = stock / consumePerHour;
-      supplyAtMaxCapacity[index] = inventory.LimitedAmount(ingredient.GoodId) / consumePerHour;
+      supplyAtMaxCapacity[index] = inventory.LimitedAmount(ingredient.Id) / consumePerHour;
     }
     if (recipe.ConsumesFuel) {
       var index = supplyLeftHours.Length - 1;
-      var stock = inventory.AmountInStock(recipe.Fuel.Id) + _manufactory.FuelRemaining;
+      var stock = inventory.AmountInStock(recipe.Fuel) + _manufactory.FuelRemaining;
       var consumePerHour = 1f / (recipe.CyclesFuelLasts * recipe.CycleDurationInHours);
       supplyLeftHours[index] = stock / consumePerHour;
-      supplyAtMaxCapacity[index] = inventory.LimitedAmount(recipe.Fuel.Id) / consumePerHour;
+      supplyAtMaxCapacity[index] = inventory.LimitedAmount(recipe.Fuel) / consumePerHour;
     }
 
     var minLastsHours = supplyLeftHours.Min();

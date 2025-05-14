@@ -20,16 +20,16 @@ namespace IgorZ.Automation.Utils;
 /// </remarks>
 /// <typeparam name="T">the type of the class</typeparam>
 /// <seealso cref="DynamicClassSerializer{T}"/>
-public sealed class StaticClassSerializer<T> : IObjectSerializer<T> where T : IGameSerializable, new() {
+public sealed class StaticClassSerializer<T> : IValueSerializer<T> where T : IGameSerializable, new() {
   /// <inheritdoc/>
-  public void Serialize(T value, IObjectSaver objectSaver) {
-    value.SaveTo(objectSaver);
+  public void Serialize(T value, IValueSaver objectSaver) {
+    value.SaveTo(objectSaver.AsObject());
   }
 
   /// <inheritdoc/>
-  public Obsoletable<T> Deserialize(IObjectLoader objectLoader) {
+  public Obsoletable<T> Deserialize(IValueLoader objectLoader) {
     var instance = new T();
-    instance.LoadFrom(objectLoader);
+    instance.LoadFrom(objectLoader.AsObject());
     return instance;
   }
 }

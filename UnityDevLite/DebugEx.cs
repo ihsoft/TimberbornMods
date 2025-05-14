@@ -5,7 +5,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
@@ -83,7 +82,18 @@ static class DebugEx {
   /// <seealso cref="ObjectToString"/>
   public static void Log(LogType type, string format, params object[] args) {
     try {
-      Debug.unityLogger.LogFormat(type, format, args.Select(ObjectToString).ToArray());
+      var objects = args.Select(x => {
+        switch (x) {
+          case IList list: {
+            List<object> res = [];
+            res.AddRange(from object item in list select ObjectToString(item));
+            return string.Join(",", res);
+          }
+          default:
+            return ObjectToString(x);
+        }
+      }).ToArray();
+      Debug.unityLogger.LogFormat(type, format, objects);
     } catch (Exception e) {
       Debug.LogErrorFormat("Failed to format logging string: {0}.\n{1}", format, e.StackTrace);
     }
@@ -113,7 +123,7 @@ static class DebugEx {
       return obj.ToString();
     }
     var unityComponent = (Component)obj;
-    if (!unityComponent) {  // It's important to use the "!" notion to catch the destroyed objects!
+    if (!unityComponent) {  // It is important to use the "!" notion to catch the destroyed objects!
       return "[DestroyedComponent]";
     }
     if (obj is BaseComponent baseComponent) {
@@ -122,12 +132,12 @@ static class DebugEx {
     return $"[{unityComponent.GetType().Name}]";
   }
 
-  /// <summary>Helper method to make a user friendly object name for the logs.</summary>
+  /// <summary>Helper method to make a user-friendly object name for the logs.</summary>
   public static string BaseComponentToString(BaseComponent component) {
     if (component != null && !component) {  // It is important to use the "!" notion to catch the destroyed objects!
       return "[DestroyedComponent]";
     }
-    var prefab = component.GetComponentFast<Prefab>();
+    var prefab = component.GetComponentFast<PrefabSpec>();
     var blockObj = component.GetComponentFast<BlockObject>();
     if (prefab && blockObj) {
       return $"[{prefab.Name}@{blockObj.Coordinates}]";

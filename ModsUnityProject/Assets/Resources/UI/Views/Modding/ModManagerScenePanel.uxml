@@ -1,0 +1,36 @@
+<engine:UXML xmlns:engine="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="project://database/Assets/Resources/UI/Views/MainMenu/MainMenuMiscStyle.uss" />
+    <Style src="ModdingStyle.uss" />
+    <Style src="project://database/Assets/Resources/UI/Views/Options/OptionsStyle.uss" />
+    <engine:VisualElement name="ModManagerScenePanel" class="title-screen content-row-centered">
+        <engine:VisualElement name="ModManagerBox" class="mod-manager-box">
+            <engine:VisualElement name="Content" class="mod-manager-scene-panel__content box__content-container">
+                <engine:VisualElement name="HeaderWrapper" class="capsule-header capsule-header--lower content-centered mod-manager-scene-panel__header">
+                    <engine:Label text="Mods" name="Header" class="capsule-header__text" />
+                </engine:VisualElement>
+                <engine:VisualElement name="TopButtons" class="mod-manager-box__top-buttons">
+                    <engine:Button name="ResetOrderButton" text="Reset load order" class="mod-manager-box__top-button text--default text--bold" />
+                </engine:VisualElement>
+                <engine:ScrollView name="Items" class="mod-manager-box__list mod-manager-scene-panel__list" />
+                <engine:Button text="OK" name="StartButton" class="mod-manager-scene-panel__button mod-manger-box__confirm-button" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+        <engine:VisualElement name="Footer" picking-mode="Ignore" class="grow-centered title-screen__footer">
+            <engine:VisualElement name="LeftPanel" class="title-screen__left-panel title-screen__footer-element">
+                <engine:Label text="Version" name="GameVersion" class="title-screen__footer-text" />
+            </engine:VisualElement>
+            <engine:VisualElement name="MiddlePanel" class="title-screen__footer-element">
+                <engine:VisualElement name="MacOsRosettaWarningContainer" class="title-screen__rosetta-warning-container">
+                    <engine:VisualElement name="WarningIcon" class="warning-icon" />
+                    <engine:Label name="MacOsRosettaWarning" text="Rosetta: OFF" class="text--default" />
+                </engine:VisualElement>
+            </engine:VisualElement>
+            <engine:VisualElement name="RightPanel" class="title-screen__right-panel title-screen__footer-element" />
+        </engine:VisualElement>
+        <engine:VisualElement name="ModManagerTooltip" picking-mode="Ignore" class="tooltip-wrapper">
+            <engine:Label name="TooltipLabel" text="Tooltip" picking-mode="Ignore" enable-rich-text="false" class="tooltip bg-box--brown game-text-normal text--grey mod-manager-scene-panel__tooltip" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

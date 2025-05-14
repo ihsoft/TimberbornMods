@@ -15,7 +15,6 @@ using UnityEngine.UIElements;
 namespace IgorZ.SmartPower.PowerConsumersUI;
 
 sealed class PowerInputLimiterFragment : IEntityPanelFragment {
-  const string SuspendIfNoPowerLocKey = "IgorZ.SmartPower.PowerInputLimiter.SuspendIfNoPower";
   const string SuspendIfLowEfficiencyLocKey = "IgorZ.SmartPower.PowerInputLimiter.SuspendIfLowEfficiency";
   const string MinBatteriesRatioLocKey = "IgorZ.SmartPower.PowerInputLimiter.MinBatteriesRatio";
   const string ApplyToAllBuildingsLocKey = "IgorZ.SmartPower.PowerInputLimiter.ApplyToAllBuildings";
@@ -27,7 +26,7 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
   VisualElement _root;
   Toggle _automateCheckbox;
   Label _suspendIfLowEfficiencyLabel;
-  PreciseSliderWrapper _minEfficiencySlider;
+  PreciseSlider _minEfficiencySlider;
   Toggle _suspendIfBatteryLowCheckbox;
   Slider _minBatteriesChargeSlider;
   Button _applyToAllBuildingsButton;
@@ -41,43 +40,42 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
   }
 
   public VisualElement InitializeFragment() {
-    _automateCheckbox = _uiFactory.CreateToggle(
-        SuspendIfNoPowerLocKey, e => {
+    _root = _uiFactory.LoadVisualTreeAsset("IgorZ/PowerInputLimiterFragment");
+    _automateCheckbox = _root.Q<Toggle>("AutomateCheckbox");
+    _automateCheckbox.RegisterValueChangedCallback(
+        e => {
           _powerInputLimiter.Automate = e.newValue;
           _powerInputLimiter.UpdateState();
           UpdateControls();
         });
-    _suspendIfLowEfficiencyLabel = _uiFactory.CreateLabel();
-    _minEfficiencySlider = _uiFactory.CreatePreciseSlider(
-        0.01f,
+    _suspendIfLowEfficiencyLabel = _root.Q<Label>("SuspendIfLowEfficiencyLabel");
+    _minEfficiencySlider = _root.Q<PreciseSlider>("MinEfficiencySlider");
+    _minEfficiencySlider.UpdateValuesWithoutNotify(0, 1f);
+    _uiFactory.AddFixedStepChangeHandler(
+        _minEfficiencySlider, 0.01f,
         newValue => {
           _powerInputLimiter.MinPowerEfficiency = newValue;
           _powerInputLimiter.UpdateState();
           UpdateControls();
         });
-    _suspendIfBatteryLowCheckbox = _uiFactory.CreateToggle(
-        null, e => {
+    _suspendIfBatteryLowCheckbox = _root.Q<Toggle>("SuspendIfBatteryLowCheckbox");
+    _suspendIfBatteryLowCheckbox.RegisterValueChangedCallback(
+        e => {
           _powerInputLimiter.CheckBatteryCharge = e.newValue;
           _powerInputLimiter.UpdateState();
           UpdateControls();
         });
-    _minBatteriesChargeSlider = _uiFactory.CreateSlider(
-        e => {
-          _powerInputLimiter.MinBatteriesCharge = e.newValue;
+    _minBatteriesChargeSlider = _root.Q<Slider>("MinBatteriesChargeSlider");
+    _uiFactory.AddFixedStepChangeHandler(
+        _minBatteriesChargeSlider, 0.05f,
+        newValue => {
+          _powerInputLimiter.MinBatteriesCharge = newValue;
           _powerInputLimiter.UpdateState();
           UpdateControls();
-        }, 0f, 1.0f, stepSize: 0.05f);
+        });
 
-    _applyToAllBuildingsButton = _uiFactory.CreateButton(ApplyToAllBuildingsLocKey, ApplyToAllBuildings);
-
-    _root = _uiFactory.CreateCenteredPanelFragmentBuilder()
-        .AddComponent(_automateCheckbox)
-        .AddComponent(_suspendIfLowEfficiencyLabel)
-        .AddComponent(_minEfficiencySlider)
-        .AddComponent(_suspendIfBatteryLowCheckbox)
-        .AddComponent(_minBatteriesChargeSlider)
-        .AddComponent(_uiFactory.CenterElement(_applyToAllBuildingsButton))
-        .BuildAndInitialize();
+    _applyToAllBuildingsButton = _root.Q<Button>("ApplyToAllBuildingsButton");
+    _applyToAllBuildingsButton.clicked += ApplyToAllBuildings;
 
     _root.ToggleDisplayStyle(visible: false);
     return _root;
@@ -90,7 +88,7 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
       return;
     }
     _automateCheckbox.SetValueWithoutNotify(_powerInputLimiter.Automate);
-    _minEfficiencySlider.UpdateValuesWithoutNotify(_powerInputLimiter.MinPowerEfficiency, 1f);
+    _minEfficiencySlider.SetValueWithoutNotify(_powerInputLimiter.MinPowerEfficiency);
     _suspendIfBatteryLowCheckbox.SetValueWithoutNotify(_powerInputLimiter.CheckBatteryCharge);
     _minBatteriesChargeSlider.SetValueWithoutNotify(_powerInputLimiter.MinBatteriesCharge);
     UpdateControls();

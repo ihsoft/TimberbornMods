@@ -31,13 +31,13 @@ sealed class AdjustableWaterOutputFragment : IEntityPanelFragment {
 
   /// <inheritdoc/>
   public VisualElement InitializeFragment() {
+    //FIXME: create an asset
     _waterLevelSlider = _uiFactory.CreatePreciseSlider(
         WaterLevelChangeStep, v => _adjustableWaterOutput.SetSpillwayHeightDelta(v - Range));
     _infoLabel = _uiFactory.CreateLabel();
-    _root = _uiFactory.CreateCenteredPanelFragmentBuilder()
-        .AddComponent(_infoLabel)
-        .AddComponent(_waterLevelSlider)
-        .BuildAndInitialize();
+    _root = _uiFactory.CreateCenteredPanelFragment();
+    _root.Add(_infoLabel);
+    _root.Add(_waterLevelSlider);
     _root.ToggleDisplayStyle(visible: false);
     return _root;
   }

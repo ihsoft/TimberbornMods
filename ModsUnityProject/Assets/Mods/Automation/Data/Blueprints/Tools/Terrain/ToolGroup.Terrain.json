@@ -1,0 +1,12 @@
+{
+  "TimberApiToolGroupSpec": {
+    "Id": "AutomationTerrainToolGroupId",
+    "GroupId": "AutomationToolGroupId",
+    "Type": "AutomationToolGroup",
+    "Layout": "Green",
+    "Order": 20,
+    "Icon": "Sprites/IgorZ/tool-group-terrain",
+    "NameLocKey": "IgorZ.Automation.ToolGroup.Terrain.DisplayName",
+    "FallbackGroup": false
+  }
+}

@@ -15,10 +15,11 @@ using UnityEngine.UIElements;
 namespace IgorZ.SmartPower.PowerGeneratorsUI;
 
 sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
-  const string AutomateLocKey = "IgorZ.SmartPower.PowerOutputBalancer.AutomateGenerator";
   const string ChargeLevelLocKey = "IgorZ.SmartPower.PowerOutputBalancer.ChargeBatteriesRangeText";
   const string ApplyToAllGeneratorsLocKey = "IgorZ.SmartPower.PowerOutputBalancer.ApplyToAllGenerators";
   const string AppliedToGeneratorsLocKey = "IgorZ.SmartPower.PowerOutputBalancer.AppliedToGenerators";
+  const string MinutesTillResumeLocKey = "IgorZ.SmartPower.Common.MinutesTillResume";
+  const string MinutesTillSuspendLocKey = "IgorZ.SmartPower.Common.MinutesTillSuspend";
 
   readonly UiFactory _uiFactory;
 
@@ -28,7 +29,7 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
   VisualElement _root;
   Toggle _automateCheckbox;
   Label _chargeBatteriesText;
-  MinMaxSlider2 _chargeBatteriesSlider;
+  MinMaxSlider _chargeBatteriesSlider;
   Button _applyToAllGeneratorsButton;
 
   PowerOutputBalancer _balancer;
@@ -39,30 +40,26 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
   }
 
   public VisualElement InitializeFragment() {
-    _automateCheckbox = _uiFactory.CreateToggle(
-        AutomateLocKey, _ => {
-          _balancer.Automate = _automateCheckbox.value;
+    _root = _uiFactory.LoadVisualTreeAsset("IgorZ/PowerOutputBalancerFragment");
+    _automateCheckbox = _root.Q<Toggle>("AutomateCheckbox");
+    _automateCheckbox.RegisterValueChangedCallback(
+        e => {
+          _balancer.Automate = e.newValue;
           _balancer.UpdateState();
           UpdateControls();
         });
-
-    _chargeBatteriesSlider = _uiFactory.CreateMinMaxSlider(
-        _ => {
-          _balancer.DischargeBatteriesThreshold = _chargeBatteriesSlider.value.x;
-          _balancer.ChargeBatteriesThreshold = _chargeBatteriesSlider.value.y;
+    _chargeBatteriesText = _root.Q<Label>("ChargeBatteriesText");
+    _chargeBatteriesSlider = _root.Q<MinMaxSlider>("ChargeBatteriesSlider");
+    _uiFactory.AddFixedStepChangeHandler(
+        _chargeBatteriesSlider, 0.05f, 0.10f,
+        newValue => {
+          _balancer.DischargeBatteriesThreshold = newValue.x;
+          _balancer.ChargeBatteriesThreshold = newValue.y;
           _balancer.UpdateState();
           UpdateControls();
-        }, 0f, 1.0f, 0.10f, stepSize: 0.05f);
-
-    _chargeBatteriesText = _uiFactory.CreateLabel();
-    _applyToAllGeneratorsButton = _uiFactory.CreateButton(ApplyToAllGeneratorsLocKey, ApplyToAllGenerators);
-
-    _root = _uiFactory.CreateCenteredPanelFragmentBuilder()
-        .AddComponent(_automateCheckbox)
-        .AddComponent(_chargeBatteriesText)
-        .AddComponent(_chargeBatteriesSlider)
-        .AddComponent(_uiFactory.CenterElement(_applyToAllGeneratorsButton))
-        .BuildAndInitialize();
+        });
+    _applyToAllGeneratorsButton = _root.Q<Button>("ApplyToAllGeneratorsButton");
+    _applyToAllGeneratorsButton.clicked += ApplyToAllGenerators;
 
     _suspendStatusLabel = _uiFactory.CreateLabel();
     _suspendStatusLabel.ToggleDisplayStyle(visible: false);
@@ -125,9 +122,6 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
     _applyToAllGeneratorsButton.text = _uiFactory.T(AppliedToGeneratorsLocKey, affectedGenerators);
     _applyToAllGeneratorsButton.SetEnabled(false);
   }
-
-  const string MinutesTillResumeLocKey = "IgorZ.SmartPower.Common.MinutesTillResume";
-  const string MinutesTillSuspendLocKey = "IgorZ.SmartPower.Common.MinutesTillSuspend";
 
   void UpdateGeneratorBuildingText() {
     if (_balancer.MinutesTillResume > 0) {

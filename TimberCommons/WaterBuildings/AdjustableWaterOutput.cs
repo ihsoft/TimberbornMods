@@ -6,6 +6,7 @@ using IgorZ.TimberCommons.Settings;
 using Timberborn.Persistence;
 using Timberborn.PrefabSystem;
 using Timberborn.WaterBuildings;
+using Timberborn.WorldPersistence;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
@@ -29,7 +30,7 @@ sealed class AdjustableWaterOutput : WaterOutput, IPersistentEntity {
   float _spillwayHeightDelta = 0.1f;
   
   [SerializeField]
-  [Tooltip("Tells if there should be a controls in the game GUI to change the depth limit. Ths GUI is always available"
+  [Tooltip("Tells if there should be controls in the game GUI to change the depth limit. Ths GUI is always available"
       + " in DEV mode.")]
   bool _allowAdjustmentsInGame = true;
 
@@ -104,8 +105,7 @@ sealed class AdjustableWaterOutput : WaterOutput, IPersistentEntity {
   new void Awake() {
     SpillwayHeightDelta = -_spillwayHeightDelta;
     base.Awake();
-    //FIXME
-    _isFluidDump = GetComponentFast<Prefab>().name.StartsWith("FluidDump");
+    _isFluidDump = GetComponentFast<PrefabSpec>().name.StartsWith("FluidDump");
   }
 
   #endregion
@@ -123,10 +123,9 @@ sealed class AdjustableWaterOutput : WaterOutput, IPersistentEntity {
 
   /// <inheritdoc/>
   public void Load(IEntityLoader entityLoader) {
-    if (!entityLoader.HasComponent(AdjustableWaterOutputKey)) {
+    if (!entityLoader.TryGetComponent(AdjustableWaterOutputKey, out var component)) {
       return;
     }
-    var component = entityLoader.GetComponent(AdjustableWaterOutputKey);
     if (component.Has(SpillwayHeightDeltaKey)) {
       SpillwayHeightDelta = component.Get(SpillwayHeightDeltaKey);
     }

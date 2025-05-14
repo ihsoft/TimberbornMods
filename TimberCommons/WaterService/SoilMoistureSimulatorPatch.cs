@@ -17,11 +17,11 @@ static class SoilMoistureSimulatorPatch {
     return AccessTools.DeclaredMethod("Timberborn.SoilMoistureSystem.SoilMoistureSimulator:CalculateMoistureForCell");
   }
 
-  static void Postfix(int index, ref float __result, bool __runOriginal) {
+  static void Postfix(int index3D, ref float __result, bool __runOriginal) {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!
     }
-    if (DirectSoilMoistureSystemAccessor.MoistureLevelOverrides.TryGetValue(index, out var newLevel)
+    if (DirectSoilMoistureSystemAccessor.MoistureLevelOverrides.TryGetValue(index3D, out var newLevel)
         && __result < newLevel) {
       __result = newLevel;
     }

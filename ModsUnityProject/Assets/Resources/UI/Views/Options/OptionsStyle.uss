@@ -1,0 +1,497 @@
+.options-panel {
+    width: 650px;
+}
+
+.key-bindings-box {
+    height: 650px;
+    width: 750px;
+}
+
+.key-bindings-box__column-headers-wrapper {
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-right: 23px;
+}
+
+.key-bindings-box__column-header {
+    -unity-text-align: middle-center;
+    width: 33%;
+}
+
+.key-bindings_box__reset_button {
+    bottom: -10px;
+    right: 13px;
+    align-self: flex-end;
+    --click-sound: 'UI.Click';
+}
+
+.key-bindings_box__reset_button:hover:enabled {
+    color: yellow;
+}
+
+.key-binding-group {
+    margin-top: 10px;
+}
+
+.key-binding-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+    padding-left: 7px;
+    margin-bottom: 3px;
+}
+
+.key-binding-row__element {
+    width: 33%;
+}
+
+.key-binding-row__name {
+    align-self: center;
+    -unity-text-align: middle-left;
+    min-height: 27px;
+    margin-right: 6px;
+}
+
+.key-binding-row__input {
+    flex-grow: 1;
+    margin-left: 3px;
+    padding: 2px;
+    --click-sound: 'UI.Click';
+}
+
+.key-binding-row__input:hover:enabled {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-1-highlighted');
+}
+
+.credits__box {
+    padding: 50px;
+}
+
+.credits__scroll-view {
+    overflow: hidden;
+    width: 900px;
+    height: 600px;
+}
+
+.credits__content {
+    position: absolute;
+    left: 0;
+    right: 0;
+    align-items: center;
+}
+
+.credits__header {
+    color: rgb(255, 255, 255);
+    font-size: 25px;
+    -unity-text-align: middle-center;
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+.credits__subheader {
+    color: rgb(255, 255, 255);
+    font-size: 21px;
+    -unity-text-align: middle-center;
+    margin-bottom: 10px;
+}
+
+.credits__section {
+    flex-direction: row;
+    margin-bottom: 30px;
+}
+
+.credits__labels {
+    margin-right: 5px;
+    min-width: 400px;
+}
+
+.credits__label {
+    color: rgb(255, 255, 255);
+    font-size: 17px;
+    -unity-text-align: upper-right;
+    margin-bottom: 7px;
+}
+
+.credits__label--supporter {
+    font-size: 15px;
+}
+
+.credits__names {
+    margin-left: 5px;
+    min-width: 400px;
+}
+
+.credits__name {
+    color: rgb(255, 255, 255);
+    font-size: 17px;
+    -unity-text-align: upper-left;
+    margin-bottom: 7px;
+}
+
+.credits__name--centered {
+    -unity-text-align: upper-center;
+}
+
+.credits__name--supporter {
+    font-size: 15px;
+}
+
+.credits__logo-timberborn {
+    background-image: resource('UI/Images/MainMenu/logo');
+    align-self: center;
+    min-width: 425px;
+    min-height: 65px;
+    margin-bottom: 30px;
+}
+
+.credits__logo-mechanistry-label {
+    color: rgb(255, 255, 255);
+    font-size: 16px;
+    -unity-text-align: middle-center;
+    margin-top: 500px;
+}
+
+.credits__logo-mechanistry {
+    background-image: resource('UI/Images/Branding/mechanistry-grey');
+    align-self: center;
+    min-width: 351px;
+    min-height: 248px;
+}
+
+.credits__final-quote {
+    color: rgb(255, 255, 255);
+    font-size: 16px;
+    -unity-text-align: middle-center;
+    -unity-font-style: italic;
+    margin-top: 600px;
+}
+
+.load-box {
+    height: 685px;
+    width: 800px;
+}
+
+.load-box__list-wrapper {
+    border-width: 5px;
+    flex-grow: 1;
+    width: 45%;
+    height: 100%;
+}
+
+.load-box__list-title {
+    border-bottom-width: 10px;
+}
+
+.load-box__thumbnail {
+    height: 185px;
+    width: 325px;
+    margin-top: 18px;
+    align-self: center;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.load-box__thumbnail .thumbnail__no-preview {
+    font-size: 12px;
+    margin-top: 20px;
+}
+
+.load-box__show-mods-button {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    padding: 3px 8px;
+    background-color: rgba(0, 0, 0, 0.65);
+    --click-sound: 'UI.Click';
+}
+
+.load-box__show-mods-button:hover {
+    color: rgb(0, 0, 0);
+    background-color: rgba(205, 208, 181, 0.8);
+}
+
+.panel-list-view {
+    flex-grow: 1;
+    width: 100%;
+}
+
+.open-dir__button {
+    bottom: -10px;
+    right: -10px;
+    align-self: flex-end;
+    --click-sound: 'UI.Click';
+}
+
+.open-dir__button:hover:enabled {
+    color: yellow;
+}
+
+.new-map-box {
+    height: 200px;
+}
+
+.new-map-box__input {
+    width: 100px;
+}
+
+.new-map-box__input > .unity-base-field__input {
+    font-size: 18px;
+}
+
+.new-map-box__text {
+    color: rgb(204, 204, 204);
+    font-size: 18px;
+    margin: 10px 5px 10px 5px;
+}
+
+.box-buttons {
+    flex-shrink: 0;
+    flex-direction: row;
+    justify-content: center;
+    min-height: 32px;
+    margin-top: 10px;
+}
+
+.bottom-padding--medium {
+    padding-bottom: 25px;
+}
+
+.settings-header {
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+    font-size: 16px;
+    margin: 20px 5px 5px 5px;
+    -unity-text-align: upper-center;
+}
+
+.settings-box {
+    height: 600px;
+}
+
+.settings-element {
+    margin: 2px 5px 2px 5px;
+}
+
+.settings-text {
+    color: rgb(255, 255, 255);
+    font-size: 14px;
+    -unity-text-align: middle-left;
+}
+
+.settings-dropdown .dropdown__label {
+    color: rgb(255, 255, 255);
+    font-size: 14px;
+    -unity-text-align: middle-left;
+}
+
+.settings-dropdown .dropdown-item__text {
+    color: rgb(255, 255, 255);
+    font-size: 14px;
+    -unity-text-align: middle-center;
+}
+
+.settings-slider.settings-text > .settings-slider__slider > .unity-slider__label {
+    color: rgb(255, 255, 255);
+}
+
+.settings-slider.settings-text > .settings-slider__slider > .unity-base-slider__label {
+    color: rgb(255, 255, 255);
+}
+
+.settings-slider.settings-text > .settings-slider__end-label {
+    color: rgb(255, 255, 255);
+}
+
+.settings-toggle.settings-text > .unity-toggle__input > .unity-toggle__text {
+    color: rgb(255, 255, 255);
+}
+
+.settings-slider {
+    flex-direction: row;
+}
+
+.settings-slider__slider > .unity-slider__input > .unity-base-slider__drag-container {
+    justify-content: center;
+}
+
+.settings-slider__slider > .unity-base-slider__input > .unity-base-slider__drag-container {
+    justify-content: center;
+}
+
+.settings-slider__slider > .unity-slider__input > .unity-base-slider__drag-container > .unity-base-slider__dragger {
+    background-image: resource('UI/Images/Buttons/slider_holder');
+    width: 25px;
+    height: 25px;
+    margin-top: -10px;
+}
+
+.settings-slider__slider > .unity-base-slider__input > .unity-base-slider__drag-container > .unity-base-slider__dragger {
+    background-image: resource('UI/Images/Buttons/slider_holder');
+    width: 25px;
+    height: 25px;
+    margin-top: -10px;
+}
+
+.settings-slider__slider > .unity-slider__input > .unity-base-slider__drag-container > .unity-base-slider__dragger:hover:enabled {
+    background-image: resource('UI/Images/Buttons/slider_holder_hover');
+}
+
+.settings-slider__slider > .unity-base-slider__input > .unity-base-slider__drag-container > .unity-base-slider__dragger:hover:enabled {
+    background-image: resource('UI/Images/Buttons/slider_holder_hover');
+}
+
+.settings-slider__slider > .unity-slider__input > .unity-base-slider__drag-container > .unity-base-slider__tracker {
+    background-image: resource('UI/Images/Buttons/slider_bar');
+    -unity-background-scale-mode: stretch-to-fill;
+    height: 4px;
+}
+
+.settings-slider__slider > .unity-base-slider__input > .unity-base-slider__drag-container > .unity-base-slider__tracker {
+    background-image: resource('UI/Images/Buttons/slider_bar');
+    -unity-background-scale-mode: stretch-to-fill;
+    height: 4px;
+}
+
+.settings-toggle {
+    --click-sound: 'UI.Click';
+}
+
+.settings-toggle > .unity-toggle__input > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/checkbox_off');
+    width: 25px;
+    height: 25px;
+}
+
+.settings-toggle > .unity-toggle__input:checked > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/checkbox_on');
+}
+
+.settings-toggle > .unity-toggle__input:checked:hover:enabled > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/checkbox_on_hover');
+}
+
+.settings-toggle > .unity-toggle__input:hover:enabled > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/checkbox_off_hover');
+}
+
+.settings-slider__end-label {
+    width: 40px;
+    -unity-text-align: middle-center;
+    font-size: 12px;
+}
+
+.settings-slider__slider {
+    flex-grow: 1;
+}
+
+.settings-slider__slider > .unity-slider__label {
+    width: 250px;
+    white-space: normal;
+}
+
+.settings-wrapper {
+    flex-direction: row;
+    align-items: center;
+}
+
+.change-language-label {
+    margin-right: 4px;
+}
+
+.change-language-button {
+    margin-left: auto;
+}
+
+.change-language-box {
+    width: 450px;
+    padding: 45px;
+}
+
+.change-language-item {
+    flex-grow: 1;
+    align-items: center;
+    flex-direction: row;
+}
+
+.change-language-item__new-language-marker {
+    color: rgb(255, 77, 77);
+    font-size: 10px;
+    white-space: normal;
+    -unity-text-align: upper-left;
+    bottom: 2px;
+    right: 1px;
+}
+
+.settings-dropdown .dropdown__selection {
+    --background-image: resource('UI/Images/Backgrounds/bg-pixel-0');
+    background-image: resource('UI/Images/Buttons/dropdown');
+    height: 36px;
+    max-width: 245px;
+    padding: 0 45px 0 16px;
+    margin-left: auto;
+}
+
+.settings-dropdown .dropdown__selection:enabled:hover .dropdown-item__text {
+    color: black;
+}
+
+.settings-dropdown .dropdown__selectable.dropdown__selection:enabled:hover {
+    --background-image: resource('UI/Images/Backgrounds/bg-pixel-0');
+    background-image: resource('UI/Images/Buttons/dropdown-hover');
+}
+
+.settings-dropdown .dropdown__arrow {
+    display: none;
+}
+
+.load-map-box {
+    width: 1100px;
+    height: 690px;
+}
+
+.load-map-box__content {
+    flex-grow: 1;
+    justify-content: center;
+}
+
+.load-map-box__map-selection {
+    flex-direction: row;
+    flex-grow: 0;
+    flex-shrink: 1;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.game-save-item {
+    padding: 4px 0;
+}
+
+.game-save-item__name {
+    -unity-text-align: middle-left;
+    flex-grow: 0;
+}
+
+.game-save-item__data-row {
+    flex-direction: row;
+    flex-grow: 1;
+}
+
+.game-save-item__game-time {
+    -unity-text-align: middle-left;
+    flex-grow: 1;
+}
+
+.game-save-item__timestamp {
+    -unity-text-align: middle-right;
+    flex-grow: 1;
+}
+
+.delete-analytics-data-button {
+    margin-left: auto;
+}
+
+.developer-test-label {
+    background-image: resource('UI/Images/Backgrounds/bg-pixel-1');
+    width: 100%;
+    height: 100%;
+}

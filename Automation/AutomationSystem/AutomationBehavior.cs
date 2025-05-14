@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Bindito.Core;
@@ -12,12 +13,19 @@ using Timberborn.EntitySystem;
 using Timberborn.Localization;
 using Timberborn.Persistence;
 using Timberborn.SingletonSystem;
+using Timberborn.StatusSystem;
+using Timberborn.WorldPersistence;
 using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.AutomationSystem;
 
 /// <summary>The component that keeps all the automation state on the building.</summary>
-public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDeletableEntity {
+public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDeletableEntity, IFinishedStateListener {
+
+  const string AutomationErrorIcon = "IgorZ.Automation/error-icon-script-failed";
+  const string AutomationErrorAlertLocKey = "IgorZ.Automation.ShowStatusAction.AutomationErrorAlert";
+  const string AutomationErrorDescriptionLocKey = "IgorZ.Automation.ShowStatusAction.AutomationErrorDescription";
+
   #region Injection shortcuts
 
   /// <summary>Shortcut to the <see cref="AutomationService"/>.</summary>
@@ -35,6 +43,8 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
 
   #endregion
 
+  #region API
+
   /// <summary>
   /// Automation can only work on the block objects. This is the object which this behavior is attached to.
   /// </summary>
@@ -44,10 +54,8 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
   public bool HasActions => _actions.Count > 0;
 
   /// <summary>All actions on the building.</summary>
-  public IEnumerable<IAutomationAction> Actions => _actions.AsReadOnly();
-  List<IAutomationAction> _actions = new();
-
-  #region API
+  public IList<IAutomationAction> Actions => _actions.AsReadOnly();
+  List<IAutomationAction> _actions = [];
 
   /// <summary>Creates a rule from the condition and action.</summary>
   /// <param name="condition">
@@ -76,7 +84,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
     UpdateRegistration();
   }
 
-  /// <summary>Removes all rules that were defined for the specified template group.</summary>
+  /// <summary>Removes all rules defined for the specified template group.</summary>
   public void RemoveRulesForTemplateFamily(string templateFamily) {
     HostedDebugLog.Fine(this, "Removing all rules for template family: {0}", templateFamily);
     for (var i = _actions.Count - 1; i >= 0; i--) {
@@ -94,15 +102,46 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
     }
   }
 
-  /// <summary>Removes all rules that depend on condition and/or action that is marked for cleanup.</summary>
-  public void CollectCleanedRules() {
-    for (int i = _actions.Count - 1; i >= 0; i--) {
-      var action = _actions[i];
-      if (action.IsMarkedForCleanup || action.Condition.IsMarkedForCleanup) {
-        HostedDebugLog.Fine(this, "Cleaning up action: {0}", action);
-        DeleteRuleAt(i);
-      }
+  StatusToggle _errorToggle;
+  readonly HashSet<object> _failingInstances = [];
+
+  /// <summary>Shows an error status for a building that has problems with the rules.</summary>
+  public void ReportError(object instance) {
+    HostedDebugLog.Fine(this, "Automation error reported by: {0}", instance);
+    if (_errorToggle == null) {
+      _errorToggle = StatusToggle.CreatePriorityStatusWithAlertAndFloatingIcon(
+          AutomationErrorIcon, Loc.T(AutomationErrorDescriptionLocKey), Loc.T(AutomationErrorAlertLocKey));
+      GetComponentFast<StatusSubject>().RegisterStatus(_errorToggle);
     }
+    _errorToggle.Activate();
+    _failingInstances.Add(instance);
+  }
+
+  /// <summary>Clears the error status.</summary>
+  public void ClearError(object instance) {
+    if (!_failingInstances.Remove(instance)) {
+      DebugEx.Warning("Cannot clear error. It was never reported by: {0}", instance);
+      return;
+    }
+    HostedDebugLog.Fine(this, "Clearing error from: {0}", instance);
+    if (_failingInstances.Count == 0) {
+      _errorToggle?.Deactivate();
+    }
+  }
+
+  /// <summary>Returns the component or creates it if none exists.</summary>
+  public T GetOrCreate<T>() where T : BaseComponent {
+    return GetComponentFast<T>() ?? BaseInstantiator.AddComponent<T>(GameObjectFast);
+  }
+
+  /// <summary>Returns the component or throws an exception if none exists.</summary>
+  /// <exception cref="InvalidOperationException">if the requested component not found.</exception>
+  public T GetOrThrow<T>() where T : BaseComponent {
+    var tracker = GetComponentFast<T>();
+    if (!tracker) {
+      throw new InvalidOperationException($"Component {typeof(T).Name} not found");
+    }
+    return tracker;
   }
 
   #endregion
@@ -124,20 +163,36 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
 
   /// <inheritdoc/>
   public void Load(IEntityLoader entityLoader) {
-    if (!entityLoader.HasComponent(AutomationBehaviorKey)) {
+    if (!entityLoader.TryGetComponent(AutomationBehaviorKey, out var component)) {
       return;
     }
-    var component = entityLoader.GetComponent(AutomationBehaviorKey);
     _actions = component
         .Get(ActionsKey, AutomationActionBase.ActionSerializerNullable)
         .OfType<IAutomationAction>()
         .Where(a => !a.IsMarkedForCleanup && a.Condition is { IsMarkedForCleanup: false })
         .ToList();
+  }
+
+  #endregion
+
+  #region IFinishedStateListener implementation
+
+  /// <inheritdoc/>
+  public void OnEnterFinishedState() {
+    // Update rules that work on finished building only.
     foreach (var action in _actions) {
-      action.Condition.Behavior = this;
-      action.Behavior = this;
+      if (!action.Behavior) {
+        break;  // Not initialized yet. It is likely a save game load.
+      }
+      if (!action.Condition.CanRunOnUnfinishedBuildings) {
+        action.Condition.SyncState();
+      }
     }
     UpdateRegistration();
+  }
+
+  /// <inheritdoc/>
+  public void OnExitFinishedState() {
   }
 
   #endregion
@@ -161,6 +216,27 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
 
   void Awake() {
     BlockObject = GetComponentFast<BlockObject>();
+  }
+
+  void Start() {
+    // This needs to be executed after all the entity components are loaded and initialized.
+    foreach (var action in _actions) {
+      action.Condition.Behavior = this;
+      action.Behavior = this;
+      action.Condition.SyncState();
+    }
+    UpdateRegistration();
+  }
+
+  /// <summary>Removes all rules that depend on condition and/or action that is marked for cleanup.</summary>
+  internal void CollectCleanedRules() {
+    for (var i = _actions.Count - 1; i >= 0; i--) {
+      var action = _actions[i];
+      if (action.IsMarkedForCleanup || action.Condition.IsMarkedForCleanup) {
+        HostedDebugLog.Fine(this, "Cleaning up action: {0}", action);
+        DeleteRuleAt(i);
+      }
+    }
   }
 
   void UpdateRegistration() {

@@ -30,7 +30,7 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
 
   /// <inheritdoc/>
   public string GetRate() {
-    var goodPerHour = _goodConsumingBuilding._goodPerHour * 24;
+    var goodPerHour = _goodConsumingBuilding.GoodPerHour * 24;
     return goodPerHour.ToString("0.#");
   }
   
@@ -60,7 +60,7 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
 
   /// <inheritdoc/>
   protected override void UpdateConsumptionRate() {
-    _goodConsumingBuilding._goodPerHour = _prefabGoodPerHour * Coverage;
+    _goodConsumingBuilding._goodConsumingBuildingSpec._goodPerHour = _prefabGoodPerHour * Coverage;
     if (Coverage > 0) {
       _goodConsumingToggle.ResumeConsumption();
     } else {

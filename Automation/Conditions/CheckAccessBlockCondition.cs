@@ -4,6 +4,7 @@
 
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.PathCheckingSystem;
+using IgorZ.TimberDev.Utils;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.BuildingsNavigation;
 using Timberborn.Persistence;
@@ -27,7 +28,11 @@ public sealed class CheckAccessBlockCondition : AutomationConditionBase {
   /// </summary>
   public bool IsReversedCondition { get; private set; }
 
-  #region AutomationConditionBase implementation
+  #region AutomationConditionBase overrides
+
+  /// <inheritdoc/>
+  public override bool CanRunOnUnfinishedBuildings => true;
+
   /// <inheritdoc/>
   public override string UiDescription =>
       Behavior.Loc.T(!IsReversedCondition ? BlockingPathNameLocKey : NotBlockingPathNameLocKey);
@@ -56,6 +61,7 @@ public sealed class CheckAccessBlockCondition : AutomationConditionBase {
   protected override void OnBehaviorToBeCleared() {
     DependencyContainer.GetInstance<PathCheckingService>().RemoveCondition(this);
   }
+
   #endregion
 
   #region IGameSerializable implemenation
@@ -64,7 +70,7 @@ public sealed class CheckAccessBlockCondition : AutomationConditionBase {
   /// <inheritdoc/>
   public override void LoadFrom(IObjectLoader objectLoader) {
     base.LoadFrom(objectLoader);
-    IsReversedCondition = objectLoader.GetValueOrNullable(IsReversedConditionKey) ?? false;
+    IsReversedCondition = objectLoader.GetValueOrDefault(IsReversedConditionKey);
   }
 
   /// <inheritdoc/>
@@ -75,10 +81,11 @@ public sealed class CheckAccessBlockCondition : AutomationConditionBase {
   #endregion
 
   #region Implementation
+
   /// <summary>Removes the condition from the object, but it must only be called on an active condition.</summary>
   internal void CancelCondition() {
     IsMarkedForCleanup = true;
-    Behavior.CollectCleanedRules();
   }
+
   #endregion
 }

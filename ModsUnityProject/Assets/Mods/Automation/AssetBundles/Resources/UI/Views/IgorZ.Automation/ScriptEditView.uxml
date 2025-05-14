@@ -1,0 +1,21 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle" />
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle" />
+    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/RulesEditorStyle.uss?fileID=7433441132597879392&amp;guid=82ba7710a5bad1b489b53edd629e2a56&amp;type=3#RulesEditorStyle" />
+    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/TimberDevStyle.uss?fileID=7433441132597879392&amp;guid=86824deb2a4bc844cbec48367a164254&amp;type=3#TimberDevStyle" />
+    <engine:VisualElement>
+        <engine:VisualElement style="flex-direction: row; align-items: center; justify-content: flex-start;">
+            <Timberborn.CoreUI.LocalizableLabel text="ConditionLabel" text-loc-key="IgorZ.Automation.Scripting.Editor.ConditionLabel" class="game-text-big" style="margin-right: 5px;" />
+            <Timberborn.CoreUI.NineSliceTextField value="(eq (sig Log) 1)  looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong string" name="ConditionScript" class="text-field game-text-big" style="flex-shrink: 1; flex-grow: 1;" />
+        </engine:VisualElement>
+        <engine:VisualElement style="flex-direction: row; align-items: center; margin-top: 1px;">
+            <Timberborn.CoreUI.LocalizableLabel text="ActionLabel" text-loc-key="IgorZ.Automation.Scripting.Editor.ActionLabel" class="game-text-big" style="margin-right: 5px;" />
+            <Timberborn.CoreUI.NineSliceTextField value="(eq (sig Log) 1)" name="ActionScript" class="text-field game-text-big" style="flex-shrink: 1; flex-grow: 1;" />
+        </engine:VisualElement>
+        <engine:VisualElement style="align-items: flex-start; flex-direction: row; margin-top: 5px;">
+            <Timberborn.CoreUI.LocalizableButton name="TestScriptBtn" text="TestScriptBtn" text-loc-key="IgorZ.Automation.Scripting.Editor.TestScriptBtn" class="button-game game-text-small timberdev-button-small--left-aligned" />
+            <Timberborn.CoreUI.LocalizableButton name="SaveScriptBtn" text="SaveScriptBtn" text-loc-key="IgorZ.Automation.Scripting.Editor.SaveScriptBtn" class="button-game game-text-small timberdev-button-small--left-aligned" />
+            <Timberborn.CoreUI.LocalizableButton name="DiscardScriptBtn" text="DiscardScriptBtn" text-loc-key="IgorZ.Automation.Scripting.Editor.DiscardScriptBtn" class="button-game game-text-small timberdev-button-small--left-aligned" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

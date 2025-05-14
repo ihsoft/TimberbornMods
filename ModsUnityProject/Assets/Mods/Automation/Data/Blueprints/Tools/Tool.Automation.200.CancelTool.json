@@ -1,0 +1,11 @@
+{
+  "ToolSpec": {
+    "Id": "Automation.CancelTool",
+    "GroupId": "AutomationToolGroupId",
+    "Type": "IgorZ.Automation.CommonTools.CancelTool",
+    "Order": 200,
+    "Icon": "Sprites/IgorZ/tool-cancel",
+    "NameLocKey": "IgorZ.Automation.CancelTool.Title",
+    "DescriptionLocKey": "IgorZ.Automation.CancelTool.Description"
+  }
+}
