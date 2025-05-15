@@ -74,7 +74,7 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
       DisplayName = Loc.T(DepthSignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
-          NumberFormat = "0.00",
+          ValueFormatter = x => x.AsFloat.ToString("0.00"),
       },
   };
   SignalDef _depthSignalDef;
@@ -84,7 +84,7 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
       DisplayName = Loc.T(ContaminationSignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
-          NumberFormat = "0.00",
+          ValueFormatter = x => x.AsFloat.ToString("P0"),
       },
   };
   SignalDef _contaminationSignalDef;
@@ -94,7 +94,8 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
       DisplayName = Loc.T(CurrentSignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
-          NumberFormat = "0.0",
+          ValueFormatter = x => x.AsFloat.ToString("0.0"),
+
       },
   };
   SignalDef _currentSignalDef;

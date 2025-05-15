@@ -86,7 +86,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
       DisplayName = Loc.T(HeightSignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
-          NumberFormat = "0.00",
+          ValueFormatter = x => x.AsFloat.ToString("0.00"),
       },
   };
   SignalDef _heightSignalDef;
@@ -101,7 +101,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
       Arguments = [
           new ValueDef {
               ValueType = ScriptValue.TypeEnum.Number,
-              NumberFormat = "0.00",
+              ValueFormatter = x => x.AsFloat.ToString("0.00"),
           },
       ],
   };

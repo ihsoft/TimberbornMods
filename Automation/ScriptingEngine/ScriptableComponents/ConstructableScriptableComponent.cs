@@ -85,7 +85,7 @@ sealed class ConstructableScriptableComponent : ScriptableComponentBase {
       DisplayName = Loc.T(ProgressSignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
-          NumberFormat = "0.00",
+          ValueFormatter = x => x.AsFloat.ToString("P0"),
       },
   };
   SignalDef _progressSignalDef;

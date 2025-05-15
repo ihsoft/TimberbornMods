@@ -13,9 +13,15 @@ sealed record ValueDef {
   /// <summary>The type of the argument.</summary>
   public ScriptValue.TypeEnum ValueType { get; init; }
 
-  /// <summary>Optional formatting specification for the numbers.</summary>
-  /// <remarks>If not provided, then the value is transformed to float and formatted with "0.##".</remarks>
-  public string NumberFormat { get; init; }
+  /// <summary>
+  /// Optional formatting processor. The result string should only be used for presenting the value, it can be
+  /// non-parsable back to the value.
+  /// </summary>
+  /// <remarks>
+  /// If provided, then any other formatting option is disregarded and only the result from this formatter is used.
+  /// </remarks>
+  /// <returns>
+  /// The formatted value or <c>null</c>. In the latter case, the default formatting algorithm is resumed.
 
   /// <summary>Optional validating function.</summary>
   /// <remarks>It should throw <see cref="ScriptError"/> if the value is not appropriate.</remarks>

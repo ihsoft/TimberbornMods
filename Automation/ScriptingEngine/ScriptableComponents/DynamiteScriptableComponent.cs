@@ -99,7 +99,7 @@ class DynamiteScriptableComponent : ScriptableComponentBase {
       Arguments = [
           new ValueDef {
               ValueType = ScriptValue.TypeEnum.Number,
-              NumberFormat = "0",
+              ValueFormatter = x => x.AsInt.ToString(),
           },
       ],
   };

@@ -161,7 +161,6 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
           },
           new ValueDef {
               ValueType = ScriptValue.TypeEnum.Number,
-              NumberFormat = "0",
           },
       ],
   };

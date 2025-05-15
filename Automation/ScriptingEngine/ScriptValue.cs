@@ -114,18 +114,26 @@ record struct ScriptValue {
   }
 
   /// <summary>Formats the value according to the value definition.</summary>
+  /// <param name="valueDef">
+  /// Optional value definition. If not provided, then the string types are presented "as-is", and the number types are
+  /// converted to floats and formatted as "0.##".
+  /// </param>
   public string FormatValue(ValueDef valueDef) {
-    if (ValueType != TypeEnum.String) {
-      return AsFloat.ToString(valueDef?.NumberFormat ?? "0.##");
+    if (valueDef == null) {
+      return ValueType == TypeEnum.Number ? AsFloat.ToString("0.##") : AsString;
+    }
+    if (valueDef.ValueFormatter != null) {
+      return valueDef.ValueFormatter(this);
+    }
+    if (valueDef.ValueType != TypeEnum.String) {
+      return AsFloat.ToString("0.##");
     }
     var stringValue = AsString;
-    if (valueDef?.Options == null) {
+    if (valueDef.Options == null) {
       return stringValue;
     }
     var resolvedValue = valueDef.Options.FirstOrDefault(x => x.Value == stringValue);
-    return resolvedValue.Text != ""
-        ? resolvedValue.Text
-        : CommonFormats.HighlightRed("?{stringValue}");
+    return resolvedValue.Text != "" ? resolvedValue.Text : CommonFormats.HighlightRed("?" + stringValue);
   }
 
   int? _number;
