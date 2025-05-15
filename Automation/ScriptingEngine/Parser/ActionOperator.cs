@@ -60,12 +60,20 @@ sealed class ActionOperator : AbstractOperator {
         throw new ScriptError.ParsingError($"Argument #{i + 1} must be a value, but found: {operand}");
       }
       var argDef = _actionDef.Arguments[i];
-      argDef.ValueValidator?.Invoke(valueExpr);
       if (argDef.ValueType != valueExpr.ValueType) {
         throw new ScriptError.ParsingError(
             $"Argument #{i + 1} must be of type '{argDef.ValueType}', but found: {valueExpr.ValueType}");
       }
-      argValues[i] = valueExpr.ValueFn;
+      argDef.ArgumentValidator?.Invoke(valueExpr);
+      if (argDef.ValueValidator == null || VerifyConstantValueExpr(argDef, valueExpr)) {
+        argValues[i] = valueExpr.ValueFn;
+      } else {
+        argValues[i] = () => {
+          var value = valueExpr.ValueFn();
+          argDef.ValueValidator(value);
+          return value;
+        };
+      }
     }
     var action = context.ScriptingService.GetActionExecutor(ActionName, context.ScriptHost);
     Execute = () => action(argValues.Select(v => v()).ToArray());

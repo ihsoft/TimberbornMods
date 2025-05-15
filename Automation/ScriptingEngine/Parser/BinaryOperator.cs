@@ -56,11 +56,18 @@ sealed class BinaryOperator : BoolOperator {
     } else if (right is SignalOperator rightSignal) {
       _signalDef = context.ScriptingService.GetSignalDefinition(rightSignal.SignalName, context.ScriptHost);
     }
-    if (_signalDef?.Result.Options != null && right is ConstantValueExpr constantValueExpr) {
-      var value = constantValueExpr.ValueFn().AsString;
-      var allowedValues = _signalDef.Result.Options.Select(x => x.Value).ToArray();
-      if (!allowedValues.Contains(value)) {
-        throw new ScriptError.ParsingError($"Unexpected value: {value}. Allowed: {string.Join(", ", allowedValues)}");
+    if (_signalDef != null) {
+      var otherArgExpr = left is SignalOperator ? right : left;
+      _signalDef.Result.ArgumentValidator?.Invoke(otherArgExpr);
+      VerifyConstantValueExpr(_signalDef.Result, otherArgExpr);
+      if (otherArgExpr is ConstantValueExpr constantValueExpr) {
+        if (_signalDef.Result.Options != null) {
+          var value = constantValueExpr.ValueFn().AsString;
+          var allowedValues = _signalDef.Result.Options.Select(x => x.Value).ToArray();
+          if (!allowedValues.Contains(value)) {
+            throw new ScriptError.ParsingError($"Unexpected value: {value}. Allowed: {string.Join(", ", allowedValues)}");
+          }
+        }
       }
     }
     Execute = left.ValueType switch {

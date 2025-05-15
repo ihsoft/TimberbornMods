@@ -58,4 +58,17 @@ abstract class AbstractOperator(string name, IList<IExpression> operands) : IExp
       throw new ScriptError.ParsingError($"Operator '{Name}' requires at most {max} arguments, but got {count}");
     }
   }
+
+  protected static bool VerifyConstantValueExpr(ValueDef valueDef, IValueExpr valueExpr) {
+    if (valueExpr is not ConstantValueExpr) {
+      return false;
+    }
+    try {
+      valueDef.ValueValidator?.Invoke(valueExpr.ValueFn());
+    } catch (ScriptError e) {
+      // Report as parsing error since it is checked at parse time.
+      throw new ScriptError.ParsingError(e.Message);
+    }
+    return true;
+  }
 }

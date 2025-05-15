@@ -157,7 +157,7 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
       Arguments = [
           new ValueDef {
               ValueType = ScriptValue.TypeEnum.String,
-              ValueValidator = SignalNameValidator,
+              ArgumentValidator = SignalNameValidator,
           },
           new ValueDef {
               ValueType = ScriptValue.TypeEnum.Number,
