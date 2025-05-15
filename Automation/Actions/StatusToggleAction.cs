@@ -138,9 +138,10 @@ public class StatusToggleAction : AutomationActionBase {
       var baseInstantiator = DependencyContainer.GetInstance<BaseInstantiator>();
       status = baseInstantiator.AddComponent<StatusController>(Behavior.GameObjectFast);
       status.SetStatusToken(StatusToken);
-      if (ActionKind == ActionKindEnum.ShowStatus) {  // No status for the hide action.
-        status.SetStatus(this);
-      }
+    }
+    if (ActionKind == ActionKindEnum.ShowStatus) {
+      // The blocker could get created from the hide action which doesn't have a status setting.
+      status.SetStatus(this);
     }
     return status;
   }
@@ -225,6 +226,9 @@ public class StatusToggleAction : AutomationActionBase {
     }
 
     public void SetStatus(StatusToggleAction toggleAction) {
+      if (_statusToggle != null) {
+        return;
+      }
       _statusToggle = toggleAction.StatusKind switch {
           StatusKindEnum.NormalStatus =>
               StatusToggle.CreateNormalStatus(toggleAction.StatusIcon, _loc.T(toggleAction.StatusText)),
