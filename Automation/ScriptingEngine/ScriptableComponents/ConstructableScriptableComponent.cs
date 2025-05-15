@@ -7,6 +7,7 @@ using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.BlockSystem;
 using Timberborn.ConstructionSites;
+using UnityEngine;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
@@ -90,11 +91,20 @@ sealed class ConstructableScriptableComponent : ScriptableComponentBase {
 
   #endregion
 
-  #region implementation
+  #region Implementation
 
   class ConstructableStateTracker : AbstractStatusTracker, IFinishedStateListener {
+    int _prevProgress;
+
     void Awake() {
-      GetComponentFast<ConstructionSite>().OnConstructionSiteProgressed += (_, _) => ScheduleSignal(ProgressSignalName);
+      var constructionSite = GetComponentFast<ConstructionSite>();
+      GetComponentFast<ConstructionSite>().OnConstructionSiteProgressed += (_, _) => {
+        var progress = Mathf.RoundToInt(constructionSite.BuildTimeProgress * 100f);
+        if (progress != _prevProgress) {
+          _prevProgress = progress;
+          ScheduleSignal(ProgressSignalName);
+        }
+      };
     }
 
     /// <inheritdoc/>
