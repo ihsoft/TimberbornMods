@@ -112,10 +112,15 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
   /// </summary>
   public void CheckBlockingStateAndTriggerActions(PathCheckingSite site) {
     PatchCheckingTimer.Start();
-    site.CanFinish = !IsBlockingSite(site);
+    var newCanFinish = !IsBlockingSite(site);
+    if (site.CanFinish == newCanFinish) {
+      PatchCheckingTimer.Stop();
+      return;  // No need to trigger the condition.
+    }
+    site.CanFinish = newCanFinish;
     var conditions = _conditionsIndex[site];
     foreach (var condition in conditions) {
-      condition.ConditionState = condition.IsReversedCondition ? site.CanFinish : !site.CanFinish;
+      condition.ConditionState = condition.IsReversedCondition ? newCanFinish : !newCanFinish;
     }
     PatchCheckingTimer.Stop();
   }
