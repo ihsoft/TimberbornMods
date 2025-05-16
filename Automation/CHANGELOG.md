@@ -2,6 +2,7 @@
 * [Feature] Add settings to control how to show the rules on the building's panel.
 * [Feature] Add new scripting component `FlowControl` to allow scripting the water flow on sluices and badwater domes.
 * [Feature] The dynamite drilldown templates are now scripted. Such rules can be created and edited via the rules' editor.
+* [Feature] New template tool pause construction site when its progress reaches 100%.
 * [Change] The "Open water regulator" template can now be applied to the sluices as well.
 * [Change] Various improvements to better check and show the script arguments values. 
 

@@ -1,0 +1,32 @@
+{
+  "ToolSpec": {
+    "Id": "Automation.Tmpl.Construction.PauseConstruction",
+    "GroupId": "AutomationToolGroupId",
+    "Type": "IgorZ.Automation.TemplateTools.ApplyTemplateTool",
+    "Order": 31,
+    "Icon": "Sprites/IgorZ/tool-pause-construction",
+    "DevMode": false,
+    "NameLocKey": "IgorZ.Automation.Tool.tmpl.PauseConstruction.DisplayName",
+    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.PauseConstruction.Description"
+  },
+  "AutomationTemplateSpec": {
+    "TemplateFamilyName": "Construction.Pause",
+    "Rules": [
+      {
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Precondition", "StrValue": "(and (?sig Constructable.OnUnfinished.Progress) (?act Pausable.Pause) (ne (sig Constructable.OnUnfinished.State) 'finished'))" },
+            { "Name": "Expression", "StrValue": "(eq (sig Constructable.OnUnfinished.Progress) 100)" }
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Pausable.Pause.Once)" }
+          ]
+        }
+      }
+    ]
+  }
+}
