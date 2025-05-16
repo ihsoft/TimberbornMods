@@ -48,6 +48,9 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
   AutomationBehavior _automationBehavior;
 
+  int _lastTickEffectsChecked = -1;
+  bool _buildingHasEffects;
+
   AutomationFragment(UiFactory uiFactory, RulesEditorDialog rulesEditorDialog, CopyRulesTool copyRulesTool,
                      EntityPanelSettings entityPanelSettings, ScriptingService scriptingService) {
     _uiFactory = uiFactory;
@@ -72,6 +75,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
   public void ShowFragment(BaseComponent entity) {
     _automationBehavior = entity.GetComponentFast<AutomationBehavior>();
+    _lastTickEffectsChecked = -1;
     UpdateView();
   }
 
@@ -91,11 +95,14 @@ sealed class AutomationFragment : IEntityPanelFragment {
       return;
     }
     if (!_automationBehavior.HasActions && !_entityPanelSettings.AlwaysShowAddRulesButton.Value) {
-      var hasSignals = _scriptingService.GetSignalNamesForBuilding(_automationBehavior)
-          .Any(x => !GlobalActions.Any(x.StartsWith));
-      var hasActions = _scriptingService.GetActionNamesForBuilding(_automationBehavior)
-          .Any(x => !GlobalActions.Any(x.StartsWith));
-      if (!hasSignals && !hasActions) {
+      // It is too expensive to check for the building's signals and actions every tick.
+      if (_lastTickEffectsChecked != AutomationService.CurrentTick) {
+        _lastTickEffectsChecked = AutomationService.CurrentTick;
+        _buildingHasEffects =
+            _scriptingService.GetSignalNamesForBuilding(_automationBehavior).Any(x => !GlobalActions.Any(x.StartsWith))
+            || _scriptingService.GetActionNamesForBuilding(_automationBehavior).Any(x => !GlobalActions.Any(x.StartsWith));
+      }
+      if (!_buildingHasEffects) {
         _root.ToggleDisplayStyle(false);
         return;
       }
