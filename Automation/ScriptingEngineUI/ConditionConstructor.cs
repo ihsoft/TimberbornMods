@@ -23,20 +23,20 @@ class ConditionConstructor : BaseConstructor {
   }
 
   public override VisualElement Root { get; }
-  public readonly ArgumentConstructor SignalSelector;
+  public readonly ResizableDropdownElement SignalSelector;
   public readonly ResizableDropdownElement OperatorSelector;
   public readonly ArgumentConstructor ValueSelector;
 
   public void SetDefinitions(IEnumerable<ConditionDefinition> lvalueDef) {
     _lvalueDefinitions = lvalueDef.ToArray();
-    SignalSelector.SetOptions(_lvalueDefinitions.Select(x => x.Name).ToArray());
+    SignalSelector.Items = _lvalueDefinitions.Select(x => x.Name).ToArray();
     SetArgument(_lvalueDefinitions[0].Name.Value);
   }
 
   public string Validate() => ValueSelector.Validate();
 
   public string GetScript() {
-    var arg = SignalSelector.Value;
+    var arg = SignalSelector.SelectedValue;
     var op = OperatorSelector.SelectedValue;
     var val = ValueSelector.GetScriptValue();
     return $"({op} (sig {arg}) {val})";
@@ -64,12 +64,11 @@ class ConditionConstructor : BaseConstructor {
   ConditionDefinition[] _lvalueDefinitions;
 
   public ConditionConstructor(UiFactory uiFactory) : base(uiFactory) {
-    SignalSelector = new ArgumentConstructor(uiFactory);
-    SignalSelector.OnStringValueChanged += (_, _) => SetArgument(SignalSelector.Value);
+    SignalSelector = uiFactory.CreateSimpleDropdown(SetArgument);
     OperatorSelector = uiFactory.CreateSimpleDropdown();
     ValueSelector = new ArgumentConstructor(uiFactory);
 
-    Root = MakeRow(uiFactory.T(ConditionLabelLocKey), SignalSelector.Root, OperatorSelector, ValueSelector.Root);
+    Root = MakeRow(uiFactory.T(ConditionLabelLocKey), SignalSelector, OperatorSelector, ValueSelector.Root);
   }
 
   void SetArgument(string argument) {

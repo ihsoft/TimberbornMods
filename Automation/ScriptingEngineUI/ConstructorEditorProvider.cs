@@ -134,7 +134,7 @@ sealed class ConstructorEditorProvider : IEditorProvider {
     if (ruleRow.ParsedCondition is not BinaryOperator binaryOperatorExpr) {
       throw new InvalidOperationException("Binary operator is expected, but found: " + ruleRow.ParsedCondition);
     }
-    conditionConstructor.SignalSelector.Value = (binaryOperatorExpr.Left as SignalOperator)!.FullSignalName;
+    conditionConstructor.SignalSelector.SelectedValue = (binaryOperatorExpr.Left as SignalOperator)!.FullSignalName;
     conditionConstructor.OperatorSelector.SelectedValue = binaryOperatorExpr.Name;
     if (binaryOperatorExpr.Right is not ConstantValueExpr constantValue) {
       throw new InvalidOperationException("Constant value is expected");

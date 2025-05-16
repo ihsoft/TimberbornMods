@@ -21,13 +21,9 @@ sealed class ArgumentConstructor : BaseConstructor {
 
   public override VisualElement Root { get; }
 
-  public event EventHandler OnStringValueChanged;
-
-  public bool IsInput => _typeSelectionDropdown.SelectedValue == InputTypeName;
-  public ScriptValue.TypeEnum ValueType => _argumentDefinition.ValueType;
-
   public string Value {
-    get => IsInput ? _textField.value : _typeSelectionDropdown.SelectedValue;
+    get => _typeSelectionDropdown.SelectedValue == InputTypeName
+        ? _textField.value : _typeSelectionDropdown.SelectedValue;
     set {
       if (_typeSelectionDropdown.Items.Any(x => x.Value == value)) {
         _typeSelectionDropdown.SelectedValue = value;
@@ -38,15 +34,6 @@ sealed class ArgumentConstructor : BaseConstructor {
         _textField.ToggleDisplayStyle(true);
       }
     }
-  }
-
-  /// <summary>Sets a plain list fo values for teh dropdown.</summary>
-  /// <remarks>No logic for the input field or value generation is available.</remarks>
-  /// FIMXE: why needing this? Use simple dropdown.
-  public void SetOptions(DropdownItem<string>[] options) {
-    _argumentDefinition = null;
-    _typeSelectionDropdown.Items = options;
-    _typeSelectionDropdown.SetEnabled(options.Length > 1 || options[0].Value != InputTypeName);
   }
 
   public void SetDefinition(ArgumentDefinition argumentDef) {
@@ -70,6 +57,25 @@ sealed class ArgumentConstructor : BaseConstructor {
         ScriptValue.TypeEnum.String => CheckInputForString(),
         _ => throw new ArgumentException($"Invalid argument type: {_argumentDefinition.ValueType}")
     };
+  }
+
+  #endregion
+
+  #region Implementation 
+
+  readonly ResizableDropdownElement _typeSelectionDropdown;
+  readonly TextField _textField;
+  ArgumentDefinition _argumentDefinition;
+
+  public ArgumentConstructor(UiFactory uiFactory) : base(uiFactory) {
+    _typeSelectionDropdown = uiFactory.CreateSimpleDropdown(_ => UpdateTypeSelection());
+    _textField = uiFactory.CreateTextField(width: 100, classes: [UiFactory.GameTextBigClass]);
+    Root = MakeRow(_typeSelectionDropdown, _textField);
+  }
+
+  void UpdateTypeSelection() {
+    _textField.ToggleDisplayStyle(_typeSelectionDropdown.SelectedValue == InputTypeName);
+    _textField.value = "";
   }
 
   string CheckInputForNumber() {
@@ -100,26 +106,6 @@ sealed class ArgumentConstructor : BaseConstructor {
       VisualEffects.SetTemporaryClass(_textField, ErrorStatusHighlightDurationMs, "text-field-error");
     }
     return res;
-  }
-
-  #endregion
-
-  #region Implementation 
-
-  readonly ResizableDropdownElement _typeSelectionDropdown;
-  readonly TextField _textField;
-  ArgumentDefinition _argumentDefinition;
-
-  public ArgumentConstructor(UiFactory uiFactory) : base(uiFactory) {
-    _typeSelectionDropdown = uiFactory.CreateSimpleDropdown(_ => UpdateTypeSelection());
-    _textField = uiFactory.CreateTextField(width: 100, classes: [UiFactory.GameTextBigClass]);
-    Root = MakeRow(_typeSelectionDropdown, _textField);
-  }
-
-  void UpdateTypeSelection() {
-    _textField.ToggleDisplayStyle(IsInput);
-    _textField.value = "";
-    OnStringValueChanged?.Invoke(this, EventArgs.Empty);
   }
 
   static string ExecuteValidator<T>(Action<ScriptValue> validator, T value) {
