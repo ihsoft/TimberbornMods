@@ -34,6 +34,7 @@ class ScriptError : Exception {
   /// This error is only produced during the parsing stage. If the component state becomes bad after the successful
   /// parsing, then it should be reported as <see cref="ScriptError.RuntimeError"/>.
   /// </remarks>
-  public class BadStateError(BaseComponent component, string reason)
-      : ScriptError($"{DebugEx.ObjectToString(component)}: {reason}");
+  public class BadStateError(BaseComponent component, string reason) : ScriptError(reason) {
+    public override string ToString() => $"{DebugEx.ObjectToString(component)}: {Message}";
+  }
 }
