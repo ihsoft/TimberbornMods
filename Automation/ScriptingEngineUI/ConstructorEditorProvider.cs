@@ -17,9 +17,6 @@ sealed class ConstructorEditorProvider : IEditorProvider {
   const string AddRuleViaConstructorBtnLocKey = "IgorZ.Automation.Scripting.Editor.AddRuleViaConstructorBtn";
   const string EditInConstructorBtnLocKey = "IgorZ.Automation.Scripting.Editor.EditInConstructorBtn";
 
-  const string StringConstantTypeLocKey = "IgorZ.Automation.Scripting.Editor.StringConstantType";
-  const string NumberConstantTypeLocKey = "IgorZ.Automation.Scripting.Editor.NumberConstantType";
-
   #region IEditorProvider implementation
 
   /// <inheritdoc/>
