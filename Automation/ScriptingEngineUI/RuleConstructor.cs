@@ -15,6 +15,7 @@ sealed class RuleConstructor : BaseConstructor {
 
   public RuleConstructor(UiFactory uiFactory) : base(uiFactory) {
     ConditionConstructor = new ConditionConstructor(uiFactory);
+    ConditionConstructor.Root.style.marginBottom = 5;
     ActionConstructor = new ActionConstructor(uiFactory);
     Root = new VisualElement();
     Root.Add(ConditionConstructor.Root);
