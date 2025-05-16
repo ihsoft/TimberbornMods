@@ -93,9 +93,8 @@ sealed class ConstructorEditorProvider : IEditorProvider {
     var conditions = _scriptingService.GetSignalNamesForBuilding(behavior)
         .Select(t => _scriptingService.GetSignalDefinition(t, behavior))
         .Select(t => new ConditionConstructor.ConditionDefinition {
-            Argument = (t.ScriptName, t.DisplayName),
-            ArgumentType = t.Result.ValueType,
-            ArgumentOptions = GetArgumentOptions(t.Result),
+            Name = (t.ScriptName, t.DisplayName),
+            Argument = new ArgumentDefinition(_uiFactory, t.Result),
         });
     ruleConstructor.ConditionConstructor.SetDefinitions(conditions);
 
@@ -103,19 +102,10 @@ sealed class ConstructorEditorProvider : IEditorProvider {
         .Select(t => _scriptingService.GetActionDefinition(t, behavior))
         .Where(x => x.Arguments.Length <= 1)
         .Select(t => new ActionConstructor.ActionDefinition {
-            Action = (t.ScriptName, t.DisplayName),
-            Arguments = t.Arguments.Select(a => (a.ValueType, GetArgumentOptions(a))).ToArray(),
+            Name = (t.ScriptName, t.DisplayName),
+            Arguments = t.Arguments.Select(v => new ArgumentDefinition(_uiFactory, v)).ToArray(),
         });
     ruleConstructor.ActionConstructor.SetDefinitions(actions);
-  }
-
-  DropdownItem<string>[] GetArgumentOptions(ValueDef def) {
-    if (def.Options != null) {
-      return def.Options;
-    }
-    return def.ValueType == ScriptValue.TypeEnum.Number
-        ? [(ArgumentConstructor.InputTypeName, _uiFactory.T(NumberConstantTypeLocKey))]
-        : [(ArgumentConstructor.InputTypeName, _uiFactory.T(StringConstantTypeLocKey))];
   }
 
   static void PopulateAction(RuleRow ruleRow, RuleConstructor ruleConstructor) {

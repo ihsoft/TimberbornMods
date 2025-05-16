@@ -18,9 +18,8 @@ class ConditionConstructor : BaseConstructor {
   #region API
 
   public record ConditionDefinition {
-    public DropdownItem<string> Argument { get; init; }
-    public ScriptValue.TypeEnum ArgumentType { get; init; }
-    public DropdownItem<string>[] ArgumentOptions { get; init; }
+    public DropdownItem<string> Name { get; init; }
+    public ArgumentDefinition Argument { get; init; }
   }
 
   public override VisualElement Root { get; }
@@ -30,22 +29,16 @@ class ConditionConstructor : BaseConstructor {
 
   public void SetDefinitions(IEnumerable<ConditionDefinition> lvalueDef) {
     _lvalueDefinitions = lvalueDef.ToArray();
-    SignalSelector.SetDefinitions(_lvalueDefinitions.Select(x => x.Argument).ToArray());
-    SetArgument(_lvalueDefinitions[0].Argument.Value);
+    SignalSelector.SetOptions(_lvalueDefinitions.Select(x => x.Name).ToArray());
+    SetArgument(_lvalueDefinitions[0].Name.Value);
   }
 
-  public string Validate() {
-    return _selectedDefinition.ArgumentType switch {
-        ScriptValue.TypeEnum.Number => ValueSelector.CheckInputForNumber(),
-        ScriptValue.TypeEnum.String => ValueSelector.CheckInputForString(),
-        _ => null,
-    };
-  }
+  public string Validate() => ValueSelector.Validate();
 
   public string GetScript() {
     var arg = SignalSelector.Value;
     var op = OperatorSelector.SelectedValue;
-    var val = PrepareConstantValue(ValueSelector.Value, _selectedDefinition.ArgumentType);
+    var val = ValueSelector.GetScriptValue();
     return $"({op} (sig {arg}) {val})";
   }
 
@@ -85,15 +78,15 @@ class ConditionConstructor : BaseConstructor {
       ValueSelector.Root.ToggleDisplayStyle(false);
       return;
     }
-    _selectedDefinition = _lvalueDefinitions.First(x => x.Argument.Value == argument);
-    if (_selectedDefinition.ArgumentOptions == null) {
+    _selectedDefinition = _lvalueDefinitions.First(x => x.Name.Value == argument);
+    if (_selectedDefinition.Argument.ValueOptions == null) {
       OperatorSelector.ToggleDisplayStyle(false);
       ValueSelector.Root.ToggleDisplayStyle(false);
     }
     OperatorSelector.Items =
-        _selectedDefinition.ArgumentType == ScriptValue.TypeEnum.String ? StringOperators : NumberOperators;
+        _selectedDefinition.Argument.ValueType == ScriptValue.TypeEnum.String ? StringOperators : NumberOperators;
     OperatorSelector.ToggleDisplayStyle(true);
-    ValueSelector.SetDefinitions(_selectedDefinition.ArgumentOptions);
+    ValueSelector.SetDefinition(_selectedDefinition.Argument);
     ValueSelector.Root.ToggleDisplayStyle(true);
   }
 

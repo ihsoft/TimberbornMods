@@ -4,7 +4,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using IgorZ.Automation.ScriptingEngine;
 using IgorZ.TimberDev.UI;
 using Timberborn.CoreUI;
 using UnityEngine.UIElements;
@@ -18,8 +17,8 @@ sealed class ActionConstructor : BaseConstructor {
   #region API
 
   public record ActionDefinition {
-    public DropdownItem<string> Action { get; init; }
-    public (ScriptValue.TypeEnum ValueType, DropdownItem<string>[] Options)[] Arguments { get; init; }
+    public DropdownItem<string> Name { get; init; }
+    public ArgumentDefinition[] Arguments { get; init; }
   }
 
   public override VisualElement Root { get; }
@@ -28,31 +27,27 @@ sealed class ActionConstructor : BaseConstructor {
 
   public void SetDefinitions(IEnumerable<ActionDefinition> actionDefinitions) {
     _actionDefinitions = actionDefinitions.ToArray();
-    ActionSelector.Items = _actionDefinitions.Select(def => def.Action).ToArray();
-    SetAction(_actionDefinitions[0].Action.Value);
+    ActionSelector.Items = _actionDefinitions.Select(def => def.Name).ToArray();
+    SetAction(_actionDefinitions[0].Name.Value);
   }
 
   public string Validate() {
     return _selectedAction.Arguments.Length switch {
         0 => null,
-        1 => _selectedAction.Arguments[0].ValueType switch {
-            ScriptValue.TypeEnum.Number => ArgumentConstructor.CheckInputForNumber(),
-            ScriptValue.TypeEnum.String => ArgumentConstructor.CheckInputForString(),
-            _ => null,
-        },
+        1 => ArgumentConstructor.Validate(),
         _ => throw new System.NotImplementedException("Multiple arguments are not supported yet"),
     };
   }
 
   public string GetScript() {
     var action = ActionSelector.SelectedValue;
-    var def = _actionDefinitions.First(x => x.Action.Value == action);
+    var def = _actionDefinitions.First(x => x.Name.Value == action);
     if (def.Arguments.Length == 0) {
       return $"(act {action})";
     }
     var script = "(act " + action;
     for (var i = 0; i < def.Arguments.Length; i++) {
-      script += " " + PrepareConstantValue(ArgumentConstructor.Value, def.Arguments[i].ValueType);
+      script += " " + ArgumentConstructor.GetScriptValue();
     }
     return script + ")";
   }
@@ -71,12 +66,12 @@ sealed class ActionConstructor : BaseConstructor {
   }
 
   void SetAction(string action) {
-    _selectedAction = _actionDefinitions.First(def => def.Action.Value == action);
+    _selectedAction = _actionDefinitions.First(def => def.Name.Value == action);
     if (_selectedAction.Arguments.Length == 0) {
       ArgumentConstructor.Root.ToggleDisplayStyle(false);
     } else if (_selectedAction.Arguments.Length == 1) {
       ArgumentConstructor.Root.ToggleDisplayStyle(true);
-      ArgumentConstructor.SetDefinitions(_selectedAction.Arguments[0].Options);
+      ArgumentConstructor.SetDefinition(_selectedAction.Arguments[0]);
     } else {
       throw new System.NotImplementedException("Multiple arguments are not supported yet");
     }
