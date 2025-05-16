@@ -94,6 +94,7 @@ class DistrictScriptableComponent : ScriptableComponentBase {
       DisplayName = Loc.T(BeaversPopulationSignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
+          ValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
       },
   };
   SignalDef _beaverPopulationSignalDef;
@@ -103,6 +104,7 @@ class DistrictScriptableComponent : ScriptableComponentBase {
       DisplayName = Loc.T(BotPopulationSignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
+          ValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
       },
   };
   SignalDef _botPopulationSignalDef;
@@ -112,6 +114,7 @@ class DistrictScriptableComponent : ScriptableComponentBase {
       DisplayName = Loc.T(NumberOfBedsSignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
+          ValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
       },
   };
   SignalDef _numberOfBedsSignalDef;

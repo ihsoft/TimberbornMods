@@ -39,8 +39,10 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override SignalDef GetSignalDefinition(string name, AutomationBehavior behavior) {
+    var floodgate = GetFloodgate(behavior);
+    var key = name + "-" + floodgate.MaxHeight;
     return name switch {
-        HeightSignalName => HeightSignalDef,
+        HeightSignalName => LookupSignalDef(key, () => MakeHeightSignalDef(floodgate)),
         _ => throw new UnknownSignalException(name),
     };
   }
@@ -60,9 +62,11 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   }
 
   /// <inheritdoc/>
-  public override ActionDef GetActionDefinition(string name, AutomationBehavior _) {
+  public override ActionDef GetActionDefinition(string name, AutomationBehavior behavior) {
+    var floodgate = GetFloodgate(behavior);
+    var key = name + "-" + floodgate.MaxHeight;
     return name switch {
-        SetHeightActionName => SetHeightActionDef,
+        SetHeightActionName => LookupActionDef(key, () => MakeSetActionDef(floodgate)),
         _ => throw new UnknownActionException(name),
     };
   }
@@ -81,31 +85,35 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
   #region Signals
 
-  SignalDef HeightSignalDef => _heightSignalDef ??= new SignalDef {
-      ScriptName = HeightSignalName,
-      DisplayName = Loc.T(HeightSignalLocKey),
-      Result = new ValueDef {
-          ValueType = ScriptValue.TypeEnum.Number,
-          ValueFormatter = x => x.AsFloat.ToString("0.00"),
-      },
-  };
-  SignalDef _heightSignalDef;
+  SignalDef MakeHeightSignalDef(Floodgate floodgate) {
+    return new SignalDef {
+        ScriptName = HeightSignalName,
+        DisplayName = Loc.T(HeightSignalLocKey),
+        Result = new ValueDef {
+            ValueType = ScriptValue.TypeEnum.Number,
+            ValueFormatter = x => x.AsFloat.ToString("0.00"),
+            ValueValidator = ValueDef.RangeCheckValidatorFloat(0f, floodgate.MaxHeight),
+        },
+    };
+  }
 
   #endregion
 
   #region Actions
 
-  ActionDef SetHeightActionDef => _setHeightActionDef ??= new ActionDef {
-      ScriptName = SetHeightActionName,
-      DisplayName = Loc.T(SetHeightActionLocKey),
-      Arguments = [
-          new ValueDef {
-              ValueType = ScriptValue.TypeEnum.Number,
-              ValueFormatter = x => x.AsFloat.ToString("0.00"),
-          },
-      ],
-  };
-  ActionDef _setHeightActionDef;
+  ActionDef MakeSetActionDef(Floodgate floodgate) {
+    return new ActionDef {
+        ScriptName = SetHeightActionName,
+        DisplayName = Loc.T(SetHeightActionLocKey),
+        Arguments = [
+            new ValueDef {
+                ValueType = ScriptValue.TypeEnum.Number,
+                ValueFormatter = x => x.AsFloat.ToString("0.00"),
+                ValueValidator = ValueDef.RangeCheckValidatorFloat(0, floodgate.MaxHeight),
+            },
+        ],
+    };
+  }
 
   static void SetHeightAction(Floodgate floodgate, ScriptValue[] args) {
     AssertActionArgsCount(SetHeightActionName, args, 1);

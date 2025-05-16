@@ -75,6 +75,7 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
           ValueFormatter = x => x.AsFloat.ToString("0.00"),
+          ValueValidator = ValueDef.RangeCheckValidatorFloat(min: 0f),
       },
   };
   SignalDef _depthSignalDef;
@@ -85,6 +86,7 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
           ValueFormatter = x => x.AsFloat.ToString("P0"),
+          ValueValidator = ValueDef.RangeCheckValidatorFloat(0f, 1f),
       },
   };
   SignalDef _contaminationSignalDef;
@@ -95,7 +97,7 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
           ValueFormatter = x => x.AsFloat.ToString("0.0"),
-
+          ValueValidator = ValueDef.RangeCheckValidatorFloat(min: 0f),
       },
   };
   SignalDef _currentSignalDef;

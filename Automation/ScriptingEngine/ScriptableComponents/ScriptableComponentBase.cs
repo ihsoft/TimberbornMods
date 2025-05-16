@@ -3,10 +3,10 @@
 // License: Public Domain
 
 using System;
+using System.Collections.Generic;
 using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
-using Timberborn.BaseComponentSystem;
 using Timberborn.Localization;
 using Timberborn.SingletonSystem;
 using UnityDev.Utils.LogUtilsLite;
@@ -77,11 +77,33 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
   public virtual void UninstallAction(ActionOperator actionOperator, AutomationBehavior behavior) {
   }
 
+  #endregion
+
+  #region Internal API
+
   protected static void AssertActionArgsCount(string actionName, ScriptValue[] args, int expectedCount) {
     if (args.Length != expectedCount) {
       throw new ScriptError.ParsingError($"{actionName} action requires {expectedCount} argument(s)");
     }
   }
+
+  protected ActionDef LookupActionDef(string name, Func<ActionDef> getDefault) {
+    if (!_cachedActionDefs.TryGetValue(name, out var actionDef)) {
+      actionDef = getDefault();
+      _cachedActionDefs[name] = actionDef;
+    }
+    return actionDef;
+  }
+  readonly Dictionary<string, ActionDef> _cachedActionDefs = new();
+
+  protected SignalDef LookupSignalDef(string name, Func<SignalDef> getDefault) {
+    if (!_cachedSignalDefs.TryGetValue(name, out var signalDef)) {
+      signalDef = getDefault();
+      _cachedSignalDefs[name] = signalDef;
+    }
+    return signalDef;
+  }
+  readonly Dictionary<string, SignalDef> _cachedSignalDefs = new();
 
   #endregion
 

@@ -64,20 +64,8 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override SignalDef GetSignalDefinition(string name, AutomationBehavior behavior) {
-    var parsed = ParseSignalName(name, behavior);
-    if (_signalDefs.TryGetValue(name, out var def)) {
-      return def;
-    }
-    var displayName = LocGoodSignal(parsed.isInput ? InputGoodSignalLocKey : OutputGoodSignalLocKey, parsed.goodId);
-    def = new SignalDef {
-        ScriptName = name,
-        DisplayName = displayName,
-        Result = new ValueDef {
-            ValueType = ScriptValue.TypeEnum.Number,
-        },
-    };
-    _signalDefs[name] = def;
-    return def;
+    var key = GetInventory(behavior).Capacity + "-" + name;
+    return LookupSignalDef(key, () => MakeSignalDef(name, behavior));
   }
 
   /// <inheritdoc/>
@@ -149,7 +137,19 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
 
   #region Signals
 
-  readonly Dictionary<string, SignalDef> _signalDefs = [];
+  SignalDef MakeSignalDef(string name, AutomationBehavior behavior) {
+    var parsed = ParseSignalName(name, behavior);
+    var displayName = LocGoodSignal(parsed.isInput ? InputGoodSignalLocKey : OutputGoodSignalLocKey, parsed.goodId);
+    return new SignalDef {
+        ScriptName = name,
+        DisplayName = displayName,
+        Result = new ValueDef {
+            ValueType = ScriptValue.TypeEnum.Number,
+            ValueValidator = ValueDef.RangeCheckValidatorInt(0, GetInventory(behavior).Capacity),
+        },
+    };
+  }
+
 
   #endregion
 

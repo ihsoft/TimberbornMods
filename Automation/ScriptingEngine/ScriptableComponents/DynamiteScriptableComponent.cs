@@ -100,6 +100,7 @@ class DynamiteScriptableComponent : ScriptableComponentBase {
           new ValueDef {
               ValueType = ScriptValue.TypeEnum.Number,
               ValueFormatter = x => x.AsInt.ToString(),
+              ValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
           },
       ],
   };
