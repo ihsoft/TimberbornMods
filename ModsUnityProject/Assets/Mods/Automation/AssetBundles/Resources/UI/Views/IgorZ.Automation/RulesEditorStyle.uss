@@ -3,7 +3,7 @@
 }
 
 .text-field .unity-base-field__input {
-    -unity-text-align: upper-left;
+    -unity-text-align: middle-left;
 }
 
 .text-field-green .unity-base-field__input {
