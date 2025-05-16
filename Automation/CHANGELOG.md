@@ -4,6 +4,7 @@
 * [Feature] The dynamite drilldown templates are now scripted. Such rules can be created and edited via the rules' editor.
 * [Feature] New template tool pause construction site when its progress reaches 100%.
 * [Change] The "Open water regulator" template can now be applied to the sluices as well.
+* [Change] The rule editor now only allows inventory signlas that are valid for the current building state: either the selected recipe or storage good. 
 * [Change] Various improvements to better check and show the script arguments values. 
 
 # v2.1.0 (12 May 2025):

@@ -25,7 +25,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   const string OutputGoodSignalLocKey = "IgorZ.Automation.Scriptable.Inventory.Signal.OutputGood";
   const string StartEmptyingStockActionLocKey = "IgorZ.Automation.Scriptable.Inventory.Action.StartEmptyingStock";
   const string StopEmptyingStockActionLocKey = "IgorZ.Automation.Scriptable.Inventory.Action.StopEmptyingStock";
-  const string EmptyingStatusDescriptionKey = "IgorZ.Automation.Scriptable.Inventory.Action.EmptyingStatus";
+  const string EmptyingStatusDescriptionLocKey = "IgorZ.Automation.Scriptable.Inventory.Action.EmptyingStatus";
 
   const string InputGoodSignalNamePrefix = "Inventory.InputGood.";
   const string OutputGoodSignalNamePrefix = "Inventory.OutputGood.";
@@ -45,12 +45,14 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     if (!inventory) {
       return [];
     }
+    List<GoodAmount> capacities = [];
+    inventory.GetCapacity(capacities);
     var res = new List<string>();
-    foreach (var good in inventory.AllowedGoods) {
-      var prefix = inventory.OutputGoods.Contains(good.StorableGood.GoodId)
+    foreach (var good in capacities) {
+      var prefix = inventory.OutputGoods.Contains(good.GoodId)
           ? OutputGoodSignalNamePrefix
           : InputGoodSignalNamePrefix;
-      res.Add(prefix + good.StorableGood.GoodId);
+      res.Add(prefix + good.GoodId);
     }
     return res.ToArray();
   }
@@ -64,7 +66,8 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override SignalDef GetSignalDefinition(string name, AutomationBehavior behavior) {
-    var key = GetInventory(behavior).Capacity + "-" + name;
+    var parsed = ParseSignalName(name, behavior);
+    var key = parsed.capacity + "-" + name;
     return LookupSignalDef(key, () => MakeSignalDef(name, behavior));
   }
 
@@ -140,18 +143,16 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   SignalDef MakeSignalDef(string name, AutomationBehavior behavior) {
     var parsed = ParseSignalName(name, behavior);
     var displayName = LocGoodSignal(parsed.isInput ? InputGoodSignalLocKey : OutputGoodSignalLocKey, parsed.goodId);
-    var capacity = GetInventory(behavior).Capacity;
     return new SignalDef {
         ScriptName = name,
         DisplayName = displayName,
         Result = new ValueDef {
             ValueType = ScriptValue.TypeEnum.Number,
-            ValueValidator = ValueDef.RangeCheckValidatorInt(0, capacity),
-            ValueUiHint = GetArgumentMaxValueHint(capacity),
+            ValueValidator = ValueDef.RangeCheckValidatorInt(0, parsed.capacity),
+            ValueUiHint = GetArgumentMaxValueHint(parsed.capacity),
         },
     };
   }
-
 
   #endregion
 
@@ -181,18 +182,18 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     _goodService = goodService;
   }
 
-  static (bool isInput, string goodId) ParseSignalName(
+  static (bool isInput, string goodId, int capacity) ParseSignalName(
       string name, AutomationBehavior behavior, bool throwErrors = false) {
     var inventory = GetInventory(behavior);
     if (name.StartsWith(InputGoodSignalNamePrefix)) {
       var goodId = name[InputGoodSignalNamePrefix.Length..];
-      if (inventory.InputGoods.Contains(goodId)) {
-        return (true, goodId);
+      if (inventory.InputGoods.Contains(goodId) && inventory.LimitedAmount(goodId) > 0) {
+        return (true, goodId, inventory.LimitedAmount(goodId));
       }
     } else if (name.StartsWith(OutputGoodSignalNamePrefix)) {
       var goodId = name[OutputGoodSignalNamePrefix.Length..];
-      if (inventory.OutputGoods.Contains(goodId)) {
-        return (false, goodId);
+      if (inventory.OutputGoods.Contains(goodId) && inventory.LimitedAmount(goodId) > 0) {
+        return (false, goodId, inventory.LimitedAmount(goodId));
       }
     }
     if (throwErrors) {
@@ -283,8 +284,8 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
       _emptiable = GetComponentFast<Emptiable>();
       _emptiable.UnmarkedForEmptying += (_, _) => RefreshStatus();
       _emptiable.MarkedForEmptying += (_, _) => RefreshStatus();
-      _statusToggle =
-          StatusToggle.CreatePriorityStatusWithFloatingIcon(EmptyingStatusIcon, _loc.T(EmptyingStatusDescriptionKey));
+      _statusToggle = StatusToggle.CreatePriorityStatusWithFloatingIcon(
+          EmptyingStatusIcon, _loc.T(EmptyingStatusDescriptionLocKey));
       GetComponentFast<StatusSubject>().RegisterStatus(_statusToggle);
       RefreshStatus();
     }
