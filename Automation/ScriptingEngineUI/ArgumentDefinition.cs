@@ -13,9 +13,9 @@ sealed class ArgumentDefinition {
   const string StringConstantTypeLocKey = "IgorZ.Automation.Scripting.Editor.StringConstantType";
   const string NumberConstantTypeLocKey = "IgorZ.Automation.Scripting.Editor.NumberConstantType";
 
-  public ScriptValue.TypeEnum ValueType { get; init; }
-  public Action<ScriptValue> ValueValidator { get; init; }
-  public DropdownItem<string>[] ValueOptions { get; init; }
+  public ScriptValue.TypeEnum ValueType { get; }
+  public Action<ScriptValue> ValueValidator { get; }
+  public DropdownItem<string>[] ValueOptions { get; }
 
   public ArgumentDefinition(UiFactory uiFactory, ValueDef valueDef) {
     ValueType = valueDef.ValueType;
