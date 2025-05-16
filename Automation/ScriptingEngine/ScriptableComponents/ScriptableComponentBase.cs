@@ -15,6 +15,8 @@ namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
 abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
 
+  protected const string ArgumentMaxValueHintLocKey = "IgorZ.Automation.Scripting.Editor.ArgumentMaxValueHint";
+
   #region API
 
   /// <summary>As script processing exception for the missing signal.</summary>
@@ -104,6 +106,14 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
     return signalDef;
   }
   readonly Dictionary<string, SignalDef> _cachedSignalDefs = new();
+
+  protected string GetArgumentMaxValueHint(int maxValue) {
+    return maxValue == int.MaxValue ? null : Loc.T(ArgumentMaxValueHintLocKey, maxValue);
+  }
+
+  protected string GetArgumentMaxValueHint(float maxValue, string format = "F2") {
+    return maxValue < 0 ? null : Loc.T(ArgumentMaxValueHintLocKey, maxValue.ToString(format));
+  }
 
   #endregion
 

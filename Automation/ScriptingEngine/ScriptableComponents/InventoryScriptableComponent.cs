@@ -140,12 +140,14 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   SignalDef MakeSignalDef(string name, AutomationBehavior behavior) {
     var parsed = ParseSignalName(name, behavior);
     var displayName = LocGoodSignal(parsed.isInput ? InputGoodSignalLocKey : OutputGoodSignalLocKey, parsed.goodId);
+    var capacity = GetInventory(behavior).Capacity;
     return new SignalDef {
         ScriptName = name,
         DisplayName = displayName,
         Result = new ValueDef {
             ValueType = ScriptValue.TypeEnum.Number,
-            ValueValidator = ValueDef.RangeCheckValidatorInt(0, GetInventory(behavior).Capacity),
+            ValueValidator = ValueDef.RangeCheckValidatorInt(0, capacity),
+            ValueUiHint = GetArgumentMaxValueHint(capacity),
         },
     };
   }

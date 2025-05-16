@@ -87,6 +87,7 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
           ValueType = ScriptValue.TypeEnum.Number,
           ValueFormatter = x => x.AsFloat.ToString("P0"),
           ValueValidator = ValueDef.RangeCheckValidatorFloat(0f, 1f),
+          ValueUiHint = GetArgumentMaxValueHint(1f),
       },
   };
   SignalDef _contaminationSignalDef;

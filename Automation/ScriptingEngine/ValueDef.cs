@@ -35,6 +35,9 @@ sealed record ValueDef {
   /// <exception cref="ScriptError.RuntimeError">if value doesn't pass validation</exception>
   public Action<ScriptValue> ValueValidator { get; init; }
 
+  /// <summary>Optional hint text to show in UI for the argument.</summary>
+  public string ValueUiHint { get; init; }
+
   /// <summary>Optional validating function for the value argument.</summary>
   /// <remarks>
   /// This check is performed in the parsing stage. Don't do value validation here! Use <see cref="ValueValidator"/>

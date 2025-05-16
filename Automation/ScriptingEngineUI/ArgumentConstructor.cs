@@ -41,6 +41,8 @@ sealed class ArgumentConstructor : BaseConstructor {
     var options = _argumentDefinition.ValueOptions;
     _typeSelectionDropdown.Items = options;
     _typeSelectionDropdown.SetEnabled(options.Length > 1 || options[0].Value != InputTypeName);
+    _hintText.text = argumentDef.ValueUiHint ?? "";
+    _hintText.ToggleDisplayStyle(argumentDef.ValueUiHint != null);
   }
 
   public string GetScriptValue() {
@@ -63,14 +65,20 @@ sealed class ArgumentConstructor : BaseConstructor {
 
   #region Implementation 
 
+  static readonly Color ArgumentValueHintColor = new(0.5f, 0.5f, 0.5f);
+
   readonly ResizableDropdownElement _typeSelectionDropdown;
   readonly TextField _textField;
+  readonly Label _hintText;
   ArgumentDefinition _argumentDefinition;
 
   public ArgumentConstructor(UiFactory uiFactory) : base(uiFactory) {
     _typeSelectionDropdown = uiFactory.CreateSimpleDropdown(_ => UpdateTypeSelection());
     _textField = uiFactory.CreateTextField(width: 100, classes: [UiFactory.GameTextBigClass]);
-    Root = MakeRow(_typeSelectionDropdown, _textField);
+    _textField.style.height = Length.Percent(100);
+    _hintText = uiFactory.CreateLabel(classes: [UiFactory.GameTextBigClass]);
+    _hintText.style.color = ArgumentValueHintColor;
+    Root = MakeRow(_typeSelectionDropdown, _textField, "", _hintText);
   }
 
   void UpdateTypeSelection() {

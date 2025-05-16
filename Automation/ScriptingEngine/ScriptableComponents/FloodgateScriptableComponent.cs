@@ -93,6 +93,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
             ValueType = ScriptValue.TypeEnum.Number,
             ValueFormatter = x => x.AsFloat.ToString("0.00"),
             ValueValidator = ValueDef.RangeCheckValidatorFloat(0f, floodgate.MaxHeight),
+            ValueUiHint = GetArgumentMaxValueHint(floodgate.MaxHeight),
         },
     };
   }

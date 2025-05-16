@@ -16,10 +16,12 @@ sealed class ArgumentDefinition {
   public ScriptValue.TypeEnum ValueType { get; }
   public Action<ScriptValue> ValueValidator { get; }
   public DropdownItem<string>[] ValueOptions { get; }
+  public string ValueUiHint { get; }
 
   public ArgumentDefinition(UiFactory uiFactory, ValueDef valueDef) {
     ValueType = valueDef.ValueType;
     ValueValidator = valueDef.ValueValidator;
+    ValueUiHint = valueDef.ValueUiHint;
     if (valueDef.Options != null) {
       ValueOptions = valueDef.Options;
     } else {
