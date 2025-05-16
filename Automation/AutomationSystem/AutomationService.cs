@@ -9,6 +9,7 @@ using Timberborn.BaseComponentSystem;
 using Timberborn.Localization;
 using Timberborn.SelectionSystem;
 using Timberborn.SingletonSystem;
+using Timberborn.TickSystem;
 using Timberborn.ToolSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
@@ -17,16 +18,22 @@ namespace IgorZ.Automation.AutomationSystem;
 
 /// <summary>Central point for all the automation related logic.</summary>
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-public sealed class AutomationService : IPostLoadableSingleton {
+public sealed class AutomationService : ITickableSingleton {
 
-  #region IPostLoadableSingleton implemetation 
+  #region ITickableSingleton implementation
 
   /// <inheritdoc/>
-  public void PostLoad() {}
+  public void Tick() {
+    CurrentTick++;
+  }
 
   #endregion
 
   #region API
+
+  /// <summary>Ticks since the game load.</summary>
+  /// <remarks>Can be used for synchronization and delaying actions.</remarks>
+  public static int CurrentTick { get; private set; }
 
   /// <summary>Shortcut to the instantiator.</summary>
   public readonly BaseInstantiator BaseInstantiator;
@@ -101,6 +108,7 @@ public sealed class AutomationService : IPostLoadableSingleton {
     Loc = loc;
     eventBus.Register(this);
     _highlighter = highlighter;
+    CurrentTick = 0;
   }
 
   internal void RegisterBehavior(AutomationBehavior behavior) {
