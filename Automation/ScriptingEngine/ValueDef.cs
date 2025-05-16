@@ -49,6 +49,9 @@ sealed record ValueDef {
   /// <summary>Integer value validation function.</summary>
   public static Action<ScriptValue> RangeCheckValidatorInt(int? min = null, int? max = null) {
     return value => {
+      if (value.AsNumber % 100 != 0) {
+        throw new ScriptError.RuntimeError($"Value must be an integer, found: {value.AsFloat:F2}");
+      }
       if (!max.HasValue) {
         if (value.AsInt < min) {
           throw new ScriptError.RuntimeError($"Value must be greater than or equal to {min}, found: {value.AsInt}");
