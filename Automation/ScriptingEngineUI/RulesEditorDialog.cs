@@ -19,6 +19,7 @@ sealed class RulesEditorDialog : IPanelController {
 
   const string PendingEditsNotificationLocKey = "IgorZ.Automation.Scripting.Editor.PendingEditsNotification";
   const string UnsavedChangesConfirmationLocKey = "IgorZ.Automation.Scripting.Editor.UnsavedChangesConfirmation";
+  const string RulesWithErrorsLocKey = "IgorZ.Automation.Scripting.Editor.RulesWithErrorsNotification";
   const string ReadMoreLinkLocKey = "IgorZ.Automation.Scripting.Editor.ReadMoreLink";
 
   #region IPanelController implementation
@@ -31,7 +32,11 @@ sealed class RulesEditorDialog : IPanelController {
   /// <inheritdoc/>
   public bool OnUIConfirmed() {
     if (EditsPending) {
-      ShowPendingEditsNotification();
+      _dialogBoxShower.Create().SetMessage(_uiFactory.T(PendingEditsNotificationLocKey)).Show();
+      return true;
+    }
+    if (HasErrors) {
+      _dialogBoxShower.Create().SetMessage(_uiFactory.T(RulesWithErrorsLocKey)).Show();
       return true;
     }
     SaveAndClose();
@@ -97,6 +102,7 @@ sealed class RulesEditorDialog : IPanelController {
 
   bool RulesChanged => _ruleRows.Any(x => x.IsDeleted || x.IsModified);
   bool EditsPending => _ruleRows.Any(x => x.IsInEditMode);
+  bool HasErrors => _ruleRows.Any(x => x.HasErrors);
 
   VisualElement _ruleRowsContainer;
   AutomationBehavior _activeBuilding;
@@ -121,10 +127,6 @@ sealed class RulesEditorDialog : IPanelController {
         .SetConfirmButton(confirmAction)
         .SetCancelButton(() => {})
         .Show();
-  }
-
-  void ShowPendingEditsNotification() {
-    _dialogBoxShower.Create().SetMessage(_uiFactory.T(PendingEditsNotificationLocKey)).Show();
   }
 
   void SetActiveBuilding(AutomationBehavior activeBuilding) {

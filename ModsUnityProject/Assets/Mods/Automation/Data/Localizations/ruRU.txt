@@ -142,6 +142,7 @@ IgorZ.Automation.Scriptable.Weather.Signal.Season,"сезон","Name of the cond
 IgorZ.Automation.Scripting.Editor.DialogHeader,"Правила автоматизации",
 IgorZ.Automation.Scripting.Editor.ReadMoreLink,"https://github.com/ihsoft/TimberbornMods/wiki/Automation-(scripting)-ru-RU","Link to the localized wiki page about scripting"
 IgorZ.Automation.Scripting.Editor.PendingEditsNotification,"Некоторые правила в режиме редактирования. Сначала завершите их.",
+IgorZ.Automation.Scripting.Editor.RulesWithErrorsNotification,"В некоторых правилах есть ошибки. Исправьте их перед сохранением.",
 IgorZ.Automation.Scripting.Editor.UnsavedChangesConfirmation,"Есть несохраненные изменения. Вы хотите их отменить?",
 IgorZ.Automation.Scripting.Editor.AddRuleFromScriptBtn,"Добавить скрипт",
 IgorZ.Automation.Scripting.Editor.AddRuleViaConstructorBtn,"Создать правило через конструктор",

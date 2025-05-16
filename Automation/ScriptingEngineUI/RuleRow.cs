@@ -98,6 +98,8 @@ sealed class RuleRow {
   }
   bool _isDeleted;
 
+  public bool HasErrors => (ParsedAction == null || ParsedCondition == null) && !IsDeleted && !IsInEditMode;
+
   public event EventHandler OnStateChanged;
 
   public RuleRow(IEnumerable<IEditorProvider> editors, UiFactory uiFactory, AutomationBehavior activeBuilding) {
