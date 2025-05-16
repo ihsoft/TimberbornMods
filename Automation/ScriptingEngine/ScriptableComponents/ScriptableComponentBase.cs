@@ -108,7 +108,7 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
   readonly Dictionary<string, SignalDef> _cachedSignalDefs = new();
 
   protected string GetArgumentMaxValueHint(int maxValue) {
-    return maxValue == int.MaxValue ? null : Loc.T(ArgumentMaxValueHintLocKey, maxValue);
+    return maxValue == int.MaxValue ? null : Loc.T(ArgumentMaxValueHintLocKey, maxValue.ToString());
   }
 
   protected string GetArgumentMaxValueHint(float maxValue, string format = "F2") {
