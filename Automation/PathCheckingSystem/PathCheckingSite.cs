@@ -41,7 +41,7 @@ sealed class PathCheckingSite : BaseComponent, ISelectionListener, INavMeshListe
 
   /// <summary>Tells whether this site can be finished without blocking other buildings.</summary>
   /// <seealso cref="PathCheckingService.CheckBlockingStateAndTriggerActions"/>
-  public bool CanFinish { get; internal set; }
+  public bool CanFinish { get; internal set; } = true;
 
   /// <summary>The other site that blocks this one.</summary>
   public PathCheckingSite BlockedSite { get; internal set; }
