@@ -1,3 +1,6 @@
+# v2.1.2 (pre-release):
+* [Fix] Chained building tool doesn't show the blocked completion icon.
+
 # v2.1.1 (16 May 2025):
 * [Feature] Add settings to control how to show the rules on the building's panel.
 * [Feature] Add new scripting component `FlowControl` to allow scripting the water flow on sluices and badwater domes.

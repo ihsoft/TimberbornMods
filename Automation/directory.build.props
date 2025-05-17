@@ -2,7 +2,7 @@
    <PropertyGroup>
       <Product>Automation: Plugin for Timberborn game</Product>
       <Authors>IgorZ</Authors>
-      <Version>2.1.1</Version>
+      <Version>2.1.2</Version>
       <Copyright>Public domain</Copyright>
    </PropertyGroup>
 </Project>
