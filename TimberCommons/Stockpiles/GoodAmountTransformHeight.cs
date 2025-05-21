@@ -4,6 +4,7 @@
 
 using System;
 using System.Linq;
+using IgorZ.TimberDev.Utils;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.Common;
@@ -15,7 +16,7 @@ namespace IgorZ.TimberCommons.Stockpiles;
 
 /// <summary>
 /// Replacement component for the stock <c>Timberborn.Stockpiles.GoodAmountTransformHeight</c>. It can work with
-/// manufacture buildings as well as with simple stockiples.
+/// manufacture buildings as well as with simple stockpiles.
 /// </summary>
 public sealed class GoodAmountTransformHeight : BaseComponent, IFinishedStateListener {
   
@@ -41,14 +42,16 @@ public sealed class GoodAmountTransformHeight : BaseComponent, IFinishedStateLis
 
   /// <inheritdoc/>
   public void OnEnterFinishedState() {
-    Inventory.InventoryChanged += OnInventoryChanged;
-    _maxGoodAmount = Inventory.AllowedGoods.Single(goodAmount => goodAmount.StorableGood.GoodId == _good).Amount;
+    var manufactory = GetEnabledComponent<Manufactory>();
+    _inventory = manufactory ? manufactory.Inventory : ComponentsAccessor.GetInventory(this);
+    _inventory.InventoryChanged += OnInventoryChanged;
+    _maxGoodAmount = _inventory.AllowedGoods.Single(goodAmount => goodAmount.StorableGood.GoodId == _good).Amount;
     UpdateTargetHeight();
   }
 
   /// <inheritdoc/>
   public void OnExitFinishedState() {
-    Inventory.InventoryChanged -= OnInventoryChanged;
+    _inventory.InventoryChanged -= OnInventoryChanged;
   }
 
   #endregion
@@ -59,14 +62,11 @@ public sealed class GoodAmountTransformHeight : BaseComponent, IFinishedStateLis
   float _initialHeight;
   int _maxGoodAmount;
 
-  Manufactory _manufactory;
-  Inventory Inventory => _inventory ??= _manufactory ? _manufactory.Inventory : GetEnabledComponent<Inventory>();
   Inventory _inventory;
 
   void Awake() {
     _target = GameObjectFast.FindChildTransform(_targetName);
     _initialHeight = _target.position.y;
-    _manufactory = GetEnabledComponent<Manufactory>();
   }
   
   void OnInventoryChanged(object sender, InventoryChangedEventArgs e) {
@@ -77,7 +77,7 @@ public sealed class GoodAmountTransformHeight : BaseComponent, IFinishedStateLis
   }
 
   void UpdateTargetHeight() {
-    var num = Mathf.Clamp01((float)Inventory.AmountInStock(_good) / _maxGoodAmount);
+    var num = Mathf.Clamp01((float)_inventory.AmountInStock(_good) / _maxGoodAmount);
     if (_nonLinearity != 0f) {
       num = (float)Math.Pow(num, _nonLinearity + 1f);
     }

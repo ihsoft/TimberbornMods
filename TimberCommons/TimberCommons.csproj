@@ -99,6 +99,9 @@
       <Compile Include="..\TimberDev\Utils\HarmonyPatcher.cs">
         <Link>TimberDev\Utils\HarmonyPatcher.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\Utils\ComponentsAccessor.cs">
+        <Link>TimberDev\Utils\ComponentsAccessor.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\Utils\StaticBindings.cs">
         <Link>TimberDev\Utils\StaticBindings.cs</Link>
       </Compile>
