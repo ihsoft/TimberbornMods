@@ -137,6 +137,8 @@ IgorZ.Automation.Scriptable.StreamGauge.Signal.Depth,"depth","Name of the condit
 IgorZ.Automation.Scriptable.StreamGauge.Signal.Contamination,"contamination","Name of the condition for the current water contamination level checking"
 IgorZ.Automation.Scriptable.StreamGauge.Signal.Current,"current","Name of the condition for the current water current checking"
 IgorZ.Automation.Scriptable.Weather.Signal.Season,"season","Name of the condition for the current season checking"
+IgorZ.Automation.Scriptable.Workplace.Action.RemoveWorkers,"remove workers","Name of the action that removes all workers from the workshop"
+IgorZ.Automation.Scriptable.Workplace.Action.SetWorkers,"assign {0} workers","Name of the action that sets the number of workers in the building"
 =,=,"Rules editor strings"
 IgorZ.Automation.Scripting.Editor.DialogHeader,"Automation rules",
 IgorZ.Automation.Scripting.Editor.ReadMoreLink,"https://github.com/ihsoft/TimberbornMods/wiki/Automation-(scripting)","Link to the localized wiki page about scripting"

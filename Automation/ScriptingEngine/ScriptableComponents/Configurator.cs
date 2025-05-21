@@ -15,7 +15,7 @@ sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).AssemblyQualifiedName;
 
   public void Configure(IContainerDefinition containerDefinition) {
-    HarmonyPatcher.PatchRepeated(PatchId, typeof(FloodgatePatch));
+    HarmonyPatcher.PatchRepeated(PatchId, typeof(FloodgatePatch), typeof(NoUnemployedStatusPatch));
 
     // The order of bindings is npt important for the scripting engine, but in the constructor the siganls/ and actions
     // will be shown in the order of bindings.
@@ -26,6 +26,7 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<InventoryScriptableComponent>().AsSingleton();
     containerDefinition.Bind<ConstructableScriptableComponent>().AsSingleton();
     containerDefinition.Bind<PrioritizableScriptableComponent>().AsSingleton();
+    containerDefinition.Bind<WorkplaceScriptableComponent>().AsSingleton();
     containerDefinition.Bind<DynamiteScriptableComponent>().AsSingleton();
     containerDefinition.Bind<StreamGaugeScriptableComponent>().AsSingleton();
     containerDefinition.Bind<FlowControlScriptableComponent>().AsSingleton();
