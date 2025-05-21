@@ -1,25 +1,69 @@
 ﻿ID,Text,Comment
-IgorZ.Automation.DebugPickTool.Title,"Инструмент отладки",
-IgorZ.Automation.DebugPickTool.Description,"Показать компоненты на выбранном объекте.",
-IgorZ.Automation.DebugPickTool.DescriptionHint1,"Удерживайте <i>SHIFT</i> чтобы показать компонент Accessible.",
-IgorZ.Automation.DebugPickTool.DescriptionHint2,"Удерживайте <i>CTRL</i> чтобы показать ребра NavMesh.",
-IgorZ.Automation.DebugFinishNowTool.Title,"Завершить строительство",
+IgorZ.Automation.CancelTool.Description,"Используйте этот инструмент, чтобы отменить автоматизацию для зданий и строительных площадок.",
+IgorZ.Automation.CancelTool.Title,"Отменить автоматизацию",
+IgorZ.Automation.CheckAccessBlockCondition.Blocking.Description,"<YellowHighlight>блокирует путь</YellowHighlight>",
+IgorZ.Automation.CheckAccessBlockCondition.NotBlocking.Description,"<YellowHighlight>не блокирует путь</YellowHighlight>",
+IgorZ.Automation.CheckAccessBlockCondition.NotYetReachable,"Строители не могут добраться до этого места, но дорога строится",
+IgorZ.Automation.CheckAccessBlockCondition.UnreachableAlert,"Строительный участок недоступен",
+IgorZ.Automation.CheckAccessBlockCondition.UnreachableStatus,"Строители не могут добраться до этого места. Возможно, ничего не получится построить",
 IgorZ.Automation.DebugFinishNowTool.Description,"Немедленно завершить строительство выбранных зданий.",
-IgorZ.Automation.ToolGroup.Main.DisplayName,"Настроить автоматизацию",
-IgorZ.Automation.ToolGroup.Terrain.DisplayName,"Изменение ландшафта",
-IgorZ.Automation.ToolGroup.Water.DisplayName,"Правила, зависящие от погоды",
-IgorZ.Automation.ToolGroup.Power.DisplayName,"Правила, зависящие от потребления энергии",
-IgorZ.Automation.ToolGroup.Storage.DisplayName,"Правила, зависящие от склада",
-IgorZ.Automation.ToolGroup.Population.DisplayName,"Правила, зависящие от населения",
-IgorZ.Automation.ToolGroup.Signals.DisplayName,"Правила, зависящие от сигналов",
-IgorZ.Automation.Tool.tmpl.DynamiteNow.DisplayName,"Активировать динамит",
-IgorZ.Automation.Tool.tmpl.DynamiteNow.Description,"Примените этот шаблон к динамиту чтобы активировать его сразу по завершении установки. Также можно применить к уже установленному.",
+IgorZ.Automation.DebugFinishNowTool.Title,"Завершить строительство",
+IgorZ.Automation.DebugPickTool.Description,"Показать компоненты на выбранном объекте.",
+IgorZ.Automation.DebugPickTool.DescriptionHint1,"Удерживайте <i>SHIFT</i>, чтобы показать компонент Accessible.",
+IgorZ.Automation.DebugPickTool.DescriptionHint2,"Удерживайте <i>CTRL</i>, чтобы показать ребра NavMesh.",
+IgorZ.Automation.DebugPickTool.Title,"Инструмент отладки",
+IgorZ.Automation.PauseTool.Description,"Используйте этот инструмент, чтобы остановить здания и строительные площадки.",
+IgorZ.Automation.PauseTool.Title,"Остановить здания",
+IgorZ.Automation.ResumeTool.Description,"Используйте этот инструмент, чтобы возобновить здания и строительные площадки.",
+IgorZ.Automation.ResumeTool.Title,"Возобновить здания",
+IgorZ.Automation.ShowStatusAction.AutomationErrorAlert,"Ошибка автоматизации",
+IgorZ.Automation.ShowStatusAction.AutomationErrorDescription,"Некоторые правила автоматизации не могут быть исполнены",
+IgorZ.Automation.ShowStatusAction.HoldCompletionStatusText,"Ожидание завершения строительства других зданий",
+IgorZ.Automation.ShowStatusAction.HoldConstruction,"<YellowHighlight>приостановить строительство</YellowHighlight>",
+IgorZ.Automation.ShowStatusAction.ResumeConstruction,"<YellowHighlight>завершить строительство</YellowHighlight>",
 IgorZ.Automation.Tool.tmpl.2LevelsDynamite.DisplayName,"Взорвать динамит 2 раза",
 IgorZ.Automation.Tool.tmpl.3LevelsDynamite.DisplayName,"Взорвать динамит 3 раза",
 IgorZ.Automation.Tool.tmpl.4LevelsDynamite.DisplayName,"Взорвать динамит 4 раза",
 IgorZ.Automation.Tool.tmpl.5LevelsDynamite.DisplayName,"Взорвать динамит 5 раз",
 IgorZ.Automation.Tool.tmpl.6LevelsDynamite.DisplayName,"Взорвать динамит 6 раз",
-IgorZ.Automation.Tool.tmpl.XLevelsDynamite.Description,"Этот шаблон можно применить к динамитам, как к завершенным, так и к строящимся. После завершения динамит взорвется автоматически, и на его месте будет размещен новый чертеж динамита.",
+IgorZ.Automation.Tool.tmpl.BadtideCloseFloodgate.Description,"Примените этот шаблон к затворам, которые должны закрываться когда начинается сезон плохой воды.",
+IgorZ.Automation.Tool.tmpl.BadtideCloseFloodgate.DisplayName,"Закрыть затвор в сезон плохой воды",
+IgorZ.Automation.Tool.tmpl.BadtideOpenFloodgate.Description,"Примените этот шаблон к затворам, которые должны открываться когда начинается сезон плохой воды.",
+IgorZ.Automation.Tool.tmpl.BadtideOpenFloodgate.DisplayName,"Открыть затвор в сезон плохой воды",
+IgorZ.Automation.Tool.tmpl.BadtidePause.Description,"Примените этот шаблон к зданиям, которые должны оставаться в режиме 'остановлено' в сезон плохой воды.",
+IgorZ.Automation.Tool.tmpl.BadtidePause.DisplayName,"Остановить в сезон плохой воды",
+IgorZ.Automation.Tool.tmpl.BeaversAtMax.Description,"Примените этот шаблон к зданиям, которые должны работать до тех пор пока количество бобров меньше возможного максимума для района.",
+IgorZ.Automation.Tool.tmpl.BeaversAtMax.DisplayName,"Максимальное количество бобров",
+IgorZ.Automation.Tool.tmpl.BeaversAtMinus10.Description,"Примените этот шаблон к зданиям, которые должны оставаться в режиме 'остановлено' до тех пор, пока количество бобров не упадет ниже текущего значения на 10 бобров.",
+IgorZ.Automation.Tool.tmpl.BeaversAtMinus10.DisplayName,"Количество бобров -10",
+IgorZ.Automation.Tool.tmpl.BeaversAtMinus20.Description,"Примените этот шаблон к зданиям, которые должны оставаться в режиме 'остановлено' до тех пор, пока количество бобров не упадет ниже текущего значения на 10 бобров.",
+IgorZ.Automation.Tool.tmpl.BeaversAtMinus20.DisplayName,"Количество бобров -20",
+IgorZ.Automation.Tool.tmpl.BeaversAtPlus10.Description,"Примените этот шаблон к зданиям, которые должны работать до тех пор, пока количество бобров не превысит текущее значение на 10 бобров.",
+IgorZ.Automation.Tool.tmpl.BeaversAtPlus10.DisplayName,"Количество бобров +10",
+IgorZ.Automation.Tool.tmpl.BeaversAtPlus20.Description,"Примените этот шаблон к зданиям, которые должны работать до тех пор, пока количество бобров не превысит текущее значение на 20 бобров.",
+IgorZ.Automation.Tool.tmpl.BeaversAtPlus20.DisplayName,"Количество бобров +20",
+IgorZ.Automation.Tool.tmpl.BotsAtMinus10.Description,"Примените этот шаблон к зданиям, которые должны оставаться в режиме 'остановлено' до тех пор, пока количество ботов не упадет ниже текущего значения на 10 ботов.",
+IgorZ.Automation.Tool.tmpl.BotsAtMinus10.DisplayName,"Количество ботов -10",
+IgorZ.Automation.Tool.tmpl.BotsAtMinus20.Description,"Примените этот шаблон к зданиям, которые должны оставаться в режиме 'остановлено' до тех пор, пока количество ботов не упадет ниже текущего значения на 20 ботов.",
+IgorZ.Automation.Tool.tmpl.BotsAtMinus20.DisplayName,"Количество ботов -20",
+IgorZ.Automation.Tool.tmpl.BotsAtPlus10.Description,"Примените этот шаблон к зданиям, которые должны работать до тех пор, пока количество ботов не превысит текущее значение на 10 ботов.",
+IgorZ.Automation.Tool.tmpl.BotsAtPlus10.DisplayName,"Количество ботов +10",
+IgorZ.Automation.Tool.tmpl.BotsAtPlus20.Description,"Примените этот шаблон к зданиям, которые должны работать до тех пор, пока количество ботов не превысит текущее значение на 20 ботов.",
+IgorZ.Automation.Tool.tmpl.BotsAtPlus20.DisplayName,"Количество ботов +20",
+IgorZ.Automation.Tool.tmpl.ChainedBuildings.Description,"Примените этот шаблон к строительным площадкам, которые могут блокировать пути строителей. Примечание: результат не гарантируются, особенно если здания не находятся на одном уровне.",
+IgorZ.Automation.Tool.tmpl.ChainedBuildings.DisplayName,"Не блокировать пути строителей",
+IgorZ.Automation.Tool.tmpl.DroughtCloseFloodgate.Description,"Примените этот шаблон к затворам, которые должны закрываться когда начинается засуха.",
+IgorZ.Automation.Tool.tmpl.DroughtCloseFloodgate.DisplayName,"Закрыть затвор в начале засухи",
+IgorZ.Automation.Tool.tmpl.DroughtOpenFloodgate.Description,"Примените этот шаблон к затворам, которые должны открываться когда начинается засуха.",
+IgorZ.Automation.Tool.tmpl.DroughtOpenFloodgate.DisplayName,"Открыть затвор в начале засухи",
+IgorZ.Automation.Tool.tmpl.DroughtOpenFlowControl.Description,"Примените этот шаблон к регуляторам потока воды (таким как <YellowHighlight>Купол для плохой воды</YellowHighlight> или <YellowHighlight>Шлюз</YellowHighlight>), которые должны быть открыты во время засухи.",
+IgorZ.Automation.Tool.tmpl.DroughtOpenFlowControl.DisplayName,"Разрешить поток воды во время засухи",
+IgorZ.Automation.Tool.tmpl.DroughtPause.Description,"Примените этот шаблон к зданиям, которые должны оставаться в режиме 'остановлено' во время засухи.",
+IgorZ.Automation.Tool.tmpl.DroughtPause.DisplayName,"Остановить во время засухи",
+IgorZ.Automation.Tool.tmpl.DynamiteNow.Description,"Примените этот шаблон к динамиту, чтобы активировать его сразу по завершении установки. Также можно применить к уже установленному.",
+IgorZ.Automation.Tool.tmpl.DynamiteNow.DisplayName,"Активировать динамит",
+IgorZ.Automation.Tool.tmpl.EmitSelectedGood.Description,"Примените этот шаблон к складам, чтобы они установили и обновляли сигнал выбранного запаса. Этот сигнал можно будет использовать в условиях на других зданиях.",
+IgorZ.Automation.Tool.tmpl.EmitSelectedGood.DisplayName,"Сигнал запасов на складе",
 IgorZ.Automation.Tool.tmpl.EmptyAt50pct.DisplayName,"Empty the storage if capacity is above 50%",
 IgorZ.Automation.Tool.tmpl.EmptyAt50pct.DisplayName,"Освобождать если занято болеее 50%",
 IgorZ.Automation.Tool.tmpl.EmptyAt60pct.DisplayName,"Освобождать если занято болеее 60%",
@@ -27,161 +71,117 @@ IgorZ.Automation.Tool.tmpl.EmptyAt70pct.DisplayName,"Освобождать ес
 IgorZ.Automation.Tool.tmpl.EmptyAt80pct.DisplayName,"Освобождать если занято болеее 80%",
 IgorZ.Automation.Tool.tmpl.EmptyAt90pct.DisplayName,"Освобождать если занято болеее 90%",
 IgorZ.Automation.Tool.tmpl.EmptyAtXpct.Description,"Этот шаблон можно применить к зданиям, которые производят один тип товара и не имеют входного склада. Если количество произведенного <i>товара</i> превышает заранее установленный порог, здание перейдет в режим 'освобождения', что позволит быстро вывезти товары.",
-IgorZ.Automation.Tool.tmpl.DroughtPause.DisplayName,"Остановить во время засухи",
-IgorZ.Automation.Tool.tmpl.DroughtPause.Description,"Примените этот шаблон к зданиям, которые должны оставаться в режиме 'остановлено' во время засухи.",
-IgorZ.Automation.Tool.tmpl.BadtidePause.DisplayName,"Остановить в сезон плохой воды",
-IgorZ.Automation.Tool.tmpl.BadtidePause.Description,"Примените этот шаблон к зданиям, которые должны оставаться в режиме 'остановлено' в сезон плохой воды.",
-IgorZ.Automation.Tool.tmpl.TemperatePause.DisplayName,"Остановить в сезон комфортной погоды",
-IgorZ.Automation.Tool.tmpl.TemperatePause.Description,"Примените этот шаблон к зданиям, которые должны оставаться в режиме 'остановлено' в сезон комфортной погоды.",
-IgorZ.Automation.Tool.tmpl.DroughtCloseFloodgate.DisplayName,"Закрыть затвор в начале засухи",
-IgorZ.Automation.Tool.tmpl.DroughtCloseFloodgate.Description,"Примените этот шаблон к затворам, которые должны закрываться когда начинается засуха.",
-IgorZ.Automation.Tool.tmpl.DroughtOpenFloodgate.DisplayName,"Открыть затвор в начале засухи",
-IgorZ.Automation.Tool.tmpl.DroughtOpenFloodgate.Description,"Примените этот шаблон к затворам, которые должны открываться когда начинается засуха.",
-IgorZ.Automation.Tool.tmpl.DroughtOpenFlowControl.DisplayName,"Разрешить поток воды во время засухи",
-IgorZ.Automation.Tool.tmpl.DroughtOpenFlowControl.Description,"Примените этот шаблон к регуляторам потока воды (таким как <YellowHighlight>Купол для плохой воды</YellowHighlight> или <YellowHighlight>Шлюз</YellowHighlight>), которые должны быть открыты во время засухи.",
-IgorZ.Automation.Tool.tmpl.BadtideCloseFloodgate.DisplayName,"Закрыть затвор в сезон плохой воды",
-IgorZ.Automation.Tool.tmpl.BadtideCloseFloodgate.Description,"Примените этот шаблон к затворам, которые должны закрываться когда начинается сезон плохой воды.",
-IgorZ.Automation.Tool.tmpl.BadtideOpenFloodgate.DisplayName,"Открыть затвор в сезон плохой воды",
-IgorZ.Automation.Tool.tmpl.BadtideOpenFloodgate.Description,"Примените этот шаблон к затворам, которые должны открываться когда начинается сезон плохой воды.",
-IgorZ.Automation.Tool.tmpl.TemperateCloseFloodgate.DisplayName,"Закрыть затвор при комфортной погоде",
-IgorZ.Automation.Tool.tmpl.TemperateCloseFloodgate.Description,"Примените этот шаблон к затворам, которые должны закрываться когда начинается сезон комфортной погоды.",
-IgorZ.Automation.Tool.tmpl.TemperateOpenFloodgate.DisplayName,"Открыть затвор при комфортной погоде",
-IgorZ.Automation.Tool.tmpl.TemperateOpenFloodgate.Description,"Примените этот шаблон к затворам, которые должны открываться когда начинается сезон комфортной погоды.",
-IgorZ.Automation.Tool.tmpl.TemperateSemiOpenFloodgate.DisplayName,"Приоткрыть затвор при комфортной погоде",
-IgorZ.Automation.Tool.tmpl.TemperateSemiOpenFloodgate.Description,"Примените этот шаблон к затворам, которые должны приоткрываться на 0.5м во время сезона комфортной погоды.",
-IgorZ.Automation.Tool.tmpl.BotsAtPlus10.DisplayName,"Количество ботов +10",
-IgorZ.Automation.Tool.tmpl.BotsAtPlus10.Description,"Примените этот шаблон к зданиям, которые должны работать до тех пор, пока количество ботов не превысит текущее значение на 10 ботов.",
-IgorZ.Automation.Tool.tmpl.BotsAtPlus20.DisplayName,"Количество ботов +20",
-IgorZ.Automation.Tool.tmpl.BotsAtPlus20.Description,"Примените этот шаблон к зданиям, которые должны работать до тех пор, пока количество ботов не превысит текущее значение на 20 ботов.",
-IgorZ.Automation.Tool.tmpl.BotsAtMinus10.DisplayName,"Количество ботов -10",
-IgorZ.Automation.Tool.tmpl.BotsAtMinus10.Description,"Примените этот шаблон к зданиям, которые должны оставаться в режиме 'остановлено' до тех пор, пока количество ботов не упадет ниже текущего значения на 10 ботов.",
-IgorZ.Automation.Tool.tmpl.BotsAtMinus20.DisplayName,"Количество ботов -20",
-IgorZ.Automation.Tool.tmpl.BotsAtMinus20.Description,"Примените этот шаблон к зданиям, которые должны оставаться в режиме 'остановлено' до тех пор, пока количество ботов не упадет ниже текущего значения на 20 ботов.",
-IgorZ.Automation.Tool.tmpl.BeaversAtMax.DisplayName,"Максимальное количество бобров",
-IgorZ.Automation.Tool.tmpl.BeaversAtMax.Description,"Примените этот шаблон к зданиям, которые должны работать до тех пор пока количество бобров меньше возможного максимума для района.",
-IgorZ.Automation.Tool.tmpl.BeaversAtPlus10.DisplayName,"Количество бобров +10",
-IgorZ.Automation.Tool.tmpl.BeaversAtPlus10.Description,"Примените этот шаблон к зданиям, которые должны работать до тех пор, пока количество бобров не превысит текущее значение на 10 бобров.",
-IgorZ.Automation.Tool.tmpl.BeaversAtPlus20.DisplayName,"Количество бобров +20",
-IgorZ.Automation.Tool.tmpl.BeaversAtPlus20.Description,"Примените этот шаблон к зданиям, которые должны работать до тех пор, пока количество бобров не превысит текущее значение на 20 бобров.",
-IgorZ.Automation.Tool.tmpl.BeaversAtMinus10.DisplayName,"Количество бобров -10",
-IgorZ.Automation.Tool.tmpl.BeaversAtMinus10.Description,"Примените этот шаблон к зданиям, которые должны оставаться в режиме 'остановлено' до тех пор, пока количество бобров не упадет ниже текущего значения на 10 бобров.",
-IgorZ.Automation.Tool.tmpl.BeaversAtMinus20.DisplayName,"Количество бобров -20",
-IgorZ.Automation.Tool.tmpl.BeaversAtMinus20.Description,"Примените этот шаблон к зданиям, которые должны оставаться в режиме 'остановлено' до тех пор, пока количество бобров не упадет ниже текущего значения на 10 бобров.",
-IgorZ.Automation.Tool.tmpl.ChainedBuildings.DisplayName,"Не блокировать пути строителей",
-IgorZ.Automation.Tool.tmpl.ChainedBuildings.Description,"Примените этот шаблон к строительным площадкам, которые могут блокировать пути строителей. Примечание: результат не гарантируются, особенно если здания не находятся на одном уровне.",
-IgorZ.Automation.Tool.tmpl.EmitSelectedGood.DisplayName,"Сигнал запасов на складе",
-IgorZ.Automation.Tool.tmpl.EmitSelectedGood.Description,"Примените этот шаблон к складам, чтобы они установили и обновляли сигнал выбранного запаса. Этот сигнал можно будет использовать в условиях на других зданиях.",
-IgorZ.Automation.Tool.tmpl.StreamGauge.DisplayName,"Сигнал потокового датчика",
-IgorZ.Automation.Tool.tmpl.StreamGauge.Description,"Примените этот шаблон к потоковым датчикам, чтобы они установили и обновляли сигналы качества воды. Эти сигналы можно будет использовать в условиях на других зданиях.",
-IgorZ.Automation.Tool.tmpl.FloodgateGroup.DisplayName,"Создать группу шлюзов",
 IgorZ.Automation.Tool.tmpl.FloodgateGroup.Description,"Примените этот шаблон к шлюзам для одновременного изменения высоты затвора.",
-IgorZ.Automation.Tool.tmpl.PauseConstruction.DisplayName,"Остановить строительство",
+IgorZ.Automation.Tool.tmpl.FloodgateGroup.DisplayName,"Создать группу шлюзов",
 IgorZ.Automation.Tool.tmpl.PauseConstruction.Description,"Примените этот шаблон к строительным площадкам, которые должны быть приостановлены, как только прогресс строительства достигнет 100%.",
-IgorZ.Automation.Tool.tmpl.PrioritizeByHaulers.DisplayName,"Приоритет грузчиков этой постройке",
+IgorZ.Automation.Tool.tmpl.PauseConstruction.DisplayName,"Остановить строительство",
 IgorZ.Automation.Tool.tmpl.PrioritizeByHaulers.Description,"Примените этот шаблон к зданиям, которые должны стать приоритетными для грузчиков после завершения строительства.",
-IgorZ.Automation.CancelTool.Title,"Отменить автоматизацию",
-IgorZ.Automation.CancelTool.Description,"Используйте этот инструмент, чтобы отменить автоматизацию для зданий и строительных площадок.",
-IgorZ.Automation.PauseTool.Title,"Остановить здания",
-IgorZ.Automation.PauseTool.Description,"Используйте этот инструмент, чтобы остановить здания и строительные площадки.",
-IgorZ.Automation.ResumeTool.Title,"Возобновить здания",
-IgorZ.Automation.ResumeTool.Description,"Используйте этот инструмент, чтобы возобновить здания и строительные площадки.",
-IgorZ.Automation.CheckAccessBlockCondition.Blocking.Description,"<YellowHighlight>блокирует путь</YellowHighlight>",
-IgorZ.Automation.CheckAccessBlockCondition.NotBlocking.Description,"<YellowHighlight>не блокирует путь</YellowHighlight>",
-IgorZ.Automation.CheckAccessBlockCondition.NotYetReachable,"Строители не могут добраться до этого места, но дорога строится",
-IgorZ.Automation.CheckAccessBlockCondition.UnreachableStatus,"Строители не могут добраться до этого места. Возможно, ничего не получится построить",
-IgorZ.Automation.CheckAccessBlockCondition.UnreachableAlert,"Строительный участок недоступен",
-IgorZ.Automation.ShowStatusAction.HoldConstruction,"<YellowHighlight>приостановить строительство</YellowHighlight>",
-IgorZ.Automation.ShowStatusAction.ResumeConstruction,"<YellowHighlight>завершить строительство</YellowHighlight>",
-IgorZ.Automation.ShowStatusAction.HoldCompletionStatusText,"Ожидание завершения строительства других зданий",
-IgorZ.Automation.ShowStatusAction.AutomationErrorAlert,"Ошибка автоматизации",
-IgorZ.Automation.ShowStatusAction.AutomationErrorDescription,"Некоторые правила автоматизации не могут быть исполнены",
+IgorZ.Automation.Tool.tmpl.PrioritizeByHaulers.DisplayName,"Приоритет грузчиков этой постройке",
+IgorZ.Automation.Tool.tmpl.StreamGauge.Description,"Примените этот шаблон к потоковым датчикам, чтобы они установили и обновляли сигналы качества воды. Эти сигналы можно будет использовать в условиях на других зданиях.",
+IgorZ.Automation.Tool.tmpl.StreamGauge.DisplayName,"Сигнал потокового датчика",
+IgorZ.Automation.Tool.tmpl.TemperateCloseFloodgate.Description,"Примените этот шаблон к затворам, которые должны закрываться когда начинается сезон комфортной погоды.",
+IgorZ.Automation.Tool.tmpl.TemperateCloseFloodgate.DisplayName,"Закрыть затвор при комфортной погоде",
+IgorZ.Automation.Tool.tmpl.TemperateOpenFloodgate.Description,"Примените этот шаблон к затворам, которые должны открываться когда начинается сезон комфортной погоды.",
+IgorZ.Automation.Tool.tmpl.TemperateOpenFloodgate.DisplayName,"Открыть затвор при комфортной погоде",
+IgorZ.Automation.Tool.tmpl.TemperatePause.Description,"Примените этот шаблон к зданиям, которые должны оставаться в режиме 'остановлено' в сезон комфортной погоды.",
+IgorZ.Automation.Tool.tmpl.TemperatePause.DisplayName,"Остановить в сезон комфортной погоды",
+IgorZ.Automation.Tool.tmpl.TemperateSemiOpenFloodgate.Description,"Примените этот шаблон к затворам, которые должны приоткрываться на 0.5м во время сезона комфортной погоды.",
+IgorZ.Automation.Tool.tmpl.TemperateSemiOpenFloodgate.DisplayName,"Приоткрыть затвор при комфортной погоде",
+IgorZ.Automation.Tool.tmpl.XLevelsDynamite.Description,"Этот шаблон можно применить к динамитам, как к завершенным, так и к строящимся. После завершения динамит взорвется автоматически, и на его месте будет размещен новый чертеж динамита.",
+IgorZ.Automation.ToolGroup.Main.DisplayName,"Настроить автоматизацию",
+IgorZ.Automation.ToolGroup.Population.DisplayName,"Правила, зависящие от населения",
+IgorZ.Automation.ToolGroup.Power.DisplayName,"Правила, зависящие от потребления энергии",
+IgorZ.Automation.ToolGroup.Signals.DisplayName,"Правила, зависящие от сигналов",
+IgorZ.Automation.ToolGroup.Storage.DisplayName,"Правила, зависящие от склада",
+IgorZ.Automation.ToolGroup.Terrain.DisplayName,"Изменение ландшафта",
+IgorZ.Automation.ToolGroup.Water.DisplayName,"Правила, зависящие от погоды",
 =,=,"UI fragment strings"
-IgorZ.Automation.AutomationFragment.RulesAreaCaptionTextLocKey,"Правила автоматизации:",
+IgorZ.Automation.AutomationFragment.AddRulesBtn,"Добавить правила автоматизации",
+IgorZ.Automation.AutomationFragment.CopyRulesBtn,"Копировать правила",
+IgorZ.Automation.AutomationFragment.EditRulesBtn,"Редактировать",
 IgorZ.Automation.AutomationFragment.RuleTextLocKey,"Если {0}
 Тогда {1}",
-IgorZ.Automation.AutomationFragment.AddRulesBtn,"Добавить правила автоматизации",
-IgorZ.Automation.AutomationFragment.EditRulesBtn,"Редактировать",
-IgorZ.Automation.AutomationFragment.CopyRulesBtn,"Копировать правила",
-IgorZ.Automation.Tool.CopyRules.Title,"Копировать правила автоматизации",
+IgorZ.Automation.AutomationFragment.RulesAreaCaptionTextLocKey,"Правила автоматизации:",
 IgorZ.Automation.Tool.CopyRules.Text,"Копировать правила: {0}",
+IgorZ.Automation.Tool.CopyRules.Title,"Копировать правила автоматизации",
 =,=,"Scriptable components strings"
-IgorZ.Automation.Scripting.Expressions.AndOperator," и ","String to join components of the expression with condition AND. Used to represent the condition in the panel"
-IgorZ.Automation.Scripting.Expressions.OrOperator," или ","String to join components of the expression with condition OR. Used to represent the condition in the panel"
-IgorZ.Automation.Scripting.Expressions.ParseError,"ОШИБКА ОБРАБОТКИ","String to show when the scriptable condition or action cannot be parsed"
-IgorZ.Automation.Scripting.Expressions.RuntimeError,"ОШИБКА ИСПОЛНЕНИЯ","String to show when the scriptable condition or action cannot be executed"
+IgorZ.Automation.Scriptable.Constructable.Signal.Progress,"прогресс строительства","Name of the condition for the construction progress checking"
 IgorZ.Automation.Scriptable.Constructable.Signal.State,"состояние строительства","Name of the condition for the construction state checking"
 IgorZ.Automation.Scriptable.Constructable.Signal.State.Finished,"Завершено","State name for when the building construction is complete"
-IgorZ.Automation.Scriptable.Constructable.Signal.Progress,"прогресс строительства","Name of the condition for the construction progress checking"
-IgorZ.Automation.Scriptable.Debug.Action.LogStr,"записать в журнал строку: {0}","Name of the action that write to the log an arbitrary string"
 IgorZ.Automation.Scriptable.Debug.Action.LogNum,"записать в журнал число: {0}","Name of the action that write to the log an arbitrary number or a result of computation"
+IgorZ.Automation.Scriptable.Debug.Action.LogStr,"записать в журнал строку: {0}","Name of the action that write to the log an arbitrary string"
 IgorZ.Automation.Scriptable.District.Signal.Beavers,"бобров в районе","Name of the condition for the current beaver population checking"
 IgorZ.Automation.Scriptable.District.Signal.Bots,"ботов в районе","Name of the condition for the current bot population checking"
 IgorZ.Automation.Scriptable.District.Signal.NumberOfBeds,"постелей в районе","Name of the condition for the current number of beds checking"
 IgorZ.Automation.Scriptable.Dynamite.Action.Detonate,"активировать динамит","Name of the action that immediately detonates the dynamite"
 IgorZ.Automation.Scriptable.Dynamite.Action.DetonateAndRepeat,"активировать динамит и повторить ещё <GreenHighlight>{0} раза</GreenHighlight>","Name of the action that detonates the dynamite and places new dynamites the specified number of times"
-IgorZ.Automation.Scriptable.Floodgate.Signal.Height,"высота затвора","Name of the condition for the floodgate height checking"
 IgorZ.Automation.Scriptable.Floodgate.Action.SetHeight,"выставить высоту затвора в {0}","Change the floodgate height to the specified value"
-IgorZ.Automation.Scriptable.FlowControl.Action.Open,"разрешить поток","Name of the action that opens the water flow through the building"
+IgorZ.Automation.Scriptable.Floodgate.Signal.Height,"высота затвора","Name of the condition for the floodgate height checking"
 IgorZ.Automation.Scriptable.FlowControl.Action.Close,"запретить поток","Name of the action that closes the water flow through the building"
-IgorZ.Automation.Scriptable.Inventory.Signal.InputGood,"вход: {0}","Name of the condition for the inventory input goods"
-IgorZ.Automation.Scriptable.Inventory.Signal.OutputGood,"выход: {0}","Name of the condition for the inventory output goods"
+IgorZ.Automation.Scriptable.FlowControl.Action.Open,"разрешить поток","Name of the action that opens the water flow through the building"
+IgorZ.Automation.Scriptable.Inventory.Action.EmptyingStatus,"Склад освобождается в приоритетном порядке.",
 IgorZ.Automation.Scriptable.Inventory.Action.StartEmptyingStock,"начать освобождать","Name of the action that starts emptying the storage"
 IgorZ.Automation.Scriptable.Inventory.Action.StopEmptyingStock,"прекратить освобождать","Name of the action that stops emptying the storage"
-IgorZ.Automation.Scriptable.Inventory.Action.EmptyingStatus,"Склад освобождается в приоритетном порядке.",
+IgorZ.Automation.Scriptable.Inventory.Signal.InputGood,"вход: {0}","Name of the condition for the inventory input goods"
+IgorZ.Automation.Scriptable.Inventory.Signal.OutputGood,"выход: {0}","Name of the condition for the inventory output goods"
 IgorZ.Automation.Scriptable.Pausable.Action.Pause,"остановить здание","Name of the action that pauses the building"
 IgorZ.Automation.Scriptable.Pausable.Action.Resume,"запустить здание","Name of the action that unpauses the building"
-IgorZ.Automation.Scriptable.Prioritizable.Action.SetHaulers,"+ приоритет грузчиков","Name of the action that sets the priority to the haulers"
 IgorZ.Automation.Scriptable.Prioritizable.Action.ResetHaulers,"- приоритет грузчиков","Name of the action that resets the priority to the haulers"
+IgorZ.Automation.Scriptable.Prioritizable.Action.SetHaulers,"+ приоритет грузчиков","Name of the action that sets the priority to the haulers"
 IgorZ.Automation.Scriptable.Signals.Action.Set,"сигнал: {0} = {1}","Name of the action that sets the signal to the specified value"
 IgorZ.Automation.Scriptable.Signals.Signal.Get,"сигнал: {0}","Name of the condition for the signal checking"
-IgorZ.Automation.Scriptable.StreamGauge.Signal.Depth,"глубина","Name of the condition for the current water level checking"
 IgorZ.Automation.Scriptable.StreamGauge.Signal.Contamination,"заражение","Name of the condition for the current water contamination level checking"
 IgorZ.Automation.Scriptable.StreamGauge.Signal.Current,"течение","Name of the condition for the current water current checking"
+IgorZ.Automation.Scriptable.StreamGauge.Signal.Depth,"глубина","Name of the condition for the current water level checking"
 IgorZ.Automation.Scriptable.Weather.Signal.Season,"сезон","Name of the condition for the current season checking"
 IgorZ.Automation.Scriptable.Workplace.Action.RemoveWorkers,"снять работников","Name of the action that removes all workers from the workshop"
 IgorZ.Automation.Scriptable.Workplace.Action.SetWorkers,"назначить {0} работников","Name of the action that sets the number of workers in the workshop"
+IgorZ.Automation.Scripting.Expressions.AndOperator," и ","String to join components of the expression with condition AND. Used to represent the condition in the panel"
+IgorZ.Automation.Scripting.Expressions.OrOperator," или ","String to join components of the expression with condition OR. Used to represent the condition in the panel"
+IgorZ.Automation.Scripting.Expressions.ParseError,"ОШИБКА ОБРАБОТКИ","String to show when the scriptable condition or action cannot be parsed"
+IgorZ.Automation.Scripting.Expressions.RuntimeError,"ОШИБКА ИСПОЛНЕНИЯ","String to show when the scriptable condition or action cannot be executed"
 =,=,"Rules editor strings"
-IgorZ.Automation.Scripting.Editor.DialogHeader,"Правила автоматизации",
-IgorZ.Automation.Scripting.Editor.ReadMoreLink,"https://github.com/ihsoft/TimberbornMods/wiki/Automation-(scripting)-ru-RU","Link to the localized wiki page about scripting"
-IgorZ.Automation.Scripting.Editor.PendingEditsNotification,"Некоторые правила в режиме редактирования. Сначала завершите их.",
-IgorZ.Automation.Scripting.Editor.RulesWithErrorsNotification,"В некоторых правилах есть ошибки. Исправьте их перед сохранением.",
-IgorZ.Automation.Scripting.Editor.UnsavedChangesConfirmation,"Есть несохраненные изменения. Вы хотите их отменить?",
+IgorZ.Automation.Scripting.Editor.ActionLabel,"Тогда",
+IgorZ.Automation.Scripting.Editor.ActionMustBeAction,"Действие должно быть оператором 'act'","A message to show when the action is not an action"
 IgorZ.Automation.Scripting.Editor.AddRuleFromScriptBtn,"Добавить скрипт",
 IgorZ.Automation.Scripting.Editor.AddRuleViaConstructorBtn,"Создать правило через конструктор",
-IgorZ.Automation.Scripting.Editor.TemplateFamilyLabel,"Группа шаблонов: {0}","Name of the template group (family) the rule belongs to"
-IgorZ.Automation.Scripting.Editor.DeletedRule,"Правило удалено","A message to show over the deleted rule"
-IgorZ.Automation.Scripting.Editor.ResetChangesBtn,"Сбросить изменения",
-IgorZ.Automation.Scripting.Editor.EditAsScriptBtn,"Скрипт",
-IgorZ.Automation.Scripting.Editor.EditInConstructorBtn,"Конструктор",
-IgorZ.Automation.Scripting.Editor.TestScriptBtn,"Проверить",
-IgorZ.Automation.Scripting.Editor.SaveScriptBtn,"Сохранить",
-IgorZ.Automation.Scripting.Editor.DiscardScriptBtn,"Отменить",
-IgorZ.Automation.Scripting.Editor.ConditionLabel,"Если",
-IgorZ.Automation.Scripting.Editor.ActionLabel,"Тогда",
 IgorZ.Automation.Scripting.Editor.ArgumentMaxValueHint,"(макс: {0})","A hint to show the maximum value of the argument"
+IgorZ.Automation.Scripting.Editor.ConditionLabel,"Если",
 IgorZ.Automation.Scripting.Editor.ConditionMustBeBoolean,"Условие должно быть логическим выражением","A message to show when the condition is not a boolean expression"
 IgorZ.Automation.Scripting.Editor.ConditionMustHaveSignals,"Условие должно включать хотя бы один сигнал","A message to show when the condition does not have any signals"
-IgorZ.Automation.Scripting.Editor.ActionMustBeAction,"Действие должно быть оператором 'act'","A message to show when the action is not an action"
-IgorZ.Automation.Scripting.Editor.SaveRulesBtn,"Сохранить и закрыть",
+IgorZ.Automation.Scripting.Editor.DeletedRule,"Правило удалено","A message to show over the deleted rule"
+IgorZ.Automation.Scripting.Editor.DialogHeader,"Правила автоматизации",
 IgorZ.Automation.Scripting.Editor.DiscardChangesBtn,"Отменить изменения",
+IgorZ.Automation.Scripting.Editor.DiscardScriptBtn,"Отменить",
+IgorZ.Automation.Scripting.Editor.EditAsScriptBtn,"Скрипт",
+IgorZ.Automation.Scripting.Editor.EditInConstructorBtn,"Конструктор",
 IgorZ.Automation.Scripting.Editor.MoreInfoBtn,"Читать о скриптах"
-IgorZ.Automation.Scripting.Editor.StringConstantType,"строка","Name of the string constant type"
 IgorZ.Automation.Scripting.Editor.NumberConstantType,"число","Name of the number constant type"
+IgorZ.Automation.Scripting.Editor.PendingEditsNotification,"Некоторые правила в режиме редактирования. Сначала завершите их.",
+IgorZ.Automation.Scripting.Editor.ReadMoreLink,"https://github.com/ihsoft/TimberbornMods/wiki/Automation-(scripting)-ru-RU","Link to the localized wiki page about scripting"
+IgorZ.Automation.Scripting.Editor.ResetChangesBtn,"Сбросить изменения",
+IgorZ.Automation.Scripting.Editor.RulesWithErrorsNotification,"В некоторых правилах есть ошибки. Исправьте их перед сохранением.",
+IgorZ.Automation.Scripting.Editor.SaveRulesBtn,"Сохранить и закрыть",
+IgorZ.Automation.Scripting.Editor.SaveScriptBtn,"Сохранить",
+IgorZ.Automation.Scripting.Editor.StringConstantType,"строка","Name of the string constant type"
+IgorZ.Automation.Scripting.Editor.TemplateFamilyLabel,"Группа шаблонов: {0}","Name of the template group (family) the rule belongs to"
+IgorZ.Automation.Scripting.Editor.TestScriptBtn,"Проверить",
+IgorZ.Automation.Scripting.Editor.UnsavedChangesConfirmation,"Есть несохраненные изменения. Вы хотите их отменить?",
 =,=,"Mod settings"
 IgorZ.Automation.Settings.Debug.PathCheckingProfiling,"Печатать статистику движка поиска путей",
 IgorZ.Automation.Settings.EntityPanel.Header,"Элементы управления на панели здания",
-IgorZ.Automation.Settings.EntityPanel.AlwaysShowAddRulesButton,"Всегда отбражать кнопку 'Добавить правила'",
+IgorZ.Automation.Settings.EntityPanel.AlwaysShowAddRulesButton,"Всегда отображать кнопку 'Добавить правила'",
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle,"Стиль описания правил",
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.HumanReadable,"Текст","Human readable style of the rule description."
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.Script,"Скрипт","Script style of the rule description."
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.ScriptShort,"Псевдо-скрипт","Shortened script style of the rule description."
 =,=,"TimberDev_Utils"
-TimberDev_Utils.Tools.LockSelectTool.SelectingObject,"Выделено: {0}","Text to show the type of the selected building. It's shown when the selection tool is locked on the specific buildings."
-TimberDev_Utils.Tools.LockSelectTool.SelectingNObjects,"Выделено: {0} (x{1})","The plural form of TimberDev_Utils.Tools.LockSelectTool.SelectingObject"
-TimberDev_Utils.Tools.LockSelectTool.StartSelectingPrompt,"Наведите курсор на объект и нажмите <i>ЛКМ</i> чтобы начать выделение.",
-TimberDev_Utils.Tools.LockSelectTool.StartObjectSelectingPrompt,"Выделять здания типа: {0}",
-TimberDev_Utils.Tools.LockSelectTool.DescriptionHint,"Удерживайте <i>SHIFT</i> чтобы выделять здания только одного типа.",
-TimberDev_Utils.Settings.DebugSection,"Отладка и устранение неполадок",
 TimberDev_Utils.Settings.Debug.VerboseLogging,"Детальные журналы",
 TimberDev_Utils.Settings.Debug.VerboseLoggingTooltip,"В журналы игры будет записываться больше полезной информации,
 но это может повлиять на производительность игры."
+TimberDev_Utils.Settings.DebugSection,"Отладка и устранение неполадок",
+TimberDev_Utils.Tools.LockSelectTool.DescriptionHint,"Удерживайте <i>SHIFT</i>, чтобы выделять здания только одного типа.",
+TimberDev_Utils.Tools.LockSelectTool.SelectingNObjects,"Выделено: {0} (x{1})","The plural form of TimberDev_Utils.Tools.LockSelectTool.SelectingObject"
+TimberDev_Utils.Tools.LockSelectTool.SelectingObject,"Выделено: {0}","Text to show the type of the selected building. It's shown when the selection tool is locked on the specific buildings."
+TimberDev_Utils.Tools.LockSelectTool.StartObjectSelectingPrompt,"Выделять здания типа: {0}",
+TimberDev_Utils.Tools.LockSelectTool.StartSelectingPrompt,"Наведите курсор на объект и нажмите <i>ЛКМ</i>, чтобы начать выделение.",
