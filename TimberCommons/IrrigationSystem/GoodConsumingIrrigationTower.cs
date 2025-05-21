@@ -8,14 +8,15 @@ using IgorZ.TimberCommons.Common;
 using Timberborn.Buildings;
 using Timberborn.GoodConsumingBuildingSystem;
 using Timberborn.Localization;
+using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.TimberCommons.IrrigationSystem;
 
 /// <summary>Irrigation tower that runs on top of <see cref="GoodConsumingBuilding"/>.</summary>
 /// <remarks>
 /// <p>
-/// The building is responsible for dealing with the goods (e.g. water). The tower will keep tiles in range irrigated as
-/// long as the building is consuming fuel (i.e. it's active).
+/// The building is responsible for dealing with the goods (for example, water). The tower will keep tiles in range
+/// irrigated as long as the building is consuming fuel (in other words, it is active).
 /// </p>
 /// <p>
 /// If building has components, implementing <see cref="IRangeEffect"/>, then they will be applied once the irrigation
@@ -30,7 +31,7 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
 
   /// <inheritdoc/>
   public string GetRate() {
-    var goodPerHour = _goodConsumingBuilding.GoodPerHour * 24;
+    var goodPerHour = _goodConsumingBuildingSpec.GoodPerHour * 24;
     return goodPerHour.ToString("0.#");
   }
   
@@ -60,7 +61,7 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
 
   /// <inheritdoc/>
   protected override void UpdateConsumptionRate() {
-    _goodConsumingBuilding._goodConsumingBuildingSpec._goodPerHour = _prefabGoodPerHour * Coverage;
+    _goodConsumingBuildingSpec._goodPerHour = _prefabGoodPerHour * Coverage;
     if (Coverage > 0) {
       _goodConsumingToggle.ResumeConsumption();
     } else {
@@ -87,6 +88,7 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
   #region Implementation
 
   ILoc _loc;
+  GoodConsumingBuildingSpec _goodConsumingBuildingSpec;
   GoodConsumingBuilding _goodConsumingBuilding;
   GoodConsumingToggle _goodConsumingToggle;
   readonly List<IBuildingEfficiencyProvider> _efficiencyProviders = new();
@@ -102,11 +104,17 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
   /// <inheritdoc/>
   protected override void Awake() {
     base.Awake();
-    _goodConsumingBuilding = GetComponentFast<GoodConsumingBuilding>();
-    _prefabGoodPerHour = _goodConsumingBuilding.GoodPerHour;
+    _goodConsumingBuildingSpec = GetComponentFast<GoodConsumingBuildingSpec>();
+    _prefabGoodPerHour = _goodConsumingBuildingSpec.GoodPerHour;
     GetComponentsFast(_efficiencyProviders);
     GetComponentsFast(_rangeEffects);
+  }
+
+  /// <inheritdoc/>
+  public override void StartTickable() {
+    _goodConsumingBuilding = GetComponentFast<GoodConsumingBuilding>();
     _goodConsumingToggle = _goodConsumingBuilding.GetGoodConsumingToggle();
+    base.StartTickable();
   }
 
   #endregion
