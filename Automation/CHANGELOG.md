@@ -1,4 +1,5 @@
 # v2.1.2 (pre-release):
+* [Change] Don't select the text when switching to the script input field.
 * [Fix] Chained building tool doesn't show the blocked completion icon.
 
 # v2.1.1 (16 May 2025):
