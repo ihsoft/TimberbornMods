@@ -151,11 +151,11 @@ public sealed class ModifyGrowableGrowthRangeEffect : BaseComponent, IRangeEffec
     _requiredPrefabNames = _prefabNamesFilter.ToHashSet();
   }
 
-  /// <summary>Adds the rate modifier at the tile, given there is an eligible growable.</summary>
+  /// <summary>Adds the rate modifier at the tile, given there is eligible growable.</summary>
   /// <returns>The exact coordinates of the growable or <c>null</c> if there is none.</returns>
   Vector3Int? AddModifierToTile(Vector3Int coords) {
     var modifier = _blockService.GetBottomObjectComponentAt<GrowthRateModifier>(coords);
-    if (modifier == null || !modifier.IsLiveAndGrowing) {
+    if (!modifier || !modifier.IsLiveAndGrowing) {
       return null;
     }
     if (_requiredPrefabNames.Count > 0
