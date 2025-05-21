@@ -1,4 +1,5 @@
 # v2.1.2 (pre-release):
+* [Feature] Highlight the conditions that are being evaluated to "true" with green color.
 * [Change] Don't select the text when switching to the script input field.
 * [Fix] Chained building tool doesn't show the blocked completion icon.
 

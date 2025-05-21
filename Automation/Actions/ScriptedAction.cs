@@ -28,7 +28,8 @@ sealed class ScriptedAction : AutomationActionBase {
   /// <inheritdoc/>
   public override string UiDescription =>
       _parsedExpression != null
-      ? DependencyContainer.GetInstance<ExpressionParser>().GetDescription(_parsedExpression)
+      ? CommonFormats.HighlightYellow(
+          DependencyContainer.GetInstance<ExpressionParser>().GetDescription(_parsedExpression))
       : CommonFormats.HighlightRed(
           Behavior.Loc.T(_parsingResult.ParsedExpression == null ? ParseErrorLocKey : RuntimeErrorLocKey));
 

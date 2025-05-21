@@ -318,7 +318,12 @@ sealed class RuleRow {
     if (expression == null) {
       return CommonFormats.HighlightRed(_uiFactory.T(ParseErrorLocKey));
     }
-    return CommonFormats.HighlightYellow(_expressionParser.GetDescription(expression, logErrors: true));
+    var description = _expressionParser.GetDescription(expression, logErrors: true);
+    var isGreen = false;
+    if (expression is BoolOperator boolOperator) {
+      isGreen = boolOperator.Execute();
+    }
+    return isGreen ? CommonFormats.HighlightGreen(description) : CommonFormats.HighlightYellow(description);
   }
 
   void MarkDeleted() {

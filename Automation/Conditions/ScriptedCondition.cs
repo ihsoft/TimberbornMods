@@ -28,11 +28,16 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   bool _canRunOnUnfinishedBuildings;
 
   /// <inheritdoc/>
-  public override string UiDescription =>
-      _parsedExpression != null
-      ? DependencyContainer.GetInstance<ExpressionParser>().GetDescription(_parsedExpression)
-      : CommonFormats.HighlightRed(
-          Behavior.Loc.T(_parsingResult.ParsedExpression == null ? ParseErrorLocKey : RuntimeErrorLocKey));
+  public override string UiDescription {
+    get {
+      if (_parsedExpression == null) {
+        var errorLocKey = _parsingResult.ParsedExpression == null ? ParseErrorLocKey : RuntimeErrorLocKey;
+        return CommonFormats.HighlightRed(Behavior.Loc.T(errorLocKey));
+      }
+      var description = DependencyContainer.GetInstance<ExpressionParser>().GetDescription(_parsedExpression);
+      return ConditionState ? CommonFormats.HighlightGreen(description) : CommonFormats.HighlightYellow(description);
+    }
+  }
 
   /// <inheritdoc/>
   public override void SyncState() {

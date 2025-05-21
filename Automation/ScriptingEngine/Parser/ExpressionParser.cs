@@ -40,7 +40,7 @@ sealed class ExpressionParser {
   /// <summary>Gets a human-readable description for the parsed expression.</summary>
   public string GetDescription(IExpression expression, bool logErrors = false) {
     try {
-      return CommonFormats.HighlightYellow(expression.Describe());
+      return expression.Describe();
     } catch (ScriptError e) {
       if (logErrors) {
         DebugEx.Error("Failed to get description from: {0}\n{1}", expression, e);
