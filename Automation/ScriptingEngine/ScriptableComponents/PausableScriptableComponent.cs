@@ -65,7 +65,6 @@ sealed class PausableScriptableComponent : ScriptableComponentBase {
   };
   ActionDef _resumeActionDef;
 
-
   static void PauseAction(PausableBuilding building) {
     if (!building.Paused) {
       building.Pause();
