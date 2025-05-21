@@ -35,8 +35,8 @@ class FlowControlScriptableComponent : ScriptableComponentBase {
   public override Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
     var component = FlowControlAccessor.Get(behavior);
     return name switch {
-        OpenActionName => _ => component.Open(),
-        CloseActionName => _ => component.Close(),
+        OpenActionName => _ => OpenAction(component),
+        CloseActionName => _ => CloseAction(component),
         _ => throw new UnknownActionException(name),
     };
   }
@@ -68,6 +68,18 @@ class FlowControlScriptableComponent : ScriptableComponentBase {
   };
   ActionDef _closeActionDef;
 
+  static void OpenAction(FlowControlAccessor component) {
+    if (!component.IsOpen) {
+      component.Open();
+    }
+  }
+
+  static void CloseAction(FlowControlAccessor component) {
+    if (component.IsOpen) {
+      component.Close();
+    }
+  }
+
   #endregion
 
   #region Implementation
@@ -83,6 +95,8 @@ class FlowControlScriptableComponent : ScriptableComponentBase {
       }
       return null;
     }
+
+    public bool IsOpen => _waterSource?.IsOpen ?? _sluice?.IsOpen ?? false;
 
     public void Open() {
       if (_sluice) {

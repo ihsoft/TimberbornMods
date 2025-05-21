@@ -34,8 +34,8 @@ sealed class PrioritizableScriptableComponent : ScriptableComponentBase {
       throw new ScriptError.BadStateError(behavior, "Building is not prioritizable");
     }
     return name switch {
-        SetHaulersActionName => _ => haulPrioritizable.Prioritized = true,
-        ResetHaulersActionName => _ => haulPrioritizable.Prioritized = false,
+        SetHaulersActionName => _ => SetHaulersAction(haulPrioritizable),
+        ResetHaulersActionName => _ => ResetHaulersAction(haulPrioritizable),
         _ => base.GetActionExecutor(name, behavior),
     };
   }
@@ -66,6 +66,14 @@ sealed class PrioritizableScriptableComponent : ScriptableComponentBase {
       Arguments = [],
   };
   ActionDef _resetHaulersActionDef;
+
+  static void SetHaulersAction(HaulPrioritizable prioritizable) {
+    prioritizable.Prioritized = true;
+  }
+
+  static void ResetHaulersAction(HaulPrioritizable prioritizable) {
+    prioritizable.Prioritized = false;
+  }
 
   #endregion
 }

@@ -41,18 +41,9 @@ class DistrictScriptableComponent : ScriptableComponentBase {
       throw new ScriptError.BadStateError(behavior, "Not a district building");
     }
     return name switch {
-        BeaverPopulationSignalName => () =>
-            ScriptValue.FromInt(districtBuilding.District?.DistrictPopulation.Beavers.Count ?? 0),
-        BotPopulationSignalName => () =>
-            ScriptValue.FromInt(districtBuilding.District?.DistrictPopulation.NumberOfBots ?? 0),
-        NumberOfBedsSignalName => () => {
-          if (!districtBuilding.District) {
-            return ScriptValue.FromInt(0);
-          }
-          var statistics =
-              districtBuilding.District.GetComponentFast<DistrictDwellingStatisticsProvider>().GetDwellingStatistics();
-          return ScriptValue.FromInt(statistics.FreeBeds + statistics.OccupiedBeds);
-        },
+        BeaverPopulationSignalName => () => BeaverPopulationSignal(districtBuilding),
+        BotPopulationSignalName => () => BotPopulationSignal(districtBuilding),
+        NumberOfBedsSignalName => () => NumberOfBedsSignal(districtBuilding),
         _ => throw new UnknownSignalException(name),
     };
   }
@@ -118,6 +109,23 @@ class DistrictScriptableComponent : ScriptableComponentBase {
       },
   };
   SignalDef _numberOfBedsSignalDef;
+
+  static ScriptValue BeaverPopulationSignal(DistrictBuilding districtBuilding) {
+    return ScriptValue.FromInt(districtBuilding.District?.DistrictPopulation.Beavers.Count ?? 0);
+  }
+
+  static ScriptValue BotPopulationSignal(DistrictBuilding districtBuilding) {
+    return ScriptValue.FromInt(districtBuilding.District?.DistrictPopulation.Bots.Count ?? 0);
+  }
+
+  static ScriptValue NumberOfBedsSignal(DistrictBuilding districtBuilding) {
+    if (!districtBuilding.District) {
+      return ScriptValue.FromInt(0);
+    }
+    var statistics =
+        districtBuilding.District.GetComponentFast<DistrictDwellingStatisticsProvider>().GetDwellingStatistics();
+    return ScriptValue.FromInt(statistics.FreeBeds + statistics.OccupiedBeds);
+  }
 
   #endregion
 

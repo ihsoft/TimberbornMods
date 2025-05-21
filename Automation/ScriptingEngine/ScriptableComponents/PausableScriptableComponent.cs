@@ -32,8 +32,8 @@ sealed class PausableScriptableComponent : ScriptableComponentBase {
   public override Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
     var pausableBuilding = GetPausableBuilding(behavior);
     return name switch {
-        PauseActionName => _ => pausableBuilding.Pause(),
-        ResumeActionName => _ => pausableBuilding.Resume(),
+        PauseActionName => _ => PauseAction(pausableBuilding),
+        ResumeActionName => _ => ResumeAction(pausableBuilding),
         _ => throw new UnknownActionException(name),
     };
   }
@@ -64,6 +64,19 @@ sealed class PausableScriptableComponent : ScriptableComponentBase {
       Arguments = [],
   };
   ActionDef _resumeActionDef;
+
+
+  static void PauseAction(PausableBuilding building) {
+    if (!building.Paused) {
+      building.Pause();
+    }
+  }
+
+  static void ResumeAction(PausableBuilding building) {
+    if (building.Paused) {
+      building.Resume();
+    }
+  }
 
   #endregion
 

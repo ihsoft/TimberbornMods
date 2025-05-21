@@ -61,7 +61,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   public override Func<ScriptValue> GetSignalSource(string name, AutomationBehavior behavior) {
     var parsed = ParseSignalName(name, behavior);
     var inventory = GetInventory(behavior);
-    return () => ScriptValue.FromInt(inventory.AmountInStock(parsed.goodId));
+    return () => GoodAmountSignal(parsed.goodId, inventory);
   }
 
   /// <inheritdoc/>
@@ -96,8 +96,8 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
       throw new ScriptError.BadStateError(behavior, "Building is not emptiable");
     }
     return name switch {
-        StartEmptyingStockActionName => _ => emptiable.MarkForEmptyingWithoutStatus(),
-        StopEmptyingStockActionName => _ => emptiable.UnmarkForEmptying(),
+        StartEmptyingStockActionName => _ => StartEmptyingStockAction(emptiable),
+        StopEmptyingStockActionName => _ => StopEmptyingStockAction(emptiable),
         _ => throw new UnknownActionException(name),
     };
   }
@@ -154,6 +154,10 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     };
   }
 
+  static ScriptValue GoodAmountSignal(string goodId, Inventory inventory) {
+    return ScriptValue.FromInt(inventory.AmountInStock(goodId));
+  }
+
   #endregion
 
   #region Actions
@@ -171,6 +175,18 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
       Arguments = [],
   };
   ActionDef _stopEmptyingStockActionDef;
+
+  static void StartEmptyingStockAction(Emptiable emptiable) {
+    if (!emptiable.IsMarkedForEmptying) {
+      emptiable.MarkForEmptyingWithoutStatus();
+    }
+  }
+
+  static void StopEmptyingStockAction(Emptiable emptiable) {
+    if (emptiable.IsMarkedForEmptying) {
+      emptiable.UnmarkForEmptying();
+    }
+  }
 
   #endregion
 

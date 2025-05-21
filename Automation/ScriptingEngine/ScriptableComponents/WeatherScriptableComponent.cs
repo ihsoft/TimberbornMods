@@ -33,7 +33,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   /// <inheritdoc/>
   public override Func<ScriptValue> GetSignalSource(string name, AutomationBehavior _) {
     return name switch {
-        SeasonSignalName => () => ScriptValue.Of(_currentSeason),
+        SeasonSignalName => SeasonSignal,
         _ => throw new UnknownSignalException(name),
     };
   }
@@ -84,6 +84,10 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
       },
   };
   SignalDef _seasonSignalDef;
+
+  ScriptValue SeasonSignal() {
+    return ScriptValue.Of(_currentSeason);
+  }
 
   #endregion
 

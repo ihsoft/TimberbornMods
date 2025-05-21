@@ -34,10 +34,8 @@ sealed class ConstructableScriptableComponent : ScriptableComponentBase {
   /// <inheritdoc/>
   public override Func<ScriptValue> GetSignalSource(string name, AutomationBehavior behavior) {
     return name switch {
-        StateSignalName => () =>
-            ScriptValue.Of(behavior.GetComponentFast<BlockObject>().IsFinished ? "finished" : ""),
-        ProgressSignalName => () =>
-            ScriptValue.FromFloat(behavior.GetComponentFast<ConstructionSite>().BuildTimeProgress),
+        StateSignalName => () => StateSignal(behavior),
+        ProgressSignalName => () => ProgressSignal(behavior),
         _ => throw new UnknownSignalException(name),
     };
   }
@@ -91,6 +89,15 @@ sealed class ConstructableScriptableComponent : ScriptableComponentBase {
       },
   };
   SignalDef _progressSignalDef;
+
+
+  static ScriptValue StateSignal(AutomationBehavior behavior) {
+    return ScriptValue.Of(behavior.GetComponentFast<BlockObject>().IsFinished ? "finished" : "");
+  }
+
+  static ScriptValue ProgressSignal(AutomationBehavior behavior) {
+    return ScriptValue.FromFloat(behavior.GetComponentFast<ConstructionSite>().BuildTimeProgress);
+  }
 
   #endregion
 

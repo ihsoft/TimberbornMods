@@ -52,7 +52,7 @@ class DynamiteScriptableComponent : ScriptableComponentBase {
       throw new ScriptError.BadStateError(behavior, "Dynamite component not found");
     }
     return name switch {
-        DetonateActionName => _ => behavior.GetOrThrow<DynamiteStateController>().DetonateAndRepeat(behavior, 0),
+        DetonateActionName => _ => DetonateAction(behavior),
         DetonateAndRepeatActionName => args => DetonateAndRepeatAction(behavior, args),
         _ => throw new UnknownActionException(name),
     };
@@ -106,10 +106,13 @@ class DynamiteScriptableComponent : ScriptableComponentBase {
   };
   ActionDef _detonateAndRepeatActionDef;
 
+  static void DetonateAction(AutomationBehavior behavior) {
+    behavior.GetOrThrow<DynamiteStateController>().DetonateAndRepeat(behavior, 0);
+  }
+
   static void DetonateAndRepeatAction(AutomationBehavior behavior, ScriptValue[] args) {
     AssertActionArgsCount(DetonateAndRepeatActionName, args, 1);
-    var controller = behavior.GetOrThrow<DynamiteStateController>();
-    controller.DetonateAndRepeat(behavior, args[0].AsInt);
+    behavior.GetOrThrow<DynamiteStateController>().DetonateAndRepeat(behavior, args[0].AsInt);
   }
 
   #endregion

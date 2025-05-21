@@ -37,9 +37,9 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
   public override Func<ScriptValue> GetSignalSource(string name, AutomationBehavior behavior) {
     var gauge = GetGauge(behavior);
     return name switch {
-        DepthSignalName => () => ScriptValue.FromFloat(gauge.WaterLevel),
-        ContaminationSignalName => () => ScriptValue.FromFloat(gauge.ContaminationLevel),
-        CurrentSignalName => () => ScriptValue.FromFloat(gauge.WaterCurrent),
+        DepthSignalName => () => DepthSignal(gauge),
+        ContaminationSignalName => () => ContaminationSignal(gauge),
+        CurrentSignalName => () => CurrentSignal(gauge),
         _ => throw new UnknownSignalException(name),
     };
   }
@@ -102,6 +102,18 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
       },
   };
   SignalDef _currentSignalDef;
+
+  static ScriptValue DepthSignal(StreamGauge gauge) {
+    return ScriptValue.FromFloat(gauge.WaterLevel);
+  }
+
+  static ScriptValue ContaminationSignal(StreamGauge gauge) {
+    return ScriptValue.FromFloat(gauge.ContaminationLevel);
+  }
+
+  static ScriptValue CurrentSignal(StreamGauge gauge) {
+    return ScriptValue.FromFloat(gauge.WaterCurrent);
+  }
 
   #endregion
 

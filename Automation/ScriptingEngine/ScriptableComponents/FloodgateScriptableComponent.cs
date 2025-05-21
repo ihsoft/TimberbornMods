@@ -32,7 +32,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   public override Func<ScriptValue> GetSignalSource(string name, AutomationBehavior behavior) {
     var floodgate = GetFloodgate(behavior);
     return name switch {
-        HeightSignalName => () => ScriptValue.FromFloat(floodgate.Height),
+        HeightSignalName => () => HeightSignal(floodgate),
         _ => throw new UnknownSignalException(name),
     };
   }
@@ -96,6 +96,10 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
             ValueUiHint = GetArgumentMaxValueHint((float)floodgate.MaxHeight),
         },
     };
+  }
+
+  static ScriptValue HeightSignal(Floodgate floodgate) {
+    return ScriptValue.FromFloat(floodgate.Height);
   }
 
   #endregion
