@@ -1,4 +1,4 @@
-# v2.1.2 (pre-release):
+# v2.2.0 (20 May 2025):
 * [Feature] Highlight the conditions that are being evaluated to "true" with green color.
 * [Feature] New scriptable components `Workplace`. Now, the number of workers in the workshop can be changed from the script.
 * [Change] Don't select the text when switching to the script input field.
