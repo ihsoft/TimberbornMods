@@ -1,5 +1,5 @@
-# v2.2.1 (pre-release):
-* [Fix #76] [Automation] Game crashes on recursive signals.
+# v2.2.1 (22 May 2025):
+* [Fix #76] Game crashes on recursive signals.
 
 # v2.2.0 (20 May 2025):
 * [Feature] Highlight the conditions that are being evaluated to "true" with green color.
