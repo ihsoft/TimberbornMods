@@ -69,8 +69,9 @@ public interface IAutomationCondition : IGameSerializable {
   /// behavior.
   /// </summary>
   /// <remarks>
-  /// This method is called in two cases: when the rule is created adn assigned to a behavior, and when the building
-  /// transitions to finished state.
+  /// This method is the first time called when the rule is created. If the building transitions to finished state, and
+  /// the signal is not "OnUnfinished", then this method is called to refresh the state to the finished building.
+  /// <see cref="Behavior"/> and <see cref="Listener"/> must be set before calling this method.
   /// </remarks>
   /// <seealso cref="Behavior"/>
   /// <seealso cref="Listener"/>
