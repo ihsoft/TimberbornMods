@@ -14,14 +14,6 @@ class ScriptError : Exception {
   /// <summary>Creates a new instance of the exception.</summary>
   protected ScriptError(string message) : base(message) {}
 
-  /// <summary>Exception thrown when the script execution is interrupted.</summary>
-  /// <remarks>
-  /// This is not an error. This is a signal to stop executing the rule due to the current state is not right at the
-  /// moment, but it may become right later. Throwing this exception makes sense only if no side effect yet happens. For
-  /// example, in a conditions or in an action <i>before</i> it performed any changes.
-  /// </remarks>
-  public sealed class Interrupted(string reason) : ScriptError(reason);
-
   /// <summary>Error during the script execution.</summary>
   /// <remarks>This indicated an unrecoverable error on the script.</remarks>
   public class RuntimeError(string reason) : ScriptError(reason);

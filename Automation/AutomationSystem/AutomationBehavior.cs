@@ -66,11 +66,11 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
   /// </param>
   public void AddRule(IAutomationCondition condition, IAutomationAction action) {
     action.Condition = condition;
+    HostedDebugLog.Fine(this, "Adding rule: action={0}", action);
     condition.Behavior = this;
     action.Behavior = this;
     condition.SyncState();
     _actions.Add(action);
-    HostedDebugLog.Fine(this, "Adding rule: {0}", action);
     UpdateRegistration();
   }
 
@@ -107,7 +107,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
 
   /// <summary>Shows an error status for a building that has problems with the rules.</summary>
   public void ReportError(object instance) {
-    HostedDebugLog.Fine(this, "Automation error reported by: {0}", instance);
+    HostedDebugLog.Error(this, "Automation error reported by: {0}", instance);
     if (_errorToggle == null) {
       _errorToggle = StatusToggle.CreatePriorityStatusWithAlertAndFloatingIcon(
           AutomationErrorIcon, Loc.T(AutomationErrorDescriptionLocKey), Loc.T(AutomationErrorAlertLocKey));

@@ -259,7 +259,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
       var prefix = _inventory.OutputGoods.Contains(goodId)
           ? OutputGoodSignalNamePrefix
           : InputGoodSignalNamePrefix;
-      ScheduleSignal(prefix + goodId);
+      ScheduleSignal(prefix + goodId, ignoreErrors: true);
     }
   }
 

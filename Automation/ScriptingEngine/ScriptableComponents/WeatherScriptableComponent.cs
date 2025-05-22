@@ -134,13 +134,13 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
         BadtideWeather => BadTideSeason,
         _ => throw new InvalidOperationException("Unknown hazardous weather type: " + @event.HazardousWeather),
     };
-    _referenceManager.ScheduleSignal(SeasonSignalName, ScriptingService);
+    _referenceManager.ScheduleSignal(SeasonSignalName, ScriptingService, ignoreErrors: true);
   }
 
   [OnEvent]
   public void OnHazardousWeatherEndedEvent(HazardousWeatherEndedEvent @event) {
     _currentSeason = TemperateSeason;
-    _referenceManager.ScheduleSignal(SeasonSignalName, ScriptingService);
+    _referenceManager.ScheduleSignal(SeasonSignalName, ScriptingService, ignoreErrors: true);
   }
 
   #endregion

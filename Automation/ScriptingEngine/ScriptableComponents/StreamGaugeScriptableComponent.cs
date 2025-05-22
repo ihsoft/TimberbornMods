@@ -167,17 +167,17 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
       var waterLevel = Mathf.RoundToInt(_streamGauge.WaterLevel * 100f);
       if (_prevWaterLevel != waterLevel) {
         _prevWaterLevel = waterLevel;
-        ScheduleSignal(DepthSignalName);
+        ScheduleSignal(DepthSignalName, ignoreErrors: true);
       }
       var contaminationLevel = Mathf.RoundToInt(_streamGauge.ContaminationLevel * 100f);
       if (_prevContaminationLevel != contaminationLevel) {
         _prevContaminationLevel = contaminationLevel;
-        ScheduleSignal(ContaminationSignalName);
+        ScheduleSignal(ContaminationSignalName, ignoreErrors: true);
       }
       var waterCurrent = Mathf.RoundToInt(_streamGauge.WaterCurrent * 100f);
       if (_prevWaterCurrent != waterCurrent) {
         _prevWaterCurrent = waterCurrent;
-        ScheduleSignal(CurrentSignalName);
+        ScheduleSignal(CurrentSignalName, ignoreErrors: true);
       }
     }
   }

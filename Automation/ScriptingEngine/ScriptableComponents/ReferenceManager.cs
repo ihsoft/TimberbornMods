@@ -52,13 +52,13 @@ sealed class ReferenceManager {
 
   /// <summary>Schedules all signals for the given signal name.</summary>
   /// <remarks>If the host has registered to the same signal multiple times, it will be notified once.</remarks>
-  public void ScheduleSignal(string signalName, ScriptingService scriptingService) {
+  public void ScheduleSignal(string signalName, ScriptingService scriptingService, bool ignoreErrors = false) {
     var listeners = Signals
         .Where(pair => pair.Value.Any(x => x.SignalName == signalName))
         .Select(x => x.Key)
         .ToArray();  // Need a copy! The Signals dictionary can be modified in the loop.
     foreach (var listener in listeners) {
-      scriptingService.ScheduleSignalCallback(new ScriptingService.SignalCallback(signalName, listener));
+      scriptingService.ScheduleSignalCallback(new ScriptingService.SignalCallback(signalName, listener), ignoreErrors);
     }
   }
 }

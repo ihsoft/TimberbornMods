@@ -18,9 +18,13 @@ sealed class ScriptingService {
 
   /// <summary>Signal callback wrapper.</summary>
   public readonly record struct SignalCallback(string Name, ISignalListener SignalListener) {
-    public override string ToString() =>
-        string.Format("SignalCallback(Host={0},OwnerBuilding={1}, Name={2})",
-                      SignalListener.GetHashCode(), DebugEx.ObjectToString(SignalListener.Behavior), Name);
+    public override string ToString() {
+      var host = SignalListener is IAutomationCondition
+          ? SignalListener.ToString()
+          : SignalListener.GetHashCode().ToString();
+      return string.Format("SignalCallback(Host={0},OwnerBuilding={1}, Name={2})",
+                           host, DebugEx.ObjectToString(SignalListener.Behavior), Name);
+    }
   }
 
   /// <summary>Registers a new scriptable component.</summary>
@@ -109,16 +113,23 @@ sealed class ScriptingService {
     });
   }
 
-  internal void ScheduleSignalCallback(SignalCallback callback) {
+  internal void ScheduleSignalCallback(SignalCallback callback, bool ignoreErrors = false) {
+    DebugEx.Fine("Executing signal callback: {0}", callback);
     if (_callbackStack.Contains(callback)) {
+      var log = new List<string>([$"{DebugEx.ObjectToString(callback.SignalListener.Behavior)}:{callback.Name}"]);
+      log.AddRange(_callbackStack.Select(x => $"{DebugEx.ObjectToString(x.SignalListener.Behavior)}:{x.Name}"));
       HostedDebugLog.Error(callback.SignalListener.Behavior, "Circular execution of signal '{0}'. Execution log:\n{1}",
-                           callback.Name, GetExecutionLog());
+                           callback.Name, string.Join("\n", log));
       throw new ScriptError.RuntimeError($"Circular execution of signal '{callback.Name}'");
     }
     try {
-      DebugEx.Fine("Executing signal callback: {0}", callback);
       _callbackStack.Push(callback);
       callback.SignalListener.OnValueChanged(callback.Name);
+    } catch (ScriptError e) {
+      if (!ignoreErrors) {
+        throw;
+      }
+      DebugEx.Error("Aborted execution of signal callback: {0}\n{1}", callback, e.Message);
     } finally {
       _callbackStack.Pop();
     }

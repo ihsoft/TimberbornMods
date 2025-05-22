@@ -41,8 +41,10 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
 
   /// <inheritdoc/>
   public override void SyncState() {
-    if (_parsedExpression != null) {
+    try {
       OnValueChanged(null);
+    } catch (ScriptError e) {
+      HostedDebugLog.Error(Behavior, "SyncState failed: {0}", e.Message);
     }
   }
 
@@ -230,12 +232,12 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
         HostedDebugLog.Fine(Behavior, "OneShot signal '{0}' triggered. Cleanup the rule: {1}", signalName, Expression);
         IsMarkedForCleanup = true;
       }
-    } catch (ScriptError.Interrupted e) {
-      HostedDebugLog.Fine(Behavior, "Condition execution interrupted: {0}\nReason: {1}", Expression, e.Message);
-    } catch (ScriptError e) {
-      HostedDebugLog.Error(Behavior, "Condition execution failed: {0}\nReason: {1}", Expression, e.Message);
-      SetParsedExpression(null);
-      Behavior.ReportError(this);
+    } catch (ScriptError) {
+      if (_parsedExpression != null) {  // Can be already handled upstream in case of recursive calls.
+        SetParsedExpression(null);
+        Behavior.ReportError(this);
+      }
+      throw;
     }
   }
 

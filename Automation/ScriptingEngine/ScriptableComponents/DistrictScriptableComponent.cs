@@ -182,20 +182,20 @@ class DistrictScriptableComponent : ScriptableComponentBase {
     }
 
     void OnPopulationChangedEvent(Citizen citizen = null) {
-      if (citizen == null || citizen.GetComponentFast<BotSpec>()) {
-        ScheduleSignal(BotPopulationSignalName);
+      if (!citizen || citizen.GetComponentFast<BotSpec>()) {
+        ScheduleSignal(BotPopulationSignalName, ignoreErrors: true);
       }
-      if (citizen == null || !citizen.GetComponentFast<BotSpec>()) {
-        ScheduleSignal(BeaverPopulationSignalName);
+      if (!citizen || !citizen.GetComponentFast<BotSpec>()) {
+        ScheduleSignal(BeaverPopulationSignalName, ignoreErrors: true);
       }
     }
 
     void FinishedBuildingRegisteredEvent(object sender, FinishedBuildingRegisteredEventArgs arg) {
-      ScheduleSignal(NumberOfBedsSignalName);
+      ScheduleSignal(NumberOfBedsSignalName, ignoreErrors: true);
     }
 
     void FinishedBuildingUnregisteredEvent(object sender, FinishedBuildingUnregisteredEventArgs arg) {
-      ScheduleSignal(NumberOfBedsSignalName);
+      ScheduleSignal(NumberOfBedsSignalName, ignoreErrors: true);
     }
   }
 

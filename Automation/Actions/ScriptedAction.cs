@@ -57,15 +57,15 @@ sealed class ScriptedAction : AutomationActionBase {
     }
     try {
       _parsedExpression.Execute();
-      if (_parsedExpression.ExecuteOnce) {
+      if (_parsedExpression is { ExecuteOnce: true }) {
         IsMarkedForCleanup = true;
       }
-    } catch (ScriptError.Interrupted e) {
-      HostedDebugLog.Fine(Behavior, "Action execution interrupted: {0}\nError: {1}", Expression, e.Message);
-    } catch (ScriptError e) {
-      HostedDebugLog.Error(Behavior, "Action execution failed: {0}\nError: {1}", Expression, e.Message);
-      SetParsedExpression(null);
-      Behavior.ReportError(this);
+    } catch (ScriptError) {
+      if (_parsedExpression != null) {  // Can be already handled upstream in case of recursive calls.
+        SetParsedExpression(null);
+        Behavior.ReportError(this);
+      }
+      throw;
     }
   }
 

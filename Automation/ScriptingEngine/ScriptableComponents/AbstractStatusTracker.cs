@@ -55,7 +55,8 @@ abstract class AbstractStatusTracker : BaseComponent {
   }
 
   /// <inheritdoc cref="ScriptableComponents.ReferenceManager.ScheduleSignal" />
-  public void ScheduleSignal(string signalName) => ReferenceManager.ScheduleSignal(signalName, _scriptingService);
+  public void ScheduleSignal(string signalName, bool ignoreErrors = false) =>
+      ReferenceManager.ScheduleSignal(signalName, _scriptingService, ignoreErrors);
 
   #endregion
 
