@@ -152,12 +152,12 @@ static class DebugEx {
   }
 
   /// <summary>Collection-to-string – it makes a comma separated string from the enumerable.</summary>
-  public static string C2S(IEnumerable enumerable) {
-    return string.Join(",", enumerable);
+  public static string C2S(IEnumerable enumerable, string separator = ",") {
+    return string.Join(separator, enumerable);
   }
 
   /// <summary>Collection-to-string – it makes a comma separated string from the enumerable.</summary>
-  public static string C2S<T>(IEnumerable<T> enumerable) {
-    return string.Join(",", enumerable);
+  public static string C2S<T>(IEnumerable<T> enumerable, string separator = ",") {
+    return string.Join(separator, enumerable);
   }
 }
