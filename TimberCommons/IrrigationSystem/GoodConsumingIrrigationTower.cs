@@ -8,7 +8,6 @@ using IgorZ.TimberCommons.Common;
 using Timberborn.Buildings;
 using Timberborn.GoodConsumingBuildingSystem;
 using Timberborn.Localization;
-using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.TimberCommons.IrrigationSystem;
 
@@ -77,7 +76,7 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
     var efficiency = 1f;
     // ReSharper disable once ForCanBeConvertedToForeach
     // ReSharper disable once LoopCanBeConvertedToQuery
-    for (var i = 0; i < _efficiencyProviders.Count; i++) {
+    for (var i = _efficiencyProviders.Count - 1; i >= 0; i--) {
       efficiency *= _efficiencyProviders[i].Efficiency;
     }
     return efficiency;
