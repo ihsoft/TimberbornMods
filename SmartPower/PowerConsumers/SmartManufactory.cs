@@ -127,7 +127,7 @@ public class SmartManufactory : BaseComponent, IAdjustablePowerInput {
     _standbyStatus = StatusToggle.CreateNormalStatus(StandbyStatusIcon, _loc.T(PowerSavingModeLocKey));
     var subject = GetComponentFast<StatusSubject>();
     subject.RegisterStatus(_standbyStatus);
-    HasWorkingPlaces = GetComponentFast<Workshop>() != null;
+    HasWorkingPlaces = GetComponentFast<Workshop>();
   }
 
   #endregion
