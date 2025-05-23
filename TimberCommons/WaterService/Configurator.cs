@@ -13,7 +13,7 @@ sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).FullName;
   static readonly Type[] Patches = [
       typeof(SoilMoistureSimulatorPatch),
-      typeof(SoilMoistureMapPatch)
+      typeof(SoilMoistureMapPatch),
   ];
 
   public void Configure(IContainerDefinition containerDefinition) {
