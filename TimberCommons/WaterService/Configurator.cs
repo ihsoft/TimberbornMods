@@ -18,7 +18,6 @@ sealed class Configurator : IConfigurator {
 
   public void Configure(IContainerDefinition containerDefinition) {
     HarmonyPatcher.PatchRepeated(PatchId, Patches);
-    DirectSoilMoistureSystemAccessor.ResetStaticState();
     containerDefinition.Bind<DirectSoilMoistureSystemAccessor>().AsSingleton();
   }
 }

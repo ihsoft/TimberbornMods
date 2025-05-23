@@ -1,0 +1,3 @@
+﻿IrrigationTower:
+- [P2][IT] If a tile with contamination blocker is covered, it is not tracked in contamination overrides. When removed, the tile may get contamination for one tick.
+ 

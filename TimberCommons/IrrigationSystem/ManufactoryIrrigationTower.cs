@@ -9,7 +9,6 @@ using Bindito.Core;
 using IgorZ.TimberCommons.Common;
 using IgorZ.TimberDev.UI;
 using Timberborn.Common;
-using Timberborn.Goods;
 using Timberborn.Localization;
 using Timberborn.TimeSystem;
 using Timberborn.Workshops;
@@ -21,10 +20,10 @@ namespace IgorZ.TimberCommons.IrrigationSystem;
 /// <summary>Irrigation tower that runs on top of <see cref="Manufactory"/>.</summary>
 /// <remarks>
 /// <p>
-/// The manufactory is responsible for dealing with the goods (e.g. water). The tower will be the production executor
-/// for the manufactory, so no other executors must be setup (e.g. workplace or <see cref="ProductionIncreaser"/>). The
-/// tower will keep the tiles in range irrigated as long as the manufactory can produce
-/// (<see cref="Manufactory.IsReadyToProduce"/>).
+/// The manufactory is responsible for dealing with the goods (for example, water). The tower will be the production
+/// executor for the manufactory, so no other executors must be setup (for example, workplace or
+/// <see cref="ProductionIncreaser"/>). The tower will keep the tiles in range irrigated as long as the manufactory can
+/// produce (<see cref="Manufactory.IsReadyToProduce"/>).
 /// </p>
 /// <p>
 /// If building has components, implementing <see cref="IRangeEffect"/>, then they will be applied based on the
@@ -85,8 +84,23 @@ public class ManufactoryIrrigationTower : IrrigationTower, ISupplyLeftProvider {
 
   /// <inheritdoc/>
   protected override float GetEfficiency() {
-    return _manufactory.ProductionEfficiency();
+    var newEfficiency = _manufactory.ProductionEfficiency();
+    if (!_manufactory.NeedsPower) {
+      return newEfficiency;
+    }
+
+    // When first loaded, the powered buildings need one tick for the mechanical node to get populated with the network
+    // data. Also, power can fluctuate when switching to/from batteries. Give it one tick to settle.
+    if (Mathf.Abs(CurrentEfficiency - newEfficiency) >= float.Epsilon) {
+      if (!_lastTickEfficiencyBad) {
+        _lastTickEfficiencyBad = true;
+        return CurrentEfficiency;
+      }
+    }
+    _lastTickEfficiencyBad = false;
+    return newEfficiency;
   }
+  bool _lastTickEfficiencyBad;
 
   /// <inheritdoc/>
   protected override void Initialize() {
@@ -145,7 +159,7 @@ public class ManufactoryIrrigationTower : IrrigationTower, ISupplyLeftProvider {
     base.Awake();
     _manufactory = GetComponentFast<Manufactory>();
     _effectsRulesDict = _effects
-        .Select(pair => pair.Split(new[] {'='}, 2))
+        .Select(pair => pair.Split(['='], 2))
         .ToDictionary(k => k[0], v => v[1]);
 
     // Make effect cache.
