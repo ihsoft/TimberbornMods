@@ -199,7 +199,7 @@ public class ManufactoryIrrigationTower : IrrigationTower, ISupplyLeftProvider {
       var effects = GetEffectsForRecipe(recipeId);
       if (!effects.IsEmpty()) {
         HostedDebugLog.Fine(this, "Apply effects: recipeId={0}, effectsNum={1}", recipeId, effects.Count);
-        GetEffectsForRecipe(recipeId).ForEach(x => x.ApplyEffect(ReachableTiles));
+        effects.ForEach(x => x.ApplyEffect(ReachableTiles));
       }
     }
   }
