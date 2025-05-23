@@ -5,24 +5,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Bindito.Core;
 using IgorZ.TimberCommons.Settings;
-using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.Common;
 using Timberborn.EntitySystem;
 using Timberborn.MapIndexSystem;
-using Timberborn.SceneLoading;
 using Timberborn.SingletonSystem;
 using Timberborn.SoilBarrierSystem;
 using Timberborn.SoilMoistureSystem;
 using Timberborn.TerrainSystem;
-using Timberborn.TerrainSystemRendering;
 using Timberborn.TickSystem;
 using Timberborn.UILayoutSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace IgorZ.TimberCommons.WaterService;
 
@@ -30,7 +25,7 @@ namespace IgorZ.TimberCommons.WaterService;
 /// <remarks>
 /// This code uses HarmonyX patches to access internal game's logic. Significant changes to it may break the mod.
 /// </remarks>
-public class DirectSoilMoistureSystemAccessor : ILoadableSingleton, ITickableSingleton {
+public class SoilOverridesService : ILoadableSingleton, ITickableSingleton {
 
   #region API
   // ReSharper disable UnusedMember.Global
@@ -71,11 +66,13 @@ public class DirectSoilMoistureSystemAccessor : ILoadableSingleton, ITickableSin
     DebugEx.Fine("Removed moisture override: id={0}, tiles={1}", overrideId, moistureOverrides.Count);
   }
 
+  /// <summary>Checks if there is a contamination barrier at the given coordinates.</summary>
   public bool IsContaminationBarrierAt(Vector3Int coordinates) {
     var barrier = _blockService.GetBottomObjectComponentAt<SoilBarrierSpec>(coordinates);
     return barrier && barrier.BlockContamination && barrier.GetComponentFast<BlockObject>().IsFinished;
   }
 
+  /// <summary>Checks if there is a full moisture barrier at the given coordinates.</summary>
   public bool IsFullMoistureBarrierAt(Vector3Int coordinates) {
     var barrier = _blockService.GetBottomObjectComponentAt<SoilBarrierSpec>(coordinates);
     return barrier && barrier.BlockFullMoisture && barrier.GetComponentFast<BlockObject>().IsFinished;
@@ -152,7 +149,7 @@ public class DirectSoilMoistureSystemAccessor : ILoadableSingleton, ITickableSin
   readonly EventBus _eventBus;
   readonly IThreadSafeColumnTerrainMap _columnTerrainMap;
 
-  DirectSoilMoistureSystemAccessor(MapIndexService mapIndexService, SoilBarrierMap soilBarrierMap,
+  SoilOverridesService(MapIndexService mapIndexService, SoilBarrierMap soilBarrierMap,
                                    BlockService blockService, EventBus eventBus, SoilMoistureMap soilMoistureMap,
                                    IThreadSafeColumnTerrainMap columnTerrainMap) {
     _mapIndexService = mapIndexService;

@@ -21,7 +21,7 @@ static class SoilMoistureSimulatorPatch {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!
     }
-    if (DirectSoilMoistureSystemAccessor.MoistureLevelOverrides.TryGetValue(index3D, out var newLevel)
+    if (SoilOverridesService.MoistureLevelOverrides.TryGetValue(index3D, out var newLevel)
         && __result < newLevel) {
       __result = newLevel;
     }

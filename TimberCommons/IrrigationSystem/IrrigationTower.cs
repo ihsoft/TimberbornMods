@@ -293,7 +293,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   TerrainMap _terrainMap;
   MapIndexService _mapIndexService;
   EventBus _eventBus;
-  DirectSoilMoistureSystemAccessor _directSoilMoistureSystemAccessor;
+  SoilOverridesService _soilOverridesService;
   BuildingWithRangeUpdateService _buildingWithRangeUpdateService;
   ITerrainService _terrainService;
 
@@ -303,13 +303,13 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   [Inject]
   public void InjectDependencies(TerrainMap terrainMap,
                                  MapIndexService mapIndexService, EventBus eventBus,
-                                 DirectSoilMoistureSystemAccessor directSoilMoistureSystemAccessor,
+                                 SoilOverridesService soilOverridesService,
                                  BuildingWithRangeUpdateService buildingWithRangeUpdateService,
                                  ITerrainService terrainService) {
     _terrainMap = terrainMap;
     _mapIndexService = mapIndexService;
     _eventBus = eventBus;
-    _directSoilMoistureSystemAccessor = directSoilMoistureSystemAccessor;
+    _soilOverridesService = soilOverridesService;
     _buildingWithRangeUpdateService = buildingWithRangeUpdateService;
     _terrainService = terrainService;
   }
@@ -343,9 +343,9 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
       return;
     }
     var overrides = ReachableTiles
-        .Select(tile => new DirectSoilMoistureSystemAccessor.MoistureOverride(
+        .Select(tile => new SoilOverridesService.MoistureOverride(
                     tile, 1.0f, CalculateDesertLevel(tile.XY(), EffectiveRange)));
-    _moistureOverrideIndex = _directSoilMoistureSystemAccessor.AddMoistureOverride(overrides);
+    _moistureOverrideIndex = _soilOverridesService.AddMoistureOverride(overrides);
     IrrigationStarted();
   }
 
@@ -354,7 +354,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
     if (_moistureOverrideIndex == -1) {
       return;
     }
-    _directSoilMoistureSystemAccessor.RemoveMoistureOverride(_moistureOverrideIndex);
+    _soilOverridesService.RemoveMoistureOverride(_moistureOverrideIndex);
     _moistureOverrideIndex = -1;
     IrrigationStopped();
   }
@@ -436,7 +436,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
           obstacles.Add(coordinates);
           continue;
         }
-        if (_directSoilMoistureSystemAccessor.IsFullMoistureBarrierAt(coordinates)) {
+        if (_soilOverridesService.IsFullMoistureBarrierAt(coordinates)) {
           barriers.Add(coordinates);
           continue;
         }
@@ -493,7 +493,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <summary>Monitors building new soil barriers within the range.</summary>
   [OnEvent]
   public void OnEnteredFinishedStateEvent(EnteredFinishedStateEvent e) {
-    if (!_directSoilMoistureSystemAccessor.GameLoaded) {
+    if (!_soilOverridesService.GameLoaded) {
       return;  // Don't run logic during the game load.
     }
     var blockObject = e.BlockObject;

@@ -21,7 +21,7 @@ static class SoilMoistureMapPatch {
     if (!IrrigationSystemSettings.OverrideDesertLevelsForWaterTowers) {
       return;
     }
-    if (DirectSoilMoistureSystemAccessor.TerrainTextureLevelsOverrides.TryGetValue(coordinates, out var newLevel)) {
+    if (SoilOverridesService.TerrainTextureLevelsOverrides.TryGetValue(coordinates, out var newLevel)) {
       moistureLevel = Mathf.Max(moistureLevel, newLevel);
     }
   }

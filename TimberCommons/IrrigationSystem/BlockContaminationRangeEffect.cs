@@ -16,7 +16,7 @@ namespace IgorZ.TimberCommons.IrrigationSystem;
 /// </remarks>
 /// <seealso cref="GoodConsumingIrrigationTower"/>
 /// <seealso cref="ManufactoryIrrigationTower"/>
-/// <seealso cref="DirectSoilMoistureSystemAccessor"/>
+/// <seealso cref="SoilOverridesService"/>
 public sealed class BlockContaminationRangeEffect : BaseComponent, IRangeEffect {
 
   #region Unity managed fields
@@ -39,7 +39,7 @@ public sealed class BlockContaminationRangeEffect : BaseComponent, IRangeEffect 
   /// <inheritdoc/>
   public void ApplyEffect(HashSet<Vector3Int> tiles) {
     ResetEffect();
-    _contaminationOverrideIndex = _directSoilMoistureSystemAccessor.AddContaminationOverride(tiles);
+    _contaminationOverrideIndex = _soilOverridesService.AddContaminationOverride(tiles);
   }
 
   /// <inheritdoc/>
@@ -47,7 +47,7 @@ public sealed class BlockContaminationRangeEffect : BaseComponent, IRangeEffect 
     if (_contaminationOverrideIndex == -1) {
       return;
     }
-    _directSoilMoistureSystemAccessor.RemoveContaminationOverride(_contaminationOverrideIndex);
+    _soilOverridesService.RemoveContaminationOverride(_contaminationOverrideIndex);
     _contaminationOverrideIndex = -1;
   }
 
@@ -55,13 +55,13 @@ public sealed class BlockContaminationRangeEffect : BaseComponent, IRangeEffect 
 
   #region Implementation
 
-  DirectSoilMoistureSystemAccessor _directSoilMoistureSystemAccessor;
+  SoilOverridesService _soilOverridesService;
   int _contaminationOverrideIndex = -1;
 
   /// <summary>It must be public for the injection logic to work.</summary>
   [Inject]
-  public void InjectDependencies(DirectSoilMoistureSystemAccessor directSoilMoistureSystemAccessor) {
-    _directSoilMoistureSystemAccessor = directSoilMoistureSystemAccessor;
+  public void InjectDependencies(SoilOverridesService soilOverridesService) {
+    _soilOverridesService = soilOverridesService;
   }
 
   #endregion
