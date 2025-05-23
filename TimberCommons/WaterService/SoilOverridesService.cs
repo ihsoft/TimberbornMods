@@ -25,7 +25,7 @@ namespace IgorZ.TimberCommons.WaterService;
 /// <remarks>
 /// This code uses HarmonyX patches to access internal game's logic. Significant changes to it may break the mod.
 /// </remarks>
-public class SoilOverridesService : ILoadableSingleton, ITickableSingleton {
+public class SoilOverridesService : ILoadableSingleton, ITickableSingleton, IPostLoadableSingleton, ISaveableSingleton {
 
   #region API
   // ReSharper disable UnusedMember.Global
