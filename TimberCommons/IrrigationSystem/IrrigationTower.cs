@@ -387,7 +387,6 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
     } else {
       _startingTiles = BlockObject.PositionedBlocks.GetFoundationCoordinates().Where(c => c.z == _baseZ).ToList();
     }
-    HostedDebugLog.Warning(this, "*** Starting tiles: {0}", DebugEx.C2S(_startingTiles));
     _foundationTilesIndexes = BlockObject.PositionedBlocks.GetFoundationCoordinates()
         .Where(coordinates => coordinates.z == _baseZ)
         .ToHashSet();
