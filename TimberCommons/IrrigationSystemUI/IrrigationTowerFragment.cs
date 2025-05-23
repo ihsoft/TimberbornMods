@@ -26,7 +26,7 @@ sealed class IrrigationTowerFragment : IEntityPanelFragment {
 
   IrrigationTower _irrigationTower;
 
-  public IrrigationTowerFragment(UiFactory uiFactory, ILoc loc) {
+  IrrigationTowerFragment(UiFactory uiFactory, ILoc loc) {
     _uiFactory = uiFactory;
     _loc = loc;
   }
@@ -41,7 +41,7 @@ sealed class IrrigationTowerFragment : IEntityPanelFragment {
 
   public void ShowFragment(BaseComponent entity) {
     _irrigationTower = entity.GetComponentFast<IrrigationTower>();
-    _root.ToggleDisplayStyle(visible: _irrigationTower != null);
+    _root.ToggleDisplayStyle(visible: _irrigationTower);
   }
 
   public void ClearFragment() {
@@ -50,7 +50,7 @@ sealed class IrrigationTowerFragment : IEntityPanelFragment {
   }
 
   public void UpdateFragment() {
-    if (_irrigationTower == null) {
+    if (!_irrigationTower) {
       return;
     }
     if (_irrigationTower.enabled) {
