@@ -6,16 +6,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using IgorZ.TimberCommons.Settings;
+using IgorZ.TimberDev.Utils;
+using ProtoBuf;
+using TimberApi.DependencyContainerSystem;
 using Timberborn.BlockSystem;
 using Timberborn.Common;
 using Timberborn.EntitySystem;
 using Timberborn.MapIndexSystem;
+using Timberborn.Persistence;
 using Timberborn.SingletonSystem;
 using Timberborn.SoilBarrierSystem;
 using Timberborn.SoilMoistureSystem;
 using Timberborn.TerrainSystem;
+using Timberborn.TerrainSystemRendering;
 using Timberborn.TickSystem;
 using Timberborn.UILayoutSystem;
+using Timberborn.WorldPersistence;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
@@ -30,17 +36,41 @@ public class SoilOverridesService : ILoadableSingleton, ITickableSingleton, IPos
   #region API
   // ReSharper disable UnusedMember.Global
 
-  /// <summary>True if the game is loaded and started.</summary>
+  /// <summary>True if the game is loaded and fully ready to start ticking.</summary>
+  /// <remarks>This is the next step after "PostLoad".</remarks>
   public bool GameLoaded { get; private set; }
 
-  /// <summary>Definition of the moisture override.</summary>
-  public readonly record struct MoistureOverride(Vector3Int Coordinates, float MoistureLevel, float DesertLevel);
+  /// <summary>Reclaims the loaded moisture override.</summary>
+  /// <remarks>
+  /// The components must recall their overrides and reclaim them on a load. Unclaimed overrides will be removed before
+  /// the first state update.
+  /// </remarks>
+  public List<MoistureOverride> ClaimMoistureOverrideIndex(int overrideIndex) {
+    if (!_loadedMoistureOverrideIndexes.Remove(overrideIndex)) {
+      throw new Exception("Trying to claim unknown moisture override index: {0}" + overrideIndex);
+    }
+    DebugEx.Fine("Claimed moisture override: index={0}", overrideIndex);
+    return _moistureLevelOverrides[overrideIndex];
+  }
+
+  /// <summary>Reclaims the loaded contamination blocker override.</summary>
+  /// <remarks>
+  /// The components must recall their overrides and reclaim them on a load. Unclaimed overrides will be removed before
+  /// the first state update.
+  /// </remarks>
+  public List<Vector3Int> ClaimContaminationOverrideIndex(int overrideId) {
+    if (!_loadedContaminationOverrideIndexes.Remove(overrideId)) {
+      throw new Exception("Trying to claim unknown contamination blocker override index: {0}" + overrideId);
+    }
+    DebugEx.Fine("Claimed contamination blocker override: index={0}", overrideId);
+    return _contaminationOverrides[overrideId].ToList();
+  }
 
   /// <summary>Creates moisture level overrides for a set of tiles.</summary>
   /// <remarks>
-  /// The same tiles can be listed in multiple overrides. In this case the maximum level will be used.
+  /// The same tiles can be listed in multiple overrides. In this case, the maximum level will be used.
   /// </remarks>
-  /// <param name="moistureOverrides">The tiles mosuture ovveride onfo.</param>
+  /// <param name="moistureOverrides">The tiles moisture override info.</param>
   /// <returns>Unique ID of the created override. Use it to delete the overrides.</returns>
   /// <seealso cref="RemoveMoistureOverride"/>
   public int AddMoistureOverride(IEnumerable<MoistureOverride> moistureOverrides) {
@@ -51,7 +81,6 @@ public class SoilOverridesService : ILoadableSingleton, ITickableSingleton, IPos
     DebugEx.Fine("Added moisture override: id={0}, overrides={1}", index, moistureOverridesCopy.Count);
     return index;
   }
-
 
   /// <summary>Removes the moisture override.</summary>
   /// <param name="overrideId">The ID of the override to remove.</param>
@@ -108,11 +137,112 @@ public class SoilOverridesService : ILoadableSingleton, ITickableSingleton, IPos
   // ReSharper restore UnusedMember.Global
   #endregion
 
-  #region IPostLoadableSingleton implementation
+  #region Persistence implementation
 
-  /// <summary>Sets up the moisture override logic.</summary>
+  static readonly SingletonKey TreeCuttingAreaKey = new("SoilOverridesService");
+  static readonly PropertyKey<string> OverridesStateKey = new("OverridesState");
+
+  readonly List<int> _loadedMoistureOverrideIndexes = [];
+  readonly List<int> _loadedContaminationOverrideIndexes = [];
+
+  [ProtoContract]
+  record MoistureOverrideProto {
+    [ProtoMember(1)] public int OverrideId { get; init; }
+    [ProtoMember(2)] public List<MoistureOverride> OverridesList { get; init; }
+  }
+
+  [ProtoContract]
+  record ContaminationOverrideProto {
+    [ProtoMember(1)] public int OverrideId { get; init; }
+    [ProtoMember(2)] public HashSet<Vector3Int> OverridesList { get; init; }
+  }
+
+  [ProtoContract]
+  record SavedStateProto {
+    [ProtoMember(1)] public List<MoistureOverrideProto> MoistureOverrides { get; init; } = [];
+    [ProtoMember(2)] public List<ContaminationOverrideProto> ContaminationOverrides { get; init; } = [];
+  }
+
+  /// <inheritdoc/>
+  public void Save(ISingletonSaver singletonSaver) {
+    var component = singletonSaver.GetSingleton(TreeCuttingAreaKey);
+    var protoState = new SavedStateProto {
+        MoistureOverrides = _moistureLevelOverrides.Select(x => new MoistureOverrideProto {
+            OverrideId = x.Key,
+            OverridesList = x.Value,
+        }).ToList(),
+        ContaminationOverrides = _contaminationOverrides.Select(x => new ContaminationOverrideProto {
+            OverrideId = x.Key,
+            OverridesList = x.Value,
+        }).ToList(),
+    };
+    component.Set(OverridesStateKey, StringProtoSerializer.Serialize(protoState));
+  }
+
+  /// <inheritdoc/>
   public void Load() {
     _eventBus.Register(this);
+    
+    var singletonLoader = DependencyContainer.GetInstance<ISingletonLoader>();
+    if (!singletonLoader.TryGetSingleton(TreeCuttingAreaKey, out var objectLoader)) {
+      return;
+    }
+    var serializedState = objectLoader.GetValueOrDefault(OverridesStateKey);
+    if (string.IsNullOrEmpty(serializedState)) {
+      return;
+    }
+    var protoState = StringProtoSerializer.Deserialize<SavedStateProto>(serializedState);
+
+    // Recreate the moisture overrides.
+    foreach (var moistureOverride in protoState.MoistureOverrides) {
+      var index = moistureOverride.OverrideId;
+      _moistureLevelOverrides.Add(index, moistureOverride.OverridesList);
+      _loadedMoistureOverrideIndexes.Add(index);
+    }
+    DebugEx.Fine("Loaded {0} moisture overrides", _moistureLevelOverrides.Count);
+    _nextMoistureOverrideId = _moistureLevelOverrides.Keys.Any() ? _moistureLevelOverrides.Keys.Max() + 1 : 0;
+
+    // Recreate the contamination overrides.
+    foreach (var contaminationOverride in protoState.ContaminationOverrides) {
+      var index = contaminationOverride.OverrideId;
+      _contaminationOverrides.Add(index, contaminationOverride.OverridesList);
+      _loadedContaminationOverrideIndexes.Add(index);
+    }
+    DebugEx.Fine("Loaded {0} contamination overrides", _contaminationOverrides.Count);
+    _nextContaminationOverrideId = _contaminationOverrides.Keys.Any() ? _contaminationOverrides.Keys.Max() + 1 : 0;
+  }
+
+  /// <inheritdoc/>
+  public void PostLoad() {
+    // Unclaimed overrides shouldn't affect the loaded state.
+    if (_loadedMoistureOverrideIndexes.Count > 0) {
+      DebugEx.Warning("Dropping {0} unclaimed moisture overrides", _loadedMoistureOverrideIndexes.Count);
+      foreach (var overrideIndex in _loadedMoistureOverrideIndexes) {
+        RemoveMoistureOverride(overrideIndex);
+      }
+      _loadedMoistureOverrideIndexes.Clear();
+    }
+    if (_loadedContaminationOverrideIndexes.Count > 0) {
+      DebugEx.Warning("Dropping {0} unclaimed contamination overrides", _loadedContaminationOverrideIndexes.Count);
+      foreach (var overrideIndex in _loadedContaminationOverrideIndexes) {
+        RemoveContaminationOverride(overrideIndex);
+      }
+      _loadedContaminationOverrideIndexes.Clear();
+    }
+
+    // Apply the loaded overrides.
+    if (_moistureLevelOverrides.Count > 0) {
+      _needMoistureOverridesUpdate = true;
+      UpdateMoistureOverrides();
+      if (IrrigationSystemSettings.OverrideDesertLevelsForWaterTowers) {
+        var terrainMaterialMap = DependencyContainer.GetInstance<TerrainMaterialMap>();
+        terrainMaterialMap.ProcessDesertTextureChanges();
+      }
+    }
+    if (_contaminationOverrides.Count > 0) {
+      _needContaminationOverridesUpdate = true;
+      UpdateContaminationOverrides();
+    }
   }
 
   #endregion
@@ -257,21 +387,7 @@ public class SoilOverridesService : ILoadableSingleton, ITickableSingleton, IPos
 
   #region Game load callbacks
 
-  // FIXME: doesn't work in 0.7.6.1
-  /// <summary>Refreshes terrain texture if when the game is loaded and there are active overrides.</summary>
-  // void OnSceneLoaded(object sender, EventArgs e) {
-  //   _sceneLoader.SceneLoaded -= OnSceneLoaded;
-  //   var needTextureUpdate = _needMoistureOverridesUpdate;
-  //   Tick();
-  //
-  //   // Refresh the texture on game load.
-  //   if (needTextureUpdate && IrrigationSystemSettings.OverrideDesertLevelsForWaterTowers) {
-  //     // FIXME: Consider calling Tick() instead. It's public.
-  //     _terrainMaterialMap.ProcessDesertTextureChanges();
-  //     _terrainMaterialMap.ProcessDesertTextureChanges(); // Intentionally.
-  //   }
-  // }
-
+  /// <summary>Called when the game initialized.</summary>
   [OnEvent]
   public void OnNewGameInitialized(ShowPrimaryUIEvent newGameInitializedEvent) {
     GameLoaded = true;

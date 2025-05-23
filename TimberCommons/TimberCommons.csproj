@@ -52,9 +52,13 @@
       <Reference Include="System.Collections.Immutable">
         <HintPath>..\Dependencies\GameRoot\Timberborn_Data\Managed\System.Collections.Immutable.dll</HintPath>
       </Reference>
+      <Reference Include="TimberApi">
+        <HintPath>..\Dependencies\Workshop\3288241660\version-0.7\core\TimberApi.dll</HintPath>
+      </Reference>
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />
+      <PackageReference Include="protobuf-net" Version="2.4.0" />
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Timberborn.*.dll" Publicize="true" />
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Unity*.dll" Publicize="false"/>
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Bindito.*.dll" Publicize="false"/>
@@ -101,6 +105,9 @@
       </Compile>
       <Compile Include="..\TimberDev\Utils\ComponentsAccessor.cs">
         <Link>TimberDev\Utils\ComponentsAccessor.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\IObjectLoaderExtensions.cs">
+        <Link>TimberDev\Utils\IObjectLoaderExtensions.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\Utils\StaticBindings.cs">
         <Link>TimberDev\Utils\StaticBindings.cs</Link>

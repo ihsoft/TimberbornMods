@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using Bindito.Core;
 using IgorZ.TimberCommons.WaterService;
 using Timberborn.BaseComponentSystem;
+using Timberborn.Persistence;
+using Timberborn.WorldPersistence;
 using UnityEngine;
 
 namespace IgorZ.TimberCommons.IrrigationSystem;
@@ -17,7 +19,7 @@ namespace IgorZ.TimberCommons.IrrigationSystem;
 /// <seealso cref="GoodConsumingIrrigationTower"/>
 /// <seealso cref="ManufactoryIrrigationTower"/>
 /// <seealso cref="SoilOverridesService"/>
-public sealed class BlockContaminationRangeEffect : BaseComponent, IRangeEffect {
+public sealed class BlockContaminationRangeEffect : BaseComponent, IRangeEffect, IPersistentEntity {
 
   #region Unity managed fields
   // ReSharper disable InconsistentNaming
@@ -64,10 +66,34 @@ public sealed class BlockContaminationRangeEffect : BaseComponent, IRangeEffect 
     _soilOverridesService = soilOverridesService;
   }
 
-  #endregion
-
   /// <inheritdoc/>
   public override string ToString() {
     return $"[{GetType().Name}#{EffectGroup}]";
-  } 
+  }
+
+  #endregion
+
+  #region IPersistentEntity implementation
+
+  static readonly ComponentKey ComponentKey = new(typeof(BlockContaminationRangeEffect).FullName);
+  static readonly PropertyKey<int> ContaminationOverrideIndexKey = new("OverrideIndex");
+
+  /// <inheritdoc/>
+  public void Save(IEntitySaver entitySaver) {
+    var component = entitySaver.GetComponent(ComponentKey);
+    component.Set(ContaminationOverrideIndexKey, _contaminationOverrideIndex);
+  }
+
+  /// <inheritdoc/>
+  public void Load(IEntityLoader entityLoader) {
+    if (!entityLoader.TryGetComponent(ComponentKey, out var component)) {
+      return;
+    }
+    _contaminationOverrideIndex = component.Get(ContaminationOverrideIndexKey);
+    if (_contaminationOverrideIndex != -1) {
+      _soilOverridesService.ClaimContaminationOverrideIndex(_contaminationOverrideIndex);
+    }
+  }
+
+  #endregion
 }

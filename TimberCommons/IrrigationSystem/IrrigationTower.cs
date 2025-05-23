@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Bindito.Core;
 using IgorZ.TimberCommons.WaterService;
+using IgorZ.TimberDev.Utils;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BuildingRange;
@@ -15,6 +16,7 @@ using Timberborn.BuildingsBlocking;
 using Timberborn.Common;
 using Timberborn.EntitySystem;
 using Timberborn.MapIndexSystem;
+using Timberborn.MechanicalSystem;
 using Timberborn.Persistence;
 using Timberborn.RangedEffectBuildingUI;
 using Timberborn.SelectionSystem;
@@ -195,12 +197,22 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   public override void StartTickable() {
     base.StartTickable();
     Initialize();
+
+    _needsPower = GetComponentFast<MechanicalNode>();
+    if (_needsPower) {
+      _skipTicks = 1;
+    }
     UpdateCoverage();
     UpdateState();
   }
+  bool _needsPower;
 
   /// <inheritdoc/>
-  public override void Tick() => UpdateState();
+  public override void Tick() {
+    UpdateState();
+    --_skipTicks;
+  }
+  int _skipTicks;
 
   #endregion
 
@@ -324,11 +336,22 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <summary>Updates the eligible tiles and moisture system.</summary>
   /// <remarks>If case of there are changes in the irrigating tiles, the moisturizing will be stopped.</remarks>
   void UpdateState() {
+    if (_skipTicks > 0) {
+      return;  // Skip state checks until the component is ready.
+    }
     var newEfficiency = GetEfficiency();
     if (Mathf.Abs(CurrentEfficiency - newEfficiency) >= float.Epsilon) {
-      HostedDebugLog.Fine(this, "Efficiency changed: {0} -> {1}", CurrentEfficiency, newEfficiency);
-      CurrentEfficiency = newEfficiency;
-      UpdateCoverage();
+      // Power can fluctuate within one tick when switching from generators to batteries.
+      if (!_needsPower || _lastTickChangedEfficiency) {
+        _lastTickChangedEfficiency = false;
+        HostedDebugLog.Fine(this, "Efficiency changed: {0} -> {1}", CurrentEfficiency, newEfficiency);
+        CurrentEfficiency = newEfficiency;
+        UpdateCoverage();
+      } else {
+        _lastTickChangedEfficiency = true;
+      }
+    } else {
+      _lastTickChangedEfficiency = false;
     }
     if (BlockableBuilding.IsUnblocked && CanMoisturize()) {
       StartMoisturizing();
@@ -336,6 +359,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
       StopMoisturizing();
     }
   }
+  bool _lastTickChangedEfficiency;
 
   /// <summary>Starts logic on the irrigated tiles.</summary>
   void StartMoisturizing() {
@@ -343,8 +367,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
       return;
     }
     var overrides = ReachableTiles
-        .Select(tile => new SoilOverridesService.MoistureOverride(
-                    tile, 1.0f, CalculateDesertLevel(tile.XY(), EffectiveRange)));
+        .Select(tile => new MoistureOverride(tile, 1.0f, CalculateDesertLevel(tile.XY(), EffectiveRange)));
     _moistureOverrideIndex = _soilOverridesService.AddMoistureOverride(overrides);
     IrrigationStarted();
   }
@@ -513,8 +536,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   [OnEvent]
   public void OnEntityDeletedEvent(EntityDeletedEvent e) {
     var blockObject = e.Entity.GetComponentFast<BlockObject>();
-    var checkCoordinates = new Vector3Int(blockObject.Coordinates.x, blockObject.Coordinates.y, _baseZ);
-    if (!blockObject || !blockObject.IsFinished || !_irrigationBarriers.Contains(checkCoordinates)) {
+    if (!blockObject || !blockObject.IsFinished || !_irrigationBarriers.Contains(blockObject.Coordinates)) {
       return;
     }
     var barrier = e.Entity.GetComponentFast<SoilBarrierSpec>();
@@ -556,6 +578,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
 
   static readonly ComponentKey IrrigationTowerKey = new(typeof(IrrigationTower).FullName);
   static readonly PropertyKey<float> CurrentEfficiencyKey = new("CurrentEfficiency");
+  static readonly PropertyKey<int> MoistureOverrideIndexKey = new("MoistureOverrideIndex");
 
   /// <inheritdoc/>
   public void Save(IEntitySaver entitySaver) {
@@ -564,6 +587,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
     }
     var component = entitySaver.GetComponent(IrrigationTowerKey);
     component.Set(CurrentEfficiencyKey, CurrentEfficiency);
+    component.Set(MoistureOverrideIndexKey, _moistureOverrideIndex);
   }
 
   /// <inheritdoc/>
@@ -571,8 +595,10 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
     if (!entityLoader.TryGetComponent(IrrigationTowerKey, out var component)) {
       return;
     }
-    if (component.Has(CurrentEfficiencyKey)) {
-      CurrentEfficiency = component.Get(CurrentEfficiencyKey);
+    CurrentEfficiency = component.Get(CurrentEfficiencyKey);
+    _moistureOverrideIndex = component.Get(MoistureOverrideIndexKey);
+    if (_moistureOverrideIndex != -1) {
+      _soilOverridesService.ClaimMoistureOverrideIndex(_moistureOverrideIndex);
     }
   }
 

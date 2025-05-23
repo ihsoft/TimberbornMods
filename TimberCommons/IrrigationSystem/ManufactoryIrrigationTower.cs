@@ -84,23 +84,8 @@ public class ManufactoryIrrigationTower : IrrigationTower, ISupplyLeftProvider {
 
   /// <inheritdoc/>
   protected override float GetEfficiency() {
-    var newEfficiency = _manufactory.ProductionEfficiency();
-    if (!_manufactory.NeedsPower) {
-      return newEfficiency;
-    }
-
-    // When first loaded, the powered buildings need one tick for the mechanical node to get populated with the network
-    // data. Also, power can fluctuate when switching to/from batteries. Give it one tick to settle.
-    if (Mathf.Abs(CurrentEfficiency - newEfficiency) >= float.Epsilon) {
-      if (!_lastTickEfficiencyBad) {
-        _lastTickEfficiencyBad = true;
-        return CurrentEfficiency;
-      }
-    }
-    _lastTickEfficiencyBad = false;
-    return newEfficiency;
+    return _manufactory.ProductionEfficiency();
   }
-  bool _lastTickEfficiencyBad;
 
   /// <inheritdoc/>
   protected override void Initialize() {
