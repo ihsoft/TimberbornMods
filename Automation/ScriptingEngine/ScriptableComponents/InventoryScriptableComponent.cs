@@ -15,6 +15,7 @@ using Timberborn.Goods;
 using Timberborn.InventorySystem;
 using Timberborn.Localization;
 using Timberborn.StatusSystem;
+using Timberborn.Yielding;
 using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
@@ -45,16 +46,14 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     if (!inventory) {
       return [];
     }
+    if (inventory._goodDisallower is InRangeYielderGoodAllower) {
+      // Yielders don't know which goods they allow until they find them the first time. Return all the allowed goods.
+      return inventory.AllowedGoods.Select(x => MakeSignalName(x.StorableGood.GoodId, inventory))
+          .ToArray();
+    }
     List<GoodAmount> capacities = [];
     inventory.GetCapacity(capacities);
-    var res = new List<string>();
-    foreach (var good in capacities) {
-      var prefix = inventory.OutputGoods.Contains(good.GoodId)
-          ? OutputGoodSignalNamePrefix
-          : InputGoodSignalNamePrefix;
-      res.Add(prefix + good.GoodId);
-    }
-    return res.ToArray();
+    return capacities.Select(x => MakeSignalName(x.GoodId, inventory)).ToArray();
   }
 
   /// <inheritdoc/>
@@ -198,24 +197,39 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     _goodService = goodService;
   }
 
+  static string MakeSignalName(string goodId, Inventory inventory) {
+    var prefix = inventory.OutputGoods.Contains(goodId) ? OutputGoodSignalNamePrefix : InputGoodSignalNamePrefix;
+    return prefix + goodId;
+  }
+
   static (bool isInput, string goodId, int capacity) ParseSignalName(
       string name, AutomationBehavior behavior, bool throwErrors = false) {
     var inventory = GetInventory(behavior);
+    string goodId = null;
+    var isInput = false;
     if (name.StartsWith(InputGoodSignalNamePrefix)) {
-      var goodId = name[InputGoodSignalNamePrefix.Length..];
-      if (inventory.InputGoods.Contains(goodId) && inventory.LimitedAmount(goodId) > 0) {
-        return (true, goodId, inventory.LimitedAmount(goodId));
+      isInput = true;
+      goodId = name[InputGoodSignalNamePrefix.Length..];
+      if (!inventory.InputGoods.Contains(goodId)) {
+        goodId = null;
       }
     } else if (name.StartsWith(OutputGoodSignalNamePrefix)) {
-      var goodId = name[OutputGoodSignalNamePrefix.Length..];
-      if (inventory.OutputGoods.Contains(goodId) && inventory.LimitedAmount(goodId) > 0) {
-        return (false, goodId, inventory.LimitedAmount(goodId));
+      goodId = name[OutputGoodSignalNamePrefix.Length..];
+      if (!inventory.OutputGoods.Contains(goodId)) {
+        goodId = null;
       }
     }
-    if (throwErrors) {
-      throw new InvalidOperationException("Unknown signal: " + name);
+    if (goodId == null) {
+      if (throwErrors) {
+        throw new InvalidOperationException("Unknown signal: " + name);
+      }
+      throw new ScriptError.BadStateError(inventory, "Signal not supported: " + name);
     }
-    throw new ScriptError.BadStateError(inventory, "Signal not supported: " + name);
+    // Yielders don't know about the good until they find it the first time.
+    var forceAllowedGoods = inventory._goodDisallower is InRangeYielderGoodAllower;
+    return forceAllowedGoods
+        ? (isInput, goodId, inventory.AllowedGoods.First(x => x.StorableGood.GoodId == goodId).Amount)
+        : (isInput, goodId, inventory.LimitedAmount(goodId));
   }
 
   string LocGoodSignal(string name, string goodId) {
@@ -252,14 +266,14 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
         throw new InvalidOperationException("Inventory component not found on: " + DebugEx.ObjectToString(this));
       }
       _inventory.InventoryStockChanged += NotifyChange;
+      _inventory.InventoryCapacityReservationChanged += (_, args) => {
+        HostedDebugLog.Warning(_inventory, "Capacity reservation changed: {0}", _inventory.ReservedCapacity(args.GoodAmount.GoodId));
+      };
+      //FIXME: react on inventory change to recompile the scripts, how? send a signal to recompile all on the behavior?
     }
 
     void NotifyChange(object sender, InventoryAmountChangedEventArgs args) {
-      var goodId = args.GoodAmount.GoodId;
-      var prefix = _inventory.OutputGoods.Contains(goodId)
-          ? OutputGoodSignalNamePrefix
-          : InputGoodSignalNamePrefix;
-      ScheduleSignal(prefix + goodId, ignoreErrors: true);
+      ScheduleSignal(MakeSignalName(args.GoodAmount.GoodId, _inventory), ignoreErrors: true);
     }
   }
 

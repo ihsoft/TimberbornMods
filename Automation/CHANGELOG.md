@@ -1,4 +1,5 @@
 # v2.2.2 (pre-release):
+* [Fix #84] Output good signals are not shown on the gathering flags.
 
 # v2.2.1 (22 May 2025):
 * [Fix #76] Game crashes on recursive signals.
