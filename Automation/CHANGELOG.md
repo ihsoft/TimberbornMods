@@ -1,3 +1,5 @@
+# v2.2.2 (pre-release):
+
 # v2.2.1 (22 May 2025):
 * [Fix #76] Game crashes on recursive signals.
 
