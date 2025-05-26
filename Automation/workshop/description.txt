@@ -3,6 +3,10 @@ This mod allows assigning a set of rules to a building. The rules execute logic 
 
 If you feel like you can learn the scripting language, you can do so. The scripting language is simple and easy to learn. Read about it [url=https://github.com/ihsoft/TimberbornMods/wiki/Automation-(scripting)]here[/url].
 
+[h1]Supported languages[/h1]
+[img]https://raw.githubusercontent.com/ihsoft/TimberbornMods/main/Assets/enUS-banner.png[/img] English
+[img]https://raw.githubusercontent.com/ihsoft/TimberbornMods/main/Assets/ruRU-banner.png[/img] Русский
+
 [h1]Rules editor dialog[/h1]
 
 Rules can be created and edited via the [i]Rules editor dialog[/i]. The dialog is opened by clicking on the related button in the building's entity UI.
