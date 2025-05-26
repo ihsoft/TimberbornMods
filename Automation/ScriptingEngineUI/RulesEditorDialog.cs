@@ -12,6 +12,7 @@ using IgorZ.TimberDev.UI;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.CoreUI;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
@@ -36,7 +37,7 @@ sealed class RulesEditorDialog : IPanelController {
       _dialogBoxShower.Create().SetMessage(_uiFactory.T(PendingEditsNotificationLocKey)).Show();
       return true;
     }
-    if (HasErrors) {
+    if (HasErrors && !Keyboard.current.ctrlKey.isPressed) {
       _dialogBoxShower.Create().SetMessage(_uiFactory.T(RulesWithErrorsLocKey)).Show();
       return true;
     }
