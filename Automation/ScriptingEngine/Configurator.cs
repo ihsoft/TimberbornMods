@@ -11,5 +11,6 @@ namespace IgorZ.Automation.ScriptingEngine;
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<ScriptingService>().AsSingleton();
+    containerDefinition.Bind<TemplatingService>().AsSingleton();
   }
 }

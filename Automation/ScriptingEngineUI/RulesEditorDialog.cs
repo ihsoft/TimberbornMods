@@ -9,6 +9,7 @@ using IgorZ.Automation.Actions;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.Conditions;
 using IgorZ.TimberDev.UI;
+using TimberApi.DependencyContainerSystem;
 using Timberborn.CoreUI;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -79,10 +80,33 @@ sealed class RulesEditorDialog : IPanelController {
       btn.clicked += () => provider.MakeForRule(CreateScriptedRule());
       buttons.Add(btn);
     }
+
+    _root.Q<Button>("ImportRulesButton").clicked += () => {
+      var dlg = DependencyContainer.GetInstance<ImportRulesDialog>();
+      dlg.Show(_activeBuilding, rules => OnImportComplete(rules, dlg.DeleteExistingRules));
+    };
+    _root.Q<Button>("ExportRulesButton").clicked += () => {
+      var dlg = DependencyContainer.GetInstance<ExportRulesDialog>();
+      dlg.Show(_activeBuilding);
+    };
+
     SetActiveBuilding(behavior);
 
     _onClosed = onClosed;
     _panelStack.PushDialog(this);
+  }
+
+  void OnImportComplete(IList<IAutomationAction> rules, bool clearExisting) {
+    if (clearExisting) {
+      Reset();
+    }
+    foreach (var rule in rules) {
+      var ruleRow = CreateScriptedRule();
+      if (rule is ScriptedAction scriptedAction && rule.Condition is ScriptedCondition scriptedCondition) {
+        ruleRow.Initialize(scriptedCondition, scriptedAction);
+      }
+      ruleRow.SwitchToViewMode();
+    }
   }
 
   public void Close() => _panelStack.Pop(this);

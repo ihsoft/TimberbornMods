@@ -154,6 +154,8 @@ IgorZ.Automation.Scripting.Editor.DiscardChangesBtn,"Discard changes",
 IgorZ.Automation.Scripting.Editor.DiscardScriptBtn,"Discard",
 IgorZ.Automation.Scripting.Editor.EditAsScriptBtn,"Script",
 IgorZ.Automation.Scripting.Editor.EditInConstructorBtn,"Constructor",
+IgorZ.Automation.Scripting.Editor.ExportRulesBtn,"Export rules",
+IgorZ.Automation.Scripting.Editor.ImportRulesBtn,"Import rules",
 IgorZ.Automation.Scripting.Editor.MoreInfoBtn,"Read about scripting",
 IgorZ.Automation.Scripting.Editor.NumberConstantType,"number","Name of the number constant type"
 IgorZ.Automation.Scripting.Editor.PendingEditsNotification,"There are rules in the editing state. Complete them first.",
@@ -166,6 +168,22 @@ IgorZ.Automation.Scripting.Editor.StringConstantType,"string","Name of the strin
 IgorZ.Automation.Scripting.Editor.TemplateFamilyLabel,"Template group: {0}","Name of the template group (family) the rule belongs to"
 IgorZ.Automation.Scripting.Editor.TestScriptBtn,"Test",
 IgorZ.Automation.Scripting.Editor.UnsavedChangesConfirmation,"There are unsaved changes. Do you want to discard them?",
+=,=,"Import dialog"
+IgorZ.Automation.Scripting.Editor.ExportDialogHeader,"Export automation rules",
+IgorZ.Automation.Scripting.Editor.ImportDialogHeader,"Import automation rules",
+IgorZ.Automation.Scripting.ImportDialog.AllowErrors,"Import with errors",
+IgorZ.Automation.Scripting.ImportDialog.DeleteExistingRules,"Delete existing rules",
+IgorZ.Automation.Scripting.ImportDialog.ReadMore,"Read about imports",
+IgorZ.Automation.Scripting.ImportDialog.ReadMoreUrl,"https://github.com/ihsoft/TimberbornMods/wiki/Automation-export-import-concept",
+IgorZ.Automation.Scripting.ImportDialog.SkipFailedRules,"Skip failed rules",
+IgorZ.Automation.Scripting.ImportRules.ActionNotApplicableError,"Action not applicable:
+{0}",
+IgorZ.Automation.Scripting.ImportRules.ConditionNotApplicableError,"Condition not applicable:
+{0}",
+IgorZ.Automation.Scripting.ImportRules.ExpectedActionError,"Expected action expression",
+IgorZ.Automation.Scripting.ImportRules.ExpectedConditionError,"Expected condition expression",
+IgorZ.Automation.Scripting.ImportRules.ImportError,"Error at line {0}: {1}",
+IgorZ.Automation.Scripting.ImportRules.IncompleteDeclarationError,"Incomplete rule declaration",
 =,=,"Mod settings"
 IgorZ.Automation.Settings.Debug.PathCheckingProfiling,"Log path checking engine statistics",
 IgorZ.Automation.Settings.EntityPanel.AlwaysShowAddRulesButton,"Always show 'Add rules' button",

@@ -155,6 +155,8 @@ IgorZ.Automation.Scripting.Editor.DiscardChangesBtn,"Отменить измен
 IgorZ.Automation.Scripting.Editor.DiscardScriptBtn,"Отменить",
 IgorZ.Automation.Scripting.Editor.EditAsScriptBtn,"Скрипт",
 IgorZ.Automation.Scripting.Editor.EditInConstructorBtn,"Конструктор",
+IgorZ.Automation.Scripting.Editor.ExportRulesBtn,"Экспортировать правила",
+IgorZ.Automation.Scripting.Editor.ImportRulesBtn,"Импортировать правила",
 IgorZ.Automation.Scripting.Editor.MoreInfoBtn,"Читать о скриптах"
 IgorZ.Automation.Scripting.Editor.NumberConstantType,"число","Name of the number constant type"
 IgorZ.Automation.Scripting.Editor.PendingEditsNotification,"Некоторые правила в режиме редактирования. Сначала завершите их.",
@@ -167,6 +169,22 @@ IgorZ.Automation.Scripting.Editor.StringConstantType,"строка","Name of the
 IgorZ.Automation.Scripting.Editor.TemplateFamilyLabel,"Группа шаблонов: {0}","Name of the template group (family) the rule belongs to"
 IgorZ.Automation.Scripting.Editor.TestScriptBtn,"Проверить",
 IgorZ.Automation.Scripting.Editor.UnsavedChangesConfirmation,"Есть несохраненные изменения. Вы хотите их отменить?",
+=,=,"Import dialog"
+IgorZ.Automation.Scripting.Editor.ExportDialogHeader,"Экспорт правил автоматизации",
+IgorZ.Automation.Scripting.Editor.ImportDialogHeader,"Импорт правил автоматизации",
+IgorZ.Automation.Scripting.ImportDialog.AllowErrors,"Импортировать с ошибками",
+IgorZ.Automation.Scripting.ImportDialog.DeleteExistingRules,"Удалить существующие правила",
+IgorZ.Automation.Scripting.ImportDialog.ReadMore,"Читать об импорте",
+IgorZ.Automation.Scripting.ImportDialog.ReadMoreUrl,"https://github.com/ihsoft/TimberbornMods/wiki/Automation-export-import-concept",
+IgorZ.Automation.Scripting.ImportDialog.SkipFailedRules,"Игнорировать правила с ошибками",
+IgorZ.Automation.Scripting.ImportRules.ActionNotApplicableError,"Действие не применимо:
+{0}",
+IgorZ.Automation.Scripting.ImportRules.ConditionNotApplicableError,"Условие не применимо:
+{0}",
+IgorZ.Automation.Scripting.ImportRules.ExpectedActionError,"Ожидается выражение для действия",
+IgorZ.Automation.Scripting.ImportRules.ExpectedConditionError,"Ожидается выражение для условия",
+IgorZ.Automation.Scripting.ImportRules.ImportError,"Ошибка импорта на строке {0}: {1}",
+IgorZ.Automation.Scripting.ImportRules.IncompleteDeclarationError,"Неполное объявление правила",
 =,=,"Mod settings"
 IgorZ.Automation.Settings.Debug.PathCheckingProfiling,"Печатать статистику движка поиска путей",
 IgorZ.Automation.Settings.EntityPanel.Header,"Элементы управления на панели здания",

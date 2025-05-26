@@ -13,5 +13,7 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<RulesEditorDialog>().AsSingleton();
     containerDefinition.Bind<ConstructorEditorProvider>().AsSingleton();
     containerDefinition.Bind<ScriptEditorProvider>().AsSingleton();
+    containerDefinition.Bind<ImportRulesDialog>().AsSingleton();
+    containerDefinition.Bind<ExportRulesDialog>().AsSingleton();
   }
 }

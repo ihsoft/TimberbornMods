@@ -1,3 +1,6 @@
+# v2.3.0 (pre-release):
+* [Feature] Add import/export feature for the rules.
+
 # v2.2.2 (25 May 2025):
 * [Fix #84] Output good signals are not shown on the gathering flags.
 

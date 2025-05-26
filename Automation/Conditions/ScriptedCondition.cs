@@ -108,7 +108,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   /// parsing errors in the precondition will be silently ignored.
   /// </remarks>
   // ReSharper disable once MemberCanBePrivate.Global
-  public string Precondition { get; private set; }
+  public string Precondition { get; set; }
 
   /// <summary>Sets the condition expression.</summary>
   /// <remarks>Can only be set on the non-active condition.</remarks>
