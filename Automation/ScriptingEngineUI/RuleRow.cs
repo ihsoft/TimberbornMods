@@ -12,7 +12,6 @@ using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.TimberDev.UI;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.CoreUI;
-using UnityDev.Utils.LogUtilsLite;
 using UnityEngine.UIElements;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
