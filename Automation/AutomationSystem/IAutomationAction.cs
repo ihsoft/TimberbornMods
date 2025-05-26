@@ -31,8 +31,8 @@ public interface IAutomationAction : IGameSerializable {
   /// <summary>Name of the template family that created this action.</summary>
   /// <remarks>
   /// Several templates can set the same automation, but with different condition settings. Such templates form
-  /// "a family". Applying another template from the same family may (or may not) clears the exiting automations from the
-  /// same family. It is the template handler responsibility to deal with the existing automation.
+  /// "a family". Applying another template from the same family will clear the exiting automations from the same
+  /// family. It is the template handler responsibility to deal with the existing automation.
   /// </remarks>
   public string TemplateFamily { get; set; }
 
