@@ -139,9 +139,30 @@
     padding-left: 10px;
 }
 
+.timberdev-button-normal--left-aligned {
+    padding-top: 2px;
+    padding-right: 10px;
+    padding-bottom: 2px;
+    padding-left: 10px;
+    margin-right: 5px;
+}
+
 .timberdev-button-big {
     padding-top: 5px;
     padding-right: 15px;
     padding-bottom: 5px;
     padding-left: 15px;
+}
+
+.timberdev-button-big--left-aligned {
+    padding-top: 5px;
+    padding-right: 15px;
+    padding-bottom: 5px;
+    padding-left: 15px;
+    margin-right: 5px;
+}
+
+.timberdev-text-input {
+    --unity-cursor-color: rgb(180, 180, 180);
+    --unity-selection-color: rgba(61, 128, 223, 0.65);
 }

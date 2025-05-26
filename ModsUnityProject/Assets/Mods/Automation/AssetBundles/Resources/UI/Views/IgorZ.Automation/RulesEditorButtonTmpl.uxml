@@ -1,5 +1,6 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle" />
     <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle" />
-    <Timberborn.CoreUI.NineSliceButton text="RuleRowButton" class="button-game game-text-big" style="padding-top: 5px; padding-bottom: 5px; padding-right: 15px; padding-left: 15px; margin-right: 5px;" />
+    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/TimberDevStyle.uss?fileID=7433441132597879392&amp;guid=86824deb2a4bc844cbec48367a164254&amp;type=3#TimberDevStyle" />
+    <Timberborn.CoreUI.NineSliceButton text="RuleRowButton" class="button-game game-text-big timberdev-button-big--left-aligned" style="margin-right: 5px;" />
 </engine:UXML>
