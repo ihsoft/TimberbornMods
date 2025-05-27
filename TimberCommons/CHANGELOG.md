@@ -1,5 +1,6 @@
-# v1.11.6 (pre-release)
-* Fix IrrigationTower component for Update 7.
+# v1.12.0 (pre-release)
+* [Change] Update to support game version `v0.7.9.0`. It is incompatible with the previous game versions.
+* [Change] Fix IrrigationTower component for Update 7.
 
 # v1.11.5 (27 Apr 2025)
 * Update to support game version `0.7.6.1`.

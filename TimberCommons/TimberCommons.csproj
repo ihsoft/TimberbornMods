@@ -48,17 +48,15 @@
       <Reference Include="ModSettings.CoreUI">
         <HintPath>..\Dependencies\Workshop\3283831040\version-0.6\Scripts\ModSettings.CoreUI.dll</HintPath>
       </Reference>
-      <Reference Include="System" />
-      <Reference Include="System.Collections.Immutable">
-        <HintPath>..\Dependencies\GameRoot\Timberborn_Data\Managed\System.Collections.Immutable.dll</HintPath>
-      </Reference>
       <Reference Include="TimberApi">
         <HintPath>..\Dependencies\Workshop\3288241660\version-0.7\core\TimberApi.dll</HintPath>
       </Reference>
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />
-      <PackageReference Include="protobuf-net" Version="2.4.0" />
+      <PackageReference Include="protobuf-net" Version="3.0.0" />
+      <PackageReference Include="protobuf-net.Core" Version="3.0.0" />
+      <PackageReference Include="System.Collections.Immutable" Version="9.0.0" />
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Timberborn.*.dll" Publicize="true" />
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Unity*.dll" Publicize="false"/>
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Bindito.*.dll" Publicize="false"/>
@@ -128,7 +126,7 @@
     </PropertyGroup>
     <Target Name="AfterBuild" Condition="Exists('$(ModPath)')">
         <Message Text="### Copying DLL to the game's mods folder... ###" Importance="high"/>
-        <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\version-0.7\Scripts"/>
+        <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\version-0.7.9\Scripts"/>
     </Target>
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
       <PropertyGroup>
