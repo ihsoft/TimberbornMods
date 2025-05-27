@@ -9,6 +9,7 @@ using IgorZ.Automation.ScriptingEngine;
 using IgorZ.TimberDev.UI;
 using Timberborn.CoreUI;
 using UnityDev.Utils.LogUtilsLite;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
@@ -16,6 +17,7 @@ namespace IgorZ.Automation.ScriptingEngineUI;
 class ImportRulesDialog : IPanelController {
 
   const string ImportErrorLocKey = "IgorZ.Automation.Scripting.ImportRules.ImportError";
+  const string ReadMoreUrlLocKey = "IgorZ.Automation.Scripting.ImportDialog.ReadMoreUrl";
 
   #region IPanelController implementation
 
@@ -77,6 +79,7 @@ class ImportRulesDialog : IPanelController {
     _root.Q<Button>("CloseButton").clicked += Close;
     _root.Q<Button>("CancelButton").clicked += Close;
     _root.Q<Button>("ImportButton").clicked += OnSaveButtonClicked;
+    _root.Q<Button>("ReadMoreButton").clicked += () => Application.OpenURL(_uiFactory.T(ReadMoreUrlLocKey));
     
     _skipFailedRules = _root.Q<Toggle>("SkipFailedRulesToggle");
     _allowErrors = _root.Q<Toggle>("AllowErrorsToggle");
