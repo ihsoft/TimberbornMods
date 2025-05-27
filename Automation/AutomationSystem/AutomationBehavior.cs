@@ -57,6 +57,9 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
   public IList<IAutomationAction> Actions => _actions.AsReadOnly();
   List<IAutomationAction> _actions = [];
 
+  /// <summary>The Version is updated each time the rules set is changed.</summary>
+  public int ActionsVersion { get; private set; }
+
   /// <summary>Creates a rule from the condition and action.</summary>
   /// <param name="condition">
   /// Condition definition. It will be owned by the behavior. Don't change or re-use it after adding.
@@ -71,6 +74,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
     action.Behavior = this;
     condition.SyncState();
     _actions.Add(action);
+    ActionsVersion++;
     UpdateRegistration();
   }
 
@@ -81,6 +85,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
     action.Condition.Behavior = null;
     action.Behavior = null;
     _actions.RemoveAt(index);
+    ActionsVersion++;
     UpdateRegistration();
   }
 

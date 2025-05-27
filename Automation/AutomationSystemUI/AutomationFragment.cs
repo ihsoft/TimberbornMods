@@ -48,8 +48,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
   AutomationBehavior _automationBehavior;
 
-  int _lastTickEffectsChecked = -1;
-  bool _buildingHasEffects;
+  int _automationBehaviorVersion = -1;
 
   AutomationFragment(UiFactory uiFactory, RulesEditorDialog rulesEditorDialog, CopyRulesTool copyRulesTool,
                      EntityPanelSettings entityPanelSettings, ScriptingService scriptingService) {
@@ -65,8 +64,8 @@ sealed class AutomationFragment : IEntityPanelFragment {
     _rulesList = _root.Q(RulesListName);
 
     _addRulesButton = _root.Q<Button>(AddRulesButtonName);
-    _addRulesButton.clicked += () => _rulesEditorDialog.Show(_automationBehavior, UpdateView);
-    _root.Q<Button>(EditRulesButtonName).clicked += () => _rulesEditorDialog.Show(_automationBehavior, UpdateView);
+    _addRulesButton.clicked += () => _rulesEditorDialog.Show(_automationBehavior, null);
+    _root.Q<Button>(EditRulesButtonName).clicked += () => _rulesEditorDialog.Show(_automationBehavior, null);
     _root.Q<Button>(CopyRulesButtonName).clicked += () => _copyRulesTool.StartTool(_automationBehavior);
 
     _root.ToggleDisplayStyle(visible: false);
@@ -75,8 +74,20 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
   public void ShowFragment(BaseComponent entity) {
     _automationBehavior = entity.GetComponentFast<AutomationBehavior>();
-    _lastTickEffectsChecked = -1;
-    UpdateView();
+    if (!_automationBehavior) {
+      return;
+    }
+    if (!_automationBehavior.HasActions && !_entityPanelSettings.AlwaysShowAddRulesButton.Value) {
+      var buildingHasEffects =
+          _scriptingService.GetSignalNamesForBuilding(_automationBehavior).Any(x => !GlobalActions.Any(x.StartsWith))
+          || _scriptingService.GetActionNamesForBuilding(_automationBehavior).Any(x => !GlobalActions.Any(x.StartsWith));
+      if (!buildingHasEffects) {
+        _automationBehavior = null;
+        return;
+      }
+    }
+    _automationBehaviorVersion = -1;
+    _root.ToggleDisplayStyle(true);
   }
 
   public void ClearFragment() {
@@ -84,29 +95,10 @@ sealed class AutomationFragment : IEntityPanelFragment {
   }
 
   public void UpdateFragment() {
-    if (_automationBehavior) {
-      UpdateView();
-    }
-  }
-
-  void UpdateView() {
-    if (!_automationBehavior) {
-      _root.ToggleDisplayStyle(false);
+    if (!_automationBehavior || _automationBehavior.ActionsVersion == _automationBehaviorVersion) {
       return;
     }
-    if (!_automationBehavior.HasActions && !_entityPanelSettings.AlwaysShowAddRulesButton.Value) {
-      // It is too expensive to check for the building's signals and actions every tick.
-      if (_lastTickEffectsChecked != AutomationService.CurrentTick) {
-        _lastTickEffectsChecked = AutomationService.CurrentTick;
-        _buildingHasEffects =
-            _scriptingService.GetSignalNamesForBuilding(_automationBehavior).Any(x => !GlobalActions.Any(x.StartsWith))
-            || _scriptingService.GetActionNamesForBuilding(_automationBehavior).Any(x => !GlobalActions.Any(x.StartsWith));
-      }
-      if (!_buildingHasEffects) {
-        _root.ToggleDisplayStyle(false);
-        return;
-      }
-    }
+    _automationBehaviorVersion = _automationBehavior.ActionsVersion;
 
     _root.ToggleDisplayStyle(visible: true);
     _root.Q(RulesPanelName).ToggleDisplayStyle(_automationBehavior.HasActions);
