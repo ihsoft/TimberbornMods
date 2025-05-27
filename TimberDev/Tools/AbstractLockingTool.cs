@@ -73,9 +73,7 @@ public abstract class AbstractLockingTool : AbstractAreaSelectionTool {
   protected override void OnSelectionModeChange(bool newMode) {
     base.OnSelectionModeChange(newMode);
     if (newMode) {
-      if (!IsShiftHeld
-          || HighlightedBlockObject == null
-          || !CheckCanLockOnComponent(HighlightedBlockObject)) {
+      if (!IsShiftHeld || !HighlightedBlockObject || !CheckCanLockOnComponent(HighlightedBlockObject)) {
         return;
       }
       LockedComponent = HighlightedBlockObject;
