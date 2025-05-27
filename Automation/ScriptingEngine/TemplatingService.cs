@@ -101,9 +101,9 @@ class TemplatingService {
 
   /// <summary>Renders the automation rules to a text format that can be imported later.</summary>
   /// <seealso cref="ParseFromText"/>
-  public string RenderRulesToText(AutomationBehavior behavior) {
+  public string RenderRulesToText(IList<IAutomationAction> actions) {
     var text = new List<string>();
-    foreach (var action in behavior.Actions) {
+    foreach (var action in actions) {
       if (action.Condition is not ScriptedCondition scriptedCondition || action is not ScriptedAction scriptedAction) {
         DebugEx.Warning("Ignoring non-scripted action: {0}", action);
         continue;

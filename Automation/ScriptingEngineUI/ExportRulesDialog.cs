@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System.Collections.Generic;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine;
 using IgorZ.TimberDev.UI;
@@ -11,8 +12,6 @@ using UnityEngine.UIElements;
 namespace IgorZ.Automation.ScriptingEngineUI;
 
 class ExportRulesDialog : IPanelController {
-
-  const string ImportErrorLocKey = "IgorZ.Automation.Scripting.ImportRules.ImportError";
 
   #region IPanelController implementation
 
@@ -35,8 +34,8 @@ class ExportRulesDialog : IPanelController {
 
   #region API
 
-  public void Show(AutomationBehavior automationBehavior) {
-    _exportText.value = _templatingService.RenderRulesToText(automationBehavior);
+  public void Show(IList<IAutomationAction> actions) {
+    _exportText.value = _templatingService.RenderRulesToText(actions);
     _panelStack.PushDialog(this);
   }
 
