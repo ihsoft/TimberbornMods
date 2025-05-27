@@ -146,7 +146,6 @@ public abstract class AbstractAreaSelectionTool : ToolWithDescription, IInputPro
   /// <inheritdoc/>
   public override void Enter() {
     InputService.AddInputProcessor(this);
-    _areaBlockObjectPicker = _areaBlockObjectPickerFactory.CreatePickingUpwards();
     if (CursorName != null) {
       _cursorService.SetCursor(CursorName);
     }
@@ -154,12 +153,12 @@ public abstract class AbstractAreaSelectionTool : ToolWithDescription, IInputPro
 
   /// <inheritdoc/>
   public override void Exit() {
-    _highlightSelectionDrawer.StopDrawing();
-    _actionSelectionDrawer.StopDrawing();
+    _areaBlockObjectPicker.Reset();
     InputService.RemoveInputProcessor(this);
     if (CursorName != null) {
       _cursorService.ResetCursor();
     }
+    ShowNoneCallback();
   }
 
   #endregion
@@ -169,7 +168,7 @@ public abstract class AbstractAreaSelectionTool : ToolWithDescription, IInputPro
   /// <inheritdoc/>
   public virtual bool ProcessInput() {
     return _areaBlockObjectPicker.PickBlockObjects<BuilderPrioritizable>(
-      PreviewCallback, ActionCallback, ShowNoneCallback);
+        PreviewCallback, ActionCallback, ShowNoneCallback);
   }
 
   #endregion
@@ -178,6 +177,8 @@ public abstract class AbstractAreaSelectionTool : ToolWithDescription, IInputPro
 
   /// <inheritdoc/>
   protected override void Initialize() {
+    base.Initialize();
+    _areaBlockObjectPicker = _areaBlockObjectPickerFactory.CreatePickingUpwards();
     CreateDrawers();
   }
 
