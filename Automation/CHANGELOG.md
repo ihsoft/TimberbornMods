@@ -1,4 +1,5 @@
-# v2.3.0 (pre-release):
+# v2.3.1 (pre-release):
+* [Change] Support Timberborn `0.7.9.0`. Incompatible with the previous versions of Update 7.
 * [Feature] Add import/export feature for the rules.
 
 # v2.2.2 (25 May 2025):

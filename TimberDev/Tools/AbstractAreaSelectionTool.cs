@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Bindito.Core;
 using Timberborn.AreaSelectionSystem;
+using Timberborn.AreaSelectionSystemUI;
 using Timberborn.BlockSystem;
 using Timberborn.BuilderPrioritySystem;
 using Timberborn.InputSystem;
