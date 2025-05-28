@@ -1,4 +1,4 @@
-# v1.12.0 (pre-release)
+# v1.12.0 (27 May 2025)
 * [Change] Update to support game version `v0.7.9.0`. It is incompatible with the previous game versions.
 * [Change] Fix IrrigationTower component for Update 7.
 
