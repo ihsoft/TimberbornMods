@@ -8,7 +8,6 @@ using System.Linq;
 using IgorZ.TimberCommons.Settings;
 using IgorZ.TimberDev.Utils;
 using ProtoBuf;
-using TimberApi.DependencyContainerSystem;
 using Timberborn.BlockSystem;
 using Timberborn.Common;
 using Timberborn.EntitySystem;
@@ -183,7 +182,7 @@ public class SoilOverridesService : ILoadableSingleton, ITickableSingleton, IPos
   public void Load() {
     _eventBus.Register(this);
     
-    var singletonLoader = DependencyContainer.GetInstance<ISingletonLoader>();
+    var singletonLoader = StaticBindings.DependencyContainer.GetInstance<ISingletonLoader>();
     if (!singletonLoader.TryGetSingleton(TreeCuttingAreaKey, out var objectLoader)) {
       return;
     }
@@ -235,7 +234,7 @@ public class SoilOverridesService : ILoadableSingleton, ITickableSingleton, IPos
       _needMoistureOverridesUpdate = true;
       UpdateMoistureOverrides();
       if (IrrigationSystemSettings.OverrideDesertLevelsForWaterTowers) {
-        var terrainMaterialMap = DependencyContainer.GetInstance<TerrainMaterialMap>();
+        var terrainMaterialMap = StaticBindings.DependencyContainer.GetInstance<TerrainMaterialMap>();
         terrainMaterialMap.ProcessDesertTextureChanges();
       }
     }

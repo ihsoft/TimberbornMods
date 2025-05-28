@@ -48,9 +48,6 @@
       <Reference Include="ModSettings.CoreUI">
         <HintPath>..\Dependencies\Workshop\3283831040\version-0.6\Scripts\ModSettings.CoreUI.dll</HintPath>
       </Reference>
-      <Reference Include="TimberApi">
-        <HintPath>..\Dependencies\Workshop\3288241660\version-0.7\core\TimberApi.dll</HintPath>
-      </Reference>
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />
