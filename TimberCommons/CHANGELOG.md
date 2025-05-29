@@ -1,4 +1,4 @@
-# v1.11.6 (pre-release)
+# v1.11.6 (28 May 2025) - Patch for `0.7.6.1`
 * Fix IrrigationTower component for Update 7.
 
 # v1.11.5 (27 Apr 2025)
