@@ -184,6 +184,7 @@ IgorZ.Automation.Scripting.ImportRules.ExpectedActionError,"Expected action expr
 IgorZ.Automation.Scripting.ImportRules.ExpectedConditionError,"Expected condition expression",
 IgorZ.Automation.Scripting.ImportRules.ImportError,"Error at line {0}: {1}",
 IgorZ.Automation.Scripting.ImportRules.IncompleteDeclarationError,"Incomplete rule declaration",
+IgorZ.Automation.Scripting.ImportRules.UnclosedMultiLineComment,"Unclosed multi-line comment",
 =,=,"Mod settings"
 IgorZ.Automation.Settings.Debug.PathCheckingProfiling,"Log path checking engine statistics",
 IgorZ.Automation.Settings.EntityPanel.AlwaysShowAddRulesButton,"Always show 'Add rules' button",

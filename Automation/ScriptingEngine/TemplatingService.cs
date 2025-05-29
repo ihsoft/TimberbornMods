@@ -15,6 +15,7 @@ namespace IgorZ.Automation.ScriptingEngine;
 class TemplatingService {
 
   const string IncompleteDeclarationErrorLocKey = "IgorZ.Automation.Scripting.ImportRules.IncompleteDeclarationError";
+  const string UnclosedMultiLineCommentErrorLocKey = "IgorZ.Automation.Scripting.ImportRules.UnclosedMultiLineComment";
   const string ExpectedConditionErrorLocKey = "IgorZ.Automation.Scripting.ImportRules.ExpectedConditionError";
   const string ExpectedActionErrorLocKey = "IgorZ.Automation.Scripting.ImportRules.ExpectedActionError";
   const string ConditionNotApplicableErrorLocKey = "IgorZ.Automation.Scripting.ImportRules.ConditionNotApplicableError";
@@ -132,11 +133,37 @@ class TemplatingService {
   }
 
   string TakeNextLine(string[] lines, ref int index, bool dontFail = false) {
+    string multiLineCommentCloseTag = null;
     while (index < lines.Length) {
       var line = lines[index++].Trim();
-      if (line.Length > 0 && !line.StartsWith("#")) {
+      if (line.Length == 0) {
+        continue; // Skip empty lines
+      }
+      if (multiLineCommentCloseTag != null) {
+        if (line.EndsWith(multiLineCommentCloseTag)) {
+          multiLineCommentCloseTag = null;  // Close the multi-line comment
+        }
+        continue;
+      }
+      if (line.StartsWith("/*")) {
+        if (!line.EndsWith("*/")) {
+          multiLineCommentCloseTag = "*/";
+        }
+        continue;
+      }
+      if (line.StartsWith("#|")) {
+        if (!line.EndsWith("|#")) {
+          multiLineCommentCloseTag = "|#";
+        }
+        continue;
+      }
+      if (!line.StartsWith("#") && !line.StartsWith("//") && !line.StartsWith(";")) {
         return line; // Return the first non-empty, non-comment line
       }
+    }
+    if (multiLineCommentCloseTag != null) {
+      DebugEx.Warning("Multi-line comment not closed at {0}", index);
+      throw new ImportError(index, _uiFactory.T(UnclosedMultiLineCommentErrorLocKey));
     }
     if (dontFail) {
       return null; // No more lines to process
