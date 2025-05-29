@@ -1,4 +1,5 @@
 # v2.4.0 (pre-release):
+* [Feature #88] Allow operator `add` accepting multiple arguments.
 
 # v2.3.1 (26 May 2025):
 * [Change] Support Timberborn `0.7.9.0`. Incompatible with the previous versions of Update 7.

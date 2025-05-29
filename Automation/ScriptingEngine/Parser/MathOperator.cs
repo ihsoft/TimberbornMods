@@ -40,7 +40,7 @@ class MathOperator : AbstractOperator, IValueExpr {
   public static IExpression TryCreateFrom(string name, IList<IExpression> arguments) {
     return name switch {
         AddOperatorName => new MathOperator(
-            name, arguments, 2, 2, args => args[0].ValueFn() + args[1].ValueFn()),
+            name, arguments, 2, -1, args => args.Select(x => x.ValueFn()).Aggregate((a, b) => a + b)),
         SubOperatorName => new MathOperator(
             name, arguments, 2, 2, args => args[0].ValueFn() - args[1].ValueFn()),
         MulOperatorName => new MathOperator(
