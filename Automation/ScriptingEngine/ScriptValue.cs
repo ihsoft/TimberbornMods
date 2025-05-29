@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using System.Linq;
 using IgorZ.TimberDev.UI;
 using UnityEngine;
@@ -9,7 +10,7 @@ using UnityEngine;
 namespace IgorZ.Automation.ScriptingEngine;
 
 /// <summary>Value that can be passed around in the scripting engine.</summary>
-record struct ScriptValue {
+record struct ScriptValue : IComparable<ScriptValue> {
   /// <summary>Type of the value.</summary>
   public enum TypeEnum {
     /// <summary>
@@ -62,6 +63,17 @@ record struct ScriptValue {
 
   public static ScriptValue operator *(ScriptValue left, ScriptValue right) {
     return new ScriptValue { _number = left.AsNumber * right.AsNumber / 100 };
+  }
+
+  public int CompareTo(ScriptValue other) {
+    if (ValueType != other.ValueType) {
+      throw new InvalidOperationException($"Cannot compare values of different types: {this} vs {other}");
+    }
+    return ValueType switch {
+        TypeEnum.Number => AsNumber.CompareTo(other.AsNumber),
+        TypeEnum.String => string.Compare(AsString, other.AsString, StringComparison.Ordinal),
+        _ => throw new InvalidOperationException("Unknown ScriptValue type: " + ValueType),
+    };
   }
 
   /// <exception cref="ScriptError">if dividing by zero.</exception>

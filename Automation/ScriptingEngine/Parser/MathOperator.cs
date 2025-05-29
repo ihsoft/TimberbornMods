@@ -48,11 +48,9 @@ class MathOperator : AbstractOperator, IValueExpr {
         DivOperatorName => new MathOperator(
             name, arguments, 2, 2, args => args[0].ValueFn() / args[1].ValueFn()),
         MinOperatorName => new MathOperator(
-            name, arguments, 2, -1,
-            args => ScriptValue.Of(args.Min(x => x.ValueFn().AsNumber))),
+            name, arguments, 2, -1, args => args.Select(x => x.ValueFn()).Min()),
         MaxOperatorName => new MathOperator(
-            name, arguments, 2, -1,
-            args => ScriptValue.Of(args.Max(x => x.ValueFn().AsNumber))),
+            name, arguments, 2, -1, args => args.Select(x => x.ValueFn()).Max()),
         RoundOperatorName => new MathOperator(
             name, arguments, 1, 1, args => ScriptValue.FromInt(args[0].ValueFn().AsInt)),
         _ => null,
