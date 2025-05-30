@@ -93,7 +93,7 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
     if (!_cachedActionDefs.TryGetValue(name, out var actionDef)) {
       actionDef = getDefault();
       _cachedActionDefs[name] = actionDef;
-      DebugEx.Fine("Registering action in cache:\n{0}", actionDef);
+      DebugEx.Fine("Registering action definition in cache:\n{0}", actionDef);
     }
     return actionDef;
   }
@@ -103,7 +103,7 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
     if (!_cachedSignalDefs.TryGetValue(name, out var signalDef)) {
       signalDef = getDefault();
       _cachedSignalDefs[name] = signalDef;
-      DebugEx.Fine("Registering signal in cache:\n{0}", signalDef);
+      DebugEx.Fine("Registering signal definition in cache:\n{0}", signalDef);
     }
     return signalDef;
   }
