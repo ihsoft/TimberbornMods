@@ -11,6 +11,7 @@ using Timberborn.SelectionSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.TickSystem;
 using Timberborn.ToolSystem;
+using Timberborn.UILayoutSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
@@ -34,6 +35,9 @@ public sealed class AutomationService : ITickableSingleton {
   /// <summary>Ticks since the game load.</summary>
   /// <remarks>Can be used for synchronization and delaying actions.</remarks>
   public static int CurrentTick { get; private set; }
+
+  /// <summary>Indicates if the game is fully loaded.</summary>
+  public static bool GameLoaded { get; private set; }
 
   /// <summary>Shortcut to the instantiator.</summary>
   public readonly BaseInstantiator BaseInstantiator;
@@ -142,6 +146,19 @@ public sealed class AutomationService : ITickableSingleton {
   [OnEvent]
   public void OnToolExited(ToolExitedEvent toolExitedEvent) {
     UnhighlightAutomationObjects();
+  }
+
+  #endregion
+
+  #region Game load callback
+
+  /// <summary>Called when the game initialized.</summary>
+  [OnEvent]
+  public void OnNewGameInitialized(ShowPrimaryUIEvent newGameInitializedEvent) {
+    GameLoaded = true;
+
+    DebugEx.Info("AutomationService loaded and ready");
+    EventBus.Post(new AutomationServiceReadyEvent());
   }
 
   #endregion
