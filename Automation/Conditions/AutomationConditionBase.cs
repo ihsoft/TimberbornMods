@@ -108,7 +108,7 @@ public abstract class AutomationConditionBase : IAutomationCondition {
   public abstract IAutomationCondition CloneDefinition();
 
   /// <inheritdoc/>
-  public abstract void SyncState();
+  public abstract void SyncState(bool force);
 
   /// <inheritdoc/>
   public abstract bool IsValidAt(AutomationBehavior behavior);

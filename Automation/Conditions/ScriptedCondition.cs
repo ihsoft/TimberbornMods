@@ -40,9 +40,11 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   }
 
   /// <inheritdoc/>
-  public override void SyncState() {
+  public override void SyncState(bool force) {
     try {
-      OnValueChanged(null);
+      if (force || ConditionState != _parsedExpression.Execute()) {
+        OnValueChanged(null);
+      }
     } catch (ScriptError e) {
       HostedDebugLog.Error(Behavior, "SyncState failed: {0}", e.Message);
     }

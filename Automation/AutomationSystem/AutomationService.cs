@@ -157,6 +157,25 @@ public sealed class AutomationService : ITickableSingleton {
   public void OnNewGameInitialized(ShowPrimaryUIEvent newGameInitializedEvent) {
     GameLoaded = true;
 
+    DebugEx.Info("Syncing {0} loaded automation behaviors", _registeredBehaviors.Count);
+    foreach (var behavior in _registeredBehaviors) {
+      // First, bind all rules to their behaviors.
+      foreach (var action in behavior.Actions) {
+        action.Condition.Behavior = behavior;
+        action.Behavior = behavior;
+      }
+      // Then, sync the state of all conditions in case of the loaded state caused differences.
+      // It should only happen if the game can't be loaded "as-is". 
+      foreach (var action in behavior.Actions) {
+        var oldConditionState = action.Condition.ConditionState;
+        action.Condition.SyncState();
+        if (oldConditionState != action.Condition.ConditionState) {
+          HostedDebugLog.Warning(behavior, "Condition state changed on synced for {0}: {1} -> {2}",
+                                 action.Condition, oldConditionState, action.Condition.ConditionState);
+        }
+      }
+    }
+
     DebugEx.Info("AutomationService loaded and ready");
     EventBus.Post(new AutomationServiceReadyEvent());
   }

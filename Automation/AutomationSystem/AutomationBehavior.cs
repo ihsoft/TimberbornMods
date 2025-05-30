@@ -72,7 +72,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
     HostedDebugLog.Fine(this, "Adding rule: action={0}", action);
     condition.Behavior = this;
     action.Behavior = this;
-    condition.SyncState();
+    condition.SyncState(force: true);
     _actions.Add(action);
     ActionsVersion++;
     UpdateRegistration();
@@ -184,13 +184,15 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
 
   /// <inheritdoc/>
   public void OnEnterFinishedState() {
-    // Update rules that work on finished building only.
-    foreach (var action in _actions) {
-      if (!action.Behavior) {
-        break;  // Not initialized yet. It is likely a save game load.
-      }
-      if (!action.Condition.CanRunOnUnfinishedBuildings) {
-        action.Condition.SyncState();
+    if (!HasActions) {
+      return;  // On load, this method is called for every object in the game. So, exit faster.
+    }
+    if (AutomationService.GameLoaded) {
+      // Update rules that work on finished building only.
+      foreach (var action in _actions) {
+        if (!action.Condition.CanRunOnUnfinishedBuildings) {
+          action.Condition.SyncState();
+        }
       }
     }
     UpdateRegistration();
@@ -221,16 +223,6 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
 
   void Awake() {
     BlockObject = GetComponentFast<BlockObject>();
-  }
-
-  void Start() {
-    // This needs to be executed after all the entity components are loaded and initialized.
-    foreach (var action in _actions) {
-      action.Condition.Behavior = this;
-      action.Behavior = this;
-      action.Condition.SyncState();
-    }
-    UpdateRegistration();
   }
 
   /// <summary>Removes all rules that depend on condition and/or action that is marked for cleanup.</summary>
