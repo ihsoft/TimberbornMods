@@ -82,9 +82,10 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
   /// <see cref="Actions"/>
   public void DeleteRuleAt(int index) {
     var action = _actions[index];
+    HostedDebugLog.Fine(this, "Deleting rule at index {0}: action={1}", index, _actions[index]);
+    _actions.RemoveAt(index);
     action.Condition.Behavior = null;
     action.Behavior = null;
-    _actions.RemoveAt(index);
     ActionsVersion++;
     UpdateRegistration();
   }
