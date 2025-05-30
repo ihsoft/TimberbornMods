@@ -41,6 +41,9 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
 
   /// <inheritdoc/>
   public override void SyncState(bool force) {
+    if (_parsedExpression == null) {
+      return;  // The condition is broken, no need to sync.
+    }
     try {
       if (force || ConditionState != _parsedExpression.Execute()) {
         OnValueChanged(null);
@@ -229,7 +232,9 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
       return;
     }
     try {
-      ConditionState = _parsedExpression.Execute();
+      var newState = _parsedExpression.Execute();
+      Behavior.IsDirty = ConditionState != newState;
+      ConditionState = newState;
       if (signalName != null && _oneShotSignals.Contains(signalName)) {
         HostedDebugLog.Fine(Behavior, "OneShot signal '{0}' triggered. Cleanup the rule: {1}", signalName, Expression);
         IsMarkedForCleanup = true;
