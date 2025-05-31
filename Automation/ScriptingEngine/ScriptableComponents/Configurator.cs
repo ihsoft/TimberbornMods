@@ -16,6 +16,7 @@ sealed class Configurator : IConfigurator {
 
   public void Configure(IContainerDefinition containerDefinition) {
     HarmonyPatcher.PatchRepeated(PatchId, typeof(FloodgatePatch), typeof(NoUnemployedStatusPatch));
+    containerDefinition.Bind<SignalDispatcher>().AsTransient();
 
     // The building-specific components. 
     containerDefinition.Bind<ConstructableScriptableComponent>().AsSingleton();

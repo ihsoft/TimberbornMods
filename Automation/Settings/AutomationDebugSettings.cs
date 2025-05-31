@@ -12,6 +12,7 @@ namespace IgorZ.Automation.Settings;
 sealed class AutomationDebugSettings : DebugSettings {
 
   const string PathCheckingProfilingLocKey = "IgorZ.Automation.Settings.Debug.PathCheckingProfiling";
+  const string LogSignalSettingLocKey = "IgorZ.Automation.Settings.Debug.LogSignalSetting";
   const string LogSignalPropagatingKey = "IgorZ.Automation.Settings.Debug.LogSignalPropagating";
 
   protected override string ModId => Configurator.AutomationModId;
@@ -20,6 +21,9 @@ sealed class AutomationDebugSettings : DebugSettings {
   public ModSetting<bool> PathCheckingSystemProfiling { get; } = new(
       false, ModSettingDescriptor.CreateLocalized(PathCheckingProfilingLocKey));
 
+  public ModSetting<bool> LogSignalsSetting { get; } = new(
+      false, ModSettingDescriptor.CreateLocalized(LogSignalSettingLocKey));
+
   public ModSetting<bool> LogSignalsPropagating { get; } = new(
       false, ModSettingDescriptor.CreateLocalized(LogSignalPropagatingKey));
 
@@ -27,6 +31,7 @@ sealed class AutomationDebugSettings : DebugSettings {
       ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry, ModRepository modRepository)
       : base(settings, modSettingsOwnerRegistry, modRepository) {
       
+    LogSignalsSetting.Descriptor.SetEnableCondition(() => _verboseLogging.Value);
     LogSignalsPropagating.Descriptor.SetEnableCondition(() => _verboseLogging.Value);
   }
 }

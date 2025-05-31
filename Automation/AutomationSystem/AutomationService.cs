@@ -167,6 +167,7 @@ public sealed class AutomationService : ITickableSingleton {
   [OnEvent]
   public void OnNewGameInitialized(ShowPrimaryUIEvent newGameInitializedEvent) {
     GameLoaded = true;
+    EventBus.Post(new GameLoadedEvent());
 
     DebugEx.Info("Automation system: syncing {0} loaded behaviors", _registeredBehaviors.Count);
     foreach (var behavior in _registeredBehaviors) {

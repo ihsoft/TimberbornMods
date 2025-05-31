@@ -1,4 +1,5 @@
 # v2.4.1 (pre-release):
+* [Feature #86] Add multi-value support for the custom signals. Signal values can aggregated via name suffix: `.Min`, `.Max`, `.Sum`, `.Count`. Not available in constructor.
 * [Feature #88] Allow operator `add` accepting multiple arguments.
 * [Feature #91] Allow extra comment styles in rule importing: prefixes `;` and `//`; and multi-line comments `/* ... */` and `#| ... |#`.
 
