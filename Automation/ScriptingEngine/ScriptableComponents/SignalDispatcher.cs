@@ -81,6 +81,7 @@ class SignalDispatcher {
       SignalType.Min => group.MinValue,
       SignalType.Max => group.MaxValue,
       SignalType.Sum => group.SumValue,
+      SignalType.Avg => group.AvgValue,
       _ => throw new InvalidOperationException("Unknown signal type: " + signalType)
     };
   }
@@ -228,6 +229,7 @@ class SignalDispatcher {
     public int MinValue;
     public int MaxValue;
     public int SumValue;
+    public int AvgValue;
     public int CountValue;
     public bool IsDirty = true;
     public readonly Dictionary<string, SignalSource> Sources = [];
@@ -248,9 +250,10 @@ class SignalDispatcher {
   const string AggMinNameSuffix = ".Min";
   const string AggMaxNameSuffix = ".Max";
   const string AggSumNameSuffix = ".Sum";
+  const string AggAvgNameSuffix = ".Avg";
 
   enum SignalType {
-    Last, Count, Min, Max, Sum,
+    Last, Count, Min, Max, Sum, Avg,
   }
 
   [Inject]
@@ -275,6 +278,9 @@ class SignalDispatcher {
     } else if (name.EndsWith(AggSumNameSuffix)) {
       signalType = SignalType.Sum;
       name = name[..^AggSumNameSuffix.Length];
+    } else if (name.EndsWith(AggAvgNameSuffix)) {
+      signalType = SignalType.Avg;
+      name = name[..^AggAvgNameSuffix.Length];
     } else {
       signalType = SignalType.Last;
     }
@@ -293,6 +299,7 @@ class SignalDispatcher {
     group.MinValue = newMinValue;
     group.MaxValue = newMaxValue;
     group.SumValue = newSumValue;
+    group.AvgValue = group.CountValue > 0 ? newSumValue / group.CountValue : 0;
     group.CountValue = group.Sources.Count;
     group.IsDirty = false;
   }
