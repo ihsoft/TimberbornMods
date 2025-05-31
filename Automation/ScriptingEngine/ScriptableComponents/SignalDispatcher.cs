@@ -287,7 +287,7 @@ class SignalDispatcher {
     return (signalType, name);
   }
 
-  void UpdateDirty(SignalGroup group) {
+  static void UpdateDirty(SignalGroup group) {
     var newMinValue = int.MaxValue;
     var newMaxValue = int.MinValue;
     var newSumValue = 0;
