@@ -188,6 +188,7 @@ IgorZ.Automation.Scripting.ImportRules.IncompleteDeclarationError,"Неполн�
 IgorZ.Automation.Scripting.ImportRules.UnclosedMultiLineComment,"Незавершенный многострочный комментарий",
 =,=,"Mod settings"
 IgorZ.Automation.Settings.Debug.PathCheckingProfiling,"Печатать статистику движка поиска путей",
+IgorZ.Automation.Settings.Debug.LogSignalPropagating,"Записывать в журнал распространение сигналов",
 IgorZ.Automation.Settings.EntityPanel.Header,"Элементы управления на панели здания",
 IgorZ.Automation.Settings.EntityPanel.AlwaysShowAddRulesButton,"Всегда отображать кнопку 'Добавить правила'",
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle,"Стиль описания правил",

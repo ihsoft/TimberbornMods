@@ -5,8 +5,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
+using IgorZ.Automation.Settings;
 using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine;
@@ -114,7 +116,9 @@ sealed class ScriptingService {
   }
 
   internal void ScheduleSignalCallback(SignalCallback callback, bool ignoreErrors = false) {
-    DebugEx.Fine("Executing signal callback: {0}", callback);
+    if (_debugSettings.LogSignalsPropagating.Value) {
+      DebugEx.Fine("Executing signal callback: {0}", callback);
+    }
     if (_callbackStack.Contains(callback)) {
       var log = new List<string>([$"{DebugEx.ObjectToString(callback.SignalListener.Behavior)}:{callback.Name}"]);
       log.AddRange(_callbackStack.Select(x => $"{DebugEx.ObjectToString(x.SignalListener.Behavior)}:{x.Name}"));
@@ -139,11 +143,14 @@ sealed class ScriptingService {
 
   #region Implementation
 
+  readonly AutomationDebugSettings _debugSettings;
+
   readonly Dictionary<string, IScriptable> _registeredScriptables = [];
   readonly Stack<SignalCallback> _callbackStack = new();
 
-  internal IList<string> GetScriptableNames() {
-    return _registeredScriptables.Keys.ToList();
+  [Inject]
+  ScriptingService(AutomationDebugSettings debugSettings) {
+    _debugSettings = debugSettings;
   }
 
   string GetExecutionLog() {

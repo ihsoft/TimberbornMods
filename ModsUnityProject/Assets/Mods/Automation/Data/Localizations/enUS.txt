@@ -187,6 +187,7 @@ IgorZ.Automation.Scripting.ImportRules.IncompleteDeclarationError,"Incomplete ru
 IgorZ.Automation.Scripting.ImportRules.UnclosedMultiLineComment,"Unclosed multi-line comment",
 =,=,"Mod settings"
 IgorZ.Automation.Settings.Debug.PathCheckingProfiling,"Log path checking engine statistics",
+IgorZ.Automation.Settings.Debug.LogSignalPropagating,"Log signal propagation",
 IgorZ.Automation.Settings.EntityPanel.AlwaysShowAddRulesButton,"Always show 'Add rules' button",
 IgorZ.Automation.Settings.EntityPanel.Header,"Controls on the building panel",
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle,"Style of the rule description",
