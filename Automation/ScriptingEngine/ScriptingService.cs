@@ -153,8 +153,8 @@ sealed class ScriptingService {
     _debugSettings = debugSettings;
   }
 
-  string GetExecutionLog() {
-    return string.Join("\n", _callbackStack.Select(x => $"{DebugEx.ObjectToString(x.SignalListener.Behavior)}:{x.Name}"));
+  internal IList<string> GetScriptableNames() {
+    return _registeredScriptables.Keys.ToList();
   }
 
   IScriptable GetScriptable(string name, bool throwErrors = false) {
