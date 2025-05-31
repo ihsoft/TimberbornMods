@@ -37,7 +37,16 @@ public sealed class AutomationService : ITickableSingleton {
   public static int CurrentTick { get; private set; }
 
   /// <summary>Indicates if the game is fully loaded.</summary>
+  /// <remarks>
+  /// In this state, all the game loading and initialization logic is done, but the automation system is not yet ready to
+  /// normally process signals.
+  /// </remarks>
+  /// <seealso cref="AutomationServiceReadyEvent"/>
   public static bool GameLoaded { get; private set; }
+
+  /// <summary>Indicates if the automation system is ready to use.</summary>
+  /// <remarks>In this state, all actions are loaded, initialized and synchronized.</remarks>
+  public static bool AutomationSystemReady { get; private set; }
 
   /// <summary>Shortcut to the instantiator.</summary>
   public readonly BaseInstantiator BaseInstantiator;
@@ -113,6 +122,8 @@ public sealed class AutomationService : ITickableSingleton {
     eventBus.Register(this);
     _highlighter = highlighter;
     CurrentTick = 0;
+    GameLoaded = false;
+    AutomationSystemReady = false;
   }
 
   internal void RegisterBehavior(AutomationBehavior behavior) {
@@ -177,6 +188,7 @@ public sealed class AutomationService : ITickableSingleton {
     }
 
     DebugEx.Info("AutomationService loaded and ready");
+    AutomationSystemReady = true;
     EventBus.Post(new AutomationServiceReadyEvent());
   }
 
