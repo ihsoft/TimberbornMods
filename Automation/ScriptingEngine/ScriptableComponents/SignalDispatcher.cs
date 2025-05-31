@@ -28,6 +28,7 @@ class SignalDispatcher {
   /// </remarks>
   /// <exception cref="InvalidOperationException">if operator/listener has already been registered.</exception>
   public void RegisterSignalListener(SignalOperator signalOperator, ISignalListener listener) {
+    CheckIfChangesLocked();
     var (_, signalName) = ParseSignalName(signalOperator.SignalName);
     if (!_signalGroups.TryGetValue(signalName, out var group)) {
       DebugEx.Fine("Adding signal group: {0}", signalName);
@@ -48,6 +49,7 @@ class SignalDispatcher {
   /// <summary>The operator/listener pair must be registered first.</summary>
   /// <exception cref="InvalidOperationException">if operator/listener wasn't registered before.</exception>
   public void UnregisterSignalListener(SignalOperator signalOperator, ISignalListener listener) {
+    CheckIfChangesLocked();
     var (_, signalName) = ParseSignalName(signalOperator.SignalName);
     if (!_signalGroups.TryGetValue(signalName, out var group)
         || !group.SignalSinks.TryGetValue(listener, out var consumers)
@@ -90,6 +92,7 @@ class SignalDispatcher {
   /// <remarks>The source/provider pair must be unique. This method triggers the signal update.</remarks>
   /// <exception cref="InvalidOperationException">if source/provider has been already registered.</exception>
   public void RegisterSignalProvider(string signalName, BaseComponent source, object provider) {
+    CheckIfChangesLocked();
     if (!_signalGroups.TryGetValue(signalName, out var group)) {
       DebugEx.Fine("Adding signal group: {0}", signalName);
       group = new SignalGroup();
@@ -111,6 +114,9 @@ class SignalDispatcher {
     if (!AutomationService.AutomationSystemReady) {
       return;  // Don't fire signals during the load stage.
     }
+    using var _ = new LockChanges(
+        this, $"Propagating signal group updates for '{signalName}'",
+        description: "Don't register or unregister sinks or providers while handling the signals callbacks!");
     foreach (var entry in group.SignalSinks) {
       if (entry.Value.Count == 0) {
         throw new InvalidOperationException(
@@ -125,6 +131,7 @@ class SignalDispatcher {
   /// <remarks>The source/provider pair must be registered. This method triggers the signal update.</remarks>
   /// <exception cref="InvalidOperationException">if source/provider is not registered.</exception>
   public void UnregisterSignalProvider(string signalName, BaseComponent source, object provider) {
+    CheckIfChangesLocked();
     var entityId = source.GetComponentFast<EntityComponent>().EntityId.ToString();
     if (!_signalGroups.TryGetValue(signalName, out var group)
         || !group.Sources.TryGetValue(entityId, out var signalSource)
@@ -242,6 +249,23 @@ class SignalDispatcher {
     }
   }
 
+  /// <summary>Locks the system state for changes.</summary>
+  /// <seealso cref="SignalDispatcher.CheckIfChangesLocked"/>
+  class LockChanges : IDisposable {
+    readonly SignalDispatcher _dispatcher;
+
+    public LockChanges(SignalDispatcher dispatcher, string reason, string description = null) {
+      _dispatcher = dispatcher;
+      _dispatcher._systemStateLockReason = reason;
+      _dispatcher._systemStateLockDescription = description;
+    }
+
+    public void Dispose() {
+      _dispatcher._systemStateLockReason = null;
+      _dispatcher._systemStateLockDescription = null;
+    }
+  }
+
   readonly Dictionary<string, SignalGroup> _signalGroups = [];
   readonly ScriptingService _scriptingService;
   readonly AutomationDebugSettings _automationDebugSettings;
@@ -255,6 +279,9 @@ class SignalDispatcher {
   enum SignalType {
     Last, Count, Min, Max, Sum, Avg,
   }
+
+  string _systemStateLockReason;
+  string _systemStateLockDescription;
 
   [Inject]
   SignalDispatcher(
@@ -302,6 +329,23 @@ class SignalDispatcher {
     group.AvgValue = group.CountValue > 0 ? newSumValue / group.CountValue : 0;
     group.CountValue = group.Sources.Count;
     group.IsDirty = false;
+  }
+
+  /// <summary>Checks if the system state is locked for changes.</summary>
+  /// <remarks>
+  /// Call it before dealing with the scripting system state. Changes to the system aren't allowed while serving API
+  /// methods. All side effects that can change the system state must be delayed until the system is unlocked (returned
+  /// from the API method).
+  /// </remarks>
+  void CheckIfChangesLocked() {
+    if (_systemStateLockReason == null) {
+      return;
+    }
+    if (_systemStateLockDescription != null) {
+      DebugEx.Error("SignalDispatcher is locked for changes: {0}\n{1}",
+                    _systemStateLockReason, _systemStateLockDescription);
+    }
+    throw new InvalidOperationException("SignalDispatcher is locked for changes: " + _systemStateLockReason);
   }
 
   [OnEvent]
