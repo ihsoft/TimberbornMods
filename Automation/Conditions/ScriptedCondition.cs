@@ -233,7 +233,9 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
     }
     try {
       var newState = _parsedExpression.Execute();
-      Behavior.IsDirty = ConditionState != newState;
+      if (ConditionState != newState) {
+        Behavior.IncrementStateVersion();
+      }
       ConditionState = newState;
       if (signalName != null && _oneShotSignals.Contains(signalName)) {
         HostedDebugLog.Fine(Behavior, "OneShot signal '{0}' triggered. Cleanup the rule: {1}", signalName, Expression);
@@ -249,6 +251,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   }
 
   void SetParsedExpression(IExpression expression) {
+    Behavior.IncrementStateVersion();
     var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
     if (_parsedExpression != null) {
       scriptingService.UnregisterSignals(_parsedExpression, this);

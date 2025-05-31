@@ -57,8 +57,20 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
   public IList<IAutomationAction> Actions => _actions.AsReadOnly();
   List<IAutomationAction> _actions = [];
 
-  /// <summary>The Version is updated each time the rules set is changed.</summary>
-  public int ActionsVersion { get; private set; }
+  /// <summary>The version is updated each time the behavior is changed.</summary>
+  /// <remarks>It is a monotonically increasing value. Old versions have a less value than the newer versions.</remarks>
+  /// <seealso cref="IncrementStateVersion"/>
+  public int StateVersion { get; private set; }
+
+  /// <summary>Increments the state version.</summary>
+  /// <remarks>
+  /// Update the version each time the behavior changes in a way that can be important for the stateful logic. For
+  /// example, UI can check it to avoid constant refreshes.
+  /// </remarks>
+  /// <seealso cref="StateVersion"/>
+  public void IncrementStateVersion() {
+    StateVersion++;
+  }
 
   /// <summary>Creates a rule from the condition and action.</summary>
   /// <param name="condition">
@@ -74,7 +86,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
     action.Behavior = this;
     condition.SyncState(force: true);
     _actions.Add(action);
-    ActionsVersion++;
+    IncrementStateVersion();
     UpdateRegistration();
   }
 
@@ -86,7 +98,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
     _actions.RemoveAt(index);
     action.Condition.Behavior = null;
     action.Behavior = null;
-    ActionsVersion++;
+    IncrementStateVersion();
     UpdateRegistration();
   }
 
