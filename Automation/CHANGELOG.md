@@ -1,4 +1,4 @@
-# v2.4.0 (pre-release):
+# v2.4.1 (pre-release):
 * [Feature #88] Allow operator `add` accepting multiple arguments.
 * [Feature #91] Allow extra comment styles in rule importing: prefixes `;` and `//`; and multi-line comments `/* ... */` and `#| ... |#`.
 
