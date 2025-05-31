@@ -168,7 +168,7 @@ public sealed class AutomationService : ITickableSingleton {
   public void OnNewGameInitialized(ShowPrimaryUIEvent newGameInitializedEvent) {
     GameLoaded = true;
 
-    DebugEx.Info("Syncing {0} loaded automation behaviors", _registeredBehaviors.Count);
+    DebugEx.Info("Automation system: syncing {0} loaded behaviors", _registeredBehaviors.Count);
     foreach (var behavior in _registeredBehaviors) {
       // First, bind all rules to their behaviors.
       foreach (var action in behavior.Actions) {
@@ -180,14 +180,15 @@ public sealed class AutomationService : ITickableSingleton {
       foreach (var action in behavior.Actions) {
         var oldConditionState = action.Condition.ConditionState;
         action.Condition.SyncState();
+        // If all works fine, the condition state shouldn't change after the sync.
         if (oldConditionState != action.Condition.ConditionState) {
-          HostedDebugLog.Warning(behavior, "Condition state changed on synced for {0}: {1} -> {2}",
-                                 action.Condition, oldConditionState, action.Condition.ConditionState);
+          HostedDebugLog.Warning(behavior, "Condition state changed: {0} -> {1}, action: {2}",
+                                 oldConditionState, action.Condition.ConditionState, action.Condition);
         }
       }
     }
 
-    DebugEx.Info("AutomationService loaded and ready");
+    DebugEx.Info("Automation system: loaded and ready");
     AutomationSystemReady = true;
     EventBus.Post(new AutomationServiceReadyEvent());
   }
