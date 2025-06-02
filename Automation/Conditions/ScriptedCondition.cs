@@ -30,14 +30,14 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   /// <inheritdoc/>
   public override string UiDescription {
     get {
-      if (_parsedExpression == null) {
-        var errorLocKey = _parsingResult.ParsedExpression == null ? ParseErrorLocKey : RuntimeErrorLocKey;
-        return CommonFormats.HighlightRed(Behavior.Loc.T(errorLocKey));
+      if (_staticDescription != null) {
+        return _staticDescription;
       }
       var description = DependencyContainer.GetInstance<ExpressionParser>().GetDescription(_parsedExpression);
       return ConditionState ? CommonFormats.HighlightGreen(description) : CommonFormats.HighlightYellow(description);
     }
   }
+  string _staticDescription;
 
   /// <inheritdoc/>
   public override void SyncState(bool force) {
@@ -60,9 +60,11 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
 
   /// <inheritdoc/>
   protected override void OnBehaviorToBeCleared() {
-    if (_parsedExpression != null) {
-      SetParsedExpression(null);
-    } else {
+    if (_registeredSignals != null) {
+      var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
+      scriptingService.UnregisterSignals(_registeredSignals, this);
+    }
+    if (_parsedExpression == null) {
       Behavior.ClearError(this);
     }
   }
@@ -79,7 +81,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
     }
     _lastValidatedBehavior = behavior;
     if (CheckPrecondition(behavior)) {
-      _lastValidationResult = ParseAndValidate(Expression, behavior) is { ParsedExpression: not null };
+      _lastValidationResult = ParseAndValidate(Expression, behavior, out _) != null;
     } else {
       _lastValidationResult = false;
     }
@@ -165,21 +167,23 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
 
   ParsingResult _parsingResult;
   BoolOperator _parsedExpression;
+  List<SignalOperator> _registeredSignals;
   readonly HashSet<string> _oneShotSignals = [];
 
   // Used by the RulesEditor dialog.
-  internal static ParsingResult? ParseAndValidate(string expression, AutomationBehavior behavior) {
-    var result = DependencyContainer.GetInstance<ExpressionParser>().Parse(expression, behavior);
-    if (result.LastError != null) {
-      HostedDebugLog.Error(behavior, "Failed to parse condition: {0}\nError: {1}", expression, result.LastError);
+  internal static BoolOperator ParseAndValidate(
+      string expression, AutomationBehavior behavior, out ParsingResult parsingResult) {
+    parsingResult = DependencyContainer.GetInstance<ExpressionParser>().Parse(expression, behavior);
+    if (parsingResult.LastError != null) {
+      HostedDebugLog.Error(behavior, "Failed to parse condition: {0}\nError: {1}", expression, parsingResult.LastError);
       return null;
     }
-    if (result.ParsedExpression is not BoolOperator) {
-      HostedDebugLog.Error(behavior, "Expression is not a boolean operator: {0}", result.ParsedExpression);
+    if (parsingResult.ParsedExpression is not BoolOperator result) {
+      HostedDebugLog.Error(behavior, "Expression is not a boolean operator: {0}", parsingResult.ParsedExpression);
       return null;
     }
     var hasSignals = false;
-    result.ParsedExpression.VisitNodes(x => { hasSignals |= x is SignalOperator; });
+    result.VisitNodes(x => { hasSignals |= x is SignalOperator; });
     if (!hasSignals) {
       HostedDebugLog.Error(behavior, "Condition has no signals: {0}", expression);
       return null;
@@ -188,14 +192,24 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   }
 
   void ParseAndApply() {
-    var result = ParseAndValidate(Expression, Behavior);
-    if (result == null) {
+    if (_parsingResult != default) {
+      throw new InvalidOperationException("ParseAndApply should only be called once.");
+    }
+    _parsedExpression = ParseAndValidate(Expression, Behavior, out _parsingResult);
+    if (_parsedExpression == null) {
+      _staticDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
       Behavior.ReportError(this);
       return;
     }
-    _parsingResult = result.Value;
-    SetParsedExpression(_parsingResult.ParsedExpression);
-    Expression = _parsedExpression!.Serialize();
+    _registeredSignals = DependencyContainer.GetInstance<ScriptingService>().RegisterSignals(_parsedExpression, this);
+    Expression = _parsedExpression.Serialize();
+    foreach (var signal in _registeredSignals) {
+      _canRunOnUnfinishedBuildings |= signal.OnUnfinished;
+      if (signal.OneShot) {
+        _oneShotSignals.Add(signal.SignalName);
+      }
+    }
+    Behavior.IncrementStateVersion();
   }
 
   bool CheckPrecondition(AutomationBehavior behavior) {
@@ -231,41 +245,25 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
       HostedDebugLog.Error(Behavior, "Signal change triggered, but the condition was broken: {0}", Expression);
       return;
     }
+    bool newState;
     try {
-      var newState = _parsedExpression.Execute();
-      if (ConditionState != newState) {
-        Behavior.IncrementStateVersion();
-      }
-      ConditionState = newState;
-      if (signalName != null && _oneShotSignals.Contains(signalName)) {
-        HostedDebugLog.Fine(Behavior, "OneShot signal '{0}' triggered. Cleanup the rule: {1}", signalName, Expression);
-        IsMarkedForCleanup = true;
-      }
+      newState = _parsedExpression.Execute();
     } catch (ScriptError) {
-      if (_parsedExpression != null) {  // Can be already handled upstream in case of recursive calls.
-        SetParsedExpression(null);
-        Behavior.ReportError(this);
+      if (_parsedExpression == null) {
+        throw;  // Can be already handled upstream in case of recursive calls.
       }
+      _parsedExpression = null;
+      _staticDescription = CommonFormats.HighlightRed(Behavior.Loc.T(RuntimeErrorLocKey));
+      Behavior.ReportError(this);
       throw;
     }
-  }
-
-  void SetParsedExpression(IExpression expression) {
-    Behavior.IncrementStateVersion();
-    var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
-    if (_parsedExpression != null) {
-      scriptingService.UnregisterSignals(_parsedExpression, this);
+    if (ConditionState != newState) {
+      Behavior.IncrementStateVersion();
     }
-    _parsedExpression = expression as BoolOperator;
-    if (_parsedExpression == null) {
-      return;
-    }
-    var signals = scriptingService.RegisterSignals(_parsedExpression, this);
-    foreach (var signal in signals) {
-      _canRunOnUnfinishedBuildings |= signal.OnUnfinished;
-      if (signal.OneShot) {
-        _oneShotSignals.Add(signal.SignalName);
-      }
+    ConditionState = newState;
+    if (signalName != null && _oneShotSignals.Contains(signalName)) {
+      HostedDebugLog.Fine(Behavior, "OneShot signal '{0}' triggered. Cleanup the rule: {1}", signalName, Expression);
+      IsMarkedForCleanup = true;
     }
   }
 

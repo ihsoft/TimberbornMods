@@ -41,8 +41,7 @@ sealed class RuleRow {
         throw new InvalidOperationException("Cannot set condition expression for legacy action.");
       }
       _conditionExpression = value;
-      var result = ScriptedCondition.ParseAndValidate(value, ActiveBuilding);
-      ParsedCondition = result?.ParsedExpression as BoolOperator;
+      ParsedCondition = ScriptedCondition.ParseAndValidate(value, ActiveBuilding, out _);
       CheckIfModified();
     }
   }
@@ -56,8 +55,7 @@ sealed class RuleRow {
         throw new InvalidOperationException("Cannot set action expression for legacy action.");
       }
       _actionExpression = value;
-      var result = ScriptedAction.ParseAndValidate(value, ActiveBuilding);
-      ParsedAction = result?.ParsedExpression as ActionOperator;
+      ParsedAction = ScriptedAction.ParseAndValidate(value, ActiveBuilding, out _);
       CheckIfModified();
     }
   }

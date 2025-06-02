@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System;
+using System.Collections.Generic;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
@@ -26,12 +27,16 @@ sealed class ScriptedAction : AutomationActionBase {
   }
 
   /// <inheritdoc/>
-  public override string UiDescription =>
-      _parsedExpression != null
-      ? CommonFormats.HighlightYellow(
-          DependencyContainer.GetInstance<ExpressionParser>().GetDescription(_parsedExpression))
-      : CommonFormats.HighlightRed(
-          Behavior.Loc.T(_parsingResult.ParsedExpression == null ? ParseErrorLocKey : RuntimeErrorLocKey));
+  public override string UiDescription {
+    get {
+      if (_staticDescription != null) {
+        return _staticDescription;
+      }
+      return CommonFormats.HighlightYellow(
+          DependencyContainer.GetInstance<ExpressionParser>().GetDescription(_parsedExpression));
+    }
+  }
+  string _staticDescription;
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
@@ -39,7 +44,7 @@ sealed class ScriptedAction : AutomationActionBase {
       return _lastValidationResult;
     }
     _lastValidatedBehavior = behavior;
-    _lastValidationResult = ParseAndValidate(Expression, behavior) is { ParsedExpression: not null };
+    _lastValidationResult = ParseAndValidate(Expression, behavior, out _parsingResult) != null;
     return _lastValidationResult;
   }
 
@@ -61,10 +66,12 @@ sealed class ScriptedAction : AutomationActionBase {
         IsMarkedForCleanup = true;
       }
     } catch (ScriptError) {
-      if (_parsedExpression != null) {  // Can be already handled upstream in case of recursive calls.
-        SetParsedExpression(null);
-        Behavior.ReportError(this);
+      if (_parsedExpression == null) {
+        throw;  // Can be already handled upstream in case of recursive calls.
       }
+      _parsedExpression = null;
+      _staticDescription = CommonFormats.HighlightRed(Behavior.Loc.T(RuntimeErrorLocKey));
+      Behavior.ReportError(this);
       throw;
     }
   }
@@ -78,9 +85,11 @@ sealed class ScriptedAction : AutomationActionBase {
   /// <inheritdoc/>
   protected override void OnBehaviorToBeCleared() {
     base.OnBehaviorToBeCleared();
-    if (_parsedExpression != null) {
-      SetParsedExpression(null);
-    } else {
+    if (_installedActions != null) {
+      var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
+      scriptingService.UninstallActions(_installedActions, Behavior);
+    }
+    if (_parsedExpression == null) {
       Behavior.ClearError(this);
     }
   }
@@ -136,41 +145,36 @@ sealed class ScriptedAction : AutomationActionBase {
 
   ParsingResult _parsingResult;
   ActionOperator _parsedExpression;
+  List<ActionOperator> _installedActions;
 
   // Used by the RulesEditor dialog.
-  internal static ParsingResult? ParseAndValidate(string expression, AutomationBehavior behavior) {
-    var result = DependencyContainer.GetInstance<ExpressionParser>().Parse(expression, behavior);
-    if (result.LastError != null) {
-      HostedDebugLog.Error(behavior, "Failed to parse action: {0}\nError: {1}", expression, result.LastError);
+  internal static ActionOperator ParseAndValidate(
+      string expression, AutomationBehavior behavior, out ParsingResult parsingResult) {
+    parsingResult = DependencyContainer.GetInstance<ExpressionParser>().Parse(expression, behavior);
+    if (parsingResult.LastError != null) {
+      HostedDebugLog.Error(behavior, "Failed to parse action: {0}\nError: {1}", expression, parsingResult.LastError);
       return null;
     }
-    if (result.ParsedExpression is not ActionOperator) {
-      HostedDebugLog.Error(behavior, "Expression is not an action operator: {0}", result.ParsedExpression);
+    if (parsingResult.ParsedExpression is not ActionOperator actionOperator) {
+      HostedDebugLog.Error(behavior, "Expression is not an action operator: {0}", parsingResult.ParsedExpression);
       return null;
     }
-    return result;
+    return actionOperator;
   }
 
   void ParseAndApply() {
-    var result = ParseAndValidate(Expression, Behavior);
-    if (result == null) {
+    if (_parsingResult != default) {
+      throw new InvalidOperationException("ParseAndApply should only be called once.");
+    }
+    _parsedExpression = ParseAndValidate(Expression, Behavior, out _parsingResult);
+    if (_parsedExpression == null) {
+      _staticDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
       Behavior.ReportError(this);
       return;
     }
-    _parsingResult = result.Value;
-    SetParsedExpression(_parsingResult.ParsedExpression);
-    Expression = _parsedExpression!.Serialize();
-  }
-
-  void SetParsedExpression(IExpression expression) {
-    var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
-    if (_parsedExpression != null) {
-      scriptingService.UninstallActions(_parsedExpression, Behavior);
-    }
-    _parsedExpression = expression as ActionOperator;
-    if (_parsedExpression != null) {
-      scriptingService.InstallActions(_parsedExpression, Behavior);
-    }
+    _installedActions = DependencyContainer.GetInstance<ScriptingService>().InstallActions(_parsedExpression, Behavior);
+    Expression = _parsedExpression.Serialize();
+    Behavior.IncrementStateVersion();
   }
 
   #endregion

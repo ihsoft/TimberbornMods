@@ -76,7 +76,13 @@ sealed class ScriptingService {
     return GetScriptable(name).GetActionDefinition(name, behavior);
   }
 
-  /// <inheritdoc cref="IScriptable.RegisterSignalChangeCallback"/>
+  /// <summary>Registers callbacks for all signals in the expression to the provided host.</summary>
+  /// <remarks>The host will get exactly one notification per signal name.</remarks>
+  /// <returns>
+  /// The list of signal operators that were requesting the callback. This information will be needed to unregister the
+  /// callbacks.
+  /// </returns>
+  /// <seealso cref="UnregisterSignals"/>
   public List<SignalOperator> RegisterSignals(IExpression expression, ISignalListener host) {
     var signals = new List<SignalOperator>();
     expression.VisitNodes(x => {
@@ -89,30 +95,35 @@ sealed class ScriptingService {
   }
 
   /// <inheritdoc cref="IScriptable.UnregisterSignalChangeCallback"/>
-  public void UnregisterSignals(IExpression expression, ISignalListener host) {
-    expression.VisitNodes(x => {
-      if (x is SignalOperator signal) {
-        GetScriptable(signal.SignalName, throwErrors: true).UnregisterSignalChangeCallback(signal, host);
-      }
-    });
+  /// <seealso cref="RegisterSignals"/>
+  public void UnregisterSignals(IList<SignalOperator> signalOperators, ISignalListener host) {
+    foreach (var signal in signalOperators) {
+      GetScriptable(signal.SignalName, throwErrors: true).UnregisterSignalChangeCallback(signal, host);
+    }
   }
 
-  /// <inheritdoc cref="IScriptable.InstallAction"/>
-  public void InstallActions(IExpression expression, AutomationBehavior behavior) {
+  /// <summary>Installs the actions from the provided expression.</summary>
+  /// <returns>The list of actions that were installed. This information will be needed to uninstall the
+  /// actions.
+  /// </returns>
+  /// <seealso cref="UninstallActions"/>
+  public List<ActionOperator> InstallActions(IExpression expression, AutomationBehavior behavior) {
+    var actions = new List<ActionOperator>();
     expression.VisitNodes(x => {
       if (x is ActionOperator action) {
+        actions.Add(action);
         GetScriptable(action.ActionName, throwErrors: true).InstallAction(action, behavior);
       }
     });
+    return actions;
   }
 
   /// <inheritdoc cref="IScriptable.UninstallAction"/>
-  public void UninstallActions(IExpression expression, AutomationBehavior behavior) {
-    expression.VisitNodes(x => {
-      if (x is ActionOperator action) {
-        GetScriptable(action.ActionName, throwErrors: true).UninstallAction(action, behavior);
-      }
-    });
+  /// <seealso cref="InstallActions"/>
+  public void UninstallActions(IList<ActionOperator> actionOperators, AutomationBehavior behavior) {
+    foreach (var actionOperator in actionOperators) {
+      GetScriptable(actionOperator.ActionName, throwErrors: true).UninstallAction(actionOperator, behavior);
+    }
   }
 
   internal void ScheduleSignalCallback(SignalCallback callback, bool ignoreErrors = false) {
