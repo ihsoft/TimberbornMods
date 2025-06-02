@@ -21,6 +21,7 @@ public interface IAutomationCondition : IGameSerializable {
   /// behavior is attached, then the condition becomes active, and the behavior is "owning" it.
   /// </p>
   /// <p>If the behavior is being destroyed, it must unassign itself from all the owned conditions.</p>
+  /// <p>Once activated, the condition can't be reused, even if unassigned from the previous Behavior. Rather, it must be cloned to create a new instance.</p>
   /// </remarks>
   /// <value><c>null</c> on the inactive condition.</value>
   public AutomationBehavior Behavior { get; set; }
