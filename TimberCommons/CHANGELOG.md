@@ -1,3 +1,6 @@
+# v1.11.6 (28 May 2025) - Patch for `0.7.6.1`
+* Fix IrrigationTower component for Update 7.
+
 # v1.12.0 (27 May 2025)
 * [Change] Update to support game version `v0.7.9.0`. It is incompatible with the previous game versions.
 * [Change] Fix IrrigationTower component for Update 7.
