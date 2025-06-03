@@ -3,13 +3,12 @@
 // License: Public Domain
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.Persistence;
+using Timberborn.SingletonSystem;
 using Timberborn.WorldPersistence;
-using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
@@ -28,14 +27,12 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
 
   /// <inheritdoc/>
   public override string[] GetSignalNamesForBuilding(AutomationBehavior _) {
-    CleanupUnusedSignals();
-    return _signalHandlers.Keys.OrderBy(x => x).ToArray();
+    return _signalDispatcher.GetRegisteredSignals().OrderBy(x => x).ToArray();
   }
 
   /// <inheritdoc/>
   public override Func<ScriptValue> GetSignalSource(string name, AutomationBehavior _) {
-    return () => ScriptValue.Of(
-        !_signalHandlers.TryGetValue(name, out var signalHandler) ? -1 : signalHandler.Value);
+    return () => ScriptValue.Of(_signalDispatcher.GetSignalValue(name));
   }
 
   /// <inheritdoc/>
@@ -53,15 +50,12 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
 
   /// <inheritdoc/>
   public override void RegisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
-    var signalDef = GetSignalHandler(signalOperator.SignalName, createIfNotFound: true);
-    signalDef.References.AddSignal(signalOperator, host);
+    _signalDispatcher.RegisterSignalListener(signalOperator, host);
   }
 
   /// <inheritdoc/>
   public override void UnregisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
-    var signalHandler = GetSignalHandler(signalOperator.SignalName);
-    signalHandler.References.RemoveSignal(signalOperator, host);
-    MaybeRemoveSignal(signalHandler);
+    _signalDispatcher.UnregisterSignalListener(signalOperator, host);
   }
 
   /// <inheritdoc/>
@@ -72,7 +66,7 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
   /// <inheritdoc/>
   public override Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
     return name switch {
-        SetActionName => SetSignalAction,
+        SetActionName => args => SetSignalAction(args, behavior),
         _ => throw new UnknownActionException(name),
     };
   }
@@ -88,19 +82,16 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
   /// <inheritdoc/>
   public override void InstallAction(ActionOperator actionOperator, AutomationBehavior behavior) {
     if (actionOperator.ActionName == SetActionName) {
-      var shortSignalName = ((ConstantValueExpr)actionOperator.Operands[1]).ValueFn().AsString;
-      var signalHandler = GetSignalHandler(GetSignalSignalNamePrefix + shortSignalName, createIfNotFound: true);
-      signalHandler.References.AddAction(actionOperator);
+      var signalName = GetSignalSignalNamePrefix + ((ConstantValueExpr)actionOperator.Operands[1]).ValueFn().AsString;
+      _signalDispatcher.RegisterSignalProvider(signalName, behavior, actionOperator);
     }
   }
 
   /// <inheritdoc/>
-  public override void UninstallAction(ActionOperator actionOperator, AutomationBehavior _) {
+  public override void UninstallAction(ActionOperator actionOperator, AutomationBehavior behavior) {
     if (actionOperator.ActionName == SetActionName) {
-      var shortSignalName = ((ConstantValueExpr)actionOperator.Operands[1]).ValueFn().AsString;
-      var signalHandler = GetSignalHandler(GetSignalSignalNamePrefix + shortSignalName);
-      signalHandler.References.RemoveAction(actionOperator);
-      MaybeRemoveSignal(signalHandler);
+      var signalName = GetSignalSignalNamePrefix + ((ConstantValueExpr)actionOperator.Operands[1]).ValueFn().AsString;
+      _signalDispatcher.UnregisterSignalProvider(signalName, behavior, actionOperator);
     }
   }
 
@@ -113,10 +104,8 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
 
   /// <inheritdoc/>
   public void Save(ISingletonSaver singletonSaver) {
-    CleanupUnusedSignals();
     var objectSaver = singletonSaver.GetSingleton(SignalsKey);
-    var packedValues = _signalHandlers.Select(entry => $"{entry.Key}:{entry.Value.Value}").ToList();
-    objectSaver.Set(CustomSignalsKey, packedValues);
+    objectSaver.Set(CustomSignalsKey, _signalDispatcher.ToPackedArray().ToList());
   }
 
   /// <inheritdoc/>
@@ -125,15 +114,7 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
     if (!_singletonLoader.TryGetSingleton(SignalsKey, out var objectLoader)) {
       return;
     }
-    var packedValues = objectLoader.Get(CustomSignalsKey);
-    foreach (var packedValue in packedValues) {
-      var pair = packedValue.Split(':');
-      var signalHandler = new CustomSignalHandler(pair[0]) {
-          Value = int.Parse(pair[1]),
-          HasFirstValue = true,
-      };
-      _signalHandlers[signalHandler.Name] = signalHandler;
-    }
+    _signalDispatcher.FromPackedArray(objectLoader.Get(CustomSignalsKey));
   }
 
   #endregion
@@ -166,68 +147,22 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
   };
   ActionDef _setSignalActionDef;
 
-  void SetSignalAction(ScriptValue[] args) {
+  void SetSignalAction(ScriptValue[] args, AutomationBehavior behavior) {
     AssertActionArgsCount(SetActionName, args, 2);
     var signalName = GetSignalSignalNamePrefix + args[0].AsString;
-    var value = args[1].AsNumber;
-    
-    if (!_signalHandlers.TryGetValue(signalName, out var signalHandler)) {
-      throw new InvalidOperationException("Custom signal not registered: " + signalName);
-    }
-    if (signalHandler.Value == value && signalHandler.HasFirstValue) {
-      return;
-    }
-    signalHandler.Value = value;
-    signalHandler.HasFirstValue = true;
-    signalHandler.References.ScheduleSignal(signalName, ScriptingService);
+    _signalDispatcher.SetSignalValue(signalName, args[1].AsNumber, behavior);
   }
 
   #endregion
 
   #region Implementation
 
-  record CustomSignalHandler(string Name) {
-    public int Value;
-    public bool HasFirstValue;
-    public readonly ReferenceManager References = new();
-  }
-
-  readonly Dictionary<string, CustomSignalHandler> _signalHandlers = [];
   readonly ISingletonLoader _singletonLoader;
+  readonly SignalDispatcher _signalDispatcher;
 
-  SignalsScriptableComponent(ISingletonLoader singletonLoader) {
+  SignalsScriptableComponent(ISingletonLoader singletonLoader, SignalDispatcher signalDispatcher) {
     _singletonLoader = singletonLoader;
-  }
-
-  void MaybeRemoveSignal(CustomSignalHandler signalHandler) {
-    if (signalHandler.References.Signals.Count == 0 && signalHandler.References.Actions.Count == 0) {
-      DebugEx.Fine("Removing custom signal: name={0}, value={1}", signalHandler.Name, signalHandler.Value);
-      _signalHandlers.Remove(signalHandler.Name);
-    }
-  }
-
-  CustomSignalHandler GetSignalHandler(string name, bool createIfNotFound = false) {
-    if (!_signalHandlers.TryGetValue(name, out var signalHandler)) {
-      if (createIfNotFound) {
-        signalHandler = new CustomSignalHandler(name);
-        _signalHandlers[name] = signalHandler;
-        DebugEx.Fine("Creating custom signal: name={0}", name);
-      } else {
-        throw new InvalidOperationException("Custom signal not registered: " + name);
-      }
-    }
-    return signalHandler;
-  }
-
-  void CleanupUnusedSignals() {
-    var names = _signalHandlers.Keys.ToList();  // Need a copy.
-    foreach (var name in names) {
-      var signal = _signalHandlers[name];
-      if (signal.References.Signals.Count == 0 && signal.References.Actions.Count == 0) {
-        DebugEx.Warning("Removing unused custom signal: name={0}, value={1}", signal.Name, signal.Value);
-        _signalHandlers.Remove(name);
-      }
-    }
+    _signalDispatcher = signalDispatcher;
   }
 
   static void SignalNameValidator(IValueExpr exp) {

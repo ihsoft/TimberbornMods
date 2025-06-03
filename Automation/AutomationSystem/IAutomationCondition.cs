@@ -21,6 +21,7 @@ public interface IAutomationCondition : IGameSerializable {
   /// behavior is attached, then the condition becomes active, and the behavior is "owning" it.
   /// </p>
   /// <p>If the behavior is being destroyed, it must unassign itself from all the owned conditions.</p>
+  /// <p>Once activated, the condition can't be reused, even if unassigned from the previous Behavior. Rather, it must be cloned to create a new instance.</p>
   /// </remarks>
   /// <value><c>null</c> on the inactive condition.</value>
   public AutomationBehavior Behavior { get; set; }
@@ -68,13 +69,10 @@ public interface IAutomationCondition : IGameSerializable {
   /// Sets the current state of the condition so that it matches the current state of the game and/or the automation
   /// behavior.
   /// </summary>
-  /// <remarks>
-  /// This method is the first time called when the rule is created. If the building transitions to finished state, and
-  /// the signal is not "OnUnfinished", then this method is called to refresh the state to the finished building.
-  /// <see cref="Behavior"/> and <see cref="Listener"/> must be set before calling this method.
-  /// </remarks>
+  /// <remarks><see cref="Behavior"/> and <see cref="Listener"/> must be set before calling this method.</remarks>
+  /// <param name="force">Indicates that the state callback needs to be called even if the state didn't change.</param>
   /// <seealso cref="Behavior"/>
   /// <seealso cref="Listener"/>
   /// <seealso cref="ConditionState"/>
-  public void SyncState();
+  public void SyncState(bool force = false);
 }

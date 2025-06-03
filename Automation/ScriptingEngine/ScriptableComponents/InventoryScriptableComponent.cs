@@ -266,10 +266,6 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
         throw new InvalidOperationException("Inventory component not found on: " + DebugEx.ObjectToString(this));
       }
       _inventory.InventoryStockChanged += NotifyChange;
-      _inventory.InventoryCapacityReservationChanged += (_, args) => {
-        HostedDebugLog.Warning(_inventory, "Capacity reservation changed: {0}", _inventory.ReservedCapacity(args.GoodAmount.GoodId));
-      };
-      //FIXME: react on inventory change to recompile the scripts, how? send a signal to recompile all on the behavior?
     }
 
     void NotifyChange(object sender, InventoryAmountChangedEventArgs args) {

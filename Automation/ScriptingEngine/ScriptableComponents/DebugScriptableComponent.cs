@@ -77,8 +77,8 @@ sealed class DebugScriptableComponent : ScriptableComponentBase {
   }
 
   static void LogNumAction(BaseComponent instance, ScriptValue[] args) {
-      AssertActionArgsCount(LogNumActionName, args, 1);
-      HostedDebugLog.Info(instance, "[Debug action]: {0}", args[0].AsNumber);
+    AssertActionArgsCount(LogNumActionName, args, 1);
+    HostedDebugLog.Info(instance, "[Debug action]: {0}", args[0].AsNumber);
   }
 
   #endregion

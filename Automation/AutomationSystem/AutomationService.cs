@@ -11,6 +11,7 @@ using Timberborn.SelectionSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.TickSystem;
 using Timberborn.ToolSystem;
+using Timberborn.UILayoutSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
@@ -34,6 +35,18 @@ public sealed class AutomationService : ITickableSingleton {
   /// <summary>Ticks since the game load.</summary>
   /// <remarks>Can be used for synchronization and delaying actions.</remarks>
   public static int CurrentTick { get; private set; }
+
+  /// <summary>Indicates if the game is fully loaded.</summary>
+  /// <remarks>
+  /// In this state, all the game loading and initialization logic is done, but the automation system is not yet ready to
+  /// normally process signals.
+  /// </remarks>
+  /// <seealso cref="AutomationServiceReadyEvent"/>
+  public static bool GameLoaded { get; private set; }
+
+  /// <summary>Indicates if the automation system is ready to use.</summary>
+  /// <remarks>In this state, all actions are loaded, initialized and synchronized.</remarks>
+  public static bool AutomationSystemReady { get; private set; }
 
   /// <summary>Shortcut to the instantiator.</summary>
   public readonly BaseInstantiator BaseInstantiator;
@@ -109,6 +122,8 @@ public sealed class AutomationService : ITickableSingleton {
     eventBus.Register(this);
     _highlighter = highlighter;
     CurrentTick = 0;
+    GameLoaded = false;
+    AutomationSystemReady = false;
   }
 
   internal void RegisterBehavior(AutomationBehavior behavior) {
@@ -142,6 +157,41 @@ public sealed class AutomationService : ITickableSingleton {
   [OnEvent]
   public void OnToolExited(ToolExitedEvent toolExitedEvent) {
     UnhighlightAutomationObjects();
+  }
+
+  #endregion
+
+  #region Game load callback
+
+  /// <summary>Called when the game initialized.</summary>
+  [OnEvent]
+  public void OnNewGameInitialized(ShowPrimaryUIEvent newGameInitializedEvent) {
+    GameLoaded = true;
+    EventBus.Post(new GameLoadedEvent());
+
+    DebugEx.Info("Automation system: syncing {0} loaded behaviors", _registeredBehaviors.Count);
+    foreach (var behavior in _registeredBehaviors) {
+      // First, bind all rules to their behaviors.
+      foreach (var action in behavior.Actions) {
+        action.Condition.Behavior = behavior;
+        action.Behavior = behavior;
+      }
+      // Then, sync the state of all conditions in case of the loaded state caused differences.
+      // It should only happen if the game can't be loaded "as-is". 
+      foreach (var action in behavior.Actions) {
+        var oldConditionState = action.Condition.ConditionState;
+        action.Condition.SyncState();
+        // If all works fine, the condition state shouldn't change after the sync.
+        if (oldConditionState != action.Condition.ConditionState) {
+          HostedDebugLog.Warning(behavior, "Condition state changed: {0} -> {1}, action: {2}",
+                                 oldConditionState, action.Condition.ConditionState, action.Condition);
+        }
+      }
+    }
+
+    DebugEx.Info("Automation system: loaded and ready");
+    AutomationSystemReady = true;
+    EventBus.Post(new AutomationServiceReadyEvent());
   }
 
   #endregion

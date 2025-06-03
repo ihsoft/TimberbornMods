@@ -1,6 +1,12 @@
-# v2.3.0 (pre-release):
+# v2.4.3 (pre-release):
+* [Feature #86] Add multi-value support for the custom signals. Signal values can be aggregated via name suffix: `.Min`, `.Max`, `.Sum`, `.Avg`, and `.Count`. Not available in constructor.
+* [Feature #88] Allow operator `add` accepting multiple arguments.
+* [Feature #91] Allow extra comment styles in rule importing: prefixes `;` and `//`; and multi-line comments `/* ... */` and `#| ... |#`.
+
+# v2.3.1 (26 May 2025):
+* [Change] Support Timberborn `0.7.9.0`. Incompatible with the previous versions of Update 7.
 * [Feature] Add import/export feature for the rules.
-* [Fxi #90] The placement tools prematurely place the building after an automation tool was used.
+* [Fix #90] The placement tools prematurely place the building after an automation tool was used.
 
 # v2.2.3 (27 May 2025), patch for `0.7.8.9`.
 * [Fix #90] The placement tools prematurely place the building after an automation tool was used. 

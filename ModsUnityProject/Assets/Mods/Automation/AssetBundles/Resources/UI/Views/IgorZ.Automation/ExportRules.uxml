@@ -7,7 +7,7 @@
     <engine:VisualElement class="content-row-centered">
         <engine:Instance template="NamedBoxTemplate" style="width: 1000px; height: 500px;">
             <AttributeOverrides element-name="Header" text-loc-key="IgorZ.Automation.Scripting.Editor.ExportDialogHeader" />
-            <engine:TextField vertical-scroller-visibility="AlwaysVisible" select-line-by-triple-click="true" multiline="true" value="multi-line script text&#10;yo-yo!&#10;next line" name="ExportTextField" readonly="true" class="game-text-big" style="height: 50%; background-image: resource(&apos;UI/Images/Backgrounds/bg-input&apos;); -unity-slice-left: 8; -unity-slice-top: 8; -unity-slice-right: 8; -unity-slice-bottom: 8; -unity-slice-scale: 0.5px; padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px; flex-grow: 1;" />
+            <engine:TextField vertical-scroller-visibility="AlwaysVisible" multiline="true" value="multi-line script text&#10;yo-yo!&#10;next line" name="ExportTextField" readonly="true" class="game-text-big scroll--green-decorated" style="height: 50%; background-image: resource(&apos;UI/Images/Backgrounds/bg-input&apos;); -unity-slice-left: 8; -unity-slice-top: 8; -unity-slice-right: 8; -unity-slice-bottom: 8; -unity-slice-scale: 0.5px; padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px; flex-grow: 1;" />
             <engine:VisualElement style="flex-direction: row; align-items: center; justify-content: center; margin-top: 20px; flex-shrink: 1;">
                 <Timberborn.CoreUI.LocalizableButton text="OK" text-loc-key="Core.OK" name="OkButton" class="menu-button" />
             </engine:VisualElement>

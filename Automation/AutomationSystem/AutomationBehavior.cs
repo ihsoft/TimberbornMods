@@ -57,8 +57,20 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
   public IList<IAutomationAction> Actions => _actions.AsReadOnly();
   List<IAutomationAction> _actions = [];
 
-  /// <summary>The Version is updated each time the rules set is changed.</summary>
-  public int ActionsVersion { get; private set; }
+  /// <summary>The version is updated each time the behavior is changed.</summary>
+  /// <remarks>It is a monotonically increasing value. Old versions have a less value than the newer versions.</remarks>
+  /// <seealso cref="IncrementStateVersion"/>
+  public int StateVersion { get; private set; }
+
+  /// <summary>Increments the state version.</summary>
+  /// <remarks>
+  /// Update the version each time the behavior changes in a way that can be important for the stateful logic. For
+  /// example, UI can check it to avoid constant refreshes.
+  /// </remarks>
+  /// <seealso cref="StateVersion"/>
+  public void IncrementStateVersion() {
+    StateVersion++;
+  }
 
   /// <summary>Creates a rule from the condition and action.</summary>
   /// <param name="condition">
@@ -72,9 +84,9 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
     HostedDebugLog.Fine(this, "Adding rule: action={0}", action);
     condition.Behavior = this;
     action.Behavior = this;
-    condition.SyncState();
+    condition.SyncState(force: true);
     _actions.Add(action);
-    ActionsVersion++;
+    IncrementStateVersion();
     UpdateRegistration();
   }
 
@@ -82,10 +94,11 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
   /// <see cref="Actions"/>
   public void DeleteRuleAt(int index) {
     var action = _actions[index];
+    HostedDebugLog.Fine(this, "Deleting rule at index {0}: action={1}", index, _actions[index]);
+    _actions.RemoveAt(index);
     action.Condition.Behavior = null;
     action.Behavior = null;
-    _actions.RemoveAt(index);
-    ActionsVersion++;
+    IncrementStateVersion();
     UpdateRegistration();
   }
 
@@ -184,13 +197,15 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
 
   /// <inheritdoc/>
   public void OnEnterFinishedState() {
-    // Update rules that work on finished building only.
-    foreach (var action in _actions) {
-      if (!action.Behavior) {
-        break;  // Not initialized yet. It is likely a save game load.
-      }
-      if (!action.Condition.CanRunOnUnfinishedBuildings) {
-        action.Condition.SyncState();
+    if (!HasActions) {
+      return;  // On load, this method is called for every object in the game. So, exit faster.
+    }
+    if (AutomationService.GameLoaded) {
+      // Update rules that work on finished building only.
+      foreach (var action in _actions) {
+        if (!action.Condition.CanRunOnUnfinishedBuildings) {
+          action.Condition.SyncState();
+        }
       }
     }
     UpdateRegistration();
@@ -221,16 +236,6 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
 
   void Awake() {
     BlockObject = GetComponentFast<BlockObject>();
-  }
-
-  void Start() {
-    // This needs to be executed after all the entity components are loaded and initialized.
-    foreach (var action in _actions) {
-      action.Condition.Behavior = this;
-      action.Behavior = this;
-      action.Condition.SyncState();
-    }
-    UpdateRegistration();
   }
 
   /// <summary>Removes all rules that depend on condition and/or action that is marked for cleanup.</summary>

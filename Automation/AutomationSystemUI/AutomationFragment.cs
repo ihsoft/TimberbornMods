@@ -95,10 +95,10 @@ sealed class AutomationFragment : IEntityPanelFragment {
   }
 
   public void UpdateFragment() {
-    if (!_automationBehavior || _automationBehavior.ActionsVersion == _automationBehaviorVersion) {
+    if (!_automationBehavior || _automationBehavior.StateVersion == _automationBehaviorVersion) {
       return;
     }
-    _automationBehaviorVersion = _automationBehavior.ActionsVersion;
+    _automationBehaviorVersion = _automationBehavior.StateVersion;
 
     _root.ToggleDisplayStyle(visible: true);
     _root.Q(RulesPanelName).ToggleDisplayStyle(_automationBehavior.HasActions);

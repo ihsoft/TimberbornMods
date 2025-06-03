@@ -88,7 +88,13 @@ sealed class RulesEditorDialog : IPanelController {
     };
     _root.Q<Button>("ExportRulesButton").clicked += () => {
       var dlg = DependencyContainer.GetInstance<ExportRulesDialog>();
-      dlg.Show(_activeBuilding);
+      var actions= new List<IAutomationAction>();
+      foreach (var rule in _ruleRows.Where(x => !x.IsDeleted)) {
+        var exportAction = rule.GetAction().CloneDefinition();
+        exportAction.Condition = rule.GetCondition().CloneDefinition();
+        actions.Add(exportAction);
+      }
+      dlg.Show(actions);
     };
 
     SetActiveBuilding(behavior);
