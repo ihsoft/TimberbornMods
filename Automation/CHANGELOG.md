@@ -1,5 +1,6 @@
 # v2.4.5 (pre-release, 3 June 2025):
-[Fix #101] Crash from circular execution of rule. 
+* [Fix #101] Crash from circular execution of rule.
+* [Fix #104] Game crashes with ModdableWeather mod.
 
 # v2.4.4 (June 3rd, 2025):
 * [Feature #86] Add multi-value support for the custom signals. Signal values can be aggregated via name suffix: `.Min`, `.Max`, `.Sum`, `.Avg`, and `.Count`. Not available in constructor.

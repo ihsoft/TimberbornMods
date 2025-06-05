@@ -64,6 +64,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   #region IPostLoadableSingleton implementation
 
   public void PostLoad() {
+    _eventBus.Register(this);
     _currentSeason = GetCurrentSeason();
   }
 
@@ -93,18 +94,18 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
 
   #region Implementation
 
+  readonly EventBus _eventBus;
   readonly WeatherService _weatherService;
   readonly HazardousWeatherService _hazardousWeatherService;
 
   string _currentSeason;
   readonly ReferenceManager _referenceManager = new();
 
-  WeatherScriptableComponent(
-      EventBus eventBus, WeatherService weatherService, HazardousWeatherService hazardousWeatherService) {
+  WeatherScriptableComponent(EventBus eventBus, WeatherService weatherService,
+                             HazardousWeatherService hazardousWeatherService) {
+    _eventBus = eventBus;
     _weatherService = weatherService;
     _hazardousWeatherService = hazardousWeatherService;
-    eventBus.Register(this);
-    _currentSeason = GetCurrentSeason();
   }
 
   /// <summary>
