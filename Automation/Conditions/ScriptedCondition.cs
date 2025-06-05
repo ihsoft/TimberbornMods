@@ -41,6 +41,10 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
 
   /// <inheritdoc/>
   public override void SyncState(bool force) {
+    if (_stateSynced) {
+      throw new InvalidOperationException("SyncState should only be called once per condition.");
+    }
+    _stateSynced = true;
     if (_parsedExpression == null) {
       return;  // The condition is broken, no need to sync.
     }
@@ -156,6 +160,9 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
 
   /// <inheritdoc/>
   public void OnValueChanged(string signalName) {
+    if (!_stateSynced) {
+      HostedDebugLog.Warning(Behavior, "OnValueChanged called before SyncState: {0}", Expression);
+    }
     if (!IsMarkedForCleanup) {
       CheckOperands(signalName);
     }
@@ -169,6 +176,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   BoolOperator _parsedExpression;
   List<SignalOperator> _registeredSignals;
   readonly HashSet<string> _oneShotSignals = [];
+  bool _stateSynced;
 
   // Used by the RulesEditor dialog.
   internal static BoolOperator ParseAndValidate(
@@ -201,15 +209,15 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
       Behavior.ReportError(this);
       return;
     }
-    _registeredSignals = DependencyContainer.GetInstance<ScriptingService>().RegisterSignals(_parsedExpression, this);
+    Behavior.IncrementStateVersion();
     Expression = _parsedExpression.Serialize();
+    _registeredSignals = DependencyContainer.GetInstance<ScriptingService>().RegisterSignals(_parsedExpression, this);
     foreach (var signal in _registeredSignals) {
       _canRunOnUnfinishedBuildings |= signal.OnUnfinished;
       if (signal.OneShot) {
         _oneShotSignals.Add(signal.SignalName);
       }
     }
-    Behavior.IncrementStateVersion();
   }
 
   bool CheckPrecondition(AutomationBehavior behavior) {
