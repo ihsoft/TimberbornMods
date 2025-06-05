@@ -172,9 +172,9 @@ sealed class ScriptedAction : AutomationActionBase {
       Behavior.ReportError(this);
       return;
     }
-    _installedActions = DependencyContainer.GetInstance<ScriptingService>().InstallActions(_parsedExpression, Behavior);
-    Expression = _parsedExpression.Serialize();
     Behavior.IncrementStateVersion();
+    Expression = _parsedExpression.Serialize();
+    _installedActions = DependencyContainer.GetInstance<ScriptingService>().InstallActions(_parsedExpression, Behavior);
   }
 
   #endregion

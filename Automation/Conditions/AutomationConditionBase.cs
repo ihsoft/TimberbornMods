@@ -17,6 +17,7 @@ namespace IgorZ.Automation.Conditions;
 /// </remarks>
 [SuppressMessage("ReSharper", "MemberCanBeProtected.Global")]
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+//FIXME: Implement IClonable instead of custom clone method.
 public abstract class AutomationConditionBase : IAutomationCondition {
 
   /// <summary>Serializer that handles persistence of all the condition types.</summary>
