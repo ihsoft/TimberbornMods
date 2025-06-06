@@ -137,7 +137,7 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
   }
 
   internal void RegisterBehavior(AutomationBehavior behavior) {
-    _blockObjectToBehaviorMap.Add(behavior.BlockObject, behavior);
+    _blockObjectToBehaviorMap[behavior.BlockObject] = behavior;
     if (_highlightingEnabled) {
       _highlighter.HighlightSecondary(behavior, _highlightColor);
     }
@@ -147,7 +147,9 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
     if (_highlightingEnabled) {
       _highlighter.UnhighlightSecondary(behavior);
     }
-    _blockObjectToBehaviorMap.Remove(behavior.BlockObject);
+    if (!_blockObjectToBehaviorMap.Remove(behavior.BlockObject)) {
+      DebugEx.Warning("Failed to unregister behavior {0}. It was not registered.", behavior);
+    }
   }
 
   /// <summary>
