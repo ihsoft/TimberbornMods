@@ -239,9 +239,6 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   }
 
   void CheckOperands(string signalName) {
-    if (!Behavior.BlockObject.IsFinished && !CanRunOnUnfinishedBuildings) {
-      return;
-    }
     if (_parsedExpression == null) {
       HostedDebugLog.Error(Behavior, "Signal change triggered, but the condition was broken: {0}", Expression);
       return;
