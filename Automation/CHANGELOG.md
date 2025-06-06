@@ -1,4 +1,4 @@
-# v2.5.0 (June 5st, 2025):
+# v2.5.0 (June 5th, 2025):
 * [Feature] Special short description for the rules that check signal value to itself: "signal change condition."
 * [Feature #150] Add Modulo (`mod`) Operator.
 * [Change] Rules that cannot execute on unfinished buildings are now grayed in the rule list.
