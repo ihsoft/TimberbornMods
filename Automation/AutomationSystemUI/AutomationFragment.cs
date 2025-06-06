@@ -131,6 +131,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
         }
       }
       row.Q<Label>("Content").text = _uiFactory.T(RuleTextLocKey, conditionText, actionText);
+      row.SetEnabled(action.Condition.IsActive);
       _rulesList.Add(row);
     }
   }
