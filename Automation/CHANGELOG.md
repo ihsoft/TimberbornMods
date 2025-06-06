@@ -1,4 +1,5 @@
 # v2.4.5 (pre-release, 3 June 2025):
+* [Feature] Special short description for the rules that check signal value to itself: "signal change condition."
 * [Fix #101] Crash from circular execution of rule.
 * [Fix #104] Game crashes with ModdableWeather mod.
 

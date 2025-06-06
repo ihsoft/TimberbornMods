@@ -6,10 +6,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using TimberApi.DependencyContainerSystem;
+using Timberborn.Localization;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
 sealed class BinaryOperator : BoolOperator {
+
+  const string SignalChangedLocKey = "IgorZ.Automation.Scripting.Expressions.SignalChanged";
 
   static readonly HashSet<string> Names = [ "eq", "ne", "gt", "lt", "ge", "le"];
 
@@ -24,8 +28,13 @@ sealed class BinaryOperator : BoolOperator {
 
   /// <inheritdoc/>
   public override string Describe() {
+    var leftSignal = Left as SignalOperator;
+    var rightSignal = Right as SignalOperator;
+    if (leftSignal != null && rightSignal != null && leftSignal.SignalName == rightSignal.SignalName) {
+      return DependencyContainer.GetInstance<ILoc>().T(SignalChangedLocKey, leftSignal.SignalName);
+    }
     var sb = new StringBuilder();
-    sb.Append(Left is SignalOperator ? Left.Describe() : Left.ValueFn().FormatValue(_signalDef?.Result));
+    sb.Append(leftSignal != null ? Left.Describe() : Left.ValueFn().FormatValue(_signalDef?.Result));
     sb.Append(Name switch {
         "eq" => " = ",
         "ne" => " \u2260 ",
@@ -35,7 +44,7 @@ sealed class BinaryOperator : BoolOperator {
         "le" => " \u2264 ",
         _ => throw new InvalidOperationException("Unknown operator: " + Name),
     });
-    sb.Append(Right is SignalOperator ? Right.Describe() : Right.ValueFn().FormatValue(_signalDef?.Result));
+    sb.Append(rightSignal != null ? Right.Describe() : Right.ValueFn().FormatValue(_signalDef?.Result));
     return sb.ToString();
   }
 

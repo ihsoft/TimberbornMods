@@ -140,6 +140,7 @@ IgorZ.Automation.Scripting.Expressions.AndOperator," и ","String to join compon
 IgorZ.Automation.Scripting.Expressions.OrOperator," или ","String to join components of the expression with condition OR. Used to represent the condition in the panel"
 IgorZ.Automation.Scripting.Expressions.ParseError,"ОШИБКА ОБРАБОТКИ","String to show when the scriptable condition or action cannot be parsed"
 IgorZ.Automation.Scripting.Expressions.RuntimeError,"ОШИБКА ИСПОЛНЕНИЯ","String to show when the scriptable condition or action cannot be executed"
+IgorZ.Automation.Scripting.Expressions.SignalChanged,"изменился сигнал: {0}","String to indicate that the check is being done for the signal change regardless of the value"
 =,=,"Rules editor strings"
 IgorZ.Automation.Scripting.Editor.ActionLabel,"Тогда",
 IgorZ.Automation.Scripting.Editor.ActionMustBeAction,"Действие должно быть оператором 'act'","A message to show when the action is not an action"
