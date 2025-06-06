@@ -8,7 +8,7 @@
         <engine:VisualElement name="RulesPanel" style="flex-grow: 1;">
             <tb:LocalizableLabel text="RulesAreaCaptionTextLocKey" text-loc-key="IgorZ.Automation.AutomationFragment.RulesAreaCaptionTextLocKey" class="entity-panel__text" style="color: rgb(0, 255, 255);" />
             <engine:VisualElement name="RulesList" style="flex-grow: 1;">
-                <engine:Instance template="FragmentRule" />
+                <engine:Instance template="FragmentRule" enabled="false" />
                 <engine:Instance template="FragmentRule" />
             </engine:VisualElement>
         </engine:VisualElement>
