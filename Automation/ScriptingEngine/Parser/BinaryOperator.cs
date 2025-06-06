@@ -30,8 +30,8 @@ sealed class BinaryOperator : BoolOperator {
   public override string Describe() {
     var leftSignal = Left as SignalOperator;
     var rightSignal = Right as SignalOperator;
-    if (leftSignal != null && rightSignal != null && leftSignal.SignalName == rightSignal.SignalName) {
-      return DependencyContainer.GetInstance<ILoc>().T(SignalChangedLocKey, leftSignal.SignalName);
+    if (leftSignal != null && rightSignal != null && leftSignal.SignalName == rightSignal.SignalName && Name == "eq") {
+      return leftSignal.Describe();
     }
     var sb = new StringBuilder();
     sb.Append(leftSignal != null ? Left.Describe() : Left.ValueFn().FormatValue(_signalDef?.Result));
