@@ -209,6 +209,7 @@ class SignalDispatcher {
         DebugEx.Warning("Invalid signal value: {0}", entityIdAndValue[1]);
         continue;
       }
+      DebugEx.Fine("[Automation system] Loading signal: {0}, entityId={1}, value={2}", signalName, entityId, value);
       var group = _signalGroups.GetOrAdd(signalName);
       var signalSource = group.Sources.GetOrAdd(entityId);
       signalSource.Value = value;
