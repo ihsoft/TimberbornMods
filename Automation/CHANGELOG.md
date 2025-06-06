@@ -2,6 +2,7 @@
 * [Feature] Special short description for the rules that check signal value to itself: "signal change condition."
 * [Fix #101] Crash from circular execution of rule.
 * [Fix #104] Game crashes with ModdableWeather mod.
+* [Fix #102] NullReferenceException: Object reference not set to an instance of an object. 
 
 # v2.4.4 (June 3rd, 2025):
 * [Feature #86] Add multi-value support for the custom signals. Signal values can be aggregated via name suffix: `.Min`, `.Max`, `.Sum`, `.Avg`, and `.Count`. Not available in constructor.

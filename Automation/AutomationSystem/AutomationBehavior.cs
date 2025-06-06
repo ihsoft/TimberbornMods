@@ -189,6 +189,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
         .OfType<IAutomationAction>()
         .Where(a => !a.IsMarkedForCleanup && a.Condition is { IsMarkedForCleanup: false })
         .ToList();
+    UpdateRegistration();
   }
 
   #endregion
