@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.Utils;
@@ -59,7 +60,7 @@ public abstract class AutomationConditionBase : IAutomationCondition {
     get => _conditionState;
     internal set {
       _conditionState = value;
-      if (!IsMarkedForCleanup) {
+      if (IsActive) {
         Listener?.OnConditionState(this);
       }
     }
@@ -72,6 +73,7 @@ public abstract class AutomationConditionBase : IAutomationCondition {
     protected set {
       _isMarkedForCleanup = value;
       if (value) {
+        IsActive = false;
         HostedDebugLog.Fine(Behavior, "Action marked for cleanup: {0}", this);
         Behavior.AutomationService.MarkBehaviourForCleanup(Behavior);
       }
@@ -106,10 +108,21 @@ public abstract class AutomationConditionBase : IAutomationCondition {
   public abstract string UiDescription { get; }
 
   /// <inheritdoc/>
+  public bool IsActive { get; private set; }
+
+  /// <inheritdoc/>
   public abstract IAutomationCondition CloneDefinition();
 
   /// <inheritdoc/>
-  public abstract void SyncState(bool force);
+  public virtual void SyncState(bool force) {
+    if (IsActive) {
+      throw new InvalidOperationException("SyncState already called.");
+    }
+    if (IsMarkedForCleanup) {
+      throw new InvalidOperationException("Cannot sync state on a condition marked for cleanup.");
+    }
+    IsActive = true;
+  }
 
   /// <inheritdoc/>
   public abstract bool IsValidAt(AutomationBehavior behavior);

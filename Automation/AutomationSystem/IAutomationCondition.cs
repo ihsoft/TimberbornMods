@@ -59,6 +59,13 @@ public interface IAutomationCondition : IGameSerializable {
   /// <seealso cref="AutomationBehavior.Loc"/>
   public string UiDescription { get; }
 
+  /// <summary>
+  /// Indicates that the action is attached to a behavior, got its state synced, and is not marked for deletion.
+  /// </summary>
+  /// <remarks>Inactive conditions must not execute state change logic.</remarks>
+  /// <seealso cref="SyncState"/>
+  public bool IsActive { get; }
+
   /// <summary>Returns a full copy of the condition <i>definition</i>. There must be no state copied.</summary>
   public IAutomationCondition CloneDefinition();
 
@@ -67,12 +74,16 @@ public interface IAutomationCondition : IGameSerializable {
 
   /// <summary>
   /// Sets the current state of the condition so that it matches the current state of the game and/or the automation
-  /// behavior.
+  /// behavior, and marks this condition as active.
   /// </summary>
-  /// <remarks><see cref="Behavior"/> and <see cref="Listener"/> must be set before calling this method.</remarks>
+  /// <remarks>
+  /// <see cref="Behavior"/> and <see cref="Listener"/> must be set before calling this method. This method should be
+  /// called only once in life-time of the condition.
+  /// </remarks>
   /// <param name="force">Indicates that the state callback needs to be called even if the state didn't change.</param>
   /// <seealso cref="Behavior"/>
   /// <seealso cref="Listener"/>
   /// <seealso cref="ConditionState"/>
+  /// <seealso cref="IsActive"/> 
   public void SyncState(bool force = false);
 }

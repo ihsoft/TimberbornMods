@@ -20,7 +20,7 @@ using UnityDev.Utils.LogUtilsLite;
 namespace IgorZ.Automation.AutomationSystem;
 
 /// <summary>The component that keeps all the automation state on the building.</summary>
-public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDeletableEntity, IFinishedStateListener {
+public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDeletableEntity {
 
   const string AutomationErrorIcon = "IgorZ.Automation/error-icon-script-failed";
   const string AutomationErrorAlertLocKey = "IgorZ.Automation.ShowStatusAction.AutomationErrorAlert";
@@ -84,7 +84,9 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
     HostedDebugLog.Fine(this, "Adding rule: action={0}", action);
     condition.Behavior = this;
     action.Behavior = this;
-    condition.SyncState(force: true);
+    if (BlockObject.IsFinished || condition.CanRunOnUnfinishedBuildings) {
+      condition.SyncState(force: true);
+    }
     _actions.Add(action);
     IncrementStateVersion();
     UpdateRegistration();
@@ -190,30 +192,6 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
         .Where(a => !a.IsMarkedForCleanup && a.Condition is { IsMarkedForCleanup: false })
         .ToList();
     UpdateRegistration();
-  }
-
-  #endregion
-
-  #region IFinishedStateListener implementation
-
-  /// <inheritdoc/>
-  public void OnEnterFinishedState() {
-    if (!HasActions) {
-      return;  // On load, this method is called for every object in the game. So, exit faster.
-    }
-    if (AutomationService.GameLoaded) {
-      // Update rules that work on finished building only.
-      foreach (var action in _actions) {
-        if (!action.Condition.CanRunOnUnfinishedBuildings) {
-          action.Condition.SyncState();
-        }
-      }
-    }
-    UpdateRegistration();
-  }
-
-  /// <inheritdoc/>
-  public void OnExitFinishedState() {
   }
 
   #endregion

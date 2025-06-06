@@ -48,11 +48,6 @@ public sealed class CheckAccessBlockCondition : AutomationConditionBase {
   }
 
   /// <inheritdoc/>
-  public override void SyncState(bool force) {
-    // Game tick required.
-  }
-
-  /// <inheritdoc/>
   protected override void OnBehaviorAssigned() {
     DependencyContainer.GetInstance<PathCheckingService>().AddCondition(this);
   }

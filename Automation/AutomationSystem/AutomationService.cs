@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using IgorZ.Automation.TemplateTools;
 using Timberborn.BaseComponentSystem;
+using Timberborn.BlockSystem;
 using Timberborn.Localization;
 using Timberborn.SelectionSystem;
 using Timberborn.SingletonSystem;
@@ -19,13 +20,22 @@ namespace IgorZ.Automation.AutomationSystem;
 
 /// <summary>Central point for all the automation related logic.</summary>
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-public sealed class AutomationService : ITickableSingleton {
+public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
 
   #region ITickableSingleton implementation
 
   /// <inheritdoc/>
   public void Tick() {
     CurrentTick++;
+  }
+
+  #endregion
+
+  #region ILoadableSingleton implementation
+
+  /// <inheritdoc/>
+  public void Load() {
+    EventBus.Register(this);
   }
 
   #endregion
@@ -60,7 +70,7 @@ public sealed class AutomationService : ITickableSingleton {
   /// <summary>Highlights all registered behaviors on the map.</summary>
   public void HighlightAutomationObjects(Color? useColor = null) {
     _highlightingEnabled = true;
-    foreach (var behavior in _registeredBehaviors) {
+    foreach (var behavior in _blockObjectToBehaviorMap.Values) {
       _highlighter.HighlightSecondary(behavior, useColor ?? _highlightColor);
     }
   }
@@ -107,7 +117,8 @@ public sealed class AutomationService : ITickableSingleton {
     }
   }
 
-  readonly HashSet<AutomationBehavior> _registeredBehaviors = [];
+  //readonly HashSet<AutomationBehavior> _registeredBehaviors = [];
+  readonly Dictionary<BlockObject, AutomationBehavior> _blockObjectToBehaviorMap = new();
   readonly HashSet<AutomationBehavior> _behaviorsNeedsCleanup = [];
   readonly Color _highlightColor = Color.cyan * 0.5f;
   readonly Highlighter _highlighter;
@@ -119,7 +130,6 @@ public sealed class AutomationService : ITickableSingleton {
     EventBus = eventBus;
     BaseInstantiator = baseInstantiator;
     Loc = loc;
-    eventBus.Register(this);
     _highlighter = highlighter;
     CurrentTick = 0;
     GameLoaded = false;
@@ -127,7 +137,7 @@ public sealed class AutomationService : ITickableSingleton {
   }
 
   internal void RegisterBehavior(AutomationBehavior behavior) {
-    _registeredBehaviors.Add(behavior);
+    _blockObjectToBehaviorMap.Add(behavior.BlockObject, behavior);
     if (_highlightingEnabled) {
       _highlighter.HighlightSecondary(behavior, _highlightColor);
     }
@@ -137,7 +147,7 @@ public sealed class AutomationService : ITickableSingleton {
     if (_highlightingEnabled) {
       _highlighter.UnhighlightSecondary(behavior);
     }
-    _registeredBehaviors.Remove(behavior);
+    _blockObjectToBehaviorMap.Remove(behavior.BlockObject);
   }
 
   /// <summary>
@@ -159,6 +169,26 @@ public sealed class AutomationService : ITickableSingleton {
     UnhighlightAutomationObjects();
   }
 
+  /// <summary>
+  /// Reacts on the <see cref="EnteredFinishedStateEvent"/> to update rules that work on finished buildings only.
+  /// </summary>
+  [OnEvent]
+  public void OnEnteredFinishedStateEvent(EnteredFinishedStateEvent evt) {
+    if (!AutomationSystemReady) {
+      return;  // Only serve event in the loaded and active game.
+    }
+    if (!_blockObjectToBehaviorMap.TryGetValue(evt.BlockObject, out var behavior)) {
+      return;
+    }
+
+    // Update rules that work on finished building only.
+    foreach (var action in behavior.Actions) {
+      if (!action.Condition.CanRunOnUnfinishedBuildings) {
+        action.Condition.SyncState();
+      }
+    }
+  }
+
   #endregion
 
   #region Game load callback
@@ -169,8 +199,8 @@ public sealed class AutomationService : ITickableSingleton {
     GameLoaded = true;
     EventBus.Post(new GameLoadedEvent());
 
-    DebugEx.Info("Automation system: syncing {0} loaded behaviors", _registeredBehaviors.Count);
-    foreach (var behavior in _registeredBehaviors) {
+    var activatedRulesCount = 0;
+    foreach (var behavior in _blockObjectToBehaviorMap.Values) {
       // First, bind all rules to their behaviors.
       foreach (var action in behavior.Actions) {
         action.Condition.Behavior = behavior;
@@ -179,17 +209,27 @@ public sealed class AutomationService : ITickableSingleton {
       // Then, sync the state of all conditions in case of the loaded state caused differences.
       // It should only happen if the game can't be loaded "as-is". 
       foreach (var action in behavior.Actions) {
+        if (!behavior.BlockObject.IsFinished && !action.Condition.CanRunOnUnfinishedBuildings) {
+          continue;  // Skip unfinished buildings. They will activate when finished.
+        }
+        activatedRulesCount++;
         var oldConditionState = action.Condition.ConditionState;
         action.Condition.SyncState();
-        // If all works fine, the condition state shouldn't change after the sync.
         if (oldConditionState != action.Condition.ConditionState) {
+          // If all works fine, the condition state shouldn't change after the sync.
           HostedDebugLog.Warning(behavior, "Condition state changed: {0} -> {1}, action: {2}",
                                  oldConditionState, action.Condition.ConditionState, action.Condition);
         }
       }
     }
+    if (activatedRulesCount > 0) {
+      DebugEx.Info("[Automation system] Activated {0} rules on {1} behaviors",
+                   activatedRulesCount, _blockObjectToBehaviorMap.Count);
+    } else {
+      DebugEx.Info("[Automation system] No rules to activate");
+    }
 
-    DebugEx.Info("Automation system: loaded and ready");
+    DebugEx.Info("[Automation system] Loaded and ready");
     AutomationSystemReady = true;
     EventBus.Post(new AutomationServiceReadyEvent());
   }
