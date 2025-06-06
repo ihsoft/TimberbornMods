@@ -14,6 +14,7 @@ class MathOperator : AbstractOperator, IValueExpr {
   const string SubOperatorName = "sub";
   const string MulOperatorName = "mul";
   const string DivOperatorName = "div";
+  const string ModOperatorName = "mod";
   const string MinOperatorName = "min";
   const string MaxOperatorName = "max";
   const string RoundOperatorName = "round";
@@ -31,6 +32,7 @@ class MathOperator : AbstractOperator, IValueExpr {
         SubOperatorName => $"({Operands[0].Describe()} - {Operands[1].Describe()})",
         MulOperatorName => $"{Operands[0].Describe()} × {Operands[1].Describe()}",
         DivOperatorName => $"{Operands[0].Describe()} ÷ {Operands[1].Describe()}",
+        ModOperatorName => $"{Operands[0].Describe()} % {Operands[1].Describe()}",
         MinOperatorName or MaxOperatorName => $"{Name}({string.Join(", ", Operands.Select(x => x.Describe()))})",
         RoundOperatorName => $"Round({Operands[0].Describe()})",
         _ => throw new InvalidDataException("Unknown operator: " + Name),
@@ -47,6 +49,8 @@ class MathOperator : AbstractOperator, IValueExpr {
             name, arguments, 2, 2, args => args[0].ValueFn() * args[1].ValueFn()),
         DivOperatorName => new MathOperator(
             name, arguments, 2, 2, args => args[0].ValueFn() / args[1].ValueFn()),
+        ModOperatorName => new MathOperator(
+            name, arguments, 2, 2, args => ScriptValue.FromFloat(args[0].ValueFn().AsFloat % args[1].ValueFn().AsFloat)),
         MinOperatorName => new MathOperator(
             name, arguments, 2, -1, args => args.Select(x => x.ValueFn()).Min()),
         MaxOperatorName => new MathOperator(
