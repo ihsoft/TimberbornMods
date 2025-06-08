@@ -3,11 +3,13 @@
 // License: Public Domain
 
 using System;
+using System.Collections.Generic;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.HazardousWeatherSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.WeatherSystem;
+using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
@@ -19,6 +21,15 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   const string DroughtSeason = "drought";
   const string BadTideSeason = "badtide";
   const string TemperateSeason = "temperate";
+
+  /// <summary>A list of season IDs that are returned "'"as-is" and are not supported by the constructor.</summary>
+  /// <remarks>
+  /// Extend this list as more weather affecting mods are being released/updated. The IDs that are not known will be
+  /// reported in the logs.
+  /// </remarks>
+  static readonly HashSet<string> ThirdPartySeasons = [
+      "Monsoon", "ProgressiveTemperate", "Rain", "ShortTemperate", "SurprisinglyRefreshing",
+  ];
 
   #region ScriptableComponentBase implementation
 
@@ -97,31 +108,43 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   readonly EventBus _eventBus;
   readonly WeatherService _weatherService;
   readonly HazardousWeatherService _hazardousWeatherService;
+  readonly string _badtideWeatherId;
+  readonly string _droughtWeatherId;
 
   string _currentSeason;
   readonly ReferenceManager _referenceManager = new();
 
   WeatherScriptableComponent(EventBus eventBus, WeatherService weatherService,
-                             HazardousWeatherService hazardousWeatherService) {
+                             HazardousWeatherService hazardousWeatherService,
+                             BadtideWeather badtideWeather, DroughtWeather droughtWeather) {
     _eventBus = eventBus;
     _weatherService = weatherService;
     _hazardousWeatherService = hazardousWeatherService;
+    _badtideWeatherId = badtideWeather.Id;
+    _droughtWeatherId = droughtWeather.Id;
   }
 
-  /// <summary>
-  /// Gets the current season based on the weather conditions. Don't use it in the weather change event handlers!
-  /// </summary>
+  /// <summary>Gets the current season based on the weather conditions.</summary>
+  /// <remarks>
+  /// Don't use in hazardous season end events due to the wayher service state is not fully updated yet.
+  /// </remarks>
   /// <exception cref="InvalidOperationException">if the weather season can't be recognized.</exception>
   string GetCurrentSeason() {
     if (!_weatherService.IsHazardousWeather) {
       return TemperateSeason;
     }
-    return _hazardousWeatherService.CurrentCycleHazardousWeather switch {
-        DroughtWeather => DroughtSeason,
-        BadtideWeather => BadTideSeason,
-        _ => throw new InvalidOperationException(
-            "Unknown hazardous weather type: " + _hazardousWeatherService.CurrentCycleHazardousWeather),
-    };
+    var weatherId = _hazardousWeatherService.CurrentCycleHazardousWeather.Id;
+    if (weatherId == _badtideWeatherId) {
+      return BadTideSeason;
+    }
+    if (weatherId == _droughtWeatherId) {
+      return DroughtSeason;
+    }
+    if (!ThirdPartySeasons.Contains(weatherId)) {
+      DebugEx.Warning(
+          "[Automation system] Unrecognized hazardous weather ID: {0}. Returning it as a season name.", weatherId);
+    }
+    return weatherId;
   }
 
   #endregion
@@ -129,12 +152,8 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   #region Event listeners
 
   [OnEvent]
-  public void OnHazardousWeatherStartedEvent(HazardousWeatherStartedEvent @event) {
-    _currentSeason = @event.HazardousWeather switch {
-        DroughtWeather => DroughtSeason,
-        BadtideWeather => BadTideSeason,
-        _ => throw new InvalidOperationException("Unknown hazardous weather type: " + @event.HazardousWeather),
-    };
+  public void OnHazardousWeatherStartedEvent(HazardousWeatherStartedEvent _) {
+    _currentSeason = GetCurrentSeason();
     _referenceManager.ScheduleSignal(SeasonSignalName, ScriptingService, ignoreErrors: true);
   }
 
