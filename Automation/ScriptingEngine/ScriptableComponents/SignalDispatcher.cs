@@ -9,6 +9,8 @@ using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.Automation.Settings;
+using IgorZ.TimberDev.Utils;
+using ProtoBuf;
 using Timberborn.BaseComponentSystem;
 using Timberborn.Common;
 using Timberborn.EntitySystem;
@@ -180,9 +182,50 @@ class SignalDispatcher {
     UpdateSignalGroup(signalName, group);
   }
 
+  #endregion
+
+  #region Persistence implementation
+
+  [ProtoContract]
+  record PersistentSignalSourceGroup {
+
+    [ProtoContract]
+    public record Source {
+      [ProtoMember(1)] public int Value;
+      [ProtoMember(2)] public string EntityId;
+    }
+    
+    [ProtoMember(1)] public string SignalName;
+    [ProtoMember(2)] public int LastValue;
+    [ProtoMember(3)] public List<Source> Sources = [];
+
+    public override string ToString() {
+      var sb = new System.Text.StringBuilder();
+      sb.AppendLine($"PersistentSignalSourceGroup: SignalName={SignalName}, LastValue={LastValue}");
+      foreach (var source in Sources) {
+        sb.AppendLine($"  Source: EntityId={source.EntityId}, Value={source.Value}");
+      }
+      return sb.ToString().TrimEnd();
+    }
+  }
+
   /// <summary>Serializes the state into a list of strings.</summary>
   public IEnumerable<string> ToPackedArray() {
-    return _signalGroups.SelectMany(x => x.Value.Sources.Select(e => $"{x.Key}:{e.Key}={e.Value.Value}"));
+    var result = new List<string>();
+    foreach (var signalGroup in _signalGroups) {
+      var group = new PersistentSignalSourceGroup {
+          SignalName = signalGroup.Key,
+          LastValue = signalGroup.Value.LastValue,
+      };
+      foreach (var source in signalGroup.Value.Sources) {
+        group.Sources.Add(new PersistentSignalSourceGroup.Source {
+            Value = source.Value.Value,
+            EntityId = source.Key,
+        });
+      }
+      result.Add(StringProtoSerializer.Serialize(group));
+    }
+    return result;
   }
 
   /// <summary>Deserializes the state from a list of strings.</summary>
@@ -193,28 +236,15 @@ class SignalDispatcher {
   public void FromPackedArray(IEnumerable<string> packedValues) {
     _signalGroups.Clear();
     foreach (var packedValue in packedValues) {
-      var parts = packedValue.Split(':');
-      if (parts.Length != 2) {
-        DebugEx.Error("Invalid packed signal value: {0}", packedValue);
-        continue;
+      var unpackedGroup = StringProtoSerializer.Deserialize<PersistentSignalSourceGroup>(packedValue);
+      DebugEx.Fine("[Automation system] Loading signal group: {0}", unpackedGroup);
+      var group = _signalGroups.GetOrAdd(unpackedGroup.SignalName);
+      group.LastValue = unpackedGroup.LastValue;
+      foreach (var unpackedSource in unpackedGroup.Sources) {
+        var signalSource = group.Sources.GetOrAdd(unpackedSource.EntityId);
+        signalSource.Value = unpackedSource.Value;
+        signalSource.HasFirstValue = true;  // On load, all conditions will sync to the current value, default or not.
       }
-      var signalName = parts[0];
-      var entityIdAndValue = parts[1].Split('=');
-      if (entityIdAndValue.Length != 2) {
-        DebugEx.Warning("Invalid packed source value: {0}", packedValue);
-        continue;
-      }
-      var entityId = entityIdAndValue[0];
-      if (!int.TryParse(entityIdAndValue[1], out var value)) {
-        DebugEx.Warning("Invalid signal value: {0}", entityIdAndValue[1]);
-        continue;
-      }
-      DebugEx.Fine("[Automation system] Loading signal: {0}, entityId={1}, value={2}", signalName, entityId, value);
-      var group = _signalGroups.GetOrAdd(signalName);
-      var signalSource = group.Sources.GetOrAdd(entityId);
-      signalSource.Value = value;
-      signalSource.HasFirstValue = true;  // On load, all conditions will sync to the current value, default or not.
-      group.IsDirty = true;  // Force recalculation of aggregates.
     }
   }
 

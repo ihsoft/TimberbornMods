@@ -7,8 +7,8 @@ using System.Linq;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.Persistence;
-using Timberborn.SingletonSystem;
 using Timberborn.WorldPersistence;
+using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
@@ -100,7 +100,7 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
   #region Persistence implementation
 
   static readonly SingletonKey SignalsKey = new("IgorZ.Automation.SignalsScriptableComponent");
-  static readonly ListKey<string> CustomSignalsKey = new("IgorZ.Automation.CustomSignals");
+  static readonly ListKey<string> CustomSignalsKey = new("IgorZ.Automation.CustomSignals.Proto");
 
   /// <inheritdoc/>
   public void Save(ISingletonSaver singletonSaver) {
@@ -112,6 +112,11 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
   public override void Load() {
     base.Load();
     if (!_singletonLoader.TryGetSingleton(SignalsKey, out var objectLoader)) {
+      return;
+    }
+    // FIXME: Compatibility with old saves prior to v2.5.1. Drop it in the future.
+    if (!objectLoader.Has(CustomSignalsKey)) {
+      DebugEx.Warning("Skipping old signals state loading! All signals are reset to value 0.");
       return;
     }
     _signalDispatcher.FromPackedArray(objectLoader.Get(CustomSignalsKey));

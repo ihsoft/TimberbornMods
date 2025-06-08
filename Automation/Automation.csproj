@@ -61,6 +61,8 @@
     <ItemGroup>
       <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all" />
       <PackageReference Include="IndexRange" Version="1.0.3" />
+      <PackageReference Include="protobuf-net" Version="3.0.0" />
+      <PackageReference Include="System.Collections.Immutable" Version="9.0.0" />
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Timberborn.*.dll" Publicize="true" />
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Unity*.dll" Publicize="false"/>
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Bindito.*.dll" Publicize="false"/>
@@ -148,6 +150,9 @@
       </Compile>
       <Compile Include="..\TimberDev\Utils\PrefabPatcher.cs">
         <Link>TimberDev\Utils\PrefabPatcher.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\ProtoSerializer.cs">
+        <Link>TimberDev\Utils\ProtoSerializer.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\Utils\StaticBindings.cs">
         <Link>TimberDev\Utils\StaticBindings.cs</Link>
