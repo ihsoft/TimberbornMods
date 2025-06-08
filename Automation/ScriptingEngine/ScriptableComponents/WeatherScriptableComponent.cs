@@ -22,7 +22,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   const string BadTideSeason = "badtide";
   const string TemperateSeason = "temperate";
 
-  /// <summary>A list of season IDs that are returned "'"as-is" and are not supported by the constructor.</summary>
+  /// <summary>A list of season IDs that are returned "as-is" and are not supported by the constructor.</summary>
   /// <remarks>
   /// Extend this list as more weather affecting mods are being released/updated. The IDs that are not known will be
   /// reported in the logs.
