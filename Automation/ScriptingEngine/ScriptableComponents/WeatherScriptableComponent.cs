@@ -28,6 +28,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   /// reported in the logs.
   /// </remarks>
   static readonly HashSet<string> ThirdPartySeasons = [
+      // Moddable Weather: https://steamcommunity.com/workshop/filedetails/?id=3493039008
       "Monsoon", "ProgressiveTemperate", "Rain", "ShortTemperate", "SurprisinglyRefreshing",
   ];
 
