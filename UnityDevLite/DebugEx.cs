@@ -134,7 +134,7 @@ static class DebugEx {
 
   /// <summary>Helper method to make a user-friendly object name for the logs.</summary>
   public static string BaseComponentToString(BaseComponent component) {
-    if (component != null && !component) {  // It is important to use the "!" notion to catch the destroyed objects!
+    if (!component) {  // It is important to use the "!" notion to catch the destroyed objects!
       return "[DestroyedComponent]";
     }
     var prefab = component.GetComponentFast<PrefabSpec>();
