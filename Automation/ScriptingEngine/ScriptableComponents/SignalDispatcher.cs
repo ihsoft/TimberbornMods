@@ -108,11 +108,11 @@ class SignalDispatcher {
     if (!signalSource.Providers.Add(provider)) {
       throw new InvalidOperationException("Provider already registered for signal: " + signalName);
     }
+    group.IsDirty = true;
     UpdateSignalGroup(signalName, group);
   }
 
   void UpdateSignalGroup(string signalName, SignalGroup group) {
-    group.IsDirty = true;
     if (!AutomationService.AutomationSystemReady) {
       return;  // Don't fire signals during the load stage.
     }
@@ -147,6 +147,7 @@ class SignalDispatcher {
       DebugEx.Fine("Removing signal group: name={0}, group={1}", signalName, group);
       _signalGroups.Remove(signalName);
     }
+    group.IsDirty = true;
     UpdateSignalGroup(signalName, group);
   }
 
@@ -169,16 +170,21 @@ class SignalDispatcher {
     if (!group.Sources.TryGetValue(entityId, out var source)) {
       throw new InvalidOperationException("Signal source not found for entity: " + entityId);
     }
+    var needsUpdate = !source.HasFirstValue || group.LastValue != value || source.Value != value;
     if (_automationDebugSettings.LogSignalsSetting.Value) {
-      HostedDebugLog.Fine(provider, "Setting signal value: source={0}, value={1}", source, value);
+      HostedDebugLog.Fine(
+          provider, "Setting signal '{0}' to value {1} (needs update: {2}):\nSignalGroup: {3}\nSignalSource: {4}",
+          signalName, value, needsUpdate, group, source);
     }
-    if (source.Value == value && source.HasFirstValue) {
+    if (!needsUpdate) {
       return;
     }
-    source.Value = value;
-    source.HasFirstValue = true;
+    if (source.Value != value || !source.HasFirstValue) { 
+      source.Value = value;
+      source.HasFirstValue = true;
+      group.IsDirty = true;
+    }
     group.LastValue = value;
-
     UpdateSignalGroup(signalName, group);
   }
 
