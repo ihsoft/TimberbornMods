@@ -126,19 +126,22 @@ sealed class ScriptingService {
     }
   }
 
+  //FIXME: Move to settings.
+  const int MaxStackSize = 10;
+
   internal void ScheduleSignalCallback(SignalCallback callback, bool ignoreErrors = false) {
     if (_debugSettings.LogSignalsPropagating.Value) {
       DebugEx.Fine("Executing signal callback: {0}", callback);
     }
-    if (_callbackStack.Contains(callback)) {
-      var log = new List<string>([$"{DebugEx.ObjectToString(callback.SignalListener.Behavior)}:{callback.Name}"]);
-      log.AddRange(_callbackStack.Select(x => $"{DebugEx.ObjectToString(x.SignalListener.Behavior)}:{x.Name}"));
-      HostedDebugLog.Error(callback.SignalListener.Behavior, "Circular execution of signal '{0}'. Execution log:\n{1}",
-                           callback.Name, string.Join("\n", log));
-      throw new ScriptError.RuntimeError($"Circular execution of signal '{callback.Name}'");
+    _callbackStack.Push(callback);
+    
+    if (_callbackStack.Count > MaxStackSize) {
+      var stackTrace =_callbackStack.Select(x => $"{DebugEx.ObjectToString(x.SignalListener.Behavior)}:{x.Name}");
+      HostedDebugLog.Error(callback.SignalListener.Behavior, "Script stack overflow ({0}). Execution log:\n{1}",
+                           MaxStackSize, string.Join("\n", stackTrace));
+      throw new ScriptError.RuntimeError("Script stack overflow");
     }
     try {
-      _callbackStack.Push(callback);
       callback.SignalListener.OnValueChanged(callback.Name);
     } catch (ScriptError e) {
       if (!ignoreErrors) {

@@ -1,4 +1,5 @@
 # v2.5.4 (pre-release, June 6th, 2025):
+* [Change] Improve circular execution detection.
 * [Fix #103] Signals not restored on game load.
 * [Fix #104] Game crashes with ModdableWeather mod.
 
