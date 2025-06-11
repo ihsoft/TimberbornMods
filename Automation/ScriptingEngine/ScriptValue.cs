@@ -65,6 +65,14 @@ record struct ScriptValue : IComparable<ScriptValue> {
     return new ScriptValue { _number = left.AsNumber * right.AsNumber / 100 };
   }
 
+  /// <exception cref="ScriptError">if dividing by zero.</exception>
+  public static ScriptValue operator /(ScriptValue left, ScriptValue right) {
+    if (right.AsNumber == 0) {
+      throw new ScriptError.RuntimeError("Division by zero");
+    }
+    return new ScriptValue { _number = left.AsNumber * 100 / right.AsNumber};
+  }
+
   public int CompareTo(ScriptValue other) {
     if (ValueType != other.ValueType) {
       throw new InvalidOperationException($"Cannot compare values of different types: {this} vs {other}");
@@ -74,14 +82,6 @@ record struct ScriptValue : IComparable<ScriptValue> {
         TypeEnum.String => string.Compare(AsString, other.AsString, StringComparison.Ordinal),
         _ => throw new InvalidOperationException("Unknown ScriptValue type: " + ValueType),
     };
-  }
-
-  /// <exception cref="ScriptError">if dividing by zero.</exception>
-  public static ScriptValue operator /(ScriptValue left, ScriptValue right) {
-    if (right.AsNumber == 0) {
-      throw new ScriptError.RuntimeError("Division by zero");
-    }
-    return new ScriptValue { _number = left.AsNumber * 100 / right.AsNumber};
   }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
