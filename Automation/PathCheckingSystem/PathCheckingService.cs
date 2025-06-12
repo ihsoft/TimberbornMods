@@ -34,7 +34,7 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
 
   /// <inheritdoc/>
   public void Tick() {
-    if (_automationDebugSettings.PathCheckingSystemProfiling.Value) {
+    if (AutomationDebugSettings.PathCheckingSystemProfiling) {
       Profile();
     }
   }
@@ -81,7 +81,6 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
   readonly NodeIdService _nodeIdService;
   readonly BaseInstantiator _baseInstantiator;
   readonly DistrictMap _districtMap;
-  readonly AutomationDebugSettings _automationDebugSettings;
 
   /// <summary>All path checking conditions on the sites.</summary>
   readonly Dictionary<PathCheckingSite, List<CheckAccessBlockCondition>> _conditionsIndex = new();
@@ -96,14 +95,12 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
   bool _navMeshIsReady;
 
   PathCheckingService(EntityComponentRegistry entityComponentRegistry, AutomationService automationService,
-                      NodeIdService nodeIdService, BaseInstantiator baseInstantiator, DistrictMap districtMap,
-                      AutomationDebugSettings automationDebugSettings) {
+                      NodeIdService nodeIdService, BaseInstantiator baseInstantiator, DistrictMap districtMap) {
     Instance = this;
     _entityComponentRegistry = entityComponentRegistry;
     _nodeIdService = nodeIdService;
     _baseInstantiator = baseInstantiator;
     _districtMap = districtMap;
-    _automationDebugSettings = automationDebugSettings;
     automationService.EventBus.Register(this);
   }
 

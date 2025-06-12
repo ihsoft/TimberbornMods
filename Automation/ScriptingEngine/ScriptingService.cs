@@ -130,7 +130,7 @@ sealed class ScriptingService {
   const int MaxStackSize = 10;
 
   internal void ScheduleSignalCallback(SignalCallback callback, bool ignoreErrors = false) {
-    if (_debugSettings.LogSignalsPropagating.Value) {
+    if (AutomationDebugSettings.LogSignalsPropagating) {
       DebugEx.Fine("Executing signal callback: {0}", callback);
     }
     _callbackStack.Push(callback);
@@ -157,15 +157,8 @@ sealed class ScriptingService {
 
   #region Implementation
 
-  readonly AutomationDebugSettings _debugSettings;
-
   readonly Dictionary<string, IScriptable> _registeredScriptables = [];
   readonly Stack<SignalCallback> _callbackStack = new();
-
-  [Inject]
-  ScriptingService(AutomationDebugSettings debugSettings) {
-    _debugSettings = debugSettings;
-  }
 
   internal IList<string> GetScriptableNames() {
     return _registeredScriptables.Keys.ToList();
