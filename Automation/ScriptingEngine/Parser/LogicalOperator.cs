@@ -37,7 +37,7 @@ class LogicalOperator : BoolOperator {
         descriptions.Add(operand.Describe());
       }
     }
-    return string.Join(displayName, descriptions);
+    return string.Join(" " + displayName + " ", descriptions);
   }
 
   LogicalOperator(string name, IList<IExpression> operands) : base(name, operands) {
