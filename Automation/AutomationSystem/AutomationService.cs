@@ -4,6 +4,8 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using IgorZ.Automation.Settings;
 using IgorZ.Automation.TemplateTools;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
@@ -200,28 +202,24 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
     GameLoaded = true;
     EventBus.Post(new GameLoadedEvent());
 
-    // FIXME: Add a setting to forcibly re-execute all rules?
+    if (!AutomationDebugSettings.ReevaluateRulesOnLoad) {
+      BindLoadedRules();
+    } else {
+      ReexecuteLoadedRules();
+    }
+
+    DebugEx.Info("[Automation system] Loaded and ready");
+    AutomationSystemReady = true;
+    EventBus.Post(new AutomationServiceReadyEvent());
+  }
+
+  void BindLoadedRules() {
     var activatedRulesCount = 0;
     foreach (var behavior in _blockObjectToBehaviorMap.Values) {
-      // First, bind all rules to their behaviors.
       foreach (var action in behavior.Actions) {
         action.Condition.Behavior = behavior;
         action.Behavior = behavior;
-      }
-      // Then, sync the state of all conditions in case of the loaded state caused differences.
-      // It should only happen if the game can't be loaded "as-is". 
-      foreach (var action in behavior.Actions) {
-        if (!behavior.BlockObject.IsFinished && !action.Condition.CanRunOnUnfinishedBuildings) {
-          continue;  // Skip unfinished buildings. They will activate when finished.
-        }
         activatedRulesCount++;
-        var oldConditionState = action.Condition.ConditionState;
-        action.Condition.SyncState();
-        if (oldConditionState != action.Condition.ConditionState) {
-          // If all works fine, the condition state shouldn't change after the sync.
-          HostedDebugLog.Warning(behavior, "Condition state changed: {0} -> {1}, action: {2}",
-                                 oldConditionState, action.Condition.ConditionState, action.Condition);
-        }
       }
     }
     if (activatedRulesCount > 0) {
@@ -230,10 +228,19 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
     } else {
       DebugEx.Info("[Automation system] No rules to activate");
     }
+  }
 
-    DebugEx.Info("[Automation system] Loaded and ready");
-    AutomationSystemReady = true;
-    EventBus.Post(new AutomationServiceReadyEvent());
+  void ReexecuteLoadedRules() {
+    DebugEx.Warning("[Automation system] Re-evaluating all rules on game load.");
+    // Need a copy since the rules be removed/added, which triggers the registration updates.
+    var behaviors = _blockObjectToBehaviorMap.Values.ToList();
+    foreach (var behavior in behaviors) {
+      var actions = behavior.Actions.ToList();
+      behavior.ClearAllRules();
+      foreach (var action in actions) {
+        behavior.AddRule(action.Condition, action);
+      }
+    }
   }
 
   #endregion

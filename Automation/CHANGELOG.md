@@ -3,6 +3,7 @@
 * [Fix #103] Signals not restored on game load.
 * [Fix #104] Game crashes with ModdableWeather mod.
 * [Fix #107] Signal values may not be truly global.
+* [Fix #109] Add a debug option to re-evaluate scripts on game load.
 
 # v2.5.0 (June 5th, 2025):
 * [Feature] Special short description for the rules that check signal value to itself: "signal change condition."

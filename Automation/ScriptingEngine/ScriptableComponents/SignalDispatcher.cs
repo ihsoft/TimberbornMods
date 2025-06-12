@@ -113,7 +113,7 @@ class SignalDispatcher {
   }
 
   void UpdateSignalGroup(string signalName, SignalGroup group) {
-    if (!AutomationService.AutomationSystemReady) {
+    if (!AutomationService.AutomationSystemReady && !AutomationDebugSettings.ReevaluateRulesOnLoad) {
       return;  // Don't fire signals during the load stage.
     }
     using var _ = new LockChanges(
@@ -171,7 +171,7 @@ class SignalDispatcher {
       throw new InvalidOperationException("Signal source not found for entity: " + entityId);
     }
     var needsUpdate = !source.HasFirstValue || group.LastValue != value || source.Value != value;
-    if (_automationDebugSettings.LogSignalsSetting.Value) {
+    if (AutomationDebugSettings.LogSignalsSetting) {
       HostedDebugLog.Fine(
           provider, "Setting signal '{0}' to value {1} (needs update: {2}):\nSignalGroup: {3}\nSignalSource: {4}",
           signalName, value, needsUpdate, group, source);
@@ -305,7 +305,6 @@ class SignalDispatcher {
 
   readonly Dictionary<string, SignalGroup> _signalGroups = [];
   readonly ScriptingService _scriptingService;
-  readonly AutomationDebugSettings _automationDebugSettings;
 
   const string AggCountNameSuffix = ".Count";
   const string AggMinNameSuffix = ".Min";
@@ -321,11 +320,9 @@ class SignalDispatcher {
   string _systemStateLockDescription;
 
   [Inject]
-  SignalDispatcher(
-      ScriptingService scriptingService, AutomationDebugSettings automationDebugSettings, EventBus eventBus) {
+  SignalDispatcher(ScriptingService scriptingService, EventBus eventBus) {
     eventBus.Register(this);
     _scriptingService = scriptingService;
-    _automationDebugSettings = automationDebugSettings;
   }
 
   static (SignalType signalType, string signalName) ParseSignalName(string name) {

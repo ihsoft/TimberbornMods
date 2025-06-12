@@ -189,6 +189,8 @@ IgorZ.Automation.Scripting.ImportRules.UnclosedMultiLineComment,"Unclosed multi-
 IgorZ.Automation.Settings.Debug.PathCheckingProfiling,"Log path checking engine statistics",
 IgorZ.Automation.Settings.Debug.LogSignalSetting,"Log setting signal values",
 IgorZ.Automation.Settings.Debug.LogSignalPropagating,"Log signal propagation",
+IgorZ.Automation.Settings.Debug.ReevaluateRulesOnLoad,"Re-evaluate rules on load",
+IgorZ.Automation.Settings.Debug.ResetSignalsOnLoad,"Reset custom signals on load",
 IgorZ.Automation.Settings.EntityPanel.AlwaysShowAddRulesButton,"Always show 'Add rules' button",
 IgorZ.Automation.Settings.EntityPanel.Header,"Controls on the building panel",
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle,"Style of the rule description",

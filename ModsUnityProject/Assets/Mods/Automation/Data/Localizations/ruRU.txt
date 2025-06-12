@@ -190,6 +190,8 @@ IgorZ.Automation.Scripting.ImportRules.UnclosedMultiLineComment,"Незавер�
 IgorZ.Automation.Settings.Debug.PathCheckingProfiling,"Записывать в журнал статистику движка поиска путей",
 IgorZ.Automation.Settings.Debug.LogSignalSetting,"Записывать в журнал установку сигналов",
 IgorZ.Automation.Settings.Debug.LogSignalPropagating,"Записывать в журнал распространение сигналов",
+IgorZ.Automation.Settings.Debug.ReevaluateRulesOnLoad,"Исполнять правила при загрузке",
+IgorZ.Automation.Settings.Debug.ResetSignalsOnLoad,"Сбрасывать сигналы при загрузке",
 IgorZ.Automation.Settings.EntityPanel.Header,"Элементы управления на панели здания",
 IgorZ.Automation.Settings.EntityPanel.AlwaysShowAddRulesButton,"Всегда отображать кнопку 'Добавить правила'",
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle,"Стиль описания правил",

@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
+using IgorZ.Automation.Settings;
 using Timberborn.Persistence;
 using Timberborn.WorldPersistence;
 using UnityDev.Utils.LogUtilsLite;
@@ -119,7 +120,12 @@ class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSingleton {
       DebugEx.Warning("Skipping old signals state loading! All signals are reset to value 0.");
       return;
     }
-    _signalDispatcher.FromPackedArray(objectLoader.Get(CustomSignalsKey));
+    var packedSignals = objectLoader.Get(CustomSignalsKey);
+    if (AutomationDebugSettings.ResetSignalsOnLoad) {
+      DebugEx.Warning("Not restoring {0} signals from the save file.", packedSignals.Count);
+      return;
+    }
+    _signalDispatcher.FromPackedArray(packedSignals);
   }
 
   #endregion
