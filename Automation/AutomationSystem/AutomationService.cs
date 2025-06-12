@@ -117,7 +117,6 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
     }
   }
 
-  //readonly HashSet<AutomationBehavior> _registeredBehaviors = [];
   readonly Dictionary<BlockObject, AutomationBehavior> _blockObjectToBehaviorMap = new();
   readonly HashSet<AutomationBehavior> _behaviorsNeedsCleanup = [];
   readonly Color _highlightColor = Color.cyan * 0.5f;
@@ -201,6 +200,7 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
     GameLoaded = true;
     EventBus.Post(new GameLoadedEvent());
 
+    // FIXME: Add a setting to forcibly re-execute all rules?
     var activatedRulesCount = 0;
     foreach (var behavior in _blockObjectToBehaviorMap.Values) {
       // First, bind all rules to their behaviors.
