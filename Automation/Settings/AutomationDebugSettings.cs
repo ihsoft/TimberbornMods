@@ -11,7 +11,7 @@ using Timberborn.SettingsSystem;
 namespace IgorZ.Automation.Settings;
 
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-sealed class AutomationDebugSettings : DebugSettings {
+sealed class AutomationDebugSettings : DebugSettings<AutomationDebugSettings> {
 
   const string PathCheckingProfilingLocKey = "IgorZ.Automation.Settings.Debug.PathCheckingProfiling";
   const string LogSignalSettingLocKey = "IgorZ.Automation.Settings.Debug.LogSignalSetting";
@@ -21,37 +21,33 @@ sealed class AutomationDebugSettings : DebugSettings {
 
   protected override string ModId => Configurator.AutomationModId;
 
-  // ReSharper disable once UnusedMember.Local
   public ModSetting<bool> PathCheckingSystemProfilingInternal { get; } = new(
       false, ModSettingDescriptor.CreateLocalized(PathCheckingProfilingLocKey));
   public static bool PathCheckingSystemProfiling { get; private set; }
 
   public ModSetting<bool> LogSignalsSettingInternal { get; } = new(
       false, ModSettingDescriptor.CreateLocalized(LogSignalSettingLocKey));
-    public static bool LogSignalsSetting => _instance.LogSignalsSettingInternal.Value;
+  public static bool LogSignalsSetting => Instance.VerboseLogging.Value && Instance.LogSignalsSettingInternal.Value;
 
   public ModSetting<bool> LogSignalsPropagatingInternal { get; } = new(
       false, ModSettingDescriptor.CreateLocalized(LogSignalPropagatingKey));
-    public static bool LogSignalsPropagating => _instance.LogSignalsPropagatingInternal.Value;
+  public static bool LogSignalsPropagating =>
+      Instance.VerboseLogging.Value && Instance.LogSignalsPropagatingInternal.Value;
 
   public ModSetting<bool> ReevaluateRulesOnLoadInternal { get; } = new(
       false, ModSettingDescriptor.CreateLocalized(ReevaluateRulesOnLoadKey));
-  public static bool ReevaluateRulesOnLoad => _instance.ReevaluateRulesOnLoadInternal.Value;
+  public static bool ReevaluateRulesOnLoad => Instance.ReevaluateRulesOnLoadInternal.Value;
 
   public ModSetting<bool> ResetSignalsOnLoadInternal { get; } = new(
       false, ModSettingDescriptor.CreateLocalized(ResetSignalsOnLoadKey));
-  public static bool ResetSignalsOnLoad => ReevaluateRulesOnLoad && _instance.ResetSignalsOnLoadInternal.Value;
-
-  static AutomationDebugSettings _instance;
+  public static bool ResetSignalsOnLoad => ReevaluateRulesOnLoad && Instance.ResetSignalsOnLoadInternal.Value;
 
   AutomationDebugSettings(
       ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry, ModRepository modRepository)
       : base(settings, modSettingsOwnerRegistry, modRepository) { 
-    _instance = this;
-    PathCheckingSystemProfilingInternal.ValueChanged +=
-        (_, _) => PathCheckingSystemProfiling = PathCheckingSystemProfilingInternal.Value;
-    LogSignalsSettingInternal.Descriptor.SetEnableCondition(() => _verboseLogging.Value);
-    LogSignalsPropagatingInternal.Descriptor.SetEnableCondition(() => _verboseLogging.Value);
+    InstallSettingCallback(PathCheckingSystemProfilingInternal, v => PathCheckingSystemProfiling = v);
+    LogSignalsSettingInternal.Descriptor.SetEnableCondition(() => VerboseLogging.Value);
+    LogSignalsPropagatingInternal.Descriptor.SetEnableCondition(() => VerboseLogging.Value);
     ResetSignalsOnLoadInternal.Descriptor.SetEnableCondition(() => ReevaluateRulesOnLoadInternal.Value);
   }
 }

@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System.Diagnostics.CodeAnalysis;
 using ModSettings.Core;
 using Timberborn.Modding;
 using Timberborn.SettingsSystem;
@@ -16,21 +17,18 @@ namespace IgorZ.TimberDev.Settings;
 /// <see cref="ModSetting"/> properties in the descendants. See "DebugSettingsConfigurator.cs" for an example of binding
 /// this class.
 /// </remarks>
-abstract class DebugSettings : ModSettingsOwner {
+[SuppressMessage("ReSharper", "MemberCanBeProtected.Global")]
+abstract class DebugSettings<T> : BaseSettings<T> where T : DebugSettings<T> {
   const string VerboseLoggingLocKey = "TimberDev_Utils.Settings.Debug.VerboseLogging";
   const string VerboseLoggingTooltipLocKey = "TimberDev_Utils.Settings.Debug.VerboseLoggingTooltip";
   const string HeaderStringLocKey = "TimberDev_Utils.Settings.DebugSection";
 
   #region Settings
-  // ReSharper disable InconsistentNaming
-  // ReSharper disable MemberCanBePrivate.Global
 
-  public ModSetting<bool> _verboseLogging { get; } = new(
+  public ModSetting<bool> VerboseLogging { get; } = new(
       false,
       ModSettingDescriptor.CreateLocalized(VerboseLoggingLocKey).SetLocalizedTooltip(VerboseLoggingTooltipLocKey));
 
-  // ReSharper restore MemberCanBePrivate.Global
-  // ReSharper restore InconsistentNaming
   #endregion
 
   #region ModSettingsOwner overrides
@@ -51,18 +49,14 @@ abstract class DebugSettings : ModSettingsOwner {
   protected DebugSettings(
       ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry, ModRepository modRepository)
       : base(settings, modSettingsOwnerRegistry, modRepository) {
-    _verboseLogging.ValueChanged += (_, _) => UpdateVerbosityLevel();
-  }
-
-  protected override void OnAfterLoad() {
-    UpdateVerbosityLevel();
+    InstallSettingCallback(VerboseLogging, UpdateVerbosityLevel);
   }
 
   void UpdateVerbosityLevel() {
     var oldLevel = DebugEx.VerbosityLevel;
-    DebugEx.VerbosityLevel = _verboseLogging.Value ? DebugEx.LogLevel.Finer : DebugEx.LogLevel.Info;
+    DebugEx.VerbosityLevel = VerboseLogging.Value ? DebugEx.LogLevel.Finer : DebugEx.LogLevel.Info;
     if (oldLevel != DebugEx.VerbosityLevel) {
-      DebugEx.Info("Debug verbosity level changed: from={0}, to={1}", oldLevel, DebugEx.VerbosityLevel);
+      DebugEx.Info("Debug verbosity level changed for {0}: from={1}, to={2}", ModId, oldLevel, DebugEx.VerbosityLevel);
     }
   }
 
