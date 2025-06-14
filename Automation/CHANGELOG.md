@@ -1,10 +1,10 @@
 # v2.5.4 (pre-release, June 6th, 2025):
 * [Feature] Allow disabling arguments and values checking in the scripts via settings.
 * [Change] Improve circular execution detection.
-* [Fix #103] Signals not restored on game load.
+* [Fix #103] Signals not restored on a game load.
 * [Fix #104] Game crashes with ModdableWeather mod.
 * [Fix #107] Signal values may not be truly global.
-* [Fix #109] Add a debug option to re-evaluate scripts on game load.
+* [Fix #109] Add a debug option to re-evaluate scripts on a game load.
 
 # v2.5.0 (June 5th, 2025):
 * [Feature] Special short description for the rules that check signal value to itself: "signal change condition."
