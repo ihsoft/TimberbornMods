@@ -15,5 +15,6 @@ sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<AutomationDebugSettings>().AsSingleton();
     containerDefinition.Bind<EntityPanelSettings>().AsSingleton();
+    containerDefinition.Bind<ScriptEngineSettings>().AsSingleton();
   }
 }

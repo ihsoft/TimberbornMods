@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using IgorZ.Automation.Settings;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
@@ -65,12 +66,14 @@ sealed class ActionOperator : AbstractOperator {
             $"Argument #{i + 1} must be of type '{argDef.ValueType}', but found: {valueExpr.ValueType}");
       }
       argDef.ArgumentValidator?.Invoke(valueExpr);
-      if (argDef.ValueValidator == null || VerifyConstantValueExpr(argDef, valueExpr)) {
+      if (argDef.ValueValidator == null || VerifyConstantValueExpr(argDef, valueExpr) != null) {
         argValues[i] = valueExpr.ValueFn;
       } else {
         argValues[i] = () => {
           var value = valueExpr.ValueFn();
-          argDef.ValueValidator(value);
+          if (ScriptEngineSettings.CheckArgumentValues) {
+            argDef.ValueValidator(value);
+          }
           return value;
         };
       }

@@ -197,6 +197,9 @@ IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle,"Style of the rule d
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.HumanReadable,"Text","Human readable style of the rule description."
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.Script,"Script","Script style of the rule description."
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.ScriptShort,"Pseudo-script","Shortened script style of the rule description."
+IgorZ.Automation.Settings.ScriptEngine.Header,"Script engine settings",
+IgorZ.Automation.Settings.ScriptEngine.CheckArgumentValues,"Check argument value in runtime",
+IgorZ.Automation.Settings.ScriptEngine.CheckOptionsArguments,"Check arguments with fixed set of values",
 =,=,"TimberDev_Utils"
 TimberDev_Utils.Settings.Debug.VerboseLogging,"Verbose logging",
 TimberDev_Utils.Settings.Debug.VerboseLoggingTooltip,"Logs will have more useful details, but it may impact game performance.",

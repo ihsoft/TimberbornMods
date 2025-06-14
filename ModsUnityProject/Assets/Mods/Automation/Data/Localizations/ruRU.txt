@@ -198,6 +198,9 @@ IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle,"Стиль опис
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.HumanReadable,"Текст","Human readable style of the rule description."
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.Script,"Скрипт","Script style of the rule description."
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.ScriptShort,"Псевдо-скрипт","Shortened script style of the rule description."
+IgorZ.Automation.Settings.ScriptEngine.Header,"Настройки движка скриптов",
+IgorZ.Automation.Settings.ScriptEngine.CheckArgumentValues,"Проверять значения аргументов во время исполнения",
+IgorZ.Automation.Settings.ScriptEngine.CheckOptionsArguments,"Проверять аргументы с фиксированным набором значений",
 =,=,"TimberDev_Utils"
 TimberDev_Utils.Settings.Debug.VerboseLogging,"Детальные журналы",
 TimberDev_Utils.Settings.Debug.VerboseLoggingTooltip,"В журналы игры будет записываться больше полезной информации,

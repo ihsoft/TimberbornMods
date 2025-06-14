@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using IgorZ.Automation.Settings;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.Localization;
 
@@ -68,14 +69,13 @@ sealed class BinaryOperator : BoolOperator {
     if (_signalDef != null) {
       var otherArgExpr = left is SignalOperator ? right : left;
       _signalDef.Result.ArgumentValidator?.Invoke(otherArgExpr);
-      VerifyConstantValueExpr(_signalDef.Result, otherArgExpr);
-      if (otherArgExpr is ConstantValueExpr constantValueExpr) {
-        if (_signalDef.Result.Options != null) {
-          var value = constantValueExpr.ValueFn().AsString;
-          var allowedValues = _signalDef.Result.Options.Select(x => x.Value).ToArray();
-          if (!allowedValues.Contains(value)) {
-            throw new ScriptError.ParsingError($"Unexpected value: {value}. Allowed: {string.Join(", ", allowedValues)}");
-          }
+      var constantValueExpr = VerifyConstantValueExpr(_signalDef.Result, otherArgExpr);
+      if (constantValueExpr != null && _signalDef.Result.Options != null
+          && ScriptEngineSettings.CheckOptionsArguments) {
+        var value = constantValueExpr.ValueFn().AsString;
+        var allowedValues = _signalDef.Result.Options.Select(x => x.Value).ToArray();
+        if (!allowedValues.Contains(value)) {
+          throw new ScriptError.ParsingError($"Unexpected value: {value}. Allowed: {string.Join(", ", allowedValues)}");
         }
       }
     }

@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using IgorZ.Automation.Settings;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
@@ -59,9 +60,12 @@ abstract class AbstractOperator(string name, IList<IExpression> operands) : IExp
     }
   }
 
-  protected static bool VerifyConstantValueExpr(ValueDef valueDef, IValueExpr valueExpr) {
-    if (valueExpr is not ConstantValueExpr) {
-      return false;
+  protected static ConstantValueExpr VerifyConstantValueExpr(ValueDef valueDef, IValueExpr valueExpr) {
+    if (valueExpr is not ConstantValueExpr constantValueExpr) {
+      return null;
+    }
+    if (!ScriptEngineSettings.CheckArgumentValues) {
+      return constantValueExpr;
     }
     try {
       valueDef.ValueValidator?.Invoke(valueExpr.ValueFn());
@@ -69,6 +73,6 @@ abstract class AbstractOperator(string name, IList<IExpression> operands) : IExp
       // Report as parsing error since it is checked at parse time.
       throw new ScriptError.ParsingError(e.Message);
     }
-    return true;
+    return constantValueExpr;
   }
 }
