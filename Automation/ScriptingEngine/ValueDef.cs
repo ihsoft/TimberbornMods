@@ -38,7 +38,7 @@ sealed record ValueDef {
   /// <summary>Optional hint text to show in UI for the argument.</summary>
   public string ValueUiHint { get; init; }
 
-  /// <summary>Optional validating function for the value argument.</summary>
+  /// <summary>Optional validating function for the argument value <i>expression</i>.</summary>
   /// <remarks>
   /// This check is performed in the parsing stage. Don't do value validation here! Use <see cref="ValueValidator"/>
   /// instead.
