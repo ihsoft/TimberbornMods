@@ -169,7 +169,6 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   ParsingResult _parsingResult;
   BoolOperator _parsedExpression;
   List<SignalOperator> _registeredSignals;
-  readonly HashSet<string> _oneShotSignals = [];
 
   // Used by the RulesEditor dialog.
   internal static BoolOperator ParseAndValidate(
@@ -205,12 +204,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
     Behavior.IncrementStateVersion();
     Expression = _parsedExpression.Serialize();
     _registeredSignals = DependencyContainer.GetInstance<ScriptingService>().RegisterSignals(_parsedExpression, this);
-    foreach (var signal in _registeredSignals) {
-      _canRunOnUnfinishedBuildings |= signal.OnUnfinished;
-      if (signal.OneShot) {
-        _oneShotSignals.Add(signal.SignalName);
-      }
-    }
+    _canRunOnUnfinishedBuildings = _registeredSignals.Select(x => x.OnUnfinished).Aggregate((x, y) => x || y); 
   }
 
   bool CheckPrecondition(AutomationBehavior behavior) {
@@ -259,10 +253,6 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
       Behavior.IncrementStateVersion();
     }
     ConditionState = newState;
-    if (signalName != null && _oneShotSignals.Contains(signalName)) {
-      HostedDebugLog.Fine(Behavior, "OneShot signal '{0}' triggered. Cleanup the rule: {1}", signalName, Expression);
-      IsMarkedForCleanup = true;
-    }
   }
 
   #endregion
