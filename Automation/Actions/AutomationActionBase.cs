@@ -66,17 +66,17 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
   IAutomationCondition _condition;
 
   /// <inheritdoc/>
-  public bool IsMarkedForCleanup {
-    get => _isMarkedForCleanup;
-    protected set {
-      _isMarkedForCleanup = value;
-      if (value) {
-        HostedDebugLog.Fine(Behavior, "Condition marked for cleanup: {0}", this);
-        Behavior.AutomationService.MarkBehaviourForCleanup(Behavior);
-      }
+  public bool IsMarkedForCleanup { get; private set; }
+
+  /// <inheritdoc/>
+  public void MarkForCleanup() {
+    if (IsMarkedForCleanup) {
+      return;
     }
+    IsMarkedForCleanup = true;
+    HostedDebugLog.Fine(Behavior, "Action marked for cleanup: {0}", this);
+    Behavior.AutomationService.MarkBehaviourForCleanup(Behavior);
   }
-  bool _isMarkedForCleanup;
 
   #endregion
 

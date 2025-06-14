@@ -63,7 +63,7 @@ sealed class ScriptedAction : AutomationActionBase {
     try {
       _parsedExpression.Execute();
       if (_parsedExpression is { ExecuteOnce: true }) {
-        IsMarkedForCleanup = true;
+        MarkForCleanup();
       }
     } catch (ScriptError) {
       if (_parsedExpression == null) {

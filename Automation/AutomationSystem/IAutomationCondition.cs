@@ -69,6 +69,9 @@ public interface IAutomationCondition : IGameSerializable {
   /// <summary>Returns a full copy of the condition <i>definition</i>. There must be no state copied.</summary>
   public IAutomationCondition CloneDefinition();
 
+  /// <summary>Marks the condition for cleanup.</summary>
+  public void MarkForCleanup();
+
   /// <summary>Verifies that the condition can be used on the provided automation behavior.</summary>
   public bool IsValidAt(AutomationBehavior behavior);
 

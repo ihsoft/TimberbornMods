@@ -50,6 +50,9 @@ public interface IAutomationAction : IGameSerializable {
   /// <seealso cref="TemplateFamily"/>
   public IAutomationAction CloneDefinition();
 
+  /// <summary>Marks the condition for cleanup.</summary>
+  public void MarkForCleanup();
+
   /// <summary>Verifies that the definitions of the two actions are equal.</summary>
   public bool CheckSameDefinition(IAutomationAction other);
 

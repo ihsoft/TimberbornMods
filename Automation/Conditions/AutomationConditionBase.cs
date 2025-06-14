@@ -68,30 +68,27 @@ public abstract class AutomationConditionBase : IAutomationCondition {
   bool _conditionState;
 
   /// <inheritdoc/>
-  public bool IsMarkedForCleanup {
-    get => _isMarkedForCleanup;
-    protected set {
-      _isMarkedForCleanup = value;
-      if (value) {
-        IsActive = false;
-        HostedDebugLog.Fine(Behavior, "Action marked for cleanup: {0}", this);
-        Behavior.AutomationService.MarkBehaviourForCleanup(Behavior);
-      }
+  public bool IsMarkedForCleanup { get; private set; }
+
+  /// <inheritdoc/>
+  public void MarkForCleanup() {
+    if (IsMarkedForCleanup) {
+      return;
     }
+    IsMarkedForCleanup = true;
+    HostedDebugLog.Fine(Behavior, "Action marked for cleanup: {0}", this);
+    Behavior.AutomationService.MarkBehaviourForCleanup(Behavior);
   }
-  bool _isMarkedForCleanup;
 
   #endregion
 
   #region IGameSerializable implemenation
 
   static readonly PropertyKey<bool> ConditionStateKey = new("ConditionState");
-  static readonly PropertyKey<bool> IsMarkedForCleanupKey = new("IsMarkedForCleanup");
 
   /// <inheritdoc/>
   public virtual void LoadFrom(IObjectLoader objectLoader) {
-    ConditionState = objectLoader.Has(ConditionStateKey) && objectLoader.Get(ConditionStateKey);
-    IsMarkedForCleanup = objectLoader.Has(IsMarkedForCleanupKey) && objectLoader.Get(IsMarkedForCleanupKey);
+    _conditionState = objectLoader.GetValueOrDefault(ConditionStateKey);
   }
 
   /// <inheritdoc/>

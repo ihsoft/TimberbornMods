@@ -79,7 +79,7 @@ public sealed class CheckAccessBlockCondition : AutomationConditionBase {
 
   /// <summary>Removes the condition from the object, but it must only be called on an active condition.</summary>
   internal void CancelCondition() {
-    IsMarkedForCleanup = true;
+    MarkForCleanup();
   }
 
   #endregion
