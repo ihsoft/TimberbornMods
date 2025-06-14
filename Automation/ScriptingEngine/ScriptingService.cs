@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.Automation.Settings;
@@ -126,19 +125,16 @@ sealed class ScriptingService {
     }
   }
 
-  //FIXME: Move to settings.
-  const int MaxStackSize = 10;
-
   internal void ScheduleSignalCallback(SignalCallback callback, bool ignoreErrors = false) {
     if (AutomationDebugSettings.LogSignalsPropagating) {
       DebugEx.Fine("Executing signal callback: {0}", callback);
     }
     _callbackStack.Push(callback);
     
-    if (_callbackStack.Count > MaxStackSize) {
+    if (_callbackStack.Count > ScriptEngineSettings.SignalExecutionStackSize) {
       var stackTrace =_callbackStack.Select(x => $"{DebugEx.ObjectToString(x.SignalListener.Behavior)}:{x.Name}");
       HostedDebugLog.Error(callback.SignalListener.Behavior, "Script stack overflow ({0}). Execution log:\n{1}",
-                           MaxStackSize, string.Join("\n", stackTrace));
+                           ScriptEngineSettings.SignalExecutionStackSize, string.Join("\n", stackTrace));
       throw new ScriptError.RuntimeError("Script stack overflow");
     }
     try {

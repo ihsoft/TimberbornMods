@@ -43,6 +43,10 @@ sealed class ScriptEngineSettings : BaseSettings<ScriptEngineSettings> {
   public ModSetting<bool> CheckArgumentValuesInternal { get; } = new(
       true, ModSettingDescriptor.CreateLocalized(CheckArgumentValuesLocKey));
 
+  public static int SignalExecutionStackSize { get; private set; }
+  public ModSetting<int> SignalExecutionStackSizeInternal { get; } = new(
+      10, ModSettingDescriptor.CreateLocalized(SignalExecutionStackSizeLocKey));
+
   #endregion
 
   #region Implementation
@@ -51,6 +55,7 @@ sealed class ScriptEngineSettings : BaseSettings<ScriptEngineSettings> {
       ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry, ModRepository modRepository)
       : base(settings, modSettingsOwnerRegistry, modRepository) { 
     InstallSettingCallback(CheckArgumentValuesInternal, v => CheckArgumentValues = v);
+    InstallSettingCallback(SignalExecutionStackSizeInternal, v => SignalExecutionStackSize = v);
   }
 
   #endregion
