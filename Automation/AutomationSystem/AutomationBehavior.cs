@@ -85,7 +85,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
     condition.Behavior = this;
     action.Behavior = this;
     if (BlockObject.IsFinished || condition.CanRunOnUnfinishedBuildings) {
-      condition.SyncState(force: true);
+      condition.Activate();
     }
     _actions.Add(action);
     IncrementStateVersion();

@@ -6,6 +6,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.Utils;
+using IgorZ.TimberDev.Utils;
 using Timberborn.Persistence;
 using UnityDev.Utils.LogUtilsLite;
 
@@ -60,8 +61,11 @@ public abstract class AutomationConditionBase : IAutomationCondition {
     get => _conditionState;
     internal set {
       _conditionState = value;
-      if (IsActive) {
-        Listener?.OnConditionState(this);
+      if (!IsActive) {
+        throw new InvalidOperationException("Condition state can only be set on an activated condition.");
+      }
+      if (!IsMarkedForCleanup) {
+        Listener.OnConditionState(this);
       }
     }
   }
@@ -94,7 +98,6 @@ public abstract class AutomationConditionBase : IAutomationCondition {
   /// <inheritdoc/>
   public virtual void SaveTo(IObjectSaver objectSaver) {
     objectSaver.Set(ConditionStateKey, ConditionState);
-    objectSaver.Set(IsMarkedForCleanupKey, IsMarkedForCleanup);
   }
 
   #endregion
@@ -111,12 +114,12 @@ public abstract class AutomationConditionBase : IAutomationCondition {
   public abstract IAutomationCondition CloneDefinition();
 
   /// <inheritdoc/>
-  public virtual void SyncState(bool force) {
+  public virtual void Activate(bool noTrigger = false) {
     if (IsActive) {
-      throw new InvalidOperationException("SyncState already called.");
+      throw new InvalidOperationException("Condition already activated.");
     }
-    if (IsMarkedForCleanup) {
-      throw new InvalidOperationException("Cannot sync state on a condition marked for cleanup.");
+    if (!Behavior || Listener == null) {
+      throw new InvalidOperationException("Behavior and Listener must be set before activating the condition.");
     }
     IsActive = true;
   }

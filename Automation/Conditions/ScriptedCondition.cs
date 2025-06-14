@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
@@ -40,14 +41,20 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   string _staticDescription;
 
   /// <inheritdoc/>
-  public override void SyncState(bool force) {
-    base.SyncState(force);
+  public override void Activate(bool noTrigger = false) {
+    base.Activate(noTrigger);
     if (_parsedExpression == null) {
+      HostedDebugLog.Warning(Behavior, "Condition is broken, cannot sync state: {0}", Expression);
       return;  // The condition is broken, no need to sync.
     }
     try {
-      if (force || ConditionState != _parsedExpression.Execute()) {
-        OnValueChanged(null);
+      if (noTrigger) {
+        if (ConditionState != _parsedExpression.Execute()) {
+          HostedDebugLog.Warning(Behavior, "Condition state mismatch: loaded={0}, calculated={1}", ConditionState,
+                                 _parsedExpression.Execute());
+        }
+      } else {
+        CheckOperands();
       }
     } catch (ScriptError e) {
       HostedDebugLog.Error(Behavior, "SyncState failed: {0}", e.Message);
@@ -157,8 +164,8 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
 
   /// <inheritdoc/>
   public void OnValueChanged(string signalName) {
-    if (IsActive) {
-      CheckOperands(signalName);
+    if (IsActive && !IsMarkedForCleanup) {
+      CheckOperands();
     }
   }
 
@@ -232,7 +239,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
     return resultValue;
   }
 
-  void CheckOperands(string signalName) {
+  void CheckOperands() {
     if (_parsedExpression == null) {
       HostedDebugLog.Error(Behavior, "Signal change triggered, but the condition was broken: {0}", Expression);
       return;

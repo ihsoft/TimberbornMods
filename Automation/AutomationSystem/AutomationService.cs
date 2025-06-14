@@ -187,7 +187,7 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
     // Update rules that work on finished building only.
     foreach (var action in behavior.Actions) {
       if (!action.Condition.CanRunOnUnfinishedBuildings) {
-        action.Condition.SyncState();
+        action.Condition.Activate(); 
       }
     }
   }
@@ -219,6 +219,7 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
       foreach (var action in behavior.Actions) {
         action.Condition.Behavior = behavior;
         action.Behavior = behavior;
+        action.Condition.Activate(noTrigger: true);
         activatedRulesCount++;
       }
     }
