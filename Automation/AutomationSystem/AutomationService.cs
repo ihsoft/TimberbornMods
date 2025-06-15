@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -29,6 +30,10 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
   /// <inheritdoc/>
   public void Tick() {
     CurrentTick++;
+    // ReSharper disable once ForCanBeConvertedToForeach
+    for (var i = 0; i < _tickables.Count; i++) {
+      _tickables[i].Invoke(CurrentTick);
+    }
   }
 
   #endregion
@@ -107,9 +112,26 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
     _behaviorsNeedsCleanup.Clear();
   }
 
+  /// <summary>Registers a tickable action.</summary>
+  public void RegisterTickable(Action<int> tickable) {
+    if (_tickables.Contains(tickable)) {
+      throw new InvalidOperationException("Tickable already registered: " + tickable);
+    }
+    _tickables.Add(tickable);
+  }
+
+  /// <summary>Unregisters a tickable action.</summary>
+  public void UnregisterTickable(Action<int> tickable) {
+    if (!_tickables.Remove(tickable)) {
+      throw new InvalidOperationException("Tickable not registered: " + tickable);
+    }
+  }
+
   #endregion
 
   #region Implementation
+
+  readonly List<Action<int>> _tickables = [];
 
   sealed class CleanupComponent : MonoBehaviour {
     public AutomationService AutomationService;
