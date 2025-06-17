@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.TimberDev.UI;
@@ -48,6 +49,10 @@ sealed record ValueDef {
 
   /// <summary>Optional list of pre-defined values for the argument.</summary>
   public DropdownItem<string>[] Options { get; init; }
+
+  /// <summary>Map of replacement options for the argument.</summary>
+  /// <remarks>Used to replace deprecated constants with the new values.</remarks>
+  public Dictionary<string, string> CompatibilityOptions { get; init; }
 
   /// <summary>Integer value validation function.</summary>
   public static Action<ScriptValue> RangeCheckValidatorInt(int? min = null, int? max = null) {

@@ -11,7 +11,7 @@ sealed class ConstantValueExpr : IValueExpr {
   public ScriptValue.TypeEnum ValueType { get; private init; }
   public Func<ScriptValue> ValueFn { get; private init; }
 
-  public static IExpression TryCreateFrom(string token) {
+  public static ConstantValueExpr TryCreateFrom(string token) {
     if (token.StartsWith("'")) {
       var literal = token.Substring(1, token.Length - 2);
       return new ConstantValueExpr { ValueType = ScriptValue.TypeEnum.String, ValueFn = () => ScriptValue.Of(literal) };

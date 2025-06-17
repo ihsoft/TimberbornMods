@@ -9,6 +9,7 @@ using System.Text;
 using IgorZ.Automation.Settings;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.Localization;
+using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
@@ -70,6 +71,24 @@ sealed class BinaryOperator : BoolOperator {
       var otherArgExpr = left is SignalOperator ? right : left;
       _signalDef.Result.ArgumentValidator?.Invoke(otherArgExpr);
       var constantValueExpr = VerifyConstantValueExpr(_signalDef.Result, otherArgExpr);
+
+      // Options compatibility support.
+      if (constantValueExpr != null && _signalDef.Result.CompatibilityOptions != null) {
+        var value = constantValueExpr.ValueFn().AsString;
+        if (_signalDef.Result.CompatibilityOptions.TryGetValue(value, out var replaceOption)) {
+          var newConstantValueExpr = ConstantValueExpr.TryCreateFrom($"'{replaceOption}'");
+          DebugEx.Warning("BinaryOperator: Replacing constant value '{0}' with '{1}' for signal {2}",
+                          value, replaceOption, _signalDef.ScriptName);
+          if (Operands[0] == otherArgExpr) {
+            Operands[0] = newConstantValueExpr;
+            left = newConstantValueExpr;
+          } else {
+            Operands[1] = newConstantValueExpr;
+            right = newConstantValueExpr;
+          }
+        }
+      }
+
       if (constantValueExpr != null && _signalDef.Result.Options != null
           && ScriptEngineSettings.CheckOptionsArguments) {
         var value = constantValueExpr.ValueFn().AsString;

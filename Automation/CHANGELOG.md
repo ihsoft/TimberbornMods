@@ -1,6 +1,7 @@
 # v2.5.5 (pre-release, June 14th, 2025):
 * [Feature] Allow disabling arguments and values checking in the scripts via settings.
 * [Feature] Add `Debug.Ticker` signal. You asked for it, you got it! Now you can use `Debug.Ticker` signal to get your rules executed every tick.
+* [Feature] Load weather seasons from the game blueprints. This allows the modded seasons to work, given the mod that introduces them follows the specs naming convention.
 * [Change] Improve circular execution detection.
 * [Fix #103] Signals not restored on a game load.
 * [Fix #104] Game crashes with ModdableWeather mod.

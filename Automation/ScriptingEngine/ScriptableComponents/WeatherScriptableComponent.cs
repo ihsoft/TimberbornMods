@@ -3,9 +3,14 @@
 // License: Public Domain
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
+using IgorZ.TimberDev.UI;
+using TimberApi.DependencyContainerSystem;
+using Timberborn.BlueprintSystem;
 using Timberborn.HazardousWeatherSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.WeatherSystem;
@@ -16,21 +21,12 @@ namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadableSingleton {
 
   const string SeasonSignalLocKey = "IgorZ.Automation.Scriptable.Weather.Signal.Season";
+  const string TemperateWeatherNameLocKey = "Weather.Temperate";
+  const string BadtideWeatherNameLocKey = "Weather.Badtide";
+  const string DroughtWeatherNameLocKey = "Weather.Drought";
 
   const string SeasonSignalName = "Weather.Season";
-  const string DroughtSeason = "drought";
-  const string BadTideSeason = "badtide";
-  const string TemperateSeason = "temperate";
-
-  /// <summary>A list of season IDs that are returned "as-is" and are not supported by the constructor.</summary>
-  /// <remarks>
-  /// Extend this list as more weather affecting mods are being released/updated. The IDs that are not known will be
-  /// reported in the logs.
-  /// </remarks>
-  static readonly HashSet<string> ThirdPartySeasons = [
-      // Moddable Weather: https://steamcommunity.com/workshop/filedetails/?id=3493039008
-      "Monsoon", "ProgressiveTemperate", "Rain", "ShortTemperate", "SurprisinglyRefreshing",
-  ];
+  const string TemperateWeatherId = "TemperateWeather";
 
   #region ScriptableComponentBase implementation
 
@@ -39,7 +35,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
 
   /// <inheritdoc/>
   public override string[] GetSignalNamesForBuilding(AutomationBehavior _) {
-    return [SeasonSignalName]; 
+    return [SeasonSignalName];
   }
 
   /// <inheritdoc/>
@@ -78,6 +74,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   public void PostLoad() {
     _eventBus.Register(this);
     _currentSeason = GetCurrentSeason();
+    LoadWeatherIds();
   }
 
   #endregion
@@ -89,11 +86,13 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
       DisplayName = Loc.T(SeasonSignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.String,
-          Options = [
-              (TemperateSeason, Loc.T("Weather.Temperate")),
-              (DroughtSeason, Loc.T("Weather.Drought")),
-              (BadTideSeason, Loc.T("Weather.Badtide")),
-          ],
+          Options = _weatherSeasonOptions,
+          // FIXME: Options changed in v2.5.6 on 2025-06-16, drop one day.
+          CompatibilityOptions = new Dictionary<string, string> {
+              { "temperate", TemperateWeatherId },
+              { "badtide", "BadtideWeather" },
+              { "drought", "DroughtWeather" },
+          },
       },
   };
   SignalDef _seasonSignalDef;
@@ -109,20 +108,22 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   readonly EventBus _eventBus;
   readonly WeatherService _weatherService;
   readonly HazardousWeatherService _hazardousWeatherService;
-  readonly string _badtideWeatherId;
-  readonly string _droughtWeatherId;
+
+  static readonly (string Value, string text)[] StandardSeasons = [
+      ("DroughtWeather", DroughtWeatherNameLocKey),
+      ("BadtideWeather", BadtideWeatherNameLocKey),
+      (TemperateWeatherId, TemperateWeatherNameLocKey),
+  ];
 
   string _currentSeason;
   readonly ReferenceManager _referenceManager = new();
+  DropdownItem<string>[] _weatherSeasonOptions;
 
   WeatherScriptableComponent(EventBus eventBus, WeatherService weatherService,
-                             HazardousWeatherService hazardousWeatherService,
-                             BadtideWeather badtideWeather, DroughtWeather droughtWeather) {
+                             HazardousWeatherService hazardousWeatherService) {
     _eventBus = eventBus;
     _weatherService = weatherService;
     _hazardousWeatherService = hazardousWeatherService;
-    _badtideWeatherId = badtideWeather.Id;
-    _droughtWeatherId = droughtWeather.Id;
   }
 
   /// <summary>Gets the current season based on the weather conditions.</summary>
@@ -131,21 +132,56 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   /// </remarks>
   /// <exception cref="InvalidOperationException">if the weather season can't be recognized.</exception>
   string GetCurrentSeason() {
-    if (!_weatherService.IsHazardousWeather) {
-      return TemperateSeason;
+    return _weatherService.IsHazardousWeather
+        ? _hazardousWeatherService.CurrentCycleHazardousWeather.Id
+        : TemperateWeatherId;
+  }
+
+
+  /// <summary>Loads the weather IDs from the weather specs.</summary>
+  /// <remarks>
+  /// In case there are modded seasons added by the other mods, they're loaded first. Then, the standard seasons added
+  /// if they're missing in the modded list. The order in which the IDs are loaded will be reflected in the constructor
+  /// UI.
+  /// </remarks>
+  void LoadWeatherIds() {
+    var seasons = new List<DropdownItem<string>>();
+    var specService = DependencyContainer.GetInstance<ISpecService>() as SpecService
+        ?? throw new Exception("ISpecService is no longer SpecService");
+    var specTypes = specService._cachedBlueprints.Keys.Where(q => q.Name.EndsWith("WeatherSpec"));
+    foreach (var specType in specTypes) {
+      var specs = (IEnumerable)typeof(ISpecService).GetMethod(nameof(ISpecService.GetSpecs))!
+          .MakeGenericMethod(specType).Invoke(specService, []);
+      var idProp = specType.GetProperty("Id");
+      var idLocNameProp = specType.GetProperty("NameLocKey");
+      if (idProp == null || idLocNameProp == null) {
+        DebugEx.Warning("Skipping incompatible weather spec {0}: hasId={1}, hasNameLocKey={2}",
+                        specType, idProp != null, idLocNameProp != null);
+        continue;
+      }
+      foreach (var spec in specs) {
+        var seasonId = idProp.GetValue(spec) as string;
+        var seasonNameLocKey = idLocNameProp.GetValue(spec) as string;
+        if (string.IsNullOrWhiteSpace(seasonId) || string.IsNullOrWhiteSpace(seasonNameLocKey)) {
+          DebugEx.Warning("Skipping bad weather spec {0}: id={1}, nameLocKey={2}",
+                          specType, seasonId, seasonNameLocKey);
+          continue;
+        }
+        if (seasons.Any(x => x.Value == seasonId)) {
+          DebugEx.Warning("Skipping duplicate weather spec {0}: id={1}, nameLocKey={2}",
+                          specType, seasonId, seasonNameLocKey);
+          continue;
+        }
+        DebugEx.Info("Loading weather spec {0}: id={1}, name={2}", specType, seasonId, seasonNameLocKey);
+        seasons.Add(new DropdownItem<string> { Value = seasonId, Text = Loc.T(seasonNameLocKey) });
+      }
     }
-    var weatherId = _hazardousWeatherService.CurrentCycleHazardousWeather.Id;
-    if (weatherId == _badtideWeatherId) {
-      return BadTideSeason;
+    foreach (var stdSeason in StandardSeasons) {
+      if (seasons.All(x => x.Value != stdSeason.Value)) {
+        seasons.Insert(0, new DropdownItem<string> { Value = stdSeason.Value, Text = Loc.T(stdSeason.text) });
+      }
     }
-    if (weatherId == _droughtWeatherId) {
-      return DroughtSeason;
-    }
-    if (!ThirdPartySeasons.Contains(weatherId)) {
-      DebugEx.Warning(
-          "[Automation system] Unrecognized hazardous weather ID: {0}. Returning it as a season name.", weatherId);
-    }
-    return weatherId;
+    _weatherSeasonOptions = seasons.ToArray();
   }
 
   #endregion
@@ -160,7 +196,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
 
   [OnEvent]
   public void OnHazardousWeatherEndedEvent(HazardousWeatherEndedEvent @event) {
-    _currentSeason = TemperateSeason;
+    _currentSeason = TemperateWeatherId;
     _referenceManager.ScheduleSignal(SeasonSignalName, ScriptingService, ignoreErrors: true);
   }
 

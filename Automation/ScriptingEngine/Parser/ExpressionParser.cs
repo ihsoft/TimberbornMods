@@ -161,7 +161,11 @@ sealed class ExpressionParser {
     }
     var token = tokens.Dequeue();
     if (token != "(") {
-      return ConstantValueExpr.TryCreateFrom(token) ?? new SymbolExpr(token);
+      var constantValue = ConstantValueExpr.TryCreateFrom(token);
+      if (constantValue != null) {
+        return constantValue;
+      }
+      return new SymbolExpr(token);
     }
     CheckHasMoreTokens(tokens);
     var operatorName = tokens.Dequeue();
