@@ -145,7 +145,7 @@ record struct ScriptValue : IComparable<ScriptValue> {
       return stringValue;
     }
     var resolvedValue = valueDef.Options.FirstOrDefault(x => x.Value == stringValue);
-    return resolvedValue.Text != "" ? resolvedValue.Text : CommonFormats.HighlightRed("?" + stringValue);
+    return resolvedValue.Text ?? CommonFormats.HighlightRed("?" + stringValue);
   }
 
   int? _number;
