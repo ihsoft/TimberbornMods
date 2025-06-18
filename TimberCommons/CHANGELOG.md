@@ -1,3 +1,6 @@
+# v1.12.1 (June 17th, 2025)
+* [Fix] Fix a crash during a game load under some circumstances.
+
 # v1.11.6 (28 May 2025) - Patch for `0.7.6.1`
 * Fix IrrigationTower component for Update 7.
 
