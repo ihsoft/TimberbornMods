@@ -1,5 +1,6 @@
 # v2.5.7 (June 17th, 2025):
 * [Change] Don't crash if the modded seasons can't be loaded. Ignore the specs and use the standard seasons instead.
+* [Fix] Fix a crash during a game load under some circumstances.
 
 # v2.5.6 (June 16th, 2025):
 * [Feature] Allow disabling arguments and values checking in the scripts via settings.
