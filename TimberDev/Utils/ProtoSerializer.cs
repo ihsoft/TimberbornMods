@@ -3,8 +3,8 @@
 // License: Public Domain
 
 using System;
+using System.Collections.Generic;
 using System.IO;
-using ProtoBuf;
 using ProtoBuf.Meta;
 using UnityEngine;
 
@@ -34,24 +34,52 @@ namespace IgorZ.TimberDev.Utils;
 /// ]]></code>
 /// </example>
 public static class StringProtoSerializer {
-  // Add more Unity or custom types here if needed.
-  static StringProtoSerializer() {
-    RuntimeTypeModel.Default.Add(typeof(Vector2Int), false).Add("x", "y");
-    RuntimeTypeModel.Default.Add(typeof(Vector3Int), false).Add("x", "y", "z");
-    RuntimeTypeModel.Default.Add(typeof(Vector2), false).Add("x", "y");
-    RuntimeTypeModel.Default.Add(typeof(Vector3), false).Add("x", "y", "z");
-  }
-
   /// <summary>Serializes the protobuf object to a base64 string.</summary>
   public static string Serialize<T>(T obj) {
     using var stream = new MemoryStream();
-    Serializer.Serialize(stream, obj);
+    GetRuntimeTypeModel().Serialize(stream, obj);
     return Convert.ToBase64String(stream.GetBuffer(), 0, (int)stream.Length);
   }
 
   /// <summary>Deserializes the protobuf object from a base64 string.</summary>
   public static T Deserialize<T>(string text) {
     using var stream = new MemoryStream(Convert.FromBase64String(text));
-    return Serializer.Deserialize<T>(stream);
+    return GetRuntimeTypeModel().Deserialize<T>(stream);
   }
+
+  /// <summary>Adds a type to the serializer with the specified member names.</summary>
+  public static void AddType<T>(string[] memberNames) {
+    if (TypeToProtoMemberNames.TryGetValue(typeof(T), out var existingNames)) {
+      if (existingNames.Length != memberNames.Length) {
+        throw new InvalidDataException($"Type {typeof(T)} already registered with different member names.");
+      }
+      for (int i = 0; i < existingNames.Length; i++) {
+        if (existingNames[i] != memberNames[i]) {
+          throw new InvalidDataException($"Type {typeof(T)} already registered with different member names.");
+        }
+      }
+      return;
+    }
+    TypeToProtoMemberNames[typeof(T)] = memberNames;
+    _localRuntimeTypeModel = null;
+  }
+
+  /// <summary>Standard Unity types.</summary>
+  static readonly Dictionary<Type, string[]> TypeToProtoMemberNames = new() {
+      {typeof(Vector2Int), ["x", "y"]},
+      {typeof(Vector3Int), ["x", "y", "z"]},
+      {typeof(Vector2), ["x", "y"]},
+      {typeof(Vector3), ["x", "y", "z"]},
+  };
+
+  static RuntimeTypeModel GetRuntimeTypeModel() {
+    if (_localRuntimeTypeModel == null) {
+      _localRuntimeTypeModel = RuntimeTypeModel.Create();
+      foreach (var types in TypeToProtoMemberNames) {
+        _localRuntimeTypeModel.Add(types.Key).Add(types.Value);
+      }
+    }
+    return _localRuntimeTypeModel;
+  }
+  static RuntimeTypeModel _localRuntimeTypeModel;
 }
