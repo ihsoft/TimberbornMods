@@ -1,3 +1,6 @@
+# v2.5.7 (June 17th, 2025):
+* [Change] Don't crash if the modded seasons can't be loaded. Ignore the specs and use the standard seasons instead.
+
 # v2.5.6 (June 16th, 2025):
 * [Feature] Allow disabling arguments and values checking in the scripts via settings.
 * [Feature] Add `Debug.Ticker` signal. You asked for it, you got it! Now you can use `Debug.Ticker` signal to get your rules executed every tick.

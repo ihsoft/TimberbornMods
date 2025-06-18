@@ -108,6 +108,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   readonly EventBus _eventBus;
   readonly WeatherService _weatherService;
   readonly HazardousWeatherService _hazardousWeatherService;
+  readonly ISpecService _specService;
 
   static readonly (string Value, string text)[] StandardSeasons = [
       ("DroughtWeather", DroughtWeatherNameLocKey),
@@ -120,10 +121,11 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   DropdownItem<string>[] _weatherSeasonOptions;
 
   WeatherScriptableComponent(EventBus eventBus, WeatherService weatherService,
-                             HazardousWeatherService hazardousWeatherService) {
+                             HazardousWeatherService hazardousWeatherService, ISpecService specService) {
     _eventBus = eventBus;
     _weatherService = weatherService;
     _hazardousWeatherService = hazardousWeatherService;
+    _specService = specService;
   }
 
   /// <summary>Gets the current season based on the weather conditions.</summary>
@@ -145,9 +147,15 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   /// UI.
   /// </remarks>
   void LoadWeatherIds() {
+    if (_specService is not SpecService specService) {
+      DebugEx.Error("ISpecService expected to be  SpecService, but was {0}. Don't load modded seasons.", _specService);
+      _weatherSeasonOptions = StandardSeasons
+          .Select(x => new DropdownItem<string> { Value = x.Value, Text = Loc.T(x.text) })
+          .Reverse()
+          .ToArray();
+      return;
+    }
     var seasons = new List<DropdownItem<string>>();
-    var specService = DependencyContainer.GetInstance<ISpecService>() as SpecService
-        ?? throw new Exception("ISpecService is no longer SpecService");
     var specTypes = specService._cachedBlueprints.Keys.Where(q => q.Name.EndsWith("WeatherSpec"));
     foreach (var specType in specTypes) {
       var specs = (IEnumerable)typeof(ISpecService).GetMethod(nameof(ISpecService.GetSpecs))!
