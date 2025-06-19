@@ -202,6 +202,7 @@ IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.ScriptShort,"Псе�
 IgorZ.Automation.Settings.ScriptEngine.Header,"Настройки движка скриптов",
 IgorZ.Automation.Settings.ScriptEngine.CheckArgumentValues,"Проверять значения аргументов во время исполнения",
 IgorZ.Automation.Settings.ScriptEngine.CheckOptionsArguments,"Проверять аргументы с фиксированным набором значений",
+IgorZ.Automation.Settings.ScriptEngine.SignalExecutionStackSize,"Размер стека исполнения сигналов",
 =,=,"TimberDev_Utils"
 TimberDev_Utils.Settings.Debug.VerboseLogging,"Детальные журналы",
 TimberDev_Utils.Settings.Debug.VerboseLoggingTooltip,"В журналы игры будет записываться больше полезной информации,

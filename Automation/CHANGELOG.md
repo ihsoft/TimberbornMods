@@ -1,3 +1,7 @@
+# v2.5.8 (June 18th, 2025):
+* [Fix] Properly convert the legacy seasons names into the season IDs.
+* [Fix] Add a missing localization string for the settings dialog.
+
 # v2.5.7 (June 17th, 2025):
 * [Change] Don't crash if the modded seasons can't be loaded. Ignore the specs and use the standard seasons instead.
 * [Fix] Fix a crash during a game load under some circumstances.
