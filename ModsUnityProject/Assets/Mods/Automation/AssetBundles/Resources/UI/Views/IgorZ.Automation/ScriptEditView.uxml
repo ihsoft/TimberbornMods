@@ -4,13 +4,13 @@
     <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/RulesEditorStyle.uss?fileID=7433441132597879392&amp;guid=82ba7710a5bad1b489b53edd629e2a56&amp;type=3#RulesEditorStyle" />
     <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/TimberDevStyle.uss?fileID=7433441132597879392&amp;guid=86824deb2a4bc844cbec48367a164254&amp;type=3#TimberDevStyle" />
     <engine:VisualElement>
-        <engine:VisualElement style="flex-direction: row; align-items: center; justify-content: flex-start;">
+        <engine:VisualElement style="flex-direction: row; align-items: flex-start; justify-content: flex-start;">
             <Timberborn.CoreUI.LocalizableLabel text="ConditionLabel" text-loc-key="IgorZ.Automation.Scripting.Editor.ConditionLabel" class="game-text-big" style="margin-right: 5px;" />
-            <Timberborn.CoreUI.NineSliceTextField value="(eq (sig Log) 1)  looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong string" name="ConditionScript" select-all-on-focus="false" select-all-on-mouse-up="false" class="text-field game-text-big" style="flex-shrink: 1; flex-grow: 1;" />
+            <Timberborn.CoreUI.NineSliceTextField value="(eq (sig Log) 1)  looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong string" name="ConditionScript" select-all-on-focus="false" select-all-on-mouse-up="false" multiline="true" vertical-scroller-visibility="Auto" class="text-field game-text-big" style="flex-shrink: 1; flex-grow: 1;" />
         </engine:VisualElement>
-        <engine:VisualElement style="flex-direction: row; align-items: center; margin-top: 1px;">
+        <engine:VisualElement style="flex-direction: row; align-items: flex-start; margin-top: 1px;">
             <Timberborn.CoreUI.LocalizableLabel text="ActionLabel" text-loc-key="IgorZ.Automation.Scripting.Editor.ActionLabel" class="game-text-big" style="margin-right: 5px;" />
-            <Timberborn.CoreUI.NineSliceTextField value="(eq (sig Log) 1)" name="ActionScript" select-all-on-mouse-up="false" select-all-on-focus="false" class="text-field game-text-big" style="flex-shrink: 1; flex-grow: 1;" />
+            <Timberborn.CoreUI.NineSliceTextField value="(eq (sig Log) 1)" name="ActionScript" select-all-on-mouse-up="false" select-all-on-focus="false" multiline="true" class="text-field game-text-big" style="flex-shrink: 1; flex-grow: 1;" />
         </engine:VisualElement>
         <engine:VisualElement style="align-items: flex-start; flex-direction: row; margin-top: 5px;">
             <Timberborn.CoreUI.LocalizableButton name="TestScriptBtn" text="TestScriptBtn" text-loc-key="IgorZ.Automation.Scripting.Editor.TestScriptBtn" class="button-game game-text-small timberdev-button-small--left-aligned" />
