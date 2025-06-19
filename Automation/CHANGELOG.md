@@ -1,3 +1,5 @@
+# v2.5.9 (pre-release, June 18th, 2025):
+
 # v2.5.8 (June 18th, 2025):
 * [Fix] Properly convert the legacy seasons names into the season IDs.
 * [Fix] Add a missing localization string for the settings dialog.
