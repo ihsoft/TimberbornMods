@@ -235,7 +235,21 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
     EventBus.Post(new AutomationServiceReadyEvent());
   }
 
+  /// <summary>Restore rules conditions to what was at the game save.</summary>
+  /// <remarks>
+  /// This mode may not restore the state properly if not all buildings/rules can be properly loaded. E.g. if some mod
+  /// was removed, the game load may drop some buildings that had rules attached to them.
+  /// </remarks>
   void BindLoadedRules() {
+    // Bind all rules to the behaviors to restore the runtime before the game save.
+    foreach (var behavior in _blockObjectToBehaviorMap.Values) {
+      foreach (var action in behavior.Actions) {
+        action.Condition.Behavior = behavior;
+        action.Behavior = behavior;
+      }
+    }
+
+    // Activate all rules to restore the state before the game save.
     var activatedRulesCount = 0;
     foreach (var behavior in _blockObjectToBehaviorMap.Values) {
       foreach (var action in behavior.Actions) {
@@ -253,6 +267,11 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
     }
   }
 
+  /// <summary>Load the rules as if they were new rules, created by the player after the game loaded.</summary>
+  /// <remarks>
+  /// This mode may be slow in case of many rules exist. It can also trigger side effects, resulting in a state that is
+  /// different than was at the game save. In some cases, it can be preferred, though.
+  /// </remarks>
   void ReexecuteLoadedRules() {
     DebugEx.Warning("[Automation system] Re-evaluating all rules on game load.");
     // Need a copy since the rules be removed/added, which triggers the registration updates.
