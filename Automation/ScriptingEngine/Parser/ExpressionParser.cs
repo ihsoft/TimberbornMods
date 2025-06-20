@@ -17,8 +17,6 @@ namespace IgorZ.Automation.ScriptingEngine.Parser;
 /// <summary>Parser for the expressions in the scripting engine.</summary>
 sealed class ExpressionParser {
 
-  const string RuntimeErrorLocKey = "IgorZ.Automation.Scripting.Expressions.RuntimeError";
-
   #region API
 
   /// <summary>Parses expression for the given context.</summary>
@@ -41,11 +39,11 @@ sealed class ExpressionParser {
   public string GetDescription(IExpression expression, bool logErrors = false) {
     try {
       return expression.Describe();
-    } catch (ScriptError e) {
+    } catch (ScriptError.RuntimeError e) {
       if (logErrors) {
         DebugEx.Error("Failed to get description from: {0}\n{1}", expression, e);
       }
-      return CommonFormats.HighlightRed(_loc.T(RuntimeErrorLocKey));
+      return CommonFormats.HighlightRed(_loc.T(e.LocKey));
     }
   }
 

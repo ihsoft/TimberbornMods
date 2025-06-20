@@ -28,9 +28,10 @@ class GetPropertyOperator : AbstractOperator, IValueExpr {
   }
 
   GetPropertyOperator(ScriptValue.TypeEnum valueType, ExpressionParser.Context context,
-                          string name, IList<IExpression> operands)
+                      string name, IList<IExpression> operands)
       : base(name, operands) {
     AsserNumberOfOperandsRange(1, -1);
+    ValueType = valueType;
     if (Operands[0] is not SymbolExpr symbol) {
       throw new ScriptError.ParsingError("Expected a symbol: " + Operands[0]);
     }
@@ -58,6 +59,7 @@ class GetPropertyOperator : AbstractOperator, IValueExpr {
     var listObject = propValueFn();
     var listVal = GetAsList(listObject);
     if (listVal != null) {
+      IsList = true;
       if (operands.Count == 1) {
         if (valueType != ScriptValue.TypeEnum.Number) {
           throw new ScriptError.ParsingError("The list type counter cannot be accessed as string");
@@ -72,7 +74,7 @@ class GetPropertyOperator : AbstractOperator, IValueExpr {
           var list = GetAsList(listObject);
           var index = indexExpr.ValueFn().AsInt;
           if (index < 0 || index >= operands.Count) {
-            throw new ScriptError.RuntimeError($"Index {index} is out of range: [{0}; {list.Count})");
+            throw new ScriptError.ValueOutOfRange($"Index {index} is out of range: [{0}; {list.Count})");
           }
           return list[index];
         };
@@ -93,7 +95,7 @@ class GetPropertyOperator : AbstractOperator, IValueExpr {
     };
   }
 
-  internal static BaseComponent GetComponentByName(BaseComponent baseComponent, string name) {
+  static BaseComponent GetComponentByName(BaseComponent baseComponent, string name) {
     if (name == "Inventory") {
       // Special case: the buildings can have more than one inventory. 
       return InventoryScriptableComponent.GetInventory(baseComponent, throwIfNotFound: false);
@@ -119,7 +121,23 @@ class GetPropertyOperator : AbstractOperator, IValueExpr {
     while (enumeratorObj.MoveNext()) {
       list.Add(enumeratorObj.Current);
     }
+    if (list.Count <= 0) {
+      return list;
+    }
+    // The list must contain trivial types, and be sorted (for the repeatable outcome).
+    var sampleValue = list[0];
+    if (GoodTypes.All(x => !x.IsAssignableFrom(sampleValue.GetType()))) {
+      // The list values aren't trivial. We can't handle them.
+      return null;
+    }
     list.Sort();
     return list;
   }
+
+  static readonly List<Type> GoodTypes = [
+      typeof(string),
+      typeof(int),
+      typeof(float),
+      typeof(bool),
+  ];
 }

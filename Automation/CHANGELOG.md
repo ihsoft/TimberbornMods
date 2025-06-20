@@ -1,5 +1,6 @@
 # v2.5.9 (pre-release, June 18th, 2025):
 * [Change] Make input field in script editor multi-line.
+* [Change] Better handling the script errors in both UI and the execution phases.
 
 # v2.5.8 (June 18th, 2025):
 * [Fix] Properly convert the legacy seasons names into the season IDs.

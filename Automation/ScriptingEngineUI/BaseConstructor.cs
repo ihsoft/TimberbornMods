@@ -14,6 +14,8 @@ abstract class BaseConstructor(UiFactory uiFactory) {
 
   public abstract VisualElement Root { get; }
 
+  protected readonly UiFactory UIFactory = uiFactory;
+
   protected VisualElement MakeRow(params object[] arguments) {
     var rowPanel = new VisualElement {
         style = {
@@ -24,7 +26,7 @@ abstract class BaseConstructor(UiFactory uiFactory) {
     foreach (var arg in arguments) {
       switch (arg) {
         case string text:
-          var element = uiFactory.CreateLabel(classes: [UiFactory.GameTextBigClass]);
+          var element = UIFactory.CreateLabel(classes: [UiFactory.GameTextBigClass]);
           element.text = text;
           element.style.marginRight = 5;
           rowPanel.Add(element);

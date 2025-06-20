@@ -84,7 +84,7 @@ sealed class WorkplaceScriptableComponent : ScriptableComponentBase {
     AssertActionArgsCount(SetWorkersActionName, args, 1);
     var numWorkers = args[0].AsInt;
     if (numWorkers < 1 || numWorkers > building.MaxWorkers) {
-      throw new ScriptError.RuntimeError("Number of workers out of range: " + numWorkers);
+      throw new ScriptError.ValueOutOfRange($"Number of workers out of range: {numWorkers}");
     }
     if (building.DesiredWorkers == numWorkers) {
       return;

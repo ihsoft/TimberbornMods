@@ -55,54 +55,48 @@ sealed record ValueDef {
   public Dictionary<string, string> CompatibilityOptions { get; init; }
 
   /// <summary>Integer value validation function.</summary>
+  /// <exception cref="ScriptError.RuntimeError">if value is out of range.</exception>
   public static Action<ScriptValue> RangeCheckValidatorInt(int? min = null, int? max = null) {
     return value => {
       if (value.AsNumber % 100 != 0) {
-        throw new ScriptError.RuntimeError($"Value must be an integer, found: {value.AsFloat:F2}");
+        throw new ScriptError.ValueOutOfRange($"Value must be an integer, found: {value.AsFloat:F2}");
       }
       if (!max.HasValue) {
         if (value.AsInt < min) {
-          throw new ScriptError.RuntimeError($"Value must be greater than or equal to {min}, found: {value.AsInt}");
+          throw new ScriptError.ValueOutOfRange($"Value must be greater than or equal to {min}, found: {value.AsInt}");
         }
       } else if (!min.HasValue) {
         if (value.AsInt > max) {
-          throw new ScriptError.RuntimeError($"Value must be less than or equal to {max}, found: {value.AsInt}");
+          throw new ScriptError.ValueOutOfRange($"Value must be less than or equal to {max}, found: {value.AsInt}");
         }
       } else {
         if (value.AsInt < min || value.AsInt > max) {
-          throw new ScriptError.RuntimeError($"Value must be in range [{min}, {max}], found: {value.AsInt}");
+          throw new ScriptError.ValueOutOfRange($"Value must be in range [{min}, {max}], found: {value.AsInt}");
         }
       }
     };
   }
 
   /// <summary>Float value validation function.</summary>
+  /// <exception cref="ScriptError.RuntimeError">if value is out of range.</exception>
   public static Action<ScriptValue> RangeCheckValidatorFloat(float? min = null, float? max = null) {
     return value => {
       if (!max.HasValue) {
         if (value.AsNumber < Mathf.RoundToInt(min!.Value * 100f)) {
-          throw new ScriptError.RuntimeError(
+          throw new ScriptError.ValueOutOfRange(
               $"Value must be greater than or equal to {min:F2}, found: {value.AsFloat:F2}");
         }
       } else if (!min.HasValue) {
         if (value.AsNumber > Mathf.RoundToInt(max.Value * 100f)) {
-          throw new ScriptError.RuntimeError(
+          throw new ScriptError.ValueOutOfRange(
               $"Value must be less than or equal to {max:F2}, found: {value.AsFloat:F2}");
         }
       } else {
         if (value.AsNumber < Mathf.RoundToInt(min.Value * 100f)
             || value.AsNumber > Mathf.RoundToInt(max.Value * 100f)) {
-          throw new ScriptError.RuntimeError($"Value must be in range [{min:F2}, {max:F2}], found: {value.AsFloat:F2}");
+          throw new ScriptError.ValueOutOfRange(
+              $"Value must be in range [{min:F2}, {max:F2}], found: {value.AsFloat:F2}");
         }
-      }
-    };
-  }
-
-  /// <summary>String value validation function.</summary>
-  public static Action<ScriptValue> PatternCheck(Regex pattern, string errorMessage) {
-    return value => {
-      if (!pattern.IsMatch(value.AsString)) {
-        throw new ScriptError.RuntimeError($"Bad string value '{value.AsString}. {errorMessage}");
       }
     };
   }

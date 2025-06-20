@@ -95,6 +95,11 @@ IgorZ.Automation.ToolGroup.Signals.DisplayName,"Правила, зависящи
 IgorZ.Automation.ToolGroup.Storage.DisplayName,"Правила, зависящие от склада",
 IgorZ.Automation.ToolGroup.Terrain.DisplayName,"Изменение ландшафта",
 IgorZ.Automation.ToolGroup.Water.DisplayName,"Правила, зависящие от погоды",
+=,=,"Scripting engine strings"
+IgorZ.Automation.Scripting.Error.ValueOutOfRange,"ОШИБКА: Значение вне диапазона","Localizable generic message for the related exception"
+IgorZ.Automation.Scripting.Error.DivisionByZero,"ОШИБКА: Деление на ноль","Localizable generic message for the related exception"
+IgorZ.Automation.Scripting.Error.BadValue,"ОШИБКА: Неверное значение","Localizable generic message for the related exception"
+IgorZ.Automation.Scripting.Error.InternalError,"ОШИБКА: Внутренняя ошибка","Localizable generic message for the related exception"
 =,=,"UI fragment strings"
 IgorZ.Automation.AutomationFragment.AddRulesBtn,"Добавить правила автоматизации",
 IgorZ.Automation.AutomationFragment.CopyRulesBtn,"Копировать правила",
@@ -140,7 +145,6 @@ IgorZ.Automation.Scriptable.Workplace.Action.SetWorkers,"назначить {0} 
 IgorZ.Automation.Scripting.Expressions.AndOperator,"и","String to join components of the expression with condition AND. Used to represent the condition in the panel"
 IgorZ.Automation.Scripting.Expressions.OrOperator,"или","String to join components of the expression with condition OR. Used to represent the condition in the panel"
 IgorZ.Automation.Scripting.Expressions.ParseError,"ОШИБКА ОБРАБОТКИ","String to show when the scriptable condition or action cannot be parsed"
-IgorZ.Automation.Scripting.Expressions.RuntimeError,"ОШИБКА ИСПОЛНЕНИЯ","String to show when the scriptable condition or action cannot be executed"
 =,=,"Rules editor strings"
 IgorZ.Automation.Scripting.Editor.ActionLabel,"Тогда",
 IgorZ.Automation.Scripting.Editor.ActionMustBeAction,"Действие должно быть оператором 'act'","A message to show when the action is not an action"

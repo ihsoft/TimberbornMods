@@ -8,6 +8,7 @@ using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.TimberDev.UI;
+using IgorZ.TimberDev.Utils;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.Persistence;
 using UnityDev.Utils.LogUtilsLite;
@@ -17,7 +18,6 @@ namespace IgorZ.Automation.Actions;
 sealed class ScriptedAction : AutomationActionBase {
 
   const string ParseErrorLocKey = "IgorZ.Automation.Scripting.Expressions.ParseError";
-  const string RuntimeErrorLocKey = "IgorZ.Automation.Scripting.Expressions.RuntimeError";
 
   #region AutomationActionBase overrides
 
@@ -29,14 +29,14 @@ sealed class ScriptedAction : AutomationActionBase {
   /// <inheritdoc/>
   public override string UiDescription {
     get {
-      if (_staticDescription != null) {
-        return _staticDescription;
+      if (_lastScriptError != null) {
+        return CommonFormats.HighlightRed(Behavior.Loc.T(_lastScriptError));
       }
       return CommonFormats.HighlightYellow(
           DependencyContainer.GetInstance<ExpressionParser>().GetDescription(_parsedExpression));
     }
   }
-  string _staticDescription;
+  string _lastScriptError;
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
@@ -61,17 +61,16 @@ sealed class ScriptedAction : AutomationActionBase {
       return;
     }
     try {
+      ResetScriptError();
       _parsedExpression.Execute();
       if (_parsedExpression is { ExecuteOnce: true }) {
         MarkForCleanup();
       }
-    } catch (ScriptError) {
-      if (_parsedExpression == null) {
+    } catch (ScriptError.RuntimeError e) {
+      if (_lastScriptError != null) {
         throw;  // Can be already handled upstream in case of recursive calls.
       }
-      _parsedExpression = null;
-      _staticDescription = CommonFormats.HighlightRed(Behavior.Loc.T(RuntimeErrorLocKey));
-      Behavior.ReportError(this);
+      ReportScriptError(e);
       throw;
     }
   }
@@ -79,6 +78,9 @@ sealed class ScriptedAction : AutomationActionBase {
   /// <inheritdoc/>
   protected override void OnBehaviorAssigned() {
     base.OnBehaviorAssigned();
+    if (_lastScriptError != null) {
+      Behavior.ReportError(this);
+    }
     ParseAndApply();
   }
 
@@ -89,9 +91,7 @@ sealed class ScriptedAction : AutomationActionBase {
       var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
       scriptingService.UninstallActions(_installedActions, Behavior);
     }
-    if (_parsedExpression == null) {
-      Behavior.ClearError(this);
-    }
+    ResetScriptError();
   }
 
   /// <inheritdoc/>
@@ -126,17 +126,22 @@ sealed class ScriptedAction : AutomationActionBase {
   #region IGameSerializable implemenation
 
   static readonly PropertyKey<string> ExpressionKey = new("Expression");
+  static readonly PropertyKey<string> HasScriptErrorKey = new("ScriptError");
 
   /// <inheritdoc/>
   public override void LoadFrom(IObjectLoader objectLoader) {
     base.LoadFrom(objectLoader);
     Expression = objectLoader.Get(ExpressionKey);
+    _lastScriptError = objectLoader.GetValueOrDefault(HasScriptErrorKey, null);
   }
 
   /// <inheritdoc/>
   public override void SaveTo(IObjectSaver objectSaver) {
     base.SaveTo(objectSaver);
     objectSaver.Set(ExpressionKey, Expression);
+    if (_lastScriptError != null) {
+      objectSaver.Set(HasScriptErrorKey, _lastScriptError);
+    }
   }
 
   #endregion
@@ -168,13 +173,27 @@ sealed class ScriptedAction : AutomationActionBase {
     }
     _parsedExpression = ParseAndValidate(Expression, Behavior, out _parsingResult);
     if (_parsedExpression == null) {
-      _staticDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
+      ResetScriptError();
+      _lastScriptError = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
       Behavior.ReportError(this);
       return;
     }
     Behavior.IncrementStateVersion();
     Expression = _parsedExpression.Serialize();
     _installedActions = DependencyContainer.GetInstance<ScriptingService>().InstallActions(_parsedExpression, Behavior);
+  }
+
+  void ReportScriptError(ScriptError.RuntimeError e) {
+    _lastScriptError = e.LocKey;
+    Behavior.ReportError(this);
+  }
+
+  void ResetScriptError() {
+    if (_lastScriptError == null) {
+      return;  // No runtime error to reset.
+    }
+    _lastScriptError = null;
+    Behavior.ClearError(this);
   }
 
   #endregion

@@ -20,7 +20,6 @@ namespace IgorZ.Automation.Conditions;
 sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
 
   const string ParseErrorLocKey = "IgorZ.Automation.Scripting.Expressions.ParseError";
-  const string RuntimeErrorLocKey = "IgorZ.Automation.Scripting.Expressions.RuntimeError";
 
   #region AutomationConditionBase overrides
 
@@ -31,38 +30,52 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   /// <inheritdoc/>
   public override string UiDescription {
     get {
-      if (_staticDescription != null) {
-        return _staticDescription;
+      if (_lastScriptError != null) {
+        return _lastScriptError;
       }
       var description = DependencyContainer.GetInstance<ExpressionParser>().GetDescription(_parsedExpression);
       return ConditionState ? CommonFormats.HighlightGreen(description) : CommonFormats.HighlightYellow(description);
     }
   }
-  string _staticDescription;
+  string _lastScriptError;
 
   /// <inheritdoc/>
   public override void Activate(bool noTrigger = false) {
     base.Activate(noTrigger);
     if (_parsedExpression == null) {
-      HostedDebugLog.Warning(Behavior, "Condition is broken, cannot sync state: {0}", Expression);
-      return;  // The condition is broken, no need to sync.
+      HostedDebugLog.Warning(Behavior, "Condition parse failed, cannot sync state: {0}", Expression);
+      return;  // The condition can't be parsed, no need to sync.
     }
-    try {
-      if (noTrigger) {
-        if (ConditionState != _parsedExpression.Execute()) {
-          HostedDebugLog.Warning(Behavior, "Condition state mismatch: loaded={0}, calculated={1}", ConditionState,
-                                 _parsedExpression.Execute());
+
+    // Only activate and verify, no side effects expected.
+    if (noTrigger) {
+      try {
+        var newState = _parsedExpression.Execute();
+        if (ConditionState != newState) {
+          HostedDebugLog.Warning(
+              Behavior, "Condition state mismatch: loaded={0}, calculated={1}", ConditionState, newState);
         }
-      } else {
-        CheckOperands();
+      } catch (ScriptError.RuntimeError e) {
+        // The behavior error state is expected to be loaded.
+        HostedDebugLog.Error(Behavior, "SyncState failed: {0}", e.Message);
       }
-    } catch (ScriptError e) {
+      return;
+    }
+
+    // Check the condition and trigger side effects if needed.
+    try {
+      CheckOperands();
+    } catch (ScriptError.RuntimeError e) {
+      // The behavior error state is already set.
       HostedDebugLog.Error(Behavior, "SyncState failed: {0}", e.Message);
     }
   }
 
   /// <inheritdoc/>
   protected override void OnBehaviorAssigned() {
+    if (_lastScriptError != null) {
+      Behavior.ReportError(this);
+    }
     ParseAndApply();
   }
 
@@ -72,9 +85,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
       var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
       scriptingService.UnregisterSignals(_registeredSignals, this);
     }
-    if (_parsedExpression == null) {
-      Behavior.ClearError(this);
-    }
+    ResetScriptError();
   }
 
   /// <inheritdoc/>
@@ -140,12 +151,14 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   #region IGameSerializable implemenation
 
   static readonly PropertyKey<string> ExpressionKey = new("Expression");
+  static readonly PropertyKey<string> HasScriptErrorKey = new("ScriptError");
   static readonly PropertyKey<string> PreconditionKey = new("Precondition");
 
   /// <inheritdoc/>
   public override void LoadFrom(IObjectLoader objectLoader) {
     base.LoadFrom(objectLoader);
     Expression = objectLoader.Get(ExpressionKey);
+    _lastScriptError = objectLoader.GetValueOrDefault(HasScriptErrorKey, null);
     Precondition = objectLoader.GetValueOrDefault(PreconditionKey, null);
   }
 
@@ -153,6 +166,9 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   public override void SaveTo(IObjectSaver objectSaver) {
     base.SaveTo(objectSaver);
     objectSaver.Set(ExpressionKey, Expression);
+    if (_lastScriptError != null) {
+      objectSaver.Set(HasScriptErrorKey, _lastScriptError);
+    }
     if (!string.IsNullOrEmpty(Precondition)) {
       objectSaver.Set(PreconditionKey, Precondition);
     }
@@ -204,7 +220,8 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
     }
     _parsedExpression = ParseAndValidate(Expression, Behavior, out _parsingResult);
     if (_parsedExpression == null) {
-      _staticDescription = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
+      ResetScriptError();
+      _lastScriptError = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
       Behavior.ReportError(this);
       return;
     }
@@ -240,26 +257,34 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   }
 
   void CheckOperands() {
-    if (_parsedExpression == null) {
-      HostedDebugLog.Error(Behavior, "Signal change triggered, but the condition was broken: {0}", Expression);
-      return;
-    }
     bool newState;
     try {
+      ResetScriptError();
       newState = _parsedExpression.Execute();
-    } catch (ScriptError) {
-      if (_parsedExpression == null) {
+    } catch (ScriptError.RuntimeError e) {
+      if (_lastScriptError != null) {
         throw;  // Can be already handled upstream in case of recursive calls.
       }
-      _parsedExpression = null;
-      _staticDescription = CommonFormats.HighlightRed(Behavior.Loc.T(RuntimeErrorLocKey));
-      Behavior.ReportError(this);
+      ReportScriptError(e);
       throw;
     }
     if (ConditionState != newState) {
       Behavior.IncrementStateVersion();
     }
     ConditionState = newState;
+  }
+
+  void ReportScriptError(ScriptError.RuntimeError e) {
+    _lastScriptError = CommonFormats.HighlightRed(Behavior.Loc.T(e.LocKey));
+    Behavior.ReportError(this);
+  }
+
+  void ResetScriptError() {
+    if (_lastScriptError == null) {
+      return;  // No runtime error to reset.
+    }
+    _lastScriptError = null;
+    Behavior.ClearError(this);
   }
 
   #endregion

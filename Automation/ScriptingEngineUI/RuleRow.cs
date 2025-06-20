@@ -8,10 +8,12 @@ using System.Linq;
 using IgorZ.Automation.Actions;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.Conditions;
+using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.TimberDev.UI;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.CoreUI;
+using UnityDev.Utils.LogUtilsLite;
 using UnityEngine.UIElements;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
@@ -241,6 +243,15 @@ sealed class RuleRow {
     _notifications.ToggleDisplayStyle(true);
   }
 
+  public void ReportError(ScriptError error) {
+    var errorMessage = error.Message;
+    if (error is ScriptError.RuntimeError runtimeError) {
+      errorMessage = _uiFactory.T(runtimeError.LocKey) + "\n" + errorMessage;
+    }
+    _notifications.Q<Label>("ErrorText").text = errorMessage;
+    _notifications.ToggleDisplayStyle(true);
+  }
+
   public void ClearError() {
     _notifications.ToggleDisplayStyle(false);
   }
@@ -318,7 +329,12 @@ sealed class RuleRow {
     var description = _expressionParser.GetDescription(expression, logErrors: true);
     var isGreen = false;
     if (expression is BoolOperator boolOperator) {
-      isGreen = boolOperator.Execute();
+      try {
+        isGreen = boolOperator.Execute();
+      } catch (ScriptError.RuntimeError e) {
+        DebugEx.Error("Failed to execute condition: {0}\n{1}", expression, e);
+        return CommonFormats.HighlightRed(_uiFactory.T(e.LocKey));
+      }
     }
     return isGreen ? CommonFormats.HighlightGreen(description) : CommonFormats.HighlightYellow(description);
   }

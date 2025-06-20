@@ -116,7 +116,7 @@ sealed class ArgumentConstructor : BaseConstructor {
     return res;
   }
 
-  static string ExecuteValidator<T>(Action<ScriptValue> validator, T value) {
+  string ExecuteValidator<T>(Action<ScriptValue> validator, T value) {
     if (validator == null) {
       return null;
     }
@@ -127,8 +127,8 @@ sealed class ArgumentConstructor : BaseConstructor {
     };
     try {
       validator(scriptValue);
-    } catch (ScriptError e) {
-      return e.Message;
+    } catch (ScriptError.BadValue e) {
+      return UIFactory.T(e.LocKey) + "\n" + e.Message;
     }
     return null;
   }

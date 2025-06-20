@@ -135,11 +135,11 @@ sealed class ScriptingService {
       var stackTrace =_callbackStack.Select(x => $"{DebugEx.ObjectToString(x.SignalListener.Behavior)}:{x.Name}");
       HostedDebugLog.Error(callback.SignalListener.Behavior, "Script stack overflow ({0}). Execution log:\n{1}",
                            ScriptEngineSettings.SignalExecutionStackSize, string.Join("\n", stackTrace));
-      throw new ScriptError.RuntimeError("Script stack overflow");
+      throw new ScriptError.InternalError("Script stack overflow");
     }
     try {
       callback.SignalListener.OnValueChanged(callback.Name);
-    } catch (ScriptError e) {
+    } catch (ScriptError.RuntimeError e) {
       if (!ignoreErrors) {
         throw;
       }

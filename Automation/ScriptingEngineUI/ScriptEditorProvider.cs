@@ -83,22 +83,25 @@ sealed class ScriptEditorProvider : IEditorProvider {
 
   bool CheckExpressionAndShowError(RuleRow ruleRow, TextField expressionField, bool isCondition) {
     var result = _expressionParser.Parse(expressionField.value, ruleRow.ActiveBuilding);
-    var error = result.LastError;
-    if (error == null) {
-      if (isCondition) {
-        if (result.ParsedExpression is not BoolOperator) {
-          error = _uiFactory.T(ConditionMustBeBoolLocKey);
-        } else {
-          var hasSignals = false;
-          result.ParsedExpression.VisitNodes(x => { hasSignals |= x is SignalOperator; });
-          if (!hasSignals) {
-            error = _uiFactory.T(ConditionMustHaveSignalsLocKey);
-          }
-        }
+    if (result.LastScriptError != null) {
+      ruleRow.ReportError(result.LastScriptError);
+      VisualEffects.SetTemporaryClass(expressionField, TestScriptStatusHighlightDurationMs, BadScriptClass);
+      return false;
+    }
+    string error = null;
+    if (isCondition) {
+      if (result.ParsedExpression is not BoolOperator) {
+        error = _uiFactory.T(ConditionMustBeBoolLocKey);
       } else {
-        if (result.ParsedExpression is not ActionOperator) {
-          error = _uiFactory.T(ActionMustBeActionLocKey);
+        var hasSignals = false;
+        result.ParsedExpression.VisitNodes(x => { hasSignals |= x is SignalOperator; });
+        if (!hasSignals) {
+          error = _uiFactory.T(ConditionMustHaveSignalsLocKey);
         }
+      }
+    } else {
+      if (result.ParsedExpression is not ActionOperator) {
+        error = _uiFactory.T(ActionMustBeActionLocKey);
       }
     }
     if (error == null) {
