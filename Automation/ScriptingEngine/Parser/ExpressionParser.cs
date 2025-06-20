@@ -35,18 +35,6 @@ sealed class ExpressionParser {
     }
   }
 
-  /// <summary>Gets a human-readable description for the parsed expression.</summary>
-  public string GetDescription(IExpression expression, bool logErrors = false) {
-    try {
-      return expression.Describe();
-    } catch (ScriptError.RuntimeError e) {
-      if (logErrors) {
-        DebugEx.Error("Failed to get description from: {0}\n{1}", expression, e);
-      }
-      return CommonFormats.HighlightRed(_loc.T(e.LocKey));
-    }
-  }
-
   #endregion
 
   #region Implementation

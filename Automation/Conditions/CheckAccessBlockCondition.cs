@@ -43,6 +43,9 @@ public sealed class CheckAccessBlockCondition : AutomationConditionBase {
   }
 
   /// <inheritdoc/>
+  public override bool IsInErrorState => false; // This condition doesn't have any error state.
+
+  /// <inheritdoc/>
   public override IAutomationCondition CloneDefinition() {
     return new CheckAccessBlockCondition { IsReversedCondition = IsReversedCondition };
   }

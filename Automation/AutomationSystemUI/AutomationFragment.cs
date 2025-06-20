@@ -108,16 +108,25 @@ sealed class AutomationFragment : IEntityPanelFragment {
     _rulesList.Clear();
     foreach (var action in _automationBehavior.Actions) {
       var row = _uiFactory.LoadVisualElement(RuleRowTemplate);
+
       string conditionText;
       if (EntityPanelSettings.RulesDescriptionStyle == EntityPanelSettings.DescriptionStyle.HumanReadable
           || action.Condition is not ScriptedCondition scriptedCondition) {
         conditionText = action.Condition.UiDescription;
       } else {
-        conditionText = CommonFormats.HighlightYellow(scriptedCondition.Expression);
+        conditionText = scriptedCondition.Expression;
         if (EntityPanelSettings.RulesDescriptionStyle == EntityPanelSettings.DescriptionStyle.ScriptShort) {
           conditionText = ShortenNames(conditionText);
         }
       }
+      if (action.Condition.IsInErrorState) {
+        conditionText = CommonFormats.HighlightRed(conditionText);
+      } else if (action.Condition.ConditionState) {
+        conditionText = CommonFormats.HighlightGreen(conditionText);
+      } else {
+        conditionText = CommonFormats.HighlightYellow(conditionText);
+      }
+
       string actionText;
       if (EntityPanelSettings.RulesDescriptionStyle == EntityPanelSettings.DescriptionStyle.HumanReadable
           || action is not ScriptedAction scriptedAction) {

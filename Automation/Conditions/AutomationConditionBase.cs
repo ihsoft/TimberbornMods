@@ -111,6 +111,9 @@ public abstract class AutomationConditionBase : IAutomationCondition {
   public bool IsActive { get; private set; }
 
   /// <inheritdoc/>
+  public abstract bool IsInErrorState { get; }
+
+  /// <inheritdoc/>
   public abstract IAutomationCondition CloneDefinition();
 
   /// <inheritdoc/>

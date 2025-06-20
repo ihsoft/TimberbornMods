@@ -32,8 +32,7 @@ sealed class ScriptedAction : AutomationActionBase {
       if (_lastScriptError != null) {
         return CommonFormats.HighlightRed(Behavior.Loc.T(_lastScriptError));
       }
-      return CommonFormats.HighlightYellow(
-          DependencyContainer.GetInstance<ExpressionParser>().GetDescription(_parsedExpression));
+      return _parsedExpression?.Describe() ?? Behavior.Loc.T(ParseErrorLocKey);
     }
   }
   string _lastScriptError;

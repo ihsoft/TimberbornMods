@@ -63,6 +63,13 @@ public interface IAutomationCondition : IGameSerializable {
   /// <seealso cref="Activate"/>
   public bool IsActive { get; }
 
+  /// <summary>Indicates that the condition is in an error state and CANNOT say if it is "true" or "false".</summary>
+  /// <remarks>
+  /// The error state means, it is not possible to execute the whole checking logic. This should be considered a
+  /// temporary state, and the condition should be able to recover from it.
+  /// </remarks>
+  public bool IsInErrorState { get; }
+
   /// <summary>Returns a full copy of the condition <i>definition</i>. There must be no state copied.</summary>
   public IAutomationCondition CloneDefinition();
 

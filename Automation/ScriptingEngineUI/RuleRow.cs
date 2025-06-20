@@ -326,7 +326,7 @@ sealed class RuleRow {
     if (expression == null) {
       return CommonFormats.HighlightRed(_uiFactory.T(ParseErrorLocKey));
     }
-    var description = _expressionParser.GetDescription(expression, logErrors: true);
+    var description = expression.Describe();
     var isGreen = false;
     if (expression is BoolOperator boolOperator) {
       try {

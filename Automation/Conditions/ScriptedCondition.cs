@@ -24,19 +24,14 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   #region AutomationConditionBase overrides
 
   /// <inheritdoc/>
-  public override bool CanRunOnUnfinishedBuildings => _canRunOnUnfinishedBuildings;
-  bool _canRunOnUnfinishedBuildings;
+  public override bool IsInErrorState => _lastScriptError != null;
 
   /// <inheritdoc/>
-  public override string UiDescription {
-    get {
-      if (_lastScriptError != null) {
-        return _lastScriptError;
-      }
-      var description = DependencyContainer.GetInstance<ExpressionParser>().GetDescription(_parsedExpression);
-      return ConditionState ? CommonFormats.HighlightGreen(description) : CommonFormats.HighlightYellow(description);
-    }
-  }
+  public override bool CanRunOnUnfinishedBuildings => _canRunOnUnfinishedBuildings;
+  bool _canRunOnUnfinishedBuildings;
+  /// <inheritdoc/>
+  public override string UiDescription => _parsedExpression?.Describe() ?? Behavior.Loc.T(ParseErrorLocKey);
+
   string _lastScriptError;
 
   /// <inheritdoc/>
