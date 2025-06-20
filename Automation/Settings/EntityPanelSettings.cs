@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System;
+using IgorZ.TimberDev.Settings;
 using ModSettings.Common;
 using ModSettings.Core;
 using Timberborn.Modding;
@@ -10,7 +11,7 @@ using Timberborn.SettingsSystem;
 
 namespace IgorZ.Automation.Settings;
 
-sealed class EntityPanelSettings : ModSettingsOwner {
+sealed class EntityPanelSettings : BaseSettings<EntityPanelSettings> {
 
   const string HeaderStringLocKey = "IgorZ.Automation.Settings.EntityPanel.Header";
   const string AlwaysShowAddRulesButtonLocKey = "IgorZ.Automation.Settings.EntityPanel.AlwaysShowAddRulesButton";
@@ -25,7 +26,8 @@ sealed class EntityPanelSettings : ModSettingsOwner {
   // ReSharper disable InconsistentNaming
   // ReSharper disable MemberCanBePrivate.Global
 
-  public ModSetting<bool> AlwaysShowAddRulesButton { get; } =
+  public static bool AlwaysShowAddRulesButton { get; private set; }
+  public ModSetting<bool> AlwaysShowAddRulesButtonInternal { get; } =
     new(false, ModSettingDescriptor.CreateLocalized(AlwaysShowAddRulesButtonLocKey));
 
   public enum DescriptionStyle {
@@ -34,9 +36,8 @@ sealed class EntityPanelSettings : ModSettingsOwner {
     ScriptShort,
   }
 
-  public DescriptionStyle RulesDescriptionStyle { get; private set; }
-
-  public LimitedStringModSetting _rulesDescriptionStyle { get; } = new(
+  public static DescriptionStyle RulesDescriptionStyle { get; private set; }
+  public LimitedStringModSetting RulesDescriptionStyleInternal { get; } = new(
       0, [
           new LimitedStringModSettingValue(nameof(DescriptionStyle.HumanReadable), DescriptionHumanReadableLocKey),
           new LimitedStringModSettingValue(nameof(DescriptionStyle.Script), DescriptionScriptLocKey),
@@ -62,8 +63,10 @@ sealed class EntityPanelSettings : ModSettingsOwner {
 
   public EntityPanelSettings(ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry,
                              ModRepository modRepository) : base(settings, modSettingsOwnerRegistry, modRepository) {
-    _rulesDescriptionStyle.ValueChanged += (_, _) => {
-      RulesDescriptionStyle = (DescriptionStyle)Enum.Parse(typeof(DescriptionStyle), _rulesDescriptionStyle.Value);
-    };
+    InstallSettingCallback(AlwaysShowAddRulesButtonInternal, v => AlwaysShowAddRulesButton = v);
+    InstallSettingCallback(RulesDescriptionStyleInternal, v => {
+      RulesDescriptionStyle =
+          (DescriptionStyle)Enum.Parse(typeof(DescriptionStyle), RulesDescriptionStyleInternal.Value);
+    });
   }
 }

@@ -39,7 +39,6 @@ sealed class AutomationFragment : IEntityPanelFragment {
   readonly UiFactory _uiFactory;
   readonly RulesEditorDialog _rulesEditorDialog;
   readonly CopyRulesTool _copyRulesTool;
-  readonly EntityPanelSettings _entityPanelSettings;
   readonly ScriptingService _scriptingService;
 
   VisualElement _root;
@@ -51,11 +50,10 @@ sealed class AutomationFragment : IEntityPanelFragment {
   int _automationBehaviorVersion = -1;
 
   AutomationFragment(UiFactory uiFactory, RulesEditorDialog rulesEditorDialog, CopyRulesTool copyRulesTool,
-                     EntityPanelSettings entityPanelSettings, ScriptingService scriptingService) {
+                     ScriptingService scriptingService) {
     _uiFactory = uiFactory;
     _rulesEditorDialog = rulesEditorDialog;
     _copyRulesTool = copyRulesTool;
-    _entityPanelSettings = entityPanelSettings;
     _scriptingService = scriptingService;
   }
 
@@ -77,7 +75,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
     if (!_automationBehavior) {
       return;
     }
-    if (!_automationBehavior.HasActions && !_entityPanelSettings.AlwaysShowAddRulesButton.Value) {
+    if (!_automationBehavior.HasActions && !EntityPanelSettings.AlwaysShowAddRulesButton) {
       var buildingHasEffects =
           _scriptingService.GetSignalNamesForBuilding(_automationBehavior).Any(x => !GlobalActions.Any(x.StartsWith))
           || _scriptingService.GetActionNamesForBuilding(_automationBehavior).Any(x => !GlobalActions.Any(x.StartsWith));
@@ -111,22 +109,22 @@ sealed class AutomationFragment : IEntityPanelFragment {
     foreach (var action in _automationBehavior.Actions) {
       var row = _uiFactory.LoadVisualElement(RuleRowTemplate);
       string conditionText;
-      if (_entityPanelSettings.RulesDescriptionStyle == EntityPanelSettings.DescriptionStyle.HumanReadable
+      if (EntityPanelSettings.RulesDescriptionStyle == EntityPanelSettings.DescriptionStyle.HumanReadable
           || action.Condition is not ScriptedCondition scriptedCondition) {
         conditionText = action.Condition.UiDescription;
       } else {
         conditionText = CommonFormats.HighlightYellow(scriptedCondition.Expression);
-        if (_entityPanelSettings.RulesDescriptionStyle == EntityPanelSettings.DescriptionStyle.ScriptShort) {
+        if (EntityPanelSettings.RulesDescriptionStyle == EntityPanelSettings.DescriptionStyle.ScriptShort) {
           conditionText = ShortenNames(conditionText);
         }
       }
       string actionText;
-      if (_entityPanelSettings.RulesDescriptionStyle == EntityPanelSettings.DescriptionStyle.HumanReadable
+      if (EntityPanelSettings.RulesDescriptionStyle == EntityPanelSettings.DescriptionStyle.HumanReadable
           || action is not ScriptedAction scriptedAction) {
         actionText = action.UiDescription;
       } else {
         actionText = CommonFormats.HighlightYellow(scriptedAction.Expression);
-        if (_entityPanelSettings.RulesDescriptionStyle == EntityPanelSettings.DescriptionStyle.ScriptShort) {
+        if (EntityPanelSettings.RulesDescriptionStyle == EntityPanelSettings.DescriptionStyle.ScriptShort) {
           actionText = ShortenNames(actionText);
         }
       }
