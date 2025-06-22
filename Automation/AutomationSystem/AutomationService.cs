@@ -251,20 +251,20 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
 
     // Activate all rules to restore the state before the game save.
     var activatedRulesCount = 0;
+    var loadedRulesCount = 0;
     foreach (var behavior in _blockObjectToBehaviorMap.Values) {
       foreach (var action in behavior.Actions) {
+        loadedRulesCount++;
         action.Condition.Behavior = behavior;
         action.Behavior = behavior;
-        action.Condition.Activate(noTrigger: true);
-        activatedRulesCount++;
+        if (behavior.BlockObject.IsFinished || action.Condition.CanRunOnUnfinishedBuildings) {
+          action.Condition.Activate(noTrigger: true);
+          activatedRulesCount++;
+        }
       }
     }
-    if (activatedRulesCount > 0) {
-      DebugEx.Info("[Automation system] Activated {0} rules on {1} behaviors",
-                   activatedRulesCount, _blockObjectToBehaviorMap.Count);
-    } else {
-      DebugEx.Info("[Automation system] No rules to activate");
-    }
+    DebugEx.Info("[Automation system] Loaded {0} rules on {1} behaviors, activated {2}",
+                 loadedRulesCount, _blockObjectToBehaviorMap.Count, activatedRulesCount);
   }
 
   /// <summary>Load the rules as if they were new rules, created by the player after the game loaded.</summary>
