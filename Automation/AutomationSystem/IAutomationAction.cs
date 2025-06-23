@@ -24,6 +24,13 @@ public interface IAutomationAction : IGameSerializable {
   /// <summary>The condition which triggers this action.</summary>
   public IAutomationCondition Condition { get; set; }
 
+  /// <summary>Indicates that the action had an error when attempted to be executed last time.</summary>
+  /// <remarks>
+  /// The error state means, the action fails and doesn't do its job. This should be considered a temporary state, and
+  /// the action should be able to recover from it eventually.
+  /// </remarks>
+  public bool IsInErrorState { get; }
+
   /// <summary>Indicates that the action is not anymore needed and should be deleted.</summary>
   /// <remarks>Such actions are considered inactive and shouldn't process any logic.</remarks>
   public bool IsMarkedForCleanup { get; }

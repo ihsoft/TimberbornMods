@@ -15,8 +15,6 @@ namespace IgorZ.Automation.ScriptingEngine.Parser;
 
 sealed class BinaryOperator : BoolOperator {
 
-  const string SignalChangedLocKey = "IgorZ.Automation.Scripting.Expressions.SignalChanged";
-
   static readonly HashSet<string> Names = [ "eq", "ne", "gt", "lt", "ge", "le"];
 
   public IValueExpr Left => (IValueExpr)Operands[0];
@@ -30,13 +28,13 @@ sealed class BinaryOperator : BoolOperator {
 
   /// <inheritdoc/>
   public override string Describe() {
-    var leftSignal = Left as SignalOperator;
-    var rightSignal = Right as SignalOperator;
-    if (leftSignal != null && rightSignal != null && leftSignal.SignalName == rightSignal.SignalName && Name == "eq") {
+    // Special case: check for if the signal has changed (equals to itself).
+    if (Left is SignalOperator leftSignal && Right is SignalOperator rightSignal
+        && leftSignal.SignalName == rightSignal.SignalName && Name == "eq") {
       return leftSignal.Describe();
     }
     var sb = new StringBuilder();
-    sb.Append(leftSignal != null ? Left.Describe() : Left.ValueFn().FormatValue(_signalDef?.Result));
+    sb.Append(Left.Describe());
     sb.Append(Name switch {
         "eq" => " = ",
         "ne" => " \u2260 ",
@@ -46,7 +44,18 @@ sealed class BinaryOperator : BoolOperator {
         "le" => " \u2264 ",
         _ => throw new InvalidOperationException("Unknown operator: " + Name),
     });
-    sb.Append(rightSignal != null ? Right.Describe() : Right.ValueFn().FormatValue(_signalDef?.Result));
+    if (EntityPanelSettings.EvalValuesInConditions || Right is ConstantValueExpr) {
+      string rightValue;
+      try {
+        rightValue = Right.ValueFn().FormatValue(_signalDef?.Result);
+      } catch (ScriptError.BadValue e) {
+        rightValue = DependencyContainer.GetInstance<ILoc>().T(e.LocKey);
+      }
+      sb.Append(rightValue);
+    } else {
+      sb.Append(Right.Describe());
+    }
+
     return sb.ToString();
   }
 

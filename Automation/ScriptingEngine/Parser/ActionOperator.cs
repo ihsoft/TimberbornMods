@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using IgorZ.Automation.Settings;
+using TimberApi.DependencyContainerSystem;
+using Timberborn.Localization;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
@@ -30,11 +32,16 @@ sealed class ActionOperator : AbstractOperator {
     var args = new string[_actionDef.Arguments.Length];
     for (var i = 0; i < _actionDef.Arguments.Length; i++) {
       var operand = Operands[i + 1] as IValueExpr;
-      if (operand is SignalOperator) {
-        args[i] = operand.Describe();
-      } else {
-        var value = operand!.ValueFn();
+      if (EntityPanelSettings.EvalValuesInActionArguments) {
+        ScriptValue value;
+        try {
+          value = operand!.ValueFn();
+        } catch (ScriptError.BadValue e) {
+          return DependencyContainer.GetInstance<ILoc>().T(e.LocKey);
+        }
         args[i] = value.FormatValue(_actionDef.Arguments[i]);
+      } else {
+        args[i] = operand!.Describe();
       }
     }
     return string.Format(_actionDef.DisplayName, args);

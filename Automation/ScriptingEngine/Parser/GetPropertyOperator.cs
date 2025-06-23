@@ -13,11 +13,22 @@ using Timberborn.BaseComponentSystem;
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
 class GetPropertyOperator : AbstractOperator, IValueExpr {
+  /// <inheritdoc/>
   public override string Describe() {
-    throw new NotImplementedException();
+    var symbol = (Operands[0] as SymbolExpr)!.Value;
+    if (IsList) {
+      return Operands.Count == 1 ? $"Count({symbol})" : $"GetElement({symbol}, {Operands[0].Describe()})";
+    }
+    return $"ValueOf({symbol})";
   }
-  public ScriptValue.TypeEnum ValueType { get; set; }
-  public Func<ScriptValue> ValueFn { get; set; }
+
+  /// <inheritdoc/>
+  public ScriptValue.TypeEnum ValueType { get; }
+  /// <inheritdoc/>
+  public Func<ScriptValue> ValueFn { get; }
+
+  /// <summary>Tells if this operator accesses a list property.</summary>
+  public bool IsList { get; }
 
   public static IExpression TryCreateFrom(ExpressionParser.Context context, string name, IList<IExpression> operands) {
     return name switch {

@@ -1,6 +1,7 @@
 # v2.5.9 (pre-release, June 18th, 2025):
 * [Change] Make input field in script editor multi-line.
 * [Change] Better handling the script errors in both UI and the execution phases.
+* [Change #106] Allow choosing if the values should be evaluated or "described" in the UI. Check the settings dialog.
 * [Fix #115] InvalidOperationException: Condition already activated.
 
 # v2.5.8 (June 18th, 2025):

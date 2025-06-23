@@ -19,6 +19,8 @@ sealed class EntityPanelSettings : BaseSettings<EntityPanelSettings> {
   const string DescriptionHumanReadableLocKey = "IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.HumanReadable";
   const string DescriptionScriptLocKey = "IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.Script";
   const string DescriptionScriptShortLocKey = "IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.ScriptShort";
+  const string EvalValuesInConditionsLocKey = "IgorZ.Automation.Settings.EntityPanel.EvalValuesInConditions";
+  const string EvalValuesInActionArgumentsLocKey = "IgorZ.Automation.Settings.EntityPanel.EvalValuesInActionArguments";
 
   protected override string ModId => Configurator.AutomationModId;
 
@@ -44,6 +46,14 @@ sealed class EntityPanelSettings : BaseSettings<EntityPanelSettings> {
           new LimitedStringModSettingValue(nameof(DescriptionStyle.ScriptShort), DescriptionScriptShortLocKey),
       ], ModSettingDescriptor.CreateLocalized(RulesDescriptionStyleLocKey));
 
+  public static bool EvalValuesInConditions { get; private set; }
+  public ModSetting<bool> EvalValuesInConditionsInternal { get; } =
+    new(false, ModSettingDescriptor.CreateLocalized(EvalValuesInConditionsLocKey));
+
+  public static bool EvalValuesInActionArguments { get; private set; }
+  public ModSetting<bool> EvalValuesInActionArgumentsInternal { get; } =
+    new(true, ModSettingDescriptor.CreateLocalized(EvalValuesInActionArgumentsLocKey));
+
   // ReSharper restore MemberCanBePrivate.Global
   // ReSharper restore InconsistentNaming
   #endregion
@@ -68,5 +78,7 @@ sealed class EntityPanelSettings : BaseSettings<EntityPanelSettings> {
       RulesDescriptionStyle =
           (DescriptionStyle)Enum.Parse(typeof(DescriptionStyle), RulesDescriptionStyleInternal.Value);
     });
+    InstallSettingCallback(EvalValuesInConditionsInternal, v => EvalValuesInConditions = v);
+    InstallSettingCallback(EvalValuesInActionArgumentsInternal, v => EvalValuesInActionArguments = v);
   }
 }

@@ -132,11 +132,15 @@ sealed class AutomationFragment : IEntityPanelFragment {
           || action is not ScriptedAction scriptedAction) {
         actionText = action.UiDescription;
       } else {
-        actionText = CommonFormats.HighlightYellow(scriptedAction.Expression);
+        actionText = scriptedAction.Expression;
         if (EntityPanelSettings.RulesDescriptionStyle == EntityPanelSettings.DescriptionStyle.ScriptShort) {
           actionText = ShortenNames(actionText);
         }
       }
+      actionText = action.IsInErrorState
+          ? CommonFormats.HighlightRed(actionText)
+          : CommonFormats.HighlightYellow(actionText);
+
       row.Q<Label>("Content").text = _uiFactory.T(RuleTextLocKey, conditionText, actionText);
       row.SetEnabled(action.Condition.IsActive);
       _rulesList.Add(row);

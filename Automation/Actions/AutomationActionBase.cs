@@ -66,6 +66,9 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
   IAutomationCondition _condition;
 
   /// <inheritdoc/>
+  public abstract bool IsInErrorState { get; }
+
+  /// <inheritdoc/>
   public bool IsMarkedForCleanup { get; private set; }
 
   /// <inheritdoc/>

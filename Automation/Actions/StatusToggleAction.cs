@@ -84,6 +84,9 @@ public class StatusToggleAction : AutomationActionBase {
   #region AutomationActionBase overrides
 
   /// <inheritdoc/>
+  public override bool IsInErrorState => false;
+
+  /// <inheritdoc/>
   public override string UiDescription => Behavior.Loc.T(Description);
 
   /// <inheritdoc/>

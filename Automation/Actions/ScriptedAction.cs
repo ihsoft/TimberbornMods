@@ -22,6 +22,9 @@ sealed class ScriptedAction : AutomationActionBase {
   #region AutomationActionBase overrides
 
   /// <inheritdoc/>
+  public override bool IsInErrorState => _lastScriptError != null;
+
+  /// <inheritdoc/>
   public override IAutomationAction CloneDefinition() {
     return new ScriptedAction { TemplateFamily = TemplateFamily, Expression = Expression };
   }
