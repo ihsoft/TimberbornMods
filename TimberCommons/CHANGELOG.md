@@ -1,3 +1,6 @@
+# v1.12.2 (July 16th, 2025)
+* [Fix #117] Crash when irrigation tower is flooded.
+
 # v1.12.1 (June 17th, 2025)
 * [Fix] Fix a crash during a game load under some circumstances.
 

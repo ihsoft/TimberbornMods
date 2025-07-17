@@ -66,6 +66,9 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   // ReSharper disable MemberCanBeProtected.Global
   // ReSharper disable MemberCanBePrivate.Global
 
+  /// <summary>Tells if the tower is initialized and ready to work.</summary>
+  protected bool IsInitialized => MaxCoveredTilesCount > 0;
+
   /// <summary>The maximum irrigation range of the tower.</summary>
   /// <seealso cref="EligibleTiles"/>
   /// <seealso cref="EffectiveRange"/>
@@ -336,7 +339,7 @@ public abstract class IrrigationTower : TickableComponent, IBuildingWithRange, I
   /// <summary>Updates the eligible tiles and moisture system.</summary>
   /// <remarks>If case of there are changes in the irrigating tiles, the moisturizing will be stopped.</remarks>
   void UpdateState() {
-    if (_skipTicks > 0) {
+    if (!IsInitialized || _skipTicks > 0) {
       return;  // Skip state checks until the component is ready.
     }
     var newEfficiency = GetEfficiency();
