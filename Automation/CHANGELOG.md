@@ -1,3 +1,6 @@
+# v2.6.1 (pre-release):
+* [Feature] Add debug signals for district stock tracking: `Debug.DistrictStockTracker.<GoodId>`.
+
 # v2.6.0 (June 22nd, 2025):
 * [Change] Make input field in script editor multi-line.
 * [Change] Better handling the script errors in both UI and the execution phases.

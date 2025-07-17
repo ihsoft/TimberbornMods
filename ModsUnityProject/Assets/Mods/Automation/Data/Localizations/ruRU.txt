@@ -115,6 +115,8 @@ IgorZ.Automation.Scriptable.Constructable.Signal.State,"состояние ст�
 IgorZ.Automation.Scriptable.Constructable.Signal.State.Finished,"Завершено","State name for when the building construction is complete"
 IgorZ.Automation.Scriptable.Debug.Action.LogNum,"записать в журнал число: {0}","Name of the action that write to the log an arbitrary number or a result of computation"
 IgorZ.Automation.Scriptable.Debug.Action.LogStr,"записать в журнал строку: {0}","Name of the action that write to the log an arbitrary string"
+IgorZ.Automation.Scriptable.Debug.Signal.DistrictStockCapacityTracker,"вместимость хранилищ района: {0}","Name of the condition that returns the current district stock output capacity of the specified good"
+IgorZ.Automation.Scriptable.Debug.Signal.DistrictStockTracker,"заполнено хранилищ района: {0}","Name of the condition that returns the current district stock output of the specified good"
 IgorZ.Automation.Scriptable.Debug.Signal.Ticker,"тикер","Name of the condition that returns the current tick number"
 IgorZ.Automation.Scriptable.District.Signal.Beavers,"бобров в районе","Name of the condition for the current beaver population checking"
 IgorZ.Automation.Scriptable.District.Signal.Bots,"ботов в районе","Name of the condition for the current bot population checking"

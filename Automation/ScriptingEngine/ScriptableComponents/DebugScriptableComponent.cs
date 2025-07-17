@@ -3,20 +3,29 @@
 // License: Public Domain
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.BaseComponentSystem;
+using Timberborn.GameDistricts;
+using Timberborn.Goods;
+using Timberborn.InventorySystem;
+using Timberborn.ResourceCountingSystem;
 using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
 sealed class DebugScriptableComponent : ScriptableComponentBase {
 
+  const string DistrictStockCapacityTrackerSignalLocKey = "IgorZ.Automation.Scriptable.Debug.Signal.DistrictStockCapacityTracker";
+  const string DistrictStockTrackerSignalLocKey = "IgorZ.Automation.Scriptable.Debug.Signal.DistrictStockTracker";
   const string TickerSignalLocKey = "IgorZ.Automation.Scriptable.Debug.Signal.Ticker";
   const string LogStrActionLocKey = "IgorZ.Automation.Scriptable.Debug.Action.LogStr";
   const string LogNumActionLocKey = "IgorZ.Automation.Scriptable.Debug.Action.LogNum";
 
+  const string DistrictStockTrackerSignalNamePrefix = "Debug.DistrictStockTracker.";
   const string TickerSignalName = "Debug.Ticker";
   const string LogStrActionName = "Debug.LogStr";
   const string LogNumActionName = "Debug.LogNum";
@@ -33,6 +42,11 @@ sealed class DebugScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override Func<ScriptValue> GetSignalSource(string name, AutomationBehavior behavior) {
+    if (TryParseStockTrackerSignalName(name, out var goodSpec, out var isCapacity)) {
+      return isCapacity
+          ? () => StockTrackerCapacitySignal(behavior, goodSpec.Id)
+          : () => StockTrackerValueSignal(behavior, goodSpec.Id);
+    }
     return name switch {
         TickerSignalName => TickerSignal,
         _ => throw new UnknownSignalException(name),
@@ -41,6 +55,11 @@ sealed class DebugScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override SignalDef GetSignalDefinition(string name, AutomationBehavior behavior) {
+    if (TryParseStockTrackerSignalName(name, out var goodSpec, out var isCapacity)) {
+      return isCapacity
+          ? LookupSignalDef(name, () => MakeDistrictStockCapacityTrackerSignalDef(name, goodSpec))
+          : LookupSignalDef(name, () => MakeDistrictStockTrackerSignalDef(name, goodSpec));
+    }
     return name switch {
         TickerSignalName => TickerSignalDef,
         _ => throw new UnknownSignalException(name),
@@ -52,6 +71,9 @@ sealed class DebugScriptableComponent : ScriptableComponentBase {
   /// <inheritdoc/>
   public override void RegisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
     _referenceManager.AddSignal(signalOperator, host);
+    if (signalOperator.SignalName.StartsWith(DistrictStockTrackerSignalNamePrefix)) {
+      _stockTickersRegistered++;
+    }
     if (_referenceManager.Signals.Count == 1) {
       _automationService.RegisterTickable(OnTick);
     }
@@ -60,6 +82,9 @@ sealed class DebugScriptableComponent : ScriptableComponentBase {
   /// <inheritdoc/>
   public override void UnregisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
     _referenceManager.RemoveSignal(signalOperator, host);
+    if (signalOperator.SignalName.StartsWith(DistrictStockTrackerSignalNamePrefix)) {
+      _stockTickersRegistered--;
+    }
     if (_referenceManager.Signals.Count == 0) {
       _automationService.UnregisterTickable(OnTick);
     }
@@ -103,11 +128,48 @@ sealed class DebugScriptableComponent : ScriptableComponentBase {
           ValueUiHint = GetArgumentMaxValueHint(ReasonableTickQuantifierMax),
       },
   };
-
   SignalDef _tickerSignalDef;
+
+  SignalDef MakeDistrictStockTrackerSignalDef(string signalName, GoodSpec spec) {
+    return new SignalDef {
+        ScriptName = signalName,
+        DisplayName = Loc.T(DistrictStockTrackerSignalLocKey, spec.PluralDisplayName.Value),
+        Result = new ValueDef {
+            ValueType = ScriptValue.TypeEnum.Number,
+            ValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
+        },
+    };
+  }
+
+  SignalDef MakeDistrictStockCapacityTrackerSignalDef(string signalName, GoodSpec spec) {
+    return new SignalDef {
+        ScriptName = signalName,
+        DisplayName = Loc.T(DistrictStockCapacityTrackerSignalLocKey, spec.PluralDisplayName.Value),
+        Result = new ValueDef {
+            ValueType = ScriptValue.TypeEnum.Number,
+            ValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
+        },
+    };
+  }
 
   ScriptValue TickerSignal() {
     return ScriptValue.Of(AutomationService.CurrentTick);
+  }
+
+  ScriptValue StockTrackerValueSignal(AutomationBehavior behavior, string goodId) {
+    var districtCenter = behavior.GetComponentFast<DistrictBuilding>().InstantDistrict;
+    if (districtCenter == null || !_districtStockCounter.TryGetValue(districtCenter, out var stockCounter)) {
+      return ScriptValue.Of(0);
+    }
+    return ScriptValue.FromInt(stockCounter.GetInputOutputStock(goodId));
+  }
+
+  ScriptValue StockTrackerCapacitySignal(AutomationBehavior behavior, string goodId) {
+    var districtCenter = behavior.GetComponentFast<DistrictBuilding>().InstantDistrict;
+    if (districtCenter == null || !_districtCapacityCounter.TryGetValue(districtCenter, out var capacityCounter)) {
+      return ScriptValue.Of(0);
+    }
+    return ScriptValue.FromInt(capacityCounter.GetInputOutputCapacity(goodId));
   }
 
   #endregion
@@ -150,17 +212,81 @@ sealed class DebugScriptableComponent : ScriptableComponentBase {
 
   #region Implemenation
 
+  readonly Dictionary<DistrictCenter, StockCounter> _districtStockCounter = new();
+  readonly Dictionary<DistrictCenter, CapacityCounter> _districtCapacityCounter = new();
+
   AutomationService _automationService;
+  IGoodService _goodService;
+  InventoryService _inventoryService;
+  DistrictCenterRegistry _districtCenterRegistry;
+
+  int _stockTickersRegistered;
 
   [Inject]
-  public void InjectDependencies(AutomationService automationService) {
+  public void InjectDependencies(AutomationService automationService, IGoodService goodService,
+                                 InventoryService inventoryService, DistrictCenterRegistry districtCenterRegistry) {
     _automationService = automationService;
+    _goodService = goodService;
+    _inventoryService = inventoryService;
+    _districtCenterRegistry = districtCenterRegistry;
+  }
+
+  bool TryParseStockTrackerSignalName(string signalName, out GoodSpec goodSpec, out bool isCapacity) {
+    if (!signalName.StartsWith(DistrictStockTrackerSignalNamePrefix)) {
+      goodSpec = null;
+      isCapacity = false;
+      return false;
+    }
+    var parts = signalName[DistrictStockTrackerSignalNamePrefix.Length..].Split('.');
+    if (parts.Length is < 1 or > 2) {
+      throw new UnknownSignalException(signalName);
+    }
+    isCapacity = false;
+    if (parts.Length > 1) {
+      if (parts[1] != "Capacity") {
+        throw new UnknownSignalException(signalName);
+      }
+      isCapacity = true;
+    }
+    goodSpec = _goodService.GetGoodOrNull(parts[0]);
+    if (goodSpec == null) {
+      throw new UnknownSignalException(signalName);
+    }
+    return true;
+  }
+
+  void UpdateDistrictResources() {
+    _districtStockCounter.Clear();
+    _districtCapacityCounter.Clear();
+    foreach (var districtCenter in _districtCenterRegistry.FinishedDistrictCenters) {
+      var inventories = _inventoryService.PublicOutputInventories
+          .Where(inventory => inventory.GetComponentFast<DistrictBuilding>().InstantDistrict == districtCenter)
+          .ToArray();
+      var stockCounter = new StockCounter();
+      stockCounter.UpdateStock(inventories);
+      _districtStockCounter.Add(districtCenter, stockCounter);
+      var capacityCounter = new CapacityCounter();
+      capacityCounter.UpdateCapacity(inventories);
+      _districtCapacityCounter.Add(districtCenter, capacityCounter);
+    }
   }
 
   void OnTick(int currentTick) {
-    //FIXME
-    DebugEx.Warning("DebugScriptableComponent.OnTick called at tick {0}.", currentTick);
-    _referenceManager.ScheduleSignal(TickerSignalName, ScriptingService, ignoreErrors: true);
+    if (_stockTickersRegistered > 0) {
+      UpdateDistrictResources();
+      var listeners = _referenceManager.Signals
+          .Where(pair => pair.Value.Any(x => x.SignalName.StartsWith(DistrictStockTrackerSignalNamePrefix)))
+          .Select(x => x.Key)
+          .ToList();  // Need copy!
+      foreach (var listener in listeners) {
+        ScriptingService.ScheduleSignalCallback(
+            new ScriptingService.SignalCallback(DistrictStockTrackerSignalNamePrefix, listener),
+            ignoreErrors: true);
+      }
+    }
+    if (_referenceManager.Signals.Count > 0) {
+      _referenceManager.ScheduleSignal(TickerSignalName, ScriptingService, ignoreErrors: true);
+    }
   }
 
   #endregion
