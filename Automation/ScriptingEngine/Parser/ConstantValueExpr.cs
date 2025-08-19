@@ -36,7 +36,11 @@ sealed class ConstantValueExpr : IValueExpr {
 
   /// <inheritdoc/>
   public string Describe() {
-    return Serialize();
+    return ValueType switch {
+        ScriptValue.TypeEnum.String => $"'{ValueFn().AsString}'",
+        ScriptValue.TypeEnum.Number => ValueFn().AsFloat.ToString("0.0#"),
+        _ => $"ERROR:{ValueType}",
+    };
   }
 
   /// <inheritdoc/>

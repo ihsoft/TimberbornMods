@@ -1,5 +1,6 @@
 # v2.6.1 (pre-release):
 * [Feature] Add debug signals for district stock tracking: `Debug.DistrictStockTracker.<GoodId>`.
+* [Fix] In "describe mode," show action argument values as real numbers instead of script fixed point values.
 
 # v2.6.0 (June 22nd, 2025):
 * [Change] Make input field in script editor multi-line.
