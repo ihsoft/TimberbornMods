@@ -1,5 +1,7 @@
 # v2.6.1 (pre-release):
 * [Feature] Add debug signals for district stock tracking: `Debug.DistrictStockTracker.<GoodId>`.
+* [Feature] Add `Collectable.Ready` signal to check if the building can collect any gatherable or cuttable resource.
+* [Feature] Add templates to check if a gathering building can collect any gatherable or cuttable resource.
 * [Fix] In "describe mode," show action argument values as real numbers instead of script fixed point values.
 
 # v2.6.0 (June 22nd, 2025):

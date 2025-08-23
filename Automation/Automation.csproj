@@ -71,6 +71,9 @@
       <None Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Cursors\*.json">
         <Link>Mod\Blueprints\Cursors\_</Link>
       </None>
+      <None Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Planting\*.json">
+        <Link>Mod\Blueprints\Tools\Planting\_</Link>
+      </None>
       <None Include="..\ModsUnityProject\Assets\Mods\Automation\Data\Blueprints\Tools\Population\*.json">
         <Link>Mod\Blueprints\Tools\Population\_</Link>
       </None>

@@ -1,0 +1,12 @@
+{
+  "TimberApiToolGroupSpec": {
+    "Id": "AutomationPlantingToolGroupId",
+    "GroupId": "AutomationToolGroupId",
+    "Type": "AutomationToolGroup",
+    "Layout": "Green",
+    "Order": 25,
+    "Icon": "Sprites/IgorZ/tool-group-planting",
+    "NameLocKey": "IgorZ.Automation.ToolGroup.Planting.DisplayName",
+    "FallbackGroup": false
+  }
+}

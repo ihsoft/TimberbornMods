@@ -26,6 +26,12 @@ IgorZ.Automation.Tool.tmpl.3LevelsDynamite.DisplayName,"Explode dynamite 3 times
 IgorZ.Automation.Tool.tmpl.4LevelsDynamite.DisplayName,"Explode dynamite 4 times",
 IgorZ.Automation.Tool.tmpl.5LevelsDynamite.DisplayName,"Explode dynamite 5 times",
 IgorZ.Automation.Tool.tmpl.6LevelsDynamite.DisplayName,"Explode dynamite 6 times",
+IgorZ.Automation.Tool.tmpl.RunIf1PlusCollectables.DisplayName,"Run if there are collectables",
+IgorZ.Automation.Tool.tmpl.RunIf2PlusCollectables.DisplayName,"Run if there are 2 or more collectables",
+IgorZ.Automation.Tool.tmpl.RunIf3PlusCollectables.DisplayName,"Run if there are 3 or more collectables",
+IgorZ.Automation.Tool.tmpl.RunIf4PlusCollectables.DisplayName,"Run if there are 4 or more collectables",
+IgorZ.Automation.Tool.tmpl.RunIf5PlusCollectables.DisplayName,"Run if there are 5 or more collectables",
+IgorZ.Automation.Tool.tmpl.HasCollectables.Description,"Apply this template to buildings that should be running as long as there are cuttable or gatherable items in the range of the building that can be collected.",
 IgorZ.Automation.Tool.tmpl.BadtideCloseFloodgate.Description,"Apply this template on floodgates that need to close when badtide starts.",
 IgorZ.Automation.Tool.tmpl.BadtideCloseFloodgate.DisplayName,"Close floodgate on badtide start",
 IgorZ.Automation.Tool.tmpl.BadtideOpenFloodgate.Description,"Apply this template on floodgates that need to open when badtide starts.",
@@ -88,6 +94,7 @@ IgorZ.Automation.Tool.tmpl.TemperateSemiOpenFloodgate.Description,"Apply this te
 IgorZ.Automation.Tool.tmpl.TemperateSemiOpenFloodgate.DisplayName,"Slightly open floodgate during temperate weather",
 IgorZ.Automation.Tool.tmpl.XLevelsDynamite.Description,"This template can be applied to dynamites, whether it is finished or still being built. Upon completion, the dynamite will detonate automatically, and a new dynamite blueprint will be placed to dig deeper.",
 IgorZ.Automation.ToolGroup.Main.DisplayName,"Setup automation",
+IgorZ.Automation.ToolGroup.Planting.DisplayName,"Planting and gathering related rules",
 IgorZ.Automation.ToolGroup.Population.DisplayName,"Population related rules",
 IgorZ.Automation.ToolGroup.Power.DisplayName,"Power related rules",
 IgorZ.Automation.ToolGroup.Signals.DisplayName,"Signals related rules",
@@ -126,6 +133,7 @@ IgorZ.Automation.Scriptable.Floodgate.Action.SetHeight,"set gate height to {0}",
 IgorZ.Automation.Scriptable.Floodgate.Signal.Height,"floodgate height","Name of the condition for the floodgate height checking"
 IgorZ.Automation.Scriptable.FlowControl.Action.Close,"disable flow","Name of the action that closes the water flow through the building"
 IgorZ.Automation.Scriptable.FlowControl.Action.Open,"enable flow","Name of the action that opens the water flow through the building"
+IgorZ.Automation.Scriptable.Collectable.Signal.CollectableReady,"ready for collection","Name of the condition for the number of cuttable or gatherable items ready to be collected"
 IgorZ.Automation.Scriptable.Inventory.Action.EmptyingStatus,"The storage is being emptied on a priority basis.",
 IgorZ.Automation.Scriptable.Inventory.Action.StartEmptyingStock,"start emptying storage","Name of the action that starts emptying the storage"
 IgorZ.Automation.Scriptable.Inventory.Action.StopEmptyingStock,"stop emptying storage","Name of the action that stops emptying the storage"

@@ -4,7 +4,7 @@
     "GroupId": "AutomationToolGroupId",
     "Type": "AutomationToolGroup",
     "Layout": "Green",
-    "Order": 25,
+    "Order": 26,
     "Icon": "Sprites/IgorZ/tool-group-signals",
     "NameLocKey": "IgorZ.Automation.ToolGroup.Signals.DisplayName",
     "FallbackGroup": false
