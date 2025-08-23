@@ -95,7 +95,11 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
     }
     _lastValidatedBehavior = behavior;
     if (CheckPrecondition(behavior)) {
-      _lastValidationResult = ParseAndValidate(Expression, behavior, out _) != null;
+      var expression = ParseAndValidate(Expression, behavior, out _parsingResult, onlyCheck: true);
+      _lastValidationResult = expression != null;
+      if (_parsingResult.LastScriptError is ScriptError.BadStateError error) {
+        DebugEx.Fine("Expression '{0}' is not valid at {1}: {2}", Expression, behavior, error.Message);
+      }
     } else {
       _lastValidationResult = false;
     }
@@ -190,10 +194,13 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
 
   // Used by the RulesEditor dialog.
   internal static BoolOperator ParseAndValidate(
-      string expression, AutomationBehavior behavior, out ParsingResult parsingResult) {
+      string expression, AutomationBehavior behavior, out ParsingResult parsingResult, bool onlyCheck = false) {
     parsingResult = DependencyContainer.GetInstance<ExpressionParser>().Parse(expression, behavior);
     if (parsingResult.LastError != null) {
-      HostedDebugLog.Error(behavior, "Failed to parse condition: {0}\nError: {1}", expression, parsingResult.LastError);
+      if (!onlyCheck || parsingResult.LastScriptError is not ScriptError.BadStateError) {
+        HostedDebugLog.Error(
+            behavior, "Failed to parse condition: {0}\nError: {1}", expression, parsingResult.LastError);
+      }
       return null;
     }
     if (parsingResult.ParsedExpression is not BoolOperator result) {

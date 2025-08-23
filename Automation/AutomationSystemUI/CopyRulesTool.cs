@@ -35,7 +35,7 @@ sealed class CopyRulesTool : AbstractAreaSelectionTool, IAutomationModeEnabler, 
     if (!behavior || behavior == _copySource) {
       return false;
     }
-    return _copySource.Actions.All(x => x.Condition.CloneDefinition().IsValidAt(behavior) && x.CloneDefinition().IsValidAt(behavior));
+    return _copySource.Actions.All(x => x.Condition.IsValidAt(behavior) && x.CloneDefinition().IsValidAt(behavior));
   }
 
   /// <inheritdoc/>
