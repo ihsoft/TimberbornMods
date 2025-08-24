@@ -26,6 +26,12 @@ IgorZ.Automation.Tool.tmpl.3LevelsDynamite.DisplayName,"Взорвать дин�
 IgorZ.Automation.Tool.tmpl.4LevelsDynamite.DisplayName,"Взорвать динамит 4 раза",
 IgorZ.Automation.Tool.tmpl.5LevelsDynamite.DisplayName,"Взорвать динамит 5 раз",
 IgorZ.Automation.Tool.tmpl.6LevelsDynamite.DisplayName,"Взорвать динамит 6 раз",
+IgorZ.Automation.Tool.tmpl.RunIf1PlusCollectables.DisplayName,"Работать если можно что-то собрать",
+IgorZ.Automation.Tool.tmpl.RunIf2PlusCollectables.DisplayName,"Работать если доступно 2 и более клеток",
+IgorZ.Automation.Tool.tmpl.RunIf3PlusCollectables.DisplayName,"Работать если доступно 3 и более клеток",
+IgorZ.Automation.Tool.tmpl.RunIf4PlusCollectables.DisplayName,"Работать если доступно 4 и более клеток",
+IgorZ.Automation.Tool.tmpl.RunIf5PlusCollectables.DisplayName,"Работать если доступно 5 и более клеток",
+IgorZ.Automation.Tool.tmpl.HasCollectables.Description,"Примените этот шаблон к зданиям, которые должны работать только если есть деревья и растения, доступные для сбора в пределах досягаемости.",
 IgorZ.Automation.Tool.tmpl.BadtideCloseFloodgate.Description,"Примените этот шаблон к затворам, которые должны закрываться когда начинается сезон плохой воды.",
 IgorZ.Automation.Tool.tmpl.BadtideCloseFloodgate.DisplayName,"Закрыть затвор в сезон плохой воды",
 IgorZ.Automation.Tool.tmpl.BadtideOpenFloodgate.Description,"Примените этот шаблон к затворам, которые должны открываться когда начинается сезон плохой воды.",
@@ -89,6 +95,7 @@ IgorZ.Automation.Tool.tmpl.TemperateSemiOpenFloodgate.Description,"Примен�
 IgorZ.Automation.Tool.tmpl.TemperateSemiOpenFloodgate.DisplayName,"Приоткрыть затвор при комфортной погоде",
 IgorZ.Automation.Tool.tmpl.XLevelsDynamite.Description,"Этот шаблон можно применить к динамитам, как к завершенным, так и к строящимся. После завершения динамит взорвется автоматически, и на его месте будет размещен новый чертеж динамита.",
 IgorZ.Automation.ToolGroup.Main.DisplayName,"Настроить автоматизацию",
+IgorZ.Automation.ToolGroup.Planting.DisplayName,"Правила, зависящие от деревьев и растений",
 IgorZ.Automation.ToolGroup.Population.DisplayName,"Правила, зависящие от населения",
 IgorZ.Automation.ToolGroup.Power.DisplayName,"Правила, зависящие от потребления энергии",
 IgorZ.Automation.ToolGroup.Signals.DisplayName,"Правила, зависящие от сигналов",
@@ -127,6 +134,7 @@ IgorZ.Automation.Scriptable.Floodgate.Action.SetHeight,"выставить вы�
 IgorZ.Automation.Scriptable.Floodgate.Signal.Height,"высота затвора","Name of the condition for the floodgate height checking"
 IgorZ.Automation.Scriptable.FlowControl.Action.Close,"запретить поток","Name of the action that closes the water flow through the building"
 IgorZ.Automation.Scriptable.FlowControl.Action.Open,"разрешить поток","Name of the action that opens the water flow through the building"
+IgorZ.Automation.Scriptable.Collectable.Signal.CollectableReady,"доступно для сбора","Name of the condition for the number of cuttable or gatherable items ready to be collected"
 IgorZ.Automation.Scriptable.Inventory.Action.EmptyingStatus,"Склад освобождается в приоритетном порядке.",
 IgorZ.Automation.Scriptable.Inventory.Action.StartEmptyingStock,"начать освобождать","Name of the action that starts emptying the storage"
 IgorZ.Automation.Scriptable.Inventory.Action.StopEmptyingStock,"прекратить освобождать","Name of the action that stops emptying the storage"
