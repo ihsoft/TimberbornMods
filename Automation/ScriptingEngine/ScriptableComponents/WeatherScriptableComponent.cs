@@ -9,7 +9,6 @@ using System.Linq;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.TimberDev.UI;
-using TimberApi.DependencyContainerSystem;
 using Timberborn.BlueprintSystem;
 using Timberborn.HazardousWeatherSystem;
 using Timberborn.SingletonSystem;
@@ -130,10 +129,14 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
 
   /// <summary>Gets the current season based on the weather conditions.</summary>
   /// <remarks>
-  /// Don't use in hazardous season end events due to the wayher service state is not fully updated yet.
+  /// Don't use in hazardous season end events due to the weather service state is not fully updated yet.
   /// </remarks>
   /// <exception cref="InvalidOperationException">if the weather season can't be recognized.</exception>
   string GetCurrentSeason() {
+    //FIXME
+    DebugEx.Warning("GetCurrentSeason: IsHazardousWeather={0}, weatherId={1}",
+                    _weatherService.IsHazardousWeather, _hazardousWeatherService.CurrentCycleHazardousWeather.Id);
+    
     return _weatherService.IsHazardousWeather
         ? _hazardousWeatherService.CurrentCycleHazardousWeather.Id
         : TemperateWeatherId;
@@ -148,7 +151,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   /// </remarks>
   void LoadWeatherIds() {
     if (_specService is not SpecService specService) {
-      DebugEx.Error("ISpecService expected to be  SpecService, but was {0}. Don't load modded seasons.", _specService);
+      DebugEx.Error("ISpecService expected to be SpecService, but was {0}. Don't load modded seasons.", _specService);
       _weatherSeasonOptions = StandardSeasons
           .Select(x => new DropdownItem<string> { Value = x.Value, Text = Loc.T(x.text) })
           .Reverse()
@@ -203,7 +206,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   }
 
   [OnEvent]
-  public void OnHazardousWeatherEndedEvent(HazardousWeatherEndedEvent @event) {
+  public void OnHazardousWeatherEndedEvent(HazardousWeatherEndedEvent _) {
     _currentSeason = TemperateWeatherId;
     _referenceManager.ScheduleSignal(SeasonSignalName, ScriptingService, ignoreErrors: true);
   }
