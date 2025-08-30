@@ -14,6 +14,7 @@ using Timberborn.BlockSystem;
 using Timberborn.BuildingsNavigation;
 using Timberborn.Common;
 using Timberborn.Cutting;
+using Timberborn.EntitySystem;
 using Timberborn.Forestry;
 using Timberborn.Growing;
 using Timberborn.SingletonSystem;
@@ -112,7 +113,7 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
 
   #endregion
 
-  #region Inventory change tracker component
+  #region Component that tracks gatherable items in the building area.
 
   sealed class GatherableTracker : AbstractStatusTracker, IFinishedStateListener {
 
@@ -123,12 +124,14 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
       _eventBus.Register(this);
       _buildingTerrainRange.RangeChanged += BuildingRangeChanged;
       _rangeChanged = true;
+      //FIXME: make it late updateable? but we need to handle the editor case.
       UpdateState();  // Sync-up the initial state.
     }
 
     /// <inheritdoc/>
     public void OnExitFinishedState() {
       _eventBus.Unregister(this);
+      _buildingTerrainRange.RangeChanged -= BuildingRangeChanged;
       while (_yielders.Count > 0) {
         RemoveYielder(_yielders.First());
       }
@@ -148,10 +151,10 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
     EventBus _eventBus;
     BlockService _blockService;
     BuildingTerrainRange _buildingTerrainRange;
+    YieldRemovingBuilding _yieldRemovingBuilding;
     TreeCuttingArea _treeCuttingArea;
 
     readonly HashSet<Yielder> _yielders = [];
-    List<string> _allowedGoods;
     int _activeYielders;
     bool _yieldersChanged;
     bool _rangeChanged;
@@ -171,7 +174,7 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
 
     void Awake() {
       _buildingTerrainRange = GetComponentFast<BuildingTerrainRange>();
-      _allowedGoods = GetComponentFast<YieldRemovingBuilding>().GetAllowedGoods().ToList();
+      _yieldRemovingBuilding = GetComponentFast<YieldRemovingBuilding>();
       _needsCuttingArea = GetComponentFast<LumberjackFlagWorkplaceBehavior>();
     }
 
@@ -287,7 +290,7 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
       var res = new HashSet<Yielder>();
       for (var i = yielders.Count - 1; i >= 0; i--) {
         var yielder = yielders[i];
-        if (!_allowedGoods.Contains(yielder.Yield.GoodId)) {
+        if (!_yieldRemovingBuilding.IsAllowed(yielder.YielderSpec)) {
           continue;
         }
         res.Add(yielder);
@@ -314,8 +317,12 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
 
     /// <summary>Monitors for the new plants.</summary>
     [OnEvent]
-    public void OnEnteredFinishedStateEvent(EnteredFinishedStateEvent e) {
-      var yielders = GetYieldersFromBlockObject(e.BlockObject);
+    public void OnEntityInitializedEvent(EntityInitializedEvent e) {
+      var blockObject = e.Entity.GetComponentFast<BlockObject>();
+      if (blockObject == null) {
+        return;
+      }
+      var yielders = GetYieldersFromBlockObject(blockObject);
       if (yielders == null) {
         return;
       }
@@ -327,12 +334,16 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
 
     /// <summary>Removes yielders from the deleted objects.</summary>
     [OnEvent]
-    public void OnExitedFinishedStateEvent(ExitedFinishedStateEvent e) {
-      if (!_buildingTerrainRange.GetRange().Contains(e.BlockObject.Coordinates)) {
+    public void OnEntityDeletedEvent(EntityDeletedEvent e) {
+      var blockObject = e.Entity.GetComponentFast<BlockObject>();
+      if (blockObject == null) {
+        return;
+      }
+      if (!_buildingTerrainRange.GetRange().Contains(blockObject.Coordinates)) {
         return;
       }
       var yielders = new List<Yielder>();
-      e.BlockObject.GetComponentsFast(yielders);
+      blockObject.GetComponentsFast(yielders);
       for (var i = yielders.Count - 1; i >= 0; i--) {
         RemoveYielder(yielders[i], isCleanup: true);
       }
