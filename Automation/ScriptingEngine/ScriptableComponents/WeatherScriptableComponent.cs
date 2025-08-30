@@ -133,10 +133,6 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   /// </remarks>
   /// <exception cref="InvalidOperationException">if the weather season can't be recognized.</exception>
   string GetCurrentSeason() {
-    //FIXME
-    DebugEx.Warning("GetCurrentSeason: IsHazardousWeather={0}, weatherId={1}",
-                    _weatherService.IsHazardousWeather, _hazardousWeatherService.CurrentCycleHazardousWeather.Id);
-    
     return _weatherService.IsHazardousWeather
         ? _hazardousWeatherService.CurrentCycleHazardousWeather.Id
         : TemperateWeatherId;
