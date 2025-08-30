@@ -1,6 +1,6 @@
 {
   "ToolSpec": {
-    "Id": "Automation.Tmpl.Planting.RunIf3PlusCollectablesTemperate",
+    "Id": "Automation.Tmpl.Planting.RunIf3PlusCollectables",
     "GroupId": "AutomationPlantingToolGroupId",
     "Type": "IgorZ.Automation.TemplateTools.ApplyTemplateTool",
     "Order": 12,
