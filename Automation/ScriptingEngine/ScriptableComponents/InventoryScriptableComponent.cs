@@ -8,8 +8,8 @@ using System.Collections.Generic;
 using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
+using IgorZ.TimberDev.Utils;
 using Timberborn.BaseComponentSystem;
-using Timberborn.ConstructionSites;
 using Timberborn.Emptying;
 using Timberborn.Goods;
 using Timberborn.InventorySystem;
@@ -238,15 +238,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
 
   /// <summary>Gets the storage inventory from the building. The construction site inventory is ignored.</summary>
   internal static Inventory GetInventory(BaseComponent building, bool throwIfNotFound = true) {
-    var inventories = building.GetComponentFast<Inventories>();
-    if (!inventories) {
-      if (throwIfNotFound) {
-        throw new ScriptError.BadStateError(building, "Inventories component not found");
-      }
-      return null;
-    }
-    var inventory = inventories.AllInventories
-        .FirstOrDefault(x => x.ComponentName != ConstructionSiteInventoryInitializer.InventoryComponentName);
+    var inventory = ComponentsAccessor.GetGoodsInventory(building);
     if (!inventory && throwIfNotFound) {
       throw new ScriptError.BadStateError(building, "Inventory component not found");
     }
