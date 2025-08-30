@@ -43,7 +43,7 @@ public sealed class GoodAmountTransformHeight : BaseComponent, IFinishedStateLis
   /// <inheritdoc/>
   public void OnEnterFinishedState() {
     var manufactory = GetEnabledComponent<Manufactory>();
-    _inventory = manufactory ? manufactory.Inventory : ComponentsAccessor.GetInventory(this);
+    _inventory = manufactory ? manufactory.Inventory : ComponentsAccessor.GetGoodsInventory(this);
     _inventory.InventoryChanged += OnInventoryChanged;
     _maxGoodAmount = _inventory.AllowedGoods.Single(goodAmount => goodAmount.StorableGood.GoodId == _good).Amount;
     UpdateTargetHeight();

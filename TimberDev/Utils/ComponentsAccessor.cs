@@ -17,7 +17,7 @@ public static class ComponentsAccessor {
   /// <remarks>
   /// The building can have more than one inventory. This method finds one that is not used by the construction site.
   /// </remarks>
-  public static Inventory GetInventory(BaseComponent building, bool throwIfNotFound = false) {
+  public static Inventory GetGoodsInventory(BaseComponent building, bool throwIfNotFound = false) {
     var inventories = building.GetComponentFast<Inventories>();
     if (!inventories) {
       if (throwIfNotFound) {
