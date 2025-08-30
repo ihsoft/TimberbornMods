@@ -140,6 +140,7 @@ IgorZ.Automation.Scriptable.Inventory.Action.StartEmptyingStock,"начать о
 IgorZ.Automation.Scriptable.Inventory.Action.StopEmptyingStock,"прекратить освобождать","Name of the action that stops emptying the storage"
 IgorZ.Automation.Scriptable.Inventory.Signal.InputGood,"вход: {0}","Name of the condition for the inventory input goods"
 IgorZ.Automation.Scriptable.Inventory.Signal.OutputGood,"выход: {0}","Name of the condition for the inventory output goods"
+IgorZ.Automation.Scriptable.Plantable.Signal.SpotsReady,"можно посадить","Name of the condition that checks how many planting spots are available"
 IgorZ.Automation.Scriptable.Pausable.Action.Pause,"остановить здание","Name of the action that pauses the building"
 IgorZ.Automation.Scriptable.Pausable.Action.Resume,"запустить здание","Name of the action that unpauses the building"
 IgorZ.Automation.Scriptable.Prioritizable.Action.ResetHaulers,"- приоритет грузчиков","Name of the action that resets the priority to the haulers"

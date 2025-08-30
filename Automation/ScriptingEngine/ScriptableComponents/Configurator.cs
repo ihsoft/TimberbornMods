@@ -25,6 +25,7 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<FlowControlScriptableComponent>().AsSingleton();
     containerDefinition.Bind<InventoryScriptableComponent>().AsSingleton();
     containerDefinition.Bind<PausableScriptableComponent>().AsSingleton();
+    containerDefinition.Bind<PlantableScriptableComponent>().AsSingleton();
     containerDefinition.Bind<PrioritizableScriptableComponent>().AsSingleton();
     containerDefinition.Bind<StreamGaugeScriptableComponent>().AsSingleton();
     containerDefinition.Bind<WorkplaceScriptableComponent>().AsSingleton();

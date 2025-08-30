@@ -141,6 +141,7 @@ IgorZ.Automation.Scriptable.Inventory.Signal.InputGood,"input: {0}","Name of the
 IgorZ.Automation.Scriptable.Inventory.Signal.OutputGood,"output: {0}","Name of the condition for the inventory output goods"
 IgorZ.Automation.Scriptable.Pausable.Action.Pause,"pause building","Name of the action that pauses the building"
 IgorZ.Automation.Scriptable.Pausable.Action.Resume,"resume building","Name of the action that unpauses the building"
+IgorZ.Automation.Scriptable.Plantable.Signal.SpotsReady,"ready to plant","Name of the condition that checks how many planting spots are available"
 IgorZ.Automation.Scriptable.Prioritizable.Action.ResetHaulers,"- prioritize by haulers","Name of the action that resets the priority to the haulers"
 IgorZ.Automation.Scriptable.Prioritizable.Action.SetHaulers,"+ prioritize by haulers","Name of the action that sets the priority to the haulers"
 IgorZ.Automation.Scriptable.Signals.Action.Set,"set signal: {0} = {1}","Name of the action that sets the signal to the specified value"
