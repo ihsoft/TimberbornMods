@@ -116,6 +116,7 @@ IgorZ.Automation.AutomationFragment.RulesAreaCaptionTextLocKey,"Automation rules
 IgorZ.Automation.Tool.CopyRules.Text,"Copy {0} rules",
 IgorZ.Automation.Tool.CopyRules.Title,"Copy automation rules",
 =,=,"Scriptable components strings"
+IgorZ.Automation.Scriptable.Collectable.Signal.CollectableReady,"ready for collection","Name of the condition for the number of cuttable or gatherable items ready to be collected"
 IgorZ.Automation.Scriptable.Constructable.Signal.Progress,"construction progress","Name of the condition for the construction progress checking"
 IgorZ.Automation.Scriptable.Constructable.Signal.State,"construction state","Name of the condition for the construction state checking"
 IgorZ.Automation.Scriptable.Constructable.Signal.State.Finished,"Finished","State name for when the building construction is complete"
@@ -133,7 +134,6 @@ IgorZ.Automation.Scriptable.Floodgate.Action.SetHeight,"set gate height to {0}",
 IgorZ.Automation.Scriptable.Floodgate.Signal.Height,"floodgate height","Name of the condition for the floodgate height checking"
 IgorZ.Automation.Scriptable.FlowControl.Action.Close,"disable flow","Name of the action that closes the water flow through the building"
 IgorZ.Automation.Scriptable.FlowControl.Action.Open,"enable flow","Name of the action that opens the water flow through the building"
-IgorZ.Automation.Scriptable.Collectable.Signal.CollectableReady,"ready for collection","Name of the condition for the number of cuttable or gatherable items ready to be collected"
 IgorZ.Automation.Scriptable.Inventory.Action.EmptyingStatus,"The storage is being emptied on a priority basis.",
 IgorZ.Automation.Scriptable.Inventory.Action.StartEmptyingStock,"start emptying storage","Name of the action that starts emptying the storage"
 IgorZ.Automation.Scriptable.Inventory.Action.StopEmptyingStock,"stop emptying storage","Name of the action that stops emptying the storage"
