@@ -121,7 +121,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   /// <summary>Script code for expression to check.</summary>
   /// <remarks>
   /// It must be a boolean operator. See <see cref="BoolOperator"/> for the list of conditions. Example of a
-  /// condition: "(and (eq (sig Weather.Season) 'drought') (gt Floodgate.Height 0.5))".
+  /// condition: "(and (eq (sig Weather.Season) 'DroughtWeather') (gt Floodgate.Height 0.5))".
   /// </remarks>
   // ReSharper disable once MemberCanBePrivate.Global
   public string Expression { get; private set; } = "";

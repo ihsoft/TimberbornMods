@@ -16,7 +16,7 @@
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
             { "Name": "Precondition", "StrValue": "(?act Floodgate.SetHeight)" },
-            { "Name": "Expression", "StrValue": "(eq (sig Weather.Season) 'drought')" }
+            { "Name": "Expression", "StrValue": "(eq (sig Weather.Season) 'DroughtWeather')" }
           ]
         },
         "Action": {
