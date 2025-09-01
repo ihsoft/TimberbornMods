@@ -19,6 +19,7 @@ sealed class ScriptingService {
 
   /// <summary>Signal callback wrapper.</summary>
   public readonly record struct SignalCallback(string Name, ISignalListener SignalListener) {
+    /// <inheritdoc/>
     public override string ToString() {
       var host = SignalListener is IAutomationCondition
           ? SignalListener.ToString()
