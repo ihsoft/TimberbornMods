@@ -21,7 +21,7 @@ namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
 sealed class PlantableScriptableComponent : ScriptableComponentBase {
 
-  const string SpotReadySignalLocKey = "IgorZ.Automation.Scriptable.Plantable.Signal.SpotReady";
+  const string SpotReadySignalLocKey = "IgorZ.Automation.Scriptable.Plantable.Signal.SpotsReady";
   
   const string SpotReadySignalName = "Plantable.Ready";
 
