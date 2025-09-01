@@ -124,7 +124,6 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
       _eventBus.Register(this);
       _buildingTerrainRange.RangeChanged += BuildingRangeChanged;
       _rangeChanged = true;
-      //FIXME: make it late updateable? but we need to handle the editor case.
       UpdateState();  // Sync-up the initial state.
     }
 
