@@ -8,16 +8,19 @@ using System.Collections.Generic;
 using System.Linq;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
+using IgorZ.Automation.ScriptingEngine.ScriptableComponents.Extensions;
 using IgorZ.TimberDev.UI;
-using Timberborn.BlueprintSystem;
 using Timberborn.HazardousWeatherSystem;
+using Timberborn.Persistence;
 using Timberborn.SingletonSystem;
 using Timberborn.WeatherSystem;
+using Timberborn.WorldPersistence;
 using UnityDev.Utils.LogUtilsLite;
+using UnityEngine;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
-sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadableSingleton {
+sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadableSingleton, ISaveableSingleton, IWeatherExtension {
 
   const string SeasonSignalLocKey = "IgorZ.Automation.Scriptable.Weather.Signal.Season";
   const string TemperateWeatherNameLocKey = "Weather.Temperate";
@@ -26,6 +29,56 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
 
   const string SeasonSignalName = "Weather.Season";
   const string TemperateWeatherId = "TemperateWeather";
+
+  #region IWeatherExtension implementation
+
+  /// <inheritdoc/>
+  public void AddWeatherId(string weatherId, string nameLocKey) {
+    if (!_weatherSeasonIds.Add(weatherId)) {
+      DebugEx.Warning("Skipping duplicate weather spec: id={0}, nameLocKey={1}", weatherId, nameLocKey);
+      return;
+    }
+    DebugEx.Info("Adding weather spec: id={0}, name={1}", weatherId, nameLocKey);
+    _weatherSeasons.Add((weatherId, nameLocKey));
+    ;
+  }
+
+  /// <inheritdoc/>
+  public void AddTemperateWeatherIdProvider(Func<string> getCurrentWeatherIdFunc) {
+    DebugEx.Info("Adding weather ID provider: {0}", getCurrentWeatherIdFunc.GetType().AssemblyQualifiedName);
+    _weatherIdProviders.Add(getCurrentWeatherIdFunc);
+  }
+
+  /// <inheritdoc/>
+  public void TriggerSeasonCheck() {
+    ScheduleSeasonUpdate();
+  }
+
+  #endregion
+
+  #region Persistence implementation
+
+  static readonly SingletonKey WeatherStateRestorerKey = new("WeatherStateRestorer");
+  static readonly PropertyKey<string> CurrentSeasonKey = new("CurrentSeason");
+
+  /// <inheritdoc/>
+  public override void Load() {
+    base.Load();
+    if (_singletonLoader.TryGetSingleton(WeatherStateRestorerKey, out var objectLoader)) {
+      _currentSeason = objectLoader.Get(CurrentSeasonKey);
+    }
+    // FIXME: Saved state added in v2.6.1 on 2025-09-03, drop one day.
+    if (string.IsNullOrEmpty(_currentSeason)) {
+      _currentSeason = GetCurrentSeason();
+    }
+  }
+
+  /// <inheritdoc/>
+  public void Save(ISingletonSaver singletonSaver) {
+    singletonSaver.GetSingleton(WeatherStateRestorerKey).Set(CurrentSeasonKey, _currentSeason);
+  }
+
+  #endregion
 
   #region ScriptableComponentBase implementation
 
@@ -70,10 +123,9 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
 
   #region IPostLoadableSingleton implementation
 
+  /// <inheritdoc/>
   public void PostLoad() {
     _eventBus.Register(this);
-    _currentSeason = GetCurrentSeason();
-    LoadWeatherIds();
   }
 
   #endregion
@@ -85,8 +137,8 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
       DisplayName = Loc.T(SeasonSignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.String,
-          Options = _weatherSeasonOptions,
-          // FIXME: Options changed in v2.5.6 on 2025-06-16, drop one day.
+          Options = GetWeatherSeasonOptions(),
+          // FIXME: Options changed in v2.6.1 on 2025-09-01, drop one day.
           CompatibilityOptions = new Dictionary<string, string> {
               { "temperate", TemperateWeatherId },
               { "badtide", "BadtideWeather" },
@@ -107,88 +159,73 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   readonly EventBus _eventBus;
   readonly WeatherService _weatherService;
   readonly HazardousWeatherService _hazardousWeatherService;
-  readonly ISpecService _specService;
+  readonly ISingletonLoader _singletonLoader;
 
-  static readonly (string Value, string text)[] StandardSeasons = [
+  // Extensible list of weather seasons.
+  readonly List<(string Value, string text)> _weatherSeasons = [
       ("DroughtWeather", DroughtWeatherNameLocKey),
       ("BadtideWeather", BadtideWeatherNameLocKey),
       (TemperateWeatherId, TemperateWeatherNameLocKey),
   ];
+  readonly HashSet<string> _weatherSeasonIds = [
+      TemperateWeatherId, "BadtideWeather", "DroughtWeather",
+  ];
+  // Extensible list of functions to get the current temperate weather ID.
+  readonly List<Func<string>> _weatherIdProviders = [];
 
   string _currentSeason;
   readonly ReferenceManager _referenceManager = new();
-  DropdownItem<string>[] _weatherSeasonOptions;
+  readonly MonoBehaviour _monoBehaviour;
 
   WeatherScriptableComponent(EventBus eventBus, WeatherService weatherService,
-                             HazardousWeatherService hazardousWeatherService, ISpecService specService) {
+                             HazardousWeatherService hazardousWeatherService, ISingletonLoader singletonLoader,
+                             AutomationExtensionsRegistry automationExtensionsRegistry) {
     _eventBus = eventBus;
     _weatherService = weatherService;
     _hazardousWeatherService = hazardousWeatherService;
-    _specService = specService;
+    _singletonLoader = singletonLoader;
+    _monoBehaviour = new GameObject("WeatherScriptableComponent").AddComponent<SeasonUpdateNotifier>();
+    automationExtensionsRegistry.RegisterExtension(nameof(IWeatherExtension),  this);
+  }
+  sealed class SeasonUpdateNotifier : MonoBehaviour;  // Just a MonoBehaviour to run coroutines.
+
+  DropdownItem<string>[] GetWeatherSeasonOptions() {
+    return _weatherSeasons
+        .Select(x => new DropdownItem<string> { Value = x.Value, Text = Loc.T(x.text) })
+        .Reverse()
+        .ToArray();
   }
 
-  /// <summary>Gets the current season based on the weather conditions.</summary>
-  /// <remarks>
-  /// Don't use in hazardous season end events due to the weather service state is not fully updated yet.
-  /// </remarks>
-  /// <exception cref="InvalidOperationException">if the weather season can't be recognized.</exception>
   string GetCurrentSeason() {
-    return _weatherService.IsHazardousWeather
-        ? _hazardousWeatherService.CurrentCycleHazardousWeather.Id
-        : TemperateWeatherId;
+    string seasonId;
+    if (_weatherService.IsHazardousWeather) {
+      seasonId = _hazardousWeatherService.CurrentCycleHazardousWeather.Id;
+    } else {
+      seasonId = _weatherIdProviders.Select(x => x()).FirstOrDefault(x => x != null) ?? TemperateWeatherId;
+    }
+    return seasonId;
   }
 
-
-  /// <summary>Loads the weather IDs from the weather specs.</summary>
-  /// <remarks>
-  /// In case there are modded seasons added by the other mods, they're loaded first. Then, the standard seasons added
-  /// if they're missing in the modded list. The order in which the IDs are loaded will be reflected in the constructor
-  /// UI.
-  /// </remarks>
-  void LoadWeatherIds() {
-    if (_specService is not SpecService specService) {
-      DebugEx.Error("ISpecService expected to be SpecService, but was {0}. Don't load modded seasons.", _specService);
-      _weatherSeasonOptions = StandardSeasons
-          .Select(x => new DropdownItem<string> { Value = x.Value, Text = Loc.T(x.text) })
-          .Reverse()
-          .ToArray();
+  void ScheduleSeasonUpdate() {
+    if (_seasonUpdateCoroutine != null) {
       return;
     }
-    var seasons = new List<DropdownItem<string>>();
-    var specTypes = specService._cachedBlueprints.Keys.Where(q => q.Name.EndsWith("WeatherSpec"));
-    foreach (var specType in specTypes) {
-      var specs = (IEnumerable)typeof(ISpecService).GetMethod(nameof(ISpecService.GetSpecs))!
-          .MakeGenericMethod(specType).Invoke(specService, []);
-      var idProp = specType.GetProperty("Id");
-      var idLocNameProp = specType.GetProperty("NameLocKey");
-      if (idProp == null || idLocNameProp == null) {
-        DebugEx.Warning("Skipping incompatible weather spec {0}: hasId={1}, hasNameLocKey={2}",
-                        specType, idProp != null, idLocNameProp != null);
-        continue;
+    _seasonUpdateCoroutine = _monoBehaviour.StartCoroutine(UpdateSeasonCoroutine());
+  }
+  Coroutine _seasonUpdateCoroutine;
+
+  IEnumerator UpdateSeasonCoroutine() {
+    yield return new WaitForEndOfFrame(); // Wait to let the weather service update its state.
+    var oldSeason = _currentSeason;
+    _currentSeason = GetCurrentSeason();
+    if (oldSeason != _currentSeason) {
+      DebugEx.Info("Weather season changed: {0} -> {1}", oldSeason, _currentSeason);
+      if (!_weatherSeasonIds.Contains(_currentSeason)) {
+        DebugEx.Warning("Unknown weather season ID: {0}. Automation rules won't trigger.", _currentSeason);
       }
-      foreach (var spec in specs) {
-        var seasonId = idProp.GetValue(spec) as string;
-        var seasonNameLocKey = idLocNameProp.GetValue(spec) as string;
-        if (string.IsNullOrWhiteSpace(seasonId) || string.IsNullOrWhiteSpace(seasonNameLocKey)) {
-          DebugEx.Warning("Skipping bad weather spec {0}: id={1}, nameLocKey={2}",
-                          specType, seasonId, seasonNameLocKey);
-          continue;
-        }
-        if (seasons.Any(x => x.Value == seasonId)) {
-          DebugEx.Warning("Skipping duplicate weather spec {0}: id={1}, nameLocKey={2}",
-                          specType, seasonId, seasonNameLocKey);
-          continue;
-        }
-        DebugEx.Info("Loading weather spec {0}: id={1}, name={2}", specType, seasonId, seasonNameLocKey);
-        seasons.Add(new DropdownItem<string> { Value = seasonId, Text = Loc.T(seasonNameLocKey) });
-      }
+      _referenceManager.ScheduleSignal(SeasonSignalName, ScriptingService, ignoreErrors: true);
     }
-    foreach (var stdSeason in StandardSeasons) {
-      if (seasons.All(x => x.Value != stdSeason.Value)) {
-        seasons.Insert(0, new DropdownItem<string> { Value = stdSeason.Value, Text = Loc.T(stdSeason.text) });
-      }
-    }
-    _weatherSeasonOptions = seasons.ToArray();
+    _seasonUpdateCoroutine = null;
   }
 
   #endregion
@@ -196,15 +233,13 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   #region Event listeners
 
   [OnEvent]
-  public void OnHazardousWeatherStartedEvent(HazardousWeatherStartedEvent _) {
-    _currentSeason = GetCurrentSeason();
-    _referenceManager.ScheduleSignal(SeasonSignalName, ScriptingService, ignoreErrors: true);
+  public void OnHazardousWeatherStartedEvent(HazardousWeatherStartedEvent arg) {
+    ScheduleSeasonUpdate();
   }
 
   [OnEvent]
-  public void OnHazardousWeatherEndedEvent(HazardousWeatherEndedEvent _) {
-    _currentSeason = TemperateWeatherId;
-    _referenceManager.ScheduleSignal(SeasonSignalName, ScriptingService, ignoreErrors: true);
+  public void OnHazardousWeatherEndedEvent(HazardousWeatherEndedEvent arg) {
+    ScheduleSeasonUpdate();
   }
 
   #endregion
