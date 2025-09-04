@@ -3,7 +3,7 @@
 * [Feature] Add `Collectable.Ready` signal that tells how many gatherable or cuttable resources are in the range.
 * [Feature] Add `Plantable.Ready` signal that tells how many plantable resources can be planted in the range.
 * [Feature #82] Add templates to pause buildings if they can't gather or cut anything.
-* [Feature] Add ф template to pause buildings if they can't plant trees or crops.
+* [Feature] Add a template to pause buildings if they can't plant trees or crops.
 * [Fix] In "describe mode," show action argument values as real numbers instead of script fixed point values.
 
 # v2.6.0 (June 22nd, 2025):
