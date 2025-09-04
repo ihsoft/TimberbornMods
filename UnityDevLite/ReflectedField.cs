@@ -82,7 +82,6 @@ sealed class ReflectedField<TV> {
   /// </param>
   /// <seealso cref="IsValid"/>
   public ReflectedField(IReflect type, string fieldName, bool throwOnFailure = false) {
-    //MakeFromType(type, fieldName, throwOnFailure);
     _fieldInfo = type.GetField(fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
     if (_fieldInfo == null) {
       if (throwOnFailure) {
