@@ -117,7 +117,6 @@
         <Link>UnityDevLite\HostedDebugLog.cs</Link>
       </Compile>
     </ItemGroup>
-    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <PropertyGroup>
         <ModPath>u:\Mods</ModPath>
     </PropertyGroup>

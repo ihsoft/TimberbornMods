@@ -212,7 +212,6 @@
       <Compile Remove="Conditions\ObjectFinishedCondition.cs" />
       <Compile Remove="Actions\DetonateDynamiteAction.cs" />
     </ItemGroup>
-    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <PropertyGroup>
         <ModPath>u:\Mods</ModPath>
     </PropertyGroup>

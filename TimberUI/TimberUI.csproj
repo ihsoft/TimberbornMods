@@ -44,7 +44,6 @@
       <Reference Include="ModSettings.CoreUI">
         <HintPath>..\Dependencies\Workshop\3283831040\version-0.6\Scripts\ModSettings.CoreUI.dll</HintPath>
       </Reference>
-      <Reference Include="System" />
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />
@@ -97,7 +96,6 @@
         <Link>Mod\manifest.json</Link>
       </Content>
     </ItemGroup>
-    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <PropertyGroup>
         <ModPath>u:\Mods</ModPath>
     </PropertyGroup>
