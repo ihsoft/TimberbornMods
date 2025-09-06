@@ -7,6 +7,7 @@
 * [Feature] Implemented extensions support to allow other mods to modify rules options.
 * [Change] `ModdedWeather` mod support moved into a separate extension mod: `Automation+ModdedWeather`.
 * [Fix] In "describe mode," show action argument values as real numbers instead of script fixed point values.
+* [Fix] Don't change the floodgate height if it is already at the desired level. It may trigger "water deletion" without any useful effect.
 
 # v2.6.0 (June 22nd, 2025):
 * [Change] Make input field in script editor multi-line.

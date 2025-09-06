@@ -123,7 +123,10 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
   static void SetHeightAction(Floodgate floodgate, ScriptValue[] args) {
     AssertActionArgsCount(SetHeightActionName, args, 1);
-    floodgate.SetHeight(args[0].AsFloat);
+    var currentHeight = ScriptValue.FromFloat(floodgate.Height);
+    if (args[0] != currentHeight) {
+      floodgate.SetHeight(args[0].AsFloat);
+    }
   }
 
   #endregion
