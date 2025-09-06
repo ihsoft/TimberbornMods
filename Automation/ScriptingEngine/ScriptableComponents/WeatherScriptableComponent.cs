@@ -67,10 +67,6 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
     if (_singletonLoader.TryGetSingleton(WeatherStateRestorerKey, out var objectLoader)) {
       _currentSeason = objectLoader.Get(CurrentSeasonKey);
     }
-    // FIXME: Saved state added in v2.6.1 on 2025-09-03, drop one day.
-    if (string.IsNullOrEmpty(_currentSeason)) {
-      _currentSeason = GetCurrentSeason();
-    }
   }
 
   /// <inheritdoc/>
@@ -126,6 +122,10 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   /// <inheritdoc/>
   public void PostLoad() {
     _eventBus.Register(this);
+    // FIXME: Saved state added in v2.6.1 on 2025-09-03, drop one day.
+    if (string.IsNullOrEmpty(_currentSeason)) {
+      _currentSeason = GetCurrentSeason();
+    }
   }
 
   #endregion
