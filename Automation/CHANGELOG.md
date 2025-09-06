@@ -1,4 +1,4 @@
-# v2.6.1 (pre-release):
+# v2.7.0 (September 5th, 2025):
 * [Feature] Add debug signals for district stock tracking: `Debug.DistrictStockTracker.<GoodId>`.
 * [Feature] Add `Collectable.Ready` signal that tells how many gatherable or cuttable resources are in the range.
 * [Feature] Add `Plantable.Ready` signal that tells how many plantable resources can be planted in the range.
