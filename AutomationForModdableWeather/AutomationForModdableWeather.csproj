@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+        <ProjectGuid>{C62CC214-5F74-4B88-86DD-DDA718AB5094}</ProjectGuid>
+        <OutputType>Library</OutputType>
+        <RootNamespace>IgorZ.AutomationForModdableWeather</RootNamespace>
+        <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <LangVersion>12</LangVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <OutputPath>bin\Debug\</OutputPath>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugType>pdbonly</DebugType>
+        <Optimize>true</Optimize>
+        <OutputPath>bin\Release\</OutputPath>
+        <DefineConstants>TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+        <DebugSymbols>true</DebugSymbols>
+        <DocumentationFile>bin\Release\Automation.xml</DocumentationFile>
+ <PublicizeAll>true</PublicizeAll>
+    </PropertyGroup>
+    <PropertyGroup>
+        <ModPath>u:\Mods</ModPath>
+    </PropertyGroup>
+    <ItemGroup>
+      <Reference Include="ModdableWeather">
+        <HintPath>..\Dependencies\Workshop\3493039008\version-0.7\ModdableWeather.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all" />
+      <PackageReference Include="IndexRange" Version="1.0.3" />
+      <PackageReference Include="protobuf-net" Version="3.0.0" />
+      <PackageReference Include="System.Collections.Immutable" Version="9.0.0" />
+      <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Timberborn.*.dll" Publicize="false" />
+      <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Unity*.dll" Publicize="false"/>
+      <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Bindito.*.dll" Publicize="false"/>
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\Automation\Automation.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Include="..\UnityDevLite\DebugEx.cs">
+        <Link>UnityDevLite\DebugEx.cs</Link>
+      </Compile>
+    </ItemGroup>
+    <Target Name="AfterBuild" Condition="Exists('$(ModPath)')">
+        <Message Text="### Copying files to the game's mods folder... ###" Importance="high"/>
+        <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\version-0.7"/>
+        <Copy SourceFiles="$(MSBuildProjectDirectory)\manifest.json" DestinationFolder="$(ModPath)\$(ProjectName)\version-0.7"/>
+    </Target>
+    <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+      <PropertyGroup>
+        <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
+      </PropertyGroup>
+    </Target>
+</Project>
