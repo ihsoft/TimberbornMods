@@ -8,7 +8,6 @@ If you feel like you can learn the scripting language, you can do so. The script
 [img]https://raw.githubusercontent.com/ihsoft/TimberbornMods/main/Assets/ruRU-banner.png[/img] Русский
 
 [h1]Rules editor dialog[/h1]
-
 Rules can be created and edited via the [i]Rules editor dialog[/i]. The dialog is opened by clicking on the related button in the building's entity UI.
 
 [img]https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/main/Automation/workshop/Slideshow/RulesEditorDemo.png[/img]
@@ -67,12 +66,19 @@ The planting template creates rules that trigger based on if there are empty soi
 [img]https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/main/Automation/workshop/Slideshow/PlantingAndCollectionMenuDemo.jpg[/img]
 
 [h2]Signals templates[/h2]
-
 This group is for the advanced players. When you need to make a rule based on a stat value of another building, the very first thing you need to do is to create a [i]custom signal[/i]. This signal can be used in the conditions of other buildings.
 
 The floodgate group template demonstrates how the custom signals system can be used to synchronize the behavior on the similar buildings.
 
 [img]https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/main/Automation/workshop/Slideshow/SignalsMenuDemo.jpg[/img]
+
+[h1]Other mods support[/h1]
+Mods that significantly alter gameplay may affect Automation behavior. You can suggest mods for support in Discord or the Discussions threads — they might be added in the future.
+
+Here’s the full list of what is supported as of now:
+[list] 
+[*] [url=https://steamcommunity.com/workshop/filedetails/?id=3493039008]ModdedWeather[/url]. You need to install [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3562952077]Automation+ModdableWeather[/url] mod.
+[/list]
 
 [h1]Questions and discussions[/h1]
 Note that Steam has a special tab called "Discussions." It is a better place to ask questions or discuss features than doing so in the comments. I will do my best to answer all questions there, so don't hesitate to ask.
