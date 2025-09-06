@@ -59,6 +59,13 @@ Templates to create rules that trigger based on the current beaver or bot popula
 
 [img]https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/main/Automation/workshop/Slideshow/PopulationMenuDemo.jpg[/img]
 
+[h2]Gathering and planting templates[/h2]
+The gathering templates create rules that trigger based on the current number of plants available for gathering. The buildings will pause if there are no plants left and resume if there are some plants available. It is a good way to control the gathering buildings.
+
+The planting template creates rules that trigger based on if there are empty soil blocks available for planting. The buildings will pause if there is no soil left and resume if there are some empty soil blocks available. It is a good way to control the planting buildings.
+
+[img]https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/main/Automation/workshop/Slideshow/PlantingAndCollectionMenuDemo.jpg[/img]
+
 [h2]Signals templates[/h2]
 
 This group is for the advanced players. When you need to make a rule based on a stat value of another building, the very first thing you need to do is to create a [i]custom signal[/i]. This signal can be used in the conditions of other buildings.
