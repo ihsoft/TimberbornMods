@@ -16,7 +16,7 @@
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
             { "Name": "Precondition", "StrValue": "(and (?sig Plantable.Ready) (?act Pausable.Unpause))" },
-            { "Name": "Expression", "StrValue": "(ge (sig Plantable.Ready) 0)" }
+            { "Name": "Expression", "StrValue": "(gt (sig Plantable.Ready) 0)" }
           ]
         },
         "Action": {
