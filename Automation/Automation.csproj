@@ -216,8 +216,9 @@
         <ModPath>u:\Mods</ModPath>
     </PropertyGroup>
     <Target Name="AfterBuild" Condition="Exists('$(ModPath)')">
-        <Message Text="### Copying DLL to the game's mods folder... ###" Importance="high"/>
+        <Message Text="### Copying DLL and Docs to the game's mods folder... ###" Importance="high"/>
         <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\version-0.7.9\Scripts"/>
+        <Copy SourceFiles="$(TargetDir)$(TargetName).xml" DestinationFolder="$(ModPath)\$(ProjectName)\version-0.7.9\Scripts"/>
     </Target>
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
       <PropertyGroup>
