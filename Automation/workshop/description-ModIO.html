@@ -1,34 +1,49 @@
 ﻿<h2>Overview</h2>
-<p>This mod allows assigning a set of rules to a building. The rules execute logic "If This Then That" (a.k.a. IFTTT). Each rule has a condition to check and an action to execute if the condition evaluates to "true." The automation engine allows creating any combination of conditions and actions. The system can easily be extended with extra conditions and actions by the players since it is controlled via JSON files located in the mods folder.</p>
-<h2>UI concept</h2>
-<p>To keep the UI simple, a set of selection tools is implemented that applies a set of rules (or "a template") to the selected objects. The templates are made for the most common cases, but they may not fit all the player's needs. Players can adjust and create new templates as they need by changing files in the "Specification" folder. If you have questions on how to do it, join the Timberborn Discord and drop a message in the pinned mod channel (see the link below).</p>
-<h2>Tool groups</h2>
-<p>All templates are grouped by their purpose. The root menu has an icon for each group.</p>
-<p><img src="https://image.modcdn.io/members/604b/23201987/profile/mainmenudemo.png" alt="" width="411" height="64" /></p>
+<p>This mod allows assigning a set of rules to a building. The rules execute logic "If This Then That" (a.k.a. IFTTT). Each rule has a condition to check and an action to execute if the condition evaluates to "true." The rules are written with a simple scripting language. However, it is not required to learn this language to make simple rules, since for this purpose a UI is provided. The UI is designed to be simple and intuitive, so you can easily create rules without writing any code.<br><br>If you feel like you can learn the scripting language, you can do so. The scripting language is simple and easy to learn. Read about it&nbsp;<a class="bb_link" href="https://github.com/ihsoft/TimberbornMods/wiki/Automation-(scripting)" target="_blank" rel="noopener noreferrer">here</a>.</p>
+<h2>Supported languages</h2>
+<p><img src="https://raw.githubusercontent.com/ihsoft/TimberbornMods/main/Assets/enUS-banner.png" alt="enUS-banner.png">&nbsp;English<br><img src="https://raw.githubusercontent.com/ihsoft/TimberbornMods/main/Assets/ruRU-banner.png" alt="ruRU-banner.png">&nbsp;Русский</p>
+<h2>Rules editor dialog</h2>
+<p>Rules can be created and edited via the <em>Rules editor dialog</em>. The dialog is opened by clicking on the related button in the building's entity UI.<br><br><img src="https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/main/Automation/workshop/Slideshow/RulesEditorDemo.png" alt="RulesEditorDemo.png"></p>
+<h2>Templates tools</h2>
+<p>For the simple and frequently used cases, a set of&nbsp;<em>templates</em>&nbsp;is provided. You can select a set of buildings and apply a template to them. The template will automatically create the rules needed to achieve the desired behavior. The created rules can be modified via the editor dialog later if needed.<br><br>All templates are grouped by their purpose. The root menu has an icon for each group.</p>
+<p><img src="https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/main/Automation/workshop/Slideshow/MainMenuDemo.jpg" alt="MainMenuDemo.jpg"></p>
 <p>There are also special actions available, not related to the rules:</p>
 <ul>
-    <li>Pause/resume tool. Use it to quickly change the state of a set of buildings.</li>
-    <li><strong>[Dev mode only]</strong> Immediate completion of the selected buildings. Select buildings to complete, and they all will instantly finish.</li>
-    <li><strong>[Dev mode only]</strong>&nbsp;Inspects components and navmeshes on the buildings. Useful for those who make mods.</li>
+    <li><em>Pause/resume tool</em>. Use it to quickly change the state of a set of buildings.</li>
+    <li><em>Chained construction tool</em>. Apply this rule to the unfinished buildings. This rule will&nbsp;<em>try</em>&nbsp;to order the constructions so that the builders aren't getting blocked while working. It is&nbsp;<strong>not guaranteed</strong>&nbsp;that the builders will not get blocked, but it is a good way to reduce the number of blocks.</li>
+    <li><em>Pause when almost ready</em>. This tool applies rules that stop the construction at the last moment. Just in case you need to have control of it!</li>
+    <li><strong>[Dev mode only]</strong>&nbsp;<em>Immediate completion of the selected buildings</em>. Select buildings to complete, and they all will instantly finish.</li>
+    <li><strong>[Dev mode only]</strong>&nbsp;<em>Inspects components and navmeshes on the buildings</em>. Useful for those who make mods.</li>
 </ul>
 <p><em>* Press Shift+Alt+Z to activate dev mode</em></p>
 <h2>Dynamite templates</h2>
-<p>Templates to create rules that automatically detonate a dynamite and place a new one and the same place. This action is repeated multiple times. It can be handy when doing massive terraform. Be careful not to kill your workers! Once one dynamite is activated, the whole field will explode. The safest usage is to dig holes below the surface (for example, from the bridges or at the cliff).</p>
-<p><img src="https://image.modcdn.io/members/604b/23201987/profile/terrainmenudemo.png" alt="" width="409" height="124" /></p>
+<p>Templates to create rules that automatically detonate a dynamite and place a new one at the same place. This action is repeated multiple times. It can be handy when doing massive terraform. Be careful not to kill your workers! Once one dynamite is activated, the whole field will explode. The safest usage is to dig holes below the surface (for example, from the bridges or at the cliff).<br><br><img src="https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/main/Automation/workshop/Slideshow/TerrainMenuDemo.jpg" alt="TerrainMenuDemo.jpg"></p>
 <h2>Water templates</h2>
 <p>Templates to create rules that trigger on the weather season change:</p>
 <ul>
     <li>Pause/resume a building on the season change.</li>
-    <li>Close/open floodgates based on the current season.Open/close the water regulator during the drought season.</li>
+    <li>Close/open floodgates based on the current season.</li>
+    <li>Open/close the water control buildings during the drought season.</li>
 </ul>
-<p><img src="https://image.modcdn.io/members/604b/23201987/profile/watermenudemo.png" alt="" width="584" height="125" /></p>
+<p><img src="https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/main/Automation/workshop/Slideshow/WaterMenuDemo.jpg" alt="WaterMenuDemo.jpg"></p>
 <h2>Storage templates</h2>
-<p>Templates to create rules that trigger based on the building's storage capacity. If there is too much product in the inventory, then the building is turned into the "emptying mode." In this mode, all the available workers, including the ones from the idle buildings, will rush to help move the goods out of the building to the appropriate storage with spare capacity. This rule can only be used on a few buildings, like pumps. This is how the building's efficiency can be raised up to 100%, as the worker doesn't need to spend time on delivering the goods!</p>
-<p><img src="https://image.modcdn.io/members/604b/23201987/profile/storagemenudemo.png" alt="" width="414" height="122" /></p>
+<p>Templates to create rules that trigger based on the building's storage.</p>
+<ul>
+    <li>Start emptying the building when there is too much product in the inventory. In this mode, all the available workers, including the ones from the idle buildings, will rush to help move the goods out of the building to the appropriate storage with spare capacity.</li>
+    <li>Prioritize building to haulers when the building construction completes. The game doesn't allow setting it via UI, but with automation you can do it.</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/main/Automation/workshop/Slideshow/StorageMenuDemo.jpg" alt="StorageMenuDemo.jpg"></p>
 <h2>Population templates</h2>
-<p>Templates to create rules that trigger based on the current beaver or bot population size. The buildings will pause if the population is too high and resume if it's too low. It's a good way to control the bot population. Also, it will work well for the Ironteeth faction to control the beaver population.</p>
-<p><img src="https://image.modcdn.io/members/604b/23201987/profile/populationmenudemo.png" alt="" width="524" height="123" /></p>
-<h2>Chained construction tool</h2>
-<p>This tool applies a special rule to a set of unfinished buildings to <em>try</em> building them so that the workers don't get blocked. Normally, the builders in the game don't care if what they build right now blocks access to the other construction site. With this tool, most cases can be resolved as the rules will temporarily pause those buildings that would block access if completed. Keep in mind that this is only an helping tool. It won't work in all cases, so try to keep the construction sites simple.</p>
-<hr />
-<p>Discord: <a href="https://discord.com/channels/558398674389172225/1190169064383991858">https://discord.com/channels/558398674389172225/1190169064383991858</a><br />See more details in the Wiki: <a href="https://github.com/ihsoft/TimberbornMods/wiki/Automation">https://github.com/ihsoft/TimberbornMods/wiki/Automation</a><br />Report a bug: <a href="https://github.com/ihsoft/TimberbornMods/labels/automation">https://github.com/ihsoft/TimberbornMods/labels/automation</a><br />GitHub repository: <a href="https://github.com/ihsoft/TimberbornMods">https://github.com/ihsoft/TimberbornMods</a></p>
+<p>Templates to create rules that trigger based on the current beaver or bot population size. The buildings will pause if the population is too high and resume if it is too low. It is a good way to control the bot population. Also, it will work well for the Ironteeth faction to control the beaver population.<br><br><img src="https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/main/Automation/workshop/Slideshow/PopulationMenuDemo.jpg" alt="PopulationMenuDemo.jpg"></p>
+<h2>Signals templates</h2>
+<p>This group is for the advanced players. When you need to make a rule based on a stat value of another building, the very first thing you need to do is to create a <em>custom signal</em>. This signal can be used in the conditions of other buildings.<br><br>The floodgate group template demonstrates how the custom signals system can be used to synchronize the behavior on the similar buildings.</p>
+<p><img src="https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/main/Automation/workshop/Slideshow/SignalsMenuDemo.jpg" alt="SignalsMenuDemo.jpg"></p>
+<h2>Questions and discussions</h2>
+<p>Note that Steam has a special tab called "Discussions." It is a better place to ask questions or discuss features than doing so in the comments. I will do my best to answer all questions there, so don't hesitate to ask.</p>
+<hr>
+<p>Discord:</p>
+<ul>
+    <li>If you haven't joined the Timberborn server yet, here is the invite link:&nbsp;<a class="bb_link" href="https://discord.gg/6s8DyANATM" target="_blank" rel="noopener noreferrer">https://discord.gg/6s8DyANATM</a></li>
+    <li>If you have already joined, this is the link to the channel: <a class="bb_link" href="https://discord.com/channels/558398674389172225/1190169064383991858" target="_blank" rel="noopener noreferrer">https://discord.com/channels/558398674389172225/1190169064383991858</a></li>
+</ul>
+<p>See more details in the Wiki:&nbsp;<a class="bb_link" href="https://github.com/ihsoft/TimberbornMods/wiki/Automation" target="_blank" rel="noopener noreferrer">https://github.com/ihsoft/TimberbornMods/wiki/Automation</a><br>Report a bug:&nbsp;<a href="https://github.com/ihsoft/TimberbornMods/labels/automation">https://github.com/ihsoft/TimberbornMods/labels/automation</a><br>GitHub repository:&nbsp;<a href="https://github.com/ihsoft/TimberbornMods">https://github.com/ihsoft/TimberbornMods</a></p>

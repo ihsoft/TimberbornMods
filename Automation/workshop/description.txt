@@ -71,7 +71,11 @@ The floodgate group template demonstrates how the custom signals system can be u
 Note that Steam has a special tab called "Discussions." It is a better place to ask questions or discuss features than doing so in the comments. I will do my best to answer all questions there, so don't hesitate to ask.
 
 [hr][/hr]
-Discord: https://discord.com/channels/558398674389172225/1190169064383991858
+Discord:
+[list]
+[*] If you haven't joined the Timberborn server yet, here is the invite link: https://discord.gg/6s8DyANATM
+[*] If you have already joined, this is the link to the channel: https://discord.com/channels/558398674389172225/1190169064383991858
+[/list]
 See more details in the Wiki: https://github.com/ihsoft/TimberbornMods/wiki/Automation
 Report a bug: https://github.com/ihsoft/TimberbornMods/labels/automation
 GitHub repository: https://github.com/ihsoft/TimberbornMods
