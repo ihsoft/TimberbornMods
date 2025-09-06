@@ -1,0 +1,2 @@
+[h2]Unlock new weather seasons in your automation scripts![/h2]
+This mod integrates the Moddable Weather mod with the Automation mod. The expanded set of weather seasons becomes available for use in automation scripts.
