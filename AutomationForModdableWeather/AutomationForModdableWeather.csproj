@@ -57,7 +57,7 @@
         <Link>UnityDevLite\DebugEx.cs</Link>
       </Compile>
     </ItemGroup>
-    <Target Name="AfterBuild" Condition="Exists('$(ModPath)')">
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="Exists('$(ModPath)')">
         <Message Text="### Copying files to the game's mods folder... ###" Importance="high"/>
         <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\version-0.7"/>
         <Copy SourceFiles="$(MSBuildProjectDirectory)\manifest.json" DestinationFolder="$(ModPath)\$(ProjectName)\version-0.7"/>

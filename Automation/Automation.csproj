@@ -215,7 +215,7 @@
     <PropertyGroup>
         <ModPath>u:\Mods</ModPath>
     </PropertyGroup>
-    <Target Name="AfterBuild" Condition="Exists('$(ModPath)')">
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="Exists('$(ModPath)')">
         <Message Text="### Copying DLL and Docs to the game's mods folder... ###" Importance="high"/>
         <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\version-0.7.9\Scripts"/>
         <Copy SourceFiles="$(TargetDir)$(TargetName).xml" DestinationFolder="$(ModPath)\$(ProjectName)\version-0.7.9\Scripts"/>
