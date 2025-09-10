@@ -12,8 +12,8 @@ using UnityEngine;
 
 namespace IgorZ.TimberCommons.WaterService;
 
-[HarmonyPatch(typeof(SoilMoistureMap), nameof(SoilMoistureMap.UpdateDesertIntensity))]
-static class SoilMoistureMapPatch {
+[HarmonyPatch(typeof(SoilMoistureService), nameof(SoilMoistureService.UpdateDesertIntensity))]
+static class SoilMoistureServicePatch {
   static void Prefix(Vector3Int coordinates, ref float moistureLevel, bool __runOriginal) {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!

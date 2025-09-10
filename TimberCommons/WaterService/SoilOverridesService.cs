@@ -273,19 +273,22 @@ public class SoilOverridesService : ILoadableSingleton, ITickableSingleton, IPos
 
   readonly MapIndexService _mapIndexService;
   readonly SoilBarrierMap _soilBarrierMap;
-  readonly SoilMoistureMap _soilMoistureMap;
+  readonly SoilMoistureService _soilMoistureService;
   readonly BlockService _blockService;
   readonly EventBus _eventBus;
   readonly IThreadSafeColumnTerrainMap _columnTerrainMap;
 
   SoilOverridesService(MapIndexService mapIndexService, SoilBarrierMap soilBarrierMap,
-                                   BlockService blockService, EventBus eventBus, SoilMoistureMap soilMoistureMap,
-                                   IThreadSafeColumnTerrainMap columnTerrainMap) {
+                       BlockService blockService, EventBus eventBus, ISoilMoistureService soilMoistureService,
+                       IThreadSafeColumnTerrainMap columnTerrainMap) {
     _mapIndexService = mapIndexService;
     _soilBarrierMap = soilBarrierMap;
     _blockService = blockService;
     _eventBus = eventBus;
-    _soilMoistureMap = soilMoistureMap;
+    if (soilMoistureService is not SoilMoistureService soilMoistureServiceConcrete) {
+      throw new Exception("Unexpected ISoilMoistureService implementation: " + soilMoistureService.GetType());
+    }
+    _soilMoistureService = soilMoistureServiceConcrete;
     _columnTerrainMap = columnTerrainMap;
 
     MoistureLevelOverrides = new Dictionary<int, float>();
@@ -336,7 +339,7 @@ public class SoilOverridesService : ILoadableSingleton, ITickableSingleton, IPos
       if (!_columnTerrainMap.TryGetIndexAtCeiling(index2D, coordinates.z, out var index3D)) {
         throw new Exception("Invalid tile coordinates in override: " + coordinates);  // Unexpected!
       }
-      _soilMoistureMap.UpdateDesertIntensity(coordinates, _soilMoistureMap.SoilMoisture(index3D));
+      _soilMoistureService.UpdateDesertIntensity(coordinates, _soilMoistureService.SoilMoisture(index3D));
     }
   }
   bool _needMoistureOverridesUpdate;

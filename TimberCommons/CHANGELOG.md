@@ -1,3 +1,6 @@
+# v1.13.0 (preview started: September 9th, 2025)
+* [Change] Update to support game version `v0.7.10.9`. It is incompatible with the previous game versions.
+
 # v1.12.2 (July 16th, 2025)
 * [Fix #117] Crash when irrigation tower is flooded.
 
