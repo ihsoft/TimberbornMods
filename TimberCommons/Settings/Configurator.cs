@@ -12,10 +12,10 @@ sealed class Configurator : IConfigurator {
   internal static string ModId => "Timberborn.IgorZ.TimberCommons";
 
   public void Configure(IContainerDefinition containerDefinition) {
+    containerDefinition.Bind<TimberCommonsDebugSettings>().AsSingleton();
     containerDefinition.Bind<TimeAndDurationSettings>().AsSingleton();
     containerDefinition.Bind<IrrigationSystemSettings>().AsSingleton();
     containerDefinition.Bind<WaterBuildingsSettings>().AsSingleton();
     containerDefinition.Bind<InjuryProbabilitySettings>().AsSingleton();
-    containerDefinition.Bind<DebugSettings>().AsSingleton();
   }
 }

@@ -24,6 +24,8 @@ IgorZ.TimberCommons.Settings.InjuryProbabilitySection,"Вероятность р
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,"Показывать вероятность получения травмы на панели справа",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,"Отображать индикатор на аватаре строения",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHintTooltip,"Наведите курсор на индикатор, чтобы увидеть вероятность получения травмы",
-IgorZ.TimberCommons.Settings.DebugSection,"Отладка и устранение неполадок",
-IgorZ.TimberCommons.Settings.Debug.VerboseLogging,"Детальные журналы",
-IgorZ.TimberCommons.Settings.Debug.VerboseLoggingTooltip,"В журналы игры будет записываться больше полезной информации, но это может повлиять на производительность игры."
+=,=,"TimberDev_Utils"
+TimberDev_Utils.Settings.Debug.VerboseLogging,"Детальные журналы",
+TimberDev_Utils.Settings.Debug.VerboseLoggingTooltip,"В журналы игры будет записываться больше полезной информации,
+но это может повлиять на производительность игры."
+TimberDev_Utils.Settings.DebugSection,"Отладка и устранение неполадок",

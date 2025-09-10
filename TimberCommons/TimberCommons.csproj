@@ -74,6 +74,12 @@
       </Content>
     </ItemGroup>
     <ItemGroup>
+      <Compile Include="..\TimberDev\Settings\BaseSettings.cs">
+        <Link>TimberDev\Settings\BaseSettings.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Settings\DebugSettings.cs">
+        <Link>TimberDev\Settings\DebugSettings.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\UI\CommonFormats.cs">
         <Link>TimberDev\UI\CommonFormats.cs</Link>
       </Compile>
