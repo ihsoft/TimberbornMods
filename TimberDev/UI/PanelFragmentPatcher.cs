@@ -29,12 +29,12 @@ public sealed class PanelFragmentPatcher {
   /// The stock fragment name to attach the element to. For example <see cref="MechanicalNodeFragmentName"/>.
   /// </param>
   /// <param name="afterElementName">
-  /// The optional name of the stock element to add the custom element after. If set to empty string, then the custom
-  /// element will be inserted at the top, before any other stock elements.
+  /// The name of the stock element to add the custom element after. If the specified element is not found, then the
+  /// custom element will be added to the fragment panel root at the bottom children list.
   /// </param>
   /// <param name="offset">Offset, relative to the <paramref name="afterElementName"/>.</param>
   public PanelFragmentPatcher(VisualElement element, VisualElement fragmentPanelRoot, string fragmentName,
-                              string afterElementName = null, int offset = 0) {
+                              string afterElementName, int offset = 0) {
     _element = element;
     _fragmentPanelRoot = fragmentPanelRoot;
     _fragmentName = fragmentName;
@@ -54,22 +54,24 @@ public sealed class PanelFragmentPatcher {
       ReportUiPatchingError($"Cannot find {_fragmentName} fragment in root");
       return;
     }
-    if (_afterElementName == "") {
-      fragment.Insert(0, _element);
-    } else if (_afterElementName == null) {
+    var afterElement = fragment.Q(_afterElementName);
+    if (afterElement == null) {
+      ReportUiPatchingError($"Cannot find {_afterElementName} element in {_fragmentName} fragment");
       fragment.Add(_element);
-    } else {
-      var afterElement = fragment.IndexOf(fragment.Q<VisualElement>(_afterElementName));
-      if (afterElement == -1) {
-        ReportUiPatchingError($"Cannot find {_afterElementName} element in {_fragmentName} fragment");
-        afterElement = fragment.childCount;
-      }
-      fragment.Insert(afterElement + 1 + _offset, _element);
+      return;
     }
-    DebugEx.Fine("Patched the UI fragment '{0}' with {1} after '{2}'", _fragmentName, _element, _afterElementName);
+    var container = afterElement.parent;
+    var pos = container.IndexOf(afterElement) + 1 + _offset;
+    if (pos > container.childCount) {
+      ReportUiPatchingError($"Cannot add after {_afterElementName}+{_offset}: {pos} > {container.childCount}");
+      pos -= _offset;
+    }
+    container.Insert(pos, _element);
+    DebugEx.Fine("Patched UI fragment '{0}' with {1} after '{2}'+{3}",
+                 _fragmentName, _element.GetType().Name, _afterElementName, _offset);
   }
 
   static void ReportUiPatchingError(string context) {
-    DebugEx.Error("Cannot patch the stock UI! Report this error to the mod owner. Context:\n{1}", context);
+    DebugEx.Error("Cannot patch the stock UI! Report this error to the mod owner. Context:\n{0}", context);
   }
 }
