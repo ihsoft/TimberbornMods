@@ -1,3 +1,6 @@
+# v1.13.4 (September 17th, 2025)
+* Added compatibility with the `TImprove 4 UX` mod.
+
 # v1.13.3 (10 Apr 2025)
 * Update to support game version `0.7.3.1`.
 
