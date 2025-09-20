@@ -1,3 +1,6 @@
+# v1.13.1 (September 19th, 2025 - pre-release)
+* [Fix] In rare cases the game load may crash when irrigation towers are present.
+
 # v1.13.0 (September 9th, 2025)
 * [Change] Update to support game version `v0.7.10.9`. It is incompatible with the previous game versions.
 

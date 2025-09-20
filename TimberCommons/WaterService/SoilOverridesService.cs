@@ -85,11 +85,10 @@ public class SoilOverridesService : ILoadableSingleton, ITickableSingleton, IPos
   /// <param name="overrideId">The ID of the override to remove.</param>
   /// <seealso cref="AddMoistureOverride"/>
   public void RemoveMoistureOverride(int overrideId) {
-    if (!_moistureLevelOverrides.TryGetValue(overrideId, out var moistureOverrides)) {
+    if (!_moistureLevelOverrides.Remove(overrideId, out var moistureOverrides)) {
       DebugEx.Warning("Trying to remove unknown moisture override ID: {0}", overrideId);
       return;
     }
-    _moistureLevelOverrides.Remove(overrideId);
     _needMoistureOverridesUpdate = true;
     DebugEx.Fine("Removed moisture override: id={0}, tiles={1}", overrideId, moistureOverrides.Count);
   }
@@ -124,11 +123,10 @@ public class SoilOverridesService : ILoadableSingleton, ITickableSingleton, IPos
   /// <param name="overrideId">The ID of the override to remove.</param>
   /// <seealso cref="AddContaminationOverride"/>
   public void RemoveContaminationOverride(int overrideId) {
-    if (!_contaminationOverrides.TryGetValue(overrideId, out var barriers)) {
+    if (!_contaminationOverrides.Remove(overrideId, out var barriers)) {
       DebugEx.Warning("Trying to remove unknown contamination override ID: {0}", overrideId);
       return;
     }
-    _contaminationOverrides.Remove(overrideId);
     _needContaminationOverridesUpdate = true;
     DebugEx.Fine("Removed contamination override: id={0}, tiles={1}", overrideId, barriers.Count);
   }
@@ -195,6 +193,11 @@ public class SoilOverridesService : ILoadableSingleton, ITickableSingleton, IPos
     // Recreate the moisture overrides.
     foreach (var moistureOverride in protoState.MoistureOverrides) {
       var index = moistureOverride.OverrideId;
+      if (moistureOverride.OverridesList == null || moistureOverride.OverridesList.Count == 0) {
+        // This should not normally happen, but there were reports of it happening in the wild.
+        DebugEx.Error("Skipping empty overrides list: id={0}", index);
+        continue;
+      }
       _moistureLevelOverrides.Add(index, moistureOverride.OverridesList);
       _loadedMoistureOverrideIndexes.Add(index);
     }
