@@ -51,7 +51,7 @@ public sealed class GrowthRateModifier : BaseComponent {
   #region API methods
 
   /// <summary>Records the owner's request for the growth modification.</summary>
-  /// <remarks>The final rate applied may be different if there are more than one owners registered.</remarks>
+  /// <remarks>The final rate applied may be different if there are more than one owner registered.</remarks>
   /// <param name="ownerId">A unique ID of the caller that applies the modifier.</param>
   /// <param name="modifier">
   /// The rate modifer as a positive or negative value in percents. E.g. <c>15.5</c> (+15.5%) or <c>-8.5</c> (-8.5%).
@@ -64,8 +64,6 @@ public sealed class GrowthRateModifier : BaseComponent {
       _registeredBoosts[ownerId] = modifier;
     } else if (modifier < 0) {
       _registeredModerators[ownerId] = modifier;
-    } else {
-      HostedDebugLog.Warning(this, "Ignoring zero modifier from owner: {0}", ownerId);
     }
     UpdateRate();
   }
