@@ -125,10 +125,11 @@
     </ItemGroup>
     <PropertyGroup>
         <ModPath>u:\Mods</ModPath>
+        <ModScriptPath>$(ModPath)$(ProjectName)\version-0.7.10.9\Scripts</ModScriptPath>
     </PropertyGroup>
     <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="Exists('$(ModPath)')">
-        <Message Text="### Copying DLL to the game's mods folder... ###" Importance="high"/>
-        <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\version-0.7.10\Scripts"/>
+        <Message Text="### Copying mod's DLL to the game's mods folder: $(ModScriptPath) ###" Importance="high"/>
+        <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\version-0.7.10.9\Scripts"/>
     </Target>
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
       <PropertyGroup>
