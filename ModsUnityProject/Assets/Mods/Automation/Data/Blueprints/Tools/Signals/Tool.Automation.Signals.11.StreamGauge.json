@@ -16,7 +16,7 @@
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
             { "Name": "Precondition", "StrValue": "(?sig StreamGauge.Depth)" },
-            { "Name": "Expression", "StrValue": "(ge (sig StreamGauge.Depth) 0)" }
+            { "Name": "Expression", "StrValue": "(eq (sig StreamGauge.Depth) (sig StreamGauge.Depth))" }
           ]
         },
         "Action": {
@@ -31,7 +31,7 @@
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
             { "Name": "Precondition", "StrValue": "(?sig StreamGauge.Contamination)" },
-            { "Name": "Expression", "StrValue": "(ge (sig StreamGauge.Contamination) 0)" }
+            { "Name": "Expression", "StrValue": "(eq (sig StreamGauge.Contamination) (sig StreamGauge.Contamination))" }
           ]
         },
         "Action": {
@@ -46,7 +46,7 @@
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
             { "Name": "Precondition", "StrValue": "(?sig StreamGauge.Current)" },
-            { "Name": "Expression", "StrValue": "(ge (sig StreamGauge.Current) 0)" }
+            { "Name": "Expression", "StrValue": "(eq (sig StreamGauge.Current) (sig StreamGauge.Current))" }
           ]
         },
         "Action": {

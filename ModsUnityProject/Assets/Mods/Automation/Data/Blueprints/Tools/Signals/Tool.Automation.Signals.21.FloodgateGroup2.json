@@ -16,7 +16,7 @@
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
             { "Name": "Precondition", "StrValue": "(?sig Floodgate.Height)" },
-            { "Name": "Expression", "StrValue": "(ge (sig Floodgate.Height) 0)" }
+            { "Name": "Expression", "StrValue": "(eq (sig Floodgate.Height) (sig Floodgate.Height))" }
           ]
         },
         "Action": {
@@ -31,7 +31,7 @@
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
             { "Name": "Precondition", "StrValue": "(?act Floodgate.SetHeight)" },
-            { "Name": "Expression", "StrValue": "(ge (sig Signals.Floodgate.yellow2) 0)" }
+            { "Name": "Expression", "StrValue": "(eq (sig Signals.Floodgate.yellow2) (sig Signals.Floodgate.yellow2))" }
           ]
         },
         "Action": {
