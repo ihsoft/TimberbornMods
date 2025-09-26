@@ -3,8 +3,9 @@
     <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle" />
     <engine:VisualElement style="flex-direction: row; align-content: center; background-color: rgba(255, 255, 255, 0.05); margin-bottom: 1px; margin-top: 1px; margin-right: 2px; margin-left: 2px;">
         <engine:VisualElement name="Container" style="flex-grow: 1; flex-direction: row; flex-wrap: wrap;">
-            <engine:Label text="If CONDITION," name="Condition" class="game-text-small" style="margin-right: 2px;" />
-            <engine:Label text="Then ACTION" name="Action" class="game-text-small" />
+            <engine:Label text="SOURCE signal" name="Source" class="game-text-small" style="margin-right: 2px;" />
+            <engine:Label text="⇒" class="game-text-small" />
+            <engine:Label text="TARGET signal" name="Target" class="game-text-small" />
         </engine:VisualElement>
     </engine:VisualElement>
 </engine:UXML>

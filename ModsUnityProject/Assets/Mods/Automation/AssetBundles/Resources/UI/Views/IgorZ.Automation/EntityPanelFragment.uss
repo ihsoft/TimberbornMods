@@ -1,0 +1,39 @@
+.automation-deleted-text {
+    color: rgb(255, 67, 0);
+}
+
+.automation-button-copy {
+    background-image: url('project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/CopyIcon-bare.png');
+}
+
+.automation-button-copy:hover:enabled {
+    background-image: url('project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/CopyIcon-hover.png');
+}
+
+.automation-button-copy:hover:enabled:active {
+    background-image: url('project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/CopyIcon-active.png');
+}
+
+.automation-button-setup {
+    background-image: url('project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/SetupIcon-bare.png');
+}
+
+.automation-button-setup:hover:enabled {
+    background-image: url('project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/SetupIcon-hover.png');
+}
+
+.automation-button-setup:hover:enabled:active {
+    background-image: url('project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/SetupIcon-active.png');
+}
+
+.automation-button-clear {
+    background-image: url('project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/ClearIcon-bare.png');
+}
+
+.automation-button-clear:hover:enabled {
+    background-image: url('project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/ClearIcon-hover.png');
+}
+
+.automation-button-clear:hover:enabled:active {
+    background-image: url('project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/ClearIcon-active.png');
+}
