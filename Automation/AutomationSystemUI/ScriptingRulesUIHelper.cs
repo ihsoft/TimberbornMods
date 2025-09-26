@@ -6,99 +6,119 @@ using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.Conditions;
 using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
+using Timberborn.Common;
+using Timberborn.Localization;
+using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.AutomationSystemUI;
 
-public class ScriptingRulesUIHelper {
+class ScriptingRulesUIHelper {
+  const string BuildingSignalSourceLocKey = "IgorZ.Automation.AutomationFragment.BuildingSignalSource";
+
+  #region API
+
+  public record BuildingSignal {
+    public string Describe => DescribeFn();
+    public string SignalName { get; init; }
+    public string ExportedSignalName { get; init; }
+    public bool IsActive { get; init; }
+    internal Func<string> DescribeFn { get; init; }
+  }
+
+  public IReadOnlyList<BuildingSignal> BuildingSignals => _buildingSignals;
+
+  public int ExposedSignalsCount { get; private set; }
+  public int RulesCount { get; private set; }
+
+  public void SetBuilding(AutomationBehavior automationBehavior) {
+    _buildingSignals.Clear();
+    if (automationBehavior == null) {
+      return;
+    }
+    var signalMappings = new Dictionary<string, string>();
+    RulesCount = 0;
+    foreach (var action in automationBehavior.Actions) {
+      var signalMapping = TryGetSignalMapping(action as ScriptedAction);
+      if (signalMapping.buildingSignal == null) {
+        RulesCount++;
+      } else {
+        signalMappings[signalMapping.buildingSignal] = signalMapping.customSignal;
+      }
+    }
+    var signals = _scriptingService.GetSignalNamesForBuilding(automationBehavior)
+        .Where(x => !NonBuildingActions.Any(x.StartsWith));
+    ExposedSignalsCount = 0;
+    foreach (var signalName in signals) {
+      var signalMapping = signalMappings.GetOrDefault(signalName);
+      if (signalMapping != null) {
+        ExposedSignalsCount++;
+      }
+      var signalDef = _scriptingService.GetSignalDefinition(signalName, automationBehavior);
+      var signalSourceFn = _scriptingService.GetSignalSource(signalName, automationBehavior);
+      _buildingSignals.Add(new BuildingSignal {
+          SignalName = signalName,
+          DescribeFn = () => GetFormattedSignalValue(signalDef, signalSourceFn),
+          ExportedSignalName = signalMapping,
+          IsActive = true, //FIXME: get actual active action state
+      });
+    }
+  }
+ 
+  /// <summary>Indicates if the action is a signal mapping action.</summary>
+  /// <remarks>
+  /// A signal mapping action is an action that maps a building signal to a custom signal name. It's a rule, defined
+  /// like: "if signal=signal, then set signal 'customName'".
+  /// </remarks>
+  public static bool IsSignalMapping(IAutomationAction action) {
+    if (action.Condition is not ScriptedCondition || action is not ScriptedAction scriptedAction) {
+      return false;
+    }
+    return TryGetSignalMapping(scriptedAction).buildingSignal != null;
+  }
+
+  #endregion
+
+  #region Implementation
+
   // FIXME: Addd "District.". Or not.
   // FIXME: add scope to the signal definition and filter by that
   static readonly List<string> NonBuildingActions = [
       "Debug.", "Weather.", "Signals.", "District.",
   ];
 
-  public record StructureSignalPresenter {
-    public string Describe { get; init; }
-    public string SignalName { get; init; }
-    public string ExportedSignalName { get; init; }
-  }
-
-
-  public static List<StructureSignal> ExtractStructureSignal(AutomationBehavior automationBehavior) {
-  }
-
-  public Dictionary<string, string> MakeSignalsDictionary(AutomationBehavior automationBehavior) {
-    var dict = new Dictionary<string, string>();
-    var signals = _scriptingService.GetSignalNamesForBuilding(automationBehavior)
-        .Where(x => !NonBuildingActions.Any(x.StartsWith));
-    foreach (var signal in signals) {
-      dict[signal] = null;
-    }
-    var scriptedRules = automationBehavior.Actions
-        .Where(x => x.Condition is ScriptedCondition && x is ScriptedAction)
-        .Cast<ScriptedAction>();
-    foreach (var rule in scriptedRules) {
-      var mapping = TryGetSignalMapping((ScriptedCondition)rule.Condition, rule, automationBehavior);
-      if (mapping.buildingSignal != null) {
-        dict[mapping.buildingSignal] = mapping.customSignal;
-      }
-    }
-    return dict;
-  }
-
-  public bool IsSignalMapping(IAutomationAction action) {
-    if (action.Condition is not ScriptedCondition scriptedCondition || action is not ScriptedAction scriptedAction) {
-      return false;
-    }
-    var mapping = TryGetSignalMapping2(scriptedCondition.ParsedExpression, scriptedAction.ParsedExpression);
-    return mapping.buildingSignal != null;
-  }
-
-  // Detects special condition/action setup to "export" building's signal as a custom signal:
-  // If (eq (sig ABC) (sig ABC)), then (act Signals.Set "CustomSignal" (sig ABC))
-  // Means mapping: ABC -> Signals.CustomSignal
-  (string buildingSignal, string customSignal) TryGetSignalMapping(
-      ScriptedCondition condition, ScriptedAction action, AutomationBehavior automationBehavior) {
-    var conditionParseResult = _expressionParser.Parse(condition.Expression, automationBehavior);
-    var actionParseResult = _expressionParser.Parse(action.Expression, automationBehavior);
-    if (conditionParseResult.ParsedExpression == null || actionParseResult.ParsedExpression == null) {
-      return (null, null);
-    }
-    if (actionParseResult.ParsedExpression is not ActionOperator { ActionName: "Signals.Set" } actionOperator
-        || actionOperator.Operands[1] is not ConstantValueExpr { ValueType: ScriptValue.TypeEnum.String } actionExpr
-        || actionOperator.Operands[2] is not SignalOperator actionSignalOperator) {
-      return (null, null);
-    }
-    if (conditionParseResult.ParsedExpression is not BinaryOperator { Name: "eq" } binaryOperator
-        || binaryOperator.Left is not SignalOperator leftSignalOperator
-        || binaryOperator.Right is not SignalOperator rightSignalOperator
-        || leftSignalOperator.SignalName != rightSignalOperator.SignalName
-        || leftSignalOperator.SignalName != actionSignalOperator.SignalName) {
-      return (null, null);
-    }
-    return (actionSignalOperator.SignalName, actionExpr.ValueFn().AsString);
-  }
-
-  (string buildingSignal, string customSignal) TryGetSignalMapping2(BoolOperator condition, ActionOperator action) {
-    if (action is not { ActionName: "Signals.Set" } actionOperator
-        || actionOperator.Operands[1] is not ConstantValueExpr { ValueType: ScriptValue.TypeEnum.String } actionExpr
-        || actionOperator.Operands[2] is not SignalOperator actionSignalOperator) {
-      return (null, null);
-    }
-    if (condition is not BinaryOperator { Name: "eq" } binaryOperator
-        || binaryOperator.Left is not SignalOperator leftSignalOperator
-        || binaryOperator.Right is not SignalOperator rightSignalOperator
-        || leftSignalOperator.SignalName != rightSignalOperator.SignalName
-        || leftSignalOperator.SignalName != actionSignalOperator.SignalName) {
-      return (null, null);
-    }
-    return (actionSignalOperator.SignalName, actionExpr.ValueFn().AsString);
-  }
-
   readonly ScriptingService _scriptingService;
-  readonly ExpressionParser _expressionParser;
+  readonly ILoc _loc;
 
-  ScriptingRulesUIHelper(ScriptingService scriptingService, ExpressionParser expressionParser) {
+  readonly List<BuildingSignal> _buildingSignals = new();
+
+  ScriptingRulesUIHelper(ScriptingService scriptingService, ILoc loc) {
     _scriptingService = scriptingService;
-    _expressionParser = expressionParser;
+    _loc = loc;
   }
+
+  static (string buildingSignal, string customSignal) TryGetSignalMapping(ScriptedAction scriptedAction) {
+    var action = scriptedAction.ParsedExpression;
+    var condition = ((ScriptedCondition)scriptedAction.Condition).ParsedExpression;
+    // Ready for collection shows up as a singla mapping! 
+    if (action is not { ActionName: "Signals.Set" }
+        || action.Operands[1] is not ConstantValueExpr { ValueType: ScriptValue.TypeEnum.String } actionExpr
+        || action.Operands[2] is not SignalOperator actionSignalOperator
+        || condition is not BinaryOperator {
+            Name: "eq", Left: SignalOperator leftSignalOperator, Right: SignalOperator rightSignalOperator,
+        }
+        || leftSignalOperator.SignalName != rightSignalOperator.SignalName
+        || leftSignalOperator.SignalName != actionSignalOperator.SignalName) {
+      return (null, null);
+    }
+    return (actionSignalOperator.SignalName, actionExpr.ValueFn().AsString);
+  }
+
+  string GetFormattedSignalValue(SignalDef signalDef, Func<ScriptValue> signalSourceFn) {
+    var valueStr = signalDef.Result.ValueFormatter != null
+        ? signalDef.Result.ValueFormatter(signalSourceFn())
+        : signalSourceFn().AsFloat.ToString("0.#");
+    return _loc.T(BuildingSignalSourceLocKey, signalDef.DisplayName, valueStr);
+  }
+
+  #endregion
 }
