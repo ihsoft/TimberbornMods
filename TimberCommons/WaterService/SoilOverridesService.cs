@@ -145,7 +145,7 @@ public class SoilOverridesService : ILoadableSingleton, ITickableSingleton, IPos
   [ProtoContract]
   record MoistureOverrideProto {
     [ProtoMember(1)] public int OverrideId { get; init; }
-    [ProtoMember(2)] public List<MoistureOverride> OverridesList { get; init; }
+    [ProtoMember(2)] public List<MoistureOverride> OverridesList { get; init; } = [];
   }
 
   [ProtoContract]
@@ -193,11 +193,6 @@ public class SoilOverridesService : ILoadableSingleton, ITickableSingleton, IPos
     // Recreate the moisture overrides.
     foreach (var moistureOverride in protoState.MoistureOverrides) {
       var index = moistureOverride.OverrideId;
-      if (moistureOverride.OverridesList == null || moistureOverride.OverridesList.Count == 0) {
-        // This should not normally happen, but there were reports of it happening in the wild.
-        DebugEx.Error("Skipping empty overrides list: id={0}", index);
-        continue;
-      }
       _moistureLevelOverrides.Add(index, moistureOverride.OverridesList);
       _loadedMoistureOverrideIndexes.Add(index);
     }
