@@ -3,7 +3,8 @@
 }
 
 .automation-red-text {
-    color: rgb(255, 77, 77);
+    color: rgb(255, 67, 0);
+    background-color: rgba(255, 48, 0, 0.15);
 }
 
 .automation-yellow-text {
@@ -12,6 +13,11 @@
 
 .automation-green-text {
     color: rgb(89, 255, 97);
+}
+
+.automation-deleted-text {
+    color: rgb(255, 67, 0);
+    background-color: rgba(255, 48, 0, 0.15);
 }
 
 .automation-button-copy {
