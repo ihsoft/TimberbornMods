@@ -139,6 +139,9 @@
       <Compile Include="..\TimberDev\UI\VisualEffects.cs">
         <Link>TimberDev\UI\VisualEffects.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\UI\VisualElementExtensions.cs">
+        <Link>TimberDev\UI\VisualElementExtensions.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\Utils\ComponentsAccessor.cs">
         <Link>TimberDev\Utils\ComponentsAccessor.cs</Link>
       </Compile>
