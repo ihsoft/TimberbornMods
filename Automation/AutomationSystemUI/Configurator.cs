@@ -13,7 +13,6 @@ sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<AutomationFragment>().AsSingleton();
     containerDefinition.Bind<CopyRulesTool>().AsSingleton();
-    containerDefinition.Bind<ScriptingRulesUIHelper>().AsTransient();
     containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
   }
 

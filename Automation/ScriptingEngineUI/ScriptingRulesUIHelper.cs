@@ -10,7 +10,7 @@ using Timberborn.Common;
 using Timberborn.Localization;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace IgorZ.Automation.AutomationSystemUI;
+namespace IgorZ.Automation.ScriptingEngineUI;
 
 class ScriptingRulesUIHelper {
   const string BuildingSignalSourceLocKey = "IgorZ.Automation.AutomationFragment.BuildingSignalSource";
@@ -116,7 +116,7 @@ class ScriptingRulesUIHelper {
   string GetFormattedSignalValue(SignalDef signalDef, Func<ScriptValue> signalSourceFn) {
     var valueStr = signalDef.Result.ValueFormatter != null
         ? signalDef.Result.ValueFormatter(signalSourceFn())
-        : signalSourceFn().AsFloat.ToString("0.#");
+        : signalSourceFn().AsFloat.ToString("0.##");
     return _loc.T(BuildingSignalSourceLocKey, signalDef.DisplayName, valueStr);
   }
 
