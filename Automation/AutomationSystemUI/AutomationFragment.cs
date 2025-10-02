@@ -37,12 +37,6 @@ sealed class AutomationFragment : IEntityPanelFragment {
   const string SetupSignalsBtnHintLocKey = "IgorZ.Automation.AutomationFragment.SetupSignalsBtnHint";
   const string ClearSignalsBtnHintLocKey = "IgorZ.Automation.AutomationFragment.ClearSignalsBtnHint";
 
-  // Scriptable components to ignore when checking for the controls' visibility.
-  // FIXME: Addd "District.". Or not.
-  static readonly List<string> GlobalActions = [
-      "Debug.", "Weather.", "Signals.",
-  ];
-
   readonly UiFactory _uiFactory;
   readonly RulesEditorDialog _rulesEditorDialog;
   readonly SignalsEditorDialog _signalsEditorDialog;
