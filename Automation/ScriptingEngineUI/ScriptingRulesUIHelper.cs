@@ -97,9 +97,8 @@ class ScriptingRulesUIHelper {
   }
 
   static (string buildingSignal, string customSignal) TryGetSignalMapping(ScriptedAction scriptedAction) {
-    var action = scriptedAction.ParsedExpression;
-    var condition = ((ScriptedCondition)scriptedAction.Condition).ParsedExpression;
-    // Ready for collection shows up as a singla mapping! 
+    var action = scriptedAction.ParsingResult.ParsedExpression as ActionOperator;
+    var condition = ((ScriptedCondition)scriptedAction.Condition).ParsingResult.ParsedExpression;
     if (action is not { ActionName: "Signals.Set" }
         || action.Operands[1] is not ConstantValueExpr { ValueType: ScriptValue.TypeEnum.String } actionExpr
         || action.Operands[2] is not SignalOperator actionSignalOperator
