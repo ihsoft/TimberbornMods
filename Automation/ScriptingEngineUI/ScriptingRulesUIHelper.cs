@@ -173,6 +173,8 @@ class ScriptingRulesUIHelper {
     _loc = loc;
   }
 
+  /// <summary>Verifies if the scripted action is a signal mapping and extracts the signal names.</summary>
+  /// <seealso cref="SetExportedSignalName"/>
   static (string buildingSignal, string customSignal) TryGetSignalMapping(ScriptedAction scriptedAction) {
     var action = scriptedAction.ParsingResult.ParsedExpression as ActionOperator;
     var condition = ((ScriptedCondition)scriptedAction.Condition).ParsingResult.ParsedExpression;
