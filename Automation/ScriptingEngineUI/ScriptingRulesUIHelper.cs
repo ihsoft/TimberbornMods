@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Timberborn Mod: Automation
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using IgorZ.Automation.Actions;
@@ -6,9 +10,7 @@ using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.Conditions;
 using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
-using Timberborn.Common;
 using Timberborn.Localization;
-using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
 
@@ -17,79 +19,154 @@ class ScriptingRulesUIHelper {
 
   #region API
 
+  /// <summary>Information about a building signal that can be mapped to a custom signal.</summary>
   public record BuildingSignal {
     public string Describe => DescribeFn();
     public string SignalName { get; init; }
     public string ExportedSignalName { get; init; }
-    public bool IsActive { get; init; }
+    public ScriptedAction Action { get; init; }
     internal Func<string> DescribeFn { get; init; }
   }
 
+  /// <summary>List of building signals that can be mapped to custom signals.</summary>
+  /// <remarks>
+  /// This list can be longer than the building actually has signals! It happens when the scripts have more than one
+  /// mapping for the same signal. This situation can be introduced via scripts editor or import features. The regular
+  /// signals UI won't let it happen.
+  /// </remarks>
   public IReadOnlyList<BuildingSignal> BuildingSignals => _buildingSignals;
+  readonly List<BuildingSignal> _buildingSignals = [];
 
+  /// <summary>Number of building signals that are mapped to a custom signal.</summary>
+  /// <seealso cref="BuildingSignals"/>
   public int ExposedSignalsCount { get; private set; }
-  public int RulesCount { get; private set; }
 
+  /// <summary>List of rules on the building, except the signal mapping rules.</summary>
+  /// <remarks>The signals mappings are regular rules. However, they are excluded from this list</remarks>
+  /// <seealso cref="BuildingSignals"/>
+  public IReadOnlyList<IAutomationAction> BuildingRules => _buildingRules;
+  readonly List<IAutomationAction> _buildingRules = [];
+
+  /// <summary>The building that is being edited.</summary>
+  public AutomationBehavior AutomationBehavior => _automationBehavior;
+  AutomationBehavior _automationBehavior;
+
+  /// <summary>List of all building signal names that can be mapped to custom signals.</summary>
+  /// <remarks>
+  /// This list is not a complete list of the building specific signals. It's refined for the UI purpose. It can have
+  /// more or less signals than the <see cref="ScriptingService.GetSignalNamesForBuilding"/> could return. 
+  /// </remarks>
+  public IReadOnlyList<string> BuildingSignalNames => _buildingSignalNames;
+  readonly List<string> _buildingSignalNames = [];
+
+  /// <summary>Sets the building that is being edited.</summary>
+  /// <remarks>All the internal state is reset.</remarks>
   public void SetBuilding(AutomationBehavior automationBehavior) {
+    _automationBehavior = automationBehavior;
     _buildingSignals.Clear();
-    if (automationBehavior == null) {
+    _buildingRules.Clear();
+    ExposedSignalsCount = 0;
+    if (!automationBehavior) {
       return;
     }
-    var signalMappings = new Dictionary<string, string>();
-    RulesCount = 0;
-    foreach (var action in automationBehavior.Actions) {
-      var signalMapping = TryGetSignalMapping(action as ScriptedAction);
-      if (signalMapping.buildingSignal == null) {
-        RulesCount++;
-      } else {
-        signalMappings[signalMapping.buildingSignal] = signalMapping.customSignal;
-      }
-    }
-    var signals = _scriptingService.GetSignalNamesForBuilding(automationBehavior)
-        .Where(x => !NonBuildingActions.Any(x.StartsWith));
-    ExposedSignalsCount = 0;
-    foreach (var signalName in signals) {
-      var signalMapping = signalMappings.GetOrDefault(signalName);
-      if (signalMapping != null) {
-        ExposedSignalsCount++;
+
+    // We want to keep a stable order of signals, so list them in the order defined by the components.
+    // However, there can be multiple mappings for the same building signal.
+    _buildingSignalNames.Clear();
+    foreach (var signalName in _scriptingService.GetSignalNamesForBuilding(automationBehavior)) {
+      if (NonBuildingActions.Any(signalName.StartsWith) || signalName.Contains(".OnUnfinished")) {
+        continue; // Not what we want to bind as an exported signal.
       }
       var signalDef = _scriptingService.GetSignalDefinition(signalName, automationBehavior);
-      var signalSourceFn = _scriptingService.GetSignalSource(signalName, automationBehavior);
-      _buildingSignals.Add(new BuildingSignal {
-          SignalName = signalName,
-          DescribeFn = () => GetFormattedSignalValue(signalDef, signalSourceFn),
-          ExportedSignalName = signalMapping,
-          IsActive = true, //FIXME: get actual active action state
-      });
+      if (signalDef.Result.ValueType != ScriptValue.TypeEnum.Number) {
+        continue; // Custom signals can only be numbers.
+      }
+      _buildingSignalNames.Add(signalName);
+    }
+    var mappings = new List<(string signalName, ScriptedAction action)>();
+    foreach (var action in automationBehavior.Actions) {
+      var (buildingSignalName, _) = TryGetSignalMapping(action as ScriptedAction);
+      if (buildingSignalName == null || !_buildingSignalNames.Contains(buildingSignalName)) {
+        _buildingRules.Add(action);
+        continue;
+      }
+      mappings.Add((buildingSignalName, action as ScriptedAction));
+    }
+    foreach (var buildingSignalName in _buildingSignalNames) {
+      var signalDef = _scriptingService.GetSignalDefinition(buildingSignalName, automationBehavior);
+      if (signalDef.Result.ValueType != ScriptValue.TypeEnum.Number) {
+        continue; // Custom signals can only be numbers.
+      }
+      var signalSourceFn = _scriptingService.GetSignalSource(buildingSignalName, automationBehavior);
+      var existingMappings = mappings.Where(x => x.signalName == buildingSignalName).ToList();
+      var describeFn = () => GetFormattedSignalValue(signalDef, signalSourceFn);
+      if (existingMappings.Count == 0) {
+        _buildingSignals.Add(new BuildingSignal {
+            SignalName = buildingSignalName,
+            DescribeFn = describeFn,
+            ExportedSignalName = null,
+            Action = null,
+        });
+        continue;
+      }
+      foreach (var existingMapping in existingMappings) {
+        ExposedSignalsCount++;
+        _buildingSignals.Add(new BuildingSignal {
+            SignalName = buildingSignalName,
+            DescribeFn = describeFn,
+            ExportedSignalName = TryGetSignalMapping(existingMapping.action).customSignal,
+            Action = existingMapping.action,
+        });
+      }
     }
   }
- 
-  /// <summary>Indicates if the action is a signal mapping action.</summary>
+
+  /// <summary>Creates a rule for the signal mapping.</summary>
   /// <remarks>
-  /// A signal mapping action is an action that maps a building signal to a custom signal name. It's a rule, defined
-  /// like: "if signal=signal, then set signal 'customName'".
+  /// It's just a helper method. The signal mapping is a regular scripted automation rule that looks like this:
+  /// <code>
+  /// If: (eq (sig BuildingSignalName) (sig BuildingSignalName))
+  /// Then: (act Signals.Set 'ExportedSignalName' (sig BuildingSignalName))
+  /// </code>
   /// </remarks>
-  public static bool IsSignalMapping(IAutomationAction action) {
-    if (action.Condition is not ScriptedCondition || action is not ScriptedAction scriptedAction) {
-      return false;
+  public void SetExportedSignalName(string buildingSignalName, string exportedSignalName) {
+    if (!_buildingSignalNames.Contains(buildingSignalName)) {
+      throw new ArgumentException($"Signal '{buildingSignalName}' is not available on the building.");
     }
-    return TryGetSignalMapping(scriptedAction).buildingSignal != null;
+    var condition = new ScriptedCondition();
+    condition.SetExpression($"(eq (sig {buildingSignalName}) (sig {buildingSignalName}))");
+    var action = new ScriptedAction();
+    action.SetExpression($"(act Signals.Set '{exportedSignalName}' (sig {buildingSignalName}))");
+    _automationBehavior.AddRule(condition, action);
+  }
+
+  /// <summary>Removes all signal mapping rules from the building.</summary>
+  /// <seealso cref="BuildingSignals"/>
+  public void ClearSignalsOnBuilding() {
+    foreach (var signal in _buildingSignals.Where(x => x.Action != null)) {
+      _automationBehavior.DeleteRule(signal.Action);
+    }
+  }
+
+  /// <summary>Removes all rules from the building, except the signal mapping rules.</summary>
+  /// <seealso cref="BuildingRules"/>
+  public void ClearRulesOnBuilding() {
+    foreach (var rule in _buildingRules) {
+      _automationBehavior.DeleteRule(rule);
+    }
   }
 
   #endregion
 
   #region Implementation
 
-  // FIXME: Addd "District.". Or not.
-  // FIXME: add scope to the signal definition and filter by that
+  // FIXME: Add scope to the signal definition and filter by it.
   static readonly List<string> NonBuildingActions = [
       "Debug.", "Weather.", "Signals.", "District.",
   ];
 
   readonly ScriptingService _scriptingService;
   readonly ILoc _loc;
-
-  readonly List<BuildingSignal> _buildingSignals = new();
 
   ScriptingRulesUIHelper(ScriptingService scriptingService, ILoc loc) {
     _scriptingService = scriptingService;
