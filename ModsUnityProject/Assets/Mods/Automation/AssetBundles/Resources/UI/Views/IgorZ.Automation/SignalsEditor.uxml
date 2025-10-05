@@ -13,7 +13,7 @@
             <engine:VisualElement name="ScrollViewWrapper" class="scroll--green-decorated" style="flex-grow: 1; width: 100%;">
                 <engine:ScrollView name="Content">
                     <engine:VisualElement style="flex-grow: 1;">
-                        <engine:VisualElement name="RowsContainer" style="flex-direction: row;">
+                        <engine:VisualElement style="flex-direction: row;">
                             <engine:VisualElement name="SourcesSection" style="flex-grow: 0; align-items: auto; align-self: stretch; justify-content: space-evenly;">
                                 <engine:Instance template="SignalSource" />
                                 <engine:Instance template="SignalSource" />
