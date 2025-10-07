@@ -86,7 +86,10 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
     // Setup signals fragment section.
     var setupSignalsButton = _root.Q2<Button>("SetupSignalsButton");
-    setupSignalsButton.clicked += () => _signalsEditorDialog.Show(_scriptingRulesUIHelper, null);
+    setupSignalsButton.clicked += () => {
+      _signalsEditorDialog.Initialize(_scriptingRulesUIHelper);
+      _signalsEditorDialog.Show();
+    };
     _tooltipRegistrar.RegisterLocalizable(setupSignalsButton, SetupSignalsBtnHintLocKey);
     _clearSignalsButton = _root.Q2<Button>("ClearSignalsButton");
     _tooltipRegistrar.RegisterLocalizable(_clearSignalsButton, ClearSignalsBtnHintLocKey);
