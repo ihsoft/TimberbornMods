@@ -104,6 +104,7 @@ public abstract class AbstractDialog  : IPanelController {
           .SetConfirmButton(Close)
           .SetCancelButton(() => {})
           .Show();
+      return;
     }
     Close();
   }
