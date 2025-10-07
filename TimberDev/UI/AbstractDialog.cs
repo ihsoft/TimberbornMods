@@ -5,7 +5,6 @@
 using System;
 using Bindito.Core;
 using Timberborn.CoreUI;
-using UnityDev.Utils.LogUtilsLite;
 using UnityEngine.UIElements;
 
 // ReSharper disable once CheckNamespace
@@ -99,8 +98,6 @@ public abstract class AbstractDialog  : IPanelController {
 
   /// <inheritdoc/>
   public void OnUICancelled() {
-    //FIXME
-    DebugEx.Warning("*** cancelled?");
     if (CheckHasChanges()) {
       _dialogBoxShower.Create()
           .SetMessage(UiFactory.T(UnsavedChangesConfirmationLocKey))
