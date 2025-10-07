@@ -28,7 +28,7 @@ class MathOperator : AbstractOperator, IValueExpr {
   /// <inheritdoc/>
   public override string Describe() {
     return Name switch {
-        AddOperatorName => $"({Operands[0].Describe()} + {Operands[1].Describe()})",
+        AddOperatorName => $"({Operands.Select(x => x.Describe()).Aggregate((a, b) => a + " + " + b)})",
         SubOperatorName => $"({Operands[0].Describe()} - {Operands[1].Describe()})",
         MulOperatorName => $"{Operands[0].Describe()} × {Operands[1].Describe()}",
         DivOperatorName => $"{Operands[0].Describe()} ÷ {Operands[1].Describe()}",
