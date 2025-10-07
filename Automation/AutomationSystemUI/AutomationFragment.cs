@@ -2,7 +2,6 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Collections.Generic;
 using System.Linq;
 using IgorZ.Automation.Actions;
 using IgorZ.Automation.AutomationSystem;
@@ -15,6 +14,7 @@ using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
 using Timberborn.TooltipSystem;
+using Unity.Collections;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine.UIElements;
 
@@ -90,7 +90,10 @@ sealed class AutomationFragment : IEntityPanelFragment {
     _tooltipRegistrar.RegisterLocalizable(setupSignalsButton, SetupSignalsBtnHintLocKey);
     _clearSignalsButton = _root.Q2<Button>("ClearSignalsButton");
     _tooltipRegistrar.RegisterLocalizable(_clearSignalsButton, ClearSignalsBtnHintLocKey);
-    _clearSignalsButton.clicked += ClearAllSignals;
+    _clearSignalsButton.clicked += () => {
+      _scriptingRulesUIHelper.ClearSignalsOnBuilding();
+      UpdateFragment();
+    };
 
     _signalsCountLabel = _root.Q2<Label>("SignalsCountLabel");
     _foldSignalsButton = _root.Q2<Button>("FoldSignalsButton");
@@ -107,7 +110,10 @@ sealed class AutomationFragment : IEntityPanelFragment {
     _tooltipRegistrar.RegisterLocalizable(_copyRulesButton, CopyRulesBtnHintLocKey);
     _clearRulesButton = _root.Q2<Button>("ClearRulesButton");
     _tooltipRegistrar.RegisterLocalizable(_clearRulesButton, ClearRulesBtnHintLocKey);
-    _clearRulesButton.clicked += ClearAllRules;
+    _clearRulesButton.clicked += () => {
+      _scriptingRulesUIHelper.ClearRulesOnBuilding();
+      UpdateFragment();
+    };
 
     _rulesCountLabel = _root.Q2<Label>("RulesCountLabel");
     _foldRulesButton = _root.Q2<Button>("FoldRulesButton");
@@ -136,41 +142,37 @@ sealed class AutomationFragment : IEntityPanelFragment {
     if (!_automationBehavior || _automationBehavior.StateVersion == _automationBehaviorVersion) {
       return;
     }
-    //FIXME
-    DebugEx.Warning("*** AutomationFragment: updating UI for version change {0} => {1}", _automationBehavior.StateVersion, _automationBehaviorVersion);
     _automationBehaviorVersion = _automationBehavior.StateVersion;
     _scriptingRulesUIHelper.SetBuilding(_automationBehavior);
     SetRulesListFolded(_rulesListFolded);
     SetSignalsListFolded(_signalsListFolded);
 
     // Signals panel.
-    _root.Q2<VisualElement>("SignalsPanel").ToggleDisplayStyle(_scriptingRulesUIHelper.BuildingSignals.Count > 0);
-    _signalsCountLabel.text = _uiFactory.T(
-        SignalsCountTextLocKey,
-        _scriptingRulesUIHelper.ExposedSignalsCount, _scriptingRulesUIHelper.BuildingSignals.Count);
-    _clearSignalsButton.SetEnabled(_scriptingRulesUIHelper.ExposedSignalsCount > 0);
+    var totalSignalsCount = _scriptingRulesUIHelper.BuildingSignalNames.Count;
+    var exposedSignalsCount = _scriptingRulesUIHelper.ExposedSignalsCount;
+    _root.Q2<VisualElement>("SignalsPanel").ToggleDisplayStyle(totalSignalsCount > 0);
+    _signalsCountLabel.text = _uiFactory.T(SignalsCountTextLocKey, exposedSignalsCount, totalSignalsCount);
+    _clearSignalsButton.SetEnabled(exposedSignalsCount > 0);
     _signalsList.Clear();
-    foreach (var signal in _scriptingRulesUIHelper.BuildingSignals) {
-      if (signal.ExportedSignalName == null) {
+    foreach (var signalMapping in _scriptingRulesUIHelper.BuildingSignals) {
+      if (signalMapping.ExportedSignalName == null) {
         continue;
       }
       var row = _uiFactory.LoadVisualElement(SignalRowTemplate);
-      //FIXME: register "signal changed" callback to update the signal value
-      row.Q2<Label>("Source").text = CommonFormats.HighlightGreen(signal.Describe);
-      row.Q2<Label>("Target").text = CommonFormats.HighlightYellow(signal.ExportedSignalName);
-      row.Q2<VisualElement>("Container").SetEnabled(signal.IsActive);
+      row.Q2<Label>("Source").text = signalMapping.Describe;
+      row.Q2<Label>("Target").text = signalMapping.ExportedSignalName;
+      if (signalMapping.Action != null) {
+        row.Q2<VisualElement>("Container").SetEnabled(signalMapping.Action.Condition.IsActive);
+      }
       _signalsList.Add(row);
     }
 
     // Rules panel.
-    _rulesCountLabel.text = _uiFactory.T(RulesCountTextLocKey, _scriptingRulesUIHelper.RulesCount);
-    _clearRulesButton.SetEnabled(_scriptingRulesUIHelper.RulesCount > 0);
-    _copyRulesButton.SetEnabled(_scriptingRulesUIHelper.RulesCount > 0);
+    _rulesCountLabel.text = _uiFactory.T(RulesCountTextLocKey, _scriptingRulesUIHelper.BuildingRules.Count);
+    _clearRulesButton.SetEnabled(_scriptingRulesUIHelper.BuildingRules.Count > 0);
+    _copyRulesButton.SetEnabled(_scriptingRulesUIHelper.BuildingRules.Count > 0);
     _rulesList.Clear();
-    foreach (var action in _automationBehavior.Actions) {
-      if (ScriptingRulesUIHelper.IsSignalMapping(action)) {
-        continue;
-      }
+    foreach (var action in _scriptingRulesUIHelper.BuildingRules) {
       var row = _uiFactory.LoadVisualElement(RuleRowTemplate);
 
       string conditionText;
@@ -219,11 +221,11 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
   void SetRulesListFolded(bool isFolded) {
     _rulesListFolded = isFolded;
-    var actualFoldState = isFolded || _scriptingRulesUIHelper.RulesCount == 0;
+    var actualFoldState = isFolded || _scriptingRulesUIHelper.BuildingRules.Count == 0;
     _rulesList.ToggleDisplayStyle(!actualFoldState);
     _foldRulesButton.ToggleDisplayStyle(!actualFoldState);
     _unfoldRulesButton.ToggleDisplayStyle(actualFoldState);
-    _unfoldRulesButton.SetEnabled(_scriptingRulesUIHelper.RulesCount > 0);
+    _unfoldRulesButton.SetEnabled(_scriptingRulesUIHelper.BuildingRules.Count > 0);
   }
 
   void SetSignalsListFolded(bool isFolded) {
@@ -233,29 +235,5 @@ sealed class AutomationFragment : IEntityPanelFragment {
     _foldSignalsButton.ToggleDisplayStyle(!actualFoldState);
     _unfoldSignalsButton.ToggleDisplayStyle(actualFoldState);
     _unfoldSignalsButton.SetEnabled(_scriptingRulesUIHelper.ExposedSignalsCount > 0);
-  }
-
-  void ClearAllRules() {
-    var i = 0;
-    while (i < _automationBehavior.Actions.Count) {
-      if (!ScriptingRulesUIHelper.IsSignalMapping(_automationBehavior.Actions[i])) {
-        _automationBehavior.DeleteRuleAt(0);
-      } else {
-        i++;
-      }
-    }
-    UpdateFragment();
-  }
-
-  void ClearAllSignals() {
-    var i = 0;
-    while (i < _automationBehavior.Actions.Count) {
-      if (ScriptingRulesUIHelper.IsSignalMapping(_automationBehavior.Actions[i])) {
-        _automationBehavior.DeleteRuleAt(0);
-      } else {
-        i++;
-      }
-    }
-    UpdateFragment();
   }
 }
