@@ -1,0 +1,2 @@
+﻿ID,Text,Comment
+TimberDev_UI.AbstractDialog.UnsavedChangesConfirmation,"Есть несохраненные изменения. Вы хотите их отменить?","A confirmation message that is shown if the dialog is being closed by ESC and there were changes made."
