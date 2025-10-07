@@ -224,15 +224,19 @@ TimberDev_Utils.Tools.LockSelectTool.SelectingNObjects,"Selecting: {0} (x{1})","
 TimberDev_Utils.Tools.LockSelectTool.SelectingObject,"Selecting: {0}","Text to show the type of the selected building. It's shown when the selection tool is locked on the specific buildings."
 TimberDev_Utils.Tools.LockSelectTool.StartObjectSelectingPrompt,"Click to start selecting: {0}",
 TimberDev_Utils.Tools.LockSelectTool.StartSelectingPrompt,"Point to an entity and click to start selecting",
+=,=,"TimberDev_UI"
+TimberDev_UI.AbstractDialog.UnsavedChangesConfirmation,"There are unsaved changes. Do you want to discard them?","A confirmation message that is shown if the dialog is being closed by ESC and there were changes made."
 =,=,"DEBUGGING"
 IgorZ.Automation.AutomationFragment.BuildingSignalSource,"{0} ({1})","String that represents the source signal user-friendly, and it's current value"
-IgorZ.Automation.AutomationFragment.ClearRulesBtnHint,"Clear all rules on this building",
-IgorZ.Automation.AutomationFragment.ClearSignalsBtnHint,"Clear all signals mappings on this building",
-IgorZ.Automation.AutomationFragment.CopyRulesBtnHint,"Copy rules from this building to another",
+IgorZ.Automation.AutomationFragment.ClearRulesBtnHint,"Clear all rules",
+IgorZ.Automation.AutomationFragment.ClearSignalsBtnHint,"Clear all signals mappings",
+IgorZ.Automation.AutomationFragment.CopyRulesBtnHint,"Copy rules and signal mappings to another building",
 IgorZ.Automation.AutomationFragment.RuleActionTextLocKey,"Then {0}",
 IgorZ.Automation.AutomationFragment.RuleConditionTextLocKey,"If {0},",
 IgorZ.Automation.AutomationFragment.RulesCountTextLocKey,"Rules: {0}",
-IgorZ.Automation.AutomationFragment.SetupRulesBtnHint,"Setup rules for this building",
-IgorZ.Automation.AutomationFragment.SetupSignalsBtnHint,"Setup signals that will be visible to rules of the other buildings",
+IgorZ.Automation.AutomationFragment.SetupRulesBtnHint,"Setup rules",
+IgorZ.Automation.AutomationFragment.SetupSignalsBtnHint,"Setup signals that will be visible to the other buildings",
 IgorZ.Automation.AutomationFragment.SignalsCountTextLocKey,"Signals: {0}/{1}",
 IgorZ.Automation.Scripting.SignalsEditor.DialogHeader,"Setup building signals",
+IgorZ.Automation.Scripting.SignalsEditor.BadSignalNameMsg,"❌ Bad signal name!
+The name must start with a letter and contain only letters, digits, and commas.",
