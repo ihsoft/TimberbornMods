@@ -212,6 +212,13 @@
       <Compile Remove="Conditions\ObjectFinishedCondition.cs" />
       <Compile Remove="Actions\DetonateDynamiteAction.cs" />
     </ItemGroup>
+    <ItemGroup>
+      <Content Include="..\TimberDev\Tools\enUS.csv">
+        <Link>TimberDev\Tools\enUS.csv</Link>
+      </Content>
+      <Content Include="..\TimberDev\Tools\ruRU.csv">
+        <Link>TimberDev\Tools\ruRU.csv</Link>
+      </Content>
     <PropertyGroup>
         <ModPath>u:\Mods</ModPath>
     </PropertyGroup>
