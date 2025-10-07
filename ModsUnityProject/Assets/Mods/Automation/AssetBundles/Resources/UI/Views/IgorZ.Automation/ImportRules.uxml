@@ -14,9 +14,9 @@
                 <Timberborn.CoreUI.LocalizableToggle text="SkipFailedRules" name="SkipFailedRulesToggle" text-loc-key="IgorZ.Automation.Scripting.ImportDialog.SkipFailedRules" class="game-toggle" style="margin-top: 5px; align-self: flex-start;" />
             </engine:VisualElement>
             <engine:VisualElement style="flex-direction: row; align-items: center; justify-content: center; margin-top: 20px; flex-shrink: 1;">
-                <Timberborn.CoreUI.LocalizableButton text="Save" name="ImportButton" text-loc-key="Core.Save" class="menu-button" />
-                <Timberborn.CoreUI.LocalizableButton text-loc-key="IgorZ.Automation.Scripting.ImportDialog.ReadMore" text="ReadMore" name="ReadMoreButton" class="menu-button" />
                 <Timberborn.CoreUI.LocalizableButton text="Cancel" text-loc-key="Core.Cancel" name="CancelButton" class="menu-button" />
+                <Timberborn.CoreUI.LocalizableButton text-loc-key="IgorZ.Automation.Scripting.ImportDialog.ReadMore" text="ReadMore" name="ReadMoreButton" class="menu-button" />
+                <Timberborn.CoreUI.LocalizableButton text="Save" name="ImportButton" text-loc-key="Core.Save" class="menu-button" />
             </engine:VisualElement>
         </engine:Instance>
     </engine:VisualElement>
