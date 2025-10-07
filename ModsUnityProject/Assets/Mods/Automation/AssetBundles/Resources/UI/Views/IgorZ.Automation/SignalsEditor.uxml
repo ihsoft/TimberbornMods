@@ -4,9 +4,8 @@
     <engine:Template name="SignalTarget" src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/SignalTargetTmpl.uxml?fileID=9197481963319205126&amp;guid=06ae86f98d18a334985a9fadb0e4345d&amp;type=3#SignalTargetTmpl" />
     <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle" />
     <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle" />
-    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/RulesEditorStyle.uss?fileID=7433441132597879392&amp;guid=82ba7710a5bad1b489b53edd629e2a56&amp;type=3#RulesEditorStyle" />
-    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/TimberDevStyle.uss?fileID=7433441132597879392&amp;guid=86824deb2a4bc844cbec48367a164254&amp;type=3#TimberDevStyle[UNSUPPORTED_IN_UI_BUILDER]" />
-    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/AutomationCore.uss?fileID=7433441132597879392&amp;guid=3ff053cc6d97b6c4eb9edeaf49c3c4f7&amp;type=3#AutomationCore" />
+    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/TimberDevStyle.uss?fileID=7433441132597879392&amp;guid=86824deb2a4bc844cbec48367a164254&amp;type=3#TimberDevStyle" />
+    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/AutomationCoreStyle.uss?fileID=7433441132597879392&amp;guid=3ff053cc6d97b6c4eb9edeaf49c3c4f7&amp;type=3#AutomationCoreStyle" />
     <engine:VisualElement class="content-row-centered">
         <engine:Instance template="NamedBoxTemplate" style="width: 570px; height: auto;">
             <AttributeOverrides element-name="Header" text-loc-key="IgorZ.Automation.Scripting.SignalsEditor.DialogHeader" />
@@ -32,8 +31,12 @@
                                 </engine:Instance>
                             </engine:VisualElement>
                             <engine:VisualElement name="TargetsSection" style="flex-grow: 1;">
-                                <engine:Instance template="SignalTarget" />
-                                <engine:Instance template="SignalTarget" />
+                                <engine:Instance template="SignalTarget" class="text-field-error">
+                                    <AttributeOverrides element-name="SignalName" value="bad.text" />
+                                </engine:Instance>
+                                <engine:Instance template="SignalTarget" class="text-field-modified">
+                                    <AttributeOverrides element-name="SignalName" value="modified.value" />
+                                </engine:Instance>
                                 <engine:Instance template="SignalTarget">
                                     <AttributeOverrides element-name="SignalTarget" value="line-3" />
                                 </engine:Instance>
