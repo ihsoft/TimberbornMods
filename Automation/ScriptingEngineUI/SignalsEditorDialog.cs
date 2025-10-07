@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using IgorZ.TimberDev.UI;
 using UnityDev.Utils.LogUtilsLite;
@@ -18,6 +19,9 @@ sealed class SignalsEditorDialog : AbstractDialog {
 
   const string BadSignalNameMsgLocKey = "IgorZ.Automation.Scripting.SignalsEditor.BadSignalNameMsg";
 
+  const string SignalNameModifiedClass = "text-field-modified";
+  const string BadSignalNameClass = "text-field-error";
+
   #region AbstractDialog implementation
 
   /// <inheritdoc/>
@@ -25,33 +29,23 @@ sealed class SignalsEditorDialog : AbstractDialog {
 
   /// <inheritdoc/>
   protected override string VerifyInput() {
-    //FIXME: Also highlight bad names via UI.
-    foreach (var exportedSignal in _exportedSignals) {
-      if (exportedSignal.customSignalField.value == "") {
-        continue;
-      }
-      if (!ValidateCustomSignalName(exportedSignal.customSignalField.value)) {
-        return UiFactory.T(BadSignalNameMsgLocKey);
-      }
-    }
-    return null;
+    return _mappingLines.Any(x => x.HasError) ? UiFactory.T(BadSignalNameMsgLocKey) : null;
   }
 
   /// <inheritdoc/>
   protected override void ApplyInput() {
     _rulesUiHelper.ClearSignalsOnBuilding();
-    foreach (var exportedSignal in _exportedSignals) {
-      if (exportedSignal.customSignalField.value == "") {
+    foreach (var exportedSignal in _mappingLines) {
+      if (exportedSignal.CustomSignalField.value == "") {
         continue;
       }
-      _rulesUiHelper.SetExportedSignalName(exportedSignal.buildingSignalName, exportedSignal.customSignalField.value);
+      _rulesUiHelper.SetExportedSignalName(exportedSignal.Signal.SignalName, exportedSignal.CustomSignalField.value);
     }
   }
 
   /// <inheritdoc/>
   protected override bool CheckHasChanges() {
-    //FIXME: actually verify changes.
-    return false;
+    return _mappingLines.Any(exportedSignal => exportedSignal.HasChanges);
   }
 
   #endregion
@@ -59,7 +53,7 @@ sealed class SignalsEditorDialog : AbstractDialog {
   #region API
 
   ScriptingRulesUIHelper _rulesUiHelper;
-  readonly List<(string buildingSignalName, TextField customSignalField)> _exportedSignals = [];
+  readonly List<MappingLine> _mappingLines = [];
 
   public void Initialize(ScriptingRulesUIHelper rulesUIHelper) {
     _rulesUiHelper = rulesUIHelper;
@@ -68,7 +62,7 @@ sealed class SignalsEditorDialog : AbstractDialog {
     sourceSection.Clear();
     var targetSection = Root.Q2<VisualElement>("TargetsSection");
     targetSection.Clear();
-    _exportedSignals.Clear();
+    _mappingLines.Clear();
     foreach (var signalMapping in _rulesUiHelper.BuildingSignals) {
       var sourceTmpl = UiFactory.LoadVisualElement(SignalSourceTmplAsset);
       sourceTmpl.Q2<Label>("SignalName").text = signalMapping.Describe;
@@ -76,10 +70,11 @@ sealed class SignalsEditorDialog : AbstractDialog {
 
       var targetTmpl = UiFactory.LoadVisualElement(SignalTargetTmplAsset);
       var targetField = targetTmpl.Q2<TextField>("SignalName");
+      var mappingLine = new MappingLine(signalMapping, targetField);
       targetField.value = signalMapping.ExportedSignalName ?? "";
       targetTmpl.Q2<Button>("ClearSignalButton").clicked += () => targetField.value = "";
       targetSection.Add(targetTmpl);
-      _exportedSignals.Add((signalMapping.SignalName, targetField));
+      _mappingLines.Add(mappingLine);
     }
   }
 
@@ -88,14 +83,36 @@ sealed class SignalsEditorDialog : AbstractDialog {
   #region Implementation
 
   static readonly Regex MappedSignalNamePattern = new(@"^(?!\.)([A-Za-z][A-Za-z0-9]+\.?)*([A-Za-z][A-Za-z0-9]*)$");
-  
-  bool ValidateCustomSignalName(string name) {
-    //FIXME: Don't log bad names. Highlight via UI.
-    if (!MappedSignalNamePattern.IsMatch(name)) {
-      DebugEx.Error("Invalid signal name: {0}", name);
-      return false;
+
+  readonly record struct MappingLine {
+    public MappingLine(ScriptingRulesUIHelper.BuildingSignal Signal, TextField CustomSignalField) {
+      this.Signal = Signal;
+      this.CustomSignalField = CustomSignalField;
+      CustomSignalField.RegisterCallback<ChangeEvent<string>>(ValidateSignalNameCallback);
     }
-    return true;
+
+    public bool HasChanges => CustomSignalField.ClassListContains(SignalNameModifiedClass);
+    public bool HasError => CustomSignalField.ClassListContains(BadSignalNameClass);
+    public ScriptingRulesUIHelper.BuildingSignal Signal { get; }
+    public TextField CustomSignalField { get; }
+
+    void ValidateSignalNameCallback(ChangeEvent<string> evt) {
+      ValidateSignalName(evt.newValue);
+    }
+
+    void ValidateSignalName(string newValue) {
+      if (newValue == "" || MappedSignalNamePattern.IsMatch(newValue)) {
+        CustomSignalField.RemoveFromClassList(BadSignalNameClass);
+        if ((Signal.ExportedSignalName ?? "") != newValue) {
+          CustomSignalField.AddToClassList(SignalNameModifiedClass);
+        } else {
+          CustomSignalField.RemoveFromClassList(SignalNameModifiedClass);
+        }
+      } else {
+        CustomSignalField.RemoveFromClassList(SignalNameModifiedClass);
+        CustomSignalField.AddToClassList(BadSignalNameClass);
+      }
+    }
   }
 
   #endregion
