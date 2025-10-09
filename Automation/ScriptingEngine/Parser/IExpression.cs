@@ -11,6 +11,7 @@ interface IExpression {
   public string Serialize();
 
   /// <summary>Returns a human-friendly description of the expression.</summary>
+  /// <exception cref="ScriptError.RuntimeError">if values need to be calculated, but it results in error.</exception>
   public string Describe();
 
   /// <summary>Visits all nodes in the expression tree and applies the visitor function to each node.</summary>

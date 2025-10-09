@@ -8,7 +8,6 @@ using System.Linq;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
-using IgorZ.TimberDev.UI;
 using IgorZ.TimberDev.Utils;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.Persistence;
@@ -29,9 +28,20 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   /// <inheritdoc/>
   public override bool CanRunOnUnfinishedBuildings => _canRunOnUnfinishedBuildings;
   bool _canRunOnUnfinishedBuildings;
-  /// <inheritdoc/>
-  public override string UiDescription => _parsedExpression?.Describe() ?? Behavior.Loc.T(ParseErrorLocKey);
 
+  /// <inheritdoc/>
+  public override string UiDescription {
+    get {
+      if (_lastScriptError != null) {
+        return Behavior.Loc.T(_lastScriptError);
+      }
+      try {
+        return _parsedExpression.Describe();
+      } catch (ScriptError.RuntimeError e) {
+        return Behavior.Loc.T(e.LocKey);
+      }
+    }
+  }
   string _lastScriptError;
 
   /// <inheritdoc/>
@@ -52,7 +62,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
         }
       } catch (ScriptError.RuntimeError e) {
         // The behavior error state is expected to be loaded.
-        HostedDebugLog.Error(Behavior, "SyncState failed: {0}", e.Message);
+        HostedDebugLog.Error(Behavior, "Activation failed: {0}", e.Message);
       }
       return;
     }
@@ -62,7 +72,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
       CheckOperands();
     } catch (ScriptError.RuntimeError e) {
       // The behavior error state is already set.
-      HostedDebugLog.Error(Behavior, "SyncState failed: {0}", e.Message);
+      HostedDebugLog.Error(Behavior, "Activation failed: {0}", e.Message);
     }
   }
 
@@ -220,10 +230,10 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
     if (_parsingResult != default) {
       throw new InvalidOperationException("ParseAndApply should only be called once.");
     }
+    ResetScriptError();
     _parsedExpression = ParseAndValidate(Expression, Behavior, out _parsingResult);
     if (_parsedExpression == null) {
-      ResetScriptError();
-      _lastScriptError = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
+      _lastScriptError = ParseErrorLocKey;
       Behavior.ReportError(this);
       return;
     }
@@ -277,7 +287,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   }
 
   void ReportScriptError(ScriptError.RuntimeError e) {
-    _lastScriptError = CommonFormats.HighlightRed(Behavior.Loc.T(e.LocKey));
+    _lastScriptError = e.LocKey;
     Behavior.ReportError(this);
   }
 

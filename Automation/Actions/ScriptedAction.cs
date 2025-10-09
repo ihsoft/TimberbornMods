@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
-using IgorZ.TimberDev.UI;
 using IgorZ.TimberDev.Utils;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.Persistence;
@@ -17,6 +16,7 @@ namespace IgorZ.Automation.Actions;
 
 sealed class ScriptedAction : AutomationActionBase {
 
+  //FIXME: not present in loc file
   const string ParseErrorLocKey = "IgorZ.Automation.Scripting.Expressions.ParseError";
 
   #region AutomationActionBase overrides
@@ -32,10 +32,14 @@ sealed class ScriptedAction : AutomationActionBase {
   /// <inheritdoc/>
   public override string UiDescription {
     get {
-      if (_lastScriptError != null) {
-        return CommonFormats.HighlightRed(Behavior.Loc.T(_lastScriptError));
+      if (_parsedExpression != null) {
+        try {
+          return _parsedExpression.Describe();
+        } catch (ScriptError.RuntimeError e) {
+          ReportScriptError(e);
+        }
       }
-      return _parsedExpression?.Describe() ?? Behavior.Loc.T(ParseErrorLocKey);
+      return Behavior.Loc.T(_lastScriptError);
     }
   }
   string _lastScriptError;
@@ -173,10 +177,10 @@ sealed class ScriptedAction : AutomationActionBase {
     if (_parsingResult != default) {
       throw new InvalidOperationException("ParseAndApply should only be called once.");
     }
+    ResetScriptError();
     _parsedExpression = ParseAndValidate(Expression, Behavior, out _parsingResult);
     if (_parsedExpression == null) {
-      ResetScriptError();
-      _lastScriptError = CommonFormats.HighlightRed(Behavior.Loc.T(ParseErrorLocKey));
+      _lastScriptError = ParseErrorLocKey;
       Behavior.ReportError(this);
       return;
     }

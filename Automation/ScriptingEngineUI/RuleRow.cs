@@ -102,7 +102,6 @@ sealed class RuleRow {
   public event EventHandler OnStateChanged;
 
   public RuleRow(IEnumerable<IEditorProvider> editors, UiFactory uiFactory, AutomationBehavior activeBuilding) {
-    _expressionParser = DependencyContainer.GetInstance<ExpressionParser>();
     _uiFactory = uiFactory;
     ActiveBuilding = activeBuilding;
     _editorProviders = editors.ToArray();
@@ -262,7 +261,6 @@ sealed class RuleRow {
 
   readonly UiFactory _uiFactory;
   readonly IEditorProvider[] _editorProviders;
-  readonly ExpressionParser _expressionParser;
 
   readonly VisualElement _sidePanel;
   readonly VisualElement _ruleButtons;
@@ -326,17 +324,16 @@ sealed class RuleRow {
     if (expression == null) {
       return CommonFormats.HighlightRed(_uiFactory.T(ParseErrorLocKey));
     }
-    var description = expression.Describe();
-    var isGreen = false;
-    if (expression is BoolOperator boolOperator) {
-      try {
-        isGreen = boolOperator.Execute();
-      } catch (ScriptError.RuntimeError e) {
-        DebugEx.Error("Failed to execute condition: {0}\n{1}", expression, e);
-        return CommonFormats.HighlightRed(_uiFactory.T(e.LocKey));
+    try {
+      var description = expression.Describe();
+      if (expression is BoolOperator boolOperator && boolOperator.Execute()) {
+        return CommonFormats.HighlightGreen(description);
       }
+      return CommonFormats.HighlightYellow(description);
+    } catch (ScriptError.RuntimeError e) {
+      DebugEx.Error("Failed to get description: {0}\n{1}", expression, e);
+      return CommonFormats.HighlightRed(_uiFactory.T(e.LocKey));
     }
-    return isGreen ? CommonFormats.HighlightGreen(description) : CommonFormats.HighlightYellow(description);
   }
 
   void MarkDeleted() {
