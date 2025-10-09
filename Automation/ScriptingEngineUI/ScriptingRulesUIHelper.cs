@@ -48,8 +48,7 @@ class ScriptingRulesUIHelper {
   readonly List<IAutomationAction> _buildingRules = [];
 
   /// <summary>The building that is being edited.</summary>
-  public AutomationBehavior AutomationBehavior => _automationBehavior;
-  AutomationBehavior _automationBehavior;
+  public AutomationBehavior AutomationBehavior { get; private set; }
 
   /// <summary>List of all building signal names that can be mapped to custom signals.</summary>
   /// <remarks>
@@ -62,7 +61,7 @@ class ScriptingRulesUIHelper {
   /// <summary>Sets the building that is being edited.</summary>
   /// <remarks>All the internal state is reset.</remarks>
   public void SetBuilding(AutomationBehavior automationBehavior) {
-    _automationBehavior = automationBehavior;
+    AutomationBehavior = automationBehavior;
     _buildingSignals.Clear();
     _buildingRules.Clear();
     ExposedSignalsCount = 0;
@@ -137,14 +136,14 @@ class ScriptingRulesUIHelper {
     condition.SetExpression($"(eq (sig {buildingSignalName}) (sig {buildingSignalName}))");
     var action = new ScriptedAction();
     action.SetExpression($"(act Signals.Set '{exportedSignalName}' (sig {buildingSignalName}))");
-    _automationBehavior.AddRule(condition, action);
+    AutomationBehavior.AddRule(condition, action);
   }
 
   /// <summary>Removes all signal mapping rules from the building.</summary>
   /// <seealso cref="BuildingSignals"/>
   public void ClearSignalsOnBuilding() {
     foreach (var signal in _buildingSignals.Where(x => x.Action != null)) {
-      _automationBehavior.DeleteRule(signal.Action);
+      AutomationBehavior.DeleteRule(signal.Action);
     }
   }
 
@@ -152,7 +151,7 @@ class ScriptingRulesUIHelper {
   /// <seealso cref="BuildingRules"/>
   public void ClearRulesOnBuilding() {
     foreach (var rule in _buildingRules) {
-      _automationBehavior.DeleteRule(rule);
+      AutomationBehavior.DeleteRule(rule);
     }
   }
 
