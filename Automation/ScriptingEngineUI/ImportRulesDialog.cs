@@ -4,104 +4,104 @@
 
 using System;
 using System.Collections.Generic;
+using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine;
 using IgorZ.TimberDev.UI;
-using Timberborn.CoreUI;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
 
-class ImportRulesDialog : IPanelController {
+class ImportRulesDialog : AbstractDialog {
+
+  const string ImportRulesDialogAsset = "IgorZ.Automation/ImportRules";
 
   const string ImportErrorLocKey = "IgorZ.Automation.Scripting.ImportRules.ImportError";
   const string ReadMoreUrlLocKey = "IgorZ.Automation.Scripting.ImportDialog.ReadMoreUrl";
 
-  #region IPanelController implementation
+  #region AbstractDialog implementation
 
   /// <inheritdoc/>
-  public VisualElement GetPanel() {
-    return _root;
+  protected override string DialogResourceName => ImportRulesDialogAsset;
+
+  /// <inheritdoc/>
+  protected override string VerifyInput() {
+    try {
+      _templatingService.ParseFromText(
+          _importText.value, _activeBuilding, _allowErrors.value, _skipFailedRules.value, out _);
+    } catch (TemplatingService.ImportError e) {
+      return UiFactory.T(ImportErrorLocKey, e.LineNum, e.Text);
+    }
+    return null;
   }
 
   /// <inheritdoc/>
-  public bool OnUIConfirmed() {
-    return true;
+  protected override void ApplyInput() {
+    var rules = _templatingService.ParseFromText(
+        _importText.value, _activeBuilding, _allowErrors.value, _skipFailedRules.value, out var skippedRules);
+    if (skippedRules > 0) {
+      HostedDebugLog.Warning(_activeBuilding, "Skipped {0} rules during import", skippedRules);
+    }
+    _onConfirm(rules, Root.Q<Toggle>("DeleteExistingRulesToggle").value);
   }
 
   /// <inheritdoc/>
-  public void OnUICancelled() {
-    Close();
-  }
+  protected override bool CheckHasChanges() => false;
 
   #endregion
 
   #region API
 
-  public bool DeleteExistingRules => _root.Q<Toggle>("DeleteExistingRulesToggle").value;
-
-  public void Show(AutomationBehavior automationBehavior, Action<IList<IAutomationAction>> onSave) {
+  public ImportRulesDialog WithBuilding(AutomationBehavior automationBehavior) {
     _activeBuilding = automationBehavior;
-    _onSave = onSave;
-    _importText.value = "";
-    _panelStack.PushDialog(this);
+    return this;
   }
 
-  public void Close() => _panelStack.Pop(this);
+  public ImportRulesDialog Notifying(Action<IList<IAutomationAction>, bool> onConfirm) {
+    _onConfirm = onConfirm;
+    return this;
+  }
+
+  public override void Show() {
+    base.Show();
+
+    Root.Q2<Button>("ReadMoreButton").clicked += () => Application.OpenURL(UiFactory.T(ReadMoreUrlLocKey));
+    
+    _skipFailedRules = Root.Q2<Toggle>("SkipFailedRulesToggle");
+    _allowErrors = Root.Q2<Toggle>("AllowErrorsToggle");
+    _allowErrors.RegisterValueChangedCallback(_ => _skipFailedRules.SetEnabled(!_allowErrors.value));
+    _importText = Root.Q2<TextField>("ImportTextField");
+    _importText.value = "";
+  }
+
+  public override void Close() {
+    base.Close();
+    _activeBuilding = null;
+    _skipFailedRules = null;
+    _allowErrors = null;
+    _importText = null;
+    _onConfirm = null;
+  }
 
   #endregion
 
   #region Implementation
 
-  readonly VisualElement _root;
-  readonly UiFactory _uiFactory;
-  readonly PanelStack _panelStack;
-  readonly DialogBoxShower _dialogBoxShower;
-  readonly TemplatingService _templatingService;
+  TemplatingService _templatingService;
 
-  readonly Toggle _allowErrors;
-  readonly Toggle _skipFailedRules;
-  readonly TextField _importText;
+  Toggle _allowErrors;
+  Toggle _skipFailedRules;
+  TextField _importText;
 
   AutomationBehavior _activeBuilding;
-  Action<IList<IAutomationAction>> _onSave;
+  Action<IList<IAutomationAction>, bool> _onConfirm;
 
-  ImportRulesDialog(UiFactory uiFactory, PanelStack panelStack, DialogBoxShower dialogBoxShower,
-                    TemplatingService templatingService) {
-    _uiFactory = uiFactory;
-    _panelStack = panelStack;
-    _dialogBoxShower = dialogBoxShower;
+  /// <summary>Public for the inject to work properly.</summary>
+  [Inject]
+  public void InjectDependencies(TemplatingService templatingService) {
     _templatingService = templatingService;
-
-    _root = _uiFactory.LoadVisualTreeAsset("IgorZ.Automation/ImportRules");
-    _root.Q<Button>("CloseButton").clicked += Close;
-    _root.Q<Button>("CancelButton").clicked += Close;
-    _root.Q<Button>("ImportButton").clicked += OnSaveButtonClicked;
-    _root.Q<Button>("ReadMoreButton").clicked += () => Application.OpenURL(_uiFactory.T(ReadMoreUrlLocKey));
-    
-    _skipFailedRules = _root.Q<Toggle>("SkipFailedRulesToggle");
-    _allowErrors = _root.Q<Toggle>("AllowErrorsToggle");
-    _allowErrors.RegisterValueChangedCallback(evt => _skipFailedRules.SetEnabled(!_allowErrors.value));
-    _importText = _root.Q<TextField>("ImportTextField");
-  }
-
-  void OnSaveButtonClicked() {
-    List<IAutomationAction> rules;
-    var skippedRules = 0;
-    try {
-      rules = _templatingService.ParseFromText(
-          _importText.value, _activeBuilding, _allowErrors.value, _skipFailedRules.value, out skippedRules);
-    } catch (TemplatingService.ImportError e) {
-      _dialogBoxShower.Create().SetMessage(_uiFactory.T(ImportErrorLocKey, e.LineNum, e.Text)).Show();
-      return;
-    }
-    if (skippedRules > 0) {
-      HostedDebugLog.Warning(_activeBuilding, "Skipped {0} rules during import", skippedRules);
-    }
-    _onSave?.Invoke(rules);
-    Close();
   }
 
   #endregion

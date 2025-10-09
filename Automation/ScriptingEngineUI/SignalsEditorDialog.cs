@@ -51,16 +51,20 @@ sealed class SignalsEditorDialog : AbstractDialog {
 
   #region API
 
-  ScriptingRulesUIHelper _rulesUiHelper;
-  readonly List<MappingLine> _mappingLines = [];
-
-  public void Initialize(ScriptingRulesUIHelper rulesUIHelper) {
+  public SignalsEditorDialog WithUiHelper(ScriptingRulesUIHelper rulesUIHelper) {
     _rulesUiHelper = rulesUIHelper;
+    return this;
+  }
+
+  /// <inheritdoc/>
+  public override void Show() {
+    base.Show();
 
     var sourceSection = Root.Q2<VisualElement>("SourcesSection");
     sourceSection.Clear();
     var targetSection = Root.Q2<VisualElement>("TargetsSection");
     targetSection.Clear();
+
     _mappingLines.Clear();
     foreach (var signalMapping in _rulesUiHelper.BuildingSignals) {
       var sourceTmpl = UiFactory.LoadVisualElement(SignalSourceTmplAsset);
@@ -77,11 +81,21 @@ sealed class SignalsEditorDialog : AbstractDialog {
     }
   }
 
+  /// <inheritdoc/>
+  public override void Close() {
+    base.Close();
+    _mappingLines.Clear();
+    _rulesUiHelper = null;
+  }
+
   #endregion
 
   #region Implementation
 
   static readonly Regex MappedSignalNamePattern = new(@"^(?!\.)([A-Za-z][A-Za-z0-9]+\.?)*([A-Za-z][A-Za-z0-9]*)$");
+
+  ScriptingRulesUIHelper _rulesUiHelper;
+  readonly List<MappingLine> _mappingLines = [];
 
   readonly record struct MappingLine {
     public MappingLine(ScriptingRulesUIHelper.BuildingSignal Signal, TextField CustomSignalField) {

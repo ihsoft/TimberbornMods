@@ -86,10 +86,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
     // Setup signals fragment section.
     var setupSignalsButton = _root.Q2<Button>("SetupSignalsButton");
-    setupSignalsButton.clicked += () => {
-      _signalsEditorDialog.Initialize(_scriptingRulesUIHelper);
-      _signalsEditorDialog.Show();
-    };
+    setupSignalsButton.clicked += () => _signalsEditorDialog.WithUiHelper(_scriptingRulesUIHelper).Show();
     _tooltipRegistrar.RegisterLocalizable(setupSignalsButton, SetupSignalsBtnHintLocKey);
     _clearSignalsButton = _root.Q2<Button>("ClearSignalsButton");
     _tooltipRegistrar.RegisterLocalizable(_clearSignalsButton, ClearSignalsBtnHintLocKey);
@@ -106,7 +103,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
     // Setup rules fragment section.
     _setupRulesButton = _root.Q2<Button>("SetupRulesButton");
-    _setupRulesButton.clicked += () => _rulesEditorDialog.Show(_automationBehavior, null);
+    _setupRulesButton.clicked += () => _rulesEditorDialog.WithBuilding(_automationBehavior).Show();
     _tooltipRegistrar.RegisterLocalizable(_setupRulesButton, SetupRulesBtnHintLocKey);
     _copyRulesButton = _root.Q2<Button>("CopyRulesButton");
     _copyRulesButton.clicked += () => _copyRulesTool.StartTool(_automationBehavior);

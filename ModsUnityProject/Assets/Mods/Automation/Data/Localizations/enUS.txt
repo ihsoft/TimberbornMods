@@ -179,7 +179,6 @@ IgorZ.Automation.Scripting.Editor.SaveScriptBtn,"Save",
 IgorZ.Automation.Scripting.Editor.StringConstantType,"string","Name of the string constant type"
 IgorZ.Automation.Scripting.Editor.TemplateFamilyLabel,"Template group: {0}","Name of the template group (family) the rule belongs to"
 IgorZ.Automation.Scripting.Editor.TestScriptBtn,"Test",
-IgorZ.Automation.Scripting.Editor.UnsavedChangesConfirmation,"There are unsaved changes. Do you want to discard them?",
 =,=,"Import dialog"
 IgorZ.Automation.Scripting.Editor.ExportDialogHeader,"Export automation rules",
 IgorZ.Automation.Scripting.Editor.ImportDialogHeader,"Import automation rules",
