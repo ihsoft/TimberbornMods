@@ -105,7 +105,7 @@ sealed class RulesEditorDialog : AbstractDialog {
         .Notifying((rules, clearExisting) => {
           if (clearExisting) {
             // FIXME: simulate deletion instead.
-            // FIXME: consider usnaved added rows.
+            // FIXME: consider unsaved added rows.
             Reset();
           }
           //FIXME: simulate adding rows
