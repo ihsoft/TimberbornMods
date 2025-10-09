@@ -43,9 +43,9 @@ sealed class RulesEditorDialog : AbstractDialog {
 
   /// <inheritdoc/>
   protected override void ApplyInput() {
-    _activeBuilding.ClearAllRules();
+    _rulesUiHelper.ClearRulesOnBuilding();
     foreach (var rule in _ruleRows.Where(x => !x.IsDeleted)) {
-      _activeBuilding.AddRule(rule.GetCondition(), rule.GetAction());
+      _rulesUiHelper.AutomationBehavior.AddRule(rule.GetCondition(), rule.GetAction());
     }
   }
 
@@ -58,8 +58,8 @@ sealed class RulesEditorDialog : AbstractDialog {
 
   #region API
 
-  public RulesEditorDialog WithBuilding(AutomationBehavior activeBuilding) {
-    _activeBuilding = activeBuilding;
+  public RulesEditorDialog WithUiHelper(ScriptingRulesUIHelper rulesUiHelper) {
+    _rulesUiHelper = rulesUiHelper;
     return this;
   }
 
@@ -82,7 +82,7 @@ sealed class RulesEditorDialog : AbstractDialog {
 
     _ruleRowsContainer = Root.Q2<VisualElement>("RuleRowsContainer");
     Reset();
-    foreach (var action in _activeBuilding.Actions) {
+    foreach (var action in _rulesUiHelper.BuildingRules) {
       var ruleRow = CreateScriptedRule();
       if (action is ScriptedAction scriptedAction && action.Condition is ScriptedCondition scriptedCondition) {
         ruleRow.Initialize(scriptedCondition, scriptedAction);
@@ -96,12 +96,12 @@ sealed class RulesEditorDialog : AbstractDialog {
   public override void Close() {
     base.Close();
     _ruleRows.Clear();
-    _activeBuilding = null;
+    _rulesUiHelper = null;
     _ruleRowsContainer = null;
   }
 
   void ImportRules() {
-    _importRulesDialog.WithBuilding(_activeBuilding)
+    _importRulesDialog.WithBuilding(_rulesUiHelper.AutomationBehavior)
         .Notifying((rules, clearExisting) => {
           if (clearExisting) {
             // FIXME: simulate deletion instead.
@@ -143,7 +143,7 @@ sealed class RulesEditorDialog : AbstractDialog {
   bool HasErrors => _ruleRows.Any(x => x.HasErrors);
 
   VisualElement _ruleRowsContainer;
-  AutomationBehavior _activeBuilding;
+  ScriptingRulesUIHelper _rulesUiHelper;
   readonly List<RuleRow> _ruleRows = []; 
   
   /// <summary>Public for the inject to work properly.</summary>
@@ -162,7 +162,7 @@ sealed class RulesEditorDialog : AbstractDialog {
   }
 
   RuleRow CreateScriptedRule() {
-    var ruleRow = new RuleRow(_editorProviders, UiFactory, _activeBuilding);
+    var ruleRow = new RuleRow(_editorProviders, UiFactory, _rulesUiHelper.AutomationBehavior);
     ruleRow.OnStateChanged += OnRuleStateChanged;
     _ruleRows.Add(ruleRow);
     _ruleRowsContainer.Add(ruleRow.Root);
