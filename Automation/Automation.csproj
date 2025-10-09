@@ -219,6 +219,7 @@
       <Content Include="..\TimberDev\Tools\ruRU.csv">
         <Link>TimberDev\Tools\ruRU.csv</Link>
       </Content>
+    </ItemGroup>
     <PropertyGroup>
         <ModPath>u:\Mods</ModPath>
     </PropertyGroup>
