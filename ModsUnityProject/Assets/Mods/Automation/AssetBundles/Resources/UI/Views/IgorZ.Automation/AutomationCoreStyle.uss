@@ -1,0 +1,81 @@
+.button-click {
+    --click-sound: "UI.Click";
+}
+
+.automation-red-text {
+    color: rgb(255, 67, 0);
+    background-color: rgba(255, 48, 0, 0.15);
+}
+
+.automation-yellow-text {
+    color: rgb(255, 255, 26);
+}
+
+.automation-green-text {
+    color: rgb(89, 255, 97);
+}
+
+.automation-deleted-text {
+    color: rgb(255, 67, 0);
+    background-color: rgba(255, 48, 0, 0.15);
+}
+
+.text-field-error .unity-base-field__input {
+    background-color: rgba(255, 0, 0, 0.2);
+}
+
+.text-field-modified .unity-base-field__input {
+    background-color: rgba(0, 255, 0, 0.05);
+}
+
+.text-field-green .unity-base-field__input {
+    color: rgb(0, 255, 0);
+}
+
+.automation-button-copy {
+    background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/CopyIcon-bare.png?fileID=21300000&guid=895275f46056ee24eaa9c16e9607ae74&type=3#CopyIcon-bare");
+}
+
+.automation-button-copy:hover:enabled {
+    background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/CopyIcon-hover.png?fileID=21300000&guid=f319c04cfd2f34a4f9d173f279a27ccb&type=3#CopyIcon-hover");
+}
+
+.automation-button-copy:hover:enabled:active {
+    background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/CopyIcon-active.png?fileID=21300000&guid=432bb767a10fed048b24d1481d1e83ca&type=3#CopyIcon-active");
+}
+
+.automation-button-setup {
+    background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/SetupIcon-bare.png?fileID=21300000&guid=d66f6482060db074fb3947963eb893a6&type=3#SetupIcon-bare");
+}
+
+.automation-button-setup:hover:enabled {
+    background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/SetupIcon-hover.png?fileID=21300000&guid=36e20d33785510948a0f40894328606f&type=3#SetupIcon-hover");
+}
+
+.automation-button-setup:hover:enabled:active {
+    background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/SetupIcon-active.png?fileID=21300000&guid=2d71e358907dc6a439aeec5dcb027f40&type=3#SetupIcon-active");
+}
+
+.automation-button-clear {
+    background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/ClearIcon-bare.png?fileID=21300000&guid=7e8521dd054106e4594cad0ff68c38fe&type=3#ClearIcon-bare");
+}
+
+.automation-button-clear:hover:enabled {
+    background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/ClearIcon-hover.png?fileID=21300000&guid=4dfb833aa7000fc4d94d8415874aec44&type=3#ClearIcon-hover");
+}
+
+.automation-button-clear:hover:enabled:active {
+    background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/ClearIcon-active.png?fileID=21300000&guid=93da74962b47e7041935bfc2c93724d0&type=3#ClearIcon-active");
+}
+
+.automation-button-undo {
+    background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/UndoIcon.png?fileID=21300000&guid=fa0c26e4ee225e64480915b66712490f&type=3#UndoIcon");
+}
+
+.automation-button-undo:hover:enabled {
+    background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/UndoIcon-hover.png?fileID=21300000&guid=eeb1d6c6d3f990341ae71f5f826d8d9f&type=3#UndoIcon-hover");
+}
+
+.automation-button-undo:hover:enabled:active {
+    background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/UndoIcon-active.png?fileID=21300000&guid=88b1acc4c982041468b9ccbd8132fb7b&type=3#UndoIcon-active");
+}

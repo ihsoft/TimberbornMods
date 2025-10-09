@@ -127,6 +127,9 @@ sealed class ScriptedAction : AutomationActionBase {
     Expression = expression;
   }
 
+  /// <summary>Result of parsing the expression.</summary>
+  public ParsingResult ParsingResult => _parsingResult;
+
   #endregion
 
   #region IGameSerializable implemenation

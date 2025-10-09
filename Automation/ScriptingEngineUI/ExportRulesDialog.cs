@@ -3,64 +3,67 @@
 // License: Public Domain
 
 using System.Collections.Generic;
+using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine;
 using IgorZ.TimberDev.UI;
-using Timberborn.CoreUI;
 using UnityEngine.UIElements;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
 
-class ExportRulesDialog : IPanelController {
+class ExportRulesDialog : AbstractDialog {
 
-  #region IPanelController implementation
+  const string ExportRulesDialogAsset = "IgorZ.Automation/ExportRules";
 
-  /// <inheritdoc/>
-  public VisualElement GetPanel() {
-    return _root;
-  }
+  #region AbstractDialog implementation
 
   /// <inheritdoc/>
-  public bool OnUIConfirmed() {
-    return true;
-  }
+  protected override string DialogResourceName => ExportRulesDialogAsset;
 
   /// <inheritdoc/>
-  public void OnUICancelled() {
-    Close();
-  }
+  protected override string CancelButtonName => null;
+
+  /// <inheritdoc/>
+  protected override string VerifyInput() => null;
+
+  /// <inheritdoc/>
+  protected override void ApplyInput() { }
+
+  /// <inheritdoc/>
+  protected override bool CheckHasChanges() => false;
 
   #endregion
 
   #region API
 
-  public void Show(IList<IAutomationAction> actions) {
-    _exportText.value = _templatingService.RenderRulesToText(actions);
-    _panelStack.PushDialog(this);
+  public ExportRulesDialog WithActions(IList<IAutomationAction> actions) {
+    _actions = actions;
+    return this;
   }
 
-  public void Close() => _panelStack.Pop(this);
+  public override void Show() {
+    base.Show();
+    Root.Q<TextField>("ExportTextField").value = _templatingService.RenderRulesToText(_actions);
+  }
+
+  public override void Close() {
+    base.Close();
+    _actions = null;
+  }
 
   #endregion
 
   #region Implementation
 
-  readonly VisualElement _root;
-  readonly PanelStack _panelStack;
-  readonly TemplatingService _templatingService;
+  TemplatingService _templatingService;
+  IList<IAutomationAction> _actions;
 
-  readonly TextField _exportText;
-
-  ExportRulesDialog(UiFactory uiFactory, PanelStack panelStack, TemplatingService templatingService) {
-    _panelStack = panelStack;
+  /// <summary>Public for the inject to work properly.</summary>
+  [Inject]
+  public void InjectDependencies(TemplatingService templatingService) {
     _templatingService = templatingService;
-
-    _root = uiFactory.LoadVisualTreeAsset("IgorZ.Automation/ExportRules");
-    _root.Q<Button>("CloseButton").clicked += Close;
-    _root.Q<Button>("OkButton").clicked += Close;
-
-    _exportText = _root.Q<TextField>("ExportTextField");
   }
 
   #endregion
+
 }

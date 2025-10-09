@@ -109,12 +109,16 @@ IgorZ.Automation.Scripting.Error.DivisionByZero,"ERROR: Division by zero","Local
 IgorZ.Automation.Scripting.Error.BadValue,"ERROR: Bad value","Localizable generic message for the related exception"
 IgorZ.Automation.Scripting.Error.InternalError,"ERROR: Internal error","Localizable generic message for the related exception"
 =,=,"UI fragment strings"
-IgorZ.Automation.AutomationFragment.AddRulesBtn,"Add automation rules",
-IgorZ.Automation.AutomationFragment.CopyRulesBtn,"Copy rules",
-IgorZ.Automation.AutomationFragment.EditRulesBtn,"Edit rules",
-IgorZ.Automation.AutomationFragment.RuleTextLocKey,"If {0}
-Then {1}",
-IgorZ.Automation.AutomationFragment.RulesAreaCaptionTextLocKey,"Automation rules:",
+IgorZ.Automation.AutomationFragment.BuildingSignalSource,"{0} ({1})","String that represents the source signal user-friendly, and it's current value"
+IgorZ.Automation.AutomationFragment.ClearRulesBtnHint,"Clear all rules",
+IgorZ.Automation.AutomationFragment.ClearSignalsBtnHint,"Clear all signals mappings",
+IgorZ.Automation.AutomationFragment.CopyRulesBtnHint,"Copy rules and signal mappings to another building",
+IgorZ.Automation.AutomationFragment.RuleActionTextLocKey,"Then {0}",
+IgorZ.Automation.AutomationFragment.RuleConditionTextLocKey,"If {0},",
+IgorZ.Automation.AutomationFragment.RulesCountTextLocKey,"Rules: {0}",
+IgorZ.Automation.AutomationFragment.SetupRulesBtnHint,"Setup rules",
+IgorZ.Automation.AutomationFragment.SetupSignalsBtnHint,"Setup signals that will be visible to the other buildings",
+IgorZ.Automation.AutomationFragment.SignalsCountTextLocKey,"Signals: {0}/{1}",
 IgorZ.Automation.Tool.CopyRules.Text,"Copy {0} rules",
 IgorZ.Automation.Tool.CopyRules.Title,"Copy automation rules",
 =,=,"Scriptable components strings"
@@ -185,7 +189,10 @@ IgorZ.Automation.Scripting.Editor.SaveScriptBtn,"Save",
 IgorZ.Automation.Scripting.Editor.StringConstantType,"string","Name of the string constant type"
 IgorZ.Automation.Scripting.Editor.TemplateFamilyLabel,"Template group: {0}","Name of the template group (family) the rule belongs to"
 IgorZ.Automation.Scripting.Editor.TestScriptBtn,"Test",
-IgorZ.Automation.Scripting.Editor.UnsavedChangesConfirmation,"There are unsaved changes. Do you want to discard them?",
+=,=,"Signals editor strings"
+IgorZ.Automation.Scripting.SignalsEditor.DialogHeader,"Setup building signals",
+IgorZ.Automation.Scripting.SignalsEditor.BadSignalNameMsg,"❌ Bad signal name!
+The name must start with a letter and contain only letters, digits, and dots.","Message shown when the signal name is invalid; explain naming rules and note that only Latin letters are allowed."
 =,=,"Import dialog"
 IgorZ.Automation.Scripting.Editor.ExportDialogHeader,"Export automation rules",
 IgorZ.Automation.Scripting.Editor.ImportDialogHeader,"Import automation rules",
@@ -230,3 +237,5 @@ TimberDev_Utils.Tools.LockSelectTool.SelectingNObjects,"Selecting: {0} (x{1})","
 TimberDev_Utils.Tools.LockSelectTool.SelectingObject,"Selecting: {0}","Text to show the type of the selected building. It's shown when the selection tool is locked on the specific buildings."
 TimberDev_Utils.Tools.LockSelectTool.StartObjectSelectingPrompt,"Click to start selecting: {0}",
 TimberDev_Utils.Tools.LockSelectTool.StartSelectingPrompt,"Point to an entity and click to start selecting",
+=,=,"TimberDev_UI"
+TimberDev_UI.AbstractDialog.UnsavedChangesConfirmation,"There are unsaved changes. Do you want to discard them?","A confirmation message that is shown if the dialog is being closed by ESC and there were changes made."

@@ -70,12 +70,11 @@ IgorZ.Automation.Tool.tmpl.DynamiteNow.Description,"Примените этот 
 IgorZ.Automation.Tool.tmpl.DynamiteNow.DisplayName,"Активировать динамит",
 IgorZ.Automation.Tool.tmpl.EmitSelectedGood.Description,"Примените этот шаблон к складам, чтобы они установили и обновляли сигнал выбранного запаса. Этот сигнал можно будет использовать в условиях на других зданиях.",
 IgorZ.Automation.Tool.tmpl.EmitSelectedGood.DisplayName,"Сигнал запасов на складе",
-IgorZ.Automation.Tool.tmpl.EmptyAt50pct.DisplayName,"Empty the storage if capacity is above 50%",
-IgorZ.Automation.Tool.tmpl.EmptyAt50pct.DisplayName,"Освобождать если занято болеее 50%",
-IgorZ.Automation.Tool.tmpl.EmptyAt60pct.DisplayName,"Освобождать если занято болеее 60%",
-IgorZ.Automation.Tool.tmpl.EmptyAt70pct.DisplayName,"Освобождать если занято болеее 70%",
-IgorZ.Automation.Tool.tmpl.EmptyAt80pct.DisplayName,"Освобождать если занято болеее 80%",
-IgorZ.Automation.Tool.tmpl.EmptyAt90pct.DisplayName,"Освобождать если занято болеее 90%",
+IgorZ.Automation.Tool.tmpl.EmptyAt50pct.DisplayName,"Освобождать если занято более 50%",
+IgorZ.Automation.Tool.tmpl.EmptyAt60pct.DisplayName,"Освобождать если занято более 60%",
+IgorZ.Automation.Tool.tmpl.EmptyAt70pct.DisplayName,"Освобождать если занято более 70%",
+IgorZ.Automation.Tool.tmpl.EmptyAt80pct.DisplayName,"Освобождать если занято более 80%",
+IgorZ.Automation.Tool.tmpl.EmptyAt90pct.DisplayName,"Освобождать если занято более 90%",
 IgorZ.Automation.Tool.tmpl.EmptyAtXpct.Description,"Этот шаблон можно применить к зданиям, которые производят один тип товара и не имеют входного склада. Если количество произведенного <i>товара</i> превышает заранее установленный порог, здание перейдет в режим 'освобождения', что позволит быстро вывезти товары.",
 IgorZ.Automation.Tool.tmpl.FloodgateGroup.Description,"Примените этот шаблон к шлюзам для одновременного изменения высоты затвора.",
 IgorZ.Automation.Tool.tmpl.FloodgateGroup.DisplayName,"Создать группу шлюзов",
@@ -110,12 +109,16 @@ IgorZ.Automation.Scripting.Error.DivisionByZero,"ОШИБКА: Деление н
 IgorZ.Automation.Scripting.Error.BadValue,"ОШИБКА: Неверное значение","Localizable generic message for the related exception"
 IgorZ.Automation.Scripting.Error.InternalError,"ОШИБКА: Внутренняя ошибка","Localizable generic message for the related exception"
 =,=,"UI fragment strings"
-IgorZ.Automation.AutomationFragment.AddRulesBtn,"Добавить правила автоматизации",
-IgorZ.Automation.AutomationFragment.CopyRulesBtn,"Копировать правила",
-IgorZ.Automation.AutomationFragment.EditRulesBtn,"Редактировать",
-IgorZ.Automation.AutomationFragment.RuleTextLocKey,"Если {0}
-Тогда {1}",
-IgorZ.Automation.AutomationFragment.RulesAreaCaptionTextLocKey,"Правила автоматизации:",
+IgorZ.Automation.AutomationFragment.BuildingSignalSource,"{0} ({1})","String that represents the source signal user-friendly, and it's current value"
+IgorZ.Automation.AutomationFragment.ClearRulesBtnHint,"Удалить все правила",
+IgorZ.Automation.AutomationFragment.ClearSignalsBtnHint,"Удалить все сигналы",
+IgorZ.Automation.AutomationFragment.CopyRulesBtnHint,"Копировать правила и сигналы на другие здания",
+IgorZ.Automation.AutomationFragment.RuleActionTextLocKey,"Тогда {0}",
+IgorZ.Automation.AutomationFragment.RuleConditionTextLocKey,"Если {0},",
+IgorZ.Automation.AutomationFragment.RulesCountTextLocKey,"Правила: {0}",
+IgorZ.Automation.AutomationFragment.SetupRulesBtnHint,"Настроить правила",
+IgorZ.Automation.AutomationFragment.SetupSignalsBtnHint,"Настроить сигналы которые другие здания смогут использовать в своих условиях",
+IgorZ.Automation.AutomationFragment.SignalsCountTextLocKey,"Сигналы: {0}/{1}",
 IgorZ.Automation.Tool.CopyRules.Text,"Копировать правила: {0}",
 IgorZ.Automation.Tool.CopyRules.Title,"Копировать правила автоматизации",
 =,=,"Scriptable components strings"
@@ -186,7 +189,10 @@ IgorZ.Automation.Scripting.Editor.SaveScriptBtn,"Сохранить",
 IgorZ.Automation.Scripting.Editor.StringConstantType,"строка","Name of the string constant type"
 IgorZ.Automation.Scripting.Editor.TemplateFamilyLabel,"Группа шаблонов: {0}","Name of the template group (family) the rule belongs to"
 IgorZ.Automation.Scripting.Editor.TestScriptBtn,"Проверить",
-IgorZ.Automation.Scripting.Editor.UnsavedChangesConfirmation,"Есть несохраненные изменения. Вы хотите их отменить?",
+=,=,"Signals editor strings"
+IgorZ.Automation.Scripting.SignalsEditor.DialogHeader,"Сигналы автоматизации",
+IgorZ.Automation.Scripting.SignalsEditor.BadSignalNameMsg,"❌ Неверное имя сигнала!
+Имя должно начинаться с латинской буквы и содержать только буквы, цифры и точки.","Message shown when the signal name is invalid; explain naming rules and note that only Latin letters are allowed."
 =,=,"Import dialog"
 IgorZ.Automation.Scripting.Editor.ExportDialogHeader,"Экспорт правил автоматизации",
 IgorZ.Automation.Scripting.Editor.ImportDialogHeader,"Импорт правил автоматизации",
@@ -232,3 +238,5 @@ TimberDev_Utils.Tools.LockSelectTool.SelectingNObjects,"Выделено: {0} (x
 TimberDev_Utils.Tools.LockSelectTool.SelectingObject,"Выделено: {0}","Text to show the type of the selected building. It's shown when the selection tool is locked on the specific buildings."
 TimberDev_Utils.Tools.LockSelectTool.StartObjectSelectingPrompt,"Выделять здания типа: {0}",
 TimberDev_Utils.Tools.LockSelectTool.StartSelectingPrompt,"Наведите курсор на объект и нажмите <i>ЛКМ</i>, чтобы начать выделение.",
+=,=,"TimberDev_UI"
+TimberDev_UI.AbstractDialog.UnsavedChangesConfirmation,"Есть несохраненные изменения. Вы хотите их отменить?","A confirmation message that is shown if the dialog is being closed by ESC and there were changes made."

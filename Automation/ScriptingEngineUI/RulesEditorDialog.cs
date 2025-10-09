@@ -5,166 +5,84 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Bindito.Core;
 using IgorZ.Automation.Actions;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.Conditions;
 using IgorZ.TimberDev.UI;
-using TimberApi.DependencyContainerSystem;
-using Timberborn.CoreUI;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
 
-sealed class RulesEditorDialog : IPanelController {
+sealed class RulesEditorDialog : AbstractDialog {
+
+  const string RulesEditorDialogAsset = "IgorZ.Automation/RulesEditor";
+  const string RulesEditorButtonTmplAsset = "IgorZ.Automation/RulesEditorButtonTmpl";
 
   const string PendingEditsNotificationLocKey = "IgorZ.Automation.Scripting.Editor.PendingEditsNotification";
-  const string UnsavedChangesConfirmationLocKey = "IgorZ.Automation.Scripting.Editor.UnsavedChangesConfirmation";
   const string RulesWithErrorsLocKey = "IgorZ.Automation.Scripting.Editor.RulesWithErrorsNotification";
   const string ReadMoreLinkLocKey = "IgorZ.Automation.Scripting.Editor.ReadMoreLink";
 
-  #region IPanelController implementation
+  #region AbstractDialog implementation
 
   /// <inheritdoc/>
-  public VisualElement GetPanel() {
-    return _root;
-  }
+  protected override string DialogResourceName => RulesEditorDialogAsset;
 
   /// <inheritdoc/>
-  public bool OnUIConfirmed() {
+  protected override string VerifyInput() {
     if (EditsPending) {
-      _dialogBoxShower.Create().SetMessage(_uiFactory.T(PendingEditsNotificationLocKey)).Show();
-      return true;
+      return UiFactory.T(PendingEditsNotificationLocKey);
     }
     if (HasErrors && !Keyboard.current.ctrlKey.isPressed) {
-      _dialogBoxShower.Create().SetMessage(_uiFactory.T(RulesWithErrorsLocKey)).Show();
-      return true;
+      return UiFactory.T(RulesWithErrorsLocKey);
     }
-    SaveAndClose();
-    return false;
-  }
-
-  void SaveAndClose() {
-    SaveRulesAndCloseDialog();
-    Close();
-    _onClosed?.Invoke();
+    return null;
   }
 
   /// <inheritdoc/>
-  public void OnUICancelled() {
-    if (RulesChanged || EditsPending) {
-      ShowUnsavedChangesConfirmation(Close);
-      return;
+  protected override void ApplyInput() {
+    _rulesUiHelper.ClearRulesOnBuilding();
+    foreach (var rule in _ruleRows.Where(x => !x.IsDeleted)) {
+      _rulesUiHelper.AutomationBehavior.AddRule(rule.GetCondition(), rule.GetAction());
     }
-    Close();
   }
-  Action _onClosed;
+
+  /// <inheritdoc/>
+  protected override bool CheckHasChanges() {
+    return RulesChanged || EditsPending;
+  }
 
   #endregion
 
   #region API
 
-  public void Show(AutomationBehavior behavior, Action onClosed) {
-    _root = _uiFactory.LoadVisualTreeAsset("IgorZ.Automation/RulesEditor");
-    _ruleRowsContainer = _root.Q<VisualElement>("RuleRowsContainer");
-    _root.Q<Button>("ConfirmButton").clicked += () => OnUIConfirmed();
-    _root.Q<Button>("CancelButton").clicked += Close;
-    _root.Q<Button>("CloseButton").clicked += Close;
-    _root.Q<Button>("MoreInfoButton").clicked += () => Application.OpenURL(_uiFactory.T(ReadMoreLinkLocKey));
+  public RulesEditorDialog WithUiHelper(ScriptingRulesUIHelper rulesUiHelper) {
+    _rulesUiHelper = rulesUiHelper;
+    return this;
+  }
 
-    var buttons = _root.Q("Buttons");
+  /// <inheritdoc/>
+  public override void Show() {
+    base.Show();
+
+    Root.Q2<Button>("MoreInfoButton").clicked += () => Application.OpenURL(UiFactory.T(ReadMoreLinkLocKey));
+    Root.Q2<Button>("ImportRulesButton").clicked += ImportRules;
+    Root.Q2<Button>("ExportRulesButton").clicked += ExportRules;
+
+    var buttons = Root.Q2<VisualElement>("Buttons");
     buttons.Clear();
     foreach (var provider in _editorProviders) {
-      var btn = _uiFactory.LoadVisualElement<Button>("IgorZ.Automation/RulesEditorButtonTmpl");
-      btn.text = _uiFactory.T(provider.CreateRuleLocKey);
+      var btn = UiFactory.LoadVisualElement<Button>(RulesEditorButtonTmplAsset);
+      btn.text = UiFactory.T(provider.CreateRuleLocKey);
       btn.clicked += () => provider.MakeForRule(CreateScriptedRule());
       buttons.Add(btn);
     }
 
-    _root.Q<Button>("ImportRulesButton").clicked += () => {
-      var dlg = DependencyContainer.GetInstance<ImportRulesDialog>();
-      dlg.Show(_activeBuilding, rules => OnImportComplete(rules, dlg.DeleteExistingRules));
-    };
-    _root.Q<Button>("ExportRulesButton").clicked += () => {
-      var dlg = DependencyContainer.GetInstance<ExportRulesDialog>();
-      var actions= new List<IAutomationAction>();
-      foreach (var rule in _ruleRows.Where(x => !x.IsDeleted)) {
-        var exportAction = rule.GetAction().CloneDefinition();
-        exportAction.Condition = rule.GetCondition().CloneDefinition();
-        actions.Add(exportAction);
-      }
-      dlg.Show(actions);
-    };
-
-    SetActiveBuilding(behavior);
-
-    _onClosed = onClosed;
-    _panelStack.PushDialog(this);
-  }
-
-  void OnImportComplete(IList<IAutomationAction> rules, bool clearExisting) {
-    if (clearExisting) {
-      Reset();
-    }
-    foreach (var rule in rules) {
-      var ruleRow = CreateScriptedRule();
-      if (rule is ScriptedAction scriptedAction && rule.Condition is ScriptedCondition scriptedCondition) {
-        ruleRow.Initialize(scriptedCondition, scriptedAction);
-      }
-      ruleRow.SwitchToViewMode();
-    }
-  }
-
-  public void Close() => _panelStack.Pop(this);
-
-  #endregion
-
-  #region Implementation
-
-  readonly UiFactory _uiFactory;
-  readonly PanelStack _panelStack;
-  readonly DialogBoxShower _dialogBoxShower;
-
-  VisualElement _root;
-
-  readonly List<RuleRow> _ruleRows = []; 
-  readonly IEditorProvider[] _editorProviders;
-
-  bool RulesChanged => _ruleRows.Any(x => x.IsDeleted || x.IsModified);
-  bool EditsPending => _ruleRows.Any(x => x.IsInEditMode);
-  bool HasErrors => _ruleRows.Any(x => x.HasErrors);
-
-  VisualElement _ruleRowsContainer;
-  AutomationBehavior _activeBuilding;
-
-  RulesEditorDialog(UiFactory uiFactory, PanelStack panelStack, DialogBoxShower dialogBoxShower,
-                    ScriptEditorProvider scriptEditorProvider,
-                    ConstructorEditorProvider constructorEditorProvider) {
-    _uiFactory = uiFactory;
-    _panelStack = panelStack;
-    _dialogBoxShower = dialogBoxShower;
-    _editorProviders = [scriptEditorProvider, constructorEditorProvider];
-  }
-
-  void Reset() {
-    _ruleRowsContainer.Clear();
-    _ruleRows.Clear();
-  }
-
-  void ShowUnsavedChangesConfirmation(Action confirmAction) {
-    _dialogBoxShower.Create()
-        .SetMessage(_uiFactory.T(UnsavedChangesConfirmationLocKey))
-        .SetConfirmButton(confirmAction)
-        .SetCancelButton(() => {})
-        .Show();
-  }
-
-  void SetActiveBuilding(AutomationBehavior activeBuilding) {
+    _ruleRowsContainer = Root.Q2<VisualElement>("RuleRowsContainer");
     Reset();
-    _activeBuilding = activeBuilding;
-
-    foreach (var action in activeBuilding.Actions) {
+    foreach (var action in _rulesUiHelper.BuildingRules) {
       var ruleRow = CreateScriptedRule();
       if (action is ScriptedAction scriptedAction && action.Condition is ScriptedCondition scriptedCondition) {
         ruleRow.Initialize(scriptedCondition, scriptedAction);
@@ -175,15 +93,76 @@ sealed class RulesEditorDialog : IPanelController {
     }
   }
 
-  void SaveRulesAndCloseDialog() {
-    _activeBuilding.ClearAllRules();
+  public override void Close() {
+    base.Close();
+    _ruleRows.Clear();
+    _rulesUiHelper = null;
+    _ruleRowsContainer = null;
+  }
+
+  void ImportRules() {
+    _importRulesDialog.WithBuilding(_rulesUiHelper.AutomationBehavior)
+        .Notifying((rules, clearExisting) => {
+          if (clearExisting) {
+            // FIXME: simulate deletion instead.
+            // FIXME: consider unsaved added rows.
+            Reset();
+          }
+          //FIXME: simulate adding rows
+          foreach (var rule in rules) {
+            var ruleRow = CreateScriptedRule();
+            if (rule is ScriptedAction scriptedAction && rule.Condition is ScriptedCondition scriptedCondition) {
+              ruleRow.Initialize(scriptedCondition, scriptedAction);
+            }
+            ruleRow.SwitchToViewMode();
+          }
+        })
+        .Show();
+  }
+
+  void ExportRules() {
+    var actions= new List<IAutomationAction>();
     foreach (var rule in _ruleRows.Where(x => !x.IsDeleted)) {
-      _activeBuilding.AddRule(rule.GetCondition(), rule.GetAction());
+      var exportAction = rule.GetAction().CloneDefinition();
+      exportAction.Condition = rule.GetCondition().CloneDefinition();
+      actions.Add(exportAction);
     }
+    _exportRulesDialog.WithActions(actions).Show();
+  }
+
+  #endregion
+
+  #region Implementation
+
+  IEditorProvider[] _editorProviders;
+  ExportRulesDialog _exportRulesDialog;
+  ImportRulesDialog _importRulesDialog;
+
+  bool RulesChanged => _ruleRows.Any(x => x.IsDeleted || x.IsModified);
+  bool EditsPending => _ruleRows.Any(x => x.IsInEditMode);
+  bool HasErrors => _ruleRows.Any(x => x.HasErrors);
+
+  VisualElement _ruleRowsContainer;
+  ScriptingRulesUIHelper _rulesUiHelper;
+  readonly List<RuleRow> _ruleRows = []; 
+  
+  /// <summary>Public for the inject to work properly.</summary>
+  [Inject]
+  public void InjectDependencies(
+      ExportRulesDialog exportRulesDialog, ImportRulesDialog importRulesDialog,
+      ScriptEditorProvider scriptEditorProvider, ConstructorEditorProvider constructorEditorProvider) {
+    _exportRulesDialog = exportRulesDialog;
+    _importRulesDialog = importRulesDialog;
+    _editorProviders = [scriptEditorProvider, constructorEditorProvider];
+  }
+
+  void Reset() {
+    _ruleRowsContainer.Clear();
+    _ruleRows.Clear();
   }
 
   RuleRow CreateScriptedRule() {
-    var ruleRow = new RuleRow(_editorProviders, _uiFactory, _activeBuilding);
+    var ruleRow = new RuleRow(_editorProviders, UiFactory, _rulesUiHelper.AutomationBehavior);
     ruleRow.OnStateChanged += OnRuleStateChanged;
     _ruleRows.Add(ruleRow);
     _ruleRowsContainer.Add(ruleRow.Root);

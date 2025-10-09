@@ -1,0 +1,9 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/AutomationCoreStyle.uss?fileID=7433441132597879392&amp;guid=3ff053cc6d97b6c4eb9edeaf49c3c4f7&amp;type=3#AutomationCoreStyle" />
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle" />
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle" />
+    <ui:VisualElement style="flex-direction: row; margin-top: 1px; margin-right: 0; margin-bottom: 1px; margin-left: 0;">
+        <Timberborn.CoreUI.NineSliceTextField name="SignalName" select-all-on-mouse-up="false" select-all-on-focus="false" class="text-field game-text-big" style="flex-grow: 1;" />
+        <Timberborn.CoreUI.NineSliceButton name="ClearSignalButton" class="button-square automation-button-clear" />
+    </ui:VisualElement>
+</ui:UXML>

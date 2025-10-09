@@ -104,6 +104,17 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
     UpdateRegistration();
   }
 
+  /// <summary>Deletes the specified rule.</summary>
+  /// <see cref="Actions"/>
+  /// <exception cref="InvalidOperationException">if the specified action is not found in the behavior.</exception>
+  public void DeleteRule(IAutomationAction action) {
+    var index = _actions.IndexOf(action);
+    if (index < 0) {
+      throw new InvalidOperationException("The specified action is not found in the behavior");
+    }
+    DeleteRuleAt(index);
+  }
+
   /// <summary>Removes all rules defined for the specified template group.</summary>
   public void RemoveRulesForTemplateFamily(string templateFamily) {
     HostedDebugLog.Fine(this, "Removing all rules for template family: {0}", templateFamily);

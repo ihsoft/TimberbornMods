@@ -1,22 +1,48 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tb="Timberborn.CoreUI" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:Template name="FragmentSignal" src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/FragmentSignal.uxml?fileID=9197481963319205126&amp;guid=082172575a591a847a78803972d0d991&amp;type=3#FragmentSignal" />
     <engine:Template name="FragmentRule" src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/FragmentRule.uxml?fileID=9197481963319205126&amp;guid=1ab2cd2c78251db48b3e85ec2c57e9a2&amp;type=3#FragmentRule" />
     <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle" />
     <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle" />
     <Style src="project://database/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss?fileID=7433441132597879392&amp;guid=02de7aec41a58a648bcb6d7db08fd2a8&amp;type=3#EntityPanelGameStyle" />
     <Style src="project://database/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss?fileID=7433441132597879392&amp;guid=65cc3b01c73f9d845b1cd8d615d4bc5f&amp;type=3#EntityPanelCommonStyle" />
+    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/AutomationCore.uss?fileID=7433441132597879392&amp;guid=3ff053cc6d97b6c4eb9edeaf49c3c4f7&amp;type=3#AutomationCore" />
     <tb:NineSliceVisualElement class="bg-sub-box--green entity-sub-panel">
-        <engine:VisualElement name="RulesPanel" style="flex-grow: 1;">
-            <tb:LocalizableLabel text="RulesAreaCaptionTextLocKey" text-loc-key="IgorZ.Automation.AutomationFragment.RulesAreaCaptionTextLocKey" class="entity-panel__text" style="color: rgb(0, 255, 255);" />
-            <engine:VisualElement name="RulesList" style="flex-grow: 1;">
-                <engine:Instance template="FragmentRule" enabled="false" />
-                <engine:Instance template="FragmentRule" />
+        <engine:VisualElement name="SignalsPanel" style="flex-grow: 1;">
+            <engine:VisualElement style="flex-grow: 1; flex-direction: row; align-items: center;">
+                <tb:NineSliceButton name="FoldSignalsButton" class="button-square button-arrow-down" />
+                <tb:NineSliceButton name="UnfoldSignalsButton" class="button-square button-arrow-right" />
+                <engine:Label text="Signals: 0/2" name="SignalsCountLabel" selectable="true" class="entity-panel__text" />
+                <engine:VisualElement style="flex-grow: 1; flex-shrink: 0;" />
+                <tb:NineSliceButton name="SetupSignalsButton" class="button-square automation-button-setup" />
+                <tb:NineSliceButton name="ClearSignalsButton" class="button-square automation-button-clear" />
+            </engine:VisualElement>
+            <engine:VisualElement name="SignalsList" style="flex-grow: 1; flex-shrink: 0;">
+                <engine:Instance template="FragmentSignal">
+                    <AttributeOverrides element-name="Target" text="very-very-very-very-very-very loooong TARGET signal" />
+                </engine:Instance>
+                <engine:Instance template="FragmentSignal" />
             </engine:VisualElement>
         </engine:VisualElement>
-        <engine:VisualElement>
-            <tb:LocalizableButton text="AddRulesBtn" text-loc-key="IgorZ.Automation.AutomationFragment.AddRulesBtn" name="AddRulesButton" class="button-game debug-fragment__button entity-panel__text timberdev-button-small" />
-            <engine:VisualElement name="RulesAdjustmentControls" style="flex-direction: row; flex-grow: 1; justify-content: space-between;">
-                <tb:LocalizableButton text="EditRulesBtn" text-loc-key="IgorZ.Automation.AutomationFragment.EditRulesBtn" name="EditRulesButton" class="button-game debug-fragment__button entity-panel__text timberdev-button-small" style="flex-grow: 1; margin-right: 2px;" />
-                <tb:LocalizableButton text="CopyRulesBtn" text-loc-key="IgorZ.Automation.AutomationFragment.CopyRulesBtn" name="CopyRulesButton" class="button-game debug-fragment__button entity-panel__text timberdev-button-small" style="flex-grow: 1; margin-left: 2px;" />
+        <engine:VisualElement style="flex-grow: 1;">
+            <engine:VisualElement style="flex-grow: 1; flex-direction: row; align-items: center;">
+                <tb:NineSliceButton name="FoldRulesButton" class="button-square button-arrow-down" />
+                <tb:NineSliceButton name="UnfoldRulesButton" class="button-square button-arrow-right" />
+                <engine:Label text="Rules: 12" name="RulesCountLabel" class="entity-panel__text" />
+                <engine:VisualElement style="flex-grow: 1; flex-shrink: 0;" />
+                <tb:NineSliceButton name="CopyRulesButton" class="button-square automation-button-copy" />
+                <tb:NineSliceButton name="SetupRulesButton" class="button-square automation-button-setup" />
+                <tb:NineSliceButton name="ClearRulesButton" class="button-square automation-button-clear" />
+            </engine:VisualElement>
+            <engine:VisualElement name="RulesList" style="padding-top: 2px;">
+                <engine:Instance template="FragmentRule">
+                    <AttributeOverrides element-name="Content" enabled="false" />
+                    <AttributeOverrides element-name="Container" enabled="true" />
+                    <AttributeOverrides element-name="Condition" text="If very-very-very-very-very looooong CONDITION," />
+                </engine:Instance>
+                <engine:Instance template="FragmentRule">
+                    <AttributeOverrides element-name="Action" text="Then very-very-very-very-very loooong ACTION" />
+                </engine:Instance>
+                <engine:Instance template="FragmentRule" />
             </engine:VisualElement>
         </engine:VisualElement>
     </tb:NineSliceVisualElement>

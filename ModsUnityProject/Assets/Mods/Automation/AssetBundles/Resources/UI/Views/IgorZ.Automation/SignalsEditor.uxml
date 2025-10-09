@@ -1,0 +1,66 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:Template name="NamedBoxTemplate" src="project://database/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml?fileID=9197481963319205126&amp;guid=b27c549e9f96d7843b45412cf82a0c6a&amp;type=3#NamedBoxTemplate" />
+    <engine:Template name="SignalSource" src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/SignalSourceTmpl.uxml?fileID=9197481963319205126&amp;guid=c24528c489f888b4786dba49f9ec3f8c&amp;type=3#SignalSourceTmpl" />
+    <engine:Template name="SignalTarget" src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/SignalTargetTmpl.uxml?fileID=9197481963319205126&amp;guid=06ae86f98d18a334985a9fadb0e4345d&amp;type=3#SignalTargetTmpl" />
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle" />
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle" />
+    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/TimberDevStyle.uss?fileID=7433441132597879392&amp;guid=86824deb2a4bc844cbec48367a164254&amp;type=3#TimberDevStyle" />
+    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/AutomationCoreStyle.uss?fileID=7433441132597879392&amp;guid=3ff053cc6d97b6c4eb9edeaf49c3c4f7&amp;type=3#AutomationCoreStyle" />
+    <engine:VisualElement class="content-row-centered">
+        <engine:Instance template="NamedBoxTemplate" style="width: 570px; height: auto;">
+            <AttributeOverrides element-name="Header" text-loc-key="IgorZ.Automation.Scripting.SignalsEditor.DialogHeader" />
+            <engine:VisualElement name="ScrollViewWrapper" class="scroll--green-decorated" style="flex-grow: 1; width: 100%;">
+                <engine:ScrollView name="Content">
+                    <engine:VisualElement style="flex-grow: 1;">
+                        <engine:VisualElement style="flex-direction: row;">
+                            <engine:VisualElement name="SourcesSection" style="flex-grow: 0; align-items: auto; align-self: stretch; justify-content: space-evenly;">
+                                <engine:Instance template="SignalSource" />
+                                <engine:Instance template="SignalSource" />
+                                <engine:Instance template="SignalSource" />
+                                <engine:Instance template="SignalSource">
+                                    <AttributeOverrides element-name="SourceSignalName" text="random name1" />
+                                </engine:Instance>
+                                <engine:Instance template="SignalSource">
+                                    <AttributeOverrides element-name="SourceSignalName" text="randdom name2&#10;" />
+                                </engine:Instance>
+                                <engine:Instance template="SignalSource">
+                                    <AttributeOverrides element-name="SourceSignalName" text="random LONG name 3" />
+                                </engine:Instance>
+                                <engine:Instance template="SignalSource">
+                                    <AttributeOverrides element-name="SourceSignalName" text="invisible affecting size name" />
+                                </engine:Instance>
+                            </engine:VisualElement>
+                            <engine:VisualElement name="TargetsSection" style="flex-grow: 1;">
+                                <engine:Instance template="SignalTarget" class="text-field-error">
+                                    <AttributeOverrides element-name="SignalName" value="bad.text" />
+                                </engine:Instance>
+                                <engine:Instance template="SignalTarget" class="text-field-modified">
+                                    <AttributeOverrides element-name="SignalName" value="modified.value" />
+                                </engine:Instance>
+                                <engine:Instance template="SignalTarget">
+                                    <AttributeOverrides element-name="SignalTarget" value="line-3" />
+                                </engine:Instance>
+                                <engine:Instance template="SignalTarget">
+                                    <AttributeOverrides element-name="SignalTarget" value="line-4" />
+                                </engine:Instance>
+                                <engine:Instance template="SignalTarget">
+                                    <AttributeOverrides element-name="SignalTarget" value="line-5" />
+                                </engine:Instance>
+                                <engine:Instance template="SignalTarget">
+                                    <AttributeOverrides element-name="SignalTarget" value="barely visible line-6" />
+                                </engine:Instance>
+                                <engine:Instance template="SignalTarget">
+                                    <AttributeOverrides element-name="SignalTarget" value="normally, invisible line" />
+                                </engine:Instance>
+                            </engine:VisualElement>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                </engine:ScrollView>
+            </engine:VisualElement>
+            <engine:VisualElement style="flex-direction: row; align-items: center; justify-content: center; margin-top: 20px; flex-shrink: 0;">
+                <Timberborn.CoreUI.LocalizableButton text="Cancel" name="CancelButton" text-loc-key="Core.Cancel" class="menu-button" />
+                <Timberborn.CoreUI.LocalizableButton text="Save" name="ConfirmButton" text-loc-key="Core.Save" class="menu-button" />
+            </engine:VisualElement>
+        </engine:Instance>
+    </engine:VisualElement>
+</engine:UXML>

@@ -118,6 +118,9 @@
       <Compile Include="..\TimberDev\Tools\ToolWithDescription.cs">
         <Link>TimberDev\Tools\ToolWithDescription.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\UI\AbstractDialog.cs">
+        <Link>TimberDev\UI\AbstractDialog.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\UI\CommonFormats.cs">
         <Link>TimberDev\UI\CommonFormats.cs</Link>
       </Compile>
@@ -138,6 +141,9 @@
       </Compile>
       <Compile Include="..\TimberDev\UI\VisualEffects.cs">
         <Link>TimberDev\UI\VisualEffects.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UI\VisualElementExtensions.cs">
+        <Link>TimberDev\UI\VisualElementExtensions.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\Utils\ComponentsAccessor.cs">
         <Link>TimberDev\Utils\ComponentsAccessor.cs</Link>
@@ -218,6 +224,12 @@
       </Content>
       <Content Include="..\TimberDev\Tools\ruRU.csv">
         <Link>TimberDev\Tools\ruRU.csv</Link>
+      </Content>
+      <Content Include="..\TimberDev\UI\enUS.csv">
+        <Link>TimberDev\UI\enUS.csv</Link>
+      </Content>
+      <Content Include="..\TimberDev\UI\ruRU.csv">
+        <Link>TimberDev\UI\ruRU.csv</Link>
       </Content>
     </ItemGroup>
     <PropertyGroup>
