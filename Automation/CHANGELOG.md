@@ -1,6 +1,7 @@
-# v2.7.2 (pre-release, 10/6/2025):
-* [Fix] Properly display "add" operator when it has more than 2 arguments.
+# v2.8.0 (pre-release, 10/6/2025):
+* [Feature] Full refactor of the entity panel UI.
 * [Change] Improve script errors handling in UI. Fix some edge cases when game could crash due to a script error.
+* [Fix] Properly display "add" operator when it has more than 2 arguments.
 
 # v2.7.1 (September 5th, 2025):
 * [Fix] Fix the "can plant" template definition.
