@@ -109,6 +109,16 @@ IgorZ.Automation.Scripting.Error.DivisionByZero,"ОШИБКА: Деление н
 IgorZ.Automation.Scripting.Error.BadValue,"ОШИБКА: Неверное значение","Localizable generic message for the related exception"
 IgorZ.Automation.Scripting.Error.InternalError,"ОШИБКА: Внутренняя ошибка","Localizable generic message for the related exception"
 =,=,"UI fragment strings"
+IgorZ.Automation.AutomationFragment.BuildingSignalSource,"{0} ({1})","String that represents the source signal user-friendly, and it's current value"
+IgorZ.Automation.AutomationFragment.ClearRulesBtnHint,"Удалить все правила",
+IgorZ.Automation.AutomationFragment.ClearSignalsBtnHint,"Удалить все сигналы",
+IgorZ.Automation.AutomationFragment.CopyRulesBtnHint,"Копировать правила и сигналы на другие здания",
+IgorZ.Automation.AutomationFragment.RuleActionTextLocKey,"Тогда {0}",
+IgorZ.Automation.AutomationFragment.RuleConditionTextLocKey,"Если {0},",
+IgorZ.Automation.AutomationFragment.RulesCountTextLocKey,"Правила: {0}",
+IgorZ.Automation.AutomationFragment.SetupRulesBtnHint,"Настроить правила",
+IgorZ.Automation.AutomationFragment.SetupSignalsBtnHint,"Настроить сигналы которые другие здания смогут использовать в своих условиях",
+IgorZ.Automation.AutomationFragment.SignalsCountTextLocKey,"Сигналы: {0}/{1}",
 IgorZ.Automation.Tool.CopyRules.Text,"Копировать правила: {0}",
 IgorZ.Automation.Tool.CopyRules.Title,"Копировать правила автоматизации",
 =,=,"Scriptable components strings"
@@ -179,6 +189,10 @@ IgorZ.Automation.Scripting.Editor.SaveScriptBtn,"Сохранить",
 IgorZ.Automation.Scripting.Editor.StringConstantType,"строка","Name of the string constant type"
 IgorZ.Automation.Scripting.Editor.TemplateFamilyLabel,"Группа шаблонов: {0}","Name of the template group (family) the rule belongs to"
 IgorZ.Automation.Scripting.Editor.TestScriptBtn,"Проверить",
+=,=,"Signals editor strings"
+IgorZ.Automation.Scripting.SignalsEditor.DialogHeader,"Сигналы автоматизации",
+IgorZ.Automation.Scripting.SignalsEditor.BadSignalNameMsg,"❌ Неверное имя сигнала!
+Имя должно начинаться с латинской буквы и содержать только буквы, цифры и точки.","Message shown when the signal name is invalid; explain naming rules and note that only Latin letters are allowed."
 =,=,"Import dialog"
 IgorZ.Automation.Scripting.Editor.ExportDialogHeader,"Экспорт правил автоматизации",
 IgorZ.Automation.Scripting.Editor.ImportDialogHeader,"Импорт правил автоматизации",
@@ -226,17 +240,3 @@ TimberDev_Utils.Tools.LockSelectTool.StartObjectSelectingPrompt,"Выделят�
 TimberDev_Utils.Tools.LockSelectTool.StartSelectingPrompt,"Наведите курсор на объект и нажмите <i>ЛКМ</i>, чтобы начать выделение.",
 =,=,"TimberDev_UI"
 TimberDev_UI.AbstractDialog.UnsavedChangesConfirmation,"Есть несохраненные изменения. Вы хотите их отменить?","A confirmation message that is shown if the dialog is being closed by ESC and there were changes made."
-=,=,"DEBUGGING"
-IgorZ.Automation.AutomationFragment.BuildingSignalSource,"{0} ({1})","String that represents the source signal user-friendly, and it's current value"
-IgorZ.Automation.AutomationFragment.ClearRulesBtnHint,"Удалить все правила",
-IgorZ.Automation.AutomationFragment.ClearSignalsBtnHint,"Удалить все сигналы",
-IgorZ.Automation.AutomationFragment.CopyRulesBtnHint,"Копировать правила и сигналы на другие здания",
-IgorZ.Automation.AutomationFragment.RuleActionTextLocKey,"Тогда {0}",
-IgorZ.Automation.AutomationFragment.RuleConditionTextLocKey,"Если {0},",
-IgorZ.Automation.AutomationFragment.RulesCountTextLocKey,"Правила: {0}",
-IgorZ.Automation.AutomationFragment.SetupRulesBtnHint,"Настроить правила",
-IgorZ.Automation.AutomationFragment.SetupSignalsBtnHint,"Настроить сигналы которые другие здания смогут использовать в своих условиях",
-IgorZ.Automation.AutomationFragment.SignalsCountTextLocKey,"Сигналы: {0}/{1}",
-IgorZ.Automation.Scripting.SignalsEditor.DialogHeader,"Сигналы автоматизации",
-IgorZ.Automation.Scripting.SignalsEditor.BadSignalNameMsg,"❌ Неверное имя сигнала!
-Имя должно начинаться с буквы и содержать только буквы, цифры и точки.",
