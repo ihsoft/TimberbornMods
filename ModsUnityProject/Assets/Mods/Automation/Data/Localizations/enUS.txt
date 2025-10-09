@@ -238,4 +238,4 @@ IgorZ.Automation.AutomationFragment.SetupSignalsBtnHint,"Setup signals that will
 IgorZ.Automation.AutomationFragment.SignalsCountTextLocKey,"Signals: {0}/{1}",
 IgorZ.Automation.Scripting.SignalsEditor.DialogHeader,"Setup building signals",
 IgorZ.Automation.Scripting.SignalsEditor.BadSignalNameMsg,"❌ Bad signal name!
-The name must start with a letter and contain only letters, digits, and commas.",
+The name must start with a letter and contain only letters, digits, and dots.",
