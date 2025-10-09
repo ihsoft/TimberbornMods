@@ -14,8 +14,6 @@ using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
 using Timberborn.TooltipSystem;
-using Unity.Collections;
-using UnityDev.Utils.LogUtilsLite;
 using UnityEngine.UIElements;
 
 namespace IgorZ.Automation.AutomationSystemUI;
@@ -48,14 +46,14 @@ sealed class AutomationFragment : IEntityPanelFragment {
   VisualElement _root;
 
   VisualElement _rulesList;
-  bool _rulesListFolded = true; //FXIME; settings
+  bool _rulesListFolded = true;
   Label _rulesCountLabel;
   Button _foldRulesButton;
   Button _unfoldRulesButton;
   Button _copyRulesButton;
 
   VisualElement _signalsList;
-  bool _signalsListFolded = true; //FXIME; settings
+  bool _signalsListFolded = true;
   Label _signalsCountLabel;
   Button _foldSignalsButton;
   Button _unfoldSignalsButton;
@@ -90,10 +88,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
     _tooltipRegistrar.RegisterLocalizable(setupSignalsButton, SetupSignalsBtnHintLocKey);
     _clearSignalsButton = _root.Q2<Button>("ClearSignalsButton");
     _tooltipRegistrar.RegisterLocalizable(_clearSignalsButton, ClearSignalsBtnHintLocKey);
-    _clearSignalsButton.clicked += () => {
-      _scriptingRulesUIHelper.ClearSignalsOnBuilding();
-      UpdateFragment();
-    };
+    _clearSignalsButton.clicked += () => _scriptingRulesUIHelper.ClearSignalsOnBuilding();
 
     _signalsCountLabel = _root.Q2<Label>("SignalsCountLabel");
     _foldSignalsButton = _root.Q2<Button>("FoldSignalsButton");
@@ -103,17 +98,14 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
     // Setup rules fragment section.
     _setupRulesButton = _root.Q2<Button>("SetupRulesButton");
-    _setupRulesButton.clicked += () => _rulesEditorDialog.WithBuilding(_automationBehavior).Show();
+    _setupRulesButton.clicked += () => _rulesEditorDialog.WithUiHelper(_scriptingRulesUIHelper).Show();
     _tooltipRegistrar.RegisterLocalizable(_setupRulesButton, SetupRulesBtnHintLocKey);
     _copyRulesButton = _root.Q2<Button>("CopyRulesButton");
     _copyRulesButton.clicked += () => _copyRulesTool.StartTool(_automationBehavior);
     _tooltipRegistrar.RegisterLocalizable(_copyRulesButton, CopyRulesBtnHintLocKey);
     _clearRulesButton = _root.Q2<Button>("ClearRulesButton");
     _tooltipRegistrar.RegisterLocalizable(_clearRulesButton, ClearRulesBtnHintLocKey);
-    _clearRulesButton.clicked += () => {
-      _scriptingRulesUIHelper.ClearRulesOnBuilding();
-      UpdateFragment();
-    };
+    _clearRulesButton.clicked += () => _scriptingRulesUIHelper.ClearRulesOnBuilding();
 
     _rulesCountLabel = _root.Q2<Label>("RulesCountLabel");
     _foldRulesButton = _root.Q2<Button>("FoldRulesButton");
