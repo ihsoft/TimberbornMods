@@ -117,18 +117,12 @@ sealed class RuleRow {
     _notifications.ToggleDisplayStyle(false);
     _templateFamilySection = Root.Q("TemplateFamilySection");
     _templateFamilySection.ToggleDisplayStyle(false);
-    _templateFamilySection.Q<Button>("RemoveTemplateBtn").clicked += () => {
-      SetTemplateFamily(null);
-    };
-    _templateFamilySection.Q<Button>("RevertTemplateBtn").clicked += () => {
-      SetTemplateFamily(_originalTemplateFamily);
-    };
+    _templateFamilySection.Q<Button>("RemoveTemplateBtn").clicked += () => SetTemplateFamily(null);
+    _templateFamilySection.Q<Button>("RevertTemplateBtn").clicked += () => SetTemplateFamily(_originalTemplateFamily);
     _ruleContainer = Root.Q("RuleContainer");
     _deletedStateOverlay = Root.Q("DeletedStateOverlay");
     _deletedStateOverlay.ToggleDisplayStyle(false);
-    _deletedStateOverlay.Q<Button>("UndoDeleteBtn").clicked += () => {
-      IsDeleted = false;
-    };
+    _deletedStateOverlay.Q<Button>("UndoDeleteBtn").clicked += () => { IsDeleted = false; };
   }
 
   public void Initialize(ScriptedCondition condition, ScriptedAction action) {
