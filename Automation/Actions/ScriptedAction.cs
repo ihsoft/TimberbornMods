@@ -32,14 +32,14 @@ sealed class ScriptedAction : AutomationActionBase {
   /// <inheritdoc/>
   public override string UiDescription {
     get {
-      if (_parsedExpression != null) {
-        try {
-          return _parsedExpression.Describe();
-        } catch (ScriptError.RuntimeError e) {
-          ReportScriptError(e);
-        }
+      if (_lastScriptError != null) {
+        return Behavior.Loc.T(_lastScriptError);
       }
-      return Behavior.Loc.T(_lastScriptError);
+      try {
+        return _parsedExpression.Describe();
+      } catch (ScriptError.RuntimeError e) {
+        return Behavior.Loc.T(e.LocKey);
+      }
     }
   }
   string _lastScriptError;
