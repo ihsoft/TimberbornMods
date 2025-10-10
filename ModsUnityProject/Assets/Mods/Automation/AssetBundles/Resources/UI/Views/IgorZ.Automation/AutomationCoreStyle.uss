@@ -32,6 +32,30 @@
     color: rgb(0, 255, 0);
 }
 
+.automation-button-import {
+    background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/ImportIcon-bare.png");
+}
+
+.automation-button-import:hover:enabled {
+    background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/ImportIcon-hover.png");
+}
+
+.automation-button-import:hover:enabled:active {
+    background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/ImportIcon-active.png");
+}
+
+.automation-button-export {
+    background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/ExportIcon-bare.png");
+}
+
+.automation-button-export:hover:enabled {
+    background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/ExportIcon-hover.png");
+}
+
+.automation-button-export:hover:enabled:active {
+    background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/ExportIcon-active.png");
+}
+
 .automation-button-copy {
     background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/CopyIcon-bare.png?fileID=21300000&guid=895275f46056ee24eaa9c16e9607ae74&type=3#CopyIcon-bare");
 }

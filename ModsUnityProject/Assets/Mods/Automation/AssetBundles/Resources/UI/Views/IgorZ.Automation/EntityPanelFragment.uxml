@@ -29,6 +29,8 @@
                 <tb:NineSliceButton name="UnfoldRulesButton" class="button-square button-arrow-right" />
                 <engine:Label text="Rules: 12" name="RulesCountLabel" class="entity-panel__text" />
                 <engine:VisualElement style="flex-grow: 1; flex-shrink: 0;" />
+                <tb:NineSliceButton name="ExportRulesButton" class="button-square automation-button-export" />
+                <tb:NineSliceButton name="ImportRulesButton" class="button-square automation-button-import" />
                 <tb:NineSliceButton name="CopyRulesButton" class="button-square automation-button-copy" />
                 <tb:NineSliceButton name="SetupRulesButton" class="button-square automation-button-setup" />
                 <tb:NineSliceButton name="ClearRulesButton" class="button-square automation-button-clear" />

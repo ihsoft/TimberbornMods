@@ -14,14 +14,9 @@
                     <engine:VisualElement style="flex-grow: 1;">
                         <engine:VisualElement name="RuleRowsContainer">
                             <engine:Instance template="RuleRow" />
-                            <engine:Instance template="RuleRow" />
                         </engine:VisualElement>
                         <engine:VisualElement name="Buttons" style="flex-direction: row;">
                             <engine:Instance template="RulesEditorButtonTmpl" />
-                        </engine:VisualElement>
-                        <engine:VisualElement style="flex-grow: 1; flex-direction: row; margin-top: 5px; justify-content: flex-start;">
-                            <Timberborn.CoreUI.LocalizableButton text-loc-key="IgorZ.Automation.Scripting.Editor.ImportRulesBtn" text="ImportRulesBtn" name="ImportRulesButton" class="button-game game-text-big timberdev-button-big" style="margin-right: 5px;" />
-                            <Timberborn.CoreUI.LocalizableButton text-loc-key="IgorZ.Automation.Scripting.Editor.ExportRulesBtn" text="ExportRulesBtn" name="ExportRulesButton" class="button-game game-text-big timberdev-button-big" />
                         </engine:VisualElement>
                     </engine:VisualElement>
                 </engine:ScrollView>

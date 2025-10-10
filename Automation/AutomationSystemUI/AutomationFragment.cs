@@ -23,7 +23,9 @@ sealed class AutomationFragment : IEntityPanelFragment {
   const string RuleRowTemplate = "IgorZ.Automation/FragmentRule";
   const string SignalRowTemplate = "IgorZ.Automation/FragmentSignal";
   const string FragmentResource = "IgorZ.Automation/EntityPanelFragment";
-  
+
+  const string ExportRulesBtnHintLocKey = "IgorZ.Automation.AutomationFragment.ExportRulesBtnHint";
+  const string ImportRulesBtnHintLocKey = "IgorZ.Automation.AutomationFragment.ImportRulesBtnHint";
   const string RulesCountTextLocKey = "IgorZ.Automation.AutomationFragment.RulesCountTextLocKey";
   const string ConditionTextLocKey = "IgorZ.Automation.AutomationFragment.RuleConditionTextLocKey";
   const string ActionTextLocKey = "IgorZ.Automation.AutomationFragment.RuleActionTextLocKey";
@@ -43,6 +45,8 @@ sealed class AutomationFragment : IEntityPanelFragment {
   readonly ScriptingService _scriptingService;
   readonly ScriptingRulesUIHelper _scriptingRulesUIHelper;
   readonly ITooltipRegistrar _tooltipRegistrar;
+  readonly ImportRulesDialog _importRulesDialog;
+  readonly ExportRulesDialog _exportRulesDialog;
 
   VisualElement _root;
 
@@ -64,7 +68,8 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
   AutomationFragment(UiFactory uiFactory, RulesEditorDialog rulesEditorDialog, SignalsEditorDialog signalsEditorDialog,
                      CopyRulesTool copyRulesTool, ScriptingService scriptingService,
-                     ScriptingRulesUIHelper scriptingRulesUIHelper, ITooltipRegistrar tooltipRegistrar) {
+                     ScriptingRulesUIHelper scriptingRulesUIHelper, ITooltipRegistrar tooltipRegistrar,
+                     ImportRulesDialog importRulesDialog, ExportRulesDialog exportRulesDialog) {
     _uiFactory = uiFactory;
     _rulesEditorDialog = rulesEditorDialog;
     _signalsEditorDialog = signalsEditorDialog;
@@ -72,6 +77,8 @@ sealed class AutomationFragment : IEntityPanelFragment {
     _scriptingService = scriptingService; //FIXME: move to the helper
     _scriptingRulesUIHelper = scriptingRulesUIHelper;
     _tooltipRegistrar = tooltipRegistrar;
+    _importRulesDialog = importRulesDialog;
+    _exportRulesDialog = exportRulesDialog;
   }
 
   Button _clearRulesButton;
@@ -82,6 +89,14 @@ sealed class AutomationFragment : IEntityPanelFragment {
     _root = _uiFactory.LoadVisualTreeAsset(FragmentResource);
     _rulesList = _root.Q2<VisualElement>("RulesList");
     _signalsList = _root.Q2<VisualElement>("SignalsList");
+
+    // Import/Export fragment section.
+    var importButton = _root.Q2<Button>("ImportRulesButton");
+    importButton.clicked += () => _importRulesDialog.WithBuilding(_automationBehavior).Show();
+    _tooltipRegistrar.RegisterLocalizable(importButton, ImportRulesBtnHintLocKey);
+    var exportButton = _root.Q2<Button>("ExportRulesButton");
+    exportButton.clicked += () => _exportRulesDialog.WithActions(_automationBehavior.Actions).Show();
+    _tooltipRegistrar.RegisterLocalizable(exportButton, ExportRulesBtnHintLocKey);
 
     // Setup signals fragment section.
     var setupSignalsButton = _root.Q2<Button>("SetupSignalsButton");

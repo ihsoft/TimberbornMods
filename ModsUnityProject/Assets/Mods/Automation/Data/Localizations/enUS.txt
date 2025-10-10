@@ -114,6 +114,8 @@ IgorZ.Automation.AutomationFragment.BuildingSignalSource,"{0} ({1})","String tha
 IgorZ.Automation.AutomationFragment.ClearRulesBtnHint,"Clear all rules",
 IgorZ.Automation.AutomationFragment.ClearSignalsBtnHint,"Clear all signals mappings",
 IgorZ.Automation.AutomationFragment.CopyRulesBtnHint,"Copy rules and signal mappings to another building",
+IgorZ.Automation.AutomationFragment.ExportRulesBtnHint,"Export rules and signals as text",
+IgorZ.Automation.AutomationFragment.ImportRulesBtnHint,"Import rules and signals from text",
 IgorZ.Automation.AutomationFragment.RuleActionTextLocKey,"Then {0}",
 IgorZ.Automation.AutomationFragment.RuleConditionTextLocKey,"If {0},",
 IgorZ.Automation.AutomationFragment.RulesCountTextLocKey,"Rules: {0}",

@@ -44,7 +44,14 @@ class ImportRulesDialog : AbstractDialog {
     if (skippedRules > 0) {
       HostedDebugLog.Warning(_activeBuilding, "Skipped {0} rules during import", skippedRules);
     }
-    _onConfirm(rules, Root.Q<Toggle>("DeleteExistingRulesToggle").value);
+    var needToReplaceRules = Root.Q<Toggle>("DeleteExistingRulesToggle").value;
+    if (needToReplaceRules) {
+      _activeBuilding.ClearAllRules();
+    }
+    foreach (var rule in rules) {
+      // Never add real rules, only clones.
+      _activeBuilding.AddRule(rule.Condition.CloneDefinition(), rule.CloneDefinition());
+    }
   }
 
   /// <inheritdoc/>
@@ -56,11 +63,6 @@ class ImportRulesDialog : AbstractDialog {
 
   public ImportRulesDialog WithBuilding(AutomationBehavior automationBehavior) {
     _activeBuilding = automationBehavior;
-    return this;
-  }
-
-  public ImportRulesDialog Notifying(Action<IList<IAutomationAction>, bool> onConfirm) {
-    _onConfirm = onConfirm;
     return this;
   }
 
@@ -82,7 +84,6 @@ class ImportRulesDialog : AbstractDialog {
     _skipFailedRules = null;
     _allowErrors = null;
     _importText = null;
-    _onConfirm = null;
   }
 
   #endregion
@@ -96,7 +97,6 @@ class ImportRulesDialog : AbstractDialog {
   TextField _importText;
 
   AutomationBehavior _activeBuilding;
-  Action<IList<IAutomationAction>, bool> _onConfirm;
 
   /// <summary>Public for the inject to work properly.</summary>
   [Inject]

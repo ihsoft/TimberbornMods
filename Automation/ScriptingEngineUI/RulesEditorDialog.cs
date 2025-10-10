@@ -68,8 +68,6 @@ sealed class RulesEditorDialog : AbstractDialog {
     base.Show();
 
     Root.Q2<Button>("MoreInfoButton").clicked += () => Application.OpenURL(UiFactory.T(ReadMoreLinkLocKey));
-    Root.Q2<Button>("ImportRulesButton").clicked += ImportRules;
-    Root.Q2<Button>("ExportRulesButton").clicked += ExportRules;
 
     var buttons = Root.Q2<VisualElement>("Buttons");
     buttons.Clear();
@@ -100,43 +98,11 @@ sealed class RulesEditorDialog : AbstractDialog {
     _ruleRowsContainer = null;
   }
 
-  void ImportRules() {
-    _importRulesDialog.WithBuilding(_rulesUiHelper.AutomationBehavior)
-        .Notifying((rules, clearExisting) => {
-          if (clearExisting) {
-            // FIXME: simulate deletion instead.
-            // FIXME: consider unsaved added rows.
-            Reset();
-          }
-          //FIXME: simulate adding rows
-          foreach (var rule in rules) {
-            var ruleRow = CreateScriptedRule();
-            if (rule is ScriptedAction scriptedAction && rule.Condition is ScriptedCondition scriptedCondition) {
-              ruleRow.Initialize(scriptedCondition, scriptedAction);
-            }
-            ruleRow.SwitchToViewMode();
-          }
-        })
-        .Show();
-  }
-
-  void ExportRules() {
-    var actions= new List<IAutomationAction>();
-    foreach (var rule in _ruleRows.Where(x => !x.IsDeleted)) {
-      var exportAction = rule.GetAction().CloneDefinition();
-      exportAction.Condition = rule.GetCondition().CloneDefinition();
-      actions.Add(exportAction);
-    }
-    _exportRulesDialog.WithActions(actions).Show();
-  }
-
   #endregion
 
   #region Implementation
 
   IEditorProvider[] _editorProviders;
-  ExportRulesDialog _exportRulesDialog;
-  ImportRulesDialog _importRulesDialog;
 
   bool RulesChanged => _ruleRows.Any(x => x.IsDeleted || x.IsModified);
   bool EditsPending => _ruleRows.Any(x => x.IsInEditMode);
@@ -149,10 +115,7 @@ sealed class RulesEditorDialog : AbstractDialog {
   /// <summary>Public for the inject to work properly.</summary>
   [Inject]
   public void InjectDependencies(
-      ExportRulesDialog exportRulesDialog, ImportRulesDialog importRulesDialog,
       ScriptEditorProvider scriptEditorProvider, ConstructorEditorProvider constructorEditorProvider) {
-    _exportRulesDialog = exportRulesDialog;
-    _importRulesDialog = importRulesDialog;
     _editorProviders = [scriptEditorProvider, constructorEditorProvider];
   }
 
