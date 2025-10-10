@@ -8,6 +8,7 @@ using System.Linq;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
+using IgorZ.TimberDev.UI;
 using IgorZ.TimberDev.Utils;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.Persistence;
@@ -33,12 +34,13 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   public override string UiDescription {
     get {
       if (_lastScriptError != null) {
-        return Behavior.Loc.T(_lastScriptError);
+        return CommonFormats.HighlightRed(Behavior.Loc.T(_lastScriptError));
       }
       try {
-        return _parsedExpression.Describe();
+        var describe = _parsedExpression.Describe();
+        return ConditionState ? CommonFormats.HighlightGreen(describe) : CommonFormats.HighlightYellow(describe); 
       } catch (ScriptError.RuntimeError e) {
-        return Behavior.Loc.T(e.LocKey);
+        return CommonFormats.HighlightRed(Behavior.Loc.T(e.LocKey));
       }
     }
   }

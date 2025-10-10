@@ -166,6 +166,11 @@ sealed class AutomationFragment : IEntityPanelFragment {
     _rulesList.Clear();
     foreach (var action in _scriptingRulesUIHelper.BuildingRules) {
       var row = _uiFactory.LoadVisualElement(RuleRowTemplate);
+      _rulesList.Add(row);
+      rowsAdded++;
+
+      var conditionLabel = row.Q2<Label>("Condition");
+      var actionLabel = row.Q2<Label>("Action");
 
       string conditionText;
       if (EntityPanelSettings.RulesDescriptionStyle == EntityPanelSettings.DescriptionStyle.HumanReadable
@@ -177,13 +182,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
           conditionText = ShortenNames(conditionText);
         }
       }
-      if (action.Condition.IsInErrorState) {
-        conditionText = CommonFormats.HighlightRed(conditionText);
-      } else if (action.Condition.ConditionState) {
-        conditionText = CommonFormats.HighlightGreen(conditionText);
-      } else {
-        conditionText = CommonFormats.HighlightYellow(conditionText);
-      }
+      conditionLabel.text = _uiFactory.T(ConditionTextLocKey, conditionText);
 
       string actionText;
       if (EntityPanelSettings.RulesDescriptionStyle == EntityPanelSettings.DescriptionStyle.HumanReadable
@@ -195,14 +194,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
           actionText = ShortenNames(actionText);
         }
       }
-      actionText = action.IsInErrorState
-          ? CommonFormats.HighlightRed(actionText)
-          : CommonFormats.HighlightYellow(actionText);
-
-      row.Q2<Label>("Condition").text = _uiFactory.T(ConditionTextLocKey, conditionText);
-      row.Q2<Label>("Action").text = _uiFactory.T(ActionTextLocKey, actionText);
-      row.Q2<VisualElement>("Container").SetEnabled(action.Condition.IsActive);
-      _rulesList.Add(row);
+      actionLabel.text = _uiFactory.T(ActionTextLocKey, actionText);
     }
   }
 

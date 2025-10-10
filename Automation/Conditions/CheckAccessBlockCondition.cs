@@ -4,6 +4,7 @@
 
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.PathCheckingSystem;
+using IgorZ.TimberDev.UI;
 using IgorZ.TimberDev.Utils;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.BuildingsNavigation;
@@ -35,7 +36,8 @@ public sealed class CheckAccessBlockCondition : AutomationConditionBase {
 
   /// <inheritdoc/>
   public override string UiDescription =>
-      Behavior.Loc.T(!IsReversedCondition ? BlockingPathNameLocKey : NotBlockingPathNameLocKey);
+      CommonFormats.HighlightYellow(
+          Behavior.Loc.T(!IsReversedCondition ? BlockingPathNameLocKey : NotBlockingPathNameLocKey));
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {

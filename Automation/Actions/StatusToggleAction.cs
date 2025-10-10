@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
+using IgorZ.TimberDev.UI;
 using TimberApi.DependencyContainerSystem;
 using Timberborn.BaseComponentSystem;
 using Timberborn.Localization;
@@ -87,7 +88,7 @@ public class StatusToggleAction : AutomationActionBase {
   public override bool IsInErrorState => false;
 
   /// <inheritdoc/>
-  public override string UiDescription => Behavior.Loc.T(Description);
+  public override string UiDescription => CommonFormats.HighlightYellow(Behavior.Loc.T(Description));
 
   /// <inheritdoc/>
   public override IAutomationAction CloneDefinition() {

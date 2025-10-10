@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using IgorZ.Automation.Utils;
+using IgorZ.TimberDev.UI;
 
 namespace IgorZ.Automation.AutomationSystem;
 
@@ -45,11 +46,21 @@ public interface IAutomationAction : IGameSerializable {
 
   /// <summary>Returns a localized string to present the action description in UI.</summary>
   /// <remarks>
+  /// <p>
   /// The string must give an exhaustive description on what the action does, but at the same time it should be as short
   /// as possible. This property mustn't be accessed on an inactive action.
+  /// </p>
+  /// <p>
+  /// The string can have rich text markup. Removing or overriding them is discouraged. The coloring convention is:
+  /// <ul>
+  /// <li>Yellow for normal states;</li>
+  /// <li>Red for errors or bad states.</li>
+  /// </ul>
+  /// </p>
   /// </remarks>
   /// <seealso cref="Behavior"/>
   /// <seealso cref="AutomationBehavior.Loc"/>
+  /// <seealso cref="CommonFormats"/>
   public string UiDescription { get; }
 
   /// <summary>Returns a full copy of the action <i>definition</i>. There must be no state copied.</summary>
