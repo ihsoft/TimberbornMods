@@ -109,6 +109,7 @@ IgorZ.Automation.Scripting.Error.DivisionByZero,"ОШИБКА: Деление н
 IgorZ.Automation.Scripting.Error.BadValue,"ОШИБКА: Неверное значение","Localizable generic message for the related exception"
 IgorZ.Automation.Scripting.Error.InternalError,"ОШИБКА: Внутренняя ошибка","Localizable generic message for the related exception"
 =,=,"UI fragment strings"
+IgorZ.Automation.AutomationFragment.AndMoreRow,"...и ещё {0} правил...","Indicates that there are more rules that are not shown in the panel"
 IgorZ.Automation.AutomationFragment.BuildingSignalSource,"{0} ({1})","String that represents the source signal user-friendly, and it's current value"
 IgorZ.Automation.AutomationFragment.ClearRulesBtnHint,"Удалить все правила",
 IgorZ.Automation.AutomationFragment.ClearSignalsBtnHint,"Удалить все сигналы",
@@ -225,6 +226,7 @@ IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.Script,"Скрипт
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.ScriptShort,"Псевдо-скрипт","Shortened script style of the rule description."
 IgorZ.Automation.Settings.EntityPanel.EvalValuesInConditions,"Вычислять значение правого аргумента в условиях",
 IgorZ.Automation.Settings.EntityPanel.EvalValuesInActionArguments,"Вычислять значения в аргументах действий",
+IgorZ.Automation.Settings.EntityPanel.MaxRulesShown,"Макс. количество отображаемых правил",
 IgorZ.Automation.Settings.ScriptEngine.Header,"Настройки движка скриптов",
 IgorZ.Automation.Settings.ScriptEngine.CheckArgumentValues,"Проверять значения аргументов во время исполнения",
 IgorZ.Automation.Settings.ScriptEngine.CheckOptionsArguments,"Проверять аргументы с фиксированным набором значений",

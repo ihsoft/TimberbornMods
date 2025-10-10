@@ -1,5 +1,6 @@
 # v2.8.0 (pre-release, 10/6/2025):
 * [Feature] Full refactor of the entity panel UI.
+* [Feature] Limit the number of rules shown in the entity panel. Check the settings dialog.
 * [Change] Improve script errors handling in UI. Fix some edge cases when game could crash due to a script error.
 * [Fix] Properly display "add" operator when it has more than 2 arguments.
 

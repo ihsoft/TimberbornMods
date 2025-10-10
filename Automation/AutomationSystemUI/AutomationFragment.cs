@@ -27,6 +27,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
   const string RulesCountTextLocKey = "IgorZ.Automation.AutomationFragment.RulesCountTextLocKey";
   const string ConditionTextLocKey = "IgorZ.Automation.AutomationFragment.RuleConditionTextLocKey";
   const string ActionTextLocKey = "IgorZ.Automation.AutomationFragment.RuleActionTextLocKey";
+  const string AndMoreRowLocKey = "IgorZ.Automation.AutomationFragment.AndMoreRow";
   const string SetupRulesBtnHintLocKey = "IgorZ.Automation.AutomationFragment.SetupRulesBtnHint";
   const string CopyRulesBtnHintLocKey = "IgorZ.Automation.AutomationFragment.CopyRulesBtnHint";
   const string ClearRulesBtnHintLocKey = "IgorZ.Automation.AutomationFragment.ClearRulesBtnHint";
@@ -164,6 +165,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
     _clearRulesButton.SetEnabled(_scriptingRulesUIHelper.BuildingRules.Count > 0);
     _copyRulesButton.SetEnabled(_scriptingRulesUIHelper.BuildingRules.Count > 0);
     _rulesList.Clear();
+    var rowsAdded = 0;
     foreach (var action in _scriptingRulesUIHelper.BuildingRules) {
       var row = _uiFactory.LoadVisualElement(RuleRowTemplate);
       _rulesList.Add(row);
@@ -171,6 +173,14 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
       var conditionLabel = row.Q2<Label>("Condition");
       var actionLabel = row.Q2<Label>("Action");
+
+      if (rowsAdded >= EntityPanelSettings.MaxRulesShown && rowsAdded < _scriptingRulesUIHelper.BuildingRules.Count) {
+        conditionLabel.text =
+            _uiFactory.T(AndMoreRowLocKey, _scriptingRulesUIHelper.BuildingRules.Count - rowsAdded + 1);
+        actionLabel.RemoveFromHierarchy();
+        break;
+      }
+      row.Q2<VisualElement>("Container").SetEnabled(action.Condition.IsActive);
 
       string conditionText;
       if (EntityPanelSettings.RulesDescriptionStyle == EntityPanelSettings.DescriptionStyle.HumanReadable

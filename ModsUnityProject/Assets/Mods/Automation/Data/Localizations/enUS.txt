@@ -109,6 +109,7 @@ IgorZ.Automation.Scripting.Error.DivisionByZero,"ERROR: Division by zero","Local
 IgorZ.Automation.Scripting.Error.BadValue,"ERROR: Bad value","Localizable generic message for the related exception"
 IgorZ.Automation.Scripting.Error.InternalError,"ERROR: Internal error","Localizable generic message for the related exception"
 =,=,"UI fragment strings"
+IgorZ.Automation.AutomationFragment.AndMoreRow,"...and {0} more rules...","Indicates that there are more rules that are not shown in the panel"
 IgorZ.Automation.AutomationFragment.BuildingSignalSource,"{0} ({1})","String that represents the source signal user-friendly, and it's current value"
 IgorZ.Automation.AutomationFragment.ClearRulesBtnHint,"Clear all rules",
 IgorZ.Automation.AutomationFragment.ClearSignalsBtnHint,"Clear all signals mappings",
@@ -224,6 +225,7 @@ IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.Script,"Script","Scr
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.ScriptShort,"Pseudo-script","Shortened script style of the rule description."
 IgorZ.Automation.Settings.EntityPanel.EvalValuesInConditions,"Evaluate the right value in conditions",
 IgorZ.Automation.Settings.EntityPanel.EvalValuesInActionArguments,"Evaluate values in the action arguments",
+IgorZ.Automation.Settings.EntityPanel.MaxRulesShown,"Number of rules to show in panel",
 IgorZ.Automation.Settings.ScriptEngine.Header,"Script engine settings",
 IgorZ.Automation.Settings.ScriptEngine.CheckArgumentValues,"Check argument value in runtime",
 IgorZ.Automation.Settings.ScriptEngine.CheckOptionsArguments,"Check arguments with fixed set of values",
