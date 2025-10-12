@@ -37,6 +37,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
   const string SignalsCountTextLocKey = "IgorZ.Automation.AutomationFragment.SignalsCountText";
   const string SetupSignalsBtnHintLocKey = "IgorZ.Automation.AutomationFragment.SetupSignalsBtnHint";
+  const string CopySignalsBtnHintLocKey = "IgorZ.Automation.AutomationFragment.CopySignalsBtnHint";
   const string ClearSignalsBtnHintLocKey = "IgorZ.Automation.AutomationFragment.ClearSignalsBtnHint";
 
   readonly UiFactory _uiFactory;
@@ -44,7 +45,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
   readonly SignalsEditorDialog _signalsEditorDialog;
   readonly CopyRulesTool _copyRulesTool;
   readonly ScriptingService _scriptingService;
-  readonly ScriptingRulesUIHelper _scriptingRulesUIHelper;
+  readonly ScriptingRulesUIHelper _rulesHelper;
   readonly ITooltipRegistrar _tooltipRegistrar;
   readonly ImportRulesDialog _importRulesDialog;
   readonly ExportRulesDialog _exportRulesDialog;
@@ -57,34 +58,33 @@ sealed class AutomationFragment : IEntityPanelFragment {
   Button _foldRulesButton;
   Button _unfoldRulesButton;
   Button _copyRulesButton;
+  Button _clearRulesButton;
 
   VisualElement _signalsList;
   bool _signalsListFolded = true;
   Label _signalsCountLabel;
   Button _foldSignalsButton;
   Button _unfoldSignalsButton;
+  Button _clearSignalsButton;
+  Button _copySignalsButton;
 
   AutomationBehavior _automationBehavior;
   int _automationBehaviorVersion = -1;
 
   AutomationFragment(UiFactory uiFactory, RulesEditorDialog rulesEditorDialog, SignalsEditorDialog signalsEditorDialog,
                      CopyRulesTool copyRulesTool, ScriptingService scriptingService,
-                     ScriptingRulesUIHelper scriptingRulesUIHelper, ITooltipRegistrar tooltipRegistrar,
+                     ScriptingRulesUIHelper rulesHelper, ITooltipRegistrar tooltipRegistrar,
                      ImportRulesDialog importRulesDialog, ExportRulesDialog exportRulesDialog) {
     _uiFactory = uiFactory;
     _rulesEditorDialog = rulesEditorDialog;
     _signalsEditorDialog = signalsEditorDialog;
     _copyRulesTool = copyRulesTool;
     _scriptingService = scriptingService; //FIXME: move to the helper
-    _scriptingRulesUIHelper = scriptingRulesUIHelper;
+    _rulesHelper = rulesHelper;
     _tooltipRegistrar = tooltipRegistrar;
     _importRulesDialog = importRulesDialog;
     _exportRulesDialog = exportRulesDialog;
   }
-
-  Button _clearRulesButton;
-  Button _setupRulesButton;
-  Button _clearSignalsButton;
 
   public VisualElement InitializeFragment() {
     _root = _uiFactory.LoadVisualTreeAsset(FragmentResource);
@@ -101,11 +101,14 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
     // Setup signals fragment section.
     var setupSignalsButton = _root.Q2<Button>("SetupSignalsButton");
-    setupSignalsButton.clicked += () => _signalsEditorDialog.WithUiHelper(_scriptingRulesUIHelper).Show();
+    setupSignalsButton.clicked += () => _signalsEditorDialog.WithUiHelper(_rulesHelper).Show();
     _tooltipRegistrar.RegisterLocalizable(setupSignalsButton, SetupSignalsBtnHintLocKey);
+    _copySignalsButton = _root.Q2<Button>("CopySignalsButton");
+    _copySignalsButton.clicked += () => _copyRulesTool.StartTool(_rulesHelper, CopyRulesTool.CopyMode.CopySignals);
+    _tooltipRegistrar.RegisterLocalizable(_copySignalsButton, CopySignalsBtnHintLocKey);
     _clearSignalsButton = _root.Q2<Button>("ClearSignalsButton");
     _tooltipRegistrar.RegisterLocalizable(_clearSignalsButton, ClearSignalsBtnHintLocKey);
-    _clearSignalsButton.clicked += () => _scriptingRulesUIHelper.ClearSignalsOnBuilding();
+    _clearSignalsButton.clicked += () => _rulesHelper.ClearSignalsOnBuilding();
 
     _signalsCountLabel = _root.Q2<Label>("SignalsCountLabel");
     _foldSignalsButton = _root.Q2<Button>("FoldSignalsButton");
@@ -114,15 +117,15 @@ sealed class AutomationFragment : IEntityPanelFragment {
     _unfoldSignalsButton.clicked += () => SetSignalsListFolded(false);
 
     // Setup rules fragment section.
-    _setupRulesButton = _root.Q2<Button>("SetupRulesButton");
-    _setupRulesButton.clicked += () => _rulesEditorDialog.WithUiHelper(_scriptingRulesUIHelper).Show();
-    _tooltipRegistrar.RegisterLocalizable(_setupRulesButton, SetupRulesBtnHintLocKey);
+    var setupRulesButton = _root.Q2<Button>("SetupRulesButton");
+    setupRulesButton.clicked += () => _rulesEditorDialog.WithUiHelper(_rulesHelper).Show();
+    _tooltipRegistrar.RegisterLocalizable(setupRulesButton, SetupRulesBtnHintLocKey);
     _copyRulesButton = _root.Q2<Button>("CopyRulesButton");
-    _copyRulesButton.clicked += () => _copyRulesTool.StartTool(_automationBehavior);
+    _copyRulesButton.clicked += () => _copyRulesTool.StartTool(_rulesHelper, CopyRulesTool.CopyMode.CopyRules);
     _tooltipRegistrar.RegisterLocalizable(_copyRulesButton, CopyRulesBtnHintLocKey);
     _clearRulesButton = _root.Q2<Button>("ClearRulesButton");
     _tooltipRegistrar.RegisterLocalizable(_clearRulesButton, ClearRulesBtnHintLocKey);
-    _clearRulesButton.clicked += () => _scriptingRulesUIHelper.ClearRulesOnBuilding();
+    _clearRulesButton.clicked += () => _rulesHelper.ClearRulesOnBuilding();
 
     _rulesCountLabel = _root.Q2<Label>("RulesCountLabel");
     _foldRulesButton = _root.Q2<Button>("FoldRulesButton");
@@ -152,18 +155,19 @@ sealed class AutomationFragment : IEntityPanelFragment {
       return;
     }
     _automationBehaviorVersion = _automationBehavior.StateVersion;
-    _scriptingRulesUIHelper.SetBuilding(_automationBehavior);
+    _rulesHelper.SetBuilding(_automationBehavior);
     SetRulesListFolded(_rulesListFolded);
     SetSignalsListFolded(_signalsListFolded);
 
     // Signals panel.
-    var totalSignalsCount = _scriptingRulesUIHelper.BuildingSignalNames.Count;
-    var exposedSignalsCount = _scriptingRulesUIHelper.ExposedSignalsCount;
+    var totalSignalsCount = _rulesHelper.BuildingSignalNames.Count;
+    var exposedSignalsCount = _rulesHelper.ExposedSignalsCount;
     _root.Q2<VisualElement>("SignalsPanel").ToggleDisplayStyle(totalSignalsCount > 0);
     _signalsCountLabel.text = _uiFactory.T(SignalsCountTextLocKey, exposedSignalsCount, totalSignalsCount);
     _clearSignalsButton.SetEnabled(exposedSignalsCount > 0);
+    _copySignalsButton.SetEnabled(exposedSignalsCount > 0);
     _signalsList.Clear();
-    foreach (var signalMapping in _scriptingRulesUIHelper.BuildingSignals) {
+    foreach (var signalMapping in _rulesHelper.BuildingSignals) {
       if (signalMapping.ExportedSignalName == null) {
         continue;
       }
@@ -177,12 +181,12 @@ sealed class AutomationFragment : IEntityPanelFragment {
     }
 
     // Rules panel.
-    _rulesCountLabel.text = _uiFactory.T(RulesCountTextLocKey, _scriptingRulesUIHelper.BuildingRules.Count);
-    _clearRulesButton.SetEnabled(_scriptingRulesUIHelper.BuildingRules.Count > 0);
-    _copyRulesButton.SetEnabled(_scriptingRulesUIHelper.BuildingRules.Count > 0);
+    _rulesCountLabel.text = _uiFactory.T(RulesCountTextLocKey, _rulesHelper.BuildingRules.Count);
+    _clearRulesButton.SetEnabled(_rulesHelper.BuildingRules.Count > 0);
+    _copyRulesButton.SetEnabled(_rulesHelper.BuildingRules.Count > 0);
     _rulesList.Clear();
     var rowsAdded = 0;
-    foreach (var action in _scriptingRulesUIHelper.BuildingRules) {
+    foreach (var action in _rulesHelper.BuildingRules) {
       var row = _uiFactory.LoadVisualElement(RuleRowTemplate);
       _rulesList.Add(row);
       rowsAdded++;
@@ -190,9 +194,9 @@ sealed class AutomationFragment : IEntityPanelFragment {
       var conditionLabel = row.Q2<Label>("Condition");
       var actionLabel = row.Q2<Label>("Action");
 
-      if (rowsAdded >= EntityPanelSettings.MaxRulesShown && rowsAdded < _scriptingRulesUIHelper.BuildingRules.Count) {
+      if (rowsAdded >= EntityPanelSettings.MaxRulesShown && rowsAdded < _rulesHelper.BuildingRules.Count) {
         conditionLabel.text =
-            _uiFactory.T(AndMoreRowLocKey, _scriptingRulesUIHelper.BuildingRules.Count - rowsAdded + 1);
+            _uiFactory.T(AndMoreRowLocKey, _rulesHelper.BuildingRules.Count - rowsAdded + 1);
         actionLabel.RemoveFromHierarchy();
         break;
       }
@@ -231,19 +235,19 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
   void SetRulesListFolded(bool isFolded) {
     _rulesListFolded = isFolded;
-    var actualFoldState = isFolded || _scriptingRulesUIHelper.BuildingRules.Count == 0;
+    var actualFoldState = isFolded || _rulesHelper.BuildingRules.Count == 0;
     _rulesList.ToggleDisplayStyle(!actualFoldState);
     _foldRulesButton.ToggleDisplayStyle(!actualFoldState);
     _unfoldRulesButton.ToggleDisplayStyle(actualFoldState);
-    _unfoldRulesButton.SetEnabled(_scriptingRulesUIHelper.BuildingRules.Count > 0);
+    _unfoldRulesButton.SetEnabled(_rulesHelper.BuildingRules.Count > 0);
   }
 
   void SetSignalsListFolded(bool isFolded) {
     _signalsListFolded = isFolded;
-    var actualFoldState = _signalsListFolded || _scriptingRulesUIHelper.ExposedSignalsCount == 0;
+    var actualFoldState = _signalsListFolded || _rulesHelper.ExposedSignalsCount == 0;
     _signalsList.ToggleDisplayStyle(!actualFoldState);
     _foldSignalsButton.ToggleDisplayStyle(!actualFoldState);
     _unfoldSignalsButton.ToggleDisplayStyle(actualFoldState);
-    _unfoldSignalsButton.SetEnabled(_scriptingRulesUIHelper.ExposedSignalsCount > 0);
+    _unfoldSignalsButton.SetEnabled(_rulesHelper.ExposedSignalsCount > 0);
   }
 }

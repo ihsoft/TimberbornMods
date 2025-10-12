@@ -113,7 +113,8 @@ IgorZ.Automation.AutomationFragment.AndMoreRow,"...и ещё {0} правил...
 IgorZ.Automation.AutomationFragment.BuildingSignalSource,"{0} ({1})","String that represents the source signal user-friendly, and it's current value"
 IgorZ.Automation.AutomationFragment.ClearRulesBtnHint,"Удалить все правила",
 IgorZ.Automation.AutomationFragment.ClearSignalsBtnHint,"Удалить все сигналы",
-IgorZ.Automation.AutomationFragment.CopyRulesBtnHint,"Копировать правила и сигналы на другие здания",
+IgorZ.Automation.AutomationFragment.CopyRulesBtnHint,"Копировать правила на другие здания",
+IgorZ.Automation.AutomationFragment.CopySignalsBtnHint,"Копировать сигналы на другие здания",
 IgorZ.Automation.AutomationFragment.ExportRulesBtnHint,"Экспортировать правила и сигналы в виде текста",
 IgorZ.Automation.AutomationFragment.ImportRulesBtnHint,"Импортировать правила и сигналы из текста",
 IgorZ.Automation.AutomationFragment.RuleActionText,"Тогда {0}",
