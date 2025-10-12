@@ -45,7 +45,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
   readonly SignalsEditorDialog _signalsEditorDialog;
   readonly CopyRulesTool _copyRulesTool;
   readonly ScriptingService _scriptingService;
-  readonly ScriptingRulesUIHelper _rulesHelper;
+  readonly RulesUIHelper _rulesHelper;
   readonly ITooltipRegistrar _tooltipRegistrar;
   readonly ImportRulesDialog _importRulesDialog;
   readonly ExportRulesDialog _exportRulesDialog;
@@ -73,7 +73,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
   AutomationFragment(UiFactory uiFactory, RulesEditorDialog rulesEditorDialog, SignalsEditorDialog signalsEditorDialog,
                      CopyRulesTool copyRulesTool, ScriptingService scriptingService,
-                     ScriptingRulesUIHelper rulesHelper, ITooltipRegistrar tooltipRegistrar,
+                     RulesUIHelper rulesHelper, ITooltipRegistrar tooltipRegistrar,
                      ImportRulesDialog importRulesDialog, ExportRulesDialog exportRulesDialog) {
     _uiFactory = uiFactory;
     _rulesEditorDialog = rulesEditorDialog;

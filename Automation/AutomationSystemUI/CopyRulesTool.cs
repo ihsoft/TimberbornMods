@@ -82,7 +82,7 @@ sealed class CopyRulesTool : AbstractAreaSelectionTool, IAutomationModeEnabler, 
     CopyRules,
   }
 
-  public void StartTool(ScriptingRulesUIHelper rulesHelper, CopyMode copyMode) {
+  public void StartTool(RulesUIHelper rulesHelper, CopyMode copyMode) {
     Initialize();
     _sourceRulesHelper = rulesHelper;
     _copyMode = copyMode;
@@ -102,15 +102,15 @@ sealed class CopyRulesTool : AbstractAreaSelectionTool, IAutomationModeEnabler, 
   #region Implementation
 
   ToolManager _toolManager;
-  ScriptingRulesUIHelper _sourceRulesHelper;
-  ScriptingRulesUIHelper _targetRulesHelper;
+  RulesUIHelper _sourceRulesHelper;
+  RulesUIHelper _targetRulesHelper;
   CopyMode _copyMode;
   IReadOnlyList<IAutomationAction> _actionsToCopy = [];
 
   /// <summary>Injects the condition dependencies. It has to be public to work.</summary>
   [Inject]
   public void InjectDependencies(
-      ToolManager toolManager, ToolGroupManager toolGroupManager, ScriptingRulesUIHelper rulesHelper) {
+      ToolManager toolManager, ToolGroupManager toolGroupManager, RulesUIHelper rulesHelper) {
     _toolManager = toolManager;
     _toolGroupManager = toolGroupManager;
     _targetRulesHelper = rulesHelper;

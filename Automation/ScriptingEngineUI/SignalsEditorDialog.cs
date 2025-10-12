@@ -51,7 +51,7 @@ sealed class SignalsEditorDialog : AbstractDialog {
 
   #region API
 
-  public SignalsEditorDialog WithUiHelper(ScriptingRulesUIHelper rulesUIHelper) {
+  public SignalsEditorDialog WithUiHelper(RulesUIHelper rulesUIHelper) {
     _rulesUiHelper = rulesUIHelper;
     return this;
   }
@@ -94,11 +94,11 @@ sealed class SignalsEditorDialog : AbstractDialog {
 
   static readonly Regex MappedSignalNamePattern = new(@"^(?!\.)([A-Za-z][A-Za-z0-9]+\.?)*([A-Za-z][A-Za-z0-9]*)$");
 
-  ScriptingRulesUIHelper _rulesUiHelper;
+  RulesUIHelper _rulesUiHelper;
   readonly List<MappingLine> _mappingLines = [];
 
   readonly record struct MappingLine {
-    public MappingLine(ScriptingRulesUIHelper.BuildingSignal Signal, TextField CustomSignalField) {
+    public MappingLine(RulesUIHelper.BuildingSignal Signal, TextField CustomSignalField) {
       this.Signal = Signal;
       this.CustomSignalField = CustomSignalField;
       CustomSignalField.RegisterCallback<ChangeEvent<string>>(ValidateSignalNameCallback);
@@ -106,7 +106,7 @@ sealed class SignalsEditorDialog : AbstractDialog {
 
     public bool HasChanges => CustomSignalField.ClassListContains(SignalNameModifiedClass);
     public bool HasError => CustomSignalField.ClassListContains(BadSignalNameClass);
-    public ScriptingRulesUIHelper.BuildingSignal Signal { get; }
+    public RulesUIHelper.BuildingSignal Signal { get; }
     public TextField CustomSignalField { get; }
 
     void ValidateSignalNameCallback(ChangeEvent<string> evt) {

@@ -58,7 +58,7 @@ sealed class RulesEditorDialog : AbstractDialog {
 
   #region API
 
-  public RulesEditorDialog WithUiHelper(ScriptingRulesUIHelper rulesUiHelper) {
+  public RulesEditorDialog WithUiHelper(RulesUIHelper rulesUiHelper) {
     _rulesUiHelper = rulesUiHelper;
     return this;
   }
@@ -109,7 +109,7 @@ sealed class RulesEditorDialog : AbstractDialog {
   bool HasErrors => _ruleRows.Any(x => x.HasErrors);
 
   VisualElement _ruleRowsContainer;
-  ScriptingRulesUIHelper _rulesUiHelper;
+  RulesUIHelper _rulesUiHelper;
   readonly List<RuleRow> _ruleRows = []; 
   
   /// <summary>Public for the inject to work properly.</summary>

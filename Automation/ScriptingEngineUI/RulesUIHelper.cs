@@ -14,7 +14,7 @@ using Timberborn.Localization;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
 
-class ScriptingRulesUIHelper {
+class RulesUIHelper {
   const string BuildingSignalSourceLocKey = "IgorZ.Automation.AutomationFragment.BuildingSignalSource";
 
   #region API
@@ -180,7 +180,7 @@ class ScriptingRulesUIHelper {
   readonly ScriptingService _scriptingService;
   readonly ILoc _loc;
 
-  ScriptingRulesUIHelper(ScriptingService scriptingService, ILoc loc) {
+  RulesUIHelper(ScriptingService scriptingService, ILoc loc) {
     _scriptingService = scriptingService;
     _loc = loc;
   }
