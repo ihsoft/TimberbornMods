@@ -107,9 +107,9 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
     }
     _lastValidatedBehavior = behavior;
     if (CheckPrecondition(behavior)) {
-      var expression = ParseAndValidate(Expression, behavior, out _parsingResult, onlyCheck: true);
+      var expression = ParseAndValidate(Expression, behavior, out var parsingResult, onlyCheck: true);
       _lastValidationResult = expression != null;
-      if (_parsingResult.LastScriptError is ScriptError.BadStateError error) {
+      if (parsingResult.LastScriptError is ScriptError.BadStateError error) {
         DebugEx.Fine("Expression '{0}' is not valid at {1}: {2}", Expression, behavior, error.Message);
       }
     } else {

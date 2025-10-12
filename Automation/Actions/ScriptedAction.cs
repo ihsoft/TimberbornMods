@@ -51,7 +51,10 @@ sealed class ScriptedAction : AutomationActionBase {
       return _lastValidationResult;
     }
     _lastValidatedBehavior = behavior;
-    _lastValidationResult = ParseAndValidate(Expression, behavior, out _parsingResult) != null;
+    _lastValidationResult = ParseAndValidate(Expression, behavior, out var parsingResult) != null;
+    if (parsingResult.LastScriptError is ScriptError.BadStateError error) {
+      DebugEx.Fine("Expression '{0}' is not valid at {1}: {2}", Expression, behavior, error.Message);
+    }
     return _lastValidationResult;
   }
 
