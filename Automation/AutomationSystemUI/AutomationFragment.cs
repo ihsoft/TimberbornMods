@@ -26,15 +26,16 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
   const string ExportRulesBtnHintLocKey = "IgorZ.Automation.AutomationFragment.ExportRulesBtnHint";
   const string ImportRulesBtnHintLocKey = "IgorZ.Automation.AutomationFragment.ImportRulesBtnHint";
-  const string RulesCountTextLocKey = "IgorZ.Automation.AutomationFragment.RulesCountTextLocKey";
-  const string ConditionTextLocKey = "IgorZ.Automation.AutomationFragment.RuleConditionTextLocKey";
-  const string ActionTextLocKey = "IgorZ.Automation.AutomationFragment.RuleActionTextLocKey";
+
+  const string RulesCountTextLocKey = "IgorZ.Automation.AutomationFragment.RulesCountText";
+  const string ConditionTextLocKey = "IgorZ.Automation.AutomationFragment.RuleConditionText";
+  const string ActionTextLocKey = "IgorZ.Automation.AutomationFragment.RuleActionText";
   const string AndMoreRowLocKey = "IgorZ.Automation.AutomationFragment.AndMoreRow";
   const string SetupRulesBtnHintLocKey = "IgorZ.Automation.AutomationFragment.SetupRulesBtnHint";
   const string CopyRulesBtnHintLocKey = "IgorZ.Automation.AutomationFragment.CopyRulesBtnHint";
   const string ClearRulesBtnHintLocKey = "IgorZ.Automation.AutomationFragment.ClearRulesBtnHint";
 
-  const string SignalsCountTextLocKey = "IgorZ.Automation.AutomationFragment.SignalsCountTextLocKey";
+  const string SignalsCountTextLocKey = "IgorZ.Automation.AutomationFragment.SignalsCountText";
   const string SetupSignalsBtnHintLocKey = "IgorZ.Automation.AutomationFragment.SetupSignalsBtnHint";
   const string ClearSignalsBtnHintLocKey = "IgorZ.Automation.AutomationFragment.ClearSignalsBtnHint";
 

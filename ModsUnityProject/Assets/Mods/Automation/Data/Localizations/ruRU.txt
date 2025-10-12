@@ -116,13 +116,13 @@ IgorZ.Automation.AutomationFragment.ClearSignalsBtnHint,"Удалить все �
 IgorZ.Automation.AutomationFragment.CopyRulesBtnHint,"Копировать правила и сигналы на другие здания",
 IgorZ.Automation.AutomationFragment.ExportRulesBtnHint,"Экспортировать правила и сигналы в виде текста",
 IgorZ.Automation.AutomationFragment.ImportRulesBtnHint,"Импортировать правила и сигналы из текста",
-IgorZ.Automation.AutomationFragment.RuleActionTextLocKey,"Тогда {0}",
-IgorZ.Automation.AutomationFragment.RuleConditionTextLocKey,"Если {0},",
-IgorZ.Automation.AutomationFragment.RulesCountTextLocKey,"Правила: {0}",
+IgorZ.Automation.AutomationFragment.RuleActionText,"Тогда {0}",
+IgorZ.Automation.AutomationFragment.RuleConditionText,"Если {0},",
+IgorZ.Automation.AutomationFragment.RulesCountText,"Правила: {0}",
 IgorZ.Automation.AutomationFragment.SetupRulesBtnHint,"Настроить правила",
 IgorZ.Automation.AutomationFragment.SetupSignalsBtnHint,"Настроить сигналы которые другие здания
 смогут использовать в своих условиях",
-IgorZ.Automation.AutomationFragment.SignalsCountTextLocKey,"Сигналы: {0}/{1}",
+IgorZ.Automation.AutomationFragment.SignalsCountText,"Сигналы: {0}/{1}",
 IgorZ.Automation.Tool.CopyRules.Text,"Копировать правила: {0}",
 IgorZ.Automation.Tool.CopyRules.Title,"Копировать правила автоматизации",
 =,=,"Scriptable components strings"
