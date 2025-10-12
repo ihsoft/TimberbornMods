@@ -85,7 +85,7 @@ class ScriptingRulesUIHelper {
     var mappings = new List<(string signalName, ScriptedAction action)>();
     foreach (var action in automationBehavior.Actions) {
       var (buildingSignalName, _) = TryGetSignalMapping(action as ScriptedAction);
-      if (buildingSignalName == null || !_buildingSignalNames.Contains(buildingSignalName)) {
+      if (buildingSignalName == null) {
         _buildingRules.Add(action);
         continue;
       }
@@ -98,6 +98,7 @@ class ScriptingRulesUIHelper {
       }
       var signalSourceFn = _scriptingService.GetSignalSource(buildingSignalName, automationBehavior);
       var existingMappings = mappings.Where(x => x.signalName == buildingSignalName).ToList();
+      mappings.RemoveAll(x => x.signalName == buildingSignalName);
       var describeFn = () => GetFormattedSignalValue(signalDef, signalSourceFn);
       if (existingMappings.Count == 0) {
         _buildingSignals.Add(new BuildingSignal {
@@ -117,6 +118,18 @@ class ScriptingRulesUIHelper {
             Action = existingMapping.action,
         });
       }
+    }
+    // Process any remaining mappings that refer to non-building signals (added via rules import).
+    foreach (var (buildingSignalName, action) in mappings) {
+      var signalDef = _scriptingService.GetSignalDefinition(buildingSignalName, automationBehavior);
+      var signalSourceFn = _scriptingService.GetSignalSource(buildingSignalName, automationBehavior);
+      ExposedSignalsCount++;
+      _buildingSignals.Add(new BuildingSignal {
+          SignalName = buildingSignalName,
+          DescribeFn = () => GetFormattedSignalValue(signalDef, signalSourceFn),
+          ExportedSignalName = TryGetSignalMapping(action).customSignal,
+          Action = action,
+      });
     }
   }
 
