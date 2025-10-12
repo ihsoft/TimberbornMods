@@ -8,6 +8,7 @@ using System.Linq;
 using Bindito.Core;
 using IgorZ.Automation.Actions;
 using IgorZ.Automation.AutomationSystem;
+using IgorZ.Automation.AutomationSystemUI;
 using IgorZ.Automation.Conditions;
 using IgorZ.TimberDev.UI;
 using UnityEngine;

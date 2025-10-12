@@ -12,7 +12,7 @@ using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.Localization;
 
-namespace IgorZ.Automation.ScriptingEngineUI;
+namespace IgorZ.Automation.AutomationSystemUI;
 
 class RulesUIHelper {
   const string BuildingSignalSourceLocKey = "IgorZ.Automation.AutomationFragment.BuildingSignalSource";
