@@ -44,7 +44,7 @@ class ConcatOperator : AbstractOperator, IValueExpr {
       var result = "";
       foreach (var valueExpr in valueExprs) {
         if (valueExpr.ValueType == ScriptValue.TypeEnum.Number) {
-          result += valueExpr.ValueFn().AsNumber;
+          result += valueExpr.ValueFn().AsFloat.ToString("0.##");
         } else {
           result += valueExpr.ValueFn().AsString;
         }

@@ -3,6 +3,7 @@
 * [Feature] Limit the number of rules shown in the entity panel. Check the settings dialog.
 * [Change] Move script rules import/export functionality to the building panel UI.
 * [Change] Improve script errors handling in UI. Fix some edge cases when game could crash due to a script error.
+* [Change] The `concat` operator now shows the numbers as floats instead of fixed-point integers.
 * [Fix] Properly display "add" operator when it has more than 2 arguments.
 
 # v2.7.1 (September 5th, 2025):
