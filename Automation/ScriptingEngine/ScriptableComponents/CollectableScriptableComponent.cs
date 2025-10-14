@@ -17,7 +17,9 @@ using Timberborn.Cutting;
 using Timberborn.EntitySystem;
 using Timberborn.Forestry;
 using Timberborn.Growing;
+using Timberborn.NaturalResourcesLifecycle;
 using Timberborn.SingletonSystem;
+using Timberborn.YielderFinding;
 using Timberborn.Yielding;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
@@ -202,7 +204,8 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
       var oldState = _activeYielders;
       _activeYielders = 0;
       for (var i = _yielders.Count - 1; i >= 0; i--) {
-        if (_yielders.ElementAt(i).IsYielding) {
+        var yielder = _yielders.ElementAt(i);
+        if (yielder.IsYielding && (_needsCuttingArea || yielder.IsAlive())) {
           ++_activeYielders;
         }
       }
@@ -228,6 +231,11 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
       if (growable) {
         growable.HasGrown += OnYielderUpdate;
       }
+      var living = yielder.GetComponentFast<LivingNaturalResource>();
+      if (living) {
+        living.Died += OnYielderUpdate;
+        living.ReversedDeath += OnYielderUpdate;
+      }
       _yieldersChanged = true;
     }
 
@@ -248,6 +256,11 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
       var growable = yielder.GetComponentFast<Growable>();
       if (growable) {
         growable.HasGrown -= OnYielderUpdate;
+      }
+      var living = yielder.GetComponentFast<LivingNaturalResource>();
+      if (living) {
+        living.Died -= OnYielderUpdate;
+        living.ReversedDeath -= OnYielderUpdate;
       }
       _yieldersChanged = true;
     }
