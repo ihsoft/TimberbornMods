@@ -148,6 +148,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
   public void ClearFragment() {
     _root.ToggleDisplayStyle(visible: false);
+    _rulesHelper.SetBuilding(null);
   }
 
   public void UpdateFragment() {
