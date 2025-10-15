@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using Bindito.Core;
 using IgorZ.TimberDev.Utils;
 
@@ -11,8 +12,13 @@ namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Patches;
 [Context("Game")]
 sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).FullName;
+  static readonly Type[] Patches = [
+      typeof(ForesterSetReplantDeadTreesPatch),
+      typeof(SoilContaminationServicePatch),
+      typeof(SoilMoistureServicePatch),
+  ];
 
   public void Configure(IContainerDefinition containerDefinition) {
-    HarmonyPatcher.PatchRepeated(PatchId, typeof(ForesterSetReplantDeadTreesPatch));
+    HarmonyPatcher.PatchRepeated(PatchId, Patches);
   }
 }

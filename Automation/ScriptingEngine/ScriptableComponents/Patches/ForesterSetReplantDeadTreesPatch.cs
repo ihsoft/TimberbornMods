@@ -14,9 +14,6 @@ static class ForesterSetReplantDeadTreesPatch {
   // ReSharper disable once UnusedMember.Local
   [SuppressMessage("ReSharper", "InconsistentNaming")]
   static void Postfix(Forester __instance) {
-    var tracker = __instance.GetComponentFast<PlantableScriptableComponent.PlantableTracker>();
-    if (tracker) {
-      tracker.ScheduleStateUpdate();
-    }
+    PlantableScriptableComponent.Instance.OnForesterSettingsChanged(__instance);
   }
 }

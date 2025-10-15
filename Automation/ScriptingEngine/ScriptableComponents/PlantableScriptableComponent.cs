@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
@@ -63,12 +64,21 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase {
       throw new InvalidOperationException("Unknown signal: " + signalOperator.SignalName);
     }
     GetPlantingSpotFinder(host.Behavior);
-    host.Behavior.GetOrCreate<PlantableTracker>().AddSignal(signalOperator, host);
+    var tracker = host.Behavior.GetOrCreate<PlantableTracker>();
+    var hadSignals = tracker.HasSignals;
+    tracker.AddSignal(signalOperator, host);
+    if (!hadSignals && tracker.HasSignals) {
+      _allTrackers.Add(tracker);
+    }
   }
 
   /// <inheritdoc/>
   public override void UnregisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
-    host.Behavior.GetOrThrow<PlantableTracker>().RemoveSignal(signalOperator, host);
+    var tracker = host.Behavior.GetOrThrow<PlantableTracker>();
+    tracker.RemoveSignal(signalOperator, host);
+    if (!tracker.HasSignals) {
+      _allTrackers.Remove(tracker);
+    }
   }
 
   #endregion
@@ -94,6 +104,13 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase {
 
   #region Implementation
 
+  internal static PlantableScriptableComponent Instance;
+  readonly List<PlantableTracker> _allTrackers = [];
+
+  PlantableScriptableComponent() {
+    Instance = this;
+  }
+
   static PlantingSpotFinder GetPlantingSpotFinder(AutomationBehavior behavior, bool throwIfNotFound = true) {
     var plantingCoordinates = behavior.GetComponentFast<InRangePlantingCoordinates>();
     var plantingSpotFinder = behavior.GetComponentFast<PlantingSpotFinder>();
@@ -106,11 +123,36 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase {
     return null;
   }
 
+  void UpdateAffectedTrackers(Vector3Int coordinates) {
+    for (var i = _allTrackers.Count - 1; i >= 0; i--) {
+      _allTrackers[i].UpdateForPlantingSpot(coordinates);
+    }
+  }
+
+  #endregion
+
+  #region Callbacks
+
+  internal void OnForesterSettingsChanged(Forester forester) {
+    var tracker = forester.GetComponentFast<PlantableTracker>();
+    if (tracker) {
+      tracker.ScheduleStateUpdate();
+    }
+  }
+
+  internal void OnMoistureChanged(Vector3Int coordinates) {
+    UpdateAffectedTrackers(coordinates);
+  }
+
+  internal void OnContaminationChanged(Vector3Int coordinates) {
+    UpdateAffectedTrackers(coordinates);
+  }
+
   #endregion
 
   #region Inventory change tracker component
 
-  internal sealed class PlantableTracker : AbstractStatusTracker, IFinishedStateListener {
+  sealed class PlantableTracker : AbstractStatusTracker, IFinishedStateListener {
 
     #region IFinishedStateListener implementation
 
@@ -133,6 +175,19 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase {
 
     /// <summary>Returns the number of tiles that offer collectable items.</summary>
     public int SpotsForPlanting => _spotsForPlanting;
+
+    /// <summary>Updates the component if the given coordinates are its planting spot.</summary>
+    public void UpdateForPlantingSpot(Vector3Int coordinates) {
+      if (_buildingTerrainRange.GetRange().Contains(coordinates)) {
+        ScheduleStateUpdate();
+      }
+    }
+
+    /// <summary>Schedules a state update at the end of the frame.</summary>
+    public void ScheduleStateUpdate() {
+      _stateUpdateCoroutine ??= StartCoroutine(StateUpdateCoroutine());
+    }
+    Coroutine _stateUpdateCoroutine;
 
     #endregion
 
@@ -164,23 +219,12 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase {
       _buildingTerrainRange = GetComponentFast<BuildingTerrainRange>();
     }
 
-    void MaybeScheduleStateUpdate(BaseComponent component) {
+    void UpdateForBlockObject(BaseComponent component) {
       var blockObject = component.GetComponentFast<BlockObject>();
       if (blockObject) {
-        MaybeScheduleStateUpdate(blockObject.Coordinates);
+        UpdateForPlantingSpot(blockObject.Coordinates);
       }
     }
-
-    void MaybeScheduleStateUpdate(Vector3Int coordinates) {
-      if (_buildingTerrainRange.GetRange().Contains(coordinates)) {
-        ScheduleStateUpdate();
-      }
-    }
-
-    internal void ScheduleStateUpdate() {
-      _stateUpdateCoroutine ??= StartCoroutine(StateUpdateCoroutine());
-    }
-    Coroutine _stateUpdateCoroutine;
 
     IEnumerator StateUpdateCoroutine() {
       yield return new WaitForEndOfFrame(); // Wait for the end of the frame to ensure all changes are processed.
@@ -228,28 +272,32 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase {
       ScheduleStateUpdate();
     }
 
-    /// <summary>Monitors for the spots being taken.</summary>
+    /// <summary>Monitors for the spots being taken by a grown resource.</summary>
     [OnEvent]
     public void OnEntityInitializedEvent(EntityInitializedEvent e) {
-      MaybeScheduleStateUpdate(e.Entity);
+      UpdateForBlockObject(e.Entity);
     }
 
-    /// <summary>Monitors for the new spots.</summary>
+    /// <summary>Monitors for the new spots when the resources get gathered.</summary>
     [OnEvent]
     public void OnEntityDeletedEvent(EntityDeletedEvent e) {
-      MaybeScheduleStateUpdate(e.Entity);
+      UpdateForBlockObject(e.Entity);
     }
 
     /// <summary>Monitors for changes in the crop/tree planting area.</summary>
     [OnEvent]
     public void OnPlantingCoordinatesSet(PlantingCoordinatesSetEvent plantingCoordinatesSetEvent) {
-      MaybeScheduleStateUpdate(plantingCoordinatesSetEvent.Coordinates);
+      if (_buildingTerrainRange.GetRange().Contains(plantingCoordinatesSetEvent.Coordinates)) {
+        ScheduleStateUpdate();
+      }
     }
 
     /// <summary>Monitors for changes in the crop/tree planting area.</summary>
     [OnEvent]
     public void OnPlantingCoordinatesUnset(PlantingCoordinatesUnsetEvent plantingCoordinatesUnsetEvent) {
-      MaybeScheduleStateUpdate(plantingCoordinatesUnsetEvent.Coordinates);
+      if (_buildingTerrainRange.GetRange().Contains(plantingCoordinatesUnsetEvent.Coordinates)) {
+        ScheduleStateUpdate();
+      }
     }
 
     /// <summary>Monitors for changes in the tree cutting area (the "replant dead trees" case).</summary>
