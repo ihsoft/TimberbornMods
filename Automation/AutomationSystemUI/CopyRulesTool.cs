@@ -7,13 +7,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
-using IgorZ.Automation.ScriptingEngineUI;
 using IgorZ.Automation.TemplateTools;
 using IgorZ.TimberDev.Tools;
 using Timberborn.BlockSystem;
 using Timberborn.ConstructionMode;
 using Timberborn.ToolSystem;
-using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
 namespace IgorZ.Automation.AutomationSystemUI;
@@ -37,8 +35,6 @@ sealed class CopyRulesTool : AbstractAreaSelectionTool, IAutomationModeEnabler, 
   protected override bool ObjectFilterExpression(BlockObject blockObject) {
     var behavior = blockObject.GetComponentFast<AutomationBehavior>();
     if (!behavior || behavior == _sourceRulesHelper.AutomationBehavior) {
-      //FIXME
-      DebugEx.Warning("CopyRulesTool: skip behavior {0}, object {1}", behavior, blockObject);
       return false;
     }
     return _actionsToCopy.All(x => x.Condition.IsValidAt(behavior) && x.CloneDefinition().IsValidAt(behavior));
