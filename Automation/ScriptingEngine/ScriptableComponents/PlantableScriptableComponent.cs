@@ -5,6 +5,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
@@ -15,12 +17,13 @@ using Timberborn.EntitySystem;
 using Timberborn.Forestry;
 using Timberborn.Planting;
 using Timberborn.SingletonSystem;
+using Timberborn.TickSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
-sealed class PlantableScriptableComponent : ScriptableComponentBase {
+sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSingleton {
 
   const string SpotReadySignalLocKey = "IgorZ.Automation.Scriptable.Plantable.Signal.SpotsReady";
   
@@ -105,6 +108,8 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase {
   #region Implementation
 
   internal static PlantableScriptableComponent Instance;
+  static readonly Stopwatch CallbacksCostWatch = new();
+  static readonly Stopwatch UpdateCostWatch = new();
   readonly List<PlantableTracker> _allTrackers = [];
 
   PlantableScriptableComponent() {
@@ -134,18 +139,27 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase {
   #region Callbacks
 
   internal void OnForesterSettingsChanged(Forester forester) {
+    CallbacksCostWatch.Start();
     var tracker = forester.GetComponentFast<PlantableTracker>();
     if (tracker) {
       tracker.ScheduleStateUpdate();
     }
+    CallbacksCostWatch.Stop();
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   internal void OnMoistureChanged(Vector3Int coordinates) {
+    //FIXME: maintain a big bitmap of all spots from all components.
+    CallbacksCostWatch.Start();
     UpdateAffectedTrackers(coordinates);
+    CallbacksCostWatch.Stop();
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   internal void OnContaminationChanged(Vector3Int coordinates) {
+    CallbacksCostWatch.Start();
     UpdateAffectedTrackers(coordinates);
+    CallbacksCostWatch.Stop();
   }
 
   #endregion
@@ -177,6 +191,7 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase {
     public int SpotsForPlanting => _spotsForPlanting;
 
     /// <summary>Updates the component if the given coordinates are its planting spot.</summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void UpdateForPlantingSpot(Vector3Int coordinates) {
       if (_buildingTerrainRange.GetRange().Contains(coordinates)) {
         ScheduleStateUpdate();
@@ -228,8 +243,10 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase {
 
     IEnumerator StateUpdateCoroutine() {
       yield return new WaitForEndOfFrame(); // Wait for the end of the frame to ensure all changes are processed.
+      UpdateCostWatch.Start();
       UpdateState();
       _stateUpdateCoroutine = null;
+      UpdateCostWatch.Stop();
     }
 
     void UpdateState() {
@@ -269,45 +286,64 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase {
     /// <summary>Monitors for changes in the building-reachable area.</summary>
     /// <remarks>It is handled in ticks, so it doesn't happen on pause.</remarks>
     void BuildingRangeChanged(object sender, RangeChangedEventArgs args) {
+      CallbacksCostWatch.Start();
       ScheduleStateUpdate();
+      CallbacksCostWatch.Stop();
     }
 
     /// <summary>Monitors for the spots being taken by a grown resource.</summary>
     [OnEvent]
     public void OnEntityInitializedEvent(EntityInitializedEvent e) {
+      CallbacksCostWatch.Start();
       UpdateForBlockObject(e.Entity);
+      CallbacksCostWatch.Stop();
     }
 
     /// <summary>Monitors for the new spots when the resources get gathered.</summary>
     [OnEvent]
     public void OnEntityDeletedEvent(EntityDeletedEvent e) {
+      CallbacksCostWatch.Start();
       UpdateForBlockObject(e.Entity);
+      CallbacksCostWatch.Stop();
     }
 
     /// <summary>Monitors for changes in the crop/tree planting area.</summary>
     [OnEvent]
     public void OnPlantingCoordinatesSet(PlantingCoordinatesSetEvent plantingCoordinatesSetEvent) {
+      CallbacksCostWatch.Start();
       if (_buildingTerrainRange.GetRange().Contains(plantingCoordinatesSetEvent.Coordinates)) {
         ScheduleStateUpdate();
       }
+      CallbacksCostWatch.Stop();
     }
 
     /// <summary>Monitors for changes in the crop/tree planting area.</summary>
     [OnEvent]
     public void OnPlantingCoordinatesUnset(PlantingCoordinatesUnsetEvent plantingCoordinatesUnsetEvent) {
+      CallbacksCostWatch.Start();
       if (_buildingTerrainRange.GetRange().Contains(plantingCoordinatesUnsetEvent.Coordinates)) {
         ScheduleStateUpdate();
       }
+      CallbacksCostWatch.Stop();
     }
 
     /// <summary>Monitors for changes in the tree cutting area (the "replant dead trees" case).</summary>
     [OnEvent]
     public void OnTreeCuttingAreaChangedEvent(TreeCuttingAreaChangedEvent e) {
+      CallbacksCostWatch.Start();
       ScheduleStateUpdate();
+      CallbacksCostWatch.Stop();
     }
 
     #endregion
   }
 
   #endregion
+
+  //FIXME: remove when profiling is done.
+  public void Tick() {
+    DebugEx.Warning("*** Tracking costs: callbacks={0}, recalc={1}", CallbacksCostWatch.Elapsed, UpdateCostWatch.Elapsed);
+    UpdateCostWatch.Reset();
+    CallbacksCostWatch.Reset();
+  }
 }
