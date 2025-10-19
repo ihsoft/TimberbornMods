@@ -1,3 +1,6 @@
+# v2.8.4 (started on October 19th, 2025):
+* [Fix #124] Copy rules button is not working 
+
 # v2.8.3 (October 19th, 2025):
 * [Fix #123] ArgumentException: toExclusive 0 must be greater than fromInclusive 0 when scheduling T 
 

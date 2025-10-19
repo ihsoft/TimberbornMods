@@ -34,7 +34,7 @@ sealed class CopyRulesTool : AbstractAreaSelectionTool, IAutomationModeEnabler, 
   /// <inheritdoc/>
   protected override bool ObjectFilterExpression(BlockObject blockObject) {
     var behavior = blockObject.GetComponentFast<AutomationBehavior>();
-    if (!behavior || behavior == _sourceRulesHelper.AutomationBehavior) {
+    if (!behavior || behavior == _sourceBehavior) {
       return false;
     }
     return _actionsToCopy.All(x => x.Condition.IsValidAt(behavior) && x.CloneDefinition().IsValidAt(behavior));
@@ -80,13 +80,13 @@ sealed class CopyRulesTool : AbstractAreaSelectionTool, IAutomationModeEnabler, 
 
   public void StartTool(RulesUIHelper rulesHelper, CopyMode copyMode) {
     Initialize();
-    _sourceRulesHelper = rulesHelper;
+    _sourceBehavior = rulesHelper.AutomationBehavior;
     _copyMode = copyMode;
     _actionsToCopy = copyMode switch {
-        CopyMode.CopySignals => _sourceRulesHelper.BuildingSignals.Where(r => r.ExportedSignalName != null)
+        CopyMode.CopySignals => rulesHelper.BuildingSignals.Where(r => r.ExportedSignalName != null)
             .Select(x => x.Action)
             .ToList(),
-        CopyMode.CopyRules => rulesHelper.BuildingRules,
+        CopyMode.CopyRules => rulesHelper.BuildingRules.ToList(),  // Need a copy.
         _ => throw new ArgumentException("Unknown copy mode"),
     };
     _toolGroupManager.CloseToolGroup();
@@ -98,7 +98,7 @@ sealed class CopyRulesTool : AbstractAreaSelectionTool, IAutomationModeEnabler, 
   #region Implementation
 
   ToolManager _toolManager;
-  RulesUIHelper _sourceRulesHelper;
+  AutomationBehavior _sourceBehavior;
   RulesUIHelper _targetRulesHelper;
   CopyMode _copyMode;
   IReadOnlyList<IAutomationAction> _actionsToCopy = [];
