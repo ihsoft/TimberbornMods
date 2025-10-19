@@ -2,11 +2,13 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System.Collections.Generic;
 using System.Linq;
 using IgorZ.Automation.Actions;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.Conditions;
 using IgorZ.Automation.ScriptingEngine;
+using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.Automation.ScriptingEngineUI;
 using IgorZ.Automation.Settings;
 using IgorZ.TimberDev.UI;
@@ -18,7 +20,7 @@ using UnityEngine.UIElements;
 
 namespace IgorZ.Automation.AutomationSystemUI;
 
-sealed class AutomationFragment : IEntityPanelFragment {
+sealed class AutomationFragment : IEntityPanelFragment, ISignalListener {
 
   const string RuleRowTemplate = "IgorZ.Automation/FragmentRule";
   const string SignalRowTemplate = "IgorZ.Automation/FragmentSignal";
@@ -70,6 +72,7 @@ sealed class AutomationFragment : IEntityPanelFragment {
 
   AutomationBehavior _automationBehavior;
   int _automationBehaviorVersion = -1;
+  readonly List<SignalOperator> _signalConditionExpressions = [];
 
   AutomationFragment(UiFactory uiFactory, RulesEditorDialog rulesEditorDialog, SignalsEditorDialog signalsEditorDialog,
                      CopyRulesTool copyRulesTool, ScriptingService scriptingService,
@@ -85,6 +88,16 @@ sealed class AutomationFragment : IEntityPanelFragment {
     _importRulesDialog = importRulesDialog;
     _exportRulesDialog = exportRulesDialog;
   }
+
+  #region ISignalListener implementation
+
+  /// <inheritdoc/>
+  public AutomationBehavior Behavior => _automationBehavior;
+
+  /// <inheritdoc/>
+  public void OnValueChanged(string signalName) => _automationBehaviorVersion = -1;
+
+  #endregion
 
   public VisualElement InitializeFragment() {
     _root = _uiFactory.LoadVisualTreeAsset(FragmentResource);
@@ -147,6 +160,9 @@ sealed class AutomationFragment : IEntityPanelFragment {
   }
 
   public void ClearFragment() {
+    _scriptingService.UnregisterSignals(_signalConditionExpressions, this);
+    _signalConditionExpressions.Clear();
+    _automationBehavior = null; // Must be after unregistering signals!
     _root.ToggleDisplayStyle(visible: false);
     _rulesHelper.SetBuilding(null);
   }
@@ -168,6 +184,8 @@ sealed class AutomationFragment : IEntityPanelFragment {
     _clearSignalsButton.SetEnabled(exposedSignalsCount > 0);
     _copySignalsButton.SetEnabled(exposedSignalsCount > 0);
     _signalsList.Clear();
+    _scriptingService.UnregisterSignals(_signalConditionExpressions, this);
+    _signalConditionExpressions.Clear();
     foreach (var signalMapping in _rulesHelper.BuildingSignals) {
       if (signalMapping.ExportedSignalName == null) {
         continue;
@@ -179,6 +197,11 @@ sealed class AutomationFragment : IEntityPanelFragment {
         row.Q2<VisualElement>("Container").SetEnabled(signalMapping.Action.Condition.IsActive);
       }
       _signalsList.Add(row);
+
+      if (signalMapping.Action?.Condition is ScriptedCondition scriptedCondition) {
+        _signalConditionExpressions.AddRange(
+            _scriptingService.RegisterSignals(scriptedCondition.ParsingResult.ParsedExpression, this));
+      }
     }
 
     // Rules panel.
