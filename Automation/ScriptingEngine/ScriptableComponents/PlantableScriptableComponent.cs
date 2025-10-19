@@ -5,16 +5,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
+using System.Linq;
 using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
-using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BuildingsNavigation;
-using Timberborn.EntitySystem;
+using Timberborn.Common;
 using Timberborn.Forestry;
+using Timberborn.Multithreading;
 using Timberborn.Planting;
 using Timberborn.SingletonSystem;
 using Timberborn.TickSystem;
@@ -23,11 +22,51 @@ using UnityEngine;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
-sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSingleton {
+sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSingleton, IParallelTickableSingleton {
 
   const string SpotReadySignalLocKey = "IgorZ.Automation.Scriptable.Plantable.Signal.SpotsReady";
   
   const string SpotReadySignalName = "Plantable.Ready";
+
+  #region ITickableSingleton implementation
+
+  /// <inheritdoc/>
+  public void Tick() {
+    // Get the state from the parallel jobs and fire the signals.
+    for (var i = _allTrackers.Count - 1; i >= 0; i--) {
+      _allTrackers[i].FinalizeParallelUpdateState();
+    }
+  }
+
+  #endregion
+
+  #region IParallelTickableSingleton implementation
+
+  /// <inheritdoc/>
+  public void StartParallelTick() {
+    var task = new UpdateTrackerJob(_allTrackers);
+    _parallelizer.Schedule(0, _allTrackers.Count, 10, task);
+  }
+
+  #endregion
+
+  #region Parallel job implemenation
+
+  /// <summary>
+  /// This job assumes that many things are constant between the "regular ticks". Like water levels, contamination, etc.
+  /// If not, we're in troubles.
+  /// </summary>
+  /// <param name="allTrackers">The trackers to update.</param>
+  readonly struct UpdateTrackerJob(IList<PlantableTracker> allTrackers) : IParallelizerLoopTask {
+    readonly ReadOnlyArray<PlantableTracker> _allTrackers = new(allTrackers.ToArray());
+
+    /// <inheritdoc/>
+    public void Run(int index) {
+      _allTrackers[index].ParallelUpdateState();
+    }
+  } 
+
+  #endregion
 
   #region ScriptableComponentBase implementation
 
@@ -107,12 +146,13 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
 
   #region Implementation
 
+  readonly IParallelizer _parallelizer;
+
   internal static PlantableScriptableComponent Instance;
-  static readonly Stopwatch CallbacksCostWatch = new();
-  static readonly Stopwatch UpdateCostWatch = new();
   readonly List<PlantableTracker> _allTrackers = [];
 
-  PlantableScriptableComponent() {
+  PlantableScriptableComponent(IParallelizer parallelizer) {
+    _parallelizer = parallelizer;
     Instance = this;
   }
 
@@ -128,43 +168,9 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
     return null;
   }
 
-  void UpdateAffectedTrackers(Vector3Int coordinates) {
-    for (var i = _allTrackers.Count - 1; i >= 0; i--) {
-      _allTrackers[i].UpdateForPlantingSpot(coordinates);
-    }
-  }
-
   #endregion
 
-  #region Callbacks
-
-  internal void OnForesterSettingsChanged(Forester forester) {
-    CallbacksCostWatch.Start();
-    var tracker = forester.GetComponentFast<PlantableTracker>();
-    if (tracker) {
-      tracker.ScheduleStateUpdate();
-    }
-    CallbacksCostWatch.Stop();
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  internal void OnMoistureChanged(Vector3Int coordinates) {
-    //FIXME: maintain a big bitmap of all spots from all components.
-    CallbacksCostWatch.Start();
-    UpdateAffectedTrackers(coordinates);
-    CallbacksCostWatch.Stop();
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  internal void OnContaminationChanged(Vector3Int coordinates) {
-    CallbacksCostWatch.Start();
-    UpdateAffectedTrackers(coordinates);
-    CallbacksCostWatch.Stop();
-  }
-
-  #endregion
-
-  #region Inventory change tracker component
+  #region Plantable coordiantes spots tracker component
 
   sealed class PlantableTracker : AbstractStatusTracker, IFinishedStateListener {
 
@@ -174,7 +180,7 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
     public void OnEnterFinishedState() {
       _eventBus.Register(this);
       _buildingTerrainRange.RangeChanged += BuildingRangeChanged;
-      UpdateState();
+      ImmediateUpdateState();
     }
 
     /// <inheritdoc/>
@@ -188,21 +194,46 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
     #region API
 
     /// <summary>Returns the number of tiles that offer collectable items.</summary>
-    public int SpotsForPlanting => _spotsForPlanting;
-
-    /// <summary>Updates the component if the given coordinates are its planting spot.</summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void UpdateForPlantingSpot(Vector3Int coordinates) {
-      if (_buildingTerrainRange.GetRange().Contains(coordinates)) {
-        ScheduleStateUpdate();
+    public int SpotsForPlanting {
+      get => _spotsForPlanting;
+      private set {
+        if (_spotsForPlanting == value) {
+          return;
+        }
+        _spotsForPlanting = value;
+        ScheduleSignal(SpotReadySignalName, ignoreErrors: true);
       }
     }
 
-    /// <summary>Schedules a state update at the end of the frame.</summary>
-    public void ScheduleStateUpdate() {
-      _stateUpdateCoroutine ??= StartCoroutine(StateUpdateCoroutine());
+    int _spotsForPlanting;
+
+    /// <summary>Calculates the state in a parallel thread.</summary>
+    /// <remarks>
+    /// <p>
+    /// This method is called in a parallel thread to calculate the number of plantable spots. It must not access any
+    /// data that can change between the ticks.
+    /// </p>
+    /// <p>
+    /// The result will not be visible until the calculation is finalized via <see cref="FinalizeParallelUpdateState"/>.
+    /// </p>
+    /// </remarks>
+    /// <seealso cref="FinalizeParallelUpdateState"/>
+    public void ParallelUpdateState() {
+      _parallelCountedSpotsForPlanting = CalculatePlantableSpots(_plantingCoordinates.GetCoordinates()._set.ToArray());
     }
-    Coroutine _stateUpdateCoroutine;
+    int _parallelCountedSpotsForPlanting;
+
+    /// <summary>
+    /// Applies the state calculated in the parallel update to the main thread and fires signals if needed.
+    /// </summary>
+    /// <remarks>
+    /// This should be called to apply the result from <see cref="ParallelUpdateState"/>. A normal place to do that, is
+    /// the singleton tick callback.
+    /// </remarks>
+    /// <seealso cref="ParallelUpdateState"/>
+    public void FinalizeParallelUpdateState() {
+      SpotsForPlanting = _parallelCountedSpotsForPlanting;
+    }
 
     #endregion
 
@@ -212,10 +243,8 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
     PlantingService _plantingService;
 
     PlantingSpotFinder _plantingSpotFinder;
-    InRangePlantingCoordinates _coordinatesInRange;
     BuildingTerrainRange _buildingTerrainRange;
-
-    int _spotsForPlanting;
+    InRangePlantingCoordinates _plantingCoordinates;
 
     [Inject]
     public void InjectDependencies(EventBus eventBus, PlantingService plantingService) {
@@ -230,38 +259,31 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
 
     void Awake() {
       _plantingSpotFinder = GetComponentFast<PlantingSpotFinder>();
-      _coordinatesInRange = GetComponentFast<InRangePlantingCoordinates>();
       _buildingTerrainRange = GetComponentFast<BuildingTerrainRange>();
+      _plantingCoordinates = GetComponentFast<InRangePlantingCoordinates>();
     }
 
-    void UpdateForBlockObject(BaseComponent component) {
-      var blockObject = component.GetComponentFast<BlockObject>();
-      if (blockObject) {
-        UpdateForPlantingSpot(blockObject.Coordinates);
+    void ImmediateUpdateState() {
+      if (Time.timeScale != 0f) {
+        return; // The state will be updated in parallel tick.
       }
-    }
-
-    IEnumerator StateUpdateCoroutine() {
-      yield return new WaitForEndOfFrame(); // Wait for the end of the frame to ensure all changes are processed.
-      UpdateCostWatch.Start();
-      UpdateState();
-      _stateUpdateCoroutine = null;
-      UpdateCostWatch.Stop();
-    }
-
-    void UpdateState() {
-      var oldState = _spotsForPlanting;
-      _spotsForPlanting = CountPlantingSpotsInRange();
-      if (oldState == _spotsForPlanting) {
-        return; // No change in the state.
+      if (_immediateUpdateCoroutine != null) {
+        return; // Already scheduled.
       }
-      ScheduleSignal(SpotReadySignalName, ignoreErrors: true);
+      _immediateUpdateCoroutine = StartCoroutine(ImmediateUpdateCoroutine());
+    }
+    Coroutine _immediateUpdateCoroutine;
+
+    IEnumerator ImmediateUpdateCoroutine() {
+      yield return new WaitForEndOfFrame();
+      _immediateUpdateCoroutine = null;
+      ParallelUpdateState();
+      FinalizeParallelUpdateState();
     }
 
-    int CountPlantingSpotsInRange() {
-      var count = 0;
-      var plantableCoordinates = _coordinatesInRange.GetCoordinates();
-      foreach (var coords in plantableCoordinates) {
+    int CalculatePlantableSpots(Vector3Int[] plantingSpots) {
+      var plantableSpots = 0;
+      foreach (var coords in plantingSpots) {
         var plantingSpot = _plantingService.GetSpotAt(coords);
         if (!plantingSpot.HasValue && _plantingService._reservedCoordinates.Contains(coords)) {
           // When worker reserves planting coords, the spot is not returning from GetSpotAt.
@@ -271,79 +293,42 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
           }
         }
         if (plantingSpot.HasValue && _plantingSpotFinder.CanPlantAt(plantingSpot.Value, null)) {
-          count++;
+          plantableSpots++;
         }
       }
-      HostedDebugLog.Fine(
-          this, "Updated spots for planting: total={0}, plantable={1}", plantableCoordinates.Count, count);
-      return count;
+      return plantableSpots;
     }
 
     #endregion
 
-    #region Callbacks
+    #region Callbacks for the pasue mode
 
     /// <summary>Monitors for changes in the building-reachable area.</summary>
-    /// <remarks>It is handled in ticks, so it doesn't happen on pause.</remarks>
     void BuildingRangeChanged(object sender, RangeChangedEventArgs args) {
-      CallbacksCostWatch.Start();
-      ScheduleStateUpdate();
-      CallbacksCostWatch.Stop();
-    }
-
-    /// <summary>Monitors for the spots being taken by a grown resource.</summary>
-    [OnEvent]
-    public void OnEntityInitializedEvent(EntityInitializedEvent e) {
-      CallbacksCostWatch.Start();
-      UpdateForBlockObject(e.Entity);
-      CallbacksCostWatch.Stop();
-    }
-
-    /// <summary>Monitors for the new spots when the resources get gathered.</summary>
-    [OnEvent]
-    public void OnEntityDeletedEvent(EntityDeletedEvent e) {
-      CallbacksCostWatch.Start();
-      UpdateForBlockObject(e.Entity);
-      CallbacksCostWatch.Stop();
+      ImmediateUpdateState();
     }
 
     /// <summary>Monitors for changes in the crop/tree planting area.</summary>
     [OnEvent]
     public void OnPlantingCoordinatesSet(PlantingCoordinatesSetEvent plantingCoordinatesSetEvent) {
-      CallbacksCostWatch.Start();
-      if (_buildingTerrainRange.GetRange().Contains(plantingCoordinatesSetEvent.Coordinates)) {
-        ScheduleStateUpdate();
-      }
-      CallbacksCostWatch.Stop();
+      ImmediateUpdateState();
     }
 
     /// <summary>Monitors for changes in the crop/tree planting area.</summary>
     [OnEvent]
     public void OnPlantingCoordinatesUnset(PlantingCoordinatesUnsetEvent plantingCoordinatesUnsetEvent) {
-      CallbacksCostWatch.Start();
-      if (_buildingTerrainRange.GetRange().Contains(plantingCoordinatesUnsetEvent.Coordinates)) {
-        ScheduleStateUpdate();
-      }
-      CallbacksCostWatch.Stop();
+      ImmediateUpdateState();
     }
 
     /// <summary>Monitors for changes in the tree cutting area (the "replant dead trees" case).</summary>
+    /// <remarks>The dead plants only eligible for re-planting if not marked for cutting.</remarks>
     [OnEvent]
     public void OnTreeCuttingAreaChangedEvent(TreeCuttingAreaChangedEvent e) {
-      CallbacksCostWatch.Start();
-      ScheduleStateUpdate();
-      CallbacksCostWatch.Stop();
+      ImmediateUpdateState();
     }
 
     #endregion
   }
 
   #endregion
-
-  //FIXME: remove when profiling is done.
-  public void Tick() {
-    DebugEx.Warning("*** Tracking costs: callbacks={0}, recalc={1}", CallbacksCostWatch.Elapsed, UpdateCostWatch.Elapsed);
-    UpdateCostWatch.Reset();
-    CallbacksCostWatch.Reset();
-  }
 }
