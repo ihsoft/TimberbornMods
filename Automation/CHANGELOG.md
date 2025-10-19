@@ -1,4 +1,4 @@
-# v2.8.0 (pre-release, 10/6/2025):
+# v2.8.2 (October 19th, 2025):
 * [Feature] Full refactor of the entity panel UI.
 * [Feature] Limit the number of rules shown in the entity panel. Check the settings dialog.
 * [Feature] Update signal values in the entity panel.
