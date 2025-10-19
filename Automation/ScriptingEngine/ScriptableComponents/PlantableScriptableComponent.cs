@@ -27,6 +27,9 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
   
   const string SpotReadySignalName = "Plantable.Ready";
 
+  // Batch size for processing trackers in parallel. Maybe make it a setting.
+  const int ProcessTrackersButchSize = 10;
+
   #region ITickableSingleton implementation
 
   /// <inheritdoc/>
@@ -44,7 +47,7 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
   /// <inheritdoc/>
   public void StartParallelTick() {
     var task = new UpdateTrackerJob(_allTrackers);
-    _parallelizer.Schedule(0, _allTrackers.Count, 10, task);
+    _parallelizer.Schedule(0, _allTrackers.Count, ProcessTrackersButchSize, task);
   }
 
   #endregion
