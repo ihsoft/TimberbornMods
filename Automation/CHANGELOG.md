@@ -1,3 +1,6 @@
+# v2.8.3 (October 19th, 2025):
+* [Fix #123] ArgumentException: toExclusive 0 must be greater than fromInclusive 0 when scheduling T 
+
 # v2.8.2 (October 19th, 2025):
 * [Feature] Full refactor of the entity panel UI.
 * [Feature] Limit the number of rules shown in the entity panel. Check the settings dialog.

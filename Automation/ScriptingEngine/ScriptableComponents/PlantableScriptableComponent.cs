@@ -46,8 +46,10 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
 
   /// <inheritdoc/>
   public void StartParallelTick() {
-    var task = new UpdateTrackerJob(_allTrackers);
-    _parallelizer.Schedule(0, _allTrackers.Count, ProcessTrackersButchSize, task);
+    if (_allTrackers.Count == 0) {
+      return;
+    }
+    _parallelizer.Schedule(0, _allTrackers.Count, ProcessTrackersButchSize, new UpdateTrackerJob(_allTrackers));
   }
 
   #endregion
