@@ -74,7 +74,7 @@ sealed class AdjustableWaterOutput : WaterOutput, IPersistentEntity {
 
   /// <summary>Sets a new spillway delta.</summary>
   /// <remarks>
-  /// The new value must make sense in terms of the building Z-coordinate and the water level at teh spillway
+  /// The new value must make sense in terms of the building Z-coordinate and the water level at the spillway
   /// coordinates. If it doesn't, it will be corrected on the next call to <see cref="CalculateAvailableSpace"/>.
   /// </remarks>
   /// <param name="spillwayDelta"></param>
