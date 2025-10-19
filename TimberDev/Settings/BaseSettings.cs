@@ -11,7 +11,7 @@ using Timberborn.SettingsSystem;
 // ReSharper disable once CheckNamespace
 namespace IgorZ.TimberDev.Settings;
 
-/// <summary>Base class for teh mod settings.</summary>
+/// <summary>Base class for the mod settings.</summary>
 /// <remarks>
 /// Inherit from this class and add an injection in the configurator. Use
 /// <see cref="InstallSettingCallback{TV}(ModSetting{TV},Action{TV})"/> to create a static property that will update to
