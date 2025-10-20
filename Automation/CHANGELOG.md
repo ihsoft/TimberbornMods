@@ -1,4 +1,4 @@
-# v2.8.4 (started on October 19th, 2025):
+# v2.8.4 (October 19th, 2025):
 * [Fix #124] Copy rules button is not working 
 
 # v2.8.3 (October 19th, 2025):
