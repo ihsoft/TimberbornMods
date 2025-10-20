@@ -11,7 +11,6 @@ using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.BlockSystem;
 using Timberborn.BuildingsNavigation;
-using Timberborn.Common;
 using Timberborn.Forestry;
 using Timberborn.Multithreading;
 using Timberborn.Planting;
@@ -26,9 +25,6 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
   const string SpotReadySignalLocKey = "IgorZ.Automation.Scriptable.Plantable.Signal.SpotsReady";
   
   const string SpotReadySignalName = "Plantable.Ready";
-
-  // Batch size for processing trackers in parallel. Maybe make it a setting.
-  const int ProcessTrackersButchSize = 10;
 
   #region ITickableSingleton implementation
 
@@ -46,10 +42,9 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
 
   /// <inheritdoc/>
   public void StartParallelTick() {
-    if (_allTrackers.Count == 0) {
-      return;
+    for (var i = _allTrackers.Count - 1; i >= 0; i--) {
+      _parallelizer.Schedule(new UpdateTrackerJob(_allTrackers[i]));
     }
-    _parallelizer.Schedule(0, _allTrackers.Count, ProcessTrackersButchSize, new UpdateTrackerJob(_allTrackers));
   }
 
   #endregion
@@ -60,13 +55,23 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
   /// This job assumes that many things are constant between the "regular ticks". Like water levels, contamination, etc.
   /// If not, we're in troubles.
   /// </summary>
-  /// <param name="allTrackers">The trackers to update.</param>
-  readonly struct UpdateTrackerJob(IList<PlantableTracker> allTrackers) : IParallelizerLoopTask {
-    readonly ReadOnlyArray<PlantableTracker> _allTrackers = new(allTrackers.ToArray());
+  readonly struct UpdateTrackerJob : IParallelizerSingleTask {
+
+    readonly PlantableTracker _tracker;
+
+    /// <summary>
+    /// This job assumes that many things are constant between the "regular ticks". Like water levels, contamination,
+    /// etc. If not, we're in troubles.
+    /// </summary>
+    /// <param name="tracker">The tracker to update.</param>
+    public UpdateTrackerJob(PlantableTracker tracker) {
+      _tracker = tracker;
+      _tracker.PrepareForParallelUpdateState();
+    }
 
     /// <inheritdoc/>
-    public void Run(int index) {
-      _allTrackers[index].ParallelUpdateState();
+    public void Run() {
+      _tracker.ParallelUpdateState();
     }
   } 
 
@@ -208,14 +213,24 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
         ScheduleSignal(SpotReadySignalName, ignoreErrors: true);
       }
     }
-
     int _spotsForPlanting;
+
+    /// <summary>Prepares the state for calculation in a parallel thread.</summary>
+    /// <remarks>
+    /// All data that can change should be copied before calling <see cref="ParallelUpdateState"/>. This method is
+    /// called from <see cref="IParallelTickableSingleton"/>.
+    /// </remarks>
+    public void PrepareForParallelUpdateState() {
+      _threadsafePlantingSpots = _plantingCoordinates.GetCoordinates()._set.ToArray();
+    }
+    Vector3Int[] _threadsafePlantingSpots;
 
     /// <summary>Calculates the state in a parallel thread.</summary>
     /// <remarks>
     /// <p>
     /// This method is called in a parallel thread to calculate the number of plantable spots. It must not access any
-    /// data that can change between the ticks.
+    /// data that can change between the ticks. The data that can potentially change should be copied in
+    /// <see cref="PrepareForParallelUpdateState"/>.
     /// </p>
     /// <p>
     /// The result will not be visible until the calculation is finalized via <see cref="FinalizeParallelUpdateState"/>.
@@ -223,7 +238,8 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
     /// </remarks>
     /// <seealso cref="FinalizeParallelUpdateState"/>
     public void ParallelUpdateState() {
-      _parallelCountedSpotsForPlanting = CalculatePlantableSpots(_plantingCoordinates.GetCoordinates()._set.ToArray());
+      _parallelCountedSpotsForPlanting = CalculatePlantableSpots(_threadsafePlantingSpots);
+      _threadsafePlantingSpots = null;
     }
     int _parallelCountedSpotsForPlanting;
 
@@ -281,8 +297,7 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
     IEnumerator ImmediateUpdateCoroutine() {
       yield return new WaitForEndOfFrame();
       _immediateUpdateCoroutine = null;
-      ParallelUpdateState();
-      FinalizeParallelUpdateState();
+      SpotsForPlanting = CalculatePlantableSpots(_plantingCoordinates.GetCoordinates()._set.ToArray());
     }
 
     int CalculatePlantableSpots(Vector3Int[] plantingSpots) {

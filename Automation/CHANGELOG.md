@@ -1,3 +1,6 @@
+# v2.8.5 (Started on October 19th, 2025):
+* [Fix #125] The game frequently crashes when `Plantable.Ready` is used and paths are changed.
+
 # v2.8.4 (October 19th, 2025):
 * [Fix #124] Copy rules button is not working 
 
