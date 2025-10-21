@@ -4,7 +4,6 @@
 
 .automation-red-text {
     color: rgb(255, 67, 0);
-    background-color: rgba(255, 48, 0, 0.15);
 }
 
 .automation-yellow-text {
