@@ -1,3 +1,6 @@
+# v2.8.6 (October 20th, 2025):
+* [Fix #126] Game crashes when selecting a building with the "chain" template applied.
+
 # v2.8.5 (October 19th, 2025):
 * [Fix #125] The game frequently crashes when `Plantable.Ready` is used and paths are changed.
 

@@ -84,12 +84,14 @@ class RulesUIHelper {
     }
     var mappings = new List<(string signalName, ScriptedAction action)>();
     foreach (var action in automationBehavior.Actions) {
-      var (buildingSignalName, _) = TryGetSignalMapping(action as ScriptedAction);
-      if (buildingSignalName == null) {
-        _buildingRules.Add(action);
-        continue;
+      if (action is ScriptedAction scriptedAction) {
+        var buildingSignalName = TryGetSignalMapping(scriptedAction).buildingSignal;
+        if (buildingSignalName != null) {
+          mappings.Add((buildingSignalName, scriptedAction));
+          continue;
+        }
       }
-      mappings.Add((buildingSignalName, action as ScriptedAction));
+      _buildingRules.Add(action);
     }
     foreach (var buildingSignalName in _buildingSignalNames) {
       var signalDef = _scriptingService.GetSignalDefinition(buildingSignalName, automationBehavior);
