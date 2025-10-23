@@ -1,3 +1,6 @@
+# v2.8.7 (October 22nd, 2025):
+* [Fix #127] Crash when attempting Collectable.Ready signal on ruin scavenger flag.
+
 # v2.8.6 (October 20th, 2025):
 * [Fix #126] Game crashes when selecting a building with the "chain" template applied.
 

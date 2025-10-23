@@ -18,6 +18,7 @@ using Timberborn.EntitySystem;
 using Timberborn.Forestry;
 using Timberborn.Growing;
 using Timberborn.NaturalResourcesLifecycle;
+using Timberborn.Ruins;
 using Timberborn.SingletonSystem;
 using Timberborn.YielderFinding;
 using Timberborn.Yielding;
@@ -160,6 +161,7 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
     bool _yieldersChanged;
     bool _rangeChanged;
     bool _needsCuttingArea;
+    bool _noAliveCheck;
 
     [Inject]
     public void InjectDependencies(EventBus eventBus, BlockService blockService, TreeCuttingArea treeCuttingArea) {
@@ -177,6 +179,7 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
       _buildingTerrainRange = GetComponentFast<BuildingTerrainRange>();
       _yieldRemovingBuilding = GetComponentFast<YieldRemovingBuilding>();
       _needsCuttingArea = GetComponentFast<LumberjackFlagWorkplaceBehavior>();
+      _noAliveCheck = _needsCuttingArea || GetComponentFast<ScavengerWorkplaceBehavior>();
     }
 
     void ScheduleStateUpdate() {
@@ -205,7 +208,7 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
       _activeYielders = 0;
       for (var i = _yielders.Count - 1; i >= 0; i--) {
         var yielder = _yielders.ElementAt(i);
-        if (yielder.IsYielding && (_needsCuttingArea || yielder.IsAlive())) {
+        if (yielder.IsYielding && (_noAliveCheck || yielder.IsAlive())) {
           ++_activeYielders;
         }
       }
