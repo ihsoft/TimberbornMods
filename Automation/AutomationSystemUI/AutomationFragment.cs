@@ -15,6 +15,7 @@ using IgorZ.TimberDev.UI;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
+using Timberborn.InventorySystem;
 using Timberborn.TooltipSystem;
 using UnityEngine.UIElements;
 
@@ -71,6 +72,7 @@ sealed class AutomationFragment : IEntityPanelFragment, ISignalListener {
   Button _copySignalsButton;
 
   AutomationBehavior _automationBehavior;
+  IGoodDisallower _goodDisallower;
   int _automationBehaviorVersion = -1;
   readonly List<SignalOperator> _signalConditionExpressions = [];
 
@@ -156,6 +158,10 @@ sealed class AutomationFragment : IEntityPanelFragment, ISignalListener {
       return;
     }
     _automationBehaviorVersion = -1;
+    _goodDisallower = entity.GetComponentFast<IGoodDisallower>();
+    if (_goodDisallower != null) {
+      _goodDisallower.DisallowedGoodsChanged += OnGoodDisallowerChange;
+    }
     _root.ToggleDisplayStyle(true);
   }
 
@@ -163,6 +169,9 @@ sealed class AutomationFragment : IEntityPanelFragment, ISignalListener {
     _scriptingService.UnregisterSignals(_signalConditionExpressions, this);
     _signalConditionExpressions.Clear();
     _automationBehavior = null; // Must be after unregistering signals!
+    if (_goodDisallower != null) {
+      _goodDisallower.DisallowedGoodsChanged -= OnGoodDisallowerChange;
+    }
     _root.ToggleDisplayStyle(visible: false);
     _rulesHelper.SetBuilding(null);
   }
@@ -273,5 +282,9 @@ sealed class AutomationFragment : IEntityPanelFragment, ISignalListener {
     _foldSignalsButton.ToggleDisplayStyle(!actualFoldState);
     _unfoldSignalsButton.ToggleDisplayStyle(actualFoldState);
     _unfoldSignalsButton.SetEnabled(_rulesHelper.ExposedSignalsCount > 0);
+  }
+
+  void OnGoodDisallowerChange(object sender, DisallowedGoodsChangedEventArgs args) {
+    _automationBehaviorVersion = -1;
   }
 }

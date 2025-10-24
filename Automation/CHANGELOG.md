@@ -1,5 +1,6 @@
 # v2.8.8 (Started on October 23rd, 2025):
 * [Fix] Signal definition disappears in UI if allowed good is changed on stockpile.
+* [Fix] Signals list is not updated in UI when changing allowed good or recipe.
 * [Fix] Crash when saving definition of a signal that is not available on the building.
 
 # v2.8.7 (October 22nd, 2025):
