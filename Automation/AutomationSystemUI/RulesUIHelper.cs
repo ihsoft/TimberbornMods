@@ -72,7 +72,7 @@ class RulesUIHelper {
 
     // We want to keep a stable order of signals, so list them in the order defined by the components.
     // However, there can be multiple mappings for the same building signal.
-    _buildingSignalNames.Clear();
+    var allowedSignals = new List<SignalDef>();
     foreach (var signalName in _scriptingService.GetSignalNamesForBuilding(automationBehavior)) {
       if (NonBuildingActions.Any(signalName.StartsWith) || signalName.Contains(".OnUnfinished")) {
         continue; // Not what we want to bind as an exported signal.
@@ -81,7 +81,7 @@ class RulesUIHelper {
       if (signalDef.Result.ValueType != ScriptValue.TypeEnum.Number) {
         continue; // Custom signals can only be numbers.
       }
-      _buildingSignalNames.Add(signalName);
+      allowedSignals.Add(signalDef);
     }
     var mappings = new List<(string signalName, ScriptedAction action)>();
     foreach (var action in automationBehavior.Actions) {
@@ -94,18 +94,17 @@ class RulesUIHelper {
       }
       _buildingRules.Add(action);
     }
-    foreach (var buildingSignalName in _buildingSignalNames) {
-      var signalDef = _scriptingService.GetSignalDefinition(buildingSignalName, automationBehavior);
-      if (signalDef.Result.ValueType != ScriptValue.TypeEnum.Number) {
-        continue; // Custom signals can only be numbers.
-      }
-      var signalSourceFn = _scriptingService.GetSignalSource(buildingSignalName, automationBehavior);
-      var existingMappings = mappings.Where(x => x.signalName == buildingSignalName).ToList();
-      mappings.RemoveAll(x => x.signalName == buildingSignalName);
+    _buildingSignalNames.Clear();
+    foreach (var signalDef in allowedSignals) {
+      var signalName = signalDef.ScriptName;
+      _buildingSignalNames.Add(signalName);
+      var signalSourceFn = _scriptingService.GetSignalSource(signalName, automationBehavior);
+      var existingMappings = mappings.Where(x => x.signalName == signalName).ToList();
+      mappings.RemoveAll(x => x.signalName == signalName);
       var describeFn = () => GetFormattedSignalValue(signalDef, signalSourceFn);
       if (existingMappings.Count == 0) {
         _buildingSignals.Add(new BuildingSignal {
-            SignalName = buildingSignalName,
+            SignalName = signalName,
             DescribeFn = describeFn,
             ExportedSignalName = null,
             Action = null,
@@ -115,7 +114,7 @@ class RulesUIHelper {
       foreach (var existingMapping in existingMappings) {
         ExposedSignalsCount++;
         _buildingSignals.Add(new BuildingSignal {
-            SignalName = buildingSignalName,
+            SignalName = signalName,
             DescribeFn = describeFn,
             ExportedSignalName = TryGetSignalMapping(existingMapping.action).customSignal,
             Action = existingMapping.action,
