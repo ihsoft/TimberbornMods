@@ -11,6 +11,7 @@ using IgorZ.Automation.Conditions;
 using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.Localization;
+using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.AutomationSystemUI;
 
@@ -145,7 +146,7 @@ class RulesUIHelper {
   /// </remarks>
   public void SetExportedSignalName(string buildingSignalName, string exportedSignalName) {
     if (!_buildingSignalNames.Contains(buildingSignalName)) {
-      throw new ArgumentException($"Signal '{buildingSignalName}' is not available on the building.");
+      HostedDebugLog.Warning(AutomationBehavior, "Signal '{0}' is not available on the building.", buildingSignalName);
     }
     var condition = new ScriptedCondition();
     condition.SetExpression($"(eq (sig {buildingSignalName}) (sig {buildingSignalName}))");
