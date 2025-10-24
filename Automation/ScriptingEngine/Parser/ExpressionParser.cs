@@ -6,81 +6,30 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using IgorZ.Automation.AutomationSystem;
-using IgorZ.TimberDev.UI;
 using Timberborn.Common;
-using Timberborn.Localization;
-using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.Parser;
 
 /// <summary>Parser for the expressions in the scripting engine.</summary>
-sealed class ExpressionParser {
+sealed class ExpressionParser : ParserBase {
 
-  #region API
+  #region ParserBase implementation
 
-  /// <summary>Parses expression for the given context.</summary>
-  public ParsingResult Parse(string input, AutomationBehavior scriptHost) {
-    _currentContext = new Context { ScriptHost = scriptHost, ScriptingService = _scriptingService };
-    try {
-      if (input.Contains("{%")) {
-        input = Preprocess(input);
-      }
-      var parsedExpression = ProcessString(input);
-      return new ParsingResult {
-          ParsedExpression = parsedExpression,
-      };
-    } catch (ScriptError e) {
-      return new ParsingResult { LastScriptError = e };
+  /// <inheritdoc/>
+  protected override IExpression ProcessString(string input) {
+    var tokens = Tokenize(input);
+    var result = ReadFromTokens(tokens);
+    if (tokens.Any()) {
+      throw new ScriptError.ParsingError("Unexpected token at the end of the expression: " + tokens.Peek());
     }
+    return result;
   }
 
   #endregion
 
   #region Implementation
 
-  public record Context {
-    public AutomationBehavior ScriptHost { get; init; }
-    public ScriptingService ScriptingService { get; init; }
-  }
-
   static readonly Regex OperatorNameRegex = new(@"^\[a-zA-Z]+$");
-
-  readonly ScriptingService _scriptingService;
-  readonly ILoc _loc;
-
-  Context _currentContext;
-
-  ExpressionParser(ScriptingService scriptingService, ILoc loc) {
-    _scriptingService = scriptingService;
-    _loc = loc;
-  }
-
-  string Preprocess(string input) {
-    var evaluator = new MatchEvaluator(PreprocessorMatcher);
-    return Regex.Replace(input, @"\{%([^%]*)%}", evaluator);
-  }
-
-  string PreprocessorMatcher(Match match) {
-    var expression = match.Groups[1].Value;
-    var parsedExpression = ProcessString(expression);
-    if (parsedExpression is BinaryOperator binaryOperatorExpr) {
-      if (!binaryOperatorExpr.Execute()) {
-        throw new ScriptError.BadStateError(
-            _currentContext.ScriptHost, "Preprocessor expression is not true: " + expression);
-      }
-      return "";
-    }
-    if (parsedExpression is not IValueExpr valueExpr) {
-      throw new ScriptError.ParsingError("Not a value expression: " + expression);
-    }
-    var value = valueExpr.ValueFn();
-    return value.ValueType switch {
-        ScriptValue.TypeEnum.String => value.AsString,
-        ScriptValue.TypeEnum.Number => value.AsNumber.ToString(),
-        _ => throw new InvalidOperationException("Unsupported type: " + value.ValueType),
-    };
-  }
 
   static Queue<string> Tokenize(string input) {
     if (input == null) {
@@ -126,15 +75,6 @@ sealed class ExpressionParser {
     return tokens;
   }
 
-  IExpression ProcessString(string input) {
-    var tokens = Tokenize(input);
-    var result = ReadFromTokens(tokens);
-    if (tokens.Any()) {
-      throw new ScriptError.ParsingError("Unexpected token at the end of the expression: " + tokens.Peek());
-    }
-    return result;
-  }
-
   static void CheckHasMoreTokens(Queue<string> tokens) {
     if (tokens.IsEmpty()) {
       throw new ScriptError.ParsingError("Unexpected EOF while reading expression");
@@ -172,14 +112,14 @@ sealed class ExpressionParser {
     // The sequence below should be ordered by the frequency of the usage. The operators that are more likely to be
     // used in the game should come first.
     var result =
-        BinaryOperator.TryCreateFrom(_currentContext, operatorName, operands)
-        ?? SignalOperator.TryCreateFrom(_currentContext, operatorName, operands)
-        ?? ActionOperator.TryCreateFrom(_currentContext, operatorName, operands)
+        BinaryOperator.TryCreateFrom(CurrentContext, operatorName, operands)
+        ?? SignalOperator.TryCreateFrom(CurrentContext, operatorName, operands)
+        ?? ActionOperator.TryCreateFrom(CurrentContext, operatorName, operands)
         ?? LogicalOperator.TryCreateFrom(operatorName, operands)
         ?? MathOperator.TryCreateFrom(operatorName, operands)
-        ?? GetPropertyOperator.TryCreateFrom(_currentContext, operatorName, operands)
-        ?? HasComponentOperator.TryCreateFrom(_currentContext, operatorName, operands)
-        ?? ConcatOperator.TryCreateFrom(_currentContext, operatorName, operands);
+        ?? GetPropertyOperator.TryCreateFrom(CurrentContext, operatorName, operands)
+        ?? HasComponentOperator.TryCreateFrom(CurrentContext, operatorName, operands)
+        ?? ConcatOperator.TryCreateFrom(CurrentContext, operatorName, operands);
     if (result == null) {
       throw new ScriptError.ParsingError("Unknown operator: " + operatorName);
     }
