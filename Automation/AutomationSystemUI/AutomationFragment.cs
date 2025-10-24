@@ -179,7 +179,7 @@ sealed class AutomationFragment : IEntityPanelFragment, ISignalListener {
     // Signals panel.
     var totalSignalsCount = _rulesHelper.BuildingSignalNames.Count;
     var exposedSignalsCount = _rulesHelper.ExposedSignalsCount;
-    _root.Q2<VisualElement>("SignalsPanel").ToggleDisplayStyle(totalSignalsCount > 0);
+    _root.Q2<VisualElement>("SignalsPanel").ToggleDisplayStyle(totalSignalsCount > 0 || exposedSignalsCount > 0);
     _signalsCountLabel.text = _uiFactory.T(SignalsCountTextLocKey, exposedSignalsCount, totalSignalsCount);
     _clearSignalsButton.SetEnabled(exposedSignalsCount > 0);
     _copySignalsButton.SetEnabled(exposedSignalsCount > 0);

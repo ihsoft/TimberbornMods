@@ -1,3 +1,6 @@
+# v2.8.8 (Started on October 23rd, 2025):
+* [Fix] Signal definition disappears in UI if allowed good is changed on stockpile.
+
 # v2.8.7 (October 22nd, 2025):
 * [Fix #127] Crash when attempting Collectable.Ready signal on ruin scavenger flag.
 
