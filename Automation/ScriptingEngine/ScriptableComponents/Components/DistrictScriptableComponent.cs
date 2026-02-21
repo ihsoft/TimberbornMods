@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System;
+using System.Collections.Generic;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
@@ -10,6 +11,8 @@ using Timberborn.BaseComponentSystem;
 using Timberborn.Bots;
 using Timberborn.DwellingSystem;
 using Timberborn.GameDistricts;
+using Timberborn.Population;
+using Timberborn.WorkSystem;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 
@@ -18,10 +21,14 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase {
   const string BotPopulationSignalLocKey = "IgorZ.Automation.Scriptable.District.Signal.Bots";
   const string BeaversPopulationSignalLocKey = "IgorZ.Automation.Scriptable.District.Signal.Beavers";
   const string NumberOfBedsSignalLocKey = "IgorZ.Automation.Scriptable.District.Signal.NumberOfBeds";
+  const string UnemployedBeaversSignalLocKey = "IgorZ.Automation.Scriptable.District.Signal.UnemployedBeavers";
+  const string UnemployedBotsSignalLocKey = "IgorZ.Automation.Scriptable.District.Signal.UnemployedBots";
 
   const string BotPopulationSignalName = "District.Bots";
   const string BeaverPopulationSignalName = "District.Beavers";
   const string NumberOfBedsSignalName = "District.NumberOfBeds";
+  const string UnemployedBeaversSignalName = "District.UnemployedBeavers";
+  const string UnemployedBotsSignalName = "District.UnemployedBots";
 
   #region ScriptableComponentBase implementation
 
@@ -30,8 +37,9 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override string[] GetSignalNamesForBuilding(AutomationBehavior behavior) {
-    return behavior.GetComponentFast<DistrictBuilding>() 
-        ? [BeaverPopulationSignalName, BotPopulationSignalName, NumberOfBedsSignalName]
+    return behavior.GetComponentFast<DistrictBuilding>()
+        ? [BeaverPopulationSignalName, BotPopulationSignalName, NumberOfBedsSignalName,
+           UnemployedBeaversSignalName, UnemployedBotsSignalName]
         : [];
   }
 
@@ -45,6 +53,8 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase {
         BeaverPopulationSignalName => () => BeaverPopulationSignal(districtBuilding),
         BotPopulationSignalName => () => BotPopulationSignal(districtBuilding),
         NumberOfBedsSignalName => () => NumberOfBedsSignal(districtBuilding),
+        UnemployedBeaversSignalName => () => UnemployedBeaversSignal(districtBuilding),
+        UnemployedBotsSignalName => () => UnemployedBotsSignal(districtBuilding),
         _ => throw new UnknownSignalException(name),
     };
   }
@@ -59,6 +69,8 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase {
         BeaverPopulationSignalName => BeaverPopulationSignalDef,
         BotPopulationSignalName => BotPopulationSignalDef,
         NumberOfBedsSignalName => NumberOfBedsSignalDef,
+        UnemployedBeaversSignalName => UnemployedBeaversSignalDef,
+        UnemployedBotsSignalName => UnemployedBotsSignalDef,
         _ => throw new UnknownSignalException(name),
     };
   }
@@ -66,7 +78,8 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase {
   /// <inheritdoc/>
   public override void RegisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
     var name = signalOperator.SignalName;
-    if (name is not (BeaverPopulationSignalName or BotPopulationSignalName or NumberOfBedsSignalName)) {
+    if (name is not (BeaverPopulationSignalName or BotPopulationSignalName or NumberOfBedsSignalName
+        or UnemployedBeaversSignalName or UnemployedBotsSignalName)) {
       throw new InvalidOperationException("Unknown signal: " + name);
     }
     host.Behavior.GetOrCreate<DistrictChangeTracker>().AddSignal(signalOperator, host);
@@ -111,6 +124,26 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase {
   };
   SignalDef _numberOfBedsSignalDef;
 
+  SignalDef UnemployedBeaversSignalDef => _unemployedBeaversSignalDef ??= new SignalDef {
+      ScriptName = UnemployedBeaversSignalName,
+      DisplayName = Loc.T(UnemployedBeaversSignalLocKey),
+      Result = new ValueDef {
+          ValueType = ScriptValue.TypeEnum.Number,
+          ValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
+      },
+  };
+  SignalDef _unemployedBeaversSignalDef;
+
+  SignalDef UnemployedBotsSignalDef => _unemployedBotsSignalDef ??= new SignalDef {
+      ScriptName = UnemployedBotsSignalName,
+      DisplayName = Loc.T(UnemployedBotsSignalLocKey),
+      Result = new ValueDef {
+          ValueType = ScriptValue.TypeEnum.Number,
+          ValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
+      },
+  };
+  SignalDef _unemployedBotsSignalDef;
+
   static ScriptValue BeaverPopulationSignal(DistrictBuilding districtBuilding) {
     return ScriptValue.FromInt(districtBuilding.District?.DistrictPopulation.Beavers.Count ?? 0);
   }
@@ -127,6 +160,27 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase {
         districtBuilding.District.GetComponentFast<DistrictDwellingStatisticsProvider>().GetDwellingStatistics();
     return ScriptValue.FromInt(statistics.FreeBeds + statistics.OccupiedBeds);
   }
+
+  static ScriptValue UnemployedBeaversSignal(DistrictBuilding districtBuilding) {
+    var district = districtBuilding.District;
+    if (!district) {
+      return ScriptValue.FromInt(0);
+    }
+    PopDataCollector.CollectData(district, PopData);
+    return ScriptValue.FromInt(PopData.BeaverWorkplaceData.Unemployed);
+  }
+
+  static ScriptValue UnemployedBotsSignal(DistrictBuilding districtBuilding) {
+    var district = districtBuilding.District;
+    if (!district) {
+      return ScriptValue.FromInt(0);
+    }
+    PopDataCollector.CollectData(district, PopData);
+    return ScriptValue.FromInt(PopData.BotWorkplaceData.Unemployed);
+  }
+
+  static readonly PopulationDataCollector PopDataCollector = new();
+  static readonly PopulationData PopData = new();
 
   #endregion
 
@@ -145,6 +199,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase {
   sealed class DistrictChangeTracker : AbstractStatusTracker {
 
     DistrictCenter _currentDistrictCenter;
+    readonly List<Workplace> _trackedWorkplaces = new();
 
     void Start() {
       var districtBuilding = GetComponentFast<DistrictBuilding>();
@@ -154,6 +209,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase {
     }
 
     void UpdateDistrictCenter() {
+      UnsubscribeFromWorkplaces();
       if (_currentDistrictCenter) {
         _currentDistrictCenter.DistrictPopulation.CitizenAssigned -= OnCitizenAssigned;
         _currentDistrictCenter.DistrictPopulation.CitizenUnassigned -= OnCitizenUnassigned;
@@ -166,7 +222,26 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase {
         _currentDistrictCenter.DistrictPopulation.CitizenUnassigned += OnCitizenUnassigned;
         _currentDistrictCenter.DistrictBuildingRegistry.FinishedBuildingRegistered += FinishedBuildingRegisteredEvent;
         _currentDistrictCenter.DistrictBuildingRegistry.FinishedBuildingUnregistered += FinishedBuildingUnregisteredEvent;
+        SubscribeToWorkplaces();
       }
+    }
+
+    void SubscribeToWorkplaces() {
+      foreach (var workplace in _currentDistrictCenter.DistrictBuildingRegistry.GetEnabledBuildings<Workplace>()) {
+        workplace.WorkerAssigned += OnWorkerAssignmentChanged;
+        workplace.WorkerUnassigned += OnWorkerAssignmentChanged;
+        _trackedWorkplaces.Add(workplace);
+      }
+    }
+
+    void UnsubscribeFromWorkplaces() {
+      foreach (var workplace in _trackedWorkplaces) {
+        if (workplace) {
+          workplace.WorkerAssigned -= OnWorkerAssignmentChanged;
+          workplace.WorkerUnassigned -= OnWorkerAssignmentChanged;
+        }
+      }
+      _trackedWorkplaces.Clear();
     }
 
     void OnDistrictChangedEvent(object obj, EventArgs args) {
@@ -185,18 +260,35 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase {
     void OnPopulationChangedEvent(Citizen citizen = null) {
       if (!citizen || citizen.GetComponentFast<BotSpec>()) {
         ScheduleSignal(BotPopulationSignalName, ignoreErrors: true);
+        ScheduleSignal(UnemployedBotsSignalName, ignoreErrors: true);
       }
       if (!citizen || !citizen.GetComponentFast<BotSpec>()) {
         ScheduleSignal(BeaverPopulationSignalName, ignoreErrors: true);
+        ScheduleSignal(UnemployedBeaversSignalName, ignoreErrors: true);
       }
+    }
+
+    void OnWorkerAssignmentChanged(object sender, WorkerChangedEventArgs args) {
+      ScheduleSignal(UnemployedBeaversSignalName, ignoreErrors: true);
+      ScheduleSignal(UnemployedBotsSignalName, ignoreErrors: true);
     }
 
     void FinishedBuildingRegisteredEvent(object sender, FinishedBuildingRegisteredEventArgs arg) {
       ScheduleSignal(NumberOfBedsSignalName, ignoreErrors: true);
+      // Re-subscribe to pick up the new workplace's worker events.
+      UnsubscribeFromWorkplaces();
+      SubscribeToWorkplaces();
+      ScheduleSignal(UnemployedBeaversSignalName, ignoreErrors: true);
+      ScheduleSignal(UnemployedBotsSignalName, ignoreErrors: true);
     }
 
     void FinishedBuildingUnregisteredEvent(object sender, FinishedBuildingUnregisteredEventArgs arg) {
       ScheduleSignal(NumberOfBedsSignalName, ignoreErrors: true);
+      // Re-subscribe to drop the destroyed workplace's worker events.
+      UnsubscribeFromWorkplaces();
+      SubscribeToWorkplaces();
+      ScheduleSignal(UnemployedBeaversSignalName, ignoreErrors: true);
+      ScheduleSignal(UnemployedBotsSignalName, ignoreErrors: true);
     }
   }
 
