@@ -179,14 +179,13 @@ sealed class WorkplaceScriptableComponent : ScriptableComponentBase {
   ActionDef _setPriorityActionDef;
 
   static void ResetWorkersAction(Workplace building) {
-    building.DesiredWorkers = 0;
-    building.UnassignWorkerIfOverstaffed();
+    SetWorkersAction(building, [ScriptValue.FromInt(0)]);
   }
 
   static void SetWorkersAction(Workplace building, ScriptValue[] args) {
     AssertActionArgsCount(SetWorkersActionName, args, 1);
     var numWorkers = args[0].AsInt;
-    if (numWorkers < 1 || numWorkers > building.MaxWorkers) {
+    if (numWorkers < 0 || numWorkers > building.MaxWorkers) {
       throw new ScriptError.ValueOutOfRange($"Number of workers out of range: {numWorkers}");
     }
     if (building.DesiredWorkers == numWorkers) {
