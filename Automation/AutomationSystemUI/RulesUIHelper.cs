@@ -210,10 +210,7 @@ class RulesUIHelper {
   }
 
   string GetFormattedSignalValue(SignalDef signalDef, Func<ScriptValue> signalSourceFn) {
-    var valueStr = signalDef.Result.ValueFormatter != null
-        ? signalDef.Result.ValueFormatter(signalSourceFn())
-        : signalSourceFn().AsFloat.ToString("0.##");
-    return _loc.T(BuildingSignalSourceLocKey, signalDef.DisplayName, valueStr);
+    return _loc.T(BuildingSignalSourceLocKey, signalDef.DisplayName, signalSourceFn().AsFloat.ToString("0.##"));
   }
 
   #endregion

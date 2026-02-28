@@ -2,6 +2,7 @@
 * [Feature #128] New signal `Workplace.AssignedWorkers` to track the number of workers assigned to the workplace.
 * [Feature] New action `Workplace.SetPriority` to set the workplace priority.
 * [Change] No more automation tools in the map editor.
+* [Change] Don't format percentile values of exported signals. Show them as-is: the normalized float values.
 
 # v3.4.1 (February 12th, 2026):
 * [Change] On the building copy (construction or settings), the automation rules are now copied only if the buildings are _of the same type_.
