@@ -3,8 +3,6 @@
 // License: Public Domain
 
 using System;
-using IgorZ.Automation.ScriptingEngine;
-using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 using IgorZ.TimberDev.UI;
@@ -16,25 +14,24 @@ sealed class ArgumentDefinition {
   const string StringConstantTypeLocKey = "IgorZ.Automation.Scripting.Editor.StringConstantType";
   const string NumberConstantTypeLocKey = "IgorZ.Automation.Scripting.Editor.NumberConstantType";
 
-  /// <summary>The type of this value.</summary>
-  public ScriptValue.TypeEnum ValueType { get; }
+  /// <inheritdoc cref="ScriptingEngine.ScriptableComponents.ValueDef.ValueType"/>
+  public ScriptValue.TypeEnum ValueType => ValueDef.ValueType;
 
-  /// <summary>Function to validate the value of this argument.</summary>
-  /// <exception cref="ScriptError.BadValue">if the value is invalid.</exception>
-  public Action<ScriptValue> ValueValidator { get; }
+  /// <inheritdoc cref="ScriptingEngine.ScriptableComponents.ValueDef.ValueValidator"/>
+  public Action<ScriptValue> ValueValidator => ValueDef.ValueValidator;
 
   /// <summary>If the set of the string values is limited, this is the set.</summary>
   /// <remarks>If not provided (null), then it is a free form value.</remarks>
   public DropdownItem<string>[] ValueOptions { get; }
 
-  /// <summary>Optional hint text to show in UI for the argument.</summary>
-  /// <remarks>Set to "null" if no hint is needed.</remarks>
-  public string ValueUiHint { get; }
+  /// <inheritdoc cref="ScriptingEngine.ScriptableComponents.ValueDef.ValueUiHint"/>
+  public string ValueUiHint => ValueDef.ValueUiHint;
+
+  /// <summary>The value definition this argument is bound to.</summary>
+  public ValueDef ValueDef { get; }
 
   public ArgumentDefinition(UiFactory uiFactory, ValueDef valueDef) {
-    ValueType = valueDef.ValueType;
-    ValueValidator = valueDef.ValueValidator;
-    ValueUiHint = valueDef.ValueUiHint;
+    ValueDef = valueDef;
     if (valueDef.Options != null) {
       ValueOptions = valueDef.Options;
     } else {
