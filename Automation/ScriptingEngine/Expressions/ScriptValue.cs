@@ -4,6 +4,7 @@
 
 using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 using IgorZ.TimberDev.UI;
@@ -41,11 +42,11 @@ record struct ScriptValue : IComparable<ScriptValue> {
   }
 
   /// <summary>Creates a new value that represents a string literal.</summary>
-  public static ScriptValue Of(string literal) {
+  public static ScriptValue FromString(string literal) {
     return new ScriptValue { _string = literal };
   }
 
-  /// <summary>Creates a new value from a raw number.</summary>
+  /// <summary>Creates a new value from a raw numeric value.</summary>
   /// <param name="number">A 2-digits fixed precision real number.</param>
   public static ScriptValue Of(int number) {
     return new ScriptValue { _number = number };
@@ -66,7 +67,28 @@ record struct ScriptValue : IComparable<ScriptValue> {
     return new ScriptValue { _number = flag ? 100 : 0 };
   }
 
+  /// <summary>
+  /// Verifies if the float can be stored to the value without losing precision. The value must not have more than 2
+  /// digits after the comma.
+  /// </summary>
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static bool IsValidFloat(float value) {
+    return 100f * value % 1 == 0;
+  }
+
+  /// <summary>Verifies if the float can be stored to the value without losing precision and is an integer.</summary>
+  /// <param name="value"></param>
+  /// <returns></returns>
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public static bool IsValidInt(float value) {
+    return value % 1 == 0;
+  }
+
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+  public static ScriptValue operator -(ScriptValue value) {
+    return new ScriptValue { _number = -value.AsNumber };
+  }
+
   public static ScriptValue operator +(ScriptValue left, ScriptValue right) {
     return new ScriptValue { _number = left.AsNumber + right.AsNumber };
   }

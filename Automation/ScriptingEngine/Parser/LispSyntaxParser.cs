@@ -92,7 +92,7 @@ sealed class LispSyntaxParser : ParserBase {
     switch (token.TokenType) {
       case Token.Type.NumericValue:
         return int.TryParse(token.Value, out var value)
-            ? ConstantValueExpr.CreateNumericValue(value)
+            ? ConstantValueExpr.CreateFromValue(ScriptValue.Of(value))
             : throw new ScriptError.ParsingError(token, "Not a valid integer number");
       case Token.Type.StringLiteral:
         return ConstantValueExpr.CreateStringLiteral(token.Value);

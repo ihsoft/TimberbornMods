@@ -245,7 +245,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
   ScriptValue ResourceStockSignal(AutomationBehavior behavior, string goodId) {
     var districtCenter = behavior.GetComponent<DistrictBuilding>().District;
     if (!districtCenter) { // Disconnected buildings don't have District.
-      return ScriptValue.Of(0);
+      return ScriptValue.FromInt(0);
     }
     var resourceCounter = districtCenter.GetComponent<DistrictResourceCounter>();
     return ScriptValue.FromInt(resourceCounter.GetResourceCount(goodId).TotalStock);
@@ -254,7 +254,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
   ScriptValue ResourceCapacitySignal(AutomationBehavior behavior, string goodId) {
     var districtCenter = behavior.GetComponent<DistrictBuilding>().District;
     if (!districtCenter) { // Disconnected buildings don't have District.
-      return ScriptValue.Of(0);
+      return ScriptValue.FromInt(0);
     }
     var resourceCounter = districtCenter.GetComponent<DistrictResourceCounter>();
     return ScriptValue.FromInt(resourceCounter.GetResourceCount(goodId).InputOutputCapacity);

@@ -143,7 +143,7 @@ class PythonSyntaxParser : ParserBase {
     if (token is { TokenType: Token.Type.Keyword, Value: SubOperator }) {
       var operand = ConsumeValueOperand(tokens);
       return operand is ConstantValueExpr constantValueExpr
-          ? ConstantValueExpr.CreateNumericValue(-constantValueExpr.ValueFn().AsNumber)
+          ? ConstantValueExpr.CreateFromValue(-constantValueExpr.ValueFn())
           : MathOperator.CreateNegate(operand);
     }
 
@@ -172,7 +172,7 @@ class PythonSyntaxParser : ParserBase {
     }
     if (token.TokenType == Token.Type.NumericValue) {
       return float.TryParse(token.Value, out var value)
-          ? ConstantValueExpr.CreateNumericValue(Mathf.RoundToInt(value * 100))
+          ? ConstantValueExpr.CreateFromValue(ScriptValue.FromFloat(value))
           : throw new ScriptError.ParsingError(token, "Not a valid float number");
     }
 

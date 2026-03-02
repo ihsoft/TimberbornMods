@@ -108,7 +108,7 @@ sealed class DebugScriptableComponent : ScriptableComponentBase {
   SignalDef _tickerSignalDef;
 
   ScriptValue TickerSignal() {
-    return ScriptValue.Of(AutomationService.CurrentTick);
+    return ScriptValue.FromInt(AutomationService.CurrentTick);
   }
 
   #endregion

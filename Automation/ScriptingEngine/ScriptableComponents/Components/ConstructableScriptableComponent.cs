@@ -93,7 +93,7 @@ sealed class ConstructableScriptableComponent : ScriptableComponentBase {
 
 
   static ScriptValue StateSignal(AutomationBehavior behavior) {
-    return ScriptValue.Of(behavior.GetComponent<BlockObject>().IsFinished ? "finished" : "");
+    return ScriptValue.FromString(behavior.GetComponent<BlockObject>().IsFinished ? "finished" : "");
   }
 
   static ScriptValue ProgressSignal(AutomationBehavior behavior) {

@@ -123,7 +123,7 @@ sealed class ArgumentConstructor : BaseConstructor {
     }
     var scriptValue = value switch {
         float floatValue => ScriptValue.FromFloat(floatValue),
-        string stringValue => ScriptValue.Of(stringValue),
+        string stringValue => ScriptValue.FromString(stringValue),
         _ => throw new ArgumentException($"Unsupported value type: {typeof(T)}"),
     };
     try {

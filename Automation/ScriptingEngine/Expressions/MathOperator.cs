@@ -66,7 +66,7 @@ class MathOperator : AbstractOperator, IValueExpr {
         OpType.Min => () => args.Select(x => x.ValueFn()).Min(),
         OpType.Max => () => args.Select(x => x.ValueFn()).Max(),
         OpType.Round => () => ScriptValue.FromInt(args[0].ValueFn().AsInt),
-        OpType.Negate => () => ScriptValue.Of(-args[0].ValueFn().AsNumber),
+        OpType.Negate => () => -args[0].ValueFn(),
         _ => throw new ArgumentOutOfRangeException(nameof(opType), opType, null),
     };
   }

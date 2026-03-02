@@ -142,7 +142,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   SignalDef _seasonSignalDef;
 
   ScriptValue SeasonSignal() {
-    return ScriptValue.Of(_currentSeason);
+    return ScriptValue.FromString(_currentSeason);
   }
 
   #endregion
