@@ -10,16 +10,13 @@ using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
 using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
+using Timberborn.UIFormatters;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace IgorZ.SmartPower.NetworkUI;
 
 sealed class MechanicalNodeFragment : IEntityPanelFragment {
-
-  const string PowerSymbolLocKey = "Mechanical.PowerSymbol";
-  const string PowerCapacitySymbolLocKey = "Mechanical.PowerCapacitySymbol";
-  const string HourShortLocKey = "Time.HourShort";
 
   const string BatteryCapacityLocKey = "IgorZ.SmartPower.BatteryCapacity";
   const string BatteryCapacityPctLocKey = "IgorZ.SmartPower.BatteryCapacityPct";
@@ -87,7 +84,7 @@ sealed class MechanicalNodeFragment : IEntityPanelFragment {
     }
 
     var graph = _mechanicalNode.Graph;
-    var totalChargeStr = $"{graph.BatteryCharge:0} {_loc.T(PowerCapacitySymbolLocKey)}";
+    var totalChargeStr = UnitFormatter.FormatPowerCapacity(graph.BatteryCharge, _loc);
     string batteryCapacityStr;
     if (BatteriesSettings.BatteryCapacityAsPct) {
       var chargePct = Mathf.RoundToInt(100.0f * graph.BatteryCharge / batteryTotalCapacity);
@@ -100,19 +97,19 @@ sealed class MechanicalNodeFragment : IEntityPanelFragment {
 
     if (batteryPowerNeed > 0 && graph.BatteryCharge > float.Epsilon) {
       // The network is consuming battery power.
-      var timeLeft = graph.BatteryCharge / batteryPowerNeed;
+      var timeLeft = (float)graph.BatteryCharge / batteryPowerNeed;
       var flowStr = _loc.T(
           BatteryDischarging,
-          $"{batteryPowerNeed} {_loc.T(PowerSymbolLocKey)}",
-          $"{timeLeft:0.0}{_loc.T(HourShortLocKey)}");
+          UnitFormatter.FormatPower(batteryPowerNeed, _loc),
+          UnitFormatter.FormatHours(timeLeft.ToString("0.0"), _loc));
       batteryStatus = $"{batteryCapacityStr}\n{flowStr}";
     } else if (batteryPowerNeed < 0 && graph.BatteryCharge < batteryTotalCapacity) {
       // Some discharged batteries being charged using the excess power.
-      var timeLeft = (batteryTotalCapacity - graph.BatteryCharge) / -batteryPowerNeed;
+      var timeLeft = (float)(batteryTotalCapacity - graph.BatteryCharge) / -batteryPowerNeed;
       var flowStr = _loc.T(
           BatteryCharging,
-          $"{-batteryPowerNeed} {_loc.T(PowerSymbolLocKey)}",
-          $"{timeLeft:0.0}{_loc.T(HourShortLocKey)}");
+          UnitFormatter.FormatPower(-batteryPowerNeed, _loc),
+          UnitFormatter.FormatHours(timeLeft.ToString("0.0"), _loc));
       batteryStatus = $"{batteryCapacityStr}\n{flowStr}";
     } else if (batteryPowerNeed > 0 && graph.BatteryCharge < float.Epsilon) {
       // Batteries depleted.

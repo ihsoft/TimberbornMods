@@ -15,7 +15,7 @@ IgorZ.SmartPower.MechanicalBuilding.NoFuelStatus,"<YellowHighlight>⏻</YellowHi
 IgorZ.SmartPower.MechanicalBuilding.NoInputStatus,"<YellowHighlight>⏻</YellowHighlight> Не хватает ингредиентов",
 IgorZ.SmartPower.MechanicalBuilding.BlockedOutputStatus,"<YellowHighlight>⏻</YellowHighlight> Нет места для продукции",
 IgorZ.SmartPower.MechanicalBuilding.PowerSavingModeStatus,"Режим сбережения энергии",
-IgorZ.SmartPower.PowerInputLimiter.SuspendIfNoPower,"Останавливать если недостаточно энергии",
+IgorZ.SmartPower.PowerInputLimiter.SuspendIfNoPower,"Останавливать если мало энергии",
 IgorZ.SmartPower.PowerInputLimiter.SuspendIfLowEfficiency,"Минимальное обеспечение энергией: {0}%",
 IgorZ.SmartPower.PowerInputLimiter.MinBatteriesRatio,"Остановить если заряд батарей ниже {0}%",
 IgorZ.SmartPower.PowerInputLimiter.ApplyToAllBuildings,"Применить ко всем таким же зданиям",

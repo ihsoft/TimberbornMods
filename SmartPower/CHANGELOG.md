@@ -1,3 +1,8 @@
+# v1.16.0 (March 2nd, 2026)
+* [Update] Support game version `1.0.11`.
+* [Enhancement] Make some ruRU strings more compact to avoid line wrapping in UI.
+* [Fix] Units are not formatted properly after the `1.0.10` update.
+
 # v1.15.5 (February 26th, 2026)
 * [Fix] Engines without fuel enter suspended state instead of disabling automation.
 
