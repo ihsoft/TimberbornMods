@@ -31,3 +31,6 @@ TimberDev_Utils.Settings.Debug.VerboseLogging,"Детальные журналы
 TimberDev_Utils.Settings.Debug.VerboseLoggingTooltip,"В журналы игры будет записываться больше полезной информации,
 но это может повлиять на производительность игры."
 TimberDev_Utils.Settings.DebugSection,"Отладка и устранение неполадок",
+=,=,"Keep UI compact! Strings that line-wrap break UI"
+Mechanical.NetworkPower,Генерация/потребление в сети: {0} / {1},{0} stands for supply amount {1} stands for demand amount followed by PowerSymbol
+Mechanical.PowerInputMaximum,Энергия на входе: {0} из {1} ({2}%),{0} stands for input amount {1} stands for maximum amount followed by PowerSymbol {2} stands for efficency ratio in percent

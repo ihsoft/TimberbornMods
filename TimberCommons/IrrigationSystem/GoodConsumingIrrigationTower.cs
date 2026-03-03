@@ -9,6 +9,7 @@ using IgorZ.TimberCommons.Common;
 using Timberborn.Buildings;
 using Timberborn.GoodConsumingBuildingSystem;
 using Timberborn.Localization;
+using Timberborn.UIFormatters;
 using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.TimberCommons.IrrigationSystem;
@@ -27,8 +28,6 @@ namespace IgorZ.TimberCommons.IrrigationSystem;
 public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFormatter {
 
   #region IConsumptionRateFormatter implementation
-  
-  const string DaysShortLocKey = "Time.DaysShort";
 
   /// <inheritdoc/>
   public string GetRate() {
@@ -39,7 +38,7 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
   
   /// <inheritdoc/>
   public string GetTime() {
-    return _loc.T(DaysShortLocKey, "1");
+    return UnitFormatter.FormatDays("1", _loc);
   }
   
   #endregion
