@@ -38,7 +38,7 @@ namespace IgorZ.TimberCommons.IrrigationSystem;
 /// blocked for irrigation (for example, via a moisture blocker), then it is not eligible for irrigation. 
 /// </remarks>
 public abstract class IrrigationTower : TickableComponent, IAwakableComponent, IBuildingWithRange,
-                                        IFinishedStateListener, IPostPlacementChangeListener, IPausableComponent,
+                                        IFinishedStateListener, IPostPlacementChangeListener, IFinishedPausable,
                                         ILateTickable, IPersistentEntity, ISelectionListener, IPostInitializableEntity {
 
   #region API

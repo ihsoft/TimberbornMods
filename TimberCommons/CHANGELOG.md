@@ -1,3 +1,6 @@
+# v1.15.0 (March 2nd, 2026)
+* [Update] Support game version `1.0.11`.
+
 # v1.14.6 (January 12th, 2026)
 * [Update] Support game version `1.0.7`.
 
