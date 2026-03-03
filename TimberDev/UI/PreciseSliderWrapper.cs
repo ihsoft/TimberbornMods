@@ -22,7 +22,8 @@ public class PreciseSliderWrapper : VisualElement {
     _slider = slider;
     _onValueChangedFn = onValueChangedFn;
     _stepSize = stepSize;
-    slider.Initialize(OnWaterLevelSliderChanged, stepSize);
+    slider.SetStepWithoutNotify(stepSize);
+    slider.SetValueChangedCallback(OnWaterLevelSliderChanged);
     Add(slider);
   }
 
