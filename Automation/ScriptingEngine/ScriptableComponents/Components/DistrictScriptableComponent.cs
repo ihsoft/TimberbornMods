@@ -248,7 +248,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
       return ScriptValue.FromInt(0);
     }
     var resourceCounter = districtCenter.GetComponent<DistrictResourceCounter>();
-    return ScriptValue.FromInt(resourceCounter.GetResourceCount(goodId).TotalStock);
+    return ScriptValue.FromInt(resourceCounter.GetResourceCount(goodId).AvailableStock);
   }
 
   ScriptValue ResourceCapacitySignal(AutomationBehavior behavior, string goodId) {
@@ -337,7 +337,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
       } else if (signalName.StartsWith(ResourceStockSignalNamePrefix)) {
         var goodId = signalName[ResourceStockSignalNamePrefix.Length..];
         if (!GoodStock.ContainsKey(goodId)) {
-          var value = resourceCounter != null ? resourceCounter.GetResourceCount(goodId).TotalStock : 0;
+          var value = resourceCounter != null ? resourceCounter.GetResourceCount(goodId).AvailableStock : 0;
           GoodStock.Add(goodId, value);
           HostedDebugLog.Fine(AutomationBehavior, "Start tracking district signal: {0}, value={1}", signalName, value);
         }

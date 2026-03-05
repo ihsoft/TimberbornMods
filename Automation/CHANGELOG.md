@@ -1,6 +1,7 @@
 # v3.5.0 (started on February 27th, 2026):
 * [Feature #128] New signal `Workplace.AssignedWorkers` to track the number of workers assigned to the workplace.
 * [Feature] New action `Workplace.SetPriority` to set the workplace priority.
+* [Change] Update to game v1.0.11.
 * [Change] No more automation tools in the map editor.
 * [Change] Don't format percentile values of exported signals. Show them as-is: the normalized float values.
 
