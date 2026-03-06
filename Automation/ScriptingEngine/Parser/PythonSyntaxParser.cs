@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
 using UnityEngine;
@@ -82,6 +83,7 @@ class PythonSyntaxParser : ParserBase {
 
   static readonly string[] GroupTerminator = [ ")" ];
   static readonly string[] ArgumentsTerminators = [ ")", "," ];
+  static readonly Regex IsGoodFloatValueRegex = new(@"^-?\d+(\.[0-9]{1,2}[0]*)?$");
 
   IExpression ParseExpressionInternal(int parentPrecedence, Queue<Token> tokens) {
     var left = ConsumeValueOperand(tokens);
@@ -171,9 +173,12 @@ class PythonSyntaxParser : ParserBase {
       return ConstantValueExpr.CreateStringLiteral(token.Value);
     }
     if (token.TokenType == Token.Type.NumericValue) {
-      return float.TryParse(token.Value, out var value)
+      if (!float.TryParse(token.Value, out var value)) {
+        throw new ScriptError.ParsingError(token, "Not a valid float number");
+      }
+      return IsGoodFloatValueRegex.IsMatch(token.Value)
           ? ConstantValueExpr.CreateFromValue(ScriptValue.FromFloat(value))
-          : throw new ScriptError.ParsingError(token, "Not a valid float number");
+          : throw new ScriptError.ParsingError(token, "Only up to 2 digits after the decimal point are allowed.");
     }
 
     if (token.TokenType != Token.Type.Keyword) {
