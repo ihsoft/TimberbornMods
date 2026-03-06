@@ -85,8 +85,8 @@ sealed class ConstructableScriptableComponent : ScriptableComponentBase {
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
           ValueFormatter = x => x.AsFloat.ToString("P0"),
-          ValueValidator = ValueDef.RangeCheckValidatorFloat(0f, 1f),
           ValueUiHint = GetArgumentMaxValueHint(1f),
+          RuntimeValueValidator = ValueDef.RangeCheckValidatorFloat(min: 0f, max: 1f),
       },
   };
   SignalDef _progressSignalDef;

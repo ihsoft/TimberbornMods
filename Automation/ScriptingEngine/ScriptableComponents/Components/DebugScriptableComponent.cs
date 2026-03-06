@@ -101,8 +101,8 @@ sealed class DebugScriptableComponent : ScriptableComponentBase {
       DisplayName = Loc.T(TickerSignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
-          ValueValidator = ValueDef.RangeCheckValidatorInt(0, ReasonableTickQuantifierMax),
           ValueUiHint = GetArgumentMaxValueHint(ReasonableTickQuantifierMax),
+          RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min:0),
       },
   };
   SignalDef _tickerSignalDef;

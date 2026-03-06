@@ -148,8 +148,8 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
         DisplayName = displayName,
         Result = new ValueDef {
             ValueType = ScriptValue.TypeEnum.Number,
-            ValueValidator = ValueDef.RangeCheckValidatorInt(0, parsed.capacity),
             ValueUiHint = GetArgumentMaxValueHint(parsed.capacity),
+            RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0, max: parsed.capacity),
         },
     };
   }

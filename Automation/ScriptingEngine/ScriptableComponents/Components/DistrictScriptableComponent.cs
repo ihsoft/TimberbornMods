@@ -193,7 +193,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
       DisplayName = Loc.T(BeaversPopulationSignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
-          ValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
+          RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
       },
   };
   SignalDef _beaverPopulationSignalDef;
@@ -203,7 +203,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
       DisplayName = Loc.T(BotPopulationSignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
-          ValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
+          RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
       },
   };
   SignalDef _botPopulationSignalDef;
@@ -213,7 +213,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
       DisplayName = Loc.T(NumberOfBedsSignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
-          ValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
+          RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
       },
   };
   SignalDef _numberOfBedsSignalDef;
@@ -225,7 +225,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
         DisplayName = Loc.T(ResourceStockSignalLocKey, spec.PluralDisplayName.Value),
         Result = new ValueDef {
             ValueType = ScriptValue.TypeEnum.Number,
-            ValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
+            RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
         },
     };
   }
@@ -237,7 +237,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
         DisplayName = Loc.T(ResourceCapacitySignalLocKey, spec.PluralDisplayName.Value),
         Result = new ValueDef {
             ValueType = ScriptValue.TypeEnum.Number,
-            ValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
+            RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
         },
     };
   }

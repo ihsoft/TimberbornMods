@@ -128,8 +128,8 @@ sealed class WorkplaceScriptableComponent : ScriptableComponentBase {
         Result = new ValueDef {
             ValueType = ScriptValue.TypeEnum.Number,
             ValueFormatter = x => x.AsFloat.ToString("0"),
-            ValueValidator = ValueDef.RangeCheckValidatorInt(0, workplace.MaxWorkers),
             ValueUiHint = GetArgumentMinMaxValueHint(0, workplace.MaxWorkers),
+            RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0, max: workplace.MaxWorkers),
         },
     };
   }
@@ -153,8 +153,8 @@ sealed class WorkplaceScriptableComponent : ScriptableComponentBase {
             new ValueDef {
                 ValueType = ScriptValue.TypeEnum.Number,
                 ValueFormatter = x => x.AsFloat.ToString("0"),
-                ValueValidator = ValueDef.RangeCheckValidatorInt(1, workplace.MaxWorkers),
                 ValueUiHint = GetArgumentMinMaxValueHint(1, workplace.MaxWorkers),
+                RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0, workplace.MaxWorkers),
             },
         ],
     };

@@ -72,7 +72,7 @@ sealed class ManufactoryScriptableComponent : ScriptableComponentBase {
             new ValueDef {
                 ValueType = ScriptValue.TypeEnum.String,
                 ValueFormatter = arg => Loc.T(GetRecipeSpecOrThrow(arg, manufactory).DisplayLocKey),
-                ValueValidator = arg => GetRecipeSpecOrThrow(arg, manufactory),
+                RuntimeValueValidator = arg => GetRecipeSpecOrThrow(arg, manufactory),
                 Options = options.ToArray(),
             },
         ],

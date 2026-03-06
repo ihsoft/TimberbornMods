@@ -30,19 +30,21 @@ sealed record ValueDef {
 
   /// <summary>Optional validating function for the argument value.</summary>
   /// <remarks>
-  /// Normally, this check is performed in the runtime stage to verify the argument value. If the argument is a
-  /// constant value, then this check is executed only once during the parsing stage.
+  /// This check is performed in the runtime stage to verify the argument value. The only exception is constants - for
+  /// them, the check is made at the parsing time.
   /// </remarks>
   /// <exception cref="ScriptError.RuntimeError">if value doesn't pass validation</exception>
-  public Action<ScriptValue> ValueValidator { get; init; }
+  /// <seealso cref="ScriptEngineSettings.CheckArgumentValues"/>
+  public Action<ScriptValue> RuntimeValueValidator { get; init; }
 
   /// <summary>Optional hint text to show in UI for the argument.</summary>
   public string ValueUiHint { get; init; }
 
   /// <summary>Optional validating function for the argument value <i>expression</i>.</summary>
   /// <remarks>
-  /// This check is performed in the parsing stage. Don't do value validation here! Use <see cref="ValueValidator"/>
-  /// instead.
+  /// This check is performed at the parsing stage. Don't do value validation here! Use
+  /// <see cref="RuntimeValueValidator"/> instead. The main purpose of this function is to validate if the argument
+  /// makes sense from the parsing standpoint. E.g. if it's a string literal when it's the only kind of values allowed.
   /// </remarks>
   /// <exception cref="ScriptError.ParsingError">if argument is not appropriate</exception>
   public Action<IValueExpr> ArgumentValidator { get; init; }

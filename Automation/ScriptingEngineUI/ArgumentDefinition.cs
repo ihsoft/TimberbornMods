@@ -9,16 +9,13 @@ using IgorZ.TimberDev.UI;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
 
-sealed class ArgumentDefinition {
+sealed record ArgumentDefinition {
 
   const string StringConstantTypeLocKey = "IgorZ.Automation.Scripting.Editor.StringConstantType";
   const string NumberConstantTypeLocKey = "IgorZ.Automation.Scripting.Editor.NumberConstantType";
 
   /// <inheritdoc cref="ScriptingEngine.ScriptableComponents.ValueDef.ValueType"/>
   public ScriptValue.TypeEnum ValueType => ValueDef.ValueType;
-
-  /// <inheritdoc cref="ScriptingEngine.ScriptableComponents.ValueDef.ValueValidator"/>
-  public Action<ScriptValue> ValueValidator => ValueDef.ValueValidator;
 
   /// <summary>If the set of the string values is limited, this is the set.</summary>
   /// <remarks>If not provided (null), then it is a free form value.</remarks>

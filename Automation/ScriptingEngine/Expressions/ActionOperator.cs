@@ -78,13 +78,17 @@ sealed class ActionOperator : AbstractOperator {
             $"Argument #{argPos + 1} must be of type '{argDef.ValueType}', but found: {valueExpr.ValueType}");
       }
       argDef.ArgumentValidator?.Invoke(valueExpr);
-      if (argDef.ValueValidator == null || VerifyConstantValueExpr(argDef, valueExpr) != null) {
+      var isConstantValue = false;
+      if (valueExpr is ConstantValueExpr constantValueExpr) {
+        isConstantValue = true;
+      }
+      if (argDef.RuntimeValueValidator == null || isConstantValue) {
         argValues.Add(valueExpr.ValueFn);
       } else {
         argValues.Add(() => {
           var value = valueExpr.ValueFn();
           if (ScriptEngineSettings.CheckArgumentValues) {
-            argDef.ValueValidator(value);
+            argDef.RuntimeValueValidator(value);
           }
           return value;
         });
