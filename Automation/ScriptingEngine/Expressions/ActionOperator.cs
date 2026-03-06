@@ -8,6 +8,7 @@ using System.Linq;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 using IgorZ.Automation.Settings;
+using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.Expressions;
 
@@ -81,6 +82,12 @@ sealed class ActionOperator : AbstractOperator {
       var isConstantValue = false;
       if (valueExpr is ConstantValueExpr constantValueExpr) {
         isConstantValue = true;
+        if (constantValueExpr.ValidateAndMaybeCorrect(argDef, out var newValueExpr)) {
+          DebugEx.Warning("ActionOperator: Replacing constant value '{0}' with '{1}' for {2}",
+                          valueExpr.ValueFn(), newValueExpr.ValueFn(), actionName);
+          valueExpr = newValueExpr;
+          Operands[argPos] = newValueExpr;
+        }
       }
       if (argDef.RuntimeValueValidator == null || isConstantValue) {
         argValues.Add(valueExpr.ValueFn);

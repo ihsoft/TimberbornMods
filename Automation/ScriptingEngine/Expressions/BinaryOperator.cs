@@ -4,14 +4,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
-using IgorZ.Automation.Settings;
 using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.Expressions;
 
+//FIXME: ComparisonOperator
 sealed class BinaryOperator : BoolOperator {
 
   public enum OpType {
@@ -68,31 +67,17 @@ sealed class BinaryOperator : BoolOperator {
       var otherArgExpr = left is SignalOperator ? right : left;
       ResultValueDef = signalDef.Result;
       signalDef.Result.ArgumentValidator?.Invoke(otherArgExpr);
-      var constantValueExpr = VerifyConstantValueExpr(ResultValueDef, otherArgExpr);
-
-      // Options compatibility support.
-      if (constantValueExpr != null && ResultValueDef.CompatibilityOptions != null) {
-        var value = constantValueExpr.ValueFn().AsString;
-        if (ResultValueDef.CompatibilityOptions.TryGetValue(value, out var replaceOption)) {
-          constantValueExpr = ConstantValueExpr.CreateStringLiteral(replaceOption);
+      if (otherArgExpr is ConstantValueExpr constantValueExpr) {
+        if (constantValueExpr.ValidateAndMaybeCorrect(ResultValueDef, out var newValueExpr)) {
           DebugEx.Warning("BinaryOperator: Replacing constant value '{0}' with '{1}' for signal {2}",
-                          value, replaceOption, signalDef.ScriptName);
+                          constantValueExpr, newValueExpr, signalDef.ScriptName);
           if (Operands[0] == otherArgExpr) {
-            Operands[0] = constantValueExpr;
-            left = constantValueExpr;
+            Operands[0] = newValueExpr;
+            left = newValueExpr;
           } else {
-            Operands[1] = constantValueExpr;
-            right = constantValueExpr;
+            Operands[1] = newValueExpr;
+            right = newValueExpr;
           }
-        }
-      }
-
-      if (constantValueExpr != null && ResultValueDef.Options != null
-          && ScriptEngineSettings.CheckOptionsArguments) {
-        var value = constantValueExpr.ValueFn().AsString;
-        var allowedValues = ResultValueDef.Options.Select(x => x.Value).ToArray();
-        if (!allowedValues.Contains(value)) {
-          throw new ScriptError.ParsingError($"Unexpected value: {value}. Allowed: {string.Join(", ", allowedValues)}");
         }
       }
     }
