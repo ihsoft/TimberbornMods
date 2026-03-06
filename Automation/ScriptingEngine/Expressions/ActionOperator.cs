@@ -74,6 +74,7 @@ sealed class ActionOperator : AbstractOperator {
       var argDef = argDefIndex < ActionDef.Arguments.Length
           ? ActionDef.Arguments[argDefIndex++]
           : ActionDef.VarArg;
+      // The unset type means that any type is allowed. It is mostly used for the variable arguments case.
       if (argDef.ValueType != ScriptValue.TypeEnum.Unset && argDef.ValueType != valueExpr.ValueType) {
         throw new ScriptError.ParsingError(
             $"Argument #{argPos + 1} must be of type '{argDef.ValueType}', but found: {valueExpr.ValueType}");

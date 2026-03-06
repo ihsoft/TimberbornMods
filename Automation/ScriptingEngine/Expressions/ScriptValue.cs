@@ -4,7 +4,6 @@
 
 using System;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 using IgorZ.TimberDev.UI;
@@ -13,6 +12,34 @@ using UnityEngine;
 namespace IgorZ.Automation.ScriptingEngine.Expressions;
 
 /// <summary>Value that can be passed around in the scripting engine.</summary>
+/// <remarks>
+/// <p>
+/// In general, it works with only two type: string and numeric. The string one is self-explanatory. The numeric one is
+/// tricky. It's stored as a 2-digit fixed precision real number. That is, under the hood, it's an INTEGER, but the last
+/// two digits if that integer is reserved for the fractional part of the float. For example, "1.5f" would be stored as
+/// "150".
+/// </p>
+/// <p>
+/// There is virtually no way to store a number with more than 2 digits after the comma, and if you try to do that, the
+/// value will be silently rounded. Keep it in mind when you are doing calculations with the values, because the
+/// precision loss can happen without any warning.
+/// </p>
+/// <p>
+/// If you need to increase precision, multiply the dividend by 100 before doing the calculations and use the multiplied
+/// result values (don't divide them back!). As long as the number stays in the 32-bit signed integer range, the
+/// precision will be preserved. If you go over it, the beavers god may punish you somehow (nobody knows how exactly).
+/// </p>
+/// </remarks>
+/// <example>
+/// <list>
+/// <item>"10/3*3" will be evaluated as "9.99" instead of "10".</item>
+/// <item>"100*3/3" will be evaluated as "10" as expected.</item>
+/// <item>"1.005" will be stored as "100", which is "1.0f".</item>
+/// <item>"1.999" will be stored as "200", which is "2.0f".</item>
+/// <item>"1.005 / 2" will be evaluated as "50", which is "0.5f".</item>
+/// <item>"10.05 / 20 / 10" will be evaluated as "50", which is "0.5f".</item>
+/// </list>
+/// </example>
 record struct ScriptValue : IComparable<ScriptValue> {
   /// <summary>
   /// A special value that represents an invalid value. It can be used as a default value for uninitialized variables.
@@ -58,6 +85,7 @@ record struct ScriptValue : IComparable<ScriptValue> {
   }
 
   /// <summary>Creates a new value that represents a float value.</summary>
+  /// <remarks>This method will silently round the value to the last 2 digits after the comma.</remarks>
   public static ScriptValue FromFloat(float value) {
     return new ScriptValue { _number = Mathf.RoundToInt(value * 100f) };
   }
