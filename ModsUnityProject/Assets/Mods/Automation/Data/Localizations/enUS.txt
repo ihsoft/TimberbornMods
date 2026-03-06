@@ -161,7 +161,7 @@ IgorZ.Automation.Scriptable.StreamGauge.Signal.Current,"current","Name of the co
 IgorZ.Automation.Scriptable.StreamGauge.Signal.Depth,"depth","Name of the condition for the current water level checking"
 IgorZ.Automation.Scriptable.Weather.Signal.Season,"season","Name of the condition for the current season checking"
 IgorZ.Automation.Scriptable.Workplace.Action.RemoveWorkers,"remove workers","Name of the action that removes all workers from the workshop"
-IgorZ.Automation.Scriptable.Workplace.Action.SetPriority,"set worker priority to {0}","Name of the action that sets the workplace priority level"
+IgorZ.Automation.Scriptable.Workplace.Action.SetPriority,"worker priority: <GreenHighlight>{0}</GreenHighlight>","Name of the action that sets the workplace priority level"
 IgorZ.Automation.Scriptable.Workplace.Action.SetWorkers,"assign {0} workers","Name of the action that sets the number of workers in the building"
 IgorZ.Automation.Scriptable.Workplace.Signal.AssignedWorkers,"assigned workers","Name of the condition for the current number of assigned workers"
 IgorZ.Automation.Scripting.Expressions.AndOperator,"and","String to join components of the expression with condition AND. Used to represent the condition in the panel"

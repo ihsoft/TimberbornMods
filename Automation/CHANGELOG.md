@@ -7,6 +7,7 @@
 * [Change] Update to game v1.0.11.
 * [Change] No more automation tools in the map editor.
 * [Change] Don't format percentile values of exported signals. Show them as-is: the normalized float values.
+* [Change] Highlight the priority level in green in the `Workplace.SetPriority` action description and shorten the message.  
 
 # v3.4.1 (February 12th, 2026):
 * [Change] On the building copy (construction or settings), the automation rules are now copied only if the buildings are _of the same type_.
