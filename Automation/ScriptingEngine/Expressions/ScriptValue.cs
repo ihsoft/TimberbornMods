@@ -67,23 +67,6 @@ record struct ScriptValue : IComparable<ScriptValue> {
     return new ScriptValue { _number = flag ? 100 : 0 };
   }
 
-  /// <summary>
-  /// Verifies if the float can be stored to the value without losing precision. The value must not have more than 2
-  /// digits after the comma.
-  /// </summary>
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static bool IsValidFloat(float value) {
-    return 100f * value % 1 == 0;
-  }
-
-  /// <summary>Verifies if the float can be stored to the value without losing precision and is an integer.</summary>
-  /// <param name="value"></param>
-  /// <returns></returns>
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static bool IsValidInt(float value) {
-    return value % 1 == 0;
-  }
-
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
   public static ScriptValue operator -(ScriptValue value) {
     return new ScriptValue { _number = -value.AsNumber };

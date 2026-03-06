@@ -64,8 +64,8 @@
       <Compile Include="..\Automation\ScriptingEngine\Expressions\ActionOperator.cs">
         <Link>Import\ScriptingEngine\Expressions\ActionOperator.cs</Link>
       </Compile>
-      <Compile Include="..\Automation\ScriptingEngine\Expressions\BinaryOperator.cs">
-        <Link>Import\ScriptingEngine\Expressions\BinaryOperator.cs</Link>
+      <Compile Include="..\Automation\ScriptingEngine\Expressions\ComparisonOperator.cs">
+        <Link>Import\ScriptingEngine\Expressions\ComparisonOperator.cs</Link>
       </Compile>
       <Compile Include="..\Automation\ScriptingEngine\Expressions\BoolOperator.cs">
         <Link>Import\ScriptingEngine\Expressions\BoolOperator.cs</Link>
