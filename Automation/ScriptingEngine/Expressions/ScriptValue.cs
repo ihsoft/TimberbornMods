@@ -164,7 +164,7 @@ record struct ScriptValue : IComparable<ScriptValue> {
   public string AsString {
     get {
       if (_string == null) {
-        throw new ScriptError.BadValue("Value is not a string: " + ToString());
+        throw new ScriptError.BadValue($"Value is not a string: {ToString()}");
       }
       return _string;
     }
