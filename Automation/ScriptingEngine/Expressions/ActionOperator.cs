@@ -79,9 +79,7 @@ sealed class ActionOperator : AbstractOperator {
             $"Argument #{argPos + 1} must be of type '{argDef.ValueType}', but found: {valueExpr.ValueType}");
       }
       argDef.ArgumentValidator?.Invoke(valueExpr);
-      var isConstantValue = false;
       if (valueExpr is ConstantValueExpr constantValueExpr) {
-        isConstantValue = true;
         if (constantValueExpr.ValidateAndMaybeCorrect(argDef, out var newValueExpr)) {
           DebugEx.Warning("ActionOperator: Replacing constant value '{0}' with '{1}' for {2}",
                           valueExpr.ValueFn(), newValueExpr.ValueFn(), actionName);
@@ -89,7 +87,11 @@ sealed class ActionOperator : AbstractOperator {
           Operands[argPos] = newValueExpr;
         }
       }
-      if (argDef.RuntimeValueValidator == null || isConstantValue) {
+      if (argDef.RuntimeValueValidator == null || valueExpr.IsConstantValue()) {
+        // For constant value operands we can perform value validation at parsing stage.
+        if (argDef.RuntimeValueValidator != null) {
+          argDef.RuntimeValueValidator(valueExpr.ValueFn());
+        }
         argValues.Add(valueExpr.ValueFn);
       } else {
         argValues.Add(() => {

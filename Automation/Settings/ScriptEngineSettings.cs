@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System.Diagnostics.CodeAnalysis;
+using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 using IgorZ.TimberDev.Settings;
 using ModSettings.Core;
 using Timberborn.Modding;
@@ -39,6 +40,11 @@ sealed class ScriptEngineSettings : BaseSettings<ScriptEngineSettings> {
       true, ModSettingDescriptor.CreateLocalized(CheckOptionsArgumentsLocKey));
   public static bool CheckOptionsArguments => Instance.CheckOptionsArgumentsInternal.Value;
 
+  /// <summary>Tells if the engine should validate values in signal comparision and actions arguments.</summary>
+  /// <remarks>
+  /// If the setting is disabled, then <see cref="ValueDef.RuntimeValueValidator"/> won't be called in runtime. However,
+  /// the constant values will still be verified on parsing.
+  /// </remarks>
   public static bool CheckArgumentValues { get; private set; }
   public ModSetting<bool> CheckArgumentValuesInternal { get; } = new(
       true, ModSettingDescriptor.CreateLocalized(CheckArgumentValuesLocKey));

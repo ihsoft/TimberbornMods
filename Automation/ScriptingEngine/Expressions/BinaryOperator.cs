@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
+using IgorZ.Automation.Settings;
 using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.Expressions;
@@ -58,13 +59,14 @@ sealed class BinaryOperator : BoolOperator {
       throw new ScriptError.ParsingError($"Arguments type mismatch: {left.ValueType} != {right.ValueType}");
     }
     SignalDef signalDef = null;
+    IValueExpr otherArgExpr = null;
     if (left is SignalOperator leftSignal) {
       signalDef = ScriptingService.Instance.GetSignalDefinition(leftSignal.SignalName, context.ScriptHost);
     } else if (right is SignalOperator rightSignal) {
       signalDef = ScriptingService.Instance.GetSignalDefinition(rightSignal.SignalName, context.ScriptHost);
     }
     if (signalDef != null) {
-      var otherArgExpr = left is SignalOperator ? right : left;
+      otherArgExpr = left is SignalOperator ? right : left;
       ResultValueDef = signalDef.Result;
       signalDef.Result.ArgumentValidator?.Invoke(otherArgExpr);
       if (otherArgExpr is ConstantValueExpr constantValueExpr) {
@@ -81,7 +83,7 @@ sealed class BinaryOperator : BoolOperator {
         }
       }
     }
-    Execute = left.ValueType switch {
+    Func<bool> executeFn = left.ValueType switch {
         ScriptValue.TypeEnum.String => opType switch {
             OpType.Equal => () => left.ValueFn().AsString == right.ValueFn().AsString,
             OpType.NotEqual => () => left.ValueFn().AsString != right.ValueFn().AsString,
@@ -98,5 +100,17 @@ sealed class BinaryOperator : BoolOperator {
         },
         _ => throw new ArgumentOutOfRangeException(nameof(ValueType), left.ValueType, null),
     };
+    if (signalDef?.Result.RuntimeValueValidator == null || otherArgExpr.IsConstantValue()) {
+      // If there is a signal, then we have value definition and can validate the constant argument.
+      signalDef?.Result.RuntimeValueValidator?.Invoke(otherArgExpr.ValueFn());
+      Execute = executeFn;
+    } else {
+      Execute = () => {
+        if (ScriptEngineSettings.CheckArgumentValues) {
+          signalDef.Result.RuntimeValueValidator(otherArgExpr.ValueFn());
+        }
+        return executeFn();
+      };
+    }
   }
 }
