@@ -84,8 +84,8 @@ sealed class ConstructableScriptableComponent : ScriptableComponentBase {
       DisplayName = Loc.T(ProgressSignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
-          ValueFormatter = x => x.AsFloat.ToString("P0"),
-          ValueUiHint = GetArgumentMaxValueHint(1f),
+          DisplayNumericFormat = ValueDef.NumericFormatEnum.Percent,
+          DisplayNumericFormatRange = (0, 100),
           RuntimeValueValidator = ValueDef.RangeCheckValidatorFloat(min: 0f, max: 1f),
       },
   };

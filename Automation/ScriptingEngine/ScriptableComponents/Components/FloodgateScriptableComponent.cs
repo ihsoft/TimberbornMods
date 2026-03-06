@@ -93,8 +93,8 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
         DisplayName = Loc.T(HeightSignalLocKey),
         Result = new ValueDef {
             ValueType = ScriptValue.TypeEnum.Number,
-            ValueFormatter = x => x.AsFloat.ToString("0.00"),
-            ValueUiHint = GetArgumentMaxValueHint((float)floodgate.MaxHeight),
+            DisplayNumericFormat = ValueDef.NumericFormatEnum.Float,
+            DisplayNumericFormatRange = (0, floodgate.MaxHeight),
             RuntimeValueValidator = ValueDef.RangeCheckValidatorFloat(min: 0f, max: floodgate.MaxHeight),
         },
     };
@@ -115,8 +115,8 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
         Arguments = [
             new ValueDef {
                 ValueType = ScriptValue.TypeEnum.Number,
-                ValueFormatter = x => x.AsFloat.ToString("0.00"),
-                ValueUiHint = GetArgumentMaxValueHint((float)floodgate.MaxHeight),
+                DisplayNumericFormat = ValueDef.NumericFormatEnum.Float,
+                DisplayNumericFormatRange = (0, floodgate.MaxHeight),
                 RuntimeValueValidator = ValueDef.RangeCheckValidatorFloat(min: 0, max: floodgate.MaxHeight),
             },
         ],

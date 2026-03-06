@@ -14,6 +14,11 @@ namespace IgorZ.Automation.ScriptingEngine.Expressions;
 
 /// <summary>Value that can be passed around in the scripting engine.</summary>
 record struct ScriptValue : IComparable<ScriptValue> {
+  /// <summary>
+  /// A special value that represents an invalid value. It can be used as a default value for uninitialized variables.
+  /// </summary>
+  public static ScriptValue InvalidValue = new();
+
   /// <summary>Type of the value.</summary>
   public enum TypeEnum {
     /// <summary>No type set or detected. The upstream code decides how to handle it.</summary>
@@ -152,14 +157,18 @@ record struct ScriptValue : IComparable<ScriptValue> {
   /// converted to floats and formatted as "0.##".
   /// </param>
   public string FormatValue(ValueDef valueDef) {
-    if (valueDef?.ValueFormatter != null) {
-      return valueDef.ValueFormatter(this);
-    }
     var stringValue = ValueType switch {
-        TypeEnum.Number => AsFloat.ToString("0.##"),
+        TypeEnum.Number => valueDef.DisplayNumericFormat switch {
+            ValueDef.NumericFormatEnum.Float => AsFloat.ToString("0.00"),
+            ValueDef.NumericFormatEnum.SingleFloat => AsFloat.ToString("0.0#"),
+            ValueDef.NumericFormatEnum.Percent => AsFloat.ToString("0%"),
+            ValueDef.NumericFormatEnum.Integer => AsInt.ToString(),
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(valueDef.DisplayNumericFormat), valueDef.DisplayNumericFormat, null),
+        },
         TypeEnum.String => AsString,
         TypeEnum.Unset => throw new InvalidOperationException($"Cannot format value: {this}"),
-        _ => throw new ArgumentOutOfRangeException(nameof(ValueType)),
+        _ => throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, null),
     };
     if (valueDef?.Options == null) {
       return stringValue;

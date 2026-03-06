@@ -135,7 +135,7 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
     if (ruleRow.ParsedAction.Operands[0] is not ConstantValueExpr constantValue) {
       throw new InvalidOperationException("Constant value is expected");
     }
-    actionConstructor.ArgumentConstructor.Value = PrepareConstantValue(constantValue.ValueFn());
+    actionConstructor.ArgumentConstructor.SetScriptValue(constantValue.ValueFn());
   }
 
   static void PopulateCondition(RuleRow ruleRow, RuleConstructor ruleConstructor) {
@@ -152,13 +152,7 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
     if (binaryOperatorExpr.Right is not ConstantValueExpr constantValue) {
       throw new InvalidOperationException("Constant value is expected");
     }
-    conditionConstructor.ValueSelector.Value = PrepareConstantValue(constantValue.ValueFn());
-  }
-
-  static string PrepareConstantValue(ScriptValue value) {
-    return value.ValueType == ScriptValue.TypeEnum.Number
-        ? value.AsFloat.ToString("0.##")
-        : value.AsString;
+    conditionConstructor.ValueSelector.SetScriptValue(constantValue.ValueFn());
   }
 
   #endregion

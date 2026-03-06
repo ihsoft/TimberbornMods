@@ -100,7 +100,8 @@ sealed class DynamiteScriptableComponent : ScriptableComponentBase {
       Arguments = [
           new ValueDef {
               ValueType = ScriptValue.TypeEnum.Number,
-              ValueFormatter = x => x.AsInt.ToString(),
+              DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
+              DisplayNumericFormatRange = (1, 6),
               RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 1, max: 6),
           },
       ],

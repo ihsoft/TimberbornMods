@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
+using IgorZ.Automation.Settings;
 using IgorZ.TimberDev.UI;
 using UnityEngine;
 
@@ -17,16 +18,64 @@ sealed record ValueDef {
   public ScriptValue.TypeEnum ValueType { get; init; }
 
   /// <summary>
-  /// Optional formatting processor. The result string should only be used for presenting the value, it can be
-  /// non-parsable back to the value.
+  /// The UI representation of a numeric value type. It defines how the players will see and enter the value.
   /// </summary>
+  public enum NumericFormatEnum {
+    /// <summary>The default value. It's not expect to have it for a number definition.</summary>
+    /// <remarks>A numeric value definition with this value will result in a game crash.</remarks>
+    /// <seealso cref="ValueDef"/>
+    Unspecified,
+
+    /// <summary>An integer value. No fractional part allowed.</summary>
+    Integer,
+
+    /// <summary>A float value with 2 digits after the comma.</summary>
+    /// <remarks>If the number has more digits after the comme, the UI will block it.</remarks>
+    Float,
+
+    /// <summary>A float value with 1 digit after the comma.</summary>
+    /// <remarks>
+    /// For the formatters, the "1-digit rule" is only a suggestion. The constraint will only be checked when parsing
+    /// an input in UI.
+    /// </remarks>
+    SingleFloat,
+
+    /// <summary>Percent value. Doesn't allow digits after the comma.</summary>
+    /// <remarks>
+    /// Internally, the percentile type is stored as a normalized float. That is, value "0.01" means "1%". The
+    /// percentile type doesn't allow digits after the comma, because it would result in internal values with more than
+    /// 2 digits after the comma, and this will be beyond what <see cref="ScriptValue"/> can store (2-digit fixed
+    /// precision).
+    /// </remarks>
+    /// <seealso cref="ValueDef.DisplayNumericFormatRange"/>
+    Percent,
+  }
+
+  /// <summary>Defines how the numeric value should be presented in UI.</summary>
   /// <remarks>
-  /// If provided, then any other formatting option is disregarded and only the result from this formatter is used.
+  /// This type is used by the formatters for output and parses of the input. This type is not used in runtime, and it
+  /// doesn't affect expressions evaluation. It must be set if the value type is
+  /// <see cref="ScriptValue.TypeEnum.Number"/>.
   /// </remarks>
-  /// <returns>
-  /// The formatted value or <c>null</c>. In the latter case, the default formatting algorithm is resumed.
-  /// </returns>
-  public Func<ScriptValue, string> ValueFormatter { get; init; }
+  public NumericFormatEnum DisplayNumericFormat { get; init; }
+
+  /// <summary>Defines the range of the numeric value. The values are inclusive.</summary>
+  /// <summary>
+  /// <p>
+  /// It's used by the UI to show the range of the value and to validate the input. This range is not used in runtime,
+  /// and it doesn't affect expressions evaluation. Use <c>float.NaN</c> to effectively disable the range check for the
+  /// respected boundary.
+  /// </p>
+  /// <p>
+  /// The values are checked in the form as they are entered! E.g. if it's a percent value, then the range check is
+  /// performed for the value in percent, not for the normalized value. So, if you want to allow any percent value from
+  /// 0% to 100%, you should set the range as [0, 100], not [0, 1] (as it will be stored in <see cref="ScriptValue"/>).
+  /// </p>
+  /// <p>To disable range checking leave this field uninitialized (default).</p>
+  /// </summary>
+  /// <seealso cref="DisplayNumericFormat"/>
+  /// <seealso cref="ScriptValue.AsNumber"/>
+  public (float min, float max) DisplayNumericFormatRange { get; init; }
 
   /// <summary>Optional validating function for the argument value.</summary>
   /// <remarks>
@@ -36,9 +85,6 @@ sealed record ValueDef {
   /// <exception cref="ScriptError.RuntimeError">if value doesn't pass validation</exception>
   /// <seealso cref="ScriptEngineSettings.CheckArgumentValues"/>
   public Action<ScriptValue> RuntimeValueValidator { get; init; }
-
-  /// <summary>Optional hint text to show in UI for the argument.</summary>
-  public string ValueUiHint { get; init; }
 
   /// <summary>Optional validating function for the argument value <i>expression</i>.</summary>
   /// <remarks>

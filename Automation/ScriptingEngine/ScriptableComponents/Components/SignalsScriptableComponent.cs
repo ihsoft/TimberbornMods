@@ -150,6 +150,7 @@ sealed class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSing
           },
           new ValueDef {
               ValueType = ScriptValue.TypeEnum.Number,
+              DisplayNumericFormat = ValueDef.NumericFormatEnum.Float,
           },
       ],
   };

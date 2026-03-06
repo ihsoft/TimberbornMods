@@ -90,6 +90,8 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
       DisplayName = Loc.T(CollectableReadySignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
+          DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
+          DisplayNumericFormatRange = (0, float.NaN),
           RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
       },
   };

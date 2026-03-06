@@ -127,8 +127,8 @@ sealed class WorkplaceScriptableComponent : ScriptableComponentBase {
         DisplayName = Loc.T(AssignedWorkersSignalLocKey),
         Result = new ValueDef {
             ValueType = ScriptValue.TypeEnum.Number,
-            ValueFormatter = x => x.AsFloat.ToString("0"),
-            ValueUiHint = GetArgumentMinMaxValueHint(0, workplace.MaxWorkers),
+            DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
+            DisplayNumericFormatRange = (0, workplace.MaxWorkers),
             RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0, max: workplace.MaxWorkers),
         },
     };
@@ -152,8 +152,8 @@ sealed class WorkplaceScriptableComponent : ScriptableComponentBase {
         Arguments = [
             new ValueDef {
                 ValueType = ScriptValue.TypeEnum.Number,
-                ValueFormatter = x => x.AsFloat.ToString("0"),
-                ValueUiHint = GetArgumentMinMaxValueHint(1, workplace.MaxWorkers),
+                DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
+                DisplayNumericFormatRange = (0, workplace.MaxWorkers),
                 RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0, workplace.MaxWorkers),
             },
         ],

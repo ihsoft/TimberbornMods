@@ -143,6 +143,8 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
       DisplayName = Loc.T(SpotReadySignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
+          DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
+          DisplayNumericFormatRange = (0, float.NaN),
           RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
       },
   };

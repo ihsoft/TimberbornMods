@@ -174,6 +174,7 @@ IgorZ.Automation.Scripting.Editor.ActionMustBeAction,"Action must be the 'act' o
 IgorZ.Automation.Scripting.Editor.AddRuleFromScriptBtn,"Add script",
 IgorZ.Automation.Scripting.Editor.AddRuleViaConstructorBtn,"Create rule via constructor",
 IgorZ.Automation.Scripting.Editor.ArgumentMaxValueHint,"(max: {0})","A hint to show the maximum value of the argument"
+IgorZ.Automation.Scripting.Editor.ArgumentMinValueHint,"(min: {0})","A hint to show the minimum value of the argument"
 IgorZ.Automation.Scripting.Editor.ConditionLabel,"If",
 IgorZ.Automation.Scripting.Editor.ConditionMustBeBoolean,"Condition must be a boolean expression","A message to show when the condition is not a boolean expression"
 IgorZ.Automation.Scripting.Editor.ConditionMustHaveSignals,"Condition must contain at least one signal","A message to show when the condition does not have any signals"

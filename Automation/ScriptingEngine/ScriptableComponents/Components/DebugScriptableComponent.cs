@@ -101,7 +101,8 @@ sealed class DebugScriptableComponent : ScriptableComponentBase {
       DisplayName = Loc.T(TickerSignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
-          ValueUiHint = GetArgumentMaxValueHint(ReasonableTickQuantifierMax),
+          DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
+          DisplayNumericFormatRange = (0, float.NaN),
           RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min:0),
       },
   };
@@ -132,6 +133,7 @@ sealed class DebugScriptableComponent : ScriptableComponentBase {
       Arguments = [
           new ValueDef {
               ValueType = ScriptValue.TypeEnum.Number,
+              DisplayNumericFormat = ValueDef.NumericFormatEnum.Float,
           },
       ],
   };
@@ -167,8 +169,8 @@ sealed class DebugScriptableComponent : ScriptableComponentBase {
       fmtArgs[i] = arg.ValueType switch {
           ScriptValue.TypeEnum.String => arg.AsString,
           ScriptValue.TypeEnum.Number => arg.AsFloat,
-          ScriptValue.TypeEnum.Unset => throw new InvalidOperationException($"Unexpected Unset value type : {arg}"),
-          _ => throw new ArgumentOutOfRangeException(),
+          ScriptValue.TypeEnum.Unset => throw new InvalidOperationException($"Unexpected value type in the arg: {arg}"),
+          _ => throw new ArgumentOutOfRangeException(nameof(arg.ValueType), arg.ValueType, null),
       };
     }
     HostedDebugLog.Info(instance, "[Debug Log]: " + args[0].AsString, fmtArgs);

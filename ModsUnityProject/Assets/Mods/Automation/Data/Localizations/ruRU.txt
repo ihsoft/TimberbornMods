@@ -175,6 +175,7 @@ IgorZ.Automation.Scripting.Editor.ActionMustBeAction,"Действие долж�
 IgorZ.Automation.Scripting.Editor.AddRuleFromScriptBtn,"Добавить скрипт",
 IgorZ.Automation.Scripting.Editor.AddRuleViaConstructorBtn,"Создать правило через конструктор",
 IgorZ.Automation.Scripting.Editor.ArgumentMaxValueHint,"(макс: {0})","A hint to show the maximum value of the argument"
+IgorZ.Automation.Scripting.Editor.ArgumentMinValueHint,"(мин: {0})","A hint to show the minimum value of the argument"
 IgorZ.Automation.Scripting.Editor.ConditionLabel,"Если",
 IgorZ.Automation.Scripting.Editor.ConditionMustBeBoolean,"Условие должно быть логическим выражением","A message to show when the condition is not a boolean expression"
 IgorZ.Automation.Scripting.Editor.ConditionMustHaveSignals,"Условие должно включать хотя бы один сигнал","A message to show when the condition does not have any signals"

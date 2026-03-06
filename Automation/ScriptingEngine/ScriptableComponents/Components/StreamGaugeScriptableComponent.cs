@@ -79,7 +79,8 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
       DisplayName = Loc.T(DepthSignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
-          ValueFormatter = x => x.AsFloat.ToString("0.00"),
+          DisplayNumericFormat = ValueDef.NumericFormatEnum.Float,
+          DisplayNumericFormatRange = (0, float.NaN),
           RuntimeValueValidator = ValueDef.RangeCheckValidatorFloat(min: 0f),
       },
   };
@@ -90,8 +91,8 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
       DisplayName = Loc.T(ContaminationSignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
-          ValueFormatter = x => x.AsFloat.ToString("P0"),
-          ValueUiHint = GetArgumentMaxValueHint(1f),
+          DisplayNumericFormat = ValueDef.NumericFormatEnum.Percent,
+          DisplayNumericFormatRange = (0, 100),
           RuntimeValueValidator = ValueDef.RangeCheckValidatorFloat(min: 0f, max: 1f),
       },
   };
@@ -102,7 +103,8 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
       DisplayName = Loc.T(CurrentSignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
-          ValueFormatter = x => x.AsFloat.ToString("0.0"),
+          DisplayNumericFormat = ValueDef.NumericFormatEnum.SingleFloat,
+          DisplayNumericFormatRange = (0, float.NaN),
           RuntimeValueValidator = ValueDef.RangeCheckValidatorFloat(min: 0f),
       },
   };
