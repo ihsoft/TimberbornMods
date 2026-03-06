@@ -54,7 +54,7 @@ sealed class ScriptEngineSettings : BaseSettings<ScriptEngineSettings> {
 
   ScriptEngineSettings(
       ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry, ModRepository modRepository)
-      : base(settings, modSettingsOwnerRegistry, modRepository) { 
+      : base(settings, modSettingsOwnerRegistry, modRepository) {
     InstallSettingCallback(CheckArgumentValuesInternal, v => CheckArgumentValues = v);
     InstallSettingCallback(SignalExecutionStackSizeInternal, v => SignalExecutionStackSize = v);
   }
