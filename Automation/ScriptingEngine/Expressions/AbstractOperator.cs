@@ -53,22 +53,6 @@ abstract class AbstractOperator(IList<IExpression> operands) : IExpression {
     }
   }
 
-  protected static ConstantValueExpr VerifyConstantValueExpr(ValueDef valueDef, IValueExpr valueExpr) {
-    if (valueExpr is not ConstantValueExpr constantValueExpr) {
-      return null;
-    }
-    if (!ScriptEngineSettings.CheckArgumentValues) {
-      return constantValueExpr;
-    }
-    try {
-      valueDef.ValueValidator?.Invoke(valueExpr.ValueFn());
-    } catch (ScriptError e) {
-      // Report as parsing error since it is checked at parse time.
-      throw new ScriptError.ParsingError(e.Message);
-    }
-    return constantValueExpr;
-  }
-
   /// <summary>Returns a binary tree of expressions if there are more than 2 operands in the operator.</summary>
   /// <remarks>Use it to reduce multi-argument operators to binary operators.</remarks>
   /// <param name="reduceOperandsFn">
