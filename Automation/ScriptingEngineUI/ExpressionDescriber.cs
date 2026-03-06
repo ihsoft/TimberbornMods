@@ -67,7 +67,7 @@ sealed class ExpressionDescriber(ILoc Loc) {
         BinaryOperator.OpType.LessThanOrEqual => " \u2264 ",
         _ => throw new InvalidOperationException("Unknown operator: " + this),
     });
-    if (EntityPanelSettings.EvalValuesInConditions || IsConstantValueOperand(op.Right)) {
+    if (EntityPanelSettings.EvalValuesInConditions || op.Right.IsConstantValue()) {
       string rightValue;
       try {
         rightValue = op.Right.ValueFn().FormatValue(op.ResultValueDef);
@@ -116,7 +116,7 @@ sealed class ExpressionDescriber(ILoc Loc) {
   }
 
   string DescribeMathOperator(MathOperator op) {
-    if (IsConstantValueOperand(op)) {
+    if ((op as IValueExpr).IsConstantValue()) {
       return DescribeScriptValue(op.ValueFn());
     }
 
@@ -151,19 +151,11 @@ sealed class ExpressionDescriber(ILoc Loc) {
     return $"{leftValue} {opName} {rightValue}";
   }
 
-  static bool IsConstantValueOperand(IExpression operand) {
-    return operand switch {
-        ConstantValueExpr => true,
-        MathOperator mathOperator => mathOperator.Operands.All(IsConstantValueOperand),
-        _ => false,
-    };
-  }
-
   string DescribeActionOperator(ActionOperator op) {
     var args = new object[op.ActionDef.Arguments.Length];
     for (var i = 0; i < op.ActionDef.Arguments.Length; i++) {
       var operand = op.Operands[i] as IValueExpr;
-      if (EntityPanelSettings.EvalValuesInActionArguments || IsConstantValueOperand(operand)) {
+      if (EntityPanelSettings.EvalValuesInActionArguments || operand!.IsConstantValue()) {
         ScriptValue value;
         try {
           value = operand!.ValueFn();
