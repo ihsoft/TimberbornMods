@@ -163,7 +163,7 @@ sealed class ExpressionDescriber(ILoc Loc) {
     var args = new object[op.ActionDef.Arguments.Length];
     for (var i = 0; i < op.ActionDef.Arguments.Length; i++) {
       var operand = op.Operands[i] as IValueExpr;
-      if (EntityPanelSettings.EvalValuesInActionArguments || operand is ConstantValueExpr) {
+      if (EntityPanelSettings.EvalValuesInActionArguments || IsConstantValueOperand(operand)) {
         ScriptValue value;
         try {
           value = operand!.ValueFn();
