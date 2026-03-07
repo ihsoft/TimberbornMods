@@ -79,7 +79,7 @@ sealed class GetPropertyFunction : AbstractFunction, IValueExpr {
         (ValueFn, ValueType) = MakeCollectionCountGetter(propertyGetterInfo);
         break;
       default:
-        throw new ArgumentOutOfRangeException(nameof(funcName));
+        throw new InvalidOperationException($"Unexpected function: {funcName}");
     }
   }
 

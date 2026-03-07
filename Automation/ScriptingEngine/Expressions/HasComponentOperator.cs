@@ -46,7 +46,7 @@ class HasComponentOperator : BooleanOperator {
     Execute = opType switch {
         OpType.HasSignal => () => TrySignals(testStrings),
         OpType.HasAction => () => TryActions(testStrings),
-        _ => throw new ArgumentOutOfRangeException(nameof(opType), opType, null),
+        _ => throw new InvalidOperationException($"Unsupported operator type: {opType}"),
     };
   }
 

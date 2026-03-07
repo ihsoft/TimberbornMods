@@ -170,7 +170,7 @@ sealed class DebugScriptableComponent : ScriptableComponentBase {
           ScriptValue.TypeEnum.String => arg.AsString,
           ScriptValue.TypeEnum.Number => arg.AsFloat,
           ScriptValue.TypeEnum.Unset => throw new InvalidOperationException($"Unexpected value type in the arg: {arg}"),
-          _ => throw new ArgumentOutOfRangeException(nameof(arg.ValueType), arg.ValueType, null),
+          _ => throw new InvalidOperationException($"Unsupported value type: {arg.ValueType}"),
       };
     }
     HostedDebugLog.Info(instance, "[Debug Log]: " + args[0].AsString, fmtArgs);

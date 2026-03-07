@@ -95,9 +95,9 @@ sealed class ComparisonOperator : BooleanOperator {
             OpType.LessThanOrEqual => () => left.ValueFn().AsNumber <= right.ValueFn().AsNumber,
             OpType.GreaterThan => () => left.ValueFn().AsNumber > right.ValueFn().AsNumber,
             OpType.GreaterThanOrEqual => () => left.ValueFn().AsNumber >= right.ValueFn().AsNumber,
-            _ => throw new ArgumentOutOfRangeException(nameof(opType), opType, null),
+            _ => throw new InvalidOperationException($"Unknown comparison operator: {opType}"),
         },
-        _ => throw new ArgumentOutOfRangeException(nameof(ValueType), left.ValueType, null),
+        _ => throw new InvalidOperationException($"Unexpected operand type: {left.ValueType}"),
     };
     if (signalDef?.Result.RuntimeValueValidator == null || otherArgExpr.IsConstantValue()) {
       // If there is a signal, then we have value definition and can validate the constant argument.

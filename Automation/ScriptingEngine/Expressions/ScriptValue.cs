@@ -190,12 +190,11 @@ record struct ScriptValue : IComparable<ScriptValue> {
             ValueDef.NumericFormatEnum.Float => AsFloat.ToString("0.00"),
             ValueDef.NumericFormatEnum.Percent => AsFloat.ToString("0%"),
             ValueDef.NumericFormatEnum.Integer => AsInt.ToString(),
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(valueDef.DisplayNumericFormat), valueDef.DisplayNumericFormat, null),
+            _ => throw new InvalidOperationException($"Unknown numeric format: {valueDef.DisplayNumericFormat}"),
         },
         TypeEnum.String => AsString,
         TypeEnum.Unset => throw new InvalidOperationException($"Cannot format value: {this}"),
-        _ => throw new ArgumentOutOfRangeException(nameof(ValueType), ValueType, null),
+        _ => throw new InvalidOperationException($"Unknown ScriptValue type: {ValueType}"),
     };
     if (valueDef?.Options == null) {
       return stringValue;

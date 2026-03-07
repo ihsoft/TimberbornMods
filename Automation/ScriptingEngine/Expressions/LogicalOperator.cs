@@ -53,7 +53,7 @@ class LogicalOperator : BooleanOperator {
         OpType.And => () => boolOperands.All(x => x.Execute()),
         OpType.Or => () => boolOperands.Any(x => x.Execute()),
         OpType.Not => () => !boolOperands[0].Execute(), 
-        _ => throw new ArgumentOutOfRangeException(nameof(opType), opType, null),
+        _ => throw new InvalidOperationException($"Unsupported logical operator type: {opType}"),
     };
   }
 }
