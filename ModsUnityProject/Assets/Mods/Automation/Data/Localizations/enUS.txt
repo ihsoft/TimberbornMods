@@ -178,6 +178,10 @@ IgorZ.Automation.Scripting.Editor.ArgumentMinValueHint,"(min: {0})","A hint to s
 IgorZ.Automation.Scripting.Editor.ConditionLabel,"If",
 IgorZ.Automation.Scripting.Editor.ConditionMustBeBoolean,"Condition must be a boolean expression","A message to show when the condition is not a boolean expression"
 IgorZ.Automation.Scripting.Editor.ConditionMustHaveSignals,"Condition must contain at least one signal","A message to show when the condition does not have any signals"
+IgorZ.Automation.Scripting.Editor.ConstantTypeDecimals,"decimals","Name of the decimals constant type"
+IgorZ.Automation.Scripting.Editor.ConstantTypeString,"string","Name of the string constant type"
+IgorZ.Automation.Scripting.Editor.ConstantTypePercent,"percent","Name of the percent constant type"
+IgorZ.Automation.Scripting.Editor.ConstantTypeWholeNumber,"whole number","Name of the whole number constant type"
 IgorZ.Automation.Scripting.Editor.CopyRuleBtn,"Duplicate",
 IgorZ.Automation.Scripting.Editor.DeletedRule,"Rule removed","A message to show over the deleted rule"
 IgorZ.Automation.Scripting.Editor.DeleteRuleBtn,"Delete rule",
@@ -190,7 +194,6 @@ IgorZ.Automation.Scripting.Editor.ExportRulesBtn,"Export rules",
 IgorZ.Automation.Scripting.Editor.ImportRulesBtn,"Import rules",
 IgorZ.Automation.Scripting.Editor.InvertRuleBtn,"Invert",
 IgorZ.Automation.Scripting.Editor.MoreInfoBtn,"Read about scripting",
-IgorZ.Automation.Scripting.Editor.NumberConstantType,"number","Name of the number constant type"
 IgorZ.Automation.Scripting.Editor.PauseRuleBtn,"Disable rule",
 IgorZ.Automation.Scripting.Editor.PendingEditsNotification,"There are rules in the editing state. Complete them first.",
 IgorZ.Automation.Scripting.Editor.ReadMoreLink,"https://github.com/ihsoft/TimberbornMods/wiki/Automation-(scripting)","Link to the localized wiki page about scripting"
@@ -199,7 +202,6 @@ IgorZ.Automation.Scripting.Editor.ResumeRuleBtn,"Enable rule",
 IgorZ.Automation.Scripting.Editor.RulesWithErrorsNotification,"Some rules have errors! Fix them first.",
 IgorZ.Automation.Scripting.Editor.SaveRulesBtn,"Save and close",
 IgorZ.Automation.Scripting.Editor.SaveScriptBtn,"Save",
-IgorZ.Automation.Scripting.Editor.StringConstantType,"string","Name of the string constant type"
 IgorZ.Automation.Scripting.Editor.TemplateFamilyLabel,"Template group: {0}","Name of the template group (family) the rule belongs to"
 IgorZ.Automation.Scripting.Editor.TestScriptBtn,"Test",
 =,=,"Signals editor strings"

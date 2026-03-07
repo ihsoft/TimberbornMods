@@ -179,6 +179,10 @@ IgorZ.Automation.Scripting.Editor.ArgumentMinValueHint,"(мин: {0})","A hint t
 IgorZ.Automation.Scripting.Editor.ConditionLabel,"Если",
 IgorZ.Automation.Scripting.Editor.ConditionMustBeBoolean,"Условие должно быть логическим выражением","A message to show when the condition is not a boolean expression"
 IgorZ.Automation.Scripting.Editor.ConditionMustHaveSignals,"Условие должно включать хотя бы один сигнал","A message to show when the condition does not have any signals"
+IgorZ.Automation.Scripting.Editor.ConstantTypeDecimals,"дробное число","Name of the decimals constant type"
+IgorZ.Automation.Scripting.Editor.ConstantTypeString,"строка","Name of the string constant type"
+IgorZ.Automation.Scripting.Editor.ConstantTypePercent,"проценты","Name of the percent constant type"
+IgorZ.Automation.Scripting.Editor.ConstantTypeWholeNumber,"целое число","Name of the whole number constant type"
 IgorZ.Automation.Scripting.Editor.CopyRuleBtn,"Создать копию",
 IgorZ.Automation.Scripting.Editor.DeleteRuleBtn,"Удалить правило",
 IgorZ.Automation.Scripting.Editor.DeletedRule,"Правило удалено","A message to show over the deleted rule"
@@ -200,7 +204,6 @@ IgorZ.Automation.Scripting.Editor.ResumeRuleBtn,"Включить правило
 IgorZ.Automation.Scripting.Editor.RulesWithErrorsNotification,"В некоторых правилах есть ошибки. Исправьте их перед сохранением.",
 IgorZ.Automation.Scripting.Editor.SaveRulesBtn,"Сохранить и закрыть",
 IgorZ.Automation.Scripting.Editor.SaveScriptBtn,"Сохранить",
-IgorZ.Automation.Scripting.Editor.StringConstantType,"строка","Name of the string constant type"
 IgorZ.Automation.Scripting.Editor.TemplateFamilyLabel,"Группа шаблонов: {0}","Name of the template group (family) the rule belongs to"
 IgorZ.Automation.Scripting.Editor.TestScriptBtn,"Проверить",
 =,=,"Signals editor strings"

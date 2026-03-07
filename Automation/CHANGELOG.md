@@ -2,6 +2,7 @@
 * [Feature #128] New signal `Workplace.AssignedWorkers` to track the number of workers assigned to the workplace.
 * [Feature] New action `Workplace.SetPriority` to set the workplace priority.
 * [Feature] Big improvements to the rules UI consistency. Now, the numbers in the rule editor match the rule's description.
+* [Feature] Show the expected number format in the constructor: whole, decimals, percent. And verify the value.
 * [Feature] In the rules editor, give more verbose hints on the values of signals and action arguments.
 * [Feature] Fully refactor the runtime script value verification. Now, it's fast and reliable. Don't disable it (you can, via the settings)!
 * [Change] Update to game v1.0.11.

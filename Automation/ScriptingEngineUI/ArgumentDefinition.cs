@@ -11,8 +11,10 @@ namespace IgorZ.Automation.ScriptingEngineUI;
 
 sealed record ArgumentDefinition {
 
-  const string StringConstantTypeLocKey = "IgorZ.Automation.Scripting.Editor.StringConstantType";
-  const string NumberConstantTypeLocKey = "IgorZ.Automation.Scripting.Editor.NumberConstantType";
+  const string ConstantTypeStringLocKey = "IgorZ.Automation.Scripting.Editor.ConstantTypeString";
+  const string ConstantTypeWholeNumberLocKey = "IgorZ.Automation.Scripting.Editor.ConstantTypeWholeNumber";
+  const string ConstantTypeDecimalsLocKey = "IgorZ.Automation.Scripting.Editor.ConstantTypeDecimals";
+  const string ConstantTypePercentLocKey = "IgorZ.Automation.Scripting.Editor.ConstantTypePercent";
 
   /// <inheritdoc cref="ScriptingEngine.ScriptableComponents.ValueDef.ValueType"/>
   public ScriptValue.TypeEnum ValueType => ValueDef.ValueType;
@@ -29,10 +31,17 @@ sealed record ArgumentDefinition {
     if (valueDef.Options != null) {
       ValueOptions = valueDef.Options;
     } else {
-      ValueOptions = valueDef.ValueType == ScriptValue.TypeEnum.Number
-          ? [(ArgumentConstructor.InputTypeName, uiFactory.T(NumberConstantTypeLocKey))]
-          : [(ArgumentConstructor.InputTypeName, uiFactory.T(StringConstantTypeLocKey))];
+      var locValue = valueDef.ValueType switch {
+          ScriptValue.TypeEnum.String => uiFactory.T(ConstantTypeStringLocKey),
+          ScriptValue.TypeEnum.Number => valueDef.DisplayNumericFormat switch {
+              ValueDef.NumericFormatEnum.Integer => uiFactory.T(ConstantTypeWholeNumberLocKey),
+              ValueDef.NumericFormatEnum.Float => uiFactory.T(ConstantTypeDecimalsLocKey),
+              ValueDef.NumericFormatEnum.Percent => uiFactory.T(ConstantTypePercentLocKey),
+              _ => throw new InvalidOperationException($"Unsupported numeric format: {valueDef.DisplayNumericFormat}"),
+          },
+          _ => throw new InvalidOperationException($"Unsupported value type: {valueDef.ValueType}"),
+      };
+      ValueOptions = [(ArgumentConstructor.InputTypeName, locValue)];
     }
   }
 }
-
