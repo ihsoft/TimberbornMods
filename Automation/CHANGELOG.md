@@ -1,4 +1,4 @@
-# v3.5.0 (started on February 27th, 2026):
+# v3.5.0 (March 7th, 2026):
 * [Feature #128] New signal `Workplace.AssignedWorkers` to track the number of workers assigned to the workplace.
 * [Feature] New action `Workplace.SetPriority` to set the workplace priority.
 * [Feature] Big improvements to the rules UI consistency. Now, the numbers in the rule editor match the rule's description.
