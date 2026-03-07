@@ -186,10 +186,11 @@ record struct ScriptValue : IComparable<ScriptValue> {
   /// </param>
   public string FormatValue(ValueDef valueDef) {
     var stringValue = ValueType switch {
-        TypeEnum.Number => valueDef.DisplayNumericFormat switch {
+        TypeEnum.Number => valueDef?.DisplayNumericFormat switch {
             ValueDef.NumericFormatEnum.Float => AsFloat.ToString("0.00"),
             ValueDef.NumericFormatEnum.Percent => AsFloat.ToString("0%"),
             ValueDef.NumericFormatEnum.Integer => AsInt.ToString(),
+            null => AsFloat.ToString("0.##"),  // valeDef can be null.
             _ => throw new InvalidOperationException($"Unknown numeric format: {valueDef.DisplayNumericFormat}"),
         },
         TypeEnum.String => AsString,
