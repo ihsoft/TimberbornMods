@@ -188,7 +188,6 @@ record struct ScriptValue : IComparable<ScriptValue> {
     var stringValue = ValueType switch {
         TypeEnum.Number => valueDef.DisplayNumericFormat switch {
             ValueDef.NumericFormatEnum.Float => AsFloat.ToString("0.00"),
-            ValueDef.NumericFormatEnum.SingleFloat => AsFloat.ToString("0.0#"),
             ValueDef.NumericFormatEnum.Percent => AsFloat.ToString("0%"),
             ValueDef.NumericFormatEnum.Integer => AsInt.ToString(),
             _ => throw new ArgumentOutOfRangeException(

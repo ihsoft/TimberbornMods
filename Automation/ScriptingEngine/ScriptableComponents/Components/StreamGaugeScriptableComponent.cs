@@ -103,7 +103,7 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
       DisplayName = Loc.T(CurrentSignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
-          DisplayNumericFormat = ValueDef.NumericFormatEnum.SingleFloat,
+          DisplayNumericFormat = ValueDef.NumericFormatEnum.Float,
           DisplayNumericFormatRange = (0, float.NaN),
           RuntimeValueValidator = ValueDef.RangeCheckValidatorFloat(min: 0f),
       },

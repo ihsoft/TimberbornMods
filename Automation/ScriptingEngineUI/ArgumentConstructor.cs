@@ -35,7 +35,6 @@ sealed class ArgumentConstructor : BaseConstructor {
         ScriptValue.TypeEnum.Number => valueDef.DisplayNumericFormat switch {
             ValueDef.NumericFormatEnum.Percent => scriptValue.AsNumber.ToString(),
             ValueDef.NumericFormatEnum.Float => scriptValue.AsFloat.ToString("0.00"),
-            ValueDef.NumericFormatEnum.SingleFloat => scriptValue.AsFloat.ToString("0.0#"),
             ValueDef.NumericFormatEnum.Integer => scriptValue.AsInt.ToString(),
             _ => throw new InvalidOperationException($"Unsupported numeric format: {valueDef.DisplayNumericFormat}"),
         },
@@ -172,17 +171,13 @@ sealed class ArgumentConstructor : BaseConstructor {
     }
 
     // Float types. They differ by how many digits after the comma they can have (max is 2).
-    if (numericFormat is ValueDef.NumericFormatEnum.Float or ValueDef.NumericFormatEnum.SingleFloat) {
+    if (numericFormat is ValueDef.NumericFormatEnum.Float) {
       if (!float.TryParse(strValue, out var floatValue)) {
         error = $"Value must be an float: {strValue}";
         return ScriptValue.InvalidValue;
       }
-      if (numericFormat == ValueDef.NumericFormatEnum.Float && !IsGoodFullFloatValueRegex.IsMatch(strValue)) {
+      if (!IsGoodFullFloatValueRegex.IsMatch(strValue)) {
         error = $"Value must not have more than 2 digits after the comma: {strValue}";
-        return ScriptValue.InvalidValue;
-      }
-      if (numericFormat == ValueDef.NumericFormatEnum.SingleFloat && !IsGoodSingleFloatValueRegex.IsMatch(strValue)) {
-        error = $"Value must not have more than 1 digit after the comma: {strValue}";
         return ScriptValue.InvalidValue;
       }
       var range = valueDef.DisplayNumericFormatRange;
@@ -231,7 +226,6 @@ sealed class ArgumentConstructor : BaseConstructor {
   string FormatToArgPrecision(float value) {
     return _argumentDefinition.ValueDef.DisplayNumericFormat switch {
         ValueDef.NumericFormatEnum.Float => value.ToString("0.00"),
-        ValueDef.NumericFormatEnum.SingleFloat => value.ToString("0.0"),
         _ => value.ToString(CultureInfo.InvariantCulture),
     };
   }

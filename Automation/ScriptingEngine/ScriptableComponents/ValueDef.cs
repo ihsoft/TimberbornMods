@@ -33,13 +33,6 @@ sealed record ValueDef {
     /// <remarks>If the number has more digits after the comme, the UI will block it.</remarks>
     Float,
 
-    /// <summary>A float value with 1 digit after the comma.</summary>
-    /// <remarks>
-    /// For the formatters, the "1-digit rule" is only a suggestion. The constraint will only be checked when parsing
-    /// an input in UI.
-    /// </remarks>
-    SingleFloat,
-
     /// <summary>Percent value. Doesn't allow digits after the comma.</summary>
     /// <remarks>
     /// Internally, the percentile type is stored as a normalized float. That is, value "0.01" means "1%". The
