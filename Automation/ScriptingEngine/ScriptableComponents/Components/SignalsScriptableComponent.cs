@@ -132,6 +132,7 @@ sealed class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSing
   SignalDef GetSignalDef => _seasonSignalDef ??= new SignalDef {
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
+          DisplayNumericFormat = ValueDef.NumericFormatEnum.Float,
       },
   };
   SignalDef _seasonSignalDef;
