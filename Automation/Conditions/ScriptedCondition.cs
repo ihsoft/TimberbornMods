@@ -143,7 +143,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
 
   /// <summary>Script code for expression to check.</summary>
   /// <remarks>
-  /// It must be a boolean operator. See <see cref="BoolOperator"/> for the list of conditions. Example of a
+  /// It must be a boolean operator. See <see cref="BooleanOperator"/> for the list of conditions. Example of a
   /// condition: "(and (eq (sig Weather.Season) 'DroughtWeather') (gt Floodgate.Height 0.5))".
   /// </remarks>
   // ReSharper disable once MemberCanBePrivate.Global
@@ -151,7 +151,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
 
   /// <summary>Script code for precondition to check.</summary>
   /// <remarks>
-  /// It must be a boolean operator. See <see cref="BoolOperator"/> for the list of conditions. If the condition
+  /// It must be a boolean operator. See <see cref="BooleanOperator"/> for the list of conditions. If the condition
   /// evaluates to "false", then <see cref="Expression"/> cannot be applied to the selected entity. Note that any
   /// parsing errors in the precondition will be silently ignored.
   /// </remarks>
@@ -215,10 +215,10 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   #region Implementation
 
   ParsingResult _parsingResult;
-  BoolOperator _parsedExpression;
+  BooleanOperator _parsedExpression;
   List<SignalOperator> _registeredSignals;
 
-  static BoolOperator ParseAndValidate(
+  static BooleanOperator ParseAndValidate(
       string expression, AutomationBehavior behavior, out ParsingResult parsingResult, bool checkOnly = false) {
     var parserFactory = StaticBindings.DependencyContainer.GetInstance<ParserFactory>();
     var conditionOperator = parserFactory.ParseCondition(
@@ -259,7 +259,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
       }
       return false;
     }
-    if (result.ParsedExpression is not BoolOperator boolOperatorExpr) {
+    if (result.ParsedExpression is not BooleanOperator boolOperatorExpr) {
       HostedDebugLog.Error(behavior, "Precondition is not a boolean operator: {0}", result.ParsedExpression);
       return false;
     }

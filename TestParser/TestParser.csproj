@@ -67,8 +67,8 @@
       <Compile Include="..\Automation\ScriptingEngine\Expressions\ComparisonOperator.cs">
         <Link>Import\ScriptingEngine\Expressions\ComparisonOperator.cs</Link>
       </Compile>
-      <Compile Include="..\Automation\ScriptingEngine\Expressions\BoolOperator.cs">
-        <Link>Import\ScriptingEngine\Expressions\BoolOperator.cs</Link>
+      <Compile Include="..\Automation\ScriptingEngine\Expressions\BooleanOperator.cs">
+        <Link>Import\ScriptingEngine\Expressions\BooleanOperator.cs</Link>
       </Compile>
       <Compile Include="..\Automation\ScriptingEngine\Expressions\ConcatOperator.cs">
         <Link>Import\ScriptingEngine\Expressions\ConcatOperator.cs</Link>

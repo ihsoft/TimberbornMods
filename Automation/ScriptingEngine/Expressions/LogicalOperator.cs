@@ -9,7 +9,7 @@ using IgorZ.Automation.ScriptingEngine.Core;
 
 namespace IgorZ.Automation.ScriptingEngine.Expressions;
 
-class LogicalOperator : BoolOperator {
+class LogicalOperator : BooleanOperator {
 
   public enum OpType {
     And,
@@ -41,10 +41,10 @@ class LogicalOperator : BoolOperator {
   LogicalOperator(OpType opType, IList<IExpression> operands, int minArgs, int maxArgs) : base(operands) {
     OperatorType = opType;
     AssertNumberOfOperandsRange(minArgs, maxArgs);
-    var boolOperands = new List<BoolOperator>();
+    var boolOperands = new List<BooleanOperator>();
     for (var i = 0; i < operands.Count; i++) {
       var op = Operands[i];
-      if (op is not BoolOperator result) {
+      if (op is not BooleanOperator result) {
         throw new ScriptError.ParsingError($"Operand #{i + 1} must be a boolean value, found: {op}");
       }
       boolOperands.Add(result);

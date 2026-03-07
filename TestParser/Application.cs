@@ -255,7 +255,7 @@ public class Application {
   }
 
   bool TryBooleanOperator(IExpression expr, List<string> reports) {
-    if (expr is not BoolOperator boolOperator) {
+    if (expr is not BooleanOperator boolOperator) {
       return true;
     }
     var res = true;

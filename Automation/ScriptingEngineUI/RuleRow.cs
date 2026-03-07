@@ -42,7 +42,7 @@ sealed class RuleRow {
 
   public readonly VisualElement Root;
 
-  public BoolOperator ParsedCondition { get; private set; }
+  public BooleanOperator ParsedCondition { get; private set; }
   public string ConditionExpression {
     get => _conditionExpression;
     set {
@@ -371,7 +371,7 @@ sealed class RuleRow {
     }
     try {
       var description = _expressionDescriber.DescribeExpression(expression);
-      if (IsEnabled && expression is BoolOperator boolOperator && boolOperator.Execute()) {
+      if (IsEnabled && expression is BooleanOperator boolOperator && boolOperator.Execute()) {
         return CommonFormats.HighlightGreen(description);
       }
       return CommonFormats.HighlightYellow(description);

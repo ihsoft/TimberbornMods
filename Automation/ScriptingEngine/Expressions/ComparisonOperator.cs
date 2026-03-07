@@ -11,7 +11,7 @@ using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.Expressions;
 
-sealed class ComparisonOperator : BoolOperator {
+sealed class ComparisonOperator : BooleanOperator {
 
   public enum OpType {
     Equal,

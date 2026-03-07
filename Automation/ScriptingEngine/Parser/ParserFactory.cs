@@ -67,13 +67,13 @@ class ParserFactory {
   /// </param>
   /// <seealso cref="ParseExpression"/>
   /// <seealso cref="ScriptError.LocParsingError"/>
-  public BoolOperator ParseCondition(string expression, AutomationBehavior behavior, out ParsingResult result,
+  public BooleanOperator ParseCondition(string expression, AutomationBehavior behavior, out ParsingResult result,
                                      ParserBase preferredParser = null) {
     result = ParseExpression(expression, behavior, preferredParser: preferredParser);
     if (result.ParsedExpression == null) {
       return null;
     }
-    if (result.ParsedExpression is not BoolOperator boolOperator) {
+    if (result.ParsedExpression is not BooleanOperator boolOperator) {
       result = new ParsingResult {
           LastScriptError = new ScriptError.LocParsingError(ConditionMustBeBoolLocKey, "Not a boolean expression"),
       };

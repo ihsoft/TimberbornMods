@@ -9,7 +9,7 @@ using IgorZ.Automation.ScriptingEngine.Core;
 
 namespace IgorZ.Automation.ScriptingEngine.Expressions;
 
-class HasComponentOperator : BoolOperator {
+class HasComponentOperator : BooleanOperator {
 
   public enum OpType {
     HasSignal,

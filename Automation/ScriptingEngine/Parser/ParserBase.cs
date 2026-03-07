@@ -43,7 +43,7 @@ abstract class ParserBase {
   /// <remarks>
   /// Not simply negates the result, but rebuilds the expression so that it returns the inversed result.
   /// </remarks>
-  public BoolOperator InvertBooleanExpression(BoolOperator booleanOperator, AutomationBehavior scriptHost) {
+  public BooleanOperator InvertBooleanExpression(BooleanOperator booleanOperator, AutomationBehavior scriptHost) {
     CurrentContext = new ExpressionContext { ScriptHost = scriptHost };
     try {
       return InvertBooleanExpressionInternal(booleanOperator);
@@ -122,12 +122,12 @@ abstract class ParserBase {
     };
   }
 
-  BoolOperator InvertBooleanExpressionInternal(BoolOperator booleanOperator) {
+  BooleanOperator InvertBooleanExpressionInternal(BooleanOperator booleanOperator) {
     if (booleanOperator is LogicalOperator logicalOperator) {
       if (logicalOperator.OperatorType == LogicalOperator.OpType.Not) {
-        return logicalOperator.Operands[0] as BoolOperator;
+        return logicalOperator.Operands[0] as BooleanOperator;
       }
-      var invertedOperands = logicalOperator.Operands.Cast<BoolOperator>().Select(InvertBooleanExpressionInternal)
+      var invertedOperands = logicalOperator.Operands.Cast<BooleanOperator>().Select(InvertBooleanExpressionInternal)
           .ToArray<IExpression>();
       return logicalOperator.OperatorType == LogicalOperator.OpType.And
           ? LogicalOperator.CreateOr(invertedOperands)
