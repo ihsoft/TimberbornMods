@@ -11,8 +11,7 @@ using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.Expressions;
 
-//FIXME: ComparisonOperator
-sealed class BinaryOperator : BoolOperator {
+sealed class ComparisonOperator : BoolOperator {
 
   public enum OpType {
     Equal,
@@ -28,17 +27,17 @@ sealed class BinaryOperator : BoolOperator {
   public IValueExpr Right => (IValueExpr)Operands[1];
   public readonly ValueDef ResultValueDef;
 
-  public static BinaryOperator CreateEq(ExpressionContext context, IList<IExpression> operands) =>
+  public static ComparisonOperator CreateEq(ExpressionContext context, IList<IExpression> operands) =>
       new(OpType.Equal, context, operands);
-  public static BinaryOperator CreateNe(ExpressionContext context, IList<IExpression> operands) =>
+  public static ComparisonOperator CreateNe(ExpressionContext context, IList<IExpression> operands) =>
       new(OpType.NotEqual, context, operands);
-  public static BinaryOperator CreateLt(ExpressionContext context, IList<IExpression> operands) =>
+  public static ComparisonOperator CreateLt(ExpressionContext context, IList<IExpression> operands) =>
       new(OpType.LessThan, context, operands);
-  public static BinaryOperator CreateLe(ExpressionContext context, IList<IExpression> operands) =>
+  public static ComparisonOperator CreateLe(ExpressionContext context, IList<IExpression> operands) =>
       new(OpType.LessThanOrEqual, context, operands);
-  public static BinaryOperator CreateGt(ExpressionContext context, IList<IExpression> operands) =>
+  public static ComparisonOperator CreateGt(ExpressionContext context, IList<IExpression> operands) =>
       new(OpType.GreaterThan, context, operands);
-  public static BinaryOperator CreateGe(ExpressionContext context, IList<IExpression> operands) =>
+  public static ComparisonOperator CreateGe(ExpressionContext context, IList<IExpression> operands) =>
       new(OpType.GreaterThanOrEqual, context, operands);
 
   /// <inheritdoc/>
@@ -46,7 +45,7 @@ sealed class BinaryOperator : BoolOperator {
     return $"{GetType().Name}({OperatorType})";
   }
 
-  BinaryOperator(OpType opType, ExpressionContext context, IList<IExpression> operands) : base(operands) {
+  ComparisonOperator(OpType opType, ExpressionContext context, IList<IExpression> operands) : base(operands) {
     OperatorType = opType;
     AssertNumberOfOperandsExact(2);
     if (Operands[0] is not IValueExpr left) {
@@ -71,7 +70,7 @@ sealed class BinaryOperator : BoolOperator {
       signalDef.Result.ArgumentValidator?.Invoke(otherArgExpr);
       if (otherArgExpr is ConstantValueExpr constantValueExpr) {
         if (constantValueExpr.ValidateAndMaybeCorrect(ResultValueDef, out var newValueExpr)) {
-          DebugEx.Warning("BinaryOperator: Replacing constant value '{0}' with '{1}' for signal {2}",
+          DebugEx.Warning("ComparisonOperator: Replacing constant value '{0}' with '{1}' for signal {2}",
                           constantValueExpr, newValueExpr, signalDef.ScriptName);
           if (Operands[0] == otherArgExpr) {
             Operands[0] = newValueExpr;

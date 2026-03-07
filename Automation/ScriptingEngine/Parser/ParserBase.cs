@@ -104,8 +104,8 @@ abstract class ParserBase {
   string PreprocessorMatcher(Match match) {
     var expression = match.Groups[1].Value;
     var parsedExpression = ProcessString(expression);
-    if (parsedExpression is BinaryOperator binaryOperatorExpr) {
-      if (!binaryOperatorExpr.Execute()) {
+    if (parsedExpression is ComparisonOperator comparisonOperator) {
+      if (!comparisonOperator.Execute()) {
         throw new ScriptError.BadStateError(
             CurrentContext.ScriptHost, "Preprocessor expression is not true: " + expression);
       }
@@ -133,15 +133,21 @@ abstract class ParserBase {
           ? LogicalOperator.CreateOr(invertedOperands)
           : LogicalOperator.CreateAnd(invertedOperands);
     }
-    if (booleanOperator is BinaryOperator binaryOperator) {
-      return binaryOperator.OperatorType switch {
-          BinaryOperator.OpType.Equal => BinaryOperator.CreateNe(CurrentContext, binaryOperator.Operands),
-          BinaryOperator.OpType.NotEqual => BinaryOperator.CreateEq(CurrentContext, binaryOperator.Operands),
-          BinaryOperator.OpType.GreaterThan => BinaryOperator.CreateLe(CurrentContext, binaryOperator.Operands),
-          BinaryOperator.OpType.GreaterThanOrEqual => BinaryOperator.CreateLt(CurrentContext, binaryOperator.Operands),
-          BinaryOperator.OpType.LessThan => BinaryOperator.CreateGe(CurrentContext, binaryOperator.Operands),
-          BinaryOperator.OpType.LessThanOrEqual => BinaryOperator.CreateGt(CurrentContext, binaryOperator.Operands),
-          _ => throw new InvalidOperationException($"Unexpected binary operator {binaryOperator}"),
+    if (booleanOperator is ComparisonOperator comparisonOperator) {
+      return comparisonOperator.OperatorType switch {
+          ComparisonOperator.OpType.Equal =>
+              ComparisonOperator.CreateNe(CurrentContext, comparisonOperator.Operands),
+          ComparisonOperator.OpType.NotEqual =>
+              ComparisonOperator.CreateEq(CurrentContext, comparisonOperator.Operands),
+          ComparisonOperator.OpType.GreaterThan =>
+              ComparisonOperator.CreateLe(CurrentContext, comparisonOperator.Operands),
+          ComparisonOperator.OpType.GreaterThanOrEqual =>
+              ComparisonOperator.CreateLt(CurrentContext, comparisonOperator.Operands),
+          ComparisonOperator.OpType.LessThan =>
+              ComparisonOperator.CreateGe(CurrentContext, comparisonOperator.Operands),
+          ComparisonOperator.OpType.LessThanOrEqual =>
+              ComparisonOperator.CreateGt(CurrentContext, comparisonOperator.Operands),
+          _ => throw new InvalidOperationException($"Unexpected comparison operator {comparisonOperator}"),
       };
     }
     throw new InvalidOperationException($"Unsupported boolean operator: {booleanOperator}");

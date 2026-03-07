@@ -100,12 +100,12 @@ class PythonSyntaxParser : ParserBase {
       left = opName.Value switch {
           OrOperator => LogicalOperator.CreateOr(CollapseLogicalOperators(LogicalOperator.OpType.Or, operands)),
           AndOperator => LogicalOperator.CreateAnd(CollapseLogicalOperators(LogicalOperator.OpType.And, operands)),
-          EqOperator => BinaryOperator.CreateEq(CurrentContext, operands),
-          NeOperator => BinaryOperator.CreateNe(CurrentContext, operands),
-          LtOperator => BinaryOperator.CreateLt(CurrentContext, operands),
-          LeOperator => BinaryOperator.CreateLe(CurrentContext, operands),
-          GtOperator => BinaryOperator.CreateGt(CurrentContext, operands),
-          GeOperator => BinaryOperator.CreateGe(CurrentContext, operands),
+          EqOperator => ComparisonOperator.CreateEq(CurrentContext, operands),
+          NeOperator => ComparisonOperator.CreateNe(CurrentContext, operands),
+          LtOperator => ComparisonOperator.CreateLt(CurrentContext, operands),
+          LeOperator => ComparisonOperator.CreateLe(CurrentContext, operands),
+          GtOperator => ComparisonOperator.CreateGt(CurrentContext, operands),
+          GeOperator => ComparisonOperator.CreateGe(CurrentContext, operands),
           AddOperator => MathOperator.CreateAdd(CollapseMathOperators(operands)),
           SubOperator => MathOperator.CreateSubtract(operands),
           DivOperator => MathOperator.CreateDivide(operands),
@@ -320,14 +320,14 @@ class PythonSyntaxParser : ParserBase {
     // Binary operators: a + b
     var operands = expression.GetReducedOperands();
     var opName = expression switch {
-        BinaryOperator binaryOperator => binaryOperator.OperatorType switch {
-            BinaryOperator.OpType.Equal => EqOperator,
-            BinaryOperator.OpType.NotEqual => NeOperator,
-            BinaryOperator.OpType.LessThan => LtOperator,
-            BinaryOperator.OpType.LessThanOrEqual => LeOperator,
-            BinaryOperator.OpType.GreaterThan => GtOperator,
-            BinaryOperator.OpType.GreaterThanOrEqual => GeOperator,
-            _ => throw new InvalidOperationException($"Unsupported operator: {binaryOperator.OperatorType}"),
+        ComparisonOperator comparisonOperator => comparisonOperator.OperatorType switch {
+            ComparisonOperator.OpType.Equal => EqOperator,
+            ComparisonOperator.OpType.NotEqual => NeOperator,
+            ComparisonOperator.OpType.LessThan => LtOperator,
+            ComparisonOperator.OpType.LessThanOrEqual => LeOperator,
+            ComparisonOperator.OpType.GreaterThan => GtOperator,
+            ComparisonOperator.OpType.GreaterThanOrEqual => GeOperator,
+            _ => throw new InvalidOperationException($"Unsupported operator: {comparisonOperator.OperatorType}"),
         },
         MathOperator mathOperator => mathOperator.OperatorType switch {
             MathOperator.OpType.Add => AddOperator,

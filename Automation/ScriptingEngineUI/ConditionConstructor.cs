@@ -48,17 +48,17 @@ class ConditionConstructor : BaseConstructor {
   #region Implementation
 
   static readonly DropdownItem<string>[] StringOperators = [
-      new() { Value = LispSyntaxParser.ComparisonOperators[BinaryOperator.OpType.Equal], Text = "=" },
-      new() { Value = LispSyntaxParser.ComparisonOperators[BinaryOperator.OpType.NotEqual], Text = "\u2260" },
+      new() { Value = LispSyntaxParser.ComparisonOperators[ComparisonOperator.OpType.Equal], Text = "=" },
+      new() { Value = LispSyntaxParser.ComparisonOperators[ComparisonOperator.OpType.NotEqual], Text = "\u2260" },
   ];
 
   static readonly DropdownItem<string>[] NumberOperators = [
-      new() { Value = LispSyntaxParser.ComparisonOperators[BinaryOperator.OpType.Equal], Text = "=" },
-      new() { Value = LispSyntaxParser.ComparisonOperators[BinaryOperator.OpType.NotEqual], Text = "\u2260" },
-      new() { Value = LispSyntaxParser.ComparisonOperators[BinaryOperator.OpType.GreaterThan], Text = ">" },
-      new() { Value = LispSyntaxParser.ComparisonOperators[BinaryOperator.OpType.LessThan], Text = "<" },
-      new() { Value = LispSyntaxParser.ComparisonOperators[BinaryOperator.OpType.GreaterThanOrEqual], Text = "\u2265" },
-      new() { Value = LispSyntaxParser.ComparisonOperators[BinaryOperator.OpType.LessThanOrEqual], Text = "\u2264" },
+      new() { Value = LispSyntaxParser.ComparisonOperators[ComparisonOperator.OpType.Equal], Text = "=" },
+      new() { Value = LispSyntaxParser.ComparisonOperators[ComparisonOperator.OpType.NotEqual], Text = "\u2260" },
+      new() { Value = LispSyntaxParser.ComparisonOperators[ComparisonOperator.OpType.GreaterThan], Text = ">" },
+      new() { Value = LispSyntaxParser.ComparisonOperators[ComparisonOperator.OpType.LessThan], Text = "<" },
+      new() { Value = LispSyntaxParser.ComparisonOperators[ComparisonOperator.OpType.GreaterThanOrEqual], Text = "\u2265" },
+      new() { Value = LispSyntaxParser.ComparisonOperators[ComparisonOperator.OpType.LessThanOrEqual], Text = "\u2264" },
   ];
 
   ConditionDefinition _selectedDefinition;

@@ -197,8 +197,8 @@ class RulesUIHelper {
     if (action is not { ActionName: SignalsScriptableComponent.SetActionName }
         || action.Operands[0] is not ConstantValueExpr { ValueType: ScriptValue.TypeEnum.String } actionExpr
         || action.Operands[1] is not SignalOperator actionSignalOperator
-        || condition is not BinaryOperator {
-            OperatorType: BinaryOperator.OpType.Equal,
+        || condition is not ComparisonOperator {
+            OperatorType: ComparisonOperator.OpType.Equal,
             Left: SignalOperator leftSignalOperator,
             Right: SignalOperator rightSignalOperator,
         }

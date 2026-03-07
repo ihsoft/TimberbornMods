@@ -32,7 +32,7 @@ sealed class ExpressionDescriber(ILoc Loc) {
     return expression switch {
         AbstractFunction abstractFunction => DescribeFunction(abstractFunction),
         ActionOperator actionOperator => DescribeActionOperator(actionOperator),
-        BinaryOperator binaryOperator => DescribeComparisonOperator(binaryOperator),
+        ComparisonOperator comparisonOperator => DescribeComparisonOperator(comparisonOperator),
         ConcatOperator concatOperator => concatOperator.ValueFn().AsString,
         ConstantValueExpr constantValueExpr => DescribeScriptValue(constantValueExpr.ValueFn()),
         LogicalOperator logicalOperator => DescribeLogicalOperator(logicalOperator),
@@ -50,21 +50,21 @@ sealed class ExpressionDescriber(ILoc Loc) {
     };
   }
 
-  string DescribeComparisonOperator(BinaryOperator op) {
+  string DescribeComparisonOperator(ComparisonOperator op) {
     // Special case: check for if "signal changed" binding (signal equals to itself).
     if (op.Left is SignalOperator leftSignal && op.Right is SignalOperator rightSignal
-        && leftSignal.SignalName == rightSignal.SignalName && op.OperatorType == BinaryOperator.OpType.Equal) {
+        && leftSignal.SignalName == rightSignal.SignalName && op.OperatorType == ComparisonOperator.OpType.Equal) {
       return DescribeExpressionInternal(leftSignal);
     }
     var sb = new StringBuilder();
     sb.Append(DescribeLeft(op.Left, op));
     sb.Append(op.OperatorType switch {
-        BinaryOperator.OpType.Equal => " = ",
-        BinaryOperator.OpType.NotEqual => " \u2260 ",
-        BinaryOperator.OpType.GreaterThan => " > ",
-        BinaryOperator.OpType.LessThan => " < ",
-        BinaryOperator.OpType.GreaterThanOrEqual => " \u2265 ",
-        BinaryOperator.OpType.LessThanOrEqual => " \u2264 ",
+        ComparisonOperator.OpType.Equal => " = ",
+        ComparisonOperator.OpType.NotEqual => " \u2260 ",
+        ComparisonOperator.OpType.GreaterThan => " > ",
+        ComparisonOperator.OpType.LessThan => " < ",
+        ComparisonOperator.OpType.GreaterThanOrEqual => " \u2265 ",
+        ComparisonOperator.OpType.LessThanOrEqual => " \u2264 ",
         _ => throw new InvalidOperationException("Unknown operator: " + this),
     });
     if (EntityPanelSettings.EvalValuesInConditions || op.Right.IsConstantValue()) {

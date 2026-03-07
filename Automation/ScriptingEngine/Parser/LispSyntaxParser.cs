@@ -33,13 +33,13 @@ sealed class LispSyntaxParser : ParserBase {
   #region API
 
   /// <summary>Comparison operators to Lisp-syntax keyword map.</summary>
-  public static readonly Dictionary<BinaryOperator.OpType, string> ComparisonOperators = new() {
-      { BinaryOperator.OpType.Equal, EqOperator },
-      { BinaryOperator.OpType.NotEqual, NeOperator },
-      { BinaryOperator.OpType.GreaterThan, GtOperator },
-      { BinaryOperator.OpType.GreaterThanOrEqual, GeOperator },
-      { BinaryOperator.OpType.LessThan, LtOperator },
-      { BinaryOperator.OpType.LessThanOrEqual, LeOperator },
+  public static readonly Dictionary<ComparisonOperator.OpType, string> ComparisonOperators = new() {
+      { ComparisonOperator.OpType.Equal, EqOperator },
+      { ComparisonOperator.OpType.NotEqual, NeOperator },
+      { ComparisonOperator.OpType.GreaterThan, GtOperator },
+      { ComparisonOperator.OpType.GreaterThanOrEqual, GeOperator },
+      { ComparisonOperator.OpType.LessThan, LtOperator },
+      { ComparisonOperator.OpType.LessThanOrEqual, LeOperator },
   };
 
   /// <inheritdoc/>
@@ -152,12 +152,12 @@ sealed class LispSyntaxParser : ParserBase {
     return op.Value switch {
         HasSignalFunc => HasComponentOperator.CreateHasSignal(CurrentContext, operands),
         HasActionFunc => HasComponentOperator.CreateHasAction(CurrentContext, operands),
-        EqOperator => BinaryOperator.CreateEq(CurrentContext, operands),
-        NeOperator => BinaryOperator.CreateNe(CurrentContext, operands),
-        LtOperator => BinaryOperator.CreateLt(CurrentContext, operands),
-        LeOperator => BinaryOperator.CreateLe(CurrentContext, operands),
-        GtOperator => BinaryOperator.CreateGt(CurrentContext, operands),
-        GeOperator => BinaryOperator.CreateGe(CurrentContext, operands),
+        EqOperator => ComparisonOperator.CreateEq(CurrentContext, operands),
+        NeOperator => ComparisonOperator.CreateNe(CurrentContext, operands),
+        LtOperator => ComparisonOperator.CreateLt(CurrentContext, operands),
+        LeOperator => ComparisonOperator.CreateLe(CurrentContext, operands),
+        GtOperator => ComparisonOperator.CreateGt(CurrentContext, operands),
+        GeOperator => ComparisonOperator.CreateGe(CurrentContext, operands),
         AndOperator => LogicalOperator.CreateAnd(operands),
         OrOperator => LogicalOperator.CreateOr(operands),
         NotOperator => LogicalOperator.CreateNot(operands[0]),
@@ -227,14 +227,14 @@ sealed class LispSyntaxParser : ParserBase {
             HasComponentOperator.OpType.HasAction => HasActionFunc,
             _ => throw new InvalidOperationException($"Unsupported operator: {hasComponentOperator}"),
         },
-        BinaryOperator binaryOperator => binaryOperator.OperatorType switch {
-            BinaryOperator.OpType.Equal => EqOperator,
-            BinaryOperator.OpType.NotEqual => NeOperator,
-            BinaryOperator.OpType.GreaterThan => GtOperator,
-            BinaryOperator.OpType.GreaterThanOrEqual => GeOperator,
-            BinaryOperator.OpType.LessThan => LtOperator,
-            BinaryOperator.OpType.LessThanOrEqual => LeOperator,
-            _ => throw new InvalidOperationException($"Unsupported operator: {binaryOperator}"),
+        ComparisonOperator comparisonOperator => comparisonOperator.OperatorType switch {
+            ComparisonOperator.OpType.Equal => EqOperator,
+            ComparisonOperator.OpType.NotEqual => NeOperator,
+            ComparisonOperator.OpType.GreaterThan => GtOperator,
+            ComparisonOperator.OpType.GreaterThanOrEqual => GeOperator,
+            ComparisonOperator.OpType.LessThan => LtOperator,
+            ComparisonOperator.OpType.LessThanOrEqual => LeOperator,
+            _ => throw new InvalidOperationException($"Unsupported operator: {comparisonOperator}"),
         },
         LogicalOperator logicalOperator => logicalOperator.OperatorType switch {
             LogicalOperator.OpType.And => AndOperator,

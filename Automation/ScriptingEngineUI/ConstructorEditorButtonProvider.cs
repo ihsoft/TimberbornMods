@@ -59,7 +59,7 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
     if (ruleRow.ParsedCondition == null || action == null) {
       return false;
     }
-    if (ruleRow.ParsedCondition is not BinaryOperator condition) {
+    if (ruleRow.ParsedCondition is not ComparisonOperator condition) {
       return false;
     }
     if (condition.Left is not SignalOperator signal || condition.Right is not ConstantValueExpr) {
@@ -143,13 +143,13 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
       return;
     }
     var conditionConstructor = ruleConstructor.ConditionConstructor;
-    if (ruleRow.ParsedCondition is not BinaryOperator binaryOperatorExpr) {
+    if (ruleRow.ParsedCondition is not ComparisonOperator comparisonOperator) {
       throw new InvalidOperationException("Binary operator is expected, but found: " + ruleRow.ParsedCondition);
     }
-    conditionConstructor.SignalSelector.SelectedValue = (binaryOperatorExpr.Left as SignalOperator)!.SignalName;
+    conditionConstructor.SignalSelector.SelectedValue = (comparisonOperator.Left as SignalOperator)!.SignalName;
     conditionConstructor.OperatorSelector.SelectedValue =
-        LispSyntaxParser.ComparisonOperators[binaryOperatorExpr.OperatorType];
-    if (binaryOperatorExpr.Right is not ConstantValueExpr constantValue) {
+        LispSyntaxParser.ComparisonOperators[comparisonOperator.OperatorType];
+    if (comparisonOperator.Right is not ConstantValueExpr constantValue) {
       throw new InvalidOperationException("Constant value is expected");
     }
     conditionConstructor.ValueSelector.SetScriptValue(constantValue.ValueFn());
