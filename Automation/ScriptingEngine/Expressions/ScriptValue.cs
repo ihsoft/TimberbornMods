@@ -179,31 +179,6 @@ record struct ScriptValue : IComparable<ScriptValue> {
     };
   }
 
-  /// <summary>Formats the value according to the value definition.</summary>
-  /// <param name="valueDef">
-  /// Optional value definition. If not provided, then the string types are presented "as-is", and the number types are
-  /// converted to floats and formatted as "0.##".
-  /// </param>
-  public string FormatValue(ValueDef valueDef) {
-    var stringValue = ValueType switch {
-        TypeEnum.Number => valueDef?.DisplayNumericFormat switch {
-            ValueDef.NumericFormatEnum.Float => AsFloat.ToString("0.00"),
-            ValueDef.NumericFormatEnum.Percent => AsFloat.ToString("0%"),
-            ValueDef.NumericFormatEnum.Integer => AsInt.ToString(),
-            null => AsFloat.ToString("0.##"),  // valeDef can be null.
-            _ => throw new InvalidOperationException($"Unknown numeric format: {valueDef.DisplayNumericFormat}"),
-        },
-        TypeEnum.String => AsString,
-        TypeEnum.Unset => throw new InvalidOperationException($"Cannot format value: {this}"),
-        _ => throw new InvalidOperationException($"Unknown ScriptValue type: {ValueType}"),
-    };
-    if (valueDef?.Options == null) {
-      return stringValue;
-    }
-    var resolvedValue = valueDef.Options.FirstOrDefault(x => x.Value == stringValue);
-    return resolvedValue.Text ?? CommonFormats.HighlightRed("?" + stringValue);
-  }
-
   int? _number;
   string _string;
 }

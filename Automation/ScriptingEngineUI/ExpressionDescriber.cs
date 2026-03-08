@@ -8,7 +8,9 @@ using System.Text;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.Automation.ScriptingEngine.Parser;
+using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 using IgorZ.Automation.Settings;
+using IgorZ.TimberDev.UI;
 using Timberborn.Localization;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
@@ -24,6 +26,32 @@ sealed class ExpressionDescriber(ILoc Loc) {
   /// <exception cref="ScriptError.RuntimeError">if values need to be calculated, but it results in error.</exception>
   public string DescribeExpression(IExpression expression) {
     return DescribeExpressionInternal(expression);
+  }
+
+  /// <summary>Formats the value according to the value definition for the display purpose.</summary>
+  /// <param name="scriptValue">The value to format.</param>
+  /// <param name="valueDef">
+  /// Optional value definition. If not provided, then the string types are presented "as-is", and the number types are
+  /// converted to floats and formatted as "0.##".
+  /// </param>
+  public static string FormatValue(ScriptValue scriptValue, ValueDef valueDef) {
+    var stringValue = scriptValue.ValueType switch {
+        ScriptValue.TypeEnum.Number => valueDef?.DisplayNumericFormat switch {
+            ValueDef.NumericFormatEnum.Float => scriptValue.AsFloat.ToString("0.00"),
+            ValueDef.NumericFormatEnum.Percent => scriptValue.AsFloat.ToString("0%"),
+            ValueDef.NumericFormatEnum.Integer => scriptValue.AsInt.ToString(),
+            null => scriptValue.AsFloat.ToString("0.##"),  // valeDef can be null.
+            _ => throw new InvalidOperationException($"Unknown numeric format: {valueDef.DisplayNumericFormat}"),
+        },
+        ScriptValue.TypeEnum.String => scriptValue.AsString,
+        ScriptValue.TypeEnum.Unset => throw new InvalidOperationException($"Cannot format value: {scriptValue}"),
+        _ => throw new InvalidOperationException($"Unknown ScriptValue type: {scriptValue.ValueType}"),
+    };
+    if (valueDef?.Options == null) {
+      return stringValue;
+    }
+    var resolvedValue = valueDef.Options.FirstOrDefault(x => x.Value == stringValue);
+    return resolvedValue.Text ?? CommonFormats.HighlightRed("?" + stringValue);
   }
 
   #region Implementation
@@ -70,7 +98,7 @@ sealed class ExpressionDescriber(ILoc Loc) {
     if (EntityPanelSettings.EvalValuesInConditions || op.Right.IsConstantValue()) {
       string rightValue;
       try {
-        rightValue = op.Right.ValueFn().FormatValue(op.ResultValueDef);
+        rightValue = FormatValue(op.Right.ValueFn(), op.ResultValueDef);
       } catch (ScriptError.BadValue e) {
         rightValue = Loc.T(e.LocKey);
       }
@@ -162,7 +190,7 @@ sealed class ExpressionDescriber(ILoc Loc) {
         } catch (ScriptError.BadValue e) {
           return Loc.T(e.LocKey);
         }
-        args[i] = value.FormatValue(op.ActionDef.Arguments[i]);
+        args[i] = FormatValue(value, op.ActionDef.Arguments[i]);
       } else {
         args[i] = DescribeExpressionInternal(operand);
       }
