@@ -85,26 +85,6 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
     }
   }
 
-  protected ActionDef LookupActionDef(string key, Func<ActionDef> getDefault) {
-    if (!_cachedActionDefs.TryGetValue(key, out var actionDef)) {
-      actionDef = getDefault();
-      _cachedActionDefs[key] = actionDef;
-      DebugEx.Fine("Registering action definition in cache at key '{0}':\n{1}", key, actionDef);
-    }
-    return actionDef;
-  }
-  readonly Dictionary<string, ActionDef> _cachedActionDefs = new();
-
-  protected SignalDef LookupSignalDef(string key, Func<SignalDef> getDefault) {
-    if (!_cachedSignalDefs.TryGetValue(key, out var signalDef)) {
-      signalDef = getDefault();
-      _cachedSignalDefs[key] = signalDef;
-      DebugEx.Fine("Registering signal definition in cache at key '{0}':\n{1}", key, signalDef);
-    }
-    return signalDef;
-  }
-  readonly Dictionary<string, SignalDef> _cachedSignalDefs = new();
-
   protected string GetArgumentMinMaxValueHint(int minValue, int maxValue) {
     return maxValue == int.MaxValue ? null : $"({minValue}..{maxValue})";
   }

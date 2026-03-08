@@ -67,9 +67,9 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   /// <inheritdoc/>
   public override SignalDef GetSignalDefinition(string name, AutomationBehavior behavior) {
     var parsed = ParseSignalName(name, behavior);
-    var key = name + "-" + parsed.capacity;
-    return LookupSignalDef(key, () => MakeSignalDef(name, behavior));
+    return _signalDefCache.GetOrAdd(name, parsed.isInput, parsed.goodId, parsed.capacity, MakeSignalDef2);
   }
+  readonly ObjectsCache<SignalDef> _signalDefCache = new();
 
   /// <inheritdoc/>
   public override string[] GetActionNamesForBuilding(AutomationBehavior behavior) {
@@ -140,17 +140,15 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
 
   #region Signals
 
-  SignalDef MakeSignalDef(string name, AutomationBehavior behavior) {
-    var parsed = ParseSignalName(name, behavior);
-    var displayName = LocGoodSignal(parsed.isInput ? InputGoodSignalLocKey : OutputGoodSignalLocKey, parsed.goodId);
+  SignalDef MakeSignalDef2(string name, bool isInput, string goodId, int capacity) {
     return new SignalDef {
         ScriptName = name,
-        DisplayName = displayName,
+        DisplayName = LocGoodSignal(isInput ? InputGoodSignalLocKey : OutputGoodSignalLocKey, goodId),
         Result = new ValueDef {
             ValueType = ScriptValue.TypeEnum.Number,
             DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
-            DisplayNumericFormatRange = (0, parsed.capacity),
-            RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0, max: parsed.capacity),
+            DisplayNumericFormatRange = (0, capacity),
+            RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0, max: capacity),
         },
     };
   }

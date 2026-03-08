@@ -9,7 +9,6 @@ using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.TimberDev.UI;
 using Timberborn.Workshops;
-using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 
@@ -51,12 +50,13 @@ sealed class ManufactoryScriptableComponent : ScriptableComponentBase {
     if (manufactory == null) {
       throw new UnknownActionException(name);
     }
-    var key = $"{name}-{behavior.Name}";
     return name switch {
-        SetRecipeActionName => LookupActionDef(key, () => MakeSetRecipeActionDef(manufactory)),
+        SetRecipeActionName =>
+            _actionDefsCache.GetOrAdd($"{name}-{behavior.Name}", _ => MakeSetRecipeActionDef(manufactory)),
         _ => throw new UnknownActionException(name),
     };
   }
+  readonly ObjectsCache<ActionDef> _actionDefsCache = new();
 
   #endregion
 

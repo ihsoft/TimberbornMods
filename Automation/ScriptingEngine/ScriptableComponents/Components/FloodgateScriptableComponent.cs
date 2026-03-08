@@ -6,7 +6,6 @@ using System;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
-using Timberborn.BaseComponentSystem;
 using Timberborn.WaterBuildings;
 using UnityEngine;
 
@@ -42,12 +41,12 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   /// <inheritdoc/>
   public override SignalDef GetSignalDefinition(string name, AutomationBehavior behavior) {
     var floodgate = GetFloodgate(behavior);
-    var key = name + "-" + floodgate.MaxHeight;
     return name switch {
-        HeightSignalName => LookupSignalDef(key, () => MakeHeightSignalDef(floodgate)),
+        HeightSignalName => _signalDefsCache.GetOrAdd(name, floodgate.MaxHeight, MakeHeightSignalDef),
         _ => throw new UnknownSignalException(name),
     };
   }
+  readonly ObjectsCache<SignalDef> _signalDefsCache = new();
 
   /// <inheritdoc/>
   public override string[] GetActionNamesForBuilding(AutomationBehavior behavior) {
@@ -66,12 +65,12 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   /// <inheritdoc/>
   public override ActionDef GetActionDefinition(string name, AutomationBehavior behavior) {
     var floodgate = GetFloodgate(behavior);
-    var key = name + "-" + floodgate.MaxHeight;
     return name switch {
-        SetHeightActionName => LookupActionDef(key, () => MakeSetActionDef(floodgate)),
+        SetHeightActionName => _actionDefsCache.GetOrAdd(name, floodgate.MaxHeight, MakeSetActionDef),
         _ => throw new UnknownActionException(name),
     };
   }
+  readonly ObjectsCache<ActionDef> _actionDefsCache = new();
 
   /// <inheritdoc/>
   public override void RegisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
@@ -87,15 +86,15 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
   #region Signals
 
-  SignalDef MakeHeightSignalDef(Floodgate floodgate) {
+  SignalDef MakeHeightSignalDef(string signalName, int maxHeight) {
     return new SignalDef {
         ScriptName = HeightSignalName,
         DisplayName = Loc.T(HeightSignalLocKey),
         Result = new ValueDef {
             ValueType = ScriptValue.TypeEnum.Number,
             DisplayNumericFormat = ValueDef.NumericFormatEnum.Float,
-            DisplayNumericFormatRange = (0, floodgate.MaxHeight),
-            RuntimeValueValidator = ValueDef.RangeCheckValidatorFloat(min: 0f, max: floodgate.MaxHeight),
+            DisplayNumericFormatRange = (0, maxHeight),
+            RuntimeValueValidator = ValueDef.RangeCheckValidatorFloat(min: 0f, max: maxHeight),
         },
     };
   }
@@ -108,7 +107,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
   #region Actions
 
-  ActionDef MakeSetActionDef(Floodgate floodgate) {
+  ActionDef MakeSetActionDef(string actionName, int maxHeight) {
     return new ActionDef {
         ScriptName = SetHeightActionName,
         DisplayName = Loc.T(SetHeightActionLocKey),
@@ -116,8 +115,8 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
             new ValueDef {
                 ValueType = ScriptValue.TypeEnum.Number,
                 DisplayNumericFormat = ValueDef.NumericFormatEnum.Float,
-                DisplayNumericFormatRange = (0, floodgate.MaxHeight),
-                RuntimeValueValidator = ValueDef.RangeCheckValidatorFloat(min: 0, max: floodgate.MaxHeight),
+                DisplayNumericFormatRange = (0, maxHeight),
+                RuntimeValueValidator = ValueDef.RangeCheckValidatorFloat(min: 0, max: maxHeight),
             },
         ],
     };

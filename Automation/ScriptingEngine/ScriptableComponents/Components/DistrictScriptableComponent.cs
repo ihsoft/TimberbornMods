@@ -149,10 +149,10 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
       throw new ScriptError.BadStateError(behavior, "Not a district building");
     }
     if (name.StartsWith(ResourceStockSignalNamePrefix)) {
-      return LookupSignalDef(name, () => MakeResourceStockTrackerSignalDef(name));
+      return _signalDefsCache.GetOrAdd(name, MakeResourceStockTrackerSignalDef);
     }
     if (name.StartsWith(ResourceCapacitySignalNamePrefix)) {
-      return LookupSignalDef(name, () => MakeResourceCapacityTrackerSignalDef(name));
+      return _signalDefsCache.GetOrAdd(name, MakeResourceCapacityTrackerSignalDef);
     }
     return name switch {
         BeaverPopulationSignalName => BeaverPopulationSignalDef,
@@ -161,6 +161,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
         _ => throw new UnknownSignalException(name),
     };
   }
+  readonly ObjectsCache<SignalDef> _signalDefsCache = new();
 
   /// <inheritdoc/>
   public override void RegisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {

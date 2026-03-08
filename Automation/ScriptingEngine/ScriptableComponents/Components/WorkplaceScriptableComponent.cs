@@ -3,7 +3,6 @@
 // License: Public Domain
 
 using System;
-using System.Collections.Generic;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
@@ -49,12 +48,12 @@ sealed class WorkplaceScriptableComponent : ScriptableComponentBase {
   public override SignalDef GetSignalDefinition(string name, AutomationBehavior behavior) {
     var workplace = GetWorkplace(behavior);
     return name switch {
-        AssignedWorkersSignalName => LookupSignalDef(
-            AssignedWorkersSignalName + "-" + workplace.MaxWorkers,
-            () => MakeAssignedWorkersSignalDef(workplace)),
+        AssignedWorkersSignalName =>
+            _signalDefsCache.GetOrAdd(name, workplace.MaxWorkers, MakeAssignedWorkersSignalDef),
         _ => throw new UnknownSignalException(name),
     };
   }
+  readonly ObjectsCache<SignalDef> _signalDefsCache = new();
 
   /// <inheritdoc/>
   public override void RegisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
@@ -108,28 +107,28 @@ sealed class WorkplaceScriptableComponent : ScriptableComponentBase {
   /// <inheritdoc/>
   public override ActionDef GetActionDefinition(string name, AutomationBehavior behavior) {
     var workplace = GetWorkplace(behavior);
-    var key = name + "-" + workplace.MaxWorkers;
     return name switch {
         RemoveWorkersActionName => RemoveWorkersActionDef,
-        SetWorkersActionName => LookupActionDef(key, () => MakeSetWorkersActionDef(workplace)),
         SetPriorityActionName => SetPriorityActionDef,
+        SetWorkersActionName => _actionDefsCache.GetOrAdd(name, workplace.MaxWorkers, MakeSetWorkersActionDef),
         _ => throw new UnknownActionException(name),
     };
   }
+  readonly ObjectsCache<ActionDef> _actionDefsCache = new();
 
   #endregion
 
   #region Signals
 
-  SignalDef MakeAssignedWorkersSignalDef(Workplace workplace) {
+  SignalDef MakeAssignedWorkersSignalDef(string _, int maxWorkers) {
     return new SignalDef {
         ScriptName = AssignedWorkersSignalName,
         DisplayName = Loc.T(AssignedWorkersSignalLocKey),
         Result = new ValueDef {
             ValueType = ScriptValue.TypeEnum.Number,
             DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
-            DisplayNumericFormatRange = (0, workplace.MaxWorkers),
-            RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0, max: workplace.MaxWorkers),
+            DisplayNumericFormatRange = (0, maxWorkers),
+            RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0, max: maxWorkers),
         },
     };
   }
@@ -145,7 +144,7 @@ sealed class WorkplaceScriptableComponent : ScriptableComponentBase {
   };
   ActionDef _removeWorkersActionDef;
 
-  ActionDef MakeSetWorkersActionDef(Workplace workplace) {
+  ActionDef MakeSetWorkersActionDef(string _, int maxWorkers) {
     return new ActionDef {
         ScriptName = SetWorkersActionName,
         DisplayName = Loc.T(SetWorkersActionLocKey),
@@ -153,8 +152,8 @@ sealed class WorkplaceScriptableComponent : ScriptableComponentBase {
             new ValueDef {
                 ValueType = ScriptValue.TypeEnum.Number,
                 DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
-                DisplayNumericFormatRange = (0, workplace.MaxWorkers),
-                RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0, workplace.MaxWorkers),
+                DisplayNumericFormatRange = (0, maxWorkers),
+                RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0, maxWorkers),
             },
         ],
     };
