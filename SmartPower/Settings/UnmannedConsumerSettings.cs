@@ -40,8 +40,9 @@ sealed class UnmannedConsumerSettings : BaseSettings<UnmannedConsumerSettings> {
 
   #endregion
 
-  UnmannedConsumerSettings(ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry,
-                           ModRepository modRepository) : base(settings, modSettingsOwnerRegistry, modRepository) {
+  UnmannedConsumerSettings(
+      ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry, ModRepository modRepository)
+      : base(settings, modSettingsOwnerRegistry, modRepository) {
     InstallSettingCallback(ShowFloatingIconInternal, v => ShowFloatingIcon = v);
   }
 }

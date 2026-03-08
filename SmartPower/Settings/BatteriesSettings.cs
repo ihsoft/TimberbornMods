@@ -62,8 +62,9 @@ sealed class BatteriesSettings : BaseSettings<BatteriesSettings> {
 
   #region Implementation
 
-  BatteriesSettings(ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry,
-                    ModRepository modRepository) : base(settings, modSettingsOwnerRegistry, modRepository) {
+  BatteriesSettings(
+      ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry, ModRepository modRepository)
+      : base(settings, modSettingsOwnerRegistry, modRepository) {
     InstallSettingCallback(ShowBatteryVitalsInternal, v => ShowBatteryVitals = v);
     InstallSettingCallback(BatteryCapacityAsPctInternal, v => BatteryCapacityAsPct = v);
     InstallSettingCallback(BatteryRatioHysteresisInternal, v => BatteryRatioHysteresis = v);

@@ -49,8 +49,9 @@ sealed class WorkplaceConsumerSettings : BaseSettings<WorkplaceConsumerSettings>
 
   #endregion
 
-  WorkplaceConsumerSettings(ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry,
-                            ModRepository modRepository) : base(settings, modSettingsOwnerRegistry, modRepository) {
+  WorkplaceConsumerSettings(
+      ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry, ModRepository modRepository)
+      : base(settings, modSettingsOwnerRegistry, modRepository) {
     InstallSettingCallback(ShowFloatingIconInternal, v => ShowFloatingIcon = v);
     InstallSettingCallback(SuspendDelayMinutesInternal, v => SuspendDelayMinutes = v);
     InstallSettingCallback(ResumeDelayMinutesInternal, v => ResumeDelayMinutes = v);

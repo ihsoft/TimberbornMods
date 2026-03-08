@@ -14,6 +14,7 @@ sealed class SmartPowerDebugSettings : DebugSettings<SmartPowerDebugSettings> {
   /// <inheritdoc />
   protected override string ModId => Configurator.ModId;
 
-  SmartPowerDebugSettings(ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry,
-                          ModRepository modRepository) : base(settings, modSettingsOwnerRegistry, modRepository) {}
+  SmartPowerDebugSettings(
+      ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry, ModRepository modRepository)
+      : base(settings, modSettingsOwnerRegistry, modRepository) {}
 }

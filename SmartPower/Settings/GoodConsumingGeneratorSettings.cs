@@ -38,9 +38,9 @@ sealed class GoodConsumingGeneratorSettings : BaseSettings<GoodConsumingGenerato
 
   #endregion
 
-  GoodConsumingGeneratorSettings(ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry,
-                                 ModRepository modRepository) :
-      base(settings, modSettingsOwnerRegistry, modRepository) {
+  GoodConsumingGeneratorSettings(
+      ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry, ModRepository modRepository)
+      : base(settings, modSettingsOwnerRegistry, modRepository) {
     InstallSettingCallback(ShowFloatingIconInternal, v => ShowFloatingIcon = v);
   }
 }

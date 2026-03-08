@@ -49,8 +49,9 @@ sealed class AttractionConsumerSettings : BaseSettings<AttractionConsumerSetting
 
   #endregion
 
-  AttractionConsumerSettings(ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry,
-                             ModRepository modRepository) : base(settings, modSettingsOwnerRegistry, modRepository) {
+  AttractionConsumerSettings(
+      ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry, ModRepository modRepository)
+      : base(settings, modSettingsOwnerRegistry, modRepository) {
     InstallSettingCallback(ShowFloatingIconInternal, v => ShowFloatingIcon = v);
     InstallSettingCallback(SuspendDelayMinutesInternal, v => SuspendDelayMinutes = v);
     InstallSettingCallback(ResumeDelayMinutesInternal, v => ResumeDelayMinutes = v);

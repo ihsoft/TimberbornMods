@@ -19,7 +19,7 @@ sealed class WalkerPoweredGeneratorSettings : BaseSettings<WalkerPoweredGenerato
 
   protected override string ModId => Configurator.ModId;
 
-    #region Settings
+  #region Settings
   // ReSharper disable InconsistentNaming
   // ReSharper disable MemberCanBePrivate.Global
 
@@ -49,9 +49,9 @@ sealed class WalkerPoweredGeneratorSettings : BaseSettings<WalkerPoweredGenerato
 
   #endregion
 
-  WalkerPoweredGeneratorSettings(ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry,
-                                 ModRepository modRepository) :
-          base(settings, modSettingsOwnerRegistry, modRepository) {
+  WalkerPoweredGeneratorSettings(
+      ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry, ModRepository modRepository)
+      : base(settings, modSettingsOwnerRegistry, modRepository) {
     InstallSettingCallback(ShowFloatingIconInternal, v => ShowFloatingIcon = v);
     InstallSettingCallback(SuspendDelayMinutesInternal, v => SuspendDelayMinutes = v);
     InstallSettingCallback(ResumeDelayMinutesInternal, v => ResumeDelayMinutes = v);
