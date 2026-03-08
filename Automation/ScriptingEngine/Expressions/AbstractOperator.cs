@@ -5,8 +5,6 @@
 using System;
 using System.Collections.Generic;
 using IgorZ.Automation.ScriptingEngine.Core;
-using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
-using IgorZ.Automation.Settings;
 
 namespace IgorZ.Automation.ScriptingEngine.Expressions;
 
