@@ -186,7 +186,7 @@ sealed class LispSyntaxParser : ParserBase {
       case ConstantValueExpr constExpr:
         sb.Append(constExpr.ValueType switch {
             ScriptValue.TypeEnum.String => Tokenizer.EscapeString(constExpr.ValueFn().AsString),
-            ScriptValue.TypeEnum.Number => constExpr.ValueFn().AsNumber.ToString(),
+            ScriptValue.TypeEnum.Number => constExpr.ValueFn().AsRawNumber.ToString(),
             _ => throw new InvalidOperationException($"Unsupported value type: {constExpr.ValueType}"),
         });
         break;

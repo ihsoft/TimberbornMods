@@ -160,7 +160,7 @@ sealed class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSing
   void SetSignalAction(ScriptValue[] args, AutomationBehavior behavior) {
     AssertActionArgsCount(SetActionName, args, 2);
     var signalName = GetSignalSignalNamePrefix + args[0].AsString;
-    _signalDispatcher.SetSignalValue(signalName, args[1].AsNumber, behavior);
+    _signalDispatcher.SetSignalValue(signalName, args[1].AsRawNumber, behavior);
   }
 
   #endregion

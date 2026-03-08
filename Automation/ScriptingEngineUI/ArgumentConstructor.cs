@@ -33,7 +33,7 @@ sealed class ArgumentConstructor : BaseConstructor {
     var value = valueDef.ValueType switch {
         ScriptValue.TypeEnum.String => scriptValue.AsString,
         ScriptValue.TypeEnum.Number => valueDef.DisplayNumericFormat switch {
-            ValueDef.NumericFormatEnum.Percent => scriptValue.AsNumber.ToString(),
+            ValueDef.NumericFormatEnum.Percent => scriptValue.AsRawNumber.ToString(),
             ValueDef.NumericFormatEnum.Float => scriptValue.AsFloat.ToString("0.00"),
             ValueDef.NumericFormatEnum.Integer => scriptValue.AsInt.ToString(),
             _ => throw new InvalidOperationException($"Unsupported numeric format: {valueDef.DisplayNumericFormat}"),
@@ -97,7 +97,7 @@ sealed class ArgumentConstructor : BaseConstructor {
   /// <exception cref="InvalidOperationException">if the value type is unrecognized.</exception>
   public string GetScriptValue() {
     return _argumentDefinition.ValueType switch {
-        ScriptValue.TypeEnum.Number => TryGetScriptValueAsNumber(out _).AsNumber.ToString(),
+        ScriptValue.TypeEnum.Number => TryGetScriptValueAsNumber(out _).AsRawNumber.ToString(),
         ScriptValue.TypeEnum.String => $"'{TryGetScriptValueAsString(out _).AsString}'",
         _ => throw new InvalidOperationException("Unknown argument type: " + _argumentDefinition.ValueType),
     };

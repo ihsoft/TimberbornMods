@@ -117,7 +117,7 @@ abstract class ParserBase {
     var value = valueExpr.ValueFn();
     return value.ValueType switch {
         ScriptValue.TypeEnum.String => value.AsString,
-        ScriptValue.TypeEnum.Number => value.AsNumber.ToString(),
+        ScriptValue.TypeEnum.Number => value.AsRawNumber.ToString(),
         _ => throw new InvalidOperationException("Unsupported type: " + value.ValueType),
     };
   }

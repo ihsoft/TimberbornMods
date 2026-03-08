@@ -67,7 +67,7 @@ sealed record ValueDef {
   /// <p>To disable range checking leave this field uninitialized (default).</p>
   /// </summary>
   /// <seealso cref="DisplayNumericFormat"/>
-  /// <seealso cref="ScriptValue.AsNumber"/>
+  /// <seealso cref="ScriptValue.AsRawNumber"/>
   public (float min, float max) DisplayNumericFormatRange { get; init; }
 
   /// <summary>Optional validating function for the argument value.</summary>
@@ -99,7 +99,7 @@ sealed record ValueDef {
   /// <exception cref="ScriptError.RuntimeError">if value is out of range.</exception>
   public static Action<ScriptValue> RangeCheckValidatorInt(int? min = null, int? max = null) {
     return value => {
-      if (value.AsNumber % 100 != 0) {
+      if (value.AsRawNumber % 100 != 0) {
         throw new ScriptError.ValueOutOfRange($"Value must be an integer, found: {value.AsFloat:F2}");
       }
       if (!max.HasValue) {
@@ -123,18 +123,18 @@ sealed record ValueDef {
   public static Action<ScriptValue> RangeCheckValidatorFloat(float? min = null, float? max = null) {
     return value => {
       if (!max.HasValue) {
-        if (value.AsNumber < Mathf.RoundToInt(min!.Value * 100f)) {
+        if (value.AsRawNumber < Mathf.RoundToInt(min!.Value * 100f)) {
           throw new ScriptError.ValueOutOfRange(
               $"Value must be greater than or equal to {min:F2}, found: {value.AsFloat:F2}");
         }
       } else if (!min.HasValue) {
-        if (value.AsNumber > Mathf.RoundToInt(max.Value * 100f)) {
+        if (value.AsRawNumber > Mathf.RoundToInt(max.Value * 100f)) {
           throw new ScriptError.ValueOutOfRange(
               $"Value must be less than or equal to {max:F2}, found: {value.AsFloat:F2}");
         }
       } else {
-        if (value.AsNumber < Mathf.RoundToInt(min.Value * 100f)
-            || value.AsNumber > Mathf.RoundToInt(max.Value * 100f)) {
+        if (value.AsRawNumber < Mathf.RoundToInt(min.Value * 100f)
+            || value.AsRawNumber > Mathf.RoundToInt(max.Value * 100f)) {
           throw new ScriptError.ValueOutOfRange(
               $"Value must be in range [{min:F2}, {max:F2}], found: {value.AsFloat:F2}");
         }

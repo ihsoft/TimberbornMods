@@ -102,27 +102,27 @@ record struct ScriptValue : IComparable<ScriptValue> {
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
   public static ScriptValue operator -(ScriptValue value) {
-    return new ScriptValue { _number = -value.AsNumber };
+    return new ScriptValue { _number = -value.AsRawNumber };
   }
 
   public static ScriptValue operator +(ScriptValue left, ScriptValue right) {
-    return new ScriptValue { _number = left.AsNumber + right.AsNumber };
+    return new ScriptValue { _number = left.AsRawNumber + right.AsRawNumber };
   }
 
   public static ScriptValue operator -(ScriptValue left, ScriptValue right) {
-    return new ScriptValue { _number = left.AsNumber - right.AsNumber };
+    return new ScriptValue { _number = left.AsRawNumber - right.AsRawNumber };
   }
 
   public static ScriptValue operator *(ScriptValue left, ScriptValue right) {
-    return new ScriptValue { _number = Mathf.RoundToInt(left.AsNumber * right.AsNumber / 100f) };
+    return new ScriptValue { _number = Mathf.RoundToInt(left.AsRawNumber * right.AsRawNumber / 100f) };
   }
 
   /// <exception cref="ScriptError">if dividing by zero.</exception>
   public static ScriptValue operator /(ScriptValue left, ScriptValue right) {
-    if (right.AsNumber == 0) {
+    if (right.AsRawNumber == 0) {
       throw new ScriptError.DivisionByZero();
     }
-    return new ScriptValue { _number = Mathf.RoundToInt(left.AsNumber * 100f / right.AsNumber) };
+    return new ScriptValue { _number = Mathf.RoundToInt(left.AsRawNumber * 100f / right.AsRawNumber) };
   }
 
   public int CompareTo(ScriptValue other) {
@@ -130,7 +130,7 @@ record struct ScriptValue : IComparable<ScriptValue> {
       throw new InvalidOperationException($"Cannot compare values of different types: {this} vs {other}");
     }
     return ValueType switch {
-        TypeEnum.Number => AsNumber.CompareTo(other.AsNumber),
+        TypeEnum.Number => AsRawNumber.CompareTo(other.AsRawNumber),
         TypeEnum.String => string.Compare(AsString, other.AsString, StringComparison.Ordinal),
         _ => throw new InvalidOperationException("Unknown ScriptValue type: " + ValueType),
     };
@@ -142,7 +142,7 @@ record struct ScriptValue : IComparable<ScriptValue> {
   /// For example, value "1234" means "12.34f". The maximum possible precision is two digits after the point.
   /// </remarks>
   /// <exception cref="ScriptError">if the value is not a number.</exception>
-  public int AsNumber {
+  public int AsRawNumber {
     get {
       if (!_number.HasValue) {
         throw new ScriptError.BadValue("Value is not a number: " + ToString());
@@ -153,11 +153,11 @@ record struct ScriptValue : IComparable<ScriptValue> {
 
   /// <summary>Current numeric value as a float.</summary>
   /// <exception cref="ScriptError">if the value is not a number.</exception>
-  public float AsFloat => AsNumber / 100f;
+  public float AsFloat => AsRawNumber / 100f;
 
   /// <summary>Current numeric value as an integer.</summary>
   /// <exception cref="ScriptError">if the value is not a number.</exception>
-  public int AsInt => Mathf.RoundToInt(AsNumber / 100f);
+  public int AsInt => Mathf.RoundToInt(AsRawNumber / 100f);
 
   /// <summary>Current string value.</summary>
   /// <exception cref="ScriptError">if the value is not a string.</exception>
@@ -173,7 +173,7 @@ record struct ScriptValue : IComparable<ScriptValue> {
   /// <inheritdoc/>
   public override string ToString() {
     return ValueType switch {
-        TypeEnum.Number => $"ScriptValue#Number:{AsNumber.ToString()}",
+        TypeEnum.Number => $"ScriptValue#Number:{AsRawNumber.ToString()}",
         TypeEnum.String => $"ScriptValue#String:{AsString}",
         _ => $"ScriptValue#{ValueType}:UNKNOWN",
     };
