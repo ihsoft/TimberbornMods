@@ -87,8 +87,12 @@ sealed class ManufactoryScriptableComponent : ScriptableComponentBase {
 
   static RecipeSpec GetRecipeSpecOrThrow(ScriptValue arg, Manufactory manufactory) {
     var recipeId = arg.AsString;
-    return manufactory.ProductionRecipes.SingleOrDefault(x => x.Id == recipeId)
-        ?? throw new ScriptError.BadValue($"Unknown recipe id: {recipeId}");
+    var recipe = manufactory.ProductionRecipes.SingleOrDefault(x => x.Id == recipeId);
+    if (recipe != null) {
+      return recipe;
+    }
+    var allowedIds = manufactory.ProductionRecipes.Select(x => x.Id).ToArray();
+    throw new ScriptError.BadValue($"Unknown recipe id: {recipeId}. Allowed: {string.Join(", ", allowedIds)}");
   }
 
   #endregion
