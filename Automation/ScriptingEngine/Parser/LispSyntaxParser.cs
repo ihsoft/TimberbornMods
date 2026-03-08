@@ -171,7 +171,7 @@ sealed class LispSyntaxParser : ParserBase {
         MaxFunc => MathOperator.CreateMax(operands),
         RoundFunc => MathOperator.CreateRound(operands),
         ConcatFunc => ConcatOperator.Create(operands),
-        _ => throw new InvalidOperationException("Operator token not recognized: " + op),
+        _ => throw new InvalidOperationException($"Operator token not recognized: {op}"),
     };
   }
 
