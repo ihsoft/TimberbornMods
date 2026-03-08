@@ -44,6 +44,19 @@ class LocStub : ILoc {
     if (!_localizationCache.ContainsKey(key)) {
       _localizationCache[key] = new TextLocalizationWrapper(T(key));
     }
-    return _localizationCache[key].GetText(param1, param2, param3);
+    return _localizationCache[key].GetText(this, param1, param2, param3);
+  }
+
+  public string T(Phrase phrase) {
+    throw new System.NotImplementedException();
+  }
+  public string T<T1>(Phrase phrase, T1 param1) {
+    throw new System.NotImplementedException();
+  }
+  public string T<T1, T2>(Phrase phrase, T1 param1, T2 param2) {
+    throw new System.NotImplementedException();
+  }
+  public string T<T1, T2, T3>(Phrase phrase, T1 param1, T2 param2, T3 param3) {
+    throw new System.NotImplementedException();
   }
 }
