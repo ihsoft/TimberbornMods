@@ -145,6 +145,9 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ISignalListener.cs">
         <Link>Import\ScriptingEngine\ScriptableComponents\Components\ISignalListener.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ObjectsCache.cs">
+        <Link>Import\ScriptingEngine\ScriptableComponents\Components\ObjectsCache.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ReferenceManager.cs">
         <Link>Import\ScriptingEngine\ScriptableComponents\Components\ReferenceManager.cs</Link>
       </Compile>
