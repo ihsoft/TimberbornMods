@@ -111,6 +111,7 @@ sealed class RuleRow {
       _pauseRuleBtn.ToggleDisplayStyle(!IsInEditMode && _isEnabled);
       _resumeRuleBtn.ToggleDisplayStyle(!IsInEditMode && !_isEnabled);
       CheckIfModified();
+      SetRuleText();
     }
   }
   bool _isEnabled = true;
@@ -192,12 +193,7 @@ sealed class RuleRow {
     Reset();
 
     // Rule content.
-    GetDescriptions(out var conditionDesc, out var actionDesc);
-    var ruleTextLabel = _readOnlyView.Q<Label>();
-    ruleTextLabel.text =
-        _uiFactory.T(ConditionLabelLocKey) + " " + conditionDesc
-        + "\n" + _uiFactory.T(ActionLabelLocKey) + " " + actionDesc;
-    ruleTextLabel.SetEnabled(IsEnabled);
+    SetRuleText();
     _readOnlyView.ToggleDisplayStyle(true);
 
     // Controls.
@@ -355,14 +351,21 @@ sealed class RuleRow {
             || _originalEnabledState != IsEnabled;
   }
 
-  void GetDescriptions(out string condition, out string action) {
+  void SetRuleText() {
+    string conditionDesc;
+    string actionDesc;
     if (LegacyAction is not null) {
-      condition = LegacyAction.Condition.UiDescription;
-      action = LegacyAction.UiDescription;
-      return;
+      conditionDesc = LegacyAction.Condition.UiDescription;
+      actionDesc = LegacyAction.UiDescription;
+    } else {
+      conditionDesc = GetDescription(ParsedCondition);
+      actionDesc = GetDescription(ParsedAction);
     }
-    condition = GetDescription(ParsedCondition);
-    action = GetDescription(ParsedAction);
+    var ruleTextLabel = _readOnlyView.Q<Label>();
+    ruleTextLabel.text =
+        _uiFactory.T(ConditionLabelLocKey) + " " + conditionDesc
+        + "\n" + _uiFactory.T(ActionLabelLocKey) + " " + actionDesc;
+    ruleTextLabel.SetEnabled(IsEnabled);
   }
 
   string GetDescription(IExpression expression) {

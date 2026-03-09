@@ -1,3 +1,6 @@
+# v3.5.2 (Started on March 8th, 2026):
+* [Fix] Disabling a rule in the rules editor doesn't mark it as disabled (grayed out).
+
 # v3.5.1 (March 7th, 2026):
 * [Fix #143] Game crashes when importing rules. 
 
