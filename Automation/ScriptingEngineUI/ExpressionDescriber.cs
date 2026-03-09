@@ -39,7 +39,8 @@ sealed class ExpressionDescriber(ILoc Loc) {
         ScriptValue.TypeEnum.Number => valueDef?.DisplayNumericFormat switch {
             ValueDef.NumericFormatEnum.Float => scriptValue.AsFloat.ToString("0.00"),
             ValueDef.NumericFormatEnum.Percent => scriptValue.AsFloat.ToString("0%"),
-            ValueDef.NumericFormatEnum.Integer => scriptValue.AsInt.ToString(),
+            // If the runtime value happen to be not an integer, it's still formatted as float in UI.
+            ValueDef.NumericFormatEnum.Integer => scriptValue.AsFloat.ToString("0.##"),
             null => scriptValue.AsFloat.ToString("0.##"),  // valeDef can be null.
             _ => throw new InvalidOperationException($"Unknown numeric format: {valueDef.DisplayNumericFormat}"),
         },
