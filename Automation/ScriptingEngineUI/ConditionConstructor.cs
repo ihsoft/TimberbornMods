@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using IgorZ.Automation.ScriptingEngine.Expressions;
@@ -83,8 +84,11 @@ class ConditionConstructor : BaseConstructor {
       OperatorSelector.ToggleDisplayStyle(false);
       ValueSelector.Root.ToggleDisplayStyle(false);
     }
-    OperatorSelector.Items =
-        _selectedDefinition.Argument.ValueType == ScriptValue.TypeEnum.String ? StringOperators : NumberOperators;
+    OperatorSelector.Items = _selectedDefinition.Argument.ValueType switch {
+        ScriptValue.TypeEnum.String => StringOperators,
+        ScriptValue.TypeEnum.Number => NumberOperators,
+        _ => throw new InvalidOperationException($"Unsupported value type: {_selectedDefinition.Argument.ValueType}"),
+    };
     OperatorSelector.ToggleDisplayStyle(true);
     ValueSelector.SetDefinition(_selectedDefinition.Argument);
     ValueSelector.Root.ToggleDisplayStyle(true);
