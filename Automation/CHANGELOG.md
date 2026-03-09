@@ -1,4 +1,8 @@
-# v3.5.2 (Started on March 8th, 2026):
+# v3.5.2 (March 8th, 2026):
+* [Change] Many runtime value validations were removed. They were not helping, but only adding frustration.
+* [Change] Show the fractional part of the values when comparing against as signal that can only return a whole number. The math expressions can produce a decimal value, so it's worth knowing it's actual value.
+* [Change] many small "changes here and there" to improve the rules UI behavior.
+* [Fix] In the value checking mode, some valid expressions were marked as "bad value".
 * [Fix] Disabling a rule in the rules editor doesn't mark it as disabled (grayed out).
 
 # v3.5.1 (March 7th, 2026):
