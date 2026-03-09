@@ -85,7 +85,7 @@ sealed class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSing
   /// <inheritdoc/>
   public override void InstallAction(ActionOperator actionOperator, AutomationBehavior behavior) {
     if (actionOperator.ActionName == SetActionName) {
-      var signalName = GetSignalSignalNamePrefix + actionOperator.GetArgAsLiteral(0);
+      var signalName = GetSignalSignalNamePrefix + GetSignalName(actionOperator.Operands[0] as IValueExpr);
       _signalDispatcher.RegisterSignalProvider(signalName, behavior, actionOperator);
     }
   }
@@ -93,7 +93,7 @@ sealed class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSing
   /// <inheritdoc/>
   public override void UninstallAction(ActionOperator actionOperator, AutomationBehavior behavior) {
     if (actionOperator.ActionName == SetActionName) {
-      var signalName = GetSignalSignalNamePrefix + actionOperator.GetArgAsLiteral(0);
+      var signalName = GetSignalSignalNamePrefix + GetSignalName(actionOperator.Operands[0] as IValueExpr);
       _signalDispatcher.UnregisterSignalProvider(signalName, behavior, actionOperator);
     }
   }
@@ -147,7 +147,7 @@ sealed class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSing
       Arguments = [
           new ValueDef {
               ValueType = ScriptValue.TypeEnum.String,
-              ArgumentValidator = SignalNameValidator,
+              ArgumentValidator = expr => GetSignalName(expr),
           },
           new ValueDef {
               ValueType = ScriptValue.TypeEnum.Number,
@@ -175,12 +175,13 @@ sealed class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSing
     _signalDispatcher = signalDispatcher;
   }
 
-  static void SignalNameValidator(IValueExpr exp) {
-    if (exp is not ConstantValueExpr constantValueExpr) {
-      throw new ScriptError.ParsingError("Signal name must be a constant string: " + exp);
+  static string GetSignalName(IValueExpr expr) {
+    if (expr == null || !expr.IsConstantValue() || expr.ValueType != ScriptValue.TypeEnum.String) {
+      throw new ScriptError.ParsingError($"Signal name must be a constant string");
     }
-    var name = constantValueExpr.ValueFn().AsString;
+    var name = expr.ValueFn().AsString;
     SymbolExpr.CheckName(name);
+    return name;
   }
 
   #endregion
