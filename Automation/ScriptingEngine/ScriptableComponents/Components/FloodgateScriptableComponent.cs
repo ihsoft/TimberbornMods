@@ -94,7 +94,6 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
             ValueType = ScriptValue.TypeEnum.Number,
             DisplayNumericFormat = ValueDef.NumericFormatEnum.Float,
             DisplayNumericFormatRange = (0, maxHeight),
-            RuntimeValueValidator = ValueDef.RangeCheckValidatorFloat(min: 0f, max: maxHeight),
         },
     };
   }
@@ -116,7 +115,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
                 ValueType = ScriptValue.TypeEnum.Number,
                 DisplayNumericFormat = ValueDef.NumericFormatEnum.Float,
                 DisplayNumericFormatRange = (0, maxHeight),
-                RuntimeValueValidator = ValueDef.RangeCheckValidatorFloat(min: 0, max: maxHeight),
+                RuntimeValueValidator = ValueDef.RangeCheckValidator(min: 0, max: maxHeight),
             },
         ],
     };

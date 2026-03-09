@@ -92,7 +92,6 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
           ValueType = ScriptValue.TypeEnum.Number,
           DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
           DisplayNumericFormatRange = (0, float.NaN),
-          RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
       },
   };
   SignalDef _collectableReadySignalDef;

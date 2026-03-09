@@ -102,7 +102,6 @@ sealed class DynamiteScriptableComponent : ScriptableComponentBase {
               ValueType = ScriptValue.TypeEnum.Number,
               DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
               DisplayNumericFormatRange = (1, 6),
-              RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 1, max: 6),
           },
       ],
   };

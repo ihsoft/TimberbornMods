@@ -196,7 +196,6 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
           ValueType = ScriptValue.TypeEnum.Number,
           DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
           DisplayNumericFormatRange = (0, float.NaN),
-          RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
       },
   };
   SignalDef _beaverPopulationSignalDef;
@@ -208,7 +207,6 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
           ValueType = ScriptValue.TypeEnum.Number,
           DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
           DisplayNumericFormatRange = (0, float.NaN),
-          RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
       },
   };
   SignalDef _botPopulationSignalDef;
@@ -220,7 +218,6 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
           ValueType = ScriptValue.TypeEnum.Number,
           DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
           DisplayNumericFormatRange = (0, float.NaN),
-          RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
       },
   };
   SignalDef _numberOfBedsSignalDef;
@@ -234,7 +231,6 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
             ValueType = ScriptValue.TypeEnum.Number,
             DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
             DisplayNumericFormatRange = (0, float.NaN),
-            RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
         },
     };
   }
@@ -248,7 +244,6 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
             ValueType = ScriptValue.TypeEnum.Number,
             DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
             DisplayNumericFormatRange = (0, float.NaN),
-            RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
         },
     };
   }

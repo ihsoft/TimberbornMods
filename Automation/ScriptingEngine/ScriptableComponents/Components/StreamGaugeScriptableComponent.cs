@@ -81,7 +81,6 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
           ValueType = ScriptValue.TypeEnum.Number,
           DisplayNumericFormat = ValueDef.NumericFormatEnum.Float,
           DisplayNumericFormatRange = (0, float.NaN),
-          RuntimeValueValidator = ValueDef.RangeCheckValidatorFloat(min: 0f),
       },
   };
   SignalDef _depthSignalDef;
@@ -93,7 +92,7 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
           ValueType = ScriptValue.TypeEnum.Number,
           DisplayNumericFormat = ValueDef.NumericFormatEnum.Percent,
           DisplayNumericFormatRange = (0, 100),
-          RuntimeValueValidator = ValueDef.RangeCheckValidatorFloat(min: 0f, max: 1f),
+          RuntimeValueValidator = ValueDef.RangeCheckValidator(min: 0f, max: 1f),
       },
   };
   SignalDef _contaminationSignalDef;
@@ -105,7 +104,6 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
           ValueType = ScriptValue.TypeEnum.Number,
           DisplayNumericFormat = ValueDef.NumericFormatEnum.Float,
           DisplayNumericFormatRange = (0, float.NaN),
-          RuntimeValueValidator = ValueDef.RangeCheckValidatorFloat(min: 0f),
       },
   };
   SignalDef _currentSignalDef;

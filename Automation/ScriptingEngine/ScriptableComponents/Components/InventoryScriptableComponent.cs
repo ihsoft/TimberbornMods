@@ -148,7 +148,6 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
             ValueType = ScriptValue.TypeEnum.Number,
             DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
             DisplayNumericFormatRange = (0, capacity),
-            RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0, max: capacity),
         },
     };
   }

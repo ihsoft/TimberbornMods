@@ -86,7 +86,7 @@ sealed class ConstructableScriptableComponent : ScriptableComponentBase {
           ValueType = ScriptValue.TypeEnum.Number,
           DisplayNumericFormat = ValueDef.NumericFormatEnum.Percent,
           DisplayNumericFormatRange = (0, 100),
-          RuntimeValueValidator = ValueDef.RangeCheckValidatorFloat(min: 0f, max: 1f),
+          RuntimeValueValidator = ValueDef.RangeCheckValidator(min: 0f, max: 1f),
       },
   };
   SignalDef _progressSignalDef;

@@ -128,7 +128,6 @@ sealed class WorkplaceScriptableComponent : ScriptableComponentBase {
             ValueType = ScriptValue.TypeEnum.Number,
             DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
             DisplayNumericFormatRange = (0, maxWorkers),
-            RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0, max: maxWorkers),
         },
     };
   }
@@ -153,7 +152,7 @@ sealed class WorkplaceScriptableComponent : ScriptableComponentBase {
                 ValueType = ScriptValue.TypeEnum.Number,
                 DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
                 DisplayNumericFormatRange = (0, maxWorkers),
-                RuntimeValueValidator = ValueDef.RangeCheckValidatorInt(min: 0, maxWorkers),
+                RuntimeValueValidator = ValueDef.RangeCheckValidator(min: 0, maxWorkers),
             },
         ],
     };

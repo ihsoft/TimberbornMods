@@ -95,32 +95,9 @@ sealed record ValueDef {
   /// <remarks>Used to replace deprecated constants with the new values.</remarks>
   public Dictionary<string, string> CompatibilityOptions { get; init; }
 
-  /// <summary>Integer value validation function.</summary>
-  /// <exception cref="ScriptError.RuntimeError">if value is out of range.</exception>
-  public static Action<ScriptValue> RangeCheckValidatorInt(int? min = null, int? max = null) {
-    return value => {
-      if (value.AsRawNumber % 100 != 0) {
-        throw new ScriptError.ValueOutOfRange($"Value must be an integer, found: {value.AsFloat:F2}");
-      }
-      if (!max.HasValue) {
-        if (value.AsInt < min) {
-          throw new ScriptError.ValueOutOfRange($"Value must be greater than or equal to {min}, found: {value.AsInt}");
-        }
-      } else if (!min.HasValue) {
-        if (value.AsInt > max) {
-          throw new ScriptError.ValueOutOfRange($"Value must be less than or equal to {max}, found: {value.AsInt}");
-        }
-      } else {
-        if (value.AsInt < min || value.AsInt > max) {
-          throw new ScriptError.ValueOutOfRange($"Value must be in range [{min}, {max}], found: {value.AsInt}");
-        }
-      }
-    };
-  }
-
   /// <summary>Float value validation function.</summary>
   /// <exception cref="ScriptError.RuntimeError">if value is out of range.</exception>
-  public static Action<ScriptValue> RangeCheckValidatorFloat(float? min = null, float? max = null) {
+  public static Action<ScriptValue> RangeCheckValidator(float? min = null, float? max = null) {
     return value => {
       if (!max.HasValue) {
         if (value.AsRawNumber < Mathf.RoundToInt(min!.Value * 100f)) {
