@@ -150,6 +150,7 @@ public sealed class AutomationBehavior : BaseComponent, IAwakableComponent, IIni
     }
     _errorToggle.Activate();
     _failingInstances.Add(instance);
+    IncrementStateVersion();
   }
 
   /// <summary>Clears the error status.</summary>
@@ -162,6 +163,7 @@ public sealed class AutomationBehavior : BaseComponent, IAwakableComponent, IIni
     if (_failingInstances.Count == 0) {
       _errorToggle?.Deactivate();
     }
+    IncrementStateVersion();
   }
 
   readonly Dictionary<Type, AbstractDynamicComponent> _dynamicComponents = [];
