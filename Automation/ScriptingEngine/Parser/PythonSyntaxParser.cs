@@ -178,7 +178,7 @@ class PythonSyntaxParser : ParserBase {
       }
       return IsGoodFloatValueRegex.IsMatch(token.Value)
           ? ConstantValueExpr.CreateFromValue(ScriptValue.FromFloat(value))
-          : throw new ScriptError.ParsingError(token, "Only up to 2 digits after the decimal point are allowed.");
+          : throw new ScriptError.ParsingError(token, "Only up to 2 digits after the decimal point are allowed");
     }
 
     if (token.TokenType != Token.Type.Keyword) {

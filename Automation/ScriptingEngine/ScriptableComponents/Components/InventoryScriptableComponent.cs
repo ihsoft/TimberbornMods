@@ -67,7 +67,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   /// <inheritdoc/>
   public override SignalDef GetSignalDefinition(string name, AutomationBehavior behavior) {
     var parsed = ParseSignalName(name, behavior);
-    return _signalDefCache.GetOrAdd(name, parsed.isInput, parsed.goodId, parsed.capacity, MakeSignalDef2);
+    return _signalDefCache.GetOrAdd(name, parsed.isInput, parsed.goodId, parsed.capacity, MakeSignalDef);
   }
   readonly ObjectsCache<SignalDef> _signalDefCache = new();
 
@@ -140,7 +140,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
 
   #region Signals
 
-  SignalDef MakeSignalDef2(string name, bool isInput, string goodId, int capacity) {
+  SignalDef MakeSignalDef(string name, bool isInput, string goodId, int capacity) {
     return new SignalDef {
         ScriptName = name,
         DisplayName = LocGoodSignal(isInput ? InputGoodSignalLocKey : OutputGoodSignalLocKey, goodId),
