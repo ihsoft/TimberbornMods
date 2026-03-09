@@ -72,10 +72,6 @@ sealed class ActionOperator : AbstractOperator {
         }
       }
       if (argDef.RuntimeValueValidator == null || valueExpr.IsConstantValue()) {
-        // For constant value operands we can perform value validation at parsing stage.
-        if (argDef.RuntimeValueValidator != null) {
-          argDef.RuntimeValueValidator(valueExpr.ValueFn());
-        }
         argValues.Add(valueExpr.ValueFn);
       } else {
         argValues.Add(() => {
