@@ -102,6 +102,7 @@ sealed class DynamiteScriptableComponent : ScriptableComponentBase {
               ValueType = ScriptValue.TypeEnum.Number,
               DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
               DisplayNumericFormatRange = (1, 6),
+              ArgumentValidator = ValidateRepeatCount,
           },
       ],
   };
@@ -245,6 +246,12 @@ sealed class DynamiteScriptableComponent : ScriptableComponentBase {
     IEnumerator YieldAbort() {
       Destroy(gameObject);
       yield break;
+    }
+  }
+
+  static void ValidateRepeatCount(IValueExpr expr) {
+    if (!expr.IsConstantValue() || expr.ValueType != ScriptValue.TypeEnum.Number) {
+      throw new ScriptError.ParsingError($"Repeat count must be a constant value");
     }
   }
 
