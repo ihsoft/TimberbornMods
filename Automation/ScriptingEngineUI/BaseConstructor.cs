@@ -42,12 +42,4 @@ abstract class BaseConstructor(UiFactory uiFactory) {
     }
     return rowPanel;
   }
-
-  protected static string PrepareConstantValue(string value, ScriptValue.TypeEnum type) {
-    return type switch {
-        ScriptValue.TypeEnum.Number => Mathf.RoundToInt(float.Parse(value) * 100).ToString(),
-        ScriptValue.TypeEnum.String => "'" + value + "'",
-        _ => throw new InvalidOperationException("Unknown argument type: " + type),
-    };
-  }
 }
