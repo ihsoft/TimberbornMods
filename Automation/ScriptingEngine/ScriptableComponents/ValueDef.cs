@@ -21,7 +21,7 @@ sealed record ValueDef {
   /// The UI representation of a numeric value type. It defines how the players will see and enter the value.
   /// </summary>
   public enum NumericFormatEnum {
-    /// <summary>The default value. It's not expect to have it for a number definition.</summary>
+    /// <summary>The default value. It's not expected to have it for a number definition.</summary>
     /// <remarks>A numeric value definition with this value will result in a game crash.</remarks>
     /// <seealso cref="ValueDef"/>
     Unspecified,
