@@ -248,7 +248,6 @@ public class StatusToggleAction : AutomationActionBase {
           StatusKindEnum.PriorityStatusWithAlertAndFloatingIcon =>
               StatusToggle.CreatePriorityStatusWithAlertAndFloatingIcon(
                 toggleAction.StatusIcon, _loc.T(toggleAction.StatusText), _loc.T(toggleAction.AlertText)),
-          _ => throw new InvalidDataException("Unknown status kind: " + toggleAction.StatusKind)
       };
       Behavior.GetComponent<StatusSubject>().RegisterStatus(_statusToggle);
     }

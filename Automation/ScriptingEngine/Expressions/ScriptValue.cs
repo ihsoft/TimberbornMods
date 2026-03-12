@@ -132,7 +132,7 @@ record struct ScriptValue : IComparable<ScriptValue> {
     return ValueType switch {
         TypeEnum.Number => AsRawNumber.CompareTo(other.AsRawNumber),
         TypeEnum.String => string.Compare(AsString, other.AsString, StringComparison.Ordinal),
-        _ => throw new InvalidOperationException("Unknown ScriptValue type: " + ValueType),
+        TypeEnum.Unset => throw new InvalidOperationException("ScriptValue type must be set"),
     };
   }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
@@ -175,7 +175,7 @@ record struct ScriptValue : IComparable<ScriptValue> {
     return ValueType switch {
         TypeEnum.Number => $"ScriptValue#Number:{AsRawNumber.ToString()}",
         TypeEnum.String => $"ScriptValue#String:{AsString}",
-        _ => $"ScriptValue#{ValueType}:UNKNOWN",
+        TypeEnum.Unset => "ScriptValue#Unset",
     };
   }
 

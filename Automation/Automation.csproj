@@ -20,6 +20,8 @@
         <DefineConstants>DEBUG;TRACE</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
+        <NoWarn>1701;1702;CS8524</NoWarn>
+        <WarningsAsErrors>CS8509</WarningsAsErrors>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -31,6 +33,8 @@
         <WarningLevel>4</WarningLevel>
         <DebugSymbols>true</DebugSymbols>
         <DocumentationFile>bin\Release\Automation.xml</DocumentationFile>
+        <WarningsAsErrors>CS8509</WarningsAsErrors>
+        <NoWarn>1701;1702;CS8524</NoWarn>
     </PropertyGroup>
     <ItemGroup>
       <Reference Include="0Harmony">

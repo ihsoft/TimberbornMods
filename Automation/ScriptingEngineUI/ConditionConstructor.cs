@@ -87,7 +87,7 @@ class ConditionConstructor : BaseConstructor {
     OperatorSelector.Items = _selectedDefinition.Argument.ValueType switch {
         ScriptValue.TypeEnum.String => StringOperators,
         ScriptValue.TypeEnum.Number => NumberOperators,
-        _ => throw new InvalidOperationException($"Unsupported value type: {_selectedDefinition.Argument.ValueType}"),
+        ScriptValue.TypeEnum.Unset => throw new InvalidOperationException("Value type must be set"),
     };
     OperatorSelector.ToggleDisplayStyle(true);
     ValueSelector.SetDefinition(_selectedDefinition.Argument);

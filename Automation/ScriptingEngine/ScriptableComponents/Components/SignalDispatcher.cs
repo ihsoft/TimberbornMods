@@ -87,7 +87,6 @@ class SignalDispatcher {
       SignalType.Max => group.MaxValue,
       SignalType.Sum => group.SumValue,
       SignalType.Avg => group.AvgValue,
-      _ => throw new InvalidOperationException("Unknown signal type: " + signalType)
     };
   }
 

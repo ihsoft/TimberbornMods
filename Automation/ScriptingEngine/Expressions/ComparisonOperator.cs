@@ -86,7 +86,11 @@ sealed class ComparisonOperator : BooleanOperator {
         ScriptValue.TypeEnum.String => opType switch {
             OpType.Equal => () => left.ValueFn().AsString == right.ValueFn().AsString,
             OpType.NotEqual => () => left.ValueFn().AsString != right.ValueFn().AsString,
-            _ => throw new ScriptError.ParsingError("Unsupported operator for string operands: " + opType),
+            OpType.GreaterThan
+                or OpType.GreaterThanOrEqual
+                or OpType.LessThan
+                or OpType.LessThanOrEqual =>
+                throw new ScriptError.ParsingError("Unsupported operator for string operands: " + opType),
         },
         ScriptValue.TypeEnum.Number => opType switch {
             OpType.Equal => () => left.ValueFn().AsRawNumber == right.ValueFn().AsRawNumber,
@@ -95,9 +99,8 @@ sealed class ComparisonOperator : BooleanOperator {
             OpType.LessThanOrEqual => () => left.ValueFn().AsRawNumber <= right.ValueFn().AsRawNumber,
             OpType.GreaterThan => () => left.ValueFn().AsRawNumber > right.ValueFn().AsRawNumber,
             OpType.GreaterThanOrEqual => () => left.ValueFn().AsRawNumber >= right.ValueFn().AsRawNumber,
-            _ => throw new InvalidOperationException($"Unknown comparison operator: {opType}"),
         },
-        _ => throw new InvalidOperationException($"Unexpected operand type: {left.ValueType}"),
+        ScriptValue.TypeEnum.Unset => throw new InvalidOperationException($"Unexpected operand type: {left.ValueType}"),
     };
     if (signalDef?.Result.RuntimeValueValidator == null || otherArgExpr.IsConstantValue()) {
       // If there is a signal, then we have value definition and can validate the constant argument.

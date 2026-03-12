@@ -168,8 +168,7 @@ sealed class DebugScriptableComponent : ScriptableComponentBase {
       fmtArgs[i] = arg.ValueType switch {
           ScriptValue.TypeEnum.String => arg.AsString,
           ScriptValue.TypeEnum.Number => arg.AsFloat,
-          ScriptValue.TypeEnum.Unset => throw new InvalidOperationException($"Unexpected value type in the arg: {arg}"),
-          _ => throw new InvalidOperationException($"Unsupported value type: {arg.ValueType}"),
+          ScriptValue.TypeEnum.Unset => throw new InvalidOperationException($"Value type must be set"),
       };
     }
     HostedDebugLog.Info(instance, "[Debug Log]: " + args[0].AsString, fmtArgs);

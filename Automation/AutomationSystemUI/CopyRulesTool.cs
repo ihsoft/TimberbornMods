@@ -93,7 +93,6 @@ sealed class CopyRulesTool : AbstractAreaSelectionTool, IAutomationModeEnabler, 
             .Select(x => x.Action)
             .ToList(),
         CopyMode.CopyRules => rulesHelper.BuildingRules.ToList(),  // Need a copy.
-        _ => throw new ArgumentException("Unknown copy mode"),
     };
     _toolGroupService.ExitToolGroup();
     _toolService.SwitchTool(this);

@@ -13,10 +13,14 @@
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
       <DebugType>embedded</DebugType>
+      <NoWarn>1701;1702;CS8524</NoWarn>
+      <WarningsAsErrors>CS8509;NU1605</WarningsAsErrors>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
       <DebugType>embedded</DebugType>
+      <NoWarn>1701;1702;CS8524</NoWarn>
+      <WarningsAsErrors>CS8509;NU1605</WarningsAsErrors>
     </PropertyGroup>
 
     <ItemGroup>

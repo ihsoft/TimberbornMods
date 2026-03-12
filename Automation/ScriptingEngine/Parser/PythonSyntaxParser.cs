@@ -278,7 +278,7 @@ class PythonSyntaxParser : ParserBase {
         ConstantValueExpr constExpr => constExpr.ValueType switch {
             ScriptValue.TypeEnum.String => Tokenizer.EscapeString(constExpr.ValueFn().AsString),
             ScriptValue.TypeEnum.Number => constExpr.ValueFn().AsFloat.ToString("0.##"),
-            _ => throw new InvalidOperationException($"Unsupported value type: {constExpr.ValueType}"),
+            ScriptValue.TypeEnum.Unset => throw new InvalidOperationException("Value type must be set"),
         },
         _ => throw new InvalidOperationException($"Unsupported expression type: {expression}"),
     };
@@ -296,7 +296,13 @@ class PythonSyntaxParser : ParserBase {
             MathOperator.OpType.Min => MinFunc,
             MathOperator.OpType.Max => MaxFunc,
             MathOperator.OpType.Round => RoundFunc,
-            _ => null,
+            MathOperator.OpType.Add
+                or MathOperator.OpType.Subtract
+                or MathOperator.OpType.Multiply
+                or MathOperator.OpType.Divide
+                or MathOperator.OpType.Modulus
+                or MathOperator.OpType.Negate =>
+                null,
         },
         ConcatOperator => ConcatFunc,
         ActionOperator actionOperator => actionOperator.ActionName,
@@ -327,7 +333,6 @@ class PythonSyntaxParser : ParserBase {
             ComparisonOperator.OpType.LessThanOrEqual => LeOperator,
             ComparisonOperator.OpType.GreaterThan => GtOperator,
             ComparisonOperator.OpType.GreaterThanOrEqual => GeOperator,
-            _ => throw new InvalidOperationException($"Unsupported operator: {comparisonOperator.OperatorType}"),
         },
         MathOperator mathOperator => mathOperator.OperatorType switch {
             MathOperator.OpType.Add => AddOperator,
@@ -335,13 +340,16 @@ class PythonSyntaxParser : ParserBase {
             MathOperator.OpType.Multiply => MulOperator,
             MathOperator.OpType.Divide => DivOperator,
             MathOperator.OpType.Modulus => ModOperator,
-            _ => throw new InvalidOperationException($"Unsupported operator: {mathOperator.OperatorType}"),
+            MathOperator.OpType.Min
+                or MathOperator.OpType.Max
+                or MathOperator.OpType.Round
+                or MathOperator.OpType.Negate =>
+                throw new InvalidOperationException($"Unsupported operator: {mathOperator.OperatorType}"),
         },
         LogicalOperator logicalOperator => logicalOperator.OperatorType switch {
             LogicalOperator.OpType.And => AndOperator,
             LogicalOperator.OpType.Or => OrOperator,
             LogicalOperator.OpType.Not => throw new InvalidOperationException("Not expected"),
-            _ => throw new InvalidOperationException($"Unsupported operator: {logicalOperator.OperatorType}"),
         },
         _ => throw new InvalidOperationException($"Unexpected expression type: {expression}"),
     };
@@ -361,7 +369,6 @@ class PythonSyntaxParser : ParserBase {
           GetPropertyFunction.FuncName.Element =>
               $"{GetElementFunc}('{propertyName}', {DecompileInternal(getPropertyFunction.IndexExpr)})",
           GetPropertyFunction.FuncName.Length => $"{GetLenFunc}('{propertyName}')",
-          _ => throw new InvalidOperationException($"Unexpected GetPropertyFunction: {propertyName}"),
       };
     }
     throw new InvalidOperationException($"Unsupported expression type: {function}");

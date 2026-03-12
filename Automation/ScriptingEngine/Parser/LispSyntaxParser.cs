@@ -187,7 +187,7 @@ sealed class LispSyntaxParser : ParserBase {
         sb.Append(constExpr.ValueType switch {
             ScriptValue.TypeEnum.String => Tokenizer.EscapeString(constExpr.ValueFn().AsString),
             ScriptValue.TypeEnum.Number => constExpr.ValueFn().AsRawNumber.ToString(),
-            _ => throw new InvalidOperationException($"Unsupported value type: {constExpr.ValueType}"),
+            ScriptValue.TypeEnum.Unset => throw new InvalidOperationException($"Value type must be set"),
         });
         break;
       case SymbolExpr symbolExpr:
@@ -225,7 +225,6 @@ sealed class LispSyntaxParser : ParserBase {
         HasComponentOperator hasComponentOperator => hasComponentOperator.OperatorType switch {
             HasComponentOperator.OpType.HasSignal => HasSignalFunc,
             HasComponentOperator.OpType.HasAction => HasActionFunc,
-            _ => throw new InvalidOperationException($"Unsupported operator: {hasComponentOperator}"),
         },
         ComparisonOperator comparisonOperator => comparisonOperator.OperatorType switch {
             ComparisonOperator.OpType.Equal => EqOperator,
@@ -234,13 +233,11 @@ sealed class LispSyntaxParser : ParserBase {
             ComparisonOperator.OpType.GreaterThanOrEqual => GeOperator,
             ComparisonOperator.OpType.LessThan => LtOperator,
             ComparisonOperator.OpType.LessThanOrEqual => LeOperator,
-            _ => throw new InvalidOperationException($"Unsupported operator: {comparisonOperator}"),
         },
         LogicalOperator logicalOperator => logicalOperator.OperatorType switch {
             LogicalOperator.OpType.And => AndOperator,
             LogicalOperator.OpType.Or => OrOperator,
             LogicalOperator.OpType.Not => NotOperator,
-            _ => throw new InvalidOperationException($"Unsupported operator: {logicalOperator}"),
         },
         MathOperator mathOperator => mathOperator.OperatorType switch {
             MathOperator.OpType.Add => AddOperator,
@@ -252,7 +249,6 @@ sealed class LispSyntaxParser : ParserBase {
             MathOperator.OpType.Min => MinFunc,
             MathOperator.OpType.Max => MaxFunc,
             MathOperator.OpType.Round => RoundFunc,
-            _ => throw new InvalidOperationException($"Unsupported operator: {mathOperator}"),
         },
         SignalOperator sigOperator => $"{SigFunc} {sigOperator.SignalName}",
         ActionOperator actOperator => $"{ActMethod} {actOperator.FullActionName}",

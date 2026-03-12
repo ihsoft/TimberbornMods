@@ -42,11 +42,10 @@ sealed class ExpressionDescriber(ILoc Loc) {
             // If the runtime value happen to be not an integer, it's still formatted as float in UI.
             ValueDef.NumericFormatEnum.Integer => scriptValue.AsFloat.ToString("0.##"),
             null => scriptValue.AsFloat.ToString("0.##"),  // valeDef can be null.
-            _ => throw new InvalidOperationException($"Unknown numeric format: {valueDef.DisplayNumericFormat}"),
+            ValueDef.NumericFormatEnum.Unspecified => throw new InvalidOperationException("Numeric format mus tbe set"),
         },
         ScriptValue.TypeEnum.String => scriptValue.AsString,
-        ScriptValue.TypeEnum.Unset => throw new InvalidOperationException($"Cannot format value: {scriptValue}"),
-        _ => throw new InvalidOperationException($"Unknown ScriptValue type: {scriptValue.ValueType}"),
+        ScriptValue.TypeEnum.Unset => throw new InvalidOperationException("Value type must be set"),
     };
     if (valueDef?.Options == null) {
       return stringValue;
@@ -75,7 +74,7 @@ sealed class ExpressionDescriber(ILoc Loc) {
     return scriptValue.ValueType switch {
         ScriptValue.TypeEnum.String => $"'{scriptValue.AsString}'",
         ScriptValue.TypeEnum.Number => scriptValue.AsFloat.ToString("0.0#"),
-        _ => $"ERROR:{scriptValue.ValueType}",
+        ScriptValue.TypeEnum.Unset => throw new InvalidOperationException("Value type must be set"),
     };
   }
 
@@ -94,7 +93,6 @@ sealed class ExpressionDescriber(ILoc Loc) {
         ComparisonOperator.OpType.LessThan => " < ",
         ComparisonOperator.OpType.GreaterThanOrEqual => " \u2265 ",
         ComparisonOperator.OpType.LessThanOrEqual => " \u2264 ",
-        _ => throw new InvalidOperationException("Unknown operator: " + this),
     });
     if (EntityPanelSettings.EvalValuesInConditions || op.Right.IsConstantValue()) {
       string rightValue;
@@ -119,8 +117,6 @@ sealed class ExpressionDescriber(ILoc Loc) {
           GetPropertyFunction.FuncName.Element =>
               $"GetElement({propertyName}, {DescribeExpressionInternal(getPropertyFunction.IndexExpr)})",
           GetPropertyFunction.FuncName.Length => $"Count({propertyName})",
-          _ => throw new InvalidOperationException(
-              $"Unexpected GetPropertyFunction type: {getPropertyFunction.FunctionName}")
       };
     }
     throw new InvalidOperationException($"Unexpected function: {function}");
@@ -134,7 +130,7 @@ sealed class ExpressionDescriber(ILoc Loc) {
     var displayName = op.OperatorType switch {
         LogicalOperator.OpType.And => Loc.T(AndOperatorLocKey),
         LogicalOperator.OpType.Or => Loc.T(OrOperatorLocKey),
-        _ => throw new InvalidOperationException($"Unsupported operator: {op.OperatorType}"),
+        LogicalOperator.OpType.Not => throw new InvalidOperationException("Not operator should be handled separately"),
     };
 
     // Resolve the multi-operands operators: (add a b c ...)
@@ -156,7 +152,12 @@ sealed class ExpressionDescriber(ILoc Loc) {
         MathOperator.OpType.Round => "Round",
         // For constants, the negate operator should have been resolved above.
         MathOperator.OpType.Negate => "-",
-        _ => null,
+        MathOperator.OpType.Add
+            or MathOperator.OpType.Subtract
+            or MathOperator.OpType.Multiply
+            or MathOperator.OpType.Divide
+            or MathOperator.OpType.Modulus =>
+            null,
     };
     if (funcName != null) {
       var value = string.Join(", ", op.Operands.Select(DescribeExpressionInternal));
@@ -170,7 +171,11 @@ sealed class ExpressionDescriber(ILoc Loc) {
         MathOperator.OpType.Multiply => " × ",
         MathOperator.OpType.Divide => " ÷ ",
         MathOperator.OpType.Modulus => " % ",
-        _ => throw new InvalidOperationException($"Unknown operator: {op.OperatorType}"),
+        MathOperator.OpType.Min
+            or MathOperator.OpType.Max
+            or MathOperator.OpType.Round
+            or MathOperator.OpType.Negate =>
+                throw new InvalidOperationException($"Unexpected operator: {op.OperatorType}"),
     };
     var leftValue = DescribeLeft(operands[0], op);
     // Add and Multiply operators are not strictly left-associative. Avoid unneeded parenthesis.

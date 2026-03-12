@@ -37,9 +37,10 @@ sealed record ArgumentDefinition {
               ValueDef.NumericFormatEnum.Integer => uiFactory.T(ConstantTypeWholeNumberLocKey),
               ValueDef.NumericFormatEnum.Float => uiFactory.T(ConstantTypeDecimalsLocKey),
               ValueDef.NumericFormatEnum.Percent => uiFactory.T(ConstantTypePercentLocKey),
-              _ => throw new InvalidOperationException($"Unsupported numeric format: {valueDef.DisplayNumericFormat}"),
+              ValueDef.NumericFormatEnum.Unspecified =>
+                  throw new InvalidOperationException("Numeric format must be set"),
           },
-          _ => throw new InvalidOperationException($"Unsupported value type: {valueDef.ValueType}"),
+          ScriptValue.TypeEnum.Unset => throw new InvalidOperationException("Value type must be set"),
       };
       ValueOptions = [(ArgumentConstructor.InputTypeName, locValue)];
     }

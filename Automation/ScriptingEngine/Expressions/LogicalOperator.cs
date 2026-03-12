@@ -28,7 +28,7 @@ class LogicalOperator : BooleanOperator {
     Func<IList<IExpression>, LogicalOperator> reduceOperandsFn = OperatorType switch {
         OpType.Or => CreateOr,
         OpType.And => CreateAnd,
-        _ => throw new InvalidOperationException($"Cannot reduce {OperatorType}"),
+        OpType.Not => throw new InvalidOperationException($"Cannot reduce: {OperatorType}"),
     };
     return ReducedOperands(reduceOperandsFn);
   }
@@ -53,7 +53,6 @@ class LogicalOperator : BooleanOperator {
         OpType.And => () => boolOperands.All(x => x.Execute()),
         OpType.Or => () => boolOperands.Any(x => x.Execute()),
         OpType.Not => () => !boolOperands[0].Execute(), 
-        _ => throw new InvalidOperationException($"Unsupported logical operator type: {opType}"),
     };
   }
 }

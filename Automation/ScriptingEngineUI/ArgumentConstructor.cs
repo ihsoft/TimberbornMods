@@ -36,9 +36,9 @@ sealed class ArgumentConstructor : BaseConstructor {
             ValueDef.NumericFormatEnum.Percent => scriptValue.AsRawNumber.ToString(),
             ValueDef.NumericFormatEnum.Float => scriptValue.AsFloat.ToString("0.00"),
             ValueDef.NumericFormatEnum.Integer => scriptValue.AsInt.ToString(),
-            _ => throw new InvalidOperationException($"Unsupported numeric format: {valueDef.DisplayNumericFormat}"),
+            ValueDef.NumericFormatEnum.Unspecified => throw new InvalidOperationException($"Unsupported numeric format: {valueDef.DisplayNumericFormat}"),
         },
-        _ => throw new ArgumentException($"Invalid argument type: {valueDef.ValueType}")
+        ScriptValue.TypeEnum.Unset => throw new ArgumentException($"Invalid argument type: {valueDef.ValueType}"),
     };
     if (_typeSelectionDropdown.Items.Any(x => x.Value == value)) {
       _typeSelectionDropdown.SelectedValue = value;
@@ -99,7 +99,7 @@ sealed class ArgumentConstructor : BaseConstructor {
     return _argumentDefinition.ValueType switch {
         ScriptValue.TypeEnum.Number => TryGetScriptValueAsNumber(out _).AsRawNumber.ToString(),
         ScriptValue.TypeEnum.String => $"'{TryGetScriptValueAsString(out _).AsString}'",
-        _ => throw new InvalidOperationException("Unknown argument type: " + _argumentDefinition.ValueType),
+        ScriptValue.TypeEnum.Unset => throw new InvalidOperationException("Value type must be set"),
     };
   }
 
@@ -226,7 +226,9 @@ sealed class ArgumentConstructor : BaseConstructor {
   string FormatToArgPrecision(float value) {
     return _argumentDefinition.ValueDef.DisplayNumericFormat switch {
         ValueDef.NumericFormatEnum.Float => value.ToString("0.00"),
-        _ => value.ToString(CultureInfo.InvariantCulture),
+        ValueDef.NumericFormatEnum.Integer or ValueDef.NumericFormatEnum.Percent =>
+            value.ToString(CultureInfo.InvariantCulture),
+        ValueDef.NumericFormatEnum.Unspecified => throw new InvalidOperationException("Numeric format must be set"),
     };
   }
 

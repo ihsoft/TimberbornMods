@@ -118,7 +118,7 @@ abstract class ParserBase {
     return value.ValueType switch {
         ScriptValue.TypeEnum.String => value.AsString,
         ScriptValue.TypeEnum.Number => value.AsRawNumber.ToString(),
-        _ => throw new InvalidOperationException("Unsupported type: " + value.ValueType),
+        ScriptValue.TypeEnum.Unset => throw new ScriptError.ParsingError("Value must be set"),
     };
   }
 
@@ -147,7 +147,6 @@ abstract class ParserBase {
               ComparisonOperator.CreateGe(CurrentContext, comparisonOperator.Operands),
           ComparisonOperator.OpType.LessThanOrEqual =>
               ComparisonOperator.CreateGt(CurrentContext, comparisonOperator.Operands),
-          _ => throw new InvalidOperationException($"Unexpected comparison operator {comparisonOperator}"),
       };
     }
     throw new InvalidOperationException($"Unsupported boolean operator: {booleanOperator}");
