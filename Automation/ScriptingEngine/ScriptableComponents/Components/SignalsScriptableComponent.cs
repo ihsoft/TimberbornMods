@@ -85,7 +85,7 @@ sealed class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSing
   /// <inheritdoc/>
   public override void InstallAction(ActionOperator actionOperator, AutomationBehavior behavior) {
     if (actionOperator.ActionName == SetActionName) {
-      var signalName = GetSignalSignalNamePrefix + GetSignalName(actionOperator.Operands[0] as IValueExpr);
+      var signalName = GetSignalSignalNamePrefix + actionOperator.Arguments[0]().AsString;
       _signalDispatcher.RegisterSignalProvider(signalName, behavior, actionOperator);
     }
   }
@@ -93,7 +93,7 @@ sealed class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSing
   /// <inheritdoc/>
   public override void UninstallAction(ActionOperator actionOperator, AutomationBehavior behavior) {
     if (actionOperator.ActionName == SetActionName) {
-      var signalName = GetSignalSignalNamePrefix + GetSignalName(actionOperator.Operands[0] as IValueExpr);
+      var signalName = GetSignalSignalNamePrefix + actionOperator.Arguments[0]().AsString;
       _signalDispatcher.UnregisterSignalProvider(signalName, behavior, actionOperator);
     }
   }

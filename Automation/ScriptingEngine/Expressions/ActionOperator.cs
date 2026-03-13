@@ -21,6 +21,7 @@ sealed class ActionOperator : AbstractOperator {
   public readonly bool ExecuteOnce; 
   public readonly Action Execute;
   public readonly ActionDef ActionDef;
+  public readonly IList<Func<ScriptValue>> Arguments;
 
   public static ActionOperator Create(ExpressionContext context, string actionName, IList<IExpression> operands) {
     return new ActionOperator(context, actionName, operands);
@@ -47,7 +48,7 @@ sealed class ActionOperator : AbstractOperator {
     }
 
     // Handle fixed position arguments.
-    var argValues = new List<Func<ScriptValue>>(operands.Count);
+    Arguments = new Func<ScriptValue>[operands.Count];
     var argDefIndex = 0;
     for (var argPos = 0; argPos < operands.Count; argPos++) {
       var operand = operands[argPos];
@@ -72,18 +73,18 @@ sealed class ActionOperator : AbstractOperator {
         }
       }
       if (argDef.RuntimeValueValidator == null || valueExpr.IsConstantValue()) {
-        argValues.Add(valueExpr.ValueFn);
+        Arguments[argPos] = valueExpr.ValueFn;
       } else {
-        argValues.Add(() => {
+        Arguments[argPos] = () => {
           var value = valueExpr.ValueFn();
           if (ScriptEngineSettings.CheckArgumentValues) {
             argDef.RuntimeValueValidator(value);
           }
           return value;
-        });
+        };
       }
     }
     var action = ScriptingService.Instance.GetActionExecutor(ActionName, context.ScriptHost);
-    Execute = () => action(argValues.Select(v => v()).ToArray());
+    Execute = () => action(Arguments.Select(v => v()).ToArray());
   }
 }
