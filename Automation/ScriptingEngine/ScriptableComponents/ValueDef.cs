@@ -14,8 +14,13 @@ namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
 /// <summary>Definition of an argument that can be passed to a script action or be returned from a signal.</summary>
 sealed record ValueDef {
-  /// <summary>The type of the argument.</summary>
-  public ScriptValue.TypeEnum ValueType { get; init; }
+  /// <summary>Optional localized name of the value when it's an argument to an action.</summary>
+  /// <remarks>
+  /// It only makes sense when there are more than one argument. For the single argument actions, the name won't be
+  /// shown. If there are multiple arguments, adn the name is not provided, then the generic strings will be shown
+  /// instead of the arguments names.
+  /// </remarks>
+  public string DisplayName { get; init; }
 
   /// <summary>
   /// The UI representation of a numeric value type. It defines how the players will see and enter the value.
@@ -69,6 +74,9 @@ sealed record ValueDef {
   /// <seealso cref="DisplayNumericFormat"/>
   /// <seealso cref="ScriptValue.AsRawNumber"/>
   public (float min, float max) DisplayNumericFormatRange { get; init; }
+
+  /// <summary>The type of the argument.</summary>
+  public ScriptValue.TypeEnum ValueType { get; init; }
 
   /// <summary>Optional validating function for the argument value.</summary>
   /// <remarks>

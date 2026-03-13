@@ -172,6 +172,7 @@ IgorZ.Automation.Scripting.Expressions.ParseError,"ОШИБКА ОБРАБОТК
 =,=,"Rules editor strings"
 IgorZ.Automation.Scripting.Editor.ActionLabel,"Тогда",
 IgorZ.Automation.Scripting.Editor.ActionMustBeAction,"Действие должно быть оператором 'act'","A message to show when the action is not an action"
+IgorZ.Automation.Scripting.Editor.ActionArgumentName,"Аргумент #{0}","The generic name of the action arguments when there is no display name specified"
 IgorZ.Automation.Scripting.Editor.AddRuleFromScriptBtn,"Добавить скрипт",
 IgorZ.Automation.Scripting.Editor.AddRuleViaConstructorBtn,"Создать правило через конструктор",
 IgorZ.Automation.Scripting.Editor.ArgumentMaxValueHint,"(макс: {0})","A hint to show the maximum value of the argument"

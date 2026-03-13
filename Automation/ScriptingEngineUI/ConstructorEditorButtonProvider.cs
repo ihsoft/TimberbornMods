@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Core;
@@ -69,8 +70,7 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
         || !_scriptingService.GetActionNamesForBuilding(ruleRow.ActiveBuilding).Contains(action.FullActionName)) {
       return false;
     }
-    if (signal.Operands.Count != 0 || action.Operands.Count > 1
-        || action.Operands.Count == 1 && action.Operands[0] is not ConstantValueExpr) {
+    if (signal.Operands.Count != 0 || action.Operands.Any(x => x is not ConstantValueExpr)) {
       return false;
     }
     return true;
@@ -101,7 +101,6 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
 
     var actions = _scriptingService.GetActionNamesForBuilding(behavior)
         .Select(t => _scriptingService.GetActionDefinition(t, behavior))
-        .Where(x => x.Arguments.Length <= 1)
         .Select(t => new ActionConstructor.ActionDefinition {
             Name = (t.ScriptName, t.DisplayName),
             Arguments = t.Arguments.Select(v => new ArgumentDefinition(_uiFactory, v)).ToArray(),
@@ -115,6 +114,7 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
     }
     var result = _parserFactory.LispSyntaxParser.Parse(lispSyntax, ruleRow.ActiveBuilding);
     if (result.LastScriptError != null) {
+      //FXIME: maybe deal with it better?
       throw result.LastScriptError;  // Not expected!
     }
     return _parserFactory.DefaultParser.Decompile(result.ParsedExpression);
@@ -129,13 +129,14 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
     if (ruleRow.ParsedAction.Operands.Count == 0) {
       return;
     }
-    if (ruleRow.ParsedAction.Operands.Count > 1) {
-      throw new InvalidOperationException("At most one argument is expected");
+    var argumentValues = new List<ScriptValue>();
+    foreach (var argument in ruleRow.ParsedAction.Operands) {
+      if (argument is not ConstantValueExpr constantValueExpr) {
+        throw new InvalidOperationException("Constant value is expected");
+      }
+      argumentValues.Add(constantValueExpr.ValueFn());
     }
-    if (ruleRow.ParsedAction.Operands[0] is not ConstantValueExpr constantValue) {
-      throw new InvalidOperationException("Constant value is expected");
-    }
-    actionConstructor.ArgumentConstructor.SetScriptValue(constantValue.ValueFn());
+    actionConstructor.SetArguments(argumentValues);
   }
 
   static void PopulateCondition(RuleRow ruleRow, RuleConstructor ruleConstructor) {
