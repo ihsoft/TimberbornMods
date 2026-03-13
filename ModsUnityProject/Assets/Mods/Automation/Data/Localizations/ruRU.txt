@@ -156,6 +156,8 @@ IgorZ.Automation.Scriptable.Pausable.Action.Resume,"запустить здан�
 IgorZ.Automation.Scriptable.Prioritizable.Action.ResetHaulers,"- приоритет грузчиков","Name of the action that resets the priority to the haulers"
 IgorZ.Automation.Scriptable.Prioritizable.Action.SetHaulers,"+ приоритет грузчиков","Name of the action that sets the priority to the haulers"
 IgorZ.Automation.Scriptable.Signals.Action.Set,"сигнал: {0} = {1}","Name of the action that sets the signal to the specified value"
+IgorZ.Automation.Scriptable.Signals.Action.Set.SignalNameArgument,"Имя сигнала","Name of the signal argument that specifies the signal name to set"
+IgorZ.Automation.Scriptable.Signals.Action.Set.SignalValueArgument,"Значение сигнала","Name of the signal argument that specifies the signal value to set"
 IgorZ.Automation.Scriptable.Signals.Signal.Get,"сигнал: {0}","Name of the condition for the signal checking"
 IgorZ.Automation.Scriptable.StreamGauge.Signal.Contamination,"заражение","Name of the condition for the current water contamination level checking"
 IgorZ.Automation.Scriptable.StreamGauge.Signal.Current,"течение","Name of the condition for the current water current checking"

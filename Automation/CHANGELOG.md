@@ -1,3 +1,6 @@
+# v3.6.0 (started on March 13th, 2026):
+* [Feature] Allow configuring action `Signals.Set` via UI.
+
 # v3.5.2 (March 8th, 2026):
 * [Change] Many runtime value validations were removed. They were not helping, but only adding frustration.
 * [Change] Show the fractional part of the values when comparing against as signal that can only return a whole number. The math expressions can produce a decimal value, so it's worth knowing its actual value.

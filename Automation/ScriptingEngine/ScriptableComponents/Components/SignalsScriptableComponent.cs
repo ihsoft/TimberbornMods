@@ -18,6 +18,8 @@ sealed class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSing
 
   const string GetSignalLocKey = "IgorZ.Automation.Scriptable.Signals.Signal.Get";
   const string SetSignalActionLocKey = "IgorZ.Automation.Scriptable.Signals.Action.Set";
+  const string SetSignalActionSignalNameArgLocKey = "IgorZ.Automation.Scriptable.Signals.Action.Set.SignalNameArgument";
+  const string SetSignalActionSignalValueArgLocKey = "IgorZ.Automation.Scriptable.Signals.Action.Set.SignalValueArgument";
 
   const string GetSignalSignalNamePrefix = "Signals.";
   // Used by RulesUIHelper.
@@ -146,12 +148,15 @@ sealed class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSing
       DisplayName = Loc.T(SetSignalActionLocKey),
       Arguments = [
           new ValueDef {
+              DisplayName = Loc.T(SetSignalActionSignalNameArgLocKey),
               ValueType = ScriptValue.TypeEnum.String,
-              ArgumentValidator = expr => GetSignalName(expr),
+              ArgumentValidator = ValidateSignalArgument,
+              RuntimeValueValidator = ValidateSignalName,
           },
           new ValueDef {
-              ValueType = ScriptValue.TypeEnum.Number,
+              DisplayName = Loc.T(SetSignalActionSignalValueArgLocKey),
               DisplayNumericFormat = ValueDef.NumericFormatEnum.Float,
+              ValueType = ScriptValue.TypeEnum.Number,
           },
       ],
   };
@@ -175,13 +180,22 @@ sealed class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSing
     _signalDispatcher = signalDispatcher;
   }
 
-  static string GetSignalName(IValueExpr expr) {
+  static void ValidateSignalArgument(IValueExpr expr) {
     if (expr == null || !expr.IsConstantValue() || expr.ValueType != ScriptValue.TypeEnum.String) {
       throw new ScriptError.ParsingError($"Signal name must be a constant string");
     }
-    var name = expr.ValueFn().AsString;
-    SymbolExpr.CheckName(name);
-    return name;
+  }
+
+  static void ValidateSignalName(ScriptValue value) {
+    var strValue = value.AsString;
+    if (strValue == "") {
+      throw new ScriptError.BadValue("Argument must not be empty");
+    }
+    try {
+      SymbolExpr.CheckName(strValue);
+    } catch (ScriptError.ParsingError ex) {
+      throw new ScriptError.BadValue(ex.Message);
+    }
   }
 
   #endregion
