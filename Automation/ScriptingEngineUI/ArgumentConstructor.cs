@@ -109,7 +109,6 @@ sealed class ArgumentConstructor : BaseConstructor {
 
   static readonly Color ArgumentValueHintColor = new(0.5f, 0.5f, 0.5f);
   static readonly Regex IsGoodFullFloatValueRegex = new(@"^-?\d+(\.[0-9]{1,2}[0]*)?$");
-  static readonly Regex IsGoodSingleFloatValueRegex = new(@"^-?\d+(\.[0-9]?[0]*)?$");
 
   readonly ResizableDropdownElement _typeSelectionDropdown;
   readonly TextField _textField;
