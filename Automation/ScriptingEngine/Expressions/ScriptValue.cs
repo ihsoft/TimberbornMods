@@ -160,7 +160,7 @@ record struct ScriptValue : IComparable<ScriptValue> {
   public int AsInt => Mathf.RoundToInt(AsRawNumber / 100f);
 
   /// <summary>Current string value.</summary>
-  /// <exception cref="ScriptError">if the value is not a string.</exception>
+  /// <exception cref="ScriptError.BadValue">if the value is not a string.</exception>
   public string AsString {
     get {
       if (_string == null) {
