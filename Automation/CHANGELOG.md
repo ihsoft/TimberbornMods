@@ -1,4 +1,4 @@
-# v3.6.0 (started on March 13th, 2026):
+# v3.6.0 (March 13th, 2026):
 * [Feature] Allow configuring action `Signals.Set` via UI.
 
 # v3.5.2 (March 8th, 2026):
