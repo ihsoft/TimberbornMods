@@ -1,0 +1,9 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+    <cui:NineSliceVisualElement name="ImportGoodIcon" class="import-good-icon">
+        <ui:Image name="Icon" class="import-good-icon__icon">
+            <ui:VisualElement name="ImportableIcon" class="import-good-icon__importable-icon" />
+            <ui:VisualElement name="NonImportableIcon" class="import-good-icon__non-importable-icon" />
+        </ui:Image>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

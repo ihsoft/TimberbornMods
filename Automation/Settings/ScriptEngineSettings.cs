@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System.Diagnostics.CodeAnalysis;
+using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 using IgorZ.TimberDev.Settings;
 using ModSettings.Core;
 using Timberborn.Modding;
@@ -14,7 +15,6 @@ namespace IgorZ.Automation.Settings;
 sealed class ScriptEngineSettings : BaseSettings<ScriptEngineSettings> {
 
   const string HeaderStringLocKey = "IgorZ.Automation.Settings.ScriptEngine.Header";
-  const string CheckOptionsArgumentsLocKey = "IgorZ.Automation.Settings.ScriptEngine.CheckOptionsArguments";
   const string CheckArgumentValuesLocKey = "IgorZ.Automation.Settings.ScriptEngine.CheckArgumentValues";
   const string SignalExecutionStackSizeLocKey = "IgorZ.Automation.Settings.ScriptEngine.SignalExecutionStackSize";
 
@@ -35,10 +35,11 @@ sealed class ScriptEngineSettings : BaseSettings<ScriptEngineSettings> {
 
   #region Settings
 
-  public ModSetting<bool> CheckOptionsArgumentsInternal { get; } = new(
-      true, ModSettingDescriptor.CreateLocalized(CheckOptionsArgumentsLocKey));
-  public static bool CheckOptionsArguments => Instance.CheckOptionsArgumentsInternal.Value;
-
+  /// <summary>Tells if the engine should validate values in signal comparision and actions arguments.</summary>
+  /// <remarks>
+  /// If the setting is disabled, then <see cref="ValueDef.RuntimeValueValidator"/> won't be called in runtime. However,
+  /// the constant values will still be verified on parsing.
+  /// </remarks>
   public static bool CheckArgumentValues { get; private set; }
   public ModSetting<bool> CheckArgumentValuesInternal { get; } = new(
       true, ModSettingDescriptor.CreateLocalized(CheckArgumentValuesLocKey));
@@ -53,7 +54,7 @@ sealed class ScriptEngineSettings : BaseSettings<ScriptEngineSettings> {
 
   ScriptEngineSettings(
       ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry, ModRepository modRepository)
-      : base(settings, modSettingsOwnerRegistry, modRepository) { 
+      : base(settings, modSettingsOwnerRegistry, modRepository) {
     InstallSettingCallback(CheckArgumentValuesInternal, v => CheckArgumentValues = v);
     InstallSettingCallback(SignalExecutionStackSizeInternal, v => SignalExecutionStackSize = v);
   }

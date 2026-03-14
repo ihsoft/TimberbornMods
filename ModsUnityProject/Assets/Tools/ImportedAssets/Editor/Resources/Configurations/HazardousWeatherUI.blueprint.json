@@ -1,0 +1,7 @@
+{
+  "HazardousWeatherUISpec": {
+    "ApproachingNotificationDays": 3,
+    "MaxDayProgressLeftToNotify": 0.15,
+    "NotificationDuration": 6.0
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "GoodSpec": {
+    "Id": "Biofuel",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [
+      {
+        "NeedId": "Biofuel",
+        "Points": 0.3
+      }
+    ],
+    "GoodType": "Liquid",
+    "StockpileVisualization": "Liquid",
+    "VisibleContainer": "Barrel",
+    "ContainerColor": {
+      "r": 0.458823532,
+      "g": 0.533333361,
+      "b": 0.0392156877,
+      "a": 1.0
+    },
+    "ContainerMaterial": "Materials/Goods/BioFuel",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Materials",
+    "GoodOrder": 5030,
+    "Icon": "Sprites/Goods/BiofuelIcon",
+    "ForceImport": true,
+    "DisplayNameLocKey": "Good.Biofuel.DisplayName",
+    "PluralDisplayNameLocKey": "Good.Biofuel.PluralDisplayName"
+  }
+}

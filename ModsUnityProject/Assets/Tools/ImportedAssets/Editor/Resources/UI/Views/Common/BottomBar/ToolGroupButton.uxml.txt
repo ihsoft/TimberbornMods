@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False" xsi:schemaLocation="Timberborn.CoreUI file:/C:/Timberborn/timberborn/UIElementsSchema/Timberborn.CoreUI.xsd">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/BottomBar/BottomBarStyle.uss" />
+    <ui:VisualElement name="ToolGroup" class="tool-group">
+        <ui:VisualElement name="ToolButtons" class="tool-group__buttons" />
+        <ui:VisualElement name="ToolGroupButtonWrapper" class="bottom-bar-button">
+            <ui:VisualElement name="ToolButtonMainContainer" class="bottom-bar-button--main">
+                <ui:Button name="ToolGroupButton" class="bottom-bar-button__icon bottom-bar-button__button bottom-bar-button--clickable">
+                    <ui:VisualElement name="Frame" class="bottom-bar-button__inner-item bottom-bar-button__frame" />
+                </ui:Button>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <cui:NineSliceVisualElement picking-mode="Ignore" name="TooltipContent" class="tool-group__tooltip-wrapper bg-box--brown">
+            <ui:Label name="Tooltip" text="Tooltip" class="tool-group__tooltip game-text-normal" />
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

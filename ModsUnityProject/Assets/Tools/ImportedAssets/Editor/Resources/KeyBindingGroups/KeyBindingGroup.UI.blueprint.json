@@ -1,0 +1,7 @@
+{
+  "KeyBindingGroupSpec": {
+    "Id": "UI",
+    "Order": 40,
+    "LocKey": "KeyBindingGroup.UI"
+  }
+}

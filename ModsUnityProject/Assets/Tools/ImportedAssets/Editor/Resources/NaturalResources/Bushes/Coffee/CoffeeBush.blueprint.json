@@ -1,0 +1,231 @@
+{
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "TemplateSpec": {
+    "TemplateName": "CoffeeBush",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "NaturalResourceSpec": {
+    "Order": 5
+  },
+  "BushSpec": {},
+  "GrowableSpec": {
+    "GrowthTimeInDays": 9.0
+  },
+  "BasicSelectionSoundSpec": {
+    "SoundName": "Bush",
+    "AlternativeSoundName": ""
+  },
+  "DemolishableSpec": {
+    "DemolishTimeInHours": 0.8,
+    "ShowDemolishButtonInEntityPanel": false
+  },
+  "GatherableSpec": {
+    "YieldGrowthTimeInDays": 3.0,
+    "Yielder": {
+      "YielderComponentName": "Gatherable",
+      "Yield": {
+        "Id": "CoffeeBean",
+        "Amount": 1
+      },
+      "RemovalTimeInHours": 0.8,
+      "ResourceGroup": "Gatherable"
+    }
+  },
+  "PlantableSpec": {
+    "ResourceGroup": "Forester",
+    "PlantTimeInHours": 0.2
+  },
+  "PlantablePreviewModelSpec": {
+    "Model": "NaturalResources\\Bushes\\Coffee\\CoffeeBushMature"
+  },
+  "ReproducibleSpec": {
+    "ReproductionChance": 0.02
+  },
+  "WateredNaturalResourceSpec": {
+    "DaysToDieDry": 8.0
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "NaturalResource.Coffee.DisplayName",
+    "DescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "NaturalResource.Coffee.FlavorDescription",
+    "Icon": "NaturalResources/Bushes/Coffee/CoffeeBushIcon"
+  },
+  "FloodableNaturalResourceSpec": {
+    "MinWaterHeight": 0,
+    "MaxWaterHeight": 0,
+    "DaysToDie": 4.0
+  },
+  "NaturalResourceModelRandomizerSpec": {
+    "ConstrainProportion": false,
+    "MinHeightScaleFactor": 0.8,
+    "MaxHeightScaleFactor": 1.2,
+    "MinWidthScaleFactor": 0.8,
+    "MaxWidthScaleFactor": 1.2,
+    "RandomizedRotation": "BetweenMinAndMax",
+    "MinRotation": 0.0,
+    "MaxRotation": 360.0
+  },
+  "ContaminatedNaturalResourceSpec": {},
+  "BlockObjectModelSpec": {
+    "FullModelName": "#Models",
+    "UncoveredModelName": "",
+    "UndergroundModelName": "",
+    "UndergroundModelDepth": 0
+  },
+  "Children": {
+    "#Models": {
+      "Children": {
+        "Seedling": {
+          "Children": {
+            "#Alive": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Bushes/Coffee/CoffeeBushSeedling"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.06,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.29
+                  }
+                ],
+                "CapsuleColliders": []
+              }
+            },
+            "#Dead": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Bushes/Coffee/CoffeeBushSeedlingDead"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": -0.05,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.29
+                  }
+                ],
+                "CapsuleColliders": []
+              }
+            },
+            "#Dying": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Bushes/Coffee/CoffeeBushSeedlingDry"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.05,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.29
+                  }
+                ],
+                "CapsuleColliders": []
+              }
+            }
+          }
+        },
+        "Mature": {
+          "Children": {
+            "#Alive": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Bushes/Coffee/CoffeeBushMature"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.2,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.38
+                  }
+                ],
+                "CapsuleColliders": []
+              }
+            },
+            "#Dying": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Bushes/Coffee/CoffeeBushMatureDry"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.2,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.38
+                  }
+                ],
+                "CapsuleColliders": []
+              }
+            },
+            "#Dead": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Bushes/Coffee/CoffeeBushMatureDead"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.2,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.38
+                  }
+                ],
+                "CapsuleColliders": []
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

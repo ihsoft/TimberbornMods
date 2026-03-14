@@ -1,0 +1,10 @@
+{
+  "KeyBindingSpec": {
+    "Id": "IncreaseSpeed",
+    "GroupId": "Time",
+    "LocKey": "KeyBinding.IncreaseSpeed",
+    "Order": 40,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  }
+}

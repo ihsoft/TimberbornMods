@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <ui:VisualElement class="notification-panel-wrapper">
+        <Style src="/Assets/Resources/UI/Views/Game/NotificationPanel/NotificationPanelStyle.uss" />
+        <ui:VisualElement name="LatestNotification" class="notification-panel__latest game-text-small extension-panel-background" />
+        <ui:ScrollView name="Notifications" class="notification-panel game-scroll-view extension-panel-background" />
+        <ui:Button name="ExtensionToggler" class="extension-clamp notification-panel__toggler" />
+    </ui:VisualElement>
+</ui:UXML>

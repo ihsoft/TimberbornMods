@@ -1,0 +1,14 @@
+﻿{
+  "TutorialSpec": {
+    "Id": "HousingAndPopulation",
+    "NameLocKey": "Tutorial.HousingAndPopulation",
+    "RequiredTutorialIds": [
+      "Storage"
+    ],
+    "SortOrder": 60,
+    "Stages": [
+      "HousingAndPopulation.BuildLodges",
+      "HousingAndPopulation.GrowPopulation"
+    ]
+  }
+}

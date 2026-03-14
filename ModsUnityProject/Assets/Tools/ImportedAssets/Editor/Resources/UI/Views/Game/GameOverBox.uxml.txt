@@ -1,0 +1,16 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="Box" src="/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml" />
+    <ui:Template name="Thumbnail" src="/Assets/Resources/UI/Views/Common/Thumbnail.uxml" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <ui:Instance name="GameOverBox" template="Box" class="game-over-box">
+        <ui:AttributeOverrides text="The End" element-name="Header" text-loc-key="GameOver.Header" />
+        <ui:Label text="There is no one left. The Settlement has fallen." name="Info" class="game-text-heading game-over-box__end-text" />
+        <ui:Label text="To grasp with mortality is to grasp with life itself" name="Flavor" class="game-text-heading game-over-box__flavor-text" />
+        <ui:VisualElement name="Buttons" class="content-row-centered">
+            <cui:LocalizableButton text="Let me look.." name="ContinueButton" text-loc-key="GameOver.Continue" class="menu-button" />
+            <cui:LocalizableButton text="Finish" name="ExitButton" text-loc-key="GameOver.Exit" class="menu-button" />
+        </ui:VisualElement>
+    </ui:Instance>
+</ui:UXML>

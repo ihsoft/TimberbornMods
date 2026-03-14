@@ -1,0 +1,20 @@
+{
+  "KeyBindingSpec": {
+    "Id": "DecreaseBrushHeight",
+    "GroupId": "MapEditor",
+    "LocKey": "KeyBinding.DecreaseBrushHeight",
+    "Order": 50,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Mouse/scroll/down",
+    "InputModifiers": "Ctrl, Alt",
+    "Unchangeable": false
+  },
+  "SecondaryInputBindingSpec": {
+    "Path": "/Keyboard/leftBracket",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

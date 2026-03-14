@@ -1,0 +1,199 @@
+{
+  "TemplateSpec": {
+    "TemplateName": "PoleBanner.Folktails",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BuildingSpec": {
+    "SelectionSoundName": "Default",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "Log",
+        "Amount": 4
+      },
+      {
+        "Id": "Plank",
+        "Amount": 4
+      },
+      {
+        "Id": "Extract",
+        "Amount": 1
+      }
+    ],
+    "ScienceCost": 700,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": false,
+    "DrawRangeBoundsOnIt": false
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 2
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Decoration",
+    "ToolOrder": 100,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.PoleBanner.DisplayName",
+    "DescriptionLocKey": "Building.PoleBanner.Description",
+    "FlavorDescriptionLocKey": "",
+    "Icon": "Buildings/Decoration/PoleBanner/PoleBannerIcon"
+  },
+  "DecalSupplierSpec": {
+    "Category": "Banners"
+  },
+  "DecalSupplierBuildingIconSpec": {
+    "IconRendererName": "#display_FT"
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "FlippableDecalSpec": {
+    "DecalName": "#display_FT"
+  },
+  "Children": {
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Decoration/PoleBanner/PoleBanner.Folktails.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.5006134,
+              "Y": 0.468691051,
+              "Z": 0.493988931
+            },
+            "Size": {
+              "X": 0.11546123,
+              "Y": 0.7290441,
+              "Z": 0.139726281
+            }
+          },
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 1.30790484,
+              "Z": 0.494196177
+            },
+            "Size": {
+              "X": 1.0,
+              "Y": 0.944502652,
+              "Z": 0.134445071
+            }
+          },
+          {
+            "Center": {
+              "X": 0.502225041,
+              "Y": 0.05033475,
+              "Z": 0.4990294
+            },
+            "Size": {
+              "X": 0.57565403,
+              "Y": 0.1006695,
+              "Z": 0.6009426
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase1x1#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase1x1/ConstructionBase1x1.blueprint"
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Decoration/PoleBanner/PoleBanner.Folktails.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.05,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 0.5679468,
+                  "Y": 0.1,
+                  "Z": 0.564842343
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.501361668,
+                  "Y": 0.487651944,
+                  "Z": 0.4980035
+                },
+                "Size": {
+                  "X": 0.114573717,
+                  "Y": 0.7706622,
+                  "Z": 0.125712454
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    }
+  }
+}

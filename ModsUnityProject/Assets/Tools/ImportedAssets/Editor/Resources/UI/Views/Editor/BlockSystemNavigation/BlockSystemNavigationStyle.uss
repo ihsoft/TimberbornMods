@@ -1,0 +1,21 @@
+.block-object-nav-mesh-group {
+    align-items: stretch;
+    flex-direction: row;
+}
+
+.block-object-nav-mesh-group__label {
+    min-width: 120px;
+    margin-left: 3px;
+    -unity-text-align: middle-left;
+}
+
+.block-object-nav-mesh-group__group-wrapper {
+    align-items: stretch;
+    flex-direction: row;
+    flex-grow: 1;
+}
+
+.block-object-nav-mesh-group__group-name {
+    flex-grow: 1;
+    padding-left: 6px;
+}

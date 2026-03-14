@@ -1,0 +1,11 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <ui:VisualElement name="ScienceCostSection" class="science-cost-section">
+        <cui:NineSliceVisualElement name="ScienceCostBackground" class="science-cost-section__background">
+            <ui:VisualElement class="science-cost-section__lock-icon" />
+            <ui:Label name="ScienceCost" text="150" class="game-text-normal text--bold science-cost-section__cost" />
+            <ui:VisualElement class="science-cost-section__science-icon" />
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,30 @@
+{
+  "RecipeSpec": {
+    "Id": "Grease",
+    "BackwardCompatibleIds": [],
+    "DisplayLocKey": "Good.Grease.PluralDisplayName",
+    "CycleDurationInHours": 4.0,
+    "Ingredients": [
+      {
+        "Id": "Extract",
+        "Amount": 1
+      },
+      {
+        "Id": "CanolaOil",
+        "Amount": 1
+      }
+    ],
+    "Products": [
+      {
+        "Id": "Grease",
+        "Amount": 2
+      }
+    ],
+    "ProducedSciencePoints": 0,
+    "Fuel": "",
+    "CyclesFuelLasts": 0,
+    "FuelCapacity": 0,
+    "CyclesCapacity": 20,
+    "Icon": "Sprites/Goods/GreaseIcon"
+  }
+}

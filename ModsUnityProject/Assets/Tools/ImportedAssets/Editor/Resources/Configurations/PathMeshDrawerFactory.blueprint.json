@@ -1,0 +1,49 @@
+{
+  "PathMeshDrawerFactorySpec": {
+    "RegularModelVariants": [
+      "Markers/PathMarkers/PathMarker0000",
+      "Markers/PathMarkers/PathMarker000B",
+      "Markers/PathMarkers/PathMarker0B0B",
+      "Markers/PathMarkers/PathMarker00BB",
+      "Markers/PathMarkers/PathMarker0BBB",
+      "Markers/PathMarkers/PathMarker0BBP",
+      "Markers/PathMarkers/PathMarker00BP",
+      "Markers/PathMarkers/PathMarker0BPB",
+      "Markers/PathMarkers/PathMarker0BPP",
+      "Markers/PathMarkers/PathMarker000P",
+      "Markers/PathMarkers/PathMarker0P0B",
+      "Markers/PathMarkers/PathMarker0P0P",
+      "Markers/PathMarkers/PathMarker00PB",
+      "Markers/PathMarkers/PathMarker0PBB",
+      "Markers/PathMarkers/PathMarker0PBP",
+      "Markers/PathMarkers/PathMarker00PP",
+      "Markers/PathMarkers/PathMarker0PPB",
+      "Markers/PathMarkers/PathMarker0PPP",
+      "Markers/PathMarkers/PathMarkerBBBB",
+      "Markers/PathMarkers/PathMarkerPBBB",
+      "Markers/PathMarkers/PathMarkerPBPB",
+      "Markers/PathMarkers/PathMarkerPPBB",
+      "Markers/PathMarkers/PathMarkerPPPB",
+      "Markers/PathMarkers/PathMarkerPPPP"
+    ],
+    "StairsModelVariants": [
+      "Markers/PathMarkers/PathMarkerStairs00b0",
+      "Markers/PathMarkers/PathMarkerStairs00p0",
+      "Markers/PathMarkers/PathMarkerStairsB000",
+      "Markers/PathMarkers/PathMarkerStairsB0b0",
+      "Markers/PathMarkers/PathMarkerStairsB0p0",
+      "Markers/PathMarkers/PathMarkerStairsP000",
+      "Markers/PathMarkers/PathMarkerStairsP0b0",
+      "Markers/PathMarkers/PathMarkerStairsP0p0",
+      "Markers/PathMarkers/PathMarkerStairs0Pp0",
+      "Markers/PathMarkers/PathMarkerStairs0Pb0",
+      "Markers/PathMarkers/PathMarkerStairs00pP",
+      "Markers/PathMarkers/PathMarkerStairs00bP",
+      "Markers/PathMarkers/PathMarkerStairs0Bp0",
+      "Markers/PathMarkers/PathMarkerStairs0Bb0",
+      "Markers/PathMarkers/PathMarkerStairs00pB",
+      "Markers/PathMarkers/PathMarkerStairs00bB"
+    ],
+    "Material": "Markers/PathMarkers/PathMarker"
+  }
+}

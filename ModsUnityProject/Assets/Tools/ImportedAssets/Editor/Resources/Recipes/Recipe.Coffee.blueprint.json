@@ -1,0 +1,30 @@
+{
+  "RecipeSpec": {
+    "Id": "Coffee",
+    "BackwardCompatibleIds": [],
+    "DisplayLocKey": "Good.Coffee.PluralDisplayName",
+    "CycleDurationInHours": 1.0,
+    "Ingredients": [
+      {
+        "Id": "CoffeeBean",
+        "Amount": 1
+      },
+      {
+        "Id": "Water",
+        "Amount": 1
+      }
+    ],
+    "Products": [
+      {
+        "Id": "Coffee",
+        "Amount": 4
+      }
+    ],
+    "ProducedSciencePoints": 0,
+    "Fuel": "Log",
+    "CyclesFuelLasts": 10,
+    "FuelCapacity": 5,
+    "CyclesCapacity": 15,
+    "Icon": "Sprites/Goods/CoffeeIcon"
+  }
+}

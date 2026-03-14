@@ -1,0 +1,163 @@
+﻿{
+  "TemplateSpec": {
+    "TemplateName": "WaterSource",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "WaterSourceSpec": {
+    "Coordinates": [
+      {
+        "X": 0,
+        "Y": 0
+      }
+    ],
+    "DefaultStrength": 1.0
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": true
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "MapEditorWater",
+    "ToolOrder": 100,
+    "ToolShape": "Square",
+    "Layout": "Line",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": true
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.WaterSource.DisplayName",
+    "DescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "Building.WaterSource.FlavorDescription",
+    "Icon": "MapEditor/Water/WaterSource/WaterSourceIcon"
+  },
+  "BasicSelectionSoundSpec": {
+    "SoundName": "WaterSource",
+    "AlternativeSoundName": ""
+  },
+  "WaterSourceContaminationSpec": {
+    "DefaultContamination": 0.0
+  },
+  "BlockObjectNavMeshAdderSpec": {},
+  "BadtideWaterSourceContaminationControllerSpec": {},
+  "BlockObjectRandomizablePlacementSpec": {},
+  "BlockObjectModelSpec": {
+    "FullModelName": "#Model",
+    "UncoveredModelName": "",
+    "UndergroundModelName": "#Underground",
+    "UndergroundModelDepth": 1
+  },
+  "ContinuousTerrainConstraintSpec": {},
+  "TimedComponentActivatorSpec": {
+    "IsOptionallyActivable": true,
+    "CyclesUntilCountdownActivation": 5,
+    "DaysUntilActivation": 10.0,
+    "ProgressBarActiveLabelLocKey": "TimedComponentActivator.DaysUntilActivationProgress",
+    "ProgressBarNotActiveLabelLocKey": "TimedComponentActivator.CountdownNotActive",
+    "IsHazardousActivator": false
+  },
+  "ActivationWarningStatusSpec": {
+    "StatusSpriteName": "WaterSourceCountdown",
+    "StatusLocKey": "Status.TimedActivationWarning",
+    "UseInfiniteWarning": false
+  },
+  "ActivationProgressParticlesSpec": {
+    "AttachmentIds": [
+      "Water"
+    ],
+    "MinEmission": 10,
+    "MaxEmission": 100
+  },
+  "BlockableObjectParticleControllerSpec": {
+    "AttachmentIds": [
+      "Water"
+    ]
+  },
+  "TemplateAttachmentsSpec": {
+    "Attachments": [
+      {
+        "AttachmentId": "Water",
+        "Prefab": "MapEditor/Water/WaterSource/WaterSourceActivation",
+        "Parent": "#Model",
+        "Position": {
+          "X": 0.5,
+          "Y": 0.0,
+          "Z": 0.5
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": true
+      }
+    ]
+  },
+  "Children": {
+    "#Model": {
+      "TimbermeshSpec": {
+        "Model": "MapEditor/Water/WaterSource/WaterSource.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.408401847,
+              "Z": 0.5
+            },
+            "Size": {
+              "X": 1.0,
+              "Y": 0.877095938,
+              "Z": 1.0
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Underground": {
+      "TimbermeshSpec": {
+        "Model": "MapEditor/Water/WaterSource/WaterSource.Underground"
+      }
+    }
+  }
+}

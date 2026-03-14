@@ -1,0 +1,17 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <ui:VisualElement name="GoodStockpilesTooltip">
+        <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+        <ui:Label name="Name" class="game-text-big text--bold good-stockpile-tooltip__text" text="Maple syrup" />
+        <ui:VisualElement name="AmountWrapper" class="good-stockpile-tooltip__amount-wrapper">
+            <ui:VisualElement class="good-stockpile-tooltip_icon-workplace" />
+            <ui:Label name="WorkplaceAmount" class="game-text-normal good-stockpile-tooltip__text good-stockpile-tooltip_text--margin-between" text="10 / 10" />
+            <ui:VisualElement class="good-stockpile-tooltip_icon-storage" />
+            <ui:Label name="StockpileAmount" class="game-text-normal good-stockpile-tooltip__text" text="10 / 10" />
+        </ui:VisualElement>
+        <ui:Label name="Effects" class="game-text-normal good-stockpile-tooltip__effects" />
+        <cui:LocalizableLabel name="Stored" text-loc-key="Goods.StoredIn" class="game-text-normal good-stockpile-tooltip__text" text="Stored in:" />
+        <ui:VisualElement name="Icons" class="good-stockpile-tooltip__building-icons" />
+    </ui:VisualElement>
+</ui:UXML>

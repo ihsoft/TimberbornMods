@@ -1,0 +1,8 @@
+{
+  "TemplateCollectionSpec": {
+    "CollectionId": "Common",
+    "Blueprints": [
+      "Environment/RecoveredGoodStack/RecoveredGoodStack.blueprint"
+    ]
+  }
+}

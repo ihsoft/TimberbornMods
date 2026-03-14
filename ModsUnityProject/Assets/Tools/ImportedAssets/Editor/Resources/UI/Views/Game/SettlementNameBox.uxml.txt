@@ -1,0 +1,17 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+    <ui:VisualElement name="Wrapper" class="settlement-name-box">
+        <cui:NineSliceVisualElement name="SettlementNameBox" class="settlement-name-box__content sliced-border sliced-border--nontransparent content-centered">
+            <cui:LocalizableLabel name="Message" text-loc-key="Saving.NameSettlement" class="settlement-name-box__element text--default text--centered" />
+            <cui:NineSliceTextField name="Input" picking-mode="Ignore" class="text-field settlement-name-box__element" />
+            <ui:VisualElement name="Buttons" class="content-row-centered settlement-name-box__buttons-root">
+                <ui:VisualElement>
+                    <cui:LocalizableButton name="RelocateButton" text="Change start location" text-loc-key="FlexibleStart.Relocate" focusable="false" class="menu-button" />
+                    <cui:LocalizableButton name="ResetStartLocation" text="Use initial location" text-loc-key="FlexibleStart.ResetStartLocation" focusable="false" class="hyperlink-button settlement-name-box__reset-button text--default text--bold" />
+                </ui:VisualElement>
+                <cui:LocalizableButton name="ConfirmButton" text="Start!" text-loc-key="FlexibleStart.Start" focusable="false" class="menu-button" />
+            </ui:VisualElement>
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

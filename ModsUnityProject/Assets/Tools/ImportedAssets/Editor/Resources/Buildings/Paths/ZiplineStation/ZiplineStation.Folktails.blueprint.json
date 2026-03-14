@@ -1,0 +1,489 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "ZiplineStation",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "Log",
+        "Amount": 20
+      },
+      {
+        "Id": "Plank",
+        "Amount": 40
+      },
+      {
+        "Id": "MetalBlock",
+        "Amount": 20
+      }
+    ],
+    "ScienceCost": 700,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": false,
+    "DrawRangeBoundsOnIt": false
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "TemplateSpec": {
+    "TemplateName": "ZiplineStation.Folktails",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 3,
+      "Y": 2,
+      "Z": 4
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": true,
+      "Coordinates": {
+        "X": 1,
+        "Y": -1,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Paths",
+    "ToolOrder": 50,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.ZiplineStation.DisplayName",
+    "DescriptionLocKey": "Building.ZiplineStation.Description",
+    "FlavorDescriptionLocKey": "Building.ZiplineStation.FlavorDescription",
+    "Icon": "Buildings/Paths/ZiplineStation/ZiplineStationIcon"
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "BlockObjectNavMeshSettingsSpec": {
+    "NoAutoWalls": false,
+    "GenerateFloorsOnStackable": false,
+    "EdgeGroups": [
+      {
+        "Cost": 1.0,
+        "Group": {
+          "UseGroup": false,
+          "GroupName": ""
+        },
+        "IsPath": true,
+        "AddedEdges": [
+          {
+            "Start": {
+              "X": 1,
+              "Y": 0,
+              "Z": 0
+            },
+            "End": {
+              "X": 1,
+              "Y": -1,
+              "Z": 0
+            },
+            "IsTwoWay": false
+          }
+        ]
+      },
+      {
+        "Cost": 0.0,
+        "Group": {
+          "UseGroup": true,
+          "GroupName": "Zipline"
+        },
+        "IsPath": true,
+        "AddedEdges": [
+          {
+            "Start": {
+              "X": 1,
+              "Y": 0,
+              "Z": 0
+            },
+            "End": {
+              "X": 1,
+              "Y": 1,
+              "Z": 3
+            },
+            "IsTwoWay": true
+          }
+        ]
+      }
+    ],
+    "UnblockedCoordinates": [
+      {
+        "Group": "Zipline",
+        "Coordinates": {
+          "X": 1,
+          "Y": 1,
+          "Z": 3
+        }
+      }
+    ]
+  },
+  "PathSpec": {
+    "MainPathCoordinates": {
+      "X": 1,
+      "Y": 0,
+      "Z": 0
+    }
+  },
+  "ZiplineTowerSpec": {
+    "CableAnchorPoint": {
+      "X": 1.5,
+      "Y": 3.85,
+      "Z": 1.5
+    },
+    "MaxConnections": 2,
+    "MaxDistance": 30,
+    "UnobstructedCoordinates": [
+      {
+        "X": 1,
+        "Y": 1,
+        "Z": 2
+      }
+    ]
+  },
+  "MovementSpeedBoostingBuildingSpec": {
+    "BoostPercentage": 150
+  },
+  "BuildingAccessibleSpec": {
+    "LocalAccess": {
+      "X": 1.5,
+      "Y": 0.0,
+      "Z": 0.5
+    },
+    "ForceOneFinalAccess": true
+  },
+  "ZiplineStationSpec": {},
+  "BlockObjectAccessesSpec": {
+    "BlockingCoordinates": [
+      {
+        "X": 1,
+        "Y": 1,
+        "Z": 3
+      }
+    ],
+    "AllowedCoordinates": []
+  },
+  "FloodableObjectBlockerSpec": {},
+  "UnreachableBuildingBlockerSpec": {},
+  "Children": {
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Paths/ZiplineStation/ZiplineStation.Folktails.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 1.49881029,
+              "Y": 0.15200913,
+              "Z": 0.9989608
+            },
+            "Size": {
+              "X": 2.590488,
+              "Y": 0.304018259,
+              "Z": 1.99364746
+            }
+          },
+          {
+            "Center": {
+              "X": 1.49611783,
+              "Y": 2.895398,
+              "Z": 1.49455917
+            },
+            "Size": {
+              "X": 0.229688168,
+              "Y": 1.81594908,
+              "Z": 0.212578058
+            }
+          },
+          {
+            "Center": {
+              "X": 1.49881029,
+              "Y": 0.730105,
+              "Z": 0.9989608
+            },
+            "Size": {
+              "X": 1.47175646,
+              "Y": 0.8438083,
+              "Z": 1.99364746
+            }
+          },
+          {
+            "Center": {
+              "X": 1.49881029,
+              "Y": 1.43826985,
+              "Z": 0.9989608
+            },
+            "Size": {
+              "X": 0.709112167,
+              "Y": 0.581341743,
+              "Z": 1.99364746
+            }
+          },
+          {
+            "Center": {
+              "X": 1.5,
+              "Y": 3.84321022,
+              "Z": 1.5
+            },
+            "Size": {
+              "X": 0.627329946,
+              "Y": 0.08920932,
+              "Z": 0.6239952
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase3x2#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase3x2/ConstructionBase3x2.blueprint"
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/ZiplineStation/ZiplineStation.Folktails.ConstructionStage0"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 1.5,
+                  "Y": 0.06321499,
+                  "Z": 1.0
+                },
+                "Size": {
+                  "X": 3.0,
+                  "Y": 0.126429975,
+                  "Z": 2.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 1.49803877,
+                  "Y": 0.9223109,
+                  "Z": 0.9959904
+                },
+                "Size": {
+                  "X": 0.7311239,
+                  "Y": 1.58871281,
+                  "Z": 1.9994123
+                }
+              },
+              {
+                "Center": {
+                  "X": 1.49555552,
+                  "Y": 0.484267682,
+                  "Z": 0.9959904
+                },
+                "Size": {
+                  "X": 1.83236909,
+                  "Y": 0.7204203,
+                  "Z": 1.9994123
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    }
+  }
+}

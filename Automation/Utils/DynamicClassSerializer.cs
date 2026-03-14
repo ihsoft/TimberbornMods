@@ -2,10 +2,8 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System;
-using System.Linq;
+using IgorZ.TimberDev.Utils;
 using Timberborn.Persistence;
-using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.Utils;
 
@@ -50,35 +48,8 @@ public sealed class DynamicClassSerializer<T> : IValueSerializer<T> where T : cl
   public Obsoletable<T> Deserialize(IValueLoader valueLoader) {
     var objectLoader = valueLoader.AsObject();
     var savedTypeId = objectLoader.Get(TypeIdPropertyKey);
-    var instance = MakeInstance(savedTypeId, _failFast);
-    if (instance != null) {
-      instance.LoadFrom(objectLoader);
-    }
-    return instance;
-  }
-
-  /// <summary>Creates an instance of the type <typeparamref name="T"/> from the provided type identifier.</summary>
-  /// <exception cref="InvalidOperationException">if the type can't be created, or it is incompatible</exception>
-  public static T MakeInstance(string typeId, bool failFast = true) {
-    var objectType = AppDomain.CurrentDomain.GetAssemblies()
-        .Select(assembly => assembly.GetType(typeId))
-        .FirstOrDefault(t => t != null);
-    string err = null;
-    if (objectType == null) {
-      err = $"Cannot find type for typeId: {typeId}";
-    } else if (objectType.GetConstructor(Type.EmptyTypes) == null) {
-      err = $"No default constructor in: {objectType}";
-    } else if (!typeof(T).IsAssignableFrom(objectType)) {
-      err = $"Incompatible types: {typeof(T)} is not assignable from {objectType}";
-    }
-    if (err != null) {
-      if (failFast) {
-        throw new InvalidOperationException(err);
-      }
-      DebugEx.Error(err);
-      return null;
-    }
-    var instance = (T) Activator.CreateInstance(objectType);
+    var instance = ReflectionsHelper.MakeInstance<T>(savedTypeId, _failFast);
+    instance?.LoadFrom(objectLoader);
     return instance;
   }
 }

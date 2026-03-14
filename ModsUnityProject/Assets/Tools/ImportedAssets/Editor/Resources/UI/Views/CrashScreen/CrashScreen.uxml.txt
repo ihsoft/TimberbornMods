@@ -1,0 +1,32 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/CrashScreen/CrashScreenStyle.uss" />
+    <ui:VisualElement class="crash-screen">
+        <ui:Image class="crash-screen__image" />
+        <ui:Label name="Title" text="Uh oh... a bug :&apos;(" class="crash-screen__bug-text" />
+        <ui:VisualElement name="VanillaInfo" class="crash-screen__info">
+            <ui:Label name="Introduction" text="That was unexpected. The blame is on us but you can help us fix the problem by sending a crash report." class="crash-screen__text" />
+            <ui:Label name="HowToFindReport" text="You can see what data will be included in the report here:" class="crash-screen__text" />
+            <ui:Button name="ErrorReportFolder" text="C:\Users\[UserName]\Documents\Timberborn\Error reports" class="crash-screen__text-button" />
+            <ui:TextField name="Comment" multiline="true" max-length="1000" class="crash-screen__input crash-screen__input--comment" />
+            <ui:TextField name="Email" class="crash-screen__input" />
+            <ui:VisualElement class="crash-screen__policy-wrapper crash-screen__margin-top">
+                <ui:Toggle name="PrivacyPolicyToggle" text="I accept the " class="crash-screen__text crash-screen__policy-toggle" />
+                <ui:Button name="PrivacyPolicyButton" text="Privacy Policy" class="crash-screen__text-button" />
+            </ui:VisualElement>
+            <ui:Button name="SendReportButton" text="Send error report to the Timberborn team" class="crash-screen__button" />
+            <ui:Label name="ManualInstructions" text="Alternatively, you can send the report manually:" class="crash-screen__text crash-screen__margin-top" />
+            <ui:Button name="BugWebsite" text="https://mechanistry.com/bug" class="crash-screen__text-button" />
+        </ui:VisualElement>
+        <ui:VisualElement name="TamperedInfo" class="crash-screen__info">
+            <ui:VisualElement name="ModdedWarning" class="crash-screen__warning">
+                <ui:Label name="ModdedIntroduction" text="It appears that you are running a modded version of the game which is a likely cause of the crash." class="crash-screen__text" />
+                <ui:Label name="ModdedInstructions" text="Instructions on how to remove mods can be found here:" class="crash-screen__text" />
+                <ui:Button name="ModdedWebsite" text="https://mechanistry.com/how-to-remove-mods" class="crash-screen__text-button" />
+            </ui:VisualElement>
+            <ui:TextField name="Exception" multiline="true" readonly="true" class="crash-screen__input crash-screen__input--exception crash-screen__margin-top" />
+            <ui:Label name="HowToFindReportShort" text="You can see what data will be included in the report here:" class="crash-screen__text crash-screen__margin-top" />
+            <ui:Button name="ErrorReportFolderModded" text="C:\Users\[UserName]\Documents\Timberborn\Error reports" class="crash-screen__text-button" />
+        </ui:VisualElement>
+        <ui:Button name="ExitButton" text="Exit game" class="crash-screen__button crash-screen__margin-top" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,3 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <cui:NineSliceVisualElement name="DemolishableScienceRewardFragment" class="demolishable-science-reward-fragment bg-sub-box--blue" />
+</ui:UXML>

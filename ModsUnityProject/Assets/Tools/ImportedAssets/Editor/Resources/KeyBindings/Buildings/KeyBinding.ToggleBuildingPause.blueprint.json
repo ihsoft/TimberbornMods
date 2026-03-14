@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "ToggleBuildingPause",
+    "GroupId": "Buildings",
+    "LocKey": "KeyBinding.ToggleBuildingPause",
+    "Order": 0,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/p",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "RecipeSpec": {
+    "Id": "MaplePastry",
+    "BackwardCompatibleIds": [],
+    "DisplayLocKey": "Good.MaplePastry.PluralDisplayName",
+    "CycleDurationInHours": 1.5,
+    "Ingredients": [
+      {
+        "Id": "WheatFlour",
+        "Amount": 1
+      },
+      {
+        "Id": "MapleSyrup",
+        "Amount": 1
+      }
+    ],
+    "Products": [
+      {
+        "Id": "MaplePastry",
+        "Amount": 3
+      }
+    ],
+    "ProducedSciencePoints": 0,
+    "Fuel": "Log",
+    "CyclesFuelLasts": 10,
+    "FuelCapacity": 5,
+    "CyclesCapacity": 20,
+    "Icon": "Sprites/Goods/MaplePastryIcon"
+  }
+}

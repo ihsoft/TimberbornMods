@@ -71,6 +71,16 @@ public interface IAutomationCondition : IGameSerializable {
   /// <seealso cref="CommonFormats"/>
   public string UiDescription { get; }
 
+  /// <summary>Indicates if the condition can be activated.</summary>
+  /// <remarks>
+  /// This state is persistent and cannot be changed on a live rule. If rule is not enabled, it will never be activated.
+  /// To "enable" a disabled rule, delete the old rule and add an active version back. On a newly created condition,
+  /// this state is <c>true</c>.
+  /// </remarks>
+  /// <seealso cref="Activate"/>
+  /// <seealso cref="SetEnabled"/>
+  public bool IsEnabled { get; }
+
   /// <summary>Indicates that the condition is active and is processing state tracking logic.</summary>
   /// <seealso cref="Activate"/>
   public bool IsActive { get; }
@@ -97,7 +107,7 @@ public interface IAutomationCondition : IGameSerializable {
   /// <remarks>In this call, the condition should figure out and set its "current" state. And if the state evaluates to
   /// "true", then the associated listener is called.
   /// <see cref="Behavior"/> and <see cref="Listener"/> must be set before calling this method. This method should be
-  /// called only once in life-time of the condition.
+  /// called only once in life-time of the condition. It must not be called on a disabled condition.
   /// </remarks>
   /// <param name="noTrigger">
   /// Indicates that condition should activate, but don't fire the state change callback even if the state is "true".
@@ -106,4 +116,14 @@ public interface IAutomationCondition : IGameSerializable {
   /// <seealso cref="Listener"/>
   /// <seealso cref="IsActive"/> 
   public void Activate(bool noTrigger = false);
+
+  /// <summary>
+  /// Sets the enabled state of the condition. Disabled conditions will be persisted, but not activated. 
+  /// </summary>
+  /// <remarks>
+  /// The state can only be changed on a detached and inactive condition. That is, the <see cref="Behavior"/> must not 
+  /// best set, and <see cref="IsActive"/> state must be <c>false</c>.
+  /// </remarks>
+  /// <param name="state">The new state.</param>
+  public void SetEnabled(bool state);
 }

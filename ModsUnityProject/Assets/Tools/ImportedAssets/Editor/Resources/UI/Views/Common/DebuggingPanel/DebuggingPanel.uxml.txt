@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="DebuggingPanel" class="debugging-panel">
+        <Style src="/Assets/Resources/UI/Views/Common/DebuggingPanel/DebuggingPanelStyle.uss" />
+        <ui:VisualElement name="DraggingIcon" class="debugging-panel__dragging-icon" />
+        <ui:Label name="PanelHeader" text="Debug mode panel" class="game-text-heading debugging-panel__title" />
+        <ui:Button name="MinimizeIcon" class="debugging-panel__minimize-icon" />
+        <ui:VisualElement name="Content" />
+    </ui:VisualElement>
+</ui:UXML>

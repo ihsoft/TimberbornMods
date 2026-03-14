@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "Badwater",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Liquid",
+    "StockpileVisualization": "Liquid",
+    "VisibleContainer": "Barrel",
+    "ContainerColor": {
+      "r": 0.5019608,
+      "g": 0.2509804,
+      "b": 0.2,
+      "a": 1.0
+    },
+    "ContainerMaterial": "Materials/Goods/Badwater",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 2,
+    "GoodGroupId": "Badwater",
+    "GoodOrder": 20,
+    "Icon": "Sprites/Goods/BadwaterIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.Badwater.DisplayName",
+    "PluralDisplayNameLocKey": "Good.Badwater.PluralDisplayName"
+  }
+}

@@ -1,0 +1,844 @@
+{
+  "BeaverSpec": {},
+  "ChildSpec": {},
+  "CharacterModelSpec": {
+    "ModelName": "Model_Preserved"
+  },
+  "MortalSpec": {},
+  "DeadStatusSpec": {
+    "DeadStatusLocKey": "Status.Beaver.Dead"
+  },
+  "MovementAnimatorSpec": {
+    "AnimationSpeedScale": 0.8
+  },
+  "TemplateSpec": {
+    "TemplateName": "BeaverChild",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "WalkerSpeedManagerSpec": {
+    "BaseWalkingSpeed": 1.35,
+    "BaseSlowedSpeed": 0.65
+  },
+  "WellbeingTrackerSpec": {
+    "CountsToPopulationWellbeing": true
+  },
+  "SleeperSpec": {
+    "SleepOutsideEffects": [
+      {
+        "NeedId": "Sleep",
+        "PointsPerHour": 0.15,
+        "SatisfyToMaxValue": false
+      }
+    ],
+    "MaxOffsetInHours": 0.25
+  },
+  "RunningStateUpdaterSpec": {
+    "ShortWalkingDistanceThreshold": 5.0,
+    "WalkingSpeedThreshold": 0.75
+  },
+  "SwimmingAnimatorSpec": {
+    "LowerSwimmingDepthThreshold": 0.15,
+    "UpperSwimmingDepthThreshold": 0.2
+  },
+  "SimpleLabeledEntitySpec": {
+    "EntityNameLocKey": "Beaver.Child.TemplateName"
+  },
+  "BeaverInjuryTextureSetterSpec": {
+    "InjuryTextureSets": [
+      {
+        "DiffusePath": "Materials/Beavers/Common/Injuries/Head_Bandages_D",
+        "NormalMapPath": "Materials/Beavers/Common/Injuries/Head_Bandages_N",
+        "DisplacementPath": "Materials/Beavers/Common/Injuries/Head_Bandages_H"
+      },
+      {
+        "DiffusePath": "Materials/Beavers/Common/Injuries/Hand_L_Bandages_D",
+        "NormalMapPath": "Materials/Beavers/Common/Injuries/Hand_L_Bandages_N",
+        "DisplacementPath": "Materials/Beavers/Common/Injuries/Hand_L_Bandages_H"
+      },
+      {
+        "DiffusePath": "Materials/Beavers/Common/Injuries/Hand_R_Bandages_D",
+        "NormalMapPath": "Materials/Beavers/Common/Injuries/Hand_R_Bandages_N",
+        "DisplacementPath": "Materials/Beavers/Common/Injuries/Hand_R_Bandages_H"
+      },
+      {
+        "DiffusePath": "Materials/Beavers/Common/Injuries/Leg_L_Bandages_D",
+        "NormalMapPath": "Materials/Beavers/Common/Injuries/Leg_L_Bandages_N",
+        "DisplacementPath": "Materials/Beavers/Common/Injuries/Leg_L_Bandages_H"
+      },
+      {
+        "DiffusePath": "Materials/Beavers/Common/Injuries/Leg_R_Bandages_D",
+        "NormalMapPath": "Materials/Beavers/Common/Injuries/Leg_R_Bandages_N",
+        "DisplacementPath": "Materials/Beavers/Common/Injuries/Leg_R_Bandages_H"
+      },
+      {
+        "DiffusePath": "Materials/Beavers/Common/Injuries/Tail_Bandages_D",
+        "NormalMapPath": "Materials/Beavers/Common/Injuries/Tail_Bandages_N",
+        "DisplacementPath": "Materials/Beavers/Common/Injuries/Tail_Bandages_H"
+      }
+    ]
+  },
+  "BeaverNeedShaderPropertySetterSpec": {
+    "PropertySets": [
+      {
+        "NeedId": "BeeSting",
+        "PropertyName": "_BeeSting"
+      },
+      {
+        "NeedId": "BadwaterContamination",
+        "PropertyName": "_BadwaterContamination"
+      },
+      {
+        "NeedId": "WetFur",
+        "PropertyName": "_WetFur"
+      }
+    ]
+  },
+  "WellbeingBonusesSubjectSpec": {
+    "Bonuses": [
+      "GrowthSpeed",
+      "MovementSpeed",
+      "LifeExpectancy"
+    ]
+  },
+  "CharacterObjectNamerSpec": {
+    "Prefix": "BeaverChild"
+  },
+  "ZiplineHarnessModelSpec": {
+    "AttachmentId": "ZiplineHarness.BeaverChild"
+  },
+  "VariedIdleAnimationSpec": {
+    "Variants": [
+      "BeaverChild_idle_clapping",
+      "BeaverChild_idle_waiting",
+      "BeaverChild_idle_watching"
+    ]
+  },
+  "TimbermeshAnimatorControllerSpec": {
+    "BoolParameters": [
+      "Walking",
+      "Sleeping",
+      "Sitting",
+      "Dead",
+      "Swimming",
+      "RunningProhibited",
+      "MovingUp",
+      "MovingDown",
+      "ForcedIdle",
+      "Working",
+      "Stranded",
+      "ForcedSwimming",
+      "Floating",
+      "CharacterControl",
+      "Swinging",
+      "Flying",
+      "Scratching",
+      "Exercising",
+      "FloatingSleeping",
+      "Contaminated",
+      "Dancing",
+      "Detailing",
+      "Zipline",
+      "ZiplineDown",
+      "ZiplineUp",
+      "Showering",
+      "Massaging",
+      "BeaverChild_idle_clapping",
+      "BeaverChild_idle_waiting",
+      "BeaverChild_idle_watching",
+      "DeadNoAnimation"
+    ],
+    "FloatParameters": [
+      "WalkingSpeed"
+    ],
+    "AnimatorStates": [
+      {
+        "StateName": "Idle",
+        "AnimationName": "BeaverChild_idle",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": []
+      },
+      {
+        "StateName": "BeaverChild_idle_clapping",
+        "AnimationName": "BeaverChild_idle_clapping",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "BeaverChild_idle_clapping",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "BeaverChild_idle_waiting",
+        "AnimationName": "BeaverChild_idle_waiting",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "BeaverChild_idle_waiting",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "BeaverChild_idle_watching",
+        "AnimationName": "BeaverChild_idle_watching",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "BeaverChild_idle_watching",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Idle swimming",
+        "AnimationName": "BeaverChild_idle_underwater",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Contamination idle",
+        "AnimationName": "BeaverChild_idle_infected",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Contaminated",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Swimming",
+        "AnimationName": "BeaverChild_swimming",
+        "Speed": 1.2,
+        "SpeedModifier": "WalkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Walking",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Contaminated",
+            "MustBeTrue": false
+          }
+        ]
+      },
+      {
+        "StateName": "Running",
+        "AnimationName": "BeaverChild_run",
+        "Speed": 1.2,
+        "SpeedModifier": "WalkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Walking",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "MovingUp",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "MovingDown",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "RunningProhibited",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": false
+          }
+        ]
+      },
+      {
+        "StateName": "RunningDown",
+        "AnimationName": "BeaverChild_run_down",
+        "Speed": 1.2,
+        "SpeedModifier": "WalkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Walking",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "MovingDown",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "RunningProhibited",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": false
+          }
+        ]
+      },
+      {
+        "StateName": "RunningUp",
+        "AnimationName": "BeaverChild_run_up",
+        "Speed": 1.2,
+        "SpeedModifier": "WalkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Walking",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "MovingUp",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "RunningProhibited",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": false
+          }
+        ]
+      },
+      {
+        "StateName": "Walking empty handed",
+        "AnimationName": "BeaverChild_walk",
+        "Speed": 3.0,
+        "SpeedModifier": "WalkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Walking",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "RunningProhibited",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "Contaminated",
+            "MustBeTrue": false
+          }
+        ]
+      },
+      {
+        "StateName": "Sleeping",
+        "AnimationName": "BeaverChild_sleeping",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Sleeping",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": false
+          }
+        ]
+      },
+      {
+        "StateName": "Sitting",
+        "AnimationName": "BeaverChild_sitting",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Sitting",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "ForcedIdle",
+        "AnimationName": "BeaverChild_idle",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "ForcedIdle",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Working",
+        "AnimationName": "BeaverChild_working",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Working",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Sleeping underwater",
+        "AnimationName": "BeaverChild_floating_sleeping",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Sleeping",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Stranded",
+        "AnimationName": "BeaverChild_sitting",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Stranded",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": false
+          }
+        ]
+      },
+      {
+        "StateName": "Stranded underwater",
+        "AnimationName": "BeaverChild_floating",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Stranded",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Forced Swimming",
+        "AnimationName": "BeaverChild_swimming",
+        "Speed": 1.2,
+        "SpeedModifier": "WalkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "ForcedSwimming",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Floating",
+        "AnimationName": "BeaverChild_floating",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Floating",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "CharacterControl",
+        "AnimationName": "CharacterControlAnimation",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Walking",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "CharacterControl",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Swinging",
+        "AnimationName": "BeaverChild_swinging",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Swinging",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Flying",
+        "AnimationName": "BeaverChild_flying",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Flying",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Scratching",
+        "AnimationName": "BeaverChild_scratching",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Scratching",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Exercising",
+        "AnimationName": "BeaverChild_exercising",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Exercising",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "FloatingSleeping",
+        "AnimationName": "BeaverChild_floating_sleeping",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "FloatingSleeping",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Contamination walking",
+        "AnimationName": "BeaverChild_walk_infected",
+        "Speed": 3.5,
+        "SpeedModifier": "WalkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Walking",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "RunningProhibited",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "Contaminated",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Contaminated swimming",
+        "AnimationName": "BeaverChild_swimming_infected",
+        "Speed": 3.0,
+        "SpeedModifier": "WalkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Walking",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Contaminated",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Dancing",
+        "AnimationName": "BeaverChild_dancing",
+        "Speed": 1.0,
+        "SpeedModifier": "WalkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Dancing",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Detailing",
+        "AnimationName": "BeaverChild_detailing",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Detailing",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Zipline_Neutral",
+        "AnimationName": "BeaverChild_Zipline_stranded",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Zipline",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Zipline_Straight",
+        "AnimationName": "BeaverChild_Zipline",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Zipline",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Walking",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Stranded",
+            "MustBeTrue": false
+          }
+        ]
+      },
+      {
+        "StateName": "Zipline_Down",
+        "AnimationName": "BeaverChild_Zipline_down",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Zipline",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "ZiplineDown",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "ZiplineUp",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "Walking",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Zipline_Up",
+        "AnimationName": "BeaverChild_Zipline_up",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Zipline",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "ZiplineDown",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "ZiplineUp",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Walking",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Zipline_Dead",
+        "AnimationName": "BeaverChild_Zipline_dead",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Zipline",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Dead",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Showering",
+        "AnimationName": "BeaverChild_showering",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Showering",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Dead",
+        "AnimationName": "BeaverChild_dying",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": false,
+        "Conditions": [
+          {
+            "ParameterName": "Zipline",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "Dead",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "DeadNoAnimation",
+        "AnimationName": "BeaverChild_death",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": false,
+        "Conditions": [
+          {
+            "ParameterName": "Zipline",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "DeadNoAnimation",
+            "MustBeTrue": true
+          }
+        ]
+      }
+    ]
+  },
+  "TemplateAttachmentsSpec": {
+    "Attachments": [
+      {
+        "AttachmentId": "Collider.BeaverChild",
+        "Prefab": "Characters/Beaver/Attachments/Collider.BeaverChild",
+        "Parent": "#Collider",
+        "Position": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": true
+      },
+      {
+        "AttachmentId": "ZiplineHarness.BeaverChild",
+        "Prefab": "Characters/Beaver/Attachments/ZiplineHarness.BeaverChild",
+        "Parent": "#ZiplineHarness",
+        "Position": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": false
+      }
+    ]
+  },
+  "Children": {
+    "Model_Preserved": {
+      "TimbermeshSpec": {
+        "Model": "Characters/Beaver/BeaverChild.Model"
+      }
+    }
+  }
+}

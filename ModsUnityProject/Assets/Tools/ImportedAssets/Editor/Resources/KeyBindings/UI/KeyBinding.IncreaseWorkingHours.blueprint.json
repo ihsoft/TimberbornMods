@@ -1,0 +1,10 @@
+{
+  "KeyBindingSpec": {
+    "Id": "IncreaseWorkingHours",
+    "GroupId": "UI",
+    "LocKey": "KeyBinding.IncreaseWorkingHours",
+    "Order": 140,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  }
+}

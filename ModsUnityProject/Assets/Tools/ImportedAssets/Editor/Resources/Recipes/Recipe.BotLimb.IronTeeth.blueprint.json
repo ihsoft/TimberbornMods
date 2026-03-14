@@ -1,0 +1,30 @@
+{
+  "RecipeSpec": {
+    "Id": "BotLimb.IronTeeth",
+    "BackwardCompatibleIds": [],
+    "DisplayLocKey": "Good.BotLimb.PluralDisplayName",
+    "CycleDurationInHours": 4.5,
+    "Ingredients": [
+      {
+        "Id": "Plank",
+        "Amount": 1
+      },
+      {
+        "Id": "Gear",
+        "Amount": 3
+      }
+    ],
+    "Products": [
+      {
+        "Id": "BotLimb",
+        "Amount": 1
+      }
+    ],
+    "ProducedSciencePoints": 0,
+    "Fuel": "",
+    "CyclesFuelLasts": 0,
+    "FuelCapacity": 0,
+    "CyclesCapacity": 12,
+    "Icon": "Sprites/Goods/BotLimbIcon"
+  }
+}

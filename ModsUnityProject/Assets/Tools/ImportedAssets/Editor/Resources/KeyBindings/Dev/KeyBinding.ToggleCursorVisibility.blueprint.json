@@ -1,0 +1,10 @@
+{
+  "KeyBindingSpec": {
+    "Id": "ToggleCursorVisibility",
+    "GroupId": "Dev",
+    "LocKey": "",
+    "Order": 210,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": true
+  }
+}

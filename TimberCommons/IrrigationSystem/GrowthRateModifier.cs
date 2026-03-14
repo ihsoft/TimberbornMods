@@ -8,7 +8,6 @@ using Bindito.Core;
 using Timberborn.BaseComponentSystem;
 using Timberborn.Growing;
 using Timberborn.TimeSystem;
-using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
 namespace IgorZ.TimberCommons.IrrigationSystem;
@@ -20,8 +19,7 @@ namespace IgorZ.TimberCommons.IrrigationSystem;
 /// not adding up.
 /// </remarks>
 /// <seealso cref="ModifyGrowableGrowthRangeEffect"/>
-[AddComponentMenu("")] // Hide in the Unity Editor inspector.
-public sealed class GrowthRateModifier : BaseComponent {
+public sealed class GrowthRateModifier : BaseComponent, IAwakableComponent {
 
   #region API properties
   // ReSharper disable InconsistentNaming
@@ -94,9 +92,10 @@ public sealed class GrowthRateModifier : BaseComponent {
     _timeTriggerFactory = timeTriggerFactory;
   }
 
-  void Awake() {
-    _growable = GetComponentFast<Growable>();
-    _originalGrowthTimeInDays = _growable._growableSpec.GrowthTimeInDays;
+  /// <inheritdoc/>
+  public void Awake() {
+    _growable = GetComponent<Growable>();
+    _originalGrowthTimeInDays = GetComponent<GrowableSpec>().GrowthTimeInDays;
   }
 
   /// <summary>Calculates the effective multiplier and updates the growable settings.</summary>
@@ -116,7 +115,7 @@ public sealed class GrowthRateModifier : BaseComponent {
     _growable._timeTrigger = newTrigger;
     _growable._timeTrigger.Resume();
     RateIsModified = Mathf.Abs(_originalGrowthTimeInDays - newGrowthTime) > float.Epsilon;
-    _growable._growableSpec._growthTimeInDays = newGrowthTime;
+    _growable._growableSpec = _growable._growableSpec with { GrowthTimeInDays = newGrowthTime };
   }  
 
   #endregion

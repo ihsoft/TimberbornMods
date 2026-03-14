@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MainMenu/MainMenuStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MainMenu/MainMenuMiscStyle.uss" />
+    <ui:VisualElement name="LogoBackground" class="triple-stretch background__logo">
+        <ui:VisualElement name="Left" class="triple-stretch__side" />
+        <ui:VisualElement name="Center" class="content-row-centered triple-stretch__center" />
+        <ui:VisualElement name="Right" class="triple-stretch__side" />
+    </ui:VisualElement>
+</ui:UXML>

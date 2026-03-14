@@ -1,0 +1,7 @@
+{
+  "NeedGroupSpec": {
+    "Id": "BasicNeeds",
+    "Order": 10,
+    "DisplayNameLocKey": "NeedGroup.BasicNeeds.DisplayName"
+  }
+}

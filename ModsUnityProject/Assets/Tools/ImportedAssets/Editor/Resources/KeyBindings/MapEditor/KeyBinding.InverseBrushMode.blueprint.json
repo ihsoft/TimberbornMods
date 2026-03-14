@@ -1,0 +1,20 @@
+{
+  "KeyBindingSpec": {
+    "Id": "InverseBrushDirection",
+    "GroupId": "MapEditor",
+    "LocKey": "KeyBinding.InverseBrushDirection",
+    "Order": 70,
+    "AllowOtherModifiers": true,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/leftCtrl",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  },
+  "SecondaryInputBindingSpec": {
+    "Path": "/Keyboard/rightCtrl",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

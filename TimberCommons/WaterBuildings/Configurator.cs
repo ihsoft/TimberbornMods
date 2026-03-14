@@ -4,7 +4,8 @@
 
 using Bindito.Core;
 using IgorZ.TimberDev.Utils;
-using Timberborn.TemplateSystem;
+using Timberborn.TemplateInstantiation;
+using Timberborn.WaterBuildings;
 
 namespace IgorZ.TimberCommons.WaterBuildings;
 
@@ -13,8 +14,10 @@ sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).FullName;
 
   public void Configure(IContainerDefinition containerDefinition) {
+    containerDefinition.Bind<AdjustableWaterOutput>().AsTransient();
+    containerDefinition.Bind<AdjustableWaterOutputMarker>().AsTransient();
     containerDefinition.MultiBind<TemplateModule>().ToProvider<WaterOutputTemplateModuleProvider>().AsSingleton();
-    HarmonyPatcher.PatchRepeated(PatchId, typeof(WaterOutputPatch), typeof(DecoratorDefinitionPatch));
+    HarmonyPatcher.ApplyPatch(PatchId, typeof(WaterOutputPatch), typeof(DecoratorDefinitionPatch));
   }
 
   class WaterOutputTemplateModuleProvider : IProvider<TemplateModule> {

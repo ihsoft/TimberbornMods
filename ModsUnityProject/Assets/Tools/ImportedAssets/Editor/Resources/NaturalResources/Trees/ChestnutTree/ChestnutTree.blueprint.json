@@ -1,0 +1,314 @@
+{
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 3
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "TemplateSpec": {
+    "TemplateName": "ChestnutTree",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "NaturalResourceSpec": {
+    "Order": 7
+  },
+  "TreeComponentSpec": {},
+  "GrowableSpec": {
+    "GrowthTimeInDays": 23.0
+  },
+  "BasicSelectionSoundSpec": {
+    "SoundName": "Tree",
+    "AlternativeSoundName": ""
+  },
+  "PlantableSpec": {
+    "ResourceGroup": "Forester",
+    "PlantTimeInHours": 0.74
+  },
+  "DemolishableSpec": {
+    "DemolishTimeInHours": 1.2,
+    "ShowDemolishButtonInEntityPanel": false
+  },
+  "CuttableSpec": {
+    "RemoveOnCut": false,
+    "LeftoverModelName": "#Leftover",
+    "Yielder": {
+      "YielderComponentName": "Cuttable",
+      "Yield": {
+        "Id": "Log",
+        "Amount": 4
+      },
+      "RemovalTimeInHours": 1.2,
+      "ResourceGroup": "Cuttable"
+    }
+  },
+  "PlantablePreviewModelSpec": {
+    "Model": "NaturalResources/Trees/ChestnutTree/Mesh/ChestnutTreeMature"
+  },
+  "ReproducibleSpec": {
+    "ReproductionChance": 0.03
+  },
+  "WateredNaturalResourceSpec": {
+    "DaysToDieDry": 8.0
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "NaturalResource.ChestnutTree.DisplayName",
+    "DescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "NaturalResource.ChestnutTree.FlavorDescription",
+    "Icon": "NaturalResources/Trees/ChestnutTree/ChestnutTreeIcon"
+  },
+  "GatherableSpec": {
+    "YieldGrowthTimeInDays": 8.0,
+    "Yielder": {
+      "YielderComponentName": "Gatherable",
+      "Yield": {
+        "Id": "Chestnut",
+        "Amount": 3
+      },
+      "RemovalTimeInHours": 1.0,
+      "ResourceGroup": "Gatherable"
+    }
+  },
+  "FloodableNaturalResourceSpec": {
+    "MinWaterHeight": 0,
+    "MaxWaterHeight": 0,
+    "DaysToDie": 10.0
+  },
+  "NaturalResourceModelRandomizerSpec": {
+    "ConstrainProportion": true,
+    "MinHeightScaleFactor": 0.9,
+    "MaxHeightScaleFactor": 1.1,
+    "MinWidthScaleFactor": 0.9,
+    "MaxWidthScaleFactor": 1.1,
+    "RandomizedRotation": "BetweenMinAndMax",
+    "MinRotation": 0.0,
+    "MaxRotation": 360.0
+  },
+  "TreeCuttingRadiusSpec": {
+    "Radius": 0.145
+  },
+  "ContaminatedNaturalResourceSpec": {},
+  "BlockObjectModelSpec": {
+    "FullModelName": "#Models",
+    "UncoveredModelName": "",
+    "UndergroundModelName": "",
+    "UndergroundModelDepth": 0
+  },
+  "Children": {
+    "#Models": {
+      "Children": {
+        "Seedling": {
+          "Children": {
+            "#Dying": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Trees/ChestnutTree/Mesh/ChestnutTreeSeedlingDry"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [],
+                "CapsuleColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.35,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.198561281,
+                    "Height": 1.07,
+                    "Axis": "Y"
+                  }
+                ]
+              }
+            },
+            "#Dead": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Trees/ChestnutTree/Mesh/ChestnutTreeSeedlingDead"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [],
+                "CapsuleColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.3,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.2,
+                    "Height": 0.98,
+                    "Axis": "Y"
+                  }
+                ]
+              }
+            },
+            "#Alive": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Trees/ChestnutTree/Mesh/ChestnutTreeSeedling"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [],
+                "CapsuleColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.35,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.198561281,
+                    "Height": 1.07,
+                    "Axis": "Y"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "Mature": {
+          "Children": {
+            "#Alive": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Trees/ChestnutTree/Mesh/ChestnutTreeMature"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [],
+                "CapsuleColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 1.54,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.66,
+                    "Height": 1.54,
+                    "Axis": "Y"
+                  },
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.404359043,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.200641036,
+                    "Height": 1.20717847,
+                    "Axis": "Y"
+                  }
+                ]
+              }
+            },
+            "#Dying": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Trees/ChestnutTree/Mesh/ChestnutTreeMatureDry"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [],
+                "CapsuleColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 1.54,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.66,
+                    "Height": 1.54,
+                    "Axis": "Y"
+                  },
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.404359043,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.200641036,
+                    "Height": 1.20717847,
+                    "Axis": "Y"
+                  }
+                ]
+              }
+            },
+            "#Dead": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Trees/ChestnutTree/Mesh/ChestnutTreeMatureDead"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [],
+                "CapsuleColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.56,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.2,
+                    "Height": 1.54,
+                    "Axis": "Y"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "#Leftover": {
+          "TimbermeshSpec": {
+            "Model": "NaturalResources/Trees/ChestnutTree/Mesh/ChestnutTreeMatureStump"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [],
+            "SphereColliders": [],
+            "CapsuleColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.07685387,
+                  "Z": 0.5
+                },
+                "Radius": 0.204731375,
+                "Height": 0.6003412,
+                "Axis": "Y"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using IgorZ.Automation.Actions;
 using IgorZ.Automation.AutomationSystem;
@@ -12,8 +13,10 @@ using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.TimberDev.UI;
-using TimberApi.DependencyContainerSystem;
+using IgorZ.TimberDev.Utils;
+using Timberborn.Common;
 using Timberborn.CoreUI;
+using Timberborn.TooltipSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine.UIElements;
 
@@ -23,9 +26,12 @@ sealed class RuleRow {
 
   const string ConditionLabelLocKey = "IgorZ.Automation.Scripting.Editor.ConditionLabel";
   const string ActionLabelLocKey = "IgorZ.Automation.Scripting.Editor.ActionLabel";
-  const string ResetChangesLocKey = "IgorZ.Automation.Scripting.Editor.ResetChangesBtn";
   const string ParseErrorLocKey = "IgorZ.Automation.Scripting.Expressions.ParseError";
   const string TemplateFamilyLocKey = "IgorZ.Automation.Scripting.Editor.TemplateFamilyLabel";
+  const string DeleteRuleBtnLocKey = "IgorZ.Automation.Scripting.Editor.DeleteRuleBtn";
+  const string PauseRuleBtnLocKey = "IgorZ.Automation.Scripting.Editor.PauseRuleBtn";
+  const string ResetChangesBtnLocKey = "IgorZ.Automation.Scripting.Editor.ResetChangesBtn";
+  const string ResumeRuleBtnLocKey = "IgorZ.Automation.Scripting.Editor.ResumeRuleBtn";
 
   const string EditModeStyle = "editmode-rule";
   const string OriginalRuleStyle = "original-rule";
@@ -36,7 +42,7 @@ sealed class RuleRow {
 
   public readonly VisualElement Root;
 
-  public BoolOperator ParsedCondition { get; private set; }
+  public BooleanOperator ParsedCondition { get; private set; }
   public string ConditionExpression {
     get => _conditionExpression;
     set {
@@ -66,7 +72,7 @@ sealed class RuleRow {
 
   public IAutomationAction LegacyAction { get; private set; }
 
-  public readonly AutomationBehavior ActiveBuilding;
+  public AutomationBehavior ActiveBuilding { get; private set; }
 
   public bool IsNew => _originalConditionExpression == null && _originalActionExpression == null;
 
@@ -98,34 +104,30 @@ sealed class RuleRow {
   }
   bool _isDeleted;
 
+  public bool IsEnabled {
+    get => _isEnabled;
+    set {
+      _isEnabled = value;
+      _pauseRuleBtn.ToggleDisplayStyle(!IsInEditMode && _isEnabled);
+      _resumeRuleBtn.ToggleDisplayStyle(!IsInEditMode && !_isEnabled);
+      CheckIfModified();
+      SetRuleText();
+    }
+  }
+  bool _isEnabled = true;
+
   public bool HasErrors => (ParsedAction == null || ParsedCondition == null) && !IsDeleted && !IsInEditMode;
 
   public event EventHandler OnStateChanged;
 
-  public RuleRow(IEnumerable<IEditorProvider> editors, UiFactory uiFactory, AutomationBehavior activeBuilding) {
-    _uiFactory = uiFactory;
-    _expressionDescriber = DependencyContainer.GetInstance<ExpressionDescriber>();
-    _parserFactory = DependencyContainer.GetInstance<ParserFactory>();
-    ActiveBuilding = activeBuilding;
-    _editorProviders = editors.ToArray();
+  public RulesEditorDialog RulesEditorDialog { get; private set; }
 
-    Root = _uiFactory.LoadVisualTreeAsset("IgorZ.Automation/RuleRow");
-    _sidePanel = Root.Q("SidePanel");
-    _sidePanel.Q<Button>("DeleteRowBtn").clicked += MarkDeleted;
-    _bottomRowSection = Root.Q("BottomRowSection");
-    _ruleButtons = Root.Q("RuleButtons");
-    _readonlyView = Root.Q("ReadonlyRuleView");
-    _editView = Root.Q("EditRuleView");
-    _notifications  = Root.Q("Notifications");
-    _notifications.ToggleDisplayStyle(false);
-    _templateFamilySection = Root.Q("TemplateFamilySection");
-    _templateFamilySection.ToggleDisplayStyle(false);
-    _templateFamilySection.Q<Button>("RemoveTemplateBtn").clicked += () => SetTemplateFamily(null);
-    _templateFamilySection.Q<Button>("RevertTemplateBtn").clicked += () => SetTemplateFamily(_originalTemplateFamily);
-    _ruleContainer = Root.Q("RuleContainer");
-    _deletedStateOverlay = Root.Q("DeletedStateOverlay");
-    _deletedStateOverlay.ToggleDisplayStyle(false);
-    _deletedStateOverlay.Q<Button>("UndoDeleteBtn").clicked += () => { IsDeleted = false; };
+  /// <summary>The main factory method. Don't create via injection.</summary>
+  public static RuleRow CreateFor(RulesEditorDialog rulesEditorDialog, AutomationBehavior automationBehavior) {
+    var row = StaticBindings.DependencyContainer.GetInstance<RuleRow>();
+    row.RulesEditorDialog = rulesEditorDialog;
+    row.ActiveBuilding = automationBehavior;
+    return row;
   }
 
   public void Initialize(ScriptedCondition condition, ScriptedAction action) {
@@ -141,12 +143,16 @@ sealed class RuleRow {
 
     _originalTemplateFamily = action.TemplateFamily;
     SetTemplateFamily(_originalTemplateFamily);
+    _originalEnabledState = condition.IsEnabled;
+    IsEnabled = _originalEnabledState;
   }
 
   public void Initialize(IAutomationAction legacyAction) {
     LegacyAction = legacyAction;
     _originalTemplateFamily = legacyAction.TemplateFamily;
     SetTemplateFamily(_originalTemplateFamily);
+    _originalEnabledState = true;
+    IsEnabled = _originalEnabledState;
   }
 
   public IAutomationCondition GetCondition() {
@@ -157,6 +163,7 @@ sealed class RuleRow {
       return LegacyAction.Condition.CloneDefinition();
     }
     var condition = new ScriptedCondition();
+    condition.SetEnabled(IsEnabled);
     condition.SetExpression(_parserFactory.LispSyntaxParser.Decompile(ParsedCondition));
     return condition;
   }
@@ -185,42 +192,26 @@ sealed class RuleRow {
   public void SwitchToViewMode() {
     Reset();
 
-    // Side panel
-    _sidePanel.ToggleDisplayStyle(true);
-
     // Rule content.
-    GetDescriptions(out var conditionDesc, out var actionDesc);
-    _readonlyView.Q<Label>("ReadonlyRuleView").text =
-        _uiFactory.T(ConditionLabelLocKey) + " " + conditionDesc
-        + "\n" + _uiFactory.T(ActionLabelLocKey) + " " + actionDesc;
-    _readonlyView.ToggleDisplayStyle(true);
+    SetRuleText();
+    _readOnlyView.ToggleDisplayStyle(true);
 
     // Controls.
-    if (IsModified && !IsNew) {
-      CreateButton(ResetChangesLocKey, _ => {
-        ConditionExpression = _originalConditionExpression;
-        ActionExpression = _originalActionExpression;
-        SwitchToViewMode();
-      });
+    _revertChangesBtn.ToggleDisplayStyle(IsModified && !IsNew);
+    var ruleRowButtonProviders =
+        _editorProviders.Where(provider => provider.RuleRowBtnLocKey != null && provider.IsRuleRowBtnEnabled(this));
+    foreach (var provider in ruleRowButtonProviders) {
+      CreateButton(provider.RuleRowBtnLocKey, _ => provider.OnRuleRowBtnAction(this));
     }
-    var ruleEditable = false;
-    foreach (var provider in _editorProviders) {
-      var canEdit = provider.VerifyIfEditable(this);
-      if (!canEdit) {
-        continue;
-      }
-      CreateButton(provider.EditRuleLocKey, _ => provider.MakeForRule(this));
-      ruleEditable = true;
-    }
-    Root.Q("BottomRowSection").ToggleDisplayStyle(ruleEditable || _originalTemplateFamily != null);
 
     IsInEditMode = false;
+    IsEnabled = IsEnabled;  // Refresh buttons state. It depends on the edit mode.
     OnStateChanged?.Invoke(this, EventArgs.Empty);
   }
 
   public void DiscardChangesAndSwitchToViewMode() {
     if (IsNew && !IsModified) {
-      MarkDeleted();
+      MarkDeletedAction();
     }
     SwitchToViewMode();
   }
@@ -262,32 +253,78 @@ sealed class RuleRow {
 
   readonly UiFactory _uiFactory;
   readonly ExpressionDescriber _expressionDescriber;
-  readonly IEditorProvider[] _editorProviders;
   readonly ParserFactory _parserFactory;
+  readonly ImmutableArray<IEditorButtonProvider> _editorProviders;
 
-  readonly VisualElement _sidePanel;
   readonly VisualElement _ruleButtons;
-  readonly VisualElement _bottomRowSection;
   readonly VisualElement _notifications;
-  readonly VisualElement _readonlyView;
+  readonly VisualElement _readOnlyView;
   readonly VisualElement _editView;
   readonly VisualElement _templateFamilySection;
   readonly VisualElement _ruleContainer;
   readonly VisualElement _deletedStateOverlay;
 
+  readonly Button _revertChangesBtn;
+  readonly Button _pauseRuleBtn;
+  readonly Button _resumeRuleBtn;
+
   string _originalConditionExpression;
   string _originalActionExpression;
   string _templateFamily;
   string _originalTemplateFamily;
+  bool _originalEnabledState;
+
+  RuleRow(UiFactory uiFactory, ExpressionDescriber expressionDescriber, ParserFactory parserFactory,
+          ITooltipRegistrar tooltipRegistrar, IEnumerable<IEditorButtonProvider> editors) {
+    _uiFactory = uiFactory;
+    _expressionDescriber = expressionDescriber;
+    _parserFactory = parserFactory;
+    _editorProviders = editors.Where(x => x.RuleRowBtnLocKey != null).ToImmutableArray();
+
+    Root = _uiFactory.LoadVisualTreeAsset("IgorZ.Automation/RuleRow");
+
+    _revertChangesBtn = Root.Q<Button>("RevertChangesBtn");
+    _revertChangesBtn.clicked += RevertChangesAction;
+    tooltipRegistrar.RegisterLocalizable(_revertChangesBtn, ResetChangesBtnLocKey);
+
+    var moveRuleUpBtn = Root.Q<Button>("MoveRuleUpBtn");
+    moveRuleUpBtn.clicked += MoveRuleUpAction;
+    var moveRuleDownBtn = Root.Q<Button>("MoveRuleDownBtn");
+    moveRuleDownBtn.clicked += MoveRuleDownAction;
+
+    var deleteRuleBtn = Root.Q<Button>("DeleteRuleBtn");
+    tooltipRegistrar.RegisterLocalizable(deleteRuleBtn, DeleteRuleBtnLocKey);
+    deleteRuleBtn.clicked += MarkDeletedAction;
+
+    _pauseRuleBtn = Root.Q<Button>("PauseRuleBtn");
+    tooltipRegistrar.RegisterLocalizable(_pauseRuleBtn, PauseRuleBtnLocKey);
+    _pauseRuleBtn.clicked += () => { IsEnabled = false; };
+    _resumeRuleBtn = Root.Q<Button>("ResumeRuleBtn");
+    tooltipRegistrar.RegisterLocalizable(_resumeRuleBtn, ResumeRuleBtnLocKey);
+    _resumeRuleBtn.clicked += () => { IsEnabled = true; };
+
+    _ruleButtons = Root.Q("RuleButtons");
+    _readOnlyView = Root.Q("ReadOnlyRuleView");
+    _editView = Root.Q("EditRuleView");
+    _notifications  = Root.Q("Notifications");
+    _notifications.ToggleDisplayStyle(false);
+    _templateFamilySection = Root.Q("TemplateFamilySection");
+    _templateFamilySection.ToggleDisplayStyle(false);
+    _templateFamilySection.Q<Button>("RemoveTemplateBtn").clicked += () => SetTemplateFamily(null);
+    _templateFamilySection.Q<Button>("RevertTemplateBtn").clicked += () => SetTemplateFamily(_originalTemplateFamily);
+    _ruleContainer = Root.Q("RuleContainer");
+    _deletedStateOverlay = Root.Q("DeletedStateOverlay");
+    _deletedStateOverlay.ToggleDisplayStyle(false);
+    _deletedStateOverlay.Q<Button>("UndoDeleteBtn").clicked += () => { IsDeleted = false; };
+  }
 
   void Reset() {
     _editView.Clear();
     _editView.ToggleDisplayStyle(false);
-    _readonlyView.ToggleDisplayStyle(false);
-    _sidePanel.ToggleDisplayStyle(false);
+    _readOnlyView.ToggleDisplayStyle(false);
     _ruleButtons.Clear();
-    _bottomRowSection.ToggleDisplayStyle(false);
     _notifications.ToggleDisplayStyle(false);
+    _revertChangesBtn.ToggleDisplayStyle(false);
   }
 
   void SetContainerClass() {
@@ -310,17 +347,25 @@ sealed class RuleRow {
   void CheckIfModified() {
     IsModified = _originalConditionExpression != _conditionExpression
             || _originalActionExpression != _actionExpression
-            || _originalTemplateFamily != _templateFamily;
+            || _originalTemplateFamily != _templateFamily
+            || _originalEnabledState != IsEnabled;
   }
 
-  void GetDescriptions(out string condition, out string action) {
+  void SetRuleText() {
+    string conditionDesc;
+    string actionDesc;
     if (LegacyAction is not null) {
-      condition = LegacyAction.Condition.UiDescription;
-      action = LegacyAction.UiDescription;
-      return;
+      conditionDesc = LegacyAction.Condition.UiDescription;
+      actionDesc = LegacyAction.UiDescription;
+    } else {
+      conditionDesc = GetDescription(ParsedCondition);
+      actionDesc = GetDescription(ParsedAction);
     }
-    condition = GetDescription(ParsedCondition);
-    action = GetDescription(ParsedAction);
+    var ruleTextLabel = _readOnlyView.Q<Label>();
+    ruleTextLabel.text =
+        _uiFactory.T(ConditionLabelLocKey) + " " + conditionDesc
+        + "\n" + _uiFactory.T(ActionLabelLocKey) + " " + actionDesc;
+    ruleTextLabel.SetEnabled(IsEnabled);
   }
 
   string GetDescription(IExpression expression) {
@@ -329,7 +374,7 @@ sealed class RuleRow {
     }
     try {
       var description = _expressionDescriber.DescribeExpression(expression);
-      if (expression is BoolOperator boolOperator && boolOperator.Execute()) {
+      if (IsEnabled && expression is BooleanOperator boolOperator && boolOperator.Execute()) {
         return CommonFormats.HighlightGreen(description);
       }
       return CommonFormats.HighlightYellow(description);
@@ -339,9 +384,32 @@ sealed class RuleRow {
     }
   }
 
-  void MarkDeleted() {
+  void RevertChangesAction() {
+    ConditionExpression = _originalConditionExpression;
+    ActionExpression = _originalActionExpression;
+    IsEnabled = _originalEnabledState;
+    SwitchToViewMode();
+  }
+
+  void MarkDeletedAction() {
     IsDeleted = true;
     OnStateChanged?.Invoke(this, EventArgs.Empty);
+  }
+
+  void MoveRuleUpAction() {
+    var rulePos = RulesEditorDialog.RuleRows.IndexOf(this);
+    if (rulePos != 0) {
+      RulesEditorDialog.SwapRows(rulePos, rulePos - 1);
+      RulesEditorDialog.ContentScrollView.ScrollTo(Root);
+    }
+  }
+
+  void MoveRuleDownAction() {
+    var rulePos = RulesEditorDialog.RuleRows.IndexOf(this);
+    if (rulePos != RulesEditorDialog.RuleRows.Count - 1) {
+      RulesEditorDialog.SwapRows(rulePos, rulePos + 1);
+      RulesEditorDialog.ContentScrollView.ScrollTo(Root);
+    }
   }
 
   void SetTemplateFamily(string templateFamily) {

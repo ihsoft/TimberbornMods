@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "RotateCameraLeft90",
+    "GroupId": "Camera",
+    "LocKey": "KeyBinding.RotateCameraLeft90",
+    "Order": 60,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/z",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

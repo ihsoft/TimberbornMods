@@ -1,0 +1,34 @@
+{
+  "GoodSpec": {
+    "Id": "FermentedSoybean",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [
+      {
+        "NeedId": "Hunger",
+        "Points": 0.3
+      },
+      {
+        "NeedId": "FermentedSoybean",
+        "Points": 0.2
+      }
+    ],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.627451,
+      "g": 0.733333349,
+      "b": 0.211764708,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Food",
+    "GoodOrder": 11040,
+    "Icon": "Sprites/Goods/FermentedSoybeanIcon",
+    "ForceImport": true,
+    "DisplayNameLocKey": "Good.FermentedSoybean.DisplayName",
+    "PluralDisplayNameLocKey": "Good.FermentedSoybean.PluralDisplayName"
+  }
+}

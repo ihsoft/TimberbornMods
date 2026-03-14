@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <cui:NineSliceVisualElement name="AdjustableStrengthPowerGeneratorFragment" class="bg-sub-box--green entity-sub-panel">
+        <ui:VisualElement name="SliderRoot" />
+        <cui:NineSliceButton name="FlipRotation" class="entity-panel__button-wrapper entity-panel__text entity-fragment__button entity-fragment__button--green" text="Flip Rotation" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

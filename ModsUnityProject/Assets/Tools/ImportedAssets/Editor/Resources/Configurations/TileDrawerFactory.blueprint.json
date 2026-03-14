@@ -1,0 +1,9 @@
+{
+  "TileDrawerFactorySpec": {
+    "MeshResourcePath": "UI/Markers/GridMarker",
+    "TilesOnSameLevelMaterialResourcePath": "UI/Markers/ConstructionGuidelines/SameLevelGridTileMarkerInstanced",
+    "TilesBelowMaterialResourcePath": "UI/Markers/ConstructionGuidelines/BelowGridTileMarkerInstanced",
+    "TilesAboveMaterialResourcePath": "UI/Markers/ConstructionGuidelines/AboveGridTileMarkerInstanced",
+    "FootprintTilesMaterialResourcePath": "UI/Markers/ConstructionGuidelines/FootprintGridTileMarkerInstanced"
+  }
+}

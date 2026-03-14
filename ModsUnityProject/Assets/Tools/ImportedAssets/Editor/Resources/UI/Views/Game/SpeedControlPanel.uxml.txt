@@ -1,0 +1,21 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+    <ui:VisualElement class="top-right-item__wrapper">
+        <cui:NineSliceVisualElement name="SpeedControlPanel" class="top-right-item--first-column speed-control-panel square-large--green">
+            <ui:Button name="Speed0" class="speed-button speed-button--small">
+                <ui:VisualElement class="speed-button--0" />
+            </ui:Button>
+            <ui:Button name="Speed1" class="speed-button speed-button--small">
+                <ui:VisualElement class="speed-button--1" />
+            </ui:Button>
+            <ui:Button name="Speed3" class="speed-button speed-button--big">
+                <ui:VisualElement class="speed-button--2" />
+            </ui:Button>
+            <ui:Button name="Speed7" class="speed-button speed-button--big">
+                <ui:VisualElement class="speed-button--3" />
+            </ui:Button>
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,30 @@
+{
+  "GoodSpec": {
+    "Id": "Water",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [
+      {
+        "NeedId": "Thirst",
+        "Points": 0.33
+      }
+    ],
+    "GoodType": "Liquid",
+    "StockpileVisualization": "Liquid",
+    "VisibleContainer": "Barrel",
+    "ContainerColor": {
+      "r": 0.117647059,
+      "g": 0.321568638,
+      "b": 0.5137255,
+      "a": 1.0
+    },
+    "ContainerMaterial": "Materials/Goods/Water",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 2,
+    "GoodGroupId": "Water",
+    "GoodOrder": 10,
+    "Icon": "Sprites/Goods/WaterIcon",
+    "ForceImport": true,
+    "DisplayNameLocKey": "Good.Water.DisplayName",
+    "PluralDisplayNameLocKey": "Good.Water.PluralDisplayName"
+  }
+}

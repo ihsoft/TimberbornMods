@@ -1,0 +1,8 @@
+{
+  "ToolGroupSpec": {
+    "Id": "Demolishing",
+    "DisplayNameLocKey": "ToolGroups.Demolishing",
+    "Icon": "Sprites/BottomBar/DeleteGroupIcon"
+  },
+  "ConstructionModeToolGroupSpec": {}
+}

@@ -1,0 +1,10 @@
+{
+  "KeyBindingSpec": {
+    "Id": "DecreaseFloodgateHeight",
+    "GroupId": "Buildings",
+    "LocKey": "KeyBinding.DecreaseFloodgateHeight",
+    "Order": 80,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  }
+}

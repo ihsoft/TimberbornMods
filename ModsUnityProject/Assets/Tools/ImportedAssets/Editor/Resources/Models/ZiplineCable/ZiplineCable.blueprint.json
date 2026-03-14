@@ -1,0 +1,10 @@
+{
+  "CableSpec": {},
+  "Children": {
+    "Model": {
+      "TimbermeshSpec": {
+        "Model": "Models/ZiplineCable/ZiplineCable.Model"
+      }
+    }
+  }
+}

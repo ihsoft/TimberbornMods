@@ -1,0 +1,19 @@
+{
+  "CustomCursorSpec": {
+    "Id": "DefaultCursor",
+    "WindowsCursor": "",
+    "MacOsCursor": "",
+    "Hotspot": {
+      "X": 0.0,
+      "Y": 0.0
+    },
+    "WindowsCursorOffset": {
+      "X": 12.0,
+      "Y": 18.0
+    },
+    "MacOsCursorOffset": {
+      "X": 12.0,
+      "Y": 18.0
+    }
+  }
+}

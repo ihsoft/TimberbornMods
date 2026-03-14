@@ -1,0 +1,19 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="Box" src="/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Options/OptionsStyle.uss" />
+    <ui:VisualElement name="NewMapView" class="content-row-centered" picking-mode="Ignore">
+        <ui:Instance template="Box" class="options-panel new-map-box">
+            <ui:AttributeOverrides element-name="Header" text-loc-key="NewMapPanel.Header" />
+            <ui:VisualElement name="Fields" class="content-row-centered">
+                <cui:LocalizableLabel text="Size" name="SizeLabel" text-loc-key="MapEditor.NewMap.Size" class="new-map-box__text" />
+                <cui:NineSliceTextField picking-mode="Ignore" name="SizeXField" class="new-map-box__input text-field" />
+                <ui:Label text="x" class="new-map-box__text" />
+                <cui:NineSliceTextField picking-mode="Ignore" name="SizeYField" class="new-map-box__input text-field" />
+            </ui:VisualElement>
+            <ui:VisualElement name="Buttons" class="box-buttons">
+                <cui:LocalizableButton text="Start" name="StartButton" text-loc-key="MapEditor.NewMap.Create" focusable="false" class="menu-button" />
+            </ui:VisualElement>
+        </ui:Instance>
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,10 @@
+{
+  "KeyBindingSpec": {
+    "Id": "ToggleStockpilePriority",
+    "GroupId": "Buildings",
+    "LocKey": "KeyBinding.ToggleStockpilePriority",
+    "Order": 10,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  }
+}

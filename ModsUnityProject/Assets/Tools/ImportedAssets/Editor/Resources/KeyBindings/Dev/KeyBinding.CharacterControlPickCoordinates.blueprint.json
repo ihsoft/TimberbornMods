@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "CharacterControlPickCoordinates",
+    "GroupId": "Dev",
+    "LocKey": "",
+    "Order": 80,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": true
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/f",
+    "InputModifiers": "Ctrl, Shift",
+    "Unchangeable": false
+  }
+}

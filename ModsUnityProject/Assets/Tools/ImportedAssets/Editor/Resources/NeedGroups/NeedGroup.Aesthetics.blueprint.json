@@ -1,0 +1,7 @@
+{
+  "NeedGroupSpec": {
+    "Id": "Aesthetics",
+    "Order": 40,
+    "DisplayNameLocKey": "NeedGroup.Aesthetics.DisplayName"
+  }
+}

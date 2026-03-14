@@ -1,0 +1,30 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="Thumbnail" src="/Assets/Resources/UI/Views/Common/Thumbnail.uxml" />
+    <ui:Template name="Box" src="/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Options/OptionsStyle.uss" />
+    <ui:VisualElement class="content-row-centered" picking-mode="Ignore">
+        <ui:Instance template="Box" class="load-box">
+            <ui:AttributeOverrides element-name="Header" text-loc-key="Saving.LoadGamePanelHeader" />
+            <ui:VisualElement name="Lists" class="content-row-centered">
+                <ui:VisualElement name="SettlementsWrapper" class="load-box__list-wrapper content-centered">
+                    <cui:LocalizableLabel name="SettlementsTile" text-loc-key="Saving.Settlements" class="text--big text--centered load-box__list-title" />
+                    <ui:ListView name="Settlements" class="panel-list-view text--default scroll--green-decorated" />
+                </ui:VisualElement>
+                <ui:VisualElement name="SavesWrapper" class="load-box__list-wrapper content-centered">
+                    <cui:LocalizableLabel name="SettlementsTile" text-loc-key="Saving.Saves" class="text--big text--centered load-box__list-title" />
+                    <ui:ListView name="Saves" class="panel-list-view text--default scroll--green-decorated" />
+                    <ui:Instance template="Thumbnail" class="load-box__thumbnail">
+                        <ui:Button name="ShowSavedModsButton" text="Mods" class="text--default load-box__show-mods-button" />
+                    </ui:Instance>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="box-buttons">
+                <cui:LocalizableButton name="DeleteSettlementButton" text-loc-key="Saving.DeleteSettlement" focusable="false" class="menu-button menu-button--medium" />
+                <cui:LocalizableButton name="DeleteSaveButton" text-loc-key="Saving.DeleteSave" focusable="false" class="menu-button menu-button--medium" />
+                <cui:LocalizableButton name="LoadButton" text="Load" text-loc-key="Core.Load" focusable="false" class="menu-button menu-button--medium" />
+            </ui:VisualElement>
+            <cui:LocalizableButton name="BrowseDirectoryButton" text="Browse directory ►" text-loc-key="Core.BrowseFolder" focusable="false" class="open-dir__button text--default text--bold" />
+        </ui:Instance>
+    </ui:VisualElement>
+</ui:UXML>

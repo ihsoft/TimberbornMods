@@ -1,0 +1,40 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="LogoBackground" src="Background/LogoBackground.uxml" />
+    <ui:Template name="MainContent" src="Background/MainContent.uxml" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MainMenu/MainMenuStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MainMenu/MainMenuMiscStyle.uss" />
+    <ui:VisualElement name="root" class="grow-centered" picking-mode="Ignore">
+        <ui:VisualElement name="Content" class="main-menu__content">
+            <ui:Instance template="LogoBackground" class="width-stretch" />
+            <ui:Instance template="MainContent" class="width-stretch main-menu__main-content">
+                <ui:VisualElement name="Spacer" class="main-menu-spacer" />
+                <ui:VisualElement name="MainMenuPanelWrapper" class="main-menu__panel-wrapper">
+                    <cui:NineSliceVisualElement name="MainMenuPanel" class="main-menu-panel sliced-border">
+                        <cui:LocalizableButton text="Continue" name="ContinueButton" text-loc-key="Menu.Continue" focusable="false" class="menu-button menu-button--stretched" />
+                        <cui:LocalizableButton text="New game" name="NewGameButton" text-loc-key="Menu.NewGame" focusable="false" class="menu-button menu-button--stretched" />
+                        <cui:LocalizableButton text="Load game" name="LoadGameButton" text-loc-key="Menu.LoadGame" focusable="false" class="menu-button menu-button--stretched" />
+                        <cui:LocalizableButton text="Create new map" name="NewMapButton" text-loc-key="Menu.NewMap" focusable="false" class="menu-button menu-button--stretched" />
+                        <cui:LocalizableButton text="Edit map" name="LoadMapButton" text-loc-key="Menu.EditMap" focusable="false" class="menu-button menu-button--stretched" />
+                        <cui:LocalizableButton text="Mods" name="ModManagerButton" text-loc-key="Menu.ModManager" focusable="false" class="menu-button menu-button--stretched" />
+                        <cui:LocalizableButton text="Settings" name="SettingsButton" text-loc-key="Menu.Settings" focusable="false" class="menu-button menu-button--stretched" />
+                        <cui:LocalizableButton text="Credits" name="CreditsButton" text-loc-key="Menu.Credits" focusable="false" class="menu-button menu-button--stretched" />
+                        <cui:LocalizableButton text="Go to feedback site" name="FeedbackButton" text-loc-key="Menu.Feedback" focusable="false" class="menu-button menu-button--stretched" />
+                        <cui:LocalizableButton text="Exit" name="ExitButton" text-loc-key="Menu.ExitGame" focusable="false" class="menu-button menu-button--stretched" />
+                        <ui:Button name="DiscordButton" focusable="false" class="main-menu-panel__discord-button" />
+                        <ui:Label text="EXPERIMENTAL MODE" name="Experimental" class="experimental-info" />
+                    </cui:NineSliceVisualElement>
+                    <cui:NineSliceVisualElement name="UpdateInfoPanel" class="update-info-panel sliced-border">
+                        <cui:LocalizableLabel name="UpdateInfoHeader" text-loc-key="MainMenu.UpdateInfoHeader" class="update-info-panel__header" />
+                        <ui:Image name="UpdateInfoArt" class="update-info-panel__art" />
+                        <ui:Label name="UpdateInfoText" class="update-info-panel__summary" />
+                        <cui:LocalizableButton name="UpdateInfoLink" text-loc-key="MainMenu.UpdateInfoLink" class="update-info-panel__link" />
+                    </cui:NineSliceVisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="Spacer" class="main-menu-spacer" />
+            </ui:Instance>
+            <ui:VisualElement name="Logo" class="background__timberborn-logo" />
+        </ui:VisualElement>
+        <ui:Button name="MerchandiseButton" focusable="false" class="main-menu-merch-button" />
+    </ui:VisualElement>
+</ui:UXML>

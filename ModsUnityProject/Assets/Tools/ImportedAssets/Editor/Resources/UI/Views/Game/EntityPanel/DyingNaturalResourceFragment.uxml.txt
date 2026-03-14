@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <cui:NineSliceVisualElement name="DyingNaturalResourceFragment" class="entity-sub-panel bg-sub-box--green">
+        <cui:ProgressBar name="ProgressBar" class="progress-bar progress-bar--red">
+            <ui:Label name="Description" class="entity-panel__text" />
+        </cui:ProgressBar>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

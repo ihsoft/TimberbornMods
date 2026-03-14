@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <ui:VisualElement name="InputBox" class="content-row-centered">
+        <cui:NineSliceVisualElement class="content-centered sliced-border sliced-border--nontransparent">
+            <ui:VisualElement class="box">
+                <ui:Label name="Message" class="box__text box__content-margin" />
+                <cui:NineSliceTextField picking-mode="Ignore" name="Input" class="text-field box__input" />
+                <ui:VisualElement name="Buttons" class="content-row-centered">
+                    <cui:LocalizableButton name="ConfirmButton" text="Confirm" text-loc-key="Core.OK" focusable="false" class="menu-button menu-button--medium" />
+                    <cui:LocalizableButton name="CancelButton" text="Cancel" text-loc-key="Core.Cancel" focusable="false" class="menu-button menu-button--medium" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

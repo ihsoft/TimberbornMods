@@ -1,0 +1,20 @@
+{
+  "KeyBindingSpec": {
+    "Id": "MoveCameraLeft",
+    "GroupId": "Camera",
+    "LocKey": "KeyBinding.MoveCameraLeft",
+    "Order": 20,
+    "AllowOtherModifiers": true,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/a",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  },
+  "SecondaryInputBindingSpec": {
+    "Path": "/Keyboard/leftArrow",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

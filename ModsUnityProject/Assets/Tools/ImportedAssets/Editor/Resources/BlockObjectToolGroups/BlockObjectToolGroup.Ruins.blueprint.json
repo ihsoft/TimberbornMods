@@ -1,0 +1,9 @@
+{
+  "BlockObjectToolGroupSpec": {
+    "Id": "Ruins",
+    "Order": 160,
+    "NameLocKey": "ToolGroups.Ruins",
+    "Icon": "Sprites/BottomBar/BuildingGroups/Ruins",
+    "FallbackGroup": false
+  }
+}

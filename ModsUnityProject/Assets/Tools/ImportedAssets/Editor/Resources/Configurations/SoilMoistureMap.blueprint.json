@@ -1,0 +1,6 @@
+{
+  "SoilMoistureMapSpec": {
+    "MaxDesertIntensity": 0.7,
+    "DesertMoistureThreshold": 5
+  }
+}

@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/BatchControl/BatchControlStyle.uss" />
+    <cui:NineSliceVisualElement name="PopulationDistributorBatchControlRowItem" class="batch-control-box__row-item-group">
+        <cui:LocalizableLabel name="MinimumLabel" text="Minimum" text-loc-key="Migration.Minimum" class="game-text-normal population-distributor-batch-control-row-item__label" />
+        <cui:NineSliceIntegerField name="MinimumValue" class="game-text-normal text-field population-distributor-batch-control-row-item__value batch-control-row-item__background" />
+        <ui:Button name="MinusButton" class="button-square button-square--large batch-control-row-item__minus-button" />
+        <ui:Button name="PlusButton" class="button-square button-square--large batch-control-row-item__plus-button" />
+        <ui:Toggle name="ImmigrationToggle" class="button-square button-square--large population-distributor-batch-control-row-item__allow-immigration" />
+        <ui:Toggle name="EmigrationToggle" class="button-square button-square--large population-distributor-batch-control-row-item__allow-emigration" />
+        <ui:VisualElement name="NeedingIcon" class="population-distributor-batch-control-row-item__needing-icon" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

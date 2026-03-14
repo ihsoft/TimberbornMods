@@ -1,0 +1,14 @@
+﻿{
+  "TutorialStageSpec": {
+    "Id": "Wood.ConnectLumberjacks",
+    "IntroLocKey": "Tutorial.Wood.ConnectLumberjacks"
+  },
+  "Children": {
+    "Step1": {
+      "ConnectBuildingsTutorialStepSpec": {
+        "TemplateName": "LumberjackFlag.Folktails",
+        "RequiredAmount": 2
+      }
+    }
+  }
+}

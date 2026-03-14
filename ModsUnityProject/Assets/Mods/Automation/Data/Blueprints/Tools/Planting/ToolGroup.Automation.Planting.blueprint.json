@@ -1,0 +1,13 @@
+{
+  "ToolGroupSpec": {
+    "Id": "AutomationPlantingToolGroupId",
+    "DisplayNameLocKey": "IgorZ.Automation.ToolGroup.Planting.DisplayName",
+    "Icon": "Sprites/IgorZ/tool-group-planting"
+  },
+  "CustomToolGroupSpec": {
+    "ParentGroupId": "AutomationToolGroupId",
+    "Style": "Green",
+    "Order": 25
+  },
+  "ConstructionModeToolGroupSpec": {}
+}

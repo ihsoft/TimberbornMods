@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <cui:NineSliceVisualElement name="CharacterControlFragment">
+        <ui:Toggle text="Force walking" name="ForcedWalking" class="game-toggle" />
+        <cui:NineSliceButton name="MoveTo" text="Move to" class="entity-panel__text button-game debug-fragment__button" />
+        <Timberborn.DropdownSystem.Dropdown name="Animations" class="debug-fragment__button" />
+        <cui:NineSliceButton name="Release" text="Release control" class="entity-panel__text button-game debug-fragment__button" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

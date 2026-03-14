@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <ui:VisualElement name="Dropdown" class="dropdown">
+        <ui:Label name="Label" class="dropdown__label" />
+        <cui:NineSliceButton name="Selection" class="dropdown__selection">
+            <ui:VisualElement name="SelectedItem" class="dropdown__selected-item">
+                <ui:VisualElement name="SelectedItemContent" class="dropdown__selected-item-content" />
+                <ui:VisualElement name="SelectedItemOverlay" class="dropdown__selected-item-overlay" />
+            </ui:VisualElement>
+            <ui:Button name="ArrowLeft" class="dropdown__arrow dropdown__arrow-left" />
+            <ui:Button name="ArrowRight" class="dropdown__arrow dropdown__arrow-right" />
+            <ui:Button name="ArrowDown" class="dropdown__arrow dropdown__arrow-down" />
+        </cui:NineSliceButton>
+    </ui:VisualElement>
+</ui:UXML>

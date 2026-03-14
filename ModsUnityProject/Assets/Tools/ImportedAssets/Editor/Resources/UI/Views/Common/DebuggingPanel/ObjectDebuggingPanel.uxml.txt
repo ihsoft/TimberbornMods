@@ -1,0 +1,21 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/DebuggingPanel/DebuggingPanelStyle.uss" />
+    <cui:NineSliceVisualElement name="ObjectDebuggingPanel" class="object-debugging-panel">
+        <ui:VisualElement name="DraggingIcon" class="debugging-panel__dragging-icon" />
+        <ui:Label name="PanelHeader" text="Object debugger" class="game-text-heading debugging-panel__title" />
+        <ui:Button name="MinimizeIcon" class="debugging-panel__minimize-icon" />
+        <ui:VisualElement name="Wrapper">
+            <ui:VisualElement name="ObjectSelector" class="object-debugging-panel__content">
+                <ui:Label name="Context" text="Context: Singletons" class="game-text-normal text--bold" />
+                <cui:NineSliceTextField name="SearchField" placeholder-text="Type to filter..." class="text-field object-selector__search-field" />
+                <ui:ListView name="ObjectListView" vertical-scroller-visibility="AlwaysVisible" class="object-debugging-panel-scroll" />
+            </ui:VisualElement>
+            <ui:VisualElement name="Content" class="object-debugging-panel__content">
+                <ui:ScrollView name="ObjectViewer" class="object-debugging-panel-scroll" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>
+

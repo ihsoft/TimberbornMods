@@ -10,12 +10,17 @@ namespace IgorZ.Automation.ScriptingEngineUI;
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
-    containerDefinition.Bind<ConstructorEditorProvider>().AsSingleton();
-    containerDefinition.Bind<ExportRulesDialog>().AsSingleton();
-    containerDefinition.Bind<ImportRulesDialog>().AsSingleton();
-    containerDefinition.Bind<RulesEditorDialog>().AsSingleton();
-    containerDefinition.Bind<ScriptEditorProvider>().AsSingleton();
-    containerDefinition.Bind<SignalsEditorDialog>().AsSingleton();
+    // Keep the order. It defines how the buttons are shown in UI.
+    containerDefinition.MultiBind<IEditorButtonProvider>().To<ScriptEditorButtonProvider>().AsSingleton();
+    containerDefinition.MultiBind<IEditorButtonProvider>().To<ConstructorEditorButtonProvider>().AsSingleton();
+    containerDefinition.MultiBind<IEditorButtonProvider>().To<CopyRuleButtonProvider>().AsSingleton();
+    containerDefinition.MultiBind<IEditorButtonProvider>().To<InvertRuleButtonProvider>().AsSingleton();
+
+    containerDefinition.Bind<ExportRulesDialog>().AsTransient();
     containerDefinition.Bind<ExpressionDescriber>().AsSingleton();
+    containerDefinition.Bind<ImportRulesDialog>().AsTransient();
+    containerDefinition.Bind<RuleRow>().AsTransient();
+    containerDefinition.Bind<RulesEditorDialog>().AsTransient();
+    containerDefinition.Bind<SignalsEditorDialog>().AsTransient();
   }
 }

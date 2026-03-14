@@ -1,0 +1,222 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "Detailer.Folktails",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "Gear",
+        "Amount": 15
+      },
+      {
+        "Id": "TreatedPlank",
+        "Amount": 5
+      },
+      {
+        "Id": "MetalBlock",
+        "Amount": 10
+      }
+    ],
+    "ScienceCost": 1000,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": false,
+    "DrawRangeBoundsOnIt": false
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "AttractionSpec": {
+    "Effects": [
+      {
+        "NeedId": "Detailer",
+        "PointsPerHour": 0.6,
+        "SatisfyToMaxValue": false
+      }
+    ]
+  },
+  "FixedSlotManagerSpec": {},
+  "TransformSlotInitializerSpec": {
+    "Slots": [
+      {
+        "SlotKeyword": "Spot",
+        "Animation": "Detailing",
+        "Inanimate": false,
+        "RandomizeYRotation": false,
+        "WaterSlot": false
+      }
+    ]
+  },
+  "EnterableSpec": {
+    "OperatingState": "Finished",
+    "LimitedCapacityFinished": true,
+    "CapacityFinished": 1,
+    "LimitedCapacityUnfinished": false,
+    "CapacityUnfinished": 0
+  },
+  "TemplateSpec": {
+    "TemplateName": "Detailer.Folktails",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 2,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": true,
+      "Coordinates": {
+        "X": 0,
+        "Y": -1,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "BuildingAccessibleSpec": {
+    "LocalAccess": {
+      "X": 0.5,
+      "Y": 0.12,
+      "Z": 0.25
+    },
+    "ForceOneFinalAccess": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Wellbeing",
+    "ToolOrder": 110,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.Detailer.DisplayName",
+    "DescriptionLocKey": "Building.Detailer.Description",
+    "FlavorDescriptionLocKey": "Building.Detailer.Folktails.FlavorDescription",
+    "Icon": "Buildings/Wellbeing/Detailer/DetailerIcon"
+  },
+  "EnterableAnimationControllerSpec": {
+    "ResetAnimationUponExit": true
+  },
+  "DecalSupplierSpec": {
+    "Category": "Tails"
+  },
+  "DecalSupplierBuildingIconSpec": {
+    "IconRendererName": "#Press1Animated.018"
+  },
+  "GoodConsumingBuildingSpec": {
+    "FullInventoryWorkHours": 40,
+    "ConsumedGoods": [
+      {
+        "GoodId": "Extract",
+        "GoodPerHour": 0.25
+      }
+    ]
+  },
+  "GoodConsumingAttractionSpec": {},
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "EnterableTailDecalApplierSpec": {},
+  "Children": {
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Wellbeing/Detailer/Detailer.Folktails.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.1541526,
+              "Z": 1.0
+            },
+            "Size": {
+              "X": 1.0,
+              "Y": 0.3083052,
+              "Z": 2.0
+            }
+          },
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.417661,
+              "Z": 1.07999361
+            },
+            "Size": {
+              "X": 1.0,
+              "Y": 0.835322,
+              "Z": 0.155441046
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase1x2#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase1x2/ConstructionBase1x2.blueprint"
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Wellbeing/Detailer/Deatailer.Folktails.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.05,
+                  "Z": 1.0
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.1,
+                  "Z": 2.0
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    }
+  }
+}

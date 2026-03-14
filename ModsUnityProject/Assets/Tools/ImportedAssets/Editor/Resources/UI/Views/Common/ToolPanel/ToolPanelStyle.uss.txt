@@ -1,0 +1,202 @@
+.tool-panel {
+    min-width: 300px;
+    max-width: 300px;
+    flex-direction: column;
+    align-items: center;
+}
+
+.tool-panel-item {
+    margin-top: 2px;
+    padding: 2px 4px;
+    -unity-text-align: middle-center;
+}
+
+.tool-panel-item--warning {
+    margin-bottom: 2px;
+}
+
+.description-panel {
+    align-self: stretch;
+    margin-bottom: 4px;
+    padding: 2px;
+    min-width: 340px;
+}
+
+.description-panel__sections {
+    padding: 8px;
+}
+
+.description-panel-unlock-section {
+    flex-direction: row;
+    justify-content: center;
+}
+
+.description-panel-unlock-section__spacer {
+    width: 33%;
+}
+
+.description-panel-unlock-section__label {
+    -unity-text-align: middle-right;
+    padding-right: 5px;
+}
+
+.description-panel-unlock-section__button {
+    margin-top: 7px;
+    margin-bottom: 7px;
+}
+
+.description-panel-unlock-section__button .science-cost-section__background {
+    --background-image: resource('UI/Images/Buttons/button-game');
+    --background-slice-scale: 0.5;
+    --background-slice: 24;
+}
+
+.highlight .description-panel-unlock-section__button .science-cost-section__background {
+    --background-image: resource('UI/Images/Buttons/button-game-highlight');
+}
+
+.description-panel-unlock-section__button .science-cost-section__background:hover:enabled {
+    --background-image: resource('UI/Images/Buttons/button-game-disabled');
+}
+
+.description-panel-unlock-section__button.unlockable .science-cost-section__background:hover:enabled {
+    --background-image: resource('UI/Images/Buttons/button-game-hover');
+}
+
+.description-panel-unlock-section__button.unlockable .science-cost-section__background:hover:enabled .science-cost-section__lock-icon {
+    background-image: resource('UI/Images/Game/unlock-icon-yellow');
+}
+
+.materials-section__wrapper {
+    --background-image: resource('UI/Images/Backgrounds/bg-5');
+    --background-slice-scale: 0.5;
+    --background-slice: 64;
+    padding: 4px;
+    align-self: center;
+    margin-bottom: 4px;
+}
+
+.materials-section {
+    width: 100%;
+    height: 100%;
+    flex-direction: row;
+    align-items: center;
+    margin-right: 4px;
+}
+
+.materials-section__tool-icon {
+    width: 45px;
+    height: 45px;
+    margin: 8px;
+}
+
+.materials-section__tool-icon--cost {
+    background-image: resource('UI/Images/Game/ico_buildit');
+}
+
+.description-panel-section {
+    padding: 8px;
+    -unity-text-align: middle-left;
+}
+
+.description-panel-section--prioritized {
+    -unity-text-align: middle-center;
+}
+
+.description-panel__header {
+    padding: 4px;
+}
+
+.description-panel-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+}
+
+.description-panel-header__title {
+    -unity-text-align: middle-center;
+    flex-grow: 1;
+    max-width: 250px;
+}
+
+.description-panel-header__icon {
+    width: 48px;
+    height: 48px;
+    margin-right: 10px;
+}
+
+.description-panel-header__info {
+    width: 54px;
+    height: 48px;
+    align-items: flex-end;
+    justify-content: center;
+    margin-left: 4px;
+}
+
+.description-panel__title {
+    -unity-text-align: middle-center;
+    width: 100%;
+}
+
+.block-object-placement-panel {
+    flex-direction: row;
+    margin-top: 0;
+}
+
+.block-object-placement-panel__button {
+    margin: 0 4px;
+    padding: 4px;
+    flex-direction: row;
+    align-items: center;
+    --click-sound: "UI.Click";
+}
+
+.block-object-placement-panel__button-image {
+    min-height: 20px;
+    max-height: 20px;
+    min-width: 20px;
+    max-width: 20px;
+}
+
+.block-object-placement-panel__button-image--clockwise {
+    background-image: resource('UI/Images/Game/placement-rotate-clockwise');
+}
+
+.block-object-placement-panel__button-image--counterclockwise {
+    background-image: resource('UI/Images/Game/placement-rotate-counterclockwise');
+}
+
+.block-object-placement-panel__button-image--flipped {
+    background-image: resource('UI/Images/Game/placement-flipped');
+}
+
+.block-object-placement-panel__button-image--unflipped {
+    background-image: resource('UI/Images/Game/placement-unflipped');
+}
+
+.block-object-placement-panel__binding {
+    margin: 0 3px;
+    flex-shrink: 1;
+}
+
+.two-items {
+    flex-wrap: nowrap;
+}
+
+.two-items > .resource-yield-panel-item {
+    width: 50%;
+    flex-grow: 0;
+}
+
+.resource-yield-panel-item {
+    padding: 8px;
+}
+
+.resource-yield-panel-item > TemplateContainer {
+    flex-grow: 1;
+}
+
+.resource-yield-panel-item .resource-yield__progress-text {
+    display: none;
+}

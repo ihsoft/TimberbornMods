@@ -8,13 +8,15 @@ using System.Text;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.Automation.ScriptingEngine.Parser;
+using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 using IgorZ.Automation.Settings;
+using IgorZ.TimberDev.UI;
 using Timberborn.Localization;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
 
 /// <summary>Makes a human-readable description of the parsed expression.</summary>
-sealed class ExpressionDescriber {
+sealed class ExpressionDescriber(ILoc Loc) {
 
   const string AndOperatorLocKey = "IgorZ.Automation.Scripting.Expressions.AndOperator";
   const string OrOperatorLocKey = "IgorZ.Automation.Scripting.Expressions.OrOperator";
@@ -26,22 +28,41 @@ sealed class ExpressionDescriber {
     return DescribeExpressionInternal(expression);
   }
 
-  #region Implementation
-
-  readonly ILoc _loc;
-
-  ExpressionDescriber(ILoc loc) {
-    _loc = loc;
+  /// <summary>Formats the value according to the value definition for the display purpose.</summary>
+  /// <param name="scriptValue">The value to format.</param>
+  /// <param name="valueDef">
+  /// Optional value definition. If not provided, then the string types are presented "as-is", and the number types are
+  /// converted to floats and formatted as "0.##".
+  /// </param>
+  public static string FormatValue(ScriptValue scriptValue, ValueDef valueDef) {
+    var stringValue = scriptValue.ValueType switch {
+        ScriptValue.TypeEnum.Number => valueDef?.DisplayNumericFormat switch {
+            ValueDef.NumericFormatEnum.Float => scriptValue.AsFloat.ToString("0.00"),
+            ValueDef.NumericFormatEnum.Percent => scriptValue.AsFloat.ToString("0%"),
+            // If the runtime value happen to be not an integer, it's still formatted as float in UI.
+            ValueDef.NumericFormatEnum.Integer => scriptValue.AsFloat.ToString("0.##"),
+            null => scriptValue.AsFloat.ToString("0.##"),  // valeDef can be null.
+            ValueDef.NumericFormatEnum.Unspecified => throw new InvalidOperationException("Numeric format mus tbe set"),
+        },
+        ScriptValue.TypeEnum.String => scriptValue.AsString,
+        ScriptValue.TypeEnum.Unset => throw new InvalidOperationException("Value type must be set"),
+    };
+    if (valueDef?.Options == null) {
+      return stringValue;
+    }
+    var resolvedValue = valueDef.Options.FirstOrDefault(x => x.Value == stringValue);
+    return resolvedValue.Text ?? CommonFormats.HighlightRed("?" + stringValue);
   }
+
+  #region Implementation
 
   string DescribeExpressionInternal(IExpression expression) {
     return expression switch {
         AbstractFunction abstractFunction => DescribeFunction(abstractFunction),
         ActionOperator actionOperator => DescribeActionOperator(actionOperator),
-        BinaryOperator binaryOperator => DescribeComparisonOperator(binaryOperator),
+        ComparisonOperator comparisonOperator => DescribeComparisonOperator(comparisonOperator),
         ConcatOperator concatOperator => concatOperator.ValueFn().AsString,
         ConstantValueExpr constantValueExpr => DescribeScriptValue(constantValueExpr.ValueFn()),
-        GetPropertyOperator getProperty => DescribeGetPropertyOperator(getProperty),
         LogicalOperator logicalOperator => DescribeLogicalOperator(logicalOperator),
         MathOperator mathOperator => DescribeMathOperator(mathOperator),
         SignalOperator signalOperator => signalOperator.SignalDef.DisplayName,
@@ -53,33 +74,32 @@ sealed class ExpressionDescriber {
     return scriptValue.ValueType switch {
         ScriptValue.TypeEnum.String => $"'{scriptValue.AsString}'",
         ScriptValue.TypeEnum.Number => scriptValue.AsFloat.ToString("0.0#"),
-        _ => $"ERROR:{scriptValue.ValueType}",
+        ScriptValue.TypeEnum.Unset => throw new InvalidOperationException("Value type must be set"),
     };
   }
 
-  string DescribeComparisonOperator(BinaryOperator op) {
+  string DescribeComparisonOperator(ComparisonOperator op) {
     // Special case: check for if "signal changed" binding (signal equals to itself).
     if (op.Left is SignalOperator leftSignal && op.Right is SignalOperator rightSignal
-        && leftSignal.SignalName == rightSignal.SignalName && op.OperatorType == BinaryOperator.OpType.Equal) {
+        && leftSignal.SignalName == rightSignal.SignalName && op.OperatorType == ComparisonOperator.OpType.Equal) {
       return DescribeExpressionInternal(leftSignal);
     }
     var sb = new StringBuilder();
     sb.Append(DescribeLeft(op.Left, op));
     sb.Append(op.OperatorType switch {
-        BinaryOperator.OpType.Equal => " = ",
-        BinaryOperator.OpType.NotEqual => " \u2260 ",
-        BinaryOperator.OpType.GreaterThan => " > ",
-        BinaryOperator.OpType.LessThan => " < ",
-        BinaryOperator.OpType.GreaterThanOrEqual => " \u2265 ",
-        BinaryOperator.OpType.LessThanOrEqual => " \u2264 ",
-        _ => throw new InvalidOperationException("Unknown operator: " + this),
+        ComparisonOperator.OpType.Equal => " = ",
+        ComparisonOperator.OpType.NotEqual => " \u2260 ",
+        ComparisonOperator.OpType.GreaterThan => " > ",
+        ComparisonOperator.OpType.LessThan => " < ",
+        ComparisonOperator.OpType.GreaterThanOrEqual => " \u2265 ",
+        ComparisonOperator.OpType.LessThanOrEqual => " \u2264 ",
     });
-    if (EntityPanelSettings.EvalValuesInConditions || IsConstantValueOperand(op.Right)) {
+    if (EntityPanelSettings.EvalValuesInConditions || op.Right.IsConstantValue()) {
       string rightValue;
       try {
-        rightValue = op.Right.ValueFn().FormatValue(op.ResultValueDef);
+        rightValue = FormatValue(op.Right.ValueFn(), op.ResultValueDef);
       } catch (ScriptError.BadValue e) {
-        rightValue = _loc.T(e.LocKey);
+        rightValue = Loc.T(e.LocKey);
       }
       sb.Append(rightValue);
     } else {
@@ -97,32 +117,20 @@ sealed class ExpressionDescriber {
           GetPropertyFunction.FuncName.Element =>
               $"GetElement({propertyName}, {DescribeExpressionInternal(getPropertyFunction.IndexExpr)})",
           GetPropertyFunction.FuncName.Length => $"Count({propertyName})",
-          _ => throw new InvalidOperationException(
-              $"Unexpected GetPropertyFunction type: {getPropertyFunction.FunctionName}")
       };
     }
     throw new InvalidOperationException($"Unexpected function: {function}");
   }
 
-  string DescribeGetPropertyOperator(GetPropertyOperator op) {
-    var propertyName = op.GetStringLiteral(0);
-    if (op.IsList) {
-      return op.Operands.Count == 1
-          ? $"Count({propertyName})"
-          : $"GetElement({propertyName}, {DescribeExpressionInternal(op.Operands[1])})";
-    }
-    return $"ValueOf({propertyName})";
-  }
-
   string DescribeLogicalOperator(LogicalOperator op) {
     if (op.OperatorType == LogicalOperator.OpType.Not) {
       var value = DescribeLeft(op.Operands[0], op);
-      return $"{_loc.T(NotOperatorLocKey)} {value}";
+      return $"{Loc.T(NotOperatorLocKey)} {value}";
     }
     var displayName = op.OperatorType switch {
-        LogicalOperator.OpType.And => _loc.T(AndOperatorLocKey),
-        LogicalOperator.OpType.Or => _loc.T(OrOperatorLocKey),
-        _ => throw new InvalidOperationException($"Unsupported operator: {op.OperatorType}"),
+        LogicalOperator.OpType.And => Loc.T(AndOperatorLocKey),
+        LogicalOperator.OpType.Or => Loc.T(OrOperatorLocKey),
+        LogicalOperator.OpType.Not => throw new InvalidOperationException("Not operator should be handled separately"),
     };
 
     // Resolve the multi-operands operators: (add a b c ...)
@@ -133,7 +141,7 @@ sealed class ExpressionDescriber {
   }
 
   string DescribeMathOperator(MathOperator op) {
-    if (IsConstantValueOperand(op)) {
+    if ((op as IValueExpr).IsConstantValue()) {
       return DescribeScriptValue(op.ValueFn());
     }
 
@@ -144,7 +152,12 @@ sealed class ExpressionDescriber {
         MathOperator.OpType.Round => "Round",
         // For constants, the negate operator should have been resolved above.
         MathOperator.OpType.Negate => "-",
-        _ => null,
+        MathOperator.OpType.Add
+            or MathOperator.OpType.Subtract
+            or MathOperator.OpType.Multiply
+            or MathOperator.OpType.Divide
+            or MathOperator.OpType.Modulus =>
+            null,
     };
     if (funcName != null) {
       var value = string.Join(", ", op.Operands.Select(DescribeExpressionInternal));
@@ -158,7 +171,11 @@ sealed class ExpressionDescriber {
         MathOperator.OpType.Multiply => " × ",
         MathOperator.OpType.Divide => " ÷ ",
         MathOperator.OpType.Modulus => " % ",
-        _ => throw new InvalidOperationException($"Unknown operator: {op.OperatorType}"),
+        MathOperator.OpType.Min
+            or MathOperator.OpType.Max
+            or MathOperator.OpType.Round
+            or MathOperator.OpType.Negate =>
+                throw new InvalidOperationException($"Unexpected operator: {op.OperatorType}"),
     };
     var leftValue = DescribeLeft(operands[0], op);
     // Add and Multiply operators are not strictly left-associative. Avoid unneeded parenthesis.
@@ -168,26 +185,18 @@ sealed class ExpressionDescriber {
     return $"{leftValue} {opName} {rightValue}";
   }
 
-  static bool IsConstantValueOperand(IExpression operand) {
-    return operand switch {
-        ConstantValueExpr => true,
-        MathOperator mathOperator => mathOperator.Operands.All(IsConstantValueOperand),
-        _ => false,
-    };
-  }
-
   string DescribeActionOperator(ActionOperator op) {
-    var args = new string[op.ActionDef.Arguments.Length];
+    var args = new object[op.ActionDef.Arguments.Length];
     for (var i = 0; i < op.ActionDef.Arguments.Length; i++) {
       var operand = op.Operands[i] as IValueExpr;
-      if (EntityPanelSettings.EvalValuesInActionArguments) {
+      if (EntityPanelSettings.EvalValuesInActionArguments || operand!.IsConstantValue()) {
         ScriptValue value;
         try {
           value = operand!.ValueFn();
         } catch (ScriptError.BadValue e) {
-          return _loc.T(e.LocKey);
+          return Loc.T(e.LocKey);
         }
-        args[i] = value.FormatValue(op.ActionDef.Arguments[i]);
+        args[i] = FormatValue(value, op.ActionDef.Arguments[i]);
       } else {
         args[i] = DescribeExpressionInternal(operand);
       }

@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <cui:NineSliceVisualElement name="DemolishableFragment" class="entity-sub-panel bg-sub-box--green">
+        <ui:VisualElement name="ButtonWrapper" class="demolishable__button-wrapper">
+            <cui:NineSliceButton name="Button" text="Demolish" class="entity-panel__text entity-fragment__button entity-fragment__button--red" />
+        </ui:VisualElement>
+        <ui:VisualElement name="ScienceRewardWrapper" class="demolishable__science-reward-wrapper" />
+        <ui:VisualElement name="HidableWrapper">
+            <ui:VisualElement name="PriorityWrapper" />
+            <cui:ProgressBar name="ProgressBar" class="progress-bar progress-bar--red">
+                <ui:Label name="Progress" class="entity-panel__text" />
+            </cui:ProgressBar>
+        </ui:VisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

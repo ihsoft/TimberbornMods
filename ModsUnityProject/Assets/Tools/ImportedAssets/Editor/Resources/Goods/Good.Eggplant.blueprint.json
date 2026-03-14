@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "Eggplant",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.309803933,
+      "g": 0.1882353,
+      "b": 0.368627459,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Ingredients",
+    "GoodOrder": 10050,
+    "Icon": "Sprites/Goods/EggplantIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.Eggplant.DisplayName",
+    "PluralDisplayNameLocKey": "Good.Eggplant.PluralDisplayName"
+  }
+}

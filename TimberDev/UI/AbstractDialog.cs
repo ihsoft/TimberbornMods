@@ -11,7 +11,7 @@ namespace IgorZ.TimberDev.UI;
 
 /// <summary>Base class for all dialogs. The descendants must be created via injection.</summary>
 /// <remarks>Copy the localization strings from the loc files in UI directory into the main mod loc file.</remarks>
-public abstract class AbstractDialog  : IPanelController {
+public abstract class AbstractDialog : IPanelController {
 
   const string UnsavedChangesConfirmationLocKey = "TimberDev_UI.AbstractDialog.UnsavedChangesConfirmation";
 

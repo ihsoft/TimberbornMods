@@ -8,6 +8,7 @@ using System.Linq;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 using IgorZ.Automation.Settings;
+using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.Expressions;
 
@@ -20,6 +21,7 @@ sealed class ActionOperator : AbstractOperator {
   public readonly bool ExecuteOnce; 
   public readonly Action Execute;
   public readonly ActionDef ActionDef;
+  public readonly IList<Func<ScriptValue>> Arguments;
 
   public static ActionOperator Create(ExpressionContext context, string actionName, IList<IExpression> operands) {
     return new ActionOperator(context, actionName, operands);
@@ -37,33 +39,52 @@ sealed class ActionOperator : AbstractOperator {
       actionName = actionName[..^ActOnceNameSuffix.Length];
     }
     ActionName = actionName;
-    ActionDef = context.ScriptingService.GetActionDefinition(ActionName, context.ScriptHost);
-    AssertNumberOfOperandsExact(ActionDef.Arguments.Length);
-    var argValues = new Func<ScriptValue>[ActionDef.Arguments.Length];
-    for (var i = 0; i < ActionDef.Arguments.Length; i++) {
-      var operand = Operands[i];
+    ActionDef = ScriptingService.Instance.GetActionDefinition(ActionName, context.ScriptHost);
+    if (ActionDef.VarArg == null) {
+      AssertNumberOfOperandsExact(ActionDef.Arguments.Length);
+    } else {
+      // Variable number of arguments allowed. Check for minimum counter only.
+      AssertNumberOfOperandsRange(ActionDef.Arguments.Length, -1);
+    }
+
+    // Handle fixed position arguments.
+    Arguments = new Func<ScriptValue>[operands.Count];
+    var argDefIndex = 0;
+    for (var argPos = 0; argPos < operands.Count; argPos++) {
+      var operand = operands[argPos];
       if (operand is not IValueExpr valueExpr) {
-        throw new ScriptError.ParsingError($"Argument #{i + 1} must be a value, but found: {operand}");
+        throw new ScriptError.ParsingError($"Argument #{argPos + 1} must be a value, but found: {operand}");
       }
-      var argDef = ActionDef.Arguments[i];
-      if (argDef.ValueType != valueExpr.ValueType) {
+      var argDef = argDefIndex < ActionDef.Arguments.Length
+          ? ActionDef.Arguments[argDefIndex++]
+          : ActionDef.VarArg;
+      // The unset type means that any type is allowed. It is mostly used for the variable arguments case.
+      if (argDef.ValueType != ScriptValue.TypeEnum.Unset && argDef.ValueType != valueExpr.ValueType) {
         throw new ScriptError.ParsingError(
-            $"Argument #{i + 1} must be of type '{argDef.ValueType}', but found: {valueExpr.ValueType}");
+            $"Argument #{argPos + 1} must be of type '{argDef.ValueType}', but found: {valueExpr.ValueType}");
       }
       argDef.ArgumentValidator?.Invoke(valueExpr);
-      if (argDef.ValueValidator == null || VerifyConstantValueExpr(argDef, valueExpr) != null) {
-        argValues[i] = valueExpr.ValueFn;
+      if (valueExpr is ConstantValueExpr constantValueExpr) {
+        if (constantValueExpr.ValidateAndMaybeCorrect(argDef, out var newValueExpr)) {
+          DebugEx.Warning("ActionOperator: Replacing constant value '{0}' with '{1}' for {2}",
+                          valueExpr.ValueFn(), newValueExpr.ValueFn(), actionName);
+          valueExpr = newValueExpr;
+          Operands[argPos] = newValueExpr;
+        }
+      }
+      if (argDef.RuntimeValueValidator == null || valueExpr.IsConstantValue()) {
+        Arguments[argPos] = valueExpr.ValueFn;
       } else {
-        argValues[i] = () => {
+        Arguments[argPos] = () => {
           var value = valueExpr.ValueFn();
           if (ScriptEngineSettings.CheckArgumentValues) {
-            argDef.ValueValidator(value);
+            argDef.RuntimeValueValidator(value);
           }
           return value;
         };
       }
     }
-    var action = context.ScriptingService.GetActionExecutor(ActionName, context.ScriptHost);
-    Execute = () => action(argValues.Select(v => v()).ToArray());
+    var action = ScriptingService.Instance.GetActionExecutor(ActionName, context.ScriptHost);
+    Execute = () => action(Arguments.Select(v => v()).ToArray());
   }
 }

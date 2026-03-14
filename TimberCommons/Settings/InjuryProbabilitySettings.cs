@@ -26,6 +26,10 @@ sealed class InjuryProbabilitySettings(
           .CreateLocalized("IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint")
           .SetLocalizedTooltip("IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHintTooltip"));
 
+  public ModSetting<bool> ShowDailyProbability { get; } = new(
+      true,
+      ModSettingDescriptor.CreateLocalized("IgorZ.TimberCommons.Settings.InjuryProbability.ShowAsDailyProbability"));
+
   // ReSharper restore InconsistentNaming
   // ReSharper restore MemberCanBePrivate.Global
   #endregion

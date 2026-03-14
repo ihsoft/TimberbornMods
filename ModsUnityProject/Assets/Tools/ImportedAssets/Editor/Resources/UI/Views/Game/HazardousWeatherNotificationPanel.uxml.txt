@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <cui:NineSliceVisualElement name="HazardousWeatherNotificationPanel" picking-mode="Ignore" class="hazardous-weather-notification hazardous-weather-notification__fade">
+        <ui:Image name="Background" picking-mode="Ignore" class="hazardous-weather-notification__background" />
+        <cui:NineSliceLabel name="Header" picking-mode="Ignore" class="hazardous-weather-notification__header" />
+        <cui:NineSliceLabel name="Description" picking-mode="Ignore" class="hazardous-weather-notification__description" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

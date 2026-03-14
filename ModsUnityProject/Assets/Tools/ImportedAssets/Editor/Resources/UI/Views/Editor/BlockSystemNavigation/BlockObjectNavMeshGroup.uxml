@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="True">
+    <Style path="UI/Views/Editor/BlockSystemNavigation/BlockSystemNavigationStyle" />
+    <ui:VisualElement name="BlockObjectNavMeshGroup" class="block-object-nav-mesh-group">
+        <ui:Label text="Use group name" class="block-object-nav-mesh-group__label" />
+        <ui:VisualElement class="block-object-nav-mesh-group__group-wrapper">
+            <ui:Toggle name="UseGroup" binding-path="_useGroup" />
+            <ui:TextField name="GroupName" binding-path="_groupName" class="block-object-nav-mesh-group__group-name" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

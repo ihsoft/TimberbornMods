@@ -1,0 +1,34 @@
+{
+  "NeedSpec": {
+    "Id": "Sleep",
+    "BackwardCompatibleIds": [],
+    "Order": 30,
+    "NeedGroupId": "BasicNeeds",
+    "CharacterType": "Beaver",
+    "StartingValue": 1.0,
+    "MinimumValue": -0.2,
+    "MaximumValue": 0.8,
+    "DailyDelta": -0.6,
+    "ImportanceMultiplier": 3.0,
+    "Effectiveness": 1.0,
+    "Wastable": false,
+    "HoursWarningThreshold": 0.0,
+    "DisplayNameLocKey": "Need.Sleep.DisplayName",
+    "FavorableWellbeing": 1,
+    "UnfavorableWellbeing": -1
+  },
+  "CriticalNeedSpec": {
+    "CriticalNeedType": "Action",
+    "SpriteName": "Exhaustion",
+    "DescriptionLocKey": "Status.Need.Sleep",
+    "DescriptionShortLocKey": ""
+  },
+  "PunitiveNeedSpec": {
+    "Penalties": [
+      {
+        "Id": "MovementSpeed",
+        "MultiplierDelta": -0.1
+      }
+    ]
+  }
+}

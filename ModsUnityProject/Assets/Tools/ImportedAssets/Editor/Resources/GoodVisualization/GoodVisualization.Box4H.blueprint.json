@@ -1,0 +1,16 @@
+{
+  "GoodVisualizationSpec": {
+    "Id": "Box",
+    "Variant": "4H",
+    "Offset": {
+      "X": 0.26,
+      "Y": 0.26,
+      "Z": 0.232
+    },
+    "LimitingAmount": 4.0,
+    "PrimaryMesh": "StockpileGoodModels/9BoxColumn",
+    "SecondaryMesh": "",
+    "Material": "Materials/Goods/Box",
+    "NonLinearity": 0.0
+  }
+}

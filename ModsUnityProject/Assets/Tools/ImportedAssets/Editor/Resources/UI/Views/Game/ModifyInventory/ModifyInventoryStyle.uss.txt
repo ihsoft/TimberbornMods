@@ -1,0 +1,37 @@
+.modify-inventory-box {
+    width: 710px;
+    height: 500px;
+    padding: 45px;
+    flex-direction: row;
+}
+
+.modify-inventory-box__stock {
+    width: 320px;
+    padding: 8px;
+    margin-right: 8px;
+    border-right-color: darkgreen;
+    border-right-width: 1px;
+}
+
+.modify-inventory-box__items {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: 4px 0;
+}
+
+.modify-inventory-box__amount {
+    margin-left: 10px;
+    width: 100px;
+}
+
+.modify-inventory-box__warning {
+    color: red;
+}
+
+.modify-inventory-box__button {
+    width: 95px;
+    margin: 2px;
+    padding: 4px;
+    background-image: resource('UI/Images/Backgrounds/bg-pixel-2');
+    white-space: nowrap;
+}

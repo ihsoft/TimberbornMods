@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/BatchControl/BatchControlStyle.uss" />
+    <ui:VisualElement name="BeaverBuildingsBatchControlRowItem" class="beaver-buildings-batch-control-row-item">
+        <cui:NineSliceButton name="HomeButton" class="beaver-buildings-batch-control-row-item__icon-wrapper">
+            <ui:Image name="HomeIcon" class="beaver-buildings-batch-control-row-item__icon beaver-buildings-batch-control-row-item__icon--homeless" />
+        </cui:NineSliceButton>
+        <cui:NineSliceButton name="WorkplaceButton" class="beaver-buildings-batch-control-row-item__icon-wrapper">
+            <ui:Image name="WorkplaceIcon" class="beaver-buildings-batch-control-row-item__icon beaver-buildings-batch-control-row-item__icon--jobless" />
+        </cui:NineSliceButton>
+    </ui:VisualElement>
+</ui:UXML>

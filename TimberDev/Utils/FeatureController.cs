@@ -69,7 +69,7 @@ public static class FeatureController {
   public const string FeaturesFilename = "TimberDev_Features.txt";
 
   /// <summary>Reads feature config file located at <see cref="FeaturesFilename"/>.</summary>
-  /// <param name="basePath">The path to look for teh features file at.</param>
+  /// <param name="basePath">The path to look for the features file at.</param>
   /// <param name="consumeFn">
   /// The function that takes the parsed feature name, it's state and an optional value. The function must return
   /// <c>true</c> if it recognized the feature name and accepted it.

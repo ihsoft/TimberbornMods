@@ -1,0 +1,60 @@
+{
+  "FactionSpec": {
+    "Id": "IronTeeth",
+    "Order": 1,
+    "Avatar": "Sprites/Avatars/IronTeethAdult",
+    "ChildAvatar": "Sprites/Avatars/IronTeethChild",
+    "BotAvatar": "Sprites/Avatars/IronTeethBot",
+    "ContaminatedAdultAvatar": "Sprites/Avatars/IronTeethContaminatedAdult",
+    "ContaminatedChildAvatar": "Sprites/Avatars/IronTeethContaminatedChild",
+    "Logo": "Sprites/Avatars/IronTeethLogo",
+    "NewGameFullAvatar": "Sprites/Avatars/IronTeethFullNewGame",
+    "Textures": [
+      "Materials/Beavers/IronTeeth/Adult/BeaverAdult1.IronTeeth",
+      "Materials/Beavers/IronTeeth/Adult/BeaverAdult2.IronTeeth",
+      "Materials/Beavers/IronTeeth/Adult/BeaverAdult3.IronTeeth",
+      "Materials/Beavers/IronTeeth/Adult/BeaverAdult4.IronTeeth",
+      "Materials/Beavers/IronTeeth/Adult/BeaverAdult5.IronTeeth"
+    ],
+    "ChildTextures": [
+      "Materials/Beavers/IronTeeth/Child/BeaverChild1.IronTeeth",
+      "Materials/Beavers/IronTeeth/Child/BeaverChild2.IronTeeth",
+      "Materials/Beavers/IronTeeth/Child/BeaverChild3.IronTeeth"
+    ],
+    "MaterialCollectionIds": [
+      "IronTeeth"
+    ],
+    "TemplateCollectionIds": [
+      "Buildings.IronTeeth",
+      "Characters.IronTeeth",
+      "ModularShaftParts.IronTeeth",
+      "NaturalResources.IronTeeth",
+      "Planes.IronTeeth"
+    ],
+    "PathMaterial": "Buildings/Paths/Path/Path.IronTeeth",
+    "BaseWoodMaterial": "Materials/UberAtlas/Materials/IronTeeth/BaseWood_Grey.IronTeeth",
+    "NeedCollectionIds": [
+      "IronTeeth"
+    ],
+    "GoodCollectionIds": [
+      "IronTeeth"
+    ],
+    "BlueprintModifiers": [],
+    "StartingBuildingId": "DistrictCenter.IronTeeth",
+    "SoundId": "Common",
+    "DisplayNameLocKey": "Faction.IronTeeth.DisplayName",
+    "DescriptionLocKey": "Faction.IronTeeth.Description",
+    "GameOverMessageLocKey": "Faction.IronTeeth.GameOver.Message",
+    "GameOverFlavorLocKey": "Faction.IronTeeth.GameOver.Flavor"
+  },
+  "UnlockableFactionSpec": {
+    "PrerequisiteFaction": "Folktails",
+    "AverageWellbeingToUnlock": 15
+  },
+  "FactionWonderSpec": {
+    "WonderCompletionImage": "UI/Images/WonderCompletion/wonder-completion-ironteeth",
+    "WonderLaunchSound": "UI.Buildings.Wonder.EarthRepopulator",
+    "WonderCompletionFlavorLocKey": "Faction.IronTeeth.WonderCompletionFlavor",
+    "WonderCompletionMessageLocKey": "Faction.IronTeeth.WonderCompletionMessage"
+  }
+}

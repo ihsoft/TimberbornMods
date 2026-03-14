@@ -1,0 +1,472 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "FlameOfProgress",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "Plank",
+        "Amount": 300
+      },
+      {
+        "Id": "MetalBlock",
+        "Amount": 50
+      }
+    ],
+    "ScienceCost": 3000,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": false,
+    "DrawRangeBoundsOnIt": false
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "TemplateSpec": {
+    "TemplateName": "FlameOfUnity.IronTeeth",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "RangedEffectBuildingSpec": {
+    "EffectRadius": 10
+  },
+  "FloodableFireSpec": {},
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 2,
+      "Y": 2,
+      "Z": 5
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Monuments",
+    "ToolOrder": 400,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "WaterObjectSpec": {
+    "WaterCoordinates": {
+      "X": 0,
+      "Y": 0,
+      "Z": 4
+    }
+  },
+  "FloodableBuildingSpec": {},
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.FlameOfUnity.DisplayName",
+    "DescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "Building.FlameOfUnity.FlavorDescription",
+    "Icon": "Buildings/Monuments/FlameOfUnity/FlameOfUnityIcon"
+  },
+  "BlockableFloodableObjectSpec": {},
+  "ContinuousEffectBuildingSpec": {
+    "Effects": [
+      {
+        "NeedId": "FlameOfUnity",
+        "PointsPerHour": 0.1,
+        "SatisfyToMaxValue": false
+      }
+    ]
+  },
+  "FireSpec": {
+    "AttachmentId": "Fire"
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0,
+      0.5
+    ]
+  },
+  "TemplateAttachmentsSpec": {
+    "Attachments": [
+      {
+        "AttachmentId": "Fire",
+        "Prefab": "Buildings/Monuments/FlameOfUnity/FlameOfUnityFire",
+        "Parent": "#Finished",
+        "Position": {
+          "X": 1.0,
+          "Y": 3.17,
+          "Z": 1.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": true
+      }
+    ]
+  },
+  "Children": {
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Monuments/FlameOfUnity/FlameOfUnity.IronTeeth.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 1.0,
+              "Y": 0.285027921,
+              "Z": 1.0
+            },
+            "Size": {
+              "X": 2.0,
+              "Y": 0.570055842,
+              "Z": 2.0
+            }
+          },
+          {
+            "Center": {
+              "X": 1.0,
+              "Y": 2.269252,
+              "Z": 1.0
+            },
+            "Size": {
+              "X": 1.75418258,
+              "Y": 0.351551533,
+              "Z": 1.642448
+            }
+          },
+          {
+            "Center": {
+              "X": 1.0,
+              "Y": 1.33588028,
+              "Z": 1.0
+            },
+            "Size": {
+              "X": 0.8063035,
+              "Y": 1.52453041,
+              "Z": 0.779716432
+            }
+          }
+        ],
+        "SphereColliders": [
+          {
+            "Center": {
+              "X": 1.0,
+              "Y": 4.0246,
+              "Z": 1.0
+            },
+            "Radius": 0.80980444
+          }
+        ],
+        "CapsuleColliders": [
+          {
+            "Center": {
+              "X": 1.47342587,
+              "Y": 2.957381,
+              "Z": 1.48666859
+            },
+            "Radius": 0.3235147,
+            "Height": 1.85665369,
+            "Axis": "Y"
+          },
+          {
+            "Center": {
+              "X": 0.5331962,
+              "Y": 2.957381,
+              "Z": 1.48666859
+            },
+            "Radius": 0.336756468,
+            "Height": 1.85665369,
+            "Axis": "Y"
+          },
+          {
+            "Center": {
+              "X": 0.5331962,
+              "Y": 2.957381,
+              "Z": 0.5
+            },
+            "Radius": 0.336756468,
+            "Height": 1.85665369,
+            "Axis": "Y"
+          },
+          {
+            "Center": {
+              "X": 1.47342587,
+              "Y": 2.957381,
+              "Z": 0.5
+            },
+            "Radius": 0.3235147,
+            "Height": 1.85665369,
+            "Axis": "Y"
+          }
+        ]
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase2x2#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase2x2/ConstructionBase2x2.blueprint"
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Monuments/FlameOfUnity/FlameOfUnity.IronTeeth.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 1.0,
+                  "Y": 0.05,
+                  "Z": 1.0
+                },
+                "Size": {
+                  "X": 2.0,
+                  "Y": 0.1,
+                  "Z": 2.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 1.0,
+                  "Y": 0.348958552,
+                  "Z": 1.0
+                },
+                "Size": {
+                  "X": 1.43928158,
+                  "Y": 0.484601021,
+                  "Z": 1.46248531
+                }
+              },
+              {
+                "Center": {
+                  "X": 1.0,
+                  "Y": 1.37069964,
+                  "Z": 1.0
+                },
+                "Size": {
+                  "X": 0.280842781,
+                  "Y": 1.55963039,
+                  "Z": 0.271540463
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "ConstructionStage1": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Monuments/FlameOfUnity/FlameOfUnity.IronTeeth.ConstructionStage1.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 1.0,
+                  "Y": 0.05,
+                  "Z": 1.0
+                },
+                "Size": {
+                  "X": 2.0,
+                  "Y": 0.1,
+                  "Z": 2.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 1.0,
+                  "Y": 0.348958552,
+                  "Z": 1.0
+                },
+                "Size": {
+                  "X": 1.43928158,
+                  "Y": 0.484601021,
+                  "Z": 1.46248531
+                }
+              },
+              {
+                "Center": {
+                  "X": 1.0,
+                  "Y": 1.5319916,
+                  "Z": 1.0
+                },
+                "Size": {
+                  "X": 0.7482356,
+                  "Y": 1.8747251,
+                  "Z": 0.7396295
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    }
+  }
+}

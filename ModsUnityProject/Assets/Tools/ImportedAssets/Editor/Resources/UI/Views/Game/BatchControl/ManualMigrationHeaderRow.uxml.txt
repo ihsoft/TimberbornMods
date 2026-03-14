@@ -1,0 +1,13 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/BatchControl/BatchControlStyle.uss" />
+    <cui:NineSliceVisualElement name="ManualMigrationHeaderRow" class="batch-control-box__row bg-box--green">
+        <cui:NineSliceVisualElement name="RowHighlight" class="batch-control-box__row--highlighted bg-box--green manual-migration-row__highlight" />
+        <Timberborn.DropdownSystem.Dropdown name="DistrictDropdown" buttons-only-selection="true" class="manual-migration-header-row__dropdown batch-control-district-dropdown" />
+        <ui:Button name="Select" class="building-batch-control-row-item__button manual-migration-header-row__select-button">
+            <ui:Image name="DistrictIcon" class="building-batch-control-row-item__image" />
+        </ui:Button>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

@@ -1,0 +1,30 @@
+{
+  "ProbabilityGroupsSpec": {
+    "Groups": [
+      {
+        "Id": "WorkshopRandomNeedApplier",
+        "Low": 0.003125,
+        "Medium": 0.01,
+        "High": 0.02
+      },
+      {
+        "Id": "AreaNeedApplier",
+        "Low": 0.025,
+        "Medium": 0.1,
+        "High": 0.3
+      },
+      {
+        "Id": "YieldRemoverNeedApplier",
+        "Low": 0.05,
+        "Medium": 0.1,
+        "High": 0.3
+      },
+      {
+        "Id": "DemolisherNeedApplier",
+        "Low": 0.025,
+        "Medium": 0.05,
+        "High": 0.1
+      }
+    ]
+  }
+}

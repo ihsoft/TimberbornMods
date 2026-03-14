@@ -11,7 +11,8 @@ using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.Conditions;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
-using TimberApi.DependencyContainerSystem;
+using IgorZ.TimberDev.Utils;
+using Timberborn.BaseComponentSystem;
 using Timberborn.BlockObjectTools;
 using Timberborn.BlockSystem;
 using Timberborn.BuilderPrioritySystem;
@@ -19,10 +20,9 @@ using Timberborn.Common;
 using Timberborn.Coordinates;
 using Timberborn.Explosions;
 using Timberborn.MapIndexSystem;
-using Timberborn.PrefabSystem;
 using Timberborn.PrioritySystem;
 using Timberborn.TerrainSystem;
-using Timberborn.ToolSystem;
+using Timberborn.ToolButtonSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
@@ -43,12 +43,12 @@ sealed class DynamiteScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override string[] GetActionNamesForBuilding(AutomationBehavior behavior) {
-    return behavior.GetComponentFast<Dynamite>() ? [DetonateActionName, DetonateAndRepeatActionName] : [];
+    return behavior.GetComponent<Dynamite>() ? [DetonateActionName, DetonateAndRepeatActionName] : [];
   }
 
   /// <inheritdoc/>
   public override Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
-    var dynamite = behavior.GetComponentFast<Dynamite>();
+    var dynamite = behavior.GetComponent<Dynamite>();
     if (!dynamite) {
       throw new ScriptError.BadStateError(behavior, "Dynamite component not found");
     }
@@ -100,8 +100,9 @@ sealed class DynamiteScriptableComponent : ScriptableComponentBase {
       Arguments = [
           new ValueDef {
               ValueType = ScriptValue.TypeEnum.Number,
-              ValueFormatter = x => x.AsInt.ToString(),
-              ValueValidator = ValueDef.RangeCheckValidatorInt(min: 0),
+              DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
+              DisplayNumericFormatRange = (1, 6),
+              ArgumentValidator = ValidateRepeatCount,
           },
       ],
   };
@@ -124,7 +125,7 @@ sealed class DynamiteScriptableComponent : ScriptableComponentBase {
   /// Creates a custom status icon that indicates that the storage is being emptying. If the status is changed
   /// externally, then hides the status and notifies the action.
   /// </summary>
-  sealed class DynamiteStateController : AbstractStatusTracker {
+  internal sealed class DynamiteStateController : AbstractStatusTracker, IAwakableComponent {
 
     public void DetonateAndRepeat(AutomationBehavior behavior, int repeatCount) {
       // The behavior object will get destroyed on detonate, so create an independent component.
@@ -135,9 +136,9 @@ sealed class DynamiteScriptableComponent : ScriptableComponentBase {
     BuilderPrioritizable _builderPrioritizable;
     Priority _builderPriority;
 
-    void Awake() {
+    public void Awake() {
       // The priority on a finished building is reset to "Normal", so track it while the object is in preview.
-      _builderPrioritizable = GetComponentFast<BuilderPrioritizable>();
+      _builderPrioritizable = AutomationBehavior.GetComponent<BuilderPrioritizable>();
       if (_builderPrioritizable) {
         _builderPriority = _builderPrioritizable.Priority;
         _builderPrioritizable.PriorityChanged += OnPriorityChanged;
@@ -160,14 +161,14 @@ sealed class DynamiteScriptableComponent : ScriptableComponentBase {
 
     /// <summary>Sets up the component and starts the actual monitoring of the object.</summary>
     public IEnumerator WaitAndPlace(AutomationBehavior behavior, Priority builderPriority, int repeatCount) {
-      var prefabName = behavior.GetComponentFast<PrefabSpec>().Name;
-      var dynamite = behavior.GetComponentFast<Dynamite>();
+      var blueprintName = behavior.GetComponent<BlockObjectSpec>().Blueprint.Name;
+      var dynamite = behavior.GetComponent<Dynamite>();
       var coordinates = behavior.BlockObject.Coordinates;
-      var terrainService = DependencyContainer.GetInstance<ITerrainService>();
+      var terrainService = StaticBindings.DependencyContainer.GetInstance<ITerrainService>();
 
       // Find the new depth under the dynamite when it explodes. It can be placed on an overhang!
       var effectiveDepth = 0;
-      var mapIndexService = DependencyContainer.GetInstance<MapIndexService>();
+      var mapIndexService = StaticBindings.DependencyContainer.GetInstance<MapIndexService>();
       while (effectiveDepth < dynamite.Depth && coordinates.z > effectiveDepth) {
         var below = new Vector3Int(coordinates.x, coordinates.y, coordinates.z - effectiveDepth - 1);
         if (!terrainService.UnsafeCellIsTerrain(mapIndexService.CoordinatesToIndex3D(below))) {
@@ -178,20 +179,24 @@ sealed class DynamiteScriptableComponent : ScriptableComponentBase {
       yield return null;  // Act on the next frame to avoid synchronous complications.
 
       // Detonate the dynamite, but wait till all beavers are off the block.
-      var blockOccupancyService = DependencyContainer.GetInstance<IBlockOccupancyService>();
-      yield return new WaitUntil(
-          () => !dynamite || !dynamite.enabled
-              || !blockOccupancyService.OccupantPresentOnArea(behavior.BlockObject, MinDistanceToCheckOccupants));
-      if (dynamite && dynamite.enabled) {
+      var blockOccupancyService = StaticBindings.DependencyContainer.GetInstance<IBlockOccupancyService>();
+      while (dynamite
+             && blockOccupancyService.OccupantPresentOnArea(behavior.BlockObject, MinDistanceToCheckOccupants)) {
+        yield return new WaitForFixedUpdate();
+      }
+      if (dynamite) {
         HostedDebugLog.Fine(dynamite, "Detonate from automation!");
         dynamite.Trigger();
       }
       if (repeatCount <= 0) {
         yield return YieldAbort();
       }
-      
+
       // Wait for the old object to clean up.
-      yield return new WaitUntil(() => !dynamite);
+      // ReSharper disable once LoopVariableIsNeverChangedInsideLoop
+      while (dynamite) {
+        yield return new WaitForFixedUpdate();
+      }
       var expectedPlaceCoord = new Vector3Int(coordinates.x, coordinates.y, coordinates.z - effectiveDepth);
       var newHeight = terrainService.GetTerrainHeightBelow(expectedPlaceCoord);
       if (newHeight == 0 || newHeight != expectedPlaceCoord.z) {
@@ -200,24 +205,24 @@ sealed class DynamiteScriptableComponent : ScriptableComponentBase {
       }
 
       // Place another dynamite of the same type and building priority.
-      var toolButtonService = DependencyContainer.GetInstance<ToolButtonService>();
+      var toolButtonService = StaticBindings.DependencyContainer.GetInstance<ToolButtonService>();
       var dynamiteTool = toolButtonService
           .ToolButtons.Select(x => x.Tool)
           .OfType<BlockObjectTool>()
-          .First(x => x.Prefab.name.StartsWith(prefabName));
+          .First(x => x.Template.Blueprint.Name == blueprintName);
       dynamiteTool.Place(new List<Placement> { new(expectedPlaceCoord) });
       if (!dynamiteTool._placedAnythingThisFrame) {
         DebugEx.Error("Cannot place new dynamite at {0}", expectedPlaceCoord);
         yield return YieldAbort();
       }
       BlockObject newDynamite;
-      var blockService = DependencyContainer.GetInstance<BlockService>();
+      var blockService = StaticBindings.DependencyContainer.GetInstance<BlockService>();
       do {
         yield return null;
         newDynamite = blockService.GetBottomObjectAt(expectedPlaceCoord);
       } while (!newDynamite);
 
-      var prioritizable = newDynamite.GetComponentFast<BuilderPrioritizable>();
+      var prioritizable = newDynamite.GetComponent<BuilderPrioritizable>();
       if (prioritizable) {
         prioritizable.SetPriority(builderPriority);
       }
@@ -231,7 +236,7 @@ sealed class DynamiteScriptableComponent : ScriptableComponentBase {
           repeatCount > 1
               ? $"(act Dynamite.DetonateAndRepeat {(repeatCount - 1) * 100})"
               : $"(act Dynamite.Detonate)");
-      newDynamite.GetComponentFast<AutomationBehavior>().AddRule(newCondition, newAction);
+      newDynamite.GetComponent<AutomationBehavior>().AddRule(newCondition, newAction);
       HostedDebugLog.Fine(
           newDynamite, "Placed new dynamite: priority={0}, tries={1}", builderPriority, repeatCount - 1);
 
@@ -241,6 +246,12 @@ sealed class DynamiteScriptableComponent : ScriptableComponentBase {
     IEnumerator YieldAbort() {
       Destroy(gameObject);
       yield break;
+    }
+  }
+
+  static void ValidateRepeatCount(IValueExpr expr) {
+    if (!expr.IsConstantValue() || expr.ValueType != ScriptValue.TypeEnum.Number) {
+      throw new ScriptError.ParsingError($"Repeat count must be a constant value");
     }
   }
 

@@ -1,0 +1,8 @@
+{
+  "TemplateCollectionSpec": {
+    "CollectionId": "Common",
+    "Blueprints": [
+      "Buildings/Paths/Path/Path.blueprint"
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "SuperFastDevGameSpeed",
+    "GroupId": "Dev",
+    "LocKey": "",
+    "Order": 25,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": true
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/5",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

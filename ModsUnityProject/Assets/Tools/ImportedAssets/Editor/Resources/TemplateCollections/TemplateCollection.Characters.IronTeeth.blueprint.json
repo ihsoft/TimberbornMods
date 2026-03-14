@@ -1,0 +1,10 @@
+{
+  "TemplateCollectionSpec": {
+    "CollectionId": "Characters.IronTeeth",
+    "Blueprints": [
+      "Characters/Beaver/BeaverAdult.blueprint",
+      "Characters/Beaver/BeaverChild.blueprint",
+      "Characters/Bot/Bot.IronTeeth.blueprint"
+    ]
+  }
+}

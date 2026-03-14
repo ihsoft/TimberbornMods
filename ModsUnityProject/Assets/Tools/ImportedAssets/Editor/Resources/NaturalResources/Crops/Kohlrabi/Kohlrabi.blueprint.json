@@ -1,0 +1,244 @@
+{
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "TemplateSpec": {
+    "TemplateName": "Kohlrabi",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "NaturalResourceSpec": {
+    "Order": 1
+  },
+  "CropSpec": {},
+  "GrowableSpec": {
+    "GrowthTimeInDays": 3.0
+  },
+  "BasicSelectionSoundSpec": {
+    "SoundName": "Bush",
+    "AlternativeSoundName": ""
+  },
+  "PlantableSpec": {
+    "ResourceGroup": "Farmhouse",
+    "PlantTimeInHours": 0.2
+  },
+  "DemolishableSpec": {
+    "DemolishTimeInHours": 0.5,
+    "ShowDemolishButtonInEntityPanel": false
+  },
+  "CuttableSpec": {
+    "RemoveOnCut": true,
+    "LeftoverModelName": "",
+    "Yielder": {
+      "YielderComponentName": "Cuttable",
+      "Yield": {
+        "Id": "Kohlrabi",
+        "Amount": 2
+      },
+      "RemovalTimeInHours": 1.2,
+      "ResourceGroup": "Farmhouse"
+    }
+  },
+  "PlantablePreviewModelSpec": {
+    "Model": "NaturalResources\\Crops\\Kohlrabi\\KohlrabiMature"
+  },
+  "WateredNaturalResourceSpec": {
+    "DaysToDieDry": 2.0
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "NaturalResource.Kohlrabi.DisplayName",
+    "DescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "NaturalResource.Kohlrabi.FlavorDescription",
+    "Icon": "NaturalResources/Crops/Kohlrabi/KohlrabiIcon"
+  },
+  "FloodableNaturalResourceSpec": {
+    "MinWaterHeight": 0,
+    "MaxWaterHeight": 0,
+    "DaysToDie": 1.0
+  },
+  "CuttableYieldGoodIdProviderSpec": {},
+  "ContaminatedNaturalResourceSpec": {},
+  "BlockObjectModelSpec": {
+    "FullModelName": "#Models",
+    "UncoveredModelName": "",
+    "UndergroundModelName": "",
+    "UndergroundModelDepth": 0
+  },
+  "Children": {
+    "#Models": {
+      "Children": {
+        "Seedling": {
+          "Children": {
+            "#Alive": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Crops/Kohlrabi/KohlrabiSeedling"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.05,
+                      "Z": 0.5
+                    },
+                    "Size": {
+                      "X": 1.0,
+                      "Y": 0.1,
+                      "Z": 1.0
+                    }
+                  }
+                ],
+                "SphereColliders": [],
+                "CapsuleColliders": []
+              }
+            },
+            "#Dead": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Crops/Kohlrabi/KohlrabiSeedlingDead"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.05,
+                      "Z": 0.5
+                    },
+                    "Size": {
+                      "X": 1.0,
+                      "Y": 0.1,
+                      "Z": 1.0
+                    }
+                  }
+                ],
+                "SphereColliders": [],
+                "CapsuleColliders": []
+              }
+            },
+            "#Dying": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Crops/Kohlrabi/KohlrabiSeedlingDry"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.05,
+                      "Z": 0.5
+                    },
+                    "Size": {
+                      "X": 1.0,
+                      "Y": 0.1,
+                      "Z": 1.0
+                    }
+                  }
+                ],
+                "SphereColliders": [],
+                "CapsuleColliders": []
+              }
+            }
+          }
+        },
+        "Mature": {
+          "Children": {
+            "#Alive": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Crops/Kohlrabi/KohlrabiMature"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.1,
+                      "Z": 0.5
+                    },
+                    "Size": {
+                      "X": 1.0,
+                      "Y": 0.2,
+                      "Z": 1.0
+                    }
+                  }
+                ],
+                "SphereColliders": [],
+                "CapsuleColliders": []
+              }
+            },
+            "#Dead": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Crops/Kohlrabi/KohlrabiMatureDead"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.1,
+                      "Z": 0.5
+                    },
+                    "Size": {
+                      "X": 1.0,
+                      "Y": 0.2,
+                      "Z": 1.0
+                    }
+                  }
+                ],
+                "SphereColliders": [],
+                "CapsuleColliders": []
+              }
+            },
+            "#Dying": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Crops/Kohlrabi/KohlrabiMatureDry"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.1,
+                      "Z": 0.5
+                    },
+                    "Size": {
+                      "X": 1.0,
+                      "Y": 0.2,
+                      "Z": 1.0
+                    }
+                  }
+                ],
+                "SphereColliders": [],
+                "CapsuleColliders": []
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

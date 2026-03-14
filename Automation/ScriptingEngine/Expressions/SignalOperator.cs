@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System;
+using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
 namespace IgorZ.Automation.ScriptingEngine.Expressions;
@@ -30,7 +31,7 @@ sealed class SignalOperator : AbstractOperator, IValueExpr {
 
   SignalOperator(ExpressionContext context, string signalName) : base([]) {
     SignalName = signalName;
-    SignalDef = context.ScriptingService.GetSignalDefinition(SignalName, context.ScriptHost);
-    ValueFn = context.ScriptingService.GetSignalSource(SignalName, context.ScriptHost);
+    SignalDef = ScriptingService.Instance.GetSignalDefinition(SignalName, context.ScriptHost);
+    ValueFn = ScriptingService.Instance.GetSignalSource(SignalName, context.ScriptHost);
   }
 }

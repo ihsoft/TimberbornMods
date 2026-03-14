@@ -1,0 +1,29 @@
+{
+  "RecipeSpec": {
+    "Id": "Bot.Folktails",
+    "BackwardCompatibleIds": [],
+    "DisplayLocKey": "Bot.PluralDisplayName",
+    "CycleDurationInHours": 72.0,
+    "Ingredients": [
+      {
+        "Id": "BotChassis",
+        "Amount": 1
+      },
+      {
+        "Id": "BotLimb",
+        "Amount": 4
+      },
+      {
+        "Id": "BotHead",
+        "Amount": 1
+      }
+    ],
+    "Products": [],
+    "ProducedSciencePoints": 0,
+    "Fuel": "",
+    "CyclesFuelLasts": 0,
+    "FuelCapacity": 0,
+    "CyclesCapacity": 2,
+    "Icon": ""
+  }
+}

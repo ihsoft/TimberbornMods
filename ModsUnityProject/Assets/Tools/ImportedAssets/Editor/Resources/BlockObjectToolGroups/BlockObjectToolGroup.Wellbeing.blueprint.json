@@ -1,0 +1,9 @@
+{
+  "BlockObjectToolGroupSpec": {
+    "Id": "Wellbeing",
+    "Order": 90,
+    "NameLocKey": "Wellbeing.DisplayName",
+    "Icon": "Sprites/BottomBar/BuildingGroups/Wellbeing",
+    "FallbackGroup": false
+  }
+}

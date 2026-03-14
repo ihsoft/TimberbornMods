@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False" xsi:schemaLocation="Timberborn.CoreUI file:/C:/Timberborn/timberborn/UIElementsSchema/Timberborn.CoreUI.xsd">
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <ui:VisualElement name="DevPanel" class="dev-panel">
+        <Style src="/Assets/Resources/UI/Views/Common/DevPanel/DevPanelStyle.uss" />
+        <ui:VisualElement name="DevPanelContent" class="dev-panel__content">
+            <ui:ScrollView name="DevPanelScroll" class="scroll--green-decorated">
+                <ui:Label name="FavouritesLabel" text="Favourites" class="game-text-big text--bold" />
+                <ui:VisualElement name="FavouriteMethods" class="dev-panel__methods" />
+                <ui:Label name="OtherLabel" text="Other" class="game-text-big text--bold" />
+                <ui:VisualElement name="OtherMethods" class="dev-panel__methods" />
+            </ui:ScrollView>
+            <cui:NineSliceTextField name="DevPanelFilter" class="text-field dev-panel__filter" />
+        </ui:VisualElement>
+        <cui:NineSliceButton name="DevPanelTitle" text="Development controls" class="game-text-normal button-game dev-panel-button dev-panel-button--title" />
+    </ui:VisualElement>
+</ui:UXML>

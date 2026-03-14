@@ -1,0 +1,9 @@
+{
+  "BonusTypeSpec": {
+    "Id": "CarryingCapacity",
+    "MinimumValue": 0.1,
+    "MaximumValue": 10.0,
+    "Icon": "",
+    "LocKey": "Bonus.CarryingCapacity"
+  }
+}

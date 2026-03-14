@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <cui:NineSliceButton name="WorkerView" class="worker-view entity-fragment__button--green">
+        <ui:Button name="CharacterButton" class="character-button worker-view__item" />
+        <ui:Label name="Name" text="Jon (21 days old)" class="worker-view__item entity-panel__sub-text worker-view__name" />
+        <ui:VisualElement name="VacantIcon" class="worker-view__vacant-icon" />
+    </cui:NineSliceButton>
+</ui:UXML>

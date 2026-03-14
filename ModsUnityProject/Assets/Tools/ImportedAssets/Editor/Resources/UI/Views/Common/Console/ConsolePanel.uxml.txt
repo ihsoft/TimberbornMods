@@ -1,0 +1,13 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Common/Console/ConsoleStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <cui:NineSliceVisualElement name="ConsolePanel" class="console-panel console-panel--collapsed">
+        <ui:VisualElement name="Buttons" class="console-panel__buttons-wrapper">
+            <cui:LocalizableButton name="OpenDirectoryButton" text="Open logs folder" text-loc-key="Console.OpenFolderButton" class="text--default text--bold console-panel__button" />
+            <ui:Button name="ExpandButton" text="▼ Expand" class="text--default text--bold console-panel__button" />
+            <cui:LocalizableButton name="CloseButton" text="Close" text-loc-key="Console.CloseButton" class="text--default text--bold console-panel__button" />
+        </ui:VisualElement>
+        <ui:TextField name="TextField" multiline="true" readonly="true" vertical-scroller-visibility="Auto"
+                      class="console-panel__text-field scroll--green-decorated"/>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

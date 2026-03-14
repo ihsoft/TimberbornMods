@@ -4,6 +4,7 @@
 
 using System;
 using Timberborn.Localization;
+using Timberborn.UIFormatters;
 using UnityEngine;
 
 // ReSharper disable UnusedMember.Local
@@ -12,8 +13,6 @@ namespace IgorZ.TimberDev.UI;
 
 /// <summary>Utility class to format strings for UI.</summary>
 public static class CommonFormats {
-  const string DaysLocKey = "Time.DaysShort";
-  const string HoursLocKey = "Time.HoursShort";
   const string SupplyRemainingLocKey = "GoodConsuming.SupplyRemaining";
   static string _localizedSupplyRemainingTmpl;
 
@@ -48,22 +47,22 @@ public static class CommonFormats {
   public static string DaysHoursFormat(ILoc loc, float hoursAmount) {
     switch (hoursAmount) {
       case <= 0.01f:
-        return loc.T(HoursLocKey, "0");
+        return UnitFormatter.FormatHours("0", loc);
       case < 1f:
-        return loc.T(HoursLocKey, hoursAmount.ToString("0.##"));
+        return UnitFormatter.FormatHours(hoursAmount.ToString("0.##"), loc);
       case < 10f:
-        return loc.T(HoursLocKey, hoursAmount.ToString("0.#"));
+        return UnitFormatter.FormatHours(hoursAmount.ToString("0.#"), loc);
     }
     var days = Mathf.FloorToInt(hoursAmount / 24f);
     var hours = Mathf.RoundToInt(hoursAmount % 24f);
     if (days == 0) {
-      return loc.T(HoursLocKey, hours.ToString());
+      return UnitFormatter.FormatHours(hours, loc);
     }
     if (hours == 0) {
-      return loc.T(DaysLocKey, days.ToString());
+      return UnitFormatter.FormatDays(days.ToString(), loc);  // We don't want the fractional part.
     }
-    var daysStr = loc.T(DaysLocKey, days.ToString());
-    var hoursStr = loc.T(HoursLocKey, hours.ToString());
+    var daysStr = UnitFormatter.FormatDays(days.ToString(), loc);  // We don't want the fractional part.
+    var hoursStr = UnitFormatter.FormatHours(hours, loc);
     return daysStr + " " + hoursStr;
   }
 
@@ -74,7 +73,7 @@ public static class CommonFormats {
         >= 10f => value.ToString("F0"),
         >= 1f => value.ToString("0.#"),
         >= 0.1f => value.ToString("0.0#"),
-        _ => value.ToString("0.00#")
+        _ => value.ToString("0.00#"),
     };
   }
 

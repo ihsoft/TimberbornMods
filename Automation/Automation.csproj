@@ -14,16 +14,18 @@
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
         <DebugSymbols>true</DebugSymbols>
-        <DebugType>full</DebugType>
+        <DebugType>embedded</DebugType>
         <Optimize>false</Optimize>
         <OutputPath>bin\Debug\</OutputPath>
         <DefineConstants>DEBUG;TRACE</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
+        <NoWarn>1701;1702;CS8524</NoWarn>
+        <WarningsAsErrors>CS8509</WarningsAsErrors>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
-        <DebugType>pdbonly</DebugType>
+        <DebugType>embedded</DebugType>
         <Optimize>true</Optimize>
         <OutputPath>bin\Release\</OutputPath>
         <DefineConstants>TRACE</DefineConstants>
@@ -31,10 +33,17 @@
         <WarningLevel>4</WarningLevel>
         <DebugSymbols>true</DebugSymbols>
         <DocumentationFile>bin\Release\Automation.xml</DocumentationFile>
+        <WarningsAsErrors>CS8509</WarningsAsErrors>
+        <NoWarn>1701;1702;CS8524</NoWarn>
     </PropertyGroup>
     <ItemGroup>
       <Reference Include="0Harmony">
         <HintPath>..\Dependencies\Workshop\3284904751\0Harmony.dll</HintPath>
+      </Reference>
+      <Reference Include="CustomTools">
+        <HintPath>..\_WORKSHOP!\3619414212\version-1.0\Scripts\CustomTools.dll</HintPath>
+        <Aliases>CustomTools</Aliases>
+        <Private>False</Private>
       </Reference>
       <Reference Include="ModSettings.Common">
         <HintPath>..\Dependencies\Workshop\3283831040\version-0.6\Scripts\ModSettings.Common.dll</HintPath>
@@ -44,18 +53,6 @@
       </Reference>
       <Reference Include="System.Collections.Immutable">
         <HintPath>..\Dependencies\GameRoot\Timberborn_Data\Managed\System.Collections.Immutable.dll</HintPath>
-      </Reference>
-      <Reference Include="TimberApi">
-        <HintPath>..\Dependencies\Workshop\3288241660\version-0.7\core\TimberApi.dll</HintPath>
-      </Reference>
-      <Reference Include="TimberApi.BottomBarSystem">
-        <HintPath>..\Dependencies\Workshop\3288241660\version-0.7\core\TimberApi.BottomBarSystem.dll</HintPath>
-      </Reference>
-      <Reference Include="TimberApi.SpecificationSystem">
-        <HintPath>..\Dependencies\Workshop\3288241660\version-0.7\core\TimberApi.SpecificationSystem.dll</HintPath>
-      </Reference>
-      <Reference Include="TimberApi.Tools">
-        <HintPath>..\Dependencies\Workshop\3288241660\version-0.7\core\TimberApi.Tools.dll</HintPath>
       </Reference>
     </ItemGroup>
     <ItemGroup>
@@ -106,18 +103,6 @@
       <Compile Include="..\TimberDev\Settings\DebugSettings.cs">
         <Link>TimberDev\Settings\DebugSettings.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\Tools\AbstractAreaSelectionTool.cs">
-        <Link>TimberDev\Tools\AbstractAreaSelectionTool.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\Tools\AbstractLockingTool.cs">
-        <Link>TimberDev\Tools\AbstractLockingTool.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\Tools\CustomToolSystem.cs">
-        <Link>TimberDev\Tools\CustomToolSystem.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\Tools\ToolWithDescription.cs">
-        <Link>TimberDev\Tools\ToolWithDescription.cs</Link>
-      </Compile>
       <Compile Include="..\TimberDev\UI\AbstractDialog.cs">
         <Link>TimberDev\UI\AbstractDialog.cs</Link>
       </Compile>
@@ -148,9 +133,6 @@
       <Compile Include="..\TimberDev\Utils\ComponentsAccessor.cs">
         <Link>TimberDev\Utils\ComponentsAccessor.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\Utils\Configurator.cs">
-        <Link>TimberDev\Utils\Configurator.cs</Link>
-      </Compile>
       <Compile Include="..\TimberDev\Utils\CounterProfiler.cs">
         <Link>TimberDev\Utils\CounterProfiler.cs</Link>
       </Compile>
@@ -163,14 +145,17 @@
       <Compile Include="..\TimberDev\Utils\IObjectLoaderExtensions.cs">
         <Link>TimberDev\Utils\IObjectLoaderExtensions.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\Utils\PrefabPatcher.cs">
-        <Link>TimberDev\Utils\PrefabPatcher.cs</Link>
-      </Compile>
       <Compile Include="..\TimberDev\Utils\ProtoSerializer.cs">
         <Link>TimberDev\Utils\ProtoSerializer.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\Utils\ReflectionsHelper.cs">
+        <Link>TimberDev\Utils\ReflectionsHelper.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\Utils\StaticBindings.cs">
         <Link>TimberDev\Utils\StaticBindings.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\StaticBindingsConfigurator.cs">
+        <Link>TimberDev\Utils\StaticBindingsConfigurator.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\Utils\TicksProfiler.cs">
         <Link>TimberDev\Utils\TicksProfiler.cs</Link>
@@ -222,12 +207,6 @@
       <Content Include="..\..\TimberbornMods.wiki\Automation-(scripting).md">
         <Link>Mod\Automation-(scripting).md</Link>
       </Content>
-      <Content Include="..\TimberDev\Tools\enUS.csv">
-        <Link>TimberDev\Tools\enUS.csv</Link>
-      </Content>
-      <Content Include="..\TimberDev\Tools\ruRU.csv">
-        <Link>TimberDev\Tools\ruRU.csv</Link>
-      </Content>
       <Content Include="..\TimberDev\UI\enUS.csv">
         <Link>TimberDev\UI\enUS.csv</Link>
       </Content>
@@ -240,8 +219,8 @@
     </PropertyGroup>
     <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="Exists('$(ModPath)')">
         <Message Text="### Copying DLL and Docs to the game's mods folder... ###" Importance="high"/>
-        <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\version-0.7.9\Scripts"/>
-        <Copy SourceFiles="$(TargetDir)$(TargetName).xml" DestinationFolder="$(ModPath)\$(ProjectName)\version-0.7.9\Scripts"/>
+        <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\version-1.0\Scripts"/>
+        <Copy SourceFiles="$(TargetDir)$(TargetName).xml" DestinationFolder="$(ModPath)\$(ProjectName)\version-1.0\Scripts"/>
     </Target>
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
       <PropertyGroup>

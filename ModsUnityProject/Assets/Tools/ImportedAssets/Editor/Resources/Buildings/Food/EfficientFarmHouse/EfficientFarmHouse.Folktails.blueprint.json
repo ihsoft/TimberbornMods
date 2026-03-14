@@ -1,0 +1,313 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "Farmhouse",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "Log",
+        "Amount": 25
+      }
+    ],
+    "ScienceCost": 0,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": false,
+    "DrawRangeBoundsOnIt": false
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "EnterableSpec": {
+    "OperatingState": "Finished",
+    "LimitedCapacityFinished": false,
+    "CapacityFinished": 0,
+    "LimitedCapacityUnfinished": false,
+    "CapacityUnfinished": 0
+  },
+  "TemplateSpec": {
+    "TemplateName": "EfficientFarmHouse.Folktails",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 2,
+      "Y": 3,
+      "Z": 2
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": true,
+      "Coordinates": {
+        "X": 1,
+        "Y": -1,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": true
+  },
+  "BuildingAccessibleSpec": {
+    "LocalAccess": {
+      "X": 1.083552,
+      "Y": 0.1316476,
+      "Z": 1.228661
+    },
+    "ForceOneFinalAccess": false
+  },
+  "FarmHouseSpec": {},
+  "WorkplaceSpec": {
+    "MaxWorkers": 3,
+    "DefaultWorkers": 3,
+    "DefaultWorkerType": "Beaver",
+    "DisallowOtherWorkerTypes": false,
+    "WorkerTypeUnlockCosts": []
+  },
+  "TransformSlotInitializerSpec": {
+    "Slots": [
+      {
+        "SlotKeyword": "Entrance",
+        "Animation": "Sitting",
+        "Inanimate": false,
+        "RandomizeYRotation": false,
+        "WaterSlot": false
+      }
+    ]
+  },
+  "WorkplaceSlotManagerSpec": {},
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Food",
+    "ToolOrder": 21,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "PlanterBuildingSpec": {
+    "PlantableResourceGroup": "Farmhouse"
+  },
+  "WorkplaceLightingSpec": {},
+  "SimpleOutputInventorySpec": {
+    "Capacity": 50,
+    "IgnorableCapacity": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.EfficientFarmhouse.DisplayName",
+    "DescriptionLocKey": "Building.EfficientFarmhouse.Description",
+    "FlavorDescriptionLocKey": "Building.EfficientFarmhouse.FlavorDescription",
+    "Icon": "Buildings/Food/EfficientFarmHouse/EfficientFarmHouseIcon"
+  },
+  "YieldRemovingBuildingSpec": {
+    "ResourceGroup": "Farmhouse"
+  },
+  "WorkplaceWorkerOutfitSpec": {
+    "WorkerOutfit": "Farmer"
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "Children": {
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Food/EfficientFarmHouse/EfficientFarmHouse.Folktails.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 1.0,
+              "Y": 0.148020521,
+              "Z": 1.40296376
+            },
+            "Size": {
+              "X": 1.69678593,
+              "Y": 0.296041042,
+              "Z": 2.80592752
+            }
+          },
+          {
+            "Center": {
+              "X": 1.0,
+              "Y": 0.7585714,
+              "Z": 1.8
+            },
+            "Size": {
+              "X": 1.5,
+              "Y": 0.917142868,
+              "Z": 2.0
+            }
+          },
+          {
+            "Center": {
+              "X": 1.0,
+              "Y": 1.45857131,
+              "Z": 1.8
+            },
+            "Size": {
+              "X": 0.95705384,
+              "Y": 0.482857466,
+              "Z": 2.0
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase2x3#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase2x3/ConstructionBase2x3.blueprint"
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Food/EfficientFarmHouse/EfficientFarmHouse.Folktails.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 1.0,
+                  "Y": 0.03929968,
+                  "Z": 1.40296376
+                },
+                "Size": {
+                  "X": 1.69678593,
+                  "Y": 0.07859936,
+                  "Z": 2.80592752
+                }
+              },
+              {
+                "Center": {
+                  "X": 1.0,
+                  "Y": 0.6498505,
+                  "Z": 1.8
+                },
+                "Size": {
+                  "X": 1.5,
+                  "Y": 1.13458467,
+                  "Z": 2.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 1.0,
+                  "Y": 1.45857131,
+                  "Z": 1.8
+                },
+                "Size": {
+                  "X": 0.95705384,
+                  "Y": 0.482857466,
+                  "Z": 2.0
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    }
+  }
+}

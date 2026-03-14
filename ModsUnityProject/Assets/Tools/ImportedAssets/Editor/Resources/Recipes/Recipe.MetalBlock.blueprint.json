@@ -1,0 +1,26 @@
+{
+  "RecipeSpec": {
+    "Id": "MetalBlock",
+    "BackwardCompatibleIds": [],
+    "DisplayLocKey": "Good.MetalBlock.PluralDisplayName",
+    "CycleDurationInHours": 2.0,
+    "Ingredients": [
+      {
+        "Id": "ScrapMetal",
+        "Amount": 2
+      }
+    ],
+    "Products": [
+      {
+        "Id": "MetalBlock",
+        "Amount": 1
+      }
+    ],
+    "ProducedSciencePoints": 0,
+    "Fuel": "Log",
+    "CyclesFuelLasts": 5,
+    "FuelCapacity": 13,
+    "CyclesCapacity": 13,
+    "Icon": "Sprites/Goods/MetalBlockIcon"
+  }
+}

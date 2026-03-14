@@ -7,7 +7,7 @@ using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
 using Timberborn.BaseComponentSystem;
-using Timberborn.BuildingsBlocking;
+using Timberborn.Buildings;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 
@@ -84,7 +84,7 @@ sealed class PausableScriptableComponent : ScriptableComponentBase {
   #region Implementation
 
   static PausableBuilding GetPausableBuilding(BaseComponent building, bool throwIfNotFound = true) {
-    var pausable = building.GetComponentFast<PausableBuilding>();
+    var pausable = building.GetComponent<PausableBuilding>();
     if (pausable && pausable.IsPausable()) {
       return pausable;
     }

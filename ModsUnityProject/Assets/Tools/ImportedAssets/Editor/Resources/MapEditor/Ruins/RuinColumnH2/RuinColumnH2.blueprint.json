@@ -1,0 +1,109 @@
+﻿{
+  "TemplateSpec": {
+    "TemplateName": "RuinColumnH2",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 2
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Ruins",
+    "ToolOrder": 2,
+    "ToolShape": "Square",
+    "Layout": "Rectangle",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": true
+  },
+  "RuinSpec": {
+    "ModelParentName": "#Models",
+    "RuinHeight": 2,
+    "Yielder": {
+      "YielderComponentName": "Ruin",
+      "Yield": {
+        "Id": "ScrapMetal",
+        "Amount": 30
+      },
+      "RemovalTimeInHours": 1.8,
+      "ResourceGroup": "Ruin"
+    }
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.Ruins.DisplayName",
+    "DescriptionLocKey": "Building.Ruins.Description",
+    "FlavorDescriptionLocKey": "Building.Ruins.FlavorDescription",
+    "Icon": "MapEditor/Ruins/RuinColumnH2/RuinColumnH2Icon"
+  },
+  "BasicSelectionSoundSpec": {
+    "SoundName": "Ruin",
+    "AlternativeSoundName": ""
+  },
+  "BlockObjectModelSpec": {
+    "FullModelName": "#Models",
+    "UncoveredModelName": "",
+    "UndergroundModelName": "",
+    "UndergroundModelDepth": 0
+  },
+  "Children": {
+    "#Models": {
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 1.0,
+              "Z": 0.5
+            },
+            "Size": {
+              "X": 1.0,
+              "Y": 2.0,
+              "Z": 1.0
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    }
+  }
+}

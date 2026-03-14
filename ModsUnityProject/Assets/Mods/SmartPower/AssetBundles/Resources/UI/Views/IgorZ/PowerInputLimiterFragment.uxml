@@ -1,9 +1,9 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tb="Timberborn.CoreUI" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle" />
-    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle" />
-    <Style src="project://database/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss?fileID=7433441132597879392&amp;guid=02de7aec41a58a648bcb6d7db08fd2a8&amp;type=3#EntityPanelGameStyle" />
-    <Style src="project://database/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss?fileID=7433441132597879392&amp;guid=65cc3b01c73f9d845b1cd8d615d4bc5f&amp;type=3#EntityPanelCommonStyle" />
-    <Style src="project://database/Assets/Mods/SmartPower/AssetBundles/Resources/UI/TimberDevStyle.uss?fileID=7433441132597879392&amp;guid=808d244c0e14ad849862ff35711b8b1f&amp;type=3#TimberDevStyle" />
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle"/>
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle"/>
+    <Style src="project://database/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss?fileID=7433441132597879392&amp;guid=02de7aec41a58a648bcb6d7db08fd2a8&amp;type=3#EntityPanelGameStyle"/>
+    <Style src="project://database/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss?fileID=7433441132597879392&amp;guid=65cc3b01c73f9d845b1cd8d615d4bc5f&amp;type=3#EntityPanelCommonStyle"/>
+    <Style src="project://database/Assets/Mods/SmartPower/AssetBundles/Resources/UI/Views/TimberDevStyle.uss?fileID=7433441132597879392&amp;guid=808d244c0e14ad849862ff35711b8b1f&amp;type=3#TimberDevStyle"/>
     <tb:NineSliceVisualElement class="bg-sub-box--green entity-sub-panel">
         <tb:LocalizableToggle text-loc-key="IgorZ.SmartPower.PowerInputLimiter.SuspendIfNoPower" text="Останавливать если недостаточно энергии" name="AutomateCheckbox" class="entity-panel__toggle entity-panel__text game-toggle" />
         <engine:Label text="Минимальное обеспечение энергией: {0}%" name="SuspendIfLowEfficiencyLabel" class="entity-panel__text" />

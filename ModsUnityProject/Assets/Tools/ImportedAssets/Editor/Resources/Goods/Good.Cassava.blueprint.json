@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "Cassava",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.494117647,
+      "g": 0.4117647,
+      "b": 0.294117659,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Ingredients",
+    "GoodOrder": 10000,
+    "Icon": "Sprites/Goods/CassavaIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.Cassava.DisplayName",
+    "PluralDisplayNameLocKey": "Good.Cassava.PluralDisplayName"
+  }
+}

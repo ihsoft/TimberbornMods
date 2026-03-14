@@ -1,0 +1,12 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/BatchControl/BatchControlStyle.uss" />
+    <cui:NineSliceVisualElement name="DistrictCenterRowItem" class="district-center-row-item">
+        <ui:Button name="Select" class="building-batch-control-row-item__button">
+            <ui:Image name="Image" class="building-batch-control-row-item__image" />
+        </ui:Button>
+        <ui:Label name="Text" class="game-text-big text--bold migration-batch-control-header-row__label" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

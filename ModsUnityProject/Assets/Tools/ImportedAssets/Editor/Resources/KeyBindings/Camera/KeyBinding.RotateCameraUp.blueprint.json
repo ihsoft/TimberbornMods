@@ -1,0 +1,10 @@
+{
+  "KeyBindingSpec": {
+    "Id": "RotateCameraUp",
+    "GroupId": "Camera",
+    "LocKey": "KeyBinding.RotateCameraUp",
+    "Order": 55,
+    "AllowOtherModifiers": true,
+    "DevModeOnly": false
+  }
+}

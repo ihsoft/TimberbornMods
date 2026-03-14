@@ -1,0 +1,27 @@
+﻿{
+  "TutorialStageSpec": {
+    "Id": "Forestry.BuildForester",
+    "IntroLocKey": "Tutorial.Forestry.Forester"
+  },
+  "Children": {
+    "Step1": {
+      "AccumulateScienceForBuildingStepSpec": {
+        "TemplateName": "Forester.Folktails"
+      }
+    },
+    "Step2": {
+      "UnlockBuildingTutorialStepSpec": {
+        "TemplateName": "Forester.Folktails"
+      }
+    },
+    "Step3": {
+      "BuildingTutorialStepSpec": {
+        "TemplateNames": [
+          "Forester.Folktails"
+        ],
+        "OnlyFinishedBuildings": true,
+        "RequiredAmount": 1
+      }
+    }
+  }
+}

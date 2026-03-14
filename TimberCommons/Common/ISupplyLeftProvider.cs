@@ -6,9 +6,9 @@ namespace IgorZ.TimberCommons.Common;
 
 /// <summary>Interface that enables "supply lasts for XX" progress bar in UI for manufactories.</summary>
 /// <remarks>
-/// It's expected that only one component on the building will implement it. If there is such a component, and it
-/// returns a non "null" values, then the UI fragment gets a "progress bar" that tells player how long the buildings
-/// would work on the existing inventory reserves.
+/// It's expected that only one component on the building implements it. If there is such a component, and it returns a
+/// non "null" value, then the UI fragment gets a "progress bar" that tells player how long the buildings would work on
+/// the existing inventory reserves.
 /// </remarks>
 public interface ISupplyLeftProvider {
   /// <summary>Returns the stats or indicates that the progress bar should be hidden.</summary>

@@ -1,0 +1,10 @@
+{
+  "DeconstructionParticleFactorySpec": {
+    "MinParticleSpawnThreshold": 0.2,
+    "MaxParticleSpawnThreshold": 0.95,
+    "MinParticlesForThreshold": 50,
+    "MaxParticlesForThreshold": 100,
+    "ParticlePrefabPath": "Models/DeconstructionSmoke",
+    "MaxNeighboursCount": 26.0
+  }
+}

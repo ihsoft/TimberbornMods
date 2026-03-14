@@ -1,0 +1,114 @@
+.district-panel__wrapper {
+    padding-left: 0;
+    padding-right: 0;
+    align-items: center;
+    flex-direction: column-reverse;
+}
+
+.district-panel {
+    align-items: center;
+    padding-left: 4px;
+    padding-right: 4px;
+    flex-wrap: nowrap;
+    max-width: 235px;
+    width: 235px;
+}
+
+.district-panel__extension-panel-background {
+    bottom: auto;
+    top: 10px;
+}
+
+.district-panel__extension-clamp {
+    position: absolute;
+    bottom: 0;
+}
+
+.extension-clamp--hidden.district-panel__extension-clamp {
+    bottom: -29px;
+}
+
+.district-panel__selected-district-button {
+    height: 26px;
+    -unity-text-align: middle-left;
+    width: 155px;
+    max-width: 155px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    --click-sound: "UI.Click";
+}
+
+.panel--district > .square-large--green {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-4');
+}
+
+.panel--district.square-large--green {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-4');
+}
+
+.district-panel__icon {
+    min-width: 26px;
+    min-height: 26px;
+    max-width: 26px;
+    max-height: 26px;
+    background-image: resource('UI/Images/Game/ico-global');
+}
+
+.panel--district .district-panel__icon {
+    background-image: resource('UI/Images/Game/ico-district');
+}
+
+.district-panel__list > .unity-scroll-view {
+    width: 100%;
+}
+
+.district-panel__list > .unity-scroll-view > .unity-scroll-view__content-and-vertical-scroll-container > .unity-scroller > .unity-slider .unity-base-slider__dragger {
+    background-image: resource('UI/Images/Backgrounds/bg-pixel-2');
+    width: 10px;
+    left: 0;
+}
+
+.district-panel__list > .unity-scroll-view > .unity-scroll-view__content-and-vertical-scroll-container > .unity-scroller {
+    background-image: resource('UI/Images/Backgrounds/bg-pixel-1');
+    width: 10px;
+}
+
+.district-panel__list-wrapper {
+    padding: 20px 8px 8px 8px;
+}
+
+
+.district-list-panel__item-wrapper {
+    flex-direction: row;
+    align-items: center;
+}
+
+.district-list-panel__item {
+    flex-direction: row;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.district-list-panel__label {
+    flex-grow: 1;
+}
+
+.district-list-panel__icon {
+    min-width: 26px;
+    min-height: 26px;
+    max-width: 26px;
+    max-height: 26px;
+    background-image: resource('UI/Images/Game/ico-district');
+}
+
+.district-list-panel__item-wrapper:hover:enabled > .district-list-panel__item {
+    background-image: resource('UI/Images/Backgrounds/bg-pixel-3');
+}
+
+.district-list-panel__item-wrapper:checked > .district-list-panel__item {
+    background-image: resource('UI/Images/Backgrounds/bg-pixel-2');
+}
+
+.district-list-panel__item-wrapper:checked:hover:enabled > .district-list-panel__item {
+    background-image: resource('UI/Images/Backgrounds/bg-pixel-3');
+}

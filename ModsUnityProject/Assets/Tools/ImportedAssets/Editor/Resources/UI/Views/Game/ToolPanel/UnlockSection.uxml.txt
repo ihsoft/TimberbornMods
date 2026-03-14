@@ -1,0 +1,9 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="ScienceCostSection" src="/Assets/Resources/UI/Views/Game/ToolPanel/ScienceCostSection.uxml" />
+    <Style src="/Assets/Resources/UI/Views/Common/ToolPanel/ToolPanelStyle.uss" />
+    <cui:NineSliceVisualElement name="UnlockSection" class="description-panel-unlock-section bg-sub-box--blue">
+        <cui:LocalizableLabel name="UnlockLabel" text-loc-key="BuildingTools.UnlockLabel" class="game-text-normal description-panel-unlock-section__spacer description-panel-unlock-section__label" />
+        <ui:Instance name="UnlockButton" template="ScienceCostSection" class="description-panel-unlock-section__button clickable-hierarchy" />
+        <ui:VisualElement name="Spacer" class="description-panel-unlock-section__spacer" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

@@ -1,0 +1,26 @@
+{
+  "RecipeSpec": {
+    "Id": "CattailFlour",
+    "BackwardCompatibleIds": [],
+    "DisplayLocKey": "Good.CattailFlour.PluralDisplayName",
+    "CycleDurationInHours": 0.25,
+    "Ingredients": [
+      {
+        "Id": "CattailRoot",
+        "Amount": 1
+      }
+    ],
+    "Products": [
+      {
+        "Id": "CattailFlour",
+        "Amount": 1
+      }
+    ],
+    "ProducedSciencePoints": 0,
+    "Fuel": "",
+    "CyclesFuelLasts": 0,
+    "FuelCapacity": 0,
+    "CyclesCapacity": 20,
+    "Icon": "Sprites/Goods/CattailFlourIcon"
+  }
+}

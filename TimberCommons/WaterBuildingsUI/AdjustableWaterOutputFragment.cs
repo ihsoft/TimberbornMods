@@ -44,7 +44,7 @@ sealed class AdjustableWaterOutputFragment : IEntityPanelFragment {
 
   /// <inheritdoc/>
   public void ShowFragment(BaseComponent entity) {
-    _adjustableWaterOutput = entity.GetComponentFast<AdjustableWaterOutput>();
+    _adjustableWaterOutput = entity.GetComponent<AdjustableWaterOutput>();
     if (!_adjustableWaterOutput || !_adjustableWaterOutput.AllowAdjustmentsInGame) {
       _adjustableWaterOutput = null;
       return;

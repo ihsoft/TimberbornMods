@@ -1,0 +1,13 @@
+{
+  "MapSizeSpec": {
+    "DefaultMapSize": {
+      "X": 128,
+      "Y": 128
+    },
+    "MinMapSize": 4,
+    "MaxMapSize": 256,
+    "MaxMapEditorTerrainHeight": 16,
+    "MaxGameTerrainHeight": 22,
+    "MaxHeightAboveTerrain": 10
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "KeyBindingSpec": {
+    "Id": "NextDistrict",
+    "GroupId": "UI",
+    "LocKey": "KeyBinding.NextDistrict",
+    "Order": 120,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  }
+}

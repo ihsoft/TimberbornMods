@@ -1,0 +1,30 @@
+{
+  "GoodSpec": {
+    "Id": "Catalyst",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [
+      {
+        "NeedId": "Catalyst",
+        "Points": 0.3
+      }
+    ],
+    "GoodType": "Liquid",
+    "StockpileVisualization": "Liquid",
+    "VisibleContainer": "Barrel",
+    "ContainerColor": {
+      "r": 0.549019635,
+      "g": 0.3019608,
+      "b": 0.466666669,
+      "a": 1.0
+    },
+    "ContainerMaterial": "Materials/Goods/Catalyst",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Materials",
+    "GoodOrder": 5050,
+    "Icon": "Sprites/Goods/CatalystIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.Catalyst.DisplayName",
+    "PluralDisplayNameLocKey": "Good.Catalyst.PluralDisplayName"
+  }
+}

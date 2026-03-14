@@ -1,0 +1,22 @@
+{
+  "WellbeingTierSpec": {
+    "CharacterType": "Bot",
+    "BonusId": "MovementSpeed",
+    "Bonuses": [
+      {
+        "Wellbeing": 0,
+        "Multiplier": 0.3
+      },
+      {
+        "Wellbeing": 1,
+        "Multiplier": 0.6
+      },
+      {
+        "Wellbeing": 2,
+        "Multiplier": 0.8
+      }
+    ],
+    "WellbeingThreshold": 1,
+    "MultiplierIncrement": 0.2
+  }
+}

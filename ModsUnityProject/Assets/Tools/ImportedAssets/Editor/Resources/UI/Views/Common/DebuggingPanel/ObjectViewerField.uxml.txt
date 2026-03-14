@@ -1,0 +1,9 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <ui:VisualElement name="ObjectViewerField" class="object-viewer-field">
+        <ui:Label name="FieldName" class="game-text-normal" />
+        <ui:TextField name="FieldValue" readonly="true" class="object-viewer-field__input game-text-normal" />
+    </ui:VisualElement>
+</ui:UXML>
+

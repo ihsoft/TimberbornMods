@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "MouseZoomIn",
+    "GroupId": "Internal",
+    "LocKey": "",
+    "Order": 30,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Mouse/scroll/up",
+    "InputModifiers": "None",
+    "Unchangeable": true
+  }
+}

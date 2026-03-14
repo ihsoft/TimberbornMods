@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "RotateCameraRight90",
+    "GroupId": "Camera",
+    "LocKey": "KeyBinding.RotateCameraRight90",
+    "Order": 70,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/c",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

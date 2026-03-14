@@ -71,7 +71,7 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
   }
 
   public void ShowFragment(BaseComponent entity) {
-    _balancer = entity.GetComponentFast<PowerOutputBalancer>();
+    _balancer = entity.GetComponent<PowerOutputBalancer>();
     if (!_balancer) {
       return;
     }
@@ -81,7 +81,7 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
         new Vector2(_balancer.DischargeBatteriesThreshold, _balancer.ChargeBatteriesThreshold));
     UpdateControls();
     _root.ToggleDisplayStyle(visible: true);
-    _applyToAllGeneratorsButton.ToggleDisplayStyle(visible: _balancer.enabled);
+    _applyToAllGeneratorsButton.ToggleDisplayStyle(visible: _balancer.Enabled);
   }
 
   public void ClearFragment() {
@@ -94,7 +94,7 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
     if (!_balancer) {
       return;
     }
-    _applyToAllGeneratorsButton.ToggleDisplayStyle(visible: _balancer.enabled);
+    _applyToAllGeneratorsButton.ToggleDisplayStyle(visible: _balancer.Enabled);
     _applyToAllUpdater?.Update(
         () => {
           _applyToAllGeneratorsButton.text = _uiFactory.T(ApplyToAllGeneratorsLocKey);
@@ -114,9 +114,7 @@ sealed class PowerOutputBalancerFragment : IEntityPanelFragment {
     var affectedGenerators = 0;
     foreach (var balancer in _balancer.AllBalancers.Where(x => x != _balancer)) {
       affectedGenerators++;
-      balancer.ChargeBatteriesThreshold = _balancer.ChargeBatteriesThreshold;
-      balancer.DischargeBatteriesThreshold = _balancer.DischargeBatteriesThreshold;
-      balancer.UpdateState();
+      balancer.DuplicateFrom(_balancer);
     }
     _applyToAllUpdater = new TimedUpdater(1.0f, startNow: true);
     _applyToAllGeneratorsButton.text = _uiFactory.T(AppliedToGeneratorsLocKey, affectedGenerators);

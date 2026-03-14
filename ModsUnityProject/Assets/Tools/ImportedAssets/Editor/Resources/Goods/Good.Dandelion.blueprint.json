@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "Dandelion",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.9843137,
+      "g": 1.0,
+      "b": 0.0,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Materials",
+    "GoodOrder": 2000,
+    "Icon": "Sprites/Goods/DandelionIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.Dandelion.DisplayName",
+    "PluralDisplayNameLocKey": "Good.Dandelion.PluralDisplayName"
+  }
+}

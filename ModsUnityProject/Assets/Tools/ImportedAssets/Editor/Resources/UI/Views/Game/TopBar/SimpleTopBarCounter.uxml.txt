@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/TopBar/TopBarStyle.uss" />
+    <ui:VisualElement name="Counter" class="top-bar-counter__wrapper top-bar-counter--simple">
+        <cui:NineSliceVisualElement name="CounterWrapper" class="top-bar-counter bg-striped--green">
+            <ui:Image name="Icon" class="top-bar-counter__icon" />
+            <ui:Label name="Count" text="999999" class="top-bar-counter__count game-text-normal text--yellow" />
+            <ui:VisualElement name="FillFrame" class="top-bar-counter__progress-bar stockpile-capacity__progress-bar">
+                <ui:VisualElement name="Fill" class="stockpile-capacity__progress-bar-progress" />
+            </ui:VisualElement>
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

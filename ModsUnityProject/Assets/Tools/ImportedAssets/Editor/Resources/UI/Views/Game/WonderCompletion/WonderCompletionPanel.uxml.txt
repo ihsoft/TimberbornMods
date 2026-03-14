@@ -1,0 +1,35 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="Box" src="/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml" />
+    <ui:Template name="Thumbnail" src="/Assets/Resources/UI/Views/Common/Thumbnail.uxml" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <ui:Instance name="WonderCompletionPanel" template="Box" class="wonder-completion-panel">
+        <ui:AttributeOverrides element-name="Header" text-loc-key="WonderCompletion.Panel.Header" />
+        <Style src="/Assets/Resources/UI/Views/Game/WonderCompletion/WonderCompletionStyle.uss" />
+        <ui:Image name="WonderCompletionImage" class="wonder-completion-panel__image">
+            <cui:NineSliceVisualElement name="WonderCompletionImageFrame" class="wonder-completion-panel__image-frame" />
+        </ui:Image>
+        <ui:Label name="Congratulations" class="game-text-title wonder-completion-panel__congratulations-text" />
+        <ui:Label name="Flavor" class="game-text-heading wonder-completion-panel__flavor-text" />
+        <ui:VisualElement class="wonder-completion-panel__information-root">
+            <cui:NineSliceVisualElement name="MapPanel" class="wonder-completion-panel__information-panel">
+                <ui:Label name="MapName" class="game-text-title wonder-completion-panel__section-header" />
+                <ui:Instance template="Thumbnail" class="wonder-completion-panel__map-thumbnail" />
+                <ui:VisualElement name="FlexibleStartRoot" class="wonder-completion-panel__reward-element">
+                    <ui:VisualElement name="FlexibleStartIcon" class="wonder-completion-panel__icon flexible-start-icon" />
+                    <cui:LocalizableLabel name="FlexibleStartLabel" text-loc-key="FlexibleStart.Unlocked" class="wonder-completion-panel__reward-text text--default" />
+                </ui:VisualElement>
+                <ui:VisualElement name="MapMasterRoot" class="wonder-completion-panel__reward-element">
+                    <ui:VisualElement name="MapMasteryFactionIcon" class="wonder-completion-panel__icon" />
+                    <ui:Label name="MapMasteryInfo" class="wonder-completion-panel__reward-text text--default" />
+                </ui:VisualElement>
+            </cui:NineSliceVisualElement>
+            <cui:NineSliceVisualElement name="StatisticsRoot" class="wonder-completion-panel__information-panel">
+                <cui:LocalizableLabel name="StatisticsHeader" text="Statistics" text-loc-key="WonderCompletion.Panel.Statistics" class="game-text-title wonder-completion-panel__section-header" />
+                <ui:VisualElement name="StatisticsContainer" class="wonder-completion-panel__statistics-root" />
+            </cui:NineSliceVisualElement>
+        </ui:VisualElement>
+        <cui:LocalizableButton name="ResumeButton" text-loc-key="Menu.Resume" class="menu-button menu-button--centered wonder-completion-panel__button-close" />
+    </ui:Instance>
+</ui:UXML>

@@ -1,0 +1,20 @@
+{
+  "KeyBindingSpec": {
+    "Id": "UseContaminationModifier",
+    "GroupId": "Dev",
+    "LocKey": "",
+    "Order": 230,
+    "AllowOtherModifiers": true,
+    "DevModeOnly": true
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/leftShift",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  },
+  "SecondaryInputBindingSpec": {
+    "Path": "/Keyboard/rightShift",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

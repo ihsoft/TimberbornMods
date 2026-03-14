@@ -1,0 +1,20 @@
+{
+  "KeyBindingSpec": {
+    "Id": "Redo",
+    "GroupId": "MapEditor",
+    "LocKey": "KeyBinding.RedoChanges",
+    "Order": 10,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/y",
+    "InputModifiers": "Ctrl",
+    "Unchangeable": false
+  },
+  "SecondaryInputBindingSpec": {
+    "Path": "/Keyboard/z",
+    "InputModifiers": "Ctrl, Shift",
+    "Unchangeable": false
+  }
+}

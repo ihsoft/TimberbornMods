@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "BotHead",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.0,
+      "g": 1.0,
+      "b": 1.0,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 4,
+    "GoodGroupId": "Materials",
+    "GoodOrder": 5020,
+    "Icon": "Sprites/Goods/BotHeadIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.BotHead.DisplayName",
+    "PluralDisplayNameLocKey": "Good.BotHead.PluralDisplayName"
+  }
+}

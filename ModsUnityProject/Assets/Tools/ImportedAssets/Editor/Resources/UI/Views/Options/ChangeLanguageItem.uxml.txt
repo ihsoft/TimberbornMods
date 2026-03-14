@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Options/OptionsStyle.uss" />
+    <ui:VisualElement name="Root" class="change-language-item">
+        <ui:Toggle name="Item" text="Item" class="settings-element settings-toggle settings-text" />
+        <ui:Label name="NewLanguageMarker" text="NEW" class="change-language-item__new-language-marker" />
+    </ui:VisualElement>
+</ui:UXML>

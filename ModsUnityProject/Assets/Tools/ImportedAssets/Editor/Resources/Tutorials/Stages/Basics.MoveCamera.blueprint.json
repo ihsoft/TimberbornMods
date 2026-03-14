@@ -1,0 +1,32 @@
+{
+  "TutorialStageSpec": {
+    "Id": "Basics.MoveCamera",
+    "IntroLocKey": "Tutorial.Basics.MoveCamera"
+  },
+  "Children": {
+    "Step1": {
+      "CameraMovementStepSpec": {
+        "Direction": "Up",
+        "Threshold": 3.0
+      }
+    },
+    "Step2": {
+      "CameraMovementStepSpec": {
+        "Direction": "Down",
+        "Threshold": 3.0
+      }
+    },
+    "Step3": {
+      "CameraMovementStepSpec": {
+        "Direction": "Left",
+        "Threshold": 3.0
+      }
+    },
+    "Step4": {
+      "CameraMovementStepSpec": {
+        "Direction": "Right",
+        "Threshold": 3.0
+      }
+    }
+  }
+}

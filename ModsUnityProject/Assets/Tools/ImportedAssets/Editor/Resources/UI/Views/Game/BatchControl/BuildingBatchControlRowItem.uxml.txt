@@ -1,0 +1,22 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/BatchControl/BatchControlStyle.uss" />
+    <ui:VisualElement name="BuildingBatchControlRowItem" class="building-batch-control-row-item">
+        <ui:Button name="Select" class="building-batch-control-row-item__button">
+            <ui:Image name="Image" class="building-batch-control-row-item__image">
+                <ui:VisualElement name="ConstructionWrapper" class="building-batch-control-row-item__construction-wrapper">
+                    <ui:VisualElement name="Progress" class="building-batch-control-row-item__construction-progress" />
+                    <ui:Label name="ProgressText" text="100%" class="game-text-normal" />
+                </ui:VisualElement>
+            </ui:Image>
+        </ui:Button>
+        <cui:NineSliceVisualElement name="PausableWrapper" class="batch-control-box__row-item-group--green">
+            <ui:Toggle name="PausableToggle" class="building-batch-control-row-item__toggle" />
+        </cui:NineSliceVisualElement>
+        <cui:NineSliceVisualElement name="DistanceWrapper" class="batch-control-box__row-item-group--green">
+            <ui:Label name="DistanceText" text="33" class="game-text-normal building-batch-control-row-item__text" />
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

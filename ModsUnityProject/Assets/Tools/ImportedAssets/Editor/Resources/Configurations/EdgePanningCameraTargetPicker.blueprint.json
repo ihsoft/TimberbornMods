@@ -1,0 +1,7 @@
+{
+  "EdgePanningCameraTargetPickerSpec": {
+    "MinBaseSpeed": 17.0,
+    "MaxBaseSpeed": 70.0,
+    "FastMovementSpeedBonus": 45.0
+  }
+}

@@ -1,0 +1,17 @@
+﻿{
+  "TutorialStageSpec": {
+    "Id": "PowerAndPlanks.BuildWaterWheel",
+    "IntroLocKey": "Tutorial.PowerAndPlanks.WaterWheel"
+  },
+  "Children": {
+    "Step1": {
+      "BuildingTutorialStepSpec": {
+        "TemplateNames": [
+          "WaterWheel.Folktails"
+        ],
+        "OnlyFinishedBuildings": true,
+        "RequiredAmount": 1
+      }
+    }
+  }
+}

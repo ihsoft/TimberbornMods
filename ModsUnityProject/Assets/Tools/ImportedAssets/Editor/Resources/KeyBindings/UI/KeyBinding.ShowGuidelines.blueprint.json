@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "ShowGuidelines",
+    "GroupId": "UI",
+    "LocKey": "KeyBinding.ShowGuidelines",
+    "Order": 80,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/x",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

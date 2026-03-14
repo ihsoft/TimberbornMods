@@ -1,0 +1,42 @@
+{
+  "MaterialCollectionSpec": {
+    "CollectionId": "IronTeeth",
+    "Materials": [
+      "Buildings/Decoration/BulletinPole/Materials/BulletinPole.IronTeeth",
+      "Buildings/Decoration/Shrub/Materials/Shrub.IronTeeth",
+      "Buildings/Food/FoodFactory/FoodFactoryGoo.IronTeeth",
+      "Buildings/Paths/Path/Path.IronTeeth",
+      "Buildings/Wellbeing/Scratcher/Materials/Scratcher.IronTeeth",
+      "Buildings/Landscaping/Dam/Materials/Dam.IronTeeth",
+      "Characters/Bot/Bot.IronTeeth",
+      "Environment/Water/Materials/AdvancedBreedingWater",
+      "Environment/Water/Materials/BreedingWater",
+      "Materials/Goods/Extract",
+      "Materials/Goods/Grease",
+      "Materials/UberAtlas/Materials/IronTeeth/BaseMetal.IronTeeth",
+      "Materials/UberAtlas/Materials/IronTeeth/BaseWood_DarkBrown.IronTeeth",
+      "Materials/UberAtlas/Materials/IronTeeth/BaseWood_Grey.IronTeeth",
+      "Materials/UberAtlas/Materials/IronTeeth/BaseWood_Indigo.IronTeeth",
+      "Materials/UberAtlas/Materials/IronTeeth/Details.IronTeeth",
+      "Materials/UberAtlas/Materials/IronTeeth/IrregularPlanks_DarkBrown.IronTeeth",
+      "Materials/UberAtlas/Materials/IronTeeth/IrregularPlanks_Grey.IronTeeth",
+      "Materials/UberAtlas/Materials/IronTeeth/IrregularPlanks_Indigo.IronTeeth",
+      "Materials/UberAtlas/Materials/IronTeeth/IrregularPlanks_MetalForged.IronTeeth",
+      "Materials/UberAtlas/Materials/IronTeeth/PaintedMetal.IronTeeth",
+      "Materials/UberAtlas/Materials/IronTeeth/Paper.IronTeeth",
+      "Materials/UberAtlas/Materials/IronTeeth/Plaster_Orange.IronTeeth",
+      "Materials/UberAtlas/Materials/IronTeeth/Plaster_White.IronTeeth",
+      "Materials/UberAtlas/Materials/IronTeeth/PlasteredWood_Orange.IronTeeth",
+      "Materials/UberAtlas/Materials/IronTeeth/RoofPlanks.IronTeeth",
+      "Materials/UberAtlas/Materials/IronTeeth/WindowsAtlas.IronTeeth",
+      "NaturalResources/Bushes/Coffee/Materials/CoffeeBush",
+      "NaturalResources/Crops/Canola/Materials/Canola",
+      "NaturalResources/Crops/Cassava/Materials/Cassava",
+      "NaturalResources/Crops/Corn/Materials/Corn",
+      "NaturalResources/Crops/Eggplant/Materials/Eggplant",
+      "NaturalResources/Crops/Kohlrabi/Materials/Kohlrabi",
+      "NaturalResources/Crops/Soybean/Materials/Soybean",
+      "NaturalResources/Trees/Mangrove/Materials/Mangrove"
+    ]
+  }
+}

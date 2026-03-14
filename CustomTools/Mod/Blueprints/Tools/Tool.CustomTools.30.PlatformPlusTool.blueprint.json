@@ -1,0 +1,23 @@
+{
+  "CustomToolSpec": {
+    "Id": "CustomTools-PlatformPlusTool",
+    "GroupId": "CustomToolsToolGroup",
+    "Order": 30,
+    "Type": "IgorZ.CustomTools.Tools.FourTemplatesBlockObjectTool",
+    "Icon": "Sprites/BottomBar/IgorZ.CustomTools/tool-platform-plus",
+    "DisplayNameLocKey": "IgorZ.CustomTools.PlatformPlusTool.Title",
+    "DescriptionLocKey": "Building.Platform.Description"
+  },
+  "CustomToolFeatureLimiterSpec": {
+    "AllowedFactions": [
+      "Folktails",
+      "IronTeeth"
+    ]
+  },
+  "FourTemplatesToolSpec": {
+    "NoModifierTemplate": "Platform",
+    "ShiftModifierTemplate": "DoublePlatform",
+    "AltModifierTemplate": "TriplePlatform",
+    "FactionNeutral": true
+  }
+}

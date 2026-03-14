@@ -1,0 +1,302 @@
+{
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 3
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "TemplateSpec": {
+    "TemplateName": "Birch",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "NaturalResourceSpec": {
+    "Order": 5
+  },
+  "TreeComponentSpec": {},
+  "GrowableSpec": {
+    "GrowthTimeInDays": 7.0
+  },
+  "BasicSelectionSoundSpec": {
+    "SoundName": "Tree",
+    "AlternativeSoundName": ""
+  },
+  "PlantableSpec": {
+    "ResourceGroup": "Forester",
+    "PlantTimeInHours": 0.5
+  },
+  "DemolishableSpec": {
+    "DemolishTimeInHours": 1.2,
+    "ShowDemolishButtonInEntityPanel": false
+  },
+  "CuttableSpec": {
+    "RemoveOnCut": false,
+    "LeftoverModelName": "#Leftover",
+    "Yielder": {
+      "YielderComponentName": "Cuttable",
+      "Yield": {
+        "Id": "Log",
+        "Amount": 1
+      },
+      "RemovalTimeInHours": 1.0,
+      "ResourceGroup": "Cuttable"
+    }
+  },
+  "PlantablePreviewModelSpec": {
+    "Model": "NaturalResources/Trees/Birch/Mesh/BirchMature"
+  },
+  "ReproducibleSpec": {
+    "ReproductionChance": 0.03
+  },
+  "WateredNaturalResourceSpec": {
+    "DaysToDieDry": 11.0
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "NaturalResource.Birch.DisplayName",
+    "DescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "NaturalResource.Birch.FlavorDescription",
+    "Icon": "NaturalResources/Trees/Birch/BirchIcon"
+  },
+  "FloodableNaturalResourceSpec": {
+    "MinWaterHeight": 0,
+    "MaxWaterHeight": 0,
+    "DaysToDie": 14.0
+  },
+  "NaturalResourceModelRandomizerSpec": {
+    "ConstrainProportion": false,
+    "MinHeightScaleFactor": 0.8,
+    "MaxHeightScaleFactor": 1.2,
+    "MinWidthScaleFactor": 0.9,
+    "MaxWidthScaleFactor": 1.1,
+    "RandomizedRotation": "BetweenMinAndMax",
+    "MinRotation": 0.0,
+    "MaxRotation": 360.0
+  },
+  "TreeCuttingRadiusSpec": {
+    "Radius": 0.05
+  },
+  "ContaminatedNaturalResourceSpec": {},
+  "BlockObjectModelSpec": {
+    "FullModelName": "#Models",
+    "UncoveredModelName": "",
+    "UndergroundModelName": "",
+    "UndergroundModelDepth": 0
+  },
+  "Children": {
+    "#Models": {
+      "Children": {
+        "Seedling": {
+          "Children": {
+            "#Alive": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Trees/Birch/Mesh/BirchSeedling"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [],
+                "CapsuleColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.345513642,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.18786338,
+                    "Height": 1.06248057,
+                    "Axis": "Y"
+                  }
+                ]
+              }
+            },
+            "#Dead": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Trees/Birch/Mesh/BirchSeedlingDead"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [],
+                "CapsuleColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.3,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.2,
+                    "Height": 0.8,
+                    "Axis": "Y"
+                  }
+                ]
+              }
+            },
+            "#Dying": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Trees/Birch/Mesh/BirchSeedlingDry"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [],
+                "CapsuleColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.345513642,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.18786338,
+                    "Height": 1.06248057,
+                    "Axis": "Y"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "Mature": {
+          "Children": {
+            "#Alive": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Trees/Birch/Mesh/BirchMature"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [],
+                "CapsuleColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 1.39,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.35,
+                    "Height": 1.18,
+                    "Axis": "Y"
+                  },
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.61,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.11,
+                    "Height": 1.34,
+                    "Axis": "Y"
+                  }
+                ]
+              }
+            },
+            "#Dead": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Trees/Birch/Mesh/BirchMatureDead"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [],
+                "CapsuleColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.728804231,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.16,
+                    "Height": 1.49,
+                    "Axis": "Y"
+                  }
+                ]
+              }
+            },
+            "#Dying": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Trees/Birch/Mesh/BirchMatureDry"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [],
+                "CapsuleColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 1.39,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.35,
+                    "Height": 1.18,
+                    "Axis": "Y"
+                  },
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.61,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.11,
+                    "Height": 1.34,
+                    "Axis": "Y"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "#Leftover": {
+          "TimbermeshSpec": {
+            "Model": "NaturalResources/Trees/Birch/Mesh/BirchMatureStump"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [],
+            "SphereColliders": [],
+            "CapsuleColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.109086186,
+                  "Z": 0.47
+                },
+                "Radius": 0.09999077,
+                "Height": 0.461116254,
+                "Axis": "Y"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

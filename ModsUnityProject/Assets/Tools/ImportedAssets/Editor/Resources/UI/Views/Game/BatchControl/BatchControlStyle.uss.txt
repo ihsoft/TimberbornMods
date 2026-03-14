@@ -1,0 +1,1144 @@
+.batch-control-panel {
+    width: 100%;
+    margin-bottom: 4px;
+}
+
+.batch-control-panel__button {
+    padding: 4px 8px;
+}
+
+.batch-control-tab {
+    flex-direction: column-reverse;
+}
+
+.batch-control-tab__empty {
+    flex-grow: 1;
+    -unity-text-align: middle-center;
+}
+
+.batch-control-tab__header {
+    flex-shrink: 0;
+}
+
+.batch-control-tab__rows-header {
+    flex-grow: 1;
+    -unity-text-align: middle-center;
+}
+
+.batch-control-panel__tab-button {
+    background-image: resource('UI/Images/Game/tab-button');
+    width: 44px;
+    height: 44px;
+    margin: 0 2px;
+    padding-top: 7px;
+    --click-sound: "UI.Click";
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.batch-control-panel__tab-button:hover:enabled {
+    background-image: resource('UI/Images/Game/tab-button-hover');
+}
+
+.batch-control-panel__tab-button--active {
+    background-image: resource('UI/Images/Game/tab-button-active');
+    width: 44px;
+    height: 50px;
+}
+
+.batch-control-panel__tab-button--active:hover:enabled {
+    background-image: resource('UI/Images/Game/tab-button-active');
+}
+
+.batch-control-panel__tab-button-image {
+    width: 34px;
+    height: 34px;
+}
+
+.batch-control-box {
+    width: 800px;
+    flex-grow: 1;
+    align-self: flex-start;
+    flex-direction: column-reverse;
+}
+
+.batch-control-box__top-row {
+    background-color: rgba(29, 53, 41, 0.9);
+    flex-direction: row;
+    padding-left: 8px;
+    flex-shrink: 0;
+}
+
+.batch-control-box__middle-row {
+    padding: 15px 20px 10px 20px;
+    background-color: rgb(21, 39, 34);
+    flex-direction: row;
+    justify-content: space-between;
+    flex-shrink: 0;
+    height: 50px;
+}
+
+.batch-control-box__district-dropdown {
+    max-width: 300px;
+}
+
+.batch-control-box__district-dropdown .dropdown-item__text {
+    max-width: 190px;
+}
+
+.batch-control-district-dropdown .dropdown__arrow {
+    width: 18px;
+    height: 18px;
+}
+
+.batch-control-district-dropdown .dropdown__arrow-left {
+    background-image: resource('UI/Images/Buttons/arrow-left');
+}
+
+.batch-control-district-dropdown .dropdown__arrow-left:enabled:hover {
+    background-image: resource('UI/Images/Buttons/arrow-left-hover');
+}
+
+.batch-control-district-dropdown .dropdown__arrow-right {
+    background-image: resource('UI/Images/Buttons/arrow-right');
+}
+
+.batch-control-district-dropdown .dropdown__arrow-right:enabled:hover {
+    background-image: resource('UI/Images/Buttons/arrow-right-hover');
+}
+
+.batch-control-district-dropdown .dropdown__arrow-down {
+    background-image: resource('UI/Images/Buttons/arrow-down');
+    margin-right: 5px;
+}
+
+.batch-control-district-dropdown .dropdown__arrow-down:enabled:hover {
+    background-image: resource('UI/Images/Buttons/arrow-down-hover');
+}
+
+.batch-control-box__close-button {
+    width: 32px;
+    height: 32px;
+    right: 14px;
+    top: 8px;
+}
+
+.batch-control-box__border--right {
+    position: absolute;
+    height: 100%;
+    width: 10px;
+    right: -5px;
+    --background-image: resource('UI/Images/Game/batch-control-border-vertical');
+    --background-slice-scale: 0.5;
+    --background-slice-top: 10;
+    --background-slice-right: 0;
+    --background-slice-bottom: 10;
+    --background-slice-left: 0;
+}
+
+.batch-control-box__border--middle {
+    position: absolute;
+    width: 100%;
+    height: 10px;
+    top: 50px;
+    --background-image: resource('UI/Images/Game/batch-control-border-horizontal');
+    --background-slice-scale: 0.5;
+    --background-slice-top: 0;
+    --background-slice-right: 10;
+    --background-slice-bottom: 0;
+    --background-slice-left: 10;
+}
+
+.batch-control-box__settlement-button {
+    --background-image: resource('UI/Images/Game/batch-control-settlement-button');
+    --background-slice-scale: 0.5;
+    --background-slice: 24;
+    padding: 4px;
+    margin-right: 4px;
+    height: 28px;
+    align-items: center;
+    justify-content: flex-end;
+    --click-sound: "UI.Click";
+}
+
+.batch-control-box__settlement-button:enabled:hover {
+    --background-image: resource('UI/Images/Game/batch-control-settlement-button-hover');
+}
+
+.batch-control-box__settlement-icon {
+    background-image: resource('UI/Images/Game/batch-control');
+    width: 49px;
+    height: 18px;
+}
+
+.batch-control-box__tabs {
+    flex-direction: row;
+    align-items: flex-end;
+    margin-top: 2px;
+}
+
+.batch-control-box__content {
+    flex-grow: 1;
+    padding: 10px;
+    background-color: rgba(29, 53, 41, 0.9);
+}
+
+.batch-control-box__row {
+    flex-direction: row;
+    align-items: center;
+    margin: 2px 0;
+    padding: 2px;
+    height: 42px;
+}
+
+.batch-control-box__row--highlighted {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-1-highlighted');
+}
+
+.batch-control-box__row-item {
+    flex-direction: row;
+    align-items: center;
+}
+
+.batch-control-box__row-item-group {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    margin: 0 1px;
+    height: 38px;
+}
+
+.batch-control-box__row-item-group--green {
+    --background-image: resource('UI/Images/Backgrounds/bg-3');
+    --background-slice-scale: 0.5;
+    --background-slice: 9;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    margin: 0 1px;
+    height: 38px;
+}
+
+.batch-control-header-row {
+    flex-direction: row;
+    justify-content: center;
+}
+
+.batch-control-row-item__change-button {
+    width: 16px;
+    height: 16px;
+    --click-sound: "UI.Click";
+    margin-left: 4px;
+}
+
+.batch-control-row-item__change-button--increase {
+    background-image: resource('UI/Images/Buttons/priority-increase');
+}
+
+.batch-control-row-item__change-button--increase:hover:enabled {
+    background-image: resource('UI/Images/Buttons/priority-increase-hover');
+}
+
+.batch-control-row-item__change-button--decrease {
+    background-image: resource('UI/Images/Buttons/priority-decrease');
+}
+
+.batch-control-row-item__change-button--decrease:hover:enabled {
+    background-image: resource('UI/Images/Buttons/priority-decrease-hover');
+}
+
+.batch-control-row-item__background {
+    --background-image: resource('UI/Images/Backgrounds/bg-button-2');
+}
+
+.batch-control-row-item__background:enabled:hover {
+    --background-image: resource('UI/Images/Backgrounds/bg-button-2-hover');
+}
+
+.batch-control-row-item__plus-button {
+    background-image: resource('UI/Images/Buttons/plus-batch');
+}
+
+.batch-control-row-item__plus-button:enabled:hover {
+    background-image: resource('UI/Images/Buttons/plus-batch-hover');
+}
+
+.batch-control-row-item__plus-button.clickable--alternate {
+    background-image: resource('UI/Images/Buttons/plus-batch-multi');
+}
+
+.batch-control-row-item__plus-button.clickable--alternate:enabled:hover {
+    background-image: resource('UI/Images/Buttons/plus-batch-multi-hover');
+}
+
+.batch-control-row-item__minus-button {
+    background-image: resource('UI/Images/Buttons/minus-batch');
+}
+
+.batch-control-row-item__minus-button:enabled:hover {
+    background-image: resource('UI/Images/Buttons/minus-batch-hover');
+}
+
+.batch-control-row-item__minus-button.clickable--alternate {
+    background-image: resource('UI/Images/Buttons/minus-batch-multi');
+}
+
+.batch-control-row-item__minus-button.clickable--alternate:enabled:hover {
+    background-image: resource('UI/Images/Buttons/minus-batch-multi-hover');
+}
+
+.battery-batch-control-row-item__progress-bar {
+    width: 250px;
+}
+
+.battery-batch-control-row-item__icon {
+    background-image: resource('UI/Images/Game/ico-power');
+    width: 20px;
+    height: 20px;
+    margin-left: 2px;
+}
+
+.building-batch-control-row-item {
+    flex-direction: row;
+    align-items: center;
+}
+
+.building-batch-control-row-item__text {
+    width: 30px;
+    padding: 0 2px;
+    overflow: visible;
+    -unity-text-align: middle-center;
+    white-space: nowrap;
+}
+
+
+.building-batch-control-row-item__button {
+    margin: 0 1px;
+    height: 36px;
+    width: 36px;
+    background-image: resource('UI/Images/Game/beaver-building-bg');
+}
+
+.building-batch-control-row-item__button:hover:enabled {
+    background-image: resource('UI/Images/Game/beaver-building-bg-hover');
+}
+
+.building-batch-control-row-item__image {
+    height: 36px;
+    width: 36px;
+}
+
+.building-batch-control-row-item__construction-wrapper {
+    width: 100%;
+    height: 14px;
+    -unity-text-align: middle-center;
+    align-items: center;
+    justify-content: center;
+    bottom: 0;
+    position: absolute;
+    background-image: resource('UI/Images/Game/needview-inactive');
+}
+
+.building-batch-control-row-item__construction-progress {
+    width: 50%;
+    height: 100%;
+    background-image: resource('UI/Images/Game/needview-background');
+    position: absolute;
+    left: 0;
+}
+
+.building-batch-control-row-item__toggle {
+    --click-sound: "UI.Click";
+    padding: 4px 2px;
+}
+
+.building-batch-control-row-item__toggle > .unity-toggle__input:checked > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Game/pause-button-unpaused-bare');
+    width: 40px;
+    height: 24px;
+}
+
+.building-batch-control-row-item__toggle:hover:enabled > .unity-toggle__input:checked > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Game/pause-button-unpaused-hover-bare');
+}
+
+.building-batch-control-row-item__toggle > .unity-toggle__input > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Game/pause-button-paused-bare');
+    width: 40px;
+    height: 24px;
+}
+
+.building-batch-control-row-item__toggle:hover:enabled > .unity-toggle__input > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Game/pause-button-paused-hover-bare');
+}
+
+.workplace-batch-control-row-item__info {
+    width: 50px;
+    -unity-text-align: middle-center;
+}
+
+.workplace-batch-control-row-item__workers {
+    width: 24px;
+    height: 24px;
+    background-image: resource('UI/Images/Game/ico-workers');
+}
+
+.batch-control-status-image {
+    width: 32px;
+    height: 32px;
+    margin: 0 4px;
+}
+
+.status-batch-control-row-item {
+    flex-direction: row;
+    align-items: center;
+    flex-grow: 1;
+    justify-content: flex-end;
+}
+
+.batch-control-row-toggle-button {
+    background-image: resource('UI/Images/Backgrounds/bg-circle-big-borderless-1');
+    width: 36px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    --click-sound: "UI.Click";
+    margin: 1px;
+}
+
+.batch-control-row-toggle-button__icon {
+    width: 36px;
+    height: 36px;
+    opacity: 0.5;
+}
+
+.batch-control-row-toggle-button:disabled {
+    visibility: hidden;
+}
+
+.batch-control-row-toggle-button.toggle-active > .batch-control-row-toggle-button__icon {
+    opacity: 1;
+}
+
+.batch-control-row-toggle-button.toggle-active {
+    background-image: resource('UI/Images/Backgrounds/bg-circle-big-bordered-1');
+}
+
+.batch-control-row-toggle-button.toggle-active:hover:enabled {
+    background-image: resource('UI/Images/Backgrounds/bg-circle-big-bordered-1-hover');
+}
+
+.batch-control-row-toggle-button:hover:enabled {
+    background-image: resource('UI/Images/Backgrounds/bg-circle-big-borderless-1-hover');
+}
+
+.haul-candidate-batch-control-row-item > .batch-control-row-toggle-button__icon {
+    background-image: resource('UI/Images/Game/prioritize-hauling');
+}
+
+.forester-batch-control-row-item > .batch-control-row-toggle-button__icon {
+    background-image: resource('UI/Images/Game/replant-dead-trees');
+}
+
+.emptiable-batch-control-row-item > .batch-control-row-toggle-button__icon {
+    background-image: resource('UI/Images/Game/empty-inventory');
+}
+
+.prioritizable-batch-control-row-item__priority {
+    height: 24px;
+    width: 24px;
+}
+
+.stockpile-batch-control-row-item__text {
+    margin: 0 5px;
+    max-width: 120px;
+}
+
+.stockpile-batch-control-row-item__separator {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.stockpile-batch-control-row-item__amount {
+    width: 30px;
+    -unity-text-align: middle-right;
+}
+
+.stockpile-batch-control-row-item__limit {
+    width: 35px;
+    -unity-text-align: middle-left;
+}
+
+.stockpile-batch-control-row-item__wrapper {
+    flex-direction: row;
+}
+
+.stockpile-batch-control-row-item__dropdown {
+    margin: 0 4px;
+}
+
+.stockpile-batch-control-row-item__dropdown .dropdown__selection {
+    flex-grow: 0;
+    width: 200px;
+}
+
+.stockpile-batch-control-row-item__progress-bar {
+    margin-right: 5px;
+    height: 24px;
+}
+
+.stockpile-batch-control-row-item__dropdown .dropdown-item__text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.inventory-batch-control-row-item__wrapper {
+    flex-direction: row;
+}
+
+.inventory-batch-control-row-item__amount {
+    width: 20px;
+    -unity-text-align: middle-right;
+}
+
+.inventory-batch-control-row-item__limit {
+    width: 20px;
+    -unity-text-align: middle-left;
+}
+
+.inventory-batch-control-row-item__separator {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.inventory-batch-control-good__wrapper {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    margin: 0 1px;
+    height: 38px;
+}
+
+.inventory-batch-control-box__good-item {
+    flex-direction: row;
+    align-items: center;
+}
+
+.character-batch-control-row-item {
+    flex-direction: row;
+    align-items: center;
+    margin-left: 1px;
+}
+
+.character-batch-control-row-item__avatar {
+    height: 36px;
+    width: 36px;
+    margin-right: 2px;
+}
+
+.character-batch-control-row-item__avatar-overlay {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.2);
+    visibility: hidden;
+}
+
+.character-batch-control-row-item__avatar:hover:enabled > .character-batch-control-row-item__avatar-overlay {
+    visibility: visible;
+}
+
+.character-batch-control-row-item__name-wrapper {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 4px 8px;
+    width: 150px;
+    --click-sound: "UI.Click";
+}
+
+.character-batch-control-row-item__name-wrapper:hover:enabled > Label {
+    color: yellow;
+}
+
+.character-batch-control-row-item__name {
+    flex-shrink: 1;
+    -unity-text-align: middle-left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.character-batch-control-row-item__editable-hint {
+    background-image: resource('UI/Images/Game/edit');
+    width: 24px;
+    height: 24px;
+    margin-left: 4px;
+    flex-shrink: 0;
+}
+
+.beaver-buildings-batch-control-row-item__icon-wrapper {
+    --background-image: resource('UI/Images/Backgrounds/bg-3');
+    --background-slice-scale: 0.5;
+    --background-slice: 9;
+    margin: 0 1px;
+}
+
+.beaver-buildings-batch-control-row-item__icon {
+    height: 38px;
+    width: 38px;
+}
+
+.beaver-buildings-batch-control-row-item__icon-wrapper:disabled {
+    opacity: 1;
+}
+
+.beaver-buildings-batch-control-row-item__icon-wrapper:hover:enabled {
+    --background-image: resource('UI/Images/Backgrounds/bg-3-hover');
+}
+
+.beaver-buildings-batch-control-row-item__icon--homeless {
+    background-image: resource('UI/Images/Game/homeless-nobg');
+}
+
+.beaver-buildings-batch-control-row-item__icon--jobless {
+    background-image: resource('UI/Images/Game/jobless-nobg');
+}
+
+.beaver-buildings-batch-control-row-item__icon--empty {
+    background-image: none;
+}
+
+.beaver-buildings-batch-control-row-item {
+    flex-direction: row;
+}
+
+.dwelling-batch-control-row-item__dwellers {
+    width: 26px;
+    height: 26px;
+    background-image: resource('UI/Images/Game/ico-beavers');
+}
+
+.dwelling-batch-control-row-item__info {
+    width: 50px;
+    -unity-text-align: middle-center;
+}
+
+.breeding-pod-batch-control-row-item__child {
+    width: 26px;
+    height: 26px;
+    background-image: resource('UI/Images/Game/ico-child');
+}
+
+.breeding-pod-batch-control-row-item__info {
+    width: 50px;
+    -unity-text-align: middle-center;
+}
+
+.wellbeing-batch-control-row-item {
+    padding-left: 8px;
+    align-self: center;
+    width: 300px;
+}
+
+.adulthood-batch-control-row-item__child {
+    width: 26px;
+    height: 26px;
+    background-image: resource('UI/Images/Game/ico-child-grow');
+}
+
+.adulthood-batch-control-row-item__info {
+    width: 50px;
+    -unity-text-align: middle-center;
+}
+
+.productivity-batch-control-row-item__icon {
+    width: 30px;
+    height: 30px;
+}
+
+.productivity-batch-control-row-item__icon--very-low {
+    background-image: resource('UI/Images/Game/productivity-verylow');
+}
+
+.productivity-batch-control-row-item__icon--low {
+    background-image: resource('UI/Images/Game/productivity-low');
+}
+
+.productivity-batch-control-row-item__icon--medium {
+    background-image: resource('UI/Images/Game/productivity-medium');
+}
+
+.productivity-batch-control-row-item__icon--high {
+    background-image: resource('UI/Images/Game/productivity-high');
+}
+
+.productivity-batch-control-row-item__icon--very-high {
+    background-image: resource('UI/Images/Game/productivity-veryhigh');
+}
+
+.attraction-batch-control-row-item__visitors {
+    width: 26px;
+    height: 26px;
+    background-image: resource('UI/Images/Game/ico-visitors');
+}
+
+.attraction-batch-control-row-item__info {
+    width: 50px;
+    -unity-text-align: middle-center;
+}
+
+.slider-toggle-batch-control-row-item {
+    padding-left: 9px;
+    padding-right: 9px;
+}
+
+.slider-toggle-batch-control-row-item .slider-toggle__element--active {
+    --background-image: resource('UI/Images/Backgrounds/bg-button-2');
+}
+
+.slider-toggle-batch-control-row-item .slider-toggle__background {
+    --background-image: resource('UI/Images/Backgrounds/bg-button-2');
+}
+
+.deteriorable-batch-control-row-item__icon {
+    width: 26px;
+    height: 26px;
+    background-image: resource('UI/Images/Game/ico-durability');
+}
+
+.deteriorable-batch-control-row-item__info {
+    width: 50px;
+    -unity-text-align: middle-center;
+}
+
+.migration-batch-control-header-row__label {
+    margin-left: 5px;
+    margin-right: 6px;
+}
+
+.migration-batch-control-header-row__migrate-district-button {
+    background-image: resource('UI/Images/Buttons/empty-batch');
+}
+
+.migration-batch-control-header-row__migrate-district-button:hover:enabled {
+    background-image: resource('UI/Images/Buttons/empty-batch-hover');
+}
+
+.migration-batch-control-header-row__migrate-district-button-left {
+    height: 24px;
+    width: 24px;
+    background-image: resource('UI/Images/Buttons/right-arrow-green');
+}
+
+.migration-batch-control-header-row__migrate-district-button-right {
+    height: 24px;
+    width: 24px;
+    background-image: resource('UI/Images/Buttons/left-arrow-green');
+}
+
+.migration-batch-control-row-group__margin-bottom {
+    margin-bottom: 15px;
+}
+
+.migration-batch-control-row__margin-left {
+    margin-left: 13px;
+}
+
+.population-batch-control-row-item__icon {
+    width: 26px;
+    height: 26px;
+}
+
+.population-batch-control-row-item__info {
+    width: 50px;
+    -unity-text-align: middle-center;
+}
+
+.population-batch-control-row-item__info-margin {
+    margin-right: 133px;
+}
+
+.population-distributor-batch-control-row-item__label {
+    margin-left: 9px;
+    margin-right: 5px;
+}
+
+.population-distributor-batch-control-row-item__value {
+    width: 50px;
+    height: 24px;
+    margin-right: 2px;
+}
+
+.population-distributor-batch-control-row-item__allow-immigration {
+    --click-sound: "UI.Click";
+}
+
+.population-distributor-batch-control-row-item__allow-immigration > .unity-toggle__input:checked > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/Migration/allow-immigration');
+}
+
+.population-distributor-batch-control-row-item__allow-immigration > .unity-toggle__input:checked:hover:enabled > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/Migration/allow-immigration-hover');
+}
+
+.population-distributor-batch-control-row-item__allow-immigration > .unity-toggle__input > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/Migration/disallow-immigration');
+}
+
+.population-distributor-batch-control-row-item__allow-immigration > .unity-toggle__input:hover:enabled > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/Migration/disallow-immigration-hover');
+}
+
+.population-distributor-batch-control-row-item__allow-emigration {
+    --click-sound: "UI.Click";
+}
+
+.population-distributor-batch-control-row-item__allow-emigration > .unity-toggle__input:checked > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/Migration/allow-emigration');
+}
+
+.population-distributor-batch-control-row-item__allow-emigration > .unity-toggle__input:checked:hover:enabled > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/Migration/allow-emigration-hover');
+}
+
+.population-distributor-batch-control-row-item__allow-emigration > .unity-toggle__input > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/Migration/disallow-emigration');
+}
+
+.population-distributor-batch-control-row-item__allow-emigration > .unity-toggle__input:hover:enabled > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/Migration/disallow-emigration-hover');
+}
+
+.population-distributor-batch-control-row-item__needing-icon {
+    width: 20px;
+    height: 20px;
+    margin-left: 2px;
+    background-image: resource('UI/Images/Core/warning_triangle');
+}
+
+.population-data-batch-control-row-item {
+    flex-direction: row;
+    align-items: center;
+    flex-grow: 1;
+    justify-content: flex-end;
+}
+
+.population-data-batch-control-row-item__content {
+    min-width: 230px;
+}
+
+.manual-migration-panel {
+    flex-direction: column-reverse;
+}
+
+.manual-migration-panel__content {
+    flex-direction: row;
+    margin-bottom: 15px;
+}
+
+.manual-migration-panel__left-district-content {
+    width: 50%;
+    margin-right: 3px;
+}
+
+.manual-migration-panel__right-district-content {
+    width: 50%;
+    margin-left: 3px;
+}
+
+.manual-migration-panel__label {
+    margin-top: 10px;
+}
+
+
+.manual-migration-row__highlight--on .manual-migration-row__highlight {
+    opacity: 0.5;
+}
+
+.manual-migration-row__highlight {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    opacity: 0;
+    transform-origin: left;
+    transition-property: opacity;
+    transition-duration: 0.3s;
+    transition-timing-function: ease-in-out;
+}
+
+.manual-migration-row__highlight-margin {
+    margin: -2px -3px;
+}
+
+.manual-migration-header-row__select-button {
+    position: absolute;
+    margin-left: 1px;
+}
+
+.manual-migration-header-row__dropdown {
+    flex-grow: 1;
+    margin: -2px;
+}
+
+.manual-migration-header-row__dropdown .dropdown {
+    flex-grow: 1;
+}
+
+.manual-migration-header-row__dropdown .dropdown__selection {
+    align-self: stretch;
+    --background-image: resource('UI/Images/Backgrounds/bg-pixel-0');
+}
+
+.manual-migration-header-row__dropdown .dropdown__arrow-down {
+    margin-right: 12px;
+}
+
+.manual-migration-header-row__dropdown .dropdown-item__text {
+    max-width: 250px;
+}
+
+.manual-migration-population-row {
+    align-items: center;
+    flex-direction: row;
+    flex-grow: 1;
+    padding: 4px;
+    margin: 0 1px;
+    height: 38px;
+}
+
+.manual-migration-population-row__left-buttons-wrapper {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    flex-grow: 1;
+}
+
+.manual-migration-population-row__right-buttons-wrapper {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    flex-grow: 1;
+}
+
+.manual-migration-population-row__minimum {
+    width: 65px;
+}
+
+.manual-migration-population-row__button {
+    margin: 3px 3px;
+    height: 24px;
+    width: 32px;
+    --click-sound: "UI.Click";
+}
+
+.manual-migration-population-row__left-button {
+    background-image: resource('UI/Images/Buttons/Migration/left-arrow');
+    padding-left: 7px;
+}
+
+.manual-migration-population-row__left-button:hover:enabled {
+    background-image: resource('UI/Images/Buttons/Migration/left-arrow-hover');
+}
+
+.manual-migration-population-row__right-button {
+    background-image: resource('UI/Images/Buttons/Migration/right-arrow');
+    padding-right: 7px;
+}
+
+.manual-migration-population-row__right-button:hover:enabled {
+    background-image: resource('UI/Images/Buttons/Migration/right-arrow-hover');
+}
+
+.manual-migration-population-row__all-button {
+    font-size: 25px;
+}
+
+.manual-migration-population-row__number-button {
+    font-size: 15px;
+}
+
+.district-center-row-item {
+    flex-direction: row;
+    align-items: center;
+}
+
+.dropdown-batch-control-row-item {
+    width: 225px;
+}
+
+.dropdown-batch-control-row-item > Dropdown {
+    flex-grow: 1;
+}
+
+.distribution-settings-row-item {
+    min-height: 42px;
+}
+
+.distribution-settings-group {
+    flex-direction: row;
+    margin-top: 5px;
+    margin-bottom: 8px;
+}
+
+.distribution-settings-group__icon {
+    height: 26px;
+    width: 26px;
+    margin: 8px 4px 0 0;
+}
+
+.distribution-settings-group__items {
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex-grow: 1;
+    justify-content: flex-start;
+    margin-right: -0.66%;
+    padding-left: 1px;
+}
+
+.good-distribution-setting-item {
+    margin-bottom: 7px;
+    margin-left: 1%;
+    width: 32%;
+    height: 42px;
+    flex-direction: row;
+    align-items: center;
+}
+
+.good-distribution-setting-item__import-good-icon-wrapper {
+    width: 26px;
+    height: 26px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.good-distribution-setting-item__import-good-icon-wrapper .import-good-icon {
+    width: 26px;
+    height: 26px;
+}
+
+.import-icon--reset {
+    background-image: resource('UI/Images/Game/reset');
+}
+
+.import-icon--export-none {
+    background-image: resource('UI/Images/Game/export-none');
+}
+
+.import-icon--export-all {
+    background-image: resource('UI/Images/Game/export-all');
+}
+
+.import-icon--disabled {
+    background-image: resource('UI/Images/Game/import-disabled');
+    width: 24px;
+    height: 24px;
+}
+
+.import-icon--auto {
+    background-image: resource('UI/Images/Game/import-auto');
+    width: 24px;
+    height: 24px;
+}
+
+.import-icon--forced {
+    background-image: resource('UI/Images/Game/import-forced');
+    width: 24px;
+    height: 24px;
+}
+
+.slider-toggle__element--active.import-background--disabled {
+    --background-image: resource('UI/Images/Backgrounds/bg-button-6');
+}
+
+.slider-toggle__element--active.import-background--auto {
+    --background-image: resource('UI/Images/Backgrounds/bg-button-5');
+}
+
+.slider-toggle__element--active.import-background--forced {
+    --background-image: resource('UI/Images/Backgrounds/bg-button-1');
+}
+
+.district-distribution-control {
+    flex-grow: 1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.district-distribution-control__group {
+    flex-direction: row;
+    padding: 0 6px;
+}
+
+.district-distribution-control__button {
+    width: 24px;
+    height: 24px;
+    margin: 0 2px;
+    background-image: resource('UI/Images/Buttons/empty-batch');
+    --click-sound: "UI.Click";
+}
+
+.district-distribution-control__button:hover:enabled {
+    background-image: resource('UI/Images/Buttons/empty-batch-hover');
+}
+
+.district-distribution-control__button-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.export-threshold-slider {
+    flex-grow: 1;
+}
+
+.export-threshold-slider > .unity-slider__input > .unity-base-slider__drag-container > .unity-base-slider__dragger {
+    height: 20px;
+    width: 4px;
+    margin-top: -10px;
+    margin-left: -1px;
+    margin-right: -1px;
+    background-image: resource('UI/Images/Game/export-threshold-slider');
+}
+
+.export-threshold-slider--highlighted > .unity-slider__input > .unity-base-slider__drag-container > .unity-base-slider__dragger {
+    background-image: resource('UI/Images/Game/export-threshold-slider-hover');
+}
+
+.export-threshold-slider-tooltip {
+    position: absolute;
+    top: -3px;
+    justify-content: flex-end;
+    align-self: center;
+}
+
+.export-threshold-slider-tooltip__label {
+    position: absolute;
+    padding: 4px 6px;
+    align-self: center;
+    --background-image: resource('UI/Images/Backgrounds/bg-square-3');
+    --background-slice-scale: 0.5;
+    --background-slice: 10;
+}
+
+.fill-rate-progress-bar {
+    padding: 6px 0;
+    margin-right: 3px;
+    margin-left: 1px;
+}
+
+.fill-rate-progress-bar .progress-bar {
+    justify-content: center;
+}
+
+.fill-rate-progress-bar .progress-bar__frame {
+    height: 16px;
+}
+
+.fill-rate-progress-bar .progress-bar__item {
+    height: 16px;
+}

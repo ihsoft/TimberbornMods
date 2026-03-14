@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/BatchControl/BatchControlStyle.uss" />
+    <ui:VisualElement name="CharacterBatchControlRowItem" class="character-batch-control-row-item">
+        <ui:Button name="EntityAvatar" class="character-batch-control-row-item__avatar">
+            <ui:VisualElement name="AvatarOverlay" class="character-batch-control-row-item__avatar-overlay" picking-mode="Ignore" />
+        </ui:Button>
+        <cui:NineSliceButton name="EntityName" class="character-batch-control-row-item__name-wrapper batch-control-box__row-item-group--green">
+            <ui:Label name="EntityNameText" text="Name" class="character-batch-control-row-item__name game-text-normal" />
+            <ui:Image name="EntityNameHint" class="character-batch-control-row-item__editable-hint" />
+        </cui:NineSliceButton>
+    </ui:VisualElement>
+</ui:UXML>

@@ -2,11 +2,11 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Reflection;
 using HarmonyLib;
 using IgorZ.TimberCommons.Settings;
 using IgorZ.TimberDev.UI;
 using Timberborn.Growing;
+using Timberborn.GrowingUI;
 using Timberborn.Localization;
 using UnityEngine.UIElements;
 
@@ -16,12 +16,8 @@ using UnityEngine.UIElements;
 namespace IgorZ.TimberCommons.CommonUIPatches;
 
 /// <summary>Harmony patch to show growth time in days and hours.</summary>
-[HarmonyPatch]
+[HarmonyPatch(typeof(GrowableToolPanelItemFactory), nameof(GrowableToolPanelItemFactory.Create))]
 static class GrowableToolPanelItemFactoryPatch {
-  static MethodBase TargetMethod() {
-    return AccessTools.DeclaredMethod("Timberborn.GrowingUI.GrowableToolPanelItemFactory:Create");
-  }
-
   static void Postfix(GrowableSpec growableSpec, bool __runOriginal, ref VisualElement __result, ILoc ____loc) {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!

@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "AttractionsTab",
+    "GroupId": "SettlementPanel",
+    "LocKey": "KeyBinding.AttractionsTab",
+    "Order": 60,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/f6",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

@@ -1,0 +1,285 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "FluidDump",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "Log",
+        "Amount": 10
+      },
+      {
+        "Id": "Plank",
+        "Amount": 10
+      }
+    ],
+    "ScienceCost": 250,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": false,
+    "DrawRangeBoundsOnIt": false
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "WorkplaceSpec": {
+    "MaxWorkers": 1,
+    "DefaultWorkers": 1,
+    "DefaultWorkerType": "Beaver",
+    "DisallowOtherWorkerTypes": false,
+    "WorkerTypeUnlockCosts": [
+      {
+        "WorkerType": "Bot",
+        "ScienceCost": 250
+      }
+    ]
+  },
+  "EnterableSpec": {
+    "OperatingState": "Finished",
+    "LimitedCapacityFinished": false,
+    "CapacityFinished": 0,
+    "LimitedCapacityUnfinished": false,
+    "CapacityUnfinished": 0
+  },
+  "TemplateSpec": {
+    "TemplateName": "FluidDump.Folktails",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "TransformSlotInitializerSpec": {
+    "Slots": [
+      {
+        "SlotKeyword": "Entrance",
+        "Animation": "Sitting",
+        "Inanimate": false,
+        "RandomizeYRotation": false,
+        "WaterSlot": false
+      }
+    ]
+  },
+  "WorkplaceSlotManagerSpec": {},
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 2,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Air",
+        "Occupations": "Floor, Bottom, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": true,
+      "Coordinates": {
+        "X": 0,
+        "Y": -1,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "BuildingAccessibleSpec": {
+    "LocalAccess": {
+      "X": 0.5,
+      "Y": 0.1,
+      "Z": 0.25
+    },
+    "ForceOneFinalAccess": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Water",
+    "ToolOrder": 20,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": true,
+      "Coordinates": {
+        "X": 0.5,
+        "Y": 0.5,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "WorkshopSpec": {},
+  "ManufactorySpec": {
+    "ProductionRecipeIds": [
+      "FlowingWater",
+      "FlowingBadwater"
+    ]
+  },
+  "BlockObjectNavMeshSettingsSpec": {
+    "NoAutoWalls": false,
+    "GenerateFloorsOnStackable": false,
+    "EdgeGroups": [],
+    "UnblockedCoordinates": []
+  },
+  "WorkshopParticleControllerSpec": {
+    "AttachmentIds": [
+      "Water"
+    ]
+  },
+  "WorkplaceLightingSpec": {},
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.FluidDump.DisplayName",
+    "DescriptionLocKey": "Building.FluidDump.Description",
+    "FlavorDescriptionLocKey": "",
+    "Icon": "Buildings/Water/FluidDump/FluidDumpIcon"
+  },
+  "SimpleManufactoryBehaviorsSpec": {},
+  "WaterOutputSpec": {
+    "WaterCoordinates": {
+      "X": 0,
+      "Y": 1,
+      "Z": 0
+    }
+  },
+  "WorkshopWorkerHiderSpec": {},
+  "ManufactoryWaterProducerSpec": {},
+  "ManufactoryWaterContaminationProducerSpec": {},
+  "WaterOutputParticleSpec": {
+    "AttachmentId": "Water"
+  },
+  "ManufactoryTogglableRecipesSpec": {
+    "LabelLocKey": "Building.FluidDump.ToggleLabel"
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "TemplateAttachmentsSpec": {
+    "Attachments": [
+      {
+        "AttachmentId": "Water",
+        "Prefab": "Buildings/Water/FluidDump/FluidDumpWater",
+        "Parent": "#Finished",
+        "Position": {
+          "X": 0.5,
+          "Y": 0.25,
+          "Z": 1.5
+        },
+        "Rotation": {
+          "X": 90.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": true
+      }
+    ]
+  },
+  "Children": {
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Water/FluidDump/FluidDump.Folktails.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.55,
+              "Z": 1.3
+            },
+            "Size": {
+              "X": 0.2,
+              "Y": 0.4,
+              "Z": 0.7
+            }
+          },
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.3,
+              "Z": 1.44
+            },
+            "Size": {
+              "X": 1.0,
+              "Y": 0.1,
+              "Z": 1.0
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": [
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.48,
+              "Z": 0.5
+            },
+            "Radius": 0.5,
+            "Height": 1.42,
+            "Axis": "Y"
+          }
+        ]
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase1x1#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase1x1/ConstructionBase1x1.blueprint"
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Water/FluidDump/FluidDump.Folktails.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.171439216,
+                  "Z": 0.4981503
+                },
+                "Size": {
+                  "X": 0.8612499,
+                  "Y": 0.342878431,
+                  "Z": 0.9963006
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.2955694,
+                  "Z": 1.44291878
+                },
+                "Size": {
+                  "X": 0.8612499,
+                  "Y": 0.09461802,
+                  "Z": 0.890560031
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    }
+  }
+}

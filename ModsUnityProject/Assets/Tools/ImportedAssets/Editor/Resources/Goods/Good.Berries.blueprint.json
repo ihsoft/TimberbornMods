@@ -1,0 +1,30 @@
+{
+  "GoodSpec": {
+    "Id": "Berries",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [
+      {
+        "NeedId": "Hunger",
+        "Points": 0.3
+      }
+    ],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.4117647,
+      "g": 0.5764706,
+      "b": 1.0,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Food",
+    "GoodOrder": 9000,
+    "Icon": "Sprites/Goods/BerriesIcon",
+    "ForceImport": true,
+    "DisplayNameLocKey": "Good.Berries.DisplayName",
+    "PluralDisplayNameLocKey": "Good.Berries.PluralDisplayName"
+  }
+}

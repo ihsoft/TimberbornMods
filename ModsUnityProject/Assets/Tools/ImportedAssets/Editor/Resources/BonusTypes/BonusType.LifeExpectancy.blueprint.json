@@ -1,0 +1,9 @@
+{
+  "BonusTypeSpec": {
+    "Id": "LifeExpectancy",
+    "MinimumValue": 0.1,
+    "MaximumValue": 1000.0,
+    "Icon": "Sprites/Bonuses/LifeExpectancy",
+    "LocKey": "Bonus.LifeExpectancy"
+  }
+}

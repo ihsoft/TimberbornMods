@@ -40,7 +40,6 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
     }
     DebugEx.Info("Adding weather spec: id={0}, name={1}", weatherId, nameLocKey);
     _weatherSeasons.Add((weatherId, nameLocKey));
-    ;
   }
 
   /// <inheritdoc/>
@@ -122,9 +121,9 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   /// <inheritdoc/>
   public void PostLoad() {
     _eventBus.Register(this);
-    // FIXME: Saved state added in v2.6.1 on 2025-09-03, drop one day.
     if (string.IsNullOrEmpty(_currentSeason)) {
       _currentSeason = GetCurrentSeason();
+      DebugEx.Info("Initialized weather season: {0}", _currentSeason);
     }
   }
 
@@ -138,18 +137,12 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.String,
           Options = GetWeatherSeasonOptions(),
-          // FIXME: Options changed in v2.6.1 on 2025-09-01, drop one day.
-          CompatibilityOptions = new Dictionary<string, string> {
-              { "temperate", TemperateWeatherId },
-              { "badtide", "BadtideWeather" },
-              { "drought", "DroughtWeather" },
-          },
       },
   };
   SignalDef _seasonSignalDef;
 
   ScriptValue SeasonSignal() {
-    return ScriptValue.Of(_currentSeason);
+    return ScriptValue.FromString(_currentSeason);
   }
 
   #endregion
@@ -174,14 +167,15 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   readonly List<Func<string>> _weatherIdProviders = [];
 
   string _currentSeason;
-  readonly ReferenceManager _referenceManager = new();
+  readonly ReferenceManager _referenceManager;
   readonly MonoBehaviour _monoBehaviour;
 
-  WeatherScriptableComponent(EventBus eventBus, WeatherService weatherService,
+  WeatherScriptableComponent(EventBus eventBus, WeatherService weatherService, ReferenceManager referenceManager,
                              HazardousWeatherService hazardousWeatherService, ISingletonLoader singletonLoader,
                              AutomationExtensionsRegistry automationExtensionsRegistry) {
     _eventBus = eventBus;
     _weatherService = weatherService;
+    _referenceManager = referenceManager;
     _hazardousWeatherService = hazardousWeatherService;
     _singletonLoader = singletonLoader;
     _monoBehaviour = new GameObject("WeatherScriptableComponent").AddComponent<SeasonUpdateNotifier>();
@@ -223,7 +217,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
       if (!_weatherSeasonIds.Contains(_currentSeason)) {
         DebugEx.Warning("Unknown weather season ID: {0}. Automation rules won't trigger.", _currentSeason);
       }
-      _referenceManager.ScheduleSignal(SeasonSignalName, ScriptingService, ignoreErrors: true);
+      _referenceManager.ScheduleSignal(SeasonSignalName, ignoreErrors: true);
     }
     _seasonUpdateCoroutine = null;
   }

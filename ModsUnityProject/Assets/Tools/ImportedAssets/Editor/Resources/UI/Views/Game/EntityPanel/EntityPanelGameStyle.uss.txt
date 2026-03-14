@@ -1,0 +1,951 @@
+.attraction-fragment__buttons {
+    margin-top: 4px;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.battery-power__icon {
+    background-image: resource('UI/Images/Game/ico-power');
+    width: 20px;
+    height: 20px;
+    margin-left: 2px;
+}
+
+.battery-charge__slider {
+    margin-top: 10px;
+}
+
+.beaver-buildings-fragment__item {
+    flex-direction: row;
+    --click-sound: "UI.Click";
+    padding: 2px;
+}
+
+.beaver-buildings-fragment__item:hover:enabled {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-4');
+}
+
+.beaver-buildings-fragment__item:disabled {
+    opacity: 1;
+}
+
+.beaver-buildings-fragment__item--bottom {
+    margin-top: 2px;
+}
+
+.beaver-buildings-fragment__icon {
+    min-height: 32px;
+    min-width: 32px;
+    max-height: 32px;
+    max-width: 32px;
+    margin-right: 4px;
+}
+
+.beaver-buildings-fragment__icon--homeless {
+    background-image: resource('UI/Images/Game/homeless');
+}
+
+.beaver-buildings-fragment__icon--jobless {
+    background-image: resource('UI/Images/Game/jobless');
+}
+
+.beaver-buildings-fragment__icon--empty {
+    background-image: resource('UI/Images/Game/beaver-building-bg');
+}
+
+.beaver-buildings-fragment__name {
+    flex-grow: 1;
+    -unity-text-align: middle-left;
+    padding: 4px;
+}
+
+.dwelling-user-fragment__buttons {
+    margin-top: 4px;
+    flex-direction: row;
+    max-height: 225px;
+}
+
+.dweller-view {
+    flex-grow: 1;
+    margin: 1px 6px 1px 2px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 5px 2px 3px;
+}
+
+.dweller-view:disabled {
+    opacity: 1;
+}
+
+.dweller-view__name {
+    flex-shrink: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    -unity-text-align: middle-left;
+    margin-left: 4px;
+}
+
+.dweller-view__subtitle {
+    flex-grow: 1;
+    -unity-text-align: middle-left;
+    margin: 0 4px;
+}
+
+.good-consuming-building-fragment__progress {
+    margin-bottom: 4px;
+}
+
+.inventory-row {
+    flex-direction: row;
+    justify-content: flex-end;
+    flex-grow: 1;
+}
+
+.inventory-row--informational {
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.inventory-row__limit {
+    -unity-text-align: middle-left;
+}
+
+.inventory-row__input {
+    max-width: 40px;
+    min-width: 40px;
+    margin: 0 4px 0 0;
+}
+
+.inventory-row__image {
+    min-width: 24px;
+    min-height: 24px;
+    max-width: 24px;
+    max-height: 24px;
+    margin: 0 4px;
+}
+
+
+.inventory-row-informational__name {
+    -unity-text-align: middle-left;
+    min-width: 150px;
+    max-width: 150px;
+}
+
+
+.inventory-row-informational__amount {
+    -unity-text-align: middle-right;
+    min-width: 40px;
+    max-width: 40px;
+    white-space: nowrap;
+}
+
+.inventory-row-informational__limit {
+    -unity-text-align: middle-left;
+    min-width: 40px;
+    max-width: 40px;
+    white-space: nowrap;
+}
+
+.inventory-row-informational__type {
+    width: 20px;
+    height: 20px;
+    margin-left: 4px;
+    visibility: hidden;
+}
+
+.inventory-row-informational__type--input {
+    background-image: resource('UI/Images/Game/input');
+    visibility: visible;
+}
+
+.inventory-row-informational__type--output {
+    background-image: resource('UI/Images/Game/output');
+    visibility: visible;
+}
+
+.inventory-fragment__rows {
+    max-height: 200px;
+}
+
+.inventory-fragment-header__separator {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.pausable-building-fragment {
+    --click-sound: "UI.Click";
+    top: -7px;
+    position: absolute;
+}
+
+.pausable-building-fragment > .unity-toggle__input:checked > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Game/pause-button-unpaused');
+    width: 84px;
+    height: 40px;
+}
+
+.pausable-building-fragment:hover:enabled > .unity-toggle__input:checked > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Game/pause-button-unpaused-hover');
+}
+
+.pausable-building-fragment > .unity-toggle__input > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Game/pause-button-paused');
+    width: 84px;
+    height: 40px;
+}
+
+.pausable-building-fragment:hover:enabled > .unity-toggle__input > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Game/pause-button-paused-hover');
+}
+
+.floodgate-fragment {
+    flex-grow: 1;
+}
+
+.floodgate-fragment__slider {
+    width: 80%;
+}
+
+.priority-toggle-group__toggles-wrapper {
+    flex-direction: row;
+    align-self: center;
+}
+
+.priority-toggle-group {
+    justify-content: space-between;
+    flex-direction: row;
+    margin-bottom: 6px;
+}
+
+.priority-toggle-group__label {
+    margin-right: 5px;
+    max-width: 180px;
+    flex-grow: 1;
+    -unity-text-align: middle-left;
+}
+
+.status-list-fragment {
+    padding: 6px 8px;
+}
+
+.status-list-element {
+    flex-grow: 1;
+    flex-direction: row;
+    margin: 1px;
+    align-items: center;
+}
+
+.status-list-element__icon {
+    max-width: 34px;
+    max-height: 34px;
+    min-width: 34px;
+    min-height: 34px;
+    margin: 2px 8px 2px 0;
+}
+
+.status-list-element__text {
+    flex-grow: 1;
+    flex-shrink: 1;
+    max-width: 270px;
+    -unity-text-align: middle-left;
+}
+
+.wellbeing-fragment__debug {
+    padding: 4px;
+    margin-left: 2px;
+    margin-right: 2px;
+    margin-top: 4px;
+    width: 64px;
+}
+
+.wellbeing-fragment__summary {
+    --background-slice-scale: 0.5;
+    --background-slice: 10;
+    --background-image: resource('UI/Images/Backgrounds/bg-square-1');
+    padding: 2px 8px 2px 20px;
+    align-self: stretch;
+    margin-bottom: 8px;
+}
+
+.wellbeing-fragment__needs {
+    flex-direction: row;
+    max-height: 250px;
+}
+
+.need-group-view__header {
+    flex-direction: row;
+    height: 20px;
+    background-image: resource('UI/Images/Backgrounds/bg-pixel-1');
+}
+
+.need-group-view__image {
+    width: 16px;
+    height: 16px;
+    margin: 2px;
+}
+
+.need-group-view__items {
+    padding-left: 10px;
+}
+
+.need-group-view__label {
+    padding-left: 4px;
+    flex-grow: 1;
+    -unity-text-align: middle-left;
+}
+
+.need-view {
+    flex-direction: row;
+    align-items: center;
+    margin: 1px 0;
+    padding: 0 4px;
+    height: 20px;
+}
+
+.need-view__label-wrapper {
+    flex-direction: row;
+    width: 160px;
+    align-items: center;
+}
+
+.need-view__control-items {
+    flex-direction: row;
+    -unity-text-align: middle-center;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.need-view__label {
+    flex-shrink: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.need-view__progress-wrapper {
+    width: 100px;
+    height: 50%;
+    background-image: resource('UI/Images/Game/needview-inactive');
+    margin-right: 4px;
+}
+
+.need-view__progress-background {
+    --background-image: resource('UI/Images/Game/needview-background');
+    height: 100%;
+    width: 100%;
+    position: absolute;
+}
+
+.need-view__progress-background.need-view--red {
+    --background-image: resource('UI/Images/Game/needview-background-red');
+}
+
+.need-view__progress {
+    --background-image: resource('UI/Images/Game/needview-progress');
+    height: 100%;
+    width: 100%;
+    position: absolute;
+}
+
+.need-view__progress.need-view--red {
+    --background-image: resource('UI/Images/Game/needview-progress-red');
+}
+
+.need-view__image {
+    width: 16px;
+    height: 16px;
+    margin: 2px;
+}
+
+.need-view__button {
+    width: 16px;
+    height: 16px;
+}
+
+.need-view__button:hover {
+    color: yellow;
+}
+
+.need-view__image--critical {
+    background-image: resource('UI/Images/Game/CriticalNeedState');
+}
+
+.need-view__image--marker {
+    width: 4px;
+    height: 14px;
+    position: absolute;
+    background-image: resource('UI/Images/Game/progress-bar-marker');
+    margin-left: -2px;
+    margin-top: -2px;
+}
+
+.need-view__wellbeing {
+    width: 24px;
+    align-items: center;
+    white-space: nowrap;
+    -unity-text-align: middle-center;
+    --background-slice-scale: 0.5;
+    --background-slice: 10;
+    color: dimgray;
+}
+
+.need-view__wellbeing.need-view--green {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-6');
+    color: rgb(204, 204, 204);
+}
+
+.need-view__wellbeing.need-view--red {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-2');
+    color: rgb(204, 204, 204);
+}
+
+.workplace-fragment {
+    flex-direction: row;
+    align-items: center;
+}
+
+.workplace-fragment__text {
+    margin-right: 8px;
+}
+
+.workplace-fragment__worker-type-toggle-wrapper {
+    width: 72px;
+    margin: 2px 2px 2px 4px;
+}
+
+.workplace-user-fragment {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+.worker-view {
+    width: 49%;
+    flex-direction: row;
+    align-items: center;
+    align-content: flex-start;
+    padding: 2px;
+    margin: 1px;
+}
+
+.worker-view:disabled {
+    opacity: 1;
+}
+
+.worker-view__item {
+    margin: 0 2px;
+}
+
+.worker-view__name {
+    flex-shrink: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    -unity-text-align: middle-left;
+}
+
+.worker-view__vacant-icon {
+    position: absolute;
+    right: 7px;
+    width: 20px;
+    height: 20px;
+    background-image: resource('UI/Images/Core/warning_triangle');
+}
+
+.production-progress-fragment__progress {
+    -unity-text-align: middle-center;
+    width: 42px;
+    height: 24px;
+    font-size: 15px;
+    margin: 0 2px;
+    padding: 0 2px;
+    white-space: nowrap;
+}
+
+.production-progress-fragment__progress-text {
+    -unity-text-align: middle-center;
+    height: 14px;
+    margin-bottom: 6px;
+    white-space: nowrap;
+    max-width: 42px;
+}
+
+.production-progress-fragment__placeholder-text {
+    margin: 0 8px;
+    height: 26px;
+    -unity-text-align: middle-center;
+}
+
+.production-progress-fragment .production-item__items {
+    width: 95px;
+}
+
+.production-progress-fragment__placeholder {
+    display: none;
+}
+
+.production-progress-fragment__no-recipe .production-progress-fragment__placeholder {
+    display: flex;
+}
+
+.production-progress-fragment__item {
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    padding-bottom: 4px;
+    margin-top: -5px;
+}
+
+.production-progress-fragment__placeholder {
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+}
+
+.production-progress-fragment__progress-wrapper {
+    top: 10px;
+}
+
+.workplace-priority-fragment {
+    flex-direction: row;
+}
+
+.workplace-priority-fragment__title {
+    margin-right: 4px;
+    -unity-text-align: middle-left;
+}
+
+.resource-yield--inactive .resource-yield__icon {
+    opacity: 0.5;
+}
+
+.resource-yield--inactive .resource-yield__text {
+    opacity: 0.5;
+}
+
+.resource-yield--inactive .resource-yield__arrow {
+    opacity: 0.5;
+}
+
+.workplace-worker-type-fragment {
+    flex-direction: row;
+    align-items: center;
+}
+
+.workplace-worker-type-fragment__title {
+    -unity-text-align: middle-left;
+    max-width: 220px;
+    margin-right: 10px;
+}
+
+.district-center-fragment__worker-type {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.district-center-fragment__worker-type__title {
+    margin-right: 10px;
+}
+
+.district-center-fragment__migration {
+    margin: 5px 0;
+    min-width: 100%;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.district-center-fragment__worker-type__title {
+    -unity-text-align: middle-left;
+    max-width: 220px;
+}
+
+.district-center-fragment__migration-left-button {
+    flex-direction: row;
+    justify-content: center;
+}
+
+.district-center-fragment__migration-left-button-text {
+    margin-left: 5px;
+    flex-grow: 1;
+}
+
+.district-center-fragment__migration-left-button-icon {
+    margin-left: 3px;
+    height: 24px;
+    width: 24px;
+    background-image: resource('UI/Images/Buttons/right-arrow-red');
+}
+
+.district-center-fragment__migration-right-button-icon {
+    height: 24px;
+    width: 24px;
+    background-image: resource('UI/Images/Buttons/left-arrow-red');
+}
+
+.district-center-fragment__migration-right-button {
+    margin-left: 4px;
+    padding: 4px;
+    --click-sound: "UI.Click";
+}
+
+
+.construction-site-fragment__progress-bar {
+    margin-bottom: 4px;
+}
+
+.attraction-load-rate-fragment {
+    flex-direction: row;
+}
+
+.priority-action-fragment {
+    flex-direction: row;
+    align-items: center;
+}
+
+.priority-action-fragment__title {
+    -unity-text-align: middle-left;
+    max-width: 220px;
+    margin-right: 10px;
+}
+
+.stockpile-inventory-fragment__wrapper {
+    justify-content: center;
+}
+
+.stockpile-inventory-fragment__wrapper .stockpile-good-selection-box {
+    right: 328px;
+}
+
+.stockpile-inventory-fragment__top-panel {
+    flex-grow: 1;
+    align-items: flex-start;
+    justify-content: center;
+    flex-direction: row;
+}
+
+.stockpile-inventory-fragment__right-panel {
+    flex-grow: 1;
+}
+
+.stockpile-inventory-fragment__good-selection-button {
+    margin-right: 10px;
+}
+
+.stockpile-inventory-fragment__good-selection-button.highlight {
+    --background-image: resource('UI/Images/Buttons/button-game-highlight');
+}
+
+.stockpile-inventory-fragment__good-selection {
+    background-image: resource('UI/Images/Game/question-mark');
+    width: 40px;
+    height: 40px;
+    margin: 5px;
+}
+
+.stockpile-inventory-fragment__unselect-good {
+    position: absolute;
+    left: 32px;
+    top: -6px;
+    width: 24px;
+    height: 24px;
+    --click-sound: "UI.Click";
+    background-image: resource('UI/Images/Backgrounds/bg-circle-small-1');
+}
+
+.stockpile-inventory-fragment__unselect-good:enabled:hover {
+    background-image: resource('UI/Images/Backgrounds/bg-circle-small-2');
+}
+
+.stockpile-inventory-fragment__unselect-good-icon {
+    width: 100%;
+    height: 100%;
+    background-image: resource('UI/Images/Game/ico-cancel');
+}
+
+.stockpile-inventory-fragment__good-selection.icon--hidden {
+    background-image: none;
+}
+
+.stockpile-inventory-fragment__good-selection-text {
+    -unity-text-align: middle-center;
+    margin-bottom: 4px;
+}
+
+.stockpile-inventory-fragment__output-good {
+    margin-top: 4px;
+}
+
+.stockpile-good-column-visualizer-debug-fragment {
+    flex-direction: row;
+}
+
+.stockpile-good-column-visualizer-debug-fragment__item {
+    width: 100px;
+    padding: 0 4px;
+}
+
+.demolishable__button-wrapper {
+    align-items: center;
+    padding: 7px 0;
+}
+
+.demolishable__science-reward-wrapper {
+    height: 20px;
+    margin-left: 6px;
+    margin-bottom: 5px;
+}
+
+.stockpile-priority-fragment {
+    flex-direction: row;
+    align-items: center;
+}
+
+.stockpile-priority-fragment__toggle {
+    flex-shrink: 0;
+    margin-right: 8px;
+}
+
+.stockpile-priority-fragment__description {
+    flex-shrink: 1;
+}
+
+.import-goods-group {
+    flex-direction: row;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    justify-content: space-between;
+}
+
+.import-goods-group__icon {
+    flex-shrink: 0;
+    height: 26px;
+    width: 26px;
+}
+
+.import-goods-group__items {
+    flex-shrink: 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    width: 148px;
+}
+
+.district-crossing-fragment__content {
+    margin: 1px;
+    padding: 12px 6px;
+}
+
+.district-crossing-fragment__import-goods {
+    margin-top: 7px;
+    flex-wrap: nowrap;
+}
+
+.district-crossing-fragment__button {
+    margin-top: 8px;
+    margin-bottom: 0;
+}
+
+.manufactory-togglable-recipes-fragment {
+    flex-direction: row;
+    align-items: center;
+}
+
+.manufactory-togglable-recipes-fragment__title {
+    -unity-text-align: middle-left;
+    max-width: 220px;
+    margin-right: 10px;
+}
+
+.water-mover-fragment {
+    flex-direction: row;
+    align-items: center;
+}
+
+.water-mover-fragment__title {
+    -unity-text-align: middle-left;
+    max-width: 220px;
+    margin-right: 10px;
+}
+
+.water-mover-toggle__icon--unfiltered {
+    background-image: resource('UI/Images/Game/unfiltered-fluid');
+}
+
+.water-source-regulator-fragment {
+    flex-direction: row;
+    align-items: center;
+}
+
+.water-source-regulator-fragment__title {
+    -unity-text-align: middle-left;
+    max-width: 220px;
+    margin-right: 10px;
+}
+
+.water-input-depth-fragment {
+    flex-direction: row;
+    align-items: center;
+}
+
+.water-input-depth-fragment__text-depth {
+    margin-right: 8px;
+}
+
+.water-input-depth-fragment__text-limit {
+    margin-left: 4px;
+    margin-right: 8px;
+}
+
+.water-input-depth-fragment__limit {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.decal-supplier-fragment__scroll-view-container {
+    max-height: 152px;
+}
+
+.decal-supplier-fragment__scroll-view {
+    flex-direction: column;
+    margin-top: 2px;
+    min-height: 68px;
+}
+
+.decal-supplier-fragment__button-container {
+    align-content: flex-start;
+    align-items: flex-start;
+    align-self: stretch;
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+}
+
+.decal-button {
+    width: 64px;
+    height: 64px;
+    margin-top: 1px;
+    margin-bottom: 2px;
+    margin-right: 3px;
+    align-items: center;
+    justify-content: center;
+    background-image: resource('UI/Images/Game/decal');
+}
+
+.decal-button:hover {
+    background-image: resource('UI/Images/Game/decal-hover');
+}
+
+.decal-button__texture {
+    align-self: center;
+    width: 86%;
+    height: 86%;
+    --click-sound: "UI.Click";
+}
+
+.decal-button__frame {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: resource('UI/Images/Game/decal-frame');
+}
+
+.decal-button__frame--fade {
+    -unity-background-image-tint-color: rgba(190, 190, 190, 0.75);
+}
+
+.decal-supplier-fragment__user-decal-buttons {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 28px;
+}
+
+.decal-supplier-fragment__user-decal-button {
+    min-width: 60px;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+.decal-supplier-fragment__user-patterns-label {
+    align-self: center;
+    margin-top: -3px;
+    margin-bottom: 5px;
+}
+
+.sluice-fragment__mode-wrapper {
+    flex-direction: row;
+}
+
+.sluice-fragment__title {
+    -unity-text-align: middle-left;
+    max-width: 220px;
+    margin-left: 10px;
+}
+
+.sluice-toggle__icon--auto {
+    background-image: resource('UI/Images/Game/sluice-auto');
+}
+
+.sluice-toggle__icon--open {
+    background-image: resource('UI/Images/Game/sluice-open');
+}
+
+.sluice-toggle__icon--close {
+    background-image: resource('UI/Images/Game/sluice-close');
+}
+
+.zipline-tower-fragment__buttons {
+    margin-top: 4px;
+}
+
+.zipline-connection-button {
+    flex-direction: row;
+    align-items: center;
+    flex-grow: 1;
+    margin: 1px 6px 1px 2px;
+    padding: 2px 10px 2px 2px;
+    --click-sound: "UI.Click";
+}
+
+.zipline-connection-button__icon {
+    width: 42px;
+    height: 42px;
+}
+
+.zipline-connection-button__icon.icon--plus {
+    background-image: resource('UI/Images/Buttons/plus-bare');
+    width: 28px;
+    height: 28px;
+    margin: 7px;
+}
+
+.zipline-connection-button__name {
+    flex-grow: 1;
+    flex-shrink: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    -unity-text-align: middle-left;
+    margin-left: 4px;
+}
+
+.zipline-connection-button__remove-connection-icon {
+    width: 100%;
+    height: 100%;
+    background-image: resource('UI/Images/Game/ico-trash');
+}
+
+.timed-activator-progress-bar {
+    width: 100%;
+    height: 28px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}

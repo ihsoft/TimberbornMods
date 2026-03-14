@@ -1,0 +1,6 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
+    <ui:VisualElement name="TransputSpecsProviderSpec">
+        <uie:PropertyField name="TransputSpecs" binding-path="_transputSpecs" />
+        <ui:Button name="AutoGenerate" text="Auto generate transputs" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,23 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="Box" src="/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Modding/ModdingStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Options/OptionsStyle.uss" />
+    <ui:VisualElement name="CreateModBox" class="content-row-centered" picking-mode="Ignore">
+        <ui:Instance template="Box" class="create-mod-box">
+            <ui:AttributeOverrides element-name="Header" text-loc-key="Modding.CreateNewMod" />
+            <ui:VisualElement class="create-mod-box__content">
+                <Timberborn.DropdownSystem.Dropdown name="TemplateDropdown" label-loc-key="Modding.TemplateType" class="settings-element settings-dropdown create-mod-box__template-dropdown" />
+                <ui:VisualElement name="ModNameWrapper" class="create-mod-box__input-wrapper">
+                    <cui:LocalizableLabel text="Mod name" text-loc-key="Modding.NewModName" class="settings-text create-mod-box__input-label" />
+                    <cui:NineSliceTextField name="ModNameField" class="text-field create-mod-box__input-field" />
+                </ui:VisualElement>
+                <ui:VisualElement name="LanguageCodeWrapper" class="create-mod-box__input-wrapper">
+                    <cui:LocalizableLabel text="Language code" text-loc-key="Modding.NewModLanguage" class="settings-text create-mod-box__input-label" />
+                    <cui:NineSliceTextField name="LanguageCodeField" value="enGB" class="text-field create-mod-box__input-field" />
+                </ui:VisualElement>
+                <cui:LocalizableButton name="CreateModButton" text="Create mod" text-loc-key="Modding.CreateMod" class="mod-manger-box__confirm-button menu-button" />
+            </ui:VisualElement>
+        </ui:Instance>
+    </ui:VisualElement>
+</ui:UXML>

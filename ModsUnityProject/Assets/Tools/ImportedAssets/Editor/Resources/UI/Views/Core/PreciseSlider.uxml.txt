@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <ui:VisualElement name="PreciseSlider" class="precise-slider">
+        <ui:Slider name="Slider" class="precise-slider__slider slider" />
+        <ui:VisualElement name="Buttons" class="precise-slider__buttons">
+            <ui:Button name="DecreaseButton" class="button-square button-minus button-square--small" />
+            <ui:Button name="IncreaseButton" class="button-square button-plus button-square--small" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

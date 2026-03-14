@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <cui:NineSliceVisualElement name="IntegerSlider" class="integer-slider">
+        <ui:Slider name="Slider" high-value="1" class="slider integer-slider__slider" />
+        <cui:NineSliceIntegerField name="Value" text="100" class="game-text-normal text-field integer-slider__integer-field" />
+        <ui:Label name="Separator" text="/" class="game-text-normal text--yellow game-text-separator" />
+        <ui:Label name="MaxValue" text="10000" class="game-text-normal" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

@@ -1,0 +1,26 @@
+{
+  "RecipeSpec": {
+    "Id": "FermentedMushroom",
+    "BackwardCompatibleIds": [],
+    "DisplayLocKey": "Good.FermentedMushroom.PluralDisplayName",
+    "CycleDurationInHours": 2.0,
+    "Ingredients": [
+      {
+        "Id": "Mushroom",
+        "Amount": 4
+      }
+    ],
+    "Products": [
+      {
+        "Id": "FermentedMushroom",
+        "Amount": 16
+      }
+    ],
+    "ProducedSciencePoints": 0,
+    "Fuel": "",
+    "CyclesFuelLasts": 0,
+    "FuelCapacity": 0,
+    "CyclesCapacity": 4,
+    "Icon": "Sprites/Goods/FermentedMushroomIcon"
+  }
+}

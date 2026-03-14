@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="Timberborn.CoreUI file:/C:/Timberborn/timberborn/UIElementsSchema/Timberborn.CoreUI.xsd">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <ui:Tab label="Json">
+        <ui:Label name="Source" class="game-text-big" />
+        <cui:NineSliceVisualElement name="Wrapper" class="entity-debug-window__wrapper">
+            <ui:TextField name="Json" multiline="true" readonly="true" vertical-scroller-visibility="AlwaysVisible" class="entity-debug-window__json scroll--green-decorated text-field text-field--large" />
+        </cui:NineSliceVisualElement>
+    </ui:Tab>
+</ui:UXML>
+

@@ -1,0 +1,12 @@
+{
+  "RectangleBoundsDrawerFactorySpec": {
+    "BlockSideMesh0010": "Markers/BlockSides/BlockSide0010",
+    "BlockSideMesh0011": "Markers/BlockSides/BlockSide0011",
+    "BlockSideMesh0111": "Markers/BlockSides/BlockSide0111",
+    "BlockSideMesh1010": "Markers/BlockSides/BlockSide1010",
+    "BlockSideMesh1111": "Markers/BlockSides/BlockSide1111",
+    "BlockSideMaterial": "Markers/BlockSides/BlockSide",
+    "BlockBottomMesh": "Markers/TileMarker",
+    "BlockBottomMaterial": "Markers/TileMarker"
+  }
+}

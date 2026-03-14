@@ -1,0 +1,9 @@
+{
+  "BlockObjectToolGroupSpec": {
+    "Id": "Wood",
+    "Order": 60,
+    "NameLocKey": "ToolGroups.Wood",
+    "Icon": "Sprites/BottomBar/BuildingGroups/Wood",
+    "FallbackGroup": false
+  }
+}

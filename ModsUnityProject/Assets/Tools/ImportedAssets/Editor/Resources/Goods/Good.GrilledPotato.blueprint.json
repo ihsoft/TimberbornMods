@@ -1,0 +1,34 @@
+{
+  "GoodSpec": {
+    "Id": "GrilledPotato",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [
+      {
+        "NeedId": "Hunger",
+        "Points": 0.3
+      },
+      {
+        "NeedId": "GrilledPotatoes",
+        "Points": 0.2
+      }
+    ],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.7411765,
+      "g": 0.494117647,
+      "b": 0.145098045,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Food",
+    "GoodOrder": 9030,
+    "Icon": "Sprites/Goods/GrilledPotatoIcon",
+    "ForceImport": true,
+    "DisplayNameLocKey": "Good.GrilledPotato.DisplayName",
+    "PluralDisplayNameLocKey": "Good.GrilledPotato.PluralDisplayName"
+  }
+}

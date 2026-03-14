@@ -1,0 +1,26 @@
+{
+  "RecipeSpec": {
+    "Id": "GrilledPotato",
+    "BackwardCompatibleIds": [],
+    "DisplayLocKey": "Good.GrilledPotato.PluralDisplayName",
+    "CycleDurationInHours": 0.52,
+    "Ingredients": [
+      {
+        "Id": "Potato",
+        "Amount": 1
+      }
+    ],
+    "Products": [
+      {
+        "Id": "GrilledPotato",
+        "Amount": 4
+      }
+    ],
+    "ProducedSciencePoints": 0,
+    "Fuel": "Log",
+    "CyclesFuelLasts": 10,
+    "FuelCapacity": 5,
+    "CyclesCapacity": 30,
+    "Icon": "Sprites/Goods/GrilledPotatoIcon"
+  }
+}

@@ -1,0 +1,155 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "Dynamite",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "Explosives",
+        "Amount": 1
+      },
+      {
+        "Id": "Extract",
+        "Amount": 1
+      }
+    ],
+    "ScienceCost": 900,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": true,
+    "DrawRangeBoundsOnIt": true
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "#Underground",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 2
+  },
+  "TemplateSpec": {
+    "TemplateName": "DoubleDynamite.Folktails",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "DynamiteSpec": {
+    "Depth": 2,
+    "ExplosionPrefabPath": "Buildings/Landscaping/DoubleDynamite/DoubleDynamiteExplosion"
+  },
+  "BlockObjectNavMeshSettingsSpec": {
+    "NoAutoWalls": true,
+    "GenerateFloorsOnStackable": false,
+    "EdgeGroups": [],
+    "UnblockedCoordinates": []
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Landscaping",
+    "ToolOrder": 81,
+    "ToolShape": "Square",
+    "Layout": "Rectangle",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.DoubleDynamite.DisplayName",
+    "DescriptionLocKey": "Building.Dynamite.Description",
+    "FlavorDescriptionLocKey": "",
+    "Icon": "Buildings/Landscaping/DoubleDynamite/DoubleDynamiteIcon"
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "Children": {
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Landscaping/DoubleDynamite/DoubleDynamite.Folktails.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [],
+        "SphereColliders": [
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.07,
+              "Z": 0.5
+            },
+            "Radius": 0.32
+          }
+        ],
+        "CapsuleColliders": []
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase1x1Dynamite#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase1x1Dynamite/ConstructionBase1x1Dynamite.blueprint",
+          "Modification": {
+            "TimbermeshSpec": {
+              "Model": "Buildings/Landscaping/DoubleDynamite/DoubleDynamite.ConstructionSite.Model"
+            }
+          }
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Landscaping/DoubleDynamite/DoubleDynamite.Folktails.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [],
+            "SphereColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.07,
+                  "Z": 0.5
+                },
+                "Radius": 0.32
+              }
+            ],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    },
+    "#Underground": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Landscaping/DoubleDynamite/DoubleDynamite.Underground"
+      }
+    }
+  }
+}

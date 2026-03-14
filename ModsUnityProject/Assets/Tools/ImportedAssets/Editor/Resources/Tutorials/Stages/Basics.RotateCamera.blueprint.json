@@ -1,0 +1,20 @@
+{
+  "TutorialStageSpec": {
+    "Id": "Basics.RotateCamera",
+    "IntroLocKey": "Tutorial.Basics.RotateCamera"
+  },
+  "Children": {
+    "Step1": {
+      "CameraRotationStepSpec": {
+        "Direction": "Left",
+        "Angle": 30.0
+      }
+    },
+    "Step2": {
+      "CameraRotationStepSpec": {
+        "Direction": "Right",
+        "Angle": 30.0
+      }
+    }
+  }
+}

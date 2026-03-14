@@ -1,0 +1,10 @@
+{
+  "KeyBindingSpec": {
+    "Id": "DetonateUnstableCore",
+    "GroupId": "Dev",
+    "LocKey": "",
+    "Order": 240,
+    "AllowOtherModifiers": true,
+    "DevModeOnly": true
+  }
+}

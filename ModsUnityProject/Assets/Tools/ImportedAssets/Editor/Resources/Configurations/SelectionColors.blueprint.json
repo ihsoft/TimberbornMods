@@ -1,0 +1,16 @@
+{
+  "SelectionColorsSpec": {
+    "EntitySelection": {
+      "r": 0.06127626,
+      "g": 0.4811321,
+      "b": 0.3761681,
+      "a": 1.0
+    },
+    "SelectionToolHighlight": {
+      "r": 0.55,
+      "g": 0.03,
+      "b": 0.05,
+      "a": 1.0
+    }
+  }
+}

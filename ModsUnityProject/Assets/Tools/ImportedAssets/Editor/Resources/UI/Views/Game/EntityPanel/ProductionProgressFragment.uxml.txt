@@ -1,0 +1,25 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <cui:NineSliceVisualElement name="ProductionProgressFragment" class="entity-sub-panel bg-sub-box--green production-progress-fragment">
+        <ui:VisualElement name="ProductionItem" class="production-progress-fragment__item">
+            <ui:VisualElement name="InputWrapper" class="content-centered" />
+            <ui:VisualElement name="InputPlaceholder" class="production-progress-fragment__placeholder">
+                <ui:Label text="?" class="entity-panel__text production-progress-fragment__placeholder-text" />
+                <ui:VisualElement class="production-item__arrow" />
+            </ui:VisualElement>
+            <ui:VisualElement class="production-progress-fragment__progress-wrapper">
+                <cui:NineSliceLabel name="ProgressText" class="production-progress-fragment__progress entity-panel__text bg-box--green" />
+                <ui:Label name="CraftingTime" class="entity-panel__sub-text production-progress-fragment__progress-text" text="180h" />
+            </ui:VisualElement>
+            <ui:VisualElement name="OutputPlaceholder" class="production-progress-fragment__placeholder">
+                <ui:VisualElement class="production-item__arrow" />
+                <ui:Label text="?" class="entity-panel__text production-progress-fragment__placeholder-text" />
+            </ui:VisualElement>
+            <ui:VisualElement name="OutputWrapper" class="content-centered" />
+        </ui:VisualElement>
+        <ui:Label name="FuelRemaining" class="entity-panel__text text--centered" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

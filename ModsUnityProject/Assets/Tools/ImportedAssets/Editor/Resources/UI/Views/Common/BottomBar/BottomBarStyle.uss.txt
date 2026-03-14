@@ -1,0 +1,211 @@
+.bottom-bar-panel__section {
+    margin: 0 4px;
+    flex-direction: row;
+    align-items: flex-end;
+}
+
+.bottom-bar-panel__main-section-wrapper {
+    padding: 4px 0;
+    background-image: resource('UI/Images/BottomBar/bar-bg');
+    flex-direction: row;
+    justify-content: center;
+    align-self: center;
+}
+
+.bottom-bar-panel__sub-section-wrapper {
+    flex-direction: row;
+    justify-content: center;
+}
+
+.bottom-bar-button {
+    min-width: 54px;
+    min-height: 54px;
+    max-width: 54px;
+    max-height: 54px;
+    padding: 2px;
+}
+
+.bottom-bar-button--hex {
+    min-width: 62px;
+    min-height: 54px;
+    max-width: 62px;
+    max-height: 54px;
+    padding: 2px;
+}
+
+.bottom-bar-button--clickable {
+    --click-sound: "UI.Click";
+}
+
+.tool-group {
+    flex-grow: 0;
+    flex-shrink: 1;
+}
+
+.bottom-bar-button--red > .bottom-bar-button--main {
+    background-image: resource('UI/Images/BottomBar/button-bg-01');
+}
+
+.bottom-bar-button--blue > .bottom-bar-button--main {
+    background-image: resource('UI/Images/BottomBar/button-bg-02');
+}
+
+.bottom-bar-button--green > .bottom-bar-button--main {
+    background-image: resource('UI/Images/BottomBar/button-bg-03');
+}
+
+.bottom-bar-button__icon {
+    min-width: 50px;
+    min-height: 50px;
+    max-width: 50px;
+    max-height: 50px;
+    align-self: center;
+}
+
+.bottom-bar-button__icon--hex {
+    min-width: 58px;
+    min-height: 50px;
+    max-width: 58px;
+    max-height: 50px;
+    align-self: center;
+}
+
+.bottom-bar-button__button {
+    --click-sound: "UI.Click";
+}
+
+.tool-group__tooltip {
+    padding: 2px 6px;
+    white-space: nowrap;
+}
+
+.tool-group__tooltip-wrapper {
+    top: -25px;
+    position: absolute;
+    align-self: center;
+    align-items: center;
+}
+
+.bottom-bar-button__inner-item {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+}
+
+.bottom-bar-button__inner-item--hex {
+    position: absolute;
+    width: 58px;
+    height: 50px;
+}
+
+.tool-group__buttons {
+    flex-direction: row;
+    background-image: resource('UI/Images/BottomBar/bar-bg');
+    padding: 2px;
+}
+
+.bottom-bar-button__frame {
+    background-image: resource('UI/Images/BottomBar/button-frame-01');
+}
+
+.bottom-bar-button__frame--hex {
+    background-image: resource('UI/Images/BottomBar/button-frame-hex-01');
+}
+
+.bottom-bar-button__background {
+    background-image: resource('UI/Images/BottomBar/subbutton-bg-01');
+}
+
+.bottom-bar-button__background--hex {
+    background-image: resource('UI/Images/BottomBar/subbutton-bg-hex-01');
+}
+
+.bottom-bar-button__background > .bottom-bar-button__frame {
+    background-image: resource('UI/Images/BottomBar/button-frame-01');
+}
+
+.bottom-bar-button--clickable:hover:enabled .bottom-bar-button__frame {
+    background-image: resource('UI/Images/BottomBar/button-frame-04');
+}
+
+.button--active:hover:enabled > .bottom-bar-button__background > .bottom-bar-button__frame {
+    background-image: resource('UI/Images/BottomBar/button-frame-03');
+}
+
+.bottom-bar-button--clickable:hover:enabled .bottom-bar-button__frame--hex {
+    background-image: resource('UI/Images/BottomBar/button-frame-hex-04');
+}
+
+.button--active:hover:enabled > .bottom-bar-button__background--hex > .bottom-bar-button__frame--hex {
+    background-image: resource('UI/Images/BottomBar/button-frame-hex-03');
+}
+
+.button--active > .bottom-bar-button__background {
+    background-image: resource('UI/Images/BottomBar/subbutton-bg-02');
+}
+
+.button--active > .bottom-bar-button__background--hex {
+    background-image: resource('UI/Images/BottomBar/subbutton-bg-hex-02');
+}
+
+.button--active > .bottom-bar-button__background > .bottom-bar-button__frame {
+    background-image: resource('UI/Images/BottomBar/button-frame-03');
+    width: 54px;
+    height: 54px;
+    left: -2px;
+    top: -2px;
+}
+
+.button--active > .bottom-bar-button__background--hex > .bottom-bar-button__frame--hex {
+    background-image: resource('UI/Images/BottomBar/button-frame-hex-03');
+    width: 62px;
+    height: 54px;
+    left: -2px;
+    top: -2px;
+}
+
+.button--active:hover:enabled > .bottom-bar-button--main > .bottom-bar-button__icon > .bottom-bar-button__frame {
+    background-image: resource('UI/Images/BottomBar/button-frame-02');
+}
+
+.button--active > .bottom-bar-button--main > .bottom-bar-button__icon > .bottom-bar-button__frame {
+    background-image: resource('UI/Images/BottomBar/button-frame-02');
+}
+
+
+.bottom-bar-button__lock-icon {
+    display: none;
+    background-image: resource('UI/Images/BottomBar/lock-toolmenu');
+}
+
+.bottom-bar-button__lock-icon--hex {
+    left: -2px;
+}
+
+.bottom-bar-button.button--locked .bottom-bar-button__lock-icon {
+    display: flex;
+}
+
+.bottom-bar-button--hex.button--locked .bottom-bar-button__lock-icon {
+    display: flex;
+}
+
+.bottom-bar-button__bottom-text {
+    position: absolute;
+    width: 50px;
+    bottom: 4px;
+    font-size: 8px;
+    color: rgb(176, 150, 98);
+}
+
+.tutorial-tool--highlighted .bottom-bar-button__frame {
+    background-image: resource('UI/Images/BottomBar/button-frame-02');
+}
+
+.tutorial-tool--highlighted .bottom-bar-button--main {
+    -unity-background-image-tint-color: yellow;
+}
+
+.tutorial-tool--highlighted .bottom-bar-button__background {
+    background-image: resource('UI/Images/BottomBar/subbutton-bg-03');
+}

@@ -1,7 +1,7 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tb="Timberborn.CoreUI" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle" />
-    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle" />
-    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/AutomationCore.uss?fileID=7433441132597879392&amp;guid=3ff053cc6d97b6c4eb9edeaf49c3c4f7&amp;type=3#AutomationCore" />
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle"/>
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle"/>
+    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/AutomationCoreStyle.uss?fileID=7433441132597879392&amp;guid=3ff053cc6d97b6c4eb9edeaf49c3c4f7&amp;type=3#AutomationCoreStyle"/>
     <engine:VisualElement style="flex-direction: row; align-content: center; background-color: rgba(255, 255, 255, 0.05); margin-bottom: 1px; margin-top: 1px; margin-right: 2px; margin-left: 2px;">
         <engine:VisualElement name="Container" style="flex-grow: 1; flex-direction: row; flex-wrap: wrap;">
             <engine:Label text="SOURCE signal" name="Source" class="game-text-small automation-green-text" style="margin-right: 2px;" />

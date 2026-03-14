@@ -1,0 +1,261 @@
+{
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 2
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "TemplateSpec": {
+    "TemplateName": "Corn",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "NaturalResourceSpec": {
+    "Order": 5
+  },
+  "CropSpec": {},
+  "GrowableSpec": {
+    "GrowthTimeInDays": 10.0
+  },
+  "BasicSelectionSoundSpec": {
+    "SoundName": "Bush",
+    "AlternativeSoundName": ""
+  },
+  "PlantableSpec": {
+    "ResourceGroup": "Farmhouse",
+    "PlantTimeInHours": 0.2
+  },
+  "DemolishableSpec": {
+    "DemolishTimeInHours": 0.5,
+    "ShowDemolishButtonInEntityPanel": false
+  },
+  "CuttableSpec": {
+    "RemoveOnCut": true,
+    "LeftoverModelName": "",
+    "Yielder": {
+      "YielderComponentName": "Cuttable",
+      "Yield": {
+        "Id": "Corn",
+        "Amount": 2
+      },
+      "RemovalTimeInHours": 1.2,
+      "ResourceGroup": "Farmhouse"
+    }
+  },
+  "PlantablePreviewModelSpec": {
+    "Model": "NaturalResources/Crops/Corn/CornMature"
+  },
+  "WateredNaturalResourceSpec": {
+    "DaysToDieDry": 2.0
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "NaturalResource.Corn.DisplayName",
+    "DescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "NaturalResource.Corn.FlavorDescription",
+    "Icon": "NaturalResources/Crops/Corn/CornIcon"
+  },
+  "NaturalResourceModelRandomizerSpec": {
+    "ConstrainProportion": false,
+    "MinHeightScaleFactor": 1.0,
+    "MaxHeightScaleFactor": 1.0,
+    "MinWidthScaleFactor": 1.0,
+    "MaxWidthScaleFactor": 1.0,
+    "RandomizedRotation": "BetweenMinAndMax",
+    "MinRotation": 0.0,
+    "MaxRotation": 360.0
+  },
+  "FloodableNaturalResourceSpec": {
+    "MinWaterHeight": 0,
+    "MaxWaterHeight": 0,
+    "DaysToDie": 2.0
+  },
+  "CuttableYieldGoodIdProviderSpec": {},
+  "ContaminatedNaturalResourceSpec": {},
+  "BlockObjectModelSpec": {
+    "FullModelName": "#Models",
+    "UncoveredModelName": "",
+    "UndergroundModelName": "",
+    "UndergroundModelDepth": 0
+  },
+  "Children": {
+    "#Models": {
+      "Children": {
+        "Seedling": {
+          "Children": {
+            "#Alive": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Crops/Corn/CornSeedling"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.268513232,
+                      "Z": 0.5
+                    },
+                    "Size": {
+                      "X": 0.346020579,
+                      "Y": 0.537026465,
+                      "Z": 0.378777444
+                    }
+                  }
+                ],
+                "SphereColliders": [],
+                "CapsuleColliders": []
+              }
+            },
+            "#Dead": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Crops/Corn/CornSeedlingDead"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.268513232,
+                      "Z": 0.5
+                    },
+                    "Size": {
+                      "X": 0.346020579,
+                      "Y": 0.537026465,
+                      "Z": 0.378777444
+                    }
+                  }
+                ],
+                "SphereColliders": [],
+                "CapsuleColliders": []
+              }
+            },
+            "#Dying": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Crops/Corn/CornSeedlingDry"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.268513232,
+                      "Z": 0.5
+                    },
+                    "Size": {
+                      "X": 0.346020579,
+                      "Y": 0.537026465,
+                      "Z": 0.378777444
+                    }
+                  }
+                ],
+                "SphereColliders": [],
+                "CapsuleColliders": []
+              }
+            }
+          }
+        },
+        "Mature": {
+          "Children": {
+            "#Alive": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Crops/Corn/CornMature"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.5286956,
+                      "Z": 0.5
+                    },
+                    "Size": {
+                      "X": 0.481556416,
+                      "Y": 1.05739117,
+                      "Z": 0.4731881
+                    }
+                  }
+                ],
+                "SphereColliders": [],
+                "CapsuleColliders": []
+              }
+            },
+            "#Dead": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Crops/Corn/CornMatureDead"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.5286956,
+                      "Z": 0.5
+                    },
+                    "Size": {
+                      "X": 0.481556416,
+                      "Y": 1.05739117,
+                      "Z": 0.4731881
+                    }
+                  }
+                ],
+                "SphereColliders": [],
+                "CapsuleColliders": []
+              }
+            },
+            "#Dying": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Crops/Corn/CornMatureDry"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.5286956,
+                      "Z": 0.5
+                    },
+                    "Size": {
+                      "X": 0.481556416,
+                      "Y": 1.05739117,
+                      "Z": 0.4731881
+                    }
+                  }
+                ],
+                "SphereColliders": [],
+                "CapsuleColliders": []
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,9 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <cui:NineSliceVisualElement name="TimedComponentActivatorSettingsFragment" class="entity-sub-panel bg-sub-box--green">
+        <cui:LocalizableToggle name="IsEnabledToggle" class="game-toggle entity-panel__single-line-text" text-loc-key="TimedComponentActivator.IsEnabledToggle" />
+        <ui:VisualElement name="TimedComponentActivatorSettings" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

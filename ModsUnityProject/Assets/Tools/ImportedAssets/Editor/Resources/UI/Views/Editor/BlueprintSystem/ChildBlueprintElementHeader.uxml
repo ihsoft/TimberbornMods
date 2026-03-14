@@ -1,0 +1,8 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="True">
+    <Style path="UI/Views/Editor/BlueprintSystem/BlueprintSystemStyle" />
+    <ui:VisualElement name="ChildBlueprintElementHeader" class="blueprint-element-header">
+        <ui:Toggle name="VisibilityToggle" value="true" class="blueprint-element-header__visibility-toggle" />
+        <ui:TextField name="NameField" class="blueprint-element-header__name-field" />
+        <ui:Button name="RemoveButton" text="×" class="blueprint-element-header__remove-button" />
+    </ui:VisualElement>
+</ui:UXML>

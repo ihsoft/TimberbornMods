@@ -1,0 +1,50 @@
+{
+  "WellbeingTierSpec": {
+    "CharacterType": "BeaverChild",
+    "BonusId": "LifeExpectancy",
+    "Bonuses": [
+      {
+        "Wellbeing": 7,
+        "Multiplier": 0.2
+      },
+      {
+        "Wellbeing": 17,
+        "Multiplier": 0.4
+      },
+      {
+        "Wellbeing": 27,
+        "Multiplier": 0.6
+      },
+      {
+        "Wellbeing": 37,
+        "Multiplier": 0.8
+      },
+      {
+        "Wellbeing": 47,
+        "Multiplier": 1.0
+      },
+      {
+        "Wellbeing": 57,
+        "Multiplier": 1.1
+      },
+      {
+        "Wellbeing": 67,
+        "Multiplier": 1.2
+      },
+      {
+        "Wellbeing": 77,
+        "Multiplier": 1.3
+      },
+      {
+        "Wellbeing": 87,
+        "Multiplier": 1.4
+      },
+      {
+        "Wellbeing": 97,
+        "Multiplier": 1.5
+      }
+    ],
+    "WellbeingThreshold": 10,
+    "MultiplierIncrement": 0.1
+  }
+}

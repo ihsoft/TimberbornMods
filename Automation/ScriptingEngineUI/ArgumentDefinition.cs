@@ -3,45 +3,46 @@
 // License: Public Domain
 
 using System;
-using IgorZ.Automation.ScriptingEngine;
-using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 using IgorZ.TimberDev.UI;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
 
-sealed class ArgumentDefinition {
+sealed record ArgumentDefinition {
 
-  const string StringConstantTypeLocKey = "IgorZ.Automation.Scripting.Editor.StringConstantType";
-  const string NumberConstantTypeLocKey = "IgorZ.Automation.Scripting.Editor.NumberConstantType";
+  const string ConstantTypeStringLocKey = "IgorZ.Automation.Scripting.Editor.ConstantTypeString";
+  const string ConstantTypeWholeNumberLocKey = "IgorZ.Automation.Scripting.Editor.ConstantTypeWholeNumber";
+  const string ConstantTypeDecimalsLocKey = "IgorZ.Automation.Scripting.Editor.ConstantTypeDecimals";
+  const string ConstantTypePercentLocKey = "IgorZ.Automation.Scripting.Editor.ConstantTypePercent";
 
-  /// <summary>The type of this value.</summary>
-  public ScriptValue.TypeEnum ValueType { get; }
-
-  /// <summary>Function to validate the value of this argument.</summary>
-  /// <exception cref="ScriptError.BadValue">if the value is invalid.</exception>
-  public Action<ScriptValue> ValueValidator { get; }
+  /// <inheritdoc cref="ScriptingEngine.ScriptableComponents.ValueDef.ValueType"/>
+  public ScriptValue.TypeEnum ValueType => ValueDef.ValueType;
 
   /// <summary>If the set of the string values is limited, this is the set.</summary>
   /// <remarks>If not provided (null), then it is a free form value.</remarks>
   public DropdownItem<string>[] ValueOptions { get; }
 
-  /// <summary>Optional hint text to show in UI for the argument.</summary>
-  /// <remarks>Set to "null" if no hint is needed.</remarks>
-  public string ValueUiHint { get; }
+  /// <summary>The value definition this argument is bound to.</summary>
+  public ValueDef ValueDef { get; }
 
   public ArgumentDefinition(UiFactory uiFactory, ValueDef valueDef) {
-    ValueType = valueDef.ValueType;
-    ValueValidator = valueDef.ValueValidator;
-    ValueUiHint = valueDef.ValueUiHint;
+    ValueDef = valueDef;
     if (valueDef.Options != null) {
       ValueOptions = valueDef.Options;
     } else {
-      ValueOptions = valueDef.ValueType == ScriptValue.TypeEnum.Number
-          ? [(ArgumentConstructor.InputTypeName, uiFactory.T(NumberConstantTypeLocKey))]
-          : [(ArgumentConstructor.InputTypeName, uiFactory.T(StringConstantTypeLocKey))];
+      var locValue = valueDef.ValueType switch {
+          ScriptValue.TypeEnum.String => uiFactory.T(ConstantTypeStringLocKey),
+          ScriptValue.TypeEnum.Number => valueDef.DisplayNumericFormat switch {
+              ValueDef.NumericFormatEnum.Integer => uiFactory.T(ConstantTypeWholeNumberLocKey),
+              ValueDef.NumericFormatEnum.Float => uiFactory.T(ConstantTypeDecimalsLocKey),
+              ValueDef.NumericFormatEnum.Percent => uiFactory.T(ConstantTypePercentLocKey),
+              ValueDef.NumericFormatEnum.Unspecified =>
+                  throw new InvalidOperationException("Numeric format must be set"),
+          },
+          ScriptValue.TypeEnum.Unset => throw new InvalidOperationException("Value type must be set"),
+      };
+      ValueOptions = [(ArgumentConstructor.InputTypeName, locValue)];
     }
   }
 }
-

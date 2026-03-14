@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+    <ui:VisualElement name="ProductionItemOutput" class="content-row-centered production-item__wrapper">
+        <ui:VisualElement class="production-item__arrow-wrapper production-item__arrow-wrapper--right">
+            <ui:VisualElement name="OutputArrow" class="production-item__arrow" />
+        </ui:VisualElement>
+        <ui:VisualElement name="Output" class="production-item__items production-item__products" />
+    </ui:VisualElement>
+</ui:UXML>

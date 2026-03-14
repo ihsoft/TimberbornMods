@@ -1,0 +1,26 @@
+{
+  "RecipeSpec": {
+    "Id": "Mushroom",
+    "BackwardCompatibleIds": [],
+    "DisplayLocKey": "Good.Mushroom.PluralDisplayName",
+    "CycleDurationInHours": 192.0,
+    "Ingredients": [
+      {
+        "Id": "Water",
+        "Amount": 40
+      }
+    ],
+    "Products": [
+      {
+        "Id": "Mushroom",
+        "Amount": 45
+      }
+    ],
+    "ProducedSciencePoints": 0,
+    "Fuel": "",
+    "CyclesFuelLasts": 0,
+    "FuelCapacity": 0,
+    "CyclesCapacity": 1,
+    "Icon": "Sprites/Goods/MushroomIcon"
+  }
+}

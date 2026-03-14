@@ -1,0 +1,10 @@
+{
+  "BlockObjectBoundsDrawerFactorySpec": {
+    "BlockSideMesh0010": "Markers/HalfBlockSide/HalfBlockSide0010",
+    "BlockSideMesh0011": "Markers/HalfBlockSide/HalfBlockSide0011",
+    "BlockSideMesh0111": "Markers/HalfBlockSide/HalfBlockSide0111",
+    "BlockSideMesh1010": "Markers/HalfBlockSide/HalfBlockSide1010",
+    "BlockSideMesh1111": "Markers/HalfBlockSide/HalfBlockSide1111",
+    "Material": "Markers/HalfBlockSide/HalfBlockSide"
+  }
+}

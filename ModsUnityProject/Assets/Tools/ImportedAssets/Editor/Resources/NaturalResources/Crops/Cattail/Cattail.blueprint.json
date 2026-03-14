@@ -1,0 +1,261 @@
+{
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 2
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "TemplateSpec": {
+    "TemplateName": "Cattail",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "NaturalResourceSpec": {
+    "Order": 6
+  },
+  "CropSpec": {},
+  "GrowableSpec": {
+    "GrowthTimeInDays": 8.0
+  },
+  "BasicSelectionSoundSpec": {
+    "SoundName": "Bush",
+    "AlternativeSoundName": "WaterCrop"
+  },
+  "PlantableSpec": {
+    "ResourceGroup": "AquaticFarmhouse",
+    "PlantTimeInHours": 0.2
+  },
+  "DemolishableSpec": {
+    "DemolishTimeInHours": 0.5,
+    "ShowDemolishButtonInEntityPanel": false
+  },
+  "CuttableSpec": {
+    "RemoveOnCut": true,
+    "LeftoverModelName": "",
+    "Yielder": {
+      "YielderComponentName": "Cuttable",
+      "Yield": {
+        "Id": "CattailRoot",
+        "Amount": 3
+      },
+      "RemovalTimeInHours": 1.2,
+      "ResourceGroup": "AquaticFarmhouse"
+    }
+  },
+  "PlantablePreviewModelSpec": {
+    "Model": "NaturalResources/Crops/Cattail/CattailMature"
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "NaturalResource.Cattail.DisplayName",
+    "DescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "NaturalResource.Cattail.FlavorDescription",
+    "Icon": "NaturalResources/Crops/Cattail/CattailIcon"
+  },
+  "FloodableNaturalResourceSpec": {
+    "MinWaterHeight": 1,
+    "MaxWaterHeight": 1,
+    "DaysToDie": 1.0
+  },
+  "NaturalResourceModelRandomizerSpec": {
+    "ConstrainProportion": false,
+    "MinHeightScaleFactor": 0.8,
+    "MaxHeightScaleFactor": 1.2,
+    "MinWidthScaleFactor": 0.8,
+    "MaxWidthScaleFactor": 1.2,
+    "RandomizedRotation": "BetweenMinAndMax",
+    "MinRotation": 0.0,
+    "MaxRotation": 360.0
+  },
+  "WateredNaturalResourceSpec": {
+    "DaysToDieDry": 1.0
+  },
+  "CuttableYieldGoodIdProviderSpec": {},
+  "ContaminatedNaturalResourceSpec": {},
+  "BlockObjectModelSpec": {
+    "FullModelName": "#Models",
+    "UncoveredModelName": "",
+    "UndergroundModelName": "",
+    "UndergroundModelDepth": 0
+  },
+  "Children": {
+    "#Models": {
+      "Children": {
+        "Seedling": {
+          "Children": {
+            "#Alive": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Crops/Cattail/CattailSeedling"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.1,
+                      "Z": 0.5
+                    },
+                    "Size": {
+                      "X": 1.0,
+                      "Y": 0.2,
+                      "Z": 1.0
+                    }
+                  }
+                ],
+                "SphereColliders": [],
+                "CapsuleColliders": []
+              }
+            },
+            "#Dead": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Crops/Cattail/CattailSeedlingDead"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.1,
+                      "Z": 0.5
+                    },
+                    "Size": {
+                      "X": 1.0,
+                      "Y": 0.2,
+                      "Z": 1.0
+                    }
+                  }
+                ],
+                "SphereColliders": [],
+                "CapsuleColliders": []
+              }
+            },
+            "#Dying": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Crops/Cattail/CattailSeedlingDry"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.1,
+                      "Z": 0.5
+                    },
+                    "Size": {
+                      "X": 1.0,
+                      "Y": 0.2,
+                      "Z": 1.0
+                    }
+                  }
+                ],
+                "SphereColliders": [],
+                "CapsuleColliders": []
+              }
+            }
+          }
+        },
+        "Mature": {
+          "Children": {
+            "#Alive": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Crops/Cattail/CattailMature"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.25,
+                      "Z": 0.5
+                    },
+                    "Size": {
+                      "X": 1.0,
+                      "Y": 0.5,
+                      "Z": 1.0
+                    }
+                  }
+                ],
+                "SphereColliders": [],
+                "CapsuleColliders": []
+              }
+            },
+            "#Dead": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Crops/Cattail/CattailMatureDead"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.25,
+                      "Z": 0.5
+                    },
+                    "Size": {
+                      "X": 1.0,
+                      "Y": 0.5,
+                      "Z": 1.0
+                    }
+                  }
+                ],
+                "SphereColliders": [],
+                "CapsuleColliders": []
+              }
+            },
+            "#Dying": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Crops/Cattail/CattailMatureDry"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.25,
+                      "Z": 0.5
+                    },
+                    "Size": {
+                      "X": 1.0,
+                      "Y": 0.5,
+                      "Z": 1.0
+                    }
+                  }
+                ],
+                "SphereColliders": [],
+                "CapsuleColliders": []
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

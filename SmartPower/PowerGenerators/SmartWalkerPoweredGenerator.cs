@@ -2,47 +2,53 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using Bindito.Core;
 using IgorZ.SmartPower.Settings;
-using Timberborn.BuildingsBlocking;
+using Timberborn.BlockingSystem;
+using Timberborn.DuplicationSystem;
 
 namespace IgorZ.SmartPower.PowerGenerators;
 
-sealed class SmartWalkerPoweredGenerator : PowerOutputBalancer {
+sealed class SmartWalkerPoweredGenerator : PowerOutputBalancer, IDuplicable<SmartWalkerPoweredGenerator> {
 
   #region PowerOutputBalancer overrides
 
   /// <inheritdoc/>
+  protected override bool CanBeAutomated => true;
+
+  /// <inheritdoc/>
   protected override void Suspend() {
     base.Suspend();
-    _blockableBuilding.Block(this);
+    _blockableObject.Block(this);
   }
 
   /// <inheritdoc/>
   protected override void Resume() {
     base.Resume();
-    _blockableBuilding.Unblock(this);
+    _blockableObject.Unblock(this);
+  }
+
+  #endregion
+
+  #region IDuplicable implementation. Need to be called from descendants when the building is duplicated.
+
+  /// <summary>Copies settings from a source of the same type.</summary>
+  public void DuplicateFrom(SmartWalkerPoweredGenerator source) {
+    base.DuplicateFrom(source);
   }
 
   #endregion
 
   #region Implementation
 
-  WalkerPoweredGeneratorSettings _settings;
-  BlockableBuilding _blockableBuilding;
+  BlockableObject _blockableObject;
 
-  [Inject]
-  public void InjectDependencies(WalkerPoweredGeneratorSettings settings) {
-    _settings = settings;
-  }
-
-  protected override void Awake() {
-    ShowFloatingIcon = _settings.ShowFloatingIcon.Value;
-    SuspendDelayedAction = SmartPowerService.GetTimeDelayedAction(_settings.SuspendDelayMinutes.Value);
-    ResumeDelayedAction = SmartPowerService.GetTimeDelayedAction(_settings.ResumeDelayMinutes.Value);
+  public override void Awake() {
+    ShowFloatingIcon = WalkerPoweredGeneratorSettings.ShowFloatingIcon;
+    SuspendDelayedAction = SmartPowerService.GetTimeDelayedAction(WalkerPoweredGeneratorSettings.SuspendDelayMinutes);
+    ResumeDelayedAction = SmartPowerService.GetTimeDelayedAction(WalkerPoweredGeneratorSettings.ResumeDelayMinutes);
     base.Awake();
 
-    _blockableBuilding = GetComponentFast<BlockableBuilding>();
+    _blockableObject = GetComponent<BlockableObject>();
   }
 
   #endregion

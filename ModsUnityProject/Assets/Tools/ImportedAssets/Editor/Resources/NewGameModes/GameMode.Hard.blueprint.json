@@ -1,0 +1,42 @@
+{
+  "GameModeSpec": {
+    "Order": 30,
+    "IsDefault": false,
+    "DisplayNameLocKey": "NewGameConfigurationPanel.Hard",
+    "DescriptionLocKey": "NewGameConfigurationPanel.HardModeDescription",
+    "StartingAdults": 8,
+    "AdultAgeProgress": {
+      "Min": 0.1,
+      "Max": 0.7
+    },
+    "StartingChildren": 4,
+    "ChildAgeProgress": {
+      "Min": 0.1,
+      "Max": 0.8
+    },
+    "FoodConsumption": 1.0,
+    "WaterConsumption": 1.0,
+    "StartingFood": 90,
+    "StartingWater": 0,
+    "TemperateWeatherDuration": {
+      "Min": 5,
+      "Max": 8
+    },
+    "DroughtDuration": {
+      "Min": 15,
+      "Max": 30
+    },
+    "DroughtDurationHandicapMultiplier": 0.2,
+    "DroughtDurationHandicapCycles": 12,
+    "CyclesBeforeRandomizingBadtide": 3,
+    "ChanceForBadtide": 0.4,
+    "BadtideDuration": {
+      "Min": 15,
+      "Max": 30
+    },
+    "BadtideDurationHandicapMultiplier": 0.4,
+    "BadtideDurationHandicapCycles": 9,
+    "InjuryChance": 1.0,
+    "DemolishableRecoveryRate": 0.75
+  }
+}

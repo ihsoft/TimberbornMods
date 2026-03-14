@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "LowerVisibleLayer",
+    "GroupId": "UI",
+    "LocKey": "KeyBinding.LowerVisibleLayer",
+    "Order": 30,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Mouse/scroll/down",
+    "InputModifiers": "Alt",
+    "Unchangeable": false
+  }
+}

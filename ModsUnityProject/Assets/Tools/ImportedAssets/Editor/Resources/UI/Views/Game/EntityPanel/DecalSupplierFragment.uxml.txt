@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <cui:NineSliceVisualElement name="DecalSupplierFragment">
+        <cui:NineSliceVisualElement class="entity-sub-panel bg-sub-box--green decal-supplier-fragment__scroll-view-container">
+            <ui:ScrollView name="ButtonsScrollView" class="game-scroll-view decal-supplier-fragment__scroll-view">
+                <ui:VisualElement name="ButtonContainer" class="decal-supplier-fragment__button-container" />
+            </ui:ScrollView>
+        </cui:NineSliceVisualElement>
+        <cui:NineSliceVisualElement class="entity-sub-panel bg-sub-box--green">
+            <cui:LocalizableLabel name="UserPatternsLabel" text-loc-key="Decals.UserPatterns" class="entity-panel__text decal-supplier-fragment__user-patterns-label" />
+            <ui:VisualElement name="UserDecalButtons" class="decal-supplier-fragment__user-decal-buttons">
+                <cui:LocalizableButton name="BrowseButton" text-loc-key="Decals.Browse" class="entity-fragment__button entity-fragment__button--red decal-supplier-fragment__user-decal-button entity-panel__text" />
+                <cui:LocalizableButton name="RefreshButton" text-loc-key="Decals.Refresh" class="entity-fragment__button entity-fragment__button--red decal-supplier-fragment__user-decal-button entity-panel__text" />
+            </ui:VisualElement>
+        </cui:NineSliceVisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

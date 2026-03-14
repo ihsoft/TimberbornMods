@@ -1,0 +1,772 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "Default",
+    "LoopingSoundName": "",
+    "BuildingCost": [],
+    "ScienceCost": 0,
+    "PlaceFinished": true,
+    "FinishableWithBeaversOnSite": true,
+    "DrawRangeBoundsOnIt": false
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "TemplateSpec": {
+    "TemplateName": "Path",
+    "BackwardCompatibleTemplateNames": [
+      "Path.Folktails",
+      "Path.IronTeeth"
+    ],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "DynamicPathModelSpec": {
+    "GroundModelPrefix": "DirtPath",
+    "RoofModelPrefix": "RoofPath"
+  },
+  "BlockObjectNavMeshSettingsSpec": {
+    "NoAutoWalls": true,
+    "GenerateFloorsOnStackable": false,
+    "EdgeGroups": [
+      {
+        "Cost": 1.0,
+        "Group": {
+          "UseGroup": false,
+          "GroupName": ""
+        },
+        "IsPath": true,
+        "AddedEdges": [
+          {
+            "Start": {
+              "X": 0,
+              "Y": 0,
+              "Z": 0
+            },
+            "End": {
+              "X": -1,
+              "Y": 0,
+              "Z": 0
+            },
+            "IsTwoWay": false
+          },
+          {
+            "Start": {
+              "X": 0,
+              "Y": 0,
+              "Z": 0
+            },
+            "End": {
+              "X": 1,
+              "Y": 0,
+              "Z": 0
+            },
+            "IsTwoWay": false
+          },
+          {
+            "Start": {
+              "X": 0,
+              "Y": 0,
+              "Z": 0
+            },
+            "End": {
+              "X": 0,
+              "Y": -1,
+              "Z": 0
+            },
+            "IsTwoWay": false
+          },
+          {
+            "Start": {
+              "X": 0,
+              "Y": 0,
+              "Z": 0
+            },
+            "End": {
+              "X": 0,
+              "Y": 1,
+              "Z": 0
+            },
+            "IsTwoWay": false
+          }
+        ]
+      }
+    ],
+    "UnblockedCoordinates": []
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Path",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Paths",
+    "ToolOrder": 10,
+    "ToolShape": "Square",
+    "Layout": "TwoSegmentLine",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.Path.DisplayName",
+    "DescriptionLocKey": "Building.Path.Description",
+    "FlavorDescriptionLocKey": "Building.Path.FlavorDescription",
+    "Icon": "Buildings/Paths/Path/PathIcon"
+  },
+  "BlockObjectWithPathRangeSpec": {},
+  "PathSpec": {
+    "MainPathCoordinates": {
+      "X": 0,
+      "Y": 0,
+      "Z": 0
+    }
+  },
+  "Children": {
+    "#Finished": {
+      "Children": {
+        "DirtPath0000": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Path/DirtPath0000.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.02,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.04,
+                  "Z": 1.0
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "DirtPath0010": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Path/DirtPath0010.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.02,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.04,
+                  "Z": 1.0
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "DirtPath0011": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Path/DirtPath0011.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.02,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.04,
+                  "Z": 1.0
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "DirtPath0111": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Path/DirtPath0111.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.02,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.04,
+                  "Z": 1.0
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "DirtPath1010": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Path/DirtPath1010.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.02,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.04,
+                  "Z": 1.0
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "DirtPath1111": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Path/DirtPath1111.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.02,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.04,
+                  "Z": 1.0
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "RoofPath0000": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Path/RoofPath0000.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.1,
+                  "Z": 0.2
+                },
+                "Size": {
+                  "X": 0.6600001,
+                  "Y": 0.2,
+                  "Z": 0.0600000024
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.2,
+                  "Y": 0.1,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 0.06,
+                  "Y": 0.2,
+                  "Z": 0.55
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.1,
+                  "Z": 0.8
+                },
+                "Size": {
+                  "X": 0.66,
+                  "Y": 0.2,
+                  "Z": 0.06
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.8,
+                  "Y": 0.1,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 0.06,
+                  "Y": 0.2,
+                  "Z": 0.55
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "RoofPath0010": {
+          "TransformSpec": {
+            "Position": {
+              "X": 1.0,
+              "Y": 0.0,
+              "Z": 0.0
+            },
+            "Rotation": {
+              "X": 0.0,
+              "Y": 0.0,
+              "Z": 0.0
+            },
+            "Scale": {
+              "X": 1.0,
+              "Y": 1.0,
+              "Z": 1.0
+            }
+          },
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Path/RoofPath0010.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.1,
+                  "Z": 0.2
+                },
+                "Size": {
+                  "X": 0.55,
+                  "Y": 0.2,
+                  "Z": 0.06
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.2,
+                  "Y": 0.1,
+                  "Z": 0.585
+                },
+                "Size": {
+                  "X": 0.06,
+                  "Y": 0.2,
+                  "Z": 0.83
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.8,
+                  "Y": 0.1,
+                  "Z": 0.585
+                },
+                "Size": {
+                  "X": 0.06,
+                  "Y": 0.2,
+                  "Z": 0.83
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "RoofPath0011": {
+          "TransformSpec": {
+            "Position": {
+              "X": 2.0,
+              "Y": 0.0,
+              "Z": 0.0
+            },
+            "Rotation": {
+              "X": 0.0,
+              "Y": 0.0,
+              "Z": 0.0
+            },
+            "Scale": {
+              "X": 1.0,
+              "Y": 1.0,
+              "Z": 1.0
+            }
+          },
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Path/RoofPath0011.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.6,
+                  "Y": 0.1,
+                  "Z": 0.2
+                },
+                "Size": {
+                  "X": 0.8,
+                  "Y": 0.2,
+                  "Z": 0.06
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.2,
+                  "Y": 0.1,
+                  "Z": 0.6
+                },
+                "Size": {
+                  "X": 0.06,
+                  "Y": 0.2,
+                  "Z": 0.8
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.9,
+                  "Y": 0.1,
+                  "Z": 0.8
+                },
+                "Size": {
+                  "X": 0.2,
+                  "Y": 0.2,
+                  "Z": 0.06
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.8,
+                  "Y": 0.1,
+                  "Z": 0.9
+                },
+                "Size": {
+                  "X": 0.06,
+                  "Y": 0.2,
+                  "Z": 0.2
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "RoofPath0111": {
+          "TransformSpec": {
+            "Position": {
+              "X": 4.0,
+              "Y": 0.0,
+              "Z": 0.0
+            },
+            "Rotation": {
+              "X": 0.0,
+              "Y": 0.0,
+              "Z": 0.0
+            },
+            "Scale": {
+              "X": 1.0,
+              "Y": 1.0,
+              "Z": 1.0
+            }
+          },
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Path/RoofPath0111.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.1,
+                  "Z": 0.2
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.2,
+                  "Z": 0.06
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.2,
+                  "Y": 0.1,
+                  "Z": 0.9
+                },
+                "Size": {
+                  "X": 0.06,
+                  "Y": 0.2,
+                  "Z": 0.2
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.1,
+                  "Y": 0.1,
+                  "Z": 0.8
+                },
+                "Size": {
+                  "X": 0.2,
+                  "Y": 0.2,
+                  "Z": 0.06
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.9,
+                  "Y": 0.1,
+                  "Z": 0.8
+                },
+                "Size": {
+                  "X": 0.2,
+                  "Y": 0.2,
+                  "Z": 0.06
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.8,
+                  "Y": 0.1,
+                  "Z": 0.9
+                },
+                "Size": {
+                  "X": 0.06,
+                  "Y": 0.2,
+                  "Z": 0.2
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "RoofPath1010": {
+          "TransformSpec": {
+            "Position": {
+              "X": 5.0,
+              "Y": 0.0,
+              "Z": 0.0
+            },
+            "Rotation": {
+              "X": 0.0,
+              "Y": 0.0,
+              "Z": 0.0
+            },
+            "Scale": {
+              "X": 1.0,
+              "Y": 1.0,
+              "Z": 1.0
+            }
+          },
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Path/RoofPath1010.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.2,
+                  "Y": 0.1,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 0.06,
+                  "Y": 0.2,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.8,
+                  "Y": 0.1,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 0.06,
+                  "Y": 0.2,
+                  "Z": 1.0
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "RoofPath1111": {
+          "TransformSpec": {
+            "Position": {
+              "X": 7.0,
+              "Y": 0.0,
+              "Z": 0.0
+            },
+            "Rotation": {
+              "X": 0.0,
+              "Y": 0.0,
+              "Z": 0.0
+            },
+            "Scale": {
+              "X": 1.0,
+              "Y": 1.0,
+              "Z": 1.0
+            }
+          },
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Path/RoofPath1111.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.2,
+                  "Y": 0.1,
+                  "Z": 0.1
+                },
+                "Size": {
+                  "X": 0.06,
+                  "Y": 0.2,
+                  "Z": 0.2
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.1,
+                  "Y": 0.1,
+                  "Z": 0.2
+                },
+                "Size": {
+                  "X": 0.2,
+                  "Y": 0.2,
+                  "Z": 0.06
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.1,
+                  "Y": 0.1,
+                  "Z": 0.8
+                },
+                "Size": {
+                  "X": 0.2,
+                  "Y": 0.2,
+                  "Z": 0.06
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.2,
+                  "Y": 0.1,
+                  "Z": 0.9
+                },
+                "Size": {
+                  "X": 0.06,
+                  "Y": 0.2,
+                  "Z": 0.2
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.8,
+                  "Y": 0.1,
+                  "Z": 0.9
+                },
+                "Size": {
+                  "X": 0.06,
+                  "Y": 0.2,
+                  "Z": 0.2
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.9,
+                  "Y": 0.1,
+                  "Z": 0.8
+                },
+                "Size": {
+                  "X": 0.2,
+                  "Y": 0.2,
+                  "Z": 0.06
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.9,
+                  "Y": 0.1,
+                  "Z": 0.2
+                },
+                "Size": {
+                  "X": 0.2,
+                  "Y": 0.2,
+                  "Z": 0.06
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.8,
+                  "Y": 0.1,
+                  "Z": 0.1
+                },
+                "Size": {
+                  "X": 0.06,
+                  "Y": 0.2,
+                  "Z": 0.2
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase1x1#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase1x1/ConstructionBase1x1.blueprint"
+        }
+      }
+    }
+  }
+}

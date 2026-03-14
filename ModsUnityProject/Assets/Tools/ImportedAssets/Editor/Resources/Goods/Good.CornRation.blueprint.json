@@ -1,0 +1,34 @@
+{
+  "GoodSpec": {
+    "Id": "CornRation",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [
+      {
+        "NeedId": "Hunger",
+        "Points": 0.3
+      },
+      {
+        "NeedId": "CornRation",
+        "Points": 0.2
+      }
+    ],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.807843149,
+      "g": 0.733333349,
+      "b": 0.03529412,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Food",
+    "GoodOrder": 11060,
+    "Icon": "Sprites/Goods/CornRationIcon",
+    "ForceImport": true,
+    "DisplayNameLocKey": "Good.CornRation.DisplayName",
+    "PluralDisplayNameLocKey": "Good.CornRation.PluralDisplayName"
+  }
+}

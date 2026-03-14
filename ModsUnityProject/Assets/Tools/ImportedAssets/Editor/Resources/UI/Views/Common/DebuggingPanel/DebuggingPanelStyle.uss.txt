@@ -1,0 +1,153 @@
+.debugging-panel {
+    position: absolute;
+    width: 300px;
+    background-color: darkslategrey;
+    margin-bottom: 10px;
+    padding: 2px;
+}
+
+.debugging-panel__dragging-icon {
+    background-image: resource('UI/Images/Core/dragging-icon-yellow');
+    height: 20px;
+    width: 20px;
+    position: absolute;
+    top: 8px;
+    left: 8px;
+}
+
+.debugging-panel__minimize-icon {
+    background-image: resource('UI/Images/Core/minimize-icon-yellow');
+    height: 20px;
+    width: 20px;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+}
+
+.debugging-panel__minimize-icon:hover {
+    -unity-background-image-tint-color: black;
+}
+
+.debugging-panel__title {
+    -unity-text-align: middle-center;
+    padding: 5px;
+    margin-right: 32px;
+}
+
+.debugging-panel-item {
+    background-color: black;
+    width: 100%;
+    padding: 4px;
+    margin: 2px;
+}
+
+.debug-panel-item__title-wrapper {
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.debugging-panel-item__title-text {
+    -unity-text-align: middle-left;
+    flex-grow: 1;
+}
+
+.object-debugging-panel {
+    position: absolute;
+    width: 500px;
+    background-color: darkslategrey;
+    margin-bottom: 10px;
+    padding: 2px;
+    align-self: flex-end;
+}
+
+.object-debugging-panel__content {
+    background-color: black;
+    height: 400px;
+    padding: 4px;
+    margin: 2px;
+}
+
+.object-debugging-panel-scroll {
+    height: 100%;
+}
+
+.object-debugging-panel-scroll .unity-scroller > .unity-slider .unity-base-slider__dragger {
+    background-color: #DDDDDD;
+}
+
+.object-debugging-panel-scroll .unity-scroller {
+    background-color: #4a4a4a;
+}
+
+.object-debugging-panel-scroll .unity-scroller--vertical > .unity-slider .unity-base-slider__dragger {
+    width: 10px;
+    left: 0;
+}
+
+.object-debugging-panel-scroll .unity-scroller--vertical > .unity-scroller__slider {
+    width: 10px;
+    min-width: auto;
+}
+
+.object-debugging-panel-scroll .unity-scroller--vertical {
+    width: 10px;
+}
+
+.object-debugging-panel-scroll .unity-scroller--horizontal > .unity-slider .unity-base-slider__dragger {
+    height: 10px;
+    top: 0;
+}
+
+.object-debugging-panel-scroll .unity-scroller--horizontal > .unity-scroller__slider {
+    height: 10px;
+    min-height: auto;
+}
+
+.object-debugging-panel-scroll .unity-scroller--horizontal {
+    height: 10px;
+}
+
+.object-selector__search-field {
+    flex-grow: 1;
+    margin: 4px 0;
+}
+
+.object-selector__item:hover {
+    background-color: #333333;
+}
+
+.object-selector__item:checked {
+    color: yellow;
+}
+
+.object-viewer-field {
+    flex-direction: row;
+    margin: 3px 0;
+}
+
+.object-viewer-field__input {
+    margin-left: 4px;
+    min-width: 50px;
+    background-color: #4a4a4a;
+    border-width: 1px;
+    border-color: #888888;
+    padding: 0 4px;
+}
+
+.object-viewer-field__input > .unity-text-field__input {
+    -unity-text-align: middle-center;
+}
+
+.object-viewer-foldout__content {
+    margin-left: 12px;
+    background-color: rgb(0, 0, 0);
+    padding: 2px;
+}
+
+.object-viewer-foldout--odd > .object-viewer-foldout__content {
+    background-color: rgb(20, 20, 20);
+}
+
+.object-viewer-foldout .unity-toggle__input:focus:enabled > .unity-label {
+    color: rgb(204, 204, 204);
+}

@@ -1,0 +1,9 @@
+{
+  "GoodGroupSpec": {
+    "Id": "Water",
+    "Order": 50,
+    "Icon": "Sprites/TopBar/Water",
+    "SingleResourceGroup": true,
+    "DisplayNameLocKey": "TopBar.Water"
+  }
+}

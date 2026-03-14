@@ -1,0 +1,15 @@
+{
+  "TutorialSpec": {
+    "Id": "Forestry",
+    "NameLocKey": "Tutorial.Forestry",
+    "RequiredTutorialIds": [
+      "PowerAndPlanks",
+      "Science"
+    ],
+    "SortOrder": 80,
+    "Stages": [
+      "Forestry.BuildForester",
+      "Forestry.MarkBirchesForPlanting"
+    ]
+  }
+}

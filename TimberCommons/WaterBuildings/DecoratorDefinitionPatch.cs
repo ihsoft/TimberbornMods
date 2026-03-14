@@ -4,7 +4,7 @@
 
 using System;
 using HarmonyLib;
-using Timberborn.TemplateSystem;
+using Timberborn.TemplateInstantiation;
 using Timberborn.WaterBuildings;
 
 namespace IgorZ.TimberCommons.WaterBuildings;

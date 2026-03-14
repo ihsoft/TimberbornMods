@@ -1,0 +1,202 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "Default",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "MetalBlock",
+        "Amount": 5
+      }
+    ],
+    "ScienceCost": 200,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": false,
+    "DrawRangeBoundsOnIt": false
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "TemplateSpec": {
+    "TemplateName": "BeaverBust.IronTeeth",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 2
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Path",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Decoration",
+    "ToolOrder": 42,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.BeaverBust.DisplayName",
+    "DescriptionLocKey": "Building.BeaverBust.Description",
+    "FlavorDescriptionLocKey": "Building.BeaverBust.FlavorDescription",
+    "Icon": "Buildings/Decoration/BeaverBust/BeaverBustIcon"
+  },
+  "RangedEffectBuildingSpec": {
+    "EffectRadius": 2
+  },
+  "ContinuousEffectBuildingSpec": {
+    "Effects": [
+      {
+        "NeedId": "BeaverBust",
+        "PointsPerHour": 0.64,
+        "SatisfyToMaxValue": false
+      }
+    ]
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "Children": {
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Decoration/BeaverBust/BeaverBust.IronTeeth.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.05,
+              "Z": 0.5
+            },
+            "Size": {
+              "X": 0.744877458,
+              "Y": 0.1,
+              "Z": 0.746654749
+            }
+          },
+          {
+            "Center": {
+              "X": 0.503232539,
+              "Y": 0.3078717,
+              "Z": 0.5
+            },
+            "Size": {
+              "X": 0.2224245,
+              "Y": 0.415743351,
+              "Z": 0.228908658
+            }
+          }
+        ],
+        "SphereColliders": [
+          {
+            "Center": {
+              "X": 0.502664447,
+              "Y": 0.838291168,
+              "Z": 0.368513227
+            },
+            "Radius": 0.225232
+          }
+        ],
+        "CapsuleColliders": [
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.5799751,
+              "Z": 0.488488585
+            },
+            "Radius": 0.227371916,
+            "Height": 0.6228378,
+            "Axis": "X"
+          }
+        ]
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase1x1#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase1x1/ConstructionBase1x1.blueprint"
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Decoration/BeaverBust/BeaverBust.IronTeeth.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.05,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.1,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.493780375,
+                  "Y": 0.388423979,
+                  "Z": 0.524245262
+                },
+                "Size": {
+                  "X": 0.4909874,
+                  "Y": 0.58365,
+                  "Z": 0.362791181
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    }
+  }
+}

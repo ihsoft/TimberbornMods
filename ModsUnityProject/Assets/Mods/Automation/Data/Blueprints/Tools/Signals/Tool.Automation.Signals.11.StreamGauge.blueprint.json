@@ -1,0 +1,61 @@
+{
+  "CustomToolSpec": {
+    "Id": "Automation.Tmpl.Signals.StreamGauge",
+    "GroupId": "AutomationSignalsToolGroupId",
+    "Type": "IgorZ.Automation.TemplateTools.ApplyTemplateTool",
+    "Order": 11,
+    "Icon": "Sprites/IgorZ/tool-streamgauge-signals",
+    "DisplayNameLocKey": "IgorZ.Automation.Tool.tmpl.StreamGauge.DisplayName",
+    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.StreamGauge.Description"
+  },
+  "AutomationTemplateSpec": {
+    "TemplateFamilyName": "Gauge.Signals",
+    "Rules": [
+      {
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Precondition", "StrValue": "(?sig StreamGauge.Depth)" },
+            { "Name": "Expression", "StrValue": "(eq (sig StreamGauge.Depth) (sig StreamGauge.Depth))" }
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Signals.Set 'Gauge.blue1' (sig StreamGauge.Depth))" }
+          ]
+        }
+      },
+      {
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Precondition", "StrValue": "(?sig StreamGauge.Contamination)" },
+            { "Name": "Expression", "StrValue": "(eq (sig StreamGauge.Contamination) (sig StreamGauge.Contamination))" }
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Signals.Set 'Gauge.red1' (sig StreamGauge.Contamination))" }
+          ]
+        }
+      },
+      {
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Precondition", "StrValue": "(?sig StreamGauge.Current)" },
+            { "Name": "Expression", "StrValue": "(eq (sig StreamGauge.Current) (sig StreamGauge.Current))" }
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Signals.Set 'Gauge.yellow1' (sig StreamGauge.Current))" }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False" xsi:schemaLocation="Timberborn.CoreUI ">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Options/OptionsStyle.uss" />
+    <ui:VisualElement name="ChangeLanguageBox" class="content-row-centered">
+        <cui:NineSliceVisualElement class="options-panel sliced-border change-language-box">
+            <ui:VisualElement name="Items" />
+            <ui:VisualElement name="Buttons" class="box-buttons">
+                <cui:NineSliceButton text="OK" name="ConfirmButton" class="menu-button" />
+            </ui:VisualElement>
+            <ui:Button name="CancelButton" class="close-button" />
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

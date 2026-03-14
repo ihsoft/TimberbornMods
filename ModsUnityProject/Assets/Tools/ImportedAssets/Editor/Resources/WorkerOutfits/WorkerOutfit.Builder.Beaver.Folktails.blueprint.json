@@ -1,0 +1,12 @@
+{
+  "WorkerOutfitSpec": {
+    "Id": "Builder",
+    "FactionId": "Folktails",
+    "WorkerType": "Beaver",
+    "DiffuseTexture": "Materials/Beavers/Common/WorkerOutfits/WorkerHammerStrings_D",
+    "NormalTexture": "Materials/Beavers/Common/WorkerOutfits/WorkerHammerStrings_N",
+    "Attachments": [
+      "HammerBack.Beaver"
+    ]
+  }
+}

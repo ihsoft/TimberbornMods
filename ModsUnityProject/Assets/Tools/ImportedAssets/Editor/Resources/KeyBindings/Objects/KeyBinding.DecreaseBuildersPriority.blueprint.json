@@ -1,0 +1,10 @@
+{
+  "KeyBindingSpec": {
+    "Id": "DecreaseBuildersPriority",
+    "GroupId": "Objects",
+    "LocKey": "KeyBinding.DecreaseBuildersPriority",
+    "Order": 90,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  }
+}

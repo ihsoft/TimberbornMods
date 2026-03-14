@@ -1,0 +1,42 @@
+﻿.console-container {
+    flex-grow: 1;
+}
+
+.console-panel {
+    --background-image: resource('UI/Images/Backgrounds/bg-input');
+    --background-slice-scale: 0.5;
+    --background-slice: 20;
+    --background-tint: rgba(255, 255, 255, 0.9);
+    margin: -5px -5px 0 -5px;
+    padding: 10px 15px 10px 15px;
+}
+
+.console-panel--collapsed {
+    height: 33%;
+}
+
+.console-panel--expanded {
+    height: 97%;
+}
+
+.console-panel__buttons-wrapper {
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.console-panel__button {
+    margin: 0 10px;
+    --click-sound: "UI.Click";
+}
+
+.console-panel__button:hover {
+    color: yellow;
+}
+
+.console-panel__text-field {
+    flex-grow: 1;
+    flex-shrink: 1;
+    color: white;
+    font-size: 13px;
+    white-space: normal;
+}

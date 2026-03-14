@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "Undo",
+    "GroupId": "MapEditor",
+    "LocKey": "KeyBinding.UndoChanges",
+    "Order": 0,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/z",
+    "InputModifiers": "Ctrl",
+    "Unchangeable": false
+  }
+}

@@ -1,0 +1,12 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <cui:NineSliceVisualElement name="WellbeingBonusTooltip" class="wellbeing-bonus-tooltip">
+        <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+        <ui:Label name="Name" class="game-text-big wellbeing-bonus-tooltip__name" text="Walking Speed" />
+        <ui:Label name="Description" class="game-text-normal text--centered" text="Bonus 1\nBonus 2\nBonus 3" />
+        <ui:VisualElement name="NextTier" class="wellbeing-bonus-tooltip__next--background">
+            <ui:Label name="NextTierDescription" class="game-text-normal text--centered" text="Next tier:\nWellbeing  25: 10%" />
+        </ui:VisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

@@ -1,0 +1,22 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <ui:VisualElement name="DistrictCenterFragmentRoot">
+        <cui:NineSliceVisualElement name="DistrictCenterRoot" class="entity-sub-panel bg-sub-box--green">
+            <ui:VisualElement name="WorkerType" class="district-center-fragment__worker-type">
+                <cui:LocalizableLabel name="Title" text="Allowed workers:" text-loc-key="Work.DefaultAllowedWorker" class="entity-panel__text district-center-fragment__worker-type__title" />
+            </ui:VisualElement>
+            <ui:VisualElement name="MigrateButtons" class="district-center-fragment__migration">
+                <cui:NineSliceButton name="MigrateButtonLeft" class="entity-fragment__button entity-fragment__button--red district-center-fragment__migration-left-button">
+                    <cui:LocalizableLabel name="MigrateButtonLeftText" text="Migrate" text-loc-key="Migration.MigratePopulation" class="entity-panel__text district-center-fragment__migration-left-button-text" />
+                    <ui:VisualElement name="MigrateButtonLeftIcon" class="district-center-fragment__migration-left-button-icon" />
+                </cui:NineSliceButton>
+                <cui:NineSliceButton name="MigrateButtonRight" class="entity-fragment__button--red district-center-fragment__migration-right-button">
+                    <ui:VisualElement name="MigrateButtonRightIcon" class="district-center-fragment__migration-right-button-icon" />
+                </cui:NineSliceButton>
+            </ui:VisualElement>
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "CattailFlour",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.7372549,
+      "g": 0.6156863,
+      "b": 0.521568656,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 2,
+    "GoodGroupId": "Ingredients",
+    "GoodOrder": 8060,
+    "Icon": "Sprites/Goods/CattailFlourIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.CattailFlour.DisplayName",
+    "PluralDisplayNameLocKey": "Good.CattailFlour.PluralDisplayName"
+  }
+}

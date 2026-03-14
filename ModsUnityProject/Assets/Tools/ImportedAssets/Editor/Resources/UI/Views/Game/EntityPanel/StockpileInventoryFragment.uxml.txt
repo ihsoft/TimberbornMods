@@ -1,0 +1,33 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <ui:VisualElement name="StockpileInventoryFragmentWrapper" class="stockpile-inventory-fragment__wrapper">
+        <cui:NineSliceVisualElement name="StockpileInventoryFragment" class="bg-sub-box--green entity-sub-panel">
+            <ui:VisualElement name="SelectionWrapper" class="stockpile-inventory-fragment__top-panel">
+                <cui:NineSliceButton name="Selection" class="button-game stockpile-inventory-fragment__good-selection-button">
+                    <ui:Image name="GoodIcon" class="stockpile-inventory-fragment__good-selection" />
+                </cui:NineSliceButton>
+                <ui:Button name="Unselect" class="stockpile-inventory-fragment__unselect-good">
+                    <ui:VisualElement class="stockpile-inventory-fragment__unselect-good-icon" />
+                </ui:Button>
+                <ui:VisualElement name="ItemAndCapacity" class="stockpile-inventory-fragment__right-panel">
+                    <ui:Label name="SelectionItem" class="entity-panel__text stockpile-inventory-fragment__good-selection-text" />
+                    <cui:ProgressBar name="ProgressBar" class="progress-bar">
+                        <ui:Label name="CapacityAmount" text="100" class="entity-panel__text" />
+                        <ui:Label text="/" class="entity-panel__text inventory-fragment-header__separator" />
+                        <ui:Label name="CapacityLimit" text="1000" class="entity-panel__text" />
+                    </cui:ProgressBar>
+                    <ui:VisualElement name="OutputGood" class="content-row-centered stockpile-inventory-fragment__output-good">
+                        <ui:Image name="Type" class="inventory-row-informational__type inventory-row-informational__type--output" />
+                        <ui:Image name="Image" class="inventory-row__image" />
+                        <ui:Label name="Name" text="Good:" class="entity-panel__text" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>
+

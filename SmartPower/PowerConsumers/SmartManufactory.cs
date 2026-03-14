@@ -6,7 +6,6 @@ using System;
 using Bindito.Core;
 using IgorZ.SmartPower.Core;
 using Timberborn.BaseComponentSystem;
-using Timberborn.BuildingsBlocking;
 using Timberborn.EnterableSystem;
 using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
@@ -21,7 +20,7 @@ namespace IgorZ.SmartPower.PowerConsumers;
 /// Component that extends the <see cref="MechanicalBuilding"/> behavior to conserve energy when manufactory can't
 /// produce product.
 /// </summary>
-public class SmartManufactory : BaseComponent, IAdjustablePowerInput {
+public class SmartManufactory : BaseComponent, IAwakableComponent, IAdjustablePowerInput {
 
   #region API
 
@@ -70,9 +69,7 @@ public class SmartManufactory : BaseComponent, IAdjustablePowerInput {
 
   /// <inheritdoc/>
   public int UpdateAndGetPowerInput() {
-    if (_mechanicalBuilding.ConsumptionDisabled
-        || _blockableBuilding && !_blockableBuilding.IsUnblocked
-        || !_manufactory.HasCurrentRecipe) {
+    if (!_mechanicalNode.Active || !_manufactory.HasCurrentRecipe) {
       AllWorkersOut = MissingIngredients = BlockedOutput = NoFuel = StandbyMode = false;
       if (_powerInputLimiter) {
         _powerInputLimiter.SetDesiredPower(-1);
@@ -82,7 +79,7 @@ public class SmartManufactory : BaseComponent, IAdjustablePowerInput {
 
     AllWorkersOut = HasWorkingPlaces && _enterable.NumberOfEnterersInside == 0;
     MissingIngredients = !_manufactory.HasAllIngredients;
-    BlockedOutput = !_manufactory.HasUnreservedCapacity();
+    BlockedOutput = !_manufactory.HasUnreservedCapacityForCurrentProducts();
     NoFuel = !_manufactory.HasFuel;
     StandbyMode = AllWorkersOut || MissingIngredients || NoFuel || BlockedOutput;
     var newInput = Math.Max(
@@ -102,8 +99,7 @@ public class SmartManufactory : BaseComponent, IAdjustablePowerInput {
   const string PowerSavingModeLocKey = "IgorZ.SmartPower.MechanicalBuilding.PowerSavingModeStatus";
 
   ILoc _loc;
-  MechanicalBuilding _mechanicalBuilding;
-  BlockableBuilding _blockableBuilding;
+  MechanicalNode _mechanicalNode;
   Manufactory _manufactory;
   Enterable _enterable;
   PowerInputLimiter _powerInputLimiter;
@@ -117,17 +113,17 @@ public class SmartManufactory : BaseComponent, IAdjustablePowerInput {
     _loc = loc;
   }
 
-  void Awake() {
-    _mechanicalBuilding = GetComponentFast<MechanicalBuilding>();
-    _nominalPowerInput = GetComponentFast<MechanicalNodeSpec>().PowerInput;
-    _blockableBuilding = GetComponentFast<BlockableBuilding>();
-    _manufactory = GetComponentFast<Manufactory>();
-    _enterable = GetComponentFast<Enterable>();
-    _powerInputLimiter = GetComponentFast<PowerInputLimiter>();
+  /// <inheritdoc/>
+  public void Awake() {
+    _mechanicalNode = GetComponent<MechanicalNode>();
+    _nominalPowerInput = GetComponent<MechanicalNodeSpec>().PowerInput;
+    _manufactory = GetComponent<Manufactory>();
+    _enterable = GetComponent<Enterable>();
+    _powerInputLimiter = GetComponent<PowerInputLimiter>();
     _standbyStatus = StatusToggle.CreateNormalStatus(StandbyStatusIcon, _loc.T(PowerSavingModeLocKey));
-    var subject = GetComponentFast<StatusSubject>();
+    var subject = GetComponent<StatusSubject>();
     subject.RegisterStatus(_standbyStatus);
-    HasWorkingPlaces = GetComponentFast<Workshop>();
+    HasWorkingPlaces = GetComponent<Workshop>();
   }
 
   #endregion

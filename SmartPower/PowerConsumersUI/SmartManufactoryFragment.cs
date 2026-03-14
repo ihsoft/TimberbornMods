@@ -29,7 +29,7 @@ sealed class SmartManufactoryFragment : IEntityPanelFragment {
 
   public void ShowFragment(BaseComponent entity) {
     _consumerFragmentPatcher.InitializePatch(_root);
-    _smartManufactory = entity.GetComponentFast<SmartManufactory>();
+    _smartManufactory = entity.GetComponent<SmartManufactory>();
   }
 
   public void ClearFragment() {

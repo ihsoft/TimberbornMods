@@ -1,0 +1,10 @@
+{
+  "KeyBindingSpec": {
+    "Id": "IncreaseWorkers",
+    "GroupId": "Buildings",
+    "LocKey": "KeyBinding.IncreaseWorkers",
+    "Order": 20,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  }
+}

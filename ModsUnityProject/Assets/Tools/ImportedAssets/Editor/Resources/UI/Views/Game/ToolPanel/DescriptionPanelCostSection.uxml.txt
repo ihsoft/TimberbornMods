@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/ToolPanel/ToolPanelStyle.uss" />
+    <cui:NineSliceVisualElement name="DescriptionPanelCostSection" class="materials-section__wrapper">
+        <cui:NineSliceVisualElement name="Materials" class="materials-section bg-sub-box--green">
+            <ui:VisualElement class="materials-section__tool-icon materials-section__tool-icon--cost" />
+        </cui:NineSliceVisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

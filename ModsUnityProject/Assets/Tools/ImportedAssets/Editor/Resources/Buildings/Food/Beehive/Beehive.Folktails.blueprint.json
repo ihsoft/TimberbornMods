@@ -1,0 +1,211 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "Beehive",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "Log",
+        "Amount": 10
+      },
+      {
+        "Id": "Plank",
+        "Amount": 15
+      },
+      {
+        "Id": "Paper",
+        "Amount": 20
+      }
+    ],
+    "ScienceCost": 400,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": false,
+    "DrawRangeBoundsOnIt": false
+  },
+  "TemplateSpec": {
+    "TemplateName": "Beehive.Folktails",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Food",
+    "ToolOrder": 60,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "HiveSpec": {
+    "PollinationRadius": 3,
+    "HoursBetweenPollinations": 2.0,
+    "GrowthTimeReduction": 0.3,
+    "PlantsPerPollination": 3
+  },
+  "WaterObjectSpec": {
+    "WaterCoordinates": {
+      "X": 0,
+      "Y": 0,
+      "Z": 0
+    }
+  },
+  "FloodableBuildingSpec": {},
+  "BlockableFloodableObjectSpec": {},
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.Beehive.DisplayName",
+    "DescriptionLocKey": "Building.Beehive.Description",
+    "FlavorDescriptionLocKey": "Building.Beehive.FlavorDescription",
+    "Icon": "Buildings/Food/Beehive/BeehiveIcon"
+  },
+  "AreaNeedApplierSpec": {
+    "ApplicationRadius": 3,
+    "Effects": [
+      {
+        "NeedId": "BeeSting",
+        "Points": -1.0,
+        "Probability": "Medium"
+      }
+    ]
+  },
+  "BlockableObjectParticleControllerSpec": {
+    "AttachmentIds": [
+      "Bees"
+    ]
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "TemplateAttachmentsSpec": {
+    "Attachments": [
+      {
+        "AttachmentId": "Bees",
+        "Prefab": "Buildings/Food/Beehive/Bees/Bees",
+        "Parent": "#Finished",
+        "Position": {
+          "X": 0.5,
+          "Y": 0.566,
+          "Z": 0.181
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": true
+      }
+    ]
+  },
+  "Children": {
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Food/Beehive/Beehive.Folktails.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.065672636,
+              "Z": 0.5
+            },
+            "Size": {
+              "X": 1.0,
+              "Y": 0.131345272,
+              "Z": 1.0
+            }
+          }
+        ],
+        "SphereColliders": [
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.45,
+              "Z": 0.5
+            },
+            "Radius": 0.4
+          }
+        ],
+        "CapsuleColliders": []
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase1x1#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase1x1/ConstructionBase1x1.blueprint"
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Food/Beehive/Beehive.Folktails.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.1261937,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 0.743781567,
+                  "Y": 0.2523874,
+                  "Z": 0.760579
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    }
+  }
+}

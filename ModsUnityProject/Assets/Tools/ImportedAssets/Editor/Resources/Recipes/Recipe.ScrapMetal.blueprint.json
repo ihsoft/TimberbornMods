@@ -1,0 +1,26 @@
+{
+  "RecipeSpec": {
+    "Id": "ScrapMetal",
+    "BackwardCompatibleIds": [],
+    "DisplayLocKey": "Good.ScrapMetal.PluralDisplayName",
+    "CycleDurationInHours": 18.0,
+    "Ingredients": [
+      {
+        "Id": "TreatedPlank",
+        "Amount": 1
+      }
+    ],
+    "Products": [
+      {
+        "Id": "ScrapMetal",
+        "Amount": 5
+      }
+    ],
+    "ProducedSciencePoints": 0,
+    "Fuel": "",
+    "CyclesFuelLasts": 0,
+    "FuelCapacity": 0,
+    "CyclesCapacity": 30,
+    "Icon": "Sprites/Goods/ScrapMetalIcon"
+  }
+}

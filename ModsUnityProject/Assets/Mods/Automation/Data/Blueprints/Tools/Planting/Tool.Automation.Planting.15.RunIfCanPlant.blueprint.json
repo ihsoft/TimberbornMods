@@ -1,0 +1,46 @@
+{
+  "CustomToolSpec": {
+    "Id": "Automation.Tmpl.Planting.RunIfCanPlant",
+    "GroupId": "AutomationPlantingToolGroupId",
+    "Type": "IgorZ.Automation.TemplateTools.ApplyTemplateTool",
+    "Order": 15,
+    "Icon": "Sprites/IgorZ/tool-can-plant",
+    "DisplayNameLocKey": "IgorZ.Automation.Tool.tmpl.RunIfCanPlan.DisplayName",
+    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.RunIfCanPlan.Description"
+   },
+  "AutomationTemplateSpec": {
+    "TemplateFamilyName": "Plantables",
+    "Rules": [
+      {
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Precondition", "StrValue": "(and (?sig Plantable.Ready) (?act Workplace.SetWorkers))" },
+            { "Name": "Expression", "StrValue": "(gt (sig Plantable.Ready) 0)" }
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Workplace.SetWorkers {% (getvalue Workplace.MaxWorkers) %})" }
+          ]
+        }
+      },
+      {
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Precondition", "StrValue": "(and (?sig Plantable.Ready) (?act Workplace.RemoveWorkers))" },
+            { "Name": "Expression", "StrValue": "(eq (sig Plantable.Ready) 0)" }
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Workplace.RemoveWorkers)" }
+          ]
+        }
+      }
+    ]
+  }
+}

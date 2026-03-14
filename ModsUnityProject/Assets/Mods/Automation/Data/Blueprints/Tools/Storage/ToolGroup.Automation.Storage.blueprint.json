@@ -1,0 +1,13 @@
+{
+  "ToolGroupSpec": {
+    "Id": "AutomationStorageToolGroupId",
+    "DisplayNameLocKey": "IgorZ.Automation.ToolGroup.Storage.DisplayName",
+    "Icon": "Sprites/IgorZ/tool-group-storage"
+  },
+  "CustomToolGroupSpec": {
+    "ParentGroupId": "AutomationToolGroupId",
+    "Style": "Green",
+    "Order": 23
+  },
+  "ConstructionModeToolGroupSpec": {}
+}

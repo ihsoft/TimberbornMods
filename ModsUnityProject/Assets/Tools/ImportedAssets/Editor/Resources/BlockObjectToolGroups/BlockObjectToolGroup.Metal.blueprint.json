@@ -1,0 +1,9 @@
+{
+  "BlockObjectToolGroupSpec": {
+    "Id": "Metal",
+    "Order": 65,
+    "NameLocKey": "ToolGroups.Metal",
+    "Icon": "Sprites/BottomBar/BuildingGroups/Metal",
+    "FallbackGroup": false
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "GoodVisualizationSpec": {
+    "Id": "Liquid",
+    "Variant": "1x1",
+    "Offset": {
+      "X": 0.0,
+      "Y": 0.0,
+      "Z": 0.0
+    },
+    "LimitingAmount": 0.0,
+    "PrimaryMesh": "StockpileGoodModels/SmallLiquidPlane",
+    "SecondaryMesh": "",
+    "Material": "",
+    "NonLinearity": 0.0
+  }
+}

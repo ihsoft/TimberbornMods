@@ -1,0 +1,16 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <cui:NineSliceVisualElement name="BeaverBuildingsFragment" class="entity-sub-panel bg-sub-box--green">
+        <cui:NineSliceButton name="Home" class="beaver-buildings-fragment__item bg-box--green">
+            <ui:Image name="Icon" class="beaver-buildings-fragment__icon beaver-buildings-fragment__icon--homeless" />
+            <ui:Label name="Name" text="Homeless" class="beaver-buildings-fragment__name entity-panel__text" />
+        </cui:NineSliceButton>
+        <cui:NineSliceButton name="Workplace" class="beaver-buildings-fragment__item beaver-buildings-fragment__item--bottom bg-box--green">
+            <ui:Image name="Icon" class="beaver-buildings-fragment__icon beaver-buildings-fragment__icon--jobless" />
+            <ui:Label name="Name" text="Jobless" class="beaver-buildings-fragment__name entity-panel__text" />
+        </cui:NineSliceButton>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

@@ -1,0 +1,11 @@
+﻿{
+  "TutorialStageSpec": {
+    "Id": "HousingAndPopulation.GrowPopulation",
+    "IntroLocKey": "Tutorial.HousingAndPopulation.GrowPopulation"
+  },
+  "Children": {
+    "Child": {
+      "BeaverBirthStepSpec": {}
+    }
+  }
+}

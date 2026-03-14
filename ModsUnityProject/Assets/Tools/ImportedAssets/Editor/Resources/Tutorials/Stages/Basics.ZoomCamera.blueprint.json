@@ -1,0 +1,20 @@
+{
+  "TutorialStageSpec": {
+    "Id": "Basics.ZoomCamera",
+    "IntroLocKey": "Tutorial.Basics.ZoomCamera"
+  },
+  "Children": {
+    "Step1": {
+      "CameraZoomStepSpec": {
+        "Direction": "In",
+        "Threshold": 2.0
+      }
+    },
+    "Step2": {
+      "CameraZoomStepSpec": {
+        "Direction": "Out",
+        "Threshold": 2.0
+      }
+    }
+  }
+}

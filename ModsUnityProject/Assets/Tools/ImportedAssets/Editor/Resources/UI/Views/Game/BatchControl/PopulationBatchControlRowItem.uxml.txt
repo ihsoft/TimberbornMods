@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/BatchControl/BatchControlStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/Population/PopulationStyle.uss" />
+    <cui:NineSliceVisualElement name="PopulationBatchControlRowItem" class="batch-control-box__row-item-group">
+        <ui:VisualElement name="PopulationIcon" class="population-batch-control-row-item__icon" />
+        <ui:Label name="CurrentPopulation" text="100" class="game-text-normal population-batch-control-row-item__info population-batch-control-row-item__info-margin" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

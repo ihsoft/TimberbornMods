@@ -1,0 +1,30 @@
+{
+  "GoodSpec": {
+    "Id": "PunchCard",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [
+      {
+        "NeedId": "PunchCard",
+        "Points": 0.3
+      }
+    ],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.8,
+      "g": 0.8,
+      "b": 0.8,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Materials",
+    "GoodOrder": 5040,
+    "Icon": "Sprites/Goods/PunchCardIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.PunchCard.DisplayName",
+    "PluralDisplayNameLocKey": "Good.PunchCard.PluralDisplayName"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "TimbermeshSpec": {
+    "Model": "ConstructionBases/ConstructionBase4x1+Water4x2/ConstructionBase4x1+Water4x2.Model"
+  },
+  "CollidersSpec": {
+    "BoxColliders": [
+      {
+        "Center": {
+          "X": 2.0,
+          "Y": 0.1,
+          "Z": 0.5
+        },
+        "Size": {
+          "X": 4.0,
+          "Y": 0.2,
+          "Z": 1.0
+        }
+      },
+      {
+        "Center": {
+          "X": 0.2515573,
+          "Y": -0.5318086,
+          "Z": 1.8860743
+        },
+        "Size": {
+          "X": 0.0587829351,
+          "Y": 0.9234128,
+          "Z": 1.78511953
+        }
+      },
+      {
+        "Center": {
+          "X": 3.74844265,
+          "Y": -0.5318086,
+          "Z": 1.8860743
+        },
+        "Size": {
+          "X": 0.0455749035,
+          "Y": 0.9234128,
+          "Z": 1.78511953
+        }
+      },
+      {
+        "Center": {
+          "X": 2.0,
+          "Y": -0.5318085,
+          "Z": 2.75146341
+        },
+        "Size": {
+          "X": 3.59735751,
+          "Y": 0.923413038,
+          "Z": 0.09441185
+        }
+      }
+    ],
+    "SphereColliders": [],
+    "CapsuleColliders": []
+  }
+}

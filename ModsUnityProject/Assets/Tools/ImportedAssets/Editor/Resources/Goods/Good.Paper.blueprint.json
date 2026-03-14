@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "Paper",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.8,
+      "g": 0.8,
+      "b": 0.8,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Materials",
+    "GoodOrder": 1030,
+    "Icon": "Sprites/Goods/PaperIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.Paper.DisplayName",
+    "PluralDisplayNameLocKey": "Good.Paper.PluralDisplayName"
+  }
+}

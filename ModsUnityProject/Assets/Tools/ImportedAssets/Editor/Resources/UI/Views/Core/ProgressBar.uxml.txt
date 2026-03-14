@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <ui:VisualElement name="ProgressBar" class="progress-bar">
+        <ui:VisualElement class="progress-bar__item">
+            <ui:VisualElement class="progress-bar__background" />
+        </ui:VisualElement>
+        <ui:VisualElement class="progress-bar__item">
+            <cui:SimpleProgressBar name="Progress" class="progress-bar__progress" />
+        </ui:VisualElement>
+        <cui:NineSliceVisualElement class="progress-bar__frame" />
+        <ui:VisualElement name="ContentContainer" class="progress-bar__content-container content-row-centered unity-text--shaded" />
+    </ui:VisualElement>
+</ui:UXML>

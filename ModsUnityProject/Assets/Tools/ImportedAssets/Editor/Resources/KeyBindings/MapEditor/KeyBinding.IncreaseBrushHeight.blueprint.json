@@ -1,0 +1,20 @@
+{
+  "KeyBindingSpec": {
+    "Id": "IncreaseBrushHeight",
+    "GroupId": "MapEditor",
+    "LocKey": "KeyBinding.IncreaseBrushHeight",
+    "Order": 40,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Mouse/scroll/up",
+    "InputModifiers": "Ctrl, Alt",
+    "Unchangeable": false
+  },
+  "SecondaryInputBindingSpec": {
+    "Path": "/Keyboard/rightBracket",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

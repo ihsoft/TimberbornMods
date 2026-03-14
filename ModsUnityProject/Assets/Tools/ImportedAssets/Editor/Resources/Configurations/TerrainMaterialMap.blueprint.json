@@ -1,0 +1,16 @@
+{
+  "TerrainMaterialMapSpec": {
+    "DesertTexture": "Environment/Land/Materials/Desert",
+    "DryFieldTexture": "Environment/Land/Materials/Field/DryField",
+    "WetFieldTexture": "Environment/Land/Materials/Field/WetField",
+    "BlendingNoise": "Environment/Land/Materials/BlendingNoise",
+    "BlendingNoiseScale": 0.2,
+    "BlendingNoiseMultiplier": 0.96,
+    "BlendingSoftness": 5.8,
+    "BlendingMargin": 0.2,
+    "AltitudeCeiling": 22.0,
+    "AltitudeMultiplier": "Environment/Land/Materials/AltitudeMultiplierGrass_Manual",
+    "DesertAltitudeMultiplier": "Environment/Land/Materials/AltitudeMultiplierDesert_Manual",
+    "CutoutMargin": 0.1
+  }
+}

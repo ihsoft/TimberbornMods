@@ -1,0 +1,116 @@
+﻿{
+  "TemplateSpec": {
+    "TemplateName": "RuinColumnH3",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 3
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Ruins",
+    "ToolOrder": 3,
+    "ToolShape": "Square",
+    "Layout": "Rectangle",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": true
+  },
+  "RuinSpec": {
+    "ModelParentName": "#Models",
+    "RuinHeight": 3,
+    "Yielder": {
+      "YielderComponentName": "Ruin",
+      "Yield": {
+        "Id": "ScrapMetal",
+        "Amount": 45
+      },
+      "RemovalTimeInHours": 1.8,
+      "ResourceGroup": "Ruin"
+    }
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.Ruins.DisplayName",
+    "DescriptionLocKey": "Building.Ruins.Description",
+    "FlavorDescriptionLocKey": "Building.Ruins.FlavorDescription",
+    "Icon": "MapEditor/Ruins/RuinColumnH3/RuinColumnH3Icon"
+  },
+  "BasicSelectionSoundSpec": {
+    "SoundName": "Ruin",
+    "AlternativeSoundName": ""
+  },
+  "BlockObjectModelSpec": {
+    "FullModelName": "#Models",
+    "UncoveredModelName": "",
+    "UndergroundModelName": "",
+    "UndergroundModelDepth": 0
+  },
+  "Children": {
+    "#Models": {
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 1.5,
+              "Z": 0.5
+            },
+            "Size": {
+              "X": 1.0,
+              "Y": 3.0,
+              "Z": 1.0
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    }
+  }
+}

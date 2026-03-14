@@ -1,0 +1,21 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="Box" src="/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonMiscStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Options/OptionsStyle.uss" />
+    <ui:Instance name="FileBrowser" template="Box" class="file-browser">
+        <ui:AttributeOverrides element-name="Header" text-loc-key="FileBrowser.Header" />
+        <ui:Label text="Tip" name="Tip" class="text--default file-browser__tip" />
+        <ui:VisualElement class="file-browser__path-wrapper">
+            <cui:NineSliceButton name="UpwardButton" class="button-square button-square--large file-browser__button-square">
+                <ui:VisualElement name="UpwardButtonIcon" class="file-browser__upward-icon" />
+            </cui:NineSliceButton>
+            <cui:NineSliceTextField name="PathField" class="text-field file-browser__path-field" />
+        </ui:VisualElement>
+        <ui:ListView name="DiskSystemEntries" class="panel-list-view text--default scroll--green-decorated" />
+        <ui:VisualElement class="box-buttons">
+            <cui:LocalizableButton name="OpenButton" text="Open" text-loc-key="FileBrowser.Open" class="menu-button menu-button--medium" />
+        </ui:VisualElement>
+    </ui:Instance>
+</ui:UXML>

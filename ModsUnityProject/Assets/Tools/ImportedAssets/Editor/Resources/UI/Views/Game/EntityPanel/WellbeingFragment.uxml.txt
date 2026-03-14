@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <cui:NineSliceVisualElement name="WellbeingFragment" class="bg-sub-box--green entity-sub-panel">
+        <cui:NineSliceVisualElement name="Summary" class="content-row-centered wellbeing-fragment__summary" />
+        <ui:ScrollView name="NeedViews" class="game-scroll-view wellbeing-fragment__needs" />
+        <ui:VisualElement name="DebugButtons" class="content-row-centered">
+            <cui:NineSliceButton name="Edit" text="Edit" class="button-game wellbeing-fragment__debug entity-panel__text" />
+            <cui:NineSliceButton name="Freeze" text="Freeze" class="button-game wellbeing-fragment__debug entity-panel__text" />
+            <cui:NineSliceButton name="Unfreeze" text="Unfreeze" class="button-game wellbeing-fragment__debug entity-panel__text" />
+            <cui:NineSliceButton name="Boost" text="Boost" class="button-game wellbeing-fragment__debug entity-panel__text" />
+        </ui:VisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

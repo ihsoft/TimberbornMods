@@ -1,0 +1,6 @@
+{
+  "RecoveredGoodStackCoordinatesFinderSpec": {
+    "NeighboursRange": 5,
+    "MaxUpperSearch": 5
+  }
+}

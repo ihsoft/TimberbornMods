@@ -1,0 +1,19 @@
+{
+  "GoodCollectionSpec": {
+    "CollectionId": "Common",
+    "Goods": [
+      "Badwater",
+      "Berries",
+      "Dirt",
+      "Explosives",
+      "Extract",
+      "Gear",
+      "Log",
+      "MetalBlock",
+      "PineResin",
+      "Plank",
+      "ScrapMetal",
+      "Water"
+    ]
+  }
+}

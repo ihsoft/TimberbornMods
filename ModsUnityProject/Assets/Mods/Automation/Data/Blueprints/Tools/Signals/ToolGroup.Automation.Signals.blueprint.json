@@ -1,0 +1,13 @@
+{
+  "ToolGroupSpec": {
+    "Id": "AutomationSignalsToolGroupId",
+    "DisplayNameLocKey": "IgorZ.Automation.ToolGroup.Signals.DisplayName",
+    "Icon": "Sprites/IgorZ/tool-group-signals"
+  },
+  "CustomToolGroupSpec": {
+    "ParentGroupId": "AutomationToolGroupId",
+    "Style": "Green",
+    "Order": 26
+  },
+  "ConstructionModeToolGroupSpec": {}
+}

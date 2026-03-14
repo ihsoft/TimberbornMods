@@ -1,0 +1,7 @@
+{
+  "KeyBindingGroupSpec" : {
+    "Id": "IgorZ-CustomTools-BindingsGroupId",
+    "Order": -1000,
+    "LocKey": "IgorZ.CustomTools.KeyBindingGroup"
+  }
+}

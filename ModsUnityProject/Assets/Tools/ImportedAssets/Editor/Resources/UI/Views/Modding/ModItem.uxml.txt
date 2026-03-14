@@ -1,0 +1,16 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Modding/ModdingStyle.uss" />
+    <ui:VisualElement name="ModItem" class="mod-item">
+        <ui:VisualElement name="PriorityWrapper" class="mod-item__priority-wrapper">
+            <ui:Button name="Increase" class="mod-item__priority mod-item__priority--increase" />
+            <ui:Button name="Decrease" class="mod-item__priority mod-item__priority--decrease" />
+        </ui:VisualElement>
+        <ui:Toggle name="ModToggle" class="mod-item__toggle" />
+        <ui:Image name="ModIcon" class="mod-item__icon" />
+        <ui:Label name="ModName" text="ModName" class="mod-item__name" />
+        <ui:Label name="ModVersion" class="text--yellow mod-item__version" />
+        <ui:VisualElement name="WarningIcon" class="warning-icon" />
+    </ui:VisualElement>
+</ui:UXML>

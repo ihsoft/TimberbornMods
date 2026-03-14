@@ -1,0 +1,34 @@
+{
+  "GoodSpec": {
+    "Id": "Kohlrabi",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [
+      {
+        "NeedId": "Hunger",
+        "Points": 0.3
+      },
+      {
+        "NeedId": "Kohlrabi",
+        "Points": 0.2
+      }
+    ],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.3372549,
+      "g": 0.6509804,
+      "b": 0.274509817,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Food",
+    "GoodOrder": 11010,
+    "Icon": "Sprites/Goods/KohlrabiIcon",
+    "ForceImport": true,
+    "DisplayNameLocKey": "Good.Kohlrabi.DisplayName",
+    "PluralDisplayNameLocKey": "Good.Kohlrabi.PluralDisplayName"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "RecipeSpec": {
+    "Id": "Biofuel.Spadderdock",
+    "BackwardCompatibleIds": [],
+    "DisplayLocKey": "Manufactory.Recipe.BiofuelSpadderdock",
+    "CycleDurationInHours": 6.0,
+    "Ingredients": [
+      {
+        "Id": "Spadderdock",
+        "Amount": 2
+      },
+      {
+        "Id": "Water",
+        "Amount": 2
+      }
+    ],
+    "Products": [
+      {
+        "Id": "Biofuel",
+        "Amount": 25
+      }
+    ],
+    "ProducedSciencePoints": 0,
+    "Fuel": "",
+    "CyclesFuelLasts": 0,
+    "FuelCapacity": 0,
+    "CyclesCapacity": 5,
+    "Icon": "Sprites/Goods/BiofuelIcon"
+  }
+}

@@ -1,0 +1,191 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "Default",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "Plank",
+        "Amount": 5
+      },
+      {
+        "Id": "MetalBlock",
+        "Amount": 1
+      }
+    ],
+    "ScienceCost": 400,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": true,
+    "DrawRangeBoundsOnIt": false
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "#Underground",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 1
+  },
+  "TemplateSpec": {
+    "TemplateName": "ContaminationBarrier.Folktails",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Path",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Landscaping",
+    "ToolOrder": 60,
+    "ToolShape": "Square",
+    "Layout": "Line",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.ContaminationBarrier.DisplayName",
+    "DescriptionLocKey": "Building.ContaminationBarrier.Description",
+    "FlavorDescriptionLocKey": "Building.ContaminationBarrier.FlavorDescription",
+    "Icon": "Buildings/Landscaping/ContaminationBarrier/ContaminationBarrierIcon"
+  },
+  "SoilBarrierSpec": {
+    "BlockAboveMoisture": false,
+    "BlockFullMoisture": false,
+    "BlockContamination": true
+  },
+  "BlockObjectNavMeshSettingsSpec": {
+    "NoAutoWalls": true,
+    "GenerateFloorsOnStackable": false,
+    "EdgeGroups": [],
+    "UnblockedCoordinates": []
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "MergeableObjectModelSpec": {
+    "ModelNamePrefix": "ContaminationBarrier"
+  },
+  "Children": {
+    "#Finished": {
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.0451144278,
+              "Z": 0.5
+            },
+            "Size": {
+              "X": 0.9,
+              "Y": 0.0902288556,
+              "Z": 0.9
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      },
+      "Children": {
+        "ContaminationBarrier0000": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Landscaping/ContaminationBarrier/ContaminationBarrier0000.Folktails.Model"
+          }
+        },
+        "ContaminationBarrier0001": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Landscaping/ContaminationBarrier/ContaminationBarrier0001.Folktails.Model"
+          }
+        },
+        "ContaminationBarrier0011": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Landscaping/ContaminationBarrier/ContaminationBarrier0011.Folktails.Model"
+          }
+        },
+        "ContaminationBarrier0111": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Landscaping/ContaminationBarrier/ContaminationBarrier0111.Folktails.Model"
+          }
+        },
+        "ContaminationBarrier1111": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Landscaping/ContaminationBarrier/ContaminationBarrier1111.Folktails.Model"
+          }
+        },
+        "ContaminationBarrier1010": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Landscaping/ContaminationBarrier/ContaminationBarrier1010.Folktails.Model"
+          }
+        }
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase1x1#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase1x1/ConstructionBase1x1.blueprint"
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Landscaping/ContaminationBarrier/ContaminationBarrier.Folktails.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.05,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.1,
+                  "Z": 1.0
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    },
+    "#Underground": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Landscaping/ContaminationBarrier/ContaminationBarrier.Folktails.Underground"
+      }
+    }
+  }
+}

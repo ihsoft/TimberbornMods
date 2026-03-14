@@ -1,0 +1,8 @@
+{
+  "TemplateCollectionSpec": {
+    "CollectionId": "Planes.IronTeeth",
+    "Blueprints": [
+      "Buildings/Monuments/EarthRepopulator/EarthRepopulator.IronTeeth.Plane.blueprint"
+    ]
+  }
+}

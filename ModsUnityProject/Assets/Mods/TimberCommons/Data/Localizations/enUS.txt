@@ -7,6 +7,7 @@ IgorZ.TimberCommons.GrowthRateModifier.BoostPercentile,"Growth boost: <GreenHigh
 IgorZ.TimberCommons.GrowthRateModifier.SlowdownPercentile,"Growth slowdown: <RedHighlight>🡇</RedHighlight>{0:0.#}%","It indicates growth penalty, it's a bad effect."
 IgorZ.TimberCommons.AdjustableWaterOutput.StopAboveDownstream,"Close above depth at spillway: {0}",
 IgorZ.TimberCommons.InjuryProbability,"Injury probability: {0} every hour",
+IgorZ.TimberCommons.InjuryProbabilityDaily,"Injury probability: {0} during the day",
 IgorZ.TimberCommons.Settings.TimeAndDurationSection,"Time and duration representation",
 IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursSupplyLeft,"Show 'supply lasts' as days/hours",
 IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursGrowingTime,"Show grow time as days/hours",
@@ -24,6 +25,7 @@ IgorZ.TimberCommons.Settings.InjuryProbabilitySection,"Injury probability",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,"Show injury probability in the right panel",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,"Show indicator on the building avatar",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHintTooltip,"Hover over the indicator to see the injury probability",
+IgorZ.TimberCommons.Settings.InjuryProbability.ShowAsDailyProbability,"Show daily probabilities",
 =,=,"TimberDev_Utils"
 TimberDev_Utils.Settings.DebugSection,"Debug and troubleshooting",
 TimberDev_Utils.Settings.Debug.VerboseLogging,"Verbose logging",

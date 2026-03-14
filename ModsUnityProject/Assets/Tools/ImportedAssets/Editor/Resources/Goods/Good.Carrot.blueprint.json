@@ -1,0 +1,34 @@
+{
+  "GoodSpec": {
+    "Id": "Carrot",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [
+      {
+        "NeedId": "Hunger",
+        "Points": 0.3
+      },
+      {
+        "NeedId": "Carrots",
+        "Points": 0.2
+      }
+    ],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 1.0,
+      "g": 0.447058827,
+      "b": 0.0,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Food",
+    "GoodOrder": 9010,
+    "Icon": "Sprites/Goods/CarrotIcon",
+    "ForceImport": true,
+    "DisplayNameLocKey": "Good.Carrot.DisplayName",
+    "PluralDisplayNameLocKey": "Good.Carrot.PluralDisplayName"
+  }
+}

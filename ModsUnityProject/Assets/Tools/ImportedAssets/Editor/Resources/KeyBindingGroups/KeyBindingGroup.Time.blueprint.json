@@ -1,0 +1,7 @@
+{
+  "KeyBindingGroupSpec": {
+    "Id": "Time",
+    "Order": 0,
+    "LocKey": "KeyBindingGroup.Time"
+  }
+}

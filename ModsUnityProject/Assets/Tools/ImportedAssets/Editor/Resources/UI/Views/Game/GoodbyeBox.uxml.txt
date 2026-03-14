@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+    <ui:VisualElement name="GoodbyeBox" class="content-row-centered">
+        <cui:NineSliceVisualElement class="sliced-border goodbye-box">
+            <ui:VisualElement name="Fields" class="content-row-centered goodbye-box__text-wrapper">
+                <cui:LocalizableLabel text="Thanks for playing the demo!" name="Header" text-loc-key="GameExitPanel.Title" class="goodbye-box__header grow-centered text--header" />
+                <cui:LocalizableLabel text="We hope you'll join us in Early Access! Don't want to miss it?" name="Text" text-loc-key="GameExitPanel.Message" class="goodbye-box__text grow-centered text--default" />
+            </ui:VisualElement>
+            <ui:VisualElement name="Buttons" class="goodbye-box__buttons">
+                <cui:LocalizableButton text="Share feedback" name="Feedback" text-loc-key="GameExitPanel.ShareFeedback" focusable="false" class="menu-button" />
+                <cui:LocalizableButton text="Exit" name="Exit" text-loc-key="GameExitPanel.Exit" focusable="false" class="menu-button" />
+            </ui:VisualElement>
+            <ui:Button name="CancelButton" focusable="false" tabindex="1" class="close-button" />
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

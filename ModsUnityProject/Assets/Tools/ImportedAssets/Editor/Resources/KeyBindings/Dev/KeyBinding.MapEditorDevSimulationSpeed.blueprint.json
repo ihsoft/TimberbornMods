@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "MapEditorDevSimulationSpeed",
+    "GroupId": "Dev",
+    "LocKey": "",
+    "Order": 24,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": true
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/4",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

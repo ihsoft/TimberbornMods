@@ -1,0 +1,9 @@
+{
+  "GoodGroupSpec": {
+    "Id": "Ingredients",
+    "Order": 20,
+    "Icon": "Sprites/TopBar/Ingredients",
+    "SingleResourceGroup": false,
+    "DisplayNameLocKey": "TopBar.Ingredients"
+  }
+}

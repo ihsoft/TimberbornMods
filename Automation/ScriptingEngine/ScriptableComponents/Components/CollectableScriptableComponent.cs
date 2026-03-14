@@ -11,6 +11,7 @@ using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
+using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BuildingsNavigation;
 using Timberborn.Common;
@@ -89,7 +90,8 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
       DisplayName = Loc.T(CollectableReadySignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
-          ValueValidator = ValueDef.RangeCheckValidatorInt(0),
+          DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
+          DisplayNumericFormatRange = (0, float.NaN),
       },
   };
   SignalDef _collectableReadySignalDef;
@@ -104,8 +106,8 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
   #region Implementation
 
   static YieldRemovingBuilding GetYieldRemovingBuilding(AutomationBehavior behavior, bool throwIfNotFound = true) {
-    var yieldRemovingBuilding = behavior.GetComponentFast<YieldRemovingBuilding>();
-    var buildingTerrainRange = behavior.GetComponentFast<BuildingTerrainRange>();
+    var yieldRemovingBuilding = behavior.GetComponent<YieldRemovingBuilding>();
+    var buildingTerrainRange = behavior.GetComponent<BuildingTerrainRange>();
     if (yieldRemovingBuilding && buildingTerrainRange) {
       return yieldRemovingBuilding;
     }
@@ -119,7 +121,7 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
 
   #region Component that tracks gatherable items in the building area.
 
-  sealed class GatherableTracker : AbstractStatusTracker, IFinishedStateListener {
+  internal sealed class GatherableTracker : AbstractStatusTracker, IAwakableComponent, IFinishedStateListener {
 
     #region IFinishedStateListener implementation
 
@@ -169,22 +171,17 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
       _eventBus = eventBus;
       _blockService = blockService;
       _treeCuttingArea = treeCuttingArea;
-
-      // This component is added dynamically, so it won't get the finished state callback on a finished building.
-      if (GetComponentFast<BlockObject>().IsFinished) {
-        OnEnterFinishedState();
-      }
     }
 
-    void Awake() {
-      _buildingTerrainRange = GetComponentFast<BuildingTerrainRange>();
-      _yieldRemovingBuilding = GetComponentFast<YieldRemovingBuilding>();
-      _needsCuttingArea = GetComponentFast<LumberjackFlagWorkplaceBehavior>();
-      _noAliveCheck = _needsCuttingArea || GetComponentFast<ScavengerWorkplaceBehavior>();
+    public void Awake() {
+      _buildingTerrainRange = AutomationBehavior.GetComponent<BuildingTerrainRange>();
+      _yieldRemovingBuilding = AutomationBehavior.GetComponent<YieldRemovingBuilding>();
+      _needsCuttingArea = AutomationBehavior.GetComponent<LumberjackFlagWorkplaceBehavior>();
+      _noAliveCheck = _needsCuttingArea || AutomationBehavior.GetComponent<ScavengerWorkplaceBehavior>();
     }
 
     void ScheduleStateUpdate() {
-      _stateUpdateCoroutine ??= StartCoroutine(StateUpdateCoroutine());
+      _stateUpdateCoroutine ??= MonoBehaviour.StartCoroutine(StateUpdateCoroutine());
     }
     Coroutine _stateUpdateCoroutine;
 
@@ -204,7 +201,7 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
       }
       _yieldersChanged = false;
 
-      HostedDebugLog.Fine(this, "Recalculating {0} yielders", _yielders.Count);
+      HostedDebugLog.Fine(AutomationBehavior, "Recalculating {0} yielders", _yielders.Count);
       var oldState = _activeYielders;
       _activeYielders = 0;
       for (var i = _yielders.Count - 1; i >= 0; i--) {
@@ -222,20 +219,20 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     void AddYielder(Yielder yielder) {
       if (!_yielders.Add(yielder)) {
-        HostedDebugLog.Error(this, "Yielder already exists in the set: {0}", yielder);
+        HostedDebugLog.Error(AutomationBehavior, "Yielder already exists in the set: {0}", yielder);
         return;
       }
       yielder.YieldDecreased += OnYielderUpdate;
       yielder.YieldAdded += OnYielderUpdate;
-      var cuttable = yielder.GetComponentFast<Cuttable>();
+      var cuttable = yielder.GetComponent<Cuttable>();
       if (cuttable) {
         cuttable.WasCut += OnYielderUpdate;
       }
-      var growable = yielder.GetComponentFast<Growable>();
+      var growable = yielder.GetComponent<Growable>();
       if (growable) {
         growable.HasGrown += OnYielderUpdate;
       }
-      var living = yielder.GetComponentFast<LivingNaturalResource>();
+      var living = yielder.GetComponent<LivingNaturalResource>();
       if (living) {
         living.Died += OnYielderUpdate;
         living.ReversedDeath += OnYielderUpdate;
@@ -247,21 +244,21 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
     void RemoveYielder(Yielder yielder, bool isCleanup = false) {
       if (!_yielders.Remove(yielder)) {
         if (!isCleanup) {
-          HostedDebugLog.Error(this, "Yielder not found in the set: {0}", yielder);
+          HostedDebugLog.Error(AutomationBehavior, "Yielder not found in the set: {0}", yielder);
         }
         return;
       }
       yielder.YieldDecreased -= OnYielderUpdate;
       yielder.YieldAdded -= OnYielderUpdate;
-      var cuttable = yielder.GetComponentFast<Cuttable>();
+      var cuttable = yielder.GetComponent<Cuttable>();
       if (cuttable) {
         cuttable.WasCut -= OnYielderUpdate;
       }
-      var growable = yielder.GetComponentFast<Growable>();
+      var growable = yielder.GetComponent<Growable>();
       if (growable) {
         growable.HasGrown -= OnYielderUpdate;
       }
-      var living = yielder.GetComponentFast<LivingNaturalResource>();
+      var living = yielder.GetComponent<LivingNaturalResource>();
       if (living) {
         living.Died -= OnYielderUpdate;
         living.ReversedDeath -= OnYielderUpdate;
@@ -302,7 +299,7 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
         return null;
       }
       var yielders = new List<Yielder>();
-      blockObject.GetComponentsFast(yielders);
+      blockObject.GetComponents(yielders);
       var res = new HashSet<Yielder>();
       for (var i = yielders.Count - 1; i >= 0; i--) {
         var yielder = yielders[i];
@@ -334,7 +331,7 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
     /// <summary>Monitors for the new plants.</summary>
     [OnEvent]
     public void OnEntityInitializedEvent(EntityInitializedEvent e) {
-      var blockObject = e.Entity.GetComponentFast<BlockObject>();
+      var blockObject = e.Entity.GetComponent<BlockObject>();
       if (blockObject == null) {
         return;
       }
@@ -351,7 +348,7 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
     /// <summary>Removes yielders from the deleted objects.</summary>
     [OnEvent]
     public void OnEntityDeletedEvent(EntityDeletedEvent e) {
-      var blockObject = e.Entity.GetComponentFast<BlockObject>();
+      var blockObject = e.Entity.GetComponent<BlockObject>();
       if (blockObject == null) {
         return;
       }
@@ -359,7 +356,7 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
         return;
       }
       var yielders = new List<Yielder>();
-      blockObject.GetComponentsFast(yielders);
+      blockObject.GetComponents(yielders);
       for (var i = yielders.Count - 1; i >= 0; i--) {
         RemoveYielder(yielders[i], isCleanup: true);
       }

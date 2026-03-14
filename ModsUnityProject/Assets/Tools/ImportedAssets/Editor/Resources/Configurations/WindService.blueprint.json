@@ -1,0 +1,8 @@
+{
+  "WindServiceSpec": {
+    "MinWindTimeInHours": 5.0,
+    "MaxWindTimeInHours": 12.0,
+    "MinWindStrength": 0.0,
+    "MaxWindStrength": 1.0
+  }
+}

@@ -2,11 +2,11 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Reflection;
 using HarmonyLib;
 using IgorZ.TimberCommons.Settings;
 using IgorZ.TimberDev.UI;
 using Timberborn.Growing;
+using Timberborn.GrowingUI;
 using Timberborn.Localization;
 using UnityEngine.UIElements;
 
@@ -16,12 +16,8 @@ using UnityEngine.UIElements;
 namespace IgorZ.TimberCommons.CommonUIPatches;
 
 /// Harmony patch to show grow rate as days/hours.
-[HarmonyPatch]
+[HarmonyPatch(typeof(GrowableFragment), nameof(GrowableFragment.UpdateFragment))]
 static class GrowableFragmentPatch {
-  static MethodBase TargetMethod() {
-    return AccessTools.DeclaredMethod("Timberborn.GrowingUI.GrowableFragment:UpdateFragment");
-  }
-
   static void Postfix(bool __runOriginal, ILoc ____loc, Label ____growthTime, Growable ____growable) {
     if (!__runOriginal) {
       return;  // The other patches must follow the same style to properly support the skip logic!

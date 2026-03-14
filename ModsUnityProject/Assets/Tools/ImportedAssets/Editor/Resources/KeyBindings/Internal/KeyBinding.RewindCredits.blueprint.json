@@ -1,0 +1,20 @@
+{
+  "KeyBindingSpec": {
+    "Id": "RewindCredits",
+    "GroupId": "Internal",
+    "LocKey": "",
+    "Order": 60,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/upArrow",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  },
+  "SecondaryInputBindingSpec": {
+    "Path": "/Keyboard/w",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

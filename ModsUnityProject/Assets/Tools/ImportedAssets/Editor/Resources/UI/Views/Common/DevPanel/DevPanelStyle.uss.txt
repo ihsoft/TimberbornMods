@@ -1,0 +1,51 @@
+.dev-panel {
+    width: 258px;
+    background-color: darkslategrey;
+    padding: 4px;
+    position: absolute;
+    bottom: 60px;
+    left: 4px;
+}
+
+.dev-panel__content {
+    height: 750px;
+    margin-right: -7px;
+    justify-content: flex-end;
+}
+
+.dev-panel__methods {
+    margin-bottom: 8px;
+}
+
+.dev-panel__title {
+    -unity-text-align: middle-center;
+    margin-bottom: 4px;
+}
+
+.dev-panel__filter {
+    margin: 4px 20px 4px 0;
+}
+
+.dev-panel-button {
+    flex-direction: row;
+}
+
+.dev-panel-button__button {
+    margin: 2px 0;
+    padding: 0 3px;
+    font-size: 12px;
+    -unity-text-align: middle-left;
+    flex-shrink: 1;
+    flex-grow: 1;
+}
+
+.dev-panel-button__favourites {
+    align-self: center;
+    width: 17px;
+    height: 17px;
+    margin-left: 1px;
+}
+
+.dev-panel-button--title {
+    -unity-text-align: middle-center;
+}

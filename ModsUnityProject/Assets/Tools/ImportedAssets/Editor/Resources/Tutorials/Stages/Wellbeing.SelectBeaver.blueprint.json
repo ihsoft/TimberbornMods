@@ -1,0 +1,17 @@
+{
+  "TutorialStageSpec": {
+    "Id": "Wellbeing.SelectBeaver",
+    "IntroLocKey": "Tutorial.Wellbeing.Beaver"
+  },
+  "Children": {
+    "Child": {
+      "SelectEntityStepSpec": {
+        "TemplateNames": [
+          "BeaverAdult",
+          "BeaverChild"
+        ],
+        "DescriptionLocKey": "Tutorial.Wellbeing.SelectBeaver"
+      }
+    }
+  }
+}

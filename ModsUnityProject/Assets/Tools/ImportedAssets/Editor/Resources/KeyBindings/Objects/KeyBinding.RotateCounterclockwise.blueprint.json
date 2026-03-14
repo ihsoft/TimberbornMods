@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "RotateCounterclockwise",
+    "GroupId": "Objects",
+    "LocKey": "KeyBinding.RotateCounterclockwise",
+    "Order": 10,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/r",
+    "InputModifiers": "Shift",
+    "Unchangeable": false
+  }
+}

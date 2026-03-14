@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "RestoreCamera",
+    "GroupId": "Camera",
+    "LocKey": "KeyBinding.RestoreCamera",
+    "Order": 130,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/m",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

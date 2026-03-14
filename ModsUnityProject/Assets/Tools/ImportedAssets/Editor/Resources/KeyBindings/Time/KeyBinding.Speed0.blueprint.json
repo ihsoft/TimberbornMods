@@ -1,0 +1,20 @@
+{
+  "KeyBindingSpec": {
+    "Id": "Speed0",
+    "GroupId": "Time",
+    "LocKey": "KeyBinding.Speed0",
+    "Order": 0,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/space",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  },
+  "SecondaryInputBindingSpec": {
+    "Path": "/Keyboard/backquote",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

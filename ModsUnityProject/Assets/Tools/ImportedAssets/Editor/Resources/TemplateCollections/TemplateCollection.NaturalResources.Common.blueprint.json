@@ -1,0 +1,11 @@
+{
+  "TemplateCollectionSpec": {
+    "CollectionId": "Common",
+    "Blueprints": [
+      "NaturalResources/Bushes/Blueberry/BlueberryBush.blueprint",
+      "NaturalResources/Trees/Birch/Birch.blueprint",
+      "NaturalResources/Trees/Oak/Oak.blueprint",
+      "NaturalResources/Trees/Pine/Pine.blueprint"
+    ]
+  }
+}

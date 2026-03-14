@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "BotLimb",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.0,
+      "g": 0.772549033,
+      "b": 0.772549033,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 2,
+    "GoodGroupId": "Materials",
+    "GoodOrder": 5010,
+    "Icon": "Sprites/Goods/BotLimbIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.BotLimb.DisplayName",
+    "PluralDisplayNameLocKey": "Good.BotLimb.PluralDisplayName"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "WaterSimulatorSpec": {
+    "WaterFlowFactor": 2.25,
+    "WaterSpillThreshold": 0.1,
+    "NormalEvaporationSpeed": 0.0001,
+    "FastEvaporationDepthThreshold": 0.02,
+    "FastEvaporationSpeed": 0.001,
+    "OutflowBalancingScaler": 0.8,
+    "SoftDamOffset": 0.1,
+    "HardDamOffset": 0.05,
+    "MaxHardDamDecrease": 0.02,
+    "FlowChangeLimit": 0.005,
+    "OverflowPressureFactor": 8.0,
+    "DiffusionOutflowLimit": 0.125,
+    "DiffusionDepthLimit": 0.1,
+    "DiffusionRate": 0.45,
+    "MaxWaterContamination": 1.0
+  }
+}

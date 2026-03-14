@@ -1,0 +1,32 @@
+{
+  "CameraServiceSpec": {
+    "HorizontalAngle": 30.0,
+    "VerticalAngle": 70.0,
+    "VerticalAngleLimits": {
+      "Min": 10.0,
+      "Max": 89.99
+    },
+    "ZoomLevel": 0.0,
+    "ZoomSpeed": 1.7,
+    "ZoomBase": 1.3,
+    "BaseDistance": 32.0,
+    "DefaultZoomLimits": {
+      "Min": -8.0,
+      "Max": 6.0
+    },
+    "UnlockedZoomLimits": {
+      "Min": -8.0,
+      "Max": 10.0
+    },
+    "MapEditorZoomLimits": {
+      "Min": -2.5,
+      "Max": 8.0
+    },
+    "FreeModeZoomLimits": {
+      "Min": -100.0,
+      "Max": 100.0
+    },
+    "MapMargin": 50.0,
+    "FreeModeMapMargin": 100.0
+  }
+}

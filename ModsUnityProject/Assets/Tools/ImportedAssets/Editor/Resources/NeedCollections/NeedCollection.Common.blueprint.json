@@ -1,0 +1,20 @@
+{
+  "NeedCollectionSpec": {
+    "CollectionId": "Common",
+    "Needs": [
+      "BadwaterContamination",
+      "Campfire",
+      "ChippedTeeth",
+      "Hunger",
+      "Injury",
+      "Lantern",
+      "Roof",
+      "RooftopTerrace",
+      "Shelter",
+      "Shrub",
+      "Sleep",
+      "Thirst",
+      "WetFur"
+    ]
+  }
+}

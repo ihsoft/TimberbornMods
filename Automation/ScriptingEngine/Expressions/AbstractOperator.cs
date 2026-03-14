@@ -5,8 +5,6 @@
 using System;
 using System.Collections.Generic;
 using IgorZ.Automation.ScriptingEngine.Core;
-using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
-using IgorZ.Automation.Settings;
 
 namespace IgorZ.Automation.ScriptingEngine.Expressions;
 
@@ -25,23 +23,6 @@ abstract class AbstractOperator(IList<IExpression> operands) : IExpression {
   /// <inheritdoc/>
   public override string ToString() {
     return $"{GetType().Name}";
-  }
-
-  /// <summary>
-  /// Returns the specified operand string value. The operant must be a constant string or the call will fail.
-  /// </summary>
-  /// <seealso cref="ConstantValueExpr"/>
-  /// <exception cref="InvalidOperationException">
-  /// if index is out of bounds or the operant type is not a constant string value.
-  /// </exception>
-  public string GetStringLiteral(int index) {
-    if (index >= Operands.Count) {
-      throw new InvalidOperationException($"Operator {this} has {Operands.Count} operands, #{index} was requested");
-    }
-    return Operands[index] is ConstantValueExpr { ValueType: ScriptValue.TypeEnum.String } constantValueExpr
-        ? constantValueExpr.ValueFn().AsString
-        : throw new InvalidOperationException(
-            $"Expected a string literal at #{index + 1} of {this}, but got: {Operands[index]}");
   }
 
   /// <summary>Unwraps operands to the binary tree if there are more than 2 operands in the expression.</summary>
@@ -68,22 +49,6 @@ abstract class AbstractOperator(IList<IExpression> operands) : IExpression {
     if (max >= 0 && count > max) {
       throw new ScriptError.ParsingError($"Operator '{this}' requires at most {max} arguments, but got {count}");
     }
-  }
-
-  protected static ConstantValueExpr VerifyConstantValueExpr(ValueDef valueDef, IValueExpr valueExpr) {
-    if (valueExpr is not ConstantValueExpr constantValueExpr) {
-      return null;
-    }
-    if (!ScriptEngineSettings.CheckArgumentValues) {
-      return constantValueExpr;
-    }
-    try {
-      valueDef.ValueValidator?.Invoke(valueExpr.ValueFn());
-    } catch (ScriptError e) {
-      // Report as parsing error since it is checked at parse time.
-      throw new ScriptError.ParsingError(e.Message);
-    }
-    return constantValueExpr;
   }
 
   /// <summary>Returns a binary tree of expressions if there are more than 2 operands in the operator.</summary>

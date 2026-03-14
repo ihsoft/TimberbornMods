@@ -1,0 +1,21 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/BatchControl/BatchControlStyle.uss" />
+    <ui:VisualElement name="StockpileBatchControlRowItem" class="batch-control-box__row-item">
+        <cui:NineSliceVisualElement name="CapacityWrapper" class="stockpile-batch-control-row-item__wrapper batch-control-box__row-item-group--green">
+            <cui:LocalizableLabel name="CapacityHeader" text-loc-key="Inventory.Capacity" text="Capacity:" class="game-text-normal stockpile-batch-control-row-item__text" />
+            <ui:Label name="CapacityAmount" text="100" class="game-text-normal stockpile-batch-control-row-item__amount" />
+            <ui:Label text="/" class="game-text-normal stockpile-batch-control-row-item__separator" />
+            <ui:Label name="CapacityLimit" text="1000" class="game-text-normal stockpile-batch-control-row-item__limit" />
+            <ui:VisualElement name="FillFrame" class="stockpile-capacity__progress-bar stockpile-batch-control-row-item__progress-bar">
+                <ui:VisualElement name="Fill" class="stockpile-capacity__progress-bar-progress" />
+            </ui:VisualElement>
+        </cui:NineSliceVisualElement>
+        <cui:NineSliceVisualElement name="DropdownWrapper" class="stockpile-batch-control-row-item__wrapper batch-control-box__row-item-group--green">
+            <Timberborn.DropdownSystem.Dropdown name="GoodSelectionButton" class="stockpile-batch-control-row-item__dropdown" />
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

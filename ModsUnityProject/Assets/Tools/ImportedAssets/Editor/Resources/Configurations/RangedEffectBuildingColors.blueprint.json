@@ -1,0 +1,16 @@
+{
+  "RangedEffectBuildingColorsSpec": {
+    "BuildingRangeTile": {
+      "r": 1.0,
+      "g": 0.6,
+      "b": 0.0,
+      "a": 1.0
+    },
+    "BuildingRangeObject": {
+      "r": 0.4,
+      "g": 0.2,
+      "b": 0.0,
+      "a": 1.0
+    }
+  }
+}

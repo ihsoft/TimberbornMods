@@ -1,0 +1,10 @@
+{
+  "MechanicalNodeHighlighterSpec": {
+    "HighlightColor": {
+      "r": 0.055,
+      "g": 0.26,
+      "b": 0.275,
+      "a": 1.0
+    }
+  }
+}

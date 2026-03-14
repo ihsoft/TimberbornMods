@@ -12,31 +12,25 @@ using UnityEngine.UIElements;
 
 namespace IgorZ.TimberCommons.IrrigationSystemUI;
 
-sealed class GrowthRateModifierFragment : IEntityPanelFragment {
+sealed class GrowthRateModifierFragment(UiFactory uiFactory) : IEntityPanelFragment {
   const string BoostPercentileLocKey = "IgorZ.TimberCommons.GrowthRateModifier.BoostPercentile";
   const string SlowdownPercentileLocKey = "IgorZ.TimberCommons.GrowthRateModifier.SlowdownPercentile";
 
-  readonly UiFactory _uiFactory;
-  
   VisualElement _root;
   Label _infoLabel;
 
   GrowthRateModifier _growthModifier;
 
-  public GrowthRateModifierFragment(UiFactory uiFactory) {
-    _uiFactory = uiFactory;
-  }
-
   public VisualElement InitializeFragment() {
-    _infoLabel = _uiFactory.CreateLabel();
-    _root = _uiFactory.CreateCenteredPanelFragment();
+    _infoLabel = uiFactory.CreateLabel();
+    _root = uiFactory.CreateCenteredPanelFragment();
     _root.Add(_infoLabel);
     _root.ToggleDisplayStyle(visible: false);
     return _root;
   }
 
   public void ShowFragment(BaseComponent entity) {
-    _growthModifier = entity.GetComponentFast<GrowthRateModifier>();
+    _growthModifier = entity.GetComponent<GrowthRateModifier>();
     _root.ToggleDisplayStyle(visible: IsModifierVisible());
   }
 
@@ -51,10 +45,10 @@ sealed class GrowthRateModifierFragment : IEntityPanelFragment {
     }
     _root.ToggleDisplayStyle(visible: IsModifierVisible());
     var locKey = _growthModifier.EffectiveModifier > 0f ? BoostPercentileLocKey : SlowdownPercentileLocKey;
-    _infoLabel.text = _uiFactory.T(locKey, Mathf.Abs(_growthModifier.EffectiveModifier));
+    _infoLabel.text = uiFactory.T(locKey, Mathf.Abs(_growthModifier.EffectiveModifier));
   }
 
   bool IsModifierVisible() {
-    return _growthModifier != null && _growthModifier.IsLiveAndGrowing && _growthModifier.RateIsModified;
+    return _growthModifier is { IsLiveAndGrowing: true, RateIsModified: true };
   }
 }

@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "StorageTab",
+    "GroupId": "SettlementPanel",
+    "LocKey": "KeyBinding.StorageTab",
+    "Order": 40,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/f4",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

@@ -1,0 +1,16 @@
+ID,Text,Comment
+BuildingSound.PlaySound,Play sound,Label for toggle to play building sound
+EntityPanel.Close,Close,Tooltip for close button on entity panel
+EntityPanel.Focus,Focus,Tooltip over follow/focus button on entity panel
+EntityPanel.Rename,Rename district,Tooltip - rename district
+GameUI.ShowDistrictList,Show/close district list,Shown in tooltip over districts in main game hud
+KeyBinding.DragVisibleLayer,Drag visible layer,Binding for layer tool similar to KeyBinding.PickVisibleLayer
+MapMetadata.Spillage.Description,"This slope is full of small, irrigated enclaves. However, dangers abound in the region - should you not be careful, those areas will become anything but hospitable.",
+MapMetadata.Spillage.Name,Spillage,
+Settings.Input.MouseCameraRotationSpeed,Mouse rotation speed,Label in settings
+Settings.General.Header,General,Header for general settings section
+Settings.Graphics.LightQuality,Additional lights quality,Label for additional lights quality dropdown setting
+Settings.Intro.DisableIntro,Skip intro,Label for setting to skip intro cinematic
+Settings.Input.UnlockZoom,Unlimited zoom,Label for setting to unlock zoom limits
+Tool.Cursor.Tooltip,Select,Tooltip for cursor on bottom bar
+Tool.Options.Tooltip,Options,Tooltip for options on bottom bar

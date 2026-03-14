@@ -1,0 +1,17 @@
+﻿{
+  "TutorialStageSpec": {
+    "Id": "HousingAndPopulation.BuildLodges",
+    "IntroLocKey": "Tutorial.HousingAndPopulation.Lodges"
+  },
+  "Children": {
+    "Step1": {
+      "BuildingTutorialStepSpec": {
+        "TemplateNames": [
+          "Lodge.Folktails"
+        ],
+        "OnlyFinishedBuildings": true,
+        "RequiredAmount": 6
+      }
+    }
+  }
+}

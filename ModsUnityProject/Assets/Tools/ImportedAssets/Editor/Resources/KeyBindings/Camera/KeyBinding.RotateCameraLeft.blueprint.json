@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "RotateCameraLeft",
+    "GroupId": "Camera",
+    "LocKey": "KeyBinding.RotateCameraLeft",
+    "Order": 40,
+    "AllowOtherModifiers": true,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/q",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

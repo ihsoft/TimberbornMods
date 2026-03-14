@@ -1,0 +1,7 @@
+{
+  "NeedGroupSpec": {
+    "Id": "Nutrition",
+    "Order": 20,
+    "DisplayNameLocKey": "NeedGroup.Nutrition.DisplayName"
+  }
+}

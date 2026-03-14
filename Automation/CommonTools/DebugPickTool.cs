@@ -2,19 +2,21 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+extern alias CustomTools;
+
 using System.Linq;
 using System.Text;
-using IgorZ.TimberDev.Tools;
 using Timberborn.BaseComponentSystem;
+using Timberborn.BlockingSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BlockSystemNavigation;
-using Timberborn.BuildingsBlocking;
+using Timberborn.Buildings;
 using Timberborn.BuildingsNavigation;
 using Timberborn.ConstructionMode;
 using Timberborn.Coordinates;
-using Timberborn.Navigation;
 using Timberborn.PathSystem;
 using UnityDev.Utils.LogUtilsLite;
+using AbstractAreaSelectionTool = CustomTools::IgorZ.CustomTools.Tools.AbstractAreaSelectionTool;
 
 namespace IgorZ.Automation.CommonTools;
 
@@ -28,10 +30,10 @@ public class DebugPickTool : AbstractAreaSelectionTool, IConstructionModeEnabler
   /// <inheritdoc/>
   protected override void Initialize() {
     DescriptionBullets = [
-        "IgorZ.Automation.DebugPickTool.DescriptionHint1",
-        "IgorZ.Automation.DebugPickTool.DescriptionHint2",
+        Loc.T("IgorZ.Automation.DebugPickTool.DescriptionHint1"),
+        Loc.T("IgorZ.Automation.DebugPickTool.DescriptionHint2"),
     ];
-    DescriptionHintSectionLoc = null;
+    DescriptionHintSection = null;
     base.Initialize();
   }
 
@@ -59,7 +61,7 @@ public class DebugPickTool : AbstractAreaSelectionTool, IConstructionModeEnabler
     lines.AppendLine(string.Join("\n", names));
     lines.AppendLine(new string('*', 10));
 
-    var blockable = component.GetComponentFast<BlockableBuilding>();
+    var blockable = component.GetComponent<BlockableObject>();
     if (blockable && !blockable.IsUnblocked) {
       lines.AppendLine($"Building is blocked by:");
       var blockers = blockable._blockers.Select(x => x.ToString()).OrderBy(x => x);
@@ -70,25 +72,33 @@ public class DebugPickTool : AbstractAreaSelectionTool, IConstructionModeEnabler
   }
 
   static void PrintAccessible(BaseComponent component) {
-    var accessible = component.GetComponentFast<Accessible>();
-    var siteAccessible = component.GetComponentFast<ConstructionSiteAccessible>()?.Accessible;
-    if (!accessible && !siteAccessible) {
+    var buildingAccessible = component.GetComponent<BuildingAccessible>()?.Accessible;
+    var siteAccessible = component.GetComponent<ConstructionSiteAccessible>()?.Accessible;
+    if (!buildingAccessible && !siteAccessible) {
       HostedDebugLog.Error(component, "No accessible components found");
       return;
     }
     var lines = new StringBuilder();
     lines.AppendLine(new string('*', 10));
     lines.AppendLine($"Accesses on {DebugEx.BaseComponentToString(component)}");
-    if (accessible) {
-      lines.AppendLine($"From Accessible (enabled={accessible.enabled}):");
-      foreach (var access in accessible.Accesses) {
-        lines.AppendLine($"world: {access}, grid:{CoordinateSystem.WorldToGridInt(access)}");
+    if (buildingAccessible) {
+      lines.AppendLine($"From BuildingAccessible (enabled={buildingAccessible.Enabled}):");
+      if (!buildingAccessible.Accesses.IsEmpty()) {
+        foreach (var access in buildingAccessible.Accesses) {
+          lines.AppendLine($"- world: {access}, grid:{CoordinateSystem.WorldToGridInt(access)}");
+        }
+      } else {
+        lines.AppendLine("- no entries");
       }
     }
     if (siteAccessible) {
-      lines.AppendLine($"From ConstructionSiteAccessible (enabled={siteAccessible.enabled}):");
-      foreach (var access in siteAccessible.Accesses) {
-        lines.AppendLine($"world: {access}, grid:{CoordinateSystem.WorldToGridInt(access)}");
+      lines.AppendLine($"From ConstructionSiteAccessible (enabled={siteAccessible.Enabled}):");
+      if (!siteAccessible.Accesses.IsEmpty()) {
+        foreach (var access in siteAccessible.Accesses) {
+          lines.AppendLine($"world: {access}, grid:{CoordinateSystem.WorldToGridInt(access)}");
+        }
+      } else {
+        lines.AppendLine("- no entries");
       }
     }
     lines.AppendLine(new string('*', 10));
@@ -96,16 +106,16 @@ public class DebugPickTool : AbstractAreaSelectionTool, IConstructionModeEnabler
   }
 
   static void PrintNavMesh(BaseComponent component) {
-    var settings = component.GetComponentFast<BlockObjectNavMeshSettingsSpec>();
-    if (!settings) {
+    var settings = component.GetComponent<BlockObjectNavMeshSettingsSpec>();
+    if (settings == null) {
       HostedDebugLog.Error(component, "No BlockObjectNavMeshSettings component found");
       return;
     }
     var lines = new StringBuilder();
     lines.AppendLine(new string('*', 10));
     lines.AppendLine($"NavMesh edges on {DebugEx.BaseComponentToString(component)}:");
-    var isPath = (bool) component.GetComponentFast<PathSpec>();
-    var blockObject = component.GetComponentFast<BlockObject>();
+    var isPath = component.GetComponent<PathSpec>() != null;
+    var blockObject = component.GetComponent<BlockObject>();
     var isSolid = blockObject.Solid;
     lines.AppendLine($"Building: isPath={isPath}, isSolid={isSolid}");
     if (isSolid) {
@@ -120,7 +130,7 @@ public class DebugPickTool : AbstractAreaSelectionTool, IConstructionModeEnabler
     foreach (var edge in edges) {
       lines.AppendLine($"{edge.Start} => {edge.End}");
     }
-    lines.AppendLine($"{settings.UnblockedCoordinates.Count} unblocked coordinates:");
+    lines.AppendLine($"{settings.UnblockedCoordinates.Length} unblocked coordinates:");
     foreach (var coords in settings.UnblockedCoordinates) {
       lines.AppendLine($"Group={coords.Group}, coords={coords.Coordinates}");
     }

@@ -1,0 +1,69 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="Box" src="/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/SteamWorkshop/SteamWorkshopStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Options/OptionsStyle.uss" />
+    <ui:Instance name="SteamWorkshopUploadPanel" template="Box" class="steam-workshop-upload-panel">
+        <ui:AttributeOverrides element-name="Header" text-loc-key="SteamWorkshop.UploadHeader" />
+        <ui:VisualElement name="Content" class="steam-workshop-upload-panel__content">
+            <ui:VisualElement name="LeftContent" class="steam-workshop-upload-panel__content-column steam-workshop-upload-panel__left-content">
+                <ui:VisualElement name="NameAndVisibility" class="steam-workshop-upload-panel__name-and-visibility steam-workshop-upload-panel__margin-bottom">
+                    <ui:VisualElement name="NameContent" class="steam-workshop-upload-panel__name-content">
+                        <cui:LocalizableLabel name="NameHeader" text="Name" text-loc-key="SteamWorkshop.Name" class="steam-workshop-upload-panel__non-updatable-label steam-workshop-upload-panel__label" />
+                        <cui:NineSliceTextField name="Name" class="text-field steam-workshop-upload-panel__name-field" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="VisibilityContent" class="steam-workshop-upload-panel__visibility-content">
+                        <ui:VisualElement name="SectionHeader" class="steam-workshop-upload-panel__section-header">
+                            <cui:LocalizableLabel name="VisibilityHeader" text="Visibility" text-loc-key="SteamWorkshop.Visibility" class="steam-workshop-upload-panel__label" />
+                            <cui:LocalizableToggle name="UpdateVisibility" text="Update" text-loc-key="SteamWorkshop.Update" class="game-toggle game-toggle--small game-text-normal" />
+                        </ui:VisualElement>
+                        <Timberborn.DropdownSystem.Dropdown name="Visibility" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="SectionHeader" class="steam-workshop-upload-panel__section-header">
+                    <cui:LocalizableLabel name="PreviewHeader" text="Preview" text-loc-key="SteamWorkshop.Preview" class="steam-workshop-upload-panel__label" />
+                    <cui:LocalizableToggle name="UpdatePreview" text="Update" text-loc-key="SteamWorkshop.Update" class="game-toggle game-toggle--small game-text-normal" />
+                </ui:VisualElement>
+                <cui:NineSliceVisualElement name="SteamWorkshopThumbnail" class="steam-workshop-upload-panel__thumbnail">
+                    <ui:VisualElement name="ThumbnailInfo" class="steam-workshop-upload-panel__thumbnail-info">
+                        <ui:Label name="ThumbnailInfoLabel" class="text--default steam-workshop-upload-panel__thumbnail-info-label" />
+                        <cui:LocalizableButton name="RefreshThumbnailButton" text-loc-key="SteamWorkshop.RefreshThumbnail" class="wide-menu-button" />
+                    </ui:VisualElement>
+                    <ui:Image name="ThumbnailImage" picking-mode="Ignore" class="thumbnail__image">
+                        <cui:NineSliceVisualElement name="Frame" picking-mode="Ignore" class="thumbnail__frame" />
+                    </ui:Image>
+                </cui:NineSliceVisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="RightContent" class="steam-workshop-upload-panel__content-column steam-workshop-upload-panel__right-content">
+                <ui:VisualElement name="DescriptionAndChangelog" class="steam-workshop-upload-panel__description-and-changelog">
+                    <ui:VisualElement name="SectionHeader" class="steam-workshop-upload-panel__section-header">
+                        <cui:LocalizableLabel name="DescriptionHeader" text="Description" text-loc-key="SteamWorkshop.Description" class="steam-workshop-upload-panel__label" />
+                        <cui:LocalizableToggle name="UpdateDescription" text="Update" text-loc-key="SteamWorkshop.Update" class="game-toggle game-toggle--small game-text-normal" />
+                    </ui:VisualElement>
+                    <cui:NineSliceTextField name="Description" multiline="true" vertical-scroller-visibility="Auto" class="text-field text-field--large scroll--green-decorated steam-workshop-upload-panel__description steam-workshop-upload-panel__margin-bottom" />
+                    <cui:LocalizableLabel name="ChangelogHeader" text="Changelog" text-loc-key="SteamWorkshop.Changelog" class="steam-workshop-upload-panel__non-updatable-label steam-workshop-upload-panel__label" />
+                    <cui:NineSliceTextField name="Changelog" multiline="true" vertical-scroller-visibility="Auto" class="text-field text-field--large scroll--green-decorated steam-workshop-upload-panel__changelog" />
+                </ui:VisualElement>
+                <ui:VisualElement name="TagsContent" class="steam-workshop-upload-panel__tags-content">
+                    <ui:VisualElement name="SectionHeader" class="steam-workshop-upload-panel__section-header">
+                        <cui:LocalizableLabel name="TagsHeader" text="Tags" text-loc-key="SteamWorkshop.Tags" class="steam-workshop-upload-panel__label" />
+                        <cui:LocalizableToggle name="UpdateTags" text="Update" text-loc-key="SteamWorkshop.Update" class="game-toggle game-toggle--small game-text-normal" />
+                    </ui:VisualElement>
+                    <cui:NineSliceVisualElement name="TagsBackground" class="steam-workshop-upload-panel__tags-background">
+                        <ui:ScrollView name="Tags" vertical-scroller-visibility="AlwaysVisible" horizontal-scroller-visibility="Hidden" class="scroll--green-decorated steam-workshop-upload-panel__tags" />
+                    </cui:NineSliceVisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <cui:LocalizableLabel name="LegalAgreement" text="Legal agreement" text-loc-key="SteamWorkshop.LegalAgreement" class="game-text-normal steam-workshop-upload-panel__legal-agreement" />
+        <ui:VisualElement name="BottomControls" class="steam-workshop-upload-panel__bottom-controls">
+            <ui:VisualElement name="EmptySpacer" class="steam-workshop-upload-panel__spacer" />
+            <cui:LocalizableButton name="UploadButton" text="Upload" text-loc-key="SteamWorkshop.UploadButton" class="menu-button menu-button--medium" />
+            <ui:VisualElement name="UploadAsNewToggleWrapper" class="steam-workshop-upload-panel__spacer steam-workshop-upload-panel__upload-as-new-toggle-wrapper">
+                <cui:LocalizableToggle name="UploadAsNew" text="Upload as new" text-loc-key="SteamWorkshop.UploadAsNew" class="game-toggle game-toggle--small game-text-normal steam-workshop-upload-panel__upload-as-new-toggle" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:Instance>
+</ui:UXML>
+

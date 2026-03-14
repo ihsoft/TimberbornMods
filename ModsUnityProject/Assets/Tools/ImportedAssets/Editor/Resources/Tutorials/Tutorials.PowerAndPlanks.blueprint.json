@@ -1,0 +1,14 @@
+﻿{
+  "TutorialSpec": {
+    "Id": "PowerAndPlanks",
+    "NameLocKey": "Tutorial.PowerAndPlanks",
+    "RequiredTutorialIds": [
+      "Storage"
+    ],
+    "SortOrder": 70,
+    "Stages": [
+      "PowerAndPlanks.BuildWaterWheel",
+      "PowerAndPlanks.BuildLumberMill"
+    ]
+  }
+}

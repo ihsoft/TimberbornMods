@@ -1,0 +1,19 @@
+{
+  "CustomCursorSpec": {
+    "Id": "CustomToolsPauseCursor",
+    "WindowsCursor": "Sprites/UI/Cursors/IgorZ.CustomTools/pause-cursor-large",
+    "MacOsCursor": "Sprites/UI/Cursors/IgorZ.CustomTools/pause-cursor-small",
+    "Hotspot": {
+      "X": 0,
+      "Y": 0
+    },
+    "WindowsCursorOffset": {
+      "X": 10.0,
+      "Y": 30.0
+    },
+    "MacOsCursorOffset": {
+      "X": 15.0,
+      "Y": 45.0
+    }
+  }
+}

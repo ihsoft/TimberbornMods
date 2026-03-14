@@ -1,0 +1,415 @@
+﻿{
+  "TemplateSpec": {
+    "TemplateName": "UndergroundRuins",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 5,
+      "Y": 5,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Ruins",
+    "ToolOrder": 10,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": true
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.UndergroundRuins.DisplayName",
+    "DescriptionLocKey": "Building.UndergroundRuins.Description",
+    "FlavorDescriptionLocKey": "Building.UndergroundRuins.FlavorDescription",
+    "Icon": "MapEditor/Ruins/UndergroundRuins/UndergroundRuinsIcon"
+  },
+  "BlockObjectTerrainCutoutSpec": {
+    "CutoutTiles": [
+      {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      {
+        "X": 0,
+        "Y": 1,
+        "Z": 0
+      },
+      {
+        "X": 0,
+        "Y": 2,
+        "Z": 0
+      },
+      {
+        "X": 0,
+        "Y": 3,
+        "Z": 0
+      },
+      {
+        "X": 0,
+        "Y": 4,
+        "Z": 0
+      },
+      {
+        "X": 1,
+        "Y": 0,
+        "Z": 0
+      },
+      {
+        "X": 1,
+        "Y": 1,
+        "Z": 0
+      },
+      {
+        "X": 1,
+        "Y": 2,
+        "Z": 0
+      },
+      {
+        "X": 1,
+        "Y": 3,
+        "Z": 0
+      },
+      {
+        "X": 1,
+        "Y": 4,
+        "Z": 0
+      },
+      {
+        "X": 2,
+        "Y": 0,
+        "Z": 0
+      },
+      {
+        "X": 2,
+        "Y": 1,
+        "Z": 0
+      },
+      {
+        "X": 2,
+        "Y": 2,
+        "Z": 0
+      },
+      {
+        "X": 2,
+        "Y": 3,
+        "Z": 0
+      },
+      {
+        "X": 2,
+        "Y": 4,
+        "Z": 0
+      },
+      {
+        "X": 3,
+        "Y": 0,
+        "Z": 0
+      },
+      {
+        "X": 3,
+        "Y": 1,
+        "Z": 0
+      },
+      {
+        "X": 3,
+        "Y": 2,
+        "Z": 0
+      },
+      {
+        "X": 3,
+        "Y": 3,
+        "Z": 0
+      },
+      {
+        "X": 3,
+        "Y": 4,
+        "Z": 0
+      },
+      {
+        "X": 4,
+        "Y": 0,
+        "Z": 0
+      },
+      {
+        "X": 4,
+        "Y": 1,
+        "Z": 0
+      },
+      {
+        "X": 4,
+        "Y": 2,
+        "Z": 0
+      },
+      {
+        "X": 4,
+        "Y": 3,
+        "Z": 0
+      },
+      {
+        "X": 4,
+        "Y": 4,
+        "Z": 0
+      }
+    ]
+  },
+  "DryObjectSpec": {},
+  "DryObjectModelSpec": {
+    "WetModelName": "#Wet",
+    "DryModelName": "#Dry"
+  },
+  "BasicSelectionSoundSpec": {
+    "SoundName": "UndergroundRuin",
+    "AlternativeSoundName": ""
+  },
+  "BlockObjectNavMeshAdderSpec": {},
+  "BlockObjectModelSpec": {
+    "FullModelName": "#Model",
+    "UncoveredModelName": "",
+    "UndergroundModelName": "#Underground",
+    "UndergroundModelDepth": 2
+  },
+  "ContinuousTerrainConstraintSpec": {},
+  "Children": {
+    "#Model": {
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 2.5,
+              "Y": -0.2,
+              "Z": 2.5
+            },
+            "Size": {
+              "X": 5.0,
+              "Y": 0.5,
+              "Z": 5.0
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      },
+      "Children": {
+        "#Base": {
+          "TimbermeshSpec": {
+            "Model": "MapEditor/Ruins/UndergroundRuins/UndergroundRuins.Model"
+          }
+        },
+        "#Dry": {
+          "TimbermeshSpec": {
+            "Model": "MapEditor/Ruins/UndergroundRuins/UndergroundRuins.Ivy_Dry.Model"
+          }
+        },
+        "#Wet": {
+          "TimbermeshSpec": {
+            "Model": "MapEditor/Ruins/UndergroundRuins/UndergroundRuins.Ivy_Wet.Model"
+          }
+        }
+      }
+    },
+    "#Underground": {
+      "TimbermeshSpec": {
+        "Model": "MapEditor/Ruins/UndergroundRuins/UndergroundRuins.Underground"
+      }
+    }
+  }
+}

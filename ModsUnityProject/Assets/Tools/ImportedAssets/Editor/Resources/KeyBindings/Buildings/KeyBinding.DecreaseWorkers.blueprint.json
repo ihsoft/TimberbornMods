@@ -1,0 +1,10 @@
+{
+  "KeyBindingSpec": {
+    "Id": "DecreaseWorkers",
+    "GroupId": "Buildings",
+    "LocKey": "KeyBinding.DecreaseWorkers",
+    "Order": 30,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  }
+}

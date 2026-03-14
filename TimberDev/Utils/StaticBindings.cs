@@ -8,7 +8,7 @@ using Bindito.Core;
 namespace IgorZ.TimberDev.Utils;
 
 /// <summary>Provider for the frequent singletons that can be obtained in a static context.</summary>
-public class StaticBindings {
+public sealed class StaticBindings {
   /// <summary>Factory for creation of the Bindito objects.</summary>
   public static IContainer DependencyContainer { get; private set; }
 

@@ -1,0 +1,43 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <cui:NineSliceVisualElement name="EntityPanel" class="entity-panel bg-sub-box--frame">
+        <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+        <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+        <ui:VisualElement class="entity-panel__top-wrapper">
+            <cui:NineSliceVisualElement class="entity-panel__header bg-sub-box--purple-striped">
+                <ui:VisualElement name="EntityAvatar" class="entity-panel__avatar" />
+                <ui:VisualElement name="EntityNameAndSubtitle" class="grow-centered entity_panel__name-and-subtitle">
+                    <ui:Button name="EntityName" class="entity-panel__name-wrapper">
+                        <ui:Label name="EntityNameText" text="Name" class="entity-panel__heading-text entity-panel__name text--bold" />
+                        <ui:Image name="EntityNameHint" class="editable-hint" />
+                    </ui:Button>
+                    <ui:Label text="Subtitle" name="EntitySubtitle" class="entity-panel__sub-text entity-panel__sub-item" />
+                    <ui:VisualElement name="ClickableSubtitleWrapper" class="entity-panel__clickable-subtitle-wrapper">
+                        <ui:Button text="ClickableSubtitle" name="EntityClickableSubtitle" class="entity-panel__sub-text entity-panel__sub-item entity-panel__clickable-subtitle" />
+                        <ui:Image name="SubtitleWarning" class="entity-panel__subtitle-warning" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </cui:NineSliceVisualElement>
+            <cui:NineSliceVisualElement name="Header" class="entity-panel__buttons bg-sub-box--green">
+                <ui:VisualElement name="LeftButtons" picking-mode="Ignore" class="entity-panel__buttons--left" />
+                <ui:VisualElement name="MiddleButtons" picking-mode="Ignore" class="entity-panel__buttons--middle" />
+                <ui:VisualElement name="RightButtons" picking-mode="Ignore" class="entity-panel__buttons--right">
+                    <ui:Button name="Follow" class="entity-panel__button entity-panel__button--green">
+                        <ui:VisualElement class="entity-panel__button entity-panel__follow" />
+                    </ui:Button>
+                    <ui:Button name="Unselect" class="entity-panel__button entity-panel__button--red">
+                        <ui:VisualElement class="entity-panel__button entity-panel__unselect" />
+                    </ui:Button>
+                </ui:VisualElement>
+            </cui:NineSliceVisualElement>
+        </ui:VisualElement>
+        <cui:NineSliceVisualElement text="Entity description" name="EntityDescription" class="entity-sub-panel entity-panel__description bg-sub-box--blue" />
+        <ui:VisualElement name="Fragments" />
+        <ui:VisualElement name="DiagnosticFragments" />
+        <ui:Button name="EntityDescriptionHider" class="entity-panel__description-hider">
+            <ui:VisualElement class="entity-panel__description-hider-icon" />
+        </ui:Button>
+        <ui:VisualElement name="SideFragments" class="entity-panel__side-fragments" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

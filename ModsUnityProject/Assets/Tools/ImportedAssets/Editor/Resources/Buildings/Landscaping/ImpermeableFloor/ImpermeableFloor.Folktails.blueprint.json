@@ -1,0 +1,222 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "Default",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "MetalBlock",
+        "Amount": 1
+      }
+    ],
+    "ScienceCost": 200,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": true,
+    "DrawRangeBoundsOnIt": false
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "#FinishedUncovered",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "TemplateSpec": {
+    "TemplateName": "ImpermeableFloor.Folktails",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Floor",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "BlockObjectNavMeshSettingsSpec": {
+    "NoAutoWalls": false,
+    "GenerateFloorsOnStackable": true,
+    "EdgeGroups": [],
+    "UnblockedCoordinates": []
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Landscaping",
+    "ToolOrder": 50,
+    "ToolShape": "Square",
+    "Layout": "Rectangle",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.ImpermeableFloor.DisplayName",
+    "DescriptionLocKey": "Building.ImpermeableFloor.Description",
+    "FlavorDescriptionLocKey": "Building.ImpermeableFloor.FlavorDescription",
+    "Icon": "Buildings/Landscaping/ImpermeableFloor/ImpermeableFloorIcon"
+  },
+  "SoilBarrierSpec": {
+    "BlockAboveMoisture": true,
+    "BlockFullMoisture": false,
+    "BlockContamination": false
+  },
+  "FinishableHorizontalWaterObstacleSpec": {
+    "Obstacles": [
+      {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    ]
+  },
+  "ImpermeableFloorSpec": {},
+  "PathModelTypeEnforcerSpec": {
+    "PathModelType": "Roof"
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "Children": {
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Landscaping/ImpermeableFloor/ImpermeableFloor.Folktails.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.04853726,
+              "Z": 0.5
+            },
+            "Size": {
+              "X": 0.996197,
+              "Y": 0.09707452,
+              "Z": 0.995018244
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase1x1ImpermeableFloor#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase1x1ImpermeableFloor/ConstructionBase1x1ImpermeableFloor.blueprint"
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Landscaping/ImpermeableFloor/ImpermeableFloor.Folktails.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.05,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.1,
+                  "Z": 1.0
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    },
+    "#FinishedUncovered": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Landscaping/ImpermeableFloor/ImpermeableFloor.Uncovered.Folktails.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.05882147,
+              "Y": 0.006891027,
+              "Z": 0.5016653
+            },
+            "Size": {
+              "X": 0.114312351,
+              "Y": 0.01596424,
+              "Z": 0.994487166
+            }
+          },
+          {
+            "Center": {
+              "X": 0.941012561,
+              "Y": 0.006891027,
+              "Z": 0.5016653
+            },
+            "Size": {
+              "X": 0.111888051,
+              "Y": 0.01596424,
+              "Z": 0.994487166
+            }
+          },
+          {
+            "Center": {
+              "X": 0.499339223,
+              "Y": 0.006891027,
+              "Z": 0.9413115
+            },
+            "Size": {
+              "X": 0.994599462,
+              "Y": 0.01596424,
+              "Z": 0.1151948
+            }
+          },
+          {
+            "Center": {
+              "X": 0.499339223,
+              "Y": 0.006891027,
+              "Z": 0.05889418
+            },
+            "Size": {
+              "X": 0.994599462,
+              "Y": 0.01596424,
+              "Z": 0.108743116
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    }
+  }
+}

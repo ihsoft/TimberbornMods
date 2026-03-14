@@ -14,4 +14,7 @@ record ActionDef {
 
   /// <summary>The arguments that the action expects.</summary>
   public ValueDef[] Arguments { get; init; }
+
+  /// <summary>If set, then optional arguments are allowed. They will be verified via this definition.</summary>
+  public ValueDef VarArg { get; init; }
 }

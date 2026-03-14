@@ -1,0 +1,16 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+    <cui:NineSliceVisualElement name="StockpileOverlayItem" class="stockpile-overlay-item bg-sub-box--frame">
+        <cui:NineSliceButton name="EntityButton" class="content-row-centered bg-sub-box--green stockpile-overlay-item__entity-button">
+            <ui:Label name="Stock" text="0" class="game-text-normal stockpile-overlay-item__text" />
+            <ui:VisualElement name="ProgressWrapper" class="stockpile-capacity__progress-bar stockpile-overlay-item__progress-bar">
+                <ui:VisualElement name="Progress" class="stockpile-capacity__progress-bar-progress" />
+            </ui:VisualElement>
+        </cui:NineSliceButton>
+        <cui:NineSliceButton name="SelectionButton" class="bg-box--green stockpile-overlay-item__selection-button">
+            <ui:Image name="Icon" class="stockpile-overlay-item__icon" />
+        </cui:NineSliceButton>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

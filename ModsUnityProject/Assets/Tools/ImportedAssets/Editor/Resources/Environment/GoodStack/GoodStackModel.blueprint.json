@@ -1,0 +1,183 @@
+{
+  "TransformSpec": {
+    "Position": {
+      "X": 0.0,
+      "Y": 0.0,
+      "Z": 0.0
+    },
+    "Rotation": {
+      "X": 0.0,
+      "Y": 0.0,
+      "Z": 0.0
+    },
+    "Scale": {
+      "X": 1.344,
+      "Y": 1.344,
+      "Z": 1.344
+    }
+  },
+  "GoodStackModelSpec": {
+    "LogObjectName": "#Log",
+    "BarrelObjectName": "#Barrel",
+    "BoxObjectName": "#Box",
+    "BagObjectName": "#Bag"
+  },
+  "Children": {
+    "#Box": {
+      "TransformSpec": {
+        "Position": {
+          "X": 0.101,
+          "Y": 0.135,
+          "Z": 0.639
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 44.9999962,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        }
+      },
+      "TimbermeshSpec": {
+        "Model": "Environment/Common/Box/Box"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.0,
+              "Y": -0.0354,
+              "Z": 0.0
+            },
+            "Size": {
+              "X": 0.225,
+              "Y": 0.225,
+              "Z": 0.225
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Barrel": {
+      "TransformSpec": {
+        "Position": {
+          "X": 0.086,
+          "Y": 0.166,
+          "Z": 0.086
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        }
+      },
+      "TimbermeshSpec": {
+        "Model": "Environment/Common/Barrel/Barrel"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.0,
+              "Y": -0.04,
+              "Z": 0.0
+            },
+            "Size": {
+              "X": 0.2,
+              "Y": 0.3,
+              "Z": 0.2
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Log": {
+      "TransformSpec": {
+        "Position": {
+          "X": 0.502,
+          "Y": 0.1406,
+          "Z": 0.196
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 44.9999962,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 0.7,
+          "Y": 0.8,
+          "Z": 0.8
+        }
+      },
+      "TimbermeshSpec": {
+        "Model": "StockpileGoodModels/1Log"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [],
+        "SphereColliders": [],
+        "CapsuleColliders": [
+          {
+            "Center": {
+              "X": 0.0,
+              "Y": -0.1,
+              "Z": 0.0
+            },
+            "Radius": 0.1,
+            "Height": 0.8,
+            "Axis": "X"
+          }
+        ]
+      }
+    },
+    "#Bag": {
+      "TransformSpec": {
+        "Position": {
+          "X": 0.683,
+          "Y": 0.121,
+          "Z": 0.595
+        },
+        "Rotation": {
+          "X": 270.0,
+          "Y": 225.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        }
+      },
+      "TimbermeshSpec": {
+        "Model": "Environment/Common/Bag/Bag"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [],
+        "SphereColliders": [],
+        "CapsuleColliders": [
+          {
+            "Center": {
+              "X": 0.03,
+              "Y": -0.06,
+              "Z": -0.03
+            },
+            "Radius": 0.08,
+            "Height": 0.35,
+            "Axis": "Y"
+          }
+        ]
+      }
+    }
+  }
+}

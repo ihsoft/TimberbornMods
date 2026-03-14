@@ -1,0 +1,21 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonMiscStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <ui:VisualElement name="GameOptionsBox" class="grow-centered">
+        <cui:NineSliceVisualElement name="OptionsBox" class="options-box sliced-border">
+            <cui:LocalizableButton text="Resume" name="ResumeButton" text-loc-key="Menu.Resume" class="menu-button menu-button--stretched" />
+            <cui:LocalizableButton text="Save game" name="SaveGameButton" text-loc-key="Menu.SaveGame" class="menu-button menu-button--stretched" />
+            <cui:LocalizableButton text="Load game" name="LoadGameButton" text-loc-key="Menu.LoadGame" class="menu-button menu-button--stretched" />
+            <cui:LocalizableButton text="Key bindings" name="BindingsButton" text-loc-key="Menu.KeyBindings" class="menu-button menu-button--stretched" />
+            <cui:LocalizableButton text="Settings" name="SettingsButton" text-loc-key="Menu.Settings" class="menu-button menu-button--stretched" />
+            <cui:LocalizableButton text="Go to feedback site" name="FeedbackButton" text-loc-key="Menu.Feedback" class="menu-button menu-button--stretched" />
+            <cui:LocalizableButton text="Exit to main menu" name="ExitToMenuButton" text-loc-key="Menu.ExitToMenu" class="menu-button menu-button--stretched" />
+            <cui:LocalizableButton text="Exit to desktop" name="ExitToDesktopButton" text-loc-key="Menu.ExitToDesktop" class="menu-button menu-button--stretched" />
+            <ui:Button name="DiscordButton" class="options-box__discord-button" />
+            <ui:Label text="Version" name="GameVersion" class="options-box__version" />
+            <ui:Label text="Early Access" name="EarlyAccess" class="options-box__version" />
+            <ui:Label text="EXPERIMENTAL MODE" name="Experimental" class="experimental-info" />
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

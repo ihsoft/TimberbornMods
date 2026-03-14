@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "IncreaseUIScale",
+    "GroupId": "Dev",
+    "LocKey": "",
+    "Order": 40,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": true
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/equals",
+    "InputModifiers": "Ctrl",
+    "Unchangeable": false
+  }
+}

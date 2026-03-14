@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <cui:NineSliceVisualElement name="DiskSystemEntryElement" class="list-view__item-background clickable-hierarchy">
+        <ui:VisualElement name="Content" class="disk-system-entry-element">
+            <ui:Image name="Icon" class="disk-system-entry-element__icon" />
+            <ui:Label name="Name" text="Name" class="disk-system-entry-element__name text--default" />
+        </ui:VisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

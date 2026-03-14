@@ -1,0 +1,10 @@
+{
+  "KeyBindingSpec": {
+    "Id": "ToggleStockpileOverlay",
+    "GroupId": "UI",
+    "LocKey": "KeyBinding.ToggleStockpileOverlay",
+    "Order": 70,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  }
+}

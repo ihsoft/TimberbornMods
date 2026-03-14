@@ -1,0 +1,17 @@
+{
+  "NaturalResourceBrushSpec": {
+    "RemovalTileColor": {
+      "r": 0.7,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.7
+    },
+    "SpawnTileColor": {
+      "r": 0.9,
+      "g": 0.9,
+      "b": 0.1,
+      "a": 0.8
+    },
+    "DefaultNaturalResourceId": "Birch"
+  }
+}

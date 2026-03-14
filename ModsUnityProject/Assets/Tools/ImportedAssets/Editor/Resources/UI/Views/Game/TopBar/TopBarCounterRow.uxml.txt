@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/TopBar/TopBarStyle.uss" />
+    <ui:VisualElement name="Counter" class="top-bar-counter-row game-text-normal">
+        <ui:Image name="Icon" class="top-bar-counter__row-icon" />
+        <ui:Label name="Count" text="0" class="top-bar-counter__count game-text-small" />
+        <ui:VisualElement name="FillFrame" class="top-bar-counter__progress-bar stockpile-capacity__progress-bar">
+            <ui:VisualElement name="Fill" class="stockpile-capacity__progress-bar-progress" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

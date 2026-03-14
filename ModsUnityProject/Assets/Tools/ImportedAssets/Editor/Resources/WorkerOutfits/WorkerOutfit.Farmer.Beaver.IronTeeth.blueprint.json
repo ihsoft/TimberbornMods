@@ -1,0 +1,12 @@
+{
+  "WorkerOutfitSpec": {
+    "Id": "Farmer",
+    "FactionId": "IronTeeth",
+    "WorkerType": "Beaver",
+    "DiffuseTexture": "",
+    "NormalTexture": "",
+    "Attachments": [
+      "FarmerHat.Beaver.IronTeeth"
+    ]
+  }
+}

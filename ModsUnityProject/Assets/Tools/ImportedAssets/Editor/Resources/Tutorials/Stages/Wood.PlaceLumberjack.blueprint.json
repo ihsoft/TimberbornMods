@@ -1,0 +1,17 @@
+﻿{
+  "TutorialStageSpec": {
+    "Id": "Wood.PlaceLumberjacks",
+    "IntroLocKey": "Tutorial.Wood.PlaceLumberjacks"
+  },
+  "Children": {
+    "Step1": {
+      "BuildingTutorialStepSpec": {
+        "TemplateNames": [
+          "LumberjackFlag.Folktails"
+        ],
+        "OnlyFinishedBuildings": false,
+        "RequiredAmount": 2
+      }
+    }
+  }
+}

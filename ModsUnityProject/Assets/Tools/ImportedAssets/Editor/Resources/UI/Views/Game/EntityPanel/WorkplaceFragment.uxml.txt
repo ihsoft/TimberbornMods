@@ -1,0 +1,16 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <cui:NineSliceVisualElement name="WorkplaceFragment" class="entity-sub-panel bg-sub-box--green">
+        <cui:NineSliceVisualElement name="HeaderWrapper" />
+        <ui:VisualElement class="workplace-fragment">
+            <ui:Label name="Text" text="Item" class="entity-panel__text workplace-fragment__text" />
+            <ui:Button name="Decrease" class="button-square button-minus button-square--large" />
+            <ui:Button name="Increase" class="button-square button-plus button-plus--margin button-square--large" />
+            <ui:VisualElement name="WorkerTypeToggleWrapper" class="workplace-fragment__worker-type-toggle-wrapper" />
+        </ui:VisualElement>
+        <ui:VisualElement name="WorkplaceUsers" class="workplace-user-fragment" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

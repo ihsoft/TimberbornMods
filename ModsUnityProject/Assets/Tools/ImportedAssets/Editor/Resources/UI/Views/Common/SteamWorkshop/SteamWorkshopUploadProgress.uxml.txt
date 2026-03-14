@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <ui:VisualElement name="SteamWorkshopUploadProgress" class="content-row-centered">
+        <cui:NineSliceVisualElement name="Content" class="content-centered sliced-border sliced-border--nontransparent">
+            <ui:VisualElement name="Box" class="box">
+                <cui:ProgressBar name="ProgressBar" class="progress-bar">
+                    <ui:Label name="ProgressLabel" text="Uploading: 100%" class="game-text-normal" />
+                </cui:ProgressBar>
+            </ui:VisualElement>
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

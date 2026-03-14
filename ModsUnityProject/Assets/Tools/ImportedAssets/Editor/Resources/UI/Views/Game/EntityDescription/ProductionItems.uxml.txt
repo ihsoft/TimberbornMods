@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+    <cui:NineSliceVisualElement name="ProductionItems" class="production-items bg-sub-box--green">
+        <ui:VisualElement class="grow-centered">
+            <ui:VisualElement name="InputAndOutput" class="production-items__input-and-output" />
+            <ui:VisualElement name="InputOrOutput" class="production-items__input-or-output">
+                <ui:VisualElement name="Inputs" class="production-items__items" />
+                <ui:VisualElement name="IconWrapper" class="production-item__icon-wrapper">
+                    <ui:Image name="InputOrOutputIcon" class="production-item__icon production-item__icon--or-icon" />
+                    <ui:Label name="Time" class="game-text-small production-item__crafting-time" text="180h" />
+                </ui:VisualElement>
+                <ui:VisualElement name="Outputs" class="production-items__items" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

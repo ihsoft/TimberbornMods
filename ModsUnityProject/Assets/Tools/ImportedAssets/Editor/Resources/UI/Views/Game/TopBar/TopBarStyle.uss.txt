@@ -1,0 +1,105 @@
+.top-bar-panel {
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.top-bar-counter {
+    width: 84px;
+    flex-direction: row;
+    height: 26px;
+    margin: 4px 0 0 4px;
+    align-items: center;
+    padding-right: 8px;
+    padding-left: 4px;
+}
+
+.top-bar-counter__wrapper {
+    flex-direction: column-reverse;
+}
+
+.top-bar-counter__wrapper .extension-clamp {
+    background-image: resource('UI/Images/Game/clamp-up-small');
+    width: 60px;
+    margin-left: 4px;
+}
+
+.top-bar-counter__wrapper .extension-clamp:hover:enabled {
+    background-image: resource('UI/Images/Game/clamp-up-small-hover');
+}
+
+.top-bar-counter__wrapper .extension-clamp:hover:enabled:active {
+    background-image: resource('UI/Images/Game/clamp-up-small-active');
+}
+
+.top-bar-counter__wrapper .extension-clamp--hidden {
+    background-image: resource('UI/Images/Game/clamp-down');
+    height: 13px;
+    width: 67px;
+    align-self: center;
+}
+
+.top-bar-counter__wrapper .extension-clamp--hidden:hover:enabled {
+    background-image: resource('UI/Images/Game/clamp-down-hover');
+}
+
+.top-bar-counter__wrapper .extension-clamp--hidden:hover:enabled:active {
+    background-image: resource('UI/Images/Game/clamp-down-active');
+}
+
+.top-bar-counter__wrapper > .extension-panel-background {
+    left: 4px;
+    right: 4px;
+    margin-left: 4px;
+}
+
+.top-bar-counter__items {
+    padding: 3px 4px;
+}
+
+.top-bar-counter__icon {
+    width: 26px;
+    height: 26px;
+    flex-direction: row;
+}
+
+.top-bar-counter__text {
+    width: 60%;
+    -unity-text-align: middle-left;
+}
+
+.top-bar-counter__count {
+    -unity-text-align: middle-right;
+    flex-grow: 1;
+}
+
+.top-bar-counter__progress-bar {
+    margin-left: 6px;
+}
+
+.top-bar-counter-row {
+    width: 100%;
+    flex-direction: row;
+    padding: 1px 8px;
+}
+
+.top-bar-counter__row-icon {
+    width: 20px;
+    height: 20px;
+    flex-direction: row;
+}
+
+.top-bar-counter__nothing {
+    -unity-text-align: middle-left;
+}
+
+.panel--district .top-bar-counter__wrapper--district {
+    --background-image: resource('UI/Images/Backgrounds/bg-striped-3');
+}
+
+.top-bar-counter__button {
+    --click-sound: "UI.Click";
+}
+
+.top-bar-counter__button > * {
+    --click-sound: "UI.Click";
+}

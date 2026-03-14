@@ -33,13 +33,13 @@ sealed class LispSyntaxParser : ParserBase {
   #region API
 
   /// <summary>Comparison operators to Lisp-syntax keyword map.</summary>
-  public static readonly Dictionary<BinaryOperator.OpType, string> ComparisonOperators = new() {
-      { BinaryOperator.OpType.Equal, EqOperator },
-      { BinaryOperator.OpType.NotEqual, NeOperator },
-      { BinaryOperator.OpType.GreaterThan, GtOperator },
-      { BinaryOperator.OpType.GreaterThanOrEqual, GeOperator },
-      { BinaryOperator.OpType.LessThan, LtOperator },
-      { BinaryOperator.OpType.LessThanOrEqual, LeOperator },
+  public static readonly Dictionary<ComparisonOperator.OpType, string> ComparisonOperators = new() {
+      { ComparisonOperator.OpType.Equal, EqOperator },
+      { ComparisonOperator.OpType.NotEqual, NeOperator },
+      { ComparisonOperator.OpType.GreaterThan, GtOperator },
+      { ComparisonOperator.OpType.GreaterThanOrEqual, GeOperator },
+      { ComparisonOperator.OpType.LessThan, LtOperator },
+      { ComparisonOperator.OpType.LessThanOrEqual, LeOperator },
   };
 
   /// <inheritdoc/>
@@ -75,8 +75,6 @@ sealed class LispSyntaxParser : ParserBase {
   const string RoundFunc = "round";
   const string SigFunc = "sig";
   const string ActMethod = "act";
-  const string GetStrFunc = "getstr";
-  const string GetNumFunc = "getnum";
   const string GetValueFunc = "getvalue";
   const string GetElementFunc = "getelement";
   const string GetLenFunc = "getlen";
@@ -94,7 +92,7 @@ sealed class LispSyntaxParser : ParserBase {
     switch (token.TokenType) {
       case Token.Type.NumericValue:
         return int.TryParse(token.Value, out var value)
-            ? ConstantValueExpr.CreateNumericValue(value)
+            ? ConstantValueExpr.CreateFromValue(ScriptValue.Of(value))
             : throw new ScriptError.ParsingError(token, "Not a valid integer number");
       case Token.Type.StringLiteral:
         return ConstantValueExpr.CreateStringLiteral(token.Value);
@@ -135,13 +133,6 @@ sealed class LispSyntaxParser : ParserBase {
           CurrentContext, GetSymbolValue(op, operands, 0), operands.GetRange(1, operands.Count - 1));
     }
 
-    // Special handling to the Symbol argument.
-    if (op.Value is GetStrFunc or GetNumFunc) {
-      operands[0] = operands[0] is SymbolExpr symbolExpr
-          ? ConstantValueExpr.CreateStringLiteral(symbolExpr.Value)
-          : throw new ScriptError.ParsingError($"Expected property name, but got: {operands[0]}");
-    }
-
     // Fixed arguments functions.
     if (op.Value == GetValueFunc) {
       AssertNumberOfOperandsExact(op, operands, 1);
@@ -161,12 +152,12 @@ sealed class LispSyntaxParser : ParserBase {
     return op.Value switch {
         HasSignalFunc => HasComponentOperator.CreateHasSignal(CurrentContext, operands),
         HasActionFunc => HasComponentOperator.CreateHasAction(CurrentContext, operands),
-        EqOperator => BinaryOperator.CreateEq(CurrentContext, operands),
-        NeOperator => BinaryOperator.CreateNe(CurrentContext, operands),
-        LtOperator => BinaryOperator.CreateLt(CurrentContext, operands),
-        LeOperator => BinaryOperator.CreateLe(CurrentContext, operands),
-        GtOperator => BinaryOperator.CreateGt(CurrentContext, operands),
-        GeOperator => BinaryOperator.CreateGe(CurrentContext, operands),
+        EqOperator => ComparisonOperator.CreateEq(CurrentContext, operands),
+        NeOperator => ComparisonOperator.CreateNe(CurrentContext, operands),
+        LtOperator => ComparisonOperator.CreateLt(CurrentContext, operands),
+        LeOperator => ComparisonOperator.CreateLe(CurrentContext, operands),
+        GtOperator => ComparisonOperator.CreateGt(CurrentContext, operands),
+        GeOperator => ComparisonOperator.CreateGe(CurrentContext, operands),
         AndOperator => LogicalOperator.CreateAnd(operands),
         OrOperator => LogicalOperator.CreateOr(operands),
         NotOperator => LogicalOperator.CreateNot(operands[0]),
@@ -179,10 +170,8 @@ sealed class LispSyntaxParser : ParserBase {
         MinFunc => MathOperator.CreateMin(operands),
         MaxFunc => MathOperator.CreateMax(operands),
         RoundFunc => MathOperator.CreateRound(operands),
-        GetStrFunc => GetPropertyOperator.CreateGetString(CurrentContext, operands),
-        GetNumFunc => GetPropertyOperator.CreateGetNumber(CurrentContext, operands),
         ConcatFunc => ConcatOperator.Create(operands),
-        _ => throw new InvalidOperationException("Operator token not recognized: " + op),
+        _ => throw new InvalidOperationException($"Operator token not recognized: {op}"),
     };
   }
 
@@ -197,8 +186,8 @@ sealed class LispSyntaxParser : ParserBase {
       case ConstantValueExpr constExpr:
         sb.Append(constExpr.ValueType switch {
             ScriptValue.TypeEnum.String => Tokenizer.EscapeString(constExpr.ValueFn().AsString),
-            ScriptValue.TypeEnum.Number => constExpr.ValueFn().AsNumber.ToString(),
-            _ => throw new InvalidOperationException($"Unsupported value type: {constExpr.ValueType}"),
+            ScriptValue.TypeEnum.Number => constExpr.ValueFn().AsRawNumber.ToString(),
+            ScriptValue.TypeEnum.Unset => throw new InvalidOperationException($"Value type must be set"),
         });
         break;
       case SymbolExpr symbolExpr:
@@ -236,22 +225,19 @@ sealed class LispSyntaxParser : ParserBase {
         HasComponentOperator hasComponentOperator => hasComponentOperator.OperatorType switch {
             HasComponentOperator.OpType.HasSignal => HasSignalFunc,
             HasComponentOperator.OpType.HasAction => HasActionFunc,
-            _ => throw new InvalidOperationException($"Unsupported operator: {hasComponentOperator}"),
         },
-        BinaryOperator binaryOperator => binaryOperator.OperatorType switch {
-            BinaryOperator.OpType.Equal => EqOperator,
-            BinaryOperator.OpType.NotEqual => NeOperator,
-            BinaryOperator.OpType.GreaterThan => GtOperator,
-            BinaryOperator.OpType.GreaterThanOrEqual => GeOperator,
-            BinaryOperator.OpType.LessThan => LtOperator,
-            BinaryOperator.OpType.LessThanOrEqual => LeOperator,
-            _ => throw new InvalidOperationException($"Unsupported operator: {binaryOperator}"),
+        ComparisonOperator comparisonOperator => comparisonOperator.OperatorType switch {
+            ComparisonOperator.OpType.Equal => EqOperator,
+            ComparisonOperator.OpType.NotEqual => NeOperator,
+            ComparisonOperator.OpType.GreaterThan => GtOperator,
+            ComparisonOperator.OpType.GreaterThanOrEqual => GeOperator,
+            ComparisonOperator.OpType.LessThan => LtOperator,
+            ComparisonOperator.OpType.LessThanOrEqual => LeOperator,
         },
         LogicalOperator logicalOperator => logicalOperator.OperatorType switch {
             LogicalOperator.OpType.And => AndOperator,
             LogicalOperator.OpType.Or => OrOperator,
             LogicalOperator.OpType.Not => NotOperator,
-            _ => throw new InvalidOperationException($"Unsupported operator: {logicalOperator}"),
         },
         MathOperator mathOperator => mathOperator.OperatorType switch {
             MathOperator.OpType.Add => AddOperator,
@@ -263,25 +249,15 @@ sealed class LispSyntaxParser : ParserBase {
             MathOperator.OpType.Min => MinFunc,
             MathOperator.OpType.Max => MaxFunc,
             MathOperator.OpType.Round => RoundFunc,
-            _ => throw new InvalidOperationException($"Unsupported operator: {mathOperator}"),
         },
         SignalOperator sigOperator => $"{SigFunc} {sigOperator.SignalName}",
         ActionOperator actOperator => $"{ActMethod} {actOperator.FullActionName}",
-        GetPropertyOperator getPropertyOperator => getPropertyOperator.OperatorType switch {
-            GetPropertyOperator.OpType.GetString => GetStrFunc,
-            GetPropertyOperator.OpType.GetNumber => GetNumFunc,
-            _ => throw new InvalidOperationException($"Unsupported operator: {getPropertyOperator}"),
-        },
         ConcatOperator => ConcatFunc,
         _ => throw new InvalidOperationException($"Unsupported operator: {abstractOperator}"),
     };
 
     // Special handling to the Symbol argument.
     var operands = new List<IExpression>(abstractOperator.Operands);
-    if (operatorName is GetStrFunc or GetNumFunc) {
-      operands[0] = SymbolExpr.Create(abstractOperator.GetStringLiteral(0));
-    }
-
     sb.Append(operatorName);
     foreach (var operand in operands) {
       sb.Append(' ');
@@ -314,8 +290,8 @@ sealed class LispSyntaxParser : ParserBase {
         MinFunc, MaxFunc, RoundFunc,
         // Signal/action operators.
         SigFunc, ActMethod,
-        // Get property operators.
-        GetStrFunc, GetNumFunc, GetValueFunc, GetElementFunc, GetLenFunc,
+        // Get property functions.
+        GetValueFunc, GetElementFunc, GetLenFunc,
         // Concat operator.
         ConcatFunc,
     ];

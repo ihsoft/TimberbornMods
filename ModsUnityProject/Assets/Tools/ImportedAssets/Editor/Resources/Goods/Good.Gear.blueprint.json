@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "Gear",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.56078434,
+      "g": 0.5372549,
+      "b": 0.5372549,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 3,
+    "GoodGroupId": "Materials",
+    "GoodOrder": 1020,
+    "Icon": "Sprites/Goods/GearIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.Gear.DisplayName",
+    "PluralDisplayNameLocKey": "Good.Gear.PluralDisplayName"
+  }
+}

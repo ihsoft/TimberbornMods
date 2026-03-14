@@ -2,7 +2,6 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Reflection;
 using HarmonyLib;
 using Timberborn.SoilMoistureSystem;
 
@@ -12,7 +11,7 @@ using Timberborn.SoilMoistureSystem;
 namespace IgorZ.TimberCommons.WaterService;
 
 /// <summary>Harmony patch to override moisture levels.</summary>
-[HarmonyPatch(typeof(MoistureCalculationJob), nameof(MoistureCalculationJob.CalculateMoistureForCell))]
+[HarmonyPatch(typeof(MoistureCalculationTask), nameof(MoistureCalculationTask.CalculateMoistureForCell))]
 static class SoilMoistureSimulatorPatch {
   static void Postfix(int index3D, ref float __result, bool __runOriginal) {
     if (!__runOriginal) {

@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "DuplicateObject",
+    "GroupId": "Objects",
+    "LocKey": "KeyBinding.DuplicateObject",
+    "Order": 60,
+    "AllowOtherModifiers": true,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/b",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

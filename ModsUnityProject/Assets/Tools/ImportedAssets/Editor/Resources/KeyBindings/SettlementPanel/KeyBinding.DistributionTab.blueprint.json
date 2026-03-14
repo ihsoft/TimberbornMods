@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "DistributionTab",
+    "GroupId": "SettlementPanel",
+    "LocKey": "KeyBinding.DistributionTab",
+    "Order": 80,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/f8",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

@@ -1,0 +1,17 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <ui:VisualElement name="DialogBox" class="content-row-centered">
+        <cui:NineSliceVisualElement class="content-centered sliced-border sliced-border--nontransparent">
+            <ui:VisualElement name="Box" class="box">
+                <ui:VisualElement name="Content" class="box__content-margin">
+                    <ui:Label name="Message" class="box__text box__text--centered" />
+                </ui:VisualElement>
+                <ui:VisualElement name="Buttons" class="content-row-centered">
+                    <cui:NineSliceButton name="CancelButton" class="menu-button menu-button--medium" />
+                    <cui:NineSliceButton name="InfoButton" class="menu-button menu-button--medium" />
+                    <cui:NineSliceButton name="ConfirmButton" class="menu-button menu-button--medium" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

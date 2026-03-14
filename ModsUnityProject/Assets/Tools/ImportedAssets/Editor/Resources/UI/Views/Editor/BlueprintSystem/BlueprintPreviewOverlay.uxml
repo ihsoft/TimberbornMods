@@ -1,0 +1,7 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="True">
+    <Style path="UI/Views/Editor/BlueprintSystem/BlueprintSystemStyle" />
+    <ui:VisualElement name="BlueprintPreviewOverlay">
+        <ui:Label name="Title" text="Preview drawers" class="blueprint-preview-overlay__title" />
+        <ui:VisualElement name="Content" class="blueprint-preview-overlay__content" />
+    </ui:VisualElement>
+</ui:UXML>

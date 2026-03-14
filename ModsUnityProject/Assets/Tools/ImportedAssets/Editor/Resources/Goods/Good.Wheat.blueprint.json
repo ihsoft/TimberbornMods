@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "Wheat",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 1.0,
+      "g": 0.8039216,
+      "b": 0.3137255,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Ingredients",
+    "GoodOrder": 8030,
+    "Icon": "Sprites/Goods/WheatIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.Wheat.DisplayName",
+    "PluralDisplayNameLocKey": "Good.Wheat.PluralDisplayName"
+  }
+}

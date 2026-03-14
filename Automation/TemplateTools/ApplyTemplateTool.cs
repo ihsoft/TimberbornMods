@@ -2,6 +2,8 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+extern alias CustomTools;
+
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -9,12 +11,13 @@ using IgorZ.Automation.Actions;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.Conditions;
 using IgorZ.Automation.Utils;
-using IgorZ.TimberDev.Tools;
+using IgorZ.TimberDev.Utils;
 using Timberborn.BlockSystem;
 using Timberborn.BlueprintSystem;
 using Timberborn.ConstructionMode;
 using Timberborn.Persistence;
 using UnityEngine;
+using AbstractAreaSelectionTool = CustomTools::IgorZ.CustomTools.Tools.AbstractAreaSelectionTool;
 
 namespace IgorZ.Automation.TemplateTools;
 
@@ -59,8 +62,8 @@ sealed class ApplyTemplateTool : AbstractAreaSelectionTool, IAutomationModeEnabl
 
   /// <inheritdoc/>
   protected override bool ObjectFilterExpression(BlockObject blockObject) {
-    var behavior = blockObject.GetComponentFast<AutomationBehavior>();
-    if (!behavior || !behavior.enabled) {
+    var behavior = blockObject.GetComponent<AutomationBehavior>();
+    if (!behavior || !behavior.Enabled) {
       return false;
     }
     return _templateRules.All(rule => rule.IsValidAt(behavior));
@@ -68,7 +71,7 @@ sealed class ApplyTemplateTool : AbstractAreaSelectionTool, IAutomationModeEnabl
 
   /// <inheritdoc/>
   protected override void OnObjectAction(BlockObject blockObject) {
-    var behavior = blockObject.GetComponentFast<AutomationBehavior>();
+    var behavior = blockObject.GetComponent<AutomationBehavior>();
     behavior.RemoveRulesForTemplateFamily(_templateFamilyName);
     foreach (var rule in _templateRules) {
       var action = rule.Action.CloneDefinition();
@@ -102,7 +105,7 @@ sealed class ApplyTemplateTool : AbstractAreaSelectionTool, IAutomationModeEnabl
   }
 
   static T ParseAndInit<T>(AutomationTemplateSpec.DynamicTypeSpec typeSpec) where T : class, IGameSerializable {
-    var instance = DynamicClassSerializer<T>.MakeInstance(typeSpec.TypeId);
+    var instance = ReflectionsHelper.MakeInstance<T>(typeSpec.TypeId);
     if (typeSpec.Parameters != null && typeSpec.Parameters.Length > 0) {
       instance.LoadFrom(new ObjectLoader(SpecToSaveObjectConverter.ParametersToSaveObject(typeSpec.Parameters)));
     }

@@ -1,0 +1,16 @@
+{
+  "TutorialSpec": {
+    "Id": "WaterAndFood",
+    "NameLocKey": "Tutorial.WaterAndFood",
+    "RequiredTutorialIds": [
+      "Wood"
+    ],
+    "SortOrder": 30,
+    "Stages": [
+      "WaterAndFood.BuildWaterPump",
+      "WaterAndFood.BuildGatherer",
+      "WaterAndFood.BuildFarmhouse",
+      "WaterAndFood.MarkCarrots"
+    ]
+  }
+}

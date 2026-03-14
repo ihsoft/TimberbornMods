@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "TreatedPlank",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Pileable",
+    "StockpileVisualization": "TreatedPlank",
+    "VisibleContainer": "TreatedPlank",
+    "ContainerColor": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryOnArm",
+    "Weight": 4,
+    "GoodGroupId": "Materials",
+    "GoodOrder": 1060,
+    "Icon": "Sprites/Goods/TreatedPlankIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.TreatedPlank.DisplayName",
+    "PluralDisplayNameLocKey": "Good.TreatedPlank.PluralDisplayName"
+  }
+}

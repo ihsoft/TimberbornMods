@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutomationForModdableWeathe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestParser", "TestParser\TestParser.csproj", "{D8FD1432-85C3-4EB8-9E91-2711D83C23F2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomTools", "CustomTools\CustomTools.csproj", "{C7748F6F-6A16-46D3-8784-CD1DCABA420A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +44,9 @@ Global
 		{D8FD1432-85C3-4EB8-9E91-2711D83C23F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8FD1432-85C3-4EB8-9E91-2711D83C23F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8FD1432-85C3-4EB8-9E91-2711D83C23F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7748F6F-6A16-46D3-8784-CD1DCABA420A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7748F6F-6A16-46D3-8784-CD1DCABA420A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7748F6F-6A16-46D3-8784-CD1DCABA420A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7748F6F-6A16-46D3-8784-CD1DCABA420A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

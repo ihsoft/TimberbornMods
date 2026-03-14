@@ -1,0 +1,11 @@
+{
+  "name": "Timberborn.ModdingTools.Common",
+  "references": [],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "rootNamespace": "Timberborn.ModdingTools.Common",
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": false
+}

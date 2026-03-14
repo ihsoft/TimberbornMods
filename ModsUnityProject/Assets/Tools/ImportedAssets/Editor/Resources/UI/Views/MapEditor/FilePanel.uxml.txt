@@ -1,0 +1,16 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+    <ui:VisualElement name="FilePanel" class="content-row-centered file-panel">
+        <ui:VisualElement name="MapFileButtons" class="content-row-centered file-panel__buttons-group">
+            <cui:LocalizableButton name="SaveButton" text-loc-key="Core.Save" class="button-game game-text-normal file-panel__button" />
+            <cui:LocalizableButton name="SaveAsButton" text-loc-key="Core.SaveAs" class="button-game game-text-normal file-panel__button" />
+            <cui:LocalizableButton name="LoadButton" text-loc-key="Core.Load" class="button-game game-text-normal file-panel__button" />
+            <cui:LocalizableButton name="NewMapButton" text-loc-key="MapEditor.NewMap" class="button-game game-text-normal file-panel__button" />
+        </ui:VisualElement>
+        <ui:VisualElement name="UndoButtons" class="content-row-centered file-panel__buttons-group">
+            <cui:LocalizableButton name="UndoButton" text-loc-key="MapEditor.Undo" class="button-game game-text-normal file-panel__button" />
+            <cui:LocalizableButton name="RedoButton" text-loc-key="MapEditor.Redo" class="button-game game-text-normal file-panel__button" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

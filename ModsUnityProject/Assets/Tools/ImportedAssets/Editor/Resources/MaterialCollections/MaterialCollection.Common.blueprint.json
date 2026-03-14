@@ -1,0 +1,37 @@
+{
+  "MaterialCollectionSpec": {
+    "CollectionId": "Common",
+    "Materials": [
+      "Environment/Land/Materials/Blockage/Blockage",
+      "Environment/Land/Materials/Cliff",
+      "Environment/Land/Materials/CliffEdge",
+      "Environment/Land/Materials/Grass",
+      "MapEditor/Objects/Thorns/Thorns",
+      "MapEditor/Objects/Slope/SlopeCliff",
+      "MapEditor/Objects/Slope/SlopeCliffEdge",
+      "MapEditor/Objects/Slope/SlopeSand",
+      "MapEditor/Objects/UnstableCore/UnstableCore",
+      "MapEditor/Ruins/Materials/Ivy/Ivy",
+      "MapEditor/Ruins/Materials/RuinsAtlas/Ruins",
+      "MapEditor/Ruins/UndergroundRuins/UndergroundRuinsCliff",
+      "MapEditor/StartingLocation/StartingLocationMaterial",
+      "MapEditor/Water/BadwaterSource/BadwaterSource",
+      "MapEditor/Water/WaterSource/WaterSource",
+      "Materials/Beavers/Common/BeaverAdult",
+      "Materials/Beavers/Common/BeaverChild",
+      "Materials/Common/Dirt/Dirt",
+      "Materials/Common/Dirt/DirtCommon",
+      "Materials/Common/Dirt/DirtUnderground",
+      "Materials/Common/Mud",
+      "Materials/Common/Paper/PaperCommon",
+      "Materials/Common/Wood/BaseWoodCommon",
+      "Materials/Common/Wood/BaseWoodCommon_Amber",
+      "Materials/Common/Zipline/ZiplineCable",
+      "Materials/Goods/BeaverCarryingModels/BeaverCarryingModels",
+      "NaturalResources/Bushes/Blueberry/Materials/Blueberry",
+      "NaturalResources/Trees/Birch/Materials/Birch",
+      "NaturalResources/Trees/Oak/Materials/Oak",
+      "NaturalResources/Trees/Pine/Materials/Pine"
+    ]
+  }
+}

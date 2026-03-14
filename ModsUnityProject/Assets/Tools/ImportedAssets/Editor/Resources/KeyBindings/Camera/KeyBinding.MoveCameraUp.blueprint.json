@@ -1,0 +1,20 @@
+{
+  "KeyBindingSpec": {
+    "Id": "MoveCameraUp",
+    "GroupId": "Camera",
+    "LocKey": "KeyBinding.MoveCameraUp",
+    "Order": 0,
+    "AllowOtherModifiers": true,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/w",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  },
+  "SecondaryInputBindingSpec": {
+    "Path": "/Keyboard/upArrow",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

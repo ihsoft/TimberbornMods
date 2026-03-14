@@ -302,11 +302,12 @@ public class UiFactory {
 
   /// <summary>Adds a handler to the slider that will round the value to the step size.</summary>
   public void AddFixedStepChangeHandler(PreciseSlider slider, float stepSize, Action<float> onValueChangedFn) {
-    slider.Initialize(newValue => {
+    slider.SetStepWithoutNotify(stepSize);
+    slider.SetValueChangedCallback(newValue => {
       var adjustedValue = Mathf.Round(newValue / stepSize) * stepSize;
       slider.SetValueWithoutNotify(adjustedValue);
       onValueChangedFn(adjustedValue);
-    }, stepSize);
+    });
   }
 
   /// <summary>Adds a handler to the slider that will round the value to the step size.</summary>

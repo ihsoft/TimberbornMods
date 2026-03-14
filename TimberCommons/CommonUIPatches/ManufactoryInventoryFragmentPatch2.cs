@@ -2,11 +2,11 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Reflection;
 using HarmonyLib;
 using IgorZ.TimberCommons.Common;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
+using Timberborn.WorkshopsUI;
 using UnityEngine.UIElements;
 
 // ReSharper disable UnusedMember.Local
@@ -16,14 +16,10 @@ namespace IgorZ.TimberCommons.CommonUIPatches;
 
 /// <summary>Harmony patch to display "supply left" element in the manufactory UI fragment.</summary>
 /// <seealso cref="ManufactoryInventoryFragmentPatch1"/>
-[HarmonyPatch]
+[HarmonyPatch(typeof(ManufactoryInventoryFragment), nameof(ManufactoryInventoryFragment.UpdateFragment))]
 static class ManufactoryInventoryFragmentPatch2 {
   internal static Timberborn.CoreUI.ProgressBar HoursLeftBar;
   internal static Label HoursLeftLabel;
-
-  static MethodBase TargetMethod() {
-    return AccessTools.DeclaredMethod("Timberborn.WorkshopsUI.ManufactoryInventoryFragment:UpdateFragment");
-  }
 
   static void Postfix(bool __runOriginal, BaseComponent ____manufactory) {
     if (!__runOriginal) {
@@ -33,7 +29,7 @@ static class ManufactoryInventoryFragmentPatch2 {
       return;
     }
 
-    var supplyLeftProvider = ____manufactory.GetComponentFast<ISupplyLeftProvider>();
+    var supplyLeftProvider = ____manufactory.GetComponent<ISupplyLeftProvider>();
     var visible = supplyLeftProvider != null;
     HoursLeftBar.ToggleDisplayStyle(visible: visible);
     if (!visible) {

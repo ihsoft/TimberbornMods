@@ -1,0 +1,22 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonMiscStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/DebuggingPanel/DebuggingPanelStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/SteamWorkshop/SteamWorkshopStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Options/OptionsStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MapEditor/MapEditorStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Modding/ModdingStyle.uss" />
+    <ui:VisualElement name="GameUI" class="game-ui" picking-mode="Ignore">
+        <ui:VisualElement name="Top-left" picking-mode="Ignore" class="game-ui__top-left" />
+        <ui:VisualElement name="Top-right" picking-mode="Ignore" class="game-ui__top-right" />
+        <ui:VisualElement name="Top-bar" picking-mode="Ignore" class="game-ui__top-bar" />
+        <ui:VisualElement name="Bottom-left" picking-mode="Ignore" class="game-ui__bottom-left" />
+        <ui:VisualElement name="Bottom-right" picking-mode="Ignore" class="game-ui__bottom-right" />
+        <ui:VisualElement name="Bottom-bar" picking-mode="Ignore" class="game-ui__bottom-bar" />
+        <ui:VisualElement name="Absolute-items" picking-mode="Ignore" class="game-ui__absolute-items" />
+        <ui:VisualElement name="Panels" picking-mode="Ignore" class="game-ui__panels" />
+    </ui:VisualElement>
+</ui:UXML>

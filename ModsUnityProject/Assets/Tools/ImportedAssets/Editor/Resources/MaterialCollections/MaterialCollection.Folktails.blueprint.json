@@ -1,0 +1,42 @@
+{
+  "MaterialCollectionSpec": {
+    "CollectionId": "Folktails",
+    "Materials": [
+      "Buildings/Decoration/BulletinPole/Materials/BulletinPole.Folktails",
+      "Buildings/Decoration/Hedge/Materials/Hedge.Folktails",
+      "Buildings/Decoration/Shrub/Materials/Shrub.Folktails",
+      "Buildings/Monuments/FountainOfJoy/FountainWater",
+      "Buildings/Paths/Path/Path.Folktails",
+      "Buildings/Landscaping/Dam/Materials/Dam.Folktails",
+      "Characters/Bot/Bot.Folktails",
+      "Materials/UberAtlas/Materials/Folktails/BaseMetal.Folktails",
+      "Materials/UberAtlas/Materials/Folktails/BaseWood_Brown.Folktails",
+      "Materials/UberAtlas/Materials/Folktails/BaseWood_LightBrown.Folktails",
+      "Materials/UberAtlas/Materials/Folktails/BaseWood_White.Folktails",
+      "Materials/UberAtlas/Materials/Folktails/BaseWood_Yellow.Folktails",
+      "Materials/UberAtlas/Materials/Folktails/Details.Folktails",
+      "Materials/UberAtlas/Materials/Folktails/IrregularPlanks_Brown.Folktails",
+      "Materials/UberAtlas/Materials/Folktails/IrregularPlanks_LightBrown.Folktails",
+      "Materials/UberAtlas/Materials/Folktails/IrregularPlanks_Mossy.Folktails",
+      "Materials/UberAtlas/Materials/Folktails/IrregularPlanks_White.Folktails",
+      "Materials/UberAtlas/Materials/Folktails/IrregularPlanks_Yellow.Folktails",
+      "Materials/UberAtlas/Materials/Folktails/Moss.Folktails",
+      "Materials/UberAtlas/Materials/Folktails/PaintedMetal.Folktails",
+      "Materials/UberAtlas/Materials/Folktails/Paper.Folktails",
+      "Materials/UberAtlas/Materials/Folktails/Plaster_White.Folktails",
+      "Materials/UberAtlas/Materials/Folktails/PlasteredWood_White.Folktails",
+      "Materials/UberAtlas/Materials/Folktails/Sand.Folktails",
+      "Materials/UberAtlas/Materials/Folktails/ThatchedRoof.Folktails",
+      "Materials/UberAtlas/Materials/Folktails/WindowsAtlas.Folktails",
+      "NaturalResources/Bushes/Dandelion/Materials/Dandelion",
+      "NaturalResources/Crops/Carrot/Materials/Carrot",
+      "NaturalResources/Crops/Cattail/Materials/Cattail",
+      "NaturalResources/Crops/Potato/Materials/Potato",
+      "NaturalResources/Crops/Spadderdock/Materials/Spadderdock",
+      "NaturalResources/Crops/Sunflower/Materials/Sunflower",
+      "NaturalResources/Crops/Wheat/Materials/Wheat",
+      "NaturalResources/Trees/ChestnutTree/Materials/ChestnutTree",
+      "NaturalResources/Trees/Maple/Materials/Maple"
+    ]
+  }
+}

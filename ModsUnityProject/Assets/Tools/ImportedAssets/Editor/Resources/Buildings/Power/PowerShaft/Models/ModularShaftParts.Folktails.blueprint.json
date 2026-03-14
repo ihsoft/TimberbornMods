@@ -1,0 +1,23 @@
+{
+  "ModularShaftPartsSpec": {
+    "ShaftBase": "Buildings/Power/PowerShaft/Models/ShaftBase.Folktails",
+    "ShaftLowerFrame": "Buildings/Power/PowerShaft/Models/ShaftLowerFrame.Folktails",
+    "ShaftSupport": "Buildings/Power/PowerShaft/Models/ShaftSupport.Folktails",
+    "ShaftFrame": "Buildings/Power/PowerShaft/Models/ShaftFrame.Folktails",
+    "GearSmall": "Buildings/Power/PowerShaft/Models/GearSmall.Folktails",
+    "GearMedium": "Buildings/Power/PowerShaft/Models/GearMedium.Folktails",
+    "GearLarge": "Buildings/Power/PowerShaft/Models/GearLarge.Folktails",
+    "GearBottomBase": "Buildings/Power/PowerShaft/Models/GearBottomBase.Folktails",
+    "GearBottomSmall": "Buildings/Power/PowerShaft/Models/GearBottomSmall.Folktails",
+    "GearBottomLarge": "Buildings/Power/PowerShaft/Models/GearBottomLarge.Folktails",
+    "GearTopSmall": "Buildings/Power/PowerShaft/Models/GearTopSmall.Folktails",
+    "GearTopLarge": "Buildings/Power/PowerShaft/Models/GearTopLarge.Folktails",
+    "GearInner": "Buildings/Power/PowerShaft/Models/GearInner.Folktails",
+    "GearInnerLong": "Buildings/Power/PowerShaft/Models/GearInnerLong.Folktails",
+    "GearInnerOpposite": "Buildings/Power/PowerShaft/Models/GearInnerOpposite.Folktails",
+    "GearInnerThrough": "Buildings/Power/PowerShaft/Models/GearInnerThrough.Folktails",
+    "AxleInnerLong": "Buildings/Power/PowerShaft/Models/AxleInnerLong.Folktails",
+    "AxleVertical": "Buildings/Power/PowerShaft/Models/AxleVertical.Folktails",
+    "AxleHorizontal": "Buildings/Power/PowerShaft/Models/AxleHorizontal.Folktails"
+  }
+}

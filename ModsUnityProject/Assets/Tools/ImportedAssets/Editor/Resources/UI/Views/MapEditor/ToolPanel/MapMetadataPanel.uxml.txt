@@ -1,0 +1,26 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MapEditor/MapEditorStyle.uss" />
+    <cui:NineSliceVisualElement name="MapMetadataPanel" class="tool-panel-item--map-editor bg-box--green map-metadata-panel">
+        <ui:VisualElement name="DevControls" class="map-metadata-panel__dev-controls">
+            <ui:VisualElement class="map-metadata-panel__fields">
+                <ui:VisualElement name="MapNameLocKeyWrapper" class="map-metadata-panel__label-wrapper">
+                    <ui:Label name="MapNameLocKeyLabel" text="Name loc key" class="game-text-normal map-metadata-panel__input-field-label" />
+                    <ui:Label name="MapDescriptionLocKeyLabel" text="Description loc key" class="game-text-normal map-metadata-panel__input-field-label" />
+                </ui:VisualElement>
+                <ui:VisualElement name="MapDescriptionLocKeyWrapper" class="map-metadata-panel__input-field-wrapper">
+                    <cui:NineSliceTextField name="MapNameLocKey" class="text-field map-metadata-panel__input-field" />
+                    <cui:NineSliceTextField name="MapDescriptionLocKey" class="text-field map-metadata-panel__input-field" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="TogglesWrapper" class="map-metadata-panel__toggles-wrapper">
+                <ui:Toggle text="Recommended map" name="IsRecommended" class="game-toggle game-text-normal map-metadata-panel__toggle" />
+                <ui:Toggle text="Dev map" name="IsDev" class="game-toggle game-text-normal map-metadata-panel__toggle" />
+                <ui:Toggle text="Unconventional map" name="IsUnconventional" class="game-toggle game-text-normal map-metadata-panel__toggle" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <cui:LocalizableLabel name="MapDescriptionLabel" text-loc-key="MapEditor.MapMetadata.Description" class="game-text-normal" />
+        <cui:NineSliceTextField name="MapDescription" multiline="true" vertical-scroller-visibility="Auto" class="text-field text-field--large map-metadata-panel__description scroll--green-decorated" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

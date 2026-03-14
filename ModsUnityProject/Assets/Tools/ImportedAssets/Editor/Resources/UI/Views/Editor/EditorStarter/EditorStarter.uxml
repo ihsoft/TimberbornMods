@@ -1,0 +1,34 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="True">
+    <Style path="UI/Views/Editor/EditorStarter/EditorStarterStyle" />
+    <ui:ScrollView name="EditorStarter" class="editor-starter">
+        <ui:VisualElement name="Branch" class="editor-starter__field">
+            <ui:Label text="Branch" class="editor-starter__field-label" />
+            <ui:TextField name="BranchValue" class="editor-starter__field-value" />
+        </ui:VisualElement>
+        <ui:VisualElement name="StartType" class="editor-starter__field">
+            <ui:Label text="Start type" class="editor-starter__field-label" />
+            <ui:DropdownField name="StartTypeDropdown" class="editor-starter__field-value" />
+        </ui:VisualElement>
+        <ui:VisualElement name="Faction" class="editor-starter__field">
+            <ui:Label text="Faction" class="editor-starter__field-label" />
+            <ui:DropdownField name="FactionDropdown" class="editor-starter__field-value" />
+        </ui:VisualElement>
+        <ui:VisualElement name="Map" class="editor-starter__field">
+            <ui:Label text="Map" class="editor-starter__field-label" />
+            <ui:DropdownField name="MapDropdown" class="editor-starter__field-value" />
+        </ui:VisualElement>
+        <ui:VisualElement name="Settlement" class="editor-starter__field">
+            <ui:Label text="Settlement" class="editor-starter__field-label" />
+            <ui:DropdownField name="SettlementDropdown" class="editor-starter__field-value" />
+        </ui:VisualElement>
+        <ui:VisualElement name="Save" class="editor-starter__field">
+            <ui:Label text="Save" class="editor-starter__field-label" />
+            <ui:DropdownField name="SaveDropdown" class="editor-starter__field-value" />
+        </ui:VisualElement>
+        <ui:VisualElement name="FeatureToggleWrapper">
+            <ui:VisualElement name="FeatureToggles" class="editor-starter__feature-toggles" />
+            <ui:Button name="Refresh" text="Refresh" class="editor-starter__refresh" />
+        </ui:VisualElement>
+        <ui:Image name="SaveThumbnail" class="editor-starter__save-thumbnail" />
+    </ui:ScrollView>
+</ui:UXML>

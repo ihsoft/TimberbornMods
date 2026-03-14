@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <cui:NineSliceVisualElement name="ResourceYieldTooltip">
+        <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+        <ui:Label name="ResourceName" class="game-text-normal text--bold resource-yield-tooltip__text" text="Maple syrup" />
+        <ui:Label name="GrowthTime" class="game-text-small" text="Grow time: 7" />
+        <cui:LocalizableLabel name="EatableRaw" class="game-text-small" text="Can be eaten raw" text-loc-key="Goods.EatableRaw" />
+        <ui:Label name="Bonuses" class="game-text-small" text="- Basic Needs: Nutrition" />
+        <cui:LocalizableLabel name="Gathered" text-loc-key="Resources.GatheredBy" class="game-text-normal resource-yield-tooltip__text resource-yield-tooltip__text--margin" text="Gathered by:" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

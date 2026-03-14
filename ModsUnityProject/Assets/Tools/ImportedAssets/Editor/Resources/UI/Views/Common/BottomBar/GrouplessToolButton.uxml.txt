@@ -1,0 +1,16 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/BottomBar/BottomBarStyle.uss" />
+    <ui:Button name="ToolButton" class="bottom-bar-button bottom-bar-button--red bottom-bar-button--clickable">
+        <ui:VisualElement name="ToolButtonMainContainer" class="bottom-bar-button--main">
+            <ui:VisualElement name="ToolImage" class="bottom-bar-button__icon">
+                <ui:VisualElement name="Frame" class="bottom-bar-button__inner-item bottom-bar-button__frame" />
+                <ui:VisualElement name="LockIcon" class="bottom-bar-button__inner-item bottom-bar-button__lock-icon" />
+                <ui:TextElement name="BottomText" class="bottom-bar-button__bottom-text" />
+            </ui:VisualElement>
+            <cui:NineSliceVisualElement picking-mode="Ignore" name="TooltipContent" class="tool-group__tooltip-wrapper bg-box--brown">
+                <ui:Label name="Tooltip" text="Tooltip" class="tool-group__tooltip game-text-normal" />
+            </cui:NineSliceVisualElement>
+        </ui:VisualElement>
+    </ui:Button>
+</ui:UXML>

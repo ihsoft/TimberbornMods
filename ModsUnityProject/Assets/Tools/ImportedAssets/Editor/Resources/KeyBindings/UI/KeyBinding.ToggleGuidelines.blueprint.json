@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "ToggleGuidelines",
+    "GroupId": "UI",
+    "LocKey": "KeyBinding.ToggleGuidelines",
+    "Order": 90,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/x",
+    "InputModifiers": "Shift",
+    "Unchangeable": false
+  }
+}

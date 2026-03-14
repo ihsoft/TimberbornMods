@@ -1,0 +1,11 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+    <cui:NineSliceVisualElement name="WellbeingSummary" class="content-row-centered wellbeing-summary">
+        <ui:VisualElement name="Wellbeing" class="wellbeing-summary__score">
+            <cui:NineSliceLabel name="WellbeingText" text="-999" class="wellbeing-score wellbeing-score--small game-text-normal text--bold" />
+        </ui:VisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

@@ -1,0 +1,10 @@
+{
+  "KeyBindingSpec": {
+    "Id": "DecreaseSpeed",
+    "GroupId": "Time",
+    "LocKey": "KeyBinding.DecreaseSpeed",
+    "Order": 50,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  }
+}

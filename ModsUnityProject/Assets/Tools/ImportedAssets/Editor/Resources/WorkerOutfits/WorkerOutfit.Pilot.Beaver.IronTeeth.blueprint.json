@@ -1,0 +1,12 @@
+{
+  "WorkerOutfitSpec": {
+    "Id": "Pilot",
+    "FactionId": "IronTeeth",
+    "WorkerType": "Beaver",
+    "DiffuseTexture": "",
+    "NormalTexture": "",
+    "Attachments": [
+      "PilotHelmet.Beaver.IronTeeth"
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "NeedCollectionSpec": {
+    "CollectionId": "IronTeeth",
+    "Needs": [
+      "AlgaeRation",
+      "BeaverBust",
+      "BeaverStatue",
+      "Bell",
+      "Brazier",
+      "Campfire",
+      "Clock",
+      "Coffee",
+      "ControlTower",
+      "CornRation",
+      "Detailer",
+      "EarthRepopulator",
+      "EggplantRation",
+      "Energy",
+      "ExercisePlaza",
+      "FermentedCassava",
+      "FermentedMushroom",
+      "FermentedSoybean",
+      "FlameOfUnity",
+      "Grease",
+      "Kohlrabi",
+      "LaborerMonument",
+      "MangroveFruit",
+      "Motivatorium",
+      "MudBath",
+      "Scratcher",
+      "SwimmingPool",
+      "TributeToIngenuity",
+      "WindTunnel"
+    ]
+  }
+}

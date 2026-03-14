@@ -1,0 +1,8 @@
+{
+  "GameSpeedThrottlerSpec": {
+    "MinPopulation": 30,
+    "MaxPopulation": 200,
+    "MinGameSpeedScale": 0.4,
+    "MaxGameSpeedScale": 1.0
+  }
+}

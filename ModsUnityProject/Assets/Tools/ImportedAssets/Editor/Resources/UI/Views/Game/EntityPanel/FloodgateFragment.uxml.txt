@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <ui:VisualElement name="FloodgateFragment" class="floodgate-fragment">
+        <cui:NineSliceVisualElement name="HeightWrapper" class="entity-sub-panel content-centered bg-sub-box--green">
+            <ui:Label name="Height" text="Height" class="entity-panel__text" />
+            <ui:Slider name="Slider" class="slider floodgate-fragment__slider" />
+        </cui:NineSliceVisualElement>
+        <cui:NineSliceVisualElement name="SynchronizeWrapper" class="entity-sub-panel bg-sub-box--green">
+            <cui:LocalizableToggle name="Synchronize" text-loc-key="Building.Floodgate.Synchronize" text="Synchronize" class="game-toggle entity-panel__text entity-panel__toggle" />
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

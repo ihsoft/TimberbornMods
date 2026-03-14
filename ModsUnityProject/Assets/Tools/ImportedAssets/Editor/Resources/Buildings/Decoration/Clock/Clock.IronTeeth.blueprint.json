@@ -1,0 +1,243 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "Clock",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "Plank",
+        "Amount": 10
+      },
+      {
+        "Id": "Gear",
+        "Amount": 8
+      },
+      {
+        "Id": "MetalBlock",
+        "Amount": 2
+      }
+    ],
+    "ScienceCost": 600,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": false,
+    "DrawRangeBoundsOnIt": false
+  },
+  "TemplateSpec": {
+    "TemplateName": "Clock.IronTeeth",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 2
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Decoration",
+    "ToolOrder": 71,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.Clock.DisplayName",
+    "DescriptionLocKey": "Building.Clock.Description",
+    "FlavorDescriptionLocKey": "Building.Clock.FlavorDescription",
+    "Icon": "Buildings/Decoration/Clock/ClockIcon"
+  },
+  "BlockableBuildingLightingSpec": {},
+  "ClockHandAnimatorSpec": {
+    "AngleOffset": 60.0,
+    "HandName": "#HandIT"
+  },
+  "RangedEffectBuildingSpec": {
+    "EffectRadius": 3
+  },
+  "ContinuousEffectBuildingSpec": {
+    "Effects": [
+      {
+        "NeedId": "Clock",
+        "PointsPerHour": 0.64,
+        "SatisfyToMaxValue": false
+      }
+    ]
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "Children": {
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Decoration/Clock/Clock.IronTeeth.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.0993071,
+              "Z": 0.5
+            },
+            "Size": {
+              "X": 0.943794131,
+              "Y": 0.1986142,
+              "Z": 0.945815563
+            }
+          },
+          {
+            "Center": {
+              "X": 0.805831,
+              "Y": 0.642778635,
+              "Z": 0.5
+            },
+            "Size": {
+              "X": 0.132405639,
+              "Y": 0.8851738,
+              "Z": 0.5214274
+            }
+          },
+          {
+            "Center": {
+              "X": 0.2,
+              "Y": 0.642778635,
+              "Z": 0.5
+            },
+            "Size": {
+              "X": 0.132405639,
+              "Y": 0.8851738,
+              "Z": 0.5214274
+            }
+          },
+          {
+            "Center": {
+              "X": 0.50000006,
+              "Y": 1.29219806,
+              "Z": 0.5
+            },
+            "Size": {
+              "X": 0.999967,
+              "Y": 0.18301034,
+              "Z": 0.6070547
+            }
+          },
+          {
+            "Center": {
+              "X": 0.50000006,
+              "Y": 1.30094874,
+              "Z": 0.5
+            },
+            "Size": {
+              "X": 0.174207091,
+              "Y": 0.999937356,
+              "Z": 0.6070547
+            }
+          },
+          {
+            "Center": {
+              "X": 0.50000006,
+              "Y": 1.23128366,
+              "Z": 0.5
+            },
+            "Size": {
+              "X": 0.6756216,
+              "Y": 0.660999835,
+              "Z": 0.6070547
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase1x1#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase1x1/ConstructionBase1x1.blueprint"
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Decoration/Clock/Clock.IronTeeth.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.05,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.1,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.497611,
+                  "Y": 0.511742651,
+                  "Z": 0.4957403
+                },
+                "Size": {
+                  "X": 0.7530652,
+                  "Y": 0.8166696,
+                  "Z": 0.5098717
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    }
+  }
+}

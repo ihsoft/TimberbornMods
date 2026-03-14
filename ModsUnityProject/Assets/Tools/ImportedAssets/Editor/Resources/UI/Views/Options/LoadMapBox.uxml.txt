@@ -1,0 +1,22 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="MapSelection" src="/Assets/Resources/UI/Views/Common/MapSelection.uxml" />
+    <ui:Template name="Box" src="/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Options/OptionsStyle.uss" />
+    <ui:VisualElement class="content-row-centered" picking-mode="Ignore">
+        <ui:Instance template="Box" class="load-map-box">
+            <ui:AttributeOverrides element-name="Header" text-loc-key="LoadMapPanel.Header" />
+            <ui:VisualElement name="Content" class="load-map-box__content">
+                <ui:VisualElement name="MapsWrapper" class="load-map-box__map-selection">
+                    <ui:Instance template="MapSelection" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="box-buttons">
+                <cui:LocalizableButton name="DeleteMap" text-loc-key="LoadMapPanel.Delete" focusable="false" class="menu-button menu-button--medium" />
+                <cui:LocalizableButton name="LoadButton" text="Load" text-loc-key="Core.Load" focusable="false" class="menu-button menu-button--medium" />
+            </ui:VisualElement>
+        </ui:Instance>
+    </ui:VisualElement>
+</ui:UXML>
+        

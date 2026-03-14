@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "WheatFlour",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.7607843,
+      "g": 0.619607866,
+      "b": 0.270588249,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 2,
+    "GoodGroupId": "Ingredients",
+    "GoodOrder": 8040,
+    "Icon": "Sprites/Goods/WheatFlourIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.WheatFlour.DisplayName",
+    "PluralDisplayNameLocKey": "Good.WheatFlour.PluralDisplayName"
+  }
+}

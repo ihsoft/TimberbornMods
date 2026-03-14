@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <ui:Image name="DecalButton" class="decal-button">
+        <ui:Button name="TextureButton" class="decal-button__texture" />
+        <cui:NineSliceVisualElement name="Frame" picking-mode="Ignore" class="decal-button__frame" />
+    </ui:Image>
+</ui:UXML>

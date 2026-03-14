@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "CharactersTab",
+    "GroupId": "SettlementPanel",
+    "LocKey": "KeyBinding.CharactersTab",
+    "Order": 10,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/f1",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

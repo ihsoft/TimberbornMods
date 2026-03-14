@@ -1,0 +1,11 @@
+{
+  "CustomToolSpec": {
+    "Id": "Automation.EnableRulesTool",
+    "GroupId": "AutomationToolGroupId",
+    "Type": "IgorZ.Automation.CommonTools.EnableRulesTool",
+    "Order": 210,
+    "Icon": "Sprites/IgorZ/tool-enable-rules",
+    "DisplayNameLocKey": "IgorZ.Automation.EnableRulesTool.Title",
+    "DescriptionLocKey": "IgorZ.Automation.EnableRulesTool.Description"
+  }
+}

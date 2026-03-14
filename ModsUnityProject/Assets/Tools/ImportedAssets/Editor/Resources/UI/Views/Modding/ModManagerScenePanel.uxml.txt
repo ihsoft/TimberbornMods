@@ -1,0 +1,30 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MainMenu/MainMenuMiscStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Modding/ModdingStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Options/OptionsStyle.uss" />
+    <ui:VisualElement name="ModManagerScenePanel" class="title-screen title-screen-background content-row-centered">
+        <ui:VisualElement name="ModManagerBox" class="mod-manager-box">
+            <ui:VisualElement name="Content" class="mod-manager-scene-panel__content box__content-container">
+                <ui:VisualElement name="HeaderWrapper" class="capsule-header capsule-header--lower content-centered mod-manager-scene-panel__header">
+                    <ui:Label text="Mods" name="Header" class="capsule-header__text" />
+                </ui:VisualElement>
+                <ui:VisualElement name="TopButtons" class="mod-manager-box__top-buttons">
+                    <ui:Button name="ResetOrderButton" text="Reset load order" class="mod-manager-box__top-button text--default text--bold" />
+                </ui:VisualElement>
+                <ui:ScrollView name="Items" class="mod-manager-box__list mod-manager-scene-panel__list" />
+                <ui:Button text="OK" name="StartButton" class="mod-manager-scene-panel__button mod-manger-box__confirm-button" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="Footer" picking-mode="Ignore" class="grow-centered title-screen__footer">
+            <ui:VisualElement name="LeftPanel" class="title-screen__left-panel title-screen__footer-element">
+                <ui:Label text="Version" name="GameVersion" class="title-screen__footer-text" />
+            </ui:VisualElement>
+            <ui:VisualElement name="RightPanel" class="title-screen__right-panel title-screen__footer-element" />
+        </ui:VisualElement>
+        <ui:VisualElement name="ModManagerTooltip" picking-mode="Ignore" class="tooltip-wrapper">
+            <ui:Label name="TooltipLabel" text="Tooltip" picking-mode="Ignore" enable-rich-text="false" class="tooltip bg-box--brown game-text-normal text--grey mod-manager-scene-panel__tooltip" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

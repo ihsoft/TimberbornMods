@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "CanolaOil",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Liquid",
+    "StockpileVisualization": "Liquid",
+    "VisibleContainer": "Barrel",
+    "ContainerColor": {
+      "r": 0.9490196,
+      "g": 0.7372549,
+      "b": 0.0470588244,
+      "a": 1.0
+    },
+    "ContainerMaterial": "Materials/Goods/CanolaOil",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Ingredients",
+    "GoodOrder": 10030,
+    "Icon": "Sprites/Goods/CanolaOilIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.CanolaOil.DisplayName",
+    "PluralDisplayNameLocKey": "Good.CanolaOil.PluralDisplayName"
+  }
+}

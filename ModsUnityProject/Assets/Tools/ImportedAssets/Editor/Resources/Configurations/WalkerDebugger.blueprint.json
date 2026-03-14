@@ -1,0 +1,8 @@
+{
+  "WalkerDebuggerSpec": {
+    "WalkerGameObjectMarkerPath": "Markers/WalkerDebugger/WalkerGameObjectMarker",
+    "WalkerModelMarkerPath": "Markers/WalkerDebugger/WalkerModelMarker",
+    "DestinationMarkerPath": "Markers/WalkerDebugger/WalkerDestinationMarker",
+    "CornerMarkerPath": "Markers/WalkerDebugger/PathCornerMarker"
+  }
+}

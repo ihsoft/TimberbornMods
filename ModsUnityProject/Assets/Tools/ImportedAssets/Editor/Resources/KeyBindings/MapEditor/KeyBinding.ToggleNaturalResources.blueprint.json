@@ -1,0 +1,10 @@
+{
+  "KeyBindingSpec": {
+    "Id": "ToggleNaturalResources",
+    "GroupId": "MapEditor",
+    "LocKey": "KeyBinding.ToggleNaturalResources",
+    "Order": 100,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  }
+}

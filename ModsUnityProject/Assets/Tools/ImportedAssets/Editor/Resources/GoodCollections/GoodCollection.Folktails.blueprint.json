@@ -1,0 +1,35 @@
+{
+  "GoodCollectionSpec": {
+    "CollectionId": "Folktails",
+    "Goods": [
+      "Antidote",
+      "Biofuel",
+      "Book",
+      "BotChassis",
+      "BotHead",
+      "BotLimb",
+      "Bread",
+      "Carrot",
+      "Catalyst",
+      "CattailCracker",
+      "CattailFlour",
+      "CattailRoot",
+      "Chestnut",
+      "Dandelion",
+      "GrilledChestnut",
+      "GrilledPotato",
+      "GrilledSpadderdock",
+      "MaplePastry",
+      "MapleSyrup",
+      "Paper",
+      "Potato",
+      "PunchCard",
+      "Spadderdock",
+      "SunflowerSeeds",
+      "TreatedPlank",
+      "Water",
+      "Wheat",
+      "WheatFlour"
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+﻿{
+  "TutorialStageSpec": {
+    "Id": "Wellbeing.BuildCampfire",
+    "IntroLocKey": "Tutorial.Wellbeing.Campfire"
+  },
+  "Children": {
+    "Step1": {
+      "BuildingTutorialStepSpec": {
+        "TemplateNames": [
+          "Campfire.Folktails"
+        ],
+        "OnlyFinishedBuildings": true,
+        "RequiredAmount": 1
+      }
+    }
+  }
+}

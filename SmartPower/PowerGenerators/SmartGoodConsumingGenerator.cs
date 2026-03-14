@@ -2,24 +2,13 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using Bindito.Core;
 using IgorZ.SmartPower.Settings;
-using Timberborn.BlockSystem;
+using Timberborn.DuplicationSystem;
 using Timberborn.GoodConsumingBuildingSystem;
 
 namespace IgorZ.SmartPower.PowerGenerators;
 
-sealed class SmartGoodConsumingGenerator : PowerOutputBalancer, IUnfinishedStateListener {
-
-  #region IUnfinishedStateListener implementation
-
-  public void OnEnterUnfinishedState() {
-    Automate = true;  // Enable for all new generators.
-  }
-  public void OnExitUnfinishedState() {
-  }
-
-  #endregion
+sealed class SmartGoodConsumingGenerator : PowerOutputBalancer, IDuplicable<SmartGoodConsumingGenerator> {
 
   #region PowerOutputBalancer overrides
 
@@ -28,40 +17,56 @@ sealed class SmartGoodConsumingGenerator : PowerOutputBalancer, IUnfinishedState
     base.Suspend();
     _goodConsumingToggle.PauseConsumption();
     if (MechanicalNode.Graph != null) {
-      MechanicalNode.UpdateOutput(0);
+      MechanicalNode.SetOutputMultiplier(0);
     }
   }
 
   /// <inheritdoc/>
   protected override void Resume() {
     _goodConsumingToggle.ResumeConsumption();
-    if (MechanicalNode.Graph != null && _goodConsumingBuilding.HoursUntilNoSupply > 0) {
-      MechanicalNode.Active = true;
-      MechanicalNode.UpdateOutput(1.0f);
+    if (MechanicalNode.Graph != null && _goodConsumingBuilding.HoursUntilNoSupply() > 0) {
+      MechanicalNode.SetOutputMultiplier(1.0f);
     }
     base.Resume();
   }
 
-  protected override void Awake() {
-    ShowFloatingIcon = _settings.ShowFloatingIcon.Value;
+  /// <inheritdoc/>
+  protected override bool CanBeAutomated => _goodConsumingBuilding.HasSupplies();
+
+  /// <inheritdoc/>
+  protected override void OnAfterSmartLogic() {
+    // We can't know if our component ticks before or after GoodConsumingBuilding, so repeat the IsConsuming logic.
+    var isConsuming = !_goodConsumingBuilding.ConsumptionPaused
+        && _goodConsumingBuilding._blockableObject.IsUnblocked
+        && _goodConsumingBuilding.HasSupplies();
+    MechanicalNode.SetOutputMultiplier(isConsuming ? 1.0f : 0f);
+  }
+
+  /// <inheritdoc/>
+  public override void Awake() {
+    ShowFloatingIcon = GoodConsumingGeneratorSettings.ShowFloatingIcon;
+    Automate = true;
     base.Awake();
 
-    _goodConsumingBuilding = GetComponentFast<GoodConsumingBuilding>();
+    _goodConsumingBuilding = GetComponent<GoodConsumingBuilding>();
     _goodConsumingToggle = _goodConsumingBuilding.GetGoodConsumingToggle();
+  }
+
+  #endregion
+
+  #region IDuplicable implementation. Need to be called from descendants when the building is duplicated.
+
+  /// <summary>Copies settings from a source of the same type.</summary>
+  public void DuplicateFrom(SmartGoodConsumingGenerator source) {
+    base.DuplicateFrom(source);
   }
 
   #endregion
 
   #region Implementation
 
-  GoodConsumingGeneratorSettings _settings;
   GoodConsumingBuilding _goodConsumingBuilding;
   GoodConsumingToggle _goodConsumingToggle;
-
-  [Inject]
-  public void InjectDependencies(GoodConsumingGeneratorSettings settings) {
-    _settings = settings;
-  }
 
   #endregion
 }

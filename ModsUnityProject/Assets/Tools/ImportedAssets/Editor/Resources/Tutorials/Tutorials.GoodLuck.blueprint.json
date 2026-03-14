@@ -1,0 +1,14 @@
+{
+  "TutorialSpec": {
+    "Id": "GoodLuck",
+    "NameLocKey": "Tutorial.GoodLuck",
+    "RequiredTutorialIds": [
+      "Forestry",
+      "Wellbeing"
+    ],
+    "SortOrder": 0,
+    "Stages": [
+      "Tutorial.GoodLuckDescription"
+    ]
+  }
+}

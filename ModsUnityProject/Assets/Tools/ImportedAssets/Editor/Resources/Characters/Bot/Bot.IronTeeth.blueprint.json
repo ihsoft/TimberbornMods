@@ -1,0 +1,1135 @@
+{
+  "BotSpec": {},
+  "CharacterModelSpec": {
+    "ModelName": "Model_Preserved"
+  },
+  "MovementAnimatorSpec": {
+    "AnimationSpeedScale": 1.0
+  },
+  "WorkerSpec": {
+    "WorkerType": "Bot"
+  },
+  "TemplateSpec": {
+    "TemplateName": "Bot.IronTeeth",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "GoodCarrierSpec": {
+    "BaseLiftingCapacity": 20
+  },
+  "GoodCarrierModelSpec": {
+    "CarriedInHandsAttachmentName": "CarriedInHands",
+    "BackpackAttachmentName": "Backpack"
+  },
+  "WalkerSpeedManagerSpec": {
+    "BaseWalkingSpeed": 2.7,
+    "BaseSlowedSpeed": 1.35
+  },
+  "MortalSpec": {},
+  "DeadStatusSpec": {
+    "DeadStatusLocKey": "Status.Bot.Dead"
+  },
+  "RunningStateUpdaterSpec": {
+    "ShortWalkingDistanceThreshold": 10.0,
+    "WalkingSpeedThreshold": 0.75
+  },
+  "WellbeingTrackerSpec": {
+    "CountsToPopulationWellbeing": false
+  },
+  "SimpleLabeledEntitySpec": {
+    "EntityNameLocKey": "Bot.TemplateName"
+  },
+  "BotFactionNameSpec": {
+    "NameLocKey": "Bot.DisplayName.IronTeeth"
+  },
+  "DeteriorableSpec": {
+    "DeteriorationInDays": 70
+  },
+  "SwimmingAnimatorSpec": {
+    "LowerSwimmingDepthThreshold": 0.22,
+    "UpperSwimmingDepthThreshold": 0.27
+  },
+  "CriticalNeedStateAnimationSpec": {
+    "NeedId": "Energy",
+    "Animation": "NoEnergy"
+  },
+  "BotSelectionSoundSpec": {
+    "SoundNameKey": "Ironbot"
+  },
+  "OverburdenableSpec": {
+    "OverburdenedBonuses": [
+      {
+        "Id": "MovementSpeed",
+        "MultiplierDelta": -0.5
+      }
+    ]
+  },
+  "WellbeingBonusesSubjectSpec": {
+    "Bonuses": [
+      "WorkingSpeed",
+      "MovementSpeed"
+    ]
+  },
+  "TreeCutterParticleControllerSpec": {
+    "ParticlesAttachmentId": "Shavings.CuttingAnimation.Bot"
+  },
+  "PlantingParticleControllerSpec": {
+    "ParticlesAttachmentId": "Dirt.PlantingAnimation.Bot"
+  },
+  "DemolishableParticleControllerSpec": {
+    "DemolishableParticles": [
+      {
+        "AttachmentId": "Thorns.DemolishAnimation.Beaver",
+        "TemplateNames": [
+          "Thorns"
+        ]
+      }
+    ]
+  },
+  "WorkerOutfitAnimationAttachmentVisibilitySpec": {
+    "WorkerOutfitAnimationAttachments": [
+      {
+        "WorkerOutfit": "",
+        "AnimationNames": [
+          "Bot_building",
+          "Bot_building_underwater"
+        ],
+        "ShowWhenActive": [
+          "HammerHand.Bot"
+        ],
+        "HideWhenActive": []
+      },
+      {
+        "WorkerOutfit": "Builder",
+        "AnimationNames": [
+          "Bot_building",
+          "Bot_building_underwater"
+        ],
+        "ShowWhenActive": [],
+        "HideWhenActive": [
+          "HammerBack.Bot"
+        ]
+      }
+    ]
+  },
+  "AnimationParticlesTriggerSpec": {
+    "AnimationParticles": [
+      {
+        "AnimationName": "Bot_building",
+        "ParticlesAttachmentId": "Dust.BuildingAnimation",
+        "TriggerTimes": [
+          0.82
+        ]
+      },
+      {
+        "AnimationName": "Bot_building",
+        "ParticlesAttachmentId": "Thorns.DemolishAnimation.Beaver",
+        "TriggerTimes": [
+          0.82
+        ]
+      }
+    ]
+  },
+  "CharacterObjectNamerSpec": {
+    "Prefix": "Bot"
+  },
+  "TimbermeshAnimatorControllerSpec": {
+    "BoolParameters": [
+      "Walking",
+      "Working",
+      "CarryInHands",
+      "CarryOnArm",
+      "Sleeping",
+      "Sitting",
+      "Dead",
+      "DeadNoAnimation",
+      "ForcedIdle",
+      "Swimming",
+      "Building",
+      "RunningProhibited",
+      "MovingUp",
+      "MovingDown",
+      "ForcedWalking",
+      "Stranded",
+      "ForcedSwimming",
+      "Floating",
+      "ForcedAPose",
+      "NoEnergy",
+      "Charging",
+      "CharacterControl",
+      "Cutting",
+      "Planting",
+      "Piloting"
+    ],
+    "FloatParameters": [
+      "WalkingSpeed",
+      "WorkingSpeed"
+    ],
+    "AnimatorStates": [
+      {
+        "StateName": "Idle",
+        "AnimationName": "Bot_idle",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": []
+      },
+      {
+        "StateName": "Idle swimming",
+        "AnimationName": "Bot_swim_idle",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Idle NoEnergy",
+        "AnimationName": "Bot_idle_no_fuel",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "NoEnergy",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Idle Swimming NoEnergy",
+        "AnimationName": "Bot_swim_idle_no_fuel",
+        "Speed": 1.0,
+        "SpeedModifier": "WalkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "NoEnergy",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Swimming",
+        "AnimationName": "Bot_swim",
+        "Speed": 1.0,
+        "SpeedModifier": "WalkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Walking",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "CarryInHands",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "CarryOnArm",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "NoEnergy",
+            "MustBeTrue": false
+          }
+        ]
+      },
+      {
+        "StateName": "Sitting",
+        "AnimationName": "Bot_sitting",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Sitting",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Running",
+        "AnimationName": "Bot_run",
+        "Speed": 0.5,
+        "SpeedModifier": "WalkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Walking",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "MovingUp",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "MovingDown",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "RunningProhibited",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "CarryInHands",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "CarryOnArm",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "NoEnergy",
+            "MustBeTrue": false
+          }
+        ]
+      },
+      {
+        "StateName": "Walking carrying in hands",
+        "AnimationName": "Bot_walk_with_box",
+        "Speed": 1.5,
+        "SpeedModifier": "WalkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Walking",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "CarryInHands",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": false
+          }
+        ]
+      },
+      {
+        "StateName": "Walking empty handed",
+        "AnimationName": "Bot_walk",
+        "Speed": 1.0,
+        "SpeedModifier": "WalkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Walking",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "RunningProhibited",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "CarryInHands",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "CarryOnArm",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "NoEnergy",
+            "MustBeTrue": false
+          }
+        ]
+      },
+      {
+        "StateName": "Walking carrying on arm",
+        "AnimationName": "Bot_walk_with_bag",
+        "Speed": 1.5,
+        "SpeedModifier": "WalkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Walking",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "CarryOnArm",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": false
+          }
+        ]
+      },
+      {
+        "StateName": "Working",
+        "AnimationName": "Bot_work",
+        "Speed": 1.0,
+        "SpeedModifier": "WorkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Working",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": false
+          }
+        ]
+      },
+      {
+        "StateName": "Building",
+        "AnimationName": "Bot_building",
+        "Speed": 1.0,
+        "SpeedModifier": "WorkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Building",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": false
+          }
+        ]
+      },
+      {
+        "StateName": "Sleeping",
+        "AnimationName": "Bot_sitting",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Sleeping",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": false
+          }
+        ]
+      },
+      {
+        "StateName": "Forced Idle",
+        "AnimationName": "Bot_idle",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "ForcedIdle",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "RunningUp",
+        "AnimationName": "Bot_run_up",
+        "Speed": 1.0,
+        "SpeedModifier": "WalkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Walking",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "MovingUp",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "RunningProhibited",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "CarryInHands",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "CarryOnArm",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "NoEnergy",
+            "MustBeTrue": false
+          }
+        ]
+      },
+      {
+        "StateName": "RunningDown",
+        "AnimationName": "Bot_run_down",
+        "Speed": 0.5,
+        "SpeedModifier": "WalkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Walking",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "MovingDown",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "RunningProhibited",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "CarryInHands",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "CarryOnArm",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "NoEnergy",
+            "MustBeTrue": false
+          }
+        ]
+      },
+      {
+        "StateName": "Swimming carrying box",
+        "AnimationName": "Bot_swim_with_box",
+        "Speed": 1.0,
+        "SpeedModifier": "WalkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Walking",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "CarryInHands",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Swimming carrying log",
+        "AnimationName": "Bot_swim_with_log",
+        "Speed": 1.5,
+        "SpeedModifier": "WalkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Walking",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "CarryOnArm",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Working underwater",
+        "AnimationName": "Bot_swim_work",
+        "Speed": 1.0,
+        "SpeedModifier": "WorkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Working",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Building underwater",
+        "AnimationName": "Bot_building_underwater",
+        "Speed": 1.0,
+        "SpeedModifier": "WorkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Building",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Forced Walking",
+        "AnimationName": "Bot_walk",
+        "Speed": 1.4,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "ForcedWalking",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Sleeping underwater",
+        "AnimationName": "Bot_swim_idle",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Sleeping",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Stranded",
+        "AnimationName": "Bot_sitting",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Stranded",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": false
+          }
+        ]
+      },
+      {
+        "StateName": "Stranded underwater",
+        "AnimationName": "Bot_swim_idle",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Stranded",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Forced Swimming",
+        "AnimationName": "Bot_swim",
+        "Speed": 1.0,
+        "SpeedModifier": "WalkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "ForcedSwimming",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Floating",
+        "AnimationName": "Bot_swim_idle",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Floating",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Forced A-Pose",
+        "AnimationName": "Bot_A-Pose",
+        "Speed": 0.2,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "ForcedAPose",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Swimming NoEnergy",
+        "AnimationName": "Bot_swim_no_fuel",
+        "Speed": 1.0,
+        "SpeedModifier": "WalkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Walking",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "NoEnergy",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "CarryInHands",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "CarryOnArm",
+            "MustBeTrue": false
+          }
+        ]
+      },
+      {
+        "StateName": "Walking NoEnergy",
+        "AnimationName": "Bot_walk_no_fuel",
+        "Speed": 1.0,
+        "SpeedModifier": "WalkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Walking",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "NoEnergy",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "CarryOnArm",
+            "MustBeTrue": false
+          },
+          {
+            "ParameterName": "CarryInHands",
+            "MustBeTrue": false
+          }
+        ]
+      },
+      {
+        "StateName": "Charging",
+        "AnimationName": "Bot_charging",
+        "Speed": 1.0,
+        "SpeedModifier": "WalkingSpeed",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Charging",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "CharacterControl",
+        "AnimationName": "CharacterControlAnimation",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "CharacterControl",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Walking",
+            "MustBeTrue": false
+          }
+        ]
+      },
+      {
+        "StateName": "Cutting",
+        "AnimationName": "Bot_cut",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Cutting",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": false
+          }
+        ]
+      },
+      {
+        "StateName": "Cutting underwater",
+        "AnimationName": "Bot_cut_underwater",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Cutting",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Planting",
+        "AnimationName": "Bot_digging",
+        "Speed": 1.3,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Planting",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": false
+          }
+        ]
+      },
+      {
+        "StateName": "Planting Underwater",
+        "AnimationName": "Bot_dig_underwater",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Planting",
+            "MustBeTrue": true
+          },
+          {
+            "ParameterName": "Swimming",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Piloting",
+        "AnimationName": "Bot_piloting",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Piloting",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "DeadNoAnimation",
+        "AnimationName": "Bot_dead",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": false,
+        "Conditions": [
+          {
+            "ParameterName": "DeadNoAnimation",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Dead",
+        "AnimationName": "Bot_death",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": false,
+        "Conditions": [
+          {
+            "ParameterName": "Dead",
+            "MustBeTrue": true
+          }
+        ]
+      }
+    ]
+  },
+  "TemplateAttachmentsSpec": {
+    "Attachments": [
+      {
+        "AttachmentId": "Backpack",
+        "Prefab": "Characters/Attachments/Backpack",
+        "Parent": "#Backpack",
+        "Position": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": true
+      },
+      {
+        "AttachmentId": "CarriedInHands",
+        "Prefab": "Characters/Attachments/CarriedInHands",
+        "Parent": "#CarriedInHands",
+        "Position": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": false
+      },
+      {
+        "AttachmentId": "Collider.Bot",
+        "Prefab": "Characters/Bot/Attachments/Collider.Bot",
+        "Parent": "#Collider",
+        "Position": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": true
+      },
+      {
+        "AttachmentId": "Dirt.PlantingAnimation.Bot",
+        "Prefab": "Characters/Bot/Attachments/PlantingAnimationDirt",
+        "Parent": "#PlantingParticles",
+        "Position": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": false
+      },
+      {
+        "AttachmentId": "Dust.BuildingAnimation",
+        "Prefab": "Characters/Attachments/BuildingAnimationDust",
+        "Parent": "#BuildingParticles",
+        "Position": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": false
+      },
+      {
+        "AttachmentId": "FarmerHat.Bot.IronTeeth",
+        "Prefab": "Characters/Bot/Attachments/FarmerHatBot.IronTeeth",
+        "Parent": "#Head",
+        "Position": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": false
+      },
+      {
+        "AttachmentId": "HammerBack.Bot",
+        "Prefab": "Characters/Bot/Attachments/WorkerWoodenHammerBot",
+        "Parent": "#Backpack",
+        "Position": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": false
+      },
+      {
+        "AttachmentId": "HammerHand.Bot",
+        "Prefab": "Characters/Bot/Attachments/WorkerWoodenHammerInHandBot",
+        "Parent": "#CarriedInHands",
+        "Position": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": false
+      },
+      {
+        "AttachmentId": "PilotHelmet.Bot.IronTeeth",
+        "Prefab": "Characters/Bot/Attachments/PilotHelmetBot.IronTeeth",
+        "Parent": "#Head",
+        "Position": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": false
+      },
+      {
+        "AttachmentId": "Shavings.CuttingAnimation.Bot",
+        "Prefab": "Characters/Bot/Attachments/CuttingAnimationShavings",
+        "Parent": "#Teeth",
+        "Position": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": false
+      },
+      {
+        "AttachmentId": "Thorns.DemolishAnimation.Beaver",
+        "Prefab": "Characters/Attachments/ThornsAnimationDust",
+        "Parent": "#BuildingParticles",
+        "Position": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": false
+      }
+    ]
+  },
+  "Children": {
+    "Model_Preserved": {
+      "TimbermeshSpec": {
+        "Model": "Characters/Bot/Bot.IronTeeth.Model"
+      }
+    }
+  }
+}

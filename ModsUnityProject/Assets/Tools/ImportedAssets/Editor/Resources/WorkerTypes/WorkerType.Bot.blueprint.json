@@ -1,0 +1,9 @@
+{
+  "WorkerTypeSpec": {
+    "Id": "Bot",
+    "BackwardCompatibleIds": [],
+    "IgnoresWorkingHours": true,
+    "DisplayNameLocKey": "Bot.PluralDisplayName",
+    "WorkerOnlyTextLocKey": "Work.BotOnly"
+  }
+}

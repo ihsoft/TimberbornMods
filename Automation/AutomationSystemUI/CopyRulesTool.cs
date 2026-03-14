@@ -2,17 +2,19 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+extern alias CustomTools;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.TemplateTools;
-using IgorZ.TimberDev.Tools;
 using Timberborn.BlockSystem;
 using Timberborn.ConstructionMode;
 using Timberborn.ToolSystem;
 using UnityEngine;
+using AbstractAreaSelectionTool = CustomTools::IgorZ.CustomTools.Tools.AbstractAreaSelectionTool;
 
 namespace IgorZ.Automation.AutomationSystemUI;
 
@@ -26,14 +28,18 @@ sealed class CopyRulesTool : AbstractAreaSelectionTool, IAutomationModeEnabler, 
 
   #region AbstractAreaSelectionTool overries
 
-  protected override string DescriptionTitleLoc => DescriptionTitleLocKey;
+  /// <inheritdoc/>
+  protected override string DescriptionTitle => Loc.T(DescriptionTitleLocKey);
+
+  /// <inheritdoc/>
+  protected override string DescriptionMainSection => null;
 
   /// <inheritdoc/>
   protected override string CursorName => "AutomationCogCursor";
 
   /// <inheritdoc/>
   protected override bool ObjectFilterExpression(BlockObject blockObject) {
-    var behavior = blockObject.GetComponentFast<AutomationBehavior>();
+    var behavior = blockObject.GetComponent<AutomationBehavior>();
     if (!behavior || behavior == _sourceBehavior) {
       return false;
     }
@@ -42,7 +48,7 @@ sealed class CopyRulesTool : AbstractAreaSelectionTool, IAutomationModeEnabler, 
 
   /// <inheritdoc/>
   protected override void OnObjectAction(BlockObject blockObject) {
-    var behavior = blockObject.GetComponentFast<AutomationBehavior>();
+    var behavior = blockObject.GetComponent<AutomationBehavior>();
     _targetRulesHelper.SetBuilding(behavior);
     if (_copyMode == CopyMode.CopyRules) {
       _targetRulesHelper.ClearRulesOnBuilding();
@@ -65,7 +71,7 @@ sealed class CopyRulesTool : AbstractAreaSelectionTool, IAutomationModeEnabler, 
   }
 
   /// <inheritdoc/>
-  public override string WarningText() {
+  public override string GetWarningText() {
     return Loc.T(CopyRulesTextLocKey, _actionsToCopy.Count);
   }
 
@@ -87,17 +93,17 @@ sealed class CopyRulesTool : AbstractAreaSelectionTool, IAutomationModeEnabler, 
             .Select(x => x.Action)
             .ToList(),
         CopyMode.CopyRules => rulesHelper.BuildingRules.ToList(),  // Need a copy.
-        _ => throw new ArgumentException("Unknown copy mode"),
     };
-    _toolGroupManager.CloseToolGroup();
-    _toolManager.SwitchTool(this);
+    _toolGroupService.ExitToolGroup();
+    _toolService.SwitchTool(this);
   }
 
   #endregion
 
   #region Implementation
 
-  ToolManager _toolManager;
+  ToolService _toolService;
+  ToolGroupService _toolGroupService;
   AutomationBehavior _sourceBehavior;
   RulesUIHelper _targetRulesHelper;
   CopyMode _copyMode;
@@ -106,13 +112,11 @@ sealed class CopyRulesTool : AbstractAreaSelectionTool, IAutomationModeEnabler, 
   /// <summary>Injects the condition dependencies. It has to be public to work.</summary>
   [Inject]
   public void InjectDependencies(
-      ToolManager toolManager, ToolGroupManager toolGroupManager, RulesUIHelper rulesHelper) {
-    _toolManager = toolManager;
-    _toolGroupManager = toolGroupManager;
+      ToolService toolService, ToolGroupService toolGroupService, RulesUIHelper rulesHelper) {
+    _toolService = toolService;
+    _toolGroupService = toolGroupService;
     _targetRulesHelper = rulesHelper;
   }
-
-  ToolGroupManager _toolGroupManager;
 
   #endregion
 }

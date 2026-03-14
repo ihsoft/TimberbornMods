@@ -1,0 +1,9 @@
+{
+  "ToolGroupSpec": {
+    "Id": "BuilderPriority",
+    "DisplayNameLocKey": "ToolGroups.Priority",
+    "Icon": "Sprites/BottomBar/PriorityToolGroupIcon"
+  },
+  "ConstructionModeToolGroupSpec": {},
+  "BuilderPriorityToolGroupSpec": {}
+}

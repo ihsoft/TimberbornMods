@@ -1,0 +1,36 @@
+{
+  "NeedCollectionSpec": {
+    "CollectionId": "Folktails",
+    "Needs": [
+      "Agora",
+      "Antidote",
+      "BeaverStatue",
+      "BeeSting",
+      "Biofuel",
+      "Books",
+      "BrazierOfBonding",
+      "Bread",
+      "BulletinPole",
+      "Carousel",
+      "Carrots",
+      "Catalyst",
+      "CattailCracker",
+      "ContemplationSpot",
+      "DanceHall",
+      "Detailer",
+      "EarthRecultivator",
+      "FarmerMonument",
+      "FountainOfJoy",
+      "GrilledChestnuts",
+      "GrilledPotatoes",
+      "GrilledSpadderdock",
+      "Lido",
+      "MaplePastry",
+      "MudPit",
+      "PunchCard",
+      "Scarecrow",
+      "SunflowerSeeds",
+      "Weathervane"
+    ]
+  }
+}

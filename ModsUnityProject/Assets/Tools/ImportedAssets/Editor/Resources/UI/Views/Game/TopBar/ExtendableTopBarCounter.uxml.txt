@@ -1,0 +1,17 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/TopBar/TopBarStyle.uss" />
+    <ui:VisualElement name="Counter" class="top-bar-counter__wrapper top-bar-counter--extendable">
+        <ui:VisualElement name="Background" class="extension-panel-background extension-panel-position" />
+        <ui:Button name="ExtensionToggler" class="extension-clamp" />
+        <ui:VisualElement name="CounterItems" class="top-bar-counter__items">
+            <cui:LocalizableLabel name="EmptyCounterPlaceholder" text-loc-key="TopBar.Nothing" text="Item" class="top-bar-counter-row top-bar-counter__nothing game-text-small" />
+        </ui:VisualElement>
+        <cui:NineSliceVisualElement name="CounterWrapper" class="top-bar-counter top-bar-counter__button bg-striped--green">
+            <ui:Image name="Icon" class="top-bar-counter__icon" />
+            <ui:Label name="Count" text="999999" class="top-bar-counter__count game-text-normal text--yellow" />
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

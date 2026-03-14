@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "ResetCamera",
+    "GroupId": "Camera",
+    "LocKey": "KeyBinding.ResetCamera",
+    "Order": 110,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/z",
+    "InputModifiers": "Shift",
+    "Unchangeable": false
+  }
+}

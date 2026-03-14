@@ -6,6 +6,7 @@ using System.Reflection;
 using HarmonyLib;
 using IgorZ.TimberDev.UI;
 using IgorZ.TimberDev.Utils;
+using Timberborn.WaterBuildingsUI;
 using Timberborn.WaterSystem;
 using UnityEngine.UIElements;
 
@@ -14,14 +15,10 @@ using UnityEngine.UIElements;
 
 namespace IgorZ.TimberCommons.CommonUIPatches;
 
-[HarmonyPatch]
+[HarmonyPatch(typeof(SluiceFragment), nameof(SluiceFragment.InitializeFragment))]
 static class SluiceFragmentPatch1 {
   internal static Label FlowLabel;
   internal static IThreadSafeWaterMap ThreadSafeWaterMap;
-  
-  static MethodBase TargetMethod() {
-    return AccessTools.DeclaredMethod("Timberborn.WaterBuildingsUI.SluiceFragment:InitializeFragment");
-  }
 
   static void Postfix(bool __runOriginal, VisualElement ____contaminationLabel) {
     if (!__runOriginal) {

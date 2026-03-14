@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "Dirt",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Pileable",
+    "StockpileVisualization": "Dirt",
+    "VisibleContainer": "Bag",
+    "ContainerColor": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryOnArm",
+    "Weight": 7,
+    "GoodGroupId": "Materials",
+    "GoodOrder": 7000,
+    "Icon": "Sprites/Goods/DirtIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.Dirt.DisplayName",
+    "PluralDisplayNameLocKey": "Good.Dirt.PluralDisplayName"
+  }
+}

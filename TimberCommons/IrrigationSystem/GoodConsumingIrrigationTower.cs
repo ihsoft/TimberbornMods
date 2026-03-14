@@ -2,12 +2,15 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using System.Collections.Generic;
 using Bindito.Core;
 using IgorZ.TimberCommons.Common;
 using Timberborn.Buildings;
 using Timberborn.GoodConsumingBuildingSystem;
 using Timberborn.Localization;
+using Timberborn.UIFormatters;
+using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.TimberCommons.IrrigationSystem;
 
@@ -25,23 +28,30 @@ namespace IgorZ.TimberCommons.IrrigationSystem;
 public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFormatter {
 
   #region IConsumptionRateFormatter implementation
-  
-  const string DaysShortLocKey = "Time.DaysShort";
 
   /// <inheritdoc/>
   public string GetRate() {
-    var goodPerHour = _goodConsumingBuildingSpec.GoodPerHour * 24;
+    var consumedGood = _goodConsumingBuilding._goodConsumingBuildingSpec.ConsumedGoods[0];
+    var goodPerHour = consumedGood.GoodPerHour * 24;
     return goodPerHour.ToString("0.#");
   }
   
   /// <inheritdoc/>
   public string GetTime() {
-    return _loc.T(DaysShortLocKey, "1");
+    return UnitFormatter.FormatDays("1", _loc);
   }
   
   #endregion
 
   #region IrrigationTower overrides
+
+  /// <inheritdoc/>
+  protected override int IrrigationRange => _irrigationRange;
+  int _irrigationRange;
+
+  /// <inheritdoc/>
+  protected override bool IrrigateFromGroundTilesOnly => _irrigateFromGroundTilesOnly;
+  bool _irrigateFromGroundTilesOnly;
 
   /// <inheritdoc/>
   protected override bool CanMoisturize() {
@@ -60,7 +70,18 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
 
   /// <inheritdoc/>
   protected override void UpdateConsumptionRate() {
-    _goodConsumingBuildingSpec._goodPerHour = _prefabGoodPerHour * Coverage;
+    var newConsumptionRate = _prefabConsumedGoodSpec.GoodPerHour * Coverage;
+    if (Math.Abs(_prefabConsumedGoodSpec.GoodPerHour - newConsumptionRate) > float.Epsilon) {
+      var newRateSpec = _prefabGoodConsumingBuildingSpec with {
+          ConsumedGoods = [_prefabConsumedGoodSpec with { GoodPerHour = newConsumptionRate }],
+      };
+      HostedDebugLog.Fine(this, "Updating consumption rate spec: from={0}, to {1}",
+                          _goodConsumingBuilding._goodConsumingBuildingSpec, newRateSpec);
+      _goodConsumingBuilding._goodConsumingBuildingSpec = newRateSpec;
+    }
+
+    // Lazy init to not depend on the initialization order.
+    _goodConsumingToggle ??= _goodConsumingBuilding.GetGoodConsumingToggle();
     if (Coverage > 0) {
       _goodConsumingToggle.ResumeConsumption();
     } else {
@@ -87,33 +108,35 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
   #region Implementation
 
   ILoc _loc;
-  GoodConsumingBuildingSpec _goodConsumingBuildingSpec;
+  GoodConsumingBuildingSpec _prefabGoodConsumingBuildingSpec;
+  ConsumedGoodSpec _prefabConsumedGoodSpec;
   GoodConsumingBuilding _goodConsumingBuilding;
   GoodConsumingToggle _goodConsumingToggle;
-  readonly List<IBuildingEfficiencyProvider> _efficiencyProviders = new();
-  readonly List<IRangeEffect> _rangeEffects = new();
-  float _prefabGoodPerHour;
+  readonly List<IBuildingEfficiencyProvider> _efficiencyProviders = [];
+  readonly List<IRangeEffect> _rangeEffects = [];
 
   /// <summary>It must be public for the injection logic to work.</summary>
+  /// FIXME: to constructor?
   [Inject]
   public void InjectDependencies(ILoc loc) {
     _loc = loc;
   }
 
   /// <inheritdoc/>
-  protected override void Awake() {
+  public override void Awake() {
     base.Awake();
-    _goodConsumingBuildingSpec = GetComponentFast<GoodConsumingBuildingSpec>();
-    _prefabGoodPerHour = _goodConsumingBuildingSpec.GoodPerHour;
-    GetComponentsFast(_efficiencyProviders);
-    GetComponentsFast(_rangeEffects);
-  }
-
-  /// <inheritdoc/>
-  public override void StartTickable() {
-    _goodConsumingBuilding = GetComponentFast<GoodConsumingBuilding>();
-    _goodConsumingToggle = _goodConsumingBuilding.GetGoodConsumingToggle();
-    base.StartTickable();
+    _goodConsumingBuilding = GetComponent<GoodConsumingBuilding>();
+    var goodConsumingIrrigationTowerSpec = GetComponent<GoodConsumingIrrigationTowerSpec>();
+    _irrigationRange = goodConsumingIrrigationTowerSpec.IrrigationRange;
+    _irrigateFromGroundTilesOnly = goodConsumingIrrigationTowerSpec.IrrigateFromGroundTilesOnly;
+    _prefabGoodConsumingBuildingSpec = GetComponent<GoodConsumingBuildingSpec>();
+    if (_prefabGoodConsumingBuildingSpec.ConsumedGoods.Length != 1) {
+      throw new InvalidOperationException(
+          $"Towers can work with one consumed good only. Spec: {_prefabGoodConsumingBuildingSpec}");
+    }
+    _prefabConsumedGoodSpec = _prefabGoodConsumingBuildingSpec.ConsumedGoods[0];
+    GetComponents(_efficiencyProviders);
+    GetComponents(_rangeEffects);
   }
 
   #endregion

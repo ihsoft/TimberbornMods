@@ -102,3 +102,27 @@
 .automation-button-undo:hover:enabled:active {
     background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/UndoIcon-active.png");
 }
+
+.automation-button-standby-neutral {
+    background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/StanbyIconNeutral.png");
+}
+
+.automation-button-standby-neutral:hover:enabled {
+    background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/StanbyIconNeutral-hover.png");
+}
+
+.automation-button-standby-neutral:hover:enabled:active {
+    background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/StanbyIconNeutral-active.png");
+}
+
+.automation-button-standby-red {
+    background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/StanbyIconRed.png");
+}
+
+.automation-button-standby-red:hover:enabled {
+    background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/StanbyIconRed-hover.png");
+}
+
+.automation-button-standby-red:hover:enabled:active {
+    background-image: url("project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Images/Buttons/IgorZ.Automation/StanbyIconRed-active.png");
+}

@@ -1,0 +1,6 @@
+{
+  "AutosaverSpec": {
+    "AutosavesPerSettlement": 3,
+    "FrequencyInMinutes": 10.0
+  }
+}

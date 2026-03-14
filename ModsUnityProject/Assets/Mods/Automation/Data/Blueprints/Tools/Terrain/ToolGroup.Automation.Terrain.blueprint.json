@@ -1,0 +1,13 @@
+{
+  "ToolGroupSpec": {
+    "Id": "AutomationTerrainToolGroupId",
+    "DisplayNameLocKey": "IgorZ.Automation.ToolGroup.Terrain.DisplayName",
+    "Icon": "Sprites/IgorZ/tool-group-terrain"
+  },
+  "CustomToolGroupSpec": {
+    "ParentGroupId": "AutomationToolGroupId",
+    "Style": "Green",
+    "Order": 20
+  },
+  "ConstructionModeToolGroupSpec": {}
+}

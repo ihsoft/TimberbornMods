@@ -1,0 +1,21 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+    <ui:VisualElement name="BasicStatisticsPanel" class="basic-statistics__wrapper">
+        <Style src="/Assets/Resources/UI/Views/Game/Population/PopulationStyle.uss" />
+        <ui:VisualElement name="FactionWrapper" class="basic-statistics__faction_wrapper">
+            <cui:NineSliceButton name="BatchControl" class="basic-statistics__counter square-large--brown basic-statistics__batch-control">
+                <ui:VisualElement name="BatchControlIcon" class="basic-statistics__batch-control-icon" />
+            </cui:NineSliceButton>
+            <cui:NineSliceButton name="Wellbeing" class="basic-statistics__counter basic-statistics__wellbeing-counter">
+                <ui:Label name="WellbeingCount" text="12" class="game-text-normal text--centered" />
+            </cui:NineSliceButton>
+            <ui:Image name="FactionIcon" class="basic-statistics__faction-icon" />
+        </ui:VisualElement>
+        <cui:NineSliceVisualElement name="ScienceCountHeader" class="basic-statistics__counter basic-statistics__science-counter bg-striped--green">
+            <ui:VisualElement name="Icon" class="population-counter__icon population-counter__icon--science" />
+            <ui:Label name="ScienceCount" text="99" class="basic-statistics__text game-text-normal text--yellow" />
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

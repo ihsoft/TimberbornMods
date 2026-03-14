@@ -3,17 +3,17 @@
 // License: Public Domain
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Bindito.Core;
+using Bindito.Unity;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.TimberDev.UI;
-using TimberApi.DependencyContainerSystem;
-using Timberborn.BaseComponentSystem;
+using IgorZ.TimberDev.Utils;
 using Timberborn.Localization;
 using Timberborn.Persistence;
 using Timberborn.StatusSystem;
+using UnityEngine;
 
 namespace IgorZ.Automation.Actions;
 
@@ -92,15 +92,15 @@ public class StatusToggleAction : AutomationActionBase {
 
   /// <inheritdoc/>
   public override IAutomationAction CloneDefinition() {
-    return new StatusToggleAction() {
-        StatusKind = StatusKind,
-        Description = Description,
-        StatusToken = StatusToken,
-        ActionKind = ActionKind,
-        StatusIcon = StatusIcon,
-        StatusText = StatusText,
-        AlertText = AlertText,
-    };
+    var clone = (StatusToggleAction)base.CloneDefinition();
+    clone.StatusKind = StatusKind;
+    clone.Description = Description;
+    clone.StatusToken = StatusToken;
+    clone.ActionKind = ActionKind;
+    clone.StatusIcon = StatusIcon;
+    clone.StatusText = StatusText;
+    clone.AlertText = AlertText;
+    return clone;
   }
 
   /// <inheritdoc/>
@@ -115,12 +115,13 @@ public class StatusToggleAction : AutomationActionBase {
 
   /// <inheritdoc/>
   protected override void OnBehaviorAssigned() {
-    UpdateStatusState();
+    if (Condition.IsEnabled) {
+      UpdateStatusState();
+    }
   }
 
   /// <inheritdoc/>
   protected override void OnBehaviorToBeCleared() {
-    base.OnBehaviorToBeCleared();
     GetStatusController().HideStatus();
   }
 
@@ -135,13 +136,12 @@ public class StatusToggleAction : AutomationActionBase {
   /// never use. Thus, we create it dynamically only when needed.
   /// </remarks>
   StatusController GetStatusController() {
-    var allBlockers = new List<StatusController>();
-    Behavior.GetComponentsFast(allBlockers);
+    var allBlockers = Behavior.GameObject.GetComponents<StatusController>();
     var status = allBlockers.FirstOrDefault(x => x.StatusToken == StatusToken);
     if (!status) {
-      var baseInstantiator = DependencyContainer.GetInstance<BaseInstantiator>();
-      status = baseInstantiator.AddComponent<StatusController>(Behavior.GameObjectFast);
-      status.SetStatusToken(StatusToken);
+      var instantiator = StaticBindings.DependencyContainer.GetInstance<IInstantiator>();
+      status = instantiator.AddComponent<StatusController>(Behavior.GameObject);
+      status.Initialize(StatusToken, Behavior);
     }
     if (ActionKind == ActionKindEnum.ShowStatus) {
       // The blocker could get created from the hide action which doesn't have a status setting.
@@ -214,8 +214,9 @@ public class StatusToggleAction : AutomationActionBase {
 
   #region Helper BaseComponent to show blocked status
 
-  sealed class StatusController : BaseComponent {
+  sealed class StatusController : MonoBehaviour {
     public string StatusToken { get; private set; }
+    public AutomationBehavior Behavior { get; private set; }
 
     StatusToggle _statusToggle;
     ILoc _loc;
@@ -225,8 +226,9 @@ public class StatusToggleAction : AutomationActionBase {
       _loc = loc;
     }
 
-    public void SetStatusToken(string statusTag) {
+    public void Initialize(string statusTag, AutomationBehavior behavior) {
       StatusToken = statusTag;
+      Behavior = behavior;
     }
 
     public void SetStatus(StatusToggleAction toggleAction) {
@@ -246,9 +248,8 @@ public class StatusToggleAction : AutomationActionBase {
           StatusKindEnum.PriorityStatusWithAlertAndFloatingIcon =>
               StatusToggle.CreatePriorityStatusWithAlertAndFloatingIcon(
                 toggleAction.StatusIcon, _loc.T(toggleAction.StatusText), _loc.T(toggleAction.AlertText)),
-          _ => throw new InvalidDataException("Unknown status kind: " + toggleAction.StatusKind)
       };
-      GetComponentFast<StatusSubject>().RegisterStatus(_statusToggle);
+      Behavior.GetComponent<StatusSubject>().RegisterStatus(_statusToggle);
     }
 
     public void ShowStatus() {

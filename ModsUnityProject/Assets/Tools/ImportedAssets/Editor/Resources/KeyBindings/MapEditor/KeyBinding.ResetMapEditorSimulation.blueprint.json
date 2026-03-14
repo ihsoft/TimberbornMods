@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "ResetMapEditorSimulation",
+    "GroupId": "MapEditor",
+    "LocKey": "KeyBinding.ResetMapEditorSimulation",
+    "Order": 90,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/l",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

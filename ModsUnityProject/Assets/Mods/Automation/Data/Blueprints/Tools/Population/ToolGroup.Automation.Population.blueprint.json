@@ -1,0 +1,13 @@
+{
+  "ToolGroupSpec": {
+    "Id": "AutomationPopulationToolGroupId",
+    "DisplayNameLocKey": "IgorZ.Automation.ToolGroup.Population.DisplayName",
+    "Icon": "Sprites/IgorZ/tool-group-population"
+  },
+  "CustomToolGroupSpec": {
+    "ParentGroupId": "AutomationToolGroupId",
+    "Style": "Green",
+    "Order": 24
+  },
+  "ConstructionModeToolGroupSpec": {}
+}

@@ -1,0 +1,35 @@
+{
+  "TimbermeshSpec": {
+    "Model": "ConstructionBases/ConstructionBase3x3EdgesOnlyWithoutCorners/ConstructionBase3x3EdgesOnlyWithoutCorners.Model"
+  },
+  "CollidersSpec": {
+    "BoxColliders": [
+      {
+        "Center": {
+          "X": 1.5,
+          "Y": 0.05,
+          "Z": 1.5
+        },
+        "Size": {
+          "X": 3.0,
+          "Y": 0.1,
+          "Z": 1.0
+        }
+      },
+      {
+        "Center": {
+          "X": 1.5,
+          "Y": 0.05,
+          "Z": 1.5
+        },
+        "Size": {
+          "X": 1.0,
+          "Y": 0.1,
+          "Z": 3.0
+        }
+      }
+    ],
+    "SphereColliders": [],
+    "CapsuleColliders": []
+  }
+}

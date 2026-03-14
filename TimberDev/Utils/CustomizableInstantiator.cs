@@ -4,9 +4,9 @@
 
 using System;
 using System.Collections.Generic;
-using Bindito.Unity;
 using HarmonyLib;
-using UnityEngine;
+using Timberborn.BaseComponentSystem;
+using Timberborn.BlueprintSystem;
 
 // ReSharper disable UnusedMember.Local
 // ReSharper disable MemberCanBePrivate.Global
@@ -30,23 +30,20 @@ static class CustomizableInstantiator {
   /// Unique id of the patch. Adding multiple patchers with the same ID will result in overwriting the old patch.
   /// </param>
   /// <param name="patchFn">The method to call on the prefab being patched.</param>
-  public static void AddPatcher(string patchId, Action<GameObject> patchFn) {
-    HarmonyPatcher.PatchRepeated(HarmonyPatchId, typeof(PrefabInstantiatePatch));
-    PrefabInstantiatePatch.Patchers[patchId] = patchFn;
-    PrefabInstantiatePatch.PatchedCache.Clear();
+  public static void AddPatcher(string patchId, Action<Blueprint, List<object>> patchFn) {
+    if (!Harmony.HasAnyPatches(HarmonyPatchId)) {
+      HarmonyPatcher.ApplyPatch(HarmonyPatchId, typeof(BaseInstantiatorPatch));
+    }
+    BaseInstantiatorPatch.Patchers[patchId] = patchFn;
   }
 
-  [HarmonyPatch(typeof(Instantiator), nameof(Instantiator.InstantiateInactive))]
-  static class PrefabInstantiatePatch {
-    public static readonly HashSet<string> PatchedCache = new();
-    public static readonly Dictionary<string, Action<GameObject>> Patchers = new();
+  [HarmonyPatch(typeof(BaseInstantiator), nameof(BaseInstantiator.InstantiateComponents))]
+  static class BaseInstantiatorPatch {
+    public static readonly Dictionary<string, Action<Blueprint, List<object>>> Patchers = new();
 
-    static void Prefix(GameObject prefab) {
-      if (!PatchedCache.Add(prefab.name)) {
-        return;
-      }
+    static void Postfix(Blueprint blueprint, List<object> __result) {
       foreach (var patcher in Patchers.Values) {
-        patcher(prefab);
+        patcher(blueprint, __result);
       }
     }
   }

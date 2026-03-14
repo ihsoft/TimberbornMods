@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <ui:VisualElement name="ProductivityFragment">
+        <cui:NineSliceLabel text="Label" name="Text" class="entity-sub-panel entity-panel__text bg-sub-box--green" />
+        <cui:NineSliceVisualElement name="Tooltip" class="entity-sub-panel entity-panel-tooltip bg-box--brown">
+            <cui:LocalizableLabel text-loc-key="Work.Productivity" text="Title" class="entity-panel__text text--bold" />
+            <cui:LocalizableLabel text-loc-key="Work.ProductivityTip" text="Tip" class="entity-panel__text" />
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

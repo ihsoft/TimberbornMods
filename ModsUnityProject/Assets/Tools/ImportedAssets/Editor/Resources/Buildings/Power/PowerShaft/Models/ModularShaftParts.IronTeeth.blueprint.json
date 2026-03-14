@@ -1,0 +1,23 @@
+{
+  "ModularShaftPartsSpec": {
+    "ShaftBase": "Buildings/Power/PowerShaft/Models/ShaftBase.IronTeeth",
+    "ShaftLowerFrame": "Buildings/Power/PowerShaft/Models/ShaftLowerFrame.IronTeeth",
+    "ShaftSupport": "Buildings/Power/PowerShaft/Models/ShaftSupport.IronTeeth",
+    "ShaftFrame": "Buildings/Power/PowerShaft/Models/ShaftFrame.IronTeeth",
+    "GearSmall": "Buildings/Power/PowerShaft/Models/GearSmall.IronTeeth",
+    "GearMedium": "Buildings/Power/PowerShaft/Models/GearMedium.IronTeeth",
+    "GearLarge": "Buildings/Power/PowerShaft/Models/GearLarge.IronTeeth",
+    "GearBottomBase": "Buildings/Power/PowerShaft/Models/GearBottomBase.IronTeeth",
+    "GearBottomSmall": "Buildings/Power/PowerShaft/Models/GearBottomSmall.IronTeeth",
+    "GearBottomLarge": "Buildings/Power/PowerShaft/Models/GearBottomLarge.IronTeeth",
+    "GearTopSmall": "Buildings/Power/PowerShaft/Models/GearTopSmall.IronTeeth",
+    "GearTopLarge": "Buildings/Power/PowerShaft/Models/GearTopLarge.IronTeeth",
+    "GearInner": "Buildings/Power/PowerShaft/Models/GearInner.IronTeeth",
+    "GearInnerLong": "Buildings/Power/PowerShaft/Models/GearInnerLong.IronTeeth",
+    "GearInnerOpposite": "Buildings/Power/PowerShaft/Models/GearInnerOpposite.IronTeeth",
+    "GearInnerThrough": "Buildings/Power/PowerShaft/Models/GearInnerThrough.IronTeeth",
+    "AxleInnerLong": "Buildings/Power/PowerShaft/Models/AxleInnerLong.IronTeeth",
+    "AxleVertical": "Buildings/Power/PowerShaft/Models/AxleVertical.IronTeeth",
+    "AxleHorizontal": "Buildings/Power/PowerShaft/Models/AxleHorizontal.IronTeeth"
+  }
+}

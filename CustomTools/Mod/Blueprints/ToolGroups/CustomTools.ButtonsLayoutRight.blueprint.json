@@ -1,0 +1,9 @@
+{
+  "CustomBottomBarElementSpec": {
+    "Id": "CustomToolsLayoutRight",
+    "Order": 200
+  },
+  "CustomRootElementSpec": {
+    "Location": "Right"
+  }
+}

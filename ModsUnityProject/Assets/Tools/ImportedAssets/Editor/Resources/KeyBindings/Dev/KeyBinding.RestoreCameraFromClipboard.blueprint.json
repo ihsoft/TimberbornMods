@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "RestoreCameraFromClipboard",
+    "GroupId": "Dev",
+    "LocKey": "",
+    "Order": 70,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": true
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/m",
+    "InputModifiers": "Shift",
+    "Unchangeable": false
+  }
+}

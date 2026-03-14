@@ -1,0 +1,14 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/BatchControl/BatchControlStyle.uss" />
+    <cui:NineSliceVisualElement name="DistrictMigrationSetterRowItem" class="batch-control-box__row">
+        <cui:NineSliceButton name="MigrateButtonLeft" class="button-square button-square--large migration-batch-control-header-row__migrate-district-button">
+            <ui:VisualElement name="MigrateButtonLeftIcon" class="migration-batch-control-header-row__migrate-district-button-left" />
+        </cui:NineSliceButton>
+        <cui:NineSliceButton name="MigrateButtonRight" class="button-square button-square--large migration-batch-control-header-row__migrate-district-button">
+            <ui:VisualElement name="MigrateButtonRightIcon" class="migration-batch-control-header-row__migrate-district-button-right" />
+        </cui:NineSliceButton>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

@@ -1,0 +1,206 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "Default",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "Plank",
+        "Amount": 20
+      },
+      {
+        "Id": "MetalBlock",
+        "Amount": 2
+      }
+    ],
+    "ScienceCost": 600,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": false,
+    "DrawRangeBoundsOnIt": false
+  },
+  "TemplateSpec": {
+    "TemplateName": "BulletinPole.Folktails",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 2
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Decoration",
+    "ToolOrder": 70,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.BulletinPole.DisplayName",
+    "DescriptionLocKey": "Building.BulletinPole.Description",
+    "FlavorDescriptionLocKey": "Building.BulletinPole.FlavorDescription",
+    "Icon": "Buildings/Decoration/BulletinPole/BulletinPoleIcon"
+  },
+  "RangedEffectBuildingSpec": {
+    "EffectRadius": 3
+  },
+  "ContinuousEffectBuildingSpec": {
+    "Effects": [
+      {
+        "NeedId": "BulletinPole",
+        "PointsPerHour": 0.64,
+        "SatisfyToMaxValue": false
+      }
+    ]
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "Children": {
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Decoration/BulletinPole/BulletinPole.Folktails.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.495865136,
+              "Y": 0.221834421,
+              "Z": 0.5014576
+            },
+            "Size": {
+              "X": 0.567516,
+              "Y": 0.4519385,
+              "Z": 0.8023999
+            }
+          },
+          {
+            "Center": {
+              "X": 0.495865136,
+              "Y": 0.221834421,
+              "Z": 0.5014576
+            },
+            "Size": {
+              "X": 0.8023999,
+              "Y": 0.4519385,
+              "Z": 0.567516
+            }
+          }
+        ],
+        "SphereColliders": [
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 1.79,
+              "Z": 0.5
+            },
+            "Radius": 0.0768712759
+          }
+        ],
+        "CapsuleColliders": [
+          {
+            "Center": {
+              "X": 0.498246074,
+              "Y": 0.8149971,
+              "Z": 0.502469063
+            },
+            "Radius": 0.402884126,
+            "Height": 1.63350081,
+            "Axis": "Y"
+          }
+        ]
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase1x1#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase1x1/ConstructionBase1x1.blueprint"
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Decoration/BulletinPole/BulletinPole.Folktails.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.05,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.1,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.4929609,
+                  "Y": 0.297795475,
+                  "Z": 0.4946432
+                },
+                "Size": {
+                  "X": 0.5785332,
+                  "Y": 0.390949249,
+                  "Z": 0.562556863
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    }
+  }
+}

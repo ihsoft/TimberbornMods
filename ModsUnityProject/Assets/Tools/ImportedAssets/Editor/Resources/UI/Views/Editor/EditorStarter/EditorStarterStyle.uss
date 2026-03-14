@@ -1,0 +1,42 @@
+.editor-starter {
+    padding: 6px 2px 6px 6px;
+}
+
+.editor-starter__field {
+    flex-direction: row;
+}
+
+.editor-starter__field-label {
+    width: 30%;
+}
+
+.editor-starter__field-value {
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+.editor-starter__feature-toggles {
+    margin-top: 5px;
+    overflow: hidden;
+}
+
+.editor-starter__feature-toggle {
+    flex-direction: row-reverse;
+    align-self: flex-start;
+}
+
+.editor-starter__feature-toggle .unity-toggle__input {
+    flex-grow: 0;
+    margin-right: 3px;
+}
+
+.editor-starter__refresh {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.editor-starter__save-thumbnail {
+    flex-grow: 0.5;
+    margin-top: 4px;
+}

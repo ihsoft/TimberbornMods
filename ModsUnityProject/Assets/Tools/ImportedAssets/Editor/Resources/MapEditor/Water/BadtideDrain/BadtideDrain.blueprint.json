@@ -1,0 +1,175 @@
+{
+  "TemplateSpec": {
+    "TemplateName": "BadtideDrain",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "WaterSourceSpec": {
+    "Coordinates": [
+      {
+        "X": 0,
+        "Y": 1
+      }
+    ],
+    "DefaultStrength": 1.0
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 3,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "MapEditorWater",
+    "ToolOrder": 700,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": true
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.BadtideDrain.DisplayName",
+    "DescriptionLocKey": "Building.BadtideDrain.Description",
+    "FlavorDescriptionLocKey": "",
+    "Icon": "MapEditor/Water/BadtideDrain/BadtideDrainIcon"
+  },
+  "BasicSelectionSoundSpec": {
+    "SoundName": "BadwaterSource",
+    "AlternativeSoundName": ""
+  },
+  "WaterSourceContaminationSpec": {
+    "DefaultContamination": 1.0
+  },
+  "BlockObjectNavMeshAdderSpec": {},
+  "BlockObjectModelSpec": {
+    "FullModelName": "#Model",
+    "UncoveredModelName": "",
+    "UndergroundModelName": "#Underground",
+    "UndergroundModelDepth": 2
+  },
+  "ContinuousTerrainConstraintSpec": {},
+  "TimedComponentActivatorSpec": {
+    "IsOptionallyActivable": true,
+    "CyclesUntilCountdownActivation": 5,
+    "DaysUntilActivation": 10.0,
+    "ProgressBarActiveLabelLocKey": "TimedComponentActivator.DaysUntilActivationProgress",
+    "ProgressBarNotActiveLabelLocKey": "TimedComponentActivator.CountdownNotActive",
+    "IsHazardousActivator": true
+  },
+  "ActivationWarningStatusSpec": {
+    "StatusSpriteName": "WaterSourceCountdown",
+    "StatusLocKey": "Status.TimedActivationWarning",
+    "UseInfiniteWarning": false
+  },
+  "HazardousWeatherWaterSourceSpec": {
+    "ActiveInHazardousWeather": [
+      "BadtideWeather"
+    ]
+  },
+  "FinishableHorizontalWaterObstacleSpec": {
+    "Obstacles": [
+      {
+        "X": 0,
+        "Y": 1,
+        "Z": 0
+      },
+      {
+        "X": 0,
+        "Y": 1,
+        "Z": 1
+      }
+    ]
+  },
+  "DirectionalWaterSourceSpec": {},
+  "WaterObstacleSpec": {
+    "Coordinates": [
+      {
+        "X": 0,
+        "Y": 0
+      }
+    ]
+  },
+  "FinishableWaterObstacleSpec": {
+    "Height": 1.0
+  },
+  "BlockObjectNavMeshSettingsSpec": {
+    "NoAutoWalls": false,
+    "GenerateFloorsOnStackable": true,
+    "EdgeGroups": [],
+    "UnblockedCoordinates": []
+  },
+  "Children": {
+    "#Model": {
+      "TimbermeshSpec": {
+        "Model": "MapEditor/Water/BadtideDrain/BadtideDrain.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.5020208,
+              "Z": 0.992504
+            },
+            "Size": {
+              "X": 0.9652413,
+              "Y": 1.02567983,
+              "Z": 1.987962
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Underground": {
+      "TimbermeshSpec": {
+        "Model": "MapEditor/Water/BadtideDrain/BadtideDrain.Underground.Model"
+      }
+    }
+  }
+}

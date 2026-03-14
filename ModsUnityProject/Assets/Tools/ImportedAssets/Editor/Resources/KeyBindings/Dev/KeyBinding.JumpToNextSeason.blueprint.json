@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "JumpToNextSeason",
+    "GroupId": "Dev",
+    "LocKey": "",
+    "Order": 35,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": true
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/8",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

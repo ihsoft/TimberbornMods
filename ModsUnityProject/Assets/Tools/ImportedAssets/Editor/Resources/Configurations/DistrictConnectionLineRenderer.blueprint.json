@@ -1,0 +1,8 @@
+{
+  "DistrictConnectionLineRendererSpec": {
+    "LineRendererPrefab": "UI/Markers/DistrictConnectionDrawer",
+    "ArcAngle": 30.0,
+    "CurvePoints": 50,
+    "LineCutoff": 0.4
+  }
+}

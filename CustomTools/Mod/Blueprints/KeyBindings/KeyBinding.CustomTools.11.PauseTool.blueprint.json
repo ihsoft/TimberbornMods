@@ -1,0 +1,11 @@
+{
+  "CustomToolBindingSpec": {
+    "CustomToolId": "CustomTools-PauseTool",
+  },
+  "KeyBindingSpec": {
+    "Id": "IgorZ-CustomTools-PauseTool",
+    "GroupId": "IgorZ-CustomTools-BindingsGroupId",
+    "LocKey": "IgorZ.CustomTools.PauseTool.Title",
+    "Order": 11
+  }
+}

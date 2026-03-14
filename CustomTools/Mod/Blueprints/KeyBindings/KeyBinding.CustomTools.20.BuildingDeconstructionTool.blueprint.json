@@ -1,0 +1,11 @@
+{
+  "CustomToolBindingSpec": {
+    "Type": "Timberborn.DeconstructionSystemUI.BuildingDeconstructionTool"
+  },
+  "KeyBindingSpec": {
+    "Id": "IgorZ-CustomTools-BuildingDeconstructionTool",
+    "GroupId": "IgorZ-CustomTools-BindingsGroupId",
+    "LocKey": "DeletionTool.Title.Buildings",
+    "Order": 20
+  }
+}

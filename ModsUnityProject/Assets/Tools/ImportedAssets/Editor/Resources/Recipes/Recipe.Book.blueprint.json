@@ -1,0 +1,26 @@
+{
+  "RecipeSpec": {
+    "Id": "Book",
+    "BackwardCompatibleIds": [],
+    "DisplayLocKey": "Good.Book.PluralDisplayName",
+    "CycleDurationInHours": 3.0,
+    "Ingredients": [
+      {
+        "Id": "Paper",
+        "Amount": 1
+      }
+    ],
+    "Products": [
+      {
+        "Id": "Book",
+        "Amount": 1
+      }
+    ],
+    "ProducedSciencePoints": 0,
+    "Fuel": "",
+    "CyclesFuelLasts": 0,
+    "FuelCapacity": 0,
+    "CyclesCapacity": 12,
+    "Icon": "Sprites/Goods/BookIcon"
+  }
+}

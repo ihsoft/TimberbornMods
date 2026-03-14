@@ -1,0 +1,31 @@
+{
+  "CustomToolSpec": {
+    "Id": "Automation.Tmpl.Signals.StockpileSelectedGood",
+    "GroupId": "AutomationSignalsToolGroupId",
+    "Type": "IgorZ.Automation.TemplateTools.ApplyTemplateTool",
+    "Order": 10,
+    "Icon": "Sprites/IgorZ/tool-stockpile-signals",
+    "DisplayNameLocKey": "IgorZ.Automation.Tool.tmpl.EmitSelectedGood.DisplayName",
+    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.EmitSelectedGood.Description"
+  },
+  "AutomationTemplateSpec": {
+    "TemplateFamilyName": "Storage.Signals",
+    "Rules": [
+      {
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Precondition", "StrValue": "(ne (getvalue SingleGoodAllower.HasAllowedGood) 0)" },
+            { "Name": "Expression", "StrValue": "(eq (sig Inventory.OutputGood.{% (getvalue SingleGoodAllower.AllowedGood) %}) (sig Inventory.OutputGood.{% (getvalue SingleGoodAllower.AllowedGood) %}))" }
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Signals.Set 'Stockpile.yellow1' (sig Inventory.OutputGood.{% (getvalue SingleGoodAllower.AllowedGood) %}))" }
+          ]
+        }
+      }
+    ]
+  }
+}

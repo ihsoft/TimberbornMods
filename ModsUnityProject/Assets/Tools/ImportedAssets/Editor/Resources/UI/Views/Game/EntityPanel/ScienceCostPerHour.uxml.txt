@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <ui:VisualElement name="ScienceCostPerHour" class="entity-panel__row">
+        <ui:Label name="ScienceCostValue" text="0" class="entity-panel__text" />
+        <ui:Image name="ScienceCostIcon" class="science-cost-section__science-icon" />
+        <ui:Label name="ScienceCostSlash" text="/" class="entity-panel__text science-cost__slash" />
+        <cui:LocalizableLabel name="HourShort" text="h" text-loc-key="Time.HourShort" class="entity-panel__text" />
+    </ui:VisualElement>
+</ui:UXML>

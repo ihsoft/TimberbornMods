@@ -1,0 +1,10 @@
+{
+  "KeyBindingSpec": {
+    "Id": "ToggleHaulingPriority",
+    "GroupId": "Buildings",
+    "LocKey": "KeyBinding.ToggleHaulingPriority",
+    "Order": 90,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  }
+}

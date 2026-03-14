@@ -1,0 +1,357 @@
+.population-panel {
+    width: 270px;
+    align-items: stretch;
+}
+
+.population-button {
+    margin-bottom: 6px;
+    --click-sound: "UI.Click";
+}
+
+.population-counter {
+    height: 26px;
+    flex-direction: row;
+    padding: 2px 4px;
+    align-items: center;
+    overflow: visible;
+}
+
+.population-counter__text {
+    -unity-text-align: middle-left;
+    width: 55px;
+    flex-shrink: 1;
+}
+
+.population-counter__icon {
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+}
+
+.population-counter__icon--bot {
+    background-image: resource('UI/Images/Game/ico-bot');
+}
+
+.population-counter__icon--adult {
+    background-image: resource('UI/Images/Game/ico-adult');
+}
+
+.population-counter__icon--child {
+    background-image: resource('UI/Images/Game/ico-child');
+}
+
+.population-counter__icon--contamination {
+    background-image: resource('UI/Images/Game/ico-contamination');
+}
+
+.population-counter__icon--housing {
+    background-image: resource('UI/Images/Game/ico-bed');
+}
+
+.population-counter__icon--beds {
+    background-image: resource('UI/Images/Game/ico-bed-empty');
+}
+
+.population-counter__icon--homeless {
+    background-image: resource('UI/Images/Game/ico-no-bed');
+}
+
+.population-counter__icon--employment-beaver {
+    background-image: resource('UI/Images/Game/ico-work-beaver');
+}
+
+.population-counter__icon--vacancy-beaver {
+    background-image: resource('UI/Images/Game/ico-work-empty-beaver');
+}
+
+.population-counter__icon--unemployed-beaver {
+    background-image: resource('UI/Images/Game/ico-no-work-beaver');
+}
+
+.population-counter__icon--employment-bot {
+    background-image: resource('UI/Images/Game/ico-work-bot');
+}
+
+.population-counter__icon--vacancy-bot {
+    background-image: resource('UI/Images/Game/ico-work-empty-bot');
+}
+
+.population-counter__icon--unemployed-bot {
+    background-image: resource('UI/Images/Game/ico-no-work-bot');
+}
+
+.population-counter__icon--science {
+    background-image: resource('Sprites/TopBar/Science');
+}
+
+.population-wellbeing-counter {
+    margin: 2px 0;
+    width: 100%;
+    flex-direction: row;
+    height: 20px;
+}
+
+.population-wellbeing__highscore {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(232, 232, 76, 0.8);
+    margin-bottom: 8px;
+    display: none;
+}
+
+.wellbeing-highscore .population-wellbeing__highscore {
+    display: flex;
+}
+
+.population-wellbeing__highscore-text {
+    margin: 5px 0;
+}
+
+.population-wellbeing__header {
+    margin-top: 8px;
+    margin-bottom: 16px;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.population-wellbeing__header-text {
+    padding-right: 4px;
+}
+
+.population-wellbeing-counter__text {
+    width: 40%;
+    padding: 2px;
+    padding-left: 12px;
+    -unity-text-align: middle-left;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.population-wellbeing-counter__progress-wrapper.wellbeing--negative {
+    background-image: resource('UI/Images/Game/needview-background-red');
+}
+
+.population-wellbeing-counter__progress-wrapper {
+    height: 100%;
+    width: 80%;
+    margin-right: 2px;
+    background-image: resource('UI/Images/Backgrounds/bg-pixel-2');
+}
+
+.population-wellbeing-counter__progress.wellbeing--negative {
+    background-image: resource('UI/Images/Game/needview-progress-red');
+}
+
+.population-wellbeing-counter__progress {
+    height: 100%;
+    width: 50%;
+    background-image: resource('UI/Images/Game/needview-background');
+}
+
+.population-wellbeing-counter__count {
+    position: absolute;
+    width: 100%;
+    -unity-text-align: middle-center;
+}
+
+.population-wellbeing-counter__average-share {
+    margin-left: 6px;
+    margin-right: 6px;
+    width: 50px;
+    -unity-text-align: middle-center;
+    --background-slice-scale: 0.5;
+    --background-slice: 10;
+    color: dimgray;
+}
+
+.population-wellbeing-counter__average-share.wellbeing--positive {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-6');
+    color: rgb(204, 204, 204);
+}
+
+.population-wellbeing-counter__average-share.wellbeing--negative {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-2');
+    color: rgb(204, 204, 204);
+}
+
+.population-button:enabled:hover {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-4');
+}
+
+.panel--district .population-button {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-4');
+}
+
+.panel--district .population-button:enabled:hover {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-7');
+}
+
+.population-counter__faction-icon-background {
+    background-image: resource('UI/Images/Backgrounds/bg-diamond-1');
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    left: -8px;
+    top: -6px;
+}
+
+.population-counter__faction-icon {
+    width: 100%;
+    height: 100%;
+}
+
+.population-wellbeing {
+    width: 590px;
+}
+
+.population-wellbeing__items {
+    max-height: 420px;
+}
+
+.population-wellbeing__unlocked-factions {
+    margin-top: 15px;
+    align-self: center;
+}
+
+.goal-row {
+    flex-direction: row;
+    margin-top: 10px;
+}
+
+.goal-row__texts {
+    align-items: flex-start;
+}
+
+.goal-row__icon {
+    min-height: 100px;
+    min-width: 100px;
+    max-height: 100px;
+    max-width: 100px;
+}
+
+.goal-row__header {
+    margin-bottom: 5px;
+    margin-left: 10px;
+}
+
+.goal-row__description {
+    margin: 5px 0 5px 10px;
+}
+
+.goal-row__progress {
+    margin-left: 6px;
+    padding: 0 4px;
+}
+
+.blink .goal-row__progress {
+    background-color: rgba(232, 232, 76, 0.8);
+    color: black;
+}
+
+.basic-statistics__wrapper {
+    margin-bottom: 6px;
+    flex-direction: row;
+    width: 100%;
+    justify-content: center;
+}
+
+.basic-statistics__faction_wrapper {
+    width: 67%;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-right: 4px;
+}
+
+.basic-statistics__counter {
+    flex-direction: row;
+    height: 26px;
+    margin-top: 4px;
+    justify-content: center;
+    align-items: center;
+    overflow: visible;
+}
+
+.basic-statistics__batch-control {
+    width: 50%;
+    --click-sound: "UI.Click";
+    padding-left: 12px;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.basic-statistics__batch-control-icon {
+    background-image: resource('UI/Images/Game/batch-control');
+    width: 49px;
+    height: 18px;
+}
+
+.basic-statistics__science-counter {
+    padding-left: 4px;
+    width: 33%;
+}
+
+.basic-statistics__wellbeing-counter {
+    width: 50%;
+    --background-image: resource('UI/Images/Backgrounds/bg-striped-5');
+    --background-slice-scale: 0.5;
+    --background-slice-top: 8;
+    --background-slice-right: 13;
+    --background-slice-bottom: 8;
+    --background-slice-left: 81;
+    --click-sound: "UI.Click";
+}
+
+.basic-statistics__wellbeing-counter:hover:enabled {
+    --background-image: resource('UI/Images/Backgrounds/bg-striped-3');
+}
+
+.basic-statistics__faction-icon {
+    width: 36px;
+    height: 36px;
+    position: absolute;
+    top: -1px;
+    background-image: resource('UI/Images/Backgrounds/bg-diamond-1');
+}
+
+.basic-statistics__text {
+    -unity-text-align: middle-right;
+    margin-left: auto;
+    padding-right: 8px;
+}
+
+.basic-statistics__batch-control:hover:enabled {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-9');
+}
+
+.basic-statistics__negative {
+    --background-image: resource('UI/Images/Backgrounds/bg-striped-4');
+}
+
+.basic-statistics__negative:hover:enabled {
+    --background-image: resource('UI/Images/Backgrounds/bg-striped-2');
+}
+
+.basic-statistics__bot {
+    --background-image: resource('UI/Images/Backgrounds/bg-striped-3');
+}
+
+.basic-statistics__wellbeing-counter.highlight {
+    --background-image: resource('UI/Images/Backgrounds/bg-striped-6');
+}
+
+.basic-statistics__bot > Label {
+    background-image: resource('UI/Images/Game/ico-bot');
+    padding: 0;
+    width: 26px;
+    height: 26px;
+}
+
+.basic-statistics__death > Label {
+    background-image: resource('UI/Images/Game/ico-death');
+    padding: 0;
+    width: 26px;
+    height: 26px;
+}

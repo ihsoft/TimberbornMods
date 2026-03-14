@@ -1,21 +1,19 @@
 ID,Text,Comment
 IgorZ.Automation.CancelTool.Description,"Use this tool to clean up any automation on the buildings or construction sites.",
 IgorZ.Automation.CancelTool.Title,"Cancel automation",
+IgorZ.Automation.EnableRulesTool.Description,"Use this template to enable all rules on the building",
+IgorZ.Automation.EnableRulesTool.Title,"Enable rules on the building",
 IgorZ.Automation.CheckAccessBlockCondition.Blocking.Description,"<YellowHighlight>blocks path</YellowHighlight>",
 IgorZ.Automation.CheckAccessBlockCondition.NotBlocking.Description,"<YellowHighlight>doesn't block path</YellowHighlight>",
 IgorZ.Automation.CheckAccessBlockCondition.NotYetReachable,"Builders can't reach it yet, but a path is being constructed",
 IgorZ.Automation.CheckAccessBlockCondition.UnreachableAlert,"Unreachable construction site",
 IgorZ.Automation.CheckAccessBlockCondition.UnreachableStatus,"The builders can't find the way to this site. Maybe nothing can be constructed here",
-IgorZ.Automation.DebugFinishNowTool.Description,"Immediately finishes the selected constructables.",
-IgorZ.Automation.DebugFinishNowTool.Title,"Finish now debug tool",
 IgorZ.Automation.DebugPickTool.Description,"Prints components on the selected object.",
 IgorZ.Automation.DebugPickTool.DescriptionHint1,"Hold <i>SHIFT</i> to print Accessible.",
 IgorZ.Automation.DebugPickTool.DescriptionHint2,"Hold <i>CTRL</i> to print NavMesh edges.",
 IgorZ.Automation.DebugPickTool.Title,"Debug tool",
-IgorZ.Automation.PauseTool.Description,"Use this tool to pause buildings and construction sites.",
-IgorZ.Automation.PauseTool.Title,"Pause buildings",
-IgorZ.Automation.ResumeTool.Description,"Use this tool to unpause buildings and construction sites.",
-IgorZ.Automation.ResumeTool.Title,"Unpause buildings",
+IgorZ.Automation.DisableRulesTool.Title,"Disable rules on the building",
+IgorZ.Automation.DisableRulesTool.Description,"Use this template to disable all rules on the building",
 IgorZ.Automation.ShowStatusAction.AutomationErrorAlert,"Automation error",
 IgorZ.Automation.ShowStatusAction.AutomationErrorDescription,"Some automation rules cannot be executed",
 IgorZ.Automation.ShowStatusAction.HoldCompletionStatusText,"Waiting for the other buildings to finish",
@@ -132,12 +130,13 @@ IgorZ.Automation.Scriptable.Constructable.Signal.State,"construction state","Nam
 IgorZ.Automation.Scriptable.Constructable.Signal.State.Finished,"Finished","State name for when the building construction is complete"
 IgorZ.Automation.Scriptable.Debug.Action.LogNum,"write a number to logs: {0}","Name of the action that write to the log an arbitrary number or a result of computation"
 IgorZ.Automation.Scriptable.Debug.Action.LogStr,"write a string to logs: '{0}'","Name of the action that write to the log an arbitrary string"
-IgorZ.Automation.Scriptable.Debug.Signal.DistrictStockCapacityTracker,"district stock capacity: {0}","Name of the condition that returns the current district stock output capacity of the specified good"
-IgorZ.Automation.Scriptable.Debug.Signal.DistrictStockTracker,"district stock: {0}","Name of the condition that returns the current district stock output of the specified good"
+IgorZ.Automation.Scriptable.Debug.Action.Log,"write to logs: '{0}'","Name of the action that write to the log a formatted string"
 IgorZ.Automation.Scriptable.Debug.Signal.Ticker,"ticker","Name of the condition that returns the current tick number"
 IgorZ.Automation.Scriptable.District.Signal.Beavers,"beavers in district","Name of the condition for the current beaver population checking"
 IgorZ.Automation.Scriptable.District.Signal.Bots,"bots in district","Name of the condition for the current bot population checking"
 IgorZ.Automation.Scriptable.District.Signal.NumberOfBeds,"beds in district","Name of the condition for the current number of beds checking"
+IgorZ.Automation.Scriptable.District.Signal.ResourceCapacity,"district capacity: {0}","Name of the condition that returns the current district stock output capacity of the specified good"
+IgorZ.Automation.Scriptable.District.Signal.ResourceStock,"district stock: {0}","Name of the condition that returns the current district stock output of the specified good"
 IgorZ.Automation.Scriptable.Dynamite.Action.Detonate,"detonate dynamite","Name of the action that immediately detonates the dynamite"
 IgorZ.Automation.Scriptable.Dynamite.Action.DetonateAndRepeat,"detonate dynamite and add another <GreenHighlight>{0} times</GreenHighlight>","Name of the action that detonates the dynamite and places new dynamites the specified number of times"
 IgorZ.Automation.Scriptable.Floodgate.Action.SetHeight,"set gate height to {0}","Change the floodgate height to the specified value"
@@ -149,19 +148,24 @@ IgorZ.Automation.Scriptable.Inventory.Action.StartEmptyingStock,"start emptying 
 IgorZ.Automation.Scriptable.Inventory.Action.StopEmptyingStock,"stop emptying storage","Name of the action that stops emptying the storage"
 IgorZ.Automation.Scriptable.Inventory.Signal.InputGood,"input: {0}","Name of the condition for the inventory input goods"
 IgorZ.Automation.Scriptable.Inventory.Signal.OutputGood,"output: {0}","Name of the condition for the inventory output goods"
+IgorZ.Automation.Scriptable.Manufactory.Action.SetRecipe,"set recipe: {0}","Name of action that sets a recipe on a manufactory"
 IgorZ.Automation.Scriptable.Pausable.Action.Pause,"pause building","Name of the action that pauses the building"
 IgorZ.Automation.Scriptable.Pausable.Action.Resume,"resume building","Name of the action that unpauses the building"
 IgorZ.Automation.Scriptable.Plantable.Signal.SpotsReady,"ready to plant","Name of the condition that checks how many planting spots are available"
 IgorZ.Automation.Scriptable.Prioritizable.Action.ResetHaulers,"- prioritize by haulers","Name of the action that resets the priority to the haulers"
 IgorZ.Automation.Scriptable.Prioritizable.Action.SetHaulers,"+ prioritize by haulers","Name of the action that sets the priority to the haulers"
 IgorZ.Automation.Scriptable.Signals.Action.Set,"set signal: {0} = {1}","Name of the action that sets the signal to the specified value"
+IgorZ.Automation.Scriptable.Signals.Action.Set.SignalNameArgument,"Signal name","Name of the signal argument that specifies the signal name to set"
+IgorZ.Automation.Scriptable.Signals.Action.Set.SignalValueArgument,"Signal value","Name of the signal argument that specifies the signal value to set"
 IgorZ.Automation.Scriptable.Signals.Signal.Get,"signal: {0}","Name of the condition for the signal checking"
 IgorZ.Automation.Scriptable.StreamGauge.Signal.Contamination,"contamination","Name of the condition for the current water contamination level checking"
 IgorZ.Automation.Scriptable.StreamGauge.Signal.Current,"current","Name of the condition for the current water current checking"
 IgorZ.Automation.Scriptable.StreamGauge.Signal.Depth,"depth","Name of the condition for the current water level checking"
 IgorZ.Automation.Scriptable.Weather.Signal.Season,"season","Name of the condition for the current season checking"
 IgorZ.Automation.Scriptable.Workplace.Action.RemoveWorkers,"remove workers","Name of the action that removes all workers from the workshop"
+IgorZ.Automation.Scriptable.Workplace.Action.SetPriority,"worker priority: {0}","Name of the action that sets the workplace priority level"
 IgorZ.Automation.Scriptable.Workplace.Action.SetWorkers,"assign {0} workers","Name of the action that sets the number of workers in the building"
+IgorZ.Automation.Scriptable.Workplace.Signal.AssignedWorkers,"assigned workers","Name of the condition for the current number of assigned workers"
 IgorZ.Automation.Scripting.Expressions.AndOperator,"and","String to join components of the expression with condition AND. Used to represent the condition in the panel"
 IgorZ.Automation.Scripting.Expressions.OrOperator,"or","String to join components of the expression with condition OR. Used to represent the condition in the panel"
 IgorZ.Automation.Scripting.Expressions.NotOperator,"NOT","NOT operator name to represent the condition in the panel"
@@ -169,13 +173,21 @@ IgorZ.Automation.Scripting.Expressions.ParseError,"PARSE ERROR","String to show 
 =,=,"Rules editor strings"
 IgorZ.Automation.Scripting.Editor.ActionLabel,"Then",
 IgorZ.Automation.Scripting.Editor.ActionMustBeAction,"Action must be the 'act' operator","A message to show when the action is not an action"
+IgorZ.Automation.Scripting.Editor.ActionArgumentName,"Argument #{0}","The generic name of the action arguments when there is no display name specified"
 IgorZ.Automation.Scripting.Editor.AddRuleFromScriptBtn,"Add script",
 IgorZ.Automation.Scripting.Editor.AddRuleViaConstructorBtn,"Create rule via constructor",
 IgorZ.Automation.Scripting.Editor.ArgumentMaxValueHint,"(max: {0})","A hint to show the maximum value of the argument"
+IgorZ.Automation.Scripting.Editor.ArgumentMinValueHint,"(min: {0})","A hint to show the minimum value of the argument"
 IgorZ.Automation.Scripting.Editor.ConditionLabel,"If",
 IgorZ.Automation.Scripting.Editor.ConditionMustBeBoolean,"Condition must be a boolean expression","A message to show when the condition is not a boolean expression"
 IgorZ.Automation.Scripting.Editor.ConditionMustHaveSignals,"Condition must contain at least one signal","A message to show when the condition does not have any signals"
+IgorZ.Automation.Scripting.Editor.ConstantTypeDecimals,"decimals","Name of the decimals constant type"
+IgorZ.Automation.Scripting.Editor.ConstantTypeString,"string","Name of the string constant type"
+IgorZ.Automation.Scripting.Editor.ConstantTypePercent,"percent","Name of the percent constant type"
+IgorZ.Automation.Scripting.Editor.ConstantTypeWholeNumber,"whole number","Name of the whole number constant type"
+IgorZ.Automation.Scripting.Editor.CopyRuleBtn,"Duplicate",
 IgorZ.Automation.Scripting.Editor.DeletedRule,"Rule removed","A message to show over the deleted rule"
+IgorZ.Automation.Scripting.Editor.DeleteRuleBtn,"Delete rule",
 IgorZ.Automation.Scripting.Editor.DialogHeader,"Automation rules",
 IgorZ.Automation.Scripting.Editor.DiscardChangesBtn,"Discard changes",
 IgorZ.Automation.Scripting.Editor.DiscardScriptBtn,"Discard",
@@ -183,15 +195,16 @@ IgorZ.Automation.Scripting.Editor.EditAsScriptBtn,"Script",
 IgorZ.Automation.Scripting.Editor.EditInConstructorBtn,"Constructor",
 IgorZ.Automation.Scripting.Editor.ExportRulesBtn,"Export rules",
 IgorZ.Automation.Scripting.Editor.ImportRulesBtn,"Import rules",
+IgorZ.Automation.Scripting.Editor.InvertRuleBtn,"Invert",
 IgorZ.Automation.Scripting.Editor.MoreInfoBtn,"Read about scripting",
-IgorZ.Automation.Scripting.Editor.NumberConstantType,"number","Name of the number constant type"
+IgorZ.Automation.Scripting.Editor.PauseRuleBtn,"Disable rule",
 IgorZ.Automation.Scripting.Editor.PendingEditsNotification,"There are rules in the editing state. Complete them first.",
 IgorZ.Automation.Scripting.Editor.ReadMoreLink,"https://github.com/ihsoft/TimberbornMods/wiki/Automation-(scripting)","Link to the localized wiki page about scripting"
 IgorZ.Automation.Scripting.Editor.ResetChangesBtn,"Reset changes",
+IgorZ.Automation.Scripting.Editor.ResumeRuleBtn,"Enable rule",
 IgorZ.Automation.Scripting.Editor.RulesWithErrorsNotification,"Some rules have errors! Fix them first.",
 IgorZ.Automation.Scripting.Editor.SaveRulesBtn,"Save and close",
 IgorZ.Automation.Scripting.Editor.SaveScriptBtn,"Save",
-IgorZ.Automation.Scripting.Editor.StringConstantType,"string","Name of the string constant type"
 IgorZ.Automation.Scripting.Editor.TemplateFamilyLabel,"Template group: {0}","Name of the template group (family) the rule belongs to"
 IgorZ.Automation.Scripting.Editor.TestScriptBtn,"Test",
 =,=,"Signals editor strings"
@@ -221,7 +234,6 @@ IgorZ.Automation.Settings.Debug.LogSignalSetting,"Log setting signal values",
 IgorZ.Automation.Settings.Debug.LogSignalPropagating,"Log signal propagation",
 IgorZ.Automation.Settings.Debug.ReevaluateRulesOnLoad,"Re-evaluate rules on load",
 IgorZ.Automation.Settings.Debug.ResetSignalsOnLoad,"Reset custom signals on load",
-IgorZ.Automation.Settings.EntityPanel.AlwaysShowAddRulesButton,"Always show 'Add rules' button",
 IgorZ.Automation.Settings.EntityPanel.Header,"Controls on the building panel",
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle,"Style of the rule description",
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.HumanReadable,"Text","Human readable style of the rule description."
@@ -237,7 +249,6 @@ IgorZ.Automation.Settings.ScriptEditor.DefaultScriptSyntaxPython,"Python-style",
 IgorZ.Automation.Settings.ScriptEditor.DefaultScriptSyntaxTooltip,"Syntax can be overridden in the expression body by adding prefix '#PY' for Python or '#LP' for Lisp.",
 IgorZ.Automation.Settings.ScriptEngine.Header,"Script engine settings",
 IgorZ.Automation.Settings.ScriptEngine.CheckArgumentValues,"Check argument value in runtime",
-IgorZ.Automation.Settings.ScriptEngine.CheckOptionsArguments,"Check arguments with fixed set of values",
 IgorZ.Automation.Settings.ScriptEngine.SignalExecutionStackSize,"Signal execution stack size",
 =,=,"TimberDev_Utils"
 TimberDev_Utils.Settings.Debug.VerboseLogging,"Verbose logging",

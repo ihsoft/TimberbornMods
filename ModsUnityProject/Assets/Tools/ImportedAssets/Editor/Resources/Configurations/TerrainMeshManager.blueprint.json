@@ -1,0 +1,6 @@
+{
+  "TerrainMeshManagerSpec": {
+    "TerrainTilePrefab": "Environment/Land/TerrainTilePrefab",
+    "LayerToolTopMeshPrefab": "Environment/Land/LayerToolTerrainTopPrefab"
+  }
+}

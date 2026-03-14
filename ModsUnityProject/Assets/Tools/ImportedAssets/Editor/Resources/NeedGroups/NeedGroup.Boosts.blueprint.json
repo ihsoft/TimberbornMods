@@ -1,0 +1,7 @@
+{
+  "NeedGroupSpec": {
+    "Id": "Boosts",
+    "Order": 90,
+    "DisplayNameLocKey": "NeedGroup.Boosts.DisplayName"
+  }
+}

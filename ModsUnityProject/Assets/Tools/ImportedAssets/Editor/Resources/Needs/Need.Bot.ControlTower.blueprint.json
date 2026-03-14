@@ -1,0 +1,20 @@
+{
+  "NeedSpec": {
+    "Id": "ControlTower",
+    "BackwardCompatibleIds": [],
+    "Order": 10,
+    "NeedGroupId": "Boosts",
+    "CharacterType": "Bot",
+    "StartingValue": 0.0,
+    "MinimumValue": 0.0,
+    "MaximumValue": 1.0,
+    "DailyDelta": -72.0,
+    "ImportanceMultiplier": 1.0,
+    "Effectiveness": 1.0,
+    "Wastable": true,
+    "HoursWarningThreshold": 0.0,
+    "DisplayNameLocKey": "Building.ControlTower.DisplayName",
+    "FavorableWellbeing": 1,
+    "UnfavorableWellbeing": 0
+  }
+}

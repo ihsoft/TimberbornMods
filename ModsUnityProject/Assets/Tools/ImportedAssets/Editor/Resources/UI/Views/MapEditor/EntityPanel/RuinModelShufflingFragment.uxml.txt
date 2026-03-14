@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <cui:NineSliceVisualElement name="RuinModelShufflingFragment" class="entity-sub-panel single-button-fragment bg-sub-box--green">
+        <cui:LocalizableButton text-loc-key="Ruins.ShuffleModel" name="Button" text="Shuffle" class="game-text-normal entity-fragment__button entity-fragment__button--red" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

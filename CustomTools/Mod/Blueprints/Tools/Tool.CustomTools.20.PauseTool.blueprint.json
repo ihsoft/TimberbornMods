@@ -1,0 +1,11 @@
+{
+  "CustomToolSpec": {
+    "Id": "CustomTools-PauseTool",
+    "GroupId": "CustomToolsToolGroup",
+    "Order": 20,
+    "Type": "IgorZ.CustomTools.Tools.PauseTool",
+    "Icon": "Sprites/BottomBar/IgorZ.CustomTools/tool-pause",
+    "DisplayNameLocKey": "IgorZ.CustomTools.PauseTool.Title",
+    "DescriptionLocKey": "IgorZ.CustomTools.PauseTool.Description"
+  }
+}

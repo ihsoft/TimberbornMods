@@ -1,0 +1,46 @@
+{
+  "CustomToolSpec": {
+    "Id": "Automation.Tmpl.Planting.RunIf1PlusCollectable",
+    "GroupId": "AutomationPlantingToolGroupId",
+    "Type": "IgorZ.Automation.TemplateTools.ApplyTemplateTool",
+    "Order": 10,
+    "Icon": "Sprites/IgorZ/tool-gather-1-plus",
+    "DisplayNameLocKey": "IgorZ.Automation.Tool.tmpl.RunIf1PlusCollectables.DisplayName",
+    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.HasCollectables.Description"
+   },
+  "AutomationTemplateSpec": {
+    "TemplateFamilyName": "Collectables",
+    "Rules": [
+      {
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Precondition", "StrValue": "(and (?sig Collectable.Ready) (?act Workplace.SetWorkers))" },
+            { "Name": "Expression", "StrValue": "(gt (sig Collectable.Ready) 0)" }
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Workplace.SetWorkers {% (getvalue Workplace.MaxWorkers) %})" }
+          ]
+        }
+      },
+      {
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Precondition", "StrValue": "(and (?sig Collectable.Ready) (?act Workplace.RemoveWorkers))" },
+            { "Name": "Expression", "StrValue": "(eq (sig Collectable.Ready) 0)" }
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Workplace.RemoveWorkers)" }
+          ]
+        }
+      }
+    ]
+  }
+}

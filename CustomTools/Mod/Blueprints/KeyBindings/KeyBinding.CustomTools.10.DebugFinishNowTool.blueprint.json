@@ -1,0 +1,12 @@
+{
+  "CustomToolBindingSpec": {
+    "CustomToolId": "CustomTools-DebugFinishNowTool",
+  },
+  "KeyBindingSpec": {
+    "Id": "IgorZ-CustomTools-DebugFinishNowTool",
+    "GroupId": "IgorZ-CustomTools-BindingsGroupId",
+    "LocKey": "IgorZ.CustomTools.DebugFinishNowTool.Title",
+    "Order": 10,
+    "DevModeOnly": true
+  }
+}

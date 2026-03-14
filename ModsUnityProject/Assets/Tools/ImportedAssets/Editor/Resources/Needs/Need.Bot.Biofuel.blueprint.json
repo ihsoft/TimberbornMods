@@ -1,0 +1,37 @@
+{
+  "NeedSpec": {
+    "Id": "Biofuel",
+    "BackwardCompatibleIds": [],
+    "Order": 10,
+    "NeedGroupId": "BasicNeeds",
+    "CharacterType": "Bot",
+    "StartingValue": 0.8,
+    "MinimumValue": 0.0,
+    "MaximumValue": 1.0,
+    "DailyDelta": -0.58,
+    "ImportanceMultiplier": 1.0,
+    "Effectiveness": 1.0,
+    "Wastable": false,
+    "HoursWarningThreshold": 4.5,
+    "DisplayNameLocKey": "Good.Biofuel.PluralDisplayName",
+    "FavorableWellbeing": 0,
+    "UnfavorableWellbeing": -3
+  },
+  "NeedPreventingWorkSpec": {
+    "WorkRefusalWarningLocKey": "Work.WorkRefusalWarning"
+  },
+  "CriticalNeedSpec": {
+    "CriticalNeedType": "StateWithAlert",
+    "SpriteName": "OutOfFuel",
+    "DescriptionLocKey": "Status.Need.Biofuel",
+    "DescriptionShortLocKey": "Status.Need.Biofuel.Short"
+  },
+  "PunitiveNeedSpec": {
+    "Penalties": [
+      {
+        "Id": "MovementSpeed",
+        "MultiplierDelta": -0.75
+      }
+    ]
+  }
+}

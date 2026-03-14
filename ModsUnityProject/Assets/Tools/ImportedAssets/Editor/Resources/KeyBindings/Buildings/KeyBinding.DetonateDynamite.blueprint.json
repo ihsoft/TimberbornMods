@@ -1,0 +1,10 @@
+{
+  "KeyBindingSpec": {
+    "Id": "DetonateDynamite",
+    "GroupId": "Buildings",
+    "LocKey": "KeyBinding.DetonateDynamite",
+    "Order": 100,
+    "AllowOtherModifiers": true,
+    "DevModeOnly": false
+  }
+}

@@ -1,0 +1,6 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="True">
+    <Style path="UI/Views/Editor/BlueprintSystem/BlueprintSystemStyle" />
+    <ui:VisualElement name="HideableBlueprintElementHeader">
+        <ui:Toggle name="VisibilityToggle" value="true" class="blueprint-element-header__visibility-toggle" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,223 @@
+﻿{
+  "TemplateSpec": {
+    "TemplateName": "BadwaterSeep",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "WaterSourceSpec": {
+    "Coordinates": [
+      {
+        "X": 0,
+        "Y": 0
+      },
+      {
+        "X": 0,
+        "Y": 1
+      },
+      {
+        "X": 1,
+        "Y": 0
+      },
+      {
+        "X": 1,
+        "Y": 1
+      }
+    ],
+    "DefaultStrength": 1.0
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 2,
+      "Y": 2,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": true,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": true
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "MapEditorWater",
+    "ToolOrder": 600,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": true
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.BadwaterSeep.DisplayName",
+    "DescriptionLocKey": "Building.BadwaterSeep.Description",
+    "FlavorDescriptionLocKey": "",
+    "Icon": "MapEditor/Water/BadwaterSeep/BadwaterSeepIcon"
+  },
+  "BasicSelectionSoundSpec": {
+    "SoundName": "BadwaterSource",
+    "AlternativeSoundName": ""
+  },
+  "WaterSourceContaminationSpec": {
+    "DefaultContamination": 1.0
+  },
+  "WaterSourceRendererSpec": {},
+  "BlockObjectNavMeshAdderSpec": {},
+  "BadtideWaterSourceContaminationControllerSpec": {},
+  "BlockObjectModelSpec": {
+    "FullModelName": "#Model",
+    "UncoveredModelName": "",
+    "UndergroundModelName": "#Underground",
+    "UndergroundModelDepth": 1
+  },
+  "ContinuousTerrainConstraintSpec": {},
+  "WaterDepthStrengthModifierSpec": {
+    "DepthLimit": 0.8
+  },
+  "BlockObjectTerrainCutoutSpec": {
+    "CutoutTiles": [
+      {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      {
+        "X": 0,
+        "Y": 1,
+        "Z": 0
+      },
+      {
+        "X": 1,
+        "Y": 0,
+        "Z": 0
+      },
+      {
+        "X": 1,
+        "Y": 1,
+        "Z": 0
+      }
+    ]
+  },
+  "TimedComponentActivatorSpec": {
+    "IsOptionallyActivable": true,
+    "CyclesUntilCountdownActivation": 5,
+    "DaysUntilActivation": 10.0,
+    "ProgressBarActiveLabelLocKey": "TimedComponentActivator.DaysUntilActivationProgress",
+    "ProgressBarNotActiveLabelLocKey": "TimedComponentActivator.CountdownNotActive",
+    "IsHazardousActivator": true
+  },
+  "ActivationWarningStatusSpec": {
+    "StatusSpriteName": "WaterSourceCountdown",
+    "StatusLocKey": "Status.TimedActivationWarning",
+    "UseInfiniteWarning": false
+  },
+  "ActivationProgressParticlesSpec": {
+    "AttachmentIds": [
+      "Water"
+    ],
+    "MinEmission": 10,
+    "MaxEmission": 100
+  },
+  "BlockableObjectParticleControllerSpec": {
+    "AttachmentIds": [
+      "Water"
+    ]
+  },
+  "TemplateAttachmentsSpec": {
+    "Attachments": [
+      {
+        "AttachmentId": "Water",
+        "Prefab": "MapEditor/Water/BadwaterSeep/BadwaterSeepActivation",
+        "Parent": "#Model",
+        "Position": {
+          "X": 1.0,
+          "Y": 0.0,
+          "Z": 1.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": true
+      }
+    ]
+  },
+  "Children": {
+    "#Model": {
+      "TimbermeshSpec": {
+        "Model": "MapEditor/Water/BadwaterSeep/BadwaterSeep.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 1.0,
+              "Y": 0.03096795,
+              "Z": 1.0
+            },
+            "Size": {
+              "X": 2.0,
+              "Y": 0.122228041,
+              "Z": 2.0
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Underground": {
+      "TimbermeshSpec": {
+        "Model": "MapEditor/Water/BadwaterSeep/BadwaterSeep.Underground"
+      }
+    }
+  }
+}

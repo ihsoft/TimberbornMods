@@ -13,7 +13,6 @@ using Timberborn.Localization;
 using Timberborn.TimeSystem;
 using Timberborn.Workshops;
 using UnityDev.Utils.LogUtilsLite;
-using UnityEngine;
 
 namespace IgorZ.TimberCommons.IrrigationSystem;
 
@@ -32,20 +31,7 @@ namespace IgorZ.TimberCommons.IrrigationSystem;
 /// </remarks>
 public class ManufactoryIrrigationTower : IrrigationTower, ISupplyLeftProvider {
 
-  #region Unity controlled fields
-  // ReSharper disable InconsistentNaming
-  // ReSharper disable RedundantDefaultMemberInitializer
-
-  /// <summary>Defines rules to apply an effect group per the recipe selected.</summary>
-  /// <remarks>Each row is mappings like: <c>&lt;recipe id>=&lt;effect group></c>. The keys must be unique.</remarks>
-  /// <see cref="IRangeEffect.EffectGroup"/>
-  [SerializeField]
-  [Tooltip("Format: RecipeId=EffectName. Recipe IDs in the list must be unique.")]
-  internal string[] _effects = [];
-
-  // ReSharper restore InconsistentNaming
-  // ReSharper restore RedundantDefaultMemberInitializer
-  #endregion
+  const string NoTilesToIrrigateLocKey = "IgorZ.TimberCommons.WaterTower.NoTilesToIrrigate";
 
   #region TickableComponent overrides
 
@@ -63,8 +49,16 @@ public class ManufactoryIrrigationTower : IrrigationTower, ISupplyLeftProvider {
   #region IrrigationTower overrides
 
   /// <inheritdoc/>
+  protected override int IrrigationRange => _irrigationRange;
+  int _irrigationRange;
+
+  /// <inheritdoc/>
+  protected override bool IrrigateFromGroundTilesOnly => _irrigateFromGroundTilesOnly;
+  bool _irrigateFromGroundTilesOnly;
+
+  /// <inheritdoc/>
   protected override bool CanMoisturize() {
-    return BlockableBuilding.IsUnblocked && _manufactory.IsReadyToProduce;
+    return BlockableObject.IsUnblocked && _manufactory.IsReadyToProduce;
   }
 
   /// <inheritdoc/>
@@ -84,13 +78,21 @@ public class ManufactoryIrrigationTower : IrrigationTower, ISupplyLeftProvider {
 
   /// <inheritdoc/>
   protected override float GetEfficiency() {
-    return _manufactory.ProductionEfficiency();
+    return _manufactory.IsReadyToProduce ? _manufactory.ProductionEfficiency() : 0;
   }
 
   /// <inheritdoc/>
   protected override void Initialize() {
     base.Initialize();
     _originalRecipeId = _manufactory.CurrentRecipe?.Id;
+
+    // Make effect cache.
+    var rangeEffects = new List<IRangeEffect>();
+    GetComponents(rangeEffects);
+    _availableEffectsDict = rangeEffects
+        .Where(x => _effectsRulesDict.ContainsValue(x.EffectGroup))
+        .GroupBy(x => x.EffectGroup)
+        .ToDictionary(x => x.Key, x => x.ToList());
   }
 
   #endregion
@@ -100,13 +102,13 @@ public class ManufactoryIrrigationTower : IrrigationTower, ISupplyLeftProvider {
   /// <inheritdoc/>
   public override void OnEnterFinishedState() {
     base.OnEnterFinishedState();
-    _manufactory.ProductionRecipeChanged += OnProductionRecipeChanged;
+    _manufactory.RecipeChanged += OnProductionRecipeChanged;
   }
 
   /// <inheritdoc/>
   public override void OnExitFinishedState() {
     base.OnExitFinishedState();
-    _manufactory.ProductionRecipeChanged -= OnProductionRecipeChanged;
+    _manufactory.RecipeChanged -= OnProductionRecipeChanged;
   }
 
   #endregion
@@ -128,7 +130,7 @@ public class ManufactoryIrrigationTower : IrrigationTower, ISupplyLeftProvider {
 
   Dictionary<string, string> _effectsRulesDict;
   Dictionary<string, List<IRangeEffect>> _availableEffectsDict;
-  static readonly List<IRangeEffect> NoEffects = new();
+  static readonly List<IRangeEffect> NoEffects = [];
   float _ingredientsConsumptionProgress;
   string _progressUpdateMsg;
 
@@ -140,24 +142,22 @@ public class ManufactoryIrrigationTower : IrrigationTower, ISupplyLeftProvider {
   }
 
   /// <inheritdoc/>
-  protected override void Awake() {
+  public override void Awake() {
     base.Awake();
-    _manufactory = GetComponentFast<Manufactory>();
-    _effectsRulesDict = _effects
-        .Select(pair => pair.Split(['='], 2))
-        .ToDictionary(k => k[0], v => v[1]);
-
-    // Make effect cache.
-    var rangeEffects = new List<IRangeEffect>();
-    GetComponentsFast(rangeEffects);
-    _availableEffectsDict = rangeEffects
-        .Where(x => _effectsRulesDict.ContainsValue(x.EffectGroup))
-        .GroupBy(x => x.EffectGroup)
-        .ToDictionary(x => x.Key, x => x.ToList());
+    _manufactory = GetComponent<Manufactory>();
+    var spec = GetComponent<ManufactoryIrrigationTowerSpec>();
+    _irrigationRange = spec.IrrigationRange;
+    _irrigateFromGroundTilesOnly = spec.IrrigateFromGroundTilesOnly;
+    try {
+      _effectsRulesDict = spec.Effects.Select(pair => pair.Split(['='], 2)).ToDictionary(k => k[0], v => v[1]);
+    } catch (Exception ex) {
+      HostedDebugLog.Error(this, "Cannot parse effects definition: {0}. {1}", spec.Effects, ex);
+      throw;
+    }
   }
 
   /// <summary>Returns all effects that should be active for the recipe.</summary>
-  /// <seealso cref="_effects"/>
+  /// <seealso cref="ManufactoryIrrigationTowerSpec.Effects"/>
   List<IRangeEffect> GetEffectsForRecipe(string recipeId) {
     if (_effectsRulesDict.TryGetValue(recipeId, out var effectGroup)
         && _availableEffectsDict.TryGetValue(effectGroup, out var effects)) {
@@ -192,9 +192,6 @@ public class ManufactoryIrrigationTower : IrrigationTower, ISupplyLeftProvider {
   /// <summary>Updates to the new manufactory recipe.</summary>
   /// <param name="oldRecipeId">The recipe that was set before the change.</param>
   void UpdateRecipe(string oldRecipeId) {
-    if (_manufactory.CurrentRecipe?.Id == oldRecipeId) {
-      return;
-    }
     StopEffectsForRecipe(oldRecipeId);
     StartEffectsForCurrentRecipe();
     UpdateCurrentRecipeDuration();
@@ -229,28 +226,28 @@ public class ManufactoryIrrigationTower : IrrigationTower, ISupplyLeftProvider {
       return; // Cannot estimate.
     }
     var inventory = _manufactory.Inventory;
-    var totalGoodsInRecipe = recipe.Ingredients.Length + (recipe.ConsumesFuel ? 1 : 0);
-    var supplyLeftHours = new float[totalGoodsInRecipe];
-    var supplyAtMaxCapacity = new float[totalGoodsInRecipe];
-    for (var index = 0; index < recipe.Ingredients.Length; index++) {
-      var ingredient = recipe.Ingredients[index];
-      var stock = inventory.AmountInStock(ingredient.Id);
+    var supply = new List<(float supplyLeft, float maxSupply)>();
+    var ingridentLeftRatio = _manufactory.IsReadyToProduce ? 1f - _manufactory.ProductionProgress : 0f;
+    foreach (var ingredient in recipe.Ingredients) {
+      var goodRemaining = inventory.AmountInStock(ingredient.Id) + ingredient.Amount * ingridentLeftRatio;
       var consumePerHour = ingredient.Amount / recipe.CycleDurationInHours;
-      supplyLeftHours[index] = stock / consumePerHour;
-      supplyAtMaxCapacity[index] = inventory.LimitedAmount(ingredient.Id) / consumePerHour;
+      var supplyLeftHours = goodRemaining / consumePerHour;
+      var supplyAtMaxCapacity = inventory.LimitedAmount(ingredient.Id) / consumePerHour;
+      supply.Add((supplyLeftHours, supplyAtMaxCapacity));
     }
     if (recipe.ConsumesFuel) {
-      var index = supplyLeftHours.Length - 1;
-      var stock = inventory.AmountInStock(recipe.Fuel) + _manufactory.FuelRemaining;
+      var fuelRemaining = inventory.AmountInStock(recipe.Fuel) + _manufactory.FuelRemaining;
       var consumePerHour = 1f / (recipe.CyclesFuelLasts * recipe.CycleDurationInHours);
-      supplyLeftHours[index] = stock / consumePerHour;
-      supplyAtMaxCapacity[index] = inventory.LimitedAmount(recipe.Fuel) / consumePerHour;
+      var supplyLeftHours = fuelRemaining / consumePerHour;
+      var supplyAtMaxCapacity = inventory.LimitedAmount(recipe.Fuel) / consumePerHour;
+      supply.Add((supplyLeftHours, supplyAtMaxCapacity));
     }
 
-    var minLastsHours = supplyLeftHours.Min();
-    var maxReserveHours = supplyAtMaxCapacity.Min();
-    _ingredientsConsumptionProgress = minLastsHours / maxReserveHours;
-    _progressUpdateMsg = CommonFormats.FormatSupplyLeft(_loc, minLastsHours);
+    var minReserve = supply.OrderBy(x => x.supplyLeft).First();
+    _ingredientsConsumptionProgress = minReserve.supplyLeft / minReserve.maxSupply;
+    _progressUpdateMsg = Coverage > float.Epsilon
+        ? CommonFormats.FormatSupplyLeft(_loc, minReserve.supplyLeft)
+        : _loc.T(NoTilesToIrrigateLocKey);
   }
 
   #endregion

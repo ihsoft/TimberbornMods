@@ -1,0 +1,34 @@
+{
+  "GoodSpec": {
+    "Id": "FermentedMushroom",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [
+      {
+        "NeedId": "Hunger",
+        "Points": 0.3
+      },
+      {
+        "NeedId": "FermentedMushroom",
+        "Points": 0.2
+      }
+    ],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.7607843,
+      "g": 0.5568628,
+      "b": 0.8,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Food",
+    "GoodOrder": 11050,
+    "Icon": "Sprites/Goods/FermentedMushroomIcon",
+    "ForceImport": true,
+    "DisplayNameLocKey": "Good.FermentedMushroom.DisplayName",
+    "PluralDisplayNameLocKey": "Good.FermentedMushroom.PluralDisplayName"
+  }
+}

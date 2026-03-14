@@ -1,0 +1,29 @@
+[h1]Timberborn: Custom Tools[/h1]
+This mod offers new quality-of-life tools in the bottom bar and also provides an API for modders to quickly create their own tools.
+[hr][/hr]
+[h2]For the players: Built-in tools[/h2]
+[img]https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/timberborn-1.0/CustomTools/Workshop/Showcase/GroupButtonDemo.png[/img]
+[h3]Immediate finish of incomplete buildings[/h3]
+This tool is only visible when the dev mode is activated ([b]Shift + Alt + Z[/b]). Select multiple incomplete buildings and have them [b]instantly completed[/b]. A handy tool when testing or prototyping.
+[img]https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/timberborn-1.0/CustomTools/Workshop/Showcase/FinishNowToolDemo.png[/img]
+[h3]Pause buildings in the selected range[/h3]
+Select multiple buildings that need to be paused. Hold [b]SHIFT[/b] to lock the selection to a specific building type. A useful tool for temporarily stopping groups of buildings during colony micromanagement.
+[img]https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/timberborn-1.0/CustomTools/Workshop/Showcase/PauseBuildingToolDemo.png[/img]
+[h3]Resume buildings in the selected range[/h3]
+Select multiple buildings you want to resume. Hold [b]SHIFT[/b] to lock the selection to a specific building type. Helps quickly bring groups of buildings back online during micromanagement.
+[img]https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/timberborn-1.0/CustomTools/Workshop/Showcase/ResumeBuildingToolDemo.png[/img]
+[hr][/hr]
+[h2]For the modders: API to create your own tools[/h2]
+For the full instructions, read [url=https://github.com/ihsoft/TimberbornMods/blob/timberborn-1.0/CustomTools/README.md]README[/url].
+
+In nutshell, to create your own tool you need:
+[olist]
+[*] Implement a class that handles the tool's logic. Use the provided base classes to avoid dealing with the boilerplate.
+[*] Make a blueprint spec for your tool.
+[*] [i]Optional[/i]. Create blueprint specs to have your own tool group buttons created. Or you can attach your tool to the CustomTool's group.
+[*] DONE!
+[/olist]
+
+[hr][/hr]
+GitHub: https://github.com/ihsoft/TimberbornMods/blob/timberborn-1.0/CustomTools
+File a bug: https://github.com/ihsoft/TimberbornMods/issues/new?title=%5BCustomTools%5D

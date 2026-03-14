@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "MouseRight",
+    "GroupId": "Internal",
+    "LocKey": "",
+    "Order": 20,
+    "AllowOtherModifiers": true,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Mouse/rightButton",
+    "InputModifiers": "None",
+    "Unchangeable": true
+  }
+}

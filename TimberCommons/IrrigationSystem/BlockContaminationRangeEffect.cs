@@ -19,24 +19,12 @@ namespace IgorZ.TimberCommons.IrrigationSystem;
 /// <seealso cref="GoodConsumingIrrigationTower"/>
 /// <seealso cref="ManufactoryIrrigationTower"/>
 /// <seealso cref="SoilOverridesService"/>
-public sealed class BlockContaminationRangeEffect : BaseComponent, IRangeEffect, IPersistentEntity {
-
-  #region Unity managed fields
-  // ReSharper disable InconsistentNaming
-
-  /// <inheritdoc cref="EffectGroup"/>
-  [SerializeField]
-  [Tooltip(
-    "The name by which this effect can be found by the other components. Multiple effects can have the same name.")]
-  string _effectGroupName = "BlockContamination";
-
-  // ReSharper restore InconsistentNaming
-  #endregion
+public sealed class BlockContaminationRangeEffect : BaseComponent, IAwakableComponent, IRangeEffect, IPersistentEntity {
 
   #region IRangeEffect implementation
 
   /// <inheritdoc/>
-  public string EffectGroup => _effectGroupName;
+  public string EffectGroup { get; private set; }
 
   /// <inheritdoc/>
   public void ApplyEffect(HashSet<Vector3Int> tiles) {
@@ -69,6 +57,12 @@ public sealed class BlockContaminationRangeEffect : BaseComponent, IRangeEffect,
   /// <inheritdoc/>
   public override string ToString() {
     return $"[{GetType().Name}#{EffectGroup}]";
+  }
+
+  /// <inheritdoc/>
+  public void Awake() {
+    var effectSpec = GetComponent<BlockContaminationRangeEffectSpec>();
+    EffectGroup = effectSpec.EffectGroup;
   }
 
   #endregion

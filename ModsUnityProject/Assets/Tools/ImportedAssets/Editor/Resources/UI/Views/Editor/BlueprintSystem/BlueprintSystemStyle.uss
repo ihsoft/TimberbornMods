@@ -1,0 +1,124 @@
+﻿.blueprint-editor__editable-text {
+    margin-top: 10px;
+}
+
+.blueprint-editor__editable-text-field {
+    -unity-text-generator: standard;
+    -unity-font-definition: resource("UI/Fonts/NotoSansMono-Regular SDF");
+    font-size: 12px;
+}
+
+.blueprint-editor__preview-button {
+    margin-top: 10px;
+}
+
+.blueprint-editor__label {
+    max-width: 135px;
+}
+
+.blueprint-element-header {
+    flex-direction: row;
+    flex-grow: 1;
+    flex-shrink: 0;
+}
+
+.blueprint-element-header__name-field {
+    flex-grow: 1;
+    margin-left: 0;
+    margin-right: 6px;
+}
+
+.blueprint-element-header__name-field > .unity-text-field__input > .unity-text-element {
+    margin-left: 2px;
+}
+
+.blueprint-element-header__remove-button {
+    width: 20px;
+    height: 20px;
+    font-size: 18px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    padding: 0 0 2px 0;
+}
+
+.blueprint-element-header__visibility-toggle {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    margin-right: 3px;
+}
+
+.blueprint-element-header__visibility-toggle:checked > .unity-toggle__input > .unity-toggle__checkmark {
+    background-image: resource("d_scenevis_visible_hover");
+}
+
+.blueprint-element-header__visibility-toggle > .unity-toggle__input > .unity-toggle__checkmark {
+    background-image: resource("d_scenevis_hidden");
+    width: 16px;
+    height: 16px;
+}
+
+.spec-blueprint-element-header {
+    flex-direction: row;
+    flex-grow: 0;
+    flex-shrink: 1;
+}
+
+.blueprint-element-foldout {
+    padding: 2px 4px 2px 15px;
+    margin-left: -10px;
+    margin-top: 2px;
+    margin-bottom: 4px;
+}
+
+.blueprint-element-foldout--odd {
+    background-color: rgba(47, 47, 47, 1);
+}
+
+.blueprint-element-foldout--even {
+    background-color: rgba(53, 53, 53, 1);
+}
+
+.blueprint-element-foldout--spec {
+    background-color: rgba(64, 64, 64, 1);
+}
+
+.blueprint-preview-overlay__title {
+    margin: 4px;
+    -unity-font-style: bold;
+}
+
+.blueprint-preview-overlay__content {
+    flex-direction: column;
+    margin: 4px;
+}
+
+.blueprint-element-buttons {
+    flex-direction: row;
+    margin-top: 4px;
+    margin-bottom: 2px;
+    align-self: center;
+}
+
+.blueprint-element-buttons__button {
+    flex-direction: row;
+}
+
+.blueprint-element__path-field {
+    flex-grow: 1;
+    flex-shrink: 1;
+    margin: 0;
+}
+
+.blueprint-element__fields-state-button {
+    margin: 0 1px;
+    padding: 0;
+    width: 18px;
+    height: 18px;
+    -unity-text-align: upper-center;
+}
+
+.blueprint-element-foldout .unity-list-view__footer > .unity-button {
+    -unity-font-style: normal;
+}

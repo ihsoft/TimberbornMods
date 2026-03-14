@@ -1,0 +1,21 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI"
+         xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements"
+         noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MapEditor/MapEditorStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/ToolPanel/ToolPanelStyle.uss" />
+    <cui:NineSliceVisualElement name="NaturalResourceSpawningBrushPanel"
+                                class="tool-panel-item--map-editor bg-box--green resource-spawning-brush-panel">
+        <ui:VisualElement name="Toggles" class="content-row-centered resource-spawning-brush-panel__toggles" />
+        <ui:VisualElement class="resource-spawning-brush-panel__slider-wrapper">
+            <cui:LocalizableSlider name="Slider" text-loc-key="MapEditor.Brush.Density"
+                                   class="tool-panel-slider" />
+            <ui:Label name="SliderValue" text="100%"
+                      class="game-text-normal resource-spawning-brush-panel__slider-value" />
+        </ui:VisualElement>
+        <cui:LocalizableToggle text="Randomize gatherable growth" name="RandomizeYieldGrowthToggle"
+                               text-loc-key="MapEditor.Brush.RandomizeYieldGrowth"
+                               class="game-toggle game-text-normal" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

@@ -1,0 +1,273 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "ZiplinePylon",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "Plank",
+        "Amount": 20
+      },
+      {
+        "Id": "Gear",
+        "Amount": 10
+      },
+      {
+        "Id": "MetalBlock",
+        "Amount": 10
+      }
+    ],
+    "ScienceCost": 600,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": false,
+    "DrawRangeBoundsOnIt": false
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "TemplateSpec": {
+    "TemplateName": "ZiplineBeam.Folktails",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 3,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Paths",
+    "ToolOrder": 52,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": true,
+      "Coordinates": {
+        "X": 0.5,
+        "Y": 0.5,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.ZiplineBeam.DisplayName",
+    "DescriptionLocKey": "Building.ZiplineBeam.Description",
+    "FlavorDescriptionLocKey": "Building.ZiplineBeam.FlavorDescription",
+    "Icon": "Buildings/Paths/ZiplineBeam/ZiplineBeamIcon"
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "PathSpec": {
+    "MainPathCoordinates": {
+      "X": 0,
+      "Y": 2,
+      "Z": 0
+    }
+  },
+  "ZiplineTowerSpec": {
+    "CableAnchorPoint": {
+      "X": 0.5,
+      "Y": 0.85,
+      "Z": 2.5
+    },
+    "MaxConnections": 2,
+    "MaxDistance": 30,
+    "UnobstructedCoordinates": [
+      {
+        "X": 0,
+        "Y": 1,
+        "Z": 0
+      }
+    ]
+  },
+  "BlockObjectWithPathRangeSpec": {},
+  "MovementSpeedBoostingBuildingSpec": {
+    "BoostPercentage": 150
+  },
+  "BlockObjectNavMeshSettingsSpec": {
+    "NoAutoWalls": false,
+    "GenerateFloorsOnStackable": false,
+    "EdgeGroups": [],
+    "UnblockedCoordinates": [
+      {
+        "Group": "Zipline",
+        "Coordinates": {
+          "X": 0,
+          "Y": 2,
+          "Z": 0
+        }
+      }
+    ]
+  },
+  "BlockObjectAccessesSpec": {
+    "BlockingCoordinates": [
+      {
+        "X": 0,
+        "Y": 2,
+        "Z": 0
+      }
+    ],
+    "AllowedCoordinates": []
+  },
+  "Children": {
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Paths/ZiplineBeam/ZiplineBeam.Folktails.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.1514043,
+              "Z": 0.5
+            },
+            "Size": {
+              "X": 0.854235649,
+              "Y": 0.3028086,
+              "Z": 0.8603029
+            }
+          },
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.5045568,
+              "Z": 0.534176
+            },
+            "Size": {
+              "X": 0.3618347,
+              "Y": 0.4030583,
+              "Z": 0.4577403
+            }
+          },
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.789356947,
+              "Z": 1.00227809
+            },
+            "Size": {
+              "X": 0.361834764,
+              "Y": 0.161547661,
+              "Z": 0.4805249
+            }
+          },
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.919225931,
+              "Z": 1.8519038
+            },
+            "Size": {
+              "X": 0.361834764,
+              "Y": 0.08408213,
+              "Z": 1.21417165
+            }
+          },
+          {
+            "Center": {
+              "X": 0.5017257,
+              "Y": 0.8554307,
+              "Z": 2.5010736
+            },
+            "Size": {
+              "X": 0.5999843,
+              "Y": 0.09319568,
+              "Z": 0.6012025
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase1x1#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase1x1/ConstructionBase1x1.blueprint"
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/ZiplineBeam/ZiplineBeam.Folktails.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.05,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.1,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.5047116,
+                  "Y": 0.398337454,
+                  "Z": 0.509238243
+                },
+                "Size": {
+                  "X": 0.379861116,
+                  "Y": 0.5926096,
+                  "Z": 0.4884982
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    }
+  }
+}

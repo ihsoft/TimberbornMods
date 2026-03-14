@@ -1,0 +1,42 @@
+{
+  "NeedSpec": {
+    "Id": "Hunger",
+    "BackwardCompatibleIds": [],
+    "Order": 10,
+    "NeedGroupId": "BasicNeeds",
+    "CharacterType": "Beaver",
+    "StartingValue": 1.0,
+    "MinimumValue": -3.0,
+    "MaximumValue": 1.0,
+    "DailyDelta": -0.8,
+    "ImportanceMultiplier": 3.0,
+    "Effectiveness": 1.0,
+    "Wastable": false,
+    "HoursWarningThreshold": 0.0,
+    "DisplayNameLocKey": "Need.Hunger.DisplayName",
+    "FavorableWellbeing": 1,
+    "UnfavorableWellbeing": -10
+  },
+  "LethalNeedSpec": {
+    "DeathWarningLocKey": "Needs.Beaver.DeathWarning",
+    "DeathMessageLocKey": "Need.Hunger.DeathMessage"
+  },
+  "CriticalNeedSpec": {
+    "CriticalNeedType": "State",
+    "SpriteName": "Hunger",
+    "DescriptionLocKey": "Status.Need.Hunger",
+    "DescriptionShortLocKey": ""
+  },
+  "PunitiveNeedSpec": {
+    "Penalties": [
+      {
+        "Id": "WorkingSpeed",
+        "MultiplierDelta": -0.5
+      },
+      {
+        "Id": "GrowthSpeed",
+        "MultiplierDelta": -0.4
+      }
+    ]
+  }
+}

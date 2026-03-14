@@ -1,0 +1,28 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <cui:NineSliceVisualElement name="ZiplineConnectionTooltip" picking-mode="Ignore" class="tooltip tooltip--not-centered bg-box--brown">
+        <ui:VisualElement name="WarningsWrapper" class="content-row-centered--no-grow">
+            <ui:Image name="WarningsIcon" class="cross-red" />
+            <cui:LocalizableLabel text-loc-key="BuildingTools.DistrictsInConflict" name="DistrictsWarning" class="game-text-normal game-text--red" text="Different districts" />
+            <cui:LocalizableLabel text-loc-key="Zipline.BlockedWarning" name="BlockedWarning" class="game-text-normal game-text--red" text="Blocked" />
+            <cui:LocalizableLabel text-loc-key="Zipline.TooManyConnections" name="TooManyConnectionsWarning" class="game-text-normal game-text--red" text="Too many connections" />
+        </ui:VisualElement>
+        <ui:VisualElement name="DistanceWrapper" class="content-row-centered--no-grow">
+            <ui:Image name="DistanceIcon" class="checkmark-green" />
+            <ui:Label name="Distance" class="game-text-normal" text="Distance" />
+            <ui:VisualElement name="DistanceWarning" class="content-row-centered">
+                <ui:VisualElement name="Separator" class="game-text-separator game-text-separator--small" />
+                <cui:LocalizableLabel name="DistanceWarningText" class="game-text-normal game-text--red" text="Too far!" text-loc-key="Zipline.DistanceWarning" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="InclinationWrapper" class="content-row-centered--no-grow">
+            <ui:Image name="InclinationIcon" class="checkmark-green" />
+            <ui:Label name="Inclination" class="game-text-normal" text="Inclination" />
+            <ui:VisualElement name="InclinationWarning" class="content-row-centered">
+                <ui:VisualElement name="Separator" class="game-text-separator game-text-separator--small" />
+                <cui:LocalizableLabel name="InclinationWarningText" class="game-text-normal game-text--red" text="Too steep!" text-loc-key="Zipline.InclinationWarning" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

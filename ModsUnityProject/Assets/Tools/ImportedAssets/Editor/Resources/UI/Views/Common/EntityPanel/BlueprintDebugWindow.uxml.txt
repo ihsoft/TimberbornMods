@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <ui:VisualElement name="BlueprintDebugWindow" class="grow-centered">
+        <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+        <ui:Label name="Title" class="game-text-title" />
+        <ui:Label name="Path" class="game-text-normal" />
+        <ui:TabView name="Jsons" class="entity-debug-window__tab" />
+    </ui:VisualElement>
+</ui:UXML>
+

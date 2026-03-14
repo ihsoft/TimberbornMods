@@ -1,0 +1,22 @@
+{
+  "PlantingSelectionServiceSpec": {
+    "PlantingToolTile": {
+      "r": 0.0,
+      "g": 0.8,
+      "b": 0.0,
+      "a": 1.0
+    },
+    "ToolActionTile": {
+      "r": 0.95,
+      "g": 0.03,
+      "b": 0.05,
+      "a": 1.0
+    },
+    "ToolNoActionTile": {
+      "r": 0.7,
+      "g": 0.7,
+      "b": 0.0,
+      "a": 1.0
+    }
+  }
+}

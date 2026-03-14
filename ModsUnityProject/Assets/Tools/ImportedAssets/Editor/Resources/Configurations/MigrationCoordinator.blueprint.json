@@ -1,0 +1,5 @@
+{
+  "MigrationCoordinatorSpec": {
+    "MaxAutomaticMigration": 100
+  }
+}

@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False" xsi:schemaLocation="Timberborn.CoreUI file:/C:/Timberborn/timberborn/UIElementsSchema/Timberborn.CoreUI.xsd">
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/DevPanel/DevPanelStyle.uss" />
+    <ui:VisualElement name="DevPanelButton" class="dev-panel-button">
+        <cui:NineSliceButton name="Invoke" text="" class="game-text-normal button-game dev-panel-button__button" />
+        <ui:Button name="Add" class="dev-panel-button__favourites button-plus" />
+        <ui:Button name="Remove" class="dev-panel-button__favourites button-minus" />
+    </ui:VisualElement>
+</ui:UXML>

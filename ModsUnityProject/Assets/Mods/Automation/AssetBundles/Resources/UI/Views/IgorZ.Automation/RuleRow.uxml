@@ -1,40 +1,49 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <engine:Template name="ScriptEditView" src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/ScriptEditView.uxml?fileID=9197481963319205126&amp;guid=a5a94a3cc6365004e874f6e949840723&amp;type=3#ScriptEditView" />
-    <engine:Template name="RuleRowButtonTmpl" src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/RuleRowButtonTmpl.uxml?fileID=9197481963319205126&amp;guid=a4844c553ba429546b4e97867929cc8e&amp;type=3#RuleRowButtonTmpl" />
-    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle" />
-    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle" />
-    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/RulesEditorStyle.uss?fileID=7433441132597879392&amp;guid=82ba7710a5bad1b489b53edd629e2a56&amp;type=3#RulesEditorStyle" />
-    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/TimberDevStyle.uss?fileID=7433441132597879392&amp;guid=86824deb2a4bc844cbec48367a164254&amp;type=3#TimberDevStyle" />
-    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/AutomationCoreStyle.uss?fileID=7433441132597879392&amp;guid=3ff053cc6d97b6c4eb9edeaf49c3c4f7&amp;type=3#AutomationCoreStyle" />
+    <engine:Template name="RuleRowButtonTmpl" src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/RuleRowButtonTmpl.uxml?fileID=9197481963319205126&amp;guid=a4844c553ba429546b4e97867929cc8e&amp;type=3#RuleRowButtonTmpl"/>
+    <engine:Template name="ScriptEditView" src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/ScriptEditView.uxml?fileID=9197481963319205126&amp;guid=a5a94a3cc6365004e874f6e949840723&amp;type=3#ScriptEditView"/>
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle"/>
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle"/>
+    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/RulesEditorStyle.uss?fileID=7433441132597879392&amp;guid=82ba7710a5bad1b489b53edd629e2a56&amp;type=3#RulesEditorStyle"/>
+    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/TimberDevStyle.uss?fileID=7433441132597879392&amp;guid=86824deb2a4bc844cbec48367a164254&amp;type=3#TimberDevStyle"/>
+    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/AutomationCoreStyle.uss?fileID=7433441132597879392&amp;guid=3ff053cc6d97b6c4eb9edeaf49c3c4f7&amp;type=3#AutomationCoreStyle"/>
     <engine:VisualElement name="RuleContainer" class="original-rule" style="margin-bottom: 10px;">
-        <engine:VisualElement style="flex-grow: 1; flex-direction: row; align-items: center;">
-            <engine:VisualElement name="SidePanel" style="align-items: center; margin-right: 5px;">
-                <Timberborn.CoreUI.NineSliceButton name="DeleteRowBtn" class="button-square button-cross" />
-            </engine:VisualElement>
+        <engine:VisualElement name="" style="flex-grow: 1; flex-direction: row; align-items: center;">
             <engine:VisualElement style="flex-grow: 1; flex-shrink: 1; align-items: stretch;">
                 <engine:VisualElement name="EditRuleView" style="flex-grow: 1;">
-                    <engine:Instance template="ScriptEditView" />
+                    <engine:Instance template="ScriptEditView"/>
                 </engine:VisualElement>
-                <engine:Label text="If &lt;color=#ff0&gt;condition&lt;/color&gt;&#10;Then &lt;color=#ff0&gt;action&lt;/color&gt;" name="ReadonlyRuleView" class="game-text-big" />
-            </engine:VisualElement>
-        </engine:VisualElement>
-        <engine:VisualElement name="BottomRowSection" style="margin-top: 5px; align-items: center; flex-direction: row;">
-            <engine:VisualElement name="RuleButtons" style="flex-grow: 1; flex-direction: row;">
-                <engine:Instance template="RuleRowButtonTmpl" />
-                <engine:Instance template="RuleRowButtonTmpl" />
-            </engine:VisualElement>
-            <engine:VisualElement name="TemplateFamilySection" style="flex-direction: row; align-items: center;">
-                <Timberborn.CoreUI.NineSliceButton name="RemoveTemplateBtn" class="button-cross button-click" style="width: 16px; height: 16px;" />
-                <Timberborn.CoreUI.NineSliceButton name="RevertTemplateBtn" class="automation-button-undo button-click" style="width: 16px; height: 16px;" />
-                <Timberborn.CoreUI.NineSliceLabel text="TemplateFamilyName" name="TemplateFamilyName" class="game-text-small automation-red-text" style="margin-left: 2px;" />
+                <engine:VisualElement name="ReadOnlyRuleView" style="flex-grow: 1;">
+                    <engine:Label text="If &lt;color=#ff0&gt;condition&lt;/color&gt; Then &lt;color=#ff0&gt;action&lt;/color&gt;" name="" focusable="true" class="game-text-big"/>
+                    <engine:VisualElement style="flex-grow: 1; flex-direction: row; margin-top: 5px; flex-shrink: 0;">
+                        <Timberborn.CoreUI.NineSliceButton name="DeleteRuleBtn" class="button-square button-cross" style="margin-top: 0; margin-right: 5px; margin-bottom: 0; margin-left: 0;"/>
+                        <Timberborn.CoreUI.NineSliceButton name="PauseRuleBtn" class="button-square automation-button-standby-neutral" style="margin-top: 0; margin-right: 5px; margin-bottom: 0; margin-left: 0;"/>
+                        <Timberborn.CoreUI.NineSliceButton name="ResumeRuleBtn" class="button-square automation-button-standby-red" style="margin-top: 0; margin-right: 5px; margin-bottom: 0; margin-left: 0;"/>
+                        <Timberborn.CoreUI.NineSliceButton name="RevertChangesBtn" class="automation-button-undo button-click button-square" style="margin-right: 5px; margin-left: 0; margin-top: 0; margin-bottom: 0;"/>
+                        <engine:VisualElement name="" style="flex-direction: row; width: 100%;">
+                            <engine:VisualElement name="RuleButtons" style="flex-grow: 0; flex-direction: row; height: 20px; align-items: stretch; justify-content: flex-start;">
+                                <engine:Instance template="RuleRowButtonTmpl"/>
+                                <engine:Instance template="RuleRowButtonTmpl"/>
+                            </engine:VisualElement>
+                            <engine:VisualElement name="TemplateFamilySection" style="flex-direction: row; align-items: center; flex-grow: 1; justify-content: flex-end;">
+                                <Timberborn.CoreUI.NineSliceButton name="RemoveTemplateBtn" class="button-cross button-click" style="width: 20px; height: 20px;"/>
+                                <Timberborn.CoreUI.NineSliceButton name="RevertTemplateBtn" class="automation-button-undo button-click" style="width: 20px; height: 20px;"/>
+                                <Timberborn.CoreUI.NineSliceLabel text="TemplateFamilyName" name="TemplateFamilyName" class="game-text-small automation-red-text" style="margin-left: 2px;"/>
+                            </engine:VisualElement>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                    <engine:VisualElement name="" style="top: 0; right: 0; position: absolute; flex-direction: row;">
+                        <Timberborn.CoreUI.NineSliceButton name="MoveRuleUpBtn" class="button-arrow-up button-square"/>
+                        <Timberborn.CoreUI.NineSliceButton name="MoveRuleDownBtn" class="button-arrow-down button-square"/>
+                    </engine:VisualElement>
+                </engine:VisualElement>
             </engine:VisualElement>
         </engine:VisualElement>
         <engine:VisualElement name="Notifications" style="align-items: flex-start; margin-top: 5px;">
-            <engine:Label text="Some error text" name="ErrorText" class="game-text-big" style="color: rgb(255, 0, 0);" />
+            <engine:Label text="Some error text" name="ErrorText" class="game-text-big" style="color: rgb(255, 0, 0);"/>
         </engine:VisualElement>
     </engine:VisualElement>
     <engine:VisualElement name="DeletedStateOverlay" class="automation-deleted-text" style="align-items: center; justify-content: center; flex-direction: row; padding-top: 5px; padding-bottom: 5px; margin-bottom: 10px;">
-        <Timberborn.CoreUI.NineSliceButton name="UndoDeleteBtn" class="automation-button-undo button-click" style="width: 30px; height: 30px;" />
-        <Timberborn.CoreUI.LocalizableLabel text="DeletedRule" text-loc-key="IgorZ.Automation.Scripting.Editor.DeletedRule" style="font-size: 20px; margin-left: 5px;" />
+        <Timberborn.CoreUI.NineSliceButton name="UndoDeleteBtn" class="automation-button-undo button-click" style="width: 30px; height: 30px;"/>
+        <Timberborn.CoreUI.LocalizableLabel text="DeletedRule" text-loc-key="IgorZ.Automation.Scripting.Editor.DeletedRule" style="font-size: 20px; margin-left: 5px;"/>
     </engine:VisualElement>
 </engine:UXML>

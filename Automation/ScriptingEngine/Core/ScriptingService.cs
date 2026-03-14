@@ -19,6 +19,10 @@ sealed class ScriptingService {
 
   #region API
 
+  /// <summary>The scripting service instance shortcut.</summary>
+  /// <remarks>Don't waste loading time and memory by injecting it. Use directly!</remarks>
+  public static ScriptingService Instance { get; private set; }
+
   /// <summary>Signal callback wrapper.</summary>
   public readonly record struct SignalCallback(string Name, ISignalListener SignalListener) {
     /// <inheritdoc/>
@@ -150,6 +154,10 @@ sealed class ScriptingService {
 
   readonly Dictionary<string, IScriptable> _registeredScriptables = [];
   readonly Stack<SignalCallback> _callbackStack = new();
+
+  ScriptingService() {
+    Instance = this;
+  }
 
   internal IList<string> GetScriptableNames() {
     return _registeredScriptables.Keys.ToList();

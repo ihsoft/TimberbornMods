@@ -1,0 +1,6 @@
+{
+  "AreaTileDrawerFactorySpec": {
+    "TileMesh": "Markers/TileMarker",
+    "TileMaterial": "Markers/TileMarkerSmall"
+  }
+}

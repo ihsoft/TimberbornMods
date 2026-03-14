@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Options/OptionsStyle.uss" />
+    <ui:VisualElement name="KeyBindingRow" class="key-binding-row">
+        <ui:Label name="Name" text="Name" class="text--default key-binding-row__element key-binding-row__name" />
+        <ui:VisualElement name="PrimaryInputWrapper" class="key-binding-row__element">
+            <cui:NineSliceButton name="PrimaryInput" class="bg-box--green game-text-normal key-binding-row__input" />
+        </ui:VisualElement>
+        <ui:VisualElement name="SecondaryInputWrapper" class="key-binding-row__element">
+            <cui:NineSliceButton name="SecondaryInput" class="bg-box--green game-text-normal key-binding-row__input" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

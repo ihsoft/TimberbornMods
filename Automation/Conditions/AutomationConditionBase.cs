@@ -89,15 +89,18 @@ public abstract class AutomationConditionBase : IAutomationCondition {
   #region IGameSerializable implemenation
 
   static readonly PropertyKey<bool> ConditionStateKey = new("ConditionState");
+  static readonly PropertyKey<bool> IsEnabledKey = new("IsEnabled");
 
   /// <inheritdoc/>
   public virtual void LoadFrom(IObjectLoader objectLoader) {
     _conditionState = objectLoader.GetValueOrDefault(ConditionStateKey);
+    IsEnabled = objectLoader.GetValueOrDefault(IsEnabledKey, true);
   }
 
   /// <inheritdoc/>
   public virtual void SaveTo(IObjectSaver objectSaver) {
     objectSaver.Set(ConditionStateKey, ConditionState);
+    objectSaver.Set(IsEnabledKey, IsEnabled);
   }
 
   #endregion
@@ -111,13 +114,23 @@ public abstract class AutomationConditionBase : IAutomationCondition {
   public bool IsActive { get; private set; }
 
   /// <inheritdoc/>
+  public bool IsEnabled { get; private set; } = true;
+
+  /// <inheritdoc/>
   public abstract bool IsInErrorState { get; }
 
   /// <inheritdoc/>
-  public abstract IAutomationCondition CloneDefinition();
+  public virtual IAutomationCondition CloneDefinition() {
+    var clone = (AutomationConditionBase)Activator.CreateInstance(GetType());
+    clone.IsEnabled = IsEnabled;
+    return clone;
+  }
 
   /// <inheritdoc/>
   public virtual void Activate(bool noTrigger = false) {
+    if (!IsEnabled) {
+      throw new InvalidOperationException("Cannot activate disabled condition.");
+    }
     if (IsActive) {
       throw new InvalidOperationException("Condition already activated.");
     }
@@ -125,6 +138,17 @@ public abstract class AutomationConditionBase : IAutomationCondition {
       throw new InvalidOperationException("Behavior and Listener must be set before activating the condition.");
     }
     IsActive = true;
+  }
+
+  /// <inheritdoc/>
+  public void SetEnabled(bool state) {
+    if (IsEnabled == state) {
+      return;
+    }
+    if (Behavior || IsActive) {
+      throw new InvalidOperationException("State must be inactive and no Behavior set to change enabled state.");
+    }
+    IsEnabled = state;
   }
 
   /// <inheritdoc/>

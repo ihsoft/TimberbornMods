@@ -1,0 +1,10 @@
+{
+  "KeyBindingSpec": {
+    "Id": "ToggleWorkerType",
+    "GroupId": "Buildings",
+    "LocKey": "KeyBinding.ToggleWorkerType",
+    "Order": 60,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  }
+}

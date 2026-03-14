@@ -1,0 +1,323 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "BadwaterDischarge",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "Gear",
+        "Amount": 300
+      },
+      {
+        "Id": "MetalBlock",
+        "Amount": 200
+      },
+      {
+        "Id": "Explosives",
+        "Amount": 50
+      }
+    ],
+    "ScienceCost": 4000,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": false,
+    "DrawRangeBoundsOnIt": false
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "#Underground",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 99
+  },
+  "TemplateSpec": {
+    "TemplateName": "BadwaterDischarge.IronTeeth",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 3,
+      "Y": 3,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Top",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Top",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Top",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Top",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Top",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Top",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Top",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Top",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Top",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Water",
+    "ToolOrder": 80,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.BadwaterDischarge.DisplayName",
+    "DescriptionLocKey": "Building.BadwaterDischarge.Description",
+    "FlavorDescriptionLocKey": "Building.BadwaterDischarge.FlavorDescription",
+    "Icon": "Buildings/Water/BadwaterDischarge/BadwaterDischargeIcon"
+  },
+  "BottomMatchingTemplateSpec": {
+    "RequiredTemplateAtBottomName": "BadwaterSource"
+  },
+  "WaterSourceDischargerSpec": {},
+  "BuildingModelGroundCutoffSpec": {
+    "Targets": [
+      "#Quarter#Dome1",
+      "#Quarter#Dome2",
+      "#Quarter#Dome3",
+      "#Quarter#Dome4"
+    ],
+    "Offset": 0.0
+  },
+  "WaterSourceRegulatorAnimationControllerSpec": {
+    "RegulatorTransforms": [
+      {
+        "TransformName": "#Animated#Empty1",
+        "TargetOffset": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "TargetRotation": {
+          "X": 27.58,
+          "Y": -110.109,
+          "Z": -55.66
+        }
+      },
+      {
+        "TransformName": "#Animated#Empty2",
+        "TargetOffset": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "TargetRotation": {
+          "X": 27.58,
+          "Y": -200.1,
+          "Z": -55.66
+        }
+      },
+      {
+        "TransformName": "#Animated#Empty3",
+        "TargetOffset": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "TargetRotation": {
+          "X": 27.58,
+          "Y": 69.901,
+          "Z": -55.66
+        }
+      },
+      {
+        "TransformName": "#Animated#Empty4",
+        "TargetOffset": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "TargetRotation": {
+          "X": 27.58,
+          "Y": -20.099,
+          "Z": -55.66
+        }
+      }
+    ]
+  },
+  "BuildingTerrainCutoutSpec": {
+    "CutoutTiles": [
+      {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      {
+        "X": 0,
+        "Y": 1,
+        "Z": 0
+      },
+      {
+        "X": 0,
+        "Y": 2,
+        "Z": 0
+      },
+      {
+        "X": 1,
+        "Y": 0,
+        "Z": 0
+      },
+      {
+        "X": 1,
+        "Y": 2,
+        "Z": 0
+      },
+      {
+        "X": 2,
+        "Y": 0,
+        "Z": 0
+      },
+      {
+        "X": 2,
+        "Y": 1,
+        "Z": 0
+      },
+      {
+        "X": 2,
+        "Y": 2,
+        "Z": 0
+      }
+    ]
+  },
+  "WaterSourceRegulatorSpec": {},
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "FinishedBlockObjectBelowBlockerSpec": {},
+  "Children": {
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Water/BadwaterDischarge/BadwaterDischarge.IronTeeth.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 1.5,
+              "Y": 0.05,
+              "Z": 1.5
+            },
+            "Size": {
+              "X": 3.0,
+              "Y": 0.1,
+              "Z": 3.0
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase3x3EdgesOnly#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase3x3EdgesOnly/ConstructionBase3x3EdgesOnly.blueprint"
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Water/BadwaterDischarge/BadwaterDischarge.IronTeeth.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 1.5,
+                  "Y": 0.05,
+                  "Z": 1.5
+                },
+                "Size": {
+                  "X": 3.0,
+                  "Y": 0.1,
+                  "Z": 3.0
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    },
+    "#Underground": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Water/BadwaterDischarge/BadwaterDischarge.IronTeeth.Underground"
+      }
+    }
+  }
+}

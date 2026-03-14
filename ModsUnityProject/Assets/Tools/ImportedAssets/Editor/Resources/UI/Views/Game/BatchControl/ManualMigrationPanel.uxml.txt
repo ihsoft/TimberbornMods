@@ -1,0 +1,19 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/BatchControl/BatchControlStyle.uss" />
+    <ui:VisualElement name="ManualMigrationPanel" class="manual-migration-panel">
+        <ui:VisualElement name="ManualMigrationPanelContent" class="manual-migration-panel__content">
+            <ui:VisualElement name="LeftDistrictContent" class="manual-migration-panel__left-district-content">
+                <ui:VisualElement name="HeaderContent" />
+                <ui:VisualElement name="RowsContent" />
+            </ui:VisualElement>
+            <ui:VisualElement name="RightDistrictContent" class="manual-migration-panel__right-district-content">
+                <ui:VisualElement name="HeaderContent" />
+                <ui:VisualElement name="RowsContent" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <cui:LocalizableLabel name="Label" text="Migration.ManualMigration" text-loc-key="Migration.ManualMigration" class="batch-control-tab__rows-header manual-migration-panel__label game-text-heading" />
+    </ui:VisualElement>
+</ui:UXML>

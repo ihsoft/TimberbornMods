@@ -22,12 +22,15 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
   /// <inheritdoc/>
   public void Tick() {
     CurrentTick++;
-    _networkCache.Clear();  // Must be refreshed at the beginning of each tick.
   }
 
   #endregion
 
   #region API
+
+  /// <summary>Tells if the game is currently paused.</summary>
+  /// <remarks>While the game is paused, a lot of logic that is based on the ticks is not being executed.</remarks>
+  public static bool IsGamePaused => Time.timeScale < float.Epsilon;
 
   /// <summary>Gets the current tick number.</summary>
   public int CurrentTick { get; private set; }
@@ -47,26 +50,6 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
   /// <summary>Gets the delayed action that will be executed after the specified number of game minutes.</summary>
   public TickDelayedAction GetTimeDelayedAction(int skipMinutes) {
     return new TickDelayedAction(Mathf.CeilToInt(skipMinutes / FixedDeltaTimeInMinutes), () => CurrentTick);
-  }
-
-  /// <summary>Gets batteries total charge and capacity.</summary>
-  public void GetBatteriesStat(MechanicalGraph graph, out int capacity, out float charge) {
-    var paused = Time.timeScale < float.Epsilon;
-    if (paused) {
-      _networkCache.Clear();
-    }
-    if (!_networkCache.TryGetValue(graph, out var cache)) {
-      cache = new NetworkCache();
-      foreach (var batteryCtrl in graph.BatteryControllers.Where(x => x.Operational)) {
-        cache.BatteriesCapacity += batteryCtrl.Capacity;
-        cache.BatteriesCharge += batteryCtrl.Charge;
-      }
-      if (!paused) {
-        _networkCache[graph] = cache;
-      }
-    }
-    capacity = cache.BatteriesCapacity;
-    charge = cache.BatteriesCharge;
   }
 
   /// <summary>Gets power reservation in the network.</summary>
@@ -107,12 +90,6 @@ public class SmartPowerService : ITickableSingleton, ILateTickable {
   #endregion
 
   #region Implementation
-
-  record struct NetworkCache {
-    public int BatteriesCapacity;
-    public float BatteriesCharge;
-  }
-  readonly Dictionary<MechanicalGraph, NetworkCache> _networkCache = [];
 
   record PowerReservation {
     public MechanicalNode Node;

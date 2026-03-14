@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "PickVisibleLayer",
+    "GroupId": "UI",
+    "LocKey": "KeyBinding.PickVisibleLayer",
+    "Order": 40,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Mouse/middleButton",
+    "InputModifiers": "Alt",
+    "Unchangeable": false
+  }
+}

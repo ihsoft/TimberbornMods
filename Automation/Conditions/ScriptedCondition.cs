@@ -13,7 +13,6 @@ using IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 using IgorZ.Automation.ScriptingEngineUI;
 using IgorZ.TimberDev.UI;
 using IgorZ.TimberDev.Utils;
-using TimberApi.DependencyContainerSystem;
 using Timberborn.Persistence;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine.InputSystem;
@@ -39,7 +38,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
       if (_lastScriptError != null) {
         return CommonFormats.HighlightRed(Behavior.Loc.T(_lastScriptError));
       }
-      var expressionDescriber = DependencyContainer.GetInstance<ExpressionDescriber>();
+      var expressionDescriber = StaticBindings.DependencyContainer.GetInstance<ExpressionDescriber>();
       try {
         var describe = expressionDescriber.DescribeExpression(_parsedExpression);
         return ConditionState ? CommonFormats.HighlightGreen(describe) : CommonFormats.HighlightYellow(describe); 
@@ -84,24 +83,32 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
 
   /// <inheritdoc/>
   protected override void OnBehaviorAssigned() {
-    if (_lastScriptError != null) {
-      Behavior.ReportError(this);
-    }
     ParseAndApply();
+    if (!IsEnabled) {
+      return;
+    }
+    if (_lastScriptError != null) {
+      Behavior.ReportError(this);  // The error can be a runtime error, loaded from the persistent state.
+      return;
+    }
+    _registeredSignals = ScriptingService.Instance.RegisterSignals(_parsedExpression, this);
+    _canRunOnUnfinishedBuildings = _registeredSignals.Select(x => x.OnUnfinished).Aggregate((x, y) => x || y); 
   }
 
   /// <inheritdoc/>
   protected override void OnBehaviorToBeCleared() {
     if (_registeredSignals != null) {
-      var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
-      scriptingService.UnregisterSignals(_registeredSignals, this);
+      ScriptingService.Instance.UnregisterSignals(_registeredSignals, this);
     }
     ResetScriptError();
   }
 
   /// <inheritdoc/>
   public override IAutomationCondition CloneDefinition() {
-    return new ScriptedCondition { Expression = Expression, Precondition = Precondition };
+    var clone = (ScriptedCondition)base.CloneDefinition();
+    clone.Expression = Expression;
+    clone.Precondition = Precondition;
+    return clone;
   }
 
   /// <inheritdoc/>
@@ -136,7 +143,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
 
   /// <summary>Script code for expression to check.</summary>
   /// <remarks>
-  /// It must be a boolean operator. See <see cref="BoolOperator"/> for the list of conditions. Example of a
+  /// It must be a boolean operator. See <see cref="BooleanOperator"/> for the list of conditions. Example of a
   /// condition: "(and (eq (sig Weather.Season) 'DroughtWeather') (gt Floodgate.Height 0.5))".
   /// </remarks>
   // ReSharper disable once MemberCanBePrivate.Global
@@ -144,7 +151,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
 
   /// <summary>Script code for precondition to check.</summary>
   /// <remarks>
-  /// It must be a boolean operator. See <see cref="BoolOperator"/> for the list of conditions. If the condition
+  /// It must be a boolean operator. See <see cref="BooleanOperator"/> for the list of conditions. If the condition
   /// evaluates to "false", then <see cref="Expression"/> cannot be applied to the selected entity. Note that any
   /// parsing errors in the precondition will be silently ignored.
   /// </remarks>
@@ -208,12 +215,12 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   #region Implementation
 
   ParsingResult _parsingResult;
-  BoolOperator _parsedExpression;
+  BooleanOperator _parsedExpression;
   List<SignalOperator> _registeredSignals;
 
-  static BoolOperator ParseAndValidate(
+  static BooleanOperator ParseAndValidate(
       string expression, AutomationBehavior behavior, out ParsingResult parsingResult, bool checkOnly = false) {
-    var parserFactory = DependencyContainer.GetInstance<ParserFactory>();
+    var parserFactory = StaticBindings.DependencyContainer.GetInstance<ParserFactory>();
     var conditionOperator = parserFactory.ParseCondition(
         expression, behavior, out parsingResult, preferredParser: parserFactory.LispSyntaxParser);
     if (parsingResult.LastError != null
@@ -226,19 +233,16 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
 
   void ParseAndApply() {
     if (_parsingResult != default) {
-      throw new InvalidOperationException("ParseAndApply should only be called once.");
+      throw new InvalidOperationException($"{nameof(ParseAndApply)} should only be called once.");
     }
     ResetScriptError();
     _parsedExpression = ParseAndValidate(Expression, Behavior, out _parsingResult);
     if (_parsedExpression == null) {
       _lastScriptError = ParseErrorLocKey;
-      Behavior.ReportError(this);
       return;
     }
     Behavior.IncrementStateVersion();
-    Expression = DependencyContainer.GetInstance<LispSyntaxParser>().Decompile(_parsedExpression);
-    _registeredSignals = DependencyContainer.GetInstance<ScriptingService>().RegisterSignals(_parsedExpression, this);
-    _canRunOnUnfinishedBuildings = _registeredSignals.Select(x => x.OnUnfinished).Aggregate((x, y) => x || y); 
+    Expression = StaticBindings.DependencyContainer.GetInstance<LispSyntaxParser>().Decompile(_parsedExpression);
   }
 
   bool CheckPrecondition(AutomationBehavior behavior) {
@@ -246,7 +250,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
       return true;
     }
     var needLogs = Keyboard.current.ctrlKey.isPressed;
-    var result = DependencyContainer.GetInstance<LispSyntaxParser>().Parse(Precondition, behavior);
+    var result = StaticBindings.DependencyContainer.GetInstance<LispSyntaxParser>().Parse(Precondition, behavior);
     if (result.ParsedExpression == null) {
       if (result.LastScriptError is not ScriptError.BadStateError) {
         HostedDebugLog.Error(behavior, "Failed to parse precondition: {0}\nError: {1}", Precondition, result.LastError);
@@ -255,7 +259,7 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
       }
       return false;
     }
-    if (result.ParsedExpression is not BoolOperator boolOperatorExpr) {
+    if (result.ParsedExpression is not BooleanOperator boolOperatorExpr) {
       HostedDebugLog.Error(behavior, "Precondition is not a boolean operator: {0}", result.ParsedExpression);
       return false;
     }

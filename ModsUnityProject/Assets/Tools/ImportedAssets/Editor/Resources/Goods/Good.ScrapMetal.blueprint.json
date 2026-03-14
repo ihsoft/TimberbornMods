@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "ScrapMetal",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Pileable",
+    "StockpileVisualization": "ScrapMetal",
+    "VisibleContainer": "Scrap",
+    "ContainerColor": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryOnArm",
+    "Weight": 11,
+    "GoodGroupId": "Materials",
+    "GoodOrder": 3000,
+    "Icon": "Sprites/Goods/ScrapMetalIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.ScrapMetal.DisplayName",
+    "PluralDisplayNameLocKey": "Good.ScrapMetal.PluralDisplayName"
+  }
+}

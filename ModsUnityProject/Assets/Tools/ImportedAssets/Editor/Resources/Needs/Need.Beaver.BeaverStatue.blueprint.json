@@ -1,0 +1,20 @@
+{
+  "NeedSpec": {
+    "Id": "BeaverStatue",
+    "BackwardCompatibleIds": [],
+    "Order": 51,
+    "NeedGroupId": "Aesthetics",
+    "CharacterType": "Beaver",
+    "StartingValue": 0.0,
+    "MinimumValue": 0.0,
+    "MaximumValue": 1.0,
+    "DailyDelta": -0.4,
+    "ImportanceMultiplier": 1.0,
+    "Effectiveness": 1.0,
+    "Wastable": true,
+    "HoursWarningThreshold": 0.0,
+    "DisplayNameLocKey": "Building.BeaverStatue.DisplayName",
+    "FavorableWellbeing": 2,
+    "UnfavorableWellbeing": 0
+  }
+}

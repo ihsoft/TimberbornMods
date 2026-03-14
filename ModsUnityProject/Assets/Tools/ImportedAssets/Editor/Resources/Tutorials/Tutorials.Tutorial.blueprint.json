@@ -1,0 +1,12 @@
+{
+  "TutorialSpec": {
+    "Id": "Tutorial",
+    "NameLocKey": "Tutorial.Tutorial",
+    "RequiredTutorialIds": [],
+    "SortOrder": 0,
+    "Stages": [
+      "Tutorial.Introduction"
+    ]
+  },
+  "BlinkingTutorialSpec": {}
+}

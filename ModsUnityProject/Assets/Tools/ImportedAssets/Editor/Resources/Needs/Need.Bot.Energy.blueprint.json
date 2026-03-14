@@ -1,0 +1,37 @@
+{
+  "NeedSpec": {
+    "Id": "Energy",
+    "BackwardCompatibleIds": [],
+    "Order": 10,
+    "NeedGroupId": "BasicNeeds",
+    "CharacterType": "Bot",
+    "StartingValue": 0.5,
+    "MinimumValue": 0.0,
+    "MaximumValue": 1.0,
+    "DailyDelta": -0.58,
+    "ImportanceMultiplier": 1.0,
+    "Effectiveness": 1.0,
+    "Wastable": false,
+    "HoursWarningThreshold": 3.5,
+    "DisplayNameLocKey": "Need.Power.DisplayName",
+    "FavorableWellbeing": 0,
+    "UnfavorableWellbeing": -3
+  },
+  "NeedPreventingWorkSpec": {
+    "WorkRefusalWarningLocKey": "Work.WorkRefusalWarning"
+  },
+  "CriticalNeedSpec": {
+    "CriticalNeedType": "StateWithAlert",
+    "SpriteName": "OutOfEnergy",
+    "DescriptionLocKey": "Status.Need.Power",
+    "DescriptionShortLocKey": "Status.Need.Power.Short"
+  },
+  "PunitiveNeedSpec": {
+    "Penalties": [
+      {
+        "Id": "MovementSpeed",
+        "MultiplierDelta": -0.75
+      }
+    ]
+  }
+}

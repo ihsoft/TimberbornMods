@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "DecreaseUIScale",
+    "GroupId": "Dev",
+    "LocKey": "",
+    "Order": 50,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": true
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/minus",
+    "InputModifiers": "Ctrl",
+    "Unchangeable": false
+  }
+}

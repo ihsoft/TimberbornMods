@@ -1,5 +1,6 @@
 ﻿ID,Text,Comment
 IgorZ.SmartPower.BatteryCapacity,"Charge de batteries : {0} / {1}",
+IgorZ.SmartPower.BatteryCapacityPct,"Charge de batteries : {0} ({1}%)",
 IgorZ.SmartPower.BatteryCharging,"Chargement de batteries : <GreenHighlight>🡅</GreenHighlight>{0} ({1})",
 IgorZ.SmartPower.BatteryDischarging,"Décharge de batteries : <RedHighlight>🡇</RedHighlight>{0} ({1})",
 IgorZ.SmartPower.PowerOutputBalancer.AutomateGenerator,"Automatiser ce générateur",

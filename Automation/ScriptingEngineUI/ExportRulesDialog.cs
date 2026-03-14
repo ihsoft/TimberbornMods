@@ -3,16 +3,14 @@
 // License: Public Domain
 
 using System.Collections.Generic;
-using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
-using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.TimberDev.UI;
 using UnityEngine.UIElements;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
 
-class ExportRulesDialog : AbstractDialog {
+class ExportRulesDialog(TemplatingService templatingService) : AbstractDialog {
 
   const string ExportRulesDialogAsset = "IgorZ.Automation/ExportRules";
 
@@ -44,7 +42,7 @@ class ExportRulesDialog : AbstractDialog {
 
   public override void Show() {
     base.Show();
-    Root.Q<TextField>("ExportTextField").value = _templatingService.RenderRulesToText(_actions);
+    Root.Q<TextField>("ExportTextField").value = templatingService.RenderRulesToText(_actions);
   }
 
   public override void Close() {
@@ -56,15 +54,7 @@ class ExportRulesDialog : AbstractDialog {
 
   #region Implementation
 
-  TemplatingService _templatingService;
   IList<IAutomationAction> _actions;
 
-  /// <summary>Public for the inject to work properly.</summary>
-  [Inject]
-  public void InjectDependencies(TemplatingService templatingService) {
-    _templatingService = templatingService;
-  }
-
   #endregion
-
 }

@@ -1,0 +1,35 @@
+.recoverable-good-tooltip {
+    flex-shrink: 0;
+}
+
+.recoverable-good-tooltip .recoverable-good-content__items {
+    align-items: flex-start;
+    max-width: 280px;
+}
+
+.recoverable-good-content {
+    align-items: center;
+}
+
+.recoverable-good-content--in-box {
+    margin-top: 7px;
+}
+
+.recoverable-good-content--in-box .recoverable-good-item__text {
+    color: white;
+}
+
+.recoverable-good-content__items {
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex-grow: 1;
+    justify-content: center;
+}
+
+.recoverable-good-item {
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    padding: 2px 5px;
+}

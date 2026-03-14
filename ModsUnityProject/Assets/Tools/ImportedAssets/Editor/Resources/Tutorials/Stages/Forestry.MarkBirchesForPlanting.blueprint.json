@@ -1,0 +1,14 @@
+﻿{
+  "TutorialStageSpec": {
+    "Id": "Forestry.MarkBirchesForPlanting",
+    "IntroLocKey": "Tutorial.Forestry.MarkBirchesForPlanting"
+  },
+  "Children": {
+    "Step1": {
+      "MarkPlantablesTutorialStepSpec": {
+        "TemplateName": "Birch",
+        "RequiredAmount": 20
+      }
+    }
+  }
+}

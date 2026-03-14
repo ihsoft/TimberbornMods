@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "Potato",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.698039234,
+      "g": 0.68235296,
+      "b": 0.654902,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Ingredients",
+    "GoodOrder": 8000,
+    "Icon": "Sprites/Goods/PotatoIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.Potato.DisplayName",
+    "PluralDisplayNameLocKey": "Good.Potato.PluralDisplayName"
+  }
+}

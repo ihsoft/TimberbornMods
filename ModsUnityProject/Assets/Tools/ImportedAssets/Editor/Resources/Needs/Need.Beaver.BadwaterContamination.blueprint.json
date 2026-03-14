@@ -1,0 +1,38 @@
+{
+  "NeedSpec": {
+    "Id": "BadwaterContamination",
+    "BackwardCompatibleIds": [],
+    "Order": 90,
+    "NeedGroupId": "BasicNeeds",
+    "CharacterType": "Beaver",
+    "StartingValue": 0.0,
+    "MinimumValue": -1.0,
+    "MaximumValue": 0.0,
+    "DailyDelta": 0.0,
+    "ImportanceMultiplier": 1.0,
+    "Effectiveness": 1.0,
+    "Wastable": true,
+    "HoursWarningThreshold": 0.0,
+    "DisplayNameLocKey": "Need.BadwaterContamination.DisplayName",
+    "FavorableWellbeing": 0,
+    "UnfavorableWellbeing": -10
+  },
+  "NeedPreventingWorkSpec": {
+    "WorkRefusalWarningLocKey": "Work.WorkRefusalWarning"
+  },
+  "CriticalNeedSpec": {
+    "CriticalNeedType": "Alert",
+    "SpriteName": "BadwaterContamination",
+    "DescriptionLocKey": "Status.Need.BadwaterContamination",
+    "DescriptionShortLocKey": "Status.Need.BadwaterContamination.Short"
+  },
+  "PunitiveNeedSpec": {
+    "Penalties": [
+      {
+        "Id": "MovementSpeed",
+        "MultiplierDelta": -0.7
+      }
+    ]
+  },
+  "InactiveHiddenNeedSpec": {}
+}

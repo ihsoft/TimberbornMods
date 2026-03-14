@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "BotChassis",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.0,
+      "g": 0.607843161,
+      "b": 0.607843161,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 11,
+    "GoodGroupId": "Materials",
+    "GoodOrder": 5000,
+    "Icon": "Sprites/Goods/BotChassisIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.BotChassis.DisplayName",
+    "PluralDisplayNameLocKey": "Good.BotChassis.PluralDisplayName"
+  }
+}

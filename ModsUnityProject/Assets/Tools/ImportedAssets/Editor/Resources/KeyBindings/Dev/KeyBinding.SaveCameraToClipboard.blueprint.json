@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "SaveCameraToClipboard",
+    "GroupId": "Dev",
+    "LocKey": "",
+    "Order": 60,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": true
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/m",
+    "InputModifiers": "Ctrl, Shift",
+    "Unchangeable": false
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "KeyBindingSpec": {
+    "Id": "PreviousTool",
+    "GroupId": "UI",
+    "LocKey": "KeyBinding.PreviousTool",
+    "Order": 190,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Mouse/scroll/up",
+    "InputModifiers": "Shift",
+    "Unchangeable": false
+  },
+  "SecondaryInputBindingSpec": {
+    "Path": "/Mouse/scroll/left",
+    "InputModifiers": "Shift",
+    "Unchangeable": false
+  }
+}

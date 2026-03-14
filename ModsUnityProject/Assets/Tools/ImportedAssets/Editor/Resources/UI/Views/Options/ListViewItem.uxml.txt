@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Options/OptionsStyle.uss" />
+    <cui:NineSliceVisualElement name="ListViewItem" focusable="false" class="list-view__item list-view__item-background">
+        <ui:Label name="Text" text="Item name" class="list-view__label list-view__label--padding text--default" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

@@ -14,7 +14,7 @@
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
         <DebugSymbols>true</DebugSymbols>
-        <DebugType>full</DebugType>
+        <DebugType>embedded</DebugType>
         <Optimize>false</Optimize>
         <OutputPath>bin\Debug\</OutputPath>
         <DefineConstants>DEBUG;TRACE</DefineConstants>
@@ -23,7 +23,7 @@
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
-        <DebugType>pdbonly</DebugType>
+        <DebugType>embedded</DebugType>
         <Optimize>true</Optimize>
         <OutputPath>bin\Release\</OutputPath>
         <DefineConstants>TRACE</DefineConstants>
@@ -47,6 +47,7 @@
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />
+      <PackageReference Include="System.Collections.Immutable" Version="9.0.0" />
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Timberborn.*.dll" Publicize="true" />
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Unity*.dll" Publicize="false"/>
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Bindito.*.dll" Publicize="false"/>
@@ -73,6 +74,15 @@
       </Content>
     </ItemGroup>
     <ItemGroup>
+      <Compile Include="..\TimberDev\Settings\BaseSettings.cs">
+        <Link>TimberDev\Settings\BaseSettings.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Settings\DebugSettings.cs">
+        <Link>TimberDev\Settings\DebugSettings.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Settings\DebugSettingsConfigurator.cs">
+        <Link>TimberDev\Settings\DebugSettingsConfigurator.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\UI\CommonFormats.cs">
         <Link>TimberDev\UI\CommonFormats.cs</Link>
       </Compile>
@@ -103,8 +113,11 @@
       <Compile Include="..\TimberDev\Utils\IObjectLoaderExtensions.cs">
         <Link>TimberDev\Utils\IObjectLoaderExtensions.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\Utils\PrefabPatcher.cs">
-        <Link>TimberDev\Utils\PrefabPatcher.cs</Link>
+      <Compile Include="..\TimberDev\Utils\StaticBindings.cs">
+        <Link>TimberDev\Utils\StaticBindings.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\StaticBindingsConfigurator.cs">
+        <Link>TimberDev\Utils\StaticBindingsConfigurator.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\Utils\TickDelayAction.cs">
         <Link>TimberDev\Utils\TickDelayAction.cs</Link>
@@ -133,7 +146,8 @@
     </PropertyGroup>
     <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="Exists('$(ModPath)')">
         <Message Text="### Copying DLL to the game's mods folder... ###" Importance="high"/>
-        <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\version-0.7\Scripts"/>
+        <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\version-1.0\Scripts"/>
+        <Copy SourceFiles="$(TargetDir)$(TargetName).xml" DestinationFolder="$(ModPath)\$(ProjectName)\version-1.0\Scripts"/>
     </Target>
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
       <PropertyGroup>

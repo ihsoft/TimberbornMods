@@ -7,8 +7,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Bindito.Core;
 using IgorZ.Automation.Actions;
+using IgorZ.TimberDev.Utils;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
+using Timberborn.DuplicationSystem;
 using Timberborn.EntitySystem;
 using Timberborn.Localization;
 using Timberborn.Persistence;
@@ -20,7 +22,9 @@ using UnityDev.Utils.LogUtilsLite;
 namespace IgorZ.Automation.AutomationSystem;
 
 /// <summary>The component that keeps all the automation state on the building.</summary>
-public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDeletableEntity {
+public sealed class AutomationBehavior : BaseComponent, IAwakableComponent, IInitializableEntity,
+                                         IFinishedStateListener, IStartableComponent, IPersistentEntity,
+                                         IDeletableEntity, IDuplicable<AutomationBehavior> {
 
   const string AutomationErrorIcon = "IgorZ.Automation/error-icon-script-failed";
   const string AutomationErrorAlertLocKey = "IgorZ.Automation.ShowStatusAction.AutomationErrorAlert";
@@ -84,7 +88,7 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
     HostedDebugLog.Fine(this, "Adding rule: action={0}", action);
     condition.Behavior = this;
     action.Behavior = this;
-    if (BlockObject.IsFinished || condition.CanRunOnUnfinishedBuildings) {
+    if (condition.IsEnabled && (BlockObject.IsFinished || condition.CanRunOnUnfinishedBuildings)) {
       condition.Activate();
     }
     _actions.Add(action);
@@ -128,8 +132,8 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
 
   /// <summary>Removes all automation rules from the block object.</summary>
   public void ClearAllRules() {
-    while (_actions.Count > 0) {
-      DeleteRuleAt(0);
+    for (var i = _actions.Count - 1; i >= 0; i--) {
+      DeleteRuleAt(i);
     }
   }
 
@@ -142,10 +146,11 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
     if (_errorToggle == null) {
       _errorToggle = StatusToggle.CreatePriorityStatusWithAlertAndFloatingIcon(
           AutomationErrorIcon, Loc.T(AutomationErrorDescriptionLocKey), Loc.T(AutomationErrorAlertLocKey));
-      GetComponentFast<StatusSubject>().RegisterStatus(_errorToggle);
+      GetComponent<StatusSubject>().RegisterStatus(_errorToggle);
     }
     _errorToggle.Activate();
     _failingInstances.Add(instance);
+    IncrementStateVersion();
   }
 
   /// <summary>Clears the error status.</summary>
@@ -158,21 +163,56 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
     if (_failingInstances.Count == 0) {
       _errorToggle?.Deactivate();
     }
+    IncrementStateVersion();
   }
 
+  readonly Dictionary<Type, AbstractDynamicComponent> _dynamicComponents = [];
+
   /// <summary>Returns the component or creates it if none exists.</summary>
-  public T GetOrCreate<T>() where T : BaseComponent {
-    return GetComponentFast<T>() ?? BaseInstantiator.AddComponent<T>(GameObjectFast);
+  /// <remarks>
+  /// The newly created components will receive all callbacks that they would receive if were created at the behavior
+  /// creation time. Callbacks sequence: Awake, Start (if enabled), OnEnterFinishedState (if finished),
+  /// InitializeEntity (if initialized).
+  /// </remarks>
+  public T GetOrCreate<T>() where T : AbstractDynamicComponent {
+    if (_dynamicComponents.TryGetValue(typeof(T), out var component)) {
+      return (T)component;
+    }
+    component = StaticBindings.DependencyContainer.GetInstance<T>();
+    _dynamicComponents.Add(typeof(T), component);
+    component.Initialize(this);
+    if (component is IAwakableComponent awakableComponent) {
+      awakableComponent.Awake();
+    }
+    if (component.Enabled && _componentCache.StartIsEnabled) {
+      component.Start();
+    }
+    if (BlockObject.IsFinished && component is IFinishedStateListener finishedStateListener) {
+      finishedStateListener.OnEnterFinishedState();
+    }
+    if (_isInitialized && component is IInitializableEntity initializableEntity) {
+      initializableEntity.InitializeEntity();
+    }
+    return (T)component;
   }
 
   /// <summary>Returns the component or throws an exception if none exists.</summary>
   /// <exception cref="InvalidOperationException">if the requested component not found.</exception>
-  public T GetOrThrow<T>() where T : BaseComponent {
-    var tracker = GetComponentFast<T>();
-    if (!tracker) {
-      throw new InvalidOperationException($"Component {typeof(T).Name} not found");
+  public T GetOrThrow<T>() where T : AbstractDynamicComponent {
+    if (_dynamicComponents.TryGetValue(typeof(T), out var component)) {
+      return (T)component;
     }
-    return tracker;
+    throw new InvalidOperationException($"Component {typeof(T).Name} not found");
+  }
+
+  /// <summary>Verifies if the dynamic component exists and returns it.</summary>
+  public bool TryGetDynamicComponent<T>(out T component) where T : AbstractDynamicComponent {
+    if (_dynamicComponents.TryGetValue(typeof(T), out var abstractComponent)) {
+      component = (T)abstractComponent;
+      return true;
+    }
+    component = null;
+    return false;
   }
 
   #endregion
@@ -211,12 +251,88 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
 
   /// <inheritdoc/>
   public void DeleteEntity() {
+    foreach (var component in GetDynamicComponentsOf<IDeletableEntity>()) {
+      component.DeleteEntity();
+    }
     ClearAllRules();
   }
 
   #endregion
 
+  #region IAwakableComponent implementation
+  
+  /// <inheritdoc/>
+  public void Awake() {
+    BlockObject = GetComponent<BlockObject>();
+  }
+
+  #endregion
+
+  #region IInitializableEntity implementation
+
+  /// <inheritdoc/>
+  public void InitializeEntity() {
+    _isInitialized = true;
+    foreach (var component in GetDynamicComponentsOf<IInitializableEntity>()) {
+      component.InitializeEntity();
+    }
+  }
+  
+  #endregion
+
+  #region IFinishedStateListener implementation
+
+  /// <inheritdoc/>
+  public void OnEnterFinishedState() {
+    foreach (var listener in GetDynamicComponentsOf<IFinishedStateListener>()) {
+      listener.OnEnterFinishedState();
+    }
+  }
+
+  /// <inheritdoc/>
+  public void OnExitFinishedState() {
+    foreach (var listener in GetDynamicComponentsOf<IFinishedStateListener>()) {
+      listener.OnExitFinishedState();
+    }
+  }
+
+  #endregion
+
+  #region IStartableComponent implementation
+
+  /// <inheritdoc/>
+  public void Start() {
+    foreach (var component in _dynamicComponents.Values) {
+      component.Start();
+    }
+  }
+
+  #endregion
+
+  #region IDuplicable implementation
+
+  /// <inheritdoc/>
+  public bool IsDuplicable => HasActions;
+
+  /// <inheritdoc/>
+  public void DuplicateFrom(AutomationBehavior source) {
+    if (source.Actions.Count == 0 || Name != source.Name) {
+      return;
+    }
+    AutomationService.Instance.ScheduleLateUpdateOnce("duplication", () => {
+      HostedDebugLog.Info(this, "Duplicating {0} rules from {1}", source.Actions.Count, source);
+      ClearAllRules();
+      foreach (var action in source.Actions) {
+        AddRule(action.Condition.CloneDefinition(), action.CloneDefinition());
+      }
+    });
+  }
+
+  #endregion
+
   #region Implementation
+
+  bool _isInitialized;
 
   /// <summary>Injects the dependencies. It has to be public to work.</summary>
   [Inject]
@@ -224,8 +340,11 @@ public sealed class AutomationBehavior : BaseComponent, IPersistentEntity, IDele
     AutomationService = automationService;
   }
 
-  void Awake() {
-    BlockObject = GetComponentFast<BlockObject>();
+  IEnumerable<T> GetDynamicComponentsOf<T>() {
+    return _dynamicComponents
+        .Where(x => typeof(T).IsAssignableFrom(x.Key))
+        .Select(x => x.Value)
+        .Cast<T>();
   }
 
   /// <summary>Removes all rules that depend on condition and/or action that is marked for cleanup.</summary>

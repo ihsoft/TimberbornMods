@@ -1,0 +1,14 @@
+{
+  "SoilMoistureSimulatorSpec": {
+    "MinimumWaterContamination": 0.01,
+    "MaximumWaterContamination": 0.53,
+    "MoistureDecayRate": 1.25,
+    "MoistureSpreadingRate": 6.66,
+    "VerticalSpreadCostMultiplier": 6,
+    "MaxClusterSaturation": 8,
+    "QuadraticEvaporationCoefficient": 0.0595,
+    "LinearQuadraticCoefficient": 0.101,
+    "ConstantQuadraticCoefficient": 0.72,
+    "MaxEvaporationSaturation": 10
+  }
+}

@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <cui:NineSliceVisualElement name="ManufactoryInventoryFragment" class="bg-sub-box--green entity-sub-panel">
+        <ui:ScrollView name="Content" class="game-scroll-view inventory-fragment__rows" />
+        <cui:LocalizableLabel name="IsEmpty" text-loc-key="Inventory.IsEmpty" class="entity-panel__text text--centered" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

@@ -1,0 +1,8 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MapEditor/MapEditorStyle.uss" />
+    <cui:NineSliceVisualElement name="BlockObjectPlacementRandomizingPanel" class="tool-panel-item--map-editor bg-box--green block-object-placement-randomizing-panel">
+        <cui:LocalizableToggle text="Randomize placement" name="RandomizeToggle" text-loc-key="MapEditor.BlockObjectRandomizePlacement" class="game-toggle game-text-normal" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

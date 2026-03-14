@@ -1,0 +1,14 @@
+{
+  "CustomToolSpec": {
+    "Id": "CustomTools-PathPlusTool",
+    "GroupId": "CustomToolsToolGroup",
+    "Order": 32,
+    "Type": "IgorZ.CustomTools.Tools.FourTemplatesBlockObjectTool",
+    "Icon": "Sprites/BottomBar/IgorZ.CustomTools/tool-path-plus",
+    "DisplayNameLocKey": "IgorZ.CustomTools.PathPlusTool.Title",
+    "DescriptionLocKey": "Building.Path.Description"
+  },
+  "FourTemplatesToolSpec": {
+    "NoModifierTemplate": "Path"
+  }
+}

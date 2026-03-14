@@ -1,0 +1,16 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="Box" src="/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonMiscStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Options/OptionsStyle.uss" />
+    <ui:Instance template="Box" class="save-box">
+        <ui:AttributeOverrides element-name="Header" text-loc-key="Saving.SaveGamePanelHeader" />
+        <ui:VisualElement class="save-box__buttons">
+            <cui:NineSliceTextField name="SaveName" class="save-box__input text-field" />
+            <cui:LocalizableButton name="SaveButton" text="Save" text-loc-key="Core.Save" focusable="false" class="menu-button menu-button--medium" />
+        </ui:VisualElement>
+        <ui:ListView name="ItemList" class="panel-list-view text--default scroll--green-decorated" />
+        <cui:LocalizableButton name="BrowseDirectoryButton" text="Browse directory ►" text-loc-key="Core.BrowseFolder" focusable="false" class="open-dir__button text--default text--bold" />
+    </ui:Instance>
+</ui:UXML>

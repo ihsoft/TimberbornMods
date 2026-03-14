@@ -9,6 +9,7 @@ using IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 using IgorZ.Automation.ScriptingEngineUI;
 using TestParser.Stubs;
 using TestParser.Stubs.Game;
+using TestParser.Stubs.Patches;
 
 namespace TestParser;
 
@@ -48,15 +49,6 @@ public class Application {
       "concat(Signals.Var1, '-test-', 1+2+3) == '0-test-6'",
 
       // Get property operator.
-      "getstr('Foobar.str') == 'test'",
-      "getnum('Foobar.numInt') == 123",
-      "getnum('Foobar.numFloat') == 123.33",
-      "getnum('Foobar.strList') == 2",
-      "getstr('Foobar.strList', 1) == 'two'",
-      "getstr('Foobar.strList', Signals.Var1 + 1) == 'two'",
-      "getnum('Foobar.numList', 1) == 2",
-      "getnum('Foobar.boolFalse') == 0",
-      "getnum('Foobar.boolTrue') == 1",
       "getvalue('Foobar.str') == 'test'",
       "getvalue('Foobar.numInt') == 123",
       "getvalue('Foobar.numFloat') == 123.33",
@@ -114,6 +106,9 @@ public class Application {
       "round(4/3) == 1",
       "round(2/3) == 1",
       "round(5/3) == 2",
+
+      // Actions
+      "Debug.Log('foo={0}, bar={1}', 1, 'test')",
   ];
 
   readonly List<string> _badScriptSamples = [
@@ -260,7 +255,7 @@ public class Application {
   }
 
   bool TryBooleanOperator(IExpression expr, List<string> reports) {
-    if (expr is not BoolOperator boolOperator) {
+    if (expr is not BooleanOperator boolOperator) {
       return true;
     }
     var res = true;
@@ -287,15 +282,20 @@ public class Application {
     _container = Bindito.Core.Bindito.CreateContainer(configurators);
 
     var scriptingService = _container.GetInstance<ScriptingService>();
+    scriptingService.RegisterScriptable(_container.GetInstance<DebugScriptableComponent>());
     scriptingService.RegisterScriptable(_container.GetInstance<SignalsScriptableComponent>());
     scriptingService.RegisterScriptable(_container.GetInstance<FoobarScriptingComponent>());
   }
 
   class ComponentsConfigurator : IConfigurator {
     public void Configure(IContainerDefinition containerDefinition) {
+      containerDefinition.Bind<SignalDispatcher>().AsTransient();
+      containerDefinition.Bind<ReferenceManager>().AsTransient();
+
+      containerDefinition.Bind<AutomationService>().AsSingleton();
       containerDefinition.Bind<ExpressionDescriber>().AsSingleton();
-      containerDefinition.Bind<SignalDispatcher>().AsSingleton();
       containerDefinition.Bind<ScriptingService>().AsSingleton();
+      containerDefinition.Bind<DebugScriptableComponent>().AsSingleton();
       containerDefinition.Bind<SignalsScriptableComponent>().AsSingleton();
       containerDefinition.Bind<FoobarScriptingComponent>().AsSingleton();
     }

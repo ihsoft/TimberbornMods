@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "ToggleBatchControlBox",
+    "GroupId": "SettlementPanel",
+    "LocKey": "KeyBinding.ToggleBatchControlBox",
+    "Order": 0,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/g",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

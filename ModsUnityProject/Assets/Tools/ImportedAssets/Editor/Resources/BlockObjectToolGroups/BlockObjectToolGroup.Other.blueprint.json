@@ -1,0 +1,9 @@
+{
+  "BlockObjectToolGroupSpec": {
+    "Id": "Other",
+    "Order": 180,
+    "NameLocKey": "ToolGroups.Other",
+    "Icon": "Sprites/BottomBar/BuildingGroups/Other",
+    "FallbackGroup": true
+  }
+}

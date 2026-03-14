@@ -1,0 +1,54 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="Thumbnail" src="/Assets/Resources/UI/Views/Common/Thumbnail.uxml" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <ui:VisualElement name="MapSelection">
+        <cui:NineSliceVisualElement name="MapTypeButtonsWrapper" class="map-selection__map-type-buttons-wrapper">
+            <cui:NineSliceButton name="OfficialMapsButton" class="map-selection__map-type-button">
+                <cui:LocalizableLabel name="OfficialMapsLabel" text-loc-key="MapSelection.OfficialMaps" class="text--default text--bold map-selection__map-type-button-label" />
+            </cui:NineSliceButton>
+            <cui:NineSliceButton name="CustomMapsButton" class="map-selection__map-type-button map-selection__map-type-button--flipped">
+                <cui:LocalizableLabel name="CustomMapsLabel" text-loc-key="MapSelection.CustomMaps" class="text--default text--bold map-selection__map-type-button-label map-selection__map-type-button--flipped" />
+            </cui:NineSliceButton>
+        </cui:NineSliceVisualElement>
+        <ui:VisualElement name="Content" class="content-row-centered">
+            <ui:VisualElement name="MapListWrapper" class="map-selection__list-wrapper">
+                <cui:LocalizableLabel name="EmptyText" text="Nothing here" text-loc-key="Core.EmptyList" class="text--default map-selection__empty-text" />
+                <ui:ListView name="MapList" class="list-view scroll--green-decorated map-selection__list" />
+                <ui:VisualElement name="MapListButtons" class="map-selection__list-buttons">
+                    <cui:NineSliceButton name="DownloadButton" class="wide-menu-button">
+                        <ui:Image name="DownloadIcon" class="map-item__icon map-selection__download-icon" />
+                        <cui:LocalizableLabel name="DownloadMapsLabel" text-loc-key="MapSelection.DownloadMaps" class="map-selection__wide-button-label" />
+                    </cui:NineSliceButton>
+                    <cui:NineSliceButton name="BrowseButton" class="wide-menu-button">
+                        <ui:Image name="BrowseIcon" class="map-item__icon map-selection__browse-icon" />
+                        <cui:LocalizableLabel name="BrowseMapsLabel" text-loc-key="MapSelection.BrowseMaps" class="map-selection__wide-button-label" />
+                    </cui:NineSliceButton>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="SelectedMap" picking-mode="Ignore" class="map-selection__selected-map">
+                <ui:Label name="MapName" class="map-selection__map-name" />
+                <ui:VisualElement name="MapThumbnailAndFlexibleStartInfo">
+                    <ui:Instance template="Thumbnail" class="map-selection__thumbnail" />
+                    <ui:VisualElement name="FlexibleStart" class="map-selection__flexible-start">
+                        <ui:VisualElement name="FlexibleStartIcon" class="map-item__icon flexible-start-icon" />
+                        <cui:LocalizableLabel name="FlexibleStartLabel" text-loc-key="FlexibleStart.Unlocked" class="map-selection__flexible-start-text text--default" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <cui:NineSliceVisualElement name="DescriptionBackground" class="map-selection__description-background">
+                    <ui:ScrollView name="Description" vertical-scroller-visibility="Auto" class="map-selection__description list-view scroll--green-decorated">
+                        <ui:VisualElement name="RecommendedMap" class="map-selection__recommended-map">
+                            <ui:VisualElement name="RecommendedMapIcon" class="map-item__icon map-item__icon--recommended" />
+                            <cui:LocalizableLabel name="RecommendedMapLabel" text="Beginner friendly" text-loc-key="MapSelection.Recommended" class="text--default" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="UnconventionalMap" class="map-selection__unconventional-map">
+                            <ui:VisualElement name="UnconventionalMapIcon" class="map-item__icon map-item__icon--unconventional" />
+                            <cui:LocalizableLabel name="UnconventionalMapLabel" text="Unconventional" text-loc-key="MapSelection.Unconventional" class="text--default" />
+                        </ui:VisualElement>
+                        <ui:Label name="DescriptionText" class="text--default map-item__text" />
+                    </ui:ScrollView>
+                </cui:NineSliceVisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

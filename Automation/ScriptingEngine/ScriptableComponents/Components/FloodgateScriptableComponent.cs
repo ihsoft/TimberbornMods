@@ -26,7 +26,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override string[] GetSignalNamesForBuilding(AutomationBehavior behavior) {
-    return behavior.GetComponentFast<Floodgate>() ? [HeightSignalName] : [];
+    return behavior.GetComponent<Floodgate>() ? [HeightSignalName] : [];
   }
 
   /// <inheritdoc/>
@@ -41,16 +41,16 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   /// <inheritdoc/>
   public override SignalDef GetSignalDefinition(string name, AutomationBehavior behavior) {
     var floodgate = GetFloodgate(behavior);
-    var key = name + "-" + floodgate.MaxHeight;
     return name switch {
-        HeightSignalName => LookupSignalDef(key, () => MakeHeightSignalDef(floodgate)),
+        HeightSignalName => _signalDefsCache.GetOrAdd(name, floodgate.MaxHeight, MakeHeightSignalDef),
         _ => throw new UnknownSignalException(name),
     };
   }
+  readonly ObjectsCache<SignalDef> _signalDefsCache = new();
 
   /// <inheritdoc/>
   public override string[] GetActionNamesForBuilding(AutomationBehavior behavior) {
-    return behavior.GetComponentFast<Floodgate>() ? [SetHeightActionName] : [];
+    return behavior.GetComponent<Floodgate>() ? [SetHeightActionName] : [];
   }
 
   /// <inheritdoc/>
@@ -65,12 +65,12 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   /// <inheritdoc/>
   public override ActionDef GetActionDefinition(string name, AutomationBehavior behavior) {
     var floodgate = GetFloodgate(behavior);
-    var key = name + "-" + floodgate.MaxHeight;
     return name switch {
-        SetHeightActionName => LookupActionDef(key, () => MakeSetActionDef(floodgate)),
+        SetHeightActionName => _actionDefsCache.GetOrAdd(name, floodgate.MaxHeight, MakeSetActionDef),
         _ => throw new UnknownActionException(name),
     };
   }
+  readonly ObjectsCache<ActionDef> _actionDefsCache = new();
 
   /// <inheritdoc/>
   public override void RegisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
@@ -86,15 +86,14 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
   #region Signals
 
-  SignalDef MakeHeightSignalDef(Floodgate floodgate) {
+  SignalDef MakeHeightSignalDef(string signalName, int maxHeight) {
     return new SignalDef {
         ScriptName = HeightSignalName,
         DisplayName = Loc.T(HeightSignalLocKey),
         Result = new ValueDef {
             ValueType = ScriptValue.TypeEnum.Number,
-            ValueFormatter = x => x.AsFloat.ToString("0.00"),
-            ValueValidator = ValueDef.RangeCheckValidatorFloat(0f, floodgate.MaxHeight),
-            ValueUiHint = GetArgumentMaxValueHint((float)floodgate.MaxHeight),
+            DisplayNumericFormat = ValueDef.NumericFormatEnum.Float,
+            DisplayNumericFormatRange = (0, maxHeight),
         },
     };
   }
@@ -107,16 +106,16 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
   #region Actions
 
-  ActionDef MakeSetActionDef(Floodgate floodgate) {
+  ActionDef MakeSetActionDef(string actionName, int maxHeight) {
     return new ActionDef {
         ScriptName = SetHeightActionName,
         DisplayName = Loc.T(SetHeightActionLocKey),
         Arguments = [
             new ValueDef {
                 ValueType = ScriptValue.TypeEnum.Number,
-                ValueFormatter = x => x.AsFloat.ToString("0.00"),
-                ValueValidator = ValueDef.RangeCheckValidatorFloat(0, floodgate.MaxHeight),
-                ValueUiHint = GetArgumentMaxValueHint((float)floodgate.MaxHeight),
+                DisplayNumericFormat = ValueDef.NumericFormatEnum.Float,
+                DisplayNumericFormatRange = (0, maxHeight),
+                RuntimeValueValidator = ValueDef.RangeCheckValidator(min: 0, max: maxHeight),
             },
         ],
     };
@@ -135,7 +134,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   #region Implementation
 
   static Floodgate GetFloodgate(AutomationBehavior behavior) {
-    var floodgate = behavior.GetComponentFast<Floodgate>();
+    var floodgate = behavior.GetComponent<Floodgate>();
     if (!floodgate) {
       throw new ScriptError.BadStateError(behavior, "Floodgate component not found");
     }
@@ -150,8 +149,10 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
     Floodgate _floodgate;
     int _currentValue;
 
-    void Start() {
-      _floodgate = GetComponentFast<Floodgate>();
+    /// <inheritdoc/>
+    public override void Start() {
+      base.Start();
+      _floodgate = AutomationBehavior.GetComponent<Floodgate>();
       _currentValue = Mathf.RoundToInt(_floodgate.Height * 100f);
     }
 

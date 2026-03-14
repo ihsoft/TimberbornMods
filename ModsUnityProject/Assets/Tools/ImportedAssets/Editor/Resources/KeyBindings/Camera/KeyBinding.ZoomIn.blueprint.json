@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "ZoomIn",
+    "GroupId": "Camera",
+    "LocKey": "KeyBinding.ZoomIn",
+    "Order": 90,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/pageDown",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

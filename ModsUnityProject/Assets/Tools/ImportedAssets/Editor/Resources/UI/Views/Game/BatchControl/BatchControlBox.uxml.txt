@@ -1,0 +1,24 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+    <ui:VisualElement class="batch-control-box">
+        <Style src="/Assets/Resources/UI/Views/Game/BatchControl/BatchControlStyle.uss" />
+        <Style src="/Assets/Resources/UI/Views/Game/Population/PopulationStyle.uss" />
+        <ui:VisualElement name="Content" class="batch-control-box__content" />
+        <ui:VisualElement name="MiddleRow" class="batch-control-box__middle-row">
+            <ui:Label name="Header" text="Header" class="game-text-title" />
+            <Timberborn.DropdownSystem.Dropdown name="DistrictDropdown" buttons-only-selection="true" class="batch-control-district-dropdown batch-control-box__district-dropdown" />
+        </ui:VisualElement>
+        <ui:VisualElement name="TopRow" class="batch-control-box__top-row">
+            <cui:NineSliceButton name="SettlementButton" class="batch-control-box__settlement-button">
+                <ui:VisualElement name="SettlementIcon" class="batch-control-box__settlement-icon" />
+            </cui:NineSliceButton>
+            <ui:VisualElement name="TabButtons" class="batch-control-box__tabs" />
+            <ui:Button name="CancelButton" class="close-button batch-control-box__close-button" />
+        </ui:VisualElement>
+        <cui:NineSliceVisualElement name="MiddleBorder" class="batch-control-box__border--middle" />
+        <cui:NineSliceVisualElement name="RightBorder" class="batch-control-box__border--right" />
+    </ui:VisualElement>
+</ui:UXML>

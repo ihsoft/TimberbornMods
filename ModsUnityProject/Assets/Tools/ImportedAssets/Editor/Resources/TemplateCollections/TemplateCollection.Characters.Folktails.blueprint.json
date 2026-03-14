@@ -1,0 +1,10 @@
+{
+  "TemplateCollectionSpec": {
+    "CollectionId": "Characters.Folktails",
+    "Blueprints": [
+      "Characters/Beaver/BeaverAdult.blueprint",
+      "Characters/Beaver/BeaverChild.blueprint",
+      "Characters/Bot/Bot.Folktails.blueprint"
+    ]
+  }
+}

@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using IgorZ.Automation.ScriptingEngine.Expressions;
@@ -48,17 +49,17 @@ class ConditionConstructor : BaseConstructor {
   #region Implementation
 
   static readonly DropdownItem<string>[] StringOperators = [
-      new() { Value = LispSyntaxParser.ComparisonOperators[BinaryOperator.OpType.Equal], Text = "=" },
-      new() { Value = LispSyntaxParser.ComparisonOperators[BinaryOperator.OpType.NotEqual], Text = "\u2260" },
+      new() { Value = LispSyntaxParser.ComparisonOperators[ComparisonOperator.OpType.Equal], Text = "=" },
+      new() { Value = LispSyntaxParser.ComparisonOperators[ComparisonOperator.OpType.NotEqual], Text = "\u2260" },
   ];
 
   static readonly DropdownItem<string>[] NumberOperators = [
-      new() { Value = LispSyntaxParser.ComparisonOperators[BinaryOperator.OpType.Equal], Text = "=" },
-      new() { Value = LispSyntaxParser.ComparisonOperators[BinaryOperator.OpType.NotEqual], Text = "\u2260" },
-      new() { Value = LispSyntaxParser.ComparisonOperators[BinaryOperator.OpType.GreaterThan], Text = ">" },
-      new() { Value = LispSyntaxParser.ComparisonOperators[BinaryOperator.OpType.LessThan], Text = "<" },
-      new() { Value = LispSyntaxParser.ComparisonOperators[BinaryOperator.OpType.GreaterThanOrEqual], Text = "\u2265" },
-      new() { Value = LispSyntaxParser.ComparisonOperators[BinaryOperator.OpType.LessThanOrEqual], Text = "\u2264" },
+      new() { Value = LispSyntaxParser.ComparisonOperators[ComparisonOperator.OpType.Equal], Text = "=" },
+      new() { Value = LispSyntaxParser.ComparisonOperators[ComparisonOperator.OpType.NotEqual], Text = "\u2260" },
+      new() { Value = LispSyntaxParser.ComparisonOperators[ComparisonOperator.OpType.GreaterThan], Text = ">" },
+      new() { Value = LispSyntaxParser.ComparisonOperators[ComparisonOperator.OpType.LessThan], Text = "<" },
+      new() { Value = LispSyntaxParser.ComparisonOperators[ComparisonOperator.OpType.GreaterThanOrEqual], Text = "\u2265" },
+      new() { Value = LispSyntaxParser.ComparisonOperators[ComparisonOperator.OpType.LessThanOrEqual], Text = "\u2264" },
   ];
 
   ConditionDefinition _selectedDefinition;
@@ -83,8 +84,11 @@ class ConditionConstructor : BaseConstructor {
       OperatorSelector.ToggleDisplayStyle(false);
       ValueSelector.Root.ToggleDisplayStyle(false);
     }
-    OperatorSelector.Items =
-        _selectedDefinition.Argument.ValueType == ScriptValue.TypeEnum.String ? StringOperators : NumberOperators;
+    OperatorSelector.Items = _selectedDefinition.Argument.ValueType switch {
+        ScriptValue.TypeEnum.String => StringOperators,
+        ScriptValue.TypeEnum.Number => NumberOperators,
+        ScriptValue.TypeEnum.Unset => throw new InvalidOperationException("Value type must be set"),
+    };
     OperatorSelector.ToggleDisplayStyle(true);
     ValueSelector.SetDefinition(_selectedDefinition.Argument);
     ValueSelector.Root.ToggleDisplayStyle(true);

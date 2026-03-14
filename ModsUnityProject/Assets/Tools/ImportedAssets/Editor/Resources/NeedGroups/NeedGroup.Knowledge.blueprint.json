@@ -1,0 +1,7 @@
+{
+  "NeedGroupSpec": {
+    "Id": "Knowledge",
+    "Order": 70,
+    "DisplayNameLocKey": "NeedGroup.Knowledge.DisplayName"
+  }
+}

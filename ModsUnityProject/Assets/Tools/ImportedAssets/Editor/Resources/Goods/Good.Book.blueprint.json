@@ -1,0 +1,30 @@
+{
+  "GoodSpec": {
+    "Id": "Book",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [
+      {
+        "NeedId": "Books",
+        "Points": 0.4
+      }
+    ],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.2627451,
+      "g": 0.31764707,
+      "b": 0.8235294,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Materials",
+    "GoodOrder": 1040,
+    "Icon": "Sprites/Goods/BookIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.Book.DisplayName",
+    "PluralDisplayNameLocKey": "Good.Book.PluralDisplayName"
+  }
+}

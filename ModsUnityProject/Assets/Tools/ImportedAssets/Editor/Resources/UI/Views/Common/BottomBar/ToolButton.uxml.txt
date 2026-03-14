@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/BottomBar/BottomBarStyle.uss" />
+    <ui:Button name="ToolButton" class="bottom-bar-button bottom-bar-button--clickable">
+        <ui:VisualElement name="Background" class="bottom-bar-button__background">
+            <ui:VisualElement name="ToolImage" class="bottom-bar-button__icon">
+                <ui:VisualElement name="LockIcon" class="bottom-bar-button__inner-item bottom-bar-button__lock-icon" />
+            </ui:VisualElement>
+            <ui:VisualElement name="Frame" picking-mode="Ignore" class="bottom-bar-button__inner-item bottom-bar-button__frame" />
+        </ui:VisualElement>
+    </ui:Button>
+</ui:UXML>

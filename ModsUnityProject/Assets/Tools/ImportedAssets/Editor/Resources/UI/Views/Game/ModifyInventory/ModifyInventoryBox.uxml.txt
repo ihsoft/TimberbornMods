@@ -1,0 +1,20 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <cui:NineSliceVisualElement class="sliced-border modify-inventory-box">
+        <Style src="/Assets/Resources/UI/Views/Game/ModifyInventory/ModifyInventoryStyle.uss" />
+        <ui:ScrollView name="InventoryWrapper" class="game-scroll-view modify-inventory-box__stock">
+            <ui:Label text="Inventory" name="Inventory" class="game-text-normal" />
+        </ui:ScrollView>
+        <ui:VisualElement name="Content">
+            <ui:VisualElement class="modify-inventory-box__items">
+                <ui:Label text="Amount:" class="game-text-normal" />
+                <cui:NineSliceTextField name="Amount" text="10" class="modify-inventory-box__amount text-field" />
+            </ui:VisualElement>
+            <ui:Label text="click - add, hold ctrl to remove, hold shift to multiply the amount by 10" class="game-text-small" />
+            <ui:VisualElement name="Buttons" class="modify-inventory-box__items" />
+            <ui:Label name="Warning" class="game-text-normal modify-inventory-box__warning" />
+        </ui:VisualElement>
+        <ui:Button name="CancelButton" class="close-button" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

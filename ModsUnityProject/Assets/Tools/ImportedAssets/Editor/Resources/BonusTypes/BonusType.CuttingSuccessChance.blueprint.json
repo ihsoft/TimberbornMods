@@ -1,0 +1,9 @@
+{
+  "BonusTypeSpec": {
+    "Id": "CuttingSuccessChance",
+    "MinimumValue": 0.01,
+    "MaximumValue": 1.0,
+    "Icon": "",
+    "LocKey": "Bonus.CuttingSuccessChance"
+  }
+}

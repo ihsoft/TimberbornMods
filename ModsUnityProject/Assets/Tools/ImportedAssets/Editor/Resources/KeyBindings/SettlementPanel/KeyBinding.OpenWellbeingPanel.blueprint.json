@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "OpenWellbeingBox",
+    "GroupId": "SettlementPanel",
+    "LocKey": "KeyBinding.OpenWellbeingPanel",
+    "Order": 90,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/f9",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

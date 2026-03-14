@@ -14,7 +14,7 @@
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
         <DebugSymbols>true</DebugSymbols>
-        <DebugType>full</DebugType>
+        <DebugType>embedded</DebugType>
         <Optimize>false</Optimize>
         <OutputPath>bin\Debug\</OutputPath>
         <DefineConstants>DEBUG;TRACE</DefineConstants>
@@ -23,7 +23,7 @@
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
-        <DebugType>pdbonly</DebugType>
+        <DebugType>embedded</DebugType>
         <Optimize>true</Optimize>
         <OutputPath>bin\Release\</OutputPath>
         <DefineConstants>TRACE</DefineConstants>
@@ -55,6 +55,7 @@
       <PackageReference Include="protobuf-net.Core" Version="3.0.0" />
       <PackageReference Include="System.Collections.Immutable" Version="9.0.0" />
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Timberborn.*.dll" Publicize="true" />
+      <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Timberborn.BlueprintSystem.dll" Publicize="false" />
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Unity*.dll" Publicize="false"/>
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Bindito.*.dll" Publicize="false"/>
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\UnityEngine.UIElementsModule.dll" Publicize="true"/>
@@ -98,9 +99,6 @@
       <Compile Include="..\TimberDev\UI\UiFactory.cs">
         <Link>TimberDev\UI\UiFactory.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\Utils\Configurator.cs">
-        <Link>TimberDev\Utils\Configurator.cs</Link>
-      </Compile>
       <Compile Include="..\TimberDev\Utils\HarmonyPatcher.cs">
         <Link>TimberDev\Utils\HarmonyPatcher.cs</Link>
       </Compile>
@@ -116,6 +114,9 @@
       <Compile Include="..\TimberDev\Utils\StaticBindings.cs">
         <Link>TimberDev\Utils\StaticBindings.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\Utils\StaticBindingsConfigurator.cs">
+        <Link>TimberDev\Utils\StaticBindingsConfigurator.cs</Link>
+      </Compile>
       <Compile Include="..\UnityDevLite\DebugEx.cs">
         <Link>UnityDevLite\DebugEx.cs</Link>
       </Compile>
@@ -125,11 +126,10 @@
     </ItemGroup>
     <PropertyGroup>
         <ModPath>u:\Mods</ModPath>
-        <ModScriptPath>$(ModPath)$(ProjectName)\version-0.7.10.9\Scripts</ModScriptPath>
     </PropertyGroup>
     <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="Exists('$(ModPath)')">
         <Message Text="### Copying mod's DLL to the game's mods folder: $(ModScriptPath) ###" Importance="high"/>
-        <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\version-0.7.10.9\Scripts"/>
+        <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\version-1.0\Scripts"/>
     </Target>
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
       <PropertyGroup>

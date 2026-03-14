@@ -1,0 +1,387 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "Default",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "MetalBlock",
+        "Amount": 30
+      }
+    ],
+    "ScienceCost": 1000,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": true,
+    "DrawRangeBoundsOnIt": true
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "#FinishedUncovered",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "TemplateSpec": {
+    "TemplateName": "MetalPlatform3x3.IronTeeth",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 3,
+      "Y": 3,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Top, Corners",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "BlockObjectNavMeshSettingsSpec": {
+    "NoAutoWalls": false,
+    "GenerateFloorsOnStackable": true,
+    "EdgeGroups": [],
+    "UnblockedCoordinates": []
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Paths",
+    "ToolOrder": 80,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.MetalPlatform3x3.DisplayName",
+    "DescriptionLocKey": "Building.MetalPlatform3x3.Description",
+    "FlavorDescriptionLocKey": "Building.MetalPlatform.FlavorDescription",
+    "Icon": "Buildings/Paths/MetalPlatform3x3/MetalPlatform3x3Icon"
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "Children": {
+    "#FinishedUncovered": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Paths/MetalPlatform3x3/MetalPlatform.Uncovered.IronTeeth.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 1.11,
+              "Y": 0.4,
+              "Z": 1.11
+            },
+            "Size": {
+              "X": 0.2,
+              "Y": 0.9,
+              "Z": 0.2
+            }
+          },
+          {
+            "Center": {
+              "X": 1.89,
+              "Y": 0.4,
+              "Z": 1.11
+            },
+            "Size": {
+              "X": 0.2,
+              "Y": 0.9,
+              "Z": 0.2
+            }
+          },
+          {
+            "Center": {
+              "X": 1.89,
+              "Y": 0.4,
+              "Z": 1.89
+            },
+            "Size": {
+              "X": 0.2,
+              "Y": 0.9,
+              "Z": 0.2
+            }
+          },
+          {
+            "Center": {
+              "X": 1.11,
+              "Y": 0.4,
+              "Z": 1.89
+            },
+            "Size": {
+              "X": 0.2,
+              "Y": 0.9,
+              "Z": 0.2
+            }
+          },
+          {
+            "Center": {
+              "X": 1.5,
+              "Y": 0.9257401,
+              "Z": 1.5
+            },
+            "Size": {
+              "X": 0.98,
+              "Y": 0.170637429,
+              "Z": 0.98
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Paths/MetalPlatform3x3/MetalPlatform3x3.Full.IronTeeth.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 1.5,
+              "Y": 0.5,
+              "Z": 1.5
+            },
+            "Size": {
+              "X": 0.700000048,
+              "Y": 1.0,
+              "Z": 0.700000048
+            }
+          },
+          {
+            "Center": {
+              "X": 1.5,
+              "Y": 0.8830445,
+              "Z": 1.5
+            },
+            "Size": {
+              "X": 3.0,
+              "Y": 0.236239433,
+              "Z": 3.0
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase1x1#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase1x1/ConstructionBase1x1.blueprint",
+          "Modification": {
+            "TransformSpec": {
+              "Position": {
+                "X": 1.0,
+                "Y": 0.0,
+                "Z": 1.0
+              },
+              "Rotation": {
+                "X": 0.0,
+                "Y": 0.0,
+                "Z": 0.0
+              },
+              "Scale": {
+                "X": 1.0,
+                "Y": 1.0,
+                "Z": 1.0
+              }
+            }
+          }
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/MetalPlatform3x3/MetalPlatform3x3.IronTeeth.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 1.07508838,
+                  "Y": 0.425703049,
+                  "Z": 1.07358623
+                },
+                "Size": {
+                  "X": 0.173620462,
+                  "Y": 0.84859395,
+                  "Z": 0.152596474
+                }
+              },
+              {
+                "Center": {
+                  "X": 1.92,
+                  "Y": 0.425703049,
+                  "Z": 1.07358623
+                },
+                "Size": {
+                  "X": 0.173620462,
+                  "Y": 0.84859395,
+                  "Z": 0.152596474
+                }
+              },
+              {
+                "Center": {
+                  "X": 1.92,
+                  "Y": 0.425703049,
+                  "Z": 1.92
+                },
+                "Size": {
+                  "X": 0.173620462,
+                  "Y": 0.84859395,
+                  "Z": 0.152596474
+                }
+              },
+              {
+                "Center": {
+                  "X": 1.075088,
+                  "Y": 0.425703049,
+                  "Z": 1.92
+                },
+                "Size": {
+                  "X": 0.173620462,
+                  "Y": 0.84859395,
+                  "Z": 0.152596474
+                }
+              },
+              {
+                "Center": {
+                  "X": 1.07257843,
+                  "Y": 0.8468785,
+                  "Z": 1.49883592
+                },
+                "Size": {
+                  "X": 0.15615797,
+                  "Y": 0.00624299049,
+                  "Z": 2.996896
+                }
+              },
+              {
+                "Center": {
+                  "X": 1.92590714,
+                  "Y": 0.8468785,
+                  "Z": 1.49883592
+                },
+                "Size": {
+                  "X": 0.168707013,
+                  "Y": 0.00624299049,
+                  "Z": 2.996896
+                }
+              },
+              {
+                "Center": {
+                  "X": 1.50000262,
+                  "Y": 0.8468785,
+                  "Z": 1.91922581
+                },
+                "Size": {
+                  "X": 3.00428438,
+                  "Y": 0.00624299049,
+                  "Z": 0.160832167
+                }
+              },
+              {
+                "Center": {
+                  "X": 1.50000262,
+                  "Y": 0.8468785,
+                  "Z": 1.07549524
+                },
+                "Size": {
+                  "X": 3.00428438,
+                  "Y": 0.00624299049,
+                  "Z": 0.146592021
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    }
+  }
+}

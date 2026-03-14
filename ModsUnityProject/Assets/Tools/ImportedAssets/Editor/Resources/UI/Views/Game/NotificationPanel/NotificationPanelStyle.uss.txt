@@ -1,0 +1,60 @@
+.notification-panel-wrapper {
+    padding: 0;
+    width: 270px;
+}
+
+.notification-panel {
+    height: 150px;
+    flex-grow: 1;
+    padding: 4px 2px 16px 3px;
+}
+
+.notification-panel .unity-scroll-view__content-container {
+    flex-direction: column-reverse;
+}
+
+.notification-panel__latest {
+    padding: 4px 2px 4px 3px;
+}
+
+.notification-panel__toggler {
+    margin-top: -15px;
+}
+
+.notification-panel__toggler.extension-clamp-full--hidden {
+    margin-top: 0;
+}
+
+.notification-panel-item {
+    flex-direction: row;
+    padding: 0 2px;
+}
+
+.notification-panel-item:hover:enabled {
+    background-color: rgba(204, 204, 153, 0.8);
+}
+
+.notification-panel-item:hover:enabled Label {
+    color: black;
+}
+
+.notification-panel-item__date {
+    margin-right: 2px;
+    min-width: 18px;
+    color: rgb(153, 153, 153);
+}
+
+.notification-panel-item__text {
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+.notification-panel .unity-scroll-view__content-and-vertical-scroll-container > .unity-scroller > .unity-slider {
+    width: 12px;
+    min-width: 12px;
+}
+
+.notification-panel > .unity-scroll-view__content-and-vertical-scroll-container > .unity-scroller {
+    width: 12px;
+    margin: 0 0 0 2px;
+}

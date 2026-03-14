@@ -1,0 +1,111 @@
+{
+  "TemplateSpec": {
+    "TemplateName": "NaturalDam",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": true
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "MapEditorObjects",
+    "ToolOrder": 200,
+    "ToolShape": "Square",
+    "Layout": "Line",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": true
+  },
+  "FinishableWaterObstacleSpec": {
+    "Height": 0.65
+  },
+  "WaterObstacleSpec": {
+    "Coordinates": [
+      {
+        "X": 0,
+        "Y": 0
+      }
+    ]
+  },
+  "DemolishableSpec": {
+    "DemolishTimeInHours": 4.0,
+    "ShowDemolishButtonInEntityPanel": true
+  },
+  "StartableMarkerPositionUpdaterSpec": {},
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.NaturalDam.DisplayName",
+    "DescriptionLocKey": "Building.NaturalDam.Description",
+    "FlavorDescriptionLocKey": "",
+    "Icon": "MapEditor/Objects/NaturalDam/NaturalDamIcon"
+  },
+  "BasicSelectionSoundSpec": {
+    "SoundName": "Blockage",
+    "AlternativeSoundName": ""
+  },
+  "DemolishableFromTopSpec": {},
+  "BlockObjectRandomizablePlacementSpec": {},
+  "BlockObjectModelSpec": {
+    "FullModelName": "#Model",
+    "UncoveredModelName": "",
+    "UndergroundModelName": "",
+    "UndergroundModelDepth": 0
+  },
+  "BlockObjectNavMeshAdderSpec": {},
+  "Children": {
+    "#Model": {
+      "TimbermeshSpec": {
+        "Model": "MapEditor/Objects/NaturalDam/NaturalDam.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.325750858,
+              "Z": 0.5
+            },
+            "Size": {
+              "X": 1.0,
+              "Y": 0.6515017,
+              "Z": 1.0
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    }
+  }
+}

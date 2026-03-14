@@ -1,0 +1,30 @@
+{
+  "GoodCollectionSpec": {
+    "CollectionId": "IronTeeth",
+    "Goods": [
+      "Algae",
+      "AlgaeRation",
+      "BotChassis",
+      "BotHead",
+      "BotLimb",
+      "CanolaOil",
+      "CanolaSeeds",
+      "Cassava",
+      "Coffee",
+      "CoffeeBean",
+      "Corn",
+      "CornRation",
+      "Eggplant",
+      "EggplantRation",
+      "FermentedCassava",
+      "FermentedMushroom",
+      "FermentedSoybean",
+      "Grease",
+      "Kohlrabi",
+      "MangroveFruit",
+      "Mushroom",
+      "Soybean",
+      "TreatedPlank"
+    ]
+  }
+}

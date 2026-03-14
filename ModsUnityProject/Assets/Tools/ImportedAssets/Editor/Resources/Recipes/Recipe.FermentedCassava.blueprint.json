@@ -1,0 +1,26 @@
+{
+  "RecipeSpec": {
+    "Id": "FermentedCassava",
+    "BackwardCompatibleIds": [],
+    "DisplayLocKey": "Good.FermentedCassava.PluralDisplayName",
+    "CycleDurationInHours": 2.0,
+    "Ingredients": [
+      {
+        "Id": "Cassava",
+        "Amount": 4
+      }
+    ],
+    "Products": [
+      {
+        "Id": "FermentedCassava",
+        "Amount": 10
+      }
+    ],
+    "ProducedSciencePoints": 0,
+    "Fuel": "",
+    "CyclesFuelLasts": 0,
+    "FuelCapacity": 0,
+    "CyclesCapacity": 6,
+    "Icon": "Sprites/Goods/FermentedCassavaIcon"
+  }
+}

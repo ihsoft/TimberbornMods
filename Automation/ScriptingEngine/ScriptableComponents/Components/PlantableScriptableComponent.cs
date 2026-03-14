@@ -10,6 +10,7 @@ using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
+using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BuildingsNavigation;
 using Timberborn.Forestry;
@@ -142,7 +143,8 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
       DisplayName = Loc.T(SpotReadySignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
-          ValueValidator = ValueDef.RangeCheckValidatorInt(0),
+          DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
+          DisplayNumericFormatRange = (0, float.NaN),
       },
   };
   SignalDef _collectableReadySignalDef;
@@ -167,8 +169,8 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
   }
 
   static PlantingSpotFinder GetPlantingSpotFinder(AutomationBehavior behavior, bool throwIfNotFound = true) {
-    var plantingCoordinates = behavior.GetComponentFast<InRangePlantingCoordinates>();
-    var plantingSpotFinder = behavior.GetComponentFast<PlantingSpotFinder>();
+    var plantingCoordinates = behavior.GetComponent<InRangePlantingCoordinates>();
+    var plantingSpotFinder = behavior.GetComponent<PlantingSpotFinder>();
     if (plantingCoordinates && plantingSpotFinder) {
       return plantingSpotFinder;
     }
@@ -182,7 +184,7 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
 
   #region Plantable coordiantes spots tracker component
 
-  sealed class PlantableTracker : AbstractStatusTracker, IFinishedStateListener {
+  internal sealed class PlantableTracker : AbstractStatusTracker, IAwakableComponent, IFinishedStateListener {
 
     #region IFinishedStateListener implementation
 
@@ -271,17 +273,12 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
     public void InjectDependencies(EventBus eventBus, PlantingService plantingService) {
       _eventBus = eventBus;
       _plantingService = plantingService;
-
-      // This component is added dynamically, so it won't get the finished state callback on a finished building.
-      if (GetComponentFast<BlockObject>().IsFinished) {
-        OnEnterFinishedState();
-      }
     }
 
-    void Awake() {
-      _plantingSpotFinder = GetComponentFast<PlantingSpotFinder>();
-      _buildingTerrainRange = GetComponentFast<BuildingTerrainRange>();
-      _plantingCoordinates = GetComponentFast<InRangePlantingCoordinates>();
+    public void Awake() {
+      _plantingSpotFinder = AutomationBehavior.GetComponent<PlantingSpotFinder>();
+      _buildingTerrainRange = AutomationBehavior.GetComponent<BuildingTerrainRange>();
+      _plantingCoordinates = AutomationBehavior.GetComponent<InRangePlantingCoordinates>();
     }
 
     void ImmediateUpdateState() {
@@ -291,7 +288,7 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
       if (_immediateUpdateCoroutine != null) {
         return; // Already scheduled.
       }
-      _immediateUpdateCoroutine = StartCoroutine(ImmediateUpdateCoroutine());
+      _immediateUpdateCoroutine = MonoBehaviour.StartCoroutine(ImmediateUpdateCoroutine());
     }
     Coroutine _immediateUpdateCoroutine;
 

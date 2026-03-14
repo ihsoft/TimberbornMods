@@ -1,0 +1,266 @@
+{
+  "SunSpec": {
+    "SunPrefab": "Environment/Sky/Sun",
+    "SunriseColors": {
+      "SunColor": {
+        "r": 1.0,
+        "g": 0.9294118,
+        "b": 0.8,
+        "a": 0.0
+      },
+      "SunIntensity": 1.2,
+      "SunXAngle": 32.0,
+      "ShadowStrength": 1.0,
+      "AmbientSkyColor": {
+        "r": 0.09758736,
+        "g": 0.3005438,
+        "b": 0.4793202,
+        "a": 0.0
+      },
+      "AmbientEquatorColor": {
+        "r": 1.0,
+        "g": 0.783538,
+        "b": 0.5088814,
+        "a": 0.0
+      },
+      "AmbientGroundColor": {
+        "r": 1.0,
+        "g": 0.48515,
+        "b": 0.0,
+        "a": 0.0
+      },
+      "ReflectionsIntensity": 1.0,
+      "TemperateWeatherFog": {
+        "FogColor": {
+          "r": 0.682353,
+          "g": 0.6705883,
+          "b": 0.6705883,
+          "a": 1.0
+        },
+        "FogDensity": 0.003
+      },
+      "HazardousWeatherFogs": [
+        {
+          "HazardousWeatherId": "DroughtWeather",
+          "FogSettings": {
+            "FogColor": {
+              "r": 0.8156863,
+              "g": 0.7098039,
+              "b": 0.4980392,
+              "a": 1.0
+            },
+            "FogDensity": 0.003
+          }
+        },
+        {
+          "HazardousWeatherId": "BadtideWeather",
+          "FogSettings": {
+            "FogColor": {
+              "r": 0.8,
+              "g": 0.5607843,
+              "b": 0.4823529,
+              "a": 1.0
+            },
+            "FogDensity": 0.003
+          }
+        }
+      ]
+    },
+    "DayColors": {
+      "SunColor": {
+        "r": 1.0,
+        "g": 0.9625,
+        "b": 0.85,
+        "a": 0.0
+      },
+      "SunIntensity": 1.1,
+      "SunXAngle": 45.0,
+      "ShadowStrength": 1.0,
+      "AmbientSkyColor": {
+        "r": 0.6239606,
+        "g": 0.6307573,
+        "b": 0.9734455,
+        "a": 0.0
+      },
+      "AmbientEquatorColor": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 0.0
+      },
+      "AmbientGroundColor": {
+        "r": 0.2831488,
+        "g": 0.2269659,
+        "b": 0.3712378,
+        "a": 0.0
+      },
+      "ReflectionsIntensity": 1.0,
+      "TemperateWeatherFog": {
+        "FogColor": {
+          "r": 0.4470589,
+          "g": 0.7607844,
+          "b": 0.8235295,
+          "a": 1.0
+        },
+        "FogDensity": 0.003
+      },
+      "HazardousWeatherFogs": [
+        {
+          "HazardousWeatherId": "DroughtWeather",
+          "FogSettings": {
+            "FogColor": {
+              "r": 0.7058824,
+              "g": 0.5490196,
+              "b": 0.3764706,
+              "a": 1.0
+            },
+            "FogDensity": 0.003
+          }
+        },
+        {
+          "HazardousWeatherId": "BadtideWeather",
+          "FogSettings": {
+            "FogColor": {
+              "r": 0.6980392,
+              "g": 0.4392157,
+              "b": 0.3490196,
+              "a": 1.0
+            },
+            "FogDensity": 0.003
+          }
+        }
+      ]
+    },
+    "SunsetColors": {
+      "SunColor": {
+        "r": 1.0,
+        "g": 0.8313726,
+        "b": 0.5137255,
+        "a": 0.0
+      },
+      "SunIntensity": 1.3,
+      "SunXAngle": 30.0,
+      "ShadowStrength": 1.0,
+      "AmbientSkyColor": {
+        "r": 0.6509434,
+        "g": 0.12589,
+        "b": 0.3709472,
+        "a": 0.0
+      },
+      "AmbientEquatorColor": {
+        "r": 1.0,
+        "g": 0.4677838,
+        "b": 0.3813261,
+        "a": 0.0
+      },
+      "AmbientGroundColor": {
+        "r": 1.0,
+        "g": 0.6724433,
+        "b": 0.2788943,
+        "a": 0.0
+      },
+      "ReflectionsIntensity": 1.0,
+      "TemperateWeatherFog": {
+        "FogColor": {
+          "r": 0.8392158,
+          "g": 0.6156863,
+          "b": 0.6470588,
+          "a": 1.0
+        },
+        "FogDensity": 0.003
+      },
+      "HazardousWeatherFogs": [
+        {
+          "HazardousWeatherId": "DroughtWeather",
+          "FogSettings": {
+            "FogColor": {
+              "r": 0.8392158,
+              "g": 0.6980392,
+              "b": 0.6156863,
+              "a": 1.0
+            },
+            "FogDensity": 0.003
+          }
+        },
+        {
+          "HazardousWeatherId": "BadtideWeather",
+          "FogSettings": {
+            "FogColor": {
+              "r": 0.8,
+              "g": 0.6196079,
+              "b": 0.5607843,
+              "a": 1.0
+            },
+            "FogDensity": 0.003
+          }
+        }
+      ]
+    },
+    "NightColors": {
+      "SunColor": {
+        "r": 0.0,
+        "g": 0.3254902,
+        "b": 1.0,
+        "a": 0.0
+      },
+      "SunIntensity": 1.2,
+      "SunXAngle": 45.0,
+      "ShadowStrength": 0.5,
+      "AmbientSkyColor": {
+        "r": 0.2581829,
+        "g": 0.4072403,
+        "b": 1.0,
+        "a": 0.0
+      },
+      "AmbientEquatorColor": {
+        "r": 0.5394797,
+        "g": 0.5583406,
+        "b": 0.9046614,
+        "a": 0.0
+      },
+      "AmbientGroundColor": {
+        "r": 0.09254902,
+        "g": 0.105882354,
+        "b": 0.05882353,
+        "a": 0.0
+      },
+      "ReflectionsIntensity": 1.0,
+      "TemperateWeatherFog": {
+        "FogColor": {
+          "r": 0.0,
+          "g": 0.3960785,
+          "b": 0.7450981,
+          "a": 1.0
+        },
+        "FogDensity": 0.003
+      },
+      "HazardousWeatherFogs": [
+        {
+          "HazardousWeatherId": "DroughtWeather",
+          "FogSettings": {
+            "FogColor": {
+              "r": 0.4,
+              "g": 0.4,
+              "b": 0.4,
+              "a": 1.0
+            },
+            "FogDensity": 0.003
+          }
+        },
+        {
+          "HazardousWeatherId": "BadtideWeather",
+          "FogSettings": {
+            "FogColor": {
+              "r": 0.5019608,
+              "g": 0.4509804,
+              "b": 0.4509804,
+              "a": 1.0
+            },
+            "FogDensity": 0.003
+          }
+        }
+      ]
+    },
+    "RotateWithCameraOffset": 40.0
+  }
+}

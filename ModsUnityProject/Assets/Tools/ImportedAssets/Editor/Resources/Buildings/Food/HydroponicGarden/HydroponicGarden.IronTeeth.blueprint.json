@@ -1,0 +1,382 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "HydroponicGarden",
+    "LoopingSoundName": "WaterWheel",
+    "BuildingCost": [
+      {
+        "Id": "Plank",
+        "Amount": 20
+      },
+      {
+        "Id": "Gear",
+        "Amount": 10
+      },
+      {
+        "Id": "MetalBlock",
+        "Amount": 5
+      }
+    ],
+    "ScienceCost": 200,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": false,
+    "DrawRangeBoundsOnIt": false
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "WorkplaceSpec": {
+    "MaxWorkers": 1,
+    "DefaultWorkers": 1,
+    "DefaultWorkerType": "Beaver",
+    "DisallowOtherWorkerTypes": false,
+    "WorkerTypeUnlockCosts": [
+      {
+        "WorkerType": "Bot",
+        "ScienceCost": 750
+      }
+    ]
+  },
+  "ManufactorySpec": {
+    "ProductionRecipeIds": [
+      "Mushroom",
+      "Algae"
+    ]
+  },
+  "WorkshopSpec": {},
+  "EnterableSpec": {
+    "OperatingState": "Finished",
+    "LimitedCapacityFinished": false,
+    "CapacityFinished": 0,
+    "LimitedCapacityUnfinished": false,
+    "CapacityUnfinished": 0
+  },
+  "TemplateSpec": {
+    "TemplateName": "HydroponicGarden.IronTeeth",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "TransformSlotInitializerSpec": {
+    "Slots": [
+      {
+        "SlotKeyword": "Entrance",
+        "Animation": "Sitting",
+        "Inanimate": false,
+        "RandomizeYRotation": false,
+        "WaterSlot": false
+      }
+    ]
+  },
+  "WorkplaceSlotManagerSpec": {},
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 3,
+      "Y": 3,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": true,
+      "Coordinates": {
+        "X": 1,
+        "Y": -1,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "BuildingAccessibleSpec": {
+    "LocalAccess": {
+      "X": 1.5,
+      "Y": 0.03047585,
+      "Z": 1.55
+    },
+    "ForceOneFinalAccess": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Food",
+    "ToolOrder": 90,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "WorkplaceLightingSpec": {},
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.HydroponicGarden.DisplayName",
+    "DescriptionLocKey": "Building.HydroponicGarden.Description",
+    "FlavorDescriptionLocKey": "Building.HydroponicGarden.FlavorDescription",
+    "Icon": "Buildings/Food/HydroponicGarden/HydroponicGardenIcon"
+  },
+  "SimpleManufactoryBehaviorsSpec": {},
+  "WorkshopParticleControllerSpec": {
+    "AttachmentIds": [
+      "Water"
+    ]
+  },
+  "BlockObjectNavMeshSettingsSpec": {
+    "NoAutoWalls": false,
+    "GenerateFloorsOnStackable": true,
+    "EdgeGroups": [],
+    "UnblockedCoordinates": []
+  },
+  "ManufactoryProgressVisualizerSpec": {
+    "ProgressSteps": [
+      {
+        "Threshold": 0.0,
+        "ModelNames": [
+          "#HydroponicGardenAlgae1",
+          "#HydroponicGardenMushrooms1"
+        ]
+      },
+      {
+        "Threshold": 0.2,
+        "ModelNames": [
+          "#HydroponicGardenAlgae2",
+          "#HydroponicGardenMushrooms2"
+        ]
+      },
+      {
+        "Threshold": 0.4,
+        "ModelNames": [
+          "#HydroponicGardenAlgae3",
+          "#HydroponicGardenMushrooms3"
+        ]
+      },
+      {
+        "Threshold": 0.6,
+        "ModelNames": [
+          "#HydroponicGardenAlgae4",
+          "#HydroponicGardenMushrooms4"
+        ]
+      },
+      {
+        "Threshold": 0.8,
+        "ModelNames": [
+          "#HydroponicGardenAlgae5",
+          "#HydroponicGardenMushrooms5"
+        ]
+      }
+    ]
+  },
+  "ManufactoryRecipeVisualizerSpec": {
+    "InitialModelName": "#HydroponicGardenEmpty",
+    "RecipeModels": [
+      {
+        "RecipeId": "Algae",
+        "ModelName": "Algae"
+      },
+      {
+        "RecipeId": "Mushroom",
+        "ModelName": "Mushrooms"
+      }
+    ]
+  },
+  "ProductionResetterSpec": {
+    "HoursToResetProgress": 24.0,
+    "StatusLocKey": "Status.HydroponicGarden.CultivationHalted",
+    "AlertLocKey": "Status.HydroponicGarden.CultivationHalted.Short",
+    "StatusIcon": "CultivationHalted"
+  },
+  "WorkshopWorkerHiderSpec": {},
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "TemplateAttachmentsSpec": {
+    "Attachments": [
+      {
+        "AttachmentId": "Water",
+        "Prefab": "Buildings/Food/HydroponicGarden/HydroponicGardenWater",
+        "Parent": "#Finished",
+        "Position": {
+          "X": 1.483,
+          "Y": 0.896,
+          "Z": 1.501
+        },
+        "Rotation": {
+          "X": 90.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": true
+      }
+    ]
+  },
+  "Children": {
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Food/HydroponicGarden/HydroponicGarden.IronTeeth.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 1.5,
+              "Y": 0.114998549,
+              "Z": 1.50977659
+            },
+            "Size": {
+              "X": 2.911419,
+              "Y": 0.2299971,
+              "Z": 2.8753314
+            }
+          },
+          {
+            "Center": {
+              "X": 1.5,
+              "Y": 0.5573376,
+              "Z": 1.50977659
+            },
+            "Size": {
+              "X": 0.7497406,
+              "Y": 0.6644839,
+              "Z": 0.791234732
+            }
+          },
+          {
+            "Center": {
+              "X": 1.5,
+              "Y": 0.9420941,
+              "Z": 1.50977659
+            },
+            "Size": {
+              "X": 2.911419,
+              "Y": 0.104362309,
+              "Z": 2.8753314
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase3x3#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase3x3/ConstructionBase3x3.blueprint"
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Food/HydroponicGarden/HydroponicGarden.IronTeeth.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 1.5,
+                  "Y": 0.05,
+                  "Z": 1.5
+                },
+                "Size": {
+                  "X": 3.0,
+                  "Y": 0.1,
+                  "Z": 3.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 1.5,
+                  "Y": 0.493261933,
+                  "Z": 1.50977659
+                },
+                "Size": {
+                  "X": 0.7497406,
+                  "Y": 0.7926352,
+                  "Z": 0.791234732
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    }
+  }
+}

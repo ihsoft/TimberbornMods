@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "Extract",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Liquid",
+    "StockpileVisualization": "Liquid",
+    "VisibleContainer": "Barrel",
+    "ContainerColor": {
+      "r": 0.0,
+      "g": 0.58431375,
+      "b": 0.1764706,
+      "a": 1.0
+    },
+    "ContainerMaterial": "Materials/Goods/Extract",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Materials",
+    "GoodOrder": 4010,
+    "Icon": "Sprites/Goods/ExtractIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.Extract.DisplayName",
+    "PluralDisplayNameLocKey": "Good.Extract.PluralDisplayName"
+  }
+}

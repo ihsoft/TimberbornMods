@@ -1,0 +1,26 @@
+{
+  "RecipeSpec": {
+    "Id": "Algae",
+    "BackwardCompatibleIds": [],
+    "DisplayLocKey": "Good.Algae.PluralDisplayName",
+    "CycleDurationInHours": 288.0,
+    "Ingredients": [
+      {
+        "Id": "Water",
+        "Amount": 60
+      }
+    ],
+    "Products": [
+      {
+        "Id": "Algae",
+        "Amount": 70
+      }
+    ],
+    "ProducedSciencePoints": 0,
+    "Fuel": "",
+    "CyclesFuelLasts": 0,
+    "FuelCapacity": 0,
+    "CyclesCapacity": 1,
+    "Icon": "Sprites/Goods/AlgaeIcon"
+  }
+}

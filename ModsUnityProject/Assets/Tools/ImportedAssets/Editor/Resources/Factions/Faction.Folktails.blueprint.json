@@ -1,0 +1,56 @@
+{
+  "FactionSpec": {
+    "Id": "Folktails",
+    "Order": 0,
+    "Avatar": "Sprites/Avatars/FolktailsAdult",
+    "ChildAvatar": "Sprites/Avatars/FolktailsChild",
+    "BotAvatar": "Sprites/Avatars/FolktailsBot",
+    "ContaminatedAdultAvatar": "Sprites/Avatars/FolktailsContaminatedAdult",
+    "ContaminatedChildAvatar": "Sprites/Avatars/FolktailsContaminatedChild",
+    "Logo": "Sprites/Avatars/FolktailsLogo",
+    "NewGameFullAvatar": "Sprites/Avatars/FolktailsFullNewGame",
+    "Textures": [
+      "Materials/Beavers/Folktails/Adult/BeaverAdult1.Folktails",
+      "Materials/Beavers/Folktails/Adult/BeaverAdult2.Folktails",
+      "Materials/Beavers/Folktails/Adult/BeaverAdult3.Folktails",
+      "Materials/Beavers/Folktails/Adult/BeaverAdult4.Folktails",
+      "Materials/Beavers/Folktails/Adult/BeaverAdult5.Folktails"
+    ],
+    "ChildTextures": [
+      "Materials/Beavers/Folktails/Child/BeaverChild1.Folktails",
+      "Materials/Beavers/Folktails/Child/BeaverChild2.Folktails",
+      "Materials/Beavers/Folktails/Child/BeaverChild3.Folktails"
+    ],
+    "MaterialCollectionIds": [
+      "Folktails"
+    ],
+    "TemplateCollectionIds": [
+      "Buildings.Folktails",
+      "Characters.Folktails",
+      "ModularShaftParts.Folktails",
+      "NaturalResources.Folktails"
+    ],
+    "PathMaterial": "Buildings/Paths/Path/Path.Folktails",
+    "BaseWoodMaterial": "Materials/UberAtlas/Materials/Folktails/BaseWood_White.Folktails",
+    "NeedCollectionIds": [
+      "Folktails"
+    ],
+    "GoodCollectionIds": [
+      "Folktails"
+    ],
+    "BlueprintModifiers": [],
+    "StartingBuildingId": "DistrictCenter.Folktails",
+    "SoundId": "Common",
+    "DisplayNameLocKey": "Faction.Folktails.DisplayName",
+    "DescriptionLocKey": "Faction.Folktails.Description",
+    "GameOverMessageLocKey": "Faction.Folktails.GameOver.Message",
+    "GameOverFlavorLocKey": "Faction.Folktails.GameOver.Flavor"
+  },
+  "StartingFactionSpec": {},
+  "FactionWonderSpec": {
+    "WonderCompletionImage": "UI/Images/WonderCompletion/wonder-completion-folktails",
+    "WonderLaunchSound": "UI.Buildings.Wonder.EarthRecultivator",
+    "WonderCompletionFlavorLocKey": "Faction.Folktails.WonderCompletionFlavor",
+    "WonderCompletionMessageLocKey": "Faction.Folktails.WonderCompletionMessage"
+  }
+}

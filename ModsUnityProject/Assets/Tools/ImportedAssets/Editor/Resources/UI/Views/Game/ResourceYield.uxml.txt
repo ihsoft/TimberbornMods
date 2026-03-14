@@ -1,0 +1,20 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+    <cui:NineSliceVisualElement name="ResourceYield" class="resource-yield">
+        <ui:VisualElement name="CalendarWrapper" class="content-centered">
+            <ui:VisualElement name="Calendar" class="resource-yield__icon" />
+            <ui:Label name="GrowthTime" class="game-text-normal resource-yield__text" text="2d" />
+        </ui:VisualElement>
+        <ui:VisualElement name="ProgressWrapper" class="content-centered">
+            <ui:VisualElement class="resource-yield__arrow" />
+            <ui:Label name="ProgressText" class="game-text-small resource-yield__progress-text" text="20%" />
+        </ui:VisualElement>
+        <ui:VisualElement name="YieldWrapper" class="content-centered">
+            <ui:Image name="YieldIcon" class="resource-yield__icon" />
+            <ui:Label name="YieldAmount" class="game-text-normal resource-yield__text" text="2" />
+        </ui:VisualElement>
+        <ui:VisualElement name="InfoIcon" class="resource-yield__info-icon" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

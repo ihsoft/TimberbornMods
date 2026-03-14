@@ -1,0 +1,34 @@
+{
+  "GoodSpec": {
+    "Id": "SunflowerSeeds",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [
+      {
+        "NeedId": "Hunger",
+        "Points": 0.3
+      },
+      {
+        "NeedId": "SunflowerSeeds",
+        "Points": 0.5
+      }
+    ],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.494117647,
+      "g": 0.478431374,
+      "b": 0.407843143,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Food",
+    "GoodOrder": 9020,
+    "Icon": "Sprites/Goods/SunflowerSeedsIcon",
+    "ForceImport": true,
+    "DisplayNameLocKey": "Good.SunflowerSeeds.DisplayName",
+    "PluralDisplayNameLocKey": "Good.SunflowerSeeds.PluralDisplayName"
+  }
+}

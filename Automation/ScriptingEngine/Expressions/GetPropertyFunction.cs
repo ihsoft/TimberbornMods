@@ -79,7 +79,7 @@ sealed class GetPropertyFunction : AbstractFunction, IValueExpr {
         (ValueFn, ValueType) = MakeCollectionCountGetter(propertyGetterInfo);
         break;
       default:
-        throw new ArgumentOutOfRangeException(nameof(funcName));
+        throw new InvalidOperationException($"Unexpected function: {funcName}");
     }
   }
 
@@ -105,7 +105,7 @@ sealed class GetPropertyFunction : AbstractFunction, IValueExpr {
 
   (Func<ScriptValue> valueFn, ScriptValue.TypeEnum valueType) MakeOrdinaryGetter(Type valueType, Func<object> valueFn) {
     if (valueType == typeof(string)) {
-      return (() => ScriptValue.Of((string)valueFn()), ScriptValue.TypeEnum.String);
+      return (() => ScriptValue.FromString((string)valueFn()), ScriptValue.TypeEnum.String);
     }
     if (valueType == typeof(int)) {
       return (() => ScriptValue.FromInt((int)valueFn()), ScriptValue.TypeEnum.Number);

@@ -1,0 +1,405 @@
+.entity-panel {
+    padding: 1px;
+    width: 325px;
+    position: absolute;
+    right: 0;
+    top: 110px;
+}
+
+.entity-sub-panel {
+    padding: 8px 12px;
+}
+
+.entity-panel__text {
+    color: rgb(204, 204, 204);
+    font-size: 13px;
+    white-space: normal;
+}
+
+.entity-panel__heading-text {
+    color: rgb(204, 204, 204);
+    font-size: 14px;
+    white-space: normal;
+}
+
+.entity-panel__sub-text {
+    color: rgb(204, 204, 204);
+    font-size: 12px;
+    white-space: normal;
+}
+
+.entity-panel__name {
+    -unity-text-align: middle-center;
+    flex-shrink: 1;
+}
+
+.entity-panel__description {
+    display: flex;
+    height: auto;
+}
+
+.entity-panel__description-hider {
+    display: flex;
+    position: absolute;
+    background-image: resource('UI/Images/Buttons/circle-empty');
+    width: 22px;
+    height: 22px;
+    right: 16px;
+    top: 82px;
+    --click-sound: "UI.Click"
+}
+
+.entity-panel__description-hider:hover:enabled {
+    background-image: resource('UI/Images/Buttons/circle-empty-hover');
+}
+
+.entity-panel__description-hider:hover:enabled:active {
+    background-image: resource('UI/Images/Buttons/circle-empty-active');
+}
+
+.entity-panel__description-hider-icon {
+    background-image: resource('UI/Images/Game/entity-description-hide');
+    width: 22px;
+    height: 22px;
+}
+
+.entity-panel__description--none {
+    display: none;
+}
+
+.entity-panel__description--hidden {
+    display: none;
+}
+
+.entity-panel__description-hider--none {
+    display: none;
+}
+
+.entity-panel__description-hider--show-icon > .entity-panel__description-hider-icon {
+    background-image: resource('UI/Images/Game/entity-description-show');
+}
+
+.entity-panel__clickable-subtitle-wrapper {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.entity-panel__clickable-subtitle:hover {
+    color: yellow;
+}
+
+.entity-panel__subtitle-warning {
+    background-image: resource('UI/Images/Game/CriticalNeedState');
+    width: 12px;
+    height: 12px;
+}
+
+.entity-panel__single-line-text {
+    flex-grow: 1;
+    color: rgb(204, 204, 204);
+    font-size: 13px;
+    white-space: normal;
+    -unity-text-align: middle-left;
+    align-self: flex-start;
+}
+
+.entity-panel-input > .unity-base-field__input {
+    background-image: resource('UI/Images/Backgrounds/bg-pixel-1');
+    -unity-text-align: middle-right;
+    color: rgb(204, 204, 204);
+    --unity-cursor-color: rgb(204, 204, 204);
+    --unity-selection-color: rgba(81, 126, 116, 0.5);
+}
+
+.entity-panel__button-wrapper {
+    margin-top: 8px;
+}
+
+.entity-panel__header-button-wrapper {
+    margin-top: 4px;
+    margin-bottom: 8px;
+}
+
+.single-button-fragment {
+    background-image: none;
+    align-items: center;
+    padding: 15px 0;
+}
+
+.entity-fragment__button {
+    min-width: 50%;
+    padding: 4px;
+    --click-sound: "UI.Click";
+}
+
+.entity-fragment__button--silent {
+    --click-sound: none;
+}
+
+.entity-fragment__button--red {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-2');
+    --background-slice-scale: 0.5;
+    --background-slice: 10;
+}
+
+.entity-fragment__button--red:hover:enabled {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-5');
+    --background-slice-scale: 0.5;
+    --background-slice: 10;
+}
+
+.entity-fragment__button--green {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-1');
+    --background-slice-scale: 0.5;
+    --background-slice: 10;
+}
+
+.entity-fragment__button--green:hover:enabled {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-4');
+    --background-slice-scale: 0.5;
+    --background-slice: 10;
+}
+
+.entity-panel__top-wrapper {
+    flex-direction: column-reverse;
+}
+
+.entity-panel__buttons {
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.entity-panel__buttons--right {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.entity-panel__buttons--middle {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.entity-panel__buttons--left {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.entity-panel__header {
+    padding: 4px 60px 4px 4px;
+    flex-direction: row;
+}
+
+.entity-panel__avatar {
+    background-image: resource('UI/Images/Backgrounds/bg-4');
+    min-height: 56px;
+    min-width: 56px;
+    max-height: 56px;
+    max-width: 56px;
+}
+
+.entity_panel__name-and-subtitle {
+    align-items: stretch;
+}
+
+.entity-panel__name-wrapper {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.entity-panel__name-wrapper:disabled {
+    opacity: 1;
+}
+
+.entity-panel__sub-item {
+    -unity-text-align: middle-center;
+}
+
+.entity-panel__name-wrapper:hover:enabled > .entity-panel__name {
+    color: yellow;
+}
+
+.entity-panel__button {
+    width: 28px;
+    height: 28px;
+    --click-sound: "UI.Click";
+}
+
+.entity-panel__button--green {
+    background-image: resource('UI/Images/Backgrounds/bg-circle-small-1');
+}
+
+Button.entity-panel__button--green:hover:enabled {
+    background-image: resource('UI/Images/Backgrounds/bg-circle-small-2');
+}
+
+.entity-panel__button--red {
+    background-image: resource('UI/Images/Backgrounds/bg-circle-small-4');
+}
+
+Button.entity-panel__button--red:hover:enabled {
+    background-image: resource('UI/Images/Backgrounds/bg-circle-small-6');
+}
+
+.entity-panel-tooltip {
+    position: absolute;
+    width: 300px;
+    left: -308px;
+}
+
+.entity-panel__toggle {
+    align-self: flex-start;
+    margin: 4px 0;
+}
+
+.entity-panel__follow {
+    background-image: resource('UI/Images/Game/ico-eye');
+}
+
+.clickable--alternate .entity-panel__follow {
+    background-image: resource('UI/Images/Game/ico-eye-cancel');
+}
+
+.entity-panel__unselect {
+    background-image: resource('UI/Images/Game/ico-cancel');
+}
+
+.entity-panel__row {
+    align-items: center;
+    flex-direction: row;
+}
+
+.entity-panel__side-fragments {
+    flex-direction: column;
+    align-items: stretch;
+    position: absolute;
+    width: 190px;
+    left: -194px;
+    top: 28px;
+}
+
+.delete-building__icon {
+    background-image: resource('UI/Images/Game/ico-trash');
+}
+
+.duplicate-settings__icon {
+    background-image: resource('UI/Images/Game/ico-duplicate-settings');
+}
+
+.duplicate-object__icon {
+    background-image: resource('UI/Images/Game/ico-duplicate-object');
+}
+
+.game-toggle > .unity-toggle__input > .unity-toggle__text {
+    max-width: 270px;
+}
+
+.entity-panel-setting {
+    flex-grow: 1;
+    flex-direction: row;
+    margin: 2px 0;
+    align-items: flex-start;
+}
+
+.entity-panel-setting__text {
+    flex-grow: 1;
+    flex-shrink: 1;
+    margin-right: 4px;
+    -unity-text-align: middle-left;
+}
+
+.entity-panel-setting__input {
+    --background-image: resource('UI/Images/Backgrounds/bg-input');
+    --background-slice-scale: 0.5;
+    --background-slice: 8;
+    width: 80px;
+}
+
+
+.entity-panel-setting__input > .unity-base-field__input {
+    padding: 1px 3px;
+    background-image: none;
+}
+
+
+.debug-fragment__title-wrapper {
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.debug-fragment__button {
+    margin: 0;
+}
+
+.debug-fragment__title-text {
+    -unity-text-align: middle-left;
+    flex-grow: 1;
+}
+
+.debug-fragment--margin {
+    margin-top: 8px;
+}
+
+.science-cost__slash {
+    margin-right: 2px;
+}
+
+.wonder-fragment__activate-button {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    align-self: center;
+}
+
+.entity-debug-window__tab .unity-tab__header {
+    background-image: resource('UI/Images/Backgrounds/bg-oval-borderless-1');
+    width: 72px;
+    height: 26px;
+    color: rgb(204, 204, 204);
+    justify-content: center;
+    margin: 20px 8px 8px 0;
+}
+
+.entity-debug-window__tab .unity-tab__header:checked:enabled {
+    background-image: resource('UI/Images/Backgrounds/bg-oval-bordered-1');
+}
+
+
+.entity-debug-window__tab .unity-tab__header:hover:enabled {
+    background-image: resource('UI/Images/Backgrounds/bg-oval-bordered-2');
+}
+
+.entity-debug-window__wrapper {
+    --background-image: resource('UI/Images/Backgrounds/bg-input');
+    --background-slice-scale: 0.5;
+    --background-slice: 8;
+    margin-top: 8px;
+}
+
+.entity-debug-window__json {
+    height: 400px;
+}
+
+.demolishable-science-reward {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.demolishable-science-reward__points {
+    margin: 0 1px 0 4px;
+}
+
+.unstable-core-panel-setting {
+    flex-grow: 1;
+    flex-direction: row;
+}

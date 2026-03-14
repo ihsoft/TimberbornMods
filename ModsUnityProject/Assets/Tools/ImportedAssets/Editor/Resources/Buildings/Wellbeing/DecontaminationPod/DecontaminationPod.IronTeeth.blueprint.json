@@ -1,0 +1,298 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "DecontaminationPod",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "Plank",
+        "Amount": 20
+      },
+      {
+        "Id": "Gear",
+        "Amount": 5
+      },
+      {
+        "Id": "MetalBlock",
+        "Amount": 5
+      }
+    ],
+    "ScienceCost": 400,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": false,
+    "DrawRangeBoundsOnIt": false
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "AttractionSpec": {
+    "Effects": [
+      {
+        "NeedId": "BadwaterContamination",
+        "PointsPerHour": 0.034,
+        "SatisfyToMaxValue": false
+      }
+    ]
+  },
+  "FixedSlotManagerSpec": {},
+  "TransformSlotInitializerSpec": {
+    "Slots": [
+      {
+        "SlotKeyword": "Spot",
+        "Animation": "FloatingSleeping",
+        "Inanimate": false,
+        "RandomizeYRotation": false,
+        "WaterSlot": false
+      }
+    ]
+  },
+  "EnterableSpec": {
+    "OperatingState": "Finished",
+    "LimitedCapacityFinished": true,
+    "CapacityFinished": 1,
+    "LimitedCapacityUnfinished": false,
+    "CapacityUnfinished": 0
+  },
+  "TemplateSpec": {
+    "TemplateName": "DecontaminationPod.IronTeeth",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 2,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": true,
+      "Coordinates": {
+        "X": 0,
+        "Y": -1,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "BuildingAccessibleSpec": {
+    "LocalAccess": {
+      "X": 0.5,
+      "Y": 0.0,
+      "Z": 0.0
+    },
+    "ForceOneFinalAccess": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Wellbeing",
+    "ToolOrder": 60,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.DecontaminationPod.DisplayName",
+    "DescriptionLocKey": "Building.DecontaminationPod.Description",
+    "FlavorDescriptionLocKey": "Building.DecontaminationPod.FlavorDescription",
+    "Icon": "Buildings/Wellbeing/DecontaminationPod/DecontaminationPodIcon"
+  },
+  "MechanicalBuildingSpec": {},
+  "MechanicalNodeSpec": {
+    "PowerOutput": 0,
+    "PowerInput": 100,
+    "IsShaft": false
+  },
+  "EntererNeedSuspendingBuildingSpec": {
+    "NeedSuspender": {
+      "SuspendableNeedIds": [
+        "Sleep",
+        "Shelter"
+      ]
+    }
+  },
+  "EnterableLightingSpec": {},
+  "EnterableAnimationControllerSpec": {
+    "ResetAnimationUponExit": false
+  },
+  "GoodConsumingBuildingSpec": {
+    "FullInventoryWorkHours": 100,
+    "ConsumedGoods": [
+      {
+        "GoodId": "Extract",
+        "GoodPerHour": 0.1
+      }
+    ]
+  },
+  "PoweredGoodConsumingBuildingSpec": {},
+  "GoodConsumingAttractionSpec": {},
+  "GoodConsumingAttractionSurfaceControllerSpec": {
+    "SurfaceName": "#MiscWater.008",
+    "AttachmentIds": [
+      "Bubbles"
+    ]
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "TransputProviderSpec": {
+    "Transputs": [
+      {
+        "Coordinates": {
+          "X": 0,
+          "Y": 0,
+          "Z": 0
+        },
+        "Directions": "Bottom",
+        "ReverseRotation": false
+      },
+      {
+        "Coordinates": {
+          "X": 0,
+          "Y": 1,
+          "Z": 0
+        },
+        "Directions": "Left, Up, Right, Bottom",
+        "ReverseRotation": false
+      }
+    ],
+    "IgnoreRotation": false
+  },
+  "MechanicalConnectorTargetSpec": {},
+  "TemplateAttachmentsSpec": {
+    "Attachments": [
+      {
+        "AttachmentId": "Bubbles",
+        "Prefab": "Buildings/Wellbeing/DecontaminationPod/DecontaminationPodBubbles",
+        "Parent": "#Finished",
+        "Position": {
+          "X": 0.5,
+          "Y": 0.35,
+          "Z": 0.8
+        },
+        "Rotation": {
+          "X": -8.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": true
+      }
+    ]
+  },
+  "Children": {
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Wellbeing/DecontaminationPod/DecontaminationPod.IronTeeth.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.05,
+              "Z": 0.62
+            },
+            "Size": {
+              "X": 1.0,
+              "Y": 0.1,
+              "Z": 1.24
+            }
+          },
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.21,
+              "Z": 0.67
+            },
+            "Size": {
+              "X": 0.83,
+              "Y": 0.41,
+              "Z": 1.1
+            }
+          },
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.43,
+              "Z": 1.6
+            },
+            "Size": {
+              "X": 1.0,
+              "Y": 0.87,
+              "Z": 0.765
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase1x2#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase1x2/ConstructionBase1x2.blueprint"
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Wellbeing/DecontaminationPod/DecontaminationPod.IronTeeth.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.11712683,
+                  "Z": 1.05679965
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.23425366,
+                  "Z": 1.88640082
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    }
+  }
+}

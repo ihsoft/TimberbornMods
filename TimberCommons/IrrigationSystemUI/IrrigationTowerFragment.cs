@@ -40,7 +40,7 @@ sealed class IrrigationTowerFragment : IEntityPanelFragment {
   }
 
   public void ShowFragment(BaseComponent entity) {
-    _irrigationTower = entity.GetComponentFast<IrrigationTower>();
+    _irrigationTower = entity.GetComponent<IrrigationTower>();
     _root.ToggleDisplayStyle(visible: _irrigationTower);
   }
 
@@ -53,7 +53,7 @@ sealed class IrrigationTowerFragment : IEntityPanelFragment {
     if (!_irrigationTower) {
       return;
     }
-    if (_irrigationTower.enabled) {
+    if (_irrigationTower.Enabled) {
       var utilization = _irrigationTower.EligibleTiles.Count * 100f / _irrigationTower.MaxCoveredTilesCount;
       var info = new List<string> {
           _loc.T(TowerUtilizationLocKey, utilization),
@@ -62,6 +62,6 @@ sealed class IrrigationTowerFragment : IEntityPanelFragment {
       };
       _infoLabel.text = string.Join("\n", info);
     }
-    _infoLabel.ToggleDisplayStyle(visible: _irrigationTower.enabled);
+    _infoLabel.ToggleDisplayStyle(visible: _irrigationTower.Enabled);
   }
 }

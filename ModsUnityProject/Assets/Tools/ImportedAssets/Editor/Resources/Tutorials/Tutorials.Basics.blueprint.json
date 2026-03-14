@@ -1,0 +1,17 @@
+{
+  "TutorialSpec": {
+    "Id": "Basics",
+    "NameLocKey": "Tutorial.Basics",
+    "RequiredTutorialIds": [
+      "Tutorial"
+    ],
+    "SortOrder": 10,
+    "Stages": [
+      "Basics.MoveCamera",
+      "Basics.RotateCamera",
+      "Basics.ZoomCamera",
+      "Basics.ManagePause",
+      "Basics.ManageSpeed"
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/SteamWorkshop/SteamWorkshopStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Options/OptionsStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MainMenu/MainMenuStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MainMenu/MainMenuMiscStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Modding/ModdingStyle.uss" />
+    <ui:VisualElement name="TitleScreen" class="title-screen title-screen-background">
+        <ui:VisualElement name="TitleScreenContent" class="title-screen__content" />
+        <ui:VisualElement name="Footer" picking-mode="Ignore" class="grow-centered title-screen__footer">
+            <ui:VisualElement name="LeftPanel" class="title-screen__left-panel title-screen__footer-element">
+                <ui:Label text="Version" name="GameVersion" class="title-screen__footer-text" />
+                <ui:Label text="Dev mode enabled" name="DevModeAlert" class="main-menu-panel__dev-mode-alert" />
+            </ui:VisualElement>
+            <ui:VisualElement name="MiddlePanel" class="title-screen__footer-element">
+                <ui:VisualElement name="MacOsRosettaWarningContainer" class="title-screen__rosetta-warning-container">
+                    <ui:VisualElement name="WarningIcon" class="warning-icon" />
+                    <ui:Label name="MacOsRosettaWarning" text="Rosetta: ON" class="text--default" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="RightPanel" class="title-screen__right-panel title-screen__footer-element">
+                <ui:Button name="ChangeLanguageButton" class="title-screen__footer-text main-menu-panel__language-button" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

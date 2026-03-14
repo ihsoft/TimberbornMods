@@ -1,0 +1,26 @@
+{
+  "TutorialStageSpec": {
+    "Id": "Basics.ManageSpeed",
+    "IntroLocKey": "Tutorial.Basics.ManageSpeed"
+  },
+  "Children": {
+    "Step1": {
+      "GameSpeedStepSpec": {
+        "Speed": 2,
+        "OnlyOnce": true
+      }
+    },
+    "Step2": {
+      "GameSpeedStepSpec": {
+        "Speed": 3,
+        "OnlyOnce": true
+      }
+    },
+    "Step3": {
+      "GameSpeedStepSpec": {
+        "Speed": 1,
+        "OnlyOnce": false
+      }
+    }
+  }
+}

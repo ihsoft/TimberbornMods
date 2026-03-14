@@ -1,0 +1,173 @@
+.tutorial-panels {
+    position: absolute;
+    min-width: 400px;
+    max-width: 400px;
+    right: 0;
+    bottom: 124px;
+}
+
+.tutorial-panel {
+    margin: 4px 0;
+}
+
+.hidden.tutorial-panel {
+    align-items: flex-end;
+}
+
+.tutorial-panel__header {
+    background-color: rgba(48, 35, 55, 0.9);
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    border-top-color: rgba(179, 179, 128, 0.8);
+    border-top-width: 1px;
+}
+
+.hidden .tutorial-panel__header {
+    border-top-width: 0;
+}
+
+.tutorial-panel--highlighted > .tutorial-panel__header {
+    background-color: rgba(179, 179, 128, 0.8);
+}
+
+.tutorial-panel__header-button {
+    padding: 4px;
+    flex-direction: row;
+    justify-content: flex-end;
+    flex-grow: 1;
+}
+
+.hover-enabled.tutorial-panel__header:hover:enabled {
+    background-color: rgba(179, 179, 128, 0.8);
+}
+
+.hover-enabled.tutorial-panel__header:hover:enabled .tutorial-panel__header-text {
+    color: black;
+}
+
+.hover-enabled.tutorial-panel__header:hover:enabled .tutorial-panel__header-icon {
+    -unity-background-image-tint-color: rgba(0, 0, 0, 0.75);
+}
+
+.tutorial-panel__dev-button {
+    width: 80px;
+    height: 24px;
+    color: rgb(204, 204, 204);
+    white-space: normal;
+    font-size: 11px;
+    margin: 2px;
+    padding: 2px;
+}
+
+.tutorial-panel__header-text {
+    margin: 0 8px;
+    -unity-text-align: middle-right;
+}
+
+.tutorial-panel--highlighted .tutorial-panel__header-text {
+    color: black;
+}
+
+.tutorial-panel__header-icon {
+    width: 22px;
+    height: 22px;
+    margin-left: 8px;
+    background-image: resource('UI/Images/Game/tutorial-icon');
+}
+
+.all-steps-achieved .tutorial-panel__header-icon {
+    background-image: resource('UI/Images/Game/tutorial-ready');
+}
+
+.tutorial-panel--highlighted .tutorial-panel__header-icon {
+    -unity-background-image-tint-color: rgba(0, 0, 0, 0.75);
+}
+
+.tutorial-panel__content {
+    background-color: rgba(48, 35, 55, 0.8);
+    padding: 4px 22px 4px 4px;
+}
+
+.hidden .tutorial-panel__content {
+    display: none;
+}
+
+.hidden .tutorial-panel__disable {
+    display: none;
+}
+
+.tutorial-panel__continue {
+    margin-top: 4px;
+    padding: 4px;
+    min-width: 50%;
+    align-self: center;
+    margin-bottom: 4px;
+    display: none;
+    --background-image: resource('UI/Images/Backgrounds/bg-button-4');
+    --background-slice-scale: 0.5;
+    --background-slice: 24;
+}
+
+.tutorial-panel__continue:hover:enabled {
+    --background-image: resource('UI/Images/Backgrounds/bg-button-3');
+}
+
+.all-steps-achieved .tutorial-panel__continue {
+    display: flex;
+}
+
+.tutorial-panel__disable {
+    background-image: resource('UI/Images/Game/tutorial-hide');
+    --click-sound: "UI.Click";
+    width: 18px;
+    height: 18px;
+    position: absolute;
+    right: 5px;
+    top: 4px;
+}
+
+.tutorial-panel__disable:hover:enabled {
+    -unity-background-image-tint-color: rgb(51, 204, 51);
+}
+
+.tutorial-panel__intro {
+    padding: 4px;
+    -unity-paragraph-spacing: -40px;
+}
+
+.tutorial-panel__steps {
+    margin-top: 2px;
+}
+
+.tutorial-step-view {
+    flex-direction: row;
+    padding: 2px 4px;
+}
+
+.tutorial-step-view__checkbox {
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+    background-image: resource('UI/Images/Buttons/empty-alt');
+}
+
+.tutorial-step-view--finished > .tutorial-step-view__checkbox {
+    background-image: resource('UI/Images/Buttons/checkmark-alt');
+
+}
+
+.tutorial-step-view__key-binding {
+    padding: 0 4px;
+    margin-left: 8px;
+    background-color: rgb(154, 134, 94);
+    -unity-text-align: middle-center;
+    justify-content: center;
+    display: none;
+}
+
+.tutorial-step-view__key-binding--text {
+    color: rgb(0, 0, 0);
+    font-size: 13px;
+    white-space: normal;
+}

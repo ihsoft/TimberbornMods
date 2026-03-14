@@ -1,0 +1,20 @@
+{
+  "KeyBindingSpec": {
+    "Id": "DeleteObject",
+    "GroupId": "Objects",
+    "LocKey": "KeyBinding.DeleteObject",
+    "Order": 30,
+    "AllowOtherModifiers": true,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/delete",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  },
+  "SecondaryInputBindingSpec": {
+    "Path": "/Keyboard/backspace",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

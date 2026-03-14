@@ -1,0 +1,26 @@
+{
+  "RecipeSpec": {
+    "Id": "CanolaOil",
+    "BackwardCompatibleIds": [],
+    "DisplayLocKey": "Good.CanolaOil.PluralDisplayName",
+    "CycleDurationInHours": 1.25,
+    "Ingredients": [
+      {
+        "Id": "CanolaSeeds",
+        "Amount": 1
+      }
+    ],
+    "Products": [
+      {
+        "Id": "CanolaOil",
+        "Amount": 1
+      }
+    ],
+    "ProducedSciencePoints": 0,
+    "Fuel": "",
+    "CyclesFuelLasts": 0,
+    "FuelCapacity": 0,
+    "CyclesCapacity": 30,
+    "Icon": "Sprites/Goods/CanolaOilIcon"
+  }
+}

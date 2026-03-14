@@ -1,0 +1,13 @@
+{
+  "ToolGroupSpec": {
+    "Id": "AutomationWaterToolGroupId",
+    "DisplayNameLocKey": "IgorZ.Automation.ToolGroup.Water.DisplayName",
+    "Icon": "Sprites/IgorZ/tool-group-water"
+  },
+  "CustomToolGroupSpec": {
+    "ParentGroupId": "AutomationToolGroupId",
+    "Style": "Green",
+    "Order": 21
+  },
+  "ConstructionModeToolGroupSpec": {}
+}

@@ -1,0 +1,6 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="True">
+    <Style path="UI/Views/Editor/BlueprintSystem/BlueprintSystemStyle" />
+    <ui:VisualElement name="SpecBlueprintElementHeader" class="spec-blueprint-element-header">
+        <ui:Button name="RemoveButton" text="×" class="blueprint-element-header__remove-button" />
+    </ui:VisualElement>
+</ui:UXML>

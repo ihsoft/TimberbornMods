@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "Spadderdock",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.07450981,
+      "g": 0.6313726,
+      "b": 0.294117659,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Ingredients",
+    "GoodOrder": 8020,
+    "Icon": "Sprites/Goods/SpadderdockIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.Spadderdock.DisplayName",
+    "PluralDisplayNameLocKey": "Good.Spadderdock.PluralDisplayName"
+  }
+}

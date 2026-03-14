@@ -1,0 +1,356 @@
+{
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 3
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "TemplateSpec": {
+    "TemplateName": "Pine",
+    "BackwardCompatibleTemplateNames": [
+      "ChestnutTree"
+    ],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "NaturalResourceSpec": {
+    "Order": 6
+  },
+  "TreeComponentSpec": {},
+  "GrowableSpec": {
+    "GrowthTimeInDays": 12.0
+  },
+  "BasicSelectionSoundSpec": {
+    "SoundName": "Tree",
+    "AlternativeSoundName": ""
+  },
+  "PlantableSpec": {
+    "ResourceGroup": "Forester",
+    "PlantTimeInHours": 0.75
+  },
+  "DemolishableSpec": {
+    "DemolishTimeInHours": 1.2,
+    "ShowDemolishButtonInEntityPanel": false
+  },
+  "CuttableSpec": {
+    "RemoveOnCut": false,
+    "LeftoverModelName": "#Leftover",
+    "Yielder": {
+      "YielderComponentName": "Cuttable",
+      "Yield": {
+        "Id": "Log",
+        "Amount": 2
+      },
+      "RemovalTimeInHours": 1.5,
+      "ResourceGroup": "Cuttable"
+    }
+  },
+  "PlantablePreviewModelSpec": {
+    "Model": "NaturalResources/Trees/Pine/Mesh/PineMature"
+  },
+  "ReproducibleSpec": {
+    "ReproductionChance": 0.03
+  },
+  "WateredNaturalResourceSpec": {
+    "DaysToDieDry": 13.0
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "NaturalResource.Pine.DisplayName",
+    "DescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "NaturalResource.Pine.FlavorDescription",
+    "Icon": "NaturalResources/Trees/Pine/PineIcon"
+  },
+  "GatherableSpec": {
+    "YieldGrowthTimeInDays": 7.0,
+    "Yielder": {
+      "YielderComponentName": "Gatherable",
+      "Yield": {
+        "Id": "PineResin",
+        "Amount": 2
+      },
+      "RemovalTimeInHours": 1.2,
+      "ResourceGroup": "Tappable"
+    }
+  },
+  "FloodableNaturalResourceSpec": {
+    "MinWaterHeight": 0,
+    "MaxWaterHeight": 0,
+    "DaysToDie": 12.0
+  },
+  "NaturalResourceModelRandomizerSpec": {
+    "ConstrainProportion": false,
+    "MinHeightScaleFactor": 0.8,
+    "MaxHeightScaleFactor": 1.0,
+    "MinWidthScaleFactor": 0.9,
+    "MaxWidthScaleFactor": 1.1,
+    "RandomizedRotation": "BetweenMinAndMax",
+    "MinRotation": 0.0,
+    "MaxRotation": 360.0
+  },
+  "TreeCuttingRadiusSpec": {
+    "Radius": 0.095
+  },
+  "ContaminatedNaturalResourceSpec": {},
+  "BlockObjectModelSpec": {
+    "FullModelName": "#Models",
+    "UncoveredModelName": "",
+    "UndergroundModelName": "",
+    "UndergroundModelDepth": 0
+  },
+  "Children": {
+    "#Models": {
+      "Children": {
+        "Seedling": {
+          "Children": {
+            "#Dying": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Trees/Pine/Mesh/PineSeedlingDry"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [],
+                "CapsuleColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.5613813,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.198561281,
+                    "Height": 1.54919016,
+                    "Axis": "Y"
+                  }
+                ]
+              }
+            },
+            "#Dead": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Trees/Pine/Mesh/PineSeedlingDead"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [],
+                "CapsuleColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.3,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.2,
+                    "Height": 0.8,
+                    "Axis": "Y"
+                  }
+                ]
+              }
+            },
+            "#Alive": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Trees/Pine/Mesh/PineSeedling"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [],
+                "CapsuleColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.5613813,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.198561281,
+                    "Height": 1.54919016,
+                    "Axis": "Y"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "Mature": {
+          "Children": {
+            "#Alive": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Trees/Pine/Mesh/PineMature"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [],
+                "CapsuleColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 1.84,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.456594944,
+                    "Height": 1.52,
+                    "Axis": "Y"
+                  },
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.85,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.200641036,
+                    "Height": 1.87,
+                    "Axis": "Y"
+                  },
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 2.67,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.200641036,
+                    "Height": 0.69,
+                    "Axis": "Y"
+                  }
+                ]
+              }
+            },
+            "#Dying": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Trees/Pine/Mesh/PineMatureDry"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [],
+                "CapsuleColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 1.84,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.456594944,
+                    "Height": 1.52,
+                    "Axis": "Y"
+                  },
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.85,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.200641036,
+                    "Height": 1.87,
+                    "Axis": "Y"
+                  },
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 2.67,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.200641036,
+                    "Height": 0.69,
+                    "Axis": "Y"
+                  }
+                ]
+              }
+            },
+            "#Dead": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Trees/Pine/Mesh/PineMatureDead"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [],
+                "CapsuleColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 1.84,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.456594944,
+                    "Height": 1.52,
+                    "Axis": "Y"
+                  },
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.85,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.200641036,
+                    "Height": 1.87,
+                    "Axis": "Y"
+                  },
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 2.67,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.200641036,
+                    "Height": 0.69,
+                    "Axis": "Y"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "#Leftover": {
+          "TimbermeshSpec": {
+            "Model": "NaturalResources/Trees/Pine/Mesh/PineMatureStump"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [],
+            "SphereColliders": [],
+            "CapsuleColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.07685387,
+                  "Z": 0.5
+                },
+                "Radius": 0.204731375,
+                "Height": 0.6003412,
+                "Axis": "Y"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

@@ -5,6 +5,7 @@
 using System;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Expressions;
+using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.ConstructionSites;
 using UnityEngine;
@@ -27,7 +28,7 @@ sealed class ConstructableScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override string[] GetSignalNamesForBuilding(AutomationBehavior behavior) {
-    var blockObject = behavior.GetComponentFast<BlockObject>();
+    var blockObject = behavior.GetComponent<BlockObject>();
     return !blockObject.IsFinished ? [StateSignalName, ProgressSignalName] : [];
   }
 
@@ -83,32 +84,32 @@ sealed class ConstructableScriptableComponent : ScriptableComponentBase {
       DisplayName = Loc.T(ProgressSignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
-          ValueFormatter = x => x.AsFloat.ToString("P0"),
-          ValueValidator = ValueDef.RangeCheckValidatorFloat(0f, 1f),
-          ValueUiHint = GetArgumentMaxValueHint(1f),
+          DisplayNumericFormat = ValueDef.NumericFormatEnum.Percent,
+          DisplayNumericFormatRange = (0, 100),
+          RuntimeValueValidator = ValueDef.RangeCheckValidator(min: 0f, max: 1f),
       },
   };
   SignalDef _progressSignalDef;
 
 
   static ScriptValue StateSignal(AutomationBehavior behavior) {
-    return ScriptValue.Of(behavior.GetComponentFast<BlockObject>().IsFinished ? "finished" : "");
+    return ScriptValue.FromString(behavior.GetComponent<BlockObject>().IsFinished ? "finished" : "");
   }
 
   static ScriptValue ProgressSignal(AutomationBehavior behavior) {
-    return ScriptValue.FromFloat(behavior.GetComponentFast<ConstructionSite>().BuildTimeProgress);
+    return ScriptValue.FromFloat(behavior.GetComponent<ConstructionSite>().BuildTimeProgress);
   }
 
   #endregion
 
   #region Implementation
 
-  class ConstructableStateTracker : AbstractStatusTracker, IFinishedStateListener {
+  internal sealed class ConstructableStateTracker : AbstractStatusTracker, IAwakableComponent, IFinishedStateListener {
     int _prevProgress;
 
-    void Awake() {
-      var constructionSite = GetComponentFast<ConstructionSite>();
-      GetComponentFast<ConstructionSite>().OnConstructionSiteProgressed += (_, _) => {
+    public void Awake() {
+      var constructionSite = AutomationBehavior.GetComponent<ConstructionSite>();
+      AutomationBehavior.GetComponent<ConstructionSite>().OnConstructionSiteProgressed += (_, _) => {
         var progress = Mathf.RoundToInt(constructionSite.BuildTimeProgress * 100f);
         if (progress != _prevProgress) {
           _prevProgress = progress;

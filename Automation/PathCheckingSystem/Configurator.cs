@@ -10,11 +10,12 @@ namespace IgorZ.Automation.PathCheckingSystem;
 // ReSharper disable once UnusedType.Global
 [Context("Game")]
 sealed class Configurator : IConfigurator {
-  static readonly string PatchId = typeof(Configurator).FullName;
+  static readonly string PatchId = typeof(Configurator).AssemblyQualifiedName;
 
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<PathCheckingService>().AsSingleton();
+    containerDefinition.Bind<PathCheckingSite>().AsTransient();
 
-    HarmonyPatcher.PatchRepeated(PatchId, typeof(ConstructionSiteFinishIfRequirementsMetPatch));
+    HarmonyPatcher.ApplyPatch(PatchId, typeof(ConstructionSiteFinishIfRequirementsMetPatch));
   }
 }

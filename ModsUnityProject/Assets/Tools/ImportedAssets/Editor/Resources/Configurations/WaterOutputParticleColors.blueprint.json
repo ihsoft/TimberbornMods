@@ -1,0 +1,24 @@
+{
+  "WaterOutputParticleColorsSpec": {
+    "WaterContaminationParticleGradient": [
+      {
+        "Color": {
+          "r": 0.3119882,
+          "g": 0.4793913,
+          "b": 0.5377358,
+          "a": 1.0
+        },
+        "Time": 0.0
+      },
+      {
+        "Color": {
+          "r": 0.9529412,
+          "g": 0.321568638,
+          "b": 0.192156866,
+          "a": 1.0
+        },
+        "Time": 0.36
+      }
+    ]
+  }
+}

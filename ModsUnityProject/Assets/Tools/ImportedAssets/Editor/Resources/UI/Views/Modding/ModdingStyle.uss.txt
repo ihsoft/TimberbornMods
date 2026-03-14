@@ -1,0 +1,363 @@
+.mod-manager-scene-panel__content {
+    background-image: resource('UI/Images/MainMenu/border_mod_manager');
+}
+
+.mod-manager-scene-panel__header {
+    background-image: resource('UI/Images/Core/header');
+}
+
+.mod-manager-scene-panel__list > .unity-scroll-view__content-and-vertical-scroll-container > .unity-scroller > .unity-repeat-button {
+    display: none;
+}
+
+.mod-manager-scene-panel__list > .unity-scroll-view__horizontal-scroller > .unity-repeat-button {
+    display: none;
+}
+
+.mod-manager-scene-panel__list > .unity-scroll-view__content-and-vertical-scroll-container > .unity-scroller > .unity-slider {
+    width: 20px;
+}
+
+.mod-manager-scene-panel__list > .unity-scroll-view__content-and-vertical-scroll-container > .unity-scroller > .unity-slider .unity-base-slider__dragger {
+    background-image: resource('UI/Images/Core/vertical-scroll-button-nine-slice');
+    max-height: 60px;
+    min-height: 60px;
+    width: 20px;
+    left: 0;
+}
+
+.mod-manager-scene-panel__list > .unity-scroll-view__content-and-vertical-scroll-container > .unity-scroller > .unity-slider > .unity-slider__input > .unity-base-slider__drag-container > .unity-base-slider__dragger:hover {
+    background-image: resource('UI/Images/Core/vertical-scroll-button-nine-slice-highlight');
+}
+
+.mod-manager-scene-panel__list > .unity-scroll-view__content-and-vertical-scroll-container > .unity-scroller > .unity-slider > .unity-slider__input > .unity-base-slider__drag-container:active > .unity-base-slider__dragger {
+    background-image: resource('UI/Images/Core/vertical-scroll-button-nine-slice-highlight');
+}
+
+.mod-manager-scene-panel__list > .unity-scroll-view__content-and-vertical-scroll-container > .unity-scroller {
+    background-image: resource('UI/Images/MainMenu/scrollbar_mod_manager');
+    -unity-background-scale-mode: stretch-to-fill;
+    width: 20px;
+}
+
+.mod-manager-scene-panel__button {
+    background-image: resource('UI/Images/Buttons/button');
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+    height: 33px;
+    width: 184px;
+    font-size: 13px;
+}
+
+.mod-manager-scene-panel__button:hover:enabled {
+    background-image: resource('UI/Images/Buttons/button-hover');
+    color: rgb(0, 0, 0);
+}
+
+.mod-manager-scene-panel__tooltip {
+    background-image: resource('UI/Images/Backgrounds/bg-square-3');
+    -unity-slice-bottom: 10;
+    -unity-slice-top: 10;
+    -unity-slice-left: 10;
+    -unity-slice-right: 10;
+    -unity-slice-scale: 0.5px;
+}
+
+.mod-manager-box {
+    height: 685px;
+    width: 600px;
+    align-self: center;
+}
+
+.mod-manager-box__top-buttons {
+    flex-shrink: 0;
+    flex-grow: 0;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.mod-manager-box__top-button {
+    --click-sound: "UI.Click";
+}
+
+.mod-manager-box__top-button:hover:enabled {
+    color: yellow;
+}
+
+.mod-manager-box__list {
+    padding: 12px;
+    flex-grow: 1;
+    background-image: resource('UI/Images/Backgrounds/bg-square-1');
+    -unity-slice-bottom: 10;
+    -unity-slice-top: 10;
+    -unity-slice-left: 10;
+    -unity-slice-right: 10;
+    -unity-slice-scale: 0.5px;
+}
+
+.mod-manger-box__confirm-button {
+    flex-shrink: 0;
+    flex-direction: row;
+    align-self: center;
+    margin-top: 14px;
+    margin-bottom: -5px;
+}
+
+.mod-manager-box__restart-label {
+    color: red;
+    font-size: 14px;
+    -unity-text-align: middle-center;
+    display: none;
+    margin-top: 10px;
+    margin-bottom: -10px;
+}
+
+.mod-item {
+    flex-direction: row;
+    margin-bottom: 5px;
+    padding: 3px 0;
+    align-items: center;
+}
+
+.mod-item__priority-wrapper {
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.mod-item__priority {
+    width: 14px;
+    height: 14px;
+    margin-right: 5px;
+    --click-sound: "UI.Click";
+}
+
+.mod-item__priority--increase {
+    background-image: resource('UI/Images/Buttons/arrow-up-bare');
+}
+
+.mod-item__priority--decrease {
+    background-image: resource('UI/Images/Buttons/arrow-down-bare');
+}
+
+.mod-item__priority--increase:hover {
+    background-image: resource('UI/Images/Buttons/arrow-up-bare-hover');
+}
+
+.mod-item__priority--decrease:hover {
+    background-image: resource('UI/Images/Buttons/arrow-down-bare-hover');
+}
+
+.mod-item__priority-modifier .mod-item__priority--increase {
+    background-image: resource('UI/Images/Buttons/arrow-up-bare-double');
+}
+
+.mod-item__priority-modifier .mod-item__priority--decrease {
+    background-image: resource('UI/Images/Buttons/arrow-down-bare-double');
+}
+
+.mod-item__priority-modifier .mod-item__priority--increase:hover {
+    background-image: resource('UI/Images/Buttons/arrow-up-bare-double-hover');
+}
+
+.mod-item__priority-modifier .mod-item__priority--decrease:hover {
+    background-image: resource('UI/Images/Buttons/arrow-down-bare-double-hover');
+}
+
+.mod-item__toggle {
+    --click-sound: "UI.Click";
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.mod-item__toggle > .unity-toggle__input {
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: 100%;
+}
+
+.mod-item__toggle > .unity-toggle__input > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/checkbox_off');
+    width: 25px;
+    height: 25px;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.mod-item__toggle > .unity-toggle__input:checked > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/checkbox_on');
+}
+
+.mod-item__toggle > .unity-toggle__input:checked:hover:enabled > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/checkbox_on_hover');
+}
+
+.mod-item__toggle > .unity-toggle__input:hover:enabled > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/checkbox_off_hover');
+}
+
+.mod-item__icon {
+    width: 24px;
+    height: 24px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    margin: 1px 2px 1px 4px;
+}
+
+.mod-item__icon--cloud {
+    background-image: resource('UI/Images/Core/cloud-file-icon');
+}
+
+.mod-item__icon--local {
+    background-image: resource('UI/Images/Core/local-file-icon');
+}
+
+.mod-item__name {
+    color: rgb(255, 255, 255);
+    font-size: 17px;
+    margin: 0 5px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    flex-grow: 0;
+    flex-shrink: 1;
+    white-space: nowrap;
+}
+
+.mod-item__version {
+    font-size: 14px;
+    margin-right: 5px;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.warning-icon {
+    background-image: resource('UI/Images/Core/warning_triangle');
+    width: 20px;
+    height: 20px;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.error-icon {
+    background-image: resource('UI/Images/Core/error-icon');
+    width: 20px;
+    height: 20px;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.mod-uploader-box {
+    height: 650px;
+    width: 580px;
+    align-self: center;
+}
+
+.mod-uploader-box__items {
+    flex-grow: 1;
+    margin: 8px;
+}
+
+.uploadable-mod-item {
+    height: 34px;
+}
+
+.mod-incompatibility-box__panels-wrapper {
+    flex-wrap: nowrap;
+}
+
+.simple-mod-panel {
+    margin: 20px;
+}
+
+.simple-mod-panel__container {
+    width: 400px;
+    height: 350px;
+    padding: 10px;
+}
+
+.mod-management-panel {
+    position: absolute;
+    left: 630px;
+    width: auto;
+    align-self: center;
+    align-items: center;
+    align-content: stretch;
+    padding: 45px;
+}
+
+.mod-management-panel__button {
+    margin: 7px 0;
+    width: 100%;
+}
+
+.mod-management-panel__button.wide-menu-button {
+    padding: 0 25px;
+}
+
+.create-mod-box {
+    height: auto;
+    width: auto;
+    align-self: center;
+}
+
+.create-mod-box__content {
+    padding: 7px 50px;
+}
+
+.create-mod-box__input-wrapper {
+    flex-direction: row;
+    width: auto;
+    justify-content: space-between;
+    margin: 8px 10px;
+    padding: 0 5px;
+}
+
+.create-mod-box__input-label {
+    flex-grow: 1;
+    margin-right: 15px;
+    font-size: 18px;
+    width: 150px;
+    white-space: normal;
+}
+
+.create-mod-box__input-field {
+    width: 243px;
+    height: 30px;
+    align-self: center;
+    font-size: 18px;
+}
+
+.create-mod-box__template-dropdown {
+    width: auto;
+    margin: 20px 10px 8px 10px;
+    padding: 0 5px;
+}
+
+.create-mod-box__template-dropdown .dropdown__label {
+    flex-grow: 1;
+    flex-shrink: 1;
+    font-size: 18px;
+    width: 150px;
+    white-space: normal;
+}
+
+.create-mod-box__template-dropdown .dropdown__selectable.dropdown__selection {
+    width: 300px;
+}
+
+.create-mod-box__template-dropdown .dropdown-item__text {
+    font-size: 16px;
+}
+
+.mod-created-message__success-icon {
+    background-image: resource('UI/Images/Core/success-popup-icon-checkmark');
+    width: 60px;
+    height: 60px;
+    align-self: center;
+    margin-bottom: 10px;
+}
+
+.mod-created-message__text {
+    -unity-text-align: upper-center;
+    font-size: 15px;
+}

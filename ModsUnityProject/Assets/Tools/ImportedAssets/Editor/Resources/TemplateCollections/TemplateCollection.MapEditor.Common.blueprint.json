@@ -1,0 +1,39 @@
+{
+  "TemplateCollectionSpec": {
+    "CollectionId": "Common",
+    "Blueprints": [
+      "MapEditor/Objects/Blockage/Blockage.blueprint",
+      "MapEditor/Objects/GeothermalField/GeothermalField.blueprint",
+      "MapEditor/Objects/LargeRelic/LargeRelic.blueprint",
+      "MapEditor/Objects/MediumRelic/MediumRelic.blueprint",
+      "MapEditor/Objects/NaturalDam/NaturalDam.blueprint",
+      "MapEditor/Objects/NaturalOverhang2x1/NaturalOverhang2x1.blueprint",
+      "MapEditor/Objects/NaturalOverhang3x1/NaturalOverhang3x1.blueprint",
+      "MapEditor/Objects/NaturalOverhang4x1/NaturalOverhang4x1.blueprint",
+      "MapEditor/Objects/ReservePile/ReservePile.blueprint",
+      "MapEditor/Objects/ReserveTank/ReserveTank.blueprint",
+      "MapEditor/Objects/ReserveWarehouse/ReserveWarehouse.blueprint",
+      "MapEditor/Objects/Slope/Slope.blueprint",
+      "MapEditor/Objects/SmallRelic/SmallRelic.blueprint",
+      "MapEditor/Objects/Thorns/Thorns.blueprint",
+      "MapEditor/Objects/UnstableCore/UnstableCore.blueprint",
+      "MapEditor/Ruins/RuinColumnH1/RuinColumnH1.blueprint",
+      "MapEditor/Ruins/RuinColumnH2/RuinColumnH2.blueprint",
+      "MapEditor/Ruins/RuinColumnH3/RuinColumnH3.blueprint",
+      "MapEditor/Ruins/RuinColumnH4/RuinColumnH4.blueprint",
+      "MapEditor/Ruins/RuinColumnH5/RuinColumnH5.blueprint",
+      "MapEditor/Ruins/RuinColumnH6/RuinColumnH6.blueprint",
+      "MapEditor/Ruins/RuinColumnH7/RuinColumnH7.blueprint",
+      "MapEditor/Ruins/RuinColumnH8/RuinColumnH8.blueprint",
+      "MapEditor/Ruins/UndergroundRuins/UndergroundRuins.blueprint",
+      "MapEditor/StartingLocation/StartingLocation.blueprint",
+      "MapEditor/Water/AncientAquiferDrill/AncientAquiferDrill.blueprint",
+      "MapEditor/Water/Aquifer/Aquifer.blueprint",
+      "MapEditor/Water/BadtideDrain/BadtideDrain.blueprint",
+      "MapEditor/Water/BadwaterSeep/BadwaterSeep.blueprint",
+      "MapEditor/Water/BadwaterSource/BadwaterSource.blueprint",
+      "MapEditor/Water/WaterSeep/WaterSeep.blueprint",
+      "MapEditor/Water/WaterSource/WaterSource.blueprint"
+    ]
+  }
+}

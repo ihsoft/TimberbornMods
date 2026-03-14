@@ -1,0 +1,9 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <ui:VisualElement name="TimedActivatorSetting" class="entity-panel-setting">
+        <ui:Label name="Text" class="game-text-normal entity-panel-setting__text" />
+        <cui:NineSliceFloatField name="Value" class="entity-panel-setting__input entity-panel-input" />
+    </ui:VisualElement>
+</ui:UXML>

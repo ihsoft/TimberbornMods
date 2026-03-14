@@ -1,0 +1,19 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/BatchControl/BatchControlStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/Population/PopulationStyle.uss" />
+    <cui:NineSliceVisualElement name="ManualMigrationPopulationRowLeft" class="manual-migration-population-row">
+        <cui:NineSliceVisualElement name="RowHighlight" class="batch-control-box__row--highlighted bg-box--green manual-migration-row__highlight manual-migration-row__highlight-margin" />
+        <ui:VisualElement name="PopulationIcon" class="population-batch-control-row-item__icon" />
+        <ui:Label name="CurrentPopulation" text="100" class="game-text-normal population-batch-control-row-item__info" />
+        <ui:Label name="MinimumLabel" text="Minimum" class="game-text-normal population-distributor-batch-control-row-item__label" />
+        <ui:Label name="CurrentMinimum" text="100" class="game-text-normal manual-migration-population-row__minimum" />
+        <ui:VisualElement name="ButtonsWrapper" class="manual-migration-population-row__left-buttons-wrapper">
+            <ui:Button name="ButtonOne" text="1" class="manual-migration-population-row__button manual-migration-population-row__right-button text--yellow manual-migration-population-row__number-button" />
+            <ui:Button name="ButtonTen" text="10" class="manual-migration-population-row__button manual-migration-population-row__right-button text--yellow manual-migration-population-row__number-button" />
+            <ui:Button name="ButtonAll" text="∞" class="manual-migration-population-row__button manual-migration-population-row__right-button text--yellow manual-migration-population-row__all-button" />
+        </ui:VisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

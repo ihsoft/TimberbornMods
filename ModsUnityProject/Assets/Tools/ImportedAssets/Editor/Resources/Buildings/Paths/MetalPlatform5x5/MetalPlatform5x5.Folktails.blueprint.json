@@ -1,0 +1,564 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "Default",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "MetalBlock",
+        "Amount": 90
+      }
+    ],
+    "ScienceCost": 2000,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": true,
+    "DrawRangeBoundsOnIt": true
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "#FinishedUncovered",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "TemplateSpec": {
+    "TemplateName": "MetalPlatform5x5.Folktails",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 5,
+      "Y": 5,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Top, Corners",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "BlockObjectNavMeshSettingsSpec": {
+    "NoAutoWalls": false,
+    "GenerateFloorsOnStackable": true,
+    "EdgeGroups": [],
+    "UnblockedCoordinates": []
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Paths",
+    "ToolOrder": 81,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.MetalPlatform5x5.DisplayName",
+    "DescriptionLocKey": "Building.MetalPlatform5x5.Description",
+    "FlavorDescriptionLocKey": "Building.MetalPlatform.FlavorDescription",
+    "Icon": "Buildings/Paths/MetalPlatform5x5/MetalPlatform5x5Icon"
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "Children": {
+    "#FinishedUncovered": {
+      "TransformSpec": {
+        "Position": {
+          "X": 1.0,
+          "Y": 0.0,
+          "Z": 1.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        }
+      },
+      "TimbermeshSpec": {
+        "Model": "Buildings/Paths/MetalPlatform5x5/MetalPlatform.Uncovered.Folktails.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 1.11,
+              "Y": 0.4,
+              "Z": 1.11
+            },
+            "Size": {
+              "X": 0.2,
+              "Y": 0.9,
+              "Z": 0.2
+            }
+          },
+          {
+            "Center": {
+              "X": 1.89,
+              "Y": 0.4,
+              "Z": 1.11
+            },
+            "Size": {
+              "X": 0.2,
+              "Y": 0.9,
+              "Z": 0.2
+            }
+          },
+          {
+            "Center": {
+              "X": 1.89,
+              "Y": 0.4,
+              "Z": 1.89
+            },
+            "Size": {
+              "X": 0.2,
+              "Y": 0.9,
+              "Z": 0.2
+            }
+          },
+          {
+            "Center": {
+              "X": 1.11,
+              "Y": 0.4,
+              "Z": 1.89
+            },
+            "Size": {
+              "X": 0.2,
+              "Y": 0.9,
+              "Z": 0.2
+            }
+          },
+          {
+            "Center": {
+              "X": 1.5,
+              "Y": 0.9257401,
+              "Z": 1.5
+            },
+            "Size": {
+              "X": 0.98,
+              "Y": 0.170637429,
+              "Z": 0.98
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Paths/MetalPlatform5x5/MetalPlatform5x5.Full.Folktails.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 2.5,
+              "Y": 0.5,
+              "Z": 2.5
+            },
+            "Size": {
+              "X": 0.6999998,
+              "Y": 1.0,
+              "Z": 0.6999998
+            }
+          },
+          {
+            "Center": {
+              "X": 2.5,
+              "Y": 0.87620914,
+              "Z": 2.5
+            },
+            "Size": {
+              "X": 5.0,
+              "Y": 0.236104727,
+              "Z": 5.0
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase1x1#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase1x1/ConstructionBase1x1.blueprint",
+          "Modification": {
+            "TransformSpec": {
+              "Position": {
+                "X": 2.0,
+                "Y": 0.0,
+                "Z": 2.0
+              },
+              "Rotation": {
+                "X": 0.0,
+                "Y": 0.0,
+                "Z": 0.0
+              },
+              "Scale": {
+                "X": 1.0,
+                "Y": 1.0,
+                "Z": 1.0
+              }
+            }
+          }
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/MetalPlatform5x5/MetalPlatform5x5.Folktails.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 2.07397485,
+                  "Y": 0.425703049,
+                  "Z": 2.07649922
+                },
+                "Size": {
+                  "X": 0.155954838,
+                  "Y": 0.84859395,
+                  "Z": 0.157643676
+                }
+              },
+              {
+                "Center": {
+                  "X": 2.93,
+                  "Y": 0.425703049,
+                  "Z": 2.07649922
+                },
+                "Size": {
+                  "X": 0.155954838,
+                  "Y": 0.84859395,
+                  "Z": 0.157643676
+                }
+              },
+              {
+                "Center": {
+                  "X": 2.93,
+                  "Y": 0.425703049,
+                  "Z": 2.93
+                },
+                "Size": {
+                  "X": 0.155954838,
+                  "Y": 0.84859395,
+                  "Z": 0.157643676
+                }
+              },
+              {
+                "Center": {
+                  "X": 2.07397485,
+                  "Y": 0.425703049,
+                  "Z": 2.93
+                },
+                "Size": {
+                  "X": 0.155954838,
+                  "Y": 0.84859395,
+                  "Z": 0.157643676
+                }
+              },
+              {
+                "Center": {
+                  "X": 2.50121927,
+                  "Y": 0.8468785,
+                  "Z": 1.08
+                },
+                "Size": {
+                  "X": 5.00671768,
+                  "Y": 0.00624299049,
+                  "Z": 0.166721344
+                }
+              },
+              {
+                "Center": {
+                  "X": 2.50121927,
+                  "Y": 0.8468785,
+                  "Z": 2.08
+                },
+                "Size": {
+                  "X": 5.00671768,
+                  "Y": 0.00624299049,
+                  "Z": 0.166721344
+                }
+              },
+              {
+                "Center": {
+                  "X": 2.50121927,
+                  "Y": 0.8468785,
+                  "Z": 2.93495631
+                },
+                "Size": {
+                  "X": 5.00671768,
+                  "Y": 0.00624299049,
+                  "Z": 0.171809673
+                }
+              },
+              {
+                "Center": {
+                  "X": 2.50121927,
+                  "Y": 0.8468785,
+                  "Z": 3.92622066
+                },
+                "Size": {
+                  "X": 5.00671768,
+                  "Y": 0.00624299049,
+                  "Z": 0.171809673
+                }
+              },
+              {
+                "Center": {
+                  "X": 1.07444072,
+                  "Y": 0.8468785,
+                  "Z": 2.50340128
+                },
+                "Size": {
+                  "X": 0.160183191,
+                  "Y": 0.00624299049,
+                  "Z": 5.00072765
+                }
+              },
+              {
+                "Center": {
+                  "X": 2.074441,
+                  "Y": 0.8468785,
+                  "Z": 2.50340128
+                },
+                "Size": {
+                  "X": 0.160183191,
+                  "Y": 0.00624299049,
+                  "Z": 5.00072765
+                }
+              },
+              {
+                "Center": {
+                  "X": 2.92584085,
+                  "Y": 0.8468785,
+                  "Z": 2.50340128
+                },
+                "Size": {
+                  "X": 0.1482563,
+                  "Y": 0.00624299049,
+                  "Z": 5.00072765
+                }
+              },
+              {
+                "Center": {
+                  "X": 3.92545915,
+                  "Y": 0.8468785,
+                  "Z": 2.50340128
+                },
+                "Size": {
+                  "X": 0.158195019,
+                  "Y": 0.00624299049,
+                  "Z": 5.00072765
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    }
+  }
+}

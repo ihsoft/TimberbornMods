@@ -3,7 +3,10 @@
 // License: Public Domain
 
 using HarmonyLib;
+using IgorZ.Automation.AutomationSystem;
 using Timberborn.ConstructionSites;
+
+// ReSharper disable InconsistentNaming
 
 namespace IgorZ.Automation.PathCheckingSystem;
 
@@ -18,11 +21,11 @@ static class ConstructionSiteFinishIfRequirementsMetPatch {
     if (!__instance.IsReadyToFinish || !__instance.IsFinishNotBlocked) {
       return true;
     }
-    var site = __instance.GetComponentFast<PathCheckingSite>();
-    if (site && site.enabled) {
-      PathCheckingService.Instance.CheckBlockingStateAndTriggerActions(site);
-      return site.CanFinish;
+    var behavior = __instance.GetComponent<AutomationBehavior>();
+    if (!behavior || !behavior.TryGetDynamicComponent<PathCheckingSite>(out var site) || !site.Enabled) {
+      return true;
     }
-    return true;
+    PathCheckingService.Instance.CheckBlockingStateAndTriggerActions(site);
+    return site.CanFinish;
   }
 }

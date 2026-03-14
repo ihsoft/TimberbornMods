@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
-using Timberborn.PrefabSystem;
 using UnityEngine;
 
 namespace UnityDev.Utils.LogUtilsLite;
@@ -37,7 +36,7 @@ static class DebugEx {
   /// <seealso cref="Log"/>
   public static void Info(string format, params object[] args) {
     if (VerbosityLevel >= LogLevel.Info) {
-      Console.WriteLine("[Log-INFO] " + format, args);
+      Log(LogType.Log, format, args);
     }
   }
 
@@ -45,7 +44,7 @@ static class DebugEx {
   /// <inheritdoc cref="Info"/>
   public static void Fine(string format, params object[] args) {
     if (VerbosityLevel >= LogLevel.Fine) {
-      Console.WriteLine("[Log-FINE] " + format, args);
+      Log(LogType.Log, format, args);
     }
   }
 
@@ -53,7 +52,7 @@ static class DebugEx {
   /// <inheritdoc cref="Info"/>
   public static void Warning(string format, params object[] args) {
     if (VerbosityLevel >= LogLevel.Warning) {
-      Console.WriteLine("[Log-WARNING] " + format, args);
+      Log(LogType.Warning, format, args);
     }
   }
 
@@ -61,7 +60,7 @@ static class DebugEx {
   /// <inheritdoc cref="Info"/>
   public static void Error(string format, params object[] args) {
     if (VerbosityLevel >= LogLevel.Error) {
-      Console.WriteLine("[Log-ERROR] " + format, args);
+      Log(LogType.Error, format, args);
     }
   }
 
@@ -75,24 +74,17 @@ static class DebugEx {
   /// <seealso cref="ObjectToString"/>
   public static void Log(LogType type, string format, params object[] args) {
     try {
-      var objects = args.Select(x => {
-        switch (x) {
-          case IList list: {
-            List<object> res = [];
-            res.AddRange(from object item in list select ObjectToString(item));
-            return string.Join(",", res);
-          }
-          default:
-            return ObjectToString(x);
-        }
+      var objects = args.Select(x => x switch {
+          IList list => string.Join(",", list.Cast<object>().Select(ObjectToString)),
+          _ => ObjectToString(x),
       }).ToArray();
-      Console.WriteLine(format, args);
+      Console.WriteLine($"[{type}] {format}", objects);
     } catch (Exception e) {
       Console.WriteLine("Failed to format logging string: {0}.\n{1}", format, e.StackTrace);
     }
   }
 
-  /// <summary>Helper method to make a user friendly object name for the logs.</summary>
+  /// <summary>Helper method to make a user-friendly object name for the logs.</summary>
   /// <remarks>
   /// This method is much more intelligent than a regular <c>ToString()</c>, it can detect some common types and give
   /// more context on them while keeping the output short.
@@ -112,36 +104,34 @@ static class DebugEx {
     if (obj is Quaternion rot) {
       return $"[Quaternion:{rot.x:0.0###}, {rot.y:0.0###}, {rot.z:0.0###}, {rot.w:0.0###}]";
     }
-    if (obj is not Component) {
-      return obj.ToString();
-    }
-    var unityComponent = (Component)obj;
-    if (!unityComponent) {  // It is important to use the "!" notion to catch the destroyed objects!
-      return "[DestroyedComponent]";
-    }
     if (obj is BaseComponent baseComponent) {
       return BaseComponentToString(baseComponent);
+    }
+    if (obj is not Component unityComponent) {
+      return obj.ToString();
+    }
+    if (!unityComponent) {  // It is important to use the "!" notion to catch the destroyed objects!
+      return "[DestroyedComponent]";
     }
     return $"[{unityComponent.GetType().Name}]";
   }
 
   /// <summary>Helper method to make a user-friendly object name for the logs.</summary>
   public static string BaseComponentToString(BaseComponent component) {
-    if (!component) {  // It is important to use the "!" notion to catch the destroyed objects!
+    if (component == null) {
+      return $"[IncompleteComponent]";
+    }
+    if (!component) {
+      // It is important to use the "!" notion to catch the destroyed GameObject!
       return "[DestroyedComponent]";
     }
-    var prefab = component.GetComponentFast<PrefabSpec>();
-    var blockObj = component.GetComponentFast<BlockObject>();
-    if (prefab && blockObj) {
-      return $"[{prefab.Name}@{blockObj.Coordinates}]";
-    }
-    if (prefab) {
-      return $"[Prefab:{prefab.Name}]";
-    }
+    var blockObj = component.GetComponent<BlockObject>();
     if (blockObj) {
-      return $"[BlockObject@{blockObj.Coordinates}]";
+      // Block objects have coordinates. It's good to know them. 
+      return $"[{component.Name}@{blockObj.Coordinates}]";
     }
-    return $"[{component.GetType().Name}]";
+    // It's just a Unity prefab object.
+    return $"[Prefab:{component.Name}]";
   }
 
   /// <summary>Collection-to-string – it makes a comma separated string from the enumerable.</summary>

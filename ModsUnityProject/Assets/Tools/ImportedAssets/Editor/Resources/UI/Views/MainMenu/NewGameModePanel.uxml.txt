@@ -1,0 +1,129 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="NewGame" src="NewGameTemplate.uxml" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MainMenu/MainMenuStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MainMenu/MainMenuMiscStyle.uss" />
+    <ui:VisualElement name="root" class="grow-centered" picking-mode="Ignore">
+        <ui:Instance template="NewGame" class="width-stretch">
+            <ui:AttributeOverrides element-name="HeaderText" text-loc-key="NewGameConfigurationPanel.SubHeader" />
+            <ui:VisualElement name="NewGameModesAndDetails" class="new-game-mode-panel__modes-and-details">
+                <ui:ScrollView name="Modes" class="new-game-mode-panel__modes scroll--green-decorated" />
+                <ui:VisualElement name="ModeDetails" class="new-game-mode-panel__mode-details">
+                    <ui:Label name="ModeDescription" class="new-game-mode-panel__mode-description" />
+                    <cui:LocalizableButton name="CustomizeButton" text-loc-key="NewGameConfigurationPanel.Customize" class="wide-menu-button new-game-mode-panel__mode-customize-button" />
+                    <ui:ScrollView name="CustomModeSettings" horizontal-scroller-visibility="Hidden" class="new-game-mode-panel__scroll-view scroll--green-decorated">
+                        <ui:VisualElement name="StartingAdultsWrapper" class="new-game-mode-panel__setting-wrapper">
+                            <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.StartingAdults" class="new-game-mode-panel__setting-label" />
+                            <cui:NineSliceIntegerField name="StartingAdults" class="new-game-mode-panel__setting-input text-field" />
+                            <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.Aged" class="new-game-mode-panel__setting-additional-text" />
+                            <cui:NineSliceIntegerField name="MinAdultAgeProgress" class="new-game-mode-panel__setting-input text-field" />
+                            <ui:Label text="%" class="new-game-mode-panel__setting-additional-text" />
+                            <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.To" class="new-game-mode-panel__setting-additional-text" />
+                            <cui:NineSliceIntegerField name="MaxAdultAgeProgress" class="new-game-mode-panel__setting-input text-field" />
+                            <ui:Label text="%" class="new-game-mode-panel__setting-additional-text" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="StartingChildrenWrapper" class="new-game-mode-panel__setting-wrapper">
+                            <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.StartingChildren" class="new-game-mode-panel__setting-label" />
+                            <cui:NineSliceIntegerField name="StartingChildren" class="new-game-mode-panel__setting-input text-field" />
+                            <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.Aged" class="new-game-mode-panel__setting-additional-text" />
+                            <cui:NineSliceIntegerField name="MinChildAgeProgress" class="new-game-mode-panel__setting-input text-field" />
+                            <ui:Label text="%" class="new-game-mode-panel__setting-additional-text" />
+                            <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.To" class="new-game-mode-panel__setting-additional-text" />
+                            <cui:NineSliceIntegerField name="MaxChildAgeProgress" class="new-game-mode-panel__setting-input text-field" />
+                            <ui:Label text="%" class="new-game-mode-panel__setting-additional-text" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="FoodConsumptionWrapper" class="new-game-mode-panel__setting-wrapper">
+                            <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.FoodConsumption" class="new-game-mode-panel__setting-label" />
+                            <cui:NineSliceIntegerField name="FoodConsumption" class="new-game-mode-panel__setting-input text-field" />
+                            <ui:Label text="%" class="new-game-mode-panel__setting-additional-text" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="WaterConsumptionWrapper" class="new-game-mode-panel__setting-wrapper">
+                            <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.WaterConsumption" class="new-game-mode-panel__setting-label" />
+                            <cui:NineSliceIntegerField name="WaterConsumption" class="new-game-mode-panel__setting-input text-field" />
+                            <ui:Label text="%" class="new-game-mode-panel__setting-additional-text" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="StartingFoodWrapper" class="new-game-mode-panel__setting-wrapper">
+                            <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.StartingFood" class="new-game-mode-panel__setting-label" />
+                            <cui:NineSliceIntegerField name="StartingFood" class="new-game-mode-panel__setting-input text-field" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="StartingWaterWrapper" class="new-game-mode-panel__setting-wrapper">
+                            <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.StartingWater" class="new-game-mode-panel__setting-label" />
+                            <cui:NineSliceIntegerField name="StartingWater" class="new-game-mode-panel__setting-input text-field" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="TemperateWeatherDurationWrapper" class="new-game-mode-panel__setting-wrapper">
+                            <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.TemperateWeatherDuration" class="new-game-mode-panel__setting-label" />
+                            <cui:NineSliceIntegerField name="MinTemperateWeatherDuration" class="new-game-mode-panel__setting-input text-field" />
+                            <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.To" class="new-game-mode-panel__setting-additional-text" />
+                            <cui:NineSliceIntegerField name="MaxTemperateWeatherDuration" class="new-game-mode-panel__setting-input text-field" />
+                            <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.Days" class="new-game-mode-panel__setting-additional-text" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="DroughtEnabledWrapper" class="new-game-mode-panel__setting-wrapper">
+                            <ui:Toggle name="DroughtEnabled" class="new-game-mode-panel__setting-toggle" />
+                            <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.EnableDroughts" class="new-game-mode-panel__setting-label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="DroughtWrapper">
+                            <ui:VisualElement name="DroughtDurationWrapper" class="new-game-mode-panel__setting-wrapper">
+                                <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.DroughtDuration" class="new-game-mode-panel__setting-label" />
+                                <cui:NineSliceIntegerField name="MinDroughtDuration" class="new-game-mode-panel__setting-input text-field" />
+                                <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.To" class="new-game-mode-panel__setting-additional-text" />
+                                <cui:NineSliceIntegerField name="MaxDroughtDuration" class="new-game-mode-panel__setting-input text-field" />
+                                <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.Days" class="new-game-mode-panel__setting-additional-text" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="DroughtDurationHandicapWrapper" class="new-game-mode-panel__setting-wrapper">
+                                <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.DroughtDurationHandicap" class="new-game-mode-panel__setting-label" />
+                                <cui:NineSliceIntegerField name="DroughtDurationHandicapMultiplier" class="new-game-mode-panel__setting-input text-field" />
+                                <ui:Label text="%" class="new-game-mode-panel__setting-additional-text" />
+                                <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.For" class="new-game-mode-panel__setting-additional-text" />
+                                <cui:NineSliceIntegerField name="DroughtDurationHandicapCycles" class="new-game-mode-panel__setting-input text-field" />
+                                <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.Cycles" class="new-game-mode-panel__setting-additional-text" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        <ui:VisualElement name="BadtideEnabledWrapper" class="new-game-mode-panel__setting-wrapper">
+                            <ui:Toggle name="BadtideEnabled" class="new-game-mode-panel__setting-toggle" />
+                            <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.EnableBadtides" class="new-game-mode-panel__setting-label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="BadtideWrapper">
+                            <ui:VisualElement name="CyclesBeforeRandomizingBadtideWrapper" class="new-game-mode-panel__setting-wrapper">
+                                <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.CyclesBeforeBadtideRandomization" class="new-game-mode-panel__setting-label" />
+                                <cui:NineSliceIntegerField name="CyclesBeforeRandomizingBadtide" class="new-game-mode-panel__setting-input text-field" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="ChanceForBadtideWrapper" class="new-game-mode-panel__setting-wrapper">
+                                <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.ChanceForBadtide" class="new-game-mode-panel__setting-label" />
+                                <cui:NineSliceIntegerField name="ChanceForBadtide" class="new-game-mode-panel__setting-input text-field" />
+                                <ui:Label text="%" class="new-game-mode-panel__setting-additional-text" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="BadtideDurationWrapper" class="new-game-mode-panel__setting-wrapper">
+                                <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.BadtideDuration" class="new-game-mode-panel__setting-label" />
+                                <cui:NineSliceIntegerField name="MinBadtideDuration" class="new-game-mode-panel__setting-input text-field" />
+                                <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.To" class="new-game-mode-panel__setting-additional-text" />
+                                <cui:NineSliceIntegerField name="MaxBadtideDuration" class="new-game-mode-panel__setting-input text-field" />
+                                <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.Days" class="new-game-mode-panel__setting-additional-text" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="BadtideDurationHandicapWrapper" class="new-game-mode-panel__setting-wrapper">
+                                <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.BadtideDurationHandicap" class="new-game-mode-panel__setting-label" />
+                                <cui:NineSliceIntegerField name="BadtideDurationHandicapMultiplier" class="new-game-mode-panel__setting-input text-field" />
+                                <ui:Label text="%" class="new-game-mode-panel__setting-additional-text" />
+                                <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.For" class="new-game-mode-panel__setting-additional-text" />
+                                <cui:NineSliceIntegerField name="BadtideDurationHandicapCycles" class="new-game-mode-panel__setting-input text-field" />
+                                <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.Cycles" class="new-game-mode-panel__setting-additional-text" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        <ui:VisualElement name="InjuryChanceWrapper" class="new-game-mode-panel__setting-wrapper">
+                            <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.InjuryChance" class="new-game-mode-panel__setting-label" />
+                            <cui:NineSliceIntegerField name="InjuryChance" class="new-game-mode-panel__setting-input text-field" />
+                            <ui:Label text="%" class="new-game-mode-panel__setting-additional-text" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="DemolishableRecoveryRateWrapper" class="new-game-mode-panel__setting-wrapper">
+                            <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.DemolishableRecoveryRate" class="new-game-mode-panel__setting-label" />
+                            <cui:NineSliceIntegerField name="DemolishableRecoveryRate" class="new-game-mode-panel__setting-input text-field" />
+                            <ui:Label text="%" class="new-game-mode-panel__setting-additional-text" />
+                        </ui:VisualElement>
+                    </ui:ScrollView>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="Summary" class="new-game__summary content-centered">
+                <ui:Label name="SummaryText" class="new-game__summary-text" />
+            </ui:VisualElement>
+        </ui:Instance>
+    </ui:VisualElement>
+</ui:UXML>

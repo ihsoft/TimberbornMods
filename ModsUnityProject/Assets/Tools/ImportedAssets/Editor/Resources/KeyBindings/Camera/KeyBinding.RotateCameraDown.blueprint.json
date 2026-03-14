@@ -1,0 +1,10 @@
+{
+  "KeyBindingSpec": {
+    "Id": "RotateCameraDown",
+    "GroupId": "Camera",
+    "LocKey": "KeyBinding.RotateCameraDown",
+    "Order": 56,
+    "AllowOtherModifiers": true,
+    "DevModeOnly": false
+  }
+}

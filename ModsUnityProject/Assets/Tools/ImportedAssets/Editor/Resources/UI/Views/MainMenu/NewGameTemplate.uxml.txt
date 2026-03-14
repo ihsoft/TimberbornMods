@@ -1,0 +1,24 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="LogoBackground" src="Background/LogoBackground.uxml" />
+    <ui:Template name="MainContent" src="Background/MainContent.uxml" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MainMenu/MainMenuStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MainMenu/MainMenuMiscStyle.uss" />
+    <ui:VisualElement name="root" class="grow-centered new-game-panel">
+        <ui:Instance template="LogoBackground" class="width-stretch" />
+        <ui:VisualElement name="Spacer" class="new-game__logo-spacer" />
+        <ui:VisualElement name="Content" class="content-centered width-stretch new-game_panel__content">
+            <ui:Instance template="MainContent" class="width-stretch new-game_panel__content">
+                <ui:VisualElement name="MainContent" content-container="true" class="content-centered new-game__main-content" />
+            </ui:Instance>
+            <cui:NineSliceVisualElement name="Header" class="capsule-header content-centered">
+                <cui:LocalizableLabel text="NEW GAME" name="HeaderText" class="capsule-header__text" />
+            </cui:NineSliceVisualElement>
+            <ui:VisualElement name="NavigationButtons" class="new-game__navigation-buttons">
+                <cui:NineSliceButton name="BackButton" text="Back" focusable="false" class="menu-button menu-button--medium" />
+                <cui:NineSliceButton name="NextButton" text="Next" focusable="false" class="menu-button menu-button--large-text" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="Logo" class="background__timberborn-logo" />
+    </ui:VisualElement>
+</ui:UXML>

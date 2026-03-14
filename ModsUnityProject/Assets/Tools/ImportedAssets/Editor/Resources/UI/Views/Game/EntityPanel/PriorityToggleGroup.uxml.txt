@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <cui:NineSliceVisualElement name="PriorityToggleGroup" class="priority-toggle-group">
+        <ui:Label name="Label" text="Priorities" class="entity-panel__heading-text priority-toggle-group__label" />
+        <cui:NineSliceVisualElement name="TogglesWrapper" class="priority-toggle-group__toggles-wrapper" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

@@ -10,14 +10,14 @@ namespace IgorZ.TimberCommons.WaterService;
 
 [Context("Game")]
 sealed class Configurator : IConfigurator {
-  static readonly string PatchId = typeof(Configurator).FullName;
+  static readonly string PatchId = typeof(Configurator).AssemblyQualifiedName;
   static readonly Type[] Patches = [
       typeof(SoilMoistureSimulatorPatch),
       typeof(SoilMoistureServicePatch),
   ];
 
   public void Configure(IContainerDefinition containerDefinition) {
-    HarmonyPatcher.PatchRepeated(PatchId, Patches);
+    HarmonyPatcher.ApplyPatch(PatchId, Patches);
     containerDefinition.Bind<SoilOverridesService>().AsSingleton();
   }
 }

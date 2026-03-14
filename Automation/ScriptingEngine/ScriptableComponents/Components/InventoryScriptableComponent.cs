@@ -67,13 +67,13 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   /// <inheritdoc/>
   public override SignalDef GetSignalDefinition(string name, AutomationBehavior behavior) {
     var parsed = ParseSignalName(name, behavior);
-    var key = parsed.capacity + "-" + name;
-    return LookupSignalDef(key, () => MakeSignalDef(name, behavior));
+    return _signalDefCache.GetOrAdd(name, parsed.isInput, parsed.goodId, parsed.capacity, MakeSignalDef);
   }
+  readonly ObjectsCache<SignalDef> _signalDefCache = new();
 
   /// <inheritdoc/>
   public override string[] GetActionNamesForBuilding(AutomationBehavior behavior) {
-    if (!behavior.GetComponentFast<Emptiable>()) {
+    if (!behavior.GetComponent<Emptiable>()) {
       return [];
     }
     var inventory = GetInventory(behavior, throwIfNotFound: false);
@@ -91,7 +91,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   
   /// <inheritdoc/>
   public override Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
-    var emptiable = behavior.GetComponentFast<Emptiable>();
+    var emptiable = behavior.GetComponent<Emptiable>();
     if (!emptiable) {
       throw new ScriptError.BadStateError(behavior, "Building is not emptiable");
     }
@@ -140,16 +140,14 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
 
   #region Signals
 
-  SignalDef MakeSignalDef(string name, AutomationBehavior behavior) {
-    var parsed = ParseSignalName(name, behavior);
-    var displayName = LocGoodSignal(parsed.isInput ? InputGoodSignalLocKey : OutputGoodSignalLocKey, parsed.goodId);
+  SignalDef MakeSignalDef(string name, bool isInput, string goodId, int capacity) {
     return new SignalDef {
         ScriptName = name,
-        DisplayName = displayName,
+        DisplayName = LocGoodSignal(isInput ? InputGoodSignalLocKey : OutputGoodSignalLocKey, goodId),
         Result = new ValueDef {
             ValueType = ScriptValue.TypeEnum.Number,
-            ValueValidator = ValueDef.RangeCheckValidatorInt(0, parsed.capacity),
-            ValueUiHint = GetArgumentMaxValueHint(parsed.capacity),
+            DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
+            DisplayNumericFormatRange = (0, capacity),
         },
     };
   }
@@ -250,12 +248,12 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
 
   #region Inventory change tracker component
 
-  sealed class InventoryChangeTracker : AbstractStatusTracker {
+  internal sealed class InventoryChangeTracker : AbstractStatusTracker, IAwakableComponent {
 
     Inventory _inventory;
 
-    void Awake() {
-      _inventory = GetInventory(this, throwIfNotFound: false);
+    public void Awake() {
+      _inventory = GetInventory(AutomationBehavior, throwIfNotFound: false);
       if (!_inventory) {
         throw new InvalidOperationException("Inventory component not found on: " + DebugEx.ObjectToString(this));
       }
@@ -275,7 +273,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   /// Creates a custom status icon that indicates that the storage is being emptying. If the status is changed
   /// externally, then hides the status and notifies the action.
   /// </summary>
-  sealed class EmptyingStatusBehavior : AbstractStatusTracker {
+  internal sealed class EmptyingStatusBehavior : AbstractStatusTracker {
 
     ILoc _loc;
     StatusToggle _statusToggle;
@@ -300,13 +298,15 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
       _loc = loc;
     }
 
-    void Start() {
-      _emptiable = GetComponentFast<Emptiable>();
+    /// <inheritdoc/>
+    public override void Start() {
+      base.Start();
+      _emptiable = AutomationBehavior.GetComponent<Emptiable>();
       _emptiable.UnmarkedForEmptying += (_, _) => RefreshStatus();
       _emptiable.MarkedForEmptying += (_, _) => RefreshStatus();
       _statusToggle = StatusToggle.CreatePriorityStatusWithFloatingIcon(
           EmptyingStatusIcon, _loc.T(EmptyingStatusDescriptionLocKey));
-      GetComponentFast<StatusSubject>().RegisterStatus(_statusToggle);
+      AutomationBehavior.GetComponent<StatusSubject>().RegisterStatus(_statusToggle);
       RefreshStatus();
     }
 

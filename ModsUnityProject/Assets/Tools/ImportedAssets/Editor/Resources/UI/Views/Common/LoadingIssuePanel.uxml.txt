@@ -1,0 +1,18 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="Box" src="/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonMiscStyle.uss" />
+    <ui:VisualElement name="LoadingIssuePanel" class="loading-issue-panel content-row-centered" picking-mode="Ignore">
+        <ui:Instance template="Box" class="loading-issue-panel options-panel">
+            <ui:AttributeOverrides element-name="Header" text-loc-key="LoadingIssue.LoadingIssues" />
+            <cui:LocalizableLabel name="LoadingIssuesDetected" text-loc-key="LoadingIssue.LoadingIssuesDetected" class="loading-issue-panel--text" />
+            <cui:NineSliceTextField name="Issues" text="Issues" multiline="true" readonly="true" vertical-scroller-visibility="Auto" class="loading-issue-panel--text loading-issue-panel--issues scroll--green-decorated" />
+            <cui:LocalizableLabel name="MapIssuesWarning" text-loc-key="LoadingIssue.MapIssuesWarning" class="loading-issue-panel--text" />
+            <ui:VisualElement name="Buttons" class="box-buttons">
+                <cui:LocalizableButton name="ExitToMenu" focusable="false" text-loc-key="Menu.ExitToMenu" class="menu-button" />
+                <cui:LocalizableButton name="ContinuePlaying" focusable="false" text-loc-key="LoadingIssue.ContinuePlaying" class="menu-button" />
+            </ui:VisualElement>
+        </ui:Instance>
+    </ui:VisualElement>
+</ui:UXML>

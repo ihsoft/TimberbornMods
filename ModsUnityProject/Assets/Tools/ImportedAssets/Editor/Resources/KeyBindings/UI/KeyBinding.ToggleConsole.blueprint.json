@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "ToggleConsole",
+    "GroupId": "UI",
+    "LocKey": "KeyBinding.ToggleConsole",
+    "Order": 210,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/backquote",
+    "InputModifiers": "Alt",
+    "Unchangeable": false
+  }
+}

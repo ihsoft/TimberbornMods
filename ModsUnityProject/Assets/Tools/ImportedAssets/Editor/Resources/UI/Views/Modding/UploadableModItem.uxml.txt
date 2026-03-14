@@ -1,0 +1,9 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Modding/ModdingStyle.uss" />
+    <cui:NineSliceVisualElement name="UploadableModItem" class="mod-item uploadable-mod-item list-view__item-background clickable-hierarchy">
+        <ui:Label name="ModName" text="ModName" enable-rich-text="false" class="mod-item__name" />
+        <ui:Label name="ModVersion" class="text--yellow mod-item__version" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

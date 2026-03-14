@@ -1,0 +1,33 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/MultithreadingAnalysis/MultithreadingAnalysisStyle.uss" />
+    <cui:NineSliceVisualElement name="TaskSnapshotPanel" class="task-snapshot-panel">
+        <ui:VisualElement name="Metrics" class="task-snapshot-panel__min-max-container">
+            <ui:Label name="MinTime" class="game-text-big task-snapshot-panel__min-max" />
+            <ui:Label name="MaxTime" class="game-text-big task-snapshot-panel__min-max" />
+        </ui:VisualElement>
+        <ui:VisualElement name="TimelineContainer" class="task-snapshot-panel__timeline-container">
+            <ui:VisualElement name="ThreadLabels" class="task-snapshot-panel__thread-labels" />
+            <ui:ScrollView name="ScrollView" class="scroll--green-decorated task-snapshot-panel__timeline-scroll" show-horizontal-scroller="true" show-vertical-scroller="true">
+                <ui:VisualElement name="Timeline" class="task-snapshot-panel__timeline" />
+            </ui:ScrollView>
+        </ui:VisualElement>
+        <ui:VisualElement class="task-snapshot-panel__footer">
+            <ui:VisualElement name="ScaleWrapper" class="task-snapshot-panel__scale-wrapper">
+                <ui:Label text="Scale [%]:" class="game-text-normal" />
+                <ui:Slider name="ScaleSlider" class="slider game-text-normal task-snapshot-panel__scale-slider" />
+                <cui:NineSliceTextField name="ScaleValue" class="text-field game-text-normal task-snapshot-panel__scale-value" />
+                <cui:NineSliceButton name="FitButton" text="Fit to screen" class="button-game game-text-normal task-snapshot-panel__scale-button" />
+            </ui:VisualElement>
+            <ui:Toggle name="ShowMarkers" text="Show markers" class="game-toggle task-snapshot-panel__toggle" />
+            <ui:VisualElement class="task-snapshot-panel__stats">
+                <ui:Label name="TaskCount" class="game-text-normal" />
+                <ui:Label name="TotalTaskTime" class="game-text-normal" />
+                <ui:Label name="TotalIdleTime" class="game-text-normal" />
+            </ui:VisualElement>
+            <cui:NineSliceButton name="TakeSnapshot" text="Take another snapshot" class="button-game game-text-normal task-snapshot-panel__take-snapshot-button" />
+            <cui:NineSliceButton name="CloseButton" text="Close" class="button-game game-text-normal task-snapshot-panel__close-button" />
+        </ui:VisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

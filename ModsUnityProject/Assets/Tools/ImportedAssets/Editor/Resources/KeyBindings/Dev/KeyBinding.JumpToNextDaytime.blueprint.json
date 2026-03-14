@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "JumpToNextDaytime",
+    "GroupId": "Dev",
+    "LocKey": "",
+    "Order": 30,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": true
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/7",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

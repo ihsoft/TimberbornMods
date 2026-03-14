@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <cui:NineSliceVisualElement name="WaterInputDepthFragment" class="entity-sub-panel bg-sub-box--green water-input-depth-fragment">
+        <ui:Label name="Depth" text="Depth: " class="entity-panel__text water-input-depth-fragment__text-depth" />
+        <ui:VisualElement name="Limit" class="water-input-depth-fragment__limit">
+            <ui:Toggle name="UseDepthLimit" class="game-toggle" />
+            <ui:Label name="Limit" text="Limit: " class="entity-panel__text water-input-depth-fragment__text-limit" />
+            <ui:Button name="DecreaseDepth" class="button-square button-square--large button-minus" />
+            <ui:Button name="IncreaseDepth" class="button-square button-square--large button-plus button-plus--margin" />
+        </ui:VisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

@@ -1,0 +1,23 @@
+﻿ID,Text,Comment
+IgorZ.CustomTools.BlockObjectTool.UndoHint,"<i>Ctrl+Z</i> отменяет последнее действие.",
+IgorZ.CustomTools.FourTemplatesBlockObjectTool.ShiftDescriptionHint,"Зажмите <i>SHIFT</i>: {0}",
+IgorZ.CustomTools.FourTemplatesBlockObjectTool.CtrlDescriptionHint,"Зажмите <i>CTRL</i>: {0}",
+IgorZ.CustomTools.FourTemplatesBlockObjectTool.AltDescriptionHint,"Зажмите <i>ALT</i>: {0}",
+IgorZ.CustomTools.ToolGroup.Main.DisplayName,"Инструменты",
+IgorZ.CustomTools.LeveePlusTool.Title,"Дамба или Плотина",
+IgorZ.CustomTools.LockSelectTool.DescriptionHint,"Зажмите <i>Shift</i> для выбора одного типа зданий.",
+IgorZ.CustomTools.LockSelectTool.SelectingNObjects,"Выделено: {0} (x{1})","The plural form of TimberDev_Utils.Tools.LockSelectTool.SelectingObject"
+IgorZ.CustomTools.LockSelectTool.SelectingObject,"Выделено: {0}","Text to show the type of the selected building. It's shown when the selection tool is locked on the specific buildings."
+IgorZ.CustomTools.LockSelectTool.StartObjectSelectingPrompt,"Выделять здания типа: {0}",
+IgorZ.CustomTools.LockSelectTool.StartSelectingPrompt,"Наведите курсор на объект и нажмите <i>ЛКМ</i>, чтобы начать выделение.",
+IgorZ.CustomTools.MultiTemplateBlockObjectTool.TemplateIsUnlocked,"Здание '{0}' пока еще недоступно",
+IgorZ.CustomTools.DebugFinishNowTool.Description,"Немедленно завершить строительство выбранных зданий.",
+IgorZ.CustomTools.DebugFinishNowTool.Title,"Завершить строительство",
+IgorZ.CustomTools.PathPlusTool.Title,"Дорога+",
+IgorZ.CustomTools.PauseTool.Description,"Используйте этот инструмент чтобы остановить здания и строительные площадки.",
+IgorZ.CustomTools.PauseTool.Title,"Остановить здания",
+IgorZ.CustomTools.PlatformPlusTool.Title,"Настраиваемая платформа",
+IgorZ.CustomTools.ResumeTool.Description,"Используйте этот инструмент чтобы возобновить здания и строительные площадки.",
+IgorZ.CustomTools.ResumeTool.Title,"Возобновить здания",
+=,=,"Key bindings"
+IgorZ.CustomTools.KeyBindingGroup,"Мод CustomTools",

@@ -4,10 +4,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
-using Bindito.Core;
 using IgorZ.Automation.Actions;
-using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.AutomationSystemUI;
 using IgorZ.Automation.Conditions;
 using IgorZ.TimberDev.UI;
@@ -59,6 +58,13 @@ sealed class RulesEditorDialog : AbstractDialog {
 
   #region API
 
+  /// <summary>The rule rows of the dialog.</summary>
+  public IReadOnlyList<RuleRow> RuleRows => _ruleRows;
+
+  /// <summary>The scrolling view that holds the rules.</summary>
+  public ScrollView ContentScrollView => _contentScrollView ??= Root.Q<ScrollView>();
+  ScrollView _contentScrollView;
+
   public RulesEditorDialog WithUiHelper(RulesUIHelper rulesUiHelper) {
     _rulesUiHelper = rulesUiHelper;
     return this;
@@ -73,9 +79,12 @@ sealed class RulesEditorDialog : AbstractDialog {
     var buttons = Root.Q2<VisualElement>("Buttons");
     buttons.Clear();
     foreach (var provider in _editorProviders) {
+      if (provider.CreateRuleBtnLocKey == null) {
+        continue;
+      }
       var btn = UiFactory.LoadVisualElement<Button>(RulesEditorButtonTmplAsset);
-      btn.text = UiFactory.T(provider.CreateRuleLocKey);
-      btn.clicked += () => provider.MakeForRule(CreateScriptedRule());
+      btn.text = UiFactory.T(provider.CreateRuleBtnLocKey);
+      btn.clicked += () => provider.OnRuleRowBtnAction(CreateScriptedRule());
       buttons.Add(btn);
     }
 
@@ -92,6 +101,7 @@ sealed class RulesEditorDialog : AbstractDialog {
     }
   }
 
+  /// <inheritdoc/>
   public override void Close() {
     base.Close();
     _ruleRows.Clear();
@@ -99,11 +109,44 @@ sealed class RulesEditorDialog : AbstractDialog {
     _ruleRowsContainer = null;
   }
 
+  /// <summary>Creates a new rule row at the end of the list.</summary>
+  /// <remarks>The row is not initialized. The caller need to set values and trigger view mode change.</remarks>
+  public RuleRow CreateScriptedRule() {
+    return InsertScriptedRuleAt(_ruleRows.Count);
+  }
+
+  /// <summary>Creates a new rule row and inserts it at the specified position.</summary>
+  /// <param name="index">The position to place the new rwo at.</param>
+  public RuleRow InsertScriptedRuleAt(int index) {
+    index = Math.Min(index, _ruleRows.Count);
+    var ruleRow = RuleRow.CreateFor(this, _rulesUiHelper.AutomationBehavior);
+    ruleRow.OnStateChanged += OnRuleStateChanged;
+    _ruleRows.Insert(index, ruleRow);
+    _ruleRowsContainer.Insert(index, ruleRow.Root);
+    return ruleRow;
+  }
+
+  /// <summary>Swaps the two rows in rules order list.</summary>
+  /// <remarks>
+  /// The rules order does NOT determine the execution ordering! It's purely the representation thing.
+  /// </remarks>
+  public void SwapRows(int from, int to) {
+    if (from < to) {
+      (from, to) = (to, from);
+    }
+    var fromRuleRow = _ruleRows[from];
+    _ruleRows.RemoveAt(from);
+    _ruleRows.Insert(to, fromRuleRow);
+    var fromRuleRowContainer = _ruleRowsContainer[from];
+    _ruleRowsContainer.RemoveAt(from);
+    _ruleRowsContainer.Insert(to, fromRuleRowContainer);
+  }
+
   #endregion
 
   #region Implementation
 
-  IEditorProvider[] _editorProviders;
+  readonly ImmutableArray<IEditorButtonProvider> _editorProviders;
 
   bool RulesChanged => _ruleRows.Any(x => x.IsDeleted || x.IsModified);
   bool EditsPending => _ruleRows.Any(x => x.IsInEditMode);
@@ -111,26 +154,15 @@ sealed class RulesEditorDialog : AbstractDialog {
 
   VisualElement _ruleRowsContainer;
   RulesUIHelper _rulesUiHelper;
-  readonly List<RuleRow> _ruleRows = []; 
+  readonly List<RuleRow> _ruleRows = [];
   
-  /// <summary>Public for the inject to work properly.</summary>
-  [Inject]
-  public void InjectDependencies(
-      ScriptEditorProvider scriptEditorProvider, ConstructorEditorProvider constructorEditorProvider) {
-    _editorProviders = [scriptEditorProvider, constructorEditorProvider];
+  RulesEditorDialog(IEnumerable<IEditorButtonProvider> editorProviders) {
+    _editorProviders = editorProviders.Where(x => x.RuleRowBtnLocKey != null).ToImmutableArray();
   }
 
   void Reset() {
     _ruleRowsContainer.Clear();
     _ruleRows.Clear();
-  }
-
-  RuleRow CreateScriptedRule() {
-    var ruleRow = new RuleRow(_editorProviders, UiFactory, _rulesUiHelper.AutomationBehavior);
-    ruleRow.OnStateChanged += OnRuleStateChanged;
-    _ruleRows.Add(ruleRow);
-    _ruleRowsContainer.Add(ruleRow.Root);
-    return ruleRow;
   }
 
   void OnRuleStateChanged(object obj, EventArgs args) {

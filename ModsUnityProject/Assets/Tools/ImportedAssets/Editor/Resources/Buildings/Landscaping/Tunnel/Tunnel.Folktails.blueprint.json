@@ -1,0 +1,495 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "Dynamite",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "Explosives",
+        "Amount": 1
+      },
+      {
+        "Id": "Extract",
+        "Amount": 1
+      },
+      {
+        "Id": "Plank",
+        "Amount": 6
+      }
+    ],
+    "ScienceCost": 2000,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": true,
+    "DrawRangeBoundsOnIt": true
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "#FinishedUncovered",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "TemplateSpec": {
+    "TemplateName": "Tunnel.Folktails",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Top, Corners, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": true
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "BlockObjectNavMeshSettingsSpec": {
+    "NoAutoWalls": true,
+    "GenerateFloorsOnStackable": false,
+    "EdgeGroups": [],
+    "UnblockedCoordinates": []
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Landscaping",
+    "ToolOrder": 83,
+    "ToolShape": "Square",
+    "Layout": "Rectangle",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.Tunnel.DisplayName",
+    "DescriptionLocKey": "Building.Tunnel.Description",
+    "FlavorDescriptionLocKey": "",
+    "Icon": "Buildings/Landscaping/Tunnel/TunnelIcon"
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "TunnelSpec": {
+    "ExplosionPrefabPath": "Buildings/Landscaping/Tunnel/TunnelExplosion",
+    "TunnelSupportTemplateName": "Platform.Folktails"
+  },
+  "UncoveredModelSwitcherSpec": {
+    "FullModelName": "#Full",
+    "UncoveredModelName": "#Uncovered"
+  },
+  "Children": {
+    "#Finished": {
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.498789757,
+              "Y": 0.5042006,
+              "Z": 0.498646855
+            },
+            "Size": {
+              "X": 1.13822091,
+              "Y": 0.481918156,
+              "Z": 0.453853
+            }
+          },
+          {
+            "Center": {
+              "X": 0.498789579,
+              "Y": 0.498339325,
+              "Z": 0.4977249
+            },
+            "Size": {
+              "X": 0.438777179,
+              "Y": 0.467444658,
+              "Z": 1.12138414
+            }
+          },
+          {
+            "Center": {
+              "X": 0.500085235,
+              "Y": 1.01840818,
+              "Z": 0.496468484
+            },
+            "Size": {
+              "X": 0.999659359,
+              "Y": 0.0800766647,
+              "Z": 0.970062852
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      },
+      "Children": {
+        "#Full": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Landscaping/Tunnel/Tunnel.Full.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.498789757,
+                  "Y": 0.5042006,
+                  "Z": 0.498646855
+                },
+                "Size": {
+                  "X": 1.13822091,
+                  "Y": 0.481918156,
+                  "Z": 0.453853
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.498789579,
+                  "Y": 0.498339325,
+                  "Z": 0.4977249
+                },
+                "Size": {
+                  "X": 0.438777179,
+                  "Y": 0.467444658,
+                  "Z": 1.12138414
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.497980922,
+                  "Y": 1.01840818,
+                  "Z": 0.4985954
+                },
+                "Size": {
+                  "X": 0.9739452,
+                  "Y": 0.080076836,
+                  "Z": 0.965809047
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "#Uncovered": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Landscaping/Tunnel/Tunnel.Uncovered.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.498789757,
+                  "Y": 0.5042006,
+                  "Z": 0.498646855
+                },
+                "Size": {
+                  "X": 1.13822091,
+                  "Y": 0.481918156,
+                  "Z": 0.453853
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.498789579,
+                  "Y": 0.498339325,
+                  "Z": 0.4977249
+                },
+                "Size": {
+                  "X": 0.438777179,
+                  "Y": 0.467444658,
+                  "Z": 1.12138414
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.497980952,
+                  "Y": 0.95,
+                  "Z": 0.4973563
+                },
+                "Size": {
+                  "X": 0.978901565,
+                  "Y": 0.149999961,
+                  "Z": 0.96828717
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    },
+    "#FinishedUncovered": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Landscaping/Tunnel/Tunnel.Uncovered.ConstructionStage0.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.498789757,
+              "Y": 0.5042006,
+              "Z": 0.498646855
+            },
+            "Size": {
+              "X": 1.13822091,
+              "Y": 0.481918156,
+              "Z": 0.453853
+            }
+          },
+          {
+            "Center": {
+              "X": 0.498789579,
+              "Y": 0.498339325,
+              "Z": 0.4977249
+            },
+            "Size": {
+              "X": 0.438777179,
+              "Y": 0.467444658,
+              "Z": 1.12138414
+            }
+          },
+          {
+            "Center": {
+              "X": 0.501698,
+              "Y": 0.95,
+              "Z": 0.499834448
+            },
+            "Size": {
+              "X": 0.971467,
+              "Y": 0.15,
+              "Z": 0.963330865
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase": {
+          "Children": {
+            "#Full": {
+              "TimbermeshSpec": {
+                "Model": "Buildings/Landscaping/Tunnel/Tunnel.Full.ConstructionBase.Model"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [
+                  {
+                    "Center": {
+                      "X": 0.498789757,
+                      "Y": 0.5042006,
+                      "Z": 0.498646855
+                    },
+                    "Size": {
+                      "X": 1.13822091,
+                      "Y": 0.481918156,
+                      "Z": 0.453853
+                    }
+                  },
+                  {
+                    "Center": {
+                      "X": 0.498789579,
+                      "Y": 0.498339325,
+                      "Z": 0.4977249
+                    },
+                    "Size": {
+                      "X": 0.438777179,
+                      "Y": 0.467444658,
+                      "Z": 1.12138414
+                    }
+                  },
+                  {
+                    "Center": {
+                      "X": 0.4967419,
+                      "Y": 1.01840818,
+                      "Z": 0.5010735
+                    },
+                    "Size": {
+                      "X": 0.966510832,
+                      "Y": 0.080076836,
+                      "Z": 0.960852861
+                    }
+                  }
+                ],
+                "SphereColliders": [],
+                "CapsuleColliders": []
+              }
+            },
+            "#Uncovered": {
+              "TimbermeshSpec": {
+                "Model": "Buildings/Landscaping/Tunnel/Tunnel.Uncovered.ConstructionBase.Model"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [
+                  {
+                    "Center": {
+                      "X": 0.498789757,
+                      "Y": 0.5042006,
+                      "Z": 0.498646855
+                    },
+                    "Size": {
+                      "X": 1.13822091,
+                      "Y": 0.481918156,
+                      "Z": 0.453853
+                    }
+                  },
+                  {
+                    "Center": {
+                      "X": 0.498789579,
+                      "Y": 0.498339325,
+                      "Z": 0.4977249
+                    },
+                    "Size": {
+                      "X": 0.438777179,
+                      "Y": 0.467444658,
+                      "Z": 1.12138414
+                    }
+                  },
+                  {
+                    "Center": {
+                      "X": 0.497980863,
+                      "Y": 0.95,
+                      "Z": 0.4985954
+                    },
+                    "Size": {
+                      "X": 0.97394526,
+                      "Y": 0.149999961,
+                      "Z": 0.965809047
+                    }
+                  }
+                ],
+                "SphereColliders": [],
+                "CapsuleColliders": []
+              }
+            }
+          }
+        },
+        "ConstructionStage0": {
+          "Children": {
+            "#Full": {
+              "TimbermeshSpec": {
+                "Model": "Buildings/Landscaping/Tunnel/Tunnel.Full.ConstructionStage0.Model"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [
+                  {
+                    "Center": {
+                      "X": 0.498789757,
+                      "Y": 0.5042006,
+                      "Z": 0.498646855
+                    },
+                    "Size": {
+                      "X": 1.13822091,
+                      "Y": 0.481918156,
+                      "Z": 0.453853
+                    }
+                  },
+                  {
+                    "Center": {
+                      "X": 0.498789579,
+                      "Y": 0.498339325,
+                      "Z": 0.4977249
+                    },
+                    "Size": {
+                      "X": 0.438777179,
+                      "Y": 0.467444658,
+                      "Z": 1.12138414
+                    }
+                  },
+                  {
+                    "Center": {
+                      "X": 0.497980863,
+                      "Y": 1.01840818,
+                      "Z": 0.498595327
+                    },
+                    "Size": {
+                      "X": 0.9739455,
+                      "Y": 0.080076836,
+                      "Z": 0.965809166
+                    }
+                  }
+                ],
+                "SphereColliders": [],
+                "CapsuleColliders": []
+              }
+            },
+            "#Uncovered": {
+              "TimbermeshSpec": {
+                "Model": "Buildings/Landscaping/Tunnel/Tunnel.Uncovered.ConstructionStage0.Model"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [
+                  {
+                    "Center": {
+                      "X": 0.498789757,
+                      "Y": 0.5042006,
+                      "Z": 0.498646855
+                    },
+                    "Size": {
+                      "X": 1.13822091,
+                      "Y": 0.481918156,
+                      "Z": 0.453853
+                    }
+                  },
+                  {
+                    "Center": {
+                      "X": 0.498789579,
+                      "Y": 0.498339325,
+                      "Z": 0.4977249
+                    },
+                    "Size": {
+                      "X": 0.438777179,
+                      "Y": 0.467444658,
+                      "Z": 1.12138414
+                    }
+                  },
+                  {
+                    "Center": {
+                      "X": 0.4992201,
+                      "Y": 0.95,
+                      "Z": 0.4998344
+                    },
+                    "Size": {
+                      "X": 0.971467,
+                      "Y": 0.149999961,
+                      "Z": 0.963331
+                    }
+                  }
+                ],
+                "SphereColliders": [],
+                "CapsuleColliders": []
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

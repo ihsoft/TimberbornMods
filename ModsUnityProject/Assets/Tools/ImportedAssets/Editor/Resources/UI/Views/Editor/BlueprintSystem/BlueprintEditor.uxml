@@ -1,0 +1,11 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="True">
+    <Style path="UI/Views/Editor/BlueprintSystem/BlueprintSystemStyle" />
+    <ui:VisualElement name="BlueprintEditor">
+        <ui:Button name="PreviewButton" text="Preview" class="blueprint-editor__preview-button" />
+        <ui:VisualElement name="Content" />
+        <ui:Foldout name="BlueprintEditableText" text="JSON" value="false" class="blueprint-editor__editable-text">
+            <ui:Toggle name="BlueprintValidationToggle" text="Disable Blueprint validation" />
+            <ui:TextField multiline="true" class="blueprint-editor__editable-text-field" />
+        </ui:Foldout>
+    </ui:VisualElement>
+</ui:UXML>

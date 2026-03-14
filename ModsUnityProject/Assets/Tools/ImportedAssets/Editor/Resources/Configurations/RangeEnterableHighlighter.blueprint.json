@@ -1,0 +1,10 @@
+{
+  "RangeEnterableHighlighterSpec": {
+    "BuildingInRange": {
+      "r": 0.7,
+      "g": 0.5,
+      "b": 0.1,
+      "a": 1.0
+    }
+  }
+}

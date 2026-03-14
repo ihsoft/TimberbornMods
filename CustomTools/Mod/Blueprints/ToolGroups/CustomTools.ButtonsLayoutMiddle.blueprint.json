@@ -1,0 +1,9 @@
+{
+  "CustomBottomBarElementSpec": {
+    "Id": "CustomToolsLayoutMiddle",
+    "Order": -100
+  },
+  "CustomRootElementSpec": {
+    "Location": "Middle"
+  }
+}

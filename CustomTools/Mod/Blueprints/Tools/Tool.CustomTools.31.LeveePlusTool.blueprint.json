@@ -1,0 +1,22 @@
+{
+  "CustomToolSpec": {
+    "Id": "CustomTools-LeveePlusTool",
+    "GroupId": "CustomToolsToolGroup",
+    "Order": 31,
+    "Type": "IgorZ.CustomTools.Tools.FourTemplatesBlockObjectTool",
+    "Icon": "Sprites/BottomBar/IgorZ.CustomTools/tool-levee-plus",
+    "DisplayNameLocKey": "IgorZ.CustomTools.LeveePlusTool.Title",
+    "DescriptionLocKey": "Building.Levee.Description"
+  },
+  "CustomToolFeatureLimiterSpec": {
+    "AllowedFactions": [
+      "Folktails",
+      "IronTeeth"
+    ]
+  },
+  "FourTemplatesToolSpec": {
+    "NoModifierTemplate": "Levee",
+    "ShiftModifierTemplate": "Dam",
+    "FactionNeutral": true
+  }
+}

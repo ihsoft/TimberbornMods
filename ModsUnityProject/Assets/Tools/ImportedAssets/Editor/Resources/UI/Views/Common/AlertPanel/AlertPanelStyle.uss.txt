@@ -1,0 +1,78 @@
+.alert-panel {
+    margin-bottom: 120px;
+    align-items: flex-start;
+}
+
+.alert-panel-row {
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 2px 8px 2px 4px;
+}
+
+.alert-panel-row--blink {
+    background-color: rgb(159, 92, 8);
+}
+
+.alert-fragment_row__icon {
+    max-width: 30px;
+    max-height: 30px;
+    min-width: 30px;
+    min-height: 30px;
+}
+
+.alert-panel-row__text {
+    margin-left: -15px;
+    padding: 2px 5px 2px 20px;
+    background-color: rgba(48, 35, 55, 0.8);
+    flex-grow: 0;
+    -unity-text-align: middle-left;
+    white-space: nowrap;
+    height: 22px;
+}
+
+.alert-panel-row--blink .alert-panel-row__text {
+    background-color: rgb(159, 92, 8);
+}
+
+.alert-panel-row__text:hover:enabled {
+    background-color: rgba(204, 204, 153, 0.8);
+    color: black;
+}
+
+.closable-alert-panel-row__wrapper {
+    background-color: rgba(232, 232, 76, 0.8);
+    flex-direction: row;
+    margin-left: -15px;
+    padding-left: 15px;
+}
+
+.hover-enabled .closable-alert-panel-row__wrapper:hover:enabled {
+    background-color: rgba(51, 153, 0, 0.8);
+}
+
+.closable-alert-panel-row__button {
+    padding-left: 4px;
+    flex-grow: 0;
+    -unity-text-align: middle-left;
+    white-space: nowrap;
+    height: 22px;
+}
+
+.closable-alert-panel-row__close {
+    height: 22px;
+    align-items: center;
+    justify-content: center;
+    --click-sound: "UI.Cancel";
+    padding: 0 2px;
+}
+
+.closable-alert-panel-row__close:hover:enabled {
+    background-color: rgba(51, 153, 0, 0.8);
+}
+
+.closable-alert-panel-row__cross {
+    background-image: resource('UI/Images/Buttons/cross-black-thin');
+    width: 12px;
+    height: 12px;
+}

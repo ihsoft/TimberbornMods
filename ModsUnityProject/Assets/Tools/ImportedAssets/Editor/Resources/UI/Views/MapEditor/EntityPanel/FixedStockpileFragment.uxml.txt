@@ -1,0 +1,14 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MapEditor/MapEditorStyle.uss" />
+    <cui:NineSliceVisualElement name="FixedStockpileFragment" class="entity-sub-panel bg-sub-box--green">
+        <Timberborn.DropdownSystem.Dropdown name="Goods" class="fixed-stockpile-goods__dropdown" />
+        <ui:VisualElement class="entity-panel-setting">
+            <cui:LocalizableLabel class="game-text-normal entity-panel-setting__text" text-loc-key="Goods.Amount" />
+            <cui:NineSliceIntegerField name="Amount" class="entity-panel-setting__input entity-panel-input" />
+        </ui:VisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>
+

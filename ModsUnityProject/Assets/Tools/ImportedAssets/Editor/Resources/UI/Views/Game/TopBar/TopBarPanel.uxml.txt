@@ -1,0 +1,5 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="TopBar" picking-mode="Ignore" class="top-bar-panel">
+        <Style src="/Assets/Resources/UI/Views/Game/TopBar/TopBarStyle.uss" />
+    </ui:VisualElement>
+</ui:UXML>

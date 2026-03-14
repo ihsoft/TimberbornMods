@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <ui:VisualElement name="InventoryInformationalRow" class="inventory-row inventory-row--informational">
+        <ui:Image name="Type" class="inventory-row-informational__type" />
+        <ui:Image name="Image" class="inventory-row__image" />
+        <ui:Label name="Name" text="Good:" class="entity-panel__text inventory-row-informational__name" />
+        <ui:Label name="Amount" text="10" class="entity-panel__text inventory-row-informational__amount" />
+        <ui:Label name="Separator" text="/" class="entity-panel__text game-text-separator" />
+        <ui:Label name="Limit" text="100" class="entity-panel__text inventory-row-informational__limit" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,15 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <cui:NineSliceVisualElement name="StreamGaugeFragment" class="entity-sub-panel bg-sub-box--green">
+        <ui:Label text="Depth: " display-tooltip-when-elided="true" name="DepthLabel" class="entity-panel__text" />
+        <ui:Label text="Greatest Depth: " display-tooltip-when-elided="true" name="GreatestDepthLabel" class="entity-panel__text" />
+        <ui:Label text="Current: " display-tooltip-when-elided="true" name="CurrentLabel" class="entity-panel__text" />
+        <ui:Label text="Contamination: " display-tooltip-when-elided="true" name="ContaminationLabel" class="entity-panel__text" />
+        <ui:VisualElement name="ButtonContainer" class="content-centered entity-panel__button-wrapper">
+            <cui:LocalizableButton name="ResetGreatestDepthButton" text-loc-key="Building.StreamGauge.Reset" text="Reset" class="entity-panel__text entity-fragment__button entity-fragment__button--red" />
+        </ui:VisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

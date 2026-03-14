@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <ui:VisualElement name="RecoverableGoodContent" class="recoverable-good-content">
+        <Style src="/Assets/Resources/UI/Views/Game/RecoverableGood/RecoverableGoodStyle.uss" />
+        <cui:LocalizableLabel name="Label" text="RecoveredGoods" text-loc-key="RecoverableGood.RecoveredGoods" class="game-text-normal recoverable-good-item__text" />
+        <ui:VisualElement name="Items" class="recoverable-good-content__items" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,36 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MainMenu/MainMenuStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MainMenu/MainMenuMiscStyle.uss" />
+    <ui:VisualElement name="root" class="normal-faction">
+        <ui:VisualElement name="NormalFaction" class="faction-item-normal content-centered">
+            <ui:VisualElement name="LogoRing" class="faction-item__logo-background content-centered">
+                <ui:VisualElement name="Logo" class="faction-item__logo" />
+            </ui:VisualElement>
+            <ui:VisualElement name="Shadow" class="faction-item__shadow" />
+            <ui:VisualElement name="Avatar" class="faction-item__avatar" />
+        </ui:VisualElement>
+        <ui:VisualElement name="SelectedFaction" class="faction-item-selected content-centered">
+            <ui:VisualElement class="faction-item-selected content-centered">
+                <ui:VisualElement name="SelectedBackground" class="faction-item-selected__background content-centered">
+                    <ui:VisualElement name="LogoRing" class="faction-item__logo-background faction-item-selected__logo content-centered">
+                        <ui:VisualElement name="SelectedLogo" class="faction-item__logo" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="SelectedAvatar" class="faction-item-selected__avatar" />
+                    <ui:VisualElement name="SelectedFaction" class="faction-item-selected__name content-centered">
+                        <ui:Label name="SelectedFactionName" text="Faction" class="name__text" />
+                    </ui:VisualElement>
+                    <ui:Button name="LeftArrow" class="arrow--left faction-item-selected__left-arrow" />
+                    <ui:Button name="RightArrow" class="arrow--right faction-item-selected__right-arrow" />
+                </ui:VisualElement>
+                <ui:VisualElement name="SelectedDescription" class="content-row-centered faction-item-selected__description">
+                    <ui:VisualElement name="LogoBackground" class="faction-item__logo-background content-centered">
+                        <ui:VisualElement name="DescriptionLogo" class="faction-item__logo" />
+                    </ui:VisualElement>
+                    <ui:Label name="SelectedFactionDescription" text="Faction description" class="faction-item-selected__description-text" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

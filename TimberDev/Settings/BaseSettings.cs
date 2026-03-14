@@ -17,6 +17,17 @@ namespace IgorZ.TimberDev.Settings;
 /// <see cref="InstallSettingCallback{TV}(ModSetting{TV},Action{TV})"/> to create a static property that will update to
 /// the setting value.
 /// </remarks>
+/// <code><![CDATA[
+/// // Static setting property.
+/// public static bool MyProperty { get; private set; }
+/// public ModSetting<bool> MyPropertyInternal { get; } =
+///     new(true, ModSettingDescriptor.CreateLocalized("MyPropertyLocKey"));
+/// // Init static property.
+/// MySettingsCosntructor(ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry,
+///     ModRepository modRepository) : base(settings, modSettingsOwnerRegistry, modRepository) {
+///   InstallSettingCallback(MyPropertyInternal, v => MyProperty = v);
+/// }
+/// ]]></code>
 /// <typeparam name="T"></typeparam>
 abstract class BaseSettings<T> : ModSettingsOwner where T : BaseSettings<T> {
 

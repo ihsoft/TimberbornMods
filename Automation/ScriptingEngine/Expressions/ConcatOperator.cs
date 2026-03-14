@@ -42,7 +42,7 @@ class ConcatOperator : AbstractOperator, IValueExpr {
           result += argument.ValueFn().AsString;
         }
       }
-      return ScriptValue.Of(result);
+      return ScriptValue.FromString(result);
     };
   }
 }

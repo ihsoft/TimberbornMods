@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <ui:VisualElement name="TitleScreen" style="flex-grow: 1; flex-shrink: 1; -unity-background-scale-mode: scale-and-crop; background-image: url(&apos;/Assets/Resources/UI/Images/LoadingScreen/loading_bg_Manual.png#loading_bg_Manual&apos;);">
+        <ui:VisualElement name="LoadingLabelWrapper" style="height: 50px; align-items: flex-end; margin-top: 30px;">
+            <ui:VisualElement style="background-image: url(&apos;/Assets/Resources/UI/Images/LoadingScreen/loading_txt.png#loading_txt&apos;); height: 52px; -unity-background-scale-mode: stretch-to-fill; width: 432px;">
+                <ui:Label text="LOADING" name="LoadingLabel" style="width: auto; height: auto; color: rgb(229, 228, 225); font-size: 38px; -unity-text-align: middle-center; padding-right: 0; -unity-font-style: normal; margin-left: 100px; flex-grow: 1;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="TipWrapper" style="flex-grow: 1; justify-content: flex-end;">
+            <ui:Label text="Tip&#10;" display-tooltip-when-elided="true" name="TipText" style="background-color: rgba(0, 0, 0, 0.5); -unity-text-align: middle-center; font-size: 21px; height: 70px; color: rgb(229, 228, 225); justify-content: flex-start; margin-bottom: 35px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

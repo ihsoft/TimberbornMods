@@ -21,30 +21,37 @@ sealed class InjuryProbabilityFragment : IEntityPanelFragment {
   const float MaxProbabilityForColorLabel = 2;
   const string InjuryNeedId = "Injury";
   const string InjuryProbabilityLocKey = "IgorZ.TimberCommons.InjuryProbability";
+  const string InjuryProbabilityDailyLocKey = "IgorZ.TimberCommons.InjuryProbabilityDaily";
 
   readonly UiFactory _uiFactory;
   readonly ITooltipRegistrar _tooltipRegistrar;
   readonly InjuryProbabilitySettings _settings;
+  readonly EffectProbabilityService _effectProbabilityService;
 
   VisualElement _root;
   Label _injuryProbabilityLabel;
   Label _injuryProbabilityAvatarHint;
   string _injuryProbabilityText;
 
-  WorkshopRandomNeedApplierSpec _needApplierSpec;
+  WorkshopRandomNeedApplier _needApplier;
   bool _indicatorAttached;
 
-  InjuryProbabilityFragment(UiFactory uiFactory, ITooltipRegistrar tooltipRegistrar, InjuryProbabilitySettings settings) {
+  InjuryProbabilityFragment(UiFactory uiFactory, ITooltipRegistrar tooltipRegistrar,
+                            InjuryProbabilitySettings settings, EffectProbabilityService effectProbabilityService) {
     _uiFactory = uiFactory;
     _tooltipRegistrar = tooltipRegistrar;
     _settings = settings;
+    _effectProbabilityService = effectProbabilityService;
   }
 
   /// <inheritdoc/>
   public VisualElement InitializeFragment() {
-    _injuryProbabilityAvatarHint = new Label();
-    _injuryProbabilityAvatarHint.text = "🟢";
-    _injuryProbabilityAvatarHint.style.alignSelf = Align.FlexEnd;
+    _injuryProbabilityAvatarHint = new Label {
+        text = "🟢",
+        style = {
+            alignSelf = Align.FlexEnd,
+        },
+    };
     _tooltipRegistrar.Register(_injuryProbabilityAvatarHint, () => _injuryProbabilityText);
     _injuryProbabilityAvatarHint.ToggleDisplayStyle(visible: false);
 
@@ -57,8 +64,8 @@ sealed class InjuryProbabilityFragment : IEntityPanelFragment {
 
   /// <inheritdoc/>
   public void ShowFragment(BaseComponent entity) {
-    _needApplierSpec = entity.GetComponentFast<WorkshopRandomNeedApplierSpec>();
-    if (_needApplierSpec == null) {
+    _needApplier = entity.GetComponent<WorkshopRandomNeedApplier>();
+    if (_needApplier == null) {
       return;
     }
     if (!_indicatorAttached) {
@@ -71,7 +78,7 @@ sealed class InjuryProbabilityFragment : IEntityPanelFragment {
   public void ClearFragment() {
     _root.ToggleDisplayStyle(visible: false);
     _injuryProbabilityAvatarHint.ToggleDisplayStyle(visible: false);
-    _needApplierSpec = null;
+    _needApplier = null;
   }
 
   /// <inheritdoc/>
@@ -79,21 +86,44 @@ sealed class InjuryProbabilityFragment : IEntityPanelFragment {
   }
 
   void UpdateInjuryProbability() {
-    var injuryEffect = _needApplierSpec.Effects.FirstOrDefault(e => e.NeedId == InjuryNeedId);
+    var injuryEffect = _needApplier._workshopRandomNeedApplierSpec.Effects.FirstOrDefault(e => e.NeedId == InjuryNeedId);
     if (injuryEffect == null) {
       _injuryProbabilityAvatarHint.ToggleDisplayStyle(visible: false);
       _root.ToggleDisplayStyle(visible: false);
       return;
     }
-    var probabilityPct = injuryEffect.Probability * 100;
-    var redRatio = Mathf.Clamp01(probabilityPct / MaxProbabilityForColorLabel);
-    var greenRatio = 1 - redRatio;
-    var scale = 1 / (redRatio < greenRatio ? greenRatio : redRatio);
-    var color = new Color(redRatio * scale, greenRatio * scale, 0);
+    var probabilityPct = _effectProbabilityService.GetEffectProbability(injuryEffect, _needApplier.ProbabilityGroupId);
+    Color color;
+    switch (injuryEffect.Probability) {
+      case EffectProbability.Low:
+        color = Color.green;
+        break;
+      case EffectProbability.Medium:
+        color = Color.yellow;
+        break;
+      case EffectProbability.High:
+        color = Color.red;
+        break;
+      default:
+        DebugEx.Warning("Unknown probability value: {0}. Falling back to approximation", injuryEffect.Probability);
+        var redRatio = Mathf.Clamp01(probabilityPct / MaxProbabilityForColorLabel);
+        var greenRatio = 1 - redRatio;
+        var scale = 1 / (redRatio < greenRatio ? greenRatio : redRatio);
+        color = new Color(redRatio * scale, greenRatio * scale, 0);
+        break;
+    }
     _injuryProbabilityAvatarHint.style.color = color;
-
-    var coloredText = $"<color=#{ColorUtility.ToHtmlStringRGB(color)}>{probabilityPct:0.###}%</color>";
-    _injuryProbabilityText = _uiFactory.T(InjuryProbabilityLocKey, coloredText);
+    var pctLocKey = InjuryProbabilityLocKey;
+    if (_settings.ShowDailyProbability.Value) {
+      var dailyProbability = probabilityPct;
+      for (var i = 1; i < 24; i++) {
+        dailyProbability *= Mathf.Pow(1f + probabilityPct, i);
+      }
+      probabilityPct = dailyProbability;
+      pctLocKey = InjuryProbabilityDailyLocKey;
+    }
+    var coloredText = $"<color=#{ColorUtility.ToHtmlStringRGB(color)}>{probabilityPct:0.###%}</color>";
+    _injuryProbabilityText = _uiFactory.T(pctLocKey, coloredText);
     _injuryProbabilityLabel.text = _injuryProbabilityText;
 
     _injuryProbabilityAvatarHint.ToggleDisplayStyle(visible: _settings.ShowAvatarHint.Value);

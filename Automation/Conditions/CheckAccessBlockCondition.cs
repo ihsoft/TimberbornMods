@@ -6,7 +6,6 @@ using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.PathCheckingSystem;
 using IgorZ.TimberDev.UI;
 using IgorZ.TimberDev.Utils;
-using TimberApi.DependencyContainerSystem;
 using Timberborn.BuildingsNavigation;
 using Timberborn.Persistence;
 
@@ -19,7 +18,7 @@ namespace IgorZ.Automation.Conditions;
 /// <remarks>This logic works only on the set of the objects that has this condition assigned to. It won't check all the
 /// objects being constructed in the scene.
 /// </remarks>
-public sealed class CheckAccessBlockCondition : AutomationConditionBase {
+sealed class CheckAccessBlockCondition : AutomationConditionBase {
   const string BlockingPathNameLocKey = "IgorZ.Automation.CheckAccessBlockCondition.Blocking.Description";
   const string NotBlockingPathNameLocKey = "IgorZ.Automation.CheckAccessBlockCondition.NotBlocking.Description"; 
 
@@ -41,7 +40,7 @@ public sealed class CheckAccessBlockCondition : AutomationConditionBase {
 
   /// <inheritdoc/>
   public override bool IsValidAt(AutomationBehavior behavior) {
-    return !behavior.BlockObject.IsFinished && behavior.GetComponentFast<ConstructionSiteAccessible>();
+    return !behavior.BlockObject.IsFinished && behavior.GetComponent<ConstructionSiteAccessible>();
   }
 
   /// <inheritdoc/>
@@ -49,17 +48,23 @@ public sealed class CheckAccessBlockCondition : AutomationConditionBase {
 
   /// <inheritdoc/>
   public override IAutomationCondition CloneDefinition() {
-    return new CheckAccessBlockCondition { IsReversedCondition = IsReversedCondition };
+    var clone = (CheckAccessBlockCondition)base.CloneDefinition();
+    clone.IsReversedCondition = IsReversedCondition;
+    return clone;
   }
 
   /// <inheritdoc/>
   protected override void OnBehaviorAssigned() {
-    DependencyContainer.GetInstance<PathCheckingService>().AddCondition(this);
+    if (IsEnabled) {
+      StaticBindings.DependencyContainer.GetInstance<PathCheckingService>().AddCondition(this);
+    }
   }
 
   /// <inheritdoc/>
   protected override void OnBehaviorToBeCleared() {
-    DependencyContainer.GetInstance<PathCheckingService>().RemoveCondition(this);
+    if (IsEnabled) {
+      StaticBindings.DependencyContainer.GetInstance<PathCheckingService>().RemoveCondition(this);
+    }
   }
 
   #endregion

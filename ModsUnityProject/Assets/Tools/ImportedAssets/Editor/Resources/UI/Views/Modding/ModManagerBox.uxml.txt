@@ -1,0 +1,26 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="Box" src="/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Modding/ModdingStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Options/OptionsStyle.uss" />
+    <ui:VisualElement name="ModManagerBox" class="content-row-centered" picking-mode="Ignore">
+        <ui:Instance template="Box" class="mod-manager-box">
+            <ui:AttributeOverrides element-name="Header" text-loc-key="Modding.ModManagerHeader" />
+            <ui:VisualElement name="TopButtons" class="mod-manager-box__top-buttons">
+                <cui:LocalizableButton name="ResetOrderButton" text="Reset order" text-loc-key="Modding.ResetOrder" focusable="false" class="mod-manager-box__top-button text--default text--bold" />
+            </ui:VisualElement>
+            <ui:ScrollView name="Items" class="scroll--green-decorated mod-manager-box__list" />
+            <cui:LocalizableButton name="ConfirmButton" text="OK" text-loc-key="Core.OK" class="mod-manger-box__confirm-button menu-button menu-button--medium" />
+            <cui:LocalizableLabel name="RestartWarning" text="Changes will not take effect until restart" text-loc-key="Modding.RestartWarning" class="mod-manager-box__restart-label" />
+            <cui:NineSliceVisualElement name="ModManagementPanel" class="mod-management-panel sliced-border">
+                <ui:VisualElement name="ManagementButtonsWrapper">
+                    <cui:LocalizableButton name="DownloadButton" text="Download mods" text-loc-key="Modding.DownloadMods" class="wide-menu-button mod-management-panel__button" />
+                    <cui:LocalizableButton name="BrowseButton" text="Browse local mods" text-loc-key="Modding.BrowseMods" class="wide-menu-button mod-management-panel__button" />
+                    <cui:LocalizableButton name="CreateModButton" text="Create new mod" text-loc-key="Modding.CreateNewMod" class="wide-menu-button mod-management-panel__button" />
+                    <cui:LocalizableButton name="UploadButton" text="Upload" text-loc-key="Modding.ShowUploadPanel" focusable="false" class="wide-menu-button mod-management-panel__button" />
+                </ui:VisualElement>
+            </cui:NineSliceVisualElement>
+        </ui:Instance>
+    </ui:VisualElement>
+</ui:UXML>

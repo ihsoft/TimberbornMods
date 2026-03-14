@@ -1,0 +1,231 @@
+{
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "TemplateSpec": {
+    "TemplateName": "Dandelion",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "NaturalResourceSpec": {
+    "Order": 2
+  },
+  "BushSpec": {},
+  "GrowableSpec": {
+    "GrowthTimeInDays": 3.0
+  },
+  "BasicSelectionSoundSpec": {
+    "SoundName": "Bush",
+    "AlternativeSoundName": ""
+  },
+  "DemolishableSpec": {
+    "DemolishTimeInHours": 0.8,
+    "ShowDemolishButtonInEntityPanel": false
+  },
+  "GatherableSpec": {
+    "YieldGrowthTimeInDays": 3.0,
+    "Yielder": {
+      "YielderComponentName": "Gatherable",
+      "Yield": {
+        "Id": "Dandelion",
+        "Amount": 1
+      },
+      "RemovalTimeInHours": 0.5,
+      "ResourceGroup": "Gatherable"
+    }
+  },
+  "PlantableSpec": {
+    "ResourceGroup": "Forester",
+    "PlantTimeInHours": 0.25
+  },
+  "PlantablePreviewModelSpec": {
+    "Model": "NaturalResources/Bushes/Dandelion/DandelionMature"
+  },
+  "ReproducibleSpec": {
+    "ReproductionChance": 0.01
+  },
+  "WateredNaturalResourceSpec": {
+    "DaysToDieDry": 8.0
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "NaturalResource.Dandelion.DisplayName",
+    "DescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "NaturalResource.Dandelion.FlavorDescription",
+    "Icon": "NaturalResources/Bushes/Dandelion/DandelionIcon"
+  },
+  "FloodableNaturalResourceSpec": {
+    "MinWaterHeight": 0,
+    "MaxWaterHeight": 0,
+    "DaysToDie": 4.0
+  },
+  "NaturalResourceModelRandomizerSpec": {
+    "ConstrainProportion": false,
+    "MinHeightScaleFactor": 0.8,
+    "MaxHeightScaleFactor": 1.2,
+    "MinWidthScaleFactor": 0.8,
+    "MaxWidthScaleFactor": 1.2,
+    "RandomizedRotation": "BetweenMinAndMax",
+    "MinRotation": 0.0,
+    "MaxRotation": 360.0
+  },
+  "ContaminatedNaturalResourceSpec": {},
+  "BlockObjectModelSpec": {
+    "FullModelName": "#Models",
+    "UncoveredModelName": "",
+    "UndergroundModelName": "",
+    "UndergroundModelDepth": 0
+  },
+  "Children": {
+    "#Models": {
+      "Children": {
+        "Seedling": {
+          "Children": {
+            "#Alive": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Bushes/Dandelion/DandelionSeedling"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.0,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.29
+                  }
+                ],
+                "CapsuleColliders": []
+              }
+            },
+            "#Dead": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Bushes/Dandelion/DandelionSeedlingDead"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.0,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.29
+                  }
+                ],
+                "CapsuleColliders": []
+              }
+            },
+            "#Dying": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Bushes/Dandelion/DandelionSeedlingDry"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.0,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.29
+                  }
+                ],
+                "CapsuleColliders": []
+              }
+            }
+          }
+        },
+        "Mature": {
+          "Children": {
+            "#Alive": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Bushes/Dandelion/DandelionMature"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.0,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.38
+                  }
+                ],
+                "CapsuleColliders": []
+              }
+            },
+            "#Dying": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Bushes/Dandelion/DandelionMatureDry"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.0,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.38
+                  }
+                ],
+                "CapsuleColliders": []
+              }
+            },
+            "#Dead": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Bushes/Dandelion/DandelionMatureDead"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.0,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.38
+                  }
+                ],
+                "CapsuleColliders": []
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

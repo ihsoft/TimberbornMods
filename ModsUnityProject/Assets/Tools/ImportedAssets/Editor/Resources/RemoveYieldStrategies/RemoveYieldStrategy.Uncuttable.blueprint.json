@@ -1,0 +1,12 @@
+{
+  "RemoveYieldStrategySpec": {
+    "Id": "Uncuttable",
+    "CompatibleResourceGroups": [
+      "Farmhouse",
+      "AquaticFarmhouse",
+      "Gatherable",
+      "Tappable"
+    ],
+    "Animation": "Working"
+  }
+}

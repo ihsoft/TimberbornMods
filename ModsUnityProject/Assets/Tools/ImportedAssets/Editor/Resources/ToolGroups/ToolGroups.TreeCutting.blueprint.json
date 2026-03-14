@@ -1,0 +1,9 @@
+{
+  "ToolGroupSpec": {
+    "Id": "TreeCutting",
+    "DisplayNameLocKey": "ToolGroups.TreeCutting",
+    "Icon": "Sprites/BottomBar/TreeToolGroupIcon"
+  },
+  "PlantingToolGroupSpec": {},
+  "TreeCuttingToolGroupSpec": {}
+}

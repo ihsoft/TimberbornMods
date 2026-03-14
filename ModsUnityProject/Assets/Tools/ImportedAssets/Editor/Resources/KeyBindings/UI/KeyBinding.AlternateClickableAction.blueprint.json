@@ -1,0 +1,20 @@
+{
+  "KeyBindingSpec": {
+    "Id": "AlternateClickableAction",
+    "GroupId": "UI",
+    "LocKey": "KeyBinding.AlternateClickableAction",
+    "Order": 110,
+    "AllowOtherModifiers": true,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/leftShift",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  },
+  "SecondaryInputBindingSpec": {
+    "Path": "/Keyboard/rightShift",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

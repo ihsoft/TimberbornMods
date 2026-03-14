@@ -1,0 +1,21 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
+    <Style path="UI/Views/Editor/BlockSystem/BlockSystemStyle" />
+    <ui:VisualElement name="BlockSpec" class="block-spec">
+        <ui:Label name="Coordinates" class="block-spec__coords-column" />
+        <ui:VisualElement class="block-spec__column">
+            <uie:EnumField name="MatterBelow" label="" />
+        </ui:VisualElement>
+        <ui:VisualElement class="block-spec__column">
+            <uie:EnumFlagsField name="Occupations" />
+        </ui:VisualElement>
+        <ui:VisualElement class="block-spec__column">
+            <uie:EnumField name="Stackable" label="" />
+        </ui:VisualElement>
+        <ui:VisualElement class="block-spec__bool-column">
+            <ui:Toggle name="OccupyAllBelow" />
+        </ui:VisualElement>
+        <ui:VisualElement class="block-spec__bool-column">
+            <ui:Toggle name="Underground" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

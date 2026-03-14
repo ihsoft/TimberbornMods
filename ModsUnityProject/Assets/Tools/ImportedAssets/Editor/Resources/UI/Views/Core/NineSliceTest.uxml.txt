@@ -1,0 +1,16 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement style="background-color: black; flex-grow: 1; flex-shrink: 1; align-items: center; justify-content: center;">
+        <cui:NineSliceVisualElement style="--background-image: resource(&apos;UI/Views/Core/NineSliceTestBackground&apos;); --background-slice-scale: 2; --background-slice: 100; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; width: 383px; height: 325.3333px; justify-content: center;">
+            <ui:VisualElement name="Fields" style="flex-direction: row; justify-content: center; align-items: center;">
+                <ui:Label text="Size" name="SizeLabel" />
+                <ui:TextField picking-mode="Ignore" name="SizeXField" />
+                <ui:Label text="x" />
+                <ui:TextField picking-mode="Ignore" name="SizeYField" />
+            </ui:VisualElement>
+            <ui:VisualElement name="Buttons" style="flex-direction: row; justify-content: center;">
+                <ui:Button text="Cancel" name="CancelButton" />
+                <ui:Button text="Start" name="StartButton" />
+            </ui:VisualElement>
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

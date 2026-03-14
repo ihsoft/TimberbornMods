@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MainMenu/MainMenuStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MainMenu/MainMenuMiscStyle.uss" />
+    <ui:VisualElement name="WelcomeScreenBox" class="content-row-centered" picking-mode="Ignore">
+        <cui:NineSliceVisualElement class="welcome-screen-box sliced-border">
+            <cui:LocalizableLabel name="Header" text="Welcome!" text-loc-key="MainMenu.WelcomeScreenTitle" class="text--header text--centered" />
+            <cui:LocalizableLabel name="Message" text-loc-key="MainMenu.WelcomeScreenText" class="text--default welcome-screen-box__body" text="Timberborn welcome info goes here..." />
+            <ui:VisualElement name="Buttons" class="content-row-centered">
+                <cui:LocalizableButton name="Start" text="Start" text-loc-key="MainMenu.WelcomeScreenStart" focusable="false" class="menu-button" />
+            </ui:VisualElement>
+            <cui:NineSliceVisualElement name="ExperimentalInfo" class="welcome-screen-box--experimental sliced-border">
+                <cui:LocalizableLabel text-loc-key="Experimental.Header" class="welcome-screen-box__header--experimental" />
+                <cui:LocalizableLabel text-loc-key="Experimental.WelcomeText" class="text--default welcome-screen-box__body" />
+            </cui:NineSliceVisualElement>
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

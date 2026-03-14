@@ -1,0 +1,12 @@
+{
+  "CoreSoundSpec": {
+    "MaxVerticalListenerPositionAboveGround": 3,
+    "MinBuildingFadeDistance": 1.0,
+    "MaxBuildingFadeDistance": 60.0,
+    "WindAmbientKey": "Environment.Ambient.Wind",
+    "MinAmbientFade": 0.5,
+    "MaxAmbientFade": 1.0,
+    "MinWindFade": 0.5,
+    "MaxWindFade": -0.2
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "GoodVisualizationSpec": {
+    "Id": "ScrapMetal",
+    "Variant": "",
+    "Offset": {
+      "X": 0.2,
+      "Y": 0.0,
+      "Z": 0.17
+    },
+    "LimitingAmount": 4.0,
+    "PrimaryMesh": "StockpileGoodModels/1ScrapMetal",
+    "SecondaryMesh": "StockpileGoodModels/4ScrapMetals",
+    "Material": "Materials/Goods/BeaverCarryingModels/BeaverCarryingModels",
+    "NonLinearity": 0.0
+  }
+}

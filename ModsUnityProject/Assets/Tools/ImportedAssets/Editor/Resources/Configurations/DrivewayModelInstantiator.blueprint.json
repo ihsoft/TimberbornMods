@@ -1,0 +1,10 @@
+{
+  "DrivewayModelInstantiatorSpec": {
+    "NarrowLeftDrivewayPrefab": "Buildings/Paths/Path/DirtDrivewayNarrowLeft",
+    "NarrowCenterDrivewayPrefab": "Buildings/Paths/Path/DirtDrivewayNarrowCenter",
+    "NarrowRightDrivewayPrefab": "Buildings/Paths/Path/DirtDrivewayNarrowRight",
+    "WideCenterDrivewayPrefab": "Buildings/Paths/Path/DirtDrivewayWideCenter",
+    "LongCenterDrivewayPrefab": "Buildings/Paths/Path/DirtDrivewayLongCenter",
+    "StraightPathDrivewayPrefab": "Buildings/Paths/Path/DirtDrivewayStraightPath"
+  }
+}

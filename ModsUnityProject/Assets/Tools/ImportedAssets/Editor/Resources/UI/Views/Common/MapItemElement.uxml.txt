@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <cui:NineSliceVisualElement name="MapItemElement" class="list-view__item-background clickable-hierarchy">
+        <ui:VisualElement name="Content" class="map-item">
+            <ui:Image name="Icon" class="map-item__icon" />
+            <ui:Label name="MapName" text="Map name" class="map-item__map-name" />
+            <ui:Image name="Recommended" class="map-item__icon map-item__icon--recommended" />
+            <ui:Image name="Unconventional" class="map-item__icon map-item__icon--unconventional" />
+            <ui:VisualElement name="FactionsList" class="map-item__factions-list" />
+            <ui:Label name="MapSize" text="256x256" class="map-item__map-size text--yellow unity-text--shaded" />
+        </ui:VisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

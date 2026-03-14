@@ -95,14 +95,22 @@ public class SoilOverridesService : ILoadableSingleton, ITickableSingleton, IPos
 
   /// <summary>Checks if there is a contamination barrier at the given coordinates.</summary>
   public bool IsContaminationBarrierAt(Vector3Int coordinates) {
-    var barrier = _blockService.GetBottomObjectComponentAt<SoilBarrierSpec>(coordinates);
-    return barrier && barrier.BlockContamination && barrier.GetComponentFast<BlockObject>().IsFinished;
+    var blockObject = _blockService.GetBottomObjectComponentAt<BlockObject>(coordinates);
+    if (!blockObject) {
+      return false;
+    }
+    var barrier = blockObject.GetComponent<SoilBarrierSpec>();
+    return blockObject.IsFinished && barrier != null && barrier.BlockContamination;
   }
 
   /// <summary>Checks if there is a full moisture barrier at the given coordinates.</summary>
   public bool IsFullMoistureBarrierAt(Vector3Int coordinates) {
-    var barrier = _blockService.GetBottomObjectComponentAt<SoilBarrierSpec>(coordinates);
-    return barrier && barrier.BlockFullMoisture && barrier.GetComponentFast<BlockObject>().IsFinished;
+    var blockObject = _blockService.GetBottomObjectComponentAt<BlockObject>(coordinates);
+    if (!blockObject) {
+      return false;
+    }
+    var barrier = blockObject.GetComponent<SoilBarrierSpec>();
+    return blockObject.IsFinished && barrier != null && barrier.BlockFullMoisture;
   }
 
   /// <summary>Sets contamination blockers for a set of tiles.</summary>
@@ -371,11 +379,11 @@ public class SoilOverridesService : ILoadableSingleton, ITickableSingleton, IPos
   /// <remarks>If there is an overriden blocker for the tile, then the barrier is restored.</remarks>
   [OnEvent]
   public void OnEntityDeletedEvent(EntityDeletedEvent e) {
-    var barrierSpec = e.Entity.GetComponentFast<SoilBarrierSpec>();
-    if (!barrierSpec || !barrierSpec.BlockContamination) {
+    var barrierSpec = e.Entity.GetComponent<SoilBarrierSpec>();
+    if (barrierSpec == null || !barrierSpec.BlockContamination) {
       return;
     }
-    var blockObject = e.Entity.GetComponentFast<BlockObject>();
+    var blockObject = e.Entity.GetComponent<BlockObject>();
     if (!blockObject.IsFinished || !_contaminatedTilesCache.Contains(blockObject.Coordinates)) {
       return;
     }

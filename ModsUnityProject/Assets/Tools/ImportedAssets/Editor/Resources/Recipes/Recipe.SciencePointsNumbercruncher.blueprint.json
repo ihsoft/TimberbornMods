@@ -1,0 +1,16 @@
+{
+  "RecipeSpec": {
+    "Id": "SciencePointsNumbercruncher",
+    "BackwardCompatibleIds": [],
+    "DisplayLocKey": "Science.SciencePoints",
+    "CycleDurationInHours": 1.0,
+    "Ingredients": [],
+    "Products": [],
+    "ProducedSciencePoints": 10,
+    "Fuel": "",
+    "CyclesFuelLasts": 0,
+    "FuelCapacity": 0,
+    "CyclesCapacity": 1,
+    "Icon": "UI/Images/Game/science-icon"
+  }
+}

@@ -16,6 +16,7 @@ using Timberborn.Common;
 using Timberborn.EntitySystem;
 using Timberborn.GameDistricts;
 using Timberborn.Navigation;
+using Timberborn.SelectionSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.TickSystem;
 using UnityDev.Utils.LogUtilsLite;
@@ -28,7 +29,7 @@ namespace IgorZ.Automation.PathCheckingSystem;
 /// It can't be handled in the scope of one condition due to all of them are interconnected (they can affect each
 /// other). This controller has "the full picture" and orchestrates all the conditions.
 /// </remarks>
-sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener {
+sealed class PathCheckingService : ITickableSingleton {
 
   #region ITickableSingleton implementation
 
@@ -55,7 +56,7 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
 
   /// <summary>Add the path checking condition to monitor.</summary>
   public void AddCondition(CheckAccessBlockCondition condition) {
-    var site = GetOrCreate(condition.Behavior.BlockObject);
+    var site = GetOrCreateSite(condition.Behavior);
     _conditionsIndex.GetOrAdd(site).Add(condition);
   }
 
@@ -79,7 +80,6 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
 
   readonly EntityComponentRegistry _entityComponentRegistry;
   readonly NodeIdService _nodeIdService;
-  readonly BaseInstantiator _baseInstantiator;
   readonly DistrictMap _districtMap;
 
   /// <summary>All path checking conditions on the sites.</summary>
@@ -91,15 +91,11 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
   /// <summary>Cache of tiles that are paths to the characters on the map.</summary>
   HashSet<int> _walkersTakenNodes;
 
-  /// <summary>Tells whether the NvaMesh is now initialized and ready to use.</summary>
-  bool _navMeshIsReady;
-
   PathCheckingService(EntityComponentRegistry entityComponentRegistry, AutomationService automationService,
-                      NodeIdService nodeIdService, BaseInstantiator baseInstantiator, DistrictMap districtMap) {
+                      NodeIdService nodeIdService, DistrictMap districtMap) {
     Instance = this;
     _entityComponentRegistry = entityComponentRegistry;
     _nodeIdService = nodeIdService;
-    _baseInstantiator = baseInstantiator;
     _districtMap = districtMap;
     automationService.EventBus.Register(this);
   }
@@ -207,10 +203,10 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
     _lastCacheBuiltFrame = Time.frameCount;
     _walkersTakenNodes = new HashSet<int>();
     var citizens = _entityComponentRegistry.GetEnabled<BlockOccupant>()
-        .Select(x => x.GetComponentFast<Citizen>())
+        .Select(x => x.GetComponent<Citizen>())
         .Where(x => x && x.HasAssignedDistrict);
     foreach (var citizen in citizens) {
-      var pathNodes = GetPathToRoadFast(citizen.TransformFast.position, citizen.AssignedDistrict.District);
+      var pathNodes = GetPathToRoadFast(citizen.Transform.position, citizen.AssignedDistrict.District);
       if (pathNodes != null) {
         _walkersTakenNodes.AddRange(pathNodes);
       }
@@ -243,23 +239,19 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
 
   /// <summary>Deletes site if the matching component is in index.</summary>
   void TryDeleteSite(BaseComponent component) {
-    var blockObject = component.GetComponentFast<BlockObject>();
+    var blockObject = component.GetComponent<BlockObject>();
     if (blockObject && _sitesByBlockObject.TryGetValue(blockObject, out var site)) {
       DeleteSite(site);
     }
   }
 
   /// <summary>Finds the existing construction site or creates a new one.</summary>
-  PathCheckingSite GetOrCreate(BlockObject blockObject) {
+  PathCheckingSite GetOrCreateSite(AutomationBehavior automationBehavior) {
+    var blockObject = automationBehavior.BlockObject;
     if (!_sitesByBlockObject.TryGetValue(blockObject, out var cachedSite)) {
-      cachedSite = blockObject.GetComponentFast<PathCheckingSite>();
-      if (cachedSite) {
-        cachedSite.EnableComponent();
-      } else {
-        cachedSite = _baseInstantiator.AddComponent<PathCheckingSite>(blockObject.GameObjectFast);
-        if (_navMeshIsReady) { // No mesh means it's a loading stage. The game will init the site. 
-          cachedSite.InitializeEntity();
-        }
+      cachedSite = automationBehavior.GetOrCreate<PathCheckingSite>();
+      if (!cachedSite.Enabled) {
+        cachedSite.EnableSiteComponent();
       }
       _sitesByBlockObject.Add(blockObject, cachedSite);
     }
@@ -274,7 +266,7 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
     }
     _conditionsIndex.Remove(site);
     _sitesByBlockObject.Remove(site.BlockObject);
-    site.DisableComponent();
+    site.DisableSiteComponent();
   }
 
   #endregion
@@ -322,13 +314,24 @@ sealed class PathCheckingService : ITickableSingleton, ISingletonNavMeshListener
     TryDeleteSite(@event.Entity);
   }
 
-  #endregion
+  /// <summary>Propagates selection events to the sites.</summary>
+  /// <remarks>Dynamic components only get a limited set of BaseComponent events.</remarks>
+  /// <seealso cref="AbstractDynamicComponent"/>
+  [OnEvent]
+  public void OnSelectableObjectSelectedEvent(SelectableObjectSelectedEvent @event) {
+    var checkObject = @event.SelectableObject.GameObject;
+    var targetSite = _sitesByBlockObject.Values.FirstOrDefault(x => x.AutomationBehavior.GameObject == checkObject);
+    targetSite?.OnSelect();
+  }
 
-  #region ISingletonNavMeshListener implementation
-
-  /// <inheritdoc/>
-  public void OnNavMeshUpdated(NavMeshUpdate navMeshUpdate) {
-    _navMeshIsReady = true;
+  /// <summary>Propagates selection events to the sites.</summary>
+  /// <remarks>Dynamic components only get a limited set of BaseComponent events.</remarks>
+  /// <seealso cref="AbstractDynamicComponent"/>
+  [OnEvent]
+  public void OnSelectableObjectUnselectedEvent(SelectableObjectUnselectedEvent @event) {
+    var checkObject = @event.SelectableObject.GameObject;
+    var targetSite = _sitesByBlockObject.Values.FirstOrDefault(x => x.AutomationBehavior.GameObject == checkObject);
+    targetSite?.OnUnselect();
   }
 
   #endregion

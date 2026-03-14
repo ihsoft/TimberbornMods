@@ -1,0 +1,20 @@
+{
+  "NeedSpec": {
+    "Id": "PunchCard",
+    "BackwardCompatibleIds": [],
+    "Order": 30,
+    "NeedGroupId": "Boosts",
+    "CharacterType": "Bot",
+    "StartingValue": 0.0,
+    "MinimumValue": 0.0,
+    "MaximumValue": 1.0,
+    "DailyDelta": -0.2,
+    "ImportanceMultiplier": 1.0,
+    "Effectiveness": 1.0,
+    "Wastable": false,
+    "HoursWarningThreshold": 4.5,
+    "DisplayNameLocKey": "Good.PunchCard.PluralDisplayName",
+    "FavorableWellbeing": 1,
+    "UnfavorableWellbeing": 0
+  }
+}

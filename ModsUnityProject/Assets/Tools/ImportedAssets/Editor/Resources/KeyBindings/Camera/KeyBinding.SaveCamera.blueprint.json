@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "SaveCamera",
+    "GroupId": "Camera",
+    "LocKey": "KeyBinding.SaveCamera",
+    "Order": 120,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/m",
+    "InputModifiers": "Ctrl",
+    "Unchangeable": false
+  }
+}

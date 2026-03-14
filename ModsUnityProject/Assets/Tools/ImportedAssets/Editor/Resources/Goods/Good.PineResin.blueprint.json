@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "PineResin",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.7490196,
+      "g": 0.65882355,
+      "b": 0.13333334,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 2,
+    "GoodGroupId": "Materials",
+    "GoodOrder": 1050,
+    "Icon": "Sprites/Goods/PineResinIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.PineResin.DisplayName",
+    "PluralDisplayNameLocKey": "Good.PineResin.PluralDisplayName"
+  }
+}

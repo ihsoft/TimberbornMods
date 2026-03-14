@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "Algae",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.09411765,
+      "g": 0.498039216,
+      "b": 0.4117647,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Ingredients",
+    "GoodOrder": 10070,
+    "Icon": "Sprites/Goods/AlgaeIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.Algae.DisplayName",
+    "PluralDisplayNameLocKey": "Good.Algae.PluralDisplayName"
+  }
+}

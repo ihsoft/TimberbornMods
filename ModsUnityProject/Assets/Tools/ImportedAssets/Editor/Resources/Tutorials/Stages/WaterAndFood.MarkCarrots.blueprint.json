@@ -1,0 +1,14 @@
+﻿{
+  "TutorialStageSpec": {
+    "Id": "WaterAndFood.MarkCarrots",
+    "IntroLocKey": "Tutorial.WaterAndFood.MarkCarrots"
+  },
+  "Children": {
+    "Step1": {
+      "MarkPlantablesTutorialStepSpec": {
+        "TemplateName": "Carrot",
+        "RequiredAmount": 100
+      }
+    }
+  }
+}

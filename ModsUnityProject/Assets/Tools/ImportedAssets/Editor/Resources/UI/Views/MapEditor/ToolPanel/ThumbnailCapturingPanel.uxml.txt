@@ -1,0 +1,23 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MapEditor/MapEditorStyle.uss" />
+    <cui:NineSliceVisualElement name="ThumbnailCapturingPanel" class="tool-panel-item--map-editor bg-box--green thumbnail-capturing-panel">
+        <ui:Image name="Preview" class="thumbnail-capturing-panel__preview">
+            <ui:Image name="Overlay" class="thumbnail-capturing-panel__overlay" />
+        </ui:Image>
+        <ui:VisualElement name="CameraPositionRow" class="thumbnail-capturing-panel__row">
+            <cui:LocalizableLabel name="CameraPosition" text-loc-key="MapEditor.ThumbnailCapturing.CameraPosition" class="game-text-normal thumbnail-capturing-panel__label" />
+            <ui:VisualElement name="Buttons" class="thumbnail-capturing-panel__buttons">
+                <cui:LocalizableButton name="Update" text-loc-key="MapEditor.ThumbnailCapturing.UpdateThumbnail" class="button-game game-text-normal thumbnail-capturing-panel__button" />
+                <cui:LocalizableButton name="Reset" text-loc-key="MapEditor.ThumbnailCapturing.Reset" class="button-game game-text-normal thumbnail-capturing-panel__button" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="OverlayRow" class="thumbnail-capturing-panel__row">
+            <cui:LocalizableLabel name="Overlay" text-loc-key="MapEditor.ThumbnailCapturing.Overlay" class="game-text-normal thumbnail-capturing-panel__label" />
+            <ui:VisualElement name="Buttons" class="thumbnail-capturing-panel__buttons">
+                <cui:LocalizableButton name="SelectOverlay" text-loc-key="MapEditor.ThumbnailCapturing.SelectOverlay" class="button-game game-text-normal thumbnail-capturing-panel__button" />
+                <cui:LocalizableButton name="ClearOverlay" text-loc-key="MapEditor.ThumbnailCapturing.ClearOverlay" class="button-game game-text-normal thumbnail-capturing-panel__button" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

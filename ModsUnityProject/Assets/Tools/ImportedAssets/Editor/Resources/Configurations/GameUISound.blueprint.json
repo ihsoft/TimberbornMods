@@ -1,0 +1,11 @@
+{
+  "GameUISoundSpec": {
+    "WellbeingHighscore": "UI.NewAverageWellBeingRecord",
+    "FieldPlaced": "UI.FieldPlaced",
+    "BlinkingSoundKey": "UI.Weather.Alarm",
+    "BadtideStartedSoundKey": "UI.Weather.BadtideStarted",
+    "DroughtStartedSoundKey": "UI.Weather.DroughtStarted",
+    "TemperateWeatherStartedSoundKey": "UI.Weather.TemperateWeatherStarted",
+    "WonderCongratulationSoundKey": "UI.Buildings.Wonder.Congratulations"
+  }
+}

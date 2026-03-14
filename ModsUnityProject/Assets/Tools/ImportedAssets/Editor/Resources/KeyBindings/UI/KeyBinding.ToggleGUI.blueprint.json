@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "ToggleGUI",
+    "GroupId": "UI",
+    "LocKey": "KeyBinding.ToggleGUI",
+    "Order": 100,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/h",
+    "InputModifiers": "Ctrl",
+    "Unchangeable": false
+  }
+}

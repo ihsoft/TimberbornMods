@@ -1,0 +1,6 @@
+{
+  "YieldRemovalChanceBonusSpec": {
+    "BonusId": "CuttingSuccessChance",
+    "GoodId": "Log"
+  }
+}

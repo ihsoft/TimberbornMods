@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/DebuggingPanel/DebuggingPanelStyle.uss" />
+    <ui:VisualElement name="DebuggingPanelItem" class="debugging-panel-item">
+        <ui:VisualElement name="TitleWrapper" class="debug-panel-item__title-wrapper">
+            <ui:Label name="Title" text="Title" class="game-text-normal text--bold debugging-panel-item__title-text" />
+            <ui:Button name="Show"
+                       class="button-square button-plus button-plus--bare button-plus--margin button-square--small" />
+            <ui:Button name="Hide" class="button-square button-minus button-minus--bare button-square--small" />
+        </ui:VisualElement>
+        <ui:Label name="Info" text="Info" class="game-text-normal" />
+    </ui:VisualElement>
+</ui:UXML>

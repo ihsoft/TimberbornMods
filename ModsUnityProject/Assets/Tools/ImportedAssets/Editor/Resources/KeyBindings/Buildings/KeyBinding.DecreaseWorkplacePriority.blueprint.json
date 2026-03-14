@@ -1,0 +1,10 @@
+{
+  "KeyBindingSpec": {
+    "Id": "DecreaseWorkplacePriority",
+    "GroupId": "Buildings",
+    "LocKey": "KeyBinding.DecreaseWorkplacePriority",
+    "Order": 50,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  }
+}

@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/Tutorial/TutorialStyle.uss" />
+    <ui:VisualElement name="TutorialStepView" class="tutorial-step-view">
+        <ui:VisualElement name="Checkbox" class="tutorial-step-view__checkbox" />
+        <ui:Label name="Description" text="build a Log pile" class="game-text-normal" />
+        <ui:VisualElement name="FixedKeyBinding" class="tutorial-step-view__key-binding" />
+        <ui:Label name="KeyBinding" text="W" class="tutorial-step-view__key-binding tutorial-step-view__key-binding--text" />
+    </ui:VisualElement>
+</ui:UXML>

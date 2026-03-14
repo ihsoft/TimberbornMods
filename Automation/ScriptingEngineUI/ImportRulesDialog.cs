@@ -2,11 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System;
-using System.Collections.Generic;
-using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
-using IgorZ.Automation.ScriptingEngine;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.TimberDev.UI;
 using UnityDev.Utils.LogUtilsLite;
@@ -15,7 +11,7 @@ using UnityEngine.UIElements;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
 
-class ImportRulesDialog : AbstractDialog {
+class ImportRulesDialog(TemplatingService templatingService) : AbstractDialog {
 
   const string ImportRulesDialogAsset = "IgorZ.Automation/ImportRules";
 
@@ -30,7 +26,7 @@ class ImportRulesDialog : AbstractDialog {
   /// <inheritdoc/>
   protected override string VerifyInput() {
     try {
-      _templatingService.ParseFromText(
+      templatingService.ParseFromText(
           _importText.value, _activeBuilding, _allowErrors.value, _skipFailedRules.value, out _);
     } catch (TemplatingService.ImportError e) {
       return UiFactory.T(ImportErrorLocKey, e.LineNum, e.Text);
@@ -40,7 +36,7 @@ class ImportRulesDialog : AbstractDialog {
 
   /// <inheritdoc/>
   protected override void ApplyInput() {
-    var rules = _templatingService.ParseFromText(
+    var rules = templatingService.ParseFromText(
         _importText.value, _activeBuilding, _allowErrors.value, _skipFailedRules.value, out var skippedRules);
     if (skippedRules > 0) {
       HostedDebugLog.Warning(_activeBuilding, "Skipped {0} rules during import", skippedRules);
@@ -91,19 +87,11 @@ class ImportRulesDialog : AbstractDialog {
 
   #region Implementation
 
-  TemplatingService _templatingService;
-
   Toggle _allowErrors;
   Toggle _skipFailedRules;
   TextField _importText;
 
   AutomationBehavior _activeBuilding;
-
-  /// <summary>Public for the inject to work properly.</summary>
-  [Inject]
-  public void InjectDependencies(TemplatingService templatingService) {
-    _templatingService = templatingService;
-  }
 
   #endregion
 }

@@ -1,0 +1,25 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="Box" src="/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Modding/ModdingStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Options/OptionsStyle.uss" />
+    <ui:VisualElement name="ModIncompatibilityDialogBox">
+        <cui:LocalizableLabel name="IncompatibilityInfo" text="You are trying to load a game without mods that it was saved with." text-loc-key="Modding.ModsIncompatibilityMessage" class="text--default text--centered" />
+        <ui:VisualElement name="PanelsWrapper" class="content-row-centered mod-incompatibility-box__panels-wrapper">
+            <ui:VisualElement name="ActiveModsPanel" class="simple-mod-panel">
+                <cui:LocalizableLabel name="ActiveModsLabel" text="Active mods:" text-loc-key="Modding.ActiveMods" class="text--default text--centered" />
+                <cui:NineSliceVisualElement name="ActiveModsContainer" class="bg-box--green simple-mod-panel__container">
+                    <ui:ScrollView name="ActiveMods" class="scroll--green-decorated" />
+                </cui:NineSliceVisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="SavedModsPanel" class="simple-mod-panel">
+                <cui:LocalizableLabel name="SavedModsLabel" text="Saved mods:" text-loc-key="Modding.SavedMods" class="text--default text--centered" />
+                <cui:NineSliceVisualElement name="SavedModsContainer" class="bg-box--green simple-mod-panel__container">
+                    <ui:ScrollView name="SavedMods" class="scroll--green-decorated" />
+                </cui:NineSliceVisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <cui:LocalizableLabel name="ConfirmationLabel" text="Are you sure you want to load it?" text-loc-key="Modding.LoadConfirmation" class="text--default text--centered" />
+    </ui:VisualElement>
+</ui:UXML>

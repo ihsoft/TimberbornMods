@@ -1,0 +1,97 @@
+{
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": true,
+    "Flippable": false
+  },
+  "TemplateSpec": {
+    "TemplateName": "RecoveredGoodStack",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "RecoveredGoodStack.DisplayName",
+    "DescriptionLocKey": "RecoveredGoodStack.Description",
+    "FlavorDescriptionLocKey": "RecoveredGoodStack.FlavorDescription",
+    "Icon": "Environment/RecoveredGoodStack/RecoveredGoodStackIcon"
+  },
+  "RecoveredGoodStackSpec": {},
+  "RecoveredGoodStackModelSpec": {
+    "ModelName": "#Model"
+  },
+  "BlockObjectModelSpec": {
+    "FullModelName": "#Model",
+    "UncoveredModelName": "",
+    "UndergroundModelName": "",
+    "UndergroundModelDepth": 0
+  },
+  "HidabilityPositionUpdaterSpec": {},
+  "RecoveredGoodStackDisintegrationSpec": {
+    "DaysToDisintegrate": 15.0
+  },
+  "Children": {
+    "#Model": {
+      "TransformSpec": {
+        "Position": {
+          "X": 0.5,
+          "Y": 0.0,
+          "Z": 0.5
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        }
+      },
+      "TimbermeshSpec": {
+        "Model": "Environment/RecoveredGoodStack/RecoveredGoodStackModel"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.0,
+              "Y": 0.05,
+              "Z": 0.0
+            },
+            "Size": {
+              "X": 0.75,
+              "Y": 0.1,
+              "Z": 0.75
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    }
+  }
+}

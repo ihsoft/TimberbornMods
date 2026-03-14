@@ -1,0 +1,191 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "Default",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "Log",
+        "Amount": 10
+      },
+      {
+        "Id": "TreatedPlank",
+        "Amount": 5
+      }
+    ],
+    "ScienceCost": 400,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": true,
+    "DrawRangeBoundsOnIt": false
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "#Underground",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 1
+  },
+  "TemplateSpec": {
+    "TemplateName": "IrrigationBarrier.IronTeeth",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Path",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Landscaping",
+    "ToolOrder": 61,
+    "ToolShape": "Square",
+    "Layout": "Line",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.IrrigationBarrier.DisplayName",
+    "DescriptionLocKey": "Building.IrrigationBarrier.Description",
+    "FlavorDescriptionLocKey": "Building.IrrigationBarrier.FlavorDescription",
+    "Icon": "Buildings/Landscaping/IrrigationBarrier/IrrigationBarrierIcon"
+  },
+  "SoilBarrierSpec": {
+    "BlockAboveMoisture": false,
+    "BlockFullMoisture": true,
+    "BlockContamination": true
+  },
+  "BlockObjectNavMeshSettingsSpec": {
+    "NoAutoWalls": true,
+    "GenerateFloorsOnStackable": false,
+    "EdgeGroups": [],
+    "UnblockedCoordinates": []
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "MergeableObjectModelSpec": {
+    "ModelNamePrefix": "IrrigationBarrier"
+  },
+  "Children": {
+    "#Finished": {
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.0451144278,
+              "Z": 0.5
+            },
+            "Size": {
+              "X": 0.9,
+              "Y": 0.0902288556,
+              "Z": 0.9
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      },
+      "Children": {
+        "IrrigationBarrier0000": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Landscaping/IrrigationBarrier/IrrigationBarrier0000.IronTeeth.Model"
+          }
+        },
+        "IrrigationBarrier0001": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Landscaping/IrrigationBarrier/IrrigationBarrier0001.IronTeeth.Model"
+          }
+        },
+        "IrrigationBarrier0011": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Landscaping/IrrigationBarrier/IrrigationBarrier0011.IronTeeth.Model"
+          }
+        },
+        "IrrigationBarrier0111": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Landscaping/IrrigationBarrier/IrrigationBarrier0111.IronTeeth.Model"
+          }
+        },
+        "IrrigationBarrier1010": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Landscaping/IrrigationBarrier/IrrigationBarrier1010.IronTeeth.Model"
+          }
+        },
+        "IrrigationBarrier1111": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Landscaping/IrrigationBarrier/IrrigationBarrier1111.IronTeeth.Model"
+          }
+        }
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase1x1#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase1x1/ConstructionBase1x1.blueprint"
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Landscaping/IrrigationBarrier/IrrigationBarrier.IronTeeth.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.05,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.1,
+                  "Z": 1.0
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    },
+    "#Underground": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Landscaping/IrrigationBarrier/IrrigationBarrier.IroinTeeth.Underground"
+      }
+    }
+  }
+}

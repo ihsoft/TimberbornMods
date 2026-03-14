@@ -1,0 +1,20 @@
+{
+  "KeyBindingSpec": {
+    "Id": "PlantWithYield",
+    "GroupId": "Dev",
+    "LocKey": "",
+    "Order": 130,
+    "AllowOtherModifiers": true,
+    "DevModeOnly": true
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/leftAlt",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  },
+  "SecondaryInputBindingSpec": {
+    "Path": "/Keyboard/rightAlt",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

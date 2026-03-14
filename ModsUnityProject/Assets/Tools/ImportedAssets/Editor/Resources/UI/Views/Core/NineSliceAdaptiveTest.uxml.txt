@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <cui:NineSliceVisualElement style="
+    --background-image: resource(&apos;UI/Views/Core/NineSliceTestBackground2&apos;); 
+    --background-slice-scale: 0.5; 
+    --background-slice-top: 65;
+    --background-slice-right: 65;
+    --background-slice-bottom: 65;
+    --background-slice-left: 65;
+    flex-grow: 1;" />
+</ui:UXML>

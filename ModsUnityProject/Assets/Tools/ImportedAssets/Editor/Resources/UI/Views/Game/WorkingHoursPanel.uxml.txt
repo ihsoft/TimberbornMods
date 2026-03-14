@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+    <ui:VisualElement class="top-right-item__wrapper">
+        <cui:NineSliceVisualElement name="WorkingHours" class="top-right-item--first-column bg-striped--green">
+            <ui:VisualElement class="working-hours-panel__icon" />
+            <ui:Button name="Minus" class="button-square button-square--small button-minus" />
+            <ui:Button name="Plus" class="button-square button-square--small button-plus button-plus--margin" />
+            <ui:Label name="Text" text="18h" class="game-text-normal text--yellow working-hours-panel__text" />
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

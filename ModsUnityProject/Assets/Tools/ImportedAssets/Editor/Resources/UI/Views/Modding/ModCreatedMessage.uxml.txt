@@ -1,0 +1,9 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="Box" src="/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Modding/ModdingStyle.uss" />
+    <ui:VisualElement name="ModCreatedMessage" picking-mode="Ignore">
+        <ui:VisualElement name="SuccessIcon" class="mod-created-message__success-icon" />
+        <ui:Label name="Message" class="box__text box__text--centered mod-created-message__text" />
+    </ui:VisualElement>
+</ui:UXML>

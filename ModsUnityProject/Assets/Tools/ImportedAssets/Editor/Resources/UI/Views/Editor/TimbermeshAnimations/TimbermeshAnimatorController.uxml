@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="True">
+    <Style path="UI/Views/Editor/TimbermeshAnimations/TimbermeshAnimationsStyle" />
+    <ui:ScrollView name="DebugBox" class="controller-box">
+        <ui:Label name="CurrentState" text="Current state:" class="controller-box__label" />
+        <ui:Label name="CurrentValues" text="Current values:" class="controller-box__label" />
+    </ui:ScrollView>
+</ui:UXML>

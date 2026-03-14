@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False" xsi:schemaLocation="Timberborn.CoreUI file:/Users/szymonzachara/UProjects/timberborn/UIElementsSchema/Timberborn.CoreUI.xsd UnityEngine.UIElements file:/Users/szymonzachara/UProjects/timberborn/UIElementsSchema/UnityEngine.UIElements.xsd">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/Tutorial/TutorialStyle.uss" />
+    <cui:NineSliceVisualElement name="TooltipContent" picking-mode="Ignore" class="tooltip game-text-normal text--grey">
+        <ui:Label name="Description" text="Description" class="game-text-normal" />
+        <ui:VisualElement name="KeyBindingRoot" class="tooltip-key-binding content-row-centered--no-grow">
+            <ui:Label name="KeyBinding" text="Enter" class="key-binding" />
+        </ui:VisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

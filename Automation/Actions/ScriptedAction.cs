@@ -11,7 +11,6 @@ using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.Automation.ScriptingEngineUI;
 using IgorZ.TimberDev.UI;
 using IgorZ.TimberDev.Utils;
-using TimberApi.DependencyContainerSystem;
 using Timberborn.Persistence;
 using UnityDev.Utils.LogUtilsLite;
 
@@ -19,7 +18,6 @@ namespace IgorZ.Automation.Actions;
 
 sealed class ScriptedAction : AutomationActionBase {
 
-  //FIXME: not present in loc file
   const string ParseErrorLocKey = "IgorZ.Automation.Scripting.Expressions.ParseError";
 
   #region AutomationActionBase overrides
@@ -29,16 +27,19 @@ sealed class ScriptedAction : AutomationActionBase {
 
   /// <inheritdoc/>
   public override IAutomationAction CloneDefinition() {
-    return new ScriptedAction { TemplateFamily = TemplateFamily, Expression = Expression };
+    var clone = (ScriptedAction)base.CloneDefinition();
+    clone.Expression = Expression;
+    return clone;
   }
 
   /// <inheritdoc/>
   public override string UiDescription {
     get {
+      //FIXME: return null by design and move logic to UI helpers.
       if (_lastScriptError != null) {
         return CommonFormats.HighlightRed(Behavior.Loc.T(_lastScriptError));
       }
-      var expressionDescriber = DependencyContainer.GetInstance<ExpressionDescriber>();
+      var expressionDescriber = StaticBindings.DependencyContainer.GetInstance<ExpressionDescriber>();
       try {
         return CommonFormats.HighlightYellow(expressionDescriber.DescribeExpression(_parsedExpression));
       } catch (ScriptError.RuntimeError e) {
@@ -90,19 +91,22 @@ sealed class ScriptedAction : AutomationActionBase {
 
   /// <inheritdoc/>
   protected override void OnBehaviorAssigned() {
-    base.OnBehaviorAssigned();
-    if (_lastScriptError != null) {
-      Behavior.ReportError(this);
-    }
     ParseAndApply();
+    if (!Condition.IsEnabled) {
+      return;
+    }
+    if (_lastScriptError != null) {
+      Behavior.ReportError(this);  // The error can be a runtime error, loaded from the persistent state.
+      return;
+    }
+    _installedActions = ScriptingService.Instance.InstallActions(_parsedExpression, Behavior);
   }
 
   /// <inheritdoc/>
   protected override void OnBehaviorToBeCleared() {
-    base.OnBehaviorToBeCleared();
     if (_installedActions != null) {
-      var scriptingService = DependencyContainer.GetInstance<ScriptingService>();
-      scriptingService.UninstallActions(_installedActions, Behavior);
+      ScriptingService.Instance.UninstallActions(_installedActions, Behavior);
+      _installedActions = null;
     }
     ResetScriptError();
   }
@@ -170,7 +174,7 @@ sealed class ScriptedAction : AutomationActionBase {
 
   static ActionOperator ParseAndValidate(
       string expression, AutomationBehavior behavior, out ParsingResult parsingResult) {
-    var parserFactory = DependencyContainer.GetInstance<ParserFactory>();
+    var parserFactory = StaticBindings.DependencyContainer.GetInstance<ParserFactory>();
     var actionOperator = parserFactory.ParseAction(
         expression, behavior, out parsingResult, preferredParser: parserFactory.LispSyntaxParser);
     if (parsingResult.LastError != null) {
@@ -181,18 +185,16 @@ sealed class ScriptedAction : AutomationActionBase {
 
   void ParseAndApply() {
     if (_parsingResult != default) {
-      throw new InvalidOperationException("ParseAndApply should only be called once.");
+      throw new InvalidOperationException($"{nameof(ParseAndApply)} should only be called once.");
     }
     ResetScriptError();
     _parsedExpression = ParseAndValidate(Expression, Behavior, out _parsingResult);
     if (_parsedExpression == null) {
       _lastScriptError = ParseErrorLocKey;
-      Behavior.ReportError(this);
       return;
     }
     Behavior.IncrementStateVersion();
-    Expression = DependencyContainer.GetInstance<LispSyntaxParser>().Decompile(_parsedExpression);
-    _installedActions = DependencyContainer.GetInstance<ScriptingService>().InstallActions(_parsedExpression, Behavior);
+    Expression = StaticBindings.DependencyContainer.GetInstance<LispSyntaxParser>().Decompile(_parsedExpression);
   }
 
   void ReportScriptError(ScriptError.RuntimeError e) {

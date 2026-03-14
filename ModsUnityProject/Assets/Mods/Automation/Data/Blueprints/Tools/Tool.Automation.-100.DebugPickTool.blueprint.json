@@ -1,0 +1,12 @@
+{
+  "CustomToolSpec": {
+    "Id": "Automation.DebugPickTool",
+    "GroupId": "CustomToolsToolGroup",
+    "Type": "IgorZ.Automation.CommonTools.DebugPickTool",
+    "Order": -100,
+    "Icon": "Sprites/IgorZ/tool-debug-inspect",
+    "DisplayNameLocKey": "IgorZ.Automation.DebugPickTool.Title",
+    "DescriptionLocKey": "IgorZ.Automation.DebugPickTool.Description",
+    "DevMode": true
+  }
+}

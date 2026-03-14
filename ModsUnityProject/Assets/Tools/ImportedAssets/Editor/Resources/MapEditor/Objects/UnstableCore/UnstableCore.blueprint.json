@@ -1,0 +1,171 @@
+{
+  "TemplateSpec": {
+    "TemplateName": "UnstableCore",
+    "BackwardCompatibleTemplateNames": [
+      "Bomb"
+    ],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 2,
+      "Y": 2,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": true
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "MapEditorObjects",
+    "ToolOrder": 900,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": true
+  },
+  "StartableMarkerPositionUpdaterSpec": {},
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.UnstableCore.DisplayName",
+    "DescriptionLocKey": "Building.UnstableCore.Description",
+    "FlavorDescriptionLocKey": "",
+    "Icon": "MapEditor/Objects/UnstableCore/UnstableCoreIcon"
+  },
+  "TimedComponentActivatorSpec": {
+    "IsOptionallyActivable": false,
+    "CyclesUntilCountdownActivation": 5,
+    "DaysUntilActivation": 10.5,
+    "ProgressBarActiveLabelLocKey": "TimedComponentActivator.DaysUntilExplosionProgress",
+    "ProgressBarNotActiveLabelLocKey": "TimedComponentActivator.CountdownNotActive",
+    "IsHazardousActivator": true
+  },
+  "ActivationWarningStatusSpec": {
+    "StatusSpriteName": "UnstableCoreCountdown",
+    "StatusLocKey": "Status.UnstableCoreActivationWarning",
+    "UseInfiniteWarning": true
+  },
+  "BasicSelectionSoundSpec": {
+    "SoundName": "UnstableCore",
+    "AlternativeSoundName": ""
+  },
+  "BlockObjectModelSpec": {
+    "FullModelName": "#Model",
+    "UncoveredModelName": "",
+    "UndergroundModelName": "#Underground",
+    "UndergroundModelDepth": 1
+  },
+  "UnstableCoreSpec": {
+    "MinExplosionRadius": 0,
+    "MaxExplosionRadius": 5,
+    "DefaultExplosionRadius": 5,
+    "InnerRadius": 1.0
+  },
+  "UnstableCoreEffectsSpawnerSpec": {
+    "ExplosionPrefabPath": "MapEditor/Objects/UnstableCore/UnstableCoreExplosion"
+  },
+  "UnstableCoreLightingSpec": {
+    "MinInterval": 0.5,
+    "MaxInterval": 1.5,
+    "LightStrength": 5.0,
+    "AttachmentId": "Light"
+  },
+  "TemplateAttachmentsSpec": {
+    "Attachments": [
+      {
+        "AttachmentId": "Light",
+        "Prefab": "MapEditor/Objects/UnstableCore/UnstableCoreLight",
+        "Parent": "#Model",
+        "Position": {
+          "X": 0.7,
+          "Y": 0.7,
+          "Z": 1.3
+        },
+        "Rotation": {
+          "X": -30.0,
+          "Y": -45.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": true
+      }
+    ]
+  },
+  "BlockObjectNavMeshAdderSpec": {},
+  "Children": {
+    "#Model": {
+      "TimbermeshSpec": {
+        "Model": "MapEditor/Objects/UnstableCore/UnstableCore.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [],
+        "SphereColliders": [
+          {
+            "Center": {
+              "X": 1.00291932,
+              "Y": 0.291050851,
+              "Z": 0.982491136
+            },
+            "Radius": 0.65
+          }
+        ],
+        "CapsuleColliders": []
+      }
+    },
+    "#Underground": {
+      "TimbermeshSpec": {
+        "Model": "MapEditor/Objects/UnstableCore/UnstableCore.Underground"
+      }
+    }
+  }
+}

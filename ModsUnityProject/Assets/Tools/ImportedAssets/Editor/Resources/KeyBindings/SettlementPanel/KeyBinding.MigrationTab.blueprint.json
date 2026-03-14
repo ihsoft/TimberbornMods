@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "MigrationTab",
+    "GroupId": "SettlementPanel",
+    "LocKey": "KeyBinding.MigrationTab",
+    "Order": 70,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/f7",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

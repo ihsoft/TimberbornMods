@@ -1,0 +1,8 @@
+{
+  "TemplateCollectionSpec": {
+    "CollectionId": "ModularShaftParts.Folktails",
+    "Blueprints": [
+      "Buildings/Power/PowerShaft/Models/ModularShaftParts.Folktails.blueprint"
+    ]
+  }
+}

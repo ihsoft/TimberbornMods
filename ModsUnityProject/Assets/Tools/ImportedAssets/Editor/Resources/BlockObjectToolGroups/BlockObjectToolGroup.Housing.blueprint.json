@@ -1,0 +1,9 @@
+{
+  "BlockObjectToolGroupSpec": {
+    "Id": "Housing",
+    "Order": 40,
+    "NameLocKey": "ToolGroups.Housing",
+    "Icon": "Sprites/BottomBar/BuildingGroups/Housing",
+    "FallbackGroup": false
+  }
+}

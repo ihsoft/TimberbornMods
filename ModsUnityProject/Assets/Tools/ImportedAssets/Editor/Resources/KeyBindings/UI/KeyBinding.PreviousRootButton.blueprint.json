@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "PreviousRootButton",
+    "GroupId": "UI",
+    "LocKey": "KeyBinding.PreviousRootButton",
+    "Order": 170,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Mouse/scroll/up",
+    "InputModifiers": "Ctrl",
+    "Unchangeable": false
+  }
+}

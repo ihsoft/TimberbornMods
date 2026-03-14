@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <cui:NineSliceButton name="DwellerView" class="dweller-view entity-fragment__button--green">
+        <ui:Button name="CharacterButton" class="character-button" />
+        <ui:Label name="Name" text="Jon" class="entity-panel__sub-text dweller-view__name" />
+        <ui:Label name="Subtitle" text="21 days old" class="entity-panel__sub-text dweller-view__subtitle" />
+        <cui:NineSliceLabel name="WellbeingScore" text="0" class="wellbeing-score wellbeing-score--small entity-panel__text text--bold" />
+    </cui:NineSliceButton>
+</ui:UXML>

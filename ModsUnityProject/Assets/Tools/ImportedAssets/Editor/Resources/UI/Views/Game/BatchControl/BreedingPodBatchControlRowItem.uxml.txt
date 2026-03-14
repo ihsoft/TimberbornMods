@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/BatchControl/BatchControlStyle.uss" />
+    <cui:NineSliceVisualElement name="BreedingPodBatchControlRowItem" class="batch-control-box__row-item batch-control-box__row-item-group--green">
+        <ui:VisualElement name="BeaverChild" class="breeding-pod-batch-control-row-item__child" />
+        <ui:Label name="Progress" class="game-text-normal text--centered breeding-pod-batch-control-row-item__info" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

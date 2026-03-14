@@ -8,8 +8,10 @@ using Bindito.Core;
 using IgorZ.SmartPower.Core;
 using IgorZ.SmartPower.Utils;
 using IgorZ.TimberDev.Utils;
+using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
-using Timberborn.BuildingsBlocking;
+using Timberborn.Buildings;
+using Timberborn.DuplicationSystem;
 using Timberborn.EntitySystem;
 using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
@@ -23,7 +25,8 @@ using UnityEngine;
 namespace IgorZ.SmartPower.PowerGenerators;
 
 abstract class PowerOutputBalancer
-    : TickableComponent, IPersistentEntity, IFinishedStateListener, IPostInitializableEntity {
+    : TickableComponent, IAwakableComponent, IPersistentEntity, IFinishedStateListener, IPostInitializableEntity,
+      IDuplicable<PowerOutputBalancer> {
 
   const float MaxBatteryChargeRatio = 0.9f;
   const float MinBatteryChargeRatio = 0.65f;
@@ -45,6 +48,10 @@ abstract class PowerOutputBalancer
   /// <summary>Indicates if the generator is currently suspended.</summary>
   public bool IsSuspended { get; private set; }
 
+  /// <summary>Indicates whether the generator should automatically pause/unpause based on power demand.</summary>
+  /// <seealso cref="UpdateState"/>
+  public bool Automate { get; set; }
+
   /// <summary>The minimum level to let the batteries discharge to.</summary>
   /// <seealso cref="UpdateState"/>
   public float DischargeBatteriesThreshold { get; set; } = MinBatteryChargeRatio;
@@ -53,27 +60,23 @@ abstract class PowerOutputBalancer
   /// <seealso cref="UpdateState"/>
   public float ChargeBatteriesThreshold { get; set; } = MaxBatteryChargeRatio;
 
-  /// <summary>Indicates whether the generator should automatically pause/unpause based on power demand.</summary>
-  /// <seealso cref="UpdateState"/>
-  public bool Automate { get; set; }
-
   /// <summary>Returns the same balancers in the network.</summary>
   public IEnumerable<PowerOutputBalancer> AllBalancers => MechanicalNode.Graph.Nodes
-      .Select(x => x.GetComponentFast<PowerOutputBalancer>())
-      .Where(x => x != null && x.name == name);
+      .Select(x => x.GetComponent<PowerOutputBalancer>())
+      .Where(x => x != null && x.Name == Name);
 
   /// <summary>Updates the suspend state of the consumer to the current power state.</summary>
   /// <remarks>Call it when settings have been changed.</remarks>
   public void UpdateState() {
-    if (!enabled) {
+    if (!Enabled) {
       return;
     }
-    if (IsSuspended && (!Automate || _pausableBuilding.Paused)) {
+    if (Automate && CanBeAutomated && !_pausableBuilding.Paused) {
+      HandleSmartLogic();
+    } else if (IsSuspended) {
       Resume();
     }
-    if (Automate && !_pausableBuilding.Paused) {
-      HandleSmartLogic();
-    }
+    OnAfterSmartLogic();
   }
 
   #endregion
@@ -93,12 +96,12 @@ abstract class PowerOutputBalancer
 
   /// <inheritdoc/>
   public void OnEnterFinishedState() {
-    enabled = true;
+    EnableComponent();
   }
 
   /// <inheritdoc/>
   public void OnExitFinishedState() {
-    enabled = false;
+    DisableComponent();
   }
 
   #endregion
@@ -123,7 +126,7 @@ abstract class PowerOutputBalancer
   static readonly PropertyKey<bool> IsSuspendedKey = new("IsSuspended");
 
   /// <inheritdoc/>
-  public void Save(IEntitySaver entitySaver) {
+  public virtual void Save(IEntitySaver entitySaver) {
     var saver = entitySaver.GetComponent(AutomationBehaviorKey);
     saver.Set(AutomateKey, Automate);
     saver.Set(ChargeBatteriesThresholdKey, ChargeBatteriesThreshold);
@@ -132,14 +135,30 @@ abstract class PowerOutputBalancer
   }
 
   /// <inheritdoc/>
-  public void Load(IEntityLoader entityLoader) {
+  public virtual void Load(IEntityLoader entityLoader) {
     if (!entityLoader.TryGetComponent(AutomationBehaviorKey, out var state)) {
       return;
     }
-    Automate = state.GetValueOrDefault(AutomateKey);
-    ChargeBatteriesThreshold = state.GetValueOrDefault(ChargeBatteriesThresholdKey, MaxBatteryChargeRatio);
-    DischargeBatteriesThreshold = state.GetValueOrDefault(DischargeBatteriesThresholdKey, MinBatteryChargeRatio);
+    Automate = state.GetValueOrDefault(AutomateKey, Automate);
+    ChargeBatteriesThreshold = state.GetValueOrDefault(ChargeBatteriesThresholdKey, ChargeBatteriesThreshold);
+    DischargeBatteriesThreshold = state.GetValueOrDefault(DischargeBatteriesThresholdKey, DischargeBatteriesThreshold);
     IsSuspended = state.GetValueOrDefault(IsSuspendedKey);
+  }
+
+  #endregion
+
+  #region IDuplicable implementation. Need to be called from descendants when the building is duplicated.
+
+  /// <summary>Copies settings of the base type.</summary>
+  /// <remarks>
+  /// The game will call the duplication method only on the final component. So, if descendants need to be properly
+  /// copied, they need to define a method for own type, even if it only calls this one.
+  /// </remarks>
+  public void DuplicateFrom(PowerOutputBalancer source) {
+    Automate = source.Automate;
+    DischargeBatteriesThreshold = source.DischargeBatteriesThreshold;
+    ChargeBatteriesThreshold = source.ChargeBatteriesThreshold;
+    UpdateState();
   }
 
   #endregion
@@ -168,21 +187,28 @@ abstract class PowerOutputBalancer
   /// <remarks>If not set before the base `Awake` method is executed, then there will be no delay.</remarks>
   protected TickDelayedAction SuspendDelayedAction;
 
+  /// <summary>Tells if the generator can be automated.</summary>
+  /// <remarks>
+  /// If false, then the generator will return to the normal stock game behavior regardless to all other settings.
+  /// </remarks>
+  /// <seealso cref="Automate"/>
+  protected abstract bool CanBeAutomated { get; }
+
   /// <summary>The place where all components get their dependencies.</summary>
-  protected virtual void Awake() {
-    MechanicalNode = GetComponentFast<MechanicalNode>();
-    _pausableBuilding = GetComponentFast<PausableBuilding>();
+  public virtual void Awake() {
+    MechanicalNode = GetComponent<MechanicalNode>();
+    _pausableBuilding = GetComponent<PausableBuilding>();
     _pausableBuilding.PausedChanged += (_, _) => UpdateState();
 
     _shutdownStatus = ShowFloatingIcon
         ? StatusToggle.CreateNormalStatusWithFloatingIcon(ShutdownStatusIcon, _loc.T(PowerShutdownModeLocKey))
         : StatusToggle.CreateNormalStatus(ShutdownStatusIcon, _loc.T(PowerShutdownModeLocKey));
-    GetComponentFast<StatusSubject>().RegisterStatus(_shutdownStatus);
+    GetComponent<StatusSubject>().RegisterStatus(_shutdownStatus);
 
     SuspendDelayedAction ??= SmartPowerService.GetTickDelayedAction(0);
     ResumeDelayedAction ??= SmartPowerService.GetTickDelayedAction(0);
 
-    enabled = false;
+    DisableComponent();
   }
 
   /// <summary>
@@ -190,7 +216,7 @@ abstract class PowerOutputBalancer
   /// </summary>
   protected virtual void Resume() {
     HostedDebugLog.Fine(this, "Resume generator: nominalPower={0}, actualPower={1}",
-                        MechanicalNode._nominalPowerOutput, MechanicalNode.PowerOutput);
+                        MechanicalNode._nominalPowerOutput, MechanicalNode.Actuals.PowerOutput);
     IsSuspended = false;
     _shutdownStatus.Deactivate();
   }
@@ -200,10 +226,18 @@ abstract class PowerOutputBalancer
   /// </summary>
   protected virtual void Suspend() {
     HostedDebugLog.Fine(this, "Suspend generator: nominalPower={0}, actualPower={1}",
-                        MechanicalNode._nominalPowerOutput, MechanicalNode.PowerOutput);
+                        MechanicalNode._nominalPowerOutput, MechanicalNode.Actuals.PowerOutput);
     IsSuspended = true;
     _shutdownStatus.Activate();
   }
+
+  /// <summary>Executes every tick right after the smart logic is executed.</summary>
+  /// <remarks>
+  /// At this point all decisions are made and the building's running state is updated. When handling logic in this
+  /// method, keep in mind that it's basically undetermined when the component will tick compared to other components
+  /// in the same building.
+  /// </remarks>
+  protected virtual void OnAfterSmartLogic() {}
 
   #endregion
 
@@ -224,7 +258,8 @@ abstract class PowerOutputBalancer
   }
 
   void HandleSmartLogic() {
-    SmartPowerService.GetBatteriesStat(MechanicalNode.Graph, out var capacity, out var charge);
+    var capacity = (float) MechanicalNode.Graph.BatteryCapacity;
+    var charge = (float) MechanicalNode.Graph.BatteryCharge;
     var reservedPower = SmartPowerService.GetReservedPower(MechanicalNode.Graph);
 
     // Keep the batteries charged if there are any. Disregard the supply/demand balance if no suspended consumers.
@@ -244,9 +279,8 @@ abstract class PowerOutputBalancer
       return;
     }
 
-    var currentPower = MechanicalNode.Graph.CurrentPower;
-    var demand = currentPower.PowerDemand + reservedPower;
-    var supply = currentPower.PowerSupply;
+    var demand = MechanicalNode.Graph.PowerDemand + reservedPower;
+    var supply = MechanicalNode.Graph.PowerSupply;
 
     // If the generator is suspended, then it should be resumed only if the demand is greater than the supply.
     if (IsSuspended) {
@@ -258,10 +292,10 @@ abstract class PowerOutputBalancer
     }
 
     // Suspend the generator if the supply is greater than the demand.
-    if (supply - MechanicalNode.PowerOutput >= demand) {
+    if (supply - MechanicalNode.Actuals.PowerOutput >= demand) {
       ResumeDelayedAction.Reset();
       // Inactive generators don't need hysteresis.
-      SuspendDelayedAction.Execute(Suspend, MechanicalNode.PowerOutput == 0);
+      SuspendDelayedAction.Execute(Suspend, MechanicalNode.Actuals.PowerOutput == 0);
     }
   }
 

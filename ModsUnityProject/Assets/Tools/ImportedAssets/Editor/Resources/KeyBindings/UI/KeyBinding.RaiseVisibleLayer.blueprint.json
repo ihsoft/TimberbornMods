@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "RaiseVisibleLayer",
+    "GroupId": "UI",
+    "LocKey": "KeyBinding.RaiseVisibleLayer",
+    "Order": 20,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Mouse/scroll/up",
+    "InputModifiers": "Alt",
+    "Unchangeable": false
+  }
+}

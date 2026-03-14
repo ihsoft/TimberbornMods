@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "Screenshot",
+    "GroupId": "Camera",
+    "LocKey": "KeyBinding.Screenshot",
+    "Order": 140,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/f11",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

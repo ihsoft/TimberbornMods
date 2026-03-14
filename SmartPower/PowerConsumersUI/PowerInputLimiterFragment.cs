@@ -83,7 +83,7 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
 
   public void ShowFragment(BaseComponent entity) {
     _consumerFragmentPatcher.InitializePatch(_root);
-    _powerInputLimiter = entity.GetComponentFast<PowerInputLimiter>();
+    _powerInputLimiter = entity.GetComponent<PowerInputLimiter>();
     if (!_powerInputLimiter) {
       return;
     }
@@ -105,7 +105,7 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
     if (!_powerInputLimiter) {
       return;
     }
-    _applyToAllBuildingsButton.ToggleDisplayStyle(visible: _powerInputLimiter.enabled);
+    _applyToAllBuildingsButton.ToggleDisplayStyle(visible: _powerInputLimiter.Enabled);
     _applyToAllUpdater?.Update(
         () => {
           _applyToAllBuildingsButton.text = _uiFactory.T(ApplyToAllBuildingsLocKey);
@@ -131,10 +131,7 @@ sealed class PowerInputLimiterFragment : IEntityPanelFragment {
     var affectedBuildings = 0;
     foreach (var balancer in _powerInputLimiter.AllLimiters.Where(x => x != _powerInputLimiter)) {
       affectedBuildings++;
-      balancer.MinPowerEfficiency = _powerInputLimiter.MinPowerEfficiency;
-      balancer.CheckBatteryCharge = _powerInputLimiter.CheckBatteryCharge;
-      balancer.MinBatteriesCharge = _powerInputLimiter.MinBatteriesCharge;
-      balancer.UpdateState();
+      balancer.DuplicateFrom(_powerInputLimiter);
     }
     _applyToAllUpdater = new TimedUpdater(1.0f, startNow: true);
     _applyToAllBuildingsButton.text = _uiFactory.T(AppliedToBuildingsLocKey, affectedBuildings);

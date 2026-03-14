@@ -1,0 +1,24 @@
+﻿{
+  "TutorialStageSpec": {
+    "Id": "Storage.BuildTanks",
+    "IntroLocKey": "Tutorial.Storage.Tanks"
+  },
+  "Children": {
+    "Step1": {
+      "BuildingTutorialStepSpec": {
+        "TemplateNames": [
+          "SmallTank.Folktails"
+        ],
+        "OnlyFinishedBuildings": true,
+        "RequiredAmount": 3
+      }
+    },
+    "Step2": {
+      "SelectStockpileGoodTutorialStepSpec": {
+        "TemplateName": "SmallTank.Folktails",
+        "RequiredAmount": 3,
+        "GoodId": "Water"
+      }
+    }
+  }
+}

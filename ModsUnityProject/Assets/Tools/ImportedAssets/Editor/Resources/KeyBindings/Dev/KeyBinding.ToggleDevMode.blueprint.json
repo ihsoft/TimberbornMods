@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "ToggleDevMode",
+    "GroupId": "Dev",
+    "LocKey": "",
+    "Order": 0,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/z",
+    "InputModifiers": "Alt, Shift",
+    "Unchangeable": false
+  }
+}

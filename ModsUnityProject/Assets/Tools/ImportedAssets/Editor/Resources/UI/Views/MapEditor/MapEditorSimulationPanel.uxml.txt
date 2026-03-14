@@ -1,0 +1,23 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+    <cui:NineSliceVisualElement name="MapEditorSimulationPanel" class="top-right-item content-row-centered--no-grow square-large--green">
+        <ui:VisualElement class="map-editor-simulation__icon" />
+        <ui:Button name="Speed0" class="speed-button speed-button--big">
+            <ui:VisualElement class="speed-button--0" />
+        </ui:Button>
+        <ui:Button name="Speed1" class="speed-button speed-button--big">
+            <ui:VisualElement class="speed-button--1" />
+        </ui:Button>
+        <ui:Button name="Speed10" class="speed-button speed-button--big">
+            <ui:VisualElement class="speed-button--2" />
+        </ui:Button>
+        <ui:Button name="Speed20" class="speed-button speed-button--big">
+            <ui:VisualElement class="speed-button--3" />
+        </ui:Button>
+        <ui:Button name="Reset" class="speed-button speed-button--big">
+            <ui:VisualElement class="reset-button" />
+        </ui:Button>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

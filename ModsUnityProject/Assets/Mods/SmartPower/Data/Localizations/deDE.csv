@@ -1,5 +1,6 @@
 ID,Text,Comment
 IgorZ.SmartPower.BatteryCapacity,Energiespeicher: {0} / {1},
+IgorZ.SmartPower.BatteryCapacityPct,"Energiespeicher: {0} ({1}%)",
 IgorZ.SmartPower.BatteryCharging,Energiespeicher lädt: <GreenHighlight>🡅</GreenHighlight>{0} ({1}),
 IgorZ.SmartPower.BatteryDischarging,Energiespeicher entlädt: <RedHighlight>🡇</RedHighlight>{0} ({1}),
 IgorZ.SmartPower.PowerOutputBalancer.AutomateGenerator,Diesen Energieerzeuger automatisieren,

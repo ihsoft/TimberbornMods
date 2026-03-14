@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+    <cui:NineSliceButton name="Button" class="slider-toggle__button slider-toggle__element">
+        <ui:Image name="Icon" class="slider-toggle__icon" />
+        <ui:VisualElement name="BlockIcon" class="slider-toggle__lock" picking-mode="Ignore" />
+    </cui:NineSliceButton>
+</ui:UXML>

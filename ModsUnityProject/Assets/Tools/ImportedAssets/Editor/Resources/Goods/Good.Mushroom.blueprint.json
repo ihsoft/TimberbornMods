@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "Mushroom",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.6901961,
+      "g": 0.5568628,
+      "b": 0.905882359,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Ingredients",
+    "GoodOrder": 10060,
+    "Icon": "Sprites/Goods/MushroomIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.Mushroom.DisplayName",
+    "PluralDisplayNameLocKey": "Good.Mushroom.PluralDisplayName"
+  }
+}

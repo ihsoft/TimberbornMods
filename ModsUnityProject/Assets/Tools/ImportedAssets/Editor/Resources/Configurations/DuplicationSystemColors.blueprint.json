@@ -1,0 +1,16 @@
+{
+  "DuplicationSystemColorsSpec": {
+    "SourceColor": {
+      "r": 0.06127626,
+      "g": 0.4811321,
+      "b": 0.3761681,
+      "a": 1.0
+    },
+    "TargetColor": {
+      "r": 0.0,
+      "g": 0.5,
+      "b": 0.06862748,
+      "a": 1.0
+    }
+  }
+}

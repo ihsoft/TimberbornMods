@@ -18,6 +18,7 @@ using Timberborn.ToolSystem;
 using Timberborn.UILayoutSystem;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace IgorZ.Automation.AutomationSystem;
 
@@ -48,6 +49,10 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
   #endregion
 
   #region API
+
+  /// <summary>The automation service instance shortcut.</summary>
+  /// <remarks>Don't waste loading time and memory by injecting it. Use directly!</remarks>
+  public static AutomationService Instance { get; private set; }
 
   /// <summary>Ticks since the game load.</summary>
   /// <remarks>Can be used for synchronization and delaying actions.</remarks>
@@ -93,10 +98,7 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
   /// <seealso cref="CollectDeletedRules"/>
   public void MarkBehaviourForCleanup(AutomationBehavior behavior) {
     _behaviorsNeedsCleanup.Add(behavior);
-    if (!_cleanupRulesComponent) {
-      _cleanupRulesComponent = new GameObject("AutomationCleanupRules").AddComponent<CleanupComponent>();
-      _cleanupRulesComponent.AutomationService = this;
-    }
+    ScheduleLateUpdateOnce("Automation.RulesCleanup", CollectDeletedRules);
   }
 
   /// <summary>Removes the rules that are marked as deleted.</summary>
@@ -127,19 +129,63 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
     }
   }
 
+  /// <summary>Schedules an action that will be called <i>once</i> in the late update phase of the same frame.</summary>
+  /// <remarks>
+  /// It's a good way of doing async work. The action will be executed not immediately, but at the end of the current
+  /// frame when all the other logic is already settled. Note that it's the renderer frame, not the game's tick!
+  /// </remarks>
+  /// <param name="tag">
+  /// And arbitrary name of the action being scheduled. The action for the same tag will be scheduled only once. It's OK
+  /// to call this method at high frequency.
+  /// </param>
+  /// <param name="actionFn">The action to execute.</param>
+  /// <returns>
+  /// <c>true</c> if a new action was scheduled. <c>false</c> if an action with the same tag was already scheduled.
+  /// </returns>
+  public bool ScheduleLateUpdateOnce(string tag, Action actionFn) {
+    if (_lateUpdatable.ContainsKey(tag)) {
+      return false;
+    }
+    var component = new GameObject().AddComponent<LateUpdateComponent>();
+    component.Tag = tag;
+    component.LateActionFn = actionFn;
+    _lateUpdatable.Add(tag, component);
+    return true;
+  }
+
+  /// <summary>Clears a late update scheduled by <see cref="ScheduleLateUpdateOnce"/>.</summary>
+  /// <remarks>
+  /// Note that clearing a scheduled action only makes sense within a single frame. On the next frame, it's already
+  /// executed.
+  /// </remarks>
+  /// <param name="tag">The name of the scheduled action. If it's not found, then it's NO-OP.</param>
+  /// <c>true</c> if there was an action cleared. <c>false</c> if there was no action found.
+  public bool ClearLateUpdate(string tag) {
+    if (!_lateUpdatable.TryGetValue(tag, out var component)) {
+      return false;
+    }
+    Object.Destroy(component.gameObject);
+    return _lateUpdatable.Remove(tag);
+  }
+
   #endregion
 
   #region Implementation
 
   readonly List<Action<int>> _tickables = [];
 
-  sealed class CleanupComponent : MonoBehaviour {
-    public AutomationService AutomationService;
+  sealed class LateUpdateComponent : MonoBehaviour {
+    public string Tag { get; set; }
+    public Action LateActionFn { get; set; }
+
     void LateUpdate() {
-      AutomationService.CollectDeletedRules();
-      Destroy(gameObject);
+      LateActionFn();
+      if (!Instance.ClearLateUpdate(Tag)) {  // We don't expect it normally.
+        DebugEx.Warning("Late update executed after being cleared: tag={0}", Tag);
+      }
     }
   }
+  readonly Dictionary<string, LateUpdateComponent> _lateUpdatable = new();
 
   readonly Dictionary<BlockObject, AutomationBehavior> _blockObjectToBehaviorMap = new();
   readonly HashSet<AutomationBehavior> _behaviorsNeedsCleanup = [];
@@ -147,9 +193,9 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
   readonly Highlighter _highlighter;
 
   bool _highlightingEnabled;
-  CleanupComponent _cleanupRulesComponent;
 
   AutomationService(EventBus eventBus, Highlighter highlighter, BaseInstantiator baseInstantiator, ILoc loc) {
+    Instance = this;
     EventBus = eventBus;
     BaseInstantiator = baseInstantiator;
     Loc = loc;
@@ -208,7 +254,7 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
 
     // Update rules that work on finished building only.
     foreach (var action in behavior.Actions) {
-      if (!action.Condition.CanRunOnUnfinishedBuildings) {
+      if (action.Condition.IsEnabled && !action.Condition.CanRunOnUnfinishedBuildings) {
         action.Condition.Activate(); 
       }
     }
@@ -257,7 +303,8 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
         loadedRulesCount++;
         action.Condition.Behavior = behavior;
         action.Behavior = behavior;
-        if (behavior.BlockObject.IsFinished || action.Condition.CanRunOnUnfinishedBuildings) {
+        if (action.Condition.IsEnabled
+            && (behavior.BlockObject.IsFinished || action.Condition.CanRunOnUnfinishedBuildings)) {
           action.Condition.Activate(noTrigger: true);
           activatedRulesCount++;
         }

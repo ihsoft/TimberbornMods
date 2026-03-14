@@ -1,0 +1,28 @@
+{
+  "RuinModelFactorySpec": {
+    "IvyDryModel": "MapEditor/Ruins/Models/Ivy_Dry",
+    "IvyWetModel": "MapEditor/Ruins/Models/Ivy_Wet",
+    "RuinModelVariants": [
+      {
+        "Id": "A",
+        "Model": "MapEditor/Ruins/Models/RuinColumnA"
+      },
+      {
+        "Id": "B",
+        "Model": "MapEditor/Ruins/Models/RuinColumnB"
+      },
+      {
+        "Id": "C",
+        "Model": "MapEditor/Ruins/Models/RuinColumnC"
+      },
+      {
+        "Id": "D",
+        "Model": "MapEditor/Ruins/Models/RuinColumnD"
+      },
+      {
+        "Id": "E",
+        "Model": "MapEditor/Ruins/Models/RuinColumnE"
+      }
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "CustomToolBindingSpec": {
+    "CustomToolId": "CustomTools-PlatformPlusTool"
+  },
+  "KeyBindingSpec": {
+    "Id": "IgorZ-CustomTools-PlatformPlusTool",
+    "GroupId": "IgorZ-CustomTools-BindingsGroupId",
+    "LocKey": "IgorZ.CustomTools.PlatformPlusTool.Title",
+    "Order": 31
+  }
+}

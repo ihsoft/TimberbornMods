@@ -1,0 +1,12 @@
+{
+  "SoilContaminationSimulatorSpec": {
+    "MaxRangeFromSource": 7,
+    "VerticalSpreadCostMultiplier": 5.0,
+    "ContaminationSpreadingRate": 0.066,
+    "ContaminationDecayRate": 0.033,
+    "ContaminationPositiveEqualizationRate": 0.035,
+    "ContaminationNegativeEqualizationRate": 0.01,
+    "MinimumWaterContamination": 0.5,
+    "ContaminationThreshold": 0.001
+  }
+}

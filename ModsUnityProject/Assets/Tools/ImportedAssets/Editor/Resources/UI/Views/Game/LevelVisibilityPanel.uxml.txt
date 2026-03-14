@@ -1,0 +1,21 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+    <ui:VisualElement name="LevelVisibilityPanel" class="top-right-item level-visibility-panel">
+        <cui:NineSliceVisualElement name="Content" class="level-visibility-panel__content">
+            <ui:VisualElement name="LevelIcon" class="level-visibility-panel__icon" />
+            <cui:NineSliceVisualElement name="LevelButtonWrapper" class="bg-box--green level-visibility-panel__level-button-wrapper">
+                <ui:RepeatButton name="LevelButton" class="level-visibility-panel__level-button">
+                    <ui:Label name="Level" text="2" class="game-text-big level-visibility-panel__level-text text--yellow" />
+                    <ui:VisualElement name="LevelSelectionMouseHint" class="level-visibility-panel__level-hint" />
+                </ui:RepeatButton>
+            </cui:NineSliceVisualElement>
+            <ui:VisualElement name="ButtonsWrapper" class="level-visibility-panel__buttons">
+                <ui:Button name="Up" class="button-square button-square--small button-arrow-up" />
+                <ui:Button name="Down" class="button-square button-square--small button-arrow-down" />
+            </ui:VisualElement>
+        </cui:NineSliceVisualElement>
+        <ui:Button name="Reset" class="level-visibility-panel__reset-button" />
+    </ui:VisualElement>
+</ui:UXML>

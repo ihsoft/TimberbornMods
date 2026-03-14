@@ -3,12 +3,10 @@
 // License: Public Domain
 
 using Bindito.Core;
-using IgorZ.TimberDev.Tools;
 
 namespace IgorZ.Automation.TemplateTools;
 
 [Context("Game")]
-[Context("MapEditor")]
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
 
@@ -17,6 +15,6 @@ sealed class Configurator : IConfigurator {
 
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<ApplyTemplateTool.AutomationTemplateSpec>().AsTransient();
-    CustomToolSystem.BindTool<ApplyTemplateTool>(containerDefinition);
+    containerDefinition.Bind<ApplyTemplateTool>().AsTransient();
   }
 }

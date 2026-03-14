@@ -1,0 +1,28 @@
+{
+  "BuilderPriorityToolSpec": {
+    "PriorityHighlightColor": {
+      "r": 0.2,
+      "g": 0.2,
+      "b": 0.2,
+      "a": 1.0
+    },
+    "PriorityActionColor": {
+      "r": 0.5019608,
+      "g": 0.5019608,
+      "b": 0.5019608,
+      "a": 1.0
+    },
+    "PriorityTileColor": {
+      "r": 0.8,
+      "g": 0.8,
+      "b": 0.8,
+      "a": 1.0
+    },
+    "PrioritySideColor": {
+      "r": 1.0,
+      "g": 1.0,
+      "b": 1.0,
+      "a": 1.0
+    }
+  }
+}

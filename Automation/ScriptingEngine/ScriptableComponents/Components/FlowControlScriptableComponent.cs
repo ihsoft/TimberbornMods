@@ -124,8 +124,8 @@ sealed class FlowControlScriptableComponent : ScriptableComponentBase {
     readonly WaterSourceRegulator _waterSource;
 
     FlowControlAccessor(AutomationBehavior behavior) {
-      _sluice = behavior.GetComponentFast<SluiceState>();
-      _waterSource = behavior.GetComponentFast<WaterSourceRegulator>();
+      _sluice = behavior.GetComponent<SluiceState>();
+      _waterSource = behavior.GetComponent<WaterSourceRegulator>();
     }
   }
 

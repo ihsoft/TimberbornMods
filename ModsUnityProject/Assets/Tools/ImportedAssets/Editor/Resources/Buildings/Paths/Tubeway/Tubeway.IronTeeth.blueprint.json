@@ -1,0 +1,713 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "Tubeway",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "Plank",
+        "Amount": 2
+      },
+      {
+        "Id": "MetalBlock",
+        "Amount": 1
+      }
+    ],
+    "ScienceCost": 500,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": false,
+    "DrawRangeBoundsOnIt": false
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "TemplateSpec": {
+    "TemplateName": "Tubeway.IronTeeth",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectNavMeshSettingsSpec": {
+    "NoAutoWalls": false,
+    "GenerateFloorsOnStackable": false,
+    "EdgeGroups": [
+      {
+        "Cost": 0.25,
+        "Group": {
+          "UseGroup": true,
+          "GroupName": "Tubeway"
+        },
+        "IsPath": true,
+        "AddedEdges": [
+          {
+            "Start": {
+              "X": 0,
+              "Y": 0,
+              "Z": 0
+            },
+            "End": {
+              "X": -1,
+              "Y": 0,
+              "Z": 0
+            },
+            "IsTwoWay": false
+          },
+          {
+            "Start": {
+              "X": 0,
+              "Y": 0,
+              "Z": 0
+            },
+            "End": {
+              "X": 1,
+              "Y": 0,
+              "Z": 0
+            },
+            "IsTwoWay": false
+          },
+          {
+            "Start": {
+              "X": 0,
+              "Y": 0,
+              "Z": 0
+            },
+            "End": {
+              "X": 0,
+              "Y": -1,
+              "Z": 0
+            },
+            "IsTwoWay": false
+          },
+          {
+            "Start": {
+              "X": 0,
+              "Y": 0,
+              "Z": 0
+            },
+            "End": {
+              "X": 0,
+              "Y": 1,
+              "Z": 0
+            },
+            "IsTwoWay": false
+          },
+          {
+            "Start": {
+              "X": 0,
+              "Y": 0,
+              "Z": 0
+            },
+            "End": {
+              "X": 0,
+              "Y": 0,
+              "Z": -1
+            },
+            "IsTwoWay": false
+          }
+        ]
+      }
+    ],
+    "UnblockedCoordinates": []
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Paths",
+    "ToolOrder": 51,
+    "ToolShape": "Square",
+    "Layout": "TwoSegmentLine",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.Tubeway.DisplayName",
+    "DescriptionLocKey": "Building.Tubeway.Description",
+    "FlavorDescriptionLocKey": "Building.Tubeway.FlavorDescription",
+    "Icon": "Buildings/Paths/Tubeway/TubewayIcon"
+  },
+  "BlockObjectWithPathRangeSpec": {},
+  "PathSpec": {
+    "MainPathCoordinates": {
+      "X": 0,
+      "Y": 0,
+      "Z": 0
+    }
+  },
+  "TubeModelSpec": {
+    "ModelPrefix": "Variant_"
+  },
+  "TubeSpec": {},
+  "MovementSpeedBoostingBuildingSpec": {
+    "BoostPercentage": 300
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "Children": {
+    "#Finished": {
+      "Children": {
+        "Variant_000000": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Tubeway/Tubeway000000.IronTeeth.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.02,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.04,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.367945939,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 0.361290425,
+                  "Y": 0.7358919,
+                  "Z": 0.997990847
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "Variant_001000": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Tubeway/Tubeway001000.IronTeeth.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.02,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.04,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.367945939,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 0.361290425,
+                  "Y": 0.7358919,
+                  "Z": 0.997990847
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "Variant_101000": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Tubeway/Tubeway101000.IronTeeth.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.02,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.04,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.367945939,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 0.361290425,
+                  "Y": 0.7358919,
+                  "Z": 0.997990847
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "Variant_001100": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Tubeway/Tubeway001100.IronTeeth.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.02,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.04,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.367945939,
+                  "Z": 0.673533857
+                },
+                "Size": {
+                  "X": 0.361290455,
+                  "Y": 0.7358919,
+                  "Z": 0.650923133
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.661812067,
+                  "Y": 0.367945939,
+                  "Z": 0.5101131
+                },
+                "Size": {
+                  "X": 0.6849146,
+                  "Y": 0.7358919,
+                  "Z": 0.32637167
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "Variant_011100": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Tubeway/Tubeway011100.IronTeeth.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.02,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.04,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.367945939,
+                  "Z": 0.673533857
+                },
+                "Size": {
+                  "X": 0.361290455,
+                  "Y": 0.7358919,
+                  "Z": 0.650923133
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.501838863,
+                  "Y": 0.367945939,
+                  "Z": 0.5101131
+                },
+                "Size": {
+                  "X": 0.997506,
+                  "Y": 0.7358919,
+                  "Z": 0.32637167
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "Variant_111100": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Tubeway/Tubeway111100.IronTeeth.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.02,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.04,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.502758145,
+                  "Y": 0.367945939,
+                  "Z": 0.5101131
+                },
+                "Size": {
+                  "X": 1.00302243,
+                  "Y": 0.7358919,
+                  "Z": 0.32637167
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.367945939,
+                  "Z": 0.5006892
+                },
+                "Size": {
+                  "X": 0.361290455,
+                  "Y": 0.7358919,
+                  "Z": 0.9966124
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "Variant_000001": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Tubeway/Tubeway000001.IronTeeth.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.02,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.04,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.4797725,
+                  "Z": 0.5035118
+                },
+                "Size": {
+                  "X": 0.361290455,
+                  "Y": 0.959545,
+                  "Z": 0.3839444
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "Variant_001001": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Tubeway/Tubeway001001.IronTeeth.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.02,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.04,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.345124185,
+                  "Z": 0.682662547
+                },
+                "Size": {
+                  "X": 0.361290455,
+                  "Y": 0.69024837,
+                  "Z": 0.632665753
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "Variant_101001": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Tubeway/Tubeway101001.IronTeeth.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.02,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.04,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.367945939,
+                  "Z": 0.501229644
+                },
+                "Size": {
+                  "X": 0.361290455,
+                  "Y": 0.7358919,
+                  "Z": 0.9955315
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "Variant_001101": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Tubeway/Tubeway001101.IronTeeth.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.02,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.04,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.367945939,
+                  "Z": 0.673533857
+                },
+                "Size": {
+                  "X": 0.361290455,
+                  "Y": 0.7358919,
+                  "Z": 0.650923133
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.661812067,
+                  "Y": 0.367945939,
+                  "Z": 0.5101131
+                },
+                "Size": {
+                  "X": 0.6849146,
+                  "Y": 0.7358919,
+                  "Z": 0.32637167
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "Variant_011101": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Tubeway/Tubeway011101.IronTeeth.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.02,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.04,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.367945939,
+                  "Z": 0.673533857
+                },
+                "Size": {
+                  "X": 0.361290455,
+                  "Y": 0.7358919,
+                  "Z": 0.650923133
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.501838863,
+                  "Y": 0.367945939,
+                  "Z": 0.5101131
+                },
+                "Size": {
+                  "X": 0.997506,
+                  "Y": 0.7358919,
+                  "Z": 0.32637167
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "Variant_111101": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Tubeway/Tubeway111101.IronTeeth.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.02,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.04,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.502758145,
+                  "Y": 0.367945939,
+                  "Z": 0.5101131
+                },
+                "Size": {
+                  "X": 1.00302243,
+                  "Y": 0.7358919,
+                  "Z": 0.32637167
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.367945939,
+                  "Z": 0.5006892
+                },
+                "Size": {
+                  "X": 0.361290455,
+                  "Y": 0.7358919,
+                  "Z": 0.9966124
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase1x1#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase1x1/ConstructionBase1x1.blueprint"
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Tubeway/Tubeway.IronTeeth.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.05,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.1,
+                  "Z": 1.0
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    }
+  }
+}

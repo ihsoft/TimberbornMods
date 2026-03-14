@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+    <cui:NineSliceVisualElement name="WeatherPanel" class="top-right-item weather-panel square-large--green">
+        <ui:VisualElement name="ProgressRoot" class="weather-panel__progress-bar">
+            <ui:VisualElement class="weather-panel__progress-background">
+                <cui:SimpleProgressBar name="Progress" class="weather-panel__progress-progress" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Label name="ForecastCounter" class="game-text-normal text--yellow weather-panel__counter" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

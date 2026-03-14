@@ -1,0 +1,17 @@
+{
+  "CustomToolBindingSpec": {
+  },
+  "KeyBindingSpec": {
+    "Id": "IgorZ-CustomTools-Undo",
+    "GroupId": "IgorZ-CustomTools-BindingsGroupId",
+    "LocKey": "KeyBinding.UndoChanges",
+    "Order": 99,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/z",
+    "InputModifiers": "Ctrl",
+    "Unchangeable": true
+  }
+}

@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+    <ui:VisualElement name="Clock" class="clock-panel">
+        <ui:VisualElement class="clock-panel__item clock-panel__circle" />
+        <cui:RotatingBackground name="Daytime" class="clock-panel__item clock-panel__daytime" />
+        <cui:RotatingBackground name="Nighttime" class="clock-panel__item clock-panel__nighttime" />
+        <cui:RotatingBackground name="DaytimeStart" class="clock-panel__item clock-panel__daytime-start" />
+        <cui:RotatingBackground name="NighttimeStart" class="clock-panel__item clock-panel__nighttime-start" />
+        <cui:RotatingBackground name="TimeNeedle" class="clock-panel__item clock-panel__time-needle" />
+        <cui:RotatingBackground name="WorkingHoursNeedle" class="clock-panel__item clock-panel__working-hours-needle" />
+    </ui:VisualElement>
+</ui:UXML>

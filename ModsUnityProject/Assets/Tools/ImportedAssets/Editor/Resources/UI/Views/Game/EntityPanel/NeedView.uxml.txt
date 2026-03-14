@@ -1,0 +1,23 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <ui:VisualElement class="need-view">
+        <ui:VisualElement class="need-view__label-wrapper">
+            <ui:Label text="Need" name="Name" class="entity-panel__sub-text need-view__label" />
+            <ui:VisualElement name="Critical" class="need-view__image need-view__image--critical" />
+            <ui:VisualElement name="ControlItems" class="need-view__control-items">
+                <ui:Label name="ExactValue" text="1.34" class="entity-panel__sub-text" />
+                <ui:Button name="Decrease" text="-" class="need-view__button entity-panel__sub-text" />
+                <ui:Button name="Increase" text="+" class="need-view__button entity-panel__sub-text" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="ProgressWrapper" class="need-view__progress-wrapper">
+            <cui:DoubleSidedProgressBar name="ProgressBackground" class="need-view__progress-background" />
+            <cui:DoubleSidedProgressBar name="Progress" class="need-view__progress" />
+            <ui:VisualElement name="ProgressMarker" class="need-view__image--marker" />
+        </ui:VisualElement>
+        <cui:NineSliceLabel text="+99" name="Wellbeing" class="entity-panel__sub-text need-view__wellbeing" />
+    </ui:VisualElement>
+</ui:UXML>

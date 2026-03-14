@@ -1,0 +1,46 @@
+{
+  "CustomToolSpec": {
+    "Id": "Automation.Tmpl.Population.BeaversAtPlus10",
+    "GroupId": "AutomationPopulationToolGroupId",
+    "Type": "IgorZ.Automation.TemplateTools.ApplyTemplateTool",
+    "Order": 21,
+    "Icon": "Sprites/IgorZ/tool-beavers+10",
+    "DisplayNameLocKey": "IgorZ.Automation.Tool.tmpl.BeaversAtPlus10.DisplayName",
+    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.BeaversAtPlus10.Description",
+  },
+  "AutomationTemplateSpec": {
+    "TemplateFamilyName": "Population",
+    "Rules": [
+      {
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Precondition", "StrValue": "(and (?sig District.Beavers) (?act Pausable.Unpause))" },
+            { "Name": "Expression", "StrValue": "(lt (sig District.Beavers) {% (add (sig District.Beavers) 1000) %})" }
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Pausable.Unpause)" }
+          ]
+        }
+      },
+      {
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Precondition", "StrValue": "(and (?sig District.Beavers) (?act Pausable.Pause))" },
+            { "Name": "Expression", "StrValue": "(ge (sig District.Beavers) {% (add (sig District.Beavers) 1000) %})" }
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Pausable.Pause)" }
+          ]
+        }
+      }
+    ]
+  }
+}

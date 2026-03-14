@@ -1,0 +1,21 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="Box" src="/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <ui:Instance name="PopulationWellbeingBox" template="Box" class="population-wellbeing">
+        <ui:AttributeOverrides element-name="Header" text-loc-key="Wellbeing.PopulationWellbeing" />
+        <Style src="/Assets/Resources/UI/Views/Game/Population/PopulationStyle.uss" />
+        <ui:VisualElement name="Header" class="population-wellbeing__highscore">
+            <cui:LocalizableLabel text="Highscore:" text-loc-key="Wellbeing.HighscoreReached" class="population-wellbeing__highscore-text game-text-heading game-text--black" />
+        </ui:VisualElement>
+        <ui:VisualElement name="Header" class="population-wellbeing__header">
+            <cui:LocalizableLabel text="Average well-being:" text-loc-key="Wellbeing.AverageWellbeing" class="population-wellbeing__header-text game-text-heading" />
+            <cui:NineSliceLabel name="AverageWellbeingScore" text="0" class="wellbeing-score wellbeing-score--small game-text-heading text--bold" />
+        </ui:VisualElement>
+        <ui:ScrollView name="Items" class="game-scroll-view text--default population-wellbeing__items" />
+        <ui:VisualElement name="GoalsWrapper">
+            <cui:LocalizableLabel text="Unlocked factions" text-loc-key="Wellbeing.UnlockedFactions" class="game-text-title population-wellbeing__unlocked-factions text--bold" />
+        </ui:VisualElement>
+    </ui:Instance>
+</ui:UXML>

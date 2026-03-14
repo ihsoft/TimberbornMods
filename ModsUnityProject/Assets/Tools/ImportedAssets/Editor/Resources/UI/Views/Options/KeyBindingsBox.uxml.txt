@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="Box" src="/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Options/OptionsStyle.uss" />
+    <ui:Instance template="Box" class="key-bindings-box">
+        <ui:AttributeOverrides element-name="Header" text-loc-key="KeyBindingsPanel.Header" />
+        <ui:VisualElement name="ColumnHeadersWrapper" class="key-bindings-box__column-headers-wrapper">
+            <cui:LocalizableLabel name="PrimaryBinding" text="PrimaryBinding" text-loc-key="KeyBindingBox.PrimaryBinding" class="text--default key-bindings-box__column-header" />
+            <cui:LocalizableLabel name="SecondaryBinding" text="SecondaryBinding" text-loc-key="KeyBindingBox.SecondaryBinding" class="text--default key-bindings-box__column-header" />
+        </ui:VisualElement>
+        <ui:ScrollView name="Content" class="panel-list-view scroll--green-decorated" />
+        <cui:LocalizableButton name="ResetToDefault" text="ResetToDefault" text-loc-key="KeyBindingBox.ResetToDefault" class="key-bindings_box__reset_button text--default text--bold" />
+    </ui:Instance>
+</ui:UXML>

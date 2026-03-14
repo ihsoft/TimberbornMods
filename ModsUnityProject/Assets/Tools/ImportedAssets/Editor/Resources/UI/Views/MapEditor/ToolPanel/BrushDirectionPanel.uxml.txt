@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MapEditor/MapEditorStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/ToolPanel/ToolPanelStyle.uss" />
+    <cui:NineSliceVisualElement name="BrushDirectionPanel" class="tool-panel-item--map-editor bg-box--green">
+        <ui:VisualElement class="tool-panel-item__text-wrapper tool-panel-item__text-wrapper--numberless">
+            <cui:LocalizableLabel text="Brush direction:" text-loc-key="MapEditor.Brush.Direction.Label" class="game-text-normal tool-panel-item__label" />
+        </ui:VisualElement>
+        <ui:VisualElement name="Toggles" class="tool-panel-item__text__toggles content-centered" />
+        <cui:NineSliceLabel name="Binding" class="tool-panel-item__binding tool-panel-item__binding-row key-binding" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

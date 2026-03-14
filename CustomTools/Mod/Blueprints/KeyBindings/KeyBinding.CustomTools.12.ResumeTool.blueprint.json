@@ -1,0 +1,11 @@
+{
+  "CustomToolBindingSpec": {
+    "CustomToolId": "CustomTools-ResumeTool",
+  },
+  "KeyBindingSpec": {
+    "Id": "IgorZ-CustomTools-ResumeTool",
+    "GroupId": "IgorZ-CustomTools-BindingsGroupId",
+    "LocKey": "IgorZ.CustomTools.ResumeTool.Title",
+    "Order": 12
+  }
+}

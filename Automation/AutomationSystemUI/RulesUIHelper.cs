@@ -197,8 +197,8 @@ class RulesUIHelper {
     if (action is not { ActionName: SignalsScriptableComponent.SetActionName }
         || action.Operands[0] is not ConstantValueExpr { ValueType: ScriptValue.TypeEnum.String } actionExpr
         || action.Operands[1] is not SignalOperator actionSignalOperator
-        || condition is not BinaryOperator {
-            OperatorType: BinaryOperator.OpType.Equal,
+        || condition is not ComparisonOperator {
+            OperatorType: ComparisonOperator.OpType.Equal,
             Left: SignalOperator leftSignalOperator,
             Right: SignalOperator rightSignalOperator,
         }
@@ -210,10 +210,7 @@ class RulesUIHelper {
   }
 
   string GetFormattedSignalValue(SignalDef signalDef, Func<ScriptValue> signalSourceFn) {
-    var valueStr = signalDef.Result.ValueFormatter != null
-        ? signalDef.Result.ValueFormatter(signalSourceFn())
-        : signalSourceFn().AsFloat.ToString("0.##");
-    return _loc.T(BuildingSignalSourceLocKey, signalDef.DisplayName, valueStr);
+    return _loc.T(BuildingSignalSourceLocKey, signalDef.DisplayName, signalSourceFn().AsFloat.ToString("0.##"));
   }
 
   #endregion

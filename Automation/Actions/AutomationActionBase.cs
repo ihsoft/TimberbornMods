@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.Conditions;
@@ -117,7 +118,11 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
   public abstract string UiDescription { get; }
 
   /// <inheritdoc/>
-  public abstract IAutomationAction CloneDefinition();
+  public virtual IAutomationAction CloneDefinition() {
+    var clone = (AutomationActionBase)Activator.CreateInstance(GetType());
+    clone.TemplateFamily = TemplateFamily;
+    return clone;
+  }
 
   /// <inheritdoc/>
   public virtual bool CheckSameDefinition(IAutomationAction other) {
@@ -128,16 +133,16 @@ public abstract class AutomationActionBase : IAutomationAction, IAutomationCondi
   public abstract bool IsValidAt(AutomationBehavior behavior);
 
   /// <summary>
-  /// Notifies that a new behavior has been assigned to the condition. It's the time to setup the behaviors. 
+  /// Notifies that a new behavior has been assigned to the condition. It's the time to set up the behaviors. 
   /// </summary>
   /// <seealso cref="Behavior"/>
-  protected virtual void OnBehaviorAssigned() {}
+  protected abstract void OnBehaviorAssigned();
 
   /// <summary>
-  /// Notifies that the current behavior is about to be cleared. It's the time to cleanup the behaviors. 
+  /// Notifies that the current behavior is about to be cleared. It's the time to clean up the behaviors. 
   /// </summary>
   /// <seealso cref="Behavior"/>
-  protected virtual void OnBehaviorToBeCleared() {}
+  protected abstract void OnBehaviorToBeCleared();
 
   #endregion
 

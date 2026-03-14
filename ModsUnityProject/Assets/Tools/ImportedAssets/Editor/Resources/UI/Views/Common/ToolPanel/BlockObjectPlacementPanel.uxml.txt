@@ -1,0 +1,19 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/ToolPanel/ToolPanelStyle.uss" />
+    <ui:VisualElement name="BlockObjectPlacementPanel" class="tool-panel-item block-object-placement-panel">
+        <cui:NineSliceButton name="RotateClockwise" class="button-game block-object-placement-panel__button">
+            <ui:VisualElement class="block-object-placement-panel__button-image block-object-placement-panel__button-image--clockwise" />
+            <ui:Label name="Binding" text="[R]" class="game-text-normal block-object-placement-panel__binding" />
+        </cui:NineSliceButton>
+        <cui:NineSliceButton name="RotateCounterclockwise" class="button-game block-object-placement-panel__button">
+            <ui:VisualElement class="block-object-placement-panel__button-image block-object-placement-panel__button-image--counterclockwise" />
+            <ui:Label name="Binding" text="[Shift-R]" class="game-text-normal block-object-placement-panel__binding" />
+        </cui:NineSliceButton>
+        <cui:NineSliceButton name="Flip" class="button-game block-object-placement-panel__button">
+            <ui:VisualElement name="FlipIcon" class="block-object-placement-panel__button-image block-object-placement-panel__button-image--flipped" />
+            <ui:Label name="Binding" text="[F]" class="game-text-normal block-object-placement-panel__binding" />
+        </cui:NineSliceButton>
+    </ui:VisualElement>
+</ui:UXML>

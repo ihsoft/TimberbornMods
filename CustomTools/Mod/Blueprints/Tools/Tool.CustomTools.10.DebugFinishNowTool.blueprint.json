@@ -1,0 +1,12 @@
+{
+  "CustomToolSpec": {
+    "Id": "CustomTools-DebugFinishNowTool",
+    "GroupId": "CustomToolsToolGroup",
+    "Order": 10,
+    "Type": "IgorZ.CustomTools.Tools.DebugFinishNowTool",
+    "Icon": "Sprites/BottomBar/IgorZ.CustomTools/tool-debug-finish-all",
+    "DisplayNameLocKey": "IgorZ.CustomTools.DebugFinishNowTool.Title",
+    "DescriptionLocKey": "IgorZ.CustomTools.DebugFinishNowTool.Description",
+    "DevMode": true
+  }
+}

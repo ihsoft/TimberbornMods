@@ -1,0 +1,7 @@
+{
+  "WaterStrengthSpec": {
+    "MaxWaterSourceStrength": 8.0,
+    "MaxWaterSourceChangePerSecond": 0.0058,
+    "MinWaterSourceChangeScaler": 0.15
+  }
+}

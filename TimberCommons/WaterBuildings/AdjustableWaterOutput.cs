@@ -3,9 +3,10 @@
 // License: Public Domain
 
 using IgorZ.TimberCommons.Settings;
+using Timberborn.BaseComponentSystem;
 using Timberborn.Persistence;
-using Timberborn.PrefabSystem;
 using Timberborn.WaterBuildings;
+using Timberborn.WaterSystem;
 using Timberborn.WorldPersistence;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
@@ -20,31 +21,18 @@ namespace IgorZ.TimberCommons.WaterBuildings;
 /// This component automatically replaces any stock water output with the settings set to defaults. If a building has
 /// this component in the prefab, it will keep the custom settings.
 /// </remarks>
-sealed class AdjustableWaterOutput : WaterOutput, IPersistentEntity {
+sealed class AdjustableWaterOutput(IWaterService waterService, IThreadSafeWaterMap threadSafeWaterMap)
+    : WaterOutput(waterService, threadSafeWaterMap), IAwakableComponent, IPersistentEntity {
 
-  #region Fields for Unity
-  // ReSharper disable InconsistentNaming
-
-  [SerializeField]
-  [Tooltip("A minimum height difference between the output spillway and the water surface below.")]
-  float _spillwayHeightDelta = 0.1f;
-  
-  [SerializeField]
-  [Tooltip("Tells if there should be controls in the game GUI to change the depth limit. Ths GUI is always available"
-      + " in DEV mode.")]
-  bool _allowAdjustmentsInGame = true;
-
-  [SerializeField]
-  [Tooltip("Tells if currently selected height should be displayed the same ways as it's done for Sluice.")]
-  bool _showHeightMarker = true;
-
-  // ReSharper restore InconsistentNaming
-  #endregion
+  const string FluidDumpPrefabName = "FluidDump";
 
   #region API
 
   /// <summary>Maximum possible height of the water under the spillway.</summary>
   public int MaxHeight => _waterCoordinatesTransformed.z;
+
+  /// <summary>The current water level at the output.</summary>
+  public float CurrentWaterLevel => _threadSafeWaterMap.WaterHeightOrFloor(_waterCoordinatesTransformed);
 
   /// <summary>Minimum possible height of the water under the spillway.</summary>
   public int MinHeight => !_threadSafeWaterMap.TryGetColumnFloor(_waterCoordinatesTransformed, out var floor)
@@ -55,19 +43,17 @@ sealed class AdjustableWaterOutput : WaterOutput, IPersistentEntity {
   /// Difference from the spillway height to the water surface. The output will stop if level goes higher.
   /// </summary>
   /// <seealso cref="SetSpillwayHeightDelta"/>
-  public float SpillwayHeightDelta { get; private set; }
+  public float SpillwayHeightDelta { get; private set; } = -0.1f;  // Once it was a Unity setting.
 
   /// <summary>Tells if the height marker should be shown when the building is selected.</summary>
   public bool ShowHeightMarker =>
-      _showHeightMarker
-      && (!_isFluidDump && WaterBuildingsSettings.AdjustWaterDepthAtSpillwayOnMechanicalPumps
-          || _isFluidDump && WaterBuildingsSettings.AdjustWaterDepthAtSpillwayOnFluidDumps);
+      !_isFluidDump && WaterBuildingsSettings.AdjustWaterDepthAtSpillwayOnMechanicalPumps
+      || _isFluidDump && WaterBuildingsSettings.AdjustWaterDepthAtSpillwayOnFluidDumps;
 
   /// <summary>Tells if GUI should be presented to change the limit in the game.</summary>
   public bool AllowAdjustmentsInGame =>
-      _allowAdjustmentsInGame
-      && (!_isFluidDump && WaterBuildingsSettings.AdjustWaterDepthAtSpillwayOnMechanicalPumps
-          || _isFluidDump && WaterBuildingsSettings.AdjustWaterDepthAtSpillwayOnFluidDumps);
+      !_isFluidDump && WaterBuildingsSettings.AdjustWaterDepthAtSpillwayOnMechanicalPumps
+      || _isFluidDump && WaterBuildingsSettings.AdjustWaterDepthAtSpillwayOnFluidDumps;
 
   /// <summary>Transformed coordinates of the water spillway.</summary>
   public Vector3Int TargetCoordinates => _waterCoordinatesTransformed;
@@ -102,10 +88,10 @@ sealed class AdjustableWaterOutput : WaterOutput, IPersistentEntity {
     return MaxHeight + SpillwayHeightDelta - _threadSafeWaterMap.WaterHeightOrFloor(_waterCoordinatesTransformed);
   }
 
-  new void Awake() {
-    SpillwayHeightDelta = -_spillwayHeightDelta;
+  /// <inheritdoc/>
+  public new void Awake() {
     base.Awake();
-    _isFluidDump = GetComponentFast<PrefabSpec>().name.StartsWith("FluidDump");
+    _isFluidDump = Name.StartsWith(FluidDumpPrefabName);
   }
 
   #endregion

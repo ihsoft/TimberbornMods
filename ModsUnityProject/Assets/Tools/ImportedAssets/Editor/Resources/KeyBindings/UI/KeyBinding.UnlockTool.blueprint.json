@@ -1,0 +1,20 @@
+{
+  "KeyBindingSpec": {
+    "Id": "UnlockTool",
+    "GroupId": "UI",
+    "LocKey": "KeyBinding.UnlockTool",
+    "Order": 200,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/enter",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  },
+  "SecondaryInputBindingSpec": {
+    "Path": "/Keyboard/numpadEnter",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

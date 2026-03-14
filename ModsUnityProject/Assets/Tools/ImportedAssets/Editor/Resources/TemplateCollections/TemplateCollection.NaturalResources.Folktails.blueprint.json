@@ -1,0 +1,16 @@
+{
+  "TemplateCollectionSpec": {
+    "CollectionId": "NaturalResources.Folktails",
+    "Blueprints": [
+      "NaturalResources/Bushes/Dandelion/Dandelion.blueprint",
+      "NaturalResources/Crops/Carrot/Carrot.blueprint",
+      "NaturalResources/Crops/Cattail/Cattail.blueprint",
+      "NaturalResources/Crops/Potato/Potato.blueprint",
+      "NaturalResources/Crops/Spadderdock/Spadderdock.blueprint",
+      "NaturalResources/Crops/Sunflower/Sunflower.blueprint",
+      "NaturalResources/Crops/Wheat/Wheat.blueprint",
+      "NaturalResources/Trees/ChestnutTree/ChestnutTree.blueprint",
+      "NaturalResources/Trees/Maple/Maple.blueprint"
+    ]
+  }
+}

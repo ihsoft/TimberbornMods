@@ -1,0 +1,297 @@
+.tool-panel-item--map-editor {
+    background-image: resource('UI/Images/Backgrounds/bg-pixel-1');
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    min-width: 510px;
+    max-width: 510px;
+    min-height: 24px;
+    padding: 8px;
+    margin: 2px 0;
+}
+
+.tool-panel-item__text-wrapper {
+    flex-direction: row;
+    min-width: 150px;
+    max-width: 150px;
+    justify-content: flex-end;
+}
+
+.tool-panel-item__text-wrapper--numberless {
+    padding-right: 6px;
+}
+
+.tool-panel-item__label {
+    margin: 0 4px;
+    flex-shrink: 1;
+    -unity-text-align: middle-right;
+}
+
+.tool-panel-item__text-centered {
+    margin: 0 4px;
+    flex-grow: 1;
+    -unity-text-align: middle-center;
+}
+
+.tool-panel-item__binding-row {
+    margin-left: 5px;
+    flex-direction: row;
+}
+
+.tool-panel-item__binding {
+    margin: 0 4px;
+    flex-direction: row;
+    flex-shrink: 1;
+    padding: 3px 8px;
+    -unity-text-align: middle-center;
+}
+
+.tool-panel-item__value-text {
+    min-width: 15px;
+    -unity-text-align: middle-center;
+    margin-right: 8px;
+}
+
+.tool-panel-item__text__toggles {
+    flex-direction: row;
+    flex-shrink: 0;
+}
+
+.tool-panel-toggle {
+    margin: 1px 4px 1px 2px;
+}
+
+.tool-panel-toggle > .unity-toggle__input > .unity-toggle__text {
+    font-size: 13px;
+    white-space: normal;
+    flex-shrink: 1;
+}
+
+.tool-panel-slider {
+    flex-grow: 1;
+}
+
+.tool-panel-slider > .unity-slider__label {
+    color: rgb(204, 204, 204);
+    font-size: 13px;
+    padding-right: 13px;
+    -unity-text-align: middle-right;
+    min-width: 0;
+}
+
+.tool-panel-slider > .unity-slider__input > .unity-base-slider__drag-container > .unity-base-slider__dragger {
+    height: 16px;
+    width: 16px;
+    margin-top: -7px;
+    background-image: resource('UI/Images/Buttons/circle-off');
+}
+
+.tool-panel-slider > .unity-slider__input > .unity-base-slider__drag-container > .unity-base-slider__dragger:hover:enabled {
+    background-image: resource('UI/Images/Buttons/circle-hover');
+}
+
+.tool-panel-slider > .unity-slider__input > .unity-base-slider__drag-container:hover:enabled:active > .unity-base-slider__dragger {
+    background-image: resource('UI/Images/Buttons/circle-on');
+}
+
+.tool-panel-slider > .unity-slider__input > .unity-base-slider__drag-container > .unity-base-slider__tracker {
+    background-image: resource('UI/Images/Backgrounds/bg-pixel-2');
+    -unity-background-scale-mode: stretch-to-fill;
+    height: 2px;
+}
+
+.resource-spawning-brush-panel {
+    flex-direction: column;
+}
+
+.resource-spawning-brush-panel__toggles {
+    justify-content: space-around;
+}
+
+.resource-spawning-brush-panel__toggles > .tool-panel-toggle {
+    width: 170px;
+    padding: 2px 0;
+}
+
+.resource-spawning-brush-panel__slider-wrapper {
+    flex-direction: row;
+    width: 100%;
+    padding: 8px;
+}
+
+.resource-spawning-brush-panel__slider-value {
+    width: 40px;
+    -unity-text-align: middle-center;
+}
+
+.map-editor-simulation__icon {
+    background-image: resource('UI/Images/MapEditor/Simulation');
+    width: 26px;
+    height: 26px;
+}
+
+.file-panel {
+    padding: 2px 0;
+    flex-wrap: nowrap;
+}
+
+.file-panel__buttons-group {
+    margin-right: 24px;
+    flex-wrap: nowrap;
+}
+
+.file-panel__button {
+    margin: 2px;
+    padding: 4px 8px;
+}
+
+.thumbnail-capturing-panel {
+    flex-direction: column;
+    max-width: 500px;
+    padding-top: 15px;
+}
+
+.thumbnail-capturing-panel__preview {
+    width: 480px;
+    height: 270px;
+    margin-bottom: 5px;
+}
+
+.thumbnail-capturing-panel__overlay {
+    flex-grow: 1;
+}
+
+.thumbnail-capturing-panel__row {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 5px;
+    flex-grow: 1;
+    width: 100%;
+}
+
+.thumbnail-capturing-panel__label {
+    -unity-text-align: middle-right;
+    margin-right: 4px;
+    width: 50%;
+}
+
+.thumbnail-capturing-panel__buttons {
+    flex-direction: row;
+    width: 50%;
+    flex-grow: 1;
+}
+
+.thumbnail-capturing-panel__button {
+    margin: 2px;
+    padding: 4px 8px;
+}
+
+.map-metadata-panel {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.map-metadata-panel__dev-controls {
+    align-items: flex-start;
+}
+
+.map-metadata-panel__description {
+    margin-top: 5px;
+    height: 90px;
+    width: 100%;
+}
+
+.map-metadata-panel__fields {
+    flex-direction: row;
+    flex-shrink: 1;
+    flex-grow: 1;
+}
+
+.map-metadata-panel__labels-wrapper {
+    flex-direction: column;
+    width: auto;
+    flex-grow: 1;
+    -unity-text-align: middle-left;
+}
+
+.map-metadata-panel__input-field-wrapper {
+    flex-direction: column;
+    flex-shrink: 1;
+    flex-grow: 1;
+    margin-bottom: 5px;
+}
+
+.map-metadata-panel__input-field-label {
+    -unity-text-align: middle-left;
+    height: 23px;
+    margin-bottom: 4px;
+}
+
+.map-metadata-panel__input-field {
+    margin-left: 10px;
+    flex-grow: 1;
+    height: 23px;
+    margin-bottom: 5px;
+}
+
+.map-metadata-panel__input-field > .unity-base-field__input {
+    -unity-text-align: middle-left;
+}
+
+.map-metadata-panel__toggles-wrapper {
+    flex-direction: row;
+    flex-grow: 1;
+    margin-bottom: 5px;
+}
+
+.map-metadata-panel__toggle {
+    align-self: flex-start;
+    margin-bottom: 10px;
+    margin-right: 40px;
+}
+
+.map-metadata-panel__toggle > .unity-toggle__input {
+    flex-direction: row-reverse;
+}
+
+.map-metadata-panel__toggle > .unity-toggle__input > .unity-toggle__checkmark {
+    margin-left: 10px;
+}
+
+.hazardous-weather-panel {
+    margin-top: 4px;
+    padding-right: 4px;
+    height: 26px;
+}
+
+.hazardous-weather-panel > .slider-toggle > .slider-toggle__content > .slider-toggle__background {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-2');
+}
+
+.hazardous-weather-panel > .slider-toggle > .slider-toggle__content > .slider-toggle__element--active {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-2');
+}
+
+.block-object-placement-randomizing-panel {
+    justify-content: center;
+    padding: 10px;
+}
+
+.level-visibility-panel--map-editor {
+    align-self: stretch;
+    padding: 0;
+    margin-left: 4px;
+    min-height: 52px;
+}
+
+.fixed-stockpile-goods__dropdown {
+    flex-grow: 1;
+    margin: 2px 2px 4px;
+}
+
+.demolishable-science-reward-fragment {
+    padding-left: 8px;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}

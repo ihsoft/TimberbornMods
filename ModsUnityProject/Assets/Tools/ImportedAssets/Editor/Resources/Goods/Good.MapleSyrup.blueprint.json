@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "MapleSyrup",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Liquid",
+    "StockpileVisualization": "Liquid",
+    "VisibleContainer": "Barrel",
+    "ContainerColor": {
+      "r": 0.7647059,
+      "g": 0.266666681,
+      "b": 0.09803922,
+      "a": 1.0
+    },
+    "ContainerMaterial": "Materials/Goods/MapleSyrup",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Ingredients",
+    "GoodOrder": 8070,
+    "Icon": "Sprites/Goods/MapleSyrupIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.MapleSyrup.DisplayName",
+    "PluralDisplayNameLocKey": "Good.MapleSyrup.PluralDisplayName"
+  }
+}

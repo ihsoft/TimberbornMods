@@ -1,0 +1,7 @@
+{
+  "KeyBindingGroupSpec": {
+    "Id": "Objects",
+    "Order": 20,
+    "LocKey": "KeyBindingGroup.Objects"
+  }
+}

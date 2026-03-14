@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
 using UnityEngine;
@@ -41,8 +42,6 @@ class PythonSyntaxParser : ParserBase {
 
   #region Implementation
 
-  const string HasSignalFunc = "?sig";//FIXME
-  const string HasActionFunc = "?act";//FIXME
   const string EqOperator = "==";
   const string NeOperator = "!=";
   const string LtOperator = "<";
@@ -60,8 +59,6 @@ class PythonSyntaxParser : ParserBase {
   const string MinFunc = "min";
   const string MaxFunc = "max";
   const string RoundFunc = "round";
-  const string GetStrFunc = "getstr";
-  const string GetNumFunc = "getnum";
   const string GetValueFunc = "getvalue";
   const string GetElementFunc = "getelement";
   const string GetLenFunc = "getlen";
@@ -86,6 +83,7 @@ class PythonSyntaxParser : ParserBase {
 
   static readonly string[] GroupTerminator = [ ")" ];
   static readonly string[] ArgumentsTerminators = [ ")", "," ];
+  static readonly Regex IsGoodFloatValueRegex = new(@"^-?\d+(\.[0-9]{1,2}[0]*)?$");
 
   IExpression ParseExpressionInternal(int parentPrecedence, Queue<Token> tokens) {
     var left = ConsumeValueOperand(tokens);
@@ -102,12 +100,12 @@ class PythonSyntaxParser : ParserBase {
       left = opName.Value switch {
           OrOperator => LogicalOperator.CreateOr(CollapseLogicalOperators(LogicalOperator.OpType.Or, operands)),
           AndOperator => LogicalOperator.CreateAnd(CollapseLogicalOperators(LogicalOperator.OpType.And, operands)),
-          EqOperator => BinaryOperator.CreateEq(CurrentContext, operands),
-          NeOperator => BinaryOperator.CreateNe(CurrentContext, operands),
-          LtOperator => BinaryOperator.CreateLt(CurrentContext, operands),
-          LeOperator => BinaryOperator.CreateLe(CurrentContext, operands),
-          GtOperator => BinaryOperator.CreateGt(CurrentContext, operands),
-          GeOperator => BinaryOperator.CreateGe(CurrentContext, operands),
+          EqOperator => ComparisonOperator.CreateEq(CurrentContext, operands),
+          NeOperator => ComparisonOperator.CreateNe(CurrentContext, operands),
+          LtOperator => ComparisonOperator.CreateLt(CurrentContext, operands),
+          LeOperator => ComparisonOperator.CreateLe(CurrentContext, operands),
+          GtOperator => ComparisonOperator.CreateGt(CurrentContext, operands),
+          GeOperator => ComparisonOperator.CreateGe(CurrentContext, operands),
           AddOperator => MathOperator.CreateAdd(CollapseMathOperators(operands)),
           SubOperator => MathOperator.CreateSubtract(operands),
           DivOperator => MathOperator.CreateDivide(operands),
@@ -147,7 +145,7 @@ class PythonSyntaxParser : ParserBase {
     if (token is { TokenType: Token.Type.Keyword, Value: SubOperator }) {
       var operand = ConsumeValueOperand(tokens);
       return operand is ConstantValueExpr constantValueExpr
-          ? ConstantValueExpr.CreateNumericValue(-constantValueExpr.ValueFn().AsNumber)
+          ? ConstantValueExpr.CreateFromValue(-constantValueExpr.ValueFn())
           : MathOperator.CreateNegate(operand);
     }
 
@@ -175,9 +173,12 @@ class PythonSyntaxParser : ParserBase {
       return ConstantValueExpr.CreateStringLiteral(token.Value);
     }
     if (token.TokenType == Token.Type.NumericValue) {
-      return float.TryParse(token.Value, out var value)
-          ? ConstantValueExpr.CreateNumericValue(Mathf.RoundToInt(value * 100))
-          : throw new ScriptError.ParsingError(token, "Not a valid float number");
+      if (!float.TryParse(token.Value, out var value)) {
+        throw new ScriptError.ParsingError(token, "Not a valid float number");
+      }
+      return IsGoodFloatValueRegex.IsMatch(token.Value)
+          ? ConstantValueExpr.CreateFromValue(ScriptValue.FromFloat(value))
+          : throw new ScriptError.ParsingError(token, "Only up to 2 digits after the decimal point are allowed");
     }
 
     if (token.TokenType != Token.Type.Keyword) {
@@ -205,8 +206,6 @@ class PythonSyntaxParser : ParserBase {
         MaxFunc => MathOperator.CreateMax(arguments),
         RoundFunc => MathOperator.CreateRound(arguments),
         ConcatFunc => ConcatOperator.Create(arguments),
-        GetNumFunc => GetPropertyOperator.CreateGetNumber(CurrentContext, arguments),
-        GetStrFunc => GetPropertyOperator.CreateGetString(CurrentContext, arguments),
         _ => throw new ScriptError.ParsingError(token, "Unknown function"),
     };
   }
@@ -279,7 +278,7 @@ class PythonSyntaxParser : ParserBase {
         ConstantValueExpr constExpr => constExpr.ValueType switch {
             ScriptValue.TypeEnum.String => Tokenizer.EscapeString(constExpr.ValueFn().AsString),
             ScriptValue.TypeEnum.Number => constExpr.ValueFn().AsFloat.ToString("0.##"),
-            _ => throw new InvalidOperationException($"Unsupported value type: {constExpr.ValueType}"),
+            ScriptValue.TypeEnum.Unset => throw new InvalidOperationException("Value type must be set"),
         },
         _ => throw new InvalidOperationException($"Unsupported expression type: {expression}"),
     };
@@ -297,12 +296,13 @@ class PythonSyntaxParser : ParserBase {
             MathOperator.OpType.Min => MinFunc,
             MathOperator.OpType.Max => MaxFunc,
             MathOperator.OpType.Round => RoundFunc,
-            _ => null,
-        },
-        GetPropertyOperator getPropertyOperator => getPropertyOperator.OperatorType switch {
-            GetPropertyOperator.OpType.GetNumber => GetNumFunc,
-            GetPropertyOperator.OpType.GetString => GetStrFunc,
-            _ => throw new InvalidOperationException($"Unsupported operator: {getPropertyOperator}"),
+            MathOperator.OpType.Add
+                or MathOperator.OpType.Subtract
+                or MathOperator.OpType.Multiply
+                or MathOperator.OpType.Divide
+                or MathOperator.OpType.Modulus
+                or MathOperator.OpType.Negate =>
+                null,
         },
         ConcatOperator => ConcatFunc,
         ActionOperator actionOperator => actionOperator.ActionName,
@@ -326,14 +326,13 @@ class PythonSyntaxParser : ParserBase {
     // Binary operators: a + b
     var operands = expression.GetReducedOperands();
     var opName = expression switch {
-        BinaryOperator binaryOperator => binaryOperator.OperatorType switch {
-            BinaryOperator.OpType.Equal => EqOperator,
-            BinaryOperator.OpType.NotEqual => NeOperator,
-            BinaryOperator.OpType.LessThan => LtOperator,
-            BinaryOperator.OpType.LessThanOrEqual => LeOperator,
-            BinaryOperator.OpType.GreaterThan => GtOperator,
-            BinaryOperator.OpType.GreaterThanOrEqual => GeOperator,
-            _ => throw new InvalidOperationException($"Unsupported operator: {binaryOperator.OperatorType}"),
+        ComparisonOperator comparisonOperator => comparisonOperator.OperatorType switch {
+            ComparisonOperator.OpType.Equal => EqOperator,
+            ComparisonOperator.OpType.NotEqual => NeOperator,
+            ComparisonOperator.OpType.LessThan => LtOperator,
+            ComparisonOperator.OpType.LessThanOrEqual => LeOperator,
+            ComparisonOperator.OpType.GreaterThan => GtOperator,
+            ComparisonOperator.OpType.GreaterThanOrEqual => GeOperator,
         },
         MathOperator mathOperator => mathOperator.OperatorType switch {
             MathOperator.OpType.Add => AddOperator,
@@ -341,12 +340,16 @@ class PythonSyntaxParser : ParserBase {
             MathOperator.OpType.Multiply => MulOperator,
             MathOperator.OpType.Divide => DivOperator,
             MathOperator.OpType.Modulus => ModOperator,
-            _ => throw new InvalidOperationException($"Unsupported operator: {mathOperator.OperatorType}"),
+            MathOperator.OpType.Min
+                or MathOperator.OpType.Max
+                or MathOperator.OpType.Round
+                or MathOperator.OpType.Negate =>
+                throw new InvalidOperationException($"Unsupported operator: {mathOperator.OperatorType}"),
         },
         LogicalOperator logicalOperator => logicalOperator.OperatorType switch {
             LogicalOperator.OpType.And => AndOperator,
             LogicalOperator.OpType.Or => OrOperator,
-            _ => throw new InvalidOperationException($"Unsupported operator: {logicalOperator.OperatorType}"),
+            LogicalOperator.OpType.Not => throw new InvalidOperationException("Not expected"),
         },
         _ => throw new InvalidOperationException($"Unexpected expression type: {expression}"),
     };
@@ -366,7 +369,6 @@ class PythonSyntaxParser : ParserBase {
           GetPropertyFunction.FuncName.Element =>
               $"{GetElementFunc}('{propertyName}', {DecompileInternal(getPropertyFunction.IndexExpr)})",
           GetPropertyFunction.FuncName.Length => $"{GetLenFunc}('{propertyName}')",
-          _ => throw new InvalidOperationException($"Unexpected GetPropertyFunction: {propertyName}"),
       };
     }
     throw new InvalidOperationException($"Unsupported expression type: {function}");
@@ -405,8 +407,8 @@ class PythonSyntaxParser : ParserBase {
         AndOperator, OrOperator, NotOperator,
         // Math functions.
         MinFunc, MaxFunc, RoundFunc,
-        // Get property operators.
-        GetStrFunc, GetNumFunc, GetValueFunc, GetElementFunc, GetLenFunc,
+        // Get property functions.
+        GetValueFunc, GetElementFunc, GetLenFunc,
         // Concat operator.
         ConcatFunc,
     ];

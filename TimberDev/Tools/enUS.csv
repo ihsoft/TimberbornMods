@@ -1,6 +1,0 @@
-﻿ID,Text,Comment
-TimberDev_Utils.Tools.LockSelectTool.SelectingObject,"Selecting: {0}","Text to show the type of the selected building. It's shown when the selection tool is locked on the specific buildings."
-TimberDev_Utils.Tools.LockSelectTool.SelectingNObjects,"Selecting: {0} (x{1})","The plural form of TimberDev_Utils.Tools.LockSelectTool.SelectingObject"
-TimberDev_Utils.Tools.LockSelectTool.StartSelectingPrompt,"Point to an entity and click to start selecting",
-TimberDev_Utils.Tools.LockSelectTool.StartObjectSelectingPrompt,"Click to start selecting: {0}",
-TimberDev_Utils.Tools.LockSelectTool.DescriptionHint,"Hold <i>SHIFT</i> to select items of one type only.",

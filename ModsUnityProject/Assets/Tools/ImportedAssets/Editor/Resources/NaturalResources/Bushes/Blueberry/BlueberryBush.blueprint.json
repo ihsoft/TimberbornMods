@@ -1,0 +1,231 @@
+{
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "TemplateSpec": {
+    "TemplateName": "BlueberryBush",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "NaturalResourceSpec": {
+    "Order": 1
+  },
+  "BushSpec": {},
+  "GrowableSpec": {
+    "GrowthTimeInDays": 12.0
+  },
+  "BasicSelectionSoundSpec": {
+    "SoundName": "Bush",
+    "AlternativeSoundName": ""
+  },
+  "DemolishableSpec": {
+    "DemolishTimeInHours": 0.8,
+    "ShowDemolishButtonInEntityPanel": false
+  },
+  "GatherableSpec": {
+    "YieldGrowthTimeInDays": 12.0,
+    "Yielder": {
+      "YielderComponentName": "Gatherable",
+      "Yield": {
+        "Id": "Berries",
+        "Amount": 3
+      },
+      "RemovalTimeInHours": 0.8,
+      "ResourceGroup": "Gatherable"
+    }
+  },
+  "PlantableSpec": {
+    "ResourceGroup": "Forester",
+    "PlantTimeInHours": 0.37
+  },
+  "PlantablePreviewModelSpec": {
+    "Model": "NaturalResources/Bushes/Blueberry/BlueberryBushMature"
+  },
+  "ReproducibleSpec": {
+    "ReproductionChance": 0.02
+  },
+  "WateredNaturalResourceSpec": {
+    "DaysToDieDry": 9.0
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "NaturalResource.Blueberry.DisplayName",
+    "DescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "NaturalResource.Blueberry.FlavorDescription",
+    "Icon": "NaturalResources/Bushes/Blueberry/BlueberryBushIcon"
+  },
+  "FloodableNaturalResourceSpec": {
+    "MinWaterHeight": 0,
+    "MaxWaterHeight": 0,
+    "DaysToDie": 7.0
+  },
+  "NaturalResourceModelRandomizerSpec": {
+    "ConstrainProportion": false,
+    "MinHeightScaleFactor": 0.8,
+    "MaxHeightScaleFactor": 1.2,
+    "MinWidthScaleFactor": 0.8,
+    "MaxWidthScaleFactor": 1.2,
+    "RandomizedRotation": "BetweenMinAndMax",
+    "MinRotation": 0.0,
+    "MaxRotation": 360.0
+  },
+  "ContaminatedNaturalResourceSpec": {},
+  "BlockObjectModelSpec": {
+    "FullModelName": "#Models",
+    "UncoveredModelName": "",
+    "UndergroundModelName": "",
+    "UndergroundModelDepth": 0
+  },
+  "Children": {
+    "#Models": {
+      "Children": {
+        "Seedling": {
+          "Children": {
+            "#Alive": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Bushes/Blueberry/BlueberryBushSeedling"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.0,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.29
+                  }
+                ],
+                "CapsuleColliders": []
+              }
+            },
+            "#Dead": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Bushes/Blueberry/BlueberryBushSeedlingDead"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.0,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.29
+                  }
+                ],
+                "CapsuleColliders": []
+              }
+            },
+            "#Dying": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Bushes/Blueberry/BlueberryBushSeedlingDry"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.0,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.29
+                  }
+                ],
+                "CapsuleColliders": []
+              }
+            }
+          }
+        },
+        "Mature": {
+          "Children": {
+            "#Alive": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Bushes/Blueberry/BlueberryBushMature"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.0,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.38
+                  }
+                ],
+                "CapsuleColliders": []
+              }
+            },
+            "#Dying": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Bushes/Blueberry/BlueberryBushMatureDry"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.0,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.38
+                  }
+                ],
+                "CapsuleColliders": []
+              }
+            },
+            "#Dead": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Bushes/Blueberry/BlueberryBushMatureDead"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.0,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.38
+                  }
+                ],
+                "CapsuleColliders": []
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

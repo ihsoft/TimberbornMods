@@ -6,6 +6,7 @@ using System;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
+using Timberborn.BaseComponentSystem;
 using Timberborn.TickSystem;
 using Timberborn.WaterBuildings;
 using UnityEngine;
@@ -29,7 +30,7 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override string[] GetSignalNamesForBuilding(AutomationBehavior behavior) {
-    return behavior.GetComponentFast<StreamGauge>()
+    return behavior.GetComponent<StreamGauge>()
         ? [DepthSignalName, ContaminationSignalName, CurrentSignalName]
         : [];
   }
@@ -58,7 +59,10 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
   /// <inheritdoc/>
   public override void RegisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
     host.Behavior.GetOrCreate<StreamGaugeTracker>().AddSignal(signalOperator, host);
-    host.Behavior.GetOrCreate<StreamGaugeCheckTicker>();
+    var ticker = host.Behavior.GetComponent<StreamGaugeCheckTicker>();
+    if (!ticker) {
+      throw new InvalidOperationException($"No ticker component found on {host.Behavior}");
+    }
   }
 
   /// <inheritdoc/>
@@ -75,8 +79,8 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
       DisplayName = Loc.T(DepthSignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
-          ValueFormatter = x => x.AsFloat.ToString("0.00"),
-          ValueValidator = ValueDef.RangeCheckValidatorFloat(min: 0f),
+          DisplayNumericFormat = ValueDef.NumericFormatEnum.Float,
+          DisplayNumericFormatRange = (0, float.NaN),
       },
   };
   SignalDef _depthSignalDef;
@@ -86,9 +90,9 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
       DisplayName = Loc.T(ContaminationSignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
-          ValueFormatter = x => x.AsFloat.ToString("P0"),
-          ValueValidator = ValueDef.RangeCheckValidatorFloat(0f, 1f),
-          ValueUiHint = GetArgumentMaxValueHint(1f),
+          DisplayNumericFormat = ValueDef.NumericFormatEnum.Percent,
+          DisplayNumericFormatRange = (0, 100),
+          RuntimeValueValidator = ValueDef.RangeCheckValidator(min: 0f, max: 1f),
       },
   };
   SignalDef _contaminationSignalDef;
@@ -98,8 +102,8 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
       DisplayName = Loc.T(CurrentSignalLocKey),
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
-          ValueFormatter = x => x.AsFloat.ToString("0.0"),
-          ValueValidator = ValueDef.RangeCheckValidatorFloat(min: 0f),
+          DisplayNumericFormat = ValueDef.NumericFormatEnum.Float,
+          DisplayNumericFormatRange = (0, float.NaN),
       },
   };
   SignalDef _currentSignalDef;
@@ -121,7 +125,7 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
   #region Implementation
 
   static StreamGauge GetGauge(AutomationBehavior behavior) {
-    var streamGauge = behavior.GetComponentFast<StreamGauge>();
+    var streamGauge = behavior.GetComponent<StreamGauge>();
     if (!streamGauge) {
       throw new ScriptError.BadStateError(behavior, "StreamGauge component not found");
     }
@@ -132,33 +136,38 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
 
   #region Stream gauge tracker component
 
-  internal sealed class StreamGaugeCheckTicker : TickableComponent {
+  internal sealed class StreamGaugeCheckTicker : TickableComponent, IAwakableComponent {
     StreamGaugeTracker _streamGaugeTracker;
 
-    void Awake() {
-      enabled = false;
+    public void Awake() {
+      DisableComponent();
+    }
+
+    public override void StartTickable() {
+      _streamGaugeTracker = GetComponent<AutomationBehavior>().GetOrCreate<StreamGaugeTracker>();
+      base.StartTickable();
     }
 
     public override void Tick() {
-      if (!_streamGaugeTracker) {
-        _streamGaugeTracker = GetComponentFast<StreamGaugeTracker>();
-      }
       _streamGaugeTracker.UpdateSignals();
     }
   }
 
-  sealed class StreamGaugeTracker : AbstractStatusTracker {
+  //FXIME: disable component on the last signal unregistered, enable on first.
+  internal sealed class StreamGaugeTracker : AbstractStatusTracker {
     StreamGauge _streamGauge;
     int _prevWaterLevel;
     int _prevContaminationLevel;
     int _prevWaterCurrent;
 
-    void Start() {
-      _streamGauge = GetComponentFast<StreamGauge>();
+    /// <inheritdoc/>
+    public override void Start() {
+      base.Start();
+      _streamGauge = AutomationBehavior.GetComponent<StreamGauge>();
       _prevWaterLevel = Mathf.RoundToInt(_streamGauge.WaterLevel * 100f);
       _prevContaminationLevel = Mathf.RoundToInt(_streamGauge.ContaminationLevel * 100f);
       _prevWaterCurrent = Mathf.RoundToInt(_streamGauge.WaterCurrent * 100f);
-      GetComponentFast<StreamGaugeCheckTicker>().enabled = true;
+      AutomationBehavior.GetComponent<StreamGaugeCheckTicker>().EnableComponent();
     }
 
     public void UpdateSignals() {

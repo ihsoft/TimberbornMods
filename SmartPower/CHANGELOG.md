@@ -1,5 +1,45 @@
+# v1.16.0 (March 2nd, 2026)
+* [Update] Support game version `1.0.11`.
+* [Enhancement] Make some ruRU strings more compact to avoid line wrapping in UI.
+* [Fix] Units are not formatted properly after the `1.0.10` update.
+
+# v1.15.5 (February 26th, 2026)
+* [Fix] Engines without fuel enter suspended state instead of disabling automation.
+
+# v1.15.4 (February 26th, 2026)
+* [Enhancement] Automation On/Off state is now copied between the buildings with the other settings.
+* [Enhancement] Stock game copy/duplicate building functionality now copies the SmartPower settings.
+* [Fix] In some setups engines can enter endless start/stop loop.
+* [Fix] Unfinished engines always load with automation mode enabled, even if it was disabled before saving.
+
+# v1.15.3 (February 25th, 2026)
+* [Enhancement] Added a new UI mode for batteries charge: show in percent. It's enabled by default, but can be disabled via settings.
+* [Fix] Engines continue working even if there is no fuel.
+
+# v1.15.2 (February 13th, 2026)
+* [Fix] Manufactories in the unpowered network enter suspend/resume cycle.
+
+# v1.15.1 (February 4th, 2026)
+* [Fix] Mod crashes on buildings without adjustable power module.
+
+# v1.15.0 (February 3rd, 2026)
+* [Enhancement] Added Simplified Chinese localization.
+* [Change] Update to support game version `1.0.8.1`.
+
+# v1.14.3 (January 27th, 2026)
+* [Change] Update to support game version `1.0.8.0`.
+
+# v1.14.2 (January 14th, 2026)
+* [Fix] Generators repeatedly turn ON and OFF.
+
+# v1.14.1 (December 12th, 2025)
+* [Change] Update to support game version `1.0.6.0`. Unity `6000.3.0f1` can't properly load resources from the previous versions :(
+
+# v1.14.0 (December 10th, 2025)
+* Update to support game version `1.0.5.1`. Mod version `v1.13.4` is included to the package to support the older game version. 
+
 # v1.13.4 (September 17th, 2025)
-* Added compatibility with the `TImprove 4 UX` mod.
+* Added compatibility with the `Timprove 4 UX` mod.
 
 # v1.13.3 (10 Apr 2025)
 * Update to support game version `0.7.3.1`.

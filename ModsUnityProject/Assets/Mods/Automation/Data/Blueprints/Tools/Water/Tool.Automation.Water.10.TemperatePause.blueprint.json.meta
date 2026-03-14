@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: b22f6cb30ca727a438097fd1ea357e22
+importerOverride:
+  nativeImporterType: 1031
+  scriptedImporterType:
+    serializedVersion: 2
+    Hash: d53ca297fb8e7ea31d64b12a57aef201
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: -1829411045, guid: dd945cf86b60b6c4fac506c39936cbfa, type: 3}
+  _disableBlueprintValidation: 0

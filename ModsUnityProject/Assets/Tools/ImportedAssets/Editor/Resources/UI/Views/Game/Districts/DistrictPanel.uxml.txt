@@ -1,0 +1,21 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/GameStyle.uss" />
+    <ui:VisualElement name="DistrictPanel" picking-mode="Ignore" class="district-panel__wrapper top-right-item">
+        <Style src="/Assets/Resources/UI/Views/Game/Districts/DistrictsStyle.uss" />
+        <ui:VisualElement name="Background" class="extension-panel-background extension-panel-position district-panel__extension-panel-background">
+            <ui:VisualElement name="CounterItems" class="top-bar-counter__items" />
+            <ui:VisualElement name="DistrictListPanel" class="district-panel__list-wrapper content-row-centered">
+                <ui:ListView name="DistrictList" class="district-panel__list box__simple-list" />
+            </ui:VisualElement>
+            <ui:Button name="ExtensionToggler" class="extension-clamp district-panel__extension-clamp" />
+        </ui:VisualElement>
+        <cui:NineSliceVisualElement name="DistrictHeader" picking-mode="Ignore" class="square-large--green district-panel content-row-centered">
+            <ui:VisualElement class="district-panel__icon" />
+            <ui:Button name="DistrictName" text="Glorious District" class="district-panel__selected-district-button game-text-normal text--yellow" />
+            <ui:Button name="PreviousDistrict" class="button-square button-square--small button-arrow-left" />
+            <ui:Button name="NextDistrict" class="button-square button-square--small button-arrow-right" />
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

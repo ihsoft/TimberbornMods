@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "MouseLeft",
+    "GroupId": "Internal",
+    "LocKey": "",
+    "Order": 0,
+    "AllowOtherModifiers": true,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Mouse/leftButton",
+    "InputModifiers": "None",
+    "Unchangeable": true
+  }
+}

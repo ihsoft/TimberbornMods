@@ -1,0 +1,23 @@
+ID,Text,Comment
+IgorZ.CustomTools.BlockObjectTool.UndoHint,"Press <i>Ctrl+Z</i> to undo the last change",
+IgorZ.CustomTools.FourTemplatesBlockObjectTool.ShiftDescriptionHint,"Hold <i>SHIFT</i>: {0}",
+IgorZ.CustomTools.FourTemplatesBlockObjectTool.CtrlDescriptionHint,"Hold <i>CTRL</i>: {0}",
+IgorZ.CustomTools.FourTemplatesBlockObjectTool.AltDescriptionHint,"Hold <i>ALT</i>: {0}",
+IgorZ.CustomTools.ToolGroup.Main.DisplayName,"Tools",
+IgorZ.CustomTools.LeveePlusTool.Title,"Levee or Dam",
+IgorZ.CustomTools.LockSelectTool.DescriptionHint,"Hold <i>SHIFT</i> to select items of one type only.",
+IgorZ.CustomTools.LockSelectTool.SelectingNObjects,"Selecting: {0} (x{1})","The plural form of TimberDev_Utils.Tools.LockSelectTool.SelectingObject"
+IgorZ.CustomTools.LockSelectTool.SelectingObject,"Selecting: {0}","Text to show the type of the selected building. It's shown when the selection tool is locked on the specific buildings."
+IgorZ.CustomTools.LockSelectTool.StartObjectSelectingPrompt,"Click to start selecting: {0}",
+IgorZ.CustomTools.LockSelectTool.StartSelectingPrompt,"Point to an entity and click to start selecting",
+IgorZ.CustomTools.MultiTemplateBlockObjectTool.TemplateIsUnlocked,"Building '{0}' is not yet available",
+IgorZ.CustomTools.DebugFinishNowTool.Description,"Immediately finishes the selected constructables.",
+IgorZ.CustomTools.DebugFinishNowTool.Title,"Finish now debug tool",
+IgorZ.CustomTools.PathPlusTool.Title,"Path+",
+IgorZ.CustomTools.PauseTool.Description,"Use this tool to pause buildings and construction sites.",
+IgorZ.CustomTools.PauseTool.Title,"Pause buildings",
+IgorZ.CustomTools.PlatformPlusTool.Title,"Adjustable Platform",
+IgorZ.CustomTools.ResumeTool.Description,"Use this tool to unpause buildings and construction sites.",
+IgorZ.CustomTools.ResumeTool.Title,"Unpause buildings",
+=,=,"Key bindings"
+IgorZ.CustomTools.KeyBindingGroup,"CustomTools Mod",

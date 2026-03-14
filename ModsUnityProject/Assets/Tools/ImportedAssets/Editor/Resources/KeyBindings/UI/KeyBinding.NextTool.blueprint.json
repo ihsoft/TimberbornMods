@@ -1,0 +1,20 @@
+{
+  "KeyBindingSpec": {
+    "Id": "NextTool",
+    "GroupId": "UI",
+    "LocKey": "KeyBinding.NextTool",
+    "Order": 180,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Mouse/scroll/down",
+    "InputModifiers": "Shift",
+    "Unchangeable": false
+  },
+  "SecondaryInputBindingSpec": {
+    "Path": "/Mouse/scroll/right",
+    "InputModifiers": "Shift",
+    "Unchangeable": false
+  }
+}

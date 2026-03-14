@@ -11,7 +11,7 @@ using IgorZ.Automation.ScriptingEngine.Expressions;
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 
 /// <summary>Helper class to track the registration of signals and actions.</summary>
-sealed class ReferenceManager {
+sealed class ReferenceManager(ScriptingService scriptingService) {
   public readonly Dictionary<ISignalListener, HashSet<SignalOperator>> Signals = new();
   public readonly HashSet<ActionOperator> Actions = [];
 
@@ -53,7 +53,7 @@ sealed class ReferenceManager {
 
   /// <summary>Schedules all signals for the given signal name.</summary>
   /// <remarks>If the host has registered to the same signal multiple times, it will be notified once.</remarks>
-  public void ScheduleSignal(string signalName, ScriptingService scriptingService, bool ignoreErrors = false) {
+  public void ScheduleSignal(string signalName, bool ignoreErrors = false) {
     var listeners = Signals
         .Where(pair => pair.Value.Any(x => x.SignalName == signalName))
         .Select(x => x.Key)

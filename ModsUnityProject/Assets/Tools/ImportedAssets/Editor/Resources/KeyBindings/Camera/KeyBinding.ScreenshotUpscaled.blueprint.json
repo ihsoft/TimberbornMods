@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "ScreenshotUpscaled",
+    "GroupId": "Camera",
+    "LocKey": "KeyBinding.ScreenshotUpscaled",
+    "Order": 150,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/f11",
+    "InputModifiers": "Ctrl",
+    "Unchangeable": false
+  }
+}

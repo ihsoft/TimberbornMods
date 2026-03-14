@@ -1,0 +1,18 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonMiscStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <ui:VisualElement name="MapEditorOptionsBox" class="grow-centered">
+        <cui:NineSliceVisualElement name="OptionsBox" class="options-box sliced-border">
+            <cui:LocalizableButton text="Resume" name="Resume" text-loc-key="Menu.Resume" class="menu-button menu-button--stretched" />
+            <cui:LocalizableButton text="Save" name="Save" text-loc-key="Core.Save" class="menu-button menu-button--stretched" />
+            <cui:LocalizableButton text="SaveAs" name="SaveAs" text-loc-key="Core.SaveAs" class="menu-button menu-button--stretched" />
+            <cui:LocalizableButton text="Load" name="Load" text-loc-key="Core.Load" class="menu-button menu-button--stretched" />
+            <cui:LocalizableButton text="NewMap" name="NewMap" text-loc-key="MapEditor.NewMap" class="menu-button menu-button--stretched" />
+            <cui:LocalizableButton text="Key bindings" name="Bindings" text-loc-key="Menu.KeyBindings" class="menu-button menu-button--stretched" />
+            <cui:LocalizableButton text="Settings" name="Settings" text-loc-key="Menu.Settings" class="menu-button menu-button--stretched" />
+            <cui:LocalizableButton text="Exit to main menu" name="ExitToMenu" text-loc-key="Menu.ExitToMenu" class="menu-button menu-button--stretched" />
+            <cui:LocalizableButton text="Exit to desktop" name="ExitToDesktop" text-loc-key="Menu.ExitToDesktop" class="menu-button menu-button--stretched" />
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

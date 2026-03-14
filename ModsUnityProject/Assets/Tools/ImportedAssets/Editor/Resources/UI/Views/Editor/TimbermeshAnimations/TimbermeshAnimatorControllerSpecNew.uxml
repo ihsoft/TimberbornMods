@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="True">
+    <Style path="UI/Views/Editor/TimbermeshAnimations/TimbermeshAnimationsStyle" />
+    <ui:ScrollView name="Validation" class="controller-box">
+        <ui:Button name="Validate" text="Validate" class="controller-validation__button" />
+        <ui:Label name="ValidationOutput" multiline="True" class="controller-box__label" />
+    </ui:ScrollView>
+</ui:UXML>

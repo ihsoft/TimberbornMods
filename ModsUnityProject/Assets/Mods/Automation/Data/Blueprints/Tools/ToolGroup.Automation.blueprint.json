@@ -1,0 +1,13 @@
+{
+  "ToolGroupSpec": {
+    "Id": "AutomationToolGroupId",
+    "DisplayNameLocKey": "IgorZ.Automation.ToolGroup.Main.DisplayName",
+    "Icon": "Sprites/IgorZ/automation-tool-group"
+  },
+  "CustomToolGroupSpec": {
+    "Style": "Blue",
+    "Order": 10000,
+    "Layout": "Left"
+  },
+  "ConstructionModeToolGroupSpec": {}
+}

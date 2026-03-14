@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "CoffeeBean",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.31764707,
+      "g": 0.09019608,
+      "b": 0.08627451,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Ingredients",
+    "GoodOrder": 10080,
+    "Icon": "Sprites/Goods/CoffeeBeanIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.CoffeeBean.DisplayName",
+    "PluralDisplayNameLocKey": "Good.CoffeeBean.PluralDisplayName"
+  }
+}

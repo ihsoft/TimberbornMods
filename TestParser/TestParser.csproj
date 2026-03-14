@@ -11,6 +11,18 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <DebugType>embedded</DebugType>
+      <NoWarn>1701;1702;CS8524</NoWarn>
+      <WarningsAsErrors>CS8509;NU1605</WarningsAsErrors>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <DebugType>embedded</DebugType>
+      <NoWarn>1701;1702;CS8524</NoWarn>
+      <WarningsAsErrors>CS8509;NU1605</WarningsAsErrors>
+    </PropertyGroup>
+
     <ItemGroup>
       <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all" />
       <PackageReference Include="IndexRange" Version="1.0.3" />
@@ -23,6 +35,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Compile Include="..\Automation\AutomationSystem\AbstractDynamicComponent.cs">
+        <Link>Import\AutomationSystem\AbstractDynamicComponent.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\AutomationSystem\AutomationServiceReadyEvent.cs">
         <Link>Import\AutomationSystem\AutomationServiceReadyEvent.cs</Link>
       </Compile>
@@ -53,11 +68,11 @@
       <Compile Include="..\Automation\ScriptingEngine\Expressions\ActionOperator.cs">
         <Link>Import\ScriptingEngine\Expressions\ActionOperator.cs</Link>
       </Compile>
-      <Compile Include="..\Automation\ScriptingEngine\Expressions\BinaryOperator.cs">
-        <Link>Import\ScriptingEngine\Expressions\BinaryOperator.cs</Link>
+      <Compile Include="..\Automation\ScriptingEngine\Expressions\ComparisonOperator.cs">
+        <Link>Import\ScriptingEngine\Expressions\ComparisonOperator.cs</Link>
       </Compile>
-      <Compile Include="..\Automation\ScriptingEngine\Expressions\BoolOperator.cs">
-        <Link>Import\ScriptingEngine\Expressions\BoolOperator.cs</Link>
+      <Compile Include="..\Automation\ScriptingEngine\Expressions\BooleanOperator.cs">
+        <Link>Import\ScriptingEngine\Expressions\BooleanOperator.cs</Link>
       </Compile>
       <Compile Include="..\Automation\ScriptingEngine\Expressions\ConcatOperator.cs">
         <Link>Import\ScriptingEngine\Expressions\ConcatOperator.cs</Link>
@@ -70,9 +85,6 @@
       </Compile>
       <Compile Include="..\Automation\ScriptingEngine\Expressions\GetPropertyFunction.cs">
         <Link>Import\ScriptingEngine\Expressions\GetPropertyFunction.cs</Link>
-      </Compile>
-      <Compile Include="..\Automation\ScriptingEngine\Expressions\GetPropertyOperator.cs">
-        <Link>Import\ScriptingEngine\Expressions\GetPropertyOperator.cs</Link>
       </Compile>
       <Compile Include="..\Automation\ScriptingEngine\Expressions\HasComponentOperator.cs">
         <Link>Import\ScriptingEngine\Expressions\HasComponentOperator.cs</Link>
@@ -98,8 +110,6 @@
       <Compile Include="..\Automation\ScriptingEngine\Expressions\SymbolExpr.cs">
         <Link>Import\ScriptingEngine\Expressions\SymbolExpr.cs</Link>
       </Compile>
-      <Compile Remove="WIP\AbstractSyntaxTree.cs" />
-      <Compile Remove="WIP\AstHandler.cs" />
       <Compile Include="..\Automation\ScriptingEngine\Parser\Configurator.cs">
         <Link>Import\ScriptingEngine\Parser\Configurator.cs</Link>
       </Compile>
@@ -130,29 +140,8 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\AbstractStatusTracker.cs">
         <Link>Import\ScriptingEngine\ScriptableComponents\Components\AbstractStatusTracker.cs</Link>
       </Compile>
-      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\CollectableScriptableComponent.cs">
-        <Link>Import\ScriptingEngine\ScriptableComponents\Components\CollectableScriptableComponent.cs</Link>
-      </Compile>
-      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\Configurator.cs">
-        <Link>Import\ScriptingEngine\ScriptableComponents\Components\Configurator.cs</Link>
-      </Compile>
-      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ConstructableScriptableComponent.cs">
-        <Link>Import\ScriptingEngine\ScriptableComponents\Components\ConstructableScriptableComponent.cs</Link>
-      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\DebugScriptableComponent.cs">
         <Link>Import\ScriptingEngine\ScriptableComponents\Components\DebugScriptableComponent.cs</Link>
-      </Compile>
-      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\DistrictScriptableComponent.cs">
-        <Link>Import\ScriptingEngine\ScriptableComponents\Components\DistrictScriptableComponent.cs</Link>
-      </Compile>
-      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\DynamiteScriptableComponent.cs">
-        <Link>Import\ScriptingEngine\ScriptableComponents\Components\DynamiteScriptableComponent.cs</Link>
-      </Compile>
-      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\FloodgateScriptableComponent.cs">
-        <Link>Import\ScriptingEngine\ScriptableComponents\Components\FloodgateScriptableComponent.cs</Link>
-      </Compile>
-      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\FlowControlScriptableComponent.cs">
-        <Link>Import\ScriptingEngine\ScriptableComponents\Components\FlowControlScriptableComponent.cs</Link>
       </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\InventoryScriptableComponent.cs">
         <Link>Import\ScriptingEngine\ScriptableComponents\Components\InventoryScriptableComponent.cs</Link>
@@ -160,14 +149,8 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ISignalListener.cs">
         <Link>Import\ScriptingEngine\ScriptableComponents\Components\ISignalListener.cs</Link>
       </Compile>
-      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\PausableScriptableComponent.cs">
-        <Link>Import\ScriptingEngine\ScriptableComponents\Components\PausableScriptableComponent.cs</Link>
-      </Compile>
-      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\PlantableScriptableComponent.cs">
-        <Link>Import\ScriptingEngine\ScriptableComponents\Components\PlantableScriptableComponent.cs</Link>
-      </Compile>
-      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\PrioritizableScriptableComponent.cs">
-        <Link>Import\ScriptingEngine\ScriptableComponents\Components\PrioritizableScriptableComponent.cs</Link>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ObjectsCache.cs">
+        <Link>Import\ScriptingEngine\ScriptableComponents\Components\ObjectsCache.cs</Link>
       </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ReferenceManager.cs">
         <Link>Import\ScriptingEngine\ScriptableComponents\Components\ReferenceManager.cs</Link>
@@ -180,15 +163,6 @@
       </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\SignalsScriptableComponent.cs">
         <Link>Import\ScriptingEngine\ScriptableComponents\Components\SignalsScriptableComponent.cs</Link>
-      </Compile>
-      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\StreamGaugeScriptableComponent.cs">
-        <Link>Import\ScriptingEngine\ScriptableComponents\Components\StreamGaugeScriptableComponent.cs</Link>
-      </Compile>
-      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\WeatherScriptableComponent.cs">
-        <Link>Import\ScriptingEngine\ScriptableComponents\Components\WeatherScriptableComponent.cs</Link>
-      </Compile>
-      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\WorkplaceScriptableComponent.cs">
-        <Link>Import\ScriptingEngine\ScriptableComponents\Components\WorkplaceScriptableComponent.cs</Link>
       </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Extensions\AutomationExtensionsRegistry.cs">
         <Link>Import\ScriptingEngine\ScriptableComponents\Extensions\AutomationExtensionsRegistry.cs</Link>
@@ -223,9 +197,6 @@
       <Compile Include="..\Automation\Utils\StaticClassSerializer.cs">
         <Link>Import\Utils\StaticClassSerializer.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\UI\AbstractDialog.cs">
-        <Link>Import\TimberDev\UI\AbstractDialog.cs</Link>
-      </Compile>
       <Compile Include="..\TimberDev\UI\CommonFormats.cs">
         <Link>Import\TimberDev\UI\CommonFormats.cs</Link>
       </Compile>
@@ -256,9 +227,6 @@
       <Compile Include="..\TimberDev\Utils\ComponentsAccessor.cs">
         <Link>Import\TimberDev\Utils\ComponentsAccessor.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\Utils\Configurator.cs">
-        <Link>Import\TimberDev\Utils\Configurator.cs</Link>
-      </Compile>
       <Compile Include="..\TimberDev\Utils\CounterProfiler.cs">
         <Link>Import\TimberDev\Utils\CounterProfiler.cs</Link>
       </Compile>
@@ -271,11 +239,11 @@
       <Compile Include="..\TimberDev\Utils\PausedStopwatch.cs">
         <Link>Import\TimberDev\Utils\PausedStopwatch.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\Utils\PrefabPatcher.cs">
-        <Link>Import\TimberDev\Utils\PrefabPatcher.cs</Link>
-      </Compile>
       <Compile Include="..\TimberDev\Utils\ProtoSerializer.cs">
         <Link>Import\TimberDev\Utils\ProtoSerializer.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\ReflectionsHelper.cs">
+        <Link>Import\TimberDev\Utils\ReflectionsHelper.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\Utils\StaticBindings.cs">
         <Link>Import\TimberDev\Utils\StaticBindings.cs</Link>

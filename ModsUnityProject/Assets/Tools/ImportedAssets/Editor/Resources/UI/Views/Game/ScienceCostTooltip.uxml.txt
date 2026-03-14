@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="ScienceCostSection" src="/Assets/Resources/UI/Views/Game/ToolPanel/ScienceCostSection.uxml" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <cui:NineSliceLabel name="ScienceCostTooltip" picking-mode="Ignore">
+        <cui:NineSliceLabel name="TooltipText" text="Tooltip" picking-mode="Ignore" class="game-text-normal text--grey text--centered" />
+        <ui:Instance template="ScienceCostSection" class="science-cost-tooltip__science-section" />
+    </cui:NineSliceLabel>
+</ui:UXML>

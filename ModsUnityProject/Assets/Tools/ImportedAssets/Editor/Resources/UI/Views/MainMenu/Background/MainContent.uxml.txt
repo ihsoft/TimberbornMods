@@ -1,0 +1,22 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MainMenu/MainMenuStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MainMenu/MainMenuMiscStyle.uss" />
+    <ui:VisualElement name="MainContent" class="width-stretch main-menu__main-content">
+        <ui:VisualElement name="Content" class="triple-stretch background__content main-menu__main-content">
+            <ui:VisualElement name="Left" class="triple-stretch__side" />
+            <ui:VisualElement name="Center" content-container="true" class="triple-stretch__center" />
+            <ui:VisualElement name="Right" class="triple-stretch__side" />
+        </ui:VisualElement>
+        <ui:VisualElement name="TopBar" class="triple-stretch background__top-bar">
+            <ui:VisualElement name="Left" class="triple-stretch__side" />
+            <ui:VisualElement name="Center" class="triple-stretch__center" />
+            <ui:VisualElement name="Right" class="triple-stretch__side" />
+        </ui:VisualElement>
+        <ui:VisualElement name="BottomBar" class="triple-stretch background__bottom-bar">
+            <ui:VisualElement name="Left" class="triple-stretch__side" />
+            <ui:VisualElement name="Center" class="triple-stretch__center" />
+            <ui:VisualElement name="Right" class="triple-stretch__side" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,17 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MainMenu/MainMenuStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MainMenu/MainMenuMiscStyle.uss" />
+    <ui:VisualElement name="AnalyticsConsentBox" class="content-row-centered">
+        <cui:NineSliceVisualElement class="analytics-consent-box sliced-border">
+            <cui:LocalizableLabel name="Header" text="User data" text-loc-key="AnalyticsConsent.Header" class="text--header text--centered" />
+            <cui:LocalizableLabel name="Info" text-loc-key="AnalyticsConsent.Info" class="text--default analytics-consent-box__info" text="Help us make the game better by sharing data on how you play Timberborn." />
+            <ui:VisualElement name="Buttons" class="content-row-centered">
+                <cui:LocalizableButton name="Disagree" text="Disagree" text-loc-key="AnalyticsConsent.Disagree" class="menu-button" />
+                <cui:LocalizableButton name="Agree" text="Agree" text-loc-key="AnalyticsConsent.Agree"
+                                       class="menu-button" />
+            </ui:VisualElement>
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

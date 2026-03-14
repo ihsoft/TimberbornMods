@@ -87,7 +87,6 @@ class SignalDispatcher {
       SignalType.Max => group.MaxValue,
       SignalType.Sum => group.SumValue,
       SignalType.Avg => group.AvgValue,
-      _ => throw new InvalidOperationException("Unknown signal type: " + signalType)
     };
   }
 
@@ -101,7 +100,7 @@ class SignalDispatcher {
       group = new SignalGroup();
       _signalGroups.Add(signalName, group);
     }
-    var entityId = source.GetComponentFast<EntityComponent>().EntityId.ToString();
+    var entityId = source.GetComponent<EntityComponent>().EntityId.ToString();
     if (!group.Sources.TryGetValue(entityId, out var signalSource)) {
       signalSource = new SignalSource();
       group.Sources.Add(entityId, signalSource);
@@ -135,7 +134,7 @@ class SignalDispatcher {
   /// <exception cref="InvalidOperationException">if source/provider is not registered.</exception>
   public void UnregisterSignalProvider(string signalName, BaseComponent source, object provider) {
     CheckIfChangesLocked();
-    var entityId = source.GetComponentFast<EntityComponent>().EntityId.ToString();
+    var entityId = source.GetComponent<EntityComponent>().EntityId.ToString();
     if (!_signalGroups.TryGetValue(signalName, out var group)
         || !group.Sources.TryGetValue(entityId, out var signalSource)
         || !signalSource.Providers.Remove(provider)) {
@@ -167,7 +166,7 @@ class SignalDispatcher {
     if (!_signalGroups.TryGetValue(signalName, out var group)) {
       throw new InvalidOperationException("Signal group not found for signal: " + signalName);
     }
-    var entityId = provider.GetComponentFast<EntityComponent>().EntityId.ToString();
+    var entityId = provider.GetComponent<EntityComponent>().EntityId.ToString();
     if (!group.Sources.TryGetValue(entityId, out var source)) {
       throw new InvalidOperationException("Signal source not found for entity: " + entityId);
     }

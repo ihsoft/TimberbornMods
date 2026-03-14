@@ -1,0 +1,26 @@
+{
+  "RecipeSpec": {
+    "Id": "Bread",
+    "BackwardCompatibleIds": [],
+    "DisplayLocKey": "Good.Bread.PluralDisplayName",
+    "CycleDurationInHours": 1.0,
+    "Ingredients": [
+      {
+        "Id": "WheatFlour",
+        "Amount": 1
+      }
+    ],
+    "Products": [
+      {
+        "Id": "Bread",
+        "Amount": 5
+      }
+    ],
+    "ProducedSciencePoints": 0,
+    "Fuel": "Log",
+    "CyclesFuelLasts": 10,
+    "FuelCapacity": 5,
+    "CyclesCapacity": 38,
+    "Icon": "Sprites/Goods/BreadIcon"
+  }
+}

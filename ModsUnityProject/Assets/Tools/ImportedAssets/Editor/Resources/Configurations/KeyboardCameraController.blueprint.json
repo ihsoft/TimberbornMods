@@ -1,0 +1,7 @@
+{
+  "KeyboardCameraControllerSpec": {
+    "JumpRotationAngle": 90,
+    "JumpRotationSpeedInAnglePerUpdate": 10,
+    "BaseZoomSpeed": 3.0
+  }
+}

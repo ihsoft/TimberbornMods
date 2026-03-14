@@ -1,0 +1,34 @@
+{
+  "GoodSpec": {
+    "Id": "CattailCracker",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [
+      {
+        "NeedId": "Hunger",
+        "Points": 0.3
+      },
+      {
+        "NeedId": "CattailCracker",
+        "Points": 0.2
+      }
+    ],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.490196079,
+      "g": 0.345098048,
+      "b": 0.23137255,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Food",
+    "GoodOrder": 9070,
+    "Icon": "Sprites/Goods/CattailCrackerIcon",
+    "ForceImport": true,
+    "DisplayNameLocKey": "Good.CattailCracker.DisplayName",
+    "PluralDisplayNameLocKey": "Good.CattailCracker.PluralDisplayName"
+  }
+}

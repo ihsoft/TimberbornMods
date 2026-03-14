@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "ToggleWaterVisibility",
+    "GroupId": "UI",
+    "LocKey": "KeyBinding.ToggleWaterVisibility",
+    "Order": 50,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/t",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

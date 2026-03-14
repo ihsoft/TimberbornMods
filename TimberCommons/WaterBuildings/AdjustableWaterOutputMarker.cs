@@ -2,7 +2,6 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using Bindito.Core;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.Rendering;
@@ -16,60 +15,60 @@ namespace IgorZ.TimberCommons.WaterBuildings;
 /// It will be added to any building with <see cref="AdjustableWaterOutput"/> component with the default settings.
 /// However, if it's already on the prefab, it wil retain the settings. 
 /// </remarks>
-sealed class AdjustableWaterOutputMarker : BaseComponent, ISelectionListener {
+sealed class AdjustableWaterOutputMarker(MarkerDrawerFactory markerDrawerFactory)
+    : BaseComponent, IAwakableComponent, IUpdatableComponent, ISelectionListener {
 
-  #region Fields for Unity
-  // ReSharper disable InconsistentNaming
-
-  [SerializeField]
-  [Tooltip("The color of the 'hovering' p[lane that shows the water spillway depth limit.")]
-  Color _markerColor = Color.blue;
-
-  [SerializeField]
-  [Tooltip("Defines for how long the marker plane should go off the building. A purely cosmetic purpose.")]
-  float _markerYOffset = 0.02f;
-
-  // ReSharper restore InconsistentNaming
-  #endregion
+  static readonly Color AboveLevelMarkerColor = Color.green;
+  static readonly Color BelowLevelMarkerColor = Color.blue;
+  static readonly float MarkerYOffset = 0.02f;
 
   #region ISelectionListener implemetation
 
   /// <inheritdoc/>
   public void OnSelect() {
-    enabled = !_blockObject.IsPreview && _adjustableWaterOutput.ShowHeightMarker;
+    if (!_blockObject.IsPreview && _adjustableWaterOutput.ShowHeightMarker) {
+      EnableComponent();
+    }
   }
 
   /// <inheritdoc/>
   public void OnUnselect() {
-    enabled = false;
+    DisableComponent();
+  }
+
+  #endregion
+
+  #region Implementation of IAwakableComponent
+
+  /// <inheritdoc/>
+  public void Awake() {
+    _adjustableWaterOutput = GetComponent<AdjustableWaterOutput>();
+    _blockObject = GetComponent<BlockObject>();
+    _markerDrawer = markerDrawerFactory.CreateTileDrawer();
+    DisableComponent();
+  }
+
+  #endregion
+
+  #region Implementation of IUpdatableComponent
+
+  /// <inheritdoc/>
+  public void Update() {
+    var targetCoordinates = _adjustableWaterOutput.TargetCoordinates;
+    var coordinates = new Vector3Int(targetCoordinates.x, targetCoordinates.y, _adjustableWaterOutput.MaxHeight); 
+    var currentWaterLevel = _adjustableWaterOutput.CurrentWaterLevel;
+    var currentLevelLimit = _adjustableWaterOutput.MaxHeight + _adjustableWaterOutput.SpillwayHeightDelta;
+    var color  = currentWaterLevel < currentLevelLimit ? AboveLevelMarkerColor : BelowLevelMarkerColor;
+    _markerDrawer.DrawAtCoordinates(coordinates, _adjustableWaterOutput.SpillwayHeightDelta + MarkerYOffset, color);
   }
 
   #endregion
 
   #region Implementation
 
-  MarkerDrawerFactory _markerDrawerFactory;
   AdjustableWaterOutput _adjustableWaterOutput;
   MeshDrawer _markerDrawer;
   BlockObject _blockObject;
-
-  [Inject]
-  public void InjectDependencies(MarkerDrawerFactory markerDrawerFactory) {
-    _markerDrawerFactory = markerDrawerFactory;
-  }
-
-  void Awake() {
-    _adjustableWaterOutput = GetComponentFast<AdjustableWaterOutput>();
-    _blockObject = GetComponentFast<BlockObject>();
-    _markerDrawer = _markerDrawerFactory.CreateTileDrawer(_markerColor);
-    enabled = false;
-  }
-
-  void Update() {
-    var targetCoordinates = _adjustableWaterOutput.TargetCoordinates;
-    var coordinates = new Vector3Int(targetCoordinates.x, targetCoordinates.y, _adjustableWaterOutput.MaxHeight); 
-    _markerDrawer.DrawAtCoordinates(coordinates, _adjustableWaterOutput.SpillwayHeightDelta + _markerYOffset);
-  }
 
   #endregion
 }

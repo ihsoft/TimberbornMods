@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
@@ -19,7 +20,7 @@ abstract class ParserBase {
 
   /// <summary>Parses expression for the given context.</summary>
   public ParsingResult Parse(string input, AutomationBehavior scriptHost) {
-    CurrentContext = new ExpressionContext { ScriptHost = scriptHost, ScriptingService = _scriptingService };
+    CurrentContext = new ExpressionContext { ScriptHost = scriptHost };
     try {
       if (input.Contains("{%")) {
         input = Preprocess(input);
@@ -30,11 +31,26 @@ abstract class ParserBase {
       };
     } catch (ScriptError e) {
       return new ParsingResult { LastScriptError = e };
+    } finally {
+      CurrentContext = null;
     }
   }
 
   /// <summary>Serializes expression back to the parsable form.</summary>
   public abstract string Decompile(IExpression expression);
+
+  /// <summary>Inverts the condition expression.</summary>
+  /// <remarks>
+  /// Not simply negates the result, but rebuilds the expression so that it returns the inversed result.
+  /// </remarks>
+  public BooleanOperator InvertBooleanExpression(BooleanOperator booleanOperator, AutomationBehavior scriptHost) {
+    CurrentContext = new ExpressionContext { ScriptHost = scriptHost };
+    try {
+      return InvertBooleanExpressionInternal(booleanOperator);
+    } finally {
+      CurrentContext = null;
+    }
+  }
 
   #endregion
 
@@ -88,8 +104,8 @@ abstract class ParserBase {
   string PreprocessorMatcher(Match match) {
     var expression = match.Groups[1].Value;
     var parsedExpression = ProcessString(expression);
-    if (parsedExpression is BinaryOperator binaryOperatorExpr) {
-      if (!binaryOperatorExpr.Execute()) {
+    if (parsedExpression is ComparisonOperator comparisonOperator) {
+      if (!comparisonOperator.Execute()) {
         throw new ScriptError.BadStateError(
             CurrentContext.ScriptHost, "Preprocessor expression is not true: " + expression);
       }
@@ -101,9 +117,39 @@ abstract class ParserBase {
     var value = valueExpr.ValueFn();
     return value.ValueType switch {
         ScriptValue.TypeEnum.String => value.AsString,
-        ScriptValue.TypeEnum.Number => value.AsNumber.ToString(),
-        _ => throw new InvalidOperationException("Unsupported type: " + value.ValueType),
+        ScriptValue.TypeEnum.Number => value.AsRawNumber.ToString(),
+        ScriptValue.TypeEnum.Unset => throw new ScriptError.ParsingError("Value must be set"),
     };
+  }
+
+  BooleanOperator InvertBooleanExpressionInternal(BooleanOperator booleanOperator) {
+    if (booleanOperator is LogicalOperator logicalOperator) {
+      if (logicalOperator.OperatorType == LogicalOperator.OpType.Not) {
+        return logicalOperator.Operands[0] as BooleanOperator;
+      }
+      var invertedOperands = logicalOperator.Operands.Cast<BooleanOperator>().Select(InvertBooleanExpressionInternal)
+          .ToArray<IExpression>();
+      return logicalOperator.OperatorType == LogicalOperator.OpType.And
+          ? LogicalOperator.CreateOr(invertedOperands)
+          : LogicalOperator.CreateAnd(invertedOperands);
+    }
+    if (booleanOperator is ComparisonOperator comparisonOperator) {
+      return comparisonOperator.OperatorType switch {
+          ComparisonOperator.OpType.Equal =>
+              ComparisonOperator.CreateNe(CurrentContext, comparisonOperator.Operands),
+          ComparisonOperator.OpType.NotEqual =>
+              ComparisonOperator.CreateEq(CurrentContext, comparisonOperator.Operands),
+          ComparisonOperator.OpType.GreaterThan =>
+              ComparisonOperator.CreateLe(CurrentContext, comparisonOperator.Operands),
+          ComparisonOperator.OpType.GreaterThanOrEqual =>
+              ComparisonOperator.CreateLt(CurrentContext, comparisonOperator.Operands),
+          ComparisonOperator.OpType.LessThan =>
+              ComparisonOperator.CreateGe(CurrentContext, comparisonOperator.Operands),
+          ComparisonOperator.OpType.LessThanOrEqual =>
+              ComparisonOperator.CreateGt(CurrentContext, comparisonOperator.Operands),
+      };
+    }
+    throw new InvalidOperationException($"Unsupported boolean operator: {booleanOperator}");
   }
 
   #endregion

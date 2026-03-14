@@ -1,0 +1,34 @@
+{
+  "GoodSpec": {
+    "Id": "Antidote",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [
+      {
+        "NeedId": "BadwaterContamination",
+        "Points": 0.125
+      },
+      {
+        "NeedId": "Antidote",
+        "Points": 0.5
+      }
+    ],
+    "GoodType": "Liquid",
+    "StockpileVisualization": "Liquid",
+    "VisibleContainer": "Barrel",
+    "ContainerColor": {
+      "r": 0.68235296,
+      "g": 0.6156863,
+      "b": 0.09019608,
+      "a": 1.0
+    },
+    "ContainerMaterial": "Materials/Goods/Antidote",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Materials",
+    "GoodOrder": 2010,
+    "Icon": "Sprites/Goods/AntidoteIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.Antidote.DisplayName",
+    "PluralDisplayNameLocKey": "Good.Antidote.PluralDisplayName"
+  }
+}

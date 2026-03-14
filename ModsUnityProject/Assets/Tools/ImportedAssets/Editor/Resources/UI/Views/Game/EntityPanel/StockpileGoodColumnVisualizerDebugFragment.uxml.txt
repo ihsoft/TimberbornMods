@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <cui:NineSliceVisualElement name="StockpileGoodColumnVisualizerDebugFragment" class="stockpile-good-column-visualizer-debug-fragment">
+        <ui:Label name="Hash" text="#" class="entity-panel__text" />
+        <cui:NineSliceTextField name="Color" class="entity-panel-input stockpile-good-column-visualizer-debug-fragment__item" />
+        <cui:NineSliceButton name="SetColor" text="Set" class="entity-panel__text button-game stockpile-good-column-visualizer-debug-fragment__item" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

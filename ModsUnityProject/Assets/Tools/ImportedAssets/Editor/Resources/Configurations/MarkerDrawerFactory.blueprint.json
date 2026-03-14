@@ -1,0 +1,20 @@
+{
+  "MarkerDrawerFactorySpec": {
+    "TileMesh": "Markers/TileMarker",
+    "SmallBlockMesh": "Markers/SmallBlockMarker",
+    "LargeBlockMesh": "Markers/LargeBlockMarker",
+    "TerrainBlockMesh": "Markers/LargeBlockMarker",
+    "TopTerrainTileMesh": "Markers/TileMarker",
+    "TileMaterial": "Markers/TileMarkerSmall",
+    "TerrainTileMaterial": "Markers/DestroyedTerrainTileMarkerInstanced",
+    "TopTerrainTileMaterial": "Markers/TopDestroyedTerrainTileMarkerInstanced",
+    "PrioritizedTileMaterial": "Markers/PrioritizedTileMarker",
+    "EntranceMesh": "Markers/EntranceMarker",
+    "EntranceMarkerMaterial": "Markers/ArrowMarker",
+    "MechanicalInputMesh": "Markers/MechanicalMarkerInput",
+    "MechanicalOutputMesh": "Markers/MechanicalMarkerOutput",
+    "MechanicalMarkerMaterial": "Markers/MechanicalMarker",
+    "ArrowMesh": "Markers/ArrowMarker",
+    "ArrowMaterial": "Markers/BlueArrowMarker"
+  }
+}

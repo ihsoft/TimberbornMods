@@ -1,0 +1,56 @@
+{
+  "AutoAtlaserSpec": {
+    "AutoAtlases": [
+      {
+        "Name": "FactionAtlas.Folktails",
+        "IsUnique": true,
+        "Fragments": [
+          "Materials/UberAtlas/Materials/Folktails/BaseWood_Brown.Folktails",
+          "Materials/UberAtlas/Materials/Folktails/BaseWood_White.Folktails",
+          "Materials/UberAtlas/Materials/Folktails/Details.Folktails",
+          "Materials/UberAtlas/Materials/Folktails/Paper.Folktails",
+          "Materials/UberAtlas/Materials/Folktails/ThatchedRoof.Folktails",
+          "Materials/UberAtlas/Materials/Folktails/IrregularPlanks_Brown.Folktails",
+          "Materials/UberAtlas/Materials/Folktails/IrregularPlanks_White.Folktails",
+          "Materials/UberAtlas/Materials/Folktails/IrregularPlanks_Mossy.Folktails",
+          "Materials/UberAtlas/Materials/Folktails/PlasteredWood_White.Folktails",
+          "Materials/UberAtlas/Materials/Folktails/Plaster_White.Folktails",
+          "Materials/UberAtlas/Materials/Folktails/WindowsAtlas.Folktails",
+          "Materials/UberAtlas/Materials/Folktails/BaseMetal.Folktails",
+          "Materials/UberAtlas/Materials/Folktails/PaintedMetal.Folktails",
+          "Materials/UberAtlas/Materials/Folktails/Sand.Folktails",
+          "Materials/UberAtlas/Materials/Folktails/Moss.Folktails"
+        ]
+      },
+      {
+        "Name": "FactionAtlas.IronTeeth",
+        "IsUnique": true,
+        "Fragments": [
+          "Materials/UberAtlas/Materials/IronTeeth/BaseWood_Indigo.IronTeeth",
+          "Materials/UberAtlas/Materials/IronTeeth/BaseWood_Grey.IronTeeth",
+          "Materials/UberAtlas/Materials/IronTeeth/Details.IronTeeth",
+          "Materials/UberAtlas/Materials/IronTeeth/Paper.IronTeeth",
+          "Materials/UberAtlas/Materials/IronTeeth/RoofPlanks.IronTeeth",
+          "Materials/UberAtlas/Materials/IronTeeth/IrregularPlanks_Indigo.IronTeeth",
+          "Materials/UberAtlas/Materials/IronTeeth/IrregularPlanks_Grey.IronTeeth",
+          "Materials/UberAtlas/Materials/IronTeeth/IrregularPlanks_MetalForged.IronTeeth",
+          "Materials/UberAtlas/Materials/IronTeeth/PlasteredWood_Orange.IronTeeth",
+          "Materials/UberAtlas/Materials/IronTeeth/Plaster_White.IronTeeth",
+          "Materials/UberAtlas/Materials/IronTeeth/WindowsAtlas.IronTeeth",
+          "Materials/UberAtlas/Materials/IronTeeth/BaseMetal.IronTeeth",
+          "Materials/UberAtlas/Materials/IronTeeth/PaintedMetal.IronTeeth"
+        ]
+      },
+      {
+        "Name": "CommonAtlas.MapEditor",
+        "IsUnique": false,
+        "Fragments": [
+          "Materials/Goods/BeaverCarryingModels/BeaverCarryingModels",
+          "Materials/Common/Wood/BaseWoodCommon",
+          "Materials/Common/Wood/BaseWoodCommon_Amber",
+          "Materials/Common/Dirt/DirtCommon"
+        ]
+      }
+    ]
+  }
+}

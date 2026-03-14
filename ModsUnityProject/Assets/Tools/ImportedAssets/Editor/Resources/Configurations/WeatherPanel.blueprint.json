@@ -1,0 +1,6 @@
+{
+  "WeatherPanelSpec": {
+    "NumberOfBlinks": 10,
+    "SecondsBetweenBlinks": 0.44
+  }
+}

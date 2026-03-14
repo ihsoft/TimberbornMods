@@ -1,0 +1,44 @@
+{
+  "PlaneSpec": {
+    "PilotSeatName": "#Slot#Pilot",
+    "RotationSpeed": 30.0
+  },
+  "TemplateSpec": {
+    "TemplateName": "EarthRepopulator.IronTeeth.Plane",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "TemplateAttachmentsSpec": {
+    "Attachments": [
+      {
+        "AttachmentId": "Trails",
+        "Prefab": "Buildings/Monuments/EarthRepopulator/PlaneTrails",
+        "Parent": "Model",
+        "Position": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": true
+      }
+    ]
+  },
+  "Children": {
+    "Model": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Monuments/EarthRepopulator/EarthRepopulator.IronTeeth.Plane.Model"
+      }
+    }
+  }
+}

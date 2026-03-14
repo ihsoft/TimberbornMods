@@ -1,0 +1,26 @@
+{
+  "RecipeSpec": {
+    "Id": "Extract",
+    "BackwardCompatibleIds": [],
+    "DisplayLocKey": "Good.Extract.PluralDisplayName",
+    "CycleDurationInHours": 1.5,
+    "Ingredients": [
+      {
+        "Id": "Badwater",
+        "Amount": 4
+      }
+    ],
+    "Products": [
+      {
+        "Id": "Extract",
+        "Amount": 1
+      }
+    ],
+    "ProducedSciencePoints": 0,
+    "Fuel": "Log",
+    "CyclesFuelLasts": 10,
+    "FuelCapacity": 5,
+    "CyclesCapacity": 20,
+    "Icon": "Sprites/Goods/ExtractIcon"
+  }
+}

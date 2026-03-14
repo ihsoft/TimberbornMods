@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <ui:VisualElement name="ImportGoodIconTooltip">
+        <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
+        <ui:Label name="GoodLabel" class="game-text-normal text--bold import-good-icon-tooltip__good-label" />
+        <cui:LocalizableLabel name="DisabledInfo" text-loc-key="Distribution.ImportGoodTooltip.Disabled" class="game-text-normal import-good-icon-tooltip__non-importable-text" />
+        <cui:LocalizableLabel name="ForcedInfo" text-loc-key="Distribution.ImportGoodTooltip.Forced" class="game-text-normal import-good-icon-tooltip__importable-text" />
+        <cui:LocalizableLabel name="ImportableInfo" text-loc-key="Distribution.ImportGoodTooltip.Importable" class="game-text-normal import-good-icon-tooltip__importable-text" />
+        <ui:VisualElement name="NonImportableInfo" class="game-text-normal import-good-icon-tooltip__warning">
+            <ui:Image name="WarningIcon" class="import-good-icon-tooltip__warning-icon" />
+            <cui:LocalizableLabel name="NonImportableText" text-loc-key="Distribution.ImportGoodTooltip.NonImportable" class="game-text-normal import-good-icon-tooltip__warning-text import-good-icon-tooltip__non-importable-text" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

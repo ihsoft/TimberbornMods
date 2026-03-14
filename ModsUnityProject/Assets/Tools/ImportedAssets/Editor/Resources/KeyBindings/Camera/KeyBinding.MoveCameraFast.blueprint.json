@@ -1,0 +1,20 @@
+{
+  "KeyBindingSpec": {
+    "Id": "MoveCameraFast",
+    "GroupId": "Camera",
+    "LocKey": "KeyBinding.MoveCameraFast",
+    "Order": 80,
+    "AllowOtherModifiers": true,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/leftShift",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  },
+  "SecondaryInputBindingSpec": {
+    "Path": "/Keyboard/rightShift",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

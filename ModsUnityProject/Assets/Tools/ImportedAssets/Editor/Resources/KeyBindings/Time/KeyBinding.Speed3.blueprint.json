@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "Speed3",
+    "GroupId": "Time",
+    "LocKey": "KeyBinding.Speed3",
+    "Order": 30,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/3",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

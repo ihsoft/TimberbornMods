@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/ToolPanel/ToolPanelStyle.uss" />
+    <ui:VisualElement>
+        <cui:NineSliceVisualElement name="DescriptionPanel" class="description-panel tool-panel-item bg-sub-box--frame">
+            <cui:NineSliceVisualElement class="description-panel__header bg-sub-box--purple-striped">
+                <ui:Label name="Title" class="description-panel__title game-text-heading" />
+            </cui:NineSliceVisualElement>
+            <cui:NineSliceVisualElement name="InternalSections" />
+        </cui:NineSliceVisualElement>
+        <ui:VisualElement name="ExternalSections" />
+    </ui:VisualElement>
+</ui:UXML>

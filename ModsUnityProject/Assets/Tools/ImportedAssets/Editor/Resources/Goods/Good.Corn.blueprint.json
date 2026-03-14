@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "Corn",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.929411769,
+      "g": 0.8862745,
+      "b": 0.03529412,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Ingredients",
+    "GoodOrder": 10040,
+    "Icon": "Sprites/Goods/CornIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.Corn.DisplayName",
+    "PluralDisplayNameLocKey": "Good.Corn.PluralDisplayName"
+  }
+}

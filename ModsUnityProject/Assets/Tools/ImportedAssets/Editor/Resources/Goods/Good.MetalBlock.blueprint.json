@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "MetalBlock",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Pileable",
+    "StockpileVisualization": "MetalBlock",
+    "VisibleContainer": "MetalBlock",
+    "ContainerColor": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryOnArm",
+    "Weight": 5,
+    "GoodGroupId": "Materials",
+    "GoodOrder": 3010,
+    "Icon": "Sprites/Goods/MetalBlockIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.MetalBlock.DisplayName",
+    "PluralDisplayNameLocKey": "Good.MetalBlock.PluralDisplayName"
+  }
+}

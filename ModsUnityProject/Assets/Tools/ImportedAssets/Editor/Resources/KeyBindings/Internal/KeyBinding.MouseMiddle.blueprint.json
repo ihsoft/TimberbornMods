@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "MouseMiddle",
+    "GroupId": "Internal",
+    "LocKey": "",
+    "Order": 10,
+    "AllowOtherModifiers": true,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Mouse/middleButton",
+    "InputModifiers": "None",
+    "Unchangeable": true
+  }
+}

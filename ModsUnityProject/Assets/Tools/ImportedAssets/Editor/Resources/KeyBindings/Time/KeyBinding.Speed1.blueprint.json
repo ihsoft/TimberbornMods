@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "Speed1",
+    "GroupId": "Time",
+    "LocKey": "KeyBinding.Speed1",
+    "Order": 10,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/1",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

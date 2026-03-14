@@ -1,6 +1,0 @@
-﻿ID,Text,Comment
-TimberDev_Utils.Tools.LockSelectTool.SelectingObject,"Выделено: {0}","Text to show the type of the selected building. It's shown when the selection tool is locked on the specific buildings."
-TimberDev_Utils.Tools.LockSelectTool.SelectingNObjects,"Выделено: {0} (x{1})","The plural form of TimberDev_Utils.Tools.LockSelectTool.SelectingObject"
-TimberDev_Utils.Tools.LockSelectTool.StartSelectingPrompt,"Наведите курсор на объект и нажмите <i>ЛКМ</i> чтобы начать выделение.",
-TimberDev_Utils.Tools.LockSelectTool.StartObjectSelectingPrompt,"Выделять здания типа: {0}",
-TimberDev_Utils.Tools.LockSelectTool.DescriptionHint,"Удерживайте <i>SHIFT</i> чтобы выделять здания только одного типа.",

@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <cui:NineSliceVisualElement name="WonderFragment" class="entity-sub-panel bg-sub-box--green">
+        <ui:VisualElement name="InventoryRoot" />
+        <cui:LocalizableButton name="ActivateButton" text-loc-key="Wonder.Activate" focusable="false" class="entity-panel__text entity-fragment__button entity-fragment__button--red entity-fragment__button--silent wonder-fragment__activate-button" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

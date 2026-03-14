@@ -1,0 +1,1206 @@
+.game-ui {
+    width: 100%;
+    height: 100%;
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.game-ui__top-left {
+    align-items: flex-start;
+    margin-left: 4px;
+    flex-direction: column;
+}
+
+.game-ui__top-right {
+    flex-direction: column;
+    flex-wrap: wrap-reverse;
+    align-items: flex-start;
+    height: 100px;
+    flex-grow: 1;
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-right: 4px;
+}
+
+.game-ui__top-right-buttons {
+    flex-direction: row-reverse;
+}
+
+
+.game-ui__bottom-left {
+    position: absolute;
+    align-content: flex-start;
+    bottom: 0;
+    left: 0;
+}
+
+.game-ui__bottom-right {
+    position: absolute;
+    flex-direction: column;
+    align-items: flex-end;
+    bottom: 0;
+    right: 0;
+}
+
+.game-ui__bottom-bar {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    align-items: center;
+    flex-direction: column;
+}
+
+.game-ui__panels {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+}
+
+.game-ui__absolute-items {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+
+
+.goodbye-box {
+    min-width: 572px;
+    max-width: 850px;
+    padding: 45px;
+}
+
+.goodbye-box__text-wrapper {
+    flex-direction: column;
+    flex-wrap: nowrap;
+}
+
+.goodbye-box__buttons {
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 10px;
+    flex-wrap: nowrap;
+}
+
+.goodbye-box__text {
+    margin: 10px 0;
+    -unity-text-align: middle-center;
+}
+
+.goodbye-box__header {
+    margin-bottom: 10px;
+    -unity-text-align: middle-center;
+}
+
+.panel-item {
+    padding: 4px;
+}
+
+.wellbeing-counter__count {
+    margin-left: 5px;
+}
+
+.clock-panel {
+    background-image: resource('UI/Images/Clock/ClockBackground');
+    width: 61px;
+    height: 61px;
+    position: absolute;
+    top: 1px;
+    right: 2px;
+    align-items: center;
+    justify-content: center;
+}
+
+.clock-panel__item {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+
+.clock-panel__circle {
+    background-image: resource('UI/Images/Clock/ClockCircle');
+}
+
+.clock-panel__time-needle {
+    --background-image: resource('UI/Images/Clock/ClockNeedle');
+}
+
+.clock-panel__working-hours-needle {
+    --background-image: resource('UI/Images/Clock/WorkingHoursNeedle');
+}
+
+.clock-panel__daytime-start {
+    --background-image: resource('UI/Images/Clock/ClockArrowNighttimeDaytime');
+}
+
+.clock-panel__nighttime-start {
+    --background-image: resource('UI/Images/Clock/ClockArrowDaytimeNighttime');
+}
+
+.clock-panel__daytime {
+    --background-image: resource('UI/Images/Clock/ClockDaytime');
+}
+
+.clock-panel__nighttime {
+    --background-image: resource('UI/Images/Clock/ClockNighttime');
+}
+
+.top-right-item__wrapper {
+    margin-left: 4px;
+    min-width: 185px;
+    height: 26px;
+    margin-top: 4px;
+    padding-right: 25px;
+    align-self: flex-end;
+}
+
+.top-right-item--first-column {
+    flex-direction: row;
+    padding-right: 24px;
+    align-items: center;
+    flex-grow: 1;
+    padding-left: 4px;
+}
+
+.top-right-item {
+    margin-top: 4px;
+    margin-left: 4px;
+    min-width: 185px;
+    min-height: 26px;
+    padding-right: 8px;
+    padding-left: 4px;
+}
+
+.top-right-button {
+    margin-top: 4px;
+    margin-right: 4px;
+}
+
+.working-hours-panel__icon {
+    background-image: resource('UI/Images/Game/ico-clock');
+    width: 26px;
+    height: 26px;
+    margin-right: 4px;
+}
+
+.working-hours-panel__text {
+    flex-grow: 1;
+    -unity-text-align: middle-center;
+}
+
+.weather-panel {
+    flex-direction: row;
+    height: 26px;
+    align-items: center;
+    padding-right: 4px;
+    --background-slice-scale: 0.5;
+    --background-slice-top: 8;
+    --background-slice-right: 13;
+    --background-slice-bottom: 8;
+    --background-slice-left: 81;
+}
+
+.weather-panel.weather-panel--blink.weather-panel--dry {
+    --background-image: resource('UI/Images/Backgrounds/bg-striped-6');
+}
+
+.weather-panel.weather-panel--blink.weather-panel--badtide {
+    --background-image: resource('UI/Images/Backgrounds/bg-striped-4');
+}
+
+.weather-panel--blink > .weather-panel__progress-bar {
+    opacity: 0.3;
+}
+
+.weather-panel__progress-bar {
+    height: 100%;
+    flex-grow: 1;
+}
+
+.weather-panel__progress-background {
+    background-image: resource('UI/Images/Game/weather-progress-wet');
+    width: 100%;
+    height: 100%;
+}
+
+.weather-approaching .weather-panel__progress-background {
+    background-image: resource('UI/Images/Game/weather-progress-wet');
+}
+
+.weather-panel--dry.weather-in-progress .weather-panel__progress-background {
+    background-image: resource('UI/Images/Game/weather-progress-dry');
+}
+
+.weather-panel--badtide.weather-in-progress .weather-panel__progress-background {
+    background-image: resource('UI/Images/Game/weather-progress-badtide');
+}
+
+.weather-panel__progress-progress {
+    width: 100%;
+    height: 100%;
+}
+
+.weather-panel--dry.weather-approaching .weather-panel__progress-progress {
+    --background-image: resource('UI/Images/Game/weather-progress-dry');
+}
+
+.weather-panel--badtide.weather-approaching .weather-panel__progress-progress {
+    --background-image: resource('UI/Images/Game/weather-progress-badtide');
+}
+
+.weather-in-progress .weather-panel__progress-progress {
+    --background-image: resource('UI/Images/Game/weather-progress-wet');
+}
+
+.weather-panel__counter {
+    margin: 0 4px;
+}
+
+.date-panel {
+    flex-direction: row;
+    align-items: center;
+}
+
+.date-panel__icon {
+    background-image: resource('UI/Images/Core/ico-weather-temperate');
+    width: 26px;
+    height: 26px;
+}
+
+.date-panel--drought > .date-panel__icon {
+    background-image: resource('UI/Images/Core/ico-weather-drought');
+}
+
+.date-panel--badtide > .date-panel__icon {
+    background-image: resource('UI/Images/Core/ico-weather-badtide');
+}
+
+.date-panel__text {
+    flex-grow: 1;
+    white-space: nowrap;
+}
+
+.speed-control-panel {
+    justify-content: space-between;
+    padding-right: 38px;
+}
+
+.speed-button {
+    --click-sound: "UI.Click";
+    margin: 0 2px;
+    align-items: center;
+    justify-content: center;
+}
+
+.speed-button--small {
+    width: 24px;
+    height: 24px;
+}
+
+.speed-button--big {
+    width: 32px;
+    height: 24px;
+}
+
+.speed-button > VisualElement {
+    width: 100%;
+    height: 100%;
+}
+
+.speed-button--0 {
+    background-image: resource('UI/Images/SpeedControl/speed-button-0');
+}
+
+.speed-button--1 {
+    background-image: resource('UI/Images/SpeedControl/speed-button-1');
+}
+
+.speed-button--2 {
+    background-image: resource('UI/Images/SpeedControl/speed-button-2');
+}
+
+.speed-button--3 {
+    background-image: resource('UI/Images/SpeedControl/speed-button-3');
+}
+
+.reset-button {
+    background-image: resource('UI/Images/SpeedControl/reset-button');
+}
+
+.speed-button:hover:enabled > .speed-button--0 {
+    background-image: resource('UI/Images/SpeedControl/speed-button-0-hover');
+}
+
+.speed-button:hover:enabled > .speed-button--1 {
+    background-image: resource('UI/Images/SpeedControl/speed-button-1-hover');
+}
+
+.speed-button:hover:enabled > .speed-button--2 {
+    background-image: resource('UI/Images/SpeedControl/speed-button-2-hover');
+}
+
+.speed-button:hover:enabled > .speed-button--3 {
+    background-image: resource('UI/Images/SpeedControl/speed-button-3-hover');
+}
+
+.speed-button:hover:enabled > .reset-button {
+    background-image: resource('UI/Images/SpeedControl/reset-button-hover');
+}
+
+.speed-button--highlighted > .speed-button--0 {
+    background-image: resource('UI/Images/SpeedControl/speed-button-0-active');
+}
+
+.speed-button--highlighted > .speed-button--1 {
+    background-image: resource('UI/Images/SpeedControl/speed-button-1-active');
+}
+
+.speed-button--highlighted > .speed-button--2 {
+    background-image: resource('UI/Images/SpeedControl/speed-button-2-active');
+}
+
+.speed-button--highlighted > .speed-button--3 {
+    background-image: resource('UI/Images/SpeedControl/speed-button-3-active');
+}
+
+.reset-button--highlighted {
+    background-image: resource('UI/Images/SpeedControl/reset-button-active');
+}
+
+.speed-button--custom {
+    color: cyan;
+    -unity-font-style: bold;
+    font-size: 12px;
+}
+
+.speed-button--custom > VisualElement {
+    background-image: none;
+}
+
+.frames-per-second-panel {
+    width: 100px;
+    -unity-text-align: middle-right;
+    margin-right: 5px;
+}
+
+.benchmark-panel {
+    background-image: resource('UI/Images/Backgrounds/bg-pixel-3');
+    top: 100px;
+    position: absolute;
+    padding: 5px;
+    align-self: center;
+}
+
+.level-visibility-panel {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: flex-end;
+}
+
+.level-visibility-panel--game {
+    align-items: center;
+    width: 195px;
+    padding-left: 0;
+}
+
+
+.level-visibility-panel__content {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding-right: 8px;
+    padding-left: 4px;
+    height: 26px;
+    flex-grow: 1;
+}
+
+.level-visibility-panel__icon {
+    background-image: resource('UI/Images/Game/level-visibility');
+    width: 20px;
+    height: 20px;
+    margin-left: 4px;
+}
+
+.level-visibility-panel__reset-button {
+    width: 28px;
+    height: 26px;
+    margin-left: 4px;
+    --click-sound: "UI.Click";
+    background-image: resource('UI/Images/Game/level-visibility-reset');
+}
+
+.level-visibility-panel__reset-button:hover:enabled {
+    background-image: resource('UI/Images/Game/level-visibility-reset-hover');
+}
+
+.level-visibility-panel__reset-button:disabled {
+    visibility: hidden;
+}
+
+.level-visibility-panel__level-button-wrapper {
+    margin: 0 10px;
+    height: 18px;
+    flex-grow: 1;
+}
+
+.level-visibility-panel__level-button {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 0 4px;
+}
+
+.level-visibility-panel__level-hint {
+    position: absolute;
+    right: 0;
+    visibility: hidden;
+    background-image: resource('UI/Images/Game/level-visibility-arrows');
+    width: 15px;
+    height: 15px;
+}
+
+.level-visibility-panel__level-button-wrapper:hover:enabled {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-4');
+}
+
+.level-visibility-panel__level-button-wrapper.level-visibility-panel__level-button--held {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-4');
+}
+
+.level-visibility-panel__level-button--held > .level-visibility-panel__level-hint {
+    visibility: visible;
+}
+
+.level-visibility-panel__level-text {
+    width: 24px;
+    -unity-text-align: middle-center;
+    height: 18px;
+}
+
+.level-visibility-panel__buttons {
+    flex-grow: 0;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.square-toggle--water-opacity > .unity-toggle__input > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Game/square-toggle-water-opacity');
+}
+
+.square-toggle--construction-guidelines > .unity-toggle__input > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Game/square-toggle-construction-guidelines');
+}
+
+.square-toggle--natural-resources > .unity-toggle__input > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Game/square-toggle-natural-resources');
+}
+
+.square-toggle--stockpile-overlay > .unity-toggle__input > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Game/square-toggle-stockpile-overlay');
+}
+
+.described-amount {
+    flex-direction: row;
+    align-items: center;
+    margin: 1px;
+}
+
+.described-amount__amount-wrapper {
+    padding: 2px 4px;
+    min-width: 40px;
+}
+
+.described-amount__amount {
+    -unity-text-align: middle-center;
+    white-space: nowrap;
+    padding-right: 5px;
+    padding-left: 1px;
+}
+
+.described-amount__icon-background {
+    width: 40px;
+    height: 40px;
+    padding: 2px;
+    margin-left: -10px;
+    align-items: center;
+    justify-content: center;
+    background-image: resource('UI/Images/Backgrounds/bg-circle-big-alt-1');
+}
+
+.described-amount__icon {
+    width: 24px;
+    height: 24px;
+}
+
+.described-amount--power > .described-amount__icon {
+    background-image: resource('UI/Images/Game/ico-power');
+    width: 20px;
+    height: 20px;
+}
+
+.described-amount--power > .described-amount__text {
+    font-size: 12px;
+}
+
+.described-amount--workers > .described-amount__icon {
+    background-image: resource('UI/Images/Game/ico-workers');
+    width: 20px;
+    height: 20px;
+}
+
+.described-amount--workers > .described-amount__text {
+    font-size: 12px;
+}
+
+.described-amount--science > .described-amount__icon {
+    background-image: resource('UI/Images/Game/science-icon');
+}
+
+.flavor-text {
+    -unity-text-align: middle-right;
+    -unity-font-style: italic;
+    margin-top: 4px;
+    font-size: 12px;
+}
+
+.description-text {
+    padding: 8px;
+}
+
+.description-text--single-section {
+    padding: 0;
+}
+
+.description-text__text {
+    -unity-text-align: middle-left;
+}
+
+.production-items {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    min-height: 52px;
+}
+
+.production-items__input-and-output {
+    width: 100%;
+    justify-content: center;
+}
+
+.production-items__input-or-output {
+    flex-direction: row;
+    justify-content: center;
+}
+
+.production-items__items {
+    justify-content: center;
+    flex-direction: row;
+    align-items: center;
+    width: 124px;
+}
+
+.production-item {
+    justify-content: center;
+    flex-direction: row;
+    align-items: center;
+    padding: 4px 0;
+}
+
+.production-item--shaded {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.production-item__wrapper {
+    flex-wrap: nowrap;
+}
+
+.production-item__arrow-wrapper {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+}
+
+.production-item__arrow-wrapper--left {
+    margin-left: 4px;
+}
+
+.production-item__arrow-wrapper--right {
+    margin-right: 4px;
+}
+
+.production-item__arrow {
+    width: 24px;
+    height: 24px;
+    background-image: resource('UI/Images/Game/arrow');
+}
+
+.production-item__items {
+    flex-direction: row;
+    align-items: center;
+    width: 115px;
+    flex-wrap: wrap;
+}
+
+.production-item__items--input {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+}
+
+.production-item__icon-wrapper {
+    align-items: center;
+    justify-content: center;
+}
+
+.production-item__icon {
+    width: 21px;
+    height: 21px;
+    margin: 0 4px;
+    background-image: resource('UI/Images/Game/production-icon');
+    align-self: center;
+}
+
+.production-item__icon--or-icon {
+    margin-left: 6px;
+}
+
+.production-item__crafting-time {
+    display: none;
+}
+
+.settlement-name-box {
+    width: 100%;
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.settlement-name-box__content {
+    align-self: center;
+    padding: 45px;
+    min-width: 580px;
+    margin-bottom: 120px;
+}
+
+.settlement-name-box__element {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.settlement-name-box__buttons-root {
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+}
+
+.settlement-name-box__reset-button {
+    align-self: center;
+    margin-top: 4px;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    -unity-text-align: lower-center;
+    max-width: 225px;
+}
+
+.character-button__wrapper {
+    height: 32px;
+    width: 32px;
+    margin: 2px;
+    padding: 2px;
+}
+
+.character-button {
+    height: 28px;
+    width: 28px;
+}
+
+.character-button:disabled {
+    opacity: 0.5;
+}
+
+.resource-yield-tooltip__text {
+    -unity-text-align: middle-center;
+    flex-grow: 1;
+}
+
+.resource-yield-tooltip__text--margin {
+    margin-top: 15px;
+}
+
+.tooltip-building-item {
+    flex-direction: row;
+}
+
+.tooltip-building-item__text {
+    -unity-text-align: middle-left;
+}
+
+.tooltip-building-item__icon {
+    height: 38px;
+    width: 38px;
+}
+
+.resource-yield {
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+}
+
+.resource-yield__icon {
+    width: 24px;
+    height: 24px;
+}
+
+.resource-yield__icon.resource-yield__no-yield {
+    width: 38px;
+    height: 38px;
+    left: 7px;
+    margin-left: -14px;
+    background-image: resource('UI/Images/Game/plants-growth');
+}
+
+.resource-yield__icon--calendar {
+    background-image: resource('UI/Images/Game/calendar');
+}
+
+.resource-yield__icon--calendar-cycle {
+    background-image: resource('UI/Images/Game/calendar-cycle');
+}
+
+.resource-yield__text {
+    -unity-text-align: middle-center;
+}
+
+.resource-yield__progress-text {
+    -unity-text-align: middle-center;
+    margin-top: -6px;
+}
+
+.resource-yield__arrow {
+    width: 24px;
+    height: 24px;
+    margin: 0 12px;
+    background-image: resource('UI/Images/Game/arrow');
+}
+
+.resource-yield__info-icon {
+    width: 18px;
+    height: 18px;
+    background-image: resource('UI/Images/Game/info');
+    position: absolute;
+    right: -4px;
+    bottom: -4px;
+}
+
+.slider-toggle {
+    height: 36px;
+    justify-content: center;
+    margin-right: auto;
+}
+
+.slider-toggle:disabled {
+    opacity: 1;
+}
+
+.slider-toggle__content {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 24px;
+    padding: 0 4px;
+}
+
+.slider-toggle__element:enabled:hover {
+    --background-image: resource('UI/Images/Game/slider-button-hover');
+    --background-slice-scale: 0.5;
+    --background-slice: 6;
+}
+
+.slider-toggle__element--active {
+    --background-image: resource('UI/Images/Backgrounds/bg-button-4');
+    --background-slice-scale: 0.5;
+    --background-slice: 24;
+}
+
+.slider-toggle__element--active:enabled:hover {
+    --background-image: resource('UI/Images/Backgrounds/bg-button-3');
+}
+
+.slider-toggle__background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    --background-image: resource('UI/Images/Backgrounds/bg-button-4');
+    --background-slice-scale: 0.5;
+    --background-slice: 24;
+}
+
+.slider-toggle__button {
+    width: 28px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+    --click-sound: "UI.Click";
+    overflow: visible;
+}
+
+.slider-toggle__button--disabled > .slider-toggle__icon {
+    opacity: 0.5;
+}
+
+.slider-toggle__icon {
+    width: 26px;
+    height: 26px;
+}
+
+.slider-toggle--locked .slider-toggle__icon {
+    opacity: 0.5;
+}
+
+.slider-toggle__lock {
+    position: absolute;
+    right: -12px;
+    top: -6px;
+    width: 20px;
+    height: 20px;
+    background-image: resource('UI/Images/Core/lock_icon');
+    display: none;
+}
+
+.slider-toggle--locked .slider-toggle__lock {
+    display: flex;
+}
+
+.worker-type-toggle__icon--beaver {
+    background-image: resource('UI/Images/Game/ico-adult');
+}
+
+.worker-type-toggle__icon--bot {
+    background-image: resource('UI/Images/Game/ico-bot');
+}
+
+.attraction-load-rate {
+    margin: 1px;
+    width: 6px;
+    height: 22px;
+    justify-content: flex-end;
+}
+
+.attraction-load-rate__marker {
+    width: 6px;
+    height: 4px;
+    background-image: resource('UI/Images/Game/current-hour-marker');
+}
+
+.attraction-load-rate__rate-wrapper {
+    background-image: resource('UI/Images/Game/needview-inactive');
+    width: 100%;
+    height: 18px;
+    justify-content: flex-end;
+}
+
+.attraction-load-rate__rate {
+    background-image: resource('UI/Images/Game/needview-background');
+    width: 100%;
+}
+
+.farmhouse-toggle__icon--planting {
+    background-image: resource('UI/Images/Game/ico-planting');
+}
+
+.farmhouse-toggle__icon--harvesting {
+    background-image: resource('UI/Images/Game/ico-harvesting');
+}
+
+.wellbeing-summary {
+    flex-wrap: nowrap;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.wellbeing-summary__score {
+    width: 48px;
+    margin-right: 4px;
+}
+
+.wellbeing-summary__bonus {
+    width: 68px;
+    margin-right: 4px;
+    justify-content: flex-start;
+    align-content: flex-start;
+    flex-direction: row;
+}
+
+.wellbeing-summary__bonus--text {
+    flex-grow: 1;
+    -unity-text-align: middle-left;
+}
+
+.wellbeing-summary__bonus--icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 4px;
+    justify-content: center;
+}
+
+.wellbeing-summary__bonus--icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 4px;
+    justify-content: center;
+}
+
+.wellbeing-bonus-tooltip {
+    width: 170px;
+    min-height: 50px;
+    padding: 4px;
+}
+
+.wellbeing-bonus-tooltip__name {
+    -unity-text-align: middle-center;
+    margin-bottom: 4px;
+}
+
+.wellbeing-bonus-tooltip__next--background {
+    margin-top: 8px;
+    margin-bottom: 2px;
+    padding: 4px 8px 4px 8px;
+    background-color: #4e332f;
+}
+
+.stockpile-overlay-item {
+    position: absolute;
+    padding: 1px;
+    flex-direction: row;
+}
+
+.stockpile-overlay-item__entity-button {
+    flex-wrap: nowrap;
+    padding-right: 2px;
+    height: 28px;
+    --click-sound: "UI.Click";
+}
+
+.stockpile-overlay-item__entity-button:enabled:hover {
+    --background-image: resource('UI/Images/Backgrounds/bg-3-hover');
+}
+
+.stockpile-overlay-item__selection-button {
+    position: absolute;
+    margin-left: 2px;
+    align-self: center;
+    --click-sound: "UI.Click";
+}
+
+.stockpile-overlay-item__selection-button:hover {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-4');
+}
+
+.stockpile-overlay-item__icon {
+    width: 20px;
+    height: 20px;
+    margin: 2px;
+    background-image: resource('UI/Images/Game/question-mark');
+}
+
+.stockpile-overlay-item__text {
+    margin-right: 5px;
+    margin-left: 32px;
+}
+
+.stockpile-overlay-item__progress-bar {
+    margin-left: 1px;
+    margin-right: 4px;
+}
+
+.stockpile-capacity__progress-bar {
+    width: 6px;
+    height: 16px;
+    align-self: center;
+    background-color: rgba(157, 135, 89, 0.2);
+    justify-content: flex-end;
+}
+
+.stockpile-capacity__progress-bar-progress {
+    background-color: rgb(157, 135, 89);
+    width: 6px;
+}
+
+.stockpile-overlay-item__icon.icon--hidden {
+    background-image: none;
+}
+
+.good-stockpile-tooltip__text {
+    -unity-text-align: middle-center;
+    margin-left: 4px;
+}
+
+.good-stockpile-tooltip__amount-wrapper {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    margin-bottom: 10px;
+}
+
+.good-stockpile-tooltip_icon-workplace {
+    width: 26px;
+    height: 26px;
+    background-image: resource('UI/Images/Game/workplace-goods');
+}
+
+.good-stockpile-tooltip_icon-storage {
+    width: 26px;
+    height: 26px;
+    background-image: resource('UI/Images/Game/storage-goods');
+}
+
+.good-stockpile-tooltip_text--margin-between {
+    margin-right: 8px;
+}
+
+.good-stockpile-tooltip__effects {
+    margin-bottom: 10px;
+}
+
+.good-stockpile-tooltip__building-icons {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 42px;
+}
+
+.good-stockpile-tooltip__building-icon {
+    width: 38px;
+    height: 38px;
+    margin: 0 2px;
+}
+
+.stockpile-priority-toggle__icon--accept {
+    background-image: resource('UI/Images/Game/accept-icon');
+}
+
+.stockpile-priority-toggle__icon--empty {
+    background-image: resource('UI/Images/Game/empty-icon');
+}
+
+.stockpile-priority-toggle__icon--obtain {
+    background-image: resource('UI/Images/Game/obtain-icon');
+}
+
+.stockpile-priority-toggle__icon--supply {
+    background-image: resource('UI/Images/Game/supply-icon');
+}
+
+.import-toggle-tooltip {
+    max-width: 500px;
+}
+
+.import-toggle-tooltip__description {
+    margin-top: 4px;
+}
+
+.import-good-icon {
+    width: 20%;
+    height: 26px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.import-good-icon__icon {
+    width: 24px;
+    height: 24px;
+}
+
+.import-good-icon__importable-icon {
+    position: absolute;
+    bottom: 0;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    background-image: resource('UI/Images/Game/importable-icon');
+}
+
+.import-good-icon__non-importable-icon {
+    position: absolute;
+    bottom: 0;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    background-image: resource('UI/Images/Game/non-importable-icon');
+}
+
+.import-good-icon-tooltip__good-label {
+    margin-bottom: 2px;
+}
+
+.import-good-icon-tooltip__warning {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 2px;
+}
+
+.import-good-icon-tooltip__warning-icon {
+    width: 20px;
+    height: 20px;
+    background-image: resource('UI/Images/Core/warning_triangle');
+    margin-right: 4px;
+}
+
+.import-good-icon-tooltip__warning-text {
+    max-width: 250px;
+}
+
+.import-good-icon-tooltip__non-importable-text {
+    color: red;
+}
+
+.import-good-icon-tooltip__importable-text {
+    color: limegreen;
+}
+
+.water-source-regulator-toggle__icon--open {
+    background-image: resource('UI/Images/Game/ico-water-source-regulator-open');
+}
+
+.water-source-regulator-toggle__icon--closed {
+    background-image: resource('UI/Images/Game/ico-water-source-regulator-closed');
+}
+
+.game-over-box {
+    width: 750px;
+}
+
+.game-over-box__end-text {
+    -unity-text-align: middle-center;
+    margin: 20px 0;
+}
+
+.game-over-box__flavor-text {
+    -unity-font-style: italic;
+    -unity-text-align: middle-center;
+    margin-bottom: 20px;
+}
+
+.water-powered-generator-preview-panel {
+    height: 28px;
+    top: 54px;
+    padding: 0 12px;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+}
+
+.water-powered-generator-preview-panel__text {
+    -unity-text-align: middle-center;
+}
+
+.water-powered-generator-preview-panel__icon {
+    background-image: resource('UI/Images/Game/ico-power');
+    width: 20px;
+    height: 20px;
+    margin-left: 2px;
+}

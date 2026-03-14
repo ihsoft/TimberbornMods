@@ -1,0 +1,12 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="Box" src="/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Modding/ModdingStyle.uss" />
+    <ui:VisualElement name="GameSaveModBox">
+        <cui:LocalizableLabel name="SavedModsLabel" text="Saved mods:" text-loc-key="Modding.SavedMods" class="text--default text--centered" />
+        <cui:NineSliceVisualElement name="SavedModsContainer" class="bg-box--green simple-mod-panel__container">
+            <ui:ScrollView name="SavedMods" class="scroll--green-decorated" />
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

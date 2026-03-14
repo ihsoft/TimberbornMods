@@ -1,0 +1,46 @@
+{
+  "CustomToolSpec": {
+    "Id": "Automation.Tmpl.Signals.FloodgateGroup2",
+    "GroupId": "AutomationSignalsToolGroupId",
+    "Type": "IgorZ.Automation.TemplateTools.ApplyTemplateTool",
+    "Order": 21,
+    "Icon": "Sprites/IgorZ/tool-floodgate-group2",
+    "DisplayNameLocKey": "IgorZ.Automation.Tool.tmpl.FloodgateGroup.DisplayName",
+    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.FloodgateGroup.Description"
+  },
+  "AutomationTemplateSpec": {
+    "TemplateFamilyName": "Floodgate.Sync",
+    "Rules": [
+      {
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Precondition", "StrValue": "(?sig Floodgate.Height)" },
+            { "Name": "Expression", "StrValue": "(eq (sig Floodgate.Height) (sig Floodgate.Height))" }
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Signals.Set 'Floodgate.yellow2' (sig Floodgate.Height))" }
+          ]
+        }
+      },
+      {
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Precondition", "StrValue": "(?act Floodgate.SetHeight)" },
+            { "Name": "Expression", "StrValue": "(eq (sig Signals.Floodgate.yellow2) (sig Signals.Floodgate.yellow2))" }
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Floodgate.SetHeight (sig Signals.Floodgate.yellow2))" }
+          ]
+        }
+      }
+    ]
+  }
+}

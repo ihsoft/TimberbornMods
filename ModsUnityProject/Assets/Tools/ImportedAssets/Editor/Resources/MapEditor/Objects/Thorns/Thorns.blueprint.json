@@ -1,0 +1,116 @@
+{
+  "TemplateSpec": {
+    "TemplateName": "Thorns",
+    "BackwardCompatibleTemplateNames": [
+      "Bramble"
+    ],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": true
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "MapEditorObjects",
+    "ToolOrder": 800,
+    "ToolShape": "Square",
+    "Layout": "Rectangle",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": true
+  },
+  "DemolishableSpec": {
+    "DemolishTimeInHours": 10.0,
+    "ShowDemolishButtonInEntityPanel": true
+  },
+  "StartableMarkerPositionUpdaterSpec": {},
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.Thorns.DisplayName",
+    "DescriptionLocKey": "Building.Thorns.Description",
+    "FlavorDescriptionLocKey": "",
+    "Icon": "MapEditor/Objects/Thorns/ThornsIcon"
+  },
+  "BasicSelectionSoundSpec": {
+    "SoundName": "Thorns",
+    "AlternativeSoundName": ""
+  },
+  "BlockObjectRandomizablePlacementSpec": {},
+  "BlockObjectModelSpec": {
+    "FullModelName": "#Model",
+    "UncoveredModelName": "",
+    "UndergroundModelName": "",
+    "UndergroundModelDepth": 0
+  },
+  "SoilBarrierSpec": {
+    "BlockAboveMoisture": false,
+    "BlockFullMoisture": true,
+    "BlockContamination": true
+  },
+  "BlockObjectNavMeshAdderSpec": {},
+  "DemolishableFromTopSpec": {},
+  "DemolishableEffectsSpec": {
+    "Effects": [
+      {
+        "NeedId": "Injury",
+        "Points": -1.0,
+        "Probability": "High"
+      }
+    ]
+  },
+  "Children": {
+    "#Model": {
+      "TimbermeshSpec": {
+        "Model": "MapEditor/Objects/Thorns/Thorns.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.0487027019,
+              "Z": 0.5
+            },
+            "Size": {
+              "X": 0.8771647,
+              "Y": 0.0974054039,
+              "Z": 0.883003235
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    }
+  }
+}

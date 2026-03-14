@@ -1,0 +1,13 @@
+.triple-stretch {
+    flex-direction: row;
+    width: 100%;
+}
+
+.triple-stretch__side {
+    height: 100%;
+    width: 100%;
+}
+
+.triple-stretch__center {
+    height: 100%;
+}

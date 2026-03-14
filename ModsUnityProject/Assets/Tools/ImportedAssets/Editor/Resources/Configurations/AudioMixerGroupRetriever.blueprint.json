@@ -1,0 +1,5 @@
+{
+  "AudioMixerGroupRetrieverSpec": {
+    "AudioMixer": "Sounds/AudioMixer"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "Flip",
+    "GroupId": "Objects",
+    "LocKey": "KeyBinding.Flip",
+    "Order": 20,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/f",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

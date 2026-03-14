@@ -1,0 +1,20 @@
+{
+  "NeedSpec": {
+    "Id": "Agora",
+    "BackwardCompatibleIds": [],
+    "Order": 40,
+    "NeedGroupId": "SocialLife",
+    "CharacterType": "Beaver",
+    "StartingValue": 0.0,
+    "MinimumValue": 0.0,
+    "MaximumValue": 1.0,
+    "DailyDelta": -0.1,
+    "ImportanceMultiplier": 1.0,
+    "Effectiveness": 1.0,
+    "Wastable": false,
+    "HoursWarningThreshold": 0.0,
+    "DisplayNameLocKey": "Building.Agora.DisplayName",
+    "FavorableWellbeing": 3,
+    "UnfavorableWellbeing": 0
+  }
+}

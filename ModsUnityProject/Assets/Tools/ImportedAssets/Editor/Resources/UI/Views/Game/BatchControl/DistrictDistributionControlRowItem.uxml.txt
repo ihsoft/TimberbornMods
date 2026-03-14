@@ -1,0 +1,31 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/BatchControl/BatchControlStyle.uss" />
+    <ui:VisualElement name="DistrictDistributionControlRowItem" class="district-distribution-control">
+        <ui:VisualElement name="ResetButtonGroup" class="district-distribution-control__group">
+            <ui:Button name="Reset" class="district-distribution-control__button">
+                <ui:VisualElement name="Icon" class="district-distribution-control__button-icon import-icon--reset" />
+            </ui:Button>
+        </ui:VisualElement>
+        <ui:VisualElement name="ExportButtons" class="district-distribution-control__group">
+            <ui:Button name="ExportAll" class="district-distribution-control__button">
+                <ui:VisualElement name="Icon" class="district-distribution-control__button-icon import-icon--export-all" />
+            </ui:Button>
+            <ui:Button name="ExportNone" class="district-distribution-control__button">
+                <ui:VisualElement name="Icon" class="district-distribution-control__button-icon import-icon--export-none" />
+            </ui:Button>
+        </ui:VisualElement>
+        <ui:VisualElement name="ImportButtons" class="district-distribution-control__group">
+            <ui:Button name="ImportDisabledAll" class="district-distribution-control__button">
+                <ui:VisualElement name="Icon" class="district-distribution-control__button-icon import-icon--disabled" />
+            </ui:Button>
+            <ui:Button name="ImportAutoAll" class="district-distribution-control__button">
+                <ui:VisualElement name="Icon" class="district-distribution-control__button-icon import-icon--auto" />
+            </ui:Button>
+            <ui:Button name="ImportForcedAll" class="district-distribution-control__button">
+                <ui:VisualElement name="Icon" class="district-distribution-control__button-icon import-icon--forced" />
+            </ui:Button>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

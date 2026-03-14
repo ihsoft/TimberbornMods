@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="MapSelection" src="/Assets/Resources/UI/Views/Common/MapSelection.uxml" />
+    <ui:Template name="NewGame" src="NewGameTemplate.uxml" />
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MainMenu/MainMenuMiscStyle.uss" />
+    <ui:VisualElement name="root" class="grow-centered">
+        <ui:Instance template="NewGame" class="width-stretch">
+            <ui:AttributeOverrides element-name="HeaderText" text-loc-key="NewGameMapPanel.SubHeader" />
+            <ui:VisualElement name="SelectMap" class="content-row-centered">
+                <ui:Instance template="MapSelection" />
+            </ui:VisualElement>
+        </ui:Instance>
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,8 +1,8 @@
 {
   "Name": "Automation",
-  "Version": "3.0.2",
+  "Version": "3.6.0",
   "Id": "Timberborn.IgorZ.Automation",
-  "MinimumGameVersion": "0.7.9.0",
+  "MinimumGameVersion": "1.0.12.0",
   "Description": "This mod that automates a lot of things!",
   "RequiredMods": [
     {
@@ -10,12 +10,12 @@
       "MinimumVersion": "2.3.3"
     },
     {
-      "Id": "TimberApi",
-      "MinimumVersion": "0.7.12.1"
+      "Id": "eMka.ModSettings",
+      "MinimumVersion": "1.0.6.0"
     },
     {
-      "Id": "eMka.ModSettings",
-      "MinimumVersion": "0.7.2.0"
+      "Id": "Timberborn.IgorZ.CustomTools",
+      "MinimumVersion": "1.1.1"
     }
   ]
 }

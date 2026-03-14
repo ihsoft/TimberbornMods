@@ -1,0 +1,144 @@
+* {
+    -unity-font-definition: resource('UI/Fonts/NotoSansDisplay-Medium SDF - Static');
+    margin: 0;
+    padding: 0;
+    border-width: 0;
+    border-radius: 0;
+    background-color: transparent;
+    -unity-background-image-tint-color: white;
+}
+
+TextField {
+    -unity-font: resource('UI/Fonts/NotoSansDisplay-Medium');
+}
+
+NineSliceTextField {
+    -unity-font: resource('UI/Fonts/NotoSansDisplay-Medium');
+}
+
+.crash-screen {
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+}
+
+.crash-screen__image {
+    background-image: resource('UI/Images/CrashScreen/CrashScreenImage');
+    width: 540px;
+    height: 270px;
+}
+
+.crash-screen__text {
+    font-size: 14px;
+    color: rgb(255, 255, 255);
+}
+
+.crash-screen__bug-text {
+    font-size: 19px;
+    margin: 15px 0;
+    color: red;
+}
+
+.crash-screen__text-button {
+    font-size: 14px;
+    color: rgb(204, 204, 0);
+}
+
+.crash-screen__text-button:hover {
+    color: yellow;
+}
+
+.crash-screen__info {
+    align-items: center;
+}
+
+.crash-screen__warning {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: rgb(130, 0, 0);
+    align-items: center;
+}
+
+.crash-screen__input {
+    width: 470px;
+    padding: 4px;
+    margin-top: 10px;
+    border-width: 1px;
+    border-color: rgb(185, 185, 0);
+    font-size: 14px;
+    color: rgb(255, 255, 255);
+    --unity-cursor-color: rgb(255, 255, 255);
+}
+
+.crash-screen__input .unity-base-text-field__input--placeholder {
+    color: rgb(150, 150, 150);
+}
+
+.crash-screen__input .unity-base-slider__dragger {
+    background-color: rgb(185, 185, 0);
+}
+
+.crash-screen__input .unity-repeat-button {
+    display: none;
+}
+
+.crash-screen__input--comment {
+    white-space: normal;
+    height: 120px;
+}
+
+.crash-screen__input--exception {
+    white-space: normal;
+    width: 1100px;
+    height: 300px;
+}
+
+.crash-screen__policy-wrapper {
+    flex-direction: row;
+}
+
+.crash-screen__policy-toggle {
+    margin-right: 3px;
+}
+
+.crash-screen__policy-toggle > .unity-toggle__input > .unity-toggle__text {
+    margin-left: 8px;
+}
+
+.crash-screen__policy-toggle > .unity-toggle__input > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/empty-inverted');
+}
+
+.crash-screen__policy-toggle > .unity-toggle__input:checked > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/checkmark-inverted');
+}
+
+.crash-screen__policy-toggle > .unity-toggle__input:hover:enabled > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/empty-hover');
+}
+
+.crash-screen__policy-toggle > .unity-toggle__input:checked:hover:enabled > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Buttons/checkmark-hover');
+}
+
+.crash-screen__button {
+    background-image: resource('UI/Images/Backgrounds/bg-pixel-1');
+    margin: 5px;
+    padding: 5px 10px;
+    color: rgb(255, 255, 255);
+    font-size: 14px;
+}
+
+.crash-screen__button:hover:enabled {
+    background-image: resource('UI/Images/Backgrounds/bg-pixel-2');
+}
+
+.crash-screen__button:hover:enabled:active {
+    background-image: resource('UI/Images/Backgrounds/bg-pixel-3');
+}
+
+.crash-screen__margin-top {
+    margin-top: 25px;
+}

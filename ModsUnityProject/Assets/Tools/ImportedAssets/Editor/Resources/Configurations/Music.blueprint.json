@@ -1,0 +1,9 @@
+{
+  "MusicSpec": {
+    "DroughtTrack": "Music_Game.DroughtTrack",
+    "StandardTrack": "Music_Game.StandardTrack",
+    "StandardPhrase": "Music_Game.StandardPhrase",
+    "MinDelay": 5.0,
+    "MaxDelay": 15.0
+  }
+}

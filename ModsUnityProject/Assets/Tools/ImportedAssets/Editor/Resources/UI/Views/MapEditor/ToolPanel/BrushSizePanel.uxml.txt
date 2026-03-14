@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/MapEditor/MapEditorStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/ToolPanel/ToolPanelStyle.uss" />
+    <cui:NineSliceVisualElement name="BrushSizePanel" class="tool-panel-item--map-editor bg-box--green">
+        <ui:VisualElement class="tool-panel-item__text-wrapper">
+            <cui:LocalizableLabel text="Brush size:" text-loc-key="MapEditor.Brush.Size.Label" class="game-text-normal tool-panel-item__label" />
+            <ui:Label name="Height" text="0" class="tool-panel-item__value-text game-text-normal" />
+        </ui:VisualElement>
+        <ui:Button name="Minus" class="button-square button-minus" />
+        <ui:Button name="Plus" class="button-square button-plus button-plus--margin" />
+        <ui:VisualElement name="Bindings" class="tool-panel-item__binding-row">
+            <cui:NineSliceLabel name="Decrease" class="key-binding tool-panel-item__binding" />
+            <cui:NineSliceLabel name="Increase" class="key-binding tool-panel-item__binding" />
+        </ui:VisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

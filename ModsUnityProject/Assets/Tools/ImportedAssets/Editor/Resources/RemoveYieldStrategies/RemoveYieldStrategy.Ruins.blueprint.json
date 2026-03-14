@@ -1,0 +1,9 @@
+{
+  "RemoveYieldStrategySpec": {
+    "Id": "Ruins",
+    "CompatibleResourceGroups": [
+      "Ruin"
+    ],
+    "Animation": "Working"
+  }
+}

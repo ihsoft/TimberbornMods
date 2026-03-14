@@ -1,0 +1,10 @@
+{
+  "WorkerOutfitSpec": {
+    "Id": "Hauler",
+    "FactionId": "IronTeeth",
+    "WorkerType": "Beaver",
+    "DiffuseTexture": "Materials/Beavers/Common/WorkerOutfits/HaulerBackpackStrings_D",
+    "NormalTexture": "Materials/Beavers/Common/WorkerOutfits/HaulerBackpackStrings_N",
+    "Attachments": []
+  }
+}

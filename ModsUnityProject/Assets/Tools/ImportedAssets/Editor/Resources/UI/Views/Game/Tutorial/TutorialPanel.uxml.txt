@@ -1,0 +1,22 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/Tutorial/TutorialStyle.uss" />
+    <ui:VisualElement name="TutorialPanel" class="tutorial-panel">
+        <ui:VisualElement name="Tutorial" class="tutorial-panel__content">
+            <ui:Label name="Intro" text="Build some buildings." class="game-text-normal tutorial-panel__intro" />
+            <ui:VisualElement name="TutorialSteps" class="tutorial-panel__steps" />
+            <cui:NineSliceButton name="Continue" text="Continue" class="tutorial-panel__continue game-text-normal" />
+            <ui:Button name="Disable" class="tutorial-panel__disable" />
+        </ui:VisualElement>
+        <ui:VisualElement name="TutorialHeader" class="tutorial-panel__header">
+            <cui:NineSliceButton name="DevComplete" text="Complete" class="button-game tutorial-panel__dev-button" />
+            <cui:NineSliceButton name="DevCompleteAll" text="Complete all" class="button-game tutorial-panel__dev-button" />
+            <ui:Button name="HeaderButton" class="tutorial-panel__header-button">
+                <ui:VisualElement name="HeaderIcon" class="tutorial-panel__header-icon" />
+                <ui:Label name="TutorialTitle" text="Tutorial" class="game-text-normal tutorial-panel__header-text" />
+                <ui:Label name="TutorialStageState" text="1/1" class="game-text-normal tutorial-panel__header-text" />
+            </ui:Button>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

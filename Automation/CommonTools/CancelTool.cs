@@ -2,12 +2,14 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+extern alias CustomTools;
+
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.TemplateTools;
-using IgorZ.TimberDev.Tools;
 using Timberborn.BlockSystem;
 using Timberborn.ConstructionMode;
 using UnityEngine;
+using AbstractAreaSelectionTool = CustomTools::IgorZ.CustomTools.Tools.AbstractAreaSelectionTool;
 
 namespace IgorZ.Automation.CommonTools;
 
@@ -37,7 +39,7 @@ sealed class CancelTool : AbstractAreaSelectionTool, IAutomationModeEnabler, ICo
 
   /// <inheritdoc/>
   protected override void OnObjectAction(BlockObject blockObject) {
-    blockObject.GetComponentFast<AutomationBehavior>().ClearAllRules();
+    blockObject.GetComponent<AutomationBehavior>().ClearAllRules();
   }
 
   #endregion

@@ -1,0 +1,244 @@
+.game-scroll-view > .unity-scroll-view__content-and-vertical-scroll-container > .unity-scroller > .unity-slider .unity-base-slider__dragger {
+    background-image: resource('UI/Images/Backgrounds/bg-pixel-2');
+}
+
+.good-list__good-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.extension-clamp {
+    background-image: resource('UI/Images/Game/clamp-up');
+    height: 16px;
+    width: 94px;
+    align-self: center;
+    --click-sound: "UI.Click";
+}
+
+.extension-clamp:hover:enabled {
+    background-image: resource('UI/Images/Game/clamp-up-hover');
+}
+
+.extension-clamp:hover:enabled:active {
+    background-image: resource('UI/Images/Game/clamp-up-active');
+}
+
+.extension-clamp--hidden {
+    background-image: resource('UI/Images/Game/clamp-down');
+    height: 13px;
+    width: 67px;
+    align-self: center;
+}
+
+.extension-clamp--hidden:hover:enabled {
+    background-image: resource('UI/Images/Game/clamp-down-hover');
+}
+
+.extension-clamp--hidden:hover:enabled:active {
+    background-image: resource('UI/Images/Game/clamp-down-active');
+}
+
+.extension-clamp-full--hidden {
+    background-image: resource('UI/Images/Game/clamp-down-full');
+    height: 16px;
+    width: 94px;
+    align-self: center;
+}
+
+.extension-clamp-full--hidden:hover:enabled {
+    background-image: resource('UI/Images/Game/clamp-down-full-hover');
+}
+
+.extension-clamp-full--hidden:hover:enabled:active {
+    background-image: resource('UI/Images/Game/clamp-down-full-active');
+}
+
+.extension-panel-background {
+    background-color: rgba(48, 35, 55, 0.7);
+}
+
+.extension-panel-position {
+    position: absolute;
+    top: 16px;
+    bottom: 0;
+    left: 4px;
+    right: 4px;
+}
+
+.panel--district .extension-panel-background {
+    background-color: rgba(21, 47, 3, 0.7);
+}
+
+.wellbeing-score.wellbeing--negative {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-2');
+}
+
+.wellbeing-score {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-6');
+    --background-slice-scale: 0.5;
+    --background-slice: 10;
+    width: 74px;
+    height: 48px;
+    -unity-text-align: middle-center;
+}
+
+.wellbeing-score--small {
+    width: 34px;
+    height: 24px;
+}
+
+.priority-toggle {
+    width: 24px;
+    height: 24px;
+    --click-sound: "UI.Click";
+}
+
+.priority-toggle--checked {
+    background-image: resource('UI/Images/Game/priority-toggle-checked');
+}
+
+.progress-bar--teal .progress-bar__progress {
+    --background-image: resource('UI/Images/Game/progress-bar-progress-teal');
+}
+
+.progress-bar--blue .progress-bar__progress {
+    --background-image: resource('UI/Images/Game/progress-bar-progress-blue');
+}
+
+.progress-bar--green .progress-bar__progress {
+    --background-image: resource('UI/Images/Game/progress-bar-progress-green');
+}
+
+.progress-bar--red .progress-bar__progress {
+    --background-image: resource('UI/Images/Game/progress-bar-progress-red');
+}
+
+.stockpile-good-selection-box {
+    padding: 1px;
+    position: absolute;
+}
+
+.stockpile-good-selection-box__good-selection {
+    padding: 12px 8px;
+}
+
+.good-selection-box-row {
+    flex-direction: row;
+    max-width: 185px;
+    margin-bottom: 8px;
+    align-self: flex-start;
+}
+
+.good-selection-box-row--no-margin {
+    margin-bottom: 0;
+}
+
+.good-selection-box-row__header-icon {
+    height: 34px;
+    width: 26px;
+    min-width: 26px;
+    min-height: 26px;
+    margin: 0 4px 0 0;
+}
+
+.good-selection-box-row__icons {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.good-selection-box-item {
+    width: 46px;
+    height: 30px;
+    padding: 8px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    --click-sound: "UI.Click";
+}
+
+.good-selection-box-item__wrapper {
+    width: 50px;
+    height: 34px;
+    padding: 2px;
+}
+
+.good-selection-box-item:enabled:hover {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-4');
+}
+
+.selected-item.good-selection-box-item {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-1-highlighted');
+}
+
+.good-selection-box-item__good {
+    min-width: 20px;
+    min-height: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.good-selection-box-item__progress-bar {
+    position: absolute;
+    display: none;
+    right: 5px;
+    height: 20px;
+}
+
+.hazardous-weather-notification {
+    position: relative;
+    top: 200px;
+    align-self: center;
+    align-items: center;
+    justify-content: center;
+}
+
+.hazardous-weather-notification__fade {
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-in-out;
+}
+
+.hazardous-weather-notification__fade--enabled {
+    opacity: 1;
+}
+
+.hazardous-weather-notification__background {
+    position: absolute;
+    width: 757px;
+    height: 174px;
+    align-items: center;
+    justify-content: center;
+}
+
+.hazardous-weather-notification__background--wet {
+    background-image: resource('UI/Images/Game/weather-notification-wet');
+}
+
+.hazardous-weather-notification__background--dry {
+    background-image: resource('UI/Images/Game/weather-notification-dry');
+}
+
+.hazardous-weather-notification__background--badtide {
+    background-image: resource('UI/Images/Game/weather-notification-badtide');
+}
+
+.hazardous-weather-notification__header {
+    position: absolute;
+    top: -80px;
+    height: 58px;
+    color: rgb(225, 225, 225);
+    font-size: 24px;
+    text-shadow: 0px 0px 4px black;
+    -unity-text-align: middle-center;
+}
+
+.hazardous-weather-notification__description {
+    position: absolute;
+    top: -35px;
+    height: 20px;
+    color: rgb(225, 225, 225);
+    font-size: 14px;
+    text-shadow: 0px 0px 4px black;
+    -unity-text-align: middle-center;
+}

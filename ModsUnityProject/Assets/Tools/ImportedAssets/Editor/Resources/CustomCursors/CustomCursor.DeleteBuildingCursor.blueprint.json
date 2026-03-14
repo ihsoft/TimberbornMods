@@ -1,0 +1,19 @@
+{
+  "CustomCursorSpec": {
+    "Id": "DeleteBuildingCursor",
+    "WindowsCursor": "UI/Cursors/DeleteBuildingCursorLarge",
+    "MacOsCursor": "UI/Cursors/DeleteBuildingCursorSmall",
+    "Hotspot": {
+      "X": 0.0,
+      "Y": 0.0
+    },
+    "WindowsCursorOffset": {
+      "X": 10.0,
+      "Y": 30.0
+    },
+    "MacOsCursorOffset": {
+      "X": 15.0,
+      "Y": 45.0
+    }
+  }
+}

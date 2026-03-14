@@ -1,0 +1,21 @@
+{
+  "RecipeSpec": {
+    "Id": "Badwater",
+    "BackwardCompatibleIds": [],
+    "DisplayLocKey": "Good.Badwater.PluralDisplayName",
+    "CycleDurationInHours": 0.33,
+    "Ingredients": [],
+    "Products": [
+      {
+        "Id": "Badwater",
+        "Amount": 1
+      }
+    ],
+    "ProducedSciencePoints": 0,
+    "Fuel": "",
+    "CyclesFuelLasts": 0,
+    "FuelCapacity": 0,
+    "CyclesCapacity": 15,
+    "Icon": "Sprites/Goods/BadwaterIcon"
+  }
+}

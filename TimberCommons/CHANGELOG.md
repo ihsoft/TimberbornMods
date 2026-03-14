@@ -1,3 +1,26 @@
+# v1.15.1 (March 2nd, 2026)
+* [Enhancement] Shorten some ruRU strings in teh stock game to avoid line wrapping in UI.
+* [Fix] Add units to teh current strength of the sluice.
+* [Fix] Units are not formatted properly after the `1.0.10` update.
+
+# v1.15.0 (March 2nd, 2026)
+* [Update] Support game version `1.0.11`.
+
+# v1.14.6 (January 12th, 2026)
+* [Update] Support game version `1.0.7`.
+
+# v1.14.5 (January 12th, 2026)
+* [Fix] Properly handle `BlockContaminationRangeEffectSpec`.
+
+# v1.14.4 (January 10th, 2026)
+* [Update] Add `BlockContaminationRangeEffectSpec` to allow the contamination block effect on the irrigation tower.
+
+# v1.14.3 (December 3rd, 2025)
+* [Update] Support game version `v1.0`. The older version `v1.13.1` will be included in the package to support the main brunch.
+* [Feature] Show green/blue colors when adjusting the water drop sources levels based on the water level at the output.
+* [Feature] Add an option to show the injury ratio for the whole day. It's a default mode now.
+* [Fix] Properly calculate "supply left" estimation on the recipe based towers.
+
 # v1.13.1 (September 28th, 2025)
 * [Fix] In rare cases the game load may crash when irrigation towers are present.
 

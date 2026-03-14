@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/AlertPanel/AlertPanelStyle.uss" />
+    <ui:VisualElement name="ClosableAlertPanelRow" class="alert-panel-row">
+        <ui:VisualElement name="Wrapper" class="closable-alert-panel-row__wrapper">
+            <ui:Button name="Button" class="closable-alert-panel-row__button game-text-normal game-text--black" />
+            <ui:Button name="Close" class="closable-alert-panel-row__close">
+                <ui:Image name="Cross" class="closable-alert-panel-row__cross" />
+            </ui:Button>
+        </ui:VisualElement>
+        <ui:Image name="Icon" class="alert-fragment_row__icon" />
+    </ui:VisualElement>
+</ui:UXML>
