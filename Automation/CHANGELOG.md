@@ -1,4 +1,5 @@
 # v3.6.1 (started on March 18th, 2026):
+* [Feature] Add `SetNoticeIcon`, `SetStatusIcon`, and `SetStatus` actions to show icons and status text on the buildings.
 * [Change] Show a wider input box for the string argument values.
 * [Fix] Don't show `SetRecipe` action in the rules editor if there are no more than one recipe in the workshop.
 
