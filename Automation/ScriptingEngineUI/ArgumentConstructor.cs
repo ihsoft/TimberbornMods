@@ -36,7 +36,8 @@ sealed class ArgumentConstructor : BaseConstructor {
             ValueDef.NumericFormatEnum.Percent => scriptValue.AsRawNumber.ToString(),
             ValueDef.NumericFormatEnum.Float => scriptValue.AsFloat.ToString("0.00"),
             ValueDef.NumericFormatEnum.Integer => scriptValue.AsInt.ToString(),
-            ValueDef.NumericFormatEnum.Unspecified => throw new InvalidOperationException($"Unsupported numeric format: {valueDef.DisplayNumericFormat}"),
+            ValueDef.NumericFormatEnum.Unspecified =>
+                throw new InvalidOperationException($"Unsupported numeric format: {valueDef.DisplayNumericFormat}"),
         },
         ScriptValue.TypeEnum.Unset => throw new ArgumentException($"Invalid argument type: {valueDef.ValueType}"),
     };
@@ -70,6 +71,8 @@ sealed class ArgumentConstructor : BaseConstructor {
       _hintText.text = "";
     }
     _hintText.ToggleDisplayStyle(_hintText.text.Length > 0);
+    _textField.style.width =
+        argumentDef.ValueType == ScriptValue.TypeEnum.Number ? NumericFieldWidth : StringFieldWidth;
   }
 
   public string Validate() {
@@ -110,6 +113,9 @@ sealed class ArgumentConstructor : BaseConstructor {
   static readonly Color ArgumentValueHintColor = new(0.5f, 0.5f, 0.5f);
   static readonly Regex IsGoodFullFloatValueRegex = new(@"^-?\d+(\.[0-9]{1,2}[0]*)?$");
 
+  const int NumericFieldWidth = 100;
+  const int StringFieldWidth = 300;
+
   readonly ResizableDropdownElement _typeSelectionDropdown;
   readonly TextField _textField;
   readonly Label _hintText;
@@ -121,7 +127,7 @@ sealed class ArgumentConstructor : BaseConstructor {
 
   public ArgumentConstructor(UiFactory uiFactory) : base(uiFactory) {
     _typeSelectionDropdown = uiFactory.CreateSimpleDropdown(_ => UpdateTypeSelection());
-    _textField = uiFactory.CreateTextField(width: 100, classes: [UiFactory.GameTextBigClass]);
+    _textField = uiFactory.CreateTextField(classes: [UiFactory.GameTextBigClass]);
     _textField.style.height = Length.Percent(100);
     _hintText = uiFactory.CreateLabel(classes: [UiFactory.GameTextBigClass]);
     _hintText.style.color = ArgumentValueHintColor;

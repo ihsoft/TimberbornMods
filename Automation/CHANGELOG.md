@@ -1,3 +1,6 @@
+# v3.6.1 (started on March 18th, 2026):
+* [Change] Show a wider input box for the string argument values.
+
 # v3.6.0 (March 13th, 2026):
 * [Feature] Allow configuring action `Signals.Set` via UI.
 
