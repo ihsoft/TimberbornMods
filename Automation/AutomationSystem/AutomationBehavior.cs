@@ -38,12 +38,6 @@ public sealed class AutomationBehavior : BaseComponent, IAwakableComponent, IIni
   /// <summary>Shortcut to the <see cref="ILoc"/>.</summary>
   public ILoc Loc => AutomationService.Loc;
 
-  /// <summary>Shortcut to the <see cref="EventBus"/>.</summary>
-  public EventBus EventBus => AutomationService.EventBus;
-
-  /// <summary>Shortcut to the <see cref="BaseInstantiator"/>.</summary>
-  public BaseInstantiator BaseInstantiator => AutomationService.BaseInstantiator;
-
   #endregion
 
   #region API

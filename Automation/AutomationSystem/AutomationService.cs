@@ -70,9 +70,6 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
   /// <remarks>In this state, all actions are loaded, initialized and synchronized.</remarks>
   public static bool AutomationSystemReady { get; private set; }
 
-  /// <summary>Shortcut to the instantiator.</summary>
-  public readonly BaseInstantiator BaseInstantiator;
-
   /// <summary>Shortcut to the localizator.</summary>
   public readonly ILoc Loc;
 
@@ -194,10 +191,9 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
 
   bool _highlightingEnabled;
 
-  AutomationService(EventBus eventBus, Highlighter highlighter, BaseInstantiator baseInstantiator, ILoc loc) {
+  AutomationService(EventBus eventBus, Highlighter highlighter, ILoc loc) {
     Instance = this;
     EventBus = eventBus;
-    BaseInstantiator = baseInstantiator;
     Loc = loc;
     _highlighter = highlighter;
     CurrentTick = 0;
