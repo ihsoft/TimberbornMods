@@ -26,7 +26,7 @@ sealed class ManufactoryScriptableComponent : ScriptableComponentBase {
   /// <inheritdoc/>
   public override string[] GetActionNamesForBuilding(AutomationBehavior behavior) {
     var manufactory = behavior.GetComponent<Manufactory>();
-    if (manufactory == null) {
+    if (manufactory == null || manufactory.ProductionRecipes.Length <= 1) {
       return [];
     }
     return [SetRecipeActionName];

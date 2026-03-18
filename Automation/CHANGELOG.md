@@ -1,5 +1,6 @@
 # v3.6.1 (started on March 18th, 2026):
 * [Change] Show a wider input box for the string argument values.
+* [Fix] Don't show `SetRecipe` action in the rules editor if there are no more than one recipe in the workshop.
 
 # v3.6.0 (March 13th, 2026):
 * [Feature] Allow configuring action `Signals.Set` via UI.
