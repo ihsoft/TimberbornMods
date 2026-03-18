@@ -71,10 +71,6 @@ public sealed class ResizableDropdownElement : VisualElement {
   }
   string _selectedValue;
 
-  /// <summary>The text label of the dropdown.</summary>
-  /// <remarks>It is hidden by default.</remarks>
-  public Label TextLabel => this.Q<Label>("Label");
-
   #endregion
 
   #region Implemenation
