@@ -5,6 +5,7 @@
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.EntitySystem;
+using Timberborn.WorldPersistence;
 using UnityEngine;
 
 namespace IgorZ.Automation.AutomationSystem;
@@ -14,16 +15,15 @@ namespace IgorZ.Automation.AutomationSystem;
 /// </summary>
 /// <remarks>
 /// <p>
-/// The descendants of this type are added to the game object dynamically. The v1.0 game doesn't naturally support
-/// dynamic components. All the base components must be defined in the blueprints at the game start. However, this type
-/// of components can be created dynamically via <see cref="AutomationBehavior.GetOrCreate&lt;T&gt;"/>.
+/// The descendants of this type are added to the game object dynamically via
+/// <see cref="AutomationBehavior.GetOrCreate&lt;T&gt;"/>.
 /// </p>
 /// <p>New components can be created, but they cannot be destroyed!</p>
 /// <p>
 /// Dynamic components behave similar to BaseComponents. Some base component callback interfaces are supported out of
 /// the box. For the others, the client need to add own support. The supported interfaces:
 /// <see cref="IAwakableComponent"/>, <see cref="IStartableComponent"/>, <see cref="IFinishedStateListener"/>,
-/// <see cref="IInitializableEntity"/>, and <see cref="IDeletableEntity"/>.
+/// <see cref="IInitializableEntity"/>, <see cref="IDeletableEntity"/>, and <see cref="IPersistentEntity"/>.
 /// </p>
 /// </remarks>
 public abstract class AbstractDynamicComponent : IStartableComponent {

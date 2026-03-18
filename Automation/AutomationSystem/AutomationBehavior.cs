@@ -14,7 +14,6 @@ using Timberborn.DuplicationSystem;
 using Timberborn.EntitySystem;
 using Timberborn.Localization;
 using Timberborn.Persistence;
-using Timberborn.SingletonSystem;
 using Timberborn.StatusSystem;
 using Timberborn.WorldPersistence;
 using UnityDev.Utils.LogUtilsLite;
@@ -178,22 +177,7 @@ public sealed class AutomationBehavior : BaseComponent, IAwakableComponent, IIni
     if (_dynamicComponents.TryGetValue(typeof(T), out var component)) {
       return (T)component;
     }
-    component = StaticBindings.DependencyContainer.GetInstance<T>();
-    _dynamicComponents.Add(typeof(T), component);
-    component.Initialize(this);
-    if (component is IAwakableComponent awakableComponent) {
-      awakableComponent.Awake();
-    }
-    if (component.Enabled && _componentCache.StartIsEnabled) {
-      component.Start();
-    }
-    if (BlockObject.IsFinished && component is IFinishedStateListener finishedStateListener) {
-      finishedStateListener.OnEnterFinishedState();
-    }
-    if (_isInitialized && component is IInitializableEntity initializableEntity) {
-      initializableEntity.InitializeEntity();
-    }
-    return (T)component;
+    return (T)CreateDynamicComponent(typeof(T));
   }
 
   /// <summary>Returns the component or throws an exception if none exists.</summary>
@@ -221,6 +205,7 @@ public sealed class AutomationBehavior : BaseComponent, IAwakableComponent, IIni
 
   static readonly ComponentKey AutomationBehaviorKey = new(typeof(AutomationBehavior).FullName);
   static readonly ListKey<AutomationActionBase> ActionsKey = new("Actions");
+  static readonly ListKey<string> SavedComponentsKey = new("SavedComponents");
 
   /// <inheritdoc/>
   public void Save(IEntitySaver entitySaver) {
@@ -230,6 +215,15 @@ public sealed class AutomationBehavior : BaseComponent, IAwakableComponent, IIni
     var component = entitySaver.GetComponent(AutomationBehaviorKey);
     var actionsToSave = _actions.OfType<AutomationActionBase>().ToList();
     component.Set(ActionsKey, actionsToSave, AutomationActionBase.ActionSerializer);
+
+    var savedComponentTypes = new List<string>();
+    foreach (var persistentDynamicComponent in GetDynamicComponentsOf<IPersistentEntity>()) {
+      savedComponentTypes.Add(persistentDynamicComponent.GetType().FullName);
+      persistentDynamicComponent.Save(entitySaver);
+    }
+    if (savedComponentTypes.Count > 0) {
+      component.Set(SavedComponentsKey, savedComponentTypes);
+    }
   }
 
   /// <inheritdoc/>
@@ -243,6 +237,25 @@ public sealed class AutomationBehavior : BaseComponent, IAwakableComponent, IIni
         .Where(a => !a.IsMarkedForCleanup && a.Condition is { IsMarkedForCleanup: false })
         .ToList();
     UpdateRegistration();
+
+    if (!component.Has(SavedComponentsKey)) {
+      return;
+    }
+    var savedComponentTypes = component.Get(SavedComponentsKey);
+    foreach (var savedComponentType in savedComponentTypes) {
+      var componentType = ReflectionsHelper.GetType(savedComponentType, baseType: typeof(AbstractDynamicComponent),
+                                                    needDefaultConstructor: false, throwOnError: false);
+      if (componentType == null) {
+        HostedDebugLog.Error(this, "Cannot make dynamic component type: {0}", savedComponentType);
+        continue;
+      }
+      var abstractComponent = CreateDynamicComponent(componentType);
+      if (abstractComponent is not IPersistentEntity persistentEntity) {
+        HostedDebugLog.Error(this, "Dynamic component type {0} is not a persistent entity", componentType.FullName);
+        continue;
+      }
+      persistentEntity.Load(entityLoader);
+    }
   }
 
   #endregion
@@ -345,6 +358,25 @@ public sealed class AutomationBehavior : BaseComponent, IAwakableComponent, IIni
         .Where(x => typeof(T).IsAssignableFrom(x.Key))
         .Select(x => x.Value)
         .Cast<T>();
+  }
+
+  AbstractDynamicComponent CreateDynamicComponent(Type type) {
+    var component = (AbstractDynamicComponent)StaticBindings.DependencyContainer.GetInstance(type);
+    _dynamicComponents.Add(type, component);
+    component.Initialize(this);
+    if (component is IAwakableComponent awakableComponent) {
+      awakableComponent.Awake();
+    }
+    if (component.Enabled && _componentCache.StartIsEnabled) {
+      component.Start();
+    }
+    if (BlockObject.IsFinished && component is IFinishedStateListener finishedStateListener) {
+      finishedStateListener.OnEnterFinishedState();
+    }
+    if (_isInitialized && component is IInitializableEntity initializableEntity) {
+      initializableEntity.InitializeEntity();
+    }
+    return component;
   }
 
   /// <summary>Removes all rules that depend on condition and/or action that is marked for cleanup.</summary>
