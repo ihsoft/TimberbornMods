@@ -97,7 +97,7 @@ sealed record ValueDef {
   public Action<IValueExpr> ArgumentValidator { get; init; }
 
   /// <summary>Optional list of pre-defined values for the argument.</summary>
-  public DropdownItem<string>[] Options { get; init; }
+  public DropdownItem[] Options { get; init; }
 
   /// <summary>Map of replacement options for the argument.</summary>
   /// <remarks>Used to replace deprecated constants with the new values.</remarks>

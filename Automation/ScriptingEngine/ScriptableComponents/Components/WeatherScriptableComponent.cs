@@ -183,9 +183,9 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   }
   sealed class SeasonUpdateNotifier : MonoBehaviour;  // Just a MonoBehaviour to run coroutines.
 
-  DropdownItem<string>[] GetWeatherSeasonOptions() {
+  DropdownItem[] GetWeatherSeasonOptions() {
     return _weatherSeasons
-        .Select(x => new DropdownItem<string> { Value = x.Value, Text = Loc.T(x.text) })
+        .Select(x => new DropdownItem { Value = x.Value, Text = Loc.T(x.text) })
         .Reverse()
         .ToArray();
   }

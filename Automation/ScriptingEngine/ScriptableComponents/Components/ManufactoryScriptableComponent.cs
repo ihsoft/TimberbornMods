@@ -64,7 +64,7 @@ sealed class ManufactoryScriptableComponent : ScriptableComponentBase {
 
   ActionDef MakeSetRecipeActionDef(Manufactory manufactory) {
     var options = manufactory.ProductionRecipes
-        .Select(x => new DropdownItem<string> { Value = x.Id, Text = Loc.T(x.DisplayLocKey) });
+        .Select(x => new DropdownItem { Value = x.Id, Text = Loc.T(x.DisplayLocKey) });
     return new ActionDef {
         ScriptName = SetRecipeActionName,
         DisplayName = Loc.T(SetRecipeActionLocKey),

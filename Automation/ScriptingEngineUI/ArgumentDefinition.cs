@@ -21,7 +21,7 @@ sealed record ArgumentDefinition {
 
   /// <summary>If the set of the string values is limited, this is the set.</summary>
   /// <remarks>If not provided (null), then it is a free form value.</remarks>
-  public DropdownItem<string>[] ValueOptions { get; }
+  public DropdownItem[] ValueOptions { get; }
 
   /// <summary>The value definition this argument is bound to.</summary>
   public ValueDef ValueDef { get; }

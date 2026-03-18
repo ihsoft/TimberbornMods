@@ -20,7 +20,7 @@ class ConditionConstructor : BaseConstructor {
   #region API
 
   public record ConditionDefinition {
-    public DropdownItem<string> Name { get; init; }
+    public DropdownItem Name { get; init; }
     public ArgumentDefinition Argument { get; init; }
   }
 
@@ -48,12 +48,12 @@ class ConditionConstructor : BaseConstructor {
 
   #region Implementation
 
-  static readonly DropdownItem<string>[] StringOperators = [
+  static readonly DropdownItem[] StringOperators = [
       new() { Value = LispSyntaxParser.ComparisonOperators[ComparisonOperator.OpType.Equal], Text = "=" },
       new() { Value = LispSyntaxParser.ComparisonOperators[ComparisonOperator.OpType.NotEqual], Text = "\u2260" },
   ];
 
-  static readonly DropdownItem<string>[] NumberOperators = [
+  static readonly DropdownItem[] NumberOperators = [
       new() { Value = LispSyntaxParser.ComparisonOperators[ComparisonOperator.OpType.Equal], Text = "=" },
       new() { Value = LispSyntaxParser.ComparisonOperators[ComparisonOperator.OpType.NotEqual], Text = "\u2260" },
       new() { Value = LispSyntaxParser.ComparisonOperators[ComparisonOperator.OpType.GreaterThan], Text = ">" },

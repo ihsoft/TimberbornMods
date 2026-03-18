@@ -53,11 +53,11 @@ public sealed class ResizableDropdownElement : VisualElement {
   /// <remarks>
   /// Changing this set will reset <see cref="SelectedValue"/> to the first item. The callback will fire.
   /// </remarks>
-  public DropdownItem<string>[] Items {
+  public DropdownItem[] Items {
     get => _items;
     set => SetItems(value);
   }
-  DropdownItem<string>[] _items;
+  DropdownItem[] _items;
 
   /// <summary>The currently selected value of the dropdown.</summary>
   public string SelectedValue {
@@ -108,7 +108,7 @@ public sealed class ResizableDropdownElement : VisualElement {
     _selection.RegisterCallback<ClickEvent>(ToggleSelectionListDisplayStyle);
   }
 
-  void SetItems(DropdownItem<string>[] items) {
+  void SetItems(DropdownItem[] items) {
     _elements.Clear();
     _items = items;
     SelectedValue = _items.FirstOrDefault().Value;

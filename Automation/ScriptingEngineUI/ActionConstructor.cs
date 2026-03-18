@@ -20,7 +20,7 @@ sealed class ActionConstructor : BaseConstructor {
   #region API
 
   public record ActionDefinition {
-    public DropdownItem<string> Name { get; init; }
+    public DropdownItem Name { get; init; }
     public ArgumentDefinition[] Arguments { get; init; }
   }
 
