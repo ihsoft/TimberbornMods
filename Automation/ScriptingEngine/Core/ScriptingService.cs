@@ -20,7 +20,10 @@ sealed class ScriptingService {
   #region API
 
   /// <summary>The scripting service instance shortcut.</summary>
-  /// <remarks>Don't waste loading time and memory by injecting it. Use directly!</remarks>
+  /// <remarks>
+  /// Don't waste loading time and memory by injecting it. Use directly! However, avoid doing so from the singletons
+  /// constructors and dependency injectors as the instantiation order is undetermined.
+  /// </remarks>
   public static ScriptingService Instance { get; private set; }
 
   /// <summary>Signal callback wrapper.</summary>
