@@ -13,11 +13,16 @@ using UnityEngine.UIElements;
 // ReSharper disable once CheckNamespace
 namespace IgorZ.TimberDev.UI;
 
-/// <summary>Simple dropdown field with a value and an arbitrary text. Icons are not supported.</summary>
+/// <summary>Simple dropdown field with a value, optional icon and an arbitrary text.</summary>
+/// <remarks>
+/// By default, it measures the size of all its items and sets the of teh control to the biggest. This can be disabled
+/// via <see cref="AutoResizeToOptions"/>. Set the maximum width via the styles to prevent the control becoming too big.
+/// </remarks>
 /// <example>
 /// <code><![CDATA[
-/// var dropdown1 = UiBuilder.Create<ResizableDropdown>().BuildAndInitialize();
-/// var dropdown2 = Uifactory.CreateSimpleDropdown(v => SetValue(v));
+/// var dropdown = UiFactory.CreateSimpleDropdown(v => OnValueUpdated(v));
+/// dropdown.Items = [(Value = "value1", Text = "Text Of Vlaue1")];
+/// doprdown.Value = "value1";
 /// ]]></code>
 /// </example>
 public sealed class ResizableDropdownElement : VisualElement {
@@ -119,7 +124,7 @@ public sealed class ResizableDropdownElement : VisualElement {
     }
     _selectedItem.Clear();
     var option = _items.FirstOrDefault(x => x.Value == _selectedValue);
-    _selectedItem.Add(CreateSelectedItemElement(option.Text));
+    _selectedItem.Add(CreateSelectedItemElement(option));
   }
 
   void ToggleSelectionListDisplayStyle(ClickEvent evt) {
@@ -133,10 +138,10 @@ public sealed class ResizableDropdownElement : VisualElement {
   void ResizeWidth() {
     _selectedItem.Clear();
     foreach (var option in _items) {
-      var element = CreateItemElement(option.Text);
+      var element = CreateItemElement(option);
       element.RegisterCallback<ClickEvent>(_ => SelectedValue = option.Value);
       _elements.Add(element);
-      _selectedItem.Add(CreateSelectedItemElement(option.Text));
+      _selectedItem.Add(CreateSelectedItemElement(option));
     }
     if (_resizeScheduled) {
       return;
@@ -151,19 +156,29 @@ public sealed class ResizableDropdownElement : VisualElement {
   }
   bool _resizeScheduled;
 
-  VisualElement CreateItemElement(string text) {
+  VisualElement CreateItemElement(DropdownItem option) {
     var visualElement = _visualElementLoader.LoadVisualElement("Core/DropdownItem");
-    visualElement.Q("Icon").ToggleDisplayStyle(false);
+
+    var iconElement = visualElement.Q<Image>("Icon");
+    if (option.Icon != null) {
+      iconElement.sprite = option.Icon;
+      iconElement.ToggleDisplayStyle(true);
+    }
+
     var textElement = visualElement.Q<Label>("Text");
-    textElement.text = text;
+    textElement.text = option.Text;
+    if (option.Text == "") {
+      textElement.ToggleDisplayStyle(false);
+    }
+    
     var container = textElement.parent;
     container.style.paddingRight = 0;
 
     return visualElement;
   }
 
-  VisualElement CreateSelectedItemElement(string text) {
-    var item = CreateItemElement(text);
+  VisualElement CreateSelectedItemElement(DropdownItem option) {
+    var item = CreateItemElement(option);
     item.SetEnabled(value: false);
     item.AddToClassList(ItemSelectedClass);
     return item;

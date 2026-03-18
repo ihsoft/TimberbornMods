@@ -25,7 +25,7 @@ public record struct DropdownItem {
   }
 
   /// <summary>Implicit conversion from a tuple to the DropdownItem.</summary>
-  public static implicit operator DropdownItem<T>((T value, string text) tuple) {
-    return new DropdownItem<T> { Value = tuple.value, Text = tuple.text };
+  public static implicit operator DropdownItem((string value, Sprite icon, string text) tuple) {
+    return new DropdownItem { Value = tuple.value, Icon = tuple.icon, Text = tuple.text };
   }
 }
