@@ -142,14 +142,7 @@ record struct ScriptValue : IComparable<ScriptValue> {
   /// For example, value "1234" means "12.34f". The maximum possible precision is two digits after the point.
   /// </remarks>
   /// <exception cref="ScriptError">if the value is not a number.</exception>
-  public int AsRawNumber {
-    get {
-      if (!_number.HasValue) {
-        throw new ScriptError.BadValue("Value is not a number: " + ToString());
-      }
-      return _number.Value;
-    }
-  }
+  public int AsRawNumber => _number ?? throw new ScriptError.BadValue($"Value is not a number: {ToString()}");
 
   /// <summary>Current numeric value as a float.</summary>
   /// <exception cref="ScriptError">if the value is not a number.</exception>
@@ -161,14 +154,7 @@ record struct ScriptValue : IComparable<ScriptValue> {
 
   /// <summary>Current string value.</summary>
   /// <exception cref="ScriptError.BadValue">if the value is not a string.</exception>
-  public string AsString {
-    get {
-      if (_string == null) {
-        throw new ScriptError.BadValue($"Value is not a string: {ToString()}");
-      }
-      return _string;
-    }
-  }
+  public string AsString => _string ?? throw new ScriptError.BadValue($"Value is not a string: {ToString()}");
 
   /// <inheritdoc/>
   public override string ToString() {
