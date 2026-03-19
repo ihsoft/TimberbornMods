@@ -1,5 +1,10 @@
 fileFormatVersion: 2
 guid: ffb5842d4aa8e894ba6f5ff6ca701dde
+importerOverride:
+  nativeImporterType: 1031
+  scriptedImporterType:
+    serializedVersion: 2
+    Hash: d53ca297fb8e7ea31d64b12a57aef201
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
