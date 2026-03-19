@@ -8,6 +8,9 @@ using Timberborn.StatusSystem;
 using Timberborn.WorkSystem;
 using Timberborn.WorkSystemUI;
 
+// ReSharper disable UnusedMember.Local
+// ReSharper disable InconsistentNaming
+
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Patches;
 
 [HarmonyPatch(typeof(NoUnemployedStatus), nameof(NoUnemployedStatus.UpdateStatus))]
