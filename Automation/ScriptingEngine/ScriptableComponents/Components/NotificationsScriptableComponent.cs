@@ -221,7 +221,7 @@ sealed class NotificationsScriptableComponent : ScriptableComponentBase {
     return new DropdownItem {
         Value = spriteName,
         Icon = _statusSpriteLoader.LoadSprite(spriteName),
-        Text = spriteName,
+        Text = spriteName.Split('/', '\\').Last(),
     };
   }
 
