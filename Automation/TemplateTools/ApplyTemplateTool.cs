@@ -26,35 +26,6 @@ sealed class ApplyTemplateTool : AbstractAreaSelectionTool, IAutomationModeEnabl
 
   static readonly Color ToolColor = new(0, 1, 1, 0.7f);
 
-  #region Tool spec
-
-  /// <summary>Spec that holds the template tool configuration.</summary>
-  public sealed record AutomationTemplateSpec : ComponentSpec {
-    [Serialize]
-    public string TemplateFamilyName { get; init; } = "";
-
-    public record DynamicTypeSpec {
-      [Serialize]
-      public string TypeId { get; init; }
-
-      [Serialize]
-      public ImmutableArray<SpecToSaveObjectConverter.AutomationParameterSpec> Parameters { get; init; }
-    }
-
-    public record AutomationRuleSpec {
-      [Serialize]
-      public DynamicTypeSpec Condition { get; init; }
-
-      [Serialize]
-      public DynamicTypeSpec Action { get; init; }
-    }
-
-    [Serialize]
-    public ImmutableArray<AutomationRuleSpec> Rules { get; init; }
-  }
-
-  #endregion
-
   #region AbstractAreaSelectionTool overries
 
   /// <inheritdoc/>

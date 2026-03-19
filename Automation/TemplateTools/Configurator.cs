@@ -14,7 +14,6 @@ sealed class Configurator : IConfigurator {
   const string AutomationTooGroupId = "AutomationToolGroup";
 
   public void Configure(IContainerDefinition containerDefinition) {
-    containerDefinition.Bind<ApplyTemplateTool.AutomationTemplateSpec>().AsTransient();
     containerDefinition.Bind<ApplyTemplateTool>().AsTransient();
   }
 }
