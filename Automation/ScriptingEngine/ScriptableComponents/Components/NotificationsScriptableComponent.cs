@@ -231,12 +231,12 @@ sealed class NotificationsScriptableComponent : ScriptableComponentBase {
 
     /// <summary>Full definition of the status.</summary>
     [ProtoContract]
-    public record struct StatusDef {
-      [ProtoMember(1)] public string SpriteName { get; init; }
-      [ProtoMember(2)] public string StatusTextLocKey { get; init; }
-      [ProtoMember(3)] public string AlertTextLocKey { get; init; }
-      [ProtoMember(4)] public bool NeedFloatingIcon { get; init; }
-      [ProtoMember(5)] public bool IsPriority { get; init; }
+    public record struct StatusDef() {
+      [ProtoMember(1)] public string SpriteName { get; init; } = null;
+      [ProtoMember(2)] public string StatusTextLocKey { get; init; } = "";
+      [ProtoMember(3)] public string AlertTextLocKey { get; init; } = "";
+      [ProtoMember(4)] public bool NeedFloatingIcon { get; init; } = false;
+      [ProtoMember(5)] public bool IsPriority { get; init; } = false;
     }
 
     public void SetStatusState(StatusDef statusDef, bool newState) {
@@ -303,15 +303,15 @@ sealed class NotificationsScriptableComponent : ScriptableComponentBase {
       var statusText = statusDef.StatusTextLocKey.StartsWith("#")
           ? AutomationBehavior.Loc.T(statusDef.StatusTextLocKey[1..])
           : statusDef.StatusTextLocKey;
-      var alertText = statusDef.AlertTextLocKey != null && statusDef.AlertTextLocKey.StartsWith("#")
+      var alertText = statusDef.AlertTextLocKey.StartsWith("#")
           ? AutomationBehavior.Loc.T(statusDef.AlertTextLocKey[1..])
           : statusDef.AlertTextLocKey;
       if (statusDef.IsPriority) {
-        statusToggle = alertText != null
+        statusToggle = alertText != ""
             ? StatusToggle.CreatePriorityStatusWithAlertAndFloatingIcon(statusDef.SpriteName, statusText, alertText)
             : StatusToggle.CreatePriorityStatusWithFloatingIcon(statusDef.SpriteName, statusText);
-      } else if (statusDef.NeedFloatingIcon || alertText != null) {
-        statusToggle = alertText != null
+      } else if (statusDef.NeedFloatingIcon || alertText != "") {
+        statusToggle = alertText != ""
             ? StatusToggle.CreateNormalStatusWithAlertAndFloatingIcon(statusDef.SpriteName, statusText, alertText)
             : StatusToggle.CreateNormalStatusWithFloatingIcon(statusDef.SpriteName, statusText);
       } else {
