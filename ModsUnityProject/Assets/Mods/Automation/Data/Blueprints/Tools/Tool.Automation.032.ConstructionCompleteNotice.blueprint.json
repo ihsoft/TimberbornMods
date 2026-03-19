@@ -1,0 +1,31 @@
+{
+  "CustomToolSpec": {
+    "Id": "Automation.Tmpl.Construction.ConstructionCompleteNotice",
+    "GroupId": "AutomationToolGroupId",
+    "Type": "IgorZ.Automation.TemplateTools.ApplyTemplateTool",
+    "Order": 32,
+    "Icon": "Sprites/IgorZ/tool-notify-construction",
+    "DisplayNameLocKey": "IgorZ.Automation.Tool.tmpl.ConstructionCompleteNotice.DisplayName",
+    "DescriptionLocKey": "IgorZ.Automation.Tool.tmpl.ConstructionCompleteNotice.Description"
+  },
+  "AutomationTemplateSpec": {
+    "TemplateFamilyName": "ConstructionCompleteNotice",
+    "Rules": [
+      {
+        "Condition": {
+          "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
+          "Parameters": [
+            { "Name": "Precondition", "StrValue": "(and (?sig Constructable.OnUnfinished.Progress) (ne (sig Constructable.OnUnfinished.State) 'finished'))" },
+            { "Name": "Expression", "StrValue": "(eq (sig Constructable.OnUnfinished.Progress) 100)" }
+          ]
+        },
+        "Action": {
+          "TypeId": "IgorZ.Automation.Actions.ScriptedAction",
+          "Parameters": [
+            { "Name": "Expression", "StrValue": "(act Notifications.SetAlert 'IgorZ.Automation/Notification' '#IgorZ.Automation.Tool.tmpl.ConstructionCompleteNotice.StatusText' '#IgorZ.Automation.Tool.tmpl.ConstructionCompleteNotice.AlertText')" }
+          ]
+        }
+      }
+    ]
+  }
+}
