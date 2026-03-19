@@ -34,6 +34,7 @@ sealed class NotificationsScriptableComponent : ScriptableComponentBase {
   const string SetStatusActionName = "Notifications.SetStatus";
 
   static readonly List<string> AlertStatusIcons = [
+      "IgorZ.Automation/Notification", "IgorZ.Automation/Alarm",
       "ApiStopped",
       "Hunger", "Thirst", "Exhaustion", "NothingToDo", "OutOfFuel", "BadwaterContamination",
       "GenericError",
