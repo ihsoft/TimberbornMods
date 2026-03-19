@@ -306,6 +306,11 @@ sealed class NotificationsScriptableComponent : ScriptableComponentBase {
       var alertText = statusDef.AlertTextLocKey.StartsWith("#")
           ? AutomationBehavior.Loc.T(statusDef.AlertTextLocKey[1..])
           : statusDef.AlertTextLocKey;
+      if (alertText != "") {
+        // Alerts are grouped in the UI fragment by the alert text only.
+        // The patch will remove the prefix before presenting the string in UI. 
+        alertText = $"{statusDef.SpriteName}###{alertText}";
+      }
       if (statusDef.IsPriority) {
         statusToggle = alertText != ""
             ? StatusToggle.CreatePriorityStatusWithAlertAndFloatingIcon(statusDef.SpriteName, statusText, alertText)

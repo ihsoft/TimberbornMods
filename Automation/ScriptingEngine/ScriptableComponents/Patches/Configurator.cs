@@ -13,6 +13,7 @@ sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).AssemblyQualifiedName;
 
   public void Configure(IContainerDefinition containerDefinition) {
-    HarmonyPatcher.ApplyPatch(PatchId, typeof(FloodgatePatch), typeof(NoUnemployedStatusPatch));
+    HarmonyPatcher.ApplyPatch(
+        PatchId, typeof(FloodgatePatch), typeof(NoUnemployedStatusPatch), typeof(StatusAlertFragmentRowPatch));
   }
 }
