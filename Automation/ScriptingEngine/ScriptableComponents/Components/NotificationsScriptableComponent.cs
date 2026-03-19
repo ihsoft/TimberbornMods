@@ -34,8 +34,12 @@ sealed class NotificationsScriptableComponent : ScriptableComponentBase {
   const string SetStatusActionName = "Notifications.SetStatus";
 
   static readonly List<string> AlertStatusIcons = [
-      "Hunger", "Thirst", "Exhaustion", "Death", "GenericError", "ApiStopped", "NotEnoughWater", "NoStorage",
-      "LackOfResources", "WellbeingHighscore",
+      "ApiStopped",
+      "Hunger", "Thirst", "Exhaustion", "NothingToDo", "OutOfFuel", "BadwaterContamination",
+      "GenericError",
+      "NotEnoughWater", "NoStorage", "LackOfResources",
+      "Death",
+      "WellbeingHighscore",
   ];
 
   static readonly List<string> NoticeStatusIcons = AlertStatusIcons;
