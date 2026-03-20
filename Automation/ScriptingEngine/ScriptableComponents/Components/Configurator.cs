@@ -15,7 +15,7 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<SignalDispatcher>().AsTransient();
     containerDefinition.Bind<ReferenceManager>().AsTransient();
 
-    // The building-specific components.
+    // The building-specific components. The declaring order defines the order of teh items in UI.
     containerDefinition.Bind<CollectableScriptableComponent>().AsSingleton();
     containerDefinition.Bind<CollectableScriptableComponent.GatherableTracker>().AsTransient();
     containerDefinition.Bind<ConstructableScriptableComponent>().AsSingleton();
@@ -29,8 +29,6 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<InventoryScriptableComponent.EmptyingStatusBehavior>().AsTransient();
     containerDefinition.Bind<InventoryScriptableComponent.InventoryChangeTracker>().AsTransient();
     containerDefinition.Bind<ManufactoryScriptableComponent>().AsSingleton();
-    containerDefinition.Bind<NotificationsScriptableComponent>().AsSingleton();
-    containerDefinition.Bind<NotificationsScriptableComponent.StatusController>().AsTransient();
     containerDefinition.Bind<PausableScriptableComponent>().AsSingleton();
     containerDefinition.Bind<PlantableScriptableComponent>().AsSingleton();
     containerDefinition.Bind<PlantableScriptableComponent.PlantableTracker>().AsTransient();
@@ -47,6 +45,8 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<DebugScriptableComponent>().AsSingleton();
     containerDefinition.Bind<DistrictScriptableComponent>().AsSingleton();
     containerDefinition.Bind<DistrictScriptableComponent.DistrictChangeTracker>().AsTransient();
+    containerDefinition.Bind<NotificationsScriptableComponent>().AsSingleton();
+    containerDefinition.Bind<NotificationsScriptableComponent.StatusController>().AsTransient();
     containerDefinition.Bind<SignalsScriptableComponent>().AsSingleton();
     containerDefinition.Bind<WeatherScriptableComponent>().AsSingleton();
 
