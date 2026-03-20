@@ -40,6 +40,8 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<StreamGaugeScriptableComponent.StreamGaugeTracker>().AsTransient();
     containerDefinition.Bind<WorkplaceScriptableComponent>().AsSingleton();
     containerDefinition.Bind<WorkplaceScriptableComponent.WorkplaceChangeTracker>().AsSingleton();
+    containerDefinition.Bind<AutomatorScriptableComponent>().AsSingleton();
+    containerDefinition.Bind<AutomatorScriptableComponent.AutomatorStateTracker>().AsTransient();
 
     // Global components.
     containerDefinition.Bind<DebugScriptableComponent>().AsSingleton();

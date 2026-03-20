@@ -129,6 +129,7 @@ IgorZ.Automation.AutomationFragment.SignalsCountText,"Сигналы: {0}/{1}",
 IgorZ.Automation.Tool.CopyRules.Text,"Копировать правила: {0}",
 IgorZ.Automation.Tool.CopyRules.Title,"Копировать правила автоматизации",
 =,=,"Scriptable components strings"
+IgorZ.Automation.Scriptable.Automator.Signal.State,"сигнал автоматизации","Name of the condition for the automator state checking"
 IgorZ.Automation.Scriptable.Collectable.Signal.CollectableReady,"можно собрать","Name of the condition for the number of cuttable or gatherable items ready to be collected"
 IgorZ.Automation.Scriptable.Constructable.Signal.Progress,"прогресс строительства","Name of the condition for the construction progress checking"
 IgorZ.Automation.Scriptable.Constructable.Signal.State,"состояние строительства","Name of the condition for the construction state checking"
