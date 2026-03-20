@@ -141,7 +141,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
 
   /// <inheritdoc/>
   public override SignalDef GetSignalDefinition(string name, AutomationBehavior behavior) {
-    GetComponentOrThrow<DistrictBuilding>(behavior);  // Just verify.
+    GetComponentOrThrow<DistrictBuilding>(behavior);  // Verify only.
     if (name.StartsWith(ResourceStockSignalNamePrefix)) {
       return _signalDefsCache.GetOrAdd(name, MakeResourceStockTrackerSignalDef);
     }
