@@ -1,4 +1,5 @@
-# v3.6.1 (started on March 18th, 2026):
+# v4.0.0 (started on March 18th, 2026):
+* [BUG CHANGE] The mod is now named "Extended Automation" to better reflect its purpose and avoid confusion with the stock game automation system.
 * [Feature] Add `SetNoticeIcon`, `SetStatusIcon`, and `SetStatus` actions to show icons and status text on the buildings.
 * [Feature] Add new tool: Construction complete Notification. Once the buildings is completed, and icon and status text will be shown on it to notify the player.
 * [Feature] Add signal `Automator.State` to the automation buildings. If the building can be used as _source_ of the stock game automation signal, then it will have this scripting signal. It can be used "as-is" in the conditions of that building, or be exported via the normal __Extended Automation__ signals feature.
