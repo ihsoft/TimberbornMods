@@ -193,6 +193,15 @@ public sealed class AutomationBehavior : BaseComponent, IAwakableComponent, IIni
     return false;
   }
 
+  /// <summary>Returns the requested component or crashes the game.</summary>
+  /// <remarks>Use this method in the logic where the component is normally expected to exist.</remarks>
+  /// <exception cref="InvalidOperationException">if teh component not found.</exception>
+  /// <seealso cref="BaseComponent.GetComponent"/>
+  public T GetComponentOrFail<T>() where T : BaseComponent {
+    return GetComponent<T>()
+        ?? throw new InvalidOperationException($"Cannot find {typeof(T).FullName} on {DebugEx.ObjectToString(this)}");
+  }
+
   #endregion
 
   #region IPersistentEntity implemenatation

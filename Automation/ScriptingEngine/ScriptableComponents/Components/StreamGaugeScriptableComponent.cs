@@ -37,7 +37,7 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override Func<ScriptValue> GetSignalSource(string name, AutomationBehavior behavior) {
-    var gauge = GetGauge(behavior);
+    var gauge = GetComponentOrThrow<StreamGauge>(behavior);
     return name switch {
         DepthSignalName => () => DepthSignal(gauge),
         ContaminationSignalName => () => ContaminationSignal(gauge),
@@ -48,6 +48,7 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override SignalDef GetSignalDefinition(string name, AutomationBehavior behavior) {
+    GetComponentOrThrow<StreamGauge>(behavior);  // Verify only.
     return name switch {
         DepthSignalName => DepthSignalDef,
         ContaminationSignalName => ContaminationSignalDef,
@@ -122,18 +123,6 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
 
   #endregion
 
-  #region Implementation
-
-  static StreamGauge GetGauge(AutomationBehavior behavior) {
-    var streamGauge = behavior.GetComponent<StreamGauge>();
-    if (!streamGauge) {
-      throw new ScriptError.BadStateError(behavior, "StreamGauge component not found");
-    }
-    return streamGauge;
-  }
-
-  #endregion
-
   #region Stream gauge tracker component
 
   internal sealed class StreamGaugeCheckTicker : TickableComponent, IAwakableComponent {
@@ -153,7 +142,6 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
     }
   }
 
-  //FXIME: disable component on the last signal unregistered, enable on first.
   internal sealed class StreamGaugeTracker : AbstractStatusTracker {
     StreamGauge _streamGauge;
     int _prevWaterLevel;
@@ -163,11 +151,11 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
     /// <inheritdoc/>
     public override void Start() {
       base.Start();
-      _streamGauge = AutomationBehavior.GetComponent<StreamGauge>();
+      _streamGauge = AutomationBehavior.GetComponentOrFail<StreamGauge>();
       _prevWaterLevel = Mathf.RoundToInt(_streamGauge.WaterLevel * 100f);
       _prevContaminationLevel = Mathf.RoundToInt(_streamGauge.ContaminationLevel * 100f);
       _prevWaterCurrent = Mathf.RoundToInt(_streamGauge.WaterCurrent * 100f);
-      AutomationBehavior.GetComponent<StreamGaugeCheckTicker>().EnableComponent();
+      AutomationBehavior.GetComponentOrFail<StreamGaugeCheckTicker>().EnableComponent();
     }
 
     public void UpdateSignals() {

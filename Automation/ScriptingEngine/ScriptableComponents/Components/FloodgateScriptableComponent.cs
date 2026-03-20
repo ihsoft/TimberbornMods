@@ -31,7 +31,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override Func<ScriptValue> GetSignalSource(string name, AutomationBehavior behavior) {
-    var floodgate = GetFloodgate(behavior);
+    var floodgate = GetComponentOrThrow<Floodgate>(behavior);
     return name switch {
         HeightSignalName => () => HeightSignal(floodgate),
         _ => throw new UnknownSignalException(name),
@@ -40,7 +40,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override SignalDef GetSignalDefinition(string name, AutomationBehavior behavior) {
-    var floodgate = GetFloodgate(behavior);
+    var floodgate = GetComponentOrThrow<Floodgate>(behavior);
     return name switch {
         HeightSignalName => _signalDefsCache.GetOrAdd(name, floodgate.MaxHeight, MakeHeightSignalDef),
         _ => throw new UnknownSignalException(name),
@@ -55,7 +55,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
-    var floodgate = GetFloodgate(behavior);
+    var floodgate = GetComponentOrThrow<Floodgate>(behavior);
     return name switch {
         SetHeightActionName => args => SetHeightAction(floodgate, args),
         _ => throw new UnknownActionException(name),
@@ -64,7 +64,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override ActionDef GetActionDefinition(string name, AutomationBehavior behavior) {
-    var floodgate = GetFloodgate(behavior);
+    var floodgate = GetComponentOrThrow<Floodgate>(behavior);
     return name switch {
         SetHeightActionName => _actionDefsCache.GetOrAdd(name, floodgate.MaxHeight, MakeSetActionDef),
         _ => throw new UnknownActionException(name),
@@ -131,18 +131,6 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
 
   #endregion
 
-  #region Implementation
-
-  static Floodgate GetFloodgate(AutomationBehavior behavior) {
-    var floodgate = behavior.GetComponent<Floodgate>();
-    if (!floodgate) {
-      throw new ScriptError.BadStateError(behavior, "Floodgate component not found");
-    }
-    return floodgate;
-  }
-
-  #endregion
-
   #region Inventory change tracker component
 
   internal sealed class HeightChangeTracker : AbstractStatusTracker {
@@ -152,7 +140,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
     /// <inheritdoc/>
     public override void Start() {
       base.Start();
-      _floodgate = AutomationBehavior.GetComponent<Floodgate>();
+      _floodgate = AutomationBehavior.GetComponentOrFail<Floodgate>();
       _currentValue = Mathf.RoundToInt(_floodgate.Height * 100f);
     }
 

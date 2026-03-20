@@ -28,17 +28,20 @@ sealed class ConstructableScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override string[] GetSignalNamesForBuilding(AutomationBehavior behavior) {
-    var blockObject = behavior.GetComponent<BlockObject>();
-    return !blockObject.IsFinished ? [StateSignalName, ProgressSignalName] : [];
+    return !behavior.BlockObject.IsFinished ? [StateSignalName, ProgressSignalName] : [];
   }
 
   /// <inheritdoc/>
   public override Func<ScriptValue> GetSignalSource(string name, AutomationBehavior behavior) {
-    return name switch {
-        StateSignalName => () => StateSignal(behavior),
-        ProgressSignalName => () => ProgressSignal(behavior),
-        _ => throw new UnknownSignalException(name),
-    };
+    switch (name) {
+      case StateSignalName:
+        return () => StateSignal(behavior.BlockObject);
+      case ProgressSignalName:
+        var constructionSite = GetComponentOrThrow<ConstructionSite>(behavior);
+        return () => ProgressSignal(constructionSite);
+      default:
+        throw new UnknownSignalException(name);
+    }
   }
 
   /// <inheritdoc/>
@@ -91,13 +94,12 @@ sealed class ConstructableScriptableComponent : ScriptableComponentBase {
   };
   SignalDef _progressSignalDef;
 
-
-  static ScriptValue StateSignal(AutomationBehavior behavior) {
-    return ScriptValue.FromString(behavior.GetComponent<BlockObject>().IsFinished ? "finished" : "");
+  static ScriptValue StateSignal(BlockObject blockObject) {
+    return ScriptValue.FromString(blockObject.IsFinished ? "finished" : "");
   }
 
-  static ScriptValue ProgressSignal(AutomationBehavior behavior) {
-    return ScriptValue.FromFloat(behavior.GetComponent<ConstructionSite>().BuildTimeProgress);
+  static ScriptValue ProgressSignal(ConstructionSite constructionSite) {
+    return ScriptValue.FromFloat(constructionSite.BuildTimeProgress);
   }
 
   #endregion
@@ -108,8 +110,8 @@ sealed class ConstructableScriptableComponent : ScriptableComponentBase {
     int _prevProgress;
 
     public void Awake() {
-      var constructionSite = AutomationBehavior.GetComponent<ConstructionSite>();
-      AutomationBehavior.GetComponent<ConstructionSite>().OnConstructionSiteProgressed += (_, _) => {
+      var constructionSite = AutomationBehavior.GetComponentOrFail<ConstructionSite>();
+      constructionSite.OnConstructionSiteProgressed += (_, _) => {
         var progress = Mathf.RoundToInt(constructionSite.BuildTimeProgress * 100f);
         if (progress != _prevProgress) {
           _prevProgress = progress;

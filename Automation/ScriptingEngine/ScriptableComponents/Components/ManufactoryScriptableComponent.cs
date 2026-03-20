@@ -34,10 +34,7 @@ sealed class ManufactoryScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
-    var manufactory = behavior.GetComponent<Manufactory>();
-    if (manufactory == null) {
-      throw new UnknownActionException(name);
-    }
+    var manufactory = GetComponentOrThrow<Manufactory>(behavior);
     return name switch {
         SetRecipeActionName => args => SetRecipeAction(args, manufactory),
         _ => throw new UnknownActionException(name),
@@ -46,10 +43,7 @@ sealed class ManufactoryScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override ActionDef GetActionDefinition(string name, AutomationBehavior behavior) {
-    var manufactory = behavior.GetComponent<Manufactory>();
-    if (manufactory == null) {
-      throw new UnknownActionException(name);
-    }
+    var manufactory = GetComponentOrThrow<Manufactory>(behavior);
     return name switch {
         SetRecipeActionName =>
             _actionDefsCache.GetOrAdd($"{name}-{behavior.Name}", _ => MakeSetRecipeActionDef(manufactory)),

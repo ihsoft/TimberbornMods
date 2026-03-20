@@ -48,10 +48,7 @@ sealed class DynamiteScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
-    var dynamite = behavior.GetComponent<Dynamite>();
-    if (!dynamite) {
-      throw new ScriptError.BadStateError(behavior, "Dynamite component not found");
-    }
+    GetComponentOrThrow<Dynamite>(behavior);  // Verify only.
     return name switch {
         DetonateActionName => _ => DetonateAction(behavior),
         DetonateAndRepeatActionName => args => DetonateAndRepeatAction(behavior, args),
@@ -71,14 +68,14 @@ sealed class DynamiteScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override void InstallAction(ActionOperator actionOperator, AutomationBehavior behavior) {
-    if (actionOperator.ActionName is  DetonateActionName or DetonateAndRepeatActionName) {
+    if (actionOperator.ActionName is DetonateActionName or DetonateAndRepeatActionName) {
       behavior.GetOrCreate<DynamiteStateController>().AddAction(actionOperator);
     }
   }
 
   /// <inheritdoc/>
   public override void UninstallAction(ActionOperator actionOperator, AutomationBehavior behavior) {
-    if (actionOperator.ActionName is  DetonateActionName or DetonateAndRepeatActionName) {
+    if (actionOperator.ActionName is DetonateActionName or DetonateAndRepeatActionName) {
       behavior.GetOrThrow<DynamiteStateController>().RemoveAction(actionOperator);
     }
   }
@@ -162,7 +159,7 @@ sealed class DynamiteScriptableComponent : ScriptableComponentBase {
     /// <summary>Sets up the component and starts the actual monitoring of the object.</summary>
     public IEnumerator WaitAndPlace(AutomationBehavior behavior, Priority builderPriority, int repeatCount) {
       var blueprintName = behavior.GetComponent<BlockObjectSpec>().Blueprint.Name;
-      var dynamite = behavior.GetComponent<Dynamite>();
+      var dynamite = behavior.GetComponentOrFail<Dynamite>();
       var coordinates = behavior.BlockObject.Coordinates;
       var terrainService = StaticBindings.DependencyContainer.GetInstance<ITerrainService>();
 

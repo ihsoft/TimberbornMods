@@ -8,6 +8,7 @@ using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
+using Timberborn.BaseComponentSystem;
 using Timberborn.Localization;
 using Timberborn.SingletonSystem;
 using UnityDev.Utils.LogUtilsLite;
@@ -95,6 +96,16 @@ abstract class ScriptableComponentBase : ILoadableSingleton, IScriptable {
 
   protected string GetArgumentMaxValueHint(float maxValue, string format = "F2") {
     return maxValue < 0 ? null : Loc.T(ArgumentMaxValueHintLocKey, maxValue.ToString(format));
+  }
+
+  /// <summary>Returns the requested component or throws a parsing error if not found.</summary>
+  /// <remarks>
+  /// Use this method in the parsing flow where signals or actions may be requested on an incompatible building.
+  /// </remarks>
+  /// <exception cref="ScriptError.BadStateError">if the component not found.</exception>
+  protected static T GetComponentOrThrow<T>(AutomationBehavior behavior) where T : BaseComponent {
+    var component = behavior.GetComponent<T>();
+    return component ?? throw new ScriptError.BadStateError(behavior, $"Building has no '{typeof(T).Name}'");
   }
 
   #endregion

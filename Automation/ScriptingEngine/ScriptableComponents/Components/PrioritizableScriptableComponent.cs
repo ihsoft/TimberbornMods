@@ -31,10 +31,7 @@ sealed class PrioritizableScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
-    var haulPrioritizable = behavior.GetComponent<HaulPrioritizable>();
-    if (!haulPrioritizable) {
-      throw new ScriptError.BadStateError(behavior, "Building is not prioritizable");
-    }
+    var haulPrioritizable = GetComponentOrThrow<HaulPrioritizable>(behavior);
     return name switch {
         SetHaulersActionName => _ => SetHaulersAction(haulPrioritizable),
         ResetHaulersActionName => _ => ResetHaulersAction(haulPrioritizable),
@@ -43,11 +40,12 @@ sealed class PrioritizableScriptableComponent : ScriptableComponentBase {
   }
 
   /// <inheritdoc/>
-  public override ActionDef GetActionDefinition(string name, AutomationBehavior _) {
+  public override ActionDef GetActionDefinition(string name, AutomationBehavior behavior) {
+    GetComponentOrThrow<HaulPrioritizable>(behavior);  // Verify only.
     return name switch {
         SetHaulersActionName => SetHaulersActionDef,
         ResetHaulersActionName => ResetHaulersActionDef,
-        _ => base.GetActionDefinition(name, _),
+        _ => base.GetActionDefinition(name, behavior),
     };
   }
 

@@ -328,7 +328,7 @@ sealed class NotificationsScriptableComponent : ScriptableComponentBase {
         statusToggle = StatusToggle.CreateNormalStatus(statusDef.SpriteName, statusText);
       }
       try {
-        AutomationBehavior.GetComponent<StatusSubject>().RegisterStatus(statusToggle);
+        AutomationBehavior.GetComponentOrFail<StatusSubject>().RegisterStatus(statusToggle);
       } catch (InvalidOperationException) {
         throw new ScriptError.BadValue($"Unknown status icon name: {statusDef.SpriteName}");
       }

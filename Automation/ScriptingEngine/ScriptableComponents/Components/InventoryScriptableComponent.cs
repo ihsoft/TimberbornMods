@@ -91,10 +91,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   
   /// <inheritdoc/>
   public override Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
-    var emptiable = behavior.GetComponent<Emptiable>();
-    if (!emptiable) {
-      throw new ScriptError.BadStateError(behavior, "Building is not emptiable");
-    }
+    var emptiable = GetComponentOrThrow<Emptiable>(behavior);
     return name switch {
         StartEmptyingStockActionName => _ => StartEmptyingStockAction(emptiable),
         StopEmptyingStockActionName => _ => StopEmptyingStockAction(emptiable),
@@ -103,7 +100,8 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   }
 
   /// <inheritdoc/>
-  public override ActionDef GetActionDefinition(string name, AutomationBehavior _) {
+  public override ActionDef GetActionDefinition(string name, AutomationBehavior behavior) {
+    GetComponentOrThrow<Emptiable>(behavior);  // Verify only.
     return name switch {
         StartEmptyingStockActionName => StartEmptyingStockActionDef,
         StopEmptyingStockActionName => StopEmptyingStockActionDef,
@@ -301,12 +299,12 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     /// <inheritdoc/>
     public override void Start() {
       base.Start();
-      _emptiable = AutomationBehavior.GetComponent<Emptiable>();
+      _emptiable = AutomationBehavior.GetComponentOrFail<Emptiable>();
       _emptiable.UnmarkedForEmptying += (_, _) => RefreshStatus();
       _emptiable.MarkedForEmptying += (_, _) => RefreshStatus();
       _statusToggle = StatusToggle.CreatePriorityStatusWithFloatingIcon(
           EmptyingStatusIcon, _loc.T(EmptyingStatusDescriptionLocKey));
-      AutomationBehavior.GetComponent<StatusSubject>().RegisterStatus(_statusToggle);
+      AutomationBehavior.GetComponentOrFail<StatusSubject>().RegisterStatus(_statusToggle);
       RefreshStatus();
     }
 

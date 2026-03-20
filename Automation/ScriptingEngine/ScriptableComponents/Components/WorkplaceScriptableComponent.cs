@@ -31,13 +31,13 @@ sealed class WorkplaceScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override string[] GetSignalNamesForBuilding(AutomationBehavior behavior) {
-    var workplace = GetWorkplace(behavior, throwIfNotFound: false);
+    var workplace = behavior.GetComponent<Workplace>();
     return workplace ? [AssignedWorkersSignalName] : [];
   }
 
   /// <inheritdoc/>
   public override Func<ScriptValue> GetSignalSource(string name, AutomationBehavior behavior) {
-    var workplace = GetWorkplace(behavior);
+    var workplace = GetComponentOrThrow<Workplace>(behavior);
     return name switch {
         AssignedWorkersSignalName => () => ScriptValue.FromInt(workplace.NumberOfAssignedWorkers),
         _ => throw new UnknownSignalException(name),
@@ -46,7 +46,7 @@ sealed class WorkplaceScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override SignalDef GetSignalDefinition(string name, AutomationBehavior behavior) {
-    var workplace = GetWorkplace(behavior);
+    var workplace = GetComponentOrThrow<Workplace>(behavior);
     return name switch {
         AssignedWorkersSignalName =>
             _signalDefsCache.GetOrAdd(name, workplace.MaxWorkers, MakeAssignedWorkersSignalDef),
@@ -77,7 +77,7 @@ sealed class WorkplaceScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override string[] GetActionNamesForBuilding(AutomationBehavior behavior) {
-    var workplace = GetWorkplace(behavior, throwIfNotFound: false);
+    var workplace = behavior.GetComponent<Workplace>();
     if (!workplace) {
       return [];
     }
@@ -89,7 +89,7 @@ sealed class WorkplaceScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
-    var workplace = GetWorkplace(behavior);
+    var workplace = GetComponentOrThrow<Workplace>(behavior);
     if (name == SetPriorityActionName) {
       var priorityComponent = behavior.GetComponent<WorkplacePriority>();
       if (!priorityComponent) {
@@ -106,7 +106,7 @@ sealed class WorkplaceScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override ActionDef GetActionDefinition(string name, AutomationBehavior behavior) {
-    var workplace = GetWorkplace(behavior);
+    var workplace = GetComponentOrThrow<Workplace>(behavior);
     return name switch {
         RemoveWorkersActionName => RemoveWorkersActionDef,
         SetPriorityActionName => SetPriorityActionDef,
@@ -207,18 +207,6 @@ sealed class WorkplaceScriptableComponent : ScriptableComponentBase {
 
   #endregion
 
-  #region Implementation
-
-  static Workplace GetWorkplace(BaseComponent building, bool throwIfNotFound = true) {
-    var workplace = building.GetComponent<Workplace>();
-    if (!workplace && throwIfNotFound) {
-      throw new ScriptError.BadStateError(building, "Building doesn't have Workplace");
-    }
-    return workplace;
-  }
-
-  #endregion
-
   #region Workplace change tracker
 
   internal sealed class WorkplaceChangeTracker : AbstractStatusTracker {
@@ -226,7 +214,7 @@ sealed class WorkplaceScriptableComponent : ScriptableComponentBase {
     /// <inheritdoc/>
     public override void Start() {
       base.Start();
-      var workplace = AutomationBehavior.GetComponent<Workplace>();
+      var workplace = AutomationBehavior.GetComponentOrFail<Workplace>();
       workplace.WorkerAssigned += OnWorkerChanged;
       workplace.WorkerUnassigned += OnWorkerChanged;
     }

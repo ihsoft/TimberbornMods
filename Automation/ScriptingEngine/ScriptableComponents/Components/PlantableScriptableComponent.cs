@@ -169,8 +169,8 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
   }
 
   static PlantingSpotFinder GetPlantingSpotFinder(AutomationBehavior behavior, bool throwIfNotFound = true) {
-    var plantingCoordinates = behavior.GetComponent<InRangePlantingCoordinates>();
-    var plantingSpotFinder = behavior.GetComponent<PlantingSpotFinder>();
+    var plantingCoordinates = behavior.GetComponentOrFail<InRangePlantingCoordinates>();
+    var plantingSpotFinder = behavior.GetComponentOrFail<PlantingSpotFinder>();
     if (plantingCoordinates && plantingSpotFinder) {
       return plantingSpotFinder;
     }
@@ -276,9 +276,9 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
     }
 
     public void Awake() {
-      _plantingSpotFinder = AutomationBehavior.GetComponent<PlantingSpotFinder>();
-      _buildingTerrainRange = AutomationBehavior.GetComponent<BuildingTerrainRange>();
-      _plantingCoordinates = AutomationBehavior.GetComponent<InRangePlantingCoordinates>();
+      _plantingSpotFinder = AutomationBehavior.GetComponentOrFail<PlantingSpotFinder>();
+      _buildingTerrainRange = AutomationBehavior.GetComponentOrFail<BuildingTerrainRange>();
+      _plantingCoordinates = AutomationBehavior.GetComponentOrFail<InRangePlantingCoordinates>();
     }
 
     void ImmediateUpdateState() {

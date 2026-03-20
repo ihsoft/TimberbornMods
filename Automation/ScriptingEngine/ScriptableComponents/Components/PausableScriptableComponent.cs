@@ -26,13 +26,16 @@ sealed class PausableScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override string[] GetActionNamesForBuilding(AutomationBehavior behavior) {
-    var pausableBuilding = GetPausableBuilding(behavior, throwIfNotFound: false);
-    return pausableBuilding ? [PauseActionName, ResumeActionName] : [];
+    var pausable = behavior.GetComponent<PausableBuilding>();
+    if (!pausable || !pausable.IsPausable()) {
+      return [];
+    }
+    return [PauseActionName, ResumeActionName];
   }
 
   /// <inheritdoc/>
   public override Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
-    var pausableBuilding = GetPausableBuilding(behavior);
+    var pausableBuilding = GetComponentOrThrow<PausableBuilding>(behavior);
     return name switch {
         PauseActionName => _ => PauseAction(pausableBuilding),
         ResumeActionName => _ => ResumeAction(pausableBuilding),
@@ -41,7 +44,8 @@ sealed class PausableScriptableComponent : ScriptableComponentBase {
   }
 
   /// <inheritdoc/>
-  public override ActionDef GetActionDefinition(string name, AutomationBehavior _) {
+  public override ActionDef GetActionDefinition(string name, AutomationBehavior behavior) {
+    GetComponentOrThrow<PausableBuilding>(behavior);  // Verify only.
     return name switch {
         PauseActionName => PauseActionDef,
         ResumeActionName => ResumeActionDef,
@@ -77,21 +81,6 @@ sealed class PausableScriptableComponent : ScriptableComponentBase {
     if (building.Paused) {
       building.Resume();
     }
-  }
-
-  #endregion
-
-  #region Implementation
-
-  static PausableBuilding GetPausableBuilding(BaseComponent building, bool throwIfNotFound = true) {
-    var pausable = building.GetComponent<PausableBuilding>();
-    if (pausable && pausable.IsPausable()) {
-      return pausable;
-    }
-    if (throwIfNotFound) {
-      throw new ScriptError.BadStateError(building, "Building is not pausable");
-    }
-    return null;
   }
 
   #endregion

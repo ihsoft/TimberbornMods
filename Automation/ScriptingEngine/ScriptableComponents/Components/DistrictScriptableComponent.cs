@@ -122,17 +122,14 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
 
   /// <inheritdoc/>
   public override Func<ScriptValue> GetSignalSource(string name, AutomationBehavior behavior) {
-    var districtBuilding = behavior.GetComponent<DistrictBuilding>();
-    if (!districtBuilding) {
-      throw new ScriptError.BadStateError(behavior, "Not a district building");
-    }
+    var districtBuilding = GetComponentOrThrow<DistrictBuilding>(behavior);
     if (name.StartsWith(ResourceStockSignalNamePrefix)) {
       var goodId = ParseResourceSignalName(name).Id;
-      return () => ResourceStockSignal(behavior, goodId);
+      return () => ResourceStockSignal(districtBuilding, goodId);
     }
     if (name.StartsWith(ResourceCapacitySignalNamePrefix)) {
       var goodId = ParseResourceSignalName(name).Id;
-      return () => ResourceCapacitySignal(behavior, goodId);
+      return () => ResourceCapacitySignal(districtBuilding, goodId);
     }
     return name switch {
         BeaverPopulationSignalName => () => BeaverPopulationSignal(districtBuilding),
@@ -144,10 +141,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
 
   /// <inheritdoc/>
   public override SignalDef GetSignalDefinition(string name, AutomationBehavior behavior) {
-    var districtBuilding = behavior.GetComponent<DistrictBuilding>();
-    if (!districtBuilding) {
-      throw new ScriptError.BadStateError(behavior, "Not a district building");
-    }
+    GetComponentOrThrow<DistrictBuilding>(behavior);  // Just verify.
     if (name.StartsWith(ResourceStockSignalNamePrefix)) {
       return _signalDefsCache.GetOrAdd(name, MakeResourceStockTrackerSignalDef);
     }
@@ -248,8 +242,8 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
     };
   }
 
-  ScriptValue ResourceStockSignal(AutomationBehavior behavior, string goodId) {
-    var districtCenter = behavior.GetComponent<DistrictBuilding>().District;
+  ScriptValue ResourceStockSignal(DistrictBuilding districtBuilding, string goodId) {
+    var districtCenter = districtBuilding.District;
     if (!districtCenter) { // Disconnected buildings don't have District.
       return ScriptValue.FromInt(0);
     }
@@ -257,8 +251,8 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
     return ScriptValue.FromInt(resourceCounter.GetResourceCount(goodId).AvailableStock);
   }
 
-  ScriptValue ResourceCapacitySignal(AutomationBehavior behavior, string goodId) {
-    var districtCenter = behavior.GetComponent<DistrictBuilding>().District;
+  ScriptValue ResourceCapacitySignal(DistrictBuilding districtBuilding, string goodId) {
+    var districtCenter = districtBuilding.District;
     if (!districtCenter) { // Disconnected buildings don't have District.
       return ScriptValue.FromInt(0);
     }
@@ -321,7 +315,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
     /// <inheritdoc/>
     public override void Start() {
       base.Start();
-      var districtBuilding = AutomationBehavior.GetComponent<DistrictBuilding>();
+      var districtBuilding = AutomationBehavior.GetComponentOrFail<DistrictBuilding>();
       districtBuilding.ReassignedDistrict += OnDistrictChangedEvent;
       districtBuilding.ReassignedConstructionDistrict += OnDistrictChangedEvent;
       UpdateDistrictCenter();
@@ -331,7 +325,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
     public override void AddSignal(SignalOperator signalOperator, ISignalListener host) {
       base.AddSignal(signalOperator, host);
       var signalName = signalOperator.SignalName;
-      var district = AutomationBehavior.GetComponent<DistrictBuilding>().District;
+      var district = AutomationBehavior.GetComponentOrFail<DistrictBuilding>().District;
       var resourceCounter = district?.GetComponentInChildren<DistrictResourceCounter>();
       if (signalName.StartsWith(ResourceCapacitySignalNamePrefix)) {
         var goodId = signalName[ResourceCapacitySignalNamePrefix.Length..];
@@ -390,7 +384,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
         _currentDistrictCenter.DistrictBuildingRegistry.FinishedBuildingRegistered -= FinishedBuildingRegisteredEvent;
         _currentDistrictCenter.DistrictBuildingRegistry.FinishedBuildingUnregistered -= FinishedBuildingUnregisteredEvent;
       }
-      _currentDistrictCenter = AutomationBehavior.GetComponent<DistrictBuilding>().District;
+      _currentDistrictCenter = AutomationBehavior.GetComponentOrFail<DistrictBuilding>().District;
       if (_currentDistrictCenter) {
         TrackersWithNoDistrict.Remove(this);
         TrackersByDistrict.GetOrAdd(_currentDistrictCenter, () => []).Add(this);
