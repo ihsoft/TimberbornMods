@@ -27,7 +27,7 @@ sealed class FlowControlScriptableComponent : ScriptableComponentBase {
 
   /// <inheritdoc/>
   public override string[] GetActionNamesForBuilding(AutomationBehavior behavior) {
-    if (FlowControlAccessor.Get(behavior, throwIfNotFound: false) == null) {
+    if (!FlowControlAccessor.CanControlFlow(behavior)) {
       return [];
     }
     return [OpenActionName, CloseActionName];
@@ -87,15 +87,14 @@ sealed class FlowControlScriptableComponent : ScriptableComponentBase {
   #region Implementation
 
   sealed class FlowControlAccessor {
-    public static FlowControlAccessor Get(AutomationBehavior behavior, bool throwIfNotFound = true) {
-      var res = new FlowControlAccessor(behavior);
-      if (res._sluice || res._waterSource) {
-        return res;
-      }
-      if (throwIfNotFound) {
-        throw new ScriptError.BadStateError(behavior, "No FlowControl component found.");
-      }
-      return null;
+    public static FlowControlAccessor Get(AutomationBehavior behavior) {
+      return CanControlFlow(behavior)
+          ? new FlowControlAccessor(behavior)
+          : throw new ScriptError.BadStateError(behavior, "No FlowControl component found.");
+    }
+
+    public static bool CanControlFlow(AutomationBehavior behavior) {
+      return behavior.GetComponent<SluiceState>() || behavior.GetComponent<WaterSourceRegulator>() != null;
     }
 
     public bool IsOpen => _waterSource?.IsOpen ?? _sluice?.IsOpen ?? false;

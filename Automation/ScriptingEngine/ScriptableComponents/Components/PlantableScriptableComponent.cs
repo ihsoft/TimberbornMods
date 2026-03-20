@@ -169,8 +169,8 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
   }
 
   static PlantingSpotFinder GetPlantingSpotFinder(AutomationBehavior behavior, bool throwIfNotFound = true) {
-    var plantingCoordinates = behavior.GetComponentOrFail<InRangePlantingCoordinates>();
-    var plantingSpotFinder = behavior.GetComponentOrFail<PlantingSpotFinder>();
+    var plantingCoordinates = behavior.GetComponent<InRangePlantingCoordinates>();
+    var plantingSpotFinder = behavior.GetComponent<PlantingSpotFinder>();
     if (plantingCoordinates && plantingSpotFinder) {
       return plantingSpotFinder;
     }
