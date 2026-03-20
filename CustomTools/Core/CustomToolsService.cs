@@ -62,7 +62,7 @@ public sealed class CustomToolsService(
   /// <summary>Activates the generic game tool.</summary>
   /// <remarks>
   /// The relevant group will be looked up via <see cref="ToolGroupService"/>. If group association is not found, then
-  /// the tool will be activated without activating teh group.
+  /// the tool will be activated without activating the group.
   /// </remarks>
   public void SelectTool(ITool tool) {
     SelectTool(tool, toolGroupService._assignedToolGroups.GetOrDefault(tool)?.Id);

@@ -15,7 +15,7 @@ namespace IgorZ.TimberDev.UI;
 
 /// <summary>Simple dropdown field with a value, optional icon and an arbitrary text.</summary>
 /// <remarks>
-/// By default, it measures the size of all its items and sets the of teh control to the biggest. This can be disabled
+/// By default, it measures the size of all its items and sets the of the control to the biggest. This can be disabled
 /// via <see cref="AutoResizeToOptions"/>. Set the maximum width via the styles to prevent the control becoming too big.
 /// </remarks>
 /// <example>

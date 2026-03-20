@@ -68,7 +68,7 @@ public abstract class AbstractDynamicComponent : IStartableComponent {
 
   /// <summary>Counterpart to the Unit Start() event.</summary>
   /// <remarks>
-  /// Normally, it is called when the automation behavior object is started by Unity. If teh dynamic object is being
+  /// Normally, it is called when the automation behavior object is started by Unity. If the dynamic object is being
   /// created on already started behavior, then this method is called immediately after Awake(). The component must
   /// be enabled to get the call. When component becomes enabled, the start method will be called if not called before.
   /// </remarks>

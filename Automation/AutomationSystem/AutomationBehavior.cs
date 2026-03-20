@@ -195,7 +195,7 @@ public sealed class AutomationBehavior : BaseComponent, IAwakableComponent, IIni
 
   /// <summary>Returns the requested component or crashes the game.</summary>
   /// <remarks>Use this method in the logic where the component is normally expected to exist.</remarks>
-  /// <exception cref="InvalidOperationException">if teh component not found.</exception>
+  /// <exception cref="InvalidOperationException">if the component not found.</exception>
   /// <seealso cref="BaseComponent.GetComponent"/>
   public T GetComponentOrFail<T>() where T : BaseComponent {
     return GetComponent<T>()

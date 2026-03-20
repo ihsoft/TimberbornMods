@@ -26,7 +26,7 @@ interface IEditorButtonProvider {
 
   /// <summary>Tells if the rule row action is available for the row.</summary>
   /// <remarks>This check is done when the rule row view is activated.</remarks>
-  /// <param name="ruleRow">The rule row to check teh status for.</param>
+  /// <param name="ruleRow">The rule row to check the status for.</param>
   /// <returns></returns>
   public bool IsRuleRowBtnEnabled(RuleRow ruleRow);
 }

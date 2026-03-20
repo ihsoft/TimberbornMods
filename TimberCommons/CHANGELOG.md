@@ -1,6 +1,6 @@
 # v1.15.1 (March 2nd, 2026)
-* [Enhancement] Shorten some ruRU strings in teh stock game to avoid line wrapping in UI.
-* [Fix] Add units to teh current strength of the sluice.
+* [Enhancement] Shorten some ruRU strings in the stock game to avoid line wrapping in UI.
+* [Fix] Add units to the current strength of the sluice.
 * [Fix] Units are not formatted properly after the `1.0.10` update.
 
 # v1.15.0 (March 2nd, 2026)
