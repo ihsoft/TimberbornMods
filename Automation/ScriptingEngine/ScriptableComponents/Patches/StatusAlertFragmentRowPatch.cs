@@ -2,7 +2,6 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using HarmonyLib;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
@@ -19,7 +18,6 @@ namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Patches;
 /// </summary>
 [HarmonyPatch(typeof(StatusAlertFragmentRow), nameof(StatusAlertFragmentRow.GetAlertText))]
 static class StatusAlertFragmentRowPatch {
-  [SuppressMessage("ReSharper", "InconsistentNaming")]
   static string Postfix(string __result, bool __runOriginal) {
     if (!__runOriginal) {
       return __result;  // The other patches must follow the same style to properly support the skip logic!

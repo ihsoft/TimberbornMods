@@ -2,7 +2,6 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Diagnostics.CodeAnalysis;
 using HarmonyLib;
 using Timberborn.StatusSystem;
 using Timberborn.WorkSystem;
@@ -15,7 +14,6 @@ namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Patches;
 
 [HarmonyPatch(typeof(NoUnemployedStatus), nameof(NoUnemployedStatus.UpdateStatus))]
 static class NoUnemployedStatusPatch {
-  [SuppressMessage("ReSharper", "InconsistentNaming")]
   static bool Prefix(bool __runOriginal, Workplace ____workplace, StatusToggle ____statusToggle) {
     if (!__runOriginal) {
       return true;  // The other patches must follow the same style to properly support the skip logic!
