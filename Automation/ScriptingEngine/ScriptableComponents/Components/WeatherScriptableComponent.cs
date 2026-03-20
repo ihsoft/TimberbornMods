@@ -104,7 +104,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   /// <inheritdoc/>
   public override void RegisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
     if (signalOperator.SignalName != SeasonSignalName) {
-      throw new InvalidOperationException("Unknown signal: " + signalOperator.SignalName);
+      throw new InvalidOperationException($"Unknown signal: {signalOperator.SignalName}");
     }
     _referenceManager.AddSignal(signalOperator, host);
   }
