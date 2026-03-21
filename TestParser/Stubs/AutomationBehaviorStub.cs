@@ -17,4 +17,8 @@ public class AutomationBehavior : BaseComponent {
   public void AddRule(ScriptedCondition condition, ScriptedAction action) {
     throw new NotImplementedException();
   }
+  
+  public T GetComponentOrFail<T>() where T : BaseComponent {
+    throw new NotImplementedException();
+  }
 }
