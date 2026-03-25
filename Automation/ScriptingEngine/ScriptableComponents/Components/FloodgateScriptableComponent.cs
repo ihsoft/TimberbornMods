@@ -151,7 +151,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
       var newValue = Mathf.RoundToInt(_floodgate.Height * 100f);
       if (_currentValue != newValue) {
         _currentValue = newValue;
-        ScheduleSignal(HeightSignalName, ignoreErrors: true);
+        TriggerSignalUpdate(HeightSignalName);
       }
     }
   }

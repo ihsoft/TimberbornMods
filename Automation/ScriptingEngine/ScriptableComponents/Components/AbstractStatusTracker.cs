@@ -54,9 +54,10 @@ abstract class AbstractStatusTracker : AbstractDynamicComponent {
     }
   }
 
-  /// <inheritdoc cref="Components.ReferenceManager.ScheduleSignal" />
-  public void ScheduleSignal(string signalName, bool ignoreErrors = false) =>
-      ReferenceManager.ScheduleSignal(signalName, ignoreErrors);
+  /// <inheritdoc cref="Components.ReferenceManager.TriggerSignalUpdate" />
+  public void TriggerSignalUpdate(string signalName) {
+    ReferenceManager.TriggerSignalUpdate(signalName);
+  }
 
   #endregion
 

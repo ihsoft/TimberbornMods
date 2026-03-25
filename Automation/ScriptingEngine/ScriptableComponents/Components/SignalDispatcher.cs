@@ -124,8 +124,7 @@ class SignalDispatcher {
         throw new InvalidOperationException(
             "Signal sink has no registered operators: " + signalName + ", listener=" + entry.Key);
       }
-      _scriptingService.ScheduleSignalCallback(
-          new ScriptingService.SignalCallback(signalName, entry.Key), ignoreErrors: true);
+      _scriptingService.NotifySignalListener(signalName, entry.Key);
     }
   }
 

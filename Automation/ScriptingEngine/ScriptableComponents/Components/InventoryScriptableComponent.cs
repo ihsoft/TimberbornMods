@@ -259,7 +259,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     }
 
     void NotifyChange(object sender, InventoryAmountChangedEventArgs args) {
-      ScheduleSignal(MakeSignalName(args.GoodAmount.GoodId, _inventory), ignoreErrors: true);
+      TriggerSignalUpdate(MakeSignalName(args.GoodAmount.GoodId, _inventory));
     }
   }
 

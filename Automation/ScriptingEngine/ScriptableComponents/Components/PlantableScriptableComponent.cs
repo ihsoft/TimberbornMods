@@ -213,7 +213,7 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
           return;
         }
         _spotsForPlanting = value;
-        ScheduleSignal(SpotReadySignalName, ignoreErrors: true);
+        TriggerSignalUpdate(SpotReadySignalName);
       }
     }
     int _spotsForPlanting;

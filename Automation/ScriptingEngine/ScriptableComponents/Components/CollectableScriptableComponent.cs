@@ -213,7 +213,7 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
       if (oldState == _activeYielders) {
         return; // No change in the state.
       }
-      ScheduleSignal(CollectableReadySignalName, ignoreErrors: true);
+      TriggerSignalUpdate(CollectableReadySignalName);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

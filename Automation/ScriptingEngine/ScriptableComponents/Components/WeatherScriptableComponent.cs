@@ -217,7 +217,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
       if (!_weatherSeasonIds.Contains(_currentSeason)) {
         DebugEx.Warning("Unknown weather season ID: {0}. Automation rules won't trigger.", _currentSeason);
       }
-      _referenceManager.ScheduleSignal(SeasonSignalName, ignoreErrors: true);
+      _referenceManager.TriggerSignalUpdate(SeasonSignalName);
     }
     _seasonUpdateCoroutine = null;
   }

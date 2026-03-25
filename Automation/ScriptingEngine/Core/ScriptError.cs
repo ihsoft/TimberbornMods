@@ -22,7 +22,7 @@ abstract class ScriptError : Exception {
   ScriptError(string message) : base(message) {}
 
   /// <summary>Error during the script execution.</summary>
-  /// <remarks>This indicated an unrecoverable error on the script.</remarks>
+  /// <remarks>Such errors are recoverable. I.e. the next execution of the same script may succeed.</remarks>
   public abstract class RuntimeError(string locKey, string reason) : ScriptError(reason) {
     public string LocKey { get; } = locKey;
   }
@@ -48,9 +48,7 @@ abstract class ScriptError : Exception {
   public class DivisionByZero() : RuntimeError(DivisionByZeroLocKey, "Division by zero");
 
   /// <summary>Error that indicates an internal error in the script engine.</summary>
-  /// <remarks>
-  /// This kind of error marks the cases when the script has major problems in general. Such errors are unrecoverable.
-  /// </remarks>
+  /// <remarks>This kind of error marks the cases when the script has major problems in general.</remarks>
   public class InternalError(string reason = null) : RuntimeError(InternalErrorLocKey, reason ?? "Internal error");
 
   /// <summary>The script source is invalid and can't be properly parsed.</summary>

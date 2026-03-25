@@ -271,26 +271,18 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   }
 
   void CheckOperands() {
-    bool newState;
     try {
       ResetScriptError();
-      newState = _parsedExpression.Execute();
-    } catch (ScriptError.RuntimeError e) {
-      if (_lastScriptError != null) {
-        throw;  // Can be already handled upstream in case of recursive calls.
+      var newState = _parsedExpression.Execute();
+      if (ConditionState != newState) {
+        //FIXME: move to set staus?
+        Behavior.IncrementStateVersion();
       }
-      ReportScriptError(e);
-      throw;
+      ConditionState = newState;
+    } catch (ScriptError.RuntimeError e) {
+      _lastScriptError = e.LocKey;
+      Behavior.ReportError(this);
     }
-    if (ConditionState != newState) {
-      Behavior.IncrementStateVersion();
-    }
-    ConditionState = newState;
-  }
-
-  void ReportScriptError(ScriptError.RuntimeError e) {
-    _lastScriptError = e.LocKey;
-    Behavior.ReportError(this);
   }
 
   void ResetScriptError() {

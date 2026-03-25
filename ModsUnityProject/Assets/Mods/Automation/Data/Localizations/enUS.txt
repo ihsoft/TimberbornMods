@@ -110,6 +110,7 @@ IgorZ.Automation.Scripting.Error.ValueOutOfRange,"ERROR: Value out of range","Lo
 IgorZ.Automation.Scripting.Error.DivisionByZero,"ERROR: Division by zero","Localizable generic message for the related exception"
 IgorZ.Automation.Scripting.Error.BadValue,"ERROR: Bad value","Localizable generic message for the related exception"
 IgorZ.Automation.Scripting.Error.InternalError,"ERROR: Internal error","Localizable generic message for the related exception"
+IgorZ.Automation.Scripting.Error.StackOverflow,"ERROR: Stack overflow","Localizable generic message for the related exception"
 =,=,"UI fragment strings"
 IgorZ.Automation.AutomationFragment.AndMoreRow,"...and {0} more rules...","Indicates that there are more rules that are not shown in the panel"
 IgorZ.Automation.AutomationFragment.BuildingSignalSource,"{0} ({1})","String that represents the source signal user-friendly, and it's current value"

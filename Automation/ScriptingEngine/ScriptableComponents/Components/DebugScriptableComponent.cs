@@ -188,7 +188,7 @@ sealed class DebugScriptableComponent : ScriptableComponentBase {
 
   void OnTick(int currentTick) {
     if (_referenceManager.Signals.Count > 0) {
-      _referenceManager.ScheduleSignal(TickerSignalName, ignoreErrors: true);
+      _referenceManager.TriggerSignalUpdate(TickerSignalName);
     }
   }
 

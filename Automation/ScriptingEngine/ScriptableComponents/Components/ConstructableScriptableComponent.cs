@@ -115,14 +115,14 @@ sealed class ConstructableScriptableComponent : ScriptableComponentBase {
         var progress = Mathf.RoundToInt(constructionSite.BuildTimeProgress * 100f);
         if (progress != _prevProgress) {
           _prevProgress = progress;
-          ScheduleSignal(ProgressSignalName, ignoreErrors: true);
+          TriggerSignalUpdate(ProgressSignalName);
         }
       };
     }
 
     /// <inheritdoc/>
     public void OnEnterFinishedState() {
-      ScheduleSignal(StateSignalName, ignoreErrors: true);
+      TriggerSignalUpdate(StateSignalName);
     }
 
     /// <inheritdoc/>

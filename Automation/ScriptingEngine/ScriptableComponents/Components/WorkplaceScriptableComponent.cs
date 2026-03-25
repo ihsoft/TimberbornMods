@@ -220,7 +220,7 @@ sealed class WorkplaceScriptableComponent : ScriptableComponentBase {
     }
 
     void OnWorkerChanged(object sender, WorkerChangedEventArgs args) {
-      ScheduleSignal(AssignedWorkersSignalName, ignoreErrors: true);
+      TriggerSignalUpdate(AssignedWorkersSignalName);
     }
   }
 

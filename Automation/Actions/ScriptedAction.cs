@@ -9,6 +9,7 @@ using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.Automation.ScriptingEngineUI;
+using IgorZ.Automation.Settings;
 using IgorZ.TimberDev.UI;
 using IgorZ.TimberDev.Utils;
 using Timberborn.Persistence;
@@ -19,10 +20,13 @@ namespace IgorZ.Automation.Actions;
 sealed class ScriptedAction : AutomationActionBase {
 
   const string ParseErrorLocKey = "IgorZ.Automation.Scripting.Expressions.ParseError";
+  const string AutomationLoopErrorLocKey = "Status.Automation.AutomationLoop.Short";
+  const string StackOverflowErrorLocKey = "IgorZ.Automation.Scripting.Error.StackOverflow";
 
   #region AutomationActionBase overrides
 
   /// <inheritdoc/>
+  /// FIXME: IsPermanentlyBroken to be chacned by teh condition? or in OnStateChange
   public override bool IsInErrorState => _lastScriptError != null;
 
   /// <inheritdoc/>
@@ -70,24 +74,42 @@ sealed class ScriptedAction : AutomationActionBase {
     if (!Condition.ConditionState || IsMarkedForCleanup) {
       return;
     }
-    if (_parsedExpression == null) {
+    if (_parsedExpression == null || _isPermanentlyBroken) {
       HostedDebugLog.Error(Behavior, "Condition triggered, but the action was broken: {0}", Expression);
       return;
     }
+    var scriptingService = ScriptingService.Instance;
+    ResetScriptError();
+    scriptingService.PushToExecutionStack(this);
     try {
-      ResetScriptError();
+      if (scriptingService.GetExecutionStackSize() > ScriptEngineSettings.SignalExecutionStackSize) {
+        ReportScriptError(StackOverflowErrorLocKey);
+        DebugEx.Error(
+            "Stack overflow. Execution log:\n{0}", string.Join("\n", scriptingService.CaptureCallStack()));
+        _isPermanentlyBroken = true;
+        return;
+      }
+      if (_isExecuting) {
+        DebugEx.Error(
+            "Automation loop detected. Execution log:\n{0}", string.Join("\n", scriptingService.CaptureCallStack()));
+        ReportScriptError(AutomationLoopErrorLocKey);
+        _isPermanentlyBroken = true;
+        return;
+      }
+      _isExecuting = true;
       _parsedExpression.Execute();
       if (_parsedExpression is { ExecuteOnce: true }) {
         MarkForCleanup();
       }
-    } catch (ScriptError.RuntimeError e) {
-      if (_lastScriptError != null) {
-        throw;  // Can be already handled upstream in case of recursive calls.
-      }
-      ReportScriptError(e);
-      throw;
+    } catch (ScriptError.RuntimeError ex) {
+      ReportScriptError(ex.LocKey);
+    } finally {
+      _isExecuting = false;
+      ScriptingService.Instance.PopFromExecutionStack(this);
     }
   }
+  bool _isExecuting;
+  bool _isPermanentlyBroken;
 
   /// <inheritdoc/>
   protected override void OnBehaviorAssigned() {
@@ -197,8 +219,8 @@ sealed class ScriptedAction : AutomationActionBase {
     Expression = StaticBindings.DependencyContainer.GetInstance<LispSyntaxParser>().Decompile(_parsedExpression);
   }
 
-  void ReportScriptError(ScriptError.RuntimeError e) {
-    _lastScriptError = e.LocKey;
+  void ReportScriptError(string errorLocKey) {
+    _lastScriptError = errorLocKey;
     Behavior.ReportError(this);
   }
 

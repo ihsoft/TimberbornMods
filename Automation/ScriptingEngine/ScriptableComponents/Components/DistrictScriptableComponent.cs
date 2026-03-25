@@ -49,7 +49,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
               continue;
             }
             tracker.GoodCapacity[goodId] = value;
-            tracker.ScheduleSignal(ResourceCapacitySignalNamePrefix + goodId, ignoreErrors: true);
+            tracker.TriggerSignalUpdate(ResourceCapacitySignalNamePrefix + goodId);
           }
           foreach (var goodId in tracker.GoodStock.Keys.ToArray()) { // Need a copy!
             var value = resourceCounter._stockCounter.GetInputOutputStock(goodId)
@@ -58,7 +58,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
               continue;
             }
             tracker.GoodStock[goodId] = value;
-            tracker.ScheduleSignal(ResourceStockSignalNamePrefix + goodId, ignoreErrors: true);
+            tracker.TriggerSignalUpdate(ResourceStockSignalNamePrefix + goodId);
           }
         }
       }
@@ -70,14 +70,14 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
             continue;
           }
           tracker.GoodCapacity[goodId] = 0;
-          tracker.ScheduleSignal(ResourceCapacitySignalNamePrefix + goodId, ignoreErrors: true);
+          tracker.TriggerSignalUpdate(ResourceCapacitySignalNamePrefix + goodId);
         }
         foreach (var goodId in tracker.GoodStock.Keys.ToArray()) { // Need a copy!
           if (tracker.GoodStock[goodId] == 0) {
             continue;
           }
           tracker.GoodStock[goodId] = 0;
-          tracker.ScheduleSignal(ResourceStockSignalNamePrefix + goodId, ignoreErrors: true);
+          tracker.TriggerSignalUpdate(ResourceStockSignalNamePrefix + goodId);
         }
       }
     }
@@ -412,19 +412,19 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
 
     void OnPopulationChangedEvent(Citizen citizen = null) {
       if (citizen == null || citizen.GetComponent<BotSpec>() != null) {
-        ScheduleSignal(BotPopulationSignalName, ignoreErrors: true);
+        TriggerSignalUpdate(BotPopulationSignalName);
       }
       if (citizen == null || citizen.GetComponent<BotSpec>() == null) {
-        ScheduleSignal(BeaverPopulationSignalName, ignoreErrors: true);
+        TriggerSignalUpdate(BeaverPopulationSignalName);
       }
     }
 
     void FinishedBuildingRegisteredEvent(object sender, FinishedBuildingRegisteredEventArgs arg) {
-      ScheduleSignal(NumberOfBedsSignalName, ignoreErrors: true);
+      TriggerSignalUpdate(NumberOfBedsSignalName);
     }
 
     void FinishedBuildingUnregisteredEvent(object sender, FinishedBuildingUnregisteredEventArgs arg) {
-      ScheduleSignal(NumberOfBedsSignalName, ignoreErrors: true);
+      TriggerSignalUpdate(NumberOfBedsSignalName);
     }
 
     #endregion

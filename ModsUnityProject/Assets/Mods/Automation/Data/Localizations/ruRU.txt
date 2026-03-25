@@ -110,6 +110,7 @@ IgorZ.Automation.Scripting.Error.ValueOutOfRange,"ОШИБКА: Значение
 IgorZ.Automation.Scripting.Error.DivisionByZero,"ОШИБКА: Деление на ноль","Localizable generic message for the related exception"
 IgorZ.Automation.Scripting.Error.BadValue,"ОШИБКА: Неверное значение","Localizable generic message for the related exception"
 IgorZ.Automation.Scripting.Error.InternalError,"ОШИБКА: Внутренняя ошибка","Localizable generic message for the related exception"
+IgorZ.Automation.Scripting.Error.StackOverflow,"ОШИБКА: Стек переполнен","Localizable generic message for the related exception"
 =,=,"UI fragment strings"
 IgorZ.Automation.AutomationFragment.AndMoreRow,"...и ещё {0} правил...","Indicates that there are more rules that are not shown in the panel"
 IgorZ.Automation.AutomationFragment.BuildingSignalSource,"{0} ({1})","String that represents the source signal user-friendly, and it's current value"

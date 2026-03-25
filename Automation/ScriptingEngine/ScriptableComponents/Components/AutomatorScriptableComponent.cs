@@ -87,7 +87,7 @@ sealed class AutomatorScriptableComponent : ScriptableComponentBase {
 
   internal sealed class AutomatorStateTracker : AbstractStatusTracker {
     public void OnStateChanged() {
-      ScheduleSignal(StateSignalName, ignoreErrors: true);
+      TriggerSignalUpdate(StateSignalName);
     }
   }
 
