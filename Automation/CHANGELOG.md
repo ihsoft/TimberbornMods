@@ -1,3 +1,6 @@
+# v4.0.1 (started on March 25th, 2026):
+* [Fix] Game crashes when selecting non-automatable buildings (like rubble piles).
+
 # v4.0.0 (March 25th, 2026):
 * [BIG CHANGE] The mod is now named "Advanced Automation" to better reflect its purpose and avoid confusion with the stock game automation system.
 * [Feature] Add `SetNoticeIcon`, `SetStatusIcon`, and `SetStatus` actions to show icons and status text on the buildings.

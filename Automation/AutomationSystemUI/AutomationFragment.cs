@@ -175,6 +175,9 @@ sealed class AutomationFragment : IEntityPanelFragment, ISignalListener {
   }
 
   public void ClearFragment() {
+    if (!_automationBehavior) {
+      return;
+    }
     _scriptingService.UnregisterSignals(_signalConditionExpressions, this);
     _signalConditionExpressions.Clear();
     var goodDisallower = _automationBehavior.GetComponent<IGoodDisallower>();
