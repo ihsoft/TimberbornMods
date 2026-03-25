@@ -3,6 +3,7 @@
 * [Feature] Add `SetNoticeIcon`, `SetStatusIcon`, and `SetStatus` actions to show icons and status text on the buildings.
 * [Feature] Add new tool: Construction complete Notification. Once the buildings is completed, and icon and status text will be shown on it to notify the player.
 * [Feature] Add signal `Automator.State` to the automation buildings. If the building can be used as _source_ of the stock game automation signal, then it will have this scripting signal. It can be used "as-is" in the conditions of that building, or be exported via the normal __Extended Automation__ signals feature.
+* [Feature] Add action `Lever.SetState` to set the state of the lever.
 * [Change] Show a wider input box for the string argument values.
 * [Change] No more mod versions for the pre-1.0 game version. Use `v3.6.0` or earlier for the older game versions.
 * [Fix] Don't show `SetRecipe` action in the rules editor if there are no more than one recipe in the workshop.

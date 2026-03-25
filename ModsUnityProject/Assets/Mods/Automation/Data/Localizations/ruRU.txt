@@ -155,6 +155,7 @@ IgorZ.Automation.Scriptable.Inventory.Action.StartEmptyingStock,"начать о
 IgorZ.Automation.Scriptable.Inventory.Action.StopEmptyingStock,"прекратить освобождать","Name of the action that stops emptying the storage"
 IgorZ.Automation.Scriptable.Inventory.Signal.InputGood,"вход: {0}","Name of the condition for the inventory input goods"
 IgorZ.Automation.Scriptable.Inventory.Signal.OutputGood,"выход: {0}","Name of the condition for the inventory output goods"
+IgorZ.Automation.Scriptable.Lever.Action.SetState,"рычаг в состояние: {0}","Name of the action that sets the lever state to the specified value"
 IgorZ.Automation.Scriptable.Manufactory.Action.SetRecipe,"сменить рецепт: {0}","Name of action that sets a recipe on a manufactory"
 IgorZ.Automation.Scriptable.Notifications.Action.ClearStatus,"очистить статус","Name of the action that clears the notification status on the building"
 IgorZ.Automation.Scriptable.Notifications.Action.SetAlert,"показать предупреждение: {0}","Name of the action that sets the alert status on the building"
