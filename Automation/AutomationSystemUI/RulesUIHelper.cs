@@ -12,6 +12,7 @@ using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
+using Timberborn.Automation;
 using Timberborn.Localization;
 using UnityDev.Utils.LogUtilsLite;
 
@@ -210,7 +211,10 @@ class RulesUIHelper {
   }
 
   string GetFormattedSignalValue(SignalDef signalDef, Func<ScriptValue> signalSourceFn) {
-    return _loc.T(BuildingSignalSourceLocKey, signalDef.DisplayName, signalSourceFn().AsFloat.ToString("0.##"));
+    var displayName = signalDef.ScriptName == "Automator.State"
+        ? AutomationBehavior.GetComponentOrFail<Automator>().AutomatorName
+        : signalDef.DisplayName;
+    return _loc.T(BuildingSignalSourceLocKey, displayName, signalSourceFn().AsFloat.ToString("0.##"));
   }
 
   #endregion

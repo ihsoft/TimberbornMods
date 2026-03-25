@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using IgorZ.Automation.Actions;
@@ -16,6 +17,7 @@ using IgorZ.TimberDev.UI;
 using IgorZ.TimberDev.Utils;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
+using Timberborn.EntityNaming;
 using Timberborn.EntityPanelSystem;
 using Timberborn.InventorySystem;
 using Timberborn.TooltipSystem;
@@ -70,7 +72,6 @@ sealed class AutomationFragment : IEntityPanelFragment, ISignalListener {
   Button _copySignalsButton;
 
   AutomationBehavior _automationBehavior;
-  IGoodDisallower _goodDisallower;
   int _automationBehaviorVersion = -1;
   readonly List<SignalOperator> _signalConditionExpressions = [];
 
@@ -162,9 +163,13 @@ sealed class AutomationFragment : IEntityPanelFragment, ISignalListener {
       return;
     }
     _automationBehaviorVersion = -1;
-    _goodDisallower = entity.GetComponent<IGoodDisallower>();
-    if (_goodDisallower != null) {
-      _goodDisallower.DisallowedGoodsChanged += OnGoodDisallowerChange;
+    var goodDisallower = entity.GetComponent<IGoodDisallower>();
+    if (goodDisallower != null) {
+      goodDisallower.DisallowedGoodsChanged += OnGoodDisallowerChange;
+    }
+    var namedEntity = entity.GetComponent<NamedEntity>();
+    if (namedEntity != null) {
+      namedEntity.EntityNameChanged += OnEntityNameChanged;
     }
     _root.ToggleDisplayStyle(true);
   }
@@ -172,10 +177,15 @@ sealed class AutomationFragment : IEntityPanelFragment, ISignalListener {
   public void ClearFragment() {
     _scriptingService.UnregisterSignals(_signalConditionExpressions, this);
     _signalConditionExpressions.Clear();
-    _automationBehavior = null; // Must be after unregistering signals!
-    if (_goodDisallower != null) {
-      _goodDisallower.DisallowedGoodsChanged -= OnGoodDisallowerChange;
+    var goodDisallower = _automationBehavior.GetComponent<IGoodDisallower>();
+    if (goodDisallower != null) {
+      goodDisallower.DisallowedGoodsChanged -= OnGoodDisallowerChange;
     }
+    var namedEntity = _automationBehavior.GetComponent<NamedEntity>();
+    if (namedEntity != null) {
+      namedEntity.EntityNameChanged -= OnEntityNameChanged;
+    }
+    _automationBehavior = null; // Must be after unregistering signals!
     _root.ToggleDisplayStyle(visible: false);
     _rulesHelper.SetBuilding(null);
   }
@@ -291,5 +301,10 @@ sealed class AutomationFragment : IEntityPanelFragment, ISignalListener {
 
   void OnGoodDisallowerChange(object sender, DisallowedGoodsChangedEventArgs args) {
     _automationBehaviorVersion = -1;
+  }
+
+  void OnEntityNameChanged(object sender, EventArgs e) {
+    _automationBehaviorVersion = -1;
+    _rulesHelper.SetBuilding(_automationBehavior); // To update the descriptions with new name.
   }
 }
