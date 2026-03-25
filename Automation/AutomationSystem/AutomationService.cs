@@ -8,7 +8,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using IgorZ.Automation.Settings;
 using IgorZ.Automation.TemplateTools;
-using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.Localization;
 using Timberborn.SelectionSystem;
@@ -313,7 +312,7 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
   /// <summary>Load the rules as if they were new rules, created by the player after the game loaded.</summary>
   /// <remarks>
   /// This mode may be slow in case of many rules exist. It can also trigger side effects, resulting in a state that is
-  /// different than was at the game save. In some cases, it can be preferred, though.
+  /// different from was at the game save. In some cases, it can be preferred, though.
   /// </remarks>
   void ReexecuteLoadedRules() {
     DebugEx.Warning("[Automation system] Re-evaluating all rules on game load.");

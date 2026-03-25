@@ -4,9 +4,7 @@
 
 using System;
 using IgorZ.Automation.AutomationSystem;
-using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
-using Timberborn.BaseComponentSystem;
 using Timberborn.Buildings;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
