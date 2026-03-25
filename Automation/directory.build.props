@@ -1,6 +1,6 @@
 <Project>
    <PropertyGroup>
-      <Product>Extended Automation: Plugin for Timberborn game</Product>
+      <Product>Advanced Automation: Plugin for Timberborn game</Product>
       <Authors>IgorZ</Authors>
       <Version>4.0.0</Version>
       <Copyright>Public domain</Copyright>

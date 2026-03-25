@@ -61,6 +61,7 @@ sealed class GetPropertyFunction : AbstractFunction, IValueExpr {
     FunctionName = funcName;
     PropertyFullName = propertyFullName;
     if (funcName == FuncName.Element) {
+      //FXIME; if expression, then can throw.
       if (indexExpr is not IValueExpr valueExpr) {
         throw new ScriptError.ParsingError($"Element index must be value expression");
       }
