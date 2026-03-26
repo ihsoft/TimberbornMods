@@ -8,7 +8,6 @@ using IgorZ.TimberDev.UI;
 using Timberborn.BlockSystem;
 using Timberborn.CoreUI;
 using Timberborn.Localization;
-using Timberborn.UIFormatters;
 using Timberborn.WaterBuildings;
 using Timberborn.WaterBuildingsUI;
 using UnityEngine;
@@ -38,7 +37,7 @@ static class SluiceFragmentPatch2 {
     var val = SluiceFragmentPatch1.ThreadSafeWaterMap.WaterFlowDirection(
         ____sluice.GetComponent<BlockObject>().Coordinates);
     var currentStrength = Mathf.Max(Mathf.Abs(val.x), Mathf.Abs(val.y));
-    var formattedValue = ____loc.T(UnitFormatter.FlowUnitLocKey, CommonFormats.FormatSmallValue(currentStrength));
+    var formattedValue = ____loc.T(UnitFormats.FlowUnitLocKey, CommonFormats.FormatSmallValue(currentStrength));
     SluiceFragmentPatch1.FlowLabel.text = ____loc.T(WaterCurrentLocKey, formattedValue);
   }
 }

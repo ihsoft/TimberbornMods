@@ -1,3 +1,7 @@
+# v1.15.2 (March 25th, 2026)
+* [Update] Support game version `1.0.12.7`.
+* [Change] No more mod versions for the pre-1.0 game version.
+
 # v1.15.1 (March 2nd, 2026)
 * [Enhancement] Shorten some ruRU strings in the stock game to avoid line wrapping in UI.
 * [Fix] Add units to the current strength of the sluice.

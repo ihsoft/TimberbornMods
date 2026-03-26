@@ -6,10 +6,10 @@ using System;
 using System.Collections.Generic;
 using Bindito.Core;
 using IgorZ.TimberCommons.Common;
+using IgorZ.TimberDev.UI;
 using Timberborn.Buildings;
 using Timberborn.GoodConsumingBuildingSystem;
 using Timberborn.Localization;
-using Timberborn.UIFormatters;
 using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.TimberCommons.IrrigationSystem;
@@ -38,7 +38,7 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
   
   /// <inheritdoc/>
   public string GetTime() {
-    return UnitFormatter.FormatDays("1", _loc);
+    return UnitFormats.FormatDays("1", _loc);
   }
   
   #endregion
