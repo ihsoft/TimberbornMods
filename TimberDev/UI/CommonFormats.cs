@@ -4,7 +4,6 @@
 
 using System;
 using Timberborn.Localization;
-using Timberborn.UIFormatters;
 using UnityEngine;
 
 // ReSharper disable UnusedMember.Local
@@ -47,22 +46,22 @@ public static class CommonFormats {
   public static string DaysHoursFormat(ILoc loc, float hoursAmount) {
     switch (hoursAmount) {
       case <= 0.01f:
-        return UnitFormatter.FormatHours("0", loc);
+        return UnitFormats.FormatHours("0", loc);
       case < 1f:
-        return UnitFormatter.FormatHours(hoursAmount.ToString("0.##"), loc);
+        return UnitFormats.FormatHours(hoursAmount.ToString("0.##"), loc);
       case < 10f:
-        return UnitFormatter.FormatHours(hoursAmount.ToString("0.#"), loc);
+        return UnitFormats.FormatHours(hoursAmount.ToString("0.#"), loc);
     }
     var days = Mathf.FloorToInt(hoursAmount / 24f);
     var hours = Mathf.RoundToInt(hoursAmount % 24f);
     if (days == 0) {
-      return UnitFormatter.FormatHours(hours, loc);
+      return UnitFormats.FormatHours(hours, loc);
     }
     if (hours == 0) {
-      return UnitFormatter.FormatDays(days.ToString(), loc);  // We don't want the fractional part.
+      return UnitFormats.FormatDays(days.ToString(), loc);  // We don't want the fractional part.
     }
-    var daysStr = UnitFormatter.FormatDays(days.ToString(), loc);  // We don't want the fractional part.
-    var hoursStr = UnitFormatter.FormatHours(hours, loc);
+    var daysStr = UnitFormats.FormatDays(days.ToString(), loc);  // We don't want the fractional part.
+    var hoursStr = UnitFormats.FormatHours(hours, loc);
     return daysStr + " " + hoursStr;
   }
 
