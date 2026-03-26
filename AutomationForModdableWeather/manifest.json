@@ -1,13 +1,13 @@
 {
   "Name": "Automation+ModdableWeather",
-  "Version": "1.1.0",
+  "Version": "1.1.1",
   "Id": "Timberborn.IgorZ.AutomationForModdableWeather",
-  "MinimumGameVersion": "1.0.6.0",
-  "Description": "Autiomation and ModdableWeather integration",
+  "MinimumGameVersion": "1.0.12.7",
+  "Description": "Automation and ModdableWeather integration",
   "RequiredMods": [
     {
       "Id": "Timberborn.IgorZ.Automation",
-      "MinimumVersion": "3.2.0"
+      "MinimumVersion": "4.0.0"
     },
     {
       "Id": "ModdableWeathers",
