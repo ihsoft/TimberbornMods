@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using IgorZ.Automation.Actions;
 using IgorZ.Automation.Conditions;
 using Timberborn.BaseComponentSystem;
@@ -8,6 +9,7 @@ namespace IgorZ.Automation.AutomationSystem;
 
 public class AutomationBehavior : BaseComponent {
   public BlockObject BlockObject => throw new NotImplementedException();
+  public IList<ScriptedAction> Actions => throw new NotImplementedException();
   public T GetOrCreate<T>() where T : AbstractDynamicComponent {
     throw new NotImplementedException();
   }

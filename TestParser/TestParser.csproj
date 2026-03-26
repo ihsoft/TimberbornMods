@@ -218,6 +218,9 @@
       <Compile Include="..\TimberDev\UI\UiFactory.cs">
         <Link>Import\TimberDev\UI\UiFactory.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\UI\UnitFormats.cs">
+        <Link>Import\TimberDev\UI\UnitFormats.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\UI\VisualEffects.cs">
         <Link>Import\TimberDev\UI\VisualEffects.cs</Link>
       </Compile>
