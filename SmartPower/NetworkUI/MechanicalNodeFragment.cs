@@ -10,7 +10,6 @@ using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
 using Timberborn.Localization;
 using Timberborn.MechanicalSystem;
-using Timberborn.UIFormatters;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -84,7 +83,7 @@ sealed class MechanicalNodeFragment : IEntityPanelFragment {
     }
 
     var graph = _mechanicalNode.Graph;
-    var totalChargeStr = UnitFormatter.FormatPowerCapacity(graph.BatteryCharge, _loc);
+    var totalChargeStr = UnitFormats.FormatPowerCapacity(graph.BatteryCharge, _loc);
     string batteryCapacityStr;
     if (BatteriesSettings.BatteryCapacityAsPct) {
       var chargePct = Mathf.RoundToInt(100.0f * graph.BatteryCharge / batteryTotalCapacity);
@@ -100,16 +99,16 @@ sealed class MechanicalNodeFragment : IEntityPanelFragment {
       var timeLeft = (float)graph.BatteryCharge / batteryPowerNeed;
       var flowStr = _loc.T(
           BatteryDischarging,
-          UnitFormatter.FormatPower(batteryPowerNeed, _loc),
-          UnitFormatter.FormatHours(timeLeft.ToString("0.0"), _loc));
+          UnitFormats.FormatPower(batteryPowerNeed, _loc),
+          UnitFormats.FormatHours(timeLeft.ToString("0.0"), _loc));
       batteryStatus = $"{batteryCapacityStr}\n{flowStr}";
     } else if (batteryPowerNeed < 0 && graph.BatteryCharge < batteryTotalCapacity) {
       // Some discharged batteries being charged using the excess power.
       var timeLeft = (float)(batteryTotalCapacity - graph.BatteryCharge) / -batteryPowerNeed;
       var flowStr = _loc.T(
           BatteryCharging,
-          UnitFormatter.FormatPower(-batteryPowerNeed, _loc),
-          UnitFormatter.FormatHours(timeLeft.ToString("0.0"), _loc));
+          UnitFormats.FormatPower(-batteryPowerNeed, _loc),
+          UnitFormats.FormatHours(timeLeft.ToString("0.0"), _loc));
       batteryStatus = $"{batteryCapacityStr}\n{flowStr}";
     } else if (batteryPowerNeed > 0 && graph.BatteryCharge < float.Epsilon) {
       // Batteries depleted.

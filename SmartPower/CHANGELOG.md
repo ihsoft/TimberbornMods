@@ -1,3 +1,7 @@
+# v1.16.1 (March 25th, 2026)
+* [Update] Support game version `1.0.12.7`.
+* [Change] No more mod versions for the pre-1.0 game version.
+
 # v1.16.0 (March 2nd, 2026)
 * [Update] Support game version `1.0.11`.
 * [Enhancement] Make some ruRU strings more compact to avoid line wrapping in UI.

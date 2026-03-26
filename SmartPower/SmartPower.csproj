@@ -104,6 +104,9 @@
       <Compile Include="..\TimberDev\UI\UiFactory.cs">
         <Link>TimberDev\UI\UiFactory.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\UI\UnitFormats.cs">
+        <Link>TimberDev\UI\UnitFormats.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\Utils\CustomizableInstantiator.cs">
         <Link>TimberDev\Utils\CustomizableInstantiator.cs</Link>
       </Compile>
