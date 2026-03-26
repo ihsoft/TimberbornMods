@@ -1,6 +1,6 @@
 {
   "Name": "Advanced Automation",
-  "Version": "4.0.0",
+  "Version": "4.0.2",
   "Id": "Timberborn.IgorZ.Automation",
   "MinimumGameVersion": "1.0.12.0",
   "Description": "This mod gives a way to use a simple script to automate a lot of things in the game! It goes beyond the vanilla automation and allows you to create your own custom tools with custom conditions and actions. It also includes a lot of pre-made tools that you can use right away.",

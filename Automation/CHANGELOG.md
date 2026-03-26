@@ -1,3 +1,6 @@
+# v4.0.2 (started on March 25th, 2026):
+* [Update] Support game version `1.0.12.7`.
+
 # v4.0.1 (started on March 25th, 2026):
 * [Fix] Game crashes when selecting non-automatable buildings (like rubble piles).
 
