@@ -18,6 +18,7 @@ using Timberborn.Common;
 using Timberborn.Cutting;
 using Timberborn.EntitySystem;
 using Timberborn.Forestry;
+using Timberborn.GoodStackSystem;
 using Timberborn.Growing;
 using Timberborn.NaturalResourcesLifecycle;
 using Timberborn.Ruins;
@@ -208,6 +209,18 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
         var yielder = _yielders.ElementAt(i);
         if (yielder.IsYielding && (_noAliveCheck || yielder.IsAlive())) {
           ++_activeYielders;
+          continue;
+        }
+        // If a good stack is created, it consumes the whole yielder content.
+        var goodStack = yielder.GetComponent<GoodStack>();
+        if (!goodStack) {
+          continue;
+        }
+        goodStack.GoodStackDisabled -= OnGoodStackDisabled;
+        var hasGood = goodStack.Inventory.Enabled && !goodStack.Inventory.IsEmpty;
+        if (hasGood) {
+          ++_activeYielders;
+          goodStack.GoodStackDisabled += OnGoodStackDisabled;
         }
       }
       if (oldState == _activeYielders) {
@@ -324,6 +337,13 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
 
     /// <summary>Monitors for changes in the yielders amounts.</summary>
     void OnYielderUpdate(object sender, EventArgs e) {
+      _yieldersChanged = true;
+      ScheduleStateUpdate();
+    }
+
+    /// <summary>Monitors good stack changes when the cuttable was moved to it.</summary>
+    /// <remarks>The stack inventory gets disabled when the last item was removed (delivered).</remarks>
+    void OnGoodStackDisabled(object sender, EventArgs _) {
       _yieldersChanged = true;
       ScheduleStateUpdate();
     }
