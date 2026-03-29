@@ -175,8 +175,8 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
     }
 
     public void Awake() {
-      _buildingTerrainRange = AutomationBehavior.GetComponent<BuildingTerrainRange>();
-      _yieldRemovingBuilding = AutomationBehavior.GetComponent<YieldRemovingBuilding>();
+      _buildingTerrainRange = AutomationBehavior.GetComponentOrFail<BuildingTerrainRange>();
+      _yieldRemovingBuilding = AutomationBehavior.GetComponentOrFail<YieldRemovingBuilding>();
       _needsCuttingArea = AutomationBehavior.GetComponent<LumberjackFlagWorkplaceBehavior>();
       _noAliveCheck = _needsCuttingArea || AutomationBehavior.GetComponent<ScavengerWorkplaceBehavior>();
     }
@@ -330,13 +330,13 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
 
     /// <summary>Monitors for changes in the building-reachable area.</summary>
     /// <remarks>It is handled in ticks, so it doesn't happen on pause.</remarks>
-    void BuildingRangeChanged(object sender, RangeChangedEventArgs args) {
+    void BuildingRangeChanged(object sender, RangeChangedEventArgs _) {
       _rangeChanged = true;
       ScheduleStateUpdate();
     }
 
     /// <summary>Monitors for changes in the yielders amounts.</summary>
-    void OnYielderUpdate(object sender, EventArgs e) {
+    void OnYielderUpdate(object sender, EventArgs _) {
       _yieldersChanged = true;
       ScheduleStateUpdate();
     }
