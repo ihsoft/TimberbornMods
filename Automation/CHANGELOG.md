@@ -1,7 +1,10 @@
-# v4.0.2 (started on March 25th, 2026):
+# v4.0.3 (March 26th, 2026):
+* [Fix] Water flow control actions crash the game.
+
+# v4.0.2 (March 25th, 2026):
 * [Update] Support game version `1.0.12.7`.
 
-# v4.0.1 (started on March 25th, 2026):
+# v4.0.1 (March 25th, 2026):
 * [Fix] Game crashes when selecting non-automatable buildings (like rubble piles).
 
 # v4.0.0 (March 25th, 2026):

@@ -123,8 +123,8 @@ sealed class FlowControlScriptableComponent : ScriptableComponentBase {
     readonly WaterSourceRegulator _waterSource;
 
     FlowControlAccessor(AutomationBehavior behavior) {
-      _sluice = behavior.GetComponentOrFail<SluiceState>();
-      _waterSource = behavior.GetComponentOrFail<WaterSourceRegulator>();
+      _sluice = behavior.GetComponent<SluiceState>();
+      _waterSource = behavior.GetComponent<WaterSourceRegulator>();
     }
   }
 
