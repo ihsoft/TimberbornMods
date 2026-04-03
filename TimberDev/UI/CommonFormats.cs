@@ -55,13 +55,13 @@ public static class CommonFormats {
     var days = Mathf.FloorToInt(hoursAmount / 24f);
     var hours = Mathf.RoundToInt(hoursAmount % 24f);
     if (days == 0) {
-      return UnitFormats.FormatHours(hours, loc);
+      return UnitFormats.FormatHours(hours.ToString(), loc);
     }
     if (hours == 0) {
       return UnitFormats.FormatDays(days.ToString(), loc);  // We don't want the fractional part.
     }
     var daysStr = UnitFormats.FormatDays(days.ToString(), loc);  // We don't want the fractional part.
-    var hoursStr = UnitFormats.FormatHours(hours, loc);
+    var hoursStr = UnitFormats.FormatHours(hours.ToString(), loc);
     return daysStr + " " + hoursStr;
   }
 

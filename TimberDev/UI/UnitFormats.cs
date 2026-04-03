@@ -25,19 +25,11 @@ public static class UnitFormats {
   public const string PowerCapacityPerMeterUnitLocKey = "Unit.HorsePowerHourPerMeter.NumberAndUnit";
 
   public static string FormatTicks(int value, ILoc loc) {
-    return loc.T(TickUnitLocKey, value);
-  }
-
-  public static string FormatHours(int value, ILoc loc) {
-    return loc.T(HourUnitLocKey, $"{value}");
+    return loc.T(TickUnitLocKey, value.ToString());
   }
 
   public static string FormatHours(string value, ILoc loc) {
     return loc.T(HourUnitLocKey, value);
-  }
-
-  public static string FormatDays(float value, ILoc loc) {
-    return loc.T(DayUnitLocKey, $"{value:F1}");
   }
 
   public static string FormatDays(string value, ILoc loc) {
@@ -45,30 +37,26 @@ public static class UnitFormats {
   }
 
   public static string FormatFlow(float value, ILoc loc) {
-    return loc.T(FlowUnitLocKey, $"{value:F2}");
+    return loc.T(FlowUnitLocKey, value.ToString("F2"));
   }
 
   public static string FormatDistance(float value, ILoc loc) {
-    return loc.T(DistanceUnitLocKey, $"{value:F2}");
-  }
-
-  public static string FormatDistance(int value, ILoc loc) {
-    return loc.T(DistanceUnitLocKey, $"{value}");
+    return loc.T(DistanceUnitLocKey, value.ToString("F2"));
   }
 
   public static string FormatAngle(int value, ILoc loc) {
-    return loc.T(AngleUnitLocKey, value);
+    return loc.T(AngleUnitLocKey, value.ToString());
   }
 
   public static string FormatPower(int value, ILoc loc) {
-    return loc.T(PowerUnitLocKey, value);
+    return loc.T(PowerUnitLocKey, value.ToString());
   }
 
   public static string FormatPowerCapacity(int value, ILoc loc) {
-    return loc.T(PowerCapacityUnitLocKey, value);
+    return loc.T(PowerCapacityUnitLocKey, value.ToString());
   }
 
   public static string FormatPowerCapacityPerMeter(int value, ILoc loc) {
-    return loc.T(PowerCapacityPerMeterUnitLocKey, value);
+    return loc.T(PowerCapacityPerMeterUnitLocKey, value.ToString());
   }
 }
