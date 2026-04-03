@@ -12,7 +12,7 @@ namespace IgorZ.SmartPower.Settings;
 
 sealed class WorkplaceConsumerSettings : BaseSettings<WorkplaceConsumerSettings> {
 
-  const string HeaderStringLocKey = "IgorZ.SmartPower.Settings.UnmannedConsumerSection";
+  const string HeaderStringLocKey = "IgorZ.SmartPower.Settings.WorkplaceConsumerSection";
   const string ShowFloatingIconLocKey = "IgorZ.SmartPower.Settings.UI.ShowFloatingIcon";
   const string SuspendDelayMinutesLocKey = "IgorZ.SmartPower.Settings.Hysteresis.SuspendDelay";
   const string ResumeDelayMinutesLocKey = "IgorZ.SmartPower.Settings.Hysteresis.ResumeDelay";

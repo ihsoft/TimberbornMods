@@ -1,3 +1,7 @@
+# v1.16.2 (April 3rd, 2026)
+* [Fix] Settings sections title for the buildings with workplaces is misspelled.
+* [Fix] Game logs get spammed with localization strings formatting errors.
+
 # v1.16.1 (March 25th, 2026)
 * [Update] Support game version `1.0.12.7`.
 * [Change] No more mod versions for the pre-1.0 game version.
