@@ -199,8 +199,8 @@ sealed class AutomationFragment : IEntityPanelFragment, ISignalListener {
     }
     _automationBehaviorVersion = _automationBehavior.StateVersion;
     _rulesHelper.SetBuilding(_automationBehavior);
-    SetRulesListFolded(_rulesListFolded);
-    SetSignalsListFolded(_signalsListFolded);
+    SetRulesListFolded(_rulesListFolded && !_rulesHelper.HasFailedRules);
+    SetSignalsListFolded(_signalsListFolded && !_rulesHelper.HasFailedBindings);
 
     // Signals panel.
     var totalSignalsCount = _rulesHelper.BuildingSignalNames.Count;

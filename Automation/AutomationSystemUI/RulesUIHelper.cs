@@ -62,6 +62,9 @@ class RulesUIHelper {
   public IReadOnlyList<string> BuildingSignalNames => _buildingSignalNames;
   readonly List<string> _buildingSignalNames = [];
 
+  public bool HasFailedRules { get; private set; }
+  public bool HasFailedBindings { get; private set; }
+
   /// <summary>Sets the building that is being edited.</summary>
   /// <remarks>All the internal state is reset.</remarks>
   public void SetBuilding(AutomationBehavior automationBehavior) {
@@ -69,6 +72,8 @@ class RulesUIHelper {
     _buildingSignals.Clear();
     _buildingRules.Clear();
     ExposedSignalsCount = 0;
+    HasFailedRules = false;
+    HasFailedBindings = false;
     if (!automationBehavior) {
       return;
     }
@@ -91,10 +96,12 @@ class RulesUIHelper {
       if (action is ScriptedAction scriptedAction) {
         var buildingSignalName = TryGetSignalMapping(scriptedAction).buildingSignal;
         if (buildingSignalName != null) {
+          HasFailedBindings |= action.IsInErrorState;
           mappings.Add((buildingSignalName, scriptedAction));
           continue;
         }
       }
+      HasFailedRules |= action.IsInErrorState;
       _buildingRules.Add(action);
     }
     _buildingSignalNames.Clear();
