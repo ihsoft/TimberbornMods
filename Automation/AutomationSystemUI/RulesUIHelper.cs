@@ -28,6 +28,7 @@ class RulesUIHelper {
     public string Describe => DescribeFn();
     public string SignalName { get; init; }
     public string ExportedSignalName { get; init; }
+    public string DisplaySignalName { get; init; }
     public ScriptedAction Action { get; init; }
     internal Func<string> DescribeFn { get; init; }
   }
@@ -121,13 +122,14 @@ class RulesUIHelper {
         });
         continue;
       }
-      foreach (var existingMapping in existingMappings) {
+      foreach (var (_, action) in existingMappings) {
         ExposedSignalsCount++;
         _buildingSignals.Add(new BuildingSignal {
             SignalName = signalName,
             DescribeFn = describeFn,
-            ExportedSignalName = TryGetSignalMapping(existingMapping.action).customSignal,
-            Action = existingMapping.action,
+            ExportedSignalName = TryGetSignalMapping(action).customSignal,
+            DisplaySignalName = action.IsInErrorState ? action.UiDescription : TryGetSignalMapping(action).customSignal,
+            Action = action,
         });
       }
     }
@@ -140,6 +142,7 @@ class RulesUIHelper {
           SignalName = buildingSignalName,
           DescribeFn = () => GetFormattedSignalValue(signalDef, signalSourceFn),
           ExportedSignalName = TryGetSignalMapping(action).customSignal,
+          DisplaySignalName = action.IsInErrorState ? action.UiDescription : TryGetSignalMapping(action).customSignal,
           Action = action,
       });
     }

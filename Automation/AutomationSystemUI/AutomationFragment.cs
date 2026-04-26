@@ -218,7 +218,7 @@ sealed class AutomationFragment : IEntityPanelFragment, ISignalListener {
       }
       var row = _uiFactory.LoadVisualElement(SignalRowTemplate);
       row.Q2<Label>("Source").text = signalMapping.Describe;
-      row.Q2<Label>("Target").text = signalMapping.ExportedSignalName;
+      row.Q2<Label>("Target").text = signalMapping.DisplaySignalName;
       if (signalMapping.Action != null) {
         row.Q2<VisualElement>("Container").SetEnabled(signalMapping.Action.Condition.IsActive);
       }
