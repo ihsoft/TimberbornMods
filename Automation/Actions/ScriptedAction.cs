@@ -26,7 +26,7 @@ sealed class ScriptedAction : AutomationActionBase {
   #region AutomationActionBase overrides
 
   /// <inheritdoc/>
-  /// FIXME: IsPermanentlyBroken to be chacned by teh condition? or in OnStateChange
+  /// FIXME: IsPermanentlyBroken to be changed by the condition? or in OnStateChange
   public override bool IsInErrorState => _lastScriptError != null;
 
   /// <inheritdoc/>
