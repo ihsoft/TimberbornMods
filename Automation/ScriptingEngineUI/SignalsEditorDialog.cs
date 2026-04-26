@@ -39,7 +39,9 @@ sealed class SignalsEditorDialog : AbstractDialog {
       if (exportedSignal.CustomSignalField.value == "") {
         continue;
       }
-      _rulesUiHelper.SetExportedSignalName(exportedSignal.Signal.SignalName, exportedSignal.CustomSignalField.value);
+      _rulesUiHelper.SetExportedSignalName(
+          exportedSignal.Signal.SignalName, exportedSignal.CustomSignalField.value,
+          templateFamily: exportedSignal.Signal.Action.TemplateFamily);
     }
   }
 

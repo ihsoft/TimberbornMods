@@ -153,13 +153,16 @@ class RulesUIHelper {
   /// Then: (act Signals.Set 'ExportedSignalName' (sig BuildingSignalName))
   /// </code>
   /// </remarks>
-  public void SetExportedSignalName(string buildingSignalName, string exportedSignalName) {
+  public void SetExportedSignalName(
+      string buildingSignalName, string exportedSignalName, string templateFamily = null) {
     if (!_buildingSignalNames.Contains(buildingSignalName)) {
       HostedDebugLog.Warning(AutomationBehavior, "Signal '{0}' is not available on the building.", buildingSignalName);
     }
     var condition = new ScriptedCondition();
     condition.SetExpression($"(eq (sig {buildingSignalName}) (sig {buildingSignalName}))");
-    var action = new ScriptedAction();
+    var action = new ScriptedAction {
+        TemplateFamily = templateFamily,
+    };
     action.SetExpression($"(act Signals.Set '{exportedSignalName}' (sig {buildingSignalName}))");
     AutomationBehavior.AddRule(condition, action);
   }
