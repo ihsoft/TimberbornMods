@@ -271,14 +271,10 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
   }
 
   void CheckOperands() {
+    Behavior.IncrementStateVersion();
     try {
       ResetScriptError();
-      var newState = _parsedExpression.Execute();
-      if (ConditionState != newState) {
-        //FIXME: move to set staus?
-        Behavior.IncrementStateVersion();
-      }
-      ConditionState = newState;
+      ConditionState = _parsedExpression.Execute();
     } catch (ScriptError.RuntimeError e) {
       _lastScriptError = e.LocKey;
       Behavior.ReportError(this);
