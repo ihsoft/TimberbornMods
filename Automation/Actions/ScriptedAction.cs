@@ -105,7 +105,7 @@ sealed class ScriptedAction : AutomationActionBase {
       ReportScriptError(ex.LocKey);
     } finally {
       _isExecuting = false;
-      ScriptingService.Instance.PopFromExecutionStack(this);
+      scriptingService.PopFromExecutionStack(this);
     }
   }
   bool _isExecuting;
@@ -169,12 +169,14 @@ sealed class ScriptedAction : AutomationActionBase {
 
   static readonly PropertyKey<string> ExpressionKey = new("Expression");
   static readonly PropertyKey<string> HasScriptErrorKey = new("ScriptError");
+  static readonly PropertyKey<bool> IsPermanentlyBrokenKey = new("IsPermanentlyBroken");
 
   /// <inheritdoc/>
   public override void LoadFrom(IObjectLoader objectLoader) {
     base.LoadFrom(objectLoader);
     Expression = objectLoader.Get(ExpressionKey);
     _lastScriptError = objectLoader.GetValueOrDefault(HasScriptErrorKey, null);
+    _isPermanentlyBroken = objectLoader.GetValueOrDefault(IsPermanentlyBrokenKey);
   }
 
   /// <inheritdoc/>
@@ -184,6 +186,7 @@ sealed class ScriptedAction : AutomationActionBase {
     if (_lastScriptError != null) {
       objectSaver.Set(HasScriptErrorKey, _lastScriptError);
     }
+    objectSaver.Set(IsPermanentlyBrokenKey, _isPermanentlyBroken);
   }
 
   #endregion
@@ -209,7 +212,6 @@ sealed class ScriptedAction : AutomationActionBase {
     if (_parsingResult != default) {
       throw new InvalidOperationException($"{nameof(ParseAndApply)} should only be called once.");
     }
-    ResetScriptError();
     _parsedExpression = ParseAndValidate(Expression, Behavior, out _parsingResult);
     if (_parsedExpression == null) {
       _lastScriptError = ParseErrorLocKey;

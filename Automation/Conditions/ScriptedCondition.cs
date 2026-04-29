@@ -235,7 +235,6 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
     if (_parsingResult != default) {
       throw new InvalidOperationException($"{nameof(ParseAndApply)} should only be called once.");
     }
-    ResetScriptError();
     _parsedExpression = ParseAndValidate(Expression, Behavior, out _parsingResult);
     if (_parsedExpression == null) {
       _lastScriptError = ParseErrorLocKey;
