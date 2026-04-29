@@ -118,9 +118,7 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
     }
     GetPlantingSpotFinder(host.Behavior);
     var tracker = host.Behavior.GetOrCreate<PlantableTracker>();
-    var hadSignals = tracker.HasSignals;
-    tracker.AddSignal(signalOperator, host);
-    if (!hadSignals && tracker.HasSignals) {
+    if (tracker.AddSignal(signalOperator, host)) {
       _allTrackers.Add(tracker);
     }
   }
@@ -128,8 +126,7 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
   /// <inheritdoc/>
   public override void UnregisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
     var tracker = host.Behavior.GetOrThrow<PlantableTracker>();
-    tracker.RemoveSignal(signalOperator, host);
-    if (!tracker.HasSignals) {
+    if (!tracker.RemoveSignal(signalOperator, host)) {
       _allTrackers.Remove(tracker);
     }
   }
@@ -209,9 +206,6 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
     public int SpotsForPlanting {
       get => _spotsForPlanting;
       private set {
-        if (_spotsForPlanting == value) {
-          return;
-        }
         _spotsForPlanting = value;
         TriggerSignalUpdate(SpotReadySignalName);
       }

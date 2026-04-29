@@ -278,17 +278,25 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     Emptiable _emptiable;
 
     /// <inheritdoc/>
-    protected override void OnFirstReference() {
+    public override bool AddAction(ActionOperator actionOperator) {
+      if (!base.AddAction(actionOperator)) {
+        return false;
+      }
       if (_statusToggle != null) {  // On game load, add ref is called before the Start() event gets executed.
         RefreshStatus();
       }
+      return true;
     }
 
     /// <inheritdoc/>
-    protected override void OnLastReference() {
+    public override bool RemoveAction(ActionOperator actionOperator) {
+      if (base.RemoveAction(actionOperator)) {
+        return true;
+      }
       if (_emptiable.IsMarkedForEmptying) {
         _emptiable.UnmarkForEmptying();
       }
+      return false;
     }
 
     [Inject]

@@ -143,17 +143,11 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
 
   internal sealed class StreamGaugeTracker : AbstractStatusTracker {
     StreamGauge _streamGauge;
-    int _prevWaterLevel;
-    int _prevContaminationLevel;
-    int _prevWaterCurrent;
 
     /// <inheritdoc/>
     public override void Start() {
       base.Start();
       _streamGauge = AutomationBehavior.GetComponentOrFail<StreamGauge>();
-      _prevWaterLevel = Mathf.RoundToInt(_streamGauge.WaterLevel * 100f);
-      _prevContaminationLevel = Mathf.RoundToInt(_streamGauge.ContaminationLevel * 100f);
-      _prevWaterCurrent = Mathf.RoundToInt(_streamGauge.WaterCurrent * 100f);
       AutomationBehavior.GetComponentOrFail<StreamGaugeCheckTicker>().EnableComponent();
     }
 
@@ -161,21 +155,9 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
       if (!_streamGauge) {
         return;
       }
-      var waterLevel = Mathf.RoundToInt(_streamGauge.WaterLevel * 100f);
-      if (_prevWaterLevel != waterLevel) {
-        _prevWaterLevel = waterLevel;
-        TriggerSignalUpdate(DepthSignalName);
-      }
-      var contaminationLevel = Mathf.RoundToInt(_streamGauge.ContaminationLevel * 100f);
-      if (_prevContaminationLevel != contaminationLevel) {
-        _prevContaminationLevel = contaminationLevel;
-        TriggerSignalUpdate(ContaminationSignalName);
-      }
-      var waterCurrent = Mathf.RoundToInt(_streamGauge.WaterCurrent * 100f);
-      if (_prevWaterCurrent != waterCurrent) {
-        _prevWaterCurrent = waterCurrent;
-        TriggerSignalUpdate(CurrentSignalName);
-      }
+      TriggerSignalUpdate(DepthSignalName);
+      TriggerSignalUpdate(ContaminationSignalName);
+      TriggerSignalUpdate(CurrentSignalName);
     }
   }
 

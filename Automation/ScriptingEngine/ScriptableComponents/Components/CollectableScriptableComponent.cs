@@ -203,7 +203,6 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
       _yieldersChanged = false;
 
       HostedDebugLog.Fine(AutomationBehavior, "Recalculating {0} yielders", _yielders.Count);
-      var oldState = _activeYielders;
       _activeYielders = 0;
       for (var i = _yielders.Count - 1; i >= 0; i--) {
         var yielder = _yielders.ElementAt(i);
@@ -222,9 +221,6 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
           ++_activeYielders;
           goodStack.GoodStackDisabled += OnGoodStackDisabled;
         }
-      }
-      if (oldState == _activeYielders) {
-        return; // No change in the state.
       }
       TriggerSignalUpdate(CollectableReadySignalName);
     }

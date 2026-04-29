@@ -6,7 +6,6 @@ using System;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Expressions;
 using Timberborn.WaterBuildings;
-using UnityEngine;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 
@@ -123,7 +122,7 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   static void SetHeightAction(Floodgate floodgate, ScriptValue[] args) {
     AssertActionArgsCount(SetHeightActionName, args, 1);
     var currentHeight = ScriptValue.FromFloat(floodgate.Height);
-    if (args[0] != currentHeight) {
+    if (args[0] != currentHeight) {  // Setting height destroys water even if the value is the same.
       floodgate.SetHeight(args[0].AsFloat);
     }
   }
@@ -133,25 +132,8 @@ sealed class FloodgateScriptableComponent : ScriptableComponentBase {
   #region Inventory change tracker component
 
   internal sealed class HeightChangeTracker : AbstractStatusTracker {
-    Floodgate _floodgate;
-    int _currentValue;
-
-    /// <inheritdoc/>
-    public override void Start() {
-      base.Start();
-      _floodgate = AutomationBehavior.GetComponentOrFail<Floodgate>();
-      _currentValue = Mathf.RoundToInt(_floodgate.Height * 100f);
-    }
-
     public void OnHeighChanged() {
-      if (!_floodgate) {
-        return;
-      }
-      var newValue = Mathf.RoundToInt(_floodgate.Height * 100f);
-      if (_currentValue != newValue) {
-        _currentValue = newValue;
-        TriggerSignalUpdate(HeightSignalName);
-      }
+      TriggerSignalUpdate(HeightSignalName);
     }
   }
 

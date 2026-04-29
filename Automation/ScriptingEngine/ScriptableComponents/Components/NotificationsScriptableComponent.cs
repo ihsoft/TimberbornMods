@@ -230,7 +230,7 @@ sealed class NotificationsScriptableComponent : ScriptableComponentBase {
 
   #region Helper BaseComponent to show blocked status
 
-  internal sealed class StatusController : AbstractStatusTracker, IPersistentEntity {
+  internal sealed class StatusController : AbstractStatusTracker {
 
     #region API
 
@@ -267,7 +267,8 @@ sealed class NotificationsScriptableComponent : ScriptableComponentBase {
     static readonly PropertyKey<string> StatusStateKey = new("StatusState");
 
     /// <inheritdoc/>
-    public void Save(IEntitySaver entitySaver) {
+    public override void Save(IEntitySaver entitySaver) {
+      base.Save(entitySaver);
       if (_currentStatusToggle is not { IsActive: true }) {
         return;
       }
@@ -276,20 +277,26 @@ sealed class NotificationsScriptableComponent : ScriptableComponentBase {
     }
 
     /// <inheritdoc/>
-    public void Load(IEntityLoader entityLoader) {
+    public override void Load(IEntityLoader entityLoader) {
+      base.Load(entityLoader);
       if (!entityLoader.TryGetComponent(StatusControllerKey, out var component)) {
         return;
       }
       var statusDef = StringProtoSerializer.Deserialize<StatusDef>(component.Get(StatusStateKey));
       SetStatusState(statusDef, true);
     }
+
     #endregion
 
     #region AbstractStatusTracker implementation
 
     /// <inheritdoc/>
-    protected override void OnLastReference() {
+    public override bool RemoveAction(ActionOperator actionOperator) {
+      if (base.RemoveAction(actionOperator)) {
+        return true;
+      }
       ClearCurrentStatus();
+      return false;
     }
 
     #endregion

@@ -45,18 +45,12 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
         foreach (var tracker in pair.Value) {
           foreach (var goodId in tracker.GoodCapacity.Keys.ToArray()) { // Need a copy!
             var value = resourceCounter._capacityCounter.GetInputOutputCapacity(goodId);
-            if (tracker.GoodCapacity[goodId] == value) {
-              continue;
-            }
             tracker.GoodCapacity[goodId] = value;
             tracker.TriggerSignalUpdate(ResourceCapacitySignalNamePrefix + goodId);
           }
           foreach (var goodId in tracker.GoodStock.Keys.ToArray()) { // Need a copy!
             var value = resourceCounter._stockCounter.GetInputOutputStock(goodId)
                 + resourceCounter._stockCounter.GetOutputStock(goodId);
-            if (tracker.GoodStock[goodId] == value) {
-              continue;
-            }
             tracker.GoodStock[goodId] = value;
             tracker.TriggerSignalUpdate(ResourceStockSignalNamePrefix + goodId);
           }
@@ -322,8 +316,8 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
     }
 
     /// <inheritdoc/>
-    public override void AddSignal(SignalOperator signalOperator, ISignalListener host) {
-      base.AddSignal(signalOperator, host);
+    public override bool AddSignal(SignalOperator signalOperator, ISignalListener host) {
+      var isFirstListener = base.AddSignal(signalOperator, host);
       var signalName = signalOperator.SignalName;
       var district = AutomationBehavior.GetComponentOrFail<DistrictBuilding>().District;
       var resourceCounter = district?.GetComponentInChildren<DistrictResourceCounter>();
@@ -342,24 +336,24 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
           HostedDebugLog.Fine(AutomationBehavior, "Start tracking district signal: {0}, value={1}", signalName, value);
         }
       }
+      return isFirstListener;
     }
 
     /// <inheritdoc/>
-    public override void RemoveSignal(SignalOperator signalOperator, ISignalListener host) {
-      base.RemoveSignal(signalOperator, host);
+    public override bool RemoveSignal(SignalOperator signalOperator, ISignalListener host) {
+      if (base.RemoveSignal(signalOperator, host)) {
+        return true;  // Still need to track it.
+      }
       var signalName = signalOperator.SignalName;
       if (!signalName.StartsWith(ResourceCapacitySignalNamePrefix)) {
-        return;
-      }
-      var hasAnySuchSignal = ReferenceManager.Signals.SelectMany(x => x.Value).Any(x => x.SignalName == signalName);
-      if (hasAnySuchSignal) {
-        return;  // Still need to track it.
+        return false;
       }
       var goodId = signalName[ResourceCapacitySignalNamePrefix.Length..];
       HostedDebugLog.Fine(AutomationBehavior, "Stop tracking district signal: {0}", signalName);
       if (!GoodCapacity.Remove(goodId)) { // It's an abnormal situation.
         throw new InvalidOperationException($"Cannot remove resource capacity for: {signalName}");
       }
+      return false;
     }
 
     #endregion
