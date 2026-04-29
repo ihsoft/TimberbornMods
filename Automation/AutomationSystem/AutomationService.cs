@@ -149,6 +149,18 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
     return true;
   }
 
+  /// <summary>Schedules an action that will be in the late update phase of the same frame.</summary>
+  /// <remarks>
+  /// It's a good way of doing async work. The action will be executed not immediately, but at the end of the current
+  /// frame when all the other logic is already settled. Note that it's the renderer frame, not the game's tick!
+  /// </remarks>
+  /// <param name="actionFn">The action to execute.</param>
+  public void ScheduleLateUpdate(Action actionFn) {
+    while (!ScheduleLateUpdateOnce(Guid.NewGuid().ToString(), actionFn)) {
+      // For the unlikely case of making a UUID that is already in the list.
+    }
+  }
+
   /// <summary>Clears a late update scheduled by <see cref="ScheduleLateUpdateOnce"/>.</summary>
   /// <remarks>
   /// Note that clearing a scheduled action only makes sense within a single frame. On the next frame, it's already

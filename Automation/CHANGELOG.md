@@ -1,4 +1,5 @@
 # v4.0.4 (started on March 28th, 2026):
+* [Fix] Rules are not copied to all objects when using duplicate build tool.
 * [Fix #130] Lumberjacks leaving left over Oak Logs when using Collectable.Ready == 0
 
 # v4.0.3 (March 26th, 2026):

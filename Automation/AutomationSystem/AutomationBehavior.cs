@@ -335,7 +335,7 @@ public sealed class AutomationBehavior : BaseComponent, IAwakableComponent, IIni
     if (source.Actions.Count == 0 || Name != source.Name) {
       return;
     }
-    AutomationService.Instance.ScheduleLateUpdateOnce("duplication", () => {
+    AutomationService.Instance.ScheduleLateUpdate(() => {
       HostedDebugLog.Info(this, "Duplicating {0} rules from {1}", source.Actions.Count, source);
       ClearAllRules();
       foreach (var action in source.Actions) {
