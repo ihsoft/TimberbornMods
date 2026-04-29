@@ -31,7 +31,7 @@
           "TypeId": "IgorZ.Automation.Conditions.ScriptedCondition",
           "Parameters": [
             { "Name": "Precondition", "StrValue": "(?act Floodgate.SetHeight)" },
-            { "Name": "Expression", "StrValue": "(eq (sig Signals.Floodgate.yellow3) (sig Signals.Floodgate.yellow3))" }
+            { "Name": "Expression", "StrValue": "(and (ne (sig Signals.Floodgate.yellow3) (sig Floodgate.Height)) (le (sig Signals.Floodgate.yellow3) (getvalue Floodgate.MaxHeight)))" }
           ]
         },
         "Action": {
