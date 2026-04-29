@@ -1,7 +1,7 @@
 ID,Text,Comment
 IgorZ.Automation.CancelTool.Description,"Use this tool to clean up any automation on the buildings or construction sites.",
 IgorZ.Automation.CancelTool.Title,"Cancel automation",
-IgorZ.Automation.EnableRulesTool.Description,"Use this template to enable all rules on the building",
+IgorZ.Automation.EnableRulesTool.Description,"Use this tool to enable all rules on the building",
 IgorZ.Automation.EnableRulesTool.Title,"Enable rules on the building",
 IgorZ.Automation.CheckAccessBlockCondition.Blocking.Description,"<YellowHighlight>blocks path</YellowHighlight>",
 IgorZ.Automation.CheckAccessBlockCondition.NotBlocking.Description,"<YellowHighlight>doesn't block path</YellowHighlight>",
@@ -13,7 +13,7 @@ IgorZ.Automation.DebugPickTool.DescriptionHint1,"Hold <i>SHIFT</i> to print Acce
 IgorZ.Automation.DebugPickTool.DescriptionHint2,"Hold <i>CTRL</i> to print NavMesh edges.",
 IgorZ.Automation.DebugPickTool.Title,"Debug tool",
 IgorZ.Automation.DisableRulesTool.Title,"Disable rules on the building",
-IgorZ.Automation.DisableRulesTool.Description,"Use this template to disable all rules on the building",
+IgorZ.Automation.DisableRulesTool.Description,"Use this tool to disable all rules on the building",
 IgorZ.Automation.ShowStatusAction.AutomationErrorAlert,"Automation error",
 IgorZ.Automation.ShowStatusAction.AutomationErrorDescription,"Some automation rules cannot be executed",
 IgorZ.Automation.ShowStatusAction.HoldCompletionStatusText,"Waiting for the other buildings to finish",
