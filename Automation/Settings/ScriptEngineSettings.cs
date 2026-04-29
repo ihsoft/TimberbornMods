@@ -46,7 +46,7 @@ sealed class ScriptEngineSettings : BaseSettings<ScriptEngineSettings> {
 
   public static int SignalExecutionStackSize { get; private set; }
   public ModSetting<int> SignalExecutionStackSizeInternal { get; } = new(
-      10, ModSettingDescriptor.CreateLocalized(SignalExecutionStackSizeLocKey));
+      20, ModSettingDescriptor.CreateLocalized(SignalExecutionStackSizeLocKey));
 
   #endregion
 
@@ -57,6 +57,15 @@ sealed class ScriptEngineSettings : BaseSettings<ScriptEngineSettings> {
       : base(settings, modSettingsOwnerRegistry, modRepository) {
     InstallSettingCallback(CheckArgumentValuesInternal, v => CheckArgumentValues = v);
     InstallSettingCallback(SignalExecutionStackSizeInternal, v => SignalExecutionStackSize = v);
+  }
+
+  /// <inheritdoc />
+  protected override void OnAfterLoad() {
+    base.OnAfterLoad();
+    // FIXME: Compatibility code added on 4/28/2026 in v4.0.4.
+    if (SignalExecutionStackSizeInternal.Value == 10) {
+      SignalExecutionStackSizeInternal.SetValue(20);  // New default.
+    }
   }
 
   #endregion
