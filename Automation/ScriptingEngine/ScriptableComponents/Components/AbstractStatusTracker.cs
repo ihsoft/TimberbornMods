@@ -158,6 +158,9 @@ abstract class AbstractStatusTracker : AbstractDynamicComponent, IPersistentEnti
     readonly List<(SignalOperator signalOperator, ISignalListener listener)> _registrants = [];
 
     public bool UpdateLastValue() {
+      if (_registrants.Count == 0) {
+        return false;
+      }
       var newValue = _registrants[0].signalOperator.ValueFn();
       var isChanged = LastValue != newValue;
       LastValue = newValue;

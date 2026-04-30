@@ -41,7 +41,7 @@ sealed class SignalsEditorDialog : AbstractDialog {
       }
       _rulesUiHelper.SetExportedSignalName(
           exportedSignal.Signal.SignalName, exportedSignal.CustomSignalField.value,
-          templateFamily: exportedSignal.Signal.Action.TemplateFamily);
+          templateFamily: exportedSignal.Signal.Action?.TemplateFamily);
     }
   }
 

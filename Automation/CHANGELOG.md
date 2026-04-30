@@ -1,3 +1,7 @@
+# v4.0.5 (April 29th, 2026):
+* [Fix] Game crashes when adding a new signal export.
+* [Fix] Game may crash when loading certain saved games.
+
 # v4.0.4 (April 28th, 2026):
 * [Fix] Rules are not copied to all objects when using duplicate build tool.
 * [Fix #130] Lumberjacks leaving left over Oak Logs when using Collectable.Ready == 0
