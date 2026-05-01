@@ -300,6 +300,7 @@ public sealed class AutomationBehavior : BaseComponent, IAwakableComponent, IIni
 
   /// <inheritdoc/>
   public void OnEnterFinishedState() {
+    _isFinished = true;
     foreach (var listener in GetDynamicComponentsOf<IFinishedStateListener>()) {
       listener.OnEnterFinishedState();
     }
@@ -307,6 +308,7 @@ public sealed class AutomationBehavior : BaseComponent, IAwakableComponent, IIni
 
   /// <inheritdoc/>
   public void OnExitFinishedState() {
+    _isFinished = false;
     foreach (var listener in GetDynamicComponentsOf<IFinishedStateListener>()) {
       listener.OnExitFinishedState();
     }
@@ -349,6 +351,7 @@ public sealed class AutomationBehavior : BaseComponent, IAwakableComponent, IIni
   #region Implementation
 
   bool _isInitialized;
+  bool _isFinished;
 
   /// <summary>Injects the dependencies. It has to be public to work.</summary>
   [Inject]
@@ -373,7 +376,7 @@ public sealed class AutomationBehavior : BaseComponent, IAwakableComponent, IIni
     if (component.Enabled && _componentCache.StartIsEnabled) {
       component.Start();
     }
-    if (BlockObject.IsFinished && component is IFinishedStateListener finishedStateListener) {
+    if (_isFinished && component is IFinishedStateListener finishedStateListener) {
       finishedStateListener.OnEnterFinishedState();
     }
     if (_isInitialized && component is IInitializableEntity initializableEntity) {

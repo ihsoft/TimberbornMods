@@ -1,3 +1,6 @@
+# v4.0.6 (April 30th, 2026):
+* [Fix] Game can crash on loading a state with "available for collection" rules.
+
 # v4.0.5 (April 29th, 2026):
 * [Fix] Game crashes when adding a new signal export.
 * [Fix] Game may crash when loading certain saved games.
