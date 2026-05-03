@@ -1,3 +1,6 @@
+# v4.0.7 (Math 2nd, 2026):
+* [Fix] Game can crash when a lumberjack with collectable rules is destroyed.
+
 # v4.0.6 (April 30th, 2026):
 * [Fix] Game can crash on loading a state with "available for collection" rules.
 

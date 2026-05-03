@@ -267,6 +267,10 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
       if (growable) {
         growable.HasGrown -= OnYielderUpdate;
       }
+      var goodStack = yielder.GetComponent<GoodStack>();
+      if (goodStack) {
+        goodStack.GoodStackDisabled -= OnGoodStackDisabled;
+      }
       var living = yielder.GetComponent<LivingNaturalResource>();
       if (living) {
         living.Died -= OnYielderUpdate;
