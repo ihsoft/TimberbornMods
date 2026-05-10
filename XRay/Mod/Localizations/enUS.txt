@@ -1,0 +1,7 @@
+ID,Text,Comment
+IgorZ.XRay.ColorSettings.Header,"Models color settings",
+IgorZ.XRay.ColorSettings.GrassColor,"Grass color",
+IgorZ.XRay.ColorSettings.CliffColor,"Cliff color",
+IgorZ.XRay.ColorSettings.CliffEdgeColor,"Cliff edge color",
+IgorZ.XRay.ColorSettings.GhostModelIntensity,"Models transparency",
+IgorZ.XRay.ColorSettings.Glowing,"Glowing mode",
