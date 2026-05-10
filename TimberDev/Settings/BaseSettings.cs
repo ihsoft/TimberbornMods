@@ -4,9 +4,11 @@
 
 using System;
 using System.Collections.Generic;
+using ModSettings.Common;
 using ModSettings.Core;
 using Timberborn.Modding;
 using Timberborn.SettingsSystem;
+using UnityEngine;
 
 // ReSharper disable once CheckNamespace
 namespace IgorZ.TimberDev.Settings;
@@ -41,6 +43,18 @@ abstract class BaseSettings<T> : ModSettingsOwner where T : BaseSettings<T> {
 
   /// <inheritdoc cref="InstallSettingCallback{TV}(ModSetting{TV}, Action{TV})"/>
   protected void InstallSettingCallback<TV>(ModSetting<TV> setting, Action setter) where TV : notnull {
+    setting.ValueChanged += (_, _) => setter();
+    _afterLoadActions.Add(setter);
+  }
+
+  /// <inheritdoc cref="InstallSettingCallback{TV}(ModSetting{TV}, Action{TV})"/>
+  protected void InstallSettingCallback(ColorModSetting setting, Action<Color> setter) { 
+    setting.ValueChanged += (_, _) => setter(setting.Color);
+    _afterLoadActions.Add(() => setter(setting.Color));
+  }
+
+  /// <inheritdoc cref="InstallSettingCallback{TV}(ModSetting{TV}, Action{TV})"/>
+  protected void InstallSettingCallback(ColorModSetting setting, Action setter) { 
     setting.ValueChanged += (_, _) => setter();
     _afterLoadActions.Add(setter);
   }
