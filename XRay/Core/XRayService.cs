@@ -16,7 +16,8 @@ using UnityEngine.Rendering;
 
 namespace IgorZ.XRay.Core;
 
-sealed class XRayService(TerrainMeshManager terrainMeshManager, IWaterMesh waterMesh) : ILoadableSingleton {
+sealed class XRayService(TerrainMeshManager terrainMeshManager, IWaterMesh waterMesh, ColorSettings colorSettings)
+    : IPostLoadableSingleton {
 
   // Used to render the X-Ray models.
   const string UnlitShaderName = "Universal Render Pipeline/Unlit";
@@ -45,11 +46,11 @@ sealed class XRayService(TerrainMeshManager terrainMeshManager, IWaterMesh water
     }
   }
 
-  #region ILoadableSingleton implementation
+  #region IPostLoadableSingleton implementation
 
-  public void Load() {
-    MakeMaterials();
-    ColorSettings.OnSettingsUpdated = MakeMaterials; 
+  /// <inheritdoc/>
+  public void PostLoad() {
+    ColorSettings.OnSettingsUpdated = () => MakeMaterials(forceRefresh: true);
   }
 
   #endregion
@@ -78,6 +79,7 @@ sealed class XRayService(TerrainMeshManager terrainMeshManager, IWaterMesh water
     if (_waterRenderQueue == -1) {
       _waterRenderQueue = DetectWaterRenderQueue();
     }
+    MakeMaterials();
     
     var renderers = GetTerrainRenderers();
     DebugEx.Info("Enable X-Ray mode: meshes={0}", renderers.Count);
@@ -164,7 +166,10 @@ sealed class XRayService(TerrainMeshManager terrainMeshManager, IWaterMesh water
   }
 
   /// <summary>Makes or refreshes the materials for the "ghost" meshes.</summary>
-  void MakeMaterials() {
+  void MakeMaterials(bool forceRefresh = false) {
+    if (!forceRefresh && _xrayGrassMaterial && _xrayCliffMaterial && _xrayCliffEdgeMaterial) {
+      return;
+    }
     _xrayGrassMaterial = GetTransparencyShader(XRayGrassMaterialName);
     _xrayCliffMaterial = GetTransparencyShader(XRayCliffMaterialName);
     _xrayCliffEdgeMaterial = GetTransparencyShader(XRayCliffEdgeMaterialName);
