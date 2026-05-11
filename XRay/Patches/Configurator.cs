@@ -13,10 +13,16 @@ sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).AssemblyQualifiedName;
   static readonly Type[] Patches = [
       typeof(TileComponentsPatch),
+      typeof(LevelVisibilityServicePatch),
   ];
 
   public void Configure(IContainerDefinition containerDefinition) {
-    TileComponentsPatch.FixRenderer = null;
+    InitializePatches();
     HarmonyPatcher.ApplyPatch(PatchId, Patches);
+  }
+
+  static void InitializePatches() {
+    TileComponentsPatch.FixRenderer = null;
+    LevelVisibilityServicePatch.XrayModeEnabled = false;
   }
 }

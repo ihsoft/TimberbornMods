@@ -80,6 +80,7 @@ sealed class XRayService(TerrainMeshManager terrainMeshManager, IWaterMesh water
       _waterRenderQueue = DetectWaterRenderQueue();
     }
     MakeMaterials();
+    LevelVisibilityServicePatch.XrayModeEnabled = true;
     
     var renderers = GetTerrainRenderers();
     DebugEx.Info("Enable X-Ray mode: meshes={0}", renderers.Count);
@@ -95,6 +96,7 @@ sealed class XRayService(TerrainMeshManager terrainMeshManager, IWaterMesh water
     DebugEx.Info("Disable X-Ray mode: meshes={0}", renderers.Count);
     IsActive = false;
     TileComponentsPatch.FixRenderer = null;
+    LevelVisibilityServicePatch.XrayModeEnabled = false;
     foreach (var renderer in renderers) {
       SetOriginalRenderer(renderer);
     }
