@@ -199,7 +199,7 @@ sealed class XRayService(TerrainMeshManager terrainMeshManager, IWaterMesh water
   /// <seealso cref="XRayCliffMaterialName"/>
   /// <seealso cref="XRayCliffEdgeMaterialName"/>
   // ReSharper disable Unity.PreferAddressByIdToGraphicsParams
-  static Material GetTransparencyShader(string name) {
+  Material GetTransparencyShader(string name) {
     var mat = new Material(Shader.Find(UnlitShaderName)) {
         name = name,
         renderQueue = _waterRenderQueue + 1, // Just after water since we need it to get rendered first.
@@ -212,41 +212,31 @@ sealed class XRayService(TerrainMeshManager terrainMeshManager, IWaterMesh water
     mat.SetFloat("_ZWrite", 0);  // Don't hide underground objects
     mat.SetFloat("_Cull", (float)CullMode.Back);
 
-    mat.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
-    mat.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
-    mat.SetInt("_SrcBlendAlpha", (int)BlendMode.One);
-    mat.SetInt("_DstBlendAlpha", (int)BlendMode.OneMinusSrcAlpha);
-
     mat.DisableKeyword("_ALPHATEST_ON");
     mat.DisableKeyword("_ALPHAPREMULTIPLY_ON");
     mat.DisableKeyword("_ALPHAMODULATE_ON");
     mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
 
-    if (ColorSettings.GlowingEdges) {
-      if (name == XRayCliffEdgeMaterialName) {
-        mat.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
-      } else {
-        mat.SetInt("_SrcBlend", (int)BlendMode.One);
-      }
+    if (colorSettings.GlowingEdges.Value) {
+      mat.SetInt("_SrcBlend", (int)BlendMode.One);
       mat.SetInt("_DstBlend", (int)BlendMode.One);
+    } else {
+      mat.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
+      mat.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
+      mat.SetInt("_SrcBlendAlpha", (int)BlendMode.One);
+      mat.SetInt("_DstBlendAlpha", (int)BlendMode.OneMinusSrcAlpha);
     }
 
-    Color color;
-    if (ColorSettings.GlowingEdges) {
-      color = name switch {
-          XRayGrassMaterialName => ColorSettings.GlowGrassColor,
-          XRayCliffMaterialName => ColorSettings.GlowCliffColor,
-          XRayCliffEdgeMaterialName => ColorSettings.GlowCliffEdgeColor,
-          _ => throw new InvalidOperationException($"Unexpected material name: {name}"),
-      };
-    } else {
-      color = name switch {
-          XRayGrassMaterialName => ColorSettings.GrassColor,
-          XRayCliffMaterialName => ColorSettings.CliffColor,
-          XRayCliffEdgeMaterialName => ColorSettings.CliffEdgeColor,
-          _ => throw new InvalidOperationException($"Unexpected material name: {name}"),
-      };
-    }
+    var referenceColor = name switch {
+      XRayGrassMaterialName => colorSettings.GrassColor.Color,
+      XRayCliffMaterialName => colorSettings.CliffColor.Color,
+      XRayCliffEdgeMaterialName => colorSettings.CliffEdgeColor.Color,
+      _ => throw new InvalidOperationException($"Unexpected material name: {name}"),
+    };
+    var transparency = colorSettings.GhostModeIntensity.Value / 100f;
+    var color = colorSettings.GlowingEdges.Value
+        ? referenceColor * transparency
+        : new Color(referenceColor.r, referenceColor.g, referenceColor.b, transparency);
     mat.SetColor("_BaseColor", color);
     mat.SetColor("_Color",     color);
 
