@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using IgorZ.TimberDev.Settings;
@@ -35,13 +36,21 @@ sealed class ColorSettings : BaseSettings<ColorSettings> {
       string NameLocKey, Color GrassColor, Color CliffColor, Color CliffEdgeColor, bool GlowingEdges,
       int GhostModeIntensity);
 
+  static readonly Preset DefaultSchema =
+      new(ColorSchemaNameBwBrightLocKey, HexColor(0xCACACA), HexColor(0xCACACA), HexColor(0xFFFFFF), false, 21);
+  static readonly Preset CustomSettings =
+      new(ColorSchemaNameCustomLocKey, HexColor(0), HexColor(0), HexColor(0), false, 0);
+
   static readonly Preset[] SchemaPresets = [
-      new(ColorSchemaNameCustomLocKey, HexColor(0), HexColor(0), HexColor(0), false, 0),
+      CustomSettings,
       new(ColorSchemaNameNormalLocKey, HexColor(0x00DAB9), HexColor(0x00B196), HexColor(0x00FFD9), false, 10),
       new(ColorSchemaNameNormalGlowLocKey, HexColor(0x00DAB9), HexColor(0x00B196), HexColor(0x00FFD9), true, 10),
       new(ColorSchemaNameBwDarkLocKey, HexColor(0xCACACA), HexColor(0xCACACA), HexColor(0xFFFFFF), false, 10),
-      new(ColorSchemaNameBwBrightLocKey, HexColor(0xCACACA), HexColor(0xCACACA), HexColor(0xFFFFFF), false, 21),
+      DefaultSchema,
   ];
+  static readonly int DefaultSchemaIndex = SchemaPresets.ToList().IndexOf(DefaultSchema) != -1
+    ? SchemaPresets.ToList().IndexOf(DefaultSchema)
+    : throw new InvalidOperationException("Default schema is not found in presets");
 
   protected override string ModId => Configurator.AutomationModId;
 
@@ -64,28 +73,29 @@ sealed class ColorSettings : BaseSettings<ColorSettings> {
 
   public LimitedStringModSetting ColorSchemaInternal { get; } =
     new(
-        0,
+        DefaultSchemaIndex,
         SchemaPresets.Select(p => new LimitedStringModSettingValue(p.NameLocKey, p.NameLocKey)).ToArray(),
         ModSettingDescriptor.CreateLocalized(ColorSchemaDropdownLocKey));
 
   public ColorModSetting GrassColor { get; } =
-      new(new Color(0f, 1f, 0.851f),
+      new(DefaultSchema.GrassColor,
           ModSettingDescriptor.CreateLocalized(ColorGrassLocKey).SetEnableCondition(IsCustom),
           false);
 
   public ColorModSetting CliffColor { get; } =
-      new(new Color(0.349f, 0.451f, 0.380f),
+      new(DefaultSchema.CliffColor,
           ModSettingDescriptor.CreateLocalized(ColorCliffLocKey).SetEnableCondition(IsCustom),
           false);
 
   public ColorModSetting CliffEdgeColor { get; } =
-      new(new Color(0f, 1f, 0.851f),
+      new(DefaultSchema.CliffEdgeColor,
           ModSettingDescriptor.CreateLocalized(ColorCliffEdgeLocKey).SetEnableCondition(IsCustom),
           false);
 
   public ModSetting<int> GhostModeIntensity { get; } =
       new RangeIntModSetting(
-          50, 0, 100, ModSettingDescriptor.CreateLocalized(GhostModeIntensityLocKey).SetEnableCondition(IsCustom));
+          DefaultSchema.GhostModeIntensity, 0, 100,
+          ModSettingDescriptor.CreateLocalized(GhostModeIntensityLocKey).SetEnableCondition(IsCustom));
 
   public ModSetting<bool> GlowingEdges { get; } =
       new(true, ModSettingDescriptor.CreateLocalized(GlowingLocKey).SetEnableCondition(IsCustom));
