@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using IgorZ.XRay.Patches;
 using IgorZ.XRay.Settings;
 using Timberborn.SingletonSystem;
 using Timberborn.TerrainSystemRendering;
@@ -16,8 +15,7 @@ using UnityEngine.Rendering;
 
 namespace IgorZ.XRay.Core;
 
-sealed class XRayService(TerrainMeshManager terrainMeshManager, IWaterMesh waterMesh, ColorSettings colorSettings)
-    : IPostLoadableSingleton {
+sealed class XRayService : IPostLoadableSingleton {
 
   // Used to render the X-Ray models.
   const string UnlitShaderName = "Universal Render Pipeline/Unlit";
@@ -33,6 +31,7 @@ sealed class XRayService(TerrainMeshManager terrainMeshManager, IWaterMesh water
   const string OriginalCliffMaterialName = "Cliff";
   const string OriginalCliffEdgeMaterialName = "CliffEdge";
 
+  public static XRayService Instance { get; private set; }
   public bool IsActive { get; private set; }
 
   public void SetActiveMode(bool state) {
@@ -71,21 +70,29 @@ sealed class XRayService(TerrainMeshManager terrainMeshManager, IWaterMesh water
   Material _originalGrassMaterial;
   Material _originalCliffMaterial;
   Material _originalCliffEdgeMaterial;
+  readonly TerrainMeshManager _terrainMeshManager;
+  readonly IWaterMesh _waterMesh;
+  readonly ColorSettings _colorSettings;
 
   // This value is set once per the game launch.
   static int _waterRenderQueue = -1;
+
+  XRayService(TerrainMeshManager terrainMeshManager, IWaterMesh waterMesh, ColorSettings colorSettings) {
+    Instance = this;
+    _terrainMeshManager = terrainMeshManager;
+    _waterMesh = waterMesh;
+    _colorSettings = colorSettings;
+  }
 
   void SetXRayMode() {
     if (_waterRenderQueue == -1) {
       _waterRenderQueue = DetectWaterRenderQueue();
     }
     MakeMaterials();
-    LevelVisibilityServicePatch.XrayModeEnabled = true;
-    
+
     var renderers = GetTerrainRenderers();
     DebugEx.Info("Enable X-Ray mode: meshes={0}", renderers.Count);
     IsActive = true;
-    TileComponentsPatch.FixRenderer = SetXRayRenderer;
     foreach (var renderer in renderers) {
       SetXRayRenderer(renderer);
     }
@@ -95,8 +102,6 @@ sealed class XRayService(TerrainMeshManager terrainMeshManager, IWaterMesh water
     var renderers = GetTerrainRenderers();
     DebugEx.Info("Disable X-Ray mode: meshes={0}", renderers.Count);
     IsActive = false;
-    TileComponentsPatch.FixRenderer = null;
-    LevelVisibilityServicePatch.XrayModeEnabled = false;
     foreach (var renderer in renderers) {
       SetOriginalRenderer(renderer);
     }
@@ -108,7 +113,7 @@ sealed class XRayService(TerrainMeshManager terrainMeshManager, IWaterMesh water
   /// replaced (and recorded for the restore!). The unrecognized materials will not be affected.
   /// </remarks>
   /// <seealso cref="SetOriginalRenderer"/>
-  void SetXRayRenderer(Renderer renderer) {
+  internal void SetXRayRenderer(Renderer renderer) {
     _originalShadowCastingMode = renderer.shadowCastingMode;
     _originalReceiveShadows = renderer.receiveShadows;
     var newMaterials = new Material[renderer.sharedMaterials.Length];
@@ -160,7 +165,7 @@ sealed class XRayService(TerrainMeshManager terrainMeshManager, IWaterMesh water
 
   /// <summary>Returns all teh active renderers for the terrain meshes.</summary>
   List<Renderer> GetTerrainRenderers() {
-    return terrainMeshManager._tiles.Values
+    return _terrainMeshManager._tiles.Values
         .Select(tileComponents => tileComponents._meshRenderer)
         .Where(renderer => renderer && renderer.sharedMaterials != null && renderer.gameObject.activeSelf)
         .Cast<Renderer>()
@@ -219,7 +224,7 @@ sealed class XRayService(TerrainMeshManager terrainMeshManager, IWaterMesh water
     mat.DisableKeyword("_ALPHAMODULATE_ON");
     mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
 
-    if (colorSettings.GlowingEdges.Value) {
+    if (_colorSettings.GlowingEdges.Value) {
       mat.SetInt("_SrcBlend", (int)BlendMode.One);
       mat.SetInt("_DstBlend", (int)BlendMode.One);
     } else {
@@ -230,13 +235,13 @@ sealed class XRayService(TerrainMeshManager terrainMeshManager, IWaterMesh water
     }
 
     var referenceColor = name switch {
-      XRayGrassMaterialName => colorSettings.GrassColor.Color,
-      XRayCliffMaterialName => colorSettings.CliffColor.Color,
-      XRayCliffEdgeMaterialName => colorSettings.CliffEdgeColor.Color,
+      XRayGrassMaterialName => _colorSettings.GrassColor.Color,
+      XRayCliffMaterialName => _colorSettings.CliffColor.Color,
+      XRayCliffEdgeMaterialName => _colorSettings.CliffEdgeColor.Color,
       _ => throw new InvalidOperationException($"Unexpected material name: {name}"),
     };
-    var transparency = colorSettings.GhostModeIntensity.Value / 100f;
-    var color = colorSettings.GlowingEdges.Value
+    var transparency = _colorSettings.GhostModeIntensity.Value / 100f;
+    var color = _colorSettings.GlowingEdges.Value
         ? referenceColor * transparency
         : new Color(referenceColor.r, referenceColor.g, referenceColor.b, transparency);
     mat.SetColor("_BaseColor", color);
@@ -249,7 +254,7 @@ sealed class XRayService(TerrainMeshManager terrainMeshManager, IWaterMesh water
   /// <summary>Detects the render queue which the water render pipeline uses.</summary>
   /// <remarks>The "ghost" models needs to be drawn after all the vital objects have been rendered.</remarks>
   int DetectWaterRenderQueue() {
-    if (waterMesh is not WaterMesh waterMeshObj) {
+    if (_waterMesh is not WaterMesh waterMeshObj) {
       DebugEx.Warning("Cannot get WaterMesh. Defaulting water render queue to {0}", DefaultWaterRednerQueue);
       return DefaultWaterRednerQueue;
     }

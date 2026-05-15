@@ -17,12 +17,6 @@ sealed class Configurator : IConfigurator {
   ];
 
   public void Configure(IContainerDefinition containerDefinition) {
-    InitializePatches();
     HarmonyPatcher.ApplyPatch(PatchId, Patches);
-  }
-
-  static void InitializePatches() {
-    TileComponentsPatch.FixRenderer = null;
-    LevelVisibilityServicePatch.XrayModeEnabled = false;
   }
 }
