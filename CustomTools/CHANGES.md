@@ -1,4 +1,7 @@
-﻿# v1.3.1 (2/20/2026)
+﻿# v1.3.2 (5/18/2026)
+* [Fix] The multi template tool can crash the game under some rare conditions.
+
+# v1.3.1 (2/20/2026)
 * [Fix] The game crashes if the non-stock game factions are in play.
 
 # v1.3.0 (2/18/2026)

@@ -225,7 +225,11 @@ public abstract class AbstractMultiTemplateBlockObjectTool<T>
       Place(placements);
       return;
     }
-    _toolUnlockingService.TryToUnlock(blockObjectTool, () => Place(placements), _previewPlacer.HideAllPreviews);
+    if (_toolUnlockingService.IsLocked(blockObjectTool)) {
+      _toolUnlockingService.TryToUnlock(blockObjectTool, () => Place(placements), _previewPlacer.HideAllPreviews);
+    } else {
+      Place(placements);
+    } 
   }
 
   void Place(IEnumerable<Placement> placements) {
