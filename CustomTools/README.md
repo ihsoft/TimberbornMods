@@ -4,28 +4,28 @@ This mod offers new quality-of-life tools in the bottom bar and also provides an
 
 ## For the players: Built-in tools
 
-![Custom tools bottom bar button](https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/timberborn-1.0/CustomTools/Workshop/Showcase/GroupButtonDemo.png)
-
 ### Immediate finish of incomplete buildings
-
-This tool is only visible when the dev mode is activated (Shift + Alt + Z). Select multiple incomplete buildings and have
-them instantly completed. A handy tool when testing or prototyping.
-
-![Immediate finish of incomplete buildings](https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/timberborn-1.0/CustomTools/Workshop/Showcase/FinishNowToolDemo.png)
+This tool is only visible when the dev mode is activated (**Shift + Alt + Z**). Select multiple incomplete buildings and have them instantly completed. A handy tool when testing or prototyping.
 
 ### Pause buildings in the selected range
-
-Select multiple buildings that need to be paused. Hold **SHIFT** to lock the selection to a specific building type.  
-A useful tool for temporarily stopping groups of buildings during colony micromanagement.
-
-![Pause buildings in the selected range](https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/timberborn-1.0/CustomTools/Workshop/Showcase/PauseBuildingToolDemo.png)
+Select multiple buildings that need to be paused. Hold **SHIFT** to lock the selection to a specific building type. A useful tool for temporarily stopping groups of buildings during colony micromanagement.
 
 ### Resume buildings in the selected range
+Select multiple buildings you want to resume. Hold **SHIFT** to lock the selection to a specific building type. Helps quickly bring groups of buildings back online during micromanagement.
 
-Select multiple buildings you want to resume. Hold **SHIFT** to lock the selection to a specific building type.  
-Helps quickly bring groups of buildings back online during micromanagement.
+### Adjustable platform
+This tool allows placing 1-, 2-, and 3-levels platforms. Hold **ALT** or **SHIFT** key to switch between the levels. A convenient tool for building complex platform structures.
+Additionally, you get **CTRL+Z** keybinding which undoes the last platform placement action.
 
-![Resume buildings in the selected range](https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/timberborn-1.0/CustomTools/Workshop/Showcase/ResumeBuildingToolDemo.png)
+### Levee or Dam
+This tool allows placing levees or dams. Hold **SHIFT** to switch between the two. A convenient tool for building complex water management structures.
+Additionally, you get **CTRL+Z** keybinding which undoes the last levee/dam placement action.
+
+### Path+
+This tool allows placing regular paths, but you also get the **CTRL+Z** keybinding which undoes the last path placement action. No need to switch tools if a wrong path was placed!
+
+### Key bindings
+For every tool you can assign a hotkey. Go to the standard keybindings setup screen in the game. There will be a section for CustomTool bindings.
 
 ## For the modders: Simplified API to create your own tools
 
