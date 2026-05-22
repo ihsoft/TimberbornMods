@@ -34,14 +34,14 @@ You can choose to use that mod for the maximum flexibility in configuring tools.
 button” or a small set of buttons, you can use this mod to set up your tools with minimum coding efforts:
 
 1. Create a simple class that inherits from
-   [`AbstractCustomTool`](https://github.com/ihsoft/TimberbornMods/blob/timberborn-1.0/CustomTools/Tools/AbstractCustomTool.cs)
+   [`AbstractCustomTool`](https://github.com/ihsoft/TimberbornMods/blob/main/CustomTools/Tools/AbstractCustomTool.cs)
    or one of its descendants. This class will be serving the tool functionality.
    * This class must be bound via Bindito: `containerDefinition.Bind<PauseTool>().AsSingleton()`.
    * If you plan to use the same class for serving multiple tools, bind as transient:
      `containerDefinition.Bind<PauseTool>().AsTransient()`.
 
 2. Create a blueprint that defines the appearance of your tool button. See example blueprint:
-   [`DebugFinishNowTool`](https://github.com/ihsoft/TimberbornMods/blob/timberborn-1.0/CustomTools/Mod/Blueprints/Tools/Tool.CustomTools.DebugFinishNowTool.blueprint.json).
+   [`DebugFinishNowTool`](https://github.com/ihsoft/TimberbornMods/blob/main/CustomTools/Mod/Blueprints/Tools/Tool.CustomTools.DebugFinishNowTool.blueprint.json).
    * The file name _must_ follow the blueprint naming convention: `<AnyArbitraryText>.blueprint.json`.
    * Blueprint file names must be __globally unique__. The subfolders are not counted!
    * Add [`CustomToolSpec`](https://github.com/ihsoft/TimberbornMods/blob/8704467e2e08885f47f8b4cce06ed01912e48672/CustomTools/Core/CustomToolSpec.cs)
@@ -61,9 +61,12 @@ button” or a small set of buttons, you can use this mod to set up your tools w
 
 ### Tool examples
 
-* [`DebugFinishNowTool`](https://github.com/ihsoft/TimberbornMods/blob/timberborn-1.0/CustomTools/Tools/DebugFinishNowTool.cs).
+* [`DebugFinishNowTool`](https://github.com/ihsoft/TimberbornMods/blob/main/CustomTools/Tools/DebugFinishNowTool.cs).
   A basic tool that selects a set of block objects on the map and performs actions on them.
   Its blueprint can be found [here](https://github.com/ihsoft/TimberbornMods/blob/8704467e2e08885f47f8b4cce06ed01912e48672/CustomTools/Mod/Blueprints/Tools/Tool.CustomTools.DebugFinishNowTool.blueprint.json).
 
-* [`PauseTool`](https://github.com/ihsoft/TimberbornMods/blob/timberborn-1.0/CustomTools/Tools/PauseTool.cs).
+* [`PauseTool`](https://github.com/ihsoft/TimberbornMods/blob/main/CustomTools/Tools/PauseTool.cs).
   A more advanced example that uses selection locking to target specific object types.
+
+* [`FourTemplatesBlockObjectTool`](https://github.com/ihsoft/TimberbornMods/blob/main/CustomTools/Tools/FourTemplatesBlockObjectTool.cs)
+  An advanced block tool that can place different buildings (up to 4).
