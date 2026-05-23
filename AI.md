@@ -1,6 +1,6 @@
 # Совместная работа человека и ИИ над визуальными задачами
 
-## Практические наблюдения и workflow
+## Практические наблюдения, workflow и creative briefing
 
 Целью было создать качественный cover-art для мода Advanced Automation к Timberborn. В процессе выяснилось, что при работе над визуальными задачами человек и ИИ могут по-разному интерпретировать одну и ту же сцену. Это не проблема “непонимания”, а скорее разница в способе восприятия:
 
@@ -283,6 +283,76 @@ arrow = move connection here
 * потом связи;
 * потом UI;
 * потом финальная полировка.
+
+---
+
+# Creative briefing
+
+## 1. Primary visual message
+
+Перед началом работы полезно ответить на вопрос:
+
+> “Что игрок должен понять первым?”
+
+Или более формально:
+
+> “What is the ONE thing the player must immediately understand?”
+
+Примеры:
+
+* “This mod automates colony management”
+* “This mod adds visual scripting”
+* “This mod controls infrastructure automatically”
+* “This mod helps optimize production chains”
+
+Это помогает выстроить всю композицию вокруг одной основной идеи.
+
+---
+
+## 2. Visual style
+
+Полезно заранее определить желаемый стиль.
+
+Например:
+
+* Official game-like
+* Cinematic
+* Technical / engineering
+* UI-heavy infographic
+* Minimalistic
+* Blueprint / holographic
+* Funny / meme-like
+* Dark / dramatic
+* Bright / welcoming
+
+Также полезно определить visual priorities:
+
+* authenticity
+* readability
+* atmosphere
+* spectacle
+* information density
+
+Потому что некоторые из этих целей могут конфликтовать между собой.
+
+---
+
+## 3. Success criteria
+
+Перед началом работы полезно определить:
+
+> “Как понять, что изображение получилось удачным?”
+
+Например:
+
+* Игрок Timberborn мгновенно узнаёт игру
+* Назначение мода понятно с первого взгляда
+* Картинка выглядит как официальный promotional art
+* Изображение хорошо читается в маленьком размере
+* Связи между объектами очевидны
+* Workshop page выглядит более профессионально и кликабельно
+
+Это помогает оценивать результат не по субъективному “нравится / не нравится”, а по понятным критериям.
 
 ---
 
