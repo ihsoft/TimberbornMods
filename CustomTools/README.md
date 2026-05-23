@@ -4,28 +4,28 @@ This mod offers new quality-of-life tools in the bottom bar and also provides an
 
 ## For the players: Built-in tools
 
-![Custom tools bottom bar button](https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/timberborn-1.0/CustomTools/Workshop/Showcase/GroupButtonDemo.png)
-
 ### Immediate finish of incomplete buildings
-
-This tool is only visible when the dev mode is activated (Shift + Alt + Z). Select multiple incomplete buildings and have
-them instantly completed. A handy tool when testing or prototyping.
-
-![Immediate finish of incomplete buildings](https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/timberborn-1.0/CustomTools/Workshop/Showcase/FinishNowToolDemo.png)
+This tool is only visible when the dev mode is activated (**Shift + Alt + Z**). Select multiple incomplete buildings and have them instantly completed. A handy tool when testing or prototyping.
 
 ### Pause buildings in the selected range
-
-Select multiple buildings that need to be paused. Hold **SHIFT** to lock the selection to a specific building type.  
-A useful tool for temporarily stopping groups of buildings during colony micromanagement.
-
-![Pause buildings in the selected range](https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/timberborn-1.0/CustomTools/Workshop/Showcase/PauseBuildingToolDemo.png)
+Select multiple buildings that need to be paused. Hold **SHIFT** to lock the selection to a specific building type. A useful tool for temporarily stopping groups of buildings during colony micromanagement.
 
 ### Resume buildings in the selected range
+Select multiple buildings you want to resume. Hold **SHIFT** to lock the selection to a specific building type. Helps quickly bring groups of buildings back online during micromanagement.
 
-Select multiple buildings you want to resume. Hold **SHIFT** to lock the selection to a specific building type.  
-Helps quickly bring groups of buildings back online during micromanagement.
+### Adjustable platform
+This tool allows placing 1-, 2-, and 3-levels platforms. Hold **ALT** or **SHIFT** key to switch between the levels. A convenient tool for building complex platform structures.
+Additionally, you get **CTRL+Z** keybinding which undoes the last platform placement action.
 
-![Resume buildings in the selected range](https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/timberborn-1.0/CustomTools/Workshop/Showcase/ResumeBuildingToolDemo.png)
+### Levee or Dam
+This tool allows placing levees or dams. Hold **SHIFT** to switch between the two. A convenient tool for building complex water management structures.
+Additionally, you get **CTRL+Z** keybinding which undoes the last levee/dam placement action.
+
+### Path+
+This tool allows placing regular paths, but you also get the **CTRL+Z** keybinding which undoes the last path placement action. No need to switch tools if a wrong path was placed!
+
+### Key bindings
+For every tool you can assign a hotkey. Go to the standard keybindings setup screen in the game. There will be a section for CustomTool bindings.
 
 ## For the modders: Simplified API to create your own tools
 
@@ -34,14 +34,14 @@ You can choose to use that mod for the maximum flexibility in configuring tools.
 button” or a small set of buttons, you can use this mod to set up your tools with minimum coding efforts:
 
 1. Create a simple class that inherits from
-   [`AbstractCustomTool`](https://github.com/ihsoft/TimberbornMods/blob/timberborn-1.0/CustomTools/Tools/AbstractCustomTool.cs)
+   [`AbstractCustomTool`](https://github.com/ihsoft/TimberbornMods/blob/main/CustomTools/Tools/AbstractCustomTool.cs)
    or one of its descendants. This class will be serving the tool functionality.
    * This class must be bound via Bindito: `containerDefinition.Bind<PauseTool>().AsSingleton()`.
    * If you plan to use the same class for serving multiple tools, bind as transient:
      `containerDefinition.Bind<PauseTool>().AsTransient()`.
 
 2. Create a blueprint that defines the appearance of your tool button. See example blueprint:
-   [`DebugFinishNowTool`](https://github.com/ihsoft/TimberbornMods/blob/timberborn-1.0/CustomTools/Mod/Blueprints/Tools/Tool.CustomTools.DebugFinishNowTool.blueprint.json).
+   [`DebugFinishNowTool`](https://github.com/ihsoft/TimberbornMods/blob/main/CustomTools/Mod/Blueprints/Tools/Tool.CustomTools.DebugFinishNowTool.blueprint.json).
    * The file name _must_ follow the blueprint naming convention: `<AnyArbitraryText>.blueprint.json`.
    * Blueprint file names must be __globally unique__. The subfolders are not counted!
    * Add [`CustomToolSpec`](https://github.com/ihsoft/TimberbornMods/blob/8704467e2e08885f47f8b4cce06ed01912e48672/CustomTools/Core/CustomToolSpec.cs)
@@ -61,9 +61,12 @@ button” or a small set of buttons, you can use this mod to set up your tools w
 
 ### Tool examples
 
-* [`DebugFinishNowTool`](https://github.com/ihsoft/TimberbornMods/blob/timberborn-1.0/CustomTools/Tools/DebugFinishNowTool.cs).
+* [`DebugFinishNowTool`](https://github.com/ihsoft/TimberbornMods/blob/main/CustomTools/Tools/DebugFinishNowTool.cs).
   A basic tool that selects a set of block objects on the map and performs actions on them.
   Its blueprint can be found [here](https://github.com/ihsoft/TimberbornMods/blob/8704467e2e08885f47f8b4cce06ed01912e48672/CustomTools/Mod/Blueprints/Tools/Tool.CustomTools.DebugFinishNowTool.blueprint.json).
 
-* [`PauseTool`](https://github.com/ihsoft/TimberbornMods/blob/timberborn-1.0/CustomTools/Tools/PauseTool.cs).
+* [`PauseTool`](https://github.com/ihsoft/TimberbornMods/blob/main/CustomTools/Tools/PauseTool.cs).
   A more advanced example that uses selection locking to target specific object types.
+
+* [`FourTemplatesBlockObjectTool`](https://github.com/ihsoft/TimberbornMods/blob/main/CustomTools/Tools/FourTemplatesBlockObjectTool.cs)
+  An advanced block tool that can place different buildings (up to 4).
