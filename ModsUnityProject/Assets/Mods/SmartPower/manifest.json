@@ -1,6 +1,6 @@
 {
   "Name": "SmartPower",
-  "Version": "1.16.2",
+  "Version": "1.16.3",
   "Id": "Timberborn.IgorZ.SmartPower",
   "MinimumGameVersion": "1.0.12.7",
   "Description": "This mod lowers the power consumption by the buildings that don't provide anything. It also optimizes engines to not waste wood.",

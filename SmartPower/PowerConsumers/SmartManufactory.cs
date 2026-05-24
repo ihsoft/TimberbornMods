@@ -26,7 +26,7 @@ public class SmartManufactory : BaseComponent, IAwakableComponent, IAdjustablePo
 
   // ReSharper disable once MemberCanBePrivate.Global
   /// <summary>Indicates that the building has a working place that should have workers.</summary>
-  public bool HasWorkingPlaces { get; private set; }
+  public bool NeedsWorkingPlaces { get; private set; }
 
   /// <summary>
   /// Indicates that the building is expected to be staffed and working, but no workers are currently at the working
@@ -77,7 +77,7 @@ public class SmartManufactory : BaseComponent, IAwakableComponent, IAdjustablePo
       return 0;
     }
 
-    AllWorkersOut = HasWorkingPlaces && _enterable.NumberOfEnterersInside == 0;
+    AllWorkersOut = NeedsWorkingPlaces && _enterable.NumberOfEnterersInside == 0;
     MissingIngredients = !_manufactory.HasAllIngredients;
     BlockedOutput = !_manufactory.HasUnreservedCapacityForCurrentProducts();
     NoFuel = !_manufactory.HasFuel;
@@ -123,7 +123,7 @@ public class SmartManufactory : BaseComponent, IAwakableComponent, IAdjustablePo
     _standbyStatus = StatusToggle.CreateNormalStatus(StandbyStatusIcon, _loc.T(PowerSavingModeLocKey));
     var subject = GetComponent<StatusSubject>();
     subject.RegisterStatus(_standbyStatus);
-    HasWorkingPlaces = GetComponent<Workshop>();
+    NeedsWorkingPlaces = GetComponent<Workshop>() && !GetComponent<ProductionIncreaser>();
   }
 
   #endregion

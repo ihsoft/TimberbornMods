@@ -1,3 +1,6 @@
+# v1.16.3 (May 23rd, 2026)
+* [Fix] Don't go to the save mode on a workshop that can work without workers.
+
 # v1.16.2 (April 3rd, 2026)
 * [Fix] Settings sections title for the buildings with workplaces is misspelled.
 * [Fix] Game logs get spammed with localization strings formatting errors.
