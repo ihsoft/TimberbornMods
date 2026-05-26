@@ -48,12 +48,12 @@ sealed class XRayService {
 
   void SetXRayMode() {
     DebugEx.Info("Enable X-Ray mode");
-    _wireframeTerrainMeshService.EnableWireframe();
+    _transparentTerrainMeshService.Activate();
   }
 
   void ResetXRayMode() {
     DebugEx.Info("Disable X-Ray mode");
-    _wireframeTerrainMeshService.DisableWireframe();
+    _transparentTerrainMeshService.Deactivate();
   }
 
   #endregion
