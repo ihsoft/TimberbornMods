@@ -7,7 +7,7 @@ using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.XRay.Core;
 
-sealed class XRayService {
+sealed class XRayModeManager {
 
   #region API
 
@@ -39,9 +39,9 @@ sealed class XRayService {
   readonly TransparentTerrainMeshService _transparentTerrainMeshService;
 
   // Primarily made for the efficient patches handling.
-  internal static XRayService Instance { get; private set; }
+  internal static XRayModeManager Instance { get; private set; }
 
-  XRayService(TransparentTerrainMeshService transparentTerrainMeshService) {
+  XRayModeManager(TransparentTerrainMeshService transparentTerrainMeshService) {
     Instance = this;
     _transparentTerrainMeshService = transparentTerrainMeshService;
   }

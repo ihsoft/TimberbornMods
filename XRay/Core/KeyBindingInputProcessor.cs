@@ -7,7 +7,7 @@ using Timberborn.SingletonSystem;
 
 namespace IgorZ.XRay.Core;
 
-sealed class KeyBindingInputProcessor(XRayService xRayService, InputService inputService)
+sealed class KeyBindingInputProcessor(XRayModeManager xRayModeManager, InputService inputService)
     : IPostLoadableSingleton, IInputProcessor {
 
   const string ToggleModeKeyBindingId = "IgorZ-XRayToggleMode";
@@ -26,7 +26,7 @@ sealed class KeyBindingInputProcessor(XRayService xRayService, InputService inpu
   /// <inheritdoc/>
   public bool ProcessInput() {
     if (inputService.IsKeyDown(ToggleModeKeyBindingId)) {
-      xRayService.SetActiveMode(!xRayService.IsActive);
+      xRayModeManager.SetActiveMode(!xRayModeManager.IsActive);
       return true;
     }
     return false;

@@ -15,7 +15,7 @@ static class SelectableObjectRaycasterPatch {
   [HarmonyPrefix]
   [HarmonyPatch(nameof(SelectableObjectRaycaster.HitIsCloserThanTerrain))]
   static bool HitIsCloserThanTerrainPrefix(ref bool __result) {
-    if (!XRayService.Instance.IsActive) {
+    if (!XRayModeManager.Instance.IsActive) {
       return true;
     }
     __result = true;

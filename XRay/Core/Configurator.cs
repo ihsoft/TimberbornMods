@@ -12,6 +12,7 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<KeyBindingInputProcessor>().AsSingleton();
     containerDefinition.Bind<RendererFactory>().AsSingleton();
     containerDefinition.Bind<TerrainRayCaster>().AsSingleton();
-    containerDefinition.Bind<XRayService>().AsSingleton();
+    containerDefinition.Bind<TransparentTerrainMeshService>().AsSingleton();
+    containerDefinition.Bind<XRayModeManager>().AsSingleton();
   }
 }

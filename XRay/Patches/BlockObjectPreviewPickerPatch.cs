@@ -20,7 +20,7 @@ static class BlockObjectPreviewPickerPatch {
   static bool CenteredPreviewCoordinatesPrefix(
       PlaceableBlockObjectSpec placeableBlockObjectSpec, Orientation orientation, Ray ray,
       ref PickedCoordinates? __result) {
-    if (!XRayService.Instance.IsActive) {
+    if (!XRayModeManager.Instance.IsActive) {
       return true;
     }
     __result = TerrainRayCaster.Instance.CenteredPreviewCoordinates(placeableBlockObjectSpec, orientation, ray);
