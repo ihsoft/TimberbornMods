@@ -56,7 +56,7 @@ sealed class XRayService : IPostLoadableSingleton {
 
   #region Implementation
 
-  // The names of our custom materials, which will repace the original once's.
+  // The names of our custom materials, which will replace the original once's.
   const string XRayGrassMaterialName = "XRay_Grass";
   const string XRayCliffMaterialName = "XRay_Cliff";
   const string XRayCliffEdgeMaterialName = "XRay_CliffEdge";
@@ -163,7 +163,7 @@ sealed class XRayService : IPostLoadableSingleton {
     renderer.receiveShadows = _originalReceiveShadows;
   }
 
-  /// <summary>Returns all teh active renderers for the terrain meshes.</summary>
+  /// <summary>Returns all the active renderers for the terrain meshes.</summary>
   List<Renderer> GetTerrainRenderers() {
     return _terrainMeshManager._tiles.Values
         .Select(tileComponents => tileComponents._meshRenderer)
