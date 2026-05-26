@@ -84,10 +84,11 @@ class WireframeTerrainMeshService(
     var mat = rendererFactory.CreateTransparencyMaterial("WireMaterial", color);
 
     var size = mapSize.TerrainSize;
-    for (var x = 0; x < size.x; x += XMeshSize) {
-      for (var y = 0; y < size.y; y += YMeshSize) {
-        var meshX = x / XMeshSize;
-        var meshY = y / YMeshSize;
+    _allEdges.Clear();
+    for (var startX = 0; startX < size.x; startX += XMeshSize) {
+      for (var startY = 0; startY < size.y; startY += YMeshSize) {
+        var meshX = startX / XMeshSize;
+        var meshY = startY / YMeshSize;
         var meshObj = new GameObject($"Mesh:{meshX}-{meshY}");
         meshObj.transform.SetParent(overlayObj.transform, false);
         var mf = meshObj.AddComponent<MeshFilter>();
@@ -103,6 +104,8 @@ class WireframeTerrainMeshService(
 
     return overlayObj;
   }
+
+  readonly HashSet<(Vector3, Vector3)> _allEdges = [];
 
   bool IsSolid(Vector3Int coordinates) {
     return terrainMap.IsTerrainVoxel(coordinates);
@@ -174,18 +177,20 @@ class WireframeTerrainMeshService(
     }
   }
 
-  static void AddFaceEdges(HashSet<(Vector3, Vector3)> edges, Vector3 a, Vector3 b, Vector3 c, Vector3 d) {
+  void AddFaceEdges(HashSet<(Vector3, Vector3)> edges, Vector3 a, Vector3 b, Vector3 c, Vector3 d) {
     AddEdge(edges, a, b);
     AddEdge(edges, b, c);
     AddEdge(edges, c, d);
     AddEdge(edges, d, a);
   }
 
-  static void AddEdge(HashSet<(Vector3, Vector3)> edges, Vector3 a, Vector3 b) {
+  void AddEdge(HashSet<(Vector3, Vector3)> edges, Vector3 a, Vector3 b) {
     if (Compare(a, b) > 0) {
       (a, b) = (b, a);
     }
-    edges.Add((a, b));
+    if (_allEdges.Add((a, b))) {
+      edges.Add((a, b));
+    }
   }
 
   static int Compare(Vector3 a, Vector3 b) {
