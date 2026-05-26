@@ -91,7 +91,9 @@ class WireframeTerrainMeshService(
         var meshObj = new GameObject($"Mesh:{meshX}-{meshY}");
         meshObj.transform.SetParent(overlayObj.transform, false);
         var mf = meshObj.AddComponent<MeshFilter>();
-        mf.sharedMesh = BuildTileWireMesh(x, x + XMeshSize, y, y + YMeshSize, size.z);
+        var endX = Mathf.Min(startX + XMeshSize, size.x);
+        var endY = Mathf.Min(startY + YMeshSize, size.y);
+        mf.sharedMesh = BuildTileWireMesh(startX, endX, startY, endY, size.z);
         var mr = meshObj.AddComponent<MeshRenderer>();
         mr.sharedMaterial = mat;
         mr.shadowCastingMode = ShadowCastingMode.Off;
