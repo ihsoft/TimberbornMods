@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Timberborn.MapStateSystem;
 using Timberborn.RootProviders;
 using Timberborn.SingletonSystem;
@@ -65,6 +66,8 @@ class WireframeTerrainMeshService(
   bool _terrainDirty;
   bool _needOverlayMesh;
 
+  readonly HashSet<(Vector3Int, Vector3Int)> _allEdges = [];
+
   void RefreshOverlay() {
     if (_overlay) {
       Object.Destroy(_overlay);
@@ -105,17 +108,13 @@ class WireframeTerrainMeshService(
     return overlayObj;
   }
 
-  readonly HashSet<(Vector3, Vector3)> _allEdges = [];
-
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   bool IsSolid(Vector3Int coordinates) {
     return terrainMap.IsTerrainVoxel(coordinates);
   }
 
   Mesh BuildTileWireMesh(int startX, int endX, int startY, int endY, int maxZ) {
-    var vertices = new List<Vector3>();
-    var indices = new List<int>();
-    var edges = new HashSet<(Vector3, Vector3)>();
-
+    var edges = new HashSet<(Vector3Int, Vector3Int)>();
     for (var x = startX; x < endX; x++) {
       for (var y = startY; y < endY; y++) {
         for (var z = 0; z < maxZ; z++) {
@@ -128,6 +127,8 @@ class WireframeTerrainMeshService(
       }
     }
 
+    var vertices = new List<Vector3>();
+    var indices = new List<int>();
     foreach (var (a, b) in edges) {
       var i = vertices.Count;
       vertices.Add(a);
@@ -143,19 +144,20 @@ class WireframeTerrainMeshService(
     return mesh;
   }
 
-  void AddVisibleCubeEdges(Vector3Int coordinates, HashSet<(Vector3, Vector3)> edges) {
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  void AddVisibleCubeEdges(Vector3Int coordinates, HashSet<(Vector3Int, Vector3Int)> edges) {
     var x = coordinates.x;
     var y = coordinates.y;
     var z = coordinates.z;
 
-    var p000 = new Vector3(x,     z,     y);
-    var p100 = new Vector3(x + 1, z,     y);
-    var p010 = new Vector3(x,     z + 1, y);
-    var p110 = new Vector3(x + 1, z + 1, y);
-    var p001 = new Vector3(x,     z,     y + 1);
-    var p101 = new Vector3(x + 1, z,     y + 1);
-    var p011 = new Vector3(x,     z + 1, y + 1);
-    var p111 = new Vector3(x + 1, z + 1, y + 1);
+    var p000 = new Vector3Int(x,     z,     y);
+    var p100 = new Vector3Int(x + 1, z,     y);
+    var p010 = new Vector3Int(x,     z + 1, y);
+    var p110 = new Vector3Int(x + 1, z + 1, y);
+    var p001 = new Vector3Int(x,     z,     y + 1);
+    var p101 = new Vector3Int(x + 1, z,     y + 1);
+    var p011 = new Vector3Int(x,     z + 1, y + 1);
+    var p111 = new Vector3Int(x + 1, z + 1, y + 1);
 
     if (!IsSolid(new Vector3Int(x, y, z + 1))) {  // top
       AddFaceEdges(edges, p010, p110, p111, p011);
@@ -177,14 +179,16 @@ class WireframeTerrainMeshService(
     }
   }
 
-  void AddFaceEdges(HashSet<(Vector3, Vector3)> edges, Vector3 a, Vector3 b, Vector3 c, Vector3 d) {
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  void AddFaceEdges(HashSet<(Vector3Int, Vector3Int)> edges, Vector3Int a, Vector3Int b, Vector3Int c, Vector3Int d) {
     AddEdge(edges, a, b);
     AddEdge(edges, b, c);
     AddEdge(edges, c, d);
     AddEdge(edges, d, a);
   }
 
-  void AddEdge(HashSet<(Vector3, Vector3)> edges, Vector3 a, Vector3 b) {
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  void AddEdge(HashSet<(Vector3Int, Vector3Int)> edges, Vector3Int a, Vector3Int b) {
     if (Compare(a, b) > 0) {
       (a, b) = (b, a);
     }
@@ -193,7 +197,8 @@ class WireframeTerrainMeshService(
     }
   }
 
-  static int Compare(Vector3 a, Vector3 b) {
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  static int Compare(Vector3Int a, Vector3Int b) {
     var r = a.x.CompareTo(b.x);
     if (r != 0) {
       return r;
