@@ -90,6 +90,7 @@ class TransparentTerrainMeshService : IPostLoadableSingleton {
   readonly TerrainMeshManager _terrainMeshManager;
   readonly ColorSettings _colorSettings;
 
+  // Primarily made for the efficient patches handling.
   internal static TransparentTerrainMeshService Instance { get; private set; }
 
   TransparentTerrainMeshService(
