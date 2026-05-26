@@ -194,10 +194,7 @@ class WireframeTerrainMeshService(
       return r;
     }
     r = a.y.CompareTo(b.y);
-    if (r != 0) {
-      return r;
-    }
-    return a.z.CompareTo(b.z);
+    return r != 0 ? r : a.z.CompareTo(b.z);
   }
 
   #endregion
