@@ -54,6 +54,12 @@ sealed class RendererFactory(IWaterMesh waterMesh) {
     return mat;
   }
 
+  /// <summary>Makes the material glowing instead of blending by the alpha channel.</summary>
+  public void SetMaterialToGlowing(Material mat) {
+    mat.SetInt(SrcBlendProperty, (int)BlendMode.One);
+    mat.SetInt(DstBlendProperty, (int)BlendMode.One);
+  }
+
   #endregion
 
   #region Implementation

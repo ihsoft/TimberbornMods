@@ -16,8 +16,8 @@ static class TileComponentsPatch {
   [HarmonyPatch(nameof(TerrainMeshManager.TileComponents.UpdateMesh))]
   static void UpdateMeshPostfix(TerrainMeshManager.TileComponents __instance) {
     var renderer = __instance._meshRenderer;
-    if (renderer && XRayService.Instance.IsActive) {
-      XRayService.Instance.SetXRayRenderer(renderer);
+    if (renderer && TransparentTerrainMeshService.Instance.IsActive) {
+      TransparentTerrainMeshService.Instance.SetXRayRenderer(renderer);
     }
   }
 }
