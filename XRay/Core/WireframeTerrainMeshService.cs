@@ -4,18 +4,20 @@
 
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using IgorZ.XRay.Settings;
 using Timberborn.MapStateSystem;
 using Timberborn.RootProviders;
 using Timberborn.SingletonSystem;
 using Timberborn.TerrainSystem;
 using UnityEngine;
 using UnityEngine.Rendering;
+using Object = UnityEngine.Object;
 
 namespace IgorZ.XRay.Core;
 
 class WireframeTerrainMeshService(
     TerrainMap terrainMap, MapSize mapSize, ITerrainService terrainService, RootObjectProvider rootObjectProvider,
-    RendererFactory rendererFactory)
+    RendererFactory rendererFactory, ColorSettings colorSettings)
     : ILoadableSingleton, ILateUpdatableSingleton {
 
   // FIXME: Older cards may need smaller mesh size
@@ -66,7 +68,18 @@ class WireframeTerrainMeshService(
   bool _terrainDirty;
   bool _needOverlayMesh;
 
-  readonly HashSet<(Vector3Int, Vector3Int)> _allEdges = [];
+  readonly record struct EdgeKey(Vector3Int A, Vector3Int B) {
+    public static EdgeKey Create(Vector3Int a, Vector3Int b) =>
+        Compare(a, b) <= 0 ? new EdgeKey(a, b) : new EdgeKey(b, a);
+  }
+
+  struct EdgeInfo {
+    public int FaceCount;
+    public Vector3Int FirstNormal;
+    public bool HasDifferentNormals;
+  }
+
+  readonly Dictionary<EdgeKey, EdgeInfo> _edgeCache = new();
 
   void RefreshOverlay() {
     if (_overlay) {
@@ -82,12 +95,10 @@ class WireframeTerrainMeshService(
 
   GameObject CreateWireOverlay() {
     var overlayObj = new GameObject("XRayWireframeTerrainMesh");
-    //FIXME: to settings?
-    var color = new Color(0.55f, 0.9f, 1f, 0.10f);
-    var mat = rendererFactory.CreateTransparencyMaterial("WireMaterial", color);
+    BuildMeshEdgeCache();
 
+    var mat = rendererFactory.CreateTransparencyMaterial("WireMaterial", colorSettings.WireframeEdgeColor.Color);
     var size = mapSize.TerrainSize;
-    _allEdges.Clear();
     for (var startX = 0; startX < size.x; startX += XMeshSize) {
       for (var startY = 0; startY < size.y; startY += YMeshSize) {
         var meshX = startX / XMeshSize;
@@ -113,26 +124,35 @@ class WireframeTerrainMeshService(
     return terrainMap.IsTerrainVoxel(coordinates);
   }
 
-  Mesh BuildTileWireMesh(int startX, int endX, int startY, int endY, int maxZ) {
-    var edges = new HashSet<(Vector3Int, Vector3Int)>();
-    for (var x = startX; x < endX; x++) {
-      for (var y = startY; y < endY; y++) {
-        for (var z = 0; z < maxZ; z++) {
+  void BuildMeshEdgeCache() {
+    _edgeCache.Clear();
+    var size = mapSize.TerrainSize;
+    for (var x = 0; x < size.x; x++) {
+      for (var y = 0; y < size.y; y++) {
+        for (var z = 0; z < size.z; z++) {
           var coordinates = new Vector3Int(x, y, z);
           if (!IsSolid(coordinates)) {
             continue;
           }
-          AddVisibleCubeEdges(coordinates, edges);
+          AddVisibleCubeEdges(coordinates);
         }
       }
     }
+  }
 
+  Mesh BuildTileWireMesh(int startX, int endX, int startY, int endY, int maxZ) {
     var vertices = new List<Vector3>();
     var indices = new List<int>();
-    foreach (var (a, b) in edges) {
+    foreach (var (edge, info) in _edgeCache) {
+      if (!IsContourEdge(info)) {
+        continue;
+      }
+      if (!BelongsToChunk(edge, startX, endX, startY, endY)) {
+        continue;
+      }
       var i = vertices.Count;
-      vertices.Add(a);
-      vertices.Add(b);
+      vertices.Add(edge.A);
+      vertices.Add(edge.B);
       indices.Add(i);
       indices.Add(i + 1);
     }
@@ -144,8 +164,20 @@ class WireframeTerrainMeshService(
     return mesh;
   }
 
+  // top:    new Vector3Int(0, 0, 1)
+  // bottom: new Vector3Int(0, 0, -1)
+  // west:   new Vector3Int(-1, 0, 0)
+  // east:   new Vector3Int(1, 0, 0)
+  // south:  new Vector3Int(0, -1, 0)
+  // north:  new Vector3Int(0, 1, 0)
+  static readonly Vector3Int FaceTop = new(0, 0, 1);
+  static readonly Vector3Int FaceWest = new(-1, 0, 0);
+  static readonly Vector3Int FaceEast = new(1, 0, 0);
+  static readonly Vector3Int FaceSouth = new(0, -1, 0);
+  static readonly Vector3Int FaceNorth = new(0, 1, 0);
+
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  void AddVisibleCubeEdges(Vector3Int coordinates, HashSet<(Vector3Int, Vector3Int)> edges) {
+  void AddVisibleCubeEdges(Vector3Int coordinates) {
     var x = coordinates.x;
     var y = coordinates.y;
     var z = coordinates.z;
@@ -159,42 +191,51 @@ class WireframeTerrainMeshService(
     var p011 = new Vector3Int(x,     z + 1, y + 1);
     var p111 = new Vector3Int(x + 1, z + 1, y + 1);
 
-    if (!IsSolid(new Vector3Int(x, y, z + 1))) {  // top
-      AddFaceEdges(edges, p010, p110, p111, p011);
+    if (!IsSolid(coordinates + FaceTop)) {  // top
+      RegisterFaceEdges(p010, p110, p111, p011, FaceTop);
     }
-    if (!IsSolid(new Vector3Int(x, y, z - 1))) {  // bottom, probably optional
-      AddFaceEdges(edges, p000, p001, p101, p100);
+    if (!IsSolid(coordinates + FaceWest)) {  // west
+      RegisterFaceEdges(p000, p010, p011, p001, FaceWest);
     }
-    if (!IsSolid(new Vector3Int(x - 1, y, z))) {  // west
-      AddFaceEdges(edges, p000, p010, p011, p001);
+    if (!IsSolid(coordinates + FaceEast)) {  // east
+      RegisterFaceEdges(p100, p101, p111, p110, FaceEast);
     }
-    if (!IsSolid(new Vector3Int(x + 1, y, z))) {  // east
-      AddFaceEdges(edges, p100, p101, p111, p110);
+    if (!IsSolid(coordinates + FaceSouth)) {  // south
+      RegisterFaceEdges(p000, p100, p110, p010, FaceSouth);
     }
-    if (!IsSolid(new Vector3Int(x, y - 1, z))) {  // south
-      AddFaceEdges(edges, p000, p100, p110, p010);
-    }
-    if (!IsSolid(new Vector3Int(x, y + 1, z))) {  // north
-      AddFaceEdges(edges, p001, p011, p111, p101);
+    if (!IsSolid(coordinates + FaceNorth)) {  // north
+      RegisterFaceEdges(p001, p011, p111, p101, FaceNorth);
     }
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  void AddFaceEdges(HashSet<(Vector3Int, Vector3Int)> edges, Vector3Int a, Vector3Int b, Vector3Int c, Vector3Int d) {
-    AddEdge(edges, a, b);
-    AddEdge(edges, b, c);
-    AddEdge(edges, c, d);
-    AddEdge(edges, d, a);
+  void RegisterFaceEdges(Vector3Int a, Vector3Int b, Vector3Int c, Vector3Int d, Vector3Int normal) {
+    RegisterEdge(a, b, normal);
+    RegisterEdge(b, c, normal);
+    RegisterEdge(c, d, normal);
+    RegisterEdge(d, a, normal);
+  }
+
+  void RegisterEdge(Vector3Int a, Vector3Int b, Vector3Int normal) {
+    var key = EdgeKey.Create(a, b);
+    if (!_edgeCache.TryGetValue(key, out var info)) {
+      _edgeCache.Add(key, new EdgeInfo {
+          FaceCount = 1,
+          FirstNormal = normal,
+          HasDifferentNormals = false,
+      });
+      return;
+    }
+
+    info.FaceCount++;
+    info.HasDifferentNormals |= info.FirstNormal != normal;
+    //FIXME: record instead of struct?
+    _edgeCache[key] = info;
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  void AddEdge(HashSet<(Vector3Int, Vector3Int)> edges, Vector3Int a, Vector3Int b) {
-    if (Compare(a, b) > 0) {
-      (a, b) = (b, a);
-    }
-    if (_allEdges.Add((a, b))) {
-      edges.Add((a, b));
-    }
+  static bool IsContourEdge(EdgeInfo info) {
+    return info.FaceCount == 1 || info.HasDifferentNormals || info.FaceCount > 2;
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]

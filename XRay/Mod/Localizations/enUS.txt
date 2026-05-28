@@ -2,6 +2,7 @@ ID,Text,Comment
 IgorZ.XRay.ColorSettings.Color.CliffEdge,"Cliff edge color",
 IgorZ.XRay.ColorSettings.Color.Cliff,"Cliff color",
 IgorZ.XRay.ColorSettings.Color.Grass,"Grass color",
+IgorZ.XRay.ColorSettings.Color.WireframeEdge,"Wireframe edge color",
 IgorZ.XRay.ColorSettings.ColorSchemaDropdown,"Color schema","The dropdown label for color schema selection"
 IgorZ.XRay.ColorSettings.ColorSchemaName.BWBright,"Black and white bright","The name of the color schema with bright colors in black and white style"
 IgorZ.XRay.ColorSettings.ColorSchemaName.BWDark,"Black and white dark","The name of the color schema with dark colors in black and white style"

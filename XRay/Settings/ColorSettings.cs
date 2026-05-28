@@ -3,8 +3,6 @@
 // License: Public Domain
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using IgorZ.TimberDev.Settings;
 using ModSettings.Common;
@@ -16,12 +14,12 @@ using UnityEngine;
 
 namespace IgorZ.XRay.Settings;
 
-[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 sealed class ColorSettings : BaseSettings<ColorSettings> {
 
   const string ColorCliffEdgeLocKey = "IgorZ.XRay.ColorSettings.Color.CliffEdge";
   const string ColorCliffLocKey = "IgorZ.XRay.ColorSettings.Color.Cliff";
   const string ColorGrassLocKey = "IgorZ.XRay.ColorSettings.Color.Grass";
+  const string ColorWireframeEdgeLocKey = "IgorZ.XRay.ColorSettings.Color.WireframeEdge";
   const string ColorSchemaDropdownLocKey = "IgorZ.XRay.ColorSettings.ColorSchemaDropdown";
   const string ColorSchemaNameBwBrightLocKey = "IgorZ.XRay.ColorSettings.ColorSchemaName.BWBright";
   const string ColorSchemaNameBwDarkLocKey = "IgorZ.XRay.ColorSettings.ColorSchemaName.BWDark";
@@ -33,19 +31,19 @@ sealed class ColorSettings : BaseSettings<ColorSettings> {
   const string HeaderStringLocKey = "IgorZ.XRay.ColorSettings.Header";
 
   record struct Preset(
-      string NameLocKey, Color GrassColor, Color CliffColor, Color CliffEdgeColor, bool GlowingEdges,
-      int GhostModeIntensity);
+      string NameLocKey, Color GrassColor, Color CliffColor, Color CliffEdgeColor, Color WireframeEdgeColor,
+      bool GlowingEdges, int GhostModeIntensity);
 
   static readonly Preset DefaultSchema =
-      new(ColorSchemaNameBwBrightLocKey, HexColor(0xCACACA), HexColor(0xCACACA), HexColor(0xFFFFFF), false, 21);
+      new(ColorSchemaNameBwBrightLocKey, HexColor(0xCACACA), HexColor(0xCACACA), HexColor(0xFFFFFF), HexColor(0xCACACA), false, 21);
   static readonly Preset CustomSettings =
-      new(ColorSchemaNameCustomLocKey, HexColor(0), HexColor(0), HexColor(0), false, 0);
+      new(ColorSchemaNameCustomLocKey, HexColor(0), HexColor(0), HexColor(0), HexColor(0), false, 0);
 
   static readonly Preset[] SchemaPresets = [
       CustomSettings,
-      new(ColorSchemaNameNormalLocKey, HexColor(0x00DAB9), HexColor(0x00B196), HexColor(0x00FFD9), false, 10),
-      new(ColorSchemaNameNormalGlowLocKey, HexColor(0x00DAB9), HexColor(0x00B196), HexColor(0x00FFD9), true, 10),
-      new(ColorSchemaNameBwDarkLocKey, HexColor(0xCACACA), HexColor(0xCACACA), HexColor(0xFFFFFF), false, 10),
+      new(ColorSchemaNameNormalLocKey, HexColor(0x00DAB9), HexColor(0x00B196), HexColor(0x00FFD9), HexColor(0x00B196), false, 10),
+      new(ColorSchemaNameNormalGlowLocKey, HexColor(0x00DAB9), HexColor(0x00B196), HexColor(0x00FFD9), HexColor(0x00B196), true, 10),
+      new(ColorSchemaNameBwDarkLocKey, HexColor(0xCACACA), HexColor(0xCACACA), HexColor(0xFFFFFF), HexColor(0xCACACA), false, 10),
       DefaultSchema,
   ];
   static readonly int DefaultSchemaIndex = SchemaPresets.ToList().IndexOf(DefaultSchema) != -1
@@ -92,6 +90,11 @@ sealed class ColorSettings : BaseSettings<ColorSettings> {
           ModSettingDescriptor.CreateLocalized(ColorCliffEdgeLocKey).SetEnableCondition(IsCustom),
           false);
 
+  public ColorModSetting WireframeEdgeColor { get; } =
+    new(DefaultSchema.WireframeEdgeColor,
+        ModSettingDescriptor.CreateLocalized(ColorWireframeEdgeLocKey).SetEnableCondition(IsCustom),
+        false);
+
   public ModSetting<int> GhostModeIntensity { get; } =
       new RangeIntModSetting(
           DefaultSchema.GhostModeIntensity, 0, 100,
@@ -115,6 +118,7 @@ sealed class ColorSettings : BaseSettings<ColorSettings> {
     GrassColor.ValueChanged += (_, _) => OnSettingsUpdated?.Invoke();
     CliffColor.ValueChanged += (_, _) => OnSettingsUpdated?.Invoke();
     CliffEdgeColor.ValueChanged += (_, _) => OnSettingsUpdated?.Invoke();
+    WireframeEdgeColor.ValueChanged += (_, _) => OnSettingsUpdated?.Invoke();
     GlowingEdges.ValueChanged += (_, _) => OnSettingsUpdated?.Invoke();
     GhostModeIntensity.ValueChanged += (_, _) => OnSettingsUpdated?.Invoke();
   }
@@ -131,6 +135,7 @@ sealed class ColorSettings : BaseSettings<ColorSettings> {
     GrassColor.SetValue(preset.GrassColor);
     CliffColor.SetValue(preset.CliffColor);
     CliffEdgeColor.SetValue(preset.CliffEdgeColor);
+    WireframeEdgeColor.SetValue(preset.WireframeEdgeColor);
     GlowingEdges.SetValue(preset.GlowingEdges);
     GhostModeIntensity.SetValue(preset.GhostModeIntensity);
   }
