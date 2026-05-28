@@ -9,45 +9,46 @@ using Timberborn.MapStateSystem;
 using Timberborn.RootProviders;
 using Timberborn.SingletonSystem;
 using Timberborn.TerrainSystem;
-using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 
 namespace IgorZ.XRay.Core;
 
-class WireframeTerrainMeshService(
-    TerrainMap terrainMap,
-    MapSize mapSize,
-    ITerrainService terrainService,
-    RootObjectProvider rootObjectProvider,
-    RendererFactory rendererFactory,
-    ColorSettings colorSettings)
+class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootObjectProvider rootObjectProvider,
+                                  RendererFactory rendererFactory, ColorSettings colorSettings)
     : ILoadableSingleton, ILateUpdatableSingleton {
 
-  // const int XMeshSize = 48;
-  // const int YMeshSize = 48;
-  const int XMeshSize = 10;
-  const int YMeshSize = 10;
+  // Chunk size directly affects incremental rebuild cost.
+  //
+  // Approximate worst-case vertex counts for contour rendering (checkerboard-like terrain with maximum contour
+  // complexity):
+  //
+  //  16x16 -> ~3k vertices
+  //  32x32 -> ~12k vertices
+  //  64x64 -> ~49k vertices
+  //
+  // Larger chunks reduce renderer/draw-call overhead, but dramatically increase rebuild cost and approach Unity's
+  // 16-bit mesh vertex limit (~65k vertices).
+  //
+  // 32x32 provides a good balance for dynamic terrain updates.
+  const int XMeshSize = 32;
+  const int YMeshSize = 32;
 
-  public void Activate() {
-    _needOverlayMesh = true;
-    _fullRebuildRequested = true;
-    _needUpdate = true;
-  }
+  #region Implementation of ILoadableSingleton
 
-  public void Deactivate() {
-    _needOverlayMesh = false;
-    _needUpdate = true;
-  }
-
+  /// <inheritdoc/>
   public void Load() {
     _root = rootObjectProvider.CreateRootObject("XRayWireframeTerrainMesh");
-    terrainService.TerrainHeightChanged += OnTerrainHeightChanged;
     terrainMap.TerrainAdded += OnTerrainAdded;
     terrainMap.TerrainRemoved += OnTerrainRemoved;
   }
 
+  #endregion
+
+  #region ILateUpdatableSingleton implementation
+
+  /// <inheritdoc/>
   public void LateUpdateSingleton() {
     if (!_needUpdate) {
       return;
@@ -64,39 +65,42 @@ class WireframeTerrainMeshService(
     RebuildDirtyChunks();
   }
 
-  /// <summary>
-  /// Incremental update entry point. Call this after the terrain state has changed.
-  /// </summary>
-  public void ApplyVoxelChange(Vector3Int coordinates, bool wasSolid, bool isSolid) {
-    if (wasSolid == isSolid) {
-      return;
-    }
-    if (!_needOverlayMesh) {
-      return;
-    }
-    if (!_overlay) {
-      _fullRebuildRequested = true;
-      _needUpdate = true;
-      return;
-    }
-    if (isSolid) {
-      AddSolidVoxel(coordinates);
-    } else {
-      RemoveSolidVoxel(coordinates);
-    }
+  #endregion
+
+  #region API
+
+  /// <summary>Tells if the wire frame mesh is active and should be rendered.</summary>
+  public bool IsActive { get; private set; }
+
+  /// <summary>Activate the wire frame mesh that will stay as long as it's active.</summary>
+  /// <remarks>
+  /// The activation can be expensive as it may (but not required) need to rebuild the entire terrain mesh. The
+  /// following terrain updates will trigger mesh rebuilds. It will add latency.
+  /// </remarks>
+  /// <seealso cref="IsActive"/>
+  public void Activate() {
+    IsActive = true;
+    _fullRebuildRequested = true;
     _needUpdate = true;
   }
+
+  /// <summary>Deactivate the wire frame mesh that will stop rendering until it's activated again.</summary>
+  /// <remarks>All the meshes will be removed from the scene. No extra cost on terrain update.</remarks>
+  /// <seealso cref="IsActive"/>
+  public void Deactivate() {
+    IsActive = false;
+    _needUpdate = true;
+  }
+
+  #endregion
+
+  #region Implementation
 
   GameObject _root;
   GameObject _overlay;
   Material _material;
   bool _needUpdate;
-  bool _needOverlayMesh;
   bool _fullRebuildRequested;
-
-  readonly Dictionary<EdgeKey, EdgeInfo> _edgeCache = new();
-  readonly Dictionary<Vector2Int, MeshFilter> _chunkMeshFilters = new();
-  readonly HashSet<Vector2Int> _dirtyChunks = new();
 
   readonly record struct EdgeKey(Vector3Int A, Vector3Int B) {
     public static EdgeKey Create(Vector3Int a, Vector3Int b) =>
@@ -106,6 +110,7 @@ class WireframeTerrainMeshService(
   struct EdgeInfo {
     public int Total;
     public int Top;
+    public int Bottom;
     public int West;
     public int East;
     public int South;
@@ -113,18 +118,24 @@ class WireframeTerrainMeshService(
   }
 
   static readonly Vector3Int FaceTop = new(0, 0, 1);
+  static readonly Vector3Int FaceBottom = new(0, 0, -1);
   static readonly Vector3Int FaceWest = new(-1, 0, 0);
   static readonly Vector3Int FaceEast = new(1, 0, 0);
   static readonly Vector3Int FaceSouth = new(0, -1, 0);
   static readonly Vector3Int FaceNorth = new(0, 1, 0);
 
-  static readonly Vector3Int[] Faces = {
+  static readonly Vector3Int[] Faces = [
       FaceTop,
+      FaceBottom,
       FaceWest,
       FaceEast,
       FaceSouth,
       FaceNorth,
-  };
+  ];
+
+  readonly Dictionary<EdgeKey, EdgeInfo> _edgeCache = new();
+  readonly Dictionary<Vector2Int, MeshFilter> _chunkMeshFilters = new();
+  readonly HashSet<Vector2Int> _dirtyChunks = [];
 
   void RefreshOverlay() {
     if (_overlay) {
@@ -133,26 +144,19 @@ class WireframeTerrainMeshService(
     }
     _chunkMeshFilters.Clear();
     _dirtyChunks.Clear();
-
-    if (!_needOverlayMesh) {
+    if (!IsActive) {
       return;
     }
-
     _overlay = CreateWireOverlay();
     _overlay.transform.SetParent(_root.transform, false);
   }
 
   GameObject CreateWireOverlay() {
-    var overlayObj = new GameObject("XRayWireframeTerrainMesh");
-
     BuildMeshEdgeCache();
-
-    _material = rendererFactory.CreateTransparencyMaterial(
-        "WireMaterial",
-        colorSettings.WireframeEdgeColor.Color);
+    _material = rendererFactory.CreateTransparencyMaterial("WireMaterial", colorSettings.WireframeEdgeColor.Color);
 
     var size = mapSize.TerrainSize;
-
+    var overlayObj = new GameObject("XRayWireframeTerrainMesh");
     for (var startX = 0; startX < size.x; startX += XMeshSize) {
       for (var startY = 0; startY < size.y; startY += YMeshSize) {
         var chunk = new Vector2Int(startX / XMeshSize, startY / YMeshSize);
@@ -180,10 +184,9 @@ class WireframeTerrainMeshService(
       for (var y = 0; y < size.y; y++) {
         for (var z = 0; z < size.z; z++) {
           var coordinates = new Vector3Int(x, y, z);
-          if (!IsSolid(coordinates)) {
-            continue;
+          if (IsSolid(coordinates)) {
+            ChangeVisibleCubeFaces(coordinates, +1);
           }
-          ChangeVisibleCubeFaces(coordinates, +1);
         }
       }
     }
@@ -191,8 +194,6 @@ class WireframeTerrainMeshService(
 
   void RebuildDirtyChunks() {
     foreach (var chunk in _dirtyChunks) {
-      //FIXME: level
-      DebugEx.Warning("*** Rebuilding chunk: {0}", chunk);
       if (!_chunkMeshFilters.TryGetValue(chunk, out var mf)) {
         continue;
       }
@@ -228,6 +229,23 @@ class WireframeTerrainMeshService(
     mesh.SetIndices(indices, MeshTopology.Lines, 0);
     mesh.RecalculateBounds();
     return mesh;
+  }
+
+  void ApplyVoxelChange(Vector3Int coordinates, bool wasSolid, bool isSolid) {
+    if (wasSolid == isSolid || !IsActive) {
+      return;
+    }
+    if (!_overlay) {
+      _fullRebuildRequested = true;
+      _needUpdate = true;
+      return;
+    }
+    if (isSolid) {
+      AddSolidVoxel(coordinates);
+    } else {
+      RemoveSolidVoxel(coordinates);
+    }
+    _needUpdate = true;
   }
 
   void AddSolidVoxel(Vector3Int coordinates) {
@@ -280,6 +298,8 @@ class WireframeTerrainMeshService(
 
     if (normal == FaceTop) {
       ChangeFaceEdges(p010, p110, p111, p011, normal, delta);
+    } else if (normal == FaceBottom) {
+      ChangeFaceEdges(p000, p001, p101, p100, normal, delta);
     } else if (normal == FaceWest) {
       ChangeFaceEdges(p000, p010, p011, p001, normal, delta);
     } else if (normal == FaceEast) {
@@ -291,6 +311,7 @@ class WireframeTerrainMeshService(
     }
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void ChangeFaceEdges(Vector3Int a, Vector3Int b, Vector3Int c, Vector3Int d, Vector3Int normal, int delta) {
     ChangeEdge(a, b, normal, delta);
     ChangeEdge(b, c, normal, delta);
@@ -319,6 +340,8 @@ class WireframeTerrainMeshService(
     info.Total += delta;
     if (normal == FaceTop) {
       info.Top += delta;
+    } else if (normal == FaceBottom) {
+      info.Bottom += delta;
     } else if (normal == FaceWest) {
       info.West += delta;
     } else if (normal == FaceEast) {
@@ -332,8 +355,6 @@ class WireframeTerrainMeshService(
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void MarkChunkDirty(EdgeKey edge) {
-    //FIXME
-    DebugEx.Warning("*** Marking chunk dirty: {0}", GetOwnerChunk(edge));
     _needUpdate = true;
     _dirtyChunks.Add(GetOwnerChunk(edge));
   }
@@ -360,12 +381,14 @@ class WireframeTerrainMeshService(
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   static bool IsContourEdge(EdgeInfo info) {
-    return info.Total == 1 || CountUsedNormals(info) > 1;
-  }
-
-  static int CountUsedNormals(EdgeInfo info) {
+    if (info.Total == 1) {
+      return true;
+    }
     var count = 0;
     if (info.Top > 0) {
+      count++;
+    }
+    if (info.Bottom > 0) {
       count++;
     }
     if (info.West > 0) {
@@ -380,7 +403,7 @@ class WireframeTerrainMeshService(
     if (info.North > 0) {
       count++;
     }
-    return count;
+    return count > 1;
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -393,21 +416,17 @@ class WireframeTerrainMeshService(
     return r != 0 ? r : a.z.CompareTo(b.z);
   }
 
+  #endregion
+
+  #region Terrain changed event listeners
+
   void OnTerrainAdded(object sender, Vector3Int coordinates) {
-    //FIXME
-    DebugEx.Warning("*** terrain added: {0}", coordinates);
     ApplyVoxelChange(coordinates, wasSolid: false, isSolid: true);
   }
 
   void OnTerrainRemoved(object sender, Vector3Int coordinates) {
-    //FIXME
-    DebugEx.Warning("*** terrain removed: {0}", coordinates);
     ApplyVoxelChange(coordinates, wasSolid: true, isSolid: false);
   }
 
-  void OnTerrainHeightChanged(object sender, TerrainHeightChangeEventArgs terrainHeightChangeEventArgs) {
-    // _fullRebuildRequested = true;
-    // _needUpdate = true;
-    DebugEx.Warning("*** terrain changed!");
-  }
+  #endregion
 }

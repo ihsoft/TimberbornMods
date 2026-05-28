@@ -14,5 +14,6 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<TerrainRayCaster>().AsSingleton();
     containerDefinition.Bind<TransparentTerrainMeshService>().AsSingleton();
     containerDefinition.Bind<XRayModeManager>().AsSingleton();
+    containerDefinition.Bind<WireframeTerrainMeshService>().AsSingleton();
   }
 }
