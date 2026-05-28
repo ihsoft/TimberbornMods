@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using IgorZ.XRay.Settings;
@@ -102,6 +103,17 @@ class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootOb
   bool _needUpdate;
   bool _fullRebuildRequested;
 
+  enum FaceDirection {
+    Top,
+    Bottom,
+    West,
+    East,
+    South,
+    North,
+  }
+
+  readonly record struct Face(FaceDirection Direction, Vector3Int Offset);
+
   readonly record struct EdgeKey(Vector3Int A, Vector3Int B) {
     public static EdgeKey Create(Vector3Int a, Vector3Int b) =>
         Compare(a, b) <= 0 ? new EdgeKey(a, b) : new EdgeKey(b, a);
@@ -117,20 +129,13 @@ class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootOb
     public int North;
   }
 
-  static readonly Vector3Int FaceTop = new(0, 0, 1);
-  static readonly Vector3Int FaceBottom = new(0, 0, -1);
-  static readonly Vector3Int FaceWest = new(-1, 0, 0);
-  static readonly Vector3Int FaceEast = new(1, 0, 0);
-  static readonly Vector3Int FaceSouth = new(0, -1, 0);
-  static readonly Vector3Int FaceNorth = new(0, 1, 0);
-
-  static readonly Vector3Int[] Faces = [
-      FaceTop,
-      FaceBottom,
-      FaceWest,
-      FaceEast,
-      FaceSouth,
-      FaceNorth,
+  static readonly Face[] Faces = [
+      new(FaceDirection.Top, new Vector3Int(0, 0, 1)),
+      new(FaceDirection.Bottom, new Vector3Int(0, 0, -1)),
+      new(FaceDirection.West, new Vector3Int(-1, 0, 0)),
+      new(FaceDirection.East, new Vector3Int(1, 0, 0)),
+      new(FaceDirection.South, new Vector3Int(0, -1, 0)),
+      new(FaceDirection.North, new Vector3Int(0, 1, 0)),
   ];
 
   readonly Dictionary<EdgeKey, EdgeInfo> _edgeCache = new();
@@ -249,10 +254,10 @@ class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootOb
   }
 
   void AddSolidVoxel(Vector3Int coordinates) {
-    foreach (var normal in Faces) {
-      var neighbor = coordinates + normal;
+    foreach (var face in Faces) {
+      var neighbor = coordinates + face.Offset;
       if (IsSolid(neighbor)) {
-        ChangeSingleFace(neighbor, -normal, -1);
+        ChangeSingleFace(neighbor, Opposite(face.Direction), -1);
       }
     }
     ChangeVisibleCubeFaces(coordinates, +1);
@@ -260,10 +265,10 @@ class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootOb
 
   void RemoveSolidVoxel(Vector3Int coordinates) {
     ChangeVisibleCubeFaces(coordinates, -1);
-    foreach (var normal in Faces) {
-      var neighbor = coordinates + normal;
+    foreach (var face in Faces) {
+      var neighbor = coordinates + face.Offset;
       if (IsSolid(neighbor)) {
-        ChangeSingleFace(neighbor, -normal, +1);
+        ChangeSingleFace(neighbor, Opposite(face.Direction), +1);
       }
     }
   }
@@ -275,14 +280,14 @@ class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootOb
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   void ChangeVisibleCubeFaces(Vector3Int coordinates, int delta) {
-    foreach (var normal in Faces) {
-      if (!IsSolid(coordinates + normal)) {
-        ChangeSingleFace(coordinates, normal, delta);
+    foreach (var face in Faces) {
+      if (!IsSolid(coordinates + face.Offset)) {
+        ChangeSingleFace(coordinates, face.Direction, delta);
       }
     }
   }
 
-  void ChangeSingleFace(Vector3Int coordinates, Vector3Int normal, int delta) {
+  void ChangeSingleFace(Vector3Int coordinates, FaceDirection direction, int delta) {
     var x = coordinates.x;
     var y = coordinates.y;
     var z = coordinates.z;
@@ -296,34 +301,43 @@ class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootOb
     var p011 = new Vector3Int(x, z + 1, y + 1);
     var p111 = new Vector3Int(x + 1, z + 1, y + 1);
 
-    if (normal == FaceTop) {
-      ChangeFaceEdges(p010, p110, p111, p011, normal, delta);
-    } else if (normal == FaceBottom) {
-      ChangeFaceEdges(p000, p001, p101, p100, normal, delta);
-    } else if (normal == FaceWest) {
-      ChangeFaceEdges(p000, p010, p011, p001, normal, delta);
-    } else if (normal == FaceEast) {
-      ChangeFaceEdges(p100, p101, p111, p110, normal, delta);
-    } else if (normal == FaceSouth) {
-      ChangeFaceEdges(p000, p100, p110, p010, normal, delta);
-    } else if (normal == FaceNorth) {
-      ChangeFaceEdges(p001, p011, p111, p101, normal, delta);
+    switch (direction) {
+      case FaceDirection.Top:
+        ChangeFaceEdges(p010, p110, p111, p011, direction, delta);
+        break;
+      case FaceDirection.Bottom:
+        ChangeFaceEdges(p000, p001, p101, p100, direction, delta);
+        break;
+      case FaceDirection.West:
+        ChangeFaceEdges(p000, p010, p011, p001, direction, delta);
+        break;
+      case FaceDirection.East:
+        ChangeFaceEdges(p100, p101, p111, p110, direction, delta);
+        break;
+      case FaceDirection.South:
+        ChangeFaceEdges(p000, p100, p110, p010, direction, delta);
+        break;
+      case FaceDirection.North:
+        ChangeFaceEdges(p001, p011, p111, p101, direction, delta);
+        break;
+      default:
+        throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
     }
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  void ChangeFaceEdges(Vector3Int a, Vector3Int b, Vector3Int c, Vector3Int d, Vector3Int normal, int delta) {
-    ChangeEdge(a, b, normal, delta);
-    ChangeEdge(b, c, normal, delta);
-    ChangeEdge(c, d, normal, delta);
-    ChangeEdge(d, a, normal, delta);
+  void ChangeFaceEdges(Vector3Int a, Vector3Int b, Vector3Int c, Vector3Int d, FaceDirection direction, int delta) {
+    ChangeEdge(a, b, direction, delta);
+    ChangeEdge(b, c, direction, delta);
+    ChangeEdge(c, d, direction, delta);
+    ChangeEdge(d, a, direction, delta);
   }
 
-  void ChangeEdge(Vector3Int a, Vector3Int b, Vector3Int normal, int delta) {
+  void ChangeEdge(Vector3Int a, Vector3Int b, FaceDirection direction, int delta) {
     var key = EdgeKey.Create(a, b);
     _edgeCache.TryGetValue(key, out var info);
     var wasContour = IsContourEdge(info);
-    AddNormal(ref info, normal, delta);
+    AddNormal(ref info, direction, delta);
     if (info.Total <= 0) {
       _edgeCache.Remove(key);
     } else {
@@ -336,20 +350,29 @@ class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootOb
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  static void AddNormal(ref EdgeInfo info, Vector3Int normal, int delta) {
+  static void AddNormal(ref EdgeInfo info, FaceDirection direction, int delta) {
     info.Total += delta;
-    if (normal == FaceTop) {
-      info.Top += delta;
-    } else if (normal == FaceBottom) {
-      info.Bottom += delta;
-    } else if (normal == FaceWest) {
-      info.West += delta;
-    } else if (normal == FaceEast) {
-      info.East += delta;
-    } else if (normal == FaceSouth) {
-      info.South += delta;
-    } else if (normal == FaceNorth) {
-      info.North += delta;
+    switch (direction) {
+      case FaceDirection.Top:
+        info.Top += delta;
+        break;
+      case FaceDirection.Bottom:
+        info.Bottom += delta;
+        break;
+      case FaceDirection.West:
+        info.West += delta;
+        break;
+      case FaceDirection.East:
+        info.East += delta;
+        break;
+      case FaceDirection.South:
+        info.South += delta;
+        break;
+      case FaceDirection.North:
+        info.North += delta;
+        break;
+      default:
+        throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
     }
   }
 
@@ -404,6 +427,19 @@ class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootOb
       count++;
     }
     return count > 1;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  static FaceDirection Opposite(FaceDirection direction) {
+    return direction switch {
+        FaceDirection.Top => FaceDirection.Bottom,
+        FaceDirection.Bottom => FaceDirection.Top,
+        FaceDirection.West => FaceDirection.East,
+        FaceDirection.East => FaceDirection.West,
+        FaceDirection.South => FaceDirection.North,
+        FaceDirection.North => FaceDirection.South,
+        _ => direction,
+    };
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
