@@ -67,8 +67,6 @@ sealed class ColorSettings : BaseSettings<ColorSettings> {
 
   #region Settings
 
-  internal static Action OnSettingsUpdated;
-
   public LimitedStringModSetting ColorSchemaInternal { get; } =
     new(
         DefaultSchemaIndex,
@@ -113,14 +111,7 @@ sealed class ColorSettings : BaseSettings<ColorSettings> {
       ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry, ModRepository modRepository)
       : base(settings, modSettingsOwnerRegistry, modRepository) {
     _instance = this;
-    OnSettingsUpdated = null;
     InstallSettingCallback(ColorSchemaInternal, ApplyColorSchema);
-    GrassColor.ValueChanged += (_, _) => OnSettingsUpdated?.Invoke();
-    CliffColor.ValueChanged += (_, _) => OnSettingsUpdated?.Invoke();
-    CliffEdgeColor.ValueChanged += (_, _) => OnSettingsUpdated?.Invoke();
-    WireframeEdgeColor.ValueChanged += (_, _) => OnSettingsUpdated?.Invoke();
-    GlowingEdges.ValueChanged += (_, _) => OnSettingsUpdated?.Invoke();
-    GhostModeIntensity.ValueChanged += (_, _) => OnSettingsUpdated?.Invoke();
   }
 
   void ApplyColorSchema() {

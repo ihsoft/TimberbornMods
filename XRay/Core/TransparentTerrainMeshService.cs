@@ -20,7 +20,11 @@ class TransparentTerrainMeshService : IPostLoadableSingleton {
 
   /// <inheritdoc/>
   public void PostLoad() {
-    ColorSettings.OnSettingsUpdated = () => MakeMaterials(forceRefresh: true);
+    _colorSettings.GrassColor.ValueChanged += (_, _) => MakeMaterials(forceRefresh: true);
+    _colorSettings.CliffColor.ValueChanged += (_, _) => MakeMaterials(forceRefresh: true);
+    _colorSettings.CliffEdgeColor.ValueChanged += (_, _) => MakeMaterials(forceRefresh: true);
+    _colorSettings.GhostModeIntensity.ValueChanged += (_, _) => MakeMaterials(forceRefresh: true);
+    _colorSettings.GlowingEdges.ValueChanged += (_, _) => MakeMaterials(forceRefresh: true);
   }
 
   #endregion
@@ -86,6 +90,7 @@ class TransparentTerrainMeshService : IPostLoadableSingleton {
   Material _originalGrassMaterial;
   Material _originalCliffMaterial;
   Material _originalCliffEdgeMaterial;
+
   readonly RendererFactory _rendererFactory;
   readonly TerrainMeshManager _terrainMeshManager;
   readonly ColorSettings _colorSettings;
@@ -168,7 +173,6 @@ class TransparentTerrainMeshService : IPostLoadableSingleton {
 
   /// <summary>Makes or refreshes the materials for the "ghost" meshes.</summary>
   void MakeMaterials(bool forceRefresh = false) {
-    //FIXME: separate from active
     if (!forceRefresh && _xrayGrassMaterial && _xrayCliffMaterial && _xrayCliffEdgeMaterial) {
       return;
     }
