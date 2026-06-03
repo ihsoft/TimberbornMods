@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "IgorZ-XRayToggleMode",
+    "GroupId": "IgorZ-XRay-BindingsGroupId",
+    "LocKey": "IgorZ.XRay.KeyBinding.ToggleMode",
+    "Order": 0,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/p",
+    "InputModifiers": "Ctrl",
+    "Unchangeable": false
+  }
+}

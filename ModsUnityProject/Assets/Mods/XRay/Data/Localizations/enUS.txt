@@ -14,4 +14,7 @@ IgorZ.XRay.ColorSettings.GhostModelIntensity,"Models transparency","The label fo
 IgorZ.XRay.ColorSettings.Glowing,"Glowing mode","The label for the toggle that enables or disables the glowing effect on the models"
 IgorZ.XRay.ColorSettings.Header,"Models color settings","The header for the section of the mod settings that allows to customize the colors of the models"
 IgorZ.XRay.KeyBindingGroup,"X-Ray Mod","The header for the section of the mod settings that allows to customize the key bindings"
+IgorZ.XRay.KeyBinding.ToggleMode,"Toggle X-Ray mode","The label for the key binding that toggles the X-Ray mode on and off"
 IgorZ.XRay.KeyBinding.ShowMode,"Show X-Ray mode","The label for the key binding that shows the X-Ray mode while held down"
+IgorZ.XRay.Visibility.Show,Show underground structures,"The label for the toggle that enables or disables the visibility of underground structures"
+IgorZ.XRay.Visibility.Hide,Hide underground structures,"The label for the toggle that enables or disables the visibility of underground buildings"
