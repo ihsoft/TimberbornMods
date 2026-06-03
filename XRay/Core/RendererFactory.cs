@@ -60,6 +60,16 @@ sealed class RendererFactory(IWaterMesh waterMesh) {
     mat.SetInt(DstBlendProperty, (int)BlendMode.One);
   }
 
+  /// <summary>Updates color on the material, assuming it was made by this util class.</summary>
+  /// <remarks>
+  /// This method is dumb. It sets the color on a material, assuming all the other properties (shader included) were
+  /// set up from <see cref="CreateTransparencyMaterial"/>.
+  /// </remarks>
+  public void SetMaterialColor(Material mat, Color color) {
+    mat.SetColor(BaseColorProperty, color);
+    mat.SetColor(ColorProperty, color);
+  }
+
   #endregion
 
   #region Implementation
