@@ -13,3 +13,5 @@ IgorZ.XRay.ColorSettings.ColorSchemaName.Normal,"Normal","The name of the color 
 IgorZ.XRay.ColorSettings.GhostModelIntensity,"Models transparency","The label for the slider that controls the transparency of the models"
 IgorZ.XRay.ColorSettings.Glowing,"Glowing mode","The label for the toggle that enables or disables the glowing effect on the models"
 IgorZ.XRay.ColorSettings.Header,"Models color settings","The header for the section of the mod settings that allows to customize the colors of the models"
+IgorZ.XRay.KeyBindingGroup,"X-Ray Mod","The header for the section of the mod settings that allows to customize the key bindings"
+IgorZ.XRay.KeyBinding.ShowMode,"Show X-Ray mode","The label for the key binding that shows the X-Ray mode while held down"

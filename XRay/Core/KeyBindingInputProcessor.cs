@@ -10,7 +10,7 @@ namespace IgorZ.XRay.Core;
 sealed class KeyBindingInputProcessor(XRayModeManager xRayModeManager, InputService inputService)
     : IPostLoadableSingleton, IInputProcessor {
 
-  const string ToggleModeKeyBindingId = "IgorZ-XRayToggleMode";
+  const string XrayModeKeyHeldBindingId = "IgorZ-XRayShow";
 
   #region IPostLoadableSingleton implementation
 
@@ -25,12 +25,14 @@ sealed class KeyBindingInputProcessor(XRayModeManager xRayModeManager, InputServ
 
   /// <inheritdoc/>
   public bool ProcessInput() {
-    if (inputService.IsKeyDown(ToggleModeKeyBindingId)) {
-      xRayModeManager.SetActiveMode(!xRayModeManager.IsActive);
-      return true;
+    var newShowMode = inputService.IsKeyHeld(XrayModeKeyHeldBindingId);
+    if (_xrayModeKeyHeld != newShowMode && (!newShowMode || !xRayModeManager.IsActive)) {
+      _xrayModeKeyHeld = newShowMode;
+      xRayModeManager.SetActiveMode(newShowMode);
     }
     return false;
   }
+  bool _xrayModeKeyHeld;
 
   #endregion
 }
