@@ -9,7 +9,7 @@
         <AssemblyName>XRay</AssemblyName>
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <TargetFramework>netstandard2.1</TargetFramework>
-        <LangVersion>12</LangVersion>
+        <LangVersion>13</LangVersion>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
