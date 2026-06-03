@@ -5,6 +5,7 @@
 using System;
 using System.Linq;
 using IgorZ.TimberDev.Settings;
+using IgorZ.XRay.Core;
 using ModSettings.Common;
 using ModSettings.Core;
 using Timberborn.Modding;
@@ -21,6 +22,7 @@ sealed class ColorSettings : BaseSettings<ColorSettings> {
   const string ColorGrassLocKey = "IgorZ.XRay.ColorSettings.Color.Grass";
   const string ColorWireframeEdgeLocKey = "IgorZ.XRay.ColorSettings.Color.WireframeEdge";
   const string ColorSchemaDropdownLocKey = "IgorZ.XRay.ColorSettings.ColorSchemaDropdown";
+  const string ColorSchemaNameBlueprintLocKey = "IgorZ.XRay.ColorSettings.ColorSchemaName.Blueprint";
   const string ColorSchemaNameBwBrightLocKey = "IgorZ.XRay.ColorSettings.ColorSchemaName.BWBright";
   const string ColorSchemaNameBwDarkLocKey = "IgorZ.XRay.ColorSettings.ColorSchemaName.BWDark";
   const string ColorSchemaNameCustomLocKey = "IgorZ.XRay.ColorSettings.ColorSchemaName.Custom";
@@ -29,23 +31,44 @@ sealed class ColorSettings : BaseSettings<ColorSettings> {
   const string GhostModeIntensityLocKey = "IgorZ.XRay.ColorSettings.GhostModelIntensity";
   const string GlowingLocKey = "IgorZ.XRay.ColorSettings.Glowing";
   const string HeaderStringLocKey = "IgorZ.XRay.ColorSettings.Header";
+  const string WireframeModeDropdownLocKey = "IgorZ.XRay.MeshSettings.WireframeModeDropdown";
+  const string WireframeModeDropdownNoteLocKey = "IgorZ.XRay.MeshSettings.WireframeModeDropdown.Note";
+  const string WireframeModeNoneLocKey = "IgorZ.XRay.MeshSettings.WireframeMode.None";
+  const string WireframeModeGridLocKey = "IgorZ.XRay.MeshSettings.WireframeMode.Grid";
+  const string WireframeModeContoursLocKey = "IgorZ.XRay.MeshSettings.WireframeMode.Contours";
 
   record struct Preset(
-      string NameLocKey, Color GrassColor, Color CliffColor, Color CliffEdgeColor, Color WireframeEdgeColor,
-      bool GlowingEdges, int GhostModeIntensity);
+      string NameLocKey, Color GrassColor, Color CliffColor, Color CliffEdgeColor,
+      bool GlowingEdges, int GhostModeIntensity, string WireframeMode, Color WireframeEdgeColor);
 
-  static readonly Preset DefaultSchema =
-      new(ColorSchemaNameBwBrightLocKey, HexColor(0xCACACA), HexColor(0xCACACA), HexColor(0xFFFFFF), HexColor(0xCACACA), false, 21);
   static readonly Preset CustomSettings =
-      new(ColorSchemaNameCustomLocKey, HexColor(0), HexColor(0), HexColor(0), HexColor(0), false, 0);
+      new(ColorSchemaNameCustomLocKey, HexColor(0), HexColor(0), HexColor(0), false, 0, "", HexColor(0));
+
+  static readonly Preset BlueprintSchema =
+      new(ColorSchemaNameBlueprintLocKey, HexColor(0x0036DA), HexColor(0x0036DA), HexColor(0x0036DA), false, 30,
+          nameof(WireframeTerrainMeshService.Mode.Contours), HexColor(0xB2FFFFFF));
+  static readonly Preset BwBrightSchema =
+      new(ColorSchemaNameBwBrightLocKey, HexColor(0xCACACA), HexColor(0xCACACA), HexColor(0xFFFFFF), false, 21,
+          nameof(WireframeTerrainMeshService.Mode.None), HexColor(0xCACACA));
+  static readonly Preset BwDarkSchema =
+      new(ColorSchemaNameBwDarkLocKey, HexColor(0xCACACA), HexColor(0xCACACA), HexColor(0xFFFFFF), false, 10,
+          nameof(WireframeTerrainMeshService.Mode.None), HexColor(0xCACACA));
+  static readonly Preset NormalSchema =
+      new(ColorSchemaNameNormalLocKey, HexColor(0x00DAB9), HexColor(0x00B196), HexColor(0x00FFD9), false, 10,
+          nameof(WireframeTerrainMeshService.Mode.None), HexColor(0x00B196));
+  static readonly Preset NormalGlowSchema =
+      new(ColorSchemaNameNormalGlowLocKey, HexColor(0x00DAB9), HexColor(0x00B196), HexColor(0x00FFD9), true, 10,
+          nameof(WireframeTerrainMeshService.Mode.None), HexColor(0x00B196));
 
   static readonly Preset[] SchemaPresets = [
       CustomSettings,
-      new(ColorSchemaNameNormalLocKey, HexColor(0x00DAB9), HexColor(0x00B196), HexColor(0x00FFD9), HexColor(0x00B196), false, 10),
-      new(ColorSchemaNameNormalGlowLocKey, HexColor(0x00DAB9), HexColor(0x00B196), HexColor(0x00FFD9), HexColor(0x00B196), true, 10),
-      new(ColorSchemaNameBwDarkLocKey, HexColor(0xCACACA), HexColor(0xCACACA), HexColor(0xFFFFFF), HexColor(0xCACACA), false, 10),
-      DefaultSchema,
+      BlueprintSchema,
+      BwBrightSchema,
+      BwDarkSchema,
+      NormalSchema,
+      NormalGlowSchema,
   ];
+  static readonly Preset DefaultSchema = BlueprintSchema;
   static readonly int DefaultSchemaIndex = SchemaPresets.ToList().IndexOf(DefaultSchema) != -1
     ? SchemaPresets.ToList().IndexOf(DefaultSchema)
     : throw new InvalidOperationException("Default schema is not found in presets");
@@ -88,11 +111,6 @@ sealed class ColorSettings : BaseSettings<ColorSettings> {
           ModSettingDescriptor.CreateLocalized(ColorCliffEdgeLocKey).SetEnableCondition(IsCustom),
           false);
 
-  public ColorModSetting WireframeEdgeColor { get; } =
-    new(DefaultSchema.WireframeEdgeColor,
-        ModSettingDescriptor.CreateLocalized(ColorWireframeEdgeLocKey).SetEnableCondition(IsCustom),
-        false);
-
   public ModSetting<int> GhostModeIntensity { get; } =
       new RangeIntModSetting(
           DefaultSchema.GhostModeIntensity, 0, 100,
@@ -100,6 +118,22 @@ sealed class ColorSettings : BaseSettings<ColorSettings> {
 
   public ModSetting<bool> GlowingEdges { get; } =
       new(true, ModSettingDescriptor.CreateLocalized(GlowingLocKey).SetEnableCondition(IsCustom));
+
+  public LimitedStringModSetting WireframeModeInternal { get; } =
+    new(0,
+        [
+            new LimitedStringModSettingValue(nameof(WireframeTerrainMeshService.Mode.None), WireframeModeNoneLocKey),
+            new LimitedStringModSettingValue(nameof(WireframeTerrainMeshService.Mode.Grid), WireframeModeGridLocKey),
+            new LimitedStringModSettingValue(nameof(WireframeTerrainMeshService.Mode.Contours), WireframeModeContoursLocKey),
+        ],
+        ModSettingDescriptor.CreateLocalized(WireframeModeDropdownLocKey)
+            .SetLocalizedTooltip(WireframeModeDropdownNoteLocKey)
+            .SetEnableCondition(IsCustom));
+
+  public ColorModSetting WireframeEdgeColor { get; } =
+    new(DefaultSchema.WireframeEdgeColor,
+        ModSettingDescriptor.CreateLocalized(ColorWireframeEdgeLocKey).SetEnableCondition(IsCustom),
+        true);
 
   #endregion
 
@@ -126,15 +160,20 @@ sealed class ColorSettings : BaseSettings<ColorSettings> {
     GrassColor.SetValue(preset.GrassColor);
     CliffColor.SetValue(preset.CliffColor);
     CliffEdgeColor.SetValue(preset.CliffEdgeColor);
-    WireframeEdgeColor.SetValue(preset.WireframeEdgeColor);
     GlowingEdges.SetValue(preset.GlowingEdges);
     GhostModeIntensity.SetValue(preset.GhostModeIntensity);
+    WireframeEdgeColor.SetValue(preset.WireframeEdgeColor);
+    WireframeModeInternal.SetValue(preset.WireframeMode);
   }
 
   static bool IsCustom() => _instance.ColorSchemaInternal.Value == ColorSchemaNameCustomLocKey;
 
-  static Color HexColor(int colorIndex) {
-    return new Color(colorIndex >> 16 & 0xFF, colorIndex >> 8 & 0xFF, colorIndex & 0xFF) / 255f; 
+  static Color HexColor(uint colorIndex) {
+    var alpha = colorIndex >> 24 & 0xFF;
+    if (alpha == 0) {
+      alpha = 0xFF;
+    }
+    return new Color(colorIndex >> 16 & 0xFF, colorIndex >> 8 & 0xFF, colorIndex & 0xFF, alpha) / 255f; 
   }
 
   #endregion
