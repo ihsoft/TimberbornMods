@@ -3,7 +3,6 @@
 // License: Public Domain
 
 using IgorZ.XRay.Patches;
-using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.XRay.Core;
 
@@ -37,23 +36,26 @@ sealed class XRayModeManager {
   #region Implementation
 
   readonly TransparentTerrainMeshService _transparentTerrainMeshService;
+  readonly WireframeTerrainMeshService _wireframeTerrainMeshService;
 
   // Primarily made for the efficient patches handling.
   internal static XRayModeManager Instance { get; private set; }
 
-  XRayModeManager(TransparentTerrainMeshService transparentTerrainMeshService) {
+  XRayModeManager(TransparentTerrainMeshService transparentTerrainMeshService,
+                  WireframeTerrainMeshService wireframeTerrainMeshService) {
     Instance = this;
     _transparentTerrainMeshService = transparentTerrainMeshService;
+    _wireframeTerrainMeshService = wireframeTerrainMeshService;
   }
 
   void SetXRayMode() {
-    DebugEx.Info("Enable X-Ray mode");
     _transparentTerrainMeshService.Activate();
+    _wireframeTerrainMeshService.Activate();
   }
 
   void ResetXRayMode() {
-    DebugEx.Info("Disable X-Ray mode");
     _transparentTerrainMeshService.Deactivate();
+    _wireframeTerrainMeshService.Deactivate();
   }
 
   #endregion
