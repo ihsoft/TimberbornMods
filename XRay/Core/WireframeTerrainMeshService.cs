@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using IgorZ.XRay.Settings;
 using Timberborn.MapStateSystem;
@@ -16,54 +17,73 @@ using Object = UnityEngine.Object;
 
 namespace IgorZ.XRay.Core;
 
-class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootObjectProvider rootObjectProvider,
-                                  RendererFactory rendererFactory, ColorSettings colorSettings)
-    : ILoadableSingleton, ILateUpdatableSingleton {
+class WireframeTerrainMeshService(
+    TerrainMap terrainMap, MapSize mapSize, RootObjectProvider rootObjectProvider, RendererFactory rendererFactory,
+    ColorSettings colorSettings)
+    : IPostLoadableSingleton, ILateUpdatableSingleton {
 
-  // Chunk size directly affects incremental rebuild cost.
+  // This is how much time is allowed for building the chunk meshes before it is considered too slow. If there are more 
+  // chunks left, then they will be updated in the next frame. That being said, the full scene update may not be
+  // complete in one frame. It will become visible to the user, but it will unblock the game interface.
+  const int MaxChunkMeshBuildTimeMs = 50;
+
+  // Chunk size directly affects rebuild cost. The incremental cost goes down on the smaller chunks. However, the
+  // smaller chunks take more time on full map rebuild. The full rebuild happens when the current show mode is changed
+  // or the wireframe type is changed to wireframe (any type). 
   //
+  // Another limiter is the total number of vertices in the contour mesh. Unity has a limit of 65k vertices per mesh. 
   // Approximate worst-case vertex counts for contour rendering (checkerboard-like terrain with maximum contour
   // complexity):
   //
-  //  16x16 -> ~3k vertices
-  //  32x32 -> ~12k vertices
-  //  64x64 -> ~49k vertices
+  //  16x16 -> ~3k vertices.
+  //  32x32 -> ~12k vertices.
+  //  64x64 -> ~49k vertices.
   //
-  // Larger chunks reduce renderer/draw-call overhead, but dramatically increase rebuild cost and approach Unity's
-  // 16-bit mesh vertex limit (~65k vertices).
-  //
-  // 32x32 provides a good balance for dynamic terrain updates.
-  const int XMeshSize = 32;
-  const int YMeshSize = 32;
+  //  Anything larger will be dangerously close to the limit.
+  const int XMeshSize = 16;
+  const int YMeshSize = 16;
 
-  #region Implementation of ILoadableSingleton
+  #region Implementation of IPostLoadableSingleton
 
   /// <inheritdoc/>
-  public void Load() {
+  public void PostLoad() {
     _root = rootObjectProvider.CreateRootObject("XRayWireframeTerrainMesh");
     terrainMap.TerrainAdded += OnTerrainAdded;
     terrainMap.TerrainRemoved += OnTerrainRemoved;
+    colorSettings.WireframeModeInternal.ValueChanged += (_, _) => {
+      SetMode(Enum.Parse<Mode>(colorSettings.WireframeModeInternal.Value));
+    };
+    colorSettings.WireframeEdgeColor.ValueChanged += (_, _) => {
+      SetEdgesColor(colorSettings.WireframeEdgeColor.Color);
+    };
+    _currentMode = Enum.Parse<Mode>(colorSettings.WireframeModeInternal.Value);
+    BuildMeshEdgeCache();
   }
 
   #endregion
 
   #region ILateUpdatableSingleton implementation
 
-  /// <inheritdoc/>
   public void LateUpdateSingleton() {
-    if (!_needUpdate) {
+    if (!_needUpdate && _dirtyChunks.Count == 0) {
       return;
     }
     _needUpdate = false;
 
-    if (_fullRebuildRequested || !_overlay) {
-      _fullRebuildRequested = false;
+    if (_currentMode == Mode.None || !IsActive) {
       _dirtyChunks.Clear();
-      RefreshOverlay();
+      if (_overlay) {
+        DestroyWireOverlay();
+      }
       return;
     }
-
-    RebuildDirtyChunks();
+    if (!_overlay) {
+      _dirtyChunks.Clear();
+      _overlay = CreateWireOverlay();
+      _overlay.transform.SetParent(_root.transform, false);
+      return;
+    }
+    RebuildDirtyChunkMeshes();
   }
 
   #endregion
@@ -71,7 +91,19 @@ class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootOb
   #region API
 
   /// <summary>Tells if the wire frame mesh is active and should be rendered.</summary>
+  /// <seealso cref="Activate"/>
+  /// <seaalso cref="Deactivate"/>
   public bool IsActive { get; private set; }
+
+  /// <summary>Wireframe rendering mode.</summary>
+  public enum Mode {
+    // No wireframe at all.
+    None,
+    // Only the tile edges where the height changes are outlined.
+    Contours,
+    // Every tile edge is outlined. Except the underground ones.
+    Grid,
+  }
 
   /// <summary>Activate the wire frame mesh that will stay as long as it's active.</summary>
   /// <remarks>
@@ -81,7 +113,6 @@ class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootOb
   /// <seealso cref="IsActive"/>
   public void Activate() {
     IsActive = true;
-    _fullRebuildRequested = true;
     _needUpdate = true;
   }
 
@@ -100,8 +131,8 @@ class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootOb
   GameObject _root;
   GameObject _overlay;
   Material _material;
+  Mode _currentMode = Mode.None;
   bool _needUpdate;
-  bool _fullRebuildRequested;
 
   enum FaceDirection {
     Top,
@@ -142,24 +173,25 @@ class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootOb
   readonly Dictionary<Vector2Int, MeshFilter> _chunkMeshFilters = new();
   readonly HashSet<Vector2Int> _dirtyChunks = [];
 
-  void RefreshOverlay() {
-    if (_overlay) {
-      Object.Destroy(_overlay);
-      _overlay = null;
-    }
-    _chunkMeshFilters.Clear();
-    _dirtyChunks.Clear();
-    if (!IsActive) {
+  void SetMode(Mode mode) {
+    if (_currentMode == mode) {
       return;
     }
-    _overlay = CreateWireOverlay();
-    _overlay.transform.SetParent(_root.transform, false);
+    _currentMode = mode;
+    _needUpdate = true;
+    foreach (var chunk in _chunkMeshFilters.Keys) {
+      _dirtyChunks.Add(chunk);
+    }
+  }
+
+  void SetEdgesColor(Color color) {
+    if (_material) {
+      rendererFactory.SetMaterialColor(_material, color);
+    }
   }
 
   GameObject CreateWireOverlay() {
-    BuildMeshEdgeCache();
     _material = rendererFactory.CreateTransparencyMaterial("WireMaterial", colorSettings.WireframeEdgeColor.Color);
-
     var size = mapSize.TerrainSize;
     var overlayObj = new GameObject("XRayWireframeTerrainMesh");
     for (var startX = 0; startX < size.x; startX += XMeshSize) {
@@ -170,7 +202,7 @@ class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootOb
 
         var mf = meshObj.AddComponent<MeshFilter>();
         _chunkMeshFilters[chunk] = mf;
-        mf.sharedMesh = BuildChunkMesh(chunk);
+        _dirtyChunks.Add(chunk);
 
         var mr = meshObj.AddComponent<MeshRenderer>();
         mr.sharedMaterial = _material;
@@ -178,8 +210,16 @@ class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootOb
         mr.receiveShadows = false;
       }
     }
-
+    _needUpdate = true;
     return overlayObj;
+  }
+
+  void DestroyWireOverlay() {
+    Object.Destroy(_overlay);
+    _overlay = null;
+    Object.Destroy(_material);
+    _material = null;
+    _chunkMeshFilters.Clear();
   }
 
   void BuildMeshEdgeCache() {
@@ -197,8 +237,12 @@ class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootOb
     }
   }
 
-  void RebuildDirtyChunks() {
+  /// <summary>Rebuilds mesh for dirty chunks, processing them in batches to avoid long update times.</summary>
+  void RebuildDirtyChunkMeshes() {
+    var stopWatch = Stopwatch.StartNew();
+    var processedChunks = new List<Vector2Int>();
     foreach (var chunk in _dirtyChunks) {
+      processedChunks.Add(chunk);
       if (!_chunkMeshFilters.TryGetValue(chunk, out var mf)) {
         continue;
       }
@@ -206,8 +250,15 @@ class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootOb
         Object.Destroy(mf.sharedMesh);
       }
       mf.sharedMesh = BuildChunkMesh(chunk);
+      if (stopWatch.ElapsedMilliseconds > MaxChunkMeshBuildTimeMs) {
+        break;
+      }
     }
-    _dirtyChunks.Clear();
+    if (processedChunks.Count == _dirtyChunks.Count) {
+      _dirtyChunks.Clear();
+    } else {
+      _dirtyChunks.RemoveWhere(processedChunks.Contains);
+    }
   }
 
   Mesh BuildChunkMesh(Vector2Int chunk) {
@@ -219,7 +270,7 @@ class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootOb
     var vertices = new List<Vector3>();
     var indices = new List<int>();
     foreach (var (edge, info) in _edgeCache) {
-      if (!IsContourEdge(info) || !BelongsToChunk(edge, startX, endX, startY, endY)) {
+      if (!ShouldRenderEdge(info) || !BelongsToChunk(edge, startX, endX, startY, endY)) {
         continue;
       }
       var i = vertices.Count;
@@ -236,41 +287,25 @@ class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootOb
     return mesh;
   }
 
-  void ApplyVoxelChange(Vector3Int coordinates, bool wasSolid, bool isSolid) {
-    if (wasSolid == isSolid || !IsActive) {
-      return;
-    }
-    if (!_overlay) {
-      _fullRebuildRequested = true;
-      _needUpdate = true;
-      return;
-    }
+  void ApplyVoxelChange(Vector3Int coordinates, bool isSolid) {
     if (isSolid) {
-      AddSolidVoxel(coordinates);
+      foreach (var face in Faces) {
+        var neighbor = coordinates + face.Offset;
+        if (IsSolid(neighbor)) {
+          ChangeSingleFace(neighbor, Opposite(face.Direction), -1);
+        }
+      }
+      ChangeVisibleCubeFaces(coordinates, +1);
     } else {
-      RemoveSolidVoxel(coordinates);
+      ChangeVisibleCubeFaces(coordinates, -1);
+      foreach (var face in Faces) {
+        var neighbor = coordinates + face.Offset;
+        if (IsSolid(neighbor)) {
+          ChangeSingleFace(neighbor, Opposite(face.Direction), +1);
+        }
+      }
     }
     _needUpdate = true;
-  }
-
-  void AddSolidVoxel(Vector3Int coordinates) {
-    foreach (var face in Faces) {
-      var neighbor = coordinates + face.Offset;
-      if (IsSolid(neighbor)) {
-        ChangeSingleFace(neighbor, Opposite(face.Direction), -1);
-      }
-    }
-    ChangeVisibleCubeFaces(coordinates, +1);
-  }
-
-  void RemoveSolidVoxel(Vector3Int coordinates) {
-    ChangeVisibleCubeFaces(coordinates, -1);
-    foreach (var face in Faces) {
-      var neighbor = coordinates + face.Offset;
-      if (IsSolid(neighbor)) {
-        ChangeSingleFace(neighbor, Opposite(face.Direction), +1);
-      }
-    }
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -336,16 +371,17 @@ class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootOb
   void ChangeEdge(Vector3Int a, Vector3Int b, FaceDirection direction, int delta) {
     var key = EdgeKey.Create(a, b);
     _edgeCache.TryGetValue(key, out var info);
-    var wasContour = IsContourEdge(info);
+    var wasRendered = ShouldRenderEdge(info);
     AddNormal(ref info, direction, delta);
     if (info.Total <= 0) {
       _edgeCache.Remove(key);
     } else {
       _edgeCache[key] = info;
     }
-    var isContour = info.Total > 0 && IsContourEdge(info);
-    if (wasContour != isContour) {
-      MarkChunkDirty(key);
+    var isRendered = info.Total > 0 && ShouldRenderEdge(info);
+    if (wasRendered != isRendered) {
+      _needUpdate = true;
+      _dirtyChunks.Add(GetOwnerChunk(key));
     }
   }
 
@@ -377,12 +413,6 @@ class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootOb
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  void MarkChunkDirty(EdgeKey edge) {
-    _needUpdate = true;
-    _dirtyChunks.Add(GetOwnerChunk(edge));
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   Vector2Int GetOwnerChunk(EdgeKey edge) {
     var ownerX = Mathf.Min(edge.A.x, edge.B.x);
     var ownerY = Mathf.Min(edge.A.z, edge.B.z);
@@ -400,6 +430,15 @@ class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootOb
     ownerX = Mathf.Clamp(ownerX, 0, size.x - 1);
     ownerY = Mathf.Clamp(ownerY, 0, size.y - 1);
     return ownerX >= startX && ownerX < endX && ownerY >= startY && ownerY < endY;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  bool ShouldRenderEdge(EdgeInfo info) {
+    return _currentMode switch {
+        Mode.Contours => IsContourEdge(info),
+        Mode.Grid => info.Total > 0,
+        _ => false,
+    };
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -429,7 +468,6 @@ class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootOb
     return count > 1;
   }
 
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   static FaceDirection Opposite(FaceDirection direction) {
     return direction switch {
         FaceDirection.Top => FaceDirection.Bottom,
@@ -457,11 +495,11 @@ class WireframeTerrainMeshService(TerrainMap terrainMap, MapSize mapSize, RootOb
   #region Terrain changed event listeners
 
   void OnTerrainAdded(object sender, Vector3Int coordinates) {
-    ApplyVoxelChange(coordinates, wasSolid: false, isSolid: true);
+    ApplyVoxelChange(coordinates, isSolid: true);
   }
 
   void OnTerrainRemoved(object sender, Vector3Int coordinates) {
-    ApplyVoxelChange(coordinates, wasSolid: true, isSolid: false);
+    ApplyVoxelChange(coordinates, isSolid: false);
   }
 
   #endregion
