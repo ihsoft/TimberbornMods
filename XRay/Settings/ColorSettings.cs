@@ -23,6 +23,7 @@ sealed class ColorSettings : BaseSettings<ColorSettings> {
   const string ColorWireframeEdgeLocKey = "IgorZ.XRay.ColorSettings.Color.WireframeEdge";
   const string ColorSchemaDropdownLocKey = "IgorZ.XRay.ColorSettings.ColorSchemaDropdown";
   const string ColorSchemaNameBlueprintLocKey = "IgorZ.XRay.ColorSettings.ColorSchemaName.Blueprint";
+  const string ColorSchemaNameBlueGridLocKey = "IgorZ.XRay.ColorSettings.ColorSchemaName.BlueGrid";
   const string ColorSchemaNameBwBrightLocKey = "IgorZ.XRay.ColorSettings.ColorSchemaName.BWBright";
   const string ColorSchemaNameBwDarkLocKey = "IgorZ.XRay.ColorSettings.ColorSchemaName.BWDark";
   const string ColorSchemaNameCustomLocKey = "IgorZ.XRay.ColorSettings.ColorSchemaName.Custom";
@@ -47,6 +48,9 @@ sealed class ColorSettings : BaseSettings<ColorSettings> {
   static readonly Preset BlueprintSchema =
       new(ColorSchemaNameBlueprintLocKey, HexColor(0x0036DA), HexColor(0x0036DA), HexColor(0x0036DA), false, 30,
           nameof(WireframeTerrainMeshService.Mode.Contours), HexColor(0xB2FFFFFF));
+  static readonly Preset BlueGridSchema =
+      new(ColorSchemaNameBlueGridLocKey, HexColor(0x0036DA), HexColor(0x0036DA), HexColor(0x0036DA), false, 30,
+          nameof(WireframeTerrainMeshService.Mode.Grid), HexColor(0x18FFFFFF));
   static readonly Preset BwBrightSchema =
       new(ColorSchemaNameBwBrightLocKey, HexColor(0xCACACA), HexColor(0xCACACA), HexColor(0xFFFFFF), false, 21,
           nameof(WireframeTerrainMeshService.Mode.None), HexColor(0xCACACA));
@@ -63,6 +67,7 @@ sealed class ColorSettings : BaseSettings<ColorSettings> {
   static readonly Preset[] SchemaPresets = [
       CustomSettings,
       BlueprintSchema,
+      BlueGridSchema,
       BwBrightSchema,
       BwDarkSchema,
       NormalSchema,
