@@ -70,19 +70,18 @@ class WireframeTerrainMeshService(
     }
     _needUpdate = false;
 
-    if (_currentMode == Mode.None || !IsActive) {
+    if (_currentMode == Mode.None) {
       _dirtyChunks.Clear();
-      if (_overlay) {
-        DestroyWireOverlay();
-      }
+      DestroyWireOverlay();
       return;
     }
     if (!_overlay) {
       _dirtyChunks.Clear();
       _overlay = CreateWireOverlay();
       _overlay.transform.SetParent(_root.transform, false);
-      return;
     }
+    _overlay.SetActive(IsActive);
+
     RebuildDirtyChunkMeshes();
   }
 
@@ -90,12 +89,12 @@ class WireframeTerrainMeshService(
 
   #region API
 
-  /// <summary>Tells if the wire frame mesh is active and should be rendered.</summary>
+  /// <summary>Indicates whether the overlay is currently visible.</summary>
   /// <seealso cref="Activate"/>
   /// <seaalso cref="Deactivate"/>
   public bool IsActive { get; private set; }
 
-  /// <summary>Wireframe rendering mode.</summary>
+  /// <summary>Controls how terrain geometry is visualized.</summary>
   public enum Mode {
     // No wireframe at all.
     None,
@@ -105,10 +104,10 @@ class WireframeTerrainMeshService(
     Grid,
   }
 
-  /// <summary>Activate the wire frame mesh that will stay as long as it's active.</summary>
+  /// <summary>Shows the overlay.</summary>
   /// <remarks>
-  /// The activation can be expensive as it may (but not required) need to rebuild the entire terrain mesh. The
-  /// following terrain updates will trigger mesh rebuilds. It will add latency.
+  /// The mesh cache is maintained independently from visibility and is normally already up-to-date when
+  /// this method is called.
   /// </remarks>
   /// <seealso cref="IsActive"/>
   public void Activate() {
@@ -116,8 +115,10 @@ class WireframeTerrainMeshService(
     _needUpdate = true;
   }
 
-  /// <summary>Deactivate the wire frame mesh that will stop rendering until it's activated again.</summary>
-  /// <remarks>All the meshes will be removed from the scene. No extra cost on terrain update.</remarks>
+  /// <summary>Hides the overlay.</summary>
+  /// <remarks>
+  /// The cached meshes are preserved and continue to track terrain changes while hidden.
+  /// </remarks>
   /// <seealso cref="IsActive"/>
   public void Deactivate() {
     IsActive = false;
@@ -173,15 +174,19 @@ class WireframeTerrainMeshService(
   readonly Dictionary<Vector2Int, MeshFilter> _chunkMeshFilters = new();
   readonly HashSet<Vector2Int> _dirtyChunks = [];
 
+  /// <summary>Changes the visualization mode.</summary>
+  /// <remarks>
+  /// Switching modes requires rebuilding the mesh representation because contour and grid modes use
+  /// different edge filtering rules.
+  /// </remarks>
   void SetMode(Mode mode) {
     if (_currentMode == mode) {
       return;
     }
     _currentMode = mode;
+    _dirtyChunks.Clear();
+    DestroyWireOverlay();
     _needUpdate = true;
-    foreach (var chunk in _chunkMeshFilters.Keys) {
-      _dirtyChunks.Add(chunk);
-    }
   }
 
   void SetEdgesColor(Color color) {
@@ -222,6 +227,8 @@ class WireframeTerrainMeshService(
     _chunkMeshFilters.Clear();
   }
 
+  /// <summary>Rebuilds the global edge cache from the current terrain state.</summary>
+  /// <remarks>This is an expensive operation intended for initialization and full cache rebuilds.</remarks>
   void BuildMeshEdgeCache() {
     _edgeCache.Clear();
     var size = mapSize.TerrainSize;
@@ -287,6 +294,10 @@ class WireframeTerrainMeshService(
     return mesh;
   }
 
+  /// <summary>Updates the mesh cache to reflect a terrain voxel change.</summary>
+  /// <remarks>
+  /// The update is applied incrementally and only affects chunks that contain modified contour edges.
+  /// </remarks>
   void ApplyVoxelChange(Vector3Int coordinates, bool isSolid) {
     if (isSolid) {
       foreach (var face in Faces) {
