@@ -1,0 +1,26 @@
+﻿ID,Text,Comment
+IgorZ.XRay.ColorSettings.Color.CliffEdge,"Цвет рёбер скал",
+IgorZ.XRay.ColorSettings.Color.Cliff,"Цвет скал",
+IgorZ.XRay.ColorSettings.Color.Grass,"Цвет травы",
+IgorZ.XRay.ColorSettings.Color.WireframeEdge,"Цвет рёбер",
+IgorZ.XRay.ColorSettings.ColorSchemaDropdown,"Цветовая схема","The dropdown label for color schema selection"
+IgorZ.XRay.ColorSettings.ColorSchemaName.Blueprint,"Чертёж","The name of the color schema with blue colors in blueprint style and contoured edges"
+IgorZ.XRay.ColorSettings.ColorSchemaName.BlueGrid,"Синий каркас","The name of the color schema with blue colors in grid style"
+IgorZ.XRay.ColorSettings.ColorSchemaName.BWBright,"Светлая ч/б","The name of the color schema with bright colors in black and white style"
+IgorZ.XRay.ColorSettings.ColorSchemaName.BWDark,"Тёмная ч/б","The name of the color schema with dark colors in black and white style"
+IgorZ.XRay.ColorSettings.ColorSchemaName.Custom,"Своя","The name of the custom color schema. User can choose own settings"
+IgorZ.XRay.ColorSettings.ColorSchemaName.NormalGlow,"Светящаяся","The name of the color schema with normal colors and glowing effect"
+IgorZ.XRay.ColorSettings.ColorSchemaName.Normal,"Обычная","The name of the color schema with normal colors and no glowing effect"
+IgorZ.XRay.ColorSettings.GhostModelIntensity,"Прозрачность моделей","The label for the slider that controls the transparency of the models"
+IgorZ.XRay.ColorSettings.Glowing,"Режим свечения","The label for the toggle that enables or disables the glowing effect on the models"
+IgorZ.XRay.ColorSettings.Header,"Внешний вид наложения","The header for the section of the mod settings that allows to customize the overlay appearance"
+IgorZ.XRay.KeyBindingGroup,"Мод X-Ray","The header for the section of the mod settings that allows to customize the key bindings"
+IgorZ.XRay.KeyBinding.ToggleMode,"Переключить режим X-Ray","The label for the key binding that toggles the X-Ray mode on and off"
+IgorZ.XRay.KeyBinding.ShowMode,"Показать режим X-Ray","The label for the key binding that shows the X-Ray mode while held down"
+IgorZ.XRay.MeshSettings.WireframeModeDropdown,"Отображение рельефа","The dropdown label for terrain visualization mode selection"
+IgorZ.XRay.MeshSettings.WireframeModeDropdown.Note,"Этот режим требует дополнительного времени на обновление рельефа.","The note for the wireframe mode dropdown that informs the user about the performance impact of using wireframe modes"
+IgorZ.XRay.MeshSettings.WireframeMode.None,"Отключено","The name of the visualization mode that disables terrain overlay rendering"
+IgorZ.XRay.MeshSettings.WireframeMode.Grid,"Каркас","The name of the visualization mode that renders a grid over the terrain"
+IgorZ.XRay.MeshSettings.WireframeMode.Contours,"Контуры","The name of the visualization mode that renders terrain contours"
+IgorZ.XRay.Visibility.Show,"Показывать подземные сооружения","The label for the toggle that enables or disables the visibility of underground structures"
+IgorZ.XRay.Visibility.Hide,"Скрывать подземные сооружения","The label for the toggle that enables or disables the visibility of underground buildings"
