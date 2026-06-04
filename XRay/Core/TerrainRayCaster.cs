@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System.Runtime.CompilerServices;
 using Timberborn.BlockObjectPickingSystem;
 using Timberborn.BlockSystem;
 using Timberborn.Common;
@@ -41,9 +42,9 @@ sealed class TerrainRayCaster {
       var isFaceUp = item.Face.z == 1;
       if (_terrainService.Contains(coordinates.XY())) {
         if (isFaceUp) {
-          // If surface has already been hit, only consider empty volumes under the surface.
-          if (surfaceHit.HasValue
-              && _terrainService.Underground(coordinates) && _terrainService.Underground(coordinates.Above())) {
+          // Allow second hits only if they find empty space under the surface.
+          if (surfaceHit.HasValue && _terrainService.Underground(coordinates)
+              && (_terrainService.Underground(coordinates.Above()) || !IsUnderSurface(coordinates))) {
             continue;
           }
           if (allUnderground && _blockObjectPreviewPicker.IsTerrainWithStump(coordinates)
@@ -80,5 +81,15 @@ sealed class TerrainRayCaster {
       }
     }
     return surfaceHit;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  bool IsUnderSurface(Vector3Int coordinates) {
+    for (coordinates = coordinates.Above(); _terrainService.Contains(coordinates); coordinates = coordinates.Above()) {
+      if (_terrainService.Underground(coordinates)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
