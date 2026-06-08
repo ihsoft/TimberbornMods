@@ -257,6 +257,12 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
         }
         return;
       }
+      _yieldersChanged = true;
+      if (!yielder) {
+        // Due to a race condition, the building range update can happen before the entity deletion event. As a result,
+        // there can be dead entries, which will be cleaned up at the end of the frame run.
+        return;
+      }
       yielder.YieldDecreased -= OnYielderUpdate;
       yielder.YieldAdded -= OnYielderUpdate;
       var cuttable = yielder.GetComponent<Cuttable>();
@@ -276,7 +282,6 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
         living.Died -= OnYielderUpdate;
         living.ReversedDeath -= OnYielderUpdate;
       }
-      _yieldersChanged = true;
     }
 
     void UpdateArea() {

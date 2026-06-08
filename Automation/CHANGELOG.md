@@ -1,4 +1,7 @@
-# v4.0.7 (Math 2nd, 2026):
+# v4.0.8 (June 7th, 2026):
+* [Fix] Under a rare condition, the game can crash when a lumberjack with collectable rules is destroyed. 
+
+# v4.0.7 (March 2nd, 2026):
 * [Fix] Game can crash when a lumberjack with collectable rules is destroyed.
 
 # v4.0.6 (April 30th, 2026):
