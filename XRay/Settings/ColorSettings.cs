@@ -3,11 +3,13 @@
 // License: Public Domain
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using IgorZ.TimberDev.Settings;
 using IgorZ.XRay.Core;
 using ModSettings.Common;
 using ModSettings.Core;
+using Timberborn.Common;
 using Timberborn.Modding;
 using Timberborn.SettingsSystem;
 using UnityDev.Utils.LogUtilsLite;
@@ -63,6 +65,13 @@ sealed class ColorSettings : BaseSettings<ColorSettings> {
   static readonly Preset NormalGlowSchema =
       new(ColorSchemaNameNormalGlowLocKey, HexColor(0x00DAB9), HexColor(0x00B196), HexColor(0x00FFD9), true, 10,
           nameof(WireframeTerrainMeshService.Mode.None), HexColor(0x00B196));
+
+  static readonly LimitedStringModSettingValue[] WireframeModeValues = [
+      new(nameof(WireframeTerrainMeshService.Mode.None), WireframeModeNoneLocKey),
+      new(nameof(WireframeTerrainMeshService.Mode.Grid), WireframeModeGridLocKey),
+      new(nameof(WireframeTerrainMeshService.Mode.Contours), WireframeModeContoursLocKey),
+  ];
+  static readonly string[] WireframeModeOptions = WireframeModeValues.Select(v => v.Value).ToArray();
 
   static readonly Preset[] SchemaPresets = [
       CustomSettings,
@@ -122,15 +131,11 @@ sealed class ColorSettings : BaseSettings<ColorSettings> {
           ModSettingDescriptor.CreateLocalized(GhostModeIntensityLocKey).SetEnableCondition(IsCustom));
 
   public ModSetting<bool> GlowingEdges { get; } =
-      new(true, ModSettingDescriptor.CreateLocalized(GlowingLocKey).SetEnableCondition(IsCustom));
+      new(DefaultSchema.GlowingEdges, ModSettingDescriptor.CreateLocalized(GlowingLocKey).SetEnableCondition(IsCustom));
 
   public LimitedStringModSetting WireframeModeInternal { get; } =
-    new(0,
-        [
-            new LimitedStringModSettingValue(nameof(WireframeTerrainMeshService.Mode.None), WireframeModeNoneLocKey),
-            new LimitedStringModSettingValue(nameof(WireframeTerrainMeshService.Mode.Grid), WireframeModeGridLocKey),
-            new LimitedStringModSettingValue(nameof(WireframeTerrainMeshService.Mode.Contours), WireframeModeContoursLocKey),
-        ],
+    new(((ICollection<string>)WireframeModeOptions).IndexOf(DefaultSchema.WireframeMode),
+        WireframeModeValues,
         ModSettingDescriptor.CreateLocalized(WireframeModeDropdownLocKey)
             .SetLocalizedTooltip(WireframeModeDropdownNoteLocKey)
             .SetEnableCondition(IsCustom));
