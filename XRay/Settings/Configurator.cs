@@ -12,6 +12,6 @@ sealed class Configurator : IConfigurator {
   public const string AutomationModId = "Timberborn.IgorZ.XRay";
 
   public void Configure(IContainerDefinition containerDefinition) {
-    containerDefinition.Bind<ColorSettings>().AsSingleton();
+    containerDefinition.Bind<MeshSettings>().AsSingleton();
   }
 }

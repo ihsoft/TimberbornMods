@@ -20,11 +20,11 @@ class TransparentTerrainMeshService : IPostLoadableSingleton {
 
   /// <inheritdoc/>
   public void PostLoad() {
-    _colorSettings.GrassColor.ValueChanged += (_, _) => MakeMaterials(forceRefresh: true);
-    _colorSettings.CliffColor.ValueChanged += (_, _) => MakeMaterials(forceRefresh: true);
-    _colorSettings.CliffEdgeColor.ValueChanged += (_, _) => MakeMaterials(forceRefresh: true);
-    _colorSettings.GhostModeIntensity.ValueChanged += (_, _) => MakeMaterials(forceRefresh: true);
-    _colorSettings.GlowingEdges.ValueChanged += (_, _) => MakeMaterials(forceRefresh: true);
+    _meshSettings.GrassColor.ValueChanged += (_, _) => MakeMaterials(forceRefresh: true);
+    _meshSettings.CliffColor.ValueChanged += (_, _) => MakeMaterials(forceRefresh: true);
+    _meshSettings.CliffEdgeColor.ValueChanged += (_, _) => MakeMaterials(forceRefresh: true);
+    _meshSettings.GhostModeIntensity.ValueChanged += (_, _) => MakeMaterials(forceRefresh: true);
+    _meshSettings.GlowingEdges.ValueChanged += (_, _) => MakeMaterials(forceRefresh: true);
   }
 
   #endregion
@@ -93,17 +93,17 @@ class TransparentTerrainMeshService : IPostLoadableSingleton {
 
   readonly RendererFactory _rendererFactory;
   readonly TerrainMeshManager _terrainMeshManager;
-  readonly ColorSettings _colorSettings;
+  readonly MeshSettings _meshSettings;
 
   // Primarily made for the efficient patches handling.
   internal static TransparentTerrainMeshService Instance { get; private set; }
 
   TransparentTerrainMeshService(
-      RendererFactory rendererFactory, TerrainMeshManager terrainMeshManager, ColorSettings colorSettings) {
+      RendererFactory rendererFactory, TerrainMeshManager terrainMeshManager, MeshSettings meshSettings) {
     Instance = this;
     _rendererFactory = rendererFactory;
     _terrainMeshManager = terrainMeshManager;
-    _colorSettings = colorSettings;
+    _meshSettings = meshSettings;
   }
 
   /// <summary>Sets the X-Ray material(s) to the renderer and also can remember the original material.</summary>
@@ -183,6 +183,7 @@ class TransparentTerrainMeshService : IPostLoadableSingleton {
     if (!IsActive) {
       return;
     }
+    //FIXME: separate create and set color/settings
     var renderers = GetTerrainRenderers();
     foreach (var renderer in renderers) {
       var materials = renderer.sharedMaterials;
@@ -207,17 +208,17 @@ class TransparentTerrainMeshService : IPostLoadableSingleton {
   // ReSharper disable Unity.PreferAddressByIdToGraphicsParams
   Material GetTransparencyShader(string name) {
     var referenceColor = name switch {
-        XRayGrassMaterialName => _colorSettings.GrassColor.Color,
-        XRayCliffMaterialName => _colorSettings.CliffColor.Color,
-        XRayCliffEdgeMaterialName => _colorSettings.CliffEdgeColor.Color,
+        XRayGrassMaterialName => _meshSettings.GrassColor.Color,
+        XRayCliffMaterialName => _meshSettings.CliffColor.Color,
+        XRayCliffEdgeMaterialName => _meshSettings.CliffEdgeColor.Color,
         _ => throw new InvalidOperationException($"Unexpected material name: {name}"),
     };
-    var transparency = _colorSettings.GhostModeIntensity.Value / 100f;
-    var color = _colorSettings.GlowingEdges.Value
+    var transparency = _meshSettings.GhostModeIntensity.Value / 100f;
+    var color = _meshSettings.GlowingEdges.Value
         ? referenceColor * transparency
         : new Color(referenceColor.r, referenceColor.g, referenceColor.b, transparency);
     var mat = _rendererFactory.CreateTransparencyMaterial(name, color);
-    if (_colorSettings.GlowingEdges.Value) {
+    if (_meshSettings.GlowingEdges.Value) {
       _rendererFactory.SetMaterialToGlowing(mat);
     }
     return mat;

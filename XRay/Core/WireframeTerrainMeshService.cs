@@ -19,7 +19,7 @@ namespace IgorZ.XRay.Core;
 
 class WireframeTerrainMeshService(
     TerrainMap terrainMap, MapSize mapSize, RootObjectProvider rootObjectProvider, RendererFactory rendererFactory,
-    ColorSettings colorSettings)
+    MeshSettings meshSettings)
     : IPostLoadableSingleton, ILateUpdatableSingleton {
 
   // This is how much time is allowed for building the chunk meshes before it is considered too slow. If there are more 
@@ -56,13 +56,13 @@ class WireframeTerrainMeshService(
     _root = rootObjectProvider.CreateRootObject("XRayWireframeTerrainMesh");
     terrainMap.TerrainAdded += OnTerrainAdded;
     terrainMap.TerrainRemoved += OnTerrainRemoved;
-    colorSettings.WireframeModeInternal.ValueChanged += (_, _) => {
-      SetMode(Enum.Parse<Mode>(colorSettings.WireframeModeInternal.Value));
+    meshSettings.WireframeModeInternal.ValueChanged += (_, _) => {
+      SetMode(Enum.Parse<Mode>(meshSettings.WireframeModeInternal.Value));
     };
-    colorSettings.WireframeEdgeColor.ValueChanged += (_, _) => {
-      SetEdgesColor(colorSettings.WireframeEdgeColor.Color);
+    meshSettings.WireframeEdgeColor.ValueChanged += (_, _) => {
+      SetEdgesColor(meshSettings.WireframeEdgeColor.Color);
     };
-    _currentMode = Enum.Parse<Mode>(colorSettings.WireframeModeInternal.Value);
+    _currentMode = Enum.Parse<Mode>(meshSettings.WireframeModeInternal.Value);
     BuildMeshEdgeCache();
   }
 
@@ -202,7 +202,7 @@ class WireframeTerrainMeshService(
   }
 
   GameObject CreateWireOverlay() {
-    _material = rendererFactory.CreateTransparencyMaterial("WireMaterial", colorSettings.WireframeEdgeColor.Color);
+    _material = rendererFactory.CreateTransparencyMaterial("WireMaterial", meshSettings.WireframeEdgeColor.Color);
     var size = mapSize.TerrainSize;
     var overlayObj = new GameObject("XRayWireframeTerrainMesh");
     for (var startX = 0; startX < size.x; startX += XMeshSize) {

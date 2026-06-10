@@ -17,23 +17,23 @@ using UnityEngine;
 
 namespace IgorZ.XRay.Settings;
 
-sealed class ColorSettings : BaseSettings<ColorSettings> {
+sealed class MeshSettings : BaseSettings<MeshSettings> {
 
-  const string ColorCliffEdgeLocKey = "IgorZ.XRay.ColorSettings.Color.CliffEdge";
-  const string ColorCliffLocKey = "IgorZ.XRay.ColorSettings.Color.Cliff";
-  const string ColorGrassLocKey = "IgorZ.XRay.ColorSettings.Color.Grass";
-  const string ColorWireframeEdgeLocKey = "IgorZ.XRay.ColorSettings.Color.WireframeEdge";
-  const string ColorSchemaDropdownLocKey = "IgorZ.XRay.ColorSettings.ColorSchemaDropdown";
-  const string ColorSchemaNameBlueprintLocKey = "IgorZ.XRay.ColorSettings.ColorSchemaName.Blueprint";
-  const string ColorSchemaNameBlueGridLocKey = "IgorZ.XRay.ColorSettings.ColorSchemaName.BlueGrid";
-  const string ColorSchemaNameBwBrightLocKey = "IgorZ.XRay.ColorSettings.ColorSchemaName.BWBright";
-  const string ColorSchemaNameBwDarkLocKey = "IgorZ.XRay.ColorSettings.ColorSchemaName.BWDark";
-  const string ColorSchemaNameCustomLocKey = "IgorZ.XRay.ColorSettings.ColorSchemaName.Custom";
-  const string ColorSchemaNameNormalGlowLocKey = "IgorZ.XRay.ColorSettings.ColorSchemaName.NormalGlow";
-  const string ColorSchemaNameNormalLocKey = "IgorZ.XRay.ColorSettings.ColorSchemaName.Normal";
-  const string GhostModeIntensityLocKey = "IgorZ.XRay.ColorSettings.GhostModelIntensity";
-  const string GlowingLocKey = "IgorZ.XRay.ColorSettings.Glowing";
-  const string HeaderStringLocKey = "IgorZ.XRay.ColorSettings.Header";
+  const string ColorCliffEdgeLocKey = "IgorZ.XRay.MeshSettings.Color.CliffEdge";
+  const string ColorCliffLocKey = "IgorZ.XRay.MeshSettings.Color.Cliff";
+  const string ColorGrassLocKey = "IgorZ.XRay.MeshSettings.Color.Grass";
+  const string ColorWireframeEdgeLocKey = "IgorZ.XRay.MeshSettings.Color.WireframeEdge";
+  const string ColorSchemaDropdownLocKey = "IgorZ.XRay.MeshSettings.ColorSchemaDropdown";
+  const string ColorSchemaNameBlueprintLocKey = "IgorZ.XRay.MeshSettings.ColorSchemaName.Blueprint";
+  const string ColorSchemaNameBlueGridLocKey = "IgorZ.XRay.MeshSettings.ColorSchemaName.BlueGrid";
+  const string ColorSchemaNameBwBrightLocKey = "IgorZ.XRay.MeshSettings.ColorSchemaName.BWBright";
+  const string ColorSchemaNameBwDarkLocKey = "IgorZ.XRay.MeshSettings.ColorSchemaName.BWDark";
+  const string ColorSchemaNameCustomLocKey = "IgorZ.XRay.MeshSettings.ColorSchemaName.Custom";
+  const string ColorSchemaNameNormalGlowLocKey = "IgorZ.XRay.MeshSettings.ColorSchemaName.NormalGlow";
+  const string ColorSchemaNameNormalLocKey = "IgorZ.XRay.MeshSettings.ColorSchemaName.Normal";
+  const string GhostModeIntensityLocKey = "IgorZ.XRay.MeshSettings.GhostModelIntensity";
+  const string GlowingLocKey = "IgorZ.XRay.MeshSettings.Glowing";
+  const string HeaderStringLocKey = "IgorZ.XRay.MeshSettings.Header";
   const string WireframeModeDropdownLocKey = "IgorZ.XRay.MeshSettings.WireframeModeDropdown";
   const string WireframeModeDropdownNoteLocKey = "IgorZ.XRay.MeshSettings.WireframeModeDropdown.Note";
   const string WireframeModeNoneLocKey = "IgorZ.XRay.MeshSettings.WireframeMode.None";
@@ -149,9 +149,9 @@ sealed class ColorSettings : BaseSettings<ColorSettings> {
 
   #region Implementation
 
-  static ColorSettings _instance;
+  static MeshSettings _instance;
 
-  ColorSettings(
+  MeshSettings(
       ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry, ModRepository modRepository)
       : base(settings, modSettingsOwnerRegistry, modRepository) {
     _instance = this;
