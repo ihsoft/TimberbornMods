@@ -24,8 +24,14 @@ class WireframeTerrainMeshService(
 
   // This is how much time is allowed for building the chunk meshes before it is considered too slow. If there are more 
   // chunks left, then they will be updated in the next frame. That being said, the full scene update may not be
-  // complete in one frame. It will become visible to the user, but it will unblock the game interface.
+  // complete in one frame. It will become clear to the user that the meshes are being built, but it will unblock the
+  // game interface, which is most important for the user experience.
   const int MaxChunkMeshBuildTimeMs = 50;
+
+  // Same as MaxChunkMeshBuildTimeMs, but for the case when the X-Ray mode is disabled. It takes much longer to build
+  // the meshes, but as long as they are not needed, we can take our time. It mostly affects the moments after the game
+  // loading since this mode is disabled by default.
+  const int MaxChunkMeshBuildTimeInactiveMs = 5;
 
   // Chunk size directly affects rebuild cost. The incremental cost goes down on the smaller chunks. However, the
   // smaller chunks take more time on full map rebuild. The full rebuild happens when the current show mode is changed
@@ -257,7 +263,8 @@ class WireframeTerrainMeshService(
         Object.Destroy(mf.sharedMesh);
       }
       mf.sharedMesh = BuildChunkMesh(chunk);
-      if (stopWatch.ElapsedMilliseconds > MaxChunkMeshBuildTimeMs) {
+      var maxLatency = IsActive ? MaxChunkMeshBuildTimeMs : MaxChunkMeshBuildTimeInactiveMs;
+      if (stopWatch.ElapsedMilliseconds > maxLatency) {
         break;
       }
     }
