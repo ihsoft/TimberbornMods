@@ -76,6 +76,9 @@
       <Content Include="..\ModsUnityProject\Assets\Mods\XRay\Data\Localizations\enUS.txt">
         <Link>Mod\Localizations\enUS.txt</Link>
       </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\XRay\Data\Localizations\ruRU.txt">
+        <Link>Mod\Localizations\ruRU.txt</Link>
+      </Content>
       <Content Include="..\ModsUnityProject\Assets\Mods\XRay\manifest.json">
         <Link>Mod\manifest.json</Link>
       </Content>
