@@ -44,7 +44,7 @@ static class HarmonyPatcher {
 }
 
 [Context("Game")]
-// ReSharper disable once UnusedType.Global
+[Context("MainMenu")]
 sealed class HarmonyPatcherConfigurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<HarmonyPatcherUnpatcher>().AsSingleton();
