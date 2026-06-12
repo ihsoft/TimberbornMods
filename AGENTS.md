@@ -147,3 +147,17 @@ Use reflection only when necessary.
 If unsure, ask or state the uncertainty.
 
 Do not invent Timberborn APIs, services, classes, paths, files, behaviors, or extension points.
+
+## First task
+
+Before making any code changes:
+
+1. Read AGENTS.md.
+2. Read all relevant files from the docs directory.
+3. Summarize:
+   - repository architecture,
+   - coding style,
+   - Timberborn modding approach,
+   - important repository-specific notes,
+   - lessons learned.
+4. Confirm understanding before proposing changes.
