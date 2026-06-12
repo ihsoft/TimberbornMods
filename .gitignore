@@ -1,4 +1,5 @@
 .idea
+.tools/
 *.DotSettings.user
 _*
 /packages/
