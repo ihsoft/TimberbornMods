@@ -47,6 +47,24 @@ Shared functionality that is not player-facing may belong here instead of Timber
 
 ---
 
+## Local Tools and Decompiled Game Sources
+
+The repository distinguishes tracked helper scripts from local/generated artifacts:
+
+- `tools/` contains repository scripts and helper commands. These files are intended to be tracked in Git.
+- `.tools/` contains locally installed external tools, such as `ilspycmd`. This directory is machine-local and ignored.
+- `_DecompiledGame/` contains generated decompiled Timberborn game sources. This directory is ignored.
+
+Use decompiled game sources as a read-only architecture reference.
+
+Do not edit game DLLs.
+
+Do not edit generated files under `_DecompiledGame/`.
+
+Regenerate `_DecompiledGame/` from the game assemblies when needed.
+
+---
+
 ## Localization
 
 Localization files are typically stored as text files containing CSV content.

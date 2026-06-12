@@ -89,6 +89,14 @@ When asked to modify a repository file:
 
 If the file cannot be read completely, stop and report the problem instead of guessing.
 
+## Local tools and generated references
+
+- `tools/` contains repository scripts and helper commands that should be tracked in Git.
+- `.tools/` contains locally installed external tools and must stay ignored.
+- `_DecompiledGame/` contains generated decompiled game sources and must stay ignored.
+- Do not edit game DLLs or generated decompiled game sources.
+- Use decompiled game sources as a read-only reference for understanding Timberborn architecture.
+
 ## Final version requests
 
 When the user asks for a "final version" of any repository file:
