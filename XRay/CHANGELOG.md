@@ -1,4 +1,7 @@
-# v0.2.0 (started on May 14th, 2026):
+# v1.0.0 (June 10th, 2026):
+* Release!
+
+# v0.2.0 (May 14th, 2026):
 * [Feature] Add buildings placement under the surface.
 
 # v0.1.0 (May 10th, 2026):
