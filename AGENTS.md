@@ -1,0 +1,124 @@
+# AI Agent Instructions
+
+This repository contains Timberborn mods.
+
+Before making changes, read the relevant instruction files listed below and follow them unless the user explicitly says otherwise.
+
+## Required reading
+
+Always read first:
+
+1. `docs/csharp-formatting-rules-for-ai-agents.md`
+2. `docs/timberborn-modding-rules-for-ai-agents.md`
+3. `docs/timberborn-modding-howto-for-ai-agents.md`
+
+When working with TimberCommons, also read:
+
+4. `docs/TimberCommons-modding-notes-for-ai-agents.md`
+
+## Instruction hierarchy
+
+The instruction files serve different purposes:
+
+| File | Purpose |
+|--------|--------|
+| `docs/csharp-formatting-rules-for-ai-agents.md` | C# formatting and code style |
+| `docs/timberborn-modding-rules-for-ai-agents.md` | Repository-specific Timberborn modding rules |
+| `docs/timberborn-modding-howto-for-ai-agents.md` | How to discover, design, and implement new Timberborn mods |
+| `docs/TimberCommons-modding-notes-for-ai-agents.md` | TimberCommons-specific implementation notes |
+
+## Read only what is relevant
+
+Do not load all instruction files blindly.
+
+Read:
+
+- formatting rules when generating C# code,
+- Timberborn modding rules when modifying repository code,
+- Timberborn modding how-to when designing new features,
+- TimberCommons notes only when working with TimberCommons.
+
+## Core principles
+
+- Evidence over assumptions.
+- Read existing files before modifying them.
+- Never reconstruct existing files from memory.
+- Preserve existing content unless explicitly asked to remove it.
+- Make the smallest change that satisfies the task.
+- Avoid opportunistic refactoring unless explicitly requested.
+- Prefer existing Timberborn architecture over custom architecture.
+- Prefer extension over replacement.
+- Prefer dependency injection over Harmony when possible.
+- Use Harmony only when no reasonable extension point exists.
+
+## Repository file changes
+
+When asked to modify a repository file:
+
+1. Read the current file first.
+2. Verify that the retrieved content is complete.
+3. Preserve unrelated content.
+4. Apply only the requested changes.
+5. Keep existing formatting and style.
+6. Return or commit the complete updated file, depending on the task.
+
+If the file cannot be read completely, stop and report the problem instead of guessing.
+
+## Final version requests
+
+When the user asks for a "final version" of any repository file:
+
+1. Read the current file from the repository first.
+2. Never reconstruct the file from memory or previous chat context.
+3. Preserve existing content unless explicitly asked to remove it.
+4. Return the complete updated file.
+5. If the current file cannot be retrieved completely, say so.
+
+## Creating new Timberborn mods
+
+When designing or implementing a new Timberborn mod:
+
+1. Find the closest existing game feature.
+2. Study the game data and classes behind it.
+3. Understand ownership, dependencies, UI integration, and save/load behavior.
+4. Prefer existing extension points.
+5. Avoid Harmony unless necessary.
+6. Add localization for all user-facing text.
+7. Consider performance frequency: startup, tick, frame, building, district, or UI open.
+
+Follow `docs/timberborn-modding-howto-for-ai-agents.md` for the full workflow.
+
+## Coding style
+
+Follow `docs/csharp-formatting-rules-for-ai-agents.md`.
+
+Important reminders:
+
+- 2-space indentation for executable code.
+- Java/K&R-style braces.
+- 120-character line limit.
+- `var` when the type is obvious.
+- 4-space indentation for wrapped arguments, initializers, expression continuations, and ternary operators.
+- Do not split generic method signatures unless absolutely necessary.
+
+## Localization
+
+User-facing text must be localized.
+
+Follow the localization rules in `docs/timberborn-modding-rules-for-ai-agents.md`.
+
+Do not hardcode visible English strings in UI or gameplay messages.
+
+## Publicizer and private access
+
+Before using reflection or `AccessTools`, check whether the relevant game assembly is publicized.
+
+If direct access is available, prefer direct access.
+
+Use reflection only when necessary.
+
+## Safety rule
+
+If unsure, ask or state the uncertainty.
+
+Do not invent Timberborn APIs, services, classes, paths, files, or behavior.

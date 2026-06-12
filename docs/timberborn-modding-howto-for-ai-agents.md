@@ -32,6 +32,27 @@ Copy architecture, not implementation.
 
 ---
 
+## Evidence-Based Development
+
+Do not assume game behavior.
+
+Do not assume API capabilities.
+
+Do not invent classes, services, methods, extension points, configuration files, or game systems.
+
+Whenever possible:
+
+1. Inspect actual game code.
+2. Inspect actual game data.
+3. Inspect actual repository code.
+4. Verify assumptions before building on them.
+
+If required information is unavailable, explicitly state the limitation instead of guessing.
+
+Incorrect certainty is usually more harmful than incomplete information.
+
+---
+
 ## Understand the game before writing code
 
 Do not start by writing Harmony patches.
@@ -54,6 +75,23 @@ The usual order is:
 6. Only then start implementing changes.
 
 Time spent understanding the existing implementation is usually repaid many times during development.
+
+---
+
+## Retrieve sources before modifying them
+
+When modifying an existing file:
+
+1. Read the current version first.
+2. Verify that the retrieved content is complete.
+3. Preserve existing content unless explicitly instructed otherwise.
+4. Make the smallest change that satisfies the request.
+
+Never reconstruct existing files from memory.
+
+Never assume file contents based on previous conversations.
+
+If the current file cannot be retrieved reliably, explicitly state the problem instead of generating a partial reconstruction.
 
 ---
 
@@ -227,6 +265,26 @@ The smaller the patch, the more resilient it is to game updates.
 
 ---
 
+## Minimal Change Principle
+
+When modifying existing code:
+
+- preserve architecture,
+- preserve behavior,
+- preserve formulas,
+- preserve thresholds,
+- preserve logging,
+- preserve comments,
+- preserve formatting conventions.
+
+Change only what is required by the task.
+
+Avoid opportunistic refactoring unless explicitly requested.
+
+A correct minimal change is usually preferable to a larger "improved" solution.
+
+---
+
 ## Reuse existing data
 
 Avoid creating duplicate state.
@@ -362,6 +420,7 @@ Understanding these classes frequently reveals the overall architecture of the f
 Before creating a new implementation:
 
 - find the existing implementation,
+- verify assumptions against actual code and data,
 - understand the data flow,
 - understand the dependency graph,
 - understand persistence,
@@ -399,6 +458,8 @@ The best Timberborn mods feel like a natural part of the game.
 Prefer solutions that integrate with existing systems.
 
 Prefer understanding over patching.
+
+Prefer evidence over assumptions.
 
 Prefer extension over replacement.
 
