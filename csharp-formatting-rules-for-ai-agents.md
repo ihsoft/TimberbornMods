@@ -1,0 +1,407 @@
+# C# Formatting Rules for AI Agents
+
+This document defines the preferred C# formatting style for this project/user.
+It is intended primarily for AI coding agents. When generating or modifying C# code, follow these rules unless explicitly instructed otherwise.
+
+## Core style
+
+The style is close to Google Java Style, adapted for C#.
+
+Goals:
+
+- Compact code.
+- Consistent formatting.
+- Minimal vertical expansion.
+- High readability.
+- Avoid typical C# Allman-style formatting.
+
+When in doubt, prefer the more compact version as long as it remains readable.
+
+---
+
+## Indentation
+
+Use 2 spaces for normal executable code indentation.
+
+```csharp
+if (condition) {
+  DoSomething();
+}
+```
+
+Do not use 4 spaces for normal code blocks.
+
+```csharp
+if (condition) {
+    DoSomething();
+}
+```
+
+---
+
+## Braces
+
+Use K&R / Java-style braces.
+
+```csharp
+class Example {
+  void Method() {
+    DoSomething();
+  }
+}
+```
+
+Do not use Allman braces.
+
+```csharp
+class Example
+{
+  void Method()
+  {
+    DoSomething();
+  }
+}
+```
+
+---
+
+## Namespace
+
+Prefer file-scoped namespaces.
+
+```csharp
+namespace MyProject.MyFeature;
+```
+
+---
+
+## Access modifiers
+
+Do not write access modifiers unless they are required.
+
+Prefer:
+
+```csharp
+static class Helper {
+  static void DoWork() {
+  }
+}
+```
+
+Avoid:
+
+```csharp
+internal static class Helper {
+  private static void DoWork() {
+  }
+}
+```
+
+Harmony patch classes and methods do not require explicit access modifiers unless technically necessary.
+
+---
+
+## `var`
+
+Prefer `var` when the type is obvious from the right-hand side.
+
+```csharp
+var button = new Button();
+var count = modItems.Count;
+```
+
+Use explicit types only when they improve readability or the type is not obvious.
+
+---
+
+## Line length
+
+Maximum line length is 120 characters.
+
+If a statement fits within 120 characters, keep it on a single line.
+
+Prefer:
+
+```csharp
+var visible = !showOnlyActive || ModPlayerPrefsHelper.IsModEnabled(mod);
+```
+
+Avoid unnecessary wrapping:
+
+```csharp
+var visible =
+  !showOnlyActive ||
+  ModPlayerPrefsHelper.IsModEnabled(mod);
+```
+
+---
+
+## Line wrapping philosophy
+
+Wrapping is not used to improve aesthetics.
+
+Wrapping is used only when:
+
+- The line exceeds 120 characters.
+- The code becomes genuinely difficult to read.
+
+If code fits within 120 characters, keep it on one line.
+
+---
+
+## Wrapped method calls
+
+When a method call exceeds 120 characters, preserve as much of the call signature as possible.
+
+Do not split:
+
+- Method name.
+- Generic parameters.
+- Member access chain.
+
+Instead, wrap only the argument list.
+
+Preferred:
+
+```csharp
+var modItems = AccessTools.FieldRefAccess<ModListView, Dictionary<Mod, ModItem>>(
+    modListView,
+    "_modItems"
+);
+```
+
+Avoid:
+
+```csharp
+var modItems = AccessTools.FieldRefAccess<
+    ModListView,
+    Dictionary<Mod, ModItem>>(
+    modListView,
+    "_modItems"
+);
+```
+
+Avoid:
+
+```csharp
+var modItems = AccessTools
+    .FieldRefAccess<ModListView, Dictionary<Mod, ModItem>>(
+        modListView,
+        "_modItems"
+    );
+```
+
+### Argument indentation
+
+Wrapped argument lists use 4 spaces.
+
+```csharp
+SomeMethod(
+    firstArgument,
+    secondArgument,
+    thirdArgument
+);
+```
+
+Rationale:
+
+Arguments are part of a declaration-like structure rather than executable logic.
+Using 4 spaces visually distinguishes them from normal code blocks.
+
+---
+
+## Wrapped expressions
+
+When an expression exceeds 120 characters, wrap it only when necessary.
+
+Wrapped expression continuations use 4 spaces, not 2 spaces.
+
+Rationale:
+
+A multi-line expression is still one value computed as a single unit.
+It is closer to initialization/declaration than to multiple executable statements.
+
+### Operators move with the right operand
+
+When wrapping an expression, keep the operator together with the operand/expression that follows it.
+
+Preferred:
+
+```csharp
+var enabled = hasManualOverride
+    || ModPlayerPrefsHelper.IsModEnabled(mod) && !ModPlayerPrefsHelper.HasModWarning(mod);
+```
+
+Avoid:
+
+```csharp
+var enabled = hasManualOverride ||
+    ModPlayerPrefsHelper.IsModEnabled(mod) && !ModPlayerPrefsHelper.HasModWarning(mod);
+```
+
+### Preserve logical execution groups
+
+When wrapping boolean expressions, keep natural logical groups together according to operator precedence and intent.
+
+For example, in `var1 || var2 && var3`, `var2 && var3` is the logical group.
+
+Preferred:
+
+```csharp
+var result = var1
+    || var2 && var3;
+```
+
+Avoid:
+
+```csharp
+var result = var1 || var2
+    && var3;
+```
+
+The second form visually suggests the wrong grouping.
+
+### Do not wrap if it fits
+
+Prefer:
+
+```csharp
+var result = var1 || var2 && var3;
+```
+
+Avoid:
+
+```csharp
+var result = var1
+    || var2 && var3;
+```
+
+if the single-line version fits within 120 characters.
+
+---
+
+## Object and collection initializers
+
+Object and collection initializers use 4 spaces.
+
+```csharp
+var filterButton = new Button() {
+    name = "ShowActiveModsButton",
+    text = "Show active",
+};
+```
+
+```csharp
+var values = new List<int>() {
+    1,
+    2,
+    3,
+};
+```
+
+Use trailing commas in multi-line initializers.
+
+---
+
+## Lambdas
+
+Lambda bodies are normal executable code.
+
+Use 2-space indentation.
+
+```csharp
+button.clicked += () => {
+  showOnlyActive = !showOnlyActive;
+  ApplyFilter(modListView, showOnlyActive);
+};
+```
+
+Do not use 4-space indentation for lambda bodies.
+
+---
+
+## Ternary operator
+
+A ternary operator is executable logic.
+
+When wrapped, use normal code indentation (2 spaces).
+
+```csharp
+filterButton.text = showOnlyActive
+  ? $"Show all ({totalCount})"
+  : $"Show active ({activeCount}/{totalCount})";
+```
+
+Do not use 4-space continuation indentation.
+
+Avoid:
+
+```csharp
+filterButton.text = showOnlyActive
+    ? $"Show all ({totalCount})"
+    : $"Show active ({activeCount}/{totalCount})";
+```
+
+Think of a ternary operator as a compact form of:
+
+```csharp
+if (showOnlyActive) {
+  ...
+} else {
+  ...
+}
+```
+
+The indentation should reflect that.
+
+---
+
+## Blank lines
+
+Use blank lines between logical blocks.
+
+```csharp
+if (resetButton?.parent == null) {
+  return;
+}
+
+var filterButton = new Button() {
+    name = "ShowActiveModsButton",
+};
+
+resetButton.parent.Insert(resetButton.parent.IndexOf(resetButton) + 1, filterButton);
+```
+
+Do not add blank lines after every statement.
+
+---
+
+## General philosophy
+
+The desired result should look like compact Java-style C#.
+
+Characteristics:
+
+- 2-space indentation for executable code.
+- Same-line opening braces.
+- Minimal access modifiers.
+- `var` when obvious.
+- 120-character line limit.
+- No unnecessary wrapping.
+- Preserve method signatures when wrapping calls.
+- Wrap only argument lists when possible.
+- Operators move with the following operand in wrapped expressions.
+- Preserve logical execution groups in wrapped expressions.
+- 4-space indentation for:
+  - object initializers,
+  - collection initializers,
+  - wrapped argument lists,
+  - wrapped expression continuations.
+- 2-space indentation for:
+  - executable code,
+  - lambdas,
+  - ternary operators,
+  - conditionals,
+  - loops.
+
+When multiple formatting choices are valid, prefer the version with fewer lines while maintaining readability.
