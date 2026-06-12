@@ -11,10 +11,12 @@ Always read first:
 1. `docs/csharp-formatting-rules-for-ai-agents.md`
 2. `docs/timberborn-modding-rules-for-ai-agents.md`
 3. `docs/timberborn-modding-howto-for-ai-agents.md`
+4. `docs/timberborn-repository-notes.md`
+5. `docs/timberborn-lessons-learned.md`
 
 When working with TimberCommons, also read:
 
-4. `docs/TimberCommons-modding-notes-for-ai-agents.md`
+6. `docs/TimberCommons-modding-notes-for-ai-agents.md`
 
 ## Instruction hierarchy
 
@@ -25,6 +27,8 @@ The instruction files serve different purposes:
 | `docs/csharp-formatting-rules-for-ai-agents.md` | C# formatting and code style |
 | `docs/timberborn-modding-rules-for-ai-agents.md` | Repository-specific Timberborn modding rules |
 | `docs/timberborn-modding-howto-for-ai-agents.md` | How to discover, design, and implement new Timberborn mods |
+| `docs/timberborn-repository-notes.md` | Repository-specific architectural and workflow notes |
+| `docs/timberborn-lessons-learned.md` | Practical discoveries and development experience |
 | `docs/TimberCommons-modding-notes-for-ai-agents.md` | TimberCommons-specific implementation notes |
 
 ## Read only what is relevant
@@ -36,6 +40,8 @@ Read:
 - formatting rules when generating C# code,
 - Timberborn modding rules when modifying repository code,
 - Timberborn modding how-to when designing new features,
+- repository notes when making architectural decisions,
+- lessons learned when investigating implementation approaches,
 - TimberCommons notes only when working with TimberCommons.
 
 ## Core principles
@@ -50,6 +56,25 @@ Read:
 - Prefer extension over replacement.
 - Prefer dependency injection over Harmony when possible.
 - Use Harmony only when no reasonable extension point exists.
+
+## Research before implementation
+
+When working on a new feature:
+
+1. Find the closest existing game feature.
+2. Study the implementation.
+3. Understand ownership of the data.
+4. Understand dependencies.
+5. Understand save/load behavior.
+6. Understand UI integration.
+7. Identify extension points.
+8. Only then begin implementation.
+
+Prefer understanding over patching.
+
+Prefer evidence over assumptions.
+
+Copy architecture, not implementation.
 
 ## Repository file changes
 
@@ -121,4 +146,4 @@ Use reflection only when necessary.
 
 If unsure, ask or state the uncertainty.
 
-Do not invent Timberborn APIs, services, classes, paths, files, or behavior.
+Do not invent Timberborn APIs, services, classes, paths, files, behaviors, or extension points.
