@@ -27,5 +27,6 @@ sealed class ConfiguratorForGame : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     CommonFormats.ResetCachedLocStrings();
     HarmonyPatcher.ApplyPatch(PatchId, Patches);
+    containerDefinition.Bind<ModListViewLocInitializer>().AsSingleton();
   }
 }

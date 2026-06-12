@@ -17,5 +17,6 @@ sealed class ConfiguratorFromMainMenu : IConfigurator {
 
   public void Configure(IContainerDefinition containerDefinition) {
     HarmonyPatcher.ApplyPatch(PatchId, Patches);
+    containerDefinition.Bind<ModListViewLocInitializer>().AsSingleton();
   }
 }

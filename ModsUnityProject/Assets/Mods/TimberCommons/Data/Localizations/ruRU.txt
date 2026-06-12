@@ -25,6 +25,9 @@ IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,"Показыва�
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,"Отображать индикатор на аватаре строения",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHintTooltip,"Наведите курсор на индикатор, чтобы увидеть вероятность получения травмы",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAsDailyProbability,"Показывать вероятность за целый день",
+=,=,"CommonUIPatches"
+IgorZ.TimberCommons.CommonUIPatches.ModListView.ShowActiveMods,"Показать активные ({0}/{1})","Button in mod manager. Shows only enabled mods."
+IgorZ.TimberCommons.CommonUIPatches.ModListView.ShowAllMods,"Показать все ({0})","Button in mod manager. Shows all installed mods."
 =,=,"TimberDev_Utils"
 TimberDev_Utils.Settings.Debug.VerboseLogging,"Детальные журналы",
 TimberDev_Utils.Settings.Debug.VerboseLoggingTooltip,"В журналы игры будет записываться больше полезной информации,

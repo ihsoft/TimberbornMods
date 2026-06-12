@@ -26,3 +26,6 @@ IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHintTooltip,"Survolez l
 IgorZ.TimberCommons.Settings.DebugSection,"Débogage et dépannage",
 IgorZ.TimberCommons.Settings.Debug.VerboseLogging,"Journalisation verbeuse",
 IgorZ.TimberCommons.Settings.Debug.VerboseLoggingTooltip,"Les journaux contiendront plus de détails utiles, mais cela peut avoir un impact sur les performances du jeu."
+=,=,"CommonUIPatches"
+IgorZ.TimberCommons.CommonUIPatches.ModListView.ShowActiveMods,"Afficher les mods actifs ({0}/{1})","Button in mod manager. Shows only enabled mods."
+IgorZ.TimberCommons.CommonUIPatches.ModListView.ShowAllMods,"Afficher tous les mods ({0})","Button in mod manager. Shows all installed mods."

@@ -2,9 +2,9 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
+using Timberborn.Localization;
 using Timberborn.Modding;
 using Timberborn.ModdingUI;
 using UnityEngine.UIElements;
@@ -15,6 +15,15 @@ namespace IgorZ.TimberCommons.CommonUIPatches;
 
 [HarmonyPatch(typeof(ModListView), nameof(ModListView.Initialize))]
 static class ModListViewInitializePatch {
+  const string ShowActiveModsLocKey = "IgorZ.TimberCommons.CommonUIPatches.ModListView.ShowActiveMods";
+  const string ShowAllModsLocKey = "IgorZ.TimberCommons.CommonUIPatches.ModListView.ShowAllMods";
+
+  static ILoc _loc = null!;
+
+  public static void SetLoc(ILoc loc) {
+    _loc = loc;
+  }
+
   static void Postfix(ModListView __instance, VisualElement root) {
     var resetButton = root.Q<Button>("ResetOrderButton");
     if (resetButton?.parent == null) {
@@ -35,9 +44,9 @@ static class ModListViewInitializePatch {
 
     resetButton.parent.Insert(resetButton.parent.IndexOf(resetButton) + 1, filterButton);
 
-    UpdateButtonText(__instance, filterButton, false);
-
     var showOnlyActive = false;
+    UpdateButtonText(__instance, filterButton, showOnlyActive);
+
     filterButton.clicked += () => {
       showOnlyActive = !showOnlyActive;
       ApplyFilter(__instance, showOnlyActive);
@@ -46,25 +55,18 @@ static class ModListViewInitializePatch {
   }
 
   static void ApplyFilter(ModListView modListView, bool showOnlyActive) {
-    var modItems = GetModItems(modListView);
-
-    foreach (var (mod, item) in modItems) {
+    foreach (var (mod, item) in modListView._modItems) {
       var visible = !showOnlyActive || ModPlayerPrefsHelper.IsModEnabled(mod);
       item.Root.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
     }
   }
 
   static void UpdateButtonText(ModListView modListView, Button filterButton, bool showOnlyActive) {
-    var modItems = GetModItems(modListView);
-    var activeCount = modItems.Keys.Count(ModPlayerPrefsHelper.IsModEnabled);
-    var totalCount = modItems.Count;
+    var activeCount = modListView._modItems.Keys.Count(ModPlayerPrefsHelper.IsModEnabled);
+    var totalCount = modListView._modItems.Count;
 
     filterButton.text = showOnlyActive
-      ? $"Show all ({totalCount})"
-      : $"Show active ({activeCount}/{totalCount})";
-  }
-
-  static Dictionary<Mod, ModItem> GetModItems(ModListView modListView) {
-    return AccessTools.FieldRefAccess<ModListView, Dictionary<Mod, ModItem>>(modListView, "_modItems");
+        ? _loc.T(ShowAllModsLocKey, totalCount)
+        : _loc.T(ShowActiveModsLocKey, activeCount, totalCount);
   }
 }
