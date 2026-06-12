@@ -195,9 +195,51 @@ element.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
 
 This is often safer than rebuilding lists or modifying source collections.
 
-## Accessing private fields
+## Accessing private fields and publicizer
 
-When needed, use Harmony `AccessTools`.
+Before using Harmony `AccessTools` for private/internal game members, inspect the mod project file.
+
+Some mods use `BepInEx.AssemblyPublicizer.MSBuild` and publicized game references.
+
+Example project-file pattern:
+
+```xml
+<PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />
+<Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Timberborn.*.dll" Publicize="true" />
+<Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\UnityEngine.UIElementsModule.dll" Publicize="true" />
+```
+
+If the target assembly is publicized, prefer direct member access.
+
+Important:
+
+The target assembly may be publicized either by an explicit reference or by a wildcard reference pattern.
+
+Example explicit reference:
+
+```xml
+<Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Timberborn.ModdingUI.dll" Publicize="true" />
+```
+
+Example wildcard reference:
+
+```xml
+<Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Timberborn.*.dll" Publicize="true" />
+```
+
+In the wildcard example, assemblies such as `Timberborn.ModdingUI.dll` are publicized even if they are not listed explicitly.
+
+When checking whether direct access is available, match the target assembly against all `Reference Include` entries, including wildcard patterns, and use the effective `Publicize` value for the matching reference.
+
+Preferred when publicizer applies:
+
+```csharp
+var value = instance._somePrivateField;
+```
+
+Avoid unnecessary `AccessTools` in that case.
+
+If publicizer is not available for the target assembly, use Harmony `AccessTools` when needed.
 
 Example:
 
@@ -207,8 +249,14 @@ static SomeType GetSomePrivateField(SomeClass instance) {
 }
 ```
 
-Use this sparingly.
-Prefer public APIs when they exist.
+Performance rule:
+
+- `AccessTools.FieldRefAccess` is relatively expensive.
+- A single call in initialization or low-frequency UI code is usually acceptable.
+- Do not call it repeatedly in hot paths.
+- If repeated access is needed and direct publicized access is unavailable, cache the result/delegate or move the lookup out of the hot path.
+
+Prefer public APIs first, publicized direct access second, and `AccessTools` only when needed.
 
 ## Registration
 
