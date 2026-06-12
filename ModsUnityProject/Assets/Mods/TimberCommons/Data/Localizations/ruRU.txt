@@ -20,7 +20,6 @@ IgorZ.TimberCommons.Settings.IrrigationSystem.OverrideDesertLevelsForWaterTowers
 IgorZ.TimberCommons.Settings.WaterBuildingsSection,"Водные сооружения",
 IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnMechanicalPumps,"Позволять менять максимальный уровень воды на водосбросе универсальных насосов",
 IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnFluidDumps,"Позволять менять максимальный уровень воды на водосбросе сливов для жидкостей",
-IgorZ.TimberCommons.Settings.WaterBuildings.ShowCurrentStrengthInSluice,"Показывать текущую скорость потока воды в шлюзе",
 IgorZ.TimberCommons.Settings.InjuryProbabilitySection,"Вероятность ранения",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,"Показывать вероятность получения травмы на панели справа",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,"Отображать индикатор на аватаре строения",

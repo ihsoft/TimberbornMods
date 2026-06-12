@@ -19,7 +19,6 @@ sie als „kaum bewässert“ anzeigen, da die Bewässerungstürme nur die Grund
 IgorZ.TimberCommons.Settings.WaterBuildingsSection,Wassergebundene Gebäude,
 IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnMechanicalPumps,Ermöglicht die Einstellung der maximalen Wasserstiefe am Ausgang der mechanischen Flüssigkeitspumpen,
 IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnFluidDumps,Ermöglicht die Einstellung der maximalen Wasserstiefe am Ausgang der Flüssigkeitsableiter,
-IgorZ.TimberCommons.Settings.WaterBuildings.ShowCurrentStrengthInSluice,Anzeige der Fließgeschwindigkeit bei Schützen,
 IgorZ.TimberCommons.Settings.InjuryProbabilitySection,Verletzungsrisiko,
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,Verletzungsrisiko im Gebäudefenster anzeigen,
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,Indikator am Gebäudesymbol anzeigen,

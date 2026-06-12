@@ -19,7 +19,6 @@ les montrera comme « à peine hydratées » puisque les tours d'irrigation ne d
 IgorZ.TimberCommons.Settings.WaterBuildingsSection,"Bâtiments hydrauliques",
 IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnMechanicalPumps,"Permettre de fixer le niveau d'eau maximum au déversoir des pompes mécaniques",
 IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnFluidDumps,"Permet de fixer le niveau d'eau maximum au déversoir d'écoulement de liquide",
-IgorZ.TimberCommons.Settings.WaterBuildings.ShowCurrentStrengthInSluice,"Afficher la force actuelle dans la vanne",
 IgorZ.TimberCommons.Settings.InjuryProbabilitySection,"Probabilité de blessure",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,"Afficher la probabilité de blessure dans le panneau de droite",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,"Afficher l'indicateur sur l'icône du bâtiment",

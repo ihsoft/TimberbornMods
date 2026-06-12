@@ -20,7 +20,6 @@ will show them as 'barely moisturized' since the irrigation towers give only the
 IgorZ.TimberCommons.Settings.WaterBuildingsSection,"Water buildings",
 IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnMechanicalPumps,"Allow setting maximum water level at the spillway of the mechanical pumps",
 IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnFluidDumps,"Allow setting maximum water level at the spillway of the liquid drops",
-IgorZ.TimberCommons.Settings.WaterBuildings.ShowCurrentStrengthInSluice,"Show current strength in sluice",
 IgorZ.TimberCommons.Settings.InjuryProbabilitySection,"Injury probability",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,"Show injury probability in the right panel",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,"Show indicator on the building avatar",

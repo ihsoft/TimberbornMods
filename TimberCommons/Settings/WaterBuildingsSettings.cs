@@ -29,12 +29,6 @@ sealed class WaterBuildingsSettings : ModSettingsOwner {
       ModSettingDescriptor
           .CreateLocalized("IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnFluidDumps"));
 
-  public static bool ShowCurrentStrengthInSluice =>
-      _instance._showCurrentStrengthInSluice.Value;
-  public ModSetting<bool> _showCurrentStrengthInSluice { get; } = new(
-      true,
-      ModSettingDescriptor.CreateLocalized("IgorZ.TimberCommons.Settings.WaterBuildings.ShowCurrentStrengthInSluice"));
-
   // ReSharper restore InconsistentNaming
   // ReSharper restore MemberCanBePrivate.Global
   #endregion
