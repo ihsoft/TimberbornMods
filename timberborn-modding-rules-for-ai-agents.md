@@ -9,6 +9,25 @@ Use this together with:
 The C# formatting file controls code style.
 This file controls Timberborn-specific modding practices that are broadly useful across mods.
 
+## Ask when intent is unclear
+
+Do not guess project intent.
+
+Code shows implementation.
+It does not always show design intent.
+
+When multiple architectural choices seem reasonable, ask.
+
+Examples:
+
+- Should this functionality be generic or feature-specific?
+- Should this code be reused elsewhere?
+- Is this intended to become infrastructure?
+- Is backward compatibility important?
+- Is there an existing design decision behind the current implementation?
+
+A short question is usually preferable to making the wrong architectural decision.
+
 ## Repository context
 
 The main repository is:
@@ -284,3 +303,4 @@ When working on Timberborn mods:
 - Preserve existing mod architecture and naming conventions.
 - Keep localization keys close to the class that uses them.
 - Update all existing localization files when adding user-facing text.
+- Ask instead of guessing when project intent is unclear.
