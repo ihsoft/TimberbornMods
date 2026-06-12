@@ -1,3 +1,6 @@
+# v1.16.0 (started on June 5th, 2026)
+* [Feature] Add "Show active" filter to the mods selection dialog.
+
 # v1.15.2 (March 25th, 2026)
 * [Update] Support game version `1.0.12.7`.
 * [Change] No more mod versions for the pre-1.0 game version.

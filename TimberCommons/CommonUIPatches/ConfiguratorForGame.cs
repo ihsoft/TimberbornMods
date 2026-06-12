@@ -11,18 +11,17 @@ namespace IgorZ.TimberCommons.CommonUIPatches;
 
 [Context("Game")]
 // ReSharper disable once UnusedType.Global
-sealed class Configurator : IConfigurator {
-  static readonly string PatchId = typeof(Configurator).AssemblyQualifiedName;
+sealed class ConfiguratorForGame : IConfigurator {
+  static readonly string PatchId = typeof(ConfiguratorForGame).AssemblyQualifiedName;
   static readonly Type[] Patches = [
       typeof(GoodConsumingBuildingDescriberPatch),
       typeof(ManufactoryInventoryFragmentPatch1),
       typeof(ManufactoryInventoryFragmentPatch2),
-      typeof(SluiceFragmentPatch1),
-      typeof(SluiceFragmentPatch2),
       typeof(GrowableToolPanelItemFactoryPatch),
       typeof(GrowableFragmentPatch),
       typeof(ManufactoryDescriberPatch1),
-      typeof(ManufactoryDescriberPatch2)
+      typeof(ManufactoryDescriberPatch2),
+      typeof(ModListViewInitializePatch),
   ];
 
   public void Configure(IContainerDefinition containerDefinition) {
