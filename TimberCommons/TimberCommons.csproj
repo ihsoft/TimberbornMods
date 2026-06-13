@@ -67,6 +67,9 @@
       <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\enUS.txt">
         <Link>Mod\Localizations\enUS.txt</Link>
       </Content>
+      <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\frFR.txt">
+        <Link>Mod\Localizations\frFR.txt</Link>
+      </Content>
       <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\ruRU.txt">
         <Link>Mod\Localizations\ruRU.txt</Link>
       </Content>
