@@ -18,6 +18,10 @@ When working with TimberCommons, also read:
 
 6. `docs/TimberCommons-modding-notes-for-ai-agents.md`
 
+When bootstrapping a new repository that only copied `AGENTS.md` and `docs/`, also read:
+
+7. `docs/timberborn-new-repository-bootstrap-for-ai-agents.md`
+
 ## Instruction hierarchy
 
 The instruction files serve different purposes:
@@ -30,6 +34,7 @@ The instruction files serve different purposes:
 | `docs/timberborn-repository-notes.md` | Repository-specific architectural and workflow notes |
 | `docs/timberborn-lessons-learned.md` | Practical discoveries and development experience |
 | `docs/TimberCommons-modding-notes-for-ai-agents.md` | TimberCommons-specific implementation notes |
+| `docs/timberborn-new-repository-bootstrap-for-ai-agents.md` | New repository setup and first-mod bootstrap workflow |
 
 ## Read only what is relevant
 
@@ -43,6 +48,8 @@ Read:
 - repository notes when making architectural decisions,
 - lessons learned when investigating implementation approaches,
 - TimberCommons notes only when working with TimberCommons.
+- new repository bootstrap notes only when setting up a repository that does not yet have local links, generated
+  references, or established mod project structure.
 
 ## Core principles
 
