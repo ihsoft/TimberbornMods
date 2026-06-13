@@ -277,7 +277,46 @@ Performance rule:
 
 Prefer public APIs first, publicized direct access second, and `AccessTools` only when needed.
 
-## Registration
+## Configurators and DI registration
+
+Each package should have its own configurator.
+
+A configurator implements `IConfigurator` and is marked with one or more `Context` attributes.
+
+Known Timberborn contexts:
+
+```text
+Bootstrapper
+MainMenu
+Game
+MapEditor
+```
+
+Choose the context from the task:
+
+- `Game` for gameplay, in-game UI, entity components, services, ticks, save/load, tools, and patches used in a loaded
+  game.
+- `MainMenu` for main menu systems, mod settings, and mod-manager-related UI.
+- `MapEditor` for systems that must run in the map editor.
+- `Bootstrapper` is not for ordinary mod features. Use it only when there is clear evidence that the system must run
+  during bootstrap.
+
+A configurator can be registered in more than one context when the same bindings are required in multiple places.
+
+Any type defined by a package that must participate in DI must be registered by the package configurator.
+
+Common binding patterns:
+
+```csharp
+containerDefinition.Bind<SomeService>().AsSingleton();
+containerDefinition.Bind<SomeComponent>().AsTransient();
+```
+
+Use `AsSingleton()` for shared services, settings, managers, UI modules/fragments, and objects expected to have one
+instance per context.
+
+Use `AsTransient()` for entity components, UI rows/dialogs created repeatedly, short-lived helpers, and objects that
+must be constructed per owner or per request.
 
 When adding helper singletons, register them using the existing mod configurator pattern.
 
@@ -288,6 +327,31 @@ ILoadableSingleton
 ```
 
 and follow the local convention.
+
+### Template decorators
+
+Some entity components are added through Timberborn template decorators.
+
+Typical pattern:
+
+```csharp
+containerDefinition.Bind<SomeComponent>().AsTransient();
+containerDefinition.MultiBind<TemplateModule>().ToProvider(ProvideTemplateModule).AsSingleton();
+
+static TemplateModule ProvideTemplateModule() {
+  var builder = new TemplateModule.Builder();
+  builder.AddDecorator<SomeComponentSpec, SomeComponent>();
+  return builder.Build();
+}
+```
+
+Decorator rules:
+
+- Register the runtime component in DI, usually as transient.
+- Register the `TemplateModule` provider.
+- Add the decorator mapping between the spec or source component and the runtime component.
+- Check existing game or repository decorators before creating a new pattern.
+- If the decorator mechanism is unclear, ask before implementing it.
 
 Do not invent a new DI pattern if the mod already has one.
 

@@ -222,11 +222,27 @@ Configurators are often the entry point for game systems.
 When studying a feature:
 
 1. Find the configurator.
-2. Identify which components are added.
+2. Identify which context it runs in.
 3. Identify which services are registered.
-4. Identify how the game object is assembled.
+4. Identify which components are registered.
+5. Identify whether bindings are singleton or transient.
+6. Identify whether any components are added through `TemplateModule` decorators.
+7. Identify how the game object is assembled.
 
 Many gameplay features become much easier to understand after locating the configurator.
+
+When creating a new package, create a package configurator and register every DI-participating type defined by that
+package.
+
+Use the smallest correct context:
+
+- `Game`,
+- `MainMenu`,
+- `MapEditor`,
+- rarely `Bootstrapper`.
+
+If an entity component is attached from a blueprint/spec, check whether a `TemplateModule.Builder().AddDecorator(...)`
+registration is required.
 
 ---
 
