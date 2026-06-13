@@ -7,6 +7,20 @@ Use this together with:
 - repository-level `csharp-formatting-rules-for-ai-agents.md`
 - repository-level `timberborn-modding-rules-for-ai-agents.md`
 
+## Project role
+
+TimberCommons is a regular player-facing Timberborn mod.
+
+It is named "Commons" because it contains many small gameplay and UI changes, not because it is a general shared
+library.
+
+The important reusable API surface is the irrigation tower system. Components based on `IrrigationTower`, such as
+`GoodConsumingIrrigationTower` and `ManufactoryIrrigationTower`, may be used by other mods, including third-party
+mods.
+
+When changing the irrigation tower components, specs, save/load behavior, or public API, consider compatibility for
+external mods. Do not treat unrelated TimberCommons features as reusable infrastructure unless there is evidence.
+
 ## Data location
 
 TimberCommons is a Unity-based mod.

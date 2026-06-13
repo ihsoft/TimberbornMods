@@ -10,7 +10,7 @@ Unlike the general modding guides, the contents of this document are specific to
 
 ## Repository Structure
 
-This repository contains multiple Timberborn mods and shared libraries.
+This repository contains multiple Timberborn mods and supporting libraries.
 
 Examples include:
 
@@ -48,15 +48,21 @@ ModsUnityProject/Assets/Mods/<ModName>/
 
 ---
 
-## Shared Libraries
+## Project Roles
 
 ### TimberCommons
 
-Player-facing shared functionality.
+TimberCommons is a regular player-facing Timberborn mod.
 
-Contains reusable systems that may be used by multiple mods.
+It is named "Commons" because it contains many small gameplay and UI changes, not because it is a general
+shared library.
 
-When modifying TimberCommons, consider potential impact on all dependent mods.
+One important exception is the irrigation tower system. TimberCommons provides reusable components based on
+`IrrigationTower`, such as `GoodConsumingIrrigationTower` and `ManufactoryIrrigationTower`, that can be used by
+other mods, including third-party mods.
+
+When modifying those irrigation tower components or their specs, consider compatibility for external mods that may
+depend on them. Do not treat unrelated TimberCommons features as shared infrastructure unless there is evidence.
 
 ### TimberDev
 
