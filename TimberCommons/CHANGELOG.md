@@ -1,4 +1,5 @@
 # v1.16.0 (started on June 5th, 2026)
+* [Update] Support game version `v1.1`.
 * [Update] Removed sluice enhancements support.
 * [Feature] Add "Show active" filter to the mods selection dialog.
 

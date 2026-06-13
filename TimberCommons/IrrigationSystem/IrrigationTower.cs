@@ -37,7 +37,7 @@ namespace IgorZ.TimberCommons.IrrigationSystem;
 /// Connected tiles must be immediately adjusted to each other on the left, right, top or bottom side. If the tile is
 /// blocked for irrigation (for example, via a moisture blocker), then it is not eligible for irrigation. 
 /// </remarks>
-public abstract class IrrigationTower : TickableComponent, IAwakableComponent, IBuildingWithRange,
+public abstract class IrrigationTower : TickableComponent, IAwakableComponent, IBuildingWithRange, IInitializableEntity,
                                         IFinishedStateListener, IPostPlacementChangeListener, IFinishedPausable,
                                         ILateTickable, IPersistentEntity, ISelectionListener, IPostInitializableEntity {
 
@@ -178,11 +178,10 @@ public abstract class IrrigationTower : TickableComponent, IAwakableComponent, I
 
   #endregion
 
-  #region TickableComponent implementation
+  #region IInitializableEntity implementation
 
   /// <inheritdoc/>
-  public override void StartTickable() {
-    base.StartTickable();
+  public void InitializeEntity() {
     Initialize();
 
     _needsPower = GetComponent<MechanicalNode>();
@@ -193,6 +192,10 @@ public abstract class IrrigationTower : TickableComponent, IAwakableComponent, I
     UpdateState();
   }
   bool _needsPower;
+
+  #endregion
+
+  #region TickableComponent implementation
 
   /// <inheritdoc/>
   public override void Tick() {
