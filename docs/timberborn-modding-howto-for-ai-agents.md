@@ -129,6 +129,25 @@ Before searching for classes:
 - inspect configuration files,
 - inspect localization identifiers.
 
+When `_ExtractedGameAssets/` is available, use it as a read-only game data reference:
+
+- inspect `_ExtractedGameAssets/Blueprints/` for blueprint and component-spec patterns,
+- inspect `_ExtractedGameAssets/Localizations/` for existing game localization keys and terminology,
+- inspect `_ExtractedGameAssets/UI/` for UXML, USS, sprites, stable element names, and UI hierarchy,
+- inspect `_ExtractedGameAssets/Shaders/` only for shader-specific work.
+
+If `_ExtractedGameAssets/` is missing and game data or UI structure is needed, regenerate it from the archives under:
+
+```text
+_GAME!/Timberborn_Data/StreamingAssets/Modding/
+```
+
+using:
+
+```powershell
+tools/extract-game-modding-assets.ps1
+```
+
 Determine:
 
 - which components are used,

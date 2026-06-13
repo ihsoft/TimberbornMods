@@ -74,21 +74,53 @@ Shared functionality that is not player-facing may belong here instead of Timber
 
 ---
 
-## Local Tools and Decompiled Game Sources
+## Local Tools and Generated Game References
 
 The repository distinguishes tracked helper scripts from local/generated artifacts:
 
 - `tools/` contains repository scripts and helper commands. These files are intended to be tracked in Git.
 - `.tools/` contains locally installed external tools, such as `ilspycmd`. This directory is machine-local and ignored.
 - `_DecompiledGame/` contains generated decompiled Timberborn game sources. This directory is ignored.
+- `_ExtractedGameAssets/` contains generated extracted game modding assets. This directory is ignored.
 
 Use decompiled game sources as a read-only architecture reference.
+
+Use extracted game assets as read-only data and UI references.
 
 Do not edit game DLLs.
 
 Do not edit generated files under `_DecompiledGame/`.
 
+Do not edit generated files under `_ExtractedGameAssets/`.
+
 Regenerate `_DecompiledGame/` from the game assemblies when needed.
+
+Regenerate `_ExtractedGameAssets/` from the game modding archives when needed.
+
+The game modding archives are located under:
+
+```text
+_GAME!/Timberborn_Data/StreamingAssets/Modding/
+```
+
+Important archives:
+
+- `Blueprints.zip` contains game blueprints.
+- `Localizations.zip` contains game localization files.
+- `Shaders.zip` contains game shaders.
+- `UI.zip` contains game UI assets, including UXML, USS, and sprites.
+
+Use:
+
+```powershell
+tools/extract-game-modding-assets.ps1
+```
+
+to extract them into:
+
+```text
+_ExtractedGameAssets/
+```
 
 ---
 

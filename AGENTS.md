@@ -94,8 +94,10 @@ If the file cannot be read completely, stop and report the problem instead of gu
 - `tools/` contains repository scripts and helper commands that should be tracked in Git.
 - `.tools/` contains locally installed external tools and must stay ignored.
 - `_DecompiledGame/` contains generated decompiled game sources and must stay ignored.
-- Do not edit game DLLs or generated decompiled game sources.
+- `_ExtractedGameAssets/` contains generated extracted game modding assets and must stay ignored.
+- Do not edit game DLLs, generated decompiled game sources, or generated extracted game assets.
 - Use decompiled game sources as a read-only reference for understanding Timberborn architecture.
+- Use extracted game assets as a read-only reference for game blueprints, localizations, UI assets, and shaders.
 
 ## Final version requests
 
