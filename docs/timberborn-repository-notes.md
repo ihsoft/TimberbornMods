@@ -27,6 +27,27 @@ Always inspect the specific mod before making changes.
 
 ---
 
+## ModsUnityProject
+
+`ModsUnityProject` is a Unity project used by Timberborn Modding Tools.
+
+For Unity-based mods, package data, localizations, UXML/USS, thumbnails, workshop data, and asset bundle
+resources may live under:
+
+```text
+ModsUnityProject/Assets/Mods/<ModName>/
+```
+
+Do not assume that mod package data is in a `Mod/` directory or next to the C# project.
+
+Before editing localization, blueprints, UI assets, thumbnails, workshop metadata, or Unity-based mods, inspect:
+
+```text
+ModsUnityProject/Assets/Mods/<ModName>/
+```
+
+---
+
 ## Shared Libraries
 
 ### TimberCommons
