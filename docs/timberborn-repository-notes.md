@@ -92,6 +92,23 @@ Regenerate `_DecompiledGame/` from the game assemblies when needed.
 
 ---
 
+## Wiki Documentation
+
+The GitHub Wiki may contain user-facing and modder-facing documentation for public mod APIs and workflows.
+
+When changing behavior, public components, blueprint specs, modder-facing APIs, workshop-visible features, or
+documented workflows, check whether the Wiki needs an update.
+
+For TimberCommons irrigation tower components, check:
+
+```text
+https://github.com/ihsoft/TimberbornMods/wiki/Timber-Commons
+```
+
+Do not update Wiki pages for internal-only refactoring unless public behavior or documented API changes.
+
+---
+
 ## Localization
 
 Localization files are typically stored as text files containing CSV content.

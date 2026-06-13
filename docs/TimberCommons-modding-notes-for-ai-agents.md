@@ -21,6 +21,13 @@ mods.
 When changing the irrigation tower components, specs, save/load behavior, or public API, consider compatibility for
 external mods. Do not treat unrelated TimberCommons features as reusable infrastructure unless there is evidence.
 
+When changing `IrrigationTower`, `GoodConsumingIrrigationTower`, `ManufactoryIrrigationTower`, `IRangeEffect`, or
+their specs/effects, check whether the Timber Commons Wiki needs to be updated:
+
+```text
+https://github.com/ihsoft/TimberbornMods/wiki/Timber-Commons
+```
+
 ## Data location
 
 TimberCommons is a Unity-based mod.
