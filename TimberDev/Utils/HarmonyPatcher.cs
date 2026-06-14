@@ -45,6 +45,8 @@ static class HarmonyPatcher {
 
 [Context("Game")]
 [Context("MainMenu")]
+[Context("MapEditor")]
+[Context("Bootstrapper")]
 sealed class HarmonyPatcherConfigurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<HarmonyPatcherUnpatcher>().AsSingleton();
