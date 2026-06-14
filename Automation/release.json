@@ -5,14 +5,21 @@
   "ScriptFileBase": "AdvancedAutomation",
   "ReadyForPublish": false,
   "Package": {
-    "Mode": "ExistingZip",
-    "Path": "_MODS!/AdvancedAutomation_v4.1.0.zip",
+    "Mode": "LocalModFolder",
+    "SourcePath": "_MODS!/Automation",
+    "OutputPath": "_MODS!/AdvancedAutomation_v4.1.0.zip",
+    "PreviousPackagePattern": "_MODS!/AdvancedAutomation_v*.zip",
     "MaxAgeDays": 14
   },
   "ManifestVersions": {
+    "version-1.0": "4.0.8",
     "version-1.1": "4.1.0"
   },
   "GameVersionCompatibility": {
+    "version-1.0": {
+      "MinimumGameVersion": "1.0.12.0",
+      "MaximumGameVersion": "1.0.99.99"
+    },
     "version-1.1": {
       "MinimumGameVersion": "1.1.0.0",
       "MaximumGameVersion": "1.1.99.99"

@@ -6,8 +6,8 @@ param(
     [string] $GameVersion = "version-1.1",
     [string] $OutputRoot = ".tools/release-preview",
     [string] $LocalModRoot = "",
-    [string] $ConfigPath = "",
-    [string] $AccessTokenPath = "",
+    [string] $SteamStagingRoot = ".tools/steam-staging",
+    [string] $VdfRoot = ".tools/steam",
     [string] $ChangeNotesPrefix = "",
     [switch] $IncludeLegacyVersions,
     [switch] $SkipBuild,
@@ -40,30 +40,14 @@ function Get-LatestChangeNotes([string] $Path, [string] $Version) {
     $pattern = "(?ms)^#\s+v$escapedVersion[^\r\n]*\r?\n(?<body>.*?)(?=^#\s+v|\z)"
     $match = [regex]::Match($content, $pattern)
     if (-not $match.Success) {
-        throw "Cannot find CHANGES.md section for v$Version"
+        throw "Cannot find changelog section for v$Version"
     }
 
     $body = $match.Groups["body"].Value.Trim()
     if ([string]::IsNullOrWhiteSpace($body)) {
-        throw "CHANGES.md section for v$Version is empty"
+        throw "Changelog section for v$Version is empty"
     }
     return $body
-}
-
-function Get-ZipVersionFolders([string] $ZipPath) {
-    Add-Type -AssemblyName System.IO.Compression.FileSystem
-    $zip = [System.IO.Compression.ZipFile]::OpenRead($ZipPath)
-    try {
-        $folders = $zip.Entries | ForEach-Object {
-            if ($_.FullName -match "^[^/]+/(version-\d+\.\d+)/") {
-                $matches[1]
-            }
-        } | Sort-Object -Unique
-        return @($folders)
-    }
-    finally {
-        $zip.Dispose()
-    }
 }
 
 function Test-ZipPackage(
@@ -83,22 +67,23 @@ function Test-ZipPackage(
         }
 
         foreach ($versionFolder in $versionFolders) {
+            $escapedVersionFolder = [regex]::Escape($versionFolder)
             $manifestEntry = $zip.Entries | Where-Object {
-                $_.FullName -match "^[^/]+/$([regex]::Escape($versionFolder))/manifest\.json$"
+                $_.FullName -match "^[^/]+/$escapedVersionFolder/manifest\.json$"
             } | Select-Object -First 1
             if ($null -eq $manifestEntry) {
                 throw "Package folder $versionFolder must contain manifest.json."
             }
 
             $dllEntry = $zip.Entries | Where-Object {
-                $_.FullName -match "^[^/]+/$([regex]::Escape($versionFolder))/Scripts/$([regex]::Escape($ScriptFileBase))\.dll$"
+                $_.FullName -match "^[^/]+/$escapedVersionFolder/Scripts/$([regex]::Escape($ScriptFileBase))\.dll$"
             } | Select-Object -First 1
             if ($null -eq $dllEntry) {
                 throw "Package folder $versionFolder must contain Scripts/$ScriptFileBase.dll."
             }
 
             $xmlEntry = $zip.Entries | Where-Object {
-                $_.FullName -match "^[^/]+/$([regex]::Escape($versionFolder))/Scripts/$([regex]::Escape($ScriptFileBase))\.xml$"
+                $_.FullName -match "^[^/]+/$escapedVersionFolder/Scripts/$([regex]::Escape($ScriptFileBase))\.xml$"
             } | Select-Object -First 1
             if ($null -eq $xmlEntry) {
                 throw "Package folder $versionFolder must contain Scripts/$ScriptFileBase.xml."
@@ -226,106 +211,57 @@ function New-ZipFromDirectory([string] $SourceRoot, [string] $ZipPath) {
     }
 }
 
-function Compare-VersionText([string] $Left, [string] $Right) {
-    $leftVersion = [version]$Left
-    $rightVersion = [version]$Right
-    return $leftVersion.CompareTo($rightVersion)
+function Expand-PackageForSteam([string] $ZipPath, [string] $DestinationRoot) {
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    if (Test-Path -LiteralPath $DestinationRoot) {
+        Remove-Item -LiteralPath $DestinationRoot -Recurse -Force
+    }
+    New-Item -ItemType Directory -Path $DestinationRoot | Out-Null
+    [System.IO.Compression.ZipFile]::ExtractToDirectory($ZipPath, $DestinationRoot)
+
+    $roots = @(Get-ChildItem -LiteralPath $DestinationRoot -Directory)
+    if ($roots.Count -ne 1) {
+        throw "Steam staging must contain exactly one root folder after extraction: $DestinationRoot"
+    }
+    return $roots[0].FullName
 }
 
-function Get-CompatibilitySuffix($ReleaseConfig, [string[]] $VersionFolders) {
-    $minimumGameVersion = $null
-    $maximumGameVersion = $null
+function ConvertTo-VdfString([string] $Value) {
+    return $Value.Replace("\", "\\").Replace('"', '\"').Replace("`r", "").Replace("`n", "\n")
+}
 
-    foreach ($versionFolder in $VersionFolders) {
-        $compatibility = $ReleaseConfig.GameVersionCompatibility.$versionFolder
-        if ($null -eq $compatibility) {
-            throw "No compatibility mapping for $versionFolder in $releaseConfigPath"
-        }
-
-        $folderMinimum = [string]$compatibility.MinimumGameVersion
-        $folderMaximum = [string]$compatibility.MaximumGameVersion
-        if ([string]::IsNullOrWhiteSpace($folderMinimum) -or [string]::IsNullOrWhiteSpace($folderMaximum)) {
-            throw "Incomplete compatibility mapping for $versionFolder in $releaseConfigPath"
-        }
-
-        if ($null -eq $minimumGameVersion -or (Compare-VersionText $folderMinimum $minimumGameVersion) -lt 0) {
-            $minimumGameVersion = $folderMinimum
-        }
-        if ($null -eq $maximumGameVersion -or (Compare-VersionText $folderMaximum $maximumGameVersion) -gt 0) {
-            $maximumGameVersion = $folderMaximum
-        }
+function Write-WorkshopVdf(
+    [string] $Path,
+    [string] $AppId,
+    [string] $PublishedFileId,
+    [string] $ContentFolder,
+    [string] $PreviewFile,
+    [string] $Visibility,
+    [string] $Title,
+    [string[]] $Tags,
+    [string] $ChangeNote) {
+    $tagLines = $Tags | ForEach-Object {
+        "        `"$_`""
     }
-
-    return @"
----
-MinimumGameVersion: $minimumGameVersion
-MaximumGameVersion: $maximumGameVersion
----
+    $vdf = @"
+"workshopitem"
+{
+    "appid" "$AppId"
+    "publishedfileid" "$PublishedFileId"
+    "contentfolder" "$(ConvertTo-VdfString $ContentFolder)"
+    "previewfile" "$(ConvertTo-VdfString $PreviewFile)"
+    "visibility" "$Visibility"
+    "title" "$(ConvertTo-VdfString $Title)"
+    "changenote" "$(ConvertTo-VdfString $ChangeNote)"
+    "tags"
+    {
+$($tagLines -join "`r`n")
+    }
+}
 "@
-}
-
-function Read-ModIoConfig([string] $Path) {
-    if ([string]::IsNullOrWhiteSpace($Path)) {
-        $Path = Join-Path $repoRoot ".tools/modio/$ModName.local.json"
-    }
-    if (-not (Test-Path -LiteralPath $Path)) {
-        return $null
-    }
-    return Get-Content -Raw -LiteralPath $Path | ConvertFrom-Json
-}
-
-function Read-ModIoAccessToken([string] $Path) {
-    if ([string]::IsNullOrWhiteSpace($Path)) {
-        $Path = Join-Path $repoRoot ".tools/modio/$ModName.token.txt"
-    }
-    if (Test-Path -LiteralPath $Path) {
-        return (Get-Content -Raw -LiteralPath $Path).Trim()
-    }
-
-    return ""
-}
-
-function Publish-Modfile(
-    [string] $ApiBase,
-    [string] $GameId,
-    [string] $ModId,
-    [string] $AccessToken,
-    [string] $ZipPath,
-    [string] $Version,
-    [string] $ChangeNotes) {
-    Add-Type -AssemblyName System.Net.Http
-
-    $endpoint = "$($ApiBase.TrimEnd("/"))/games/$GameId/mods/$ModId/files"
-    $client = [System.Net.Http.HttpClient]::new()
-    $content = [System.Net.Http.MultipartFormDataContent]::new()
-    $fileStream = $null
-    try {
-        $client.DefaultRequestHeaders.Authorization = [System.Net.Http.Headers.AuthenticationHeaderValue]::new(
-            "Bearer",
-            $AccessToken)
-
-        $content.Add([System.Net.Http.StringContent]::new($Version), "version")
-        $content.Add([System.Net.Http.StringContent]::new($ChangeNotes), "changelog")
-
-        $fileStream = [System.IO.File]::OpenRead($ZipPath)
-        $fileContent = [System.Net.Http.StreamContent]::new($fileStream)
-        $fileContent.Headers.ContentType = [System.Net.Http.Headers.MediaTypeHeaderValue]::Parse("application/zip")
-        $content.Add($fileContent, "filedata", [System.IO.Path]::GetFileName($ZipPath))
-
-        $response = $client.PostAsync($endpoint, $content).GetAwaiter().GetResult()
-        $responseBody = $response.Content.ReadAsStringAsync().GetAwaiter().GetResult()
-        if (-not $response.IsSuccessStatusCode) {
-            throw "Mod.IO upload failed: HTTP $([int]$response.StatusCode) $($response.ReasonPhrase)`n$responseBody"
-        }
-        return $responseBody
-    }
-    finally {
-        if ($null -ne $fileStream) {
-            $fileStream.Dispose()
-        }
-        $content.Dispose()
-        $client.Dispose()
-    }
+    $directory = Split-Path -Parent $Path
+    New-Item -ItemType Directory -Path $directory -Force | Out-Null
+    Set-Content -LiteralPath $Path -Value $vdf -Encoding UTF8
 }
 
 Assert-PathExists $releaseConfigPath "Release config"
@@ -350,7 +286,7 @@ if (-not [string]::IsNullOrWhiteSpace($releaseConfig.ReleaseVersion)) {
     $modVersion = [string]$releaseConfig.ReleaseVersion
 }
 if ([string]::IsNullOrWhiteSpace($modVersion)) {
-    throw "Manifest version is empty: $manifestPath"
+    throw "Release version is empty."
 }
 
 $packageMode = "Build"
@@ -377,9 +313,7 @@ if ($packageMode -eq "Build") {
     }
 
     & $buildScriptPath @buildArguments
-
-    $outputRootPath = Resolve-RepoPath $OutputRoot
-    $zipPath = Join-Path $outputRootPath "$($ModName)_v$modVersion.zip"
+    $zipPath = Join-Path (Resolve-RepoPath $OutputRoot) "$($ModName)_v$modVersion.zip"
 }
 elseif ($packageMode -eq "ExistingZip") {
     if ([string]::IsNullOrWhiteSpace($releaseConfig.Package.Path)) {
@@ -427,73 +361,95 @@ if (-not [string]::IsNullOrWhiteSpace($releaseConfig.ScriptFileBase)) {
 }
 $versionFolders = Test-ZipPackage $zipPath $scriptFileBase $releaseConfig
 
+$allowSingleGameVersion = $releaseConfig.Steam.AllowSingleGameVersion -eq $true
+if ($versionFolders.Count -lt 2 -and -not $allowSingleGameVersion) {
+    throw "Steam package contains only $($versionFolders -join ', '). Add Steam.AllowSingleGameVersion with a reason or ask before publishing."
+}
+if ($allowSingleGameVersion -and [string]::IsNullOrWhiteSpace($releaseConfig.Steam.CompatibilityReason)) {
+    throw "Steam.AllowSingleGameVersion requires Steam.CompatibilityReason."
+}
+
+$localModRootPath = $LocalModRoot
+if ([string]::IsNullOrWhiteSpace($localModRootPath)) {
+    $localModRootPath = Join-Path "_MODS!" $ModName
+}
+$localModRootPath = Resolve-RepoPath $localModRootPath
+$workshopDataPath = Join-Path $localModRootPath "workshop_data.json"
+Assert-PathExists $workshopDataPath "Steam workshop data"
+$workshopData = Get-Content -Raw -LiteralPath $workshopDataPath | ConvertFrom-Json
+
+$appId = "1062090"
+if (-not [string]::IsNullOrWhiteSpace($releaseConfig.Steam.AppId)) {
+    $appId = [string]$releaseConfig.Steam.AppId
+}
+$publishedFileId = [string]$workshopData.ItemId
+if (-not [string]::IsNullOrWhiteSpace($releaseConfig.Steam.PublishedFileId)) {
+    $publishedFileId = [string]$releaseConfig.Steam.PublishedFileId
+}
+if ([string]::IsNullOrWhiteSpace($publishedFileId)) {
+    throw "Steam PublishedFileId is empty."
+}
+
+$visibilityMap = @{
+    "Public" = "0"
+    "FriendsOnly" = "1"
+    "Private" = "2"
+    "Unlisted" = "3"
+}
+$visibilityName = [string]$workshopData.Visibility
+if (-not [string]::IsNullOrWhiteSpace($releaseConfig.Steam.Visibility)) {
+    $visibilityName = [string]$releaseConfig.Steam.Visibility
+}
+if (-not $visibilityMap.ContainsKey($visibilityName)) {
+    throw "Unsupported Steam visibility: $visibilityName"
+}
+
 $changeNotes = Get-LatestChangeNotes $changesPath $modVersion
 if (-not [string]::IsNullOrWhiteSpace($ChangeNotesPrefix)) {
     $changeNotes = $ChangeNotesPrefix.Trim() + "`r`n" + $changeNotes.TrimStart()
 }
-$compatibilitySuffix = Get-CompatibilitySuffix $releaseConfig $versionFolders
-$modIoChangeNotes = ($changeNotes.TrimEnd() + "`r`n`r`n" + $compatibilitySuffix.Trim()).Trim()
-$hash = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash
-$modIoConfig = Read-ModIoConfig $ConfigPath
 
-$apiBase = ""
-$gameId = ""
-$modId = ""
-if ($null -ne $modIoConfig) {
-    $apiBase = [string]$modIoConfig.ApiBase
-    $gameId = [string]$modIoConfig.GameId
-    $modId = [string]$modIoConfig.ModId
+$stagingRootPath = Resolve-RepoPath $SteamStagingRoot
+$contentFolder = Expand-PackageForSteam $zipPath (Join-Path $stagingRootPath $ModName)
+$previewFile = Join-Path $contentFolder "thumbnail.jpg"
+if ($workshopData.UpdatePreview -eq $false) {
+    $previewFile = ""
 }
-$endpoint = ""
-if (-not [string]::IsNullOrWhiteSpace($apiBase) -and
-        -not [string]::IsNullOrWhiteSpace($gameId) -and
-        -not [string]::IsNullOrWhiteSpace($modId)) {
-    $endpoint = "$($apiBase.TrimEnd("/"))/games/$gameId/mods/$modId/files"
+elseif (-not (Test-Path -LiteralPath $previewFile)) {
+    throw "Steam preview file not found: $previewFile"
 }
+
+$vdfPath = Join-Path (Resolve-RepoPath $VdfRoot) "$ModName.vdf"
+$tags = @($workshopData.Tags)
+Write-WorkshopVdf $vdfPath $appId $publishedFileId $contentFolder $previewFile $visibilityMap[$visibilityName] `
+    ([string]$workshopData.Name) $tags $changeNotes
 
 Write-Host ""
-Write-Host "Mod.IO publish plan for $ModName v$modVersion"
+Write-Host "Steam publish plan for $ModName v$modVersion"
 Write-Host "Package: $zipPath"
-Write-Host "SHA256: $hash"
+Write-Host "Content folder: $contentFolder"
+Write-Host "VDF: $vdfPath"
+Write-Host "AppId: $appId"
+Write-Host "PublishedFileId: $publishedFileId"
+Write-Host "Visibility: $visibilityName"
 Write-Host "Game version folders: $($versionFolders -join ', ')"
 if ($releaseConfig.ReadyForPublish -eq $false) {
     Write-Host "Ready for publish: false"
 }
-if ([string]::IsNullOrWhiteSpace($endpoint)) {
-    Write-Host "Endpoint: not configured"
-    Write-Host "Config: create .tools/modio/$ModName.local.json or pass -ConfigPath"
-}
-else {
-    Write-Host "Endpoint: $endpoint"
+Write-Host "Tags: $($tags -join ', ')"
+if ($allowSingleGameVersion) {
+    Write-Host "Single game-version override: $($releaseConfig.Steam.CompatibilityReason)"
 }
 Write-Host ""
-Write-Host "Change notes:"
-Write-Host $modIoChangeNotes
+Write-Host "Change note:"
+Write-Host $changeNotes
 Write-Host ""
 
-if (-not $Publish) {
-    Write-Host "Dry run only. Nothing was uploaded. Use -Publish only after an explicit publish request."
-    exit 0
+if ($Publish) {
+    if ($releaseConfig.ReadyForPublish -eq $false) {
+        throw "Cannot publish: $ModName release config is marked ReadyForPublish=false."
+    }
+    throw "Steam publish execution is not implemented yet. This script currently generates a dry-run VDF only."
 }
 
-if ($null -eq $modIoConfig) {
-    throw "Cannot publish: Mod.IO config is missing."
-}
-if ($releaseConfig.ReadyForPublish -eq $false) {
-    throw "Cannot publish: $ModName release config is marked ReadyForPublish=false."
-}
-if ([string]::IsNullOrWhiteSpace($apiBase) -or
-        [string]::IsNullOrWhiteSpace($gameId) -or
-        [string]::IsNullOrWhiteSpace($modId)) {
-    throw "Cannot publish: Mod.IO config must define ApiBase, GameId, and ModId."
-}
-
-$accessToken = Read-ModIoAccessToken $AccessTokenPath
-if ([string]::IsNullOrWhiteSpace($accessToken)) {
-    throw "Cannot publish: create .tools/modio/$ModName.token.txt."
-}
-
-Write-Host "Publishing to Mod.IO..."
-$responseBody = Publish-Modfile $apiBase $gameId $modId $accessToken $zipPath $modVersion $modIoChangeNotes
-Write-Host "Published to Mod.IO."
-Write-Host $responseBody
+Write-Host "Dry run only. SteamCMD was not started."
