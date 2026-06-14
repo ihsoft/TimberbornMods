@@ -10,8 +10,20 @@
       <Compile Include="..\SmartPower\Core\SmartPowerService.cs">
         <Link>SmartPower\Core\SmartPowerService.cs</Link>
       </Compile>
+      <Compile Include="..\SmartPower\Core\IAdjustablePowerInput.cs">
+        <Link>SmartPower\Core\IAdjustablePowerInput.cs</Link>
+      </Compile>
       <Compile Include="..\SmartPower\PowerGenerators\PowerOutputBalancer.cs">
         <Link>SmartPower\PowerGenerators\PowerOutputBalancer.cs</Link>
+      </Compile>
+      <Compile Include="..\SmartPower\PowerConsumers\PowerInputLimiter.cs">
+        <Link>SmartPower\PowerConsumers\PowerInputLimiter.cs</Link>
+      </Compile>
+      <Compile Include="..\SmartPower\PowerConsumers\SmartPoweredAttraction.cs">
+        <Link>SmartPower\PowerConsumers\SmartPoweredAttraction.cs</Link>
+      </Compile>
+      <Compile Include="..\SmartPower\PowerConsumers\SmartManufactory.cs">
+        <Link>SmartPower\PowerConsumers\SmartManufactory.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\Utils\TickDelayAction.cs">
         <Link>TimberDev\Utils\TickDelayAction.cs</Link>

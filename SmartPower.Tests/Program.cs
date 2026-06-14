@@ -26,6 +26,18 @@ static class Program {
       ("PowerOutputBalancer keeps running when its output is needed", PowerOutputBalancerTests.KeepsNeededOutputRunning),
       ("PowerOutputBalancer resumes when automation is disabled", PowerOutputBalancerTests.ResumesWhenAutomationDisabled),
       ("PowerOutputBalancer skips balancing when disabled", PowerOutputBalancerTests.SkipsBalancingWhenDisabled),
+      ("PowerInputLimiter suspends immediately on low batteries", PowerInputLimiterTests.SuspendsOnLowBatteries),
+      ("PowerInputLimiter resumes when automation is disabled", PowerInputLimiterTests.ResumesWhenAutomationDisabled),
+      ("PowerInputLimiter suspends when no batteries and efficiency is low",
+          PowerInputLimiterTests.SuspendsOnLowEfficiencyWithoutBatteries),
+      ("PowerInputLimiter resumes when supply can cover desired power", PowerInputLimiterTests.ResumesWhenSupplyRecovers),
+      ("PowerInputLimiter updates adjustable power input", PowerInputLimiterTests.UpdatesAdjustablePowerInput),
+      ("SmartPoweredAttraction lowers power when empty", SmartPoweredAttractionTests.LowersPowerWhenEmpty),
+      ("SmartPoweredAttraction uses nominal power when occupied", SmartPoweredAttractionTests.UsesNominalPowerWhenOccupied),
+      ("SmartPoweredAttraction returns zero when inactive", SmartPoweredAttractionTests.ReturnsZeroWhenInactive),
+      ("SmartManufactory enters standby when ingredients are missing", SmartManufactoryTests.StandbyOnMissingIngredients),
+      ("SmartManufactory uses nominal power when recipe can run", SmartManufactoryTests.NominalPowerWhenReady),
+      ("SmartManufactory returns zero without current recipe", SmartManufactoryTests.ZeroWithoutRecipe),
   ];
 
   static int Main() {

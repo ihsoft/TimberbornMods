@@ -7,6 +7,22 @@ public class BaseComponent {
 
   public string Name { get; set; } = "";
 
+  public static bool operator true(BaseComponent component) {
+    return component != null;
+  }
+
+  public static bool operator false(BaseComponent component) {
+    return component == null;
+  }
+
+  public static bool operator !(BaseComponent component) {
+    return component == null;
+  }
+
+  public static implicit operator bool(BaseComponent component) {
+    return component != null;
+  }
+
   public T GetComponent<T>() where T : class {
     return _components.TryGetValue(typeof(T), out var component) ? (T)component : null;
   }
