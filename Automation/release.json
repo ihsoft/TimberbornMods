@@ -1,0 +1,21 @@
+{
+  "ManifestPath": "ModsUnityProject/Assets/Mods/Automation/manifest.json",
+  "ChangesPath": "Automation/CHANGELOG.md",
+  "ReleaseVersion": "4.1.0",
+  "ScriptFileBase": "AdvancedAutomation",
+  "ReadyForPublish": false,
+  "Package": {
+    "Mode": "ExistingZip",
+    "Path": "_MODS!/AdvancedAutomation_v4.1.0.zip",
+    "MaxAgeDays": 14
+  },
+  "ManifestVersions": {
+    "version-1.1": "4.1.0"
+  },
+  "GameVersionCompatibility": {
+    "version-1.1": {
+      "MinimumGameVersion": "1.1.0.0",
+      "MaximumGameVersion": "1.1.99.99"
+    }
+  }
+}

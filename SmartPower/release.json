@@ -1,0 +1,25 @@
+{
+  "ManifestPath": "ModsUnityProject/Assets/Mods/SmartPower/manifest.json",
+  "ChangesPath": "SmartPower/CHANGELOG.md",
+  "ReleaseVersion": "1.17.0",
+  "ScriptFileBase": "SmartPower",
+  "Package": {
+    "Mode": "ExistingZip",
+    "Path": "_MODS!/SmartPower_v1.17.0.zip",
+    "MaxAgeDays": 14
+  },
+  "ManifestVersions": {
+    "version-1.0": "1.16.3",
+    "version-1.1": "1.17.0"
+  },
+  "GameVersionCompatibility": {
+    "version-1.0": {
+      "MinimumGameVersion": "1.0.12.7",
+      "MaximumGameVersion": "1.0.99.99"
+    },
+    "version-1.1": {
+      "MinimumGameVersion": "1.1.0.0",
+      "MaximumGameVersion": "1.1.99.99"
+    }
+  }
+}

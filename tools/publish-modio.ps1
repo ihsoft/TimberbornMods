@@ -18,8 +18,6 @@ $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $modRoot = Join-Path $repoRoot $ModName
-$manifestPath = Join-Path $modRoot "Mod/manifest.json"
-$changesPath = Join-Path $modRoot "CHANGES.md"
 $releaseConfigPath = Join-Path $modRoot "release.json"
 $buildScriptPath = Join-Path $PSScriptRoot "build-mod-package.ps1"
 
@@ -27,6 +25,13 @@ function Assert-PathExists([string] $Path, [string] $Description) {
     if (-not (Test-Path -LiteralPath $Path)) {
         throw "$Description not found: $Path"
     }
+}
+
+function Resolve-RepoPath([string] $Path) {
+    if ([System.IO.Path]::IsPathRooted($Path)) {
+        return $Path
+    }
+    return Join-Path $repoRoot $Path
 }
 
 function Get-LatestChangeNotes([string] $Path, [string] $Version) {
@@ -58,6 +63,83 @@ function Get-ZipVersionFolders([string] $ZipPath) {
     }
     finally {
         $zip.Dispose()
+    }
+}
+
+function Test-ZipPackage(
+    [string] $ZipPath,
+    [string] $ScriptFileBase,
+    [object] $ReleaseConfig) {
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $zip = [System.IO.Compression.ZipFile]::OpenRead($ZipPath)
+    try {
+        $versionFolders = @($zip.Entries | ForEach-Object {
+            if ($_.FullName -match "^[^/]+/(version-\d+\.\d+)/") {
+                $matches[1]
+            }
+        } | Sort-Object -Unique)
+        if ($versionFolders.Count -eq 0) {
+            throw "Package must contain at least one version-X.X folder."
+        }
+
+        foreach ($versionFolder in $versionFolders) {
+            $manifestEntry = $zip.Entries | Where-Object {
+                $_.FullName -match "^[^/]+/$([regex]::Escape($versionFolder))/manifest\.json$"
+            } | Select-Object -First 1
+            if ($null -eq $manifestEntry) {
+                throw "Package folder $versionFolder must contain manifest.json."
+            }
+
+            $dllEntry = $zip.Entries | Where-Object {
+                $_.FullName -match "^[^/]+/$([regex]::Escape($versionFolder))/Scripts/$([regex]::Escape($ScriptFileBase))\.dll$"
+            } | Select-Object -First 1
+            if ($null -eq $dllEntry) {
+                throw "Package folder $versionFolder must contain Scripts/$ScriptFileBase.dll."
+            }
+
+            $xmlEntry = $zip.Entries | Where-Object {
+                $_.FullName -match "^[^/]+/$([regex]::Escape($versionFolder))/Scripts/$([regex]::Escape($ScriptFileBase))\.xml$"
+            } | Select-Object -First 1
+            if ($null -eq $xmlEntry) {
+                throw "Package folder $versionFolder must contain Scripts/$ScriptFileBase.xml."
+            }
+
+            $reader = [System.IO.StreamReader]::new($manifestEntry.Open())
+            try {
+                $manifest = $reader.ReadToEnd() | ConvertFrom-Json
+            }
+            finally {
+                $reader.Dispose()
+            }
+
+            $manifestVersion = [string]$manifest.Version
+            if ([string]::IsNullOrWhiteSpace($manifestVersion)) {
+                throw "Package folder $versionFolder has an empty manifest Version."
+            }
+
+            $expectedVersion = $ReleaseConfig.ManifestVersions.$versionFolder
+            if ($null -ne $expectedVersion -and $manifestVersion -ne [string]$expectedVersion) {
+                throw "Package folder $versionFolder has manifest Version=$manifestVersion, expected $expectedVersion."
+            }
+        }
+
+        return $versionFolders
+    }
+    finally {
+        $zip.Dispose()
+    }
+}
+
+function Assert-PackageFreshEnough([string] $ZipPath, [object] $PackageConfig) {
+    $maxAgeDays = $PackageConfig.MaxAgeDays
+    if ($null -eq $maxAgeDays) {
+        return
+    }
+
+    $lastWriteTime = (Get-Item -LiteralPath $ZipPath).LastWriteTime
+    $age = (Get-Date) - $lastWriteTime
+    if ($age.TotalDays -gt [double]$maxAgeDays) {
+        throw "Package is too old: $ZipPath. LastWriteTime=$lastWriteTime, MaxAgeDays=$maxAgeDays."
     }
 }
 
@@ -163,49 +245,78 @@ function Publish-Modfile(
     }
 }
 
-Assert-PathExists $manifestPath "Manifest"
-Assert-PathExists $changesPath "Changes file"
 Assert-PathExists $releaseConfigPath "Release config"
 Assert-PathExists $buildScriptPath "Package builder"
 
+$releaseConfig = Get-Content -Raw -LiteralPath $releaseConfigPath | ConvertFrom-Json
+$manifestPath = Join-Path $modRoot "Mod/manifest.json"
+if (-not [string]::IsNullOrWhiteSpace($releaseConfig.ManifestPath)) {
+    $manifestPath = Resolve-RepoPath ([string]$releaseConfig.ManifestPath)
+}
+$changesPath = Join-Path $modRoot "CHANGES.md"
+if (-not [string]::IsNullOrWhiteSpace($releaseConfig.ChangesPath)) {
+    $changesPath = Resolve-RepoPath ([string]$releaseConfig.ChangesPath)
+}
+
+Assert-PathExists $manifestPath "Manifest"
+Assert-PathExists $changesPath "Changes file"
+
 $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
 $modVersion = [string]$manifest.Version
+if (-not [string]::IsNullOrWhiteSpace($releaseConfig.ReleaseVersion)) {
+    $modVersion = [string]$releaseConfig.ReleaseVersion
+}
 if ([string]::IsNullOrWhiteSpace($modVersion)) {
     throw "Manifest version is empty: $manifestPath"
 }
 
-$buildArguments = @{
-    ModName = $ModName
-    Configuration = $Configuration
-    GameVersion = $GameVersion
-    OutputRoot = $OutputRoot
-    Force = $true
-}
-if (-not [string]::IsNullOrWhiteSpace($LocalModRoot)) {
-    $buildArguments.LocalModRoot = $LocalModRoot
-}
-if ($IncludeLegacyVersions) {
-    $buildArguments.IncludeLegacyVersions = $true
-}
-if ($SkipBuild) {
-    $buildArguments.SkipBuild = $true
+$packageMode = "Build"
+if (-not [string]::IsNullOrWhiteSpace($releaseConfig.Package.Mode)) {
+    $packageMode = [string]$releaseConfig.Package.Mode
 }
 
-& $buildScriptPath @buildArguments
+if ($packageMode -eq "Build") {
+    $buildArguments = @{
+        ModName = $ModName
+        Configuration = $Configuration
+        GameVersion = $GameVersion
+        OutputRoot = $OutputRoot
+        Force = $true
+    }
+    if (-not [string]::IsNullOrWhiteSpace($LocalModRoot)) {
+        $buildArguments.LocalModRoot = $LocalModRoot
+    }
+    if ($IncludeLegacyVersions) {
+        $buildArguments.IncludeLegacyVersions = $true
+    }
+    if ($SkipBuild) {
+        $buildArguments.SkipBuild = $true
+    }
 
-$outputRootPath = $OutputRoot
-if (-not [System.IO.Path]::IsPathRooted($outputRootPath)) {
-    $outputRootPath = Join-Path $repoRoot $outputRootPath
+    & $buildScriptPath @buildArguments
+
+    $outputRootPath = Resolve-RepoPath $OutputRoot
+    $zipPath = Join-Path $outputRootPath "$($ModName)_v$modVersion.zip"
 }
-$zipPath = Join-Path $outputRootPath "$($ModName)_v$modVersion.zip"
+elseif ($packageMode -eq "ExistingZip") {
+    if ([string]::IsNullOrWhiteSpace($releaseConfig.Package.Path)) {
+        throw "ExistingZip package mode requires Package.Path in $releaseConfigPath"
+    }
+    $zipPath = Resolve-RepoPath ([string]$releaseConfig.Package.Path)
+}
+else {
+    throw "Unsupported package mode: $packageMode"
+}
+
 Assert-PathExists $zipPath "Release package"
+Assert-PackageFreshEnough $zipPath $releaseConfig.Package
 
-$versionFolders = Get-ZipVersionFolders $zipPath
-if ($versionFolders.Count -eq 0) {
-    throw "Package must contain at least one version-X.X folder."
+$scriptFileBase = $ModName
+if (-not [string]::IsNullOrWhiteSpace($releaseConfig.ScriptFileBase)) {
+    $scriptFileBase = [string]$releaseConfig.ScriptFileBase
 }
+$versionFolders = Test-ZipPackage $zipPath $scriptFileBase $releaseConfig
 
-$releaseConfig = Get-Content -Raw -LiteralPath $releaseConfigPath | ConvertFrom-Json
 $changeNotes = Get-LatestChangeNotes $changesPath $modVersion
 if (-not [string]::IsNullOrWhiteSpace($ChangeNotesPrefix)) {
     $changeNotes = $ChangeNotesPrefix.Trim() + "`r`n" + $changeNotes.TrimStart()
@@ -235,6 +346,9 @@ Write-Host "Mod.IO publish plan for $ModName v$modVersion"
 Write-Host "Package: $zipPath"
 Write-Host "SHA256: $hash"
 Write-Host "Game version folders: $($versionFolders -join ', ')"
+if ($releaseConfig.ReadyForPublish -eq $false) {
+    Write-Host "Ready for publish: false"
+}
 if ([string]::IsNullOrWhiteSpace($endpoint)) {
     Write-Host "Endpoint: not configured"
     Write-Host "Config: create .tools/modio/$ModName.local.json or pass -ConfigPath"
@@ -254,6 +368,9 @@ if (-not $Publish) {
 
 if ($null -eq $modIoConfig) {
     throw "Cannot publish: Mod.IO config is missing."
+}
+if ($releaseConfig.ReadyForPublish -eq $false) {
+    throw "Cannot publish: $ModName release config is marked ReadyForPublish=false."
 }
 if ([string]::IsNullOrWhiteSpace($apiBase) -or
         [string]::IsNullOrWhiteSpace($gameId) -or
