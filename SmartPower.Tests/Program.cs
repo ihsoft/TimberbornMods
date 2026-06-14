@@ -17,6 +17,15 @@ static class Program {
       ("SmartPowerService removes power reservations", SmartPowerServiceTests.RemovesReservations),
       ("SmartPowerService accepts reservations before graph initialization",
           SmartPowerServiceTests.AcceptsReservationsBeforeGraphInitialization),
+      ("PowerOutputBalancer suspends when batteries are charged", PowerOutputBalancerTests.SuspendsChargedBatteries),
+      ("PowerOutputBalancer resumes when batteries discharge", PowerOutputBalancerTests.ResumesDischargedBatteries),
+      ("PowerOutputBalancer uses reserved power when deciding to resume",
+          PowerOutputBalancerTests.ResumesForReservedPowerDemand),
+      ("PowerOutputBalancer suspends immediately when inactive output is redundant",
+          PowerOutputBalancerTests.SuspendsInactiveRedundantOutput),
+      ("PowerOutputBalancer keeps running when its output is needed", PowerOutputBalancerTests.KeepsNeededOutputRunning),
+      ("PowerOutputBalancer resumes when automation is disabled", PowerOutputBalancerTests.ResumesWhenAutomationDisabled),
+      ("PowerOutputBalancer skips balancing when disabled", PowerOutputBalancerTests.SkipsBalancingWhenDisabled),
   ];
 
   static int Main() {

@@ -10,6 +10,9 @@
       <Compile Include="..\SmartPower\Core\SmartPowerService.cs">
         <Link>SmartPower\Core\SmartPowerService.cs</Link>
       </Compile>
+      <Compile Include="..\SmartPower\PowerGenerators\PowerOutputBalancer.cs">
+        <Link>SmartPower\PowerGenerators\PowerOutputBalancer.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\Utils\TickDelayAction.cs">
         <Link>TimberDev\Utils\TickDelayAction.cs</Link>
       </Compile>
