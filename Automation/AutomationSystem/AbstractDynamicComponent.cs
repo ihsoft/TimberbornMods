@@ -21,38 +21,28 @@ namespace IgorZ.Automation.AutomationSystem;
 /// <p>New components can be created, but they cannot be destroyed!</p>
 /// <p>
 /// Dynamic components behave similar to BaseComponents. Some base component callback interfaces are supported out of
-/// the box. For the others, the client need to add own support. The supported interfaces:
-/// <see cref="IAwakableComponent"/>, <see cref="IStartableComponent"/>, <see cref="IFinishedStateListener"/>,
-/// <see cref="IInitializableEntity"/>, <see cref="IDeletableEntity"/>, and <see cref="IPersistentEntity"/>.
+/// the box. For the others, the client needs to add their own support. The supported interfaces:
+/// <see cref="IAwakableComponent"/>, <see cref="IFinishedStateListener"/>, <see cref="IInitializableEntity"/>,
+/// <see cref="IDeletableEntity"/>, and <see cref="IPersistentEntity"/>.
 /// </p>
 /// </remarks>
-public abstract class AbstractDynamicComponent : IStartableComponent {
+public abstract class AbstractDynamicComponent {
   /// <summary>The automation owner object.</summary>
   /// <remarks>Handle all <see cref="BaseComponent"/> related logic via this object.</remarks>
   public AutomationBehavior AutomationBehavior { get; private set; }
 
   /// <summary>Indicates if this component is enabled and should get Unity/Timberborn events.</summary>
-  /// <remarks>For now, only the <see cref="IStartableComponent"/> is subject to this state.</remarks>
   /// <seealso cref="AutomationBehavior.GetOrCreate"/>
   public bool Enabled { get; private set; } = true;
 
-  /// <summary>Indicates if this component has started.</summary>
-  public bool Started { get; private set; }
-
-  /// <summary>A Unity MonoBehaviour object. In case of Unity functionality is needed.</summary>
+  /// <summary>A Unity MonoBehaviour object. In the case of Unity, functionality is needed.</summary>
   protected MonoBehaviour MonoBehaviour => AutomationBehavior._componentCache;
 
   /// <summary>
   /// Counterpart to the <see cref="BaseComponent.EnableComponent"/>, but only affects this dynamic component.
   /// </summary>
   public virtual void EnableComponent() {
-    if (Enabled) {
-      return;
-    }
     Enabled = true;
-    if (!Started && AutomationBehavior._componentCache.StartIsEnabled) {
-      Start();
-    }
   }
 
   /// <summary>
@@ -64,17 +54,5 @@ public abstract class AbstractDynamicComponent : IStartableComponent {
 
   internal void Initialize(AutomationBehavior behavior) {
     AutomationBehavior = behavior;
-  }
-
-  /// <summary>Counterpart to the Unit Start() event.</summary>
-  /// <remarks>
-  /// Normally, it is called when the automation behavior object is started by Unity. If the dynamic object is being
-  /// created on already started behavior, then this method is called immediately after Awake(). The component must
-  /// be enabled to get the call. When component becomes enabled, the start method will be called if not called before.
-  /// </remarks>
-  /// <seealso cref="Started"/>
-  /// <seealso cref="Enabled"/>
-  public virtual void Start() {
-    Started = true;
   }
 }

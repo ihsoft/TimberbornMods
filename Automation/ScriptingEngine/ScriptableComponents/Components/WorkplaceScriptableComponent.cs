@@ -6,6 +6,7 @@ using System;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
+using Timberborn.BaseComponentSystem;
 using Timberborn.PrioritySystem;
 using Timberborn.WorkSystem;
 
@@ -208,11 +209,10 @@ sealed class WorkplaceScriptableComponent : ScriptableComponentBase {
 
   #region Workplace change tracker
 
-  internal sealed class WorkplaceChangeTracker : AbstractStatusTracker {
+  internal sealed class WorkplaceChangeTracker : AbstractStatusTracker, IAwakableComponent {
 
     /// <inheritdoc/>
-    public override void Start() {
-      base.Start();
+    public void Awake() {
       var workplace = AutomationBehavior.GetComponentOrFail<Workplace>();
       workplace.WorkerAssigned += OnWorkerChanged;
       workplace.WorkerUnassigned += OnWorkerChanged;

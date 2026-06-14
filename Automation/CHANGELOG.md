@@ -1,3 +1,6 @@
+# v4.1.0 (June 14th, 2026):
+* [Update] Support game version `v1.1`.
+
 # v4.0.8 (June 7th, 2026):
 * [Fix] Under a rare condition, the game can crash when a lumberjack with collectable rules is destroyed. 
 

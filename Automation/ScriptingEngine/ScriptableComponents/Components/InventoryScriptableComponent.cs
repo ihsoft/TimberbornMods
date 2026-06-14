@@ -12,6 +12,7 @@ using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.TimberDev.Utils;
 using Timberborn.BaseComponentSystem;
 using Timberborn.Emptying;
+using Timberborn.EntitySystem;
 using Timberborn.Goods;
 using Timberborn.InventorySystem;
 using Timberborn.Localization;
@@ -258,7 +259,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
       _inventory.InventoryStockChanged += NotifyChange;
     }
 
-    void NotifyChange(object sender, InventoryAmountChangedEventArgs args) {
+    void NotifyChange(object sender, InventoryStockChangedEventArgs args) {
       TriggerSignalUpdate(MakeSignalName(args.GoodAmount.GoodId, _inventory));
     }
   }
@@ -271,7 +272,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   /// Creates a custom status icon that indicates that the storage is being emptying. If the status is changed
   /// externally, then hides the status and notifies the action.
   /// </summary>
-  internal sealed class EmptyingStatusBehavior : AbstractStatusTracker {
+  internal sealed class EmptyingStatusBehavior : AbstractStatusTracker, IInitializableEntity {
 
     ILoc _loc;
     StatusToggle _statusToggle;
@@ -282,7 +283,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
       if (!base.AddAction(actionOperator)) {
         return false;
       }
-      if (_statusToggle != null) {  // On game load, add ref is called before the Start() event gets executed.
+      if (_statusToggle != null) {  // On game load, actions can be added before InitializeEntity().
         RefreshStatus();
       }
       return true;
@@ -305,8 +306,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     }
 
     /// <inheritdoc/>
-    public override void Start() {
-      base.Start();
+    public void InitializeEntity() {
       _emptiable = AutomationBehavior.GetComponentOrFail<Emptiable>();
       _emptiable.UnmarkedForEmptying += (_, _) => RefreshStatus();
       _emptiable.MarkedForEmptying += (_, _) => RefreshStatus();

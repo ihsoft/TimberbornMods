@@ -94,36 +94,24 @@ sealed class FlowControlScriptableComponent : ScriptableComponentBase {
     }
 
     public static bool CanControlFlow(AutomationBehavior behavior) {
-      return behavior.GetComponent<SluiceState>() || behavior.GetComponent<WaterSourceRegulator>() != null;
+      return behavior.GetComponent<WaterSourceRegulator>() != null;
     }
 
-    public bool IsOpen => _waterSource?.IsOpen ?? _sluice?.IsOpen ?? false;
+    public bool IsOpen => _waterSource?.IsOpen ?? false;
 
     public void Open() {
-      if (_sluice) {
-        HostedDebugLog.Fine(_sluice, "Opening sluice");
-        _sluice.Open();
-      } else {
-        HostedDebugLog.Fine(_waterSource, "Opening water source regulator");
-        _waterSource.Open();
-      }
+      HostedDebugLog.Fine(_waterSource, "Opening water source regulator");
+      _waterSource.Open();
     }
 
     public void Close() {
-      if (_sluice) {
-        HostedDebugLog.Fine(_sluice, "Closing sluice");
-        _sluice.Close();
-      } else {
-        HostedDebugLog.Fine(_waterSource, "Closing water source regulator");
-        _waterSource.Close();
-      }
+      HostedDebugLog.Fine(_waterSource, "Closing water source regulator");
+      _waterSource.Close();
     }
 
-    readonly SluiceState _sluice;
     readonly WaterSourceRegulator _waterSource;
 
     FlowControlAccessor(AutomationBehavior behavior) {
-      _sluice = behavior.GetComponent<SluiceState>();
       _waterSource = behavior.GetComponent<WaterSourceRegulator>();
     }
   }

@@ -11,6 +11,7 @@ using IgorZ.Automation.ScriptingEngine.Expressions;
 using Timberborn.Bots;
 using Timberborn.Common;
 using Timberborn.DwellingSystem;
+using Timberborn.EntitySystem;
 using Timberborn.GameDistricts;
 using Timberborn.Goods;
 using Timberborn.ResourceCountingSystem;
@@ -302,18 +303,21 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
 
   #region District citizens tracker
 
-  internal sealed class DistrictChangeTracker : AbstractStatusTracker {
+  internal sealed class DistrictChangeTracker : AbstractStatusTracker, IInitializableEntity {
 
-    #region AbstractStatusTracker overrides
+    #region IInitializableEntity implementation
 
     /// <inheritdoc/>
-    public override void Start() {
-      base.Start();
+    public void InitializeEntity() {
       var districtBuilding = AutomationBehavior.GetComponentOrFail<DistrictBuilding>();
       districtBuilding.ReassignedDistrict += OnDistrictChangedEvent;
       districtBuilding.ReassignedConstructionDistrict += OnDistrictChangedEvent;
       UpdateDistrictCenter();
     }
+
+    #endregion
+
+    #region AbstractStatusTracker overrides
 
     /// <inheritdoc/>
     public override bool AddSignal(SignalOperator signalOperator, ISignalListener host) {

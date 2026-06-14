@@ -8,7 +8,6 @@ using IgorZ.Automation.ScriptingEngine.Expressions;
 using Timberborn.BaseComponentSystem;
 using Timberborn.TickSystem;
 using Timberborn.WaterBuildings;
-using UnityEngine;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 
@@ -129,11 +128,7 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
 
     public void Awake() {
       DisableComponent();
-    }
-
-    public override void StartTickable() {
       _streamGaugeTracker = GetComponent<AutomationBehavior>().GetOrCreate<StreamGaugeTracker>();
-      base.StartTickable();
     }
 
     public override void Tick() {
@@ -141,13 +136,13 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
     }
   }
 
-  internal sealed class StreamGaugeTracker : AbstractStatusTracker {
+  internal sealed class StreamGaugeTracker : AbstractStatusTracker, IAwakableComponent {
     StreamGauge _streamGauge;
 
     /// <inheritdoc/>
-    public override void Start() {
-      base.Start();
+    public void Awake() {
       _streamGauge = AutomationBehavior.GetComponentOrFail<StreamGauge>();
+      //FIXME: Enable/Disable based on signals.
       AutomationBehavior.GetComponentOrFail<StreamGaugeCheckTicker>().EnableComponent();
     }
 
