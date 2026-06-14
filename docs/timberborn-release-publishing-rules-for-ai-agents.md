@@ -40,8 +40,9 @@ Tell the user to restore the exact source path, rebuild/export the mod to the ex
 
 For `Package.Mode = "LocalModFolder"`, the source folder is the source of truth.
 
-The generated ZIP must be only a package of the current source folder contents. Do not add missing `version-*` folders
-from previous archives.
+The configured source folder is the only input for release package contents. Agents may validate it, package it, and
+report what is missing. Agents must not repair, supplement, or reinterpret it using previous archives, backup folders,
+similarly named folders, or inferred state.
 
 If the source folder does not contain a game-version folder, the release does not contain it.
 
