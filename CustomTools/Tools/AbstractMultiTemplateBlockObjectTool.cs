@@ -9,7 +9,6 @@ using Bindito.Core;
 using IgorZ.CustomTools.Core;
 using IgorZ.CustomTools.KeyBindings;
 using Timberborn.AreaSelectionSystem;
-using Timberborn.BaseComponentSystem;
 using Timberborn.BlockObjectTools;
 using Timberborn.BlockSystem;
 using Timberborn.BlueprintSystem;
@@ -26,13 +25,12 @@ using Timberborn.SingletonSystem;
 using Timberborn.TemplateSystem;
 using Timberborn.ToolSystem;
 using Timberborn.UISound;
-using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.CustomTools.Tools;
 
 /// <summary>The base class to the BlockObject tools that can place different templates.</summary>
 /// <remarks>
-/// This tool also supports the Undo ability. The block objects that were placed by the tool <i>before</i> existing it,
+/// This tool also supports the Undo ability. The block objects placed by the tool <i>before</i> existing it
 /// can be undone. The undo key binding is constant: <see cref="UndoPlacementsKeyBinding"/>. Due to the tool description
 /// is not a dynamic thing, the primary binding is fixed to "Ctrl+Z". This is used in the tool description. A secondary
 /// binding can be defined, but the primary one cannot be changed.
@@ -155,7 +153,7 @@ public abstract class AbstractMultiTemplateBlockObjectTool<T>
     _previewPlacer.HideAllPreviews();
     _areaPicker.Reset();
     _placedAnythingThisFrame = false;
-    _placementHistory.Clear();
+    _customToolsUndoService.Clear();
     _eventBus.Unregister(this);
     CurrentMode = _defaultMode;
   }
@@ -173,26 +171,25 @@ public abstract class AbstractMultiTemplateBlockObjectTool<T>
   AreaPicker _areaPicker;
   FactionService _factionService;
   EventBus _eventBus;
-  EntityService _entityService;
   KeyBindingInputProcessor _keyBindingInputProcessor;
   CustomToolsService _customToolsService;
+  CustomToolsUndoService _customToolsUndoService;
   ToolUnlockingService _toolUnlockingService;
   BuildingUnlockingService _buildingUnlockingService;
   DevModeManager _devModeManager;
 
   PreviewPlacer _previewPlacer;
   bool _placedAnythingThisFrame;
-  readonly Stack<List<BaseComponent>> _placementHistory = [];
 
-  /// <summary>Has to be public for the inject to work!</summary>
+  /// <summary>Has to be public for the injection to work!</summary>
   [Inject]
   public void InjectDependencies(
       InputService inputService, TemplateNameMapper templateNameMapper,
       PreviewPlacerFactory previewPlacerFactory, BlockObjectPlacerService blockObjectPlacerService,
       AreaPicker areaPicker, UISoundController uiSoundController, PreviewPlacement previewPlacement,
-      FactionService factionService, EventBus eventBus, EntityService entityService,
-      KeyBindingInputProcessor keyBindingInputProcessor, CustomToolsService customToolsService,
-      ToolUnlockingService toolUnlockingService, 
+      FactionService factionService, EventBus eventBus, KeyBindingInputProcessor keyBindingInputProcessor,
+      CustomToolsService customToolsService, CustomToolsUndoService customToolsUndoService,
+      ToolUnlockingService toolUnlockingService,
       BuildingUnlockingService buildingUnlockingService, DevModeManager devModeManager) {
     _inputService = inputService;
     _templateNameMapper = templateNameMapper;
@@ -203,9 +200,9 @@ public abstract class AbstractMultiTemplateBlockObjectTool<T>
     _previewPlacement = previewPlacement;
     _factionService = factionService;
     _eventBus = eventBus;
-    _entityService = entityService;
     _keyBindingInputProcessor = keyBindingInputProcessor;
     _customToolsService = customToolsService;
+    _customToolsUndoService = customToolsUndoService;
     _toolUnlockingService = toolUnlockingService;
     _buildingUnlockingService = buildingUnlockingService;
     _devModeManager = devModeManager;
@@ -239,14 +236,22 @@ public abstract class AbstractMultiTemplateBlockObjectTool<T>
     }
     _placedAnythingThisFrame = false;
     var buildableCoordinates = _previewPlacer.GetBuildableCoordinates(placements);
-    var spec = Template.GetSpec<BlockObjectSpec>();
-    var blockObjectPlacer = _blockObjectPlacerService.GetMatchingPlacer(spec);
-    var historyRecord = new List<BaseComponent>();
-    foreach (var placement in buildableCoordinates) {
-      blockObjectPlacer.Place(spec, placement, component => historyRecord.Add(component));
-      _placedAnythingThisFrame = true;
+    var blockObjectPlacer = _blockObjectPlacerService.GetMatchingPlacer(Template.GetSpec<BlockObjectSpec>());
+    var committedCapture = false;
+    _customToolsUndoService.BeginCapture();
+    try {
+      foreach (var placement in buildableCoordinates) {
+        var builder = new EntitySetup.Builder(Template.Blueprint);
+        blockObjectPlacer.Place(builder, placement);
+        _placedAnythingThisFrame = true;
+      }
+      _customToolsUndoService.CommitCapture();
+      committedCapture = true;
+    } finally {
+      if (!committedCapture) {
+        _customToolsUndoService.AbortCapture();
+      }
     }
-    _placementHistory.Push(historyRecord);
     if (_placedAnythingThisFrame) {
       _uiSoundController.PlaySound(BlockObjectPlacedSoundName);
     } else {
@@ -257,15 +262,11 @@ public abstract class AbstractMultiTemplateBlockObjectTool<T>
   /// <summary>Listens for the undo keybinding.</summary>
   [OnEvent]
   public void OnCustomToolEvent(CustomToolKeyBindingEvent keyBindingEvent) {
-    if (_placementHistory.Count == 0 || keyBindingEvent.KeyBinding.Id != UndoPlacementsKeyBinding) {
+    if (!_customToolsUndoService.CanUndo || keyBindingEvent.KeyBinding.Id != UndoPlacementsKeyBinding) {
       return;
     }
     _keyBindingInputProcessor.ConsumeKeyBinding(keyBindingEvent.KeyBinding.Id);
-    var sequence = _placementHistory.Pop();
-    DebugEx.Info("Undoing {0} placements from tool {1}...", sequence.Count, ToolSpec.Id);
-    foreach (var component in sequence) {
-      _entityService.Delete(component);
-    }
+    _customToolsUndoService.Undo();
   }
 
   #endregion

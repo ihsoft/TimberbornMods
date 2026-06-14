@@ -13,6 +13,7 @@ class Configurator : IConfigurator {
 
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<CustomToolsService>().AsSingleton();
+    containerDefinition.Bind<CustomToolsUndoService>().AsSingleton();
     containerDefinition.Bind<FeatureLimiterService>().AsSingleton();
     containerDefinition.MultiBind<CustomBottomBarElement>().To<LayoutElementLeft>().AsSingleton();
     containerDefinition.MultiBind<CustomBottomBarElement>().To<LayoutElementMiddle>().AsSingleton();

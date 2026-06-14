@@ -1,4 +1,7 @@
-﻿# v1.3.2 (5/18/2026)
+﻿# v1.4.0 (6/13/2026)
+* [Update] Support game version `v1.1`.
+
+# v1.3.2 (5/18/2026)
 * [Fix] The multi template tool can crash the game under some rare conditions.
 
 # v1.3.1 (2/20/2026)
