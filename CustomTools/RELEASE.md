@@ -66,6 +66,9 @@ Prepare a Mod.IO publish plan:
 This is a dry run. It builds the package, reads the actual zip, generates the Mod.IO change notes with the game-version
 compatibility suffix, and prints the upload endpoint when local configuration is available.
 
+Use `-ChangeNotesPrefix "..."` to test or add a temporary line at the beginning of the Mod.IO change notes without
+editing `CHANGES.md`.
+
 Real publishing is only allowed after an explicit user request to publish:
 
 ```powershell
@@ -95,4 +98,8 @@ Local Mod.IO configuration belongs in `.tools/modio/CustomTools.local.json`:
 }
 ```
 
-The OAuth token must be supplied through `MODIO_ACCESS_TOKEN`.
+The OAuth token must be supplied through the ignored local file:
+
+```text
+.tools/modio/CustomTools.token.txt
+```

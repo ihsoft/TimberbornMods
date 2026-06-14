@@ -7,7 +7,8 @@ param(
     [string] $OutputRoot = ".tools/release-preview",
     [string] $LocalModRoot = "",
     [string] $ConfigPath = "",
-    [string] $AccessTokenEnvironmentVariable = "MODIO_ACCESS_TOKEN",
+    [string] $AccessTokenPath = "",
+    [string] $ChangeNotesPrefix = "",
     [switch] $IncludeLegacyVersions,
     [switch] $SkipBuild,
     [switch] $Publish
@@ -108,6 +109,17 @@ function Read-ModIoConfig([string] $Path) {
     return Get-Content -Raw -LiteralPath $Path | ConvertFrom-Json
 }
 
+function Read-ModIoAccessToken([string] $Path) {
+    if ([string]::IsNullOrWhiteSpace($Path)) {
+        $Path = Join-Path $repoRoot ".tools/modio/$ModName.token.txt"
+    }
+    if (Test-Path -LiteralPath $Path) {
+        return (Get-Content -Raw -LiteralPath $Path).Trim()
+    }
+
+    return ""
+}
+
 function Publish-Modfile(
     [string] $ApiBase,
     [string] $GameId,
@@ -180,9 +192,6 @@ if ($SkipBuild) {
 }
 
 & $buildScriptPath @buildArguments
-if ($LASTEXITCODE -ne 0) {
-    throw "Package builder failed."
-}
 
 $outputRootPath = $OutputRoot
 if (-not [System.IO.Path]::IsPathRooted($outputRootPath)) {
@@ -198,6 +207,9 @@ if ($versionFolders.Count -eq 0) {
 
 $releaseConfig = Get-Content -Raw -LiteralPath $releaseConfigPath | ConvertFrom-Json
 $changeNotes = Get-LatestChangeNotes $changesPath $modVersion
+if (-not [string]::IsNullOrWhiteSpace($ChangeNotesPrefix)) {
+    $changeNotes = $ChangeNotesPrefix.Trim() + "`r`n" + $changeNotes.TrimStart()
+}
 $compatibilitySuffix = Get-CompatibilitySuffix $releaseConfig $versionFolders
 $modIoChangeNotes = ($changeNotes.TrimEnd() + "`r`n`r`n" + $compatibilitySuffix.Trim()).Trim()
 $hash = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash
@@ -249,9 +261,9 @@ if ([string]::IsNullOrWhiteSpace($apiBase) -or
     throw "Cannot publish: Mod.IO config must define ApiBase, GameId, and ModId."
 }
 
-$accessToken = [Environment]::GetEnvironmentVariable($AccessTokenEnvironmentVariable)
+$accessToken = Read-ModIoAccessToken $AccessTokenPath
 if ([string]::IsNullOrWhiteSpace($accessToken)) {
-    throw "Cannot publish: environment variable $AccessTokenEnvironmentVariable is empty."
+    throw "Cannot publish: create .tools/modio/$ModName.token.txt."
 }
 
 Write-Host "Publishing to Mod.IO..."
