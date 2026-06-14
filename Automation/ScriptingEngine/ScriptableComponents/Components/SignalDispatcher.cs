@@ -26,10 +26,10 @@ class SignalDispatcher {
 
   /// <summary>Registers a listener for signal changes.</summary>
   /// <remarks>
-  /// The operator/listener pair must be unique. The for same listener, multiple operators cane be registered. No matter
+  /// The operator/listener pair must be unique. For the same listener, multiple operators can be registered. No matter
   /// how many operators were registered for the listener, it gets only one notification when the signal changes.
   /// </remarks>
-  /// <exception cref="InvalidOperationException">if operator/listener has already been registered.</exception>
+  /// <exception cref="InvalidOperationException">if the operator / listener has already been registered.</exception>
   public void RegisterSignalListener(SignalOperator signalOperator, ISignalListener listener) {
     CheckIfChangesLocked();
     var (_, signalName) = ParseSignalName(signalOperator.SignalName);
@@ -50,7 +50,7 @@ class SignalDispatcher {
 
   /// <summary>Unregisters a listener for signal changes.</summary>
   /// <summary>The operator/listener pair must be registered first.</summary>
-  /// <exception cref="InvalidOperationException">if operator/listener wasn't registered before.</exception>
+  /// <exception cref="InvalidOperationException">if the operator / listener wasn't registered before.</exception>
   public void UnregisterSignalListener(SignalOperator signalOperator, ISignalListener listener) {
     CheckIfChangesLocked();
     var (_, signalName) = ParseSignalName(signalOperator.SignalName);
@@ -92,7 +92,7 @@ class SignalDispatcher {
 
   /// <summary>Registers a signal provider for the given signal name.</summary>
   /// <remarks>The source/provider pair must be unique. This method triggers the signal update.</remarks>
-  /// <exception cref="InvalidOperationException">if source/provider has been already registered.</exception>
+  /// <exception cref="InvalidOperationException">if the source / provider has been already registered.</exception>
   public void RegisterSignalProvider(string signalName, BaseComponent source, object provider) {
     CheckIfChangesLocked();
     if (!_signalGroups.TryGetValue(signalName, out var group)) {
@@ -130,7 +130,7 @@ class SignalDispatcher {
 
   /// <summary>Unregisters a signal provider for the given signal name.</summary>
   /// <remarks>The source/provider pair must be registered. This method triggers the signal update.</remarks>
-  /// <exception cref="InvalidOperationException">if source/provider is not registered.</exception>
+  /// <exception cref="InvalidOperationException">if the source / provider is not registered.</exception>
   public void UnregisterSignalProvider(string signalName, BaseComponent source, object provider) {
     CheckIfChangesLocked();
     var entityId = source.GetComponent<EntityComponent>().EntityId.ToString();
@@ -158,7 +158,7 @@ class SignalDispatcher {
 
   /// <summary>Sets the value of a signal.</summary>
   /// <remarks>
-  /// The signal update will only be fired if the value has changed from the prvious value. The value is checked on a
+  /// The signal update will only be fired if the value has changed from the previous value. The value is checked on a
   /// per-provider basis.
   /// </remarks>
   public void SetSignalValue(string signalName, int value, BaseComponent provider, bool ignoreErrors = false) {
@@ -236,7 +236,7 @@ class SignalDispatcher {
   /// <summary>Deserializes the state from a list of strings.</summary>
   /// <remarks>
   /// The state must be loaded in the normal game loading phase. Calling this method after the game initialization has
-  /// complete will result in a wrong system behavior.
+  /// completed will result in a wrong system behavior.
   /// </remarks>
   public void FromPackedArray(IEnumerable<string> packedValues) {
     _signalGroups.Clear();
