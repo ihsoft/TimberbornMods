@@ -108,6 +108,7 @@ Before submitting any change to this branch, run:
 
 ```powershell
 dotnet run --project TimberDev.Tests\TimberDev.Tests.csproj
+dotnet run --project SmartPower.Tests\SmartPower.Tests.csproj
 ```
 
 These tests MUST pass for every change in this branch.

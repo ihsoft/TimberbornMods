@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XRay", "XRay\XRay.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimberDev.Tests", "TimberDev.Tests\TimberDev.Tests.csproj", "{A3021CA5-BFF2-4C88-BF21-B25BE05DDF17}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartPower.Tests", "SmartPower.Tests\SmartPower.Tests.csproj", "{7B54D648-91BC-4563-9D5B-50E484D0A317}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,5 +62,9 @@ Global
 		{A3021CA5-BFF2-4C88-BF21-B25BE05DDF17}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3021CA5-BFF2-4C88-BF21-B25BE05DDF17}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3021CA5-BFF2-4C88-BF21-B25BE05DDF17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B54D648-91BC-4563-9D5B-50E484D0A317}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B54D648-91BC-4563-9D5B-50E484D0A317}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B54D648-91BC-4563-9D5B-50E484D0A317}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B54D648-91BC-4563-9D5B-50E484D0A317}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
