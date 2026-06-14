@@ -1,0 +1,12 @@
+{
+  "GameVersionCompatibility": {
+    "version-1.0": {
+      "MinimumGameVersion": "1.0.12.7",
+      "MaximumGameVersion": "1.0.99.99"
+    },
+    "version-1.1": {
+      "MinimumGameVersion": "1.1.0.0",
+      "MaximumGameVersion": "1.1.99.99"
+    }
+  }
+}
