@@ -65,7 +65,7 @@ public class UiFactory {
   public string T<T1, T2, T3>(string key, T1 param1, T2 param2, T3 param3) => _loc.T(key, param1, param2, param3);
 
   /// <summary>Sets an alternative path to <see cref="TimberDevStylesheet"/>.</summary>
-  /// <remarks>If the path wasn't set, then stylesheet will be loaded from "UI/Views/TimberDevStyle".</remarks>
+  /// <remarks>If the path wasn't set, then the stylesheet will be loaded from "UI/Views/TimberDevStyle".</remarks>
   public string TimberDevStylesheetPath {
     get => _timberDevStylesheetPath;
     set {
