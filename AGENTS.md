@@ -102,6 +102,16 @@ When asked to modify a repository file:
 
 If the file cannot be read completely, stop and report the problem instead of guessing.
 
+## Required tests
+
+Before submitting any change to this branch, run:
+
+```powershell
+dotnet run --project TimberDev.Tests\TimberDev.Tests.csproj
+```
+
+These tests MUST pass for every change in this branch.
+
 ## Local tools and generated references
 
 - `tools/` contains repository scripts and helper commands that should be tracked in Git.

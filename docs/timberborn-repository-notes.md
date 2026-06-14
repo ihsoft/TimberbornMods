@@ -231,6 +231,14 @@ After editing, inspect the diff for unrelated changes, encoding-only changes, BO
 git diff --check
 ```
 
+Before submitting any change to this branch, run:
+
+```powershell
+dotnet run --project TimberDev.Tests\TimberDev.Tests.csproj
+```
+
+These tests MUST pass for every change in this branch.
+
 When verifying a mod project, distinguish C# compilation failures from post-build target failures. Some projects copy
 outputs to the local game mods folder after building, and that copy step may fail even when the DLL compiled.
 
