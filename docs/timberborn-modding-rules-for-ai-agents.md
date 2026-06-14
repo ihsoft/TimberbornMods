@@ -328,6 +328,29 @@ ILoadableSingleton
 
 and follow the local convention.
 
+### Game service bindings and contexts
+
+When using a Timberborn game service, first find all DI bindings for that service and inspect their `Context`
+attributes.
+
+Do not assume that a service has the same implementation in `Game`, `MapEditor`, `MainMenu`, and `Bootstrapper`.
+Some services are real in one context and dummy/no-op in another.
+
+Before changing or replacing a game service binding:
+
+- Find every `Bind<T>()` for the service.
+- Identify the implementation used in each context.
+- Inspect all consumers in the affected context.
+- Check whether the service is intentionally disabled by a dummy implementation.
+
+If a service is bound to a dummy/no-op implementation in `Game`, do not replace it globally unless all consumers in
+that context have been reviewed. Prefer a narrow mod-owned service or scoped wrapper when the mod only needs a small
+part of the behavior.
+
+When implementing event-capture behavior, verify the event order in decompiled game code. For example, entity creation
+events may be posted before the entity has finished initialization, so state that depends on initialized components may
+need to be captured later.
+
 ### Template decorators
 
 Some entity components are added through Timberborn template decorators.

@@ -213,6 +213,37 @@ Repository files are the source of truth.
 
 ---
 
+## Editing and Verification Workflow
+
+Before editing an existing source file, read the exact current file from the repository. Do not assume it matches
+decompiled game patterns, older conversations, or nearby code.
+
+For large or frequently edited files, prefer small sequential patches:
+
+- dependency registration,
+- fields and injected dependencies,
+- method bodies,
+- cleanup.
+
+After editing, inspect the diff for unrelated changes, encoding-only changes, BOM changes, or line-ending noise. Run:
+
+```powershell
+git diff --check
+```
+
+When verifying a mod project, distinguish C# compilation failures from post-build target failures. Some projects copy
+outputs to the local game mods folder after building, and that copy step may fail even when the DLL compiled.
+
+For compilation-only verification of projects with mod-copy post-build targets, use a non-existent `ModPath`:
+
+```powershell
+dotnet build <ProjectPath>.csproj /p:ModPath=__NoSuchModPath__
+```
+
+Report which build command was used when the ordinary build has repository-specific side effects.
+
+---
+
 ## Branches
 
 Inspect the repository before assuming branch structure.
