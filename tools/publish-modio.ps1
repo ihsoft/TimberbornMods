@@ -149,56 +149,6 @@ function Get-VersionFoldersFromDirectory([string] $PackageRoot) {
     } | Select-Object -ExpandProperty Name | Sort-Object -Unique)
 }
 
-function Copy-MissingVersionFoldersFromPreviousPackages(
-    [string] $PackageRoot,
-    [string] $PreviousPackagePattern,
-    [string] $WorkRoot) {
-    if ([string]::IsNullOrWhiteSpace($PreviousPackagePattern)) {
-        return
-    }
-
-    $resolvedPattern = Resolve-RepoPath $PreviousPackagePattern
-    $previousPackages = @(Get-ChildItem -Path $resolvedPattern -File -ErrorAction SilentlyContinue |
-        Sort-Object LastWriteTime -Descending)
-    foreach ($previousPackage in $previousPackages) {
-        $existingVersions = Get-VersionFoldersFromDirectory $PackageRoot
-        Add-Type -AssemblyName System.IO.Compression.FileSystem
-        $zip = [System.IO.Compression.ZipFile]::OpenRead($previousPackage.FullName)
-        try {
-            $archiveVersions = @($zip.Entries | ForEach-Object {
-                if ($_.FullName -match "^[^/]+/(version-\d+\.\d+)/") {
-                    $matches[1]
-                }
-            } | Sort-Object -Unique)
-        }
-        finally {
-            $zip.Dispose()
-        }
-
-        $missingVersions = @($archiveVersions | Where-Object { $existingVersions -notcontains $_ })
-        if ($missingVersions.Count -eq 0) {
-            continue
-        }
-
-        if (Test-Path -LiteralPath $WorkRoot) {
-            Remove-Item -LiteralPath $WorkRoot -Recurse -Force
-        }
-        New-Item -ItemType Directory -Path $WorkRoot | Out-Null
-        [System.IO.Compression.ZipFile]::ExtractToDirectory($previousPackage.FullName, $WorkRoot)
-        $archiveRoot = Get-ChildItem -LiteralPath $WorkRoot -Directory | Select-Object -First 1
-        if ($null -eq $archiveRoot) {
-            continue
-        }
-
-        foreach ($missingVersion in $missingVersions) {
-            $sourceVersionPath = Join-Path $archiveRoot.FullName $missingVersion
-            if (Test-Path -LiteralPath $sourceVersionPath) {
-                Copy-Item -LiteralPath $sourceVersionPath -Destination $PackageRoot -Recurse -Force
-            }
-        }
-    }
-}
-
 function New-ZipFromDirectory([string] $SourceRoot, [string] $ZipPath) {
     Add-Type -AssemblyName System.IO.Compression
     Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -405,10 +355,6 @@ elseif ($packageMode -eq "LocalModFolder") {
     New-Item -ItemType Directory -Path $packageStage | Out-Null
     Copy-Item -LiteralPath $sourcePath -Destination $packageStage -Recurse -Force
     $packageRoot = Join-Path $packageStage (Split-Path -Leaf $sourcePath)
-
-    Copy-MissingVersionFoldersFromPreviousPackages $packageRoot `
-        ([string]$releaseConfig.Package.PreviousPackagePattern) `
-        (Resolve-RepoPath ".tools/release-staging/$ModName-previous")
 
     $zipPath = Resolve-RepoPath ([string]$releaseConfig.Package.OutputPath)
     New-ZipFromDirectory $packageStage $zipPath

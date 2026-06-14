@@ -8,9 +8,13 @@ param(
     [string] $LocalModRoot = "",
     [string] $SteamStagingRoot = ".tools/steam-staging",
     [string] $VdfRoot = ".tools/steam",
+    [string] $SteamConfigPath = "",
+    [string] $SteamCmdPath = "",
+    [string] $SteamUserName = "",
     [string] $ChangeNotesPrefix = "",
     [switch] $IncludeLegacyVersions,
     [switch] $SkipBuild,
+    [switch] $LoginOnly,
     [switch] $Publish
 )
 
@@ -134,56 +138,6 @@ function Get-VersionFoldersFromDirectory([string] $PackageRoot) {
     } | Select-Object -ExpandProperty Name | Sort-Object -Unique)
 }
 
-function Copy-MissingVersionFoldersFromPreviousPackages(
-    [string] $PackageRoot,
-    [string] $PreviousPackagePattern,
-    [string] $WorkRoot) {
-    if ([string]::IsNullOrWhiteSpace($PreviousPackagePattern)) {
-        return
-    }
-
-    $resolvedPattern = Resolve-RepoPath $PreviousPackagePattern
-    $previousPackages = @(Get-ChildItem -Path $resolvedPattern -File -ErrorAction SilentlyContinue |
-        Sort-Object LastWriteTime -Descending)
-    foreach ($previousPackage in $previousPackages) {
-        $existingVersions = Get-VersionFoldersFromDirectory $PackageRoot
-        Add-Type -AssemblyName System.IO.Compression.FileSystem
-        $zip = [System.IO.Compression.ZipFile]::OpenRead($previousPackage.FullName)
-        try {
-            $archiveVersions = @($zip.Entries | ForEach-Object {
-                if ($_.FullName -match "^[^/]+/(version-\d+\.\d+)/") {
-                    $matches[1]
-                }
-            } | Sort-Object -Unique)
-        }
-        finally {
-            $zip.Dispose()
-        }
-
-        $missingVersions = @($archiveVersions | Where-Object { $existingVersions -notcontains $_ })
-        if ($missingVersions.Count -eq 0) {
-            continue
-        }
-
-        if (Test-Path -LiteralPath $WorkRoot) {
-            Remove-Item -LiteralPath $WorkRoot -Recurse -Force
-        }
-        New-Item -ItemType Directory -Path $WorkRoot | Out-Null
-        [System.IO.Compression.ZipFile]::ExtractToDirectory($previousPackage.FullName, $WorkRoot)
-        $archiveRoot = Get-ChildItem -LiteralPath $WorkRoot -Directory | Select-Object -First 1
-        if ($null -eq $archiveRoot) {
-            continue
-        }
-
-        foreach ($missingVersion in $missingVersions) {
-            $sourceVersionPath = Join-Path $archiveRoot.FullName $missingVersion
-            if (Test-Path -LiteralPath $sourceVersionPath) {
-                Copy-Item -LiteralPath $sourceVersionPath -Destination $PackageRoot -Recurse -Force
-            }
-        }
-    }
-}
-
 function New-ZipFromDirectory([string] $SourceRoot, [string] $ZipPath) {
     Add-Type -AssemblyName System.IO.Compression
     Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -227,7 +181,20 @@ function Expand-PackageForSteam([string] $ZipPath, [string] $DestinationRoot) {
 }
 
 function ConvertTo-VdfString([string] $Value) {
-    return $Value.Replace("\", "\\").Replace('"', '\"').Replace("`r", "").Replace("`n", "\n")
+    return $Value.Replace("\", "\\").Replace('"', '\"')
+}
+
+function ConvertTo-SteamChangeNote([string] $Version, [string] $ChangeNotes) {
+    $lines = $ChangeNotes.Trim() -split "\r?\n"
+    $convertedLines = $lines | ForEach-Object {
+        if ($_ -match "^\*\s+(?<text>.+)$") {
+            "[*] " + $matches["text"]
+        }
+        else {
+            $_
+        }
+    }
+    return "[h3]v$Version[/h3]`r`n" + (($convertedLines -join "`r`n").Trim())
 }
 
 function Write-WorkshopVdf(
@@ -264,8 +231,100 @@ $($tagLines -join "`r`n")
     Set-Content -LiteralPath $Path -Value $vdf -Encoding UTF8
 }
 
+function Read-SteamConfig([string] $Path) {
+    if ([string]::IsNullOrWhiteSpace($Path)) {
+        $Path = Join-Path $repoRoot ".tools/steam/steam.local.json"
+    }
+    if (-not (Test-Path -LiteralPath $Path)) {
+        return $null
+    }
+    return Get-Content -Raw -LiteralPath $Path | ConvertFrom-Json
+}
+
+function Resolve-SteamCmdPath([string] $ConfiguredPath) {
+    if (-not [string]::IsNullOrWhiteSpace($ConfiguredPath)) {
+        $resolvedPath = Resolve-RepoPath $ConfiguredPath
+        if (Test-Path -LiteralPath $resolvedPath) {
+            return $resolvedPath
+        }
+        throw "SteamCMD not found: $resolvedPath"
+    }
+
+    $command = Get-Command steamcmd.exe -ErrorAction SilentlyContinue
+    if ($null -ne $command) {
+        return $command.Source
+    }
+
+    $commonPaths = @(
+        "C:\steamcmd\steamcmd.exe",
+        "C:\SteamCMD\steamcmd.exe",
+        "C:\Program Files (x86)\Steam\steamcmd.exe",
+        "C:\Program Files\Steam\steamcmd.exe",
+        (Join-Path $repoRoot ".tools/steamcmd/steamcmd.exe")
+    )
+    foreach ($path in $commonPaths) {
+        if (Test-Path -LiteralPath $path) {
+            return $path
+        }
+    }
+
+    return ""
+}
+
+function Invoke-SteamWorkshopUpload([string] $SteamCmd, [string] $UserName, [string] $VdfPath) {
+    if ([string]::IsNullOrWhiteSpace($SteamCmd)) {
+        throw "Cannot publish: steamcmd.exe was not found. Set SteamCmdPath in .tools/steam/steam.local.json."
+    }
+    if ([string]::IsNullOrWhiteSpace($UserName)) {
+        throw "Cannot publish: SteamUserName is empty. Set UserName in .tools/steam/steam.local.json."
+    }
+
+    & $SteamCmd +login $UserName +workshop_build_item $VdfPath +quit
+    if ($LASTEXITCODE -ne 0) {
+        throw "SteamCMD failed with exit code $LASTEXITCODE."
+    }
+}
+
+function Get-SteamLoginSettings() {
+    $steamConfig = Read-SteamConfig $SteamConfigPath
+    if ($null -ne $steamConfig) {
+        if ([string]::IsNullOrWhiteSpace($SteamCmdPath)) {
+            $script:SteamCmdPath = [string]$steamConfig.SteamCmdPath
+        }
+        if ([string]::IsNullOrWhiteSpace($SteamUserName)) {
+            $script:SteamUserName = [string]$steamConfig.UserName
+        }
+    }
+
+    $resolvedSteamCmdPath = Resolve-SteamCmdPath $SteamCmdPath
+    if ([string]::IsNullOrWhiteSpace($resolvedSteamCmdPath)) {
+        throw "steamcmd.exe was not found. Set SteamCmdPath in .tools/steam/steam.local.json."
+    }
+    if ([string]::IsNullOrWhiteSpace($SteamUserName)) {
+        throw "Steam user name is empty. Set UserName in .tools/steam/steam.local.json."
+    }
+
+    return [pscustomobject]@{
+        SteamCmdPath = $resolvedSteamCmdPath
+        UserName = $SteamUserName
+    }
+}
+
+function Start-SteamInteractiveLogin([string] $SteamCmd, [string] $UserName) {
+    Start-Process -FilePath $SteamCmd -ArgumentList @("+login", $UserName) -WorkingDirectory (Split-Path -Parent $SteamCmd)
+}
+
 Assert-PathExists $releaseConfigPath "Release config"
 Assert-PathExists $buildScriptPath "Package builder"
+
+if ($LoginOnly) {
+    $loginSettings = Get-SteamLoginSettings
+    Start-SteamInteractiveLogin $loginSettings.SteamCmdPath $loginSettings.UserName
+    Write-Host "Started SteamCMD login window for $($loginSettings.UserName)."
+    Write-Host "Approve Steam Guard if prompted, then type quit in the SteamCMD window."
+    Write-Host "You can rerun this command if the mobile confirmation expires."
+    exit 0
+}
 
 $releaseConfig = Get-Content -Raw -LiteralPath $releaseConfigPath | ConvertFrom-Json
 $manifestPath = Join-Path $modRoot "Mod/manifest.json"
@@ -340,10 +399,6 @@ elseif ($packageMode -eq "LocalModFolder") {
     Copy-Item -LiteralPath $sourcePath -Destination $packageStage -Recurse -Force
     $packageRoot = Join-Path $packageStage (Split-Path -Leaf $sourcePath)
 
-    Copy-MissingVersionFoldersFromPreviousPackages $packageRoot `
-        ([string]$releaseConfig.Package.PreviousPackagePattern) `
-        (Resolve-RepoPath ".tools/release-staging/$ModName-previous")
-
     $zipPath = Resolve-RepoPath ([string]$releaseConfig.Package.OutputPath)
     New-ZipFromDirectory $packageStage $zipPath
     Write-Host "Built package from local mod folder: $zipPath"
@@ -408,6 +463,7 @@ $changeNotes = Get-LatestChangeNotes $changesPath $modVersion
 if (-not [string]::IsNullOrWhiteSpace($ChangeNotesPrefix)) {
     $changeNotes = $ChangeNotesPrefix.Trim() + "`r`n" + $changeNotes.TrimStart()
 }
+$steamChangeNote = ConvertTo-SteamChangeNote $modVersion $changeNotes
 
 $stagingRootPath = Resolve-RepoPath $SteamStagingRoot
 $contentFolder = Expand-PackageForSteam $zipPath (Join-Path $stagingRootPath $ModName)
@@ -422,7 +478,7 @@ elseif (-not (Test-Path -LiteralPath $previewFile)) {
 $vdfPath = Join-Path (Resolve-RepoPath $VdfRoot) "$ModName.vdf"
 $tags = @($workshopData.Tags)
 Write-WorkshopVdf $vdfPath $appId $publishedFileId $contentFolder $previewFile $visibilityMap[$visibilityName] `
-    ([string]$workshopData.Name) $tags $changeNotes
+    ([string]$workshopData.Name) $tags $steamChangeNote
 
 Write-Host ""
 Write-Host "Steam publish plan for $ModName v$modVersion"
@@ -442,14 +498,18 @@ if ($allowSingleGameVersion) {
 }
 Write-Host ""
 Write-Host "Change note:"
-Write-Host $changeNotes
+Write-Host $steamChangeNote
 Write-Host ""
 
 if ($Publish) {
     if ($releaseConfig.ReadyForPublish -eq $false) {
         throw "Cannot publish: $ModName release config is marked ReadyForPublish=false."
     }
-    throw "Steam publish execution is not implemented yet. This script currently generates a dry-run VDF only."
+    $loginSettings = Get-SteamLoginSettings
+    Write-Host "Starting SteamCMD..."
+    Invoke-SteamWorkshopUpload $loginSettings.SteamCmdPath $loginSettings.UserName $vdfPath
+    Write-Host "SteamCMD upload completed."
+    exit 0
 }
 
 Write-Host "Dry run only. SteamCMD was not started."

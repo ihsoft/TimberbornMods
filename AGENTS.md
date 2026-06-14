@@ -22,6 +22,10 @@ When bootstrapping a new repository that only copied `AGENTS.md` and `docs/`, al
 
 7. `docs/timberborn-new-repository-bootstrap-for-ai-agents.md`
 
+When preparing, validating, or publishing releases to Steam Workshop or Mod.IO, also read:
+
+8. `docs/timberborn-release-publishing-rules-for-ai-agents.md`
+
 ## Instruction hierarchy
 
 The instruction files serve different purposes:
@@ -35,6 +39,7 @@ The instruction files serve different purposes:
 | `docs/timberborn-lessons-learned.md` | Practical discoveries and development experience |
 | `docs/TimberCommons-modding-notes-for-ai-agents.md` | TimberCommons-specific implementation notes |
 | `docs/timberborn-new-repository-bootstrap-for-ai-agents.md` | New repository setup and first-mod bootstrap workflow |
+| `docs/timberborn-release-publishing-rules-for-ai-agents.md` | Release validation and publishing rules |
 
 ## Read only what is relevant
 
@@ -50,6 +55,7 @@ Read:
 - TimberCommons notes only when working with TimberCommons.
 - new repository bootstrap notes only when setting up a repository that does not yet have local links, generated
   references, or established mod project structure.
+- release publishing rules only when preparing, validating, or publishing releases to Steam Workshop or Mod.IO.
 
 ## Core principles
 
