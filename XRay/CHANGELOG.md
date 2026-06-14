@@ -1,3 +1,6 @@
+# v1.1.0 (June 13th, 2026):
+* [Feature] Enable mod in the map editor mode.
+
 # v1.0.0 (June 10th, 2026):
 * Release!
 

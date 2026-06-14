@@ -8,6 +8,7 @@ namespace IgorZ.XRay.Settings;
 
 [Context("MainMenu")]
 [Context("Game")]
+[Context("MapEditor")]
 sealed class Configurator : IConfigurator {
   public const string AutomationModId = "Timberborn.IgorZ.XRay";
 

@@ -9,6 +9,7 @@ using IgorZ.TimberDev.Utils;
 namespace IgorZ.XRay.Patches;
 
 [Context("Game")]
+[Context("MapEditor")]
 sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).AssemblyQualifiedName;
   static readonly Type[] Patches = [
