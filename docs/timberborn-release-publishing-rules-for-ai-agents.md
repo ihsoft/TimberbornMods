@@ -92,6 +92,55 @@ MaximumGameVersion: 1.1.99.99
 
 Do not claim support for a game version unless the final package contains the corresponding `version-X.X` folder.
 
+## Platform descriptions
+
+Local files under a mod's `Workshop` directory are the expected source for published platform descriptions.
+
+Before publishing, compare the local `Workshop` description files with the current descriptions published on Steam
+Workshop and Mod.IO when platform access is available.
+
+If a local description and the published platform description differ, stop. Do not publish until the user decides which
+side is correct:
+
+- update the platform from the local `Workshop` file,
+- update the local `Workshop` file from the platform,
+- or manually reconcile the difference.
+
+Do not silently overwrite either side when a mismatch is found.
+
+When a release changes user-visible behavior, update the platform description as the current product description for a
+new player. Describe what the mod does now. Do not describe removed or historical behavior in the main platform
+description. Put historical change information only in changelog or release notes when needed.
+
+Preserve each platform's existing markup and file style. Steam Workshop descriptions use Steam formatting:
+
+```text
+https://steamcommunity.com/comment/Recommendation/formattinghelp
+```
+
+Example:
+
+```text
+[h1]Header[/h1]
+[h2]Section[/h2]
+[list]
+[*]Item
+[/list]
+```
+
+Mod.IO descriptions use regular HTML formatting, such as:
+
+```html
+<h1>Header</h1>
+<h2>Section</h2>
+<ul>
+  <li>Item</li>
+</ul>
+```
+
+Make the smallest description edit that matches the current mod behavior. Do not regenerate or restyle the full
+description unless the user explicitly asks for it.
+
 ## Steam change notes
 
 Steam change notes use Steam formatting.
