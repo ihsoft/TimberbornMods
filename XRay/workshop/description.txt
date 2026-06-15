@@ -1,0 +1,23 @@
+﻿[h1]See what is hidden underground[/h1]
+No need to change the terrain layer now! Just press a hotkey or click the tool button.
+
+✓ See underground structures
+✓ Build underground
+✓ Select and manage hidden buildings
+✓ Multiple visualization modes
+✓ Extensive customization options
+✓ Toggle or Hold-to-X-Ray
+
+[h1]Default Hotkeys[/h1]
+Ctrl+P — Toggle X-Ray
+P — Hold-to-X-Ray
+
+All keybindings can be changed in the game settings.
+
+[hr][/hr]
+Discord:
+[list]
+[*]If you haven't joined the Timberborn server yet, here is the invite link: https://discord.gg/6s8DyANATM
+[*]If you have already joined, this is the link to the channel: https://discord.com/channels/558398674389172225/1514386980648128686
+[/list]
+GitHub repository: https://github.com/ihsoft/TimberbornMods
