@@ -37,6 +37,12 @@
       <Compile Include="..\TimberDev\UI\VisualElementExtensions.cs">
         <Link>TimberDev\UI\VisualElementExtensions.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\Settings\BaseSettings.cs">
+        <Link>TimberDev\Settings\BaseSettings.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Settings\DebugSettings.cs">
+        <Link>TimberDev\Settings\DebugSettings.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\Utils\ComponentsAccessor.cs">
         <Link>TimberDev\Utils\ComponentsAccessor.cs</Link>
       </Compile>
