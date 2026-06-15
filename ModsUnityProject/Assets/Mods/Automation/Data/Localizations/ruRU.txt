@@ -127,6 +127,11 @@ IgorZ.Automation.AutomationFragment.SetupRulesBtnHint,"Настроить пра
 IgorZ.Automation.AutomationFragment.SetupSignalsBtnHint,"Настроить сигналы которые другие здания
 смогут использовать в своих условиях",
 IgorZ.Automation.AutomationFragment.SignalsCountText,"Сигналы: {0}/{1}",
+IgorZ.Automation.PinnedCustomSignals.AttachSignal,"Прикрепить сигнал...","Dropdown placeholder for choosing a custom signal to show on the left-side panel"
+IgorZ.Automation.PinnedCustomSignals.NoMoreSignals,"Все сигналы прикреплены","Dropdown placeholder shown when every custom signal is already pinned"
+IgorZ.Automation.PinnedCustomSignals.NoSignals,"Нет пользовательских сигналов","Dropdown placeholder shown when no custom signals exist"
+IgorZ.Automation.PinnedCustomSignals.SignalValue,"{0}: {1}","Pinned custom signal row text. Parameters are signal name and current value"
+IgorZ.Automation.PinnedCustomSignals.UnpinSignal,"Отцепить сигнал","Tooltip for the button that removes a signal from the left-side panel"
 IgorZ.Automation.Tool.CopyRules.Text,"Копировать правила: {0}",
 IgorZ.Automation.Tool.CopyRules.Title,"Копировать правила автоматизации",
 =,=,"Scriptable components strings"

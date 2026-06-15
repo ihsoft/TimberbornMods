@@ -24,6 +24,8 @@ class SignalDispatcher {
 
   #region API
 
+  public event EventHandler SignalsChanged;
+
   /// <summary>Registers a listener for signal changes.</summary>
   /// <remarks>
   /// The operator/listener pair must be unique. For the same listener, multiple operators can be registered. No matter
@@ -46,6 +48,7 @@ class SignalDispatcher {
       throw new InvalidOperationException(
           $"Signal operator already registered for signal '{signalName}': {signalOperator}");
     }
+    SignalsChanged?.Invoke(this, EventArgs.Empty);
   }
 
   /// <summary>Unregisters a listener for signal changes.</summary>
@@ -67,6 +70,7 @@ class SignalDispatcher {
       DebugEx.Fine("Removing signal group: name={0}, group={1}", signalName, group);
       _signalGroups.Remove(signalName);
     }
+    SignalsChanged?.Invoke(this, EventArgs.Empty);
   }
 
   /// <summary>Gets the value of a signal.</summary>
@@ -110,6 +114,7 @@ class SignalDispatcher {
     }
     group.IsDirty = true;
     UpdateSignalGroup(signalName, group);
+    SignalsChanged?.Invoke(this, EventArgs.Empty);
   }
 
   void UpdateSignalGroup(string signalName, SignalGroup group) {
@@ -148,6 +153,7 @@ class SignalDispatcher {
     }
     group.IsDirty = true;
     UpdateSignalGroup(signalName, group);
+    SignalsChanged?.Invoke(this, EventArgs.Empty);
   }
 
   /// <summary>Gets the names of all registered signals.</summary>
@@ -185,6 +191,7 @@ class SignalDispatcher {
     }
     group.LastValue = value;
     UpdateSignalGroup(signalName, group);
+    SignalsChanged?.Invoke(this, EventArgs.Empty);
   }
 
   #endregion
@@ -251,6 +258,7 @@ class SignalDispatcher {
         signalSource.HasFirstValue = true;  // On load, all conditions will sync to the current value, default or not.
       }
     }
+    SignalsChanged?.Invoke(this, EventArgs.Empty);
   }
 
   #endregion
@@ -391,6 +399,9 @@ class SignalDispatcher {
     foreach (var groupName in unusedGroups) {
       DebugEx.Warning("Removing unused signal group: " + groupName);
       _signalGroups.Remove(groupName);
+    }
+    if (unusedGroups.Count > 0) {
+      SignalsChanged?.Invoke(this, EventArgs.Empty);
     }
   }
 

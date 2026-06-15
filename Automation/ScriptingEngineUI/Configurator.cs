@@ -19,6 +19,7 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<ExportRulesDialog>().AsTransient();
     containerDefinition.Bind<ExpressionDescriber>().AsSingleton();
     containerDefinition.Bind<ImportRulesDialog>().AsTransient();
+    containerDefinition.Bind<PinnedCustomSignalsPanel>().AsSingleton();
     containerDefinition.Bind<RuleRow>().AsTransient();
     containerDefinition.Bind<RulesEditorDialog>().AsTransient();
     containerDefinition.Bind<SignalsEditorDialog>().AsTransient();

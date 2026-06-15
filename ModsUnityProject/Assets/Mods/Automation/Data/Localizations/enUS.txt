@@ -126,6 +126,11 @@ IgorZ.Automation.AutomationFragment.RulesCountText,"Rules: {0}",
 IgorZ.Automation.AutomationFragment.SetupRulesBtnHint,"Setup rules",
 IgorZ.Automation.AutomationFragment.SetupSignalsBtnHint,"Setup signals that will be visible to the other buildings",
 IgorZ.Automation.AutomationFragment.SignalsCountText,"Signals: {0}/{1}",
+IgorZ.Automation.PinnedCustomSignals.AttachSignal,"Pin signal...","Dropdown placeholder for choosing a custom signal to show on the left-side panel"
+IgorZ.Automation.PinnedCustomSignals.NoMoreSignals,"All signals pinned","Dropdown placeholder shown when every custom signal is already pinned"
+IgorZ.Automation.PinnedCustomSignals.NoSignals,"No custom signals","Dropdown placeholder shown when no custom signals exist"
+IgorZ.Automation.PinnedCustomSignals.SignalValue,"{0}: {1}","Pinned custom signal row text. Parameters are signal name and current value"
+IgorZ.Automation.PinnedCustomSignals.UnpinSignal,"Unpin signal","Tooltip for the button that removes a signal from the left-side panel"
 IgorZ.Automation.Tool.CopyRules.Text,"Copy {0} rules",
 IgorZ.Automation.Tool.CopyRules.Title,"Copy automation rules",
 =,=,"Scriptable components strings"

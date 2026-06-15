@@ -12,7 +12,7 @@ namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 [Context("Game")]
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
-    containerDefinition.Bind<SignalDispatcher>().AsTransient();
+    containerDefinition.Bind<SignalDispatcher>().AsSingleton();
     containerDefinition.Bind<ReferenceManager>().AsTransient();
 
     // The building-specific components. The declaring order defines the order of teh items in UI.
