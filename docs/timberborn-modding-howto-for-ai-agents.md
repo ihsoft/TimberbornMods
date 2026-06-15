@@ -355,6 +355,10 @@ Verify:
 - default values,
 - compatibility with existing saves.
 
+When a UI action creates persistent gameplay state or a new state source, define its full lifecycle before implementing:
+creation, save/load, update, and removal. If the UI can create or attach the state, make sure there is an explicit and
+understandable way to remove the same state, and that the UI wording matches the actual effect.
+
 A feature that works in a fresh game but breaks after loading is not finished.
 
 ---

@@ -214,6 +214,11 @@ element.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
 
 This is often safer than rebuilding lists or modifying source collections.
 
+When adding or changing in-game UI assets, first find the closest existing game or mod UI element with the same role.
+Reuse its UI Toolkit component type and classes before hand-styling controls. For example, prefer the same
+`NineSliceTextField`, button classes, validation classes, and template structure used by nearby dialogs over recreating
+input backgrounds and padding manually.
+
 ## Accessing private fields and publicizer
 
 Before using Harmony `AccessTools` for private/internal game members, inspect the mod project file.
