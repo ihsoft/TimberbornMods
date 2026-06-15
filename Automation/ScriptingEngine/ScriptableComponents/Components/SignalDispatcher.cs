@@ -364,11 +364,11 @@ class SignalDispatcher {
       newMaxValue = Math.Max(newMaxValue, handler.Value);
       newSumValue += handler.Value;
     }
+    group.CountValue = group.Sources.Count;
     group.MinValue = newMinValue;
     group.MaxValue = newMaxValue;
     group.SumValue = newSumValue;
     group.AvgValue = group.CountValue > 0 ? newSumValue / group.CountValue : 0;
-    group.CountValue = group.Sources.Count;
     group.IsDirty = false;
   }
 
