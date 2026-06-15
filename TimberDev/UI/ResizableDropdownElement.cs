@@ -113,6 +113,13 @@ public sealed class ResizableDropdownElement : VisualElement {
     _elements.Clear();
     _items = items;
     SelectedValue = _items.FirstOrDefault().Value;
+    foreach (var option in _items) {
+      var element = CreateItemElement(option);
+      element.RegisterCallback<ClickEvent>(_ => SelectedValue = option.Value);
+      _elements.Add(element);
+      _selectedItem.Add(CreateSelectedItemElement(option));
+    }
+    UpdateSelectedValue();
     if (_autoResizeToOptions) {
       ResizeWidth();
     }
@@ -138,9 +145,6 @@ public sealed class ResizableDropdownElement : VisualElement {
   void ResizeWidth() {
     _selectedItem.Clear();
     foreach (var option in _items) {
-      var element = CreateItemElement(option);
-      element.RegisterCallback<ClickEvent>(_ => SelectedValue = option.Value);
-      _elements.Add(element);
       _selectedItem.Add(CreateSelectedItemElement(option));
     }
     if (_resizeScheduled) {
