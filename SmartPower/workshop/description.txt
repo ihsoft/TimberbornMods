@@ -11,7 +11,7 @@ This mod modifies some power generating and consuming buildings to optimize powe
 [h1]Ironteeth Engine[/h1]
 [list]
 [*] Engines automatically turn on and off to minimize the wood consumption while providing enough power supply to the network.
-[*] If there are batteries in the network, then the engines will only produce energy to keep the total network charge reserve within a specified range. For example, "not less than 10%, but not greater than 35%." This can be configured per engine.
+[*] If there are batteries in the network, then the engines will only produce energy to keep the total network charge reserve within a specified range. For example, 'not less than 10%, but not greater than 35%.' This can be configured per engine.
 [/list]
 
 [h1]Power Wheel[/h1]
