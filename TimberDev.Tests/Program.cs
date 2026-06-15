@@ -34,6 +34,8 @@ static class Program {
       ("TicksProfiler reports hits and samples and resets", TicksProfilerTests.ReportsHitsAndSamplesAndResets),
       ("TimedUpdater executes only after threshold", TimedUpdaterTests.ExecutesOnlyAfterThreshold),
       ("TimedUpdater startNow and force control execution", TimedUpdaterTests.StartNowAndForceControlExecution),
+      ("StringProtoSerializer serializes object", StringProtoSerializerTests.SerializesObjectToBase64AndDeserializesIt),
+      ("StringProtoSerializer validates AddType", StringProtoSerializerTests.ValidatesAddType),
       ("ReflectionsHelper creates compatible instance", ReflectionsHelperTests.GetsCompatibleTypeAndCreatesInstance),
       ("ReflectionsHelper handles missing and invalid types", ReflectionsHelperTests.HandlesMissingAndInvalidTypes),
       ("IObjectLoaderExtensions returns defaults", IObjectLoaderExtensionsTests.ReturnsDefaultsForMissingValues),

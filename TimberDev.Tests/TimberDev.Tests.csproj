@@ -67,6 +67,9 @@
       <Compile Include="..\TimberDev\Utils\PausedStopwatch.cs">
         <Link>TimberDev\Utils\PausedStopwatch.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\Utils\ProtoSerializer.cs">
+        <Link>TimberDev\Utils\ProtoSerializer.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\Utils\ReflectionsHelper.cs">
         <Link>TimberDev\Utils\ReflectionsHelper.cs</Link>
       </Compile>
