@@ -28,10 +28,6 @@ public readonly struct Color {
 public sealed class Sprite {
 }
 
-public sealed class TextAsset {
-  public string name;
-}
-
 public struct Vector2 {
   public float x { get; set; }
   public float y { get; set; }

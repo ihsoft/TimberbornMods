@@ -42,8 +42,6 @@ static class Program {
       ("IObjectLoaderExtensions returns stored values", IObjectLoaderExtensionsTests.ReturnsStoredValues),
       ("ComponentsAccessor returns goods inventory", ComponentsAccessorTests.ReturnsFirstNonConstructionInventory),
       ("ComponentsAccessor handles missing inventory", ComponentsAccessorTests.HandlesMissingInventory),
-      ("ModTextAssetConverterPatch appends path", ModTextAssetConverterPatchTests.AppendsSourcePathForValidExtension),
-      ("ModTextAssetConverterPatch ignores invalid extension", ModTextAssetConverterPatchTests.IgnoresInvalidExtension),
       ("StaticBindings stores dependency container", StaticBindingsTests.ConstructorStoresDependencyContainer),
       ("StaticBindingsConfigurator registers singleton", StaticBindingsTests.ConfiguratorRegistersSingleton),
       ("StaticBindingsConfigurator declares contexts", StaticBindingsTests.ConfiguratorDeclaresExpectedContexts),

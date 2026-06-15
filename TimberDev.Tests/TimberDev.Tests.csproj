@@ -61,9 +61,6 @@
       <Compile Include="..\TimberDev\Utils\IObjectLoaderExtensions.cs">
         <Link>TimberDev\Utils\IObjectLoaderExtensions.cs</Link>
       </Compile>
-      <Compile Include="..\TimberDev\Utils\ModTextAssetConverterPatch.cs">
-        <Link>TimberDev\Utils\ModTextAssetConverterPatch.cs</Link>
-      </Compile>
       <Compile Include="..\TimberDev\Utils\PausedStopwatch.cs">
         <Link>TimberDev\Utils\PausedStopwatch.cs</Link>
       </Compile>
