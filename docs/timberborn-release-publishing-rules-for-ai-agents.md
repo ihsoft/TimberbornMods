@@ -104,6 +104,8 @@ Before publishing any mod, compare the local `Workshop` description files with t
 Steam Workshop and Mod.IO when platform access is available. This synchronization verification is mandatory for every
 release.
 
+Use `tools/verify-platform-descriptions.ps1` for this check when possible.
+
 If a local description and the published platform description differ, stop. Do not publish until the user decides which
 side is correct:
 
@@ -148,6 +150,25 @@ Mod.IO descriptions use regular HTML formatting, such as:
 
 Make the smallest description edit that matches the current mod behavior. Do not regenerate or restyle the full
 description unless the user explicitly asks for it.
+
+Steam descriptions must be compared as exact text after normalizing CRLF/LF line endings only. Do not ignore trailing
+spaces, blank lines, line breaks, punctuation, or other formatting characters in Steam descriptions. Steam formatting is
+plain text markup, so whitespace may change rendering.
+
+Mod.IO descriptions use HTML and the platform may normalize HTML attributes, links, entities, and whitespace. For
+Mod.IO synchronization, compare the visible rendered text after HTML decoding and tag stripping instead of requiring
+byte-for-byte HTML equality.
+
+An existing Mod.IO token for one mod can be used to read descriptions for the other mods owned by the same account and
+game scope. If the available tokens cannot read a mod description, stop and ask the user to create or provide a new
+token.
+
+When the user explicitly asks to update a Steam description, prefer `tools/update-steam-description.ps1`. The script
+does a dry run by default, updates only when `-Publish` is passed, and verifies the live Steam description after upload.
+Do not hand-write Steam description VDFs unless the script is unavailable and the user explicitly approves the risk.
+SteamCMD description VDFs are fragile: unescaped double quotes inside multiline `description` values can truncate the
+published description. If a Steam description contains double quotes, replace them or improve and test the escaping
+before publishing.
 
 ## Steam change notes
 
