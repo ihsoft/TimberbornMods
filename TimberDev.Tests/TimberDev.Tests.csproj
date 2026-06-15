@@ -16,6 +16,9 @@
       <Compile Include="..\TimberDev\UI\PanelFragmentPatcher.cs">
         <Link>TimberDev\UI\PanelFragmentPatcher.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\UI\PreciseSliderWrapper.cs">
+        <Link>TimberDev\UI\PreciseSliderWrapper.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\UI\UnitFormats.cs">
         <Link>TimberDev\UI\UnitFormats.cs</Link>
       </Compile>

@@ -17,6 +17,8 @@ static class Program {
       ("VisualEffects temporarily sets class", VisualEffectsTests.TemporarilySetsClass),
       ("PanelFragmentPatcher inserts once", PanelFragmentPatcherTests.InsertsElementAfterTargetOnlyOnce),
       ("PanelFragmentPatcher appends without target", PanelFragmentPatcherTests.AppendsElementWhenTargetIsMissing),
+      ("PreciseSliderWrapper rounds value", PreciseSliderWrapperTests.RoundsChangedValueToStepAndInvokesCallback),
+      ("PreciseSliderWrapper updates without callback", PreciseSliderWrapperTests.UpdatesValuesWithoutCallback),
       ("CounterProfiler reports sorted frame stats and resets", CounterProfilerTests.ReportsSortedFrameStatsAndResets),
       ("PausedStopwatch pauses and resumes", PausedStopwatchTests.PausesRunningStopwatchAndResumesOnDispose),
       ("PausedStopwatch starts stopped stopwatch on dispose", PausedStopwatchTests.StartsStoppedStopwatchOnDispose),
