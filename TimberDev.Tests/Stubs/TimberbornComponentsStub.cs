@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 
 namespace Timberborn.BaseComponentSystem {
+  using System.Collections.Generic;
+  using Timberborn.BlueprintSystem;
+
   public class BaseComponent {
     readonly Dictionary<System.Type, object> _components = new();
 
@@ -11,6 +14,17 @@ namespace Timberborn.BaseComponentSystem {
     public T GetComponent<T>() where T : class {
       return _components.TryGetValue(typeof(T), out var component) ? (T)component : null;
     }
+  }
+
+  public class BaseInstantiator {
+    public List<object> InstantiateComponents(Blueprint blueprint) {
+      return [];
+    }
+  }
+}
+
+namespace Timberborn.BlueprintSystem {
+  public sealed class Blueprint {
   }
 }
 
