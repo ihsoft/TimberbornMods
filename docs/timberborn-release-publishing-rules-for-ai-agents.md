@@ -96,8 +96,9 @@ Do not claim support for a game version unless the final package contains the co
 
 Local files under a mod's `Workshop` directory are the expected source for published platform descriptions.
 
-Before publishing, compare the local `Workshop` description files with the current descriptions published on Steam
-Workshop and Mod.IO when platform access is available.
+Before publishing any mod, compare the local `Workshop` description files with the current descriptions published on
+Steam Workshop and Mod.IO when platform access is available. This synchronization verification is mandatory for every
+release.
 
 If a local description and the published platform description differ, stop. Do not publish until the user decides which
 side is correct:
@@ -108,9 +109,12 @@ side is correct:
 
 Do not silently overwrite either side when a mismatch is found.
 
-When a release changes user-visible behavior, update the platform description as the current product description for a
-new player. Describe what the mod does now. Do not describe removed or historical behavior in the main platform
-description. Put historical change information only in changelog or release notes when needed.
+Updating platform descriptions is not part of the normal release flow. Change local description files or published
+platform descriptions only when the user explicitly asks for a description update.
+
+When the user asks to update a description because release behavior changed, update it as the current product
+description for a new player. Describe what the mod does now. Do not describe removed or historical behavior in the
+main platform description. Put historical change information only in changelog or release notes when needed.
 
 Preserve each platform's existing markup and file style. Steam Workshop descriptions use Steam formatting:
 
@@ -183,6 +187,7 @@ Stop and ask if any of these are unclear or inconsistent:
 - `version-X.X` folders,
 - manifest versions,
 - DLL/XML names,
+- platform description synchronization,
 - Steam `publishedfileid`,
 - Mod.IO game/mod IDs,
 - Steam or Mod.IO credentials.
