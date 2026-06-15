@@ -49,6 +49,12 @@
       <Compile Include="..\TimberDev\Utils\ReflectionsHelper.cs">
         <Link>TimberDev\Utils\ReflectionsHelper.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\Utils\StaticBindings.cs">
+        <Link>TimberDev\Utils\StaticBindings.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\StaticBindingsConfigurator.cs">
+        <Link>TimberDev\Utils\StaticBindingsConfigurator.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\Utils\TickDelayAction.cs">
         <Link>TimberDev\Utils\TickDelayAction.cs</Link>
       </Compile>
