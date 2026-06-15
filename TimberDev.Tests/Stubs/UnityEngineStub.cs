@@ -3,6 +3,10 @@ using System.Globalization;
 
 namespace UnityEngine;
 
+public static class Time {
+  public static float unscaledTime;
+}
+
 public readonly struct Color {
   public readonly float r;
   public readonly float g;
@@ -12,6 +16,53 @@ public readonly struct Color {
     this.r = r;
     this.g = g;
     this.b = b;
+  }
+}
+
+public sealed class Sprite {
+}
+
+public readonly struct Vector2 {
+  public readonly float x;
+  public readonly float y;
+
+  public Vector2(float x, float y) {
+    this.x = x;
+    this.y = y;
+  }
+}
+
+public readonly struct Vector3 {
+  public readonly float x;
+  public readonly float y;
+  public readonly float z;
+
+  public Vector3(float x, float y, float z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+  }
+}
+
+public readonly struct Vector2Int {
+  public readonly int x;
+  public readonly int y;
+
+  public Vector2Int(int x, int y) {
+    this.x = x;
+    this.y = y;
+  }
+}
+
+public readonly struct Vector3Int {
+  public readonly int x;
+  public readonly int y;
+  public readonly int z;
+
+  public Vector3Int(int x, int y, int z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
   }
 }
 

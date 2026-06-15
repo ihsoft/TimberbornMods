@@ -14,6 +14,8 @@ static class UnitFormatsTests {
     Assert.Equal(UnitFormats.AngleUnitLocKey + ":45", UnitFormats.FormatAngle(45, loc));
     Assert.Equal(UnitFormats.PowerUnitLocKey + ":120", UnitFormats.FormatPower(120, loc));
     Assert.Equal(UnitFormats.PowerCapacityUnitLocKey + ":300", UnitFormats.FormatPowerCapacity(300, loc));
-    Assert.Equal(UnitFormats.PowerCapacityPerMeterUnitLocKey + ":40", UnitFormats.FormatPowerCapacityPerMeter(40, loc));
+    Assert.Equal(
+        UnitFormats.PowerCapacityPerMeterUnitLocKey + ":40",
+        UnitFormats.FormatPowerCapacityPerMeter(40, loc));
   }
 }

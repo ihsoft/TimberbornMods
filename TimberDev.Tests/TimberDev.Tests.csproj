@@ -10,14 +10,47 @@
       <Compile Include="..\TimberDev\UI\CommonFormats.cs">
         <Link>TimberDev\UI\CommonFormats.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\UI\DropdownItem.cs">
+        <Link>TimberDev\UI\DropdownItem.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UI\PanelFragmentPatcher.cs">
+        <Link>TimberDev\UI\PanelFragmentPatcher.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\UI\UnitFormats.cs">
         <Link>TimberDev\UI\UnitFormats.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UI\VisualEffects.cs">
+        <Link>TimberDev\UI\VisualEffects.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UI\VisualElementExtensions.cs">
+        <Link>TimberDev\UI\VisualElementExtensions.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\ComponentsAccessor.cs">
+        <Link>TimberDev\Utils\ComponentsAccessor.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\CounterProfiler.cs">
+        <Link>TimberDev\Utils\CounterProfiler.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\Utils\FeatureController.cs">
         <Link>TimberDev\Utils\FeatureController.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\Utils\IObjectLoaderExtensions.cs">
+        <Link>TimberDev\Utils\IObjectLoaderExtensions.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\PausedStopwatch.cs">
+        <Link>TimberDev\Utils\PausedStopwatch.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\ReflectionsHelper.cs">
+        <Link>TimberDev\Utils\ReflectionsHelper.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\Utils\TickDelayAction.cs">
         <Link>TimberDev\Utils\TickDelayAction.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\TicksProfiler.cs">
+        <Link>TimberDev\Utils\TicksProfiler.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\TimedUpdater.cs">
+        <Link>TimberDev\Utils\TimedUpdater.cs</Link>
       </Compile>
     </ItemGroup>
 </Project>
