@@ -1,5 +1,5 @@
 # v4.2.0 (started on June 14th, 2026):
-* [Feature] Allow pinning the custom signal to the UI to show its value.
+* [Feature] Add a UI panel for pinned custom signals with manual value control.
 
 # v4.1.0 (June 14th, 2026):
 * [Update] Support game version `v1.1`.

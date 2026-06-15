@@ -175,21 +175,51 @@ class SignalDispatcher {
     if (!group.Sources.TryGetValue(entityId, out var source)) {
       throw new InvalidOperationException("Signal source not found for entity: " + entityId);
     }
-    var needsUpdate = !source.HasFirstValue || group.LastValue != value || source.Value != value;
     if (AutomationDebugSettings.LogSignalsSetting) {
       HostedDebugLog.Fine(
-          provider, "Setting signal '{0}' to value {1} (needs update: {2}):\nSignalGroup: {3}\nSignalSource: {4}",
-          signalName, value, needsUpdate, group, source);
+          provider, "Setting signal '{0}' to value {1}:\nSignalGroup: {2}\nSignalSource: {3}",
+          signalName, value, group, source);
     }
-    if (!needsUpdate) {
+    SetSignalSourceValue(signalName, value, group, source);
+  }
+
+  /// <summary>Sets the manual/global value of a signal.</summary>
+  public void SetManualSignalValue(string signalName, int value) {
+    if (!_signalGroups.TryGetValue(signalName, out var group)) {
+      DebugEx.Fine("Adding signal group for manual value: {0}", signalName);
+      group = new SignalGroup();
+      _signalGroups.Add(signalName, group);
+    }
+    var source = group.Sources.GetOrAdd(ManualSignalSourceId);
+    if (AutomationDebugSettings.LogSignalsSetting) {
+      DebugEx.Fine(
+          "Setting manual signal '{0}' to value {1}:\nSignalGroup: {2}\nSignalSource: {3}",
+          signalName, value, group, source);
+    }
+    SetSignalSourceValue(signalName, value, group, source);
+  }
+
+  /// <summary>Returns whether the signal has a manual/global value source.</summary>
+  public bool HasManualSignalValue(string signalName) {
+    return _signalGroups.TryGetValue(signalName, out var group)
+        && group.Sources.ContainsKey(ManualSignalSourceId);
+  }
+
+  /// <summary>Removes the manual/global value source of a signal.</summary>
+  public void UnsetManualSignalValue(string signalName) {
+    CheckIfChangesLocked();
+    if (!_signalGroups.TryGetValue(signalName, out var group)
+        || !group.Sources.Remove(ManualSignalSourceId)) {
+      throw new InvalidOperationException("Manual signal source not found for signal: " + signalName);
+    }
+    if (group.Sources.Count == 0 && group.SignalSinks.Count == 0) {
+      DebugEx.Fine("Removing manual signal group: name={0}, group={1}", signalName, group);
+      _signalGroups.Remove(signalName);
+      SignalsChanged?.Invoke(this, EventArgs.Empty);
       return;
     }
-    if (source.Value != value || !source.HasFirstValue) { 
-      source.Value = value;
-      source.HasFirstValue = true;
-      group.IsDirty = true;
-    }
-    group.LastValue = value;
+    group.LastValue = group.Sources.Values.LastOrDefault()?.Value ?? 0;
+    group.IsDirty = true;
     UpdateSignalGroup(signalName, group);
     SignalsChanged?.Invoke(this, EventArgs.Empty);
   }
@@ -313,6 +343,8 @@ class SignalDispatcher {
   readonly Dictionary<string, SignalGroup> _signalGroups = [];
   readonly ScriptingService _scriptingService;
 
+  const string ManualSignalSourceId = "manual/global";
+
   const string AggCountNameSuffix = ".Count";
   const string AggMinNameSuffix = ".Min";
   const string AggMaxNameSuffix = ".Max";
@@ -353,6 +385,21 @@ class SignalDispatcher {
       signalType = SignalType.Last;
     }
     return (signalType, name);
+  }
+
+  void SetSignalSourceValue(string signalName, int value, SignalGroup group, SignalSource source) {
+    var needsUpdate = !source.HasFirstValue || group.LastValue != value || source.Value != value;
+    if (!needsUpdate) {
+      return;
+    }
+    if (source.Value != value || !source.HasFirstValue) {
+      source.Value = value;
+      source.HasFirstValue = true;
+      group.IsDirty = true;
+    }
+    group.LastValue = value;
+    UpdateSignalGroup(signalName, group);
+    SignalsChanged?.Invoke(this, EventArgs.Empty);
   }
 
   static void UpdateDirty(SignalGroup group) {

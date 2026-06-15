@@ -1,0 +1,25 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:Template name="NamedBoxTemplate" src="project://database/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml?fileID=9197481963319205126&amp;guid=b27c549e9f96d7843b45412cf82a0c6a&amp;type=3#NamedBoxTemplate" />
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle" />
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle" />
+    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/RulesEditorStyle.uss?fileID=7433441132597879392&amp;guid=82ba7710a5bad1b489b53edd629e2a56&amp;type=3#RulesEditorStyle" />
+    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/TimberDevStyle.uss?fileID=7433441132597879392&amp;guid=86824deb2a4bc844cbec48367a164254&amp;type=3#TimberDevStyle" />
+    <engine:VisualElement class="content-row-centered">
+        <engine:Instance template="NamedBoxTemplate" style="width: 620px; height: auto;">
+            <AttributeOverrides element-name="Header" text-loc-key="IgorZ.Automation.PinnedCustomSignals.SetValue.DialogHeader" />
+            <engine:VisualElement style="padding-top: 12px; padding-right: 12px; padding-bottom: 12px; padding-left: 12px;">
+                <engine:Label name="SignalName" class="game-text-big" style="margin-bottom: 12px;" />
+                <engine:VisualElement name="SignalNameInputWrapper" style="margin-bottom: 12px;">
+                    <Timberborn.CoreUI.LocalizableLabel text-loc-key="IgorZ.Automation.PinnedCustomSignals.SetValue.SignalNameLabel" class="game-text-big" />
+                    <Timberborn.CoreUI.NineSliceTextField select-all-on-mouse-up="false" select-all-on-focus="true" name="SignalNameInput" class="text-field game-text-big" style="flex-grow: 1; margin-top: 4px;" />
+                </engine:VisualElement>
+                <Timberborn.CoreUI.LocalizableLabel text-loc-key="IgorZ.Automation.PinnedCustomSignals.SetValue.ValueLabel" class="game-text-big" />
+                <Timberborn.CoreUI.NineSliceTextField select-all-on-mouse-up="false" select-all-on-focus="true" name="SignalValue" class="text-field game-text-big" style="flex-grow: 1; margin-top: 4px;" />
+            </engine:VisualElement>
+            <engine:VisualElement style="flex-direction: row; align-items: center; justify-content: center; margin-top: 8px; flex-shrink: 0;">
+                <Timberborn.CoreUI.LocalizableButton text="Cancel" name="CancelButton" text-loc-key="Core.Cancel" class="menu-button" />
+                <Timberborn.CoreUI.LocalizableButton text="Save" name="ConfirmButton" text-loc-key="Core.Save" class="menu-button" />
+            </engine:VisualElement>
+        </engine:Instance>
+    </engine:VisualElement>
+</engine:UXML>

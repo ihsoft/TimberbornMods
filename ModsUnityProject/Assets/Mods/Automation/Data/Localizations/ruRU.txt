@@ -128,9 +128,21 @@ IgorZ.Automation.AutomationFragment.SetupSignalsBtnHint,"Настроить си
 смогут использовать в своих условиях",
 IgorZ.Automation.AutomationFragment.SignalsCountText,"Сигналы: {0}/{1}",
 IgorZ.Automation.PinnedCustomSignals.AttachSignal,"Прикрепить сигнал...","Dropdown placeholder for choosing a custom signal to show on the left-side panel"
+IgorZ.Automation.PinnedCustomSignals.CreateManualSignal,"Создать ручной сигнал...","Dropdown item for creating a new custom signal with a manual value"
+IgorZ.Automation.PinnedCustomSignals.DeleteManualSignal,"Удалить ручной сигнал","Tooltip for the button that removes a pinned manual custom signal and its manual value source"
 IgorZ.Automation.PinnedCustomSignals.NoMoreSignals,"Все сигналы прикреплены","Dropdown placeholder shown when every custom signal is already pinned"
 IgorZ.Automation.PinnedCustomSignals.NoSignals,"Нет пользовательских сигналов","Dropdown placeholder shown when no custom signals exist"
 IgorZ.Automation.PinnedCustomSignals.SignalValue,"{0}: {1}","Pinned custom signal row text. Parameters are signal name and current value"
+IgorZ.Automation.PinnedCustomSignals.SetSignalValue,"Изменить значение сигнала","Tooltip for clicking a pinned custom signal value"
+IgorZ.Automation.PinnedCustomSignals.SetValue.DialogHeader,"Изменить значение сигнала","Dialog header for manually changing a custom signal value"
+IgorZ.Automation.PinnedCustomSignals.SetValue.DuplicateSignalName,"Сигнал уже существует: {0}","Error shown when creating a manual custom signal with an existing name"
+IgorZ.Automation.PinnedCustomSignals.SetValue.InvalidValueFormat,"Некорректное значение сигнала: {0}
+После точки можно указать не больше двух цифр.","Error shown when the manually entered signal value has too many fractional digits"
+IgorZ.Automation.PinnedCustomSignals.SetValue.InvalidValueNumber,"Некорректное значение сигнала: {0}
+Введите число, например: 1, 1.5 или -2.25.","Error shown when the manually entered signal value is not a number"
+IgorZ.Automation.PinnedCustomSignals.SetValue.SignalName,"Сигнал: {0}","Dialog text showing the custom signal being edited"
+IgorZ.Automation.PinnedCustomSignals.SetValue.SignalNameLabel,"Имя сигнала","Label for the new manual custom signal name field"
+IgorZ.Automation.PinnedCustomSignals.SetValue.ValueLabel,"Значение","Label for the manual custom signal value field"
 IgorZ.Automation.PinnedCustomSignals.UnpinSignal,"Отцепить сигнал","Tooltip for the button that removes a signal from the left-side panel"
 IgorZ.Automation.Tool.CopyRules.Text,"Копировать правила: {0}",
 IgorZ.Automation.Tool.CopyRules.Title,"Копировать правила автоматизации",

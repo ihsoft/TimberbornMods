@@ -9,6 +9,7 @@ using IgorZ.Automation.Settings;
 using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 using IgorZ.TimberDev.UI;
+using IgorZ.TimberDev.Utils;
 using Timberborn.CoreUI;
 using Timberborn.Persistence;
 using Timberborn.SingletonSystem;
@@ -24,11 +25,15 @@ sealed class PinnedCustomSignalsPanel : ILoadableSingleton, IPostLoadableSinglet
   const string PanelResource = "Game/AutomationPins/PinnedIndicatorsPanel";
   const string PinResource = "Game/AutomationPins/PinnedIndicator";
   const string SignalNamePrefix = "Signals.";
+  const string CreateManualSignalValue = "<create-manual-signal>";
 
+  const string CreateManualSignalLocKey = "IgorZ.Automation.PinnedCustomSignals.CreateManualSignal";
   const string AttachSignalLocKey = "IgorZ.Automation.PinnedCustomSignals.AttachSignal";
   const string NoSignalsLocKey = "IgorZ.Automation.PinnedCustomSignals.NoSignals";
   const string NoMoreSignalsLocKey = "IgorZ.Automation.PinnedCustomSignals.NoMoreSignals";
   const string SignalValueLocKey = "IgorZ.Automation.PinnedCustomSignals.SignalValue";
+  const string SetSignalValueLocKey = "IgorZ.Automation.PinnedCustomSignals.SetSignalValue";
+  const string DeleteManualSignalLocKey = "IgorZ.Automation.PinnedCustomSignals.DeleteManualSignal";
   const string UnpinSignalLocKey = "IgorZ.Automation.PinnedCustomSignals.UnpinSignal";
 
   static readonly SingletonKey PinnedCustomSignalsKey = new("IgorZ.Automation.PinnedCustomSignalsPanel");
@@ -106,6 +111,11 @@ sealed class PinnedCustomSignalsPanel : ILoadableSingleton, IPostLoadableSinglet
   }
 
   void AttachSignal(string signalName) {
+    if (signalName == CreateManualSignalValue) {
+      ShowCreateManualSignalDialog();
+      _signalSelector.SelectedValue = "";
+      return;
+    }
     if (string.IsNullOrEmpty(signalName) || _pinnedSignals.Contains(signalName)) {
       return;
     }
@@ -114,6 +124,12 @@ sealed class PinnedCustomSignalsPanel : ILoadableSingleton, IPostLoadableSinglet
   }
 
   void UnpinSignal(string signalName) {
+    _pinnedSignals.Remove(signalName);
+    Recreate();
+  }
+
+  void DeleteManualSignal(string signalName) {
+    _signalDispatcher.UnsetManualSignalValue(signalName);
     _pinnedSignals.Remove(signalName);
     Recreate();
   }
@@ -128,7 +144,7 @@ sealed class PinnedCustomSignalsPanel : ILoadableSingleton, IPostLoadableSinglet
     foreach (var signalName in _pinnedSignals.ToList()) {
       CreatePinnedSignalRow(signalName);
     }
-    _root.ToggleDisplayStyle(_pinnedSignals.Count > 0 || GetCustomSignalNames().Count > 0);
+    _root.ToggleDisplayStyle(visible: true);
   }
 
   void UpdateSignalSelector() {
@@ -144,26 +160,57 @@ sealed class PinnedCustomSignalsPanel : ILoadableSingleton, IPostLoadableSinglet
     }
     _signalSelector.Items = new[] {
         new DropdownItem { Value = "", Text = placeholder },
-    }.Concat(unpinnedSignals.Select(x => new DropdownItem { Value = x, Text = FormatSignalName(x) })).ToArray();
-    _signalSelector.SetEnabled(unpinnedSignals.Count > 0);
+    }
+        .Concat(unpinnedSignals.Select(x => new DropdownItem { Value = x, Text = FormatSignalName(x) }))
+        .Append(new DropdownItem { Value = CreateManualSignalValue, Text = _uiFactory.T(CreateManualSignalLocKey) })
+        .ToArray();
+    _signalSelector.SetEnabled(true);
   }
 
   void CreatePinnedSignalRow(string signalName) {
     var row = _uiFactory.LoadVisualElement(PinResource);
     row.Q2<Image>("StateIcon").ToggleDisplayStyle(visible: false);
-    row.Q2<Label>("Name").text = _uiFactory.T(
+    var signalLabel = row.Q2<Label>("Name");
+    signalLabel.text = _uiFactory.T(
         SignalValueLocKey, FormatSignalName(signalName), GetFormattedSignalValue(signalName));
+    signalLabel.RegisterCallback<ClickEvent>(_ => ShowSetSignalValueDialog(signalName));
+    _tooltipRegistrar.RegisterLocalizable(signalLabel, SetSignalValueLocKey);
 
-    var unpinButton = new Button();
-    unpinButton.AddToClassList("button-square");
-    unpinButton.AddToClassList("button-square--small");
-    unpinButton.AddToClassList("button-minus");
-    unpinButton.style.marginRight = 3;
-    unpinButton.clicked += () => UnpinSignal(signalName);
-    _tooltipRegistrar.RegisterLocalizable(unpinButton, UnpinSignalLocKey);
-    row.Insert(0, unpinButton);
+    var hasManualValue = _signalDispatcher.HasManualSignalValue(signalName);
+    var removeButton = new Button();
+    removeButton.AddToClassList("button-square");
+    removeButton.AddToClassList("button-square--small");
+    removeButton.AddToClassList(hasManualValue ? "button-cross" : "button-minus");
+    removeButton.style.marginRight = 3;
+    removeButton.clicked += () => {
+      if (hasManualValue) {
+        DeleteManualSignal(signalName);
+      } else {
+        UnpinSignal(signalName);
+      }
+    };
+    _tooltipRegistrar.RegisterLocalizable(
+        removeButton, hasManualValue ? DeleteManualSignalLocKey : UnpinSignalLocKey);
+    row.Insert(0, removeButton);
 
     _signalsContainer.Add(row);
+  }
+
+  void ShowSetSignalValueDialog(string signalName) {
+    StaticBindings.DependencyContainer.GetInstance<SetCustomSignalValueDialog>()
+        .WithSignal(signalName, FormatSignalName(signalName), _signalDispatcher.GetSignalValue(signalName))
+        .Show();
+  }
+
+  void ShowCreateManualSignalDialog() {
+    StaticBindings.DependencyContainer.GetInstance<SetCustomSignalValueDialog>()
+        .WithNewSignal(GetCustomSignalNames(), signalName => {
+          if (!_pinnedSignals.Contains(signalName)) {
+            _pinnedSignals.Add(signalName);
+          }
+          Recreate();
+        })
+        .Show();
   }
 
   List<string> GetCustomSignalNames() {
