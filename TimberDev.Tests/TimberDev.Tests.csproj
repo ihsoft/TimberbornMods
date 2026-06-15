@@ -7,6 +7,9 @@
         <Nullable>disable</Nullable>
     </PropertyGroup>
     <ItemGroup>
+      <Compile Include="..\TimberDev\UI\AbstractDialog.cs">
+        <Link>TimberDev\UI\AbstractDialog.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\UI\CommonFormats.cs">
         <Link>TimberDev\UI\CommonFormats.cs</Link>
       </Compile>

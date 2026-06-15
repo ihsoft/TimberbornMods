@@ -220,6 +220,9 @@ public class VisualTreeAsset {
     target.Add(new Button { name = "Selection" });
     target.Add(new Button { name = "ArrowLeft" });
     target.Add(new Button { name = "ArrowRight" });
+    target.Add(new Button { name = "ConfirmButton" });
+    target.Add(new Button { name = "CancelButton" });
+    target.Add(new Button { name = "CloseButton" });
   }
 
   public VisualElement Instantiate() {

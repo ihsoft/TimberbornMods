@@ -12,6 +12,10 @@ public sealed class Context : Attribute {
   }
 }
 
+[AttributeUsage(AttributeTargets.Method)]
+public sealed class Inject : Attribute {
+}
+
 public interface IConfigurator {
   void Configure(IContainerDefinition containerDefinition);
 }
