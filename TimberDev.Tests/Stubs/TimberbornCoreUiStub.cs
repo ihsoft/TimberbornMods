@@ -10,6 +10,10 @@ public static class VisualElementDisplayExtensions {
 }
 
 public sealed class VisualElementLoader {
+  public VisualTreeAsset LoadVisualTreeAsset(string name) {
+    return new VisualTreeAsset();
+  }
+
   public VisualElement LoadVisualElement(string name) {
     var root = new VisualElement();
     var container = new VisualElement();
@@ -18,6 +22,27 @@ public sealed class VisualElementLoader {
     container.Add(new Label { name = "Text" });
     return root;
   }
+}
+
+public sealed class VisualElementInitializer {
+  public readonly System.Collections.Generic.List<VisualElement> Initialized = new();
+
+  public void InitializeVisualElement(VisualElement element) {
+    Initialized.Add(element);
+    element.AddToClassList("initialized");
+  }
+}
+
+public class NineSliceVisualElement : VisualElement {
+}
+
+public class NineSliceLabel : Label {
+}
+
+public class NineSliceButton : Button {
+}
+
+public class NineSliceTextField : TextField {
 }
 
 public sealed class PreciseSlider : VisualElement {

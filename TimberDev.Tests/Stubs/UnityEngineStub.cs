@@ -32,9 +32,9 @@ public sealed class TextAsset {
   public string name;
 }
 
-public readonly struct Vector2 {
-  public readonly float x;
-  public readonly float y;
+public struct Vector2 {
+  public float x { get; set; }
+  public float y { get; set; }
 
   public Vector2(float x, float y) {
     this.x = x;
@@ -43,9 +43,9 @@ public readonly struct Vector2 {
 }
 
 public readonly struct Vector3 {
-  public readonly float x;
-  public readonly float y;
-  public readonly float z;
+  public float x { get; }
+  public float y { get; }
+  public float z { get; }
 
   public Vector3(float x, float y, float z) {
     this.x = x;
@@ -89,6 +89,10 @@ public static class ColorUtility {
 }
 
 public static class Mathf {
+  public static float Round(float value) {
+    return (float)Math.Round(value);
+  }
+
   public static int FloorToInt(float value) {
     return (int)Math.Floor(value);
   }

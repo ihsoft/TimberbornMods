@@ -16,6 +16,7 @@ public class VisualElement {
   public IVisualElementScheduler schedule { get; } = new TestScheduler();
   public int childCount => _children.Count;
   public bool enabledSelf { get; private set; } = true;
+  public StyleSheetList styleSheets { get; } = new();
 
   public void Add(VisualElement child) {
     child.parent = this;
@@ -42,9 +43,12 @@ public class VisualElement {
     return _children[index];
   }
 
-  public T Q<T>(string queryName) where T : VisualElement {
+  public T Q<T>(string queryName = null) where T : VisualElement {
+    if (this is T self && queryName == null) {
+      return self;
+    }
     foreach (var child in _children) {
-      if (child is T typed && child.name == queryName) {
+      if (child is T typed && (queryName == null || child.name == queryName)) {
         return typed;
       }
       var nested = child.Q<T>(queryName);
@@ -126,6 +130,81 @@ public class Button : VisualElement {
   }
 }
 
+public class TextField : VisualElement {
+}
+
+public class Toggle : VisualElement {
+  Action<ChangeEvent<bool>> _valueChangedCallback;
+
+  public string text;
+  public bool value { get; private set; }
+
+  public void RegisterValueChangedCallback(Action<ChangeEvent<bool>> callback) {
+    _valueChangedCallback = callback;
+  }
+
+  public void SetValueWithoutNotify(bool newValue) {
+    value = newValue;
+  }
+
+  public void TriggerValueChanged(bool previousValue, bool newValue) {
+    value = newValue;
+    _valueChangedCallback?.Invoke(ChangeEvent<bool>.GetPooled(previousValue, newValue));
+  }
+}
+
+public class Slider : VisualElement {
+  Action<ChangeEvent<float>> _valueChangedCallback;
+
+  public float value;
+  public float lowValue;
+  public float highValue;
+
+  public Slider(float lowValue, float highValue) {
+    this.lowValue = lowValue;
+    this.highValue = highValue;
+  }
+
+  public void RegisterValueChangedCallback(Action<ChangeEvent<float>> callback) {
+    _valueChangedCallback = callback;
+  }
+
+  public void SetValueWithoutNotify(float newValue) {
+    value = newValue;
+  }
+
+  public void TriggerValueChanged(float previousValue, float newValue) {
+    value = newValue;
+    _valueChangedCallback?.Invoke(ChangeEvent<float>.GetPooled(previousValue, newValue));
+  }
+}
+
+public class MinMaxSlider : VisualElement {
+  Action<ChangeEvent<UnityEngine.Vector2>> _valueChangedCallback;
+
+  public UnityEngine.Vector2 value;
+
+  public MinMaxSlider(float minValue, float maxValue, float lowLimit, float highLimit) {
+    value = new UnityEngine.Vector2(lowLimit, highLimit);
+  }
+
+  public void RegisterValueChangedCallback(Action<ChangeEvent<UnityEngine.Vector2>> callback) {
+    _valueChangedCallback = callback;
+  }
+
+  public void SetValueWithoutNotify(UnityEngine.Vector2 newValue) {
+    value = newValue;
+  }
+
+  public void TriggerValueChanged(UnityEngine.Vector2 previousValue, UnityEngine.Vector2 newValue) {
+    value = newValue;
+    _valueChangedCallback?.Invoke(ChangeEvent<UnityEngine.Vector2>.GetPooled(previousValue, newValue));
+  }
+}
+
+public class ScrollView : VisualElement {
+}
+
 public class Label : VisualElement {
   public string text;
 }
@@ -142,6 +221,12 @@ public class VisualTreeAsset {
     target.Add(new Button { name = "ArrowLeft" });
     target.Add(new Button { name = "ArrowRight" });
   }
+
+  public VisualElement Instantiate() {
+    var root = new VisualElement();
+    CloneTree(root);
+    return root;
+  }
 }
 
 public class ClickEvent {
@@ -157,6 +242,12 @@ public sealed class VisualElementStyle {
   public StyleLength width;
   public int paddingRight;
   public int marginBottom;
+  public int paddingTop;
+  public int paddingLeft;
+  public int paddingBottom;
+  public int paddingRightButton;
+  public Justify justifyContent;
+  public FlexDirection flexDirection;
 }
 
 public sealed class ResolvedStyle {
@@ -185,6 +276,34 @@ public readonly struct StyleLength {
 public enum StyleKeyword {
   Undefined,
   Null,
+}
+
+public enum Justify {
+  FlexStart,
+  Center,
+}
+
+public enum FlexDirection {
+  Column,
+  Row,
+}
+
+public class StyleSheet {
+}
+
+public sealed class StyleSheetList : List<StyleSheet> {
+}
+
+public sealed class ChangeEvent<T> {
+  public T previousValue;
+  public T newValue;
+
+  public static ChangeEvent<T> GetPooled(T previousValue, T newValue) {
+    return new ChangeEvent<T> {
+        previousValue = previousValue,
+        newValue = newValue,
+    };
+  }
 }
 
 public static class UQueryExtensions {
