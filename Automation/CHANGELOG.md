@@ -1,4 +1,4 @@
-# v4.2.0 (started on June 14th, 2026):
+# v4.2.0 (June 15th, 2026):
 * [Feature] Add a UI panel for pinned custom signals with manual value control.
 
 # v4.1.0 (June 14th, 2026):
