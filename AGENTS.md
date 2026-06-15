@@ -104,14 +104,24 @@ If the file cannot be read completely, stop and report the problem instead of gu
 
 ## Required tests
 
-Before submitting any change to this branch, run:
+Before submitting a change, run the tests relevant to the changed package.
+
+For TimberDev-only changes, run:
 
 ```powershell
 dotnet run --project TimberDev.Tests\TimberDev.Tests.csproj
-dotnet run --project SmartPower.Tests\SmartPower.Tests.csproj
 ```
 
-These tests MUST pass for every change in this branch.
+TimberDev is a standalone package that depends only on itself and the game APIs. Do not use other mods as a
+TimberDev validation gate by default.
+
+If a TimberDev change affects logic that another mod actually uses, also run that mod's tests as downstream regression
+coverage.
+
+For changes in a mod, run that mod's own tests when they exist. If the change touches shared behavior used by multiple
+packages, run the affected package tests as well.
+
+These relevant tests MUST pass before submitting the change.
 
 ## Local tools and generated references
 
@@ -181,6 +191,16 @@ Use reflection only when necessary.
 If unsure, ask or state the uncertainty.
 
 Do not invent Timberborn APIs, services, classes, paths, files, behaviors, or extension points.
+
+## Testing rule
+
+Tests must not drive unapproved production-code changes.
+
+If adding or expanding tests reveals a production bug, dead code, missing API, or design mismatch, stop and ask before
+changing production code unless the user explicitly asked to fix it.
+
+Configurator-only classes that only bind services or declare contexts do not need unit tests unless they contain
+non-trivial logic.
 
 ## First task
 

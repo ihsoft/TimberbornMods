@@ -72,6 +72,12 @@ Contains utilities intended to support mod development.
 
 Shared functionality that is not player-facing may belong here instead of TimberCommons.
 
+TimberDev is a standalone package. When working on TimberDev, treat it as depending only on itself and the game APIs.
+Do not use other mods as a TimberDev validation gate by default.
+
+If a TimberDev change affects logic that another mod actually uses, also run that mod's tests as downstream regression
+coverage.
+
 ### TimberUI
 
 TimberUI is a dead mod kept only for reference. It does not build and should be excluded from release, publishing, and
@@ -236,14 +242,27 @@ After editing, inspect the diff for unrelated changes, encoding-only changes, BO
 git diff --check
 ```
 
-Before submitting any change to this branch, run:
+Before submitting a change, run the tests relevant to the changed package.
+
+For TimberDev-only changes, run:
 
 ```powershell
 dotnet run --project TimberDev.Tests\TimberDev.Tests.csproj
-dotnet run --project SmartPower.Tests\SmartPower.Tests.csproj
 ```
 
-These tests MUST pass for every change in this branch.
+Do not use other mods as a TimberDev validation gate by default. If a TimberDev change affects logic that another mod
+actually uses, also run that mod's tests as downstream regression coverage. If the change touches a mod, run that mod's
+own tests when they exist. If the change touches shared behavior used by multiple packages, run the affected package
+tests as well.
+
+These relevant tests MUST pass before submitting the change.
+
+Tests must not drive unapproved production-code changes. If adding or expanding tests reveals a production bug, dead
+code, missing API, or design mismatch, stop and ask before changing production code unless the user explicitly asked to
+fix it.
+
+Configurator-only classes that only bind services or declare contexts do not need unit tests unless they contain
+non-trivial logic.
 
 When verifying a mod project, distinguish C# compilation failures from post-build target failures. Some projects copy
 outputs to the local game mods folder after building, and that copy step may fail even when the DLL compiled.
