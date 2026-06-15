@@ -46,6 +46,14 @@ similarly named folders, or inferred state.
 
 If the source folder does not contain a game-version folder, the release does not contain it.
 
+Before building a release ZIP from `Package.SourcePath`, make sure the current code has been built into that exact
+source folder. For C# mods, run the mod project build with the real `ModPath` and verify that the expected DLL/XML
+files in the source folder were updated. Do not package a local mod folder that may contain stale binaries.
+
+If the release package is built from a local Unity-exported mod folder, ask the user to confirm that Unity assets were
+exported before building the ZIP. Do this before packaging, because missing or stale asset bundle changes cannot be
+detected reliably from C# build output.
+
 ## Package validation
 
 Before any upload, validate the final package, not just source files.
