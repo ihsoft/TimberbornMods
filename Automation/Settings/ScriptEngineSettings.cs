@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 using IgorZ.TimberDev.Settings;
@@ -17,6 +18,7 @@ sealed class ScriptEngineSettings : BaseSettings<ScriptEngineSettings> {
   const string HeaderStringLocKey = "IgorZ.Automation.Settings.ScriptEngine.Header";
   const string CheckArgumentValuesLocKey = "IgorZ.Automation.Settings.ScriptEngine.CheckArgumentValues";
   const string SignalExecutionStackSizeLocKey = "IgorZ.Automation.Settings.ScriptEngine.SignalExecutionStackSize";
+  const string PinnedCustomSignalsLocKey = "IgorZ.Automation.Settings.ScriptEngine.PinnedCustomSignals";
 
   protected override string ModId => Configurator.AutomationModId;
 
@@ -48,6 +50,11 @@ sealed class ScriptEngineSettings : BaseSettings<ScriptEngineSettings> {
   public ModSetting<int> SignalExecutionStackSizeInternal { get; } = new(
       20, ModSettingDescriptor.CreateLocalized(SignalExecutionStackSizeLocKey));
 
+  public static bool PinnedCustomSignals { get; private set; } = true;
+  public static event EventHandler PinnedCustomSignalsChanged;
+  public ModSetting<bool> PinnedCustomSignalsInternal { get; } = new(
+      true, ModSettingDescriptor.CreateLocalized(PinnedCustomSignalsLocKey));
+
   #endregion
 
   #region Implementation
@@ -57,6 +64,10 @@ sealed class ScriptEngineSettings : BaseSettings<ScriptEngineSettings> {
       : base(settings, modSettingsOwnerRegistry, modRepository) {
     InstallSettingCallback(CheckArgumentValuesInternal, v => CheckArgumentValues = v);
     InstallSettingCallback(SignalExecutionStackSizeInternal, v => SignalExecutionStackSize = v);
+    InstallSettingCallback(PinnedCustomSignalsInternal, v => {
+      PinnedCustomSignals = v;
+      PinnedCustomSignalsChanged?.Invoke(this, EventArgs.Empty);
+    });
   }
 
   /// <inheritdoc />

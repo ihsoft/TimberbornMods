@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using IgorZ.Automation.Settings;
 using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 using IgorZ.TimberDev.UI;
@@ -77,6 +78,7 @@ sealed class PinnedCustomSignalsPanel : ILoadableSingleton, IPostLoadableSinglet
     _root.Insert(0, _signalSelector);
 
     _signalDispatcher.SignalsChanged += OnSignalsChanged;
+    ScriptEngineSettings.PinnedCustomSignalsChanged += OnPinnedCustomSignalsSettingChanged;
     _eventBus.Register(this);
     Recreate();
   }
@@ -99,6 +101,10 @@ sealed class PinnedCustomSignalsPanel : ILoadableSingleton, IPostLoadableSinglet
     Recreate();
   }
 
+  void OnPinnedCustomSignalsSettingChanged(object sender, EventArgs e) {
+    Recreate();
+  }
+
   void AttachSignal(string signalName) {
     if (string.IsNullOrEmpty(signalName) || _pinnedSignals.Contains(signalName)) {
       return;
@@ -113,6 +119,10 @@ sealed class PinnedCustomSignalsPanel : ILoadableSingleton, IPostLoadableSinglet
   }
 
   void Recreate() {
+    if (!ScriptEngineSettings.PinnedCustomSignals) {
+      _root.ToggleDisplayStyle(visible: false);
+      return;
+    }
     UpdateSignalSelector();
     _signalsContainer.Clear();
     foreach (var signalName in _pinnedSignals.ToList()) {
