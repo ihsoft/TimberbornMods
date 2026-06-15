@@ -228,7 +228,7 @@ IgorZ.Automation.Scripting.Editor.TemplateFamilyLabel,"Template group: {0}","Nam
 IgorZ.Automation.Scripting.Editor.TestScriptBtn,"Test",
 =,=,"Signals editor strings"
 IgorZ.Automation.Scripting.SignalsEditor.DialogHeader,"Setup building signals",
-IgorZ.Automation.Scripting.SignalsEditor.BadSignalNameMsg,"❌ Bad signal name!
+IgorZ.Automation.Scripting.SignalsEditor.BadSignalNameMsg,"Bad signal name!
 The name must start with a letter and contain only letters, digits, and dots.","Message shown when the signal name is invalid; explain naming rules and note that only Latin letters are allowed."
 =,=,"Import dialog"
 IgorZ.Automation.Scripting.Editor.ExportDialogHeader,"Export automation rules",

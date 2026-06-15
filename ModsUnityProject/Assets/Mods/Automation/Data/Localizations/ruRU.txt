@@ -230,7 +230,7 @@ IgorZ.Automation.Scripting.Editor.TemplateFamilyLabel,"Группа шаблон
 IgorZ.Automation.Scripting.Editor.TestScriptBtn,"Проверить",
 =,=,"Signals editor strings"
 IgorZ.Automation.Scripting.SignalsEditor.DialogHeader,"Сигналы автоматизации",
-IgorZ.Automation.Scripting.SignalsEditor.BadSignalNameMsg,"❌ Неверное имя сигнала!
+IgorZ.Automation.Scripting.SignalsEditor.BadSignalNameMsg,"Неверное имя сигнала!
 Имя должно начинаться с латинской буквы и содержать только буквы, цифры и точки.","Message shown when the signal name is invalid; explain naming rules and note that only Latin letters are allowed."
 =,=,"Import dialog"
 IgorZ.Automation.Scripting.Editor.ExportDialogHeader,"Экспорт правил автоматизации",
