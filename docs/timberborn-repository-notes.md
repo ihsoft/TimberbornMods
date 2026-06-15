@@ -72,6 +72,11 @@ Contains utilities intended to support mod development.
 
 Shared functionality that is not player-facing may belong here instead of TimberCommons.
 
+### TimberUI
+
+TimberUI is a dead mod kept only for reference. It does not build and should be excluded from release, publishing, and
+platform description synchronization workflows unless the user explicitly asks to revive or inspect it.
+
 ---
 
 ## Local Tools and Generated Game References

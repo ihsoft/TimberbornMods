@@ -96,6 +96,10 @@ Do not claim support for a game version unless the final package contains the co
 
 Local files under a mod's `Workshop` directory are the expected source for published platform descriptions.
 
+Do not apply these rules to mods explicitly known as dead, unpublished, or kept only for reference. In this repository,
+`TimberUI` is a dead mod kept only for reference; it does not build and must be excluded from release and platform
+description synchronization checks.
+
 Before publishing any mod, compare the local `Workshop` description files with the current descriptions published on
 Steam Workshop and Mod.IO when platform access is available. This synchronization verification is mandatory for every
 release.

@@ -6,6 +6,7 @@ This mod modifies some power generating and consuming buildings to optimize powe
 [img]https://raw.githubusercontent.com/ihsoft/TimberbornMods/main/Assets/ruRU-banner.png[/img] Русский
 [img]https://raw.githubusercontent.com/ihsoft/TimberbornMods/main/Assets/frFR-banner.png[/img] Français (Erazil@Discord)
 [img]https://raw.githubusercontent.com/ihsoft/TimberbornMods/main/Assets/deDE-banner.png[/img] Deutsch (juf0816@Discord)
+简体中文 (EndermanLV@GitHub)
 
 [h1]Ironteeth Engine[/h1]
 [list]
