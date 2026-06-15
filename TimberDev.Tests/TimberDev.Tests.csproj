@@ -19,6 +19,9 @@
       <Compile Include="..\TimberDev\UI\PreciseSliderWrapper.cs">
         <Link>TimberDev\UI\PreciseSliderWrapper.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\UI\ResizableDropdownElement.cs">
+        <Link>TimberDev\UI\ResizableDropdownElement.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\UI\UnitFormats.cs">
         <Link>TimberDev\UI\UnitFormats.cs</Link>
       </Compile>

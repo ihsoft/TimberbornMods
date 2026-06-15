@@ -3,6 +3,23 @@ using UnityEngine.UIElements;
 
 namespace Timberborn.CoreUI;
 
+public static class VisualElementDisplayExtensions {
+  public static void ToggleDisplayStyle(this VisualElement element, bool visible) {
+    element.EnableInClassList("displayed", visible);
+  }
+}
+
+public sealed class VisualElementLoader {
+  public VisualElement LoadVisualElement(string name) {
+    var root = new VisualElement();
+    var container = new VisualElement();
+    root.Add(container);
+    container.Add(new Image { name = "Icon" });
+    container.Add(new Label { name = "Text" });
+    return root;
+  }
+}
+
 public sealed class PreciseSlider : VisualElement {
   Action<float> _valueChangedCallback;
 

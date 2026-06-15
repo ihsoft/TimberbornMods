@@ -19,6 +19,8 @@ static class Program {
       ("PanelFragmentPatcher appends without target", PanelFragmentPatcherTests.AppendsElementWhenTargetIsMissing),
       ("PreciseSliderWrapper rounds value", PreciseSliderWrapperTests.RoundsChangedValueToStepAndInvokesCallback),
       ("PreciseSliderWrapper updates without callback", PreciseSliderWrapperTests.UpdatesValuesWithoutCallback),
+      ("ResizableDropdownElement selects item", ResizableDropdownElementTests.SelectsFirstItemAndUpdatesValue),
+      ("ResizableDropdownElement resizes width", ResizableDropdownElementTests.AutoResizeCanBeDisabled),
       ("CounterProfiler reports sorted frame stats and resets", CounterProfilerTests.ReportsSortedFrameStatsAndResets),
       ("PausedStopwatch pauses and resumes", PausedStopwatchTests.PausesRunningStopwatchAndResumesOnDispose),
       ("PausedStopwatch starts stopped stopwatch on dispose", PausedStopwatchTests.StartsStoppedStopwatchOnDispose),

@@ -7,6 +7,12 @@ public static class Time {
   public static float unscaledTime;
 }
 
+public static class Resources {
+  public static T Load<T>(string path) where T : new() {
+    return new T();
+  }
+}
+
 public readonly struct Color {
   public readonly float r;
   public readonly float g;
