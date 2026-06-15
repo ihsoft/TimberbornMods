@@ -31,6 +31,8 @@ static class Program {
       ("IObjectLoaderExtensions returns stored values", IObjectLoaderExtensionsTests.ReturnsStoredValues),
       ("ComponentsAccessor returns goods inventory", ComponentsAccessorTests.ReturnsFirstNonConstructionInventory),
       ("ComponentsAccessor handles missing inventory", ComponentsAccessorTests.HandlesMissingInventory),
+      ("ModTextAssetConverterPatch appends path", ModTextAssetConverterPatchTests.AppendsSourcePathForValidExtension),
+      ("ModTextAssetConverterPatch ignores invalid extension", ModTextAssetConverterPatchTests.IgnoresInvalidExtension),
       ("FeatureController reads feature flags and values", FeatureControllerTests.ReadFeatures),
       ("FeatureController rejects invalid feature names", FeatureControllerTests.RejectsInvalidNames),
       ("FeatureController validates flags and values", FeatureControllerTests.ValidatesHelpers),
