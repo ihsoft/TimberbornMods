@@ -172,7 +172,7 @@ namespace Timberborn.Common {
 }
 
 namespace Timberborn.StatusSystem {
-  public sealed class StatusSubject {
+  public sealed class StatusSubject : Timberborn.BaseComponentSystem.BaseComponent {
     public readonly List<StatusToggle> RegisteredStatuses = [];
 
     public void RegisterStatus(StatusToggle statusToggle) {
@@ -182,9 +182,27 @@ namespace Timberborn.StatusSystem {
 
   public sealed class StatusToggle {
     public bool Active { get; private set; }
+    public bool IsActive => Active;
 
     public static StatusToggle CreatePriorityStatusWithAlertAndFloatingIcon(
         string icon, string description, string alert) {
+      return new StatusToggle();
+    }
+
+    public static StatusToggle CreatePriorityStatusWithFloatingIcon(string icon, string description) {
+      return new StatusToggle();
+    }
+
+    public static StatusToggle CreateNormalStatusWithAlertAndFloatingIcon(
+        string icon, string description, string alert) {
+      return new StatusToggle();
+    }
+
+    public static StatusToggle CreateNormalStatusWithFloatingIcon(string icon, string description) {
+      return new StatusToggle();
+    }
+
+    public static StatusToggle CreateNormalStatus(string icon, string description) {
       return new StatusToggle();
     }
 
@@ -194,6 +212,10 @@ namespace Timberborn.StatusSystem {
 
     public void Deactivate() {
       Active = false;
+    }
+
+    public void Toggle(bool active) {
+      Active = active;
     }
   }
 }

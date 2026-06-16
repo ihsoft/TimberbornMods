@@ -24,6 +24,12 @@ namespace IgorZ.Automation.Settings {
 namespace IgorZ.TimberDev.UI {
   using UnityEngine;
 
+  public sealed class StatusSpriteLoader {
+    public Sprite LoadSprite(string spriteName) {
+      return new Sprite();
+    }
+  }
+
   public record struct DropdownItem {
     public string Value { get; init; }
     public string Text { get; init; }

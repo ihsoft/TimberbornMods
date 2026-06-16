@@ -128,6 +128,9 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\LeverScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\LeverScriptableComponent.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\NotificationsScriptableComponent.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\NotificationsScriptableComponent.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ObjectsCache.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\ObjectsCache.cs</Link>
       </Compile>
