@@ -57,6 +57,12 @@ static class Program {
       ("ValueDef range check supports single boundary", ValueDefTests.RangeCheckValidatorSupportsSingleBoundary),
 
       // ScriptingEngine.ScriptableComponents.Components
+      ("AbstractStatusTracker tracks actions and reports duplicates",
+          AbstractStatusTrackerTests.TracksActionsAndReportsDuplicates),
+      ("AbstractStatusTracker tracks signals and reports duplicates",
+          AbstractStatusTrackerTests.TracksSignalsAndReportsDuplicates),
+      ("AbstractStatusTracker notifies listeners only when value changes",
+          AbstractStatusTrackerTests.NotifiesListenersOnlyWhenValueChanges),
       ("AutomatorScriptableComponent exposes signal for transmitter automator",
           AutomatorScriptableComponentTests.ExposesSignalForTransmitterAutomator),
       ("AutomatorScriptableComponent hides signal for missing or non-transmitter automator",
