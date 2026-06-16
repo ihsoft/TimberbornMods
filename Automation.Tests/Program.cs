@@ -63,6 +63,8 @@ static class Program {
           AbstractStatusTrackerTests.TracksSignalsAndReportsDuplicates),
       ("AbstractStatusTracker notifies listeners only when value changes",
           AbstractStatusTrackerTests.NotifiesListenersOnlyWhenValueChanges),
+      ("AbstractStatusTracker notifies same listener once for multiple signal registrations",
+          AbstractStatusTrackerTests.NotifiesSameListenerOnceForMultipleSignalRegistrations),
       ("AutomatorScriptableComponent exposes signal for transmitter automator",
           AutomatorScriptableComponentTests.ExposesSignalForTransmitterAutomator),
       ("AutomatorScriptableComponent hides signal for missing or non-transmitter automator",

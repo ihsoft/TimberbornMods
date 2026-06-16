@@ -173,7 +173,9 @@ abstract class AbstractStatusTracker : AbstractDynamicComponent, IPersistentEnti
         throw new InvalidOperationException($"Signal listener already registered: {item}");
       }
       _registrants.Add(item);
-      Listeners.Add(listener);
+      if (!Listeners.Contains(listener)) {
+        Listeners.Add(listener);
+      }
     }
 
     public void Unregister(SignalOperator signalOperator, ISignalListener listener) {

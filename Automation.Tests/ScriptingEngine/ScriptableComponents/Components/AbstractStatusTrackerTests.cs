@@ -57,6 +57,22 @@ static class AbstractStatusTrackerTests {
     Assert.Equal("Signals.Value", firstListener.LastSignalName);
   }
 
+  public static void NotifiesSameListenerOnceForMultipleSignalRegistrations() {
+    TestScripting.CreateService();
+    var tracker = new TestStatusTracker();
+    var value = 1;
+    var listener = new TestSignalListener();
+
+    tracker.AddSignal(CreateSignal(() => ScriptValue.FromInt(value)), listener);
+    tracker.AddSignal(CreateSignal(() => ScriptValue.FromInt(value)), listener);
+
+    value = 2;
+    tracker.TriggerSignalUpdate("Signals.Value");
+
+    Assert.Equal(1, listener.Calls);
+    Assert.Equal("Signals.Value", listener.LastSignalName);
+  }
+
   static SignalOperator CreateSignal(Func<ScriptValue> source) {
     var signals = new TestScriptable("Signals");
     signals.RegisterSignal("Signals.Value", ScriptValue.TypeEnum.Number, source);
