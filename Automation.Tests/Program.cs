@@ -48,6 +48,12 @@ static class Program {
       ("SignalsScriptableComponent exposes definitions", SignalsScriptableComponentTests.ExposesDefinitions),
       ("SignalsScriptableComponent sets manual signal values", SignalsScriptableComponentTests.SetsManualSignalValues),
       ("SignalsScriptableComponent validates signal names", SignalsScriptableComponentTests.ValidatesSignalNames),
+      ("SignalDispatcher aggregates provider values", SignalDispatcherTests.AggregatesProviderValues),
+      ("SignalDispatcher handles manual signal values", SignalDispatcherTests.HandlesManualSignalValues),
+      ("SignalDispatcher notifies listeners on signal changes", SignalDispatcherTests.NotifiesListenersOnSignalChanges),
+      ("SignalDispatcher rejects duplicate and missing registrations",
+          SignalDispatcherTests.RejectsDuplicateAndMissingRegistrations),
+      ("SignalDispatcher locks changes while notifying listeners", SignalDispatcherTests.LocksChangesWhileNotifying),
   ];
 
   static int Main() {
