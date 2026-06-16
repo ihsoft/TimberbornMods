@@ -5,8 +5,8 @@ using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 using Timberborn.BaseComponentSystem;
-using Timberborn.Common;
 using Timberborn.EntitySystem;
+using Timberborn.SingletonSystem;
 
 namespace Automation.Tests;
 

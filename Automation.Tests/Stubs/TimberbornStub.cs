@@ -136,6 +136,22 @@ namespace Timberborn.Hauling {
   }
 }
 
+namespace Timberborn.HazardousWeatherSystem {
+  public sealed class HazardousWeather {
+    public string Id { get; init; }
+  }
+
+  public sealed class HazardousWeatherService {
+    public HazardousWeather CurrentCycleHazardousWeather { get; init; }
+  }
+
+  public sealed class HazardousWeatherStartedEvent {
+  }
+
+  public sealed class HazardousWeatherEndedEvent {
+  }
+}
+
 namespace Timberborn.Localization {
   public interface ILoc {
     string T(string key, params object[] args);
@@ -160,6 +176,14 @@ namespace Timberborn.SingletonSystem {
   public interface IPostLoadableSingleton {
   }
 
+  public sealed class EventBus {
+    public readonly List<object> RegisteredObjects = [];
+
+    public void Register(object obj) {
+      RegisteredObjects.Add(obj);
+    }
+  }
+
   [System.AttributeUsage(System.AttributeTargets.Method)]
   public sealed class OnEventAttribute : System.Attribute {
   }
@@ -169,14 +193,6 @@ namespace Timberborn.Common {
   public static class DictionaryExtensions {
     public static TValue GetOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key) {
       return dictionary.TryGetValue(key, out var value) ? value : default;
-    }
-  }
-
-  public sealed class EventBus {
-    public readonly List<object> RegisteredObjects = [];
-
-    public void Register(object obj) {
-      RegisteredObjects.Add(obj);
     }
   }
 }
@@ -277,6 +293,12 @@ namespace Timberborn.WaterSourceSystem {
     public void Close() {
       IsOpen = false;
     }
+  }
+}
+
+namespace Timberborn.WeatherSystem {
+  public sealed class WeatherService {
+    public bool IsHazardousWeather { get; init; }
   }
 }
 

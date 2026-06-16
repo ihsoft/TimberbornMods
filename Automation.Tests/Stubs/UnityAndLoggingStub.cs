@@ -1,8 +1,46 @@
+using System.Collections;
+using System.Collections.Generic;
+
 namespace UnityEngine {
+  public sealed class Coroutine {
+  }
+
+  public sealed class GameObject {
+    public string Name { get; }
+
+    public GameObject(string name) {
+      Name = name;
+    }
+
+    public T AddComponent<T>() where T : new() {
+      return new T();
+    }
+  }
+
   public class MonoBehaviour {
+    static readonly List<IEnumerator> QueuedCoroutines = [];
+
+    public Coroutine StartCoroutine(IEnumerator enumerator) {
+      QueuedCoroutines.Add(enumerator);
+      return new Coroutine();
+    }
+
+    public static void RunQueuedCoroutines() {
+      while (QueuedCoroutines.Count > 0) {
+        var coroutines = QueuedCoroutines.ToArray();
+        QueuedCoroutines.Clear();
+        foreach (var coroutine in coroutines) {
+          while (coroutine.MoveNext()) {
+          }
+        }
+      }
+    }
   }
 
   public class Sprite {
+  }
+
+  public sealed class WaitForEndOfFrame {
   }
 
   public static class Mathf {

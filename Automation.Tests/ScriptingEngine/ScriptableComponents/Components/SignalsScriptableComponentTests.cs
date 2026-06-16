@@ -5,7 +5,7 @@ using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
-using Timberborn.Common;
+using Timberborn.SingletonSystem;
 using Timberborn.WorldPersistence;
 
 namespace Automation.Tests;
