@@ -41,12 +41,13 @@ static class ParserFactoryTests {
   public static void ParsesValidConditionsAndActions() {
     var factory = CreateFactory();
     var behavior = new AutomationBehavior();
-    ResetScriptingService();
-    ScriptingService.Instance.RegisterSignal(
+    var signals = new TestScriptable("Signals");
+    signals.RegisterSignal(
         "Signals.Var1",
         ScriptValue.TypeEnum.Number,
         () => ScriptValue.FromInt(5));
-    ScriptingService.Instance.RegisterAction("Signals.Set", ScriptValue.TypeEnum.String, ScriptValue.TypeEnum.Number);
+    signals.RegisterAction("Signals.Set", ScriptValue.TypeEnum.String, ScriptValue.TypeEnum.Number);
+    TestScripting.CreateService(signals);
 
     var condition = factory.ParseCondition(
         "Signals.Var1 >= 5",
@@ -116,7 +117,4 @@ static class ParserFactoryTests {
     Assert.Equal(null, result.ParsedExpression);
   }
 
-  static void ResetScriptingService() {
-    ScriptingService.Instance.Reset();
-  }
 }

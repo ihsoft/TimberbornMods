@@ -17,6 +17,9 @@
       <Compile Include="..\Automation\ScriptingEngine\Core\ScriptError.cs">
         <Link>Automation\ScriptingEngine\Core\ScriptError.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Core\ScriptingService.cs">
+        <Link>Automation\ScriptingEngine\Core\ScriptingService.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\Expressions\AbstractFunction.cs">
         <Link>Automation\ScriptingEngine\Expressions\AbstractFunction.cs</Link>
       </Compile>
@@ -91,6 +94,12 @@
       </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\ActionDef.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\ActionDef.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ISignalListener.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\ISignalListener.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\IScriptable.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\IScriptable.cs</Link>
       </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\SignalDef.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\SignalDef.cs</Link>

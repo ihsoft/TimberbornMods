@@ -28,12 +28,13 @@ static class ParserTests {
 
   public static void PythonParserParsesSignalsAndActions() {
     var parser = new PythonSyntaxParser();
-    ResetScriptingService();
-    ScriptingService.Instance.RegisterSignal(
+    var signals = new TestScriptable("Signals");
+    signals.RegisterSignal(
         "Signals.Var1",
         ScriptValue.TypeEnum.Number,
         () => ScriptValue.FromInt(5));
-    ScriptingService.Instance.RegisterAction("Signals.Set", ScriptValue.TypeEnum.String, ScriptValue.TypeEnum.Number);
+    signals.RegisterAction("Signals.Set", ScriptValue.TypeEnum.String, ScriptValue.TypeEnum.Number);
+    TestScripting.CreateService(signals);
 
     var signalExpression = ParseOk(parser, "Signals.Var1 >= 5");
     var actionExpression = ParseOk(parser, "Signals.Set('yellow', Signals.Var1 + 123)");
@@ -110,7 +111,4 @@ static class ParserTests {
     Assert.Equal(decompiled, parser.Decompile(reparsed));
   }
 
-  static void ResetScriptingService() {
-    ScriptingService.Instance.Reset();
-  }
 }

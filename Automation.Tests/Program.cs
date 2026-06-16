@@ -35,6 +35,13 @@ static class Program {
       ("ParserFactory parses valid conditions and actions", ParserFactoryTests.ParsesValidConditionsAndActions),
       ("ParserFactory rejects invalid conditions", ParserFactoryTests.RejectsInvalidConditions),
       ("ParserFactory rejects non-action expressions", ParserFactoryTests.RejectsNonActionExpressions),
+      ("ScriptingService registers and looks up scriptables", ScriptingServiceTests.RegistersAndLooksUpScriptables),
+      ("ScriptingService reports unknown scriptables", ScriptingServiceTests.UnknownScriptableReportsParsingError),
+      ("ScriptingService registers and unregisters signals", ScriptingServiceTests.RegistersAndUnregistersSignalsFromExpression),
+      ("ScriptingService installs and uninstalls actions", ScriptingServiceTests.InstallsAndUninstallsActionsFromExpression),
+      ("ScriptingService maintains execution stack", ScriptingServiceTests.MaintainsExecutionStack),
+      ("ScriptingService wraps signal callbacks with execution stack",
+          ScriptingServiceTests.NotifySignalListenerWrapsCallbackWithExecutionStack),
   ];
 
   static int Main() {

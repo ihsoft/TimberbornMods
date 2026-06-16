@@ -15,3 +15,7 @@ public abstract class AutomationActionBase : IgorZ.Automation.AutomationSystem.I
     throw new NotSupportedException();
   }
 }
+
+sealed class ScriptedAction : AutomationActionBase {
+  public string Expression { get; set; }
+}
