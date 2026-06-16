@@ -3,3 +3,5 @@
 *.DotSettings.user
 _*
 /packages/
+**/bin/
+**/obj/
