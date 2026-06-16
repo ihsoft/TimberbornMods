@@ -128,6 +128,9 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\LeverScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\LeverScriptableComponent.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ManufactoryScriptableComponent.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\ManufactoryScriptableComponent.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\NotificationsScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\NotificationsScriptableComponent.cs</Link>
       </Compile>
@@ -151,6 +154,9 @@
       </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\SignalsScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\SignalsScriptableComponent.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\StreamGaugeScriptableComponent.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\StreamGaugeScriptableComponent.cs</Link>
       </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\IScriptable.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\IScriptable.cs</Link>

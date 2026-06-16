@@ -220,6 +220,23 @@ namespace Timberborn.StatusSystem {
   }
 }
 
+namespace Timberborn.TickSystem {
+  public abstract class TickableComponent : Timberborn.BaseComponentSystem.BaseComponent {
+    public bool Enabled { get; private set; } = true;
+
+    public void DisableComponent() {
+      Enabled = false;
+    }
+
+    public void EnableComponent() {
+      Enabled = true;
+    }
+
+    public virtual void Tick() {
+    }
+  }
+}
+
 namespace Timberborn.WaterBuildings {
   public sealed class Floodgate : Timberborn.BaseComponentSystem.BaseComponent {
     public float Height { get; set; }
@@ -230,6 +247,12 @@ namespace Timberborn.WaterBuildings {
       Height = height;
       SetHeightCalls++;
     }
+  }
+
+  public sealed class StreamGauge : Timberborn.BaseComponentSystem.BaseComponent {
+    public float WaterLevel { get; init; }
+    public float ContaminationLevel { get; init; }
+    public float WaterCurrent { get; init; }
   }
 }
 
@@ -243,6 +266,24 @@ namespace Timberborn.WaterSourceSystem {
 
     public void Close() {
       IsOpen = false;
+    }
+  }
+}
+
+namespace Timberborn.Workshops {
+  public sealed class RecipeSpec {
+    public string Id { get; init; }
+    public string DisplayLocKey { get; init; }
+  }
+
+  public sealed class Manufactory : Timberborn.BaseComponentSystem.BaseComponent {
+    public RecipeSpec[] ProductionRecipes { get; init; } = [];
+    public RecipeSpec CurrentRecipe { get; set; }
+    public int SetRecipeCalls { get; private set; }
+
+    public void SetRecipe(RecipeSpec recipe) {
+      CurrentRecipe = recipe;
+      SetRecipeCalls++;
     }
   }
 }
