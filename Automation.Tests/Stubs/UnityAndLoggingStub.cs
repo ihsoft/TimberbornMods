@@ -2,6 +2,9 @@ namespace UnityEngine {
   public class MonoBehaviour {
   }
 
+  public class Sprite {
+  }
+
   public static class Mathf {
     public static int RoundToInt(float value) {
       return (int)System.MathF.Round(value);

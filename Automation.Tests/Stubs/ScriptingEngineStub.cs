@@ -22,7 +22,21 @@ namespace IgorZ.Automation.Settings {
 }
 
 namespace IgorZ.TimberDev.UI {
-  public sealed record DropdownItem(string Value, string Text);
+  using UnityEngine;
+
+  public record struct DropdownItem {
+    public string Value { get; init; }
+    public string Text { get; init; }
+    public Sprite Icon { get; init; }
+
+    public static implicit operator DropdownItem((string value, string text) tuple) {
+      return new DropdownItem { Value = tuple.value, Text = tuple.text };
+    }
+
+    public static implicit operator DropdownItem((string value, Sprite icon, string text) tuple) {
+      return new DropdownItem { Value = tuple.value, Icon = tuple.icon, Text = tuple.text };
+    }
+  }
 }
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components {

@@ -35,6 +35,20 @@ namespace Timberborn.BaseComponentSystem {
   }
 }
 
+namespace Timberborn.AutomationBuildings {
+  public sealed class Lever : Timberborn.BaseComponentSystem.BaseComponent {
+    public bool IsOn { get; private set; }
+
+    public void SwitchOn() {
+      IsOn = true;
+    }
+
+    public void SwitchOff() {
+      IsOn = false;
+    }
+  }
+}
+
 namespace Timberborn.BlockSystem {
   public sealed class BlockObject {
     public bool IsFinished { get; set; }
@@ -153,6 +167,23 @@ namespace Timberborn.StatusSystem {
 
     public void Deactivate() {
       Active = false;
+    }
+  }
+}
+
+namespace Timberborn.WaterBuildings {
+}
+
+namespace Timberborn.WaterSourceSystem {
+  public sealed class WaterSourceRegulator : Timberborn.BaseComponentSystem.BaseComponent {
+    public bool IsOpen { get; private set; }
+
+    public void Open() {
+      IsOpen = true;
+    }
+
+    public void Close() {
+      IsOpen = false;
     }
   }
 }
