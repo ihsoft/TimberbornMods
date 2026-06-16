@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Bindito.Core;
 
-[AttributeUsage(AttributeTargets.Method)]
+[AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Method)]
 public sealed class Inject : Attribute {
 }
 

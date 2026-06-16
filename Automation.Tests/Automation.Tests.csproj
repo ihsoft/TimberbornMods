@@ -107,6 +107,12 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ScriptableComponentBase.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\ScriptableComponentBase.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\SignalDispatcher.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\SignalDispatcher.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\SignalsScriptableComponent.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\SignalsScriptableComponent.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\IScriptable.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\IScriptable.cs</Link>
       </Compile>

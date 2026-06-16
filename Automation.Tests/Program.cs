@@ -45,6 +45,9 @@ static class Program {
       ("DebugScriptableComponent exposes definitions", DebugScriptableComponentTests.ExposesDefinitions),
       ("DebugScriptableComponent executes log actions", DebugScriptableComponentTests.ExecutesLogActions),
       ("DebugScriptableComponent registers ticker callbacks", DebugScriptableComponentTests.RegistersTickerCallbacks),
+      ("SignalsScriptableComponent exposes definitions", SignalsScriptableComponentTests.ExposesDefinitions),
+      ("SignalsScriptableComponent sets manual signal values", SignalsScriptableComponentTests.SetsManualSignalValues),
+      ("SignalsScriptableComponent validates signal names", SignalsScriptableComponentTests.ValidatesSignalNames),
   ];
 
   static int Main() {

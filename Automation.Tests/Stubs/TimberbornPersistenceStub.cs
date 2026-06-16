@@ -40,6 +40,13 @@ namespace Timberborn.Persistence {
       return (IList<T>)_values[key.Name];
     }
   }
+  public sealed class SingletonKey {
+    public string Name { get; }
+
+    public SingletonKey(string name) {
+      Name = name;
+    }
+  }
 }
 
 namespace Timberborn.WorldPersistence {
@@ -57,6 +64,18 @@ namespace Timberborn.WorldPersistence {
 
   public interface IEntityLoader {
     bool TryGetComponent(ComponentKey componentKey, out IObjectLoader objectLoader);
+  }
+
+  public interface ISaveableSingleton {
+    void Save(ISingletonSaver singletonSaver);
+  }
+
+  public interface ISingletonSaver {
+    IObjectSaver GetSingleton(SingletonKey singletonKey);
+  }
+
+  public interface ISingletonLoader {
+    bool TryGetSingleton(SingletonKey singletonKey, out IObjectLoader objectLoader);
   }
 
   public sealed class TestEntitySaver : IEntitySaver {

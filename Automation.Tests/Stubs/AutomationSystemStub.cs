@@ -8,6 +8,7 @@ public sealed class AutomationService {
   public ILoc Loc { get; } = new FakeLoc();
   public AutomationService Instance => this;
   public static int CurrentTick { get; private set; }
+  public static bool AutomationSystemReady { get; set; } = true;
   public readonly List<AutomationBehavior> RegisteredBehaviors = [];
   public readonly List<AutomationBehavior> UnregisteredBehaviors = [];
   public readonly List<Action<int>> RegisteredTickables = [];
@@ -59,6 +60,9 @@ public interface IAutomationAction : IGameSerializable {
   string TemplateFamily { get; }
 
   IAutomationAction CloneDefinition();
+}
+
+public sealed class AutomationServiceReadyEvent {
 }
 
 sealed class FakeLoc : ILoc {

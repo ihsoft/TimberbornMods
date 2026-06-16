@@ -49,6 +49,10 @@ namespace Timberborn.DuplicationSystem {
 }
 
 namespace Timberborn.EntitySystem {
+  public sealed class EntityComponent : Timberborn.BaseComponentSystem.BaseComponent {
+    public object EntityId { get; set; } = "entity";
+  }
+
   public interface IInitializableEntity {
     void InitializeEntity();
   }
@@ -67,6 +71,23 @@ namespace Timberborn.Localization {
 namespace Timberborn.SingletonSystem {
   public interface ILoadableSingleton {
     void Load();
+  }
+
+  public interface IPostLoadableSingleton {
+  }
+
+  [System.AttributeUsage(System.AttributeTargets.Method)]
+  public sealed class OnEventAttribute : System.Attribute {
+  }
+}
+
+namespace Timberborn.Common {
+  public sealed class EventBus {
+    public readonly List<object> RegisteredObjects = [];
+
+    public void Register(object obj) {
+      RegisteredObjects.Add(obj);
+    }
   }
 }
 
