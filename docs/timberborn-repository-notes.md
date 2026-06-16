@@ -242,6 +242,15 @@ After editing, inspect the diff for unrelated changes, encoding-only changes, BO
 git diff --check
 ```
 
+Before committing, check:
+
+```powershell
+git status --short
+```
+
+Normal `git diff` output does not show untracked files, so use status to avoid missing new tests or accidentally
+committing generated files.
+
 Before submitting a change, run the tests relevant to the changed package.
 
 For TimberDev-only changes, run:
@@ -266,6 +275,15 @@ fix it.
 
 Configurator-only classes that only bind services or declare contexts do not need unit tests unless they contain
 non-trivial logic.
+
+When testing code that depends on Timberborn or game services, prefer the smallest useful test seam.
+
+Test stubs are acceptable when the goal is to cut the game runtime out of unit tests, but keep them narrow. Model only
+the behavior required by the tests being added, and do not expand stubs speculatively.
+
+If a test requires large stubs, reflection into private construction, or duplicated lifecycle behavior, first try the
+smallest test-only approach. If that becomes brittle or obscures the behavior under test, stop and ask whether a
+minimal production-code testability change is acceptable.
 
 When verifying a mod project, distinguish C# compilation failures from post-build target failures. Some projects copy
 outputs to the local game mods folder after building, and that copy step may fail even when the DLL compiled.

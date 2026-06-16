@@ -178,6 +178,35 @@ Rationale:
 
 Arguments are part of a declaration-like structure rather than executable logic. Using 4 spaces visually distinguishes them from normal code blocks.
 
+### Compact wrapped arguments
+
+Do not force one argument per line when several arguments fit comfortably within the 120-character limit.
+
+Preferred:
+
+    static WeatherScriptableComponent CreateComponent(
+        AutomationExtensionsRegistry registry = null, WeatherService weatherService = null,
+        HazardousWeatherService hazardousWeatherService = null) {
+      ...
+    }
+
+Also acceptable when it improves readability:
+
+    static WeatherScriptableComponent CreateComponent(
+        AutomationExtensionsRegistry registry = null,
+        WeatherService weatherService = null,
+        HazardousWeatherService hazardousWeatherService = null) {
+      ...
+    }
+
+Prefer the fewer-line version when both are readable.
+
+### `out` and `ref` parameters
+
+Avoid `out` and `ref` parameters in helper methods when they are used only to expose temporary local state.
+
+If an `out` or `ref` parameter is genuinely needed, place it at the end of the parameter list.
+
 * * *
 
 ## Wrapped expressions
