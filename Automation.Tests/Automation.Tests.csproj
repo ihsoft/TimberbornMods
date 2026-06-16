@@ -107,8 +107,14 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\DebugScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\DebugScriptableComponent.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\AbstractStatusTracker.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\AbstractStatusTracker.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\FlowControlScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\FlowControlScriptableComponent.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\FloodgateScriptableComponent.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\FloodgateScriptableComponent.cs</Link>
       </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ISignalListener.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\ISignalListener.cs</Link>

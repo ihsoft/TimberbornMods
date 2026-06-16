@@ -17,10 +17,22 @@ namespace Timberborn.Persistence {
     }
   }
 
+  public sealed class PropertyKey<T> {
+    public string Name { get; }
+
+    public PropertyKey(string name) {
+      Name = name;
+    }
+  }
+
   public sealed class IObjectSaver {
     public readonly Dictionary<string, object> Values = new();
 
     public void Set<T>(ListKey<T> key, IList<T> value, object serializer = null) {
+      Values[key.Name] = value;
+    }
+
+    public void Set<T>(PropertyKey<T> key, T value) {
       Values[key.Name] = value;
     }
   }
@@ -38,6 +50,10 @@ namespace Timberborn.Persistence {
 
     public IList<T> Get<T>(ListKey<T> key, object serializer = null) {
       return (IList<T>)_values[key.Name];
+    }
+
+    public T Get<T>(PropertyKey<T> key) {
+      return (T)_values[key.Name];
     }
   }
   public sealed class SingletonKey {

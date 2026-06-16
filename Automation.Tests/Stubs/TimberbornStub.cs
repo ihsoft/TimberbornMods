@@ -172,6 +172,16 @@ namespace Timberborn.StatusSystem {
 }
 
 namespace Timberborn.WaterBuildings {
+  public sealed class Floodgate : Timberborn.BaseComponentSystem.BaseComponent {
+    public float Height { get; set; }
+    public int MaxHeight { get; init; } = 1;
+    public int SetHeightCalls { get; private set; }
+
+    public void SetHeight(float height) {
+      Height = height;
+      SetHeightCalls++;
+    }
+  }
 }
 
 namespace Timberborn.WaterSourceSystem {
