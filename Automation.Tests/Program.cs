@@ -22,6 +22,14 @@ static class Program {
       ("Parsers can round-trip between Python and Lisp", ParserTests.ParsersRoundTripAcrossSyntaxes),
       ("Python parser rejects malformed expressions", ParserTests.PythonParserRejectsMalformedExpressions),
       ("Lisp parser rejects malformed expressions", ParserTests.LispParserRejectsMalformedExpressions),
+      ("ScriptValue stores fixed precision numbers", ExpressionTests.ScriptValueStoresFixedPrecisionNumbers),
+      ("ScriptValue arithmetic uses raw fixed precision", ExpressionTests.ScriptValueArithmeticUsesRawFixedPrecision),
+      ("ScriptValue rejects invalid value access", ExpressionTests.ScriptValueRejectsInvalidAccess),
+      ("MathOperator executes numeric functions", ExpressionTests.MathOperatorExecutesNumericFunctions),
+      ("ComparisonOperator executes number and string comparisons", ExpressionTests.ComparisonOperatorExecutesComparisons),
+      ("LogicalOperator executes boolean composition", ExpressionTests.LogicalOperatorExecutesBooleanComposition),
+      ("ConcatOperator concatenates number and string values", ExpressionTests.ConcatOperatorConcatenatesValues),
+      ("Operators reject invalid operands", ExpressionTests.OperatorsRejectInvalidOperands),
   ];
 
   static int Main() {
