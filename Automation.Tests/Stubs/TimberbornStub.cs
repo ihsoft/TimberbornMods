@@ -64,6 +64,12 @@ namespace Timberborn.Localization {
   }
 }
 
+namespace Timberborn.SingletonSystem {
+  public interface ILoadableSingleton {
+    void Load();
+  }
+}
+
 namespace Timberborn.StatusSystem {
   public sealed class StatusSubject {
     public readonly List<StatusToggle> RegisteredStatuses = [];

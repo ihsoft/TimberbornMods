@@ -7,8 +7,10 @@ namespace IgorZ.Automation.AutomationSystem;
 public sealed class AutomationService {
   public ILoc Loc { get; } = new FakeLoc();
   public AutomationService Instance => this;
+  public static int CurrentTick { get; private set; }
   public readonly List<AutomationBehavior> RegisteredBehaviors = [];
   public readonly List<AutomationBehavior> UnregisteredBehaviors = [];
+  public readonly List<Action<int>> RegisteredTickables = [];
 
   public void RegisterBehavior(AutomationBehavior behavior) {
     RegisteredBehaviors.Add(behavior);
@@ -20,6 +22,21 @@ public sealed class AutomationService {
 
   public void ScheduleLateUpdate(Action action) {
     action();
+  }
+
+  public void RegisterTickable(Action<int> tickable) {
+    RegisteredTickables.Add(tickable);
+  }
+
+  public void UnregisterTickable(Action<int> tickable) {
+    RegisteredTickables.Remove(tickable);
+  }
+
+  public void Tick(int currentTick) {
+    CurrentTick = currentTick;
+    foreach (var tickable in RegisteredTickables.ToArray()) {
+      tickable(currentTick);
+    }
   }
 }
 

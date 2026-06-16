@@ -42,6 +42,9 @@ static class Program {
       ("ScriptingService maintains execution stack", ScriptingServiceTests.MaintainsExecutionStack),
       ("ScriptingService wraps signal callbacks with execution stack",
           ScriptingServiceTests.NotifySignalListenerWrapsCallbackWithExecutionStack),
+      ("DebugScriptableComponent exposes definitions", DebugScriptableComponentTests.ExposesDefinitions),
+      ("DebugScriptableComponent executes log actions", DebugScriptableComponentTests.ExecutesLogActions),
+      ("DebugScriptableComponent registers ticker callbacks", DebugScriptableComponentTests.RegistersTickerCallbacks),
   ];
 
   static int Main() {

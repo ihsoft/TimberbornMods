@@ -95,8 +95,17 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\ActionDef.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\ActionDef.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\DebugScriptableComponent.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\DebugScriptableComponent.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ISignalListener.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\ISignalListener.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ReferenceManager.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\ReferenceManager.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ScriptableComponentBase.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\ScriptableComponentBase.cs</Link>
       </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\IScriptable.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\IScriptable.cs</Link>
