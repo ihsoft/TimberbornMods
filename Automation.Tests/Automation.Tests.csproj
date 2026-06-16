@@ -5,6 +5,7 @@
         <LangVersion>12</LangVersion>
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>disable</Nullable>
+        <NoWarn>CS8524</NoWarn>
     </PropertyGroup>
     <ItemGroup>
       <Compile Include="..\Automation\AutomationSystem\AbstractDynamicComponent.cs">
@@ -12,6 +13,87 @@
       </Compile>
       <Compile Include="..\Automation\AutomationSystem\AutomationBehavior.cs">
         <Link>Automation\AutomationSystem\AutomationBehavior.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Core\ScriptError.cs">
+        <Link>Automation\ScriptingEngine\Core\ScriptError.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Expressions\AbstractFunction.cs">
+        <Link>Automation\ScriptingEngine\Expressions\AbstractFunction.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Expressions\AbstractOperator.cs">
+        <Link>Automation\ScriptingEngine\Expressions\AbstractOperator.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Expressions\ActionOperator.cs">
+        <Link>Automation\ScriptingEngine\Expressions\ActionOperator.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Expressions\BooleanOperator.cs">
+        <Link>Automation\ScriptingEngine\Expressions\BooleanOperator.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Expressions\ComparisonOperator.cs">
+        <Link>Automation\ScriptingEngine\Expressions\ComparisonOperator.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Expressions\ConcatOperator.cs">
+        <Link>Automation\ScriptingEngine\Expressions\ConcatOperator.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Expressions\ConstantValueExpr.cs">
+        <Link>Automation\ScriptingEngine\Expressions\ConstantValueExpr.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Expressions\ExpressionContext.cs">
+        <Link>Automation\ScriptingEngine\Expressions\ExpressionContext.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Expressions\GetPropertyFunction.cs">
+        <Link>Automation\ScriptingEngine\Expressions\GetPropertyFunction.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Expressions\HasComponentOperator.cs">
+        <Link>Automation\ScriptingEngine\Expressions\HasComponentOperator.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Expressions\IExpression.cs">
+        <Link>Automation\ScriptingEngine\Expressions\IExpression.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Expressions\IValueExpr.cs">
+        <Link>Automation\ScriptingEngine\Expressions\IValueExpr.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Expressions\LogicalOperator.cs">
+        <Link>Automation\ScriptingEngine\Expressions\LogicalOperator.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Expressions\MathOperator.cs">
+        <Link>Automation\ScriptingEngine\Expressions\MathOperator.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Expressions\ScriptValue.cs">
+        <Link>Automation\ScriptingEngine\Expressions\ScriptValue.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Expressions\SignalOperator.cs">
+        <Link>Automation\ScriptingEngine\Expressions\SignalOperator.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Expressions\SymbolExpr.cs">
+        <Link>Automation\ScriptingEngine\Expressions\SymbolExpr.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Parser\InfixExpressionUtil.cs">
+        <Link>Automation\ScriptingEngine\Parser\InfixExpressionUtil.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Parser\LispSyntaxParser.cs">
+        <Link>Automation\ScriptingEngine\Parser\LispSyntaxParser.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Parser\ParserBase.cs">
+        <Link>Automation\ScriptingEngine\Parser\ParserBase.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Parser\ParsingResult.cs">
+        <Link>Automation\ScriptingEngine\Parser\ParsingResult.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Parser\PythonSyntaxParser.cs">
+        <Link>Automation\ScriptingEngine\Parser\PythonSyntaxParser.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Parser\TokenizerBase.cs">
+        <Link>Automation\ScriptingEngine\Parser\TokenizerBase.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\ActionDef.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\ActionDef.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\SignalDef.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\SignalDef.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\ValueDef.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\ValueDef.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\Utils\StaticBindings.cs">
         <Link>TimberDev\Utils\StaticBindings.cs</Link>

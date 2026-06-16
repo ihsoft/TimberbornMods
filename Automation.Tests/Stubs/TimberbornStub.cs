@@ -6,6 +6,7 @@ namespace Timberborn.BaseComponentSystem {
     readonly Dictionary<System.Type, object> _components = new();
 
     public string Name { get; set; }
+    public List<object> AllComponents { get; } = [];
     public MonoBehaviour _componentCache = new();
 
     public void SetComponent<T>(T component) where T : class {
@@ -14,6 +15,10 @@ namespace Timberborn.BaseComponentSystem {
 
     public T GetComponent<T>() where T : class {
       return _components.TryGetValue(typeof(T), out var component) ? (T)component : null;
+    }
+
+    public static bool operator !(BaseComponent component) {
+      return component == null;
     }
   }
 

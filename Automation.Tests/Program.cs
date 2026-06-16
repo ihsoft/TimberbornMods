@@ -15,6 +15,13 @@ static class Program {
       ("AutomationBehavior forwards lifecycle callbacks to existing dynamic components",
           AutomationBehaviorTests.ForwardsLifecycleCallbacks),
       ("AutomationBehavior delete forwards to dynamic components", AutomationBehaviorTests.DeleteEntityForwardsToComponents),
+      ("Python parser preserves math and logical precedence", ParserTests.PythonParserPreservesPrecedence),
+      ("Python parser handles strings and concat", ParserTests.PythonParserHandlesStringsAndConcat),
+      ("Python parser parses signal comparisons and actions", ParserTests.PythonParserParsesSignalsAndActions),
+      ("Lisp parser round-trips comparison and math expressions", ParserTests.LispParserRoundTripsExpressions),
+      ("Parsers can round-trip between Python and Lisp", ParserTests.ParsersRoundTripAcrossSyntaxes),
+      ("Python parser rejects malformed expressions", ParserTests.PythonParserRejectsMalformedExpressions),
+      ("Lisp parser rejects malformed expressions", ParserTests.LispParserRejectsMalformedExpressions),
   ];
 
   static int Main() {
