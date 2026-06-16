@@ -9,6 +9,7 @@ public sealed class Inject : Attribute {
 
 public interface IContainer {
   object GetInstance(Type type);
+  T GetInstance<T>();
 }
 
 public sealed class TestContainer : IContainer {
@@ -22,5 +23,9 @@ public sealed class TestContainer : IContainer {
     return _factories.TryGetValue(type, out var factory)
         ? factory()
         : Activator.CreateInstance(type);
+  }
+
+  public T GetInstance<T>() {
+    return (T)GetInstance(typeof(T));
   }
 }

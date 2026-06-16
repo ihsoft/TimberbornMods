@@ -66,13 +66,85 @@ namespace Timberborn.Automation {
 }
 
 namespace Timberborn.BlockSystem {
-  public sealed class BlockObject {
+  using System.Collections.Generic;
+  using Timberborn.BaseComponentSystem;
+
+  public sealed class BlockObject : BaseComponent {
     public bool IsFinished { get; set; }
+    public UnityEngine.Vector3Int Coordinates { get; init; }
+  }
+
+  public sealed class BlockObjectSpec : BaseComponent {
+    public Timberborn.BlockObjectTools.Blueprint Blueprint { get; init; } = new();
+  }
+
+  public sealed class BlockService {
+    readonly Dictionary<UnityEngine.Vector3Int, BlockObject> _bottomObjects = [];
+
+    public void SetBottomObjectAt(UnityEngine.Vector3Int coordinates, BlockObject blockObject) {
+      _bottomObjects[coordinates] = blockObject;
+    }
+
+    public BlockObject GetBottomObjectAt(UnityEngine.Vector3Int coordinates) {
+      return _bottomObjects.TryGetValue(coordinates, out var blockObject) ? blockObject : null;
+    }
+  }
+
+  public interface IBlockOccupancyService {
+    bool OccupantPresentOnArea(BlockObject blockObject, float maxDistance);
   }
 
   public interface IFinishedStateListener {
     void OnEnterFinishedState();
     void OnExitFinishedState();
+  }
+}
+
+namespace Timberborn.BlockObjectTools {
+  using System.Collections.Generic;
+  using Timberborn.BlockSystem;
+
+  public sealed class BlockObjectTool {
+    public Template Template { get; init; } = new();
+    public bool _placedAnythingThisFrame = true;
+
+    public void Place(List<Placement> placements) {
+    }
+  }
+
+  public sealed class Placement {
+    public UnityEngine.Vector3Int Coordinates { get; }
+
+    public Placement(UnityEngine.Vector3Int coordinates) {
+      Coordinates = coordinates;
+    }
+  }
+
+  public sealed class Template {
+    public Blueprint Blueprint { get; init; } = new();
+  }
+
+  public sealed class Blueprint {
+    public string Name { get; init; }
+  }
+}
+
+namespace Timberborn.BuilderPrioritySystem {
+  using System;
+  using Timberborn.BaseComponentSystem;
+  using Timberborn.PrioritySystem;
+
+  public sealed class PriorityChangedEventArgs : EventArgs {
+  }
+
+  public sealed class BuilderPrioritizable : BaseComponent {
+    public event EventHandler<PriorityChangedEventArgs> PriorityChanged;
+    public Priority Priority { get; private set; }
+
+    public void SetPriority(Priority priority) {
+      Priority = priority;
+      PriorityChanged?.Invoke(this, new PriorityChangedEventArgs());
+    }
   }
 }
 
@@ -197,6 +269,38 @@ namespace Timberborn.Common {
   }
 }
 
+namespace Timberborn.Conditions {
+}
+
+namespace Timberborn.Coordinates {
+  public static class Vector3IntExtensions {
+    public static string XY(this UnityEngine.Vector3Int coordinates) {
+      return $"{coordinates.x},{coordinates.y}";
+    }
+  }
+}
+
+namespace Timberborn.Explosions {
+  using Timberborn.BaseComponentSystem;
+
+  public sealed class Dynamite : BaseComponent {
+    public int Depth { get; init; } = 1;
+    public int TriggerCalls { get; private set; }
+
+    public void Trigger() {
+      TriggerCalls++;
+    }
+  }
+}
+
+namespace Timberborn.MapIndexSystem {
+  public sealed class MapIndexService {
+    public int CoordinatesToIndex3D(UnityEngine.Vector3Int coordinates) {
+      return 0;
+    }
+  }
+}
+
 namespace Timberborn.StatusSystem {
   public sealed class StatusSubject : Timberborn.BaseComponentSystem.BaseComponent {
     public readonly List<StatusToggle> RegisteredStatuses = [];
@@ -260,6 +364,25 @@ namespace Timberborn.TickSystem {
 
     public virtual void Tick() {
     }
+  }
+}
+
+namespace Timberborn.TerrainSystem {
+  public interface ITerrainService {
+    bool UnsafeCellIsTerrain(int index);
+    int GetTerrainHeightBelow(UnityEngine.Vector3Int coordinates);
+  }
+}
+
+namespace Timberborn.ToolButtonSystem {
+  using System.Collections.Generic;
+
+  public sealed class ToolButtonService {
+    public List<ToolButton> ToolButtons { get; } = [];
+  }
+
+  public sealed class ToolButton {
+    public object Tool { get; init; }
   }
 }
 

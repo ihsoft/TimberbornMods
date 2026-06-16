@@ -121,6 +121,10 @@ static class AutomationBehaviorTests {
       CreatedComponents.Add(component);
       return component;
     }
+
+    public T GetInstance<T>() {
+      return (T)GetInstance(typeof(T));
+    }
   }
 
   sealed class RecordingDynamicComponent : AbstractDynamicComponent, IAwakableComponent,

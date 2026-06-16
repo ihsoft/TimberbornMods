@@ -13,12 +13,19 @@ namespace UnityEngine {
     }
 
     public T AddComponent<T>() where T : new() {
-      return new T();
+      var component = new T();
+      if (component is MonoBehaviour monoBehaviour) {
+        monoBehaviour.gameObject = this;
+      }
+      return component;
     }
   }
 
   public class MonoBehaviour {
     static readonly List<IEnumerator> QueuedCoroutines = [];
+
+    public GameObject gameObject { get; set; } = new("MonoBehaviour");
+    public static int QueuedCoroutineCount => QueuedCoroutines.Count;
 
     public Coroutine StartCoroutine(IEnumerator enumerator) {
       QueuedCoroutines.Add(enumerator);
@@ -35,6 +42,13 @@ namespace UnityEngine {
         }
       }
     }
+
+    public static void ClearQueuedCoroutines() {
+      QueuedCoroutines.Clear();
+    }
+
+    protected static void Destroy(GameObject gameObject) {
+    }
   }
 
   public class Sprite {
@@ -42,6 +56,11 @@ namespace UnityEngine {
 
   public sealed class WaitForEndOfFrame {
   }
+
+  public sealed class WaitForFixedUpdate {
+  }
+
+  public readonly record struct Vector3Int(int x, int y, int z);
 
   public static class Mathf {
     public static int RoundToInt(float value) {

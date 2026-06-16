@@ -107,6 +107,9 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\DebugScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\DebugScriptableComponent.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\DynamiteScriptableComponent.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\DynamiteScriptableComponent.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\AbstractStatusTracker.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\AbstractStatusTracker.cs</Link>
       </Compile>

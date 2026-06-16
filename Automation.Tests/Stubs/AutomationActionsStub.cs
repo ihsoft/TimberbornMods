@@ -8,7 +8,7 @@ public abstract class AutomationActionBase : IgorZ.Automation.AutomationSystem.I
 
   public IgorZ.Automation.AutomationSystem.AutomationBehavior Behavior { get; set; }
   public IgorZ.Automation.AutomationSystem.IAutomationCondition Condition { get; set; }
-  public virtual string TemplateFamily => "";
+  public virtual string TemplateFamily { get; set; } = "";
   public virtual bool IsMarkedForCleanup => false;
 
   public virtual IgorZ.Automation.AutomationSystem.IAutomationAction CloneDefinition() {
@@ -18,4 +18,8 @@ public abstract class AutomationActionBase : IgorZ.Automation.AutomationSystem.I
 
 sealed class ScriptedAction : AutomationActionBase {
   public string Expression { get; set; }
+
+  public void SetExpression(string expression) {
+    Expression = expression;
+  }
 }
