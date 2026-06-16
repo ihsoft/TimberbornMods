@@ -14,6 +14,9 @@ namespace UnityDev.Utils.LogUtilsLite {
     public static void Fine(string format, params object[] args) {
     }
 
+    public static void Info(string format, params object[] args) {
+    }
+
     public static void Warning(string format, params object[] args) {
     }
 

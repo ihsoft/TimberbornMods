@@ -51,6 +51,11 @@ static class Program {
       ("ScriptingService wraps signal callbacks with execution stack",
           ScriptingServiceTests.NotifySignalListenerWrapsCallbackWithExecutionStack),
 
+      // ScriptingEngine.ScriptableComponents
+      ("ValueDef range check accepts values in range", ValueDefTests.RangeCheckValidatorAcceptsValuesInRange),
+      ("ValueDef range check rejects values outside range", ValueDefTests.RangeCheckValidatorRejectsValuesOutsideRange),
+      ("ValueDef range check supports single boundary", ValueDefTests.RangeCheckValidatorSupportsSingleBoundary),
+
       // ScriptingEngine.ScriptableComponents.Components
       ("DebugScriptableComponent exposes definitions", DebugScriptableComponentTests.ExposesDefinitions),
       ("DebugScriptableComponent executes log actions", DebugScriptableComponentTests.ExecutesLogActions),
@@ -79,6 +84,14 @@ static class Program {
           ScriptableComponentBaseTests.GetsComponentOrReportsBadState),
       ("ObjectsCache caches objects by single key", ObjectsCacheTests.CachesObjectsBySingleKey),
       ("ObjectsCache caches objects by composite keys", ObjectsCacheTests.CachesObjectsByCompositeKeys),
+
+      // ScriptingEngine.ScriptableComponents.Extensions
+      ("AutomationExtensionsRegistry gets registered extension by name and type",
+          AutomationExtensionsRegistryTests.GetsRegisteredExtensionByNameAndType),
+      ("AutomationExtensionsRegistry ignores duplicate extension registration",
+          AutomationExtensionsRegistryTests.IgnoresDuplicateExtensionRegistration),
+      ("AutomationExtensionsRegistry returns null for missing extension",
+          AutomationExtensionsRegistryTests.ReturnsNullForMissingExtension),
   ];
 
   static int Main() {

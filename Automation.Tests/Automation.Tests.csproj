@@ -95,6 +95,15 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\ActionDef.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\ActionDef.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Extensions\AutomationExtensionsRegistry.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Extensions\AutomationExtensionsRegistry.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Extensions\IAutomationExtension.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Extensions\IAutomationExtension.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Extensions\IWeatherExtension.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Extensions\IWeatherExtension.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\DebugScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\DebugScriptableComponent.cs</Link>
       </Compile>

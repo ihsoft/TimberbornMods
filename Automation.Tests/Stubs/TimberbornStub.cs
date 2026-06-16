@@ -82,6 +82,12 @@ namespace Timberborn.SingletonSystem {
 }
 
 namespace Timberborn.Common {
+  public static class DictionaryExtensions {
+    public static TValue GetOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key) {
+      return dictionary.TryGetValue(key, out var value) ? value : default;
+    }
+  }
+
   public sealed class EventBus {
     public readonly List<object> RegisteredObjects = [];
 
