@@ -59,6 +59,14 @@ static class Program {
       ("ReferenceManager notifies host once for matching signal", ReferenceManagerTests.NotifiesHostOnceForMatchingSignal),
       ("ReferenceManager allows registration changes while notifying",
           ReferenceManagerTests.AllowsRegistrationChangesWhileNotifying),
+      ("ScriptableComponentBase returns empty definitions by default",
+          ScriptableComponentBaseTests.ReturnsEmptyDefinitionsByDefault),
+      ("ScriptableComponentBase reports unknown signals and actions",
+          ScriptableComponentBaseTests.ReportsUnknownSignalsAndActions),
+      ("ScriptableComponentBase load registers scriptable", ScriptableComponentBaseTests.LoadRegistersScriptable),
+      ("ScriptableComponentBase formats argument hints", ScriptableComponentBaseTests.FormatsArgumentHints),
+      ("ScriptableComponentBase gets component or reports bad state",
+          ScriptableComponentBaseTests.GetsComponentOrReportsBadState),
   ];
 
   static int Main() {
