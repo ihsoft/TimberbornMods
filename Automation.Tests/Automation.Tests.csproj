@@ -77,6 +77,9 @@
       <Compile Include="..\Automation\ScriptingEngine\Parser\ParserBase.cs">
         <Link>Automation\ScriptingEngine\Parser\ParserBase.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Parser\ParserFactory.cs">
+        <Link>Automation\ScriptingEngine\Parser\ParserFactory.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\Parser\ParsingResult.cs">
         <Link>Automation\ScriptingEngine\Parser\ParsingResult.cs</Link>
       </Compile>

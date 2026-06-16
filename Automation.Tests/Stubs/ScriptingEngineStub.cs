@@ -80,6 +80,15 @@ namespace IgorZ.Automation.Settings {
   static class ScriptEngineSettings {
     public static bool CheckArgumentValues => true;
   }
+
+  static class ScriptEditorSettings {
+    public enum ScriptSyntax {
+      Lisp,
+      Python,
+    }
+
+    public static ScriptSyntax DefaultScriptSyntax { get; set; } = ScriptSyntax.Python;
+  }
 }
 
 namespace IgorZ.TimberDev.UI {

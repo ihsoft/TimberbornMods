@@ -30,6 +30,11 @@ static class Program {
       ("LogicalOperator executes boolean composition", ExpressionTests.LogicalOperatorExecutesBooleanComposition),
       ("ConcatOperator concatenates number and string values", ExpressionTests.ConcatOperatorConcatenatesValues),
       ("Operators reject invalid operands", ExpressionTests.OperatorsRejectInvalidOperands),
+      ("ParserFactory selects parser by explicit prefix", ParserFactoryTests.SelectsParserByExplicitPrefix),
+      ("ParserFactory uses preferred parser when no prefix is present", ParserFactoryTests.UsesPreferredParser),
+      ("ParserFactory parses valid conditions and actions", ParserFactoryTests.ParsesValidConditionsAndActions),
+      ("ParserFactory rejects invalid conditions", ParserFactoryTests.RejectsInvalidConditions),
+      ("ParserFactory rejects non-action expressions", ParserFactoryTests.RejectsNonActionExpressions),
   ];
 
   static int Main() {
