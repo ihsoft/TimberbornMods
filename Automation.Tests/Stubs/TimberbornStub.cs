@@ -21,6 +21,10 @@ namespace Timberborn.BaseComponentSystem {
       return component == null;
     }
 
+    public static implicit operator bool(BaseComponent component) {
+      return component != null;
+    }
+
     public static bool operator true(BaseComponent component) {
       return component != null;
     }
@@ -46,6 +50,18 @@ namespace Timberborn.AutomationBuildings {
     public void SwitchOff() {
       IsOn = false;
     }
+  }
+}
+
+namespace Timberborn.Automation {
+  public enum AutomatorState {
+    Off,
+    On,
+  }
+
+  public sealed class Automator : Timberborn.BaseComponentSystem.BaseComponent {
+    public bool IsTransmitter { get; init; }
+    public AutomatorState State { get; set; }
   }
 }
 
@@ -75,6 +91,17 @@ namespace Timberborn.Buildings {
 
     public void Resume() {
       Paused = false;
+    }
+  }
+}
+
+namespace Timberborn.ConstructionSites {
+  public sealed class ConstructionSite : Timberborn.BaseComponentSystem.BaseComponent {
+    public event System.EventHandler OnConstructionSiteProgressed;
+    public float BuildTimeProgress { get; init; }
+
+    public void Progress() {
+      OnConstructionSiteProgressed?.Invoke(this, System.EventArgs.Empty);
     }
   }
 }
