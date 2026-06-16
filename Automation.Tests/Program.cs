@@ -54,6 +54,11 @@ static class Program {
       ("SignalDispatcher rejects duplicate and missing registrations",
           SignalDispatcherTests.RejectsDuplicateAndMissingRegistrations),
       ("SignalDispatcher locks changes while notifying listeners", SignalDispatcherTests.LocksChangesWhileNotifying),
+      ("ReferenceManager tracks action registrations", ReferenceManagerTests.TracksActionRegistrations),
+      ("ReferenceManager tracks signal registrations", ReferenceManagerTests.TracksSignalRegistrations),
+      ("ReferenceManager notifies host once for matching signal", ReferenceManagerTests.NotifiesHostOnceForMatchingSignal),
+      ("ReferenceManager allows registration changes while notifying",
+          ReferenceManagerTests.AllowsRegistrationChangesWhileNotifying),
   ];
 
   static int Main() {
