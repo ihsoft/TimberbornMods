@@ -101,6 +101,9 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ISignalListener.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\ISignalListener.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ObjectsCache.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\ObjectsCache.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ReferenceManager.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\ReferenceManager.cs</Link>
       </Compile>

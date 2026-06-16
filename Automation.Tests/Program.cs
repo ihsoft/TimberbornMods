@@ -67,6 +67,8 @@ static class Program {
       ("ScriptableComponentBase formats argument hints", ScriptableComponentBaseTests.FormatsArgumentHints),
       ("ScriptableComponentBase gets component or reports bad state",
           ScriptableComponentBaseTests.GetsComponentOrReportsBadState),
+      ("ObjectsCache caches objects by single key", ObjectsCacheTests.CachesObjectsBySingleKey),
+      ("ObjectsCache caches objects by composite keys", ObjectsCacheTests.CachesObjectsByCompositeKeys),
   ];
 
   static int Main() {
