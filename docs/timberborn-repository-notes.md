@@ -255,6 +255,9 @@ actually uses, also run that mod's tests as downstream regression coverage. If t
 own tests when they exist. If the change touches shared behavior used by multiple packages, run the affected package
 tests as well.
 
+For test-only changes, run the test project that was changed. Do not run downstream mod tests for test-only changes
+unless the change also modifies shared production code or shared test infrastructure used by those downstream tests.
+
 These relevant tests MUST pass before submitting the change.
 
 Tests must not drive unapproved production-code changes. If adding or expanding tests reveals a production bug, dead
