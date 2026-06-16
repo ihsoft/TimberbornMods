@@ -142,6 +142,16 @@ namespace Timberborn.Localization {
   }
 }
 
+namespace Timberborn.PrioritySystem {
+  public enum Priority {
+    VeryLow,
+    Low,
+    Normal,
+    High,
+    VeryHigh,
+  }
+}
+
 namespace Timberborn.SingletonSystem {
   public interface ILoadableSingleton {
     void Load();
@@ -266,6 +276,42 @@ namespace Timberborn.WaterSourceSystem {
 
     public void Close() {
       IsOpen = false;
+    }
+  }
+}
+
+namespace Timberborn.WorkSystem {
+  using System;
+  using Timberborn.PrioritySystem;
+
+  public sealed class WorkerChangedEventArgs : EventArgs {
+  }
+
+  public sealed class Workplace : Timberborn.BaseComponentSystem.BaseComponent {
+    public event EventHandler<WorkerChangedEventArgs> WorkerAssigned;
+    public event EventHandler<WorkerChangedEventArgs> WorkerUnassigned;
+    public int NumberOfAssignedWorkers { get; init; }
+    public int MaxWorkers { get; init; }
+    public int DesiredWorkers { get; set; }
+    public int UnassignWorkerIfOverstaffedCalls { get; private set; }
+
+    public void UnassignWorkerIfOverstaffed() {
+      UnassignWorkerIfOverstaffedCalls++;
+      WorkerUnassigned?.Invoke(this, new WorkerChangedEventArgs());
+    }
+
+    public void AssignWorker() {
+      WorkerAssigned?.Invoke(this, new WorkerChangedEventArgs());
+    }
+  }
+
+  public sealed class WorkplacePriority : Timberborn.BaseComponentSystem.BaseComponent {
+    public Priority Priority { get; set; }
+    public int SetPriorityCalls { get; private set; }
+
+    public void SetPriority(Priority priority) {
+      Priority = priority;
+      SetPriorityCalls++;
     }
   }
 }

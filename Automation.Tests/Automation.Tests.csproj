@@ -158,6 +158,9 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\StreamGaugeScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\StreamGaugeScriptableComponent.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\WorkplaceScriptableComponent.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\WorkplaceScriptableComponent.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\IScriptable.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\IScriptable.cs</Link>
       </Compile>
