@@ -20,6 +20,14 @@ namespace Timberborn.BaseComponentSystem {
     public static bool operator !(BaseComponent component) {
       return component == null;
     }
+
+    public static bool operator true(BaseComponent component) {
+      return component != null;
+    }
+
+    public static bool operator false(BaseComponent component) {
+      return component == null;
+    }
   }
 
   public interface IAwakableComponent {
@@ -35,6 +43,25 @@ namespace Timberborn.BlockSystem {
   public interface IFinishedStateListener {
     void OnEnterFinishedState();
     void OnExitFinishedState();
+  }
+}
+
+namespace Timberborn.Buildings {
+  public sealed class PausableBuilding : Timberborn.BaseComponentSystem.BaseComponent {
+    public bool Pausable { get; init; } = true;
+    public bool Paused { get; private set; }
+
+    public bool IsPausable() {
+      return Pausable;
+    }
+
+    public void Pause() {
+      Paused = true;
+    }
+
+    public void Resume() {
+      Paused = false;
+    }
   }
 }
 
@@ -59,6 +86,12 @@ namespace Timberborn.EntitySystem {
 
   public interface IDeletableEntity {
     void DeleteEntity();
+  }
+}
+
+namespace Timberborn.Hauling {
+  public sealed class HaulPrioritizable : Timberborn.BaseComponentSystem.BaseComponent {
+    public bool Prioritized { get; set; }
   }
 }
 
