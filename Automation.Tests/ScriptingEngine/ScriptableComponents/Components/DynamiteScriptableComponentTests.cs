@@ -1,9 +1,14 @@
+using System.Reflection;
+using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
+using IgorZ.TimberDev.Utils;
+using Timberborn.BlockSystem;
 using Timberborn.Explosions;
 using Timberborn.Localization;
+using Timberborn.PrioritySystem;
 using UnityEngine;
 
 namespace Automation.Tests;
@@ -68,6 +73,22 @@ static class DynamiteScriptableComponentTests {
     MonoBehaviour.ClearQueuedCoroutines();
   }
 
+  public static void WaitAndPlaceRepeatsDynamiteInOrder() {
+    var rule = new DynamiteScriptableComponent.DetonateAndMaybeRepeatRule();
+    var repeatService = new TestRepeatService();
+    rule.RepeatService = repeatService;
+
+    RunCoroutine(rule.WaitAndPlace(new AutomationBehavior(), Priority.High, 2));
+
+    Assert.Equal(
+        "CaptureTarget,GetEffectiveDepth,IsDynamiteAlive,IsOccupantPresent,IsDynamiteAlive,Detonate,"
+        + "IsDynamiteAlive,GetExpectedPlaceCoordinates,CanPlaceAt,TryPlaceDynamite,GetPlacedDynamite,"
+        + "ConfigurePlacedDynamite",
+        string.Join(",", repeatService.Calls));
+    Assert.Equal(Priority.High, repeatService.BuilderPriority);
+    Assert.Equal(2, repeatService.RepeatCount);
+  }
+
   public static void InstallsAndUninstallsActions() {
     var component = CreateComponent();
     var behavior = new AutomationBehavior();
@@ -90,6 +111,7 @@ static class DynamiteScriptableComponentTests {
   }
 
   static DynamiteScriptableComponent CreateComponent() {
+    SetDependencyContainer(new TestContainer());
     var component = new DynamiteScriptableComponent();
     component.InjectDependencies(new TestLoc(), TestScripting.CreateService());
     component.Load();
@@ -98,6 +120,24 @@ static class DynamiteScriptableComponentTests {
 
   static ActionOperator Action(string actionName, AutomationBehavior behavior) {
     return ActionOperator.Create(new ExpressionContext { ScriptHost = behavior }, actionName, []);
+  }
+
+  static void SetDependencyContainer(IContainer container) {
+    var constructor = typeof(StaticBindings).GetConstructor(
+        BindingFlags.Instance | BindingFlags.NonPublic,
+        null,
+        [typeof(IContainer)],
+        null);
+    constructor.Invoke([container]);
+  }
+
+  static void RunCoroutine(System.Collections.IEnumerator enumerator) {
+    var steps = 0;
+    while (enumerator.MoveNext()) {
+      if (++steps > 20) {
+        throw new System.InvalidOperationException("Coroutine did not finish.");
+      }
+    }
   }
 
   sealed class TestNonConstantValueExpr : IValueExpr {
@@ -112,6 +152,68 @@ static class DynamiteScriptableComponentTests {
   sealed class TestLoc : ILoc {
     public string T(string key, params object[] args) {
       return key;
+    }
+  }
+
+  sealed class TestRepeatService : DynamiteScriptableComponent.DynamiteRepeatService {
+    readonly DynamiteScriptableComponent.DynamiteRepeatTarget _target = new(
+        "Dynamite", new Dynamite(), new BlockObject(), new Vector3Int(4, 5, 6));
+    bool _alive = true;
+
+    public System.Collections.Generic.List<string> Calls { get; } = [];
+    public Priority BuilderPriority { get; private set; }
+    public int RepeatCount { get; private set; }
+
+    public override DynamiteScriptableComponent.DynamiteRepeatTarget CaptureTarget(AutomationBehavior behavior) {
+      Calls.Add(nameof(CaptureTarget));
+      return _target;
+    }
+
+    public override int GetEffectiveDepth(DynamiteScriptableComponent.DynamiteRepeatTarget target) {
+      Calls.Add(nameof(GetEffectiveDepth));
+      return 2;
+    }
+
+    public override bool IsDynamiteAlive(DynamiteScriptableComponent.DynamiteRepeatTarget target) {
+      Calls.Add(nameof(IsDynamiteAlive));
+      return _alive;
+    }
+
+    public override bool IsOccupantPresent(DynamiteScriptableComponent.DynamiteRepeatTarget target) {
+      Calls.Add(nameof(IsOccupantPresent));
+      return false;
+    }
+
+    public override void Detonate(DynamiteScriptableComponent.DynamiteRepeatTarget target) {
+      Calls.Add(nameof(Detonate));
+      _alive = false;
+    }
+
+    public override Vector3Int GetExpectedPlaceCoordinates(
+        DynamiteScriptableComponent.DynamiteRepeatTarget target, int effectiveDepth) {
+      Calls.Add(nameof(GetExpectedPlaceCoordinates));
+      return new Vector3Int(4, 5, 4);
+    }
+
+    public override bool CanPlaceAt(Vector3Int expectedPlaceCoord) {
+      Calls.Add(nameof(CanPlaceAt));
+      return true;
+    }
+
+    public override bool TryPlaceDynamite(string blueprintName, Vector3Int expectedPlaceCoord) {
+      Calls.Add(nameof(TryPlaceDynamite));
+      return true;
+    }
+
+    public override BlockObject GetPlacedDynamite(Vector3Int expectedPlaceCoord) {
+      Calls.Add(nameof(GetPlacedDynamite));
+      return new BlockObject();
+    }
+
+    public override void ConfigurePlacedDynamite(BlockObject newDynamite, Priority builderPriority, int repeatCount) {
+      Calls.Add(nameof(ConfigurePlacedDynamite));
+      BuilderPriority = builderPriority;
+      RepeatCount = repeatCount;
     }
   }
 }

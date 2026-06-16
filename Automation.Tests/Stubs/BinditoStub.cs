@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Bindito.Core;
 
@@ -20,12 +21,26 @@ public sealed class TestContainer : IContainer {
   }
 
   public object GetInstance(Type type) {
-    return _factories.TryGetValue(type, out var factory)
+    var instance = _factories.TryGetValue(type, out var factory)
         ? factory()
         : Activator.CreateInstance(type);
+    InjectDependencies(instance);
+    return instance;
   }
 
   public T GetInstance<T>() {
     return (T)GetInstance(typeof(T));
+  }
+
+  void InjectDependencies(object instance) {
+    var methods = instance.GetType()
+        .GetMethods()
+        .Where(x => x.GetCustomAttributes(typeof(Inject), inherit: true).Any());
+    foreach (var method in methods) {
+      var args = method.GetParameters()
+          .Select(x => GetInstance(x.ParameterType))
+          .ToArray();
+      method.Invoke(instance, args);
+    }
   }
 }

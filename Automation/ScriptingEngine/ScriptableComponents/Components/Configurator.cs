@@ -22,6 +22,7 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<ConstructableScriptableComponent.ConstructableStateTracker>().AsTransient();
     containerDefinition.Bind<DynamiteScriptableComponent>().AsSingleton();
     containerDefinition.Bind<DynamiteScriptableComponent.DynamiteStateController>().AsTransient();
+    containerDefinition.Bind<DynamiteScriptableComponent.DynamiteRepeatService>().AsSingleton();
     containerDefinition.Bind<FloodgateScriptableComponent>().AsSingleton();
     containerDefinition.Bind<FloodgateScriptableComponent.HeightChangeTracker>().AsTransient();
     containerDefinition.Bind<FlowControlScriptableComponent>().AsSingleton();

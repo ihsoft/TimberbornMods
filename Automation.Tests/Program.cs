@@ -96,6 +96,8 @@ static class Program {
           DynamiteScriptableComponentTests.ValidatesRepeatCount),
       ("DynamiteScriptableComponent executes detonate action by queueing coroutine",
           DynamiteScriptableComponentTests.ExecutesDetonateActionByQueueingCoroutine),
+      ("DynamiteScriptableComponent wait and place repeats dynamite in order",
+          DynamiteScriptableComponentTests.WaitAndPlaceRepeatsDynamiteInOrder),
       ("DynamiteScriptableComponent installs and uninstalls actions",
           DynamiteScriptableComponentTests.InstallsAndUninstallsActions),
       ("DynamiteScriptableComponent reports unknown action", DynamiteScriptableComponentTests.ReportsUnknownAction),
