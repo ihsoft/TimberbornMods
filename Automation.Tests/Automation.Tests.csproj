@@ -119,6 +119,9 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ConstructableScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\ConstructableScriptableComponent.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\CollectableScriptableComponent.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\CollectableScriptableComponent.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\FlowControlScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\FlowControlScriptableComponent.cs</Link>
       </Compile>

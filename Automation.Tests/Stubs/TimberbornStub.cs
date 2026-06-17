@@ -11,6 +11,9 @@ namespace Timberborn.BaseComponentSystem {
 
     public void SetComponent<T>(T component) where T : class {
       _components[typeof(T)] = component;
+      if (!AllComponents.Contains(component)) {
+        AllComponents.Add(component);
+      }
     }
 
     public T GetComponent<T>() where T : class {
@@ -72,6 +75,14 @@ namespace Timberborn.BlockSystem {
   public sealed class BlockObject : BaseComponent {
     public bool IsFinished { get; set; }
     public UnityEngine.Vector3Int Coordinates { get; init; }
+
+    public void GetComponents<T>(List<T> components) where T : class {
+      foreach (var component in AllComponents) {
+        if (component is T typedComponent) {
+          components.Add(typedComponent);
+        }
+      }
+    }
   }
 
   public sealed class BlockObjectSpec : BaseComponent {
@@ -80,6 +91,7 @@ namespace Timberborn.BlockSystem {
 
   public sealed class BlockService {
     readonly Dictionary<UnityEngine.Vector3Int, BlockObject> _bottomObjects = [];
+    readonly Dictionary<UnityEngine.Vector3Int, List<BlockObject>> _objects = [];
 
     public void SetBottomObjectAt(UnityEngine.Vector3Int coordinates, BlockObject blockObject) {
       _bottomObjects[coordinates] = blockObject;
@@ -87,6 +99,14 @@ namespace Timberborn.BlockSystem {
 
     public BlockObject GetBottomObjectAt(UnityEngine.Vector3Int coordinates) {
       return _bottomObjects.TryGetValue(coordinates, out var blockObject) ? blockObject : null;
+    }
+
+    public void SetObjectsAt(UnityEngine.Vector3Int coordinates, params BlockObject[] blockObjects) {
+      _objects[coordinates] = [..blockObjects];
+    }
+
+    public List<BlockObject> GetObjectsAt(UnityEngine.Vector3Int coordinates) {
+      return _objects.TryGetValue(coordinates, out var blockObjects) ? blockObjects : [];
     }
   }
 
@@ -167,6 +187,47 @@ namespace Timberborn.Buildings {
   }
 }
 
+namespace Timberborn.BuildingsNavigation {
+  using System;
+  using System.Collections.Generic;
+  using Timberborn.BaseComponentSystem;
+
+  public sealed class RangeChangedEventArgs : EventArgs {
+  }
+
+  public sealed class BuildingTerrainRange : BaseComponent {
+    readonly List<UnityEngine.Vector3Int> _range = [];
+
+    public event EventHandler<RangeChangedEventArgs> RangeChanged;
+
+    public void SetRange(params UnityEngine.Vector3Int[] coordinates) {
+      _range.Clear();
+      _range.AddRange(coordinates);
+    }
+
+    public IEnumerable<UnityEngine.Vector3Int> GetRange() {
+      return _range;
+    }
+
+    public void RaiseRangeChanged() {
+      RangeChanged?.Invoke(this, new RangeChangedEventArgs());
+    }
+  }
+}
+
+namespace Timberborn.Cutting {
+  using System;
+  using Timberborn.BaseComponentSystem;
+
+  public sealed class Cuttable : BaseComponent {
+    public event EventHandler WasCut;
+
+    public void Cut() {
+      WasCut?.Invoke(this, EventArgs.Empty);
+    }
+  }
+}
+
 namespace Timberborn.ConstructionSites {
   public static class ConstructionSiteInventoryInitializer {
     public const string InventoryComponentName = "ConstructionSite";
@@ -203,6 +264,22 @@ namespace Timberborn.EntitySystem {
 
   public interface IDeletableEntity {
     void DeleteEntity();
+  }
+
+  public sealed class EntityInitializedEvent {
+    public Timberborn.BaseComponentSystem.BaseComponent Entity { get; }
+
+    public EntityInitializedEvent(Timberborn.BaseComponentSystem.BaseComponent entity) {
+      Entity = entity;
+    }
+  }
+
+  public sealed class EntityDeletedEvent {
+    public Timberborn.BaseComponentSystem.BaseComponent Entity { get; }
+
+    public EntityDeletedEvent(Timberborn.BaseComponentSystem.BaseComponent entity) {
+      Entity = entity;
+    }
   }
 }
 
@@ -279,6 +356,38 @@ namespace Timberborn.Goods {
   }
 }
 
+namespace Timberborn.GoodStackSystem {
+  using System;
+  using Timberborn.BaseComponentSystem;
+
+  public sealed class GoodStack : BaseComponent {
+    public event EventHandler GoodStackDisabled;
+    public StackInventory Inventory { get; } = new();
+
+    public void DisableStack() {
+      GoodStackDisabled?.Invoke(this, EventArgs.Empty);
+    }
+  }
+
+  public sealed class StackInventory {
+    public bool Enabled { get; set; } = true;
+    public bool IsEmpty { get; set; }
+  }
+}
+
+namespace Timberborn.Growing {
+  using System;
+  using Timberborn.BaseComponentSystem;
+
+  public sealed class Growable : BaseComponent {
+    public event EventHandler HasGrown;
+
+    public void Grow() {
+      HasGrown?.Invoke(this, EventArgs.Empty);
+    }
+  }
+}
+
 namespace Timberborn.Hauling {
   public sealed class HaulPrioritizable : Timberborn.BaseComponentSystem.BaseComponent {
     public bool Prioritized { get; set; }
@@ -331,6 +440,10 @@ namespace Timberborn.SingletonSystem {
     public void Register(object obj) {
       RegisteredObjects.Add(obj);
     }
+
+    public void Unregister(object obj) {
+      RegisteredObjects.Remove(obj);
+    }
   }
 
   [System.AttributeUsage(System.AttributeTargets.Method)]
@@ -342,6 +455,14 @@ namespace Timberborn.Common {
   public static class DictionaryExtensions {
     public static TValue GetOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key) {
       return dictionary.TryGetValue(key, out var value) ? value : default;
+    }
+  }
+
+  public static class CollectionExtensions {
+    public static void AddRange<T>(this ISet<T> set, IEnumerable<T> values) {
+      foreach (var value in values) {
+        set.Add(value);
+      }
     }
   }
 }
@@ -450,6 +571,54 @@ namespace Timberborn.InventorySystem {
 
     public InventoryStockChangedEventArgs(GoodAmount goodAmount) {
       GoodAmount = goodAmount;
+    }
+  }
+}
+
+namespace Timberborn.Forestry {
+  using System.Collections.Generic;
+  using Timberborn.BaseComponentSystem;
+
+  public sealed class LumberjackFlagWorkplaceBehavior : BaseComponent {
+  }
+
+  public sealed class TreeCuttingArea {
+    readonly HashSet<UnityEngine.Vector3Int> _disabledCoordinates = [];
+
+    public void SetInCuttingArea(UnityEngine.Vector3Int coordinates, bool inArea) {
+      if (inArea) {
+        _disabledCoordinates.Remove(coordinates);
+      } else {
+        _disabledCoordinates.Add(coordinates);
+      }
+    }
+
+    public bool IsInCuttingArea(UnityEngine.Vector3Int coordinates) {
+      return !_disabledCoordinates.Contains(coordinates);
+    }
+  }
+
+  public sealed class TreeCuttingAreaChangedEvent {
+  }
+}
+
+namespace Timberborn.NaturalResourcesLifecycle {
+  using System;
+  using Timberborn.BaseComponentSystem;
+
+  public sealed class LivingNaturalResource : BaseComponent {
+    public event EventHandler Died;
+    public event EventHandler ReversedDeath;
+    public bool Alive { get; private set; } = true;
+
+    public void Die() {
+      Alive = false;
+      Died?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void ReverseDeath() {
+      Alive = true;
+      ReversedDeath?.Invoke(this, EventArgs.Empty);
     }
   }
 }
@@ -572,6 +741,11 @@ namespace Timberborn.WaterSourceSystem {
   }
 }
 
+namespace Timberborn.Ruins {
+  public sealed class ScavengerWorkplaceBehavior : Timberborn.BaseComponentSystem.BaseComponent {
+  }
+}
+
 namespace Timberborn.WeatherSystem {
   public sealed class WeatherService {
     public bool IsHazardousWeather { get; init; }
@@ -579,8 +753,51 @@ namespace Timberborn.WeatherSystem {
 }
 
 namespace Timberborn.Yielding {
+  using System;
+  using System.Collections.Generic;
+  using Timberborn.BaseComponentSystem;
+  using Timberborn.NaturalResourcesLifecycle;
+
   public sealed class InRangeYielderGoodAllower {
   }
+
+  public sealed class YieldRemovingBuilding : BaseComponent {
+    readonly HashSet<object> _disallowedSpecs = [];
+
+    public void Disallow(object yielderSpec) {
+      _disallowedSpecs.Add(yielderSpec);
+    }
+
+    public bool IsAllowed(object yielderSpec) {
+      return !_disallowedSpecs.Contains(yielderSpec);
+    }
+  }
+
+  public sealed class Yielder : BaseComponent {
+    public event EventHandler YieldDecreased;
+    public event EventHandler YieldAdded;
+    public object YielderSpec { get; init; } = new();
+    public bool IsYielding { get; private set; } = true;
+
+    public void SetYielding(bool isYielding) {
+      IsYielding = isYielding;
+    }
+
+    public void DecreaseYield() {
+      YieldDecreased?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void AddYield() {
+      YieldAdded?.Invoke(this, EventArgs.Empty);
+    }
+
+    public bool IsAlive() {
+      return GetComponent<LivingNaturalResource>()?.Alive ?? true;
+    }
+  }
+}
+
+namespace Timberborn.YielderFinding {
 }
 
 namespace Timberborn.WorkSystem {
