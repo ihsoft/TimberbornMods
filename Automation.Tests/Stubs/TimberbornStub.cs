@@ -452,6 +452,23 @@ namespace Timberborn.SingletonSystem {
 }
 
 namespace Timberborn.Common {
+  public readonly struct ReadOnlyHashSet<T> {
+    public readonly HashSet<T> _set;
+    public int Count => _set.Count;
+
+    public ReadOnlyHashSet(HashSet<T> set) {
+      _set = set;
+    }
+
+    public HashSet<T>.Enumerator GetEnumerator() {
+      return _set.GetEnumerator();
+    }
+
+    public bool Contains(T item) {
+      return _set.Contains(item);
+    }
+  }
+
   public static class DictionaryExtensions {
     public static TValue GetOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key) {
       return dictionary.TryGetValue(key, out var value) ? value : default;
@@ -496,6 +513,45 @@ namespace Timberborn.MapIndexSystem {
     public int CoordinatesToIndex3D(UnityEngine.Vector3Int coordinates) {
       return 0;
     }
+  }
+}
+
+namespace Timberborn.Multithreading {
+  using System;
+
+  public readonly struct ParallelizerHandle {
+  }
+
+  public interface IParallelizerSingleTask {
+    void Run();
+  }
+
+  public interface IParallelizerLoopTask {
+    void Run(int index);
+  }
+
+  public interface IParallelizer {
+    long LastTaskTimestamp { get; }
+    int NumberOfThreads { get; }
+
+    ParallelizerHandle Schedule<T>(in T task) where T : struct, IParallelizerSingleTask;
+    ParallelizerHandle Schedule<T>(in T task, ParallelizerHandle dependency)
+        where T : struct, IParallelizerSingleTask;
+    ParallelizerHandle Schedule<T>(in T task, ReadOnlySpan<ParallelizerHandle> dependencies)
+        where T : struct, IParallelizerSingleTask;
+    ParallelizerHandle Schedule<T>(int fromInclusive, int toExclusive, int batchSize, in T task)
+        where T : struct, IParallelizerLoopTask;
+    ParallelizerHandle Schedule<T>(
+        int fromInclusive, int toExclusive, int batchSize, in T task, ParallelizerHandle dependency)
+        where T : struct, IParallelizerLoopTask;
+    ParallelizerHandle Schedule<T>(
+        int fromInclusive, int toExclusive, int batchSize, in T task, ReadOnlySpan<ParallelizerHandle> dependencies)
+        where T : struct, IParallelizerLoopTask;
+
+    void StartScheduling();
+    void StopScheduling();
+    void Wait();
+    void ThrowIfAnyPendingTasks();
   }
 }
 
@@ -623,6 +679,104 @@ namespace Timberborn.NaturalResourcesLifecycle {
   }
 }
 
+namespace Timberborn.Planting {
+  using System;
+  using System.Collections.Generic;
+  using Timberborn.BaseComponentSystem;
+  using Timberborn.BlockSystem;
+  using Timberborn.Common;
+
+  public readonly struct PlantingSpot {
+    public UnityEngine.Vector3Int Coordinates { get; }
+    public string ResourceToPlant { get; }
+    public BlockObject PlantingBlocker { get; }
+
+    public PlantingSpot(UnityEngine.Vector3Int coordinates, string resourceToPlant, BlockObject plantingBlocker) {
+      Coordinates = coordinates;
+      ResourceToPlant = resourceToPlant;
+      PlantingBlocker = plantingBlocker;
+    }
+  }
+
+  public sealed class PlantingService {
+    readonly Dictionary<UnityEngine.Vector3Int, PlantingSpot> _plantingSpots = [];
+    readonly Dictionary<UnityEngine.Vector3Int, string> _resources = [];
+    public readonly HashSet<UnityEngine.Vector3Int> _reservedCoordinates = [];
+
+    public void SetSpot(UnityEngine.Vector3Int coordinates, string resource, bool hasSpot = true) {
+      _resources[coordinates] = resource;
+      if (hasSpot) {
+        _plantingSpots[coordinates] = new PlantingSpot(coordinates, resource, null);
+      } else {
+        _plantingSpots.Remove(coordinates);
+      }
+    }
+
+    public PlantingSpot? GetSpotAt(UnityEngine.Vector3Int coordinates) {
+      return _plantingSpots.TryGetValue(coordinates, out var spot) ? spot : null;
+    }
+
+    public string GetResourceAt(UnityEngine.Vector3Int coordinates) {
+      return _resources.GetValueOrDefault(coordinates);
+    }
+
+    public PlantingSpot CreatePlantingSpot(UnityEngine.Vector3Int coordinates, string resourceToPlant) {
+      return new PlantingSpot(coordinates, resourceToPlant, null);
+    }
+  }
+
+  public sealed class PlantingSpotFinder : BaseComponent {
+    readonly HashSet<UnityEngine.Vector3Int> _blockedCoordinates = [];
+
+    public void SetCanPlantAt(UnityEngine.Vector3Int coordinates, bool canPlant) {
+      if (canPlant) {
+        _blockedCoordinates.Remove(coordinates);
+      } else {
+        _blockedCoordinates.Add(coordinates);
+      }
+    }
+
+    public bool CanPlantAt(PlantingSpot plantingSpot, object prioritizedPlantableSpec) {
+      return !_blockedCoordinates.Contains(plantingSpot.Coordinates);
+    }
+  }
+
+  public sealed class InRangePlantingCoordinates : BaseComponent {
+    readonly HashSet<UnityEngine.Vector3Int> _coordinates = [];
+
+    public void SetCoordinates(params UnityEngine.Vector3Int[] coordinates) {
+      _coordinates.Clear();
+      foreach (var coordinate in coordinates) {
+        _coordinates.Add(coordinate);
+      }
+    }
+
+    public ReadOnlyHashSet<UnityEngine.Vector3Int> GetCoordinates() {
+      return new ReadOnlyHashSet<UnityEngine.Vector3Int>(_coordinates);
+    }
+  }
+
+  public sealed class PlantingCoordinatesSetEvent {
+    public UnityEngine.Vector3Int Coordinates { get; }
+    public string Resource { get; }
+
+    public PlantingCoordinatesSetEvent(UnityEngine.Vector3Int coordinates, string resource) {
+      Coordinates = coordinates;
+      Resource = resource;
+    }
+  }
+
+  public sealed class PlantingCoordinatesUnsetEvent {
+    public UnityEngine.Vector3Int Coordinates { get; }
+    public string Resource { get; }
+
+    public PlantingCoordinatesUnsetEvent(UnityEngine.Vector3Int coordinates, string resource) {
+      Coordinates = coordinates;
+      Resource = resource;
+    }
+  }
+}
+
 namespace Timberborn.StatusSystem {
   public sealed class StatusSubject : Timberborn.BaseComponentSystem.BaseComponent {
     public readonly List<StatusToggle> RegisteredStatuses = [];
@@ -673,6 +827,14 @@ namespace Timberborn.StatusSystem {
 }
 
 namespace Timberborn.TickSystem {
+  public interface ITickableSingleton {
+    void Tick();
+  }
+
+  public interface IParallelTickableSingleton {
+    void StartParallelTick();
+  }
+
   public abstract class TickableComponent : Timberborn.BaseComponentSystem.BaseComponent {
     public bool Enabled { get; private set; } = true;
 

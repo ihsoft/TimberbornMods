@@ -60,6 +60,10 @@ namespace UnityEngine {
   public sealed class WaitForFixedUpdate {
   }
 
+  public static class Time {
+    public static float timeScale = 1f;
+  }
+
   public readonly record struct Vector3Int(int x, int y, int z);
 
   public static class Mathf {

@@ -149,6 +149,9 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\PausableScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\PausableScriptableComponent.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\PlantableScriptableComponent.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\PlantableScriptableComponent.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\PrioritizableScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\PrioritizableScriptableComponent.cs</Link>
       </Compile>
