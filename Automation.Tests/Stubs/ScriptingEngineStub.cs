@@ -46,15 +46,6 @@ namespace IgorZ.TimberDev.UI {
 }
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components {
-  static class InventoryScriptableComponent {
-    public static Timberborn.BaseComponentSystem.BaseComponent GetInventory(
-        Timberborn.BaseComponentSystem.BaseComponent building, bool throwIfNotFound = true) {
-      return null;
-    }
-  }
-}
-
-namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components {
   static class DictionaryExtensions {
     public static TValue GetOrAdd<TKey, TValue>(this System.Collections.Generic.Dictionary<TKey, TValue> dictionary,
                                                 TKey key)

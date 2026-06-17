@@ -168,6 +168,10 @@ namespace Timberborn.Buildings {
 }
 
 namespace Timberborn.ConstructionSites {
+  public static class ConstructionSiteInventoryInitializer {
+    public const string InventoryComponentName = "ConstructionSite";
+  }
+
   public sealed class ConstructionSite : Timberborn.BaseComponentSystem.BaseComponent {
     public event System.EventHandler OnConstructionSiteProgressed;
     public float BuildTimeProgress { get; init; }
@@ -199,6 +203,79 @@ namespace Timberborn.EntitySystem {
 
   public interface IDeletableEntity {
     void DeleteEntity();
+  }
+}
+
+namespace Timberborn.Emptying {
+  using System;
+  using Timberborn.BaseComponentSystem;
+
+  public sealed class Emptiable : BaseComponent {
+    public event EventHandler MarkedForEmptying;
+    public event EventHandler UnmarkedForEmptying;
+    public bool IsMarkedForEmptying { get; private set; }
+    public int MarkForEmptyingCalls { get; private set; }
+    public int UnmarkForEmptyingCalls { get; private set; }
+
+    public void MarkForEmptyingWithoutStatus() {
+      IsMarkedForEmptying = true;
+      MarkForEmptyingCalls++;
+      MarkedForEmptying?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void UnmarkForEmptying() {
+      IsMarkedForEmptying = false;
+      UnmarkForEmptyingCalls++;
+      UnmarkedForEmptying?.Invoke(this, EventArgs.Empty);
+    }
+  }
+}
+
+namespace Timberborn.Goods {
+  public readonly struct GoodAmount {
+    public string GoodId { get; }
+    public int Amount { get; }
+
+    public GoodAmount(string goodId, int amount) {
+      GoodId = goodId;
+      Amount = amount;
+    }
+  }
+
+  public sealed class GoodSpec {
+    public string Id { get; init; }
+    public LocalizedText PluralDisplayName { get; init; }
+  }
+
+  public interface IGoodService {
+    GoodSpec GetGood(string id);
+    GoodSpec GetGoodOrNull(string id);
+  }
+
+  public sealed class LocalizedText {
+    public string Value { get; }
+
+    public LocalizedText(string value) {
+      Value = value;
+    }
+  }
+
+  public readonly struct StorableGood {
+    public string GoodId { get; }
+
+    public StorableGood(string goodId) {
+      GoodId = goodId;
+    }
+  }
+
+  public readonly struct StorableGoodAmount {
+    public StorableGood StorableGood { get; }
+    public int Amount { get; }
+
+    public StorableGoodAmount(StorableGood storableGood, int amount) {
+      StorableGood = storableGood;
+      Amount = amount;
+    }
   }
 }
 
@@ -297,6 +374,82 @@ namespace Timberborn.MapIndexSystem {
   public sealed class MapIndexService {
     public int CoordinatesToIndex3D(UnityEngine.Vector3Int coordinates) {
       return 0;
+    }
+  }
+}
+
+namespace Timberborn.InventorySystem {
+  using System;
+  using System.Collections.Generic;
+  using System.Linq;
+  using Timberborn.BaseComponentSystem;
+  using Timberborn.Goods;
+
+  public sealed class Inventories : BaseComponent {
+    readonly List<Inventory> _allInventories = [];
+
+    public IReadOnlyList<Inventory> AllInventories => _allInventories;
+
+    public void AddInventory(Inventory inventory) {
+      _allInventories.Add(inventory);
+    }
+  }
+
+  public sealed class Inventory : BaseComponent {
+    readonly List<StorableGoodAmount> _allowedGoods = [];
+    readonly HashSet<string> _inputGoods = [];
+    readonly HashSet<string> _outputGoods = [];
+    readonly Dictionary<string, int> _amounts = [];
+    public object _goodDisallower;
+
+    public Inventory(bool isYielderInventory = false) {
+      if (isYielderInventory) {
+        _goodDisallower = new Timberborn.Yielding.InRangeYielderGoodAllower();
+      }
+    }
+
+    public string ComponentName { get; init; } = "Storage";
+    public bool IsOutput => _outputGoods.Count > 0;
+    public IReadOnlyList<StorableGoodAmount> AllowedGoods => _allowedGoods;
+    public IReadOnlyCollection<string> InputGoods => _inputGoods;
+    public IReadOnlyCollection<string> OutputGoods => _outputGoods;
+    public event EventHandler<InventoryStockChangedEventArgs> InventoryStockChanged;
+
+    public void AddInputGood(string goodId, int capacity) {
+      _inputGoods.Add(goodId);
+      _allowedGoods.Add(new StorableGoodAmount(new StorableGood(goodId), capacity));
+    }
+
+    public void AddOutputGood(string goodId, int capacity) {
+      _outputGoods.Add(goodId);
+      _allowedGoods.Add(new StorableGoodAmount(new StorableGood(goodId), capacity));
+    }
+
+    public void SetAmount(string goodId, int amount) {
+      _amounts[goodId] = amount;
+      InventoryStockChanged?.Invoke(this, new InventoryStockChangedEventArgs(new GoodAmount(goodId, amount)));
+    }
+
+    public int AmountInStock(string goodId) {
+      return _amounts.GetValueOrDefault(goodId);
+    }
+
+    public int LimitedAmount(string goodId) {
+      return _allowedGoods.First(x => x.StorableGood.GoodId == goodId).Amount;
+    }
+
+    public void GetCapacity(List<GoodAmount> capacity) {
+      foreach (var good in _allowedGoods) {
+        capacity.Add(new GoodAmount(good.StorableGood.GoodId, good.Amount));
+      }
+    }
+  }
+
+  public readonly struct InventoryStockChangedEventArgs {
+    public GoodAmount GoodAmount { get; }
+
+    public InventoryStockChangedEventArgs(GoodAmount goodAmount) {
+      GoodAmount = goodAmount;
     }
   }
 }
@@ -422,6 +575,11 @@ namespace Timberborn.WaterSourceSystem {
 namespace Timberborn.WeatherSystem {
   public sealed class WeatherService {
     public bool IsHazardousWeather { get; init; }
+  }
+}
+
+namespace Timberborn.Yielding {
+  public sealed class InRangeYielderGoodAllower {
   }
 }
 

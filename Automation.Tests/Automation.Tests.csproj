@@ -125,6 +125,9 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\FloodgateScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\FloodgateScriptableComponent.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\InventoryScriptableComponent.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\InventoryScriptableComponent.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ISignalListener.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\ISignalListener.cs</Link>
       </Compile>
@@ -181,6 +184,9 @@
       </Compile>
       <Compile Include="..\TimberDev\Utils\ReflectionsHelper.cs">
         <Link>TimberDev\Utils\ReflectionsHelper.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\Utils\ComponentsAccessor.cs">
+        <Link>TimberDev\Utils\ComponentsAccessor.cs</Link>
       </Compile>
     </ItemGroup>
 </Project>

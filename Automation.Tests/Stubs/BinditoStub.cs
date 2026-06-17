@@ -8,6 +8,9 @@ namespace Bindito.Core;
 public sealed class Inject : Attribute {
 }
 
+public sealed class BaseInstantiator {
+}
+
 public interface IContainer {
   object GetInstance(Type type);
   T GetInstance<T>();
