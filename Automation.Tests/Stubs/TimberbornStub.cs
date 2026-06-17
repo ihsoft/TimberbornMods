@@ -20,6 +20,10 @@ namespace Timberborn.BaseComponentSystem {
       return _components.TryGetValue(typeof(T), out var component) ? (T)component : null;
     }
 
+    public T GetComponentInChildren<T>() where T : class {
+      return GetComponent<T>();
+    }
+
     public static bool operator !(BaseComponent component) {
       return component == null;
     }
@@ -65,6 +69,11 @@ namespace Timberborn.Automation {
   public sealed class Automator : Timberborn.BaseComponentSystem.BaseComponent {
     public bool IsTransmitter { get; init; }
     public AutomatorState State { get; set; }
+  }
+}
+
+namespace Timberborn.Bots {
+  public sealed class BotSpec : Timberborn.BaseComponentSystem.BaseComponent {
   }
 }
 
@@ -253,9 +262,29 @@ namespace Timberborn.DuplicationSystem {
   }
 }
 
+namespace Timberborn.DwellingSystem {
+  using Timberborn.BaseComponentSystem;
+
+  public readonly struct DwellingStatistics {
+    public int FreeBeds { get; init; }
+    public int OccupiedBeds { get; init; }
+  }
+
+  public sealed class DistrictDwellingStatisticsProvider : BaseComponent {
+    public DwellingStatistics Statistics { get; set; }
+
+    public DwellingStatistics GetDwellingStatistics() {
+      return Statistics;
+    }
+  }
+}
+
 namespace Timberborn.EntitySystem {
   public sealed class EntityComponent : Timberborn.BaseComponentSystem.BaseComponent {
     public object EntityId { get; set; } = "entity";
+  }
+
+  public sealed class Citizen : Timberborn.BaseComponentSystem.BaseComponent {
   }
 
   public interface IInitializableEntity {
@@ -388,6 +417,98 @@ namespace Timberborn.Growing {
   }
 }
 
+namespace Timberborn.GameDistricts {
+  using System;
+  using System.Collections.Generic;
+  using Timberborn.BaseComponentSystem;
+  using Timberborn.EntitySystem;
+
+  public sealed class DistrictBuilding : BaseComponent {
+    public event EventHandler ReassignedDistrict;
+    public event EventHandler ReassignedConstructionDistrict;
+    public DistrictCenter District { get; private set; }
+    public DistrictCenter InstantDistrict { get; private set; }
+    public DistrictCenter ConstructionDistrict { get; private set; }
+
+    public void SetDistrict(DistrictCenter district) {
+      District = district;
+      ReassignedDistrict?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void SetInstantDistrict(DistrictCenter district) {
+      InstantDistrict = district;
+    }
+
+    public void SetConstructionDistrict(DistrictCenter district) {
+      ConstructionDistrict = district;
+      ReassignedConstructionDistrict?.Invoke(this, EventArgs.Empty);
+    }
+  }
+
+  public sealed class DistrictCenter : BaseComponent {
+    public DistrictPopulation DistrictPopulation { get; } = new();
+    public DistrictBuildingRegistry DistrictBuildingRegistry { get; } = new();
+  }
+
+  public sealed class DistrictPopulation {
+    public event EventHandler<CitizenAssignedEventArgs> CitizenAssigned;
+    public event EventHandler<CitizenUnassignedEventArgs> CitizenUnassigned;
+    public List<Citizen> Beavers { get; } = [];
+    public List<Citizen> Bots { get; } = [];
+
+    public void AssignBeaver(Citizen citizen) {
+      Beavers.Add(citizen);
+      CitizenAssigned?.Invoke(this, new CitizenAssignedEventArgs(citizen));
+    }
+
+    public void AssignBot(Citizen citizen) {
+      Bots.Add(citizen);
+      CitizenAssigned?.Invoke(this, new CitizenAssignedEventArgs(citizen));
+    }
+
+    public void Unassign(Citizen citizen) {
+      Beavers.Remove(citizen);
+      Bots.Remove(citizen);
+      CitizenUnassigned?.Invoke(this, new CitizenUnassignedEventArgs(citizen));
+    }
+  }
+
+  public sealed class CitizenAssignedEventArgs : EventArgs {
+    public Citizen Citizen { get; }
+
+    public CitizenAssignedEventArgs(Citizen citizen) {
+      Citizen = citizen;
+    }
+  }
+
+  public sealed class CitizenUnassignedEventArgs : EventArgs {
+    public Citizen Citizen { get; }
+
+    public CitizenUnassignedEventArgs(Citizen citizen) {
+      Citizen = citizen;
+    }
+  }
+
+  public sealed class DistrictBuildingRegistry {
+    public event EventHandler<FinishedBuildingRegisteredEventArgs> FinishedBuildingRegistered;
+    public event EventHandler<FinishedBuildingUnregisteredEventArgs> FinishedBuildingUnregistered;
+
+    public void RegisterFinishedBuilding() {
+      FinishedBuildingRegistered?.Invoke(this, new FinishedBuildingRegisteredEventArgs());
+    }
+
+    public void UnregisterFinishedBuilding() {
+      FinishedBuildingUnregistered?.Invoke(this, new FinishedBuildingUnregisteredEventArgs());
+    }
+  }
+
+  public sealed class FinishedBuildingRegisteredEventArgs : EventArgs {
+  }
+
+  public sealed class FinishedBuildingUnregisteredEventArgs : EventArgs {
+  }
+}
+
 namespace Timberborn.Hauling {
   public sealed class HaulPrioritizable : Timberborn.BaseComponentSystem.BaseComponent {
     public bool Prioritized { get; set; }
@@ -472,6 +593,15 @@ namespace Timberborn.Common {
   public static class DictionaryExtensions {
     public static TValue GetOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key) {
       return dictionary.TryGetValue(key, out var value) ? value : default;
+    }
+
+    public static TValue GetOrAdd<TKey, TValue>(
+        this Dictionary<TKey, TValue> dictionary, TKey key, System.Func<TValue> factory) {
+      if (!dictionary.TryGetValue(key, out var value)) {
+        value = factory();
+        dictionary.Add(key, value);
+      }
+      return value;
     }
   }
 
@@ -835,6 +965,9 @@ namespace Timberborn.TickSystem {
     void StartParallelTick();
   }
 
+  public interface ILateTickable {
+  }
+
   public abstract class TickableComponent : Timberborn.BaseComponentSystem.BaseComponent {
     public bool Enabled { get; private set; } = true;
 
@@ -905,6 +1038,66 @@ namespace Timberborn.WaterSourceSystem {
 
 namespace Timberborn.Ruins {
   public sealed class ScavengerWorkplaceBehavior : Timberborn.BaseComponentSystem.BaseComponent {
+  }
+}
+
+namespace Timberborn.ResourceCountingSystem {
+  using System.Collections.Generic;
+  using Timberborn.BaseComponentSystem;
+
+  public readonly struct ResourceCount {
+    public int AvailableStock { get; init; }
+    public int InputOutputCapacity { get; init; }
+  }
+
+  public sealed class DistrictResourceCounter : BaseComponent {
+    public readonly StockCounter _stockCounter = new();
+    public readonly CapacityCounter _capacityCounter = new();
+
+    public ResourceCount GetResourceCount(string goodId) {
+      return new ResourceCount {
+          AvailableStock = _stockCounter.GetInputOutputStock(goodId) + _stockCounter.GetOutputStock(goodId),
+          InputOutputCapacity = _capacityCounter.GetInputOutputCapacity(goodId),
+      };
+    }
+  }
+
+  public sealed class StockCounter {
+    public readonly Dictionary<string, int> _inputOutputStock = [];
+    public readonly Dictionary<string, int> _outputStock = [];
+
+    public void SetInputOutputStock(string goodId, int value) {
+      _inputOutputStock[goodId] = value;
+    }
+
+    public void SetOutputStock(string goodId, int value) {
+      _outputStock[goodId] = value;
+    }
+
+    public int GetInputOutputStock(string goodId) {
+      return _inputOutputStock.GetValueOrDefault(goodId);
+    }
+
+    public int GetOutputStock(string goodId) {
+      return _outputStock.GetValueOrDefault(goodId);
+    }
+  }
+
+  public sealed class CapacityCounter {
+    public readonly Dictionary<string, int> _inputOutputCapacity = [];
+    public readonly Dictionary<string, int> _outputCapacity = [];
+
+    public void SetInputOutputCapacity(string goodId, int value) {
+      _inputOutputCapacity[goodId] = value;
+    }
+
+    public void SetOutputCapacity(string goodId, int value) {
+      _outputCapacity[goodId] = value;
+    }
+
+    public int GetInputOutputCapacity(string goodId) {
+      return _inputOutputCapacity.GetValueOrDefault(goodId);
+    }
   }
 }
 

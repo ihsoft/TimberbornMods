@@ -122,6 +122,9 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\CollectableScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\CollectableScriptableComponent.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\DistrictScriptableComponent.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\DistrictScriptableComponent.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\FlowControlScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\FlowControlScriptableComponent.cs</Link>
       </Compile>
