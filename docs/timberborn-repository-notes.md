@@ -25,9 +25,21 @@ Do not assume that all mods use identical project layouts.
 
 Always inspect the specific mod before making changes.
 
+## Mod-Specific Instruction Files
+
 Mod-specific `AGENTS.md` files are welcome when a rule applies only to one mod. Treat the root `AGENTS.md` as the
-repository-wide baseline, then apply the closest mod-specific `AGENTS.md` for files in that mod. Keep mod-specific
-rules out of the root instructions unless they also apply across the repository.
+repository-wide baseline, then apply the closest mod-specific `AGENTS.md` for files in that mod.
+
+Good candidates for a mod-specific `AGENTS.md`:
+
+- exact package-data paths,
+- known localization files,
+- mod-specific test commands,
+- release or package quirks,
+- compatibility notes for public APIs,
+- known game-version or lifecycle pitfalls.
+
+Do not put these details in the root `AGENTS.md` unless they apply repository-wide.
 
 ---
 

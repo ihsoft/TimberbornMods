@@ -2,44 +2,35 @@
 
 This repository contains Timberborn mods.
 
-Before making changes, read the relevant instruction files listed below and follow them unless the user explicitly says otherwise.
+Before making changes, read this file and the instruction files that apply to the current task. Follow them unless the
+user explicitly says otherwise.
 
-## Required reading
+## How to choose instructions to read
 
-Always read first:
+Always start with this root `AGENTS.md`.
 
-1. `docs/csharp-formatting-rules-for-ai-agents.md`
-2. `docs/timberborn-modding-rules-for-ai-agents.md`
-3. `docs/timberborn-modding-howto-for-ai-agents.md`
-4. `docs/timberborn-repository-notes.md`
-5. `docs/timberborn-lessons-learned.md`
+Then read only the instruction files that apply to the current task. Do not load every document blindly.
 
-When working with TimberCommons, also read:
-
-6. `docs/TimberCommons-modding-notes-for-ai-agents.md`
-
-When bootstrapping a new repository that only copied `AGENTS.md` and `docs/`, also read:
-
-7. `docs/timberborn-new-repository-bootstrap-for-ai-agents.md`
-
-When preparing, validating, or publishing releases to Steam Workshop or Mod.IO, also read:
-
-8. `docs/timberborn-release-publishing-rules-for-ai-agents.md`
-
-## Instruction hierarchy
-
-The instruction files serve different purposes:
-
-| File | Purpose |
+| Condition | Read |
 |--------|--------|
-| `docs/csharp-formatting-rules-for-ai-agents.md` | C# formatting and code style |
-| `docs/timberborn-modding-rules-for-ai-agents.md` | Repository-specific Timberborn modding rules |
-| `docs/timberborn-modding-howto-for-ai-agents.md` | How to discover, design, and implement new Timberborn mods |
-| `docs/timberborn-repository-notes.md` | Repository-specific architectural and workflow notes |
-| `docs/timberborn-lessons-learned.md` | Practical discoveries and development experience |
-| `docs/TimberCommons-modding-notes-for-ai-agents.md` | TimberCommons-specific implementation notes |
-| `docs/timberborn-new-repository-bootstrap-for-ai-agents.md` | New repository setup and first-mod bootstrap workflow |
-| `docs/timberborn-release-publishing-rules-for-ai-agents.md` | Release validation and publishing rules |
+| Generating or modifying C# code | `docs/csharp-formatting-rules-for-ai-agents.md` |
+| Modifying Timberborn mod code, data, UI, localization, or package files | `docs/timberborn-modding-rules-for-ai-agents.md` and `docs/timberborn-repository-notes.md` |
+| Designing a new feature or new mod | `docs/timberborn-modding-howto-for-ai-agents.md` and `docs/timberborn-lessons-learned.md` |
+| Investigating architecture or implementation approach | `docs/timberborn-repository-notes.md` and `docs/timberborn-lessons-learned.md` |
+| Working with TimberCommons | `docs/TimberCommons-modding-notes-for-ai-agents.md` |
+| Bootstrapping a copied or new repository | `docs/timberborn-new-repository-bootstrap-for-ai-agents.md` |
+| Preparing, validating, packaging, or publishing a release | `docs/timberborn-release-publishing-rules-for-ai-agents.md` |
+| Organizing or updating agent rules | This `AGENTS.md`, relevant files under `docs/`, and any local `AGENTS.md` whose scope is being changed |
+
+## Rule priority
+
+When instructions conflict, follow this priority:
+
+1. Explicit user instruction for the current task.
+2. The closest applicable local `AGENTS.md`.
+3. This root `AGENTS.md`.
+4. Relevant files under `docs/`.
+5. Existing code and repository conventions.
 
 ## Rule scope and local AGENTS.md files
 
@@ -57,21 +48,16 @@ When working inside a specific mod:
 Local `AGENTS.md` files may add or narrow rules for their mod. They should not weaken repository-wide safety rules,
 generated-reference rules, localization requirements, release stop conditions, or explicit user instructions.
 
-## Read only what is relevant
+Use a mod-specific `AGENTS.md` for rules that apply only to one mod, such as:
 
-Do not load all instruction files blindly.
+- package data locations,
+- mod-specific test commands,
+- release quirks,
+- public API compatibility notes,
+- known pitfalls of that mod,
+- mod-specific localization or UI conventions.
 
-Read:
-
-- formatting rules when generating C# code,
-- Timberborn modding rules when modifying repository code,
-- Timberborn modding how-to when designing new features,
-- repository notes when making architectural decisions,
-- lessons learned when investigating implementation approaches,
-- TimberCommons notes only when working with TimberCommons.
-- new repository bootstrap notes only when setting up a repository that does not yet have local links, generated
-  references, or established mod project structure.
-- release publishing rules only when preparing, validating, or publishing releases to Steam Workshop or Mod.IO.
+Keep repository-wide rules in this root `AGENTS.md` or in files under `docs/`.
 
 ## Core principles
 
@@ -126,9 +112,32 @@ When the user asks to organize, clarify, or update agent rules, change only rule
 Other repository files may be changing in parallel by other agents. Do not inspect, interpret, fix, format, stage,
 revert, or otherwise account for unrelated non-rule changes during a rules-maintenance task.
 
+## Task checklists
+
+### Rules-maintenance task
+
+- Edit only rule files such as `AGENTS.md`, local `AGENTS.md` files, and files under `docs/`.
+- Ignore unrelated non-rule changes in the working tree.
+- Run `git diff --check` for edited rule files before committing.
+- Stage only the rule files changed for this task.
+
+### Test-only task
+
+- Run the changed test project.
+- Do not change production code unless the user explicitly asks.
+- If tests expose a production issue, stop and ask.
+
+### Unity-resource task
+
+- Remind the user to rebuild or export Unity assets before real-game testing.
+
 ## Required tests
 
 Before submitting a change, run the tests relevant to the changed package.
+
+Use `docs/timberborn-repository-notes.md` as the authoritative source for package-specific test selection.
+
+Short version:
 
 For TimberDev-only changes, run:
 
@@ -136,17 +145,10 @@ For TimberDev-only changes, run:
 dotnet run --project TimberDev.Tests\TimberDev.Tests.csproj
 ```
 
-TimberDev is a standalone package that depends only on itself and the game APIs. Do not use other mods as a
-TimberDev validation gate by default.
-
-If a TimberDev change affects logic that another mod actually uses, also run that mod's tests as downstream regression
-coverage.
-
-For changes in a mod, run that mod's own tests when they exist. If the change touches shared behavior used by multiple
-packages, run the affected package tests as well.
-
-For test-only changes, run the test project that was changed. Do not run downstream mod tests for test-only changes
-unless the change also modifies shared production code or shared test infrastructure used by those downstream tests.
+- For mod changes, run that mod's own tests when they exist.
+- For shared behavior changes, run affected package tests.
+- For test-only changes, run the changed test project.
+- Do not use downstream mod tests as automatic gates unless the changed package actually affects them.
 
 These relevant tests MUST pass before submitting the change.
 
@@ -223,6 +225,20 @@ Use reflection only when necessary.
 If unsure, ask or state the uncertainty.
 
 Do not invent Timberborn APIs, services, classes, paths, files, behaviors, or extension points.
+
+## Stop and ask when
+
+Stop and ask the user instead of guessing when:
+
+- the requested file cannot be read completely,
+- project intent or architecture is unclear,
+- multiple reasonable implementation paths exist,
+- a test reveals a production bug, dead code, missing API, or design mismatch but the user did not ask to fix
+  production code,
+- a release version, source path, package contents, platform ID, or credentials are inconsistent,
+- Steam/Mod.IO descriptions differ from local `Workshop` descriptions,
+- bootstrap paths such as `_GAME!`, `_MODS!`, `_WORKSHOP!`, or `_LOGS!` cannot be discovered safely,
+- a rule change would weaken an existing safety rule.
 
 ## Testing rule
 
