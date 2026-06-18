@@ -55,6 +55,18 @@ sealed class InvertRuleButtonProvider(ParserFactory parserFactory) : IEditorButt
       }
       return null;
     }
+    if (actioName == "FillValve.SetHeight") {
+      var fillValve = automationBehavior.GetComponent<FillValve>();
+      var argHeight = ((IValueExpr)action.Operands[0]).ValueFn().AsInt;
+      var maxTargetDepth = fillValve.MaxTargetHeight - fillValve.MinTargetHeight;
+      if (argHeight == 0) {
+        return $"(act FillValve.SetHeight {maxTargetDepth * 100})";
+      }
+      if (argHeight == maxTargetDepth) {
+        return "(act FillValve.SetHeight 0)";
+      }
+      return null;
+    }
     if (actioName is "Workplace.SetWorkers" or "Workplace.RemoveWorkers") {
       var workplace = automationBehavior.GetComponent<Workplace>();
       var argNumWorkers = actioName == "Workplace.SetWorkers" ? ((IValueExpr)action.Operands[0]).ValueFn().AsInt : 0;
@@ -67,6 +79,8 @@ sealed class InvertRuleButtonProvider(ParserFactory parserFactory) : IEditorButt
       return null;
     }
     return action.ActionName switch {
+        "FillValve.Open" => "(act FillValve.Close)",
+        "FillValve.Close" => "(act FillValve.Open)",
         "FlowControl.Open" => "(act FlowControl.Close)",
         "FlowControl.Close" => "(act FlowControl.Open)",
         "Inventory.StartEmptying" => "(act Inventory.StopEmptying)",

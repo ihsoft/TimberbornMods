@@ -1015,6 +1015,25 @@ namespace Timberborn.WaterBuildings {
     }
   }
 
+  public sealed class FillValve : Timberborn.BaseComponentSystem.BaseComponent {
+    public int MinTargetHeight { get; init; }
+    public int MaxTargetHeight { get; init; } = 1;
+    public float TargetHeight { get; private set; }
+    public bool TargetHeightEnabled { get; private set; }
+    public int SetTargetHeightCalls { get; private set; }
+    public int SetTargetHeightEnabledCalls { get; private set; }
+
+    public void SetTargetHeightEnabledAndSynchronize(bool value) {
+      TargetHeightEnabled = value;
+      SetTargetHeightEnabledCalls++;
+    }
+
+    public void SetTargetHeightAndSynchronize(float value) {
+      TargetHeight = value;
+      SetTargetHeightCalls++;
+    }
+  }
+
   public sealed class StreamGauge : Timberborn.BaseComponentSystem.BaseComponent {
     public float WaterLevel { get; init; }
     public float ContaminationLevel { get; init; }

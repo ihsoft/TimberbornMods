@@ -137,6 +137,15 @@ static class Program {
       ("FlowControlScriptableComponent executes open and close actions",
           FlowControlScriptableComponentTests.ExecutesOpenAndCloseActions),
       ("FlowControlScriptableComponent reports unknown action", FlowControlScriptableComponentTests.ReportsUnknownAction),
+      ("FillValveScriptableComponent exposes actions for fill valve",
+          FillValveScriptableComponentTests.ExposesActionsForFillValve),
+      ("FillValveScriptableComponent hides actions for missing fill valve",
+          FillValveScriptableComponentTests.HidesActionsForMissingFillValve),
+      ("FillValveScriptableComponent executes open close and set height actions",
+          FillValveScriptableComponentTests.ExecutesOpenCloseAndSetHeightActions),
+      ("FillValveScriptableComponent builds action definitions for target depth",
+          FillValveScriptableComponentTests.BuildsActionDefinitionsForTargetDepth),
+      ("FillValveScriptableComponent reports unknown action", FillValveScriptableComponentTests.ReportsUnknownAction),
       ("FloodgateScriptableComponent exposes signal and action for floodgate",
           FloodgateScriptableComponentTests.ExposesSignalAndActionForFloodgate),
       ("FloodgateScriptableComponent hides signal and action for missing floodgate",
@@ -280,6 +289,12 @@ static class Program {
           ScriptableComponentBaseTests.GetsComponentOrReportsBadState),
       ("ObjectsCache caches objects by single key", ObjectsCacheTests.CachesObjectsBySingleKey),
       ("ObjectsCache caches objects by composite keys", ObjectsCacheTests.CachesObjectsByCompositeKeys),
+
+      // ScriptingEngineUI
+      ("InvertRuleButtonProvider inverts FillValve.SetHeight argument without changing action",
+          InvertRuleButtonProviderTests.InvertsFillValveSetHeightArgumentWithoutChangingAction),
+      ("InvertRuleButtonProvider inverts FillValve open and close actions",
+          InvertRuleButtonProviderTests.InvertsFillValveOpenAndCloseActions),
 
       // ScriptingEngine.ScriptableComponents.Extensions
       ("AutomationExtensionsRegistry gets registered extension by name and type",

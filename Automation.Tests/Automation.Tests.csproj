@@ -131,8 +131,17 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\FloodgateScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\FloodgateScriptableComponent.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\FillValveScriptableComponent.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\FillValveScriptableComponent.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\InventoryScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\InventoryScriptableComponent.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngineUI\IEditorButtonProvider.cs">
+        <Link>Automation\ScriptingEngineUI\IEditorButtonProvider.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngineUI\InvertRuleButtonProvider.cs">
+        <Link>Automation\ScriptingEngineUI\InvertRuleButtonProvider.cs</Link>
       </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ISignalListener.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\ISignalListener.cs</Link>
