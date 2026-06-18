@@ -16,6 +16,8 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<ReferenceManager>().AsTransient();
 
     // The building-specific components. The declaring order defines the order of teh items in UI.
+    containerDefinition.Bind<BreedingPodScriptableComponent>().AsSingleton();
+    containerDefinition.Bind<BreedingPodScriptableComponent.BreedingPodProgressTracker>().AsTransient();
     containerDefinition.Bind<CollectableScriptableComponent>().AsSingleton();
     containerDefinition.Bind<CollectableScriptableComponent.GatherableTracker>().AsTransient();
     containerDefinition.Bind<ConstructableScriptableComponent>().AsSingleton();
