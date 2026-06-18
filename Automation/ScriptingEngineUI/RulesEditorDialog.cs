@@ -157,7 +157,7 @@ sealed class RulesEditorDialog : AbstractDialog {
   }
 
   public GameAutomationRuleConflictState GetGameAutomationRuleConflictState(RuleRow ruleRow) {
-    if (!EntityPanelSettings.PreventGameAutomationConflicts) {
+    if (!EntityPanelSettings.PreventGameAutomationConflicts || !IsGameAutomationAvailable()) {
       return GameAutomationRuleConflictState.None;
     }
     var ruleNumber = _ruleRows.IndexOf(ruleRow) + 1;
@@ -211,7 +211,7 @@ sealed class RulesEditorDialog : AbstractDialog {
   }
 
   string GetGameAutomationConflictNotification() {
-    if (!EntityPanelSettings.PreventGameAutomationConflicts) {
+    if (!EntityPanelSettings.PreventGameAutomationConflicts || !IsGameAutomationAvailable()) {
       return null;
     }
     var conflictingRules = _gameAutomationRuleSaveConflictDetector.GetConflictingRuleNumbers(
@@ -234,8 +234,16 @@ sealed class RulesEditorDialog : AbstractDialog {
   }
 
   bool IsControlledByGameAutomation() {
-    var automatable = _rulesUiHelper.AutomationBehavior.GetComponent<Automatable>();
+    var automatable = GetGameAutomatable();
     return automatable && automatable.IsAutomated;
+  }
+
+  bool IsGameAutomationAvailable() {
+    return GetGameAutomatable();
+  }
+
+  Automatable GetGameAutomatable() {
+    return _rulesUiHelper.AutomationBehavior.GetComponent<Automatable>();
   }
 
   #endregion
