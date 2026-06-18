@@ -76,6 +76,17 @@ frFR.txt
 
 When adding new localization keys, update all existing localization files when practical.
 
+When adding or editing localized UI strings, do not translate only from the English source text.
+
+First search the base game's extracted localization files for the same feature, building, resource, status, action, or
+nearby concept. Prefer the game's established terminology and style, adjusting capitalization and punctuation to the
+local UI context.
+
+If no close game wording exists, translate normally and keep the existing mod localization style.
+
+When the wording choice depends on a game term, cite or mention the exact game localization keys used as evidence in
+the final response or implementation notes.
+
 ## Localization file format
 
 Localization files have three columns:
