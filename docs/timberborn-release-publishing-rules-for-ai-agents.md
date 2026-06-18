@@ -22,6 +22,9 @@ Examples:
 
 Do not treat close versions as aliases. Ask the user to confirm the exact version.
 
+Before release preparation, verify that the target package changelog has a matching version section and user-visible
+release notes. Changelog workflow rules live in `docs/timberborn-repository-notes.md`.
+
 ## Exact source paths only
 
 If `release.json` points to `Package.SourcePath`, use only that exact path.
@@ -207,6 +210,17 @@ Steam Guard mobile confirmation may take longer than an agent command timeout.
 Use a login-only/retry mode that opens SteamCMD for interactive login and does not build, stage, or publish anything.
 
 Do not store Steam passwords in repository files or local config files.
+
+## Closing GitHub issues after release
+
+When publishing a mod release, identify the issue-backed changes included in that release.
+
+Before closing any GitHub issues, show the user the exact list of issues proposed for closure and ask for explicit
+confirmation.
+
+Never close GitHub issues automatically as a side effect of committing, pushing, packaging, or publishing.
+
+If release scope is unclear, ask instead of closing issues.
 
 ## Stop on uncertainty
 

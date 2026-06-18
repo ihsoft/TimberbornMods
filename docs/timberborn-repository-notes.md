@@ -171,6 +171,56 @@ Do not update Wiki pages for internal-only refactoring unless public behavior or
 
 ---
 
+## Package Changelogs
+
+When completing a user-visible feature or bug fix for a mod package, update that package's `CHANGELOG.md` before
+committing. Do not add noisy changelog entries for internal refactors, test-only changes, or documentation-only changes
+unless they have user-visible release-note value or the user asks for it.
+
+Keep entries short. For features, describe the new capability. For fixes, describe the broken behavior before the fix.
+
+If the work corresponds to a GitHub issue, include the issue number in the bracket prefix:
+
+```text
+* [Feature #83] Add breeding pod progress signal.
+* [Fix #123] Game could crash when opening the panel.
+```
+
+If the changelog has no top section marked `(TBD)`, start one using this heading format:
+
+```text
+# v4.4.0 (TBD)
+```
+
+Choose the next version from the last published version of that package:
+
+- feature work starts the next minor version,
+- fix-only work starts the next patch version.
+
+If an existing `(TBD)` section was started as a patch version and a feature is added before publication, rename the
+pending section to the next minor version because feature scope dominates patch scope.
+
+Each package may have its own changelog and version stream. Update the target package changelog, not a repository-wide
+changelog, unless the task explicitly affects repository-wide release notes.
+
+---
+
+## GitHub Issue References in Commits
+
+For commits that implement or fix a GitHub issue, link the issue in the commit body with:
+
+```text
+Refs #83
+```
+
+Do not use auto-closing keywords such as `Closes #83`, `Fixes #83`, or `Resolves #83` in ordinary implementation
+commits.
+
+In this repository, code may be committed before the mod is published to players. Auto-closing the issue at commit,
+push, or merge time can make the public issue state misleading.
+
+---
+
 ## Localization
 
 Localization files are typically stored as text files containing CSV content.
