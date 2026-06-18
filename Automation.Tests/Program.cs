@@ -36,6 +36,10 @@ static class Program {
           GameAutomationConflictDetectorTests.IgnoresRuleSaveConflictsWhenGameAutomationIsDisabled),
       ("GameAutomationRuleSaveConflictDetector ignores disabled and deleted rule save conflicts",
           GameAutomationConflictDetectorTests.IgnoresDisabledAndDeletedRuleSaveConflicts),
+      ("GameAutomationRuleSaveConflictDetector detects state changing rule candidates",
+          GameAutomationConflictDetectorTests.DetectsStateChangingRuleCandidates),
+      ("GameAutomationRuleSaveConflictDetector ignores non-state-changing, disabled, and deleted rule candidates",
+          GameAutomationConflictDetectorTests.IgnoresNonStateChangingDisabledAndDeletedRuleCandidates),
 
       // ScriptingEngine.Parser
       ("Python parser preserves math and logical precedence", ParserTests.PythonParserPreservesPrecedence),

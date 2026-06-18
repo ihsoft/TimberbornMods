@@ -31,7 +31,8 @@
                             </engine:VisualElement>
                         </engine:VisualElement>
                     </engine:VisualElement>
-                    <engine:VisualElement name="" style="top: 0; right: 0; position: absolute; flex-direction: row;">
+                    <engine:VisualElement name="" style="top: 0; right: 0; position: absolute; flex-direction: row; align-items: center;">
+                        <engine:Label text="!" name="GameAutomationConflictIcon" focusable="true" class="game-text-big rule-conflict-icon"/>
                         <Timberborn.CoreUI.NineSliceButton name="MoveRuleUpBtn" class="button-arrow-up button-square"/>
                         <Timberborn.CoreUI.NineSliceButton name="MoveRuleDownBtn" class="button-arrow-down button-square"/>
                     </engine:VisualElement>

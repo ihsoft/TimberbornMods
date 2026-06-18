@@ -32,11 +32,17 @@ sealed class RuleRow {
   const string PauseRuleBtnLocKey = "IgorZ.Automation.Scripting.Editor.PauseRuleBtn";
   const string ResetChangesBtnLocKey = "IgorZ.Automation.Scripting.Editor.ResetChangesBtn";
   const string ResumeRuleBtnLocKey = "IgorZ.Automation.Scripting.Editor.ResumeRuleBtn";
+  const string GameAutomationBlocksSaveLocKey =
+      "IgorZ.Automation.Scripting.Editor.GameAutomationBlocksSaveRuleHint";
+  const string GameAutomationWillBeBlockedLocKey =
+      "IgorZ.Automation.Scripting.Editor.GameAutomationWillBeBlockedRuleHint";
 
   const string EditModeStyle = "editmode-rule";
   const string OriginalRuleStyle = "original-rule";
   const string ModifiedRuleStyle = "modified-rule";
   const string DeletedTextStyle = "automation-red-text";
+  const string ConflictBlocksSaveStyle = "rule-conflict-icon--blocks-save";
+  const string ConflictWillBlockStyle = "rule-conflict-icon--will-block";
 
   #region API
 
@@ -100,6 +106,7 @@ sealed class RuleRow {
       _isDeleted = value;
       _deletedStateOverlay.ToggleDisplayStyle(value);
       _ruleContainer.ToggleDisplayStyle(!value);
+      UpdateGameAutomationConflictIcon();
     }
   }
   bool _isDeleted;
@@ -112,6 +119,7 @@ sealed class RuleRow {
       _resumeRuleBtn.ToggleDisplayStyle(!IsInEditMode && !_isEnabled);
       CheckIfModified();
       SetRuleText();
+      UpdateGameAutomationConflictIcon();
     }
   }
   bool _isEnabled = true;
@@ -263,6 +271,7 @@ sealed class RuleRow {
   readonly VisualElement _templateFamilySection;
   readonly VisualElement _ruleContainer;
   readonly VisualElement _deletedStateOverlay;
+  readonly VisualElement _gameAutomationConflictIcon;
 
   readonly Button _revertChangesBtn;
   readonly Button _pauseRuleBtn;
@@ -291,6 +300,9 @@ sealed class RuleRow {
     moveRuleUpBtn.clicked += MoveRuleUpAction;
     var moveRuleDownBtn = Root.Q<Button>("MoveRuleDownBtn");
     moveRuleDownBtn.clicked += MoveRuleDownAction;
+    _gameAutomationConflictIcon = Root.Q("GameAutomationConflictIcon");
+    _gameAutomationConflictIcon.ToggleDisplayStyle(false);
+    tooltipRegistrar.RegisterUpdatable(_gameAutomationConflictIcon, GetGameAutomationConflictTooltip);
 
     var deleteRuleBtn = Root.Q<Button>("DeleteRuleBtn");
     tooltipRegistrar.RegisterLocalizable(deleteRuleBtn, DeleteRuleBtnLocKey);
@@ -325,6 +337,7 @@ sealed class RuleRow {
     _ruleButtons.Clear();
     _notifications.ToggleDisplayStyle(false);
     _revertChangesBtn.ToggleDisplayStyle(false);
+    _gameAutomationConflictIcon.ToggleDisplayStyle(false);
   }
 
   void SetContainerClass() {
@@ -366,6 +379,35 @@ sealed class RuleRow {
         _uiFactory.T(ConditionLabelLocKey) + " " + conditionDesc
         + "\n" + _uiFactory.T(ActionLabelLocKey) + " " + actionDesc;
     ruleTextLabel.SetEnabled(IsEnabled);
+    UpdateGameAutomationConflictIcon();
+  }
+
+  void UpdateGameAutomationConflictIcon() {
+    if (_gameAutomationConflictIcon == null) {
+      return;
+    }
+    _gameAutomationConflictIcon.EnableInClassList(ConflictBlocksSaveStyle, false);
+    _gameAutomationConflictIcon.EnableInClassList(ConflictWillBlockStyle, false);
+    if (IsInEditMode || RulesEditorDialog == null) {
+      _gameAutomationConflictIcon.ToggleDisplayStyle(false);
+      return;
+    }
+    var conflictState = RulesEditorDialog.GetGameAutomationRuleConflictState(this);
+    _gameAutomationConflictIcon.ToggleDisplayStyle(
+        conflictState != RulesEditorDialog.GameAutomationRuleConflictState.None);
+    _gameAutomationConflictIcon.EnableInClassList(
+        ConflictBlocksSaveStyle, conflictState == RulesEditorDialog.GameAutomationRuleConflictState.BlocksSave);
+    _gameAutomationConflictIcon.EnableInClassList(
+        ConflictWillBlockStyle, conflictState == RulesEditorDialog.GameAutomationRuleConflictState.BlocksGameAutomation);
+  }
+
+  string GetGameAutomationConflictTooltip() {
+    return RulesEditorDialog?.GetGameAutomationRuleConflictState(this) switch {
+        RulesEditorDialog.GameAutomationRuleConflictState.BlocksSave => _uiFactory.T(GameAutomationBlocksSaveLocKey),
+        RulesEditorDialog.GameAutomationRuleConflictState.BlocksGameAutomation =>
+            _uiFactory.T(GameAutomationWillBeBlockedLocKey),
+        _ => null,
+    };
   }
 
   string GetDescription(IExpression expression) {

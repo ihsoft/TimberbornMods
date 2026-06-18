@@ -15,13 +15,17 @@ sealed class GameAutomationRuleSaveConflictDetector(GameAutomationConflictDetect
       return conflictingRules;
     }
     foreach (var rule in rules) {
-      if (!rule.IsDeleted
-          && rule.IsEnabled
-          && conflictDetector.IsBuildingStateChangingAction(rule.ParsedAction)) {
+      if (IsStateChangingRule(rule)) {
         conflictingRules.Add(rule.RuleNumber);
       }
     }
     return conflictingRules;
+  }
+
+  public bool IsStateChangingRule(RuleCandidate rule) {
+    return !rule.IsDeleted
+        && rule.IsEnabled
+        && conflictDetector.IsBuildingStateChangingAction(rule.ParsedAction);
   }
 
   public readonly record struct RuleCandidate(int RuleNumber, bool IsDeleted, bool IsEnabled, ActionOperator ParsedAction);

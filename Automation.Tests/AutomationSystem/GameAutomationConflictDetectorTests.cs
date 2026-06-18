@@ -119,6 +119,23 @@ static class GameAutomationConflictDetectorTests {
     Assert.Equal(0, conflicts.Count);
   }
 
+  public static void DetectsStateChangingRuleCandidates() {
+    var behavior = CreateBehavior();
+    var detector = new GameAutomationRuleSaveConflictDetector(new GameAutomationConflictDetector());
+
+    Assert.True(detector.IsStateChangingRule(Rule(1, ParseAction(behavior, "FillValve.Open()"))));
+    Assert.True(detector.IsStateChangingRule(Rule(2, ParseAction(behavior, "ThrottlingValve.SetFlow(1)"))));
+  }
+
+  public static void IgnoresNonStateChangingDisabledAndDeletedRuleCandidates() {
+    var behavior = CreateBehavior();
+    var detector = new GameAutomationRuleSaveConflictDetector(new GameAutomationConflictDetector());
+
+    Assert.False(detector.IsStateChangingRule(Rule(1, ParseAction(behavior, "Signals.Set('notice', 1)"))));
+    Assert.False(detector.IsStateChangingRule(Rule(2, ParseAction(behavior, "FillValve.Open()"), isEnabled: false)));
+    Assert.False(detector.IsStateChangingRule(Rule(3, ParseAction(behavior, "ThrottlingValve.Close()"), isDeleted: true)));
+  }
+
   static AutomationBehavior CreateBehavior(params object[] components) {
     var behavior = new AutomationBehavior {
         Name = "TestBehavior",

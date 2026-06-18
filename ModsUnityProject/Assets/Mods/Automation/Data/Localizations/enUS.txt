@@ -241,6 +241,10 @@ IgorZ.Automation.Scripting.Editor.PendingEditsNotification,"There are rules in t
 IgorZ.Automation.Scripting.Editor.GameAutomationConflictNotification,"Game automation is already enabled.
 Rules {0} change this building's state.
 Remove or disable them first.","Message shown when saving Advanced Automation rules that conflict with enabled game automation."
+IgorZ.Automation.Scripting.Editor.GameAutomationBlocksSaveRuleHint,"Game automation is enabled.
+This rule cannot be saved while active.","Tooltip for a rule that conflicts with enabled game automation."
+IgorZ.Automation.Scripting.Editor.GameAutomationWillBeBlockedRuleHint,"This rule changes building state.
+Game automation will be blocked.","Tooltip for a rule that will block game automation controls."
 IgorZ.Automation.Scripting.Editor.ReadMoreLink,"https://github.com/ihsoft/TimberbornMods/wiki/Automation-(scripting)","Link to the localized wiki page about scripting"
 IgorZ.Automation.Scripting.Editor.ResetChangesBtn,"Reset changes",
 IgorZ.Automation.Scripting.Editor.ResumeRuleBtn,"Enable rule",

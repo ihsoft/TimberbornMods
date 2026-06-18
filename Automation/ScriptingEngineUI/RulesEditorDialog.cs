@@ -149,6 +149,26 @@ sealed class RulesEditorDialog : AbstractDialog {
     _ruleRowsContainer.Insert(to, fromRuleRowContainer);
   }
 
+  public enum GameAutomationRuleConflictState {
+    None,
+    BlocksGameAutomation,
+    BlocksSave,
+  }
+
+  public GameAutomationRuleConflictState GetGameAutomationRuleConflictState(RuleRow ruleRow) {
+    var ruleNumber = _ruleRows.IndexOf(ruleRow) + 1;
+    if (ruleNumber <= 0) {
+      return GameAutomationRuleConflictState.None;
+    }
+    var rule = CreateRuleCandidate(ruleRow, ruleNumber);
+    if (!_gameAutomationRuleSaveConflictDetector.IsStateChangingRule(rule)) {
+      return GameAutomationRuleConflictState.None;
+    }
+    return IsControlledByGameAutomation()
+        ? GameAutomationRuleConflictState.BlocksSave
+        : GameAutomationRuleConflictState.BlocksGameAutomation;
+  }
+
   #endregion
 
   #region Implementation
@@ -195,11 +215,15 @@ sealed class RulesEditorDialog : AbstractDialog {
   }
 
   IEnumerable<GameAutomationRuleSaveConflictDetector.RuleCandidate> GetRuleCandidates() {
-    return _ruleRows.Select((ruleRow, index) => new GameAutomationRuleSaveConflictDetector.RuleCandidate(
-        RuleNumber: index + 1,
+    return _ruleRows.Select((ruleRow, index) => CreateRuleCandidate(ruleRow, index + 1));
+  }
+
+  static GameAutomationRuleSaveConflictDetector.RuleCandidate CreateRuleCandidate(RuleRow ruleRow, int ruleNumber) {
+    return new GameAutomationRuleSaveConflictDetector.RuleCandidate(
+        RuleNumber: ruleNumber,
         IsDeleted: ruleRow.IsDeleted,
         IsEnabled: ruleRow.IsEnabled,
-        ParsedAction: ruleRow.ParsedAction));
+        ParsedAction: ruleRow.ParsedAction);
   }
 
   bool IsControlledByGameAutomation() {

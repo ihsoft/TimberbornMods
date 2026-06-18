@@ -49,3 +49,22 @@
     border-left-width: 1px;
     background-color: rgba(0, 255, 0, 0.05);
 }
+
+.rule-conflict-icon {
+    width: 20px;
+    height: 20px;
+    margin: 2px;
+    -unity-text-align: middle-center;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+.rule-conflict-icon--will-block {
+    color: rgb(45, 38, 20);
+    background-color: rgb(204, 160, 60);
+}
+
+.rule-conflict-icon--blocks-save {
+    color: rgb(245, 220, 180);
+    background-color: rgb(128, 45, 40);
+}
