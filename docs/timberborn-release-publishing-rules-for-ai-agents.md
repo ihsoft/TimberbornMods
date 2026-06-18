@@ -50,6 +50,13 @@ Before building a release ZIP from `Package.SourcePath`, make sure the current c
 source folder. For C# mods, run the mod project build with the real `ModPath` and verify that the expected DLL/XML
 files in the source folder were updated. Do not package a local mod folder that may contain stale binaries.
 
+Before building the release binary, update the mod's `directory.build.props`. The DLL assembly version is taken from
+that file. Verify the built DLL assembly version after the build. Other version declarations still matter for their own
+consumers: the Unity `manifest.json` version is used by the game, and `release.json` is used by the release process.
+
+If `directory.build.props` was updated after a build or package dry run, treat the previous DLL and ZIP as stale and
+rebuild/repackage before publishing.
+
 If the release package is built from a local Unity-exported mod folder, ask the user to confirm that Unity assets were
 exported before building the ZIP. Do this before packaging, because missing or stale asset bundle changes cannot be
 detected reliably from C# build output.
