@@ -20,10 +20,11 @@ static class Program {
           GameAutomationConflictDetectorTests.DetectsFillValveStateChangingRules),
       ("GameAutomationConflictDetector detects ThrottlingValve state changing rules",
           GameAutomationConflictDetectorTests.DetectsThrottlingValveStateChangingRules),
-      ("GameAutomationConflictDetector ignores rules that do not change building state",
-          GameAutomationConflictDetectorTests.IgnoresRulesThatDoNotChangeBuildingState),
-      ("GameAutomationConflictDetector ignores state changing rules for different building type",
-          GameAutomationConflictDetectorTests.IgnoresStateChangingRulesForDifferentBuildingType),
+      ("GameAutomationConflictDetector detects state changing rules for other buildings",
+          GameAutomationConflictDetectorTests.DetectsStateChangingRulesForOtherBuildings),
+      ("GameAutomationConflictDetector ignores signal rules", GameAutomationConflictDetectorTests.IgnoresSignalRules),
+      ("GameAutomationConflictDetector ignores notification rules",
+          GameAutomationConflictDetectorTests.IgnoresNotificationRules),
       ("GameAutomationConflictDetector ignores disabled rules", GameAutomationConflictDetectorTests.IgnoresDisabledRules),
 
       // ScriptingEngine.Parser

@@ -5,21 +5,33 @@
 using System.Collections.Generic;
 using IgorZ.Automation.Actions;
 using IgorZ.Automation.ScriptingEngine.Expressions;
-using Timberborn.WaterBuildings;
 
 namespace IgorZ.Automation.AutomationSystem;
 
 sealed class GameAutomationConflictDetector {
-  static readonly HashSet<string> FillValveStateChangingActions = [
+  static readonly HashSet<string> BuildingStateChangingActions = [
+      "Dynamite.Detonate",
+      "Dynamite.DetonateAndRepeat",
       "FillValve.Open",
       "FillValve.Close",
       "FillValve.SetHeight",
-  ];
-
-  static readonly HashSet<string> ThrottlingValveStateChangingActions = [
+      "Floodgate.SetHeight",
+      "FlowControl.Open",
+      "FlowControl.Close",
+      "Inventory.StartEmptying",
+      "Inventory.StopEmptying",
+      "Lever.SetState",
+      "Manufactory.SetRecipe",
+      "Pausable.Pause",
+      "Pausable.Unpause",
+      "Prioritizable.SetHaulers",
+      "Prioritizable.ResetHaulers",
       "ThrottlingValve.Open",
       "ThrottlingValve.Close",
       "ThrottlingValve.SetFlow",
+      "Workplace.RemoveWorkers",
+      "Workplace.SetWorkers",
+      "Workplace.SetPriority",
   ];
 
   public bool HasConflictingRules(AutomationBehavior behavior) {
@@ -27,25 +39,20 @@ sealed class GameAutomationConflictDetector {
       return false;
     }
     foreach (var action in behavior.Actions) {
-      if (IsConflictingRule(action, behavior)) {
+      if (IsConflictingRule(action)) {
         return true;
       }
     }
     return false;
   }
 
-  static bool IsConflictingRule(IAutomationAction action, AutomationBehavior behavior) {
+  static bool IsConflictingRule(IAutomationAction action) {
     if (action is not ScriptedAction scriptedAction
         || action.IsMarkedForCleanup
         || action.Condition is not { IsEnabled: true, IsMarkedForCleanup: false }
         || scriptedAction.ParsingResult.ParsedExpression is not ActionOperator actionOperator) {
       return false;
     }
-    return IsStateChangingActionForBuilding(actionOperator.ActionName, behavior);
-  }
-
-  static bool IsStateChangingActionForBuilding(string actionName, AutomationBehavior behavior) {
-    return (behavior.GetComponent<FillValve>() && FillValveStateChangingActions.Contains(actionName))
-        || (behavior.GetComponent<ThrottlingValve>() && ThrottlingValveStateChangingActions.Contains(actionName));
+    return BuildingStateChangingActions.Contains(actionOperator.ActionName);
   }
 }

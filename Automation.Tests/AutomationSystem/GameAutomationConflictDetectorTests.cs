@@ -27,7 +27,16 @@ static class GameAutomationConflictDetectorTests {
     Assert.True(new GameAutomationConflictDetector().HasConflictingRules(behavior));
   }
 
-  public static void IgnoresRulesThatDoNotChangeBuildingState() {
+  public static void DetectsStateChangingRulesForOtherBuildings() {
+    var behavior = CreateBehavior();
+
+    AddRule(behavior, "Pausable.Pause()");
+    AddRule(behavior, "Workplace.SetPriority('High')");
+
+    Assert.True(new GameAutomationConflictDetector().HasConflictingRules(behavior));
+  }
+
+  public static void IgnoresSignalRules() {
     var behavior = CreateBehavior(new FillValve());
 
     AddRule(behavior, "Signals.Set('notice', 1)");
@@ -35,10 +44,10 @@ static class GameAutomationConflictDetectorTests {
     Assert.False(new GameAutomationConflictDetector().HasConflictingRules(behavior));
   }
 
-  public static void IgnoresStateChangingRulesForDifferentBuildingType() {
+  public static void IgnoresNotificationRules() {
     var behavior = CreateBehavior();
 
-    AddRule(behavior, "FillValve.Close()");
+    AddRule(behavior, "Notifications.SetNoticeIcon('NothingToDo', 'check it')");
 
     Assert.False(new GameAutomationConflictDetector().HasConflictingRules(behavior));
   }
@@ -106,10 +115,22 @@ static class GameAutomationConflictDetectorTests {
     throttlingValve.RegisterAction("ThrottlingValve.Close");
     throttlingValve.RegisterAction("ThrottlingValve.SetFlow", ScriptValue.TypeEnum.Number);
 
+    var pausable = new TestScriptable("Pausable");
+    pausable.RegisterAction("Pausable.Pause");
+    pausable.RegisterAction("Pausable.Unpause");
+
+    var workplace = new TestScriptable("Workplace");
+    workplace.RegisterAction("Workplace.RemoveWorkers");
+    workplace.RegisterAction("Workplace.SetWorkers", ScriptValue.TypeEnum.Number);
+    workplace.RegisterAction("Workplace.SetPriority", ScriptValue.TypeEnum.String);
+
     var signals = new TestScriptable("Signals");
     signals.RegisterAction("Signals.Set", ScriptValue.TypeEnum.String, ScriptValue.TypeEnum.Number);
 
-    TestScripting.CreateService(fillValve, throttlingValve, signals);
+    var notifications = new TestScriptable("Notifications");
+    notifications.RegisterAction("Notifications.SetNoticeIcon", ScriptValue.TypeEnum.String, ScriptValue.TypeEnum.String);
+
+    TestScripting.CreateService(fillValve, throttlingValve, pausable, workplace, signals, notifications);
   }
 
   static ParserFactory CreateParserFactory() {
