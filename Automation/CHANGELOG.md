@@ -1,3 +1,7 @@
+# v4.3.0 (TBD):
+* [Feature] Add actions for Fill Valve and Throttling Valve.
+* [Feature] Improve interaction with the stock game automation. Advanced Automation now blocks conflicting stock automation assignment, prevents saving active state-changing rules on already automated buildings, and marks affected rules in the rules editor.
+
 # v4.2.0 (June 15th, 2026):
 * [Feature] Add a UI panel for pinned custom signals with manual value control.
 
