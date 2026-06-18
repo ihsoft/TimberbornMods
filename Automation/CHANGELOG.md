@@ -1,4 +1,4 @@
-# v4.4.0 (TBD):
+# v4.4.0 (June 18th, 2026):
 * [Feature #83] Add the `BreedingPod.Progress` signal to track breeding pod completion progress.
 * [Feature] Add a setting to disable game automation conflict prevention.
 * [Fix] Do not show game automation conflict warnings on buildings without game automation controls.
