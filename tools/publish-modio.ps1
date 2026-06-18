@@ -9,6 +9,8 @@ param(
     [string] $ConfigPath = "",
     [string] $AccessTokenPath = "",
     [string] $ChangeNotesPrefix = "",
+    [int] $ScanTimeoutSeconds = 600,
+    [int] $ScanPollSeconds = 15,
     [switch] $IncludeLegacyVersions,
     [switch] $SkipBuild,
     [switch] $Publish
@@ -256,6 +258,7 @@ function Publish-Modfile(
 
         $content.Add([System.Net.Http.StringContent]::new($Version), "version")
         $content.Add([System.Net.Http.StringContent]::new($ChangeNotes), "changelog")
+        $content.Add([System.Net.Http.StringContent]::new("true"), "active")
 
         $fileStream = [System.IO.File]::OpenRead($ZipPath)
         $fileContent = [System.Net.Http.StreamContent]::new($fileStream)
@@ -276,6 +279,61 @@ function Publish-Modfile(
         $content.Dispose()
         $client.Dispose()
     }
+}
+
+function Get-Modfile(
+    [string] $ApiBase,
+    [string] $GameId,
+    [string] $ModId,
+    [string] $AccessToken,
+    [int] $FileId) {
+    $endpoint = "$($ApiBase.TrimEnd("/"))/games/$GameId/mods/$ModId/files/$FileId"
+    return Invoke-RestMethod -Uri $endpoint -Headers @{ Authorization = "Bearer $AccessToken" }
+}
+
+function Wait-ModfileScan(
+    [string] $ApiBase,
+    [string] $GameId,
+    [string] $ModId,
+    [string] $AccessToken,
+    [int] $FileId,
+    [int] $TimeoutSeconds,
+    [int] $PollSeconds) {
+    $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+    while ((Get-Date) -lt $deadline) {
+        $modfile = Get-Modfile $ApiBase $GameId $ModId $AccessToken $FileId
+        $virusStatus = [int]$modfile.virus_status
+        $virusPositive = [int]$modfile.virus_positive
+        if ($virusStatus -eq 1 -and $virusPositive -eq 0) {
+            return $modfile
+        }
+        if ($virusStatus -eq 1 -and $virusPositive -ne 0) {
+            throw "Mod.IO virus scan flagged file ${FileId}: virus_positive=$virusPositive."
+        }
+        if ($virusStatus -eq 4 -or $virusStatus -eq 5) {
+            throw "Mod.IO virus scan failed for file ${FileId}: virus_status=$virusStatus."
+        }
+
+        Write-Host "Waiting for Mod.IO virus scan on file $FileId. virus_status=$virusStatus, virus_positive=$virusPositive"
+        Start-Sleep -Seconds $PollSeconds
+    }
+
+    throw "Timed out waiting for Mod.IO virus scan on file $FileId after $TimeoutSeconds seconds."
+}
+
+function Set-ModfileActive(
+    [string] $ApiBase,
+    [string] $GameId,
+    [string] $ModId,
+    [string] $AccessToken,
+    [int] $FileId) {
+    $endpoint = "$($ApiBase.TrimEnd("/"))/games/$GameId/mods/$ModId/files/$FileId"
+    return Invoke-RestMethod `
+        -Uri $endpoint `
+        -Method Put `
+        -Headers @{ Authorization = "Bearer $AccessToken" } `
+        -Body @{ active = "true" } `
+        -ContentType "application/x-www-form-urlencoded"
 }
 
 Assert-PathExists $releaseConfigPath "Release config"
@@ -441,5 +499,21 @@ if ([string]::IsNullOrWhiteSpace($accessToken)) {
 
 Write-Host "Publishing to Mod.IO..."
 $responseBody = Publish-Modfile $apiBase $gameId $modId $accessToken $zipPath $modVersion $modIoChangeNotes
-Write-Host "Published to Mod.IO."
+$publishedModfile = $responseBody | ConvertFrom-Json
+if ($null -eq $publishedModfile.id) {
+    throw "Mod.IO upload response did not include a modfile id."
+}
+
+Write-Host "Uploaded to Mod.IO as file id $($publishedModfile.id)."
+$scannedModfile = Wait-ModfileScan `
+    $apiBase `
+    $gameId `
+    $modId `
+    $accessToken `
+    ([int]$publishedModfile.id) `
+    $ScanTimeoutSeconds `
+    $ScanPollSeconds
+Write-Host "Mod.IO virus scan complete for file id $($scannedModfile.id)."
+$activeModfile = Set-ModfileActive $apiBase $gameId $modId $accessToken ([int]$publishedModfile.id)
+Write-Host "Published to Mod.IO and marked file id $($activeModfile.id) active."
 Write-Host $responseBody

@@ -133,6 +133,10 @@ MaximumGameVersion: 1.1.99.99
 
 Do not claim support for a game version unless the final package contains the corresponding `version-X.X` folder.
 
+After uploading a Mod.IO file, verify that the uploaded file becomes the live file. If Mod.IO reports the file as
+uploaded but not live after scanning, explicitly activate the uploaded modfile through the Mod.IO API instead of
+assuming upload success is enough.
+
 ## Platform descriptions
 
 Local files under a mod's `Workshop` directory are the expected source for published platform descriptions.
