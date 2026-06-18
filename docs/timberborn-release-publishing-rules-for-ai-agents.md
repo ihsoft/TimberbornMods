@@ -11,6 +11,37 @@ Never publish to Steam or Mod.IO unless the user explicitly asks to publish.
 Dry runs may build packages, validate files, generate metadata, and prepare staging directories. They must not upload
 anything.
 
+## Dirty worktree before publishing
+
+Before uploading a mod release, check for uncommitted changes that belong to the target mod or to shared
+release-critical dependencies.
+
+Uncommitted changes in unrelated mods do not block publishing.
+
+For the target mod, treat these uncommitted changes as a red flag:
+
+- files under the target mod directory,
+- the target mod's test project,
+- `ModsUnityProject/Assets/Mods/<ModName>/`,
+- the target mod's `Workshop` files, changelog, release metadata, and package source tracked in Git,
+- release scripts, release configs, or shared publishing tools changed for the current release.
+
+For any mod release, also treat uncommitted changes in `TimberDev` or `TimberDev.Tests` as a red flag because
+TimberDev is shared by many mods.
+
+When red-flag changes are present:
+
+1. Stop before upload.
+2. List the specific files or file groups.
+3. Ask the user one direct question: whether to continue publishing despite those uncommitted changes.
+4. Do not fix, stage, commit, revert, or otherwise clean up those changes as part of the publish flow unless the user
+   explicitly asks.
+
+Uncommitted changes in unrelated mods may be mentioned as background, but they should not block publishing.
+
+For shared docs/tools changes, block only when they affect the current publish flow, release validation, release
+metadata, package construction, or platform upload. Otherwise, mention them as background instead of stopping.
+
 ## Exact version matching
 
 When the user names a release version, it must exactly match the configured release version.
