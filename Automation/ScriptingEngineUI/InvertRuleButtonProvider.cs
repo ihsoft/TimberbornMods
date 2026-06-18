@@ -67,6 +67,17 @@ sealed class InvertRuleButtonProvider(ParserFactory parserFactory) : IEditorButt
       }
       return null;
     }
+    if (actioName == "ThrottlingValve.SetFlow") {
+      var valve = automationBehavior.GetComponent<ThrottlingValve>();
+      var argFlow = ((IValueExpr)action.Operands[0]).ValueFn().AsFloat;
+      if (argFlow == 0) {
+        return $"(act ThrottlingValve.SetFlow {valve.MaxOutflowLimit * 100})";
+      }
+      if (argFlow == valve.MaxOutflowLimit) {
+        return "(act ThrottlingValve.SetFlow 0)";
+      }
+      return null;
+    }
     if (actioName is "Workplace.SetWorkers" or "Workplace.RemoveWorkers") {
       var workplace = automationBehavior.GetComponent<Workplace>();
       var argNumWorkers = actioName == "Workplace.SetWorkers" ? ((IValueExpr)action.Operands[0]).ValueFn().AsInt : 0;
@@ -81,6 +92,8 @@ sealed class InvertRuleButtonProvider(ParserFactory parserFactory) : IEditorButt
     return action.ActionName switch {
         "FillValve.Open" => "(act FillValve.Close)",
         "FillValve.Close" => "(act FillValve.Open)",
+        "ThrottlingValve.Open" => "(act ThrottlingValve.Close)",
+        "ThrottlingValve.Close" => "(act ThrottlingValve.Open)",
         "FlowControl.Open" => "(act FlowControl.Close)",
         "FlowControl.Close" => "(act FlowControl.Open)",
         "Inventory.StartEmptying" => "(act Inventory.StopEmptying)",

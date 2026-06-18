@@ -182,6 +182,9 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\StreamGaugeScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\StreamGaugeScriptableComponent.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ThrottlingValveScriptableComponent.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\ThrottlingValveScriptableComponent.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\WeatherScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\WeatherScriptableComponent.cs</Link>
       </Compile>
