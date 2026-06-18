@@ -10,6 +10,7 @@ using IgorZ.Automation.Actions;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.AutomationSystemUI;
 using IgorZ.Automation.Conditions;
+using IgorZ.Automation.Settings;
 using IgorZ.TimberDev.UI;
 using Timberborn.Automation;
 using UnityEngine;
@@ -156,6 +157,9 @@ sealed class RulesEditorDialog : AbstractDialog {
   }
 
   public GameAutomationRuleConflictState GetGameAutomationRuleConflictState(RuleRow ruleRow) {
+    if (!EntityPanelSettings.PreventGameAutomationConflicts) {
+      return GameAutomationRuleConflictState.None;
+    }
     var ruleNumber = _ruleRows.IndexOf(ruleRow) + 1;
     if (ruleNumber <= 0) {
       return GameAutomationRuleConflictState.None;
@@ -207,6 +211,9 @@ sealed class RulesEditorDialog : AbstractDialog {
   }
 
   string GetGameAutomationConflictNotification() {
+    if (!EntityPanelSettings.PreventGameAutomationConflicts) {
+      return null;
+    }
     var conflictingRules = _gameAutomationRuleSaveConflictDetector.GetConflictingRuleNumbers(
         IsControlledByGameAutomation(), GetRuleCandidates());
     return conflictingRules.Count == 0

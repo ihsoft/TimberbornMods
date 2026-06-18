@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using IgorZ.Automation.AutomationSystem;
+using IgorZ.Automation.Settings;
 using Timberborn.AutomationUI;
 using Timberborn.Localization;
 using Timberborn.TooltipSystem;
@@ -23,13 +24,15 @@ sealed class GameAutomationConflictGuardService(
   }
 
   public void UpdateSelectorState(TransmitterSelector transmitterSelector) {
-    var enabled = !HasConflict(transmitterSelector);
+    var enabled = !EntityPanelSettings.PreventGameAutomationConflicts || !HasConflict(transmitterSelector);
     SetEnabled(transmitterSelector.Q<Button>("Selection"), enabled);
     SetEnabled(transmitterSelector.Q<Button>("ArrowDown"), enabled);
   }
 
   string GetWarningTooltip(TransmitterSelector transmitterSelector) {
-    return HasConflict(transmitterSelector) ? loc.T(WarningLocKey) : null;
+    return EntityPanelSettings.PreventGameAutomationConflicts && HasConflict(transmitterSelector)
+        ? loc.T(WarningLocKey)
+        : null;
   }
 
   bool HasConflict(TransmitterSelector transmitterSelector) {

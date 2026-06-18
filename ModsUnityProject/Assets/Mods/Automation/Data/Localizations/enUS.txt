@@ -288,6 +288,7 @@ IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.Script,"Script","Scr
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.ScriptShort,"Pseudo-script","Shortened script style of the rule description."
 IgorZ.Automation.Settings.EntityPanel.EvalValuesInConditions,"Evaluate the right value in conditions",
 IgorZ.Automation.Settings.EntityPanel.EvalValuesInActionArguments,"Evaluate values in the action arguments",
+IgorZ.Automation.Settings.EntityPanel.PreventGameAutomationConflicts,"Prevent game automation conflicts",
 IgorZ.Automation.Settings.EntityPanel.MaxRulesShown,"Number of rules to show in panel",
 IgorZ.Automation.Settings.ScriptEditor.Header,"Script editor",
 IgorZ.Automation.Settings.ScriptEditor.DefaultScriptSyntax,"Default expressions syntax",

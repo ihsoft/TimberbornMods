@@ -20,6 +20,8 @@ sealed class EntityPanelSettings : BaseSettings<EntityPanelSettings> {
   const string DescriptionScriptShortLocKey = "IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.ScriptShort";
   const string EvalValuesInConditionsLocKey = "IgorZ.Automation.Settings.EntityPanel.EvalValuesInConditions";
   const string EvalValuesInActionArgumentsLocKey = "IgorZ.Automation.Settings.EntityPanel.EvalValuesInActionArguments";
+  const string PreventGameAutomationConflictsLocKey =
+      "IgorZ.Automation.Settings.EntityPanel.PreventGameAutomationConflicts";
   const string MaxRulesShownLocKey = "IgorZ.Automation.Settings.EntityPanel.MaxRulesShown";
 
   protected override string ModId => Configurator.AutomationModId;
@@ -50,6 +52,10 @@ sealed class EntityPanelSettings : BaseSettings<EntityPanelSettings> {
   public ModSetting<bool> EvalValuesInActionArgumentsInternal { get; } =
       new(true, ModSettingDescriptor.CreateLocalized(EvalValuesInActionArgumentsLocKey));
 
+  public static bool PreventGameAutomationConflicts { get; private set; } = true;
+  public ModSetting<bool> PreventGameAutomationConflictsInternal { get; } =
+      new(true, ModSettingDescriptor.CreateLocalized(PreventGameAutomationConflictsLocKey));
+
   public static int MaxRulesShown { get; private set; }
   public ModSetting<int> MaxRulesShownInternal { get; } =
       new(6, ModSettingDescriptor.CreateLocalized(MaxRulesShownLocKey));
@@ -79,6 +85,7 @@ sealed class EntityPanelSettings : BaseSettings<EntityPanelSettings> {
     });
     InstallSettingCallback(EvalValuesInConditionsInternal, v => EvalValuesInConditions = v);
     InstallSettingCallback(EvalValuesInActionArgumentsInternal, v => EvalValuesInActionArguments = v);
+    InstallSettingCallback(PreventGameAutomationConflictsInternal, v => PreventGameAutomationConflicts = v);
     InstallSettingCallback(MaxRulesShownInternal, v => MaxRulesShown = v);
   }
 }
