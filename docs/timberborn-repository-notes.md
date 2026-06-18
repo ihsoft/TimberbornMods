@@ -133,6 +133,9 @@ to extract them into:
 _ExtractedGameAssets/
 ```
 
+The extraction script supports PowerShell `-WhatIf`; use it when checking archive paths without rewriting generated
+asset folders.
+
 ---
 
 ## Wiki Documentation

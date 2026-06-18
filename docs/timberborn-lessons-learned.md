@@ -107,3 +107,11 @@ Do not invent:
 - configuration formats.
 
 Verify assumptions against actual code and actual game data.
+
+---
+
+## PowerShell WhatIf
+
+Do not assume a repository script supports `-WhatIf` unless it declares `CmdletBinding(SupportsShouldProcess)`.
+
+If a script is expected to be used in dry-run checks, implement real `ShouldProcess` handling around filesystem writes.

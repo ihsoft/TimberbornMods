@@ -1,3 +1,4 @@
+[CmdletBinding(SupportsShouldProcess = $true)]
 param(
   [string] $GameRoot = "_GAME!",
   [string] $OutputRoot = "_ExtractedGameAssets",
@@ -24,11 +25,14 @@ if (!(Test-Path -LiteralPath $moddingAssetsPath)) {
   throw "Game modding assets folder not found: $moddingAssetsPath"
 }
 
-if ($Clean -and (Test-Path -LiteralPath $outputRootPath)) {
+if ($Clean -and (Test-Path -LiteralPath $outputRootPath) -and $PSCmdlet.ShouldProcess(
+    $outputRootPath, "Remove existing output root")) {
   Remove-Item -LiteralPath $outputRootPath -Recurse -Force
 }
 
-New-Item -ItemType Directory -Force -Path $outputRootPath | Out-Null
+if ($PSCmdlet.ShouldProcess($outputRootPath, "Create output root")) {
+  New-Item -ItemType Directory -Force -Path $outputRootPath | Out-Null
+}
 
 foreach ($archiveName in $Archives) {
   $archivePath = Join-Path $moddingAssetsPath $archiveName
@@ -39,13 +43,20 @@ foreach ($archiveName in $Archives) {
   $destinationName = [System.IO.Path]::GetFileNameWithoutExtension($archiveName)
   $destinationPath = Join-Path $outputRootPath $destinationName
 
-  if (Test-Path -LiteralPath $destinationPath) {
+  if ((Test-Path -LiteralPath $destinationPath) -and $PSCmdlet.ShouldProcess(
+      $destinationPath, "Remove existing extracted assets")) {
     Remove-Item -LiteralPath $destinationPath -Recurse -Force
   }
 
-  Write-Host "Extracting $archiveName -> $destinationPath"
-  New-Item -ItemType Directory -Force -Path $destinationPath | Out-Null
-  Expand-Archive -LiteralPath $archivePath -DestinationPath $destinationPath -Force
+  if ($PSCmdlet.ShouldProcess($destinationPath, "Extract $archiveName")) {
+    Write-Host "Extracting $archiveName -> $destinationPath"
+    New-Item -ItemType Directory -Force -Path $destinationPath | Out-Null
+    Expand-Archive -LiteralPath $archivePath -DestinationPath $destinationPath -Force
+  }
 }
 
-Write-Host "Done. Extracted $($Archives.Count) archives into $outputRootPath"
+if ($WhatIfPreference) {
+  Write-Host "Done. Verified extraction plan for $($Archives.Count) archives into $outputRootPath"
+} else {
+  Write-Host "Done. Extracted $($Archives.Count) archives into $outputRootPath"
+}
