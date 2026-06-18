@@ -25,6 +25,10 @@ Do not assume that all mods use identical project layouts.
 
 Always inspect the specific mod before making changes.
 
+Mod-specific `AGENTS.md` files are welcome when a rule applies only to one mod. Treat the root `AGENTS.md` as the
+repository-wide baseline, then apply the closest mod-specific `AGENTS.md` for files in that mod. Keep mod-specific
+rules out of the root instructions unless they also apply across the repository.
+
 ---
 
 ## ModsUnityProject
@@ -231,6 +235,9 @@ Repository files are the source of truth.
 
 Before editing an existing source file, read the exact current file from the repository. Do not assume it matches
 decompiled game patterns, older conversations, or nearby code.
+
+For rules-maintenance tasks, edit only rule files such as `AGENTS.md` and files under `docs/`. Other repository files
+may be changing in parallel by other agents; ignore unrelated non-rule changes instead of analyzing or cleaning them up.
 
 For large or frequently edited files, prefer small sequential patches:
 

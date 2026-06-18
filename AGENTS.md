@@ -41,6 +41,22 @@ The instruction files serve different purposes:
 | `docs/timberborn-new-repository-bootstrap-for-ai-agents.md` | New repository setup and first-mod bootstrap workflow |
 | `docs/timberborn-release-publishing-rules-for-ai-agents.md` | Release validation and publishing rules |
 
+## Rule scope and local AGENTS.md files
+
+This root `AGENTS.md` defines repository-wide rules.
+
+Individual mods may also have their own `AGENTS.md` files. This is encouraged when rules apply only to that mod, its
+package layout, release process, tests, public API, or known pitfalls.
+
+When working inside a specific mod:
+
+1. Read this root `AGENTS.md`.
+2. Check the mod directory and relevant parent directories for additional `AGENTS.md` files.
+3. Follow the most specific applicable rules for files in that scope.
+
+Local `AGENTS.md` files may add or narrow rules for their mod. They should not weaken repository-wide safety rules,
+generated-reference rules, localization requirements, release stop conditions, or explicit user instructions.
+
 ## Read only what is relevant
 
 Do not load all instruction files blindly.
@@ -101,6 +117,14 @@ When asked to modify a repository file:
 6. Return or commit the complete updated file, depending on the task.
 
 If the file cannot be read completely, stop and report the problem instead of guessing.
+
+## Rules-maintenance tasks
+
+When the user asks to organize, clarify, or update agent rules, change only rule and rule-documentation files such as
+`AGENTS.md` and files under `docs/`.
+
+Other repository files may be changing in parallel by other agents. Do not inspect, interpret, fix, format, stage,
+revert, or otherwise account for unrelated non-rule changes during a rules-maintenance task.
 
 ## Required tests
 
