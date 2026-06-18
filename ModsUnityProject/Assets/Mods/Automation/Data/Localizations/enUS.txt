@@ -16,6 +16,8 @@ IgorZ.Automation.DisableRulesTool.Title,"Disable rules on the building",
 IgorZ.Automation.DisableRulesTool.Description,"Use this tool to disable all rules on the building",
 IgorZ.Automation.ShowStatusAction.AutomationErrorAlert,"Automation error",
 IgorZ.Automation.ShowStatusAction.AutomationErrorDescription,"Some automation rules cannot be executed",
+IgorZ.Automation.GameAutomationConflict.Warning,"Advanced Automation controls this building.
+Remove or disable its rules first.","Message shown before assigning game automation to a building controlled by Advanced Automation rules."
 IgorZ.Automation.ShowStatusAction.HoldCompletionStatusText,"Waiting for the other buildings to finish",
 IgorZ.Automation.ShowStatusAction.HoldConstruction,"<YellowHighlight>hold completion</YellowHighlight>",
 IgorZ.Automation.ShowStatusAction.ResumeConstruction,"<YellowHighlight>resume building</YellowHighlight>",

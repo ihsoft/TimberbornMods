@@ -1,4 +1,5 @@
 using System;
+using IgorZ.Automation.ScriptingEngine.Parser;
 
 namespace IgorZ.Automation.Actions;
 
@@ -18,6 +19,7 @@ public abstract class AutomationActionBase : IgorZ.Automation.AutomationSystem.I
 
 sealed class ScriptedAction : AutomationActionBase {
   public string Expression { get; set; }
+  public ParsingResult ParsingResult { get; set; }
 
   public void SetExpression(string expression) {
     Expression = expression;

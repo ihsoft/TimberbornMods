@@ -4,7 +4,8 @@ using IgorZ.Automation.AutomationSystem;
 
 public abstract class AutomationConditionBase : IAutomationCondition {
   public AutomationBehavior Behavior { get; set; }
-  public bool IsEnabled => true;
+  public bool Enabled { get; set; } = true;
+  public bool IsEnabled => Enabled;
   public bool CanRunOnUnfinishedBuildings => false;
   public bool IsMarkedForCleanup => false;
 

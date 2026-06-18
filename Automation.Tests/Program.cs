@@ -16,6 +16,15 @@ static class Program {
       ("AutomationBehavior forwards lifecycle callbacks to existing dynamic components",
           AutomationBehaviorTests.ForwardsLifecycleCallbacks),
       ("AutomationBehavior delete forwards to dynamic components", AutomationBehaviorTests.DeleteEntityForwardsToComponents),
+      ("GameAutomationConflictDetector detects FillValve state changing rules",
+          GameAutomationConflictDetectorTests.DetectsFillValveStateChangingRules),
+      ("GameAutomationConflictDetector detects ThrottlingValve state changing rules",
+          GameAutomationConflictDetectorTests.DetectsThrottlingValveStateChangingRules),
+      ("GameAutomationConflictDetector ignores rules that do not change building state",
+          GameAutomationConflictDetectorTests.IgnoresRulesThatDoNotChangeBuildingState),
+      ("GameAutomationConflictDetector ignores state changing rules for different building type",
+          GameAutomationConflictDetectorTests.IgnoresStateChangingRulesForDifferentBuildingType),
+      ("GameAutomationConflictDetector ignores disabled rules", GameAutomationConflictDetectorTests.IgnoresDisabledRules),
 
       // ScriptingEngine.Parser
       ("Python parser preserves math and logical precedence", ParserTests.PythonParserPreservesPrecedence),
