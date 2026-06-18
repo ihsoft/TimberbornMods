@@ -26,6 +26,14 @@ automation controls.
 When adding new scriptable actions, decide whether the action changes building state. If it does, update the game
 automation conflict detector and its tests.
 
+When showing conflicts in UI, distinguish blocking errors from informational warnings:
+
+- If stock game automation is already enabled, active state-changing Advanced Automation rules cannot be saved while
+  active.
+- If stock game automation is not enabled, state-changing Advanced Automation rules may be saved, but the UI may warn
+  that they will block stock game automation later.
+- Disabled or deleted rules should not be treated as conflicts.
+
 ## Tooltips
 
 Keep Automation tooltip text short and localized.

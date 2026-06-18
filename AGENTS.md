@@ -136,6 +136,11 @@ These relevant tests MUST pass before submitting the change.
 - Use decompiled game sources as a read-only reference for understanding Timberborn architecture.
 - Use extracted game assets as a read-only reference for game blueprints, localizations, UI assets, and shaders.
 
+## Unity resources
+
+When changing Unity project resources (`UXML`, `USS`, localization files, images, sprites, prefabs, or asset bundle
+content), remind the user to rebuild the Unity project before testing in the real game.
+
 ## Final version requests
 
 When the user asks for a "final version" of any repository file:
