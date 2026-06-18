@@ -60,6 +60,65 @@ static class GameAutomationConflictDetectorTests {
     Assert.False(new GameAutomationConflictDetector().HasConflictingRules(behavior));
   }
 
+  public static void DetectsStateChangingActionNames() {
+    var behavior = CreateBehavior();
+
+    Assert.True(new GameAutomationConflictDetector().IsBuildingStateChangingAction(
+        ParseAction(behavior, "FillValve.Open()")));
+    Assert.True(new GameAutomationConflictDetector().IsBuildingStateChangingAction(
+        ParseAction(behavior, "ThrottlingValve.SetFlow(1)")));
+  }
+
+  public static void IgnoresNonStateChangingActionNames() {
+    var behavior = CreateBehavior();
+
+    Assert.False(new GameAutomationConflictDetector().IsBuildingStateChangingAction(
+        ParseAction(behavior, "Signals.Set('notice', 1)")));
+    Assert.False(new GameAutomationConflictDetector().IsBuildingStateChangingAction(
+        ParseAction(behavior, "Notifications.SetNoticeIcon('NothingToDo', 'check it')")));
+  }
+
+  public static void FindsRuleSaveConflictsByRuleNumber() {
+    var behavior = CreateBehavior();
+    var detector = new GameAutomationRuleSaveConflictDetector(new GameAutomationConflictDetector());
+    var rules = new[] {
+        Rule(1, ParseAction(behavior, "Signals.Set('notice', 1)")),
+        Rule(2, ParseAction(behavior, "FillValve.Open()")),
+        Rule(3, ParseAction(behavior, "ThrottlingValve.SetFlow(1)")),
+    };
+
+    var conflicts = detector.GetConflictingRuleNumbers(gameAutomationEnabled: true, rules);
+
+    Assert.Equal(2, conflicts.Count);
+    Assert.Equal(2, conflicts[0]);
+    Assert.Equal(3, conflicts[1]);
+  }
+
+  public static void IgnoresRuleSaveConflictsWhenGameAutomationIsDisabled() {
+    var behavior = CreateBehavior();
+    var detector = new GameAutomationRuleSaveConflictDetector(new GameAutomationConflictDetector());
+    var rules = new[] {
+        Rule(1, ParseAction(behavior, "FillValve.Open()")),
+    };
+
+    var conflicts = detector.GetConflictingRuleNumbers(gameAutomationEnabled: false, rules);
+
+    Assert.Equal(0, conflicts.Count);
+  }
+
+  public static void IgnoresDisabledAndDeletedRuleSaveConflicts() {
+    var behavior = CreateBehavior();
+    var detector = new GameAutomationRuleSaveConflictDetector(new GameAutomationConflictDetector());
+    var rules = new[] {
+        Rule(1, ParseAction(behavior, "FillValve.Open()"), isEnabled: false),
+        Rule(2, ParseAction(behavior, "ThrottlingValve.Close()"), isDeleted: true),
+    };
+
+    var conflicts = detector.GetConflictingRuleNumbers(gameAutomationEnabled: true, rules);
+
+    Assert.Equal(0, conflicts.Count);
+  }
+
   static AutomationBehavior CreateBehavior(params object[] components) {
     var behavior = new AutomationBehavior {
         Name = "TestBehavior",
@@ -102,6 +161,11 @@ static class GameAutomationConflictDetectorTests {
       throw result.LastScriptError;
     }
     return action;
+  }
+
+  static GameAutomationRuleSaveConflictDetector.RuleCandidate Rule(
+      int ruleNumber, ActionOperator parsedAction, bool isDeleted = false, bool isEnabled = true) {
+    return new GameAutomationRuleSaveConflictDetector.RuleCandidate(ruleNumber, isDeleted, isEnabled, parsedAction);
   }
 
   static void RegisterScriptables() {

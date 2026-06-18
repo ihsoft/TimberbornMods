@@ -26,6 +26,16 @@ static class Program {
       ("GameAutomationConflictDetector ignores notification rules",
           GameAutomationConflictDetectorTests.IgnoresNotificationRules),
       ("GameAutomationConflictDetector ignores disabled rules", GameAutomationConflictDetectorTests.IgnoresDisabledRules),
+      ("GameAutomationConflictDetector detects state changing action names",
+          GameAutomationConflictDetectorTests.DetectsStateChangingActionNames),
+      ("GameAutomationConflictDetector ignores non-state-changing action names",
+          GameAutomationConflictDetectorTests.IgnoresNonStateChangingActionNames),
+      ("GameAutomationRuleSaveConflictDetector finds rule save conflicts by rule number",
+          GameAutomationConflictDetectorTests.FindsRuleSaveConflictsByRuleNumber),
+      ("GameAutomationRuleSaveConflictDetector ignores conflicts when game automation is disabled",
+          GameAutomationConflictDetectorTests.IgnoresRuleSaveConflictsWhenGameAutomationIsDisabled),
+      ("GameAutomationRuleSaveConflictDetector ignores disabled and deleted rule save conflicts",
+          GameAutomationConflictDetectorTests.IgnoresDisabledAndDeletedRuleSaveConflicts),
 
       // ScriptingEngine.Parser
       ("Python parser preserves math and logical precedence", ParserTests.PythonParserPreservesPrecedence),

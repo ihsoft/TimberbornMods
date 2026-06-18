@@ -240,6 +240,9 @@ IgorZ.Automation.Scripting.Editor.MoreInfoBtn,"Читать о скриптах"
 IgorZ.Automation.Scripting.Editor.NumberConstantType,"число","Name of the number constant type"
 IgorZ.Automation.Scripting.Editor.PauseRuleBtn,"Выключить правило",
 IgorZ.Automation.Scripting.Editor.PendingEditsNotification,"Некоторые правила в режиме редактирования. Сначала завершите их.",
+IgorZ.Automation.Scripting.Editor.GameAutomationConflictNotification,"Игровая автоматизация уже включена.
+Правила {0} меняют состояние здания.
+Сначала удалите или выключите их.","Message shown when saving Advanced Automation rules that conflict with enabled game automation."
 IgorZ.Automation.Scripting.Editor.ReadMoreLink,"https://github.com/ihsoft/TimberbornMods/wiki/Automation-(scripting)-ru-RU","Link to the localized wiki page about scripting"
 IgorZ.Automation.Scripting.Editor.ResetChangesBtn,"Сбросить изменения",
 IgorZ.Automation.Scripting.Editor.ResumeRuleBtn,"Включить правило",

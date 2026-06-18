@@ -7,9 +7,11 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using IgorZ.Automation.Actions;
+using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.AutomationSystemUI;
 using IgorZ.Automation.Conditions;
 using IgorZ.TimberDev.UI;
+using Timberborn.Automation;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
@@ -23,6 +25,7 @@ sealed class RulesEditorDialog : AbstractDialog {
 
   const string PendingEditsNotificationLocKey = "IgorZ.Automation.Scripting.Editor.PendingEditsNotification";
   const string RulesWithErrorsLocKey = "IgorZ.Automation.Scripting.Editor.RulesWithErrorsNotification";
+  const string GameAutomationConflictLocKey = "IgorZ.Automation.Scripting.Editor.GameAutomationConflictNotification";
   const string ReadMoreLinkLocKey = "IgorZ.Automation.Scripting.Editor.ReadMoreLink";
 
   #region AbstractDialog implementation
@@ -37,6 +40,10 @@ sealed class RulesEditorDialog : AbstractDialog {
     }
     if (HasErrors && !Keyboard.current.ctrlKey.isPressed) {
       return UiFactory.T(RulesWithErrorsLocKey);
+    }
+    var gameAutomationConflictNotification = GetGameAutomationConflictNotification();
+    if (gameAutomationConflictNotification != null) {
+      return gameAutomationConflictNotification;
     }
     return null;
   }
@@ -147,6 +154,7 @@ sealed class RulesEditorDialog : AbstractDialog {
   #region Implementation
 
   readonly ImmutableArray<IEditorButtonProvider> _editorProviders;
+  readonly GameAutomationRuleSaveConflictDetector _gameAutomationRuleSaveConflictDetector;
 
   bool RulesChanged => _ruleRows.Any(x => x.IsDeleted || x.IsModified);
   bool EditsPending => _ruleRows.Any(x => x.IsInEditMode);
@@ -156,8 +164,11 @@ sealed class RulesEditorDialog : AbstractDialog {
   RulesUIHelper _rulesUiHelper;
   readonly List<RuleRow> _ruleRows = [];
   
-  RulesEditorDialog(IEnumerable<IEditorButtonProvider> editorProviders) {
+  RulesEditorDialog(
+      IEnumerable<IEditorButtonProvider> editorProviders,
+      GameAutomationRuleSaveConflictDetector gameAutomationRuleSaveConflictDetector) {
     _editorProviders = editorProviders.Where(x => x.RuleRowBtnLocKey != null).ToImmutableArray();
+    _gameAutomationRuleSaveConflictDetector = gameAutomationRuleSaveConflictDetector;
   }
 
   void Reset() {
@@ -173,6 +184,27 @@ sealed class RulesEditorDialog : AbstractDialog {
         ruleRow.Root.RemoveFromHierarchy();
       }
     }
+  }
+
+  string GetGameAutomationConflictNotification() {
+    var conflictingRules = _gameAutomationRuleSaveConflictDetector.GetConflictingRuleNumbers(
+        IsControlledByGameAutomation(), GetRuleCandidates());
+    return conflictingRules.Count == 0
+        ? null
+        : UiFactory.T(GameAutomationConflictLocKey, string.Join(", ", conflictingRules.Select(x => "#" + x)));
+  }
+
+  IEnumerable<GameAutomationRuleSaveConflictDetector.RuleCandidate> GetRuleCandidates() {
+    return _ruleRows.Select((ruleRow, index) => new GameAutomationRuleSaveConflictDetector.RuleCandidate(
+        RuleNumber: index + 1,
+        IsDeleted: ruleRow.IsDeleted,
+        IsEnabled: ruleRow.IsEnabled,
+        ParsedAction: ruleRow.ParsedAction));
+  }
+
+  bool IsControlledByGameAutomation() {
+    var automatable = _rulesUiHelper.AutomationBehavior.GetComponent<Automatable>();
+    return automatable && automatable.IsAutomated;
   }
 
   #endregion

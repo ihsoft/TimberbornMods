@@ -46,13 +46,25 @@ sealed class GameAutomationConflictDetector {
     return false;
   }
 
-  static bool IsConflictingRule(IAutomationAction action) {
-    if (action is not ScriptedAction scriptedAction
+  public bool IsBuildingStateChangingAction(ActionOperator actionOperator) {
+    return actionOperator != null && BuildingStateChangingActions.Contains(actionOperator.ActionName);
+  }
+
+  public bool IsBuildingStateChangingAction(IAutomationAction action) {
+    return action switch {
+        ScriptedAction scriptedAction => scriptedAction.ParsingResult.ParsedExpression is ActionOperator actionOperator
+            && IsBuildingStateChangingAction(actionOperator),
+        _ => false,
+    };
+  }
+
+  bool IsConflictingRule(IAutomationAction action) {
+    if (action == null
         || action.IsMarkedForCleanup
         || action.Condition is not { IsEnabled: true, IsMarkedForCleanup: false }
-        || scriptedAction.ParsingResult.ParsedExpression is not ActionOperator actionOperator) {
+        || !IsBuildingStateChangingAction(action)) {
       return false;
     }
-    return BuildingStateChangingActions.Contains(actionOperator.ActionName);
+    return true;
   }
 }

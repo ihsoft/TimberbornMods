@@ -17,6 +17,9 @@
       <Compile Include="..\Automation\AutomationSystem\GameAutomationConflictDetector.cs">
         <Link>Automation\AutomationSystem\GameAutomationConflictDetector.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\AutomationSystem\GameAutomationRuleSaveConflictDetector.cs">
+        <Link>Automation\AutomationSystem\GameAutomationRuleSaveConflictDetector.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\Core\ScriptError.cs">
         <Link>Automation\ScriptingEngine\Core\ScriptError.cs</Link>
       </Compile>

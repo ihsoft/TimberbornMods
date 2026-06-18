@@ -16,6 +16,7 @@ sealed class Configurator : IConfigurator {
 
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<GameAutomationConflictDetector>().AsSingleton();
+    containerDefinition.Bind<GameAutomationRuleSaveConflictDetector>().AsSingleton();
     containerDefinition.Bind<GameAutomationConflictGuardService>().AsSingleton();
     containerDefinition.Bind<AutomationFragment>().AsSingleton();
     containerDefinition.Bind<CopyRulesTool>().AsSingleton();
