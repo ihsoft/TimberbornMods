@@ -71,6 +71,39 @@ Smaller UI modifications are usually more resilient to game updates.
 
 ---
 
+## Game UI Verification Before Tests
+
+For changes that depend on in-game UI behavior, Harmony UI patches, or visually sensitive interactions:
+
+1. Implement the production change.
+2. Build it into the real mod folder.
+3. Let the user verify it in the actual game.
+4. Add or adjust tests after the real-game behavior is confirmed.
+
+Tests written before a manual game check can lock in the wrong approach and waste time.
+
+---
+
+## Tooltip Text
+
+Tooltip text must be short, localized, and sized for the actual Timberborn UI.
+
+Long tooltip lines can run across the screen or look broken even when technically visible.
+
+When a tooltip needs more than a few words, add an intentional line break in the localization string to keep the
+tooltip compact.
+
+---
+
+## Incremental Design Work
+
+When the user says the broader task is not finished, treat each commit as a confirmed working step, not as the end of
+the design.
+
+Keep the unresolved context in mind for follow-up changes and avoid restarting the topic from scratch.
+
+---
+
 ## Performance Awareness
 
 Always determine execution frequency before optimizing.
