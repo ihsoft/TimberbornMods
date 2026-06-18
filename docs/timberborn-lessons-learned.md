@@ -50,6 +50,18 @@ Large patches increase maintenance cost and game update risk.
 
 ---
 
+## State Transition Timing
+
+When a feature depends on an exact state-transition edge, identify the game method that owns the transition.
+
+Polling a calculated state after the fact can miss the semantic edge if the game resets or restarts the state inside
+the same lifecycle method.
+
+When the mod needs the final state after game logic has reacted to an event, patch after the owning game method instead
+of subscribing to a lower-level event that fires earlier.
+
+---
+
 ## Save/Load Validation
 
 Every new persistent feature should be tested through:

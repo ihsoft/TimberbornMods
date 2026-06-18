@@ -310,6 +310,9 @@ minimal production-code testability change is acceptable.
 When verifying a mod project, distinguish C# compilation failures from post-build target failures. Some projects copy
 outputs to the local game mods folder after building, and that copy step may fail even when the DLL compiled.
 
+If the user says not to run tests, interpret that as "do not run test suites" unless they also explicitly say not to
+build. After code changes, still run the relevant compile or build check when possible.
+
 For compilation-only verification of projects with mod-copy post-build targets, use a non-existent `ModPath`:
 
 ```powershell

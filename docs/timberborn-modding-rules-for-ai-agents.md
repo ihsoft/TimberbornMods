@@ -179,6 +179,17 @@ For UI patches, `Load()` may be too late.
 
 Prefer small, targeted patches.
 
+When patching Timberborn game methods, prefer `nameof(TargetType.Method)` over string method names whenever the
+publicized game assemblies make the target method compile-visible. This lets compilation catch renamed or removed game
+methods after a Timberborn update.
+
+If publicized direct access is not available for the target method, use the existing reflection or `AccessTools`
+approach instead of forcing `nameof`.
+
+When patching multiple methods on the same target type, prefer one patch class annotated with
+`[HarmonyPatch(typeof(TargetType))]` and method-level `[HarmonyPatch(nameof(TargetType.Method))]` attributes, unless a
+different shape is required by the target signature or patch discovery.
+
 For UI patches:
 
 - Prefer postfix patches when possible.
@@ -355,6 +366,10 @@ part of the behavior.
 When implementing event-capture behavior, verify the event order in decompiled game code. For example, entity creation
 events may be posted before the entity has finished initialization, so state that depends on initialized components may
 need to be captured later.
+
+When state ownership and event order matter, prefer observing the method that owns the state transition after it has
+run instead of subscribing to a lower-level event that may fire before the owner updates its state. A small targeted
+postfix can be safer than an earlier event subscription when the mod needs the final post-update state.
 
 ### Template decorators
 
