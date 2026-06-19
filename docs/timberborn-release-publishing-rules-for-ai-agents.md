@@ -282,6 +282,26 @@ Never close GitHub issues automatically as a side effect of committing, pushing,
 
 If release scope is unclear, ask instead of closing issues.
 
+When the user confirms closing GitHub issues after a release, use GitHub CLI when available:
+
+```powershell
+gh issue comment <issue-number> --repo ihsoft/TimberbornMods --body "Released in <ModName> vX.Y.Z."
+gh issue close <issue-number> --repo ihsoft/TimberbornMods
+gh issue view <issue-number> --repo ihsoft/TimberbornMods --json number,title,state,url,comments
+```
+
+Run authenticated `gh` commands outside the sandbox. In this environment, sandboxed `gh` may see an invalid or default
+token because it runs without access to the user's keyring, while the user's normal `gh auth` works outside the
+sandbox.
+
+For each closed issue, add a release comment such as:
+
+```text
+Released in Automation v4.5.0.
+```
+
+After closing, verify the issue state with `gh issue view`.
+
 If automatic issue closing is unavailable because GitHub CLI, tokens, browser access, or another authenticated path is
 not available, do not treat the issues as closed. Give the user direct links to the confirmed issues and state clearly
 that they still need manual closing.
