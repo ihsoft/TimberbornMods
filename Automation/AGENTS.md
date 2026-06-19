@@ -39,3 +39,12 @@ When showing conflicts in UI, distinguish blocking errors from informational war
 Keep Automation tooltip text short and localized.
 
 Use intentional line breaks in localization strings when a tooltip would otherwise become a long single-line panel.
+
+## Signal Design
+
+For player-visible signals with two named logical states, prefer a string signal with `ValueDef.Options` over a numeric
+`0`/`1` signal. Automation's Rules UI can show string options as readable dropdown values.
+
+For global time-like signals, prefer game events, `ITimeTriggerFactory`, or similar scheduled triggers over
+`AutomationService.RegisterTickable` polling. If exact per-tick precision is not required, use a coarse bucket and a
+lazy one-shot trigger when there are listeners.

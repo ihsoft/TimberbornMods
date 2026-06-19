@@ -87,6 +87,10 @@ If no close game wording exists, translate normally and keep the existing mod lo
 When the wording choice depends on a game term, cite or mention the exact game localization keys used as evidence in
 the final response or implementation notes.
 
+Do not expose implementation frequency, polling intervals, update buckets, or other internal mechanics in
+player-visible names unless players need that detail to make a decision. Put such details in localization comments,
+code comments, or documentation when useful.
+
 ## Localization file format
 
 Localization files have three columns:

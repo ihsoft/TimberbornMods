@@ -266,6 +266,31 @@ if the single-line version fits within 120 characters.
 
 * * *
 
+## Pattern matching readability
+
+Use pattern matching when it stays readable.
+
+If a property, list, or nested pattern inside an `if (... is ... { ... } variable)` becomes difficult to scan, split it
+into a simple type check first and then write separate property checks.
+
+Preferred for complex cases:
+
+    if (value is not SomeType typedValue) {
+      return;
+    }
+
+    if (typedValue.Items is not [var firstItem, ..]) {
+      return;
+    }
+
+    if (!firstItem.IsEnabled) {
+      return;
+    }
+
+Avoid compact pattern matching that hides several decisions inside one condition just to save lines.
+
+* * *
+
 ## Object and collection initializers
 
 Object and collection initializers use 4 spaces.
