@@ -7,33 +7,42 @@ using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.BlockSystem;
 using Timberborn.WaterBuildings;
+using Timberborn.WaterSourceSystem;
 
 namespace Automation.Tests;
 
 static class GameAutomationConflictDetectorTests {
-  public static void DetectsFillValveStateChangingRules() {
+  public static void IgnoresFillValveManualTargetRules() {
     var behavior = CreateBehavior(new FillValve());
 
     AddRule(behavior, "FillValve.SetHeight(1)");
 
-    Assert.True(new GameAutomationConflictDetector().HasConflictingRules(behavior));
+    Assert.False(new GameAutomationConflictDetector().HasConflictingRules(behavior));
   }
 
-  public static void DetectsThrottlingValveStateChangingRules() {
+  public static void IgnoresThrottlingValveManualFlowRules() {
     var behavior = CreateBehavior(new ThrottlingValve());
 
     AddRule(behavior, "ThrottlingValve.SetFlow(1)");
 
+    Assert.False(new GameAutomationConflictDetector().HasConflictingRules(behavior));
+  }
+
+  public static void DetectsFlowControlRulesOnWaterSourceRegulators() {
+    var behavior = CreateBehavior(new WaterSourceRegulator());
+
+    AddRule(behavior, "FlowControl.Open()");
+
     Assert.True(new GameAutomationConflictDetector().HasConflictingRules(behavior));
   }
 
-  public static void DetectsStateChangingRulesForOtherBuildings() {
+  public static void IgnoresStateChangesToNonAutomatedProperties() {
     var behavior = CreateBehavior();
 
     AddRule(behavior, "Pausable.Pause()");
     AddRule(behavior, "Workplace.SetPriority('High')");
 
-    Assert.True(new GameAutomationConflictDetector().HasConflictingRules(behavior));
+    Assert.False(new GameAutomationConflictDetector().HasConflictingRules(behavior));
   }
 
   public static void IgnoresSignalRules() {
@@ -78,62 +87,82 @@ static class GameAutomationConflictDetectorTests {
         ParseAction(behavior, "Notifications.SetNoticeIcon('NothingToDo', 'check it')")));
   }
 
-  public static void FindsRuleSaveConflictsByRuleNumber() {
-    var behavior = CreateBehavior();
+  public static void IgnoresManualWaterValveRuleSaveConflicts() {
+    var fillValveBehavior = CreateBehavior(new FillValve());
+    var throttlingValveBehavior = CreateBehavior(new ThrottlingValve());
+    var detector = new GameAutomationRuleSaveConflictDetector(new GameAutomationConflictDetector());
+    var fillValveRules = new[] {
+        Rule(1, ParseAction(fillValveBehavior, "Signals.Set('notice', 1)")),
+        Rule(2, ParseAction(fillValveBehavior, "FillValve.Open()")),
+    };
+    var throttlingValveRules = new[] {
+        Rule(1, ParseAction(throttlingValveBehavior, "ThrottlingValve.SetFlow(1)")),
+    };
+
+    var fillValveConflicts = detector.GetConflictingRuleNumbers(
+        fillValveBehavior, gameAutomationEnabled: true, fillValveRules);
+    var throttlingValveConflicts = detector.GetConflictingRuleNumbers(
+        throttlingValveBehavior, gameAutomationEnabled: true, throttlingValveRules);
+
+    Assert.Equal(0, fillValveConflicts.Count);
+    Assert.Equal(0, throttlingValveConflicts.Count);
+  }
+
+  public static void FindsFlowControlRuleSaveConflicts() {
+    var behavior = CreateBehavior(new WaterSourceRegulator());
     var detector = new GameAutomationRuleSaveConflictDetector(new GameAutomationConflictDetector());
     var rules = new[] {
         Rule(1, ParseAction(behavior, "Signals.Set('notice', 1)")),
-        Rule(2, ParseAction(behavior, "FillValve.Open()")),
-        Rule(3, ParseAction(behavior, "ThrottlingValve.SetFlow(1)")),
+        Rule(2, ParseAction(behavior, "FlowControl.Open()")),
     };
 
-    var conflicts = detector.GetConflictingRuleNumbers(gameAutomationEnabled: true, rules);
+    var conflicts = detector.GetConflictingRuleNumbers(behavior, gameAutomationEnabled: true, rules);
 
-    Assert.Equal(2, conflicts.Count);
+    Assert.Equal(1, conflicts.Count);
     Assert.Equal(2, conflicts[0]);
-    Assert.Equal(3, conflicts[1]);
   }
 
   public static void IgnoresRuleSaveConflictsWhenGameAutomationIsDisabled() {
-    var behavior = CreateBehavior();
+    var behavior = CreateBehavior(new FillValve());
     var detector = new GameAutomationRuleSaveConflictDetector(new GameAutomationConflictDetector());
     var rules = new[] {
         Rule(1, ParseAction(behavior, "FillValve.Open()")),
     };
 
-    var conflicts = detector.GetConflictingRuleNumbers(gameAutomationEnabled: false, rules);
+    var conflicts = detector.GetConflictingRuleNumbers(behavior, gameAutomationEnabled: false, rules);
 
     Assert.Equal(0, conflicts.Count);
   }
 
   public static void IgnoresDisabledAndDeletedRuleSaveConflicts() {
-    var behavior = CreateBehavior();
+    var behavior = CreateBehavior(new FillValve());
     var detector = new GameAutomationRuleSaveConflictDetector(new GameAutomationConflictDetector());
     var rules = new[] {
         Rule(1, ParseAction(behavior, "FillValve.Open()"), isEnabled: false),
         Rule(2, ParseAction(behavior, "ThrottlingValve.Close()"), isDeleted: true),
     };
 
-    var conflicts = detector.GetConflictingRuleNumbers(gameAutomationEnabled: true, rules);
+    var conflicts = detector.GetConflictingRuleNumbers(behavior, gameAutomationEnabled: true, rules);
 
     Assert.Equal(0, conflicts.Count);
   }
 
-  public static void DetectsStateChangingRuleCandidates() {
-    var behavior = CreateBehavior();
+  public static void IgnoresNonConflictingRuleCandidates() {
+    var behavior = CreateBehavior(new FillValve());
     var detector = new GameAutomationRuleSaveConflictDetector(new GameAutomationConflictDetector());
 
-    Assert.True(detector.IsStateChangingRule(Rule(1, ParseAction(behavior, "FillValve.Open()"))));
-    Assert.True(detector.IsStateChangingRule(Rule(2, ParseAction(behavior, "ThrottlingValve.SetFlow(1)"))));
+    Assert.False(detector.IsConflictingRule(behavior, Rule(1, ParseAction(behavior, "Signals.Set('notice', 1)"))));
+    Assert.False(detector.IsConflictingRule(behavior, Rule(2, ParseAction(behavior, "FillValve.Open()"))));
   }
 
-  public static void IgnoresNonStateChangingDisabledAndDeletedRuleCandidates() {
-    var behavior = CreateBehavior();
+  public static void IgnoresDisabledAndDeletedRuleCandidates() {
+    var behavior = CreateBehavior(new FillValve());
     var detector = new GameAutomationRuleSaveConflictDetector(new GameAutomationConflictDetector());
 
-    Assert.False(detector.IsStateChangingRule(Rule(1, ParseAction(behavior, "Signals.Set('notice', 1)"))));
-    Assert.False(detector.IsStateChangingRule(Rule(2, ParseAction(behavior, "FillValve.Open()"), isEnabled: false)));
-    Assert.False(detector.IsStateChangingRule(Rule(3, ParseAction(behavior, "ThrottlingValve.Close()"), isDeleted: true)));
+    Assert.False(detector.IsConflictingRule(
+        behavior, Rule(1, ParseAction(behavior, "FillValve.Open()"), isEnabled: false)));
+    Assert.False(detector.IsConflictingRule(
+        behavior, Rule(2, ParseAction(behavior, "FillValve.Close()"), isDeleted: true)));
   }
 
   static AutomationBehavior CreateBehavior(params object[] components) {
@@ -211,7 +240,11 @@ static class GameAutomationConflictDetectorTests {
     var notifications = new TestScriptable("Notifications");
     notifications.RegisterAction("Notifications.SetNoticeIcon", ScriptValue.TypeEnum.String, ScriptValue.TypeEnum.String);
 
-    TestScripting.CreateService(fillValve, throttlingValve, pausable, workplace, signals, notifications);
+    var flowControl = new TestScriptable("FlowControl");
+    flowControl.RegisterAction("FlowControl.Open");
+    flowControl.RegisterAction("FlowControl.Close");
+
+    TestScripting.CreateService(fillValve, throttlingValve, pausable, workplace, signals, notifications, flowControl);
   }
 
   static ParserFactory CreateParserFactory() {

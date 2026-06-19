@@ -165,7 +165,7 @@ sealed class RulesEditorDialog : AbstractDialog {
       return GameAutomationRuleConflictState.None;
     }
     var rule = CreateRuleCandidate(ruleRow, ruleNumber);
-    if (!_gameAutomationRuleSaveConflictDetector.IsStateChangingRule(rule)) {
+    if (!_gameAutomationRuleSaveConflictDetector.IsConflictingRule(_rulesUiHelper.AutomationBehavior, rule)) {
       return GameAutomationRuleConflictState.None;
     }
     return IsControlledByGameAutomation()
@@ -215,7 +215,7 @@ sealed class RulesEditorDialog : AbstractDialog {
       return null;
     }
     var conflictingRules = _gameAutomationRuleSaveConflictDetector.GetConflictingRuleNumbers(
-        IsControlledByGameAutomation(), GetRuleCandidates());
+        _rulesUiHelper.AutomationBehavior, IsControlledByGameAutomation(), GetRuleCandidates());
     return conflictingRules.Count == 0
         ? null
         : UiFactory.T(GameAutomationConflictLocKey, string.Join(", ", conflictingRules.Select(x => "#" + x)));
