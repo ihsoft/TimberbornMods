@@ -17,6 +17,7 @@ Then read only the instruction files that apply to the current task. Do not load
 | Modifying Timberborn mod code, data, UI, localization, or package files | `docs/timberborn-modding-rules-for-ai-agents.md` and `docs/timberborn-repository-notes.md` |
 | Designing a new feature or new mod | `docs/timberborn-modding-howto-for-ai-agents.md` and `docs/timberborn-lessons-learned.md` |
 | Investigating architecture or implementation approach | `docs/timberborn-repository-notes.md` and `docs/timberborn-lessons-learned.md` |
+| Editing or reviewing GitHub Wiki pages | `docs/timberborn-wiki-editing-rules-for-ai-agents.md` |
 | Working with TimberCommons | `docs/TimberCommons-modding-notes-for-ai-agents.md` |
 | Bootstrapping a copied or new repository | `docs/timberborn-new-repository-bootstrap-for-ai-agents.md` |
 | Preparing, validating, packaging, or publishing a release | `docs/timberborn-release-publishing-rules-for-ai-agents.md` |
