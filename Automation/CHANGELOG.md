@@ -1,4 +1,4 @@
-# v4.5.0 (TBD):
+# v4.5.0 (June 19th, 2026):
 * [Feature] Add actions for Clutch.
 * [Feature #79] Add `Science.Points` signal.
 * [Feature #72] Add time signals for game day, time of day, and working hours.
