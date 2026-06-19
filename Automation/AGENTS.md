@@ -48,3 +48,13 @@ For player-visible signals with two named logical states, prefer a string signal
 For global time-like signals, prefer game events, `ITimeTriggerFactory`, or similar scheduled triggers over
 `AutomationService.RegisterTickable` polling. If exact per-tick precision is not required, use a coarse bucket and a
 lazy one-shot trigger when there are listeners.
+
+When adding a new Automation signal family, decide whether each signal is building-scoped or global.
+
+Use `SignalDef.Scope` as the source of truth for exportability. Building signal export UI must rely on explicit scope,
+not on script-name prefixes or deny-lists.
+
+Global game, colony, district, weather, time, science, or service-state signals should use `SignalDef.ScopeEnum.Global`
+unless a specific building actually owns and produces the value.
+
+When adding global signals, verify that the building signal export dialog does not list them.
