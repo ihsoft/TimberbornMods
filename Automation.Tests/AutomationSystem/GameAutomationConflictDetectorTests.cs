@@ -6,6 +6,7 @@ using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.BlockSystem;
+using Timberborn.PowerManagement;
 using Timberborn.WaterBuildings;
 using Timberborn.WaterSourceSystem;
 
@@ -32,6 +33,14 @@ static class GameAutomationConflictDetectorTests {
     var behavior = CreateBehavior(new WaterSourceRegulator());
 
     AddRule(behavior, "FlowControl.Open()");
+
+    Assert.True(new GameAutomationConflictDetector().HasConflictingRules(behavior));
+  }
+
+  public static void DetectsClutchRulesOnClutches() {
+    var behavior = CreateBehavior(new Clutch());
+
+    AddRule(behavior, "Clutch.Engage()");
 
     Assert.True(new GameAutomationConflictDetector().HasConflictingRules(behavior));
   }
@@ -76,6 +85,8 @@ static class GameAutomationConflictDetectorTests {
         ParseAction(behavior, "FillValve.Open()")));
     Assert.True(new GameAutomationConflictDetector().IsBuildingStateChangingAction(
         ParseAction(behavior, "ThrottlingValve.SetFlow(1)")));
+    Assert.True(new GameAutomationConflictDetector().IsBuildingStateChangingAction(
+        ParseAction(behavior, "Clutch.Disengage()")));
   }
 
   public static void IgnoresNonStateChangingActionNames() {
@@ -114,6 +125,20 @@ static class GameAutomationConflictDetectorTests {
     var rules = new[] {
         Rule(1, ParseAction(behavior, "Signals.Set('notice', 1)")),
         Rule(2, ParseAction(behavior, "FlowControl.Open()")),
+    };
+
+    var conflicts = detector.GetConflictingRuleNumbers(behavior, gameAutomationEnabled: true, rules);
+
+    Assert.Equal(1, conflicts.Count);
+    Assert.Equal(2, conflicts[0]);
+  }
+
+  public static void FindsClutchRuleSaveConflicts() {
+    var behavior = CreateBehavior(new Clutch());
+    var detector = new GameAutomationRuleSaveConflictDetector(new GameAutomationConflictDetector());
+    var rules = new[] {
+        Rule(1, ParseAction(behavior, "Signals.Set('notice', 1)")),
+        Rule(2, ParseAction(behavior, "Clutch.Disengage()")),
     };
 
     var conflicts = detector.GetConflictingRuleNumbers(behavior, gameAutomationEnabled: true, rules);
@@ -244,7 +269,12 @@ static class GameAutomationConflictDetectorTests {
     flowControl.RegisterAction("FlowControl.Open");
     flowControl.RegisterAction("FlowControl.Close");
 
-    TestScripting.CreateService(fillValve, throttlingValve, pausable, workplace, signals, notifications, flowControl);
+    var clutch = new TestScriptable("Clutch");
+    clutch.RegisterAction("Clutch.Engage");
+    clutch.RegisterAction("Clutch.Disengage");
+
+    TestScripting.CreateService(
+        fillValve, throttlingValve, pausable, workplace, signals, notifications, flowControl, clutch);
   }
 
   static ParserFactory CreateParserFactory() {

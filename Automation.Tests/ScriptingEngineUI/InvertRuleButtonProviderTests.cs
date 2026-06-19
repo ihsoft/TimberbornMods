@@ -5,6 +5,7 @@ using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 using IgorZ.Automation.ScriptingEngineUI;
+using Timberborn.PowerManagement;
 using Timberborn.WaterBuildings;
 
 namespace Automation.Tests;
@@ -64,6 +65,19 @@ static class InvertRuleButtonProviderTests {
     Assert.Equal("(act ThrottlingValve.Open)", MakeInvertedActionExpression(parserFactory, closeAction, behavior));
   }
 
+  public static void InvertsClutchEngageAndDisengageActions() {
+    var behavior = new AutomationBehavior();
+    behavior.SetComponent(new Clutch());
+    var parserFactory = CreateParserFactory();
+    RegisterClutchScriptableComponent();
+
+    var engageAction = ParseAction(parserFactory, behavior, "Clutch.Engage()");
+    var disengageAction = ParseAction(parserFactory, behavior, "Clutch.Disengage()");
+
+    Assert.Equal("(act Clutch.Disengage)", MakeInvertedActionExpression(parserFactory, engageAction, behavior));
+    Assert.Equal("(act Clutch.Engage)", MakeInvertedActionExpression(parserFactory, disengageAction, behavior));
+  }
+
   static string MakeInvertedActionExpression(
       ParserFactory parserFactory, ActionOperator action, AutomationBehavior behavior) {
     var provider = new InvertRuleButtonProvider(parserFactory);
@@ -100,6 +114,13 @@ static class InvertRuleButtonProviderTests {
   static void RegisterThrottlingValveScriptableComponent() {
     var service = TestScripting.CreateService();
     var component = new ThrottlingValveScriptableComponent();
+    component.InjectDependencies(new TestLoc(), service);
+    component.Load();
+  }
+
+  static void RegisterClutchScriptableComponent() {
+    var service = TestScripting.CreateService();
+    var component = new ClutchScriptableComponent();
     component.InjectDependencies(new TestLoc(), service);
     component.Load();
   }

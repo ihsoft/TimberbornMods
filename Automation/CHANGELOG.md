@@ -1,4 +1,5 @@
-# v4.4.1 (TBD):
+# v4.5.0 (TBD):
+* [Feature] Add actions for Clutch.
 * [Fix] Only report game automation conflicts when vanilla automation and Advanced Automation change the same property.
 
 # v4.4.0 (June 18th, 2026):

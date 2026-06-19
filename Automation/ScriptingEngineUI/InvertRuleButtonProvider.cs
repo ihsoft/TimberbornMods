@@ -94,6 +94,8 @@ sealed class InvertRuleButtonProvider(ParserFactory parserFactory) : IEditorButt
         "FillValve.Close" => "(act FillValve.Open)",
         "ThrottlingValve.Open" => "(act ThrottlingValve.Close)",
         "ThrottlingValve.Close" => "(act ThrottlingValve.Open)",
+        "Clutch.Engage" => "(act Clutch.Disengage)",
+        "Clutch.Disengage" => "(act Clutch.Engage)",
         "FlowControl.Open" => "(act FlowControl.Close)",
         "FlowControl.Close" => "(act FlowControl.Open)",
         "Inventory.StartEmptying" => "(act Inventory.StopEmptying)",

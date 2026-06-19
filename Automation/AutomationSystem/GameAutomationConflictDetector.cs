@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using IgorZ.Automation.Actions;
 using IgorZ.Automation.ScriptingEngine.Expressions;
+using Timberborn.PowerManagement;
 using Timberborn.WaterBuildings;
 using Timberborn.WaterSourceSystem;
 
@@ -13,6 +14,7 @@ namespace IgorZ.Automation.AutomationSystem;
 
 sealed class GameAutomationConflictDetector {
   const string DynamiteDetonationProperty = "Dynamite.Detonation";
+  const string ClutchModeProperty = "Clutch.Mode";
   const string FillValveTargetHeightProperty = "FillValve.TargetHeight";
   const string FillValveAutomationTargetHeightProperty = "FillValve.AutomationTargetHeight";
   const string FloodgateHeightProperty = "Floodgate.Height";
@@ -31,6 +33,8 @@ sealed class GameAutomationConflictDetector {
   static readonly Dictionary<string, string[]> ActionChangedProperties = new() {
       ["Dynamite.Detonate"] = [DynamiteDetonationProperty],
       ["Dynamite.DetonateAndRepeat"] = [DynamiteDetonationProperty],
+      ["Clutch.Engage"] = [ClutchModeProperty],
+      ["Clutch.Disengage"] = [ClutchModeProperty],
       ["FillValve.Open"] = [FillValveTargetHeightProperty],
       ["FillValve.Close"] = [FillValveTargetHeightProperty],
       ["FillValve.SetHeight"] = [FillValveTargetHeightProperty],
@@ -101,6 +105,9 @@ sealed class GameAutomationConflictDetector {
     var properties = new HashSet<string>();
     if (behavior.GetComponent<WaterSourceRegulator>()) {
       properties.Add(FlowControlStateProperty);
+    }
+    if (behavior.GetComponent<Clutch>()) {
+      properties.Add(ClutchModeProperty);
     }
     if (behavior.GetComponent<FillValve>()) {
       properties.Add(FillValveAutomationTargetHeightProperty);

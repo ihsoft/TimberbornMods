@@ -547,6 +547,22 @@ namespace Timberborn.PrioritySystem {
   }
 }
 
+namespace Timberborn.PowerManagement {
+  public enum ClutchMode {
+    Engaged,
+    Disengaged,
+    Automated,
+  }
+
+  public sealed class Clutch : Timberborn.BaseComponentSystem.BaseComponent {
+    public ClutchMode Mode { get; private set; }
+
+    public void SetMode(ClutchMode value) {
+      Mode = value;
+    }
+  }
+}
+
 namespace Timberborn.SingletonSystem {
   public interface ILoadableSingleton {
     void Load();

@@ -166,6 +166,8 @@ IgorZ.Automation.Scriptable.District.Signal.ResourceCapacity,"вместимос
 IgorZ.Automation.Scriptable.District.Signal.ResourceStock,"запас района: {0}","Name of the condition that returns the current district stock output of the specified good"
 IgorZ.Automation.Scriptable.Dynamite.Action.Detonate,"активировать динамит","Name of the action that immediately detonates the dynamite"
 IgorZ.Automation.Scriptable.Dynamite.Action.DetonateAndRepeat,"активировать динамит и повторить ещё <GreenHighlight>{0} раза</GreenHighlight>","Name of the action that detonates the dynamite and places new dynamites the specified number of times"
+IgorZ.Automation.Scriptable.Clutch.Action.Disengage,"расцепить","Name of the action that disengages a clutch"
+IgorZ.Automation.Scriptable.Clutch.Action.Engage,"сцепить","Name of the action that engages a clutch"
 IgorZ.Automation.Scriptable.FillValve.Action.Close,"закрыть","Name of the action that sets the target height on a fill valve to zero"
 IgorZ.Automation.Scriptable.FillValve.Action.Open,"полностью открыть","Name of the action that sets the target height on a fill valve to the maximum"
 IgorZ.Automation.Scriptable.FillValve.Action.SetHeight,"выставить высоту в {0}","Name of the action that sets the target height on a fill valve"

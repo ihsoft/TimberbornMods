@@ -7,6 +7,7 @@ using IgorZ.Automation.Settings;
 using Timberborn.AutomationUI;
 using Timberborn.Localization;
 using Timberborn.TooltipSystem;
+using UnityDev.Utils.LogUtilsLite;
 using UnityEngine.UIElements;
 
 namespace IgorZ.Automation.AutomationSystemUI;
@@ -37,8 +38,7 @@ sealed class GameAutomationConflictGuardService(
 
   bool HasConflict(TransmitterSelector transmitterSelector) {
     var owner = transmitterSelector._owner;
-    var behavior = owner ? owner.GetComponent<AutomationBehavior>() : null;
-    return conflictDetector.HasConflictingRules(behavior);
+    return owner && conflictDetector.HasConflictingRules(owner.GetComponent<AutomationBehavior>());
   }
 
   static void SetEnabled(VisualElement element, bool enabled) {

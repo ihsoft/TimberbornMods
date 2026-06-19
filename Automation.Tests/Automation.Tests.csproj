@@ -122,6 +122,9 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\AutomatorScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\AutomatorScriptableComponent.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ClutchScriptableComponent.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\ClutchScriptableComponent.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ConstructableScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\ConstructableScriptableComponent.cs</Link>
       </Compile>
