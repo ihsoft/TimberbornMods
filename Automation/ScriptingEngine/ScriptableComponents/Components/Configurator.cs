@@ -56,6 +56,7 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<NotificationsScriptableComponent.StatusController>().AsTransient();
     containerDefinition.Bind<ScienceScriptableComponent>().AsSingleton();
     containerDefinition.Bind<SignalsScriptableComponent>().AsSingleton();
+    containerDefinition.Bind<TimeScriptableComponent>().AsSingleton();
     containerDefinition.Bind<WeatherScriptableComponent>().AsSingleton();
 
     containerDefinition.MultiBind<TemplateModule>().ToProvider(ProvideTemplateModule).AsSingleton();

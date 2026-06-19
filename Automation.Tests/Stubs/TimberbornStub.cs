@@ -588,6 +588,42 @@ namespace Timberborn.SingletonSystem {
   }
 }
 
+namespace Timberborn.GameCycleSystem {
+  public sealed class CycleDayStartedEvent {
+  }
+}
+
+namespace Timberborn.TimeSystem {
+  using System;
+
+  public interface IDayNightCycle {
+    int DayNumber { get; }
+    float HoursPassedToday { get; }
+  }
+
+  public interface ITimeTrigger {
+    bool InProgress { get; }
+    void Resume();
+    void Pause();
+  }
+
+  public interface ITimeTriggerFactory {
+    ITimeTrigger Create(Action action, float delayInDays);
+  }
+}
+
+namespace Timberborn.WorkSystem {
+  public sealed class WorkingHoursManager {
+    public bool AreWorkingHours { get; set; }
+  }
+
+  public sealed class WorkingHoursTransitionedEvent {
+  }
+
+  public sealed class WorkingHoursChangedEvent {
+  }
+}
+
 namespace Timberborn.ScienceSystem {
   public sealed class ScienceService {
     public int SciencePoints { get; private set; }

@@ -6,7 +6,10 @@ using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 using IgorZ.Automation.ScriptingEngineUI;
 using Timberborn.PowerManagement;
+using Timberborn.SingletonSystem;
+using Timberborn.TimeSystem;
 using Timberborn.WaterBuildings;
+using Timberborn.WorkSystem;
 
 namespace Automation.Tests;
 
@@ -78,6 +81,40 @@ static class InvertRuleButtonProviderTests {
     Assert.Equal("(act Clutch.Engage)", MakeInvertedActionExpression(parserFactory, disengageAction, behavior));
   }
 
+  public static void InvertsTimeWorkingHoursConditionBySwitchingStringValue() {
+    var behavior = new AutomationBehavior();
+    var parserFactory = CreateParserFactory();
+    RegisterTimeScriptableComponent();
+
+    var workingCondition = ParseCondition(parserFactory, behavior, "Time.WorkingHours == 'Working'");
+    var offHoursCondition = ParseCondition(parserFactory, behavior, "Time.WorkingHours != 'OffHours'");
+
+    Assert.Equal(
+        "(eq (sig Time.WorkingHours) 'OffHours')",
+        MakeInvertedConditionExpression(parserFactory, workingCondition));
+    Assert.Equal(
+        "(ne (sig Time.WorkingHours) 'Working')",
+        MakeInvertedConditionExpression(parserFactory, offHoursCondition));
+  }
+
+  public static void DoesNotSpecialInvertOtherTimeConditions() {
+    var behavior = new AutomationBehavior();
+    var parserFactory = CreateParserFactory();
+    RegisterTimeScriptableComponent();
+
+    var condition = ParseCondition(parserFactory, behavior, "Time.Day == 1");
+
+    Assert.Equal(null, MakeInvertedConditionExpression(parserFactory, condition));
+  }
+
+  static string MakeInvertedConditionExpression(ParserFactory parserFactory, BooleanOperator condition) {
+    var provider = new InvertRuleButtonProvider(parserFactory);
+    var method = typeof(InvertRuleButtonProvider).GetMethod(
+        "MakeInvertedConditionExpression",
+        BindingFlags.Instance | BindingFlags.NonPublic);
+    return (string)method.Invoke(provider, [condition]);
+  }
+
   static string MakeInvertedActionExpression(
       ParserFactory parserFactory, ActionOperator action, AutomationBehavior behavior) {
     var provider = new InvertRuleButtonProvider(parserFactory);
@@ -85,6 +122,14 @@ static class InvertRuleButtonProviderTests {
         "MakeInvertedActionExpression",
         BindingFlags.Instance | BindingFlags.NonPublic);
     return (string)method.Invoke(provider, [action, behavior]);
+  }
+
+  static BooleanOperator ParseCondition(ParserFactory parserFactory, AutomationBehavior behavior, string expression) {
+    var condition = parserFactory.ParseCondition(expression, behavior, out var result, parserFactory.PythonSyntaxParser);
+    if (result.LastScriptError != null) {
+      throw result.LastScriptError;
+    }
+    return condition;
   }
 
   static ActionOperator ParseAction(ParserFactory parserFactory, AutomationBehavior behavior, string expression) {
@@ -118,11 +163,58 @@ static class InvertRuleButtonProviderTests {
     component.Load();
   }
 
+  static void RegisterTimeScriptableComponent() {
+    var service = TestScripting.CreateService();
+    var component = CreateTimeScriptableComponent(service);
+    component.InjectDependencies(new TestLoc(), service);
+    component.Load();
+  }
+
+  static TimeScriptableComponent CreateTimeScriptableComponent(ScriptingService service) {
+    var constructor = typeof(TimeScriptableComponent).GetConstructor(
+        BindingFlags.Instance | BindingFlags.NonPublic,
+        null,
+        [
+            typeof(EventBus),
+            typeof(IDayNightCycle),
+            typeof(ITimeTriggerFactory),
+            typeof(WorkingHoursManager),
+            typeof(ReferenceManager),
+        ],
+        null);
+    return (TimeScriptableComponent)constructor.Invoke(
+        [new EventBus(), new TestDayNightCycle(), new TestTimeTriggerFactory(), new WorkingHoursManager(),
+            new ReferenceManager(service)]);
+  }
+
   static void RegisterClutchScriptableComponent() {
     var service = TestScripting.CreateService();
     var component = new ClutchScriptableComponent();
     component.InjectDependencies(new TestLoc(), service);
     component.Load();
+  }
+
+  sealed class TestDayNightCycle : IDayNightCycle {
+    public int DayNumber => 1;
+    public float HoursPassedToday => 0;
+  }
+
+  sealed class TestTimeTriggerFactory : ITimeTriggerFactory {
+    public ITimeTrigger Create(System.Action action, float delayInDays) {
+      return new TestTimeTrigger();
+    }
+  }
+
+  sealed class TestTimeTrigger : ITimeTrigger {
+    public bool InProgress { get; private set; }
+
+    public void Resume() {
+      InProgress = true;
+    }
+
+    public void Pause() {
+      InProgress = false;
+    }
   }
 
   sealed class TestLoc : Timberborn.Localization.ILoc {

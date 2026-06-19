@@ -1,6 +1,7 @@
 # v4.5.0 (TBD):
 * [Feature] Add actions for Clutch.
 * [Feature #79] Add `Science.Points` signal.
+* [Feature #72] Add time signals for game day, time of day, and working hours.
 * [Fix] Only report game automation conflicts when vanilla automation and Advanced Automation change the same property.
 
 # v4.4.0 (June 18th, 2026):

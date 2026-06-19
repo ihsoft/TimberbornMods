@@ -23,8 +23,18 @@ sealed class InvertRuleButtonProvider(ParserFactory parserFactory) : IEditorButt
 
   /// <inheritdoc/>
   public void OnRuleRowBtnAction(RuleRow ruleRow) {
-    var inverted = parserFactory.DefaultParser.InvertBooleanExpression(ruleRow.ParsedCondition, ruleRow.ActiveBuilding);
-    ruleRow.ConditionExpression = parserFactory.DefaultParser.Decompile(inverted);
+    var invertedConditionExpression = MakeInvertedConditionExpression(ruleRow.ParsedCondition);
+    if (invertedConditionExpression != null) {
+      var result = parserFactory.LispSyntaxParser.Parse(invertedConditionExpression, ruleRow.ActiveBuilding);
+      if (result.LastScriptError != null) {
+        throw new InvalidOperationException(
+            $"Cannot parse inverted condition: {invertedConditionExpression} => {result.LastError}");
+      }
+      ruleRow.ConditionExpression = parserFactory.DefaultParser.Decompile(result.ParsedExpression);
+    } else {
+      var inverted = parserFactory.DefaultParser.InvertBooleanExpression(ruleRow.ParsedCondition, ruleRow.ActiveBuilding);
+      ruleRow.ConditionExpression = parserFactory.DefaultParser.Decompile(inverted);
+    }
     var invertedActionExpression = MakeInvertedActionExpression(ruleRow.ParsedAction, ruleRow.ActiveBuilding);
     if (invertedActionExpression != null) {
       var result = parserFactory.LispSyntaxParser.Parse(invertedActionExpression, ruleRow.ActiveBuilding);
@@ -40,6 +50,28 @@ sealed class InvertRuleButtonProvider(ParserFactory parserFactory) : IEditorButt
   /// <inheritdoc/>
   public bool IsRuleRowBtnEnabled(RuleRow ruleRow) {
     return ruleRow.ParsedCondition != null && ruleRow.ParsedAction != null;
+  }
+
+  string MakeInvertedConditionExpression(BooleanOperator condition) {
+    if (condition is not ComparisonOperator comparison) {
+      return null;
+    }
+    if (comparison.OperatorType is not (ComparisonOperator.OpType.Equal or ComparisonOperator.OpType.NotEqual)) {
+      return null;
+    }
+    if (!TryGetTimeWorkingHoursComparison(comparison, out var currentValue)) {
+      return null;
+    }
+    var invertedValue = currentValue switch {
+        "Working" => "OffHours",
+        "OffHours" => "Working",
+        _ => null,
+    };
+    if (invertedValue == null) {
+      return null;
+    }
+    var operatorName = comparison.OperatorType == ComparisonOperator.OpType.Equal ? "eq" : "ne";
+    return $"({operatorName} (sig Time.WorkingHours) '{invertedValue}')";
   }
 
   string MakeInvertedActionExpression(ActionOperator action, AutomationBehavior automationBehavior) {
@@ -106,5 +138,20 @@ sealed class InvertRuleButtonProvider(ParserFactory parserFactory) : IEditorButt
         "Prioritizable.ResetHaulers" => "(act Prioritizable.SetHaulers)",
         _ => null,
     };
+  }
+
+  static bool TryGetTimeWorkingHoursComparison(ComparisonOperator comparison, out string value) {
+    value = null;
+    if (comparison.Left is SignalOperator { SignalName: "Time.WorkingHours" }
+        && comparison.Right is ConstantValueExpr { ValueType: ScriptValue.TypeEnum.String } rightValue) {
+      value = rightValue.ValueFn().AsString;
+      return true;
+    }
+    if (comparison.Right is SignalOperator { SignalName: "Time.WorkingHours" }
+        && comparison.Left is ConstantValueExpr { ValueType: ScriptValue.TypeEnum.String } leftValue) {
+      value = leftValue.ValueFn().AsString;
+      return true;
+    }
+    return false;
   }
 }
