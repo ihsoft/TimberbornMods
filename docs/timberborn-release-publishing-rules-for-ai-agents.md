@@ -52,6 +52,21 @@ Uncommitted changes in unrelated mods may be mentioned as background, but they s
 For shared docs/tools changes, block only when they affect the current publish flow, release validation, release
 metadata, package construction, or platform upload. Otherwise, mention them as background instead of stopping.
 
+## Publish script sequencing
+
+Do not run Steam and Mod.IO release scripts for the same mod in parallel.
+
+The publish scripts may share staging and output paths, such as `.tools/release-staging/<ModName>-local` and generated
+ZIP paths under the local mod source or output folder. Run dry runs and uploads sequentially unless the scripts have
+been changed to use unique staging roots per invocation.
+
+Recommended order:
+
+1. Steam dry run.
+2. Mod.IO dry run.
+3. Steam upload, if requested.
+4. Mod.IO upload, if requested.
+
 ## Exact version matching
 
 When the user names a release version, it must exactly match the configured release version.
@@ -266,6 +281,10 @@ confirmation.
 Never close GitHub issues automatically as a side effect of committing, pushing, packaging, or publishing.
 
 If release scope is unclear, ask instead of closing issues.
+
+If automatic issue closing is unavailable because GitHub CLI, tokens, browser access, or another authenticated path is
+not available, do not treat the issues as closed. Give the user direct links to the confirmed issues and state clearly
+that they still need manual closing.
 
 ## Stop on uncertainty
 
