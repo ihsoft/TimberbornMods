@@ -11,6 +11,16 @@ Never publish to Steam or Mod.IO unless the user explicitly asks to publish.
 Dry runs may build packages, validate files, generate metadata, and prepare staging directories. They must not upload
 anything.
 
+## Network checks
+
+Release publishing requires live Steam, GitHub, and Mod.IO checks.
+
+In this repository environment, PowerShell network requests from the sandbox may fail with connection-closed errors.
+For mandatory release checks or upload verification, request an escalated run instead of treating the sandbox network
+failure as evidence about the platform state.
+
+Do not skip required platform verification because a sandboxed network request failed.
+
 ## Dirty worktree before publishing
 
 Before uploading a mod release, check for uncommitted changes that belong to the target mod or to shared
