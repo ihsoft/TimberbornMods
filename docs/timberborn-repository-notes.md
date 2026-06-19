@@ -192,6 +192,12 @@ If the changelog has no top section marked `(TBD)`, start one using this heading
 # v4.4.0 (TBD)
 ```
 
+Treat changelog sections with a concrete release date as published history.
+
+Do not add new entries to dated changelog sections unless the user explicitly asks to correct historical release notes.
+
+If the top changelog section is dated, new user-visible changes must go into a new `(TBD)` section above it.
+
 Choose the next version from the last published version of that package:
 
 - feature work starts the next minor version,
