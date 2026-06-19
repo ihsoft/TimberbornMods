@@ -11,6 +11,8 @@ public abstract class AutomationActionBase : IgorZ.Automation.AutomationSystem.I
   public IgorZ.Automation.AutomationSystem.IAutomationCondition Condition { get; set; }
   public virtual string TemplateFamily { get; set; } = "";
   public virtual bool IsMarkedForCleanup => false;
+  public virtual bool IsInErrorState => false;
+  public virtual string UiDescription => "";
 
   public virtual IgorZ.Automation.AutomationSystem.IAutomationAction CloneDefinition() {
     throw new NotSupportedException();

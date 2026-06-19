@@ -83,10 +83,13 @@ class RulesUIHelper {
     // However, there can be multiple mappings for the same building signal.
     var allowedSignals = new List<SignalDef>();
     foreach (var signalName in _scriptingService.GetSignalNamesForBuilding(automationBehavior)) {
-      if (NonBuildingActions.Any(signalName.StartsWith) || signalName.Contains(".OnUnfinished")) {
+      if (signalName.Contains(".OnUnfinished")) {
         continue; // Not what we want to bind as an exported signal.
       }
       var signalDef = _scriptingService.GetSignalDefinition(signalName, automationBehavior);
+      if (signalDef.Scope != SignalDef.ScopeEnum.Building) {
+        continue;
+      }
       if (signalDef.Result.ValueType != ScriptValue.TypeEnum.Number) {
         continue; // Custom signals can only be numbers.
       }
@@ -189,11 +192,6 @@ class RulesUIHelper {
   #endregion
 
   #region Implementation
-
-  // FIXME: Add scope to the signal definition and filter by it.
-  static readonly List<string> NonBuildingActions = [
-      "Debug.", "Weather.", "Signals.", "District.",
-  ];
 
   readonly ScriptingService _scriptingService;
   readonly ILoc _loc;

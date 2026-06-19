@@ -6,11 +6,19 @@ namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
 /// <summary>Definition of a signal that can be used in the scripting engine.</summary>
 sealed record SignalDef {
+  public enum ScopeEnum {
+    Building,
+    Global,
+  }
+
   /// <summary>Unique name of the signal as it appears in the scripts.</summary>
   public string ScriptName { get; init; }
 
   /// <summary>Human-readable and localized name of the signal.</summary>
   public string DisplayName { get; init; }
+
+  /// <summary>Scope that owns the signal value.</summary>
+  public ScopeEnum Scope { get; init; } = ScopeEnum.Building;
 
   /// <summary>Definition of the result value.</summary>
   public ValueDef Result { get; init; }

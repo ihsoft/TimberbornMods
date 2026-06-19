@@ -38,11 +38,14 @@ sealed class TestScriptable : IScriptable {
     Name = name;
   }
 
-  public void RegisterSignal(string name, ScriptValue.TypeEnum valueType, Func<ScriptValue> source = null) {
+  public void RegisterSignal(
+      string name, ScriptValue.TypeEnum valueType, Func<ScriptValue> source = null,
+      SignalDef.ScopeEnum scope = SignalDef.ScopeEnum.Building) {
     _signals[name] = (
         new SignalDef {
             ScriptName = name,
             DisplayName = name,
+            Scope = scope,
             Result = new ValueDef {
                 ValueType = valueType,
                 DisplayNumericFormat = ValueDef.NumericFormatEnum.Float,

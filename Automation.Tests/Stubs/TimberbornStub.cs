@@ -69,6 +69,7 @@ namespace Timberborn.Automation {
   public sealed class Automator : Timberborn.BaseComponentSystem.BaseComponent {
     public bool IsTransmitter { get; init; }
     public AutomatorState State { get; set; }
+    public string AutomatorName { get; set; }
   }
 }
 

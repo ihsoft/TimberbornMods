@@ -181,6 +181,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
   SignalDef BeaverPopulationSignalDef => _beaverPopulationSignalDef ??= new SignalDef {
       ScriptName = BeaverPopulationSignalName,
       DisplayName = Loc.T(BeaversPopulationSignalLocKey),
+      Scope = SignalDef.ScopeEnum.Global,
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
           DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
@@ -192,6 +193,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
   SignalDef BotPopulationSignalDef => _botPopulationSignalDef ??= new SignalDef {
       ScriptName = BotPopulationSignalName,
       DisplayName = Loc.T(BotPopulationSignalLocKey),
+      Scope = SignalDef.ScopeEnum.Global,
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
           DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
@@ -203,6 +205,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
   SignalDef NumberOfBedsSignalDef => _numberOfBedsSignalDef ??= new SignalDef {
       ScriptName = NumberOfBedsSignalName,
       DisplayName = Loc.T(NumberOfBedsSignalLocKey),
+      Scope = SignalDef.ScopeEnum.Global,
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
           DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
@@ -216,6 +219,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
     return new SignalDef {
         ScriptName = signalName,
         DisplayName = Loc.T(ResourceStockSignalLocKey, spec.PluralDisplayName.Value),
+        Scope = SignalDef.ScopeEnum.Global,
         Result = new ValueDef {
             ValueType = ScriptValue.TypeEnum.Number,
             DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
@@ -229,6 +233,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
     return new SignalDef {
         ScriptName = signalName,
         DisplayName = Loc.T(ResourceCapacitySignalLocKey, spec.PluralDisplayName.Value),
+        Scope = SignalDef.ScopeEnum.Global,
         Result = new ValueDef {
             ValueType = ScriptValue.TypeEnum.Number,
             DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,

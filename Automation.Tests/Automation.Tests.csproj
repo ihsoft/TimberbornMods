@@ -20,6 +20,9 @@
       <Compile Include="..\Automation\AutomationSystem\GameAutomationRuleSaveConflictDetector.cs">
         <Link>Automation\AutomationSystem\GameAutomationRuleSaveConflictDetector.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\AutomationSystemUI\RulesUIHelper.cs">
+        <Link>Automation\AutomationSystemUI\RulesUIHelper.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\Core\ScriptError.cs">
         <Link>Automation\ScriptingEngine\Core\ScriptError.cs</Link>
       </Compile>

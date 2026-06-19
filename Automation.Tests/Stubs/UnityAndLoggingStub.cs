@@ -99,6 +99,9 @@ namespace UnityDev.Utils.LogUtilsLite {
     public static void Info(object host, string format, params object[] args) {
     }
 
+    public static void Warning(object host, string format, params object[] args) {
+    }
+
     public static void Error(object host, string format, params object[] args) {
     }
   }

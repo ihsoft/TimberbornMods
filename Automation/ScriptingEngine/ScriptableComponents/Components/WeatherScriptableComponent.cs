@@ -134,6 +134,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   SignalDef SeasonSignalDef => _seasonSignalDef ??= new SignalDef {
       ScriptName = SeasonSignalName,
       DisplayName = Loc.T(SeasonSignalLocKey),
+      Scope = SignalDef.ScopeEnum.Global,
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.String,
           Options = GetWeatherSeasonOptions(),

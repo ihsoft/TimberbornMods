@@ -99,6 +99,7 @@ sealed class TimeScriptableComponent : ScriptableComponentBase, IPostLoadableSin
   SignalDef MinuteOfDaySignalDef => _minuteOfDaySignalDef ??= new SignalDef {
       ScriptName = MinuteOfDaySignalName,
       DisplayName = Loc.T(MinuteOfDaySignalLocKey),
+      Scope = SignalDef.ScopeEnum.Global,
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
           DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
@@ -110,6 +111,7 @@ sealed class TimeScriptableComponent : ScriptableComponentBase, IPostLoadableSin
   SignalDef DaySignalDef => _daySignalDef ??= new SignalDef {
       ScriptName = DaySignalName,
       DisplayName = Loc.T(DaySignalLocKey),
+      Scope = SignalDef.ScopeEnum.Global,
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
           DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
@@ -121,6 +123,7 @@ sealed class TimeScriptableComponent : ScriptableComponentBase, IPostLoadableSin
   SignalDef WorkingHoursSignalDef => _workingHoursSignalDef ??= new SignalDef {
       ScriptName = WorkingHoursSignalName,
       DisplayName = Loc.T(WorkingHoursSignalLocKey),
+      Scope = SignalDef.ScopeEnum.Global,
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.String,
           Options = [

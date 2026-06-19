@@ -69,6 +69,7 @@ sealed class ScienceScriptableComponent : ScriptableComponentBase {
   SignalDef PointsSignalDef => _pointsSignalDef ??= new SignalDef {
       ScriptName = PointsSignalName,
       DisplayName = Loc.T(PointsSignalLocKey),
+      Scope = SignalDef.ScopeEnum.Global,
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
           DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,

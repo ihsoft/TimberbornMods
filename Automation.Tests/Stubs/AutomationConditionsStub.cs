@@ -1,6 +1,7 @@
 namespace IgorZ.Automation.Conditions;
 
 using IgorZ.Automation.AutomationSystem;
+using IgorZ.Automation.ScriptingEngine.Parser;
 
 public abstract class AutomationConditionBase : IAutomationCondition {
   public AutomationBehavior Behavior { get; set; }
@@ -8,6 +9,8 @@ public abstract class AutomationConditionBase : IAutomationCondition {
   public bool IsEnabled => Enabled;
   public bool CanRunOnUnfinishedBuildings => false;
   public bool IsMarkedForCleanup => false;
+  public bool IsInErrorState => false;
+  public string UiDescription => "";
 
   public void Activate() {
   }
@@ -19,6 +22,7 @@ public abstract class AutomationConditionBase : IAutomationCondition {
 
 sealed class ScriptedCondition : AutomationConditionBase {
   public string Expression { get; private set; }
+  public ParsingResult ParsingResult { get; set; }
 
   public void SetExpression(string expression) {
     Expression = expression;

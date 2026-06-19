@@ -1,3 +1,6 @@
+# v4.5.1 (TBD)
+* [Fix] Hide global time and science signals from the building signal export dialog.
+
 # v4.5.0 (June 19th, 2026):
 * [Feature] Add actions for Clutch.
 * [Feature #79] Add `Science.Points` signal.

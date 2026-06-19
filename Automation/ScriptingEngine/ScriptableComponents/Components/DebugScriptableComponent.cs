@@ -99,6 +99,7 @@ sealed class DebugScriptableComponent : ScriptableComponentBase {
   SignalDef TickerSignalDef => _tickerSignalDef ??= new SignalDef {
       ScriptName = TickerSignalName,
       DisplayName = Loc.T(TickerSignalLocKey),
+      Scope = SignalDef.ScopeEnum.Global,
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
           DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,

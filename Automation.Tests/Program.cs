@@ -48,6 +48,8 @@ static class Program {
           GameAutomationConflictDetectorTests.IgnoresNonConflictingRuleCandidates),
       ("GameAutomationRuleSaveConflictDetector ignores disabled and deleted rule candidates",
           GameAutomationConflictDetectorTests.IgnoresDisabledAndDeletedRuleCandidates),
+      ("RulesUIHelper lists only building number signals for export",
+          RulesUIHelperTests.ListsOnlyBuildingNumberSignalsForExport),
 
       // ScriptingEngine.Parser
       ("Python parser preserves math and logical precedence", ParserTests.PythonParserPreservesPrecedence),

@@ -49,6 +49,8 @@ public interface IAutomationCondition : IGameSerializable {
   AutomationBehavior Behavior { get; set; }
   bool IsEnabled { get; }
   bool CanRunOnUnfinishedBuildings { get; }
+  bool IsInErrorState { get; }
+  string UiDescription { get; }
 
   void Activate();
   IAutomationCondition CloneDefinition();
@@ -58,6 +60,8 @@ public interface IAutomationAction : IGameSerializable {
   AutomationBehavior Behavior { get; set; }
   IAutomationCondition Condition { get; set; }
   string TemplateFamily { get; }
+  bool IsInErrorState { get; }
+  string UiDescription { get; }
 
   IAutomationAction CloneDefinition();
 }
