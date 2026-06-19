@@ -182,6 +182,7 @@ public abstract class IrrigationTower : TickableComponent, IAwakableComponent, I
 
   /// <inheritdoc/>
   public void InitializeEntity() {
+    UpdateBuildingPositioning();
     Initialize();
 
     _needsPower = GetComponent<MechanicalNode>();

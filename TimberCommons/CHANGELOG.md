@@ -1,3 +1,6 @@
+# v1.16.1 (TBD)
+* [Fix] Game could crash when loading a save with irrigation towers.
+
 # v1.16.0 (June 6th, 2026)
 * [Update] Support game version `v1.1`.
 * [Update] Removed sluice enhancements support.
