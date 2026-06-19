@@ -588,6 +588,20 @@ namespace Timberborn.SingletonSystem {
   }
 }
 
+namespace Timberborn.ScienceSystem {
+  public sealed class ScienceService {
+    public int SciencePoints { get; private set; }
+
+    public void AddPoints(int amount) {
+      SciencePoints += amount;
+    }
+
+    public void SubtractPoints(int amount) {
+      SciencePoints -= amount;
+    }
+  }
+}
+
 namespace Timberborn.Common {
   public readonly struct ReadOnlyHashSet<T> {
     public readonly HashSet<T> _set;

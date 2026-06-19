@@ -193,6 +193,7 @@ IgorZ.Automation.Scriptable.Pausable.Action.Resume,"resume building","Name of th
 IgorZ.Automation.Scriptable.Plantable.Signal.SpotsReady,"ready to plant","Name of the condition that checks how many planting spots are available"
 IgorZ.Automation.Scriptable.Prioritizable.Action.ResetHaulers,"- prioritize by haulers","Name of the action that resets the priority to the haulers"
 IgorZ.Automation.Scriptable.Prioritizable.Action.SetHaulers,"+ prioritize by haulers","Name of the action that sets the priority to the haulers"
+IgorZ.Automation.Scriptable.Science.Signal.Points,"science points","Name of the condition for the current science points checking"
 IgorZ.Automation.Scriptable.Signals.Action.Set,"set signal: {0} = {1}","Name of the action that sets the signal to the specified value"
 IgorZ.Automation.Scriptable.Signals.Action.Set.SignalNameArgument,"Signal name","Name of the signal argument that specifies the signal name to set"
 IgorZ.Automation.Scriptable.Signals.Action.Set.SignalValueArgument,"Signal value","Name of the signal argument that specifies the signal value to set"

@@ -54,6 +54,7 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<DistrictScriptableComponent.DistrictChangeTracker>().AsTransient();
     containerDefinition.Bind<NotificationsScriptableComponent>().AsSingleton();
     containerDefinition.Bind<NotificationsScriptableComponent.StatusController>().AsTransient();
+    containerDefinition.Bind<ScienceScriptableComponent>().AsSingleton();
     containerDefinition.Bind<SignalsScriptableComponent>().AsSingleton();
     containerDefinition.Bind<WeatherScriptableComponent>().AsSingleton();
 
