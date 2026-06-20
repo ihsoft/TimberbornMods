@@ -81,6 +81,16 @@ Do not treat close versions as aliases. Ask the user to confirm the exact versio
 Before release preparation, verify that the target package changelog has a matching version section and user-visible
 release notes. Changelog workflow rules live in `docs/timberborn-repository-notes.md`.
 
+If the requested version matches the top package changelog section and that section is marked `(TBD)`, treat stale
+release metadata as normal release-preparation work. Update `release.json`, `directory.build.props`, Unity manifest
+versions, and other release metadata to the requested version as needed instead of stopping only because they still
+contain the previous published version.
+
+This release-preparation allowance does not weaken the upload gate. Before any real upload, the release config, DLL
+assembly version, Unity manifest versions in the final package source, generated package path, and final package
+contents must all match the requested version exactly. Stop if the package path or source would publish an older
+artifact, such as a previous-version ZIP.
+
 ## Exact source paths only
 
 If `release.json` points to `Package.SourcePath`, use only that exact path.
@@ -94,6 +104,16 @@ If it does not exist, stop. Do not:
 
 Tell the user to restore the exact source path, rebuild/export the mod to the exact path, or explicitly update
 `release.json`.
+
+## Package source mode
+
+For a newly prepared release of a Unity-exported mod, prefer `Package.Mode = "LocalModFolder"` when an up-to-date
+`_MODS!/<ModName>` source folder exists. Build, validate, and package that source folder instead of relying on a
+previously generated ZIP.
+
+`Package.Mode = "ExistingZip"` is acceptable only when the user explicitly asks to publish that specific ready ZIP, or
+when the release config already points to a fresh ZIP for the requested version and the package has been validated.
+Do not publish an older ZIP just because it is still referenced by `release.json`.
 
 ## Source folder is truth
 
@@ -120,6 +140,10 @@ If the release package is built from a local Unity-exported mod folder, ask the 
 exported before building the ZIP. Do this before packaging, because missing or stale asset bundle changes cannot be
 detected reliably from C# build output.
 
+After the user confirms that Unity assets were exported, verify the `manifest.json` version inside the configured
+`Package.SourcePath` or final package source. Do not rely only on the Unity project file, because the Unity project and
+the exported package source can be out of sync.
+
 ## Package validation
 
 Before any upload, validate the final package, not just source files.
@@ -131,6 +155,9 @@ Every `version-X.X` folder must contain:
 - `manifest.json`,
 - `Scripts/<ScriptFileBase>.dll`,
 - `Scripts/<ScriptFileBase>.xml`.
+
+Missing XML is allowed only for explicit legacy exceptions listed in the release config for specific version folders,
+after the user confirms that case. Keep XML required by default; do not add a global exception for a mod or release.
 
 If `ManifestVersions` is configured, each manifest version must match its configured version for that folder.
 
@@ -157,6 +184,10 @@ MaximumGameVersion: 1.1.99.99
 ```
 
 Do not claim support for a game version unless the final package contains the corresponding `version-X.X` folder.
+
+For Mod.IO uploads, prefer the target mod's own token file. If the per-mod token is missing, another known owner token
+for the same Mod.IO account may be used only through an explicit access-token path while keeping the target mod's own
+Mod.IO config. After upload, verify that the target mod's parent modfile ID and version point to the uploaded file.
 
 After uploading a Mod.IO file, verify that the uploaded file becomes the live file. If Mod.IO reports the file as
 uploaded but not live after scanning, explicitly activate the uploaded modfile through the Mod.IO API instead of
