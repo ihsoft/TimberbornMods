@@ -1,5 +1,6 @@
 # v1.16.1 (TBD)
 * [Change] Replace `PrefabNamesFilter` with `TemplateNamesFilter`. The old filed will be removed from the spec in the next version.
+* [Fix] Irrigated ground could look only barely moist until the game was unpaused after loading a save.
 * [Fix] Game could crash when loading a save with irrigation towers.
 
 # v1.16.0 (June 6th, 2026)

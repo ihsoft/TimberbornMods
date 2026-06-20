@@ -241,6 +241,8 @@ public class SoilOverridesService : ILoadableSingleton, ITickableSingleton, IPos
       UpdateMoistureOverrides();
       if (IrrigationSystemSettings.OverrideDesertLevelsForWaterTowers) {
         var terrainMaterialMap = StaticBindings.DependencyContainer.GetInstance<TerrainMaterialMap>();
+        // Match the game's PostLoad flow: the first pass writes old/new pixels, the second stabilizes them.
+        terrainMaterialMap.ProcessDesertTextureChanges();
         terrainMaterialMap.ProcessDesertTextureChanges();
       }
     }
