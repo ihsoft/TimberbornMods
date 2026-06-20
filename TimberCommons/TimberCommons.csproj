@@ -136,6 +136,7 @@
     <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="Exists('$(ModPath)')">
         <Message Text="### Copying mod's DLL to the game's mods folder: $(ModScriptPath) ###" Importance="high"/>
         <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\version-1.1\Scripts"/>
+        <Copy SourceFiles="$(TargetDir)$(ProjectName).xml" DestinationFolder="$(ModPath)\$(ProjectName)\version-1.1\Scripts" Condition="Exists('$(TargetDir)$(ProjectName).xml')"/>
     </Target>
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
       <PropertyGroup>

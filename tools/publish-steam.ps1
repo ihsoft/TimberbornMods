@@ -86,10 +86,11 @@ function Test-ZipPackage(
                 throw "Package folder $versionFolder must contain Scripts/$ScriptFileBase.dll."
             }
 
+            $allowMissingXmlFolders = @($ReleaseConfig.Package.AllowMissingXmlFolders)
             $xmlEntry = $zip.Entries | Where-Object {
                 $_.FullName -match "^[^/]+/$escapedVersionFolder/Scripts/$([regex]::Escape($ScriptFileBase))\.xml$"
             } | Select-Object -First 1
-            if ($null -eq $xmlEntry) {
+            if ($null -eq $xmlEntry -and $versionFolder -notin $allowMissingXmlFolders) {
                 throw "Package folder $versionFolder must contain Scripts/$ScriptFileBase.xml."
             }
 

@@ -1,16 +1,20 @@
 {
   "ManifestPath": "ModsUnityProject/Assets/Mods/TimberCommons/manifest.json",
   "ChangesPath": "TimberCommons/CHANGELOG.md",
-  "ReleaseVersion": "1.16.0",
+  "ReleaseVersion": "1.17.0",
   "ScriptFileBase": "TimberCommons",
   "Package": {
-    "Mode": "ExistingZip",
-    "Path": "_MODS!/TimberCommons_v1.16.0_proper.zip",
-    "MaxAgeDays": 14
+    "Mode": "LocalModFolder",
+    "SourcePath": "_MODS!/TimberCommons",
+    "OutputPath": "_MODS!/TimberCommons_v1.17.0.zip",
+    "MaxAgeDays": 14,
+    "AllowMissingXmlFolders": [
+      "version-1.0"
+    ]
   },
   "ManifestVersions": {
     "version-1.0": "1.15.2",
-    "version-1.1": "1.16.0"
+    "version-1.1": "1.17.0"
   },
   "GameVersionCompatibility": {
     "version-1.0": {

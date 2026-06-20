@@ -1,4 +1,4 @@
-# v1.17.0 (TBD)
+# v1.17.0 (June 20th, 2026)
 * [Change] Replace `PrefabNamesFilter` with `TemplateNamesFilter`. The old filed will be removed from the spec in the next version.
 * [Feature] Show irrigation tower efficiency, maximum range and effects in the building description.
 * [Fix] Irrigated ground could look only barely moist until the game was unpaused after loading a save.
