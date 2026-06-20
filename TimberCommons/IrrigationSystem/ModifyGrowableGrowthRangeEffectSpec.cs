@@ -29,7 +29,7 @@ record ModifyGrowableGrowthRangeEffectSpec : ComponentSpec {
   [Serialize]
   public float GrowthRateModifier { get; init; }
 
-  /// <summary>The components that must exist on the growable in order to be a target of this effect.</summary>
+  /// <summary>The components that must exist on the growable to be a target of this effect.</summary>
   /// <remarks>
   /// <p>If the list is empty, then no restriction by the components is applied.</p>
   /// <p>
@@ -40,8 +40,13 @@ record ModifyGrowableGrowthRangeEffectSpec : ComponentSpec {
   [Serialize]
   public ImmutableArray<string> ComponentsFilter { get; init; } = [];
 
-  /// <summary>The exact names of the prefabs to be selected for this effect.</summary>
-  /// <remarks>If the list is empty, then no restriction by the prefab name is applied.</remarks>
+  /// <summary>DEPRECATED! DO NOT USE.</summary>
+  // FIXME: Drop once Water Towers mod is updated to support TB v1.1.
   [Serialize]
   public ImmutableArray<string> PrefabNamesFilter { get; init; } = [];
+
+  /// <summary>The names from TemplateSpec to be selected for this effect.</summary>
+  /// <remarks>If the list is empty, then no restriction by the prefab name is applied.</remarks>
+  [Serialize]
+  public ImmutableArray<string> TemplateNamesFilter { get; init; } = [];
 }

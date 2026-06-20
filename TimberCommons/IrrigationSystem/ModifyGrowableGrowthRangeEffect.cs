@@ -11,6 +11,7 @@ using Timberborn.BlockSystem;
 using Timberborn.Common;
 using Timberborn.EntitySystem;
 using Timberborn.SingletonSystem;
+using Timberborn.TemplateSystem;
 using UnityEngine;
 
 namespace IgorZ.TimberCommons.IrrigationSystem;
@@ -83,7 +84,7 @@ public sealed class ModifyGrowableGrowthRangeEffect
   EventBus _eventBus;
   string _modifierOwnerId;
   HashSet<string> _requiredComponents;
-  HashSet<string> _requiredPrefabNames;
+  HashSet<string> _requiredTemplateNames;
   float _growthRateModifier;
 
   HashSet<Vector3Int> _allTiles;
@@ -106,7 +107,7 @@ public sealed class ModifyGrowableGrowthRangeEffect
     _modifierOwnerId = Guid.NewGuid().ToString();
     var effectSpec = GetComponent<ModifyGrowableGrowthRangeEffectSpec>();
     _requiredComponents = effectSpec.ComponentsFilter.ToHashSet();
-    _requiredPrefabNames = effectSpec.PrefabNamesFilter.ToHashSet();
+    _requiredTemplateNames = effectSpec.TemplateNamesFilter.ToHashSet();
     _growthRateModifier = effectSpec.GrowthRateModifier;
     EffectGroup = effectSpec.EffectGroup;
   }
@@ -117,8 +118,11 @@ public sealed class ModifyGrowableGrowthRangeEffect
     if (!modifier || !modifier.IsLiveAndGrowing) {
       return false;
     }
-    if (_requiredPrefabNames.Count > 0 && !_requiredPrefabNames.Contains(modifier.Name)) {
-      return false;
+    if (_requiredTemplateNames.Count > 0) {
+      var templateName = modifier.GetComponent<TemplateSpec>()?.TemplateName;
+      if (templateName == null || !_requiredTemplateNames.Contains(templateName)) {
+        return false;
+      }
     }
     var hasComponents = _requiredComponents.IsEmpty()
         || modifier.AllComponents.Any(component => _requiredComponents.Contains(component.GetType().FullName));

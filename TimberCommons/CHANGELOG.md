@@ -1,4 +1,5 @@
 # v1.16.1 (TBD)
+* [Change] Replace `PrefabNamesFilter` with `TemplateNamesFilter`. The old filed will be removed from the spec in the next version.
 * [Fix] Game could crash when loading a save with irrigation towers.
 
 # v1.16.0 (June 6th, 2026)
