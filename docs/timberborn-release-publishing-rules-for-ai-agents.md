@@ -170,6 +170,25 @@ configured with a `Steam.CompatibilityReason`.
 
 Do not infer compatibility across major Timberborn versions.
 
+## Steam visibility
+
+Do not change Steam Workshop visibility during normal release publishing, description updates, metadata updates, or
+package uploads.
+
+Publication tooling must omit the Steam `visibility` field by default, even if local `workshop_data.json` contains a
+`Visibility` value. A stored local visibility value is not permission to change the live Steam visibility.
+
+Change visibility only when the user explicitly asks to change visibility for that specific mod and release operation.
+In that case, use a command-level opt-in such as `-UpdateVisibility`, together with the requested visibility, and make
+the dry-run output say that visibility will be updated.
+
+If local data or release config already has `UpdateVisibility=true`, do not treat that as enough permission to change
+the live Steam visibility. Stop unless the current user request explicitly asks for a visibility change and the
+publication command includes the visibility-update opt-in.
+
+If a normal publish dry-run shows that visibility will be updated, stop before upload and ask the user for explicit
+confirmation. Treat accidental `Private`, `FriendsOnly`, or `Unlisted` visibility changes as release blockers.
+
 ## Mod.IO compatibility suffix
 
 For Mod.IO, generate the game compatibility suffix from the actual `version-X.X` folders in the final package.

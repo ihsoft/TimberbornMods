@@ -140,7 +140,6 @@ function Write-DescriptionVdf(
 {
     "appid" "1062090"
     "publishedfileid" "$PublishedFileId"
-    "visibility" "0"
     "title" "$Title"
     "description" "$(ConvertTo-VdfString $Description)"
 }

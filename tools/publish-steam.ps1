@@ -15,6 +15,7 @@ param(
     [switch] $IncludeLegacyVersions,
     [switch] $SkipBuild,
     [switch] $LoginOnly,
+    [switch] $UpdateVisibility,
     [switch] $Publish
 )
 
@@ -211,6 +212,10 @@ function Write-WorkshopVdf(
     $tagLines = $Tags | ForEach-Object {
         "        `"$_`""
     }
+    $visibilityLine = ""
+    if (-not [string]::IsNullOrWhiteSpace($Visibility)) {
+        $visibilityLine = "    `"visibility`" `"$Visibility`"`r`n"
+    }
     $vdf = @"
 "workshopitem"
 {
@@ -218,8 +223,7 @@ function Write-WorkshopVdf(
     "publishedfileid" "$PublishedFileId"
     "contentfolder" "$(ConvertTo-VdfString $ContentFolder)"
     "previewfile" "$(ConvertTo-VdfString $PreviewFile)"
-    "visibility" "$Visibility"
-    "title" "$(ConvertTo-VdfString $Title)"
+$visibilityLine    "title" "$(ConvertTo-VdfString $Title)"
     "changenote" "$(ConvertTo-VdfString $ChangeNote)"
     "tags"
     {
@@ -459,6 +463,14 @@ if (-not [string]::IsNullOrWhiteSpace($releaseConfig.Steam.Visibility)) {
 if (-not $visibilityMap.ContainsKey($visibilityName)) {
     throw "Unsupported Steam visibility: $visibilityName"
 }
+$configuredVisibilityUpdate = $workshopData.UpdateVisibility -eq $true -or $releaseConfig.Steam.UpdateVisibility -eq $true
+if ($configuredVisibilityUpdate -and -not $UpdateVisibility) {
+    throw "Steam visibility update is configured, but -UpdateVisibility was not passed. Do not change visibility unless the user explicitly asks."
+}
+$visibilityValue = ""
+if ($UpdateVisibility) {
+    $visibilityValue = $visibilityMap[$visibilityName]
+}
 
 $changeNotes = Get-LatestChangeNotes $changesPath $modVersion
 if (-not [string]::IsNullOrWhiteSpace($ChangeNotesPrefix)) {
@@ -478,7 +490,7 @@ elseif (-not (Test-Path -LiteralPath $previewFile)) {
 
 $vdfPath = Join-Path (Resolve-RepoPath $VdfRoot) "$ModName.vdf"
 $tags = @($workshopData.Tags)
-Write-WorkshopVdf $vdfPath $appId $publishedFileId $contentFolder $previewFile $visibilityMap[$visibilityName] `
+Write-WorkshopVdf $vdfPath $appId $publishedFileId $contentFolder $previewFile $visibilityValue `
     ([string]$workshopData.Name) $tags $steamChangeNote
 
 Write-Host ""
@@ -488,7 +500,12 @@ Write-Host "Content folder: $contentFolder"
 Write-Host "VDF: $vdfPath"
 Write-Host "AppId: $appId"
 Write-Host "PublishedFileId: $publishedFileId"
-Write-Host "Visibility: $visibilityName"
+if ($UpdateVisibility) {
+    Write-Host "Visibility update: $visibilityName"
+}
+else {
+    Write-Host "Visibility update: unchanged"
+}
 Write-Host "Game version folders: $($versionFolders -join ', ')"
 if ($releaseConfig.ReadyForPublish -eq $false) {
     Write-Host "Ready for publish: false"
