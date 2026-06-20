@@ -1,4 +1,5 @@
-# v4.5.1 (TBD)
+# v4.6.0 (TBD)
+* [Feature #144] Add power network signals for supply, demand, and battery state.
 * [Fix] Hide global time and science signals from the building signal export dialog.
 
 # v4.5.0 (June 19th, 2026):

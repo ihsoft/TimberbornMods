@@ -38,6 +38,8 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<PausableScriptableComponent>().AsSingleton();
     containerDefinition.Bind<PlantableScriptableComponent>().AsSingleton();
     containerDefinition.Bind<PlantableScriptableComponent.PlantableTracker>().AsTransient();
+    containerDefinition.Bind<PowerScriptableComponent>().AsSingleton();
+    containerDefinition.Bind<PowerScriptableComponent.PowerTracker>().AsTransient();
     containerDefinition.Bind<PrioritizableScriptableComponent>().AsSingleton();
     containerDefinition.Bind<StreamGaugeScriptableComponent>().AsSingleton();
     containerDefinition.Bind<StreamGaugeScriptableComponent.StreamGaugeCheckTicker>().AsTransient();

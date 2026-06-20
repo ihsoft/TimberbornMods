@@ -564,6 +564,23 @@ namespace Timberborn.PowerManagement {
   }
 }
 
+namespace Timberborn.MechanicalSystem {
+  using Timberborn.BaseComponentSystem;
+
+  public sealed class MechanicalNode : BaseComponent {
+    public MechanicalGraph Graph { get; set; }
+  }
+
+  public sealed class MechanicalGraph {
+    public int PowerSupply { get; set; }
+    public int PowerDemand { get; set; }
+    public int BatteryCharge { get; set; }
+    public int BatteryCapacity { get; set; }
+
+    public float BatteryChargeLevel => BatteryCapacity <= 0 ? 0f : (float)BatteryCharge / BatteryCapacity;
+  }
+}
+
 namespace Timberborn.SingletonSystem {
   public interface ILoadableSingleton {
     void Load();

@@ -176,6 +176,9 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\PlantableScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\PlantableScriptableComponent.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\PowerScriptableComponent.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\PowerScriptableComponent.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\PrioritizableScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\PrioritizableScriptableComponent.cs</Link>
       </Compile>
