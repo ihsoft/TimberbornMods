@@ -1,4 +1,4 @@
-# v4.6.1 (TBD)
+# v4.6.1 (June 21st, 2026)
 * [Fix] Open dropdowns could close every game tick while pinned custom signals were updating.
 
 # v4.6.0 (June 19th, 2026)
