@@ -47,6 +47,8 @@ sealed class PinnedCustomSignalsPanel : ILoadableSingleton, IPostLoadableSinglet
   readonly SignalDispatcher _signalDispatcher;
 
   readonly List<string> _pinnedSignals = [];
+  readonly Dictionary<string, VisualElement> _signalRows = [];
+  readonly Dictionary<string, Label> _signalLabels = [];
   VisualElement _root;
   VisualElement _signalsContainer;
   ResizableDropdownElement _signalSelector;
@@ -83,9 +85,12 @@ sealed class PinnedCustomSignalsPanel : ILoadableSingleton, IPostLoadableSinglet
     _root.Insert(0, _signalSelector);
 
     _signalDispatcher.SignalsChanged += OnSignalsChanged;
+    _signalDispatcher.SignalValuesChanged += OnSignalValuesChanged;
     ScriptEngineSettings.PinnedCustomSignalsChanged += OnPinnedCustomSignalsSettingChanged;
     _eventBus.Register(this);
-    Recreate();
+    CreatePinnedSignalRows();
+    UpdateSignalSelector();
+    UpdatePanelVisibility();
   }
 
   /// <inheritdoc/>
@@ -103,11 +108,23 @@ sealed class PinnedCustomSignalsPanel : ILoadableSingleton, IPostLoadableSinglet
   }
 
   void OnSignalsChanged(object sender, EventArgs e) {
-    Recreate();
+    if (ScriptEngineSettings.PinnedCustomSignals) {
+      UpdateSignalSelector();
+    }
+  }
+
+  void OnSignalValuesChanged(object sender, EventArgs e) {
+    if (_signalLabels.Count == 0) {
+      return;
+    }
+    UpdateSignalValues();
   }
 
   void OnPinnedCustomSignalsSettingChanged(object sender, EventArgs e) {
-    Recreate();
+    if (ScriptEngineSettings.PinnedCustomSignals) {
+      UpdateSignalSelector();
+    }
+    UpdatePanelVisibility();
   }
 
   void AttachSignal(string signalName) {
@@ -120,31 +137,29 @@ sealed class PinnedCustomSignalsPanel : ILoadableSingleton, IPostLoadableSinglet
       return;
     }
     _pinnedSignals.Add(signalName);
-    Recreate();
+    CreatePinnedSignalRow(signalName);
+    UpdateSignalSelector();
   }
 
   void UnpinSignal(string signalName) {
-    _pinnedSignals.Remove(signalName);
-    Recreate();
+    RemovePinnedSignal(signalName);
+    UpdateSignalSelector();
   }
 
   void DeleteManualSignal(string signalName) {
+    RemovePinnedSignal(signalName);
+    UpdateSignalSelector();
     _signalDispatcher.UnsetManualSignalValue(signalName);
-    _pinnedSignals.Remove(signalName);
-    Recreate();
   }
 
-  void Recreate() {
-    if (!ScriptEngineSettings.PinnedCustomSignals) {
-      _root.ToggleDisplayStyle(visible: false);
-      return;
-    }
-    UpdateSignalSelector();
-    _signalsContainer.Clear();
-    foreach (var signalName in _pinnedSignals.ToList()) {
+  void CreatePinnedSignalRows() {
+    foreach (var signalName in _pinnedSignals) {
       CreatePinnedSignalRow(signalName);
     }
-    _root.ToggleDisplayStyle(visible: true);
+  }
+
+  void UpdatePanelVisibility() {
+    _root.ToggleDisplayStyle(ScriptEngineSettings.PinnedCustomSignals);
   }
 
   void UpdateSignalSelector() {
@@ -168,11 +183,15 @@ sealed class PinnedCustomSignalsPanel : ILoadableSingleton, IPostLoadableSinglet
   }
 
   void CreatePinnedSignalRow(string signalName) {
+    if (_signalRows.ContainsKey(signalName)) {
+      return;
+    }
     var row = _uiFactory.LoadVisualElement(PinResource);
     row.Q2<Image>("StateIcon").ToggleDisplayStyle(visible: false);
     var signalLabel = row.Q2<Label>("Name");
     signalLabel.text = _uiFactory.T(
         SignalValueLocKey, FormatSignalName(signalName), GetFormattedSignalValue(signalName));
+    _signalLabels[signalName] = signalLabel;
     signalLabel.RegisterCallback<ClickEvent>(_ => ShowSetSignalValueDialog(signalName));
     _tooltipRegistrar.RegisterLocalizable(signalLabel, SetSignalValueLocKey);
 
@@ -193,7 +212,24 @@ sealed class PinnedCustomSignalsPanel : ILoadableSingleton, IPostLoadableSinglet
         removeButton, hasManualValue ? DeleteManualSignalLocKey : UnpinSignalLocKey);
     row.Insert(0, removeButton);
 
+    _signalRows[signalName] = row;
     _signalsContainer.Add(row);
+  }
+
+  void RemovePinnedSignal(string signalName) {
+    _pinnedSignals.Remove(signalName);
+    _signalLabels.Remove(signalName);
+    if (!_signalRows.Remove(signalName, out var row)) {
+      return;
+    }
+    row.RemoveFromHierarchy();
+  }
+
+  void UpdateSignalValues() {
+    foreach (var (signalName, signalLabel) in _signalLabels) {
+      signalLabel.text = _uiFactory.T(
+          SignalValueLocKey, FormatSignalName(signalName), GetFormattedSignalValue(signalName));
+    }
   }
 
   void ShowSetSignalValueDialog(string signalName) {
@@ -207,8 +243,9 @@ sealed class PinnedCustomSignalsPanel : ILoadableSingleton, IPostLoadableSinglet
         .WithNewSignal(GetCustomSignalNames(), signalName => {
           if (!_pinnedSignals.Contains(signalName)) {
             _pinnedSignals.Add(signalName);
+            CreatePinnedSignalRow(signalName);
+            UpdateSignalSelector();
           }
-          Recreate();
         })
         .Show();
   }

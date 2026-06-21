@@ -24,7 +24,10 @@ class SignalDispatcher {
 
   #region API
 
+  /// <summary>Fired when the list of registered signals changes.</summary>
   public event EventHandler SignalsChanged;
+  /// <summary>Fired when the value of an existing signal changes.</summary>
+  public event EventHandler SignalValuesChanged;
 
   /// <summary>Registers a listener for signal changes.</summary>
   /// <remarks>
@@ -185,10 +188,12 @@ class SignalDispatcher {
 
   /// <summary>Sets the manual/global value of a signal.</summary>
   public void SetManualSignalValue(string signalName, int value) {
+    var signalCreated = false;
     if (!_signalGroups.TryGetValue(signalName, out var group)) {
       DebugEx.Fine("Adding signal group for manual value: {0}", signalName);
       group = new SignalGroup();
       _signalGroups.Add(signalName, group);
+      signalCreated = true;
     }
     var source = group.Sources.GetOrAdd(ManualSignalSourceId);
     if (AutomationDebugSettings.LogSignalsSetting) {
@@ -197,6 +202,9 @@ class SignalDispatcher {
           signalName, value, group, source);
     }
     SetSignalSourceValue(signalName, value, group, source);
+    if (signalCreated) {
+      SignalsChanged?.Invoke(this, EventArgs.Empty);
+    }
   }
 
   /// <summary>Returns whether the signal has a manual/global value source.</summary>
@@ -221,7 +229,7 @@ class SignalDispatcher {
     group.LastValue = group.Sources.Values.LastOrDefault()?.Value ?? 0;
     group.IsDirty = true;
     UpdateSignalGroup(signalName, group);
-    SignalsChanged?.Invoke(this, EventArgs.Empty);
+    SignalValuesChanged?.Invoke(this, EventArgs.Empty);
   }
 
   #endregion
@@ -399,7 +407,7 @@ class SignalDispatcher {
     }
     group.LastValue = value;
     UpdateSignalGroup(signalName, group);
-    SignalsChanged?.Invoke(this, EventArgs.Empty);
+    SignalValuesChanged?.Invoke(this, EventArgs.Empty);
   }
 
   static void UpdateDirty(SignalGroup group) {

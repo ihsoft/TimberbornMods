@@ -302,6 +302,8 @@ static class Program {
       ("SignalDispatcher aggregates provider values", SignalDispatcherTests.AggregatesProviderValues),
       ("SignalDispatcher handles manual signal values", SignalDispatcherTests.HandlesManualSignalValues),
       ("SignalDispatcher notifies listeners on signal changes", SignalDispatcherTests.NotifiesListenersOnSignalChanges),
+      ("SignalDispatcher separates signal list and value events",
+          SignalDispatcherTests.SeparatesSignalListAndValueEvents),
       ("SignalDispatcher rejects duplicate and missing registrations",
           SignalDispatcherTests.RejectsDuplicateAndMissingRegistrations),
       ("SignalDispatcher locks changes while notifying listeners", SignalDispatcherTests.LocksChangesWhileNotifying),

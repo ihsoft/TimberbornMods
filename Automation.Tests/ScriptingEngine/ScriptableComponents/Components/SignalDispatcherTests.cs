@@ -67,6 +67,29 @@ static class SignalDispatcherTests {
     Assert.Equal(0, service.GetExecutionStackSize());
   }
 
+  public static void SeparatesSignalListAndValueEvents() {
+    var dispatcher = CreateDispatcher();
+    var signalsChangedCalls = 0;
+    var signalValuesChangedCalls = 0;
+    dispatcher.SignalsChanged += (_, _) => signalsChangedCalls++;
+    dispatcher.SignalValuesChanged += (_, _) => signalValuesChangedCalls++;
+
+    dispatcher.SetManualSignalValue("Signals.Custom", 1);
+    dispatcher.SetManualSignalValue("Signals.Custom", 1);
+    dispatcher.SetManualSignalValue("Signals.Custom", 2);
+
+    Assert.Equal(1, signalsChangedCalls);
+    Assert.Equal(2, signalValuesChangedCalls);
+
+    var provider = Provider("provider");
+    var action = new object();
+    dispatcher.RegisterSignalProvider("Signals.Custom", provider, action);
+    dispatcher.SetSignalValue("Signals.Custom", 3, provider);
+
+    Assert.Equal(2, signalsChangedCalls);
+    Assert.Equal(3, signalValuesChangedCalls);
+  }
+
   public static void RejectsDuplicateAndMissingRegistrations() {
     var dispatcher = CreateDispatcher();
     var listener = new TestSignalListener();

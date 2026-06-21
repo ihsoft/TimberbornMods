@@ -1,3 +1,6 @@
+# v4.6.1 (TBD)
+* [Fix] Open dropdowns could close every game tick while pinned custom signals were updating.
+
 # v4.6.0 (June 19th, 2026)
 * [Feature #144] Add power network signals for supply, demand, and battery state.
 * [Fix] Hide global time and science signals from the building signal export dialog.
