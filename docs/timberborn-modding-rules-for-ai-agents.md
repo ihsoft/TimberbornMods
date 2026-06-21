@@ -252,6 +252,11 @@ A value-only change should update existing UI state only: label text, icon state
 selection value, or other stable visual properties. It must not clear containers, recreate controls, rebuild dropdown
 items, reset selection, steal focus, or reconstruct the visual hierarchy unless the UI structure actually changed.
 
+When adding related mod settings, check both runtime behavior and settings UI state. If a setting only has an effect
+when another mode, toggle, or parent setting is enabled, disable the dependent control through the setting descriptor,
+such as `.SetEnableCondition(...)`, instead of leaving an active-looking control whose value is currently ignored.
+Labels and tooltips for dependent settings should describe the condition or mode in which the setting applies.
+
 Use structural UI rebuilds only when the shape of the UI changes, such as items being added, removed, renamed,
 reordered, or when a different target object requires a different set of controls.
 
