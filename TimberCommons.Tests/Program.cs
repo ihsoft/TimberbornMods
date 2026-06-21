@@ -24,6 +24,8 @@ static class Program {
           ManufactoryIrrigationTowerTests.MoisturizesOnlyWhenUnblockedAndReady),
       ("ManufactoryIrrigationTower reports production efficiency only when ready",
           ManufactoryIrrigationTowerTests.ReportsProductionEfficiencyOnlyWhenReady),
+      ("IrrigationTower initializes flat-foundation coverage from lifecycle",
+          IrrigationTowerTests.InitializesFlatFoundationCoverageFromLifecycle),
       ("BlockContaminationRangeEffect applies and replaces contamination override",
           BlockContaminationRangeEffectTests.AppliesAndReplacesContaminationOverride),
       ("BlockContaminationRangeEffect saves and claims loaded override",
