@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using UnityEngine;
 
 namespace Timberborn.Common;
@@ -6,6 +7,10 @@ namespace Timberborn.Common;
 public static class CollectionExtensions {
   public static bool IsEmpty<T>(this ICollection<T> collection) {
     return collection.Count == 0;
+  }
+
+  public static bool IsEmpty<T>(this ImmutableArray<T> collection) {
+    return collection.IsDefaultOrEmpty;
   }
 }
 

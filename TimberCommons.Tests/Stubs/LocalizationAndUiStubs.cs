@@ -11,6 +11,12 @@ namespace IgorZ.TimberDev.UI {
       return value;
     }
   }
+
+  public static class CommonFormats {
+    public static string FormatSupplyLeft(Timberborn.Localization.ILoc loc, float hours) {
+      return hours.ToString("0.##");
+    }
+  }
 }
 
 namespace Timberborn.Localization {

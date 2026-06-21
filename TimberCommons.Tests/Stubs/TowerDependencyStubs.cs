@@ -111,5 +111,8 @@ namespace UnityDev.Utils.LogUtilsLite {
   public static class HostedDebugLog {
     public static void Fine(object host, string message, params object[] args) {
     }
+
+    public static void Error(object host, string message, params object[] args) {
+    }
   }
 }

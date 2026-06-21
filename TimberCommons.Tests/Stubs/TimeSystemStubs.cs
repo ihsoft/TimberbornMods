@@ -4,6 +4,15 @@ using System.Linq;
 
 namespace Timberborn.TimeSystem;
 
+public enum TimeOfDay {
+  Day,
+  Night,
+}
+
+public interface IDayNightCycle {
+  float FixedDeltaTimeInHours { get; }
+}
+
 public interface ITimeTrigger {
   void FastForwardProgress(float progress);
   void Reset();

@@ -10,6 +10,9 @@
       <Compile Include="..\TimberCommons\IrrigationSystem\IRangeEffect.cs">
         <Link>TimberCommons\IrrigationSystem\IRangeEffect.cs</Link>
       </Compile>
+      <Compile Include="..\TimberCommons\Common\ISupplyLeftProvider.cs">
+        <Link>TimberCommons\Common\ISupplyLeftProvider.cs</Link>
+      </Compile>
       <Compile Include="..\TimberCommons\IrrigationSystem\IrrigationTower.cs">
         <Link>TimberCommons\IrrigationSystem\IrrigationTower.cs</Link>
       </Compile>
@@ -21,6 +24,12 @@
       </Compile>
       <Compile Include="..\TimberCommons\IrrigationSystem\GoodConsumingIrrigationTowerSpec.cs">
         <Link>TimberCommons\IrrigationSystem\GoodConsumingIrrigationTowerSpec.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberCommons\IrrigationSystem\ManufactoryIrrigationTower.cs">
+        <Link>TimberCommons\IrrigationSystem\ManufactoryIrrigationTower.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberCommons\IrrigationSystem\ManufactoryIrrigationTowerSpec.cs">
+        <Link>TimberCommons\IrrigationSystem\ManufactoryIrrigationTowerSpec.cs</Link>
       </Compile>
       <Compile Include="..\TimberCommons\IrrigationSystem\BlockContaminationRangeEffect.cs">
         <Link>TimberCommons\IrrigationSystem\BlockContaminationRangeEffect.cs</Link>
