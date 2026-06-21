@@ -4,9 +4,12 @@ using IgorZ.TimberCommons.WaterService;
 using Timberborn.BlockingSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BuildingRange;
+using Timberborn.EntitySystem;
 using Timberborn.MapIndexSystem;
 using Timberborn.Persistence;
+using Timberborn.RangedEffectBuildingUI;
 using Timberborn.SingletonSystem;
+using Timberborn.SoilBarrierSystem;
 using Timberborn.TerrainSystem;
 using UnityEngine;
 
@@ -113,6 +116,38 @@ static class IrrigationTowerTests {
     Assert.Equal(3, tower.ConsumptionRateUpdates);
   }
 
+  public static void RecalculatesCoverageWhenSoilBarrierIsBuilt() {
+    var tower = CreateTower();
+    var barrierCoordinates = new Vector3Int(4, 5, 0);
+    var barrier = CreateBarrierBlock(barrierCoordinates);
+    tower.InitializeEntity();
+    tower.OnEnterFinishedState();
+
+    tower.SoilOverridesService.FullMoistureBarrierTiles.Add(barrierCoordinates);
+    tower.OnEnteredFinishedStateEvent(new EnteredFinishedStateEvent(barrier));
+
+    Assert.Equal(7, tower.EligibleTiles.Count);
+    Assert.Equal(7, tower.ReachableTiles.Count);
+    Assert.Equal(0.875f, tower.Coverage);
+    Assert.Equal(3, tower.ConsumptionRateUpdates);
+  }
+
+  public static void RecalculatesCoverageWhenSoilBarrierIsDeleted() {
+    var tower = CreateTower();
+    var barrierCoordinates = new Vector3Int(4, 5, 0);
+    var barrier = CreateBarrierBlock(barrierCoordinates);
+    tower.SoilOverridesService.FullMoistureBarrierTiles.Add(barrierCoordinates);
+    tower.InitializeEntity();
+
+    tower.SoilOverridesService.FullMoistureBarrierTiles.Remove(barrierCoordinates);
+    tower.OnEntityDeletedEvent(new EntityDeletedEvent(barrier));
+
+    Assert.Equal(8, tower.EligibleTiles.Count);
+    Assert.Equal(8, tower.ReachableTiles.Count);
+    Assert.Equal(1, tower.Coverage);
+    Assert.Equal(3, tower.ConsumptionRateUpdates);
+  }
+
   static TestIrrigationTower CreateTower() {
     var positionedBlocks = new PositionedBlocks();
     positionedBlocks.AddBlock(new Vector3Int(5, 5, 0));
@@ -142,6 +177,16 @@ static class IrrigationTowerTests {
         terrainService);
     tower.Awake();
     return tower;
+  }
+
+  static BlockObject CreateBarrierBlock(Vector3Int coordinates) {
+    var barrier = new BlockObject {
+        Coordinates = coordinates,
+        IsFinished = true,
+    };
+    barrier.SetComponent(new SoilBarrierSpec { BlockFullMoisture = true });
+    barrier.SetComponent(barrier);
+    return barrier;
   }
 
   sealed class TestIrrigationTower : IrrigationTower {

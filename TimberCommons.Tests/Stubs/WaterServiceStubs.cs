@@ -20,6 +20,7 @@ public sealed class SoilOverridesService {
   public HashSet<Vector3Int> ActiveContaminationOverrideTiles { get; private set; } = [];
   public int ActiveMoistureOverrideId { get; private set; } = -1;
   public List<MoistureOverride> ActiveMoistureOverrides { get; private set; } = [];
+  public HashSet<Vector3Int> FullMoistureBarrierTiles { get; } = [];
 
   public int AddContaminationOverride(IEnumerable<Vector3Int> tiles) {
     var id = _nextContaminationOverrideId++;
@@ -63,7 +64,7 @@ public sealed class SoilOverridesService {
   }
 
   public bool IsFullMoistureBarrierAt(Vector3Int coordinates) {
-    return false;
+    return FullMoistureBarrierTiles.Contains(coordinates);
   }
 }
 
