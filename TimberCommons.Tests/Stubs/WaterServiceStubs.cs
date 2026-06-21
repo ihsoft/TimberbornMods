@@ -11,10 +11,15 @@ public sealed class SoilOverridesService {
   public readonly List<HashSet<Vector3Int>> AddedContaminationOverrides = [];
   public readonly List<int> RemovedContaminationOverrideIds = [];
   public readonly List<int> ClaimedContaminationOverrideIds = [];
+  public readonly List<List<MoistureOverride>> AddedMoistureOverrides = [];
+  public readonly List<int> RemovedMoistureOverrideIds = [];
+  public readonly List<int> ClaimedMoistureOverrideIds = [];
   public bool GameLoaded { get; set; } = true;
 
   public int ActiveContaminationOverrideId { get; private set; } = -1;
   public HashSet<Vector3Int> ActiveContaminationOverrideTiles { get; private set; } = [];
+  public int ActiveMoistureOverrideId { get; private set; } = -1;
+  public List<MoistureOverride> ActiveMoistureOverrides { get; private set; } = [];
 
   public int AddContaminationOverride(IEnumerable<Vector3Int> tiles) {
     var id = _nextContaminationOverrideId++;
@@ -38,13 +43,23 @@ public sealed class SoilOverridesService {
   }
 
   public int AddMoistureOverride(IEnumerable<MoistureOverride> moistureOverrides) {
-    return _nextMoistureOverrideId++;
+    var id = _nextMoistureOverrideId++;
+    ActiveMoistureOverrideId = id;
+    ActiveMoistureOverrides = moistureOverrides.ToList();
+    AddedMoistureOverrides.Add(ActiveMoistureOverrides);
+    return id;
   }
 
   public void RemoveMoistureOverride(int overrideId) {
+    RemovedMoistureOverrideIds.Add(overrideId);
+    if (ActiveMoistureOverrideId == overrideId) {
+      ActiveMoistureOverrideId = -1;
+      ActiveMoistureOverrides = [];
+    }
   }
 
   public void ClaimMoistureOverrideIndex(int overrideId) {
+    ClaimedMoistureOverrideIds.Add(overrideId);
   }
 
   public bool IsFullMoistureBarrierAt(Vector3Int coordinates) {
