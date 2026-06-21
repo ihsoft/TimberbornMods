@@ -184,6 +184,10 @@ Do not force one argument per line when several arguments fit comfortably within
 
 This rule applies to method calls, method declarations, constructors, and primary constructors.
 
+This includes constructor calls and object creation expressions such as `new SomeSetting(...)`. Keep short literal or
+configuration arguments together on one line when they fit cleanly, especially numeric ranges, flags, and small option
+groups.
+
 Preferred:
 
     static WeatherScriptableComponent CreateComponent(
