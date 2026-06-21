@@ -240,6 +240,18 @@ element.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
 
 This is often safer than rebuilding lists or modifying source collections.
 
+When UI observes changing gameplay state, distinguish value updates from structural updates.
+
+A value-only change should update existing UI state only: label text, icon state, enabled/disabled state, progress,
+selection value, or other stable visual properties. It must not clear containers, recreate controls, rebuild dropdown
+items, reset selection, steal focus, or reconstruct the visual hierarchy unless the UI structure actually changed.
+
+Use structural UI rebuilds only when the shape of the UI changes, such as items being added, removed, renamed,
+reordered, or when a different target object requires a different set of controls.
+
+For frequently changing runtime values, prefer separate events or callbacks for structural changes and value-only
+changes. Name them so the difference is visible to future agents.
+
 When adding or changing in-game UI assets, first find the closest existing game or mod UI element with the same role.
 Reuse its UI Toolkit component type and classes before hand-styling controls. For example, prefer the same
 `NineSliceTextField`, button classes, validation classes, and template structure used by nearby dialogs over recreating
