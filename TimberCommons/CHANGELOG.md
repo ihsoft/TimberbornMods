@@ -1,4 +1,4 @@
-# v1.17.1 (TBD)
+# v1.17.1 (June 21st, 2026)
 * [Fix] Compact Mechanical Pump no longer gets an artificial output water level limit by default.
 * [Enhancement] Limit output water level slider now uses a cached local height range by default.
 
