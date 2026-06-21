@@ -7,6 +7,7 @@ using Timberborn.BlockSystem;
 using Timberborn.BuildingRange;
 using Timberborn.EntitySystem;
 using Timberborn.MapIndexSystem;
+using Timberborn.MechanicalSystem;
 using Timberborn.Persistence;
 using Timberborn.RangedEffectBuildingUI;
 using Timberborn.SingletonSystem;
@@ -202,7 +203,37 @@ static class IrrigationTowerTests {
     Assert.False(blocks.Contains(new Vector3Int(6, 5, 0)));
   }
 
-  static TestIrrigationTower CreateTower(bool isFinished = true) {
+  public static void DelaysMechanicalEfficiencyChanges() {
+    var tower = CreateTower(hasMechanicalNode: true);
+    tower.InitializeEntity();
+
+    Assert.Equal(0, tower.CurrentEfficiency);
+    Assert.Equal(0, tower.ReachableTiles.Count);
+
+    tower.Tick();
+    tower.Tick();
+
+    Assert.Equal(0, tower.CurrentEfficiency);
+    Assert.Equal(0, tower.ReachableTiles.Count);
+
+    tower.Tick();
+
+    Assert.Equal(1, tower.CurrentEfficiency);
+    Assert.Equal(8, tower.ReachableTiles.Count);
+
+    tower.Efficiency = 0;
+    tower.Tick();
+
+    Assert.Equal(1, tower.CurrentEfficiency);
+    Assert.Equal(8, tower.ReachableTiles.Count);
+
+    tower.Tick();
+
+    Assert.Equal(0, tower.CurrentEfficiency);
+    Assert.Equal(0, tower.ReachableTiles.Count);
+  }
+
+  static TestIrrigationTower CreateTower(bool isFinished = true, bool hasMechanicalNode = false) {
     var positionedBlocks = new PositionedBlocks();
     positionedBlocks.AddBlock(new Vector3Int(5, 5, 0));
 
@@ -218,6 +249,9 @@ static class IrrigationTowerTests {
         PositionedBlocks = positionedBlocks,
     });
     tower.SetComponent(new BlockableObject());
+    if (hasMechanicalNode) {
+      tower.SetComponent(new MechanicalNode());
+    }
     tower.EventBus = eventBus;
     tower.SoilOverridesService = soilOverridesService;
     tower.TerrainMap = terrainMap;
