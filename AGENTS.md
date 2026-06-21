@@ -113,6 +113,11 @@ When the user asks to organize, clarify, or update agent rules, change only rule
 Other repository files may be changing in parallel by other agents. Do not inspect, interpret, fix, format, stage,
 revert, or otherwise account for unrelated non-rule changes during a rules-maintenance task.
 
+When a rule change comes from another agent's delegated suggestion and the source thread is known, notify that source
+thread after the rule files are finalized. Tell the source agent which files actually changed and that they should
+refresh those files or update their checkout. Report the files that were really edited, even if they differ from the
+files the source agent expected or requested.
+
 ## Task checklists
 
 ### Rules-maintenance task
