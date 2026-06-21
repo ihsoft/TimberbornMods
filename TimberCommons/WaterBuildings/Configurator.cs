@@ -14,6 +14,7 @@ sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).FullName;
 
   public void Configure(IContainerDefinition containerDefinition) {
+    containerDefinition.Bind<WaterOutputLevelRangeService>().AsSingleton();
     containerDefinition.Bind<AdjustableWaterOutput>().AsTransient();
     containerDefinition.Bind<AdjustableWaterOutputMarker>().AsTransient();
     containerDefinition.MultiBind<TemplateModule>().ToProvider<WaterOutputTemplateModuleProvider>().AsSingleton();

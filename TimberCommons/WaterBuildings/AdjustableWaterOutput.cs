@@ -4,6 +4,7 @@
 
 using IgorZ.TimberCommons.Settings;
 using Timberborn.BaseComponentSystem;
+using Timberborn.MapStateSystem;
 using Timberborn.Persistence;
 using Timberborn.WaterBuildings;
 using Timberborn.WaterSystem;
@@ -21,15 +22,27 @@ namespace IgorZ.TimberCommons.WaterBuildings;
 /// This component automatically replaces any stock water output with the settings set to defaults. If a building has
 /// this component in the prefab, it will keep the custom settings.
 /// </remarks>
-sealed class AdjustableWaterOutput(IWaterService waterService, IThreadSafeWaterMap threadSafeWaterMap)
+sealed class AdjustableWaterOutput(
+    IWaterService waterService, IThreadSafeWaterMap threadSafeWaterMap, MapSize mapSize,
+    WaterOutputLevelRangeService waterOutputLevelRangeService)
     : WaterOutput(waterService, threadSafeWaterMap), IAwakableComponent, IPersistentEntity {
 
+  const float DamHeight = 0.65f;
   const string FluidDumpPrefabName = "FluidDump";
 
   #region API
 
   /// <summary>Maximum possible height of the water under the spillway.</summary>
   public int MaxHeight => _waterCoordinatesTransformed.z;
+
+  /// <summary>Maximum target water level allowed for this output.</summary>
+  public int MaxTargetHeight => _waterOutputSpec.OverflowAllowed ? mapSize.TotalSize.z : MaxHeight;
+
+  /// <summary>Maximum target water level that is useful to present in the UI slider.</summary>
+  public int MaxSliderTargetHeight => waterOutputLevelRangeService.GetMaxTargetHeight(this);
+
+  /// <summary>Tells if the stock water output allows overflow above the spillway.</summary>
+  public bool OverflowAllowed => _waterOutputSpec.OverflowAllowed;
 
   /// <summary>The current water level at the output.</summary>
   public float CurrentWaterLevel => _threadSafeWaterMap.WaterHeightOrFloor(_waterCoordinatesTransformed);
@@ -45,10 +58,20 @@ sealed class AdjustableWaterOutput(IWaterService waterService, IThreadSafeWaterM
   /// <seealso cref="SetSpillwayHeightDelta"/>
   public float SpillwayHeightDelta { get; private set; } = -0.1f;  // Once it was a Unity setting.
 
+  /// <summary>Tells if the output should stop when the water level reaches the configured target.</summary>
+  public bool LimitOutputLevelEnabled => _limitOutputLevelEnabled ?? !_waterOutputSpec.OverflowAllowed;
+
+  /// <summary>Target water level at the output.</summary>
+  public float TargetWaterLevel => MaxTargetHeight + SpillwayHeightDelta;
+
+  /// <summary>Default target water level used when the player enables the output limit.</summary>
+  public float DefaultTargetWaterLevel => Mathf.Max(CurrentWaterLevel, _blockObject.CoordinatesAtBaseZ.z + DamHeight);
+
   /// <summary>Tells if the height marker should be shown when the building is selected.</summary>
   public bool ShowHeightMarker =>
-      !_isFluidDump && WaterBuildingsSettings.AdjustWaterDepthAtSpillwayOnMechanicalPumps
-      || _isFluidDump && WaterBuildingsSettings.AdjustWaterDepthAtSpillwayOnFluidDumps;
+      LimitOutputLevelEnabled
+      && (!_isFluidDump && WaterBuildingsSettings.AdjustWaterDepthAtSpillwayOnMechanicalPumps
+          || _isFluidDump && WaterBuildingsSettings.AdjustWaterDepthAtSpillwayOnFluidDumps);
 
   /// <summary>Tells if GUI should be presented to change the limit in the game.</summary>
   public bool AllowAdjustmentsInGame =>
@@ -69,23 +92,40 @@ sealed class AdjustableWaterOutput(IWaterService waterService, IThreadSafeWaterM
     SpillwayHeightDelta = spillwayDelta;
   }
 
+  /// <summary>Sets whether this output should limit the water level.</summary>
+  public void SetLimitOutputLevelEnabled(bool enabled) {
+    if (enabled && !LimitOutputLevelEnabled) {
+      SetTargetWaterLevel(DefaultTargetWaterLevel);
+    }
+    _limitOutputLevelEnabled = enabled;
+  }
+
+  /// <summary>Sets the target water level.</summary>
+  public void SetTargetWaterLevel(float targetWaterLevel) {
+    SpillwayHeightDelta = Mathf.Clamp(targetWaterLevel, MinHeight, MaxTargetHeight) - MaxTargetHeight;
+  }
+
   #endregion
 
   #region Implementation
 
   bool _isFluidDump;
+  bool? _limitOutputLevelEnabled;
 
   /// <summary>
   /// Called via a Harmony patch to provide  <see cref="WaterOutput.AvailableSpace"/>. Normally happens at least once
   /// per tick. Can be called multiple times, so keep it simple.
   /// </summary>
   internal float CalculateAvailableSpace() {
-    if (SpillwayHeightDelta < MinHeight - MaxHeight) {
+    if (!LimitOutputLevelEnabled) {
+      return float.MaxValue;
+    }
+    if (SpillwayHeightDelta < MinHeight - MaxTargetHeight) {
       var oldDelta = SpillwayHeightDelta;
-      SetSpillwayHeightDelta(MinHeight - MaxHeight);
+      SetSpillwayHeightDelta(MinHeight - MaxTargetHeight);
       HostedDebugLog.Fine(this, "SpillwayHeightDelta corrected: {0} => {1}", oldDelta, SpillwayHeightDelta);
     }
-    return MaxHeight + SpillwayHeightDelta - _threadSafeWaterMap.WaterHeightOrFloor(_waterCoordinatesTransformed);
+    return TargetWaterLevel - _threadSafeWaterMap.WaterHeightOrFloor(_waterCoordinatesTransformed);
   }
 
   /// <inheritdoc/>
@@ -100,11 +140,13 @@ sealed class AdjustableWaterOutput(IWaterService waterService, IThreadSafeWaterM
 
   static readonly ComponentKey AdjustableWaterOutputKey = new(typeof(AdjustableWaterOutput).FullName);
   static readonly PropertyKey<float> SpillwayHeightDeltaKey = new("SpillwayHeightDelta");
+  static readonly PropertyKey<bool> LimitOutputLevelEnabledKey = new("LimitOutputLevelEnabled");
 
   /// <inheritdoc/>
   public void Save(IEntitySaver entitySaver) {
     var component = entitySaver.GetComponent(AdjustableWaterOutputKey);
     component.Set(SpillwayHeightDeltaKey, SpillwayHeightDelta);
+    component.Set(LimitOutputLevelEnabledKey, LimitOutputLevelEnabled);
   }
 
   /// <inheritdoc/>
@@ -114,6 +156,9 @@ sealed class AdjustableWaterOutput(IWaterService waterService, IThreadSafeWaterM
     }
     if (component.Has(SpillwayHeightDeltaKey)) {
       SpillwayHeightDelta = component.Get(SpillwayHeightDeltaKey);
+    }
+    if (component.Has(LimitOutputLevelEnabledKey)) {
+      _limitOutputLevelEnabled = component.Get(LimitOutputLevelEnabledKey);
     }
   }
 

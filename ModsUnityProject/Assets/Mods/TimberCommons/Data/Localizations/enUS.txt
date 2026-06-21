@@ -15,6 +15,7 @@ IgorZ.TimberCommons.IrrigationTower.OutputGrowthModifierTooltip,"Growth rate mod
 IgorZ.TimberCommons.IrrigationTower.OutputContaminationBlockTooltip,"Blocks contamination","Tooltip for the virtual recipe output that represents contamination blocking."
 IgorZ.TimberCommons.GrowthRateModifier.BoostPercentile,"Growth boost: <GreenHighlight>🡅</GreenHighlight>{0:0.#}%","It indicates growth boost, it's a good effect."
 IgorZ.TimberCommons.GrowthRateModifier.SlowdownPercentile,"Growth slowdown: <RedHighlight>🡇</RedHighlight>{0:0.#}%","It indicates growth penalty, it's a bad effect."
+IgorZ.TimberCommons.AdjustableWaterOutput.LimitOutputLevel,"Limit output water level",
 IgorZ.TimberCommons.AdjustableWaterOutput.StopAboveDownstream,"Close above depth at spillway: {0}",
 IgorZ.TimberCommons.InjuryProbability,"Injury probability: {0} every hour",
 IgorZ.TimberCommons.InjuryProbabilityDaily,"Injury probability: {0} during the day",
@@ -30,6 +31,10 @@ will show them as 'barely moisturized' since the irrigation towers give only the
 IgorZ.TimberCommons.Settings.WaterBuildingsSection,"Water buildings",
 IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnMechanicalPumps,"Allow setting maximum water level at the spillway of the mechanical pumps",
 IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnFluidDumps,"Allow setting maximum water level at the spillway of the liquid drops",
+IgorZ.TimberCommons.Settings.WaterBuildings.UseLocalOutputLevelLimitScan,"Use local height range for output water level slider",
+IgorZ.TimberCommons.Settings.WaterBuildings.OutputLevelLimitScanRadius,"Area checked around water output",
+IgorZ.TimberCommons.Settings.WaterBuildings.OutputLevelLimitScanRadiusTooltip,"How far from the water output to look for the slider's highest useful level.
+Higher values check a larger nearby area.",
 IgorZ.TimberCommons.Settings.InjuryProbabilitySection,"Injury probability",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,"Show injury probability in the right panel",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,"Show indicator on the building avatar",

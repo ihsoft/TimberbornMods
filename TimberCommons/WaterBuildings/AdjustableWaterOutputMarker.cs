@@ -26,13 +26,13 @@ sealed class AdjustableWaterOutputMarker(MarkerDrawerFactory markerDrawerFactory
 
   /// <inheritdoc/>
   public void OnSelect() {
-    if (!_blockObject.IsPreview && _adjustableWaterOutput.ShowHeightMarker) {
-      EnableComponent();
-    }
+    _selected = true;
+    RefreshVisibility();
   }
 
   /// <inheritdoc/>
   public void OnUnselect() {
+    _selected = false;
     DisableComponent();
   }
 
@@ -54,21 +54,35 @@ sealed class AdjustableWaterOutputMarker(MarkerDrawerFactory markerDrawerFactory
 
   /// <inheritdoc/>
   public void Update() {
+    RefreshVisibility();
+    if (!Enabled) {
+      return;
+    }
     var targetCoordinates = _adjustableWaterOutput.TargetCoordinates;
     var coordinates = new Vector3Int(targetCoordinates.x, targetCoordinates.y, _adjustableWaterOutput.MaxHeight); 
     var currentWaterLevel = _adjustableWaterOutput.CurrentWaterLevel;
-    var currentLevelLimit = _adjustableWaterOutput.MaxHeight + _adjustableWaterOutput.SpillwayHeightDelta;
+    var currentLevelLimit = _adjustableWaterOutput.TargetWaterLevel;
+    var markerOffset = currentLevelLimit - _adjustableWaterOutput.MaxHeight;
     var color  = currentWaterLevel < currentLevelLimit ? AboveLevelMarkerColor : BelowLevelMarkerColor;
-    _markerDrawer.DrawAtCoordinates(coordinates, _adjustableWaterOutput.SpillwayHeightDelta + MarkerYOffset, color);
+    _markerDrawer.DrawAtCoordinates(coordinates, markerOffset + MarkerYOffset, color);
   }
 
   #endregion
 
   #region Implementation
 
+  internal void RefreshVisibility() {
+    if (_selected && !_blockObject.IsPreview && _adjustableWaterOutput.ShowHeightMarker) {
+      EnableComponent();
+    } else {
+      DisableComponent();
+    }
+  }
+
   AdjustableWaterOutput _adjustableWaterOutput;
   MeshDrawer _markerDrawer;
   BlockObject _blockObject;
+  bool _selected;
 
   #endregion
 }

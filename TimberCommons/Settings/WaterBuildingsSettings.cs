@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using ModSettings.Common;
 using ModSettings.Core;
 using Timberborn.Modding;
 using Timberborn.SettingsSystem;
@@ -28,6 +29,23 @@ sealed class WaterBuildingsSettings : ModSettingsOwner {
       true,
       ModSettingDescriptor
           .CreateLocalized("IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnFluidDumps"));
+
+  public static bool UseLocalOutputLevelLimitScan => _instance._useLocalOutputLevelLimitScan.Value;
+
+  public ModSetting<bool> _useLocalOutputLevelLimitScan { get; } = new(
+      true,
+      ModSettingDescriptor.CreateLocalized(
+          "IgorZ.TimberCommons.Settings.WaterBuildings.UseLocalOutputLevelLimitScan"));
+
+  public static int OutputLevelLimitScanRadius => _instance._outputLevelLimitScanRadius.Value;
+
+  public ModSetting<int> _outputLevelLimitScanRadius { get; } = new RangeIntModSetting(
+      8, 1, 64,
+      ModSettingDescriptor.CreateLocalized(
+          "IgorZ.TimberCommons.Settings.WaterBuildings.OutputLevelLimitScanRadius")
+          .SetLocalizedTooltip(
+              "IgorZ.TimberCommons.Settings.WaterBuildings.OutputLevelLimitScanRadiusTooltip")
+          .SetEnableCondition(() => UseLocalOutputLevelLimitScan));
 
   // ReSharper restore InconsistentNaming
   // ReSharper restore MemberCanBePrivate.Global

@@ -1,3 +1,7 @@
+# v1.17.1 (TBD)
+* [Fix] Compact Mechanical Pump no longer gets an artificial output water level limit by default.
+* [Enhancement] Limit output water level slider now uses a cached local height range by default.
+
 # v1.17.0 (June 20th, 2026)
 * [Change] Replace `PrefabNamesFilter` with `TemplateNamesFilter`. The old filed will be removed from the spec in the next version.
 * [Feature] Show irrigation tower efficiency, maximum range and effects in the building description.

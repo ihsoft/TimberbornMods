@@ -15,6 +15,7 @@ IgorZ.TimberCommons.IrrigationTower.OutputGrowthModifierTooltip,Wachstumsgeschwi
 IgorZ.TimberCommons.IrrigationTower.OutputContaminationBlockTooltip,Blockiert Kontamination,Tooltip for the virtual recipe output that represents contamination blocking.
 IgorZ.TimberCommons.GrowthRateModifier.BoostPercentile,Wachstumsförderung: <GreenHighlight>🡅</GreenHighlight>{0:0.#}%,Wachstumsförderung ist ein positiver Effekt.
 IgorZ.TimberCommons.GrowthRateModifier.SlowdownPercentile,Wachstumsminderung: <RedHighlight>🡇</RedHighlight>{0:0.#}%,Wachstumsminderung ist ein negativer Effekt.
+IgorZ.TimberCommons.AdjustableWaterOutput.LimitOutputLevel,Wasserstand am Ausgang begrenzen,
 IgorZ.TimberCommons.AdjustableWaterOutput.StopAboveDownstream,Schließen ab Ausgangstiefe: {0},
 IgorZ.TimberCommons.InjuryProbability,Verletzungsrisiko: {0} pro Stunde,
 IgorZ.TimberCommons.Settings.TimeAndDurationSection,Anzeige Zeit und Dauer,
@@ -29,6 +30,10 @@ sie als „kaum bewässert“ anzeigen, da die Bewässerungstürme nur die Grund
 IgorZ.TimberCommons.Settings.WaterBuildingsSection,Wassergebundene Gebäude,
 IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnMechanicalPumps,Ermöglicht die Einstellung der maximalen Wasserstiefe am Ausgang der mechanischen Flüssigkeitspumpen,
 IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnFluidDumps,Ermöglicht die Einstellung der maximalen Wasserstiefe am Ausgang der Flüssigkeitsableiter,
+IgorZ.TimberCommons.Settings.WaterBuildings.UseLocalOutputLevelLimitScan,Lokalen Höhenbereich für den Wasserstand-Ausgangsregler verwenden,
+IgorZ.TimberCommons.Settings.WaterBuildings.OutputLevelLimitScanRadius,Bereich um den Wasserausgang prüfen,
+IgorZ.TimberCommons.Settings.WaterBuildings.OutputLevelLimitScanRadiusTooltip,"Wie weit um den Wasserausgang herum nach einer sinnvollen Obergrenze gesucht wird.
+Höhere Werte prüfen einen größeren Bereich in der Nähe.",
 IgorZ.TimberCommons.Settings.InjuryProbabilitySection,Verletzungsrisiko,
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,Verletzungsrisiko im Gebäudefenster anzeigen,
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,Indikator am Gebäudesymbol anzeigen,
