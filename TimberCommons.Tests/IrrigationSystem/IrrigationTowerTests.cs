@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using IgorZ.TimberCommons.IrrigationSystem;
 using IgorZ.TimberCommons.WaterService;
 using Timberborn.BlockingSystem;
@@ -98,12 +99,28 @@ static class IrrigationTowerTests {
     Assert.Equal(1, restoredTower.SoilOverridesService.ClaimedMoistureOverrideIds[0]);
   }
 
+  public static void RecalculatesCoverageWhenTerrainEligibilityChanges() {
+    var tower = CreateTower();
+    tower.InitializeEntity();
+    tower.OnEnterFinishedState();
+
+    tower.TerrainService.NonGroundTiles.Add(new Vector3Int(4, 5, 0));
+    tower.TerrainMap.RemoveTerrain(new Vector3Int(4, 5, 0));
+
+    Assert.Equal(7, tower.EligibleTiles.Count);
+    Assert.Equal(7, tower.ReachableTiles.Count);
+    Assert.Equal(0.875f, tower.Coverage);
+    Assert.Equal(3, tower.ConsumptionRateUpdates);
+  }
+
   static TestIrrigationTower CreateTower() {
     var positionedBlocks = new PositionedBlocks();
     positionedBlocks.AddBlock(new Vector3Int(5, 5, 0));
 
     var eventBus = new EventBus();
     var soilOverridesService = new SoilOverridesService();
+    var terrainMap = new TerrainMap();
+    var terrainService = new TestTerrainService();
     var tower = new TestIrrigationTower();
     tower.SetComponent(new BlockObject {
         Coordinates = new Vector3Int(5, 5, 0),
@@ -114,13 +131,15 @@ static class IrrigationTowerTests {
     tower.SetComponent(new BlockableObject());
     tower.EventBus = eventBus;
     tower.SoilOverridesService = soilOverridesService;
+    tower.TerrainMap = terrainMap;
+    tower.TerrainService = terrainService;
     tower.InjectDependencies(
-        new TerrainMap(),
+        terrainMap,
         new MapIndexService { TerrainSize = new Vector2Int(20, 20) },
         eventBus,
         soilOverridesService,
         new BuildingWithRangeUpdateService(),
-        new TestTerrainService());
+        terrainService);
     tower.Awake();
     return tower;
   }
@@ -128,6 +147,8 @@ static class IrrigationTowerTests {
   sealed class TestIrrigationTower : IrrigationTower {
     public EventBus EventBus { get; set; }
     public SoilOverridesService SoilOverridesService { get; set; }
+    public TerrainMap TerrainMap { get; set; }
+    public TestTerrainService TerrainService { get; set; }
     public bool CanMoisturizeValue { get; set; }
     public float Efficiency { get; set; } = 1;
     public int ConsumptionRateUpdates { get; private set; }
@@ -159,8 +180,10 @@ static class IrrigationTowerTests {
   }
 
   sealed class TestTerrainService : ITerrainService {
+    public HashSet<Vector3Int> NonGroundTiles { get; } = [];
+
     public bool OnGround(Vector3Int coordinates) {
-      return true;
+      return !NonGroundTiles.Contains(coordinates);
     }
   }
 }

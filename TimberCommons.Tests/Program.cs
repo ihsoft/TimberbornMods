@@ -34,6 +34,8 @@ static class Program {
           IrrigationTowerTests.RecalculatesCoverageWhenEfficiencyChanges),
       ("IrrigationTower saves and claims active moisture override",
           IrrigationTowerTests.SavesAndClaimsActiveMoistureOverride),
+      ("IrrigationTower recalculates coverage when terrain eligibility changes",
+          IrrigationTowerTests.RecalculatesCoverageWhenTerrainEligibilityChanges),
       ("BlockContaminationRangeEffect applies and replaces contamination override",
           BlockContaminationRangeEffectTests.AppliesAndReplacesContaminationOverride),
       ("BlockContaminationRangeEffect saves and claims loaded override",
