@@ -17,6 +17,14 @@ public class BaseComponent {
     return _components.TryGetValue(typeof(T), out var component) ? (T)component : null;
   }
 
+  public void GetComponents<T>(List<T> components) where T : class {
+    foreach (var component in AllComponents) {
+      if (component is T typedComponent) {
+        components.Add(typedComponent);
+      }
+    }
+  }
+
   public static bool operator true(BaseComponent component) {
     return component != null;
   }

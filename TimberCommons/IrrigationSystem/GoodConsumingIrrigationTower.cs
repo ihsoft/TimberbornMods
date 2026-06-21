@@ -71,7 +71,8 @@ public class GoodConsumingIrrigationTower : IrrigationTower, IConsumptionRateFor
   /// <inheritdoc/>
   protected override void UpdateConsumptionRate() {
     var newConsumptionRate = _prefabConsumedGoodSpec.GoodPerHour * Coverage;
-    if (Math.Abs(_prefabConsumedGoodSpec.GoodPerHour - newConsumptionRate) > float.Epsilon) {
+    var currentConsumptionRate = _goodConsumingBuilding._goodConsumingBuildingSpec.ConsumedGoods[0].GoodPerHour;
+    if (Math.Abs(currentConsumptionRate - newConsumptionRate) > float.Epsilon) {
       var newRateSpec = _prefabGoodConsumingBuildingSpec with {
           ConsumedGoods = [_prefabConsumedGoodSpec with { GoodPerHour = newConsumptionRate }],
       };

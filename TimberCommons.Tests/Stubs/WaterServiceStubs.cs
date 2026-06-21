@@ -6,10 +6,12 @@ namespace IgorZ.TimberCommons.WaterService;
 
 public sealed class SoilOverridesService {
   int _nextContaminationOverrideId = 1;
+  int _nextMoistureOverrideId = 1;
 
   public readonly List<HashSet<Vector3Int>> AddedContaminationOverrides = [];
   public readonly List<int> RemovedContaminationOverrideIds = [];
   public readonly List<int> ClaimedContaminationOverrideIds = [];
+  public bool GameLoaded { get; set; } = true;
 
   public int ActiveContaminationOverrideId { get; private set; } = -1;
   public HashSet<Vector3Int> ActiveContaminationOverrideTiles { get; private set; } = [];
@@ -34,4 +36,20 @@ public sealed class SoilOverridesService {
     ClaimedContaminationOverrideIds.Add(overrideId);
     return [];
   }
+
+  public int AddMoistureOverride(IEnumerable<MoistureOverride> moistureOverrides) {
+    return _nextMoistureOverrideId++;
+  }
+
+  public void RemoveMoistureOverride(int overrideId) {
+  }
+
+  public void ClaimMoistureOverrideIndex(int overrideId) {
+  }
+
+  public bool IsFullMoistureBarrierAt(Vector3Int coordinates) {
+    return false;
+  }
 }
+
+public readonly record struct MoistureOverride(Vector3Int Coordinates, float MoistureLevel, float DesertLevel);
