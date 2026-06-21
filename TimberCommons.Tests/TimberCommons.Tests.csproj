@@ -13,6 +13,12 @@
       <Compile Include="..\TimberCommons\IrrigationSystem\GrowthRateModifier.cs">
         <Link>TimberCommons\IrrigationSystem\GrowthRateModifier.cs</Link>
       </Compile>
+      <Compile Include="..\TimberCommons\IrrigationSystem\BlockContaminationRangeEffect.cs">
+        <Link>TimberCommons\IrrigationSystem\BlockContaminationRangeEffect.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberCommons\IrrigationSystem\BlockContaminationRangeEffectSpec.cs">
+        <Link>TimberCommons\IrrigationSystem\BlockContaminationRangeEffectSpec.cs</Link>
+      </Compile>
       <Compile Include="..\TimberCommons\IrrigationSystem\ModifyGrowableGrowthRangeEffect.cs">
         <Link>TimberCommons\IrrigationSystem\ModifyGrowableGrowthRangeEffect.cs</Link>
       </Compile>
