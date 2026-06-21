@@ -30,6 +30,8 @@ static class Program {
           IrrigationTowerTests.StartsMoistureOverrideOnceAndRemovesItOnExit),
       ("IrrigationTower removes moisture override when blocked",
           IrrigationTowerTests.RemovesMoistureOverrideWhenBlocked),
+      ("IrrigationTower recalculates coverage when efficiency changes",
+          IrrigationTowerTests.RecalculatesCoverageWhenEfficiencyChanges),
       ("BlockContaminationRangeEffect applies and replaces contamination override",
           BlockContaminationRangeEffectTests.AppliesAndReplacesContaminationOverride),
       ("BlockContaminationRangeEffect saves and claims loaded override",

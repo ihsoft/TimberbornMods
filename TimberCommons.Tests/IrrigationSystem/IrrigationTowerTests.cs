@@ -64,6 +64,22 @@ static class IrrigationTowerTests {
     Assert.Equal(1, tower.IrrigationStoppedCalls);
   }
 
+  public static void RecalculatesCoverageWhenEfficiencyChanges() {
+    var tower = CreateTower();
+    tower.InitializeEntity();
+
+    tower.Efficiency = 0;
+    tower.Tick();
+
+    Assert.Equal(0, tower.CurrentEfficiency);
+    Assert.Equal(0, tower.EffectiveRange);
+    Assert.Equal(8, tower.EligibleTiles.Count);
+    Assert.Equal(0, tower.ReachableTiles.Count);
+    Assert.Equal(0, tower.Coverage);
+    Assert.Equal(3, tower.ConsumptionRateUpdates);
+    Assert.Equal(0, tower.SoilOverridesService.AddedMoistureOverrides.Count);
+  }
+
   static TestIrrigationTower CreateTower() {
     var positionedBlocks = new PositionedBlocks();
     positionedBlocks.AddBlock(new Vector3Int(5, 5, 0));
@@ -95,6 +111,7 @@ static class IrrigationTowerTests {
     public EventBus EventBus { get; set; }
     public SoilOverridesService SoilOverridesService { get; set; }
     public bool CanMoisturizeValue { get; set; }
+    public float Efficiency { get; set; } = 1;
     public int ConsumptionRateUpdates { get; private set; }
     public int IrrigationStartedCalls { get; private set; }
     public int IrrigationStoppedCalls { get; private set; }
@@ -119,7 +136,7 @@ static class IrrigationTowerTests {
     }
 
     protected override float GetEfficiency() {
-      return 1;
+      return Efficiency;
     }
   }
 
