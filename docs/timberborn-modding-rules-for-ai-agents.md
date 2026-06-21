@@ -91,6 +91,12 @@ Do not expose implementation frequency, polling intervals, update buckets, or ot
 player-visible names unless players need that detail to make a decision. Put such details in localization comments,
 code comments, or documentation when useful.
 
+For tooltip localization, preserve the useful explanation. Do not shorten a tooltip so much that it loses important
+meaning only because the text is long.
+
+Long tooltip text should be wrapped intentionally in the localization value with line breaks inside the quoted CSV
+field. Prefer a readable multi-line tooltip over a single long line that renders poorly in Timberborn UI.
+
 ## Localization file format
 
 Localization files have three columns:
