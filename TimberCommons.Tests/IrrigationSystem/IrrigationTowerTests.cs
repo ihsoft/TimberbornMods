@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using IgorZ.TimberCommons.IrrigationSystem;
 using IgorZ.TimberCommons.WaterService;
 using Timberborn.BlockingSystem;
@@ -148,7 +149,60 @@ static class IrrigationTowerTests {
     Assert.Equal(3, tower.ConsumptionRateUpdates);
   }
 
-  static TestIrrigationTower CreateTower() {
+  public static void ReturnsPreviewRangeForUnfinishedBuilding() {
+    var tower = CreateTower(isFinished: false);
+
+    tower.OnPostPlacementChanged();
+
+    var blocks = tower.GetBlocksInRange().ToHashSet();
+    Assert.Equal(8, blocks.Count);
+    Assert.True(blocks.Contains(new Vector3Int(4, 5, 0)));
+    Assert.False(blocks.Contains(new Vector3Int(5, 5, 0)));
+  }
+
+  public static void ReturnsReachableOrEligibleRangeForFinishedBuilding() {
+    var tower = CreateTower();
+    tower.InitializeEntity();
+
+    tower.Efficiency = 0;
+    tower.Tick();
+
+    Assert.Equal(0, tower.GetBlocksInRange().Count());
+
+    tower.GetComponent<BlockableObject>().Block();
+
+    Assert.Equal(8, tower.GetBlocksInRange().Count());
+  }
+
+  public static void PostPlacementChangeRecalculatesPreviewPositioning() {
+    var tower = CreateTower(isFinished: false);
+    var blockObject = tower.GetComponent<BlockObject>();
+    tower.OnPostPlacementChanged();
+
+    blockObject.PositionedBlocks.AddBlock(new Vector3Int(6, 5, 0));
+    tower.OnPostPlacementChanged();
+
+    var blocks = tower.GetBlocksInRange().ToHashSet();
+    Assert.Equal(10, blocks.Count);
+    Assert.False(blocks.Contains(new Vector3Int(5, 5, 0)));
+    Assert.False(blocks.Contains(new Vector3Int(6, 5, 0)));
+  }
+
+  public static void PostInitializeEntityRecalculatesPreviewPositioning() {
+    var tower = CreateTower(isFinished: false);
+    var blockObject = tower.GetComponent<BlockObject>();
+    tower.OnPostPlacementChanged();
+
+    blockObject.PositionedBlocks.AddBlock(new Vector3Int(6, 5, 0));
+    tower.PostInitializeEntity();
+
+    var blocks = tower.GetBlocksInRange().ToHashSet();
+    Assert.Equal(10, blocks.Count);
+    Assert.False(blocks.Contains(new Vector3Int(5, 5, 0)));
+    Assert.False(blocks.Contains(new Vector3Int(6, 5, 0)));
+  }
+
+  static TestIrrigationTower CreateTower(bool isFinished = true) {
     var positionedBlocks = new PositionedBlocks();
     positionedBlocks.AddBlock(new Vector3Int(5, 5, 0));
 
@@ -159,7 +213,7 @@ static class IrrigationTowerTests {
     var tower = new TestIrrigationTower();
     tower.SetComponent(new BlockObject {
         Coordinates = new Vector3Int(5, 5, 0),
-        IsFinished = true,
+        IsFinished = isFinished,
         Placement = new Placement { Coordinates = new Vector3Int(5, 5, 0) },
         PositionedBlocks = positionedBlocks,
     });
