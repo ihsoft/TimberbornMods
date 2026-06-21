@@ -182,6 +182,8 @@ Arguments are part of a declaration-like structure rather than executable logic.
 
 Do not force one argument per line when several arguments fit comfortably within the 120-character limit.
 
+This rule applies to method calls, method declarations, constructors, and primary constructors.
+
 Preferred:
 
     static WeatherScriptableComponent CreateComponent(
@@ -200,6 +202,9 @@ Also acceptable when it improves readability:
     }
 
 Prefer the fewer-line version when both are readable.
+
+After adding, removing, or reordering constructor or method parameters, re-check whether the final signature can be
+formatted more compactly while staying readable and within the 120-character limit.
 
 ### `out` and `ref` parameters
 
