@@ -36,6 +36,30 @@ static class ManufactoryIrrigationTowerTests {
     Assert.Equal("IgorZ.TimberCommons.WaterTower.NoTilesToIrrigate", stats.progressBarMsg);
   }
 
+  public static void MoisturizesOnlyWhenUnblockedAndReady() {
+    var tower = CreateTower();
+
+    Assert.True(tower.CanMoisturizeForTest());
+
+    tower.GetComponent<BlockableObject>().Block();
+    Assert.False(tower.CanMoisturizeForTest());
+
+    tower.GetComponent<BlockableObject>().Unblock();
+    tower.GetComponent<Manufactory>().IsReadyToProduce = false;
+    Assert.False(tower.CanMoisturizeForTest());
+  }
+
+  public static void ReportsProductionEfficiencyOnlyWhenReady() {
+    var tower = CreateTower();
+    var manufactory = tower.GetComponent<Manufactory>();
+
+    manufactory.ProductionEfficiencyValue = 0.35f;
+    Assert.Equal(0.35f, tower.GetEfficiencyForTest());
+
+    manufactory.IsReadyToProduce = false;
+    Assert.Equal(0, tower.GetEfficiencyForTest());
+  }
+
   static TestManufactoryIrrigationTower CreateTower() {
     var inventory = new Inventory();
     inventory.SetStock("Water", amount: 3, limitedAmount: 20);
@@ -62,6 +86,14 @@ static class ManufactoryIrrigationTowerTests {
   sealed class TestManufactoryIrrigationTower : ManufactoryIrrigationTower {
     public void UpdateConsumptionRateForTest() {
       UpdateConsumptionRate();
+    }
+
+    public bool CanMoisturizeForTest() {
+      return CanMoisturize();
+    }
+
+    public float GetEfficiencyForTest() {
+      return GetEfficiency();
     }
   }
 
