@@ -4,6 +4,7 @@ using Timberborn.BlockingSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BuildingRange;
 using Timberborn.MapIndexSystem;
+using Timberborn.Persistence;
 using Timberborn.SingletonSystem;
 using Timberborn.TerrainSystem;
 using UnityEngine;
@@ -78,6 +79,23 @@ static class IrrigationTowerTests {
     Assert.Equal(0, tower.Coverage);
     Assert.Equal(3, tower.ConsumptionRateUpdates);
     Assert.Equal(0, tower.SoilOverridesService.AddedMoistureOverrides.Count);
+  }
+
+  public static void SavesAndClaimsActiveMoistureOverride() {
+    var sourceTower = CreateTower();
+    sourceTower.InitializeEntity();
+    sourceTower.OnEnterFinishedState();
+    sourceTower.CanMoisturizeValue = true;
+    sourceTower.Tick();
+
+    var state = new EntityState();
+    sourceTower.Save(state);
+    var restoredTower = CreateTower();
+
+    restoredTower.Load(state);
+
+    Assert.Equal(1, restoredTower.SoilOverridesService.ClaimedMoistureOverrideIds.Count);
+    Assert.Equal(1, restoredTower.SoilOverridesService.ClaimedMoistureOverrideIds[0]);
   }
 
   static TestIrrigationTower CreateTower() {
