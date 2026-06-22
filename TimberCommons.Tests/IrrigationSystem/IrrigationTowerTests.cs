@@ -381,9 +381,43 @@ static class IrrigationTowerTests {
     Assert.False(tower.EligibleTiles.Contains(new Vector3Int(-1, 0, 0)));
   }
 
+  public static void TerrainObstaclesCutOffDisconnectedTiles() {
+    var tower = CreateTower(irrigationRange: 2);
+    for (var y = 3; y <= 7; y++) {
+      tower.TerrainService.NonGroundTiles.Add(new Vector3Int(6, y, 0));
+    }
+
+    tower.InitializeEntity();
+
+    Assert.Equal(20, tower.MaxCoveredTilesCount);
+    Assert.Equal(12, tower.EligibleTiles.Count);
+    Assert.Equal(12, tower.ReachableTiles.Count);
+    Assert.Equal(0.6f, tower.Coverage);
+    Assert.False(tower.EligibleTiles.Contains(new Vector3Int(6, 5, 0)));
+    Assert.False(tower.EligibleTiles.Contains(new Vector3Int(7, 5, 0)));
+    Assert.True(tower.EligibleTiles.Contains(new Vector3Int(4, 5, 0)));
+  }
+
+  public static void SoilBarriersCutOffDisconnectedTiles() {
+    var tower = CreateTower(irrigationRange: 2);
+    for (var y = 3; y <= 7; y++) {
+      tower.SoilOverridesService.FullMoistureBarrierTiles.Add(new Vector3Int(6, y, 0));
+    }
+
+    tower.InitializeEntity();
+
+    Assert.Equal(20, tower.MaxCoveredTilesCount);
+    Assert.Equal(12, tower.EligibleTiles.Count);
+    Assert.Equal(12, tower.ReachableTiles.Count);
+    Assert.Equal(0.6f, tower.Coverage);
+    Assert.False(tower.EligibleTiles.Contains(new Vector3Int(6, 5, 0)));
+    Assert.False(tower.EligibleTiles.Contains(new Vector3Int(7, 5, 0)));
+    Assert.True(tower.EligibleTiles.Contains(new Vector3Int(4, 5, 0)));
+  }
+
   static TestIrrigationTower CreateTower(
       bool isFinished = true, bool hasMechanicalNode = false, bool irrigateFromGroundTilesOnly = true,
-      IEnumerable<(Vector3Int Coordinates, MatterBelow MatterBelow)> foundationBlocks = null) {
+      int irrigationRange = 1, IEnumerable<(Vector3Int Coordinates, MatterBelow MatterBelow)> foundationBlocks = null) {
     var positionedBlocks = new PositionedBlocks();
     foreach (var (coordinates, matterBelow) in foundationBlocks ?? [(new Vector3Int(5, 5, 0), MatterBelow.Ground)]) {
       positionedBlocks.AddBlock(coordinates, matterBelow);
@@ -414,6 +448,7 @@ static class IrrigationTowerTests {
     tower.BuildingWithRangeUpdateService = buildingWithRangeUpdateService;
     tower.SelectableObject = selectableObject;
     tower.IrrigateFromGroundTilesOnlyValue = irrigateFromGroundTilesOnly;
+    tower.IrrigationRangeValue = irrigationRange;
     tower.InjectDependencies(
         terrainMap,
         new MapIndexService { TerrainSize = new Vector2Int(20, 20) },
@@ -447,12 +482,13 @@ static class IrrigationTowerTests {
     public SelectableObject SelectableObject { get; set; }
     public bool CanMoisturizeValue { get; set; }
     public bool IrrigateFromGroundTilesOnlyValue { get; set; } = true;
+    public int IrrigationRangeValue { get; set; } = 1;
     public float Efficiency { get; set; } = 1;
     public int ConsumptionRateUpdates { get; private set; }
     public int IrrigationStartedCalls { get; private set; }
     public int IrrigationStoppedCalls { get; private set; }
 
-    protected override int IrrigationRange => 1;
+    protected override int IrrigationRange => IrrigationRangeValue;
     protected override bool IrrigateFromGroundTilesOnly => IrrigateFromGroundTilesOnlyValue;
 
     protected override bool CanMoisturize() {
