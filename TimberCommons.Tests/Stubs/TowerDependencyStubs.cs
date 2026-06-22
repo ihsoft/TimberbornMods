@@ -52,12 +52,18 @@ namespace Timberborn.SelectionSystem {
   }
 
   public sealed class SelectableObjectSelectedEvent {
+    public SelectableObject SelectableObject { get; }
+
     public SelectableObjectSelectedEvent(SelectableObject selectableObject) {
+      SelectableObject = selectableObject;
     }
   }
 
   public sealed class SelectableObjectUnselectedEvent {
+    public SelectableObject SelectableObject { get; }
+
     public SelectableObjectUnselectedEvent(SelectableObject selectableObject) {
+      SelectableObject = selectableObject;
     }
   }
 }

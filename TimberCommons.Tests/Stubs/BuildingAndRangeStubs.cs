@@ -30,10 +30,15 @@ namespace Timberborn.BuildingRange {
   }
 
   public sealed class BuildingWithRangeUpdateService {
+    public List<SelectableObjectUnselectedEvent> UnselectedEvents { get; } = [];
+    public List<SelectableObjectSelectedEvent> SelectedEvents { get; } = [];
+
     public void OnSelectableObjectUnselected(SelectableObjectUnselectedEvent e) {
+      UnselectedEvents.Add(e);
     }
 
     public void OnSelectableObjectSelected(SelectableObjectSelectedEvent e) {
+      SelectedEvents.Add(e);
     }
   }
 }

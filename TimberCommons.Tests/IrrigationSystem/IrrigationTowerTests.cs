@@ -10,6 +10,7 @@ using Timberborn.MapIndexSystem;
 using Timberborn.MechanicalSystem;
 using Timberborn.Persistence;
 using Timberborn.RangedEffectBuildingUI;
+using Timberborn.SelectionSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.SoilBarrierSystem;
 using Timberborn.TerrainSystem;
@@ -233,6 +234,35 @@ static class IrrigationTowerTests {
     Assert.Equal(0, tower.ReachableTiles.Count);
   }
 
+  public static void RefreshesRangeHighlightOnlyWhileSelected() {
+    var tower = CreateTower();
+    var changedTile = new Vector3Int(4, 5, 0);
+    tower.InitializeEntity();
+    tower.OnEnterFinishedState();
+
+    tower.TerrainService.NonGroundTiles.Add(changedTile);
+    tower.TerrainMap.RemoveTerrain(changedTile);
+
+    Assert.Equal(0, tower.BuildingWithRangeUpdateService.UnselectedEvents.Count);
+    Assert.Equal(0, tower.BuildingWithRangeUpdateService.SelectedEvents.Count);
+
+    tower.OnSelect();
+    tower.TerrainService.NonGroundTiles.Remove(changedTile);
+    tower.TerrainMap.AddTerrain(changedTile);
+
+    Assert.Equal(1, tower.BuildingWithRangeUpdateService.UnselectedEvents.Count);
+    Assert.Equal(1, tower.BuildingWithRangeUpdateService.SelectedEvents.Count);
+    Assert.Equal(tower.SelectableObject, tower.BuildingWithRangeUpdateService.UnselectedEvents[0].SelectableObject);
+    Assert.Equal(tower.SelectableObject, tower.BuildingWithRangeUpdateService.SelectedEvents[0].SelectableObject);
+
+    tower.OnUnselect();
+    tower.TerrainService.NonGroundTiles.Add(changedTile);
+    tower.TerrainMap.RemoveTerrain(changedTile);
+
+    Assert.Equal(1, tower.BuildingWithRangeUpdateService.UnselectedEvents.Count);
+    Assert.Equal(1, tower.BuildingWithRangeUpdateService.SelectedEvents.Count);
+  }
+
   static TestIrrigationTower CreateTower(bool isFinished = true, bool hasMechanicalNode = false) {
     var positionedBlocks = new PositionedBlocks();
     positionedBlocks.AddBlock(new Vector3Int(5, 5, 0));
@@ -241,6 +271,8 @@ static class IrrigationTowerTests {
     var soilOverridesService = new SoilOverridesService();
     var terrainMap = new TerrainMap();
     var terrainService = new TestTerrainService();
+    var buildingWithRangeUpdateService = new BuildingWithRangeUpdateService();
+    var selectableObject = new SelectableObject();
     var tower = new TestIrrigationTower();
     tower.SetComponent(new BlockObject {
         Coordinates = new Vector3Int(5, 5, 0),
@@ -249,6 +281,7 @@ static class IrrigationTowerTests {
         PositionedBlocks = positionedBlocks,
     });
     tower.SetComponent(new BlockableObject());
+    tower.SetComponent(selectableObject);
     if (hasMechanicalNode) {
       tower.SetComponent(new MechanicalNode());
     }
@@ -256,12 +289,14 @@ static class IrrigationTowerTests {
     tower.SoilOverridesService = soilOverridesService;
     tower.TerrainMap = terrainMap;
     tower.TerrainService = terrainService;
+    tower.BuildingWithRangeUpdateService = buildingWithRangeUpdateService;
+    tower.SelectableObject = selectableObject;
     tower.InjectDependencies(
         terrainMap,
         new MapIndexService { TerrainSize = new Vector2Int(20, 20) },
         eventBus,
         soilOverridesService,
-        new BuildingWithRangeUpdateService(),
+        buildingWithRangeUpdateService,
         terrainService);
     tower.Awake();
     return tower;
@@ -282,6 +317,8 @@ static class IrrigationTowerTests {
     public SoilOverridesService SoilOverridesService { get; set; }
     public TerrainMap TerrainMap { get; set; }
     public TestTerrainService TerrainService { get; set; }
+    public BuildingWithRangeUpdateService BuildingWithRangeUpdateService { get; set; }
+    public SelectableObject SelectableObject { get; set; }
     public bool CanMoisturizeValue { get; set; }
     public float Efficiency { get; set; } = 1;
     public int ConsumptionRateUpdates { get; private set; }

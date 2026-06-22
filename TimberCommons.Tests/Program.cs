@@ -50,6 +50,8 @@ static class Program {
           IrrigationTowerTests.PostInitializeEntityRecalculatesPreviewPositioning),
       ("IrrigationTower delays mechanical efficiency changes",
           IrrigationTowerTests.DelaysMechanicalEfficiencyChanges),
+      ("IrrigationTower refreshes range highlight only while selected",
+          IrrigationTowerTests.RefreshesRangeHighlightOnlyWhileSelected),
       ("BlockContaminationRangeEffect applies and replaces contamination override",
           BlockContaminationRangeEffectTests.AppliesAndReplacesContaminationOverride),
       ("BlockContaminationRangeEffect saves and claims loaded override",
