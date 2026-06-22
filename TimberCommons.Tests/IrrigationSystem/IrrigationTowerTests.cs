@@ -139,6 +139,24 @@ static class IrrigationTowerTests {
     Assert.Equal(1, restoredTower.SoilOverridesService.ClaimedMoistureOverrideIds[0]);
   }
 
+  public static void RestoresSavedEfficiency() {
+    var sourceTower = CreateTower(hasMechanicalNode: true);
+    sourceTower.InitializeEntity();
+    sourceTower.OnEnterFinishedState();
+    sourceTower.CanMoisturizeValue = true;
+    sourceTower.Tick();
+    sourceTower.Tick();
+    sourceTower.Tick();
+
+    var state = new EntityState();
+    sourceTower.Save(state);
+    var restoredTower = CreateTower();
+
+    restoredTower.Load(state);
+
+    Assert.Equal(1, restoredTower.CurrentEfficiency);
+  }
+
   public static void RecalculatesCoverageWhenTerrainEligibilityChanges() {
     var tower = CreateTower();
     tower.InitializeEntity();

@@ -38,6 +38,8 @@ static class Program {
           IrrigationTowerTests.RecalculatesCoverageWhenEfficiencyChanges),
       ("IrrigationTower saves and claims active moisture override",
           IrrigationTowerTests.SavesAndClaimsActiveMoistureOverride),
+      ("IrrigationTower restores saved efficiency",
+          IrrigationTowerTests.RestoresSavedEfficiency),
       ("IrrigationTower recalculates coverage when terrain eligibility changes",
           IrrigationTowerTests.RecalculatesCoverageWhenTerrainEligibilityChanges),
       ("IrrigationTower refreshes moisture override when coverage changes",
