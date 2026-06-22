@@ -57,6 +57,21 @@ static class IrrigationTowerTests {
     Assert.False(tower.Enabled);
   }
 
+  public static void StartsMoistureOverrideWithDistanceBasedDesertLevels() {
+    var tower = CreateTower();
+    tower.InitializeEntity();
+    tower.OnEnterFinishedState();
+    tower.CanMoisturizeValue = true;
+
+    tower.Tick();
+
+    var overrides = tower.SoilOverridesService.ActiveMoistureOverrides.ToDictionary(o => o.Coordinates);
+    Assert.Equal(8, overrides.Count);
+    Assert.Equal(1, overrides[new Vector3Int(4, 5, 0)].MoistureLevel);
+    Assert.Equal(1.5f, overrides[new Vector3Int(4, 5, 0)].DesertLevel);
+    Assert.Equal(2.5f - (float)System.Math.Sqrt(2), overrides[new Vector3Int(4, 4, 0)].DesertLevel);
+  }
+
   public static void UnsubscribesFromRuntimeEventsOnExit() {
     var tower = CreateTower();
     var blockableObject = tower.GetComponent<BlockableObject>();
@@ -136,6 +151,26 @@ static class IrrigationTowerTests {
     Assert.Equal(7, tower.ReachableTiles.Count);
     Assert.Equal(0.875f, tower.Coverage);
     Assert.Equal(3, tower.ConsumptionRateUpdates);
+  }
+
+  public static void RefreshesMoistureOverrideWhenCoverageChanges() {
+    var tower = CreateTower();
+    var changedTile = new Vector3Int(4, 5, 0);
+    tower.InitializeEntity();
+    tower.OnEnterFinishedState();
+    tower.CanMoisturizeValue = true;
+    tower.Tick();
+
+    tower.TerrainService.NonGroundTiles.Add(changedTile);
+    tower.TerrainMap.RemoveTerrain(changedTile);
+
+    Assert.Equal(2, tower.SoilOverridesService.AddedMoistureOverrides.Count);
+    Assert.Equal(1, tower.SoilOverridesService.RemovedMoistureOverrideIds.Count);
+    Assert.Equal(2, tower.SoilOverridesService.ActiveMoistureOverrideId);
+    Assert.Equal(7, tower.SoilOverridesService.ActiveMoistureOverrides.Count);
+    Assert.False(tower.SoilOverridesService.ActiveMoistureOverrides.Any(o => o.Coordinates == changedTile));
+    Assert.Equal(2, tower.IrrigationStartedCalls);
+    Assert.Equal(1, tower.IrrigationStoppedCalls);
   }
 
   public static void RecalculatesCoverageWhenSoilBarrierIsBuilt() {
