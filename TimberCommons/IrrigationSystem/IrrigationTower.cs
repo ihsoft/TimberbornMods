@@ -154,6 +154,10 @@ public abstract class IrrigationTower : TickableComponent, IAwakableComponent, I
   /// <inheritdoc/>
   public virtual void OnExitFinishedState() {
     StopMoisturizing();
+    _terrainMap.TerrainAdded -= OnTerrainChanged;
+    _terrainMap.TerrainRemoved -= OnTerrainChanged;
+    BlockableObject.ObjectBlocked -= OnBlockedStateChanged;
+    BlockableObject.ObjectUnblocked -= OnBlockedStateChanged;
     _eventBus.Unregister(this);
     DisableComponent();
   }

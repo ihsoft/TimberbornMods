@@ -57,6 +57,25 @@ static class IrrigationTowerTests {
     Assert.False(tower.Enabled);
   }
 
+  public static void UnsubscribesFromRuntimeEventsOnExit() {
+    var tower = CreateTower();
+    var blockableObject = tower.GetComponent<BlockableObject>();
+    var changedTile = new Vector3Int(4, 5, 0);
+    tower.InitializeEntity();
+    tower.OnEnterFinishedState();
+
+    tower.OnExitFinishedState();
+
+    tower.TerrainService.NonGroundTiles.Add(changedTile);
+    tower.TerrainMap.RemoveTerrain(changedTile);
+    tower.CanMoisturizeValue = true;
+    blockableObject.Block();
+    blockableObject.Unblock();
+
+    Assert.Equal(2, tower.ConsumptionRateUpdates);
+    Assert.Equal(0, tower.SoilOverridesService.AddedMoistureOverrides.Count);
+  }
+
   public static void RemovesMoistureOverrideWhenBlocked() {
     var tower = CreateTower();
     var blockableObject = tower.GetComponent<BlockableObject>();

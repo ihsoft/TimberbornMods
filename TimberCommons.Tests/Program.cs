@@ -28,6 +28,8 @@ static class Program {
           IrrigationTowerTests.InitializesFlatFoundationCoverageFromLifecycle),
       ("IrrigationTower starts moisture override once and removes it on exit",
           IrrigationTowerTests.StartsMoistureOverrideOnceAndRemovesItOnExit),
+      ("IrrigationTower unsubscribes from runtime events on exit",
+          IrrigationTowerTests.UnsubscribesFromRuntimeEventsOnExit),
       ("IrrigationTower removes moisture override when blocked",
           IrrigationTowerTests.RemovesMoistureOverrideWhenBlocked),
       ("IrrigationTower recalculates coverage when efficiency changes",
