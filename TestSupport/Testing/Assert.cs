@@ -1,12 +1,16 @@
 using System;
 using System.Collections.Generic;
 
-namespace Automation.Tests;
-
 static class Assert {
   public static void Equal<T>(T expected, T actual) {
     if (!EqualityComparer<T>.Default.Equals(expected, actual)) {
-      throw new InvalidOperationException($"Expected <{expected}>, actual <{actual}>.");
+      throw new InvalidOperationException($"Expected <{expected}>, got <{actual}>.");
+    }
+  }
+
+  public static void Equal(float expected, float actual, float tolerance = 0.0001f) {
+    if (Math.Abs(expected - actual) > tolerance) {
+      throw new InvalidOperationException($"Expected <{expected}>, got <{actual}>.");
     }
   }
 
@@ -18,13 +22,13 @@ static class Assert {
 
   public static void True(bool condition, string message = null) {
     if (!condition) {
-      throw new InvalidOperationException(message ?? "Expected true.");
+      throw new InvalidOperationException(message ?? "Expected condition to be true.");
     }
   }
 
   public static void False(bool condition, string message = null) {
     if (condition) {
-      throw new InvalidOperationException(message ?? "Expected false.");
+      throw new InvalidOperationException(message ?? "Expected condition to be false.");
     }
   }
 
@@ -33,7 +37,10 @@ static class Assert {
       action();
     } catch (T e) {
       return e;
+    } catch (Exception e) {
+      throw new InvalidOperationException($"Expected {typeof(T).Name}, got {e.GetType().Name}.", e);
     }
-    throw new InvalidOperationException($"Expected exception of type {typeof(T).Name}.");
+
+    throw new InvalidOperationException($"Expected {typeof(T).Name}, but no exception was thrown.");
   }
 }

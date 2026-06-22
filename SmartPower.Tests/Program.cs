@@ -41,20 +41,6 @@ static class Program {
   ];
 
   static int Main() {
-    var failed = 0;
-    foreach (var (name, test) in Tests) {
-      try {
-        test();
-        Console.WriteLine("[PASS] " + name);
-      } catch (Exception e) {
-        failed++;
-        Console.WriteLine("[FAIL] " + name);
-        Console.WriteLine(e);
-      }
-    }
-
-    Console.WriteLine();
-    Console.WriteLine($"Total: {Tests.Count}, Passed: {Tests.Count - failed}, Failed: {failed}");
-    return failed == 0 ? 0 : 1;
+    return TestRunner.Run(Tests);
   }
 }

@@ -7,6 +7,12 @@
         <Nullable>disable</Nullable>
     </PropertyGroup>
     <ItemGroup>
+      <Compile Include="..\TestSupport\Testing\Assert.cs">
+        <Link>TestSupport\Testing\Assert.cs</Link>
+      </Compile>
+      <Compile Include="..\TestSupport\Testing\TestRunner.cs">
+        <Link>TestSupport\Testing\TestRunner.cs</Link>
+      </Compile>
       <Compile Include="..\SmartPower\Core\SmartPowerService.cs">
         <Link>SmartPower\Core\SmartPowerService.cs</Link>
       </Compile>
