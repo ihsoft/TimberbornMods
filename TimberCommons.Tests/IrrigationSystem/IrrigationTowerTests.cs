@@ -313,9 +313,62 @@ static class IrrigationTowerTests {
     Assert.Equal(7, tower.ReachableTiles.Count);
   }
 
-  static TestIrrigationTower CreateTower(bool isFinished = true, bool hasMechanicalNode = false) {
+  public static void CalculatesCoverageFromTwoByTwoFoundationBoundary() {
+    var tower = CreateTower(foundationBlocks: [
+        (new Vector3Int(5, 5, 0), MatterBelow.Ground),
+        (new Vector3Int(6, 5, 0), MatterBelow.Ground),
+        (new Vector3Int(5, 6, 0), MatterBelow.Ground),
+        (new Vector3Int(6, 6, 0), MatterBelow.Ground),
+    ]);
+
+    tower.InitializeEntity();
+
+    Assert.Equal(8, tower.MaxCoveredTilesCount);
+    Assert.Equal(8, tower.EligibleTiles.Count);
+    Assert.Equal(8, tower.ReachableTiles.Count);
+    Assert.False(tower.EligibleTiles.Contains(new Vector3Int(5, 5, 0)));
+    Assert.False(tower.EligibleTiles.Contains(new Vector3Int(6, 6, 0)));
+    Assert.True(tower.EligibleTiles.Contains(new Vector3Int(4, 5, 0)));
+    Assert.True(tower.EligibleTiles.Contains(new Vector3Int(7, 6, 0)));
+    Assert.False(tower.EligibleTiles.Contains(new Vector3Int(4, 4, 0)));
+    Assert.False(tower.EligibleTiles.Contains(new Vector3Int(7, 7, 0)));
+  }
+
+  public static void UsesAllFoundationTilesWhenGroundOnlyIsDisabled() {
+    var tower = CreateTower(irrigateFromGroundTilesOnly: false, foundationBlocks: [
+        (new Vector3Int(5, 5, 0), MatterBelow.Other),
+    ]);
+
+    tower.InitializeEntity();
+
+    Assert.Equal(8, tower.MaxCoveredTilesCount);
+    Assert.Equal(8, tower.EligibleTiles.Count);
+    Assert.Equal(8, tower.ReachableTiles.Count);
+  }
+
+  public static void ClipsCoverageAtMapBounds() {
+    var tower = CreateTower(foundationBlocks: [
+        (new Vector3Int(0, 0, 0), MatterBelow.Ground),
+    ]);
+
+    tower.InitializeEntity();
+
+    Assert.Equal(8, tower.MaxCoveredTilesCount);
+    Assert.Equal(3, tower.EligibleTiles.Count);
+    Assert.Equal(3, tower.ReachableTiles.Count);
+    Assert.True(tower.EligibleTiles.Contains(new Vector3Int(0, 1, 0)));
+    Assert.True(tower.EligibleTiles.Contains(new Vector3Int(1, 0, 0)));
+    Assert.True(tower.EligibleTiles.Contains(new Vector3Int(1, 1, 0)));
+    Assert.False(tower.EligibleTiles.Contains(new Vector3Int(-1, 0, 0)));
+  }
+
+  static TestIrrigationTower CreateTower(
+      bool isFinished = true, bool hasMechanicalNode = false, bool irrigateFromGroundTilesOnly = true,
+      IEnumerable<(Vector3Int Coordinates, MatterBelow MatterBelow)> foundationBlocks = null) {
     var positionedBlocks = new PositionedBlocks();
-    positionedBlocks.AddBlock(new Vector3Int(5, 5, 0));
+    foreach (var (coordinates, matterBelow) in foundationBlocks ?? [(new Vector3Int(5, 5, 0), MatterBelow.Ground)]) {
+      positionedBlocks.AddBlock(coordinates, matterBelow);
+    }
 
     var eventBus = new EventBus();
     var soilOverridesService = new SoilOverridesService();
@@ -341,6 +394,7 @@ static class IrrigationTowerTests {
     tower.TerrainService = terrainService;
     tower.BuildingWithRangeUpdateService = buildingWithRangeUpdateService;
     tower.SelectableObject = selectableObject;
+    tower.IrrigateFromGroundTilesOnlyValue = irrigateFromGroundTilesOnly;
     tower.InjectDependencies(
         terrainMap,
         new MapIndexService { TerrainSize = new Vector2Int(20, 20) },
@@ -373,13 +427,14 @@ static class IrrigationTowerTests {
     public BuildingWithRangeUpdateService BuildingWithRangeUpdateService { get; set; }
     public SelectableObject SelectableObject { get; set; }
     public bool CanMoisturizeValue { get; set; }
+    public bool IrrigateFromGroundTilesOnlyValue { get; set; } = true;
     public float Efficiency { get; set; } = 1;
     public int ConsumptionRateUpdates { get; private set; }
     public int IrrigationStartedCalls { get; private set; }
     public int IrrigationStoppedCalls { get; private set; }
 
     protected override int IrrigationRange => 1;
-    protected override bool IrrigateFromGroundTilesOnly => true;
+    protected override bool IrrigateFromGroundTilesOnly => IrrigateFromGroundTilesOnlyValue;
 
     protected override bool CanMoisturize() {
       return CanMoisturizeValue;
