@@ -263,6 +263,56 @@ static class IrrigationTowerTests {
     Assert.Equal(1, tower.BuildingWithRangeUpdateService.SelectedEvents.Count);
   }
 
+  public static void IgnoresIrrelevantTerrainEvents() {
+    var tower = CreateTower();
+    tower.InitializeEntity();
+    tower.OnEnterFinishedState();
+
+    tower.TerrainService.NonGroundTiles.Add(new Vector3Int(10, 10, 0));
+    tower.TerrainMap.RemoveTerrain(new Vector3Int(10, 10, 0));
+    tower.TerrainMap.AddTerrain(new Vector3Int(4, 5, 0));
+
+    Assert.Equal(2, tower.ConsumptionRateUpdates);
+    Assert.Equal(8, tower.EligibleTiles.Count);
+    Assert.Equal(8, tower.ReachableTiles.Count);
+  }
+
+  public static void IgnoresIrrelevantSoilBarrierBuildEvents() {
+    var tower = CreateTower();
+    var barrierCoordinates = new Vector3Int(4, 5, 0);
+    tower.InitializeEntity();
+    tower.OnEnterFinishedState();
+
+    tower.SoilOverridesService.GameLoaded = false;
+    tower.SoilOverridesService.FullMoistureBarrierTiles.Add(barrierCoordinates);
+    tower.OnEnteredFinishedStateEvent(new EnteredFinishedStateEvent(CreateBarrierBlock(barrierCoordinates)));
+
+    tower.SoilOverridesService.GameLoaded = true;
+    tower.OnEnteredFinishedStateEvent(new EnteredFinishedStateEvent(
+        CreateBarrierBlock(barrierCoordinates, hasSpec: false)));
+    tower.OnEnteredFinishedStateEvent(new EnteredFinishedStateEvent(CreateBarrierBlock(barrierCoordinates,
+        blockFullMoisture: false)));
+
+    Assert.Equal(2, tower.ConsumptionRateUpdates);
+    Assert.Equal(8, tower.EligibleTiles.Count);
+    Assert.Equal(8, tower.ReachableTiles.Count);
+  }
+
+  public static void IgnoresIrrelevantSoilBarrierDeleteEvents() {
+    var tower = CreateTower();
+    var barrierCoordinates = new Vector3Int(4, 5, 0);
+    tower.SoilOverridesService.FullMoistureBarrierTiles.Add(barrierCoordinates);
+    tower.InitializeEntity();
+
+    tower.OnEntityDeletedEvent(new EntityDeletedEvent(CreateBarrierBlock(barrierCoordinates, isFinished: false)));
+    tower.OnEntityDeletedEvent(new EntityDeletedEvent(CreateBarrierBlock(new Vector3Int(10, 10, 0))));
+    tower.OnEntityDeletedEvent(new EntityDeletedEvent(CreateBarrierBlock(barrierCoordinates, blockFullMoisture: false)));
+
+    Assert.Equal(2, tower.ConsumptionRateUpdates);
+    Assert.Equal(7, tower.EligibleTiles.Count);
+    Assert.Equal(7, tower.ReachableTiles.Count);
+  }
+
   static TestIrrigationTower CreateTower(bool isFinished = true, bool hasMechanicalNode = false) {
     var positionedBlocks = new PositionedBlocks();
     positionedBlocks.AddBlock(new Vector3Int(5, 5, 0));
@@ -302,12 +352,15 @@ static class IrrigationTowerTests {
     return tower;
   }
 
-  static BlockObject CreateBarrierBlock(Vector3Int coordinates) {
+  static BlockObject CreateBarrierBlock(
+      Vector3Int coordinates, bool isFinished = true, bool hasSpec = true, bool blockFullMoisture = true) {
     var barrier = new BlockObject {
         Coordinates = coordinates,
-        IsFinished = true,
+        IsFinished = isFinished,
     };
-    barrier.SetComponent(new SoilBarrierSpec { BlockFullMoisture = true });
+    if (hasSpec) {
+      barrier.SetComponent(new SoilBarrierSpec { BlockFullMoisture = blockFullMoisture });
+    }
     barrier.SetComponent(barrier);
     return barrier;
   }
