@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimberCommons.Tests", "Timb
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XRay.Tests", "XRay.Tests\XRay.Tests.csproj", "{A8E87771-C095-4D47-B647-25830C55DDE6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomTools.Tests", "CustomTools.Tests\CustomTools.Tests.csproj", "{63396925-D19B-443C-BCED-BF1218D57237}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -84,5 +86,9 @@ Global
 		{A8E87771-C095-4D47-B647-25830C55DDE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A8E87771-C095-4D47-B647-25830C55DDE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A8E87771-C095-4D47-B647-25830C55DDE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63396925-D19B-443C-BCED-BF1218D57237}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63396925-D19B-443C-BCED-BF1218D57237}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63396925-D19B-443C-BCED-BF1218D57237}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63396925-D19B-443C-BCED-BF1218D57237}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
