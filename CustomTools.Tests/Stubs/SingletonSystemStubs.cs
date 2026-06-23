@@ -13,7 +13,13 @@ public class OnEventAttribute : Attribute {
 public class EventBus {
   public object RegisteredObject { get; private set; }
 
+  public object LastEvent { get; private set; }
+
   public void Register(object listener) {
     RegisteredObject = listener;
+  }
+
+  public void Post(object @event) {
+    LastEvent = @event;
   }
 }

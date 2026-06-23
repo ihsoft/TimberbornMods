@@ -25,5 +25,14 @@
       <Compile Include="..\CustomTools\Core\FeatureLimiterService.cs">
         <Link>CustomTools\Core\FeatureLimiterService.cs</Link>
       </Compile>
+      <Compile Include="..\CustomTools\KeyBindings\CustomToolBindingSpec.cs">
+        <Link>CustomTools\KeyBindings\CustomToolBindingSpec.cs</Link>
+      </Compile>
+      <Compile Include="..\CustomTools\KeyBindings\CustomToolKeyBindingEvent.cs">
+        <Link>CustomTools\KeyBindings\CustomToolKeyBindingEvent.cs</Link>
+      </Compile>
+      <Compile Include="..\CustomTools\KeyBindings\KeyBindingInputProcessor.cs">
+        <Link>CustomTools\KeyBindings\KeyBindingInputProcessor.cs</Link>
+      </Compile>
     </ItemGroup>
 </Project>

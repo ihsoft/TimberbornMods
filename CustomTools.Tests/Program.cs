@@ -17,6 +17,21 @@ static class Program {
           CustomToolsUndoServiceTests.IgnoresCreationOutsideCapture),
       ("CustomToolsUndoService keeps nested capture as one action",
           CustomToolsUndoServiceTests.KeepsNestedCaptureAsOneAction),
+      ("KeyBindingInputProcessor registers itself and clears state on post load",
+          KeyBindingInputProcessorTests.RegistersItselfAndClearsStateOnPostLoad),
+      ("KeyBindingInputProcessor selects block object tool and blocks consumed key",
+          KeyBindingInputProcessorTests.SelectsBlockObjectToolAndBlocksConsumedKey),
+      ("KeyBindingInputProcessor selects tool by type", KeyBindingInputProcessorTests.SelectsToolByType),
+      ("KeyBindingInputProcessor selects tool by custom tool id",
+          KeyBindingInputProcessorTests.SelectsToolByCustomToolId),
+      ("KeyBindingInputProcessor processes newest pressed binding first",
+          KeyBindingInputProcessorTests.ProcessesNewestPressedBindingFirst),
+      ("KeyBindingInputProcessor posts event for unrouted binding",
+          KeyBindingInputProcessorTests.PostsEventForUnroutedBinding),
+      ("KeyBindingInputProcessor ignores bindings without custom tool spec",
+          KeyBindingInputProcessorTests.IgnoresBindingsWithoutCustomToolSpec),
+      ("KeyBindingInputProcessor throws when block object blueprint is unknown",
+          KeyBindingInputProcessorTests.ThrowsWhenBlockObjectBlueprintIsUnknown),
   ];
 
   static int Main() {
