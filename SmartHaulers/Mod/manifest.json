@@ -1,0 +1,13 @@
+{
+  "Name": "SmartHaulers",
+  "Version": "0.1.0",
+  "Id": "Timberborn.IgorZ.SmartHaulers",
+  "MinimumGameVersion": "1.1.0.0",
+  "Description": "Experimental hauler assignment and interruption improvements",
+  "RequiredMods": [
+    {
+      "Id": "Harmony",
+      "MinimumVersion": "2.3.3"
+    }
+  ]
+}
