@@ -331,6 +331,15 @@ Performance rule:
 
 Prefer public APIs first, publicized direct access second, and `AccessTools` only when needed.
 
+## Game API drift
+
+When fixing a mod after Timberborn game API drift, do more than update signatures until the code compiles.
+
+If the mod subclasses, wraps, replaces, patches, or decorates a stock game component or service, compare the fresh
+`_DecompiledGame` implementation with the modded implementation. Preserve new stock behavior unless the user explicitly
+wants to override it. Constructor changes often come with behavior changes, so verify the updated stock logic before
+using old fallback values or copied logic.
+
 ## Configurators and DI registration
 
 Each package should have its own configurator.

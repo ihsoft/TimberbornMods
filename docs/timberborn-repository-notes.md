@@ -209,6 +209,16 @@ pending section to the next minor version because feature scope dominates patch 
 Each package may have its own changelog and version stream. Update the target package changelog, not a repository-wide
 changelog, unless the task explicitly affects repository-wide release notes.
 
+During ordinary code compatibility work after a Timberborn update, do not update release metadata such as
+`release.json` or `directory.build.props` unless the user explicitly asks for release preparation. A changelog `(TBD)`
+section, Unity manifest minimum game version, and code changes may be correct for compatibility work while release
+metadata remains owned by the later publish or release workflow.
+
+For compatibility updates after a Timberborn game update, prefer a single `[Update] Support game version X.Y.Z...`
+entry when the work is primarily restoring support for the new game version. Include important adapted stock behavior
+in that update entry. Do not split it into a separate `[Fix]` unless players could encounter the broken behavior in a
+released mod version.
+
 ---
 
 ## GitHub Issue References in Commits
