@@ -1,4 +1,4 @@
-﻿// Timberborn Mod: X-Ray
+// Timberborn Mod: X-Ray
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 

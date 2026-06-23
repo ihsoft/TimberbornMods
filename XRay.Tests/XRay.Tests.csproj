@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <LangVersion>13</LangVersion>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+    </PropertyGroup>
+    <ItemGroup>
+      <Compile Include="..\TestSupport\Testing\Assert.cs">
+        <Link>TestSupport\Testing\Assert.cs</Link>
+      </Compile>
+      <Compile Include="..\TestSupport\Testing\TestRunner.cs">
+        <Link>TestSupport\Testing\TestRunner.cs</Link>
+      </Compile>
+      <Compile Include="..\XRay\Core\KeyBindingInputProcessor.cs">
+        <Link>XRay\Core\KeyBindingInputProcessor.cs</Link>
+      </Compile>
+      <Compile Include="..\XRay\Core\XRayModeManager.cs">
+        <Link>XRay\Core\XRayModeManager.cs</Link>
+      </Compile>
+    </ItemGroup>
+</Project>
