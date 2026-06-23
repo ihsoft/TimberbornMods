@@ -1,4 +1,5 @@
-# v1.17.2 (TBD)
+# v1.18.0 (TBD)
+* [Update] Support game version `1.1.0.2`, including the updated water output overflow logic.
 * [Fix] Irrigation towers no longer react to terrain or blocking changes after leaving the finished state.
 
 # v1.17.1 (June 21st, 2026)

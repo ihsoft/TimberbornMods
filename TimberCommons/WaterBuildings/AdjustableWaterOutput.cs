@@ -24,8 +24,8 @@ namespace IgorZ.TimberCommons.WaterBuildings;
 /// </remarks>
 sealed class AdjustableWaterOutput(
     IWaterService waterService, IThreadSafeWaterMap threadSafeWaterMap, MapSize mapSize,
-    WaterOutputLevelRangeService waterOutputLevelRangeService)
-    : WaterOutput(waterService, threadSafeWaterMap), IAwakableComponent, IPersistentEntity {
+    WaterOutputLevelRangeService waterOutputLevelRangeService, WaterOverflowCalculator waterOverflowCalculator)
+    : WaterOutput(waterService, threadSafeWaterMap, waterOverflowCalculator), IAwakableComponent, IPersistentEntity {
 
   const float DamHeight = 0.65f;
   const string FluidDumpPrefabName = "FluidDump";
@@ -118,7 +118,7 @@ sealed class AdjustableWaterOutput(
   /// </summary>
   internal float CalculateAvailableSpace() {
     if (!LimitOutputLevelEnabled) {
-      return float.MaxValue;
+      return CalculateStockAvailableSpace();
     }
     if (SpillwayHeightDelta < MinHeight - MaxTargetHeight) {
       var oldDelta = SpillwayHeightDelta;
@@ -126,6 +126,18 @@ sealed class AdjustableWaterOutput(
       HostedDebugLog.Fine(this, "SpillwayHeightDelta corrected: {0} => {1}", oldDelta, SpillwayHeightDelta);
     }
     return TargetWaterLevel - _threadSafeWaterMap.WaterHeightOrFloor(_waterCoordinatesTransformed);
+  }
+
+  float CalculateStockAvailableSpace() {
+    if (!_waterOutputSpec.OverflowAllowed) {
+      return DistanceToGround;
+    }
+    var currentOverflow = _threadSafeWaterMap.ColumnOverflow(_waterCoordinatesTransformed);
+    if (currentOverflow <= 0f) {
+      return float.MaxValue;
+    }
+    var ceiling = _threadSafeWaterMap.ColumnCeiling(_waterCoordinatesTransformed);
+    return _waterOverflowCalculator.GetOverflowSpace(currentOverflow, ceiling) - WaterUpperSafetySpace;
   }
 
   /// <inheritdoc/>
