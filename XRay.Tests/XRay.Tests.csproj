@@ -16,6 +16,9 @@
       <Compile Include="..\XRay\Core\KeyBindingInputProcessor.cs">
         <Link>XRay\Core\KeyBindingInputProcessor.cs</Link>
       </Compile>
+      <Compile Include="..\XRay\Core\TerrainRayCaster.cs">
+        <Link>XRay\Core\TerrainRayCaster.cs</Link>
+      </Compile>
       <Compile Include="..\XRay\Core\XRayModeManager.cs">
         <Link>XRay\Core\XRayModeManager.cs</Link>
       </Compile>

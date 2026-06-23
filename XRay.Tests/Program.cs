@@ -11,6 +11,11 @@ static class Program {
       ("KeyBindingInputProcessor activates while show binding is held", KeyBindingInputProcessorTests.ActivatesOnHold),
       ("KeyBindingInputProcessor ignores hold while toggle mode is active",
           KeyBindingInputProcessorTests.IgnoresHoldWhenActive),
+      ("TerrainRayCaster returns surface terrain hits", TerrainRayCasterTests.ReturnsSurfaceTerrainHits),
+      ("TerrainRayCaster stops when an object blocks the ray", TerrainRayCasterTests.StopsOnBlockingObject),
+      ("TerrainRayCaster supports side-attached previews", TerrainRayCasterTests.SupportsSideAttachedPreviews),
+      ("TerrainRayCaster prefers underground hits after surface fallback",
+          TerrainRayCasterTests.PrefersUndergroundHitsAfterSurfaceFallback),
   ];
 
   static int Main() {
