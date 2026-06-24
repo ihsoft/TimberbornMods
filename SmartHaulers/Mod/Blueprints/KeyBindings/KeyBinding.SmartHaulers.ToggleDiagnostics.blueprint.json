@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "IgorZ-SmartHaulersToggleDiagnostics",
+    "GroupId": "IgorZ-SmartHaulers-BindingsGroupId",
+    "LocKey": "IgorZ.SmartHaulers.KeyBinding.ToggleDiagnostics",
+    "Order": 0,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/h",
+    "InputModifiers": "Ctrl, Shift",
+    "Unchangeable": false
+  }
+}

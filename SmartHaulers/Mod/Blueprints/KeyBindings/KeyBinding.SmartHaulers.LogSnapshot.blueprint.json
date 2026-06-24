@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "IgorZ-SmartHaulersLogSnapshot",
+    "GroupId": "IgorZ-SmartHaulers-BindingsGroupId",
+    "LocKey": "IgorZ.SmartHaulers.KeyBinding.LogSnapshot",
+    "Order": 1,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/j",
+    "InputModifiers": "Ctrl, Shift",
+    "Unchangeable": false
+  }
+}

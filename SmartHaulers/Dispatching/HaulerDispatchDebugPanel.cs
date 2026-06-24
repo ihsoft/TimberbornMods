@@ -1,0 +1,172 @@
+// Timberborn Mod: SmartHaulers
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+
+using System.Collections.Generic;
+using System.Linq;
+using IgorZ.SmartHaulers.Core;
+using Timberborn.CoreUI;
+using Timberborn.SingletonSystem;
+using Timberborn.UILayoutSystem;
+using UnityDev.Utils.LogUtilsLite;
+using UnityEngine;
+using UnityEngine.UIElements;
+
+namespace IgorZ.SmartHaulers.Dispatching;
+
+sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingleton {
+  readonly DispatchCenterRegistry _dispatchCenterRegistry;
+  readonly UILayout _uiLayout;
+
+  VisualElement _root;
+  Label _contentLabel;
+  bool _isAddedToLayout;
+  string _lastText;
+
+  public HaulerDispatchDebugPanel(DispatchCenterRegistry dispatchCenterRegistry, UILayout uiLayout) {
+    _dispatchCenterRegistry = dispatchCenterRegistry;
+    _uiLayout = uiLayout;
+  }
+
+  public void PostLoad() {
+    _root = CreateRoot();
+    _contentLabel = CreateContentLabel();
+    var scrollView = new ScrollView(ScrollViewMode.VerticalAndHorizontal);
+    scrollView.contentContainer.Add(_contentLabel);
+    _root.Add(CreateTitleLabel());
+    _root.Add(scrollView);
+    _root.ToggleDisplayStyle(visible: false);
+  }
+
+  public void UpdateSingleton() {
+    if (!_isAddedToLayout) {
+      _uiLayout.AddAbsoluteItem(_root);
+      _isAddedToLayout = true;
+    }
+    _root.ToggleDisplayStyle(SmartHaulersState.DiagnosticsEnabled);
+    if (!SmartHaulersState.DiagnosticsEnabled) {
+      return;
+    }
+    var text = BuildText();
+    if (SmartHaulersState.ConsumeLogSnapshotRequest()) {
+      LogSnapshot(text);
+    }
+    if (text == _lastText) {
+      return;
+    }
+    _lastText = text;
+    _contentLabel.text = text;
+  }
+
+  static VisualElement CreateRoot() {
+    var root = new VisualElement {
+        name = "SmartHaulersDebugPanel",
+    };
+    root.style.position = Position.Absolute;
+    root.style.left = 8;
+    root.style.top = new StyleLength(new Length(38, LengthUnit.Percent));
+    root.style.width = 760;
+    root.style.maxHeight = new StyleLength(new Length(55, LengthUnit.Percent));
+    root.style.paddingLeft = 8;
+    root.style.paddingRight = 8;
+    root.style.paddingTop = 6;
+    root.style.paddingBottom = 6;
+    root.style.backgroundColor = new Color(0f, 0f, 0f, 0.78f);
+    root.style.borderTopLeftRadius = 3;
+    root.style.borderTopRightRadius = 3;
+    root.style.borderBottomLeftRadius = 3;
+    root.style.borderBottomRightRadius = 3;
+    return root;
+  }
+
+  static Label CreateTitleLabel() {
+    var label = new Label("SmartHaulers dispatch");
+    label.style.unityFontStyleAndWeight = FontStyle.Bold;
+    label.style.color = Color.white;
+    label.style.marginBottom = 4;
+    return label;
+  }
+
+  static Label CreateContentLabel() {
+    var label = new Label();
+    label.style.color = Color.white;
+    label.style.whiteSpace = WhiteSpace.NoWrap;
+    return label;
+  }
+
+  string BuildText() {
+    var lines = new List<string>();
+    foreach (var dispatchCenter in OrderedDispatchCenters()) {
+      AddDispatchCenter(lines, dispatchCenter);
+    }
+    return lines.Count > 0 ? string.Join("\n", lines) : "No districts";
+  }
+
+  IEnumerable<HaulerDispatchCenter> OrderedDispatchCenters() {
+    return _dispatchCenterRegistry.DispatchCenters
+        .Where(dispatchCenter => dispatchCenter.DistrictCenter && dispatchCenter.Agents.Count > 0)
+        .OrderBy(dispatchCenter => dispatchCenter.DistrictCenterId);
+  }
+
+  static void AddDispatchCenter(List<string> lines, HaulerDispatchCenter dispatchCenter) {
+    var counts = CountAgents(dispatchCenter.Agents);
+    lines.Add(
+        $"{DebugEx.ObjectToString(dispatchCenter.DistrictCenter)}, {dispatchCenter.Agents.Count}, "
+        + $"{counts.available}, {counts.wandering}, {counts.workplaceIdle}, {counts.transporting}, "
+        + $"{counts.working}, {dispatchCenter.Orders.Count}");
+    foreach (var agent in dispatchCenter.Agents.OrderBy(agent => agent.EntityId)) {
+      lines.Add(FormatAgent(agent));
+    }
+    foreach (var order in dispatchCenter.Orders.OrderBy(order => order.AgentId)) {
+      lines.Add(FormatOrder(order));
+    }
+  }
+
+  static (int available, int wandering, int workplaceIdle, int transporting, int working) CountAgents(
+      IReadOnlyList<TransportAgentSnapshot> agents) {
+    var available = 0;
+    var wandering = 0;
+    var workplaceIdle = 0;
+    var transporting = 0;
+    var working = 0;
+    foreach (var agent in agents) {
+      switch (agent.State) {
+        case TransportAgentState.Available:
+          available++;
+          break;
+        case TransportAgentState.IdleWandering:
+          wandering++;
+          break;
+        case TransportAgentState.WorkplaceIdle:
+          workplaceIdle++;
+          break;
+        case TransportAgentState.Transporting:
+          transporting++;
+          break;
+        case TransportAgentState.Working:
+          working++;
+          break;
+      }
+    }
+    return (available, wandering, workplaceIdle, transporting, working);
+  }
+
+  static string FormatAgent(TransportAgentSnapshot agent) {
+    return $"  {agent.DisplayName}, {agent.State}, {agent.Activity}, {agent.Position}, {agent.Speed:0.##}, "
+        + $"{agent.Capacity}";
+  }
+
+  static string FormatOrder(TransportOrderSnapshot order) {
+    return $"  {TransportAgentSnapshot.FormatWorker(order.Worker)}, {order.Phase}, {order.GoodAmount}, "
+        + $"{DebugEx.ObjectToString(order.Source)}, {DebugEx.ObjectToString(order.Target)}, "
+        + $"{order.RouteDistance:0.##}, {order.RemainingDistance:0.##}, {order.Progress:0.##}";
+  }
+
+  static void LogSnapshot(string text) {
+    DebugEx.Info(
+        "SmartHaulers snapshot columns: district, agents, available, wandering, workplaceIdle, transporting, "
+        + "working, orders | agent, state, activity, position, speed, capacity | agent, phase, good, source, target, "
+        + "route, remaining, progress");
+    DebugEx.Info("SmartHaulers snapshot:\n{0}", text);
+  }
+}
