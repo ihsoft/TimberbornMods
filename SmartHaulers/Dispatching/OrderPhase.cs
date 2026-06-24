@@ -5,6 +5,7 @@
 namespace IgorZ.SmartHaulers.Dispatching;
 
 enum OrderPhase {
+  Queued,
   PickingUp,
   Delivering,
 }

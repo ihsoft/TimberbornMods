@@ -91,6 +91,7 @@ sealed class TransportAgentFragment(DispatchCenterRegistry dispatchCenterRegistr
     };
     root.style.width = 450;
     root.style.minWidth = 450;
+    root.style.alignSelf = Align.FlexEnd;
     root.style.marginTop = 4;
     root.style.marginBottom = 4;
     root.style.paddingLeft = 8;

@@ -12,6 +12,8 @@ namespace IgorZ.SmartHaulers.Dispatching;
 readonly struct TransportAgentActivity {
   const string WanderRootBehaviorName = "WanderRootBehavior";
   const string WaitInsideIdlyWorkplaceBehaviorName = "WaitInsideIdlyWorkplaceBehavior";
+  const string CarryRootBehaviorName = "CarryRootBehavior";
+  const string NeedBehaviorSuffix = "NeedBehavior";
 
   public static readonly TransportAgentActivity Idle = new TransportAgentActivity(
       TransportAgentState.Available, isCarrying: false, hasStockReservation: false, hasCapacityReservation: false,
@@ -58,18 +60,45 @@ readonly struct TransportAgentActivity {
   }
 
   static TransportAgentState Classify(GoodCarrier goodCarrier, GoodReserver goodReserver, string runningBehavior) {
-    if (goodCarrier.IsCarrying || goodReserver.HasReservedStock || goodReserver.HasReservedCapacity) {
+    if (goodCarrier.IsCarrying
+        || (HasReservation(goodReserver) && IsTransportBehavior(runningBehavior))) {
       return TransportAgentState.Transporting;
     }
     return runningBehavior switch {
         null => TransportAgentState.Available,
         WanderRootBehaviorName => TransportAgentState.IdleWandering,
         WaitInsideIdlyWorkplaceBehaviorName => TransportAgentState.WorkplaceIdle,
+        var behaviorName when IsNeedBehavior(behaviorName) => TransportAgentState.SatisfyingNeed,
         _ => TransportAgentState.Working,
     };
   }
 
+  static bool HasReservation(GoodReserver goodReserver) {
+    return goodReserver.HasReservedStock || goodReserver.HasReservedCapacity;
+  }
+
+  static bool IsTransportBehavior(string runningBehavior) {
+    return runningBehavior is CarryRootBehaviorName
+        or "BringNutrientWorkplaceBehavior"
+        or "EmptyInventoriesWorkplaceBehavior"
+        or "EmptyOutputWorkplaceBehavior"
+        or "FillInputWorkplaceBehavior"
+        or "ObtainGoodWorkplaceBehavior"
+        or "RemoveUnwantedStockWorkplaceBehavior"
+        or "SupplyGoodWorkplaceBehavior";
+  }
+
+  static bool IsNeedBehavior(string runningBehavior) {
+    return runningBehavior?.EndsWith(NeedBehaviorSuffix) ?? false;
+  }
+
   public override string ToString() {
+    if (State != TransportAgentState.Transporting && !string.IsNullOrEmpty(ExecutorName)) {
+      return $"{BehaviorName}/{ExecutorName} {ExecutorElapsedTime:0.#}s";
+    }
+    if (State != TransportAgentState.Transporting && !string.IsNullOrEmpty(BehaviorName)) {
+      return BehaviorName;
+    }
     if (IsCarrying) {
       return $"Carrying {CarriedGood}";
     }

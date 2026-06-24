@@ -20,6 +20,7 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<HaulerDispatchDebugPanel>().AsSingleton();
     containerDefinition.Bind<KeyBindingInputProcessor>().AsSingleton();
     containerDefinition.Bind<TransportAgentFragment>().AsSingleton();
+    containerDefinition.Bind<TransportRequesterFragment>().AsSingleton();
     containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
     containerDefinition.MultiBind<TemplateModule>().ToProvider(ProvideTemplateModule).AsSingleton();
   }
@@ -30,10 +31,13 @@ sealed class Configurator : IConfigurator {
     return builder.Build();
   }
 
-  sealed class EntityPanelModuleProvider(TransportAgentFragment transportAgentFragment) : IProvider<EntityPanelModule> {
+  sealed class EntityPanelModuleProvider(
+      TransportAgentFragment transportAgentFragment,
+      TransportRequesterFragment transportRequesterFragment) : IProvider<EntityPanelModule> {
     public EntityPanelModule Get() {
       var builder = new EntityPanelModule.Builder();
       builder.AddSideFragment(transportAgentFragment);
+      builder.AddSideFragment(transportRequesterFragment);
       return builder.Build();
     }
   }

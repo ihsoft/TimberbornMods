@@ -113,21 +113,22 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
     lines.Add(
         $"{DebugEx.ObjectToString(dispatchCenter.DistrictCenter)}, {dispatchCenter.Agents.Count}, "
         + $"{counts.available}, {counts.wandering}, {counts.workplaceIdle}, {counts.transporting}, "
-        + $"{counts.working}, {dispatchCenter.Orders.Count}");
+        + $"{counts.satisfyingNeed}, {counts.working}, {dispatchCenter.Orders.Count}");
     foreach (var agent in dispatchCenter.Agents.OrderBy(agent => agent.EntityId)) {
       lines.Add(FormatAgent(agent));
     }
-    foreach (var order in dispatchCenter.Orders.OrderBy(order => order.AgentId)) {
+    foreach (var order in dispatchCenter.Orders) {
       lines.Add(FormatOrder(order));
     }
   }
 
-  static (int available, int wandering, int workplaceIdle, int transporting, int working) CountAgents(
+  static (int available, int wandering, int workplaceIdle, int transporting, int satisfyingNeed, int working) CountAgents(
       IReadOnlyList<TransportAgentSnapshot> agents) {
     var available = 0;
     var wandering = 0;
     var workplaceIdle = 0;
     var transporting = 0;
+    var satisfyingNeed = 0;
     var working = 0;
     foreach (var agent in agents) {
       switch (agent.State) {
@@ -143,12 +144,15 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
         case TransportAgentState.Transporting:
           transporting++;
           break;
+        case TransportAgentState.SatisfyingNeed:
+          satisfyingNeed++;
+          break;
         case TransportAgentState.Working:
           working++;
           break;
       }
     }
-    return (available, wandering, workplaceIdle, transporting, working);
+    return (available, wandering, workplaceIdle, transporting, satisfyingNeed, working);
   }
 
   static string FormatAgent(TransportAgentSnapshot agent) {
@@ -157,6 +161,10 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
   }
 
   static string FormatOrder(TransportOrderSnapshot order) {
+    if (order.Phase == OrderPhase.Queued) {
+      return $"  queued, {order.Weight:0.##}, {order.BehaviorName}, {DebugEx.ObjectToString(order.Source)}, "
+          + $"{DebugEx.ObjectToString(order.Target)}, {DebugEx.ObjectToString(order.Requester)}";
+    }
     return $"  {TransportAgentSnapshot.FormatWorker(order.Worker)}, {order.Phase}, {order.GoodAmount}, "
         + $"{DebugEx.ObjectToString(order.Source)}, {DebugEx.ObjectToString(order.Target)}, "
         + $"{order.RouteDistance:0.##}, {order.RemainingDistance:0.##}, {order.Progress:0.##}";
@@ -165,8 +173,8 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
   static void LogSnapshot(string text) {
     DebugEx.Info(
         "SmartHaulers snapshot columns: district, agents, available, wandering, workplaceIdle, transporting, "
-        + "working, orders | agent, state, activity, position, speed, capacity | agent, phase, good, source, target, "
-        + "route, remaining, progress");
+        + "satisfyingNeed, working, orders | agent, state, activity, position, speed, capacity | agent, phase, "
+        + "good, source, target, route, remaining, progress | queued, weight, behavior, source, target, requester");
     DebugEx.Info("SmartHaulers snapshot:\n{0}", text);
   }
 }

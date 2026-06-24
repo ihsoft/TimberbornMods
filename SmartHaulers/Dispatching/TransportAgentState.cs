@@ -8,6 +8,7 @@ enum TransportAgentState {
   Available,
   IdleWandering,
   WorkplaceIdle,
+  SatisfyingNeed,
   Transporting,
   Working,
 }
