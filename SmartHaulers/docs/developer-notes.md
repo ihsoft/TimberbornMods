@@ -114,6 +114,18 @@ model.
 A future SmartHaulers-owned compound or batch planner likely needs to enumerate candidate inventories from the
 district/good registry, rank them, and apply virtual stock/capacity subtraction across multiple planned segments.
 
+For per-good `FillInput` planning, vanilla `weight = 1 - GetInputFillPercentage(inputInventory)` is a weak heuristic
+for multi-ingredient recipes. It can hide a critically missing ingredient when another ingredient fills much of the
+shared input inventory. SmartHaulers should treat per-good demand and urgency as an intended improvement direction, not
+only overall input inventory fill percentage. Example: a recipe needs logs and water; logs are full, water is empty.
+The shared input inventory may look partly full, but water delivery should still be urgent.
+
+Current prototype working assumption: for ordinary buildings, treat there as being at most one active meaningful
+inventory at a time. A construction inventory is active while a building is under construction; after construction it is
+deactivated and no longer relevant. If a finished building has input or output storage, that production inventory is the
+active one. For current planning work, assume a building has one active inventory or none, not multiple simultaneous
+input inventories. Revisit this if decompiled sources or real-game evidence show an important exception.
+
 ## Transport Order Categories
 
 Do not assume that every transport-like activity is an `IHaulBehaviorProvider` request.
