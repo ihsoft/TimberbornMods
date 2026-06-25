@@ -13,6 +13,9 @@ the same game behavior or accidentally treat disproven assumptions as vanilla lo
 Agents may prototype behavior that differs from the base game. When doing so, make the difference explicit: treat it as
 SmartHaulers-owned logic, not as existing Timberborn behavior.
 
+Some notes describe promising SmartHaulers prototype strategies, not vanilla contracts. Keep that distinction explicit
+when using or changing them.
+
 ## Timberborn Hauling Model
 
 Timberborn does not centrally assign hauling work to the nearest agent.
@@ -74,6 +77,32 @@ transport distinguishable unless a prototype deliberately collapses them.
 `IJobBehavior` is too broad to mean transport. Its implementors include planting, demolishing, build execution, labor,
 and other non-transport behavior. Do not assume that validating or supporting "all `IJobBehavior`" means validating or
 supporting all transport orders.
+
+## Road-Distance Ranking Strategy
+
+For road-distance ranking, SmartHaulers may compute `building or inventory access -> agent position` distance instead
+of `agent -> building or inventory` distance. This can use the same distance value for ranking while aligning the
+origin with vanilla flow-field caching.
+
+Finished buildings commonly have cached road flow fields through `BuildingCachingFlowField`, which calls
+`INavigationCachingService.StartCachingRoadFlowField(accessCoordinates)` while the building is finished and stops that
+cache when the building leaves the finished state.
+
+Use public navigation APIs. `INavigationService.FindRoadPath(start, end, out distance)` uses cached pathfinding, and
+`INavigationCachingService.StartCachingRoadFlowField(Vector3Int coordinates)` /
+`StopCachingRoadFlowField(...)` can explicitly hold a cache for a SmartHaulers-owned origin. Do not touch internal
+`PathfindingService`, `RoadFlowFieldCache`, or `FlowFieldCache` directly.
+
+This inversion is suitable for road-distance estimates and ranking. `RoadNavMeshGraph` uses bidirectional road
+connections with equal cost, and the vanilla pathfinding code also has reversed cached path request logic. Use the
+result as a ranking estimate, not as the final physical path an agent must follow.
+
+For multi-access origins, evaluate each access point explicitly and use the minimum distance. Avoid
+`Accessible.FindRoadPath(Vector3)` for this because it can require a single access point.
+
+If SmartHaulers starts its own road-flow-field cache for large batches, balance every
+`StartCachingRoadFlowField(...)` with the matching `StopCachingRoadFlowField(...)`. The vanilla flow-field cache is
+reference-counted: an extra stop can throw, and a missing stop leaves the cache alive.
 
 ## Navigation Diagnostics
 
