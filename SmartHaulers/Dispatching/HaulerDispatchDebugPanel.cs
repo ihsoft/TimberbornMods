@@ -193,7 +193,7 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
     DebugEx.Info(
         "SmartHaulers snapshot columns: view, district, agents, available, wandering, workplaceIdle, transporting, "
         + "satisfyingNeed, working, orders | agent, state, activity, position, speed, capacity | agent, phase, "
-        + "good, source, target, route, remaining, progress | phase, weight, behavior, good, source, target, requester");
+        + "good, from, to, route, left, prog | phase, weight, behavior, good, from, to, requester");
     DebugEx.Info("SmartHaulers snapshot:\n{0}", text);
   }
 

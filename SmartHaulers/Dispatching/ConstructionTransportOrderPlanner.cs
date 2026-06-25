@@ -77,7 +77,7 @@ static class ConstructionTransportOrderPlanner {
   static TransportOrderSnapshot CreateOrder(
       ConstructionSite constructionSite, Priority priority, Inventory source, Inventory target, GoodAmount goodAmount) {
     var requesterId = constructionSite.GetComponent<EntityComponent>()?.EntityId ?? Guid.Empty;
-    return TransportOrderSnapshot.Queued(
+    return TransportOrderSnapshot.Construction(
         requesterId, constructionSite, BehaviorName, PriorityWeight(priority), source, target, goodAmount);
   }
 
