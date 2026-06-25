@@ -2,6 +2,17 @@
 
 These notes apply only when working inside the SmartHaulers mod.
 
+## Purpose
+
+SmartHaulers is currently a prototype.
+
+These notes are not a final design spec and should not narrow the search for a working solution. They record confirmed
+facts about Timberborn's current hauling, transport, navigation, and diagnostics behavior so agents do not rediscover
+the same game behavior or accidentally treat disproven assumptions as vanilla logic.
+
+Agents may prototype behavior that differs from the base game. When doing so, make the difference explicit: treat it as
+SmartHaulers-owned logic, not as existing Timberborn behavior.
+
 ## Timberborn Hauling Model
 
 Timberborn does not centrally assign hauling work to the nearest agent.
@@ -24,26 +35,29 @@ For common flows such as `TryCarryFromAnyInventory` and `TryCarryToAnyInventory`
 source or target inventory by distance between inventories or accessibles. It does not choose based on the current
 agent's distance to the start of the order.
 
-Do not design SmartHaulers logic around "nearest agent to point A" unless the mod explicitly implements that behavior.
+Do not assume that "nearest agent to point A" is existing game behavior. If SmartHaulers prototypes or implements that
+model, treat it as mod-owned logic and document the difference from the base game.
 
 ## Transport Order Categories
 
-Do not treat every transport-like activity as an `IHaulBehaviorProvider` request.
+Do not assume that every transport-like activity is an `IHaulBehaviorProvider` request.
 
 Explicit haul-provider requests include behaviors such as `FillInput`, `EmptyOutput`, `EmptyInventories`,
 `RemoveUnwantedStock`, `SupplyGood`, `ObtainGood`, `BringNutrient`, and similar building or storage
 `WeightedBehavior` requests.
 
 Some transport is implicit inside job or workplace behavior, such as construction material delivery through
-`ConstructionJob` or `GoodStackRetrieverBehavior`, harvest, gather, scavenge, and lumberjack flows. Diagnostics and
-dispatching logic should model explicit haul-provider requests and implicit job or workplace transport separately.
+`ConstructionJob` or `GoodStackRetrieverBehavior`, harvest, gather, scavenge, and lumberjack flows. When diagnostics or
+dispatching logic needs transport coverage, keep explicit haul-provider requests and implicit job or workplace
+transport distinguishable unless a prototype deliberately collapses them.
 
 `IJobBehavior` is too broad to mean transport. Its implementors include planting, demolishing, build execution, labor,
-and other non-transport behavior. Do not validate or support "all `IJobBehavior`" as transport orders.
+and other non-transport behavior. Do not assume that validating or supporting "all `IJobBehavior`" means validating or
+supporting all transport orders.
 
 ## Navigation Diagnostics
 
-Do not call `Accessible.FindRoadPath(Vector3)` on an accessible that may have multiple access points. Internally it
+Avoid calling `Accessible.FindRoadPath(Vector3)` on an accessible that may have multiple access points. Internally it
 uses `UnblockedSingleAccess`, which can throw when more than one access point exists.
 
 Use a multi-access-aware API when available. In diagnostics, prefer returning unknown, NaN, or no path over crashing on
@@ -53,5 +67,5 @@ a multi-access building.
 
 `UpdateSingleton` and UI frame updates may run every frame, including while the game is paused.
 
-Do not rebuild expensive transport snapshots every frame. Prefer game-tick cadence for regular diagnostics refreshes,
+Avoid rebuilding expensive transport snapshots every frame. Prefer game-tick cadence for regular diagnostics refreshes,
 plus one-shot refreshes when diagnostics are enabled, the view mode changes, or the user explicitly requests a snapshot.
