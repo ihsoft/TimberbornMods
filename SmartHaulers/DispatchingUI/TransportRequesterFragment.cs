@@ -16,21 +16,24 @@ using UnityEngine.UIElements;
 
 namespace IgorZ.SmartHaulers.DispatchingUI;
 
-sealed class TransportRequesterFragment(DispatchCenterRegistry dispatchCenterRegistry) : IEntityPanelFragment {
+sealed class TransportRequesterFragment(
+    DispatchCenterRegistry dispatchCenterRegistry,
+    TransportDebugRowFactory rowFactory) : IEntityPanelFragment {
   readonly List<TransportOrderSnapshot> _orders = [];
 
   VisualElement _root;
   Label _titleLabel;
-  Label _ordersLabel;
+  VisualElement _ordersContainer;
   BaseComponent _selectedEntity;
   Guid _selectedEntityId;
+  string _lastOrdersText;
 
   public VisualElement InitializeFragment() {
     _root = CreateRoot();
     _titleLabel = CreateLabel(FontStyle.Bold);
-    _ordersLabel = CreateLabel(FontStyle.Normal);
+    _ordersContainer = new VisualElement();
     _root.Add(_titleLabel);
-    _root.Add(_ordersLabel);
+    _root.Add(_ordersContainer);
     _root.ToggleDisplayStyle(visible: false);
     return _root;
   }
@@ -44,6 +47,7 @@ sealed class TransportRequesterFragment(DispatchCenterRegistry dispatchCenterReg
   public void ClearFragment() {
     _selectedEntity = null;
     _selectedEntityId = Guid.Empty;
+    _lastOrdersText = null;
     _orders.Clear();
     _root.ToggleDisplayStyle(visible: false);
   }
@@ -59,11 +63,16 @@ sealed class TransportRequesterFragment(DispatchCenterRegistry dispatchCenterReg
     }
     FindOrders();
     if (_orders.Count == 0) {
+      _lastOrdersText = null;
       _root.ToggleDisplayStyle(visible: false);
       return;
     }
     _titleLabel.text = $"SmartHaulers orders: {_orders.Count}";
-    _ordersLabel.text = FormatOrders();
+    var ordersText = FormatOrdersSignature();
+    if (ordersText != _lastOrdersText) {
+      _lastOrdersText = ordersText;
+      UpdateOrders();
+    }
     _root.ToggleDisplayStyle(visible: true);
   }
 
@@ -90,15 +99,23 @@ sealed class TransportRequesterFragment(DispatchCenterRegistry dispatchCenterReg
     return inventory && inventory.GetComponent<EntityComponent>()?.EntityId == _selectedEntityId;
   }
 
-  string FormatOrders() {
-    var lines = new List<string> {
-        $"{TransportDebugFormatter.FormatObject(_selectedEntity)}",
-    };
+  void UpdateOrders() {
+    _ordersContainer.Clear();
+    _ordersContainer.Add(CreateLabel(TransportDebugFormatter.FormatObject(_selectedEntity), FontStyle.Normal));
     for (var i = 0; i < _orders.Count; i++) {
       if (_orders.Count > 1 && i > 0) {
-        lines.Add("");
+        _ordersContainer.Add(CreateSpacer());
       }
-      lines.Add(TransportDebugFormatter.FormatOrderVerbose(_orders[i], includeRequester: false));
+      _ordersContainer.Add(rowFactory.CreateOrderRow(_orders[i], includeRequester: false));
+    }
+  }
+
+  string FormatOrdersSignature() {
+    var lines = new List<string> {
+        TransportDebugFormatter.FormatObject(_selectedEntity),
+    };
+    foreach (var order in _orders) {
+      lines.Add(TransportDebugFormatter.FormatOrderVerbose(order, includeRequester: false));
     }
     return string.Join("\n", lines);
   }
@@ -138,5 +155,17 @@ sealed class TransportRequesterFragment(DispatchCenterRegistry dispatchCenterReg
     label.style.color = Color.white;
     label.style.unityFontStyleAndWeight = fontStyle;
     return label;
+  }
+
+  static Label CreateLabel(string text, FontStyle fontStyle) {
+    var label = CreateLabel(fontStyle);
+    label.text = text;
+    return label;
+  }
+
+  static VisualElement CreateSpacer() {
+    var spacer = new VisualElement();
+    spacer.style.height = 6;
+    return spacer;
   }
 }

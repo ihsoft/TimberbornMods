@@ -1,0 +1,98 @@
+// Timberborn Mod: SmartHaulers
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+
+using IgorZ.SmartHaulers.Dispatching;
+using Timberborn.BaseComponentSystem;
+using Timberborn.SelectionSystem;
+using UnityEngine;
+using UnityEngine.UIElements;
+
+namespace IgorZ.SmartHaulers.DispatchingUI;
+
+sealed class TransportDebugRowFactory(EntitySelectionService entitySelectionService) {
+  static readonly Color TextColor = Color.white;
+  static readonly Color LinkColor = new Color(0.55f, 0.82f, 1f);
+
+  public VisualElement CreateAgentRow(TransportAgentSnapshot agent) {
+    var row = CreateRow();
+    AddLink(row, agent.DisplayName, agent.Worker);
+    AddText(row, $", state={agent.State}, act={agent.Activity}, pos={agent.Position}, ");
+    AddText(row, $"speed={agent.Speed:0.##}, cap={agent.Capacity}");
+    return row;
+  }
+
+  public VisualElement CreateOrderRow(
+      TransportOrderSnapshot order, bool includeAgent = true, bool includeRequester = true) {
+    var row = CreateRow();
+    if (IsUnassignedOrder(order.Phase)) {
+      AddText(row, $"{order.Phase}, weight={order.Weight:0.##}, beh={order.BehaviorName}, ");
+      AddText(row, $"good={order.GoodAmount}, ");
+      AddRoute(row, order);
+      if (includeRequester) {
+        AddText(row, ", req=");
+        AddLink(row, TransportDebugFormatter.FormatObject(order.Requester), order.Requester);
+      }
+      return row;
+    }
+    if (includeAgent) {
+      AddLink(row, TransportAgentSnapshot.FormatWorker(order.Worker), order.Worker);
+      AddText(row, ", ");
+    }
+    AddText(row, $"{order.Phase}, good={order.GoodAmount}, ");
+    AddRoute(row, order);
+    AddText(row, $", route={order.RouteDistance:0.##}, left={order.RemainingDistance:0.##}, ");
+    AddText(row, $"prog={order.Progress:0.##}");
+    return row;
+  }
+
+  static VisualElement CreateRow() {
+    var row = new VisualElement();
+    row.style.flexDirection = FlexDirection.Row;
+    row.style.flexWrap = Wrap.Wrap;
+    return row;
+  }
+
+  void AddRoute(VisualElement row, TransportOrderSnapshot order) {
+    AddLink(row, TransportDebugFormatter.FormatObject(order.Source), order.Source);
+    AddText(row, "=>");
+    AddLink(row, TransportDebugFormatter.FormatObject(order.Target), order.Target);
+  }
+
+  void AddLink(VisualElement row, string text, BaseComponent target) {
+    if (!IsSelectable(target)) {
+      AddText(row, text);
+      return;
+    }
+    var label = CreateLabel(text);
+    label.style.color = LinkColor;
+    label.RegisterCallback<ClickEvent>(_ => Select(target));
+    row.Add(label);
+  }
+
+  static void AddText(VisualElement row, string text) {
+    row.Add(CreateLabel(text));
+  }
+
+  static Label CreateLabel(string text) {
+    var label = new Label(text);
+    label.style.whiteSpace = WhiteSpace.Normal;
+    label.style.color = TextColor;
+    return label;
+  }
+
+  void Select(BaseComponent target) {
+    if (IsSelectable(target)) {
+      entitySelectionService.SelectAndFocusOn(target);
+    }
+  }
+
+  static bool IsSelectable(BaseComponent target) {
+    return target && target.HasComponent<Timberborn.EntitySystem.EntityComponent>()
+        && !target.GetComponent<Timberborn.EntitySystem.EntityComponent>().Deleted;
+  }
+
+  static bool IsUnassignedOrder(OrderPhase phase) {
+    return phase is OrderPhase.Queued or OrderPhase.Covered or OrderPhase.Estimated;
+  }
+}

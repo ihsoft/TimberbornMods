@@ -14,18 +14,28 @@ using UnityEngine.UIElements;
 
 namespace IgorZ.SmartHaulers.DispatchingUI;
 
-sealed class TransportAgentFragment(DispatchCenterRegistry dispatchCenterRegistry) : IEntityPanelFragment {
+sealed class TransportAgentFragment : IEntityPanelFragment {
+  readonly DispatchCenterRegistry _dispatchCenterRegistry;
+  readonly TransportDebugRowFactory _rowFactory;
+
   VisualElement _root;
-  Label _agentLabel;
-  Label _orderLabel;
+  VisualElement _agentRow;
+  VisualElement _orderRow;
   Worker _selectedWorker;
+  string _lastAgentText;
+  string _lastOrderText;
+
+  public TransportAgentFragment(DispatchCenterRegistry dispatchCenterRegistry, TransportDebugRowFactory rowFactory) {
+    _dispatchCenterRegistry = dispatchCenterRegistry;
+    _rowFactory = rowFactory;
+  }
 
   public VisualElement InitializeFragment() {
     _root = CreateRoot();
-    _agentLabel = CreateLabel(FontStyle.Bold);
-    _orderLabel = CreateLabel(FontStyle.Normal);
-    _root.Add(_agentLabel);
-    _root.Add(_orderLabel);
+    _agentRow = new VisualElement();
+    _orderRow = new VisualElement();
+    _root.Add(_agentRow);
+    _root.Add(_orderRow);
     _root.ToggleDisplayStyle(visible: false);
     return _root;
   }
@@ -37,6 +47,8 @@ sealed class TransportAgentFragment(DispatchCenterRegistry dispatchCenterRegistr
 
   public void ClearFragment() {
     _selectedWorker = null;
+    _lastAgentText = null;
+    _lastOrderText = null;
     _root.ToggleDisplayStyle(visible: false);
   }
 
@@ -53,15 +65,27 @@ sealed class TransportAgentFragment(DispatchCenterRegistry dispatchCenterRegistr
       _root.ToggleDisplayStyle(visible: false);
       return;
     }
-    _agentLabel.text = TransportDebugFormatter.FormatAgentVerbose(agent);
-    _orderLabel.text = TryFindOrder(agent, out var order)
+    var agentText = TransportDebugFormatter.FormatAgentVerbose(agent);
+    if (agentText != _lastAgentText) {
+      _lastAgentText = agentText;
+      _agentRow.Clear();
+      _agentRow.Add(_rowFactory.CreateAgentRow(agent));
+    }
+    var orderText = TryFindOrder(agent, out var order)
         ? TransportDebugFormatter.FormatOrderVerbose(order)
         : "order=none";
+    if (orderText != _lastOrderText) {
+      _lastOrderText = orderText;
+      _orderRow.Clear();
+      _orderRow.Add(orderText != "order=none"
+          ? _rowFactory.CreateOrderRow(order, includeAgent: false)
+          : CreateLabel(orderText));
+    }
     _root.ToggleDisplayStyle(visible: true);
   }
 
   bool TryFindAgent(Worker worker, out TransportAgentSnapshot agent) {
-    foreach (var dispatchCenter in dispatchCenterRegistry.DispatchCenters) {
+    foreach (var dispatchCenter in _dispatchCenterRegistry.DispatchCenters) {
       foreach (var candidate in dispatchCenter.Agents) {
         if (candidate.Worker == worker) {
           agent = candidate;
@@ -74,7 +98,7 @@ sealed class TransportAgentFragment(DispatchCenterRegistry dispatchCenterRegistr
   }
 
   bool TryFindOrder(TransportAgentSnapshot agent, out TransportOrderSnapshot order) {
-    foreach (var dispatchCenter in dispatchCenterRegistry.DispatchCenters) {
+    foreach (var dispatchCenter in _dispatchCenterRegistry.DispatchCenters) {
       var match = dispatchCenter.Orders.FirstOrDefault(candidate => candidate.AgentId == agent.EntityId);
       if (match.Worker) {
         order = match;
@@ -102,11 +126,10 @@ sealed class TransportAgentFragment(DispatchCenterRegistry dispatchCenterRegistr
     return root;
   }
 
-  static Label CreateLabel(FontStyle fontStyle) {
-    var label = new Label();
+  static Label CreateLabel(string text) {
+    var label = new Label(text);
     label.style.whiteSpace = WhiteSpace.Normal;
     label.style.color = Color.white;
-    label.style.unityFontStyleAndWeight = fontStyle;
     return label;
   }
 }
