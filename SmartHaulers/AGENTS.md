@@ -35,6 +35,26 @@ For common flows such as `TryCarryFromAnyInventory` and `TryCarryToAnyInventory`
 source or target inventory by distance between inventories or accessibles. It does not choose based on the current
 agent's distance to the start of the order.
 
+`CarrierInventoryFinder` delegates inventory lookup to `DistrictInventoryPicker`: carry-from flows use
+`ClosestInventoryWithStock(...)`, and carry-to flows use `ClosestInventoryWithCapacity(...)`.
+
+Vanilla inventory lookup is indexed by district, good, and unreserved stock or capacity. `DistrictInventoryRegistry`
+and `InventoryRegistry` expose active inventories with stock or capacity for a `goodId`, backed by per-good
+`HashSet<Inventory>` collections that are maintained from inventory changes.
+
+After that filtering, `DistrictInventoryPicker` still iterates the matching `ReadOnlyHashSet<Inventory>` candidates and
+chooses the minimum road-path distance. No inventory spatial nearest index, such as a kd-tree or grid over inventories,
+was found in the decompiled game sources. Treat the candidate scan as roughly O(k), where k is the number of active
+public inventories in the district that match the good and stock/capacity condition.
+
+Path distance goes through `Accessible.FindRoadPath(...)`, `NavigationService.FindRoadPath(...)`, and
+`PathfindingService.FindRoadPathCached(...)`. The flow-field cache can reduce repeated pathfinding cost from the same
+start node, but it does not remove the candidate iteration.
+
+If SmartHaulers evaluates many possible orders or distances, account for this vanilla shape. The game already has a
+district plus good plus stock/capacity index, but not a spatial nearest-inventory lookup on top of it. Prefer
+SmartHaulers-owned caching, batching, or cadence limits over repeatedly calling the picker in frame-rate diagnostics.
+
 Do not assume that "nearest agent to point A" is existing game behavior. If SmartHaulers prototypes or implements that
 model, treat it as mod-owned logic and document the difference from the base game.
 
