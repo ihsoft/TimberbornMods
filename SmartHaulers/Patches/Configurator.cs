@@ -17,6 +17,8 @@ sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<DispatchCenterRegistry>().AsSingleton();
     containerDefinition.Bind<HaulBehaviorSupportValidator>().AsSingleton();
+    containerDefinition.Bind<TransportDecisionEvaluator>().AsSingleton();
+    containerDefinition.Bind<TransportDistanceEstimator>().AsSingleton();
     containerDefinition.Bind<HaulerDispatchCenter>().AsTransient();
     containerDefinition.Bind<HaulerDispatchDebugPanel>().AsSingleton();
     containerDefinition.Bind<KeyBindingInputProcessor>().AsSingleton();

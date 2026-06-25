@@ -181,20 +181,31 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
 
   static string FormatOrder(TransportOrderSnapshot order) {
     if (IsUnassignedOrder(order.Phase)) {
-      return $"  {order.Phase}, {order.Weight:0.##}, {order.BehaviorName}, {order.GoodAmount}, "
-          + $"{TransportDebugFormatter.FormatRoute(order)}, {TransportDebugFormatter.FormatObject(order.Requester)}";
+      return $"  {FormatUnassignedOrder(order)}, "
+          + $"{TransportDebugFormatter.FormatObject(order.Requester)}";
     }
     return $"  {TransportAgentSnapshot.FormatWorker(order.Worker)}, {order.Phase}, {order.GoodAmount}, "
         + $"{TransportDebugFormatter.FormatRoute(order)}, "
-        + $"{order.RouteDistance:0.##}, {order.RemainingDistance:0.##}, {order.Progress:0.##}";
+        + $"{order.RouteDistance:0.##}, {order.RemainingDistance:0.##}";
   }
 
   static void LogSnapshot(string text) {
     DebugEx.Info(
         "SmartHaulers snapshot columns: view, district, agents, available, wandering, workplaceIdle, transporting, "
         + "satisfyingNeed, working, orders | agent, state, activity, position, speed, capacity | agent, phase, "
-        + "good, path, route, left, prog | phase, weight, behavior, good, path, requester");
+        + "good, path, route, left | phase(weight), behavior, optional good, optional path, decision, requester");
     DebugEx.Info("SmartHaulers snapshot:\n{0}", text);
+  }
+
+  static string FormatUnassignedOrder(TransportOrderSnapshot order) {
+    var text = $"{TransportDebugFormatter.FormatPhase(order)}, {order.BehaviorName}";
+    text = AppendPart(text, TransportDebugFormatter.FormatCargo(order));
+    text = AppendPart(text, TransportDebugFormatter.FormatKnownRoute(order));
+    return text + TransportDebugFormatter.FormatDecision(order.Decision);
+  }
+
+  static string AppendPart(string text, string part) {
+    return string.IsNullOrEmpty(part) ? text : $"{text}, {part}";
   }
 
   static bool IsUnassignedOrder(OrderPhase phase) {

@@ -28,6 +28,7 @@ namespace IgorZ.SmartHaulers.Dispatching;
 sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDeletableEntity {
   readonly DispatchCenterRegistry _dispatchCenterRegistry;
   readonly ConstructionRegistry _constructionRegistry;
+  readonly TransportDecisionEvaluator _decisionEvaluator;
   readonly List<TransportAgentSnapshot> _agents = [];
   readonly List<TransportOrderSnapshot> _orders = [];
   readonly List<Accessible> _builderHubAccessibles = [];
@@ -43,9 +44,12 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
   public IReadOnlyList<TransportAgentSnapshot> Agents => _agents;
   public IReadOnlyList<TransportOrderSnapshot> Orders => _orders;
 
-  public HaulerDispatchCenter(DispatchCenterRegistry dispatchCenterRegistry, ConstructionRegistry constructionRegistry) {
+  public HaulerDispatchCenter(
+      DispatchCenterRegistry dispatchCenterRegistry, ConstructionRegistry constructionRegistry,
+      TransportDecisionEvaluator decisionEvaluator) {
     _dispatchCenterRegistry = dispatchCenterRegistry;
     _constructionRegistry = constructionRegistry;
+    _decisionEvaluator = decisionEvaluator;
   }
 
   public void Awake() {
@@ -86,8 +90,18 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
     }
     AddQueuedOrders();
     AddConstructionOrders();
+    AddDecisions();
     _agents.Sort((left, right) => left.EntityId.CompareTo(right.EntityId));
     _orders.Sort(CompareOrders);
+  }
+
+  void AddDecisions() {
+    for (var i = 0; i < _orders.Count; i++) {
+      var decision = _decisionEvaluator.Evaluate(_orders[i], _agents);
+      if (decision.HasWinner) {
+        _orders[i] = _orders[i].WithDecision(decision);
+      }
+    }
   }
 
   TransportAgentSnapshot CreateAgentSnapshot(Worker worker) {

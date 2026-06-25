@@ -15,17 +15,39 @@ static class TransportDebugFormatter {
 
   public static string FormatOrderVerbose(TransportOrderSnapshot order, bool includeRequester = true) {
     if (IsUnassignedOrder(order.Phase)) {
-      var text = $"{order.Phase}, weight={order.Weight:0.##}, beh={order.BehaviorName}, "
-          + $"good={order.GoodAmount}, {FormatRoute(order)}";
+      var text = $"{FormatPhase(order)}, {order.BehaviorName}";
+      text = AppendPart(text, FormatCargo(order));
+      text = AppendPart(text, FormatKnownRoute(order));
+      text += FormatDecision(order.Decision);
       return includeRequester ? $"{text}, req={FormatObject(order.Requester)}" : text;
     }
     return $"{TransportAgentSnapshot.FormatWorker(order.Worker)}, {order.Phase}, "
-        + $"good={order.GoodAmount}, {FormatRoute(order)}, route={order.RouteDistance:0.##}, "
-        + $"left={order.RemainingDistance:0.##}, prog={order.Progress:0.##}";
+        + $"{order.GoodAmount}, {FormatRoute(order)}, route={order.RouteDistance:0.##}, "
+        + $"left={order.RemainingDistance:0.##}";
   }
 
   public static string FormatRoute(TransportOrderSnapshot order) {
     return $"{FormatObject(order.Source)}=>{FormatObject(order.Target)}";
+  }
+
+  public static string FormatKnownRoute(TransportOrderSnapshot order) {
+    return order.Phase is OrderPhase.Queued or OrderPhase.Covered ? "" : FormatRoute(order);
+  }
+
+  public static string FormatPhase(TransportOrderSnapshot order) {
+    return IsUnassignedOrder(order.Phase) ? $"{order.Phase} (w={order.Weight:0.##})" : order.Phase.ToString();
+  }
+
+  public static string FormatDecision(TransportDecision decision) {
+    if (!decision.HasWinner) {
+      return "";
+    }
+    var text = $", best={FormatCandidate(decision.Winner)}";
+    return decision.HasRunnerUp ? $"{text}, next={FormatCandidate(decision.RunnerUp)}" : text;
+  }
+
+  public static string FormatCargo(TransportOrderSnapshot order) {
+    return order.Phase == OrderPhase.Queued ? "" : order.GoodAmount.ToString();
   }
 
   public static string FormatObject(BaseComponent component) {
@@ -42,6 +64,12 @@ static class TransportDebugFormatter {
     return $"[{FormatComponentName(component)}]";
   }
 
+  public static string FormatCandidate(TransportCandidateScore candidate) {
+    var eta = candidate.PickupEta + candidate.DeliveryEta;
+    return $"{candidate.Agent.DisplayName} score={candidate.Score:0.##} eta={eta:0.##} "
+        + $"dA={candidate.DistanceToSource:0.##} cap={candidate.CarryAmount}/{candidate.Agent.Capacity}";
+  }
+
   static string FormatComponentName(BaseComponent component) {
     var name = component.Name;
     var factionSeparator = name.IndexOf('.');
@@ -50,6 +78,10 @@ static class TransportDebugFormatter {
     }
     const string cloneSuffix = "(Clone)";
     return name.EndsWith(cloneSuffix) ? name[..^cloneSuffix.Length] : name;
+  }
+
+  static string AppendPart(string text, string part) {
+    return string.IsNullOrEmpty(part) ? text : $"{text}, {part}";
   }
 
   static bool IsUnassignedOrder(OrderPhase phase) {

@@ -26,9 +26,10 @@ sealed class TransportDebugRowFactory(EntitySelectionService entitySelectionServ
       TransportOrderSnapshot order, bool includeAgent = true, bool includeRequester = true) {
     var row = CreateRow();
     if (IsUnassignedOrder(order.Phase)) {
-      AddText(row, $"{order.Phase}, weight={order.Weight:0.##}, beh={order.BehaviorName}, ");
-      AddText(row, $"good={order.GoodAmount}, ");
-      AddRoute(row, order);
+      AddText(row, $"{TransportDebugFormatter.FormatPhase(order)}, {order.BehaviorName}");
+      AddOptionalText(row, TransportDebugFormatter.FormatCargo(order));
+      AddOptionalRoute(row, order);
+      AddDecision(row, order.Decision);
       if (includeRequester) {
         AddText(row, ", req=");
         AddLink(row, TransportDebugFormatter.FormatObject(order.Requester), order.Requester);
@@ -39,11 +40,23 @@ sealed class TransportDebugRowFactory(EntitySelectionService entitySelectionServ
       AddLink(row, TransportAgentSnapshot.FormatWorker(order.Worker), order.Worker);
       AddText(row, ", ");
     }
-    AddText(row, $"{order.Phase}, good={order.GoodAmount}, ");
+    AddText(row, $"{order.Phase}, {order.GoodAmount}, ");
     AddRoute(row, order);
-    AddText(row, $", route={order.RouteDistance:0.##}, left={order.RemainingDistance:0.##}, ");
-    AddText(row, $"prog={order.Progress:0.##}");
+    AddText(row, $", route={order.RouteDistance:0.##}, left={order.RemainingDistance:0.##}");
     return row;
+  }
+
+  void AddDecision(VisualElement row, TransportDecision decision) {
+    if (!decision.HasWinner) {
+      return;
+    }
+    AddText(row, ", best=");
+    AddLink(row, TransportDebugFormatter.FormatCandidate(decision.Winner), decision.Winner.Agent.Worker);
+    if (!decision.HasRunnerUp) {
+      return;
+    }
+    AddText(row, ", next=");
+    AddLink(row, TransportDebugFormatter.FormatCandidate(decision.RunnerUp), decision.RunnerUp.Agent.Worker);
   }
 
   static VisualElement CreateRow() {
@@ -57,6 +70,19 @@ sealed class TransportDebugRowFactory(EntitySelectionService entitySelectionServ
     AddLink(row, TransportDebugFormatter.FormatObject(order.Source), order.Source);
     AddText(row, "=>");
     AddLink(row, TransportDebugFormatter.FormatObject(order.Target), order.Target);
+  }
+
+  void AddOptionalRoute(VisualElement row, TransportOrderSnapshot order) {
+    if (order.Phase is not OrderPhase.Queued and not OrderPhase.Covered) {
+      AddText(row, ", ");
+      AddRoute(row, order);
+    }
+  }
+
+  static void AddOptionalText(VisualElement row, string text) {
+    if (!string.IsNullOrEmpty(text)) {
+      AddText(row, $", {text}");
+    }
   }
 
   void AddLink(VisualElement row, string text, BaseComponent target) {

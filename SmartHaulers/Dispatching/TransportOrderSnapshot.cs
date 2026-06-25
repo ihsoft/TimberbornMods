@@ -15,6 +15,7 @@ readonly struct TransportOrderSnapshot {
   public TransportOrderOrigin Origin { get; }
   public TransportOrderRoute Route { get; }
   public TransportCargo Cargo { get; }
+  public TransportDecision Decision { get; }
   public OrderPhase Phase { get; }
   public Guid AgentId => Assignment.AgentId;
   public Guid RequesterId => Origin.RequesterId;
@@ -31,12 +32,17 @@ readonly struct TransportOrderSnapshot {
 
   public TransportOrderSnapshot(
       TransportOrderAssignment assignment, TransportOrderOrigin origin, OrderPhase phase, TransportOrderRoute route,
-      TransportCargo cargo) {
+      TransportCargo cargo, TransportDecision decision = default) {
     Assignment = assignment;
     Origin = origin;
     Route = route;
     Cargo = cargo;
+    Decision = decision;
     Phase = phase;
+  }
+
+  public TransportOrderSnapshot WithDecision(TransportDecision decision) {
+    return new TransportOrderSnapshot(Assignment, Origin, Phase, Route, Cargo, decision);
   }
 
   public static TransportOrderSnapshot Assigned(
