@@ -16,6 +16,7 @@ namespace IgorZ.SmartHaulers.Patches;
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<DispatchCenterRegistry>().AsSingleton();
+    containerDefinition.Bind<HaulBehaviorSupportValidator>().AsSingleton();
     containerDefinition.Bind<HaulerDispatchCenter>().AsTransient();
     containerDefinition.Bind<HaulerDispatchDebugPanel>().AsSingleton();
     containerDefinition.Bind<KeyBindingInputProcessor>().AsSingleton();

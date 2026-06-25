@@ -3,6 +3,9 @@
 // License: Public Domain
 
 using System.Collections.Generic;
+using Timberborn.BuilderHubSystem;
+using Timberborn.Buildings;
+using Timberborn.ConstructionSites;
 using IgorZ.SmartHaulers.Core;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BehaviorSystem;
@@ -14,6 +17,7 @@ using Timberborn.Goods;
 using Timberborn.Hauling;
 using Timberborn.InventorySystem;
 using Timberborn.Navigation;
+using Timberborn.PrioritySystem;
 using Timberborn.TickSystem;
 using Timberborn.WalkingSystem;
 using Timberborn.WorkSystem;
@@ -23,8 +27,10 @@ namespace IgorZ.SmartHaulers.Dispatching;
 
 sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDeletableEntity {
   readonly DispatchCenterRegistry _dispatchCenterRegistry;
+  readonly ConstructionRegistry _constructionRegistry;
   readonly List<TransportAgentSnapshot> _agents = [];
   readonly List<TransportOrderSnapshot> _orders = [];
+  readonly List<Accessible> _builderHubAccessibles = [];
   readonly List<WeightedBehavior> _weightedBehaviors = [];
   readonly Dictionary<Worker, TransportAgentProgress> _progressByAgent = [];
   readonly Dictionary<Worker, TransportOrderMemory> _orderMemoryByAgent = [];
@@ -37,8 +43,9 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
   public IReadOnlyList<TransportAgentSnapshot> Agents => _agents;
   public IReadOnlyList<TransportOrderSnapshot> Orders => _orders;
 
-  public HaulerDispatchCenter(DispatchCenterRegistry dispatchCenterRegistry) {
+  public HaulerDispatchCenter(DispatchCenterRegistry dispatchCenterRegistry, ConstructionRegistry constructionRegistry) {
     _dispatchCenterRegistry = dispatchCenterRegistry;
+    _constructionRegistry = constructionRegistry;
   }
 
   public void Awake() {
@@ -55,10 +62,10 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
     if (!SmartHaulersState.DiagnosticsEnabled && !SmartHaulersState.LogSnapshotRequested) {
       return;
     }
-    RefreshSnapshots();
+    RefreshSnapshot();
   }
 
-  void RefreshSnapshots() {
+  public void RefreshSnapshot() {
     _agents.Clear();
     _orders.Clear();
     if (_districtCenter?.DistrictPopulation == null) {
@@ -78,6 +85,7 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
       }
     }
     AddQueuedOrders();
+    AddConstructionOrders();
     _agents.Sort((left, right) => left.EntityId.CompareTo(right.EntityId));
     _orders.Sort(CompareOrders);
   }
@@ -230,14 +238,42 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
         if (weightedBehavior.Weight <= 0f) {
           continue;
         }
-        var requesterId = haulCandidate.GetComponent<EntityComponent>()?.EntityId ?? System.Guid.Empty;
-        var behaviorName = FormatBehaviorName(weightedBehavior.WorkplaceBehavior);
-        var source = IsTakeAwayBehavior(behaviorName) ? FindKnownEndpointInventory(haulCandidate, behaviorName) : null;
-        var target = IsBringBehavior(behaviorName) ? FindKnownEndpointInventory(haulCandidate, behaviorName) : null;
-        _orders.Add(TransportOrderSnapshot.Queued(
-            requesterId, haulCandidate, behaviorName, weightedBehavior.Weight, source, target));
+        _orders.Add(PossibleTransportOrderPlanner.Plan(_districtCenter, haulCandidate, weightedBehavior));
       }
       _weightedBehaviors.Clear();
+    }
+  }
+
+  void AddConstructionOrders() {
+    var districtBuildingRegistry = _districtCenter.GetComponent<DistrictBuildingRegistry>();
+    if (!districtBuildingRegistry) {
+      return;
+    }
+    CollectBuilderHubAccessibles(districtBuildingRegistry);
+    if (_builderHubAccessibles.Count == 0) {
+      return;
+    }
+    foreach (var priority in Priorities.Descending) {
+      foreach (var constructionJob in _constructionRegistry.GetJobs(priority)) {
+        if (ConstructionTransportOrderPlanner.TryPlan(
+            _districtCenter, constructionJob, _builderHubAccessibles, priority, out var order)) {
+          _orders.Add(order);
+        }
+      }
+    }
+    _builderHubAccessibles.Clear();
+  }
+
+  void CollectBuilderHubAccessibles(DistrictBuildingRegistry districtBuildingRegistry) {
+    _builderHubAccessibles.Clear();
+    foreach (var haulCandidate in districtBuildingRegistry.GetEnabledBuildings<HaulCandidate>()) {
+      if (!haulCandidate.GetComponent<BuilderHubWorkplaceBehavior>()) {
+        continue;
+      }
+      var accessible = haulCandidate.GetComponent<BuildingAccessible>()?.Accessible;
+      if (accessible) {
+        _builderHubAccessibles.Add(accessible);
+      }
     }
   }
 
@@ -246,7 +282,7 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
     if (phaseComparison != 0) {
       return phaseComparison;
     }
-    if (left.Phase == OrderPhase.Queued) {
+    if (IsUnassignedOrder(left.Phase)) {
       var requesterComparison = left.RequesterId.CompareTo(right.RequesterId);
       if (requesterComparison != 0) {
         return requesterComparison;
@@ -258,6 +294,10 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
       return right.Weight.CompareTo(left.Weight);
     }
     return left.AgentId.CompareTo(right.AgentId);
+  }
+
+  static bool IsUnassignedOrder(OrderPhase phase) {
+    return phase is OrderPhase.Queued or OrderPhase.Covered or OrderPhase.Estimated;
   }
 
   static string FormatBehaviorName(WorkplaceBehavior workplaceBehavior) {

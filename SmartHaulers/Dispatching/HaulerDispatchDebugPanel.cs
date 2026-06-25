@@ -47,6 +47,9 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
     if (!SmartHaulersState.DiagnosticsEnabled) {
       return;
     }
+    if (SmartHaulersState.ConsumeSnapshotRefreshRequest()) {
+      RefreshSnapshots();
+    }
     var text = BuildText();
     if (SmartHaulersState.ConsumeLogSnapshotRequest()) {
       LogSnapshot(text);
@@ -100,6 +103,12 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
       AddDispatchCenter(lines, dispatchCenter);
     }
     return lines.Count > 0 ? string.Join("\n", lines) : "No districts";
+  }
+
+  void RefreshSnapshots() {
+    foreach (var dispatchCenter in _dispatchCenterRegistry.DispatchCenters) {
+      dispatchCenter.RefreshSnapshot();
+    }
   }
 
   IEnumerable<HaulerDispatchCenter> OrderedDispatchCenters() {
@@ -161,8 +170,9 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
   }
 
   static string FormatOrder(TransportOrderSnapshot order) {
-    if (order.Phase == OrderPhase.Queued) {
-      return $"  queued, {order.Weight:0.##}, {order.BehaviorName}, {DebugEx.ObjectToString(order.Source)}, "
+    if (IsUnassignedOrder(order.Phase)) {
+      return $"  {order.Phase}, {order.Weight:0.##}, {order.BehaviorName}, {order.GoodAmount}, "
+          + $"{DebugEx.ObjectToString(order.Source)}, "
           + $"{DebugEx.ObjectToString(order.Target)}, {DebugEx.ObjectToString(order.Requester)}";
     }
     return $"  {TransportAgentSnapshot.FormatWorker(order.Worker)}, {order.Phase}, {order.GoodAmount}, "
@@ -174,7 +184,11 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
     DebugEx.Info(
         "SmartHaulers snapshot columns: district, agents, available, wandering, workplaceIdle, transporting, "
         + "satisfyingNeed, working, orders | agent, state, activity, position, speed, capacity | agent, phase, "
-        + "good, source, target, route, remaining, progress | queued, weight, behavior, source, target, requester");
+        + "good, source, target, route, remaining, progress | phase, weight, behavior, good, source, target, requester");
     DebugEx.Info("SmartHaulers snapshot:\n{0}", text);
+  }
+
+  static bool IsUnassignedOrder(OrderPhase phase) {
+    return phase is OrderPhase.Queued or OrderPhase.Covered or OrderPhase.Estimated;
   }
 }

@@ -13,14 +13,19 @@ static class TransportDebugFormatter {
   }
 
   public static string FormatOrderVerbose(TransportOrderSnapshot order, bool includeRequester = true) {
-    if (order.Phase == OrderPhase.Queued) {
+    if (IsUnassignedOrder(order.Phase)) {
       var text = $"phase={order.Phase}, weight={order.Weight:0.##}, behavior={order.BehaviorName}, "
-          + $"source={DebugEx.ObjectToString(order.Source)}, target={DebugEx.ObjectToString(order.Target)}";
+          + $"good={order.GoodAmount}, source={DebugEx.ObjectToString(order.Source)}, "
+          + $"target={DebugEx.ObjectToString(order.Target)}";
       return includeRequester ? $"{text}, requester={DebugEx.ObjectToString(order.Requester)}" : text;
     }
     return $"agent={TransportAgentSnapshot.FormatWorker(order.Worker)}, phase={order.Phase}, "
         + $"good={order.GoodAmount}, source={DebugEx.ObjectToString(order.Source)}, "
         + $"target={DebugEx.ObjectToString(order.Target)}, route={order.RouteDistance:0.##}, "
         + $"remaining={order.RemainingDistance:0.##}, progress={order.Progress:0.##}";
+  }
+
+  static bool IsUnassignedOrder(OrderPhase phase) {
+    return phase is OrderPhase.Queued or OrderPhase.Covered or OrderPhase.Estimated;
   }
 }

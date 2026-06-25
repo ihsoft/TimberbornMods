@@ -12,6 +12,7 @@ sealed class KeyBindingInputProcessor(InputService inputService) : IPostLoadable
   internal const string LogSnapshotBindingKey = "IgorZ-SmartHaulersLogSnapshot";
 
   public void PostLoad() {
+    SmartHaulersState.Reset();
     inputService.AddInputProcessor(this);
   }
 

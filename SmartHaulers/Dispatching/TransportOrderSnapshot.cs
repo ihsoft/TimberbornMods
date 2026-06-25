@@ -53,9 +53,19 @@ readonly struct TransportOrderSnapshot {
   }
 
   public static TransportOrderSnapshot Queued(
-      Guid requesterId, BaseComponent requester, string behaviorName, float weight, Inventory source, Inventory target) {
+      Guid requesterId, BaseComponent requester, string behaviorName, float weight, Inventory source, Inventory target,
+      GoodAmount goodAmount) {
+    var phase = source && target && goodAmount.Amount > 0 ? OrderPhase.Estimated : OrderPhase.Queued;
     return new TransportOrderSnapshot(
-        Guid.Empty, requesterId, null, OrderPhase.Queued, requester, behaviorName, weight, source, target,
-        new GoodAmount(null, 0), float.NaN, float.NaN, float.NaN);
+        Guid.Empty, requesterId, null, phase, requester, behaviorName, weight, source, target,
+        goodAmount, float.NaN, float.NaN, float.NaN);
+  }
+
+  public static TransportOrderSnapshot Covered(
+      Guid requesterId, BaseComponent requester, string behaviorName, float weight, Inventory target,
+      GoodAmount goodAmount) {
+    return new TransportOrderSnapshot(
+        Guid.Empty, requesterId, null, OrderPhase.Covered, requester, behaviorName, weight, null, target,
+        goodAmount, float.NaN, float.NaN, float.NaN);
   }
 }
