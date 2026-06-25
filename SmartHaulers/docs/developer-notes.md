@@ -111,6 +111,17 @@ transport distinguishable unless a prototype deliberately collapses them.
 and other non-transport behavior. Do not assume that validating or supporting "all `IJobBehavior`" means validating or
 supporting all transport orders.
 
+## Covered Requests
+
+A `Covered` order should not be treated as a concrete single source-to-target route.
+
+`Covered` means the request is currently covered by existing active reservations or deliveries. That coverage may come
+from multiple agents, multiple source inventories, multiple target inventories, or a mix of these.
+
+For diagnostics and future decision logic, active agent delivery rows are the reliable place to inspect exact
+source/target pairs. A `Covered` request may keep cargo, request, and weight information, but any source-to-target route
+shown on it is at best partial and can be misleading. Do not use it as a dispatcher route contract.
+
 ## Road-Distance Ranking Strategy
 
 For road-distance ranking, SmartHaulers may compute `building or inventory access -> agent position` distance instead
