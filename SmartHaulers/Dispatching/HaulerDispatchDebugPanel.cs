@@ -125,7 +125,8 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
     var counts = CountAgents(dispatchCenter.Agents);
     var viewMode = SmartHaulersState.DispatchViewMode;
     lines.Add(
-        $"{viewMode}, {DebugEx.ObjectToString(dispatchCenter.DistrictCenter)}, {dispatchCenter.Agents.Count}, "
+        $"{viewMode}, {TransportDebugFormatter.FormatObject(dispatchCenter.DistrictCenter)}, "
+        + $"{dispatchCenter.Agents.Count}, "
         + $"{counts.available}, {counts.wandering}, {counts.workplaceIdle}, {counts.transporting}, "
         + $"{counts.satisfyingNeed}, {counts.working}, {dispatchCenter.Orders.Count}");
     if (viewMode is DispatchDebugViewMode.All or DispatchDebugViewMode.Agents) {
@@ -181,11 +182,10 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
   static string FormatOrder(TransportOrderSnapshot order) {
     if (IsUnassignedOrder(order.Phase)) {
       return $"  {order.Phase}, {order.Weight:0.##}, {order.BehaviorName}, {order.GoodAmount}, "
-          + $"{DebugEx.ObjectToString(order.Source)}, "
-          + $"{DebugEx.ObjectToString(order.Target)}, {DebugEx.ObjectToString(order.Requester)}";
+          + $"{TransportDebugFormatter.FormatRoute(order)}, {TransportDebugFormatter.FormatObject(order.Requester)}";
     }
     return $"  {TransportAgentSnapshot.FormatWorker(order.Worker)}, {order.Phase}, {order.GoodAmount}, "
-        + $"{DebugEx.ObjectToString(order.Source)}, {DebugEx.ObjectToString(order.Target)}, "
+        + $"{TransportDebugFormatter.FormatRoute(order)}, "
         + $"{order.RouteDistance:0.##}, {order.RemainingDistance:0.##}, {order.Progress:0.##}";
   }
 
@@ -193,7 +193,7 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
     DebugEx.Info(
         "SmartHaulers snapshot columns: view, district, agents, available, wandering, workplaceIdle, transporting, "
         + "satisfyingNeed, working, orders | agent, state, activity, position, speed, capacity | agent, phase, "
-        + "good, from, to, route, left, prog | phase, weight, behavior, good, from, to, requester");
+        + "good, path, route, left, prog | phase, weight, behavior, good, path, requester");
     DebugEx.Info("SmartHaulers snapshot:\n{0}", text);
   }
 

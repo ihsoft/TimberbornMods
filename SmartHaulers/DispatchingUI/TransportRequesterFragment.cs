@@ -11,7 +11,6 @@ using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
 using Timberborn.EntitySystem;
 using Timberborn.InventorySystem;
-using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -93,7 +92,7 @@ sealed class TransportRequesterFragment(DispatchCenterRegistry dispatchCenterReg
 
   string FormatOrders() {
     var lines = new List<string> {
-        $"{DebugEx.ObjectToString(_selectedEntity)}",
+        $"{TransportDebugFormatter.FormatObject(_selectedEntity)}",
     };
     for (var i = 0; i < _orders.Count; i++) {
       if (_orders.Count > 1 && i > 0) {
