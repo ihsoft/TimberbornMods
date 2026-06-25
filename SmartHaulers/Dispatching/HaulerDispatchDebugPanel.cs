@@ -19,6 +19,7 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
   readonly UILayout _uiLayout;
 
   VisualElement _root;
+  Label _titleLabel;
   Label _contentLabel;
   bool _isAddedToLayout;
   string _lastText;
@@ -30,10 +31,11 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
 
   public void PostLoad() {
     _root = CreateRoot();
+    _titleLabel = CreateTitleLabel();
     _contentLabel = CreateContentLabel();
     var scrollView = new ScrollView(ScrollViewMode.VerticalAndHorizontal);
     scrollView.contentContainer.Add(_contentLabel);
-    _root.Add(CreateTitleLabel());
+    _root.Add(_titleLabel);
     _root.Add(scrollView);
     _root.ToggleDisplayStyle(visible: false);
   }
@@ -43,13 +45,15 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
       _uiLayout.AddAbsoluteItem(_root);
       _isAddedToLayout = true;
     }
-    _root.ToggleDisplayStyle(SmartHaulersState.DiagnosticsEnabled);
-    if (!SmartHaulersState.DiagnosticsEnabled) {
+    var visible = SmartHaulersState.DiagnosticsEnabled && SmartHaulersState.DispatchPanelVisible;
+    _root.ToggleDisplayStyle(visible);
+    if (!visible) {
       return;
     }
     if (SmartHaulersState.ConsumeSnapshotRefreshRequest()) {
       RefreshSnapshots();
     }
+    _titleLabel.text = $"SmartHaulers dispatch: {SmartHaulersState.DispatchViewMode}";
     var text = BuildText();
     if (SmartHaulersState.ConsumeLogSnapshotRequest()) {
       LogSnapshot(text);
@@ -83,7 +87,7 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
   }
 
   static Label CreateTitleLabel() {
-    var label = new Label("SmartHaulers dispatch");
+    var label = new Label();
     label.style.unityFontStyleAndWeight = FontStyle.Bold;
     label.style.color = Color.white;
     label.style.marginBottom = 4;
@@ -119,15 +123,20 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
 
   static void AddDispatchCenter(List<string> lines, HaulerDispatchCenter dispatchCenter) {
     var counts = CountAgents(dispatchCenter.Agents);
+    var viewMode = SmartHaulersState.DispatchViewMode;
     lines.Add(
-        $"{DebugEx.ObjectToString(dispatchCenter.DistrictCenter)}, {dispatchCenter.Agents.Count}, "
+        $"{viewMode}, {DebugEx.ObjectToString(dispatchCenter.DistrictCenter)}, {dispatchCenter.Agents.Count}, "
         + $"{counts.available}, {counts.wandering}, {counts.workplaceIdle}, {counts.transporting}, "
         + $"{counts.satisfyingNeed}, {counts.working}, {dispatchCenter.Orders.Count}");
-    foreach (var agent in dispatchCenter.Agents.OrderBy(agent => agent.EntityId)) {
-      lines.Add(FormatAgent(agent));
+    if (viewMode is DispatchDebugViewMode.All or DispatchDebugViewMode.Agents) {
+      foreach (var agent in dispatchCenter.Agents.OrderBy(agent => agent.EntityId)) {
+        lines.Add(FormatAgent(agent));
+      }
     }
-    foreach (var order in dispatchCenter.Orders) {
-      lines.Add(FormatOrder(order));
+    if (viewMode is DispatchDebugViewMode.All or DispatchDebugViewMode.Orders) {
+      foreach (var order in dispatchCenter.Orders) {
+        lines.Add(FormatOrder(order));
+      }
     }
   }
 
@@ -182,7 +191,7 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
 
   static void LogSnapshot(string text) {
     DebugEx.Info(
-        "SmartHaulers snapshot columns: district, agents, available, wandering, workplaceIdle, transporting, "
+        "SmartHaulers snapshot columns: view, district, agents, available, wandering, workplaceIdle, transporting, "
         + "satisfyingNeed, working, orders | agent, state, activity, position, speed, capacity | agent, phase, "
         + "good, source, target, route, remaining, progress | phase, weight, behavior, good, source, target, requester");
     DebugEx.Info("SmartHaulers snapshot:\n{0}", text);

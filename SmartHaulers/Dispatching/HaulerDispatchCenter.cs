@@ -381,7 +381,10 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
   static bool TryGetRouteDistance(Inventory source, Inventory target, out float distance) {
     var sourceAccessible = source ? source.GetEnabledComponent<Accessible>() : null;
     var targetAccessible = target ? target.GetEnabledComponent<Accessible>() : null;
-    if (sourceAccessible && targetAccessible && sourceAccessible.FindRoadPath(targetAccessible, out distance)) {
+    if (sourceAccessible
+        && targetAccessible
+        && sourceAccessible.HasSingleAccess
+        && sourceAccessible.FindRoadPath(targetAccessible, out distance)) {
       return true;
     }
     distance = 0f;
@@ -390,7 +393,7 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
 
   static bool TryGetRemainingDistance(Inventory target, Vector3 position, out float distance) {
     var accessible = target ? target.GetEnabledComponent<Accessible>() : null;
-    if (accessible && accessible.FindRoadPath(position, out distance)) {
+    if (accessible && accessible.FindPathUnlimitedRange(position, [], out distance)) {
       return true;
     }
     distance = 0f;

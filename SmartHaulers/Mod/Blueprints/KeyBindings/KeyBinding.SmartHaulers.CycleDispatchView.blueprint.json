@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "IgorZ-SmartHaulersCycleDispatchView",
+    "GroupId": "IgorZ-SmartHaulers-BindingsGroupId",
+    "LocKey": "IgorZ.SmartHaulers.KeyBinding.CycleDispatchView",
+    "Order": 3,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/l",
+    "InputModifiers": "Ctrl, Shift",
+    "Unchangeable": false
+  }
+}
