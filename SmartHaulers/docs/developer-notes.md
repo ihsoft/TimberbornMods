@@ -94,6 +94,26 @@ SmartHaulers-owned caching, batching, or cadence limits over repeatedly calling 
 Do not assume that "nearest agent to point A" is existing game behavior. If SmartHaulers prototypes or implements that
 model, treat it as mod-owned logic and document the difference from the base game.
 
+## Possible Order Planning
+
+The current SmartHaulers possible-order planner uses vanilla `DistrictInventoryPicker.ClosestInventoryWithStock(...)`
+and `ClosestInventoryWithCapacity(...)` to estimate a request.
+
+These APIs return one closest matching inventory. They do not expose an ordered iterator or list of next-best
+candidates.
+
+As a current prototype limitation, a request that could be satisfied by multiple inventories creates at most one
+estimated source-to-target segment for the first closest source or target pair. For example, if a target can accept
+`5x Log`, the closest source has `3x Log`, and another source has `2x Log`, the current planner estimates only `3x Log`
+from the closest source. It does not create a `3 + 2` compound coverage plan in one pass.
+
+Repeating the vanilla picker while filtering out already chosen inventories can emulate "next inventory", but each
+repeat is another candidate scan and path-distance pass. Treat that as a prototype shortcut, not as a scalable planning
+model.
+
+A future SmartHaulers-owned compound or batch planner likely needs to enumerate candidate inventories from the
+district/good registry, rank them, and apply virtual stock/capacity subtraction across multiple planned segments.
+
 ## Transport Order Categories
 
 Do not assume that every transport-like activity is an `IHaulBehaviorProvider` request.
