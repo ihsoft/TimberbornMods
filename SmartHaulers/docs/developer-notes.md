@@ -65,6 +65,24 @@ Reservations are the lock point. After `GoodReserver` reserves goods or capacity
 stock or capacity and should not take the same volume. After accepting a carry task, an agent usually keeps it until
 completion or explicit cancellation by game behavior or UI.
 
+## Carry Capacity Semantics
+
+`GoodCarrier.LiftingCapacity` is weight capacity in kilograms, not a count of item units.
+
+The number of carriable units depends on `GoodSpec.Weight`. Vanilla `GoodCarrierFragment` displays carried weight as
+`goodAmount.Amount * good.Weight` next to `LiftingCapacity`.
+
+Vanilla `CarryAmountCalculator.AmountToCarry(...)` effectively computes a maximum unit count from weight first:
+
+```text
+maxUnits = Math.Max(liftingCapacity / good.Weight, 1)
+```
+
+It then limits that count by available stock, request amount, and target capacity.
+
+For SmartHaulers scoring and diagnostics, do not compare `GoodAmount.Amount` directly with `LiftingCapacity`. Convert
+through the good weight or use the same carry-amount semantics as vanilla.
+
 ## Inventory Lookup And Distance
 
 For common flows such as `TryCarryFromAnyInventory` and `TryCarryToAnyInventory`, `CarrierInventoryFinder` chooses the

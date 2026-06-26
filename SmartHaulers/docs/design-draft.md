@@ -38,7 +38,7 @@ The current snapshot tracks:
 - worker identity and display name;
 - grid and world position;
 - walking speed;
-- carrying capacity;
+- carrying capacity in kilograms;
 - coarse state;
 - current activity;
 - active transport order, when one can be reconstructed.
@@ -51,6 +51,15 @@ Current candidate states for passive dispatcher decisions:
 
 These are intentionally conservative. `Working`, `Transporting`, and `SatisfyingNeed` are observed but not selected as
 new-order candidates by the passive evaluator.
+
+`WorkplaceIdle` is too broad for passive scoring by itself. The current SmartHaulers-owned scoring model classifies the
+workplace role:
+
+- transport workplace idle: district-center or hauling-center style workers; usable helper, small penalty;
+- builder workplace idle: avoid unless useful or important; builders are idle now but expected to build;
+- production workplace idle: manufactory or factory worker; avoid more strongly because production may resume as soon
+  as inputs, power, or another blocker becomes available;
+- unknown workplace idle: worst fallback because the interrupted work is unknown.
 
 ## Transport Orders
 
@@ -137,7 +146,17 @@ Where:
 - pickup ETA is agent-to-source distance divided by agent speed;
 - delivery ETA is source-to-target distance divided by agent speed;
 - state penalty is small for idle-ish states;
-- capacity penalty is a small penalty when requested cargo exceeds agent capacity.
+- capacity penalty is a small penalty when the agent cannot carry the full requested cargo by weight.
+
+Capacity is weight-based. `GoodCarrier.LiftingCapacity` is kilograms, while cargo amount is item units. Passive scoring
+must convert through the good's `GoodSpec.Weight` or the vanilla carry-amount semantics before deciding whether an agent
+can carry the full request.
+
+Diagnostics should make this visible when useful, for example by showing carried amount and kilogram coverage such as:
+
+```text
+cap=4x 12/20kg (..., max=14kg)
+```
 
 This is deliberately simple. It is a comparison scaffold, not the final dispatch policy.
 
