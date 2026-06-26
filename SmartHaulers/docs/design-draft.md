@@ -61,6 +61,13 @@ workplace role:
   as inputs, power, or another blocker becomes available;
 - unknown workplace idle: worst fallback because the interrupted work is unknown.
 
+Builders are not transport workplace workers in the current model. Builder workplace idle keeps a large penalty because
+builders are expected to build.
+
+A future SmartHaulers-owned policy may let the user opt builders into transport help through UI on a district center,
+builder workplace, worker panel, or another suitable control. This is a possible micromanagement feature for early-game
+pressure, not current behavior and not vanilla behavior.
+
 ## Transport Orders
 
 SmartHaulers treats transport orders as first-class objects. An order has:
@@ -197,6 +204,7 @@ The current design does not yet:
 - virtually subtract stock or capacity across planned segments;
 - evaluate critical needs, hunger, thirst, fuel, or rest risk;
 - cancel or drop active work;
+- allow user-controlled builder help for hauling or transport;
 - use parallel computation.
 
 These are future layers.
