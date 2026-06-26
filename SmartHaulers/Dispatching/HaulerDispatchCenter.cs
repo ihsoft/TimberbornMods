@@ -129,11 +129,11 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
     if (!workplace) {
       return TransportWorkplaceRole.None;
     }
-    if (workplace.GetComponent<DistrictCenter>() || workplace.GetComponent<HaulingCenter>()) {
-      return TransportWorkplaceRole.Transport;
-    }
     if (workplace.GetComponent<BuilderHubWorkplaceBehavior>()) {
       return TransportWorkplaceRole.Builder;
+    }
+    if (workplace.GetComponent<HaulingCenter>()) {
+      return TransportWorkplaceRole.Transport;
     }
     if (workplace.GetComponent<Manufactory>()) {
       return TransportWorkplaceRole.Production;
