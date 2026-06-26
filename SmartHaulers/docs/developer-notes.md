@@ -143,6 +143,30 @@ transport distinguishable unless a prototype deliberately collapses them.
 and other non-transport behavior. Do not assume that validating or supporting "all `IJobBehavior`" means validating or
 supporting all transport orders.
 
+## Haul Request Weight Semantics
+
+These are baseline vanilla weight sources for supported haul-provider requests in the current SmartHaulers model.
+SmartHaulers may intentionally replace or reinterpret these weights later, but future scoring work should know what the
+vanilla values mean.
+
+- `RemoveUnwantedStock`: vanilla constant `0.5` from `UnwantedStockHaulBehaviorProvider`; current SmartHaulers uses it
+  as-is.
+- `EmptyInventories`: vanilla constant `0.51` from `EmptiableHaulBehaviorProvider`; current SmartHaulers uses it as-is.
+- `FillInput`: vanilla fill-based weight, but the SmartHaulers prototype now expands it to per-good weight
+  `1 - AmountInStock(goodId) / LimitedAmount(goodId)` for each input good.
+- `BringNutrient`: vanilla `1 - InventoryFillCalculator.GetInputFillPercentage(inventory)`; current SmartHaulers uses
+  it as-is.
+- `ObtainGood`: vanilla `1 - GetInputFillPercentage(stockpileInventory)`; current SmartHaulers uses it as-is.
+- `SupplyGood`: vanilla `GetInputFillPercentage(stockpileInventory)`; current SmartHaulers uses it as-is.
+- `EmptyOutput`: vanilla output fill percentage. Manufactories use `GetOutputFillPercentage(outputInventory)`;
+  simple-output buildings use `GetInStockOutputFillPercentage(inventory)`. A District Center has
+  `SimpleOutputInventorySpec` and can naturally produce `EmptyOutput` with weight `1` when an in-stock good reaches its
+  per-good limit; this is computed, not a special constant.
+
+Vanilla `HaulCandidate.PrioritizeAndValidate` adds `PriorityFactor = 0.5` when `HaulPrioritizable.Prioritized` is true
+and `weight >= 0.5`. This means baseline weights such as `0.5` and `0.51` can become `1.0` and `1.01` after priority is
+applied.
+
 ## Covered Requests
 
 A `Covered` order should not be treated as a concrete single source-to-target route.
