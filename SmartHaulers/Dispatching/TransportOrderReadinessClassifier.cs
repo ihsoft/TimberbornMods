@@ -43,7 +43,8 @@ static class TransportOrderReadinessClassifier {
     }
     var limit = inventory.LimitedAmount(goodId);
     if (limit <= 0) {
-      return false;
+      fillRatio = inventory.AmountInStock(goodId) > 0 ? 1f : 0f;
+      return true;
     }
     fillRatio = (float)inventory.AmountInStock(goodId) / limit;
     return true;
