@@ -11,7 +11,7 @@ namespace IgorZ.SmartHaulers.Dispatching;
 sealed class TransportDecisionEvaluator(TransportDistanceEstimator distanceEstimator, IGoodService goodService) {
   public TransportDecision Evaluate(
       TransportOrderSnapshot order, IReadOnlyList<TransportAgentSnapshot> agents) {
-    if (order.Phase != OrderPhase.Estimated || !order.Route.HasKnownEndpoints || !order.Cargo.HasGoods) {
+    if (order.Phase != OrderPhase.Dispatchable || !order.Route.HasKnownEndpoints || !order.Cargo.HasGoods) {
       return default;
     }
     if (!distanceEstimator.TryGetRouteDistance(order.Source, order.Target, out var routeDistance)) {

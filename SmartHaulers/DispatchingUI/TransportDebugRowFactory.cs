@@ -119,6 +119,7 @@ sealed class TransportDebugRowFactory(EntitySelectionService entitySelectionServ
   }
 
   static bool IsUnassignedOrder(OrderPhase phase) {
-    return phase is OrderPhase.Queued or OrderPhase.Covered or OrderPhase.Estimated;
+    return phase is OrderPhase.Queued or OrderPhase.Estimated or OrderPhase.Deferred or OrderPhase.Dispatchable
+        or OrderPhase.Covered;
   }
 }

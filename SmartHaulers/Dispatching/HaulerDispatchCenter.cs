@@ -91,9 +91,16 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
     }
     AddQueuedOrders();
     AddConstructionOrders();
+    ClassifyOrderReadiness();
     AddDecisions();
     _agents.Sort((left, right) => left.EntityId.CompareTo(right.EntityId));
     _orders.Sort(CompareOrders);
+  }
+
+  void ClassifyOrderReadiness() {
+    for (var i = 0; i < _orders.Count; i++) {
+      _orders[i] = TransportOrderReadinessClassifier.Classify(_orders[i]);
+    }
   }
 
   void AddDecisions() {
@@ -337,7 +344,8 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
   }
 
   static bool IsUnassignedOrder(OrderPhase phase) {
-    return phase is OrderPhase.Queued or OrderPhase.Covered or OrderPhase.Estimated;
+    return phase is OrderPhase.Queued or OrderPhase.Estimated or OrderPhase.Deferred or OrderPhase.Dispatchable
+        or OrderPhase.Covered;
   }
 
   static string FormatBehaviorName(WorkplaceBehavior workplaceBehavior) {

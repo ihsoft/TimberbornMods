@@ -6,8 +6,10 @@ namespace IgorZ.SmartHaulers.Dispatching;
 
 enum OrderPhase {
   Queued,
-  Covered,
   Estimated,
+  Deferred,
+  Dispatchable,
+  Covered,
   PickingUp,
   Delivering,
 }

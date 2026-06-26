@@ -45,6 +45,10 @@ readonly struct TransportOrderSnapshot {
     return new TransportOrderSnapshot(Assignment, Origin, Phase, Route, Cargo, decision);
   }
 
+  public TransportOrderSnapshot WithPhase(OrderPhase phase) {
+    return new TransportOrderSnapshot(Assignment, Origin, phase, Route, Cargo, Decision);
+  }
+
   public static TransportOrderSnapshot Assigned(
       Guid agentId, Worker worker, OrderPhase phase, Inventory source, Inventory target, GoodAmount goodAmount,
       float routeDistance, float remainingDistance, float progress) {
