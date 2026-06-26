@@ -3,12 +3,12 @@
 // License: Public Domain
 
 using System.Collections.Generic;
-using Timberborn.BuilderHubSystem;
 using Timberborn.Buildings;
 using Timberborn.ConstructionSites;
 using IgorZ.SmartHaulers.Core;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BehaviorSystem;
+using Timberborn.BuilderHubSystem;
 using Timberborn.Carrying;
 using Timberborn.CharacterNavigation;
 using Timberborn.EntitySystem;
@@ -20,6 +20,7 @@ using Timberborn.Navigation;
 using Timberborn.PrioritySystem;
 using Timberborn.TickSystem;
 using Timberborn.WalkingSystem;
+using Timberborn.Workshops;
 using Timberborn.WorkSystem;
 using UnityEngine;
 
@@ -117,10 +118,27 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
     var activity = TransportAgentActivity.Create(goodCarrier, goodReserver, behaviorManager, worker.JobRunning);
     var walkingSpeed = worker.GetComponent<WalkerSpeedManager>()?.GetWalkerSpeedAtCurrentPosition() ?? 0f;
     var entityId = worker.GetComponent<EntityComponent>()?.EntityId ?? System.Guid.Empty;
+    var workplaceRole = ClassifyWorkplaceRole(worker);
     return new TransportAgentSnapshot(
         entityId, worker, TransportAgentSnapshot.FormatWorker(worker), position, worldPosition, walkingSpeed,
-        goodCarrier.LiftingCapacity,
-        activity.State, activity, isTransportAgent: true);
+        goodCarrier.LiftingCapacity, activity.State, workplaceRole, activity, isTransportAgent: true);
+  }
+
+  static TransportWorkplaceRole ClassifyWorkplaceRole(Worker worker) {
+    var workplace = worker.Workplace;
+    if (!workplace) {
+      return TransportWorkplaceRole.None;
+    }
+    if (workplace.GetComponent<DistrictCenter>() || workplace.GetComponent<HaulingCenter>()) {
+      return TransportWorkplaceRole.Transport;
+    }
+    if (workplace.GetComponent<BuilderHubWorkplaceBehavior>()) {
+      return TransportWorkplaceRole.Builder;
+    }
+    if (workplace.GetComponent<Manufactory>()) {
+      return TransportWorkplaceRole.Production;
+    }
+    return TransportWorkplaceRole.Unknown;
   }
 
   bool TryCreateOrderSnapshot(

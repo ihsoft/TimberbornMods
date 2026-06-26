@@ -4,10 +4,11 @@
 
 using System;
 using System.Collections.Generic;
+using Timberborn.Goods;
 
 namespace IgorZ.SmartHaulers.Dispatching;
 
-sealed class TransportDecisionEvaluator(TransportDistanceEstimator distanceEstimator) {
+sealed class TransportDecisionEvaluator(TransportDistanceEstimator distanceEstimator, IGoodService goodService) {
   public TransportDecision Evaluate(
       TransportOrderSnapshot order, IReadOnlyList<TransportAgentSnapshot> agents) {
     if (order.Phase != OrderPhase.Estimated || !order.Route.HasKnownEndpoints || !order.Cargo.HasGoods) {
@@ -42,11 +43,17 @@ sealed class TransportDecisionEvaluator(TransportDistanceEstimator distanceEstim
     }
     var pickupEta = distance / agent.Speed;
     var deliveryEta = routeDistance / agent.Speed;
-    var statePenalty = StatePenalty(agent.State);
-    var capacityPenalty = CapacityPenalty(order.Cargo.Amount, agent.Capacity);
-    var carryAmount = Math.Min(order.Cargo.Amount, agent.Capacity);
+    var statePenalty = StatePenalty(agent);
+    var goodWeight = goodService.GetGood(order.Cargo.GoodId).Weight;
+    var carryAmount = CarryAmount(order.Cargo.Amount, agent.Capacity, goodWeight);
+    var requestedWeight = order.Cargo.Amount * goodWeight;
+    var carryWeight = carryAmount * goodWeight;
+    var capacityRatio = CapacityRatio(order.Cargo.Amount, carryAmount);
+    var capacityPenalty = CapacityPenalty(capacityRatio);
+    var stateClass = StateClass(agent);
     score = new TransportCandidateScore(
-        agent, distance, pickupEta, deliveryEta, statePenalty, capacityPenalty, carryAmount,
+        agent, distance, routeDistance, pickupEta, deliveryEta, capacityRatio, statePenalty, capacityPenalty,
+        carryAmount, carryWeight, requestedWeight, stateClass,
         pickupEta + deliveryEta + statePenalty + capacityPenalty);
     return true;
   }
@@ -61,16 +68,54 @@ sealed class TransportDecisionEvaluator(TransportDistanceEstimator distanceEstim
             or TransportAgentState.WorkplaceIdle);
   }
 
-  static float StatePenalty(TransportAgentState state) {
-    return state switch {
+  static float StatePenalty(TransportAgentSnapshot agent) {
+    return agent.State switch {
         TransportAgentState.Available => 0f,
         TransportAgentState.IdleWandering => 1f,
-        TransportAgentState.WorkplaceIdle => 2f,
+        TransportAgentState.WorkplaceIdle => WorkplaceIdlePenalty(agent.WorkplaceRole),
         _ => 1000f,
     };
   }
 
-  static float CapacityPenalty(int requestedAmount, int capacity) {
-    return Math.Max(0, requestedAmount - capacity) * 0.25f;
+  static float WorkplaceIdlePenalty(TransportWorkplaceRole role) {
+    return role switch {
+        TransportWorkplaceRole.Transport => 1f,
+        TransportWorkplaceRole.Builder => 10f,
+        TransportWorkplaceRole.Production => 50f,
+        TransportWorkplaceRole.Unknown => 100f,
+        _ => 100f,
+    };
+  }
+
+  static int CarryAmount(int requestedAmount, int liftingCapacity, int goodWeight) {
+    var carryCapacity = Math.Max(liftingCapacity / goodWeight, 1);
+    return Math.Min(requestedAmount, carryCapacity);
+  }
+
+  static float CapacityRatio(int requestedAmount, int carryAmount) {
+    return requestedAmount <= 0 ? 1f : Math.Min(1f, (float)carryAmount / requestedAmount);
+  }
+
+  static float CapacityPenalty(float capacityRatio) {
+    return (1f - capacityRatio) * 2f;
+  }
+
+  static string StateClass(TransportAgentSnapshot agent) {
+    return agent.State switch {
+        TransportAgentState.Available => "free",
+        TransportAgentState.IdleWandering => "idle",
+        TransportAgentState.WorkplaceIdle => WorkplaceIdleClass(agent.WorkplaceRole),
+        _ => "busy",
+    };
+  }
+
+  static string WorkplaceIdleClass(TransportWorkplaceRole role) {
+    return role switch {
+        TransportWorkplaceRole.Transport => "workplace-transport",
+        TransportWorkplaceRole.Builder => "workplace-builder",
+        TransportWorkplaceRole.Production => "workplace-production",
+        TransportWorkplaceRole.Unknown => "workplace-unknown",
+        _ => "workplace-unknown",
+    };
   }
 }

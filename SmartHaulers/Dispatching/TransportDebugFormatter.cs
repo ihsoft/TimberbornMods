@@ -9,7 +9,7 @@ namespace IgorZ.SmartHaulers.Dispatching;
 
 static class TransportDebugFormatter {
   public static string FormatAgentVerbose(TransportAgentSnapshot agent) {
-    return $"{agent.DisplayName}, state={agent.State}, act={agent.Activity}, pos={agent.Position}, "
+    return $"{agent.DisplayName}, state={FormatAgentState(agent)}, act={agent.Activity}, pos={agent.Position}, "
         + $"speed={agent.Speed:0.##}, cap={agent.Capacity}";
   }
 
@@ -65,9 +65,12 @@ static class TransportDebugFormatter {
   }
 
   public static string FormatCandidate(TransportCandidateScore candidate) {
-    var eta = candidate.PickupEta + candidate.DeliveryEta;
-    return $"{candidate.Agent.DisplayName} score={candidate.Score:0.##} eta={eta:0.##} "
-        + $"dA={candidate.DistanceToSource:0.##} cap={candidate.CarryAmount}/{candidate.Agent.Capacity}";
+    return $"{candidate.Agent.DisplayName} score={candidate.Score:0.##} eta={candidate.TotalEta:0.##} "
+        + $"toA={candidate.DistanceToSource:0.##}/{candidate.PickupEta:0.##} "
+        + $"AtoB={candidate.RouteDistance:0.##}/{candidate.DeliveryEta:0.##} "
+        + $"cap={candidate.CarryAmount}x {candidate.CarryWeight}/{candidate.RequestedWeight}kg "
+        + $"({candidate.CapacityRatio:0.##}, max={candidate.Agent.Capacity}kg) "
+        + $"state={candidate.StateClass}+{candidate.StatePenalty:0.##} capP={candidate.CapacityPenalty:0.##}";
   }
 
   static string FormatComponentName(BaseComponent component) {
@@ -82,6 +85,12 @@ static class TransportDebugFormatter {
 
   static string AppendPart(string text, string part) {
     return string.IsNullOrEmpty(part) ? text : $"{text}, {part}";
+  }
+
+  static string FormatAgentState(TransportAgentSnapshot agent) {
+    return agent.State == TransportAgentState.WorkplaceIdle
+        ? $"{agent.State}/{agent.WorkplaceRole}"
+        : agent.State.ToString();
   }
 
   static bool IsUnassignedOrder(OrderPhase phase) {
