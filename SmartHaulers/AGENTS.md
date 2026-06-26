@@ -14,6 +14,10 @@ questions, read:
 
 - `SmartHaulers/docs/developer-notes.md`
 
+For the current SmartHaulers-owned design draft, read:
+
+- `SmartHaulers/docs/design-draft.md`
+
 Agents may prototype behavior that differs from the base game. When doing so, make the difference explicit: treat it as
 SmartHaulers-owned logic, not as existing Timberborn behavior.
 
