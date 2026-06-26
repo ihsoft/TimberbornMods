@@ -106,7 +106,8 @@ Some supported behaviors still produce at most one SmartHaulers order per vanill
 
 SmartHaulers expands selected behaviors per good:
 
-- one `FillInput` request may create multiple `Estimated` or `Covered` orders;
+- one `FillInput` request may create multiple planned orders across `Estimated`, `Deferred`, `Dispatchable`, or
+  `Covered` phases;
 - one `EmptyOutput` request may create multiple take-away orders, one per unreserved output good found in enabled
   inventories;
 - one `RemoveUnwantedStock` request may create multiple take-away orders, one per unwanted good;
@@ -207,7 +208,7 @@ It should support the investigation loop:
 - inspect orders exposed by a selected building;
 - inspect active order and state for a selected agent;
 - click known objects and agents to select them in-game;
-- show passive `best` and `next` candidates for estimated orders.
+- show passive `best` and `next` candidates for dispatchable orders.
 
 The UI is intentionally compact. Labels like `good=`, `beh=`, and `prog=` were removed when the values became
 self-explanatory. `Queued` and `Covered` hide route text because it is misleading at those phases.
@@ -234,7 +235,7 @@ The next design layer should stay passive unless there is a clear reason to inte
 
 Useful next steps:
 
-- expand per-good planning beyond `FillInput` where it makes sense;
+- continue refining per-good planning and decide which remaining behaviors should expand per good;
 - replace fixed 50% readiness thresholds with time-to-blockage versus delivery-ETA estimates;
 - design a compound order model for multi-source or multi-target coverage;
 - improve passive scoring with clearer ETA and capacity semantics;
