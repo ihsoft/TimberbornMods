@@ -98,24 +98,28 @@ agents, sources, or targets, so active agent rows are the reliable source for co
 
 The current possible-order planner expands vanilla haul-provider requests into SmartHaulers order snapshots.
 
-For most supported behaviors, one vanilla request still produces at most one SmartHaulers order:
+Some supported behaviors still produce at most one SmartHaulers order per vanilla request:
 
 - `BringNutrient`;
-- `EmptyInventories`;
-- `EmptyOutput`;
 - `ObtainGood`;
-- `RemoveUnwantedStock`;
 - `SupplyGood`.
 
-`FillInput` is different. SmartHaulers now expands it per input good:
+SmartHaulers expands selected behaviors per good:
 
 - one `FillInput` request may create multiple `Estimated` or `Covered` orders;
+- one `EmptyOutput` request may create multiple take-away orders, one per unreserved output good found in enabled
+  inventories;
+- one `RemoveUnwantedStock` request may create multiple take-away orders, one per unwanted good;
+- one `EmptyInventories` request may create multiple take-away orders, one per unreserved good from inventories being
+  emptied;
 - each input good gets its own cargo and weight;
-- goods are no longer prioritized by vanilla `GoodAmountComparer`;
+- take-away goods get their own cargo and weight when expanded;
+- goods are no longer prioritized only by vanilla `GoodAmountComparer`;
 - priority is represented by each order's weight.
 
 The current planner still uses vanilla nearest inventory lookup. This means each planned good gets at most one nearest
-source-to-target segment. It does not yet build compound coverage from multiple source inventories.
+source-to-target segment. It does not yet build compound coverage from multiple source inventories or batch-plan across
+multiple destinations.
 
 Current readiness classification is a prototype simplification. It uses fixed per-good inventory fill thresholds:
 

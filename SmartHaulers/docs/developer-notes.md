@@ -144,6 +144,15 @@ deactivated and no longer relevant. If a finished building has input or output s
 active one. For current planning work, assume a building has one active inventory or none, not multiple simultaneous
 input inventories. Revisit this if decompiled sources or real-game evidence show an important exception.
 
+Current take-away per-good planning uses per-good source fill ratio as weight/readiness input when possible:
+
+```text
+fillRatio = AmountInStock(goodId) / LimitedAmount(goodId)
+```
+
+If `LimitedAmount(goodId) <= 0` and stock is present, treat the good as full/urgent with `fillRatio = 1`. This matters
+for disallowed or unwanted goods: otherwise they can remain forever `Deferred` even though any stock should be removed.
+
 ## Transport Order Categories
 
 Do not assume that every transport-like activity is an `IHaulBehaviorProvider` request.
