@@ -132,6 +132,17 @@ model.
 A future SmartHaulers-owned compound or batch planner likely needs to enumerate candidate inventories from the
 district/good registry, rank them, and apply virtual stock/capacity subtraction across multiple planned segments.
 
+Treat planned orders as snapshot-bound candidates. They are execution options computed from one view of district stock,
+capacity, reservations, and active deliveries, not a durable independent queue. Candidate conflicts can span multiple
+vanilla requests: two different factories may both produce candidates that use the same source inventory.
+
+Without virtual subtraction, the safe prototype strategy is to refresh the snapshot, choose one best dispatchable
+candidate, perform the real reservation or assignment, then refresh or rebuild affected candidates before choosing the
+next one. Rebuilding the whole district after an assignment is acceptable while the prototype is still simple.
+
+Virtual subtraction is only needed when SmartHaulers wants to batch-plan several assignments from one snapshot before
+making real reservations. Until then, prefer fresh game state over pretending the old candidate set is still current.
+
 For per-good `FillInput` planning, vanilla `weight = 1 - GetInputFillPercentage(inputInventory)` is a weak heuristic
 for multi-ingredient recipes. It can hide a critically missing ingredient when another ingredient fills much of the
 shared input inventory. SmartHaulers should treat per-good demand and urgency as an intended improvement direction, not

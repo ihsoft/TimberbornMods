@@ -99,6 +99,10 @@ agents, sources, or targets, so active agent rows are the reliable source for co
 
 The current possible-order planner expands vanilla haul-provider requests into SmartHaulers order snapshots.
 
+Planned orders are snapshot-bound candidates, not an independent queue of real orders. `Estimated`, `Deferred`, and
+`Dispatchable` describe execution options that are valid for the stock, capacity, reservations, and active deliveries
+seen in the snapshot that produced them.
+
 Some supported behaviors still produce at most one SmartHaulers order per vanilla request:
 
 - `BringNutrient`;
@@ -122,6 +126,13 @@ SmartHaulers expands selected behaviors per good:
 The current planner still uses vanilla nearest inventory lookup. This means each planned good gets at most one nearest
 source-to-target segment. It does not yet build compound coverage from multiple source inventories or batch-plan across
 multiple destinations.
+
+Candidates may compete across vanilla requests, not only inside one request. For example, two factories can both create
+delivery candidates that depend on the same source stock. After SmartHaulers eventually performs a real assignment or
+reservation, the old snapshot should be treated as stale because available stock or capacity may have changed. The safe
+prototype sequence is: refresh a snapshot, choose one best dispatchable candidate, perform the real reservation or
+assignment, then rebuild affected candidates before choosing the next one. Rebuilding the whole district is acceptable
+at this stage.
 
 Current readiness classification is a prototype simplification. It uses fixed per-good inventory fill thresholds:
 
@@ -223,6 +234,7 @@ The current design does not yet:
 - use a time-to-blockage versus delivery-ETA readiness model;
 - model compound plans across several source inventories;
 - virtually subtract stock or capacity across planned segments;
+- batch-plan several assignments from one snapshot;
 - evaluate critical needs, hunger, thirst, fuel, or rest risk;
 - cancel or drop active work;
 - allow user-controlled builder help for hauling or transport;
@@ -239,6 +251,7 @@ Useful next steps:
 - continue refining per-good planning and decide which remaining behaviors should expand per good;
 - replace fixed 50% readiness thresholds with time-to-blockage versus delivery-ETA estimates;
 - design a compound order model for multi-source or multi-target coverage;
+- keep planned candidates explicitly tied to the snapshot that produced them;
 - improve passive scoring with clearer ETA and capacity semantics;
 - compare vanilla active assignments with SmartHaulers passive decisions;
 - identify the narrowest safe intervention point for assignment, if passive comparison proves useful.
