@@ -252,7 +252,7 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
         if (weightedBehavior.Weight <= 0f) {
           continue;
         }
-        _orders.Add(PossibleTransportOrderPlanner.Plan(_districtCenter, haulCandidate, weightedBehavior));
+        PossibleTransportOrderPlanner.AddPlans(_districtCenter, haulCandidate, weightedBehavior, _orders);
       }
       _weightedBehaviors.Clear();
     }
@@ -305,7 +305,15 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
       if (behaviorComparison != 0) {
         return behaviorComparison;
       }
-      return right.Weight.CompareTo(left.Weight);
+      var weightComparison = right.Weight.CompareTo(left.Weight);
+      if (weightComparison != 0) {
+        return weightComparison;
+      }
+      var goodComparison = string.CompareOrdinal(left.Cargo.GoodId, right.Cargo.GoodId);
+      if (goodComparison != 0) {
+        return goodComparison;
+      }
+      return left.Cargo.Amount.CompareTo(right.Cargo.Amount);
     }
     return left.AgentId.CompareTo(right.AgentId);
   }

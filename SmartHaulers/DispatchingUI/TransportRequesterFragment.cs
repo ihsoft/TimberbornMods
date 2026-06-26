@@ -129,7 +129,15 @@ sealed class TransportRequesterFragment(
     if (behaviorComparison != 0) {
       return behaviorComparison;
     }
-    return right.Weight.CompareTo(left.Weight);
+    var weightComparison = right.Weight.CompareTo(left.Weight);
+    if (weightComparison != 0) {
+      return weightComparison;
+    }
+    var goodComparison = string.CompareOrdinal(left.Cargo.GoodId, right.Cargo.GoodId);
+    if (goodComparison != 0) {
+      return goodComparison;
+    }
+    return left.Cargo.Amount.CompareTo(right.Cargo.Amount);
   }
 
   static VisualElement CreateRoot() {

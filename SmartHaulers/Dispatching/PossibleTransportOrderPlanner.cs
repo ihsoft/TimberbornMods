@@ -43,22 +43,27 @@ static class PossibleTransportOrderPlanner {
         $"Unsupported SmartHaulers haul behavior {behaviorName} on {DebugEx.ObjectToString(context)}.");
   }
 
-  public static TransportOrderSnapshot Plan(
-      DistrictCenter districtCenter, HaulCandidate haulCandidate, WeightedBehavior weightedBehavior) {
+  public static void AddPlans(
+      DistrictCenter districtCenter, HaulCandidate haulCandidate, WeightedBehavior weightedBehavior,
+      List<TransportOrderSnapshot> orders) {
     EnsureSupported(weightedBehavior.WorkplaceBehavior, haulCandidate);
     var behaviorName = FormatBehaviorName(weightedBehavior.WorkplaceBehavior);
     var requesterId = haulCandidate.GetComponent<EntityComponent>()?.EntityId ?? Guid.Empty;
-    return behaviorName switch {
+    if (behaviorName == FillInputBehaviorName) {
+      AddFillInputPlans(districtCenter, haulCandidate, requesterId, weightedBehavior, orders);
+      return;
+    }
+    orders.Add(behaviorName switch {
         BringNutrientBehaviorName => PlanBringNutrient(districtCenter, haulCandidate, requesterId, weightedBehavior),
-        EmptyInventoriesBehaviorName => PlanEmptyInventories(districtCenter, haulCandidate, requesterId, weightedBehavior),
+        EmptyInventoriesBehaviorName => PlanEmptyInventories(
+            districtCenter, haulCandidate, requesterId, weightedBehavior),
         EmptyOutputBehaviorName => PlanEmptyOutput(districtCenter, haulCandidate, requesterId, weightedBehavior),
-        FillInputBehaviorName => PlanFillInput(districtCenter, haulCandidate, requesterId, weightedBehavior),
         ObtainGoodBehaviorName => PlanObtainGood(districtCenter, haulCandidate, requesterId, weightedBehavior),
         RemoveUnwantedStockBehaviorName => PlanRemoveUnwantedStock(
             districtCenter, haulCandidate, requesterId, weightedBehavior),
         SupplyGoodBehaviorName => PlanSupplyGood(districtCenter, haulCandidate, requesterId, weightedBehavior),
         _ => throw new InvalidOperationException($"Supported behavior {behaviorName} was not handled."),
-    };
+    });
   }
 
   static bool IsSupported(string behaviorName) {
@@ -82,35 +87,44 @@ static class PossibleTransportOrderPlanner {
       if (TryPlanBringingGood(districtCenter, target, nutrient.Id, _ => true, out var order)) {
         return WithRequest(haulCandidate, requesterId, weightedBehavior, order.source, order.target, order.goodAmount);
       }
-      if (TryCreateCoveredOrder(haulCandidate, requesterId, weightedBehavior, target, nutrient.Id, out var coveredOrder)) {
+      if (TryCreateCoveredOrder(
+          haulCandidate, requesterId, weightedBehavior, target, nutrient.Id, out var coveredOrder)) {
         return coveredOrder;
       }
     }
     return EmptyOrder(haulCandidate, requesterId, weightedBehavior, source: null, target);
   }
 
-  static TransportOrderSnapshot PlanFillInput(
-      DistrictCenter districtCenter, HaulCandidate haulCandidate, Guid requesterId, WeightedBehavior weightedBehavior) {
+  static void AddFillInputPlans(
+      DistrictCenter districtCenter, HaulCandidate haulCandidate, Guid requesterId, WeightedBehavior weightedBehavior,
+      List<TransportOrderSnapshot> orders) {
     var inventories = haulCandidate.GetComponent<Inventories>();
     var emptiable = haulCandidate.GetComponent<Emptiable>();
     if (!inventories || emptiable && emptiable.IsMarkedForEmptying) {
-      return EmptyOrder(haulCandidate, requesterId, weightedBehavior, source: null, target: null);
+      orders.Add(EmptyOrder(haulCandidate, requesterId, weightedBehavior, source: null, target: null));
+      return;
     }
+    var added = false;
     foreach (var target in inventories.EnabledInventories) {
-      var inputGoodsOrdered = new SortedSet<GoodAmount>(new GoodAmountComparer());
       foreach (var inputGood in target.InputGoods) {
-        inputGoodsOrdered.Add(new GoodAmount(inputGood, target.UnreservedAmountInStock(inputGood)));
-      }
-      foreach (var inputGood in inputGoodsOrdered) {
-        if (TryPlanBringingGood(districtCenter, target, inputGood.GoodId, _ => true, out var order)) {
-          return WithRequest(haulCandidate, requesterId, weightedBehavior, order.source, order.target, order.goodAmount);
+        var weight = InputGoodWeight(target, inputGood, weightedBehavior.Weight);
+        if (TryPlanBringingGood(districtCenter, target, inputGood, _ => true, out var order)) {
+          orders.Add(WithRequest(
+              haulCandidate, requesterId, weightedBehavior, weight, order.source, order.target, order.goodAmount));
+          added = true;
+          continue;
         }
-        if (TryCreateCoveredOrder(haulCandidate, requesterId, weightedBehavior, target, inputGood.GoodId, out var coveredOrder)) {
-          return coveredOrder;
+        if (TryCreateCoveredOrder(
+            haulCandidate, requesterId, weightedBehavior, weight, target, inputGood, out var coveredOrder)) {
+          orders.Add(coveredOrder);
+          added = true;
         }
       }
     }
-    return EmptyOrder(haulCandidate, requesterId, weightedBehavior, source: null, PickInputInventory(inventories));
+    if (!added) {
+      orders.Add(EmptyOrder(
+          haulCandidate, requesterId, weightedBehavior, source: null, PickInputInventory(inventories)));
+    }
   }
 
   static TransportOrderSnapshot PlanObtainGood(
@@ -137,7 +151,8 @@ static class PossibleTransportOrderPlanner {
     if (!inventories || !emptiable || !emptiable.IsMarkedForEmptying) {
       return EmptyOrder(haulCandidate, requesterId, weightedBehavior, source: null, target: null);
     }
-    return PlanFirstTakeAwayOrder(districtCenter, haulCandidate, requesterId, weightedBehavior, inventories, GetUnreservedGoods);
+    return PlanFirstTakeAwayOrder(
+        districtCenter, haulCandidate, requesterId, weightedBehavior, inventories, GetUnreservedGoods);
   }
 
   static TransportOrderSnapshot PlanEmptyOutput(
@@ -187,7 +202,8 @@ static class PossibleTransportOrderPlanner {
     foreach (var source in inventories.EnabledInventories) {
       foreach (var goodAmount in goodsProvider(source)) {
         if (TryPlanTakingGood(districtCenter, source, goodAmount, _ => true, out var order)) {
-          return WithRequest(haulCandidate, requesterId, weightedBehavior, order.source, order.target, order.goodAmount);
+          return WithRequest(
+              haulCandidate, requesterId, weightedBehavior, order.source, order.target, order.goodAmount);
         }
       }
     }
@@ -298,18 +314,31 @@ static class PossibleTransportOrderPlanner {
       HaulCandidate haulCandidate,
       Guid requesterId,
       WeightedBehavior weightedBehavior,
+      float weight,
       Inventory source,
       Inventory target,
       GoodAmount goodAmount) {
     return TransportOrderSnapshot.Queued(
-        requesterId, haulCandidate, FormatBehaviorName(weightedBehavior.WorkplaceBehavior), weightedBehavior.Weight,
+        requesterId, haulCandidate, FormatBehaviorName(weightedBehavior.WorkplaceBehavior), weight,
         source, target, goodAmount);
+  }
+
+  static TransportOrderSnapshot WithRequest(
+      HaulCandidate haulCandidate,
+      Guid requesterId,
+      WeightedBehavior weightedBehavior,
+      Inventory source,
+      Inventory target,
+      GoodAmount goodAmount) {
+    return WithRequest(
+        haulCandidate, requesterId, weightedBehavior, weightedBehavior.Weight, source, target, goodAmount);
   }
 
   static bool TryCreateCoveredOrder(
       HaulCandidate haulCandidate,
       Guid requesterId,
       WeightedBehavior weightedBehavior,
+      float weight,
       Inventory target,
       string goodId,
       out TransportOrderSnapshot order) {
@@ -319,9 +348,20 @@ static class PossibleTransportOrderPlanner {
       return false;
     }
     order = TransportOrderSnapshot.Covered(
-        requesterId, haulCandidate, FormatBehaviorName(weightedBehavior.WorkplaceBehavior), weightedBehavior.Weight,
+        requesterId, haulCandidate, FormatBehaviorName(weightedBehavior.WorkplaceBehavior), weight,
         target, new GoodAmount(goodId, reservedCapacity));
     return true;
+  }
+
+  static bool TryCreateCoveredOrder(
+      HaulCandidate haulCandidate,
+      Guid requesterId,
+      WeightedBehavior weightedBehavior,
+      Inventory target,
+      string goodId,
+      out TransportOrderSnapshot order) {
+    return TryCreateCoveredOrder(
+        haulCandidate, requesterId, weightedBehavior, weightedBehavior.Weight, target, goodId, out order);
   }
 
   static TransportOrderSnapshot EmptyOrder(
@@ -340,5 +380,21 @@ static class PossibleTransportOrderPlanner {
   static string FormatBehaviorName(Type workplaceBehaviorType) {
     var name = workplaceBehaviorType.Name;
     return name.EndsWith(WorkplaceBehaviorSuffix) ? name[..^WorkplaceBehaviorSuffix.Length] : name;
+  }
+
+  static float InputGoodWeight(Inventory target, string goodId, float fallbackWeight) {
+    var limit = target.LimitedAmount(goodId);
+    if (limit <= 0) {
+      return fallbackWeight;
+    }
+    var fill = (float)target.AmountInStock(goodId) / limit;
+    return Clamp01(1f - fill);
+  }
+
+  static float Clamp01(float value) {
+    if (value < 0f) {
+      return 0f;
+    }
+    return value > 1f ? 1f : value;
   }
 }
