@@ -85,6 +85,8 @@ Current phases:
 
 - `Queued`: a vanilla request exists, but SmartHaulers has not found a concrete executable route and cargo.
 - `Estimated`: SmartHaulers found a concrete source, target, and cargo that could be executed if started now.
+- `Deferred`: SmartHaulers found a possible route and cargo, but the order is not urgent enough to dispatch yet.
+- `Dispatchable`: SmartHaulers found a possible route and cargo that should be considered by passive decision scoring.
 - `Covered`: the request appears covered by existing reservations or deliveries.
 - `PickingUp`: an agent has an active transport order and is moving toward the source.
 - `Delivering`: an agent has picked up cargo and is moving toward the target.
@@ -115,6 +117,18 @@ For most supported behaviors, one vanilla request still produces at most one Sma
 The current planner still uses vanilla nearest inventory lookup. This means each planned good gets at most one nearest
 source-to-target segment. It does not yet build compound coverage from multiple source inventories.
 
+Current readiness classification is a prototype simplification. It uses fixed per-good inventory fill thresholds:
+
+- bring/fill requests are treated as dispatchable when the target good fill is at or below 50%;
+- take-away requests are treated as dispatchable when the source good fill is at or above 50%;
+- construction material delivery remains dispatchable immediately.
+
+This threshold is not the intended final readiness model. Future SmartHaulers readiness should be time-based: estimate
+how long until a building blocks because of missing input or excess output, and compare that time with delivery ETA.
+For example, if a manufactory can keep working for about 2 days but delivery takes 1.5 days, the order may need to
+become dispatchable now even if the inventory is not past a fixed fill threshold. This is SmartHaulers-owned design
+direction, not vanilla behavior.
+
 ## FillInput Weight
 
 SmartHaulers intentionally does not use vanilla overall input inventory fill as the final `FillInput` priority.
@@ -138,7 +152,7 @@ This is SmartHaulers-owned logic, not vanilla behavior.
 
 ## Passive Decisions
 
-The current dispatcher computes passive decisions for `Estimated` orders only.
+The current dispatcher computes passive decisions for `Dispatchable` orders only.
 
 It picks a winner and runner-up without changing game state. The decision is diagnostic and explainable.
 
@@ -200,6 +214,7 @@ The current design does not yet:
 
 - reserve or assign orders;
 - prevent vanilla from selecting a different worker;
+- use a time-to-blockage versus delivery-ETA readiness model;
 - model compound plans across several source inventories;
 - virtually subtract stock or capacity across planned segments;
 - evaluate critical needs, hunger, thirst, fuel, or rest risk;
@@ -216,6 +231,7 @@ The next design layer should stay passive unless there is a clear reason to inte
 Useful next steps:
 
 - expand per-good planning beyond `FillInput` where it makes sense;
+- replace fixed 50% readiness thresholds with time-to-blockage versus delivery-ETA estimates;
 - design a compound order model for multi-source or multi-target coverage;
 - improve passive scoring with clearer ETA and capacity semantics;
 - compare vanilla active assignments with SmartHaulers passive decisions;
