@@ -55,14 +55,15 @@ new-order candidates by the passive evaluator.
 `WorkplaceIdle` is too broad for passive scoring by itself. The current SmartHaulers-owned scoring model classifies the
 workplace role:
 
-- transport workplace idle: district-center or hauling-center style workers; usable helper, small penalty;
-- builder workplace idle: avoid unless useful or important; builders are idle now but expected to build;
+- transport workplace idle: hauling-center style workers; usable helper, small penalty;
+- builder workplace idle: district-center and builder-workplace workers; avoid unless useful or important; builders are
+  idle now but expected to build;
 - production workplace idle: manufactory or factory worker; avoid more strongly because production may resume as soon
   as inputs, power, or another blocker becomes available;
 - unknown workplace idle: worst fallback because the interrupted work is unknown.
 
-Builders are not transport workplace workers in the current model. Builder workplace idle keeps a large penalty because
-builders are expected to build.
+District Center workers are builders in the current model, not transport workplace workers. Builder workplace idle keeps
+a large penalty because builders are expected to build.
 
 A future SmartHaulers-owned policy may let the user opt builders into transport help through UI on a district center,
 builder workplace, worker panel, or another suitable control. This is a possible micromanagement feature for early-game
