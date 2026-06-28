@@ -69,9 +69,9 @@ When a signal script-name segment is derived from an external game or mod identi
 prefab ID, or template ID, do not insert the raw identifier directly. Use the shared script-safe segment codec/helper
 and preserve raw or backward-compatible lookup behavior where existing scripts may depend on it.
 
-Reusable Automation utilities or helpers that define script-name serialization, encoding, or naming contracts must have
-XML documentation on their public methods. Document the format, which names remain raw, what gets encoded, decode
-failure behavior, and backward-compatibility expectations.
+For Automation helpers that define script-name serialization, encoding, or naming contracts, make the XML documentation
+especially explicit. Document the exact format, which names remain raw, what gets encoded, decode failure behavior, and
+backward-compatibility expectations for existing scripts.
 
 Use `SignalDef.Scope` as the source of truth for exportability. Building signal export UI must rely on explicit scope,
 not on script-name prefixes or deny-lists.
