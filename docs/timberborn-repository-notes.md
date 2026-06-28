@@ -387,6 +387,11 @@ dotnet build <ProjectPath>.csproj /p:ModPath=__NoSuchModPath__
 
 Report which build command was used when the ordinary build has repository-specific side effects.
 
+When a mod gameplay, runtime, or UI fix is ready for user real-game validation, a compile-only build is not enough.
+Unless the user explicitly says not to write to `_MODS!`, run the normal mod build that updates the real local mod
+output, then verify the expected DLL/XML or package artifact timestamp when practical. This prevents the user from
+testing an old build in game.
+
 ---
 
 ## Branches
