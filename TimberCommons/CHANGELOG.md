@@ -1,4 +1,4 @@
-# v1.18.1 (TBD)
+# v1.18.1 (June 28th, 2026)
 * [Fix] Discharge buildings use the discharge water level settings after the Timberborn 1.1 rename.
 
 # v1.18.0 (June 22nd, 2026)
