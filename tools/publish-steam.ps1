@@ -4,6 +4,7 @@ param(
 
     [string] $Configuration = "Release",
     [string] $GameVersion = "version-1.1",
+    [string] $GameRoot = "_GAME!",
     [string] $OutputRoot = ".tools/release-preview",
     [string] $LocalModRoot = "",
     [string] $SteamStagingRoot = ".tools/steam-staging",
@@ -14,6 +15,7 @@ param(
     [string] $ChangeNotesPrefix = "",
     [switch] $IncludeLegacyVersions,
     [switch] $SkipBuild,
+    [switch] $SkipUnityExport,
     [switch] $LoginOnly,
     [switch] $UpdateVisibility,
     [switch] $Publish
@@ -25,6 +27,7 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 $modRoot = Join-Path $repoRoot $ModName
 $releaseConfigPath = Join-Path $modRoot "release.json"
 $buildScriptPath = Join-Path $PSScriptRoot "build-mod-package.ps1"
+$unityExportScriptPath = Join-Path $PSScriptRoot "export-unity-mod.ps1"
 
 function Assert-PathExists([string] $Path, [string] $Description) {
     if (-not (Test-Path -LiteralPath $Path)) {
@@ -164,6 +167,138 @@ function New-ZipFromDirectory([string] $SourceRoot, [string] $ZipPath) {
     }
     finally {
         $zip.Dispose()
+    }
+}
+
+function Invoke-UnityExport([string] $Name, [string] $VersionFolder) {
+    Assert-PathExists $unityExportScriptPath "Unity export script"
+    & $unityExportScriptPath -ModName $Name -GameVersion $VersionFolder
+}
+
+function Assert-RepositoryReleaseVersions(
+    [object] $Manifest,
+    [string] $ManifestPath,
+    [string] $Version) {
+    $manifestVersion = [string]$Manifest.Version
+    if ($manifestVersion -ne $Version) {
+        throw "Manifest version mismatch before Unity export. Manifest=$manifestVersion, Release=$Version. Update $ManifestPath first."
+    }
+
+    $propsPath = Join-Path $modRoot "directory.build.props"
+    Assert-PathExists $propsPath "Directory build props"
+    $props = [xml](Get-Content -Raw -LiteralPath $propsPath)
+    $versions = @($props.Project.PropertyGroup | ForEach-Object {
+        [string]$_.Version
+    } | Where-Object {
+        -not [string]::IsNullOrWhiteSpace($_)
+    })
+    if ($versions.Count -eq 0) {
+        throw "Version is missing in $propsPath"
+    }
+
+    $projectVersion = $versions[0]
+    if ($projectVersion -ne $Version) {
+        throw "Project version mismatch before build. directory.build.props=$projectVersion, Release=$Version. Update $propsPath first."
+    }
+}
+
+function Get-InstalledGameVersionInfo([string] $RootPath) {
+    $gameRootPath = Resolve-RepoPath $RootPath
+    $versionNumbersPath = Join-Path $gameRootPath "Timberborn_Data/StreamingAssets/VersionNumbers.json"
+    Assert-PathExists $versionNumbersPath "Timberborn version numbers"
+    $versionNumbers = Get-Content -Raw -LiteralPath $versionNumbersPath | ConvertFrom-Json
+    $currentVersion = [string]$versionNumbers.CurrentVersion
+    if ([string]::IsNullOrWhiteSpace($currentVersion)) {
+        throw "CurrentVersion is empty in $versionNumbersPath"
+    }
+
+    $versionTextPath = Join-Path $gameRootPath "Timberborn_Data/StreamingAssets/Version.txt"
+    $versionText = ""
+    if (Test-Path -LiteralPath $versionTextPath) {
+        $versionText = (Get-Content -Raw -LiteralPath $versionTextPath).Trim()
+    }
+
+    return [pscustomobject]@{
+        CurrentVersion = $currentVersion
+        VersionText = $versionText
+        VersionNumbersPath = $versionNumbersPath
+    }
+}
+
+function Assert-InstalledGameVersionCompatible(
+    [object] $ReleaseConfig,
+    [object] $Manifest,
+    [string] $VersionFolder,
+    [string] $RootPath) {
+    $compatibility = $ReleaseConfig.GameVersionCompatibility.$VersionFolder
+    if ($null -eq $compatibility) {
+        throw "No game-version compatibility mapping for $VersionFolder in $releaseConfigPath"
+    }
+
+    $gameVersionInfo = Get-InstalledGameVersionInfo $RootPath
+    $currentVersion = [version]$gameVersionInfo.CurrentVersion
+    $minimumVersion = [version]([string]$compatibility.MinimumGameVersion)
+    $maximumVersion = [version]([string]$compatibility.MaximumGameVersion)
+    if ($currentVersion -lt $minimumVersion -or $currentVersion -gt $maximumVersion) {
+        throw "Installed Timberborn $($gameVersionInfo.CurrentVersion) is outside $VersionFolder compatibility range $minimumVersion..$maximumVersion."
+    }
+
+    $manifestMinimumGameVersion = [string]$Manifest.MinimumGameVersion
+    if (-not [string]::IsNullOrWhiteSpace($manifestMinimumGameVersion) -and
+            $currentVersion -lt [version]$manifestMinimumGameVersion) {
+        throw "Installed Timberborn $($gameVersionInfo.CurrentVersion) is older than manifest MinimumGameVersion=$manifestMinimumGameVersion."
+    }
+
+    if ([string]::IsNullOrWhiteSpace($gameVersionInfo.VersionText)) {
+        Write-Host "Installed Timberborn version: $($gameVersionInfo.CurrentVersion)"
+    }
+    else {
+        Write-Host "Installed Timberborn version: $($gameVersionInfo.CurrentVersion) ($($gameVersionInfo.VersionText))"
+    }
+}
+
+function Assert-UnityExportedVersionFolder(
+    [string] $SourcePath,
+    [string] $VersionFolder,
+    [string] $ExpectedManifestVersion) {
+    $versionPath = Join-Path $SourcePath $VersionFolder
+    Assert-PathExists $versionPath "Unity-exported version folder"
+    $exportedManifestPath = Join-Path $versionPath "manifest.json"
+    Assert-PathExists $exportedManifestPath "Unity-exported manifest"
+    $exportedManifest = Get-Content -Raw -LiteralPath $exportedManifestPath | ConvertFrom-Json
+    $exportedManifestVersion = [string]$exportedManifest.Version
+    if ($exportedManifestVersion -ne $ExpectedManifestVersion) {
+        throw "Unity-exported manifest version mismatch. Manifest=$exportedManifestVersion, expected $ExpectedManifestVersion at $exportedManifestPath"
+    }
+}
+
+function Build-LocalModScripts(
+    [string] $Name,
+    [string] $ConfigurationName,
+    [string] $SourcePath,
+    [string] $VersionFolder,
+    [string] $ScriptFileBase,
+    [string] $ExpectedVersion) {
+    $projectPath = Join-Path (Join-Path $repoRoot $Name) "$Name.csproj"
+    Assert-PathExists $projectPath "Project file"
+    $modPath = Split-Path -Parent $SourcePath
+    & dotnet build $projectPath -c $ConfigurationName "/p:ModPath=$modPath"
+    if ($LASTEXITCODE -ne 0) {
+        throw "dotnet build failed for $projectPath"
+    }
+
+    $scriptsPath = Join-Path (Join-Path $SourcePath $VersionFolder) "Scripts"
+    $dllPath = Join-Path $scriptsPath "$ScriptFileBase.dll"
+    $xmlPath = Join-Path $scriptsPath "$ScriptFileBase.xml"
+    Assert-PathExists $dllPath "Built DLL copied to local mod folder"
+    Assert-PathExists $xmlPath "Built XML documentation copied to local mod folder"
+
+    $assemblyVersion = [Reflection.AssemblyName]::GetAssemblyName($dllPath).Version
+    $expectedAssemblyVersion = [version]$ExpectedVersion
+    if ($assemblyVersion.Major -ne $expectedAssemblyVersion.Major -or
+            $assemblyVersion.Minor -ne $expectedAssemblyVersion.Minor -or
+            $assemblyVersion.Build -ne $expectedAssemblyVersion.Build) {
+        throw "Built DLL version mismatch. DLL=$assemblyVersion, expected $ExpectedVersion at $dllPath"
     }
 }
 
@@ -353,6 +488,11 @@ if ([string]::IsNullOrWhiteSpace($modVersion)) {
     throw "Release version is empty."
 }
 
+$scriptFileBase = $ModName
+if (-not [string]::IsNullOrWhiteSpace($releaseConfig.ScriptFileBase)) {
+    $scriptFileBase = [string]$releaseConfig.ScriptFileBase
+}
+
 $packageMode = "Build"
 if (-not [string]::IsNullOrWhiteSpace($releaseConfig.Package.Mode)) {
     $packageMode = [string]$releaseConfig.Package.Mode
@@ -394,7 +534,20 @@ elseif ($packageMode -eq "LocalModFolder") {
     }
 
     $sourcePath = Resolve-RepoPath ([string]$releaseConfig.Package.SourcePath)
+    $expectedExportedManifestVersion = $releaseConfig.ManifestVersions.$GameVersion
+    if ($null -eq $expectedExportedManifestVersion) {
+        $expectedExportedManifestVersion = $modVersion
+    }
+    Assert-RepositoryReleaseVersions $manifest $manifestPath $modVersion
+    Assert-InstalledGameVersionCompatible $releaseConfig $manifest $GameVersion $GameRoot
+    if (-not $SkipUnityExport) {
+        Invoke-UnityExport $ModName $GameVersion
+    }
     Assert-PathExists $sourcePath "Local mod folder"
+    Assert-UnityExportedVersionFolder $sourcePath $GameVersion ([string]$expectedExportedManifestVersion)
+    if (-not $SkipBuild) {
+        Build-LocalModScripts $ModName $Configuration $sourcePath $GameVersion $scriptFileBase $modVersion
+    }
 
     $packageStage = Resolve-RepoPath ".tools/release-staging/$ModName-local"
     if (Test-Path -LiteralPath $packageStage) {
@@ -415,10 +568,6 @@ else {
 Assert-PathExists $zipPath "Release package"
 Assert-PackageFreshEnough $zipPath $releaseConfig.Package
 
-$scriptFileBase = $ModName
-if (-not [string]::IsNullOrWhiteSpace($releaseConfig.ScriptFileBase)) {
-    $scriptFileBase = [string]$releaseConfig.ScriptFileBase
-}
 $versionFolders = Test-ZipPackage $zipPath $scriptFileBase $releaseConfig
 
 $allowSingleGameVersion = $releaseConfig.Steam.AllowSingleGameVersion -eq $true

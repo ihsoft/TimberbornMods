@@ -17,11 +17,18 @@ namespace Timberborn.ModdingTools.AssetsManagement {
     public bool IsBuiltIn => false;
 
     public bool TryLoad<T>(string path, out OrderedAsset orderedAsset) where T : Object {
-      orderedAsset = LoadAll<T>(path).FirstOrDefault();
+      orderedAsset = LoadAll<T>(path, null).FirstOrDefault();
       return orderedAsset.Asset != null;
     }
 
-    public IEnumerable<OrderedAsset> LoadAll<T>(string path) where T : Object {
+    public IEnumerable<OrderedAsset> LoadAll<T>(string path, IEnumerable<string> resourceAssets) where T : Object {
+      if (resourceAssets != null) {
+        return resourceAssets.SelectMany(resourceAsset => LoadAll<T>(Path.Combine(path, resourceAsset)));
+      }
+      return LoadAll<T>(path);
+    }
+
+    private IEnumerable<OrderedAsset> LoadAll<T>(string path) where T : Object {
       var pathDirectory = Path.GetDirectoryName(path) ?? string.Empty;
       var fileName = Path.GetFileName(path) + ".*";
       foreach (var modDirectory in _modFinder.GetModDirectories()) {
