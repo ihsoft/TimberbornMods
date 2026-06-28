@@ -193,6 +193,9 @@ reminder is needed to prevent repeated misses.
 - Preserve existing content unless explicitly asked to remove it.
 - Make the smallest change that satisfies the task.
 - Avoid opportunistic refactoring unless explicitly requested.
+- Treat player-facing and user-facing text as high-impact content. Do not silently shorten, rewrite, or add visible
+  text. Preserve useful meaning, avoid adding noise, and ask for review when a technical limit or workflow requires a
+  meaningful text change.
 - Prefer existing Timberborn architecture over custom architecture.
 - Prefer extension over replacement.
 - Prefer dependency injection over Harmony when possible.
