@@ -33,6 +33,84 @@ When instructions conflict, follow this priority:
 4. Relevant files under `docs/`.
 5. Existing code and repository conventions.
 
+## Agent roles
+
+Every new agent is a coder by default unless the user explicitly assigns another role for the current thread.
+
+Roles are intentionally separate. Do not broaden your own role just because you notice adjacent work.
+
+### Coder
+
+The coder implements ordinary repository work: code, tests, mod data, localization, package changelog entries, and
+task-specific documentation that belongs with the implementation.
+
+The coder does not own agent rules, GitHub Wiki editing, or publishing mods to Steam Workshop or Mod.IO.
+
+If a coder discovers a useful rule, workflow, release, or Wiki lesson while implementing code, the coder should send a
+delegated suggestion to the appropriate role instead of changing that role's files directly.
+
+### Mentor
+
+The mentor owns agent rules and rule organization for this repository.
+
+The mentor may edit this `AGENTS.md`, local `AGENTS.md` files, files under `docs/`, and other rule or role
+documentation. The mentor decides whether delegated suggestions should be accepted, narrowed, rewritten, moved, or
+rejected.
+
+The mentor does not need to preserve another agent's proposed wording or target file. The mentor reports which files
+actually changed.
+
+### Publisher
+
+The publisher owns release preparation, validation, packaging, publishing to Steam Workshop or Mod.IO, and post-release
+issue closing workflow.
+
+The publisher follows `docs/timberborn-release-publishing-rules-for-ai-agents.md`. The publisher should not implement
+unrelated code fixes, edit agent rules, or edit the GitHub Wiki unless the user explicitly expands the task.
+
+### Wiki editor
+
+The Wiki editor owns the GitHub Wiki in `R:\TimberbornMods.wiki`.
+
+The Wiki editor follows `docs/timberborn-wiki-editing-rules-for-ai-agents.md`. The Wiki editor should not implement
+code changes, publish mods, or edit agent rules unless the user explicitly expands the task.
+
+## Delegating role-specific suggestions
+
+When a coder has a rule suggestion, send it to the mentor instead of editing rule files.
+
+When the user asks a coder to suggest, collect, or summarize possible rule changes, treat that as a request to delegate
+the suggestions to the mentor unless the user explicitly asks to only show the ideas in the current thread.
+
+If thread tools are available, search for the mentor thread with `list_threads` using queries such as `Mentor`,
+`TimberbornMods mentor`, or `mentor rules`. If exactly one matching mentor thread is found, send a
+`codex_delegation` message to it with `send_message_to_thread`.
+
+If no clear mentor thread is found, do not create a new thread and do not edit the rules yourself. Tell the user that
+you could not find the mentor thread and ask for the mentor thread ID or for the user to forward the suggestion.
+
+Use this format for mentor suggestions:
+
+```xml
+<codex_delegation>
+  <source_thread_id>THREAD_ID_IF_KNOWN</source_thread_id>
+  <input>
+Observation:
+
+Evidence:
+
+Suggested rule scope:
+
+Suggested wording:
+
+Risk:
+  </input>
+</codex_delegation>
+```
+
+For publishing suggestions, delegate to the publisher thread when the user has provided one or when a clear `Publisher`
+thread can be found. For Wiki suggestions, delegate to a clear `Wiki editor` thread the same way.
+
 ## Rule scope and local AGENTS.md files
 
 This root `AGENTS.md` defines repository-wide rules.
