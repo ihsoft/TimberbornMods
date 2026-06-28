@@ -178,6 +178,10 @@ Use a mod-specific `AGENTS.md` for rules that apply only to one mod, such as:
 
 Keep repository-wide rules in this root `AGENTS.md` or in files under `docs/`.
 
+Keep this root `AGENTS.md` as the routing layer. Put detailed, role-specific, workflow-specific, or mod-specific rules
+in the closest relevant linked file. Avoid duplicating the same rule in several places; use pointers unless a local
+reminder is needed to prevent repeated misses.
+
 ## Core principles
 
 - Evidence over assumptions.
