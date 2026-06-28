@@ -355,10 +355,13 @@ SteamCMD description VDFs are fragile: unescaped double quotes inside multiline 
 published description. If a Steam description contains double quotes, replace them or improve and test the escaping
 before publishing.
 
-Keep Steam descriptions under the practical SteamCMD limit of about 8000 bytes. If SteamCMD parses the VDF but returns
-`Invalid Parameter` while updating a description, check description length first and shorten it below the practical
-limit before retrying. Treat this limit as empirical and replace it with an exact platform limit if tooling later proves
-one.
+Keep Steam descriptions under the practical SteamCMD limit of about 8000 bytes. Do not silently shorten a Steam
+description to fit this limit. If a description is too long, propose a shortened version for user review and publish it
+only after the user approves the new text.
+
+If SteamCMD parses the VDF but returns `Invalid Parameter` while updating a description, check description length first.
+If shortening is needed, prepare a reviewed shorter description before retrying. Treat this limit as empirical and
+replace it with an exact platform limit if tooling later proves one.
 
 Avoid raw double quotes in local Steam description files unless the updater is proven to escape them safely. Prefer
 single quotes or wording that avoids quotes instead of ad-hoc VDF escaping.
