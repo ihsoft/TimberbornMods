@@ -65,6 +65,10 @@ When adding a new Automation signal family, decide whether each signal is buildi
 When adding an Automation `SignalDef`, always set `Scope` explicitly, even when it is
 `SignalDef.ScopeEnum.Building`, so ownership semantics are visible at the definition site.
 
+When a signal script-name segment is derived from an external game or mod identifier, such as a `GoodId`, recipe ID,
+prefab ID, or template ID, do not insert the raw identifier directly. Use the shared script-safe segment codec/helper
+and preserve raw or backward-compatible lookup behavior where existing scripts may depend on it.
+
 Use `SignalDef.Scope` as the source of truth for exportability. Building signal export UI must rely on explicit scope,
 not on script-name prefixes or deny-lists.
 
