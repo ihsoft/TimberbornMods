@@ -1,24 +1,19 @@
-﻿<h2>Overview</h2>
-<p>For a regular player, this mod implements a lot of small changes to UI and QoL. They won't change your gameplay, but they may be helpful.</p>
-<p>For a mod developer, this mod offers components that allow the creation of completely new buildings with unique logic!</p>
-<h2>For the players</h2>
-<p>Check out the image slideshow above to get a picture of what the mod provides. But long story short, you get:</p>
+<h2>Overview</h2>
+<p>TimberCommons is a collection of small UI and quality-of-life improvements for Timberborn. It helps you read the game state faster, tune water-output buildings more precisely, and get better information from compatible irrigation tower mods.</p>
+<p>It also provides building components for other mod makers. The technical details are in the Wiki, while this page focuses on what players get in-game.</p>
+<h2>For players</h2>
+<p>Check out the image slideshow above to get a picture of what the mod provides. In short:</p>
 <ul>
-    <li><strong>UI</strong>. Expressing time durations as "days/hours." For a human, the duration of "2d 4h" is clearer than "52 hours," isn't it?</li>
-    <li><strong>UI</strong>. Increased precision in displaying small durations. Did you know Birch doesn't need a full 9 days to grow? It actually grows in "8d 12h," or 8.5 days.</li>
-    <li><strong>UI</strong>. The sluice will tell you what water flow is going through it. This may help in planning your infrastructure.</li>
-    <li><strong>UI</strong>. If workers can get hurt in a building, the probability of injury will be displayed on the right panel. It can appear as an indicator with a tooltip or as regular text in the building details. This is configurable through the settings.&nbsp;</li>
-    <li><strong>QoL</strong>. You can now adjust the water level at fluid dump buildings, like Mechanical Pump or Fluid Dump. Not only can you change the "0.9 m" default, but you can also now place a fluid dump building at any level above the surface and set it up so that it doesn't flood the output!</li>
-    <li><strong>Feature.</strong> If you install a mod that uses `TimberCommons`, like <a href="https://mod.io/g/timberborn/m/water-extention-irrigation-towers">Water Extension</a>, you will get a set of irrigation tower buildings!</li>
+    <li><strong>Clearer time values</strong>. Shows supply time, growth time, and recipe duration as days/hours where it is easier to read. For example, "2d 4h" is clearer than "52 hours".</li>
+    <li><strong>More precise small durations</strong>. Some values in Timberborn are rounded in the stock UI. TimberCommons can show short recipe durations more accurately, such as the Grilled Potatoes recipe taking "0.52h".</li>
+    <li><strong>Injury probability</strong>. Buildings that can injure workers can show the injury chance in the right panel or as a small avatar indicator with a tooltip. This is configurable in the settings.</li>
+    <li><strong>Active mod filter</strong>. Adds a "Show active" filter to the mod selection dialog, so it is easier to review which installed mods are actually enabled.</li>
+    <li><strong>Water output control</strong>. Lets you set the output water level for Mechanical Pumps, Deep Mechanical Pumps, Compact Mechanical Pumps, and Discharges. This helps tune reservoirs and avoid accidental flooding.</li>
+    <li><strong>Better irrigation tower information</strong>. If you install a mod that uses TimberCommons, such as <a href="https://mod.io/g/timberborn/m/water-extention-irrigation-towers">Water Extension</a>, irrigation tower buildings can show useful details like efficiency, maximum range, growth effects, contamination blocking, and recipe outputs directly in the game UI.</li>
 </ul>
-<h2>For the mod makers</h2>
-<p>You can use the components that `TimberCommons` offers to create your own buildings. Consider these:</p>
-<ul>
-    <li>`GoodConsumingIrrigationTower` &ndash; a simple tower that consumes one resource (usually water).</li>
-    <li>`ManufactoryIrrigationTower` &ndash; a tower that can use the power of the manufactory recipes! You can use multiple ingredients and also define "effects" which would be applied to the growables based on the selected recipe.</li>
-</ul>
-<p>See more details on the provided components in Wiki: https://github.com/ihsoft/TimberbornMods/wiki/Timber-Commons.</p>
-<h2>Mods that provide Water Towers</h2>
+<h2>For mod makers</h2>
+<p>TimberCommons includes reusable irrigation tower components for mods that add new water or badwater-related buildings. See the Wiki for component details, specs, and compatibility notes:<br /><a href="https://github.com/ihsoft/TimberbornMods/wiki/Timber-Commons">https://github.com/ihsoft/TimberbornMods/wiki/Timber-Commons</a></p>
+<h2>Mods that use TimberCommons</h2>
 <p><a href="https://mod.io/g/timberborn/m/water-extention-irrigation-towers">https://mod.io/g/timberborn/m/water-extention-irrigation-towers</a></p>
 <hr />
 <p>Discord: <a href="https://discord.com/channels/558398674389172225/1242339605634875432">https://discord.com/channels/558398674389172225/1242339605634875432</a><br />Report a bug: <a href="https://github.com/ihsoft/TimberbornMods/labels/timbercommons">https://github.com/ihsoft/TimberbornMods/labels/timbercommons</a><br />GitHub repository: <a href="https://github.com/ihsoft/TimberbornMods">https://github.com/ihsoft/TimberbornMods</a></p>
