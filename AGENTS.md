@@ -116,6 +116,40 @@ Risk:
 For publishing suggestions, delegate to the publisher thread when the user has provided one or when a clear `Publisher`
 thread can be found. For Wiki suggestions, delegate to a clear `Wiki editor` thread the same way.
 
+## Role learning handoff
+
+At the end of a non-trivial task, each role agent should briefly check whether it learned something durable that would
+help future agents.
+
+Send a suggestion to the mentor only when the observation is:
+
+- likely to repeat in future work,
+- specific enough to become a rule, guardrail, workflow note, or local `AGENTS.md` note,
+- backed by concrete evidence from the task,
+- not already covered clearly by existing rules.
+
+Good mentor-note candidates include:
+
+- the user corrected a workflow, safety, role, release, Wiki, test, or build assumption,
+- an existing rule was missed because it was hidden, vague, too broad, too narrow, or not in the files the role
+  naturally read,
+- a repeated repository, mod, platform, localization, build, or test pitfall became clear,
+- a workflow step behaved differently from what the rules implied,
+- a local mod needs a new or updated `AGENTS.md` note because the lesson is mod-specific.
+
+Do not treat "I forgot" as an acceptable explanation. Agents are expected to follow applicable rules.
+
+If a rule was missed, the mentor note must analyze the process failure instead of excusing it:
+
+- which applicable rule or expectation was missed,
+- which files or instructions the agent did or did not read,
+- what task step should have triggered the rule,
+- why the current checklist or workflow failed to catch it,
+- what concrete rule placement, checklist item, or role-specific reminder might prevent recurrence.
+
+Do not send mentor notes for raw logs, long transcripts, speculative ideas without evidence, or suggestions that only
+say "be careful". The goal is not blame. The goal is to make future rule-following harder to miss.
+
 ## Rule scope and local AGENTS.md files
 
 This root `AGENTS.md` defines repository-wide rules.
@@ -200,6 +234,10 @@ When a rule change comes from another agent's delegated suggestion and the sourc
 thread after the rule files are finalized. Tell the source agent which files actually changed and that they should
 refresh those files or update their checkout. Report the files that were really edited, even if they differ from the
 files the source agent expected or requested.
+
+After any committed rule change, notify the dedicated `Publisher` and `Wiki editor` threads when thread tools are
+available. These roles must refresh their checkout or context after repository rules change, even when the change did
+not start from them.
 
 ## Task checklists
 
