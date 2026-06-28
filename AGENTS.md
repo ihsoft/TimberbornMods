@@ -2,6 +2,10 @@
 
 This repository contains Timberborn mods.
 
+These rules are repository rules for any AI agent working here. Some coordination steps mention Codex thread tools; if
+another agent environment does not provide those tools, follow the same role boundaries manually and ask the user to
+forward messages or provide the target role contact.
+
 Before making changes, read this file and the instruction files that apply to the current task. Follow them unless the
 user explicitly says otherwise.
 
@@ -82,12 +86,13 @@ When a coder has a rule suggestion, send it to the mentor instead of editing rul
 When the user asks a coder to suggest, collect, or summarize possible rule changes, treat that as a request to delegate
 the suggestions to the mentor unless the user explicitly asks to only show the ideas in the current thread.
 
-If thread tools are available, search for the mentor thread with `list_threads` using queries such as `Mentor`,
-`TimberbornMods mentor`, or `mentor rules`. If exactly one matching mentor thread is found, send a
+In Codex or another environment with thread tools, search for the mentor thread with `list_threads` using queries such
+as `Mentor`, `TimberbornMods mentor`, or `mentor rules`. If exactly one matching mentor thread is found, send a
 `codex_delegation` message to it with `send_message_to_thread`.
 
-If no clear mentor thread is found, do not create a new thread and do not edit the rules yourself. Tell the user that
-you could not find the mentor thread and ask for the mentor thread ID or for the user to forward the suggestion.
+If thread tools are unavailable, or if no clear mentor thread is found, do not create a new thread and do not edit the
+rules yourself. Tell the user that you could not reach the mentor and ask for the mentor thread ID, contact, or for the
+user to forward the suggestion.
 
 Use this format for mentor suggestions:
 
