@@ -254,6 +254,9 @@ Do not claim support for a game version unless the final package contains the co
 For Mod.IO uploads, prefer the target mod's own token file. If the per-mod token is missing, another known owner token
 for the same Mod.IO account may be used only through an explicit access-token path while keeping the target mod's own
 Mod.IO config. After upload, verify that the target mod's parent modfile ID and version point to the uploaded file.
+If the publish script stops only because the target mod's token file is missing, either create the target mod's local
+token file when the user provides one, or rerun with an explicit `-AccessTokenPath` to another known owner token. Do not
+copy, rename, or guess token files.
 
 After uploading a Mod.IO file, verify that the uploaded file becomes the live file. If Mod.IO reports the file as
 uploaded but not live after scanning, explicitly activate the uploaded modfile through the Mod.IO API instead of
@@ -276,6 +279,11 @@ Use `tools/verify-platform-descriptions.ps1` for this check when possible.
 When verifying descriptions for a specific release, gate the release on the requested mod and platform targets. If a
 shared verification command reports mismatches for unrelated mods, report them as background but do not block the
 current mod release because of those unrelated mismatches.
+
+If `tools/verify-platform-descriptions.ps1 -ModName <ModName>` returns nonzero while the requested mod's target
+platform descriptions match, treat that as a tooling friction rather than a current-release blocker. Preserve the
+distinction explicitly in the report: selected mod synchronized, unrelated mismatches reported separately. Do not ignore
+nonzero exits when the requested mod or requested platform still has a mismatch.
 
 If a local description and the published platform description differ, stop. Do not publish until the user decides which
 side is correct:
