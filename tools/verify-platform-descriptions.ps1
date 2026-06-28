@@ -83,18 +83,18 @@ function Get-ModIoDescriptionTargets() {
     }
 
     return @(Get-ChildItem -LiteralPath $configRoot -Filter "*.local.json" | ForEach-Object {
-        $modName = $_.BaseName -replace "\.local$", ""
-        if (-not (Test-SelectedMod $modName)) {
+        $targetModName = $_.BaseName -replace "\.local$", ""
+        if (-not (Test-SelectedMod $targetModName)) {
             return
         }
 
-        $localPath = "$modName/workshop/description-ModIO.html"
-        if ($modName -eq "CustomTools") {
+        $localPath = "$targetModName/workshop/description-ModIO.html"
+        if ($targetModName -eq "CustomTools") {
             $localPath = "CustomTools/Workshop/ModIO-Description.html"
         }
 
         [pscustomobject]@{
-            ModName = $modName
+            ModName = $targetModName
             ConfigPath = $_.FullName
             LocalPath = $localPath
         }
