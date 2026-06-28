@@ -87,10 +87,27 @@ static class TransportDebugFormatter {
     return string.IsNullOrEmpty(part) ? text : $"{text}, {part}";
   }
 
-  static string FormatAgentState(TransportAgentSnapshot agent) {
+  public static string FormatAgentState(TransportAgentSnapshot agent) {
+    return agent.Role is TransportAgentRole.None or TransportAgentRole.DedicatedHauler
+        ? FormatState(agent)
+        : $"{FormatState(agent)}/{FormatRole(agent.Role)}";
+  }
+
+  static string FormatState(TransportAgentSnapshot agent) {
     return agent.State == TransportAgentState.WorkplaceIdle
         ? $"{agent.State}/{agent.WorkplaceRole}"
         : agent.State.ToString();
+  }
+
+  static string FormatRole(TransportAgentRole role) {
+    return role switch {
+        TransportAgentRole.CommunityService => "community",
+        TransportAgentRole.Builder => "builder",
+        TransportAgentRole.Production => "production",
+        TransportAgentRole.Free => "free",
+        TransportAgentRole.Unknown => "unknown",
+        _ => role.ToString(),
+    };
   }
 
   static bool IsUnassignedOrder(OrderPhase phase) {

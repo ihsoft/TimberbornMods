@@ -141,7 +141,8 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
     }
   }
 
-  static (int available, int wandering, int workplaceIdle, int transporting, int satisfyingNeed, int working) CountAgents(
+  static (
+      int available, int wandering, int workplaceIdle, int transporting, int satisfyingNeed, int working) CountAgents(
       IReadOnlyList<TransportAgentSnapshot> agents) {
     var available = 0;
     var wandering = 0;
@@ -175,8 +176,8 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
   }
 
   static string FormatAgent(TransportAgentSnapshot agent) {
-    return $"  {agent.DisplayName}, {agent.State}, {agent.Activity}, {agent.Position}, {agent.Speed:0.##}, "
-        + $"{agent.Capacity}";
+    return $"  {agent.DisplayName}, {TransportDebugFormatter.FormatAgentState(agent)}, {agent.Activity}, "
+        + $"{agent.Position}, {agent.Speed:0.##}, {agent.Capacity}";
   }
 
   static string FormatOrder(TransportOrderSnapshot order) {
@@ -192,7 +193,7 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
   static void LogSnapshot(string text) {
     DebugEx.Info(
         "SmartHaulers snapshot columns: view, district, agents, available, wandering, workplaceIdle, transporting, "
-        + "satisfyingNeed, working, orders | agent, state, activity, position, speed, capacity | agent, phase, "
+        + "satisfyingNeed, working, orders | agent, state/role, activity, position, speed, capacity | agent, phase, "
         + "good, path, route, left | phase(weight), behavior, optional good, optional path, decision, requester");
     DebugEx.Info("SmartHaulers snapshot:\n{0}", text);
   }

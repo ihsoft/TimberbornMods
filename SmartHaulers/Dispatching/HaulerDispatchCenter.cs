@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using System.Collections.Generic;
 using Timberborn.Buildings;
 using Timberborn.ConstructionSites;
@@ -126,9 +127,34 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
     var walkingSpeed = worker.GetComponent<WalkerSpeedManager>()?.GetWalkerSpeedAtCurrentPosition() ?? 0f;
     var entityId = worker.GetComponent<EntityComponent>()?.EntityId ?? System.Guid.Empty;
     var workplaceRole = ClassifyWorkplaceRole(worker);
+    var role = ClassifyAgentRole(worker, behaviorManager, workplaceRole);
     return new TransportAgentSnapshot(
         entityId, worker, TransportAgentSnapshot.FormatWorker(worker), position, worldPosition, walkingSpeed,
-        goodCarrier.LiftingCapacity, activity.State, workplaceRole, activity, isTransportAgent: true);
+        goodCarrier.LiftingCapacity, activity.State, role, workplaceRole, activity, isTransportAgent: true);
+  }
+
+  static TransportAgentRole ClassifyAgentRole(
+      Worker worker, BehaviorManager behaviorManager, TransportWorkplaceRole workplaceRole) {
+    if (IsRunningCommunityServiceBehavior(behaviorManager)) {
+      return TransportAgentRole.CommunityService;
+    }
+    if (CanRunCommunityService(worker)) {
+      return TransportAgentRole.CommunityService;
+    }
+    return workplaceRole switch {
+        TransportWorkplaceRole.Transport => TransportAgentRole.DedicatedHauler,
+        TransportWorkplaceRole.Builder => TransportAgentRole.Builder,
+        TransportWorkplaceRole.Production => TransportAgentRole.Production,
+        TransportWorkplaceRole.Unknown => TransportAgentRole.Unknown,
+        _ => worker.Workplace ? TransportAgentRole.Unknown : TransportAgentRole.Free,
+    };
+  }
+
+  static bool CanRunCommunityService(Worker worker) {
+    if (worker.GetComponent<WorkRefuser>().RefusesWork) {
+      return false;
+    }
+    return !worker.Employed || !worker.GetComponent<WorkerWorkingHours>().AreWorkingHours;
   }
 
   static TransportWorkplaceRole ClassifyWorkplaceRole(Worker worker) {
@@ -157,12 +183,12 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
       orderSnapshot = default;
       return false;
     }
-    if (!IsActiveTransportOrder(behaviorManager, goodCarrier)) {
+    var source = goodReserver.HasReservedStock ? goodReserver.StockReservation.Inventory : null;
+    var target = goodReserver.HasReservedCapacity ? goodReserver.CapacityReservation.Inventory : null;
+    if (!IsActiveTransportOrder(behaviorManager, goodCarrier, target)) {
       orderSnapshot = default;
       return false;
     }
-    var source = goodReserver.HasReservedStock ? goodReserver.StockReservation.Inventory : null;
-    var target = goodReserver.HasReservedCapacity ? goodReserver.CapacityReservation.Inventory : null;
     var goodAmount = PickGoodAmount(goodCarrier, goodReserver);
     var phase = goodCarrier.IsCarrying ? OrderPhase.Delivering : OrderPhase.PickingUp;
     RestoreKnownEndpoints(worker, goodAmount, ref source, ref target);
@@ -218,7 +244,10 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
     return workplaceBehavior;
   }
 
-  static bool IsActiveTransportOrder(BehaviorManager behaviorManager, GoodCarrier goodCarrier) {
+  static bool IsActiveTransportOrder(BehaviorManager behaviorManager, GoodCarrier goodCarrier, Inventory target) {
+    if (IsSpecializedLooseGoodTarget(target)) {
+      return false;
+    }
     if (goodCarrier.IsCarrying) {
       return true;
     }
@@ -228,8 +257,27 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
     if (behavior is CarryRootBehavior) {
       return true;
     }
+    if (IsCommunityServiceTransportBehavior(behavior)) {
+      return true;
+    }
     if (behavior is WorkplaceBehavior workplaceBehavior) {
       return IsTransportWorkplaceBehavior(workplaceBehavior);
+    }
+    return false;
+  }
+
+  static bool IsSpecializedLooseGoodTarget(Inventory target) {
+    var workplace = target ? target.GetComponent<Workplace>() : null;
+    if (!workplace) {
+      return false;
+    }
+    foreach (var workplaceBehavior in workplace.WorkplaceBehaviors) {
+      if (workplaceBehavior.GetType().Name is
+          "FarmHouseGoodStackRetrieverWorkplaceBehavior"
+          or "GatherWorkplaceBehavior"
+          or "LumberjackFlagWorkplaceBehavior") {
+        return true;
+      }
     }
     return false;
   }
@@ -237,6 +285,14 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
   static bool TryGetRunningBehavior(BehaviorManager behaviorManager, out Behavior behavior) {
     behavior = behaviorManager ? behaviorManager._runningBehavior : null;
     return behavior;
+  }
+
+  static bool IsRunningCommunityServiceBehavior(BehaviorManager behaviorManager) {
+    return TryGetRunningBehavior(behaviorManager, out var behavior) && IsCommunityServiceTransportBehavior(behavior);
+  }
+
+  static bool IsCommunityServiceTransportBehavior(Behavior behavior) {
+    return behavior?.GetType().Name == "BringNutrientBehavior";
   }
 
   static bool IsTransportWorkplaceBehavior(WorkplaceBehavior workplaceBehavior) {
@@ -338,9 +394,22 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
       if (goodComparison != 0) {
         return goodComparison;
       }
-      return left.Cargo.Amount.CompareTo(right.Cargo.Amount);
+      var amountComparison = left.Cargo.Amount.CompareTo(right.Cargo.Amount);
+      if (amountComparison != 0) {
+        return amountComparison;
+      }
+      var sourceComparison = CompareComponents(left.Source, right.Source);
+      return sourceComparison != 0 ? sourceComparison : CompareComponents(left.Target, right.Target);
     }
     return left.AgentId.CompareTo(right.AgentId);
+  }
+
+  static int CompareComponents(BaseComponent left, BaseComponent right) {
+    return ComponentId(left).CompareTo(ComponentId(right));
+  }
+
+  static Guid ComponentId(BaseComponent component) {
+    return component ? component.GetComponent<EntityComponent>()?.EntityId ?? Guid.Empty : Guid.Empty;
   }
 
   static bool IsUnassignedOrder(OrderPhase phase) {

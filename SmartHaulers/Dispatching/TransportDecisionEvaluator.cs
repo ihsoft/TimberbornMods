@@ -37,13 +37,13 @@ sealed class TransportDecisionEvaluator(TransportDistanceEstimator distanceEstim
       TransportOrderSnapshot order, TransportAgentSnapshot agent, float routeDistance,
       out TransportCandidateScore score) {
     score = default;
-    if (!IsCandidate(agent)
+    if (!IsCandidate(order, agent)
         || !distanceEstimator.TryGetDistanceToInventory(order.Source, agent.WorldPosition, out var distance)) {
       return false;
     }
     var pickupEta = distance / agent.Speed;
     var deliveryEta = routeDistance / agent.Speed;
-    var statePenalty = StatePenalty(agent);
+    var statePenalty = StatePenalty(order, agent);
     var goodWeight = goodService.GetGood(order.Cargo.GoodId).Weight;
     var carryAmount = CarryAmount(order.Cargo.Amount, agent.Capacity, goodWeight);
     var requestedWeight = order.Cargo.Amount * goodWeight;
@@ -58,22 +58,42 @@ sealed class TransportDecisionEvaluator(TransportDistanceEstimator distanceEstim
     return true;
   }
 
-  static bool IsCandidate(TransportAgentSnapshot agent) {
+  static bool IsCandidate(TransportOrderSnapshot order, TransportAgentSnapshot agent) {
     return agent.IsTransportAgent
         && agent.Worker
         && agent.Speed > 0f
         && agent.Capacity > 0
+        && IsEligibleRole(order, agent)
         && (agent.State is TransportAgentState.Available
             or TransportAgentState.IdleWandering
             or TransportAgentState.WorkplaceIdle);
   }
 
-  static float StatePenalty(TransportAgentSnapshot agent) {
-    return agent.State switch {
+  static bool IsEligibleRole(TransportOrderSnapshot order, TransportAgentSnapshot agent) {
+    return order.Domain switch {
+        TransportOrderDomain.Hauling => agent.Role == TransportAgentRole.DedicatedHauler,
+        TransportOrderDomain.CommunityService => agent.Role
+            is TransportAgentRole.CommunityService
+            or TransportAgentRole.DedicatedHauler,
+        TransportOrderDomain.Construction => agent.Role == TransportAgentRole.Builder,
+        _ => false,
+    };
+  }
+
+  static float StatePenalty(TransportOrderSnapshot order, TransportAgentSnapshot agent) {
+    var statePenalty = agent.State switch {
         TransportAgentState.Available => 0f,
         TransportAgentState.IdleWandering => 1f,
         TransportAgentState.WorkplaceIdle => WorkplaceIdlePenalty(agent.WorkplaceRole),
         _ => 1000f,
+    };
+    return statePenalty + RolePenalty(order, agent);
+  }
+
+  static float RolePenalty(TransportOrderSnapshot order, TransportAgentSnapshot agent) {
+    return order.Domain switch {
+        TransportOrderDomain.CommunityService when agent.Role == TransportAgentRole.DedicatedHauler => 5f,
+        _ => 0f,
     };
   }
 
@@ -101,11 +121,23 @@ sealed class TransportDecisionEvaluator(TransportDistanceEstimator distanceEstim
   }
 
   static string StateClass(TransportAgentSnapshot agent) {
-    return agent.State switch {
+    var stateClass = agent.State switch {
         TransportAgentState.Available => "free",
         TransportAgentState.IdleWandering => "idle",
         TransportAgentState.WorkplaceIdle => WorkplaceIdleClass(agent.WorkplaceRole),
         _ => "busy",
+    };
+    return agent.Role == TransportAgentRole.DedicatedHauler ? stateClass : $"{stateClass}/{RoleClass(agent.Role)}";
+  }
+
+  static string RoleClass(TransportAgentRole role) {
+    return role switch {
+        TransportAgentRole.CommunityService => "community",
+        TransportAgentRole.Builder => "builder",
+        TransportAgentRole.Production => "production",
+        TransportAgentRole.Free => "free",
+        TransportAgentRole.Unknown => "unknown",
+        _ => "none",
     };
   }
 

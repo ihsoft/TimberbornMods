@@ -91,7 +91,7 @@ static class PossibleTransportOrderPlanner {
       return EmptyOrder(haulCandidate, requesterId, weightedBehavior, source: null, target);
     }
     foreach (var nutrient in breedingPod.NutrientsPerCycle) {
-      if (TryPlanBringingGood(districtCenter, target, nutrient.Id, _ => true, out var order)) {
+      if (TryPlanClosestBringingGood(districtCenter, target, nutrient.Id, _ => true, out var order)) {
         return WithRequest(haulCandidate, requesterId, weightedBehavior, order.source, order.target, order.goodAmount);
       }
       if (TryCreateCoveredOrder(
@@ -115,13 +115,14 @@ static class PossibleTransportOrderPlanner {
     foreach (var target in inventories.EnabledInventories) {
       foreach (var inputGood in target.InputGoods) {
         var weight = InputGoodWeight(target, inputGood, weightedBehavior.Weight);
-        if (TryPlanBringingGood(districtCenter, target, inputGood, _ => true, out var order)) {
+        var addedGood = false;
+        foreach (var order in PlanBringingGoodCandidates(districtCenter, target, inputGood, _ => true)) {
           orders.Add(WithRequest(
               haulCandidate, requesterId, weightedBehavior, weight, order.source, order.target, order.goodAmount));
           added = true;
-          continue;
+          addedGood = true;
         }
-        if (TryCreateCoveredOrder(
+        if (!addedGood && TryCreateCoveredOrder(
             haulCandidate, requesterId, weightedBehavior, weight, target, inputGood, out var coveredOrder)) {
           orders.Add(coveredOrder);
           added = true;
@@ -141,7 +142,8 @@ static class PossibleTransportOrderPlanner {
     if (!target || !singleGoodAllower || !singleGoodAllower.HasAllowedGood) {
       return EmptyOrder(haulCandidate, requesterId, weightedBehavior, source: null, target);
     }
-    if (TryPlanBringingGood(districtCenter, target, singleGoodAllower.AllowedGood, CanObtainFrom, out var order)) {
+    if (TryPlanClosestBringingGood(
+        districtCenter, target, singleGoodAllower.AllowedGood, CanObtainFrom, out var order)) {
       return WithRequest(haulCandidate, requesterId, weightedBehavior, order.source, order.target, order.goodAmount);
     }
     if (TryCreateCoveredOrder(
@@ -228,7 +230,7 @@ static class PossibleTransportOrderPlanner {
     }
   }
 
-  static bool TryPlanBringingGood(
+  static bool TryPlanClosestBringingGood(
       DistrictCenter districtCenter,
       Inventory target,
       string goodId,
@@ -250,6 +252,28 @@ static class PossibleTransportOrderPlanner {
     }
     order = (source, target, goodAmount);
     return true;
+  }
+
+  static IEnumerable<(Inventory source, Inventory target, GoodAmount goodAmount)> PlanBringingGoodCandidates(
+      DistrictCenter districtCenter,
+      Inventory target,
+      string goodId,
+      Predicate<Inventory> sourceFilter) {
+    var targetAccessible = target.GetEnabledComponent<Accessible>();
+    if (!targetAccessible) {
+      yield break;
+    }
+    var districtInventoryRegistry = districtCenter.GetComponent<DistrictInventoryRegistry>();
+    foreach (var source in districtInventoryRegistry.ActiveInventoriesWithStock(goodId)) {
+      var sourceAccessible = source.GetEnabledComponent<Accessible>();
+      if (!sourceAccessible || !sourceFilter(source) || !targetAccessible.FindRoadPath(sourceAccessible, out _)) {
+        continue;
+      }
+      var goodAmount = MaxTransferableAmount(source, target, goodId);
+      if (goodAmount.Amount > 0) {
+        yield return (source, target, goodAmount);
+      }
+    }
   }
 
   static bool TryPlanTakingGood(

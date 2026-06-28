@@ -13,6 +13,7 @@ readonly struct TransportAgentActivity {
   const string WanderRootBehaviorName = "WanderRootBehavior";
   const string WaitInsideIdlyWorkplaceBehaviorName = "WaitInsideIdlyWorkplaceBehavior";
   const string CarryRootBehaviorName = "CarryRootBehavior";
+  const string BringNutrientBehaviorName = "BringNutrientBehavior";
   const string NeedBehaviorSuffix = "NeedBehavior";
 
   public static readonly TransportAgentActivity Idle = new TransportAgentActivity(
@@ -79,6 +80,7 @@ readonly struct TransportAgentActivity {
 
   static bool IsTransportBehavior(string runningBehavior) {
     return runningBehavior is CarryRootBehaviorName
+        or BringNutrientBehaviorName
         or "BringNutrientWorkplaceBehavior"
         or "EmptyInventoriesWorkplaceBehavior"
         or "EmptyOutputWorkplaceBehavior"

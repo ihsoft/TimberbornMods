@@ -20,14 +20,15 @@ readonly struct TransportAgentSnapshot {
   public float Speed { get; }
   public int Capacity { get; }
   public TransportAgentState State { get; }
+  public TransportAgentRole Role { get; }
   public TransportWorkplaceRole WorkplaceRole { get; }
   public TransportAgentActivity Activity { get; }
   public bool IsTransportAgent { get; }
 
   public TransportAgentSnapshot(
       Guid entityId, Worker worker, string displayName, Vector3Int position, Vector3 worldPosition, float speed,
-      int capacity, TransportAgentState state, TransportWorkplaceRole workplaceRole, TransportAgentActivity activity,
-      bool isTransportAgent) {
+      int capacity, TransportAgentState state, TransportAgentRole role, TransportWorkplaceRole workplaceRole,
+      TransportAgentActivity activity, bool isTransportAgent) {
     EntityId = entityId;
     Worker = worker;
     DisplayName = displayName;
@@ -36,6 +37,7 @@ readonly struct TransportAgentSnapshot {
     Speed = speed;
     Capacity = capacity;
     State = state;
+    Role = role;
     WorkplaceRole = workplaceRole;
     Activity = activity;
     IsTransportAgent = isTransportAgent;
@@ -44,7 +46,7 @@ readonly struct TransportAgentSnapshot {
   public static TransportAgentSnapshot NotTransportAgent(Worker worker) {
     return new TransportAgentSnapshot(
         Guid.Empty, worker, FormatWorker(worker), default, default, 0f, 0, TransportAgentState.Available,
-        TransportWorkplaceRole.None, TransportAgentActivity.Idle, isTransportAgent: false);
+        TransportAgentRole.None, TransportWorkplaceRole.None, TransportAgentActivity.Idle, isTransportAgent: false);
   }
 
   public static string FormatWorker(Worker worker) {

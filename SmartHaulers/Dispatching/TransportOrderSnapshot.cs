@@ -22,6 +22,7 @@ readonly struct TransportOrderSnapshot {
   public Worker Worker => Assignment.Worker;
   public BaseComponent Requester => Origin.Requester;
   public string BehaviorName => Origin.BehaviorName;
+  public TransportOrderDomain Domain => Origin.Domain;
   public float Weight => Origin.Weight;
   public Inventory Source => Route.Source;
   public Inventory Target => Route.Target;

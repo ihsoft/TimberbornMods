@@ -13,6 +13,13 @@ readonly struct TransportOrderOrigin {
   public BaseComponent Requester { get; }
   public string BehaviorName { get; }
   public float Weight { get; }
+  public TransportOrderDomain Domain => Type switch {
+      TransportOrderOriginType.ConstructionJob => TransportOrderDomain.Construction,
+      TransportOrderOriginType.HaulBehavior when BehaviorName == "BringNutrient" =>
+          TransportOrderDomain.CommunityService,
+      TransportOrderOriginType.HaulBehavior => TransportOrderDomain.Hauling,
+      _ => TransportOrderDomain.Active,
+  };
   public bool HasRequester => RequesterId != Guid.Empty && Requester;
 
   TransportOrderOrigin(
