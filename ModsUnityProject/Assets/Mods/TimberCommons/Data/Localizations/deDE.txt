@@ -28,8 +28,8 @@ IgorZ.TimberCommons.Settings.IrrigationSystem.OverrideDesertLevelsForWaterTowers
 IgorZ.TimberCommons.Settings.IrrigationSystem.OverrideDesertLevelsForWaterTowersTooltip,"Ermöglicht das bewässerte Flächen leuchtend grün („gut bewässert“) angezeigt werden. Andernfalls wird die Spiellogik
 sie als „kaum bewässert“ anzeigen, da die Bewässerungstürme nur die Grundfeuchtigkeit angeben.",
 IgorZ.TimberCommons.Settings.WaterBuildingsSection,Wassergebundene Gebäude,
-IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnMechanicalPumps,Ermöglicht die Einstellung der maximalen Wasserstiefe am Ausgang der mechanischen Flüssigkeitspumpen,
-IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnFluidDumps,Ermöglicht die Einstellung der maximalen Wasserstiefe am Ausgang der Flüssigkeitsableiter,
+IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnMechanicalPumps,Ermöglicht die Einstellung der maximalen Wasserstiefe am Ausgang der mechanischen Pumpen,
+IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnFluidDumps,Ermöglicht die Einstellung der maximalen Wasserstiefe am Ausgang der Abflüsse,
 IgorZ.TimberCommons.Settings.WaterBuildings.UseLocalOutputLevelLimitScan,Lokalen Höhenbereich für den Wasserstand-Ausgangsregler verwenden,
 IgorZ.TimberCommons.Settings.WaterBuildings.OutputLevelLimitScanRadius,Bereich um den Wasserausgang prüfen,
 IgorZ.TimberCommons.Settings.WaterBuildings.OutputLevelLimitScanRadiusTooltip,"Wie weit um den Wasserausgang herum nach einer sinnvollen Obergrenze gesucht wird.

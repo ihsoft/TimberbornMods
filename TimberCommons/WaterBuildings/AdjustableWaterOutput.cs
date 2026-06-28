@@ -6,6 +6,7 @@ using IgorZ.TimberCommons.Settings;
 using Timberborn.BaseComponentSystem;
 using Timberborn.MapStateSystem;
 using Timberborn.Persistence;
+using Timberborn.TemplateSystem;
 using Timberborn.WaterBuildings;
 using Timberborn.WaterSystem;
 using Timberborn.WorldPersistence;
@@ -19,8 +20,8 @@ namespace IgorZ.TimberCommons.WaterBuildings;
 /// And, optionally, allows adjusting it in game via GUI.
 /// </summary>
 /// <remarks>
-/// This component automatically replaces any stock water output with the settings set to defaults. If a building has
-/// this component in the prefab, it will keep the custom settings.
+/// This component automatically replaces any stock water output with the settings set to defaults. If a building
+/// blueprint has this component, it will keep the custom settings.
 /// </remarks>
 sealed class AdjustableWaterOutput(
     IWaterService waterService, IThreadSafeWaterMap threadSafeWaterMap, MapSize mapSize,
@@ -28,8 +29,6 @@ sealed class AdjustableWaterOutput(
     : WaterOutput(waterService, threadSafeWaterMap, waterOverflowCalculator), IAwakableComponent, IPersistentEntity {
 
   const float DamHeight = 0.65f;
-  const string FluidDumpPrefabName = "FluidDump";
-
   #region API
 
   /// <summary>Maximum possible height of the water under the spillway.</summary>
@@ -70,13 +69,13 @@ sealed class AdjustableWaterOutput(
   /// <summary>Tells if the height marker should be shown when the building is selected.</summary>
   public bool ShowHeightMarker =>
       LimitOutputLevelEnabled
-      && (!_isFluidDump && WaterBuildingsSettings.AdjustWaterDepthAtSpillwayOnMechanicalPumps
-          || _isFluidDump && WaterBuildingsSettings.AdjustWaterDepthAtSpillwayOnFluidDumps);
+      && (!_usesDischargeSettings && WaterBuildingsSettings.AdjustWaterDepthAtSpillwayOnMechanicalPumps
+          || _usesDischargeSettings && WaterBuildingsSettings.AdjustWaterDepthAtSpillwayOnFluidDumps);
 
   /// <summary>Tells if GUI should be presented to change the limit in the game.</summary>
   public bool AllowAdjustmentsInGame =>
-      !_isFluidDump && WaterBuildingsSettings.AdjustWaterDepthAtSpillwayOnMechanicalPumps
-      || _isFluidDump && WaterBuildingsSettings.AdjustWaterDepthAtSpillwayOnFluidDumps;
+      !_usesDischargeSettings && WaterBuildingsSettings.AdjustWaterDepthAtSpillwayOnMechanicalPumps
+      || _usesDischargeSettings && WaterBuildingsSettings.AdjustWaterDepthAtSpillwayOnFluidDumps;
 
   /// <summary>Transformed coordinates of the water spillway.</summary>
   public Vector3Int TargetCoordinates => _waterCoordinatesTransformed;
@@ -109,7 +108,7 @@ sealed class AdjustableWaterOutput(
 
   #region Implementation
 
-  bool _isFluidDump;
+  bool _usesDischargeSettings;
   bool? _limitOutputLevelEnabled;
 
   /// <summary>
@@ -143,7 +142,7 @@ sealed class AdjustableWaterOutput(
   /// <inheritdoc/>
   public new void Awake() {
     base.Awake();
-    _isFluidDump = Name.StartsWith(FluidDumpPrefabName);
+    _usesDischargeSettings = DischargeTemplateMatcher.UsesDischargeSettings(GetComponent<TemplateSpec>());
   }
 
   #endregion

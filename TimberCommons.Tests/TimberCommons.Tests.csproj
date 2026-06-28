@@ -49,5 +49,8 @@
       <Compile Include="..\TimberCommons\IrrigationSystem\ModifyGrowableGrowthRangeEffectSpec.cs">
         <Link>TimberCommons\IrrigationSystem\ModifyGrowableGrowthRangeEffectSpec.cs</Link>
       </Compile>
+      <Compile Include="..\TimberCommons\WaterBuildings\DischargeTemplateMatcher.cs">
+        <Link>TimberCommons\WaterBuildings\DischargeTemplateMatcher.cs</Link>
+      </Compile>
     </ItemGroup>
 </Project>

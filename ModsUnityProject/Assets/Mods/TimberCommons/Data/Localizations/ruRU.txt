@@ -29,8 +29,8 @@ IgorZ.TimberCommons.Settings.IrrigationSystem.OverrideDesertLevelsForWaterTowers
 IgorZ.TimberCommons.Settings.IrrigationSystem.OverrideDesertLevelsForWaterTowersTooltip,"Указывает, что такие клетки должны отображаться ярко-зелеными (хорошо увлажненные). В противном случае стандартная
 логика будет показывать их как 'едва увлаженные', так как орошающие башни дают только базовый уровень влажности.",
 IgorZ.TimberCommons.Settings.WaterBuildingsSection,"Водные сооружения",
-IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnMechanicalPumps,"Позволять менять максимальный уровень воды на водосбросе универсальных насосов",
-IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnFluidDumps,"Позволять менять максимальный уровень воды на водосбросе сливов для жидкостей",
+IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnMechanicalPumps,"Позволять менять максимальный уровень воды на выходе механических насосов",
+IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnFluidDumps,"Позволять менять максимальный уровень воды на выходе водосбросов",
 IgorZ.TimberCommons.Settings.WaterBuildings.UseLocalOutputLevelLimitScan,"Использовать локальный диапазон высот для слайдера уровня воды на выходе",
 IgorZ.TimberCommons.Settings.WaterBuildings.OutputLevelLimitScanRadius,"Область проверки рядом с выходом воды",
 IgorZ.TimberCommons.Settings.WaterBuildings.OutputLevelLimitScanRadiusTooltip,"Насколько далеко от выхода воды искать удобный верхний предел слайдера.

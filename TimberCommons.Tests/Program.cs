@@ -86,6 +86,12 @@ static class Program {
           ModifyGrowableGrowthRangeEffectTests.HonorsTemplateAndComponentFilters),
       ("ModifyGrowableGrowthRangeEffect handles new initialized entities",
           ModifyGrowableGrowthRangeEffectTests.HandlesNewInitializedEntities),
+      ("DischargeTemplateMatcher recognizes current discharge template names",
+          DischargeTemplateMatcherTests.RecognizesCurrentDischargeTemplateNames),
+      ("DischargeTemplateMatcher recognizes legacy discharge names through backward-compatible aliases",
+          DischargeTemplateMatcherTests.RecognizesLegacyDischargeTemplateNamesThroughBackwardCompatibleAliases),
+      ("DischargeTemplateMatcher keeps pump template names out of discharge settings",
+          DischargeTemplateMatcherTests.KeepsPumpTemplateNamesOutOfDischargeSettings),
   ];
 
   static int Main() {

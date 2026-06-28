@@ -1,3 +1,6 @@
+# v1.18.1 (TBD)
+* [Fix] Discharge buildings use the discharge water level settings after the Timberborn 1.1 rename.
+
 # v1.18.0 (June 22nd, 2026)
 * [Update] Support game version `1.1.0.2`, including the updated water output overflow logic.
 * [Fix] Irrigation towers no longer react to terrain or blocking changes after leaving the finished state.

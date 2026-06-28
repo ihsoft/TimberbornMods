@@ -29,8 +29,8 @@ IgorZ.TimberCommons.Settings.IrrigationSystem.OverrideDesertLevelsForWaterTowers
 IgorZ.TimberCommons.Settings.IrrigationSystem.OverrideDesertLevelsForWaterTowersTooltip,"Specifies whether the tiles should look shiny green (well moisturized). Otherwise, the stock logic
 will show them as 'barely moisturized' since the irrigation towers give only the base moisture level.",
 IgorZ.TimberCommons.Settings.WaterBuildingsSection,"Water buildings",
-IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnMechanicalPumps,"Allow setting maximum water level at the spillway of the mechanical pumps",
-IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnFluidDumps,"Allow setting maximum water level at the spillway of the liquid drops",
+IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnMechanicalPumps,"Allow setting maximum water level at the spillway of Mechanical Pumps",
+IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnFluidDumps,"Allow setting maximum water level at the spillway of Discharges",
 IgorZ.TimberCommons.Settings.WaterBuildings.UseLocalOutputLevelLimitScan,"Use local height range for output water level slider",
 IgorZ.TimberCommons.Settings.WaterBuildings.OutputLevelLimitScanRadius,"Area checked around water output",
 IgorZ.TimberCommons.Settings.WaterBuildings.OutputLevelLimitScanRadiusTooltip,"How far from the water output to look for the slider's highest useful level.
