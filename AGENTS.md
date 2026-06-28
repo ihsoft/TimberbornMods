@@ -74,7 +74,8 @@ unrelated code fixes, edit agent rules, or edit the GitHub Wiki unless the user 
 
 ### Wiki editor
 
-The Wiki editor owns the GitHub Wiki in `R:\TimberbornMods.wiki`.
+The Wiki editor owns the separate GitHub Wiki checkout. The expected local layout is a sibling repository named
+`<repo-root>.wiki`, not a folder inside the main repository.
 
 The Wiki editor follows `docs/timberborn-wiki-editing-rules-for-ai-agents.md`. The Wiki editor should not implement
 code changes, publish mods, or edit agent rules unless the user explicitly expands the task.
@@ -189,6 +190,32 @@ Keep repository-wide rules in this root `AGENTS.md` or in files under `docs/`.
 - Prefer extension over replacement.
 - Prefer dependency injection over Harmony when possible.
 - Use Harmony only when no reasonable extension point exists.
+
+## Portable local paths
+
+Use portable path conventions in repository rules and documentation:
+
+- `<repo-root>` means the current main repository root.
+- `<repo-root>.wiki` means the expected sibling GitHub Wiki checkout.
+- `_GAME!`, `_MODS!`, `_WORKSHOP!`, and `_LOGS!` are local environment aliases discovered from the current
+  checkout/config/tools, not portable absolute paths.
+
+Do not encode machine-specific absolute paths in repository rules.
+
+If an expected local path, alias, checkout, generated reference folder, or tool is missing, stop and ask the user. Do
+not merely report that it is missing. Explain what the missing item is used for and propose the next setup action, such
+as locating an existing path, creating a local link, cloning the Wiki checkout, or continuing without the optional
+resource when the current task does not need it.
+
+The GitHub Wiki is a separate Git repository. The expected URL is:
+
+```text
+https://github.com/ihsoft/TimberbornMods.wiki.git
+```
+
+The recommended local checkout is the sibling path `<repo-root>.wiki`. If it is missing and Wiki work is needed, ask
+whether to clone it there, locate an existing checkout, or continue without Wiki edits. Do not create Wiki pages inside
+the main repository.
 
 ## Research before implementation
 

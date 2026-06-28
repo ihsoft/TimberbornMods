@@ -5,16 +5,26 @@ Use these rules when editing or reviewing the TimberbornMods GitHub Wiki.
 The Wiki repository is separate from the main mod repository:
 
 ```text
-Main repository: R:\TimberbornMods
-Wiki repository: R:\TimberbornMods.wiki
+Main repository: <repo-root>
+Wiki repository: <repo-root>.wiki
 Wiki branch: master
 ```
+
+The Wiki checkout is a separate Git repository, not a directory inside the main repository. The expected Git URL is:
+
+```text
+https://github.com/ihsoft/TimberbornMods.wiki.git
+```
+
+If the sibling `<repo-root>.wiki` checkout is missing, ask the user whether to clone it there, locate an existing Wiki
+checkout, or continue without Wiki edits. Explain that Wiki commits must be made in the separate Wiki repository. Do
+not create Wiki pages inside the main repository.
 
 Do not mix main-repository commits and Wiki commits.
 
 ## Source of truth
 
-For Wiki content, the source of truth is the current `R:\TimberbornMods` repository state, not the current Wiki text,
+For Wiki content, the source of truth is the current `<repo-root>` repository state, not the current Wiki text,
 changelog entries, release notes, or suggestions from other agents.
 
 Before editing a Wiki page, verify public behavior against the mod code, package data, localizations, blueprints, or

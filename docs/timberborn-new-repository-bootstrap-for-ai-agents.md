@@ -40,6 +40,10 @@ Before creating the first mod:
 
 Do not invent local paths.
 
+When something important is missing, do not merely report the missing item. Explain what it is used for and propose the
+next setup action, such as locating an existing path, creating a local link, generating references, or skipping an
+optional resource if the current task does not need it.
+
 Do not create a mod project until local references and the expected project layout are clear.
 
 ---
@@ -57,11 +61,11 @@ Ask the user where these links should point:
 | `_MODS!` | User Timberborn mods folder |
 | `_LOGS!` | Timberborn LocalLow folder with logs and settings |
 
-Common Windows examples:
+Common Windows target examples:
 
 ```text
-_GAME!      -> R:\Program Files (x86)\Steam\steamapps\common\Timberborn
-_WORKSHOP!  -> R:\Program Files (x86)\Steam\steamapps\workshop\content\1062090
+_GAME!      -> <Steam library>\steamapps\common\Timberborn
+_WORKSHOP!  -> <Steam library>\steamapps\workshop\content\1062090
 _MODS!      -> %USERPROFILE%\Documents\Timberborn\Mods
 _LOGS!      -> %USERPROFILE%\AppData\LocalLow\Mechanistry\Timberborn
 ```
@@ -201,5 +205,16 @@ Ask concise questions for missing local setup information:
 - Should local links be created as Windows junctions?
 - Should game assemblies be referenced through `_GAME!`, copied into `Dependencies/GameRoot`, or linked another way?
 - What should the first mod do, in player-visible terms?
+
+When asking, include a short setup proposal. For example:
+
+- If `_GAME!` is missing, explain that the Timberborn install path is needed for game assemblies, publicized
+  references, and asset extraction, then ask whether to create a local link to the install folder.
+- If `_MODS!` is missing, explain that the local mods folder is needed for real-game validation builds, then ask
+  whether to create a local link to the user's Timberborn mods folder.
+- If `_WORKSHOP!` or `_LOGS!` is missing, explain what the current task would use it for before asking to configure it.
+- If the Wiki checkout is missing, explain that GitHub Wiki pages live in a separate repository and ask whether to
+  clone `https://github.com/ihsoft/TimberbornMods.wiki.git` into sibling path `<repo-root>.wiki`, locate an existing
+  checkout, or continue without Wiki edits.
 
 After the user answers, set up the repository and continue with the normal Timberborn modding workflow.
