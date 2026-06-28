@@ -342,6 +342,10 @@ An existing Mod.IO token for one mod can be used to read descriptions for the ot
 game scope. If the available tokens cannot read a mod description, stop and ask the user to create or provide a new
 token.
 
+When the user explicitly asks to update a Mod.IO description, prefer `tools/update-modio-description.ps1`. The script
+does a dry run by default, updates only when `-Publish` is passed, supports explicit `-AccessTokenPath`, and verifies
+the live Mod.IO visible HTML text after upload.
+
 When the user explicitly asks to update a Steam description, prefer `tools/update-steam-description.ps1`. The script
 does a dry run by default, updates only when `-Publish` is passed, and verifies the live Steam description after upload.
 Do not hand-write Steam description VDFs unless the script is unavailable and the user explicitly approves the risk.
