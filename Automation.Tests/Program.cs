@@ -16,6 +16,8 @@ static class Program {
       ("AutomationBehavior forwards lifecycle callbacks to existing dynamic components",
           AutomationBehaviorTests.ForwardsLifecycleCallbacks),
       ("AutomationBehavior delete forwards to dynamic components", AutomationBehaviorTests.DeleteEntityForwardsToComponents),
+      ("AutomationBehavior rejects shared dynamic component instances",
+          AutomationBehaviorTests.SharedDynamicComponentInstanceIsRejected),
       ("GameAutomationConflictDetector ignores FillValve manual target rules",
           GameAutomationConflictDetectorTests.IgnoresFillValveManualTargetRules),
       ("GameAutomationConflictDetector ignores ThrottlingValve manual flow rules",

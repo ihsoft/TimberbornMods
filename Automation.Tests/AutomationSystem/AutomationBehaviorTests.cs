@@ -91,12 +91,23 @@ static class AutomationBehaviorTests {
     Assert.Equal("DeleteEntity", component.EventsText);
   }
 
+  public static void SharedDynamicComponentInstanceIsRejected() {
+    var sharedComponent = new RecordingDynamicComponent();
+    var first = new Harness(new SingletonContainer(sharedComponent));
+    var second = new Harness(new SingletonContainer(sharedComponent));
+
+    first.Behavior.GetOrCreate<RecordingDynamicComponent>();
+
+    Assert.Throws<InvalidOperationException>(() => second.Behavior.GetOrCreate<RecordingDynamicComponent>());
+  }
+
   sealed class Harness {
-    public readonly RecordingContainer Container = new();
+    public readonly RecordingContainer Container;
     public readonly AutomationBehavior Behavior = new();
 
-    public Harness() {
-      SetDependencyContainer(Container);
+    public Harness(IContainer container = null) {
+      Container = container as RecordingContainer ?? new RecordingContainer();
+      SetDependencyContainer(container ?? Container);
       Behavior.Name = "TestBehavior";
       Behavior.SetComponent(new BlockObject());
       Behavior.InjectDependencies(new AutomationService());
@@ -119,6 +130,16 @@ static class AutomationBehaviorTests {
     public object GetInstance(Type type) {
       var component = Activator.CreateInstance(type);
       CreatedComponents.Add(component);
+      return component;
+    }
+
+    public T GetInstance<T>() {
+      return (T)GetInstance(typeof(T));
+    }
+  }
+
+  sealed class SingletonContainer(object component) : IContainer {
+    public object GetInstance(Type type) {
       return component;
     }
 

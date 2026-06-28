@@ -2,6 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.EntitySystem;
@@ -53,6 +54,10 @@ public abstract class AbstractDynamicComponent {
   }
 
   internal void Initialize(AutomationBehavior behavior) {
+    if (AutomationBehavior && AutomationBehavior != behavior) {
+      throw new InvalidOperationException(
+          $"Dynamic component {GetType().FullName} is already owned by {AutomationBehavior}");
+    }
     AutomationBehavior = behavior;
   }
 }
