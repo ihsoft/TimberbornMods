@@ -7,7 +7,7 @@ Donations are completely optional. If you enjoy the mods and want to say thanks,
 [url=https://www.paypal.com/donate/?hosted_button_id=8RPFC884ZEV9L]Donate via PayPal[/url]
 
 [h1]Overview[/h1]
-This mod allows assigning a set of rules to a building. The rules execute logic "If This Then That" (a.k.a. IFTTT). Each rule has a condition to check and an action to execute if the condition evaluates to "true." The rules are written with a simple scripting language. However, it is not required to learn this language to make simple rules, since for this purpose a UI is provided. The UI is designed to be simple and intuitive, so you can easily create rules without writing any code.
+This mod allows assigning a set of rules to a building. The rules execute logic 'If This Then That' (a.k.a. IFTTT). Each rule has a condition to check and an action to execute if the condition evaluates to 'true.' The rules are written with a simple scripting language, but simple rules can be made through the UI without writing code.
 
 If you feel like you can learn the scripting language, you can do so. The scripting language is simple and easy to learn. Read about it [url=https://github.com/ihsoft/TimberbornMods/wiki/Automation-(scripting)]here[/url].
 
@@ -89,7 +89,7 @@ Here’s the full list of what is supported as of now:
 [/list]
 
 [h1]Questions and discussions[/h1]
-Note that Steam has a special tab called "Discussions." It is a better place to ask questions or discuss features than doing so in the comments. I will do my best to answer all questions there, so don't hesitate to ask.
+Note that Steam has a special tab called 'Discussions.' It is a better place to ask questions or discuss features than doing so in the comments. I will do my best to answer all questions there, so don't hesitate to ask.
 
 [hr][/hr]
 Discord:
