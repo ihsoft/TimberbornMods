@@ -374,6 +374,32 @@ Do not add blank lines after every statement.
 
 * * *
 
+## XML documentation
+
+Public types and public members should have XML documentation.
+
+This applies to public methods, properties, constructors, nested types, and reusable public helpers. Documentation is
+part of the public API contract, even when the member name looks self-explanatory.
+
+Avoid documentation that only repeats the member name in prose. If the first draft sounds like a copy of the name, think
+again about what a caller needs to know:
+
+  * the intended use case,
+  * which inputs are accepted,
+  * what is escaped, encoded, parsed, cached, or persisted,
+  * return values and failure modes,
+  * side effects,
+  * ordering, lifecycle, or threading expectations,
+  * compatibility promises for saved data, scripts, public APIs, or other mods.
+
+Example: a method named `EscapeSpecialSymbols` still needs documentation explaining which symbols are escaped and for
+which target format or parser.
+
+Private and internal members do not need XML documentation by default, but add it when a helper defines a subtle
+contract that future maintainers are likely to misuse.
+
+* * *
+
 ## General philosophy
 
 The desired result should look like compact Java-style C#.
