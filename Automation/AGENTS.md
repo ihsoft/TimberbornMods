@@ -60,6 +60,11 @@ Before adding a new Automation scriptable component with callbacks, ticking, tra
 at least one nearby component with the same lifecycle shape and follow that lifecycle pattern unless there is a reason
 not to.
 
+Automation dynamic components derived from `AbstractDynamicComponent` and created through
+`AutomationBehavior.GetOrCreate` are building-owned instances. Register these dynamic component types in DI as
+`AsTransient()`, never `AsSingleton()`, so runtime state, saved state, callbacks, signals, and owner references cannot
+leak between buildings.
+
 When adding a new Automation signal family, decide whether each signal is building-scoped or global.
 
 When adding an Automation `SignalDef`, always set `Scope` explicitly, even when it is
