@@ -26,6 +26,25 @@ static class InventoryScriptableComponentTests {
     Assert.Equal("Inventory.OutputGood.Plank", signalNames[1]);
   }
 
+  public static void EncodesUnsafeGoodIds() {
+    var component = CreateComponent();
+    var inventory = CreateInventory(inputGoods: ["Log_Rewrite"], outputGoods: ["123Food"]);
+    inventory.SetAmount("Log_Rewrite", 17);
+    inventory.SetAmount("123Food", 8);
+    var behavior = CreateBehavior(inventory);
+
+    var signalNames = component.GetSignalNamesForBuilding(behavior);
+    var inputDef = component.GetSignalDefinition("Inventory.InputGood.LogX5FRewrite", behavior);
+    var outputDef = component.GetSignalDefinition("Inventory.OutputGood.X3123Food", behavior);
+
+    Assert.Equal("Inventory.InputGood.LogX5FRewrite", signalNames[0]);
+    Assert.Equal("Inventory.OutputGood.X3123Food", signalNames[1]);
+    Assert.Equal(17, component.GetSignalSource("Inventory.InputGood.LogX5FRewrite", behavior)().AsInt);
+    Assert.Equal(8, component.GetSignalSource("Inventory.OutputGood.X3123Food", behavior)().AsInt);
+    Assert.Equal("Inventory.InputGood.LogX5FRewrite", inputDef.ScriptName);
+    Assert.Equal("Inventory.OutputGood.X3123Food", outputDef.ScriptName);
+  }
+
   public static void ExposesAllowedGoodsSignalsForYielderInventory() {
     var component = CreateComponent();
     var behavior = CreateBehavior(CreateInventory(isYielderInventory: true));

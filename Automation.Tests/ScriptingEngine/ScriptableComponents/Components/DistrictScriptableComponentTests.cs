@@ -45,6 +45,31 @@ static class DistrictScriptableComponentTests {
     Assert.Equal("District.ResourceCapacity.Log", signalNames[6]);
   }
 
+  public static void EncodesUnsafeResourceSignalGoodIds() {
+    var component = CreateComponent();
+    var districtCenter = CreateDistrictCenter();
+    var resourceCounter = districtCenter.GetComponent<DistrictResourceCounter>();
+    resourceCounter._stockCounter.SetInputOutputStock("Log_Rewrite", 4);
+    resourceCounter._stockCounter.SetOutputStock("Log_Rewrite", 3);
+    resourceCounter._capacityCounter.SetInputOutputCapacity("Log_Rewrite", 12);
+    var behavior = CreateBehavior(districtCenter, withDynamicComponents: true);
+    var stockListener = new TestSignalListener(behavior);
+
+    var signalNames = component.GetSignalNamesForBuilding(behavior);
+    component.RegisterSignalChangeCallback(Signal("District.ResourceStock.LogX5FRewrite", behavior), stockListener);
+    resourceCounter._stockCounter.SetInputOutputStock("Log_Rewrite", 8);
+    component.Tick();
+
+    Assert.Equal("District.ResourceStock.LogX5FRewrite", signalNames[3]);
+    Assert.Equal("District.ResourceCapacity.LogX5FRewrite", signalNames[4]);
+    Assert.Equal(11, component.GetSignalSource("District.ResourceStock.LogX5FRewrite", behavior)().AsInt);
+    Assert.Equal(12, component.GetSignalSource("District.ResourceCapacity.LogX5FRewrite", behavior)().AsInt);
+    Assert.Equal("IgorZ.Automation.Scriptable.District.Signal.ResourceStock:Rewrite Logs",
+        component.GetSignalDefinition("District.ResourceStock.LogX5FRewrite", behavior).DisplayName);
+    Assert.Equal(1, stockListener.Calls);
+    Assert.Equal("District.ResourceStock.LogX5FRewrite", stockListener.LastSignalName);
+  }
+
   public static void HidesSignalsForMissingDistrictBuilding() {
     var component = CreateComponent();
 
@@ -226,6 +251,7 @@ static class DistrictScriptableComponentTests {
       return id switch {
           "Log" => Good(id, "Logs"),
           "Plank" => Good(id, "Boards"),
+          "Log_Rewrite" => Good(id, "Rewrite Logs"),
           _ => null,
       };
     }

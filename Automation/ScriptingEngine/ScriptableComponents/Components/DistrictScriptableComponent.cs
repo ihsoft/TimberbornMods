@@ -47,13 +47,13 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
           foreach (var goodId in tracker.GoodCapacity.Keys.ToArray()) { // Need a copy!
             var value = resourceCounter._capacityCounter.GetInputOutputCapacity(goodId);
             tracker.GoodCapacity[goodId] = value;
-            tracker.TriggerSignalUpdate(ResourceCapacitySignalNamePrefix + goodId);
+            tracker.TriggerSignalUpdate(ResourceCapacitySignalNamePrefix + SignalNameSegment.Encode(goodId));
           }
           foreach (var goodId in tracker.GoodStock.Keys.ToArray()) { // Need a copy!
             var value = resourceCounter._stockCounter.GetInputOutputStock(goodId)
                 + resourceCounter._stockCounter.GetOutputStock(goodId);
             tracker.GoodStock[goodId] = value;
-            tracker.TriggerSignalUpdate(ResourceStockSignalNamePrefix + goodId);
+            tracker.TriggerSignalUpdate(ResourceStockSignalNamePrefix + SignalNameSegment.Encode(goodId));
           }
         }
       }
@@ -65,14 +65,14 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
             continue;
           }
           tracker.GoodCapacity[goodId] = 0;
-          tracker.TriggerSignalUpdate(ResourceCapacitySignalNamePrefix + goodId);
+          tracker.TriggerSignalUpdate(ResourceCapacitySignalNamePrefix + SignalNameSegment.Encode(goodId));
         }
         foreach (var goodId in tracker.GoodStock.Keys.ToArray()) { // Need a copy!
           if (tracker.GoodStock[goodId] == 0) {
             continue;
           }
           tracker.GoodStock[goodId] = 0;
-          tracker.TriggerSignalUpdate(ResourceStockSignalNamePrefix + goodId);
+          tracker.TriggerSignalUpdate(ResourceStockSignalNamePrefix + SignalNameSegment.Encode(goodId));
         }
       }
     }
@@ -107,8 +107,8 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
       availableGoodIds.AddRange(resourceCounter._capacityCounter._outputCapacity.Keys);
       var sortedGoodIds = availableGoodIds.OrderBy(x => _goodService.GetGoodOrNull(x).PluralDisplayName.Value);
       foreach (var goodId in sortedGoodIds) {
-        res.Add(ResourceStockSignalNamePrefix + goodId);
-        res.Add(ResourceCapacitySignalNamePrefix + goodId);
+        res.Add(ResourceStockSignalNamePrefix + SignalNameSegment.Encode(goodId));
+        res.Add(ResourceCapacitySignalNamePrefix + SignalNameSegment.Encode(goodId));
       }
     }
 
@@ -297,11 +297,16 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
     if (parts.Length != 3) { // Callers must check it!
       throw new InvalidOperationException($"Malformed resource signal name: {signalName}");
     }
-    var goodSpec = _goodService.GetGoodOrNull(parts[2]);
+    var goodSpec = _goodService.GetGoodOrNull(parts[2])
+        ?? _goodService.GetGoodOrNull(DecodeResourceSignalNameSegment(parts[2]));
     if (goodSpec == null) {
       throw new ScriptError.ParsingError("Unknown resource name: " + parts[2]);
     }
     return goodSpec;
+  }
+
+  static string DecodeResourceSignalNameSegment(string signalNameSegment) {
+    return SignalNameSegment.TryDecode(signalNameSegment, out var decodedGoodId) ? decodedGoodId : signalNameSegment;
   }
 
   #endregion
@@ -331,14 +336,14 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
       var district = AutomationBehavior.GetComponentOrFail<DistrictBuilding>().District;
       var resourceCounter = district?.GetComponentInChildren<DistrictResourceCounter>();
       if (signalName.StartsWith(ResourceCapacitySignalNamePrefix)) {
-        var goodId = signalName[ResourceCapacitySignalNamePrefix.Length..];
+        var goodId = DecodeResourceSignalNameSegment(signalName[ResourceCapacitySignalNamePrefix.Length..]);
         if (!GoodCapacity.ContainsKey(goodId)) {
           var value = resourceCounter != null ? resourceCounter.GetResourceCount(goodId).InputOutputCapacity : 0;
           GoodCapacity.Add(goodId, value);
           HostedDebugLog.Fine(AutomationBehavior, "Start tracking district signal: {0}, value={1}", signalName, value);
         }
       } else if (signalName.StartsWith(ResourceStockSignalNamePrefix)) {
-        var goodId = signalName[ResourceStockSignalNamePrefix.Length..];
+        var goodId = DecodeResourceSignalNameSegment(signalName[ResourceStockSignalNamePrefix.Length..]);
         if (!GoodStock.ContainsKey(goodId)) {
           var value = resourceCounter != null ? resourceCounter.GetResourceCount(goodId).AvailableStock : 0;
           GoodStock.Add(goodId, value);
@@ -357,7 +362,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
       if (!signalName.StartsWith(ResourceCapacitySignalNamePrefix)) {
         return false;
       }
-      var goodId = signalName[ResourceCapacitySignalNamePrefix.Length..];
+      var goodId = DecodeResourceSignalNameSegment(signalName[ResourceCapacitySignalNamePrefix.Length..]);
       HostedDebugLog.Fine(AutomationBehavior, "Stop tracking district signal: {0}", signalName);
       if (!GoodCapacity.Remove(goodId)) { // It's an abnormal situation.
         throw new InvalidOperationException($"Cannot remove resource capacity for: {signalName}");

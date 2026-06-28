@@ -224,6 +224,9 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\SignalDef.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\SignalDef.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\SignalNameSegment.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\SignalNameSegment.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\ValueDef.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\ValueDef.cs</Link>
       </Compile>

@@ -197,7 +197,7 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
 
   static string MakeSignalName(string goodId, Inventory inventory) {
     var prefix = inventory.OutputGoods.Contains(goodId) ? OutputGoodSignalNamePrefix : InputGoodSignalNamePrefix;
-    return prefix + goodId;
+    return prefix + SignalNameSegment.Encode(goodId);
   }
 
   static (bool isInput, string goodId, int capacity) ParseSignalName(
@@ -207,12 +207,12 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     var isInput = false;
     if (name.StartsWith(InputGoodSignalNamePrefix)) {
       isInput = true;
-      goodId = name[InputGoodSignalNamePrefix.Length..];
+      goodId = ResolveGoodId(name[InputGoodSignalNamePrefix.Length..], inventory.InputGoods.Contains);
       if (!inventory.InputGoods.Contains(goodId)) {
         goodId = null;
       }
     } else if (name.StartsWith(OutputGoodSignalNamePrefix)) {
-      goodId = name[OutputGoodSignalNamePrefix.Length..];
+      goodId = ResolveGoodId(name[OutputGoodSignalNamePrefix.Length..], inventory.OutputGoods.Contains);
       if (!inventory.OutputGoods.Contains(goodId)) {
         goodId = null;
       }
@@ -228,6 +228,13 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     return forceAllowedGoods
         ? (isInput, goodId, inventory.AllowedGoods.First(x => x.StorableGood.GoodId == goodId).Amount)
         : (isInput, goodId, inventory.LimitedAmount(goodId));
+  }
+
+  static string ResolveGoodId(string signalNameSegment, Func<string, bool> hasGood) {
+    if (hasGood(signalNameSegment)) {
+      return signalNameSegment;
+    }
+    return SignalNameSegment.TryDecode(signalNameSegment, out var decodedGoodId) ? decodedGoodId : signalNameSegment;
   }
 
   string LocGoodSignal(string name, string goodId) {

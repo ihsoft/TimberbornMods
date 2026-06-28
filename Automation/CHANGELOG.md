@@ -1,3 +1,6 @@
+# v4.6.2 (TBD)
+* [Fix] Resource signals could break when another mod added goods with script-unsafe IDs.
+
 # v4.6.1 (June 21st, 2026)
 * [Fix] Open dropdowns could close every game tick while pinned custom signals were updating.
 
