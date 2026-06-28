@@ -155,7 +155,20 @@ The configured source folder is the only input for release package contents. Age
 report what is missing. Agents must not repair, supplement, or reinterpret it using previous archives, backup folders,
 similarly named folders, or inferred state.
 
-If the source folder does not contain a game-version folder, the release does not contain it.
+Treat `version-*` folders as compatibility lanes, not as mandatory folders for every Timberborn game version. Add or
+export a new `version-X.X` folder only when the release needs a distinct compatibility lane, such as stable versus
+experimental or an incompatible game API/data change. If the source folder does not contain a game-version folder, the
+release does not contain it.
+
+For LocalModFolder releases with Unity-exported assets, use this order:
+
+1. Update repository version files first, including `release.json`, `directory.build.props`, and Unity manifest data as
+   needed.
+2. Run the Unity export for the selected compatibility lane, so the exported source folder and `version-X.X` lane are
+   refreshed or created from current Unity assets.
+3. Build the C# project with `ModPath` pointing at the exported mod root.
+4. Verify that the expected DLL/XML were copied into the selected lane's `Scripts` folder and that the DLL assembly
+   version matches the intended release.
 
 Before building a release ZIP from `Package.SourcePath`, make sure the current code has been built into that exact
 source folder. For C# mods, run the mod project build with the real `ModPath` and verify that the expected DLL/XML
@@ -168,9 +181,11 @@ consumers: the Unity `manifest.json` version is used by the game, and `release.j
 If `directory.build.props` was updated after a build or package dry run, treat the previous DLL and ZIP as stale and
 rebuild/repackage before publishing.
 
-If the release package is built from a local Unity-exported mod folder, ask the user to confirm that Unity assets were
-exported before building the ZIP. Do this before packaging, because missing or stale asset bundle changes cannot be
-detected reliably from C# build output.
+If the release package is built from a local Unity-exported mod folder, do not rely on a manual "Unity was exported"
+assumption when release tooling can perform the export. Export the selected compatibility lane before the release C#
+build when possible. If export tooling is unavailable, ask the user to confirm that Unity assets were exported before
+building the ZIP. Do this before packaging, because missing or stale asset bundle changes cannot be detected reliably
+from C# build output.
 
 After the user confirms that Unity assets were exported, verify the `manifest.json` version inside the configured
 `Package.SourcePath` or final package source. Do not rely only on the Unity project file, because the Unity project and
