@@ -21,6 +21,18 @@ failure as evidence about the platform state.
 
 Do not skip required platform verification because a sandboxed network request failed.
 
+For publishing tasks, these are expected host or network operations and may require an escalated run when the sandbox
+cannot access the real host state: real `_MODS!` build and inspection, Steam dry runs and uploads, Mod.IO dry runs and
+uploads, platform-description verification, GitHub issue search/comment/close, and post-upload Mod.IO parent or live
+file checks.
+
+Keep elevation scoped to the release workflow step that needs it. Ordinary repository reads, local diffs, and local
+planning do not need elevation only because the task is a release.
+
+Prefer grouping read-only post-upload Mod.IO parent, file, virus-scan, platform-status, and live checks into one
+verification command when practical. Do not split them into several approvals unless a follow-up check depends on the
+previous result.
+
 ## Dirty worktree before publishing
 
 Before uploading a mod release, check for uncommitted changes that belong to the target mod or to shared
@@ -59,6 +71,10 @@ Do not run Steam and Mod.IO release scripts for the same mod in parallel.
 The publish scripts may share staging and output paths, such as `.tools/release-staging/<ModName>-local` and generated
 ZIP paths under the local mod source or output folder. Run dry runs and uploads sequentially unless the scripts have
 been changed to use unique staging roots per invocation.
+
+If stale Mod.IO or Steam staging output blocks packaging, it is safe to clear only the target mod's own staging
+directory, such as `.tools/release-staging/<ModName>-local`, after resolving the path and verifying that it is inside
+`.tools/release-staging`. Do not clean broader staging or output directories as a convenience.
 
 Recommended order:
 
@@ -225,6 +241,10 @@ Steam Workshop and Mod.IO when platform access is available. This synchronizatio
 release.
 
 Use `tools/verify-platform-descriptions.ps1` for this check when possible.
+
+When verifying descriptions for a specific release, gate the release on the requested mod and platform targets. If a
+shared verification command reports mismatches for unrelated mods, report them as background but do not block the
+current mod release because of those unrelated mismatches.
 
 If a local description and the published platform description differ, stop. Do not publish until the user decides which
 side is correct:
