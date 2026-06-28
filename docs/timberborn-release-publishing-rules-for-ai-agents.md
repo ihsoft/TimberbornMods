@@ -251,12 +251,14 @@ MaximumGameVersion: 1.1.99.99
 
 Do not claim support for a game version unless the final package contains the corresponding `version-X.X` folder.
 
-For Mod.IO uploads, prefer the target mod's own token file. If the per-mod token is missing, another known owner token
-for the same Mod.IO account may be used only through an explicit access-token path while keeping the target mod's own
-Mod.IO config. After upload, verify that the target mod's parent modfile ID and version point to the uploaded file.
+For Mod.IO uploads, prefer the target mod's own token file when it exists. In this repository, local Mod.IO token files
+are equivalent owner tokens for the same account and game scope. If the per-mod token is missing but another known valid
+owner token file exists, pass it explicitly with `-AccessTokenPath` while keeping the target mod's own Mod.IO config.
+Do not ask solely because the token filename belongs to another mod. Do not copy, rename, or guess token files.
+
 If the publish script stops only because the target mod's token file is missing, either create the target mod's local
-token file when the user provides one, or rerun with an explicit `-AccessTokenPath` to another known owner token. Do not
-copy, rename, or guess token files.
+token file when the user provides one, or rerun with an explicit `-AccessTokenPath` to another known owner token. After
+upload, verify that the target mod's parent modfile ID and version point to the uploaded file.
 
 After uploading a Mod.IO file, verify that the uploaded file becomes the live file. If Mod.IO reports the file as
 uploaded but not live after scanning, explicitly activate the uploaded modfile through the Mod.IO API instead of
@@ -352,6 +354,14 @@ Do not hand-write Steam description VDFs unless the script is unavailable and th
 SteamCMD description VDFs are fragile: unescaped double quotes inside multiline `description` values can truncate the
 published description. If a Steam description contains double quotes, replace them or improve and test the escaping
 before publishing.
+
+Keep Steam descriptions under the practical SteamCMD limit of about 8000 bytes. If SteamCMD parses the VDF but returns
+`Invalid Parameter` while updating a description, check description length first and shorten it below the practical
+limit before retrying. Treat this limit as empirical and replace it with an exact platform limit if tooling later proves
+one.
+
+Avoid raw double quotes in local Steam description files unless the updater is proven to escape them safely. Prefer
+single quotes or wording that avoids quotes instead of ad-hoc VDF escaping.
 
 ## Steam change notes
 
