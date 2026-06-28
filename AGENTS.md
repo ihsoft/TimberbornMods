@@ -53,6 +53,9 @@ The coder does not own agent rules, GitHub Wiki editing, or publishing mods to S
 If a coder discovers a useful rule, workflow, release, or Wiki lesson while implementing code, the coder should send a
 delegated suggestion to the appropriate role instead of changing that role's files directly.
 
+If the user asks a coder to add or update an agent rule, treat that as a mentor task unless the user explicitly expands
+the current role to mentor or rules-maintenance work. Do not self-switch roles.
+
 ### Mentor
 
 The mentor owns agent rules and rule organization for this repository.

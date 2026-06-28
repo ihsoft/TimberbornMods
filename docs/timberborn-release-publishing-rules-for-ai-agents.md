@@ -107,6 +107,22 @@ assembly version, Unity manifest versions in the final package source, generated
 contents must all match the requested version exactly. Stop if the package path or source would publish an older
 artifact, such as a previous-version ZIP.
 
+## Target game version
+
+At the start of release preparation, clarify which Timberborn game version folder the release targets, such as
+`version-1.1`, unless the user already stated it.
+
+If the user does not name a specific game version folder, treat the intended default as the current Timberborn game
+version, meaning the latest known game version for the current checkout and release tooling. Resolve that current
+version from repository evidence such as `release.json`, Unity export configuration, package source contents, or the
+release scripts, then state the concrete `version-X.X` value before changing version files, exporting Unity assets, or
+building DLLs.
+
+Do not hardcode a previously used game version folder just because it appears in a project file, post-build target, old
+package, or previous release. If the resolved current game version conflicts with any build target, manifest mapping,
+Unity export output, or package source folder, stop and ask instead of silently building or packaging for the older
+folder.
+
 ## Exact source paths only
 
 If `release.json` points to `Package.SourcePath`, use only that exact path.
