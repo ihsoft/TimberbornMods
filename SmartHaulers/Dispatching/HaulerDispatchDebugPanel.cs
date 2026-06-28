@@ -16,6 +16,7 @@ namespace IgorZ.SmartHaulers.Dispatching;
 
 sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingleton {
   readonly DispatchCenterRegistry _dispatchCenterRegistry;
+  readonly DispatchPerformanceStats _performanceStats;
   readonly UILayout _uiLayout;
 
   VisualElement _root;
@@ -24,8 +25,10 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
   bool _isAddedToLayout;
   string _lastText;
 
-  public HaulerDispatchDebugPanel(DispatchCenterRegistry dispatchCenterRegistry, UILayout uiLayout) {
+  public HaulerDispatchDebugPanel(
+      DispatchCenterRegistry dispatchCenterRegistry, DispatchPerformanceStats performanceStats, UILayout uiLayout) {
     _dispatchCenterRegistry = dispatchCenterRegistry;
+    _performanceStats = performanceStats;
     _uiLayout = uiLayout;
   }
 
@@ -103,6 +106,7 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
 
   string BuildText() {
     var lines = new List<string>();
+    lines.Add(FormatPerformance());
     foreach (var dispatchCenter in OrderedDispatchCenters()) {
       AddDispatchCenter(lines, dispatchCenter);
     }
@@ -113,6 +117,34 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
     foreach (var dispatchCenter in _dispatchCenterRegistry.DispatchCenters) {
       dispatchCenter.RefreshSnapshot();
     }
+  }
+
+  string FormatPerformance() {
+    var last = _performanceStats.LastSample;
+    var total = _performanceStats.WindowTotal;
+    var sampleCount = _performanceStats.WindowSampleCount;
+    if (sampleCount == 0) {
+      return "perf, no samples";
+    }
+    return $"perf, last={FormatSample(last)}, avg{sampleCount}={FormatAverage(total, sampleCount)}";
+  }
+
+  static string FormatSample(DispatchPerformanceSample sample) {
+    return $"total {Milliseconds(sample.TotalTicks):0.###}ms, "
+        + $"pickup {Milliseconds(sample.PickupPathTicks):0.###}ms/{sample.PickupPathCalls}, "
+        + $"delivery {Milliseconds(sample.DeliveryPathTicks):0.###}ms/{sample.DeliveryPathCalls}";
+  }
+
+  static string FormatAverage(DispatchPerformanceSample total, int sampleCount) {
+    return $"total {Milliseconds(total.TotalTicks) / sampleCount:0.###}ms, "
+        + $"pickup {Milliseconds(total.PickupPathTicks) / sampleCount:0.###}ms/"
+        + $"{(float)total.PickupPathCalls / sampleCount:0.#}, "
+        + $"delivery {Milliseconds(total.DeliveryPathTicks) / sampleCount:0.###}ms/"
+        + $"{(float)total.DeliveryPathCalls / sampleCount:0.#}";
+  }
+
+  static double Milliseconds(long ticks) {
+    return DispatchPerformanceStats.TicksToMilliseconds(ticks);
   }
 
   IEnumerable<HaulerDispatchCenter> OrderedDispatchCenters() {
@@ -192,9 +224,10 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
 
   static void LogSnapshot(string text) {
     DebugEx.Info(
-        "SmartHaulers snapshot columns: view, district, agents, available, wandering, workplaceIdle, transporting, "
-        + "satisfyingNeed, working, orders | agent, state/role, activity, position, speed, capacity | agent, phase, "
-        + "good, path, route, left | phase(weight), behavior, optional good, optional path, decision, requester");
+        "SmartHaulers snapshot columns: perf, last/avg total/pickup/delivery ms/calls | view, district, agents, "
+        + "available, wandering, workplaceIdle, transporting, satisfyingNeed, working, orders | agent, state/role, "
+        + "activity, position, speed, capacity | agent, phase, good, path, route, left | phase(weight), behavior, "
+        + "optional good, optional path, decision, requester");
     DebugEx.Info("SmartHaulers snapshot:\n{0}", text);
   }
 

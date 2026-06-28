@@ -31,6 +31,7 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
   readonly DispatchCenterRegistry _dispatchCenterRegistry;
   readonly ConstructionRegistry _constructionRegistry;
   readonly TransportDecisionEvaluator _decisionEvaluator;
+  readonly DispatchPerformanceStats _performanceStats;
   readonly List<TransportAgentSnapshot> _agents = [];
   readonly List<TransportOrderSnapshot> _orders = [];
   readonly List<Accessible> _builderHubAccessibles = [];
@@ -48,10 +49,11 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
 
   public HaulerDispatchCenter(
       DispatchCenterRegistry dispatchCenterRegistry, ConstructionRegistry constructionRegistry,
-      TransportDecisionEvaluator decisionEvaluator) {
+      TransportDecisionEvaluator decisionEvaluator, DispatchPerformanceStats performanceStats) {
     _dispatchCenterRegistry = dispatchCenterRegistry;
     _constructionRegistry = constructionRegistry;
     _decisionEvaluator = decisionEvaluator;
+    _performanceStats = performanceStats;
   }
 
   public void Awake() {
@@ -72,6 +74,15 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
   }
 
   public void RefreshSnapshot() {
+    _performanceStats.BeginRefresh();
+    try {
+      RefreshSnapshotInternal();
+    } finally {
+      _performanceStats.EndRefresh();
+    }
+  }
+
+  void RefreshSnapshotInternal() {
     _agents.Clear();
     _orders.Clear();
     if (_districtCenter?.DistrictPopulation == null) {
@@ -196,7 +207,7 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
     RestoreDistrictEndpoint(goodAmount, ref source, ref target);
     var routeDistance = TryGetRouteDistance(source, target, out var distance) ? distance : float.NaN;
     var targetInventory = phase == OrderPhase.PickingUp ? source : target;
-    var remainingDistance = TryGetRemainingDistance(targetInventory, agentSnapshot.WorldPosition, out var remaining)
+    var remainingDistance = TryGetRemainingDistance(phase, targetInventory, agentSnapshot.WorldPosition, out var remaining)
         ? remaining
         : float.NaN;
     var progress = TrackProgress(worker, phase, targetInventory, goodAmount, remainingDistance);
@@ -495,26 +506,47 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
     return progress.ProgressFrom(remainingDistance);
   }
 
-  static bool TryGetRouteDistance(Inventory source, Inventory target, out float distance) {
-    var sourceAccessible = source ? source.GetEnabledComponent<Accessible>() : null;
-    var targetAccessible = target ? target.GetEnabledComponent<Accessible>() : null;
-    if (sourceAccessible
-        && targetAccessible
-        && sourceAccessible.HasSingleAccess
-        && sourceAccessible.FindRoadPath(targetAccessible, out distance)) {
-      return true;
+  bool TryGetRouteDistance(Inventory source, Inventory target, out float distance) {
+    _performanceStats.BeginDeliveryPath();
+    var start = DispatchPerformanceStats.Timestamp();
+    try {
+      var sourceAccessible = source ? source.GetEnabledComponent<Accessible>() : null;
+      var targetAccessible = target ? target.GetEnabledComponent<Accessible>() : null;
+      if (sourceAccessible
+          && targetAccessible
+          && sourceAccessible.HasSingleAccess
+          && sourceAccessible.FindRoadPath(targetAccessible, out distance)) {
+        return true;
+      }
+      distance = 0f;
+      return false;
+    } finally {
+      _performanceStats.EndDeliveryPath(start);
     }
-    distance = 0f;
-    return false;
   }
 
-  static bool TryGetRemainingDistance(Inventory target, Vector3 position, out float distance) {
-    var accessible = target ? target.GetEnabledComponent<Accessible>() : null;
-    if (accessible && accessible.FindPathUnlimitedRange(position, [], out distance)) {
-      return true;
+  bool TryGetRemainingDistance(OrderPhase phase, Inventory target, Vector3 position, out float distance) {
+    var isPickup = phase == OrderPhase.PickingUp;
+    if (isPickup) {
+      _performanceStats.BeginPickupPath();
+    } else {
+      _performanceStats.BeginDeliveryPath();
     }
-    distance = 0f;
-    return false;
+    var start = DispatchPerformanceStats.Timestamp();
+    try {
+      var accessible = target ? target.GetEnabledComponent<Accessible>() : null;
+      if (accessible && accessible.FindPathUnlimitedRange(position, [], out distance)) {
+        return true;
+      }
+      distance = 0f;
+      return false;
+    } finally {
+      if (isPickup) {
+        _performanceStats.EndPickupPath(start);
+      } else {
+        _performanceStats.EndDeliveryPath(start);
+      }
+    }
   }
 
 }

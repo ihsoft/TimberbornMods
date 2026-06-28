@@ -16,6 +16,7 @@ namespace IgorZ.SmartHaulers.Patches;
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<DispatchCenterRegistry>().AsSingleton();
+    containerDefinition.Bind<DispatchPerformanceStats>().AsSingleton();
     containerDefinition.Bind<HaulBehaviorSupportValidator>().AsSingleton();
     containerDefinition.Bind<TransportDecisionEvaluator>().AsSingleton();
     containerDefinition.Bind<TransportDistanceEstimator>().AsSingleton();

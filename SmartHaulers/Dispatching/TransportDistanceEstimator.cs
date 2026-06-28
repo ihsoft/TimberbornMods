@@ -8,8 +8,28 @@ using UnityEngine;
 
 namespace IgorZ.SmartHaulers.Dispatching;
 
-sealed class TransportDistanceEstimator {
+sealed class TransportDistanceEstimator(DispatchPerformanceStats performanceStats) {
   public bool TryGetRouteDistance(Inventory source, Inventory target, out float distance) {
+    performanceStats.BeginDeliveryPath();
+    var start = DispatchPerformanceStats.Timestamp();
+    try {
+      return TryGetRouteDistanceInternal(source, target, out distance);
+    } finally {
+      performanceStats.EndDeliveryPath(start);
+    }
+  }
+
+  public bool TryGetDistanceToInventory(Inventory inventory, Vector3 position, out float distance) {
+    performanceStats.BeginPickupPath();
+    var start = DispatchPerformanceStats.Timestamp();
+    try {
+      return TryGetDistanceToInventoryInternal(inventory, position, out distance);
+    } finally {
+      performanceStats.EndPickupPath(start);
+    }
+  }
+
+  static bool TryGetRouteDistanceInternal(Inventory source, Inventory target, out float distance) {
     var sourceAccessible = source ? source.GetEnabledComponent<Accessible>() : null;
     var targetAccessible = target ? target.GetEnabledComponent<Accessible>() : null;
     if (sourceAccessible
@@ -22,7 +42,7 @@ sealed class TransportDistanceEstimator {
     return false;
   }
 
-  public bool TryGetDistanceToInventory(Inventory inventory, Vector3 position, out float distance) {
+  static bool TryGetDistanceToInventoryInternal(Inventory inventory, Vector3 position, out float distance) {
     var accessible = inventory ? inventory.GetEnabledComponent<Accessible>() : null;
     if (accessible && accessible.FindPathUnlimitedRange(position, [], out distance)) {
       return true;
