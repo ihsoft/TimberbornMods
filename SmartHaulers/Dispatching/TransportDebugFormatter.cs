@@ -35,7 +35,14 @@ static class TransportDebugFormatter {
   }
 
   public static string FormatPhase(TransportOrderSnapshot order) {
-    return IsUnassignedOrder(order.Phase) ? $"{order.Phase} (w={order.Weight:0.##})" : order.Phase.ToString();
+    if (!IsUnassignedOrder(order.Phase)) {
+      return order.Phase.ToString();
+    }
+    var text = $"{order.Phase} (w={order.Weight:0.##}";
+    if (order.HasCriticalTime) {
+      text += $",t={order.CriticalTimeInHours:0.#}h";
+    }
+    return $"{text})";
   }
 
   public static string FormatDecision(TransportDecision decision) {

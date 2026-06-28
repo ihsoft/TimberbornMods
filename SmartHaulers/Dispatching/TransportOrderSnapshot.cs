@@ -17,6 +17,7 @@ readonly struct TransportOrderSnapshot {
   public TransportCargo Cargo { get; }
   public TransportDecision Decision { get; }
   public OrderPhase Phase { get; }
+  public float CriticalTimeInHours { get; }
   public Guid AgentId => Assignment.AgentId;
   public Guid RequesterId => Origin.RequesterId;
   public Worker Worker => Assignment.Worker;
@@ -30,24 +31,30 @@ readonly struct TransportOrderSnapshot {
   public float RouteDistance => Route.RouteDistance;
   public float RemainingDistance => Route.RemainingDistance;
   public float Progress => Route.Progress;
+  public bool HasCriticalTime => !float.IsNaN(CriticalTimeInHours);
 
   public TransportOrderSnapshot(
       TransportOrderAssignment assignment, TransportOrderOrigin origin, OrderPhase phase, TransportOrderRoute route,
-      TransportCargo cargo, TransportDecision decision = default) {
+      TransportCargo cargo, TransportDecision decision = default, float criticalTimeInHours = float.NaN) {
     Assignment = assignment;
     Origin = origin;
     Route = route;
     Cargo = cargo;
     Decision = decision;
     Phase = phase;
+    CriticalTimeInHours = criticalTimeInHours;
   }
 
   public TransportOrderSnapshot WithDecision(TransportDecision decision) {
-    return new TransportOrderSnapshot(Assignment, Origin, Phase, Route, Cargo, decision);
+    return new TransportOrderSnapshot(Assignment, Origin, Phase, Route, Cargo, decision, CriticalTimeInHours);
   }
 
   public TransportOrderSnapshot WithPhase(OrderPhase phase) {
-    return new TransportOrderSnapshot(Assignment, Origin, phase, Route, Cargo, Decision);
+    return new TransportOrderSnapshot(Assignment, Origin, phase, Route, Cargo, Decision, CriticalTimeInHours);
+  }
+
+  public TransportOrderSnapshot WithCriticalTime(float criticalTimeInHours) {
+    return new TransportOrderSnapshot(Assignment, Origin, Phase, Route, Cargo, Decision, criticalTimeInHours);
   }
 
   public static TransportOrderSnapshot Assigned(
