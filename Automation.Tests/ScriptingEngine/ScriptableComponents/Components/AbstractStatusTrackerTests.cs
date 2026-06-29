@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
+using Timberborn.Persistence;
+using Timberborn.WorldPersistence;
 
 namespace Automation.Tests;
 
@@ -71,6 +74,16 @@ static class AbstractStatusTrackerTests {
 
     Assert.Equal(1, listener.Calls);
     Assert.Equal("Signals.Value", listener.LastSignalName);
+  }
+
+  public static void LoadIgnoresComponentWithoutSavedSignals() {
+    var tracker = new TestStatusTracker();
+    var loader = new TestEntityLoader();
+    loader.SetComponent(
+        new ComponentKey(typeof(TestStatusTracker).FullName),
+        new IObjectLoader(new Dictionary<string, object>()));
+
+    tracker.Load(loader);
   }
 
   static SignalOperator CreateSignal(Func<ScriptValue> source) {

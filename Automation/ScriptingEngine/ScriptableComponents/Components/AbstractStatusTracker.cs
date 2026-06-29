@@ -73,7 +73,11 @@ abstract class AbstractStatusTracker : AbstractDynamicComponent, IPersistentEnti
     if (!entityLoader.TryGetComponent(EntityComponentKey, out var component)) {
       return;
     }
-    var state = StringProtoSerializer.Deserialize<SavedSignalsState>(component.Get(SavedSignalsKey));
+    var savedSignals = component.GetValueOrDefault(SavedSignalsKey, null);
+    if (savedSignals == null) {
+      return;
+    }
+    var state = StringProtoSerializer.Deserialize<SavedSignalsState>(savedSignals);
     foreach (var signalValue in state.SignalValues) {
       _signals.Add(signalValue.SignalName, new SignalSink { LastValue = signalValue.ToScriptValue() });
     }

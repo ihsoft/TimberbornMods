@@ -1,3 +1,6 @@
+# v4.6.3 (TBD)
+* [Fix] Game could crash when loading a save with active notification status actions.
+
 # v4.6.2 (June 28th, 2026)
 * [Fix] Resource signals could break when another mod added goods with script-unsafe IDs.
 * [Fix] Game could crash when loading a save with `Workplace.AssignedWorkers` rules on multiple workplaces.

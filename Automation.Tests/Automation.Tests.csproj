@@ -239,5 +239,8 @@
       <Compile Include="..\TimberDev\Utils\ComponentsAccessor.cs">
         <Link>TimberDev\Utils\ComponentsAccessor.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\Utils\IObjectLoaderExtensions.cs">
+        <Link>TimberDev\Utils\IObjectLoaderExtensions.cs</Link>
+      </Compile>
     </ItemGroup>
 </Project>

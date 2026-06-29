@@ -282,7 +282,11 @@ sealed class NotificationsScriptableComponent : ScriptableComponentBase {
       if (!entityLoader.TryGetComponent(StatusControllerKey, out var component)) {
         return;
       }
-      var statusDef = StringProtoSerializer.Deserialize<StatusDef>(component.Get(StatusStateKey));
+      var statusState = component.GetValueOrDefault(StatusStateKey, null);
+      if (statusState == null) {
+        return;
+      }
+      var statusDef = StringProtoSerializer.Deserialize<StatusDef>(statusState);
       SetStatusState(statusDef, true);
     }
 

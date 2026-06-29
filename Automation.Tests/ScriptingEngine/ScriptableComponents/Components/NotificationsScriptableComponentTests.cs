@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
@@ -9,7 +10,9 @@ using IgorZ.TimberDev.UI;
 using IgorZ.TimberDev.Utils;
 using Timberborn.BlockSystem;
 using Timberborn.Localization;
+using Timberborn.Persistence;
 using Timberborn.StatusSystem;
+using Timberborn.WorldPersistence;
 
 namespace Automation.Tests;
 
@@ -89,6 +92,15 @@ static class NotificationsScriptableComponentTests {
     Assert.Throws<InvalidOperationException>(() => component.UninstallAction(unknownAction, behavior));
   }
 
+  public static void StatusControllerLoadIgnoresMissingStatusState() {
+    var loader = new TestEntityLoader();
+    loader.SetComponent(
+        new ComponentKey(typeof(NotificationsScriptableComponent.StatusController).FullName),
+        new IObjectLoader(new Dictionary<string, object>()));
+
+    new NotificationsScriptableComponent.StatusController().Load(loader);
+  }
+
   static NotificationsScriptableComponent CreateComponent() {
     var component = new NotificationsScriptableComponent();
     component.InjectDependencies(new TestLoc(), TestScripting.CreateService());
@@ -127,4 +139,5 @@ static class NotificationsScriptableComponentTests {
       return key;
     }
   }
+
 }

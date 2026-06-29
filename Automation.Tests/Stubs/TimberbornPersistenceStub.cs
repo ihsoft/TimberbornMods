@@ -25,6 +25,9 @@ namespace Timberborn.Persistence {
     }
   }
 
+  public interface IValueSerializer<T> {
+  }
+
   public sealed class IObjectSaver {
     public readonly Dictionary<string, object> Values = new();
 
@@ -48,12 +51,20 @@ namespace Timberborn.Persistence {
       return _values.ContainsKey(key.Name);
     }
 
+    public bool Has<T>(PropertyKey<T> key) {
+      return _values.ContainsKey(key.Name);
+    }
+
     public IList<T> Get<T>(ListKey<T> key, object serializer = null) {
       return (IList<T>)_values[key.Name];
     }
 
     public T Get<T>(PropertyKey<T> key) {
       return (T)_values[key.Name];
+    }
+
+    public T Get<T>(PropertyKey<T> key, IValueSerializer<T> serializer) {
+      return Get(key);
     }
   }
   public sealed class SingletonKey {
