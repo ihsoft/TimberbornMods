@@ -79,8 +79,43 @@ function ConvertTo-ProcessArgument([string] $Argument) {
     return '"' + $Argument.Replace('"', '\"') + '"'
 }
 
+function Normalize-PathForComparison([string] $Path) {
+    return [System.IO.Path]::GetFullPath($Path).TrimEnd('\', '/')
+}
+
+function Test-CommandLineReferencesProject([string] $CommandLine, [string] $ProjectRoot) {
+    if ([string]::IsNullOrWhiteSpace($CommandLine)) {
+        return $false
+    }
+
+    $normalizedProjectRoot = Normalize-PathForComparison $ProjectRoot
+    $alternateProjectRoot = $normalizedProjectRoot.Replace('\', '/')
+    return $CommandLine.IndexOf($normalizedProjectRoot, [System.StringComparison]::OrdinalIgnoreCase) -ge 0 -or
+        $CommandLine.IndexOf($alternateProjectRoot, [System.StringComparison]::OrdinalIgnoreCase) -ge 0
+}
+
+function Assert-UnityProjectNotOpen([string] $ProjectRoot) {
+    $knownLockFiles = @(
+        (Join-Path $ProjectRoot "Temp/UnityLockfile"),
+        (Join-Path $ProjectRoot "Temp/UnityLockFile")
+    )
+    foreach ($lockFile in $knownLockFiles) {
+        if (Test-Path -LiteralPath $lockFile) {
+            throw "Unity project appears to be open or locked: $ProjectRoot. Close Unity Editor for this project before running batch export. Lock file: $lockFile"
+        }
+    }
+
+    $unityProcesses = @(Get-CimInstance Win32_Process -Filter "name = 'Unity.exe'" -ErrorAction SilentlyContinue |
+        Where-Object { Test-CommandLineReferencesProject ([string]$_.CommandLine) $ProjectRoot })
+    if ($unityProcesses.Count -gt 0) {
+        $processList = ($unityProcesses | ForEach-Object { "pid=$($_.ProcessId)" }) -join ", "
+        throw "Unity project appears to be open in Unity Editor: $ProjectRoot ($processList). Close Unity Editor before running batch export."
+    }
+}
+
 $projectRoot = Resolve-RepoPath $ProjectPath
 Assert-PathExists $projectRoot "Unity project"
+Assert-UnityProjectNotOpen $projectRoot
 $editorVersion = Get-UnityProjectVersion $projectRoot
 $unityExe = Resolve-UnityPath $UnityPath $editorVersion
 $compatibilityVersion = Convert-GameVersionToCompatibilityVersion $GameVersion
