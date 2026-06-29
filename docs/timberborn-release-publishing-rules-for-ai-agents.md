@@ -188,7 +188,8 @@ building the ZIP. Do this before packaging, because missing or stale asset bundl
 from C# build output.
 
 Before running `tools/export-unity-mod.ps1` or a release script that invokes Unity batch export, make sure the regular
-Unity Editor is not open on the same `ModsUnityProject`.
+Unity Editor is not open on the same `ModsUnityProject`. Current export tooling should preflight this, but keep the
+rule as release workflow guidance for older checkouts and any other Unity batch invocation path.
 
 If Unity batch export exits with code 1 and the per-export log is very short, only shows startup/licensing/project-open
 output, or ends before `ModBuilderBatch` logs an exception, first check whether a regular Unity Editor process is

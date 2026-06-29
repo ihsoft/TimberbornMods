@@ -120,6 +120,15 @@ Risk:
 For publishing suggestions, delegate to the publisher thread when the user has provided one or when a clear `Publisher`
 thread can be found. For Wiki suggestions, delegate to a clear `Wiki editor` thread the same way.
 
+## Answering delegated help requests
+
+When another agent asks your role for help, diagnostics, or a decision, treat the source thread as an open requester.
+You may investigate in your own thread and ask the user for missing context when needed, but once you have a conclusion,
+partial finding, committed fix, or blocker, send a concise answer back to the requester.
+
+The answer should include the conclusion, the main evidence, and the next action or blocker. Do not leave the requesting
+agent waiting just because the fix or investigation was completed elsewhere.
+
 ## Role learning handoff
 
 At the end of a non-trivial task, each role agent should briefly check whether it learned something durable that would
