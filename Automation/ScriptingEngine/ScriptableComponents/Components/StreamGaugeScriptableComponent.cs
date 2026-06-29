@@ -128,11 +128,15 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
 
     public void Awake() {
       DisableComponent();
-      _streamGaugeTracker = GetComponent<AutomationBehavior>().GetOrCreate<StreamGaugeTracker>();
     }
 
     public override void Tick() {
-      _streamGaugeTracker.UpdateSignals();
+      _streamGaugeTracker?.UpdateSignals();
+    }
+
+    public void SetTracker(StreamGaugeTracker streamGaugeTracker) {
+      _streamGaugeTracker = streamGaugeTracker;
+      EnableComponent();
     }
   }
 
@@ -143,7 +147,7 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
     public void Awake() {
       _streamGauge = AutomationBehavior.GetComponentOrFail<StreamGauge>();
       //FIXME: Enable/Disable based on signals.
-      AutomationBehavior.GetComponentOrFail<StreamGaugeCheckTicker>().EnableComponent();
+      AutomationBehavior.GetComponentOrFail<StreamGaugeCheckTicker>().SetTracker(this);
     }
 
     public void UpdateSignals() {

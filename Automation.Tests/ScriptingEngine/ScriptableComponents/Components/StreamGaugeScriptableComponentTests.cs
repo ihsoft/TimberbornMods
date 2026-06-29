@@ -1,8 +1,12 @@
+using System;
+using System.Reflection;
+using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
+using IgorZ.TimberDev.Utils;
 using Timberborn.Localization;
 using Timberborn.WaterBuildings;
 
@@ -62,6 +66,42 @@ static class StreamGaugeScriptableComponentTests {
     Assert.Throws<ScriptError.ParsingError>(() => component.GetSignalDefinition("StreamGauge.Missing", behavior));
   }
 
+  public static void TickerAwakeDoesNotCreateTracker() {
+    SetDependencyContainer(new ActivatorContainer());
+    var behavior = new AutomationBehavior();
+    var ticker = new StreamGaugeScriptableComponent.StreamGaugeCheckTicker();
+    behavior.SetComponent(new StreamGauge());
+    behavior.SetComponent(ticker);
+    ticker.SetComponent(behavior);
+
+    ticker.Awake();
+
+    Assert.False(ticker.Enabled);
+    Assert.False(behavior.TryGetDynamicComponent<StreamGaugeScriptableComponent.StreamGaugeTracker>(out _));
+  }
+
+  public static void RegisterSignalCreatesTrackerAndEnablesTicker() {
+    SetDependencyContainer(new ActivatorContainer());
+    var component = CreateComponent();
+    ScriptingService.Instance.RegisterScriptable(component);
+    var behavior = new AutomationBehavior();
+    var ticker = new StreamGaugeScriptableComponent.StreamGaugeCheckTicker();
+    behavior.SetComponent(new StreamGauge());
+    behavior.SetComponent(ticker);
+    ticker.SetComponent(behavior);
+    ticker.Awake();
+
+    component.RegisterSignalChangeCallback(Signal("StreamGauge.Depth", behavior), new TestSignalListener(behavior));
+
+    Assert.True(behavior.TryGetDynamicComponent<StreamGaugeScriptableComponent.StreamGaugeTracker>(out var tracker));
+    Assert.True(ticker.Enabled);
+    Assert.True(tracker != null);
+  }
+
+  static SignalOperator Signal(string signalName, AutomationBehavior behavior) {
+    return SignalOperator.Create(new ExpressionContext { ScriptHost = behavior }, signalName);
+  }
+
   static StreamGaugeScriptableComponent CreateComponent() {
     var component = new StreamGaugeScriptableComponent();
     component.InjectDependencies(new TestLoc(), TestScripting.CreateService());
@@ -71,6 +111,32 @@ static class StreamGaugeScriptableComponentTests {
   sealed class TestLoc : ILoc {
     public string T(string key, params object[] args) {
       return key;
+    }
+  }
+
+  static void SetDependencyContainer(IContainer container) {
+    var constructor = typeof(StaticBindings).GetConstructor(
+        BindingFlags.Instance | BindingFlags.NonPublic,
+        null,
+        [typeof(IContainer)],
+        null);
+    constructor.Invoke([container]);
+  }
+
+  sealed class ActivatorContainer : IContainer {
+    public object GetInstance(Type type) {
+      return Activator.CreateInstance(type);
+    }
+
+    public T GetInstance<T>() {
+      return (T)GetInstance(typeof(T));
+    }
+  }
+
+  sealed class TestSignalListener(AutomationBehavior behavior) : ISignalListener {
+    public AutomationBehavior Behavior { get; } = behavior;
+
+    public void OnValueChanged(string signalName) {
     }
   }
 }
