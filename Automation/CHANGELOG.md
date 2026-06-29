@@ -1,4 +1,4 @@
-# v4.6.3 (TBD)
+# v4.6.3 (June 28th, 2026)
 * [Fix] Game could crash when loading a save with active notification status actions.
 * [Fix] The 1.0-compatible package was updated to Advanced Automation 4.0.9 with the notification-status load fix and
   workplace signal tracker lifetime fix.
