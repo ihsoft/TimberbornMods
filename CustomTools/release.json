@@ -1,4 +1,14 @@
 {
+  "ManifestPath": "ModsUnityProject/Assets/Mods/CustomTools/manifest.json",
+  "ChangesPath": "CustomTools/CHANGES.md",
+  "ReleaseVersion": "1.4.0",
+  "ScriptFileBase": "CustomTools",
+  "Package": {
+    "Mode": "LocalModFolder",
+    "SourcePath": "_MODS!/CustomTools",
+    "OutputPath": "_MODS!/CustomTools_v1.4.0.zip",
+    "MaxAgeDays": 14
+  },
   "ManifestVersions": {
     "version-1.0": "1.3.2",
     "version-1.1": "1.4.0"

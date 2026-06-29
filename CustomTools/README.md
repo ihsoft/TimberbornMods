@@ -41,7 +41,7 @@ button” or a small set of buttons, you can use this mod to set up your tools w
      `containerDefinition.Bind<PauseTool>().AsTransient()`.
 
 2. Create a blueprint that defines the appearance of your tool button. See example blueprint:
-   [`DebugFinishNowTool`](https://github.com/ihsoft/TimberbornMods/blob/main/CustomTools/Mod/Blueprints/Tools/Tool.CustomTools.DebugFinishNowTool.blueprint.json).
+   [`DebugFinishNowTool`](https://github.com/ihsoft/TimberbornMods/blob/main/ModsUnityProject/Assets/Mods/CustomTools/Data/Blueprints/Tools/Tool.CustomTools.10.DebugFinishNowTool.blueprint.json).
    * The file name _must_ follow the blueprint naming convention: `<AnyArbitraryText>.blueprint.json`.
    * Blueprint file names must be __globally unique__. The subfolders are not counted!
    * Add [`CustomToolSpec`](https://github.com/ihsoft/TimberbornMods/blob/8704467e2e08885f47f8b4cce06ed01912e48672/CustomTools/Core/CustomToolSpec.cs)
@@ -51,7 +51,7 @@ button” or a small set of buttons, you can use this mod to set up your tools w
      tool implementation, get extra specs via `ToolSpec.GetSpec<MyExtraSpec>()`.
 
 3. __Optional__. Create your own group button in the bottom bar and attach your tools to it. See example blueprint:
-   [`ToolGroup.CustomTools`](https://github.com/ihsoft/TimberbornMods/blob/8704467e2e08885f47f8b4cce06ed01912e48672/CustomTools/Mod/Blueprints/ToolGroups/ToolGroup.CustomTools.blueprint.json).
+   [`ToolGroup.CustomTools`](https://github.com/ihsoft/TimberbornMods/blob/main/ModsUnityProject/Assets/Mods/CustomTools/Data/Blueprints/ToolGroups/ToolGroup.CustomTools.blueprint.json).
    * The file name _must_ follow the blueprint naming convention: `<AnyArbitraryText>.blueprint.json`.
    * Blueprint file names must be __globally unique__. The subfolders are not counted!
    * Groups can be nested. Set `CustomGroupSpec.ParentGroupId` to a name of another groups, and it will become a
@@ -63,7 +63,7 @@ button” or a small set of buttons, you can use this mod to set up your tools w
 
 * [`DebugFinishNowTool`](https://github.com/ihsoft/TimberbornMods/blob/main/CustomTools/Tools/DebugFinishNowTool.cs).
   A basic tool that selects a set of block objects on the map and performs actions on them.
-  Its blueprint can be found [here](https://github.com/ihsoft/TimberbornMods/blob/8704467e2e08885f47f8b4cce06ed01912e48672/CustomTools/Mod/Blueprints/Tools/Tool.CustomTools.DebugFinishNowTool.blueprint.json).
+  Its blueprint can be found [here](https://github.com/ihsoft/TimberbornMods/blob/main/ModsUnityProject/Assets/Mods/CustomTools/Data/Blueprints/Tools/Tool.CustomTools.10.DebugFinishNowTool.blueprint.json).
 
 * [`PauseTool`](https://github.com/ihsoft/TimberbornMods/blob/main/CustomTools/Tools/PauseTool.cs).
   A more advanced example that uses selection locking to target specific object types.

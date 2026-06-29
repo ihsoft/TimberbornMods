@@ -52,6 +52,26 @@
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\UnityEngine.UIElementsModule.dll" Publicize="true"/>
     </ItemGroup>
     <ItemGroup>
+      <None Include="..\ModsUnityProject\Assets\Mods\CustomTools\Data\Blueprints\CustomCursors\*.json">
+        <Link>Mod\Blueprints\CustomCursors\_</Link>
+      </None>
+      <None Include="..\ModsUnityProject\Assets\Mods\CustomTools\Data\Blueprints\KeyBindings\*.json">
+        <Link>Mod\Blueprints\KeyBindings\_</Link>
+      </None>
+      <None Include="..\ModsUnityProject\Assets\Mods\CustomTools\Data\Blueprints\ToolGroups\*.json">
+        <Link>Mod\Blueprints\ToolGroups\_</Link>
+      </None>
+      <None Include="..\ModsUnityProject\Assets\Mods\CustomTools\Data\Blueprints\Tools\*.json">
+        <Link>Mod\Blueprints\Tools\_</Link>
+      </None>
+      <None Include="..\ModsUnityProject\Assets\Mods\CustomTools\Data\Localizations\*.txt">
+        <Link>Mod\Localizations\_</Link>
+      </None>
+      <None Include="..\ModsUnityProject\Assets\Mods\CustomTools\manifest.json">
+        <Link>Mod\manifest.json</Link>
+      </None>
+    </ItemGroup>
+    <ItemGroup>
       <Compile Include="..\TimberDev\Utils\HarmonyPatcher.cs">
         <Link>TimberDev\Utils\HarmonyPatcher.cs</Link>
       </Compile>

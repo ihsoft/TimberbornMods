@@ -7,19 +7,19 @@ This is the pilot release workflow for one mod. If it stays useful, apply the sa
 From the repository root:
 
 ```powershell
-.\tools\build-mod-package.ps1 -ModName CustomTools
+.\tools\publish-modio.ps1 -ModName CustomTools
 ```
 
-The script:
+This is a dry run. The script follows `CustomTools/release.json` and uses the Unity-exported local mod folder as the
+package source:
 
-1. Reads `CustomTools/Mod/manifest.json`.
-2. Reads `CustomTools/directory.build.props`.
-3. Fails if the manifest version and assembly version differ.
-4. Builds `CustomTools/CustomTools.csproj` in `Release`.
-5. Creates `.tools/release-staging/CustomTools/CustomTools/version-1.1`.
-6. Copies `CustomTools/Mod` into that game-version folder.
-7. Copies `CustomTools.dll` and optional `CustomTools.xml` into `Scripts`.
-8. Writes `_MODS!/CustomTools_v<version>.zip`.
+1. Reads `ModsUnityProject/Assets/Mods/CustomTools/manifest.json`.
+2. Checks the repository manifest version against `CustomTools/release.json`.
+3. Exports CustomTools from the Unity project into `_MODS!/CustomTools`.
+4. Verifies the exported `version-1.1/manifest.json`.
+5. Builds `CustomTools/CustomTools.csproj` in `Release`.
+6. Copies `CustomTools.dll` and optional `CustomTools.xml` into the exported `Scripts` folder.
+7. Writes `_MODS!/CustomTools_v<version>.zip` from `_MODS!/CustomTools`.
 
 Before writing the zip, the script validates the staged package:
 
@@ -28,11 +28,7 @@ Before writing the zip, the script validates the staged package:
 - every `version-X.X` folder must contain `Scripts/CustomTools.dll`;
 - every `version-X.X` folder must contain `Scripts/CustomTools.xml`.
 
-Use `-Force` only when intentionally replacing an existing local package.
-
-```powershell
-.\tools\build-mod-package.ps1 -ModName CustomTools -Force
-```
+If an old local package already exists, remove it intentionally before rebuilding the preview package.
 
 ## Legacy game-version folders
 
@@ -42,7 +38,7 @@ contain older folders, such as `version-1.0`.
 To include locally staged legacy folders from `_MODS!/CustomTools`, run:
 
 ```powershell
-.\tools\build-mod-package.ps1 -ModName CustomTools -IncludeLegacyVersions
+.\tools\publish-modio.ps1 -ModName CustomTools -IncludeLegacyVersions
 ```
 
 This copies any `version-*` folders except the active one from `_MODS!/CustomTools` into the package. Do not rely on
