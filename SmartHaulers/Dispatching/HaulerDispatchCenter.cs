@@ -129,7 +129,8 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
     var goodReserver = worker.GetComponent<GoodReserver>();
     var navigator = worker.GetComponent<Navigator>();
     var behaviorManager = worker.GetComponent<BehaviorManager>();
-    if (!goodCarrier || !goodReserver || !navigator) {
+    var workRefuser = worker.GetComponent<WorkRefuser>();
+    if (!goodCarrier || !goodReserver || !navigator || !workRefuser) {
       return TransportAgentSnapshot.NotTransportAgent(worker);
     }
     var worldPosition = navigator.CurrentAccessOrPosition();
@@ -141,7 +142,8 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
     var role = ClassifyAgentRole(worker, behaviorManager, workplaceRole);
     return new TransportAgentSnapshot(
         entityId, worker, TransportAgentSnapshot.FormatWorker(worker), position, worldPosition, walkingSpeed,
-        goodCarrier.LiftingCapacity, activity.State, role, workplaceRole, activity, isTransportAgent: true);
+        goodCarrier.LiftingCapacity, activity.State, role, workplaceRole, activity, workRefuser.RefusesWork,
+        isTransportAgent: true);
   }
 
   static TransportAgentRole ClassifyAgentRole(

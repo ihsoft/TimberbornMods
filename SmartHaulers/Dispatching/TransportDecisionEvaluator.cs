@@ -61,6 +61,7 @@ sealed class TransportDecisionEvaluator(TransportDistanceEstimator distanceEstim
   static bool IsCandidate(TransportOrderSnapshot order, TransportAgentSnapshot agent) {
     return agent.IsTransportAgent
         && agent.Worker
+        && !agent.RefusesWork
         && agent.Speed > 0f
         && agent.Capacity > 0
         && IsEligibleRole(order, agent)

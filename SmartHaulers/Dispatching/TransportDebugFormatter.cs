@@ -95,9 +95,10 @@ static class TransportDebugFormatter {
   }
 
   public static string FormatAgentState(TransportAgentSnapshot agent) {
-    return agent.Role is TransportAgentRole.None or TransportAgentRole.DedicatedHauler
+    var text = agent.Role is TransportAgentRole.None or TransportAgentRole.DedicatedHauler
         ? FormatState(agent)
         : $"{FormatState(agent)}/{FormatRole(agent.Role)}";
+    return agent.RefusesWork ? $"{text}/noWork" : text;
   }
 
   static string FormatState(TransportAgentSnapshot agent) {
