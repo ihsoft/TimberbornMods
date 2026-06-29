@@ -90,8 +90,10 @@ When a coder has a rule suggestion, send it to the mentor instead of editing rul
 When the user asks a coder to suggest, collect, or summarize possible rule changes, treat that as a request to delegate
 the suggestions to the mentor unless the user explicitly asks to only show the ideas in the current thread.
 
-In Codex or another environment with thread tools, search for the mentor thread with `list_threads` using queries such
-as `Mentor`, `TimberbornMods mentor`, or `mentor rules`. If exactly one matching mentor thread is found, send a
+In Codex or another environment with thread tools, search for the mentor thread with `list_threads`. Start with or fall
+back to the role name alone, such as `Mentor`, then verify the returned thread's title and current repository before
+sending. More specific queries such as `TimberbornMods mentor` or `mentor rules` are useful, but an empty result for a
+specific query is not evidence that no mentor thread exists. If exactly one matching mentor thread is found, send a
 `codex_delegation` message to it with `send_message_to_thread`.
 
 If thread tools are unavailable, or if no clear mentor thread is found, do not create a new thread and do not edit the

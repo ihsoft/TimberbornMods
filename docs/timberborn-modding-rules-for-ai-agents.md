@@ -50,6 +50,14 @@ ModsUnityProject/Assets/Mods/<ModName>/Data/
 Do not assume there is only one `Mod` directory.
 For Unity-based mods, inspect the project files and existing asset references to find the actual package data location.
 
+## Unity-generated assets
+
+When adding generated Unity `.meta` files, run `git diff --check` or `git diff --cached --check` before committing.
+
+Unity can leave trailing whitespace on empty YAML values in generated `.meta` files. If whitespace check reports this,
+trim only the trailing whitespace from the affected `.meta` files before staging. Do not change asset GUIDs, importer
+settings, bundle names, or other Unity metadata as part of this cleanup.
+
 ## Localization
 
 Timberborn localization files are CSV files stored as `.txt`.
