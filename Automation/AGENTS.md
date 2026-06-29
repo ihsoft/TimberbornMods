@@ -65,6 +65,13 @@ Automation dynamic components derived from `AbstractDynamicComponent` and create
 `AsTransient()`, never `AsSingleton()`, so runtime state, saved state, callbacks, signals, and owner references cannot
 leak between buildings.
 
+Do not create persistent Automation dynamic components from template-owned `BaseComponent` or `TickableComponent`
+`Awake()` methods when those dynamic components can also be restored from `AutomationBehavior.SavedComponents`.
+`Awake()` runs before `IPersistentEntity.Load()` during world loading, so early `AutomationBehavior.GetOrCreate` calls
+can create a component that load then tries to restore a second time. Prefer creating dynamic components from script or
+action registration, or have the dynamic component attach itself to the template-owned component after the dynamic
+component is created or restored.
+
 When adding a new Automation signal family, decide whether each signal is building-scoped or global.
 
 When adding an Automation `SignalDef`, always set `Scope` explicitly, even when it is
