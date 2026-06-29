@@ -187,6 +187,15 @@ build when possible. If export tooling is unavailable, ask the user to confirm t
 building the ZIP. Do this before packaging, because missing or stale asset bundle changes cannot be detected reliably
 from C# build output.
 
+Before running `tools/export-unity-mod.ps1` or a release script that invokes Unity batch export, make sure the regular
+Unity Editor is not open on the same `ModsUnityProject`.
+
+If Unity batch export exits with code 1 and the per-export log is very short, only shows startup/licensing/project-open
+output, or ends before `ModBuilderBatch` logs an exception, first check whether a regular Unity Editor process is
+already open on the project. Close that editor and retry the export once before deeper investigation. If the retry still
+fails, continue normal Unity diagnostics: the per-export log, global Unity `Editor.log`, project compile or import
+errors, mod registration, and tooling or upstream changes.
+
 After the user confirms that Unity assets were exported, verify the `manifest.json` version inside the configured
 `Package.SourcePath` or final package source. Do not rely only on the Unity project file, because the Unity project and
 the exported package source can be out of sync.
