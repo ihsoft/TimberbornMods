@@ -302,6 +302,14 @@ not start from them.
 - Do not change production code unless the user explicitly asks.
 - If tests expose a production issue, stop and ask.
 
+### Mode-shifted task
+
+- If a task starts as investigation, diagnostics, review, or reproduction work and then turns into an implemented fix or
+  committed change, re-run the applicable submission checklist before committing.
+- For player-visible or user-visible mod behavior changes, this includes re-checking the package changelog rule in
+  `docs/timberborn-repository-notes.md`.
+- Do not carry forward only the investigation checklist into the final commit.
+
 ### Unity-resource task
 
 - Remind the user to rebuild or export Unity assets before real-game testing.
