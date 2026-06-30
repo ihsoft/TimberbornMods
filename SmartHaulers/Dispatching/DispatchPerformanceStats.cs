@@ -14,6 +14,13 @@ sealed class DispatchPerformanceStats {
   readonly DispatchPerformanceSample[] _samples = new DispatchPerformanceSample[WindowSize];
 
   Stopwatch _refreshStopwatch;
+  long _agentTicks;
+  long _activeOrderTicks;
+  long _queuedOrderTicks;
+  long _constructionOrderTicks;
+  long _readinessTicks;
+  long _decisionTicks;
+  long _sortTicks;
   long _pickupPathTicks;
   long _deliveryPathTicks;
   int _pickupPathCalls;
@@ -43,6 +50,13 @@ sealed class DispatchPerformanceStats {
       var sum = WindowTotal;
       return new DispatchPerformanceSample(
           sum.TotalTicks / _sampleCount,
+          sum.AgentTicks / _sampleCount,
+          sum.ActiveOrderTicks / _sampleCount,
+          sum.QueuedOrderTicks / _sampleCount,
+          sum.ConstructionOrderTicks / _sampleCount,
+          sum.ReadinessTicks / _sampleCount,
+          sum.DecisionTicks / _sampleCount,
+          sum.SortTicks / _sampleCount,
           sum.PickupPathTicks / _sampleCount,
           sum.DeliveryPathTicks / _sampleCount,
           sum.PickupPathCalls / _sampleCount,
@@ -53,6 +67,13 @@ sealed class DispatchPerformanceStats {
   public int WindowSampleCount => _sampleCount;
 
   public void BeginRefresh() {
+    _agentTicks = 0;
+    _activeOrderTicks = 0;
+    _queuedOrderTicks = 0;
+    _constructionOrderTicks = 0;
+    _readinessTicks = 0;
+    _decisionTicks = 0;
+    _sortTicks = 0;
     _pickupPathTicks = 0;
     _deliveryPathTicks = 0;
     _pickupPathCalls = 0;
@@ -66,7 +87,18 @@ sealed class DispatchPerformanceStats {
     }
     _refreshStopwatch.Stop();
     _lastSample = new DispatchPerformanceSample(
-        _refreshStopwatch.ElapsedTicks, _pickupPathTicks, _deliveryPathTicks, _pickupPathCalls, _deliveryPathCalls);
+        _refreshStopwatch.ElapsedTicks,
+        _agentTicks,
+        _activeOrderTicks,
+        _queuedOrderTicks,
+        _constructionOrderTicks,
+        _readinessTicks,
+        _decisionTicks,
+        _sortTicks,
+        _pickupPathTicks,
+        _deliveryPathTicks,
+        _pickupPathCalls,
+        _deliveryPathCalls);
     AddToFrameSample(Time.frameCount, _lastSample);
     _refreshStopwatch = null;
   }
@@ -98,6 +130,38 @@ sealed class DispatchPerformanceStats {
 
   public void EndDeliveryPath(long startTimestamp) {
     _deliveryPathTicks += Stopwatch.GetTimestamp() - startTimestamp;
+  }
+
+  public long BeginSection() {
+    return Stopwatch.GetTimestamp();
+  }
+
+  public void EndAgentSection(long startTimestamp) {
+    _agentTicks += Stopwatch.GetTimestamp() - startTimestamp;
+  }
+
+  public void EndActiveOrderSection(long startTimestamp) {
+    _activeOrderTicks += Stopwatch.GetTimestamp() - startTimestamp;
+  }
+
+  public void EndQueuedOrderSection(long startTimestamp) {
+    _queuedOrderTicks += Stopwatch.GetTimestamp() - startTimestamp;
+  }
+
+  public void EndConstructionOrderSection(long startTimestamp) {
+    _constructionOrderTicks += Stopwatch.GetTimestamp() - startTimestamp;
+  }
+
+  public void EndReadinessSection(long startTimestamp) {
+    _readinessTicks += Stopwatch.GetTimestamp() - startTimestamp;
+  }
+
+  public void EndDecisionSection(long startTimestamp) {
+    _decisionTicks += Stopwatch.GetTimestamp() - startTimestamp;
+  }
+
+  public void EndSortSection(long startTimestamp) {
+    _sortTicks += Stopwatch.GetTimestamp() - startTimestamp;
   }
 
   public static long Timestamp() {

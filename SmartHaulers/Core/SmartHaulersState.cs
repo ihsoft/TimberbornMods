@@ -7,14 +7,14 @@ namespace IgorZ.SmartHaulers.Core;
 static class SmartHaulersState {
   public static bool DiagnosticsEnabled { get; private set; }
   public static bool DispatchPanelVisible { get; private set; } = true;
-  public static DispatchDebugViewMode DispatchViewMode { get; private set; } = DispatchDebugViewMode.All;
+  public static DispatchDebugViewMode DispatchViewMode { get; private set; } = DispatchDebugViewMode.Agents;
   public static bool LogSnapshotRequested { get; private set; }
   public static bool SnapshotRefreshRequested { get; private set; }
 
   public static void Reset() {
     DiagnosticsEnabled = false;
     DispatchPanelVisible = true;
-    DispatchViewMode = DispatchDebugViewMode.All;
+    DispatchViewMode = DispatchDebugViewMode.Agents;
     LogSnapshotRequested = false;
     SnapshotRefreshRequested = false;
   }
@@ -32,10 +32,10 @@ static class SmartHaulersState {
 
   public static void CycleDispatchViewMode() {
     DispatchViewMode = DispatchViewMode switch {
-        DispatchDebugViewMode.All => DispatchDebugViewMode.Agents,
         DispatchDebugViewMode.Agents => DispatchDebugViewMode.Orders,
-        DispatchDebugViewMode.Orders => DispatchDebugViewMode.All,
-        _ => DispatchDebugViewMode.All,
+        DispatchDebugViewMode.Orders => DispatchDebugViewMode.Perf,
+        DispatchDebugViewMode.Perf => DispatchDebugViewMode.Agents,
+        _ => DispatchDebugViewMode.Agents,
     };
   }
 

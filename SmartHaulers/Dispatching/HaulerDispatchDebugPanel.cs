@@ -106,7 +106,10 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
 
   string BuildText() {
     var lines = new List<string>();
-    lines.Add(FormatPerformance());
+    if (SmartHaulersState.DispatchViewMode == DispatchDebugViewMode.Perf) {
+      AddPerformance(lines);
+      return string.Join("\n", lines);
+    }
     foreach (var dispatchCenter in OrderedDispatchCenters()) {
       AddDispatchCenter(lines, dispatchCenter);
     }
@@ -119,28 +122,69 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
     }
   }
 
-  string FormatPerformance() {
+  void AddPerformance(List<string> lines) {
     var last = _performanceStats.LastSample;
     var total = _performanceStats.WindowTotal;
     var sampleCount = _performanceStats.WindowSampleCount;
     if (sampleCount == 0) {
-      return "perf, no samples";
+      lines.Add("No samples");
+      return;
     }
-    return $"perf, last={FormatSample(last)}, avg{sampleCount}={FormatAverage(total, sampleCount)}";
+    lines.Add($"window={sampleCount}");
+    lines.Add($"last, {FormatSample(last)}");
+    lines.Add($"avg,  {FormatAverage(total, sampleCount)}");
+    lines.Add($"last phases, {FormatBreakdown(last)}");
+    lines.Add($"avg phases,  {FormatAverageBreakdown(total, sampleCount)}");
+    lines.Add("T total, PU pickup path, DL delivery path");
+    lines.Add("A agents, O active orders, Q queued orders, B construction, R readiness, D decisions, S sort, X other");
+    lines.Add("PU/DL are included in phase times.");
   }
 
   static string FormatSample(DispatchPerformanceSample sample) {
-    return $"total {Milliseconds(sample.TotalTicks):0.###}ms, "
-        + $"pickup {Milliseconds(sample.PickupPathTicks):0.###}ms/{sample.PickupPathCalls}, "
-        + $"delivery {Milliseconds(sample.DeliveryPathTicks):0.###}ms/{sample.DeliveryPathCalls}";
+    return $"T={Milliseconds(sample.TotalTicks):0.###}ms, "
+        + $"PU={Milliseconds(sample.PickupPathTicks):0.###}ms/{sample.PickupPathCalls}, "
+        + $"DL={Milliseconds(sample.DeliveryPathTicks):0.###}ms/{sample.DeliveryPathCalls}";
+  }
+
+  static string FormatBreakdown(DispatchPerformanceSample sample) {
+    return $"A={Milliseconds(sample.AgentTicks):0.###}, "
+        + $"O={Milliseconds(sample.ActiveOrderTicks):0.###}, "
+        + $"Q={Milliseconds(sample.QueuedOrderTicks):0.###}, "
+        + $"B={Milliseconds(sample.ConstructionOrderTicks):0.###}, "
+        + $"R={Milliseconds(sample.ReadinessTicks):0.###}, "
+        + $"D={Milliseconds(sample.DecisionTicks):0.###}, "
+        + $"S={Milliseconds(sample.SortTicks):0.###}, "
+        + $"X={Milliseconds(OtherTicks(sample)):0.###}ms";
   }
 
   static string FormatAverage(DispatchPerformanceSample total, int sampleCount) {
-    return $"total {Milliseconds(total.TotalTicks) / sampleCount:0.###}ms, "
-        + $"pickup {Milliseconds(total.PickupPathTicks) / sampleCount:0.###}ms/"
+    return $"T={Milliseconds(total.TotalTicks) / sampleCount:0.###}ms, "
+        + $"PU={Milliseconds(total.PickupPathTicks) / sampleCount:0.###}ms/"
         + $"{(float)total.PickupPathCalls / sampleCount:0.#}, "
-        + $"delivery {Milliseconds(total.DeliveryPathTicks) / sampleCount:0.###}ms/"
+        + $"DL={Milliseconds(total.DeliveryPathTicks) / sampleCount:0.###}ms/"
         + $"{(float)total.DeliveryPathCalls / sampleCount:0.#}";
+  }
+
+  static string FormatAverageBreakdown(DispatchPerformanceSample total, int sampleCount) {
+    return $"A={Milliseconds(total.AgentTicks) / sampleCount:0.###}, "
+        + $"O={Milliseconds(total.ActiveOrderTicks) / sampleCount:0.###}, "
+        + $"Q={Milliseconds(total.QueuedOrderTicks) / sampleCount:0.###}, "
+        + $"B={Milliseconds(total.ConstructionOrderTicks) / sampleCount:0.###}, "
+        + $"R={Milliseconds(total.ReadinessTicks) / sampleCount:0.###}, "
+        + $"D={Milliseconds(total.DecisionTicks) / sampleCount:0.###}, "
+        + $"S={Milliseconds(total.SortTicks) / sampleCount:0.###}, "
+        + $"X={Milliseconds(OtherTicks(total)) / sampleCount:0.###}ms";
+  }
+
+  static long OtherTicks(DispatchPerformanceSample sample) {
+    var knownTicks = sample.AgentTicks
+        + sample.ActiveOrderTicks
+        + sample.QueuedOrderTicks
+        + sample.ConstructionOrderTicks
+        + sample.ReadinessTicks
+        + sample.DecisionTicks
+        + sample.SortTicks;
+    return sample.TotalTicks > knownTicks ? sample.TotalTicks - knownTicks : 0;
   }
 
   static double Milliseconds(long ticks) {
@@ -161,12 +205,12 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
         + $"{dispatchCenter.Agents.Count}, "
         + $"{counts.available}, {counts.wandering}, {counts.workplaceIdle}, {counts.transporting}, "
         + $"{counts.satisfyingNeed}, {counts.working}, {dispatchCenter.Orders.Count}");
-    if (viewMode is DispatchDebugViewMode.All or DispatchDebugViewMode.Agents) {
+    if (viewMode is DispatchDebugViewMode.Agents) {
       foreach (var agent in dispatchCenter.Agents.OrderBy(agent => agent.EntityId)) {
         lines.Add(FormatAgent(agent));
       }
     }
-    if (viewMode is DispatchDebugViewMode.All or DispatchDebugViewMode.Orders) {
+    if (viewMode is DispatchDebugViewMode.Orders) {
       foreach (var order in dispatchCenter.Orders) {
         lines.Add(FormatOrder(order));
       }
@@ -224,10 +268,10 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
 
   static void LogSnapshot(string text) {
     DebugEx.Info(
-        "SmartHaulers snapshot columns: perf, last/avg total/pickup/delivery ms/calls | view, district, agents, "
-        + "available, wandering, workplaceIdle, transporting, satisfyingNeed, working, orders | agent, state/role, "
-        + "activity, position, speed, capacity | agent, phase, good, path, route, left | phase(weight), behavior, "
-        + "optional good, optional path, decision, requester");
+        "SmartHaulers snapshot columns: perf mode: T/PU/DL and phase timings | agents/orders modes: view, district, "
+        + "agents, available, wandering, workplaceIdle, transporting, satisfyingNeed, working, orders | agent, "
+        + "state/role, activity, position, speed, capacity | agent, phase, good, path, route, left | phase(weight), "
+        + "behavior, optional good, optional path, decision, requester");
     DebugEx.Info("SmartHaulers snapshot:\n{0}", text);
   }
 

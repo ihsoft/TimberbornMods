@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using Timberborn.Buildings;
+using Timberborn.BlockingSystem;
 using Timberborn.ConstructionSites;
 using IgorZ.SmartHaulers.Core;
 using Timberborn.BaseComponentSystem;
@@ -89,24 +90,38 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
       return;
     }
     foreach (var worker in _districtCenter.DistrictPopulation.GetEnabledCharacters<Worker>()) {
+      var section = _performanceStats.BeginSection();
       var agentSnapshot = CreateAgentSnapshot(worker);
+      _performanceStats.EndAgentSection(section);
       if (!agentSnapshot.IsTransportAgent) {
         continue;
       }
       _agents.Add(agentSnapshot);
+      section = _performanceStats.BeginSection();
       if (TryCreateOrderSnapshot(worker, agentSnapshot, out var orderSnapshot)) {
         _orders.Add(orderSnapshot);
       } else {
         _progressByAgent.Remove(worker);
         _orderMemoryByAgent.Remove(worker);
       }
+      _performanceStats.EndActiveOrderSection(section);
     }
+    var refreshSection = _performanceStats.BeginSection();
     AddQueuedOrders();
+    _performanceStats.EndQueuedOrderSection(refreshSection);
+    refreshSection = _performanceStats.BeginSection();
     AddConstructionOrders();
+    _performanceStats.EndConstructionOrderSection(refreshSection);
+    refreshSection = _performanceStats.BeginSection();
     ClassifyOrderReadiness();
+    _performanceStats.EndReadinessSection(refreshSection);
+    refreshSection = _performanceStats.BeginSection();
     AddDecisions();
+    _performanceStats.EndDecisionSection(refreshSection);
+    refreshSection = _performanceStats.BeginSection();
     _agents.Sort((left, right) => left.EntityId.CompareTo(right.EntityId));
     _orders.Sort(CompareOrders);
+    _performanceStats.EndSortSection(refreshSection);
   }
 
   void ClassifyOrderReadiness() {
@@ -314,22 +329,82 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
   }
 
   void RestoreDistrictEndpoint(GoodAmount goodAmount, ref Inventory source, ref Inventory target) {
-    var districtInventoryPicker = _districtCenter.GetComponent<DistrictInventoryPicker>();
-    if (!districtInventoryPicker) {
+    var districtInventoryRegistry = _districtCenter.GetComponent<DistrictInventoryRegistry>();
+    if (!districtInventoryRegistry) {
       return;
     }
     if (source && !target) {
-      var sourceAccessible = source.GetEnabledComponent<Accessible>();
-      if (sourceAccessible) {
-        target = districtInventoryPicker.ClosestInventoryWithCapacity(sourceAccessible, goodAmount, _ => true, out _);
-      }
+      target = ClosestInventoryWithCapacity(source, goodAmount, districtInventoryRegistry);
     }
     if (!source && target) {
-      var targetAccessible = target.GetEnabledComponent<Accessible>();
-      if (targetAccessible) {
-        source = districtInventoryPicker.ClosestInventoryWithStock(targetAccessible, goodAmount.GoodId, _ => true);
+      source = ClosestInventoryWithStock(target, goodAmount.GoodId, districtInventoryRegistry);
+    }
+  }
+
+  static Inventory ClosestInventoryWithCapacity(
+      Inventory source, GoodAmount goodAmount, DistrictInventoryRegistry districtInventoryRegistry) {
+    var sourceAccessible = source.GetEnabledComponent<Accessible>();
+    if (!sourceAccessible) {
+      return null;
+    }
+    Inventory closestInventory = null;
+    var closestDistance = float.MaxValue;
+    foreach (var inventory in districtInventoryRegistry.ActiveInventoriesWithCapacity(goodAmount.GoodId)) {
+      var targetAccessible = inventory.GetEnabledComponent<Accessible>();
+      if (targetAccessible
+          && InventoryIsTaking(inventory, goodAmount)
+          && TryFindRoadPath(sourceAccessible, targetAccessible, out var distance)
+          && distance < closestDistance) {
+        closestInventory = inventory;
+        closestDistance = distance;
       }
     }
+    return closestInventory;
+  }
+
+  static Inventory ClosestInventoryWithStock(
+      Inventory target, string goodId, DistrictInventoryRegistry districtInventoryRegistry) {
+    var targetAccessible = target.GetEnabledComponent<Accessible>();
+    if (!targetAccessible) {
+      return null;
+    }
+    Inventory closestInventory = null;
+    var closestDistance = float.MaxValue;
+    foreach (var inventory in districtInventoryRegistry.ActiveInventoriesWithStock(goodId)) {
+      var sourceAccessible = inventory.GetEnabledComponent<Accessible>();
+      if (sourceAccessible
+          && TryFindRoadPath(targetAccessible, sourceAccessible, out var distance)
+          && distance < closestDistance) {
+        closestInventory = inventory;
+        closestDistance = distance;
+      }
+    }
+    return closestInventory;
+  }
+
+  static bool InventoryIsTaking(Inventory inventory, GoodAmount goodAmount) {
+    return inventory.HasUnreservedCapacity(goodAmount)
+        && inventory.GetComponent<IInventoryValidator>().ValidInventory
+        && inventory.GetComponent<BlockableObject>().IsUnblocked;
+  }
+
+  static bool TryFindRoadPath(Accessible start, Accessible end, out float distance) {
+    distance = float.PositiveInfinity;
+    if (AccessibleIsBlocked(start) || AccessibleIsBlocked(end)) {
+      return false;
+    }
+    var pathFound = false;
+    foreach (var startAccess in start.Accesses) {
+      if (end.FindPathUnlimitedRange(startAccess, [], out var pathDistance)) {
+        distance = Math.Min(distance, pathDistance);
+        pathFound = true;
+      }
+    }
+    return pathFound;
+  }
+
+  static bool AccessibleIsBlocked(Accessible accessible) {
+    return !accessible.Enabled || (accessible._blockedAccessible?.IsBlocked() ?? false);
   }
 
   void AddQueuedOrders() {

@@ -5,7 +5,7 @@
 namespace IgorZ.SmartHaulers.Core;
 
 enum DispatchDebugViewMode {
-  All,
   Agents,
   Orders,
+  Perf,
 }
