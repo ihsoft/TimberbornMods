@@ -52,6 +52,10 @@ Current candidate states for passive dispatcher decisions:
 These are intentionally conservative. `Working`, `Transporting`, and `SatisfyingNeed` are observed but not selected as
 new-order candidates by the passive evaluator.
 
+Agents with `WorkRefuser.RefusesWork` are visible in diagnostics but are not eligible for passive scoring. This covers
+workers and bots that the game currently prevents from working, such as contaminated, injured, or critical-need agents
+whose need has `NeedPreventingWorkSpec`.
+
 `WorkplaceIdle` is too broad for passive scoring by itself. The current SmartHaulers-owned scoring model classifies the
 workplace role:
 
@@ -123,9 +127,18 @@ SmartHaulers expands selected behaviors per good:
 - goods are no longer prioritized only by vanilla `GoodAmountComparer`;
 - priority is represented by each order's weight.
 
-The current planner still uses vanilla nearest inventory lookup. This means each planned good gets at most one nearest
-source-to-target segment. It does not yet build compound coverage from multiple source inventories or batch-plan across
-multiple destinations.
+The current planner still uses vanilla nearest inventory lookup for individual candidates. Each candidate has one
+concrete source-to-target segment. The planner does not yet build compound coverage from multiple source inventories or
+batch-plan across multiple destinations.
+
+For `FillInput`, the prototype can create multiple source candidates for one good across source inventories. These are
+alternative candidates from one snapshot, not a compound plan. They do not virtually subtract stock, and they do not
+mean SmartHaulers can already reserve several sources for one request in one pass.
+
+The same multi-candidate idea likely matters for take-away and export flows. An output source may need to move more
+goods than the closest accepting storage can hold, so multiple target inventories or alternative target candidates can
+matter for `EmptyOutput`, `RemoveUnwantedStock`, `EmptyInventories`, and possibly `SupplyGood` or `ObtainGood` flows
+where source stock or target capacity limits create alternatives.
 
 Candidates may compete across vanilla requests, not only inside one request. For example, two factories can both create
 delivery candidates that depend on the same source stock. After SmartHaulers eventually performs a real assignment or
@@ -134,17 +147,20 @@ prototype sequence is: refresh a snapshot, choose one best dispatchable candidat
 assignment, then rebuild affected candidates before choosing the next one. Rebuilding the whole district is acceptable
 at this stage.
 
-Current readiness classification is a prototype simplification. It uses fixed per-good inventory fill thresholds:
+Current readiness classification is partly time-based. Fixed per-good inventory fill thresholds remain only as fallback
+behavior for order types where SmartHaulers cannot yet estimate time-to-critical.
 
-- bring/fill requests are treated as dispatchable when the target good fill is at or below 50%;
-- take-away requests are treated as dispatchable when the source good fill is at or above 50%;
-- construction material delivery remains dispatchable immediately.
+Implemented time-based cases:
 
-This threshold is not the intended final readiness model. Future SmartHaulers readiness should be time-based: estimate
-how long until a building blocks because of missing input or excess output, and compare that time with delivery ETA.
-For example, if a manufactory can keep working for about 2 days but delivery takes 1.5 days, the order may need to
-become dispatchable now even if the inventory is not past a fixed fill threshold. This is SmartHaulers-owned design
-direction, not vanilla behavior.
+- `FillInput` can estimate time until a manufactory runs out of a missing input or fuel.
+- `FillInput` can estimate time until a `GoodConsumingBuilding` exhausts a supplied good.
+- `EmptyOutput` can estimate time until manufactory output storage blocks production.
+
+The current prototype classifies time estimates with fixed urgency windows, not delivery ETA. Delivery ETA is computed
+for passive scoring, but readiness does not yet compare delivery ETA against time-to-critical. The intended model is
+still time-to-critical versus delivery ETA: if a manufactory can keep working for about 2 days but delivery takes 1.5
+days, the order may need to become dispatchable now even if the inventory is not past a fixed fill threshold. This is
+SmartHaulers-owned design direction, not vanilla behavior.
 
 ## FillInput Weight
 
@@ -207,6 +223,8 @@ Known constraints:
 - vanilla inventory picker returns one closest matching inventory, not an ordered list;
 - repeated picker calls with exclusion filters can emulate "next inventory" but are not a scalable batch planner;
 - multi-access buildings require care, because some vanilla helpers assume a single access point;
+- cached road flow-field data may be unavailable immediately after save load, so diagnostics should prefer unknown
+  endpoints or best-effort path estimates over crashes;
 - inverted road-distance ranking may be useful later to align with flow-field cache origins.
 
 ## Diagnostics UI
@@ -225,14 +243,25 @@ It should support the investigation loop:
 The UI is intentionally compact. Labels like `good=`, `beh=`, and `prog=` were removed when the values became
 self-explanatory. `Queued` and `Covered` hide route text because it is misleading at those phases.
 
+Current main dispatch views are:
+
+- `Agents`;
+- `Orders`;
+- `Perf`.
+
+There is no `All` mode in the current UI. `Perf` shows a multi-line timing breakdown for the snapshot refresh loop,
+including total time, pickup path, delivery path, agents, active orders, queued orders, construction, readiness,
+decisions, sort, and other work.
+
 ## Current Limitations
 
 The current design does not yet:
 
 - reserve or assign orders;
 - prevent vanilla from selecting a different worker;
-- use a time-to-blockage versus delivery-ETA readiness model;
+- compare time-to-critical against delivery ETA for readiness;
 - model compound plans across several source inventories;
+- model compound plans across several target inventories;
 - virtually subtract stock or capacity across planned segments;
 - batch-plan several assignments from one snapshot;
 - evaluate critical needs, hunger, thirst, fuel, or rest risk;
@@ -249,8 +278,8 @@ The next design layer should stay passive unless there is a clear reason to inte
 Useful next steps:
 
 - continue refining per-good planning and decide which remaining behaviors should expand per good;
-- replace fixed 50% readiness thresholds with time-to-blockage versus delivery-ETA estimates;
-- design a compound order model for multi-source or multi-target coverage;
+- expand time-to-critical readiness coverage and compare it against delivery ETA;
+- design a compound or multi-candidate order model for multi-source or multi-target coverage;
 - keep planned candidates explicitly tied to the snapshot that produced them;
 - improve passive scoring with clearer ETA and capacity semantics;
 - compare vanilla active assignments with SmartHaulers passive decisions;

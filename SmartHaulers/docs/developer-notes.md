@@ -120,10 +120,10 @@ and `ClosestInventoryWithCapacity(...)` to estimate a request.
 These APIs return one closest matching inventory. They do not expose an ordered iterator or list of next-best
 candidates.
 
-As a current prototype limitation, a request that could be satisfied by multiple inventories creates at most one
-estimated source-to-target segment for the first closest source or target pair. For example, if a target can accept
-`5x Log`, the closest source has `3x Log`, and another source has `2x Log`, the current planner estimates only `3x Log`
-from the closest source. It does not create a `3 + 2` compound coverage plan in one pass.
+As a current prototype limitation, each candidate is one estimated source-to-target segment. `FillInput` can create
+multiple alternative source candidates for one good across source inventories, but this is not compound planning. For
+example, if a target can accept `5x Log`, the closest source has `3x Log`, and another source has `2x Log`, the current
+planner can expose alternatives, but it does not create a `3 + 2` compound coverage plan in one pass.
 
 Repeating the vanilla picker while filtering out already chosen inventories can emulate "next inventory", but each
 repeat is another candidate scan and path-distance pass. Treat that as a prototype shortcut, not as a scalable planning
@@ -131,6 +131,11 @@ model.
 
 A future SmartHaulers-owned compound or batch planner likely needs to enumerate candidate inventories from the
 district/good registry, rank them, and apply virtual stock/capacity subtraction across multiple planned segments.
+
+The same candidate expansion problem exists on the target side. Take-away or product-export flows may need to move more
+goods than the closest accepting storage can hold, so future planning may need multiple target candidates or compound
+target coverage for `EmptyOutput`, `RemoveUnwantedStock`, `EmptyInventories`, and possibly `SupplyGood` or `ObtainGood`
+flows where stock or capacity limits create alternatives.
 
 Treat planned orders as snapshot-bound candidates. They are execution options computed from one view of district stock,
 capacity, reservations, and active deliveries, not a durable independent queue. Candidate conflicts can span multiple
@@ -163,6 +168,35 @@ fillRatio = AmountInStock(goodId) / LimitedAmount(goodId)
 
 If `LimitedAmount(goodId) <= 0` and stock is present, treat the good as full/urgent with `fillRatio = 1`. This matters
 for disallowed or unwanted goods: otherwise they can remain forever `Deferred` even though any stock should be removed.
+
+## Time-Based Readiness
+
+`TransportOrderReadinessClassifier` currently prefers time-to-critical estimates when
+`TransportOrderCriticalTimeEstimator.TryGetHoursUntilCritical(...)` can provide them. Fixed per-good fill thresholds are
+fallback behavior for order types where a time estimate is not implemented yet.
+
+Current time estimate coverage:
+
+- `FillInput` into a manufactory can estimate time until a required ingredient or fuel becomes critical.
+- `FillInput` into a `GoodConsumingBuilding` can estimate time until the building exhausts a supplied good.
+- `EmptyOutput` from a manufactory can estimate time until product output storage blocks production.
+
+Manufactory input estimates use `CurrentRecipe`. Ingredient availability is counted in future recipe cycles from
+unreserved stock, and `_ingredientsConsumed` plus remaining cycle time determine whether the current cycle has already
+consumed its ingredients. Fuel estimates use stored fuel, `FuelRemaining`, and `CyclesFuelLasts` to estimate how many
+future cycles can still run. Output estimates count unreserved output capacity for recipe products and include remaining
+cycle time when the current cycle can still complete.
+
+`GoodConsumingBuilding` estimates use the per-good `GoodPerHour` rate and combine inventory stock with the building's
+internal supply for that good.
+
+Current limitations:
+
+- production efficiency, power state, paused/disabled state, and other limiters are not fully folded into readiness;
+- delivery ETA is not yet compared against time-to-critical when deciding whether an order is dispatchable;
+- the current urgency windows are prototype constants, not final dispatch policy.
+
+Keep the distinction clear: time-to-critical readiness is SmartHaulers-owned prototype logic, not vanilla behavior.
 
 ## Transport Order Categories
 
@@ -249,6 +283,11 @@ uses `UnblockedSingleAccess`, which can throw when more than one access point ex
 
 Use a multi-access-aware API when available. In diagnostics, prefer returning unknown, NaN, or no path over crashing on
 a multi-access building.
+
+Cached road flow-field data may be missing after save load or before vanilla has warmed the relevant cache. Diagnostics
+should not crash or assume the cache exists. For endpoint restoration, prefer a safe best-effort registry scan and
+`FindPathUnlimitedRange` over vanilla `DistrictInventoryPicker` paths that can throw through `UnblockedSingleAccess`.
+An unknown endpoint is better than crashing the diagnostics panel.
 
 ## Diagnostics Cadence
 
