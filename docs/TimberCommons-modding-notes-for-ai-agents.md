@@ -190,3 +190,30 @@ French:
 IgorZ.TimberCommons.CommonUIPatches.ModListView.ShowActiveMods,"Afficher les mods actifs ({0}/{1})","Button in mod manager. Shows only enabled mods."
 IgorZ.TimberCommons.CommonUIPatches.ModListView.ShowAllMods,"Afficher tous les mods ({0})","Button in mod manager. Shows all installed mods."
 ```
+
+## Common UI dialogs
+
+TimberCommons common UI patches may use shared TimberDev UI helpers such as `AbstractDialog`.
+
+Treat shared TimberDev helpers as general infrastructure. Add behavior there only when it is clearly reusable by
+multiple dialogs. Keep feature-specific layout, loading, confirmation, and validation behavior in the TimberCommons
+subclass.
+
+Do not casually replace helper methods in shared UI infrastructure. For example, if existing code uses `Root.Q2`, keep
+that helper unless the change has been checked against its intended behavior and all affected dialogs.
+
+For UI replacement patches such as save-load dialogs, keep the Harmony patch thin. The patch should intercept the game
+method, resolve the TimberCommons dialog or service from DI, delegate to it, and return the appropriate Harmony result.
+The dialog class should own UI loading, validation, button behavior, confirmation flow, and state.
+
+When a dialog asks for confirmation before continuing, preserve the user's context. If the confirmation has Cancel,
+Cancel should leave the user in the original dialog instead of closing it and returning to the previous screen.
+
+## Save-load mod compatibility dialog
+
+Save-file mod checks must compare logical mod identity, not only the specific package item that appeared in the save or
+repository list.
+
+Local-folder and Workshop copies can share the same manifest id. If an equivalent local-folder copy is already active,
+do not offer to enable a disabled Workshop duplicate just because that package item is disabled. Reason by manifest id
+or equivalent logical identity first, then decide whether any installed mod actually needs to be enabled.

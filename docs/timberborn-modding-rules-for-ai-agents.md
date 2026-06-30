@@ -212,6 +212,11 @@ When patching Timberborn game methods, prefer `nameof(TargetType.Method)` over s
 publicized game assemblies make the target method compile-visible. This lets compilation catch renamed or removed game
 methods after a Timberborn update.
 
+Do not trust `_DecompiledGame` accessibility alone when deciding whether a game member requires a string-based Harmony
+patch or reflection. Decompiled references show the original game assemblies before MSBuild publicizer changes. If the
+project publicizes the target assembly, verify against the publicized compile artifact or try compiling with direct
+access before falling back to string method names or `AccessTools`.
+
 If publicized direct access is not available for the target method, use the existing reflection or `AccessTools`
 approach instead of forcing `nameof`.
 
@@ -223,6 +228,8 @@ For UI patches:
 
 - Prefer postfix patches when possible.
 - Avoid replacing original behavior unless necessary.
+- When a patch replaces a UI flow, keep the Harmony patch thin when possible. The patch should intercept and delegate to
+  a normal DI-created class; the dialog, view, or service should own UI loading, validation, button behavior, and state.
 - Use existing UI elements as anchors.
 - Avoid depending on UXML when a safe runtime insertion is enough.
 - Use `root.Q<T>("ElementName")` to find stable named elements.
@@ -375,6 +382,11 @@ Choose the context from the task:
 A configurator can be registered in more than one context when the same bindings are required in multiple places.
 
 Any type defined by a package that must participate in DI must be registered by the package configurator.
+
+When adding a dialog, view, service, or patch helper that can be instantiated from more than one game area, verify every
+context that can create it. Include inherited constructor dependencies from base classes. If the type is used from both
+main-menu UI and in-game UI, its package bindings and any static dependency bridge must cover the required contexts
+explicitly instead of assuming the `Game` context is enough.
 
 Common binding patterns:
 
