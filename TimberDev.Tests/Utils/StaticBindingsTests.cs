@@ -39,7 +39,8 @@ static class StaticBindingsTests {
         .ToArray();
 
     Assert.Equal("Game", contexts[0]);
-    Assert.Equal("Menu", contexts[1]);
-    Assert.Equal(2, contexts.Length);
+    Assert.Equal("MainMenu", contexts[1]);
+    Assert.Equal("Menu", contexts[2]);
+    Assert.Equal(3, contexts.Length);
   }
 }

@@ -8,6 +8,7 @@ using Bindito.Core;
 namespace IgorZ.TimberDev.UI;
 
 [Context("Game")]
+[Context("MainMenu")]
 // ReSharper disable once UnusedType.Global
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {

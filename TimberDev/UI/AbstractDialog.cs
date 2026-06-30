@@ -78,8 +78,16 @@ public abstract class AbstractDialog : IPanelController {
   /// <seealso cref="OnUICancelled"/>
   protected abstract bool CheckHasChanges();
 
+  /// <summary>Shows the message returned by <see cref="VerifyInput"/> and keeps the dialog open.</summary>
+  protected virtual void ShowVerificationMessage(string message) {
+    DialogBoxShower.Create().SetMessage(message).Show();
+  }
+
   /// <summary>UI factory utility class. Use it to manipulate the elements.</summary>
   protected UiFactory UiFactory { get; private set; }
+
+  /// <summary>Dialog box factory utility class.</summary>
+  protected DialogBoxShower DialogBoxShower { get; private set; }
 
   #endregion
 
@@ -94,7 +102,7 @@ public abstract class AbstractDialog : IPanelController {
   public bool OnUIConfirmed() {
     var maybeError = VerifyInput();
     if (maybeError != null) {
-      _dialogBoxShower.Create().SetMessage(maybeError).Show();
+      ShowVerificationMessage(maybeError);
       return true;
     }
     ApplyInput();
@@ -105,7 +113,7 @@ public abstract class AbstractDialog : IPanelController {
   /// <inheritdoc/>
   public void OnUICancelled() {
     if (CheckHasChanges()) {
-      _dialogBoxShower.Create()
+      DialogBoxShower.Create()
           .SetMessage(UiFactory.T(UnsavedChangesConfirmationLocKey))
           .SetConfirmButton(Close)
           .SetCancelButton(() => {})
@@ -120,14 +128,13 @@ public abstract class AbstractDialog : IPanelController {
   #region Implementation
 
   PanelStack _panelStack;
-  DialogBoxShower _dialogBoxShower;
 
   /// <summary>Public for the inject to work properly.</summary>
   [Inject]
   public void InjectDependencies(UiFactory uiFactory, PanelStack panelStack, DialogBoxShower dialogBoxShower) {
     UiFactory = uiFactory;
     _panelStack = panelStack;
-    _dialogBoxShower = dialogBoxShower;
+    DialogBoxShower = dialogBoxShower;
   }
 
   #endregion
