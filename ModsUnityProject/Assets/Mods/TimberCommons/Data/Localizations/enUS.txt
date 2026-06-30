@@ -40,9 +40,9 @@ IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,"Show injury proba
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,"Show indicator on the building avatar",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHintTooltip,"Hover over the indicator to see the injury probability",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAsDailyProbability,"Show daily probabilities",
-=,=,"CommonUIPatches"
-IgorZ.TimberCommons.CommonUIPatches.ModListView.ShowActiveMods,"Show active ({0}/{1})","Button in mod manager. Shows only enabled mods."
-IgorZ.TimberCommons.CommonUIPatches.ModListView.ShowAllMods,"Show all ({0})","Button in mod manager. Shows all installed mods."
+=,=,"ModUIPatches"
+IgorZ.TimberCommons.ModUIPatches.ModListView.ShowActiveMods,"Show active ({0}/{1})","Button in mod manager. Shows only enabled mods."
+IgorZ.TimberCommons.ModUIPatches.ModListView.ShowAllMods,"Show all ({0})","Button in mod manager. Shows all installed mods."
 =,=,"TimberDev_Utils"
 TimberDev_Utils.Settings.DebugSection,"Debug and troubleshooting",
 TimberDev_Utils.Settings.Debug.VerboseLogging,"Verbose logging",

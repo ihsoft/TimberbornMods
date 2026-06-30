@@ -1,4 +1,4 @@
-﻿// Timberborn Mod: Timberborn Commons
+// Timberborn Mod: Timberborn Commons
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
@@ -6,11 +6,12 @@ using System;
 using Bindito.Core;
 using IgorZ.TimberDev.Utils;
 
-namespace IgorZ.TimberCommons.CommonUIPatches;
+namespace IgorZ.TimberCommons.ModUIPatches;
 
-[Context("MainMenu")]
-sealed class ConfiguratorFromMainMenu : IConfigurator {
-  static readonly string PatchId = typeof(ConfiguratorFromMainMenu).AssemblyQualifiedName;
+[Context("Game")]
+// ReSharper disable once UnusedType.Global
+sealed class ConfiguratorForGame : IConfigurator {
+  static readonly string PatchId = typeof(ConfiguratorForGame).AssemblyQualifiedName;
   static readonly Type[] Patches = [
       typeof(ModListViewInitializePatch),
   ];

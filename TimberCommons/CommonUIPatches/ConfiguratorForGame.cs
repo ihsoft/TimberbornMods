@@ -21,12 +21,10 @@ sealed class ConfiguratorForGame : IConfigurator {
       typeof(GrowableFragmentPatch),
       typeof(ManufactoryDescriberPatch1),
       typeof(ManufactoryDescriberPatch2),
-      typeof(ModListViewInitializePatch),
   ];
 
   public void Configure(IContainerDefinition containerDefinition) {
     CommonFormats.ResetCachedLocStrings();
     HarmonyPatcher.ApplyPatch(PatchId, Patches);
-    containerDefinition.Bind<ModListViewLocInitializer>().AsSingleton();
   }
 }

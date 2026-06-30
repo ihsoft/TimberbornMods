@@ -38,9 +38,9 @@ IgorZ.TimberCommons.Settings.InjuryProbabilitySection,Verletzungsrisiko,
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,Verletzungsrisiko im Gebäudefenster anzeigen,
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,Indikator am Gebäudesymbol anzeigen,
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHintTooltip,"Bewege den Mauszeiger über den Indikator, um das Verletzungsrisiko anzuzeigen.",
-=,=,"CommonUIPatches"
-IgorZ.TimberCommons.CommonUIPatches.ModListView.ShowActiveMods,"Aktive anzeigen ({0}/{1})","Button in mod manager. Shows only enabled mods."
-IgorZ.TimberCommons.CommonUIPatches.ModListView.ShowAllMods,"Alle anzeigen ({0})","Button in mod manager. Shows all installed mods."
+=,=,"ModUIPatches"
+IgorZ.TimberCommons.ModUIPatches.ModListView.ShowActiveMods,"Aktive anzeigen ({0}/{1})","Button in mod manager. Shows only enabled mods."
+IgorZ.TimberCommons.ModUIPatches.ModListView.ShowAllMods,"Alle anzeigen ({0})","Button in mod manager. Shows all installed mods."
 =,=,"TimberDev_Utils"
 TimberDev_Utils.Settings.DebugSection,Fehlersuche und Fehlerbehebung,
 TimberDev_Utils.Settings.Debug.VerboseLogging,Ausführliches Loggen,

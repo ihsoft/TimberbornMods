@@ -11,12 +11,12 @@ using UnityEngine.UIElements;
 
 // ReSharper disable InconsistentNaming
 
-namespace IgorZ.TimberCommons.CommonUIPatches;
+namespace IgorZ.TimberCommons.ModUIPatches;
 
 [HarmonyPatch(typeof(ModListView), nameof(ModListView.Initialize))]
 static class ModListViewInitializePatch {
-  const string ShowActiveModsLocKey = "IgorZ.TimberCommons.CommonUIPatches.ModListView.ShowActiveMods";
-  const string ShowAllModsLocKey = "IgorZ.TimberCommons.CommonUIPatches.ModListView.ShowAllMods";
+  const string ShowActiveModsLocKey = "IgorZ.TimberCommons.ModUIPatches.ModListView.ShowActiveMods";
+  const string ShowAllModsLocKey = "IgorZ.TimberCommons.ModUIPatches.ModListView.ShowAllMods";
 
   static ILoc _loc = null!;
 
