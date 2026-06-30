@@ -407,6 +407,25 @@ Use a login-only/retry mode that opens SteamCMD for interactive login and does n
 
 Do not store Steam passwords in repository files or local config files.
 
+## Wiki handoff after release
+
+After a successful mod release, consider whether the release changes any Wiki-facing surface:
+
+- public API,
+- mod component specs,
+- configuration or data formats,
+- user-facing behavior documented in the Wiki,
+- compatibility notes,
+- examples or scripting/reference material.
+
+If the release plausibly affects the Wiki, send a delegated note to the `Wiki editor` thread. Include the mod name,
+released version, release commit, relevant changelog bullets, and the Wiki areas that may need review.
+
+Do not edit the Wiki directly as part of the publisher role unless the user explicitly expands the task.
+
+Do not send a Wiki handoff for releases with no plausible Wiki impact. If uncertain, send a concise "may need review"
+note instead of silently skipping.
+
 ## Closing GitHub issues after release
 
 When publishing a mod release, identify the issue-backed changes included in that release.
