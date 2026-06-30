@@ -1,4 +1,4 @@
-# v4.6.4 (TBD)
+# v4.6.4 (June 29th, 2026)
 * [Fix] Game could crash when loading old saves with active Stream Gauge signal rules.
 
 # v4.6.3 (June 28th, 2026)
