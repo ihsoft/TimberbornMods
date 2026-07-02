@@ -99,6 +99,38 @@ Current phases:
 `Queued` and `Covered` are not route contracts. `Queued` has no useful route. `Covered` may be covered by multiple
 agents, sources, or targets, so active agent rows are the reliable source for concrete source-to-target pairs.
 
+Current phase and tuning cheat sheet:
+
+- `Queued`: a vanilla request exists, but SmartHaulers did not find a concrete route or cargo. Weight may exist, but
+  cargo can be `0x`; passive scoring does not evaluate it.
+- `Estimated`: a concrete source, target, and cargo candidate exists, but readiness has not made it urgent enough for
+  scoring. With a time estimate, `4h < t <= 12h` stays `Estimated`.
+- `Deferred`: the candidate is possible but not urgent; passive scoring does not evaluate it. With a time estimate,
+  `t > 12h` becomes `Deferred`.
+- `Dispatchable`: the only planned-order phase considered by passive decision scoring. With a time estimate,
+  `t <= 4h` becomes `Dispatchable`.
+- `Covered`: existing reservations or deliveries appear to cover the request. It is not a single dispatcher route
+  contract and passive scoring does not evaluate it.
+- `PickingUp` and `Delivering`: active reservation or carry orders reconstructed from an agent. Weight is not used to
+  select them.
+
+Readiness changes phase only. It does not mutate `Weight`. `Weight` is stored in `TransportOrderOrigin.Weight` when the
+order is created and currently remains diagnostic/order-priority data.
+
+In the phase thresholds, `t` means the current `CriticalTimeInHours` estimate: how many in-game hours remain before the
+target building runs out of the delivered good or the source building becomes blocked by the taken-away good. It is a
+prototype time-to-critical estimate, not delivery ETA.
+
+Current readiness constants:
+
+- `UrgentDeliveryThresholdInHours = 4`.
+- `RelaxedDeliveryThresholdMultiplier = 3`, so the relaxed threshold is `12h`.
+- Time-based readiness is implemented for `FillInput` into manufactories, fuel-consuming production, and
+  `GoodConsumingBuilding` supply, and for `EmptyOutput` from manufactories.
+- Fallback fill thresholds still apply where time-to-critical is unavailable: bring/fill behaviors become
+  `Dispatchable` at target fill ratio `<= 0.5`; take-away behaviors become `Dispatchable` at source fill ratio
+  `>= 0.5`; construction is always `Dispatchable`.
+
 ## Possible Order Planning
 
 The current possible-order planner expands vanilla haul-provider requests into SmartHaulers order snapshots.
@@ -135,10 +167,17 @@ For `FillInput`, the prototype can create multiple source candidates for one goo
 alternative candidates from one snapshot, not a compound plan. They do not virtually subtract stock, and they do not
 mean SmartHaulers can already reserve several sources for one request in one pass.
 
+The current `FillInput` source-candidate algorithm orders source inventories by road distance and stops once cumulative
+planned amount covers the target `UnreservedCapacity(goodId)`.
+
 The same multi-candidate idea likely matters for take-away and export flows. An output source may need to move more
 goods than the closest accepting storage can hold, so multiple target inventories or alternative target candidates can
 matter for `EmptyOutput`, `RemoveUnwantedStock`, `EmptyInventories`, and possibly `SupplyGood` or `ObtainGood` flows
 where source stock or target capacity limits create alternatives.
+
+The current take-away target-candidate algorithm orders target inventories by road distance and stops once cumulative
+planned capacity covers the available amount or after `MaxTakeAwayTargetCandidates = 3`. The cap of `3` is a prototype
+diagnostics limit chosen to keep the UI readable and should be revisited during tuning.
 
 Candidates may compete across vanilla requests, not only inside one request. For example, two factories can both create
 delivery candidates that depend on the same source stock. After SmartHaulers eventually performs a real assignment or
@@ -150,17 +189,73 @@ at this stage.
 Current readiness classification is partly time-based. Fixed per-good inventory fill thresholds remain only as fallback
 behavior for order types where SmartHaulers cannot yet estimate time-to-critical.
 
-Implemented time-based cases:
+Current `CriticalTimeInHours` mechanics:
 
-- `FillInput` can estimate time until a manufactory runs out of a missing input or fuel.
-- `FillInput` can estimate time until a `GoodConsumingBuilding` exhausts a supplied good.
-- `EmptyOutput` can estimate time until manufactory output storage blocks production.
+- Manufactory ingredient `FillInput` works only when the target inventory belongs to a `Manufactory` with
+  `HasCurrentRecipe` and the cargo good is one of the current recipe ingredients. It counts full future recipe cycles
+  from unreserved stock:
+
+  ```text
+  futureCycles = UnreservedAmountInStock(ingredient.Id) / ingredient.Amount
+  ```
+
+  If current-cycle ingredients were already consumed, it adds the remaining current-cycle time:
+
+  ```text
+  RemainingCycleHours = (1 - ProductionProgress) * CycleDurationInHours
+  ```
+
+  Otherwise current-cycle extra time is `0`, because the missing input matters before another cycle can start. If the
+  ingredient amount is `<= 0`, the estimate is `float.MaxValue`.
+
+- Manufactory fuel `FillInput` applies when the current recipe consumes the cargo good as fuel. It converts stored
+  unreserved fuel and already loaded fuel into remaining recipe cycles:
+
+  ```text
+  storedFuelCycles = UnreservedAmountInStock(fuel) * CyclesFuelLasts
+  loadedFuelCycles = FuelRemaining * CyclesFuelLasts
+  remainingFuelCycles = storedFuelCycles + loadedFuelCycles - ProductionProgress
+  hours = max(0, remainingFuelCycles) * CycleDurationInHours
+  ```
+
+  If `CyclesFuelLasts <= 0`, the estimate is `float.MaxValue`.
+
+- `GoodConsumingBuilding` `FillInput` applies when the target inventory has a `GoodConsumingBuilding` that consumes the
+  cargo good with `GoodPerHour > 0`. It combines unreserved inventory stock and the building's internal supply:
+
+  ```text
+  hours = (UnreservedAmountInStock(goodId) + suppliesLeft) / GoodPerHour
+  ```
+
+- Manufactory `EmptyOutput` works only when the source inventory belongs to a `Manufactory` with `HasCurrentRecipe` and
+  the cargo good is one of the current recipe products. It counts full future product cycles from unreserved output
+  capacity:
+
+  ```text
+  futureCycles = UnreservedCapacity(product.Id) / product.Amount
+  ```
+
+  If `futureCycles <= 0`, time is `0` because output is already blocked for that product. Otherwise the estimate counts
+  the current cycle completion first, then each additional available product slot as another full cycle:
+
+  ```text
+  hours = RemainingCycleHours + (futureCycles - 1) * CycleDurationInHours
+  ```
+
+  If product amount is `<= 0`, the estimate is `float.MaxValue`.
+
+These calculations use integer cycle counts for ingredients and products. Partial ingredients or partial output
+capacity do not count as a full future cycle.
 
 The current prototype classifies time estimates with fixed urgency windows, not delivery ETA. Delivery ETA is computed
 for passive scoring, but readiness does not yet compare delivery ETA against time-to-critical. The intended model is
 still time-to-critical versus delivery ETA: if a manufactory can keep working for about 2 days but delivery takes 1.5
 days, the order may need to become dispatchable now even if the inventory is not past a fixed fill threshold. This is
 SmartHaulers-owned design direction, not vanilla behavior.
+
+The estimate does not fully model production efficiency, power availability, paused or blocked state, worker
+availability, recipe switching beyond the current recipe, or other production limiters. If any readiness constants or
+`CriticalTimeInHours` formulas are tuned, update this design note in the same change.
 
 ## FillInput Weight
 
@@ -182,6 +277,55 @@ Water: 0 / 3  -> weight 1
 ```
 
 This is SmartHaulers-owned logic, not vanilla behavior.
+
+For examples with `LimitedAmount(goodId) = 8`:
+
+```text
+0 / 8 -> weight 1
+4 / 8 -> weight 0.5
+7 / 8 -> weight 0.125
+8 / 8 -> weight 0
+```
+
+The current take-away per-good expansion uses the inverse formula:
+
+```text
+weight = AmountInStock(goodId) / LimitedAmount(goodId)
+```
+
+The value is clamped to `[0, 1]`. If `LimitedAmount(goodId) <= 0` and stock exists, weight is `1`; this makes unwanted
+or disallowed stock urgent instead of permanently deferred.
+
+For examples with `LimitedAmount(goodId) = 20`:
+
+```text
+0 / 20  -> weight 0
+10 / 20 -> weight 0.5
+20 / 20 -> weight 1
+```
+
+Construction order weight currently uses building priority:
+
+```text
+weight = ((int)priority + 1) / 5
+```
+
+Examples:
+
+```text
+VeryLow  -> 0.2
+Low      -> 0.4
+Normal   -> 0.6
+High     -> 0.8
+VeryHigh -> 1.0
+```
+
+Current vanilla/fallback baseline weights:
+
+- `RemoveUnwantedStock = 0.5`;
+- `EmptyInventories = 0.51`;
+- `BringNutrient`, `ObtainGood`, `SupplyGood`, and non-expanded vanilla `EmptyOutput` use the vanilla weighted behavior
+  value as input or fallback.
 
 ## Passive Decisions
 
@@ -205,6 +349,9 @@ Where:
 Capacity is weight-based. `GoodCarrier.LiftingCapacity` is kilograms, while cargo amount is item units. Passive scoring
 must convert through the good's `GoodSpec.Weight` or the vanilla carry-amount semantics before deciding whether an agent
 can carry the full request.
+
+`Weight` is not currently added to the candidate score. The current score is an ETA and penalty comparison for already
+`Dispatchable` candidates, not a weighted-priority sort across all planned orders.
 
 Diagnostics should make this visible when useful, for example by showing carried amount and kilogram coverage such as:
 
