@@ -29,6 +29,22 @@ static class PossibleTransportOrderPlanner {
   const string RemoveUnwantedStockBehaviorName = "RemoveUnwantedStock";
   const string SupplyGoodBehaviorName = "SupplyGood";
   const string WorkplaceBehaviorSuffix = "WorkplaceBehavior";
+  // Prototype cap: large output inventories can have many possible targets. Three keeps diagnostics readable for now.
+  const int MaxTakeAwayTargetCandidates = 3;
+
+  readonly struct PlannedCandidate {
+    public readonly Inventory Source;
+    public readonly Inventory Target;
+    public readonly GoodAmount GoodAmount;
+    public readonly float Distance;
+
+    public PlannedCandidate(Inventory source, Inventory target, GoodAmount goodAmount, float distance) {
+      Source = source;
+      Target = target;
+      GoodAmount = goodAmount;
+      Distance = distance;
+    }
+  }
 
   public static void EnsureSupported(WorkplaceBehavior workplaceBehavior, object context) {
     EnsureSupported(workplaceBehavior.GetType(), context);
@@ -222,7 +238,7 @@ static class PossibleTransportOrderPlanner {
     var added = false;
     foreach (var source in inventories.EnabledInventories) {
       foreach (var goodAmount in goodsProvider(source)) {
-        if (TryPlanTakingGood(districtCenter, source, goodAmount, IsAvailableTarget, out var order)) {
+        foreach (var order in PlanTakingGoodCandidates(districtCenter, source, goodAmount, IsAvailableTarget)) {
           var weight = TakeAwayGoodWeight(source, goodAmount.GoodId, weightedBehavior.Weight);
           orders.Add(WithRequest(
               haulCandidate, requesterId, weightedBehavior, weight, order.source, order.target, order.goodAmount));
@@ -269,18 +285,73 @@ static class PossibleTransportOrderPlanner {
     if (!targetAccessible || !IsAvailableTarget(target)) {
       yield break;
     }
+    var requestedAmount = target.UnreservedCapacity(goodId);
+    if (requestedAmount <= 0) {
+      yield break;
+    }
+    var candidates = new List<PlannedCandidate>();
     var districtInventoryRegistry = districtCenter.GetComponent<DistrictInventoryRegistry>();
     foreach (var source in districtInventoryRegistry.ActiveInventoriesWithStock(goodId)) {
       var sourceAccessible = source.GetEnabledComponent<Accessible>();
       if (!sourceAccessible
           || !IsAvailableSource(source)
           || !sourceFilter(source)
-          || !targetAccessible.FindRoadPath(sourceAccessible, out _)) {
+          || !targetAccessible.FindRoadPath(sourceAccessible, out var distance)) {
         continue;
       }
       var goodAmount = MaxTransferableAmount(source, target, goodId);
       if (goodAmount.Amount > 0) {
-        yield return (source, target, goodAmount);
+        candidates.Add(new PlannedCandidate(source, target, goodAmount, distance));
+      }
+    }
+    candidates.Sort((left, right) => left.Distance.CompareTo(right.Distance));
+    var plannedAmount = 0;
+    foreach (var candidate in candidates) {
+      yield return (candidate.Source, candidate.Target, candidate.GoodAmount);
+      plannedAmount += candidate.GoodAmount.Amount;
+      if (plannedAmount >= requestedAmount) {
+        break;
+      }
+    }
+  }
+
+  static IEnumerable<(Inventory source, Inventory target, GoodAmount goodAmount)> PlanTakingGoodCandidates(
+      DistrictCenter districtCenter,
+      Inventory source,
+      GoodAmount availableGood,
+      Predicate<Inventory> targetFilter) {
+    if (availableGood.Amount <= 0 || !IsAvailableSource(source)) {
+      yield break;
+    }
+    var sourceAccessible = source.GetEnabledComponent<Accessible>();
+    if (!sourceAccessible) {
+      yield break;
+    }
+    var candidates = new List<PlannedCandidate>();
+    var districtInventoryRegistry = districtCenter.GetComponent<DistrictInventoryRegistry>();
+    foreach (var target in districtInventoryRegistry.ActiveInventoriesWithCapacity(availableGood.GoodId)) {
+      var targetAccessible = target.GetEnabledComponent<Accessible>();
+      if (!targetAccessible
+          || !IsAvailableTarget(target)
+          || !targetFilter(target)
+          || !IsTaking(target, availableGood.GoodId)
+          || !sourceAccessible.FindRoadPath(targetAccessible, out var distance)) {
+        continue;
+      }
+      var goodAmount = MaxTransferableAmount(source, target, availableGood);
+      if (goodAmount.Amount > 0) {
+        candidates.Add(new PlannedCandidate(source, target, goodAmount, distance));
+      }
+    }
+    candidates.Sort((left, right) => left.Distance.CompareTo(right.Distance));
+    var plannedAmount = 0;
+    var plannedTargets = 0;
+    foreach (var candidate in candidates) {
+      yield return (candidate.Source, candidate.Target, candidate.GoodAmount);
+      plannedAmount += candidate.GoodAmount.Amount;
+      plannedTargets++;
+      if (plannedAmount >= availableGood.Amount || plannedTargets >= MaxTakeAwayTargetCandidates) {
+        break;
       }
     }
   }
@@ -331,6 +402,10 @@ static class PossibleTransportOrderPlanner {
 
   static bool IsAvailableTarget(Inventory inventory) {
     return inventory && inventory.IsUnblocked;
+  }
+
+  static bool IsTaking(Inventory inventory, string goodId) {
+    return inventory.HasUnreservedCapacity(goodId) && inventory.GetComponent<IInventoryValidator>().ValidInventory;
   }
 
   static IEnumerable<GoodAmount> GetUnreservedGoods(Inventory inventory) {
