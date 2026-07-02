@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using Timberborn.Buildings;
 using Timberborn.BlockingSystem;
 using Timberborn.ConstructionSites;
-using IgorZ.SmartHaulers.Core;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BehaviorSystem;
 using Timberborn.BuilderHubSystem;
@@ -20,7 +19,6 @@ using Timberborn.Hauling;
 using Timberborn.InventorySystem;
 using Timberborn.Navigation;
 using Timberborn.PrioritySystem;
-using Timberborn.TickSystem;
 using Timberborn.WalkingSystem;
 using Timberborn.Workshops;
 using Timberborn.WorkSystem;
@@ -28,7 +26,7 @@ using UnityEngine;
 
 namespace IgorZ.SmartHaulers.Dispatching;
 
-sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDeletableEntity {
+sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletableEntity {
   readonly DispatchCenterRegistry _dispatchCenterRegistry;
   readonly ConstructionRegistry _constructionRegistry;
   readonly TransportDecisionEvaluator _decisionEvaluator;
@@ -67,20 +65,8 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
     _dispatchCenterRegistry.Unregister(this);
   }
 
-  public override void Tick() {
-    if (!SmartHaulersState.DiagnosticsEnabled && !SmartHaulersState.LogSnapshotRequested) {
-      return;
-    }
-    RefreshSnapshot();
-  }
-
   public void RefreshSnapshot() {
-    _performanceStats.BeginRefresh();
-    try {
-      RefreshSnapshotInternal();
-    } finally {
-      _performanceStats.EndRefresh();
-    }
+    RefreshSnapshotInternal();
   }
 
   void RefreshSnapshotInternal() {

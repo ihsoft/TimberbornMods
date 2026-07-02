@@ -18,6 +18,7 @@ namespace IgorZ.SmartHaulers.Dispatching;
 sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingleton {
   readonly DispatchCenterRegistry _dispatchCenterRegistry;
   readonly DispatchPerformanceStats _performanceStats;
+  readonly HaulerDispatchRefreshService _refreshService;
   readonly TransportDebugRowFactory _rowFactory;
   readonly UILayout _uiLayout;
 
@@ -30,10 +31,12 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
   public HaulerDispatchDebugPanel(
       DispatchCenterRegistry dispatchCenterRegistry,
       DispatchPerformanceStats performanceStats,
+      HaulerDispatchRefreshService refreshService,
       TransportDebugRowFactory rowFactory,
       UILayout uiLayout) {
     _dispatchCenterRegistry = dispatchCenterRegistry;
     _performanceStats = performanceStats;
+    _refreshService = refreshService;
     _rowFactory = rowFactory;
     _uiLayout = uiLayout;
   }
@@ -123,9 +126,7 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
   }
 
   void RefreshSnapshots() {
-    foreach (var dispatchCenter in _dispatchCenterRegistry.DispatchCenters) {
-      dispatchCenter.RefreshSnapshot();
-    }
+    _refreshService.RefreshSnapshots();
   }
 
   void AddPerformance(List<string> lines) {

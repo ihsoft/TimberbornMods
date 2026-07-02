@@ -4,7 +4,6 @@
 
 using System;
 using System.Diagnostics;
-using UnityEngine;
 
 namespace IgorZ.SmartHaulers.Dispatching;
 
@@ -26,8 +25,6 @@ sealed class DispatchPerformanceStats {
   int _pickupPathCalls;
   int _deliveryPathCalls;
   int _nextSampleIndex;
-  int _currentFrame = -1;
-  int _currentSampleIndex = -1;
   int _sampleCount;
   DispatchPerformanceSample _lastSample;
 
@@ -99,21 +96,15 @@ sealed class DispatchPerformanceStats {
         _deliveryPathTicks,
         _pickupPathCalls,
         _deliveryPathCalls);
-    AddToFrameSample(Time.frameCount, _lastSample);
+    AddSample(_lastSample);
     _refreshStopwatch = null;
   }
 
-  void AddToFrameSample(int frame, DispatchPerformanceSample sample) {
-    if (_currentFrame != frame || _currentSampleIndex < 0) {
-      _currentFrame = frame;
-      _currentSampleIndex = _nextSampleIndex;
-      _samples[_currentSampleIndex] = sample;
-      _nextSampleIndex = (_nextSampleIndex + 1) % WindowSize;
-      _sampleCount = Math.Min(_sampleCount + 1, WindowSize);
-    } else {
-      _samples[_currentSampleIndex] = _samples[_currentSampleIndex].Add(sample);
-    }
-    _lastSample = _samples[_currentSampleIndex];
+  void AddSample(DispatchPerformanceSample sample) {
+    _samples[_nextSampleIndex] = sample;
+    _nextSampleIndex = (_nextSampleIndex + 1) % WindowSize;
+    _sampleCount = Math.Min(_sampleCount + 1, WindowSize);
+    _lastSample = sample;
   }
 
   public void BeginPickupPath() {
