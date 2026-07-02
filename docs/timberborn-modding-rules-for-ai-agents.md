@@ -205,6 +205,29 @@ Reason:
 
 For UI patches, `Load()` may be too late.
 
+## Logging
+
+When logging from repository code, use `DebugEx` or `HostedDebugLog`, not direct `UnityEngine.Debug`.
+
+Use `DebugEx` for general repository or service logs.
+
+Use `HostedDebugLog` when the message is logically attached to a game entity or hosted component, usually a
+`BaseComponent`.
+
+Prefer placeholder arguments such as `{0}` over string interpolation so repository logging helpers can format messages
+consistently:
+
+```csharp
+DebugEx.Warning("Failed to read save version from {0}: {1}", selectedSave.DisplayName, e);
+HostedDebugLog.Warning(component, "Signal '{0}' is not available on the building.", signalName);
+```
+
+Avoid:
+
+```csharp
+Debug.LogWarning($"Failed to read save version from {selectedSave.DisplayName}: {e}");
+```
+
 ## Harmony patching practices
 
 Prefer small, targeted patches.
@@ -220,6 +243,13 @@ access before falling back to string method names or `AccessTools`.
 
 If publicized direct access is not available for the target method, use the existing reflection or `AccessTools`
 approach instead of forcing `nameof`.
+
+Organize Harmony patches by target game class, not by feature.
+
+A patch targeting `MyClass` should live in `MyClassPatch.cs`, and the patch class should be named `MyClassPatch`.
+
+Do not put patches for different target game classes in the same file. If one feature patches several game classes, use
+separate `TargetClassPatch.cs` files.
 
 When patching multiple methods on the same target type, prefer one patch class annotated with
 `[HarmonyPatch(typeof(TargetType))]` and method-level `[HarmonyPatch(nameof(TargetType.Method))]` attributes, unless a
