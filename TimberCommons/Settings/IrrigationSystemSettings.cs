@@ -2,36 +2,39 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using IgorZ.TimberDev.Settings;
 using ModSettings.Core;
 using Timberborn.Modding;
 using Timberborn.SettingsSystem;
 
 namespace IgorZ.TimberCommons.Settings;
 
-sealed class IrrigationSystemSettings : ModSettingsOwner {
+sealed class IrrigationSystemSettings : BaseSettings<IrrigationSystemSettings> {
+  const string HeaderStringLocKey = "IgorZ.TimberCommons.Settings.IrrigationSystemSection";
+  const string OverrideDesertLevelsForWaterTowersLocKey =
+      "IgorZ.TimberCommons.Settings.IrrigationSystem.OverrideDesertLevelsForWaterTowers";
+  const string OverrideDesertLevelsForWaterTowersTooltipLocKey =
+      "IgorZ.TimberCommons.Settings.IrrigationSystem.OverrideDesertLevelsForWaterTowersTooltip";
+
+  protected override string ModId => Configurator.ModId;
+
   #region Settings
-  // ReSharper disable InconsistentNaming
   // ReSharper disable MemberCanBePrivate.Global
 
-  public static bool OverrideDesertLevelsForWaterTowers => _instance._overrideDesertLevelsForWaterTowers.Value;
-  public ModSetting<bool> _overrideDesertLevelsForWaterTowers { get; } = new(
-    true,
-    ModSettingDescriptor
-        .CreateLocalized("IgorZ.TimberCommons.Settings.IrrigationSystem.OverrideDesertLevelsForWaterTowers")
-        .SetLocalizedTooltip(
-            "IgorZ.TimberCommons.Settings.IrrigationSystem.OverrideDesertLevelsForWaterTowersTooltip"));
+  public static bool OverrideDesertLevelsForWaterTowers { get; private set; } = true;
+  public ModSetting<bool> OverrideDesertLevelsForWaterTowersInternal { get; } = new(
+      true,
+      ModSettingDescriptor
+          .CreateLocalized(OverrideDesertLevelsForWaterTowersLocKey)
+          .SetLocalizedTooltip(OverrideDesertLevelsForWaterTowersTooltipLocKey));
 
   // ReSharper restore MemberCanBePrivate.Global
-  // ReSharper restore InconsistentNaming
   #endregion
 
   #region ModSettingsOwner overrides
 
   /// <inheritdoc />
-  protected override string ModId => Configurator.ModId;
-
-  /// <inheritdoc />
-  public override string HeaderLocKey => "IgorZ.TimberCommons.Settings.IrrigationSystemSection";
+  public override string HeaderLocKey => HeaderStringLocKey;
 
   /// <inheritdoc />
   public override int Order => 2;
@@ -43,12 +46,10 @@ sealed class IrrigationSystemSettings : ModSettingsOwner {
 
   #region Implementation
 
-  static IrrigationSystemSettings _instance;
-
   public IrrigationSystemSettings(
       ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry, ModRepository modRepository)
       : base(settings, modSettingsOwnerRegistry, modRepository) {
-    _instance = this;
+    InstallSettingCallback(OverrideDesertLevelsForWaterTowersInternal, v => OverrideDesertLevelsForWaterTowers = v);
   }
 
   #endregion

@@ -25,7 +25,6 @@ sealed class InjuryProbabilityFragment : IEntityPanelFragment {
 
   readonly UiFactory _uiFactory;
   readonly ITooltipRegistrar _tooltipRegistrar;
-  readonly InjuryProbabilitySettings _settings;
   readonly EffectProbabilityService _effectProbabilityService;
 
   VisualElement _root;
@@ -36,11 +35,10 @@ sealed class InjuryProbabilityFragment : IEntityPanelFragment {
   WorkshopRandomNeedApplier _needApplier;
   bool _indicatorAttached;
 
-  InjuryProbabilityFragment(UiFactory uiFactory, ITooltipRegistrar tooltipRegistrar,
-                            InjuryProbabilitySettings settings, EffectProbabilityService effectProbabilityService) {
+  InjuryProbabilityFragment(
+      UiFactory uiFactory, ITooltipRegistrar tooltipRegistrar, EffectProbabilityService effectProbabilityService) {
     _uiFactory = uiFactory;
     _tooltipRegistrar = tooltipRegistrar;
-    _settings = settings;
     _effectProbabilityService = effectProbabilityService;
   }
 
@@ -86,7 +84,8 @@ sealed class InjuryProbabilityFragment : IEntityPanelFragment {
   }
 
   void UpdateInjuryProbability() {
-    var injuryEffect = _needApplier._workshopRandomNeedApplierSpec.Effects.FirstOrDefault(e => e.NeedId == InjuryNeedId);
+    var injuryEffect = _needApplier._workshopRandomNeedApplierSpec.Effects
+        .FirstOrDefault(e => e.NeedId == InjuryNeedId);
     if (injuryEffect == null) {
       _injuryProbabilityAvatarHint.ToggleDisplayStyle(visible: false);
       _root.ToggleDisplayStyle(visible: false);
@@ -114,7 +113,7 @@ sealed class InjuryProbabilityFragment : IEntityPanelFragment {
     }
     _injuryProbabilityAvatarHint.style.color = color;
     var pctLocKey = InjuryProbabilityLocKey;
-    if (_settings.ShowDailyProbability.Value) {
+    if (InjuryProbabilitySettings.ShowDailyProbability) {
       var dailyProbability = probabilityPct;
       for (var i = 1; i < 24; i++) {
         dailyProbability *= Mathf.Pow(1f + probabilityPct, i);
@@ -126,8 +125,8 @@ sealed class InjuryProbabilityFragment : IEntityPanelFragment {
     _injuryProbabilityText = _uiFactory.T(pctLocKey, coloredText);
     _injuryProbabilityLabel.text = _injuryProbabilityText;
 
-    _injuryProbabilityAvatarHint.ToggleDisplayStyle(visible: _settings.ShowAvatarHint.Value);
-    _root.ToggleDisplayStyle(visible: _settings.ShowInFragment.Value);
+    _injuryProbabilityAvatarHint.ToggleDisplayStyle(visible: InjuryProbabilitySettings.ShowAvatarHint);
+    _root.ToggleDisplayStyle(visible: InjuryProbabilitySettings.ShowInFragment);
   }
 
   void AttachIndicator() {

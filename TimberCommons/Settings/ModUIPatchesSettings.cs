@@ -26,7 +26,6 @@ sealed class ModUIPatchesSettings : BaseSettings<ModUIPatchesSettings> {
 
   #region Settings
   // ReSharper disable MemberCanBePrivate.Global
-  // ReSharper disable InconsistentNaming
 
   public static bool EnhanceSaveModsIncompatibilityDialog { get; private set; } = true;
   public ModSetting<bool> EnhanceSaveModsIncompatibilityDialogInternal { get; } = new(
@@ -36,7 +35,6 @@ sealed class ModUIPatchesSettings : BaseSettings<ModUIPatchesSettings> {
           .SetLocalizedTooltip(EnhanceSaveModsIncompatibilityDialogTooltipLocKey)
           .SetEnableCondition(() => !HasConflictingSaveModsIncompatibilityDialogPatch()));
 
-  // ReSharper restore InconsistentNaming
   // ReSharper restore MemberCanBePrivate.Global
   #endregion
 
@@ -67,8 +65,7 @@ sealed class ModUIPatchesSettings : BaseSettings<ModUIPatchesSettings> {
       ISettings settings, ModSettingsOwnerRegistry modSettingsOwnerRegistry, ModRepository modRepository)
       : base(settings, modSettingsOwnerRegistry, modRepository) {
     InstallSettingCallback(
-        EnhanceSaveModsIncompatibilityDialogInternal,
-        v => EnhanceSaveModsIncompatibilityDialog = v);
+        EnhanceSaveModsIncompatibilityDialogInternal, v => EnhanceSaveModsIncompatibilityDialog = v);
   }
 
   static bool HasConflictingSaveModsIncompatibilityDialogPatch() {
