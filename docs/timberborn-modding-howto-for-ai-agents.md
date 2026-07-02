@@ -66,6 +66,13 @@ Treat it as upstream external documentation, not as a replacement for repository
 answer against this repository's current code, the target Timberborn game version, generated references, exported assets,
 and local workflow.
 
+When using official external documentation, fetch the current page during the task. Do not rely on memory, previous chat
+context, cached summaries, or an older browser tab. If the answer depends on exact wording or a recently changed page,
+refresh or reopen the page and cite the URL used.
+
+If live access to the official documentation is unavailable, say that it could not be refreshed and treat any remembered
+or cached information as possibly stale.
+
 Important version caveat: the official modding documentation tracks the latest game version, including Experimental.
 It may not match the Stable version or the exact game version targeted by the current task.
 
