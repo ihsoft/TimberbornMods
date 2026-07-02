@@ -53,6 +53,18 @@
       <Compile Include="..\TimberDev\Utils\HarmonyPatcher.cs">
         <Link>TimberDev\Utils\HarmonyPatcher.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\UI\DropdownItem.cs">
+        <Link>TimberDev\UI\DropdownItem.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UI\PreciseSliderWrapper.cs">
+        <Link>TimberDev\UI\PreciseSliderWrapper.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UI\ResizableDropdownElement.cs">
+        <Link>TimberDev\UI\ResizableDropdownElement.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UI\UiFactory.cs">
+        <Link>TimberDev\UI\UiFactory.cs</Link>
+      </Compile>
       <Compile Include="..\UnityDevLite\DebugEx.cs">
         <Link>UnityDevLite\DebugEx.cs</Link>
       </Compile>

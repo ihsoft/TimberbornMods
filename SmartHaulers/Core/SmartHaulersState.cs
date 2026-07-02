@@ -8,6 +8,8 @@ static class SmartHaulersState {
   public static bool DiagnosticsEnabled { get; private set; }
   public static bool DispatchPanelVisible { get; private set; } = true;
   public static DispatchDebugViewMode DispatchViewMode { get; private set; } = DispatchDebugViewMode.Agents;
+  public static DispatchAgentFilter AgentFilter { get; private set; }
+  public static DispatchOrderFilter OrderFilter { get; private set; }
   public static bool LogSnapshotRequested { get; private set; }
   public static bool SnapshotRefreshRequested { get; private set; }
 
@@ -15,6 +17,8 @@ static class SmartHaulersState {
     DiagnosticsEnabled = false;
     DispatchPanelVisible = true;
     DispatchViewMode = DispatchDebugViewMode.Agents;
+    AgentFilter = DispatchAgentFilter.All;
+    OrderFilter = DispatchOrderFilter.All;
     LogSnapshotRequested = false;
     SnapshotRefreshRequested = false;
   }
@@ -37,6 +41,14 @@ static class SmartHaulersState {
         DispatchDebugViewMode.Perf => DispatchDebugViewMode.Agents,
         _ => DispatchDebugViewMode.Agents,
     };
+  }
+
+  public static void SetAgentFilter(DispatchAgentFilter filter) {
+    AgentFilter = filter;
+  }
+
+  public static void SetOrderFilter(DispatchOrderFilter filter) {
+    OrderFilter = filter;
   }
 
   public static void RequestLogSnapshot() {

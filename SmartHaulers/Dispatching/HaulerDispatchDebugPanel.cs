@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using IgorZ.SmartHaulers.Core;
 using IgorZ.SmartHaulers.DispatchingUI;
+using IgorZ.TimberDev.UI;
 using Timberborn.CoreUI;
 using Timberborn.SingletonSystem;
 using Timberborn.UILayoutSystem;
@@ -20,12 +21,16 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
   readonly DispatchPerformanceStats _performanceStats;
   readonly HaulerDispatchRefreshService _refreshService;
   readonly TransportDebugRowFactory _rowFactory;
+  readonly UiFactory _uiFactory;
   readonly UILayout _uiLayout;
 
   VisualElement _root;
   Label _titleLabel;
+  ResizableDropdownElement _filterDropdown;
   VisualElement _contentContainer;
   bool _isAddedToLayout;
+  bool _updatingFilterDropdown;
+  DispatchDebugViewMode? _filterDropdownMode;
   string _lastText;
 
   public HaulerDispatchDebugPanel(
@@ -33,21 +38,25 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
       DispatchPerformanceStats performanceStats,
       HaulerDispatchRefreshService refreshService,
       TransportDebugRowFactory rowFactory,
+      UiFactory uiFactory,
       UILayout uiLayout) {
     _dispatchCenterRegistry = dispatchCenterRegistry;
     _performanceStats = performanceStats;
     _refreshService = refreshService;
     _rowFactory = rowFactory;
+    _uiFactory = uiFactory;
     _uiLayout = uiLayout;
   }
 
   public void PostLoad() {
     _root = CreateRoot();
     _titleLabel = CreateTitleLabel();
+    _filterDropdown = CreateFilterDropdown();
     _contentContainer = new VisualElement();
     var scrollView = new ScrollView(ScrollViewMode.VerticalAndHorizontal);
     scrollView.contentContainer.Add(_contentContainer);
     _root.Add(_titleLabel);
+    _root.Add(_filterDropdown);
     _root.Add(scrollView);
     _root.ToggleDisplayStyle(visible: false);
   }
@@ -65,7 +74,8 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
     if (SmartHaulersState.ConsumeSnapshotRefreshRequest()) {
       RefreshSnapshots();
     }
-    _titleLabel.text = $"SmartHaulers dispatch: {SmartHaulersState.DispatchViewMode}";
+    UpdateFilterDropdown();
+    _titleLabel.text = $"SmartHaulers dispatch: {FormatViewTitle()}";
     var text = BuildText();
     if (SmartHaulersState.ConsumeLogSnapshotRequest()) {
       LogSnapshot(text);
@@ -111,6 +121,68 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
     label.style.whiteSpace = WhiteSpace.Normal;
     label.style.color = Color.white;
     return label;
+  }
+
+  ResizableDropdownElement CreateFilterDropdown() {
+    var dropdown = _uiFactory.CreateSimpleDropdown(OnFilterSelected);
+    dropdown.AutoResizeToOptions = false;
+    dropdown.style.width = 170;
+    dropdown.style.marginBottom = 4;
+    return dropdown;
+  }
+
+  void UpdateFilterDropdown() {
+    var viewMode = SmartHaulersState.DispatchViewMode;
+    var visible = viewMode is DispatchDebugViewMode.Agents or DispatchDebugViewMode.Orders;
+    _filterDropdown.ToggleDisplayStyle(visible);
+    if (!visible) {
+      _filterDropdownMode = null;
+      return;
+    }
+    if (_filterDropdownMode != viewMode) {
+      _updatingFilterDropdown = true;
+      _filterDropdown.Items = viewMode == DispatchDebugViewMode.Agents
+          ? FilterItems<DispatchAgentFilter>()
+          : FilterItems<DispatchOrderFilter>();
+      _filterDropdown.SelectedValue = CurrentFilterValue();
+      _updatingFilterDropdown = false;
+      _filterDropdownMode = viewMode;
+      return;
+    }
+    if (_filterDropdown.SelectedValue != CurrentFilterValue()) {
+      _updatingFilterDropdown = true;
+      _filterDropdown.SelectedValue = CurrentFilterValue();
+      _updatingFilterDropdown = false;
+    }
+  }
+
+  void OnFilterSelected(string value) {
+    if (_updatingFilterDropdown) {
+      return;
+    }
+    if (SmartHaulersState.DispatchViewMode == DispatchDebugViewMode.Agents
+        && System.Enum.TryParse<DispatchAgentFilter>(value, out var agentFilter)) {
+      SmartHaulersState.SetAgentFilter(agentFilter);
+    }
+    if (SmartHaulersState.DispatchViewMode == DispatchDebugViewMode.Orders
+        && System.Enum.TryParse<DispatchOrderFilter>(value, out var orderFilter)) {
+      SmartHaulersState.SetOrderFilter(orderFilter);
+    }
+  }
+
+  static DropdownItem[] FilterItems<T>() where T : struct, System.Enum {
+    return System.Enum.GetValues(typeof(T))
+        .Cast<T>()
+        .Select(value => new DropdownItem { Value = value.ToString(), Text = value.ToString() })
+        .ToArray();
+  }
+
+  static string CurrentFilterValue() {
+    return SmartHaulersState.DispatchViewMode switch {
+        DispatchDebugViewMode.Agents => SmartHaulersState.AgentFilter.ToString(),
+        DispatchDebugViewMode.Orders => SmartHaulersState.OrderFilter.ToString(),
+        _ => "",
+    };
   }
 
   string BuildText() {
@@ -171,19 +243,18 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
 
   void AddDispatchCenterContent(VisualElement content, HaulerDispatchCenter dispatchCenter) {
     var counts = CountAgents(dispatchCenter.Agents);
-    var viewMode = SmartHaulersState.DispatchViewMode;
     content.Add(CreateContentLabel(
-        $"{viewMode}, {TransportDebugFormatter.FormatObject(dispatchCenter.DistrictCenter)}, "
+        $"{FormatViewTitle()}, {TransportDebugFormatter.FormatObject(dispatchCenter.DistrictCenter)}, "
         + $"{dispatchCenter.Agents.Count}, "
         + $"{counts.available}, {counts.wandering}, {counts.workplaceIdle}, {counts.transporting}, "
         + $"{counts.satisfyingNeed}, {counts.working}, {dispatchCenter.Orders.Count}"));
-    if (viewMode is DispatchDebugViewMode.Agents) {
-      foreach (var agent in dispatchCenter.Agents.OrderBy(agent => agent.EntityId)) {
+    if (SmartHaulersState.DispatchViewMode is DispatchDebugViewMode.Agents) {
+      foreach (var agent in dispatchCenter.Agents.Where(MatchesAgentFilter).OrderBy(agent => agent.EntityId)) {
         content.Add(_rowFactory.CreateAgentRow(agent));
       }
     }
-    if (viewMode is DispatchDebugViewMode.Orders) {
-      foreach (var order in dispatchCenter.Orders) {
+    if (SmartHaulersState.DispatchViewMode is DispatchDebugViewMode.Orders) {
+      foreach (var order in OrdersForDisplay(dispatchCenter.Orders)) {
         content.Add(_rowFactory.CreateOrderRow(order));
       }
     }
@@ -248,22 +319,83 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
 
   static void AddDispatchCenter(List<string> lines, HaulerDispatchCenter dispatchCenter) {
     var counts = CountAgents(dispatchCenter.Agents);
-    var viewMode = SmartHaulersState.DispatchViewMode;
     lines.Add(
-        $"{viewMode}, {TransportDebugFormatter.FormatObject(dispatchCenter.DistrictCenter)}, "
+        $"{FormatViewTitle()}, {TransportDebugFormatter.FormatObject(dispatchCenter.DistrictCenter)}, "
         + $"{dispatchCenter.Agents.Count}, "
         + $"{counts.available}, {counts.wandering}, {counts.workplaceIdle}, {counts.transporting}, "
         + $"{counts.satisfyingNeed}, {counts.working}, {dispatchCenter.Orders.Count}");
-    if (viewMode is DispatchDebugViewMode.Agents) {
-      foreach (var agent in dispatchCenter.Agents.OrderBy(agent => agent.EntityId)) {
+    if (SmartHaulersState.DispatchViewMode is DispatchDebugViewMode.Agents) {
+      foreach (var agent in dispatchCenter.Agents.Where(MatchesAgentFilter).OrderBy(agent => agent.EntityId)) {
         lines.Add(FormatAgent(agent));
       }
     }
-    if (viewMode is DispatchDebugViewMode.Orders) {
-      foreach (var order in dispatchCenter.Orders) {
+    if (SmartHaulersState.DispatchViewMode is DispatchDebugViewMode.Orders) {
+      foreach (var order in OrdersForDisplay(dispatchCenter.Orders)) {
         lines.Add(FormatOrder(order));
       }
     }
+  }
+
+  static string FormatViewTitle() {
+    return SmartHaulersState.DispatchViewMode switch {
+        DispatchDebugViewMode.Agents => $"{DispatchDebugViewMode.Agents} / {SmartHaulersState.AgentFilter}",
+        DispatchDebugViewMode.Orders => $"{DispatchDebugViewMode.Orders} / {SmartHaulersState.OrderFilter}",
+        _ => SmartHaulersState.DispatchViewMode.ToString(),
+    };
+  }
+
+  static bool MatchesAgentFilter(TransportAgentSnapshot agent) {
+    return SmartHaulersState.AgentFilter switch {
+        DispatchAgentFilter.All => true,
+        DispatchAgentFilter.Candidates => IsCandidateState(agent) && !agent.RefusesWork,
+        DispatchAgentFilter.Active => agent.State == TransportAgentState.Transporting,
+        DispatchAgentFilter.Needs => agent.State == TransportAgentState.SatisfyingNeed,
+        DispatchAgentFilter.Busy => agent.State == TransportAgentState.Working,
+        DispatchAgentFilter.Haulers => agent.Role == TransportAgentRole.DedicatedHauler,
+        DispatchAgentFilter.Builders => agent.Role == TransportAgentRole.Builder,
+        DispatchAgentFilter.Production => agent.Role == TransportAgentRole.Production,
+        DispatchAgentFilter.Resource => agent.Role == TransportAgentRole.SpecializedResource,
+        DispatchAgentFilter.Community => agent.Role == TransportAgentRole.CommunityService,
+        DispatchAgentFilter.Other => IsOtherAgent(agent),
+        _ => true,
+    };
+  }
+
+  static bool IsCandidateState(TransportAgentSnapshot agent) {
+    return agent.State is TransportAgentState.Available
+        or TransportAgentState.IdleWandering
+        or TransportAgentState.WorkplaceIdle;
+  }
+
+  static bool IsOtherAgent(TransportAgentSnapshot agent) {
+    return agent.Role is TransportAgentRole.None or TransportAgentRole.Free or TransportAgentRole.Unknown;
+  }
+
+  static bool MatchesOrderFilter(TransportOrderSnapshot order) {
+    return SmartHaulersState.OrderFilter switch {
+        DispatchOrderFilter.All => true,
+        DispatchOrderFilter.Queued => order.Phase == OrderPhase.Queued,
+        DispatchOrderFilter.Estimated => order.Phase == OrderPhase.Estimated,
+        DispatchOrderFilter.Deferred => order.Phase == OrderPhase.Deferred,
+        DispatchOrderFilter.Dispatchable => order.Phase == OrderPhase.Dispatchable,
+        DispatchOrderFilter.Covered => order.Phase == OrderPhase.Covered,
+        DispatchOrderFilter.Active => order.Phase is OrderPhase.PickingUp or OrderPhase.Delivering,
+        DispatchOrderFilter.PickingUp => order.Phase == OrderPhase.PickingUp,
+        DispatchOrderFilter.Delivering => order.Phase == OrderPhase.Delivering,
+        _ => true,
+    };
+  }
+
+  static IEnumerable<TransportOrderSnapshot> OrdersForDisplay(IEnumerable<TransportOrderSnapshot> orders) {
+    var filteredOrders = orders.Where(MatchesOrderFilter);
+    if (SmartHaulersState.OrderFilter == DispatchOrderFilter.All) {
+      return filteredOrders;
+    }
+    return filteredOrders
+        .OrderByDescending(order => order.Weight)
+        .ThenBy(order => order.Phase)
+        .ThenBy(order => order.BehaviorName)
+        .ThenBy(order => order.RequesterId);
   }
 
   static (

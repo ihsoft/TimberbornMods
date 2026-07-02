@@ -6,6 +6,7 @@ using Bindito.Core;
 using IgorZ.SmartHaulers.Core;
 using IgorZ.SmartHaulers.Dispatching;
 using IgorZ.SmartHaulers.DispatchingUI;
+using IgorZ.TimberDev.UI;
 using Timberborn.EntityPanelSystem;
 using Timberborn.GameDistricts;
 using Timberborn.TemplateInstantiation;
@@ -21,6 +22,7 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<HaulerDispatchRefreshService>().AsSingleton();
     containerDefinition.Bind<TransportDecisionEvaluator>().AsSingleton();
     containerDefinition.Bind<TransportDistanceEstimator>().AsSingleton();
+    containerDefinition.Bind<UiFactory>().AsSingleton();
     containerDefinition.Bind<HaulerDispatchCenter>().AsTransient();
     containerDefinition.Bind<HaulerDispatchDebugPanel>().AsSingleton();
     containerDefinition.Bind<KeyBindingInputProcessor>().AsSingleton();
