@@ -180,7 +180,11 @@ Arguments are part of a declaration-like structure rather than executable logic.
 
 ### Compact wrapped arguments
 
-Do not force one argument per line when several arguments fit comfortably within the 120-character limit.
+Default to the fewest readable lines.
+
+When formatting arguments or parameters, first try to keep multiple arguments on the same line. Split one argument per
+line only when the combined line would exceed the 120-character limit or when grouping them clearly hurts readability.
+Do not force one argument per line by habit.
 
 This rule applies to method calls, method declarations, constructors, and primary constructors.
 
