@@ -188,6 +188,21 @@ This includes constructor calls and object creation expressions such as `new Som
 configuration arguments together on one line when they fit cleanly, especially numeric ranges, flags, and small option
 groups.
 
+For callback registration and similar small two-argument calls, do not split each argument onto its own line by habit.
+If the call receiver and opening parenthesis need their own line and the arguments fit comfortably on the continuation
+line, keep the short value argument and short lambda together.
+
+Preferred:
+
+    InstallSettingCallback(
+        EnhanceSaveModsIncompatibilityDialogInternal, v => EnhanceSaveModsIncompatibilityDialog = v);
+
+Avoid:
+
+    InstallSettingCallback(
+        EnhanceSaveModsIncompatibilityDialogInternal,
+        v => EnhanceSaveModsIncompatibilityDialog = v);
+
 Preferred:
 
     static WeatherScriptableComponent CreateComponent(
