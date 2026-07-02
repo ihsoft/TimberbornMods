@@ -70,8 +70,9 @@ actually changed.
 
 ### Publisher
 
-The publisher owns release preparation, validation, packaging, publishing to Steam Workshop or Mod.IO, and post-release
-issue closing workflow.
+The publisher owns release preparation, validation, packaging, publishing to Steam Workshop or Mod.IO, platform
+description update proposals when release scope changes the mod's player-facing capabilities, and post-release issue
+closing workflow.
 
 The publisher follows `docs/timberborn-release-publishing-rules-for-ai-agents.md`. The publisher should not implement
 unrelated code fixes, edit agent rules, or edit the GitHub Wiki unless the user explicitly expands the task.

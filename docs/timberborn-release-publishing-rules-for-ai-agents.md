@@ -309,6 +309,12 @@ Do not silently overwrite either side when a mismatch is found.
 Updating platform descriptions is not part of the normal release flow. Change local description files or published
 platform descriptions only when the user explicitly asks for a description update.
 
+Before publishing, review the target changelog section for serious player-facing capability changes. Ignore ordinary
+fixes for this purpose. If the release adds new capabilities, removes capabilities, substantially changes what players
+can do with the mod, or changes the mod's public positioning, propose updating the mod description on all published
+platforms before release. Do not edit or publish description changes automatically; show the user what should be
+updated and ask whether to prepare the new text.
+
 When the user asks to update a description because release behavior changed, update it as the current product
 description for a new player. Describe what the mod does now. Do not describe removed or historical behavior in the
 main platform description. Put historical change information only in changelog or release notes when needed.
