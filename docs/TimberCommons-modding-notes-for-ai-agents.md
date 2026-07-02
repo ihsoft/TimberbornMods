@@ -70,23 +70,6 @@ const string ShowActiveModsLocKey = "IgorZ.TimberCommons.CommonUIPatches.ModList
 const string ShowAllModsLocKey = "IgorZ.TimberCommons.CommonUIPatches.ModListView.ShowAllMods";
 ```
 
-## Settings style
-
-Some older TimberCommons settings classes use older notation. Do not copy that style automatically for new settings
-work.
-
-For new TimberCommons settings, follow the general ModSettings guidance in
-`timberborn-modding-rules-for-ai-agents.md`. Compare against the closest current settings style before coding. Prefer
-the Automation-style pattern when it fits:
-
-- declare local `const string ...LocKey` values near the top of the settings class;
-- use `BaseSettings<T>`;
-- use callback-backed static setting values when runtime code needs static access to a setting value;
-- keep localized labels and tooltips in localization files rather than inline settings strings.
-
-For existing released TimberCommons settings, do not rename settings owner classes or public `ModSetting` properties
-only for style unless the user accepts the persisted-setting reset or a migration/stable id is implemented.
-
 ## Mod manager active-mod filter
 
 TimberCommons currently patches the Timberborn mod manager list via:
