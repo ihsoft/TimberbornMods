@@ -283,6 +283,11 @@ Reuse its UI Toolkit component type and classes before hand-styling controls. Fo
 `NineSliceTextField`, button classes, validation classes, and template structure used by nearby dialogs over recreating
 input backgrounds and padding manually.
 
+If a UI pattern is common enough to document, base repository UI notes on verified local evidence from game UXML, USS,
+sprites, classes, and existing mod code. External or AI-generated UI cheat sheets may suggest search terms, but do not
+copy them into repository rules or treat them as authoritative until the pattern is confirmed against the current game
+assets or code.
+
 ## Accessing private fields and publicizer
 
 Before using Harmony `AccessTools` for private/internal game members, inspect the mod project file.

@@ -114,6 +114,11 @@ Use decompiled game sources as a read-only architecture reference.
 
 Use extracted game assets as read-only data and UI references.
 
+Before treating generated references as authoritative, verify that they match the target Timberborn game version or
+branch for the task. Check available version markers, generated folder provenance, game assemblies, package
+`MinimumGameVersion`, and the user's requested Stable or Experimental target. If the generated reference version does
+not match, say so and avoid relying on it without additional verification against the correct game files.
+
 Do not edit game DLLs.
 
 Do not edit generated files under `_DecompiledGame/`.
