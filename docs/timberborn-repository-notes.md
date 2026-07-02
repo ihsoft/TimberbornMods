@@ -179,6 +179,10 @@ unless they have user-visible release-note value or the user asks for it.
 
 Keep entries short. For features, describe the new capability. For fixes, describe the broken behavior before the fix.
 
+Group implementation controls, compatibility switches, and small options under the primary user-facing feature unless
+they are independently meaningful to players as a separate change. Changelog bullets should describe delivered
+user-facing feature slices, not every implementation piece added inside one feature.
+
 Do not manually wrap changelog bullet text to the 120-character code line limit. Keep each changelog bullet as one
 logical line even when it is long; downstream platform and UI renderers are responsible for visual wrapping. Use
 continuation lines only when the changelog intentionally needs a separate paragraph or list item.
