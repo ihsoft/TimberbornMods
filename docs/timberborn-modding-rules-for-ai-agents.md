@@ -252,13 +252,16 @@ if (root.Q<Button>("NewButton") != null) {
 
 ## Mod settings
 
-For new ModSettings work, prefer the current repository settings style when the target mod has the necessary helpers:
+For new ModSettings work, use the current repository settings style:
 
 - declare local `const string ...LocKey` values near the top of the settings class;
-- use `BaseSettings<T>` where available;
+- use `BaseSettings<T>`;
 - use callback-backed static setting values when runtime code needs static access;
 - use `...Internal` naming for public `ModSetting` properties when a wrapper/static runtime value exposes the setting;
 - keep visible labels and tooltips in localization files instead of inline strings.
+
+`BaseSettings<T>` is available through TimberDev. If the target mod does not already reference the needed TimberDev
+settings helper, add the normal dependency/import instead of falling back to an older settings style.
 
 Do not mechanically rename existing released settings classes or public `ModSetting` properties only to match style.
 `ModSettings.Core.ModSettingsOwner` persists settings using keys based on the mod id, settings owner class name, and

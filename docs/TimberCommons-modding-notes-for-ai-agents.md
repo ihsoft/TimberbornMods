@@ -80,7 +80,7 @@ For new TimberCommons settings, follow the general ModSettings guidance in
 the Automation-style pattern when it fits:
 
 - declare local `const string ...LocKey` values near the top of the settings class;
-- use `BaseSettings<T>` where available;
+- use `BaseSettings<T>`;
 - use callback-backed static setting values when runtime code needs static access to a setting value;
 - keep localized labels and tooltips in localization files rather than inline settings strings.
 
