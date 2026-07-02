@@ -1,4 +1,4 @@
-# v1.19.0 (TBD)
+# v1.19.0 (July 2nd, 2026)
 * [Feature] Allow enabling installed disabled mods from the save-load mod incompatibility dialog.
 * [Feature] Show the saved game version on the load-game preview.
 
