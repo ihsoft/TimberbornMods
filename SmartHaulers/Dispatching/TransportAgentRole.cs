@@ -10,6 +10,7 @@ enum TransportAgentRole {
   CommunityService,
   Builder,
   Production,
+  SpecializedResource,
   Free,
   Unknown,
 }

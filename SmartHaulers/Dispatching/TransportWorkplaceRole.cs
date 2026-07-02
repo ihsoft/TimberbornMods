@@ -9,5 +9,6 @@ enum TransportWorkplaceRole {
   Transport,
   Builder,
   Production,
+  SpecializedResource,
   Unknown,
 }

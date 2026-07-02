@@ -112,6 +112,7 @@ static class TransportDebugFormatter {
         TransportAgentRole.CommunityService => "community",
         TransportAgentRole.Builder => "builder",
         TransportAgentRole.Production => "production",
+        TransportAgentRole.SpecializedResource => "resource",
         TransportAgentRole.Free => "free",
         TransportAgentRole.Unknown => "unknown",
         _ => role.ToString(),

@@ -173,6 +173,7 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
         TransportWorkplaceRole.Transport => TransportAgentRole.DedicatedHauler,
         TransportWorkplaceRole.Builder => TransportAgentRole.Builder,
         TransportWorkplaceRole.Production => TransportAgentRole.Production,
+        TransportWorkplaceRole.SpecializedResource => TransportAgentRole.SpecializedResource,
         TransportWorkplaceRole.Unknown => TransportAgentRole.Unknown,
         _ => worker.Workplace ? TransportAgentRole.Unknown : TransportAgentRole.Free,
     };
@@ -198,6 +199,9 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
     }
     if (workplace.GetComponent<Manufactory>()) {
       return TransportWorkplaceRole.Production;
+    }
+    if (HasSpecializedResourceBehavior(workplace)) {
+      return TransportWorkplaceRole.SpecializedResource;
     }
     return TransportWorkplaceRole.Unknown;
   }
@@ -300,14 +304,27 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
       return false;
     }
     foreach (var workplaceBehavior in workplace.WorkplaceBehaviors) {
-      if (workplaceBehavior.GetType().Name is
-          "FarmHouseGoodStackRetrieverWorkplaceBehavior"
-          or "GatherWorkplaceBehavior"
-          or "LumberjackFlagWorkplaceBehavior") {
+      if (IsSpecializedResourceBehavior(workplaceBehavior)) {
         return true;
       }
     }
     return false;
+  }
+
+  static bool HasSpecializedResourceBehavior(Workplace workplace) {
+    foreach (var workplaceBehavior in workplace.WorkplaceBehaviors) {
+      if (IsSpecializedResourceBehavior(workplaceBehavior)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  static bool IsSpecializedResourceBehavior(WorkplaceBehavior workplaceBehavior) {
+    return workplaceBehavior.GetType().Name is
+        "FarmHouseGoodStackRetrieverWorkplaceBehavior"
+        or "GatherWorkplaceBehavior"
+        or "LumberjackFlagWorkplaceBehavior";
   }
 
   static bool TryGetRunningBehavior(BehaviorManager behaviorManager, out Behavior behavior) {

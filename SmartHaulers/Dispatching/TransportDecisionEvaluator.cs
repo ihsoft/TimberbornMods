@@ -103,6 +103,7 @@ sealed class TransportDecisionEvaluator(TransportDistanceEstimator distanceEstim
         TransportWorkplaceRole.Transport => 1f,
         TransportWorkplaceRole.Builder => 10f,
         TransportWorkplaceRole.Production => 50f,
+        TransportWorkplaceRole.SpecializedResource => 100f,
         TransportWorkplaceRole.Unknown => 100f,
         _ => 100f,
     };
@@ -136,6 +137,7 @@ sealed class TransportDecisionEvaluator(TransportDistanceEstimator distanceEstim
         TransportAgentRole.CommunityService => "community",
         TransportAgentRole.Builder => "builder",
         TransportAgentRole.Production => "production",
+        TransportAgentRole.SpecializedResource => "resource",
         TransportAgentRole.Free => "free",
         TransportAgentRole.Unknown => "unknown",
         _ => "none",
@@ -147,6 +149,7 @@ sealed class TransportDecisionEvaluator(TransportDistanceEstimator distanceEstim
         TransportWorkplaceRole.Transport => "workplace-transport",
         TransportWorkplaceRole.Builder => "workplace-builder",
         TransportWorkplaceRole.Production => "workplace-production",
+        TransportWorkplaceRole.SpecializedResource => "workplace-resource",
         TransportWorkplaceRole.Unknown => "workplace-unknown",
         _ => "workplace-unknown",
     };
