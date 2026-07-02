@@ -334,6 +334,108 @@ function ConvertTo-SteamChangeNote([string] $Version, [string] $ChangeNotes) {
     return "[h3]v$Version[/h3]`r`n" + (($convertedLines -join "`r`n").Trim())
 }
 
+function Format-Tags([string[]] $Tags) {
+    if ($Tags.Count -eq 0) {
+        return "(none)"
+    }
+    return $Tags -join ", "
+}
+
+function Get-UniqueTags([string[]] $Tags) {
+    $seen = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+    $result = New-Object System.Collections.Generic.List[string]
+    foreach ($tag in $Tags) {
+        $trimmed = [string]$tag
+        $trimmed = $trimmed.Trim()
+        if ([string]::IsNullOrWhiteSpace($trimmed)) {
+            continue
+        }
+        if ($seen.Add($trimmed)) {
+            $result.Add($trimmed)
+        }
+    }
+    return @($result)
+}
+
+function Test-VersionTag([string] $Tag) {
+    return $Tag -match "^Update \d+\.\d+$"
+}
+
+function Convert-VersionFolderToSteamTag([string] $VersionFolder) {
+    if ($VersionFolder -match "^version-(?<major>\d+)\.(?<minor>\d+)(?:\.\d+)?$") {
+        return "Update $($matches["major"]).$($matches["minor"])"
+    }
+    throw "Unsupported version folder for Steam tag conversion: $VersionFolder"
+}
+
+function Get-TargetSteamTags([string[]] $LocalTags, [string[]] $VersionFolders) {
+    $versionTags = @($VersionFolders | ForEach-Object { Convert-VersionFolderToSteamTag $_ })
+    $nonVersionTags = @($LocalTags | Where-Object { -not (Test-VersionTag $_) })
+    return Get-UniqueTags (@("Mod") + $versionTags + $nonVersionTags)
+}
+
+function Get-AddedTags([string[]] $TargetTags, [string[]] $CurrentTags) {
+    $current = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+    foreach ($tag in $CurrentTags) {
+        [void]$current.Add($tag)
+    }
+    return @($TargetTags | Where-Object { -not $current.Contains($_) })
+}
+
+function Get-RemovedTags([string[]] $TargetTags, [string[]] $CurrentTags) {
+    $target = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+    foreach ($tag in $TargetTags) {
+        [void]$target.Add($tag)
+    }
+    return @($CurrentTags | Where-Object { -not $target.Contains($_) })
+}
+
+function Save-WorkshopData([string] $Path, [object] $WorkshopData) {
+    $WorkshopData | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $Path -Encoding UTF8
+}
+
+function Get-SteamDetails([string] $PublishedFileId) {
+    $body = "itemcount=1&publishedfileids%5B0%5D=$PublishedFileId"
+    $response = Invoke-RestMethod `
+        -Uri "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/" `
+        -Method Post `
+        -Body $body `
+        -ContentType "application/x-www-form-urlencoded"
+    $item = $response.response.publishedfiledetails[0]
+    if ($item.result -ne 1) {
+        throw "Steam API failed for $PublishedFileId with result $($item.result)."
+    }
+    return $item
+}
+
+function Get-LiveSteamTags([string] $PublishedFileId) {
+    $details = Get-SteamDetails $PublishedFileId
+    return Get-UniqueTags @($details.tags | ForEach-Object { [string]$_.tag })
+}
+
+function Invoke-SteamTagsUpdate([string] $PublishedFileId, [string[]] $TargetTags) {
+    $projectPath = Resolve-RepoPath "tools/SteamTagUpdater/SteamTagUpdater.csproj"
+    Assert-PathExists $projectPath "Steam tag updater project"
+    & dotnet build $projectPath -c Release
+    if ($LASTEXITCODE -ne 0) {
+        throw "Steam tag updater build failed with exit code $LASTEXITCODE."
+    }
+
+    $exePath = Resolve-RepoPath "tools/SteamTagUpdater/bin/Release/net8.0/SteamTagUpdater.exe"
+    Assert-PathExists $exePath "Steam tag updater executable"
+    $arguments = @($PublishedFileId) + $TargetTags
+    Push-Location (Split-Path -Parent $exePath)
+    try {
+        & $exePath @arguments
+        if ($LASTEXITCODE -ne 0) {
+            throw "Steam tag updater failed with exit code $LASTEXITCODE."
+        }
+    }
+    finally {
+        Pop-Location
+    }
+}
+
 function Write-WorkshopVdf(
     [string] $Path,
     [string] $AppId,
@@ -638,7 +740,21 @@ elseif (-not (Test-Path -LiteralPath $previewFile)) {
 }
 
 $vdfPath = Join-Path (Resolve-RepoPath $VdfRoot) "$ModName.vdf"
-$tags = @($workshopData.Tags)
+$localTags = Get-UniqueTags @($workshopData.Tags)
+$tags = Get-TargetSteamTags $localTags $versionFolders
+$localTagAdds = Get-AddedTags $tags $localTags
+$localTagRemoves = Get-RemovedTags $tags $localTags
+$localTagsSynchronized = $localTagAdds.Count -eq 0 -and $localTagRemoves.Count -eq 0
+if ($Publish -and -not $localTagsSynchronized) {
+    $workshopData.Tags = @($tags)
+    Save-WorkshopData $workshopDataPath $workshopData
+}
+
+$liveTags = Get-LiveSteamTags $publishedFileId
+$liveTagAdds = Get-AddedTags $tags $liveTags
+$liveTagRemoves = Get-RemovedTags $tags $liveTags
+$liveTagsSynchronized = $liveTagAdds.Count -eq 0 -and $liveTagRemoves.Count -eq 0
+
 Write-WorkshopVdf $vdfPath $appId $publishedFileId $contentFolder $previewFile $visibilityValue `
     ([string]$workshopData.Name) $tags $steamChangeNote
 
@@ -660,6 +776,27 @@ if ($releaseConfig.ReadyForPublish -eq $false) {
     Write-Host "Ready for publish: false"
 }
 Write-Host "Tags: $($tags -join ', ')"
+if (-not $localTagsSynchronized) {
+    if ($Publish) {
+        Write-Host "Local workshop_data.json tag update: applied"
+    }
+    else {
+        Write-Host "Local workshop_data.json tag update: needed"
+    }
+    Write-Host "  Add locally: $(Format-Tags $localTagAdds)"
+    Write-Host "  Remove locally: $(Format-Tags $localTagRemoves)"
+}
+Write-Host "Live Steam tags: $(Format-Tags $liveTags)"
+if (-not $liveTagsSynchronized) {
+    if ($Publish) {
+        Write-Host "Live Steam tag update: will update before SteamCMD upload"
+    }
+    else {
+        Write-Host "Live Steam tag update: needed before SteamCMD upload"
+    }
+    Write-Host "  Add live: $(Format-Tags $liveTagAdds)"
+    Write-Host "  Remove live: $(Format-Tags $liveTagRemoves)"
+}
 if ($allowSingleGameVersion) {
     Write-Host "Single game-version override: $($releaseConfig.Steam.CompatibilityReason)"
 }
@@ -671,6 +808,17 @@ Write-Host ""
 if ($Publish) {
     if ($releaseConfig.ReadyForPublish -eq $false) {
         throw "Cannot publish: $ModName release config is marked ReadyForPublish=false."
+    }
+    if (-not $liveTagsSynchronized) {
+        Invoke-SteamTagsUpdate $publishedFileId $tags
+        Start-Sleep -Seconds 2
+        $updatedLiveTags = Get-LiveSteamTags $publishedFileId
+        $remainingLiveAdds = Get-AddedTags $tags $updatedLiveTags
+        $remainingLiveRemoves = Get-RemovedTags $tags $updatedLiveTags
+        if ($remainingLiveAdds.Count -ne 0 -or $remainingLiveRemoves.Count -ne 0) {
+            throw "Steam tags update completed, but live tags do not match target. Live: $(Format-Tags $updatedLiveTags)"
+        }
+        Write-Host "Steam tags are synchronized."
     }
     $loginSettings = Get-SteamLoginSettings
     Write-Host "Starting SteamCMD..."
