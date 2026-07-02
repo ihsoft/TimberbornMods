@@ -53,6 +53,35 @@ Incorrect certainty is usually more harmful than incomplete information.
 
 ---
 
+## Official Mechanistry documentation
+
+Before guessing how Timberborn modding workflow, Unity modding tools, assets, blueprints, translations, UI, or
+Timberborn architecture are supposed to work, check the official Mechanistry modding documentation:
+
+```text
+https://github.com/mechanistry/timberborn-modding/wiki
+```
+
+Treat it as upstream external documentation, not as a replacement for repository evidence. After reading it, verify the
+answer against this repository's current code, the target Timberborn game version, generated references, exported assets,
+and local workflow.
+
+Important version caveat: the official modding documentation tracks the latest game version, including Experimental.
+It may not match the Stable version or the exact game version targeted by the current task.
+
+For 3D model work, also check the official Timbermesh documentation before guessing about `.timbermesh` files, Blender
+exports, model hierarchy, slots, mesh merging, vertex animation, node animation, or model naming:
+
+```text
+https://github.com/mechanistry/timbermesh/wiki
+```
+
+Do not copy large external documentation sections into this repository. Link to official docs for general upstream
+workflow and keep repository rules focused on local conventions, confirmed local pitfalls, and project-specific
+decisions.
+
+---
+
 ## Understand the game before writing code
 
 Do not start by writing Harmony patches.
