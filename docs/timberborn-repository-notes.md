@@ -119,6 +119,11 @@ branch for the task. Check available version markers, generated folder provenanc
 `MinimumGameVersion`, and the user's requested Stable or Experimental target. If the generated reference version does
 not match, say so and avoid relying on it without additional verification against the correct game files.
 
+Treat `_ExtractedGameAssets` as a generated cache that can be stale or partially extracted. When an expected current
+game UI or data asset is missing there, check the source archive under
+`_GAME!/Timberborn_Data/StreamingAssets/Modding/*.zip` or rerun the extraction script before concluding that the asset
+does not exist.
+
 Do not edit game DLLs.
 
 Do not edit generated files under `_DecompiledGame/`.
@@ -353,6 +358,10 @@ Normal `git diff` output does not show untracked files, so use status to avoid m
 committing generated files.
 
 Before submitting a change, run the tests relevant to the changed package.
+
+Do not parallelize multiple `dotnet build` invocations for the same project and configuration unless they use isolated
+intermediate output paths. Builds of the same project share `obj` and can fail with file-lock errors. Run compile-only
+and package-copy builds sequentially.
 
 For TimberDev-only changes, run:
 

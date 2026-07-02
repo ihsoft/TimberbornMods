@@ -53,6 +53,10 @@ Other verified `Timberborn.CoreUI` controls exist, such as `LocalizableToggle`, 
 `LocalizableSliderInt`, `NineSliceIntegerField`, `NineSliceFloatField`, and `IntegerSliderFactory`. Before using them,
 inspect a nearby game example or decompiled factory/initializer and follow its pattern.
 
+When reusing stock UI classes for visual consistency, inspect their USS first. Classes may include layout or positioning
+such as `position: absolute`, `right`, or `bottom`, not only colors, fonts, and backgrounds. If copying such a class to
+a sibling element, explicitly reset layout properties or create a wrapper that owns the positioning.
+
 ## Common Style Classes
 
 Core text classes from `CoreStyle.uss`:

@@ -128,6 +128,35 @@ If code fits within 120 characters, keep it on one line.
 
 * * *
 
+## Constants and local literals
+
+Do not hoist every literal into top-of-class constants by habit.
+
+Use class-level constants for values that are important contracts or durable configuration:
+
+  * Localization keys.
+  * Save keys.
+  * Settings keys or default names.
+  * Mod-wide default values.
+  * Shared tuning values.
+  * Values used across multiple methods where the name clarifies behavior.
+
+Do not replace incidental literals with local constants by habit either.
+
+For visual component initialization, prefer direct literals when the target variable, property, or nearby method already
+gives enough context. For example, a value assigned inside `saveVersionLabel.style.marginTop = 4` usually does not need
+a separate `SaveVersionLabelMarginTop` constant.
+
+Use a local constant only when the value is reused in the method or when the constant name adds real meaning that the
+surrounding code does not provide.
+
+If a one-off literal needs semantic explanation, prefer a short comment over an artificial constant name.
+
+Top-of-class constants should make important contracts easy to find. Local constants should clarify real local concepts.
+Neither should turn incidental UI glue into fake configuration.
+
+* * *
+
 ## Wrapped method calls
 
 When a method call exceeds 120 characters, preserve as much of the call signature as possible.

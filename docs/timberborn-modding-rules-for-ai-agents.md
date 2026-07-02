@@ -255,6 +255,12 @@ When patching multiple methods on the same target type, prefer one patch class a
 `[HarmonyPatch(typeof(TargetType))]` and method-level `[HarmonyPatch(nameof(TargetType.Method))]` attributes, unless a
 different shape is required by the target signature or patch discovery.
 
+When a Harmony patch delegates into a normal DI-created class, service, or helper, expose the patch-called entrypoint as
+`internal` unless a broader public API is intentionally needed.
+
+Place patch-called entrypoints near the top of that class because they are still an internal API surface. Keep the real
+implementation methods private when they are only used by that entrypoint.
+
 For UI patches:
 
 - Prefer postfix patches when possible.
@@ -439,6 +445,12 @@ Choose the context from the task:
   during bootstrap.
 
 A configurator can be registered in more than one context when the same bindings are required in multiple places.
+
+Use a generic `Configurator` only when the registered bindings and patches are the same for every context on the class.
+
+When the set differs by context, split into context-specific configurators such as `ConfiguratorForGame`,
+`ConfiguratorForMainMenu`, or `ConfiguratorForMapEditor`, and keep each context's bindings and patches in the matching
+configurator. Do not hide context-specific branching inside one generic configurator.
 
 Any type defined by a package that must participate in DI must be registered by the package configurator.
 
