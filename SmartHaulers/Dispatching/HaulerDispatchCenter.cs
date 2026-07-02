@@ -310,7 +310,9 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
     return workplaceBehavior.GetType().Name is
         "FarmHouseGoodStackRetrieverWorkplaceBehavior"
         or "GatherWorkplaceBehavior"
-        or "LumberjackFlagWorkplaceBehavior";
+        or "LumberjackFlagWorkplaceBehavior"
+        or "PlanterWorkplaceBehavior"
+        or "ScavengerWorkplaceBehavior";
   }
 
   static bool TryGetRunningBehavior(BehaviorManager behaviorManager, out Behavior behavior) {
