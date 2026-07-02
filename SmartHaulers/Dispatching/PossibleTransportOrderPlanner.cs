@@ -91,7 +91,7 @@ static class PossibleTransportOrderPlanner {
       return EmptyOrder(haulCandidate, requesterId, weightedBehavior, source: null, target);
     }
     foreach (var nutrient in breedingPod.NutrientsPerCycle) {
-      if (TryPlanClosestBringingGood(districtCenter, target, nutrient.Id, _ => true, out var order)) {
+      if (TryPlanClosestBringingGood(districtCenter, target, nutrient.Id, IsAvailableSource, out var order)) {
         return WithRequest(haulCandidate, requesterId, weightedBehavior, order.source, order.target, order.goodAmount);
       }
       if (TryCreateCoveredOrder(
@@ -116,7 +116,7 @@ static class PossibleTransportOrderPlanner {
       foreach (var inputGood in target.InputGoods) {
         var weight = InputGoodWeight(target, inputGood, weightedBehavior.Weight);
         var addedGood = false;
-        foreach (var order in PlanBringingGoodCandidates(districtCenter, target, inputGood, _ => true)) {
+        foreach (var order in PlanBringingGoodCandidates(districtCenter, target, inputGood, IsAvailableSource)) {
           orders.Add(WithRequest(
               haulCandidate, requesterId, weightedBehavior, weight, order.source, order.target, order.goodAmount));
           added = true;
@@ -200,7 +200,12 @@ static class PossibleTransportOrderPlanner {
     }
     var goodAmount = new GoodAmount(
         singleGoodAllower.AllowedGood, source.UnreservedAmountInStock(singleGoodAllower.AllowedGood));
-    if (TryPlanTakingGood(districtCenter, source, goodAmount, CanGiveTo, out var order)) {
+    if (TryPlanTakingGood(
+        districtCenter,
+        source,
+        goodAmount,
+        inventory => IsAvailableTarget(inventory) && CanGiveTo(inventory),
+        out var order)) {
       return WithRequest(haulCandidate, requesterId, weightedBehavior, order.source, order.target, order.goodAmount);
     }
     return EmptyOrder(haulCandidate, requesterId, weightedBehavior, source, target: null);
@@ -217,7 +222,7 @@ static class PossibleTransportOrderPlanner {
     var added = false;
     foreach (var source in inventories.EnabledInventories) {
       foreach (var goodAmount in goodsProvider(source)) {
-        if (TryPlanTakingGood(districtCenter, source, goodAmount, _ => true, out var order)) {
+        if (TryPlanTakingGood(districtCenter, source, goodAmount, IsAvailableTarget, out var order)) {
           var weight = TakeAwayGoodWeight(source, goodAmount.GoodId, weightedBehavior.Weight);
           orders.Add(WithRequest(
               haulCandidate, requesterId, weightedBehavior, weight, order.source, order.target, order.goodAmount));
@@ -238,11 +243,12 @@ static class PossibleTransportOrderPlanner {
       out (Inventory source, Inventory target, GoodAmount goodAmount) order) {
     order = default;
     var targetAccessible = target.GetEnabledComponent<Accessible>();
-    if (!targetAccessible) {
+    if (!targetAccessible || !IsAvailableTarget(target)) {
       return false;
     }
     var source = districtCenter.GetComponent<DistrictInventoryPicker>()
-        .ClosestInventoryWithStock(targetAccessible, goodId, sourceFilter);
+        .ClosestInventoryWithStock(
+            targetAccessible, goodId, inventory => IsAvailableSource(inventory) && sourceFilter(inventory));
     if (!source) {
       return false;
     }
@@ -260,13 +266,16 @@ static class PossibleTransportOrderPlanner {
       string goodId,
       Predicate<Inventory> sourceFilter) {
     var targetAccessible = target.GetEnabledComponent<Accessible>();
-    if (!targetAccessible) {
+    if (!targetAccessible || !IsAvailableTarget(target)) {
       yield break;
     }
     var districtInventoryRegistry = districtCenter.GetComponent<DistrictInventoryRegistry>();
     foreach (var source in districtInventoryRegistry.ActiveInventoriesWithStock(goodId)) {
       var sourceAccessible = source.GetEnabledComponent<Accessible>();
-      if (!sourceAccessible || !sourceFilter(source) || !targetAccessible.FindRoadPath(sourceAccessible, out _)) {
+      if (!sourceAccessible
+          || !IsAvailableSource(source)
+          || !sourceFilter(source)
+          || !targetAccessible.FindRoadPath(sourceAccessible, out _)) {
         continue;
       }
       var goodAmount = MaxTransferableAmount(source, target, goodId);
@@ -283,7 +292,7 @@ static class PossibleTransportOrderPlanner {
       Predicate<Inventory> targetFilter,
       out (Inventory source, Inventory target, GoodAmount goodAmount) order) {
     order = default;
-    if (availableGood.Amount <= 0) {
+    if (availableGood.Amount <= 0 || !IsAvailableSource(source)) {
       return false;
     }
     var sourceAccessible = source.GetEnabledComponent<Accessible>();
@@ -291,7 +300,11 @@ static class PossibleTransportOrderPlanner {
       return false;
     }
     var target = districtCenter.GetComponent<DistrictInventoryPicker>()
-        .ClosestInventoryWithCapacity(sourceAccessible, new GoodAmount(availableGood.GoodId, 1), targetFilter, out _);
+        .ClosestInventoryWithCapacity(
+            sourceAccessible,
+            new GoodAmount(availableGood.GoodId, 1),
+            inventory => IsAvailableTarget(inventory) && targetFilter(inventory),
+            out _);
     if (!target) {
       return false;
     }
@@ -310,6 +323,14 @@ static class PossibleTransportOrderPlanner {
   static GoodAmount MaxTransferableAmount(Inventory source, Inventory target, GoodAmount availableGood) {
     var amount = Math.Min(availableGood.Amount, target.UnreservedCapacity(availableGood.GoodId));
     return new GoodAmount(availableGood.GoodId, amount);
+  }
+
+  static bool IsAvailableSource(Inventory inventory) {
+    return inventory && inventory.IsUnblocked;
+  }
+
+  static bool IsAvailableTarget(Inventory inventory) {
+    return inventory && inventory.IsUnblocked;
   }
 
   static IEnumerable<GoodAmount> GetUnreservedGoods(Inventory inventory) {

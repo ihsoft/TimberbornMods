@@ -430,7 +430,7 @@ sealed class HaulerDispatchCenter : TickableComponent, IAwakableComponent, IDele
       return;
     }
     foreach (var haulCandidate in districtBuildingRegistry.GetEnabledBuildings<HaulCandidate>()) {
-      if (!haulCandidate.Enabled) {
+      if (!haulCandidate.Enabled || !haulCandidate.GetComponent<BlockableObject>().IsUnblocked) {
         continue;
       }
       haulCandidate.GetWeightedBehaviors(_weightedBehaviors);
