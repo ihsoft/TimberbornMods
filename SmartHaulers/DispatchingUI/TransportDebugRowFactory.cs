@@ -17,7 +17,7 @@ sealed class TransportDebugRowFactory(EntitySelectionService entitySelectionServ
   public VisualElement CreateAgentRow(TransportAgentSnapshot agent) {
     var row = CreateRow();
     AddLink(row, agent.DisplayName, agent.Worker);
-    AddText(row, $", state={agent.State}, act={agent.Activity}, pos={agent.Position}, ");
+    AddText(row, $", state={TransportDebugFormatter.FormatAgentState(agent)}, act={agent.Activity}, pos={agent.Position}, ");
     AddText(row, $"speed={agent.Speed:0.##}, cap={agent.Capacity}");
     return row;
   }

@@ -5,6 +5,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using IgorZ.SmartHaulers.Core;
+using IgorZ.SmartHaulers.DispatchingUI;
 using Timberborn.CoreUI;
 using Timberborn.SingletonSystem;
 using Timberborn.UILayoutSystem;
@@ -17,27 +18,32 @@ namespace IgorZ.SmartHaulers.Dispatching;
 sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingleton {
   readonly DispatchCenterRegistry _dispatchCenterRegistry;
   readonly DispatchPerformanceStats _performanceStats;
+  readonly TransportDebugRowFactory _rowFactory;
   readonly UILayout _uiLayout;
 
   VisualElement _root;
   Label _titleLabel;
-  Label _contentLabel;
+  VisualElement _contentContainer;
   bool _isAddedToLayout;
   string _lastText;
 
   public HaulerDispatchDebugPanel(
-      DispatchCenterRegistry dispatchCenterRegistry, DispatchPerformanceStats performanceStats, UILayout uiLayout) {
+      DispatchCenterRegistry dispatchCenterRegistry,
+      DispatchPerformanceStats performanceStats,
+      TransportDebugRowFactory rowFactory,
+      UILayout uiLayout) {
     _dispatchCenterRegistry = dispatchCenterRegistry;
     _performanceStats = performanceStats;
+    _rowFactory = rowFactory;
     _uiLayout = uiLayout;
   }
 
   public void PostLoad() {
     _root = CreateRoot();
     _titleLabel = CreateTitleLabel();
-    _contentLabel = CreateContentLabel();
+    _contentContainer = new VisualElement();
     var scrollView = new ScrollView(ScrollViewMode.VerticalAndHorizontal);
-    scrollView.contentContainer.Add(_contentLabel);
+    scrollView.contentContainer.Add(_contentContainer);
     _root.Add(_titleLabel);
     _root.Add(scrollView);
     _root.ToggleDisplayStyle(visible: false);
@@ -65,7 +71,7 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
       return;
     }
     _lastText = text;
-    _contentLabel.text = text;
+    UpdateContent();
   }
 
   static VisualElement CreateRoot() {
@@ -97,10 +103,10 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
     return label;
   }
 
-  static Label CreateContentLabel() {
-    var label = new Label();
+  static Label CreateContentLabel(string text) {
+    var label = new Label(text);
+    label.style.whiteSpace = WhiteSpace.Normal;
     label.style.color = Color.white;
-    label.style.whiteSpace = WhiteSpace.NoWrap;
     return label;
   }
 
@@ -138,6 +144,48 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
     lines.Add("T total, PU pickup path, DL delivery path");
     lines.Add("A agents, O active orders, Q queued orders, B construction, R readiness, D decisions, S sort, X other");
     lines.Add("PU/DL are included in phase times.");
+  }
+
+  void UpdateContent() {
+    _contentContainer.Clear();
+    if (SmartHaulersState.DispatchViewMode == DispatchDebugViewMode.Perf) {
+      AddPerformanceLabels(_contentContainer);
+      return;
+    }
+    foreach (var dispatchCenter in OrderedDispatchCenters()) {
+      AddDispatchCenterContent(_contentContainer, dispatchCenter);
+    }
+    if (_contentContainer.childCount == 0) {
+      _contentContainer.Add(CreateContentLabel("No districts"));
+    }
+  }
+
+  void AddPerformanceLabels(VisualElement content) {
+    var lines = new List<string>();
+    AddPerformance(lines);
+    foreach (var line in lines) {
+      content.Add(CreateContentLabel(line));
+    }
+  }
+
+  void AddDispatchCenterContent(VisualElement content, HaulerDispatchCenter dispatchCenter) {
+    var counts = CountAgents(dispatchCenter.Agents);
+    var viewMode = SmartHaulersState.DispatchViewMode;
+    content.Add(CreateContentLabel(
+        $"{viewMode}, {TransportDebugFormatter.FormatObject(dispatchCenter.DistrictCenter)}, "
+        + $"{dispatchCenter.Agents.Count}, "
+        + $"{counts.available}, {counts.wandering}, {counts.workplaceIdle}, {counts.transporting}, "
+        + $"{counts.satisfyingNeed}, {counts.working}, {dispatchCenter.Orders.Count}"));
+    if (viewMode is DispatchDebugViewMode.Agents) {
+      foreach (var agent in dispatchCenter.Agents.OrderBy(agent => agent.EntityId)) {
+        content.Add(_rowFactory.CreateAgentRow(agent));
+      }
+    }
+    if (viewMode is DispatchDebugViewMode.Orders) {
+      foreach (var order in dispatchCenter.Orders) {
+        content.Add(_rowFactory.CreateOrderRow(order));
+      }
+    }
   }
 
   static string FormatSample(DispatchPerformanceSample sample) {
