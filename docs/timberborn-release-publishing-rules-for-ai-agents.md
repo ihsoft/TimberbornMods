@@ -246,6 +246,26 @@ publication command includes the visibility-update opt-in.
 If a normal publish dry-run shows that visibility will be updated, stop before upload and ask the user for explicit
 confirmation. Treat accidental `Private`, `FriendsOnly`, or `Unlisted` visibility changes as release blockers.
 
+## Platform tags
+
+Treat the final `_MODS!/<ModName>/version-*` folders as the source of truth for platform compatibility tags.
+
+Convert `version-X.Y` and `version-X.Y.Z` folders to platform update tags such as `Update X.Y`. Preserve non-version
+tags from `workshop_data.json`, but replace version/update tags so they match the actual final package folders.
+
+For Mod.IO, update tags through the Mod.IO tags API and verify the live tags after the update. Map local Steam-style tag
+names to Mod.IO names where needed, such as `Quality of life` to `QoL` and `New content` to `New in-game content`.
+
+For Steam, do not rely on SteamCMD `workshop_build_item` to update existing Workshop tags. SteamCMD may report success
+while live tags remain unchanged. Use the repository Steam tag updater helper through `tools/update-platform-tags.ps1`,
+then verify the live tags through Steam published-file details. SteamCMD remains the normal content upload path, but tag
+synchronization is separate.
+
+When publishing a Steam release, compute target tags from the final package's version folders before upload. If live
+Steam tags differ, synchronize them before starting the SteamCMD upload and verify them after synchronization.
+
+Do not change Steam visibility as part of tag synchronization.
+
 ## Mod.IO compatibility suffix
 
 For Mod.IO, generate the game compatibility suffix from the actual `version-X.X` folders in the final package.
@@ -344,6 +364,20 @@ Mod.IO descriptions use regular HTML formatting, such as:
   <li>Item</li>
 </ul>
 ```
+
+When applying the same editorial change to both Steam and Mod.IO descriptions, keep the text semantically equivalent
+but format it natively for each platform.
+
+Use a small mechanical mapping where practical:
+
+- Steam `[h1]` and `[h2]` map to Mod.IO `<h1>` and `<h2>`.
+- Steam `[list]` with `[*]` items maps to Mod.IO `<ul>` with `<li>` items.
+- Steam `[b]` maps to Mod.IO `<strong>`.
+- Steam `[i]` maps to Mod.IO `<em>`.
+- Steam `[url=...]text[/url]` maps to Mod.IO `<a href="...">text</a>`.
+
+Preserve each platform's existing structure and make the smallest reviewed edit. Do not run an automatic
+full-description conversion or restyle unless the user explicitly asks for it and reviews the result.
 
 Make the smallest description edit that matches the current mod behavior. Do not regenerate or restyle the full
 description unless the user explicitly asks for it.
