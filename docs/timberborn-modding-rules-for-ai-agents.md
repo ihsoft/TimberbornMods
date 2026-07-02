@@ -250,6 +250,24 @@ if (root.Q<Button>("NewButton") != null) {
 }
 ```
 
+## Mod settings
+
+For new ModSettings work, prefer the current repository settings style when the target mod has the necessary helpers:
+
+- declare local `const string ...LocKey` values near the top of the settings class;
+- use `BaseSettings<T>` where available;
+- use callback-backed static setting values when runtime code needs static access;
+- use `...Internal` naming for public `ModSetting` properties when a wrapper/static runtime value exposes the setting;
+- keep visible labels and tooltips in localization files instead of inline strings.
+
+Do not mechanically rename existing released settings classes or public `ModSetting` properties only to match style.
+`ModSettings.Core.ModSettingsOwner` persists settings using keys based on the mod id, settings owner class name, and
+public property name. Renaming a settings owner class or public `ModSetting` property can reset players' persisted
+settings.
+
+Treat such renames as setting migrations, not formatting cleanup. Before renaming existing settings in released mods,
+ask the user whether resetting those settings is acceptable or implement an explicit migration or stable custom id.
+
 ## UI manipulation
 
 For UI Toolkit elements, hiding existing elements with `DisplayStyle.None` is a safe first approach.
