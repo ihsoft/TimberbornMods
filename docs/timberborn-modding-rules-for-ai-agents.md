@@ -5,6 +5,7 @@ This document defines general Timberborn modding rules and practical knowledge f
 Use this together with:
 
 - `csharp-formatting-rules-for-ai-agents.md`
+- `timberborn-ui-toolkit-notes-for-ai-agents.md` for in-game UI Toolkit work
 
 The C# formatting file controls code style.
 This file controls Timberborn-specific modding practices that are broadly useful across mods.
@@ -282,6 +283,8 @@ When adding or changing in-game UI assets, first find the closest existing game 
 Reuse its UI Toolkit component type and classes before hand-styling controls. For example, prefer the same
 `NineSliceTextField`, button classes, validation classes, and template structure used by nearby dialogs over recreating
 input backgrounds and padding manually.
+
+For UI Toolkit details, follow `timberborn-ui-toolkit-notes-for-ai-agents.md`.
 
 If a UI pattern is common enough to document, base repository UI notes on verified local evidence from game UXML, USS,
 sprites, classes, and existing mod code. External or AI-generated UI cheat sheets may suggest search terms, but do not
