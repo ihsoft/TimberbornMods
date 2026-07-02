@@ -1,3 +1,6 @@
+# v1.19.0 (TBD)
+* [Feature] Allow enabling installed disabled mods from the save-load mod incompatibility dialog.
+
 # v1.18.1 (June 28th, 2026)
 * [Fix] Discharge buildings use the discharge water level settings after the Timberborn 1.1 rename.
 

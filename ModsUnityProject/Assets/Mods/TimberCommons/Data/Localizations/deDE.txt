@@ -38,9 +38,16 @@ IgorZ.TimberCommons.Settings.InjuryProbabilitySection,Verletzungsrisiko,
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,Verletzungsrisiko im Gebäudefenster anzeigen,
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,Indikator am Gebäudesymbol anzeigen,
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHintTooltip,"Bewege den Mauszeiger über den Indikator, um das Verletzungsrisiko anzuzeigen.",
+IgorZ.TimberCommons.Settings.ModUIPatchesSection,Mod-UI-Patches,
+IgorZ.TimberCommons.Settings.ModUIPatches.EnhanceSaveModsIncompatibilityDialog,Dialog für Mod-Abweichungen beim Laden verbessern,
+IgorZ.TimberCommons.Settings.ModUIPatches.EnhanceSaveModsIncompatibilityDialogTooltip,"Fügt Steuerelemente hinzu, mit denen fehlende Mods direkt aus der Ladewarnung aktiviert werden können.
+Diese Option wird automatisch deaktiviert, wenn ein anderer Mod diesen Spieldialog ebenfalls patcht.",
 =,=,"ModUIPatches"
 IgorZ.TimberCommons.ModUIPatches.ModListView.ShowActiveMods,"Aktive anzeigen ({0}/{1})","Button in mod manager. Shows only enabled mods."
 IgorZ.TimberCommons.ModUIPatches.ModListView.ShowAllMods,"Alle anzeigen ({0})","Button in mod manager. Shows all installed mods."
+IgorZ.TimberCommons.ModUIPatches.SaveModsValidator.RestartConfirmation,"Du hast {0} Mod(s) zum Aktivieren ausgewählt. Sie werden erst nach einem Neustart des Spiels geladen. Was möchtest du tun?","Confirmation shown after the player tries to load a save while mods were selected to be enabled after restart. {0} is the number of mods."
+IgorZ.TimberCommons.ModUIPatches.SaveModsValidator.ContinueWithoutRestart,"Fortfahren","Button in save-load mod incompatibility dialog. Continues loading the save without restarting the game first."
+IgorZ.TimberCommons.ModUIPatches.SaveModsValidator.EnableModTooltip,"{0} nach einem Neustart des Spiels aktivieren.","Tooltip for the checkbox in save-load mod incompatibility dialog. {0} is the mod display name."
 =,=,"TimberDev_Utils"
 TimberDev_Utils.Settings.DebugSection,Fehlersuche und Fehlerbehebung,
 TimberDev_Utils.Settings.Debug.VerboseLogging,Ausführliches Loggen,

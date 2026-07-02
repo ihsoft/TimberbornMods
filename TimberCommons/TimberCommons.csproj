@@ -84,6 +84,9 @@
       <Compile Include="..\TimberDev\Settings\DebugSettings.cs">
         <Link>TimberDev\Settings\DebugSettings.cs</Link>
       </Compile>
+      <Compile Include="..\TimberDev\UI\AbstractDialog.cs">
+        <Link>TimberDev\UI\AbstractDialog.cs</Link>
+      </Compile>
       <Compile Include="..\TimberDev\UI\CommonFormats.cs">
         <Link>TimberDev\UI\CommonFormats.cs</Link>
       </Compile>
@@ -104,6 +107,9 @@
       </Compile>
       <Compile Include="..\TimberDev\UI\UnitFormats.cs">
         <Link>TimberDev\UI\UnitFormats.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberDev\UI\VisualElementExtensions.cs">
+        <Link>TimberDev\UI\VisualElementExtensions.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\Utils\HarmonyPatcher.cs">
         <Link>TimberDev\Utils\HarmonyPatcher.cs</Link>

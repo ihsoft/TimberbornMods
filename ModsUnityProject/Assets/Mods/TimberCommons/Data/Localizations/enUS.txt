@@ -40,9 +40,16 @@ IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,"Show injury proba
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,"Show indicator on the building avatar",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHintTooltip,"Hover over the indicator to see the injury probability",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAsDailyProbability,"Show daily probabilities",
+IgorZ.TimberCommons.Settings.ModUIPatchesSection,"Mod UI patches",
+IgorZ.TimberCommons.Settings.ModUIPatches.EnhanceSaveModsIncompatibilityDialog,"Enhance the save-load mod mismatch dialog",
+IgorZ.TimberCommons.Settings.ModUIPatches.EnhanceSaveModsIncompatibilityDialogTooltip,"Adds controls for enabling missing mods directly from the save-load warning.
+This option is disabled automatically when another mod also patches this game dialog.",
 =,=,"ModUIPatches"
 IgorZ.TimberCommons.ModUIPatches.ModListView.ShowActiveMods,"Show active ({0}/{1})","Button in mod manager. Shows only enabled mods."
 IgorZ.TimberCommons.ModUIPatches.ModListView.ShowAllMods,"Show all ({0})","Button in mod manager. Shows all installed mods."
+IgorZ.TimberCommons.ModUIPatches.SaveModsValidator.RestartConfirmation,"You selected {0} mod(s) to be enabled. They will be loaded only after restarting the game. What do you want to do?","Confirmation shown after the player tries to load a save while mods were selected to be enabled after restart. {0} is the number of mods."
+IgorZ.TimberCommons.ModUIPatches.SaveModsValidator.ContinueWithoutRestart,"Continue","Button in save-load mod incompatibility dialog. Continues loading the save without restarting the game first."
+IgorZ.TimberCommons.ModUIPatches.SaveModsValidator.EnableModTooltip,"Enable {0} after restarting the game.","Tooltip for the checkbox in save-load mod incompatibility dialog. {0} is the mod display name."
 =,=,"TimberDev_Utils"
 TimberDev_Utils.Settings.DebugSection,"Debug and troubleshooting",
 TimberDev_Utils.Settings.Debug.VerboseLogging,"Verbose logging",

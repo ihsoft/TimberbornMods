@@ -17,5 +17,6 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<IrrigationSystemSettings>().AsSingleton();
     containerDefinition.Bind<WaterBuildingsSettings>().AsSingleton();
     containerDefinition.Bind<InjuryProbabilitySettings>().AsSingleton();
+    containerDefinition.Bind<ModUIPatchesSettings>().AsSingleton();
   }
 }

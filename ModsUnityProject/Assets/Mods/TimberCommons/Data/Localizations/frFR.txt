@@ -41,6 +41,13 @@ IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHintTooltip,"Survolez l
 IgorZ.TimberCommons.Settings.DebugSection,"Débogage et dépannage",
 IgorZ.TimberCommons.Settings.Debug.VerboseLogging,"Journalisation verbeuse",
 IgorZ.TimberCommons.Settings.Debug.VerboseLoggingTooltip,"Les journaux contiendront plus de détails utiles, mais cela peut avoir un impact sur les performances du jeu."
+IgorZ.TimberCommons.Settings.ModUIPatchesSection,"Patchs d'interface des mods",
+IgorZ.TimberCommons.Settings.ModUIPatches.EnhanceSaveModsIncompatibilityDialog,"Améliorer le dialogue d'incompatibilité des mods au chargement",
+IgorZ.TimberCommons.Settings.ModUIPatches.EnhanceSaveModsIncompatibilityDialogTooltip,"Ajoute des contrôles pour activer les mods manquants directement depuis l'avertissement de chargement.
+Cette option est automatiquement désactivée lorsqu'un autre mod patche aussi ce dialogue du jeu.",
 =,=,"ModUIPatches"
 IgorZ.TimberCommons.ModUIPatches.ModListView.ShowActiveMods,"Afficher les mods actifs ({0}/{1})","Button in mod manager. Shows only enabled mods."
 IgorZ.TimberCommons.ModUIPatches.ModListView.ShowAllMods,"Afficher tous les mods ({0})","Button in mod manager. Shows all installed mods."
+IgorZ.TimberCommons.ModUIPatches.SaveModsValidator.RestartConfirmation,"Vous avez choisi {0} mod(s) à activer. Ils seront chargés uniquement après le redémarrage du jeu. Que voulez-vous faire ?","Confirmation shown after the player tries to load a save while mods were selected to be enabled after restart. {0} is the number of mods."
+IgorZ.TimberCommons.ModUIPatches.SaveModsValidator.ContinueWithoutRestart,"Continuer","Button in save-load mod incompatibility dialog. Continues loading the save without restarting the game first."
+IgorZ.TimberCommons.ModUIPatches.SaveModsValidator.EnableModTooltip,"Activer {0} après le redémarrage du jeu.","Tooltip for the checkbox in save-load mod incompatibility dialog. {0} is the mod display name."

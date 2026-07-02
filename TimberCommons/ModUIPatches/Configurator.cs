@@ -8,16 +8,20 @@ using IgorZ.TimberDev.Utils;
 
 namespace IgorZ.TimberCommons.ModUIPatches;
 
+[Context("MainMenu")]
 [Context("Game")]
 // ReSharper disable once UnusedType.Global
-sealed class ConfiguratorForGame : IConfigurator {
-  static readonly string PatchId = typeof(ConfiguratorForGame).AssemblyQualifiedName;
+sealed class Configurator : IConfigurator {
+  static readonly string PatchId = typeof(Configurator).AssemblyQualifiedName;
   static readonly Type[] Patches = [
       typeof(ModListViewInitializePatch),
+      typeof(ModManagerBoxOpenPatch),
+      typeof(SaveModsValidatorShowModsIncompatibilityDialogPatch),
   ];
 
   public void Configure(IContainerDefinition containerDefinition) {
     HarmonyPatcher.ApplyPatch(PatchId, Patches);
     containerDefinition.Bind<ModListViewLocInitializer>().AsSingleton();
+    containerDefinition.Bind<ModsIncompatibilityDialog>().AsTransient();
   }
 }
