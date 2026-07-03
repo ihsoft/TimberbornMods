@@ -6,6 +6,20 @@ It is not a finished specification. It captures the SmartHaulers-owned model tha
 strong enough to guide the next implementation steps. Confirmed vanilla behavior and investigation details remain in
 `developer-notes.md`.
 
+## Research Goal
+
+SmartHaulers is a prototype for testing whether Timberborn hauling can be improved by building a district-level,
+evidence-based view of transport work and using it to discover where meaningful intervention points actually exist.
+
+The project challenges the assumption that vanilla hauling choices stay good enough as a colony grows, especially when
+distance, reservations, critical needs, stockpile policies, and resource-output flows interact.
+
+SmartHaulers starts with diagnostics because intervention without a trusted model is likely to make the economy worse.
+Before broad behavior changes, diagnostics should show what vanilla already did, what SmartHaulers would have chosen,
+why the two differ, and whether the difference repeats in controlled saves.
+
+Prototype interventions are allowed, but they should stay narrow and reversible until the observed model is proven.
+
 ## Current Design Goal
 
 SmartHaulers is moving toward a district-level dispatch model layered over Timberborn hauling.
@@ -470,6 +484,26 @@ cap=4x 12/20kg (..., max=14kg)
 
 This is deliberately simple. It is a comparison scaffold, not the final dispatch policy.
 
+## Critical Inventory Needs
+
+Critical self-supply needs are transport-like but separate from hauling orders. A worker or bot can travel to an
+inventory to satisfy its own critical need, and that trip consumes time and path capacity, but it is not a haul-provider
+request and should not be modeled as a normal delivery order.
+
+The current SmartHaulers prototype handles only initial action selection for critical-state inventory needs. It patches
+vanilla `DistrictNeedBehaviorService.PickBestAction` for `NeedFilter.OnlyCriticalStateNeeds`, considers
+`InventoryNeedBehavior` targets, and currently applies to `Hunger`, `Thirst`, `Biofuel`, and `Power`. `Catalyst` is
+excluded for now.
+
+For those survival/refuel cases, the prototype ranks candidate inventory targets by nearest travel time and ignores
+vanilla consumable quality/appraisal. Vanilla first chooses the highest-appraised consumable effect group, then chooses
+the shortest action within that group; SmartHaulers deliberately prefers nearest survival/refuel access for critical
+state.
+
+This does not reroute an already running need trip. Vanilla `InventoryNeedBehavior` reserves exactly one good inside
+the chosen inventory, and once a `WalkInsideExecutor` is running, current SmartHaulers does not cancel, retarget, or
+reselect it. Mid-route retargeting requires a separate cancellation/reselection mechanism and remains unresolved.
+
 ## Distance Model
 
 The current implementation uses public navigation and inventory APIs.
@@ -559,6 +593,8 @@ It is a working backlog, not a final design spec and not a blocker for further d
   restart viability or minimum useful restart batch instead of treating every tiny input delivery as urgent.
 - Active `GAME` orders are observed but not controlled. There is no cancel-before-pickup, no drop or redirect after
   pickup, no repeat-assignment guard, and no critical-need policy yet.
+- Critical inventory needs are handled only at initial critical action selection. Mid-route cancellation, retargeting,
+  and reselection for already-running need trips remain unresolved.
 - Agent policy remains draft. Builders, production-workplace idle workers, community workers, ordinary idle workers,
   work hours, contamination, no-work state, sleep, and other needs need explicit policy before intervention.
 - The UI is diagnostic, not final player-facing UI. It explains why; a final intervention UI should emphasize what
