@@ -520,6 +520,35 @@ The current design does not yet:
 
 These are future layers.
 
+## Before Real Intervention Checklist
+
+This checklist records prototype gaps that must be revisited before SmartHaulers starts making real dispatch decisions.
+It is a working backlog, not a final design spec and not a blocker for further diagnostics.
+
+- SmartHaulers still observes, estimates, and scores. It does not perform real assignments, reservations,
+  cancellations, target overrides, or source overrides.
+- The resource-output gap is proven but not solved. Vanilla can send specialized workers from resource or workplace
+  outputs across the map to an `Obtain` stockpile while a nearby valid storage exists. Future policy must decide how to
+  prevent this without breaking simple nearest-storage unload behavior.
+- `ObtainGood` and `SupplyGood` soft tier planning is implemented but unproven by controlled in-game dispatch tests.
+  `StockpilePriorityTierDistancePenalty = 40` is still a tuning hypothesis.
+- Current pickup and delivery ETA values from `distance / agent.Speed` are real seconds, not in-game hours. Convert
+  them before comparing with `CriticalTimeInHours` or showing them as game-time ETA.
+- Time-based readiness is partial. It covers selected production, fuel, consumer, and output cases, but not all
+  stockpile flows, resource outputs, non-recipe consumers or producers, paused or blocked state, power, workers,
+  efficiency, or recipe-switching effects.
+- Compound and batch planning are not implemented. The safe strategy remains: refresh a snapshot, choose one candidate,
+  perform a real reservation or assignment, then rebuild affected candidates. Virtual subtraction is future
+  batch-planning work.
+- Active `GAME` orders are observed but not controlled. There is no cancel-before-pickup, no drop or redirect after
+  pickup, no repeat-assignment guard, and no critical-need policy yet.
+- Agent policy remains draft. Builders, production-workplace idle workers, community workers, ordinary idle workers,
+  work hours, contamination, no-work state, sleep, and other needs need explicit policy before intervention.
+- The UI is diagnostic, not final player-facing UI. It explains why; a final intervention UI should emphasize what
+  SmartHaulers did.
+- Performance is measured but not optimized. Path and ranking costs need batching, caching, cadence control, and
+  parallel-friendly DTO work later, but optimization should not outrun correctness unless it is cheap and simple.
+
 ## Near-Term Direction
 
 The next design layer should stay passive unless there is a clear reason to intervene.
