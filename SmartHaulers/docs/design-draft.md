@@ -145,6 +145,36 @@ Some supported behaviors still produce at most one SmartHaulers order per vanill
 - `ObtainGood`;
 - `SupplyGood`.
 
+Current SmartHaulers `ObtainGood` and `SupplyGood` planning treats stockpile priority modes as soft intent for
+stockpile balancing. Unlike vanilla `ObtainGoodWorkplaceBehavior`, SmartHaulers does not treat every reachable
+inventory as equivalent.
+
+`ObtainGood` source candidates are ranked by tier:
+
+- tier 0: `Supply` stockpiles;
+- tier 1: ordinary non-obtaining stockpiles;
+- tier 2: producing building outputs, currently intentionally limited to `Manufactory` output inventories.
+
+`SupplyGood` target candidates are ranked by tier:
+
+- tier 0: `Obtain` stockpiles;
+- tier 1: ordinary stockpiles.
+
+`SupplyGood` excludes target stockpiles that are already in `Supply` mode.
+
+Tier preference is not absolute. Candidate score adds a per-tier distance penalty:
+
+```text
+score = roadDistance + tier * StockpilePriorityTierDistancePenalty
+```
+
+The current prototype value is `StockpilePriorityTierDistancePenalty = 40`, so one priority tier is worth about 40 road
+distance units. This is an empirical, tuning-sensitive prototype value: roughly a noticeable part of a working day at
+base walking speed, but not a reason for arbitrary cross-map trips.
+
+The producer fallback for `ObtainGood` is deliberately narrow. Resource workplaces such as scavenger flags, gatherer
+flags, lumberjack flags, farmhouses, or forester outputs should not become generic stockpile balancing sources again.
+
 SmartHaulers expands selected behaviors per good:
 
 - one `FillInput` request may create multiple planned orders across `Estimated`, `Deferred`, `Dispatchable`, or
@@ -325,7 +355,8 @@ Current vanilla/fallback baseline weights:
 - `RemoveUnwantedStock = 0.5`;
 - `EmptyInventories = 0.51`;
 - `BringNutrient`, `ObtainGood`, `SupplyGood`, and non-expanded vanilla `EmptyOutput` use the vanilla weighted behavior
-  value as input or fallback.
+  value as input or fallback, even when SmartHaulers uses its own candidate tier model for `ObtainGood` and
+  `SupplyGood`.
 
 ## Passive Decisions
 
@@ -345,6 +376,10 @@ Where:
 - delivery ETA is source-to-target distance divided by agent speed;
 - state penalty is small for idle-ish states;
 - capacity penalty is a small penalty when the agent cannot carry the full requested cargo by weight.
+
+Current pickup and delivery ETA values are computed as `distance / agent.Speed`. These values are real seconds of
+movement, not in-game hours. They are usable for relative candidate ranking, but must be converted before comparing
+against `CriticalTimeInHours` or presenting them as game-time ETA.
 
 Capacity is weight-based. `GoodCarrier.LiftingCapacity` is kilograms, while cargo amount is item units. Passive scoring
 must convert through the good's `GoodSpec.Weight` or the vanilla carry-amount semantics before deciding whether an agent

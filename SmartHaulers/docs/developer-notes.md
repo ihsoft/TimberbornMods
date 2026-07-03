@@ -228,8 +228,12 @@ vanilla values mean.
   `1 - AmountInStock(goodId) / LimitedAmount(goodId)` for each input good.
 - `BringNutrient`: vanilla `1 - InventoryFillCalculator.GetInputFillPercentage(inventory)`; current SmartHaulers uses
   it as-is.
-- `ObtainGood`: vanilla `1 - GetInputFillPercentage(stockpileInventory)`; current SmartHaulers uses it as-is.
-- `SupplyGood`: vanilla `GetInputFillPercentage(stockpileInventory)`; current SmartHaulers uses it as-is.
+- `ObtainGood`: vanilla `1 - GetInputFillPercentage(stockpileInventory)`. Current SmartHaulers keeps the vanilla
+  weight as input or fallback, but uses soft source tiers: `Supply` stockpiles, then ordinary non-obtaining stockpiles,
+  then a narrow producing-building fallback currently limited to `Manufactory` outputs.
+- `SupplyGood`: vanilla `GetInputFillPercentage(stockpileInventory)`. Current SmartHaulers keeps the vanilla weight as
+  input or fallback, but uses soft target tiers: `Obtain` stockpiles, then ordinary stockpiles, while excluding
+  stockpiles already in `Supply` mode.
 - `EmptyOutput`: vanilla output fill percentage. Manufactories use `GetOutputFillPercentage(outputInventory)`;
   simple-output buildings use `GetInStockOutputFillPercentage(inventory)`. A District Center has
   `SimpleOutputInventorySpec` and can naturally produce `EmptyOutput` with weight `1` when an in-stock good reaches its
