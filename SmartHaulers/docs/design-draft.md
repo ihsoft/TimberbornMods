@@ -490,7 +490,7 @@ Critical self-supply needs are transport-like but separate from hauling orders. 
 inventory to satisfy its own critical need, and that trip consumes time and path capacity, but it is not a haul-provider
 request and should not be modeled as a normal delivery order.
 
-The current SmartHaulers prototype handles only initial action selection for critical-state inventory needs. It patches
+The current SmartHaulers prototype handles initial action selection for critical-state inventory needs. It patches
 vanilla `DistrictNeedBehaviorService.PickBestAction` for `NeedFilter.OnlyCriticalStateNeeds`, considers
 `InventoryNeedBehavior` targets, and currently applies to `Hunger`, `Thirst`, `Biofuel`, and `Power`. `Catalyst` is
 excluded for now.
@@ -500,9 +500,16 @@ vanilla consumable quality/appraisal. Vanilla first chooses the highest-appraise
 the shortest action within that group; SmartHaulers deliberately prefers nearest survival/refuel access for critical
 state.
 
-This does not reroute an already running need trip. Vanilla `InventoryNeedBehavior` reserves exactly one good inside
-the chosen inventory, and once a `WalkInsideExecutor` is running, current SmartHaulers does not cancel, retarget, or
-reselect it. Mid-route retargeting requires a separate cancellation/reselection mechanism and remains unresolved.
+The prototype also includes a narrow mid-route reroute for already-running critical `InventoryNeedBehavior` trips. When
+the running behavior is an `InventoryNeedBehavior`, the running executor is `WalkInsideExecutor`, and the nearest
+critical inventory target differs from the current one, SmartHaulers can release the current stock and enterable-slot
+reservations, clear the running behavior/executor state, and let root behavior pick the nearest critical target.
+
+This is prototype control logic and should be treated as high risk until proven in-game. It is still limited to
+inventory-based critical needs in the whitelist above, and it is not a general cancellation or retargeting system.
+
+Diagnostics for critical need trips must show where the agent is going to satisfy the need. Showing only that a beaver
+or bot is in a need state is not enough to validate initial selection or mid-route rerouting.
 
 ## Distance Model
 
@@ -527,6 +534,7 @@ It should support the investigation loop:
 - filter agents vs orders;
 - inspect orders exposed by a selected building;
 - inspect active order and state for a selected agent;
+- inspect the target/source of an active critical need trip for a selected agent;
 - click known objects and agents to select them in-game;
 - show passive `best` and `next` candidates for dispatchable orders.
 
@@ -559,7 +567,7 @@ The current design does not yet:
 - model compound plans across several target inventories;
 - virtually subtract stock or capacity across planned segments;
 - batch-plan several assignments from one snapshot;
-- evaluate critical needs, hunger, thirst, fuel, or rest risk;
+- fully evaluate critical-need, hunger, thirst, fuel, rest, or reroute risk beyond the narrow inventory-needs prototype;
 - cancel or drop active work;
 - allow user-controlled builder help for hauling or transport;
 - use parallel computation.
@@ -593,8 +601,8 @@ It is a working backlog, not a final design spec and not a blocker for further d
   restart viability or minimum useful restart batch instead of treating every tiny input delivery as urgent.
 - Active `GAME` orders are observed but not controlled. There is no cancel-before-pickup, no drop or redirect after
   pickup, no repeat-assignment guard, and no critical-need policy yet.
-- Critical inventory needs are handled only at initial critical action selection. Mid-route cancellation, retargeting,
-  and reselection for already-running need trips remain unresolved.
+- Critical inventory needs now have initial action selection and a narrow mid-route reroute prototype, but this is
+  high-risk control logic and not a general cancellation, retargeting, or need-policy system.
 - Agent policy remains draft. Builders, production-workplace idle workers, community workers, ordinary idle workers,
   work hours, contamination, no-work state, sleep, and other needs need explicit policy before intervention.
 - The UI is diagnostic, not final player-facing UI. It explains why; a final intervention UI should emphasize what
