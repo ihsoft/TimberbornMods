@@ -86,33 +86,85 @@ SmartHaulers treats transport orders as first-class objects. An order has:
 - route and remaining distance when known;
 - optional passive dispatcher decision.
 
-Current phases:
+### Order Phase Reference
 
-- `Queued`: a vanilla request exists, but SmartHaulers has not found a concrete executable route and cargo.
-- `Estimated`: SmartHaulers found a concrete source, target, and cargo that could be executed if started now.
-- `Deferred`: SmartHaulers found a possible route and cargo, but the order is not urgent enough to dispatch yet.
-- `Dispatchable`: SmartHaulers found a possible route and cargo that should be considered by passive decision scoring.
-- `Covered`: the request appears covered by existing reservations or deliveries.
-- `PickingUp`: an agent has an active transport order and is moving toward the source.
-- `Delivering`: an agent has picked up cargo and is moving toward the target.
+The phase describes the order's current planning or observation state. It is separate from origin ownership labels such
+as `GAME`, `IDEA`, and `IDEA/build`.
 
-`Queued` and `Covered` are not route contracts. `Queued` has no useful route. `Covered` may be covered by multiple
-agents, sources, or targets, so active agent rows are the reliable source for concrete source-to-target pairs.
+Planned phases are snapshot-bound candidates, not a durable independent queue. They can become stale whenever stock,
+capacity, reservations, active deliveries, building state, or the district snapshot changes.
 
-Current phase and tuning cheat sheet:
+`GAME` phases observe work already assigned or reserved by Timberborn. SmartHaulers does not own those assignments.
 
-- `Queued`: a vanilla request exists, but SmartHaulers did not find a concrete route or cargo. Weight may exist, but
-  cargo can be `0x`; passive scoring does not evaluate it.
-- `Estimated`: a concrete source, target, and cargo candidate exists, but readiness has not made it urgent enough for
-  scoring. With a time estimate, `4h < t <= 12h` stays `Estimated`.
-- `Deferred`: the candidate is possible but not urgent; passive scoring does not evaluate it. With a time estimate,
-  `t > 12h` becomes `Deferred`.
-- `Dispatchable`: the only planned-order phase considered by passive decision scoring. With a time estimate,
-  `t <= 4h` becomes `Dispatchable`.
-- `Covered`: existing reservations or deliveries appear to cover the request. It is not a single dispatcher route
-  contract and passive scoring does not evaluate it.
-- `PickingUp` and `Delivering`: active reservation or carry orders reconstructed from an agent. Weight is not used to
-  select them.
+`Queued`
+
+- Meaning: a vanilla request exists, but SmartHaulers has not found a concrete executable route and cargo.
+- Owner label: usually `IDEA`, because it comes from SmartHaulers request planning, but it is not executable yet.
+- Decision: produced when the vanilla request is visible but route/cargo planning cannot form a concrete candidate.
+- Route data: no useful route contract; source, target, or cargo may be missing or diagnostic-only, and cargo can be
+  `0x`.
+- Scoring: not evaluated by passive decision scoring.
+- Staleness: rebuild the snapshot; a later inventory, capacity, reservation, or path change may turn it into a concrete
+  planned candidate.
+
+`Estimated`
+
+- Meaning: SmartHaulers found a concrete source, target, and cargo candidate that could be executed if started now, but
+  readiness did not make it urgent enough for scoring.
+- Owner label: `IDEA`.
+- Decision: produced by possible-order planning followed by readiness classification. With a time estimate, current
+  `4h < t <= 12h` stays `Estimated`.
+- Route data: source, target, and cargo describe a snapshot-bound candidate route, not a reservation.
+- Scoring: not evaluated by passive decision scoring.
+- Staleness: any stock, capacity, reservation, active-delivery, or readiness-input change can invalidate it.
+
+`Deferred`
+
+- Meaning: SmartHaulers found a concrete candidate, but it is intentionally not urgent.
+- Owner label: `IDEA`.
+- Decision: readiness classification sets it when a time estimate is `t > 12h` or when fallback fill thresholds say the
+  order is not dispatchable.
+- Route data: source, target, and cargo describe a snapshot-bound candidate route, not a reservation.
+- Scoring: not evaluated by passive decision scoring.
+- Staleness: same as `Estimated`; it may become `Estimated` or `Dispatchable` after the next snapshot/readiness pass.
+
+`Dispatchable`
+
+- Meaning: SmartHaulers found a concrete candidate that is eligible for passive decision scoring.
+- Owner label: `IDEA`, or `IDEA/build` for planned construction candidates.
+- Decision: readiness classification sets it when a time estimate is `t <= 4h`, fallback fill thresholds pass, or the
+  candidate is construction work, which is currently always dispatchable.
+- Route data: source, target, and cargo describe a snapshot-bound candidate route, not a reservation.
+- Scoring: this is the only planned-order phase evaluated by passive decision scoring.
+- Staleness: scoring is valid only for the snapshot that produced the candidate.
+
+`Covered`
+
+- Meaning: the request appears covered by existing reservations or deliveries.
+- Owner label: `IDEA`, because it is SmartHaulers' interpretation of coverage for a request, not a new game assignment.
+- Decision: produced when existing active work/reservations appear to cover the request.
+- Route data: not a single route contract. Coverage may come from multiple agents, sources, targets, or deliveries.
+  Active `GAME` rows are the reliable source for concrete route details.
+- Scoring: not evaluated by passive decision scoring.
+- Staleness: coverage must be recomputed from active reservations and deliveries in each snapshot.
+
+`PickingUp`
+
+- Meaning: an agent has an active reservation/order and is moving toward the source.
+- Owner label: `GAME`.
+- Decision: reconstructed from the agent's active Timberborn work/reservation state.
+- Route data: diagnostic route and remaining-distance data describe game-assigned work already in progress.
+- Scoring: not evaluated as a new candidate; SmartHaulers observes it.
+- Staleness: changes when Timberborn advances, cancels, completes, or replaces the agent's work.
+
+`Delivering`
+
+- Meaning: an agent has picked up cargo and is carrying it toward the target.
+- Owner label: `GAME`.
+- Decision: reconstructed from the agent's active carry/delivery state.
+- Route data: diagnostic route and remaining-distance data describe game-assigned work already in progress.
+- Scoring: not evaluated as a new candidate; SmartHaulers observes it.
+- Staleness: changes when Timberborn advances, cancels, completes, or replaces the agent's work.
 
 Readiness changes phase only. It does not mutate `Weight`. `Weight` is stored in `TransportOrderOrigin.Weight` when the
 order is created and currently remains diagnostic/order-priority data.
