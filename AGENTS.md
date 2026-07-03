@@ -138,6 +138,10 @@ agent waiting just because the fix or investigation was completed elsewhere.
 At the end of a non-trivial task, each role agent should briefly check whether it learned something durable that would
 help future agents.
 
+Treat task signoff, a final "done" report, a post-release conclusion, or "no more diagnosis needed" as the end of the
+task for this check. Do not wait for the user to ask for a mentor handoff. If the task produced a durable lesson that
+meets the criteria below, send it to the mentor as part of closing the task.
+
 Send a suggestion to the mentor only when the observation is:
 
 - likely to repeat in future work,

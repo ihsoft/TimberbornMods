@@ -479,6 +479,18 @@ Do not edit the Wiki directly as part of the publisher role unless the user expl
 Do not send a Wiki handoff for releases with no plausible Wiki impact. If uncertain, send a concise "may need review"
 note instead of silently skipping.
 
+## Publisher signoff handoff
+
+At the end of a non-trivial publishing, release-preparation, platform-description, platform-tag, or post-release
+investigation task, perform the root `AGENTS.md` role learning handoff check before signing off.
+
+Do not wait for the user to ask for a mentor handoff. If the publisher task exposed a durable release, platform,
+artifact, credential, staging, verification, or tooling lesson that is not already clearly covered by the rules, send a
+concise delegated note to the mentor with the observation, evidence, suggested scope, and risk.
+
+Do not send a mentor handoff only to say that an incident is understood or that an existing rule already covers it. In
+that case, mention in the publisher's final report that no new mentor-rule update seems needed.
+
 ## Closing GitHub issues after release
 
 When publishing a mod release, identify the issue-backed changes included in that release.
