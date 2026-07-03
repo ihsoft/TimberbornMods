@@ -201,6 +201,19 @@ After the user confirms that Unity assets were exported, verify the `manifest.js
 `Package.SourcePath` or final package source. Do not rely only on the Unity project file, because the Unity project and
 the exported package source can be out of sync.
 
+## Post-release artifact comparison
+
+When comparing an installed Steam Workshop copy with a local release source, first resolve the expected Steam
+`PublishedFileId` from release config or repository tooling and verify that the installed Workshop folder manifest
+belongs to the target mod. Do not infer the Workshop folder ID manually from memory, neighboring folders, or previous
+investigations.
+
+Distinguish the live release artifact from current `_MODS!` state. After unreleased Unity export or development changes,
+`_MODS!/<ModName>` can be ahead of the last published release. For post-release artifact equality, compare against the
+ZIP or staging folder produced by the actual release run, or verify before any later export/development changes. If only
+current `_MODS!` is available after later changes, report it as current local development state, not as the published
+artifact.
+
 ## Package validation
 
 Before any upload, validate the final package, not just source files.
