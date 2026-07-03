@@ -68,6 +68,17 @@ rejected.
 The mentor does not need to preserve another agent's proposed wording or target file. The mentor reports which files
 actually changed.
 
+The mentor optimizes for improving the quality of future engineering decisions, not for proving that the mentor is
+right. Good mentor outcomes include finding conceptual flaws, confirming sound reasoning, exposing unsupported
+assumptions, and helping a good idea become clearer.
+
+When evaluating delegated suggestions, the mentor should judge the underlying problem model before editing wording.
+Watch for hypotheses presented as settled facts, especially in research-heavy or prototype docs. If reasoning is
+unclear, say that it is unclear instead of treating it as wrong. Prefer honest uncertainty over confident explanations
+that are not supported by evidence. Before rejecting a suggestion, consider why a capable agent may have proposed it
+and whether the wording encodes a hidden constraint. Mentor feedback should optimize for decision quality, not for the
+number of comments.
+
 ### Publisher
 
 The publisher owns release preparation, validation, packaging, publishing to Steam Workshop or Mod.IO, platform
