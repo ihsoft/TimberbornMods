@@ -26,6 +26,7 @@ sealed class TransportDebugRowFactory(EntitySelectionService entitySelectionServ
       TransportOrderSnapshot order, bool includeAgent = true, bool includeRequester = true) {
     var row = CreateRow();
     if (IsUnassignedOrder(order.Phase)) {
+      AddText(row, $"{TransportDebugFormatter.FormatOrderSource(order)}, ");
       AddText(row, $"{TransportDebugFormatter.FormatPhase(order)}, {order.BehaviorName}");
       AddOptionalText(row, TransportDebugFormatter.FormatCargo(order));
       AddOptionalRoute(row, order);
@@ -36,6 +37,7 @@ sealed class TransportDebugRowFactory(EntitySelectionService entitySelectionServ
       }
       return row;
     }
+    AddText(row, $"{TransportDebugFormatter.FormatOrderSource(order)}, ");
     if (includeAgent) {
       AddLink(row, TransportAgentSnapshot.FormatWorker(order.Worker), order.Worker);
       AddText(row, ", ");

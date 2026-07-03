@@ -15,15 +15,24 @@ static class TransportDebugFormatter {
 
   public static string FormatOrderVerbose(TransportOrderSnapshot order, bool includeRequester = true) {
     if (IsUnassignedOrder(order.Phase)) {
-      var text = $"{FormatPhase(order)}, {order.BehaviorName}";
+      var text = $"{FormatOrderSource(order)}, {FormatPhase(order)}, {order.BehaviorName}";
       text = AppendPart(text, FormatCargo(order));
       text = AppendPart(text, FormatKnownRoute(order));
       text += FormatDecision(order.Decision);
       return includeRequester ? $"{text}, req={FormatObject(order.Requester)}" : text;
     }
-    return $"{TransportAgentSnapshot.FormatWorker(order.Worker)}, {order.Phase}, "
+    return $"{FormatOrderSource(order)}, {TransportAgentSnapshot.FormatWorker(order.Worker)}, {order.Phase}, "
         + $"{order.GoodAmount}, {FormatRoute(order)}, route={order.RouteDistance:0.##}, "
         + $"left={order.RemainingDistance:0.##}";
+  }
+
+  public static string FormatOrderSource(TransportOrderSnapshot order) {
+    return order.Origin.Type switch {
+        TransportOrderOriginType.ActiveReservation => "GAME",
+        TransportOrderOriginType.ConstructionJob => "IDEA/build",
+        TransportOrderOriginType.HaulBehavior => "IDEA",
+        _ => "IDEA",
+    };
   }
 
   public static string FormatRoute(TransportOrderSnapshot order) {

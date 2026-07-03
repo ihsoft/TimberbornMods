@@ -15,6 +15,7 @@ using Timberborn.Navigation;
 using Timberborn.Reproduction;
 using Timberborn.StockpilePrioritySystem;
 using Timberborn.Stockpiles;
+using Timberborn.Workshops;
 using Timberborn.WorkSystem;
 using UnityDev.Utils.LogUtilsLite;
 
@@ -31,18 +32,24 @@ static class PossibleTransportOrderPlanner {
   const string WorkplaceBehaviorSuffix = "WorkplaceBehavior";
   // Prototype cap: large output inventories can have many possible targets. Three keeps diagnostics readable for now.
   const int MaxTakeAwayTargetCandidates = 3;
+  // One priority tier is worth this many road-distance units. The value is empirical: at base adult speed 40 units are
+  // roughly 45 in-game minutes, enough to prefer nearby Supply/Obtain intent without making priority absolute. This
+  // has not been proven by in-game dispatch tests yet.
+  const float StockpilePriorityTierDistancePenalty = 40f;
 
   readonly struct PlannedCandidate {
     public readonly Inventory Source;
     public readonly Inventory Target;
     public readonly GoodAmount GoodAmount;
     public readonly float Distance;
+    public readonly float Score;
 
-    public PlannedCandidate(Inventory source, Inventory target, GoodAmount goodAmount, float distance) {
+    public PlannedCandidate(Inventory source, Inventory target, GoodAmount goodAmount, float distance, float score) {
       Source = source;
       Target = target;
       GoodAmount = goodAmount;
       Distance = distance;
+      Score = score;
     }
   }
 
@@ -158,8 +165,7 @@ static class PossibleTransportOrderPlanner {
     if (!target || !singleGoodAllower || !singleGoodAllower.HasAllowedGood) {
       return EmptyOrder(haulCandidate, requesterId, weightedBehavior, source: null, target);
     }
-    if (TryPlanClosestBringingGood(
-        districtCenter, target, singleGoodAllower.AllowedGood, CanObtainFrom, out var order)) {
+    if (TryPlanRankedObtainGood(districtCenter, target, singleGoodAllower.AllowedGood, out var order)) {
       return WithRequest(haulCandidate, requesterId, weightedBehavior, order.source, order.target, order.goodAmount);
     }
     if (TryCreateCoveredOrder(
@@ -216,12 +222,7 @@ static class PossibleTransportOrderPlanner {
     }
     var goodAmount = new GoodAmount(
         singleGoodAllower.AllowedGood, source.UnreservedAmountInStock(singleGoodAllower.AllowedGood));
-    if (TryPlanTakingGood(
-        districtCenter,
-        source,
-        goodAmount,
-        inventory => IsAvailableTarget(inventory) && CanGiveTo(inventory),
-        out var order)) {
+    if (TryPlanRankedSupplyGood(districtCenter, source, goodAmount, out var order)) {
       return WithRequest(haulCandidate, requesterId, weightedBehavior, order.source, order.target, order.goodAmount);
     }
     return EmptyOrder(haulCandidate, requesterId, weightedBehavior, source, target: null);
@@ -301,10 +302,10 @@ static class PossibleTransportOrderPlanner {
       }
       var goodAmount = MaxTransferableAmount(source, target, goodId);
       if (goodAmount.Amount > 0) {
-        candidates.Add(new PlannedCandidate(source, target, goodAmount, distance));
+        candidates.Add(new PlannedCandidate(source, target, goodAmount, distance, distance));
       }
     }
-    candidates.Sort((left, right) => left.Distance.CompareTo(right.Distance));
+    candidates.Sort(ComparePlannedCandidates);
     var plannedAmount = 0;
     foreach (var candidate in candidates) {
       yield return (candidate.Source, candidate.Target, candidate.GoodAmount);
@@ -340,10 +341,10 @@ static class PossibleTransportOrderPlanner {
       }
       var goodAmount = MaxTransferableAmount(source, target, availableGood);
       if (goodAmount.Amount > 0) {
-        candidates.Add(new PlannedCandidate(source, target, goodAmount, distance));
+        candidates.Add(new PlannedCandidate(source, target, goodAmount, distance, distance));
       }
     }
-    candidates.Sort((left, right) => left.Distance.CompareTo(right.Distance));
+    candidates.Sort(ComparePlannedCandidates);
     var plannedAmount = 0;
     var plannedTargets = 0;
     foreach (var candidate in candidates) {
@@ -385,6 +386,92 @@ static class PossibleTransportOrderPlanner {
     }
     order = (source, target, goodAmount);
     return true;
+  }
+
+  static bool TryPlanRankedObtainGood(
+      DistrictCenter districtCenter,
+      Inventory target,
+      string goodId,
+      out (Inventory source, Inventory target, GoodAmount goodAmount) order) {
+    order = default;
+    var targetAccessible = target.GetEnabledComponent<Accessible>();
+    if (!targetAccessible || !IsAvailableTarget(target)) {
+      return false;
+    }
+    var candidates = new List<PlannedCandidate>();
+    var districtInventoryRegistry = districtCenter.GetComponent<DistrictInventoryRegistry>();
+    foreach (var source in districtInventoryRegistry.ActiveInventoriesWithStock(goodId)) {
+      var sourceAccessible = source.GetEnabledComponent<Accessible>();
+      if (!sourceAccessible
+          || source == target
+          || !IsAvailableSource(source)
+          || !TryGetObtainSourceTier(source, goodId, out var tier)
+          || !targetAccessible.FindRoadPath(sourceAccessible, out var distance)) {
+        continue;
+      }
+      var goodAmount = MaxTransferableAmount(source, target, goodId);
+      if (goodAmount.Amount > 0) {
+        candidates.Add(new PlannedCandidate(
+            source, target, goodAmount, distance, PriorityScore(distance, tier)));
+      }
+    }
+    return TryPickBestCandidate(candidates, out order);
+  }
+
+  static bool TryPlanRankedSupplyGood(
+      DistrictCenter districtCenter,
+      Inventory source,
+      GoodAmount availableGood,
+      out (Inventory source, Inventory target, GoodAmount goodAmount) order) {
+    order = default;
+    if (availableGood.Amount <= 0 || !IsAvailableSource(source)) {
+      return false;
+    }
+    var sourceAccessible = source.GetEnabledComponent<Accessible>();
+    if (!sourceAccessible) {
+      return false;
+    }
+    var candidates = new List<PlannedCandidate>();
+    var districtInventoryRegistry = districtCenter.GetComponent<DistrictInventoryRegistry>();
+    foreach (var target in districtInventoryRegistry.ActiveInventoriesWithCapacity(availableGood.GoodId)) {
+      var targetAccessible = target.GetEnabledComponent<Accessible>();
+      if (!targetAccessible
+          || target == source
+          || !IsAvailableTarget(target)
+          || !IsTaking(target, availableGood.GoodId)
+          || !TryGetSupplyTargetTier(target, out var tier)
+          || !sourceAccessible.FindRoadPath(targetAccessible, out var distance)) {
+        continue;
+      }
+      var goodAmount = MaxTransferableAmount(source, target, availableGood);
+      if (goodAmount.Amount > 0) {
+        candidates.Add(new PlannedCandidate(
+            source, target, goodAmount, distance, PriorityScore(distance, tier)));
+      }
+    }
+    return TryPickBestCandidate(candidates, out order);
+  }
+
+  static bool TryPickBestCandidate(
+      List<PlannedCandidate> candidates,
+      out (Inventory source, Inventory target, GoodAmount goodAmount) order) {
+    order = default;
+    if (candidates.Count == 0) {
+      return false;
+    }
+    candidates.Sort(ComparePlannedCandidates);
+    var best = candidates[0];
+    order = (best.Source, best.Target, best.GoodAmount);
+    return true;
+  }
+
+  static int ComparePlannedCandidates(PlannedCandidate left, PlannedCandidate right) {
+    var scoreComparison = left.Score.CompareTo(right.Score);
+    return scoreComparison != 0 ? scoreComparison : left.Distance.CompareTo(right.Distance);
+  }
+
+  static float PriorityScore(float distance, int tier) {
+    return distance + tier * StockpilePriorityTierDistancePenalty;
   }
 
   static GoodAmount MaxTransferableAmount(Inventory source, Inventory target, string goodId) {
@@ -440,14 +527,39 @@ static class PossibleTransportOrderPlanner {
     return [];
   }
 
-  static bool CanGiveTo(Inventory inventory) {
-    var goodSupplier = inventory.GetComponent<GoodSupplier>();
-    return !goodSupplier || !goodSupplier.IsSupplying;
+  static bool TryGetObtainSourceTier(Inventory inventory, string goodId, out int tier) {
+    if (inventory.GetComponent<Stockpile>()) {
+      if (!CanObtainFromStockpile(inventory)) {
+        tier = default;
+        return false;
+      }
+      tier = inventory.GetComponent<GoodSupplier>()?.IsSupplying == true ? 0 : 1;
+      return true;
+    }
+    if (IsProducingBuildingSource(inventory, goodId)) {
+      tier = 2;
+      return true;
+    }
+    tier = default;
+    return false;
   }
 
-  static bool CanObtainFrom(Inventory inventory) {
+  static bool TryGetSupplyTargetTier(Inventory inventory, out int tier) {
+    if (!inventory.GetComponent<Stockpile>() || inventory.GetComponent<GoodSupplier>()?.IsSupplying == true) {
+      tier = default;
+      return false;
+    }
+    tier = inventory.GetComponent<GoodObtainer>()?.IsObtaining == true ? 0 : 1;
+    return true;
+  }
+
+  static bool CanObtainFromStockpile(Inventory inventory) {
     var goodObtainer = inventory.GetComponent<GoodObtainer>();
     return !goodObtainer || !goodObtainer.IsObtaining;
+  }
+
+  static bool IsProducingBuildingSource(Inventory inventory, string goodId) {
+    return !inventory.GetComponent<Stockpile>() && inventory.GetComponent<Manufactory>() && inventory.Gives(goodId);
   }
 
   static Inventory PickInputInventory(Inventories inventories) {
