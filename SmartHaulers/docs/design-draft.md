@@ -278,6 +278,18 @@ prototype sequence is: refresh a snapshot, choose one best dispatchable candidat
 assignment, then rebuild affected candidates before choosing the next one. Rebuilding the whole district is acceptable
 at this stage.
 
+Urgency does not automatically justify one-unit immediate dispatch. If a remote source currently has only one unit, is
+likely to produce more soon, and a candidate agent can carry more than one unit, future dispatch policy should consider
+a short batching window when the consumer's time-to-critical allows it. Otherwise SmartHaulers can reproduce vanilla
+micro-delivery spam by sending one agent for every newly available unit.
+
+Distance-sensitive batching must distinguish production that will block soon from production that is already blocked.
+While production is still running, `CriticalTimeInHours` and delivery ETA describe how much batching slack exists. If
+the building will block before a full batch can arrive, a smaller batch may be correct. Once production is already
+blocked by missing input, `CriticalTimeInHours` no longer expresses urgency by itself; the question becomes restart
+viability. If the available remote cargo is only a tiny fraction of an agent's carrying capacity and cannot restart
+production or complete a meaningful cycle, waiting or batching can save hauler time without worsening production.
+
 Current readiness classification is partly time-based. Fixed per-good inventory fill thresholds remain only as fallback
 behavior for order types where SmartHaulers cannot yet estimate time-to-critical.
 
@@ -540,6 +552,11 @@ It is a working backlog, not a final design spec and not a blocker for further d
 - Compound and batch planning are not implemented. The safe strategy remains: refresh a snapshot, choose one candidate,
   perform a real reservation or assignment, then rebuild affected candidates. Virtual subtraction is future
   batch-planning work.
+- Urgent orders still need a batching policy. Critical consumer need means supply should start, but it does not prove
+  that every newly available unit at a remote source should get a separate agent. Future logic should compare consumer
+  time-to-critical, delivery ETA, source production or arrival rate, agent capacity, and already assigned deliveries.
+- Batching policy must distinguish "will block soon" from "already blocked". For already-blocked production, evaluate
+  restart viability or minimum useful restart batch instead of treating every tiny input delivery as urgent.
 - Active `GAME` orders are observed but not controlled. There is no cancel-before-pickup, no drop or redirect after
   pickup, no repeat-assignment guard, and no critical-need policy yet.
 - Agent policy remains draft. Builders, production-workplace idle workers, community workers, ordinary idle workers,
