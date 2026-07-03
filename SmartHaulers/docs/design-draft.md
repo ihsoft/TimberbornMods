@@ -172,6 +172,10 @@ The current prototype value is `StockpilePriorityTierDistancePenalty = 40`, so o
 distance units. This is an empirical, tuning-sensitive prototype value: roughly a noticeable part of a working day at
 base walking speed, but not a reason for arbitrary cross-map trips.
 
+This tier model and the current `40` value are prototype hypotheses. They are implemented and compile, but have not yet
+been proven by controlled in-game dispatch tests. Future tuning must verify that selected candidates match intended
+Supply/Obtain behavior and do not reintroduce long cross-map hauling or resource-workplace misuse.
+
 The producer fallback for `ObtainGood` is deliberately narrow. Resource workplaces such as scavenger flags, gatherer
 flags, lumberjack flags, farmhouses, or forester outputs should not become generic stockpile balancing sources again.
 
