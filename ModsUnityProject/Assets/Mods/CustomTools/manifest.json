@@ -1,6 +1,6 @@
 {
   "Name": "CustomTools",
-  "Version": "1.4.0",
+  "Version": "1.4.1",
   "Id": "Timberborn.IgorZ.CustomTools",
   "MinimumGameVersion": "1.1.0.0",
   "Description": "Offers some QoL tools and allows other mods to create new tools",
