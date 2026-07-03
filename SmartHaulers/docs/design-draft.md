@@ -179,6 +179,12 @@ Supply/Obtain behavior and do not reintroduce long cross-map hauling or resource
 The producer fallback for `ObtainGood` is deliberately narrow. Resource workplaces such as scavenger flags, gatherer
 flags, lumberjack flags, farmhouses, or forester outputs should not become generic stockpile balancing sources again.
 
+Resource-output flows can expose an important vanilla-vs-planned gap. Timberborn can already assign specialized workers
+to long `EmptyOutput` deliveries through vanilla reservation and nearest-capacity lookup, while SmartHaulers may have a
+nearer snapshot-bound candidate that remains only an idea. Future intervention must decide whether and how to prevent
+`Obtain` stockpiles from pulling resource-output workers across the map without breaking simple nearest-storage unload
+behavior for resource workplaces.
+
 SmartHaulers expands selected behaviors per good:
 
 - one `FillInput` request may create multiple planned orders across `Estimated`, `Deferred`, `Dispatchable`, or
@@ -428,6 +434,11 @@ It should support the investigation loop:
 
 The UI is intentionally compact. Labels like `good=`, `beh=`, and `prog=` were removed when the values became
 self-explanatory. `Queued` and `Covered` hide route text because it is misleading at those phases.
+
+Diagnostics must keep game-assigned work and SmartHaulers planned candidates visually distinct. `GAME` rows are already
+reserved or assigned by Timberborn. `IDEA` rows are SmartHaulers snapshot-bound planned candidates, and `IDEA/build`
+rows are planned construction candidates. `IDEA` rows are not real assignments and should not be blamed on vanilla
+workers until SmartHaulers actually intervenes.
 
 Current main dispatch views are:
 
