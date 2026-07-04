@@ -43,6 +43,7 @@ sealed class TransportDebugRowFactory(EntitySelectionService entitySelectionServ
       AddText(row, $"{TransportDebugFormatter.FormatPhase(order)}, {order.BehaviorName}");
       AddOptionalText(row, TransportDebugFormatter.FormatCargo(order));
       AddOptionalRoute(row, order);
+      AddOptionalText(row, TransportDebugFormatter.FormatInventoryDiagnostics(order));
       AddDecision(row, order.Decision);
       if (includeRequester) {
         AddText(row, ", req=");
@@ -59,11 +60,14 @@ sealed class TransportDebugRowFactory(EntitySelectionService entitySelectionServ
     if (order.Domain == TransportOrderDomain.CriticalNeed) {
       AddText(row, "at=");
       AddLink(row, TransportDebugFormatter.FormatObject(order.Source), order.Source);
+      AddOptionalText(row, TransportDebugFormatter.FormatInventoryDiagnostics(order));
       AddText(row, $", left={order.RemainingDistance:0.##}");
       return row;
     }
     AddRoute(row, order);
-    AddText(row, $", route={order.RouteDistance:0.##}, left={order.RemainingDistance:0.##}");
+    AddText(row, $", route={order.RouteDistance:0.##}");
+    AddOptionalText(row, TransportDebugFormatter.FormatInventoryDiagnostics(order));
+    AddText(row, $", left={order.RemainingDistance:0.##}");
     return row;
   }
 

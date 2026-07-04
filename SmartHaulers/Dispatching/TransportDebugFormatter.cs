@@ -4,6 +4,7 @@
 
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
+using Timberborn.InventorySystem;
 
 namespace IgorZ.SmartHaulers.Dispatching;
 
@@ -18,16 +19,18 @@ static class TransportDebugFormatter {
       var text = $"{FormatOrderSource(order)}, {FormatPhase(order)}, {order.BehaviorName}";
       text = AppendPart(text, FormatCargo(order));
       text = AppendPart(text, FormatKnownRoute(order));
+      text = AppendPart(text, FormatInventoryDiagnostics(order));
       text += FormatDecision(order.Decision);
       return includeRequester ? $"{text}, req={FormatObject(order.Requester)}" : text;
     }
     if (order.Domain == TransportOrderDomain.CriticalNeed) {
       return $"{FormatOrderSource(order)}, {TransportAgentSnapshot.FormatWorker(order.Worker)}, {order.Phase}, "
-          + $"{order.GoodAmount}, at={FormatObject(order.Source)}, left={order.RemainingDistance:0.##}";
+          + $"{order.GoodAmount}, at={FormatObject(order.Source)}, {FormatInventoryDiagnostics(order)}, "
+          + $"left={order.RemainingDistance:0.##}";
     }
     return $"{FormatOrderSource(order)}, {TransportAgentSnapshot.FormatWorker(order.Worker)}, {order.Phase}, "
         + $"{order.GoodAmount}, {FormatRoute(order)}, route={order.RouteDistance:0.##}, "
-        + $"left={order.RemainingDistance:0.##}";
+        + $"{FormatInventoryDiagnostics(order)}, left={order.RemainingDistance:0.##}";
   }
 
   public static string FormatOrderSource(TransportOrderSnapshot order) {
@@ -72,6 +75,18 @@ static class TransportDebugFormatter {
     return order.Phase == OrderPhase.Queued ? "" : order.GoodAmount.ToString();
   }
 
+  public static string FormatInventoryDiagnostics(TransportOrderSnapshot order) {
+    if (!order.Cargo.HasGoods) {
+      return "";
+    }
+    var source = FormatSourceInventoryDiagnostics(order.Source, order.Cargo.GoodId);
+    var target = FormatTargetInventoryDiagnostics(order.Target, order.Cargo.GoodId);
+    if (string.IsNullOrEmpty(source)) {
+      return target;
+    }
+    return string.IsNullOrEmpty(target) ? source : $"{source}, {target}";
+  }
+
   public static string FormatObject(BaseComponent component) {
     if (component == null) {
       return "[NULL]";
@@ -107,6 +122,26 @@ static class TransportDebugFormatter {
 
   static string AppendPart(string text, string part) {
     return string.IsNullOrEmpty(part) ? text : $"{text}, {part}";
+  }
+
+  static string FormatSourceInventoryDiagnostics(Inventory inventory, string goodId) {
+    if (!inventory) {
+      return "";
+    }
+    var stock = inventory.AmountInStock(goodId);
+    var reserved = inventory._reservedStock.Amount(goodId);
+    var free = inventory.UnreservedAmountInStock(goodId);
+    return $"src={stock}/{reserved}/{free}";
+  }
+
+  static string FormatTargetInventoryDiagnostics(Inventory inventory, string goodId) {
+    if (!inventory) {
+      return "";
+    }
+    var capacity = inventory.UnreservedCapacity(goodId) + inventory.ReservedCapacity(goodId);
+    var reserved = inventory.ReservedCapacity(goodId);
+    var free = inventory.UnreservedCapacity(goodId);
+    return $"dst={capacity}/{reserved}/{free}";
   }
 
   public static string FormatAgentState(TransportAgentSnapshot agent) {
