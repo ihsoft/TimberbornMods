@@ -38,6 +38,9 @@ when using or changing them.
 - Not every transport-like activity is an `IHaulBehaviorProvider` request.
 - `IJobBehavior` is broader than transport.
 - `Accessible.FindRoadPath(Vector3)` is unsafe for accessibles that may have multiple access points.
+- For SmartHaulers diagnostics/planning over arbitrary source-target pairs, avoid direct `Accessible.FindRoadPath(...)`
+  or other cached road-path calls. Use a SmartHaulers-owned helper that iterates access points and returns no-path or
+  unknown instead of crashing when road-flow cache data is missing or stale.
 
 ## Prototype Guardrails
 

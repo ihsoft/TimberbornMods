@@ -273,8 +273,13 @@ This inversion is suitable for road-distance estimates and ranking. `RoadNavMesh
 connections with equal cost, and the vanilla pathfinding code also has reversed cached path request logic. Use the
 result as a ranking estimate, not as the final physical path an agent must follow.
 
-For multi-access origins, evaluate each access point explicitly and use the minimum distance. Avoid
-`Accessible.FindRoadPath(Vector3)` for this because it can require a single access point.
+For SmartHaulers diagnostics and planning over arbitrary source-target pairs, avoid direct
+`Accessible.FindRoadPath(...)` and other cached road-path calls. They can throw when road-flow cache data is missing or
+stale, and some overloads assume a single access point. Use a SmartHaulers-owned helper such as
+`TransportPathDistance.TryFindRoadPath(...)` that explicitly iterates access points, uses `FindPathUnlimitedRange(...)`,
+and returns no-path or unknown instead of crashing diagnostics.
+
+For multi-access origins, evaluate each access point explicitly and use the minimum distance.
 
 If SmartHaulers starts its own road-flow-field cache for large batches, balance every
 `StartCachingRoadFlowField(...)` with the matching `StopCachingRoadFlowField(...)`. The vanilla flow-field cache is
@@ -284,6 +289,9 @@ reference-counted: an extra stop can throw, and a missing stop leaves the cache 
 
 Avoid calling `Accessible.FindRoadPath(Vector3)` on an accessible that may have multiple access points. Internally it
 uses `UnblockedSingleAccess`, which can throw when more than one access point exists.
+
+Avoid calling `Accessible.FindRoadPath(Accessible)` for arbitrary diagnostic/planning ranking too. It can rely on cached
+road flow fields and throw `There's no cached flow field` when the cache is not ready, stale, or missing.
 
 Use a multi-access-aware API when available. In diagnostics, prefer returning unknown, NaN, or no path over crashing on
 a multi-access building.
