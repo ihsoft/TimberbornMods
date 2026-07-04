@@ -96,7 +96,29 @@ sealed class TransportRequesterFragment(
   }
 
   bool InventoryBelongsToSelectedEntity(Inventory inventory) {
-    return inventory && inventory.GetComponent<EntityComponent>()?.EntityId == _selectedEntityId;
+    if (!inventory) {
+      return false;
+    }
+    if (inventory.GetComponent<EntityComponent>()?.EntityId == _selectedEntityId) {
+      return true;
+    }
+    var selectedInventories = new List<Inventory>();
+    _selectedEntity.GetComponents(selectedInventories);
+    foreach (var selectedInventory in selectedInventories) {
+      if (selectedInventory == inventory) {
+        return true;
+      }
+    }
+    var inventories = _selectedEntity.GetComponent<Inventories>();
+    if (!inventories) {
+      return false;
+    }
+    foreach (var selectedInventory in inventories.AllInventories) {
+      if (selectedInventory == inventory) {
+        return true;
+      }
+    }
+    return false;
   }
 
   void UpdateOrders() {

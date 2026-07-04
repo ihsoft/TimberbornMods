@@ -6,6 +6,7 @@ namespace IgorZ.SmartHaulers.Dispatching;
 
 enum TransportOrderDomain {
   Active,
+  CriticalNeed,
   Hauling,
   CommunityService,
   Construction,

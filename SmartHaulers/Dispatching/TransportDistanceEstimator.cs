@@ -34,8 +34,7 @@ sealed class TransportDistanceEstimator(DispatchPerformanceStats performanceStat
     var targetAccessible = target ? target.GetEnabledComponent<Accessible>() : null;
     if (sourceAccessible
         && targetAccessible
-        && sourceAccessible.HasSingleAccess
-        && sourceAccessible.FindRoadPath(targetAccessible, out distance)) {
+        && TransportPathDistance.TryFindRoadPath(sourceAccessible, targetAccessible, out distance)) {
       return true;
     }
     distance = float.NaN;

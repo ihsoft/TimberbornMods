@@ -68,6 +68,19 @@ readonly struct TransportOrderSnapshot {
         new TransportCargo(goodAmount));
   }
 
+  public static TransportOrderSnapshot CriticalNeed(
+      Guid agentId, Worker worker, Inventory source, GoodAmount goodAmount, float remainingDistance, float progress,
+      bool controlledBySmartHaulers) {
+    return new TransportOrderSnapshot(
+        new TransportOrderAssignment(agentId, worker),
+        controlledBySmartHaulers
+            ? TransportOrderOrigin.SmartCriticalNeed()
+            : TransportOrderOrigin.CriticalNeed(),
+        OrderPhase.PickingUp,
+        new TransportOrderRoute(source, null, float.NaN, remainingDistance, progress),
+        new TransportCargo(goodAmount));
+  }
+
   public static TransportOrderSnapshot Queued(
       Guid requesterId, BaseComponent requester, string behaviorName, float weight, Inventory source, Inventory target,
       GoodAmount goodAmount) {

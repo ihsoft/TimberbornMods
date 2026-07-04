@@ -297,7 +297,7 @@ static class PossibleTransportOrderPlanner {
       if (!sourceAccessible
           || !IsAvailableSource(source)
           || !sourceFilter(source)
-          || !targetAccessible.FindRoadPath(sourceAccessible, out var distance)) {
+          || !TransportPathDistance.TryFindRoadPath(targetAccessible, sourceAccessible, out var distance)) {
         continue;
       }
       var goodAmount = MaxTransferableAmount(source, target, goodId);
@@ -336,7 +336,7 @@ static class PossibleTransportOrderPlanner {
           || !IsAvailableTarget(target)
           || !targetFilter(target)
           || !IsTaking(target, availableGood.GoodId)
-          || !sourceAccessible.FindRoadPath(targetAccessible, out var distance)) {
+          || !TransportPathDistance.TryFindRoadPath(sourceAccessible, targetAccessible, out var distance)) {
         continue;
       }
       var goodAmount = MaxTransferableAmount(source, target, availableGood);
@@ -406,7 +406,7 @@ static class PossibleTransportOrderPlanner {
           || source == target
           || !IsAvailableSource(source)
           || !TryGetObtainSourceTier(source, goodId, out var tier)
-          || !targetAccessible.FindRoadPath(sourceAccessible, out var distance)) {
+          || !TransportPathDistance.TryFindRoadPath(targetAccessible, sourceAccessible, out var distance)) {
         continue;
       }
       var goodAmount = MaxTransferableAmount(source, target, goodId);
@@ -440,7 +440,7 @@ static class PossibleTransportOrderPlanner {
           || !IsAvailableTarget(target)
           || !IsTaking(target, availableGood.GoodId)
           || !TryGetSupplyTargetTier(target, out var tier)
-          || !sourceAccessible.FindRoadPath(targetAccessible, out var distance)) {
+          || !TransportPathDistance.TryFindRoadPath(sourceAccessible, targetAccessible, out var distance)) {
         continue;
       }
       var goodAmount = MaxTransferableAmount(source, target, availableGood);

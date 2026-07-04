@@ -6,6 +6,8 @@ namespace IgorZ.SmartHaulers.Dispatching;
 
 enum TransportOrderOriginType {
   ActiveReservation,
+  CriticalNeed,
+  SmartCriticalNeed,
   HaulBehavior,
   ConstructionJob,
 }

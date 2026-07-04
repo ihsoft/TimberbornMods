@@ -3,9 +3,12 @@
 // License: Public Domain
 
 using Timberborn.BehaviorSystem;
+using Timberborn.BaseComponentSystem;
 using Timberborn.Carrying;
+using Timberborn.DwellingSystem;
 using Timberborn.Goods;
 using Timberborn.InventorySystem;
+using Timberborn.SleepSystem;
 
 namespace IgorZ.SmartHaulers.Dispatching;
 
@@ -18,7 +21,7 @@ readonly struct TransportAgentActivity {
 
   public static readonly TransportAgentActivity Idle = new TransportAgentActivity(
       TransportAgentState.Available, isCarrying: false, hasStockReservation: false, hasCapacityReservation: false,
-      jobRunning: false, new GoodAmount(null, 0), default, default, null, null, 0f);
+      jobRunning: false, new GoodAmount(null, 0), default, default, null, null, 0f, null, null);
 
   public TransportAgentState State { get; }
   public bool IsCarrying { get; }
@@ -31,11 +34,15 @@ readonly struct TransportAgentActivity {
   public string BehaviorName { get; }
   public string ExecutorName { get; }
   public float ExecutorElapsedTime { get; }
+  public string TargetLabel { get; }
+  public BaseComponent Target { get; }
+  public bool HasTargetInfo => !string.IsNullOrEmpty(TargetLabel);
 
   TransportAgentActivity(
       TransportAgentState state, bool isCarrying, bool hasStockReservation, bool hasCapacityReservation,
       bool jobRunning, GoodAmount carriedGood, GoodReservation stockReservation,
-      GoodReservation capacityReservation, string behaviorName, string executorName, float executorElapsedTime) {
+      GoodReservation capacityReservation, string behaviorName, string executorName, float executorElapsedTime,
+      string targetLabel, BaseComponent target) {
     State = state;
     IsCarrying = isCarrying;
     HasStockReservation = hasStockReservation;
@@ -47,6 +54,8 @@ readonly struct TransportAgentActivity {
     BehaviorName = behaviorName;
     ExecutorName = executorName;
     ExecutorElapsedTime = executorElapsedTime;
+    TargetLabel = targetLabel;
+    Target = target;
   }
 
   public static TransportAgentActivity Create(
@@ -54,10 +63,25 @@ readonly struct TransportAgentActivity {
     var runningBehavior = behaviorManager?.RunningBehavior.Name;
     var runningExecutor = behaviorManager?.RunningExecutor ?? default;
     var state = Classify(goodCarrier, goodReserver, runningBehavior);
+    var target = GetTarget(behaviorManager, out var targetLabel);
     return new TransportAgentActivity(
         state, goodCarrier.IsCarrying, goodReserver.HasReservedStock, goodReserver.HasReservedCapacity,
         jobRunning, goodCarrier.CarriedGood.GoodAmount, goodReserver.StockReservation,
-        goodReserver.CapacityReservation, runningBehavior, runningExecutor.Name, runningExecutor.ElapsedTime);
+        goodReserver.CapacityReservation, runningBehavior, runningExecutor.Name, runningExecutor.ElapsedTime,
+        targetLabel, target);
+  }
+
+  static BaseComponent GetTarget(BehaviorManager behaviorManager, out string targetLabel) {
+    if (behaviorManager?._runningBehavior is SleepNeedBehavior sleepNeedBehavior) {
+      if (sleepNeedBehavior._dweller.HasHome) {
+        targetLabel = "sleepAt";
+        return sleepNeedBehavior._dweller.Home;
+      }
+      targetLabel = "sleepOutside";
+      return null;
+    }
+    targetLabel = null;
+    return null;
   }
 
   static TransportAgentState Classify(GoodCarrier goodCarrier, GoodReserver goodReserver, string runningBehavior) {
@@ -95,11 +119,14 @@ readonly struct TransportAgentActivity {
   }
 
   public override string ToString() {
+    var targetText = HasTargetInfo
+        ? Target ? $" {TargetLabel}={TransportDebugFormatter.FormatObject(Target)}" : $" {TargetLabel}"
+        : "";
     if (State != TransportAgentState.Transporting && !string.IsNullOrEmpty(ExecutorName)) {
-      return $"{BehaviorName}/{ExecutorName} {ExecutorElapsedTime:0.#}s";
+      return $"{BehaviorName}/{ExecutorName} {ExecutorElapsedTime:0.#}s{targetText}";
     }
     if (State != TransportAgentState.Transporting && !string.IsNullOrEmpty(BehaviorName)) {
-      return BehaviorName;
+      return $"{BehaviorName}{targetText}";
     }
     if (IsCarrying) {
       return $"Carrying {CarriedGood}";

@@ -21,6 +21,10 @@ static class TransportDebugFormatter {
       text += FormatDecision(order.Decision);
       return includeRequester ? $"{text}, req={FormatObject(order.Requester)}" : text;
     }
+    if (order.Domain == TransportOrderDomain.CriticalNeed) {
+      return $"{FormatOrderSource(order)}, {TransportAgentSnapshot.FormatWorker(order.Worker)}, {order.Phase}, "
+          + $"{order.GoodAmount}, at={FormatObject(order.Source)}, left={order.RemainingDistance:0.##}";
+    }
     return $"{FormatOrderSource(order)}, {TransportAgentSnapshot.FormatWorker(order.Worker)}, {order.Phase}, "
         + $"{order.GoodAmount}, {FormatRoute(order)}, route={order.RouteDistance:0.##}, "
         + $"left={order.RemainingDistance:0.##}";
@@ -29,6 +33,8 @@ static class TransportDebugFormatter {
   public static string FormatOrderSource(TransportOrderSnapshot order) {
     return order.Origin.Type switch {
         TransportOrderOriginType.ActiveReservation => "GAME",
+        TransportOrderOriginType.CriticalNeed => "GAME/need",
+        TransportOrderOriginType.SmartCriticalNeed => "SMART/need",
         TransportOrderOriginType.ConstructionJob => "IDEA/build",
         TransportOrderOriginType.HaulBehavior => "IDEA",
         _ => "IDEA",

@@ -17,9 +17,22 @@ sealed class TransportDebugRowFactory(EntitySelectionService entitySelectionServ
   public VisualElement CreateAgentRow(TransportAgentSnapshot agent) {
     var row = CreateRow();
     AddLink(row, agent.DisplayName, agent.Worker);
-    AddText(row, $", state={TransportDebugFormatter.FormatAgentState(agent)}, act={agent.Activity}, pos={agent.Position}, ");
+    AddText(row, $", state={TransportDebugFormatter.FormatAgentState(agent)}, act={agent.Activity}");
+    AddActivityTarget(row, agent.Activity);
+    AddText(row, $", pos={agent.Position}, ");
     AddText(row, $"speed={agent.Speed:0.##}, cap={agent.Capacity}");
     return row;
+  }
+
+  void AddActivityTarget(VisualElement row, TransportAgentActivity activity) {
+    if (!activity.HasTargetInfo) {
+      return;
+    }
+    AddText(row, $", target={activity.TargetLabel}");
+    if (activity.Target) {
+      AddText(row, "=");
+      AddLink(row, TransportDebugFormatter.FormatObject(activity.Target), activity.Target);
+    }
   }
 
   public VisualElement CreateOrderRow(
@@ -43,6 +56,12 @@ sealed class TransportDebugRowFactory(EntitySelectionService entitySelectionServ
       AddText(row, ", ");
     }
     AddText(row, $"{order.Phase}, {order.GoodAmount}, ");
+    if (order.Domain == TransportOrderDomain.CriticalNeed) {
+      AddText(row, "at=");
+      AddLink(row, TransportDebugFormatter.FormatObject(order.Source), order.Source);
+      AddText(row, $", left={order.RemainingDistance:0.##}");
+      return row;
+    }
     AddRoute(row, order);
     AddText(row, $", route={order.RouteDistance:0.##}, left={order.RemainingDistance:0.##}");
     return row;

@@ -26,6 +26,7 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<HaulerDispatchCenter>().AsTransient();
     containerDefinition.Bind<HaulerDispatchDebugPanel>().AsSingleton();
     containerDefinition.Bind<KeyBindingInputProcessor>().AsSingleton();
+    containerDefinition.Bind<SmartHaulersPatcher>().AsSingleton();
     containerDefinition.Bind<TransportDebugRowFactory>().AsSingleton();
     containerDefinition.Bind<TransportAgentFragment>().AsSingleton();
     containerDefinition.Bind<TransportRequesterFragment>().AsSingleton();

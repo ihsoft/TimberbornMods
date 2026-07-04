@@ -17,7 +17,9 @@ using Timberborn.GameDistricts;
 using Timberborn.Goods;
 using Timberborn.Hauling;
 using Timberborn.InventorySystem;
+using Timberborn.InventoryNeedSystem;
 using Timberborn.Navigation;
+using Timberborn.NeedSystem;
 using Timberborn.PrioritySystem;
 using Timberborn.WalkingSystem;
 using Timberborn.Workshops;
@@ -27,10 +29,13 @@ using UnityEngine;
 namespace IgorZ.SmartHaulers.Dispatching;
 
 sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletableEntity {
+  static readonly HashSet<string> SmartCriticalNeedIds = ["Hunger", "Thirst", "Biofuel", "Power"];
+
   readonly DispatchCenterRegistry _dispatchCenterRegistry;
   readonly ConstructionRegistry _constructionRegistry;
   readonly TransportDecisionEvaluator _decisionEvaluator;
   readonly DispatchPerformanceStats _performanceStats;
+  readonly IGoodService _goodService;
   readonly List<TransportAgentSnapshot> _agents = [];
   readonly List<TransportOrderSnapshot> _orders = [];
   readonly List<Accessible> _builderHubAccessibles = [];
@@ -48,11 +53,13 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
 
   public HaulerDispatchCenter(
       DispatchCenterRegistry dispatchCenterRegistry, ConstructionRegistry constructionRegistry,
-      TransportDecisionEvaluator decisionEvaluator, DispatchPerformanceStats performanceStats) {
+      TransportDecisionEvaluator decisionEvaluator, DispatchPerformanceStats performanceStats,
+      IGoodService goodService) {
     _dispatchCenterRegistry = dispatchCenterRegistry;
     _constructionRegistry = constructionRegistry;
     _decisionEvaluator = decisionEvaluator;
     _performanceStats = performanceStats;
+    _goodService = goodService;
   }
 
   public void Awake() {
@@ -197,6 +204,9 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
     var goodCarrier = worker.GetComponent<GoodCarrier>();
     var goodReserver = worker.GetComponent<GoodReserver>();
     var behaviorManager = worker.GetComponent<BehaviorManager>();
+    if (TryCreateNeedOrderSnapshot(worker, agentSnapshot, goodReserver, behaviorManager, out orderSnapshot)) {
+      return true;
+    }
     if (!goodCarrier.IsCarrying && !goodReserver.HasReservedStock && !goodReserver.HasReservedCapacity) {
       orderSnapshot = default;
       return false;
@@ -222,6 +232,43 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
     orderSnapshot = TransportOrderSnapshot.Assigned(
         agentSnapshot.EntityId, worker, phase, source, target, goodAmount, routeDistance, remainingDistance, progress);
     return true;
+  }
+
+  bool TryCreateNeedOrderSnapshot(
+      Worker worker, TransportAgentSnapshot agentSnapshot, GoodReserver goodReserver, BehaviorManager behaviorManager,
+      out TransportOrderSnapshot orderSnapshot) {
+    if (!goodReserver.HasReservedStock
+        || behaviorManager._runningBehavior is not InventoryNeedBehavior
+        || behaviorManager._runningExecutor is not WalkInsideExecutor) {
+      orderSnapshot = default;
+      return false;
+    }
+    var source = goodReserver.StockReservation.Inventory;
+    var goodAmount = goodReserver.StockReservation.GoodAmount;
+    var remainingDistance = TryGetRemainingDistance(OrderPhase.PickingUp, source, agentSnapshot.WorldPosition, out var remaining)
+        ? remaining
+        : float.NaN;
+    var progress = TrackProgress(worker, OrderPhase.PickingUp, source, goodAmount, remainingDistance);
+    var controlledBySmartHaulers = IsSmartCriticalNeed(worker, goodAmount);
+    orderSnapshot = TransportOrderSnapshot.CriticalNeed(
+        agentSnapshot.EntityId, worker, source, goodAmount, remainingDistance, progress, controlledBySmartHaulers);
+    return true;
+  }
+
+  bool IsSmartCriticalNeed(Worker worker, GoodAmount goodAmount) {
+    if (string.IsNullOrEmpty(goodAmount.GoodId)) {
+      return false;
+    }
+    var needManager = worker.GetComponent<NeedManager>();
+    if (!needManager) {
+      return false;
+    }
+    foreach (var effect in _goodService.GetGood(goodAmount.GoodId).ConsumptionEffects) {
+      if (SmartCriticalNeedIds.Contains(effect.NeedId) && needManager.NeedIsInCriticalState(effect.NeedId)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   void RestoreKnownEndpoints(Worker worker, GoodAmount goodAmount, ref Inventory source, ref Inventory target) {
@@ -263,9 +310,6 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
   }
 
   static bool IsActiveTransportOrder(BehaviorManager behaviorManager, GoodCarrier goodCarrier, Inventory target) {
-    if (IsSpecializedLooseGoodTarget(target)) {
-      return false;
-    }
     if (goodCarrier.IsCarrying) {
       return true;
     }
@@ -280,19 +324,6 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
     }
     if (behavior is WorkplaceBehavior workplaceBehavior) {
       return IsTransportWorkplaceBehavior(workplaceBehavior);
-    }
-    return false;
-  }
-
-  static bool IsSpecializedLooseGoodTarget(Inventory target) {
-    var workplace = target ? target.GetComponent<Workplace>() : null;
-    if (!workplace) {
-      return false;
-    }
-    foreach (var workplaceBehavior in workplace.WorkplaceBehaviors) {
-      if (IsSpecializedResourceBehavior(workplaceBehavior)) {
-        return true;
-      }
     }
     return false;
   }
@@ -358,7 +389,7 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
       var targetAccessible = inventory.GetEnabledComponent<Accessible>();
       if (targetAccessible
           && InventoryIsTaking(inventory, goodAmount)
-          && TryFindRoadPath(sourceAccessible, targetAccessible, out var distance)
+          && TransportPathDistance.TryFindRoadPath(sourceAccessible, targetAccessible, out var distance)
           && distance < closestDistance) {
         closestInventory = inventory;
         closestDistance = distance;
@@ -378,7 +409,7 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
     foreach (var inventory in districtInventoryRegistry.ActiveInventoriesWithStock(goodId)) {
       var sourceAccessible = inventory.GetEnabledComponent<Accessible>();
       if (sourceAccessible
-          && TryFindRoadPath(targetAccessible, sourceAccessible, out var distance)
+          && TransportPathDistance.TryFindRoadPath(targetAccessible, sourceAccessible, out var distance)
           && distance < closestDistance) {
         closestInventory = inventory;
         closestDistance = distance;
@@ -391,25 +422,6 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
     return inventory.HasUnreservedCapacity(goodAmount)
         && inventory.GetComponent<IInventoryValidator>().ValidInventory
         && inventory.GetComponent<BlockableObject>().IsUnblocked;
-  }
-
-  static bool TryFindRoadPath(Accessible start, Accessible end, out float distance) {
-    distance = float.PositiveInfinity;
-    if (AccessibleIsBlocked(start) || AccessibleIsBlocked(end)) {
-      return false;
-    }
-    var pathFound = false;
-    foreach (var startAccess in start.Accesses) {
-      if (end.FindPathUnlimitedRange(startAccess, [], out var pathDistance)) {
-        distance = Math.Min(distance, pathDistance);
-        pathFound = true;
-      }
-    }
-    return pathFound;
-  }
-
-  static bool AccessibleIsBlocked(Accessible accessible) {
-    return !accessible.Enabled || (accessible._blockedAccessible?.IsBlocked() ?? false);
   }
 
   void AddQueuedOrders() {
@@ -596,8 +608,7 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
       var targetAccessible = target ? target.GetEnabledComponent<Accessible>() : null;
       if (sourceAccessible
           && targetAccessible
-          && sourceAccessible.HasSingleAccess
-          && sourceAccessible.FindRoadPath(targetAccessible, out distance)) {
+          && TransportPathDistance.TryFindRoadPath(sourceAccessible, targetAccessible, out distance)) {
         return true;
       }
       distance = 0f;

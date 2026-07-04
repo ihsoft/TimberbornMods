@@ -14,6 +14,8 @@ readonly struct TransportOrderOrigin {
   public string BehaviorName { get; }
   public float Weight { get; }
   public TransportOrderDomain Domain => Type switch {
+      TransportOrderOriginType.CriticalNeed => TransportOrderDomain.CriticalNeed,
+      TransportOrderOriginType.SmartCriticalNeed => TransportOrderDomain.CriticalNeed,
       TransportOrderOriginType.ConstructionJob => TransportOrderDomain.Construction,
       TransportOrderOriginType.HaulBehavior when BehaviorName == "BringNutrient" =>
           TransportOrderDomain.CommunityService,
@@ -34,6 +36,16 @@ readonly struct TransportOrderOrigin {
   public static TransportOrderOrigin ActiveReservation() {
     return new TransportOrderOrigin(
         TransportOrderOriginType.ActiveReservation, Guid.Empty, null, null, float.NaN);
+  }
+
+  public static TransportOrderOrigin CriticalNeed() {
+    return new TransportOrderOrigin(
+        TransportOrderOriginType.CriticalNeed, Guid.Empty, null, "InventoryNeed", float.NaN);
+  }
+
+  public static TransportOrderOrigin SmartCriticalNeed() {
+    return new TransportOrderOrigin(
+        TransportOrderOriginType.SmartCriticalNeed, Guid.Empty, null, "InventoryNeed", float.NaN);
   }
 
   public static TransportOrderOrigin HaulBehavior(
