@@ -10,22 +10,20 @@ namespace IgorZ.SmartHaulers.Dispatching;
 
 sealed class TransportDistanceEstimator(DispatchPerformanceStats performanceStats) {
   public bool TryGetRouteDistance(Inventory source, Inventory target, out float distance) {
-    performanceStats.BeginDeliveryPath();
     var start = DispatchPerformanceStats.Timestamp();
     try {
       return TryGetRouteDistanceInternal(source, target, out distance);
     } finally {
-      performanceStats.EndDeliveryPath(start);
+      performanceStats.EndDecisionRoutePath(start);
     }
   }
 
   public bool TryGetDistanceToInventory(Inventory inventory, Vector3 position, out float distance) {
-    performanceStats.BeginPickupPath();
     var start = DispatchPerformanceStats.Timestamp();
     try {
       return TryGetDistanceToInventoryInternal(inventory, position, out distance);
     } finally {
-      performanceStats.EndPickupPath(start);
+      performanceStats.EndDecisionPickupPath(start);
     }
   }
 

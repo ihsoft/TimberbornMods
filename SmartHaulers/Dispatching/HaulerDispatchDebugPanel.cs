@@ -210,13 +210,23 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
       return;
     }
     lines.Add($"window={sampleCount}");
-    lines.Add($"last, {FormatSample(last)}");
-    lines.Add($"avg,  {FormatAverage(total, sampleCount)}");
-    lines.Add($"last phases, {FormatBreakdown(last)}");
-    lines.Add($"avg phases,  {FormatAverageBreakdown(total, sampleCount)}");
-    lines.Add("T total, PU pickup path, DL delivery path");
-    lines.Add("A agents, O active orders, Q queued orders, B construction, R readiness, D decisions, S sort, X other");
-    lines.Add("PU/DL are included in phase times.");
+    lines.Add($"last total, {FormatTotal(last)}");
+    lines.Add($"last top,   {FormatBreakdown(last)}");
+    lines.Add($"avg total,  {FormatAverageTotal(total, sampleCount)}");
+    lines.Add($"avg top,    {FormatAverageBreakdown(total, sampleCount)}");
+    lines.Add($"last O, {FormatActiveOrderBreakdown(last)}");
+    lines.Add($"last Q, {FormatQueuedOrderBreakdown(last)}");
+    lines.Add($"last D, {FormatDecisionBreakdown(last)}");
+    lines.Add($"avg O,  {FormatAverageActiveOrderBreakdown(total, sampleCount)}");
+    lines.Add($"avg Q,  {FormatAverageQueuedOrderBreakdown(total, sampleCount)}");
+    lines.Add($"avg D,  {FormatAverageDecisionBreakdown(total, sampleCount)}");
+    lines.Add($"last counts, {FormatCounts(last)}");
+    lines.Add($"avg counts,  {FormatAverageCounts(total, sampleCount)}");
+    lines.Add("T=A+O+Q+B+R+D+S+X. X is measured total minus named top-level phases.");
+    lines.Add("A agents, O active orders, Q queued orders, B construction, R readiness, D decisions, S sort.");
+    lines.Add("O=AR+RP+RD+OX, Q=PR+QX, D=DR+DP+DX.");
+    lines.Add("AR active route, RP/RD remaining pickup/delivery, PR planner route, DR decision route, DP decision pickup.");
+    lines.Add("AG agents, AO active orders, QO queued orders, BO construction, DO decision orders, DC candidates");
   }
 
   void UpdateContent() {
@@ -260,10 +270,8 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
     }
   }
 
-  static string FormatSample(DispatchPerformanceSample sample) {
-    return $"T={Milliseconds(sample.TotalTicks):0.###}ms, "
-        + $"PU={Milliseconds(sample.PickupPathTicks):0.###}ms/{sample.PickupPathCalls}, "
-        + $"DL={Milliseconds(sample.DeliveryPathTicks):0.###}ms/{sample.DeliveryPathCalls}";
+  static string FormatTotal(DispatchPerformanceSample sample) {
+    return $"T={Milliseconds(sample.TotalTicks):0.###}ms, check={Milliseconds(TopDownDeltaTicks(sample)):0.###}ms";
   }
 
   static string FormatBreakdown(DispatchPerformanceSample sample) {
@@ -277,12 +285,32 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
         + $"X={Milliseconds(OtherTicks(sample)):0.###}ms";
   }
 
-  static string FormatAverage(DispatchPerformanceSample total, int sampleCount) {
+  static string FormatActiveOrderBreakdown(DispatchPerformanceSample sample) {
+    return $"AR={Milliseconds(sample.ActiveRoutePathTicks):0.###}/{sample.ActiveRoutePathCalls}, "
+        + $"RP={Milliseconds(sample.RemainingPickupPathTicks):0.###}/{sample.RemainingPickupPathCalls}, "
+        + $"RD={Milliseconds(sample.RemainingDeliveryPathTicks):0.###}/{sample.RemainingDeliveryPathCalls}, "
+        + $"OX={Milliseconds(ActiveOrderOtherTicks(sample)):0.###}ms";
+  }
+
+  static string FormatQueuedOrderBreakdown(DispatchPerformanceSample sample) {
+    return $"PR={Milliseconds(sample.PlannerRoutePathTicks):0.###}/{sample.PlannerRoutePathCalls}, "
+        + $"QX={Milliseconds(QueuedOrderOtherTicks(sample)):0.###}ms";
+  }
+
+  static string FormatDecisionBreakdown(DispatchPerformanceSample sample) {
+    return $"DR={Milliseconds(sample.DecisionRoutePathTicks):0.###}/{sample.DecisionRoutePathCalls}, "
+        + $"DP={Milliseconds(sample.DecisionPickupPathTicks):0.###}/{sample.DecisionPickupPathCalls}, "
+        + $"DX={Milliseconds(DecisionOtherTicks(sample)):0.###}ms";
+  }
+
+  static string FormatCounts(DispatchPerformanceSample sample) {
+    return $"AG={sample.AgentCount}, AO={sample.ActiveOrderCount}, QO={sample.QueuedOrderCount}, "
+        + $"BO={sample.ConstructionOrderCount}, DO={sample.DecisionOrderCount}, DC={sample.DecisionCandidateCount}";
+  }
+
+  static string FormatAverageTotal(DispatchPerformanceSample total, int sampleCount) {
     return $"T={Milliseconds(total.TotalTicks) / sampleCount:0.###}ms, "
-        + $"PU={Milliseconds(total.PickupPathTicks) / sampleCount:0.###}ms/"
-        + $"{(float)total.PickupPathCalls / sampleCount:0.#}, "
-        + $"DL={Milliseconds(total.DeliveryPathTicks) / sampleCount:0.###}ms/"
-        + $"{(float)total.DeliveryPathCalls / sampleCount:0.#}";
+        + $"check={Milliseconds(TopDownDeltaTicks(total)) / sampleCount:0.###}ms";
   }
 
   static string FormatAverageBreakdown(DispatchPerformanceSample total, int sampleCount) {
@@ -296,6 +324,55 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
         + $"X={Milliseconds(OtherTicks(total)) / sampleCount:0.###}ms";
   }
 
+  static string FormatAverageActiveOrderBreakdown(DispatchPerformanceSample total, int sampleCount) {
+    return $"AR={Milliseconds(total.ActiveRoutePathTicks) / sampleCount:0.###}/"
+        + $"{(float)total.ActiveRoutePathCalls / sampleCount:0.#}, "
+        + $"RP={Milliseconds(total.RemainingPickupPathTicks) / sampleCount:0.###}/"
+        + $"{(float)total.RemainingPickupPathCalls / sampleCount:0.#}, "
+        + $"RD={Milliseconds(total.RemainingDeliveryPathTicks) / sampleCount:0.###}/"
+        + $"{(float)total.RemainingDeliveryPathCalls / sampleCount:0.#}, "
+        + $"OX={Milliseconds(ActiveOrderOtherTicks(total)) / sampleCount:0.###}ms";
+  }
+
+  static string FormatAverageQueuedOrderBreakdown(DispatchPerformanceSample total, int sampleCount) {
+    return $"PR={Milliseconds(total.PlannerRoutePathTicks) / sampleCount:0.###}/"
+        + $"{(float)total.PlannerRoutePathCalls / sampleCount:0.#}, "
+        + $"QX={Milliseconds(QueuedOrderOtherTicks(total)) / sampleCount:0.###}ms";
+  }
+
+  static string FormatAverageDecisionBreakdown(DispatchPerformanceSample total, int sampleCount) {
+    return $"DR={Milliseconds(total.DecisionRoutePathTicks) / sampleCount:0.###}/"
+        + $"{(float)total.DecisionRoutePathCalls / sampleCount:0.#}, "
+        + $"DP={Milliseconds(total.DecisionPickupPathTicks) / sampleCount:0.###}/"
+        + $"{(float)total.DecisionPickupPathCalls / sampleCount:0.#}, "
+        + $"DX={Milliseconds(DecisionOtherTicks(total)) / sampleCount:0.###}ms";
+  }
+
+  static string FormatAverageCounts(DispatchPerformanceSample total, int sampleCount) {
+    return $"AG={(float)total.AgentCount / sampleCount:0.#}, "
+        + $"AO={(float)total.ActiveOrderCount / sampleCount:0.#}, "
+        + $"QO={(float)total.QueuedOrderCount / sampleCount:0.#}, "
+        + $"BO={(float)total.ConstructionOrderCount / sampleCount:0.#}, "
+        + $"DO={(float)total.DecisionOrderCount / sampleCount:0.#}, "
+        + $"DC={(float)total.DecisionCandidateCount / sampleCount:0.#}";
+  }
+
+  static long ActiveOrderOtherTicks(DispatchPerformanceSample sample) {
+    return NonNegative(
+        sample.ActiveOrderTicks
+        - sample.ActiveRoutePathTicks
+        - sample.RemainingPickupPathTicks
+        - sample.RemainingDeliveryPathTicks);
+  }
+
+  static long QueuedOrderOtherTicks(DispatchPerformanceSample sample) {
+    return NonNegative(sample.QueuedOrderTicks - sample.PlannerRoutePathTicks);
+  }
+
+  static long DecisionOtherTicks(DispatchPerformanceSample sample) {
+    return NonNegative(sample.DecisionTicks - sample.DecisionRoutePathTicks - sample.DecisionPickupPathTicks);
+  }
+
   static long OtherTicks(DispatchPerformanceSample sample) {
     var knownTicks = sample.AgentTicks
         + sample.ActiveOrderTicks
@@ -305,6 +382,22 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
         + sample.DecisionTicks
         + sample.SortTicks;
     return sample.TotalTicks > knownTicks ? sample.TotalTicks - knownTicks : 0;
+  }
+
+  static long TopDownDeltaTicks(DispatchPerformanceSample sample) {
+    var topDownTicks = sample.AgentTicks
+        + sample.ActiveOrderTicks
+        + sample.QueuedOrderTicks
+        + sample.ConstructionOrderTicks
+        + sample.ReadinessTicks
+        + sample.DecisionTicks
+        + sample.SortTicks
+        + OtherTicks(sample);
+    return sample.TotalTicks - topDownTicks;
+  }
+
+  static long NonNegative(long ticks) {
+    return ticks > 0 ? ticks : 0;
   }
 
   static double Milliseconds(long ticks) {
@@ -450,7 +543,8 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
 
   static void LogSnapshot(string text) {
     DebugEx.Info(
-        "SmartHaulers snapshot columns: perf mode: T/PU/DL and phase timings | agents/orders modes: view, district, "
+        "SmartHaulers snapshot columns: perf mode: T/PU/DL, counts, phase timings, inner path timings | "
+        + "agents/orders modes: view, district, "
         + "agents, available, wandering, workplaceIdle, transporting, satisfyingNeed, working, orders | agent, "
         + "state/role, activity, position, speed, capacity | source, agent, phase, good, path, route, left | "
         + "source, phase(weight), behavior, optional good, optional path, decision, requester");

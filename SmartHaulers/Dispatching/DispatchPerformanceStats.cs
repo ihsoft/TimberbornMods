@@ -22,8 +22,28 @@ sealed class DispatchPerformanceStats {
   long _sortTicks;
   long _pickupPathTicks;
   long _deliveryPathTicks;
+  long _activeRoutePathTicks;
+  long _plannerRoutePathTicks;
+  long _decisionRoutePathTicks;
+  long _decisionPickupPathTicks;
+  long _remainingPathTicks;
+  long _remainingPickupPathTicks;
+  long _remainingDeliveryPathTicks;
+  int _agentCount;
+  int _activeOrderCount;
+  int _queuedOrderCount;
+  int _constructionOrderCount;
+  int _decisionOrderCount;
+  int _decisionCandidateCount;
   int _pickupPathCalls;
   int _deliveryPathCalls;
+  int _activeRoutePathCalls;
+  int _plannerRoutePathCalls;
+  int _decisionRoutePathCalls;
+  int _decisionPickupPathCalls;
+  int _remainingPathCalls;
+  int _remainingPickupPathCalls;
+  int _remainingDeliveryPathCalls;
   int _nextSampleIndex;
   int _sampleCount;
   DispatchPerformanceSample _lastSample;
@@ -56,8 +76,28 @@ sealed class DispatchPerformanceStats {
           sum.SortTicks / _sampleCount,
           sum.PickupPathTicks / _sampleCount,
           sum.DeliveryPathTicks / _sampleCount,
+          sum.ActiveRoutePathTicks / _sampleCount,
+          sum.PlannerRoutePathTicks / _sampleCount,
+          sum.DecisionRoutePathTicks / _sampleCount,
+          sum.DecisionPickupPathTicks / _sampleCount,
+          sum.RemainingPathTicks / _sampleCount,
+          sum.RemainingPickupPathTicks / _sampleCount,
+          sum.RemainingDeliveryPathTicks / _sampleCount,
+          sum.AgentCount / _sampleCount,
+          sum.ActiveOrderCount / _sampleCount,
+          sum.QueuedOrderCount / _sampleCount,
+          sum.ConstructionOrderCount / _sampleCount,
+          sum.DecisionOrderCount / _sampleCount,
+          sum.DecisionCandidateCount / _sampleCount,
           sum.PickupPathCalls / _sampleCount,
-          sum.DeliveryPathCalls / _sampleCount);
+          sum.DeliveryPathCalls / _sampleCount,
+          sum.ActiveRoutePathCalls / _sampleCount,
+          sum.PlannerRoutePathCalls / _sampleCount,
+          sum.DecisionRoutePathCalls / _sampleCount,
+          sum.DecisionPickupPathCalls / _sampleCount,
+          sum.RemainingPathCalls / _sampleCount,
+          sum.RemainingPickupPathCalls / _sampleCount,
+          sum.RemainingDeliveryPathCalls / _sampleCount);
     }
   }
 
@@ -73,8 +113,28 @@ sealed class DispatchPerformanceStats {
     _sortTicks = 0;
     _pickupPathTicks = 0;
     _deliveryPathTicks = 0;
+    _activeRoutePathTicks = 0;
+    _plannerRoutePathTicks = 0;
+    _decisionRoutePathTicks = 0;
+    _decisionPickupPathTicks = 0;
+    _remainingPathTicks = 0;
+    _remainingPickupPathTicks = 0;
+    _remainingDeliveryPathTicks = 0;
+    _agentCount = 0;
+    _activeOrderCount = 0;
+    _queuedOrderCount = 0;
+    _constructionOrderCount = 0;
+    _decisionOrderCount = 0;
+    _decisionCandidateCount = 0;
     _pickupPathCalls = 0;
     _deliveryPathCalls = 0;
+    _activeRoutePathCalls = 0;
+    _plannerRoutePathCalls = 0;
+    _decisionRoutePathCalls = 0;
+    _decisionPickupPathCalls = 0;
+    _remainingPathCalls = 0;
+    _remainingPickupPathCalls = 0;
+    _remainingDeliveryPathCalls = 0;
     _refreshStopwatch = Stopwatch.StartNew();
   }
 
@@ -94,8 +154,28 @@ sealed class DispatchPerformanceStats {
         _sortTicks,
         _pickupPathTicks,
         _deliveryPathTicks,
+        _activeRoutePathTicks,
+        _plannerRoutePathTicks,
+        _decisionRoutePathTicks,
+        _decisionPickupPathTicks,
+        _remainingPathTicks,
+        _remainingPickupPathTicks,
+        _remainingDeliveryPathTicks,
+        _agentCount,
+        _activeOrderCount,
+        _queuedOrderCount,
+        _constructionOrderCount,
+        _decisionOrderCount,
+        _decisionCandidateCount,
         _pickupPathCalls,
-        _deliveryPathCalls);
+        _deliveryPathCalls,
+        _activeRoutePathCalls,
+        _plannerRoutePathCalls,
+        _decisionRoutePathCalls,
+        _decisionPickupPathCalls,
+        _remainingPathCalls,
+        _remainingPickupPathCalls,
+        _remainingDeliveryPathCalls);
     AddSample(_lastSample);
     _refreshStopwatch = null;
   }
@@ -121,6 +201,30 @@ sealed class DispatchPerformanceStats {
 
   public void EndDeliveryPath(long startTimestamp) {
     _deliveryPathTicks += Stopwatch.GetTimestamp() - startTimestamp;
+  }
+
+  public void CountAgent() {
+    _agentCount++;
+  }
+
+  public void CountActiveOrder() {
+    _activeOrderCount++;
+  }
+
+  public void CountQueuedOrder() {
+    _queuedOrderCount++;
+  }
+
+  public void CountConstructionOrder() {
+    _constructionOrderCount++;
+  }
+
+  public void CountDecisionOrder() {
+    _decisionOrderCount++;
+  }
+
+  public void CountDecisionCandidate() {
+    _decisionCandidateCount++;
   }
 
   public long BeginSection() {
@@ -157,6 +261,58 @@ sealed class DispatchPerformanceStats {
 
   public static long Timestamp() {
     return Stopwatch.GetTimestamp();
+  }
+
+  public void EndActiveRoutePath(long startTimestamp) {
+    var ticks = Stopwatch.GetTimestamp() - startTimestamp;
+    _deliveryPathTicks += ticks;
+    _activeRoutePathTicks += ticks;
+    _deliveryPathCalls++;
+    _activeRoutePathCalls++;
+  }
+
+  public void EndPlannerRoutePath(long startTimestamp) {
+    var ticks = Stopwatch.GetTimestamp() - startTimestamp;
+    _deliveryPathTicks += ticks;
+    _plannerRoutePathTicks += ticks;
+    _deliveryPathCalls++;
+    _plannerRoutePathCalls++;
+  }
+
+  public void EndDecisionRoutePath(long startTimestamp) {
+    var ticks = Stopwatch.GetTimestamp() - startTimestamp;
+    _deliveryPathTicks += ticks;
+    _decisionRoutePathTicks += ticks;
+    _deliveryPathCalls++;
+    _decisionRoutePathCalls++;
+  }
+
+  public void EndDecisionPickupPath(long startTimestamp) {
+    var ticks = Stopwatch.GetTimestamp() - startTimestamp;
+    _pickupPathTicks += ticks;
+    _decisionPickupPathTicks += ticks;
+    _pickupPathCalls++;
+    _decisionPickupPathCalls++;
+  }
+
+  public void EndRemainingPath(long startTimestamp, bool isPickup) {
+    var ticks = Stopwatch.GetTimestamp() - startTimestamp;
+    if (isPickup) {
+      _pickupPathTicks += ticks;
+      _remainingPickupPathTicks += ticks;
+      _remainingPickupPathCalls++;
+    } else {
+      _deliveryPathTicks += ticks;
+      _remainingDeliveryPathTicks += ticks;
+      _remainingDeliveryPathCalls++;
+    }
+    _remainingPathTicks += ticks;
+    if (isPickup) {
+      _pickupPathCalls++;
+    } else {
+      _deliveryPathCalls++;
+    }
+    _remainingPathCalls++;
   }
 
   public T MeasurePickupPath<T>(Func<T> action) {

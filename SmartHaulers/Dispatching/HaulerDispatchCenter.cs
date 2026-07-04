@@ -90,9 +90,11 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
         continue;
       }
       _agents.Add(agentSnapshot);
+      _performanceStats.CountAgent();
       section = _performanceStats.BeginSection();
       if (TryCreateOrderSnapshot(worker, agentSnapshot, out var orderSnapshot)) {
         _orders.Add(orderSnapshot);
+        _performanceStats.CountActiveOrder();
       } else {
         _progressByAgent.Remove(worker);
         _orderMemoryByAgent.Remove(worker);
@@ -125,6 +127,7 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
 
   void AddDecisions() {
     for (var i = 0; i < _orders.Count; i++) {
+      _performanceStats.CountDecisionOrder();
       var decision = _decisionEvaluator.Evaluate(_orders[i], _agents);
       if (decision.HasWinner) {
         _orders[i] = _orders[i].WithDecision(decision);
@@ -438,7 +441,11 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
         if (weightedBehavior.Weight <= 0f) {
           continue;
         }
-        PossibleTransportOrderPlanner.AddPlans(_districtCenter, haulCandidate, weightedBehavior, _orders);
+        var orderCount = _orders.Count;
+        PossibleTransportOrderPlanner.AddPlans(_districtCenter, haulCandidate, weightedBehavior, _orders, _performanceStats);
+        for (var i = orderCount; i < _orders.Count; i++) {
+          _performanceStats.CountQueuedOrder();
+        }
       }
       _weightedBehaviors.Clear();
     }
@@ -458,6 +465,7 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
         if (ConstructionTransportOrderPlanner.TryPlan(
             _districtCenter, constructionJob, _builderHubAccessibles, priority, out var order)) {
           _orders.Add(order);
+          _performanceStats.CountConstructionOrder();
         }
       }
     }
@@ -601,7 +609,6 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
   }
 
   bool TryGetRouteDistance(Inventory source, Inventory target, out float distance) {
-    _performanceStats.BeginDeliveryPath();
     var start = DispatchPerformanceStats.Timestamp();
     try {
       var sourceAccessible = source ? source.GetEnabledComponent<Accessible>() : null;
@@ -614,17 +621,11 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
       distance = 0f;
       return false;
     } finally {
-      _performanceStats.EndDeliveryPath(start);
+      _performanceStats.EndActiveRoutePath(start);
     }
   }
 
   bool TryGetRemainingDistance(OrderPhase phase, Inventory target, Vector3 position, out float distance) {
-    var isPickup = phase == OrderPhase.PickingUp;
-    if (isPickup) {
-      _performanceStats.BeginPickupPath();
-    } else {
-      _performanceStats.BeginDeliveryPath();
-    }
     var start = DispatchPerformanceStats.Timestamp();
     try {
       var accessible = target ? target.GetEnabledComponent<Accessible>() : null;
@@ -634,11 +635,7 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
       distance = 0f;
       return false;
     } finally {
-      if (isPickup) {
-        _performanceStats.EndPickupPath(start);
-      } else {
-        _performanceStats.EndDeliveryPath(start);
-      }
+      _performanceStats.EndRemainingPath(start, phase == OrderPhase.PickingUp);
     }
   }
 

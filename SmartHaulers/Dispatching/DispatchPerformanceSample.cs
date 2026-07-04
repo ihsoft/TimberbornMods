@@ -15,8 +15,28 @@ readonly struct DispatchPerformanceSample {
   public long SortTicks { get; }
   public long PickupPathTicks { get; }
   public long DeliveryPathTicks { get; }
+  public long ActiveRoutePathTicks { get; }
+  public long PlannerRoutePathTicks { get; }
+  public long DecisionRoutePathTicks { get; }
+  public long DecisionPickupPathTicks { get; }
+  public long RemainingPathTicks { get; }
+  public long RemainingPickupPathTicks { get; }
+  public long RemainingDeliveryPathTicks { get; }
+  public int AgentCount { get; }
+  public int ActiveOrderCount { get; }
+  public int QueuedOrderCount { get; }
+  public int ConstructionOrderCount { get; }
+  public int DecisionOrderCount { get; }
+  public int DecisionCandidateCount { get; }
   public int PickupPathCalls { get; }
   public int DeliveryPathCalls { get; }
+  public int ActiveRoutePathCalls { get; }
+  public int PlannerRoutePathCalls { get; }
+  public int DecisionRoutePathCalls { get; }
+  public int DecisionPickupPathCalls { get; }
+  public int RemainingPathCalls { get; }
+  public int RemainingPickupPathCalls { get; }
+  public int RemainingDeliveryPathCalls { get; }
 
   public DispatchPerformanceSample(
       long totalTicks,
@@ -29,8 +49,28 @@ readonly struct DispatchPerformanceSample {
       long sortTicks,
       long pickupPathTicks,
       long deliveryPathTicks,
+      long activeRoutePathTicks,
+      long plannerRoutePathTicks,
+      long decisionRoutePathTicks,
+      long decisionPickupPathTicks,
+      long remainingPathTicks,
+      long remainingPickupPathTicks,
+      long remainingDeliveryPathTicks,
+      int agentCount,
+      int activeOrderCount,
+      int queuedOrderCount,
+      int constructionOrderCount,
+      int decisionOrderCount,
+      int decisionCandidateCount,
       int pickupPathCalls,
-      int deliveryPathCalls) {
+      int deliveryPathCalls,
+      int activeRoutePathCalls,
+      int plannerRoutePathCalls,
+      int decisionRoutePathCalls,
+      int decisionPickupPathCalls,
+      int remainingPathCalls,
+      int remainingPickupPathCalls,
+      int remainingDeliveryPathCalls) {
     TotalTicks = totalTicks;
     AgentTicks = agentTicks;
     ActiveOrderTicks = activeOrderTicks;
@@ -41,8 +81,28 @@ readonly struct DispatchPerformanceSample {
     SortTicks = sortTicks;
     PickupPathTicks = pickupPathTicks;
     DeliveryPathTicks = deliveryPathTicks;
+    ActiveRoutePathTicks = activeRoutePathTicks;
+    PlannerRoutePathTicks = plannerRoutePathTicks;
+    DecisionRoutePathTicks = decisionRoutePathTicks;
+    DecisionPickupPathTicks = decisionPickupPathTicks;
+    RemainingPathTicks = remainingPathTicks;
+    RemainingPickupPathTicks = remainingPickupPathTicks;
+    RemainingDeliveryPathTicks = remainingDeliveryPathTicks;
+    AgentCount = agentCount;
+    ActiveOrderCount = activeOrderCount;
+    QueuedOrderCount = queuedOrderCount;
+    ConstructionOrderCount = constructionOrderCount;
+    DecisionOrderCount = decisionOrderCount;
+    DecisionCandidateCount = decisionCandidateCount;
     PickupPathCalls = pickupPathCalls;
     DeliveryPathCalls = deliveryPathCalls;
+    ActiveRoutePathCalls = activeRoutePathCalls;
+    PlannerRoutePathCalls = plannerRoutePathCalls;
+    DecisionRoutePathCalls = decisionRoutePathCalls;
+    DecisionPickupPathCalls = decisionPickupPathCalls;
+    RemainingPathCalls = remainingPathCalls;
+    RemainingPickupPathCalls = remainingPickupPathCalls;
+    RemainingDeliveryPathCalls = remainingDeliveryPathCalls;
   }
 
   public DispatchPerformanceSample Add(DispatchPerformanceSample other) {
@@ -57,7 +117,27 @@ readonly struct DispatchPerformanceSample {
         SortTicks + other.SortTicks,
         PickupPathTicks + other.PickupPathTicks,
         DeliveryPathTicks + other.DeliveryPathTicks,
+        ActiveRoutePathTicks + other.ActiveRoutePathTicks,
+        PlannerRoutePathTicks + other.PlannerRoutePathTicks,
+        DecisionRoutePathTicks + other.DecisionRoutePathTicks,
+        DecisionPickupPathTicks + other.DecisionPickupPathTicks,
+        RemainingPathTicks + other.RemainingPathTicks,
+        RemainingPickupPathTicks + other.RemainingPickupPathTicks,
+        RemainingDeliveryPathTicks + other.RemainingDeliveryPathTicks,
+        AgentCount + other.AgentCount,
+        ActiveOrderCount + other.ActiveOrderCount,
+        QueuedOrderCount + other.QueuedOrderCount,
+        ConstructionOrderCount + other.ConstructionOrderCount,
+        DecisionOrderCount + other.DecisionOrderCount,
+        DecisionCandidateCount + other.DecisionCandidateCount,
         PickupPathCalls + other.PickupPathCalls,
-        DeliveryPathCalls + other.DeliveryPathCalls);
+        DeliveryPathCalls + other.DeliveryPathCalls,
+        ActiveRoutePathCalls + other.ActiveRoutePathCalls,
+        PlannerRoutePathCalls + other.PlannerRoutePathCalls,
+        DecisionRoutePathCalls + other.DecisionRoutePathCalls,
+        DecisionPickupPathCalls + other.DecisionPickupPathCalls,
+        RemainingPathCalls + other.RemainingPathCalls,
+        RemainingPickupPathCalls + other.RemainingPickupPathCalls,
+        RemainingDeliveryPathCalls + other.RemainingDeliveryPathCalls);
   }
 }

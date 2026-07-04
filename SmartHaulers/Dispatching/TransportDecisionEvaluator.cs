@@ -8,7 +8,10 @@ using Timberborn.Goods;
 
 namespace IgorZ.SmartHaulers.Dispatching;
 
-sealed class TransportDecisionEvaluator(TransportDistanceEstimator distanceEstimator, IGoodService goodService) {
+sealed class TransportDecisionEvaluator(
+    TransportDistanceEstimator distanceEstimator,
+    DispatchPerformanceStats performanceStats,
+    IGoodService goodService) {
   public TransportDecision Evaluate(
       TransportOrderSnapshot order, IReadOnlyList<TransportAgentSnapshot> agents) {
     if (order.Phase != OrderPhase.Dispatchable || !order.Route.HasKnownEndpoints || !order.Cargo.HasGoods) {
@@ -20,6 +23,7 @@ sealed class TransportDecisionEvaluator(TransportDistanceEstimator distanceEstim
     TransportCandidateScore winner = default;
     TransportCandidateScore runnerUp = default;
     foreach (var agent in agents) {
+      performanceStats.CountDecisionCandidate();
       if (!TryScore(order, agent, routeDistance, out var score)) {
         continue;
       }
