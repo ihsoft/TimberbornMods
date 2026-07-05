@@ -14,6 +14,7 @@ sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).AssemblyQualifiedName;
   static readonly Type[] Patches = [
       typeof(TileComponentsPatch),
+      typeof(TerrainMeshManagerPatch),
       typeof(SelectableObjectRaycasterPatch),
       typeof(BlockObjectPreviewPickerPatch),
   ];

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using IgorZ.XRay.Settings;
+using Timberborn.LevelVisibilitySystem;
 using Timberborn.MapStateSystem;
 using Timberborn.RootProviders;
 using Timberborn.SingletonSystem;
@@ -19,7 +20,7 @@ namespace IgorZ.XRay.Core;
 
 class WireframeTerrainMeshService(
     TerrainMap terrainMap, MapSize mapSize, RootObjectProvider rootObjectProvider, RendererFactory rendererFactory,
-    MeshSettings meshSettings)
+    MeshSettings meshSettings, ILevelVisibilityService levelVisibilityService)
     : IPostLoadableSingleton, ILateUpdatableSingleton {
 
   // This is how much time is allowed for building the chunk meshes before it is considered too slow. If there are more 
@@ -56,11 +57,15 @@ class WireframeTerrainMeshService(
     _root = rootObjectProvider.CreateRootObject("XRayWireframeTerrainMesh");
     terrainMap.TerrainAdded += OnTerrainAdded;
     terrainMap.TerrainRemoved += OnTerrainRemoved;
+    levelVisibilityService.MaxVisibleLevelChanged += OnMaxVisibleLevelChanged;
     meshSettings.WireframeModeInternal.ValueChanged += (_, _) => {
       SetMode(Enum.Parse<Mode>(meshSettings.WireframeModeInternal.Value));
     };
     meshSettings.WireframeEdgeColor.ValueChanged += (_, _) => {
       SetEdgesColor(meshSettings.WireframeEdgeColor.Color);
+    };
+    meshSettings.IgnoreVisibleLevel.ValueChanged += (_, _) => {
+      MarkAllChunksDirty();
     };
     _currentMode = Enum.Parse<Mode>(meshSettings.WireframeModeInternal.Value);
     BuildMeshEdgeCache();
@@ -284,7 +289,8 @@ class WireframeTerrainMeshService(
     var vertices = new List<Vector3>();
     var indices = new List<int>();
     foreach (var (edge, info) in _edgeCache) {
-      if (!ShouldRenderEdge(info) || !BelongsToChunk(edge, startX, endX, startY, endY)) {
+      if (!ShouldRenderEdge(info) || !IsEdgeBelowVisibleLevel(edge)
+          || !BelongsToChunk(edge, startX, endX, startY, endY)) {
         continue;
       }
       var i = vertices.Count;
@@ -460,6 +466,13 @@ class WireframeTerrainMeshService(
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  bool IsEdgeBelowVisibleLevel(EdgeKey edge) {
+    return meshSettings.IgnoreVisibleLevel.Value
+        || levelVisibilityService.TerrainLevelIsAtMax
+        || Mathf.Max(edge.A.y, edge.B.y) <= levelVisibilityService.MaxVisibleLevel + 1;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   static bool IsContourEdge(EdgeInfo info) {
     if (info.Total == 1) {
       return true;
@@ -518,6 +531,20 @@ class WireframeTerrainMeshService(
 
   void OnTerrainRemoved(object sender, Vector3Int coordinates) {
     ApplyVoxelChange(coordinates, isSolid: false);
+  }
+
+  void OnMaxVisibleLevelChanged(object sender, int maxVisibleLevel) {
+    MarkAllChunksDirty();
+  }
+
+  void MarkAllChunksDirty() {
+    if (_chunkMeshFilters.Count == 0) {
+      return;
+    }
+    foreach (var chunk in _chunkMeshFilters.Keys) {
+      _dirtyChunks.Add(chunk);
+    }
+    _needUpdate = true;
   }
 
   #endregion

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using IgorZ.XRay.Patches;
 using IgorZ.XRay.Settings;
+using Timberborn.LevelVisibilitySystem;
 using Timberborn.SingletonSystem;
 using Timberborn.TerrainSystemRendering;
 using UnityEngine;
@@ -25,6 +26,12 @@ class TransparentTerrainMeshService : IPostLoadableSingleton {
     _meshSettings.CliffEdgeColor.ValueChanged += (_, _) => MakeMaterials(forceRefresh: true);
     _meshSettings.GhostModeIntensity.ValueChanged += (_, _) => MakeMaterials(forceRefresh: true);
     _meshSettings.GlowingEdges.ValueChanged += (_, _) => MakeMaterials(forceRefresh: true);
+    _meshSettings.IgnoreVisibleLevel.ValueChanged += (_, _) => {
+      if (IsActive) {
+        InvalidateTerrainMeshes();
+      }
+    };
+    _levelVisibilityService.MaxVisibleLevelChanged += OnMaxVisibleLevelChanged;
   }
 
   #endregion
@@ -48,6 +55,7 @@ class TransparentTerrainMeshService : IPostLoadableSingleton {
     }
     MakeMaterials();
     IsActive = true;
+    InvalidateTerrainMeshes();
     var renderers = GetTerrainRenderers();
     foreach (var renderer in renderers) {
       SetXRayRenderer(renderer);
@@ -61,10 +69,20 @@ class TransparentTerrainMeshService : IPostLoadableSingleton {
       return;
     }
     IsActive = false;
-    var renderers = GetTerrainRenderers();
+    var renderers = GetTerrainRenderers(includeInactive: true);
     foreach (var renderer in renderers) {
       SetOriginalRenderer(renderer);
     }
+    InvalidateTerrainMeshes();
+  }
+
+  /// <summary>Checks if the terrain voxel should be included in the current X-Ray terrain mesh.</summary>
+  /// <remarks>Called from a Harmony patch while the game rebuilds terrain meshes.</remarks>
+  internal bool ShouldRenderTerrainCoordinate(Vector3Int coordinates) {
+    return !IsActive
+        || _meshSettings.IgnoreVisibleLevel.Value
+        || _levelVisibilityService.TerrainLevelIsAtMax
+        || coordinates.z <= _levelVisibilityService.MaxVisibleLevel;
   }
 
   #endregion
@@ -93,16 +111,19 @@ class TransparentTerrainMeshService : IPostLoadableSingleton {
 
   readonly RendererFactory _rendererFactory;
   readonly TerrainMeshManager _terrainMeshManager;
+  readonly ILevelVisibilityService _levelVisibilityService;
   readonly MeshSettings _meshSettings;
 
   // Primarily made for the efficient patches handling.
   internal static TransparentTerrainMeshService Instance { get; private set; }
 
   TransparentTerrainMeshService(
-      RendererFactory rendererFactory, TerrainMeshManager terrainMeshManager, MeshSettings meshSettings) {
+      RendererFactory rendererFactory, TerrainMeshManager terrainMeshManager,
+      ILevelVisibilityService levelVisibilityService, MeshSettings meshSettings) {
     Instance = this;
     _rendererFactory = rendererFactory;
     _terrainMeshManager = terrainMeshManager;
+    _levelVisibilityService = levelVisibilityService;
     _meshSettings = meshSettings;
   }
 
@@ -163,12 +184,27 @@ class TransparentTerrainMeshService : IPostLoadableSingleton {
   }
 
   /// <summary>Returns all the active renderers for the terrain meshes.</summary>
-  List<Renderer> GetTerrainRenderers() {
+  List<Renderer> GetTerrainRenderers(bool includeInactive = false) {
     return _terrainMeshManager._tiles.Values
         .Select(tileComponents => tileComponents._meshRenderer)
-        .Where(renderer => renderer && renderer.sharedMaterials != null && renderer.gameObject.activeSelf)
+        .Where(renderer => renderer && renderer.sharedMaterials != null
+            && (includeInactive || renderer.gameObject.activeSelf))
         .Cast<Renderer>()
         .ToList();
+  }
+
+  void OnMaxVisibleLevelChanged(object sender, int maxVisibleLevel) {
+    if (IsActive) {
+      InvalidateTerrainMeshes();
+    }
+  }
+
+  void InvalidateTerrainMeshes() {
+    foreach (var tileIndex in _terrainMeshManager._tiles.Keys) {
+      _terrainMeshManager._invalidTiles.Add(tileIndex);
+    }
+    // TerrainMeshManager processes invalid tiles only after at least one dirty surface-shape code is present.
+    _terrainMeshManager._dirtyCodes.Add(Vector3Int.zero);
   }
 
   /// <summary>Makes or refreshes the materials for the "ghost" meshes.</summary>

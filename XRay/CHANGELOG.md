@@ -1,3 +1,6 @@
+# v1.1.1 (TBD):
+* [Fix] X-Ray terrain and wireframe now respect the game's visible terrain level when the layer visibility tool is used.
+
 # v1.1.0 (June 13th, 2026):
 * [Feature] Enable mod in the map editor mode.
 

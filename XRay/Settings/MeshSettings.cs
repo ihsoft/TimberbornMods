@@ -34,6 +34,8 @@ sealed class MeshSettings : BaseSettings<MeshSettings> {
   const string GhostModeIntensityLocKey = "IgorZ.XRay.MeshSettings.GhostModelIntensity";
   const string GlowingLocKey = "IgorZ.XRay.MeshSettings.Glowing";
   const string HeaderStringLocKey = "IgorZ.XRay.MeshSettings.Header";
+  const string IgnoreVisibleLevelLocKey = "IgorZ.XRay.MeshSettings.IgnoreVisibleLevel";
+  const string IgnoreVisibleLevelNoteLocKey = "IgorZ.XRay.MeshSettings.IgnoreVisibleLevel.Note";
   const string WireframeModeDropdownLocKey = "IgorZ.XRay.MeshSettings.WireframeModeDropdown";
   const string WireframeModeDropdownNoteLocKey = "IgorZ.XRay.MeshSettings.WireframeModeDropdown.Note";
   const string WireframeModeNoneLocKey = "IgorZ.XRay.MeshSettings.WireframeMode.None";
@@ -144,6 +146,10 @@ sealed class MeshSettings : BaseSettings<MeshSettings> {
     new(DefaultSchema.WireframeEdgeColor,
         ModSettingDescriptor.CreateLocalized(ColorWireframeEdgeLocKey).SetEnableCondition(IsCustom),
         true);
+
+  public ModSetting<bool> IgnoreVisibleLevel { get; } =
+      new(false, ModSettingDescriptor.CreateLocalized(IgnoreVisibleLevelLocKey)
+          .SetLocalizedTooltip(IgnoreVisibleLevelNoteLocKey));
 
   #endregion
 
