@@ -26,9 +26,12 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
 
   VisualElement _root;
   Label _titleLabel;
+  ResizableDropdownElement _viewDropdown;
   ResizableDropdownElement _filterDropdown;
   VisualElement _contentContainer;
+  ScrollView _scrollView;
   bool _isAddedToLayout;
+  bool _updatingViewDropdown;
   bool _updatingFilterDropdown;
   DispatchDebugViewMode? _filterDropdownMode;
   string _lastText;
@@ -50,14 +53,16 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
 
   public void PostLoad() {
     _root = CreateRoot();
+    _uiFactory.AddTimberDevStylesheet(_root);
     _titleLabel = CreateTitleLabel();
+    _viewDropdown = CreateViewDropdown();
     _filterDropdown = CreateFilterDropdown();
     _contentContainer = new VisualElement();
-    var scrollView = new ScrollView(ScrollViewMode.VerticalAndHorizontal);
-    scrollView.contentContainer.Add(_contentContainer);
+    _scrollView = CreateScrollView();
+    _scrollView.contentContainer.Add(_contentContainer);
     _root.Add(_titleLabel);
-    _root.Add(_filterDropdown);
-    _root.Add(scrollView);
+    _root.Add(CreateControlsRow());
+    _root.Add(_scrollView);
     _root.ToggleDisplayStyle(visible: false);
   }
 
@@ -74,7 +79,7 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
     if (SmartHaulersState.ConsumeSnapshotRefreshRequest()) {
       RefreshSnapshots();
     }
-    UpdateFilterDropdown();
+    UpdateControlDropdowns();
     _titleLabel.text = $"SmartHaulers dispatch: {FormatViewTitle()}";
     var text = BuildText();
     if (SmartHaulersState.ConsumeLogSnapshotRequest()) {
@@ -92,10 +97,11 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
         name = "SmartHaulersDebugPanel",
     };
     root.style.position = Position.Absolute;
+    root.style.flexDirection = FlexDirection.Column;
     root.style.left = 8;
     root.style.top = new StyleLength(new Length(38, LengthUnit.Percent));
     root.style.width = 760;
-    root.style.maxHeight = new StyleLength(new Length(55, LengthUnit.Percent));
+    root.style.height = new StyleLength(new Length(55, LengthUnit.Percent));
     root.style.paddingLeft = 8;
     root.style.paddingRight = 8;
     root.style.paddingTop = 6;
@@ -123,12 +129,71 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
     return label;
   }
 
+  VisualElement CreateControlsRow() {
+    var row = new VisualElement();
+    row.style.flexDirection = FlexDirection.Row;
+    row.style.alignItems = Align.Center;
+    row.style.marginBottom = 4;
+    row.Add(_viewDropdown);
+    row.Add(_filterDropdown);
+    row.Add(CreateLogButton());
+    return row;
+  }
+
+  ResizableDropdownElement CreateViewDropdown() {
+    var dropdown = _uiFactory.CreateSimpleDropdown(OnViewSelected);
+    dropdown.AutoResizeToOptions = false;
+    dropdown.Items = FilterItems<DispatchDebugViewMode>();
+    dropdown.style.width = 110;
+    dropdown.style.marginRight = 6;
+    return dropdown;
+  }
+
   ResizableDropdownElement CreateFilterDropdown() {
     var dropdown = _uiFactory.CreateSimpleDropdown(OnFilterSelected);
     dropdown.AutoResizeToOptions = false;
     dropdown.style.width = 170;
-    dropdown.style.marginBottom = 4;
+    dropdown.style.marginRight = 6;
     return dropdown;
+  }
+
+  static Button CreateLogButton() {
+    var button = new Button(SmartHaulersState.RequestLogSnapshot) {
+        text = "Log",
+    };
+    button.style.height = 24;
+    button.style.minWidth = 42;
+    button.style.paddingLeft = 8;
+    button.style.paddingRight = 8;
+    return button;
+  }
+
+  ScrollView CreateScrollView() {
+    var scrollView = _uiFactory.CreateScrollView();
+    // The TimberDev scroll view only gets its scrollbar visuals from the TimberDev USS asset.
+    // Attach it directly here so the debug panel does not depend on stylesheet inheritance details.
+    _uiFactory.AddTimberDevStylesheet(scrollView);
+    scrollView.mode = ScrollViewMode.VerticalAndHorizontal;
+    scrollView.verticalScrollerVisibility = ScrollerVisibility.AlwaysVisible;
+    scrollView.horizontalScrollerVisibility = ScrollerVisibility.Auto;
+    scrollView.style.flexGrow = 1;
+    scrollView.style.minHeight = 0;
+    return scrollView;
+  }
+
+  void UpdateControlDropdowns() {
+    UpdateViewDropdown();
+    UpdateFilterDropdown();
+  }
+
+  void UpdateViewDropdown() {
+    var currentValue = SmartHaulersState.DispatchViewMode.ToString();
+    if (_viewDropdown.SelectedValue == currentValue) {
+      return;
+    }
+    _updatingViewDropdown = true;
+    _viewDropdown.SelectedValue = currentValue;
+    _updatingViewDropdown = false;
   }
 
   void UpdateFilterDropdown() {
@@ -167,6 +232,15 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
     if (SmartHaulersState.DispatchViewMode == DispatchDebugViewMode.Orders
         && System.Enum.TryParse<DispatchOrderFilter>(value, out var orderFilter)) {
       SmartHaulersState.SetOrderFilter(orderFilter);
+    }
+  }
+
+  void OnViewSelected(string value) {
+    if (_updatingViewDropdown) {
+      return;
+    }
+    if (System.Enum.TryParse<DispatchDebugViewMode>(value, out var viewMode)) {
+      SmartHaulersState.SetDispatchViewMode(viewMode);
     }
   }
 

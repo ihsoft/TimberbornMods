@@ -3,7 +3,7 @@
     "Id": "IgorZ-SmartHaulersToggleDispatchPanel",
     "GroupId": "IgorZ-SmartHaulers-BindingsGroupId",
     "LocKey": "IgorZ.SmartHaulers.KeyBinding.ToggleDispatchPanel",
-    "Order": 2,
+    "Order": 1,
     "AllowOtherModifiers": false,
     "DevModeOnly": false
   },

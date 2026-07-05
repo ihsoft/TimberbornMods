@@ -34,13 +34,8 @@ static class SmartHaulersState {
     DispatchPanelVisible = !DispatchPanelVisible;
   }
 
-  public static void CycleDispatchViewMode() {
-    DispatchViewMode = DispatchViewMode switch {
-        DispatchDebugViewMode.Agents => DispatchDebugViewMode.Orders,
-        DispatchDebugViewMode.Orders => DispatchDebugViewMode.Perf,
-        DispatchDebugViewMode.Perf => DispatchDebugViewMode.Agents,
-        _ => DispatchDebugViewMode.Agents,
-    };
+  public static void SetDispatchViewMode(DispatchDebugViewMode viewMode) {
+    DispatchViewMode = viewMode;
   }
 
   public static void SetAgentFilter(DispatchAgentFilter filter) {
