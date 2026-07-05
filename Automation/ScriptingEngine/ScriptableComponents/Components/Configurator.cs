@@ -30,6 +30,7 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<FloodgateScriptableComponent>().AsSingleton();
     containerDefinition.Bind<FloodgateScriptableComponent.HeightChangeTracker>().AsTransient();
     containerDefinition.Bind<FlowControlScriptableComponent>().AsSingleton();
+    containerDefinition.Bind<GateScriptableComponent>().AsSingleton();
     containerDefinition.Bind<InventoryScriptableComponent>().AsSingleton();
     containerDefinition.Bind<InventoryScriptableComponent.EmptyingStatusBehavior>().AsTransient();
     containerDefinition.Bind<InventoryScriptableComponent.InventoryChangeTracker>().AsTransient();

@@ -5,6 +5,7 @@ using IgorZ.Automation.Conditions;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.Automation.ScriptingEngine.Parser;
+using Timberborn.AutomationBuildings;
 using Timberborn.BlockSystem;
 using Timberborn.PowerManagement;
 using Timberborn.WaterBuildings;
@@ -43,6 +44,24 @@ static class GameAutomationConflictDetectorTests {
     AddRule(behavior, "Clutch.Engage()");
 
     Assert.True(new GameAutomationConflictDetector().HasConflictingRules(behavior));
+  }
+
+  public static void IgnoresGateRulesOnGates() {
+    var behavior = CreateBehavior(new Gate());
+
+    AddRule(behavior, "Gate.SetState('open')");
+
+    Assert.False(new GameAutomationConflictDetector().HasConflictingRules(behavior));
+  }
+
+  public static void IgnoresGateRulesOnAutomatedGates() {
+    var gate = new Gate();
+    gate.Automate();
+    var behavior = CreateBehavior(gate);
+
+    AddRule(behavior, "Gate.SetState('open')");
+
+    Assert.False(new GameAutomationConflictDetector().HasConflictingRules(behavior));
   }
 
   public static void IgnoresStateChangesToNonAutomatedProperties() {
@@ -96,6 +115,8 @@ static class GameAutomationConflictDetectorTests {
         ParseAction(behavior, "Signals.Set('notice', 1)")));
     Assert.False(new GameAutomationConflictDetector().IsBuildingStateChangingAction(
         ParseAction(behavior, "Notifications.SetNoticeIcon('NothingToDo', 'check it')")));
+    Assert.False(new GameAutomationConflictDetector().IsBuildingStateChangingAction(
+        ParseAction(behavior, "Gate.SetState('closed')")));
   }
 
   public static void IgnoresManualWaterValveRuleSaveConflicts() {
@@ -145,6 +166,21 @@ static class GameAutomationConflictDetectorTests {
 
     Assert.Equal(1, conflicts.Count);
     Assert.Equal(2, conflicts[0]);
+  }
+
+  public static void IgnoresGateRuleSaveConflicts() {
+    var gate = new Gate();
+    gate.Automate();
+    var behavior = CreateBehavior(gate);
+    var detector = new GameAutomationRuleSaveConflictDetector(new GameAutomationConflictDetector());
+    var rules = new[] {
+        Rule(1, ParseAction(behavior, "Signals.Set('notice', 1)")),
+        Rule(2, ParseAction(behavior, "Gate.SetState('automated')")),
+    };
+
+    var conflicts = detector.GetConflictingRuleNumbers(behavior, gameAutomationEnabled: true, rules);
+
+    Assert.Equal(0, conflicts.Count);
   }
 
   public static void IgnoresRuleSaveConflictsWhenGameAutomationIsDisabled() {
@@ -273,8 +309,11 @@ static class GameAutomationConflictDetectorTests {
     clutch.RegisterAction("Clutch.Engage");
     clutch.RegisterAction("Clutch.Disengage");
 
+    var gate = new TestScriptable("Gate");
+    gate.RegisterAction("Gate.SetState", ScriptValue.TypeEnum.String);
+
     TestScripting.CreateService(
-        fillValve, throttlingValve, pausable, workplace, signals, notifications, flowControl, clutch);
+        fillValve, throttlingValve, pausable, workplace, signals, notifications, flowControl, clutch, gate);
   }
 
   static ParserFactory CreateParserFactory() {

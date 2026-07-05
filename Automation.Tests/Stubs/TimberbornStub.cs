@@ -47,6 +47,30 @@ namespace Timberborn.BaseComponentSystem {
 }
 
 namespace Timberborn.AutomationBuildings {
+  public sealed class Gate : Timberborn.BaseComponentSystem.BaseComponent {
+    public bool OpenMode { get; private set; }
+    public bool ClosedMode { get; private set; }
+    public bool AutomatedMode { get; private set; }
+
+    public void Open() {
+      OpenMode = true;
+      ClosedMode = false;
+      AutomatedMode = false;
+    }
+
+    public void Close() {
+      OpenMode = false;
+      ClosedMode = true;
+      AutomatedMode = false;
+    }
+
+    public void Automate() {
+      OpenMode = false;
+      ClosedMode = false;
+      AutomatedMode = true;
+    }
+  }
+
   public sealed class Lever : Timberborn.BaseComponentSystem.BaseComponent {
     public bool IsOn { get; private set; }
 

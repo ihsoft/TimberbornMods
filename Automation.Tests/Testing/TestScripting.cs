@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Core;
@@ -70,6 +71,25 @@ sealed class TestScriptable : IScriptable {
             ScriptName = name,
             DisplayName = name,
             Arguments = arguments,
+        },
+        _ => {}
+    );
+  }
+
+  public void RegisterStringAction(string name, params string[] options) {
+    _actions[name] = (
+        new ActionDef {
+            ScriptName = name,
+            DisplayName = name,
+            Arguments = [
+                new ValueDef {
+                    ValueType = ScriptValue.TypeEnum.String,
+                    Options = [..options.Select(option => new IgorZ.TimberDev.UI.DropdownItem {
+                        Value = option,
+                        Text = option,
+                    })],
+                },
+            ],
         },
         _ => {}
     );

@@ -1,4 +1,5 @@
-# v4.6.5 (TBD)
+# v4.7.0 (TBD)
+* [Feature] Add an action for setting Gate state.
 * [Fix] Manufactory input and output goods could be missing from the building signal export list.
 
 # v4.6.4 (June 29th, 2026)

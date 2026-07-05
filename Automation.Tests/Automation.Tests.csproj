@@ -146,6 +146,9 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\FlowControlScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\FlowControlScriptableComponent.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\GateScriptableComponent.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\GateScriptableComponent.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\FloodgateScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\FloodgateScriptableComponent.cs</Link>
       </Compile>

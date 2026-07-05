@@ -175,6 +175,7 @@ IgorZ.Automation.Scriptable.Floodgate.Action.SetHeight,"выставить вы�
 IgorZ.Automation.Scriptable.Floodgate.Signal.Height,"высота затвора","Name of the condition for the floodgate height checking"
 IgorZ.Automation.Scriptable.FlowControl.Action.Close,"запретить поток","Name of the action that closes the water flow through the building"
 IgorZ.Automation.Scriptable.FlowControl.Action.Open,"разрешить поток","Name of the action that opens the water flow through the building"
+IgorZ.Automation.Scriptable.Gate.Action.SetState,"выставить состояние ворот: {0}","Name of the action that sets a gate to open, closed, or automated mode"
 IgorZ.Automation.Scriptable.Inventory.Action.EmptyingStatus,"Склад освобождается в приоритетном порядке.",
 IgorZ.Automation.Scriptable.Inventory.Action.StartEmptyingStock,"начать освобождать","Name of the action that starts emptying the storage"
 IgorZ.Automation.Scriptable.Inventory.Action.StopEmptyingStock,"прекратить освобождать","Name of the action that stops emptying the storage"

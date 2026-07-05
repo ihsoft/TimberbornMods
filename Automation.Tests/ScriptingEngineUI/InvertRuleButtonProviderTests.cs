@@ -5,6 +5,7 @@ using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 using IgorZ.Automation.ScriptingEngineUI;
+using Timberborn.AutomationBuildings;
 using Timberborn.PowerManagement;
 using Timberborn.SingletonSystem;
 using Timberborn.TimeSystem;
@@ -38,6 +39,32 @@ static class InvertRuleButtonProviderTests {
 
     Assert.Equal("(act FillValve.Close)", MakeInvertedActionExpression(parserFactory, openAction, behavior));
     Assert.Equal("(act FillValve.Open)", MakeInvertedActionExpression(parserFactory, closeAction, behavior));
+  }
+
+  public static void InvertsGenericOpenAndCloseActions() {
+    var behavior = new AutomationBehavior();
+    var parserFactory = CreateParserFactory();
+    RegisterGenericOpenCloseScriptable();
+
+    var openAction = ParseAction(parserFactory, behavior, "TestDoor.Open()");
+    var closeAction = ParseAction(parserFactory, behavior, "TestDoor.Close()");
+
+    Assert.Equal("(act TestDoor.Close)", MakeInvertedActionExpression(parserFactory, openAction, behavior));
+    Assert.Equal("(act TestDoor.Open)", MakeInvertedActionExpression(parserFactory, closeAction, behavior));
+  }
+
+  public static void InvertsGenericSetStateOpenAndClosedValues() {
+    var behavior = new AutomationBehavior();
+    var parserFactory = CreateParserFactory();
+    RegisterGenericSetStateScriptable();
+
+    var openAction = ParseAction(parserFactory, behavior, "TestGate.SetState('open')");
+    var closedAction = ParseAction(parserFactory, behavior, "TestGate.SetState('closed')");
+    var automatedAction = ParseAction(parserFactory, behavior, "TestGate.SetState('automated')");
+
+    Assert.Equal("(act TestGate.SetState 'closed')", MakeInvertedActionExpression(parserFactory, openAction, behavior));
+    Assert.Equal("(act TestGate.SetState 'open')", MakeInvertedActionExpression(parserFactory, closedAction, behavior));
+    Assert.Equal(null, MakeInvertedActionExpression(parserFactory, automatedAction, behavior));
   }
 
   public static void InvertsThrottlingValveSetFlowArgumentWithoutChangingAction() {
@@ -79,6 +106,33 @@ static class InvertRuleButtonProviderTests {
 
     Assert.Equal("(act Clutch.Disengage)", MakeInvertedActionExpression(parserFactory, engageAction, behavior));
     Assert.Equal("(act Clutch.Engage)", MakeInvertedActionExpression(parserFactory, disengageAction, behavior));
+  }
+
+  public static void InvertsGenericSetStateOnAndOffValues() {
+    var behavior = new AutomationBehavior();
+    var parserFactory = CreateParserFactory();
+    RegisterGenericSwitchStateScriptable();
+
+    var onAction = ParseAction(parserFactory, behavior, "TestSwitch.SetState('on')");
+    var offAction = ParseAction(parserFactory, behavior, "TestSwitch.SetState('off')");
+
+    Assert.Equal("(act TestSwitch.SetState 'off')", MakeInvertedActionExpression(parserFactory, onAction, behavior));
+    Assert.Equal("(act TestSwitch.SetState 'on')", MakeInvertedActionExpression(parserFactory, offAction, behavior));
+  }
+
+  public static void InvertsGateOpenAndClosedStates() {
+    var behavior = new AutomationBehavior();
+    behavior.SetComponent(new Gate());
+    var parserFactory = CreateParserFactory();
+    RegisterGateScriptableComponent();
+
+    var openAction = ParseAction(parserFactory, behavior, "Gate.SetState('open')");
+    var closedAction = ParseAction(parserFactory, behavior, "Gate.SetState('closed')");
+    var automatedAction = ParseAction(parserFactory, behavior, "Gate.SetState('automated')");
+
+    Assert.Equal("(act Gate.SetState 'closed')", MakeInvertedActionExpression(parserFactory, openAction, behavior));
+    Assert.Equal("(act Gate.SetState 'open')", MakeInvertedActionExpression(parserFactory, closedAction, behavior));
+    Assert.Equal(null, MakeInvertedActionExpression(parserFactory, automatedAction, behavior));
   }
 
   public static void InvertsTimeWorkingHoursConditionBySwitchingStringValue() {
@@ -192,6 +246,32 @@ static class InvertRuleButtonProviderTests {
     var component = new ClutchScriptableComponent();
     component.InjectDependencies(new TestLoc(), service);
     component.Load();
+  }
+
+  static void RegisterGateScriptableComponent() {
+    var service = TestScripting.CreateService();
+    var component = new GateScriptableComponent();
+    component.InjectDependencies(new TestLoc(), service);
+    component.Load();
+  }
+
+  static void RegisterGenericOpenCloseScriptable() {
+    var scriptable = new TestScriptable("TestDoor");
+    scriptable.RegisterAction("TestDoor.Open");
+    scriptable.RegisterAction("TestDoor.Close");
+    TestScripting.CreateService(scriptable);
+  }
+
+  static void RegisterGenericSetStateScriptable() {
+    var scriptable = new TestScriptable("TestGate");
+    scriptable.RegisterStringAction("TestGate.SetState", "open", "closed", "automated");
+    TestScripting.CreateService(scriptable);
+  }
+
+  static void RegisterGenericSwitchStateScriptable() {
+    var scriptable = new TestScriptable("TestSwitch");
+    scriptable.RegisterStringAction("TestSwitch.SetState", "on", "off");
+    TestScripting.CreateService(scriptable);
   }
 
   sealed class TestDayNightCycle : IDayNightCycle {
