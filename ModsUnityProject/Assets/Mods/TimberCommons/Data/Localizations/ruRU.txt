@@ -17,6 +17,7 @@ IgorZ.TimberCommons.GrowthRateModifier.BoostPercentile,"Ускорение ро�
 IgorZ.TimberCommons.GrowthRateModifier.SlowdownPercentile,"Замедление роста: <RedHighlight>🡇</RedHighlight>{0:0.#}%",
 IgorZ.TimberCommons.AdjustableWaterOutput.LimitOutputLevel,"Ограничивать уровень воды на выходе",
 IgorZ.TimberCommons.AdjustableWaterOutput.StopAboveDownstream,"Остановить при глубине на водосбросе: {0}",
+IgorZ.TimberCommons.WaterBuildings.ThrottlingValve.CurrentFlow,"Текущий поток: {0}","Label shown under the Throttling Valve flow slider. {0} is the measured flow through the valve."
 IgorZ.TimberCommons.InjuryProbability,"Вероятность ранения: {0} каждый час",
 IgorZ.TimberCommons.InjuryProbabilityDaily,"Вероятность ранения: {0} в течение дня",
 IgorZ.TimberCommons.Settings.TimeAndDurationSection,"Формат времени и продолжительности",

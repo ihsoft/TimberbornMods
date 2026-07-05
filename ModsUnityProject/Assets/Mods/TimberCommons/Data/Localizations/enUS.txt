@@ -17,6 +17,7 @@ IgorZ.TimberCommons.GrowthRateModifier.BoostPercentile,"Growth boost: <GreenHigh
 IgorZ.TimberCommons.GrowthRateModifier.SlowdownPercentile,"Growth slowdown: <RedHighlight>🡇</RedHighlight>{0:0.#}%","It indicates growth penalty, it's a bad effect."
 IgorZ.TimberCommons.AdjustableWaterOutput.LimitOutputLevel,"Limit output water level",
 IgorZ.TimberCommons.AdjustableWaterOutput.StopAboveDownstream,"Close above depth at spillway: {0}",
+IgorZ.TimberCommons.WaterBuildings.ThrottlingValve.CurrentFlow,"Current flow: {0}","Label shown under the Throttling Valve flow slider. {0} is the measured flow through the valve."
 IgorZ.TimberCommons.InjuryProbability,"Injury probability: {0} every hour",
 IgorZ.TimberCommons.InjuryProbabilityDaily,"Injury probability: {0} during the day",
 IgorZ.TimberCommons.Settings.TimeAndDurationSection,"Time and duration representation",

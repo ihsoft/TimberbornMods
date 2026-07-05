@@ -1,3 +1,6 @@
+# v1.20.0 (TBD)
+* [Enhancement] Show the measured flow through Throttling Valves under the flow slider.
+
 # v1.19.0 (July 2nd, 2026)
 * [Feature] Allow enabling installed disabled mods from the save-load mod incompatibility dialog.
 * [Feature] Show the saved game version on the load-game preview.
