@@ -1,4 +1,4 @@
-# v4.7.0 (TBD)
+# v4.7.0 (July 5th, 2026)
 * [Feature] Add an action for setting Gate state.
 * [Feature] Add manufactory signals for the current recipe and recipe completion.
 * [Fix] Manufactory input and output goods could be missing from the building signal export list.
