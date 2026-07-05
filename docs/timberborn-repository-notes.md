@@ -62,6 +62,14 @@ Before editing localization, blueprints, UI assets, thumbnails, workshop metadat
 ModsUnityProject/Assets/Mods/<ModName>/
 ```
 
+When a task changes package data under `ModsUnityProject/Assets/Mods/<ModName>/`, refresh the local game package
+through the repository Unity export path, such as `tools/export-unity-mod.ps1` / `ModBuilderBatch`, for the correct
+compatibility lane. Do not manually synchronize `_MODS!` resources as a substitute for export. Manual copies can miss
+`.meta` filtering, platform asset bundles, localization/data layout, or mod-specific package lanes.
+
+A C# build with `ModPath` usually updates only `Scripts/<Assembly>.dll` and `Scripts/<Assembly>.xml`. Do not assume it
+also synchronizes Unity-owned package data unless the project file or release tooling proves that behavior.
+
 ---
 
 ## Project Roles

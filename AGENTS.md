@@ -329,6 +329,9 @@ not start from them.
 
 ### Unity-resource task
 
+- Identify the normal Unity export/build path and compatibility lane before preparing a real-game package.
+- Do not manually copy Unity package resources into `_MODS!`; use the repository export tooling or report that export
+  was not run.
 - Remind the user to rebuild or export Unity assets before real-game testing.
 
 ## Required tests
@@ -366,6 +369,11 @@ These relevant tests MUST pass before submitting the change.
 
 When changing Unity project resources (`UXML`, `USS`, localization files, images, sprites, prefabs, or asset bundle
 content), remind the user to rebuild the Unity project before testing in the real game.
+
+If the changed files live under `ModsUnityProject/Assets/Mods/<ModName>/`, do not hand-copy package resources into
+`_MODS!`. First find the mod's normal Unity export command and compatibility lane, then use that export path or clearly
+report that the local game package was not refreshed. A C# project build only updates script outputs unless the project
+or release tooling proves that it also exports Unity package data.
 
 ## Final version requests
 

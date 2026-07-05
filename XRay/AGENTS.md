@@ -13,3 +13,9 @@ Use release metadata compatibility ranges to express supported Timberborn versio
 `1.1.x` requires a `version-1.1` package lane.
 
 Preserve old ZIP archives as historical artifacts unless the user explicitly asks to remove them.
+
+## Unity Export
+
+When exporting X-Ray Unity resources, pass `-GameVersion version-1.0` to the repository export tooling under the
+current package layout. Do not let a generic export default create or refresh `version-1.1` unless the X-Ray
+compatibility model changes.
