@@ -48,6 +48,11 @@ Use intentional line breaks in localization strings when a tooltip would otherwi
 For player-visible signals with two named logical states, prefer a string signal with `ValueDef.Options` over a numeric
 `0`/`1` signal. Automation's Rules UI can show string options as readable dropdown values.
 
+For Automation signals that represent repeatable gameplay events, prefer modeling the event as state that changes on
+every meaningful occurrence, such as a counter scoped to the current recipe or mode. Avoid generic same-value signal
+notifications because they weaken the normal value-change semantics of signal updates. Use same-value notification only
+if a stateful representation would be misleading or impossible.
+
 For global time-like signals, prefer game events, `ITimeTriggerFactory`, or similar scheduled triggers over
 `AutomationService.RegisterTickable` polling. If exact per-tick precision is not required, use a coarse bucket and a
 lazy one-shot trigger when there are listeners.
