@@ -67,7 +67,8 @@ sealed class TransportDebugRowFactory(EntitySelectionService entitySelectionServ
     AddRoute(row, order);
     AddText(row, $", route={order.RouteDistance:0.##}");
     AddOptionalText(row, TransportDebugFormatter.FormatInventoryDiagnostics(order));
-    AddText(row, $", left={order.RemainingDistance:0.##}");
+    AddText(row, $", left={order.RemainingDistance:0.##}, ");
+    AddText(row, TransportDebugFormatter.FormatRemainingTaskHours(order));
     return row;
   }
 

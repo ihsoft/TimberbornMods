@@ -30,7 +30,8 @@ static class TransportDebugFormatter {
     }
     return $"{FormatOrderSource(order)}, {TransportAgentSnapshot.FormatWorker(order.Worker)}, {order.Phase}, "
         + $"{order.GoodAmount}, {FormatRoute(order)}, route={order.RouteDistance:0.##}, "
-        + $"{FormatInventoryDiagnostics(order)}, left={order.RemainingDistance:0.##}";
+        + $"{FormatInventoryDiagnostics(order)}, left={order.RemainingDistance:0.##}, "
+        + $"{FormatRemainingTaskHours(order)}";
   }
 
   public static string FormatOrderSource(TransportOrderSnapshot order) {
@@ -85,6 +86,10 @@ static class TransportDebugFormatter {
       return target;
     }
     return string.IsNullOrEmpty(target) ? source : $"{source}, {target}";
+  }
+
+  public static string FormatRemainingTaskHours(TransportOrderSnapshot order) {
+    return float.IsNaN(order.RemainingTaskHours) ? "task=?" : $"task={order.RemainingTaskHours:0.#}h";
   }
 
   public static string FormatObject(BaseComponent component) {
@@ -148,6 +153,9 @@ static class TransportDebugFormatter {
     var text = agent.Role is TransportAgentRole.None or TransportAgentRole.DedicatedHauler
         ? FormatState(agent)
         : $"{FormatState(agent)}/{FormatRole(agent.Role)}";
+    if (agent.WorkplaceMarkedForEmptying) {
+      text += "/emptying";
+    }
     return agent.RefusesWork ? $"{text}/noWork" : text;
   }
 

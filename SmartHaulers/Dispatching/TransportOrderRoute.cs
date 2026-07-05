@@ -11,15 +11,18 @@ readonly struct TransportOrderRoute {
   public Inventory Target { get; }
   public float RouteDistance { get; }
   public float RemainingDistance { get; }
+  public float RemainingTaskHours { get; }
   public float Progress { get; }
   public bool HasKnownEndpoints => Source && Target;
 
   public TransportOrderRoute(
-      Inventory source, Inventory target, float routeDistance, float remainingDistance, float progress) {
+      Inventory source, Inventory target, float routeDistance, float remainingDistance, float remainingTaskHours,
+      float progress) {
     Source = source;
     Target = target;
     RouteDistance = routeDistance;
     RemainingDistance = remainingDistance;
+    RemainingTaskHours = remainingTaskHours;
     Progress = progress;
   }
 }

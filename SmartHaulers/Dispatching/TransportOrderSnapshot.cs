@@ -30,6 +30,7 @@ readonly struct TransportOrderSnapshot {
   public GoodAmount GoodAmount => Cargo.GoodAmount;
   public float RouteDistance => Route.RouteDistance;
   public float RemainingDistance => Route.RemainingDistance;
+  public float RemainingTaskHours => Route.RemainingTaskHours;
   public float Progress => Route.Progress;
   public bool HasCriticalTime => !float.IsNaN(CriticalTimeInHours);
 
@@ -59,12 +60,12 @@ readonly struct TransportOrderSnapshot {
 
   public static TransportOrderSnapshot Assigned(
       Guid agentId, Worker worker, OrderPhase phase, Inventory source, Inventory target, GoodAmount goodAmount,
-      float routeDistance, float remainingDistance, float progress) {
+      float routeDistance, float remainingDistance, float remainingTaskHours, float progress) {
     return new TransportOrderSnapshot(
         new TransportOrderAssignment(agentId, worker),
         TransportOrderOrigin.ActiveReservation(),
         phase,
-        new TransportOrderRoute(source, target, routeDistance, remainingDistance, progress),
+        new TransportOrderRoute(source, target, routeDistance, remainingDistance, remainingTaskHours, progress),
         new TransportCargo(goodAmount));
   }
 
@@ -77,7 +78,7 @@ readonly struct TransportOrderSnapshot {
             ? TransportOrderOrigin.SmartCriticalNeed()
             : TransportOrderOrigin.CriticalNeed(),
         OrderPhase.PickingUp,
-        new TransportOrderRoute(source, null, float.NaN, remainingDistance, progress),
+        new TransportOrderRoute(source, null, float.NaN, remainingDistance, float.NaN, progress),
         new TransportCargo(goodAmount));
   }
 
@@ -104,7 +105,7 @@ readonly struct TransportOrderSnapshot {
         TransportOrderAssignment.None,
         origin,
         phase,
-        new TransportOrderRoute(source, target, float.NaN, float.NaN, float.NaN),
+        new TransportOrderRoute(source, target, float.NaN, float.NaN, float.NaN, float.NaN),
         cargo);
   }
 
@@ -115,7 +116,7 @@ readonly struct TransportOrderSnapshot {
         TransportOrderAssignment.None,
         TransportOrderOrigin.HaulBehavior(requesterId, requester, behaviorName, weight),
         OrderPhase.Covered,
-        new TransportOrderRoute(null, target, float.NaN, float.NaN, float.NaN),
+        new TransportOrderRoute(null, target, float.NaN, float.NaN, float.NaN, float.NaN),
         new TransportCargo(goodAmount));
   }
 }

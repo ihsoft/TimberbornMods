@@ -13,6 +13,7 @@ using Timberborn.BuilderHubSystem;
 using Timberborn.Carrying;
 using Timberborn.CharacterNavigation;
 using Timberborn.EntitySystem;
+using Timberborn.Emptying;
 using Timberborn.GameDistricts;
 using Timberborn.Goods;
 using Timberborn.Hauling;
@@ -21,21 +22,27 @@ using Timberborn.InventoryNeedSystem;
 using Timberborn.Navigation;
 using Timberborn.NeedSystem;
 using Timberborn.PrioritySystem;
+using Timberborn.TimeSystem;
 using Timberborn.WalkingSystem;
 using Timberborn.Workshops;
 using Timberborn.WorkSystem;
 using UnityEngine;
+using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.SmartHaulers.Dispatching;
 
 sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletableEntity {
   static readonly HashSet<string> SmartCriticalNeedIds = ["Hunger", "Thirst", "Biofuel", "Power"];
+  static readonly HashSet<string> LoggedUnknownWorkplaces = [];
+  static readonly HashSet<string> LoggedIgnoredActiveTransports = [];
+  static readonly HashSet<string> LoggedManyInventories = [];
 
   readonly DispatchCenterRegistry _dispatchCenterRegistry;
   readonly ConstructionRegistry _constructionRegistry;
   readonly TransportDecisionEvaluator _decisionEvaluator;
   readonly DispatchPerformanceStats _performanceStats;
   readonly IGoodService _goodService;
+  readonly IDayNightCycle _dayNightCycle;
   readonly List<TransportAgentSnapshot> _agents = [];
   readonly List<TransportOrderSnapshot> _orders = [];
   readonly List<Accessible> _builderHubAccessibles = [];
@@ -54,12 +61,13 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
   public HaulerDispatchCenter(
       DispatchCenterRegistry dispatchCenterRegistry, ConstructionRegistry constructionRegistry,
       TransportDecisionEvaluator decisionEvaluator, DispatchPerformanceStats performanceStats,
-      IGoodService goodService) {
+      IGoodService goodService, IDayNightCycle dayNightCycle) {
     _dispatchCenterRegistry = dispatchCenterRegistry;
     _constructionRegistry = constructionRegistry;
     _decisionEvaluator = decisionEvaluator;
     _performanceStats = performanceStats;
     _goodService = goodService;
+    _dayNightCycle = dayNightCycle;
   }
 
   public void Awake() {
@@ -151,10 +159,16 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
     var entityId = worker.GetComponent<EntityComponent>()?.EntityId ?? System.Guid.Empty;
     var workplaceRole = ClassifyWorkplaceRole(worker);
     var role = ClassifyAgentRole(worker, behaviorManager, workplaceRole);
+    var workplaceMarkedForEmptying = IsWorkplaceMarkedForEmptying(worker);
     return new TransportAgentSnapshot(
         entityId, worker, TransportAgentSnapshot.FormatWorker(worker), position, worldPosition, walkingSpeed,
         goodCarrier.LiftingCapacity, activity.State, role, workplaceRole, activity, workRefuser.RefusesWork,
-        isTransportAgent: true);
+        workplaceMarkedForEmptying, isTransportAgent: true);
+  }
+
+  static bool IsWorkplaceMarkedForEmptying(Worker worker) {
+    var workplace = worker.Workplace;
+    return workplace && workplace.GetComponent<Emptiable>()?.IsMarkedForEmptying == true;
   }
 
   static TransportAgentRole ClassifyAgentRole(
@@ -199,6 +213,7 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
     if (HasSpecializedResourceBehavior(workplace)) {
       return TransportWorkplaceRole.SpecializedResource;
     }
+    WarnUnknownWorkplace(worker, workplace);
     return TransportWorkplaceRole.Unknown;
   }
 
@@ -217,6 +232,9 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
     var source = goodReserver.HasReservedStock ? goodReserver.StockReservation.Inventory : null;
     var target = goodReserver.HasReservedCapacity ? goodReserver.CapacityReservation.Inventory : null;
     if (!IsActiveTransportOrder(behaviorManager, goodCarrier, target)) {
+      if (!IsKnownResourceReservation(behaviorManager)) {
+        WarnIgnoredActiveTransport(worker, behaviorManager, goodCarrier, goodReserver, source, target);
+      }
       orderSnapshot = default;
       return false;
     }
@@ -224,16 +242,19 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
     var phase = goodCarrier.IsCarrying ? OrderPhase.Delivering : OrderPhase.PickingUp;
     RestoreKnownEndpoints(worker, goodAmount, ref source, ref target);
     RestoreRequesterEndpoint(behaviorManager, ref source, ref target);
+    RestoreWorkerOutputEndpoint(worker, goodAmount, target, ref source);
     RestoreDistrictEndpoint(goodAmount, ref source, ref target);
     var routeDistance = TryGetRouteDistance(source, target, out var distance) ? distance : float.NaN;
     var targetInventory = phase == OrderPhase.PickingUp ? source : target;
     var remainingDistance = TryGetRemainingDistance(phase, targetInventory, agentSnapshot.WorldPosition, out var remaining)
         ? remaining
         : float.NaN;
+    var remainingTaskHours = EstimateRemainingTaskHours(phase, routeDistance, remainingDistance, agentSnapshot.Speed);
     var progress = TrackProgress(worker, phase, targetInventory, goodAmount, remainingDistance);
     RememberKnownEndpoints(worker, source, target, goodAmount);
     orderSnapshot = TransportOrderSnapshot.Assigned(
-        agentSnapshot.EntityId, worker, phase, source, target, goodAmount, routeDistance, remainingDistance, progress);
+        agentSnapshot.EntityId, worker, phase, source, target, goodAmount, routeDistance, remainingDistance,
+        remainingTaskHours, progress);
     return true;
   }
 
@@ -272,6 +293,23 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
       }
     }
     return false;
+  }
+
+  float EstimateRemainingTaskHours(OrderPhase phase, float routeDistance, float remainingDistance, float speed) {
+    if (speed <= 0f || float.IsNaN(remainingDistance)) {
+      return float.NaN;
+    }
+    var remainingTaskDistance = phase == OrderPhase.PickingUp
+        ? RemainingPickupTaskDistance(routeDistance, remainingDistance)
+        : remainingDistance;
+    if (float.IsNaN(remainingTaskDistance)) {
+      return float.NaN;
+    }
+    return _dayNightCycle.SecondsToHours(remainingTaskDistance / speed);
+  }
+
+  static float RemainingPickupTaskDistance(float routeDistance, float remainingDistance) {
+    return float.IsNaN(routeDistance) ? float.NaN : remainingDistance + routeDistance;
   }
 
   void RestoreKnownEndpoints(Worker worker, GoodAmount goodAmount, ref Inventory source, ref Inventory target) {
@@ -325,10 +363,19 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
     if (IsCommunityServiceTransportBehavior(behavior)) {
       return true;
     }
+    if (IsLaborTransportBehavior(behavior)) {
+      return true;
+    }
     if (behavior is WorkplaceBehavior workplaceBehavior) {
       return IsTransportWorkplaceBehavior(workplaceBehavior);
     }
     return false;
+  }
+
+  static bool IsKnownResourceReservation(BehaviorManager behaviorManager) {
+    return TryGetRunningBehavior(behaviorManager, out var behavior) && behavior.GetType().Name is
+        "GoodStackRetrieverBehavior"
+        or "YieldRemoverBehavior";
   }
 
   static bool HasSpecializedResourceBehavior(Workplace workplace) {
@@ -338,6 +385,69 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
       }
     }
     return false;
+  }
+
+  static void WarnUnknownWorkplace(Worker worker, Workplace workplace) {
+    var key = $"workplace:{ComponentId(workplace)}:{workplace.GetType().FullName}";
+    if (!LoggedUnknownWorkplaces.Add(key)) {
+      return;
+    }
+    DebugEx.Warning(
+        "SmartHaulers unknown workplace role: worker={0}, workplace={1}, workplaceType={2}, behaviors=[{3}].",
+        TransportAgentSnapshot.FormatWorker(worker), DebugEx.ObjectToString(workplace),
+        workplace.GetType().FullName, FormatWorkplaceBehaviors(workplace));
+  }
+
+  static string FormatWorkplaceBehaviors(Workplace workplace) {
+    var behaviorNames = new List<string>();
+    foreach (var workplaceBehavior in workplace.WorkplaceBehaviors) {
+      behaviorNames.Add(workplaceBehavior.GetType().FullName);
+    }
+    return string.Join(", ", behaviorNames);
+  }
+
+  static void WarnIgnoredActiveTransport(
+      Worker worker, BehaviorManager behaviorManager, GoodCarrier goodCarrier, GoodReserver goodReserver,
+      Inventory source, Inventory target) {
+    var behavior = behaviorManager ? behaviorManager._runningBehavior : null;
+    var executor = behaviorManager ? behaviorManager._runningExecutor : null;
+    var key = $"ignored:{ComponentId(worker)}:{behavior?.GetType().FullName}:{executor?.GetType().FullName}:"
+        + $"{goodCarrier.IsCarrying}:{goodReserver.HasReservedStock}:{goodReserver.HasReservedCapacity}";
+    if (!LoggedIgnoredActiveTransports.Add(key)) {
+      return;
+    }
+    DebugEx.Warning(
+        "SmartHaulers ignored active reservation: worker={0}, behavior={1}, executor={2}, carrying={3}, "
+            + "reservedStock={4}, reservedCapacity={5}, source={6}, target={7}.",
+        TransportAgentSnapshot.FormatWorker(worker), FormatObjectType(behavior), FormatObjectType(executor),
+        FormatCarriedGood(goodCarrier), FormatReservedStock(goodReserver), FormatReservedCapacity(goodReserver),
+        DebugEx.ObjectToString(source), DebugEx.ObjectToString(target));
+  }
+
+  static string FormatObjectType(object obj) {
+    return obj?.GetType().FullName ?? "NULL";
+  }
+
+  static string FormatCarriedGood(GoodCarrier goodCarrier) {
+    return goodCarrier.IsCarrying ? FormatGoodAmount(goodCarrier.CarriedGood.GoodAmount) : "none";
+  }
+
+  static string FormatReservedStock(GoodReserver goodReserver) {
+    return goodReserver.HasReservedStock
+        ? $"{FormatGoodAmount(goodReserver.StockReservation.GoodAmount)} at "
+            + DebugEx.ObjectToString(goodReserver.StockReservation.Inventory)
+        : "none";
+  }
+
+  static string FormatReservedCapacity(GoodReserver goodReserver) {
+    return goodReserver.HasReservedCapacity
+        ? $"{FormatGoodAmount(goodReserver.CapacityReservation.GoodAmount)} at "
+            + DebugEx.ObjectToString(goodReserver.CapacityReservation.Inventory)
+        : "none";
+  }
+
+  static string FormatGoodAmount(GoodAmount goodAmount) {
+    return $"{goodAmount.Amount}x {goodAmount.GoodId}";
   }
 
   static bool IsSpecializedResourceBehavior(WorkplaceBehavior workplaceBehavior) {
@@ -362,9 +472,13 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
     return behavior?.GetType().Name == "BringNutrientBehavior";
   }
 
+  static bool IsLaborTransportBehavior(Behavior behavior) {
+    return behavior?.GetType().Name == "EmptyInventoriesLaborBehavior";
+  }
+
   static bool IsTransportWorkplaceBehavior(WorkplaceBehavior workplaceBehavior) {
     var behaviorName = FormatBehaviorName(workplaceBehavior);
-    return IsBringBehavior(behaviorName) || IsTakeAwayBehavior(behaviorName);
+    return behaviorName == "BuilderHub" || IsBringBehavior(behaviorName) || IsTakeAwayBehavior(behaviorName);
   }
 
   void RestoreDistrictEndpoint(GoodAmount goodAmount, ref Inventory source, ref Inventory target) {
@@ -380,6 +494,33 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
     }
   }
 
+  static void RestoreWorkerOutputEndpoint(Worker worker, GoodAmount goodAmount, Inventory target, ref Inventory source) {
+    if (source && source != target || string.IsNullOrEmpty(goodAmount.GoodId)) {
+      return;
+    }
+    var workplace = worker.Workplace;
+    if (!workplace || !workplace.GetComponent<Manufactory>()) {
+      return;
+    }
+    var inventories = workplace.GetComponent<Inventories>();
+    if (inventories) {
+      WarnIfManyInventories(workplace, inventories);
+      source = FindGoodsOutputInventoryForGood(inventories.EnabledInventories, goodAmount.GoodId, target);
+      return;
+    }
+    source = FindGoodsOutputInventoryForGood(workplace.GetComponentsAllocating<Inventory>(), goodAmount.GoodId, target);
+  }
+
+  static Inventory FindGoodsOutputInventoryForGood(
+      IEnumerable<Inventory> inventories, string goodId, Inventory excludedInventory) {
+    foreach (var inventory in inventories) {
+      if (IsGoodsInventory(inventory) && inventory != excludedInventory && inventory.Gives(goodId)) {
+        return inventory;
+      }
+    }
+    return null;
+  }
+
   static Inventory ClosestInventoryWithCapacity(
       Inventory source, GoodAmount goodAmount, DistrictInventoryRegistry districtInventoryRegistry) {
     var sourceAccessible = source.GetEnabledComponent<Accessible>();
@@ -390,7 +531,8 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
     var closestDistance = float.MaxValue;
     foreach (var inventory in districtInventoryRegistry.ActiveInventoriesWithCapacity(goodAmount.GoodId)) {
       var targetAccessible = inventory.GetEnabledComponent<Accessible>();
-      if (targetAccessible
+      if (inventory != source
+          && targetAccessible
           && InventoryIsTaking(inventory, goodAmount)
           && TransportPathDistance.TryFindRoadPath(sourceAccessible, targetAccessible, out var distance)
           && distance < closestDistance) {
@@ -411,7 +553,8 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
     var closestDistance = float.MaxValue;
     foreach (var inventory in districtInventoryRegistry.ActiveInventoriesWithStock(goodId)) {
       var sourceAccessible = inventory.GetEnabledComponent<Accessible>();
-      if (sourceAccessible
+      if (inventory != target
+          && sourceAccessible
           && TransportPathDistance.TryFindRoadPath(targetAccessible, sourceAccessible, out var distance)
           && distance < closestDistance) {
         closestInventory = inventory;
@@ -547,24 +690,54 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
   static Inventory FindKnownEndpointInventory(BaseComponent requester, string behaviorName) {
     var inventories = requester.GetComponent<Inventories>();
     if (inventories) {
-      var inventory = PickInventory(inventories, behaviorName);
-      if (inventory) {
+      WarnIfManyInventories(requester, inventories);
+      return PickInventory(inventories, behaviorName);
+    }
+    foreach (var inventory in requester.GetComponentsAllocating<Inventory>()) {
+      if (IsGoodsInventory(inventory)) {
         return inventory;
       }
     }
-    return requester.GetComponent<Inventory>();
+    return null;
   }
 
   static Inventory PickInventory(Inventories inventories, string behaviorName) {
     foreach (var inventory in inventories.EnabledInventories) {
-      if (MatchesBehavior(inventory, behaviorName)) {
+      if (IsGoodsInventory(inventory) && MatchesBehavior(inventory, behaviorName)) {
         return inventory;
       }
     }
     foreach (var inventory in inventories.EnabledInventories) {
-      return inventory;
+      if (IsGoodsInventory(inventory)) {
+        return inventory;
+      }
     }
     return null;
+  }
+
+  static bool IsGoodsInventory(Inventory inventory) {
+    return inventory.ComponentName != ConstructionSiteInventoryInitializer.InventoryComponentName;
+  }
+
+  static void WarnIfManyInventories(BaseComponent owner, Inventories inventories) {
+    if (inventories.AllInventories.Count <= 2) {
+      return;
+    }
+    var key = $"many-inventories:{ComponentId(owner)}:{owner.GetType().FullName}";
+    if (!LoggedManyInventories.Add(key)) {
+      return;
+    }
+    DebugEx.Warning(
+        "SmartHaulers found a building with more than two inventories: owner={0}, ownerType={1}, inventories=[{2}].",
+        DebugEx.ObjectToString(owner), owner.GetType().FullName, FormatInventories(inventories));
+  }
+
+  static string FormatInventories(Inventories inventories) {
+    var names = new List<string>();
+    foreach (var inventory in inventories.AllInventories) {
+      names.Add($"{inventory.ComponentName}:{inventory.GetType().FullName}");
+    }
+    return string.Join(", ", names);
   }
 
   static bool MatchesBehavior(Inventory inventory, string behaviorName) {
