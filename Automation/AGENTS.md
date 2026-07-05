@@ -93,6 +93,11 @@ unless a specific building actually owns and produces the value.
 
 When adding global signals, verify that the building signal export dialog does not list them.
 
+When listing Automation inventory signals for manufactories, do not treat `Inventory.GetCapacity(...)` as the only
+source of signal availability. In Timberborn 1.1, current recipe input or output goods may be valid script signals even
+when current inventory capacity enumeration is empty. Check `Manufactory.CurrentRecipe` and the inventory's input or
+output goods before hiding recipe goods from signal/export UI.
+
 When exposing a network, district, graph, or other aggregate as a building signal, keep the signal building-scoped if
 users select a building, but read the current game-owned aggregate object at evaluation or tick time. Do not cache the
 aggregate owner as the source of truth unless the game API provides stable lifecycle events that keep the cache
