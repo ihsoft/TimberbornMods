@@ -182,6 +182,8 @@ IgorZ.Automation.Scriptable.Inventory.Signal.InputGood,"input: {0}","Name of the
 IgorZ.Automation.Scriptable.Inventory.Signal.OutputGood,"output: {0}","Name of the condition for the inventory output goods"
 IgorZ.Automation.Scriptable.Lever.Action.SetState,"set lever state: {0}","Name of the action that sets the lever state to the specified value"
 IgorZ.Automation.Scriptable.Manufactory.Action.SetRecipe,"set recipe: {0}","Name of action that sets a recipe on a manufactory"
+IgorZ.Automation.Scriptable.Manufactory.Signal.FinishedRecipe,"finished recipe count","Name of the condition that counts completed production cycles for the current manufactory recipe"
+IgorZ.Automation.Scriptable.Manufactory.Signal.Recipe,"current recipe","Name of the condition that returns the current manufactory recipe"
 IgorZ.Automation.Scriptable.Notifications.Action.ClearStatus,"clear status","Name of the action that clears the notification status on the building"
 IgorZ.Automation.Scriptable.Notifications.Action.SetAlert,"set alert: {0}","Name of the action that sets the alert status on the building"
 IgorZ.Automation.Scriptable.Notifications.Action.SetStatus,"set status: {0}","Name of the action that sets the notification status on the building"

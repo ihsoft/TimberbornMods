@@ -36,6 +36,7 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<InventoryScriptableComponent.InventoryChangeTracker>().AsTransient();
     containerDefinition.Bind<LeverScriptableComponent>().AsSingleton();
     containerDefinition.Bind<ManufactoryScriptableComponent>().AsSingleton();
+    containerDefinition.Bind<ManufactoryScriptableComponent.ManufactoryRecipeTracker>().AsTransient();
     containerDefinition.Bind<PausableScriptableComponent>().AsSingleton();
     containerDefinition.Bind<PlantableScriptableComponent>().AsSingleton();
     containerDefinition.Bind<PlantableScriptableComponent.PlantableTracker>().AsTransient();

@@ -75,7 +75,7 @@ sealed class ConstantValueExpr : IValueExpr {
         res = true;
       }
 
-      if (valueDef.Options != null) {
+      if (valueDef.Options != null && !valueDef.AllowCustomOptions) {
         var allowedValues = valueDef.Options.Select(x => x.Value).ToArray();
         if (!allowedValues.Contains(value)) {
           throw new ScriptError.ParsingError($"Unexpected value: {value}. Allowed: {string.Join(", ", allowedValues)}");

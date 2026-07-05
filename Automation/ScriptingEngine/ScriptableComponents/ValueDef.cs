@@ -99,6 +99,13 @@ sealed record ValueDef {
   /// <summary>Optional list of pre-defined values for the argument.</summary>
   public DropdownItem[] Options { get; init; }
 
+  /// <summary>Allows string constants outside of <see cref="Options"/>.</summary>
+  /// <remarks>
+  /// Use this for values where <see cref="Options"/> is only a UI hint and the runtime may legitimately see additional
+  /// dynamic values, such as recipes added or selected by other mods.
+  /// </remarks>
+  public bool AllowCustomOptions { get; init; }
+
   /// <summary>Map of replacement options for the argument.</summary>
   /// <remarks>Used to replace deprecated constants with the new values.</remarks>
   public Dictionary<string, string> CompatibilityOptions { get; init; }

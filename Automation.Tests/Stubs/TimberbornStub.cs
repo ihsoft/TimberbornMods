@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -1369,10 +1370,17 @@ namespace Timberborn.Workshops {
     public RecipeSpec[] ProductionRecipes { get; init; } = [];
     public RecipeSpec CurrentRecipe { get; set; }
     public int SetRecipeCalls { get; private set; }
+    public event EventHandler ProductionFinished;
+    public event EventHandler RecipeChanged;
 
     public void SetRecipe(RecipeSpec recipe) {
       CurrentRecipe = recipe;
       SetRecipeCalls++;
+      RecipeChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void FinishProduction() {
+      ProductionFinished?.Invoke(this, EventArgs.Empty);
     }
   }
 }
