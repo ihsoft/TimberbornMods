@@ -67,6 +67,11 @@ Then synchronize localized pages from that source structure.
 If a localized page is badly outdated, it is acceptable to update it as a larger synchronized block instead of trying to
 mirror a small English diff line by line.
 
+For release-driven Wiki updates, check page-level metadata, headers, or visible "last updated for version/date" stamps
+on every touched source and localized page. When the page content is being brought current for a specific release,
+update those stamps to the verified source release version and date. Leave them unchanged only when the edit is not a
+version refresh.
+
 ## Markdown and rendering
 
 Prefer ordinary GitHub Markdown when it is sufficient.
@@ -94,3 +99,6 @@ git diff --check
 ```
 
 Line-ending warnings may be reported separately when the whitespace check itself is clean.
+
+Before committing release-driven Wiki changes, also scan the top metadata/header block of each touched source and
+localized page for stale version or date claims.
