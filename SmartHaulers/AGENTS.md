@@ -35,6 +35,8 @@ when using or changing them.
   order-start distance.
 - Vanilla inventory lookup is indexed by district, good, and unreserved stock/capacity, then scans matching inventory
   candidates for minimum road-path distance.
+- Ordinary buildings should have one or two runtime inventories: construction-site inventory plus optional working
+  goods inventory. Do not use single `GetComponent<Inventory>()` when SmartHaulers needs the working inventory.
 - Not every transport-like activity is an `IHaulBehaviorProvider` request.
 - `IJobBehavior` is broader than transport.
 - `Accessible.FindRoadPath(Vector3)` is unsafe for accessibles that may have multiple access points.

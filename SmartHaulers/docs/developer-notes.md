@@ -154,11 +154,20 @@ shared input inventory. SmartHaulers should treat per-good demand and urgency as
 only overall input inventory fill percentage. Example: a recipe needs logs and water; logs are full, water is empty.
 The shared input inventory may look partly full, but water delivery should still be urgent.
 
-Current prototype working assumption: for ordinary buildings, treat there as being at most one active meaningful
-inventory at a time. A construction inventory is active while a building is under construction; after construction it is
-deactivated and no longer relevant. If a finished building has input or output storage, that production inventory is the
-active one. For current planning work, assume a building has one active inventory or none, not multiple simultaneous
-input inventories. Revisit this if decompiled sources or real-game evidence show an important exception.
+Current SmartHaulers working invariant: ordinary buildings should have one or two runtime inventories. The mandatory
+one is the construction-site inventory. If the building has goods, storage, input, output, or production behavior, the
+second inventory is the active working goods inventory after construction.
+
+Code that wants the working goods inventory must filter out
+`ConstructionSiteInventoryInitializer.InventoryComponentName`. Do not call a single `GetComponent<Inventory>()` on a
+building when SmartHaulers needs the goods inventory; buildings such as a gristmill can have both construction and
+working inventories at runtime.
+
+If runtime diagnostics sees more than two inventories on an ordinary building, treat it as a suspicious exceptional
+case and log it for investigation rather than silently generalizing the model.
+
+Treat `DistrictCrossing` separately. Its crossing inventory and linked-district/incoming-stock behavior are a special
+district-crossing model, not evidence that ordinary buildings should be modeled as generic three-inventory buildings.
 
 Current take-away per-good planning uses per-good source fill ratio as weight/readiness input when possible:
 
