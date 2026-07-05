@@ -210,6 +210,8 @@ static class Program {
           InventoryScriptableComponentTests.EncodesUnsafeGoodIds),
       ("InventoryScriptableComponent exposes allowed goods signals for yielder inventory",
           InventoryScriptableComponentTests.ExposesAllowedGoodsSignalsForYielderInventory),
+      ("InventoryScriptableComponent exposes current recipe signals when inventory limits are missing",
+          InventoryScriptableComponentTests.ExposesCurrentRecipeSignalsWhenInventoryLimitsAreMissing),
       ("InventoryScriptableComponent hides signals for missing inventory",
           InventoryScriptableComponentTests.HidesSignalsForMissingInventory),
       ("InventoryScriptableComponent reads inventory amounts",

@@ -12,6 +12,7 @@ using Timberborn.Goods;
 using Timberborn.InventorySystem;
 using Timberborn.Localization;
 using Timberborn.StatusSystem;
+using Timberborn.Workshops;
 
 namespace Automation.Tests;
 
@@ -53,6 +54,33 @@ static class InventoryScriptableComponentTests {
 
     Assert.Equal("Inventory.InputGood.Log", signalNames[0]);
     Assert.Equal("Inventory.OutputGood.Plank", signalNames[1]);
+  }
+
+  public static void ExposesCurrentRecipeSignalsWhenInventoryLimitsAreMissing() {
+    var component = CreateComponent();
+    var inventory = CreateInventory(
+        inputGoods: ["Plank", "PineResin"], outputGoods: ["TreatedPlank"], capacity: 0);
+    var behavior = CreateBehavior(inventory);
+    behavior.SetComponent(new Manufactory {
+        CurrentRecipe = new RecipeSpec {
+            Ingredients = [
+                new GoodAmountSpec { Id = "Plank", Amount = 1 },
+                new GoodAmountSpec { Id = "PineResin", Amount = 1 },
+            ],
+            Products = [
+                new GoodAmountSpec { Id = "TreatedPlank", Amount = 1 },
+            ],
+            CyclesCapacity = 10,
+        },
+    });
+
+    var signalNames = component.GetSignalNamesForBuilding(behavior);
+    var outputDef = component.GetSignalDefinition("Inventory.OutputGood.TreatedPlank", behavior);
+
+    Assert.Equal("Inventory.InputGood.Plank", signalNames[0]);
+    Assert.Equal("Inventory.InputGood.PineResin", signalNames[1]);
+    Assert.Equal("Inventory.OutputGood.TreatedPlank", signalNames[2]);
+    Assert.Equal((0, 10), outputDef.Result.DisplayNumericFormatRange);
   }
 
   public static void HidesSignalsForMissingInventory() {
@@ -188,15 +216,15 @@ static class InventoryScriptableComponentTests {
   }
 
   static Inventory CreateInventory(
-      string[] inputGoods = null, string[] outputGoods = null, bool isYielderInventory = false) {
+      string[] inputGoods = null, string[] outputGoods = null, bool isYielderInventory = false, int? capacity = null) {
     inputGoods ??= ["Log"];
     outputGoods ??= ["Plank"];
     var inventory = new Inventory(isYielderInventory);
     foreach (var goodId in inputGoods) {
-      inventory.AddInputGood(goodId, goodId == "Log" ? 30 : 10);
+      inventory.AddInputGood(goodId, capacity ?? (goodId == "Log" ? 30 : 10));
     }
     foreach (var goodId in outputGoods) {
-      inventory.AddOutputGood(goodId, goodId == "Plank" ? 20 : 10);
+      inventory.AddOutputGood(goodId, capacity ?? (goodId == "Plank" ? 20 : 10));
     }
     inventory.SetAmount("Log", 12);
     inventory.SetAmount("Plank", 4);

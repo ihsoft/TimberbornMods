@@ -1,3 +1,6 @@
+# v4.6.5 (TBD)
+* [Fix] Manufactory input and output goods could be missing from the building signal export list.
+
 # v4.6.4 (June 29th, 2026)
 * [Fix] Game could crash when loading old saves with active Stream Gauge signal rules.
 

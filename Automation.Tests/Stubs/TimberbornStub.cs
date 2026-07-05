@@ -349,6 +349,15 @@ namespace Timberborn.Goods {
     }
   }
 
+  public readonly struct GoodAmountSpec {
+    public string Id { get; init; }
+    public int Amount { get; init; }
+
+    public GoodAmount ToGoodAmount() {
+      return new GoodAmount(Id, Amount);
+    }
+  }
+
   public sealed class GoodSpec {
     public string Id { get; init; }
     public LocalizedText PluralDisplayName { get; init; }
@@ -831,7 +840,9 @@ namespace Timberborn.InventorySystem {
 
     public void GetCapacity(List<GoodAmount> capacity) {
       foreach (var good in _allowedGoods) {
-        capacity.Add(new GoodAmount(good.StorableGood.GoodId, good.Amount));
+        if (good.Amount > 0) {
+          capacity.Add(new GoodAmount(good.StorableGood.GoodId, good.Amount));
+        }
       }
     }
   }
@@ -1313,9 +1324,21 @@ namespace Timberborn.WorkSystem {
 }
 
 namespace Timberborn.Workshops {
+  using Timberborn.Goods;
+
   public sealed class RecipeSpec {
     public string Id { get; init; }
     public string DisplayLocKey { get; init; }
+    public GoodAmountSpec[] Ingredients { get; init; } = [];
+    public GoodAmountSpec[] Products { get; init; } = [];
+    public string Fuel { get; init; }
+    public int FuelCapacity { get; init; }
+    public int CyclesCapacity { get; init; } = 1;
+    public bool ConsumesFuel => FuelCapacity > 0;
+
+    public int GetCapacity(GoodAmount goodAmount) {
+      return goodAmount.Amount * CyclesCapacity;
+    }
   }
 
   public sealed class Manufactory : Timberborn.BaseComponentSystem.BaseComponent {

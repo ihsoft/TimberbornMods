@@ -17,6 +17,7 @@ using Timberborn.Goods;
 using Timberborn.InventorySystem;
 using Timberborn.Localization;
 using Timberborn.StatusSystem;
+using Timberborn.Workshops;
 using Timberborn.Yielding;
 using UnityDev.Utils.LogUtilsLite;
 
@@ -53,9 +54,9 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
       return inventory.AllowedGoods.Select(x => MakeSignalName(x.StorableGood.GoodId, inventory))
           .ToArray();
     }
-    List<GoodAmount> capacities = [];
-    inventory.GetCapacity(capacities);
-    return capacities.Select(x => MakeSignalName(x.GoodId, inventory)).ToArray();
+    return GetSignalCapacities(behavior, inventory)
+        .Select(x => MakeSignalName(x.GoodId, inventory))
+        .ToArray();
   }
 
   /// <inheritdoc/>
@@ -227,7 +228,48 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
     var forceAllowedGoods = inventory._goodDisallower is InRangeYielderGoodAllower;
     return forceAllowedGoods
         ? (isInput, goodId, inventory.AllowedGoods.First(x => x.StorableGood.GoodId == goodId).Amount)
-        : (isInput, goodId, inventory.LimitedAmount(goodId));
+        : (isInput, goodId, GetSignalCapacity(behavior, inventory, goodId));
+  }
+
+  static List<GoodAmount> GetSignalCapacities(AutomationBehavior behavior, Inventory inventory) {
+    List<GoodAmount> capacities = [];
+    inventory.GetCapacity(capacities);
+    if (capacities.Count > 0) {
+      return capacities;
+    }
+    var currentRecipe = behavior.GetComponent<Manufactory>()?.CurrentRecipe;
+    if (currentRecipe == null) {
+      return capacities;
+    }
+    foreach (var ingredient in currentRecipe.Ingredients) {
+      AddRecipeCapacity(capacities, inventory, currentRecipe, ingredient.ToGoodAmount());
+    }
+    foreach (var product in currentRecipe.Products) {
+      AddRecipeCapacity(capacities, inventory, currentRecipe, product.ToGoodAmount());
+    }
+    if (currentRecipe.ConsumesFuel) {
+      AddRecipeCapacity(capacities, inventory, currentRecipe.Fuel, currentRecipe.FuelCapacity);
+    }
+    return capacities;
+  }
+
+  static void AddRecipeCapacity(
+      List<GoodAmount> capacities, Inventory inventory, RecipeSpec currentRecipe, GoodAmount goodAmount) {
+    AddRecipeCapacity(capacities, inventory, goodAmount.GoodId, currentRecipe.GetCapacity(goodAmount));
+  }
+
+  static void AddRecipeCapacity(List<GoodAmount> capacities, Inventory inventory, string goodId, int capacity) {
+    if (inventory.InputGoods.Contains(goodId) || inventory.OutputGoods.Contains(goodId)) {
+      capacities.Add(new GoodAmount(goodId, capacity));
+    }
+  }
+
+  static int GetSignalCapacity(AutomationBehavior behavior, Inventory inventory, string goodId) {
+    var capacity = inventory.LimitedAmount(goodId);
+    if (capacity > 0) {
+      return capacity;
+    }
+    return GetSignalCapacities(behavior, inventory).FirstOrDefault(x => x.GoodId == goodId).Amount;
   }
 
   static string ResolveGoodId(string signalNameSegment, Func<string, bool> hasGood) {
