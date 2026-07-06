@@ -271,7 +271,7 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
     RestoreDistrictEndpoint(goodAmount, ref source, ref target);
     var routeDistance = TryGetRouteDistance(source, target, out var distance) ? distance : float.NaN;
     var targetInventory = phase == OrderPhase.PickingUp ? source : target;
-    var remainingDistance = TryGetRemainingDistance(phase, targetInventory, agentSnapshot.WorldPosition, out var remaining)
+    var remainingDistance = TryGetRemainingDistance(worker, phase, targetInventory, agentSnapshot.WorldPosition, out var remaining)
         ? remaining
         : float.NaN;
     var remainingTaskHours = EstimateRemainingTaskHours(phase, routeDistance, remainingDistance, agentSnapshot.Speed);
@@ -294,7 +294,8 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
     }
     var source = goodReserver.StockReservation.Inventory;
     var goodAmount = goodReserver.StockReservation.GoodAmount;
-    var remainingDistance = TryGetRemainingDistance(OrderPhase.PickingUp, source, agentSnapshot.WorldPosition, out var remaining)
+    var remainingDistance = TryGetRemainingDistance(
+        worker, OrderPhase.PickingUp, source, agentSnapshot.WorldPosition, out var remaining)
         ? remaining
         : float.NaN;
     var progress = TrackProgress(worker, OrderPhase.PickingUp, source, goodAmount, remainingDistance);
@@ -833,9 +834,12 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
     }
   }
 
-  bool TryGetRemainingDistance(OrderPhase phase, Inventory target, Vector3 position, out float distance) {
+  bool TryGetRemainingDistance(Worker worker, OrderPhase phase, Inventory target, Vector3 position, out float distance) {
     var start = DispatchPerformanceStats.Timestamp();
     try {
+      if (TransportWalkingDistance.TryGetRemainingDistance(worker, out distance)) {
+        return true;
+      }
       var accessible = target ? target.GetEnabledComponent<Accessible>() : null;
       if (accessible && accessible.FindPathUnlimitedRange(position, [], out distance)) {
         return true;
