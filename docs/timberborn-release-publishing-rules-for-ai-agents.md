@@ -270,6 +270,14 @@ If a mod-local `AGENTS.md` documents a temporary package-layout exception where 
 covers multiple Timberborn update tags, follow that local rule and stop if the generic tag plan would remove a required
 compatibility tag. Keep such exceptions narrow and revisit them when the mod's compatibility model changes.
 
+When a documented exception requires compatibility/update tags beyond the final package folders, express those tags in
+the mod's `release.json` under `PlatformTags.AdditionalCompatibilityTags`. Values must be update tags such as
+`Update 1.1`. The publish and tag-sync tools merge these explicit compatibility tags with folder-derived update tags
+and still preserve non-version local tags from `workshop_data.json`.
+
+Use `PlatformTags.AdditionalCompatibilityTags` only for compatibility/update tags that are intentionally not represented
+by package folders. Do not use it for arbitrary category tags.
+
 For Mod.IO, update tags through the Mod.IO tags API and verify the live tags after the update. Map local Steam-style tag
 names to Mod.IO names where needed, such as `Quality of life` to `QoL` and `New content` to `New in-game content`.
 

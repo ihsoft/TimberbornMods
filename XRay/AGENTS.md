@@ -19,8 +19,17 @@ Preserve old ZIP archives as historical artifacts unless the user explicitly ask
 Temporary current-model exception: while X-Ray uses the single `version-1.0` package folder with release metadata
 declaring compatibility through Timberborn 1.1, keep both `Update 1.0` and `Update 1.1` platform tags.
 
+Represent this exception in `XRay/release.json` with:
+
+```json
+"PlatformTags": {
+  "AdditionalCompatibilityTags": ["Update 1.1"]
+}
+```
+
 Do not remove `Update 1.1` only because the final package has no `version-1.1` folder. If the generic platform-tag
-tooling plans to remove `Update 1.1`, stop before publishing and ask for an override or tooling fix.
+tooling plans to remove `Update 1.1`, stop before publishing and check that the release metadata still carries this
+additional compatibility tag.
 
 Re-evaluate this exception when Timberborn adds a new major/minor game-version lane or when X-Ray's package or
 compatibility model changes.
