@@ -1,20 +1,29 @@
 {
   "ManifestPath": "ModsUnityProject/Assets/Mods/XRay/manifest.json",
   "ChangesPath": "XRay/CHANGELOG.md",
-  "ReleaseVersion": "1.1.0",
+  "ReleaseVersion": "1.1.1",
   "ScriptFileBase": "XRay",
   "Package": {
     "Mode": "ExistingZip",
-    "Path": "_MODS!/XRay_v1.1.0.zip",
+    "Path": "_MODS!/XRay_v1.1.1.zip",
     "MaxAgeDays": 14
   },
   "ManifestVersions": {
-    "version-1.0": "1.1.0"
+    "version-1.0": "1.1.1"
   },
   "GameVersionCompatibility": {
     "version-1.0": {
       "MinimumGameVersion": "1.0.12.0",
       "MaximumGameVersion": "1.1.99.99"
     }
+  },
+  "PlatformTags": {
+    "AdditionalCompatibilityTags": [
+      "Update 1.1"
+    ]
+  },
+  "Steam": {
+    "AllowSingleGameVersion": true,
+    "CompatibilityReason": "X-Ray uses a single version-1.0 package folder for Timberborn 1.0 and 1.1 compatibility."
   }
 }
