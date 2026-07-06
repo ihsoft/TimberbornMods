@@ -296,11 +296,14 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
     lines.Add($"avg D,  {FormatAverageDecisionBreakdown(total, sampleCount)}");
     lines.Add($"last counts, {FormatCounts(last)}");
     lines.Add($"avg counts,  {FormatAverageCounts(total, sampleCount)}");
+    lines.Add($"last cache,  {FormatRouteCache(last)}");
+    lines.Add($"avg cache,   {FormatAverageRouteCache(total, sampleCount)}");
     lines.Add("T=A+O+Q+B+R+D+S+X. X is measured total minus named top-level phases.");
     lines.Add("A agents, O active orders, Q queued orders, B construction, R readiness, D decisions, S sort.");
     lines.Add("O=AR+RP+RD+OX, Q=PR+QX, D=DR+DP+DX.");
     lines.Add("AR active route, RP/RD remaining pickup/delivery, PR planner route, DR decision route, DP decision pickup.");
-    lines.Add("AG agents, AO active orders, QO queued orders, BO construction, DO decision orders, DC candidates");
+    lines.Add("AG agents, AO active orders, QO queued orders, BO construction, DO decision orders, DC candidates.");
+    lines.Add("RC route cache: h hits, m misses, c clears.");
   }
 
   void UpdateContent() {
@@ -382,6 +385,10 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
         + $"BO={sample.ConstructionOrderCount}, DO={sample.DecisionOrderCount}, DC={sample.DecisionCandidateCount}";
   }
 
+  static string FormatRouteCache(DispatchPerformanceSample sample) {
+    return $"RC=h{sample.RouteCacheHits}/m{sample.RouteCacheMisses}/c{sample.RouteCacheClears}";
+  }
+
   static string FormatAverageTotal(DispatchPerformanceSample total, int sampleCount) {
     return $"T={Milliseconds(total.TotalTicks) / sampleCount:0.###}ms, "
         + $"check={Milliseconds(TopDownDeltaTicks(total)) / sampleCount:0.###}ms";
@@ -429,6 +436,12 @@ sealed class HaulerDispatchDebugPanel : IPostLoadableSingleton, IUpdatableSingle
         + $"BO={(float)total.ConstructionOrderCount / sampleCount:0.#}, "
         + $"DO={(float)total.DecisionOrderCount / sampleCount:0.#}, "
         + $"DC={(float)total.DecisionCandidateCount / sampleCount:0.#}";
+  }
+
+  static string FormatAverageRouteCache(DispatchPerformanceSample total, int sampleCount) {
+    return $"RC=h{(float)total.RouteCacheHits / sampleCount:0.#}/m"
+        + $"{(float)total.RouteCacheMisses / sampleCount:0.#}/c"
+        + $"{(float)total.RouteCacheClears / sampleCount:0.#}";
   }
 
   static long ActiveOrderOtherTicks(DispatchPerformanceSample sample) {

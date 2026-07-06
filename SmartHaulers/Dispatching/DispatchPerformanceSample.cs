@@ -37,6 +37,9 @@ readonly struct DispatchPerformanceSample {
   public int RemainingPathCalls { get; }
   public int RemainingPickupPathCalls { get; }
   public int RemainingDeliveryPathCalls { get; }
+  public int RouteCacheHits { get; }
+  public int RouteCacheMisses { get; }
+  public int RouteCacheClears { get; }
 
   public DispatchPerformanceSample(
       long totalTicks,
@@ -70,7 +73,10 @@ readonly struct DispatchPerformanceSample {
       int decisionPickupPathCalls,
       int remainingPathCalls,
       int remainingPickupPathCalls,
-      int remainingDeliveryPathCalls) {
+      int remainingDeliveryPathCalls,
+      int routeCacheHits,
+      int routeCacheMisses,
+      int routeCacheClears) {
     TotalTicks = totalTicks;
     AgentTicks = agentTicks;
     ActiveOrderTicks = activeOrderTicks;
@@ -103,6 +109,9 @@ readonly struct DispatchPerformanceSample {
     RemainingPathCalls = remainingPathCalls;
     RemainingPickupPathCalls = remainingPickupPathCalls;
     RemainingDeliveryPathCalls = remainingDeliveryPathCalls;
+    RouteCacheHits = routeCacheHits;
+    RouteCacheMisses = routeCacheMisses;
+    RouteCacheClears = routeCacheClears;
   }
 
   public DispatchPerformanceSample Add(DispatchPerformanceSample other) {
@@ -138,6 +147,9 @@ readonly struct DispatchPerformanceSample {
         DecisionPickupPathCalls + other.DecisionPickupPathCalls,
         RemainingPathCalls + other.RemainingPathCalls,
         RemainingPickupPathCalls + other.RemainingPickupPathCalls,
-        RemainingDeliveryPathCalls + other.RemainingDeliveryPathCalls);
+        RemainingDeliveryPathCalls + other.RemainingDeliveryPathCalls,
+        RouteCacheHits + other.RouteCacheHits,
+        RouteCacheMisses + other.RouteCacheMisses,
+        RouteCacheClears + other.RouteCacheClears);
   }
 }

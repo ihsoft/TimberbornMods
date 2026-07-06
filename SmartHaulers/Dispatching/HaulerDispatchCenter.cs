@@ -31,7 +31,7 @@ using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.SmartHaulers.Dispatching;
 
-sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletableEntity {
+sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletableEntity, ITransportRouteDistanceProvider {
   static readonly HashSet<string> SmartCriticalNeedIds = ["Hunger", "Thirst", "Biofuel", "Power"];
   static readonly HashSet<string> LoggedUnknownWorkplaces = [];
   static readonly HashSet<string> LoggedIgnoredActiveTransports = [];
@@ -49,6 +49,7 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
   readonly List<WeightedBehavior> _weightedBehaviors = [];
   readonly Dictionary<Worker, TransportAgentProgress> _progressByAgent = [];
   readonly Dictionary<Worker, TransportOrderMemory> _orderMemoryByAgent = [];
+  readonly Dictionary<TransportRouteDistanceCacheKey, TransportRouteDistanceCacheEntry> _routeDistanceCache = [];
 
   DistrictCenter _districtCenter;
   System.Guid _districtCenterId;
@@ -78,6 +79,30 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
 
   public void DeleteEntity() {
     _dispatchCenterRegistry.Unregister(this);
+  }
+
+  public void ClearRouteCache() {
+    if (_routeDistanceCache.Count == 0) {
+      return;
+    }
+    _routeDistanceCache.Clear();
+    _performanceStats.CountRouteCacheClear();
+  }
+
+  public bool TryFindRoute(Accessible start, Accessible end, out float distance) {
+    var key = RouteCacheKey(start, end);
+    if (key.HasValue && _routeDistanceCache.TryGetValue(key.Value, out var cachedEntry)) {
+      _performanceStats.CountRouteCacheHit();
+      distance = cachedEntry.Distance;
+      return cachedEntry.Found;
+    }
+    _performanceStats.CountRouteCacheMiss();
+    var found = TransportPathDistance.TryFindRoadPath(start, end, out distance);
+    if (key.HasValue) {
+      // Cache misses too. Repeated impossible routes are just as expensive as repeated valid routes.
+      _routeDistanceCache[key.Value] = new TransportRouteDistanceCacheEntry(found, distance);
+    }
+    return found;
   }
 
   public void RefreshSnapshot() {
@@ -136,7 +161,7 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
   void AddDecisions() {
     for (var i = 0; i < _orders.Count; i++) {
       _performanceStats.CountDecisionOrder();
-      var decision = _decisionEvaluator.Evaluate(_orders[i], _agents);
+      var decision = _decisionEvaluator.Evaluate(_orders[i], _agents, this);
       if (decision.HasWinner) {
         _orders[i] = _orders[i].WithDecision(decision);
       }
@@ -521,7 +546,7 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
     return null;
   }
 
-  static Inventory ClosestInventoryWithCapacity(
+  Inventory ClosestInventoryWithCapacity(
       Inventory source, GoodAmount goodAmount, DistrictInventoryRegistry districtInventoryRegistry) {
     var sourceAccessible = source.GetEnabledComponent<Accessible>();
     if (!sourceAccessible) {
@@ -534,7 +559,7 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
       if (inventory != source
           && targetAccessible
           && InventoryIsTaking(inventory, goodAmount)
-          && TransportPathDistance.TryFindRoadPath(sourceAccessible, targetAccessible, out var distance)
+          && TryFindRoute(sourceAccessible, targetAccessible, out var distance)
           && distance < closestDistance) {
         closestInventory = inventory;
         closestDistance = distance;
@@ -543,7 +568,7 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
     return closestInventory;
   }
 
-  static Inventory ClosestInventoryWithStock(
+  Inventory ClosestInventoryWithStock(
       Inventory target, string goodId, DistrictInventoryRegistry districtInventoryRegistry) {
     var targetAccessible = target.GetEnabledComponent<Accessible>();
     if (!targetAccessible) {
@@ -555,7 +580,7 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
       var sourceAccessible = inventory.GetEnabledComponent<Accessible>();
       if (inventory != target
           && sourceAccessible
-          && TransportPathDistance.TryFindRoadPath(targetAccessible, sourceAccessible, out var distance)
+          && TryFindRoute(targetAccessible, sourceAccessible, out var distance)
           && distance < closestDistance) {
         closestInventory = inventory;
         closestDistance = distance;
@@ -585,7 +610,8 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
           continue;
         }
         var orderCount = _orders.Count;
-        PossibleTransportOrderPlanner.AddPlans(_districtCenter, haulCandidate, weightedBehavior, _orders, _performanceStats);
+        PossibleTransportOrderPlanner.AddPlans(
+            _districtCenter, haulCandidate, weightedBehavior, _orders, _performanceStats, this);
         for (var i = orderCount; i < _orders.Count; i++) {
           _performanceStats.CountQueuedOrder();
         }
@@ -666,6 +692,15 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
 
   static Guid ComponentId(BaseComponent component) {
     return component ? component.GetComponent<EntityComponent>()?.EntityId ?? Guid.Empty : Guid.Empty;
+  }
+
+  static TransportRouteDistanceCacheKey? RouteCacheKey(Accessible start, Accessible end) {
+    var startId = ComponentId(start);
+    var endId = ComponentId(end);
+    if (startId == Guid.Empty || endId == Guid.Empty) {
+      return null;
+    }
+    return new TransportRouteDistanceCacheKey(startId, endId);
   }
 
   static bool IsUnassignedOrder(OrderPhase phase) {
@@ -788,7 +823,7 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
       var targetAccessible = target ? target.GetEnabledComponent<Accessible>() : null;
       if (sourceAccessible
           && targetAccessible
-          && TransportPathDistance.TryFindRoadPath(sourceAccessible, targetAccessible, out distance)) {
+          && TryFindRoute(sourceAccessible, targetAccessible, out distance)) {
         return true;
       }
       distance = 0f;

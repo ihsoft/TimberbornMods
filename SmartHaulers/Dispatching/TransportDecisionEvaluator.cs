@@ -5,6 +5,8 @@
 using System;
 using System.Collections.Generic;
 using Timberborn.Goods;
+using Timberborn.BaseComponentSystem;
+using Timberborn.Navigation;
 
 namespace IgorZ.SmartHaulers.Dispatching;
 
@@ -13,11 +15,13 @@ sealed class TransportDecisionEvaluator(
     DispatchPerformanceStats performanceStats,
     IGoodService goodService) {
   public TransportDecision Evaluate(
-      TransportOrderSnapshot order, IReadOnlyList<TransportAgentSnapshot> agents) {
+      TransportOrderSnapshot order,
+      IReadOnlyList<TransportAgentSnapshot> agents,
+      ITransportRouteDistanceProvider routeDistanceProvider) {
     if (order.Phase != OrderPhase.Dispatchable || !order.Route.HasKnownEndpoints || !order.Cargo.HasGoods) {
       return default;
     }
-    if (!distanceEstimator.TryGetRouteDistance(order.Source, order.Target, out var routeDistance)) {
+    if (!TryGetRouteDistance(order.Source, order.Target, routeDistanceProvider, out var routeDistance)) {
       return default;
     }
     TransportCandidateScore winner = default;
@@ -35,6 +39,24 @@ sealed class TransportDecisionEvaluator(
       }
     }
     return winner.Agent.Worker ? new TransportDecision(winner, runnerUp) : default;
+  }
+
+  bool TryGetRouteDistance(
+      BaseComponent source, BaseComponent target, ITransportRouteDistanceProvider routeDistanceProvider,
+      out float distance) {
+    var start = DispatchPerformanceStats.Timestamp();
+    try {
+      var sourceAccessible = source ? source.GetEnabledComponent<Accessible>() : null;
+      var targetAccessible = target ? target.GetEnabledComponent<Accessible>() : null;
+      if (sourceAccessible && targetAccessible && routeDistanceProvider.TryFindRoute(
+          sourceAccessible, targetAccessible, out distance)) {
+        return true;
+      }
+      distance = float.NaN;
+      return false;
+    } finally {
+      performanceStats.EndDecisionRoutePath(start);
+    }
   }
 
   bool TryScore(

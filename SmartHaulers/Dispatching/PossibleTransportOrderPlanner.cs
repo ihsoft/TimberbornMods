@@ -68,32 +68,37 @@ static class PossibleTransportOrderPlanner {
 
   public static void AddPlans(
       DistrictCenter districtCenter, HaulCandidate haulCandidate, WeightedBehavior weightedBehavior,
-      List<TransportOrderSnapshot> orders, DispatchPerformanceStats performanceStats) {
+      List<TransportOrderSnapshot> orders, DispatchPerformanceStats performanceStats,
+      ITransportRouteDistanceProvider routeDistanceProvider) {
     EnsureSupported(weightedBehavior.WorkplaceBehavior, haulCandidate);
     var behaviorName = FormatBehaviorName(weightedBehavior.WorkplaceBehavior);
     var requesterId = haulCandidate.GetComponent<EntityComponent>()?.EntityId ?? Guid.Empty;
     if (behaviorName == FillInputBehaviorName) {
-      AddFillInputPlans(districtCenter, haulCandidate, requesterId, weightedBehavior, orders, performanceStats);
+      AddFillInputPlans(
+          districtCenter, haulCandidate, requesterId, weightedBehavior, orders, performanceStats, routeDistanceProvider);
       return;
     }
     if (behaviorName == EmptyInventoriesBehaviorName) {
-      AddEmptyInventoriesPlans(districtCenter, haulCandidate, requesterId, weightedBehavior, orders, performanceStats);
+      AddEmptyInventoriesPlans(
+          districtCenter, haulCandidate, requesterId, weightedBehavior, orders, performanceStats, routeDistanceProvider);
       return;
     }
     if (behaviorName == EmptyOutputBehaviorName) {
-      AddEmptyOutputPlans(districtCenter, haulCandidate, requesterId, weightedBehavior, orders, performanceStats);
+      AddEmptyOutputPlans(
+          districtCenter, haulCandidate, requesterId, weightedBehavior, orders, performanceStats, routeDistanceProvider);
       return;
     }
     if (behaviorName == RemoveUnwantedStockBehaviorName) {
-      AddRemoveUnwantedStockPlans(districtCenter, haulCandidate, requesterId, weightedBehavior, orders, performanceStats);
+      AddRemoveUnwantedStockPlans(
+          districtCenter, haulCandidate, requesterId, weightedBehavior, orders, performanceStats, routeDistanceProvider);
       return;
     }
     orders.Add(behaviorName switch {
         BringNutrientBehaviorName => PlanBringNutrient(districtCenter, haulCandidate, requesterId, weightedBehavior),
         ObtainGoodBehaviorName => PlanObtainGood(
-            districtCenter, haulCandidate, requesterId, weightedBehavior, performanceStats),
+            districtCenter, haulCandidate, requesterId, weightedBehavior, performanceStats, routeDistanceProvider),
         SupplyGoodBehaviorName => PlanSupplyGood(
-            districtCenter, haulCandidate, requesterId, weightedBehavior, performanceStats),
+            districtCenter, haulCandidate, requesterId, weightedBehavior, performanceStats, routeDistanceProvider),
         _ => throw new InvalidOperationException($"Supported behavior {behaviorName} was not handled."),
     });
   }
@@ -129,7 +134,8 @@ static class PossibleTransportOrderPlanner {
 
   static void AddFillInputPlans(
       DistrictCenter districtCenter, HaulCandidate haulCandidate, Guid requesterId, WeightedBehavior weightedBehavior,
-      List<TransportOrderSnapshot> orders, DispatchPerformanceStats performanceStats) {
+      List<TransportOrderSnapshot> orders, DispatchPerformanceStats performanceStats,
+      ITransportRouteDistanceProvider routeDistanceProvider) {
     var inventories = haulCandidate.GetComponent<Inventories>();
     var emptiable = haulCandidate.GetComponent<Emptiable>();
     if (!inventories || emptiable && emptiable.IsMarkedForEmptying) {
@@ -142,7 +148,7 @@ static class PossibleTransportOrderPlanner {
         var weight = InputGoodWeight(target, inputGood, weightedBehavior.Weight);
         var addedGood = false;
         foreach (var order in PlanBringingGoodCandidates(
-            districtCenter, target, inputGood, IsAvailableSource, performanceStats)) {
+            districtCenter, target, inputGood, IsAvailableSource, performanceStats, routeDistanceProvider)) {
           orders.Add(WithRequest(
               haulCandidate, requesterId, weightedBehavior, weight, order.source, order.target, order.goodAmount));
           added = true;
@@ -163,13 +169,14 @@ static class PossibleTransportOrderPlanner {
 
   static TransportOrderSnapshot PlanObtainGood(
       DistrictCenter districtCenter, HaulCandidate haulCandidate, Guid requesterId, WeightedBehavior weightedBehavior,
-      DispatchPerformanceStats performanceStats) {
+      DispatchPerformanceStats performanceStats, ITransportRouteDistanceProvider routeDistanceProvider) {
     var target = haulCandidate.GetComponent<Stockpile>()?.Inventory;
     var singleGoodAllower = haulCandidate.GetComponent<SingleGoodAllower>();
     if (!target || !singleGoodAllower || !singleGoodAllower.HasAllowedGood) {
       return EmptyOrder(haulCandidate, requesterId, weightedBehavior, source: null, target);
     }
-    if (TryPlanRankedObtainGood(districtCenter, target, singleGoodAllower.AllowedGood, performanceStats, out var order)) {
+    if (TryPlanRankedObtainGood(
+        districtCenter, target, singleGoodAllower.AllowedGood, performanceStats, routeDistanceProvider, out var order)) {
       return WithRequest(haulCandidate, requesterId, weightedBehavior, order.source, order.target, order.goodAmount);
     }
     if (TryCreateCoveredOrder(
@@ -181,7 +188,8 @@ static class PossibleTransportOrderPlanner {
 
   static void AddEmptyInventoriesPlans(
       DistrictCenter districtCenter, HaulCandidate haulCandidate, Guid requesterId, WeightedBehavior weightedBehavior,
-      List<TransportOrderSnapshot> orders, DispatchPerformanceStats performanceStats) {
+      List<TransportOrderSnapshot> orders, DispatchPerformanceStats performanceStats,
+      ITransportRouteDistanceProvider routeDistanceProvider) {
     var inventories = haulCandidate.GetComponent<Inventories>();
     var emptiable = haulCandidate.GetComponent<Emptiable>();
     if (!inventories || !emptiable || !emptiable.IsMarkedForEmptying) {
@@ -189,12 +197,13 @@ static class PossibleTransportOrderPlanner {
       return;
     }
     AddTakeAwayPlans(districtCenter, haulCandidate, requesterId, weightedBehavior, inventories, GetUnreservedGoods,
-        orders, performanceStats);
+        orders, performanceStats, routeDistanceProvider);
   }
 
   static void AddEmptyOutputPlans(
       DistrictCenter districtCenter, HaulCandidate haulCandidate, Guid requesterId, WeightedBehavior weightedBehavior,
-      List<TransportOrderSnapshot> orders, DispatchPerformanceStats performanceStats) {
+      List<TransportOrderSnapshot> orders, DispatchPerformanceStats performanceStats,
+      ITransportRouteDistanceProvider routeDistanceProvider) {
     var inventories = haulCandidate.GetComponent<Inventories>();
     if (!inventories) {
       orders.Add(EmptyOrder(haulCandidate, requesterId, weightedBehavior, source: null, target: null));
@@ -202,12 +211,13 @@ static class PossibleTransportOrderPlanner {
     }
     AddTakeAwayPlans(
         districtCenter, haulCandidate, requesterId, weightedBehavior, inventories, GetUnreservedOutputGoods, orders,
-        performanceStats);
+        performanceStats, routeDistanceProvider);
   }
 
   static void AddRemoveUnwantedStockPlans(
       DistrictCenter districtCenter, HaulCandidate haulCandidate, Guid requesterId, WeightedBehavior weightedBehavior,
-      List<TransportOrderSnapshot> orders, DispatchPerformanceStats performanceStats) {
+      List<TransportOrderSnapshot> orders, DispatchPerformanceStats performanceStats,
+      ITransportRouteDistanceProvider routeDistanceProvider) {
     var inventories = haulCandidate.GetComponent<Inventories>();
     if (!inventories) {
       orders.Add(EmptyOrder(haulCandidate, requesterId, weightedBehavior, source: null, target: null));
@@ -215,12 +225,12 @@ static class PossibleTransportOrderPlanner {
     }
     AddTakeAwayPlans(
         districtCenter, haulCandidate, requesterId, weightedBehavior, inventories, GetUnreservedUnwantedGoods,
-        orders, performanceStats);
+        orders, performanceStats, routeDistanceProvider);
   }
 
   static TransportOrderSnapshot PlanSupplyGood(
       DistrictCenter districtCenter, HaulCandidate haulCandidate, Guid requesterId, WeightedBehavior weightedBehavior,
-      DispatchPerformanceStats performanceStats) {
+      DispatchPerformanceStats performanceStats, ITransportRouteDistanceProvider routeDistanceProvider) {
     var source = haulCandidate.GetComponent<Stockpile>()?.Inventory;
     var singleGoodAllower = haulCandidate.GetComponent<SingleGoodAllower>();
     if (!source || !singleGoodAllower || !singleGoodAllower.HasAllowedGood) {
@@ -228,7 +238,8 @@ static class PossibleTransportOrderPlanner {
     }
     var goodAmount = new GoodAmount(
         singleGoodAllower.AllowedGood, source.UnreservedAmountInStock(singleGoodAllower.AllowedGood));
-    if (TryPlanRankedSupplyGood(districtCenter, source, goodAmount, performanceStats, out var order)) {
+    if (TryPlanRankedSupplyGood(
+        districtCenter, source, goodAmount, performanceStats, routeDistanceProvider, out var order)) {
       return WithRequest(haulCandidate, requesterId, weightedBehavior, order.source, order.target, order.goodAmount);
     }
     return EmptyOrder(haulCandidate, requesterId, weightedBehavior, source, target: null);
@@ -242,12 +253,13 @@ static class PossibleTransportOrderPlanner {
       Inventories inventories,
       Func<Inventory, IEnumerable<GoodAmount>> goodsProvider,
       List<TransportOrderSnapshot> orders,
-      DispatchPerformanceStats performanceStats) {
+      DispatchPerformanceStats performanceStats,
+      ITransportRouteDistanceProvider routeDistanceProvider) {
     var added = false;
     foreach (var source in inventories.EnabledInventories) {
       foreach (var goodAmount in goodsProvider(source)) {
         foreach (var order in PlanTakingGoodCandidates(
-            districtCenter, source, goodAmount, IsAvailableTarget, performanceStats)) {
+            districtCenter, source, goodAmount, IsAvailableTarget, performanceStats, routeDistanceProvider)) {
           var weight = TakeAwayGoodWeight(source, goodAmount.GoodId, weightedBehavior.Weight);
           orders.Add(WithRequest(
               haulCandidate, requesterId, weightedBehavior, weight, order.source, order.target, order.goodAmount));
@@ -290,7 +302,8 @@ static class PossibleTransportOrderPlanner {
       Inventory target,
       string goodId,
       Predicate<Inventory> sourceFilter,
-      DispatchPerformanceStats performanceStats) {
+      DispatchPerformanceStats performanceStats,
+      ITransportRouteDistanceProvider routeDistanceProvider) {
     var targetAccessible = target.GetEnabledComponent<Accessible>();
     if (!targetAccessible || !IsAvailableTarget(target)) {
       yield break;
@@ -306,7 +319,8 @@ static class PossibleTransportOrderPlanner {
       if (!sourceAccessible
           || !IsAvailableSource(source)
           || !sourceFilter(source)
-          || !TryFindPlannerRoute(targetAccessible, sourceAccessible, performanceStats, out var distance)) {
+          || !TryFindPlannerRoute(
+              targetAccessible, sourceAccessible, performanceStats, routeDistanceProvider, out var distance)) {
         continue;
       }
       var goodAmount = MaxTransferableAmount(source, target, goodId);
@@ -330,7 +344,8 @@ static class PossibleTransportOrderPlanner {
       Inventory source,
       GoodAmount availableGood,
       Predicate<Inventory> targetFilter,
-      DispatchPerformanceStats performanceStats) {
+      DispatchPerformanceStats performanceStats,
+      ITransportRouteDistanceProvider routeDistanceProvider) {
     if (availableGood.Amount <= 0 || !IsAvailableSource(source)) {
       yield break;
     }
@@ -346,7 +361,8 @@ static class PossibleTransportOrderPlanner {
           || !IsAvailableTarget(target)
           || !targetFilter(target)
           || !IsTaking(target, availableGood.GoodId)
-          || !TryFindPlannerRoute(sourceAccessible, targetAccessible, performanceStats, out var distance)) {
+          || !TryFindPlannerRoute(
+              sourceAccessible, targetAccessible, performanceStats, routeDistanceProvider, out var distance)) {
         continue;
       }
       var goodAmount = MaxTransferableAmount(source, target, availableGood);
@@ -403,6 +419,7 @@ static class PossibleTransportOrderPlanner {
       Inventory target,
       string goodId,
       DispatchPerformanceStats performanceStats,
+      ITransportRouteDistanceProvider routeDistanceProvider,
       out (Inventory source, Inventory target, GoodAmount goodAmount) order) {
     order = default;
     var targetAccessible = target.GetEnabledComponent<Accessible>();
@@ -417,7 +434,8 @@ static class PossibleTransportOrderPlanner {
           || source == target
           || !IsAvailableSource(source)
           || !TryGetObtainSourceTier(source, goodId, out var tier)
-          || !TryFindPlannerRoute(targetAccessible, sourceAccessible, performanceStats, out var distance)) {
+          || !TryFindPlannerRoute(
+              targetAccessible, sourceAccessible, performanceStats, routeDistanceProvider, out var distance)) {
         continue;
       }
       var goodAmount = MaxTransferableAmount(source, target, goodId);
@@ -434,6 +452,7 @@ static class PossibleTransportOrderPlanner {
       Inventory source,
       GoodAmount availableGood,
       DispatchPerformanceStats performanceStats,
+      ITransportRouteDistanceProvider routeDistanceProvider,
       out (Inventory source, Inventory target, GoodAmount goodAmount) order) {
     order = default;
     if (availableGood.Amount <= 0 || !IsAvailableSource(source)) {
@@ -452,7 +471,8 @@ static class PossibleTransportOrderPlanner {
           || !IsAvailableTarget(target)
           || !IsTaking(target, availableGood.GoodId)
           || !TryGetSupplyTargetTier(target, out var tier)
-          || !TryFindPlannerRoute(sourceAccessible, targetAccessible, performanceStats, out var distance)) {
+          || !TryFindPlannerRoute(
+              sourceAccessible, targetAccessible, performanceStats, routeDistanceProvider, out var distance)) {
         continue;
       }
       var goodAmount = MaxTransferableAmount(source, target, availableGood);
@@ -487,10 +507,11 @@ static class PossibleTransportOrderPlanner {
   }
 
   static bool TryFindPlannerRoute(
-      Accessible start, Accessible end, DispatchPerformanceStats performanceStats, out float distance) {
+      Accessible start, Accessible end, DispatchPerformanceStats performanceStats,
+      ITransportRouteDistanceProvider routeDistanceProvider, out float distance) {
     var startTimestamp = DispatchPerformanceStats.Timestamp();
     try {
-      return TransportPathDistance.TryFindRoadPath(start, end, out distance);
+      return routeDistanceProvider.TryFindRoute(start, end, out distance);
     } finally {
       performanceStats.EndPlannerRoutePath(startTimestamp);
     }

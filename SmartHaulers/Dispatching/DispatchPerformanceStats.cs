@@ -44,6 +44,9 @@ sealed class DispatchPerformanceStats {
   int _remainingPathCalls;
   int _remainingPickupPathCalls;
   int _remainingDeliveryPathCalls;
+  int _routeCacheHits;
+  int _routeCacheMisses;
+  int _routeCacheClears;
   int _nextSampleIndex;
   int _sampleCount;
   DispatchPerformanceSample _lastSample;
@@ -97,7 +100,10 @@ sealed class DispatchPerformanceStats {
           sum.DecisionPickupPathCalls / _sampleCount,
           sum.RemainingPathCalls / _sampleCount,
           sum.RemainingPickupPathCalls / _sampleCount,
-          sum.RemainingDeliveryPathCalls / _sampleCount);
+          sum.RemainingDeliveryPathCalls / _sampleCount,
+          sum.RouteCacheHits / _sampleCount,
+          sum.RouteCacheMisses / _sampleCount,
+          sum.RouteCacheClears / _sampleCount);
     }
   }
 
@@ -135,6 +141,9 @@ sealed class DispatchPerformanceStats {
     _remainingPathCalls = 0;
     _remainingPickupPathCalls = 0;
     _remainingDeliveryPathCalls = 0;
+    _routeCacheHits = 0;
+    _routeCacheMisses = 0;
+    _routeCacheClears = 0;
     _refreshStopwatch = Stopwatch.StartNew();
   }
 
@@ -175,7 +184,10 @@ sealed class DispatchPerformanceStats {
         _decisionPickupPathCalls,
         _remainingPathCalls,
         _remainingPickupPathCalls,
-        _remainingDeliveryPathCalls);
+        _remainingDeliveryPathCalls,
+        _routeCacheHits,
+        _routeCacheMisses,
+        _routeCacheClears);
     AddSample(_lastSample);
     _refreshStopwatch = null;
   }
@@ -225,6 +237,18 @@ sealed class DispatchPerformanceStats {
 
   public void CountDecisionCandidate() {
     _decisionCandidateCount++;
+  }
+
+  public void CountRouteCacheHit() {
+    _routeCacheHits++;
+  }
+
+  public void CountRouteCacheMiss() {
+    _routeCacheMisses++;
+  }
+
+  public void CountRouteCacheClear() {
+    _routeCacheClears++;
   }
 
   public long BeginSection() {

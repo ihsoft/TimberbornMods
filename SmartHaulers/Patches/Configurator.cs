@@ -20,6 +20,7 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<DispatchPerformanceStats>().AsSingleton();
     containerDefinition.Bind<HaulBehaviorSupportValidator>().AsSingleton();
     containerDefinition.Bind<HaulerDispatchRefreshService>().AsSingleton();
+    containerDefinition.Bind<RouteDistanceCacheInvalidator>().AsSingleton();
     containerDefinition.Bind<TransportDecisionEvaluator>().AsSingleton();
     containerDefinition.Bind<TransportDistanceEstimator>().AsSingleton();
     containerDefinition.Bind<UiFactory>().AsSingleton();
