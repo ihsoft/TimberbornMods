@@ -290,7 +290,9 @@ Before using reflection or AccessTools:
 
 If direct access is available, prefer direct access.
 
-Do not introduce reflection unnecessarily.
+Publicized direct access to private or internal game members is an accepted repository practice when public APIs do not
+cover the need. Do not introduce reflection, Harmony `AccessTools`, or local reimplementations unnecessarily only to
+avoid publicized access.
 
 ---
 

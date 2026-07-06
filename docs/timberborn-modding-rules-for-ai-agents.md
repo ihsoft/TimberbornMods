@@ -353,6 +353,8 @@ assets or code.
 Before using Harmony `AccessTools` for private/internal game members, inspect the mod project file.
 
 Some mods use `BepInEx.AssemblyPublicizer.MSBuild` and publicized game references.
+This repository intentionally uses publicized Timberborn assemblies as a normal modding tool. Publicized direct access is
+not a last-resort failure mode.
 
 Example project-file pattern:
 
@@ -362,7 +364,11 @@ Example project-file pattern:
 <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\UnityEngine.UIElementsModule.dll" Publicize="true" />
 ```
 
-If the target assembly is publicized, prefer direct member access.
+Prefer public game APIs first. If no suitable public API exists and the target assembly is publicized, direct access to
+publicized private or internal members is an accepted repository practice.
+
+Do not add reflection, Harmony `AccessTools`, or complex local reimplementations only to avoid touching a publicized
+private/internal member. Use direct publicized access when it is simpler and compile-visible.
 
 Important:
 
@@ -391,6 +397,9 @@ var value = instance._somePrivateField;
 ```
 
 Avoid unnecessary `AccessTools` in that case.
+
+Keep publicized private/internal access localized behind a helper or narrow adapter when the member is version-fragile,
+used in hot paths, or likely to need game-version-specific handling.
 
 If publicizer is not available for the target assembly, use Harmony `AccessTools` when needed.
 
