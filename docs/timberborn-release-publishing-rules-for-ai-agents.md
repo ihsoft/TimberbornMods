@@ -460,6 +460,34 @@ Use a login-only/retry mode that opens SteamCMD for interactive login and does n
 
 Do not store Steam passwords in repository files or local config files.
 
+## Git release tags
+
+After a mod release has been successfully uploaded and verified on all requested platforms, create a Git tag for the
+published release commit.
+
+Use the repository's existing mod-release tag pattern:
+
+```text
+<ModName>_<Version>
+```
+
+Examples:
+
+- `Automation_4.7.0`
+- `TimberCommons_1.19.0`
+
+Do not add a `v` prefix for new mod-release tags unless the user explicitly asks.
+
+The tag should point to the release-preparation commit that updated the version metadata, changelog, and package source
+for the published version. Verify that the tag does not already exist before creating it. The repository's existing
+mod-release tags are lightweight tags, so use a lightweight tag unless the user explicitly asks for an annotated tag.
+
+Create the tag only after platform uploads and live verification succeed. If publishing fails or is only partially
+completed, do not create a release tag unless the user explicitly asks.
+
+When Git remote access is available, push the tag after creating it. Report the tag name and whether it was pushed in
+the final release summary.
+
 ## Wiki handoff after release
 
 After a successful mod release, consider whether the release changes any Wiki-facing surface:
