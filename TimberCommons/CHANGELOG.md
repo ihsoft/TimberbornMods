@@ -1,4 +1,4 @@
-# v1.20.0 (TBD)
+# v1.20.0 (July 6th, 2026)
 * [Enhancement] Show the measured flow through Throttling Valves under the flow slider.
 
 # v1.19.0 (July 2nd, 2026)
