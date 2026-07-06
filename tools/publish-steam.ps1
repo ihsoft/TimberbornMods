@@ -368,10 +368,27 @@ function Convert-VersionFolderToSteamTag([string] $VersionFolder) {
     throw "Unsupported version folder for Steam tag conversion: $VersionFolder"
 }
 
-function Get-TargetSteamTags([string[]] $LocalTags, [string[]] $VersionFolders) {
+function Get-AdditionalCompatibilityTags([object] $ReleaseConfig) {
+    $tags = @()
+    if ($null -ne $ReleaseConfig.PlatformTags -and
+            $null -ne $ReleaseConfig.PlatformTags.AdditionalCompatibilityTags) {
+        $tags = @($ReleaseConfig.PlatformTags.AdditionalCompatibilityTags | ForEach-Object { [string]$_ })
+    }
+
+    foreach ($tag in $tags) {
+        if (-not (Test-VersionTag $tag)) {
+            throw "PlatformTags.AdditionalCompatibilityTags can only contain Update X.Y tags: $tag"
+        }
+    }
+
+    return Get-UniqueTags $tags
+}
+
+function Get-TargetSteamTags([string[]] $LocalTags, [string[]] $VersionFolders, [object] $ReleaseConfig) {
     $versionTags = @($VersionFolders | ForEach-Object { Convert-VersionFolderToSteamTag $_ })
+    $additionalCompatibilityTags = Get-AdditionalCompatibilityTags $ReleaseConfig
     $nonVersionTags = @($LocalTags | Where-Object { -not (Test-VersionTag $_) })
-    return Get-UniqueTags (@("Mod") + $versionTags + $nonVersionTags)
+    return Get-UniqueTags (@("Mod") + $versionTags + $additionalCompatibilityTags + $nonVersionTags)
 }
 
 function Get-AddedTags([string[]] $TargetTags, [string[]] $CurrentTags) {
@@ -741,7 +758,7 @@ elseif (-not (Test-Path -LiteralPath $previewFile)) {
 
 $vdfPath = Join-Path (Resolve-RepoPath $VdfRoot) "$ModName.vdf"
 $localTags = Get-UniqueTags @($workshopData.Tags)
-$tags = Get-TargetSteamTags $localTags $versionFolders
+$tags = Get-TargetSteamTags $localTags $versionFolders $releaseConfig
 $localTagAdds = Get-AddedTags $tags $localTags
 $localTagRemoves = Get-RemovedTags $tags $localTags
 $localTagsSynchronized = $localTagAdds.Count -eq 0 -and $localTagRemoves.Count -eq 0

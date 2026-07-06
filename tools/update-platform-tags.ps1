@@ -124,13 +124,30 @@ function Test-VersionTag([string] $Tag) {
     return $Tag -match "^Update \d+\.\d+$"
 }
 
-function Get-TargetSteamTags([string[]] $LocalTags, [string[]] $VersionTags) {
-    $nonVersionTags = @($LocalTags | Where-Object { -not (Test-VersionTag $_) })
-    return Get-UniqueTags (@("Mod") + $VersionTags + $nonVersionTags)
+function Get-AdditionalCompatibilityTags([object] $ReleaseConfig) {
+    $tags = @()
+    if ($null -ne $ReleaseConfig.PlatformTags -and
+            $null -ne $ReleaseConfig.PlatformTags.AdditionalCompatibilityTags) {
+        $tags = @($ReleaseConfig.PlatformTags.AdditionalCompatibilityTags | ForEach-Object { [string]$_ })
+    }
+
+    foreach ($tag in $tags) {
+        if (-not (Test-VersionTag $tag)) {
+            throw "PlatformTags.AdditionalCompatibilityTags can only contain Update X.Y tags: $tag"
+        }
+    }
+
+    return Get-UniqueTags $tags
 }
 
-function Get-TargetTags([string[]] $LocalTags, [string[]] $VersionTags, [string] $TargetPlatform) {
-    $sourceTags = Get-TargetSteamTags $LocalTags $VersionTags
+function Get-TargetSteamTags([string[]] $LocalTags, [string[]] $VersionTags, [object] $ReleaseConfig) {
+    $additionalCompatibilityTags = Get-AdditionalCompatibilityTags $ReleaseConfig
+    $nonVersionTags = @($LocalTags | Where-Object { -not (Test-VersionTag $_) })
+    return Get-UniqueTags (@("Mod") + $VersionTags + $additionalCompatibilityTags + $nonVersionTags)
+}
+
+function Get-TargetTags([string[]] $LocalTags, [string[]] $VersionTags, [string] $TargetPlatform, [object] $ReleaseConfig) {
+    $sourceTags = Get-TargetSteamTags $LocalTags $VersionTags $ReleaseConfig
     if ($TargetPlatform -eq "ModIO") {
         $sourceTags = @($sourceTags | ForEach-Object { Convert-ToModIoTag $_ })
     }
@@ -417,22 +434,23 @@ $workshopDataInfo = Get-LocalWorkshopData $localModRootPath
 $workshopData = $workshopDataInfo.Data
 $localTags = Get-UniqueTags @($workshopData.Tags)
 $versionInfo = Get-VersionCompatibilityTags $localModRootPath
+$releaseConfigPath = Join-Path (Join-Path $repoRoot $ModName) "release.json"
+$releaseConfig = $null
+if (Test-Path -LiteralPath $releaseConfigPath) {
+    $releaseConfig = Get-Content -Raw -LiteralPath $releaseConfigPath | ConvertFrom-Json
+}
+$additionalCompatibilityTags = Get-AdditionalCompatibilityTags $releaseConfig
 
 Write-Host "Platform tag synchronization plan for $ModName"
 Write-Host "Local mod root: $localModRootPath"
 Write-Host "Local workshop data: $($workshopDataInfo.Path)"
 Write-Host "Version folders: $(Format-Tags $versionInfo.VersionFolders)"
 Write-Host "Compatibility tags from version folders: $(Format-Tags $versionInfo.Tags)"
+Write-Host "Additional compatibility tags: $(Format-Tags $additionalCompatibilityTags)"
 Write-Host "Local tags from workshop_data.json: $(Format-Tags $localTags)"
 Write-Host ""
 
 if ($Platform -eq "All" -or $Platform -eq "Steam") {
-    $releaseConfigPath = Join-Path (Join-Path $repoRoot $ModName) "release.json"
-    $releaseConfig = $null
-    if (Test-Path -LiteralPath $releaseConfigPath) {
-        $releaseConfig = Get-Content -Raw -LiteralPath $releaseConfigPath | ConvertFrom-Json
-    }
-
     $appId = "1062090"
     if ($null -ne $releaseConfig -and -not [string]::IsNullOrWhiteSpace($releaseConfig.Steam.AppId)) {
         $appId = [string]$releaseConfig.Steam.AppId
@@ -446,7 +464,7 @@ if ($Platform -eq "All" -or $Platform -eq "Steam") {
         throw "Steam PublishedFileId is empty."
     }
 
-    $targetTags = Get-TargetTags $localTags $versionInfo.Tags "Steam"
+    $targetTags = Get-TargetTags $localTags $versionInfo.Tags "Steam" $releaseConfig
     Assert-SteamTagsValid $targetTags
     $vdfPath = Join-Path (Resolve-RepoPath $SteamVdfRoot) "$ModName-tags.vdf"
     Write-SteamTagsVdf $vdfPath $appId $publishedFileId ([string]$workshopData.Name) $targetTags
@@ -507,7 +525,7 @@ if ($Platform -eq "All" -or $Platform -eq "ModIO") {
         throw "Mod.IO access token is empty: $accessTokenPath"
     }
 
-    $targetTags = Get-TargetTags $localTags $versionInfo.Tags "ModIO"
+    $targetTags = Get-TargetTags $localTags $versionInfo.Tags "ModIO" $releaseConfig
     $game = Get-ModIoGame $config $accessToken
     $support = Assert-ModIoTagsSupported $targetTags $game
     $currentTags = Get-UniqueTags (Get-ModIoTags $config $accessToken)
