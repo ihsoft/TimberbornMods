@@ -77,6 +77,12 @@ can create a component that load then tries to restore a second time. Prefer cre
 action registration, or have the dynamic component attach itself to the template-owned component after the dynamic
 component is created or restored.
 
+When fixing load-time state mismatches, treat delayed execution mechanisms such as coroutines, end-of-frame callbacks,
+parallel tick finalization, and scheduled updates as suspect until proven safe for the specific load phase. A delayed
+callback can run later while still using incomplete load-stage game state. If a subsystem is not fully synchronized
+during `OnEnterFinishedState` or similar callbacks, prefer an explicit post-load activation or synchronization hook
+owned by the Automation behavior or service, and let dynamic components refresh cached state synchronously there.
+
 When adding a new Automation signal family, decide whether each signal is building-scoped or global.
 
 When adding an Automation `SignalDef`, always set `Scope` explicitly, even when it is

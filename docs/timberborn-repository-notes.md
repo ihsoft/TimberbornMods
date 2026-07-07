@@ -401,6 +401,11 @@ When testing code that depends on Timberborn or game services, prefer the smalle
 Test stubs are acceptable when the goal is to cut the game runtime out of unit tests, but keep them narrow. Model only
 the behavior required by the tests being added, and do not expand stubs speculatively.
 
+Unit tests that use local Timberborn stubs do not replace building the changed mod project. When a change touches game
+extension methods, publicized game APIs, or code paths represented by test stubs, also run the changed mod project
+build. Stubs may not model production namespace imports, extension-method resolution, publicized assembly shape, or
+other compile-time details from the real game assemblies.
+
 If a test requires large stubs, reflection into private construction, or duplicated lifecycle behavior, first try the
 smallest test-only approach. If that becomes brittle or obscures the behavior under test, stop and ask whether a
 minimal production-code testability change is acceptable.
