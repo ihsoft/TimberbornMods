@@ -63,7 +63,9 @@ sealed class PathCheckingService : ITickableSingleton {
   /// <summary>Removes the path checking condition from monitor and resets all caches.</summary>
   public void RemoveCondition(CheckAccessBlockCondition condition) {
     if (!_sitesByBlockObject.TryGetValue(condition.Behavior.BlockObject, out var site)) {
-      DebugEx.Warning("Unknown condition {0} on behavior {1}", condition, condition.Behavior);
+      if (!condition.IsMarkedForCleanup) {
+        DebugEx.Warning("Unknown condition {0} on behavior {1}", condition, condition.Behavior);
+      }
       return;
     }
     if (_conditionsIndex.TryGetValue(site, out var valueList)) {
