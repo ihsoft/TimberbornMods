@@ -3,7 +3,6 @@
 // License: Public Domain
 
 using Timberborn.Navigation;
-using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.SmartHaulers.Dispatching;
 
@@ -14,24 +13,13 @@ sealed class RouteDistanceCacheInvalidator(
     if (!navMeshUpdate.UpdatedRoads) {
       return;
     }
-    var matched = false;
     foreach (var dispatchCenter in dispatchCenterRegistry.DispatchCenters) {
       if (DistrictHasUpdatedRoad(dispatchCenter, navMeshUpdate)) {
         dispatchCenter.ClearRouteCache();
-        matched = true;
       }
     }
-    if (!matched) {
-      // DistrictMap can lose the old owner for removed roads by the time ordinary listeners run.
-      // Fall back to a global clear only for unmatched road updates; normal edits stay district-local.
-      DebugEx.Warning(
-          "SmartHaulers could not match road navmesh update to a district; clearing all route caches. "
-          + "roadNodes={0}, bounds={1}.",
-          navMeshUpdate.RoadNodeIds.Count, navMeshUpdate.Bounds);
-      foreach (var dispatchCenter in dispatchCenterRegistry.DispatchCenters) {
-        dispatchCenter.ClearRouteCache();
-      }
-    }
+    // Orphan roads outside every district do not participate in district-local routing. Vanilla DistrictMap ignores
+    // those road updates too, so they should not invalidate SmartHaulers route caches or spam diagnostics logs.
   }
 
   bool DistrictHasUpdatedRoad(HaulerDispatchCenter dispatchCenter, NavMeshUpdate navMeshUpdate) {
