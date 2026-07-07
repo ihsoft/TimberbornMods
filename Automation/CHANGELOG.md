@@ -1,3 +1,6 @@
+# v4.7.1 (TBD)
+* [Fix] Readiness rules could report stale state while loading a save.
+
 # v4.7.0 (July 5th, 2026)
 * [Feature] Add an action for setting Gate state.
 * [Feature] Add manufactory signals for the current recipe and recipe completion.

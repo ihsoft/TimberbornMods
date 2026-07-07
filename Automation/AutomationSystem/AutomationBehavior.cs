@@ -209,6 +209,14 @@ public sealed class AutomationBehavior : BaseComponent, IAwakableComponent, IIni
         ?? throw new InvalidOperationException($"Cannot find {typeof(T).FullName} on {DebugEx.ObjectToString(this)}");
   }
 
+  /// <summary>Activates all dynamic components before automation rules are activated.</summary>
+  /// <seealso cref="AbstractDynamicComponent.OnPostLoadActivation"/>
+  public void ActivateDynamicComponents() {
+    foreach (var component in _dynamicComponents.Values) {
+      component.OnPostLoadActivation();
+    }
+  }
+
   #endregion
 
   #region IPersistentEntity implemenatation

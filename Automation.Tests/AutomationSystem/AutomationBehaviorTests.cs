@@ -91,6 +91,16 @@ static class AutomationBehaviorTests {
     Assert.Equal("DeleteEntity", component.EventsText);
   }
 
+  public static void ActivateDynamicComponentsForwardsPostLoadActivation() {
+    var harness = new Harness();
+    var component = harness.Behavior.GetOrCreate<RecordingDynamicComponent>();
+    component.ClearEvents();
+
+    harness.Behavior.ActivateDynamicComponents();
+
+    Assert.Equal("PostLoadActivation", component.EventsText);
+  }
+
   public static void SharedDynamicComponentInstanceIsRejected() {
     var sharedComponent = new RecordingDynamicComponent();
     var first = new Harness(new SingletonContainer(sharedComponent));
@@ -176,6 +186,10 @@ static class AutomationBehaviorTests {
 
     public void DeleteEntity() {
       _events.Add("DeleteEntity");
+    }
+
+    public override void OnPostLoadActivation() {
+      _events.Add("PostLoadActivation");
     }
   }
 }

@@ -218,7 +218,7 @@
       </Content>
     </ItemGroup>
     <PropertyGroup>
-        <ModPath>u:\Mods</ModPath>
+        <ModPath>..\_MODS!</ModPath>
     </PropertyGroup>
     <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="Exists('$(ModPath)')">
         <Message Text="### Copying DLL and Docs to the game's mods folder... ###" Importance="high"/>

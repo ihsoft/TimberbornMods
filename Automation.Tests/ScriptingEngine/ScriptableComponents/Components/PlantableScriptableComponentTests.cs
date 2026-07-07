@@ -103,6 +103,40 @@ static class PlantableScriptableComponentTests {
     }
   }
 
+  public static void UpdatesReadySpotsOnPostLoadActivation() {
+    var plantingService = new PlantingService();
+    var component = CreateComponent(plantingService, new TestParallelizer());
+    var behavior = CreateBehavior(plantingService);
+    var coordinates = behavior.GetComponent<InRangePlantingCoordinates>();
+    var first = new Vector3Int(1, 2, 0);
+    var second = new Vector3Int(2, 2, 0);
+    var listener = new TestSignalListener(behavior);
+    coordinates.SetCoordinates(first, second);
+    plantingService.SetSpot(first, "Pine");
+    plantingService.SetSpot(second, "Birch");
+
+    try {
+      Time.timeScale = 0f;
+      SetAutomationSystemReady(false);
+
+      component.RegisterSignalChangeCallback(Signal("Plantable.Ready", behavior), listener);
+      behavior.OnEnterFinishedState();
+      MonoBehaviour.RunQueuedCoroutines();
+
+      Assert.Equal(0, component.GetSignalSource("Plantable.Ready", behavior)().AsInt);
+      Assert.Equal(0, listener.Calls);
+
+      behavior.ActivateDynamicComponents();
+
+      Assert.Equal(2, component.GetSignalSource("Plantable.Ready", behavior)().AsInt);
+      Assert.Equal(1, listener.Calls);
+    } finally {
+      Time.timeScale = 1f;
+      SetAutomationSystemReady(true);
+      MonoBehaviour.ClearQueuedCoroutines();
+    }
+  }
+
   public static void UpdatesReadySpotsImmediatelyWhenPaused() {
     var plantingService = new PlantingService();
     var component = CreateComponent(plantingService, new TestParallelizer());
@@ -196,6 +230,13 @@ static class PlantableScriptableComponentTests {
         [typeof(IContainer)],
         null);
     constructor.Invoke([container]);
+  }
+
+  static void SetAutomationSystemReady(bool isReady) {
+    var setter = typeof(AutomationService)
+        .GetProperty(nameof(AutomationService.AutomationSystemReady))
+        ?.GetSetMethod(nonPublic: true);
+    setter.Invoke(null, [isReady]);
   }
 
   sealed class TestLoc : ILoc {

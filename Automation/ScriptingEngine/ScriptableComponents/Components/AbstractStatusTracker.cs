@@ -90,7 +90,7 @@ abstract class AbstractStatusTracker : AbstractDynamicComponent, IPersistentEnti
   /// <summary>True if the component has any actions.</summary>
   public bool HasActions => _actions.Count > 0;
 
-  /// <summary>Adds signal to the given host. The host will be notified when the signal is scheduled.</summary>
+  /// <summary>Adds a signal to the given host. The host will be notified when the signal is scheduled.</summary>
   /// <seealso cref="TriggerSignalUpdate"/>
   /// <returns><c>true</c> if the first listener for the signal was added.</returns>
   public virtual bool AddSignal(SignalOperator signalOperator, ISignalListener host) {
@@ -153,7 +153,7 @@ abstract class AbstractStatusTracker : AbstractDynamicComponent, IPersistentEnti
 
   #endregion
 
-  #region Imlementation
+  #region Implementation
 
   sealed record SignalSink {
     public ScriptValue LastValue;

@@ -32,6 +32,11 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
 
   /// <inheritdoc/>
   public void Tick() {
+    if (!_isParallelTickingStarted) {
+      return;
+    }
+    _isParallelTickingStarted = false;
+
     // Get the state from the parallel jobs and fire the signals.
     for (var i = _allTrackers.Count - 1; i >= 0; i--) {
       _allTrackers[i].FinalizeParallelUpdateState();
@@ -44,10 +49,12 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
 
   /// <inheritdoc/>
   public void StartParallelTick() {
+    _isParallelTickingStarted = true;
     for (var i = _allTrackers.Count - 1; i >= 0; i--) {
       _parallelizer.Schedule(new UpdateTrackerJob(_allTrackers[i]));
     }
   }
+  bool _isParallelTickingStarted;
 
   #endregion
 
@@ -55,7 +62,7 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
 
   /// <summary>
   /// This job assumes that many things are constant between the "regular ticks". Like water levels, contamination, etc.
-  /// If not, we're in troubles.
+  /// If not, we're in trouble.
   /// </summary>
   readonly struct UpdateTrackerJob : IParallelizerSingleTask {
 
@@ -63,7 +70,7 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
 
     /// <summary>
     /// This job assumes that many things are constant between the "regular ticks". Like water levels, contamination,
-    /// etc. If not, we're in troubles.
+    /// etc. If not, we're in trouble.
     /// </summary>
     /// <param name="tracker">The tracker to update.</param>
     public UpdateTrackerJob(PlantableTracker tracker) {
@@ -189,7 +196,7 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
     public void OnEnterFinishedState() {
       _eventBus.Register(this);
       _buildingTerrainRange.RangeChanged += BuildingRangeChanged;
-      ImmediateUpdateState();
+      ScheduleStateUpdate();
     }
 
     /// <inheritdoc/>
@@ -244,12 +251,22 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
     /// Applies the state calculated in the parallel update to the main thread and fires signals if needed.
     /// </summary>
     /// <remarks>
-    /// This should be called to apply the result from <see cref="ParallelUpdateState"/>. A normal place to do that, is
+    /// This should be called to apply the result from <see cref="ParallelUpdateState"/>. A normal place to do that is
     /// the singleton tick callback.
     /// </remarks>
     /// <seealso cref="ParallelUpdateState"/>
     public void FinalizeParallelUpdateState() {
       SpotsForPlanting = _parallelCountedSpotsForPlanting;
+    }
+
+    #endregion
+
+    #region AbstractStatusTracker overrides
+
+    /// <inheritdoc/>
+    public override void OnPostLoadActivation() {
+      base.OnPostLoadActivation();
+      UpdateState();
     }
 
     #endregion
@@ -275,21 +292,28 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
       _plantingCoordinates = AutomationBehavior.GetComponentOrFail<InRangePlantingCoordinates>();
     }
 
-    void ImmediateUpdateState() {
+    void UpdateState() {
+      SpotsForPlanting = CalculatePlantableSpots(_plantingCoordinates.GetCoordinates()._set.ToArray());
+    }
+
+    void ScheduleStateUpdate() {
+      if (!AutomationService.AutomationSystemReady) {
+        return; // The game is loading. Wait for OnRulesBound().
+      }
       if (Time.timeScale != 0f) {
         return; // The state will be updated in parallel tick.
       }
-      if (_immediateUpdateCoroutine != null) {
+      if (_updateCoroutine != null) {
         return; // Already scheduled.
       }
-      _immediateUpdateCoroutine = MonoBehaviour.StartCoroutine(ImmediateUpdateCoroutine());
+      _updateCoroutine = MonoBehaviour.StartCoroutine(UpdateCoroutine());
     }
-    Coroutine _immediateUpdateCoroutine;
+    Coroutine _updateCoroutine;
 
-    IEnumerator ImmediateUpdateCoroutine() {
+    IEnumerator UpdateCoroutine() {
       yield return new WaitForEndOfFrame();
-      _immediateUpdateCoroutine = null;
-      SpotsForPlanting = CalculatePlantableSpots(_plantingCoordinates.GetCoordinates()._set.ToArray());
+      _updateCoroutine = null;
+      UpdateState();
     }
 
     int CalculatePlantableSpots(Vector3Int[] plantingSpots) {
@@ -316,26 +340,26 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
 
     /// <summary>Monitors for changes in the building-reachable area.</summary>
     void BuildingRangeChanged(object sender, RangeChangedEventArgs args) {
-      ImmediateUpdateState();
+      ScheduleStateUpdate();
     }
 
     /// <summary>Monitors for changes in the crop/tree planting area.</summary>
     [OnEvent]
     public void OnPlantingCoordinatesSet(PlantingCoordinatesSetEvent plantingCoordinatesSetEvent) {
-      ImmediateUpdateState();
+      ScheduleStateUpdate();
     }
 
     /// <summary>Monitors for changes in the crop/tree planting area.</summary>
     [OnEvent]
     public void OnPlantingCoordinatesUnset(PlantingCoordinatesUnsetEvent plantingCoordinatesUnsetEvent) {
-      ImmediateUpdateState();
+      ScheduleStateUpdate();
     }
 
     /// <summary>Monitors for changes in the tree cutting area (the "replant dead trees" case).</summary>
     /// <remarks>The dead plants only eligible for re-planting if not marked for cutting.</remarks>
     [OnEvent]
     public void OnTreeCuttingAreaChangedEvent(TreeCuttingAreaChangedEvent e) {
-      ImmediateUpdateState();
+      ScheduleStateUpdate();
     }
 
     #endregion

@@ -53,6 +53,10 @@ public abstract class AbstractDynamicComponent {
     Enabled = false;
   }
 
+  /// <summary>Called before automation rules are activated for this behavior.</summary>
+  public virtual void OnPostLoadActivation() {
+  }
+
   internal void Initialize(AutomationBehavior behavior) {
     if (AutomationBehavior && AutomationBehavior != behavior) {
       throw new InvalidOperationException(

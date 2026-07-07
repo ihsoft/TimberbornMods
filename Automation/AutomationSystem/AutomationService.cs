@@ -300,6 +300,7 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
         action.Condition.Behavior = behavior;
         action.Behavior = behavior;
       }
+      behavior.ActivateDynamicComponents();
     }
 
     // Activate all rules to restore the state before the game save.

@@ -62,8 +62,10 @@ sealed class ScriptedCondition : AutomationConditionBase, ISignalListener {
       try {
         var newState = _parsedExpression.Execute();
         if (ConditionState != newState) {
+          var ruleNum = Behavior.Actions.Select(x => x.Condition).ToList().IndexOf(this);
           HostedDebugLog.Warning(
-              Behavior, "Condition state mismatch: loaded={0}, calculated={1}", ConditionState, newState);
+              Behavior, "Condition state mismatch in rule {0}: loaded={1}, calculated={2}",
+              ruleNum, ConditionState, newState);
         }
       } catch (ScriptError.RuntimeError e) {
         // The behavior error state is expected to be loaded.
