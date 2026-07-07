@@ -22,6 +22,7 @@ using Timberborn.InventoryNeedSystem;
 using Timberborn.Navigation;
 using Timberborn.NeedSystem;
 using Timberborn.PrioritySystem;
+using Timberborn.RecoveredGoodSystem;
 using Timberborn.TimeSystem;
 using Timberborn.WalkingSystem;
 using Timberborn.Workshops;
@@ -384,6 +385,9 @@ sealed class HaulerDispatchCenter : BaseComponent, IAwakableComponent, IDeletabl
       return false;
     }
     if (behavior is CarryRootBehavior) {
+      return true;
+    }
+    if (behavior is RecoveredGoodStackCarryingBehavior) {
       return true;
     }
     if (IsCommunityServiceTransportBehavior(behavior)) {
