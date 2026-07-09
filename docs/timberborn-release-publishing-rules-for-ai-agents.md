@@ -500,6 +500,20 @@ completed, do not create a release tag unless the user explicitly asks.
 When Git remote access is available, push the tag after creating it. Report the tag name and whether it was pushed in
 the final release summary.
 
+## GitHub releases
+
+After the release tag is created and pushed, create a GitHub Release for the same tag.
+
+Use `tools/publish-github-release.ps1` for this step. The script dry-runs by default and publishes only with
+`-Publish`.
+
+The GitHub Release title should be `<display mod name> v<Version>`. The description should use the released version's
+changelog section as-is, without Steam or Mod.IO formatting conversion. Attach the exact release ZIP that was published
+to Steam Workshop and Mod.IO.
+
+Do not create a GitHub Release before Steam Workshop and Mod.IO uploads and live verification succeed. If platform
+publishing fails or is only partially completed, do not create a GitHub Release unless the user explicitly asks.
+
 ## Wiki handoff after release
 
 After a successful mod release, consider whether the release changes any Wiki-facing surface:
