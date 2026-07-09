@@ -11,6 +11,28 @@ Never publish to Steam or Mod.IO unless the user explicitly asks to publish.
 Dry runs may build packages, validate files, generate metadata, and prepare staging directories. They must not upload
 anything.
 
+## Unified preflight and publish scripts
+
+Prefer the unified release entry points when they support the target release:
+
+- `tools/verify-release.ps1` for local release preparation and verification.
+- `tools/publish-release.ps1` for public publishing from a preflight report.
+
+`tools/verify-release.ps1` is the preflight step. It may create or refresh local generated release artifacts such as
+Unity exports, `_MODS!` output, staging folders, ZIPs, VDFs, temporary GitHub release notes, and
+`.tools/release-preflight/<ModName>-<Version>.json` reports when those artifacts are needed to validate the exact
+package that would be published. It must not pass `-Publish` to platform scripts or change public platform state.
+
+`tools/publish-release.ps1` consumes a preflight report and performs the public publish step. It must re-check critical
+preflight invariants before public changes, including the release identity and source/package state captured by the
+report. It may request required host or network elevation up front when practical.
+
+Issue closing and Wiki handoff remain explicit user-confirmed follow-up steps, not automatic side effects of the
+publish script.
+
+This unified tooling is still new. Until it has been proven by at least one successful real release publish flow, treat
+unexpected script behavior as a stop-and-investigate condition instead of silently falling back to ad hoc manual steps.
+
 ## Network checks
 
 Release publishing requires live Steam, GitHub, and Mod.IO checks.
