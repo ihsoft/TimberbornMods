@@ -245,6 +245,18 @@ entry when the work is primarily restoring support for the new game version. Inc
 in that update entry. Do not split it into a separate `[Fix]` unless players could encounter the broken behavior in a
 released mod version.
 
+## Temporary Compatibility Code
+
+When adding temporary save, script, data, or package compatibility code, mark it with a clear dated removal comment.
+The comment should say what legacy behavior is being supported and when the path should be removed or reconsidered.
+
+Use a concrete date or release window, not an open-ended note such as "remove later". Give players enough migration time
+for saved games, scripts, or data that may already exist in the wild.
+
+During maintenance or release preparation for the affected mod, scan for expired temporary compatibility comments. If a
+temporary path has expired, either remove it or deliberately renew the date with a short justification. Do not let
+temporary compatibility paths become permanent by forgetting their removal window.
+
 ---
 
 ## GitHub Issue References in Commits

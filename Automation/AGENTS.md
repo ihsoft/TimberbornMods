@@ -96,6 +96,10 @@ For Automation helpers that define script-name serialization, encoding, or namin
 especially explicit. Document the exact format, which names remain raw, what gets encoded, decode failure behavior, and
 backward-compatibility expectations for existing scripts.
 
+When adding temporary compatibility migrations for legacy Automation scripts, rules, or saved actions, include a dated
+removal comment and explain the legacy script/action name being supported. Review expired compatibility windows during
+Automation maintenance or release preparation, and either remove the path or renew the date with justification.
+
 Use `SignalDef.Scope` as the source of truth for exportability. Building signal export UI must rely on explicit scope,
 not on script-name prefixes or deny-lists.
 
