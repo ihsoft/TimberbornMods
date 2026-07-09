@@ -221,6 +221,8 @@ reminder is needed to prevent repeated misses.
 - Preserve existing content unless explicitly asked to remove it.
 - Make the smallest change that satisfies the task.
 - Avoid opportunistic refactoring unless explicitly requested.
+- Do not invent missing user intent. If a request has multiple plausible meanings, clarify before acting, especially
+  before public, external, destructive, historical, release, tag, Wiki, or platform-facing changes.
 - Treat player-facing and user-facing text as high-impact content. Do not silently shorten, rewrite, or add visible
   text. Preserve useful meaning, avoid adding noise, and ask for review when a technical limit or workflow requires a
   meaningful text change.
@@ -458,6 +460,8 @@ Stop and ask the user instead of guessing when:
 
 - the requested file cannot be read completely,
 - project intent or architecture is unclear,
+- the user's request can reasonably mean more than one workflow or scope, especially if one interpretation would publish,
+  tag, backfill, delete, rewrite history, edit Wiki pages, change platform metadata, or otherwise affect public state,
 - multiple reasonable implementation paths exist,
 - a test reveals a production bug, dead code, missing API, or design mismatch but the user did not ask to fix
   production code,

@@ -83,6 +83,16 @@ Recommended order:
 3. Steam upload, if requested.
 4. Mod.IO upload, if requested.
 
+## Release-tooling fixes during publishing
+
+If a publish task exposes a bug in release helper scripts or tooling, prefer one verified tooling commit after the
+helper works end-to-end. Avoid committing each intermediate failed attempt while diagnosing the helper under live
+release pressure.
+
+Checkpoint commits are acceptable only when the user explicitly asks for them or when a working partial fix must be
+preserved before a risky operation. Otherwise, finish the helper fix, rerun the relevant dry run or verification, then
+commit the tooling change.
+
 ## Unpublished versions
 
 When the user asks to publish all unpublished mod versions, treat "unpublished versions" as package changelog sections
