@@ -98,6 +98,38 @@ static class InventoryScriptableComponentTests {
     Assert.Equal((0, 10), outputDef.Result.DisplayNumericFormatRange);
   }
 
+  public static void ExposesAssignedStockpileGoodSignalWhenInventoryCapacityIsHidden() {
+    var component = CreateComponent();
+    var inventory = CreateInventory(inputGoods: ["Water"], outputGoods: ["Water"], capacity: 300);
+    inventory.HideCapacity = true;
+    var behavior = CreateBehavior(inventory);
+    var singleGoodAllower = new SingleGoodAllower();
+    singleGoodAllower.Allow("Water");
+    behavior.SetComponent(singleGoodAllower);
+    behavior.SetComponent(new StockpilePriority());
+
+    var signalNames = component.GetSignalNamesForBuilding(behavior);
+    var outputDef = component.GetSignalDefinition("Inventory.OutputGood.Water", behavior);
+
+    Assert.Equal("Inventory.OutputGood.Water", signalNames[0]);
+    Assert.Equal("Inventory.HaulingMode", signalNames[1]);
+    Assert.Equal((0, 300), outputDef.Result.DisplayNumericFormatRange);
+  }
+
+  public static void HidesStockpileGoodSignalsWhenInventoryCapacityIsHiddenAndNoGoodIsAssigned() {
+    var component = CreateComponent();
+    var inventory = CreateInventory(inputGoods: ["Water"], outputGoods: ["Water"], capacity: 300);
+    inventory.HideCapacity = true;
+    var behavior = CreateBehavior(inventory);
+    behavior.SetComponent(new SingleGoodAllower());
+    behavior.SetComponent(new StockpilePriority());
+
+    var signalNames = component.GetSignalNamesForBuilding(behavior);
+
+    Assert.Equal(1, signalNames.Length);
+    Assert.Equal("Inventory.HaulingMode", signalNames[0]);
+  }
+
   public static void HidesSignalsForMissingInventory() {
     var component = CreateComponent();
 

@@ -34,7 +34,12 @@ static class RulesUIHelperTests {
     var scriptingService = TestScripting.CreateService();
     scriptingService.RegisterScriptable(inventoryComponent);
     var helper = CreateHelper(scriptingService);
-    var behavior = CreateBehavior(CreateInventory(inputGoods: [], outputGoods: ["Water"]));
+    var inventory = CreateInventory(inputGoods: ["Water"], outputGoods: ["Water"]);
+    inventory.HideCapacity = true;
+    var behavior = CreateBehavior(inventory);
+    var singleGoodAllower = new SingleGoodAllower();
+    singleGoodAllower.Allow("Water");
+    behavior.SetComponent(singleGoodAllower);
     behavior.SetComponent(new StockpilePriority());
 
     helper.SetBuilding(behavior);

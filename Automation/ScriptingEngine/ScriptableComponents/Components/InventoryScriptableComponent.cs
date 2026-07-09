@@ -334,18 +334,25 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
       return capacities;
     }
     var currentRecipe = behavior.GetComponent<Manufactory>()?.CurrentRecipe;
-    if (currentRecipe == null) {
+    if (currentRecipe != null) {
+      foreach (var ingredient in currentRecipe.Ingredients) {
+        AddRecipeCapacity(capacities, inventory, currentRecipe, ingredient.ToGoodAmount());
+      }
+      foreach (var product in currentRecipe.Products) {
+        AddRecipeCapacity(capacities, inventory, currentRecipe, product.ToGoodAmount());
+      }
+      if (currentRecipe.ConsumesFuel) {
+        AddRecipeCapacity(capacities, inventory, currentRecipe.Fuel, currentRecipe.FuelCapacity);
+      }
       return capacities;
     }
-    foreach (var ingredient in currentRecipe.Ingredients) {
-      AddRecipeCapacity(capacities, inventory, currentRecipe, ingredient.ToGoodAmount());
+    var singleGoodAllower = behavior.GetComponent<SingleGoodAllower>();
+    if (!behavior.GetComponent<StockpilePriority>() || singleGoodAllower?.AllowedGood == null) {
+      return capacities;
     }
-    foreach (var product in currentRecipe.Products) {
-      AddRecipeCapacity(capacities, inventory, currentRecipe, product.ToGoodAmount());
-    }
-    if (currentRecipe.ConsumesFuel) {
-      AddRecipeCapacity(capacities, inventory, currentRecipe.Fuel, currentRecipe.FuelCapacity);
-    }
+    var assignedGood = singleGoodAllower.AllowedGood;
+    var allowedGood = inventory.AllowedGoods.FirstOrDefault(x => x.StorableGood.GoodId == assignedGood);
+    AddRecipeCapacity(capacities, inventory, assignedGood, allowedGood.Amount);
     return capacities;
   }
 

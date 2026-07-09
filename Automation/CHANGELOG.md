@@ -1,5 +1,6 @@
 # v4.8.0 (TBD)
 * [Feature #151] Add a storage hauling mode signal and action.
+* [Fix] Storage output goods could disappear from the building signal export list in emptying mode.
 * [Fix] Readiness rules could report stale state while loading a save.
 
 # v4.7.0 (July 5th, 2026)

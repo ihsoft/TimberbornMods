@@ -834,6 +834,7 @@ namespace Timberborn.InventorySystem {
     }
 
     public string ComponentName { get; init; } = "Storage";
+    public bool HideCapacity { get; set; }
     public bool IsOutput => _outputGoods.Count > 0;
     public IReadOnlyList<StorableGoodAmount> AllowedGoods => _allowedGoods;
     public IReadOnlyCollection<string> InputGoods => _inputGoods;
@@ -864,11 +865,27 @@ namespace Timberborn.InventorySystem {
     }
 
     public void GetCapacity(List<GoodAmount> capacity) {
+      if (HideCapacity) {
+        return;
+      }
       foreach (var good in _allowedGoods) {
         if (good.Amount > 0) {
           capacity.Add(new GoodAmount(good.StorableGood.GoodId, good.Amount));
         }
       }
+    }
+  }
+
+  public sealed class SingleGoodAllower : BaseComponent {
+    public string AllowedGood { get; private set; }
+    public bool HasAllowedGood => AllowedGood != null;
+
+    public void Allow(string goodId) {
+      AllowedGood = goodId;
+    }
+
+    public void Disallow() {
+      AllowedGood = null;
     }
   }
 
