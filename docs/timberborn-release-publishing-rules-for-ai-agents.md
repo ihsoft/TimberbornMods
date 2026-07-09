@@ -83,6 +83,19 @@ Recommended order:
 3. Steam upload, if requested.
 4. Mod.IO upload, if requested.
 
+## Unpublished versions
+
+When the user asks to publish all unpublished mod versions, treat "unpublished versions" as package changelog sections
+still marked `(TBD)`.
+
+Search package changelogs such as `CHANGELOG.md` and `CHANGES.md` for top-level version sections marked `(TBD)`. Those
+sections are the publish candidates. If no `(TBD)` sections exist, report that there are no unpublished mod versions to
+publish.
+
+Do not interpret "unpublished versions" as missing Git tags, missing GitHub Releases, missing platform artifacts, or
+historical release backfill. Do not create historical tags or GitHub Releases for already-published versions unless the
+user explicitly asks for tag or GitHub Release backfill.
+
 ## Exact version matching
 
 When the user names a release version, it must exactly match the configured release version.

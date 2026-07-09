@@ -247,7 +247,8 @@ if ($releaseViewExitCode -eq 0) {
 $notesRoot = Resolve-RepoPath ".tools/github-release-notes"
 New-Item -ItemType Directory -Path $notesRoot -Force | Out-Null
 $notesPath = Join-Path $notesRoot "$tagName.md"
-Set-Content -LiteralPath $notesPath -Value $changeNotes -Encoding UTF8
+$utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+[System.IO.File]::WriteAllText($notesPath, $changeNotes, $utf8NoBom)
 
 & gh release create $tagName $zipPath --repo $Repository --title $releaseTitle --notes-file $notesPath
 if ($LASTEXITCODE -ne 0) {
