@@ -67,6 +67,10 @@ through the repository Unity export path, such as `tools/export-unity-mod.ps1` /
 compatibility lane. Do not manually synchronize `_MODS!` resources as a substitute for export. Manual copies can miss
 `.meta` filtering, platform asset bundles, localization/data layout, or mod-specific package lanes.
 
+Run that export before asking the user to validate the change in the real game, unless the user explicitly asks not to.
+If export cannot be run, say that the local package was not refreshed and do not present the build as ready for
+real-game testing.
+
 A C# build with `ModPath` usually updates only `Scripts/<Assembly>.dll` and `Scripts/<Assembly>.xml`. Do not assume it
 also synchronizes Unity-owned package data unless the project file or release tooling proves that behavior.
 

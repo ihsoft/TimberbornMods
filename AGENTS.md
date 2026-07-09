@@ -327,12 +327,29 @@ not start from them.
   `docs/timberborn-repository-notes.md`.
 - Do not carry forward only the investigation checklist into the final commit.
 
+### Real-game validation gate
+
+- For gameplay, runtime, or UI behavior changes in any mod, user real-game validation is the default submission gate
+  before tests or commit.
+- Build and export the changed mod into the real local package output first, using the appropriate C# build and Unity
+  export paths for the changed files.
+- Then tell the user the change is ready to test in game and wait for the user's validation result. The user performs
+  the in-game test, not the agent.
+- Pause test implementation and commit until the user confirms the in-game behavior, unless the user explicitly accepts
+  testing or committing before real-game validation.
+- A generic "commit" instruction does not automatically remove this gate. Before committing gameplay, runtime, or UI
+  behavior changes, either report the user's in-game validation result or state that the user explicitly accepted
+  committing without it.
+
 ### Unity-resource task
 
 - Identify the normal Unity export/build path and compatibility lane before preparing a real-game package.
 - Do not manually copy Unity package resources into `_MODS!`; use the repository export tooling or report that export
   was not run.
-- Remind the user to rebuild or export Unity assets before real-game testing.
+- Before asking the user to test in the real game, run the repository export tooling yourself when the task changed
+  package data under `ModsUnityProject/Assets/Mods/<ModName>/`, unless the user explicitly says not to.
+- If Unity resources changed but local export was not run, state that clearly instead of implying the game package is
+  ready to test.
 
 ## Required tests
 
@@ -368,7 +385,8 @@ These relevant tests MUST pass before submitting the change.
 ## Unity resources
 
 When changing Unity project resources (`UXML`, `USS`, localization files, images, sprites, prefabs, or asset bundle
-content), remind the user to rebuild the Unity project before testing in the real game.
+content), update the local game package through the repository Unity export path before asking the user to test in the
+real game, unless the user explicitly says not to.
 
 If the changed files live under `ModsUnityProject/Assets/Mods/<ModName>/`, do not hand-copy package resources into
 `_MODS!`. First find the mod's normal Unity export command and compatibility lane, then use that export path or clearly
