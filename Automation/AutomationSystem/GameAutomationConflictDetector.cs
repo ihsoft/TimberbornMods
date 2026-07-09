@@ -20,7 +20,6 @@ sealed class GameAutomationConflictDetector {
   const string FloodgateHeightProperty = "Floodgate.Height";
   const string FloodgateAutomationHeightProperty = "Floodgate.AutomationHeight";
   const string FlowControlStateProperty = "FlowControl.State";
-  const string InventoryEmptyingProperty = "Inventory.Emptying";
   const string LeverStateProperty = "Lever.State";
   const string ManufactoryRecipeProperty = "Manufactory.Recipe";
   const string PausableBuildingPausedProperty = "PausableBuilding.Paused";
@@ -41,8 +40,6 @@ sealed class GameAutomationConflictDetector {
       ["Floodgate.SetHeight"] = [FloodgateHeightProperty],
       ["FlowControl.Open"] = [FlowControlStateProperty],
       ["FlowControl.Close"] = [FlowControlStateProperty],
-      ["Inventory.StartEmptying"] = [InventoryEmptyingProperty],
-      ["Inventory.StopEmptying"] = [InventoryEmptyingProperty],
       ["Lever.SetState"] = [LeverStateProperty],
       ["Manufactory.SetRecipe"] = [ManufactoryRecipeProperty],
       ["Pausable.Pause"] = [PausableBuildingPausedProperty],

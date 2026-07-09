@@ -117,6 +117,8 @@ static class GameAutomationConflictDetectorTests {
         ParseAction(behavior, "Notifications.SetNoticeIcon('NothingToDo', 'check it')")));
     Assert.False(new GameAutomationConflictDetector().IsBuildingStateChangingAction(
         ParseAction(behavior, "Gate.SetState('closed')")));
+    Assert.False(new GameAutomationConflictDetector().IsBuildingStateChangingAction(
+        ParseAction(behavior, "Inventory.StartEmptying()")));
   }
 
   public static void IgnoresManualWaterValveRuleSaveConflicts() {
@@ -312,8 +314,12 @@ static class GameAutomationConflictDetectorTests {
     var gate = new TestScriptable("Gate");
     gate.RegisterAction("Gate.SetState", ScriptValue.TypeEnum.String);
 
+    var inventory = new TestScriptable("Inventory");
+    inventory.RegisterAction("Inventory.StartEmptying");
+    inventory.RegisterAction("Inventory.StopEmptying");
+
     TestScripting.CreateService(
-        fillValve, throttlingValve, pausable, workplace, signals, notifications, flowControl, clutch, gate);
+        fillValve, throttlingValve, pausable, workplace, signals, notifications, flowControl, clutch, gate, inventory);
   }
 
   static ParserFactory CreateParserFactory() {
