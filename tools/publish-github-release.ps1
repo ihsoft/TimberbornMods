@@ -231,8 +231,16 @@ if ($releaseConfig.ReadyForPublish -eq $false) {
 
 Assert-CommandAvailable "gh"
 
-$releaseViewOutput = & gh release view $tagName --repo $Repository 2>$null
-if ($LASTEXITCODE -eq 0) {
+$previousErrorActionPreference = $ErrorActionPreference
+$ErrorActionPreference = "Continue"
+try {
+    & gh release view $tagName --repo $Repository *> $null
+    $releaseViewExitCode = $LASTEXITCODE
+}
+finally {
+    $ErrorActionPreference = $previousErrorActionPreference
+}
+if ($releaseViewExitCode -eq 0) {
     throw "GitHub release already exists for tag $tagName."
 }
 
