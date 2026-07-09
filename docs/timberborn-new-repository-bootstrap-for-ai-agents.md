@@ -9,6 +9,9 @@ Use this document when a new Timberborn mods repository has only copied:
 
 from another Timberborn mods repository, and the user asks to set up the repository or create the first mod.
 
+Also use it when an existing TimberbornMods checkout is on a clean disk and local build/release prerequisites need to
+be recreated.
+
 The goal is to connect the copied rules to the new local environment before implementing gameplay features.
 
 Do not assume the original repository layout exists.
@@ -18,6 +21,121 @@ Do not assume the example mod idea is literal.
 If the user says something like "create a transparent ground mod like X-Ray", treat X-Ray as an example of the kind of
 feature they want, not as a command to copy an existing project. The same bootstrap and research workflow applies to
 any requested first mod.
+
+---
+
+## Existing TimberbornMods Checkout Build/Release Bootstrap
+
+A clean checkout of the existing TimberbornMods repository is not enough for build, real-game validation, or release
+publishing. Several required paths, tools, credentials, generated references, and package outputs are intentionally
+ignored by Git.
+
+Do not assume these local items exist on a clean disk. When a required item is missing, explain what it is used for and
+ask whether to locate it, create a link/config, generate it, or continue without that optional capability.
+
+### Required Local Links
+
+Normal build and release work may need both root aliases and dependency links:
+
+| Path | Target | Used for |
+| --- | --- | --- |
+| `_GAME!` | Timberborn game installation root | game assets, modding archives, release/export scripts |
+| `_WORKSHOP!` | Steam Workshop content folder for app id `1062090` | subscribed dependency mods and post-release artifact checks |
+| `_MODS!` | user Timberborn mods folder | local package output, real-game validation, release ZIPs |
+| `_LOGS!` | Timberborn LocalLow folder with logs/settings | runtime logs and local game diagnostics |
+| `Dependencies/GameRoot` | Timberborn game installation root | C# project references to game assemblies |
+| `Dependencies/Workshop` | Steam Workshop content folder for app id `1062090` | C# project references to subscribed dependency mods |
+
+`_GAME!` and `Dependencies/GameRoot` usually point to the same game install, but both may be needed because scripts and
+project files use different conventions. `_WORKSHOP!` and `Dependencies/Workshop` usually point to the same Workshop
+folder for the same reason.
+
+### External Tools And Accounts
+
+Before build or release work, verify the tools required by the task:
+
+- Git and PowerShell.
+- A .NET SDK capable of restoring NuGet packages and building the changed projects.
+- Unity Hub or Unity Editor matching `ModsUnityProject/ProjectSettings/ProjectVersion.txt`, or an explicit
+  `-UnityPath` for Unity export.
+- SteamCMD installed in a discoverable location or configured in `.tools/steam/steam.local.json`.
+- Steam account login and Steam Guard readiness for uploads.
+- GitHub CLI `gh` installed and authenticated for repository releases, issue comments, and issue closing.
+- Mod.IO owner access token stored locally under `.tools/modio/` or supplied explicitly with `-AccessTokenPath`.
+
+Secrets and account-specific configs must stay local and ignored. Do not copy, rename, guess, or commit token files.
+
+### Ignored Local Configs And Generated Folders
+
+The repository may create or require ignored local files and folders, including:
+
+- `.tools/ilspy` for decompilation tooling.
+- `.tools/steamcmd` if SteamCMD is installed under repo-local ignored tools.
+- `.tools/steam/steam.local.json` for SteamCMD path/user configuration.
+- `.tools/steam/publisher.key.txt` for Steam tag updater access.
+- `.tools/modio/<ModName>.local.json` for Mod.IO API base, game id, and mod id.
+- `.tools/modio/<ModName>.token.txt` or another explicit owner token file.
+- `.tools/release-preview`, `.tools/release-staging`, `.tools/steam-staging`,
+  `.tools/steam-tag-updates`, `.tools/steam-description-updates`, `.tools/github-release-notes`,
+  `.tools/release-preflight`, and `.tools/unity-logs` as generated working/output folders.
+
+Generated working folders should not be hand-authored except for the documented local config/secret files.
+
+### Generated References
+
+Generated references are optional until a task needs them:
+
+- `_DecompiledGame/` is generated from game assemblies and used for architecture research.
+- `_ExtractedGameAssets/` is generated from `_GAME!/Timberborn_Data/StreamingAssets/Modding/*.zip` and used for
+  blueprints, localizations, shaders, and UI assets.
+
+Treat generated references as read-only caches. If they are missing, stale, or incomplete, generate or refresh them
+instead of designing around missing files.
+
+### Release Package Local State
+
+Release package sources and ZIPs are local artifacts, not tracked repository files.
+
+For `LocalModFolder` releases, `_MODS!/<ModName>` must be materialized by Unity export and C# build before publishing.
+On a clean disk it will not exist until preflight/build/export creates it.
+
+Release ZIPs under `_MODS!` are generated artifacts. Historical ZIP archives may exist on a developer machine, but they
+are local history and are not required for normal current release bootstrap unless a release config explicitly points at
+one.
+
+For `ExistingZip` release configs, verify that the configured ZIP exists and is fresh. If it is missing or stale, stop
+and ask how to generate or provide it instead of publishing an old or guessed artifact.
+
+### Platform Metadata And Wiki Checkout
+
+Platform IDs and descriptions come from several places:
+
+- Steam metadata may come from `_MODS!/<ModName>/workshop_data.json`, release config, or platform tooling.
+- Mod.IO IDs come from `.tools/modio/<ModName>.local.json`.
+- Platform description source files are tracked under each mod's `Workshop` directory, but live verification requires
+  network access and platform credentials.
+
+Wiki work requires a separate sibling checkout, normally `<repo-root>.wiki`, cloned from:
+
+```text
+https://github.com/ihsoft/TimberbornMods.wiki.git
+```
+
+Do not create Wiki pages inside the main repository.
+
+### Useful Bootstrap Checks
+
+For a clean checkout, verify only the capabilities needed by the current task:
+
+- root aliases exist and point to plausible targets,
+- `Dependencies/GameRoot` and `Dependencies/Workshop` exist,
+- game managed assemblies exist under `Dependencies/GameRoot/Timberborn_Data/Managed`,
+- Unity Editor version is installed/resolvable and the Unity project is not already open before batch export,
+- SteamCMD path/user config exists if publishing to Steam,
+- `gh auth status` succeeds if GitHub releases or issue work are needed,
+- Mod.IO configs/tokens exist for the target mod or a shared explicit owner token path is available,
+- `_MODS!/<ModName>` exists or can be generated for `LocalModFolder` releases,
+- generated references exist only when the current research task needs them.
 
 ---
 

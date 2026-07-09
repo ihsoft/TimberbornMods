@@ -4,6 +4,10 @@ Use these rules when preparing, validating, or publishing Timberborn mod release
 
 Publishing is a high-risk workflow. Prefer stopping and asking over guessing.
 
+For clean-checkout local environment requirements such as `_MODS!`, `_GAME!`, dependency links, Unity, SteamCMD, Mod.IO
+tokens, GitHub CLI auth, generated references, and local release artifacts, follow
+`docs/timberborn-new-repository-bootstrap-for-ai-agents.md`.
+
 ## Explicit publish requests only
 
 Never publish to Steam or Mod.IO unless the user explicitly asks to publish.
