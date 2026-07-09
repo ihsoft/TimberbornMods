@@ -178,6 +178,8 @@ IgorZ.Automation.Scriptable.Gate.Action.SetState,"set gate state: {0}","Name of 
 IgorZ.Automation.Scriptable.Inventory.Action.EmptyingStatus,"The storage is being emptied on a priority basis.",
 IgorZ.Automation.Scriptable.Inventory.Action.StartEmptyingStock,"start emptying storage","Name of the action that starts emptying the storage"
 IgorZ.Automation.Scriptable.Inventory.Action.StopEmptyingStock,"stop emptying storage","Name of the action that stops emptying the storage"
+IgorZ.Automation.Scriptable.Inventory.Action.SetHaulingMode,"set hauling mode: {0}","Name of the action that changes the storage hauling mode"
+IgorZ.Automation.Scriptable.Inventory.Signal.HaulingMode,"hauling mode","Name of the signal that reports the current storage hauling mode"
 IgorZ.Automation.Scriptable.Inventory.Signal.InputGood,"input: {0}","Name of the condition for the inventory input goods"
 IgorZ.Automation.Scriptable.Inventory.Signal.OutputGood,"output: {0}","Name of the condition for the inventory output goods"
 IgorZ.Automation.Scriptable.Lever.Action.SetState,"set lever state: {0}","Name of the action that sets the lever state to the specified value"

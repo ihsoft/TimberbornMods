@@ -1076,6 +1076,47 @@ namespace Timberborn.StatusSystem {
   }
 }
 
+namespace Timberborn.StockpilePrioritySystem {
+  using System;
+  using Timberborn.BaseComponentSystem;
+
+  public sealed class StockpilePriority : BaseComponent {
+    public bool IsAcceptActive => !IsEmptyActive && !IsObtainActive && !IsSupplyActive;
+    public bool IsEmptyActive { get; private set; }
+    public bool IsObtainActive { get; private set; }
+    public bool IsSupplyActive { get; private set; }
+
+    public void Accept() {
+      IsEmptyActive = false;
+      IsObtainActive = false;
+      IsSupplyActive = false;
+    }
+
+    public void Empty() {
+      Accept();
+      IsEmptyActive = true;
+    }
+
+    public void Obtain() {
+      Accept();
+      IsObtainActive = true;
+    }
+
+    public void Supply() {
+      Accept();
+      IsSupplyActive = true;
+    }
+  }
+
+  public sealed class StockpilePriorityChangeListener : BaseComponent {
+    public event EventHandler PriorityChanged;
+
+    public void RaisePriorityChanged() {
+      PriorityChanged?.Invoke(this, EventArgs.Empty);
+    }
+  }
+}
+
 namespace Timberborn.TickSystem {
   public interface ITickableSingleton {
     void Tick();

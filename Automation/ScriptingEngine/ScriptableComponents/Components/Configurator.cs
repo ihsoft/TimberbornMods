@@ -34,6 +34,7 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<InventoryScriptableComponent>().AsSingleton();
     containerDefinition.Bind<InventoryScriptableComponent.EmptyingStatusBehavior>().AsTransient();
     containerDefinition.Bind<InventoryScriptableComponent.InventoryChangeTracker>().AsTransient();
+    containerDefinition.Bind<InventoryScriptableComponent.StockpilePriorityChangeTracker>().AsTransient();
     containerDefinition.Bind<LeverScriptableComponent>().AsSingleton();
     containerDefinition.Bind<ManufactoryScriptableComponent>().AsSingleton();
     containerDefinition.Bind<ManufactoryScriptableComponent.ManufactoryRecipeTracker>().AsTransient();
