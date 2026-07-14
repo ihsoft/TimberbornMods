@@ -123,6 +123,47 @@ https://github.com/ihsoft/TimberbornMods.wiki.git
 
 Do not create Wiki pages inside the main repository.
 
+### Role Agent Tasks
+
+Bootstrap the repository's dedicated role agents in Codex or the equivalent agent environment. These role tasks are
+part of the working repository setup because coders must be able to delegate rule, publishing, and Wiki work without
+changing roles themselves.
+
+1. Search for an existing task for each dedicated role before creating one.
+2. Verify that a match belongs to the current TimberbornMods repository and has the expected role.
+3. Create each missing role task when the environment provides task-creation tools and the user has authorized task
+   creation. Otherwise, ask the user to create it or provide the existing task contact.
+4. Give role tasks stable, searchable titles:
+   - `TimberbornMods Mentor`
+   - `TimberbornMods Publisher`
+   - `TimberbornMods Wiki editor`
+5. Initialize each new role task with its primary responsibility, role boundaries, and required instruction files.
+6. Tell the new role agent to read those files, summarize its mandate and safety gates, make no repository or external
+   changes, and wait for a concrete assignment.
+7. Confirm that each task can be found by the role name alone and by the repository-and-role title.
+
+Use English only when creating an agent task. The task title, initialization prompt, role mandate, boundaries, and all
+other text sent as part of agent creation must be in English, even when the current user conversation uses another
+language. Do not mix languages in the creation or initialization message.
+
+Use the current repository rules as the source of truth for each initialization prompt. At minimum, initialize the
+roles as follows:
+
+| Role | Primary responsibility | Required role instructions |
+| --- | --- | --- |
+| Mentor | Own and organize agent rules, evaluate delegated rule suggestions, and improve future decision quality. | `AGENTS.md` and the rule files relevant to the requested rules-maintenance scope. |
+| Publisher | Safely prepare, validate, package, and publish explicitly approved mod releases, including post-release workflow. | `AGENTS.md` and `docs/timberborn-release-publishing-rules-for-ai-agents.md`. |
+| Wiki editor | Maintain accurate player-facing documentation in the separate GitHub Wiki checkout based on confirmed behavior and released capabilities. | `AGENTS.md` and `docs/timberborn-wiki-editing-rules-for-ai-agents.md`. |
+
+The initialization prompt must state that the role does not own adjacent work. In particular, the Publisher must not
+implement unrelated code, edit agent rules, or edit the Wiki; the Wiki editor must not implement mod code, publish
+releases, or edit agent rules; and the Mentor must not implement mod code, publish releases, or edit the Wiki unless
+the user explicitly expands that role for the current task. External publication and player-facing Wiki changes
+require a concrete user assignment and all applicable safety gates.
+
+Do not create duplicate role tasks when a clear matching task already exists. Do not treat a narrowly worded search
+with no results as proof that the role task is missing; fall back to searching by the role name alone.
+
 ### Useful Bootstrap Checks
 
 For a clean checkout, verify only the capabilities needed by the current task:
@@ -136,6 +177,8 @@ For a clean checkout, verify only the capabilities needed by the current task:
 - Mod.IO configs/tokens exist for the target mod or a shared explicit owner token path is available,
 - `_MODS!/<ModName>` exists or can be generated for `LocalModFolder` releases,
 - generated references exist only when the current research task needs them.
+- dedicated `Mentor`, `Publisher`, and `Wiki editor` tasks exist and have stable searchable titles when the agent
+  environment supports persistent role tasks.
 
 ---
 
@@ -153,7 +196,8 @@ Before creating the first mod:
    - generated reference folders,
    - solution/project files,
    - package-data folders,
-   - existing examples.
+   - existing examples,
+   - dedicated role agent tasks.
 5. Ask the user for local paths that cannot be discovered safely.
 
 Do not invent local paths.
