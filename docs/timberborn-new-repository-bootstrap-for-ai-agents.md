@@ -65,6 +65,32 @@ Before build or release work, verify the tools required by the task:
 
 Secrets and account-specific configs must stay local and ignored. Do not copy, rename, guess, or commit token files.
 
+### Unity Modding Tools First Open
+
+A clean `ModsUnityProject` checkout needs the official Timberborn Modding Tools first-open workflow before batch
+compilation or export. Installing the Unity Editor alone does not import the game DLLs and assets required by the
+project.
+
+Follow the current official [Unity setup](https://github.com/mechanistry/timberborn-modding/wiki/Unity-setup) and
+[Asset importer](https://github.com/mechanistry/timberborn-modding/wiki/Asset-importer) instructions. At minimum:
+
+1. Install the exact Unity Editor version from `ModsUnityProject/ProjectSettings/ProjectVersion.txt` with both Windows
+   Build Support and Mac Build Support.
+2. Add `ModsUnityProject` to Unity Hub without opening it, then add `-disable-assembly-updater` to that project's Hub
+   command-line arguments.
+3. Open the project interactively. If Unity offers Safe Mode, choose `Ignore` so the Timberborn Modding Tools can run.
+4. Complete the Timberborn library import prompt using the verified game installation root. If the prompt does not
+   appear, use `Timberborn -> Import Timberborn DLLs and assets` from the Unity toolbar.
+5. Wait for the import and Unity compilation to finish. Verify that `ModsUnityProject/Assets/Plugins/Timberborn`
+   exists and contains the imported/publicized game DLLs before attempting batch compilation or export.
+
+The importer also refreshes game assets under `ModsUnityProject/Assets/Tools/ImportedAssets`. Repeat the import after
+game updates when the official tool requires it.
+
+This repository already tracks the Timberborn Modding Tools under `ModsUnityProject/Assets/Tools`. Do not also install
+the tools from their Git package URL when that directory and its `package.json` are present; that is the alternative
+setup for a Unity project that does not already contain the tools.
+
 ### Ignored Local Configs And Generated Folders
 
 The repository may create or require ignored local files and folders, including:
@@ -171,7 +197,9 @@ For a clean checkout, verify only the capabilities needed by the current task:
 - root aliases exist and point to plausible targets,
 - `Dependencies/GameRoot` and `Dependencies/Workshop` exist,
 - game managed assemblies exist under `Dependencies/GameRoot/Timberborn_Data/Managed`,
-- Unity Editor version is installed/resolvable and the Unity project is not already open before batch export,
+- Unity Editor version and both required Build Support modules are installed/resolvable,
+- the official Unity first-open import has populated `ModsUnityProject/Assets/Plugins/Timberborn` before batch
+  compilation or export, and the Unity project is not already open before batch export,
 - SteamCMD path/user config exists if publishing to Steam,
 - `gh auth status` succeeds if GitHub releases or issue work are needed,
 - Mod.IO configs/tokens exist for the target mod or a shared explicit owner token path is available,
