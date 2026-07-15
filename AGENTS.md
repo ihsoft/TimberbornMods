@@ -13,7 +13,17 @@ user explicitly says otherwise.
 
 Always start with this root `AGENTS.md`.
 
-Then read only the instruction files that apply to the current task. Do not load every document blindly.
+Then always read these active baseline layers, in order:
+
+1. `docs/agent-profiles/Ada-Personality-v2.md` for communication style and personality.
+2. `docs/agent-profiles/Engineering-Professional-v3.md` for general engineering reasoning.
+3. `docs/agent-profiles/Timberborn-Professional-v2.md` for Timberborn-specific expertise.
+
+These layers complement this `AGENTS.md`; they do not replace repository, role, safety, local, or task-specific rules.
+They remain subject to the rule priority below.
+
+After the baseline layers, read only the instruction files that apply to the current task. Do not load every document
+blindly.
 
 | Condition | Read |
 |--------|--------|
