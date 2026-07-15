@@ -104,7 +104,8 @@
     "NoAutoWalls": false,
     "GenerateFloorsOnStackable": true,
     "EdgeGroups": [],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "BuildingAccessibleSpec": {
     "LocalAccess": {

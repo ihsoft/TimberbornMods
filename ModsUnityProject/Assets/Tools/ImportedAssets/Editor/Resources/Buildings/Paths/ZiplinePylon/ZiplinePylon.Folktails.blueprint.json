@@ -150,7 +150,8 @@
           "Z": 3
         }
       }
-    ]
+    ],
+    "BlockedEdges": []
   },
   "BlockObjectAccessesSpec": {
     "BlockingCoordinates": [
@@ -162,6 +163,7 @@
     ],
     "AllowedCoordinates": []
   },
+  "CustomizableIlluminatorSpec": {},
   "Children": {
     "#Finished": {
       "TimbermeshSpec": {

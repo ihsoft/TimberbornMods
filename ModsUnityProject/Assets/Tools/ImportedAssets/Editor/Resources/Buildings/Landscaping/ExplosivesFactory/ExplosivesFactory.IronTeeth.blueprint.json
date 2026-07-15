@@ -12,8 +12,8 @@
         "Amount": 30
       },
       {
-        "Id": "MetalBlock",
-        "Amount": 30
+        "Id": "MetalPart",
+        "Amount": 60
       }
     ],
     "ScienceCost": 400,
@@ -43,7 +43,8 @@
   },
   "ManufactorySpec": {
     "ProductionRecipeIds": [
-      "Explosives"
+      "Explosives",
+      "Fireworks"
     ]
   },
   "WorkshopSpec": {},
@@ -291,11 +292,11 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.ExplosivesFactory.DisplayName",
     "DescriptionLocKey": "Building.ExplosivesFactory.Description",
-    "FlavorDescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "Building.ExplosivesFactory.FlavorDescription",
     "Icon": "Buildings/Landscaping/ExplosivesFactory/ExplosivesFactoryIcon"
   },
   "SimpleManufactoryBehaviorsSpec": {},

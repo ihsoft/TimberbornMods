@@ -2,7 +2,7 @@
   "NeedSpec": {
     "Id": "EarthRecultivator",
     "BackwardCompatibleIds": [],
-    "Order": 40,
+    "Order": 50,
     "NeedGroupId": "Awe",
     "CharacterType": "Beaver",
     "StartingValue": 0.0,

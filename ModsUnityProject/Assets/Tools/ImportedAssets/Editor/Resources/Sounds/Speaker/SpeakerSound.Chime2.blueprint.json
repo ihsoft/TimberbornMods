@@ -1,0 +1,6 @@
+{
+  "SpeakerSoundSpec": {
+    "SoundId": "Environment.Buildings.Speaker.Chime_02",
+    "DisplayNameLocKey": "Building.Speaker.Sound.Chime2"
+  }
+}

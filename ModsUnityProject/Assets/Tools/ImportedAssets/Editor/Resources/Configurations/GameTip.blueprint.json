@@ -1,0 +1,11 @@
+{
+  "GameTipSpec": {
+    "Tips": [
+      "Tip.Common.LayerTool",
+      "Tip.Common.KeyBindings",
+      "Tip.Game.Solid",
+      "Tip.Game.Duplicate",
+      "Tip.Game.Flip"
+    ]
+  }
+}

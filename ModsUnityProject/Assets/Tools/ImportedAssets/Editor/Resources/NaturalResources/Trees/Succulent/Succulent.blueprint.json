@@ -1,0 +1,284 @@
+{
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 2
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "TemplateSpec": {
+    "TemplateName": "Succulent",
+    "BackwardCompatibleTemplateNames": [
+      "Cactus"
+    ],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "NaturalResourceSpec": {
+    "Order": 10
+  },
+  "TreeComponentSpec": {},
+  "GrowableSpec": {
+    "GrowthTimeInDays": 50.0
+  },
+  "BasicSelectionSoundSpec": {
+    "SoundName": "Tree",
+    "AlternativeSoundName": ""
+  },
+  "PlantableSpec": {
+    "ResourceGroup": "Forester",
+    "PlantTimeInHours": 0.5
+  },
+  "DemolishableSpec": {
+    "DemolishTimeInHours": 1.2,
+    "ShowDemolishButtonInEntityPanel": false
+  },
+  "CuttableSpec": {
+    "RemoveOnCut": false,
+    "LeftoverModelName": "#Leftover",
+    "Yielder": {
+      "YielderComponentName": "Cuttable",
+      "Yield": {
+        "Id": "Water",
+        "Amount": 1
+      },
+      "RemovalTimeInHours": 1.0,
+      "ResourceGroup": "Cuttable"
+    }
+  },
+  "PlantablePreviewModelSpec": {
+    "Model": "NaturalResources/Trees/Succulent/Mesh/SucculentMature"
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "NaturalResource.Succulent.DisplayName",
+    "DescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "",
+    "Icon": "NaturalResources/Trees/Succulent/SucculentIcon"
+  },
+  "FloodableNaturalResourceSpec": {
+    "MinWaterHeight": 0,
+    "MaxWaterHeight": 0,
+    "DaysToDie": 4.0
+  },
+  "NaturalResourceModelRandomizerSpec": {
+    "ConstrainProportion": false,
+    "MinHeightScaleFactor": 0.7,
+    "MaxHeightScaleFactor": 1.0,
+    "MinWidthScaleFactor": 0.9,
+    "MaxWidthScaleFactor": 1.1,
+    "RandomizedRotation": "BetweenMinAndMax",
+    "MinRotation": 0.0,
+    "MaxRotation": 360.0
+  },
+  "TreeCuttingRadiusSpec": {
+    "Radius": 0.2
+  },
+  "ContaminatedNaturalResourceSpec": {},
+  "BlockObjectModelSpec": {
+    "FullModelName": "#Models",
+    "UncoveredModelName": "",
+    "UndergroundModelName": "",
+    "UndergroundModelDepth": 0
+  },
+  "AridNaturalResourceSpec": {
+    "DaysToDieWet": 8.0
+  },
+  "YielderNeedApplierSpec": {
+    "Effects": [
+      {
+        "NeedId": "Injury",
+        "Points": -1.0,
+        "Probability": "Medium"
+      }
+    ]
+  },
+  "DeadCuttableYieldRemoverSpec": {},
+  "Children": {
+    "#Models": {
+      "Children": {
+        "Seedling": {
+          "Children": {
+            "#Alive": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Trees/Succulent/Mesh/SucculentSeedling"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [],
+                "CapsuleColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.207612336,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.1186592,
+                    "Height": 0.591992736,
+                    "Axis": "Y"
+                  }
+                ]
+              }
+            },
+            "#Dead": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Trees/Succulent/Mesh/SucculentSeedlingDead"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [],
+                "CapsuleColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.154833138,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.129919469,
+                    "Height": 0.505139649,
+                    "Axis": "Y"
+                  }
+                ]
+              }
+            },
+            "#Dying": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Trees/Succulent/Mesh/SucculentSeedlingDry"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [],
+                "CapsuleColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.214319825,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.157883525,
+                    "Height": 0.685298443,
+                    "Axis": "Y"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "Mature": {
+          "Children": {
+            "#Alive": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Trees/Succulent/Mesh/SucculentMature"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [],
+                "CapsuleColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.501234949,
+                      "Z": 0.494938254
+                    },
+                    "Radius": 0.289937556,
+                    "Height": 1.41221666,
+                    "Axis": "Y"
+                  }
+                ]
+              }
+            },
+            "#Dead": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Trees/Succulent/Mesh/SucculentMatureDead"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [],
+                "CapsuleColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.4,
+                      "Z": 0.474691331
+                    },
+                    "Radius": 0.201317549,
+                    "Height": 1.0,
+                    "Axis": "Y"
+                  }
+                ]
+              }
+            },
+            "#Dying": {
+              "TimbermeshSpec": {
+                "Model": "NaturalResources/Trees/Succulent/Mesh/SucculentMatureDry"
+              },
+              "CollidersSpec": {
+                "BoxColliders": [],
+                "SphereColliders": [],
+                "CapsuleColliders": [
+                  {
+                    "Center": {
+                      "X": 0.5,
+                      "Y": 0.506296635,
+                      "Z": 0.5
+                    },
+                    "Radius": 0.259530067,
+                    "Height": 1.25344372,
+                    "Axis": "Y"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "#Leftover": {
+          "TimbermeshSpec": {
+            "Model": "NaturalResources/Trees/Succulent/Mesh/SucculentMatureStump"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [],
+            "SphereColliders": [],
+            "CapsuleColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.109086186,
+                  "Z": 0.47
+                },
+                "Radius": 0.234295174,
+                "Height": 0.468590379,
+                "Axis": "Y"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

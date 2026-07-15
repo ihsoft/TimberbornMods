@@ -94,6 +94,11 @@ NineSliceTextField {
     justify-content: center;
 }
 
+.content-stretched {
+    align-items: stretch;
+    justify-content: center;
+}
+
 .sliced-border {
     --background-image: resource('UI/Images/Core/border_transparent');
     --background-slice-scale: 0.5;
@@ -360,6 +365,7 @@ NineSliceTextField {
 }
 
 .tooltip--not-centered {
+    flex-direction: column;
     align-items: flex-start;
 }
 
@@ -738,10 +744,25 @@ NineSliceTextField {
 .precise-slider {
     flex-direction: row;
     flex-grow: 1;
+    margin-bottom: 5px;
 }
 
 .precise-slider__slider {
     flex-grow: 1;
+}
+
+.precise-slider__slider > .unity-slider__input > .unity-base-slider__drag-container > .unity-base-slider__tracker {
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+.precise-slider__marker {
+    position: absolute;
+    height: 16px;
+    width: 16px;
+    top: 50%;
+    margin-top: -7px;
+    background-image: resource('UI/Images/Buttons/circle-marker');
 }
 
 .precise-slider__buttons {
@@ -754,4 +775,69 @@ NineSliceTextField {
     background-color: rgb(154, 134, 94);
     font-size: 13px;
     white-space: normal;
+}
+
+.radio-button {
+    align-items: center;
+    flex-direction: row;
+    --click-sound: "UI.Click";
+    margin: 2px 0;
+}
+
+.radio-button__icon {
+    width: 18px;
+    height: 18px;
+    margin: 1px 5px 1px 0;
+    flex-shrink: 0;
+    background-image: resource('UI/Images/Buttons/radio-unselected');
+}
+
+.radio-button.selected > .radio-button__icon {
+    background-image: resource('UI/Images/Buttons/radio-selected');
+}
+
+.radio-button:enabled:hover > .radio-button__icon {
+    background-image: resource('UI/Images/Buttons/radio-unselected-hover');
+}
+
+.radio-button.selected:enabled:hover > .radio-button__icon {
+    background-image: resource('UI/Images/Buttons/radio-selected');
+}
+
+.graph {
+    flex-grow: 1;
+    flex-direction: row;
+}
+
+.graph-background {
+    flex-grow: 1;
+    justify-content: center;
+    align-items: center;
+}
+
+.graph-background > VisualElement {
+    height: 100%;
+    width: 2px;
+}
+
+.graph-background.first > VisualElement {
+    align-self: flex-start;
+}
+
+.graph-background.last > VisualElement {
+    align-self: flex-end;
+}
+
+.graph-background:enabled:hover > VisualElement {
+    background-color: rgba(25, 128, 76, 0.5);
+}
+
+
+.bar-chart {
+    align-items: stretch;
+    align-self: stretch;
+    flex-grow: 1;
+    flex-direction: row;
+    background-color: rgba(157, 135, 89, 0.2);
+    --background-hover: rgba(187, 165, 119, 0.35);
 }

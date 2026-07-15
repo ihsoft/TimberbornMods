@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <cui:NineSliceVisualElement name="HttpApiFragment" class="entity-sub-panel content-centered bg-sub-box--green http-api-fragment">
+        <cui:NineSliceButton name="StartStop" text="Start API" class="entity-panel__text entity-fragment__button entity-fragment__button--red http-api-fragment__button" />
+        <ui:VisualElement name="PortWrapper" class="http-api-fragment__port-wrapper">
+            <cui:LocalizableLabel name="PortLabel" text-loc-key="Automation.Api.Port" picking-mode="Ignore" class="entity-panel__text" />
+            <cui:NineSliceTextField name="PortValue" picking-mode="Ignore" class="text-field http-api-fragment__port-value" />
+        </ui:VisualElement>
+        <cui:LocalizableButton name="OpenBrowser" text-loc-key="Automation.Api.OpenBrowser" class="entity-panel__text entity-fragment__button entity-fragment__button--red http-api-fragment__button" />
+        <ui:Label name="Url" text="Url" class="entity-panel__text http-api-fragment__url" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

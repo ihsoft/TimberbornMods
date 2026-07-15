@@ -14,7 +14,7 @@
     "Wastable": true,
     "HoursWarningThreshold": 0.0,
     "DisplayNameLocKey": "Building.LaborerMonument.DisplayName",
-    "FavorableWellbeing": 3,
+    "FavorableWellbeing": 2,
     "UnfavorableWellbeing": 0
   }
 }

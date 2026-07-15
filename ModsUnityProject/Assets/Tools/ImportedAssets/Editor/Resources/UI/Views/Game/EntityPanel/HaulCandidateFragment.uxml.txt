@@ -4,6 +4,6 @@
     <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
     <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
     <cui:NineSliceVisualElement name="HaulCandidateFragment" class="entity-sub-panel bg-sub-box--green">
-        <cui:LocalizableToggle text="Prioritize" name="Toggle" text-loc-key="Hauling.Prioritize" class="game-toggle entity-panel__single-line-text" />
+        <cui:LocalizableToggle text="Prioritize" name="Toggle" text-loc-key="Hauling.Prioritize" class="game-toggle entity-panel__text entity-panel__toggle" />
     </cui:NineSliceVisualElement>
 </ui:UXML>

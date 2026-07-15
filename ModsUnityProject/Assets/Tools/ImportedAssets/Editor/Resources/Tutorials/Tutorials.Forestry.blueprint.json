@@ -6,6 +6,7 @@
       "PowerAndPlanks",
       "Science"
     ],
+    "SkipIfTutorialFinished": "",
     "SortOrder": 80,
     "Stages": [
       "Forestry.BuildForester",

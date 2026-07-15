@@ -1,0 +1,1013 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "HallOfAbundance",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "Plank",
+        "Amount": 700
+      },
+      {
+        "Id": "TreatedPlank",
+        "Amount": 300
+      },
+      {
+        "Id": "MetalBlock",
+        "Amount": 500
+      }
+    ],
+    "ScienceCost": 15000,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": false,
+    "DrawRangeBoundsOnIt": false
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "TemplateSpec": {
+    "TemplateName": "HallOfAbundance.Folktails",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "RangedEffectBuildingSpec": {
+    "EffectRadius": 30
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 5,
+      "Y": 5,
+      "Z": 3
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": true
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Monuments",
+    "ToolOrder": 40,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": true,
+      "Coordinates": {
+        "X": 3.0,
+        "Y": 2.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.HallOfAbundance.DisplayName",
+    "DescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "",
+    "Icon": "Buildings/Monuments/HallOfAbundance/HallOfAbundanceIcon"
+  },
+  "ContinuousEffectBuildingSpec": {
+    "Effects": [
+      {
+        "NeedId": "HallOfAbundance",
+        "PointsPerHour": 0.1,
+        "SatisfyToMaxValue": false
+      }
+    ]
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0,
+      0.5
+    ]
+  },
+  "Children": {
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Monuments/HallOfAbundance/HallOfAbundance.Folktails.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 1.0,
+              "Y": 1.183142,
+              "Z": 1.5
+            },
+            "Size": {
+              "X": 2.0,
+              "Y": 2.35608315,
+              "Z": 1.0
+            }
+          },
+          {
+            "Center": {
+              "X": 1.0,
+              "Y": 1.183142,
+              "Z": 3.5
+            },
+            "Size": {
+              "X": 2.0,
+              "Y": 2.35608315,
+              "Z": 1.0
+            }
+          },
+          {
+            "Center": {
+              "X": 4.0,
+              "Y": 1.183142,
+              "Z": 3.5
+            },
+            "Size": {
+              "X": 2.0,
+              "Y": 2.35608315,
+              "Z": 1.0
+            }
+          },
+          {
+            "Center": {
+              "X": 4.0,
+              "Y": 1.183142,
+              "Z": 1.5
+            },
+            "Size": {
+              "X": 2.0,
+              "Y": 2.35608315,
+              "Z": 1.0
+            }
+          },
+          {
+            "Center": {
+              "X": 3.5,
+              "Y": 1.183142,
+              "Z": 0.5
+            },
+            "Size": {
+              "X": 1.0,
+              "Y": 2.35608315,
+              "Z": 1.0
+            }
+          },
+          {
+            "Center": {
+              "X": 1.5,
+              "Y": 1.183142,
+              "Z": 0.5
+            },
+            "Size": {
+              "X": 1.0,
+              "Y": 2.35608315,
+              "Z": 1.0
+            }
+          },
+          {
+            "Center": {
+              "X": 1.5,
+              "Y": 1.183142,
+              "Z": 4.5
+            },
+            "Size": {
+              "X": 1.0,
+              "Y": 2.35608315,
+              "Z": 1.0
+            }
+          },
+          {
+            "Center": {
+              "X": 3.5,
+              "Y": 1.183142,
+              "Z": 4.5
+            },
+            "Size": {
+              "X": 1.0,
+              "Y": 2.35608315,
+              "Z": 1.0
+            }
+          },
+          {
+            "Center": {
+              "X": 2.5,
+              "Y": 2.24026036,
+              "Z": 4.10161448
+            },
+            "Size": {
+              "X": 1.0,
+              "Y": 0.845449,
+              "Z": 1.68841314
+            }
+          },
+          {
+            "Center": {
+              "X": 2.5,
+              "Y": 2.24026036,
+              "Z": 0.883453369
+            },
+            "Size": {
+              "X": 1.0,
+              "Y": 0.845449,
+              "Z": 1.68841314
+            }
+          },
+          {
+            "Center": {
+              "X": 0.8949423,
+              "Y": 2.24026036,
+              "Z": 2.522736
+            },
+            "Size": {
+              "X": 1.688413,
+              "Y": 0.845449,
+              "Z": 1.0
+            }
+          },
+          {
+            "Center": {
+              "X": 4.083802,
+              "Y": 2.24026036,
+              "Z": 2.522736
+            },
+            "Size": {
+              "X": 1.688413,
+              "Y": 0.845449,
+              "Z": 1.0
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase5x5HallOfAbundance#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase5x5HallOfAbundance/ConstructionBase5x5HallOfAbundance.blueprint"
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Monuments/HallOfAbundance/HallOfAbundance.Folktails.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 1.0,
+                  "Y": 0.8845195,
+                  "Z": 1.5
+                },
+                "Size": {
+                  "X": 2.0,
+                  "Y": 1.75,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 1.0,
+                  "Y": 0.8845195,
+                  "Z": 3.5
+                },
+                "Size": {
+                  "X": 2.0,
+                  "Y": 1.75,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 4.0,
+                  "Y": 0.8845195,
+                  "Z": 3.5
+                },
+                "Size": {
+                  "X": 2.0,
+                  "Y": 1.75,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 4.0,
+                  "Y": 0.8845195,
+                  "Z": 1.5
+                },
+                "Size": {
+                  "X": 2.0,
+                  "Y": 1.75,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 3.5,
+                  "Y": 0.8845195,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 1.75,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 1.5,
+                  "Y": 0.8845195,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 1.75,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 1.5,
+                  "Y": 0.8845195,
+                  "Z": 4.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 1.75,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 3.5,
+                  "Y": 0.884519458,
+                  "Z": 4.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 1.75,
+                  "Z": 1.0
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "ConstructionStage1": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Monuments/HallOfAbundance/HallOfAbundance.Folktails.ConstructionStage1.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 1.0,
+                  "Y": 1.183142,
+                  "Z": 1.5
+                },
+                "Size": {
+                  "X": 2.0,
+                  "Y": 2.35608315,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 1.0,
+                  "Y": 1.183142,
+                  "Z": 3.5
+                },
+                "Size": {
+                  "X": 2.0,
+                  "Y": 2.35608315,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 4.0,
+                  "Y": 1.183142,
+                  "Z": 3.5
+                },
+                "Size": {
+                  "X": 2.0,
+                  "Y": 2.35608315,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 4.0,
+                  "Y": 1.183142,
+                  "Z": 1.5
+                },
+                "Size": {
+                  "X": 2.0,
+                  "Y": 2.35608315,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 3.5,
+                  "Y": 1.183142,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 2.35608315,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 1.5,
+                  "Y": 1.183142,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 2.35608315,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 1.5,
+                  "Y": 1.183142,
+                  "Z": 4.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 2.35608315,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 3.5,
+                  "Y": 1.183142,
+                  "Z": 4.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 2.35608315,
+                  "Z": 1.0
+                }
+              },
+              {
+                "Center": {
+                  "X": 2.5,
+                  "Y": 2.137387,
+                  "Z": 2.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 1.0,
+                  "Z": 1.0
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    }
+  }
+}

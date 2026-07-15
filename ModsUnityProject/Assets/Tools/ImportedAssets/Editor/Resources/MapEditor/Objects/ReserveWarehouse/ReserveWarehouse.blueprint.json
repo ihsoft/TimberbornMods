@@ -1,0 +1,163 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "Warehouse",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "ScrapMetal",
+        "Amount": 10
+      }
+    ],
+    "ScienceCost": 0,
+    "PlaceFinished": true,
+    "FinishableWithBeaversOnSite": true,
+    "DrawRangeBoundsOnIt": false
+  },
+  "TemplateSpec": {
+    "TemplateName": "ReserveWarehouse",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "StockpileSpec": {
+    "MaxCapacity": 200,
+    "WhitelistedGoodType": "Box"
+  },
+  "EnterableSpec": {
+    "OperatingState": "Finished",
+    "LimitedCapacityFinished": false,
+    "CapacityFinished": 0,
+    "LimitedCapacityUnfinished": false,
+    "CapacityUnfinished": 0
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 2,
+      "Y": 2,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": true,
+      "Coordinates": {
+        "X": 1,
+        "Y": -1,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": true
+  },
+  "BlockObjectNavMeshSettingsSpec": {
+    "NoAutoWalls": false,
+    "GenerateFloorsOnStackable": true,
+    "EdgeGroups": [],
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
+  },
+  "BuildingAccessibleSpec": {
+    "LocalAccess": {
+      "X": 1.5,
+      "Y": 0.0,
+      "Z": 0.2
+    },
+    "ForceOneFinalAccess": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "MapEditorObjects",
+    "ToolOrder": 1100,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": true
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.ReserveWarehouse.DisplayName",
+    "DescriptionLocKey": "Building.SmallWarehouse.Description",
+    "FlavorDescriptionLocKey": "Building.ReserveWarehouse.FlavorDescription",
+    "Icon": "MapEditor/Objects/ReserveWarehouse/ReserveWarehouseIcon"
+  },
+  "StockpileGoodColumnVisualizerSpec": {
+    "CenterOffset": {
+      "X": 0.5,
+      "Y": 0.5,
+      "Z": 0.04
+    },
+    "GoodVisualizationId": "Box",
+    "GoodVisualizationVariant": "4H"
+  },
+  "FixedStockpileSpec": {},
+  "UnconnectedBuildingBlockerSpec": {},
+  "Children": {
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "MapEditor/Objects/ReserveWarehouse/ReserveWarehouse.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 1.0,
+              "Y": 0.349370062,
+              "Z": 1.0
+            },
+            "Size": {
+              "X": 2.0,
+              "Y": 0.6791348,
+              "Z": 2.0
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Unfinished": {}
+  }
+}

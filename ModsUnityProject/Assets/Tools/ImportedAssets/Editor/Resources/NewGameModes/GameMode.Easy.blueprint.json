@@ -4,7 +4,7 @@
     "IsDefault": false,
     "DisplayNameLocKey": "NewGameConfigurationPanel.Easy",
     "DescriptionLocKey": "NewGameConfigurationPanel.EasyModeDescription",
-    "StartingAdults": 8,
+    "StartingAdults": 9,
     "AdultAgeProgress": {
       "Min": 0.1,
       "Max": 0.7

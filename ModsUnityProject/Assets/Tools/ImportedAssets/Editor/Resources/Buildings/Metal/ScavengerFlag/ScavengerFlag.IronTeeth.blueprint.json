@@ -3,7 +3,7 @@
     "SelectionSoundName": "ScavengerFlag",
     "LoopingSoundName": "",
     "BuildingCost": [],
-    "ScienceCost": 250,
+    "ScienceCost": 0,
     "PlaceFinished": false,
     "FinishableWithBeaversOnSite": false,
     "DrawRangeBoundsOnIt": false
@@ -98,7 +98,7 @@
     "ToolGroupId": "Metal",
     "ToolOrder": 10,
     "ToolShape": "Square",
-    "Layout": "Single",
+    "Layout": "SideLine",
     "CustomPivot": {
       "HasCustomPivot": false,
       "Coordinates": {
@@ -112,7 +112,7 @@
   },
   "ScavengerSpec": {},
   "WorkplaceSlotManagerSpec": {},
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "SimpleOutputInventorySpec": {
     "Capacity": 20,
     "IgnorableCapacity": false
@@ -130,6 +130,9 @@
     "ProgressThresholds": [
       0.0
     ]
+  },
+  "WorkplaceWorkerOutfitSpec": {
+    "WorkerOutfit": "Scavenger"
   },
   "Children": {
     "#Finished": {

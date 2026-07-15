@@ -1,0 +1,12 @@
+{
+  "WorkerOutfitSpec": {
+    "Id": "Gatherer",
+    "FactionId": "IronTeeth",
+    "WorkerType": "Bot",
+    "DiffuseTexture": "",
+    "NormalTexture": "",
+    "Attachments": [
+      "GathererBackpack"
+    ]
+  }
+}

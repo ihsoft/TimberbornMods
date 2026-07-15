@@ -65,7 +65,7 @@
     "ToolGroupId": "Housing",
     "ToolOrder": 10,
     "ToolShape": "Square",
-    "Layout": "Single",
+    "Layout": "SideLine",
     "CustomPivot": {
       "HasCustomPivot": false,
       "Coordinates": {
@@ -95,7 +95,8 @@
     "NoAutoWalls": false,
     "GenerateFloorsOnStackable": false,
     "EdgeGroups": [],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "TransformSlotInitializerSpec": {
     "Slots": [

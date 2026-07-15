@@ -5,18 +5,18 @@
     "BuildingCost": [
       {
         "Id": "Plank",
-        "Amount": 75
+        "Amount": 100
       },
       {
         "Id": "Gear",
-        "Amount": 30
+        "Amount": 50
       },
       {
         "Id": "MetalBlock",
         "Amount": 50
       }
     ],
-    "ScienceCost": 700,
+    "ScienceCost": 800,
     "PlaceFinished": false,
     "FinishableWithBeaversOnSite": false,
     "DrawRangeBoundsOnIt": false
@@ -802,7 +802,7 @@
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Wellbeing",
-    "ToolOrder": 100,
+    "ToolOrder": 111,
     "ToolShape": "Square",
     "Layout": "Single",
     "CustomPivot": {
@@ -816,16 +816,20 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "DrivewayModelSpec": {
-    "Driveway": "LongCenter",
-    "HasCustomCoordinates": false,
-    "CustomCoordinates": {
-      "X": 0,
-      "Y": 0,
-      "Z": 0
-    },
-    "CustomDirection": "Down",
-    "DrivewayMode": "Unidirectional"
+  "DrivewayModelsSpec": {
+    "Driveways": [
+      {
+        "Driveway": "LongCenter",
+        "HasCustomCoordinates": false,
+        "CustomCoordinates": {
+          "X": 0,
+          "Y": 0,
+          "Z": 0
+        },
+        "CustomDirection": "Down",
+        "DrivewayMode": "Unidirectional"
+      }
+    ]
   },
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.WindTunnel.DisplayName",
@@ -833,7 +837,7 @@
     "FlavorDescriptionLocKey": "Building.WindTunnel.FlavorDescription",
     "Icon": "Buildings/Wellbeing/WindTunnel/WindTunnelIcon"
   },
-  "EnterableLightingSpec": {},
+  "EnterableIlluminatorSpec": {},
   "MechanicalNodeTransformHeightSpec": {
     "TransformName": "#Empty_Height",
     "Range": 2.0,
@@ -845,7 +849,7 @@
       "Wind"
     ]
   },
-  "BuildingLightObjectsSpec": {
+  "IlluminatorLightObjectsSpec": {
     "AttachmentIds": [
       "Light"
     ]

@@ -1,4 +1,4 @@
-﻿{
+{
   "TemplateSpec": {
     "TemplateName": "BadwaterSeep",
     "BackwardCompatibleTemplateNames": [],
@@ -93,7 +93,7 @@
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.BadwaterSeep.DisplayName",
     "DescriptionLocKey": "Building.BadwaterSeep.Description",
-    "FlavorDescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "Building.BadwaterSeep.FlavorDescription",
     "Icon": "MapEditor/Water/BadwaterSeep/BadwaterSeepIcon"
   },
   "BasicSelectionSoundSpec": {
@@ -151,7 +151,8 @@
   "ActivationWarningStatusSpec": {
     "StatusSpriteName": "WaterSourceCountdown",
     "StatusLocKey": "Status.TimedActivationWarning",
-    "UseInfiniteWarning": false
+    "UseInfiniteWarning": false,
+    "WarningSound": "UI.Buildings.Warnings.SourceActivationAlert"
   },
   "ActivationProgressParticlesSpec": {
     "AttachmentIds": [
@@ -173,11 +174,11 @@
         "Parent": "#Model",
         "Position": {
           "X": 1.0,
-          "Y": 0.0,
+          "Y": 0.15,
           "Z": 1.0
         },
         "Rotation": {
-          "X": 0.0,
+          "X": -90.0,
           "Y": 0.0,
           "Z": 0.0
         },

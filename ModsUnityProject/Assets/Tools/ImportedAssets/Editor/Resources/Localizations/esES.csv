@@ -12,17 +12,72 @@ Puedes acceder a los ajustes del juego en cualquier momento para retirar el cons
 Attractions.LoadRate,Popularidad,Header above a panel showing how popular an attraction is in each hour during the day
 Attractions.Visitors,Visitantes,"A header above a list of beavers visiting an attraction, such as a campfire."
 Attractions.VisitorsLimit,Visitantes: {0},{0} stands for capacity. Tells players the max capacity of the attraction in a shorter way
+Automation.Api.OpenBrowser,Abrir navegador,A button which opens the web browser.
+Automation.Api.Port,Puerto,Port as in the port number of a web server.
+Automation.Api.StartApi,Iniciar API,A button which starts the game's API. You may likely want to keep the term API in other languages.
+Automation.Api.StopApi,Detener API,A button which stop the game's API. You may likely want to keep the term API in other languages.
+Automation.Api.UnsafeWebhooksWarning,"Al iniciar la API, se habilitarán webhooks que llaman a servicios externos:",This is an important safety warning so please make sure it is understandable. The message is followed by a list of web addresses.
+Automation.Api.UnsafeWebhooksWarning.IUnderstandTheRisk,Comprendo los riesgos,
+Automation.Automate,Automatizar,This is for a button which adds automation to a building. Must be consistent with Automation.Automation.
+Automation.Automation,Automatización,This is a collective name for the automation system and a set of buildings in the game which allow players to automate many processes.
+Automation.AutomationNone,Nada,Dropdown value when no automation is selected
+Automation.AutomationOptional,Opcional,Dropdown value when no automation is selected but it is optional
+Automation.NoAutomation,Sin automatización,Dropdown value when no automation is selected
+Automation.Input.A,A,"This should be one character, optionally two if you really need it. Those are labels preceding dropdowns for selecting input A and input B."
+Automation.Input.B,B,"This should be one character, optionally two if you really need it. Those are labels preceding dropdowns for selecting input A and input B."
+Automation.Input.C,C,"This should be one character, optionally two if you really need it. Those are labels preceding dropdowns for selecting inputs A, B, C up to H."
+Automation.Input.D,D,"This should be one character, optionally two if you really need it. Those are labels preceding dropdowns for selecting inputs A, B, C up to H."
+Automation.Input.E,E,"This should be one character, optionally two if you really need it. Those are labels preceding dropdowns for selecting inputs A, B, C up to H."
+Automation.Input.F,F,"This should be one character, optionally two if you really need it. Those are labels preceding dropdowns for selecting inputs A, B, C up to H."
+Automation.Input.G,G,"This should be one character, optionally two if you really need it. Those are labels preceding dropdowns for selecting inputs A, B, C up to H."
+Automation.Input.H,H,"This should be one character, optionally two if you really need it. Those are labels preceding dropdowns for selecting inputs A, B, C up to H."
+Automation.Input.Reset,RST,"Abbreviation for Reset, it should correspond to Automation.ResetButton. Three characters are OK for narrow letters but CJK and other languages with wider characters should be at most two - please let us know if it's a problem. It's likely that 'RST' is the best option in all languages because it is a very common abbreviation in electronics and schematics."
+Automation.Measurement,Medida: {0},Label for the measurement value in the automation panel. {0} is a measured value.
+Automation.Mode,Modo,Keep short. This is a label for a dropdown in which select a mode of operation for different automation buildings.
+Automation.Mode.Automated,Automatizado,"A mode in a dropdown or a radio button which denotes that this building will be automated as opposed to manually controlled. Gender should be consistent with Automation.Mode. Please keep short, at most the width of 10 latin characters."
+Automation.PausedByAutomation,En pausa por automatización.,Dropdown value when no automation is selected
+Automation.Pinned,Anclado,Checkbox label - when something is pinned it is always visible in the HUD.
+Automation.PinnedAlways,Siempre anclado,Must be consistent with Automation.Pinned.
+Automation.PinnedWhenOn,Anclado si está en On,Must be consistent with Automation.Pinned. This mode means that something is pinned to the HUD only when in the ON state.
+Automation.RemoveRow,Eliminar fila,Tooltip for a button that removes a row from a list.
+Automation.ResetButton,Reiniciar,A text for a button which resets the logic memory of the selected element to zero. It's likely that 'Reset' is a good option in many languages.
+Automation.ResetCircuitButton,Reiniciar circuito,A text for a button which resets the logic memory of all elements in this circuit to zero.
+Automation.ResetsWhenResetInput,Se reinicia con <YellowHighlight>{0}</YellowHighlight>.,A text appended to some of the other mode descriptions such as Timer.Mode.* or Memory.Mode.*. {0} is Automation.Input.ResetInput. This text is meant to explain that the RST input resets this element.
+Automation.SelectTransmitter,Seleccionar transmisor,A description of a tool which allows player to select a building which sends an automation signal (a transmitter).
+Automation.State.Error,Error,A state label when a signal has an error. Keep very short because the other states are 'On' and 'Off'.
+Automation.State.Off,Off,A state label when a signal is switched off which is shown next to lightbulb icon.
+Automation.State.On,On,A state label when a signal is switched on which is shown next to lightbulb icon.
+Automation.State.Processing,Procesando...,A state label when a signal is switched on which is shown next to lightbulb icon. This state indicates that the element is in the middle of processing new data.
+Automation.Threshold,Umbral: {0},Label for the threshold value in the automation panel. {0} is a value being a threshold.
+Automation.Usages,Usos: {0},As in the number of usages - how many objects use this one.
 Autosave.Failure,Autoguardado fallido,Notification on top of the window when autosave failed. It disappears after 10 seconds
 Autosave.FailureDueToFullDisk,El autoguardado ha fallado porque no hay suficiente espacio en el disco duro.,Notification on top of the window when autosave failed. It disappears after 10 seconds
 Autosave.Success,Autoguardado completado,"Notification on top of the window when autosave succeeded. Keep short, it disappears after 2 seconds"
 BatchControl.Distribution,Distribución,Title of the distribution panel
+BatchControl.GoodStatistics,Estadísticas de bienes,Title of the Goods statistics panel
+BatchControl.GoodStatisticsType.Consumption,Consumo,Label for radio button to select consumption statistics in the Goods statistics panel.
+BatchControl.GoodStatisticsType.Export,Exportaciones,Label for radio button to select export statistics in the Goods statistics panel.
+BatchControl.GoodStatisticsType.Import,Importaciones,Label for radio button to select import statistics in the Goods statistics panel.
+BatchControl.GoodStatisticsType.Production,Producción,Label for radio button to select production statistics in the Goods statistics panel.
+BatchControl.GoodStatisticsType.Stock,Existencias,Label for radio button to select stock statistics in the Goods statistics panel. Stock here means the amount of goods currently in the settlement and in some languages Amount may be a better base for the translation than Stock.
 BatchControl.Housing,Vivienda,Tooltip of a tab allowing to manage housing buildings.
 BatchControl.Mechanical,Energía,Tooltip of a tab allowing to manage mechanical buildings. Power must be the same as used in Mechanical.PowerInput and other Mechanical. keys.
 BatchControl.Migration,Migración,Title of migration panel
 BatchControl.NoDistrict,No has seleccionado ningún distrito.,Shown when no district is selected on some batch control tabs
 BatchControl.Population,Población,Tooltip of a tab allowing to manage population.
+BatchControl.PopulationStatistics,Estadísticas de población,Title of the Population statistics panel
+BatchControl.PopulationStatistics.BeaverEmployment,Empleo castoril,Title for the graph in the population statistics panel showing beaver employment.
+BatchControl.PopulationStatistics.Births,Nacimientos,Label for a data line in graph
+BatchControl.PopulationStatistics.BotCreations,Robots creados,Label for a data line in graph
+BatchControl.PopulationStatistics.BotDestructions,Robots destruidos,Label for a data line in graph
+BatchControl.PopulationStatistics.BotEmployment,Empleo de robots,Title for the graph in the population statistics panel showing bot employment.
+BatchControl.PopulationStatistics.Deaths,Fallecimientos,Label for a data line in graph
+BatchControl.PopulationStatistics.PopulationAverage,Media de población,Label for a data line in graph in Well-being graph. Refers to average population well-being
+BatchControl.PopulationStatistics.PopulationTurnover,Fluctuación de población,Title for the graph in the population statistics panel showing births and deaths.
 BatchControl.ShowInfo,Gestionar asentamiento,Button opening a window to view and manage multiple buildings and characters at once . Please keep short
 BatchControl.Storage,Almacenamiento,Tooltip of a tab allowing to manage warehouses.
+BatchControl.TimeRange.AllTime,Desde el principio,Dropdown option for time range selection in Settlement Panel
+BatchControl.TimeRange.Days,Últimos {0} días,Dropdown option for time range selection in Settlement Panel. {0} is an integer number of days (10+). E.g. Last 50 days.
 BatchControl.Workplaces,Lugares de trabajo,Tooltip of a tab allowing to manage workplaces.
 Beaver.Adult.TemplateName,Castor adulto,
 Beaver.Adulthood,Edad adulta,Next to a progress bar that shows when a baby beaver reaches adulthood.
@@ -59,12 +114,12 @@ Bot.DeadNameSuffix,(destruido),Preceded by bot name and age
 Bot.DeathMessage,{0} se ha roto.,{0} stands for bot name. Notification that shows when a bot breaks down completely (it's destroyed)
 Bot.DisplayName.Folktails,Leñabot {0},{0} stands for a bot serial number. Name of bots from the Folktails faction. Named after the fact they are visibly made from wood.
 Bot.DisplayName.IronTeeth,Hierrobot {0},{0} stands for a bot serial number. Name of bots from the Iron Teeth faction. Named after the fact they are visibly made from metal.
-Bot.Durability,Durabilidad,Label before a progress bar showing amount of durability left
+Bot.Durability,Durabilidad: {0},"Label before a progress bar showing amount of durability left, {0} is the durability value."
 Bot.PluralDisplayName,Robots,"Bots are autonomous robots, who assist beavers in their everyday tasks. They are constructed in factories."
 Bot.TemplateName,Robot,A bot is an animated anthropomorphic being which is created from inanimate matter. Timberborn bots are depicting beavers and are made of wood and metal.
 Breeding.NutrientBringing,"Los nutrientes los traen los transportistas, los que están sin empleo y los trabajadores después de trabajar.","Haulers are the same as in Building.HaulingPost.Description, unemployed as in Beaver.UnemployedPlural, workers as in Work.WorkersLabel"
 Breeding.NutrientsNeeded,Nutrientes necesarios:,Followed by a list of nutrients needed to produce a new beaver in breeding facility
-Breeding.Progress,Progreso de crianza,Label inside a progress bar describing production progress of new beaver in breeding facility
+Breeding.Progress,Progreso de crianza: {0},"Label inside a progress bar describing production progress of new beaver in breeding facility, {0} is the progress value"
 BuilderPriorityTool.Description,"Utiliza esta herramienta para ajustar la prioridad de construcción, demolición y recolección de bienes de los escombros.",Rubble should be plural version of RecoveredGoodStack.DisplayName
 BuilderPriorityTool.Tip,Haz clic en un objeto para ajustar su nivel de prioridad o mantén pulsado para seleccionar un área más grande.,
 Building.AdvancedBreedingPod.Description,Utiliza un proceso de crianza avanzado para producir castores adultos con ganas de trabajar.,Breeding should be the same as Building.BreedingPod.DisplayName
@@ -73,22 +128,29 @@ Building.AdvancedBreedingPod.FlavorDescription,La idea surgió cuando un chaval�
 Building.Agora.Description,Un lugar de reunión enorme en el que los castores hablan de todos los temas relacionados con la madera.,
 Building.Agora.DisplayName,Ágora,
 Building.Agora.FlavorDescription,"Cuando se encienden las almenaras verdes, los Bucólicos saben que es hora de reunirse.",Folktails must be same as faction as Faction.Folktails.DisplayName.
+Building.Airlock.Description,Permite que los castores crucen y a la vez obstruye el paso del agua.,
+Building.Airlock.DisplayName,Escotilla,
 Building.AncientAquiferDrill.DisplayName,Antigua perforación de acuífero,
+Building.AncientAquiferDrill.FlavorDescription,El último intento de los humanos por recuperar lo perdido.,
+Building.ArchOfProgress.DisplayName,Arco del progreso,"A big arch, similar to classic victory arches, decorated with Iron Teeth workers that serves as a symbol of their drive to progress beaver society."
 Building.AquaticFarmhouse.Description,Contrata granjeros especializados para plantar y cosechar cultivos <YellowHighlight>acuáticos</YellowHighlight>.,"Aquatic is a keyword, must be the same as in NaturalResources.Aquatic."
 Building.AquaticFarmhouse.DisplayName,Granja acuática,A farmhouse that specializes in water plants.
 Building.AquaticFarmhouse.FlavorDescription,«Una vez se extendió el rumor de que comemos pescado. ¡Qué asco!» (Ma'Ngana).,"Beavers eating fish is a common misconception. Beavers are 100% herbivores. Ma' Ngonel is an almost legendary figure - a beaver grandma, known for her stern hand, cooking skills and respect among both kits and adult beavers. Her name is an inside joke, as our community constantly demands an addition of catapults, mangonels etc."
 Building.Aquifer.Description,Una fuente de agua subterránea.,
 Building.Aquifer.DisplayName,Acuífero,
+Building.Aquifer.FlavorDescription,Hace tanto ruido que no es difícil de encontrar.,
 Building.AquiferDrill.Description,Extrae agua de un acuífero.,
 Building.AquiferDrill.DisplayName,Perforación de acuífero,
+Building.AquiferDrill.FlavorDescription,"A diferencia de los castores, su objetivo es hacer fluir el agua.",
 Building.BadtideDrain.Description,Expulsa aguamala durante una mareamala.,
 Building.BadtideDrain.DisplayName,Sumidero de mareamala,
-Building.BadwaterDischarge.Description,"Sella una fuente de aguamala. Puedes abrirla o cerrarla. Cuando está abierta, el aguamala fluye incluso durante las sequías.","Badwater Source must be the same as Building.BadwaterSource.DisplayName, Badwater must be the same as Good.Badwater.DisplayName."
-Building.BadwaterDischarge.DisplayName,Válvula de aguamala,"Name of the building that can either stop flow of badwater or enforce flow with full power. It's a dome shaped, mechanical building that opens and closes like a camera shutter. Badwater must be the same as Good.Badwater.DisplayName."
-Building.BadwaterDischarge.FlavorDescription,Solo se permite el acceso a ingenieros civiles.,This is a reference to a youtuber called Real Civil Engineer.
+Building.BadtideDrain.FlavorDescription,«¿Para eso usaban las tuberías los humanos? Bah» (Laurel).,"Pina is a younger beaver figure that's exploring the world and isn't related to any faction in particular. Pina as a name relates to the pine tree, the translated name shouldn't suggest a gender if possible."
 Building.BadwaterDome.Description,Sella una fuente de aguamala. Puedes abrirla o cerrarla cuando quieras.,"Badwater Source must be the same as Building.BadwaterSource.DisplayName, Badwater must be the same as Good.Badwater.DisplayName."
 Building.BadwaterDome.DisplayName,Cúpula de aguamala,Name of the building that stops flow of badwater when put on its source. It's a dome shaped mechanical building that can open and close by raising the cover up and down. Badwater must be the same as Good.Badwater.DisplayName.
 Building.BadwaterDome.FlavorDescription,"Aguamala aquí no, ¿eh? ¡Aguamala, aquí, no!","This is a reference to a Bob Marley song ""No woman, no cry""."
+Building.BadwaterPressurizer.Description,"Sella una fuente de aguamala. Puedes abrirla o cerrarla. Cuando está abierta, el aguamala fluye incluso durante las sequías.","Badwater Source must be the same as Building.BadwaterSource.DisplayName, Badwater must be the same as Good.Badwater.DisplayName."
+Building.BadwaterPressurizer.DisplayName,Presurizador de aguamala,"Name of the building that can either stop flow of badwater or enforce flow with full power. It's a dome shaped, mechanical building that opens and closes like a camera shutter. Badwater must be the same as Good.Badwater.DisplayName."
+Building.BadwaterPressurizer.FlavorDescription,Solo se permite el acceso a ingenieros civiles.,This is a reference to a youtuber called Real Civil Engineer.
 Building.BadwaterPump.Description,"Una bomba de agua reforzada capaz de extraer aguamala. Si el nivel de contaminación de aguamala es bajo, bombea más lento.",Badwater should be the same as Good.Badwater.DisplayName. Ideally all uses of the word contaminate/contamination/contaminated should be uniform across the project.
 Building.BadwaterPump.DisplayName,Bomba de aguamala,Badwater should be the same as Good.Badwater.DisplayName.
 Building.BadwaterPump.FlavorDescription,«Ojalá las medidas de protección incluyesen tapones para la nariz» (Suli).,Suli is a younger beaver that likes to play tricks on their fellow beavers and isn't related to any faction in particular. Translated name shouldn't suggest a gender if possible.
@@ -97,6 +159,7 @@ Building.BadwaterRig.DisplayName,Torre de perforación de aguamala,Name of the b
 Building.BadwaterRig.FlavorDescription,Quienes trabajan sobre una fuente de aguamala en ebullición se ven sometidos a una presión constante.,Play on words with pressure referring to both water pressure and stress. If possible try to adapt the phrase to fit your language.
 Building.BadwaterSeep.Description,Una fuente de aguamala con poca presión.,
 Building.BadwaterSeep.DisplayName,Rezumadero de aguamala,"A building that allows badwater to seep through, creating a natural badwater source."
+Building.BadwaterSeep.FlavorDescription,"Presión limitada, peligros ilimitados.",
 Building.BadwaterSource.DisplayName,Fuente de aguamala,A crack or spring in the ground spuming badwater. Badwater should be the same as Good.Badwater.DisplayName.
 Building.BadwaterSource.FlavorDescription,"«¿Por qué tenemos que limpiar la porquería de los humanos? Ah, claro, porque están todos muertos» (Laurel).",
 Building.Bakery.Description,Permite hornear pan y pasteles usando harinas de diferentes tipos.,Pastry being a baked good.
@@ -123,7 +186,7 @@ Building.Bench.DisplayName,Banco,
 Building.Bench.FlavorDescription,"De vez en cuando, algún gamberro se come el mobiliario urbano.",
 Building.Blockage.Description,Una barrera natural que obstruye el paso del agua. Puede demolerse.,Demolished meaning removed by a worker.
 Building.Blockage.DisplayName,Obstrucción,"Not a dam since that's another building in game but if not possible it could be called a Natural Dam. Visually, it's a block made out of twigs and loose stones."
-Building.Blockage.FlavorDescription,"Resulta difícil creer que, en tiempos más simples, se llamaba presa a un poco de barro y unas cuantas ramas.",
+Building.Blockage.FlavorDescription,Es increíble que la naturaleza pueda crear algo a la altura de la ingeniería castoril.,
 Building.BotAssembler.Description,Ensambla robots autónomos para ejecutar las tareas cotidianas.,Bots should be the same as Bot.PluralDisplayName
 Building.BotAssembler.DisplayName,Ensambladora de robots,A factory for assembling bots. Bot should be the same as Bot.TemplateName
 Building.BotAssembler.FlavorDescription,"«Todo empezó con un simple: ""¿Y si hoy no tuviese que ir a trabajar?""» (Laurel).",
@@ -156,18 +219,30 @@ Building.Centrifuge.FlavorDescription,La idea surgió cuando un carrusel de los 
 Building.ChargingStation.Description,Un lugar al que van los robots a recargarse.,Bots should be the same as Bot.PluralDisplayName
 Building.ChargingStation.DisplayName,Estación de carga,A mechanically powered building where bots come to recharge
 Building.ChargingStation.FlavorDescription,Usar solo con dispositivos Hierrobot.,"Referring the annoying ""a different connector for each device"" trend in IT. Ironbot must be the same as Bot.DisplayName.IronTeeth"
-Building.Clock.Description,Un reloj decorativo lo bastante grande como para los ojos de los abuelos.,
-Building.Clock.DisplayName,Reloj,
-Building.Clock.FlavorDescription,Es increíble que antaño los castores usaran clepsidras.,Clepsydra is an ancient water clock.
+Building.Chronometer.Description,Envía una señal en función de la hora del día.,
+Building.Chronometer.DisplayName,Cronómetro,The name of a building which sends automation signals based on time.
+Building.Chronometer.EndTime,Termina en: {0},"{0} is a time in hours with h suffix, e.g. 1.2h"
+Building.Chronometer.Mode.NonWorkingHours,Horas libres,"One of the modes of the Chronometer, that makes it active during non-working hours"
+Building.Chronometer.Mode.TimeRange,Rango de tiempo,"One of the modes of the Chronometer, that lets player select custom start and end time"
+Building.Chronometer.Mode.WorkingHours,Horas de trabajo,"One of the modes of the Chronometer, that makes it active during working hours"
+Building.Chronometer.StartTime,Comienza en: {0},"{0} is a time in hours with h suffix, e.g. 1.2h"
+Building.Clutch.Description,Activa o desactiva la transmisión de energía.,'power' must be consistent with other uses of the word in the game.
+Building.Clutch.DisplayName,Embrague,As in the car part - it engages and disengages power shaft connections.
+Building.Clutch.Mode.Disengaged,Desengranado,As in the car part - it engages and disengages power shaft connections.
+Building.Clutch.Mode.Engaged,Engranado,As in the car part - it engages and disengages power shaft connections.
 Building.CoffeeBrewery.Description,Produce café.,Coffee should be the same as in Good.Coffee.DisplayName.
 Building.CoffeeBrewery.DisplayName,Fábrica de café,A building that brews coffee.
 Building.CoffeeBrewery.FlavorDescription,"De no ser por las limitaciones de consumo, los Dienteférreos no pegarían ojo.",
+Building.CompactMechanicalPump.Description,Extrae agua o aguamala de un lado y la vierte en el otro.,
+Building.CompactMechanicalPump.DisplayName,Bomba mecánica compacta,
 Building.CompactWaterWheel.Description,Un generador compacto que transforma la corriente de agua en energía.,
 Building.CompactWaterWheel.DisplayName,Rueda hidráulica compacta,A water wheel that's smaller than other versions.
 Building.CompactWaterWheel.FlavorDescription,"Sí, se puede reinventar la rueda hidráulica.",A play on 'can't reinvent the wheel'
 Building.ContaminationBarrier.Description,Evita que se extienda la contaminación del suelo.,Ideally all uses of the word contaminate/contamination/contaminated should be uniform across the project.
 Building.ContaminationBarrier.DisplayName,Barrera de contaminación,Name of the building that stops spreading soil contamination that's placed on the ground and is presented as square shape with objects sticking out. Ideally all uses of the word contaminate/contamination/contaminated should be uniform across the project. Barrier should be the same between Building.IrrigationBarrier.DisplayName and Building.ContaminationBarrier.DisplayName.
 Building.ContaminationBarrier.FlavorDescription,"«¡Con una barrera al día, mantienes la mareamala en la lejanía!» (póster motivacional).","Reference to the ""An apple a day, keeps the doctor away"" proverb. If possible try to adapt the phrase to fit your language."
+Building.ContaminationSensor.Description,Mide la contaminación del agua bajo el brazo.,
+Building.ContaminationSensor.DisplayName,Sensor de contaminación,
 Building.ContemplationSpot.Description,Un pequeño lugar desde el que los castores pueden contemplar la naturaleza.,
 Building.ContemplationSpot.DisplayName,Punto de observación,
 Building.ContemplationSpot.FlavorDescription,Aquí los castores se relajan y reflexionan sobre los caprichos de la madre naturaleza.,
@@ -180,22 +255,35 @@ Building.Dam.FlavorDescription,"Como bien sabe todo hijo de castor, los cimiento
 Building.DanceHall.Description,Una sala abierta donde los castores pueden desmelenarse.,
 Building.DanceHall.DisplayName,Sala de baile,
 Building.DanceHall.FlavorDescription,"«¡Venga, no te quedes ahí como si fueses un muermo Dienteférreo!» (Suli).",Iron Teeth must be the same as Faction.IronTeeth.DisplayName. Suli is a younger beaver that likes to play tricks on their fellow beavers and isn't related to any faction in particular. Translated name shouldn't suggest a gender if possible.
+Building.DancePit.Description,Una piscina de barro donde los castores liberan tensiones.,
+Building.DancePit.DisplayName,Piscina de baile,
 Building.DecontaminationPod.Description,Un baño en el que los castores se recuperan de la exposición al aguamala.,Badwater should be the same as Good.Badwater.DisplayName.
 Building.DecontaminationPod.DisplayName,Módulo de descontaminación,Ideally the name of the building should refer to the contamination effect on the beaver (Need.BadwaterContamination).
 Building.DecontaminationPod.FlavorDescription,"«No, Suli, no puedes beberte el extracto. ¡Te caíste en una marmita cuando eras una cría!» (Ma'Ngana).","Reference to Obelix from Asterix and Obelix falling into a cauldron. Suli is a younger beaver that likes to play tricks on their fellow beavers and isn't related to any faction in particular. Translated name shouldn't suggest a gender if possible. Ma' Ngonel is an almost legendary figure - a beaver grandma, known for her stern hand, cooking skills and respect among both kits and adult beavers. Her name is an inside joke, as our community constantly demands an addition of catapults, mangonels etc."
+Building.DecorativeClock.Description,"Un reloj decorativo, del tamaño perfecto para la vista de los más mayores.",
+Building.DecorativeClock.DisplayName,Reloj decorativo,
+Building.DecorativeClock.FlavorDescription,Cuesta creer que antaño los castores usaran clepsidras.,Clepsydra is an ancient water clock.
 Building.DeepBadwaterPump.DisplayName,Bomba de aguamala profunda,"Badwater Pump Must be the same as Building.BadwaterPump.DisplayName, Deep should be the same as in Building.DeepWaterPump.DisplayName"
 Building.DeepBadwaterPump.FlavorDescription,La tubería más larga ayuda a solucionar tanto los problemas de altura como el hedor.,
-Building.DeepMechanicalFluidPump.DisplayName,Bomba mecánica de fluidos profunda,
+Building.DeepMechanicalPump.DisplayName,Bomba mecánica profunda,This must be consistent with Building.MechanicalPump.DisplayName. This is an upgraded variant which can reach deeper water.
 Building.DeepWaterPump.Description,Bombea y filtra el agua para calmar la sed de los castores. La contaminación por aguamala hace que bombee más despacio.,
 Building.DeepWaterPump.DisplayName,Bomba de agua profunda,A water pump which can access deeper water than a regular pump.
 Building.DeepWaterPump.FlavorDescription,«Eres tú como el agua de mi fuente. Eres tú el hierro de mi hogar» (canción de los Dienteférreos).,"Adapted from Men at Work's famous 'Down Under' song ; Iron Teeth is a faction name, keep consistent (Faction.IronTeeth.DisplayName)"
+Building.DepthSensor.Description,Mide la profundidad del agua bajo el brazo.,
+Building.DepthSensor.DisplayName,Sensor de profundidad,
 Building.Detailer.Description,Personaliza las colas de los castores.,This building allows the player to paint beavers' tails.
 Building.Detailer.DisplayName,Decorador,Detailer references that the tail customisations are details/decorations.
 Building.Detailer.Folktails.FlavorDescription,Tus colas traerán cola.,"Only Folktails have ads, so they can also have magazines. ""Weird Tales"" is a famous pulp magazine."
 Building.Detailer.IronTeeth.FlavorDescription,"«Venga, por uno no pasará nada» (Suli).","Wordplay, as the IT variant looks painful to use."
+Building.Detonator.Description,Arma la dinamita que tiene debajo.,
+Building.Detonator.DisplayName,Detonador,A building which arms a dynamite.
 Building.DirtExcavator.Description,Maquinaria pesada de minería para recolectar tierra. Seguirá proporcionando tierra incluso después de alcanzar el lecho de roca.,Dirt must the same as Good.Dirt.DisplayName.
 Building.DirtExcavator.DisplayName,Excavadora de tierra,"A machine used to gather dirt, leaving a giant hole. Dirt must be the same as Good.Dirt.DisplayName."
 Building.DirtExcavator.FlavorDescription,"¡No es un taladro, es una sofisticada máquina de minería!",It's literally not a drill. It's a different kind of mining equipment. ;)
+Building.Discharge.Description,Vierte agua o aguamala.,Badwater should be the same as Good.Badwater.DisplayName.
+Building.Discharge.DisplayName,Vertedor,"A building which dumps water or badwater, for example to fill the reservoir below. It looks like a large faucet operated by a beaver."
+Building.Discharge.FlavorDescription,«Dame un buen cubo y moveré el lago» (el viejo Kazko).,"Ol' Kazko is a legendary forefather of modern beavers, famous inventor, pioneer of rapid industrialization."
+Building.Discharge.ToggleLabel,Fluido,Label of the toggle button in the discharge building panel that changes the type of fluid that is being discharged (water or badwater)
 Building.DistrictCenter.Description,"Crea un distrito con su población y bienes propios, además de una red de caminos aislada. Contrata constructores.",
 Building.DistrictCenter.DisplayName,Centro de distrito,
 Building.DistrictCenter.FlavorDescription.Folktails,"«Confort, comida y madera de la buena» (lema de los Bucólicos).",The motto must be the same as in Faction.Folktails.Description
@@ -203,7 +291,10 @@ Building.DistrictCenter.FlavorDescription.IronTeeth,"«Trabaja duro, y luego tra
 Building.DistrictCrossing.Description,Equilibra los bienes entre los dos distritos conectados. Cada lado tiene trabajadores que distribuyen los bienes en el cruce de distritos y en todo el distrito en general.,Districts should be the same as in Building.DistrictCenter.DisplayName
 Building.DistrictCrossing.DisplayName,Cruce de distritos,District should be the same as in Building.DistrictCenter.DisplayName
 Building.DistrictCrossing.FlavorDescription,Toda una encrucijada.,"Referencing ""Why did a chicken cross a road"" jokes"
+Building.DomedGarden.Description,Un lugar tranquilo para relajarse entre agua y vegetación.,
+Building.DomedGarden.DisplayName,Jardín cubierto,
 Building.DoubleDynamite.DisplayName,Dinamita doble,Dynamite that makes 2 blocks deep hole
+Building.DoubleDynamite.FlavorDescription,Cuando las medidas extremas no lo eran tanto.,References extreme measures mentioned in Building.Dynamite.FlavorDescription. It's part of a set.
 Building.DoubleFloodgate.DisplayName,Compuerta doble,
 Building.DoubleFloodgate.FlavorDescription,¿Cómo se mejora algo que ya es perfecto? Pues haciéndolo más alto.,
 Building.DoubleLodge.Description,Una cabaña más grande en la que caben más castores.,
@@ -219,7 +310,7 @@ Building.Dynamite.CantDetonate,No se puede detonar. Sitúa la dinamita a mayor a
 Building.Dynamite.Description,Destruye el terreno que está debajo y detona las dinamitas adyacentes.,Triggers can be changed to detonates
 Building.Dynamite.Detonate,Detonar,A button.
 Building.Dynamite.DisplayName,Dinamita,There's a good called Explosives so they need to have different names
-Building.Dynamite.ExplosionDepth,Profundidad de la explosión: {0},"Explains how deep the dynamite explosion is, {0} stands for the vertical number of blocks"
+Building.Dynamite.ExplosionDepth,Profundidad de la explosión: {0},"Explains how deep the dynamite explosion is, {0} stands for the depth value."
 Building.Dynamite.FlavorDescription,Hubo que tomar medidas extremas para adaptarse al mundo postapocalíptico.,
 Building.EarthRecultivator.Folktails.Description,"Reparte semillas de árboles por todo el planeta. Al lanzarlo, los castores de la zona se ponen más contentos que unas castañuelas.",
 Building.EarthRecultivator.Folktails.DisplayName,Recultivador terráqueo,Earth meaning planet Earth and Recultivator meaning regenerating the planet.
@@ -238,6 +329,7 @@ Building.ExercisePlaza.DisplayName,Centro de ejercicio,
 Building.ExercisePlaza.FlavorDescription,Los Dienteférreos aspiran a ser como sus creaciones: rápidos y furiosos.,"Reference to the Daft Punk song ""Harder, Better, Faster, Stronger""."
 Building.ExplosivesFactory.Description,Produce explosivos a partir de aguamala.,Explosives and badwater being goods names. Badwater should be the same as Good.Badwater.DisplayName.
 Building.ExplosivesFactory.DisplayName,Fábrica de explosivos,Explosives is name of a good.Explosives should be the same as Good.Explosives.PluralDisplayName
+Building.ExplosivesFactory.FlavorDescription,Como si no bastara con construir todo el asentamiento de madera.,
 Building.FarmerMonument.DisplayName,Monumento a los granjeros,A large statue of a farmer carrying a bundle of wheat.
 Building.FarmerMonument.FlavorDescription,"Domestica el páramo, alimenta al pueblo.",
 Building.Farmhouse.Description,Contrata granjeros para plantar y cosechar cultivos.,
@@ -246,16 +338,26 @@ Building.Farmhouse.FlavorDescription,La agricultura es uno de los pilares de la 
 Building.Fermenter.Description,Fermenta plantas para producir alimentos nutritivos.,Ferments should be the same as in Building.Fermenter.DisplayName
 Building.Fermenter.DisplayName,Fermentadora,A building that ferments plants to make food.
 Building.Fermenter.FlavorDescription,"Debido a una serie de accidentes, se ha limitado la lista de productos que se permite fermentar.",Referrencing fermentation used to produce alcoholic beverages.
+Building.FillValve.Description,Una salida unidireccional que regula el nivel del agua río abajo.,
+Building.FillValve.DisplayName,Válvula de llenado,A building which works like a valve which opens and closes to maintain the level of water in a reservoir/tank that it fills (refills).
+Building.FillValve.TargetHeight,Altura objetivo: {0},Label for a slider which sets the desired water depth.
+Building.FillValve.TargetHeightUnlimited,Sin límite,Label for a slider which sets the desired water depth when set to Unlimited.
+Building.FillValve.Synchronize,Sincronizar con válvulas de llenado adyacentes,Label for a toggle which makes this fill valve synchronize its configuration with adjacent fill valves.
+Building.FireworkLauncher.Description,Dispara fuegos artificiales a modo de celebración.,Fireworks should be consistent with Good.Fireworks.DisplayName
+Building.FireworkLauncher.DisplayName,Lanzador de fuegos artificiales,Name of a building which launches fireworks into the sky.
+Building.FireworkLauncher.FlightDistance,Distancia de vuelo: {0},Label for firework flight distance value. {0} stands for a number.
+Building.FireworkLauncher.Heading,Rumbo: {0},Label for firework heading value.
+Building.FireworkLauncher.IsContinuous,Lanzamiento continuo,Label for a toggle which makes the firework launcher launch fireworks continuously while activated.
+Building.FireworkLauncher.Pitch,Inclinación: {0},Label for firework pitch value.
 Building.FlameOfUnity.DisplayName,Llama de la unidad,A large beacon held by four beaver statues.
 Building.FlameOfUnity.FlavorDescription,«Nada une más que las cuotas de producción» (el viejo Kazko).,"Ol' Kazko is a legendary forefather of modern beavers, famous inventor, pioneer of rapid industrialization."
 Building.Floodgate.Description,Bloquea el agua a una altura regulable.,
 Building.Floodgate.DisplayName,Compuerta,
 Building.Floodgate.FlavorDescription,Nadie pensaba que se podían mejorar las presas hasta que el viejo Kazko creó «la Compuerta Primigenia».,
-Building.Floodgate.Height,Altura: {0},
-Building.Floodgate.Synchronize,Se sincroniza con las compuertas adyacentes.,
-Building.FluidDump.Description,Vierte agua o aguamala.,Badwater should be the same as Good.Badwater.DisplayName.
-Building.FluidDump.DisplayName,Balsa de fluidos,
-Building.FluidDump.ToggleLabel,Fluido:,Label of the toggle button in fluid dump panel that changes the type of fluid that is being dumped (water or badwater)
+Building.Floodgate.Height,Altura: {0},How high is the floodgates gate.
+Building.Floodgate.Synchronize,Sincronizar con compuertas adyacentes,
+Building.FlowSensor.Description,Mide la corriente de agua bajo el brazo.,
+Building.FlowSensor.DisplayName,Correntímetro,Name of a building which measures water speed.
 Building.FoodFactory.Description,Procesa ingredientes y los convierte en raciones de comida.,"Rations should be the same as in Good.AlgaeRation.DisplayName, Good.CornRation.DisplayName and Good.EggplantRation.DisplayName"
 Building.FoodFactory.DisplayName,Fábrica de comida,A factory building that literally produces food.
 Building.FoodFactory.FlavorDescription,"Cuando esto no existía y los castores querían picar algo en horario laboral, se acababan produciendo daños estructurales.",A hungry beaver may take a bite of a [wooden] construction it's working on.
@@ -264,6 +366,8 @@ Building.Forester.DisplayName,Ingeniero forestal,A building with a worker that p
 Building.Forester.FlavorDescription,"Los ingenieros forestales, que son unos profesionales como la copa de un pino, conforman el núcleo de la sociedad castoril.","Forresters are a family of central characters in ""Bold and Beautiful"", an extremely long-running American soap opera. Feel free to adapt this flavor, do not translate that literally."
 Building.FountainOfJoy.DisplayName,Fuente de la alegría,A large water fountain with statues on top.
 Building.FountainOfJoy.FlavorDescription,"Si te hace feliz, no es un derroche.",Water is a very preciuos resource in Timberborn - fountains could be seen as a waste.
+Building.Gate.Description,Desconecta un camino cuando se quiera.,Path needs to be consistent with Building.Path.DisplayName
+Building.Gate.DisplayName,Portón,Building which can be opened and closed to allow or block passage through a path.
 Building.GathererFlag.Description,Obtiene bienes de plantas silvestres.,
 Building.GathererFlag.DisplayName,Punto de recolección,Flag' could also be a Post or something similar as long as it is consistent with other Flags and different from Haulers Post
 Building.GathererFlag.FlavorDescription,"Un día que los castores empezaron a meter bayas en una cesta, descubrieron sin querer un postre delicioso.",
@@ -272,8 +376,10 @@ Building.GearWorkshop.DisplayName,Fábrica de engranajes,Gear is a good
 Building.GearWorkshop.FlavorDescription,"«Cada castor es un engranaje de nuestra sociedad, y nuestra sociedad necesita engranajes como la que más». Esta fue una famosa frase que dijo el viejo Kazko para fomentar la industrialización.","Metal Gear Solid is a famous Japanese video game series. Ol' Kazko is a legendary forefather of modern beavers, famous inventor, pioneer of rapid industrialization."
 Building.GeothermalEngine.Description,Una enorme turbina que genera energía a partir de un campo geotérmico.,
 Building.GeothermalEngine.DisplayName,Motor geotérmico,
+Building.GeothermalEngine.FlavorDescription,"Se ha automatizado, sobre todo a causa del olor.",
 Building.GeothermalField.Description,Una fuente de energía permanente y gratuita que se puede aprovechar con el artilugio adecuado.,
 Building.GeothermalField.DisplayName,Campo geotérmico,
+Building.GeothermalField.FlavorDescription,¿Aunque sea amarillo se considera energía verde?,
 Building.GravityBattery.Description,"Almacena el excedente de energía y lo pone en uso cuando a la red le falta suministro. Cuanto más alto se construya, más energía podrá almacenar.",
 Building.GravityBattery.DisplayName,Batería de gravedad,"A battery in the form of a crane, that stores power by raising a heavy weight above the ground."
 Building.GravityBattery.FlavorDescription,"Cuando inventas tus propias leyes de la física, se pueden hacer cosas así.",Gravity batteries in the real world do not make sense from the physics standpoint.
@@ -286,6 +392,7 @@ Building.Grill.FlavorDescription,"«¡Pa-ta-tas! En puré, cocidas o en un buen 
 Building.Gristmill.Description,Muele raíces y semillas para convertirlas en harina.,"Plant matter meaning different parts of plants, such as roots or flowers."
 Building.Gristmill.DisplayName,Molino harinero,
 Building.Gristmill.FlavorDescription,Los sabores más refinados dieron lugar a alimentos más refinados.,
+Building.HallOfAbundance.DisplayName,Salón de la abundancia,"A big, covered intersection resembling a hall, decorated with plants to match Folktails identity of wishing for abundance of nature"
 Building.Hammock.Description,"Un asiento que se balancea, perfecto para relajarse.",
 Building.Hammock.DisplayName,Hamaca,A free-standing hammock that beavers can rest in.
 Building.Hammock.FlavorDescription,"Antes se ataban a troncos, pero hubo demasiados accidentes con la tala de árboles.",
@@ -298,12 +405,32 @@ Building.Hedge.FlavorDescription,Ningún laberinto de setos es demasiado complic
 Building.Herbalist.Description,Crea antídoto para curar a los castores contaminados.,Antidote should be the same as Good.Antidote. Ideally all uses of the word contaminate/contamination/contaminated should be uniform across the project.
 Building.Herbalist.DisplayName,Herboristería,A building that serves as an antidote factory. It doesn't heal beavers inside.
 Building.Herbalist.FlavorDescription,El equipo de destilación se usa estrictamente para fines médicos.,This building kind of resembles an alcohol brewery.
+Building.HttpAdapter.Description,"Convierte la señal de entrada en un punto final de API y llamadas a webhook, signifique lo que signifique.",
+Building.HttpAdapter.DisplayName,Adaptador HTTP,A building that makes HTTP calls.
+Building.HttpAdapter.Method,Método,A label for a dropdown for selecting between HTTP request methods: GET vs POST.
+Building.HttpAdapter.Status,Estado: {0},
+Building.HttpAdapter.Status.Error,Error,
+Building.HttpAdapter.Status.OK,OK,
+Building.HttpAdapter.Url,URL,
+Building.HttpAdapter.WebhookWhenSwitchedOff,Llamar al desactivar,This is followed by a URL field which is called when the object is switched off.
+Building.HttpAdapter.WebhookWhenSwitchedOn,Llamar al activar,This is followed by a URL field which is called when the object is switched on.
+Building.HttpLever.Description,Un palanca controlada por una API. Los humanos dejaron muchas de estas atrás.,This is the description of a buildings which is called 'HTTP Server' and the first sentence is about humans who left a lot of servers lying around.
+Building.HttpLever.DisplayName,Palanca HTTP,A lever which can be controlled by API. It is an upgraded version of the normal Lever (Building.Lever.DisplayName) so the names should correspond to each other.
+Building.HttpLever.SwitchOffUrl,URL de desactivación,An API URL which switches off this object.
+Building.HttpLever.SwitchOnUrl,URL de activación,An API URL which switches on this object.
 Building.HydroponicGarden.Description,Cultiva plantas que no pueden crecer al aire libre.,
 Building.HydroponicGarden.DisplayName,Cultivo hidropónico,An artificial garden that's used to cultivate special plants.
 Building.HydroponicGarden.FlavorDescription,La idea surgió tras el descubrimiento de unas ruinas humanas muy húmedas que estaban recubiertas de unos hongos que crecían por todas partes.,"Referencing Timberborn's post-apo theme, but also a little bit of The Last of Us."
 Building.ImpermeableFloor.Description,Un panel para el suelo que evita que se filtre el agua.,
 Building.ImpermeableFloor.DisplayName,Superficie impermeable,"It's a metal floor tile that doesn't let any water through, hence Impermeable."
 Building.ImpermeableFloor.FlavorDescription,Todo comenzó con un castor hasta los bigotes del ruido de las goteras del tejado.,
+Building.ImpermeablePowerShaft.Description,Transfiere energía. Obstruye el paso del agua.,
+Building.ImpermeablePowerShaft.DisplayName,Eje de transmisión impermeable,Must be consistent with Building.PowerShaft.DisplayName. An axle which transfers power embedded in a block of wood which keeps it watertight.
+Building.Indicator.Description,Una luz indicadora que sirve para alertar.,An API URL which switches on this object.
+Building.Indicator.DisplayName,Indicador,"An building which is an indicator light - when it receives a signal it lights up and optionally raises an alarm. Alternative names: Alarm, Annunciator, Signal, Beacon."
+Building.Indicator.JournalEntryWhenSwitchedOn,Añadir entrada de diario con la activación,A label for a toggle which makes this indicator add a journal entry when its input signal is switched on.
+Building.Indicator.ReplicateInputColor,Replicar color de señal de entrada,A label for a toggle which makes this indicator set its color to its input signal color.
+Building.Indicator.WarningWhenSwitchedOn,Mostrar aviso con la activación,A label for a toggle which makes this indicator show a warning in GUI.
 Building.IndustrialLumberMill.Description,Crea tablones a partir de troncos. Su diseño innovador permite albergar a más trabajadores sin tener que agrandar el espacio.,"Planks should be the same as Good.Plank.DisplayName, Logs should be the same as Good.Log.DisplayName"
 Building.IndustrialLumberMill.DisplayName,Aserradero industrial,Lumber Mill should be the same as in Building.LumberMill.DisplayName
 Building.IndustrialLumberMill.FlavorDescription,Dos sierras cortan más que una.,"Referencing the ""two beavers are better than one"" song, plus the IT lumbermill has two saws rather than one that's in the FT version."
@@ -326,6 +453,7 @@ Building.LargePile.FlavorDescription,"Menudo montón de madera, tronco.","""Log"
 Building.LargePowerWheel.Description,Una fuente de energía operada por castores que ha sido rediseñada para emplear a varios trabajadores a la vez.,
 Building.LargePowerWheel.DisplayName,Rueda de energía grande,
 Building.LargePowerWheel.FlavorDescription,Los Dienteférreos querían su propio carrusel.,Iron Teeth must be the same as Faction.IronTeeth.DisplayName.
+Building.LargeRelic.FlavorDescription,«Algunos humanos eran tan grandes que usaban esto para comer» (Suli).,"Large relic is a ruined radar dish, looks like a bowl. Suli is a younger beaver that likes to play tricks on their fellow beavers and isn't related to any faction in particular. Translated name shouldn't suggest a gender if possible."
 Building.LargeRowhouse.DisplayName,Casa adosada grande,"A rowhouse is a narrow and tall house that is connected to other homes on both sides, often built in a row. Building.Rowhouse"
 Building.LargeRowhouse.FlavorDescription,Los Dienteférreos han desarrollado un gran complejo de edificios.,Referencing 'complex' meaning a group of buildings as well as a psychological behaviour.
 Building.LargeTank.DisplayName,Depósito grande,
@@ -344,6 +472,11 @@ Building.LargeWindTurbine.FlavorDescription,No hay nada como el viento de cola.,
 Building.Levee.Description,Obstruye por completo la corriente de agua.,
 Building.Levee.DisplayName,Dique,Different to a Dam
 Building.Levee.FlavorDescription,Esto no es un bloque de madera sin más. Es el resultado del trabajo y perfeccionamiento de generaciones de castores ingenieros hidráulicos.,
+Building.Lever.Description,Envía una señal de control manual. Un gran primer paso hacia la automatización de un asentamiento.,
+Building.Lever.DisplayName,Palanca,A lever as that can be moved up or down to activate something. An alternative name would be 'Switch'.
+Building.Lever.SpringReturn,Retorno con resorte,"Keep short. Checkbox label - when a lever is in spring-return mode, it means that after switching on, it momentarily switches off."
+Building.Lever.SwitchOff,Desactivar,Button label.
+Building.Lever.SwitchOn,Activar,Button label.
 Building.Lido.Description,El sitio perfecto para relajarse junto al río.,
 Building.Lido.DisplayName,Piscina natural,Lido as in a swimming pool. Built on a river bank and used to relax. Includes a swimming area and a small land area with a few lawn chairs.
 Building.Lido.FlavorDescription,"Para celebrar el primer chapuzón de sus crías, los castores hacen una fiesta en la piscina.",Kits are young beavers.
@@ -356,17 +489,30 @@ Building.LumberMill.FlavorDescription,El procesamiento mecanizado de la madera q
 Building.LumberjackFlag.Description,Contrata a un leñador que tala árboles.,
 Building.LumberjackFlag.DisplayName,Punto de tala,Flag' could also be a Post or something similar as long as it is consistent with other Flags and different from Haulers Post
 Building.LumberjackFlag.FlavorDescription,"«A quien a buen árbol se arrima, buena merienda le espera» (famoso refrán castoril).","Adapted from Monthy Python's ""Lumberjack Song"""
-Building.MechanicalFluidPump.Description,Bombea el agua o el aguamala de un lado y la descarga en el otro. Es más eficiente que una bomba normal.,Badwater should be the same as Good.Badwater.DisplayName.
-Building.MechanicalFluidPump.DisplayName,Bomba mecánica de fluidos,A mechanically powered water pump.
-Building.MechanicalFluidPump.FlavorDescription,Mejor agua corriente que estancada y maloliente.,Running water meaning water that is moving.
+Building.Massager.Description,Un masaje no muy delicado.,
+Building.Massager.DisplayName,Masajeador,A mechanical massaging device.
+Building.MechanicalPump.Description,Bombea agua o aguamala de un lado y la vierte en el otro.,Badwater should be the same as Good.Badwater.DisplayName.
+Building.MechanicalPump.DisplayName,Bomba mecánica,A mechanically powered water pump.
+Building.MechanicalPump.FlavorDescription,Mejor agua corriente que estancada y maloliente.,Running water meaning water that is moving.
 Building.MedicalBed.Description,Los castores heridos se tumban aquí para descansar y curarse., 
 Building.MedicalBed.DisplayName,Camilla médica,A place where injured beavers come to lie down and rest
 Building.MedicalBed.FlavorDescription,«¡Es solo un arañazo! ¿Puedo volver al trabajo ya?» (Laurel).,Monty Python reference.
+Building.MediumRelic.FlavorDescription,«A veces se ven cayendo del cielo» (Ma'Ngana).,"Medium Relic is a crashed satellite. Ma' Ngonel is an almost legendary figure - a beaver grandma, known for her stern hand, cooking skills and respect among both kits and adult beavers. Her name is an inside joke, as our community constantly demands an addition of catapults, mangonels etc."
 Building.MediumTank.DisplayName,Depósito mediano,
 Building.MediumTank.FlavorDescription,"Después de la Gran Sequía, los castores impusieron la norma de siempre tener unos cuantos de estos a mano.",The Great Drought should remain capitalized to indicate it's a name of an event.
 Building.MediumWarehouse.DisplayName,Almacén mediano,
 Building.MediumWarehouse.FlavorDescription,Un buen almacenamiento es vital para soportar los avatares del mundo postapocalíptico.,
 Building.MemorialToFamily.DisplayName,Homenaje a la familia,A large brazier surrounded by statues of a beaver family
+Building.Memory.Description,Cambia y conserva su estado en respuesta a secuencias de entradas específicas. Una piedra angular en la automatización avanzada.,
+Building.Memory.DisplayName,Memoria,A structure in game which can remember data.
+Building.Memory.Mode.FlipFlop,Flip-flop,An electronic component mode which flips between zero and one in response to specific input signals. 'Flip-flop' is a popular term in electronics.
+Building.Memory.Mode.FlipFlop.Description,Captura <YellowHighlight>{0}</YellowHighlight> cuando <YellowHighlight>{1}</YellowHighlight> se activa.,This describes a mode of an electronic component. {0} and {1} are input names such as A or B but styled like keywords so do not worry about articles. Notice the subtles difference with other modes between 'is on' (meaning something happens for the whole duration when a signal is On) VS 'switches on' (meaning something happens the moment a signal changes from Off to On).
+Building.Memory.Mode.Latch,Latch,An electronic component mode which memorizes data in response to specific input signals. 'Latch' is a popular term in electronics.
+Building.Memory.Mode.Latch.Description,Captura <YellowHighlight>{0}</YellowHighlight> cuando <YellowHighlight>{1}</YellowHighlight> está en On.,This describes a mode of an electronic component. {0} and {1} are input names such as A or B but styled like keywords so do not worry about articles. Notice the subtles difference with other modes between 'is on' (meaning something happens for the whole duration when a signal is On) VS 'switches on' (meaning something happens the moment a signal changes from Off to On).
+Building.Memory.Mode.SetReset,Set-Reset,An electronic component mode which flips between zero and one in response to specific input signals. 'Set-Reset' is a popular term in electronics.
+Building.Memory.Mode.SetReset.Description,Se activa con <YellowHighlight>{0}</YellowHighlight>., This describes a mode of an electronic component. {0} and {2} are input names such as A or B but styled like keywords so do not worry about articles.
+Building.Memory.Mode.Toggle,Toggle,An electronic component mode which flips state every time it receives a signal. 'Toggle' is a popular term in electronics.
+Building.Memory.Mode.Toggle.Description,Se voltea cuando <YellowHighlight>{0}</YellowHighlight> se activa.,This describes a mode of an electronic component. {0} is an input name such as A or B but styled like a keyword so do not worry about articles. Notice the subtles difference with other modes between 'is on' (meaning something happens for the whole duration when a signal is On) VS 'switches on' (meaning something happens the moment a signal changes from Off to On). 'Flips' here means that it inverts its state - from zero to one or from one to zero.
 Building.MetalFence.Description,Una valla decorativa hecha de metal.,
 Building.MetalFence.DisplayName,Valla de metal,
 Building.MetalFence.FlavorDescription,Ojo con el castor que prefiera el metal a la madera.,"Reference to ""beware the dog"" often written on fences."
@@ -375,6 +521,9 @@ Building.MetalPlatform3x3.Description,Una plataforma de metal apoyada en una col
 Building.MetalPlatform3x3.DisplayName,Plataforma de metal 3x3,Numbers at the end denote size X by Y.
 Building.MetalPlatform5x5.Description,Una plataforma de metal grande apoyada en una columna central resistente.,
 Building.MetalPlatform5x5.DisplayName,Plataforma de metal 5x5,Numbers at the end denote size X by Y.
+Building.Metalsmith.Description,Produce piezas de metal sencillas a partir de trozos de metal.,
+Building.Metalsmith.DisplayName,Metalistería,
+Building.Metalsmith.FlavorDescription,"«Si quieres que dure, utiliza metal. Algo bueno hicieron los humanos» (El viejo Kazko).","Ol' Kazko is a legendary forefather of modern beavers, famous inventor, pioneer of rapid industrialization."
 Building.Mine.Description,Contrata mineros que extraen trozos de metal de las ruinas subterráneas.,"Underground Ruins is a building, same as Building.Underground Ruins.DisplayName"
 Building.Mine.DisplayName,Mina,An extracting facility which can be placed on underground ruins.
 Building.Mine.FlavorDescription,La idea vino de siete tipos muy bajitos que cantaban sobre que cavar era lo más.,"The mine provides an endless supply of scrap metal. Reference to 'they delved too greedily and too deep, and disturbed that from which they fled, Durin's Bane' from LOTR"
@@ -392,6 +541,7 @@ Building.MudPit.DisplayName,Piscina de barro,"This building is a pit filled with
 Building.MudPit.FlavorDescription,Aquí construyen las crías sus primeras presitas.,
 Building.NaturalDam.Description,"Una barrera natural que obstruye el paso del agua, aunque permite que una pequeña cantidad pase a través de un aliviadero. Se puede demoler.",
 Building.NaturalDam.DisplayName,Presa natural,
+Building.NaturalDam.FlavorDescription,"Resulta difícil creer que, en tiempos más simples, se llamaba presa a un poco de barro y unas cuantas ramas.",
 Building.NaturalOverhang.Description,Una plataforma de roca saliente que sirve de puente o de base para otros edificios. Es totalmente hidrófuga.,
 Building.NaturalOverhang.FlavorDescription,"""¡Comprueba que haya agua debajo antes de saltar!"" (Suli)",
 Building.NaturalOverhang2x1.DisplayName,Saliente natural 2x1,This structure is a solid rock overhang. Numbers at the end denote size X by Y.
@@ -426,6 +576,36 @@ Building.Platform.DisplayName,Plataforma,
 Building.Platform.FlavorDescription,La increíble capacidad de carga de las plataformas las convierte en obras maestras de la ingeniería castoril.,
 Building.PoleBanner.Description,Un estandarte alto y personalizable.,
 Building.PoleBanner.DisplayName,Estandarte con mástil,"Tall, hanging banner on a pole."
+Building.PoleBanner.FlavorDescription,Se ha elevado para evitar que los críos se carguen las imágenes.,
+Building.PopulationCounter.DisplayName,Contador de población,"An automation building which monitors various population counters such as total population, homeless, workplaces, vacancies etc."
+Building.PopulationCounter.Description,"Monitoriza distintos medidores de población, vivienda y mano de obra.",
+Building.PopulationCounter.DistrictMode,Modo de distrito,Indicates that this counter should count only one district's data. District should be the same as in Building.DistrictCenter.DisplayName.
+Building.PopulationCounter.GlobalMode,Modo global,Indicates that this counter should count global (settlement-wide) data. Should be consistent with Districts.GlobalView
+Building.PopulationCounter.Mode.TotalPopulation,Población total,
+Building.PopulationCounter.Mode.TotalBeavers,Castores totales,
+Building.PopulationCounter.Mode.Adults,Adultos,
+Building.PopulationCounter.Mode.Children,Crías,
+Building.PopulationCounter.Mode.Bots,Robots,
+Building.PopulationCounter.Mode.TotalBeds,Camas totales,
+Building.PopulationCounter.Mode.OccupiedBeds,Camas ocupadas,
+Building.PopulationCounter.Mode.FreeBeds,Camas libres,
+Building.PopulationCounter.Mode.Homeless,Sin hogar,
+Building.PopulationCounter.Mode.Jobs,Trabajos,
+Building.PopulationCounter.Mode.Employed,Empleados,
+Building.PopulationCounter.Mode.Unemployed,Sin empleo,
+Building.PopulationCounter.Mode.Vacancies,Vacantes,
+Building.PopulationCounter.Mode.TotalWorkers,Trabajadores totales,
+Building.PopulationCounter.Mode.HealthyWorkers,Trabajadores sanos,
+Building.PopulationCounter.Mode.UnhealthyWorkers,Trabajadores enfermos,
+Building.PopulationCounter.Mode.ContaminatedTotal,Total de contaminados,
+Building.PopulationCounter.Mode.ContaminatedAdults,Adultos contaminados,
+Building.PopulationCounter.Mode.ContaminatedChildren,Crías contaminadas,
+Building.PowerMeter.Description,Monitoriza los parámetros de la red de energía.,
+Building.PowerMeter.DisplayName,Medidor de energía,"A building that measures different parameters in a power (shaft) network such as supply, demand, battery charge etc."
+Building.PowerMeter.Mode.BatteryChargeLevel,Carga de baterías,A stat name - battery charge in percent. Make sure that 'Battery' is consistent with Building.GravityBattery.DisplayName.
+Building.PowerMeter.Mode.Demand,Demanda,A stat name - as in 'network power demand'. This should be consistent with Mechanical.* keys.
+Building.PowerMeter.Mode.Supply,Suministro,A stat name - as in 'network power supply'. This should be consistent with Mechanical.* keys.
+Building.PowerMeter.Mode.Surplus,Excedente,A stat name - supply minus demand.
 Building.PowerShaft.Description,Transfiere energía.,"Power being mechanical/kinetic, not electricity. Alternative name: axle."
 Building.PowerShaft.DisplayName,Eje de transmisión,"Power being mechanical/kinetic, not electricity. Alternative name: axle."
 Building.PowerShaft.FlavorDescription,Un gran invento aún más grande si cabe.,Flavor text for the Power Shaft building
@@ -438,11 +618,32 @@ Building.PrintingPress.FlavorDescription,"Normalmente los castores se comen cada
 Building.Refinery.Description,Produce varios tipos de combustible para los robots.,Bots should be the same as Bot.PluralDisplayName.
 Building.Refinery.DisplayName,Refinería,A building where old food is processed to make biofuel
 Building.Refinery.FlavorDescription,"Reciclar, refinar y reducir.","Adapted ""Reduce, reuse, recycle"" tagline."
+Building.Relay.Description,Ejecuta operaciones lógicas sencillas con sus señales de entrada.,
+Building.Relay.DisplayName,Repetidor,The name of a building which can retransmit a signal or process it using boolean logic.
+Building.Relay.Mode.And,AND,A binaray logic AND operation. Only translate if you really have to but most languages should be better off OK with the English naming because it's a conventional name in electronics.
+Building.Relay.Mode.And.Description,<YellowHighlight>On</YellowHighlight> si ambas entradas están en <YellowHighlight>On</YellowHighlight>.,A binary logic AND operation.
+Building.Relay.Mode.Not,NOT,A binary logic NOT operation. Only translate if you really have to but most languages should be better off OK with the English naming because it's a conventional name in electronics.
+Building.Relay.Mode.Not.Description,<YellowHighlight>On</YellowHighlight> si la entrada está en <YellowHighlight>Off</YellowHighlight>.,A binary logic NOT operation.
+Building.Relay.Mode.Or,OR,A binary logic OR operation. Only translate if you really have to but most languages should be better off OK with the English naming because it's a conventional name in electronics.
+Building.Relay.Mode.Or.Description,<YellowHighlight>On</YellowHighlight> si cualquier entrada está en <YellowHighlight>On</YellowHighlight>.,A binary logic OR operation.
+Building.Relay.Mode.Passthrough,Paso directo,An operation which forwards its input unchanged to its output.
+Building.Relay.Mode.Passthrough.Description,<YellowHighlight>On</YellowHighlight> si la entrada está en <YellowHighlight>On</YellowHighlight>.,An operation which forwards its input unchanged to its output.
+Building.Relay.Mode.Xor,XOR,A binary logic XOR operation. Only translate if you really have to but most languages should be better off OK with the English naming because it's a conventional name in electronics.
+Building.Relay.Mode.Xor.Description,<YellowHighlight>On</YellowHighlight> si una entrada está en <YellowHighlight>On</YellowHighlight>.,A binary logic XOR operation.
 Building.Relic.Description,Una tecnología antigua que se puede demoler para obtener un avance científico.,
 Building.Relic.DisplayName,Reliquia,Remains of a human structure/device that can be demolished to obtain a certain amount of the Science resource
 Building.ReservePile.DisplayName,Pila de reserva,
+Building.ReservePile.FlavorDescription,«La madera antigua es mucho mejor. Antes se cultivaba de otro modo» (Ma'Ngana).,"Ma' Ngonel is an almost legendary figure - a beaver grandma, known for her stern hand, cooking skills and respect among both kits and adult beavers. Her name is an inside joke, as our community constantly demands an addition of catapults, mangonels etc."
 Building.ReserveTank.DisplayName,Depósito de reserva,
+Building.ReserveTank.FlavorDescription,"«Sí, estaba sellado. Sí, es potable. Tú primero» (Laurel).","Pina is a younger beaver figure that's exploring the world and isn't related to any faction in particular. Pina as a name relates to the pine tree, the translated name shouldn't suggest a gender if possible."
 Building.ReserveWarehouse.DisplayName,Almacén de reserva,
+Building.ReserveWarehouse.FlavorDescription,Un obsequio de generaciones pasadas.,
+Building.ResourceCounter.Description,Envía una señal en función del nivel de existencias del bien especificado.,
+Building.ResourceCounter.DisplayName,Contador de recursos,
+Building.ResourceCounter.IncludeInputs,Incluir entradas,Toggle on Resource Counter building - switches between counting available or all goods
+Building.ResourceCounter.MeasurementPercent,Medida: {0} %,"Fill rate of choosen good, please keep short."
+Building.ResourceCounter.Mode.Percent,Porcentaje (%),Mode for resource counter building - percent of storage spaces filled with goods
+Building.ResourceCounter.Mode.Quantity,Cantidad,Mode for Resource Counter building - quantity of goods
 Building.Roof.FlavorDescription,Un tejado un poco mejor de la cuenta suele ser motivo suficiente para provocar cierta rivalidad entre vecinos.,
 Building.Roof1x1.DisplayName,Tejado 1x1,Numbers at the end denote size X by Y
 Building.Roof1x2.DisplayName,Tejado 1x2,Numbers at the end denote size X by Y
@@ -458,12 +659,16 @@ Building.Rowhouse.FlavorDescription,Más vale una casa adosada que una casa atra
 Building.Ruins.Description,Un suministro limitado de trozos de metal.,Metal is a name of a good.
 Building.Ruins.DisplayName,Ruinas,
 Building.Ruins.FlavorDescription,Ruinas de la civilización humana que se encuentran dispersas por todo el territorio. Proporcionaron a los castores lo nunca visto: un bien superior a la madera.,
+Building.Sauna.Description,Una sauna en la azotea al aire libre donde los castores se olvidan del mundo.,
+Building.Sauna.DisplayName,Sauna,
 Building.Scarecrow.Description,"Una decoración que solía ahuyentar a los pájaros de los cultivos, pero que ahora divierte a jóvenes y adultos por igual.",
 Building.Scarecrow.DisplayName,Espantapájaros,
 Building.Scarecrow.FlavorDescription,Los mejores en su campo.,
 Building.ScavengerFlag.Description,Los chatarreros consiguen trozos de metal de las ruinas.,Metal is a name of a good;Ruins are a building
 Building.ScavengerFlag.DisplayName,Punto de chatarra,
 Building.ScavengerFlag.FlavorDescription,"Al llevar el metal a los asentamientos de madera tradicionales, los chatarreros se ganan el respeto de unos y el desprecio de otros.",
+Building.ScienceCounter.Description,Envía una señal en función de los puntos de ciencia.,Science Points must correspond to Science.SciencePoints.
+Building.ScienceCounter.DisplayName,Contador de ciencia,The name of a building which counts how many Science Points the player has and sends an automation signal based on that.
 Building.Scratcher.Description,Una máquina para rascarse zonas a las que es difícil llegar.,
 Building.Scratcher.DisplayName,Rascador,A rotating brush which beavers use to scratch their fur. For reference google videos of cow scratchers.
 Building.Scratcher.FlavorDescription,"Incluso cuando descansan, a los Dienteférreos les pica el gusanillo del trabajo.",Itching meaning having an itch as well as an idiom for wanting to do something very much. If possible try to adapt the phrase to fit your language. Iron Teeth must be the same as Faction.IronTeeth.DisplayName.
@@ -474,25 +679,12 @@ Building.Shrub.DisplayName,Matorral,Must be different than 'Bush' which is a pla
 Building.Shrub.FlavorDescription,"En virtud de la practicidad, la decoración debe tener belleza y buen gusto.",
 Building.Slope.DisplayName,Pendiente,
 Building.Slope.FlavorDescription,"Nadie sabe quién la hizo, pero a los castores les encanta.",
-Building.Sluice.AboveContaminationToggle,Cerrar con contaminación superior a: {0},"Label of a toggle that enables automation based on contamination level, {0} stands for currently set level, ie 5%"
-Building.Sluice.BelowContaminationToggle,Cerrar con contaminación inferior a: {0},"Label of a toggle that enables automation based on contamination level, {0} stands for currently set level, ie 5%"
-Building.Sluice.Contamination,Contaminación: {0},"Level of the water contamination, {0} stands for contamination level in percent. Ideally all uses of the word contaminate/contamination/contaminated should be uniform across the project."
-Building.Sluice.Description,Descarga de agua automática y unidireccional.,
-Building.Sluice.DisplayName,Esclusa,Also known as a sluice gate. Different than Building.Floodgate.DisplayName.
-Building.Sluice.DownstreamDepth,Profundidad río abajo: {0},{0} stands for chosen downstream depth maintained by the building.
-Building.Sluice.FlavorDescription,"""Suli, ¿se te ha vuelto a olvidar tirar el aguamala?"" (Ma'Ngana)",Badwater has to be consistent with Good.Badwater.DisplayName
-Building.Sluice.MaximumDepthToggle,Cerrar con profundidad río abajo superior a: {0},Label of a toggle that enables automation based on the maximum downstream depth of water
-Building.Sluice.Mode.Auto,Automática,Label of the toggle that sets the sluice to work in automatic mode
-Building.Sluice.Mode.AutoClosed,Automática: cerrada,Label for sluice working in automatic mode and is closed
-Building.Sluice.Mode.AutoOpen,Automática: abierta,Label for sluice working in automatic mode and is opened
-Building.Sluice.Mode.Closed,Cerrada,Label of the toggle that sets the sluice to be always closed
-Building.Sluice.Mode.Open,Abierta,Label of the toggle that sets the sluice to be always open
-Building.Sluice.Synchronize,Sincronizar con esclusas contiguas,
 Building.SmallIndustrialPile.DisplayName,Pila industrial pequeña,
 Building.SmallIndustrialPile.FlavorDescription,«¿Le ponen un techo encima y ya pasa a ser industrial? Lo típico» (Laurel).,
 Building.SmallPile.Description,Sirve para almacenar bienes voluminosos.,
 Building.SmallPile.DisplayName,Pila pequeña,
 Building.SmallPile.FlavorDescription,Ningún castor que se precie deja los materiales de construcción por ahí tirados.,
+Building.SmallRelic.FlavorDescription,«¡Suli! ¡No apuntes al sol!» (el viejo Kazko).,"Small Relic is a telescope. Ol' Kazko is a legendary forefather of modern beavers, famous inventor, pioneer of rapid industrialization."
 Building.SmallTank.Description,Sirve para almacenar líquidos.,
 Building.SmallTank.DisplayName,Depósito pequeño,
 Building.SmallTank.FlavorDescription,Aprender a no malgastar ni una gota de agua ha ayudado a los castores a adaptarse al árido entorno.,
@@ -502,22 +694,34 @@ Building.SmallWarehouse.FlavorDescription,«En mi despensa no quiero dinamita. H
 Building.Smelter.Description,Funde los trozos de metal y los transforma en bloques.,Scrap metal should be the same as Good.ScrapMetal.DisplayName and metal blocks should be the same as Good.MetalBlock.DisplayName
 Building.Smelter.DisplayName,Fundición,A facility that uses very high temperature to produce metal blocks from iron ore.
 Building.Smelter.FlavorDescription,El nuevo mundo de los castores se forja a base de sudor y olorcillo a pelaje chamuscado.,
+Building.Speaker.Description,Emite sonidos.,Description of a building which plays sounds when it receives an automation signal.
+Building.Speaker.DisplayName,Altavoz,A name of a building that plays a sound when it receives an automation signal.
+Building.Speaker.PlaybackMode.Continuously,Reproducción continua,Selectable option label for speaker that plays sound continuously while activated (looped).
+Building.Speaker.PlaybackMode.Once,Reproducir una vez,Selectiable option label for speaker that plays sound once when activated.
+Building.Speaker.Sound.Alarm,Alarma,
+Building.Speaker.Sound.Buzz,Zumbido,
+Building.Speaker.Sound.Chime1,Timbre 1,
+Building.Speaker.Sound.Chime2,Timbre 2,
+Building.Speaker.SpatialMode.NonSpatial,No espacial,"Sound mode name - bBuilding sound plays equally loud everywhere, like a UI notification."
+Building.Speaker.SpatialMode.Spatial,Espacial,"Sound mode name - building sound volume depends on distance from the building, it's played in a 3D world, relative to camera position."
 Building.SpiralStairs.DisplayName,Escaleras de caracol,Name of a building that allows beavers to climb up and down in a spiral manner.
+Building.SpiralStairs.FlavorDescription,"«Si las usas demasiado, la cabeza no deja de darte vueltas» (Suli).",Suli is a younger beaver that likes to play tricks on their fellow beavers and isn't related to any faction in particular. Translated name shouldn't suggest a gender if possible.
 Building.SquareBanner.Description,Un estandarte cuadrado y personalizable.,
 Building.SquareBanner.DisplayName,Estandarte cuadrado,"Short, standing banner in a square bracket."
+Building.SquareBanner.FlavorDescription,Piensa a lo grande.,
 Building.Stairs.DisplayName,Escaleras,
 Building.Stairs.FlavorDescription,"Cuando inventaron las escaleras, los castores subieron al siguiente nivel.",
 Building.StartingLocation.DisplayName,Ubicación inicial,
 Building.SteamEngine.Description,Quema combustible para generar energía.,
 Building.SteamEngine.DisplayName,Motor de vapor,
 Building.SteamEngine.FlavorDescription,"Pese a ser un gran invento, se convirtió en una «rama» de doble filo para las naciones castoriles. Salvo para los Dienteférreos, claro.","Iron Teeth is one of the playable factions, with the Engine being one of their unique buildings."
-Building.StreamGauge.Contamination,Contaminación: {0},"Level of the water contamination, {0} stands for contamination level in percent. Ideally all uses of the word contaminate/contamination/contaminated should be uniform across the project."
-Building.StreamGauge.Current,Corriente: {0} m³/s,"Intensity of the water current, {0} stands for current speed in cubic metre per second"
-Building.StreamGauge.Depth,Profundidad: {0},"Level of the water depth, {0} stands for this value in meters"
-Building.StreamGauge.Description,"Mide la profundidad del agua, la corriente y la contaminación por aguamala.",Badwater should be the same as Good.Badwater.DisplayName.
+Building.StreamGauge.Contamination,Contaminación: {0},"Level of the water contamination, {0} stands for the value. Ideally all uses of the word contaminate/contamination/contaminated should be uniform across the project."
+Building.StreamGauge.Current,Corriente: {0},"Intensity of the water current, {0} stands for the value"
+Building.StreamGauge.Depth,Profundidad: {0},"Level of the water depth, {0} stands for this value"
+Building.StreamGauge.Description,"Una manera tradicional de medir la profundidad, el caudal y la contaminación del agua.",Badwater should be the same as Good.Badwater.DisplayName.
 Building.StreamGauge.DisplayName,Medidor de caudal,
 Building.StreamGauge.FlavorDescription,"Medir o no medir, esa es la cuestión.",Adapted quote from Shakespeare's 'Julius Cesar'
-Building.StreamGauge.GreatestDepth,Mayor profundidad registrada: {0},"Level of the greatest noted water depth, {0} stands for this value in meters"
+Building.StreamGauge.GreatestDepth,Mayor profundidad: {0},"Level of the greatest noted water depth, {0} stands for this value"
 Building.StreamGauge.Reset,Restablecer,
 Building.SuspensionBridge.Description,Permite que los castores crucen de un saliente a otro.,
 Building.SuspensionBridge.FlavorDescription,Aguanta más de lo que parece.,
@@ -540,9 +744,28 @@ Building.TerrainBlock.Description,Un trozo de terreno artificial. El orden de co
 Building.TerrainBlock.DisplayName,Trozo de terreno,A 1x1x1 chunk of terrain
 Building.Thorns.Description,Un obstáculo infranqueable que obstruye la irrigación y la contaminación. Eliminarlo es complicado y quien lo intente podría sufrir daños.,
 Building.Thorns.DisplayName,Espinos,
+Building.Thorns.FlavorDescription,"No es una bondad de la naturaleza, sino su ira.",
+Building.Timer.Description,Aplica procesamiento basado en el tiempo a su señal de entrada.,
+Building.Timer.DisplayName,Temporizador,The name of a building which sends automation signals based on time delays.
+Building.Timer.IntervalType.Days,Días,Dropdown option that makes the Timer to work using days as time unit.
+Building.Timer.IntervalType.Hours,Horas,Dropdown option that makes the Timer to work using hours as time unit.
+Building.Timer.IntervalType.Ticks,Tics,Dropdown option that makes the Timer to work using `clock ticks` as time unit. It should be translated the same way as in Buildings.Sequential and KeyBinding.TickOnce
+Building.Timer.Mode.Accumulator,Acumulador,"One of the modes of the Timer, counts ticks when input is on and sets output on when a certain time is reached."
+Building.Timer.Mode.Accumulator.Description,On si <YellowHighlight>{0}</YellowHighlight> está en On durante al menos <YellowHighlight>{1}</YellowHighlight> en total.,This describes a mode of the Timer. {0} is Automation.Input.InputA and {1} is Building.Timer.Time1 but styled like keywords so do not worry about articles. Notice the subtles difference with other modes between 'is on' (meaning something happens for the whole duration when a signal is On) VS 'switches on' (meaning something happens the moment a signal changes from Off to On).
+Building.Timer.Mode.Delay,Retardo,"One of the modes of the Timer, which sends an output signal after a delay when it receives an input signal."
+Building.Timer.Mode.Delay.Description,Retrasa el modo On de <YellowHighlight>{0}</YellowHighlight> en <YellowHighlight>{1}</YellowHighlight> y el Off en <YellowHighlight>{2}</YellowHighlight>.,"This describes a mode of the Timer. {0} is Automation.Input.InputA, {1} is Building.Timer.Time1 and {2} is Building.Timer.Time2 but styled like keywords so do not worry about articles. Notice the subtles difference with other modes between 'is on' (meaning something happens for the whole duration when a signal is On) VS 'switches on' (meaning something happens the moment a signal changes from Off to On). In other words it means: Delays On state of input A by T1 and Off state of input A by T2."
+Building.Timer.Mode.Oscillator,Oscilador,"One of the modes of the Timer, which repeatedly changes its output to on and off at specified intervals."
+Building.Timer.Mode.Oscillator.Description,Alterna entre el modo On y Off mientras <YellowHighlight>{0}</YellowHighlight> está en On.,This describes a mode of the Timer. {0} is Automation.Input.InputA but styled like keywords so do not worry about articles. Notice the subtles difference with other modes between 'is on' (meaning something happens for the whole duration when a signal is On) VS 'switches on' (meaning something happens the moment a signal changes from Off to On).
+Building.Timer.Mode.Pulse,Pulso,"One of the modes of the Timer, which sends an output signal for a certain duration when it receives an input signal."
+Building.Timer.Mode.Pulse.Description,On durante <YellowHighlight>{1}</YellowHighlight> después de que se active <YellowHighlight>{0}</YellowHighlight>.,This describes a mode of the Timer. {0} is Automation.Input.InputA and {1} is Building.Timer.Time1 but styled like keywords so do not worry about articles. Notice the subtles difference with other modes between 'is on' (meaning something happens for the whole duration when a signal is On) VS 'switches on' (meaning something happens the moment a signal changes from Off to On).
+Building.Timer.Mode.Random,Aleatorio,"One of the modes of the Timer, which randomly changes its output to on and off at specified interval."
+Building.Timer.Mode.Random.Description,Aleatoriza el estado cada <YellowHighlight>{1}</YellowHighlight> cuando <YellowHighlight>{0}</YellowHighlight> está en On.,This describes a mode of the Timer. {0} is Automation.Input.InputA and {1} is Building.Timer.Time1 but styled like keywords so do not worry about articles. Notice the subtles difference with other modes between 'is on' (meaning something happens for the whole duration when a signal is On) VS 'switches on' (meaning something happens the moment a signal changes from Off to On).
+Building.Timer.TimeA,T1,This must be at most two characters. Label for a time setting in Timer building in which users can enter number of hours or days. It's likely that you want to keep T1 and T2 in many languages because those are internationally used in electronics and schematics.
+Building.Timer.TimeB,T2,This must be at most two characters. Label for a time setting in Timer building in which users can enter number of hours or days. It's likely that you want to keep T1 and T2 in many languages because those are internationally used in electronics and schematics.
 Building.TributeToIngenuity.DisplayName,Tributo al ingenio,Name of a monument
 Building.TributeToIngenuity.FlavorDescription,«Claro que sirve para algo; para dejarte con la boca abierta» (el viejo Kazko).,"Ol' Kazko is a legendary forefather of modern beavers, famous inventor, pioneer of rapid industrialization."
 Building.TripleDynamite.DisplayName,Dinamita triple,Dynamite that makes 3 blocks deep hole
+Building.TripleDynamite.FlavorDescription,Cuando hasta las medidas extremadamente extremas no lo eran tanto.,References extreme measures mentioned in Building.Dynamite.FlavorDescription and Building.DoubleDynamite.FlavorDescription. It's part of a set.
 Building.TripleFloodgate.DisplayName,Compuerta triple,
 Building.TripleFloodgate.FlavorDescription,"Si fuera un poquito más alta, sería imposible contener la fuerza del agua.",
 Building.TripleLodge.Description,Proporciona hogar a muchos castores.,Houses thrice the amounts of beavers as normal lodge
@@ -556,8 +779,8 @@ Building.Tubeway.FlavorDescription,"Cuando los Dienteférreos se dan un buen cab
 Building.TubewayStation.Description,Entrada y salida de una red de tubotransporte.,
 Building.TubewayStation.DisplayName,Estación de tubotransporte,"Beavers use it to enter Building.Tubeway.DisplayName, so they should be named similarly."
 Building.TubewayStation.FlavorDescription,Se recomienda a los castores claustrofóbicos que salgan al aire libre.,"Tubeways are very tight corridors, so they wouldn't be accessible for beavers scared of such places."
-Building.Tunnel.Description,Perfora el terreno y lo sustituye por una plataforma. Usa la herramienta de capas para examinar terrenos y estructuras subterráneos.,"Platform is a building, same as Building.Platform.DisplayName"
 Building.Tunnel.DisplayName,Túnel,Tunnel is a type of building that - when built - removes a tile of terrain and creates an underground tunnel
+Building.Tunnel.Description,Perfora el terreno y lo sustituye por una plataforma. Usa la herramienta de capas para examinar terrenos y estructuras subterráneos.,"Platform is a building, same as Building.Platform.DisplayName"
 Building.UndergroundPile.DisplayName,Pila subterránea,"The underground version of a pile, for reference check Building.SmallPile.DisplayName or Building.LargePile.DisplayName"
 Building.UndergroundPile.FlavorDescription,"Con tanto espacio de almacenamiento, vale la pena subir unas cuantas escaleras.",
 Building.UndergroundRuins.Description,Ruinas enterradas repletas de trozos de metal extraíbles.,
@@ -565,6 +788,16 @@ Building.UndergroundRuins.DisplayName,Ruinas subterráneas,Buried ruins on top o
 Building.UndergroundRuins.FlavorDescription,"Sea lo que sea que hacían aquí los humanos, está claro que necesitaban un montón de metal.",
 Building.UnstableCore.Description,Un dispositivo antiguo que terminará explotando inevitablemente.,
 Building.UnstableCore.DisplayName,Núcleo inestable,An object that can be placed in map editor that explodes after a set time. Name shouldn't suggest strictly military use or radioactive effect.
+Building.UnstableCore.FlavorDescription,"Sí, Suli, ¡bum!",Suli is a younger beaver that likes to play tricks on their fellow beavers and isn't related to any faction in particular. Translated name shouldn't suggest a gender if possible.
+Building.ThrottlingValve.Description,Una salida de agua unidireccional con flujo ajustable.,
+Building.ThrottlingValve.DisplayName,Válvula reguladora,A building which works like a valve which opens and closes to maintain a steady water flow rate.
+Building.ThrottlingValve.OutflowLimit,Límite de flujo: {0},Label for flow limit setting in valve building
+Building.ThrottlingValve.OutflowUnlimited,Flujo ilimitado,Label for flow limit setting when it is set to unlimited
+Building.ThrottlingValve.ReactionSpeed,Velocidad de reacción: {0},Label for a slider which controls how fast this valve reacts to changes in throughput. {0} is 0-100%.
+Building.ThrottlingValve.State.Closing,Cerrando,"Gender should be consistent with Automation.Mode. Please keep short, at most the width of 11 latin characters."
+Building.ThrottlingValve.State.Idle,Inactivo,"Gender should be consistent with Automation.Mode. Please keep short, at most the width of 11 latin characters. This is the state of a valve that is not moving - not closing or opening."
+Building.ThrottlingValve.State.Opening,Abriendo,"Gender should be consistent with Automation.Mode. Please keep short, at most the width of 11 latin characters."
+Building.ThrottlingValve.Synchronize,Sincronizar con válvulas reguladoras adyacentes,Label for a toggle which makes this throttling valve synchronize its flow rate with adjacent throttling valves.
 Building.VerticalPowerShaft.Description,Transfiere energía. Comunica dos puntos verticalmente.,"Power being mechanical/kinetic, not electricity. Alternative name: axle."
 Building.VerticalPowerShaft.DisplayName,Eje de transmisión vertical,"Power being mechanical/kinetic, not electricity. Alternative name: axle."
 Building.VerticalPowerShaft.FlavorDescription,Sirve de ayuda cuando aumenta el consumo de energía.,"Power being mechanical/kinetic, not electricity. Alternative name: axle."
@@ -576,11 +809,16 @@ Building.WaterPump.DisplayName,Bomba de agua,
 Building.WaterPump.FlavorDescription,Un buen trago de agua fresquita te pone a cien.,"""Pumped"" pun, feel free to adapt."
 Building.WaterSeep.Description,Una fuente de agua con poca presión.,
 Building.WaterSeep.DisplayName,Rezumadero de agua,"A building that allows water to seep through, creating a natural water source."
+Building.WaterSeep.FlavorDescription,"Presión limitada, posibilidades ilimitadas.",
 Building.WaterSource.DisplayName,Fuente de agua,
 Building.WaterSource.FlavorDescription,«Que tu río siempre fluya» (saludo cordial entre castores).,
 Building.WaterWheel.Description,Produce energía. Debe colocarse en una corriente de agua a orillas de un río.,Power is not an electrical but mechanical/kinetic energy.
 Building.WaterWheel.DisplayName,Rueda hidráulica,
 Building.WaterWheel.FlavorDescription,La obra maestra del viejo Kazko.,"Ol' Kazko is a legendary forefather of modern beavers, famous inventor, pioneer of rapid industrialization."
+Building.WeatherStation.Description,Envía una señal en función del tiempo.,
+Building.WeatherStation.DisplayName,Estación meteorológica,A building which checks the current weather condition (does not make forecasts).
+Building.WeatherStation.EarlyActivation,Activación anticipada,A label for a checkbox which makes the weather station activate a specified number of hours before the season starts
+Building.WeatherStation.Header,En activo durante:,"Header for weather station building settings. After this header, there are checkboxes for each weather type that can be enabled or disabled."
 Building.Weathervane.Description,Una pequeña veleta que indica la dirección y la fuerza del viento.,
 Building.Weathervane.DisplayName,Veleta,A decoration that turns towards the wind
 Building.Weathervane.FlavorDescription,"«Si no me equivoco, podríamos hacer volar esta cosa con un motor y un par de alas» (Laurel).","Referencing the Wright brothers and their first-ever aircraft. Pina is a younger beaver figure that's exploring the world and isn't related to any faction in particular. Pina as a name relates to the pine tree, the translated name shouldn't suggest a gender if possible."
@@ -591,7 +829,7 @@ Building.WindTunnel.FlavorDescription,«¡Vaya que si puedo volar! Solo tengo qu
 Building.WindTurbine.Description,Genera energía en función de la velocidad del viento.,
 Building.WindTurbine.DisplayName,Aerogenerador,
 Building.WindTurbine.FlavorDescription,"«Las palabras, como el serrín, se las lleva el viento» (dicho de los Bucólicos).","Reference to ""Dust in the Wind"" by Kansas."
-Building.WoodFence.Description,Una valla decorativa hecha de troncos.,
+Building.WoodFence.Description,Una valla decorativa hecha de madera.,
 Building.WoodFence.DisplayName,Valla de madera,
 Building.WoodFence.FlavorDescription,"Es como una presa, pero contiene castores en lugar de agua.",
 Building.WoodWorkshop.Description,Aquí se refuerzan los tablones usando resina.,It produces treated / impregnated planks. The resin used is a pine resin.
@@ -619,20 +857,27 @@ Buildings.EntranceBlocked,Entrada bloqueada.,"A notification for when a building
 Buildings.GroundOnly,<YellowHighlight>Solo en el suelo:</YellowHighlight> debe construirse en el suelo.,
 Buildings.InfiniteDepth,infinito.,Used as an infinite depth description in Buildings.UndergroundDepth key. Please keep the dot if it's used in other similar keys e.g. Buildings.TopConstraint
 Buildings.InvalidTerrainLevel,No puede construirse tan abajo en el mapa.,An alert for when someone tries to build at the lowest layer of the map.
+Buildings.MechanicalPump.FlowRate,Flujo: {0},Label for the pump efficiency stat in the building information panel. {0} is replaced by the actual efficiency value.
 Buildings.MissingGroundBelow,No hay suelo debajo.,Warning shown to player when trying to place a building without ground underneath.
 Buildings.PipeObstructed,Conducto bloqueado.,Warning that will be shown to player when Water Pump Pipe has zero lenght.
 Buildings.PreviewFlooded,Edificio inundado.,Warning that will be shown to player when they try to build a building i a flooded area.
+Buildings.Sequential,<YellowHighlight>Secuencial:</YellowHighlight> se actualiza una vez por tic.,A description of a specific type of automation buildings which only update once per 'clock tick'.
 Buildings.Solid,<YellowHighlight>Firme:</YellowHighlight> se pueden construir otros edificios encima.,Solid or Stackable — something that tells the player that you can build on top of it
+Buildings.Wonder.Description,<GreenHighlight>Otorga dominio sobre el mapa y desbloquea una ubicación de comienzo flexible para próximas partidas.</GreenHighlight>,Flexible start should be the same as in FlexibleStart.Unlocked
+Buildings.Wonder.DescriptionCompleted,<GreyHighlight>(Completado) Otorga dominio sobre el mapa y desbloquea una ubicación de comienzo flexible para próximas partidas.</GreyHighlight>,Text should be the same as Buildings.Wonder.Description but with (Completed) appendix
+BuildingSound.PlaySound,Reproducir sonido,Label for toggle to play building sound
 Buildings.TopConstraint,No puede construirse a tanta altura.,An alert for when someone tries to build forbidden buildings at the max terrain level of the map.
 Buildings.UndergroundDepth,<YellowHighlight>Profundidad subterránea:</YellowHighlight> {0}, Denotes a building that is built underground. The number tells how many blocks underground it occupies.
-Buildings.UnsuitableBuildingAbove,No se puede colocar {0} sobre {1}.,"Shown when the player tries to place a building on top of another (invalid) building, {0} and {1} stand for buildings DisplayName."
-Buildings.UnsuitableBuildingBelow,Este edificio debe construirse sobre: {0},{0} stands for another buildings DisplayName. This is a warning shown to the user during building placing.
+Buildings.UnsuitableBuildingBelow,Este edificio debe construirse sobre: {0}.,{0} stands for another buildings DisplayName. This is a warning shown to the user during building placing.
 Buildings.WaterAccess,<YellowHighlight>Requiere agua</YellowHighlight>: necesita tener acceso a agua.,
 Buildings.Wonder,<YellowHighlight>Maravilla:</YellowHighlight> la cúspide de la ingeniería castoril.,Wonder is a keyword. Shown after selecting a wonder type building.
+Button.Browse,Examinar,Label of a button that opens a file explorer for a specific folder. Please keep short.
+Button.Refresh,Actualizar,Label of a button that refreshes/reloads custom files from disk. Please keep short.
 Camera.StateSaved,Estado de la cámara guardado,"Notification on top of the window when camera state(location, rotation) is saved by player."
 CancelPlantingTool.Description,Utiliza esta herramienta para eliminar zonas de plantación.,Description of a tool that removes fields.
 CancelPlantingTool.Title,Eliminar zona de plantación,Tool that removes fields so the beavers won't plant there.
-Carrying.Carry,Transportando: {0} ({1} de {2} kg),{0} stands for Good.DisplayName {1} stands for carried good weight {2} stands for beaver lifting capacity. Tells player what the beaver is carrying and how much it weighs in comparison to the beaver's strength
+Carrying.Carry,Transportando: {0},"Label indicating what good the beaver is carrying. {0} will be either filled with the name of the good along with its current weight and the beaver lifting capacity (consistent with Carrying.Good), or will have Carrying.Nothing set if the beaver is not carrying anything."
+Carrying.Good,{0} ({1} de {2}),"Label used to tell player what good beaver is carrying and how much it weights in comparison to the beaver's strength. {0} stands for Good.DisplayName, {1} stands for carried good weight and {2} stands for a character lifting capacity. Used together with Carrying.Carry."
 Carrying.Nothing,nada,When beaver is carrying nothing.
 Condition.DisplayName,Condición,"Bot equivalent of wellbeing (how good they are taken care of, how good their mechanical condition is)"
 Console.CloseButton,Cerrar,Label of the button that closes the console
@@ -647,11 +892,11 @@ ConstructionSites.Progress,Progreso: {0} %,{0} stands for percentage of constru
 Core.BrowseFolder,Examinar carpeta ►,Opens file browser to either save folder or map folder. Please keep the arrow.
 Core.Cancel,Cancelar,A button please keep short
 Core.EmptyList,Aquí no hay nada aún.,A text shown in a list that does not contain any elements.
-Core.GameTip,"Consejo: si un edificio es <YellowHighlight>firme</YellowHighlight>, como una cabaña o un almacén, puedes construir otras estructuras encima.",Tip that shows up while the game is loading. Solid is a keyword.
 Core.GoodNameAndAmount,{0} ({1}),"Used for example in building material costs, {0} stands for good name, {1} stands for amount"
 Core.GoodNameAndAmountPerHour,{0} ({1} por hora),"Used for example in building good usage, {0} stands for good name, {1} stands for amount"
 Core.Load,Cargar,A button please keep short
 Core.Loading,CARGANDO,Used in loading screen during loading
+Core.NameWithNumber,{1} {0},"This is extremely important to get right, if in doubt talk to the dev team. This is used in multiple places for object names followed by a number, for example 'Sensor 1', 'Machine 2' etc. {0} denotes the number (for example '1'), {1} denotes the name (for example 'Sensor'). In some languages you may wish to place the number before the name or remove the space."
 Core.NavigationBack,Atrás,Used in forms to navigate to the previous step.
 Core.NavigationNext,Siguiente,Used in forms to navigate to the next step.
 Core.No,No,A button please keep short
@@ -660,7 +905,6 @@ Core.Overwrite,Sobrescribir,A button shown in prompts with confirmation that a f
 Core.Save,Guardar,A button please keep short
 Core.SaveAs,Guardar como...,A button please keep short
 Core.Start,Comenzar,A button please keep short
-Core.Status,Estado:,Indication in interface about status of some property. For example 'Status: Enabled'
 Core.Yes,Sí,
 CrashScreen.CommentPlaceholder,(Opcional) Comentario para nuestro equipo,Shown in a crash screen text field where players can optionally enter a comment that will help track down the bug
 CrashScreen.EmailPlaceholder,(Opcional) Correo electrónico por si necesitamos contactar contigo,Shown in a crash screen text field where players can optionally enter their email
@@ -677,14 +921,10 @@ CrashScreen.SendReport,Enviar informe de error al equipo de Timberborn,
 CrashScreen.SendSuccess,Hemos recibido tu informe. ¡Gracias!,
 CrashScreen.Sending,Enviando...,
 CrashScreen.Title,"Ups..., un error :'(",
-Decals.Browse,Examinar,Label of a button that opens a file explorer with a folder with custom patterns. Please keep short.
 Decals.Flip,Voltear diseño,Label on a button to flip (mirror) the pattern in the decal panel building
-Decals.Refresh,Actualizar,Label of a button that refreshes/reloads custom patterns from disk. Please keep short.
 Decals.UserPatterns,Diseños personalizados,Header of the panel that allows managing custom user patterns (loading custom images). Please keep short.
-DeletionBlocker.ObjectAtop,Hay una estructura encima.,Shown when the player tries to delete a structure that has another structure on top.
-DeletionBlocker.Prefix,No se puede eliminar.,Tooltip prefix for the delete button when the object cannot be deleted.
-DeletionBlocker.Stockpile.NotEmpty,Dentro todavía quedan algunos bienes.,Warning shown to player when trying to delete a stockpile that still has some goods inside.
-DeletionBlocker.TerrainPhysics,El edificio soporta el terreno.,Building can't be deleted when it has the terrain on top of it and it last valid support for the terrain
+DeletionBlocker.ObjectAtop,No se puede demoler si tiene otros elementos encima.,Shown when the player tries to delete a structure that has another structure or terrain on top.
+DeletionBlocker.StockpileNotEmpty,Este edificio no se puede demoler si no está vacío.,Warning shown to player when trying to delete a stockpile that still has some goods inside.
 DeletionTool.Description.Buildings,Utiliza esta herramienta para demoler edificios. Parte de los materiales de construcción y todos los bienes almacenados se convertirán en escombros recuperables.,"Rubble should be the same as RecoveredGoodStack.DisplayName, ""Stored goods"" could be translated similar to Building.SmallWarehouse.Description"
 DeletionTool.Description.Objects,Utiliza esta herramienta para eliminar objetos.,
 DeletionTool.Description.RecoveredGoodStack,Utiliza esta herramienta para eliminar escombros. Los bienes que haya entre los escombros se perderán.,Rubble should be the same as RecoveredGoodStack.DisplayName
@@ -740,9 +980,13 @@ Emptying.Empty,Vaciar almacenamiento,A command for beavers to empty this storage
 Enterable.DistanceToDistrict,Distancia hasta el centro del distrito: {0},{0} stands for distance to District Center. District Center must be the same as Building.DistrictCenter.DisplayName
 Enterable.DistanceToDistrictLarge,Considera optimizar los caminos o dividir el distrito en otros más pequeños.,
 EntityPanel.ChangeName,Elige un nombre nuevo:,Shown when renaming a beaver or a district
+EntityPanel.Close,Cerrar,Tooltip for close button on entity panel
+EntityPanel.Customize,Personalizar,Tooltip over a button in entity panel which opens color customization
+EntityPanel.Focus,Seguir,Tooltip over follow/focus button on entity panel
 EntityPanel.Hide,Ocultar descripción,Tooltip for a button which hides description
+EntityPanel.Rename,Renombrar,Common tooltip text for rename beaver / rename district
 EntityPanel.Show,Mostrar descripción,Tooltip for a button which shows description
-Experimental.Header,<RedHighlight>Información sobre el modo experimental</RedHighlight>,Welcome text that is shown to players of the experimental versions of the game
+Experimental.Header,Información sobre el modo experimental,Welcome text that is shown to players of the experimental versions of the game
 Experimental.WelcomeText,"En esta versión de Timberborn, tienes acceso a prototipos de funciones sin terminar, por lo que es más probable que se produzcan errores graves en el juego. El pueblo castor está muy orgulloso de tu valor.
 
 Las partidas experimentales se guardan de forma independiente al juego principal. Es posible que las actualizaciones inhabiliten la compatibilidad de dichas partidas.
@@ -771,11 +1015,29 @@ FactionSelection.NewFactionUnlocked,Nueva facción desbloqueada:,Followed by the
 FactionSelection.WellbeingCondition,Se desbloquea al alcanzar un bienestar medio de {0} jugando como los {1}.,{0} stands for a number {1} stand for Faction.DisplayName
 Fields.Harvesting,Cosechar,Preceded by Fields.PriorityAction
 Fields.Planting,Plantar,Preceded by Fields.PriorityAction
-Fields.PriorityAction,Acción prioritaria:,Which of the actions is prioritized.
+Fields.PriorityAction,Acción prioritaria,Which of the actions is prioritized.
 FileBrowser.Header,Selecciona un archivo,Header of the file browser window.
 FileBrowser.NoPermission,No tienes permiso para acceder a esta carpeta.,Shown in the file browser when the user doesn't have permission to access the selected folder.
 FileBrowser.Open,Abrir,Label of the button that opens currently selected folder or loads currently selected file.
+Fireworks.Type.CometBlue,Cometa (azul),"Name of a firework type, resembling a comet in blue color. Please keep short."
+Fireworks.Type.CometRed,Cometa (rojo),"Name of a firework type, resembling a comet in red color. Please keep short."
+Fireworks.Type.CometWhite,Cometa (blanco),"Name of a firework type, resembling a comet in white color. Please keep short."
+Fireworks.Type.Fish,Peces,"Name of a firework type, resembling a group of fish. Please keep short."
+Fireworks.Type.KamuroBlue,Kamuro (azul),"Name of a firework type, one of most popular firework styles, in blue color. Please keep short."
+Fireworks.Type.KamuroOrange,Kamuro (naranja),"Name of a firework type, one of most popular firework styles, in orange color. Please keep short."
+Fireworks.Type.KamuroPink,Kamuro (rosa),"Name of a firework type, one of most popular firework styles, in pink color. Please keep short."
+Fireworks.Type.KamuroRed,Kamuro (rojo),"Name of a firework type, one of most popular firework styles, in red color. Please keep short."
+Fireworks.Type.KamuroWhite,Kamuro (blanco),"Name of a firework type, one of most popular firework styles, in white color. Please keep short."
+Fireworks.Type.PalmBlue,Palmera (azul),"Name of a firework type, resembling a palm tree leaves, in blue color. Please keep short."
+Fireworks.Type.PalmGold,Palmera (dorada),"Name of a firework type, resembling a palm tree leaves, in gold color. Please keep short."
+Fireworks.Type.PalmGreen,Palmera (verde),"Name of a firework type, resembling a palm tree leaves, in green color. Please keep short."
+Fireworks.Type.PeonyRedBlue,Peonía (roja y azul),"Name of a firework type, resembling a peony flower shape, in red and blue colors. Please keep short."
+Fireworks.Type.PeonyViolet,Peonía (violeta),"Name of a firework type, resembling a peony flower shape, in violet color. Please keep short."
+Fireworks.Type.PeonyYellowGreen,Peonía (amarilla y verde),"Name of a firework type, resembling a peony flower shape, in yellow and green colors. Please keep short."
+Fireworks.Type.Sparks,Chispas,"Name of a firework type, resembling sparks flying around. Please keep short."
+Fireworks.Type.Willow,Sauce,"Name of a firework type, resembling willow tree leaves. Please keep short."
 FlexibleStart.ChooseStartLocation,Elegir ubicación inicial,Text shown when the player is choosing a new starting location.
+FlexibleStart.Needed,Completa una maravilla para desbloquear una ubicación de comienzo flexible en este mapa.,"Flexible start should be the same as in FlexibleStart.Unlocked, Wonder should be the same as Buildings.Wonder"
 FlexibleStart.Relocate,Cambiar ubicación inicial,Label of a button for changing the starting location.
 FlexibleStart.ResetStartLocation,Usar ubicación por defecto,Label of a button for bringing back the initial starting location.
 FlexibleStart.Start,Comenzar,Label of a button for confirming a start location on map and starting a new game.
@@ -783,13 +1045,14 @@ FlexibleStart.Unlocked,Comienzo flexible desbloqueado,Flexible start means that 
 GameExitPanel.Exit,Salir,A button please keep short
 GameExitPanel.Message,"Antes de irte, danos tu opinión para ayudarnos a mejorar el juego.",
 GameExitPanel.ShareFeedback,Compartir opinión,A button please keep short
-GameExitPanel.Title,¡Gracias por jugar al acceso anticipado de Timberborn!,
+GameExitPanel.Title,¡Gracias por jugar a Timberborn!,Message shown in popup box shortly before the game is closed.
 GameOver.Continue,Un último vistazo...,Text on continue button in game over panel
 GameOver.Exit,Salir al menú principal,Text on finish button in game over panel
 GameOver.Header,Fin,Header of the game over panel
+GameUI.ShowDistrictList,Mostrar/Cerrar lista de distritos,Shown in tooltip over districts in main game hud
 Gathering.Action,Recolecta:,"Followed by a list of goods, like Gathers: Berries"
 Gathering.Nothing,Nada,Nothing is prioritized to be gathered.
-Gathering.Prioritize,Priorizar:,Which resource is prioritized to be gathered.
+Gathering.Prioritize,Priorizar,Which resource is prioritized to be gathered.
 Goals.NotEligible,¡no disponible con esta facción!,Preceded by Goals.Progress
 Goals.Progress,Progreso:,
 Goals.Unlocked,¡desbloqueada!,Preceded by Goals.Progress
@@ -859,6 +1122,8 @@ Good.FermentedMushroom.DisplayName,Seta fermentada,"Mushroom should be the same 
 Good.FermentedMushroom.PluralDisplayName,Setas fermentadas,"Mushroom should be the same as Good.Mushroom.DisplayName, fermented should be the same as in Building.Fermenter.DisplayName or Building.Fermenter.Description"
 Good.FermentedSoybean.DisplayName,Soja fermentada,"Soybean should be the same as Good.Soybean.DisplayName, fermented should be the same as in Building.Fermenter.DisplayName or Building.Fermenter.Description"
 Good.FermentedSoybean.PluralDisplayName,Soja fermentada,"Soybean should be the same as Good.Soybean.DisplayName, fermented should be the same as in Building.Fermenter.DisplayName or Building.Fermenter.Description"
+Good.Fireworks.DisplayName,Fuego artificial,A name of a good used to supply Firework Launcher building.
+Good.Fireworks.PluralDisplayName,Fuegos artificiales,"A name of a good used to supply Firework Launcher building, plural form."
 Good.Flour.DisplayName,Harina,A name of a good.
 Good.Flour.PluralDisplayName,Harinas,A name of a good.
 Good.Gear.DisplayName,Engranaje,A name of a good.
@@ -883,6 +1148,8 @@ Good.MapleSyrup.DisplayName,Sirope de arce,Sweet syrup created from maple sap
 Good.MapleSyrup.PluralDisplayName,Sirope de arce,Sweet syrup created from maple sap
 Good.MetalBlock.DisplayName,Bloque de metal,A name of a good.
 Good.MetalBlock.PluralDisplayName,Bloques de metal,A name of a good.
+Good.MetalPart.DisplayName,Pieza de metal,
+Good.MetalPart.PluralDisplayName,Piezas de metal,
 Good.Mushroom.DisplayName,Seta,"Mushroom that's been cultivated in the Hydroponic Garden, it's processed into an edible ration. It doesn't specifically represent any specific mushroom, just the type of plant."
 Good.Mushroom.PluralDisplayName,Setas,"Mushroom that's been cultivated in the Hydroponic Garden, it's processed into an edible ration. It doesn't specifically represent any specific mushroom, just the type of plant."
 Good.Paper.DisplayName,Papel,A name of a good.
@@ -918,6 +1185,12 @@ Goods.Amount,Cantidad,Header of a dropdown that allows to select a good. Please 
 Goods.EatableRaw,Se puede comer sin cocinar.,Shown on a tooltip of goods that can be eaten raw.
 Goods.Nothing,Nada,
 Goods.StoredIn,Se ha almacenado en:,Header above a list of buildings that store selected good
+GoodsStatistics.Consumption,Consumo: {0},"Tooltip for the chart showing consumption of good, {0} is an integer number of units consumed."
+GoodsStatistics.Export,Exportaciones: {0},"Tooltip for the chart showing export of good, {0} is an integer number of units exported."
+GoodsStatistics.Import,Importaciones: {0},"Tooltip for the chart showing import of good, {0} is an integer number of units imported."
+GoodsStatistics.Production,Producción: {0},"Tooltip for the chart showing production of good, {0} is an integer number of units produced."
+GoodsStatistics.SampleTime,Hace {0} día(s),"Time of the last sample, {0} is an integer number of days"
+GoodsStatistics.Stock,Existencias: {0},"Tooltip for the chart showing stock amount of good, {0} is an integer number of units. Stock here means the amount of goods currently in the settlement and in some languages Amount may be a better base for the translation than Stock."
 GridRendering.Visibility.Hide,Ocultar guías de construcción,Shows construction guidelines when button is pressed.
 GridRendering.Visibility.Show,Mostrar guías de construcción,Shows construction guidelines when button is pressed.
 Growing.GrowsWhenMature,Crece al madurar,"Information about fruits and other resources, that grows when plant is mature and not when it is in seedling stage"
@@ -952,11 +1225,12 @@ KeyBinding.DecreaseWorkers,Reducir los trabajadores deseados,Label of the key th
 KeyBinding.DecreaseWorkingHours,Reducir las horas de trabajo,Label of the key that decreases settlement working hours
 KeyBinding.DecreaseWorkplacePriority,Reducir la prioridad del lugar de trabajo,Label of the key that decreases the priority of the selected workplace
 KeyBinding.DeleteObject,Eliminar objeto,Label of the key that deletes the selected object
-KeyBinding.DetonateDynamite,Detonar dinamita,Label of the key that detonates a dynamite
 KeyBinding.DistributionTab,Abrir pestaña de distribución,"Label of the key that opens the Settlement Panel and selects the Distribution tab, Distribution should be the same as BatchControl.Distribution"
 KeyBinding.DuplicateObject,Duplicar,Key binding that duplicates the selected building
 KeyBinding.DuplicateSettings,Copiar ajustes,Key binding that copies settings from one building to another
+KeyBinding.DragVisibleLayer,Arrastrar capa visible,Binding for layer tool similar to KeyBinding.PickVisibleLayer
 KeyBinding.Flip,Voltear,Label of the key that flips the selected building (makes the model mirrored)
+KeyBinding.GoodStatisticsTab,Abrir pestaña de estadísticas de bienes,"Label of the key that opens the Settlement Panel and selects the Goods statistics tab, `Goods statistics` should be the same as BatchControl.GoodsStatistics"
 KeyBinding.Hold,Mantener pulsado:,Used to describe key binding that turns something on while the key is held.
 KeyBinding.HousingTab,Abrir pestaña de vivienda,"Label of the key that opens the Settlement Panel and selects the Housing tab, Housing should be the same as BatchControl.Housing"
 KeyBinding.IncreaseBrushHeight,Aumentar la altura del pincel,"Label of the key that increases the vertical level of the brush, 'brush height' should be the same as MapEditor.Brush.Height.Label"
@@ -968,7 +1242,6 @@ KeyBinding.IncreaseWorkers,Aumentar los trabajadores deseados,Label of the key t
 KeyBinding.IncreaseWorkingHours,Aumentar las horas de trabajo,Label of the key that increases settlement working hours
 KeyBinding.IncreaseWorkplacePriority,Aumentar la prioridad del lugar de trabajo,Label of the key that increases the priority of the selected workplace
 KeyBinding.InverseBrushDirection,Invertir la dirección del pincel,
-KeyBinding.LevelVisibilityCursorTool,Cambiar visibilidad de capa,Name of layer tool keybinding
 KeyBinding.LowerVisibleLayer,Reducir la altura de la capa visible,Label of the key that decreases the max visible vertical level of buildings
 KeyBinding.MechanicalTab,Abrir pestaña de energía,"Label of the key that opens the Settlement Panel and selects the Mechanical tab, Power should be the same as BatchControl.Mechanical"
 KeyBinding.MigrationTab,Abrir pestaña de migración,"Label of the key that opens the Settlement Panel and selects the Migration tab, Migration should be the same as BatchControl.Migration"
@@ -982,6 +1255,17 @@ KeyBinding.NextRootButton,Grupo de herramientas siguiente,Label of the key that 
 KeyBinding.NextTool,Herramienta siguiente,Label of the key that selects the next tool from currently selected toolbar category.
 KeyBinding.OpenWellbeingPanel,Abrir panel de bienestar,"Label of the key that opens the Well-being box, Well-being should be the same as Wellbeing.DisplayName"
 KeyBinding.PickVisibleLayer,Escoger capa visible,Label of the key that picks the layer of the visible terrain currently under the cursor
+KeyBinding.PinnedLever1,Palanca anclada 1,The name of a key binding which switches a Lever. Must be consistent with Automation.Pinned and Building.Lever.DisplayName.
+KeyBinding.PinnedLever2,Palanca anclada 2,The name of a key binding which switches a Lever. Must be consistent with Automation.Pinned and Building.Lever.DisplayName.
+KeyBinding.PinnedLever3,Palanca anclada 3,The name of a key binding which switches a Lever. Must be consistent with Automation.Pinned and Building.Lever.DisplayName.
+KeyBinding.PinnedLever4,Palanca anclada 4,The name of a key binding which switches a Lever. Must be consistent with Automation.Pinned and Building.Lever.DisplayName.
+KeyBinding.PinnedLever5,Palanca anclada 5,The name of a key binding which switches a Lever. Must be consistent with Automation.Pinned and Building.Lever.DisplayName.
+KeyBinding.PinnedLever6,Palanca anclada 6,The name of a key binding which switches a Lever. Must be consistent with Automation.Pinned and Building.Lever.DisplayName.
+KeyBinding.PinnedLever7,Palanca anclada 7,The name of a key binding which switches a Lever. Must be consistent with Automation.Pinned and Building.Lever.DisplayName.
+KeyBinding.PinnedLever8,Palanca anclada 8,The name of a key binding which switches a Lever. Must be consistent with Automation.Pinned and Building.Lever.DisplayName.
+KeyBinding.PinnedLever9,Palanca anclada 9,The name of a key binding which switches a Lever. Must be consistent with Automation.Pinned and Building.Lever.DisplayName.
+KeyBinding.PinnedLever10,Palanca anclada 10,The name of a key binding which switches a Lever. Must be consistent with Automation.Pinned and Building.Lever.DisplayName.
+KeyBinding.PopulationStatisticsTab,Abrir pestaña de estadísticas de población,"Label of the key that opens the Settlement Panel and selects the Population statistics tab, `Population statistics` should be the same as BatchControl.PopulationStatistics"
 KeyBinding.PreviousDistrict,Seleccionar distrito anterior,Label of the key that selects the previous district
 KeyBinding.PreviousRootButton,Grupo de herramientas anterior,Label of the key that selects the previous toolbar (bottom bar) category.
 KeyBinding.PreviousTool,Herramienta anterior,Label of the key that selects the previous tool from currently selected toolbar category.
@@ -1010,6 +1294,7 @@ KeyBinding.Speed1,Velocidad de juego >,Label of the key that sets the game speed
 KeyBinding.Speed2,Velocidad de juego >>,Label of the key that sets the game speed to fast. >> shouldn't be removed as it is the symbol for fast speed on UI button.
 KeyBinding.Speed3,Velocidad de juego >>>,Label of the key that sets the game speed to very fast. >>> shouldn't be removed as it is the symbol for very fast speed on UI button.
 KeyBinding.StorageTab,Abrir pestaña de almacenamiento,"Label of the key that opens the Settlement Panel and selects the Storage tab, Storage should be the same as BatchControl.Storage"
+KeyBinding.TickOnce,Un tic,As in 'One clock tick'. Alternatively you can call it 'One tick' or 'Advance by one tick' or 'Step one tick'. This action causes the game's time to advance by one simulation tick.
 KeyBinding.Toggle,Activar/desactivar:,Used to describe key binding that toggles something on/off.
 KeyBinding.ToggleBatchControlBox,Abrir/cerrar panel del asentamiento,Label of the key that opens/close the Settlement panel
 KeyBinding.ToggleBrushShape,Cambiar la forma del pincel,"Label of the key that toggles the shape of the brush, 'brush shape' should be the same as MapEditor.Brush.Shape.Label"
@@ -1024,6 +1309,7 @@ KeyBinding.ToggleStockpilePriority,Cambiar la prioridad del almacén,Label of th
 KeyBinding.ToggleWaterVisibility,Cambiar la visibilidad del agua,Label of the key that makes water semi-transparent
 KeyBinding.ToggleWorkerType,Cambiar tipo de trabajador,Keybinding for toggling the worker type.
 KeyBinding.UndoChanges,Deshacer cambios,Key binding for undoing changes in Map editor.
+KeyBinding.UniqueBuildingAction,Acción de edificio única,"Keybinding for execute main action assigned to selected building, for example detonate dynamite or switch lever state"
 KeyBinding.UnlockTool,Desbloquear herramienta,Label of the key that unlocks the currently selected tool
 KeyBinding.WorkplacesTab,Abrir pestaña de lugares de trabajo,"Label of the key that opens the Settlement Panel and selects the Workplaces tab, Workplaces should be the same as BatchControl.Workplaces"
 KeyBinding.ZoomIn,Acercar la cámara,Label of the key that zooms camera in
@@ -1062,25 +1348,23 @@ Puedes seguir jugando, pero es posible que el mapa aparezca incompleto.",Shown w
 LoadingIssue.PrefabNotFoundIssue,El objeto tenía un tipo desconocido y se ha eliminado: {0}.,Warning shown when object type is not found in the game and cannot be instantiate.
 LoadingIssue.TerrainCutOffIssue,El terreno superaba la altura máxima permitida y se ha recortado.,Warning shwon when terrain in saved map exceeds the maximum height of the map.
 MainMenu.RosettaPerformanceWarning,Rendimiento reducido.,"Warning message displayed in the main menu when Rosetta (MacOS compatibility mode) is enabled. Preceded by the ""Rosetta: OFF"" message."
-MainMenu.UpdateInfoHeader,Actualización 1.0: Experimental,Header of the update info panel that is shown in the main menu.
+MainMenu.SteamUpdateInfoText,"• Estadísticas de bienes y de población
+• Nuevos edificios hidrófugos
+• Monumentos de nivel 4
+• Más atracciones exclusivas de facción
+• Planta exclusiva del desierto: Suculenta
+• ¡Nuevo uniforme de castor y mucho más!","Text shown in the update info panel with the latest update summary. 'Statistics', 'Succulent', 'Attractions' naming must be consistent with the usage of those terms in the rest of the game."
+MainMenu.UpdateInfoHeader,Actualización 1.1,"Header of the update info panel that is shown in the main menu, 1.0 is the current game version number. Keep consistent with MainMenu.UpdateInfoHeaderExperimental."
+MainMenu.UpdateInfoHeaderExperimental,Actualización 1.1: Experimental,"Header of the update info panel that is shown in the main menu of the experimental version, 1.0 is the current game version number. Keep consistent with MainMenu.UpdateInfoHeader."
 MainMenu.UpdateInfoLink,<u>Más información</u>,Label of the link that opens web browser with the update details webpage.
-MainMenu.UpdateInfoText,"• Nuevos objetos de mapa interactivos
-• Nuevos mapas: Presión, Oasis
-• Escaleras de caracol y estandartes
-• Proceso de creación de mods mejorado
-• Duplicación de edificios y otros retoques para facilitar las cosas","Text shown in the update info panel with the latest update summary. Ziplines, Tubeways, Tunnels, power shafts and layer tool naming must be consistent with the usage of those terms in the rest of the game."
+MainMenu.UpdateInfoText,"• Estadísticas de bienes y de población
+• Nuevos edificios hidrófugos
+• Monumentos de nivel 4
+• Más atracciones exclusivas de facción
+• Planta exclusiva del desierto: Suculenta
+• ¡Nuevo uniforme de castor y mucho más!","Text shown in the update info panel with the latest update summary. 'Statistics', 'Succulent', 'Attractions' naming must be consistent with the usage of those terms in the rest of the game."
 MainMenu.WelcomeScreenStart,Comenzar,A button please keep short
-MainMenu.WelcomeScreenText,"¡Hola!
-
-Estás jugando al <i>acceso anticipado de Timberborn</i>..., ¡pero no por mucho tiempo!
-
-El lanzamiento de Timberborn 1.0 se aproxima y esta versión experimental te ofrece una primera toma de contacto. La versión 1.0 viene cargada de nuevo contenido, mejoras que te facilitarán las cosas y cambios que los jugadores del acceso anticipado llevabais muuucho tiempo pidiendo. En especial, hemos mejorado el proceso de creación de mods y de mapas. ¡Tienes que probarlo!
-
-Es la actualización más importante de todas las que hemos lanzado hasta la fecha y nos encantaría saber qué te parece. Envíanos tus comentarios con el botón <i>Página de opiniones</i> o a través de nuestro servidor oficial de Discord.
-
-¡Buena suerte y no olvides hidratarte bien!",
-Manufactory.CurrentRecipe,Receta:,Text before a dropdown for changing factory recipe - what the factory produces from what ingredients.
-MainMenu.WelcomeScreenTitle,Información sobre el acceso anticipado,Header of the welcome screen popup.
+Manufactory.CurrentRecipe,Receta,Text before a dropdown for changing factory recipe - what the factory produces from what ingredients.
 Manufactory.NoRecipeOption,Ninguna,Text shown in a dropdown when no recipe is selected. Keep below 15 characters.
 Manufactory.Recipe.BiofuelCarrot,Biocombustible (zanahorias),Recipe for making Biofuel out of Carrots. Keep consistent with Good.Biofuel.DisplayName and Good.Carrot.PluralDisplayName.
 Manufactory.Recipe.BiofuelPotato,Biocombustible (patatas),Recipe for making Biofuel out of Potatoes. Keep consistent with Good.Biofuel.DisplayName and Good.Potato.PluralDisplayName.
@@ -1135,7 +1419,6 @@ MapEditor.ThumbnailCapturing.Reset,Restablecer,Text on the button in map editor 
 MapEditor.ThumbnailCapturing.SelectOverlay,Seleccionar,Text on the button in map editor that changes the overlay of the thumbnail
 MapEditor.ThumbnailCapturing.Title,Miniatura del mapa,Title of the map thumbnail panel in map editor
 MapEditor.ThumbnailCapturing.UpdateThumbnail,Actualizar,Text on the button in map editor that changes the position of the thumbnail camera
-MapEditor.Tip,Consejo: usa los controles de velocidad del agua en la parte superior de la pantalla para llenar tu mapa con agua desde un principio.,Tip on the loading screen of the map editor.
 MapEditor.Undo,Deshacer,Label of a button that undoes changes in Map editor.
 MapEditor.UploadMap,Subir mapa,Label of the button that uploads the map to some kind of online service
 MapMetadata.Beaverome.Description,"Para construir esta legendaria metrópolis, los ancestros de los castores vaciaron siete cráteres enormes. Incluso con la tecnología maderera de hoy día, eso sería toda una proeza.",
@@ -1165,6 +1448,8 @@ MapMetadata.Plains.Description,"Debido a que cuenta con extensas llanuras más p
 MapMetadata.Plains.Name,Planicies,
 MapMetadata.Pressure.Description,La fontanería creativa es la primera habilidad que debe aprender un castor del páramo.,
 MapMetadata.Pressure.Name,Presión,
+MapMetadata.Spillage.Description,"Esta ladera está plagada de pequeños enclaves de regadío. Sin embargo, innumerables peligros acechan en la zona... Si te descuidas, esos lugares podrían volverse inhóspitos.",
+MapMetadata.Spillage.Name,Vertidos,
 MapMetadata.Terraces.Description,"Muchas sociedades deciden asentarse en zonas elevadas, aprovechando que los castores le han pillado el truco recientemente a eso de construir en vertical.",
 MapMetadata.Terraces.Name,Terrazas,
 MapMetadata.ThousandIslands.Description,Convertir un archipiélago en una colonia industrial próspera no es tarea fácil ni para los nadadores natos.,
@@ -1184,17 +1469,14 @@ MapSelection.SemiCompatibleMapVersion,"Esta versión del mapa ({0}) no es compat
 
 ¿Seguro que quieres empezar la partida?","{0} is the map version (e.g. 0.1.15.1), {1} is the game version (in the same format). This message is shown after a player tries to start game on an incompatible map."
 MapSelection.Unconventional,No convencional,"Label of the maps that have some special, different, unconventional mechanics"
+Mechanical.BatteryCharge,{0}/{1},"Current and total value of battery charge. {0} is current value, {1} is total value."
 Mechanical.Charge,Carga,Current battery charge (how much power a battery has left)
 Mechanical.Efficiency,Eficiencia: {0} %,{0} stands for efficiency percentage number. How efficient workshop is at using the power.\
 Mechanical.NetworkPower,Suministro de la red/demanda de la red: {0}/{1},{0} stands for supply amount {1} stands for demand amount followed by PowerSymbol
 Mechanical.PowerCapacity,Capacidad,Stands for battery capacity.
-Mechanical.PowerCapacityPerMeter,CVh/m,Stands for horse power hour per meter - used to describe battery capacity. hph should be same as Mechanical.PowerCapacitySymbol.
-Mechanical.PowerCapacitySymbol,CVh,Please keep short. Stands for horse power hour (as in kilowatt-hour); should keep similar.
 Mechanical.PowerInput,Entrada de energía: {0},{0} stands for power amount followed by PowerSymbol
 Mechanical.PowerInputMaximum,Entrada de energía/energía máxima: {0}/{1} ({2} %),{0} stands for input amount {1} stands for maximum amount followed by PowerSymbol {2} stands for efficency ratio in percent
 Mechanical.PowerOutput,Salida de energía: {0},{0} stands for power amount
-Mechanical.PowerSymbol,CV,Please keep short. Stands for horse power; should keep similar.
-Mechanical.PowerSymbolPerFlow,CV/m³/s,Please keep short. Stands for horse power per cubic metre per second; hp should be the same as Mechanical.PowerSymbol.
 Menu.Continue,Continuar,A button in main menu which opens the previously played game. Please keep short
 Menu.Credits,Créditos,A button please keep short
 Menu.EditMap,Editar mapa,A button please keep short
@@ -1287,10 +1569,12 @@ NaturalResource.Eggplant.DisplayName,Berenjena,Should be consistent with Good.Eg
 NaturalResource.Eggplant.FlavorDescription,A ver si te vas a meter en un berenjenal.,Do not translate literally if this doesn't make sense in a non-English language.
 NaturalResource.Kohlrabi.DisplayName,Colirrábano,Should be consistent with Good.Kohlrabi.DisplayName
 NaturalResource.Kohlrabi.FlavorDescription,"Sabe a papel, cruje como la madera seca.","Not a very tasty food, yet consumed raw in large quantities."
+NaturalResources.Leftover,(restante),This is shown under NaturalResource.DisplayName. Leftover meaning plant that was cut but not yet collected.
 NaturalResource.Mangrove.DisplayName,Mangle,"A tree that grows in shallow water. This particular name doesn't refer to a specific type, it uses a general name for this group of trees. Produces fruits that can be harvested."
 NaturalResource.Mangrove.FlavorDescription,Las semillas las trajeron unos viajeros de unas tierras lejanas donde los ríos nunca se secan.,
 NaturalResource.Maple.DisplayName,Arce,Tree of the genus Sapindaceae
 NaturalResource.Maple.FlavorDescription,"Los arces producen sirope, pero su madera de alta calidad es una recompensa aún más dulce.",
+NaturalResources.Mature,(madura),This is shown under NaturalResource.DisplayName. Fully grown plant.
 NaturalResource.Oak.DisplayName,Roble,Common oak tree.
 NaturalResource.Oak.FlavorDescription,Las mejores construcciones de los castores están hechas de roble y hierro.,This idiom makes perfect literal sense for the Iron Teeth.
 NaturalResource.Pine.DisplayName,Pino,Tree of the genus Pinus
@@ -1301,11 +1585,13 @@ NaturalResource.Soybean.DisplayName,Soja,Should be consistent with Good.Soybean.
 NaturalResource.Soybean.FlavorDescription,"Sus semillas, que son duras y resistentes al agua, son el juguete perfecto para las crías.",
 NaturalResource.Spadderdock.DisplayName,Nenúfar amarillo,Plant Nuphar Lutea
 NaturalResource.Spadderdock.FlavorDescription,La naturaleza envía su mensaje a través de la forma de sus hojas.,"Spadderdock has heart-shaped leaves, and it can be seen in the game."
+NaturalResource.Succulent.DisplayName,Suculenta,"A kind of plant that can be found in the desert, it is usually green and spiky."
 NaturalResource.Sunflower.DisplayName,Girasol,
 NaturalResource.Sunflower.FlavorDescription,"Plantan los castores girasoles, para demostrar que no temen al fulgor ni de mil soles.",It's a reference to drought being the main threat in the game.
 NaturalResource.Wheat.DisplayName,Trigo,Plant Triticum aestivum
 NaturalResource.Wheat.FlavorDescription,«Con trigo o sin ti» (famosa balada castoril).,"Adapted from ""Fields of Gold"" by Sting."
-NaturalResources.Aquatic,<YellowHighlight>Acuática</YellowHighlight>: al menos una parte debe estar sumergida en el agua.,Aquatic is a keyword. Shown after selecting an aquatic plant. Examples of aquatic plants include spadderdock or water lilies.
+NaturalResources.Aquatic,<YellowHighlight>Acuática</YellowHighlight>: Al menos una parte debe estar sumergida en el agua.,Aquatic is a keyword. Shown after selecting an aquatic plant. Examples of aquatic plants include spadderdock or water lilies.
+NaturalResources.Arid,<YellowHighlight>Árida</YellowHighlight>: Debe plantarse exclusivamente en terreno seco.,Information tooltip shown for plants that can only grow on dry terrain.
 NaturalResources.DaysToDie,Se marchitará en: {0} días,"Shown when natural resource is dying (from any reason), {0} stands for number of days left to die"
 NaturalResources.DiedFromContamination,Se ha marchitado por la contaminación.,Shown when a plant died after being contaminated for too long. Ideally all uses of the word contaminate/contamination/contaminated should be uniform across the project. Please keep short.
 NaturalResources.DiedFromNotEnoughWater,Se ha marchitado por no estar sumergida.,Shown when a water plant died after not being submerged in water for too long. Please keep short.
@@ -1313,10 +1599,10 @@ NaturalResources.DiedFromTooMuchWater,Se ha marchitado por exceso de agua.,Shown
 NaturalResources.Dried,Se ha marchitado por falta de agua.,Shown for plants which died from lack of water. Please keep short.
 NaturalResources.DroughtResistance,Resistencia a la sequía: {0} días,The number of days a plant can survive in a drought.
 NaturalResources.GenericDied,Se ha marchitado.,Refers to a plant.
-NaturalResources.Healthy,Está planta está regada y toda sanota.,Shown when plant is healthy and has no problems with growth
-NaturalResources.Leftover,{0} (restante),{0} stands for NaturalResource.DisplayName. Leftover meaning plant that was cut but not yet collected.
-NaturalResources.Mature,{0} (ha madurado),{0} stands for NaturalResource.DisplayName. Fully grown plant.
-NaturalResources.Seedling,{0} (en crecimiento),{0} stands for NaturalResource.DisplayName. Not fully grown plant.
+NaturalResources.Healthy,Sana.,Shown when plant is healthy and has no problems with growth
+NaturalResources.Overwatered,Ha muerto por riego excesivo.,Shown for plants which died because they received too much water being on a moisture terrain. Please keep short.
+NaturalResources.OverwateringResistance,Resistencia al riego excesivo: {0} días,The number of days a plant can survive while being overwatered. {0} is replaced by the actual number of days. Overwatering term should be consistnt with NaturalResources.Overwatered.
+NaturalResources.Seedling,(en crecimiento),This is shown under NaturalResource.DisplayName. Not fully grown plant.
 NaturalResources.Visibility.Hide,Ocultar recursos naturales,Tooltip for button hiding natural resources
 NaturalResources.Visibility.Show,Mostrar recursos naturales,Tooltip for button showing natural resources
 Need.BadwaterContamination.DisplayName,Contaminación,Title of an effect that shows up when a beaver is contaminated. Ideally all uses of the word contaminate/contamination/contaminated should be uniform across the project.
@@ -1338,7 +1624,6 @@ NeedGroup.BasicNeeds.DisplayName,Necesidades básicas,"A group of needs which in
 NeedGroup.Boosts.DisplayName,Potenciadores,Name of a group containing boosting effects for bots
 NeedGroup.Fun.DisplayName,Diversión,"Name of a need group where needs are satisfied by building attractions for the beavers, previously Need.Fun.DisplayName"
 NeedGroup.Happiness.DisplayName,Felicidad,General happiness of the populace
-NeedGroup.Knowledge.DisplayName,Conocimiento,"Name of a need group where needs are satisfied when beavers learn new stuff, previously Need.Knowledge.DisplayName"
 NeedGroup.Nutrition.DisplayName,Nutrición,Same as the need named Nutrition
 NeedGroup.SocialLife.DisplayName,Vida social,"Name of a need group where needs are satisfied by letting beavers be social and chat with other beavers, previously Need.SocialLife.DisplayName"
 NeedGroup.Temporary.DisplayName,Efectos temporales,"Name of a need group containing temporary effects, both positive and negative."
@@ -1399,7 +1684,7 @@ NewGameFactionPanel.SubHeader,Elige tu facción,
 NewGameMapPanel.SubHeader,Selecciona un mapa,
 NewMapPanel.Header,Crear mapa nuevo,
 Planting.NoPriorityOption,Ninguno,No resource is prioritized
-Planting.Prioritize,Recurso prioritario:,Which resource to prioritize when planting.
+Planting.Prioritize,Recurso prioritario,Which resource to prioritize when planting.
 Planting.ReplantDeadTrees,Replantar árboles muertos que no están marcados para talar,Label of toggle in forester panel fragment
 Planting.UnlockPrompt,Tienes que desbloquear un edificio ({0}) para poder cultivar {1}.,{0} stands for Building.DisplayName {1} stands for NaturalResource.DisplayName.
 PlantingTool.Description,Utiliza esta herramienta para designar una zona de plantación.,
@@ -1449,14 +1734,13 @@ Saving.Settlements,Asentamientos,One of the two headers in the load game panel. 
 Saving.SteamCompatibilityMessage,<RedHighlight><i>Puedes jugar a una versión anterior del juego seleccionando una rama personalizada en el cliente de Steam.</i></RedHighlight>,Additional message on Steam that is shown when the save is not compatible with the current version of the game. It is shown below Saving.SemiCompatibleSaveVersion and Saving.NonCompatibleSaveVersion messages.
 Saving.TakenName,Ya existe un asentamiento con este nombre.,Error message shown after inputting a settlement name that is already used.
 Science.SciencePoints,Puntos de ciencia,The name of a resource which can be spent to unlock new technology
+Science.UnlockableOnce,<YellowHighlight>Se desbloquea una vez para todos los asentamientos.</YellowHighlight>,When someone unlokcs this building in one settlement it unlocks for all their other settlements. The game normally required you to unlock a building separately in each playthrough.
 Settings.Accessibility.DisableStarfieldRotation,Desactivar rotación de campo estelar,Label for disabling starfield (stars in the night sky) rotation in accessibility settings
 Settings.Accessibility.Header,Accesibilidad,Header for accessibility section in settings panel
 Settings.Analytics.ConsentToggle,Análisis habilitado,Selected when giving consent to data collection/analytics.
-Settings.Analytics.DataDeleted,Los datos recopilados se han eliminado.,Confirmation info that the collected data has been deleted.
-Settings.Analytics.DeleteData,Eliminar datos recopilados,Selected when withdrawing consent to data collection/analytics.
 Settings.Analytics.Header,Análisis,Header for the data collection/analytics consent section.
 Settings.GameSaving.AutoSavingOn,Autoguardado,
-Settings.GameSaving.Header,Guardando,
+Settings.General.Header,Generales,Header for general settings section
 Settings.Graphics.AnisotropicFiltering,Filtro anisotrópico,Label for anisotropic textures quality option
 Settings.Graphics.AnisotropicTextures,Texturas anisotrópicas,Label for anisotropic textures quality option
 Settings.Graphics.AntiAliasing.FXAA,FXAA,Label for FXAA anti-aliasing option in graphics settings panel
@@ -1468,7 +1752,7 @@ Settings.Graphics.AntiAliasing.SMAA,SMAA,Label for SMAA anti-aliasing option in 
 Settings.Graphics.AntiAliasingQuality,Suavizado de bordes,Antialiasing dropdown label in graphics settings panel
 Settings.Graphics.Bloom,Bloom,Label for bloom effect dropdown in graphics settings panel
 Settings.Graphics.Header,Calidad gráfica,Header for graphics quality section in settings panel
-Settings.Graphics.LightQuality,Calidad de la iluminación,Label for Light quality dropdown
+Settings.Graphics.LightQuality,Calidad adicional de la iluminación,Label for additional lights quality dropdown setting
 Settings.Graphics.OverallGraphicsQuality,Ajuste preestablecido,Label for graphics quality dropdown
 Settings.Graphics.Quality.Custom,Personalizada,Label for custom graphics quality option
 Settings.Graphics.Quality.High,Alta,Label for high quality graphics option
@@ -1481,6 +1765,7 @@ Settings.Graphics.ShadowQuality,Calidad de las sombras,Label for shadow quality 
 Settings.Graphics.TextureQuality,Calidad de las texturas,Label for texture quality option
 Settings.Graphics.WaterQuality,Calidad del agua,"Label for water quality dropdown, used in graphics settings panel"
 Settings.Header,Ajustes,
+Settings.Intro.DisableIntro,Omitir introducción,Label for setting to skip intro cinematic
 Settings.Input.DragCamera,Desplazamiento de la cámara,
 Settings.Input.EdgePanCamera,Desplazamiento de la cámara (bordes),"When this option is enabled, player can move camera by moving mouse to screen edge"
 Settings.Input.EdgePanCameraSpeed,Velocidad del desplazamiento de la cámara (bordes),
@@ -1490,12 +1775,14 @@ Settings.Input.KeyboardCameraMovementSpeed,Velocidad de desplazamiento con el te
 Settings.Input.KeyboardCameraRotationSpeed,Velocidad de rotación con el teclado,
 Settings.Input.KeyboardCameraZoomSpeed,Velocidad de zoom con el teclado,
 Settings.Input.LockCursorInWindow,Fijar cursor en la ventana,"When this option is enabled, mouse cursor cannot leave game window / display"
+Settings.Input.MouseCameraRotationSpeed,Velocidad de rotación del ratón,Label in settings.
 Settings.Input.MouseWheelCameraZoomSpeed,Velocidad de zoom con la rueda del ratón,Label of a slider for setting the speed of camera zooming with the mouse wheel.
 Settings.Input.OnScreenKeyboard.Auto,Automática,A dropdown item indicating OnScreen Keyboard mode.
 Settings.Input.OnScreenKeyboard.Disabled,Desactivado,A dropdown item indicating OnScreen Keyboard mode.
 Settings.Input.OnScreenKeyboard.Enabled,Activado,A dropdown item indicating OnScreen Keyboard mode.
 Settings.Input.OnscreenKeyboard,Teclado del modo Big Picture de Steam:,Label for dropdown indicating OnScreen Keyboard mode
 Settings.Input.SwapMouseCameraMovementWithRotation,Intercambiar botones de la cámara,"When this option is enabled, the middle mouse button is swapped with the right mouse button"
+Settings.Input.UnlockZoom,Zoom sin límites,Label for setting to unlock zoom limits
 Settings.Language.Change,Cambiar,Please keep short
 Settings.Language.Current,Idioma:,
 Settings.Language.Restart,Reiniciar ahora,Please keep short
@@ -1526,16 +1813,22 @@ Settings.Sound.MusicVolume,Volumen de la música,
 Settings.Sound.MuteWhenMinimized,Silenciar al minimizar y al pasar a segundo plano,
 Settings.Sound.UIVolume,Volumen de la interfaz,
 Settings.Tutorial.DisableTutorial,Desactivar tutorial,
-Settings.Tutorial.Header,Tutorial,
 Settings.UI.Header,Interfaz,
 Settings.UI.RunInBackground,Ejecutar en segundo plano,A settings which controls whether the game should run when minimized or out of focus.
 Settings.UI.ShowFps,Mostrar FPS,
 Settings.UI.UIScaleFactor,Escala de la interfaz,
+Status.Automation.ApiStopped,API detenida.,A warning when the API is stopped.
+Status.Automation.ApiStopped.Short,API detenida,A warning when the API is stopped.
+Status.Automation.AutomationLoop,Ciclo infinito.,A warning when there is an infinite loop (a cycle) in the automation.
+Status.Automation.AutomationLoop.Short,Ciclo infinito,A warning when there is an infinite loop (a cycle) in the automation.
 Status.BadwaterContamination.Incubation,"Este castor ha pasado demasiado tiempo en agua contaminada. Por ahora se encuentra bien, pero en unos días enfermará.",Shown as an status alert when beaver spents too much time in contaminated water (and will get sick soon). Badwater should be the same as Good.Badwater.DisplayName.
 Status.BadwaterContamination.Incubation.Short,Castor pachucho,Shown as an status alert when beaver spents too much time in contaminated badwater (and will get sick soon). Please keep short.
-Status.Beaver.Dead,Muerto,Shown in the beaver info window to explain that the beaver died
+Status.Beaver.DiedOldAge,Ha muerto de vejez.,Shown in the beaver info window to explain that the beaver died of old age. Please keep short.
+Status.Beaver.DiedTragically,Ha muerto en circunstancias trágicas.,"Shown in the beaver info window to explain that the beaver died from starvation, thirst, or other non-natural cause. Please keep short."
+Status.Beaver.DiedTragicallyShort,El castor ha muerto en circunstancias trágicas.,"This shows up as an alert when a beaver dies from starvation, thirst, or other non-natural cause. Please keep short."
 Status.BombActivationWarning,A punto de explotar.,Text shown in entity panel when count down is active for a water source.
 Status.Bot.Dead,Destruido.,This shows up when a bot has been destroyed
+Status.Bot.DeadShort,El robot se ha destruido.,This shows up as an alert when a bot has been destroyed. Please keep short.
 Status.Breeding.ProgressHalted,Se ha detenido la crianza. Esperando nutrientes.,
 Status.Breeding.ProgressHalted.Short,Crianza detenida,Please keep short.
 Status.Buildings.BlockedByContamination,Este edificio está bloqueado por aguamala.,Shown as status when badwater contamination affects building and stops it from working. Badwater should be the same as Good.Badwater.DisplayName.
@@ -1543,12 +1836,14 @@ Status.Buildings.BlockedByContamination.Short,Bloqueado por aguamala,Shown as st
 Status.Buildings.DirectionalBlocking,Construcción a la espera de que se termine la construcción anterior.,"Status shown on construction sites, that need to be finished in directional order."
 Status.Buildings.Flooded,Inundado.,Notification that shows in the selected building's panel when it's flooded.
 Status.Buildings.Flooded.Short,Edificio inundado,Alert that shows up when a building is flooded. Please keep short.
+Status.Buildings.GateConflict,No se puede abrir el portón porque conecta con dos distritos distintos.,A warning shown when gate cannot connect path because of two districts overlapping.
+Status.Buildings.GateConflict.Short,Conflicto de portón,A warning shown when gate cannot connect path because of two districts overlapping. Please keep short.
 Status.Buildings.NeedsWater,Este edificio necesita agua más profunda para funcionar.,
 Status.Buildings.NeedsWater.Short,El edificio necesita agua,Please keep short.
 Status.Buildings.Paused,En pausa.,"Alternative terms: Paused, Switched off"
 Status.Buildings.PipeObstructed,Conducto bloqueado.,Text shown in building panel when input pipe of water pump is obstructed.
-Status.Buildings.Unreachable,No hay ningún camino que conecte este edificio con un centro de distrito.,Shown when a building isn't connected to a District Center.
-Status.Buildings.Unreachable.Short,Edificio incomunicado,Shown when a building isn't connected to a District Center. Please keep short.
+Status.Buildings.Unconnected,No hay ningún camino que conecte este edificio con un centro de distrito.,Shown when a building isn't connected to a District Center.
+Status.Buildings.Unconnected.Short,Edificio incomunicado,Shown when a building isn't connected to a District Center. Please keep short.
 Status.Buildings.VerticalBlocking,Construcción a la espera de que se complete la construcción inferior.,"Status shown on construction sites, that need to be finished from bottom to top."
 Status.ConstructionSites.NoMaterials,No se pueden obtener los materiales necesarios.,Shown in the building box when there are no available materials in the nearby storages or no storages nearby
 Status.ConstructionSites.NoMaterials.Short,Faltan materiales de construcción,Notification that the construction can't be finished. Please keep short.
@@ -1567,9 +1862,12 @@ Status.Manufactory.NoRecipe,Ninguna receta seleccionada.,A warning that no recip
 Status.Manufactory.NoRecipe.Short,Sin receta,A warning that no recipe is selected for crafting. Please keep short.
 Status.Mechanical.NoPower,El edificio necesita energía para funcionar. Conéctalo a un generador.,
 Status.Mechanical.NoPower.Short,Al edificio le falta energía.,Power is not an electrical but mechanical/kinetic energy. Please keep short.
+Status.Naming.DuplicateName,Este nombre ya existe.,A warning when there are more than one object with the same name.
+Status.Naming.DuplicateName.Short,Duplicar nombres,A warning when there are more than one object with the same name.
 Status.NaturalResources.Contaminated,Contaminada.,Shown when a plant is dying because it is contaminated. Ideally all uses of the word contaminate/contamination/contaminated should be uniform across the project.
 Status.NaturalResources.Drying,Se está secando.,Shown when a plant is dying because it has no access to the water
 Status.NaturalResources.NotEnoughWater,Sin agua.,Shown when a water plant is dying because its river or lake dried up.
+Status.NaturalResources.Overwatered,Riego excesivo.,Shown when a plant is overwatered. Please keep short. Overwatered term should be consistnt with NaturalResources.Overwatered.
 Status.NaturalResources.TooMuchWater,Exceso de agua.,Shown when a plant is dying because it is submerged in water.
 Status.Need.BadwaterContamination,Contaminado por aguamala.,This shows up in the selected beaver's panel when it is contaminated. Badwater should be the same as Good.Badwater.DisplayName. Ideally all uses of the word contaminate/contamination/contaminated should be uniform across the project.
 Status.Need.BadwaterContamination.Short,Castor contaminado,This shows up as an alert when a beaver is contaminated. Please keep short. Ideally all uses of the word contaminate/contamination/contaminated should be uniform across the project.
@@ -1630,20 +1928,28 @@ StockpilePriority.Supply,Suministrando,"Please keep short. Defines a state of a 
 StockpilePriority.Supply.Long,Suministra bienes a otros almacenes.,"Defines a state of a warehouse, where it accepts goods, but haulers will move them to other warehouses if able"
 TerrainPhysicsPostLoader.TerrainHasNoSupport,El terreno no tenía un soporte válido y se ha eliminado.,Warning shown when loaded terrain has invalid physical support
 Thumbnail.NoPreview,Sin vista previa,Text shown with default thumbnail when the selected map or save has no preview image
-Time.DaysShort,{0} d,"{0} stands for days, for example 16d. Please keep very short."
-Time.HourShort,h,Hour abbreviation
-Time.HoursShort,{0} h,"{0} stands for hours, for example 16h. Please keep very short. (renamed from Work.WorkingHoursShort)"
 TimedComponentActivator.CountdownNotActive,Latente,Text shown in entity panel when count down is not active for entity.
 TimedComponentActivator.CyclesUntilCountdownActivation,Ciclo de activación de cuenta atrás,Label for input field shown in entity panel in editor. Allows to set a cycle number in which count down will start.
 TimedComponentActivator.DaysUntilActivationLoc,Duración de la cuenta atrás (días),Label for input field shown in entity panel in editor. Allows to set a number of days until activation.
 TimedComponentActivator.DaysUntilActivationProgress,Se activará en: {0} días,Text shown in entity panel during gameplay when count down is active. Informs abount time left until activation.
 TimedComponentActivator.DaysUntilExplosionProgress,Explotará en: {0} días,Text shown in entity panel during gameplay when count down is active. Informs abount time left until activation.
 TimedComponentActivator.IsEnabledToggle,Activación aplazada,Label for toggle in entity panel in editor. Allows to enable or disable time activation.
+Tip.Common.KeyBindings,"Consejo: Usa las asignaciones de teclas para ejecutar determinadas acciones más rápido, como eliminar o duplicar un edificio. Puedes consultar la lista completa en Opciones.",Tip on the loading screen.
+Tip.Common.LayerTool,Consejo: Usa la <YellowHighlight>herramienta de capas</YellowHighlight> para observar bajo el terreno y los edificios.,Tip on the loading screen. Layer tool naming must be consistent with the usage of those terms in the rest of the game.
+Tip.Game.Duplicate,Consejo: Usa las herramientas <YellowHighlight>Duplicar</YellowHighlight> y <YellowHighlight>Copiar ajustes</YellowHighlight> para crear edificios idénticos rápidamente.,Tip on the loading screen. 'Duplicate' and 'Copy settings' should be the same as in KeyBinding.DuplicateObject and KeyBinding.DuplicateSettings respectively.
+Tip.Game.Flip,Consejo: Usa <YellowHighlight>Voltear</YellowHighlight> para darle la vuelta a un edificio al colocarlo.,Tip on the loading screen. 'Flip' should be the same as in KeyBinding.Flip.
+Tip.Game.Solid,"Consejo: Si un edificio es <YellowHighlight>firme</YellowHighlight>, como una cabaña o un almacén, puedes construir otras estructuras encima.",Tip on the loading screen. Solid is a keyword.
+Tip.MapEditor.Undo,Consejo: Usa las opciones <YellowHighlight>Deshacer</YellowHighlight> y <YellowHighlight>Rehacer</YellowHighlight> para corregir rápidamente un error.,Tip on the loading screen. 'Undo' and 'Redo' should be the same as in MapEditor.Undo and MapEditor.Redo respectively.
+Tip.MapEditor.SeasonControls,Consejo: Usa los controles estacionales en la parte superior de la pantalla para simular la sequía y la mareamala.,Tip on the loading screen.
+Tip.MapEditor.SpeedControls,Consejo: Usa los controles de velocidad del agua en la parte superior de la pantalla para llenar tu mapa con agua desde un principio.,Tip on the loading screen.
 Toggle.Selected,(seleccionado),Indication in tooltip about selected item. Fore example: 'Planting (selected)'
 Toggle.State.Closed,Cerrado,Indication in tooltip about toggle state. For example 'Status: Closed'
+Toggle.State.Conflict,Conflicto,Tooltip for conflict toggle state (when two districts are in conflict and gate cannot connect them)
 Toggle.State.Off,no,Indication in tooltip about toggle state. For example 'Prioritize building by haulers: off'
 Toggle.State.On,sí,Indication in tooltip about toggle state. For example 'Prioritize building by haulers: on'
 Toggle.State.Open,Abierto,Indication in tooltip about toggle state. For example 'Status: Open'
+Tool.Cursor.Tooltip,Seleccionar,Tooltip for cursor on bottom bar
+Tool.Options.Tooltip,Opciones,Tooltip for options on bottom bar
 ToolGroups.Decoration,Decoración,Buildings and objects that are for decoration
 ToolGroups.Demolishing,Demolición de edificios y recursos,
 ToolGroups.DistrictManagement,Gestión de distritos,"Toolbar category for buildings used for district management - that includes builders, moving goods and making new districts"
@@ -1654,7 +1960,6 @@ ToolGroups.Housing,Vivienda,Buildings that beavers can live in
 ToolGroups.Landscaping,Paisajismo,Buildings that allow changes to land such as Dams or Dynamite
 ToolGroups.MapEditor,Editor de mapas,Objects specific to map editor such as starting point or water source
 ToolGroups.MapEditorObjects,Objetos,
-ToolGroups.MapEditorResources,Recursos,
 ToolGroups.MapEditorWater,Agua,
 ToolGroups.Metal,Metal,Buildings that allow to collect and produce with metal
 ToolGroups.Monuments,Monumentos,Awe-inspiring statues and fantastic contraptions
@@ -1671,6 +1976,9 @@ ToolGroups.Water,Agua,Buildings that gather and store water.
 ToolGroups.Wood,Madera,Buildings that allow gathering and producing using wood
 TopBar.Badwater,Aguamala,A group of goods. Please keep short.
 TopBar.Food,Comida,A group of goods. Please keep short.
+TopBar.GoodStockpileTooltip.Inputs,Entradas,Label in topbar tooltip - for goods keeped in input directories - please keep short
+TopBar.GoodStockpileTooltip.Outputs,Salidas,Label in topbar tooltip - for goods ready to use - please keep short
+TopBar.GoodStockpileTooltip.Stockpiles,Almacenamiento,Label in topbar tooltip - for goods keeped in stockpiles warehouses etc - please keep short
 TopBar.Ingredients,Ingredientes,Please keep short.
 TopBar.Logs,Troncos,A group of goods. Please keep short.
 TopBar.Materials,Materiales,A group of goods. Please keep short.
@@ -1681,6 +1989,12 @@ TreeCuttingSelectionTool.Description,Utiliza esta herramienta para marcar áreas
 TreeCuttingSelectionTool.Title,Marcar área de tala de árboles,
 TreeCuttingUnselectionTool.Description,Utiliza esta herramienta para eliminar marcas de áreas de tala de árboles.,Doesn't have to use a personal verb
 TreeCuttingUnselectionTool.Title,Eliminar marca de área de tala de árboles,
+Tutorial.Badtides,Mareamala,"Tutorial title, Badtides refers to Weather.Badtide"
+Tutorial.Badtides.Description,"Tu asentamiento ha resistido su primera mareamala.
+
+Al igual que la sequía, la mareamala forma parte del ciclo estacional.
+
+La próxima mareamala podría no ser tan benévola, así que no te confíes.",Badtide refers to Weather.Badtide
 Tutorial.Basics,Fundamentos básicos,Header of the tutorial section that covers the basic concepts
 Tutorial.Basics.ManagePause,Puedes pausar la partida en cualquier momento para analizar la situación y pensar tu hoja de ruta.,
 Tutorial.Basics.ManageSpeed,También puedes aumentar la velocidad de juego para reducir el tiempo no productivo mientras tus castores trabajan o duermen.,
@@ -1703,10 +2017,20 @@ Tutorial.Basics.ZoomCameraOut,Alejar la cámara,
 Tutorial.Building,Construye: {0} ({1}/{2}),"{0} stands for building name {1} stands for number of built buildings {2} stands for number of buildings to build. This is used in a goal description with the verb in active voice, for example 'Build: Warehouse (0/5)'."
 Tutorial.ConnectBuilding,Conecta: {0} ({1}/{2}),"{0} stands for building name {1} stands for number of buildings connected with paths {2} stands for number of buildings to connect. This is used in a goal description with the verb in active voice, for example 'Connect: Lumberjack Flag (0/2)'."
 Tutorial.Continue,Continuar,
+Tutorial.Dams,Presas,"Tutorial title, Dams refers to Building.Dam.DisplayName"
+Tutorial.Dams.BuildDam,"Almacenar agua en depósitos mantiene a tus castores hidratados, pero la supervivencia a largo plazo se basa en controlar el flujo del agua.
+
+Construye una serie de presas de orilla a orilla en el río más cercano y observa qué sucede.",Dam refers to Building.Dam.DisplayName
+Tutorial.DecreaseWorkplacePriority,Reducir la prioridad del lugar de trabajo: {0},{0} stands for building name
 Tutorial.Disable,Desactivar tutorial,
 Tutorial.DisablePrompt,"¿Seguro que quieres desactivar el tutorial?
 Podrás volver a activarlo en los ajustes.",
-Tutorial.Finish,Cerrar,
+Tutorial.Droughts,Sequías,"Tutorial title, Droughts refers to Weather.Drought"
+Tutorial.Droughts.Description,"¡Enhorabuena! Tu asentamiento ha superado su primera sequía.
+
+Las sequías forman parte del ciclo estacional. Volverán a repetirse y serán cada vez más duraderas.
+
+Si no lo has hecho aún, construye una presa para empezar a prepararte para la siguiente.",Drought refers to Weather.Drought
 Tutorial.Forestry,Industria maderera,
 Tutorial.Forestry.Forester,"Los castores necesitan una fuente constante de troncos. Ufff.
 
@@ -1716,34 +2040,59 @@ Tutorial.Forestry.MarkBirchesForPlanting,"Usa la herramienta «Plantación de á
 Al igual que los cultivos, los árboles solo prosperan en zonas verdes con irrigación.
 
 Recuerda marcar las zonas de plantación para la tala.","Plant Trees and Bushes is the same as ToolGroups.ForestryPlanting, Birches is the same as NaturalResource.Birch.DisplayName"
-Tutorial.GoodLuck,¡Buena suerte!,
-Tutorial.GoodLuck.Description,"¡Así se hace! Has establecido los cimientos para una gran urbe. Pero no bajes la guardia. Lo difícil de verdad empieza ahora.
+Tutorial.HaulersAndWorkforce,Transportistas y mano de obra,Tutorial title
+Tutorial.HaulersAndWorkforce.BuildHaulingPost,"Cuanto más crece tu asentamiento, mayores cantidades de bienes procesa. Transportarlos supone una parte importante de la rutina de tus trabajadores.
 
-Construye tu primera presa. Desarrolla nuevas tecnologías. Aumenta tu población y mantenla con vida.
+Y para eso están los transportistas. Trasladan los bienes por todo el distrito en función de la demanda.
 
-Lógralo y esta tierra baldía se convertirá en una auténtica utopía castoril. Fracasa y compartirás el funesto destino de la humanidad.",Dam refers to Building.Dam.DisplayName
-Tutorial.HousingAndPopulation,Vivienda y población,
-Tutorial.HousingAndPopulation.BeaverBirth,Ten crías,If there's no special name for beaver children in your language use 'have a child'.
-Tutorial.HousingAndPopulation.GrowPopulation,"Los castores no se reproducen a menos que haya viviendas disponibles. Los Bucólicos necesitan dos adultos y un espacio vacío para que suceda la magia.
+Venga, vamos a construir un puesto de transporte.",Hauling Post refers to Building.HaulingPost.DisplayName
+Tutorial.HaulersAndWorkforce.ChangeWorkforce,"Algunos lugares de trabajo, como los puestos de transporte, no completan los huecos para trabajadores por defecto. Puedes modificar el número de trabajadores deseado en un panel del edificio.
 
-Nota: Las crías de los castores son adorables.","The Tip is optional if there's no special name for beaver children in your language. If that's the case, remove this part."
-Tutorial.HousingAndPopulation.Lodges,"¡Dos castores siempre mejor que uno! Las viviendas mejoran el bienestar de los castores y permiten aumentar la población de Bucólicos.
+Además, puedes controlar la gestión del personal de un edificio mediante las prioridades del lugar de trabajo. Por ejemplo, al puesto de transporte se le suele asignar una prioridad de lugar de trabajo baja.
+
+Vamos a probar.",
+Tutorial.HaulersAndWorkforce.PauseHaulingPost,"Puedes pausar edificios y zonas de construcción. Esto te dará más control sobre las acciones de los castores.
+
+Por ejemplo, los lugares de trabajo en pausa se desocupan automáticamente y los trabajadores se reasignan a otros lugares de trabajo disponibles.
+
+Selecciona el puesto de transporte y haz clic en el botón correspondiente de su panel para pausarlo.",Hauling Post refers to Building.HaulingPost.DisplayName
+Tutorial.Housing,Vivienda,"Tutorial title, housing should be the same as ToolGroups.Housing"
+Tutorial.Housing.Lodges,"¡Dos castores siempre mejor que uno! Las viviendas mejoran el bienestar de los castores y permiten aumentar la población de Bucólicos.
 
 Los castores se asignan automáticamente a los huecos de las viviendas disponibles.",Folktails is the same as faction as Faction.Folktails.DisplayName
+Tutorial.IncreaseDesiredWorkers,Aumentar los trabajadores deseados: {0},{0} stands for building name
 Tutorial.Introduction.Description,"¡Timberborn te da la bienvenida! Este tutorial te ayudará a dar tus primeros zarpazos en el yermo y a sobrevivir al principio.
 
 Aprenderás a usar las herramientas necesarias para construir una comunidad de castores próspera.
 
 A medida que vayas avanzando, recibirás más consejos aquí.",
+Tutorial.LayerTool.ChangeUsingMouse,"Puedes controlar la capa visible sin hacer clic en los botones mediante la personalización de la asignación de teclas.
+
+Muchas otras acciones también tienen teclas asignadas. Puedes consultarlas en los consejos o en el menú de ajustes.",Keybindings refers to Menu.KeyBindings
+Tutorial.LayerTool.ChangeUsingUI,"A medida que tu asentamiento vaya ganando altura, el trabajo bajo los edificios y el terreno se complica.
+
+La herramienta de capas permite ocultar todo lo que se encuentra sobre la capa seleccionada para facilitarte la vida.
+
+Vamos a hacer clic en los botones resaltados para cambiar la capa visible.",
+Tutorial.LayerTool.Decrease,Reducir la altura de la capa visible a 0,
+Tutorial.LayerTool.Increase,Aumentar la altura de la capa visible,
+Tutorial.LayerTool,Herramienta de capas,"Tutorial title, Layer tool naming must be consistent with the usage in the rest of the game"
+Tutorial.LayerTool.Reset,Restablecer la capa visible,
 Tutorial.MarkPlantables,Planta: {0} ({1}/{2}),"{0} stands for resource name {1} stands for number of marked resource tiles {2} stands for number of tiles to mark with resource. This is used in a goal description with the verb in active voice, for example 'Plant: Carrot (0/5)'."
 Tutorial.MarkTrees,Marca árboles para talarlos.,
+Tutorial.MoreBeavers,Más castores,Tutorial title
+Tutorial.MoreBeavers.BeaverBirth,Ten crías,If there's no special name for beaver children in your language use 'have a child'.
+Tutorial.MoreBeavers.GrowPopulation,"Los castores no se reproducen a menos que haya viviendas disponibles. Los Bucólicos necesitan dos adultos y un espacio vacío para que suceda la magia.
+
+Nota: Las crías de los castores son adorables.","The Tip is optional if there's no special name for beaver children in your language. If that's the case, remove this part."
+Tutorial.PauseBuilding,Pausa: {0},{0} stands for building name
 Tutorial.PlaceBuilding,Coloca: {0} ({1}/{2}),"{0} stands for building name {1} stands for number of built buildings {2} stands for number of buildings to build. This is used in a goal description with the verb in active voice, for example 'Place: Warehouse (0/5)'."
 Tutorial.PowerAndPlanks,Energía y tablones,
 Tutorial.PowerAndPlanks.LumberMill,"¡Ha llegado la hora de fabricar tablones!
 
 Construye un aserradero justo al lado de la rueda hidráulica. También puedes construirlo más lejos y conectarlo a la rueda hidráulica con ejes de transmisión.
 
-Consejo: Muchos edificios, como los aserraderos y las cabañas, pueden intercambiar energía si se construyen pared con pared. ¡Sin necesidad de ejes de transmisión!","Planks is the same as Good.Plank.PluralDisplayName, LumberMill is the same as Building.LumberMill.DisplayName, Water Wheel is the same as Building.WaterWheel.DisplayName, Power Shafts is the same as Building.PowerShaft.DisplayName, Lodge is the same as Building.Lodge.DisplayName"
+Consejo: Muchos edificios, como los aserraderos y las cabañas, pueden transmitirse energía entre sí al construirlos pared con pared. ¡Sin necesidad de ejes de transmisión!","Planks is the same as Good.Plank.PluralDisplayName, LumberMill is the same as Building.LumberMill.DisplayName, Water Wheel is the same as Building.WaterWheel.DisplayName, Power Shafts is the same as Building.PowerShaft.DisplayName, Lodge is the same as Building.Lodge.DisplayName"
 Tutorial.PowerAndPlanks.WaterWheel,"Los edificios más avanzados requieren energía y a los castores les gusta obtenerla del río.
 
 Coloca una rueda hidráulica en una corriente de agua a orillas de un río.",Water Wheel is the same as Building.WaterWheel.DisplayName
@@ -1759,6 +2108,7 @@ Tutorial.Science.SciencePoints,"De momento, que el inventor trabaje.
 Cuando consigas suficientes puntos de ciencia, los gastaremos en desbloquear edificios más avanzados.","Inventor is the same as Building.Inventor.DisplayName, Science Points is the same as Science.SciencePoints"
 Tutorial.Science.Unlock,Desbloquea: {0},{0} stands for the name of the building to unlock
 Tutorial.SelectGood,Configura: {0} a {1} {2},{0} stands for building name {1} stands for good name {2} stands for Tutorial.Progress. This is used in a goal description with the verb in active voice. for example 'Set: Warehouse to Bread (0/5)'.
+Tutorial.SetWorkingHours,Fija las horas de trabajo en {0},{0} is the number of working hours to set
 Tutorial.Storage,Almacenamiento,
 Tutorial.Storage.Pile,"Muchos edificios tienen almacenamiento integrado, pero este se llena rápidamente.
 
@@ -1770,6 +2120,13 @@ Tutorial.Storage.Warehouses,"Por último, vamos a prepararlo todo para almacenar
 
 Los alimentos, al igual que otros bienes en cajas, se guardan en almacenes.","Berries is the same as Good.Berries.PluralDisplayName, Carrot is the same as in Good.Carrot.DisplayName"
 Tutorial.Tutorial,Tutorial,
+Tutorial.UnpauseBuilding,Reanuda: {0},{0} stands for building name
+Tutorial.VerticalArchitecture,Arquitectura vertical,Tutorial title
+Tutorial.VerticalArchitecture.BuildRooftopTerrace,"En el páramo, optimizar el uso del espacio resulta crucial. Para ello, los castores desarrollan sus urbes verticalmente.
+
+Algunos edificios, como las cabañas, tienen el tejado plano para sostener otras estructuras.
+
+Vamos a construir una terraza de azotea. Seguramente necesitarás escaleras para conectarla con el distrito.","Lodges refers to Building.Lodge.DisplayName, Rooftop Terrace refers to Building.RooftopTerrace.DisplayName"
 Tutorial.WaterAndFood,Agua y comida,
 Tutorial.WaterAndFood.Farmhouse,"A la larga, necesitaremos algo más nutritivo. Construye una granja para plantar y cosechar cultivos.
 
@@ -1800,6 +2157,11 @@ Tutorial.Wellbeing.Campfire,"El bienestar es un indicador del grado de satisfacc
 Uno de los principales modos de mejorar el bienestar es a través de las atracciones. Los castores acudirán a estos edificios cuando no estén trabajando.","Well-being is the same as Wellbeing.DisplayName, working speed is the same Bonus.WorkingSpeed, movement speed is the same as Bonus.MovementSpeed, lifespan refers to Bonus.LifeExpectancy"
 Tutorial.Wellbeing.OpenWellbeingPanel,Abre el panel de bienestar,Keep similar to KeyBinding.OpenWellbeingPanel
 Tutorial.Wellbeing.SelectBeaver,Selecciona un castor y comprueba sus necesidades,
+Tutorial.Wellbeing.SetWorkingHours,"No olvides que los castores necesitan tiempo libre para comer, beber, dormir y disfrutar de las atracciones del asentamiento.
+
+Para maximizar la productividad, tendrás que hallar un equilibrio entre el bienestar y las horas de trabajo de la mano de obra.
+
+De momento, vamos a volver a fijar las horas de trabajo por defecto.",Working hours refers to Work.WorkingHoursTooltip
 Tutorial.Wellbeing.Shrub,"Los adornos también mejoran el bienestar. Los castores no se acercarán a ellos intencionadamente, así que procura colocarlos cerca de donde suelan estar.
 
 Los matorrales constituyen el adorno más sencillo y a los castores les encanta todo lo que sea verde.","Well-being is the same as Wellbeing.DisplayName, Shrub is the same as Building.Shrub.DisplayName"
@@ -1821,10 +2183,44 @@ Vamos a usar la herramienta «Marcar área de tala de árboles». Mantén pulsad
 Tutorial.Wood.PlaceLumberjacks,"Todos los asentamientos de castores necesitan troncos, y muchos. Y solo los leñadores pueden talar árboles.
 
 Construye puntos de tala junto a los árboles cercanos.","Logs is same as Good.Log.PluralDisplayName, Lumberjack Flag is the same as Building.LumberjackFlag.DisplayName"
+Tutorial.WorkingHours,Horas de trabajo,"Tutorial title, Working hours refers to Work.WorkingHoursTooltip"
+Tutorial.WorkingHours.SetWorkingHours,"Ajustar las horas de trabajo es un modo de gestionar tu asentamiento.
+
+Las largas jornadas laborales implican un mayor avance, pero por la noche, los castores necesitan tiempo para relajarse y dormir. No los presiones demasiado ni durante mucho tiempo.
+
+De momento, vamos a ampliar el horario laboral tan solo un poquito.","Working hours refers to Work.WorkingHoursTooltip, Starvation refers to Status.Need.Hunger, dehydration refers to Status.Need.Thirst"
+Unit.Compact.Kilo.NumberAndUnit,{0} k,"Number with symbol unit added to denote thousands, {0} is the number, 'k' should be consistent with Unit.Kilo.UnitOnly. This should be extremely short - everything of more then 2 characters (inlcuding space and dot) is too long. If in doubt, just left it as k."
+Unit.Compact.Kilo.UnitOnly,k,"SI symbol for kilo, used in numbers to denote thousands and shorten their display, e.g. 1k = 1000, 2.5k = 2500, etc. This should be extremely short - everything of more then 2 characters (inlcuding space and dot) is too long. If in doubt, just left it as k."
+Unit.Compact.Mega.NumberAndUnit,{0} M,"Number with symbol unit added to denote millions, {0} is the number, 'M' should be consistent with Unit.Mega.UnitOnly. This should be extremely short - everything of more then 2 characters (inlcuding space and dot) is too long. If in doubt, just left it as M."
+Unit.Compact.Mega.UnitOnly,M,"SI symbol for mega, used in numbers to denote millions and shorten their display, e.g. 1M = 1,000,000, 2.5M = 2,500,000, etc. This should be extremely short - everything of more then 2 characters (inlcuding space and dot) is too long. If in doubt, just left it as M."
+Unit.CubicMeterPerSecond.NumberAndUnit,{0} m³/s,Abbreviation for cubic meters per second with numeric value. {0} stands for the number. Should be consistent with Unit.CubicMeterPerSecond.UnitOnly. Please keep very short.
+Unit.CubicMeterPerSecond.UnitOnly,m³/s,Abbreviation for cubic meters per second - standard unit of flow rate/speed. Please keep very short.
+Unit.Day.NumberAndUnit,{0} d,Abbreviation for day/days with numeric value. {0} stands for the number. Should be consistent with Unit.Day.UnitOnly. Please keep very short.
+Unit.Day.UnitOnly,d,Abbreviation for day/days - a unit of time. Please keep very short.
+Unit.Degree.NumberAndUnit,{0}°,Abbreviation for degree unit with numeric value. {0} stands for the number. Should be consistent with Unit.Degree.UnitOnly. Please keep very short.
+Unit.Degree.UnitOnly,°,Abbreviation for degree unit - a unit of angle measurement. Please keep very short.
+Unit.HorsePower.NumberAndUnit,{0} CV,Abbreviation for horse power unit with numeric value. {0} stands for the number. Should be consistent with Unit.HorsePower.UnitOnly. Please keep very short.
+Unit.HorsePower.UnitOnly,CV,Abbreviation for horse power unit - a unit of engine power. Please keep very short.
+Unit.HorsePowerHour.NumberAndUnit,{0} CVh,Abbreviation for horse power hour with numeric value. {0} stands for the number. Should be consistent with Unit.HorsePowerHour.UnitOnly. Please keep very short.
+Unit.HorsePowerHour.UnitOnly,CVh,Abbreviation for horse power hour unit - a unit of energy. hp and h should be consistent with Unit.HorsePower.UnitOnly and Unit.Hour.UnitOnly. Please keep very short.
+Unit.HorsePowerHourPerMeter.NumberAndUnit,{0} CVh/m,Abbreviation for horse power hour per meter with numeric value. {0} stands for the number. Should be consistent with Unit.HorsePowerHourPerMeter.UnitOnly. Please keep very short.
+Unit.HorsePowerHourPerMeter.UnitOnly,CVh/m,"Stands for horse power hour per meter - used to describe battery capacity. hph should be consistent with Unit.HorsePowerHour.UnitOnly, m should be consistent with Unit.Meter.UnitOnly. Please keep very short."
+Unit.HorsePowerPerCubicMeterPerSecond.NumberAndUnit,{0} CV/m³/s,Abbreviation for horse power per cubic meter per second with numeric value. {0} stands for the number. It should be consistent with Unit.HorsePowerPerCubicMeterPerSecond.UnitOnly. Please keep very short.
+Unit.HorsePowerPerCubicMeterPerSecond.UnitOnly,CV/m³/s,Abbreviation for horse power per cubic meter per second. It should be consistent with Unit.HorsePower.UnitOnly and Unit.CubicMeterPerSecond.UnitOnly. Please keep very short.
+Unit.Hour.NumberAndUnit,{0} h,Abbreviation for hour/hours with numeric value. {0} stands for the number. Should be consistent with Unit.Hour.UnitOnly. Please keep very short.
+Unit.Hour.UnitOnly,h,Abbreviation for hour/hours - standard unit of time. Please keep very short.
+Unit.Kilogram.NumberAndUnit,{0} kg,"Abbreviation for kilogram, {0} is the number, kg is the unit symbol, which should be consistent with Unit.Kilogram.UnitOnly"
+Unit.Kilogram.UnitOnly,kg,Standard unit symbol for kilogram
+Unit.Meter.NumberAndUnit,{0} m,Abbreviation for meters with numeric value. {0} stands for the number. Should be consistent with Unit.Meter.UnitOnly. Please keep very short.
+Unit.Meter.UnitOnly,m,Abbreviation for meters - standard unit of length/distance/depth. Please keep very short.
+Unit.Percent.NumberAndUnit,{0} %,"Number with percent unit added, {0} is the number, % is the unit symbol, which should be consistent with Unit.Percent.UnitOnly"
+Unit.Percent.UnitOnly,%,Standard math unit symbol for percent
+Unit.Tick.NumberAndUnit,{0} t,Short format for time in ticks with numeric value. It should probably be a short form of Building.Timer.IntervalType.Ticks. It should use different letter than the ones used in Unit.Hour.UnitOnly and Unit.Day.UnitOnly to avoid confusion. {0} stands for the number. Please keep very short.
+Unit.Tick.UnitOnly,t,Short format for time in ticks. It should probably be a short form of Building.Timer.IntervalType.Ticks. It should use different letter than the ones used in Unit.Hour.UnitOnly and Unit.Day.UnitOnly to avoid confusion. Please keep very short.
 UnstableCore.ExplosionRadius,Radio de la explosión,Label of a field that allows to set explosion radius of an unstable core.
 Water.Strength,Fuerza,Followed by a number which tells how much water a water source produces
-WaterInputCoordinates.Depth,Profundidad,Depth reached by the water input building (e.g. a water pump).
-WaterInputCoordinates.Limit,Límite,Depth limit of the water input building (e.g. a water pump).
+WaterInputCoordinates.Depth,Profundidad: {0},Depth reached by the water input building (e.g. a water pump). {0} stands for a number
+WaterInputCoordinates.Limit,Límite: {0},Depth limit of the water input building (e.g. a water pump). {0} stands for a number
 WaterMover.Unfiltered,Sin filtrar,"Tooltip for a toggle, that decides what kind of fluid should be pumped: unfiltered, water or badwater"
 WaterOpacity.Visibility.Hide,Ocultar agua,Tooltip for button hiding water
 WaterOpacity.Visibility.Show,Mostrar agua,Tooltip for button showing water
@@ -1841,7 +2237,6 @@ Weather.Notification.BadtideApproaching,Se avecina la mareamala,Tooltip of weath
 Weather.Notification.BadtideInProgress,Mareamala en curso,Tooltip of weather panel shown when a badtide season is in progress. Badtide should be the same as Weather.Badtide.
 Weather.Notification.DroughtApproaching,Se avecina una sequía,Tooltip of weather panel shown when a drought season is approaching. Drought should be the same as Weather.Drought.
 Weather.Notification.DroughtInProgress,Sequía en curso,Tooltip of weather panel shown when a drought season is in progress. Drought should be the same as Weather.Drought.
-Weather.Notification.Mild,Clima templado,Tooltip of weather panel shown when a mild (temperate) season is in progress.
 Weather.Temperate,Clima templado,
 Wellbeing.AverageWellbeing,Bienestar medio:,Please keep short. Well-being is how good the beavers feel in general. Could also be welfare or prosperity
 Wellbeing.DisplayName,Bienestar,How good the beavers feel. Could also be welfare or prosperity
@@ -1867,14 +2262,15 @@ WonderCompletion.WonderCompleted,Maravillas completadas: {0},Text that is shown 
 Work.BeaverOnly,<YellowHighlight>Solo para castores:</YellowHighlight> en este lugar de trabajo solo pueden trabajar castores.,Shown on a tooltip at workplaces where only beavers can work in
 Work.BotOnly,<YellowHighlight>Solo para robots:</YellowHighlight> en este lugar de trabajo solo pueden trabajar robots.,Shown on a tooltip at workplaces where only bots can work in. Bots should be the same as Bot.PluralDisplayName.
 Work.CurrentWorkers,Trabajadores: {0}/{1},Please keep short. {0} stands for the desired number of workers. {1} stands for max number of workers that can work in building.
-Work.DefaultAllowedWorker,Tipo de trabajador predeterminado para nuevos edificios:,Global setting for who is allowed to work in a new building: beavers or bots
+Work.DefaultAllowedWorker,Trabajador por defecto en edificios nuevos,Global setting for who is allowed to work in a new building: beavers or bots
 Work.DefaultAllowedWorker.Tooltip,Los edificios nuevos de este distrito usarán este tipo de trabajador por defecto.,Shown on a tooltip for a toggle deciding the default worker setting between beavers and bots.
 Work.FuelRemaining,Combustible restante: {0} %,"{0} stands for a number between 0 and 100, for example 10% means that most of the fuel has been depleted."
 Work.Incapacitated,Incapacitados,Label before a number of characters unfit for work (for example injured beavers or broken bots)
-Work.MaxDepth,Profundidad máxima: {0},"Explains how deep a building can reach, for example how deep it can pump water from. {0} stands for a number. Example usage: 'Depth: 5'"
+Work.MaxDepth,Profundidad máxima: {0},"Explains how deep a building can reach, for example how deep it can pump water from. {0} stands for a number."
 Work.MaximumWorkers,Trabajadores máximos: {0},{0} stands for max number of workers that can work in building.
 Work.PriorityTitle,Prioridad de lugar de trabajo,Setting a priority on workplace building
-Work.Productivity,Productividad:,How productive a workplace is. Followed by a percentage.
+Work.Productivity,Productividad: {0},"Label stating how productive a workplace is, should be consistent with Work.ProductivityHeader. {0} is the value of productivity,"
+Work.ProductivityHeader,Productividad,Label in a tooltip header describing the productivity of a workplace.
 Work.ProductivityTip,"Porcentaje de tiempo empleado en la producción en contraposición al tiempo no productivo, como el tiempo que se tarda en transportar materiales.",Tooltip of how productivity works
 Work.Vacant,Vacante,Denotes an empty workplace slot without a worker.
 Work.VacantPlural,Vacantes,Label before number of vacant work slots
@@ -1889,9 +2285,9 @@ Work.WorkplaceUnlock.Tooltip,Desbloquea este lugar de trabajo para robots.,Shown
 Zipline.AddConnection,Añadir conexión,Tooltip text for button with plus icon adding a connection between two zipline towers or stations.
 Zipline.BlockedWarning,¡Ruta bloqueada!,Error message when zipline path is obstructed
 Zipline.Connections,Conexiones:,A header above icon representation of connections between zipline towers or stations.
-Zipline.Distance,{0} m / {1} m,"The distance between the start and end of a zipline cable. {0} is the current distance, {1} is the maximum allowed distance. 'm' stands for meters"
+Zipline.Distance,{0}/{1},"The distance between the start and end of a zipline cable. {0} is the current distance, {1} is the maximum allowed distance."
 Zipline.DistanceWarning,¡Demasiado lejos!,Error message when the distance is too far
-Zipline.Inclination,{0}° / {1}°,"The inclination of the zipline cable. {0} is the current inclination, {1} is the maximum allowed inclination"
+Zipline.Inclination,{0}/{1},"The inclination of the zipline cable. {0} is the current inclination, {1} is the maximum allowed inclination"
 Zipline.InclinationWarning,¡Demasiada inclinación!,Error message when the inclination is too steep
 Zipline.PickDestination,Selecciona un destino para crear una conexión.,"Information provided when creating a connection between two zipline towers or stations, when user needs to click a second one to create the connection."
 Zipline.RemoveConnection,Eliminar conexión,Tooltip text for button with x icon removing a connection between two zipline towers or stations.

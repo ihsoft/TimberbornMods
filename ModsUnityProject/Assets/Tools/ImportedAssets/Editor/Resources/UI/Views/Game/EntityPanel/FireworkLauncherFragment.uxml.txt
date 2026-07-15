@@ -1,0 +1,20 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <cui:NineSliceVisualElement name="FireworkLauncherFragment">
+        <cui:NineSliceVisualElement name="Settings" class="entity-sub-panel bg-sub-box--green">
+            <Timberborn.DropdownSystem.Dropdown name="FireworkId" class="firework-launcher-fragment__dropdown game-dropdown" />
+            <ui:Label name="HeadingLabel" class="entity-panel__text" />
+            <cui:PreciseSlider name="HeadingSlider" />
+            <ui:Label name="PitchLabel" class="entity-panel__text" />
+            <cui:PreciseSlider name="PitchSlider" />
+            <ui:Label name="FlightDistanceLabel" class="entity-panel__text" />
+            <cui:PreciseSlider name="FlightDistanceSlider" />
+        </cui:NineSliceVisualElement>
+        <cui:NineSliceVisualElement name="FireworkLauncherFragment" class="entity-sub-panel bg-sub-box--green">
+            <cui:LocalizableToggle name="IsContinuous" text-loc-key="Building.FireworkLauncher.IsContinuous" class="game-toggle entity-panel__text entity-panel__toggle" />
+        </cui:NineSliceVisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

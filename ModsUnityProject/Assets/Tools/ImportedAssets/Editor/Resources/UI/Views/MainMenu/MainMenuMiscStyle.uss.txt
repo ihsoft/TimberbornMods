@@ -99,19 +99,7 @@
 
 .welcome-screen-box {
     padding: 45px;
-    width: 650px;
-}
-
-.welcome-screen-box--experimental {
-    position: absolute;
-    right: -360px;
-    padding: 45px;
-    width: 360px;
-    top: 0;
-}
-
-.welcome-screen-box__header--experimental {
-    -unity-text-align: middle-center;
+    width: 700px;
 }
 
 .welcome-screen-box__body {
@@ -416,6 +404,7 @@
 
 .new-game-mode-panel__mode-details {
     justify-content: center;
+    align-items: center;
 }
 
 .new-game-mode-panel__mode-description {
@@ -427,7 +416,7 @@
 }
 
 .new-game-mode-panel__mode-customize-button {
-    margin: 16px 0 0 0;
+    margin: 16px 0 8px 0;
 }
 
 .new-game-mode-panel__scroll-view {
@@ -445,6 +434,12 @@
 
 .new-game-mode-panel__scroll-view > .unity-scroll-view > .unity-scroll-view__content-viewport > .unity-scroll-view__content-container {
     width: 100%;
+}
+
+.new-game-mode-panel__tutorial-label {
+    color: rgb(255, 255, 255);
+    font-size: 14px;
+    -unity-text-align: middle-left;
 }
 
 .new-game-mode-panel__setting-wrapper {

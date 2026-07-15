@@ -1,0 +1,13 @@
+{
+  "TutorialStageSpec": {
+    "Id": "WorkingHours.SetWorkingHours",
+    "IntroLocKey": "Tutorial.WorkingHours.SetWorkingHours"
+  },
+  "Children": {
+    "Step1": {
+      "SetWorkingHoursStepSpec": {
+        "TargetWorkingHours": 18
+      }
+    }
+  }
+}

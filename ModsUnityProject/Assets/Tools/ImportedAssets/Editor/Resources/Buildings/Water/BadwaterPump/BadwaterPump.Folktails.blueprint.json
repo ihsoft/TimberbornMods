@@ -223,7 +223,8 @@
     "NoAutoWalls": false,
     "GenerateFloorsOnStackable": false,
     "EdgeGroups": [],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "BuildingAccessibleSpec": {
     "LocalAccess": {
@@ -249,7 +250,7 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.BadwaterPump.DisplayName",
     "DescriptionLocKey": "Building.BadwaterPump.Description",
@@ -264,10 +265,12 @@
       "X": 0,
       "Y": 2,
       "Z": -1
-    },
-    "MaxDepth": 2,
+    }
+  },
+  "WaterInputPipeSpec": {
     "PipeSegmentPrefabPath": "Buildings/Water/BadwaterPump/BadwaterPumpPipeSegment.Folktails",
-    "PipeParentName": "#Finished"
+    "PipeParentName": "#Finished",
+    "MaxDepth": 2
   },
   "ConstructionSiteProgressVisualizerSpec": {
     "ProgressThresholds": [

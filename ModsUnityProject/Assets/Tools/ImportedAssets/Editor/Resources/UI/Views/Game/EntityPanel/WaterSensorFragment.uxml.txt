@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <cui:NineSliceVisualElement name="WaterSensorFragment" class="automation-counter-fragment entity-sub-panel bg-sub-box--green">
+        <ui:Label name="Measurement" class="game-text-big automation-counter-fragment__measurement" />
+        <Timberborn.DropdownSystem.Dropdown name="Mode" class="automation-counter-fragment__comparison-mode-dropdown" />
+        <ui:Label name="ThresholdLabel" text="Threshold" class="game-text-big automation-counter-fragment__threshold" />
+        <cui:PreciseSlider name="ThresholdSlider" class="automation-counter-slider" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

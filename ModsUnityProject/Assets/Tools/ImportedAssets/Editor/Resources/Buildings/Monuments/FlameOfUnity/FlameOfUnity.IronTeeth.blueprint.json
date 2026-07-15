@@ -8,8 +8,8 @@
         "Amount": 300
       },
       {
-        "Id": "MetalBlock",
-        "Amount": 50
+        "Id": "MetalPart",
+        "Amount": 100
       }
     ],
     "ScienceCost": 3000,
@@ -197,7 +197,7 @@
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Monuments",
-    "ToolOrder": 400,
+    "ToolOrder": 21,
     "ToolShape": "Square",
     "Layout": "Single",
     "CustomPivot": {
@@ -236,7 +236,13 @@
     ]
   },
   "FireSpec": {
-    "AttachmentId": "Fire"
+    "AttachmentId": "Fire",
+    "HasLight": true
+  },
+  "IlluminatorLightObjectsSpec": {
+    "AttachmentIds": [
+      "Fire"
+    ]
   },
   "ConstructionSiteProgressVisualizerSpec": {
     "ProgressThresholds": [

@@ -3,8 +3,9 @@
     "Id": "Science",
     "NameLocKey": "Tutorial.Science",
     "RequiredTutorialIds": [
-      "WaterAndFood"
+      "WorkingHours"
     ],
+    "SkipIfTutorialFinished": "",
     "SortOrder": 50,
     "Stages": [
       "Science.BuildInventor",

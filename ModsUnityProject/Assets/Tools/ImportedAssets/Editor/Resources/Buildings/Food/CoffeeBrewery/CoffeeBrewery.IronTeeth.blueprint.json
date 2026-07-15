@@ -242,7 +242,7 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.CoffeeBrewery.DisplayName",
     "DescriptionLocKey": "Building.CoffeeBrewery.Description",

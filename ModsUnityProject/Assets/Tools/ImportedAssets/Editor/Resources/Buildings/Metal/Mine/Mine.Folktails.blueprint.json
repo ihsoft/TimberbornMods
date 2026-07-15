@@ -629,15 +629,17 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.Mine.DisplayName",
     "DescriptionLocKey": "Building.Mine.Description",
     "FlavorDescriptionLocKey": "Building.Mine.FlavorDescription",
     "Icon": "Buildings/Metal/Mine/MineIcon"
   },
-  "BottomMatchingTemplateSpec": {
-    "RequiredTemplateAtBottomName": "UndergroundRuins"
+  "UnderstructureConstraintSpec": {
+    "UnderstructureTemplateNames": [
+      "UndergroundRuins"
+    ]
   },
   "WorkshopAnimationControllerSpec": {},
   "BlockObjectNavMeshSettingsSpec": {
@@ -694,7 +696,8 @@
         ]
       }
     ],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "SimpleManufactoryBehaviorsSpec": {},
   "WorkshopRandomNeedApplierSpec": {
@@ -710,6 +713,9 @@
     "ProgressThresholds": [
       0.0
     ]
+  },
+  "WorkplaceWorkerOutfitSpec": {
+    "WorkerOutfit": "Scavenger"
   },
   "Children": {
     "#Finished": {

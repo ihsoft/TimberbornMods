@@ -115,7 +115,8 @@
     "NoAutoWalls": false,
     "GenerateFloorsOnStackable": true,
     "EdgeGroups": [],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "BuildingAccessibleSpec": {
     "LocalAccess": {
@@ -141,7 +142,7 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "EnterableLightingSpec": {},
+  "EnterableIlluminatorSpec": {},
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.Rowhouse.DisplayName",
     "DescriptionLocKey": "Building.Rowhouse.Description",

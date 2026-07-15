@@ -107,7 +107,7 @@
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Wellbeing",
-    "ToolOrder": 110,
+    "ToolOrder": 130,
     "ToolShape": "Square",
     "Layout": "Single",
     "CustomPivot": {

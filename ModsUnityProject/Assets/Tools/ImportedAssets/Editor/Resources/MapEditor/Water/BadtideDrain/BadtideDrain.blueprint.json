@@ -74,7 +74,7 @@
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.BadtideDrain.DisplayName",
     "DescriptionLocKey": "Building.BadtideDrain.Description",
-    "FlavorDescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "Building.BadtideDrain.FlavorDescription",
     "Icon": "MapEditor/Water/BadtideDrain/BadtideDrainIcon"
   },
   "BasicSelectionSoundSpec": {
@@ -103,7 +103,8 @@
   "ActivationWarningStatusSpec": {
     "StatusSpriteName": "WaterSourceCountdown",
     "StatusLocKey": "Status.TimedActivationWarning",
-    "UseInfiniteWarning": false
+    "UseInfiniteWarning": false,
+    "WarningSound": "UI.Buildings.Warnings.SourceActivationAlert"
   },
   "HazardousWeatherWaterSourceSpec": {
     "ActiveInHazardousWeather": [
@@ -140,7 +141,8 @@
     "NoAutoWalls": false,
     "GenerateFloorsOnStackable": true,
     "EdgeGroups": [],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "Children": {
     "#Model": {

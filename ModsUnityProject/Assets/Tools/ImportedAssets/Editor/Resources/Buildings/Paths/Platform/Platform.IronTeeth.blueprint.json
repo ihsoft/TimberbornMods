@@ -58,7 +58,8 @@
     "NoAutoWalls": true,
     "GenerateFloorsOnStackable": true,
     "EdgeGroups": [],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Paths",

@@ -2,7 +2,6 @@
   "MaterialCollectionSpec": {
     "CollectionId": "IronTeeth",
     "Materials": [
-      "Buildings/Decoration/BulletinPole/Materials/BulletinPole.IronTeeth",
       "Buildings/Decoration/Shrub/Materials/Shrub.IronTeeth",
       "Buildings/Food/FoodFactory/FoodFactoryGoo.IronTeeth",
       "Buildings/Paths/Path/Path.IronTeeth",

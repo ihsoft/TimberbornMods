@@ -1,10 +1,11 @@
-﻿{
+{
   "TutorialSpec": {
     "Id": "PowerAndPlanks",
     "NameLocKey": "Tutorial.PowerAndPlanks",
     "RequiredTutorialIds": [
       "Storage"
     ],
+    "SkipIfTutorialFinished": "",
     "SortOrder": 70,
     "Stages": [
       "PowerAndPlanks.BuildWaterWheel",

@@ -276,10 +276,10 @@
       0.0
     ]
   },
-  "StockpileLightingSpec": {},
+  "StockpileIlluminatorSpec": {},
   "MapBottomGroundCutoffSpec": {
     "Targets": [
-      "UndergroundPile.Folktails"
+      "UndergroundPile.Folktails.Model"
     ]
   },
   "UndergroundDepthDescriberSpec": {

@@ -251,7 +251,7 @@
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Wellbeing",
-    "ToolOrder": 70,
+    "ToolOrder": 80,
     "ToolShape": "Square",
     "Layout": "Single",
     "CustomPivot": {
@@ -304,7 +304,8 @@
     "NoAutoWalls": false,
     "GenerateFloorsOnStackable": true,
     "EdgeGroups": [],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "TickableWaterBuildingSpec": {
     "WaterCoordinates": {
@@ -315,7 +316,7 @@
     "MinWaterHeight": 0.2,
     "ChangeRange": 0.05
   },
-  "EnterableLightingSpec": {},
+  "EnterableIlluminatorSpec": {},
   "ConstructionSiteProgressVisualizerSpec": {
     "ProgressThresholds": [
       0.0

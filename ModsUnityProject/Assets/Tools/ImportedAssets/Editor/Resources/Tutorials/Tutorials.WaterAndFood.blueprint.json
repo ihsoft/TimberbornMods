@@ -5,6 +5,7 @@
     "RequiredTutorialIds": [
       "Wood"
     ],
+    "SkipIfTutorialFinished": "",
     "SortOrder": 30,
     "Stages": [
       "WaterAndFood.BuildWaterPump",

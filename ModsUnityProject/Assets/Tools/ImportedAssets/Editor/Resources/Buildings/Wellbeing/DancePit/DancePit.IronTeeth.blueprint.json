@@ -1,0 +1,1003 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "MudPit",
+    "LoopingSoundName": "DanceHall",
+    "BuildingCost": [
+      {
+        "Id": "Plank",
+        "Amount": 60
+      },
+      {
+        "Id": "Gear",
+        "Amount": 20
+      },
+      {
+        "Id": "MetalPart",
+        "Amount": 30
+      }
+    ],
+    "ScienceCost": 1800,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": false,
+    "DrawRangeBoundsOnIt": false
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "#Underground",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 1
+  },
+  "AttractionSpec": {
+    "Effects": [
+      {
+        "NeedId": "DancePit",
+        "PointsPerHour": 0.6,
+        "SatisfyToMaxValue": false
+      }
+    ]
+  },
+  "FixedSlotManagerSpec": {},
+  "TransformSlotInitializerSpec": {
+    "Slots": [
+      {
+        "SlotKeyword": "Jumping",
+        "Animation": "Jumping",
+        "Inanimate": false,
+        "RandomizeYRotation": true,
+        "WaterSlot": false
+      },
+      {
+        "SlotKeyword": "Punching",
+        "Animation": "Punching",
+        "Inanimate": false,
+        "RandomizeYRotation": true,
+        "WaterSlot": false
+      },
+      {
+        "SlotKeyword": "Stepping",
+        "Animation": "Stepping",
+        "Inanimate": false,
+        "RandomizeYRotation": true,
+        "WaterSlot": false
+      }
+    ]
+  },
+  "EnterableSpec": {
+    "OperatingState": "Finished",
+    "LimitedCapacityFinished": true,
+    "CapacityFinished": 15,
+    "LimitedCapacityUnfinished": false,
+    "CapacityUnfinished": 0
+  },
+  "TemplateSpec": {
+    "TemplateName": "DancePit.IronTeeth",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 5,
+      "Y": 5,
+      "Z": 3
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": true,
+      "Coordinates": {
+        "X": 2,
+        "Y": -1,
+        "Z": 1
+      }
+    },
+    "BaseZ": 1,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "BuildingAccessibleSpec": {
+    "LocalAccess": {
+      "X": 2.5,
+      "Y": 1.0,
+      "Z": 0.2
+    },
+    "ForceOneFinalAccess": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Wellbeing",
+    "ToolOrder": 101,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.DancePit.DisplayName",
+    "DescriptionLocKey": "Building.DancePit.Description",
+    "FlavorDescriptionLocKey": "",
+    "Icon": "Buildings/Wellbeing/DancePit/DancePitIcon"
+  },
+  "EnterableIlluminatorSpec": {},
+  "GoodConsumingAttractionSpec": {},
+  "GoodConsumingBuildingSpec": {
+    "FullInventoryWorkHours": 20,
+    "ConsumedGoods": [
+      {
+        "GoodId": "Water",
+        "GoodPerHour": 0.2
+      }
+    ]
+  },
+  "GoodConsumingAttractionSurfaceControllerSpec": {
+    "SurfaceName": "#MudMisc",
+    "AttachmentIds": [
+      "DancePitBubbles"
+    ]
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "TemplateAttachmentsSpec": {
+    "Attachments": [
+      {
+        "AttachmentId": "DancePitBubbles",
+        "Prefab": "Buildings/Wellbeing/DancePit/DancePitBubbles",
+        "Parent": "#Finished",
+        "Position": {
+          "X": 2.5,
+          "Y": -0.39,
+          "Z": 2.5
+        },
+        "Rotation": {
+          "X": 90.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": true
+      },
+      {
+        "AttachmentId": "DancePitWater",
+        "Prefab": "Buildings/Wellbeing/DancePit/DancePitWater",
+        "Parent": "#Finished",
+        "Position": {
+          "X": 2.5,
+          "Y": 1.5,
+          "Z": 2.5
+        },
+        "Rotation": {
+          "X": 90.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": true
+      },
+      {
+        "AttachmentId": "DancePitLight",
+        "Prefab": "Buildings/Wellbeing/DancePit/DancePitLight",
+        "Parent": "#Finished",
+        "Position": {
+          "X": 2.5,
+          "Y": 0.85,
+          "Z": 2.5
+        },
+        "Rotation": {
+          "X": 90.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": true
+      }
+    ]
+  },
+  "BuildingTerrainCutoutSpec": {
+    "CutoutTiles": [
+      {
+        "X": 0,
+        "Y": 0,
+        "Z": 1
+      },
+      {
+        "X": 0,
+        "Y": 1,
+        "Z": 1
+      },
+      {
+        "X": 0,
+        "Y": 2,
+        "Z": 1
+      },
+      {
+        "X": 0,
+        "Y": 3,
+        "Z": 1
+      },
+      {
+        "X": 0,
+        "Y": 4,
+        "Z": 1
+      },
+      {
+        "X": 1,
+        "Y": 0,
+        "Z": 1
+      },
+      {
+        "X": 1,
+        "Y": 1,
+        "Z": 1
+      },
+      {
+        "X": 1,
+        "Y": 2,
+        "Z": 1
+      },
+      {
+        "X": 1,
+        "Y": 3,
+        "Z": 1
+      },
+      {
+        "X": 1,
+        "Y": 4,
+        "Z": 1
+      },
+      {
+        "X": 2,
+        "Y": 0,
+        "Z": 1
+      },
+      {
+        "X": 2,
+        "Y": 1,
+        "Z": 1
+      },
+      {
+        "X": 2,
+        "Y": 2,
+        "Z": 1
+      },
+      {
+        "X": 2,
+        "Y": 3,
+        "Z": 1
+      },
+      {
+        "X": 2,
+        "Y": 4,
+        "Z": 1
+      },
+      {
+        "X": 3,
+        "Y": 0,
+        "Z": 1
+      },
+      {
+        "X": 3,
+        "Y": 1,
+        "Z": 1
+      },
+      {
+        "X": 3,
+        "Y": 2,
+        "Z": 1
+      },
+      {
+        "X": 3,
+        "Y": 3,
+        "Z": 1
+      },
+      {
+        "X": 3,
+        "Y": 4,
+        "Z": 1
+      },
+      {
+        "X": 4,
+        "Y": 0,
+        "Z": 1
+      },
+      {
+        "X": 4,
+        "Y": 1,
+        "Z": 1
+      },
+      {
+        "X": 4,
+        "Y": 2,
+        "Z": 1
+      },
+      {
+        "X": 4,
+        "Y": 3,
+        "Z": 1
+      },
+      {
+        "X": 4,
+        "Y": 4,
+        "Z": 1
+      }
+    ]
+  },
+  "EnterableParticleControllerSpec": {
+    "AttachmentIds": [
+      "DancePitWater"
+    ]
+  },
+  "IlluminatorLightObjectsSpec": {
+    "AttachmentIds": [
+      "DancePitLight"
+    ]
+  },
+  "Children": {
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Wellbeing/DancePit/DancePit.IronTeeth.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 2.509513,
+              "Y": -0.3638717,
+              "Z": 2.48312068
+            },
+            "Size": {
+              "X": 4.98287868,
+              "Y": 0.2,
+              "Z": 4.92660141
+            }
+          },
+          {
+            "Center": {
+              "X": 4.86660957,
+              "Y": 0.03482306,
+              "Z": 2.48312068
+            },
+            "Size": {
+              "X": 0.2646675,
+              "Y": 0.5868361,
+              "Z": 4.92660141
+            }
+          },
+          {
+            "Center": {
+              "X": 0.1467554,
+              "Y": 0.03482306,
+              "Z": 2.48312068
+            },
+            "Size": {
+              "X": 0.2646675,
+              "Y": 0.5868361,
+              "Z": 4.92660141
+            }
+          },
+          {
+            "Center": {
+              "X": 2.49726248,
+              "Y": 0.03482306,
+              "Z": 4.888199
+            },
+            "Size": {
+              "X": 5.00136,
+              "Y": 0.5868361,
+              "Z": 0.182291031
+            }
+          },
+          {
+            "Center": {
+              "X": 1.10814857,
+              "Y": 0.03482306,
+              "Z": 0.08709741
+            },
+            "Size": {
+              "X": 1.9648596,
+              "Y": 0.5868361,
+              "Z": 0.182291031
+            }
+          },
+          {
+            "Center": {
+              "X": 3.89186549,
+              "Y": 0.03482306,
+              "Z": 0.08709741
+            },
+            "Size": {
+              "X": 1.9648596,
+              "Y": 0.5868361,
+              "Z": 0.182291031
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase5x5#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase5x5/ConstructionBase5x5.blueprint"
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Wellbeing/DancePit/DancePit.IronTeeth.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 2.5,
+                  "Y": 0.153594851,
+                  "Z": 2.5
+                },
+                "Size": {
+                  "X": 4.996353,
+                  "Y": 0.3071897,
+                  "Z": 5.009589
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    },
+    "#Underground": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Wellbeing/DancePit/DancePit.IronTeeth.Underground"
+      }
+    }
+  }
+}

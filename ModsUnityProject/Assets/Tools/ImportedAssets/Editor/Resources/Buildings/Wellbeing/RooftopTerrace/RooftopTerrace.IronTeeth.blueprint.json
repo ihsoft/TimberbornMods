@@ -148,7 +148,13 @@
     "Icon": "Buildings/Wellbeing/RooftopTerrace/RooftopTerraceIcon"
   },
   "FireSpec": {
-    "AttachmentId": "Fire"
+    "AttachmentId": "Fire",
+    "HasLight": true
+  },
+  "IlluminatorLightObjectsSpec": {
+    "AttachmentIds": [
+      "Fire"
+    ]
   },
   "AttractionFireSpec": {
     "WoodstackName": ""

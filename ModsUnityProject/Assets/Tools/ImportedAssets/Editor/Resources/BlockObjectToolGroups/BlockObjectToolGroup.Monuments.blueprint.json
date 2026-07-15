@@ -1,7 +1,7 @@
 {
   "BlockObjectToolGroupSpec": {
     "Id": "Monuments",
-    "Order": 110,
+    "Order": 120,
     "NameLocKey": "ToolGroups.Monuments",
     "Icon": "Sprites/BottomBar/BuildingGroups/Monuments",
     "FallbackGroup": false

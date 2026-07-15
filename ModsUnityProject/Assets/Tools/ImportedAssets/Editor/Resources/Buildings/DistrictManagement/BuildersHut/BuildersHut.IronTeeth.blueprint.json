@@ -191,7 +191,7 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.BuildersHut.DisplayName",
     "DescriptionLocKey": "Building.BuildersHut.Description",

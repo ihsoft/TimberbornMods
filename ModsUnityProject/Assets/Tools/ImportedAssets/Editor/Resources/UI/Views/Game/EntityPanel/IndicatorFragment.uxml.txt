@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <cui:NineSliceVisualElement name="IndicatorFragment" class="entity-sub-panel bg-sub-box--green">
+        <cui:LocalizableToggle name="PinnedWhenOn" text-loc-key="Automation.PinnedWhenOn" class="game-toggle entity-panel__text entity-panel__toggle" />
+        <cui:LocalizableToggle name="PinnedAlways" text-loc-key="Automation.PinnedAlways" class="game-toggle entity-panel__text entity-panel__toggle" />
+        <cui:LocalizableToggle name="Warning" text-loc-key="Building.Indicator.WarningWhenSwitchedOn" class="game-toggle entity-panel__text entity-panel__toggle" />
+        <cui:LocalizableToggle name="JournalEntry" text-loc-key="Building.Indicator.JournalEntryWhenSwitchedOn" class="game-toggle entity-panel__text entity-panel__toggle" />
+        <cui:LocalizableToggle name="ColorReplication" text-loc-key="Building.Indicator.ReplicateInputColor" class="game-toggle entity-panel__text entity-panel__toggle" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

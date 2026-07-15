@@ -12,8 +12,8 @@
         "Amount": 50
       },
       {
-        "Id": "MetalBlock",
-        "Amount": 10
+        "Id": "ScrapMetal",
+        "Amount": 20
       }
     ],
     "ScienceCost": 400,
@@ -443,7 +443,7 @@
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Wellbeing",
-    "ToolOrder": 90,
+    "ToolOrder": 91,
     "ToolShape": "Square",
     "Layout": "Single",
     "CustomPivot": {
@@ -472,7 +472,13 @@
     ]
   },
   "FireSpec": {
-    "AttachmentId": "Fire"
+    "AttachmentId": "Fire",
+    "HasLight": true
+  },
+  "IlluminatorLightObjectsSpec": {
+    "AttachmentIds": [
+      "Fire"
+    ]
   },
   "AttractionFireSpec": {
     "WoodstackName": ""

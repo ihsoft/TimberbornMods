@@ -92,9 +92,9 @@
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Wellbeing",
-    "ToolOrder": 60,
+    "ToolOrder": 70,
     "ToolShape": "Square",
-    "Layout": "Single",
+    "Layout": "SideLine",
     "CustomPivot": {
       "HasCustomPivot": false,
       "Coordinates": {
@@ -112,10 +112,11 @@
     "FlavorDescriptionLocKey": "Building.ContemplationSpot.FlavorDescription",
     "Icon": "Buildings/Wellbeing/ContemplationSpot/ContemplationSpotIcon"
   },
-  "EnterableLightingSpec": {},
+  "EnterableIlluminatorSpec": {},
   "FloodableFireSpec": {},
   "FireSpec": {
-    "AttachmentId": "Fire"
+    "AttachmentId": "Fire",
+    "HasLight": false
   },
   "NightTimeLightControllerSpec": {},
   "ConstructionSiteProgressVisualizerSpec": {

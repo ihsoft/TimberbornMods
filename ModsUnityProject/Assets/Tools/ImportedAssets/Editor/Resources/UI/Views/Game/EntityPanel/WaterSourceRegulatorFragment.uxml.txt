@@ -4,6 +4,7 @@
     <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
     <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
     <cui:NineSliceVisualElement name="WaterSourceRegulatorFragment" class="entity-sub-panel water-source-regulator-fragment bg-sub-box--green">
-        <cui:LocalizableLabel name="Title" text="Title" text-loc-key="Core.Status" class="entity-panel__text water-source-regulator-fragment__title" />
+        <ui:VisualElement name="ModeToggle" />
+        <ui:Label name="ModeLabel" text="Open" class="entity-panel__text water-source-regulator-fragment__mode-label" />
     </cui:NineSliceVisualElement>
 </ui:UXML>

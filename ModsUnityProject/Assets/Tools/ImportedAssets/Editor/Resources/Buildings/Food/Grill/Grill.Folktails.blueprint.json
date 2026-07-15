@@ -170,16 +170,20 @@
     "Overridable": false,
     "Flippable": true
   },
-  "DrivewayModelSpec": {
-    "Driveway": "NarrowLeft",
-    "HasCustomCoordinates": false,
-    "CustomCoordinates": {
-      "X": 0,
-      "Y": 0,
-      "Z": 0
-    },
-    "CustomDirection": "Down",
-    "DrivewayMode": "Unidirectional"
+  "DrivewayModelsSpec": {
+    "Driveways": [
+      {
+        "Driveway": "NarrowLeft",
+        "HasCustomCoordinates": false,
+        "CustomCoordinates": {
+          "X": 0,
+          "Y": 0,
+          "Z": 0
+        },
+        "CustomDirection": "Down",
+        "DrivewayMode": "Unidirectional"
+      }
+    ]
   },
   "BuildingAccessibleSpec": {
     "LocalAccess": {
@@ -205,7 +209,7 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.Grill.DisplayName",
     "DescriptionLocKey": "Building.Grill.Description",

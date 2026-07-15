@@ -87,7 +87,8 @@
     "NoAutoWalls": false,
     "GenerateFloorsOnStackable": true,
     "EdgeGroups": [],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "BuildingAccessibleSpec": {
     "LocalAccess": {
@@ -113,17 +114,21 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "EnterableLightingSpec": {},
-  "DrivewayModelSpec": {
-    "Driveway": "LongCenter",
-    "HasCustomCoordinates": false,
-    "CustomCoordinates": {
-      "X": 0,
-      "Y": 0,
-      "Z": 0
-    },
-    "CustomDirection": "Down",
-    "DrivewayMode": "Unidirectional"
+  "EnterableIlluminatorSpec": {},
+  "DrivewayModelsSpec": {
+    "Driveways": [
+      {
+        "Driveway": "LongCenter",
+        "HasCustomCoordinates": false,
+        "CustomCoordinates": {
+          "X": 0,
+          "Y": 0,
+          "Z": 0
+        },
+        "CustomDirection": "Down",
+        "DrivewayMode": "Unidirectional"
+      }
+    ]
   },
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.MiniLodge.DisplayName",

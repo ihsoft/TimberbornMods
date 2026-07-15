@@ -1,0 +1,17 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <cui:NineSliceVisualElement name="SpeakerFragment">
+        <cui:NineSliceVisualElement name="PlaybackModeWrapper" class="entity-sub-panel bg-sub-box--green" />
+        <cui:NineSliceVisualElement name="SpatialModeWrapper" class="entity-sub-panel bg-sub-box--green" />
+        <cui:NineSliceVisualElement class="entity-sub-panel bg-sub-box--green">
+            <Timberborn.DropdownSystem.Dropdown name="SoundId" class="game-dropdown" />
+            <ui:VisualElement class="entity-panel__button-wrapper">
+                <cui:LocalizableButton name="BrowseButton" text-loc-key="Button.Browse" class="entity-fragment__button entity-fragment__button--red entity-fragment__button--narrow entity-panel__text" />
+                <cui:LocalizableButton name="RefreshButton" text-loc-key="Button.Refresh" class="entity-fragment__button entity-fragment__button--red entity-fragment__button--narrow entity-panel__text" />
+            </ui:VisualElement>
+        </cui:NineSliceVisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

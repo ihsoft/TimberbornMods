@@ -326,11 +326,13 @@
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.AquiferDrill.DisplayName",
     "DescriptionLocKey": "Building.AquiferDrill.Description",
-    "FlavorDescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "Building.AquiferDrill.FlavorDescription",
     "Icon": "Buildings/Water/AquiferDrill/UndergroundWaterDrillIcon"
   },
-  "BottomMatchingTemplateSpec": {
-    "RequiredTemplateAtBottomName": "Aquifer"
+  "UnderstructureConstraintSpec": {
+    "UnderstructureTemplateNames": [
+      "Aquifer"
+    ]
   },
   "ConstructionSiteProgressVisualizerSpec": {
     "ProgressThresholds": [

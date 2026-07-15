@@ -58,7 +58,8 @@
     "NoAutoWalls": false,
     "GenerateFloorsOnStackable": true,
     "EdgeGroups": [],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Landscaping",

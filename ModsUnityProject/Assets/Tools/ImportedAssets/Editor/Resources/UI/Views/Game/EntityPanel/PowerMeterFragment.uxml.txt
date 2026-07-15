@@ -1,0 +1,16 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <cui:NineSliceVisualElement name="PowerMeterFragment" class="entity-sub-panel bg-sub-box--green automation-counter-fragment">
+        <Timberborn.DropdownSystem.Dropdown name="Mode" class="game-dropdown automation-counter-fragment__primary-dropdown" />
+        <ui:Label name="Measurement" class="game-text-big automation-counter-fragment__measurement" />
+        <ui:VisualElement name="ComparisonWrapper" class="automation-counter-fragment__threshold-wrapper">
+            <Timberborn.DropdownSystem.Dropdown name="ComparisonMode" class="automation-counter-fragment__comparison-mode-dropdown" />
+            <cui:NineSliceIntegerField name="IntThreshold" max-length="9" class="entity-panel-setting__input entity-panel-input automation-fragment__integer-input" />
+        </ui:VisualElement>
+        <ui:Label name="PercentThresholdLabel" text="50%" class="game-text-big automation-counter-fragment__threshold" />
+        <cui:PreciseSlider name="PercentThresholdSlider" class="automation-counter-slider" />
+    </cui:NineSliceVisualElement>
+</ui:UXML>

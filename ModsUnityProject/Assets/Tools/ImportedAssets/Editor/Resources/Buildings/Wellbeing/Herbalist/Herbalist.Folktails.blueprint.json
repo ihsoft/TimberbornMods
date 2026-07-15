@@ -182,7 +182,7 @@
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Wellbeing",
-    "ToolOrder": 80,
+    "ToolOrder": 60,
     "ToolShape": "Square",
     "Layout": "Single",
     "CustomPivot": {
@@ -202,7 +202,7 @@
     "FlavorDescriptionLocKey": "Building.Herbalist.FlavorDescription",
     "Icon": "Buildings/Wellbeing/Herbalist/HerbalistIcon"
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "WorkshopParticleControllerSpec": {
     "AttachmentIds": [
       "Bubbles"

@@ -14,7 +14,7 @@
     ],
     "ScienceCost": 70,
     "PlaceFinished": false,
-    "FinishableWithBeaversOnSite": false,
+    "FinishableWithBeaversOnSite": true,
     "DrawRangeBoundsOnIt": false
   },
   "BuildingModelSpec": {
@@ -97,7 +97,8 @@
         ]
       }
     ],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "BlockObjectSpec": {
     "Size": {

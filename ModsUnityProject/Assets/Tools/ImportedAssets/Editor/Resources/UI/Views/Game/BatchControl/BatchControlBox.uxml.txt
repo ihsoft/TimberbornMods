@@ -9,6 +9,8 @@
         <ui:VisualElement name="Content" class="batch-control-box__content" />
         <ui:VisualElement name="MiddleRow" class="batch-control-box__middle-row">
             <ui:Label name="Header" text="Header" class="game-text-title" />
+            <ui:VisualElement name="Spacer" class="batch-control-box__middle-row-spacer" />
+            <Timberborn.DropdownSystem.Dropdown name="TimeRangeDropdown" class="batch-control-box__time-range-dropdown" />
             <Timberborn.DropdownSystem.Dropdown name="DistrictDropdown" buttons-only-selection="true" class="batch-control-district-dropdown batch-control-box__district-dropdown" />
         </ui:VisualElement>
         <ui:VisualElement name="TopRow" class="batch-control-box__top-row">

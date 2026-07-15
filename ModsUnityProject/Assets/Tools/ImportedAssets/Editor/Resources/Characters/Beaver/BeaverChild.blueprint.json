@@ -1,12 +1,20 @@
 {
   "BeaverSpec": {},
   "ChildSpec": {},
+  "NamedEntitySpec": {
+    "IsEditable": true
+  },
+  "CharacterBirthSpec": {
+    "NotificationLocKey": "Dwelling.Newborn"
+  },
   "CharacterModelSpec": {
     "ModelName": "Model_Preserved"
   },
   "MortalSpec": {},
   "DeadStatusSpec": {
-    "DeadStatusLocKey": "Status.Beaver.Dead"
+    "DiedOldAgeStatusLocKey": "Status.Beaver.DiedOldAge",
+    "DiedTragicallyStatusLocKey": "Status.Beaver.DiedTragically",
+    "DiedTragicallyAlertLocKey": "Status.Beaver.DiedTragicallyShort"
   },
   "MovementAnimatorSpec": {
     "AnimationSpeedScale": 0.8
@@ -20,9 +28,6 @@
   "WalkerSpeedManagerSpec": {
     "BaseWalkingSpeed": 1.35,
     "BaseSlowedSpeed": 0.65
-  },
-  "WellbeingTrackerSpec": {
-    "CountsToPopulationWellbeing": true
   },
   "SleeperSpec": {
     "SleepOutsideEffects": [
@@ -102,9 +107,6 @@
       "LifeExpectancy"
     ]
   },
-  "CharacterObjectNamerSpec": {
-    "Prefix": "BeaverChild"
-  },
   "ZiplineHarnessModelSpec": {
     "AttachmentId": "ZiplineHarness.BeaverChild"
   },
@@ -144,6 +146,9 @@
       "ZiplineUp",
       "Showering",
       "Massaging",
+      "Jumping",
+      "Punching",
+      "Stepping",
       "BeaverChild_idle_clapping",
       "BeaverChild_idle_waiting",
       "BeaverChild_idle_watching",
@@ -621,6 +626,58 @@
         "Conditions": [
           {
             "ParameterName": "Dancing",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Massaging",
+        "AnimationName": "BeaverChild_massaging",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Massaging",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Jumping",
+        "AnimationName": "BeaverChild_jumping",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Jumping",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Punching",
+        "AnimationName": "BeaverChild_jumping_punching",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Punching",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Stepping",
+        "AnimationName": "BeaverChild_jumping_stepping",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Stepping",
             "MustBeTrue": true
           }
         ]

@@ -16,7 +16,7 @@
     "CarryingAnimation": "CarryInHands",
     "Weight": 1,
     "GoodGroupId": "Materials",
-    "GoodOrder": 4010,
+    "GoodOrder": 4020,
     "Icon": "Sprites/Goods/ExtractIcon",
     "ForceImport": false,
     "DisplayNameLocKey": "Good.Extract.DisplayName",

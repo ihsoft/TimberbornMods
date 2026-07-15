@@ -1,0 +1,14 @@
+{
+  "IlluminationColorSpec": {
+    "Id": "Dimmed",
+    "Color": {
+      "r": 0.071,
+      "g": 0.086,
+      "b": 0.102,
+      "a": 1.0
+    }
+  },
+  "IlluminationPresetSpec": {
+    "Order": 1100
+  }
+}

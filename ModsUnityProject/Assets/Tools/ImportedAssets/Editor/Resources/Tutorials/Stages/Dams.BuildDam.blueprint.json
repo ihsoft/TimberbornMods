@@ -1,0 +1,17 @@
+{
+  "TutorialStageSpec": {
+    "Id": "Dams.BuildDam",
+    "IntroLocKey": "Tutorial.Dams.BuildDam"
+  },
+  "Children": {
+    "Step1": {
+      "BuildingTutorialStepSpec": {
+        "TemplateNames": [
+          "Dam.Folktails"
+        ],
+        "OnlyFinishedBuildings": true,
+        "RequiredAmount": 1
+      }
+    }
+  }
+}

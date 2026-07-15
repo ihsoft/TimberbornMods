@@ -203,7 +203,7 @@
   },
   "MechanicalBuildingSpec": {},
   "WorkshopAnimationControllerSpec": {},
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.GearWorkshop.DisplayName",
     "DescriptionLocKey": "Building.GearWorkshop.Description",

@@ -5,6 +5,7 @@
     "RequiredTutorialIds": [
       "Basics"
     ],
+    "SkipIfTutorialFinished": "",
     "SortOrder": 0,
     "Stages": [
       "Wood.PlaceLumberjacks",

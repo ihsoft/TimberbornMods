@@ -1,4 +1,4 @@
-﻿{
+{
   "TemplateSpec": {
     "TemplateName": "WaterSource",
     "BackwardCompatibleTemplateNames": [],
@@ -91,7 +91,8 @@
   "ActivationWarningStatusSpec": {
     "StatusSpriteName": "WaterSourceCountdown",
     "StatusLocKey": "Status.TimedActivationWarning",
-    "UseInfiniteWarning": false
+    "UseInfiniteWarning": false,
+    "WarningSound": "UI.Buildings.Warnings.SourceActivationAlert"
   },
   "ActivationProgressParticlesSpec": {
     "AttachmentIds": [
@@ -113,11 +114,11 @@
         "Parent": "#Model",
         "Position": {
           "X": 0.5,
-          "Y": 0.0,
+          "Y": 0.9,
           "Z": 0.5
         },
         "Rotation": {
-          "X": 0.0,
+          "X": -90.0,
           "Y": 0.0,
           "Z": 0.0
         },

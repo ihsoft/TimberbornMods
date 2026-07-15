@@ -244,7 +244,7 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.BotPartFactory.DisplayName",
     "DescriptionLocKey": "Building.BotPartFactory.Description",
@@ -272,7 +272,8 @@
     "NoAutoWalls": false,
     "GenerateFloorsOnStackable": true,
     "EdgeGroups": [],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "WorkshopWorkerHiderSpec": {},
   "ConstructionSiteProgressVisualizerSpec": {

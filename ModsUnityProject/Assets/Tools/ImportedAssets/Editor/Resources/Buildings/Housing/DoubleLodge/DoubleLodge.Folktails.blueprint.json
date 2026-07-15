@@ -206,7 +206,8 @@
         ]
       }
     ],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "BuildingAccessibleSpec": {
     "LocalAccess": {
@@ -232,7 +233,7 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "EnterableLightingSpec": {},
+  "EnterableIlluminatorSpec": {},
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.DoubleLodge.DisplayName",
     "DescriptionLocKey": "Building.DoubleLodge.Description",

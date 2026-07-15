@@ -95,7 +95,7 @@
     "ToolGroupId": "Wood",
     "ToolOrder": 10,
     "ToolShape": "Square",
-    "Layout": "Single",
+    "Layout": "SideLine",
     "CustomPivot": {
       "HasCustomPivot": false,
       "Coordinates": {
@@ -117,7 +117,7 @@
     "FlavorDescriptionLocKey": "Building.LumberjackFlag.FlavorDescription",
     "Icon": "Buildings/Wood/LumberjackFlag/LumberjackFlagIcon"
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "YieldRemovingBuildingSpec": {
     "ResourceGroup": "Cuttable"
   },
@@ -136,6 +136,9 @@
         "Probability": "Medium"
       }
     ]
+  },
+  "WorkplaceWorkerOutfitSpec": {
+    "WorkerOutfit": "Lumberjack"
   },
   "Children": {
     "#Finished": {

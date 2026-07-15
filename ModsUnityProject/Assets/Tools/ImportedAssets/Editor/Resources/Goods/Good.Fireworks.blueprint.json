@@ -1,0 +1,25 @@
+{
+  "GoodSpec": {
+    "Id": "Fireworks",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.6792453,
+      "g": 0.4179019,
+      "b": 0.368458539,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 1,
+    "GoodGroupId": "Materials",
+    "GoodOrder": 4010,
+    "Icon": "Sprites/Goods/FireworksIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.Fireworks.DisplayName",
+    "PluralDisplayNameLocKey": "Good.Fireworks.PluralDisplayName"
+  }
+}

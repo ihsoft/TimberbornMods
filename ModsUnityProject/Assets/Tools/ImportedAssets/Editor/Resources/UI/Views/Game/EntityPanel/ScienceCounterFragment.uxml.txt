@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <cui:NineSliceVisualElement name="ScienceCounterFragment" class="automation-counter-fragment entity-sub-panel bg-sub-box--green">
+        <ui:Label name="Measurement" class="game-text-big automation-counter-fragment__measurement" />
+        <ui:VisualElement class="automation-counter-fragment__threshold-wrapper">
+            <Timberborn.DropdownSystem.Dropdown name="Mode" class="automation-counter-fragment__comparison-mode-dropdown" />
+            <cui:NineSliceIntegerField name="Threshold" max-length="9" class="entity-panel-setting__input entity-panel-input automation-fragment__integer-input" />
+            <ui:Image class="science-counter-fragment__icon" />
+        </ui:VisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>
+ 

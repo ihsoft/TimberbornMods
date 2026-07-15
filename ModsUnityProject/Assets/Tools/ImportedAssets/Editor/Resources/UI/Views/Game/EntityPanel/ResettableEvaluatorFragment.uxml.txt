@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <cui:NineSliceVisualElement name="ResettableEvaluatorFragment" class="entity-sub-panel bg-sub-box--green">
+        <ui:VisualElement name="ButtonWrapper" class="entity-panel__button-wrapper">
+            <cui:LocalizableButton name="Reset" text-loc-key="Automation.ResetButton" class="entity-panel__text entity-fragment__button entity-fragment__button--narrow entity-fragment__button--red" />
+            <cui:LocalizableButton name="ResetAll" text-loc-key="Automation.ResetCircuitButton" class="entity-panel__text entity-fragment__button entity-fragment__button--narrow entity-fragment__button--red" />
+        </ui:VisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

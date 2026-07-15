@@ -28,8 +28,8 @@
                             <ui:Label text="MARTA FIJAK" class="credits__name" />
                             <ui:Label text="MICHAŁ LESZCZYŃSKI" class="credits__name" />
                             <ui:Label text="MARTYNA WASILUK" class="credits__name" />
-                            <ui:Label text="SŁAWOMIR BRYK" class="credits__name" />
                             <ui:Label text="SZYMON ZACHARA" class="credits__name" />
+                            <ui:Label text="SŁAWOMIR BRYK" class="credits__name" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement name="Programming" class="credits__section">
@@ -39,10 +39,10 @@
                             <ui:Label text="BARTOSZ KULESZA" class="credits__name" />
                             <ui:Label text="MARCIN WIERZCHOŚ" class="credits__name" />
                             <ui:Label text="KAMIL DAWIDÓW" class="credits__name" />
-                            <ui:Label text="MICHAŁ LESZCZYŃSKI" class="credits__name" />
                             <ui:Label text="BARTŁOMIEJ DAWIDÓW" class="credits__name" />
-                            <ui:Label text="SŁAWOMIR BRYK" class="credits__name" />
+                            <ui:Label text="MICHAŁ LESZCZYŃSKI" class="credits__name" />
                             <ui:Label text="SZYMON ZACHARA" class="credits__name" />
+                            <ui:Label text="SŁAWOMIR BRYK" class="credits__name" />
                             <ui:Label text="JON BIEGALSKI" class="credits__name" />
                             <ui:Label text="MARTA FIJAK" class="credits__name" />
                         </ui:VisualElement>
@@ -89,8 +89,8 @@
                         <ui:Label name="Label" text="Marketing and Community Management" class="credits__labels credits__label" />
                         <ui:VisualElement name="Names" class="credits__names">
                             <ui:Label text="MICHAŁ AMIELAŃCZYK" class="credits__name" />
-                            <ui:Label text="KLAUDIA ADAMCZYK" class="credits__name" />
                             <ui:Label text="MIRIAM KALETA" class="credits__name" />
+                            <ui:Label text="KLAUDIA ADAMCZYK" class="credits__name" />
                             <ui:Label text="ADRIAN BOCIEK" class="credits__name" />
                             <ui:Label text="JON BIEGALSKI" class="credits__name" />
                             <ui:Label text="OLGA GAJEWSKA" class="credits__name" />
@@ -183,22 +183,232 @@
                             <ui:Label text="PAWEŁ BŁASZCZAK" class="credits__name" />
                         </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:Label name="KeyArt" text="Key Art" class="credits__header" />
-                    <ui:VisualElement name="KeyArtists" class="credits__section">
+                    <ui:Label name="10KeyArt" text="1.0 Key Art" class="credits__header" />
+                    <ui:Label name="MoodVisuals" text="MOOD Visuals" class="credits__subheader" />
+                    <ui:VisualElement name="BusinessDevelopmentDirector" class="credits__section">
                         <ui:VisualElement name="Labels" class="credits__labels">
-                            <ui:Label name="Label" text="Early Access Launch" class="credits__label" />
-                            <ui:Label name="Label" text="Update 5 - Badwater" class="credits__label" />
-                            <ui:Label name="Label" text="Update 6 - Wonders of Water" class="credits__label" />
-                            <ui:Label name="Label" text="Update 7 - Ziplines &amp; Tubeways" class="credits__label" />
+                            <ui:Label name="Label" text="Business Development Director" class="credits__label" />
                         </ui:VisualElement>
                         <ui:VisualElement name="Names" class="credits__names">
-                            <ui:Label text="JAKUB MATHIA" class="credits__name" />
-                            <ui:Label text="MANUEL CASTAÑÓN" class="credits__name" />
-                            <ui:Label text="MANUEL CASTAÑÓN" class="credits__name" />
+                            <ui:Label text="CHRISTIAN STEPHAN DEMÉNY RASMUSSEN" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="ProductionCoordinator" class="credits__section">
+                        <ui:VisualElement name="Labels" class="credits__labels">
+                            <ui:Label name="Label" text="Production Coordinator" class="credits__label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="ROSS BARNWELL" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="StudioArtDirector" class="credits__section">
+                        <ui:VisualElement name="Labels" class="credits__labels">
+                            <ui:Label name="Label" text="Studio Art Director" class="credits__label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="SILAS AMDI" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="ArtDirector" class="credits__section">
+                        <ui:VisualElement name="Labels" class="credits__labels">
+                            <ui:Label name="Label" text="Art Director" class="credits__label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="DANIEL GSTIR" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="PrincipalConceptArtist" class="credits__section">
+                        <ui:VisualElement name="Labels" class="credits__labels">
+                            <ui:Label name="Label" text="Principal Concept Artist" class="credits__label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="RAFAEL KOWALSKI" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="ConceptArtists" class="credits__section">
+                        <ui:VisualElement name="Labels" class="credits__labels">
+                            <ui:Label name="Label" text="Concept Artists" class="credits__label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="JEROME BIANCHI" class="credits__name" />
+                            <ui:Label text="JULIE MARTINEZ" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:Label name="EarlyAccessKeyArts" text="Early Access Key Arts" class="credits__header" />
+                    <ui:Label name="Update7KeyArt" text="Update 7 - Ziplines &amp; Tubeways" class="credits__subheader" />
+                    <ui:VisualElement name="KeyArtists" class="credits__section">
+                        <ui:VisualElement name="Labels" class="credits__labels">
+                            <ui:Label name="Label" text="Key Artist" class="credits__label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Names" class="credits__names">
                             <ui:Label text="MANUEL CASTAÑÓN" class="credits__name" />
                         </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:Label name="Update7Trailers" text="Update 7 Trailers" class="credits__header" />
+                    <ui:Label name="Update6KeyArt" text="Update 6 - Wonders of Water" class="credits__subheader" />
+                    <ui:VisualElement name="KeyArtists" class="credits__section">
+                        <ui:VisualElement name="Labels" class="credits__labels">
+                            <ui:Label name="Label" text="Key Artist" class="credits__label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="MANUEL CASTAÑÓN" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:Label name="Update5KeyArt" text="Update 5 - Badwater" class="credits__subheader" />
+                    <ui:VisualElement name="KeyArtists" class="credits__section">
+                        <ui:VisualElement name="Labels" class="credits__labels">
+                            <ui:Label name="Label" text="Key Artist" class="credits__label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="MANUEL CASTAÑÓN" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:Label name="EarlyAccessLaunchKeyArt" text="Early Access Launch" class="credits__subheader" />
+                    <ui:VisualElement name="KeyArtists" class="credits__section">
+                        <ui:VisualElement name="Labels" class="credits__labels">
+                            <ui:Label name="Label" text="Key Artist" class="credits__label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="JAKUB MATHIA" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:Label name="OpeningCinematic" text="Opening Cinematic" class="credits__header" />
+                    <ui:Label name="LostCosmonauts" text="Lost Cosmonauts" class="credits__subheader" />
+                    <ui:VisualElement name="LostCosmonautsProduction" class="credits__section">
+                        <ui:VisualElement name="Labels" class="credits__labels">
+                            <ui:Label name="Label" text="Production" class="credits__label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="ALFRED KHAMIDULLIN" class="credits__name" />
+                            <ui:Label text="BEAVAN BLOCKER" class="credits__name" />
+                            <ui:Label text="CALEB DAWSON" class="credits__name" />
+                            <ui:Label text="CRISTINA CID" class="credits__name" />
+                            <ui:Label text="ERICK WRIGHT" class="credits__name" />
+                            <ui:Label text="NATACHA ROLLIN-ABASTADO" class="credits__name" />
+                            <ui:Label text="GILLIAN MONTAGNE" class="credits__name" />
+                            <ui:Label text="JEFFREY 'PUMODI' BRICE" class="credits__name" />
+                            <ui:Label text="JENNA HAN" class="credits__name" />
+                            <ui:Label text="MASTERCOMS" class="credits__name" />
+                            <ui:Label text="JOE PEJRIL" class="credits__name" />
+                            <ui:Label text="MELISSA UNAL" class="credits__name" />
+                            <ui:Label text="NICHOLAS CHAMBERS" class="credits__name" />
+                            <ui:Label text="SARA FRIAS JIMENEZ" class="credits__name" />
+                            <ui:Label text="SILVIA NANNI" class="credits__name" />
+                            <ui:Label text="SZABÓ ATTILA" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="OpeningCinematicNarration" class="credits__section">
+                        <ui:VisualElement name="Labels" class="credits__labels">
+                            <ui:Label name="Label" text="Narrated by" class="credits__label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="SHAUN DOOLEY" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="OpeningCinematicMusic" class="credits__section">
+                        <ui:VisualElement name="Labels" class="credits__labels">
+                            <ui:Label name="Label" text="Music by" class="credits__label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="JEFFREY 'PUMODI' BRICE" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:Label name="10LaunchTrailer" text="1.0 Launch Trailer" class="credits__header" />
+                    <ui:Label name="KWM" text="KWM, a Keywords Studios" class="credits__subheader" />
+                    <ui:VisualElement name="KWMStudioHead" class="credits__section">
+                        <ui:VisualElement name="Labels" class="credits__labels">
+                            <ui:Label name="Label" text="Studio Head" class="credits__label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="LOUIS-ETIENNE BEAUPRE" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="KWMCreativeDirector" class="credits__section">
+                        <ui:VisualElement name="Labels" class="credits__labels">
+                            <ui:Label name="Label" text="Creative Director" class="credits__label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="CHARLES DI GAETANO" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="KWMProjectManager" class="credits__section">
+                        <ui:VisualElement name="Labels" class="credits__labels">
+                            <ui:Label name="Label" text="Project Manager" class="credits__label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="FULYA EROL" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="KWMCopywriter" class="credits__section">
+                        <ui:VisualElement name="Labels" class="credits__labels">
+                            <ui:Label name="Label" text="Copywriter" class="credits__label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="IANNICK FRANCOEUR" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="KWMEditors" class="credits__section">
+                        <ui:VisualElement name="Labels" class="credits__labels">
+                            <ui:Label name="Label" text="Editors" class="credits__label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="YANN PADOVANI" class="credits__name" />
+                            <ui:Label text="KARINE CHARBONNEAU" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="KWMMotionDesigners" class="credits__section">
+                        <ui:VisualElement name="Labels" class="credits__labels">
+                            <ui:Label name="Label" text="Motion Designers" class="credits__label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="MATHIEU BLOUIN" class="credits__name" />
+                            <ui:Label text="GABRIEL MUSSET" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="KWMTechnicalSpecialist" class="credits__section">
+                        <ui:VisualElement name="Labels" class="credits__labels">
+                            <ui:Label name="Label" text="Technical Specialist" class="credits__label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="ANTOINE BERUBE" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="KWMNarration" class="credits__section">
+                        <ui:VisualElement name="Labels" class="credits__labels">
+                            <ui:Label name="Label" text="Narrated by" class="credits__label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="PATRICIA SUMMERSET" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="KWMMusic" class="credits__section">
+                        <ui:VisualElement name="Labels" class="credits__labels">
+                            <ui:Label name="Label" text="Music by" class="credits__label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="GABRIEL SABAN (SACEM)" class="credits__name" />
+                            <ui:Label text="CLAUDE SAMARD (SACEM)" class="credits__name" />
+                            <ui:Label text="CEZAME METRO PARK (BMI)" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:Label name="OneMore10ThingTrailer" text="One More 1.0 Thing Trailer" class="credits__header" />
+                    <ui:VisualElement name="Editors" class="credits__section">
+                        <ui:VisualElement name="Labels" class="credits__labels">
+                            <ui:Label name="Label" text="Gameplay Capture and Editing" class="credits__label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="LÉO GUYARD" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:Label name="AboutDamTimeTrailer" text="About. Dam. Time. Trailer" class="credits__header" />
+                    <ui:VisualElement name="Editors" class="credits__section">
+                        <ui:VisualElement name="Labels" class="credits__labels">
+                            <ui:Label name="Label" text="Gameplay Capture and Editing" class="credits__label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="MICHAŁ AMIELAŃCZYK" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:Label name="Update7Trailer" text="Update 7 Trailer" class="credits__header" />
                     <ui:VisualElement name="Editors" class="credits__section">
                         <ui:VisualElement name="Labels" class="credits__labels">
                             <ui:Label name="Label" text="Gameplay Capture and Editing" class="credits__label" />
@@ -237,6 +447,15 @@
                         </ui:VisualElement>
                         <ui:VisualElement name="Names" class="credits__names">
                             <ui:Label text="TIM GARLAND, © AUDIO NETWORK" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:Label name="Update1-6Trailers" text="Update 1-6 Trailers" class="credits__header" />
+                    <ui:VisualElement name="Editors" class="credits__section">
+                        <ui:VisualElement name="Labels" class="credits__labels">
+                            <ui:Label name="Label" text="Gameplay Capture and Editing" class="credits__label" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="MICHAŁ AMIELAŃCZYK" class="credits__name" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:Label name="EarlyAccessTrailer" text="Early Access Trailer" class="credits__header" />
@@ -529,6 +748,34 @@
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:Label name="SpecialThanks" text="Special Thanks" class="credits__header" />
+                    <ui:Label name="Blender" text="Blender" class="credits__subheader" />
+                    <ui:VisualElement name="BlenderLine" class="credits__section">
+                        <ui:Label text="Thank you for staying Free and Open Source, forever." class="credits__name credits__name--centered" />
+                    </ui:VisualElement>
+                    <ui:Label name="OpenSourceSoftware" text="Open Source Software" class="credits__subheader" />
+                    <ui:VisualElement name="OpenSourceSoftware" class="credits__section">
+                        <ui:VisualElement name="Lines">
+                            <ui:Label text="Timberborn uses open source software libraries, in alphabetical order:" class="credits__name credits__name--centered" />
+                            <ui:Label text="Bootstrap" class="credits__name credits__name--centered" />
+                            <ui:Label text="Castle Core" class="credits__name credits__name--centered" />
+                            <ui:Label text="Handlebars.Net" class="credits__name credits__name--centered" />
+                            <ui:Label text="Json.NET" class="credits__name credits__name--centered" />
+                            <ui:Label text="LINQtoCSV" class="credits__name credits__name--centered" />
+                            <ui:Label text="moq" class="credits__name credits__name--centered" />
+                            <ui:Label text="Noto Sans fonts" class="credits__name credits__name--centered" />
+                            <ui:Label text="protobuf-net" class="credits__name credits__name--centered" />
+                            <ui:Label text="Steamworks.NET" class="credits__name credits__name--centered" />
+                            <ui:Label text=" " class="credits__name credits__name--centered" />
+                            <ui:Label text="Third party licenses are located in StreamingAssets\Third Party Licenses.txt." class="credits__name credits__name--centered" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:Label name="WordHeretic" text="Word Heretic" class="credits__subheader" />
+                    <ui:VisualElement name="InGameTextReviewers" class="credits__section">
+                        <ui:Label name="Label" text="In-Game Text Review" class="credits__labels credits__label" />
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="STEPHEN “CRUDDLY“ HUDSON" class="credits__name" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
                     <ui:Label name="InternationalHobo" text="International Hobo Ltd" class="credits__subheader" />
                     <ui:VisualElement name="DesignConsultants" class="credits__section">
                         <ui:Label name="Label" text="Design Consultants" class="credits__labels credits__label" />
@@ -553,21 +800,6 @@
                     <ui:Label name="StringQuartetRecordingPhoto" text="String Quartet Recording Photography" class="credits__subheader" />
                     <ui:VisualElement name="StringQuartetRecordingPhoto" class="credits__section">
                         <ui:Label text="ADAM WOROPIŃSKI" class="credits__name credits__name--centered" />
-                    </ui:VisualElement>
-                    <ui:Label name="OpenSourceSoftware" text="Open Source Software" class="credits__subheader" />
-                    <ui:VisualElement name="OpenSourceSoftware" class="credits__section">
-                        <ui:VisualElement name="Lines">
-                            <ui:Label text="Timberborn uses open source software libraries, in alphabetical order:" class="credits__name credits__name--centered" />
-                            <ui:Label text="Castle Core" class="credits__name credits__name--centered" />
-                            <ui:Label text="Json.NET" class="credits__name credits__name--centered" />
-                            <ui:Label text="LINQtoCSV" class="credits__name credits__name--centered" />
-                            <ui:Label text="moq" class="credits__name credits__name--centered" />
-                            <ui:Label text="Noto Sans fonts" class="credits__name credits__name--centered" />
-                            <ui:Label text="protobuf-net" class="credits__name credits__name--centered" />
-                            <ui:Label text="Steamworks.NET" class="credits__name credits__name--centered" />
-                            <ui:Label text=" " class="credits__name credits__name--centered" />
-                            <ui:Label text="Third party licenses are located in StreamingAssets\Third Party Licenses.txt." class="credits__name credits__name--centered" />
-                        </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:Label name="TheShoresOfBeaverBay" text="The Shores of Beaver Bay" class="credits__header" />
                     <ui:VisualElement name="Melody" class="credits__section">
@@ -650,6 +882,17 @@
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:Label name="AdditionalSpecialThanks" text="Additional Special Thanks" class="credits__header" />
+                    <ui:VisualElement name="EarlyAccessThanks" class="credits__section">
+                        <ui:VisualElement name="Lines">
+                            <ui:Label text="To everyone who supported Timberborn during the Early Access journey." class="credits__name credits__name--centered" />
+                            <ui:Label class="credits__name" />
+                            <ui:Label text="Thank you for helping us build this world - for all your feedback," class="credits__name credits__name--centered" />
+                            <ui:Label text="for your contributions to our community, and for every hour you spent in the game." class="credits__name credits__name--centered" />
+                            <ui:Label class="credits__name" />
+                            <ui:Label text="Below, we recognize some of those who had the greatest influence on Timberborn." class="credits__name credits__name--centered" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:Label name="TheEarliestPlaytesters" text="The Earliest Playtesters" class="credits__subheader" />
                     <ui:VisualElement name="Playtesters" class="credits__section">
                         <ui:Label name="Label" text="Playtesters, in alphabetical order" class="credits__labels credits__label credits__label--supporter" />
                         <ui:VisualElement name="Names" class="credits__names">
@@ -672,7 +915,7 @@
                             <ui:Label text="Jakub Zomerski" class="credits__name credits__name--supporter" />
                         </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:Label name="CommunityMembers" text="Community Members" class="credits__header" />
+                    <ui:Label name="CommunityMembers" text="Community Members" class="credits__subheader" />
                     <ui:VisualElement name="Moderators" class="credits__section">
                         <ui:Label name="Label" text="Moderators, in alphabetical order" class="credits__labels credits__label credits__label--supporter" />
                         <ui:VisualElement name="Names" class="credits__names">
@@ -707,6 +950,14 @@
                             <ui:Label text="Sindre S.K." class="credits__name credits__name--supporter" />
                             <ui:Label text="Thunderbloom" class="credits__name credits__name--supporter" />
                             <ui:Label text="Vyna" class="credits__name credits__name--supporter" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="MasterfulEngineers" class="credits__section">
+                        <ui:Label name="Label" text="Masterful Engineers, in alphabetical order" class="credits__labels credits__label credits__label--supporter" />
+                        <ui:VisualElement name="Names" class="credits__names">
+                            <ui:Label text="Luke Vo" class="credits__name credits__name--supporter" />
+                            <ui:Label text="Magdalena Zazu Potakowska" class="credits__name credits__name--supporter" />
+                            <ui:Label text="Ton Wolfe" class="credits__name credits__name--supporter" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement name="EagerBeavers" class="credits__section">

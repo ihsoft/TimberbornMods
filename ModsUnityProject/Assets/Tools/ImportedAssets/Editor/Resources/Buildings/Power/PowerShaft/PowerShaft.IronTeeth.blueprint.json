@@ -32,7 +32,8 @@
     "NoAutoWalls": false,
     "GenerateFloorsOnStackable": false,
     "EdgeGroups": [],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "BlockObjectSpec": {
     "Size": {

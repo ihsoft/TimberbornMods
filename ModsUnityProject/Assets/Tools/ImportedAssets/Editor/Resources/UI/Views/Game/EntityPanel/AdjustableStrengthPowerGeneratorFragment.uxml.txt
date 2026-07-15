@@ -3,6 +3,8 @@
     <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
     <cui:NineSliceVisualElement name="AdjustableStrengthPowerGeneratorFragment" class="bg-sub-box--green entity-sub-panel">
         <ui:VisualElement name="SliderRoot" />
-        <cui:NineSliceButton name="FlipRotation" class="entity-panel__button-wrapper entity-panel__text entity-fragment__button entity-fragment__button--green" text="Flip Rotation" />
+        <ui:VisualElement name="ButtonWrapper" class="entity-panel__button-wrapper">
+            <cui:NineSliceButton name="FlipRotation" text="Flip rotation" class="entity-panel__text entity-fragment__button entity-fragment__button--red" />
+        </ui:VisualElement>
     </cui:NineSliceVisualElement>
 </ui:UXML>

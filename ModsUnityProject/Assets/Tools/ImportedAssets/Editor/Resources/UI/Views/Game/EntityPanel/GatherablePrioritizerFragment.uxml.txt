@@ -4,6 +4,6 @@
     <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
     <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
     <cui:NineSliceVisualElement name="GatherablePrioritizerFragment" class="entity-sub-panel bg-sub-box--green">
-        <Timberborn.DropdownSystem.Dropdown name="Priorities" label-loc-key="Gathering.Prioritize" />
+        <Timberborn.DropdownSystem.Dropdown name="Priorities" label-loc-key="Gathering.Prioritize" class="game-dropdown" />
     </cui:NineSliceVisualElement>
 </ui:UXML>

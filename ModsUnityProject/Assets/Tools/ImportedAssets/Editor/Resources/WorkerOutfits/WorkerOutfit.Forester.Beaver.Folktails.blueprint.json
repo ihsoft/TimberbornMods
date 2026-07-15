@@ -1,0 +1,12 @@
+{
+  "WorkerOutfitSpec": {
+    "Id": "Forester",
+    "FactionId": "Folktails",
+    "WorkerType": "Beaver",
+    "DiffuseTexture": "",
+    "NormalTexture": "",
+    "Attachments": [
+      "ForesterHat.Beaver.Folktails"
+    ]
+  }
+}

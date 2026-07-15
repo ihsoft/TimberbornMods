@@ -123,11 +123,11 @@
 .description-panel-header__icon {
     width: 48px;
     height: 48px;
-    margin-right: 10px;
+    margin-right: 16px;
 }
 
 .description-panel-header__info {
-    width: 54px;
+    width: 60px;
     height: 48px;
     align-items: flex-end;
     justify-content: center;

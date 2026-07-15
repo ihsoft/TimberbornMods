@@ -25,7 +25,7 @@
                         <ui:Label text="EXPERIMENTAL MODE" name="Experimental" class="experimental-info" />
                     </cui:NineSliceVisualElement>
                     <cui:NineSliceVisualElement name="UpdateInfoPanel" class="update-info-panel sliced-border">
-                        <cui:LocalizableLabel name="UpdateInfoHeader" text-loc-key="MainMenu.UpdateInfoHeader" class="update-info-panel__header" />
+                        <ui:Label name="UpdateInfoHeader" class="update-info-panel__header" />
                         <ui:Image name="UpdateInfoArt" class="update-info-panel__art" />
                         <ui:Label name="UpdateInfoText" class="update-info-panel__summary" />
                         <cui:LocalizableButton name="UpdateInfoLink" text-loc-key="MainMenu.UpdateInfoLink" class="update-info-panel__link" />

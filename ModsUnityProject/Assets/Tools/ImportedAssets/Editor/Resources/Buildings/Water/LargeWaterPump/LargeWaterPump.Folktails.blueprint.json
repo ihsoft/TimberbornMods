@@ -433,7 +433,8 @@
     "NoAutoWalls": false,
     "GenerateFloorsOnStackable": false,
     "EdgeGroups": [],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "BuildingAccessibleSpec": {
     "LocalAccess": {
@@ -459,7 +460,7 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.LargeWaterPump.DisplayName",
     "DescriptionLocKey": "Building.LargeWaterPump.Description",
@@ -474,10 +475,12 @@
       "X": 1,
       "Y": 3,
       "Z": -1
-    },
-    "MaxDepth": 4,
+    }
+  },
+  "WaterInputPipeSpec": {
     "PipeSegmentPrefabPath": "Buildings/Water/LargeWaterPump/LargeWaterPumpPipeSegment.Folktails",
-    "PipeParentName": "#Finished"
+    "PipeParentName": "#Finished",
+    "MaxDepth": 4
   },
   "ConstructionSiteProgressVisualizerSpec": {
     "ProgressThresholds": [

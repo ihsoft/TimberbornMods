@@ -3487,7 +3487,7 @@
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Monuments",
-    "ToolOrder": 500,
+    "ToolOrder": 51,
     "ToolShape": "Hex",
     "Layout": "Single",
     "CustomPivot": {
@@ -3687,9 +3687,10 @@
         ]
       }
     ],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "WorkplaceSlotManagerSpec": {},
   "UnfinishedStateSlotDisablerSpec": {
     "SlotKeyword": "Entrance"

@@ -16,7 +16,7 @@
     "CarryingAnimation": "CarryOnArm",
     "Weight": 5,
     "GoodGroupId": "Materials",
-    "GoodOrder": 3010,
+    "GoodOrder": 3020,
     "Icon": "Sprites/Goods/MetalBlockIcon",
     "ForceImport": false,
     "DisplayNameLocKey": "Good.MetalBlock.DisplayName",

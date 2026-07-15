@@ -8,8 +8,8 @@
         "Amount": 12
       },
       {
-        "Id": "MetalBlock",
-        "Amount": 2
+        "Id": "ScrapMetal",
+        "Amount": 4
       }
     ],
     "ScienceCost": 150,
@@ -94,7 +94,8 @@
   },
   "FloodableFireSpec": {},
   "FireSpec": {
-    "AttachmentId": "Fire"
+    "AttachmentId": "Fire",
+    "HasLight": false
   },
   "WaterObjectSpec": {
     "WaterCoordinates": {

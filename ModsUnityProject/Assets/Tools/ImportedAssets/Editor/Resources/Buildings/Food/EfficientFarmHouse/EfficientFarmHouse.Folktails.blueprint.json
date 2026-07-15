@@ -185,7 +185,7 @@
   "PlanterBuildingSpec": {
     "PlantableResourceGroup": "Farmhouse"
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "SimpleOutputInventorySpec": {
     "Capacity": 50,
     "IgnorableCapacity": false

@@ -33,7 +33,7 @@
     "Effects": [
       {
         "NeedId": "BadwaterContamination",
-        "PointsPerHour": 0.034,
+        "PointsPerHour": 0.068,
         "SatisfyToMaxValue": false
       }
     ]
@@ -107,7 +107,7 @@
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Wellbeing",
-    "ToolOrder": 60,
+    "ToolOrder": 61,
     "ToolShape": "Square",
     "Layout": "Single",
     "CustomPivot": {
@@ -130,7 +130,7 @@
   "MechanicalBuildingSpec": {},
   "MechanicalNodeSpec": {
     "PowerOutput": 0,
-    "PowerInput": 100,
+    "PowerInput": 50,
     "IsShaft": false
   },
   "EntererNeedSuspendingBuildingSpec": {
@@ -141,7 +141,7 @@
       ]
     }
   },
-  "EnterableLightingSpec": {},
+  "EnterableIlluminatorSpec": {},
   "EnterableAnimationControllerSpec": {
     "ResetAnimationUponExit": false
   },

@@ -1,0 +1,21 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <ui:VisualElement name="HttpAdapterFragment">
+        <cui:NineSliceVisualElement name="SwitchedOnWebhookSection" class="entity-sub-panel bg-sub-box--green">
+            <cui:LocalizableToggle name="SwitchedOnWebhookEnabled" text-loc-key="Building.HttpAdapter.WebhookWhenSwitchedOn" class="game-toggle entity-panel__text entity-panel__toggle" />
+            <cui:NineSliceTextField name="SwitchedOnWebhookUrl" picking-mode="Ignore" class="text-field http-adapter-fragment__url" />
+            <ui:Label name="SwitchedOnWebhookStatus" text="Status" class="entity-panel__text text--centered" />
+        </cui:NineSliceVisualElement>
+        <cui:NineSliceVisualElement name="SwitchedOffWebhookSection" class="entity-sub-panel bg-sub-box--green">
+            <cui:LocalizableToggle name="SwitchedOffWebhookEnabled" text-loc-key="Building.HttpAdapter.WebhookWhenSwitchedOff" class="game-toggle entity-panel__text entity-panel__toggle" />
+            <cui:NineSliceTextField name="SwitchedOffWebhookUrl" picking-mode="Ignore" class="text-field http-adapter-fragment__url" />
+            <ui:Label name="SwitchedOffWebhookStatus" text="Status" class="entity-panel__text text--centered" />
+        </cui:NineSliceVisualElement>
+        <cui:NineSliceVisualElement name="MethodSection" class="entity-sub-panel bg-sub-box--green">
+            <Timberborn.DropdownSystem.Dropdown name="Method" label-loc-key="Building.HttpAdapter.Method" class="game-dropdown standard-automation-dropdown" />
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

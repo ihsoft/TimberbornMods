@@ -1,5 +1,16 @@
 {
   "BotSpec": {},
+  "NamedEntitySpec": {
+    "IsEditable": true
+  },
+  "NumberedEntityNamerSpec": {
+    "FormatLocKey": "Bot.DisplayName.IronTeeth",
+    "NumberingGroup": "Bots",
+    "IsPersistent": true
+  },
+  "CharacterBirthSpec": {
+    "NotificationLocKey": "Bot.Created"
+  },
   "CharacterModelSpec": {
     "ModelName": "Model_Preserved"
   },
@@ -28,20 +39,16 @@
   },
   "MortalSpec": {},
   "DeadStatusSpec": {
-    "DeadStatusLocKey": "Status.Bot.Dead"
+    "DiedOldAgeStatusLocKey": "Status.Bot.Dead",
+    "DiedTragicallyStatusLocKey": "Status.Bot.Dead",
+    "DiedTragicallyAlertLocKey": "Status.Bot.DeadShort"
   },
   "RunningStateUpdaterSpec": {
     "ShortWalkingDistanceThreshold": 10.0,
     "WalkingSpeedThreshold": 0.75
   },
-  "WellbeingTrackerSpec": {
-    "CountsToPopulationWellbeing": false
-  },
   "SimpleLabeledEntitySpec": {
     "EntityNameLocKey": "Bot.TemplateName"
-  },
-  "BotFactionNameSpec": {
-    "NameLocKey": "Bot.DisplayName.IronTeeth"
   },
   "DeteriorableSpec": {
     "DeteriorationInDays": 70
@@ -130,9 +137,6 @@
         ]
       }
     ]
-  },
-  "CharacterObjectNamerSpec": {
-    "Prefix": "Bot"
   },
   "TimbermeshAnimatorControllerSpec": {
     "BoolParameters": [
@@ -1106,6 +1110,69 @@
         "AttachmentId": "Thorns.DemolishAnimation.Beaver",
         "Prefab": "Characters/Attachments/ThornsAnimationDust",
         "Parent": "#BuildingParticles",
+        "Position": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": false
+      },
+      {
+        "AttachmentId": "ScavengerHat.Bot.IronTeeth",
+        "Prefab": "Characters/Bot/Attachments/ScavengerHatBot.IronTeeth",
+        "Parent": "#Head",
+        "Position": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": false
+      },
+      {
+        "AttachmentId": "ForesterHat.Bot.IronTeeth",
+        "Prefab": "Characters/Bot/Attachments/ForesterHatBot.IronTeeth",
+        "Parent": "#Head",
+        "Position": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": false
+      },
+      {
+        "AttachmentId": "GathererBackpack",
+        "Prefab": "Characters/Attachments/GathererBackpack",
+        "Parent": "#Backpack",
         "Position": {
           "X": 0.0,
           "Y": 0.0,

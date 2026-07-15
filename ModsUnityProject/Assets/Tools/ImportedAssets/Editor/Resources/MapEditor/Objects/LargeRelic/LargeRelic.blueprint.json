@@ -1,0 +1,250 @@
+{
+  "TemplateSpec": {
+    "TemplateName": "LargeRelic",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 3,
+      "Y": 3,
+      "Z": 2
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": true
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "MapEditorObjects",
+    "ToolOrder": 1500,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": true
+  },
+  "StartableMarkerPositionUpdaterSpec": {},
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.Relic.DisplayName",
+    "DescriptionLocKey": "Building.Relic.Description",
+    "FlavorDescriptionLocKey": "Building.LargeRelic.FlavorDescription",
+    "Icon": "MapEditor/Objects/LargeRelic/LargeRelicIcon"
+  },
+  "BasicSelectionSoundSpec": {
+    "SoundName": "Relic",
+    "AlternativeSoundName": ""
+  },
+  "BlockObjectModelSpec": {
+    "FullModelName": "#Model",
+    "UncoveredModelName": "",
+    "UndergroundModelName": "#Underground",
+    "UndergroundModelDepth": 1
+  },
+  "BlockObjectNavMeshAdderSpec": {},
+  "DemolishableScienceRewardSpec": {
+    "SciencePoints": 3000
+  },
+  "DemolishableSpec": {
+    "DemolishTimeInHours": 8.0,
+    "ShowDemolishButtonInEntityPanel": true
+  },
+  "DemolishableFromTopSpec": {},
+  "Children": {
+    "#Model": {
+      "TimbermeshSpec": {
+        "Model": "MapEditor/Objects/LargeRelic/LargeRelic.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 1.5,
+              "Y": 0.0487027019,
+              "Z": 1.5
+            },
+            "Size": {
+              "X": 2.5,
+              "Y": 0.0974054039,
+              "Z": 2.5
+            }
+          },
+          {
+            "Center": {
+              "X": 1.40271688,
+              "Y": 0.818405032,
+              "Z": 0.451267719
+            },
+            "Size": {
+              "X": 1.51957178,
+              "Y": 1.42754388,
+              "Z": 0.3999803
+            }
+          },
+          {
+            "Center": {
+              "X": 0.5080538,
+              "Y": 0.818405032,
+              "Z": 1.32464767
+            },
+            "Size": {
+              "X": 0.472197,
+              "Y": 1.42754388,
+              "Z": 1.32713985
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Underground": {
+      "TimbermeshSpec": {
+        "Model": "MapEditor/Objects/LargeRelic/LargeRelic.Model.Underground.Model"
+      }
+    }
+  }
+}

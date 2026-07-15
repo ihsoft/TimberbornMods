@@ -178,6 +178,10 @@
     margin-right: 4px;
 }
 
+.working-hours-panel.highlight {
+    --background-image: resource('UI/Images/Backgrounds/bg-striped-6');
+}
+
 .working-hours-panel__icon {
     background-image: resource('UI/Images/Game/ico-clock');
     width: 26px;
@@ -400,6 +404,10 @@
     align-self: flex-end;
 }
 
+.level-visibility-panel.highlight .level-visibility-panel__content {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-large-10');
+}
+
 .level-visibility-panel--game {
     align-items: center;
     width: 195px;
@@ -434,6 +442,11 @@
 
 .level-visibility-panel__reset-button:hover:enabled {
     background-image: resource('UI/Images/Game/level-visibility-reset-hover');
+}
+
+
+.level-visibility-panel.highlight .level-visibility-panel__reset-button {
+    background-image: resource('UI/Images/Game/level-visibility-reset-highlight');
 }
 
 .level-visibility-panel__reset-button:disabled {
@@ -618,9 +631,9 @@
 }
 
 .production-item__arrow-wrapper {
-    width: 24px;
+    width: 20px;
     height: 24px;
-    min-width: 24px;
+    min-width: 20px;
 }
 
 .production-item__arrow-wrapper--left {
@@ -632,7 +645,7 @@
 }
 
 .production-item__arrow {
-    width: 24px;
+    width: 20px;
     height: 24px;
     background-image: resource('UI/Images/Game/arrow');
 }
@@ -645,8 +658,6 @@
 }
 
 .production-item__items--input {
-    flex-direction: row;
-    flex-wrap: nowrap;
     justify-content: flex-end;
 }
 
@@ -779,7 +790,7 @@
 }
 
 .resource-yield__arrow {
-    width: 24px;
+    width: 20px;
     height: 24px;
     margin: 0 12px;
     background-image: resource('UI/Images/Game/arrow');
@@ -797,7 +808,6 @@
 .slider-toggle {
     height: 36px;
     justify-content: center;
-    margin-right: auto;
 }
 
 .slider-toggle:disabled {
@@ -1043,6 +1053,28 @@
     justify-content: center;
     align-self: center;
     margin-bottom: 10px;
+    margin: 0 8px 10px 8px;
+}
+
+.good-stockpile-tooltip__amount-label {
+    min-width: 100px;
+    -unity-text-align: middle-left;
+}
+
+.good-stockpile-tooltip__amount-value {
+    -unity-text-align: middle-right;
+}
+
+.good-stockpile-tooltip__sample-history {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 34px;
+    margin: 0 2px 6px 2px;
+}
+
+.good-stockpile-tooltip__debug-table-separator {
+    margin-bottom: 8px;
 }
 
 .good-stockpile-tooltip_icon-workplace {
@@ -1170,6 +1202,10 @@
     background-image: resource('UI/Images/Game/ico-water-source-regulator-closed');
 }
 
+.water-source-regulator-toggle__icon--automated {
+    background-image: resource('UI/Images/Game/ico-automated');
+}
+
 .game-over-box {
     width: 750px;
 }
@@ -1203,4 +1239,115 @@
     width: 20px;
     height: 20px;
     margin-left: 2px;
+}
+
+.automation-state-icon--unfinished {
+    opacity: 0.2;
+}
+
+.automation-state-icon--unfinished.automation-state-icon--indicator {
+    opacity: 0.35;
+}
+
+.automation-state-icon--large {
+    width: 30px;
+    height: 30px;
+    background-image: resource('UI/Images/Game/automation-state-off-large');
+    flex-shrink: 0;
+}
+
+.automation-state-icon--large.clickable:enabled:hover {
+    background-image: resource('UI/Images/Game/automation-state-off-large-hover');
+}
+
+.automation-state-icon--large.automation-state-icon--on {
+    background-image: resource('UI/Images/Game/automation-state-on-large');
+    --unity-image: resource('UI/Images/Game/automation-state-on-glow-large');
+}
+
+.automation-state-icon--large.clickable.automation-state-icon--on:enabled:hover {
+    background-image: resource('UI/Images/Game/automation-state-on-large-hover');
+}
+
+.automation-state-icon--small {
+    width: 20px;
+    height: 20px;
+    background-image: resource('UI/Images/Game/automation-state-off-small');
+    flex-shrink: 0;
+}
+
+.automation-state-icon--small.clickable:enabled:hover {
+    background-image: resource('UI/Images/Game/automation-state-off-small-hover');
+}
+
+.automation-state-icon--small.automation-state-icon--on {
+    background-image: resource('UI/Images/Game/automation-state-on-small');
+    --unity-image: resource('UI/Images/Game/automation-state-on-glow-small');
+}
+
+.automation-state-icon--small.clickable.automation-state-icon--on:enabled:hover {
+    background-image: resource('UI/Images/Game/automation-state-on-small-hover');
+}
+
+.automation-state-icon--small-indicator {
+    width: 20px;
+    height: 20px;
+    background-image: resource('UI/Images/Game/automation-state-off-small-indicator');
+    flex-shrink: 0;
+}
+
+.automation-state-icon--small-indicator.automation-state-icon--on {
+    background-image: resource('UI/Images/Game/automation-state-on-small-indicator');
+    --unity-image: resource('UI/Images/Game/automation-state-on-glow-small-indicator');
+}
+
+.http-api-fragment {
+    padding: 5px 0;
+}
+
+.http-api-fragment__button {
+    margin: 5px 0;
+}
+
+.http-api-fragment__port-wrapper {
+    flex-direction: row;
+    align-items: center;
+}
+
+.http-api-fragment__port-value {
+    width: 60px;
+    margin: 3px 0 3px 6px;
+}
+
+.http-api-fragment__url {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+.http-adapter-fragment__url {
+    margin: 3px 0;
+}
+
+.http-lever-fragment__url {
+    margin: 3px 0;
+}
+
+.gate-toggle__icon--open {
+    background-image: resource('UI/Images/Game/ico-gate-open');
+}
+
+.gate-toggle__icon--closed {
+    background-image: resource('UI/Images/Game/ico-gate-closed');
+}
+
+.gate-toggle__icon--automated {
+    background-image: resource('UI/Images/Game/ico-automated');
+}
+
+.good-sample-tooltip {
+    padding: 2px;
+}
+
+.good-sample-tooltip__date {
+    margin: 4px;
 }

@@ -1,0 +1,19 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <ui:VisualElement name="WeatherStationFragment">
+        <cui:NineSliceVisualElement name="ModeSection" class="entity-sub-panel bg-sub-box--green">
+            <cui:LocalizableLabel name="Header" text-loc-key="Building.WeatherStation.Header" class="weather-station-fragment__header game-text-normal" />
+            <ui:VisualElement name="ModeRadioToggleContainer" />
+        </cui:NineSliceVisualElement>
+        <cui:NineSliceVisualElement name="EarlyActivationSection" class="entity-sub-panel bg-sub-box--green">
+            <cui:LocalizableToggle name="EarlyActivationToggle" text-loc-key="Building.WeatherStation.EarlyActivation" class="game-toggle entity-panel__text entity-panel__toggle" />
+            <ui:VisualElement name="EarlyActivationWrapper">
+                <ui:Label name="EarlyActivationLabel" text="EarlyActivation" class="game-text-big automation-counter-fragment__threshold" />
+                <cui:PreciseSlider name="EarlyActivationSlider" class="automation-counter-slider" />
+            </ui:VisualElement>
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

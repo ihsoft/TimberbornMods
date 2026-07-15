@@ -18,7 +18,7 @@
     ],
     "ScienceCost": 700,
     "PlaceFinished": false,
-    "FinishableWithBeaversOnSite": false,
+    "FinishableWithBeaversOnSite": true,
     "DrawRangeBoundsOnIt": false
   },
   "BuildingModelSpec": {
@@ -329,11 +329,38 @@
               "Z": 0
             },
             "IsTwoWay": true
+          },
+          {
+            "Start": {
+              "X": 0,
+              "Y": 0,
+              "Z": 0
+            },
+            "End": {
+              "X": 0,
+              "Y": -1,
+              "Z": 0
+            },
+            "IsTwoWay": false
+          },
+          {
+            "Start": {
+              "X": 2,
+              "Y": 0,
+              "Z": 0
+            },
+            "End": {
+              "X": 2,
+              "Y": -1,
+              "Z": 0
+            },
+            "IsTwoWay": false
           }
         ]
       }
     ],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "BlockObjectSpec": {
     "Size": {
@@ -469,7 +496,7 @@
     }
   },
   "TubeStationSpec": {},
-  "DistrictBuildingLightingSpec": {},
+  "DistrictBuildingIlluminatorSpec": {},
   "BuildingAccessibleSpec": {
     "LocalAccess": {
       "X": 1.5,
@@ -521,7 +548,7 @@
     ]
   },
   "FloodableObjectBlockerSpec": {},
-  "UnreachableBuildingBlockerSpec": {},
+  "UnconnectedBuildingBlockerSpec": {},
   "TransputProviderSpec": {
     "Transputs": [
       {
@@ -582,6 +609,7 @@
     "IgnoreRotation": false
   },
   "MechanicalConnectorTargetSpec": {},
+  "CustomizableIlluminatorSpec": {},
   "Children": {
     "#Finished": {
       "TimbermeshSpec": {

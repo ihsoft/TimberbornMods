@@ -1,4 +1,4 @@
-﻿{
+{
   "TemplateSpec": {
     "TemplateName": "BadwaterSource",
     "BackwardCompatibleTemplateNames": [],
@@ -188,7 +188,8 @@
   "ActivationWarningStatusSpec": {
     "StatusSpriteName": "WaterSourceCountdown",
     "StatusLocKey": "Status.TimedActivationWarning",
-    "UseInfiniteWarning": false
+    "UseInfiniteWarning": false,
+    "WarningSound": "UI.Buildings.Warnings.SourceActivationAlert"
   },
   "BlockableObjectParticleControllerSpec": {
     "AttachmentIds": [
@@ -214,7 +215,7 @@
           "Z": 1.5
         },
         "Rotation": {
-          "X": 0.0,
+          "X": -90.0,
           "Y": 0.0,
           "Z": 0.0
         },
@@ -227,6 +228,7 @@
       }
     ]
   },
+  "LightingEnablerSpec": {},
   "Children": {
     "#Model": {
       "TimbermeshSpec": {

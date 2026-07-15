@@ -98,7 +98,7 @@
     "ToolGroupId": "Wellbeing",
     "ToolOrder": 70,
     "ToolShape": "Square",
-    "Layout": "Single",
+    "Layout": "SideLine",
     "CustomPivot": {
       "HasCustomPivot": false,
       "Coordinates": {

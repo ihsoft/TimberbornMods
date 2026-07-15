@@ -12,8 +12,8 @@
         "Amount": 10
       },
       {
-        "Id": "MetalBlock",
-        "Amount": 5
+        "Id": "MetalPart",
+        "Amount": 10
       }
     ],
     "ScienceCost": 250,
@@ -223,7 +223,8 @@
     "NoAutoWalls": false,
     "GenerateFloorsOnStackable": false,
     "EdgeGroups": [],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "BuildingAccessibleSpec": {
     "LocalAccess": {
@@ -249,7 +250,7 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.DeepBadwaterPump.DisplayName",
     "DescriptionLocKey": "Building.BadwaterPump.Description",
@@ -264,10 +265,12 @@
       "X": 0,
       "Y": 2,
       "Z": -1
-    },
-    "MaxDepth": 6,
+    }
+  },
+  "WaterInputPipeSpec": {
     "PipeSegmentPrefabPath": "Buildings/Water/DeepBadwaterPump/DeepBadwaterPumpPipeSegment.IronTeeth",
-    "PipeParentName": "#Finished"
+    "PipeParentName": "#Finished",
+    "MaxDepth": 6
   },
   "ConstructionSiteProgressVisualizerSpec": {
     "ProgressThresholds": [

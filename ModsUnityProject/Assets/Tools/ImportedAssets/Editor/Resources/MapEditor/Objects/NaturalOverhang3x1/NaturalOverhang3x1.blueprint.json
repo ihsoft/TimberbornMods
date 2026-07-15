@@ -1,4 +1,4 @@
-﻿{
+{
   "TemplateSpec": {
     "TemplateName": "NaturalOverhang3x1",
     "BackwardCompatibleTemplateNames": [],
@@ -50,7 +50,8 @@
     "NoAutoWalls": false,
     "GenerateFloorsOnStackable": true,
     "EdgeGroups": [],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "MapEditorObjects",

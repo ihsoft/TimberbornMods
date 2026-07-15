@@ -2,8 +2,9 @@
     <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
     <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
     <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
-    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
-    <cui:NineSliceVisualElement name="WaterSourceFlowPreviewFragment" class="single-button-fragment entity-sub-panel bg-sub-box--green">
-        <cui:NineSliceButton name="Button" class="entity-panel__text entity-fragment__button entity-fragment__button--red" />
+    <cui:NineSliceVisualElement name="WaterSourceFlowPreviewFragment" class="entity-sub-panel bg-sub-box--green">
+        <ui:VisualElement name="ButtonWrapper" class="entity-panel__button-wrapper">
+            <cui:NineSliceButton name="Button" class="entity-panel__text entity-fragment__button entity-fragment__button--red" />
+        </ui:VisualElement>
     </cui:NineSliceVisualElement>
 </ui:UXML>

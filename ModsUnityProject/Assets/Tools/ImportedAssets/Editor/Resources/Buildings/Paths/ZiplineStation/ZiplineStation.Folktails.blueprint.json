@@ -18,7 +18,7 @@
     ],
     "ScienceCost": 700,
     "PlaceFinished": false,
-    "FinishableWithBeaversOnSite": false,
+    "FinishableWithBeaversOnSite": true,
     "DrawRangeBoundsOnIt": false
   },
   "BuildingModelSpec": {
@@ -310,7 +310,8 @@
           "Z": 3
         }
       }
-    ]
+    ],
+    "BlockedEdges": []
   },
   "PathSpec": {
     "MainPathCoordinates": {
@@ -358,7 +359,8 @@
     "AllowedCoordinates": []
   },
   "FloodableObjectBlockerSpec": {},
-  "UnreachableBuildingBlockerSpec": {},
+  "UnconnectedBuildingBlockerSpec": {},
+  "CustomizableIlluminatorSpec": {},
   "Children": {
     "#Finished": {
       "TimbermeshSpec": {

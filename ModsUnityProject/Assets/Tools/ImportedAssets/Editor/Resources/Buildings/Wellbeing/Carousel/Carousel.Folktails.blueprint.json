@@ -16,7 +16,7 @@
         "Amount": 40
       }
     ],
-    "ScienceCost": 700,
+    "ScienceCost": 600,
     "PlaceFinished": false,
     "FinishableWithBeaversOnSite": false,
     "DrawRangeBoundsOnIt": false
@@ -627,7 +627,7 @@
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Wellbeing",
-    "ToolOrder": 100,
+    "ToolOrder": 110,
     "ToolShape": "Square",
     "Layout": "Single",
     "CustomPivot": {
@@ -675,9 +675,10 @@
         ]
       }
     ],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
-  "EnterableLightingSpec": {},
+  "EnterableIlluminatorSpec": {},
   "ConstructionSiteProgressVisualizerSpec": {
     "ProgressThresholds": [
       0.0

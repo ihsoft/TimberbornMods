@@ -162,10 +162,12 @@
       "X": 0,
       "Y": 1,
       "Z": -1
-    },
-    "MaxDepth": 3,
+    }
+  },
+  "WaterInputPipeSpec": {
     "PipeSegmentPrefabPath": "Buildings/Wellbeing/Shower/ShowerPipeSegment.Folktails",
-    "PipeParentName": "#Finished"
+    "PipeParentName": "#Finished",
+    "MaxDepth": 3
   },
   "ConstructionSiteProgressVisualizerSpec": {
     "ProgressThresholds": [

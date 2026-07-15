@@ -1,4 +1,4 @@
-﻿{
+{
   "TemplateSpec": {
     "TemplateName": "Slope",
     "BackwardCompatibleTemplateNames": [],
@@ -91,7 +91,8 @@
         ]
       }
     ],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "BlockObjectNavMeshAdderSpec": {},
   "BlockObjectSpec": {

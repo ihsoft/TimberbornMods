@@ -1,0 +1,292 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "Default",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "Log",
+        "Amount": 10
+      },
+      {
+        "Id": "Plank",
+        "Amount": 10
+      },
+      {
+        "Id": "Gear",
+        "Amount": 5
+      }
+    ],
+    "ScienceCost": 300,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": false,
+    "DrawRangeBoundsOnIt": false
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "AttractionSpec": {
+    "Effects": [
+      {
+        "NeedId": "Sauna",
+        "PointsPerHour": 0.6,
+        "SatisfyToMaxValue": false
+      }
+    ]
+  },
+  "FixedSlotManagerSpec": {},
+  "TransformSlotInitializerSpec": {
+    "Slots": [
+      {
+        "SlotKeyword": "Bench",
+        "Animation": "Sitting",
+        "Inanimate": false,
+        "RandomizeYRotation": false,
+        "WaterSlot": false
+      }
+    ]
+  },
+  "EnterableSpec": {
+    "OperatingState": "Finished",
+    "LimitedCapacityFinished": true,
+    "CapacityFinished": 6,
+    "LimitedCapacityUnfinished": false,
+    "CapacityUnfinished": 0
+  },
+  "TemplateSpec": {
+    "TemplateName": "Sauna.Folktails",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 2,
+      "Y": 2,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": true,
+      "Coordinates": {
+        "X": 1,
+        "Y": -1,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": true
+  },
+  "BuildingAccessibleSpec": {
+    "LocalAccess": {
+      "X": 1.5,
+      "Y": 0.0,
+      "Z": 0.4
+    },
+    "ForceOneFinalAccess": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Wellbeing",
+    "ToolOrder": 90,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.Sauna.DisplayName",
+    "DescriptionLocKey": "Building.Sauna.Description",
+    "FlavorDescriptionLocKey": "",
+    "Icon": "Buildings/Wellbeing/Sauna/SaunaIcon"
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "TemplateAttachmentsSpec": {
+    "Attachments": [
+      {
+        "AttachmentId": "SaunaSmoke",
+        "Prefab": "Buildings/Wellbeing/Sauna/SaunaSmoke",
+        "Parent": "#Finished",
+        "Position": {
+          "X": 1.0,
+          "Y": 0.0,
+          "Z": 1.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 270.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": true
+      }
+    ]
+  },
+  "EnterableParticleControllerSpec": {
+    "AttachmentIds": [
+      "SaunaSmoke"
+    ]
+  },
+  "GoodConsumingAttractionSpec": {},
+  "GoodConsumingBuildingSpec": {
+    "FullInventoryWorkHours": 50,
+    "ConsumedGoods": [
+      {
+        "GoodId": "Log",
+        "GoodPerHour": 0.2
+      }
+    ]
+  },
+  "Children": {
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Wellbeing/Sauna/Sauna.Folktails.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 1.00736237,
+              "Y": 0.037284255,
+              "Z": 1.0
+            },
+            "Size": {
+              "X": 1.98080587,
+              "Y": 0.0734308362,
+              "Z": 2.0
+            }
+          },
+          {
+            "Center": {
+              "X": 1.00736237,
+              "Y": 0.415392,
+              "Z": 1.69699264
+            },
+            "Size": {
+              "X": 1.27899742,
+              "Y": 0.6843004,
+              "Z": 0.0614442825
+            }
+          },
+          {
+            "Center": {
+              "X": 1.00736237,
+              "Y": 0.415392,
+              "Z": 0.326558739
+            },
+            "Size": {
+              "X": 1.27899742,
+              "Y": 0.6843004,
+              "Z": 0.0614442825
+            }
+          },
+          {
+            "Center": {
+              "X": 1.61624563,
+              "Y": 0.415392,
+              "Z": 1.01185918
+            },
+            "Size": {
+              "X": 0.0602902174,
+              "Y": 0.6843004,
+              "Z": 1.43270326
+            }
+          },
+          {
+            "Center": {
+              "X": 0.396800518,
+              "Y": 0.415392,
+              "Z": 1.01185918
+            },
+            "Size": {
+              "X": 0.0602902174,
+              "Y": 0.6843004,
+              "Z": 1.43270326
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase2x2#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase2x2/ConstructionBase2x2.blueprint"
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Wellbeing/Sauna/Sauna.Folktails.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 1.0,
+                  "Y": 0.09954384,
+                  "Z": 1.0
+                },
+                "Size": {
+                  "X": 2.0,
+                  "Y": 0.199227273,
+                  "Z": 2.0
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    }
+  }
+}

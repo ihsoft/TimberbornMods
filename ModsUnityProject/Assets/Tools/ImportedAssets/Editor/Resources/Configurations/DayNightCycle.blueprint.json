@@ -1,8 +1,7 @@
 {
   "DayNightCycleSpec": {
     "HoursPassedOnNewGame": 4,
-    "ConfiguredDayLengthInSeconds": 460,
-    "ConfiguredDaytimeLengthInUnits": 16,
-    "ConfiguredNighttimeLengthInUnits": 8
+    "ConfiguredDayLengthInTicks": 768,
+    "ConfiguredDaytimeLengthInHours": 16
   }
 }

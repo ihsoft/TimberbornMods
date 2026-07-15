@@ -1,0 +1,11 @@
+﻿{
+  "TutorialStageSpec": {
+    "Id": "MoreBeavers.GrowPopulation",
+    "IntroLocKey": "Tutorial.MoreBeavers.GrowPopulation"
+  },
+  "Children": {
+    "Child": {
+      "BeaverBirthStepSpec": {}
+    }
+  }
+}

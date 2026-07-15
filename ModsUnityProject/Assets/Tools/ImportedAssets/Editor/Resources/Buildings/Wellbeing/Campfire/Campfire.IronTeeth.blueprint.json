@@ -67,7 +67,7 @@
     "Blocks": [
       {
         "MatterBelow": "Ground",
-        "Occupations": "Bottom, Corners, Path, Middle",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
         "Stackable": "None",
         "OccupyAllBelow": false,
         "Underground": false
@@ -172,7 +172,13 @@
     "Icon": "Buildings/Wellbeing/Campfire/CampfireIcon"
   },
   "FireSpec": {
-    "AttachmentId": "Fire"
+    "AttachmentId": "Fire",
+    "HasLight": true
+  },
+  "IlluminatorLightObjectsSpec": {
+    "AttachmentIds": [
+      "Fire"
+    ]
   },
   "ConstructionSiteProgressVisualizerSpec": {
     "ProgressThresholds": [

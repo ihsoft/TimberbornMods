@@ -78,6 +78,16 @@
     height: 50px;
 }
 
+.batch-control-box__middle-row-spacer {
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+.batch-control-box__time-range-dropdown {
+    width: 150px;
+    margin-right: 10px;
+}
+
 .batch-control-box__district-dropdown {
     max-width: 300px;
 }
@@ -1141,4 +1151,106 @@
 
 .fill-rate-progress-bar .progress-bar__item {
     height: 16px;
+}
+
+.good-statistics-header {
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    flex-direction: row;
+    margin-bottom: 10px;
+}
+
+.good-statistics-header > .radio-button {
+    margin-right: 20px;
+    margin-left: 20px;
+}
+
+.good-statistics-row-item {
+    min-height: 42px;
+}
+
+.good-statistics-group {
+    flex-direction: row;
+    margin-top: 5px;
+    margin-bottom: 8px;
+}
+
+.good-statistics-group__icon {
+    height: 26px;
+    width: 26px;
+    margin: 8px 4px 0 0;
+}
+
+.good-statistics-group__items {
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex-grow: 1;
+    justify-content: flex-start;
+    margin-right: -0.66%;
+    padding-left: 1px;
+}
+
+.good-statistics-batch-control-item {
+    margin-bottom: 7px;
+    margin-left: 1%;
+    width: 32%;
+    height: 42px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.good-statistics-batch-control-item__good-icon {
+    width: 24px;
+    height: 24px;
+    margin-left: 10px;
+    margin-right: 4px;
+}
+
+.good-statistics-batch-control-item__good-sample-history-chart {
+    margin: 5px 10px 5px 5px;
+}
+
+.population-statistics-row-item {
+    min-height: 10px;
+}
+
+.population-statistics-graph {
+    margin-bottom: 14px;
+}
+
+.population-statistics-graph__title {
+    margin-bottom: 4px;
+    margin-top: 4px;
+    margin-left: 4px;
+    -unity-text-align: middle-center;
+}
+
+.population-statistics-graph__toggles {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+    justify-content: center;
+}
+
+.population-statistics-graph__wrapper {
+    padding: 2px;
+    margin-top: 4px;
+}
+
+.population-statistics-graph__graph {
+    height: 150px;
+    padding: 4px;
+    background-color: rgba(0.4, 0.4, 0.4, 0.2);
+}
+
+.population-statistics-toggle {
+    margin: 4px 8px 0 4px;
+}
+
+.population-statistics-tooltip__title {
+    margin-bottom: 4px;
+    -unity-text-align: middle-center;
 }

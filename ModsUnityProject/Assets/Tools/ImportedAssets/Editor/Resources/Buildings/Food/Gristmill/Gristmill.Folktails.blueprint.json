@@ -250,7 +250,7 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.Gristmill.DisplayName",
     "DescriptionLocKey": "Building.Gristmill.Description",

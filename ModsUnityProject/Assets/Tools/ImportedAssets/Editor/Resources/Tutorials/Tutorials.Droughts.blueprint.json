@@ -1,0 +1,14 @@
+{
+  "TutorialSpec": {
+    "Id": "Droughts",
+    "NameLocKey": "Tutorial.Droughts",
+    "RequiredTutorialIds": [
+      "SurvivedFirstDroughtTrigger"
+    ],
+    "SkipIfTutorialFinished": "GoodLuck",
+    "SortOrder": 150,
+    "Stages": [
+      "Droughts.Description"
+    ]
+  }
+}

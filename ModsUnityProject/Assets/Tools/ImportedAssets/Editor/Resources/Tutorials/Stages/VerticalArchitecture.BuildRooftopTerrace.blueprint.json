@@ -1,0 +1,28 @@
+{
+  "TutorialStageSpec": {
+    "Id": "VerticalArchitecture.BuildRooftopTerrace",
+    "IntroLocKey": "Tutorial.VerticalArchitecture.BuildRooftopTerrace"
+  },
+  "Children": {
+    "Step1": {
+      "BuildingTutorialStepSpec": {
+        "TemplateNames": [
+          "RooftopTerrace.Folktails"
+        ],
+        "OnlyFinishedBuildings": true,
+        "RequiredAmount": 1
+      }
+    },
+    "Step2": {
+      "ConnectBuildingsTutorialStepSpec": {
+        "TemplateName": "RooftopTerrace.Folktails",
+        "RequiredAmount": 1,
+        "CountUnfinishedBuildings": true,
+        "HighlightableBuildingIds": [
+          "Path",
+          "Stairs.Folktails"
+        ]
+      }
+    }
+  }
+}

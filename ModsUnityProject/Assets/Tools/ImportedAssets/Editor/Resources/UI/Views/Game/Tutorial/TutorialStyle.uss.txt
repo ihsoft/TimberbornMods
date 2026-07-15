@@ -98,11 +98,11 @@
 }
 
 .tutorial-panel__continue {
-    margin-top: 4px;
+    --click-sound: "UI.Click";
+    margin: 4px 0 4px 18px;
     padding: 4px;
     min-width: 50%;
     align-self: center;
-    margin-bottom: 4px;
     display: none;
     --background-image: resource('UI/Images/Backgrounds/bg-button-4');
     --background-slice-scale: 0.5;
@@ -148,13 +148,13 @@
 .tutorial-step-view__checkbox {
     width: 16px;
     height: 16px;
+    flex-shrink: 0;
     margin-right: 4px;
     background-image: resource('UI/Images/Buttons/empty-alt');
 }
 
 .tutorial-step-view--finished > .tutorial-step-view__checkbox {
     background-image: resource('UI/Images/Buttons/checkmark-alt');
-
 }
 
 .tutorial-step-view__key-binding {

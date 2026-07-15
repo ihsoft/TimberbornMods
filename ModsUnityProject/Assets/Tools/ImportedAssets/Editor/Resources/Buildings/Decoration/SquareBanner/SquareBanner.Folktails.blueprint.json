@@ -64,7 +64,7 @@
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Decoration",
-    "ToolOrder": 110,
+    "ToolOrder": 120,
     "ToolShape": "Square",
     "Layout": "SideLine",
     "CustomPivot": {
@@ -81,7 +81,7 @@
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.SquareBanner.DisplayName",
     "DescriptionLocKey": "Building.SquareBanner.Description",
-    "FlavorDescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "Building.SquareBanner.FlavorDescription",
     "Icon": "Buildings/Decoration/SquareBanner/SquareBannerIcon"
   },
   "DecalSupplierSpec": {

@@ -151,7 +151,7 @@
   },
   "DistrictCrossingSpec": {},
   "LinkedBuildingSpec": {},
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "BlockObjectNavMeshSettingsSpec": {
     "NoAutoWalls": false,
     "GenerateFloorsOnStackable": false,
@@ -193,7 +193,8 @@
         ]
       }
     ],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "TransformSlotInitializerSpec": {
     "Slots": [

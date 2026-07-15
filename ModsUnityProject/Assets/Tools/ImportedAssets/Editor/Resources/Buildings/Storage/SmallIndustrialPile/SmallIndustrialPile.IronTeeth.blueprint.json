@@ -91,7 +91,7 @@
     "ToolGroupId": "Storage",
     "ToolOrder": 11,
     "ToolShape": "Square",
-    "Layout": "Single",
+    "Layout": "SideLine",
     "CustomPivot": {
       "HasCustomPivot": false,
       "Coordinates": {
@@ -107,7 +107,8 @@
     "NoAutoWalls": false,
     "GenerateFloorsOnStackable": true,
     "EdgeGroups": [],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.SmallIndustrialPile.DisplayName",

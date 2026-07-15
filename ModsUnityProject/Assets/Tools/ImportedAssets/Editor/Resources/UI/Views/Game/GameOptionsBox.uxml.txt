@@ -14,7 +14,6 @@
             <cui:LocalizableButton text="Exit to desktop" name="ExitToDesktopButton" text-loc-key="Menu.ExitToDesktop" class="menu-button menu-button--stretched" />
             <ui:Button name="DiscordButton" class="options-box__discord-button" />
             <ui:Label text="Version" name="GameVersion" class="options-box__version" />
-            <ui:Label text="Early Access" name="EarlyAccess" class="options-box__version" />
             <ui:Label text="EXPERIMENTAL MODE" name="Experimental" class="experimental-info" />
         </cui:NineSliceVisualElement>
     </ui:VisualElement>

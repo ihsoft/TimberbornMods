@@ -4,8 +4,8 @@
     "LoopingSoundName": "",
     "BuildingCost": [
       {
-        "Id": "MetalBlock",
-        "Amount": 3
+        "Id": "MetalPart",
+        "Amount": 6
       }
     ],
     "ScienceCost": 150,

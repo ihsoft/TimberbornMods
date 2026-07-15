@@ -22,14 +22,7 @@
             <cui:NineSliceVisualElement name="Header" class="entity-panel__buttons bg-sub-box--green">
                 <ui:VisualElement name="LeftButtons" picking-mode="Ignore" class="entity-panel__buttons--left" />
                 <ui:VisualElement name="MiddleButtons" picking-mode="Ignore" class="entity-panel__buttons--middle" />
-                <ui:VisualElement name="RightButtons" picking-mode="Ignore" class="entity-panel__buttons--right">
-                    <ui:Button name="Follow" class="entity-panel__button entity-panel__button--green">
-                        <ui:VisualElement class="entity-panel__button entity-panel__follow" />
-                    </ui:Button>
-                    <ui:Button name="Unselect" class="entity-panel__button entity-panel__button--red">
-                        <ui:VisualElement class="entity-panel__button entity-panel__unselect" />
-                    </ui:Button>
-                </ui:VisualElement>
+                <ui:VisualElement name="RightButtons" picking-mode="Ignore" class="entity-panel__buttons--right" />
             </cui:NineSliceVisualElement>
         </ui:VisualElement>
         <cui:NineSliceVisualElement text="Entity description" name="EntityDescription" class="entity-sub-panel entity-panel__description bg-sub-box--blue" />

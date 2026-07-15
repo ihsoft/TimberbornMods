@@ -12,8 +12,8 @@
         "Amount": 10
       },
       {
-        "Id": "MetalBlock",
-        "Amount": 5
+        "Id": "MetalPart",
+        "Amount": 10
       }
     ],
     "ScienceCost": 200,
@@ -180,7 +180,7 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.HydroponicGarden.DisplayName",
     "DescriptionLocKey": "Building.HydroponicGarden.Description",
@@ -197,7 +197,8 @@
     "NoAutoWalls": false,
     "GenerateFloorsOnStackable": true,
     "EdgeGroups": [],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "ManufactoryProgressVisualizerSpec": {
     "ProgressSteps": [

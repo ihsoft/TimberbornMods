@@ -1,0 +1,26 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <ui:VisualElement name="ThrottlingValveFragment">
+        <cui:NineSliceVisualElement name="OutflowLimitWrapper" class="entity-sub-panel content-stretched bg-sub-box--green">
+            <cui:LocalizableLabel name="OutflowLimitStateLabel" text-loc-key="Automation.State.Off" class="entity-panel__text entity-panel__text--centered" />
+            <ui:Label name="OutflowLimitLabel" text="OutflowLimit" class="text--centered entity-panel__text" />
+            <cui:PreciseSlider name="OutflowLimitSlider" />
+        </cui:NineSliceVisualElement>
+        <cui:NineSliceVisualElement name="AutomationOutflowLimitWrapper" class="entity-sub-panel content-stretched bg-sub-box--green">
+            <cui:LocalizableLabel name="AutomationOutflowLimitStateLabel" text-loc-key="Automation.State.On" class="entity-panel__text entity-panel__text--centered" />
+            <ui:Label name="AutomationOutflowLimitLabel" text="OutflowLimit" class="text--centered entity-panel__text" />
+            <cui:PreciseSlider name="AutomationOutflowLimitSlider" />
+        </cui:NineSliceVisualElement>
+        <cui:NineSliceVisualElement name="ReactionSpeedWrapper" class="entity-sub-panel content-stretched bg-sub-box--green">
+            <ui:Label name="ReactionSpeedLabel" text="ReactionSpeed" class="text--centered entity-panel__text" />
+            <cui:PreciseSlider name="ReactionSpeedSlider" />
+            <cui:NineSliceLabel name="ThrottlingValveState" text="ThrottlingValveState" class="entity-panel__text bg-sub-box--blue throttling-valve-fragment__state" />
+        </cui:NineSliceVisualElement>
+        <cui:NineSliceVisualElement name="SynchronizeWrapper" class="entity-sub-panel bg-sub-box--green">
+            <cui:LocalizableToggle name="Synchronize" text-loc-key="Building.ThrottlingValve.Synchronize" class="game-toggle entity-panel__text entity-panel__toggle" text="Synchronize" />
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

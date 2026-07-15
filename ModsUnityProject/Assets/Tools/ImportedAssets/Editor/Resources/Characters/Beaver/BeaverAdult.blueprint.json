@@ -1,12 +1,20 @@
 {
   "BeaverSpec": {},
   "AdultSpec": {},
+  "NamedEntitySpec": {
+    "IsEditable": true
+  },
+  "CharacterBirthSpec": {
+    "NotificationLocKey": "Dwelling.Newborn"
+  },
   "CharacterModelSpec": {
     "ModelName": "Model_Preserved"
   },
   "MortalSpec": {},
   "DeadStatusSpec": {
-    "DeadStatusLocKey": "Status.Beaver.Dead"
+    "DiedOldAgeStatusLocKey": "Status.Beaver.DiedOldAge",
+    "DiedTragicallyStatusLocKey": "Status.Beaver.DiedTragically",
+    "DiedTragicallyAlertLocKey": "Status.Beaver.DiedTragicallyShort"
   },
   "MovementAnimatorSpec": {
     "AnimationSpeedScale": 1.0
@@ -32,9 +40,6 @@
     "BaseSlowedSpeed": 1.35
   },
   "TemporalSpec": {},
-  "WellbeingTrackerSpec": {
-    "CountsToPopulationWellbeing": true
-  },
   "SleeperSpec": {
     "SleepOutsideEffects": [
       {
@@ -190,9 +195,6 @@
       }
     ]
   },
-  "CharacterObjectNamerSpec": {
-    "Prefix": "BeaverAdult"
-  },
   "ZiplineHarnessModelSpec": {
     "AttachmentId": "ZiplineHarness.BeaverAdult"
   },
@@ -244,6 +246,9 @@
       "BeaverAdult_idle_tapping_tail",
       "BeaverAdult_idle_watching",
       "Massaging",
+      "Jumping",
+      "Punching",
+      "Stepping",
       "DeadNoAnimation"
     ],
     "FloatParameters": [
@@ -721,7 +726,7 @@
       },
       {
         "StateName": "Stranded underwater",
-        "AnimationName": "BeaverAdult_floating",
+        "AnimationName": "BeaverAdult_idle_underwater",
         "Speed": 1.0,
         "SpeedModifier": "",
         "Looped": true,
@@ -1418,10 +1423,49 @@
         "AnimationName": "BeaverAdult_massaging",
         "Speed": 1.0,
         "SpeedModifier": "",
-        "Looped": false,
+        "Looped": true,
         "Conditions": [
           {
             "ParameterName": "Massaging",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Jumping",
+        "AnimationName": "BeaverAdult_jumping",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Jumping",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Punching",
+        "AnimationName": "BeaverAdult_jumping_punching",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Punching",
+            "MustBeTrue": true
+          }
+        ]
+      },
+      {
+        "StateName": "Stepping",
+        "AnimationName": "BeaverAdult_jumping_stepping",
+        "Speed": 1.0,
+        "SpeedModifier": "",
+        "Looped": true,
+        "Conditions": [
+          {
+            "ParameterName": "Stepping",
             "MustBeTrue": true
           }
         ]
@@ -1734,6 +1778,111 @@
         "AttachmentId": "Thorns.DemolishAnimation.Beaver",
         "Prefab": "Characters/Attachments/ThornsAnimationDust",
         "Parent": "#BuildingParticles",
+        "Position": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": false
+      },
+      {
+        "AttachmentId": "ScavengerHat.Beaver.Folktails",
+        "Prefab": "Characters/Beaver/Attachments/ScavengerHatBeaver.Folktails",
+        "Parent": "#Head",
+        "Position": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": false
+      },
+      {
+        "AttachmentId": "ScavengerHat.Beaver.IronTeeth",
+        "Prefab": "Characters/Beaver/Attachments/ScavengerHatBeaver.IronTeeth",
+        "Parent": "#Head",
+        "Position": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": false
+      },
+      {
+        "AttachmentId": "ForesterHat.Beaver.Folktails",
+        "Prefab": "Characters/Beaver/Attachments/ForesterHatBeaver.Folktails",
+        "Parent": "#Head",
+        "Position": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": false
+      },
+      {
+        "AttachmentId": "ForesterHat.Beaver.IronTeeth",
+        "Prefab": "Characters/Beaver/Attachments/ForesterHatBeaver.IronTeeth",
+        "Parent": "#Head",
+        "Position": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "CreateInstantly": false
+      },
+      {
+        "AttachmentId": "GathererBackpack",
+        "Prefab": "Characters/Attachments/GathererBackpack",
+        "Parent": "#Backpack",
         "Position": {
           "X": 0.0,
           "Y": 0.0,

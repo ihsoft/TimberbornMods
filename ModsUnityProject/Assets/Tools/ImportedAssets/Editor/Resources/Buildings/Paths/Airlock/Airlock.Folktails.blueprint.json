@@ -1,0 +1,319 @@
+{
+  "TemplateSpec": {
+    "TemplateName": "Airlock.Folktails",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BuildingSpec": {
+    "SelectionSoundName": "Default",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "Log",
+        "Amount": 15
+      },
+      {
+        "Id": "Gear",
+        "Amount": 8
+      },
+      {
+        "Id": "MetalBlock",
+        "Amount": 4
+      }
+    ],
+    "ScienceCost": 300,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": false,
+    "DrawRangeBoundsOnIt": false
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 3,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Paths",
+    "ToolOrder": 65,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.Airlock.DisplayName",
+    "DescriptionLocKey": "Building.Airlock.Description",
+    "FlavorDescriptionLocKey": "",
+    "Icon": "Buildings/Paths/Airlock/AirlockIcon"
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "BlockObjectNavMeshSettingsSpec": {
+    "NoAutoWalls": false,
+    "GenerateFloorsOnStackable": true,
+    "EdgeGroups": [
+      {
+        "Cost": 1.0,
+        "Group": {
+          "UseGroup": false,
+          "GroupName": ""
+        },
+        "IsPath": true,
+        "AddedEdges": [
+          {
+            "Start": {
+              "X": 0,
+              "Y": 0,
+              "Z": 0
+            },
+            "End": {
+              "X": 0,
+              "Y": -1,
+              "Z": 0
+            },
+            "IsTwoWay": false
+          },
+          {
+            "Start": {
+              "X": 0,
+              "Y": 0,
+              "Z": 0
+            },
+            "End": {
+              "X": 0,
+              "Y": 1,
+              "Z": 0
+            },
+            "IsTwoWay": true
+          },
+          {
+            "Start": {
+              "X": 0,
+              "Y": 1,
+              "Z": 0
+            },
+            "End": {
+              "X": 0,
+              "Y": 2,
+              "Z": 0
+            },
+            "IsTwoWay": true
+          },
+          {
+            "Start": {
+              "X": 0,
+              "Y": 2,
+              "Z": 0
+            },
+            "End": {
+              "X": 0,
+              "Y": 3,
+              "Z": 0
+            },
+            "IsTwoWay": false
+          }
+        ]
+      }
+    ],
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
+  },
+  "PathSpec": {
+    "MainPathCoordinates": {
+      "X": 0,
+      "Y": 0,
+      "Z": 0
+    }
+  },
+  "BlockObjectWithPathRangeSpec": {},
+  "WaterObstacleSpec": {
+    "Coordinates": [
+      {
+        "X": 0,
+        "Y": 1
+      }
+    ]
+  },
+  "FinishableWaterObstacleSpec": {
+    "Height": 1.0
+  },
+  "DrivewayModelsSpec": {
+    "Driveways": [
+      {
+        "Driveway": "StraightPath",
+        "HasCustomCoordinates": true,
+        "CustomCoordinates": {
+          "X": 0,
+          "Y": -1,
+          "Z": 0
+        },
+        "CustomDirection": "Down",
+        "DrivewayMode": "Bidirectional"
+      },
+      {
+        "Driveway": "StraightPath",
+        "HasCustomCoordinates": true,
+        "CustomCoordinates": {
+          "X": 0,
+          "Y": 1,
+          "Z": 0
+        },
+        "CustomDirection": "Down",
+        "DrivewayMode": "Bidirectional"
+      }
+    ]
+  },
+  "Children": {
+    "#Finished": {
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.0431989133,
+              "Z": 1.5014267
+            },
+            "Size": {
+              "X": 1.0,
+              "Y": 0.09268384,
+              "Z": 3.01627159
+            }
+          },
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.504678369,
+              "Z": 1.50431085
+            },
+            "Size": {
+              "X": 1.0,
+              "Y": 1.011543,
+              "Z": 0.98495245
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      },
+      "TimbermeshSpec": {
+        "Model": "Buildings/Paths/Airlock/Airlock.Folktails.Model"
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase3x1#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase3x1/ConstructionBase3x1.blueprint",
+          "Modification": {
+            "TransformSpec": {
+              "Position": {
+                "X": 0.0,
+                "Y": 0.0,
+                "Z": 3.0
+              },
+              "Rotation": {
+                "X": 0.0,
+                "Y": 90.0,
+                "Z": 0.0
+              },
+              "Scale": {
+                "X": 1.0,
+                "Y": 1.0,
+                "Z": 1.0
+              }
+            }
+          }
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Paths/Airlock/Airlock.Folktails.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.0531763732,
+                  "Z": 1.49873209
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.0904609561,
+                  "Z": 2.99265385
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.2590306,
+                  "Z": 1.49873209
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.319766074,
+                  "Z": 0.986899137
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    }
+  }
+}

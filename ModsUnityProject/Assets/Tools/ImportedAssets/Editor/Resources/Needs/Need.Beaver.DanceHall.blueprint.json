@@ -2,7 +2,7 @@
   "NeedSpec": {
     "Id": "DanceHall",
     "BackwardCompatibleIds": [],
-    "Order": 50,
+    "Order": 60,
     "NeedGroupId": "SocialLife",
     "CharacterType": "Beaver",
     "StartingValue": 0.0,

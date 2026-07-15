@@ -200,6 +200,14 @@
     background-image: resource('UI/Images/Game/pause-button-paused-hover');
 }
 
+.pausable-building-fragment.highlight > .unity-toggle__input > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Game/pause-button-highlighted');
+}
+
+.pausable-building-fragment.highlight > .unity-toggle__input:checked > .unity-toggle__checkmark {
+    background-image: resource('UI/Images/Game/pause-button-highlighted');
+}
+
 .floodgate-fragment {
     flex-grow: 1;
 }
@@ -479,7 +487,7 @@
 }
 
 .production-progress-fragment .production-item__items {
-    width: 95px;
+    width: 100px;
 }
 
 .production-progress-fragment__placeholder {
@@ -540,26 +548,11 @@
     margin-right: 10px;
 }
 
-.district-center-fragment__worker-type {
-    flex-direction: row;
-    align-items: center;
-    margin-bottom: 5px;
-}
-
-.district-center-fragment__worker-type__title {
-    margin-right: 10px;
-}
-
 .district-center-fragment__migration {
     margin: 5px 0;
     min-width: 100%;
     flex-direction: row;
     justify-content: center;
-}
-
-.district-center-fragment__worker-type__title {
-    -unity-text-align: middle-left;
-    max-width: 220px;
 }
 
 .district-center-fragment__migration-left-button {
@@ -589,6 +582,12 @@
     margin-left: 4px;
     padding: 4px;
     --click-sound: "UI.Click";
+}
+
+.district-center-fragment__worker-type__title {
+    -unity-text-align: middle-left;
+    max-width: 220px;
+    margin-right: 10px;
 }
 
 
@@ -759,9 +758,8 @@
     margin-right: 10px;
 }
 
-.water-mover-fragment {
+.water-mover-fragment__toggle-wrapper {
     flex-direction: row;
-    align-items: center;
 }
 
 .water-mover-fragment__title {
@@ -779,10 +777,10 @@
     align-items: center;
 }
 
-.water-source-regulator-fragment__title {
+.water-source-regulator-fragment__mode-label {
     -unity-text-align: middle-left;
     max-width: 220px;
-    margin-right: 10px;
+    margin-left: 10px;
 }
 
 .water-input-depth-fragment {
@@ -861,45 +859,35 @@
     -unity-background-image-tint-color: rgba(190, 190, 190, 0.75);
 }
 
-.decal-supplier-fragment__user-decal-buttons {
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    height: 28px;
-}
-
-.decal-supplier-fragment__user-decal-button {
-    min-width: 60px;
-    margin-left: 3px;
-    margin-right: 3px;
-}
-
-.decal-supplier-fragment__user-patterns-label {
+.throttling-valve-fragment__state {
+    padding: 4px 8px;
     align-self: center;
-    margin-top: -3px;
-    margin-bottom: 5px;
 }
 
-.sluice-fragment__mode-wrapper {
+.clutch-fragment {
+    flex-grow: 1;
+}
+
+.clutch-fragment__mode-wrapper {
     flex-direction: row;
 }
 
-.sluice-fragment__title {
+.clutch-fragment__mode-label {
     -unity-text-align: middle-left;
     max-width: 220px;
     margin-left: 10px;
 }
 
-.sluice-toggle__icon--auto {
-    background-image: resource('UI/Images/Game/sluice-auto');
+.clutch-toggle__icon--engaged {
+    background-image: resource('UI/Images/Game/clutch-engaged');
 }
 
-.sluice-toggle__icon--open {
-    background-image: resource('UI/Images/Game/sluice-open');
+.clutch-toggle__icon--disengaged {
+    background-image: resource('UI/Images/Game/clutch-disengaged');
 }
 
-.sluice-toggle__icon--close {
-    background-image: resource('UI/Images/Game/sluice-close');
+.clutch-toggle__icon--automated {
+    background-image: resource('UI/Images/Game/ico-automated');
 }
 
 .zipline-tower-fragment__buttons {
@@ -948,4 +936,304 @@
     height: 28px;
     margin-top: 4px;
     margin-bottom: 4px;
+}
+
+.standard-automation-dropdown {
+    margin-right: 32px;
+}
+
+.standard-automation-dropdown .dropdown__label {
+    min-width: 34px;
+}
+
+.transmitter-selector {
+    align-self: stretch;
+    align-items: center;
+    flex-direction: row;
+}
+
+.transmitter-selector__dropdown {
+    margin-left: 0;
+    margin-right: 32px;
+}
+
+.transmitter-selector__dropdown .dropdown__label {
+    min-width: 34px;
+    height: 100%;
+    --background-image: resource('UI/Images/Backgrounds/bg-7');
+    --background-slice-scale: 0.5;
+    --background-slice: 9;
+    -unity-text-align: middle-center;
+}
+
+.transmitter-selector__icon {
+    position: absolute;
+    right: 0;
+}
+
+.transmitter-selector__close-icon {
+    background-image: resource('UI/Images/Buttons/cross-bare-outline');
+    width: 18px;
+    height: 18px;
+    position: absolute;
+    top: -2px;
+    left: 20px;
+    display: none;
+}
+
+.transmitter-selector__close-icon:enabled:hover {
+    background-image: resource('UI/Images/Buttons/cross-bare-outline-hover');
+}
+
+.transmitter-selector--automatable {
+    margin-left: 32px;
+}
+
+.transmitter-selector--automatable-none .dropdown__selection {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-automation');
+    --background-slice-scale: 0.5;
+    --background-slice: 10;
+}
+
+.transmitter-selector--automatable-none .dropdown__selection:hover:enabled {
+    --background-image: resource('UI/Images/Backgrounds/bg-square-automation-hover');
+}
+
+.transmitter-selector--automatable-none .dropdown__arrow-down {
+    display: none;
+}
+
+.transmitter-selector--automatable-none .dropdown__selected-item-content {
+    align-self: stretch;
+}
+
+.transmitter-selector--automatable-none .dropdown-item--selected.dropdown-item--none {
+    align-items: center;
+    align-self: stretch;
+    padding-left: 6px;
+    padding-right: 6px;
+}
+
+.transmitter-selector--automatable-none .dropdown-item--selected.dropdown-item--none .dropdown-item__text {
+    color: rgb(204, 204, 204);
+}
+
+.transmitter-fragment__state-icon {
+    justify-content: center;
+}
+
+.transmitter-fragment__usages {
+    position: absolute;
+    right: 13px;
+}
+
+.transmitter-fragment__state-label--unfinished {
+    color: rgb(130, 130, 130);
+}
+
+.customizable-illuminator-fragment__presets {
+    margin-bottom: 3px;
+}
+
+.customizable-illuminator-fragment__color-hashtag {
+    margin: 0 4px;
+    -unity-text-align: middle-center;
+}
+
+.customizable-illuminator-fragment__color-hashtag--invisible {
+    opacity: 0;
+}
+
+.customizable-illuminator-fragment__color-field {
+    margin: 3px 0;
+}
+
+.customizable-illuminator-fragment__color-field .unity-text-element {
+    -unity-text-align: middle-center;
+}
+
+.customizable-illuminator-preset {
+    padding: 3px;
+}
+
+.customizable-illuminator-preset__image {
+    background-image: resource('UI/Images/Buttons/preset-color-fill');
+    --unity-image: resource('UI/Images/Buttons/preset-color-border');
+}
+
+.customizable-illuminator-preset__overlay {
+    width: 30px;
+    height: 30px;
+    --unity-image: resource('UI/Images/Buttons/preset-color-overlay');
+}
+
+.customizable-illuminator-preset:hover:enabled > .customizable-illuminator-preset__image {
+    --unity-image: resource('UI/Images/Buttons/preset-color-border-hover');
+}
+
+.customizable-illuminator-preset--selected > .customizable-illuminator-preset__image {
+    --unity-image: resource('UI/Images/Buttons/preset-color-border-selected');
+}
+
+.weather-station-fragment__header {
+    margin-bottom: 4px;
+}
+
+.weather-station-fragment__toggle-wrapper {
+    align-self: flex-start;
+    flex-direction: row;
+}
+
+.weather-station-fragment__toggle {
+    padding: 2px 0;
+}
+
+.weather-station-fragment__toggle-icon {
+    margin-left: 4px;
+    width: 23px;
+    height: 23px;
+    top: 1px
+}
+
+.chronometer-fragment__time-range-controls {
+    margin-top: 8px;
+}
+
+.timer-interval {
+    flex-grow: 1;
+    margin: 3px 2px 3px 0;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+
+.timer-interval__time-label {
+    width: 34px;
+    height: 100%;
+    --background-image: resource('UI/Images/Backgrounds/bg-7');
+    --background-slice-scale: 0.5;
+    --background-slice: 9;
+    -unity-text-align: middle-center;
+    margin-right: 8px;
+    align-self: center;
+}
+
+.timer-interval__time-field {
+    flex-grow: 1;
+    flex-shrink: 1;
+    width: auto;
+    margin-right: 6px;
+    padding: 0 2px;
+}
+
+.timer-interval__type-dropdown {
+    width: 150px;
+    margin-right: 30px;
+    flex-shrink: 0;
+}
+
+.timer-fragment__timer-progress {
+    margin: 3px 0;
+}
+
+.timer-fragment__timer-progress--flipped > .progress-bar > .progress-bar__item > .progress-bar__progress {
+    scale: -1 1;
+}
+
+.automation-counter-fragment {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.automation-counter-fragment__measurement {
+    -unity-text-align: middle-center;
+    flex-grow: 1;
+    margin: 4px 0;
+}
+
+.automation-counter-fragment__toggle {
+    -unity-text-align: middle-center;
+    flex-grow: 1;
+    margin: 4px 0;
+}
+
+.automation-counter-fragment__threshold {
+    -unity-text-align: middle-center;
+    margin: 4px 0;
+}
+
+.automation-counter-fragment__threshold-wrapper {
+    flex-direction: row;
+}
+
+.automation-fragment__integer-input {
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.automation-counter-fragment__comparison-mode-dropdown {
+    width: 70px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    margin-right: 8px;
+}
+
+.automation-counter-slider {
+    margin-left: 10px;
+    margin-top: 1px;
+    flex-grow: 1;
+    flex-shrink: 0;
+    align-self: stretch;
+}
+
+.automation-toggle-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.automation-counter-fragment__primary-dropdown {
+    width: 75%;
+    margin-bottom: 4px;
+    margin-top: 4px;
+}
+
+.science-counter-fragment__icon {
+    background-image: resource('UI/Images/Game/science-icon');
+    width: 24px;
+    height: 24px;
+    margin-left: 4px;
+    align-self: center;
+}
+
+.automation-counter-fragment .unity-integer-field__input {
+    -unity-text-align: middle-center;
+}
+
+.gate-fragment {
+    flex-direction: row;
+    align-items: center;
+}
+
+.gate-fragment__mode-label {
+    -unity-text-align: middle-left;
+    max-width: 220px;
+    margin-left: 10px;
+}
+
+.firework-launcher-fragment__dropdown {
+    margin-bottom: 10px;
+}
+
+.relay-fragment__add-input {
+    margin: 3px 32px 3px 0;
+    padding: 4px;
+    justify-content: center;
+    align-self: flex-end;
+}
+
+.relay-fragment__icon {
+    width: 16px;
+    height: 16px;
 }

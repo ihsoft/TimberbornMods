@@ -107,7 +107,7 @@
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.Aquifer.DisplayName",
     "DescriptionLocKey": "Building.Aquifer.Description",
-    "FlavorDescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "Building.Aquifer.FlavorDescription",
     "Icon": "MapEditor/Water/Aquifer/AquiferIcon"
   },
   "BlockObjectTerrainCutoutSpec": {

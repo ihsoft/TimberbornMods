@@ -305,7 +305,7 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.Centrifuge.DisplayName",
     "DescriptionLocKey": "Building.Centrifuge.Description",

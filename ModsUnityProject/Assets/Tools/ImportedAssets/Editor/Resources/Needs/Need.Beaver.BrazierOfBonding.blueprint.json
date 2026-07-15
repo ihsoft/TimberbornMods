@@ -14,7 +14,7 @@
     "Wastable": true,
     "HoursWarningThreshold": 0.0,
     "DisplayNameLocKey": "Building.BrazierOfBonding.DisplayName",
-    "FavorableWellbeing": 5,
+    "FavorableWellbeing": 4,
     "UnfavorableWellbeing": 0
   }
 }

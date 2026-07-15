@@ -179,11 +179,12 @@
         ]
       }
     ],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Paths",
-    "ToolOrder": 63,
+    "ToolOrder": 73,
     "ToolShape": "Square",
     "Layout": "Single",
     "CustomPivot": {
@@ -197,16 +198,20 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "DrivewayModelSpec": {
-    "Driveway": "StraightPath",
-    "HasCustomCoordinates": true,
-    "CustomCoordinates": {
-      "X": 0,
-      "Y": -1,
-      "Z": 0
-    },
-    "CustomDirection": "Down",
-    "DrivewayMode": "Unidirectional"
+  "DrivewayModelsSpec": {
+    "Driveways": [
+      {
+        "Driveway": "StraightPath",
+        "HasCustomCoordinates": true,
+        "CustomCoordinates": {
+          "X": 0,
+          "Y": -1,
+          "Z": 0
+        },
+        "CustomDirection": "Down",
+        "DrivewayMode": "Unidirectional"
+      }
+    ]
   },
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.SuspensionBridge4x1.DisplayName",

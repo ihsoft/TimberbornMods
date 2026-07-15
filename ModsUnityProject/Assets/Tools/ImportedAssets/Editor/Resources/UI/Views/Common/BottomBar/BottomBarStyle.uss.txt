@@ -25,12 +25,23 @@
     padding: 2px;
 }
 
-.bottom-bar-button--hex {
+.bottom-bar-button--tool {
+    min-width: 54px;
+    max-width: 54px;
+    min-height: 60px;
+    max-height: 60px;
+    padding: 5px 2px;
+    background-image: resource('UI/Images/BottomBar/bar-bg');
+
+}
+
+.bottom-bar-button--hex-tool {
     min-width: 62px;
-    min-height: 54px;
     max-width: 62px;
-    max-height: 54px;
-    padding: 2px;
+    min-height: 60px;
+    max-height: 60px;
+    padding: 5px 2px;
+    background-image: resource('UI/Images/BottomBar/bar-bg');
 }
 
 .bottom-bar-button--clickable {
@@ -100,8 +111,13 @@
 
 .tool-group__buttons {
     flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.tool-group__spacer {
+    width: 3px;
     background-image: resource('UI/Images/BottomBar/bar-bg');
-    padding: 2px;
 }
 
 .bottom-bar-button__frame {
@@ -182,11 +198,11 @@
     left: -2px;
 }
 
-.bottom-bar-button.button--locked .bottom-bar-button__lock-icon {
+.bottom-bar-button--tool.button--locked .bottom-bar-button__lock-icon {
     display: flex;
 }
 
-.bottom-bar-button--hex.button--locked .bottom-bar-button__lock-icon {
+.bottom-bar-button--hex-tool.button--locked .bottom-bar-button__lock-icon {
     display: flex;
 }
 

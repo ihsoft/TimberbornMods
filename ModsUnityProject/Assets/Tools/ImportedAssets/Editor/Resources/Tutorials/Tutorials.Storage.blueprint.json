@@ -3,8 +3,9 @@
     "Id": "Storage",
     "NameLocKey": "Tutorial.Storage",
     "RequiredTutorialIds": [
-      "WaterAndFood"
+      "WorkingHours"
     ],
+    "SkipIfTutorialFinished": "",
     "SortOrder": 40,
     "Stages": [
       "Storage.BuildPile",

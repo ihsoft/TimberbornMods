@@ -1,0 +1,189 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "Floodgate",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "TreatedPlank",
+        "Amount": 5
+      },
+      {
+        "Id": "MetalBlock",
+        "Amount": 5
+      }
+    ],
+    "ScienceCost": 500,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": false,
+    "DrawRangeBoundsOnIt": false
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "TemplateSpec": {
+    "TemplateName": "ThrottlingValve.Folktails",
+    "BackwardCompatibleTemplateNames": [
+      "Valve.Folktails"
+    ],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 2,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "BlockObject",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "BlockObjectNavMeshSettingsSpec": {
+    "NoAutoWalls": false,
+    "GenerateFloorsOnStackable": true,
+    "EdgeGroups": [],
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Landscaping",
+    "ToolOrder": 40,
+    "ToolShape": "Square",
+    "Layout": "SideLine",
+    "CustomPivot": {
+      "HasCustomPivot": true,
+      "Coordinates": {
+        "X": 0.5,
+        "Y": 0.5,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.ThrottlingValve.DisplayName",
+    "DescriptionLocKey": "Building.ThrottlingValve.Description",
+    "FlavorDescriptionLocKey": "",
+    "Icon": "Buildings/Landscaping/ThrottlingValve/ThrottlingValveIcon"
+  },
+  "ThrottlingValveSpec": {
+    "MaxOutflowLimit": 2.0,
+    "OutflowLimitStep": 0.01,
+    "DefaultOutflowLimitEnabled": true,
+    "DefaultOutflowLimit": 1.0,
+    "DefaultAutomationOutflowLimitEnabled": true,
+    "DefaultAutomationOutflowLimit": 0.0,
+    "RateOfChangeHighPrimary": 0.5,
+    "RateOfChangeHighSecondary": 0.1,
+    "RateOfChangeLowPrimary": 0.003,
+    "RateOfChangeLowSecondary": 0.0005,
+    "RateOfChangePrimaryTicks": 1,
+    "RateOfChangePrimaryToSecondaryTicks": 30,
+    "ReactionSpeedExponent": 7.0,
+    "ReactionSpeedStep": 0.01
+  },
+  "FinishableHorizontalWaterObstacleSpec": {
+    "Obstacles": [
+      {
+        "X": 0,
+        "Y": 0,
+        "Z": 1
+      },
+      {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    ]
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "Children": {
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Landscaping/ThrottlingValve/ThrottlingValve.Folktails.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.510495067,
+              "Z": 0.5
+            },
+            "Size": {
+              "X": 0.9,
+              "Y": 1.02099013,
+              "Z": 0.9
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase1x1#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase1x1/ConstructionBase1x1.blueprint"
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Landscaping/ThrottlingValve/ThrottlingValve.Folktails.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.05,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 1.0,
+                  "Y": 0.1,
+                  "Z": 1.0
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    }
+  }
+}

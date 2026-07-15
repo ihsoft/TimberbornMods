@@ -126,9 +126,8 @@
     "FlavorDescriptionLocKey": "Building.ControlTower.FlavorDescription",
     "Icon": "Buildings/Science/ControlTower/ControlTowerIcon"
   },
-  "BlockableBuildingLightingSpec": {},
+  "BlockableIlluminatorSpec": {},
   "BlockableObjectAnimationControllerSpec": {},
-  "BotBuildingLightingSpec": {},
   "RangedEffectBuildingSpec": {
     "EffectRadius": 10
   },
@@ -164,6 +163,10 @@
     "IgnoreRotation": false
   },
   "MechanicalConnectorTargetSpec": {},
+  "DefaultIlluminatorColorSpec": {
+    "ColorId": "Bot"
+  },
+  "CustomizableIlluminatorSpec": {},
   "Children": {
     "#Finished": {
       "TimbermeshSpec": {

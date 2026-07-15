@@ -359,11 +359,13 @@
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.AncientAquiferDrill.DisplayName",
     "DescriptionLocKey": "Building.AquiferDrill.Description",
-    "FlavorDescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "Building.AncientAquiferDrill.FlavorDescription",
     "Icon": "MapEditor/Water/AncientAquiferDrill/AncientAquiferDrillIcon"
   },
-  "BottomMatchingTemplateSpec": {
-    "RequiredTemplateAtBottomName": "Aquifer"
+  "UnderstructureConstraintSpec": {
+    "UnderstructureTemplateNames": [
+      "Aquifer"
+    ]
   },
   "TransputProviderSpec": {
     "Transputs": [

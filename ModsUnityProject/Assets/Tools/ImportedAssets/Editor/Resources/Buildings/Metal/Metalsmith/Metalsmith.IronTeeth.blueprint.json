@@ -1,0 +1,390 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "Smelter",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "Plank",
+        "Amount": 30
+      },
+      {
+        "Id": "ScrapMetal",
+        "Amount": 10
+      }
+    ],
+    "ScienceCost": 150,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": false,
+    "DrawRangeBoundsOnIt": false
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "WorkplaceSpec": {
+    "MaxWorkers": 1,
+    "DefaultWorkers": 1,
+    "DefaultWorkerType": "Beaver",
+    "DisallowOtherWorkerTypes": false,
+    "WorkerTypeUnlockCosts": [
+      {
+        "WorkerType": "Bot",
+        "ScienceCost": 1000
+      }
+    ]
+  },
+  "ManufactorySpec": {
+    "ProductionRecipeIds": [
+      "MetalPart"
+    ]
+  },
+  "WorkshopSpec": {},
+  "EnterableSpec": {
+    "OperatingState": "Finished",
+    "LimitedCapacityFinished": false,
+    "CapacityFinished": 0,
+    "LimitedCapacityUnfinished": false,
+    "CapacityUnfinished": 0
+  },
+  "TemplateSpec": {
+    "TemplateName": "Metalsmith.IronTeeth",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 2,
+      "Y": 2,
+      "Z": 3
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "All",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "None",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": true,
+      "Coordinates": {
+        "X": 1,
+        "Y": -1,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": true
+  },
+  "BuildingAccessibleSpec": {
+    "LocalAccess": {
+      "X": 1.49,
+      "Y": 0.03638568,
+      "Z": 1.232414
+    },
+    "ForceOneFinalAccess": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Metal",
+    "ToolOrder": 15,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "WorkplaceIlluminatorSpec": {},
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.Metalsmith.DisplayName",
+    "DescriptionLocKey": "Building.Metalsmith.Description",
+    "FlavorDescriptionLocKey": "Building.Metalsmith.FlavorDescription",
+    "Icon": "Buildings/Metal/Metalsmith/MetalsmithIcon"
+  },
+  "WorkshopAnimationControllerSpec": {},
+  "TransformSlotInitializerSpec": {
+    "Slots": [
+      {
+        "SlotKeyword": "Entrance",
+        "Animation": "Sitting",
+        "Inanimate": false,
+        "RandomizeYRotation": false,
+        "WaterSlot": false
+      }
+    ]
+  },
+  "WorkplaceSlotManagerSpec": {},
+  "SimpleManufactoryBehaviorsSpec": {},
+  "WorkshopRandomNeedApplierSpec": {
+    "Effects": [
+      {
+        "NeedId": "Injury",
+        "Points": -0.4,
+        "Probability": "Medium"
+      }
+    ]
+  },
+  "WorkshopParticleControllerSpec": {
+    "AttachmentIds": [
+      "Smoke"
+    ]
+  },
+  "WorkshopWorkerHiderSpec": {},
+  "WindParticleControllerSpec": {
+    "AttachmentIds": [
+      "Smoke"
+    ]
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "TransputProviderSpec": {
+    "Transputs": [
+      {
+        "Coordinates": {
+          "X": 0,
+          "Y": 0,
+          "Z": 0
+        },
+        "Directions": "Down, Left, Bottom",
+        "ReverseRotation": false
+      },
+      {
+        "Coordinates": {
+          "X": 0,
+          "Y": 1,
+          "Z": 0
+        },
+        "Directions": "Left, Up, Bottom",
+        "ReverseRotation": false
+      },
+      {
+        "Coordinates": {
+          "X": 1,
+          "Y": 0,
+          "Z": 0
+        },
+        "Directions": "Right, Bottom",
+        "ReverseRotation": false
+      },
+      {
+        "Coordinates": {
+          "X": 1,
+          "Y": 1,
+          "Z": 0
+        },
+        "Directions": "Up, Right, Bottom",
+        "ReverseRotation": false
+      }
+    ],
+    "IgnoreRotation": false
+  },
+  "MechanicalConnectorTargetSpec": {},
+  "TemplateAttachmentsSpec": {
+    "Attachments": [
+      {
+        "AttachmentId": "Smoke",
+        "Prefab": "Buildings/Metal/Metalsmith/MetalsmithSmoke",
+        "Parent": "#Finished",
+        "Position": {
+          "X": 1.0,
+          "Y": 2.5,
+          "Z": 1.5
+        },
+        "Rotation": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Scale": {
+          "X": 2.0,
+          "Y": 2.0,
+          "Z": 2.0
+        },
+        "CreateInstantly": true
+      }
+    ]
+  },
+  "Children": {
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Metal/Metalsmith/Metalsmith.IronTeeth.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 1.01207507,
+              "Y": 0.5743182,
+              "Z": 1.02129054
+            },
+            "Size": {
+              "X": 2.00528526,
+              "Y": 1.136836,
+              "Z": 2.03771472
+            }
+          },
+          {
+            "Center": {
+              "X": 0.992795944,
+              "Y": 1.35304725,
+              "Z": 1.02418685
+            },
+            "Size": {
+              "X": 1.36707067,
+              "Y": 0.428502321,
+              "Z": 2.0108633
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": [
+          {
+            "Center": {
+              "X": 0.992339432,
+              "Y": 2.0011766,
+              "Z": 1.49470818
+            },
+            "Radius": 0.218579769,
+            "Height": 1.27591467,
+            "Axis": "Y"
+          }
+        ]
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase2x2#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase2x2/ConstructionBase2x2.blueprint"
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Metal/Metalsmith/Metalsmith.IronTeeth.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 1.0,
+                  "Y": 0.5,
+                  "Z": 1.00029087
+                },
+                "Size": {
+                  "X": 2.0,
+                  "Y": 1.0,
+                  "Z": 2.00059128
+                }
+              },
+              {
+                "Center": {
+                  "X": 1.0,
+                  "Y": 1.29030633,
+                  "Z": 1.01915336
+                },
+                "Size": {
+                  "X": 1.42757988,
+                  "Y": 0.581129432,
+                  "Z": 1.98677492
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    }
+  }
+}

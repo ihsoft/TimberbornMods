@@ -1,0 +1,14 @@
+{
+  "IlluminationColorSpec": {
+    "Id": "Default",
+    "Color": {
+      "r": 0.8509804,
+      "g": 0.490196079,
+      "b": 0.1254902,
+      "a": 1.0
+    }
+  },
+  "IlluminationPresetSpec": {
+    "Order": 0
+  }
+}

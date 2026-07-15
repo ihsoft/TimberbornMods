@@ -3,18 +3,11 @@
     "Size": {
       "X": 1,
       "Y": 1,
-      "Z": 3
+      "Z": 2
     },
     "Blocks": [
       {
         "MatterBelow": "Ground",
-        "Occupations": "All",
-        "Stackable": "None",
-        "OccupyAllBelow": false,
-        "Underground": false
-      },
-      {
-        "MatterBelow": "Any",
         "Occupations": "All",
         "Stackable": "None",
         "OccupyAllBelow": false,
@@ -100,8 +93,8 @@
   },
   "NaturalResourceModelRandomizerSpec": {
     "ConstrainProportion": false,
-    "MinHeightScaleFactor": 0.8,
-    "MaxHeightScaleFactor": 1.2,
+    "MinHeightScaleFactor": 0.7,
+    "MaxHeightScaleFactor": 1.0,
     "MinWidthScaleFactor": 0.9,
     "MaxWidthScaleFactor": 1.1,
     "RandomizedRotation": "BetweenMinAndMax",

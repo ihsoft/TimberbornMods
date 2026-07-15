@@ -93,7 +93,7 @@
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.WaterSeep.DisplayName",
     "DescriptionLocKey": "Building.WaterSeep.Description",
-    "FlavorDescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "Building.WaterSeep.FlavorDescription",
     "Icon": "MapEditor/Water/WaterSeep/WaterSeepIcon"
   },
   "BasicSelectionSoundSpec": {
@@ -151,7 +151,8 @@
   "ActivationWarningStatusSpec": {
     "StatusSpriteName": "WaterSourceCountdown",
     "StatusLocKey": "Status.TimedActivationWarning",
-    "UseInfiniteWarning": false
+    "UseInfiniteWarning": false,
+    "WarningSound": "UI.Buildings.Warnings.SourceActivationAlert"
   },
   "ActivationProgressParticlesSpec": {
     "AttachmentIds": [
@@ -173,11 +174,11 @@
         "Parent": "#Model",
         "Position": {
           "X": 1.0,
-          "Y": 0.0,
+          "Y": 0.3,
           "Z": 1.0
         },
         "Rotation": {
-          "X": 0.0,
+          "X": -90.0,
           "Y": 0.0,
           "Z": 0.0
         },

@@ -1,0 +1,51 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
+    <Style path="UI/Views/Editor/BlockSystem/BlockSystemStyle" />
+    <ui:VisualElement name="Blocks">
+        <ui:VisualElement name="BlockObjectVisibility" class="block-object__layer-visibility">
+            <ui:MinMaxSlider name="LayerRangeSlider" />
+            <ui:Toggle name="HideUnoccupiedToggle" text="Hide unoccupied" />
+        </ui:VisualElement>
+        <ui:VisualElement name="BlocksHeader" class="block-object__blocks-header">
+            <ui:VisualElement class="block-spec__coords-column" />
+            <ui:VisualElement class="block-spec__column">
+                <ui:Label text="Matter below" />
+            </ui:VisualElement>
+            <ui:VisualElement class="block-spec__column">
+                <ui:Label text="Occupations" />
+            </ui:VisualElement>
+            <ui:VisualElement class="block-spec__column">
+                <ui:Label text="Stackable" />
+            </ui:VisualElement>
+            <ui:VisualElement class="block-spec__bool-column">
+                <ui:Label text="Occupy all below" />
+            </ui:VisualElement>
+            <ui:VisualElement class="block-spec__bool-column">
+                <ui:Label text="Underground" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="BlocksContainer" />
+        <ui:VisualElement name="BulkSettings" class="block-object__bulk-settings">
+            <ui:VisualElement class="block-spec__coords-column" />
+            <ui:VisualElement name="MatterBelowBulkSetter" class="block-spec__column">
+                <ui:Button name="SetMatterBelowButton" text="Set visible to:" class="block-object__bulk-setter-button" />
+                <ui:EnumField name="MatterBelowDropdown" class="block-object__bulk-setter-dropdown" />
+            </ui:VisualElement>
+            <ui:VisualElement name="OccupationBulkSetter" class="block-spec__column">
+                <ui:Button name="SetOccupationButton" text="Set visible to:" class="block-object__bulk-setter-button" />
+                <uie:EnumFlagsField name="OccupationDropdown" class="block-object__bulk-setter-dropdown" />
+            </ui:VisualElement>
+            <ui:VisualElement name="StackableBulkSetter" class="block-spec__column">
+                <ui:Button name="SetStackableButton" text="Set visible to:" class="block-object__bulk-setter-button" />
+                <uie:EnumField name="StackableDropdown" class="block-object__bulk-setter-dropdown" />
+            </ui:VisualElement>
+            <ui:VisualElement name="OccupyAllBelowBulkSetter" class="block-spec__bool-column">
+                <ui:Button name="SetOccupyAllBelowButton" text="Set visible to:" class="block-object__bulk-setter-button" />
+                <ui:Toggle name="OccupyAllBelowToggle" />
+            </ui:VisualElement>
+            <ui:VisualElement name="UndergroundBulkSetter" class="block-spec__bool-column">
+                <ui:Button name="SetUndergroundButton" text="Set visible to:" class="block-object__bulk-setter-button" />
+                <ui:Toggle name="UndergroundToggle" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

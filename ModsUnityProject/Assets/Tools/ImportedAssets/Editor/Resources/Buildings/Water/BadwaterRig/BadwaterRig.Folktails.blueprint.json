@@ -329,8 +329,10 @@
     "FlavorDescriptionLocKey": "Building.BadwaterRig.FlavorDescription",
     "Icon": "Buildings/Water/BadwaterRig/BadwaterRigIcon"
   },
-  "BottomMatchingTemplateSpec": {
-    "RequiredTemplateAtBottomName": "BadwaterSource"
+  "UnderstructureConstraintSpec": {
+    "UnderstructureTemplateNames": [
+      "BadwaterSource"
+    ]
   },
   "WaterSourceDisablerSpec": {},
   "WorkplaceSpec": {
@@ -382,7 +384,7 @@
       "Smoke"
     ]
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "BlockObjectNavMeshSettingsSpec": {
     "NoAutoWalls": false,
     "GenerateFloorsOnStackable": false,
@@ -411,7 +413,8 @@
         ]
       }
     ],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "ConstructionSiteProgressVisualizerSpec": {
     "ProgressThresholds": [

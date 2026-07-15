@@ -14,7 +14,7 @@
     ],
     "ScienceCost": 350,
     "PlaceFinished": false,
-    "FinishableWithBeaversOnSite": false,
+    "FinishableWithBeaversOnSite": true,
     "DrawRangeBoundsOnIt": false
   },
   "BuildingModelSpec": {
@@ -95,7 +95,8 @@
         ]
       }
     ],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "BlockObjectSpec": {
     "Size": {
@@ -150,7 +151,7 @@
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.SpiralStairs.DisplayName",
     "DescriptionLocKey": "",
-    "FlavorDescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "Building.SpiralStairs.FlavorDescription",
     "Icon": "Buildings/Paths/SpiralStairs/SpiralStairsIcon"
   },
   "BlockObjectWithPathRangeSpec": {},

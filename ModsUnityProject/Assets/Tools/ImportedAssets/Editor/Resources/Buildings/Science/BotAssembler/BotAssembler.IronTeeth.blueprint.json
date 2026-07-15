@@ -167,7 +167,7 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.BotAssembler.DisplayName",
     "DescriptionLocKey": "Building.BotAssembler.Description",
@@ -203,6 +203,11 @@
       }
     ]
   },
+  "IlluminatorLightObjectsSpec": {
+    "AttachmentIds": [
+      "Sparks"
+    ]
+  },
   "BotManufactoryAnimationControllerSpec": {
     "AssemblyDuration": 0.5,
     "RingRotationSpeed": 100.0,
@@ -213,16 +218,20 @@
       "Sparks"
     ]
   },
-  "DrivewayModelSpec": {
-    "Driveway": "NarrowCenter",
-    "HasCustomCoordinates": false,
-    "CustomCoordinates": {
-      "X": 0,
-      "Y": 0,
-      "Z": 0
-    },
-    "CustomDirection": "Down",
-    "DrivewayMode": "Unidirectional"
+  "DrivewayModelsSpec": {
+    "Driveways": [
+      {
+        "Driveway": "NarrowCenter",
+        "HasCustomCoordinates": false,
+        "CustomCoordinates": {
+          "X": 0,
+          "Y": 0,
+          "Z": 0
+        },
+        "CustomDirection": "Down",
+        "DrivewayMode": "Unidirectional"
+      }
+    ]
   },
   "ManufactoryProgressVisualizerSpec": {
     "ProgressSteps": [

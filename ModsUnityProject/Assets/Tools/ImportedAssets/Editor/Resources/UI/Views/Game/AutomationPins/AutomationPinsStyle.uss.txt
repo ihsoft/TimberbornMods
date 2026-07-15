@@ -1,0 +1,32 @@
+.pin-list {
+    align-items: flex-start;
+}
+
+.pin {
+    flex-direction: row;
+    margin: 2px 0;
+    align-items: center;
+}
+
+.pin:hover:enabled.hover-enabled .extension-panel-background,
+.pin:hover:enabled.hover-enabled.extension-panel-background {
+    background-color: rgba(204, 204, 153, 0.8);
+}
+
+.pin:hover:enabled.hover-enabled .pin__name {
+    color: black;
+}
+
+.pin__state {
+    align-self: stretch;
+    justify-content: center;
+}
+
+.pin__state:hover {
+    background-color: rgba(204, 204, 153, 0.8);
+}
+
+.pin__name {
+    padding: 3px 6px 3px 2px;
+    align-items: center;
+}

@@ -1,0 +1,12 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <cui:NineSliceVisualElement name="ClutchFragment" class="clutch-fragment">
+        <cui:NineSliceVisualElement name="ModeWrapper" class="clutch-fragment__mode-wrapper entity-sub-panel bg-sub-box--green">
+            <ui:VisualElement name="ModeToggle" />
+            <ui:Label name="ModeLabel" text="Title" class="entity-panel__text clutch-fragment__mode-label" />
+        </cui:NineSliceVisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

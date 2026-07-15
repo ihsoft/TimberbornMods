@@ -1,0 +1,10 @@
+{
+  "KeyBindingSpec": {
+    "Id": "PinnedLever8",
+    "GroupId": "Automation",
+    "LocKey": "KeyBinding.PinnedLever8",
+    "Order": 170,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  }
+}

@@ -1,0 +1,23 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <cui:NineSliceVisualElement name="RelayFragment" class="entity-sub-panel bg-sub-box--green">
+        <Timberborn.DropdownSystem.Dropdown name="Mode" force-label="true" class="game-dropdown standard-automation-dropdown" />
+        <Timberborn.AutomationUI.TransmitterSelector name="InputA" label-loc-key="Automation.Input.A" />
+        <Timberborn.AutomationUI.TransmitterSelector name="InputB" label-loc-key="Automation.Input.B" />
+        <Timberborn.AutomationUI.TransmitterSelector name="InputC" label-loc-key="Automation.Input.C" />
+        <Timberborn.AutomationUI.TransmitterSelector name="InputD" label-loc-key="Automation.Input.D" />
+        <Timberborn.AutomationUI.TransmitterSelector name="InputE" label-loc-key="Automation.Input.E" />
+        <Timberborn.AutomationUI.TransmitterSelector name="InputF" label-loc-key="Automation.Input.F" />
+        <Timberborn.AutomationUI.TransmitterSelector name="InputG" label-loc-key="Automation.Input.G" />
+        <Timberborn.AutomationUI.TransmitterSelector name="InputH" label-loc-key="Automation.Input.H" />
+        <cui:NineSliceButton name="AddInput" class="relay-fragment__add-input entity-fragment__button--green">
+            <ui:Image name="AddInputIcon" class="relay-fragment__icon button-plus--bare" />
+        </cui:NineSliceButton>
+        <cui:NineSliceVisualElement name="ModeDescriptionWrapper" class="entity-fragment__explanation bg-sub-box--blue">
+            <ui:Label name="ModeDescription" text="Description" class="entity-panel__text text--centered" />
+        </cui:NineSliceVisualElement>
+    </cui:NineSliceVisualElement>
+</ui:UXML>

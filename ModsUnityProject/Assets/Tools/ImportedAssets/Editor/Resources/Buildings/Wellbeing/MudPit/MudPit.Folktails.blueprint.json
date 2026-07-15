@@ -163,7 +163,7 @@
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Wellbeing",
-    "ToolOrder": 130,
+    "ToolOrder": 150,
     "ToolShape": "Square",
     "Layout": "Single",
     "CustomPivot": {
@@ -183,7 +183,7 @@
     "FlavorDescriptionLocKey": "Building.MudPit.FlavorDescription",
     "Icon": "Buildings/Wellbeing/MudPit/MudPitIcon"
   },
-  "EnterableLightingSpec": {},
+  "EnterableIlluminatorSpec": {},
   "GoodConsumingAttractionSpec": {},
   "GoodConsumingBuildingSpec": {
     "FullInventoryWorkHours": 20,
@@ -200,16 +200,20 @@
       "Bubbles"
     ]
   },
-  "DrivewayModelSpec": {
-    "Driveway": "WideCenter",
-    "HasCustomCoordinates": false,
-    "CustomCoordinates": {
-      "X": 0,
-      "Y": 0,
-      "Z": 0
-    },
-    "CustomDirection": "Down",
-    "DrivewayMode": "Unidirectional"
+  "DrivewayModelsSpec": {
+    "Driveways": [
+      {
+        "Driveway": "WideCenter",
+        "HasCustomCoordinates": false,
+        "CustomCoordinates": {
+          "X": 0,
+          "Y": 0,
+          "Z": 0
+        },
+        "CustomDirection": "Down",
+        "DrivewayMode": "Unidirectional"
+      }
+    ]
   },
   "ConstructionSiteProgressVisualizerSpec": {
     "ProgressThresholds": [

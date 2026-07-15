@@ -1,0 +1,14 @@
+{
+  "TutorialSpec": {
+    "Id": "MoreBeavers",
+    "NameLocKey": "Tutorial.MoreBeavers",
+    "RequiredTutorialIds": [
+      "Housing"
+    ],
+    "SkipIfTutorialFinished": "HousingAndPopulation",
+    "SortOrder": 60,
+    "Stages": [
+      "MoreBeavers.GrowPopulation"
+    ]
+  }
+}

@@ -789,7 +789,7 @@
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Wellbeing",
-    "ToolOrder": 90,
+    "ToolOrder": 100,
     "ToolShape": "Square",
     "Layout": "Single",
     "CustomPivot": {
@@ -809,14 +809,15 @@
     "FlavorDescriptionLocKey": "Building.Agora.FlavorDescription",
     "Icon": "Buildings/Wellbeing/Agora/AgoraIcon"
   },
-  "BuildingLightObjectsSpec": {
+  "IlluminatorLightObjectsSpec": {
     "AttachmentIds": [
       "Flames"
     ]
   },
-  "EnterableLightingSpec": {},
+  "EnterableIlluminatorSpec": {},
   "FireSpec": {
-    "AttachmentId": "Fire"
+    "AttachmentId": "Fire",
+    "HasLight": false
   },
   "BuildingTerrainCutoutSpec": {
     "CutoutTiles": [

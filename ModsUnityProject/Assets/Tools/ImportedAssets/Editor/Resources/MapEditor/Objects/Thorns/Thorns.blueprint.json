@@ -58,7 +58,7 @@
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.Thorns.DisplayName",
     "DescriptionLocKey": "Building.Thorns.Description",
-    "FlavorDescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "Building.Thorns.FlavorDescription",
     "Icon": "MapEditor/Objects/Thorns/ThornsIcon"
   },
   "BasicSelectionSoundSpec": {

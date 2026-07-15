@@ -157,7 +157,8 @@
     "NoAutoWalls": false,
     "GenerateFloorsOnStackable": true,
     "EdgeGroups": [],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "BuildingAccessibleSpec": {
     "LocalAccess": {
@@ -183,7 +184,7 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "EnterableLightingSpec": {},
+  "EnterableIlluminatorSpec": {},
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.Barrack.DisplayName",
     "DescriptionLocKey": "Building.Barrack.Description",

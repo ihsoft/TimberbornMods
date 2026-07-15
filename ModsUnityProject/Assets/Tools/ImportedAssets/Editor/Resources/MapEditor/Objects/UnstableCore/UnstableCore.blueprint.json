@@ -75,7 +75,7 @@
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.UnstableCore.DisplayName",
     "DescriptionLocKey": "Building.UnstableCore.Description",
-    "FlavorDescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "Building.UnstableCore.FlavorDescription",
     "Icon": "MapEditor/Objects/UnstableCore/UnstableCoreIcon"
   },
   "TimedComponentActivatorSpec": {
@@ -89,7 +89,8 @@
   "ActivationWarningStatusSpec": {
     "StatusSpriteName": "UnstableCoreCountdown",
     "StatusLocKey": "Status.UnstableCoreActivationWarning",
-    "UseInfiniteWarning": true
+    "UseInfiniteWarning": true,
+    "WarningSound": "UI.Buildings.Warnings.UnstableCoreAlert"
   },
   "BasicSelectionSoundSpec": {
     "SoundName": "UnstableCore",
@@ -110,11 +111,14 @@
   "UnstableCoreEffectsSpawnerSpec": {
     "ExplosionPrefabPath": "MapEditor/Objects/UnstableCore/UnstableCoreExplosion"
   },
+  "IlluminatorLightObjectsSpec": {
+    "AttachmentIds": [
+      "Light"
+    ]
+  },
   "UnstableCoreLightingSpec": {
     "MinInterval": 0.5,
-    "MaxInterval": 1.5,
-    "LightStrength": 5.0,
-    "AttachmentId": "Light"
+    "MaxInterval": 1.5
   },
   "TemplateAttachmentsSpec": {
     "Attachments": [

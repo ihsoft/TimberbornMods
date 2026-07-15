@@ -1,0 +1,25 @@
+﻿{
+  "GoodSpec": {
+    "Id": "MetalPart",
+    "BackwardCompatibleIds": [],
+    "ConsumptionEffects": [],
+    "GoodType": "Box",
+    "StockpileVisualization": "Box",
+    "VisibleContainer": "Box",
+    "ContainerColor": {
+      "r": 0.7490196,
+      "g": 0.7490196,
+      "b": 0.7490196,
+      "a": 1.0
+    },
+    "ContainerMaterial": "",
+    "CarryingAnimation": "CarryInHands",
+    "Weight": 3,
+    "GoodGroupId": "Materials",
+    "GoodOrder": 3010,
+    "Icon": "Sprites/Goods/MetalPartIcon",
+    "ForceImport": false,
+    "DisplayNameLocKey": "Good.MetalPart.DisplayName",
+    "PluralDisplayNameLocKey": "Good.MetalPart.PluralDisplayName"
+  }
+}

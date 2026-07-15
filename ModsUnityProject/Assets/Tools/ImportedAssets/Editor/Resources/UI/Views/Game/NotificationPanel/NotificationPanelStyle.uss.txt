@@ -1,6 +1,7 @@
 .notification-panel-wrapper {
     padding: 0;
     width: 270px;
+    margin-bottom: 3px;
 }
 
 .notification-panel {

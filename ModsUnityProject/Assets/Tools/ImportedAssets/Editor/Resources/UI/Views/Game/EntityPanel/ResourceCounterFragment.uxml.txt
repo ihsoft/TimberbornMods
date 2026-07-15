@@ -1,0 +1,20 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <ui:VisualElement name="ResourceCounterFragment">
+        <cui:NineSliceVisualElement name="ModeRadioToggleContainer" class="entity-sub-panel bg-sub-box--green" />
+        <cui:NineSliceVisualElement name="BottomSection" class="entity-sub-panel bg-sub-box--green automation-counter-fragment">
+            <Timberborn.DropdownSystem.Dropdown name="Good" class="automation-counter-fragment__primary-dropdown game-dropdown" />
+            <cui:LocalizableToggle name="Toggle" text="Include inputs" text-loc-key="Building.ResourceCounter.IncludeInputs" class="game-toggle automation-counter-fragment__toggle" />
+            <ui:Label name="Measurement" class="game-text-big automation-counter-fragment__measurement" />
+            <ui:VisualElement name="ComparisonWrapper" class="automation-counter-fragment__threshold-wrapper">
+                <Timberborn.DropdownSystem.Dropdown name="ComparisonMode" class="automation-counter-fragment__comparison-mode-dropdown" />
+                <cui:NineSliceIntegerField name="Threshold" max-length="9" class="entity-panel-setting__input entity-panel-input automation-fragment__integer-input" />
+            </ui:VisualElement>
+            <ui:Label name="FillRateLabel" text="50%" class="game-text-big automation-counter-fragment__threshold" />
+            <cui:PreciseSlider name="FillRateSlider" class="automation-counter-slider" />
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

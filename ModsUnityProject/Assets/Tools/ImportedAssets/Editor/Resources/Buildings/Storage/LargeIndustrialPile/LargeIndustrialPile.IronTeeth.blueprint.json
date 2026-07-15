@@ -163,7 +163,8 @@
     "NoAutoWalls": false,
     "GenerateFloorsOnStackable": true,
     "EdgeGroups": [],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.LargeIndustrialPile.DisplayName",

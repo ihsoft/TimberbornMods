@@ -66,7 +66,8 @@
     "NoAutoWalls": true,
     "GenerateFloorsOnStackable": false,
     "EdgeGroups": [],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Landscaping",
@@ -87,7 +88,7 @@
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.DoubleDynamite.DisplayName",
     "DescriptionLocKey": "Building.Dynamite.Description",
-    "FlavorDescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "Building.DoubleDynamite.FlavorDescription",
     "Icon": "Buildings/Landscaping/DoubleDynamite/DoubleDynamiteIcon"
   },
   "ConstructionSiteProgressVisualizerSpec": {

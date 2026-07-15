@@ -3,6 +3,7 @@
     "Id": "Tutorial",
     "NameLocKey": "Tutorial.Tutorial",
     "RequiredTutorialIds": [],
+    "SkipIfTutorialFinished": "",
     "SortOrder": 0,
     "Stages": [
       "Tutorial.Introduction"

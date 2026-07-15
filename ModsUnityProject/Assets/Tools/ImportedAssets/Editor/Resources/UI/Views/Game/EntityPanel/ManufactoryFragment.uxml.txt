@@ -4,6 +4,6 @@
     <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
     <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
     <cui:NineSliceVisualElement name="ManufactoryFragment" class="entity-sub-panel bg-sub-box--green">
-        <Timberborn.DropdownSystem.Dropdown name="Recipes" label-loc-key="Manufactory.CurrentRecipe" />
+        <Timberborn.DropdownSystem.Dropdown name="Recipes" label-loc-key="Manufactory.CurrentRecipe" class="game-dropdown" />
     </cui:NineSliceVisualElement>
 </ui:UXML>

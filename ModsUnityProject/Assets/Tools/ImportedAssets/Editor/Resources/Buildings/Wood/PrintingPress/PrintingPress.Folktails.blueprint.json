@@ -236,7 +236,7 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.PrintingPress.DisplayName",
     "DescriptionLocKey": "Building.PrintingPress.Description",

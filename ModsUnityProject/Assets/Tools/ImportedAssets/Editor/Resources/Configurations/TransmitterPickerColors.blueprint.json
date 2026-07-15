@@ -1,0 +1,22 @@
+{
+  "TransmitterPickerColorsSpec": {
+    "TransmitterColor": {
+      "r": 0.0,
+      "g": 0.247058824,
+      "b": 0.3529412,
+      "a": 1.0
+    },
+    "UnfinishedTransmitterColor": {
+      "r": 0.0,
+      "g": 0.113952376,
+      "b": 0.160377383,
+      "a": 1.0
+    },
+    "HoveredTransmitterColor": {
+      "r": 0.0,
+      "g": 0.5019608,
+      "b": 0.07058824,
+      "a": 1.0
+    }
+  }
+}

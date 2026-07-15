@@ -11,7 +11,15 @@
                 <ui:VisualElement name="ModeDetails" class="new-game-mode-panel__mode-details">
                     <ui:Label name="ModeDescription" class="new-game-mode-panel__mode-description" />
                     <cui:LocalizableButton name="CustomizeButton" text-loc-key="NewGameConfigurationPanel.Customize" class="wide-menu-button new-game-mode-panel__mode-customize-button" />
+                    <ui:VisualElement name="TutorialToggleWrapper" class="new-game-mode-panel__setting-wrapper">
+                        <ui:Toggle name="TutorialToggle" class="new-game-mode-panel__setting-toggle" />
+                        <cui:LocalizableLabel text-loc-key="Tutorial.Tutorial" class="new-game-mode-panel__tutorial-label" />
+                    </ui:VisualElement>
                     <ui:ScrollView name="CustomModeSettings" horizontal-scroller-visibility="Hidden" class="new-game-mode-panel__scroll-view scroll--green-decorated">
+                        <ui:VisualElement name="TutorialToggleCustomWrapper" class="new-game-mode-panel__setting-wrapper">
+                            <ui:Toggle name="TutorialToggleCustom" class="new-game-mode-panel__setting-toggle" />
+                            <cui:LocalizableLabel text-loc-key="Tutorial.Tutorial" class="new-game-mode-panel__setting-label" />
+                        </ui:VisualElement>
                         <ui:VisualElement name="StartingAdultsWrapper" class="new-game-mode-panel__setting-wrapper">
                             <cui:LocalizableLabel text-loc-key="NewGameConfigurationPanel.StartingAdults" class="new-game-mode-panel__setting-label" />
                             <cui:NineSliceIntegerField name="StartingAdults" class="new-game-mode-panel__setting-input text-field" />

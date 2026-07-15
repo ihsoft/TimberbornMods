@@ -1,0 +1,10 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Game/BatchControl/BatchControlStyle.uss" />
+    <ui:VisualElement name="PopulationStatisticsGraph" class="population-statistics-graph">
+        <cui:NineSliceVisualElement name="GraphWrapper" class="population-statistics-graph__wrapper bg-box--green">
+            <ui:Label name="Title" class="game-text-heading population-statistics-graph__title" text="Population Statistics" />
+            <cui:Graph name="Graph" class="population-statistics-graph__graph" />
+            <ui:VisualElement name="Toggles" class="population-statistics-graph__toggles" />
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

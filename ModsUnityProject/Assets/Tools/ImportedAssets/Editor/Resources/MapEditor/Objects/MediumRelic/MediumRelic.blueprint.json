@@ -1,0 +1,142 @@
+{
+  "TemplateSpec": {
+    "TemplateName": "MediumRelic",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 3,
+      "Y": 2,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Ground",
+        "Occupations": "Floor, Bottom, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": false,
+      "Coordinates": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": true
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "MapEditorObjects",
+    "ToolOrder": 1400,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": true
+  },
+  "StartableMarkerPositionUpdaterSpec": {},
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.Relic.DisplayName",
+    "DescriptionLocKey": "Building.Relic.Description",
+    "FlavorDescriptionLocKey": "Building.MediumRelic.FlavorDescription",
+    "Icon": "MapEditor/Objects/MediumRelic/MediumRelicIcon"
+  },
+  "BasicSelectionSoundSpec": {
+    "SoundName": "Relic",
+    "AlternativeSoundName": ""
+  },
+  "BlockObjectModelSpec": {
+    "FullModelName": "#Model",
+    "UncoveredModelName": "",
+    "UndergroundModelName": "#Underground",
+    "UndergroundModelDepth": 1
+  },
+  "BlockObjectNavMeshAdderSpec": {},
+  "DemolishableScienceRewardSpec": {
+    "SciencePoints": 800
+  },
+  "DemolishableSpec": {
+    "DemolishTimeInHours": 4.0,
+    "ShowDemolishButtonInEntityPanel": true
+  },
+  "DemolishableFromTopSpec": {},
+  "Children": {
+    "#Model": {
+      "TimbermeshSpec": {
+        "Model": "MapEditor/Objects/MediumRelic/MediumRelic.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 1.5,
+              "Y": 0.0487027019,
+              "Z": 1.0
+            },
+            "Size": {
+              "X": 2.55,
+              "Y": 0.0974054039,
+              "Z": 1.5
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Underground": {
+      "TimbermeshSpec": {
+        "Model": "MapEditor/Objects/MediumRelic/MediumRelic.Underground.Model"
+      }
+    }
+  }
+}

@@ -196,11 +196,13 @@
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.GeothermalEngine.DisplayName",
     "DescriptionLocKey": "Building.GeothermalEngine.Description",
-    "FlavorDescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "Building.GeothermalEngine.FlavorDescription",
     "Icon": "Buildings/Power/GeothermalEngine/GeothermalEngineIcon"
   },
-  "BottomMatchingTemplateSpec": {
-    "RequiredTemplateAtBottomName": "GeothermalField"
+  "UnderstructureConstraintSpec": {
+    "UnderstructureTemplateNames": [
+      "GeothermalField"
+    ]
   },
   "ConstructionSiteProgressVisualizerSpec": {
     "ProgressThresholds": [
@@ -272,7 +274,6 @@
       "Z": 0
     }
   },
-  "InfinitePowerGeneratorSpec": {},
   "FinishedBlockObjectBelowBlockerSpec": {},
   "TemplateAttachmentsSpec": {
     "Attachments": [

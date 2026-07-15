@@ -91,7 +91,7 @@
     "ToolGroupId": "Storage",
     "ToolOrder": 10,
     "ToolShape": "Square",
-    "Layout": "Single",
+    "Layout": "SideLine",
     "CustomPivot": {
       "HasCustomPivot": false,
       "Coordinates": {

@@ -1,0 +1,21 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Core/CoreStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Common/EntityPanel/EntityPanelCommonStyle.uss" />
+    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
+    <ui:VisualElement name="FillValveFragment">
+        <cui:NineSliceVisualElement name="TargetHeightWrapper" class="entity-sub-panel content-stretched bg-sub-box--green">
+            <cui:LocalizableLabel name="TargetHeightStateLabel" text-loc-key="Automation.State.Off" class="entity-panel__text entity-panel__text--centered" />
+            <ui:Label name="TargetHeightLabel" text="TargetHeight" class="text--centered entity-panel__text" />
+            <cui:PreciseSlider name="TargetHeightSlider" />
+        </cui:NineSliceVisualElement>
+        <cui:NineSliceVisualElement name="AutomationTargetHeightWrapper" class="entity-sub-panel content-stretched bg-sub-box--green">
+            <cui:LocalizableLabel name="AutomationTargetHeightStateLabel" text-loc-key="Automation.State.On" class="entity-panel__text entity-panel__text--centered" />
+            <ui:Label name="AutomationTargetHeightLabel" text="TargetHeight" class="text--centered entity-panel__text" />
+            <cui:PreciseSlider name="AutomationTargetHeightSlider" />
+        </cui:NineSliceVisualElement>
+        <cui:NineSliceVisualElement name="SynchronizeWrapper" class="entity-sub-panel bg-sub-box--green">
+            <cui:LocalizableToggle name="Synchronize" text-loc-key="Building.FillValve.Synchronize" class="game-toggle entity-panel__text entity-panel__toggle" text="Synchronize" />
+        </cui:NineSliceVisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -95,7 +95,7 @@
     "ToolGroupId": "Food",
     "ToolOrder": 10,
     "ToolShape": "Square",
-    "Layout": "Single",
+    "Layout": "SideLine",
     "CustomPivot": {
       "HasCustomPivot": false,
       "Coordinates": {
@@ -117,7 +117,7 @@
     "FlavorDescriptionLocKey": "Building.GathererFlag.FlavorDescription",
     "Icon": "Buildings/Food/GathererFlag/GathererFlagIcon"
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "YieldRemovingBuildingSpec": {
     "ResourceGroup": "Gatherable"
   },
@@ -125,6 +125,9 @@
     "ProgressThresholds": [
       0.0
     ]
+  },
+  "WorkplaceWorkerOutfitSpec": {
+    "WorkerOutfit": "Gatherer"
   },
   "Children": {
     "#Finished": {

@@ -2801,7 +2801,7 @@
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Monuments",
-    "ToolOrder": 500,
+    "ToolOrder": 50,
     "ToolShape": "Hex",
     "Layout": "Single",
     "CustomPivot": {
@@ -2968,9 +2968,10 @@
         ]
       }
     ],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "WindParticleControllerSpec": {
     "AttachmentIds": [
       "Lanterns"
@@ -3107,7 +3108,7 @@
               {
                 "Center": {
                   "X": 3.5,
-                  "Y": 0.0,
+                  "Y": 0.08952963,
                   "Z": 3.5
                 },
                 "Size": {
@@ -3119,7 +3120,7 @@
               {
                 "Center": {
                   "X": 3.5,
-                  "Y": 0.0,
+                  "Y": 0.08560687,
                   "Z": 3.5
                 },
                 "Size": {
@@ -3131,7 +3132,7 @@
               {
                 "Center": {
                   "X": 3.5,
-                  "Y": 0.0,
+                  "Y": 0.09061283,
                   "Z": 3.5
                 },
                 "Size": {
@@ -3154,7 +3155,7 @@
               {
                 "Center": {
                   "X": 3.5,
-                  "Y": 0.0,
+                  "Y": 0.08001274,
                   "Z": 3.5
                 },
                 "Size": {
@@ -3166,7 +3167,7 @@
               {
                 "Center": {
                   "X": 3.5,
-                  "Y": 0.0,
+                  "Y": 0.08001268,
                   "Z": 3.5
                 },
                 "Size": {
@@ -3178,7 +3179,7 @@
               {
                 "Center": {
                   "X": 3.5,
-                  "Y": 0.0,
+                  "Y": 0.07637575,
                   "Z": 3.5
                 },
                 "Size": {
@@ -3213,7 +3214,7 @@
               {
                 "Center": {
                   "X": 3.5,
-                  "Y": 0.06006366,
+                  "Y": 0.1289737,
                   "Z": 3.5
                 },
                 "Size": {
@@ -3225,7 +3226,7 @@
               {
                 "Center": {
                   "X": 3.5,
-                  "Y": 0.06006354,
+                  "Y": 0.124666721,
                   "Z": 3.5
                 },
                 "Size": {
@@ -3237,7 +3238,7 @@
               {
                 "Center": {
                   "X": 3.5,
-                  "Y": 0.06006354,
+                  "Y": 0.124666691,
                   "Z": 3.5
                 },
                 "Size": {

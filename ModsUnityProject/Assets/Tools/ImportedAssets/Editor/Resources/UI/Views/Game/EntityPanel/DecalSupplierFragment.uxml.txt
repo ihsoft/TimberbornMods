@@ -8,10 +8,10 @@
             </ui:ScrollView>
         </cui:NineSliceVisualElement>
         <cui:NineSliceVisualElement class="entity-sub-panel bg-sub-box--green">
-            <cui:LocalizableLabel name="UserPatternsLabel" text-loc-key="Decals.UserPatterns" class="entity-panel__text decal-supplier-fragment__user-patterns-label" />
-            <ui:VisualElement name="UserDecalButtons" class="decal-supplier-fragment__user-decal-buttons">
-                <cui:LocalizableButton name="BrowseButton" text-loc-key="Decals.Browse" class="entity-fragment__button entity-fragment__button--red decal-supplier-fragment__user-decal-button entity-panel__text" />
-                <cui:LocalizableButton name="RefreshButton" text-loc-key="Decals.Refresh" class="entity-fragment__button entity-fragment__button--red decal-supplier-fragment__user-decal-button entity-panel__text" />
+            <cui:LocalizableLabel name="UserPatternsLabel" text-loc-key="Decals.UserPatterns" class="entity-panel__text text--centered" />
+            <ui:VisualElement name="UserDecalButtonsWrapper" class="entity-panel__button-wrapper">
+                <cui:LocalizableButton name="BrowseButton" text-loc-key="Button.Browse" class="entity-fragment__button entity-fragment__button--red entity-fragment__button--narrow entity-panel__text" />
+                <cui:LocalizableButton name="RefreshButton" text-loc-key="Button.Refresh" class="entity-fragment__button entity-fragment__button--red entity-fragment__button--narrow entity-panel__text" />
             </ui:VisualElement>
         </cui:NineSliceVisualElement>
     </cui:NineSliceVisualElement>

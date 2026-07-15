@@ -207,7 +207,7 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.PaperMill.DisplayName",
     "DescriptionLocKey": "Building.PaperMill.Description",

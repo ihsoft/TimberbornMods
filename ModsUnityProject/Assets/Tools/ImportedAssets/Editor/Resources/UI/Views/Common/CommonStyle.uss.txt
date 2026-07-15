@@ -494,6 +494,10 @@
     font-size: 14px;
 }
 
+.dropdown-item--none .dropdown-item__text {
+    color: rgb(130, 130, 130);
+}
+
 .camera-action-marker {
     background-image: resource('UI/Images/Core/dragging-icon');
     height: 32px;
@@ -592,6 +596,7 @@
     flex-grow: 0;
     flex-shrink: 0;
     margin-right: -35px;
+    background-image: resource('UI/Images/Core/faction-logo-placeholder');
 }
 
 .map-selection__empty-text {
@@ -829,10 +834,7 @@
     background-image: resource('UI/Images/Core/scroll-down');
 }
 
-.level-tool-marker {
-    background-image: resource('UI/Images/Core/level-tool-marker');
-    height: 32px;
-    width: 32px;
-    translate: -16px -16px;
-    position: absolute;
+.game-dropdown {
+    flex-grow: 1;
+    margin: 3px 2px 3px 0;
 }

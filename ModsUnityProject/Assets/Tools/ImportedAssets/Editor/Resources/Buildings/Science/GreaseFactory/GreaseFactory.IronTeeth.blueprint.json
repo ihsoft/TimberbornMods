@@ -248,7 +248,7 @@
     "FlavorDescriptionLocKey": "Building.GreaseFactory.FlavorDescription",
     "Icon": "Buildings/Science/GreaseFactory/GreaseFactoryIcon"
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "SimpleManufactoryBehaviorsSpec": {},
   "WorkshopWorkerHiderSpec": {},
   "WorkshopAnimationControllerSpec": {},

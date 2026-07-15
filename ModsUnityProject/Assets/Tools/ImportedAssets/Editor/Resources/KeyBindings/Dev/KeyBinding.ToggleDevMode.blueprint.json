@@ -10,6 +10,6 @@
   "PrimaryInputBindingSpec": {
     "Path": "/Keyboard/z",
     "InputModifiers": "Alt, Shift",
-    "Unchangeable": false
+    "Unchangeable": true
   }
 }

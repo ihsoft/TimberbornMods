@@ -222,7 +222,7 @@
   "PlanterBuildingSpec": {
     "PlantableResourceGroup": "Forester"
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.Forester.DisplayName",
     "DescriptionLocKey": "Building.Forester.Description",
@@ -233,6 +233,9 @@
     "ProgressThresholds": [
       0.0
     ]
+  },
+  "WorkplaceWorkerOutfitSpec": {
+    "WorkerOutfit": "Forester"
   },
   "Children": {
     "#Finished": {

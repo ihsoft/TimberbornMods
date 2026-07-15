@@ -210,7 +210,8 @@
     "NoAutoWalls": false,
     "GenerateFloorsOnStackable": false,
     "EdgeGroups": [],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "BuildingAccessibleSpec": {
     "LocalAccess": {
@@ -236,7 +237,7 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.DeepWaterPump.DisplayName",
     "DescriptionLocKey": "Building.DeepWaterPump.Description",
@@ -251,10 +252,12 @@
       "X": 0,
       "Y": 2,
       "Z": -1
-    },
-    "MaxDepth": 6,
+    }
+  },
+  "WaterInputPipeSpec": {
     "PipeSegmentPrefabPath": "Buildings/Water/DeepWaterPump/DeepWaterPumpPipeSegment.IronTeeth",
-    "PipeParentName": "#Finished"
+    "PipeParentName": "#Finished",
+    "MaxDepth": 6
   },
   "ConstructionSiteProgressVisualizerSpec": {
     "ProgressThresholds": [

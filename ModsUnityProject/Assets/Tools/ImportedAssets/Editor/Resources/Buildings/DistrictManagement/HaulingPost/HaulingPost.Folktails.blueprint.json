@@ -241,7 +241,7 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.HaulingPost.DisplayName",
     "DescriptionLocKey": "Building.HaulingPost.Description",

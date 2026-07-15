@@ -5,6 +5,7 @@
     "RequiredTutorialIds": [
       "Tutorial"
     ],
+    "SkipIfTutorialFinished": "",
     "SortOrder": 10,
     "Stages": [
       "Basics.MoveCamera",

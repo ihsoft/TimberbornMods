@@ -77,7 +77,7 @@
     "ToolGroupId": "Storage",
     "ToolOrder": 60,
     "ToolShape": "Square",
-    "Layout": "Single",
+    "Layout": "SideLine",
     "CustomPivot": {
       "HasCustomPivot": false,
       "Coordinates": {
@@ -124,7 +124,7 @@
       0.0
     ]
   },
-  "StockpileLightingSpec": {},
+  "StockpileIlluminatorSpec": {},
   "Children": {
     "#Finished": {
       "TimbermeshSpec": {

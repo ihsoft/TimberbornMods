@@ -8,7 +8,7 @@
         "Amount": 400
       },
       {
-        "Id": "TreatedPlank",
+        "Id": "Plank",
         "Amount": 100
       },
       {
@@ -16,7 +16,7 @@
         "Amount": 300
       }
     ],
-    "ScienceCost": 12000,
+    "ScienceCost": 9000,
     "PlaceFinished": false,
     "FinishableWithBeaversOnSite": false,
     "DrawRangeBoundsOnIt": false
@@ -573,7 +573,7 @@
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Monuments",
-    "ToolOrder": 420,
+    "ToolOrder": 31,
     "ToolShape": "Square",
     "Layout": "Single",
     "CustomPivot": {

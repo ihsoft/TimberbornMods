@@ -293,7 +293,7 @@
     "FlavorDescriptionLocKey": "Building.Refinery.FlavorDescription",
     "Icon": "Buildings/Science/Refinery/RefineryIcon"
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "SimpleManufactoryBehaviorsSpec": {},
   "WorkshopRandomNeedApplierSpec": {
     "Effects": [

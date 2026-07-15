@@ -1,0 +1,4 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="/Assets/Resources/UI/Views/Game/BatchControl/BatchControlStyle.uss" />
+    <ui:Toggle text="Check" name="Toggle" class="game-toggle game-text-normal population-statistics-toggle" />
+</ui:UXML>

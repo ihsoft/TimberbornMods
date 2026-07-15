@@ -16,6 +16,17 @@
     white-space: normal;
 }
 
+.entity-panel__text--centered {
+    align-self: center;
+    padding: 0 6px;
+}
+
+.entity-panel__text--highlight-white {
+    color: rgb(0, 0, 0);
+    background-color: rgb(204, 204, 204);
+    border-radius: 2px;
+}
+
 .entity-panel__heading-text {
     color: rgb(204, 204, 204);
     font-size: 14px;
@@ -113,7 +124,10 @@
 }
 
 .entity-panel__button-wrapper {
-    margin-top: 8px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 6px 0;
 }
 
 .entity-panel__header-button-wrapper {
@@ -121,16 +135,18 @@
     margin-bottom: 8px;
 }
 
-.single-button-fragment {
-    background-image: none;
-    align-items: center;
-    padding: 15px 0;
-}
-
 .entity-fragment__button {
     min-width: 50%;
     padding: 4px;
     --click-sound: "UI.Click";
+}
+
+.entity-fragment__button--narrow {
+    min-width: 5%;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-left: 3px;
+    margin-right: 3px;
 }
 
 .entity-fragment__button--silent {
@@ -161,6 +177,14 @@
     --background-slice: 10;
 }
 
+.entity-fragment__explanation {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 16px;
+    margin: 4px 0;
+}
+
 .entity-panel__top-wrapper {
     flex-direction: column-reverse;
 }
@@ -171,9 +195,9 @@
 }
 
 .entity-panel__buttons--right {
-    flex-direction: row;
+    flex-direction: row-reverse;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: flex-start;
 }
 
 .entity-panel__buttons--middle {
@@ -262,6 +286,12 @@ Button.entity-panel__button--red:hover:enabled {
     margin: 4px 0;
 }
 
+.entity-panel__toggle--centered {
+    align-self: center;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
 .entity-panel__follow {
     background-image: resource('UI/Images/Game/ico-eye');
 }
@@ -272,6 +302,10 @@ Button.entity-panel__button--red:hover:enabled {
 
 .entity-panel__unselect {
     background-image: resource('UI/Images/Game/ico-cancel');
+}
+
+.entity-panel__customize {
+    background-image: resource('UI/Images/Game/ico-customize');
 }
 
 .entity-panel__row {
@@ -352,12 +386,6 @@ Button.entity-panel__button--red:hover:enabled {
 
 .science-cost__slash {
     margin-right: 2px;
-}
-
-.wonder-fragment__activate-button {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    align-self: center;
 }
 
 .entity-debug-window__tab .unity-tab__header {

@@ -148,12 +148,12 @@
     "FlavorDescriptionLocKey": "Building.RooftopTerrace.FlavorDescription",
     "Icon": "Buildings/Wellbeing/RooftopTerrace/RooftopTerraceIcon"
   },
-  "BuildingLightObjectsSpec": {
+  "IlluminatorLightObjectsSpec": {
     "AttachmentIds": [
       "Light"
     ]
   },
-  "EnterableLightingSpec": {},
+  "EnterableIlluminatorSpec": {},
   "ConstructionSiteProgressVisualizerSpec": {
     "ProgressThresholds": [
       0.0

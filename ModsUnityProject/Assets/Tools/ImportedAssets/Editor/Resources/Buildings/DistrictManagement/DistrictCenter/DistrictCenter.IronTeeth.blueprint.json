@@ -382,6 +382,14 @@
     "DevModeTool": false
   },
   "DistrictCenterSpec": {},
+  "NamedEntitySpec": {
+    "IsEditable": true
+  },
+  "NumberedEntityNamerSpec": {
+    "FormatLocKey": "Districts.DefaultDistrictName",
+    "NumberingGroup": "Districts",
+    "IsPersistent": false
+  },
   "BlockObjectNavMeshSettingsSpec": {
     "NoAutoWalls": false,
     "GenerateFloorsOnStackable": false,
@@ -423,7 +431,8 @@
         ]
       }
     ],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "WorkplaceSpec": {
     "MaxWorkers": 4,
@@ -455,7 +464,7 @@
       }
     ]
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "FloodableFireSpec": {},
   "BuilderHubSpec": {},
   "LabeledEntitySpec": {
@@ -472,7 +481,8 @@
     }
   },
   "FireSpec": {
-    "AttachmentId": "Fire"
+    "AttachmentId": "Fire",
+    "HasLight": false
   },
   "WorkplaceWorkerOutfitSpec": {
     "WorkerOutfit": "Builder"

@@ -80,11 +80,12 @@
     "NoAutoWalls": false,
     "GenerateFloorsOnStackable": true,
     "EdgeGroups": [],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Paths",
-    "ToolOrder": 71,
+    "ToolOrder": 82,
     "ToolShape": "Square",
     "Layout": "SideLine",
     "CustomPivot": {

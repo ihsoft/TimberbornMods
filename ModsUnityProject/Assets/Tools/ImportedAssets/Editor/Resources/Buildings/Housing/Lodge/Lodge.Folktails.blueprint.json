@@ -102,18 +102,23 @@
     "NoAutoWalls": false,
     "GenerateFloorsOnStackable": true,
     "EdgeGroups": [],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
-  "DrivewayModelSpec": {
-    "Driveway": "NarrowLeft",
-    "HasCustomCoordinates": false,
-    "CustomCoordinates": {
-      "X": 0,
-      "Y": 0,
-      "Z": 0
-    },
-    "CustomDirection": "Down",
-    "DrivewayMode": "Unidirectional"
+  "DrivewayModelsSpec": {
+    "Driveways": [
+      {
+        "Driveway": "NarrowLeft",
+        "HasCustomCoordinates": false,
+        "CustomCoordinates": {
+          "X": 0,
+          "Y": 0,
+          "Z": 0
+        },
+        "CustomDirection": "Down",
+        "DrivewayMode": "Unidirectional"
+      }
+    ]
   },
   "BuildingAccessibleSpec": {
     "LocalAccess": {
@@ -139,7 +144,7 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "EnterableLightingSpec": {},
+  "EnterableIlluminatorSpec": {},
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.Lodge.DisplayName",
     "DescriptionLocKey": "Building.Lodge.Description",

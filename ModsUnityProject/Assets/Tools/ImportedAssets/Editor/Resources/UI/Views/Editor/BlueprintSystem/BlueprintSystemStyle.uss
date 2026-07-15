@@ -94,6 +94,10 @@
     margin: 4px;
 }
 
+.blueprint-preview-overlay__content > .unity-toggle > .unity-toggle__label {
+    min-width: 175px;
+}
+
 .blueprint-element-buttons {
     flex-direction: row;
     margin-top: 4px;
@@ -121,4 +125,21 @@
 
 .blueprint-element-foldout .unity-list-view__footer > .unity-button {
     -unity-font-style: normal;
+}
+
+.missing-spec-warning {
+    flex-direction: row;
+}
+
+.missing-spec-warning__icon {
+    background-image: resource('UI/Images/Core/warning_triangle');
+    width: 20px;
+    height: 20px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    margin: 3px;
+}
+
+.missing-spec-warning__message {
+    -unity-text-align: middle-center;
 }

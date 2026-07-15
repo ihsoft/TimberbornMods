@@ -3,12 +3,12 @@
     "Id": "OpenWellbeingBox",
     "GroupId": "SettlementPanel",
     "LocKey": "KeyBinding.OpenWellbeingPanel",
-    "Order": 90,
+    "Order": 110,
     "AllowOtherModifiers": false,
     "DevModeOnly": false
   },
   "PrimaryInputBindingSpec": {
-    "Path": "/Keyboard/f9",
+    "Path": "/Keyboard/o",
     "InputModifiers": "None",
     "Unchangeable": false
   }

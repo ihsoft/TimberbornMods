@@ -89,7 +89,8 @@
     "NoAutoWalls": true,
     "GenerateFloorsOnStackable": false,
     "EdgeGroups": [],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "ConstructionSiteProgressVisualizerSpec": {
     "ProgressThresholds": [

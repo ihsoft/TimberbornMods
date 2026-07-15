@@ -198,7 +198,7 @@
       0.0
     ]
   },
-  "StockpileLightingSpec": {},
+  "StockpileIlluminatorSpec": {},
   "Children": {
     "#Finished": {
       "TimbermeshSpec": {

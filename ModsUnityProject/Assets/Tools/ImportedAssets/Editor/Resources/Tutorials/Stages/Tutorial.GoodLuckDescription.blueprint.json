@@ -1,9 +1,0 @@
-{
-  "TutorialStageSpec": {
-    "Id": "Tutorial.GoodLuckDescription",
-    "IntroLocKey": "Tutorial.GoodLuck.Description"
-  },
-  "CustomTutorialButtonSpec": {
-    "ButtonLocKey": "Tutorial.Finish"
-  }
-}

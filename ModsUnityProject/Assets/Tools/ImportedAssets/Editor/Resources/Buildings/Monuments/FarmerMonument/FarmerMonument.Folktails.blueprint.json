@@ -164,7 +164,7 @@
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Monuments",
-    "ToolOrder": 360,
+    "ToolOrder": 10,
     "ToolShape": "Square",
     "Layout": "Single",
     "CustomPivot": {
@@ -317,7 +317,7 @@
         },
         "ConstructionStage1": {
           "TimbermeshSpec": {
-            "Model": "Buildings/Monuments/FarmerMonument/FarmerMonument.Folktails..ConstructionStage1.Model"
+            "Model": "Buildings/Monuments/FarmerMonument/FarmerMonument.Folktails.ConstructionStage1.Model"
           },
           "CollidersSpec": {
             "BoxColliders": [

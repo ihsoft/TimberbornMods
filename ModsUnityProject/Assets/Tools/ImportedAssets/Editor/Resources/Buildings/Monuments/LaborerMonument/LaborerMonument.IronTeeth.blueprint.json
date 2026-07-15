@@ -164,7 +164,7 @@
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Monuments",
-    "ToolOrder": 360,
+    "ToolOrder": 11,
     "ToolShape": "Square",
     "Layout": "Single",
     "CustomPivot": {

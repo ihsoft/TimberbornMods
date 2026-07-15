@@ -3,7 +3,10 @@
     <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
     <Style src="/Assets/Resources/UI/Views/Common/BottomBar/BottomBarStyle.uss" />
     <ui:VisualElement name="ToolGroup" class="tool-group">
-        <ui:VisualElement name="ToolButtons" class="tool-group__buttons" />
+        <ui:VisualElement name="ToolButtons" class="tool-group__buttons">
+            <ui:VisualElement name="StartSpacer" class="tool-group__spacer" />
+            <ui:VisualElement name="EndSpacer" class="tool-group__spacer" />
+        </ui:VisualElement>
         <ui:VisualElement name="ToolGroupButtonWrapper" class="bottom-bar-button">
             <ui:VisualElement name="ToolButtonMainContainer" class="bottom-bar-button--main">
                 <ui:Button name="ToolGroupButton" class="bottom-bar-button__icon bottom-bar-button__button bottom-bar-button--clickable">

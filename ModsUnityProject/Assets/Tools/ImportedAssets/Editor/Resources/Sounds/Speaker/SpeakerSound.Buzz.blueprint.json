@@ -1,0 +1,6 @@
+{
+  "SpeakerSoundSpec": {
+    "SoundId": "Environment.Buildings.Speaker.Buzz",
+    "DisplayNameLocKey": "Building.Speaker.Sound.Buzz"
+  }
+}

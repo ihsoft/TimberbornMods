@@ -618,7 +618,7 @@
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Wellbeing",
-    "ToolOrder": 120,
+    "ToolOrder": 141,
     "ToolShape": "Square",
     "Layout": "Single",
     "CustomPivot": {
@@ -638,8 +638,8 @@
     "FlavorDescriptionLocKey": "Building.Motivatorium.FlavorDescription",
     "Icon": "Buildings/Wellbeing/Motivatorium/MotivatoriumIcon"
   },
-  "EnterableLightingSpec": {},
-  "BuildingLightObjectsSpec": {
+  "EnterableIlluminatorSpec": {},
+  "IlluminatorLightObjectsSpec": {
     "AttachmentIds": [
       "Light"
     ]

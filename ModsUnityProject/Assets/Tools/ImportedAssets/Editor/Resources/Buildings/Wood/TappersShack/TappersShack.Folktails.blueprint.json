@@ -165,7 +165,7 @@
     "Capacity": 50,
     "IgnorableCapacity": false
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "TransformSlotInitializerSpec": {
     "Slots": [
       {

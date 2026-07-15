@@ -12,8 +12,8 @@
         "Amount": 15
       },
       {
-        "Id": "MetalBlock",
-        "Amount": 5
+        "Id": "MetalPart",
+        "Amount": 10
       }
     ],
     "ScienceCost": 200,
@@ -102,7 +102,7 @@
     "ToolGroupId": "Science",
     "ToolOrder": 70,
     "ToolShape": "Square",
-    "Layout": "Single",
+    "Layout": "SideLine",
     "CustomPivot": {
       "HasCustomPivot": false,
       "Coordinates": {
@@ -126,7 +126,7 @@
     "PowerInput": 50,
     "IsShaft": false
   },
-  "EnterableLightingSpec": {},
+  "EnterableIlluminatorSpec": {},
   "EnterableParticleControllerSpec": {
     "AttachmentIds": [
       "Smoke"

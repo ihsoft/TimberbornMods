@@ -1,7 +1,7 @@
 {
   "BlockObjectToolGroupSpec": {
     "Id": "Decoration",
-    "Order": 100,
+    "Order": 110,
     "NameLocKey": "ToolGroups.Decoration",
     "Icon": "Sprites/BottomBar/BuildingGroups/Decoration",
     "FallbackGroup": false

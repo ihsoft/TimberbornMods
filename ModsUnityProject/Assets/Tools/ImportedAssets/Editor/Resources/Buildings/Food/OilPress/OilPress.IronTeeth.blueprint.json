@@ -5,15 +5,11 @@
     "BuildingCost": [
       {
         "Id": "Log",
-        "Amount": 20
+        "Amount": 40
       },
       {
-        "Id": "Plank",
-        "Amount": 20
-      },
-      {
-        "Id": "Gear",
-        "Amount": 20
+        "Id": "MetalPart",
+        "Amount": 10
       }
     ],
     "ScienceCost": 120,
@@ -206,7 +202,7 @@
     "CanBeAttachedToTerrainSide": false,
     "DevModeTool": false
   },
-  "WorkplaceLightingSpec": {},
+  "WorkplaceIlluminatorSpec": {},
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.OilPress.DisplayName",
     "DescriptionLocKey": "Building.OilPress.Description",

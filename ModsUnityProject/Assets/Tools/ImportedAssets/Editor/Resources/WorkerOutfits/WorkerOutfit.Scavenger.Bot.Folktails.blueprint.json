@@ -1,0 +1,12 @@
+{
+  "WorkerOutfitSpec": {
+    "Id": "Scavenger",
+    "FactionId": "Folktails",
+    "WorkerType": "Bot",
+    "DiffuseTexture": "",
+    "NormalTexture": "",
+    "Attachments": [
+      "ScavengerHat.Bot.Folktails"
+    ]
+  }
+}

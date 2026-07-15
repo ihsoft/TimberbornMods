@@ -71,7 +71,7 @@
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Decoration",
-    "ToolOrder": 100,
+    "ToolOrder": 110,
     "ToolShape": "Square",
     "Layout": "Single",
     "CustomPivot": {
@@ -88,7 +88,7 @@
   "LabeledEntitySpec": {
     "DisplayNameLocKey": "Building.PoleBanner.DisplayName",
     "DescriptionLocKey": "Building.PoleBanner.Description",
-    "FlavorDescriptionLocKey": "",
+    "FlavorDescriptionLocKey": "Building.PoleBanner.FlavorDescription",
     "Icon": "Buildings/Decoration/PoleBanner/PoleBannerIcon"
   },
   "DecalSupplierSpec": {

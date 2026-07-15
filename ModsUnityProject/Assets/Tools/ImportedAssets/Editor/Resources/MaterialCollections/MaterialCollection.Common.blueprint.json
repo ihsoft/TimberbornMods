@@ -31,7 +31,8 @@
       "NaturalResources/Bushes/Blueberry/Materials/Blueberry",
       "NaturalResources/Trees/Birch/Materials/Birch",
       "NaturalResources/Trees/Oak/Materials/Oak",
-      "NaturalResources/Trees/Pine/Materials/Pine"
+      "NaturalResources/Trees/Pine/Materials/Pine",
+      "NaturalResources/Trees/Succulent/Materials/Succulent"
     ]
   }
 }

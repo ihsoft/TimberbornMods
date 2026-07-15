@@ -148,10 +148,12 @@
       "X": 0,
       "Y": 1,
       "Z": -1
-    },
-    "MaxDepth": 6,
+    }
+  },
+  "WaterInputPipeSpec": {
     "PipeSegmentPrefabPath": "Buildings/Wellbeing/DoubleShower/DoubleShowerPipeSegment.IronTeeth",
-    "PipeParentName": "#Finished"
+    "PipeParentName": "#Finished",
+    "MaxDepth": 6
   },
   "ConstructionSiteProgressVisualizerSpec": {
     "ProgressThresholds": [

@@ -1,0 +1,10 @@
+{
+  "KeyBindingSpec": {
+    "Id": "PinnedLever5",
+    "GroupId": "Automation",
+    "LocKey": "KeyBinding.PinnedLever5",
+    "Order": 140,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  }
+}

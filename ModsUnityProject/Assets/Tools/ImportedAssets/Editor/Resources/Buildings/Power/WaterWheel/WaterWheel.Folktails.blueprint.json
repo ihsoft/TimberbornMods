@@ -31,7 +31,8 @@
     "NoAutoWalls": false,
     "GenerateFloorsOnStackable": false,
     "EdgeGroups": [],
-    "UnblockedCoordinates": []
+    "UnblockedCoordinates": [],
+    "BlockedEdges": []
   },
   "BlockObjectSpec": {
     "Size": {
@@ -259,7 +260,7 @@
   },
   "WaterWheelSpec": {},
   "MechanicalNodeDescriptionSpec": {
-    "AlternativePowerUnitLocKey": "Mechanical.PowerSymbolPerFlow"
+    "AlternativePowerUnitLocKey": "Unit.HorsePowerPerCubicMeterPerSecond.NumberAndUnit"
   },
   "ConstructionSiteProgressVisualizerSpec": {
     "ProgressThresholds": [

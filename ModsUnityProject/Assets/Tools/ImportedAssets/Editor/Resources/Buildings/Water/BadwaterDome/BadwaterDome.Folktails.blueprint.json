@@ -266,8 +266,10 @@
     "FlavorDescriptionLocKey": "Building.BadwaterDome.FlavorDescription",
     "Icon": "Buildings/Water/BadwaterDome/BadwaterDomeIcon"
   },
-  "BottomMatchingTemplateSpec": {
-    "RequiredTemplateAtBottomName": "BadwaterSource"
+  "UnderstructureConstraintSpec": {
+    "UnderstructureTemplateNames": [
+      "BadwaterSource"
+    ]
   },
   "WaterSourceRegulatorSpec": {},
   "WaterSourceRegulatorAnimationControllerSpec": {

@@ -35,6 +35,7 @@
     max-width: 155px;
     white-space: nowrap;
     text-overflow: ellipsis;
+    overflow: hidden;
     --click-sound: "UI.Click";
 }
 

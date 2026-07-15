@@ -6,7 +6,7 @@
         <ui:VisualElement name="Tutorial" class="tutorial-panel__content">
             <ui:Label name="Intro" text="Build some buildings." class="game-text-normal tutorial-panel__intro" />
             <ui:VisualElement name="TutorialSteps" class="tutorial-panel__steps" />
-            <cui:NineSliceButton name="Continue" text="Continue" class="tutorial-panel__continue game-text-normal" />
+            <cui:LocalizableButton name="Continue" text="Continue" text-loc-key="Tutorial.Continue" class="tutorial-panel__continue game-text-normal" />
             <ui:Button name="Disable" class="tutorial-panel__disable" />
         </ui:VisualElement>
         <ui:VisualElement name="TutorialHeader" class="tutorial-panel__header">

@@ -104,6 +104,15 @@
       0.0
     ]
   },
+  "BuildingDetailTextureSpec": {
+    "Texture": "Buildings/Decoration/BulletinPole/BulletinPole_Detail",
+    "Color": {
+      "r": 0.274509817,
+      "g": 0.196078435,
+      "b": 0.152941182,
+      "a": 0.0
+    }
+  },
   "Children": {
     "#Finished": {
       "TimbermeshSpec": {

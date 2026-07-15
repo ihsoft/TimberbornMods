@@ -9,14 +9,10 @@
       },
       {
         "Id": "TreatedPlank",
-        "Amount": 100
-      },
-      {
-        "Id": "MetalBlock",
-        "Amount": 300
+        "Amount": 200
       }
     ],
-    "ScienceCost": 12000,
+    "ScienceCost": 9000,
     "PlaceFinished": false,
     "FinishableWithBeaversOnSite": false,
     "DrawRangeBoundsOnIt": false
@@ -932,7 +928,7 @@
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Monuments",
-    "ToolOrder": 420,
+    "ToolOrder": 30,
     "ToolShape": "Square",
     "Layout": "Single",
     "CustomPivot": {
@@ -1004,13 +1000,13 @@
         "Parent": "#Finished",
         "Position": {
           "X": 2.5,
-          "Y": 2.55,
+          "Y": 2.6,
           "Z": 2.5
         },
         "Rotation": {
-          "X": 270.0,
-          "Y": 180.0,
-          "Z": 0.0
+          "X": -90.0,
+          "Y": 0.0,
+          "Z": 180.0
         },
         "Scale": {
           "X": 1.0,

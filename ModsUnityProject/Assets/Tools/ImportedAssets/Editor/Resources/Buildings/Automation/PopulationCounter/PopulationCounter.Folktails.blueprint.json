@@ -1,0 +1,227 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "Automation",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "Plank",
+        "Amount": 2
+      },
+      {
+        "Id": "Gear",
+        "Amount": 2
+      },
+      {
+        "Id": "Paper",
+        "Amount": 1
+      }
+    ],
+    "ScienceCost": 200,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": false,
+    "DrawRangeBoundsOnIt": false
+  },
+  "TemplateSpec": {
+    "TemplateName": "PopulationCounter.Folktails",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "NamedEntitySpec": {
+    "IsEditable": true
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 1,
+      "Y": 1,
+      "Z": 2
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "Any",
+        "Occupations": "Floor, Bottom, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": true,
+      "Coordinates": {
+        "X": 0,
+        "Y": -1,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Automation",
+    "ToolOrder": 90,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.PopulationCounter.DisplayName",
+    "DescriptionLocKey": "Building.PopulationCounter.Description",
+    "FlavorDescriptionLocKey": "",
+    "Icon": "Buildings/Automation/PopulationCounter/PopulationCounterIcon"
+  },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
+  "PopulationCounterSpec": {},
+  "FloodableObjectBlockerSpec": {},
+  "BuildingAccessibleSpec": {
+    "LocalAccess": {
+      "X": 0.5,
+      "Y": 0.0,
+      "Z": 0.5
+    },
+    "ForceOneFinalAccess": false
+  },
+  "BuildingDetailTextureSpec": {
+    "Texture": "Buildings/Automation/PopulationCounter/PopulationCounterDetail",
+    "Color": {
+      "r": 0.329411775,
+      "g": 0.329411775,
+      "b": 0.329411775,
+      "a": 1.0
+    }
+  },
+  "DefaultIlluminatorColorSpec": {
+    "ColorId": "Automator"
+  },
+  "Children": {
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Automation/PopulationCounter/PopulationCounter.Folktails.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.5,
+              "Z": 0.5
+            },
+            "Size": {
+              "X": 0.6248417,
+              "Y": 0.836176753,
+              "Z": 0.548106551
+            }
+          },
+          {
+            "Center": {
+              "X": 0.5,
+              "Y": 0.0446733236,
+              "Z": 0.447527528
+            },
+            "Size": {
+              "X": 0.795484364,
+              "Y": 0.08225961,
+              "Z": 0.8905659
+            }
+          },
+          {
+            "Center": {
+              "X": 0.5029193,
+              "Y": 1.30841386,
+              "Z": 0.499650329
+            },
+            "Size": {
+              "X": 0.386644959,
+              "Y": 0.7137232,
+              "Z": 0.3850508
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase1x1#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase1x1/ConstructionBase1x1.blueprint"
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Automation/PopulationCounter/PopulationCounter.Folktails.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 0.5,
+                  "Y": 0.0532829165,
+                  "Z": 0.496716976
+                },
+                "Size": {
+                  "X": 0.795253754,
+                  "Y": 0.099999994,
+                  "Z": 0.7965758
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.501479864,
+                  "Y": 0.637621164,
+                  "Z": 0.497758985
+                },
+                "Size": {
+                  "X": 0.5493319,
+                  "Y": 0.6403015,
+                  "Z": 0.479188442
+                }
+              },
+              {
+                "Center": {
+                  "X": 0.501479864,
+                  "Y": 0.637621164,
+                  "Z": 0.5001607
+                },
+                "Size": {
+                  "X": 0.141040087,
+                  "Y": 1.06540513,
+                  "Z": 0.14717114
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        }
+      }
+    }
+  }
+}

@@ -89,7 +89,7 @@
     "ToolGroupId": "Wellbeing",
     "ToolOrder": 50,
     "ToolShape": "Square",
-    "Layout": "Single",
+    "Layout": "SideLine",
     "CustomPivot": {
       "HasCustomPivot": false,
       "Coordinates": {
@@ -116,7 +116,7 @@
       }
     ]
   },
-  "EnterableLightingSpec": {},
+  "EnterableIlluminatorSpec": {},
   "EntererNeedSuspendingBuildingSpec": {
     "NeedSuspender": {
       "SuspendableNeedIds": [

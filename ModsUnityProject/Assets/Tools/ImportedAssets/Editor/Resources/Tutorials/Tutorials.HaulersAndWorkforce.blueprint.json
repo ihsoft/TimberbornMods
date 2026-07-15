@@ -1,0 +1,16 @@
+{
+  "TutorialSpec": {
+    "Id": "HaulersAndWorkforce",
+    "NameLocKey": "Tutorial.HaulersAndWorkforce",
+    "RequiredTutorialIds": [
+      "UnemployedBeaversTrigger"
+    ],
+    "SkipIfTutorialFinished": "GoodLuck",
+    "SortOrder": 160,
+    "Stages": [
+      "HaulersAndWorkforce.BuildHaulingPost",
+      "HaulersAndWorkforce.ChangeWorkforce",
+      "HaulersAndWorkforce.PauseHaulingPost"
+    ]
+  }
+}

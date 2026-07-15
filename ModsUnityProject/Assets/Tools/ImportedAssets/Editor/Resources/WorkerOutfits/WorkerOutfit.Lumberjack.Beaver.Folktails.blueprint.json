@@ -1,0 +1,10 @@
+{
+  "WorkerOutfitSpec": {
+    "Id": "Lumberjack",
+    "FactionId": "Folktails",
+    "WorkerType": "Beaver",
+    "DiffuseTexture": "Materials/Beavers/Common/WorkerOutfits/LumberjackStrings_D",
+    "NormalTexture": "Materials/Beavers/Common/WorkerOutfits/LumberjackStrings_N",
+    "Attachments": []
+  }
+}

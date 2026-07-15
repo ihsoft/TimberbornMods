@@ -193,7 +193,7 @@
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Monuments",
-    "ToolOrder": 400,
+    "ToolOrder": 20,
     "ToolShape": "Square",
     "Layout": "Single",
     "CustomPivot": {
@@ -232,7 +232,13 @@
     ]
   },
   "FireSpec": {
-    "AttachmentId": "Fire"
+    "AttachmentId": "Fire",
+    "HasLight": true
+  },
+  "IlluminatorLightObjectsSpec": {
+    "AttachmentIds": [
+      "Fire"
+    ]
   },
   "ConstructionSiteProgressVisualizerSpec": {
     "ProgressThresholds": [
