@@ -84,12 +84,35 @@ Follow the current official [Unity setup](https://github.com/mechanistry/timberb
 5. Wait for the import and Unity compilation to finish. Verify that `ModsUnityProject/Assets/Plugins/Timberborn`
    exists and contains the imported/publicized game DLLs before attempting batch compilation or export.
 
-The importer also refreshes game assets under `ModsUnityProject/Assets/Tools/ImportedAssets`. Repeat the import after
-game updates when the official tool requires it.
+The importer also refreshes dynamic, game-version-specific assets under
+`ModsUnityProject/Assets/Tools/ImportedAssets`. Keep that output local and ignored, and repeat the import after game
+updates when the official tool requires it.
 
 This repository already tracks the Timberborn Modding Tools under `ModsUnityProject/Assets/Tools`. Do not also install
 the tools from their Git package URL when that directory and its `package.json` are present; that is the alternative
 setup for a Unity project that does not already contain the tools.
+
+#### ImportedAssets Lifecycle
+
+`ModsUnityProject/Assets/Tools/ImportedAssets` is dynamic, game-version-specific output owned by the official
+Timberborn importer. `ModsUnityProject/.gitignore` intentionally ignores it. Keep it local and never stage or commit
+it, including with `git add -f`. Re-run the importer after relevant game updates instead of storing a snapshot in Git.
+
+Do not treat legacy tracked files or historical refresh commits as evidence that a tracked snapshot is intended. If
+legacy tracked files exist, get explicit user approval for a dedicated cleanup, then remove only this path from the
+Git index while preserving the local importer output:
+
+```powershell
+git rm -r --cached -- ModsUnityProject/Assets/Tools/ImportedAssets
+```
+
+Before committing that cleanup, verify that:
+
+- `git ls-files -- ModsUnityProject/Assets/Tools/ImportedAssets` returns no tracked paths,
+- the local `ImportedAssets` files still exist,
+- `git ls-files --others --ignored --exclude-standard -- ModsUnityProject/Assets/Tools/ImportedAssets` reports the
+  local output as ignored,
+- the staged diff contains the expected index deletions and no path outside the explicitly approved cleanup scope.
 
 ### Ignored Local Configs And Generated Folders
 
