@@ -51,6 +51,7 @@ packaging them.
 
 ## Knowledge boundaries
 
-Read detailed implementation patterns from the task-specific modding rules. Read repository-specific paths,
-conventions, package ownership, shared-library roles, and validation commands from the current repository notes and
-local instruction files. Treat lessons learned as evidence-backed pitfalls, not as a replacement for current rules.
+Read detailed implementation patterns from the task-specific modding rules. Read repository-specific architecture,
+roles, conventions, and history from the current repository notes. Read package ownership and validation commands from
+Timberborn Repository Validation Operational Knowledge and local instruction files. Treat lessons learned as
+evidence-backed pitfalls, not as a replacement for current rules.

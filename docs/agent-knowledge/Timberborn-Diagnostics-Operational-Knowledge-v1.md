@@ -8,7 +8,8 @@ possible subsystem or applying speculative fixes.
 This document controls diagnostic method, not the implementation or release policy for a particular subsystem. Also
 read every other instruction selected by the root routing table for the affected package and task. In particular:
 
-- use `docs/timberborn-repository-notes.md` for package ownership and build, export, and test selection;
+- use Timberborn Repository Validation Operational Knowledge for package ownership and build, export, and test
+  selection;
 - use Timberborn Unity Operational Knowledge for Unity source, imported references, export, and package-layer ownership;
 - use the bootstrap rules for missing tools, aliases, generated references, Unity installation, or local environment;
 - use the UI Toolkit notes for in-game UI problems;
@@ -68,10 +69,10 @@ problem if the mod never initialized.
 | Boundary | Start with | Route detailed handling to |
 |---|---|---|
 | Environment and references | aliases, tool/editor/game versions, generated-reference provenance, license readiness | bootstrap rules |
-| C# compilation | the first compiler error and the compile-only command from the package matrix | repository notes and modding rules |
-| Post-build copy | build success versus copy-target failure, resolved `ModPath`, output timestamps | repository notes |
+| C# compilation | the first compiler error and the compile-only command from the package matrix | repository validation knowledge and modding rules |
+| Post-build copy | build success versus copy-target failure, resolved `ModPath`, output timestamps | repository validation knowledge |
 | Unity import or export | the current per-run log under `.tools/unity-logs`, then global Unity `Editor.log` if execution stopped before the batch method | Unity knowledge, then bootstrap or release rules |
-| Local package | manifest, compatibility folder, DLL/data/assets, timestamps, exact source-to-output ownership | Unity knowledge, package matrix, and release rules |
+| Local package | manifest, compatibility folder, DLL/data/assets, timestamps, exact source-to-output ownership | Unity and repository validation knowledge, then release rules |
 | Game discovery and load | current runtime logs under `_LOGS!`, enabled-mod state, dependencies, first load or initialization exception | modding rules and local `AGENTS.md` |
 | Runtime behavior | minimal reproduction, owning game system, lifecycle and timing, narrow repository logs | modding how-to and lessons learned |
 | UI behavior | mod initialization first, then template, styles, localization, panel/dialog lifecycle, and visual result | UI Toolkit notes |

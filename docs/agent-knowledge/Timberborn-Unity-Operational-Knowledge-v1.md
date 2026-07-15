@@ -7,8 +7,8 @@ Use this model to identify ownership and select the correct pipeline without tre
 source.
 
 This document does not repeat environment setup, package-specific commands, UI patterns, diagnostics, or release
-procedure. Read bootstrap, repository notes, UI Toolkit notes, Diagnostics Operational Knowledge, and release rules when
-their routing conditions apply.
+procedure. Read bootstrap, Repository Validation Operational Knowledge, UI Toolkit notes, Diagnostics Operational
+Knowledge, and release rules when their routing conditions apply.
 
 ## Artifact Model
 

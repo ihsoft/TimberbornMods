@@ -6,6 +6,9 @@ This document contains repository-specific knowledge that is useful when working
 
 Unlike the general modding guides, the contents of this document are specific to this repository and its development practices.
 
+Package-specific build, export, real-game output, and focused test selection live in
+`docs/agent-knowledge/Timberborn-Repository-Validation-Operational-Knowledge-v1.md`.
+
 ---
 
 ## Repository Structure
@@ -92,67 +95,6 @@ coverage.
 
 TimberUI is a dead mod kept only for reference. It does not build and should be excluded from release, publishing, and
 platform description synchronization workflows unless the user explicitly asks to revive or inspect it.
-
-## Package Build And Validation Matrix
-
-Use this matrix to select the known project, focused test runner, package-data owner, and local instructions. Update it
-when a production project, test project, package-data location, or local `AGENTS.md` is added, removed, or renamed.
-Adding a new mod is not complete until its row records the known production project, focused test status, package-data
-ownership, and any local instructions.
-
-The focused test projects are executable console runners. Run them with `dotnet run --project`, not `dotnet test`.
-`No focused tests` means that no package-specific test project exists in the current repository; it does not mean that
-testing is unnecessary or that an unrelated package's tests should be used instead.
-
-| Scope | Production project | Focused validation after real-game confirmation | Package data | Extra instructions |
-|---|---|---|---|---|
-| Automation | `Automation/Automation.csproj` | `dotnet run --project Automation.Tests/Automation.Tests.csproj` | `ModsUnityProject/Assets/Mods/Automation` | `Automation/AGENTS.md` |
-| AutomationForModdableWeather | `AutomationForModdableWeather/AutomationForModdableWeather.csproj` | No focused tests | Project-local manifest and content | None |
-| CustomTools | `CustomTools/CustomTools.csproj` | `dotnet run --project CustomTools.Tests/CustomTools.Tests.csproj` | `ModsUnityProject/Assets/Mods/CustomTools` | None |
-| SmartHaulers | `SmartHaulers/SmartHaulers.csproj` | No focused tests | Split between `SmartHaulers/Mod` and `ModsUnityProject/Assets/Mods/SmartHaulers` | `SmartHaulers/AGENTS.md` |
-| SmartPower | `SmartPower/SmartPower.csproj` | `dotnet run --project SmartPower.Tests/SmartPower.Tests.csproj` | `ModsUnityProject/Assets/Mods/SmartPower` | None |
-| TimberCommons | `TimberCommons/TimberCommons.csproj` | `dotnet run --project TimberCommons.Tests/TimberCommons.Tests.csproj` | `ModsUnityProject/Assets/Mods/TimberCommons` | `docs/TimberCommons-modding-notes-for-ai-agents.md` |
-| TimberDev source | No standalone production project in the current checkout | `dotnet run --project TimberDev.Tests/TimberDev.Tests.csproj` | No standalone mod package | This document |
-| XRay | `XRay/XRay.csproj` | `dotnet run --project XRay.Tests/XRay.Tests.csproj` | `ModsUnityProject/Assets/Mods/XRay` | `XRay/AGENTS.md` |
-| TimberUI | Reference only; do not build by default | None | `ModsUnityProject/Assets/Mods/TimberUI` | See `Project Roles` above |
-
-`CustomResources`, `TestParser`, `TestSupport`, `UnityDevLite`, and projects under `tools/` are not active mod packages
-in this matrix. They have support, source-sharing, legacy, or tooling roles. Inspect the specific project and task before
-applying a mod build, test, export, or release workflow to one of them.
-
-### Compile-only validation
-
-For a changed production mod project, use the existing compile-only pattern so a post-build copy cannot turn a
-successful compilation into a misleading local-package failure:
-
-```powershell
-dotnet build <ProjectPath>.csproj /p:ModPath=__NoSuchModPath__
-```
-
-This validates compilation only. It does not prepare a package for real-game testing.
-
-### Real-game package output
-
-For a code-only change, resolve the current `_MODS!` alias and pass its absolute target as `ModPath` unless the project
-has already been verified to use that same destination. Do not rely on a project file's historical machine-specific
-default.
-
-For a change under `ModsUnityProject/Assets/Mods/<ModName>/`, use the Unity export path described in `ModsUnityProject`
-above. For SmartHaulers, inspect both package-data locations from the matrix and use the export/build paths required by
-the files changed.
-
-After the package has been updated, verify the expected output artifact or timestamp before asking the user to test in
-the game. Follow the root real-game validation gate before creating, changing, or running regression tests.
-
-### Known downstream relationships
-
-`AutomationForModdableWeather` has a project reference to `Automation`. When an Automation change affects the public
-extension contract used by that plugin, also build `AutomationForModdableWeather` as downstream compile coverage.
-
-TimberDev files are linked directly into multiple production and test projects. Run `TimberDev.Tests` for TimberDev
-changes, then run or build only the downstream packages that actually include the changed shared file or behavior.
-
----
 
 ## Local Tools and Generated Game References
 
@@ -379,112 +321,6 @@ When a bridge between DI and static code is required:
 
 - constructor initialization may be preferable,
 - verify actual execution order before relying on Load().
-
----
-
-## GitHub File Retrieval
-
-When asked to modify repository files:
-
-- retrieve the current file first,
-- verify that retrieval succeeded,
-- avoid reconstructing files from memory.
-
-Repository files are the source of truth.
-
----
-
-## Editing and Verification Workflow
-
-Before editing an existing source file, read the exact current file from the repository. Do not assume it matches
-decompiled game patterns, older conversations, or nearby code.
-
-For rules-maintenance tasks, edit only rule files such as `AGENTS.md` and files under `docs/`. Other repository files
-may be changing in parallel by other agents; ignore unrelated non-rule changes instead of analyzing or cleaning them up.
-
-For large or frequently edited files, prefer small sequential patches:
-
-- dependency registration,
-- fields and injected dependencies,
-- method bodies,
-- cleanup.
-
-After editing, inspect the diff for unrelated changes, encoding-only changes, BOM changes, or line-ending noise. Run:
-
-```powershell
-git diff --check
-```
-
-Before committing, check:
-
-```powershell
-git status --short
-```
-
-Normal `git diff` output does not show untracked files, so use status to avoid missing new tests or accidentally
-committing generated files.
-
-Before submitting a change, run the tests relevant to the changed package.
-
-Do not parallelize multiple `dotnet build` invocations for the same project and configuration unless they use isolated
-intermediate output paths. Builds of the same project share `obj` and can fail with file-lock errors. Run compile-only
-and package-copy builds sequentially.
-
-For TimberDev-only changes, run:
-
-```powershell
-dotnet run --project TimberDev.Tests\TimberDev.Tests.csproj
-```
-
-Do not use other mods as a TimberDev validation gate by default. If a TimberDev change affects logic that another mod
-actually uses, also run that mod's tests as downstream regression coverage. If the change touches a mod, run that mod's
-own tests when they exist. If the change touches shared behavior used by multiple packages, run the affected package
-tests as well.
-
-For test-only changes, run the test project that was changed. Do not run downstream mod tests for test-only changes
-unless the change also modifies shared production code or shared test infrastructure used by those downstream tests.
-
-These relevant tests MUST pass before submitting the change.
-
-Tests must not drive unapproved production-code changes. If adding or expanding tests reveals a production bug, dead
-code, missing API, or design mismatch, stop and ask before changing production code unless the user explicitly asked to
-fix it.
-
-Configurator-only classes that only bind services or declare contexts do not need unit tests unless they contain
-non-trivial logic.
-
-When testing code that depends on Timberborn or game services, prefer the smallest useful test seam.
-
-Test stubs are acceptable when the goal is to cut the game runtime out of unit tests, but keep them narrow. Model only
-the behavior required by the tests being added, and do not expand stubs speculatively.
-
-Unit tests that use local Timberborn stubs do not replace building the changed mod project. When a change touches game
-extension methods, publicized game APIs, or code paths represented by test stubs, also run the changed mod project
-build. Stubs may not model production namespace imports, extension-method resolution, publicized assembly shape, or
-other compile-time details from the real game assemblies.
-
-If a test requires large stubs, reflection into private construction, or duplicated lifecycle behavior, first try the
-smallest test-only approach. If that becomes brittle or obscures the behavior under test, stop and ask whether a
-minimal production-code testability change is acceptable.
-
-When verifying a mod project, distinguish C# compilation failures from post-build target failures. Some projects copy
-outputs to the local game mods folder after building, and that copy step may fail even when the DLL compiled.
-
-If the user says not to run tests, interpret that as "do not run test suites" unless they also explicitly say not to
-build. After code changes, still run the relevant compile or build check when possible.
-
-For compilation-only verification of projects with mod-copy post-build targets, use a non-existent `ModPath`:
-
-```powershell
-dotnet build <ProjectPath>.csproj /p:ModPath=__NoSuchModPath__
-```
-
-Report which build command was used when the ordinary build has repository-specific side effects.
-
-When a mod gameplay, runtime, or UI fix is ready for user real-game validation, a compile-only build is not enough.
-Unless the user explicitly says not to write to `_MODS!`, run the normal mod build that updates the real local mod
-output, then verify the expected DLL/XML or package artifact timestamp when practical. This prevents the user from
-testing an old build in game.
 
 ---
 

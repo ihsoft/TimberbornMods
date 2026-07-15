@@ -33,7 +33,7 @@ blindly.
 | Condition | Read |
 |--------|--------|
 | Generating or modifying C# code | `docs/csharp-formatting-rules-for-ai-agents.md` |
-| Modifying Timberborn mod code, data, UI, localization, or package files | `docs/timberborn-modding-rules-for-ai-agents.md` and `docs/timberborn-repository-notes.md` |
+| Modifying Timberborn mod code, data, UI, localization, or package files | `docs/timberborn-modding-rules-for-ai-agents.md` and `docs/agent-knowledge/Timberborn-Repository-Validation-Operational-Knowledge-v1.md` |
 | Working with `ModsUnityProject`, Unity-owned package data, the Timberborn importer, or Unity export | `docs/agent-knowledge/Timberborn-Unity-Operational-Knowledge-v1.md` |
 | Creating or modifying in-game UI Toolkit views, UXML, USS, dialogs, panels, or fragments | `docs/timberborn-ui-toolkit-notes-for-ai-agents.md` |
 | Designing a new feature or new mod | `docs/timberborn-modding-howto-for-ai-agents.md`, `docs/timberborn-repository-notes.md`, and `docs/timberborn-lessons-learned.md` |
@@ -371,7 +371,8 @@ not start from them.
 ## Required build and test validation
 
 After any applicable real-game validation gate, use the `Package Build And Validation Matrix` in
-`docs/timberborn-repository-notes.md` to select package-specific compile, export, and focused test commands.
+`docs/agent-knowledge/Timberborn-Repository-Validation-Operational-Knowledge-v1.md` to select package-specific compile,
+export, and focused test commands.
 
 - For test-only changes, run the changed test project.
 - For shared behavior changes, run or build only the downstream packages that actually include the changed behavior.
@@ -393,7 +394,7 @@ Follow `docs/timberborn-modding-howto-for-ai-agents.md` for the implementation w
 
 1. Define C# and package-data ownership, compile-only validation, real-game build/export, and focused test selection;
    add or update the mod's row in the `Package Build And Validation Matrix` in
-   `docs/timberborn-repository-notes.md`.
+   `docs/agent-knowledge/Timberborn-Repository-Validation-Operational-Knowledge-v1.md`.
 2. Decide whether durable mod-specific rules justify a local `AGENTS.md`. Do not create an empty local instruction file
    only to satisfy the checklist.
 
