@@ -31,7 +31,7 @@ blindly.
 | Generating or modifying C# code | `docs/csharp-formatting-rules-for-ai-agents.md` |
 | Modifying Timberborn mod code, data, UI, localization, or package files | `docs/timberborn-modding-rules-for-ai-agents.md` and `docs/timberborn-repository-notes.md` |
 | Creating or modifying in-game UI Toolkit views, UXML, USS, dialogs, panels, or fragments | `docs/timberborn-ui-toolkit-notes-for-ai-agents.md` |
-| Designing a new feature or new mod | `docs/timberborn-modding-howto-for-ai-agents.md` and `docs/timberborn-lessons-learned.md` |
+| Designing a new feature or new mod | `docs/timberborn-modding-howto-for-ai-agents.md`, `docs/timberborn-repository-notes.md`, and `docs/timberborn-lessons-learned.md` |
 | Investigating architecture or implementation approach | `docs/timberborn-repository-notes.md` and `docs/timberborn-lessons-learned.md` |
 | Editing or reviewing GitHub Wiki pages | `docs/wiki/Wiki-Operational-Knowledge-v1.md` and `docs/timberborn-wiki-editing-rules-for-ai-agents.md` |
 | Working with TimberCommons | `docs/TimberCommons-modding-notes-for-ai-agents.md` |
@@ -242,6 +242,8 @@ reminder is needed to prevent repeated misses.
 - Prefer extension over replacement.
 - Prefer dependency injection over Harmony when possible.
 - Use Harmony only when no reasonable extension point exists.
+- Localize player-facing text; do not hardcode visible English strings in UI or gameplay messages.
+- Before using reflection or `AccessTools`, check for direct access through publicized game assemblies.
 
 ## Portable local paths
 
@@ -271,22 +273,13 @@ the main repository.
 
 ## Research before implementation
 
-When working on a new feature:
+For a new feature, find the closest existing game feature and investigate the applicable data ownership, dependencies,
+persistence, UI integration, and extension points before implementing. Record any item that could not be established
+and why it does not block a reversible next step.
 
-1. Find the closest existing game feature.
-2. Study the implementation.
-3. Understand ownership of the data.
-4. Understand dependencies.
-5. Understand save/load behavior.
-6. Understand UI integration.
-7. Identify extension points.
-8. Only then begin implementation.
-
-Prefer understanding over patching.
-
-Prefer evidence over assumptions.
-
-Copy architecture, not implementation.
+Research should answer a concrete implementation decision, not attempt to prove exhaustively that no alternative
+exists. Use the bounded research workflow in `docs/timberborn-modding-howto-for-ai-agents.md` when the answer is not
+readily available.
 
 ## Repository file changes
 
@@ -297,9 +290,11 @@ When asked to modify a repository file:
 3. Preserve unrelated content.
 4. Apply only the requested changes.
 5. Keep existing formatting and style.
-6. Return or commit the complete updated file, depending on the task.
 
 If the file cannot be read completely, stop and report the problem instead of guessing.
+
+When the user asks for a "final version," re-read the current repository file instead of reconstructing it from memory
+or previous chat context, then return the complete updated content.
 
 ## Rules-maintenance tasks
 
@@ -345,12 +340,17 @@ not start from them.
 
 - For gameplay, runtime, or UI behavior changes in any mod, user real-game validation is the default submission gate
   before tests or commit.
+- Real-game validation establishes that the production change actually satisfies the requested behavior. A passing test
+  written against an unverified approach can preserve the wrong behavior while appearing correct.
 - Build and export the changed mod into the real local package output first, using the appropriate C# build and Unity
   export paths for the changed files.
 - Then tell the user the change is ready to test in game and wait for the user's validation result. The user performs
   the in-game test, not the agent.
-- Pause test implementation and commit until the user confirms the in-game behavior, unless the user explicitly accepts
-  testing or committing before real-game validation.
+- Pause creating, modifying, and running tests, as well as commit, until the user confirms the in-game behavior, unless
+  the user explicitly accepts testing or committing before real-game validation.
+- After confirmation, add or update focused tests for the behavior that was actually validated and run the relevant
+  test projects. These tests are regression protection for the confirmed behavior, not a substitute for real-game
+  validation.
 - A generic "commit" instruction does not automatically remove this gate. Before committing gameplay, runtime, or UI
   behavior changes, either report the user's in-game validation result or state that the user explicitly accepted
   committing without it.
@@ -365,26 +365,14 @@ not start from them.
 - If Unity resources changed but local export was not run, state that clearly instead of implying the game package is
   ready to test.
 
-## Required tests
+## Required build and test validation
 
-Before submitting a change, run the tests relevant to the changed package.
+After any applicable real-game validation gate, use the `Package Build And Validation Matrix` in
+`docs/timberborn-repository-notes.md` to select package-specific compile, export, and focused test commands.
 
-Use `docs/timberborn-repository-notes.md` as the authoritative source for package-specific test selection.
-
-Short version:
-
-For TimberDev-only changes, run:
-
-```powershell
-dotnet run --project TimberDev.Tests\TimberDev.Tests.csproj
-```
-
-- For mod changes, run that mod's own tests when they exist.
-- For shared behavior changes, run affected package tests.
 - For test-only changes, run the changed test project.
-- Do not use downstream mod tests as automatic gates unless the changed package actually affects them.
-
-These relevant tests MUST pass before submitting the change.
+- For shared behavior changes, run or build only the downstream packages that actually include the changed behavior.
+- All relevant builds and focused tests must pass before submitting the change.
 
 ## Local tools and generated references
 
@@ -396,69 +384,15 @@ These relevant tests MUST pass before submitting the change.
 - Use decompiled game sources as a read-only reference for understanding Timberborn architecture.
 - Use extracted game assets as a read-only reference for game blueprints, localizations, UI assets, and shaders.
 
-## Unity resources
+## New mod repository setup
 
-When changing Unity project resources (`UXML`, `USS`, localization files, images, sprites, prefabs, or asset bundle
-content), update the local game package through the repository Unity export path before asking the user to test in the
-real game, unless the user explicitly says not to.
+Follow `docs/timberborn-modding-howto-for-ai-agents.md` for the implementation workflow. For repository integration:
 
-If the changed files live under `ModsUnityProject/Assets/Mods/<ModName>/`, do not hand-copy package resources into
-`_MODS!`. First find the mod's normal Unity export command and compatibility lane, then use that export path or clearly
-report that the local game package was not refreshed. A C# project build only updates script outputs unless the project
-or release tooling proves that it also exports Unity package data.
-
-## Final version requests
-
-When the user asks for a "final version" of any repository file:
-
-1. Read the current file from the repository first.
-2. Never reconstruct the file from memory or previous chat context.
-3. Preserve existing content unless explicitly asked to remove it.
-4. Return the complete updated file.
-5. If the current file cannot be retrieved completely, say so.
-
-## Creating new Timberborn mods
-
-When designing or implementing a new Timberborn mod:
-
-1. Find the closest existing game feature.
-2. Study the game data and classes behind it.
-3. Understand ownership, dependencies, UI integration, and save/load behavior.
-4. Prefer existing extension points.
-5. Avoid Harmony unless necessary.
-6. Add localization for all user-facing text.
-7. Consider performance frequency: startup, tick, frame, building, district, or UI open.
-
-Follow `docs/timberborn-modding-howto-for-ai-agents.md` for the full workflow.
-
-## Coding style
-
-Follow `docs/csharp-formatting-rules-for-ai-agents.md`.
-
-Important reminders:
-
-- 2-space indentation for executable code.
-- Java/K&R-style braces.
-- 120-character line limit.
-- `var` when the type is obvious.
-- 4-space indentation for wrapped arguments, initializers, expression continuations, and ternary operators.
-- Do not split generic method signatures unless absolutely necessary.
-
-## Localization
-
-User-facing text must be localized.
-
-Follow the localization rules in `docs/timberborn-modding-rules-for-ai-agents.md`.
-
-Do not hardcode visible English strings in UI or gameplay messages.
-
-## Publicizer and private access
-
-Before using reflection or `AccessTools`, check whether the relevant game assembly is publicized.
-
-If direct access is available, prefer direct access.
-
-Use reflection only when necessary.
+1. Define C# and package-data ownership, compile-only validation, real-game build/export, and focused test selection;
+   add or update the mod's row in the `Package Build And Validation Matrix` in
+   `docs/timberborn-repository-notes.md`.
+2. Decide whether durable mod-specific rules justify a local `AGENTS.md`. Do not create an empty local instruction file
+   only to satisfy the checklist.
 
 ## Safety rule
 
@@ -474,7 +408,8 @@ Stop and ask the user instead of guessing when:
 - project intent or architecture is unclear,
 - the user's request can reasonably mean more than one workflow or scope, especially if one interpretation would publish,
   tag, backfill, delete, rewrite history, edit Wiki pages, change platform metadata, or otherwise affect public state,
-- multiple reasonable implementation paths exist,
+- several reasonable implementation paths remain and the choice would materially affect task scope, public API,
+  compatibility, player-visible behavior, persisted data, external state, or the cost of reversing the change,
 - a test reveals a production bug, dead code, missing API, or design mismatch but the user did not ask to fix
   production code,
 - a release version, source path, package contents, platform ID, or credentials are inconsistent,
@@ -482,26 +417,20 @@ Stop and ask the user instead of guessing when:
 - bootstrap paths such as `_GAME!`, `_MODS!`, `_WORKSHOP!`, or `_LOGS!` cannot be discovered safely,
 - a rule change would weaken an existing safety rule.
 
-## Testing rule
+Do not stop merely because more than one implementation is possible. When the remaining choices are internal,
+low-risk, and reversible, choose the smallest evidence-supported approach and briefly state any material tradeoff.
 
-Tests must not drive unapproved production-code changes.
+## Repository onboarding
 
-If adding or expanding tests reveals a production bug, dead code, missing API, or design mismatch, stop and ask before
-changing production code unless the user explicitly asked to fix it.
+Always load the instructions required by `How to choose instructions to read` before changing files. A routine,
+well-scoped task does not require a separate onboarding summary or user confirmation before work begins.
 
-Configurator-only classes that only bind services or declare contexts do not need unit tests unless they contain
-non-trivial logic.
+Perform an explicit onboarding review when first working broadly in this repository, designing a new feature or mod,
+investigating unfamiliar architecture, or when the user asks for an understanding summary. In that review:
 
-## First task
-
-Before making any code changes:
-
-1. Read AGENTS.md.
-2. Read all relevant files from the docs directory.
-3. Summarize:
-   - repository architecture,
-   - coding style,
-   - Timberborn modding approach,
-   - important repository-specific notes,
-   - lessons learned.
-4. Confirm understanding before proposing changes.
+1. Read this `AGENTS.md` and the relevant files under `docs/`.
+2. Summarize the task-relevant architecture, coding style, Timberborn approach, repository-specific notes, and lessons
+   learned.
+3. Identify any material unknowns or assumptions.
+4. Ask for confirmation only when an unresolved choice could materially change the intended direction; otherwise
+   proceed with the task.

@@ -100,8 +100,9 @@ Contains utilities intended to support mod development.
 
 Shared functionality that is not player-facing may belong here instead of TimberCommons.
 
-TimberDev is a standalone package. When working on TimberDev, treat it as depending only on itself and the game APIs.
-Do not use other mods as a TimberDev validation gate by default.
+TimberDev is a standalone source scope for ownership and validation, but the current checkout has no
+`TimberDev.csproj`; its files are linked into consumer projects. When working on TimberDev, treat its code as depending
+only on TimberDev and the game APIs. Do not use other mods as a TimberDev validation gate by default.
 
 If a TimberDev change affects logic that another mod actually uses, also run that mod's tests as downstream regression
 coverage.
@@ -110,6 +111,65 @@ coverage.
 
 TimberUI is a dead mod kept only for reference. It does not build and should be excluded from release, publishing, and
 platform description synchronization workflows unless the user explicitly asks to revive or inspect it.
+
+## Package Build And Validation Matrix
+
+Use this matrix to select the known project, focused test runner, package-data owner, and local instructions. Update it
+when a production project, test project, package-data location, or local `AGENTS.md` is added, removed, or renamed.
+Adding a new mod is not complete until its row records the known production project, focused test status, package-data
+ownership, and any local instructions.
+
+The focused test projects are executable console runners. Run them with `dotnet run --project`, not `dotnet test`.
+`No focused tests` means that no package-specific test project exists in the current repository; it does not mean that
+testing is unnecessary or that an unrelated package's tests should be used instead.
+
+| Scope | Production project | Focused validation after real-game confirmation | Package data | Extra instructions |
+|---|---|---|---|---|
+| Automation | `Automation/Automation.csproj` | `dotnet run --project Automation.Tests/Automation.Tests.csproj` | `ModsUnityProject/Assets/Mods/Automation` | `Automation/AGENTS.md` |
+| AutomationForModdableWeather | `AutomationForModdableWeather/AutomationForModdableWeather.csproj` | No focused tests | Project-local manifest and content | None |
+| CustomTools | `CustomTools/CustomTools.csproj` | `dotnet run --project CustomTools.Tests/CustomTools.Tests.csproj` | `ModsUnityProject/Assets/Mods/CustomTools` | None |
+| SmartHaulers | `SmartHaulers/SmartHaulers.csproj` | No focused tests | Split between `SmartHaulers/Mod` and `ModsUnityProject/Assets/Mods/SmartHaulers` | `SmartHaulers/AGENTS.md` |
+| SmartPower | `SmartPower/SmartPower.csproj` | `dotnet run --project SmartPower.Tests/SmartPower.Tests.csproj` | `ModsUnityProject/Assets/Mods/SmartPower` | None |
+| TimberCommons | `TimberCommons/TimberCommons.csproj` | `dotnet run --project TimberCommons.Tests/TimberCommons.Tests.csproj` | `ModsUnityProject/Assets/Mods/TimberCommons` | `docs/TimberCommons-modding-notes-for-ai-agents.md` |
+| TimberDev source | No standalone production project in the current checkout | `dotnet run --project TimberDev.Tests/TimberDev.Tests.csproj` | No standalone mod package | This document |
+| XRay | `XRay/XRay.csproj` | `dotnet run --project XRay.Tests/XRay.Tests.csproj` | `ModsUnityProject/Assets/Mods/XRay` | `XRay/AGENTS.md` |
+| TimberUI | Reference only; do not build by default | None | `ModsUnityProject/Assets/Mods/TimberUI` | See `Project Roles` above |
+
+`CustomResources`, `TestParser`, `TestSupport`, `UnityDevLite`, and projects under `tools/` are not active mod packages
+in this matrix. They have support, source-sharing, legacy, or tooling roles. Inspect the specific project and task before
+applying a mod build, test, export, or release workflow to one of them.
+
+### Compile-only validation
+
+For a changed production mod project, use the existing compile-only pattern so a post-build copy cannot turn a
+successful compilation into a misleading local-package failure:
+
+```powershell
+dotnet build <ProjectPath>.csproj /p:ModPath=__NoSuchModPath__
+```
+
+This validates compilation only. It does not prepare a package for real-game testing.
+
+### Real-game package output
+
+For a code-only change, resolve the current `_MODS!` alias and pass its absolute target as `ModPath` unless the project
+has already been verified to use that same destination. Do not rely on a project file's historical machine-specific
+default.
+
+For a change under `ModsUnityProject/Assets/Mods/<ModName>/`, use the Unity export path described in `ModsUnityProject`
+above. For SmartHaulers, inspect both package-data locations from the matrix and use the export/build paths required by
+the files changed.
+
+After the package has been updated, verify the expected output artifact or timestamp before asking the user to test in
+the game. Follow the root real-game validation gate before creating, changing, or running regression tests.
+
+### Known downstream relationships
+
+`AutomationForModdableWeather` has a project reference to `Automation`. When an Automation change affects the public
+extension contract used by that plugin, also build `AutomationForModdableWeather` as downstream compile coverage.
+
+TimberDev files are linked directly into multiple production and test projects. Run `TimberDev.Tests` for TimberDev
+changes, then run or build only the downstream packages that actually include the changed shared file or behavior.
 
 ---
 

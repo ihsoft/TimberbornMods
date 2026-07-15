@@ -51,6 +51,26 @@ If required information is unavailable, explicitly state the limitation instead 
 
 Incorrect certainty is usually more harmful than incomplete information.
 
+### Bound the research
+
+Research should resolve a concrete unknown that affects an implementation decision. Before broad exploration, state
+the unknown and what decision depends on it.
+
+Check the highest-value applicable evidence first: current repository code and data, current generated game references
+or extracted assets, and current official documentation. Stop expanding the search when either:
+
+- the available evidence is sufficient to make the decision, or
+- the relevant independent sources have produced the same absence or uncertainty and another search path is unlikely
+  to distinguish between the remaining choices.
+
+Failure to find an API, precedent, or behavior is not proof that it does not exist. Record the important sources
+checked and describe the result as not found or still uncertain.
+
+If the remaining uncertainty does not materially change scope, public API, compatibility, player-visible behavior,
+persisted data, external state, or reversibility, proceed with the smallest reversible evidence-supported experiment.
+Label the unconfirmed part as a hypothesis and validate the behavior in the real game before writing tests that preserve
+it. If the uncertainty would materially change one of those outcomes, stop and ask with the evidence and choices found.
+
 ---
 
 ## Official Mechanistry documentation
@@ -540,4 +560,5 @@ Prefer extension over replacement.
 
 Prefer existing architecture over custom architecture.
 
-When unsure, spend more time exploring the game and less time writing code.
+When unsure, investigate the specific decision until the evidence is sufficient, the bounded search reaches its stop
+condition, or the remaining uncertainty requires a user decision.

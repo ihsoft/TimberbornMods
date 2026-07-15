@@ -17,7 +17,12 @@ Do not guess project intent.
 Code shows implementation.
 It does not always show design intent.
 
-When multiple architectural choices seem reasonable, ask.
+Do not ask merely because more than one implementation is possible. When the remaining choices are internal,
+low-risk, and reversible, choose the smallest evidence-supported approach and state any material tradeoff.
+
+Ask when the choice would materially affect task scope, public API, compatibility, player-visible behavior, persisted
+data, external state, or the cost of reversing the change, and the intended direction cannot be established from
+available evidence.
 
 Examples:
 
@@ -27,7 +32,8 @@ Examples:
 - Is backward compatibility important?
 - Is there an existing design decision behind the current implementation?
 
-A short question is usually preferable to making the wrong architectural decision.
+A short question is preferable when the unresolved choice would commit the project to a materially different
+direction.
 
 ## Repository context
 
