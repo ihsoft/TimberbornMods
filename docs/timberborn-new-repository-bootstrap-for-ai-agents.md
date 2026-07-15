@@ -118,6 +118,7 @@ Before committing that cleanup, verify that:
 
 The repository may create or require ignored local files and folders, including:
 
+- `.agents/enable-ada` as the local opt-in marker for the optional Ada Personality profile.
 - `.tools/ilspy` for decompilation tooling.
 - `.tools/steamcmd` if SteamCMD is installed under repo-local ignored tools.
 - `.tools/steam/steam.local.json` for SteamCMD path/user configuration.
@@ -213,6 +214,28 @@ require a concrete user assignment and all applicable safety gates.
 Do not create duplicate role tasks when a clear matching task already exists. Do not treat a narrowly worded search
 with no results as proof that the role task is missing; fall back to searching by the role name alone.
 
+### Optional Ada Personality Profile
+
+The Ada Personality profile is a tracked, optional communication preset. It uses Russian by default, refers to the
+agent in the feminine form and the user in the masculine form, and favors calm, conversational communication without
+flattery or exaggerated enthusiasm. It changes communication style only; it does not replace engineering,
+repository, role, safety, or task-specific rules.
+
+During interactive bootstrap, when `.agents/enable-ada` does not exist, explicitly ask:
+
+> Enable the optional Ada Personality profile for this checkout? It uses Russian by default, refers to the agent in
+> the feminine form and to the user in the masculine form, and applies a calm, conversational style without flattery
+> or exaggerated enthusiasm. It changes communication style only, not engineering or repository rules.
+
+- If the user opts in, create the local `.agents/enable-ada` marker.
+- If the user declines, do not create the marker.
+- If bootstrap is noninteractive or the user does not answer, leave the profile disabled and report that choice.
+- Do not infer consent from the language of the conversation.
+- If the marker already exists, report that Ada is enabled and preserve the marker unless the user explicitly asks to
+  disable the profile.
+
+The marker is a local preference and must remain ignored. Do not commit it.
+
 ### Useful Bootstrap Checks
 
 For a clean checkout, verify only the capabilities needed by the current task:
@@ -249,7 +272,8 @@ Before creating the first mod:
    - package-data folders,
    - existing examples,
    - dedicated role agent tasks.
-5. Ask the user for local paths that cannot be discovered safely.
+5. Resolve the optional Ada Personality choice as described above.
+6. Ask the user for local paths that cannot be discovered safely.
 
 Do not invent local paths.
 
@@ -317,6 +341,7 @@ Before creating a link:
 Ensure `.gitignore` ignores:
 
 ```text
+.agents/enable-ada
 .tools/
 _GAME!
 _WORKSHOP!
@@ -411,6 +436,8 @@ For package data:
 
 Ask concise questions for missing local setup information:
 
+- Should the optional Ada Personality profile be enabled for this checkout? Explain its language, grammatical-gender,
+  and communication-style behavior before asking.
 - Where is the Timberborn game installation?
 - Where is the Timberborn Steam Workshop content folder?
 - Where is the user Timberborn mods folder?

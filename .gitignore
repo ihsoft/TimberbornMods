@@ -1,4 +1,5 @@
 .idea
+/.agents/enable-ada
 .tools/
 *.DotSettings.user
 _*
