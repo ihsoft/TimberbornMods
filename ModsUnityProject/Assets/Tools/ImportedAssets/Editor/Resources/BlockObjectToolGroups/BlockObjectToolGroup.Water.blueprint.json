@@ -1,9 +1,0 @@
-{
-  "BlockObjectToolGroupSpec": {
-    "Id": "Water",
-    "Order": 45,
-    "NameLocKey": "ToolGroups.Water",
-    "Icon": "Sprites/BottomBar/BuildingGroups/Water",
-    "FallbackGroup": false
-  }
-}

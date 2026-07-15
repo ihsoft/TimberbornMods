@@ -1,9 +1,0 @@
-{
-  "BlockObjectToolGroupSpec": {
-    "Id": "Automation",
-    "Order": 90,
-    "NameLocKey": "Automation.Automation",
-    "Icon": "Sprites/BottomBar/BuildingGroups/Automation",
-    "FallbackGroup": false
-  }
-}

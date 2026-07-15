@@ -1,9 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
-    <Style src="/Assets/Resources/UI/Views/Game/EntityPanel/EntityPanelGameStyle.uss" />
-    <ui:Button name="CustomizableIlluminatorPreset" class="customizable-illuminator-preset">
-        <ui:Image name="Image" class="customizable-illuminator-preset__image">
-            <ui:Image name="Image" class="customizable-illuminator-preset__overlay" />
-        </ui:Image>
-    </ui:Button>
-</ui:UXML>

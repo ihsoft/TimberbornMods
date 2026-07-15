@@ -1,9 +1,0 @@
-{
-  "BlockObjectToolGroupSpec": {
-    "Id": "MapEditorObjects",
-    "Order": 150,
-    "NameLocKey": "ToolGroups.MapEditorObjects",
-    "Icon": "Sprites/BottomBar/BuildingGroups/Objects",
-    "FallbackGroup": false
-  }
-}

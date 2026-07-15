@@ -1,9 +1,0 @@
-{
-  "WorkerTypeSpec": {
-    "Id": "Beaver",
-    "BackwardCompatibleIds": [],
-    "IgnoresWorkingHours": false,
-    "DisplayNameLocKey": "Beaver.PluralDisplayName",
-    "WorkerOnlyTextLocKey": "Work.BeaverOnly"
-  }
-}

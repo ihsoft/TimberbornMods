@@ -1,6 +1,0 @@
-{
-  "DayStageCycleSpec": {
-    "SunriseSunsetLengthInHours": 2.0,
-    "TransitionLengthInHours": 1.0
-  }
-}

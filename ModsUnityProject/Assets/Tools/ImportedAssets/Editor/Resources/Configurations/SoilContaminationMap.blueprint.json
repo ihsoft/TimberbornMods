@@ -1,6 +1,0 @@
-{
-  "SoilContaminationMapSpec": {
-    "MaxMapContamination": 0.9,
-    "ContaminationThreshold": 0.2
-  }
-}

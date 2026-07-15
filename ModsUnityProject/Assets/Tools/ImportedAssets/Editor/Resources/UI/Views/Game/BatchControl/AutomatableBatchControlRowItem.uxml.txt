@@ -1,7 +1,0 @@
-﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="/Assets/Resources/UI/Views/Game/BatchControl/BatchControlStyle.uss" />
-    <Style src="/Assets/Resources/UI/Views/Game/GameMiscStyle.uss" />
-    <cui:NineSliceVisualElement name="AutomatableBatchControlRowItem" class="batch-control-box__row-item batch-control-box__row-item-group--green">
-        <ui:Image name="StateIcon" class="automation-state-icon--large" />
-    </cui:NineSliceVisualElement>
-</ui:UXML>

@@ -1,7 +1,0 @@
-{
-  "KeyBindingGroupSpec": {
-    "Id": "MapEditor",
-    "Order": 100,
-    "LocKey": "KeyBindingGroup.MapEditor"
-  }
-}

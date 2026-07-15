@@ -1,9 +1,0 @@
-{
-  "BonusTypeSpec": {
-    "Id": "WorkingSpeed",
-    "MinimumValue": 0.05,
-    "MaximumValue": 1000.0,
-    "Icon": "Sprites/Bonuses/WorkingSpeed",
-    "LocKey": "Bonus.WorkingSpeed"
-  }
-}

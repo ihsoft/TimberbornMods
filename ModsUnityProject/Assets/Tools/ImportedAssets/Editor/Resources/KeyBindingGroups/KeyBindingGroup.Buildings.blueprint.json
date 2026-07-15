@@ -1,7 +1,0 @@
-{
-  "KeyBindingGroupSpec": {
-    "Id": "Buildings",
-    "Order": 30,
-    "LocKey": "KeyBindingGroup.Buildings"
-  }
-}

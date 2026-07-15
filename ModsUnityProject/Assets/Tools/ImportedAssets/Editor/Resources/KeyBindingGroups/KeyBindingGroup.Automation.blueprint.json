@@ -1,7 +1,0 @@
-{
-  "KeyBindingGroupSpec": {
-    "Id": "Automation",
-    "Order": 60,
-    "LocKey": "Automation.Automation"
-  }
-}

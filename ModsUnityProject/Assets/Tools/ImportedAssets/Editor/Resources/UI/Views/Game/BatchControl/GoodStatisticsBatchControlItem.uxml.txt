@@ -1,8 +1,0 @@
-﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:cui="Timberborn.CoreUI" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="/Assets/Resources/UI/Views/Game/BatchControl/BatchControlStyle.uss" />
-    <Style src="/Assets/Resources/UI/Views/Common/CommonStyle.uss" />
-    <Timberborn.CoreUI.NineSliceVisualElement name="GoodStatisticsBatchControlItem" class="good-statistics-batch-control-item bg-box--green">
-        <ui:Image name="GoodIcon" class="good-statistics-batch-control-item__good-icon" />
-        <cui:BarChart name="GoodSampleHistoryChart" class="bar-chart good-statistics-batch-control-item__good-sample-history-chart" max-bars-amount="70" />
-    </Timberborn.CoreUI.NineSliceVisualElement>
-</ui:UXML>

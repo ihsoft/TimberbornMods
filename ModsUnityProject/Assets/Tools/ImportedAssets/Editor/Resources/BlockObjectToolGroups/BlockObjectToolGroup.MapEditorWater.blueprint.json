@@ -1,9 +1,0 @@
-{
-  "BlockObjectToolGroupSpec": {
-    "Id": "MapEditorWater",
-    "Order": 140,
-    "NameLocKey": "ToolGroups.MapEditorWater",
-    "Icon": "Sprites/BottomBar/BuildingGroups/Water",
-    "FallbackGroup": false
-  }
-}

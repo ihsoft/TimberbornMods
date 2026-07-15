@@ -1,8 +1,0 @@
-{
-  "TemplateCollectionSpec": {
-    "CollectionId": "Common",
-    "Blueprints": [
-      "Buildings/Power/GravityBattery/BlockOccupier.blueprint"
-    ]
-  }
-}

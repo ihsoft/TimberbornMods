@@ -1,6 +1,0 @@
-{
-  "SpeakerSoundSpec": {
-    "SoundId": "Environment.Buildings.Speaker.Alarm",
-    "DisplayNameLocKey": "Building.Speaker.Sound.Alarm"
-  }
-}

@@ -1,7 +1,0 @@
-{
-  "WaterMeshSpec": {
-    "WaterTile": "Environment/Water/WaterTile",
-    "OpaqueMaterial": "Environment/Water/Materials/PhysicalWater_Opaque",
-    "TransparentMaterial": "Environment/Water/Materials/PhysicalWater_Transparent"
-  }
-}

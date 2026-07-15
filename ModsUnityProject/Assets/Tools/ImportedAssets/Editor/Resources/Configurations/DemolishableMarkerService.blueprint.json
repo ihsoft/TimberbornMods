@@ -1,6 +1,0 @@
-{
-  "DemolishableMarkerServiceSpec": {
-    "Mesh": "Markers/StatusMarkers/StatusIconMesh",
-    "Material": "Markers/StatusMarkers/DemolishingStatusIcon"
-  }
-}

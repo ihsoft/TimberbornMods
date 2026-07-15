@@ -1,4 +1,0 @@
-ID,Text,Comment
-Building.Relay.Mode.And.Description,<YellowHighlight>On</YellowHighlight> if all inputs are <YellowHighlight>On</YellowHighlight>.,A binary logic AND operation.
-Building.Relay.Mode.Or.Description,<YellowHighlight>On</YellowHighlight> if at least one input is <YellowHighlight>On</YellowHighlight>.,A binary logic OR operation.
-Building.Relay.Mode.Xor.Description,<YellowHighlight>On</YellowHighlight> if an odd number of inputs are <YellowHighlight>On</YellowHighlight>.,A binary logic XOR operation.

@@ -1,8 +1,0 @@
-{
-  "KeyBindingGroupSpec": {
-    "Id": "Internal",
-    "Order": 2000,
-    "LocKey": ""
-  },
-  "HiddenKeyBindingGroupSpec": {}
-}

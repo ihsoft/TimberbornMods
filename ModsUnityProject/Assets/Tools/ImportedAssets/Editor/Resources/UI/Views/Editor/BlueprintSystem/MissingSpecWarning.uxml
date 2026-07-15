@@ -1,8 +1,0 @@
-﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="True">
-    <Style path="UI/Views/Editor/BlueprintSystem/BlueprintSystemStyle" />
-    <ui:VisualElement name="MissingSpecWarning" class="missing-spec-warning">
-        <ui:Image name="WarningIcon" class="missing-spec-warning__icon" />
-        <ui:Label name="WarningMessage" text="Spec definition not found!" class="missing-spec-warning__message" />
-        <ui:Image name="WarningIcon" class="missing-spec-warning__icon" />
-    </ui:VisualElement>
-</ui:UXML>
