@@ -33,7 +33,7 @@ blindly.
 | Creating or modifying in-game UI Toolkit views, UXML, USS, dialogs, panels, or fragments | `docs/timberborn-ui-toolkit-notes-for-ai-agents.md` |
 | Designing a new feature or new mod | `docs/timberborn-modding-howto-for-ai-agents.md` and `docs/timberborn-lessons-learned.md` |
 | Investigating architecture or implementation approach | `docs/timberborn-repository-notes.md` and `docs/timberborn-lessons-learned.md` |
-| Editing or reviewing GitHub Wiki pages | `docs/timberborn-wiki-editing-rules-for-ai-agents.md` |
+| Editing or reviewing GitHub Wiki pages | `docs/wiki/Wiki-Operational-Knowledge-v1.md` and `docs/timberborn-wiki-editing-rules-for-ai-agents.md` |
 | Working with TimberCommons | `docs/TimberCommons-modding-notes-for-ai-agents.md` |
 | Bootstrapping a copied or new repository | `docs/timberborn-new-repository-bootstrap-for-ai-agents.md` |
 | Preparing, validating, packaging, or publishing a release | `docs/timberborn-release-publishing-rules-for-ai-agents.md` |
@@ -104,8 +104,9 @@ unrelated code fixes, edit agent rules, or edit the GitHub Wiki unless the user 
 The Wiki editor owns the separate GitHub Wiki checkout. The expected local layout is a sibling repository named
 `<repo-root>.wiki`, not a folder inside the main repository.
 
-The Wiki editor follows `docs/timberborn-wiki-editing-rules-for-ai-agents.md`. The Wiki editor should not implement
-code changes, publish mods, or edit agent rules unless the user explicitly expands the task.
+The Wiki editor follows `docs/wiki/Wiki-Operational-Knowledge-v1.md` and
+`docs/timberborn-wiki-editing-rules-for-ai-agents.md`. The Wiki editor should not implement code changes, publish mods,
+or edit agent rules unless the user explicitly expands the task.
 
 ## Delegating role-specific suggestions
 

@@ -2,6 +2,10 @@
 
 Use these rules when editing or reviewing the TimberbornMods GitHub Wiki.
 
+Also read `docs/wiki/Wiki-Operational-Knowledge-v1.md` for the Git working-tree, page, navigation, link, verification,
+commit, and push workflow. This document owns TimberbornMods-specific Wiki paths, content policy, editorial decisions,
+and release-driven requirements.
+
 The Wiki repository is separate from the main mod repository:
 
 ```text
@@ -60,7 +64,8 @@ with signals or another trigger source.
 
 ## Localization workflow
 
-For localized Wiki pages, first settle the English or source-facing page structure and content.
+Follow the general canonical-page workflow in Wiki Operational Knowledge. For this Wiki, first settle the English or
+source-facing page structure and content.
 
 Then synchronize localized pages from that source structure.
 
@@ -74,7 +79,8 @@ version refresh.
 
 ## Markdown and rendering
 
-Prefer ordinary GitHub Markdown when it is sufficient.
+Follow Wiki Operational Knowledge for page names, links, navigation, and formatting verification. Prefer ordinary
+GitHub Markdown when it is sufficient.
 
 For images, prefer:
 
@@ -91,6 +97,9 @@ over raw HTML such as:
 unless raw HTML is required for a specific layout that Markdown cannot express.
 
 ## Verification
+
+Complete the repository, branch, scope, page, link, navigation, and staged-change checks from Wiki Operational
+Knowledge.
 
 Before committing Wiki changes, run whitespace validation in the Wiki repository:
 
