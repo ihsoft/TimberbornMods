@@ -18,10 +18,14 @@ Then load the active baseline layers in this order:
 1. If `.agents/enable-ada` exists, read `docs/agent-profiles/Ada-Personality-v2.md` for optional communication style
    and personality. If the marker is absent, do not load that profile. Do not infer opt-in from the user's language.
 2. Always read `docs/agent-profiles/Engineering-Professional-v3.md` for general engineering reasoning.
-3. Always read `docs/agent-profiles/Timberborn-Domain-Knowledge-v1.md` for Timberborn-specific domain knowledge.
+3. Always read `docs/agent-knowledge/Timberborn-Domain-Knowledge-v1.md` for Timberborn-specific domain knowledge.
 
 These layers complement this `AGENTS.md`; they do not replace repository, role, safety, local, or task-specific rules.
 They remain subject to the rule priority below.
+
+Files named `Operational Knowledge` provide task-specific methods, evidence maps, and decision aids. They are not
+baseline profiles or independent safety policy. Load them only when a routing-table condition applies, together with
+the relevant repository, role, and local rules.
 
 After the baseline layers, read only the instruction files that apply to the current task. Do not load every document
 blindly.
@@ -33,7 +37,8 @@ blindly.
 | Creating or modifying in-game UI Toolkit views, UXML, USS, dialogs, panels, or fragments | `docs/timberborn-ui-toolkit-notes-for-ai-agents.md` |
 | Designing a new feature or new mod | `docs/timberborn-modding-howto-for-ai-agents.md`, `docs/timberborn-repository-notes.md`, and `docs/timberborn-lessons-learned.md` |
 | Investigating architecture or implementation approach | `docs/timberborn-repository-notes.md` and `docs/timberborn-lessons-learned.md` |
-| Editing or reviewing GitHub Wiki pages | `docs/wiki/Wiki-Operational-Knowledge-v1.md` and `docs/timberborn-wiki-editing-rules-for-ai-agents.md` |
+| Diagnosing build, export, mod loading, runtime, UI, save/load, or platform behavior | `docs/agent-knowledge/Timberborn-Diagnostics-Operational-Knowledge-v1.md` |
+| Editing or reviewing GitHub Wiki pages | `docs/agent-knowledge/Wiki-Operational-Knowledge-v1.md` and `docs/timberborn-wiki-editing-rules-for-ai-agents.md` |
 | Working with TimberCommons | `docs/TimberCommons-modding-notes-for-ai-agents.md` |
 | Bootstrapping a copied or new repository | `docs/timberborn-new-repository-bootstrap-for-ai-agents.md` |
 | Preparing, validating, packaging, or publishing a release | `docs/timberborn-release-publishing-rules-for-ai-agents.md` |
@@ -104,7 +109,7 @@ unrelated code fixes, edit agent rules, or edit the GitHub Wiki unless the user 
 The Wiki editor owns the separate GitHub Wiki checkout. The expected local layout is a sibling repository named
 `<repo-root>.wiki`, not a folder inside the main repository.
 
-The Wiki editor follows `docs/wiki/Wiki-Operational-Knowledge-v1.md` and
+The Wiki editor follows `docs/agent-knowledge/Wiki-Operational-Knowledge-v1.md` and
 `docs/timberborn-wiki-editing-rules-for-ai-agents.md`. The Wiki editor should not implement code changes, publish mods,
 or edit agent rules unless the user explicitly expands the task.
 

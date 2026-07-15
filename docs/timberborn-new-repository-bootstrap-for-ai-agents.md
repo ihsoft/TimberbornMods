@@ -211,7 +211,7 @@ roles as follows:
 | --- | --- | --- |
 | Mentor | Own and organize agent rules, evaluate delegated rule suggestions, and improve future decision quality. | `AGENTS.md` and the rule files relevant to the requested rules-maintenance scope. |
 | Publisher | Safely prepare, validate, package, and publish explicitly approved mod releases, including post-release workflow. | `AGENTS.md` and `docs/timberborn-release-publishing-rules-for-ai-agents.md`. |
-| Wiki editor | Maintain accurate player-facing documentation in the separate GitHub Wiki checkout based on confirmed behavior and released capabilities. | `AGENTS.md`, `docs/wiki/Wiki-Operational-Knowledge-v1.md`, and `docs/timberborn-wiki-editing-rules-for-ai-agents.md`. |
+| Wiki editor | Maintain accurate player-facing documentation in the separate GitHub Wiki checkout based on confirmed behavior and released capabilities. | `AGENTS.md`, `docs/agent-knowledge/Wiki-Operational-Knowledge-v1.md`, and `docs/timberborn-wiki-editing-rules-for-ai-agents.md`. |
 
 The initialization prompt must state that the role does not own adjacent work. In particular, the Publisher must not
 implement unrelated code, edit agent rules, or edit the Wiki; the Wiki editor must not implement mod code, publish

@@ -2,7 +2,7 @@
 
 Use these rules when editing or reviewing the TimberbornMods GitHub Wiki.
 
-Also read `docs/wiki/Wiki-Operational-Knowledge-v1.md` for the Git working-tree, page, navigation, link, verification,
+Also read `docs/agent-knowledge/Wiki-Operational-Knowledge-v1.md` for the Git working-tree, page, navigation, link, verification,
 commit, and push workflow. This document owns TimberbornMods-specific Wiki paths, content policy, editorial decisions,
 and release-driven requirements.
 
