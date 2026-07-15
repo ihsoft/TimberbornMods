@@ -45,34 +45,15 @@ Do not put these details in the root `AGENTS.md` unless they apply repository-wi
 
 ## ModsUnityProject
 
-`ModsUnityProject` is a Unity project used by Timberborn Modding Tools.
+Use `docs/agent-knowledge/Timberborn-Unity-Operational-Knowledge-v1.md` for the artifact model and pipeline selection.
 
-For Unity-based mods, package data, localizations, UXML/USS, thumbnails, workshop data, and asset bundle
-resources may live under:
+In this repository, Unity-owned package data commonly lives under `ModsUnityProject/Assets/Mods/<ModName>`, not beside
+the C# project. Check the package matrix for the actual owner and split layouts before editing localization, blueprints,
+UI assets, thumbnails, workshop metadata, or bundles.
 
-```text
-ModsUnityProject/Assets/Mods/<ModName>/
-```
-
-Do not assume that mod package data is in a `Mod/` directory or next to the C# project.
-
-Before editing localization, blueprints, UI assets, thumbnails, workshop metadata, or Unity-based mods, inspect:
-
-```text
-ModsUnityProject/Assets/Mods/<ModName>/
-```
-
-When a task changes package data under `ModsUnityProject/Assets/Mods/<ModName>/`, refresh the local game package
-through the repository Unity export path, such as `tools/export-unity-mod.ps1` / `ModBuilderBatch`, for the correct
-compatibility lane. Do not manually synchronize `_MODS!` resources as a substitute for export. Manual copies can miss
-`.meta` filtering, platform asset bundles, localization/data layout, or mod-specific package lanes.
-
-Run that export before asking the user to validate the change in the real game, unless the user explicitly asks not to.
-If export cannot be run, say that the local package was not refreshed and do not present the build as ready for
-real-game testing.
-
-A C# build with `ModPath` usually updates only `Scripts/<Assembly>.dll` and `Scripts/<Assembly>.xml`. Do not assume it
-also synchronizes Unity-owned package data unless the project file or release tooling proves that behavior.
+When Unity-owned data changes, export the correct compatibility lane through `tools/export-unity-mod.ps1` /
+`ModBuilderBatch` before real-game validation. Never substitute a manual copy into `_MODS!`. A C# build normally
+refreshes only script output; if Unity export was not run, report that the local package was not refreshed.
 
 ---
 

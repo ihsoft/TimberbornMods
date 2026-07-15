@@ -34,6 +34,7 @@ blindly.
 |--------|--------|
 | Generating or modifying C# code | `docs/csharp-formatting-rules-for-ai-agents.md` |
 | Modifying Timberborn mod code, data, UI, localization, or package files | `docs/timberborn-modding-rules-for-ai-agents.md` and `docs/timberborn-repository-notes.md` |
+| Working with `ModsUnityProject`, Unity-owned package data, the Timberborn importer, or Unity export | `docs/agent-knowledge/Timberborn-Unity-Operational-Knowledge-v1.md` |
 | Creating or modifying in-game UI Toolkit views, UXML, USS, dialogs, panels, or fragments | `docs/timberborn-ui-toolkit-notes-for-ai-agents.md` |
 | Designing a new feature or new mod | `docs/timberborn-modding-howto-for-ai-agents.md`, `docs/timberborn-repository-notes.md`, and `docs/timberborn-lessons-learned.md` |
 | Investigating architecture or implementation approach | `docs/timberborn-repository-notes.md` and `docs/timberborn-lessons-learned.md` |
@@ -362,13 +363,10 @@ not start from them.
 
 ### Unity-resource task
 
-- Identify the normal Unity export/build path and compatibility lane before preparing a real-game package.
-- Do not manually copy Unity package resources into `_MODS!`; use the repository export tooling or report that export
-  was not run.
-- Before asking the user to test in the real game, run the repository export tooling yourself when the task changed
-  package data under `ModsUnityProject/Assets/Mods/<ModName>/`, unless the user explicitly says not to.
-- If Unity resources changed but local export was not run, state that clearly instead of implying the game package is
-  ready to test.
+- Use Timberborn Unity Operational Knowledge and the package matrix to select the owner, compatibility lane, and export
+  path.
+- When Unity-owned package data changed, run repository export tooling before real-game validation. Never hand-copy it
+  into `_MODS!`; if export was not run, report that the local package was not refreshed.
 
 ## Required build and test validation
 
