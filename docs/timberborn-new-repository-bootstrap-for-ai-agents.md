@@ -50,20 +50,28 @@ Normal build and release work may need both root aliases and dependency links:
 project files use different conventions. `_WORKSHOP!` and `Dependencies/Workshop` usually point to the same Workshop
 folder for the same reason.
 
+Derive required local aliases from current tracked project references and this bootstrap documentation, not merely
+from suggestive names of existing or broken local links. For an unexpected link with no current tracked reference or
+documented purpose, do not guess or recreate its target. Report the evidence and ask whether to remove it.
+
 ### External Tools And Accounts
 
 Before build or release work, verify the tools required by the task:
 
 - Git and PowerShell.
 - A .NET SDK capable of restoring NuGet packages and building the changed projects.
-- Unity Hub or Unity Editor matching `ModsUnityProject/ProjectSettings/ProjectVersion.txt`, or an explicit
-  `-UnityPath` for Unity export.
+- Unity Hub signed in with a valid Editor license/entitlement, plus the Unity Editor matching
+  `ModsUnityProject/ProjectSettings/ProjectVersion.txt` or an explicit `-UnityPath` for Unity export.
 - SteamCMD installed in a discoverable location or configured in `.tools/steam/steam.local.json`.
 - Steam account login and Steam Guard readiness for uploads.
 - GitHub CLI `gh` installed and authenticated for repository releases, issue comments, and issue closing.
 - Mod.IO owner access token stored locally under `.tools/modio/` or supplied explicitly with `-AccessTokenPath`.
 
 Secrets and account-specific configs must stay local and ignored. Do not copy, rename, guess, or commit token files.
+
+Before the first interactive or batch Unity validation on a clean machine, verify Hub sign-in and Editor licensing.
+If licensing is not ready, explain that the user must complete the interactive Unity Hub sign-in/license step before
+batch compilation or export; do not diagnose the resulting startup failure as a project-code problem.
 
 ### Unity Modding Tools First Open
 
@@ -243,7 +251,8 @@ For a clean checkout, verify only the capabilities needed by the current task:
 - root aliases exist and point to plausible targets,
 - `Dependencies/GameRoot` and `Dependencies/Workshop` exist,
 - game managed assemblies exist under `Dependencies/GameRoot/Timberborn_Data/Managed`,
-- Unity Editor version and both required Build Support modules are installed/resolvable,
+- Unity Hub sign-in and Editor licensing are ready, and the required Editor version and both Build Support modules are
+  installed/resolvable,
 - the official Unity first-open import has populated `ModsUnityProject/Assets/Plugins/Timberborn` before batch
   compilation or export, and the Unity project is not already open before batch export,
 - SteamCMD path/user config exists if publishing to Steam,
