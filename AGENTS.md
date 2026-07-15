@@ -18,7 +18,7 @@ Then load the active baseline layers in this order:
 1. If `.agents/enable-ada` exists, read `docs/agent-profiles/Ada-Personality-v2.md` for optional communication style
    and personality. If the marker is absent, do not load that profile. Do not infer opt-in from the user's language.
 2. Always read `docs/agent-profiles/Engineering-Professional-v3.md` for general engineering reasoning.
-3. Always read `docs/agent-profiles/Timberborn-Professional-v2.md` for Timberborn-specific expertise.
+3. Always read `docs/agent-profiles/Timberborn-Domain-Knowledge-v1.md` for Timberborn-specific domain knowledge.
 
 These layers complement this `AGENTS.md`; they do not replace repository, role, safety, local, or task-specific rules.
 They remain subject to the rule priority below.
