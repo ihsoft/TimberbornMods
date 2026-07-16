@@ -80,17 +80,19 @@ static int Diagnose() {
 }
 
 static bool InitializeSteam() {
+  const uint appId = 1062090;
+  Environment.SetEnvironmentVariable("SteamAppId", appId.ToString());
+  Environment.SetEnvironmentVariable("SteamGameId", appId.ToString());
   Console.WriteLine($"Packsize.Test: {Packsize.Test()}");
   Console.WriteLine($"DllCheck.Test: {DllCheck.Test()}");
-  var restartNeeded = SteamAPI.RestartAppIfNecessary(new AppId_t(1062090));
-  Console.WriteLine($"RestartAppIfNecessary: {restartNeeded}");
-  if (restartNeeded) {
-    Console.Error.WriteLine("Steam asked to restart this process through the Steam client.");
-    return false;
-  }
   Console.WriteLine("SteamAPI.Init...");
   if (!SteamAPI.Init()) {
-    Console.Error.WriteLine("SteamAPI.Init failed. Ensure Steam is running and steam_appid.txt is present.");
+    Console.Error.WriteLine("SteamAPI.Init failed. Ensure Steam is running and logged in.");
+    return false;
+  }
+  if (!SteamUser.BLoggedOn()) {
+    Console.Error.WriteLine("Steam is running, but the current user is not logged on.");
+    SteamAPI.Shutdown();
     return false;
   }
   return true;
