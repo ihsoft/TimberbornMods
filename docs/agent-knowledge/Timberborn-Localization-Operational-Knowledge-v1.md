@@ -56,6 +56,10 @@ building, resource, status, action, or nearest useful concept. Compare the canon
 for the same keys. Use the game's established terminology and style instead of inventing new terms, adjusting
 capitalization and punctuation to the local UI context.
 
+Prefer complete phrases and control-specific grammatical patterns over assembling a translation from a glossary of
+isolated words. Static terminology tables and translations from older game versions are search hints only; verify the
+wording against current game localization keys for the task's target game version.
+
 Keep this research bounded by the concrete wording decision. Stop once the relevant game term or the absence of a close
 equivalent is established; do not search indefinitely for a perfect match.
 
@@ -89,7 +93,8 @@ ID,Text,Comment
 
 - `ID` is the stable localization key. Preserve existing IDs unless the task intentionally includes a key migration.
 - `Text` is the localized player-facing text.
-- `Comment` is always English in every locale file and should explain context rather than repeat the text.
+- `Comment` is always English in every locale file and should explain context rather than repeat the text. Keep the
+  comment for the same key consistent across locale files, updating every copy when its context changes.
 - Preserve parameters such as `{0}`, `{1}`, and `{0:0.#}` with the same names, indexes, and format specifiers in every
   locale.
 - Quote text and comment fields when they contain commas, parentheses, parameters, quotes, or line breaks. Escape a
@@ -159,10 +164,12 @@ Before submitting a localization change:
 4. Confirm parameter sets and format specifiers match across locales for every shared key.
 5. Distinguish problems introduced by the current change from pre-existing localization debt when repository history or
    the current diff provides that evidence.
-6. Do not automatically repair pre-existing missing keys, extra keys, duplicates, placeholder mismatches, or uncertain
+6. Preserve existing translations for unchanged IDs. A parity audit or file synchronization does not authorize
+   retranslation, normalization, or wording cleanup outside the requested scope.
+7. Do not automatically repair pre-existing missing keys, extra keys, duplicates, placeholder mismatches, or uncertain
    translations outside the requested scope. Report them and wait for explicit direction.
-7. Search the affected code and UI for accidental hardcoded player-facing text and stale key references.
-8. Use the owning Unity export or package build path, then follow the root real-game validation gate for the rendered
+8. Search the affected code and UI for accidental hardcoded player-facing text and stale key references.
+9. Use the owning Unity export or package build path, then follow the root real-game validation gate for the rendered
    player-visible result.
 
 If a locale remains incomplete by explicit user decision, report the exact locale, missing keys, and fallback behavior
