@@ -107,8 +107,34 @@ Example:
 Some.Mod.Feature.Action,"Do something ({0})","Button text. Explains what the action does."
 ```
 
-Place new rows near related keys when the existing file is organized by feature. Do not reorder or reformat an entire
-localization file as part of a narrow text change.
+## File Organization
+
+Apply these organization conventions to new localization rows. Do not reorder or regroup existing rows automatically
+as part of a narrow text change.
+
+Keep new rows alphabetically ordered by `ID` relative to other rows added in the same change. If the target block is
+already alphabetized, insert new rows at the correct position without moving unrelated rows. For a new file or an
+entirely new block, sort all localization rows in that scope alphabetically by `ID`.
+
+Group a substantial set of related rows into a semantic block when the grouping materially improves navigation. A
+dialog with many strings, a distinct subsystem, or a feature expected to grow can justify its own block. Avoid creating
+a separate block for only two or three rows unless there is a concrete reason to expect expansion.
+
+Introduce a block with this structural separator row:
+
+```csv
+=,=,Dialog name
+```
+
+The third field is an English descriptive label for human readers, not player-facing text. When a new block is added to
+multiple locale files, use the same separator and block structure in each file.
+
+Separator rows have `ID` equal to `=` and are not localization keys. Repeated separator rows are allowed and must be
+excluded from localization-key uniqueness, parity, and placeholder checks.
+
+Existing files may benefit from a separate cleanup that introduces semantic blocks or sorting. An agent may propose
+that cleanup, but must not perform it without an explicit request or approval. The cleanup must preserve localization
+IDs, translations, comments, placeholders, and locale coverage.
 
 ## Keys In Code And UI
 
@@ -157,19 +183,22 @@ Before submitting a localization change:
 
 1. Parse every touched localization file with a real CSV parser rather than validating it by line splitting. If the
    package has any locale besides `enUS`, parse every localization file for the package.
-2. Confirm the header and three-column structure remain intact, every `ID` is unique within its file, and empty `Text`
-   fields are reported.
-3. Compare the complete key set of every non-canonical locale with the canonical source locale, normally `enUS`.
-   Report every missing and extra key, including the affected locale and exact key names.
-4. Confirm parameter sets and format specifiers match across locales for every shared key.
-5. Distinguish problems introduced by the current change from pre-existing localization debt when repository history or
+2. Confirm the header and three-column structure remain intact, every localization `ID` is unique within its file, and
+   empty player-facing `Text` fields are reported. Repeated structural separator rows with `ID` equal to `=` are allowed.
+3. Confirm separator rows use `=,=,<English block label>` and treat them as file structure rather than localization
+   keys.
+4. Compare the complete localization-key set of every non-canonical locale with the canonical source locale, normally
+   `enUS`, excluding separator rows. Report every missing and extra key, including the affected locale and exact key
+   names.
+5. Confirm parameter sets and format specifiers match across locales for every shared localization key.
+6. Distinguish problems introduced by the current change from pre-existing localization debt when repository history or
    the current diff provides that evidence.
-6. Preserve existing translations for unchanged IDs. A parity audit or file synchronization does not authorize
+7. Preserve existing translations for unchanged IDs. A parity audit or file synchronization does not authorize
    retranslation, normalization, or wording cleanup outside the requested scope.
-7. Do not automatically repair pre-existing missing keys, extra keys, duplicates, placeholder mismatches, or uncertain
+8. Do not automatically repair pre-existing missing keys, extra keys, duplicates, placeholder mismatches, or uncertain
    translations outside the requested scope. Report them and wait for explicit direction.
-8. Search the affected code and UI for accidental hardcoded player-facing text and stale key references.
-9. Use the owning Unity export or package build path, then follow the root real-game validation gate for the rendered
+9. Search the affected code and UI for accidental hardcoded player-facing text and stale key references.
+10. Use the owning Unity export or package build path, then follow the root real-game validation gate for the rendered
    player-visible result.
 
 If a locale remains incomplete by explicit user decision, report the exact locale, missing keys, and fallback behavior
