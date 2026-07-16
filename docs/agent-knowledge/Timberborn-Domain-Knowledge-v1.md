@@ -43,6 +43,13 @@ Understand patch target selection, prefix/postfix/transpiler roles, execution ti
 with dependency injection. Harmony is an integration mechanism, not the default architecture; use existing extension
 points when they fit.
 
+## Localization model
+
+Player-facing mod text is resolved through localization keys rather than stored inline. Timberborn mod localization
+files are `.txt` files containing CSV records keyed by `ID`; runtime code commonly resolves keys through `ILoc`, and UI
+Toolkit provides localizable controls. Exact package paths, locale coverage, wording, and validation are operational
+concerns defined by Timberborn Localization Operational Knowledge and the closest local instructions.
+
 ## Unity resources, localization, and packaging
 
 Understand that code assemblies, Unity resources, localization data, package metadata, and mod loading are related but

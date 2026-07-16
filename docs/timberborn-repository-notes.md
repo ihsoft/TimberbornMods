@@ -262,24 +262,6 @@ push, or merge time can make the public issue state misleading.
 
 ---
 
-## Localization
-
-Localization files are typically stored as text files containing CSV content.
-
-Expected columns:
-
-ID,Text,Comment
-
-Rules:
-
-- Keep existing IDs unchanged.
-- Preserve placeholders.
-- Preserve formatting.
-- Comments should be written in English.
-- Update all affected languages when possible.
-
----
-
 ## Publicizer
 
 Before using reflection or AccessTools:

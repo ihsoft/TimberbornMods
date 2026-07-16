@@ -53,7 +53,8 @@ deDE.txt
 frFR.txt
 ```
 
-When adding user-facing TimberCommons text, update all existing localization files when practical.
+When adding user-facing TimberCommons text, follow Timberborn Localization Operational Knowledge and add each new key
+to every localization file present for the mod.
 
 ## Localization key prefix
 

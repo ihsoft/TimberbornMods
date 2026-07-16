@@ -33,7 +33,8 @@ blindly.
 | Condition | Read |
 |--------|--------|
 | Generating or modifying C# code | `docs/csharp-formatting-rules-for-ai-agents.md` |
-| Modifying Timberborn mod code, data, UI, localization, or package files | `docs/timberborn-modding-rules-for-ai-agents.md` and `docs/agent-knowledge/Timberborn-Repository-Validation-Operational-Knowledge-v1.md` |
+| Modifying Timberborn mod implementation: C# behavior, gameplay data, UI structure or behavior, or package metadata | `docs/timberborn-modding-rules-for-ai-agents.md` and `docs/agent-knowledge/Timberborn-Repository-Validation-Operational-Knowledge-v1.md` |
+| Adding or modifying player-facing text, localization keys or files, localized UI strings, or `ILoc` usage | `docs/agent-knowledge/Timberborn-Localization-Operational-Knowledge-v1.md` and `docs/agent-knowledge/Timberborn-Repository-Validation-Operational-Knowledge-v1.md` |
 | Working with `ModsUnityProject`, Unity-owned package data, the Timberborn importer, or Unity export | `docs/agent-knowledge/Timberborn-Unity-Operational-Knowledge-v1.md` |
 | Creating or modifying in-game UI Toolkit views, UXML, USS, dialogs, panels, or fragments | `docs/timberborn-ui-toolkit-notes-for-ai-agents.md` |
 | Designing a new feature or new mod | `docs/timberborn-modding-howto-for-ai-agents.md`, `docs/timberborn-repository-notes.md`, and `docs/timberborn-lessons-learned.md` |
