@@ -48,6 +48,10 @@
       <Reference Include="ModSettings.CoreUI">
         <HintPath>..\Dependencies\Workshop\3283831040\version-0.6\Scripts\ModSettings.CoreUI.dll</HintPath>
       </Reference>
+      <Reference Include="Newtonsoft.Json">
+        <HintPath>..\Dependencies\GameRoot\Timberborn_Data\Managed\Newtonsoft.Json.dll</HintPath>
+        <Private>false</Private>
+      </Reference>
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />

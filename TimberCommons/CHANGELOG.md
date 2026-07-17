@@ -1,3 +1,6 @@
+# v1.21.0 (TBD)
+* [Feature] Show the faction logo and localized faction name on saved-game previews.
+
 # v1.20.0 (July 6th, 2026)
 * [Enhancement] Show the measured flow through Throttling Valves under the flow slider.
 
