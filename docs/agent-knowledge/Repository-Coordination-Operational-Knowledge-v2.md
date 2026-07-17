@@ -2,8 +2,8 @@
 
 ## Purpose
 
-Prevent agents sharing one local checkout from colliding during operations that require exclusive ownership of the
-Unity project or Git index and history.
+Prevent agents sharing one local machine and repository workspace from colliding during operations that require
+exclusive ownership of Unity execution or the Git index and history.
 
 This document does not serialize ordinary reading, editing, diagnostics, or independent builds. It does not grant
 permission to commit, publish, tag, open interactive applications, or change external state.
@@ -14,11 +14,11 @@ Use resource-scoped locks rather than one global repository lock:
 
 | Resource | Exclusive scope |
 |---|---|
-| `unity-project` | opening the shared Unity project, importing, resolving packages, compiling in Unity, and exporting |
+| `unity-project` | every agent-controlled Unity Editor or batch-mode process used for this repository's work, regardless of the opened project path |
 | `git-transaction` | staging, validating the staged diff, creating a commit, and verifying the resulting commit |
 
 The tracked helper `tools/repository-coordination.psm1` owns the protocol. It combines a process-owned named mutex with
-an ignored diagnostic record under `.tools/repository-locks/`.
+an ignored diagnostic record under `.tools/repository-locks/` in the main repository.
 
 The mutex is authoritative. The JSON record exists so another agent or the user can see the owner, operation, process,
 host, acquisition time, and ownership token. Do not infer that the resource is free merely because the JSON record is
@@ -40,15 +40,26 @@ owner from deleting a newer owner's record.
 
 ## Unity Operations
 
-Acquire `unity-project` before starting any agent-controlled interactive or batch Unity operation against
-`ModsUnityProject`, including first-open import, package resolution, compilation, and export.
+Before any agent-controlled Unity Editor or batch-mode launch for this repository's work, acquire `unity-project`
+through the coordination helper in the main `<repo-root>`. This includes `ModsUnityProject`, a temporary checkout, and
+a separately cloned third-party Unity project. The lock coordinates Unity use on the shared machine; an independent
+project path is not exempt.
 
-The repository export wrapper acquires this lock automatically. Keep Unity's own `Temp/UnityLockfile` and process
-checks as a second guard: they detect a manually opened Editor or a surviving Unity child process even when that
-process did not participate in repository coordination.
+The mutex identity is derived from the `RepositoryRoot` passed to the helper. Always pass the main `<repo-root>` even
+when Unity will open a project elsewhere. Using the temporary or cloned project as `RepositoryRoot` creates a different
+mutex and does not satisfy this coordination contract.
 
-Do not acquire separate locks per mod. Unity imports, compiles, and writes shared project state, so exports from the
-same project remain mutually exclusive even when they target different packages.
+The repository export wrapper acquires this lock automatically. Keep Unity's own project lockfile and process checks
+as a second guard: they detect a manually opened Editor or a surviving Unity child process even when that process did
+not participate in repository coordination.
+
+Do not acquire separate locks per mod or Unity project. Repository work on this shared machine uses one
+`unity-project` resource so imports, compilation, package resolution, and exports remain mutually exclusive.
+
+Set command observation and monitoring timeouts long enough for the expected first import or export. A tool timeout
+does not prove that the owner or Unity child process stopped. Before retrying, inspect the coordination record and
+owner PID, relevant Unity processes, and the opened project's native lockfile. Do not launch another Unity instance
+until ownership and process state show that the previous operation ended.
 
 ## Git Commit Transactions
 
@@ -70,7 +81,7 @@ Example:
 
 ```powershell
 tools/commit-repository-changes.ps1 `
-  -Path AGENTS.md,docs/agent-knowledge/Repository-Coordination-Operational-Knowledge-v1.md `
+  -Path AGENTS.md,docs/agent-knowledge/Repository-Coordination-Operational-Knowledge-v2.md `
   -Message "Coordinate shared repository operations" `
   -Owner "mentor-thread"
 ```
@@ -87,5 +98,5 @@ which covers the whole multi-command commit transaction.
 - Do not hold a lock while waiting for user review or real-game validation.
 - Keep the Git transaction short; perform research and semantic diff review before acquiring it.
 - Do not create locks for ordinary work unless a repeated collision establishes a genuinely shared resource.
-- Separate worktrees may isolate ordinary file and index changes, but they do not make one shared Unity project safe to
-  run concurrently.
+- Separate worktrees may isolate ordinary file and index changes; separate Unity projects do not exempt repository work
+  from the shared-machine Unity lock.

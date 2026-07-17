@@ -63,9 +63,10 @@ not assume changing one automatically updates the others.
 
 Before export, resolve the package owner and lane, satisfy applicable bootstrap and import readiness, and inspect the
 current `tools/export-unity-mod.ps1` parameters. Follow Repository Coordination Operational Knowledge and acquire the
-shared Unity-project lock before checking for or launching Unity. The export wrapper does this automatically, then
-checks for an interactive Editor using the same project. Use repository export tooling rather than hand-copying source
-into `_MODS!`; copying can miss filtering, platform bundles, layout, or lanes.
+main repository's shared-machine Unity lock before checking for or launching Unity, even when the work uses a separate
+project. The export wrapper does this automatically, then checks for an interactive Editor using the same project. Use
+repository export tooling rather than hand-copying source into `_MODS!`; copying can miss filtering, platform bundles,
+layout, or lanes.
 
 After export, verify the intended local output: lane, manifest identity/version, changed data or bundles, and current
 timestamps or content. When code is involved, also verify the DLL/XML produced by the C# pipeline.

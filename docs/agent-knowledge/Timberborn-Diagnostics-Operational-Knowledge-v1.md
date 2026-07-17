@@ -85,6 +85,43 @@ problem if the mod never initialized.
 Use the nearest evidence source. Do not start with decompiled architecture when the compiler already identifies a syntax
 error, or with platform metadata when the local package has not been verified.
 
+## Silent Unity UI Bundle Drift
+
+After a game or Unity Editor update, treat serialized UI asset-bundle incompatibility as a specific diagnostic
+hypothesis when all of these observations hold:
+
+- the mod assembly and dependencies load without a direct mod exception;
+- the expected UI element is missing or cannot be instantiated;
+- current integration APIs still match the mod's source closely enough that a code break is not established;
+- the installed bundle was built with an older Unity version or its provenance is uncertain.
+
+Do not assume this hypothesis is true for every missing UI element. First verify current mod initialization and logs,
+compare the source integration point with the current game API, and establish the Unity version or provenance of the
+tested bundle. When original source is available, a controlled rebuild with the repository's current Unity version is
+a cheaper discriminator than speculative code changes. Compare the rebuilt artifact in the real game; a successful
+rebuild supports a serialized-bundle compatibility diagnosis but does not establish a universal cause.
+
+## Temporary Third-Party Unity Source
+
+For a local-only compatibility experiment on a third-party mod, prefer the author's original source over reconstructing
+assets with AssetRipper. Public source availability does not authorize committing, publishing, or redistributing it.
+
+With explicit user approval, source may be placed temporarily under the already imported
+`ModsUnityProject/Assets/Mods/<TemporaryModName>` and exported through the standard repository wrapper. Apply these
+boundaries:
+
+1. Verify the destination directory and `.meta` file do not overlap existing tracked Unity source, and record scoped Git
+   status before placement.
+2. Keep the third-party source and generated `.meta` files untracked.
+3. Acquire the main repository's `unity-project` lock before any Unity launch or export.
+4. Produce only the local artifact authorized for the diagnostic experiment; do not publish it.
+5. Remove exactly the temporary source directory and its `.meta` file after export.
+6. Verify scoped Git status shows no temporary source, metadata, or other residue before ending the task.
+
+Use this path only when it avoids a disproportionate clean-project bootstrap/import loop and the main project's current
+dependencies are suitable for the experiment. It is a reversible diagnostic technique, not a normal ownership model
+for third-party source.
+
 ## One-Hypothesis Diagnostic Loop
 
 For each iteration:

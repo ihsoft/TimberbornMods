@@ -37,7 +37,7 @@ blindly.
 | Adding or modifying player-facing text, localization keys or files, localized UI strings, or `ILoc` usage | `docs/agent-knowledge/Timberborn-Localization-Operational-Knowledge-v1.md` and `docs/agent-knowledge/Timberborn-Repository-Validation-Operational-Knowledge-v1.md` |
 | Working with `ModsUnityProject`, Unity-owned package data, compatibility lanes, or Unity export | `docs/agent-knowledge/Timberborn-Unity-Operational-Knowledge-v1.md` |
 | Changing Timberborn game, Unity Editor, or Unity package versions; running the importer; refreshing or validating imported game assemblies | `docs/agent-knowledge/Timberborn-Unity-Import-Operational-Knowledge-v1.md` and `docs/agent-knowledge/Timberborn-Unity-Operational-Knowledge-v1.md` |
-| Starting an exclusive shared-checkout operation such as opening, importing, or exporting through Unity, or staging, creating, or verifying a Git commit | `docs/agent-knowledge/Repository-Coordination-Operational-Knowledge-v1.md` |
+| Starting any agent-controlled Unity Editor or batch-mode launch for this repository's work, including a separate project, or staging, creating, or verifying a Git commit | `docs/agent-knowledge/Repository-Coordination-Operational-Knowledge-v2.md` |
 | Creating or modifying in-game UI Toolkit views, UXML, USS, dialogs, panels, or fragments | `docs/timberborn-ui-toolkit-notes-for-ai-agents.md` |
 | Designing a new feature or new mod | `docs/timberborn-modding-howto-for-ai-agents.md`, `docs/timberborn-repository-notes.md`, and `docs/timberborn-lessons-learned.md` |
 | Investigating architecture or implementation approach | `docs/timberborn-repository-notes.md` and `docs/timberborn-lessons-learned.md` |
@@ -307,9 +307,10 @@ or previous chat context, then return the complete updated content.
 
 ## Shared repository coordination
 
-Before an agent starts Unity against the shared project or begins a Git staging-and-commit transaction, follow
-`docs/agent-knowledge/Repository-Coordination-Operational-Knowledge-v1.md` and acquire the resource-specific repository
-lock. Do not lock ordinary reads, file edits, diagnostics, or independent builds.
+Before any agent-controlled Unity launch for this repository's work, including a separate temporary or cloned project,
+or before a Git staging-and-commit transaction, follow
+`docs/agent-knowledge/Repository-Coordination-Operational-Knowledge-v2.md` and acquire the resource-specific repository
+lock from the main repository. Do not lock ordinary reads, file edits, diagnostics, or independent builds.
 
 The lock serializes an already authorized operation; it does not grant permission to commit, publish, tag, open an
 interactive application, or change external state.
