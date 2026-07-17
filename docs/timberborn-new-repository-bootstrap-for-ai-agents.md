@@ -92,6 +92,10 @@ Follow the current official [Unity setup](https://github.com/mechanistry/timberb
 5. Wait for the import and Unity compilation to finish. Verify that `ModsUnityProject/Assets/Plugins/Timberborn`
    exists and contains the imported/publicized game DLLs before attempting batch compilation or export.
 
+After the first import or any version-driven refresh, follow
+`docs/agent-knowledge/Timberborn-Unity-Import-Operational-Knowledge-v1.md` and pass its package-dependency,
+assembly-load, and custom-type gates before batch compilation or export.
+
 The importer also refreshes dynamic, game-version-specific assets under
 `ModsUnityProject/Assets/Tools/ImportedAssets`. Keep that output local and ignored, and repeat the import after game
 updates when the official tool requires it.
@@ -253,8 +257,9 @@ For a clean checkout, verify only the capabilities needed by the current task:
 - game managed assemblies exist under `Dependencies/GameRoot/Timberborn_Data/Managed`,
 - Unity Hub sign-in and Editor licensing are ready, and the required Editor version and both Build Support modules are
   installed/resolvable,
-- the official Unity first-open import has populated `ModsUnityProject/Assets/Plugins/Timberborn` before batch
-  compilation or export, and the Unity project is not already open before batch export,
+- the official Unity first-open import has populated `ModsUnityProject/Assets/Plugins/Timberborn`, the Unity Import
+  Operational Knowledge gates pass before batch compilation or export, and the Unity project is not already open before
+  batch export,
 - SteamCMD path/user config exists if publishing to Steam,
 - `gh auth status` succeeds if GitHub releases or issue work are needed,
 - Mod.IO configs/tokens exist for the target mod or a shared explicit owner token path is available,

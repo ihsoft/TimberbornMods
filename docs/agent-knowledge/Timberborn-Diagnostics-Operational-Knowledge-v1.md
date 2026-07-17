@@ -10,7 +10,9 @@ read every other instruction selected by the root routing table for the affected
 
 - use Timberborn Repository Validation Operational Knowledge for package ownership and build, export, and test
   selection;
-- use Timberborn Unity Operational Knowledge for Unity source, imported references, export, and package-layer ownership;
+- use Timberborn Unity Operational Knowledge for Unity source, export, and package-layer ownership;
+- use Timberborn Unity Import Operational Knowledge for importer, game-assembly, Editor-version, and package-dependency
+  readiness;
 - use the bootstrap rules for missing tools, aliases, generated references, Unity installation, or local environment;
 - use the UI Toolkit notes for in-game UI problems;
 - use the release rules for package, platform, upload, or post-release problems;
@@ -71,7 +73,8 @@ problem if the mod never initialized.
 | Environment and references | aliases, tool/editor/game versions, generated-reference provenance, license readiness | bootstrap rules |
 | C# compilation | the first compiler error and the compile-only command from the package matrix | repository validation knowledge and modding rules |
 | Post-build copy | build success versus copy-target failure, resolved `ModPath`, output timestamps | repository validation knowledge |
-| Unity import or export | the current per-run log under `.tools/unity-logs`, then global Unity `Editor.log` if execution stopped before the batch method | Unity knowledge, then bootstrap or release rules |
+| Unity import readiness | the first assembly-load or package-dependency error in the current importer or Editor log | Unity Import knowledge, then bootstrap |
+| Unity export | the current per-run log under `.tools/unity-logs`, then global Unity `Editor.log` if execution stopped before the batch method | Unity knowledge, then release rules when applicable |
 | Local package | manifest, compatibility folder, DLL/data/assets, timestamps, exact source-to-output ownership | Unity and repository validation knowledge, then release rules |
 | Game discovery and load | current runtime logs under `_LOGS!`, enabled-mod state, dependencies, first load or initialization exception | modding rules and local `AGENTS.md` |
 | Runtime behavior | minimal reproduction, owning game system, lifecycle and timing, narrow repository logs | modding how-to and lessons learned |
