@@ -252,11 +252,17 @@ For LocalModFolder releases with Unity-exported assets, use this order:
    needed.
 2. Run the Unity export for the selected compatibility lane, so the exported source folder and `version-X.X` lane are
    refreshed or created from current Unity assets.
-3. Build the C# project with `ModPath` pointing at the exported mod root.
-4. Verify that the expected DLL/XML were copied into the selected lane's `Scripts` folder and that the DLL assembly
+3. For a release-capable source, verify the official exporter materialized root `workshop_data.json` and any required
+   `thumbnail.jpg` from the selected current lane. Before intentional release-tool metadata changes, the root files
+   must match that lane byte-for-byte. Do not hand-copy them or source them from a legacy lane.
+4. Build the C# project with `ModPath` pointing at the exported mod root.
+5. Verify that the expected DLL/XML were copied into the selected lane's `Scripts` folder and that the DLL assembly
    version matches the intended release.
-5. If the release intentionally preserves an unchanged legacy lane, restore it through the verified workflow above
+6. If the release intentionally preserves an unchanged legacy lane, restore it through the verified workflow above
    after current-lane export and build, then validate the completed source folder.
+
+Root metadata materialization does not authorize Steam visibility changes. Normal preflight must continue to report no
+visibility update unless the user explicitly authorized that exact change through the visibility workflow below.
 
 Before building a release ZIP from `Package.SourcePath`, make sure the current code has been built into that exact
 source folder. For C# mods, run the mod project build with the real `ModPath` and verify that the expected DLL/XML

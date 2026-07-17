@@ -18,6 +18,7 @@ Knowledge, UI Toolkit notes, Diagnostics Operational Knowledge, and release rule
 | Modding Tools source | `ModsUnityProject/Assets/Tools` | tracked tool integration already present in this repository |
 | Imported game references | `Assets/Plugins/Timberborn` and `Assets/Tools/ImportedAssets` | official importer; local generated game-version-specific dependencies |
 | Exported local package | `_MODS!/<ModName>` and its compatibility lanes | Unity exporter and C# build; generated real-game input |
+| Root release metadata | `_MODS!/<ModName>/workshop_data.json` and optional `thumbnail.jpg` | Unity exporter from the selected current lane; generated release-tool input |
 | Script output | package `Scripts/<Assembly>.dll` and optional XML | C# project build; generated package content |
 | Release artifact | configured package source, staging output, or ZIP | release tooling; exact input or output for a release operation |
 
@@ -70,6 +71,17 @@ layout, or lanes.
 
 After export, verify the intended local output: lane, manifest identity/version, changed data or bundles, and current
 timestamps or content. When code is involved, also verify the DLL/XML produced by the C# pipeline.
+
+For a release-capable `LocalModFolder`, `workshop_data.json` inside the selected current compatibility lane is
+Unity-owned exported metadata. The official export wrapper materializes it at `_MODS!/<ModName>/workshop_data.json` as
+the root interface consumed by release and tag tooling. It also materializes `thumbnail.jpg` when the selected lane
+contains one; the root thumbnail is required when preview updating is enabled.
+
+Do not hand-copy release metadata during publishing or source it from a legacy lane. Immediately after export and
+before any intentional release-tool metadata update, verify each materialized root file matches the selected current
+lane byte-for-byte. A valid lane export without required root metadata is usable for neither release preflight nor
+publication. Materializing `workshop_data.json` does not authorize a visibility change; the release visibility gate
+still applies.
 
 If export was not run or output cannot be verified, report that the local package was not refreshed. Route failures to
 Diagnostics Operational Knowledge; route first-open or licensing failures to bootstrap.
