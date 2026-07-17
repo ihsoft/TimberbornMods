@@ -29,8 +29,8 @@ When the game, Editor, render pipeline, or Unity package graph changes:
 
 1. Record the target game version and the Editor version from `ProjectSettings/ProjectVersion.txt`.
 2. Inspect the intended changes to `Packages/manifest.json` and the resolved changes in `Packages/packages-lock.json`.
-3. Satisfy bootstrap licensing and first-open prerequisites, then run the official importer against the verified game
-   installation.
+3. Satisfy bootstrap licensing and first-open prerequisites, acquire `unity-project` through Repository Coordination
+   Operational Knowledge, then run the official importer against the verified game installation.
 4. Wait for Unity import and compilation to finish; do not treat copied-file completion as the end of validation.
 5. Apply the package-dependency and assembly-load gates below.
 6. Hand off to Unity export only after imported game assemblies and required custom types resolve cleanly.

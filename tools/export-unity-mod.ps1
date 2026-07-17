@@ -6,6 +6,7 @@ param(
     [string] $UnityPath = "",
     [string] $ProjectPath = "ModsUnityProject",
     [string] $LogRoot = ".tools/unity-logs",
+    [string] $LockOwner = "",
     [switch] $SkipWindowsAssetBundle,
     [switch] $SkipMacAssetBundle,
     [switch] $BuildCode,
@@ -16,6 +17,8 @@ param(
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
+$coordinationModule = Join-Path $PSScriptRoot "repository-coordination.psm1"
+Import-Module $coordinationModule -Force
 
 function Resolve-RepoPath([string] $Path) {
     if ([System.IO.Path]::IsPathRooted($Path)) {
@@ -113,51 +116,54 @@ function Assert-UnityProjectNotOpen([string] $ProjectRoot) {
     }
 }
 
-$projectRoot = Resolve-RepoPath $ProjectPath
-Assert-PathExists $projectRoot "Unity project"
-Assert-UnityProjectNotOpen $projectRoot
-$editorVersion = Get-UnityProjectVersion $projectRoot
-$unityExe = Resolve-UnityPath $UnityPath $editorVersion
-$compatibilityVersion = Convert-GameVersionToCompatibilityVersion $GameVersion
+$operation = "Export Unity mod $ModName for $GameVersion"
+Invoke-WithRepositoryLock -RepositoryRoot $repoRoot -Resource "unity-project" -Operation $operation -Owner $LockOwner -Action {
+    $projectRoot = Resolve-RepoPath $ProjectPath
+    Assert-PathExists $projectRoot "Unity project"
+    Assert-UnityProjectNotOpen $projectRoot
+    $editorVersion = Get-UnityProjectVersion $projectRoot
+    $unityExe = Resolve-UnityPath $UnityPath $editorVersion
+    $compatibilityVersion = Convert-GameVersionToCompatibilityVersion $GameVersion
 
-$logRootPath = Resolve-RepoPath $LogRoot
-New-Item -ItemType Directory -Path $logRootPath -Force | Out-Null
-$logPath = Join-Path $logRootPath "$ModName-$GameVersion.log"
+    $logRootPath = Resolve-RepoPath $LogRoot
+    New-Item -ItemType Directory -Path $logRootPath -Force | Out-Null
+    $logPath = Join-Path $logRootPath "$ModName-$GameVersion.log"
 
-$unityArguments = @(
-    "-batchmode",
-    "-quit",
-    "-projectPath",
-    $projectRoot,
-    "-logFile",
-    $logPath,
-    "-executeMethod",
-    "Timberborn.ModdingTools.ModBuilding.ModBuilderBatch.Build",
-    "-mod",
-    $ModName,
-    "-compatibilityVersion",
-    $compatibilityVersion,
-    "-buildCode",
-    $BuildCode.IsPresent.ToString().ToLowerInvariant(),
-    "-buildWindowsAssetBundle",
-    (-not $SkipWindowsAssetBundle).ToString().ToLowerInvariant(),
-    "-buildMacAssetBundle",
-    (-not $SkipMacAssetBundle).ToString().ToLowerInvariant(),
-    "-deleteFiles",
-    (-not $NoDeleteFiles).ToString().ToLowerInvariant(),
-    "-buildZipArchive",
-    $BuildZipArchive.IsPresent.ToString().ToLowerInvariant()
-)
+    $unityArguments = @(
+        "-batchmode",
+        "-quit",
+        "-projectPath",
+        $projectRoot,
+        "-logFile",
+        $logPath,
+        "-executeMethod",
+        "Timberborn.ModdingTools.ModBuilding.ModBuilderBatch.Build",
+        "-mod",
+        $ModName,
+        "-compatibilityVersion",
+        $compatibilityVersion,
+        "-buildCode",
+        $BuildCode.IsPresent.ToString().ToLowerInvariant(),
+        "-buildWindowsAssetBundle",
+        (-not $SkipWindowsAssetBundle).ToString().ToLowerInvariant(),
+        "-buildMacAssetBundle",
+        (-not $SkipMacAssetBundle).ToString().ToLowerInvariant(),
+        "-deleteFiles",
+        (-not $NoDeleteFiles).ToString().ToLowerInvariant(),
+        "-buildZipArchive",
+        $BuildZipArchive.IsPresent.ToString().ToLowerInvariant()
+    )
 
-Write-Host "Running Unity export for $ModName $GameVersion"
-Write-Host "Unity: $unityExe"
-Write-Host "Project: $projectRoot"
-Write-Host "Log: $logPath"
+    Write-Host "Running Unity export for $ModName $GameVersion"
+    Write-Host "Unity: $unityExe"
+    Write-Host "Project: $projectRoot"
+    Write-Host "Log: $logPath"
 
-$argumentList = ($unityArguments | ForEach-Object { ConvertTo-ProcessArgument $_ }) -join " "
-$process = Start-Process -FilePath $unityExe -ArgumentList $argumentList -WindowStyle Hidden -Wait -PassThru
-if ($process.ExitCode -ne 0) {
-    throw "Unity export failed with exit code $($process.ExitCode). See log: $logPath"
+    $argumentList = ($unityArguments | ForEach-Object { ConvertTo-ProcessArgument $_ }) -join " "
+    $process = Start-Process -FilePath $unityExe -ArgumentList $argumentList -WindowStyle Hidden -Wait -PassThru
+    if ($process.ExitCode -ne 0) {
+        throw "Unity export failed with exit code $($process.ExitCode). See log: $logPath"
+    }
+
+    Write-Host "Unity export completed for $ModName $GameVersion"
 }
-
-Write-Host "Unity export completed for $ModName $GameVersion"

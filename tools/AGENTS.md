@@ -3,6 +3,19 @@
 These instructions apply to standalone repository tools under `tools/`. They complement the root `AGENTS.md` and do
 not relax its role, safety, publication, or external-state gates.
 
+## Repository Coordination
+
+Use `repository-coordination.psm1` for tracked tools that need exclusive ownership of a shared local resource. Do not
+invent tool-specific lock files or delete diagnostic records directly.
+
+Unity tools that open, import, compile, or export `ModsUnityProject` must hold `unity-project` for the entire operation.
+Tools that own a complete Git staging and commit transaction must hold `git-transaction`. The lock does not authorize
+the underlying Unity, Git, release, or external-state operation.
+
+Keep the existing native safety checks. Unity project lockfiles/process checks and Git's `.git/index.lock` catch
+non-participating processes and low-level collisions; repository coordination prevents the higher-level race between
+otherwise valid checks and commands.
+
 ## Standalone Steamworks.NET Tools
 
 Treat a standalone Steamworks.NET CLI as a repository tool, not as the Timberborn game process.
