@@ -57,6 +57,18 @@ ModsUnityProject/Assets/Mods/<ModName>/Data/
 Do not assume there is only one `Mod` directory.
 For Unity-based mods, inspect the project files and existing asset references to find the actual package data location.
 
+### Loose-file blueprint packages
+
+For loose `.blueprint.json` files owned directly by a mod package, treat the compatibility-lane directory as the path
+root. A blueprint referenced as `Buildings/...` or `TemplateCollections/...` must be packaged at that path relative to
+the lane. Do not insert a `Blueprints/` prefix merely because extracted game assets use that organizational directory;
+use such a prefix only when the owning export pipeline explicitly requires and produces it.
+
+Before real-game validation, inspect every changed `BlockObjectSpec` and verify that `Blocks.Count` equals
+`Size.X * Size.Y * Size.Z`. Use the closest stock blueprint to establish the meaning and order of block entries rather
+than padding an incomplete list mechanically. A missing entry can fail during eager preview creation before the mod's
+intended behavior can be tested.
+
 ## Unity-generated assets
 
 When adding generated Unity `.meta` files, run `git diff --check` or `git diff --cached --check` before committing.
