@@ -165,5 +165,15 @@ Invoke-WithRepositoryLock -RepositoryRoot $repoRoot -Resource "unity-project" -O
         throw "Unity export failed with exit code $($process.ExitCode). See log: $logPath"
     }
 
+    $exportedModRoot = Resolve-RepoPath (Join-Path "_MODS!" $ModName)
+    $exportedVersionRoot = Join-Path $exportedModRoot $GameVersion
+    Assert-PathExists $exportedVersionRoot "Exported compatibility lane"
+    foreach ($releaseMetadataFile in @("workshop_data.json", "thumbnail.jpg")) {
+        $laneMetadataPath = Join-Path $exportedVersionRoot $releaseMetadataFile
+        if (Test-Path -LiteralPath $laneMetadataPath) {
+            Copy-Item -LiteralPath $laneMetadataPath -Destination (Join-Path $exportedModRoot $releaseMetadataFile) -Force
+        }
+    }
+
     Write-Host "Unity export completed for $ModName $GameVersion"
 }
