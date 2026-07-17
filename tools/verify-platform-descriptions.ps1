@@ -146,7 +146,7 @@ if (-not $SkipSteam) {
         $localPath = Resolve-RepoPath $target.LocalPath
         Assert-PathExists $localPath "Steam local description"
 
-        $local = Get-Content -Raw -LiteralPath $localPath
+        $local = Get-Content -Raw -Encoding UTF8 -LiteralPath $localPath
         $remote = Get-SteamDescription $target.PublishedFileId
         $match = (Normalize-SteamDescription $local) -eq (Normalize-SteamDescription $remote)
 
@@ -171,7 +171,7 @@ if (-not $SkipModIo) {
         $localPath = Resolve-RepoPath $target.LocalPath
         Assert-PathExists $localPath "Mod.IO local description"
 
-        $local = Get-Content -Raw -LiteralPath $localPath
+        $local = Get-Content -Raw -Encoding UTF8 -LiteralPath $localPath
         $remote = Get-ModIoDescription $target $token.Value
         $match = (Get-VisibleHtmlText $local) -eq (Get-VisibleHtmlText $remote)
 

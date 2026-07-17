@@ -4,8 +4,9 @@
   "ReleaseVersion": "1.17.1",
   "ScriptFileBase": "SmartPower",
   "Package": {
-    "Mode": "ExistingZip",
-    "Path": "_MODS!/SmartPower_v1.17.1.zip",
+    "Mode": "LocalModFolder",
+    "SourcePath": "_MODS!/SmartPower",
+    "OutputPath": "_MODS!/SmartPower_v1.17.1.zip",
     "MaxAgeDays": 14
   },
   "ManifestVersions": {
