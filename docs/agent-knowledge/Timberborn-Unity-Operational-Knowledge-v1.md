@@ -65,6 +65,32 @@ from the package matrix, a documented local exception, release configuration, or
 Unity manifest version, C# assembly version, release metadata, and compatibility lane serve different consumers. Do
 not assume changing one automatically updates the others.
 
+## Post-Import Assembly Gate
+
+After changing the Timberborn game version, Unity Editor version, or Unity package versions and refreshing imported
+game assemblies, do not accept copied-file summaries, importer completion, or process exit code as sufficient proof of
+a valid import.
+
+Before asset export, inspect the current Unity or importer log for every `Assembly ... will not be loaded due to errors`
+message and other assembly-load failures. Classify each occurrence. Any unresolved failure involving an imported game
+assembly, a Unity assembly it requires, or their dependency cascade is a hard stop for export even if Unity can still
+build an asset bundle.
+
+Trace each cascade from its first missing or incompatible dependency. Later Timberborn assemblies failing to load may
+only be consequences of that earlier dependency failure; do not fix or dismiss them independently.
+
+When Unity or package versions change, inspect both `Packages/manifest.json` and `Packages/packages-lock.json` for
+dependencies that changed depth, disappeared, or were previously available only transitively. Do not assume a package
+required by imported game assemblies will remain transitively resolved after an Editor or render-pipeline upgrade.
+
+If imported game assemblies reference `UnityEngine.UI`, verify that `com.unity.ugui` is explicitly resolved for the
+current Editor and that the required Unity UI assembly is available before accepting the import. Apply the same
+dependency reasoning to other missing Unity assemblies rather than hard-coding one historical package version.
+
+For UI-dependent exports, also verify that the relevant Timberborn UI assemblies load and their custom UXML element
+types are available in the Editor. Absence of compile errors in the mod's own assets does not prove that imported custom
+controls were registered.
+
 ## Export Boundary
 
 Before export, resolve the package owner and lane, satisfy bootstrap readiness, close an interactive Editor using the
