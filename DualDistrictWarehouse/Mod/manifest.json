@@ -1,0 +1,13 @@
+{
+  "Name": "Dual District Warehouse",
+  "Version": "0.1.0",
+  "Id": "Timberborn.IgorZ.DualDistrictWarehouse",
+  "MinimumGameVersion": "1.1.0.0",
+  "Description": "Adds a warehouse that can be used independently from two adjacent districts.",
+  "RequiredMods": [
+    {
+      "Id": "Harmony",
+      "MinimumVersion": "2.3.3"
+    }
+  ]
+}
