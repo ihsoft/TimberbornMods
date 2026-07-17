@@ -151,10 +151,12 @@ release metadata as normal release-preparation work. Update `release.json`, `dir
 versions, and other release metadata to the requested version as needed instead of stopping only because they still
 contain the previous published version.
 
-This release-preparation allowance does not weaken the upload gate. Before any real upload, the release config, DLL
-assembly version, Unity manifest versions in the final package source, generated package path, and final package
-contents must all match the requested version exactly. Stop if the package path or source would publish an older
-artifact, such as a previous-version ZIP.
+This release-preparation allowance does not weaken the upload gate. Before any real upload, the release config,
+generated package path, final package contents, and newly built current compatibility lane must match the requested
+version exactly. A deliberately preserved legacy lane may retain its previously published DLL and manifest versions
+only through the verified legacy-lane workflow below, and its manifest must match the lane-specific value in
+`ManifestVersions`. Stop if the current lane, package path, or package source would publish an older artifact, such as a
+previous-version ZIP.
 
 ## Target game version
 
@@ -202,12 +204,47 @@ For `Package.Mode = "LocalModFolder"`, the source folder is the source of truth.
 
 The configured source folder is the only input for release package contents. Agents may validate it, package it, and
 report what is missing. Agents must not repair, supplement, or reinterpret it using previous archives, backup folders,
-similarly named folders, or inferred state.
+similarly named folders, or inferred state except for the narrowly verified unchanged-legacy-lane restoration below.
 
 Treat `version-*` folders as compatibility lanes, not as mandatory folders for every Timberborn game version. Add or
 export a new `version-X.X` folder only when the release needs a distinct compatibility lane, such as stable versus
 experimental or an incompatible game API/data change. If the source folder does not contain a game-version folder, the
 release does not contain it.
+
+## Restoring an unchanged legacy compatibility lane
+
+For a newly prepared `LocalModFolder` release, a required legacy compatibility lane may be restored before packaging
+from a verified previously published artifact only when the release plan intentionally preserves that lane unchanged.
+If it is unclear whether the new release behavior should also be rebuilt for the legacy game version, stop and ask
+instead of carrying an older lane forward implicitly.
+
+The release configuration must contain a lane-specific `ManifestVersions` value for the preserved lane. If it does
+not, stop instead of inferring the expected legacy version from the artifact being considered.
+
+Prepare, export, and build the new current lane through the normal workflow first. Never obtain the current lane from a
+previous artifact. Restore a legacy lane only when it is missing or known stale; do not overwrite a present verified
+lane merely because an older artifact is available.
+
+Resolve legacy provenance in this order:
+
+1. The verified previously published Steam Workshop item whose `PublishedFileId` matches the target mod's current
+   release configuration.
+2. An exact known local archive of that previously published release.
+
+Do not use a backup folder, similarly named archive, neighboring Workshop item, or inferred previous output. Before
+copying anything, verify:
+
+- the platform or archive identity and the previously published mod version;
+- the mod manifest identity;
+- the exact legacy `version-X.X` lane name;
+- the lane manifest version against its configured `ManifestVersions` value;
+- the required DLL/XML files or an explicit configured legacy exception;
+- any Unity bundles or other lane-owned content required by that published artifact.
+
+Copy only the verified legacy lane into the exact configured `Package.SourcePath`. Record the Workshop item or archive,
+published version, lane, and validation evidence in the preflight report or release handoff. After restoration, treat
+the completed configured `LocalModFolder` as the only packaging input and run normal final-package validation across
+all lanes.
 
 For LocalModFolder releases with Unity-exported assets, use this order:
 
@@ -218,6 +255,8 @@ For LocalModFolder releases with Unity-exported assets, use this order:
 3. Build the C# project with `ModPath` pointing at the exported mod root.
 4. Verify that the expected DLL/XML were copied into the selected lane's `Scripts` folder and that the DLL assembly
    version matches the intended release.
+5. If the release intentionally preserves an unchanged legacy lane, restore it through the verified workflow above
+   after current-lane export and build, then validate the completed source folder.
 
 Before building a release ZIP from `Package.SourcePath`, make sure the current code has been built into that exact
 source folder. For C# mods, run the mod project build with the real `ModPath` and verify that the expected DLL/XML
