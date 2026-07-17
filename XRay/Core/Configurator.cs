@@ -11,6 +11,7 @@ namespace IgorZ.XRay.Core;
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<KeyBindingInputProcessor>().AsSingleton();
+    containerDefinition.Bind<NaturalResourceVisibilityService>().AsSingleton();
     containerDefinition.Bind<RendererFactory>().AsSingleton();
     containerDefinition.Bind<TerrainRayCaster>().AsSingleton();
     containerDefinition.Bind<TransparentTerrainMeshService>().AsSingleton();

@@ -36,25 +36,31 @@ sealed class XRayModeManager {
   #region Implementation
 
   readonly TransparentTerrainMeshService _transparentTerrainMeshService;
+  readonly NaturalResourceVisibilityService _naturalResourceVisibilityService;
   readonly WireframeTerrainMeshService _wireframeTerrainMeshService;
 
   // Primarily made for the efficient patches handling.
   internal static XRayModeManager Instance { get; private set; }
 
-  XRayModeManager(TransparentTerrainMeshService transparentTerrainMeshService,
-                  WireframeTerrainMeshService wireframeTerrainMeshService) {
+  XRayModeManager(
+      TransparentTerrainMeshService transparentTerrainMeshService,
+      NaturalResourceVisibilityService naturalResourceVisibilityService,
+      WireframeTerrainMeshService wireframeTerrainMeshService) {
     Instance = this;
     _transparentTerrainMeshService = transparentTerrainMeshService;
+    _naturalResourceVisibilityService = naturalResourceVisibilityService;
     _wireframeTerrainMeshService = wireframeTerrainMeshService;
   }
 
   void SetXRayMode() {
     _transparentTerrainMeshService.Activate();
+    _naturalResourceVisibilityService.Activate();
     _wireframeTerrainMeshService.Activate();
   }
 
   void ResetXRayMode() {
     _transparentTerrainMeshService.Deactivate();
+    _naturalResourceVisibilityService.Deactivate();
     _wireframeTerrainMeshService.Deactivate();
   }
 

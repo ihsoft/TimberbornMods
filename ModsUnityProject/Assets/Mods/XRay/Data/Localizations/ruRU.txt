@@ -17,6 +17,8 @@ IgorZ.XRay.MeshSettings.ColorSchemaName.Normal,"Обычная","The name of the
 IgorZ.XRay.MeshSettings.GhostModelIntensity,"Прозрачность моделей","The label for the slider that controls the transparency of the models"
 IgorZ.XRay.MeshSettings.Glowing,"Режим свечения","The label for the toggle that enables or disables the glowing effect on the models"
 IgorZ.XRay.MeshSettings.Header,"Внешний вид наложения","The header for the section of the mod settings that allows to customize the overlay appearance"
+IgorZ.XRay.MeshSettings.HideNaturalResources,"Скрывать природные ресурсы","The label for the toggle that hides natural resource models while X-Ray mode is active"
+IgorZ.XRay.MeshSettings.HideNaturalResources.Note,"Скрывать деревья, кусты и посевы, пока включён режим X-Ray.","Tooltip for the toggle that hides natural resources while X-Ray mode is active"
 IgorZ.XRay.MeshSettings.IgnoreVisibleLevel,"Игнорировать срез рельефа","The label for the toggle that makes X-Ray ignore the game's terrain layer visibility cut"
 IgorZ.XRay.MeshSettings.IgnoreVisibleLevel.Note,"Показывать весь меш рельефа в режиме X-Ray, даже если игровой инструмент видимости слоёв скрывает верхние уровни.","Tooltip for the toggle that restores the old X-Ray terrain visibility behavior"
 IgorZ.XRay.MeshSettings.WireframeModeDropdown,"Отображение рельефа","The dropdown label for terrain visualization mode selection"

@@ -34,6 +34,8 @@ sealed class MeshSettings : BaseSettings<MeshSettings> {
   const string GhostModeIntensityLocKey = "IgorZ.XRay.MeshSettings.GhostModelIntensity";
   const string GlowingLocKey = "IgorZ.XRay.MeshSettings.Glowing";
   const string HeaderStringLocKey = "IgorZ.XRay.MeshSettings.Header";
+  const string HideNaturalResourcesLocKey = "IgorZ.XRay.MeshSettings.HideNaturalResources";
+  const string HideNaturalResourcesNoteLocKey = "IgorZ.XRay.MeshSettings.HideNaturalResources.Note";
   const string IgnoreVisibleLevelLocKey = "IgorZ.XRay.MeshSettings.IgnoreVisibleLevel";
   const string IgnoreVisibleLevelNoteLocKey = "IgorZ.XRay.MeshSettings.IgnoreVisibleLevel.Note";
   const string WireframeModeDropdownLocKey = "IgorZ.XRay.MeshSettings.WireframeModeDropdown";
@@ -150,6 +152,10 @@ sealed class MeshSettings : BaseSettings<MeshSettings> {
   public ModSetting<bool> IgnoreVisibleLevel { get; } =
       new(false, ModSettingDescriptor.CreateLocalized(IgnoreVisibleLevelLocKey)
           .SetLocalizedTooltip(IgnoreVisibleLevelNoteLocKey));
+
+  public ModSetting<bool> HideNaturalResources { get; } =
+      new(false, ModSettingDescriptor.CreateLocalized(HideNaturalResourcesLocKey)
+          .SetLocalizedTooltip(HideNaturalResourcesNoteLocKey));
 
   #endregion
 
