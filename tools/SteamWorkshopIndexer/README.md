@@ -48,7 +48,7 @@ The public browse page currently contains 30 results per page. The crawler reads
 
 ## Disk and request controls
 
-The default preview-cache ceiling is 5,000,000,000 bytes. The job stops before crossing it. Raising the ceiling must be
+The default preview-cache ceiling is 8,000,000,000 bytes. The job stops before crossing it. Raising the ceiling must be
 an explicit operator choice:
 
 ```powershell
@@ -61,6 +61,7 @@ Other useful options:
 - `--skip-previews` indexes metadata without downloading images.
 - `--preview-directory <directory>` changes the image cache location.
 - `--delay-ms <milliseconds>` controls the polite delay between public requests; the default is 150 ms.
+- `--preview-concurrency <1-16>` limits parallel preview downloads; the default is 6.
 - `--output <jsonl>` changes the snapshot location.
 
 This is a bootstrap/full-refresh job. A later incremental layer can stop after a stable overlap window because browse

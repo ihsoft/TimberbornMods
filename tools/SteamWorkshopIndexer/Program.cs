@@ -42,15 +42,23 @@ try {
 
     foreach (var batch in newIds.Chunk(DetailsBatchSize)) {
       var items = await QueryDetailsAsync(httpClient, batch, options.DelayMilliseconds);
-      foreach (var item in items) {
+      using var previewSemaphore = new SemaphoreSlim(options.PreviewConcurrency);
+      var itemTasks = items.Select(async item => {
         var classified = Classify(item);
         if (!options.SkipPreviews && !string.IsNullOrWhiteSpace(classified.PreviewUrl)) {
-          classified = classified with {
-            PreviewCachePath = await previewCache.GetAsync(classified, options.DelayMilliseconds),
-          };
+          await previewSemaphore.WaitAsync();
+          try {
+            classified = classified with {
+              PreviewCachePath = await previewCache.GetAsync(classified, options.DelayMilliseconds),
+            };
+          }
+          finally {
+            previewSemaphore.Release();
+          }
         }
-        records.Add(classified);
-      }
+        return classified;
+      });
+      records.AddRange(await Task.WhenAll(itemTasks));
     }
 
     pagesProcessed++;
@@ -258,6 +266,8 @@ sealed class PreviewCache {
   readonly string _directory;
   readonly long _limitBytes;
   readonly IReadOnlyDictionary<string, WorkshopRecord> _existingRecords;
+  readonly object _cacheLock = new();
+  long _cacheBytes;
 
   public PreviewCache(
       HttpClient client, string directory, long limitBytes, IReadOnlyDictionary<string, WorkshopRecord> existingRecords) {
@@ -265,12 +275,18 @@ sealed class PreviewCache {
     _directory = directory;
     _limitBytes = limitBytes;
     _existingRecords = existingRecords;
-    CacheBytes = Directory.Exists(directory)
+    _cacheBytes = Directory.Exists(directory)
         ? Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories).Sum(path => new FileInfo(path).Length)
         : 0;
   }
 
-  public long CacheBytes { get; private set; }
+  public long CacheBytes {
+    get {
+      lock (_cacheLock) {
+        return _cacheBytes;
+      }
+    }
+  }
 
   public async Task<string> GetAsync(WorkshopRecord record, int delayMilliseconds) {
     var relativePath = record.PublishedFileId + ".preview";
@@ -286,13 +302,6 @@ sealed class PreviewCache {
     }
     using var response = await _client.GetAsync(record.PreviewUrl, HttpCompletionOption.ResponseHeadersRead);
     response.EnsureSuccessStatusCode();
-    var contentLength = response.Content.Headers.ContentLength;
-    if (contentLength is > 0 && CacheBytes + contentLength > _limitBytes) {
-      throw new InvalidOperationException(
-          $"Preview cache limit would be exceeded ({CacheBytes + contentLength} > {_limitBytes} bytes). "
-              + "Increase --max-preview-cache-bytes explicitly after reviewing disk usage.");
-    }
-
     var temporaryPath = path + ".tmp";
     var previousLength = File.Exists(path) ? new FileInfo(path).Length : 0;
     try {
@@ -306,16 +315,18 @@ sealed class PreviewCache {
           break;
         }
         written += read;
-        if (CacheBytes - previousLength + written > _limitBytes) {
+        await output.WriteAsync(buffer.AsMemory(0, read));
+      }
+      output.Close();
+      lock (_cacheLock) {
+        if (_cacheBytes - previousLength + written > _limitBytes) {
           throw new InvalidOperationException(
               $"Preview cache limit would be exceeded while downloading {record.PublishedFileId}. "
                   + "Increase --max-preview-cache-bytes explicitly after reviewing disk usage.");
         }
-        await output.WriteAsync(buffer.AsMemory(0, read));
+        File.Move(temporaryPath, path, true);
+        _cacheBytes = _cacheBytes - previousLength + written;
       }
-      output.Close();
-      File.Move(temporaryPath, path, true);
-      CacheBytes = CacheBytes - previousLength + written;
       return relativePath;
     }
     finally {
@@ -328,7 +339,7 @@ sealed class PreviewCache {
 
 record Options(
     string OutputPath, string PreviewDirectory, uint StartPage, uint MaxPages, bool Append, bool SkipPreviews,
-    long MaxPreviewCacheBytes, int DelayMilliseconds) {
+    long MaxPreviewCacheBytes, int DelayMilliseconds, int PreviewConcurrency) {
   public static Options? Parse(string[] args) {
     var output = Path.Combine(".tools", "workshop-index", "timberborn-workshop-bootstrap.jsonl");
     var previews = Path.Combine(".tools", "workshop-index", "previews");
@@ -336,8 +347,9 @@ record Options(
     uint maxPages = 0;
     var append = false;
     var skipPreviews = false;
-    long maxPreviewCacheBytes = 5_000_000_000;
+    long maxPreviewCacheBytes = 8_000_000_000;
     var delayMilliseconds = 150;
+    var previewConcurrency = 6;
     for (var index = 0; index < args.Length; index++) {
       switch (args[index]) {
         case "--output" when index + 1 < args.Length:
@@ -358,6 +370,9 @@ record Options(
         case "--delay-ms" when index + 1 < args.Length && int.TryParse(args[++index], out var parsed):
           delayMilliseconds = parsed;
           break;
+        case "--preview-concurrency" when index + 1 < args.Length && int.TryParse(args[++index], out var parsed):
+          previewConcurrency = parsed;
+          break;
         case "--append":
           append = true;
           break;
@@ -373,15 +388,20 @@ record Options(
           return null;
       }
     }
+    if (previewConcurrency < 1 || previewConcurrency > 16) {
+      Console.Error.WriteLine("--preview-concurrency must be between 1 and 16.");
+      return null;
+    }
     return new Options(
-        output, previews, startPage, maxPages, append, skipPreviews, maxPreviewCacheBytes, delayMilliseconds);
+        output, previews, startPage, maxPages, append, skipPreviews, maxPreviewCacheBytes, delayMilliseconds,
+        previewConcurrency);
   }
 
   static void PrintUsage() {
     Console.WriteLine(
         "SteamWorkshopIndexer [--output <jsonl>] [--preview-directory <directory>] [--start-page <page>] "
             + "[--max-pages <count>] [--append] [--skip-previews] [--max-preview-cache-bytes <bytes>] "
-            + "[--delay-ms <milliseconds>]");
+            + "[--delay-ms <milliseconds>] [--preview-concurrency <1-16>]");
   }
 }
 
