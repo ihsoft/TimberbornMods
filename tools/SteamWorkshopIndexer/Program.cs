@@ -1,50 +1,74 @@
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using Steamworks;
 
 const uint AppId = 1062090;
+const int DetailsBatchSize = 100;
 
 var options = Options.Parse(args);
 if (options is null) {
   return 2;
 }
 
-if (!InitializeSteam()) {
-  return 3;
-}
-
 try {
   var outputPath = Path.GetFullPath(options.OutputPath);
+  var previewDirectory = Path.GetFullPath(options.PreviewDirectory);
   Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
-
-  var records = new List<WorkshopRecord>();
-  var page = options.StartPage;
-  uint pagesProcessed = 0;
-  uint totalMatching = 0;
-  while (options.MaxPages == 0 || pagesProcessed < options.MaxPages) {
-    var result = QueryPage(page, options.Language);
-    totalMatching = result.TotalMatching;
-    if (result.Items.Count == 0) {
-      break;
-    }
-
-    records.AddRange(result.Items.Select(Classify));
-    pagesProcessed++;
-    Console.WriteLine($"Page {page}: {result.Items.Count} items, {records.Count} collected in this run.");
-    if (page * 50 >= totalMatching) {
-      break;
-    }
-    page++;
+  if (!options.SkipPreviews) {
+    Directory.CreateDirectory(previewDirectory);
   }
 
-  if (options.Append && File.Exists(outputPath)) {
-    records.AddRange(ReadJsonLines(outputPath));
+  var existingRecords = File.Exists(outputPath)
+      ? ReadJsonLines(outputPath).ToDictionary(record => record.PublishedFileId)
+      : new Dictionary<string, WorkshopRecord>();
+  using var httpClient = CreateHttpClient();
+  var previewCache = new PreviewCache(
+      httpClient, previewDirectory, options.MaxPreviewCacheBytes, existingRecords);
+  var records = new List<WorkshopRecord>();
+  var seenIds = new HashSet<string>();
+  uint totalMatching = 0;
+  uint pagesProcessed = 0;
+  for (var page = options.StartPage; options.MaxPages == 0 || pagesProcessed < options.MaxPages; page++) {
+    var browsePage = await QueryBrowsePageAsync(httpClient, page, options.DelayMilliseconds);
+    if (browsePage.TotalMatching > 0) {
+      totalMatching = browsePage.TotalMatching;
+    }
+
+    var newIds = browsePage.PublishedFileIds.Where(seenIds.Add).ToList();
+    if (newIds.Count == 0) {
+      break;
+    }
+
+    foreach (var batch in newIds.Chunk(DetailsBatchSize)) {
+      var items = await QueryDetailsAsync(httpClient, batch, options.DelayMilliseconds);
+      foreach (var item in items) {
+        var classified = Classify(item);
+        if (!options.SkipPreviews && !string.IsNullOrWhiteSpace(classified.PreviewUrl)) {
+          classified = classified with {
+            PreviewCachePath = await previewCache.GetAsync(classified, options.DelayMilliseconds),
+          };
+        }
+        records.Add(classified);
+      }
+    }
+
+    pagesProcessed++;
+    Console.WriteLine(
+        $"Page {page}: {newIds.Count} IDs, {records.Count} detailed items, "
+            + $"preview cache {previewCache.CacheBytes} bytes.");
+    if (browsePage.IsLastPage) {
+      break;
+    }
+  }
+
+  if (options.Append) {
+    records.AddRange(existingRecords.Values);
   }
   records = records.GroupBy(record => record.PublishedFileId).Select(group => group.First())
       .OrderByDescending(record => record.UpdatedAtUtc).ToList();
   WriteJsonLines(outputPath, records);
-  WriteSummary(outputPath, records, totalMatching, options.Language);
+  WriteSummary(outputPath, records, totalMatching, options, previewCache.CacheBytes);
   Console.WriteLine($"Wrote {records.Count} Workshop items to {outputPath}");
   return 0;
 }
@@ -52,102 +76,102 @@ catch (Exception exception) {
   Console.Error.WriteLine(exception.Message);
   return 4;
 }
-finally {
-  SteamAPI.Shutdown();
+
+static HttpClient CreateHttpClient() {
+  var client = new HttpClient() { Timeout = TimeSpan.FromSeconds(60) };
+  client.DefaultRequestHeaders.UserAgent.ParseAdd("TimberbornMods-PublicWorkshopIndexer/1.0");
+  return client;
 }
 
-static bool InitializeSteam() {
-  Environment.SetEnvironmentVariable("SteamAppId", AppId.ToString());
-  Environment.SetEnvironmentVariable("SteamGameId", AppId.ToString());
-  if (!Packsize.Test() || !DllCheck.Test()) {
-    Console.Error.WriteLine("Steamworks.NET platform checks failed.");
-    return false;
+static async Task<BrowsePageResult> QueryBrowsePageAsync(HttpClient client, uint page, int delayMilliseconds) {
+  await DelayAsync(delayMilliseconds);
+  var url = "https://steamcommunity.com/workshop/browse/"
+      + $"?appid={AppId}&browsesort=lastupdated&section=readytouseitems&actualsort=lastupdated&p={page}&l=english";
+  var html = await client.GetStringAsync(url);
+  var ids = Regex.Matches(html, @"publishedfileid\\+"":\\+""(\d+)")
+      .Select(match => match.Groups[1].Value).Distinct().ToList();
+  if (ids.Count == 0) {
+    ids = Regex.Matches(html, @"data-publishedfileid=&quot;(\d+)&quot;|data-publishedfileid=""(\d+)""")
+      .Select(match => match.Groups[1].Success ? match.Groups[1].Value : match.Groups[2].Value)
+      .Distinct().ToList();
   }
-  if (!SteamAPI.Init()) {
-    Console.Error.WriteLine("SteamAPI.Init failed. Start Steam and make sure steam_appid.txt is present.");
-    return false;
+  if (ids.Count == 0) {
+    ids = Regex.Matches(html, @"sharedfiles/filedetails/\?id=(\d+)")
+        .Select(match => match.Groups[1].Value).Distinct().ToList();
   }
-  if (!SteamUser.BLoggedOn()) {
-    Console.Error.WriteLine("Steam is running, but the current user is not logged on.");
-    return false;
-  }
-  return true;
+
+  var totalMatching = ParseTotalMatching(html);
+  const uint itemsPerPage = 30;
+  var isLastPage = totalMatching > 0 && page * itemsPerPage >= totalMatching;
+  return new BrowsePageResult(ids, totalMatching, isLastPage);
 }
 
-static QueryPageResult QueryPage(uint page, string language) {
-  var handle = SteamUGC.CreateQueryAllUGCRequest(
-      EUGCQuery.k_EUGCQuery_RankedByLastUpdatedDate,
-      EUGCMatchingUGCType.k_EUGCMatchingUGCType_Items,
-      new AppId_t(AppId), new AppId_t(AppId), page);
-  if (handle == UGCQueryHandle_t.Invalid) {
-    throw new InvalidOperationException($"Steam returned an invalid query handle for page {page}.");
-  }
-
-  try {
-    RequireQueryOption(SteamUGC.SetReturnLongDescription(handle, true), "long descriptions");
-    RequireQueryOption(SteamUGC.SetReturnAdditionalPreviews(handle, true), "additional previews");
-    RequireQueryOption(SteamUGC.SetLanguage(handle, language), $"language '{language}'");
-    RequireQueryOption(SteamUGC.SetAllowCachedResponse(handle, 300), "cached responses");
-
-    var completed = false;
-    var ioFailure = false;
-    SteamUGCQueryCompleted_t callbackResult = default;
-    var callResult = CallResult<SteamUGCQueryCompleted_t>.Create();
-    callResult.Set(SteamUGC.SendQueryUGCRequest(handle), (result, failed) => {
-      callbackResult = result;
-      ioFailure = failed;
-      completed = true;
-    });
-
-    var deadline = DateTime.UtcNow.AddSeconds(60);
-    while (!completed && DateTime.UtcNow < deadline) {
-      SteamAPI.RunCallbacks();
-      Thread.Sleep(50);
-    }
-    if (!completed) {
-      throw new TimeoutException($"Timed out querying Steam Workshop page {page}.");
-    }
-    if (ioFailure || callbackResult.m_eResult != EResult.k_EResultOK) {
-      throw new InvalidOperationException(
-          $"Steam Workshop query failed on page {page}: {callbackResult.m_eResult}, ioFailure={ioFailure}.");
-    }
-
-    var items = new List<RawWorkshopRecord>();
-    for (uint index = 0; index < callbackResult.m_unNumResultsReturned; index++) {
-      if (!SteamUGC.GetQueryUGCResult(handle, index, out var details)) {
-        Console.Error.WriteLine($"Steam did not return details for page {page}, index {index}; skipping item.");
-        continue;
-      }
-      items.Add(ToRecord(handle, index, details));
-    }
-    return new QueryPageResult(items, callbackResult.m_unTotalMatchingResults);
-  }
-  finally {
-    SteamUGC.ReleaseQueryUGCRequest(handle);
-  }
+static uint ParseTotalMatching(string html) {
+  var match = Regex.Match(html, @"total_count.{0,20}?:(\d+)", RegexOptions.IgnoreCase);
+  return match.Success && uint.TryParse(match.Groups[1].Value, out var total) ? total : 0;
 }
 
-static void RequireQueryOption(bool success, string option) {
-  if (!success) {
-    throw new InvalidOperationException($"Steam rejected the query option for {option}.");
+static async Task<List<RawWorkshopRecord>> QueryDetailsAsync(
+    HttpClient client, IReadOnlyList<string> publishedFileIds, int delayMilliseconds) {
+  await DelayAsync(delayMilliseconds);
+  var values = new List<KeyValuePair<string, string>> {
+    new("itemcount", publishedFileIds.Count.ToString()),
+    new("include_tags", "true"),
+  };
+  for (var index = 0; index < publishedFileIds.Count; index++) {
+    values.Add(new KeyValuePair<string, string>($"publishedfileids[{index}]", publishedFileIds[index]));
   }
+
+  using var response = await client.PostAsync(
+      "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+      new FormUrlEncodedContent(values));
+  response.EnsureSuccessStatusCode();
+  await using var stream = await response.Content.ReadAsStreamAsync();
+  using var document = await JsonDocument.ParseAsync(stream);
+  var results = new List<RawWorkshopRecord>();
+  foreach (var item in document.RootElement.GetProperty("response").GetProperty("publishedfiledetails").EnumerateArray()) {
+    if (GetUInt32(item, "result") != 1) {
+      continue;
+    }
+    var tags = item.TryGetProperty("tags", out var tagsElement)
+        ? tagsElement.EnumerateArray().Select(tag => GetString(tag, "tag")).Where(tag => tag.Length > 0).ToList()
+        : [];
+    results.Add(new RawWorkshopRecord(
+        GetString(item, "publishedfileid"), GetString(item, "title"), GetString(item, "description"),
+        GetString(item, "creator"), GetUInt32(item, "time_created"), GetUInt32(item, "time_updated"),
+        GetString(item, "preview_url"), tags, GetUInt32(item, "votes_up"), GetUInt32(item, "votes_down"),
+        GetSingle(item, "score")));
+  }
+  return results;
 }
 
-static RawWorkshopRecord ToRecord(UGCQueryHandle_t handle, uint index, SteamUGCDetails_t details) {
-  SteamUGC.GetQueryUGCPreviewURL(handle, index, out var previewUrl, 2048);
-
-  var tags = new List<string>();
-  var tagCount = SteamUGC.GetQueryUGCNumTags(handle, index);
-  for (uint tagIndex = 0; tagIndex < tagCount; tagIndex++) {
-    if (SteamUGC.GetQueryUGCTag(handle, index, tagIndex, out var tag, 256)) {
-      tags.Add(tag);
-    }
+static string GetString(JsonElement item, string property) {
+  if (!item.TryGetProperty(property, out var value)) {
+    return string.Empty;
   }
+  return value.ValueKind == JsonValueKind.String ? value.GetString() ?? string.Empty : value.ToString();
+}
 
-  return new RawWorkshopRecord(
-      details.m_nPublishedFileId.m_PublishedFileId.ToString(), details.m_rgchTitle, details.m_rgchDescription,
-      details.m_ulSteamIDOwner.ToString(), details.m_rtimeCreated, details.m_rtimeUpdated, previewUrl,
-      tags, details.m_unVotesUp, details.m_unVotesDown, details.m_flScore);
+static uint GetUInt32(JsonElement item, string property) {
+  if (!item.TryGetProperty(property, out var value)) {
+    return 0;
+  }
+  return value.ValueKind == JsonValueKind.Number && value.TryGetUInt32(out var number)
+      ? number
+      : uint.TryParse(value.ToString(), out number) ? number : 0;
+}
+
+static float GetSingle(JsonElement item, string property) {
+  if (!item.TryGetProperty(property, out var value)) {
+    return 0;
+  }
+  return value.ValueKind == JsonValueKind.Number && value.TryGetSingle(out var number)
+      ? number
+      : float.TryParse(value.ToString(), out number) ? number : 0;
+}
+
+static Task DelayAsync(int milliseconds) {
+  return milliseconds > 0 ? Task.Delay(milliseconds) : Task.CompletedTask;
 }
 
 static WorkshopRecord Classify(RawWorkshopRecord item) {
@@ -155,11 +179,10 @@ static WorkshopRecord Classify(RawWorkshopRecord item) {
   var matches = CategoryRules.All.Select(rule => MatchRule(rule, searchableText, item.Tags)).Where(match => match.Score > 0)
       .OrderByDescending(match => match.Score).ThenBy(match => match.Category).ToList();
   var primaryCategory = matches.FirstOrDefault()?.Category ?? "other";
-  var plainDescription = StripSteamMarkup(item.Description);
   return new WorkshopRecord(
-      item.PublishedFileId, item.Title, item.Description, plainDescription, item.CreatorSteamId,
+      item.PublishedFileId, item.Title, item.Description, StripSteamMarkup(item.Description), item.CreatorSteamId,
       DateTimeOffset.FromUnixTimeSeconds(item.CreatedAt).UtcDateTime,
-      DateTimeOffset.FromUnixTimeSeconds(item.UpdatedAt).UtcDateTime, item.PreviewUrl, item.Tags,
+      DateTimeOffset.FromUnixTimeSeconds(item.UpdatedAt).UtcDateTime, item.PreviewUrl, null, item.Tags,
       item.VotesUp, item.VotesDown, item.Score, primaryCategory, matches);
 }
 
@@ -186,15 +209,13 @@ static string NormalizeSearchText(string value) {
 }
 
 static string StripSteamMarkup(string value) {
-  var withoutMarkup = Regex.Replace(value, @"\[/?[^\]]+\]", " ");
-  return Regex.Replace(withoutMarkup, @"\s+", " ").Trim();
+  return Regex.Replace(Regex.Replace(value, @"\[/?[^\]]+\]", " "), @"\s+", " ").Trim();
 }
 
 static void WriteJsonLines(string outputPath, IEnumerable<WorkshopRecord> records) {
-  var jsonOptions = JsonOptions();
   using var writer = new StreamWriter(outputPath, false, new UTF8Encoding(false));
   foreach (var record in records) {
-    writer.WriteLine(JsonSerializer.Serialize(record, jsonOptions));
+    writer.WriteLine(JsonSerializer.Serialize(record, JsonOptions()));
   }
 }
 
@@ -208,42 +229,122 @@ static IEnumerable<WorkshopRecord> ReadJsonLines(string outputPath) {
 }
 
 static JsonSerializerOptions JsonOptions() {
-  return new JsonSerializerOptions() {
-      PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
-      PropertyNameCaseInsensitive = true,
+  return new JsonSerializerOptions {
+    PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+    PropertyNameCaseInsensitive = true,
   };
 }
 
 static void WriteSummary(
-    string outputPath, IReadOnlyList<WorkshopRecord> records, uint totalMatching, string language) {
-  var categoryCounts = records.GroupBy(record => record.PrimaryCategory)
-      .OrderByDescending(group => group.Count()).ToDictionary(group => group.Key, group => group.Count());
+    string outputPath, IReadOnlyList<WorkshopRecord> records, uint totalMatching, Options options, long previewCacheBytes) {
   var summary = new {
     generated_at_utc = DateTime.UtcNow,
     app_id = AppId,
-    language,
+    source = "public-http",
     collected_items = records.Count,
     steam_total_matching = totalMatching,
-    primary_category_counts = categoryCounts,
+    preview_cache_bytes = previewCacheBytes,
+    preview_cache_limit_bytes = options.MaxPreviewCacheBytes,
+    primary_category_counts = records.GroupBy(record => record.PrimaryCategory)
+        .OrderByDescending(group => group.Count()).ToDictionary(group => group.Key, group => group.Count()),
   };
-  var summaryPath = Path.ChangeExtension(outputPath, ".summary.json");
-  File.WriteAllText(summaryPath, JsonSerializer.Serialize(summary, new JsonSerializerOptions() { WriteIndented = true }));
+  File.WriteAllText(
+      Path.ChangeExtension(outputPath, ".summary.json"),
+      JsonSerializer.Serialize(summary, new JsonSerializerOptions { WriteIndented = true }));
 }
 
-record Options(string OutputPath, string Language, uint StartPage, uint MaxPages, bool Append) {
+sealed class PreviewCache {
+  readonly HttpClient _client;
+  readonly string _directory;
+  readonly long _limitBytes;
+  readonly IReadOnlyDictionary<string, WorkshopRecord> _existingRecords;
+
+  public PreviewCache(
+      HttpClient client, string directory, long limitBytes, IReadOnlyDictionary<string, WorkshopRecord> existingRecords) {
+    _client = client;
+    _directory = directory;
+    _limitBytes = limitBytes;
+    _existingRecords = existingRecords;
+    CacheBytes = Directory.Exists(directory)
+        ? Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories).Sum(path => new FileInfo(path).Length)
+        : 0;
+  }
+
+  public long CacheBytes { get; private set; }
+
+  public async Task<string> GetAsync(WorkshopRecord record, int delayMilliseconds) {
+    var relativePath = record.PublishedFileId + ".preview";
+    var path = Path.Combine(_directory, relativePath);
+    if (File.Exists(path)
+        && _existingRecords.TryGetValue(record.PublishedFileId, out var existing)
+        && string.Equals(existing.PreviewUrl, record.PreviewUrl, StringComparison.Ordinal)) {
+      return relativePath;
+    }
+
+    if (delayMilliseconds > 0) {
+      await Task.Delay(delayMilliseconds);
+    }
+    using var response = await _client.GetAsync(record.PreviewUrl, HttpCompletionOption.ResponseHeadersRead);
+    response.EnsureSuccessStatusCode();
+    var contentLength = response.Content.Headers.ContentLength;
+    if (contentLength is > 0 && CacheBytes + contentLength > _limitBytes) {
+      throw new InvalidOperationException(
+          $"Preview cache limit would be exceeded ({CacheBytes + contentLength} > {_limitBytes} bytes). "
+              + "Increase --max-preview-cache-bytes explicitly after reviewing disk usage.");
+    }
+
+    var temporaryPath = path + ".tmp";
+    var previousLength = File.Exists(path) ? new FileInfo(path).Length : 0;
+    try {
+      await using var input = await response.Content.ReadAsStreamAsync();
+      await using var output = new FileStream(temporaryPath, FileMode.Create, FileAccess.Write, FileShare.None);
+      var buffer = new byte[81920];
+      long written = 0;
+      while (true) {
+        var read = await input.ReadAsync(buffer);
+        if (read == 0) {
+          break;
+        }
+        written += read;
+        if (CacheBytes - previousLength + written > _limitBytes) {
+          throw new InvalidOperationException(
+              $"Preview cache limit would be exceeded while downloading {record.PublishedFileId}. "
+                  + "Increase --max-preview-cache-bytes explicitly after reviewing disk usage.");
+        }
+        await output.WriteAsync(buffer.AsMemory(0, read));
+      }
+      output.Close();
+      File.Move(temporaryPath, path, true);
+      CacheBytes = CacheBytes - previousLength + written;
+      return relativePath;
+    }
+    finally {
+      if (File.Exists(temporaryPath)) {
+        File.Delete(temporaryPath);
+      }
+    }
+  }
+}
+
+record Options(
+    string OutputPath, string PreviewDirectory, uint StartPage, uint MaxPages, bool Append, bool SkipPreviews,
+    long MaxPreviewCacheBytes, int DelayMilliseconds) {
   public static Options? Parse(string[] args) {
     var output = Path.Combine(".tools", "workshop-index", "timberborn-workshop-bootstrap.jsonl");
-    var language = "english";
+    var previews = Path.Combine(".tools", "workshop-index", "previews");
     uint startPage = 1;
     uint maxPages = 0;
     var append = false;
+    var skipPreviews = false;
+    long maxPreviewCacheBytes = 5_000_000_000;
+    var delayMilliseconds = 150;
     for (var index = 0; index < args.Length; index++) {
       switch (args[index]) {
         case "--output" when index + 1 < args.Length:
           output = args[++index];
           break;
-        case "--language" when index + 1 < args.Length:
-          language = args[++index];
+        case "--preview-directory" when index + 1 < args.Length:
+          previews = args[++index];
           break;
         case "--max-pages" when index + 1 < args.Length && uint.TryParse(args[++index], out var parsed):
           maxPages = parsed;
@@ -251,8 +352,17 @@ record Options(string OutputPath, string Language, uint StartPage, uint MaxPages
         case "--start-page" when index + 1 < args.Length && uint.TryParse(args[++index], out var parsed):
           startPage = parsed;
           break;
+        case "--max-preview-cache-bytes" when index + 1 < args.Length && long.TryParse(args[++index], out var parsed):
+          maxPreviewCacheBytes = parsed;
+          break;
+        case "--delay-ms" when index + 1 < args.Length && int.TryParse(args[++index], out var parsed):
+          delayMilliseconds = parsed;
+          break;
         case "--append":
           append = true;
+          break;
+        case "--skip-previews":
+          skipPreviews = true;
           break;
         case "--help":
           PrintUsage();
@@ -263,24 +373,26 @@ record Options(string OutputPath, string Language, uint StartPage, uint MaxPages
           return null;
       }
     }
-    return new Options(output, language, startPage, maxPages, append);
+    return new Options(
+        output, previews, startPage, maxPages, append, skipPreviews, maxPreviewCacheBytes, delayMilliseconds);
   }
 
   static void PrintUsage() {
     Console.WriteLine(
-        "SteamWorkshopIndexer [--output <jsonl>] [--language <steam-language>] [--start-page <page>] "
-            + "[--max-pages <count>] [--append]");
+        "SteamWorkshopIndexer [--output <jsonl>] [--preview-directory <directory>] [--start-page <page>] "
+            + "[--max-pages <count>] [--append] [--skip-previews] [--max-preview-cache-bytes <bytes>] "
+            + "[--delay-ms <milliseconds>]");
   }
 }
 
-record QueryPageResult(List<RawWorkshopRecord> Items, uint TotalMatching);
+record BrowsePageResult(List<string> PublishedFileIds, uint TotalMatching, bool IsLastPage);
 record RawWorkshopRecord(
     string PublishedFileId, string Title, string Description, string CreatorSteamId, uint CreatedAt, uint UpdatedAt,
     string PreviewUrl, List<string> Tags, uint VotesUp, uint VotesDown, float Score);
 record WorkshopRecord(
     string PublishedFileId, string Title, string DescriptionRaw, string DescriptionPlain, string CreatorSteamId,
-    DateTime CreatedAtUtc, DateTime UpdatedAtUtc, string PreviewUrl, List<string> Tags, uint VotesUp, uint VotesDown,
-    float Score, string PrimaryCategory, List<CategoryMatch> Categories);
+    DateTime CreatedAtUtc, DateTime UpdatedAtUtc, string PreviewUrl, string? PreviewCachePath, List<string> Tags,
+    uint VotesUp, uint VotesDown, float Score, string PrimaryCategory, List<CategoryMatch> Categories);
 record CategoryMatch(string Category, int Score, List<string> Evidence);
 record CategoryRule(string Name, string[] Tags, string[] Terms);
 
