@@ -1,4 +1,4 @@
-# v1.17.1 (TBD)
+# v1.17.1 (July 17th, 2026)
 * [Update] Support game version `1.1.1.1`.
 
 # v1.17.0 (June 13th, 2026)
