@@ -22,6 +22,8 @@ sealed class RendererFactory(IWaterMesh waterMesh) {
   static readonly int BaseColorProperty = Shader.PropertyToID("_BaseColor");
   static readonly int ColorProperty = Shader.PropertyToID("_Color");
 
+  const string SurfaceTypeTransparentKeyword = "_SURFACE_TYPE_TRANSPARENT";
+
   #region API
 
   /// <summary>
@@ -47,6 +49,8 @@ sealed class RendererFactory(IWaterMesh waterMesh) {
     mat.SetFloat(SurfaceProperty, 1); // Transparent
     mat.SetFloat(BlendProperty, 0);   // Alpha
     mat.SetFloat(ZWriteProperty, 0);
+    mat.EnableKeyword(SurfaceTypeTransparentKeyword);
+    mat.SetShaderPassEnabled("DepthOnly", false);
 
     mat.SetColor(BaseColorProperty, color);
     mat.SetColor(ColorProperty, color);
