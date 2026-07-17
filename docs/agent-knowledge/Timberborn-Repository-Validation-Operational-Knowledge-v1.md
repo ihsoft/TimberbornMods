@@ -37,6 +37,19 @@ testing is unnecessary or that an unrelated package's tests should be substitute
 `CustomResources`, `TestParser`, `TestSupport`, `UnityDevLite`, and projects under `tools/` are not active mod packages
 in this matrix. Inspect their specific project purpose before applying a mod build, export, test, or release workflow.
 
+## Bulk Package Selection
+
+Before a repository-wide or pattern-based build, export, or validation operation, collect the matching paths and then
+classify their owning packages using the matrix and closest local instructions. A package does not become active merely
+because it contains files matching the requested pattern.
+
+Exclude reference-only, retired, dead, example-only, and otherwise inactive packages from bulk operations unless the
+user explicitly names that package and asks to build, export, validate, or revive it. A broad request such as "all mods
+with UXML" means all active mod packages matching the pattern; it does not override an inactive package status.
+
+If a matching package's status cannot be established, report the evidence and ask before running a build or export that
+would write generated output for it.
+
 ## Compile-Only Validation
 
 For a production mod project, use a nonexistent `ModPath` so a post-build package copy cannot turn successful C#
