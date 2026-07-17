@@ -1,18 +1,31 @@
 # TimberbornMods
-This solution only contains C# projects to build scripts (DLLs) for the mods. The mod themselves
-are made via Unity.
 
-## Prerequisites
+This repository contains the C# projects and shared Unity project used to build Timberborn mods.
 
-1. Read `README.md` in `ModsUnityProject` and folow the steps to prepare the Unity project.
-2. Read `README.md` in `Dependencies` and folow the steps to prepare the dependency assemblies.
-3. Install .NET8 or a more fresh version. The minimum supported C# compiler version is 12.
-4. Ensure that the proper MSBuild version is used by IDE. In JetBrains Rider it's located in:
-   "Build, Execution, Deployment | Toolset and Build".
-5. Setup a logical drive `u:` pointing to `C:\Users\<user>\Documents\Timberborn` to have the built
-   binaries copied automatically into the Timberborn mods folder.
+## Setup with an AI agent
+
+Point your agent at this repository and ask:
+
+> Bootstrap this TimberbornMods checkout. Follow `AGENTS.md` and
+> `docs/timberborn-new-repository-bootstrap-for-ai-agents.md`, complete everything you can, and tell me which steps
+> require my input.
+
+## Manual setup
+
+1. Install the .NET SDK selected by `global.json`. Ensure that your IDE uses a compatible MSBuild toolset.
+2. Create the local `_GAME!`, `_WORKSHOP!`, `_MODS!`, and `_LOGS!` links, plus `Dependencies/GameRoot` and
+   `Dependencies/Workshop`. Their targets are described in the
+   [bootstrap guide](docs/timberborn-new-repository-bootstrap-for-ai-agents.md) and
+   [dependency setup](Dependencies/README.md).
+3. Install the Unity Editor version from `ModsUnityProject/ProjectSettings/ProjectVersion.txt` with Windows and Mac
+   Build Support. Sign in to Unity Hub and make sure the Editor license is active.
+4. Follow the official [Unity setup](https://github.com/mechanistry/timberborn-modding/wiki/Unity-setup) and
+   [asset importer](https://github.com/mechanistry/timberborn-modding/wiki/Asset-importer) workflow. Add
+   `ModsUnityProject` to Hub with `-disable-assembly-updater`, choose `Ignore` instead of Safe Mode on first open, and
+   import the Timberborn DLLs and assets from the game installation.
 
 ## Development and building
 
-Make the mod from the Unity project. Then, compile the script. This will create a fully complete
-mod setup at the target path.
+Build each mod through its owning projects. For Unity-owned data, export `ModsUnityProject` content into `_MODS!`, then
+build the corresponding C# project so its DLLs are copied into the exported package. Repository helpers for these
+workflows live under `tools/`.
