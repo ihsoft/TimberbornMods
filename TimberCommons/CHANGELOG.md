@@ -1,4 +1,4 @@
-# v1.21.0 (TBD)
+# v1.21.0 (July 17th, 2026)
 * [Feature] Show the faction logo and localized faction name on saved-game previews.
 
 # v1.20.0 (July 6th, 2026)

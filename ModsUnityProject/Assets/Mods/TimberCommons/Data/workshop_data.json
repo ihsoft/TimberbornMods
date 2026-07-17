@@ -4,5 +4,8 @@
   "Visibility": "Public",
   "UpdateDescription": false,
   "UpdateVisibility": false,
-  "UpdatePreview": false
+  "UpdatePreview": false,
+  "Tags": [
+    "Quality of life"
+  ]
 }
