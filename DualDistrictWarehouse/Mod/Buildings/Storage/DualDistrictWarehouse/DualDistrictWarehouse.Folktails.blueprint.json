@@ -200,7 +200,7 @@
   "Children": {
     "#Finished": {
       "TimbermeshSpec": {
-        "Model": "Buildings/DistrictManagement/DistrictCrossing/DistrictCrossing.Folktails.Model"
+        "Model": "Buildings/Storage/DualDistrictWarehouse/DualDistrictWarehouse.Folktails.Model"
       },
       "CollidersSpec": {
         "BoxColliders": [
