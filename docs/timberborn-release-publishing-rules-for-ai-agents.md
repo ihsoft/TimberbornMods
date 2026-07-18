@@ -63,6 +63,33 @@ stop before the next public change. Apply the change during release preparation 
 repeat all affected validation, and create a new final preflight report with the new fingerprints and hashes. Do not
 continue under the old report even when the rebuilt package is expected to be equivalent.
 
+## Same-version corrective package replacement
+
+A same-version corrective replacement is an exceptional workflow for replacing already published package contents
+without changing the mod version. Do not infer this mode from a packaging defect or an existing platform release. The
+user must explicitly authorize replacement for the named mod, version, and platforms.
+
+Prepare the correction as a committed package-layout or release-input change, then run a fresh final preflight for the
+corrected artifact. Keep the existing release identity unchanged. The report must identify the correction commit,
+corrected package hash and source fingerprint, requested replacement platforms, existing live artifact identities and
+hashes when obtainable, and the chosen disposition of the existing pushed tag.
+
+Use explicit corrective-replacement modes in unified and child platform tooling. Normal create-or-publish behavior must
+continue to fail when the platform release or same-named asset already exists. If tooling cannot intentionally replace
+an existing package or GitHub Release asset, stop and implement or validate that bounded mode; do not bypass the
+workflow with ad hoc platform commands or an implicit clobber option.
+
+Authorization to replace platform packages or assets does not authorize changing Git history. Do not create another
+version tag or duplicate GitHub Release. Moving an existing pushed tag to the correction commit requires separate
+explicit user authorization for that tag rewrite. If the user chooses to leave the tag at its original commit, record
+that provenance difference explicitly before replacement and in the final report; do not imply that the tag contains
+the corrected package-layout commit.
+
+Before each replacement, re-check the unchanged mod and version identity plus the corrected artifact hash. Afterward,
+verify that every requested platform exposes the corrected artifact or content and that its digest or closest available
+content fingerprint matches the preflight snapshot. If replacement succeeds on only some platforms, stop, report the
+partial public state, and require explicit direction before retrying or changing tag provenance.
+
 ## Network checks
 
 Release publishing requires live Steam, GitHub, and Mod.IO checks.
