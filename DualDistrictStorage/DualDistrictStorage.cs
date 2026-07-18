@@ -10,16 +10,16 @@ using Timberborn.Stockpiles;
 using UnityEngine;
 using UnityDev.Utils.LogUtilsLite;
 
-namespace IgorZ.DualDistrictWarehouse;
+namespace IgorZ.DualDistrictStorage;
 
-sealed class DualDistrictWarehouse : BaseComponent, IAwakableComponent, IFinishedStateListener,
+sealed class DualDistrictStorage : BaseComponent, IAwakableComponent, IFinishedStateListener,
     ILateUpdatableComponent, IDeletableEntity {
   readonly MirrorOperationLock _mirrorOperationLock = new();
-  readonly DualDistrictWarehouseRegistry _registry;
+  readonly DualDistrictStorageRegistry _registry;
 
   Inventory _inventory;
   SingleGoodAllower _singleGoodAllower;
-  DualDistrictWarehouse _linked;
+  DualDistrictStorage _linked;
   GameObject _normalModel;
   GameObject _mirroredRoofModel;
   MeshFilter _liquidMeshFilter;
@@ -31,7 +31,7 @@ sealed class DualDistrictWarehouse : BaseComponent, IAwakableComponent, IFinishe
 
   internal Inventory Inventory => _inventory;
 
-  public DualDistrictWarehouse(DualDistrictWarehouseRegistry registry) {
+  public DualDistrictStorage(DualDistrictStorageRegistry registry) {
     _registry = registry;
   }
 
@@ -222,7 +222,7 @@ sealed class DualDistrictWarehouse : BaseComponent, IAwakableComponent, IFinishe
   }
 
   void OnBuildingLinked(object sender, LinkedBuilding linkedBuilding) {
-    _linked = linkedBuilding.GetComponent<DualDistrictWarehouse>();
+    _linked = linkedBuilding.GetComponent<DualDistrictStorage>();
     ApplyPairModelVariants();
     TryInitializePair();
   }
@@ -320,14 +320,14 @@ sealed class DualDistrictWarehouse : BaseComponent, IAwakableComponent, IFinishe
     _mirroredRoofModel.SetActive(mirroredRoof);
   }
 
-  void VerifyReplicasMatch(DualDistrictWarehouse other) {
+  void VerifyReplicasMatch(DualDistrictStorage other) {
     if (_singleGoodAllower.AllowedGood != other._singleGoodAllower.AllowedGood
         || !StockMatches(other) || !ReservationsMatch(other)) {
-      HostedDebugLog.Error(this, "Linked warehouse inventories are out of sync. No automatic recovery was attempted.");
+      HostedDebugLog.Error(this, "Linked storage inventories are out of sync. No automatic recovery was attempted.");
     }
   }
 
-  bool StockMatches(DualDistrictWarehouse other) {
+  bool StockMatches(DualDistrictStorage other) {
     var goods = new HashSet<string>();
     AddStockGoods(_inventory, goods);
     AddStockGoods(other._inventory, goods);
@@ -339,7 +339,7 @@ sealed class DualDistrictWarehouse : BaseComponent, IAwakableComponent, IFinishe
     return true;
   }
 
-  bool ReservationsMatch(DualDistrictWarehouse other) {
+  bool ReservationsMatch(DualDistrictStorage other) {
     var goods = new HashSet<string>();
     AddStockGoods(_inventory, goods);
     AddStockGoods(other._inventory, goods);
@@ -365,13 +365,13 @@ sealed class DualDistrictWarehouse : BaseComponent, IAwakableComponent, IFinishe
     }
   }
 
-  DualDistrictWarehouse PrimaryHalf() {
+  DualDistrictStorage PrimaryHalf() {
     return GetComponent<EntityComponent>().EntityId.CompareTo(_linked.GetComponent<EntityComponent>().EntityId) <= 0
         ? this
         : _linked;
   }
 
-  DualDistrictWarehouse PrimaryHalfOrNull() {
+  DualDistrictStorage PrimaryHalfOrNull() {
     return _linked == null ? null : PrimaryHalf();
   }
 

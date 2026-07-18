@@ -1,5 +1,6 @@
 # v0.1.0 (TBD)
 
+* [Change] Rename the mod to Dual District Storage now that it supports both goods and liquids.
 * [Feature] Add a working prototype of a warehouse with synchronized stock and independent access from two districts.
 * [Visual] Use the entrance-side half of the Folktails Medium Warehouse model for each district-facing side.
 * [Visual] Generate normal and mirrored-roof model variants so the two linked halves meet without a visible texture break.

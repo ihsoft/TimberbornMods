@@ -2,30 +2,30 @@ using System.Collections.Generic;
 using Timberborn.Goods;
 using Timberborn.ResourceCountingSystem;
 
-namespace IgorZ.DualDistrictWarehouse;
+namespace IgorZ.DualDistrictStorage;
 
-sealed class DualDistrictWarehouseRegistry {
-  readonly HashSet<DualDistrictWarehouse> _primaryHalves = [];
+sealed class DualDistrictStorageRegistry {
+  readonly HashSet<DualDistrictStorage> _primaryHalves = [];
 
-  internal static DualDistrictWarehouseRegistry Instance { get; private set; }
+  internal static DualDistrictStorageRegistry Instance { get; private set; }
 
-  public DualDistrictWarehouseRegistry() {
+  public DualDistrictStorageRegistry() {
     Instance = this;
   }
 
-  internal void Register(DualDistrictWarehouse warehouse) {
-    _primaryHalves.Add(warehouse);
+  internal void Register(DualDistrictStorage storage) {
+    _primaryHalves.Add(storage);
   }
 
-  internal void Unregister(DualDistrictWarehouse warehouse) {
-    _primaryHalves.Remove(warehouse);
+  internal void Unregister(DualDistrictStorage storage) {
+    _primaryHalves.Remove(storage);
   }
 
   internal ResourceCount Deduplicate(string goodId, ResourceCount resourceCount) {
     var duplicateStock = 0;
     var duplicateCapacity = 0;
-    foreach (var warehouse in _primaryHalves) {
-      var inventory = warehouse.Inventory;
+    foreach (var storage in _primaryHalves) {
+      var inventory = storage.Inventory;
       if (!inventory.Enabled || !inventory.Gives(goodId)) {
         continue;
       }

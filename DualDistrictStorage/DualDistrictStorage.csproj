@@ -4,8 +4,8 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <OutputType>Library</OutputType>
-    <RootNamespace>IgorZ.DualDistrictWarehouse</RootNamespace>
-    <AssemblyName>DualDistrictWarehouse</AssemblyName>
+    <RootNamespace>IgorZ.DualDistrictStorage</RootNamespace>
+    <AssemblyName>DualDistrictStorage</AssemblyName>
     <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>12</LangVersion>
   </PropertyGroup>
@@ -26,7 +26,7 @@
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\DualDistrictWarehouse.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\DualDistrictStorage.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
