@@ -13,6 +13,7 @@ param(
     [string] $SteamCmdPath = "",
     [string] $SteamUserName = "",
     [string] $ChangeNotesPrefix = "",
+    [string] $ExpectedPackageSha256 = "",
     [switch] $IncludeLegacyVersions,
     [switch] $SkipBuild,
     [switch] $SkipUnityExport,
@@ -617,7 +618,19 @@ if (-not [string]::IsNullOrWhiteSpace($releaseConfig.Package.Mode)) {
     $packageMode = [string]$releaseConfig.Package.Mode
 }
 
-if ($packageMode -eq "Build") {
+if (-not [string]::IsNullOrWhiteSpace($ExpectedPackageSha256)) {
+    if ($packageMode -eq "ExistingZip") {
+        $zipPath = Resolve-RepoPath ([string]$releaseConfig.Package.Path)
+    }
+    elseif ($packageMode -eq "LocalModFolder") {
+        $zipPath = Resolve-RepoPath ([string]$releaseConfig.Package.OutputPath)
+    }
+    else {
+        throw "Immutable preflight publishing is not supported for package mode: $packageMode"
+    }
+    Write-Host "Using immutable preflight package: $zipPath"
+}
+elseif ($packageMode -eq "Build") {
     $buildArguments = @{
         ModName = $ModName
         Configuration = $Configuration
@@ -686,6 +699,12 @@ else {
 
 Assert-PathExists $zipPath "Release package"
 Assert-PackageFreshEnough $zipPath $releaseConfig.Package
+if (-not [string]::IsNullOrWhiteSpace($ExpectedPackageSha256)) {
+    $actualPackageSha256 = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($actualPackageSha256 -ne $ExpectedPackageSha256.ToLowerInvariant()) {
+        throw "Release package changed since final preflight. Expected: $ExpectedPackageSha256; actual: $actualPackageSha256"
+    }
+}
 
 $versionFolders = Test-ZipPackage $zipPath $scriptFileBase $releaseConfig
 
@@ -763,8 +782,7 @@ $localTagAdds = Get-AddedTags $tags $localTags
 $localTagRemoves = Get-RemovedTags $tags $localTags
 $localTagsSynchronized = $localTagAdds.Count -eq 0 -and $localTagRemoves.Count -eq 0
 if ($Publish -and -not $localTagsSynchronized) {
-    $workshopData.Tags = @($tags)
-    Save-WorkshopData $workshopDataPath $workshopData
+    throw "Local workshop_data.json does not contain the final derived tags. Materialize tags and create a new final preflight report before publishing."
 }
 
 $liveTags = Get-LiveSteamTags $publishedFileId

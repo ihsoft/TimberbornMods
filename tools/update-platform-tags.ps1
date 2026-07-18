@@ -13,6 +13,7 @@ param(
     [string] $SteamVdfRoot = ".tools/steam-tag-updates",
     [string] $ModIoConfigPath = "",
     [string] $ModIoAccessTokenPath = "",
+    [switch] $MaterializeLocalOnly,
     [switch] $Publish
 )
 
@@ -449,6 +450,28 @@ Write-Host "Compatibility tags from version folders: $(Format-Tags $versionInfo.
 Write-Host "Additional compatibility tags: $(Format-Tags $additionalCompatibilityTags)"
 Write-Host "Local tags from workshop_data.json: $(Format-Tags $localTags)"
 Write-Host ""
+
+if ($MaterializeLocalOnly) {
+    if ($Publish) {
+        throw "-MaterializeLocalOnly cannot be combined with -Publish."
+    }
+
+    $targetTags = Get-TargetTags $localTags $versionInfo.Tags "Steam" $releaseConfig
+    Assert-SteamTagsValid $targetTags
+    $localAddTags = Get-AddedTags $targetTags $localTags
+    $localRemoveTags = Get-RemovedTags $targetTags $localTags
+    if ($localAddTags.Count -eq 0 -and $localRemoveTags.Count -eq 0) {
+        Write-Host "Local workshop_data.json already contains all derived release tags."
+    }
+    else {
+        Update-LocalSteamTags $workshopData $targetTags
+        Save-LocalWorkshopData $workshopDataInfo.Path $workshopData
+        Write-Host "Materialized derived release tags in local workshop_data.json."
+        Write-Host "  Add locally: $(Format-Tags $localAddTags)"
+        Write-Host "  Remove locally: $(Format-Tags $localRemoveTags)"
+    }
+    exit 0
+}
 
 if ($Platform -eq "All" -or $Platform -eq "Steam") {
     $appId = "1062090"

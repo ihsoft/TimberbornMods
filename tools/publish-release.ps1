@@ -187,6 +187,7 @@ Add-OptionalArgument $commonPublishArgs "-LocalModRoot" $LocalModRoot
 Add-SwitchArgument $commonPublishArgs "-IncludeLegacyVersions" ([bool]$report.PreflightOptions.IncludeLegacyVersions)
 Add-SwitchArgument $commonPublishArgs "-SkipBuild" $true
 Add-SwitchArgument $commonPublishArgs "-SkipUnityExport" $true
+Add-OptionalArgument $commonPublishArgs "-ExpectedPackageSha256" ([string]$report.Package.Sha256)
 
 if (-not $SkipSteam -and -not [bool]$report.PreflightOptions.SkipSteam) {
     $steamArgs = New-Object System.Collections.Generic.List[string]

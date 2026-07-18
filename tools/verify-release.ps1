@@ -204,6 +204,9 @@ if ([string]::IsNullOrWhiteSpace($packageMode)) {
 }
 
 $changelogHeading = Get-ReleaseHeading $changesPath $modVersion
+if ($changelogHeading -match "\(TBD\)") {
+    throw "Changelog heading for $ModName v$modVersion is still marked (TBD). Set and commit the concrete release date before final preflight."
+}
 $steps = New-Object System.Collections.Generic.List[object]
 
 if (-not $SkipPlatformDescriptions) {
@@ -267,6 +270,41 @@ if (-not $SkipPlatformTags) {
     Add-OptionalArgument $tagArgs "-ModIoConfigPath" $ModIoConfigPath
     Add-OptionalArgument $tagArgs "-ModIoAccessTokenPath" $ModIoAccessTokenPath
     $steps.Add((Invoke-ReleaseStep "Platform tag dry run" "update-platform-tags.ps1" $tagArgs.ToArray()))
+
+    $materializeTagArgs = New-Object System.Collections.Generic.List[string]
+    $materializeTagArgs.Add("-ModName")
+    $materializeTagArgs.Add($ModName)
+    Add-OptionalArgument $materializeTagArgs "-LocalModRoot" $LocalModRoot
+    $materializeTagArgs.Add("-MaterializeLocalOnly")
+    $steps.Add((Invoke-ReleaseStep "Local release tag materialization" "update-platform-tags.ps1" $materializeTagArgs.ToArray()))
+
+    $finalPublishArgs = New-Object System.Collections.Generic.List[string]
+    $finalPublishArgs.AddRange([string[]]$commonPublishArgs)
+    if (-not $SkipBuild) {
+        $finalPublishArgs.Add("-SkipBuild")
+    }
+    if (-not $SkipUnityExport) {
+        $finalPublishArgs.Add("-SkipUnityExport")
+    }
+
+    if (-not $SkipSteam) {
+        $finalSteamArgs = New-Object System.Collections.Generic.List[string]
+        $finalSteamArgs.AddRange([string[]]$finalPublishArgs)
+        Add-OptionalArgument $finalSteamArgs "-SteamConfigPath" $SteamConfigPath
+        Add-OptionalArgument $finalSteamArgs "-SteamCmdPath" $SteamCmdPath
+        Add-OptionalArgument $finalSteamArgs "-SteamUserName" $SteamUserName
+        $steps.Add((Invoke-ReleaseStep "Final Steam release dry run" "publish-steam.ps1" $finalSteamArgs.ToArray()))
+    }
+
+    if (-not $SkipModIo) {
+        $finalModIoArgs = New-Object System.Collections.Generic.List[string]
+        $finalModIoArgs.AddRange([string[]]$finalPublishArgs)
+        Add-OptionalArgument $finalModIoArgs "-ConfigPath" $ModIoConfigPath
+        Add-OptionalArgument $finalModIoArgs "-AccessTokenPath" $ModIoAccessTokenPath
+        $steps.Add((Invoke-ReleaseStep "Final Mod.IO release dry run" "publish-modio.ps1" $finalModIoArgs.ToArray()))
+    }
+
+    $steps.Add((Invoke-ReleaseStep "Final platform tag dry run" "update-platform-tags.ps1" $tagArgs.ToArray()))
 }
 
 Write-Host ""

@@ -10,6 +10,7 @@ param(
     [string] $ConfigPath = "",
     [string] $AccessTokenPath = "",
     [string] $ChangeNotesPrefix = "",
+    [string] $ExpectedPackageSha256 = "",
     [int] $ScanTimeoutSeconds = 600,
     [int] $ScanPollSeconds = 15,
     [switch] $IncludeLegacyVersions,
@@ -507,7 +508,19 @@ if (-not [string]::IsNullOrWhiteSpace($releaseConfig.Package.Mode)) {
     $packageMode = [string]$releaseConfig.Package.Mode
 }
 
-if ($packageMode -eq "Build") {
+if (-not [string]::IsNullOrWhiteSpace($ExpectedPackageSha256)) {
+    if ($packageMode -eq "ExistingZip") {
+        $zipPath = Resolve-RepoPath ([string]$releaseConfig.Package.Path)
+    }
+    elseif ($packageMode -eq "LocalModFolder") {
+        $zipPath = Resolve-RepoPath ([string]$releaseConfig.Package.OutputPath)
+    }
+    else {
+        throw "Immutable preflight publishing is not supported for package mode: $packageMode"
+    }
+    Write-Host "Using immutable preflight package: $zipPath"
+}
+elseif ($packageMode -eq "Build") {
     $buildArguments = @{
         ModName = $ModName
         Configuration = $Configuration
@@ -578,6 +591,12 @@ else {
 
 Assert-PathExists $zipPath "Release package"
 Assert-PackageFreshEnough $zipPath $releaseConfig.Package
+if (-not [string]::IsNullOrWhiteSpace($ExpectedPackageSha256)) {
+    $actualPackageSha256 = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($actualPackageSha256 -ne $ExpectedPackageSha256.ToLowerInvariant()) {
+        throw "Release package changed since final preflight. Expected: $ExpectedPackageSha256; actual: $actualPackageSha256"
+    }
+}
 
 $versionFolders = Test-ZipPackage $zipPath $scriptFileBase $releaseConfig
 
