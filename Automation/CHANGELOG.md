@@ -1,4 +1,4 @@
-# v4.8.1 (TBD)
+# v4.8.1 (July 18th, 2026)
 * [Update] Support Timberborn `1.1.1.1`.
 
 # v4.8.0 (July 9th, 2026)

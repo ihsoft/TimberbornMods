@@ -3,7 +3,7 @@
   "ChangesPath": "Automation/CHANGELOG.md",
   "ReleaseVersion": "4.8.1",
   "ScriptFileBase": "AdvancedAutomation",
-  "ReadyForPublish": false,
+  "ReadyForPublish": true,
   "Package": {
     "Mode": "LocalModFolder",
     "SourcePath": "_MODS!/Automation",
