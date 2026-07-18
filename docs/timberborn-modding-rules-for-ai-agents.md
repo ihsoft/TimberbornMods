@@ -69,6 +69,17 @@ Before real-game validation, inspect every changed `BlockObjectSpec` and verify 
 than padding an incomplete list mechanically. A missing entry can fail during eager preview creation before the mod's
 intended behavior can be tested.
 
+### Ground-level entrances and unfinished models
+
+In the confirmed current game lifecycle, a ground-level building entrance without `DoorstepSpawnDisablerSpec` requires
+a valid unfinished-model transform. Doorstep spawning parents its object to `BuildingModel.UnfinishedModel.transform`
+without treating a missing model as valid.
+
+`PlaceFinished` controls placement state; it does not remove this lifecycle dependency. Even a temporary
+`PlaceFinished` prototype must provide a valid `UnfinishedModelName` and referenced model when doorstep spawning remains
+enabled. Disable doorstep spawning only when the building intentionally does not need it and current architecture
+evidence supports that decision.
+
 ## Unity-generated assets
 
 When adding generated Unity `.meta` files, run `git diff --check` or `git diff --cached --check` before committing.

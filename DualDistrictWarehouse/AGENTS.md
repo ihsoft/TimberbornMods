@@ -73,3 +73,59 @@ After changing the generator, either generated model, blueprint child identities
    logistics scenarios separately.
 
 Preserve the already validated geometry while testing one evidence-supported model or lifecycle hypothesis at a time.
+
+## DualDistrictTank Generated Model Ownership
+
+`Tools/create_tank_half_timbermesh.py` owns the independent tracked model
+`Mod/Buildings/Storage/DualDistrictTank/DualDistrictTank.Folktails.Model.timbermesh`, whose resource identity is
+`DualDistrictTank.Folktails.Model`. It reuses the established Timbermesh parsing and clipping helpers but is not a member
+of the warehouse model's atomic two-output set.
+
+The generator clips the entrance-side half of the exact stock Medium Tank model at Timbermesh Z = 1. Revalidate the
+source identity, bounds, one-node representation, and complete entrance-side pipe geometry when the game asset changes.
+The ordinary mod build copies this loose Timbermesh into the compatibility lane; Unity export is not part of its
+ownership path.
+
+## DualDistrictTank Blueprint Contract
+
+Each physical tank entity is the entrance-side 2x1 half of the stock 2x2x3 Medium Tank. Two opposite placements link
+into one visual tank with opposite entrances and the existing shared replica inventory behavior.
+
+The blueprint must keep a valid `#Unfinished` model using
+`ConstructionBases/ConstructionBase1x2/ConstructionBase1x2.blueprint`. Its ground-level entrance participates in
+doorstep spawning, so `PlaceFinished` does not make an empty `UnfinishedModelName` valid.
+
+The tank remains liquid-only and retains the stock logical capacity and stock liquid height/movement behavior while
+those gameplay decisions remain part of the prototype. Building costs, construction stages, final player-facing text,
+liquid-type scope, textures, and release metadata are not final.
+
+## DualDistrictTank Liquid Visualization Contract
+
+The blueprint uses the stock `Liquid/2x2` plane at zero `CenterOffset`. Both physical halves retain their own
+visualizer; do not replace them with a stretched `Liquid/1x1` mesh or one full plane owned by only one half.
+
+After the owning visualizer assigns a real nonempty source mesh, the runtime component creates one instance-owned half
+mesh. It clips source triangles against local Z <= 0, interpolates the verified channels, translates retained geometry
+by local Z + 0.5 toward the inner seam, and preserves the stock material, amount, height, highlight, and movement
+ownership.
+
+The current source is intentionally bounded as a flat, static, single-submesh liquid plane. Do not generalize its
+channel set, one-submesh output, duplicated intersection vertices, or tangent handling to arbitrary Unity meshes.
+
+The late lifecycle guard must restore the owned half mesh when the stock visualizer reassigns its source, without
+rebuilding geometry every frame. Structural failure must latch after one diagnostic, and entity deletion must destroy
+the cloned native mesh.
+
+## DualDistrictTank Validation
+
+After changing the tank model, blueprint, inventory behavior, or liquid visualization:
+
+1. Regenerate and structurally validate the tank-half Timbermesh when its source transformation changed.
+2. Build through the ordinary package path and verify the packaged DLL and model match current sources.
+3. Verify the valid unfinished model, doorstep placement, opposite entrances, and linked inventory in the real game.
+4. Test the liquid surface selected and unselected so each entity's half ownership, seam, bounds, and highlight are
+   visible.
+5. Exercise source reassignment through initialization and relevant allowed-liquid changes; inspect a fresh runtime log
+   for split, model, selection, or lifecycle failures.
+6. Before claiming broader completion, validate save/load, deletion cleanup, logistics, reservations, construction,
+   capacity behavior, and the remaining prototype decisions separately.
