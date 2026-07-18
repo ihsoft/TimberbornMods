@@ -17,7 +17,8 @@ param(
     [switch] $SkipModIo,
     [switch] $SkipPlatformTags,
     [switch] $SkipGitTag,
-    [switch] $SkipGitHubRelease
+    [switch] $SkipGitHubRelease,
+    [switch] $ReplaceExistingGitHubAsset
 )
 
 $ErrorActionPreference = "Stop"
@@ -266,6 +267,8 @@ if (-not $SkipGitHubRelease) {
     $githubArgs.Add($modName)
     $githubArgs.Add("-Repository")
     $githubArgs.Add($Repository)
+    Add-OptionalArgument $githubArgs "-ExpectedPackageSha256" ([string]$report.Package.Sha256)
+    Add-SwitchArgument $githubArgs "-ReplaceExistingAsset" $ReplaceExistingGitHubAsset
     $githubArgs.Add("-Publish")
     Invoke-ReleaseStep "GitHub release publish" "publish-github-release.ps1" $githubArgs.ToArray()
 }

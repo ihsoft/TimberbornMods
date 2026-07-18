@@ -5,6 +5,8 @@ param(
     [string] $GameVersion = "version-1.1",
     [string] $OutputRoot = ".tools/release-preview",
     [string] $Repository = "ihsoft/TimberbornMods",
+    [string] $ExpectedPackageSha256 = "",
+    [switch] $ReplaceExistingAsset,
     [switch] $Publish
 )
 
@@ -205,6 +207,10 @@ if ([string]::IsNullOrWhiteSpace($manifest.Name)) {
     $releaseTitle = "$ModName v$modVersion"
 }
 $hash = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash
+if (-not [string]::IsNullOrWhiteSpace($ExpectedPackageSha256) -and
+    $hash -ne $ExpectedPackageSha256) {
+    throw "Release package hash differs from immutable preflight. Expected $ExpectedPackageSha256, actual $hash."
+}
 
 Write-Host ""
 Write-Host "GitHub release plan for $ModName v$modVersion"
@@ -215,6 +221,7 @@ Write-Host "Title: $releaseTitle"
 Write-Host "Package: $zipPath"
 Write-Host "SHA256: $hash"
 Write-Host "Game version folders: $($versionFolders -join ', ')"
+Write-Host "Existing release asset action: $(if ($ReplaceExistingAsset) { 'replace exact-name asset' } else { 'create new release only' })"
 Write-Host ""
 Write-Host "Release notes:"
 Write-Host $changeNotes
@@ -240,19 +247,45 @@ try {
 finally {
     $ErrorActionPreference = $previousErrorActionPreference
 }
-if ($releaseViewExitCode -eq 0) {
-    throw "GitHub release already exists for tag $tagName."
+if ($releaseViewExitCode -eq 0 -and -not $ReplaceExistingAsset) {
+    throw "GitHub release already exists for tag $tagName. Pass -ReplaceExistingAsset only for an explicitly authorized corrective replacement."
+}
+if ($releaseViewExitCode -ne 0 -and $ReplaceExistingAsset) {
+    throw "Cannot replace an asset because GitHub release $tagName does not exist."
 }
 
-$notesRoot = Resolve-RepoPath ".tools/github-release-notes"
-New-Item -ItemType Directory -Path $notesRoot -Force | Out-Null
-$notesPath = Join-Path $notesRoot "$tagName.md"
-$utf8NoBom = [System.Text.UTF8Encoding]::new($false)
-[System.IO.File]::WriteAllText($notesPath, $changeNotes, $utf8NoBom)
+if ($ReplaceExistingAsset) {
+    & gh release upload $tagName $zipPath --repo $Repository --clobber
+    if ($LASTEXITCODE -ne 0) {
+        throw "GitHub release asset replacement failed for $tagName."
+    }
+}
+else {
+    $notesRoot = Resolve-RepoPath ".tools/github-release-notes"
+    New-Item -ItemType Directory -Path $notesRoot -Force | Out-Null
+    $notesPath = Join-Path $notesRoot "$tagName.md"
+    $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+    [System.IO.File]::WriteAllText($notesPath, $changeNotes, $utf8NoBom)
 
-& gh release create $tagName $zipPath --repo $Repository --title $releaseTitle --notes-file $notesPath
+    & gh release create $tagName $zipPath --repo $Repository --title $releaseTitle --notes-file $notesPath
+    if ($LASTEXITCODE -ne 0) {
+        throw "GitHub release create failed for $tagName."
+    }
+}
+
+$releaseJson = & gh release view $tagName --repo $Repository --json assets
 if ($LASTEXITCODE -ne 0) {
-    throw "GitHub release create failed for $tagName."
+    throw "GitHub release verification failed for $tagName."
+}
+$release = $releaseJson | ConvertFrom-Json
+$assetName = [System.IO.Path]::GetFileName($zipPath)
+$asset = @($release.assets | Where-Object { $_.name -eq $assetName })
+if ($asset.Count -ne 1) {
+    throw "Expected exactly one GitHub release asset named $assetName, found $($asset.Count)."
+}
+$expectedDigest = "sha256:$($hash.ToLowerInvariant())"
+if ([string]$asset[0].digest -ne $expectedDigest) {
+    throw "GitHub release asset digest mismatch. Expected $expectedDigest, actual $($asset[0].digest)."
 }
 
-Write-Host "GitHub release created for $tagName."
+Write-Host "GitHub release asset verified for ${tagName}: $assetName ($expectedDigest)."
