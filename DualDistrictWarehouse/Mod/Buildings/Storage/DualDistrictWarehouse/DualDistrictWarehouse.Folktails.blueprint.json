@@ -199,9 +199,6 @@
   },
   "Children": {
     "#Finished": {
-      "TimbermeshSpec": {
-        "Model": "Buildings/Storage/DualDistrictWarehouse/DualDistrictWarehouse.Folktails.Model"
-      },
       "CollidersSpec": {
         "BoxColliders": [
           {
@@ -219,6 +216,18 @@
         ],
         "SphereColliders": [],
         "CapsuleColliders": []
+      },
+      "Children": {
+        "NormalModel": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Storage/DualDistrictWarehouse/DualDistrictWarehouse.Folktails.Model"
+          }
+        },
+        "MirroredRoofModel": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Storage/DualDistrictWarehouse/DualDistrictWarehouse.Folktails.MirroredRoof.Model"
+          }
+        }
       }
     },
     "#Unfinished": {

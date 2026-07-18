@@ -21,6 +21,8 @@ def parse_arguments():
     parser.add_argument("--source-model", required=True)
     parser.add_argument("--output-model", required=True)
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--mirrored-output-model", required=True)
+    parser.add_argument("--mirrored-output", required=True, type=Path)
     return parser.parse_args()
 
 
@@ -227,6 +229,54 @@ def validate_model(model):
             raise RuntimeError(f"Output mesh {mesh.material} has an invalid vertex index.")
 
 
+def mirror_roof_uv(model):
+    node = model.nodes[0]
+    roof_meshes = [
+        mesh for mesh in node.meshes
+        if mesh.material == "IrregularPlanks_Mossy.Folktails"
+    ]
+    if len(roof_meshes) != 1:
+        raise RuntimeError(f"Expected one mossy roof mesh, found {len(roof_meshes)}.")
+
+    roof_indices = set(roof_meshes[0].indices)
+    other_indices = {
+        index
+        for mesh in node.meshes
+        if mesh.material != "IrregularPlanks_Mossy.Folktails"
+        for index in mesh.indices
+    }
+    shared_indices = roof_indices & other_indices
+    if shared_indices:
+        raise RuntimeError(
+            f"Mossy roof shares {len(shared_indices)} vertices with other materials."
+        )
+
+    decoded_properties = {
+        vertex_property.name: (vertex_property, vectors)
+        for vertex_property, vectors in decode_vertex_properties(node)
+    }
+    if "uv0" not in decoded_properties or "tangent" not in decoded_properties:
+        raise RuntimeError("Mossy roof mirroring requires uv0 and tangent properties.")
+
+    uv_property, uv_values = decoded_properties["uv0"]
+    tangent_property, tangent_values = decoded_properties["tangent"]
+    mirrored_uv = list(uv_values)
+    mirrored_tangents = list(tangent_values)
+    for index in roof_indices:
+        u, v = mirrored_uv[index]
+        mirrored_uv[index] = (1.0 - u, v)
+        x, y, z, w = mirrored_tangents[index]
+        mirrored_tangents[index] = (-x, -y, -z, -w)
+
+    uv_property.data = struct.pack(
+        f"<{len(mirrored_uv) * 2}f", *(value for vector in mirrored_uv for value in vector)
+    )
+    tangent_property.data = struct.pack(
+        f"<{len(mirrored_tangents) * 4}f",
+        *(value for vector in mirrored_tangents for value in vector),
+    )
+
+
 def main():
     arguments = parse_arguments()
     sys.path.insert(0, str(arguments.unitypy_dir.resolve()))
@@ -250,9 +300,16 @@ def main():
 
     arguments.output.parent.mkdir(parents=True, exist_ok=True)
     arguments.output.write_bytes(zlib.compress(model.SerializeToString()))
+    mirrored_model = model_pb2.Model()
+    mirrored_model.ParseFromString(model.SerializeToString())
+    mirrored_model.nodes[0].name = arguments.mirrored_output_model
+    mirror_roof_uv(mirrored_model)
+    validate_model(mirrored_model)
+    arguments.mirrored_output.parent.mkdir(parents=True, exist_ok=True)
+    arguments.mirrored_output.write_bytes(zlib.compress(mirrored_model.SerializeToString()))
     output_triangle_count = sum(len(mesh.indices) // 3 for mesh in model.nodes[0].meshes)
     print(
-        f"Created {arguments.output}: "
+        f"Created {arguments.output} and {arguments.mirrored_output}: "
         f"{source_vertex_count}->{len(output_vertices)} vertices, "
         f"{source_triangle_count}->{output_triangle_count} triangles."
     )

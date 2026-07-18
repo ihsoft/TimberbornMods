@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
-using Timberborn.Buildings;
 using Timberborn.EntitySystem;
 using Timberborn.Goods;
 using Timberborn.InventorySystem;
@@ -20,8 +19,9 @@ sealed class DualDistrictWarehouse : BaseComponent, IAwakableComponent, IFinishe
   Inventory _inventory;
   SingleGoodAllower _singleGoodAllower;
   DualDistrictWarehouse _linked;
+  GameObject _normalModel;
+  GameObject _mirroredRoofModel;
   bool _registered;
-  bool _roofUvFlipped;
 
   internal Inventory Inventory => _inventory;
 
@@ -32,6 +32,9 @@ sealed class DualDistrictWarehouse : BaseComponent, IAwakableComponent, IFinishe
   public void Awake() {
     _inventory = GetComponent<Stockpile>().Inventory;
     _singleGoodAllower = GetComponent<SingleGoodAllower>();
+    _normalModel = GameObject.transform.Find("#Finished/NormalModel")?.gameObject;
+    _mirroredRoofModel = GameObject.transform.Find("#Finished/MirroredRoofModel")?.gameObject;
+    ShowModelVariant(mirroredRoof: false);
     GetComponent<LinkedBuilding>().BuildingLinked += OnBuildingLinked;
   }
 
@@ -53,7 +56,7 @@ sealed class DualDistrictWarehouse : BaseComponent, IAwakableComponent, IFinishe
 
   void OnBuildingLinked(object sender, LinkedBuilding linkedBuilding) {
     _linked = linkedBuilding.GetComponent<DualDistrictWarehouse>();
-    TryFlipSecondaryRoofUv();
+    ApplyPairModelVariants();
     TryInitializePair();
   }
 
@@ -111,7 +114,6 @@ sealed class DualDistrictWarehouse : BaseComponent, IAwakableComponent, IFinishe
   }
 
   void TryInitializePair() {
-    TryFlipSecondaryRoofUv();
     if (!IsOperationalPair()) {
       return;
     }
@@ -125,77 +127,24 @@ sealed class DualDistrictWarehouse : BaseComponent, IAwakableComponent, IFinishe
     }
   }
 
-  void TryFlipSecondaryRoofUv() {
+  void ApplyPairModelVariants() {
     if (_linked == null) {
       return;
     }
 
-    PrimaryHalf()._linked.FlipRoofUv();
+    var primary = PrimaryHalf();
+    primary.ShowModelVariant(mirroredRoof: false);
+    primary._linked.ShowModelVariant(mirroredRoof: true);
   }
 
-  void FlipRoofUv() {
-    if (_roofUvFlipped) {
+  void ShowModelVariant(bool mirroredRoof) {
+    if (_normalModel == null || _mirroredRoofModel == null) {
+      HostedDebugLog.Warning(this, "Could not find the normal and mirrored finished models.");
       return;
     }
 
-    var finishedModel = GetComponent<BuildingModel>().FinishedModel;
-    foreach (var meshRenderer in finishedModel.GetComponentsInChildren<MeshRenderer>(true)) {
-      var meshFilter = meshRenderer.GetComponent<MeshFilter>();
-      var sourceMesh = meshFilter?.sharedMesh;
-      if (sourceMesh == null) {
-        continue;
-      }
-
-      var roofVertices = RoofVertices(sourceMesh);
-      if (roofVertices.Count == 0) {
-        continue;
-      }
-
-      var mesh = UnityEngine.Object.Instantiate(sourceMesh);
-      mesh.name = sourceMesh.name + " (DualDistrictWarehouse roof UV)";
-      var uv = mesh.uv;
-      var tangents = mesh.tangents;
-      var minimumU = float.PositiveInfinity;
-      var maximumU = float.NegativeInfinity;
-      foreach (var vertexIndex in roofVertices) {
-        minimumU = Math.Min(minimumU, uv[vertexIndex].x);
-        maximumU = Math.Max(maximumU, uv[vertexIndex].x);
-      }
-      foreach (var vertexIndex in roofVertices) {
-        uv[vertexIndex].x = minimumU + maximumU - uv[vertexIndex].x;
-        if (tangents.Length == mesh.vertexCount) {
-          tangents[vertexIndex].x = -tangents[vertexIndex].x;
-          tangents[vertexIndex].y = -tangents[vertexIndex].y;
-          tangents[vertexIndex].z = -tangents[vertexIndex].z;
-          tangents[vertexIndex].w = -tangents[vertexIndex].w;
-        }
-      }
-      mesh.uv = uv;
-      if (tangents.Length == mesh.vertexCount) {
-        mesh.tangents = tangents;
-      }
-      meshFilter.sharedMesh = mesh;
-      _roofUvFlipped = true;
-      return;
-    }
-
-    HostedDebugLog.Warning(this, "Could not find the top roof surface to flip its UV coordinates.");
-  }
-
-  static HashSet<int> RoofVertices(Mesh mesh) {
-    var roofVertices = new HashSet<int>();
-    var vertices = mesh.vertices;
-    var normals = mesh.normals;
-    foreach (var vertexIndex in mesh.triangles) {
-      var position = vertices[vertexIndex];
-      if (position.x >= 0.119f && position.x <= 2.881f
-          && position.y >= 0.9995f && position.y <= 1.0005f
-          && position.z >= 0.118f && position.z <= 1.001f
-          && normals[vertexIndex].y > 0.999f) {
-        roofVertices.Add(vertexIndex);
-      }
-    }
-    return roofVertices;
+    _normalModel.SetActive(!mirroredRoof);
+    _mirroredRoofModel.SetActive(mirroredRoof);
   }
 
   void VerifyReplicasMatch(DualDistrictWarehouse other) {
