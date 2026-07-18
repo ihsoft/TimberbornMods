@@ -359,6 +359,14 @@ not start from them.
 
 - For gameplay, runtime, or UI behavior changes in any mod, user real-game validation is the default submission gate
   before tests or commit.
+- This is an implementation-submission gate, not a requirement for the Publisher to repeat behavior validation during
+  routine release preparation. For Publisher work, treat already committed implementation as having passed its
+  implementation gates unless the user or release evidence identifies an unresolved runtime problem. Rebuilding,
+  exporting, or packaging that committed implementation does not by itself reopen the real-game validation gate.
+- The Publisher still owns release-specific build, export, package, identity, platform, and immutable-artifact
+  validation, but must not describe those checks as player-behavior testing. If release work exposes a credible
+  unresolved runtime problem, stop publication and report it for implementation ownership or explicit user direction;
+  do not silently assume either that the release is safe or that the Publisher has behavior-tested it.
 - Real-game validation establishes that the production change actually satisfies the requested behavior. A passing test
   written against an unverified approach can preserve the wrong behavior while appearing correct.
 - Build and export the changed mod into the real local package output first, using the appropriate C# build and Unity
