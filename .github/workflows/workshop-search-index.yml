@@ -1,0 +1,95 @@
+name: Build Workshop search index
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 9 * * 1"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: workshop-search-index
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.100
+
+      - name: Build public Workshop indexer
+        run: dotnet build tools/SteamWorkshopIndexer/SteamWorkshopIndexer.csproj -c Release
+
+      - name: Collect public Workshop metadata
+        run: >-
+          dotnet tools/SteamWorkshopIndexer/bin/Release/net8.0/SteamWorkshopIndexer.dll
+          --skip-previews
+          --output .work/workshop-items.jsonl
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Restore CLIP model cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: clip-openai-vit-base-patch32-v1
+
+      - name: Install CPU classifier dependencies
+        run: |
+          python -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.7.1
+          python -m pip install -r tools/TimberbornMapPreviewClassifier/requirements.txt
+
+      - name: Classify map previews without retaining images
+        run: >-
+          python tools/TimberbornMapPreviewClassifier/classify.py
+          --snapshot .work/workshop-items.jsonl
+          --output .work/map-visual-features.jsonl
+          --download-previews
+          --download-concurrency 6
+          --batch-size 24
+
+      - name: Build public search artifacts
+        run: >-
+          python tools/TimberbornMapPreviewClassifier/build_public_index.py
+          --snapshot .work/workshop-items.jsonl
+          --visual-features .work/map-visual-features.jsonl
+          --output-directory .work/public
+
+      - name: Upload diagnostic artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: timberborn-workshop-search-index
+          path: .work/public
+          retention-days: 14
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .work/public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -51,3 +51,20 @@ Default input and output:
 
 Use `--max-items` for a bounded calibration run and `--batch-size` to tune CPU and memory usage. The full run is a
 snapshot operation because percentiles depend on the complete current corpus.
+
+## Scheduled public index
+
+`.github/workflows/workshop-search-index.yml` runs manually or every Monday. It collects Workshop metadata without a
+preview cache, downloads only the current classification batch, and publishes compact GitHub Pages artifacts:
+
+```text
+manifest.json
+workshop-items.jsonl.gz
+map-visual-features.jsonl.gz
+search-index.jsonl.gz
+```
+
+The merged search index retains public preview URLs so an agent can visually inspect a few final candidates without
+retaining the complete image corpus. The workflow uses no Steam account, API key, repository secret, or game process.
+
+GitHub Pages must be configured to use **GitHub Actions** as its deployment source before the first deployment.

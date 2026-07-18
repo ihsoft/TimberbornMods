@@ -5,9 +5,13 @@ from __future__ import annotations
 
 import argparse
 import bisect
+from concurrent.futures import ThreadPoolExecutor
+from io import BytesIO
 import json
 from pathlib import Path
+import time
 from typing import Iterable
+from urllib.request import Request, urlopen
 
 import torch
 from PIL import Image
@@ -104,27 +108,32 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model", default="openai/clip-vit-base-patch32")
     parser.add_argument("--batch-size", type=int, default=24)
     parser.add_argument("--max-items", type=int, default=0)
+    parser.add_argument("--download-previews", action="store_true")
+    parser.add_argument("--download-concurrency", type=int, default=6)
     return parser.parse_args()
 
 
-def load_maps(snapshot: Path, preview_directory: Path, max_items: int) -> list[dict]:
+def load_maps(
+    snapshot: Path, preview_directory: Path, max_items: int, download_previews: bool
+) -> list[dict]:
     maps = []
     with snapshot.open("r", encoding="utf-8") as stream:
         for line in stream:
             record = json.loads(line)
             if record.get("primary_category") != "map":
                 continue
+            preview_url = record.get("preview_url")
             cache_path = record.get("preview_cache_path")
-            if not cache_path:
+            preview_path = preview_directory / cache_path if cache_path else None
+            if not download_previews and (preview_path is None or not preview_path.is_file()):
                 continue
-            preview_path = preview_directory / cache_path
-            if not preview_path.is_file():
+            if download_previews and not preview_url:
                 continue
             maps.append(
                 {
                     "published_file_id": record["published_file_id"],
                     "title": record["title"],
-                    "preview_url": record["preview_url"],
+                    "preview_url": preview_url,
                     "preview_path": preview_path,
                 }
             )
@@ -140,6 +149,40 @@ def chunks(items: list[dict], size: int) -> Iterable[list[dict]]:
 
 def normalized(features: torch.Tensor) -> torch.Tensor:
     return features / features.norm(dim=-1, keepdim=True)
+
+
+def load_image(item: dict, download_previews: bool) -> Image.Image:
+    if download_previews:
+        request = Request(
+            item["preview_url"],
+            headers={"User-Agent": "TimberbornMods-PublicWorkshopIndexer/1.0"},
+        )
+        image_bytes = None
+        last_exception = None
+        for attempt in range(3):
+            try:
+                with urlopen(request, timeout=60) as response:
+                    image_bytes = response.read()
+                break
+            except Exception as exception:
+                last_exception = exception
+                if attempt < 2:
+                    time.sleep(2**attempt)
+        if image_bytes is None:
+            raise RuntimeError(
+                f"Could not download preview after 3 attempts: {last_exception}"
+            )
+        with Image.open(BytesIO(image_bytes)) as image:
+            return image.convert("RGB")
+    with Image.open(item["preview_path"]) as image:
+        return image.convert("RGB")
+
+
+def try_load_image(item: dict, download_previews: bool) -> tuple[Image.Image | None, Exception | None]:
+    try:
+        return load_image(item, download_previews), None
+    except Exception as exception:
+        return None, exception
 
 
 def build_text_prototypes(
@@ -159,19 +202,27 @@ def build_text_prototypes(
 
 
 def score_maps(
-    maps: list[dict], model: CLIPModel, processor: CLIPProcessor, batch_size: int
+    maps: list[dict],
+    model: CLIPModel,
+    processor: CLIPProcessor,
+    batch_size: int,
+    download_previews: bool,
+    download_concurrency: int,
 ) -> list[dict]:
     prototypes = build_text_prototypes(model, processor)
     results = []
     for batch_number, batch in enumerate(chunks(maps, batch_size), start=1):
-        images = []
+        images: list[Image.Image] = []
         valid = []
-        for item in batch:
-            try:
-                with Image.open(item["preview_path"]) as image:
-                    images.append(image.convert("RGB"))
+        with ThreadPoolExecutor(max_workers=download_concurrency) as executor:
+            loaded_images = list(
+                executor.map(lambda item: try_load_image(item, download_previews), batch)
+            )
+        for item, (image, exception) in zip(batch, loaded_images):
+            if image is not None:
+                images.append(image)
                 valid.append(item)
-            except Exception as exception:
+            else:
                 print(f"Skipping {item['published_file_id']}: {exception}", flush=True)
         if not images:
             continue
@@ -239,14 +290,28 @@ def main() -> int:
     args = parse_args()
     if args.batch_size < 1:
         raise ValueError("--batch-size must be positive")
-    maps = load_maps(Path(args.snapshot), Path(args.preview_directory), args.max_items)
+    if args.download_concurrency < 1 or args.download_concurrency > 16:
+        raise ValueError("--download-concurrency must be between 1 and 16")
+    maps = load_maps(
+        Path(args.snapshot),
+        Path(args.preview_directory),
+        args.max_items,
+        args.download_previews,
+    )
     if not maps:
-        raise RuntimeError("No cached map previews were found")
+        raise RuntimeError("No map previews were available")
     print(f"Loading {args.model} for {len(maps)} map previews", flush=True)
     processor = CLIPProcessor.from_pretrained(args.model, use_fast=False)
     model = CLIPModel.from_pretrained(args.model)
     model.eval()
-    results = score_maps(maps, model, processor, args.batch_size)
+    results = score_maps(
+        maps,
+        model,
+        processor,
+        args.batch_size,
+        args.download_previews,
+        args.download_concurrency,
+    )
     add_percentiles_and_labels(results)
     write_results(Path(args.output), results, args.model)
     print(f"Wrote {len(results)} records to {Path(args.output).resolve()}", flush=True)
