@@ -77,6 +77,7 @@ $operation = "Commit repository changes: $Message"
 Invoke-WithRepositoryLock -RepositoryRoot $repoRoot -Resource "git-transaction" -Operation $operation -Owner $Owner -Action {
     Push-Location $repoRoot
     $stagedByScript = @()
+    $stagingAttempted = $false
     $commitCreated = $false
     try {
         $headBefore = [string](@(Invoke-Git @("rev-parse", "HEAD"))[0])
@@ -96,8 +97,9 @@ Invoke-WithRepositoryLock -RepositoryRoot $repoRoot -Resource "git-transaction" 
             }
         }
 
+        $stagingAttempted = $true
         Invoke-Git (@("add", "--") + $relativePaths) | Out-Null
-        $stagedByScript = @(Invoke-Git @("diff", "--cached", "--name-only", "--"))
+        $stagedByScript = @(Invoke-Git @("diff", "--cached", "--no-renames", "--name-only", "--"))
         Assert-SamePathSet $relativePaths $stagedByScript "Staged"
 
         Invoke-Git @("diff", "--cached", "--check") | Out-Null
@@ -111,10 +113,12 @@ Invoke-WithRepositoryLock -RepositoryRoot $repoRoot -Resource "git-transaction" 
             throw "Git reported success but HEAD did not change."
         }
 
-        $committedPaths = @(Invoke-Git @("diff-tree", "--no-commit-id", "--name-only", "-r", $headAfter))
+        $committedPaths = @(
+            Invoke-Git @("diff-tree", "--no-renames", "--no-commit-id", "--name-only", "-r", $headAfter)
+        )
         Assert-SamePathSet $stagedByScript $committedPaths "Committed"
 
-        $remainingStaged = @(Invoke-Git @("diff", "--cached", "--name-only", "--"))
+        $remainingStaged = @(Invoke-Git @("diff", "--cached", "--no-renames", "--name-only", "--"))
         if ($remainingStaged.Count -gt 0) {
             throw "The commit completed but staged paths remain: $($remainingStaged -join ', ')."
         }
@@ -122,8 +126,8 @@ Invoke-WithRepositoryLock -RepositoryRoot $repoRoot -Resource "git-transaction" 
         Write-Host "Created and verified commit $headAfter"
         Write-Host "Committed paths: $($committedPaths -join ', ')"
     } catch {
-        if (-not $commitCreated -and $stagedByScript.Count -gt 0) {
-            & git restore --staged -- $stagedByScript 2>$null
+        if (-not $commitCreated -and $stagingAttempted) {
+            & git restore --staged -- $relativePaths 2>$null
         }
         throw
     } finally {
