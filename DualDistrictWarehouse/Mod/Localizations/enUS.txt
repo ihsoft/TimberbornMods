@@ -1,4 +1,7 @@
 ID,Text,Comment
+Building.DualDistrictTank.DisplayName,Dual-District Tank,Building name.
+Building.DualDistrictTank.Description,A tank accessible from two adjacent districts.,Building description.
+Building.DualDistrictTank.FlavorDescription,Two entrances. One tank. No borders.,Building flavor description.
 Building.DualDistrictWarehouse.DisplayName,Dual-District Warehouse,Building name.
 Building.DualDistrictWarehouse.Description,A warehouse accessible from two adjacent districts.,Building description.
 Building.DualDistrictWarehouse.FlavorDescription,Two doors. One stockpile. No paperwork.,Building flavor description.

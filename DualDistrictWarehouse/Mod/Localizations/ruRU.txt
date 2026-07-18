@@ -1,4 +1,7 @@
 ID,Text,Comment
+Building.DualDistrictTank.DisplayName,Межрайонный резервуар,Building name.
+Building.DualDistrictTank.Description,Резервуар с независимым доступом из двух соседних районов.,Building description.
+Building.DualDistrictTank.FlavorDescription,Два входа. Один резервуар. И никаких границ.,Building flavor description.
 Building.DualDistrictWarehouse.DisplayName,Межрайонный склад,Building name.
 Building.DualDistrictWarehouse.Description,Склад с независимым доступом из двух соседних районов.,Building description.
 Building.DualDistrictWarehouse.FlavorDescription,Две двери. Один запас. И никакой бюрократии.,Building flavor description.

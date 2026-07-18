@@ -12,7 +12,8 @@ using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.DualDistrictWarehouse;
 
-sealed class DualDistrictWarehouse : BaseComponent, IAwakableComponent, IFinishedStateListener {
+sealed class DualDistrictWarehouse : BaseComponent, IAwakableComponent, IFinishedStateListener,
+    ILateUpdatableComponent, IDeletableEntity {
   readonly MirrorOperationLock _mirrorOperationLock = new();
   readonly DualDistrictWarehouseRegistry _registry;
 
@@ -21,7 +22,12 @@ sealed class DualDistrictWarehouse : BaseComponent, IAwakableComponent, IFinishe
   DualDistrictWarehouse _linked;
   GameObject _normalModel;
   GameObject _mirroredRoofModel;
+  MeshFilter _liquidMeshFilter;
+  Mesh _liquidHalfMesh;
+  bool _liquidMeshPreparationFailed;
   bool _registered;
+  bool _finished;
+  bool _usesModelVariants;
 
   internal Inventory Inventory => _inventory;
 
@@ -34,11 +40,17 @@ sealed class DualDistrictWarehouse : BaseComponent, IAwakableComponent, IFinishe
     _singleGoodAllower = GetComponent<SingleGoodAllower>();
     _normalModel = GameObject.transform.Find("#Finished/NormalModel")?.gameObject;
     _mirroredRoofModel = GameObject.transform.Find("#Finished/MirroredRoofModel")?.gameObject;
-    ShowModelVariant(mirroredRoof: false);
+    if (_normalModel != null && _mirroredRoofModel != null) {
+      _usesModelVariants = true;
+      ShowModelVariant(mirroredRoof: false);
+    } else if (_normalModel != null || _mirroredRoofModel != null) {
+      HostedDebugLog.Warning(this, "Found only one of the normal and mirrored finished models.");
+    }
     GetComponent<LinkedBuilding>().BuildingLinked += OnBuildingLinked;
   }
 
   public void OnEnterFinishedState() {
+    _finished = true;
     _inventory.InventoryEnabled += OnInventoryEnabled;
     _inventory.InventoryChanged += OnInventoryChanged;
     _inventory.InventoryStockChanged += OnInventoryStockChanged;
@@ -46,7 +58,162 @@ sealed class DualDistrictWarehouse : BaseComponent, IAwakableComponent, IFinishe
     TryInitializePair();
   }
 
+  public void LateUpdate() {
+    if (!_finished || _usesModelVariants) {
+      return;
+    }
+
+    if (_liquidHalfMesh == null && !_liquidMeshPreparationFailed) {
+      PrepareLiquidHalfVisualization();
+    }
+    if (_liquidHalfMesh != null && _liquidMeshFilter.sharedMesh != _liquidHalfMesh) {
+      _liquidMeshFilter.sharedMesh = _liquidHalfMesh;
+    }
+  }
+
+  void PrepareLiquidHalfVisualization() {
+    if (_usesModelVariants) {
+      return;
+    }
+
+    _liquidMeshFilter ??= GameObject.transform.Find("#Finished/GoodVisualization")?.GetComponent<MeshFilter>();
+    if (_liquidMeshFilter == null || _liquidMeshFilter.sharedMesh == null) {
+      return;
+    }
+
+    var sourceMesh = _liquidMeshFilter.sharedMesh;
+    var sourceVertices = sourceMesh.vertices;
+    var sourceTriangles = sourceMesh.triangles;
+    if (sourceVertices.Length == 0 || sourceTriangles.Length == 0) {
+      return;
+    }
+
+    var sourceNormals = sourceMesh.normals;
+    var sourceTangents = sourceMesh.tangents;
+    var sourceUvs = sourceMesh.uv;
+    var sourceColors = sourceMesh.colors;
+    var hasNormals = sourceNormals.Length == sourceVertices.Length;
+    var hasTangents = sourceTangents.Length == sourceVertices.Length;
+    var hasUvs = sourceUvs.Length == sourceVertices.Length;
+    var hasColors = sourceColors.Length == sourceVertices.Length;
+    var outputVertices = new List<LiquidVertex>();
+    var outputTriangles = new List<int>();
+    for (var i = 0; i < sourceTriangles.Length; i += 3) {
+      var polygon = new List<LiquidVertex>(4) {
+          GetLiquidVertex(sourceTriangles[i]),
+          GetLiquidVertex(sourceTriangles[i + 1]),
+          GetLiquidVertex(sourceTriangles[i + 2]),
+      };
+      polygon = ClipLiquidPolygon(polygon);
+      for (var vertexIndex = 1; vertexIndex + 1 < polygon.Count; vertexIndex++) {
+        AddOutputVertex(polygon[0]);
+        AddOutputVertex(polygon[vertexIndex]);
+        AddOutputVertex(polygon[vertexIndex + 1]);
+      }
+    }
+
+    if (outputTriangles.Count == 0) {
+      _liquidMeshPreparationFailed = true;
+      HostedDebugLog.Error(
+          this,
+          $"Could not split the liquid plane at Z=0: source had {sourceTriangles.Length / 3} triangles.");
+      return;
+    }
+
+    var positions = new List<Vector3>(outputVertices.Count);
+    var normals = new List<Vector3>(outputVertices.Count);
+    var tangents = new List<Vector4>(outputVertices.Count);
+    var uvs = new List<Vector2>(outputVertices.Count);
+    var colors = new List<Color>(outputVertices.Count);
+    foreach (var vertex in outputVertices) {
+      positions.Add(vertex.Position + Vector3.forward * 0.5f);
+      normals.Add(vertex.Normal);
+      tangents.Add(vertex.Tangent);
+      uvs.Add(vertex.Uv);
+      colors.Add(vertex.Color);
+    }
+
+    _liquidHalfMesh = UnityEngine.Object.Instantiate(sourceMesh);
+    _liquidHalfMesh.name = "DualDistrictTank.LiquidHalf";
+    _liquidHalfMesh.Clear();
+    _liquidHalfMesh.SetVertices(positions);
+    if (hasNormals) {
+      _liquidHalfMesh.SetNormals(normals);
+    }
+    if (hasTangents) {
+      _liquidHalfMesh.SetTangents(tangents);
+    }
+    if (hasUvs) {
+      _liquidHalfMesh.SetUVs(0, uvs);
+    }
+    if (hasColors) {
+      _liquidHalfMesh.SetColors(colors);
+    }
+    _liquidHalfMesh.SetTriangles(outputTriangles, 0);
+    _liquidHalfMesh.RecalculateBounds();
+    _liquidMeshFilter.sharedMesh = _liquidHalfMesh;
+
+    LiquidVertex GetLiquidVertex(int index) {
+      return new LiquidVertex(
+          sourceVertices[index],
+          hasNormals ? sourceNormals[index] : default,
+          hasTangents ? sourceTangents[index] : default,
+          hasUvs ? sourceUvs[index] : default,
+          hasColors ? sourceColors[index] : default);
+    }
+
+    void AddOutputVertex(LiquidVertex vertex) {
+      outputTriangles.Add(outputVertices.Count);
+      outputVertices.Add(vertex);
+    }
+  }
+
+  static List<LiquidVertex> ClipLiquidPolygon(List<LiquidVertex> input) {
+    var output = new List<LiquidVertex>(4);
+    var previous = input[^1];
+    var previousInside = previous.Position.z <= 0.0001f;
+    foreach (var current in input) {
+      var currentInside = current.Position.z <= 0.0001f;
+      if (currentInside != previousInside) {
+        var interpolation = -previous.Position.z / (current.Position.z - previous.Position.z);
+        output.Add(LiquidVertex.Lerp(previous, current, interpolation));
+      }
+      if (currentInside) {
+        output.Add(current);
+      }
+      previous = current;
+      previousInside = currentInside;
+    }
+    return output;
+  }
+
+  readonly struct LiquidVertex {
+    internal readonly Vector3 Position;
+    internal readonly Vector3 Normal;
+    internal readonly Vector4 Tangent;
+    internal readonly Vector2 Uv;
+    internal readonly Color Color;
+
+    internal LiquidVertex(Vector3 position, Vector3 normal, Vector4 tangent, Vector2 uv, Color color) {
+      Position = position;
+      Normal = normal;
+      Tangent = tangent;
+      Uv = uv;
+      Color = color;
+    }
+
+    internal static LiquidVertex Lerp(LiquidVertex first, LiquidVertex second, float interpolation) {
+      return new LiquidVertex(
+          Vector3.LerpUnclamped(first.Position, second.Position, interpolation),
+          Vector3.LerpUnclamped(first.Normal, second.Normal, interpolation).normalized,
+          Vector4.LerpUnclamped(first.Tangent, second.Tangent, interpolation),
+          Vector2.LerpUnclamped(first.Uv, second.Uv, interpolation),
+          UnityEngine.Color.LerpUnclamped(first.Color, second.Color, interpolation));
+    }
+  }
+
   public void OnExitFinishedState() {
+    _finished = false;
     _inventory.InventoryEnabled -= OnInventoryEnabled;
     _inventory.InventoryChanged -= OnInventoryChanged;
     _inventory.InventoryStockChanged -= OnInventoryStockChanged;
@@ -58,6 +225,12 @@ sealed class DualDistrictWarehouse : BaseComponent, IAwakableComponent, IFinishe
     _linked = linkedBuilding.GetComponent<DualDistrictWarehouse>();
     ApplyPairModelVariants();
     TryInitializePair();
+  }
+
+  public void DeleteEntity() {
+    if (_liquidHalfMesh != null) {
+      UnityEngine.Object.Destroy(_liquidHalfMesh);
+    }
   }
 
   void OnInventoryEnabled(object sender, EventArgs e) {
@@ -128,7 +301,7 @@ sealed class DualDistrictWarehouse : BaseComponent, IAwakableComponent, IFinishe
   }
 
   void ApplyPairModelVariants() {
-    if (_linked == null) {
+    if (_linked == null || !_usesModelVariants || !_linked._usesModelVariants) {
       return;
     }
 

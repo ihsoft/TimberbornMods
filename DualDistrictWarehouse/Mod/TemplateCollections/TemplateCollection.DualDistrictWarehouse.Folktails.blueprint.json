@@ -2,6 +2,7 @@
   "TemplateCollectionSpec": {
     "CollectionId": "Buildings.Folktails",
     "Blueprints": [
+      "Buildings/Storage/DualDistrictTank/DualDistrictTank.Folktails.blueprint",
       "Buildings/Storage/DualDistrictWarehouse/DualDistrictWarehouse.Folktails.blueprint"
     ]
   }
