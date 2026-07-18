@@ -44,6 +44,13 @@ that an earlier package happened to pass validation. Before the report captures 
 the preflight workflow must materialize every derived release input needed by any requested platform, including root
 metadata and compatibility tags, then build and validate the final package from that completed source.
 
+The report must also capture the exact Git object ID of the selected mod's release-preparation commit. Do not infer this
+identity from whatever `HEAD` happens to be current when final preflight or publishing runs. When later commits already
+exist, verify that changes after the selected release commit do not alter that mod's implementation, release metadata,
+package source, or a shared release-critical dependency used by the artifact. If the correct release commit is
+ambiguous, or later changes affect its release inputs, stop and obtain an explicit commit selection or prepare a new
+release commit before final preflight.
+
 After that snapshot is captured, publishing must not mutate the configured package source, update its
 `workshop_data.json` or tags, rebuild or repackage the release, or substitute a different package. Each platform
 publisher must consume the package captured by final preflight, or staging derived from that exact package, and must
@@ -614,9 +621,15 @@ Examples:
 
 Do not add a `v` prefix for new mod-release tags unless the user explicitly asks.
 
-The tag should point to the release-preparation commit that updated the version metadata, changelog, and package source
-for the published version. Verify that the tag does not already exist before creating it. The repository's existing
-mod-release tags are lightweight tags, so use a lightweight tag unless the user explicitly asks for an annotated tag.
+The tag must point to the exact release-preparation commit recorded by final preflight for that mod. Never derive the
+tag target from current `HEAD` at publish time. If `HEAD` contains later unrelated commits, create the tag against the
+recorded commit after the preflight checks above succeed; do not make the earlier mod inherit the later commit. Verify
+the recorded object ID still resolves to the expected commit and that the tag does not already exist before creating
+it. The repository's existing mod-release tags are lightweight tags, so use a lightweight tag unless the user
+explicitly asks for an annotated tag.
+
+Changing an existing pushed tag to repair an incorrect target rewrites public release history. Do not delete, move, or
+force-push that tag without explicit user authorization for the specific correction.
 
 Create the tag only after platform uploads and live verification succeed. If publishing fails or is only partially
 completed, do not create a release tag unless the user explicitly asks.
