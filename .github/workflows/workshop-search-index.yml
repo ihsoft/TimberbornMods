@@ -3,7 +3,7 @@ name: Build Workshop search index
 on:
   workflow_dispatch:
   schedule:
-    - cron: "17 9 * * 1"
+    - cron: "17 9 * * *"
 
 permissions:
   contents: read
@@ -41,13 +41,37 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Download previous visual features
+        run: |
+          site="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}"
+          curl --fail --location --retry 3 \
+            --output .work/previous-map-visual-features.jsonl.gz \
+            "$site/map-visual-features.jsonl.gz" \
+            || rm -f .work/previous-map-visual-features.jsonl.gz
+
+      - name: Plan incremental classification
+        id: classification-plan
+        run: |
+          python tools/TimberbornMapPreviewClassifier/classify.py \
+            --snapshot .work/workshop-items.jsonl \
+            --previous-results .work/previous-map-visual-features.jsonl.gz \
+            --download-previews \
+            --plan-only \
+            --plan-output .work/classification-plan.json
+          requires_model=$(python -c "import json; print(str(json.load(open('.work/classification-plan.json'))['requires_model']).lower())")
+          echo "requires_model=$requires_model" >> "$GITHUB_OUTPUT"
+
       - name: Restore CLIP model cache
+        if: steps.classification-plan.outputs.requires_model == 'true'
         uses: actions/cache@v4
         with:
-          path: ~/.cache/huggingface
-          key: clip-openai-vit-base-patch32-v1
+          path: |
+            ~/.cache/huggingface
+            ~/.cache/pip
+          key: clip-openai-vit-base-patch32-python-3.12-v1
 
       - name: Install CPU classifier dependencies
+        if: steps.classification-plan.outputs.requires_model == 'true'
         run: |
           python -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.7.1
           python -m pip install -r tools/TimberbornMapPreviewClassifier/requirements.txt
@@ -56,6 +80,7 @@ jobs:
         run: >-
           python tools/TimberbornMapPreviewClassifier/classify.py
           --snapshot .work/workshop-items.jsonl
+          --previous-results .work/previous-map-visual-features.jsonl.gz
           --output .work/map-visual-features.jsonl
           --download-previews
           --download-concurrency 6

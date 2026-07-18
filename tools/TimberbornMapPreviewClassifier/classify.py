@@ -13,11 +13,7 @@ import time
 from typing import Iterable
 from urllib.request import Request, urlopen
 
-import torch
-from PIL import Image
-from transformers import CLIPModel, CLIPProcessor
-
-
+CLASSIFIER_VERSION = "clip-prompts-v1"
 FEATURE_PROMPTS = {
     "ruggedness": {
         "positive": [
@@ -110,6 +106,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-items", type=int, default=0)
     parser.add_argument("--download-previews", action="store_true")
     parser.add_argument("--download-concurrency", type=int, default=6)
+    parser.add_argument("--previous-results")
+    parser.add_argument("--plan-only", action="store_true")
+    parser.add_argument("--plan-output")
     return parser.parse_args()
 
 
@@ -145,6 +144,87 @@ def load_maps(
 def chunks(items: list[dict], size: int) -> Iterable[list[dict]]:
     for index in range(0, len(items), size):
         yield items[index : index + size]
+
+
+def read_json_lines(path: Path) -> list[dict]:
+    if not path.is_file():
+        return []
+    if path.suffix == ".gz":
+        import gzip
+
+        stream = gzip.open(path, "rt", encoding="utf-8")
+    else:
+        stream = path.open("r", encoding="utf-8")
+    with stream:
+        return [json.loads(line) for line in stream if line.strip()]
+
+
+def has_compatible_scores(result: dict, model_name: str) -> bool:
+    classifier_version = result.get("classifier_version", CLASSIFIER_VERSION)
+    scores = result.get("visual_scores", {})
+    return (
+        result.get("model") == model_name
+        and classifier_version == CLASSIFIER_VERSION
+        and all(feature in scores for feature in FEATURE_PROMPTS)
+    )
+
+
+def classified_preview_url(result: dict) -> str | None:
+    return result.get("classified_preview_url", result.get("preview_url"))
+
+
+def build_reused_result(item: dict, previous: dict, stale: bool = False) -> dict:
+    return {
+        "published_file_id": item["published_file_id"],
+        "title": item["title"],
+        "preview_url": item["preview_url"],
+        "classified_preview_url": classified_preview_url(previous),
+        "visual_scores": previous["visual_scores"],
+        "visual_stale": stale,
+        "classification_state": "stale" if stale else "reused",
+    }
+
+
+def plan_incremental(
+    maps: list[dict], previous_results: list[dict], model_name: str
+) -> tuple[list[dict], list[dict], dict[str, dict]]:
+    previous_by_id = {
+        result["published_file_id"]: result
+        for result in previous_results
+        if has_compatible_scores(result, model_name)
+    }
+    reused = []
+    to_classify = []
+    for item in maps:
+        previous = previous_by_id.get(item["published_file_id"])
+        if previous and classified_preview_url(previous) == item["preview_url"]:
+            reused.append(build_reused_result(item, previous))
+        else:
+            to_classify.append(item)
+    return reused, to_classify, previous_by_id
+
+
+def write_plan(path: Path | None, maps: list[dict], reused: list[dict], to_classify: list[dict]) -> None:
+    plan = {
+        "maps_total": len(maps),
+        "maps_reused": len(reused),
+        "maps_to_classify": len(to_classify),
+        "requires_model": bool(to_classify),
+        "classifier_version": CLASSIFIER_VERSION,
+    }
+    serialized = json.dumps(plan, indent=2)
+    print(serialized, flush=True)
+    if path:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(serialized + "\n", encoding="utf-8")
+
+
+def load_ml_dependencies() -> None:
+    global torch, Image, CLIPModel, CLIPProcessor
+
+    import torch
+    from PIL import Image
+    from transformers import CLIPModel, CLIPProcessor
 
 
 def normalized(features: torch.Tensor) -> torch.Tensor:
@@ -238,7 +318,10 @@ def score_maps(
                     "published_file_id": item["published_file_id"],
                     "title": item["title"],
                     "preview_url": item["preview_url"],
+                    "classified_preview_url": item["preview_url"],
                     "visual_scores": scores,
+                    "visual_stale": False,
+                    "classification_state": "classified",
                 }
             )
         print(
@@ -283,6 +366,7 @@ def write_results(output: Path, results: list[dict], model_name: str) -> None:
     with output.open("w", encoding="utf-8", newline="\n") as stream:
         for result in results:
             result["model"] = model_name
+            result["classifier_version"] = CLASSIFIER_VERSION
             stream.write(json.dumps(result, ensure_ascii=False, separators=(",", ":")) + "\n")
 
 
@@ -300,21 +384,59 @@ def main() -> int:
     )
     if not maps:
         raise RuntimeError("No map previews were available")
-    print(f"Loading {args.model} for {len(maps)} map previews", flush=True)
-    processor = CLIPProcessor.from_pretrained(args.model, use_fast=False)
-    model = CLIPModel.from_pretrained(args.model)
-    model.eval()
-    results = score_maps(
-        maps,
-        model,
-        processor,
-        args.batch_size,
-        args.download_previews,
-        args.download_concurrency,
+    previous_results = read_json_lines(Path(args.previous_results)) if args.previous_results else []
+    reused, to_classify, previous_by_id = plan_incremental(
+        maps, previous_results, args.model
     )
+    write_plan(
+        Path(args.plan_output) if args.plan_output else None,
+        maps,
+        reused,
+        to_classify,
+    )
+    if args.plan_only:
+        return 0
+
+    classified = []
+    if to_classify:
+        load_ml_dependencies()
+        print(f"Loading {args.model} for {len(to_classify)} map previews", flush=True)
+        processor = CLIPProcessor.from_pretrained(args.model, use_fast=False)
+        model = CLIPModel.from_pretrained(args.model)
+        model.eval()
+        classified = score_maps(
+            to_classify,
+            model,
+            processor,
+            args.batch_size,
+            args.download_previews,
+            args.download_concurrency,
+        )
+
+    results_by_id = {result["published_file_id"]: result for result in reused + classified}
+    for item in to_classify:
+        if item["published_file_id"] in results_by_id:
+            continue
+        previous = previous_by_id.get(item["published_file_id"])
+        if previous:
+            results_by_id[item["published_file_id"]] = build_reused_result(
+                item, previous, stale=True
+            )
+    results = [
+        results_by_id[item["published_file_id"]]
+        for item in maps
+        if item["published_file_id"] in results_by_id
+    ]
+    if not results:
+        raise RuntimeError("No map previews could be classified or reused")
     add_percentiles_and_labels(results)
     write_results(Path(args.output), results, args.model)
-    print(f"Wrote {len(results)} records to {Path(args.output).resolve()}", flush=True)
+    stale_count = sum(result["visual_stale"] for result in results)
+    print(
+        f"Wrote {len(results)} records to {Path(args.output).resolve()}; "
+        f"reused {len(reused)}, classified {len(classified)}, stale {stale_count}",
+        flush=True,
+    )
     return 0
 
 

@@ -49,6 +49,11 @@ def main() -> int:
             record["visual_percentiles"] = visual["visual_percentiles"]
             record["visual_labels"] = visual["visual_labels"]
             record["visual_model"] = visual["model"]
+            record["visual_classifier_version"] = visual.get("classifier_version")
+            record["visual_stale"] = visual.get("visual_stale", False)
+            record["visual_classified_preview_url"] = visual.get(
+                "classified_preview_url", visual.get("preview_url")
+            )
         search_index.append(record)
 
     write_gzip_json_lines(output_directory / "workshop-items.jsonl.gz", workshop_items)
@@ -66,7 +71,21 @@ def main() -> int:
         "workshop_items": len(workshop_items),
         "classified_maps": len(visual_features),
         "maps_missing_visual_features": missing_visual_maps,
+        "maps_with_stale_visual_features": sum(
+            record.get("visual_stale", False) for record in visual_features
+        ),
+        "maps_classified_this_run": sum(
+            record.get("classification_state") == "classified"
+            for record in visual_features
+        ),
+        "maps_reused_this_run": sum(
+            record.get("classification_state") == "reused"
+            for record in visual_features
+        ),
         "visual_model": visual_features[0]["model"] if visual_features else None,
+        "visual_classifier_version": (
+            visual_features[0].get("classifier_version") if visual_features else None
+        ),
         "files": {
             path.name: path.stat().st_size
             for path in sorted(output_directory.glob("*.jsonl.gz"))

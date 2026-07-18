@@ -54,8 +54,10 @@ snapshot operation because percentiles depend on the complete current corpus.
 
 ## Scheduled public index
 
-`.github/workflows/workshop-search-index.yml` runs manually or every Monday. It collects Workshop metadata without a
-preview cache, downloads only the current classification batch, and publishes compact GitHub Pages artifacts:
+`.github/workflows/workshop-search-index.yml` runs manually or daily. It collects a complete Workshop metadata snapshot
+without a preview cache, then reuses the previous raw visual scores for maps whose primary preview URL is unchanged.
+PyTorch, the CLIP model, and preview images are only needed when a map is new or its primary preview changed. The job
+recomputes corpus-relative percentiles and publishes compact GitHub Pages artifacts:
 
 ```text
 manifest.json
@@ -66,5 +68,10 @@ search-index.jsonl.gz
 
 The merged search index retains public preview URLs so an agent can visually inspect a few final candidates without
 retaining the complete image corpus. The workflow uses no Steam account, API key, repository secret, or game process.
+
+The published `manifest.json` reports how many maps were classified, reused, missing, or served with stale scores. If
+an updated preview cannot be downloaded after retries, the previous score is retained as stale and retried on the next
+run. A missing previous index, model change, or classifier-version change automatically falls back to a full visual
+bootstrap.
 
 GitHub Pages must be configured to use **GitHub Actions** as its deployment source before the first deployment.
