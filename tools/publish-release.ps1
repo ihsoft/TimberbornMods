@@ -37,6 +37,14 @@ function Assert-PathExists([string] $Path, [string] $Description) {
     }
 }
 
+function Invoke-Git([string[]] $Arguments) {
+    $output = @(& git -C $repoRoot @Arguments 2>&1)
+    if ($LASTEXITCODE -ne 0) {
+        throw "git $($Arguments -join ' ') failed.`n$($output -join [Environment]::NewLine)"
+    }
+    return [string[]]$output
+}
+
 function Get-StringSha256([string] $Value) {
     $sha = [System.Security.Cryptography.SHA256]::Create()
     try {
@@ -116,7 +124,7 @@ $reportPath = Resolve-RepoPath $PreflightReportPath
 Assert-PathExists $reportPath "Preflight report"
 $report = Get-Content -Raw -LiteralPath $reportPath | ConvertFrom-Json
 
-if ([int]$report.SchemaVersion -ne 1) {
+if ([int]$report.SchemaVersion -ne 2) {
     throw "Unsupported preflight report schema version: $($report.SchemaVersion)"
 }
 
@@ -127,8 +135,10 @@ if ($report.ReadyForPublish -ne $true) {
 $modName = [string]$report.ModName
 $modVersion = [string]$report.Version
 $tagName = [string]$report.TagName
-if ([string]::IsNullOrWhiteSpace($modName) -or [string]::IsNullOrWhiteSpace($modVersion)) {
-    throw "Preflight report is missing mod name or version."
+$releaseCommit = [string]$report.ReleaseCommit
+if ([string]::IsNullOrWhiteSpace($modName) -or [string]::IsNullOrWhiteSpace($modVersion) -or
+    [string]::IsNullOrWhiteSpace($releaseCommit)) {
+    throw "Preflight report is missing mod name, version, or release commit."
 }
 
 if ([string]::IsNullOrWhiteSpace($Configuration)) {
@@ -139,8 +149,17 @@ if ([string]::IsNullOrWhiteSpace($GameVersion)) {
 }
 
 $currentHead = (& git -C $repoRoot rev-parse HEAD).Trim()
-if ($currentHead -ne [string]$report.GitHead) {
-    throw "Git HEAD changed since preflight. Preflight: $($report.GitHead); current: $currentHead"
+& git -C $repoRoot merge-base --is-ancestor $releaseCommit $currentHead
+if ($LASTEXITCODE -ne 0) {
+    throw "Recorded release commit $releaseCommit is not an ancestor of current HEAD $currentHead."
+}
+$criticalPaths = @($report.ReleaseCriticalPaths | ForEach-Object { [string]$_ })
+if ($criticalPaths.Count -eq 0) {
+    throw "Preflight report contains no release-critical paths."
+}
+$laterCriticalChanges = @(Invoke-Git (@("diff", "--name-only", "$releaseCommit..$currentHead", "--") + $criticalPaths))
+if ($laterCriticalChanges.Count -gt 0) {
+    throw "Changes after recorded release commit $releaseCommit alter release-critical paths: $($laterCriticalChanges -join ', ')."
 }
 
 $releaseConfigPath = [string]$report.ReleaseConfigPath
@@ -228,7 +247,7 @@ if (-not $SkipPlatformTags -and -not [bool]$report.PreflightOptions.SkipPlatform
 if (-not $SkipGitTag) {
     Write-Host ""
     Write-Host "== Git release tag =="
-    & git -C $repoRoot tag $tagName $currentHead
+    & git -C $repoRoot tag $tagName $releaseCommit
     if ($LASTEXITCODE -ne 0) {
         throw "Failed to create Git tag $tagName."
     }
@@ -238,7 +257,7 @@ if (-not $SkipGitTag) {
         throw "Failed to push Git tag $tagName."
     }
 
-    Write-Host "Git tag created and pushed: $tagName"
+    Write-Host "Git tag created and pushed: $tagName -> $releaseCommit"
 }
 
 if (-not $SkipGitHubRelease) {

@@ -13,6 +13,7 @@ param(
     [string] $SteamUserName = "",
     [string] $ModIoConfigPath = "",
     [string] $ModIoAccessTokenPath = "",
+    [string] $ReleaseCommit = "",
     [switch] $IncludeLegacyVersions,
     [switch] $SkipBuild,
     [switch] $SkipUnityExport,
@@ -207,6 +208,101 @@ $changelogHeading = Get-ReleaseHeading $changesPath $modVersion
 if ($changelogHeading -match "\(TBD\)") {
     throw "Changelog heading for $ModName v$modVersion is still marked (TBD). Set and commit the concrete release date before final preflight."
 }
+
+function Invoke-Git([string[]] $Arguments) {
+    $output = @(& git -C $repoRoot @Arguments 2>&1)
+    if ($LASTEXITCODE -ne 0) {
+        throw "git $($Arguments -join ' ') failed.`n$($output -join [Environment]::NewLine)"
+    }
+    return [string[]]$output
+}
+
+function Convert-ToRepositoryPath([string] $Path) {
+    $absolutePath = [System.IO.Path]::GetFullPath($Path)
+    $rootWithSeparator = $repoRoot.TrimEnd('\', '/') + [System.IO.Path]::DirectorySeparatorChar
+    if (-not $absolutePath.StartsWith($rootWithSeparator, [System.StringComparison]::OrdinalIgnoreCase)) {
+        return $null
+    }
+    return $absolutePath.Substring($rootWithSeparator.Length).Replace('\', '/')
+}
+
+function Get-ReleaseGitSnapshot(
+    [string] $RequestedCommit,
+    [string[]] $IdentityPaths,
+    [string[]] $CriticalPaths
+) {
+    $head = [string](@(Invoke-Git @("rev-parse", "HEAD"))[0])
+    $commit = if ([string]::IsNullOrWhiteSpace($RequestedCommit)) {
+        $candidate = @(Invoke-Git (@("log", "-1", "--format=%H", "--") + $IdentityPaths))
+        if ($candidate.Count -eq 0 -or [string]::IsNullOrWhiteSpace($candidate[0])) {
+            throw "Could not identify a release-preparation commit for the selected mod. Pass -ReleaseCommit explicitly."
+        }
+        [string]$candidate[0]
+    }
+    else {
+        [string](@(Invoke-Git @("rev-parse", "$RequestedCommit^{commit}"))[0])
+    }
+
+    & git -C $repoRoot merge-base --is-ancestor $commit $head
+    if ($LASTEXITCODE -ne 0) {
+        throw "Selected release commit $commit is not an ancestor of current HEAD $head."
+    }
+
+    $identityChanges = @(Invoke-Git (@("diff-tree", "--no-commit-id", "--name-only", "-r", $commit, "--") + $IdentityPaths))
+    if ($identityChanges.Count -eq 0) {
+        throw "Selected release commit $commit does not change the selected mod's release identity paths. Pass the correct -ReleaseCommit."
+    }
+
+    $laterCriticalChanges = @(Invoke-Git (@("diff", "--name-only", "$commit..$head", "--") + $CriticalPaths))
+    if ($laterCriticalChanges.Count -gt 0) {
+        throw "Changes after release commit $commit alter release-critical paths: $($laterCriticalChanges -join ', '). Pass the correct -ReleaseCommit or prepare a new release commit."
+    }
+
+    return [ordered]@{
+        HeadAtPreflight = $head
+        ReleaseCommit = $commit
+        IdentityPaths = [string[]]$IdentityPaths
+        CriticalPaths = [string[]]$CriticalPaths
+        LaterCriticalChanges = [string[]]$laterCriticalChanges
+    }
+}
+
+$identityPaths = New-Object System.Collections.Generic.List[string]
+$identityPaths.Add("$ModName/release.json")
+$changesRepoPath = Convert-ToRepositoryPath $changesPath
+if (-not [string]::IsNullOrWhiteSpace($changesRepoPath)) {
+    $identityPaths.Add($changesRepoPath)
+}
+$manifestPathValue = [string](Get-ObjectPropertyValue $releaseConfig "ManifestPath")
+if (-not [string]::IsNullOrWhiteSpace($manifestPathValue)) {
+    $manifestRepoPath = Convert-ToRepositoryPath (Resolve-RepoPath $manifestPathValue)
+    if (-not [string]::IsNullOrWhiteSpace($manifestRepoPath)) {
+        $identityPaths.Add($manifestRepoPath)
+    }
+}
+$buildPropsPath = Join-Path $modRoot "directory.build.props"
+if (Test-Path -LiteralPath $buildPropsPath) {
+    $identityPaths.Add("$ModName/directory.build.props")
+}
+$unityModPath = "ModsUnityProject/Assets/Mods/$ModName"
+$identityPaths.Add($unityModPath)
+
+$criticalPaths = New-Object System.Collections.Generic.List[string]
+$criticalPaths.Add($ModName)
+$criticalPaths.Add($unityModPath)
+$criticalPaths.Add("TimberDev")
+$criticalPaths.Add("TimberDev.Tests")
+$packageSourceValue = [string](Get-ObjectPropertyValue $releaseConfig.Package "SourcePath")
+if (-not [string]::IsNullOrWhiteSpace($packageSourceValue)) {
+    $packageSourceRepoPath = Convert-ToRepositoryPath (Resolve-RepoPath $packageSourceValue)
+    if (-not [string]::IsNullOrWhiteSpace($packageSourceRepoPath)) {
+        $criticalPaths.Add($packageSourceRepoPath)
+    }
+}
+$gitSnapshot = Get-ReleaseGitSnapshot $ReleaseCommit `
+    @($identityPaths | Sort-Object -Unique) `
+    @($criticalPaths | Sort-Object -Unique)
+
 $steps = New-Object System.Collections.Generic.List[object]
 
 if (-not $SkipPlatformDescriptions) {
@@ -312,7 +408,6 @@ Write-Host "Collecting release artifact snapshots..."
 $packagePath = Get-PackagePath $releaseConfig
 $packageSnapshot = Get-FileSnapshot $packagePath "Release package"
 $sourceSnapshot = Get-SourceSnapshot $releaseConfig
-$gitHead = (& git -C $repoRoot rev-parse HEAD).Trim()
 $gitStatus = @(& git -C $repoRoot status --porcelain=v1 --untracked-files=normal)
 $tagName = "$($ModName)_$modVersion"
 $tagExists = $false
@@ -322,10 +417,14 @@ if ($LASTEXITCODE -eq 0) {
 }
 
 $report = [ordered]@{
-    SchemaVersion = 1
+    SchemaVersion = 2
     CreatedAtUtc = (Get-Date).ToUniversalTime().ToString("o")
     RepoRoot = $repoRoot
-    GitHead = $gitHead
+    GitHead = $gitSnapshot.HeadAtPreflight
+    ReleaseCommit = $gitSnapshot.ReleaseCommit
+    ReleaseIdentityPaths = $gitSnapshot.IdentityPaths
+    ReleaseCriticalPaths = $gitSnapshot.CriticalPaths
+    LaterReleaseCriticalChanges = $gitSnapshot.LaterCriticalChanges
     GitStatus = [string[]]$gitStatus
     ModName = $ModName
     Version = $modVersion
