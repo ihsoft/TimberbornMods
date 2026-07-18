@@ -25,19 +25,27 @@ new approach is validated.
 The generated model remains a loose Timbermesh package asset. The ordinary mod build copies it into the compatibility
 lane; Unity export is not part of this asset's current ownership path.
 
-The building geometry and opposite-entrance placement have been confirmed in the real game. Roof texture appearance is
-a known unresolved issue, so the current result is a working intermediate model rather than a finished textured asset.
-Preserved UVs are evidence of a conservative transformation, not evidence that the roof atlas is correct.
+The building geometry, opposite-entrance placement, and seamless roof texture have been confirmed in the real game.
 
-## Model Change Validation
+The current runtime roof correction operates on the optimized finished model and applies only to the secondary linked
+half. It selects the known top-roof surface using model-specific position and normal evidence. The exact selector
+bounds live with the implementation and must not be generalized to another model.
 
-After changing the generator or generated model:
+Do not restore the failed source-material-name lookup unless current runtime evidence proves that the prefab optimizer
+pipeline changed. Follow Timberborn Timbermesh Operational Knowledge for the reusable atlas-fragment, mesh-cloning,
+tangent, diagnostics, and real-game validation requirements.
 
-1. Regenerate the tracked Timbermesh through the owning script.
-2. Verify structural checks, output bounds, indices, material names, and serialization complete successfully.
-3. Build the mod through its ordinary package path and verify the packaged model matches the generated source.
-4. Validate geometry and placement in the real game.
-5. Validate roof textures, UV orientation, materials, and shading separately before describing the model as finished.
+## Model And Runtime Appearance Validation
 
-Do not speculate that a UV, material, polygon-order, or vertex-color change fixes the roof. Preserve the already
-validated geometry while testing one evidence-supported appearance hypothesis at a time.
+After changing the generator, generated model, or runtime appearance correction:
+
+1. Regenerate the tracked Timbermesh through the owning script when its source transformation changed.
+2. For generated-model changes, verify structural checks, output bounds, indices, material names, and serialization
+   complete successfully.
+3. Build the mod through its ordinary package path and verify the packaged model and DLL match their current sources.
+4. Inspect runtime logs for model-selection, optimizer, or mutation failures; successful package replacement alone is
+   not sufficient.
+5. Validate geometry and placement in the real game.
+6. Validate roof textures, UV orientation, materials, tangents, and shading separately.
+
+Preserve the already validated geometry while testing one evidence-supported appearance hypothesis at a time.

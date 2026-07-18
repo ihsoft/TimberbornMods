@@ -112,6 +112,31 @@ alone do not reproduce or validate the stock texture layout.
 Validate textured appearance in the real game. Do not describe an asset as finished based only on geometry preview or
 successful loading.
 
+## Account For Runtime Prefab Optimization
+
+Before editing a Timbermesh after instantiation, inspect the current prefab import and optimization chain. Source mesh
+structure, submesh material names, and source-space UV ranges may not survive import, auto-atlasing, or material-based
+mesh merging.
+
+Do not select a runtime surface solely by its source material name unless current runtime evidence confirms that the
+identity survives. Use a property that remains observable after optimization, or move the transformation to an earlier
+stage where the required identity is still available.
+
+Auto-atlased UVs may occupy only a fragment of the runtime atlas. A transform expressed against the full 0..1 range can
+move coordinates outside that fragment. Establish the runtime UV interval and verify the source UV relationship and
+atlas transform before applying a fragment-relative transform.
+
+When the source UV relationship is known to be symmetric and the current atlas mapping is affine, mirror U within the
+observed runtime fragment as `U' = Umin + Umax - U`. This preserves the occupied atlas interval, unlike a global
+`1 - U`. The formula is conditional on those verified properties; it is not a universal UV repair.
+
+Before changing a mesh for only one instantiated object or linked part, clone the shared mesh so the mutation does not
+affect other users of the same asset. When reflecting UV orientation, update tangent direction and handedness as
+required by the affected shader data instead of changing UV values alone.
+
+A rebuilt DLL or correctly replaced package proves deployment, not that the runtime mesh selection or mutation ran.
+Provide a diagnostic failure path, inspect runtime logs, and verify the intended appearance in the real game.
+
 ## Determine Packaging Ownership
 
 Determine whether the model is owned by Unity export or by a loose-file package workflow before selecting the build
