@@ -5,6 +5,10 @@
 Provide an evidence-based workflow for locating, extracting, modifying, validating, and packaging Timberborn
 `.timbermesh` models.
 
+This knowledge covers the lifecycle of extracted, derived, or generated Timbermesh assets. Geometry clipping is one
+supported transformation, not the document's defining purpose. It does not define general 3D modeling or arbitrary
+Unity `Mesh` workflows.
+
 This document is not a stable Timbermesh format specification. Binary container details discovered in game archives
 are version-sensitive implementation evidence and must be revalidated against the current game and official Timbermesh
 sources.
@@ -219,6 +223,14 @@ The generator should:
 
 The tracked generated asset and its generator have different ownership from ignored game archives and local parser
 dependencies. Never commit the latter merely to make regeneration self-contained.
+
+When one generator invocation produces several coordinated models that one blueprint or runtime contract consumes
+together, treat those outputs as one atomic generated set. Regenerate, validate, package, and compare the complete set;
+do not update only one member. Change generator arguments, resource identities, consumer references, and activation
+contracts together when their shared interface changes.
+
+Do not impose this atomicity on outputs that are intentionally generated and consumed independently. Derive it from the
+generator interface and consumer ownership contract, not merely from files sharing a directory or source model.
 
 ## Stop Conditions
 
