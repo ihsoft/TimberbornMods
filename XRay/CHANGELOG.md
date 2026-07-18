@@ -1,4 +1,4 @@
-# v1.2.0 (TBD):
+# v1.2.0 (July 18th, 2026):
 * [Feature] Optionally hide natural resources while X-Ray mode is active.
 * [Fix] Restore transparent terrain rendering with Unity 6000.5 and URP 17.5.
 

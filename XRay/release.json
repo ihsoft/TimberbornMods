@@ -1,15 +1,16 @@
 {
   "ManifestPath": "ModsUnityProject/Assets/Mods/XRay/manifest.json",
   "ChangesPath": "XRay/CHANGELOG.md",
-  "ReleaseVersion": "1.1.1",
+  "ReleaseVersion": "1.2.0",
   "ScriptFileBase": "XRay",
   "Package": {
-    "Mode": "ExistingZip",
-    "Path": "_MODS!/XRay_v1.1.1.zip",
+    "Mode": "LocalModFolder",
+    "SourcePath": "_MODS!/XRay",
+    "OutputPath": "_MODS!/XRay_v1.2.0.zip",
     "MaxAgeDays": 14
   },
   "ManifestVersions": {
-    "version-1.0": "1.1.1"
+    "version-1.0": "1.2.0"
   },
   "GameVersionCompatibility": {
     "version-1.0": {
