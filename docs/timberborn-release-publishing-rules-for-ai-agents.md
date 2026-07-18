@@ -37,6 +37,25 @@ publish script.
 This unified tooling is still new. Until it has been proven by at least one successful real release publish flow, treat
 unexpected script behavior as a stop-and-investigate condition instead of silently falling back to ad hoc manual steps.
 
+## Final preflight snapshot
+
+Treat a final preflight report marked ready for publishing as the immutable release snapshot, not merely as evidence
+that an earlier package happened to pass validation. Before the report captures source fingerprints and package hashes,
+the preflight workflow must materialize every derived release input needed by any requested platform, including root
+metadata and compatibility tags, then build and validate the final package from that completed source.
+
+After that snapshot is captured, publishing must not mutate the configured package source, update its
+`workshop_data.json` or tags, rebuild or repackage the release, or substitute a different package. Each platform
+publisher must consume the package captured by final preflight, or staging derived from that exact package, and must
+re-check the applicable source fingerprint and package hash before its first public change. A child publish script must
+fail instead of applying a local metadata update or selecting a code path that reconstructs the package after the
+snapshot.
+
+If publishing discovers that derived metadata, tags, package contents, or platform staging inputs still need to change,
+stop before the next public change. Apply the change during release preparation or preflight, rebuild the package,
+repeat all affected validation, and create a new final preflight report with the new fingerprints and hashes. Do not
+continue under the old report even when the rebuilt package is expected to be equivalent.
+
 ## Network checks
 
 Release publishing requires live Steam, GitHub, and Mod.IO checks.
@@ -128,6 +147,9 @@ Search package changelogs such as `CHANGELOG.md` and `CHANGES.md` for top-level 
 sections are the publish candidates. If no `(TBD)` sections exist, report that there are no unpublished mod versions to
 publish.
 
+Here `(TBD)` identifies a release candidate for preparation; it does not mean that the candidate is ready for final
+preflight or upload.
+
 Do not interpret "unpublished versions" as missing Git tags, missing GitHub Releases, missing platform artifacts, or
 historical release backfill. Do not create historical tags or GitHub Releases for already-published versions unless the
 user explicitly asks for tag or GitHub Release backfill.
@@ -150,6 +172,14 @@ If the requested version matches the top package changelog section and that sect
 release metadata as normal release-preparation work. Update `release.json`, `directory.build.props`, Unity manifest
 versions, and other release metadata to the requested version as needed instead of stopping only because they still
 contain the previous published version.
+
+Before the release-preparation commit and final unified preflight, replace `(TBD)` in the selected version heading with
+the concrete release date using that changelog's established format. The dated changelog must be part of the committed
+Git revision captured by final preflight so the eventual release tag points to published history rather than an
+unpublished marker. A selected heading that still contains `(TBD)`, or otherwise lacks its required concrete release
+date, is a stop condition for final preflight, upload, release creation, and tagging. Preliminary dry runs may happen
+earlier, but their reports are not publish-ready snapshots; rerun final preflight after dating and committing the
+changelog.
 
 This release-preparation allowance does not weaken the upload gate. Before any real upload, the release config,
 generated package path, final package contents, and newly built current compatibility lane must match the requested
