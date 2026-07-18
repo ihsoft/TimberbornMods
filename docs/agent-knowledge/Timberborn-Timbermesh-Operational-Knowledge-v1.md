@@ -86,6 +86,10 @@ For every generated intersection vertex:
 Do not assume that position, normal, and one UV channel are the complete vertex format. Inspect the source property
 layout first.
 
+Before changing vertices selected through one source submesh or material, verify whether any of their indices are shared
+with other submeshes. A per-index UV, tangent, color, or position change also affects every surface using that vertex;
+split or duplicate the vertex deliberately when shared ownership is required instead of silently modifying both.
+
 After modification, validate:
 
 - property scalar types and byte lengths;
@@ -111,6 +115,52 @@ alone do not reproduce or validate the stock texture layout.
 
 Validate textured appearance in the real game. Do not describe an asset as finished based only on geometry preview or
 successful loading.
+
+## Choose Asset Variants Or Runtime Mutation Deliberately
+
+When a small, deterministic visual difference is known before import, evaluate generating explicit Timbermesh variants
+instead of mutating an optimized runtime mesh. An asset-side transformation can use confirmed source submesh identity,
+UV layout, materials, and tangents before prefab optimization removes or merges that structure.
+
+A single template may contain several variant model children and activate exactly one according to a deterministic
+runtime role. This can preserve one construction or placement workflow without requiring separate templates, but only
+when the owning lifecycle reliably reapplies the selection after creation, linking, and save/load restoration.
+
+For deterministic variant activation, establish:
+
+- a safe default before previews or new instances become visible;
+- a total ordering or other role rule that every peer computes identically;
+- whether the role inputs persist across save/load and entity recreation;
+- the lifecycle event that reapplies selection after a relationship is restored;
+- whether either physical role assignment is valid when newly created identities are arbitrary.
+
+Also inspect non-rendering template contracts. Variant children can interact with bounds, colliders, selection,
+visibility walkers, animations, LOD, previews, or external systems that enumerate inactive descendants even when only
+one renderer is visible.
+
+Generated variants trade runtime selection complexity for other costs:
+
+- larger package output and more generated-file contracts;
+- possible import, optimization, and memory cost even for inactive children;
+- stable child-name and activation contracts;
+- variant proliferation when several dimensions can differ;
+- regeneration work whenever the source asset or transformation changes.
+
+Do not assume an inactive child is free. In confirmed current Timberborn pipelines, model import and several prefab
+optimizer stages traverse inactive descendants, so every variant can contribute import, optimization, and cached-prefab
+cost before an entity instance becomes active. Revalidate the chain for the target game version instead of treating
+this observation as a permanent engine contract.
+
+Prefer evaluating asset-side variants when the variant count is small, models are reasonably sized, the distinction is
+static, source selectors are verified, and generation is reproducible. Prefer runtime mutation when the transformation
+depends on dynamic state, variant combinations would multiply, duplicated assets are too costly, or no stable
+pre-import representation is available.
+
+Do not assume either approach is cheaper without evidence. Compressed package bytes do not measure native mesh or
+material memory. When the cost could affect the decision, compare mesh and material identities across variants and
+instances, measure their runtime memory through current engine diagnostics, and distinguish one-time cached-prefab
+cost from per-instance duplication. Validate package contents, load and optimization behavior, deterministic
+activation, save/load restoration, logs, and real-game appearance.
 
 ## Account For Runtime Prefab Optimization
 
@@ -180,6 +230,8 @@ Stop and investigate instead of guessing when:
 - more than one plausible model payload is found;
 - axes or clipping planes cannot be established from bounds and blueprint evidence;
 - required vertex properties cannot be preserved;
+- target vertex indices are shared with surfaces that must remain unchanged;
 - output structural validation fails;
+- variant role selection cannot be made deterministic across the required lifecycle and persistence boundaries;
 - geometry works but texture or shading appearance remains unexplained;
 - derived stock asset ownership or distribution expectations are unclear.
