@@ -4,38 +4,28 @@ These notes apply only when working inside the X-Ray mod.
 
 ## Release Package Layout
 
-X-Ray currently publishes as a single-folder cross-game-version package.
+X-Ray requires separate compatibility lanes because the current Update 1.1 build is not compatible with Timberborn
+Update 1.0:
 
-Do not create a `version-1.1` package folder unless the compatibility model changes. The current release package should
-contain only `XRay/version-1.0`, even when publishing mod version `1.1.x` for Timberborn 1.1 compatibility.
+- `XRay/version-1.0` preserves the verified last published artifact that remains compatible with Update 1.0;
+- `XRay/version-1.1` contains current builds and Unity exports for Update 1.1.
 
-Use release metadata compatibility ranges to express supported Timberborn versions. Do not infer that a mod version
-`1.1.x` requires a `version-1.1` package lane.
+Restore the unchanged `version-1.0` lane only through the verified legacy-lane workflow in the release publishing
+rules. Do not rebuild or overwrite it with current Update 1.1 code. Prepare a new Update 1.0 build only when the user
+explicitly asks for that separate compatibility task.
 
 Preserve old ZIP archives as historical artifacts unless the user explicitly asks to remove them.
 
 ## Platform Tags
 
-Temporary current-model exception: while X-Ray uses the single `version-1.0` package folder with release metadata
-declaring compatibility through Timberborn 1.1, keep both `Update 1.0` and `Update 1.1` platform tags.
-
-Represent this exception in `XRay/release.json` with:
-
-```json
-"PlatformTags": {
-  "AdditionalCompatibilityTags": ["Update 1.1"]
-}
-```
-
-Do not remove `Update 1.1` only because the final package has no `version-1.1` folder. If the generic platform-tag
-tooling plans to remove `Update 1.1`, stop before publishing and check that the release metadata still carries this
-additional compatibility tag.
-
-Re-evaluate this exception when Timberborn adds a new major/minor game-version lane or when X-Ray's package or
-compatibility model changes.
+Derive platform compatibility tags from the two final package lanes. A package containing both `version-1.0` and
+`version-1.1` should produce both `Update 1.0` and `Update 1.1`.
 
 ## Unity Export
 
-When exporting X-Ray Unity resources, pass `-GameVersion version-1.0` to the repository export tooling under the
-current package layout. Do not let a generic export default create or refresh `version-1.1` unless the X-Ray
-compatibility model changes.
+Export current X-Ray Unity resources into `version-1.1`. Pass `-GameVersion version-1.1` when the repository tooling
+requires an explicit lane.
+
+Never export current Unity resources into the preserved `version-1.0` lane as part of ordinary Update 1.1 release
+preparation. After export and legacy restoration, validate both lanes independently and verify that platform tags match
+the final package folders.
