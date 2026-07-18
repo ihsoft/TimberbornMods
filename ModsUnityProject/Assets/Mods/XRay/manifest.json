@@ -2,7 +2,7 @@
   "Name": "X-Ray",
   "Version": "1.2.0",
   "Id": "Timberborn.IgorZ.XRay",
-  "MinimumGameVersion": "1.0.12.0",
+  "MinimumGameVersion": "1.1.1.1",
   "Description": "This mod allows seeing through the terrain.",
   "RequiredMods": [
     {
