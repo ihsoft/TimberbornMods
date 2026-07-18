@@ -1,6 +1,6 @@
-# DualDistrictWarehouse Agent Instructions
+# DualDistrictStorage Agent Instructions
 
-These instructions apply to work under `DualDistrictWarehouse/`. Follow the repository-wide instructions and
+These instructions apply to work under `DualDistrictStorage/`. Follow the repository-wide instructions and
 Timberborn Timbermesh Operational Knowledge as well.
 
 ## Generated Model Ownership
