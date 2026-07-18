@@ -18,7 +18,8 @@ param(
     [switch] $SkipPlatformTags,
     [switch] $SkipGitTag,
     [switch] $SkipGitHubRelease,
-    [switch] $ReplaceExistingGitHubAsset
+    [switch] $ReplaceExistingGitHubAsset,
+    [switch] $CorrectiveReplacement
 )
 
 $ErrorActionPreference = "Stop"
@@ -133,6 +134,26 @@ if ($report.ReadyForPublish -ne $true) {
     throw "Preflight report is not marked ReadyForPublish."
 }
 
+$reportCorrective = $null -ne $report.CorrectiveReplacement -and $report.CorrectiveReplacement.Enabled -eq $true
+if ($CorrectiveReplacement -ne $reportCorrective) {
+    throw "Corrective replacement mode must match the immutable preflight report."
+}
+if ($CorrectiveReplacement) {
+    $replacementPlatforms = @($report.CorrectiveReplacement.Platforms | ForEach-Object { [string]$_ })
+    if ("Steam" -in $replacementPlatforms -and $SkipSteam) {
+        throw "Corrective preflight requires Steam replacement, but -SkipSteam was supplied."
+    }
+    if ("ModIO" -in $replacementPlatforms -and $SkipModIo) {
+        throw "Corrective preflight requires Mod.IO replacement, but -SkipModIo was supplied."
+    }
+    if ("GitHub" -in $replacementPlatforms -and $SkipGitHubRelease) {
+        throw "Corrective preflight requires GitHub asset replacement, but -SkipGitHubRelease was supplied."
+    }
+    if ([string]$report.CorrectiveReplacement.ExistingTagDisposition -eq "PreserveExisting" -and -not $SkipGitTag) {
+        throw "Corrective preflight preserves the existing tag; publish with -SkipGitTag."
+    }
+}
+
 $modName = [string]$report.ModName
 $modVersion = [string]$report.Version
 $tagName = [string]$report.TagName
@@ -208,6 +229,7 @@ Add-SwitchArgument $commonPublishArgs "-IncludeLegacyVersions" ([bool]$report.Pr
 Add-SwitchArgument $commonPublishArgs "-SkipBuild" $true
 Add-SwitchArgument $commonPublishArgs "-SkipUnityExport" $true
 Add-OptionalArgument $commonPublishArgs "-ExpectedPackageSha256" ([string]$report.Package.Sha256)
+Add-SwitchArgument $commonPublishArgs "-CorrectiveReplacement" $CorrectiveReplacement
 
 if (-not $SkipSteam -and -not [bool]$report.PreflightOptions.SkipSteam) {
     $steamArgs = New-Object System.Collections.Generic.List[string]
@@ -268,7 +290,7 @@ if (-not $SkipGitHubRelease) {
     $githubArgs.Add("-Repository")
     $githubArgs.Add($Repository)
     Add-OptionalArgument $githubArgs "-ExpectedPackageSha256" ([string]$report.Package.Sha256)
-    Add-SwitchArgument $githubArgs "-ReplaceExistingAsset" $ReplaceExistingGitHubAsset
+    Add-SwitchArgument $githubArgs "-ReplaceExistingAsset" ($ReplaceExistingGitHubAsset -or $CorrectiveReplacement)
     $githubArgs.Add("-Publish")
     Invoke-ReleaseStep "GitHub release publish" "publish-github-release.ps1" $githubArgs.ToArray()
 }

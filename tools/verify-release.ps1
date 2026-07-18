@@ -14,6 +14,11 @@ param(
     [string] $ModIoConfigPath = "",
     [string] $ModIoAccessTokenPath = "",
     [string] $ReleaseCommit = "",
+    [string] $Repository = "ihsoft/TimberbornMods",
+    [string] $ReplacementPlatforms = "",
+    [ValidateSet("", "PreserveExisting", "MoveAuthorized")]
+    [string] $ExistingTagDisposition = "",
+    [switch] $CorrectiveReplacement,
     [switch] $IncludeLegacyVersions,
     [switch] $SkipBuild,
     [switch] $SkipUnityExport,
@@ -329,6 +334,7 @@ Add-OptionalArgument $commonPublishArgs "-LocalModRoot" $LocalModRoot
 Add-SwitchArgument $commonPublishArgs "-IncludeLegacyVersions" $IncludeLegacyVersions
 Add-SwitchArgument $commonPublishArgs "-SkipBuild" $SkipBuild
 Add-SwitchArgument $commonPublishArgs "-SkipUnityExport" $SkipUnityExport
+Add-SwitchArgument $commonPublishArgs "-CorrectiveReplacement" $CorrectiveReplacement
 
 if (-not $SkipSteam) {
     $steamArgs = New-Object System.Collections.Generic.List[string]
@@ -416,6 +422,88 @@ if ($LASTEXITCODE -eq 0) {
     $tagExists = $true
 }
 
+$correctiveSnapshot = $null
+if ($CorrectiveReplacement) {
+    $platforms = @($ReplacementPlatforms -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ } | Sort-Object -Unique)
+    $allowedPlatforms = @("GitHub", "ModIO", "Steam")
+    $unsupportedPlatforms = @($platforms | Where-Object { $_ -notin $allowedPlatforms })
+    if ($platforms.Count -eq 0 -or $unsupportedPlatforms.Count -gt 0) {
+        throw "Corrective replacement requires -ReplacementPlatforms using only: $($allowedPlatforms -join ', ')."
+    }
+    if ([string]::IsNullOrWhiteSpace($ExistingTagDisposition)) {
+        throw "Corrective replacement requires -ExistingTagDisposition."
+    }
+    if (-not $tagExists) {
+        throw "Corrective replacement requires the existing release tag $tagName."
+    }
+
+    $existingTagCommit = (& git -C $repoRoot rev-list -n 1 $tagName).Trim()
+    $existingArtifacts = [ordered]@{}
+
+    if ("Steam" -in $platforms) {
+        $workshopDataPath = Join-Path $repoRoot "ModsUnityProject/Assets/Mods/$ModName/Data/workshop_data.json"
+        Assert-PathExists $workshopDataPath "Steam workshop metadata"
+        $workshopData = Get-Content -Raw -LiteralPath $workshopDataPath | ConvertFrom-Json
+        $publishedFileId = [string]$workshopData.ItemId
+        $steamResponse = Invoke-RestMethod -Method Post `
+            -Uri "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/" `
+            -Body @{ itemcount = "1"; "publishedfileids[0]" = $publishedFileId }
+        $steamItem = $steamResponse.response.publishedfiledetails[0]
+        $existingArtifacts.Steam = [ordered]@{
+            PublishedFileId = $publishedFileId
+            TimeUpdated = [long]$steamItem.time_updated
+            FileSize = [long]$steamItem.file_size
+        }
+    }
+
+    if ("ModIO" -in $platforms) {
+        $resolvedModIoConfigPath = Resolve-RepoPath $ModIoConfigPath
+        $resolvedTokenPath = Resolve-RepoPath $ModIoAccessTokenPath
+        Assert-PathExists $resolvedModIoConfigPath "Mod.IO config"
+        Assert-PathExists $resolvedTokenPath "Mod.IO access token"
+        $modIoConfig = Get-Content -Raw -LiteralPath $resolvedModIoConfigPath | ConvertFrom-Json
+        $token = (Get-Content -Raw -LiteralPath $resolvedTokenPath).Trim()
+        $modIoParent = Invoke-RestMethod `
+            -Uri "$($modIoConfig.ApiBase.TrimEnd('/'))/games/$($modIoConfig.GameId)/mods/$($modIoConfig.ModId)" `
+            -Headers @{ Authorization = "Bearer $token" }
+        $existingArtifacts.ModIO = [ordered]@{
+            ModId = [long]$modIoConfig.ModId
+            FileId = [long]$modIoParent.modfile.id
+            Version = [string]$modIoParent.modfile.version
+            Md5 = [string]$modIoParent.modfile.filehash.md5
+            FileSize = [long]$modIoParent.modfile.filesize
+        }
+    }
+
+    if ("GitHub" -in $platforms) {
+        $releaseJson = & gh release view $tagName --repo $Repository --json url,tagName,assets
+        if ($LASTEXITCODE -ne 0) {
+            throw "Existing GitHub release was not found for $tagName."
+        }
+        $githubRelease = $releaseJson | ConvertFrom-Json
+        $assetName = [System.IO.Path]::GetFileName($packageSnapshot.Path)
+        $asset = @($githubRelease.assets | Where-Object { $_.name -eq $assetName })
+        if ($asset.Count -ne 1) {
+            throw "Expected exactly one existing GitHub asset named $assetName, found $($asset.Count)."
+        }
+        $existingArtifacts.GitHub = [ordered]@{
+            Url = [string]$githubRelease.url
+            AssetName = [string]$asset[0].name
+            Digest = [string]$asset[0].digest
+            Size = [long]$asset[0].size
+        }
+    }
+
+    $correctiveSnapshot = [ordered]@{
+        Enabled = $true
+        CorrectionCommit = $gitSnapshot.ReleaseCommit
+        Platforms = [string[]]$platforms
+        ExistingTagCommit = $existingTagCommit
+        ExistingTagDisposition = $ExistingTagDisposition
+        ExistingArtifacts = $existingArtifacts
+    }
+}
+
 $report = [ordered]@{
     SchemaVersion = 2
     CreatedAtUtc = (Get-Date).ToUniversalTime().ToString("o")
@@ -425,6 +513,7 @@ $report = [ordered]@{
     ReleaseIdentityPaths = $gitSnapshot.IdentityPaths
     ReleaseCriticalPaths = $gitSnapshot.CriticalPaths
     LaterReleaseCriticalChanges = $gitSnapshot.LaterCriticalChanges
+    CorrectiveReplacement = $correctiveSnapshot
     GitStatus = [string[]]$gitStatus
     ModName = $ModName
     Version = $modVersion
@@ -446,6 +535,7 @@ $report = [ordered]@{
         SkipPlatformTags = [bool]$SkipPlatformTags
         SkipSteam = [bool]$SkipSteam
         SkipModIo = [bool]$SkipModIo
+        CorrectiveReplacement = [bool]$CorrectiveReplacement
     }
     Steps = [object[]]$steps.ToArray()
     ReadyForPublish = $true

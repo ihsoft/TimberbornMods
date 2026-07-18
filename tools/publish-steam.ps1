@@ -14,6 +14,7 @@ param(
     [string] $SteamUserName = "",
     [string] $ChangeNotesPrefix = "",
     [string] $ExpectedPackageSha256 = "",
+    [switch] $CorrectiveReplacement,
     [switch] $IncludeLegacyVersions,
     [switch] $SkipBuild,
     [switch] $SkipUnityExport,
@@ -822,6 +823,7 @@ if (-not $localTagsSynchronized) {
     Write-Host "  Remove locally: $(Format-Tags $localTagRemoves)"
 }
 Write-Host "Live Steam tags: $(Format-Tags $liveTags)"
+Write-Host "Corrective same-version replacement: $([bool]$CorrectiveReplacement)"
 if (-not $liveTagsSynchronized) {
     if ($Publish) {
         Write-Host "Live Steam tag update: will update before SteamCMD upload"

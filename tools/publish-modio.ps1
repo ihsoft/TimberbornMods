@@ -11,6 +11,7 @@ param(
     [string] $AccessTokenPath = "",
     [string] $ChangeNotesPrefix = "",
     [string] $ExpectedPackageSha256 = "",
+    [switch] $CorrectiveReplacement,
     [int] $ScanTimeoutSeconds = 600,
     [int] $ScanPollSeconds = 15,
     [switch] $IncludeLegacyVersions,
@@ -629,6 +630,7 @@ Write-Host "Mod.IO publish plan for $ModName v$modVersion"
 Write-Host "Package: $zipPath"
 Write-Host "SHA256: $hash"
 Write-Host "Game version folders: $($versionFolders -join ', ')"
+Write-Host "Corrective same-version replacement: $([bool]$CorrectiveReplacement)"
 if ($releaseConfig.ReadyForPublish -eq $false) {
     Write-Host "Ready for publish: false"
 }
@@ -664,6 +666,17 @@ if ([string]::IsNullOrWhiteSpace($apiBase) -or
 $accessToken = Read-ModIoAccessToken $AccessTokenPath
 if ([string]::IsNullOrWhiteSpace($accessToken)) {
     throw "Cannot publish: create .tools/modio/$ModName.token.txt."
+}
+
+$currentMod = Invoke-RestMethod `
+    -Uri "$($apiBase.TrimEnd('/'))/games/$gameId/mods/$modId" `
+    -Headers @{ Authorization = "Bearer $accessToken" }
+$currentPublishedVersion = [string]$currentMod.modfile.version
+if ($CorrectiveReplacement -and $currentPublishedVersion -ne $modVersion) {
+    throw "Corrective replacement expected existing Mod.IO version $modVersion, found $currentPublishedVersion."
+}
+if (-not $CorrectiveReplacement -and $currentPublishedVersion -eq $modVersion) {
+    throw "Mod.IO already has active version $modVersion. Use explicit corrective replacement mode only with user authorization and a corrective preflight."
 }
 
 Write-Host "Publishing to Mod.IO..."
