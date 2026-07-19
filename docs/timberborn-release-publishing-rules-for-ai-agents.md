@@ -522,6 +522,22 @@ When the user asks to update a description because release behavior changed, upd
 description for a new player. Describe what the mod does now. Do not describe removed or historical behavior in the
 main platform description. Put historical change information only in changelog or release notes when needed.
 
+For a new description or a user-approved full description refresh, keep the player-value core focused on why a player
+should install the mod, which gameplay problem it solves, its meaningful features, and how to use it. Do not fill that
+core with implementation provenance, technical build details, routine expected faction support, game-version prose, or
+dependency prose. State a faction limitation when it materially constrains use. Keep game compatibility and dependency
+declarations in the required structured platform metadata and package manifest; their absence from promotional prose
+does not weaken those publication checks.
+
+When the repository-established Support or donation block is present, keep it at the top for visibility, followed by a
+separator, the player-value core, another separator, and the source or community footer. Support and footer content is
+allowed on the page but remains editorially separate from feature claims. This layout rule does not by itself authorize
+restyling an existing description; preserve the existing structure unless the user requests and reviews the refresh.
+
+Include a Discord link only when it leads to a dedicated channel for that mod, unless the user explicitly requests a
+generic community invite. If no dedicated channel exists, omit the generic invite and add the direct channel link later
+when it becomes available.
+
 Preserve each platform's existing markup and file style. Steam Workshop descriptions use Steam formatting:
 
 ```text
