@@ -28,9 +28,42 @@ Revalidate the current game archive and official Timbermesh schema before adapti
 representation. When the generator interface or either output identity changes, update both outputs, the blueprint
 child references, and runtime activation contract in the same change.
 
+## Derived Iron Teeth Model Ownership
+
+`Tools/copy_timbermesh_model.py` owns three faction-specific Iron Teeth models derived one at a time from the tracked
+Folktails outputs. Each invocation requires `--timbermesh-plugin-dir`, `--source`, `--source-model`, `--output`, and
+`--output-model`. Do not hand-copy or hand-edit these binary assets:
+
+- `Mod/Buildings/Storage/DualDistrictWarehouse/DualDistrictWarehouse.Folktails.Model.timbermesh`, identity
+  `DualDistrictWarehouse.Folktails.Model`, produces
+  `Mod/Buildings/Storage/DualDistrictWarehouse/DualDistrictWarehouse.IronTeeth.Model.timbermesh`, identity
+  `DualDistrictWarehouse.IronTeeth.Model`;
+- `Mod/Buildings/Storage/DualDistrictWarehouse/DualDistrictWarehouse.Folktails.MirroredRoof.Model.timbermesh`, identity
+  `DualDistrictWarehouse.Folktails.MirroredRoof.Model`, produces
+  `Mod/Buildings/Storage/DualDistrictWarehouse/DualDistrictWarehouse.IronTeeth.MirroredRoof.Model.timbermesh`, identity
+  `DualDistrictWarehouse.IronTeeth.MirroredRoof.Model`;
+- `Mod/Buildings/Storage/DualDistrictTank/DualDistrictTank.Folktails.Model.timbermesh`, identity
+  `DualDistrictTank.Folktails.Model`, produces
+  `Mod/Buildings/Storage/DualDistrictTank/DualDistrictTank.IronTeeth.Model.timbermesh`, identity
+  `DualDistrictTank.IronTeeth.Model`.
+
+The tool must parse the source through the official Timbermesh protobuf schema, require the expected one-node source
+identity, change only that identity, serialize and parse the result again, and verify the exact output identity. While
+these resources remain declared copies, verify that their geometry, material descriptors, indices, and other
+non-identity model payload match their corresponding Folktails sources. Regenerate a derived output whenever its source
+changes, then verify reproducible output, source/package hashes, and the ordinary package build.
+
+Iron Teeth blueprints must reference only the corresponding Iron Teeth model identities. The derived files are not
+members of the warehouse generator's atomic Folktails output set; their separate copy-tool ownership is intentional.
+If faction-specific art later diverges, transfer each affected output to an appropriate reproducible generator and
+update its blueprint contract in the same change rather than editing the binary manually.
+
+The copy transformation, build, and packaged-file hashes have been validated. A separate real-game result for these
+Iron Teeth copies has not yet been reported; do not describe their runtime appearance as confirmed on that evidence.
+
 ## Current Model Contract
 
-The current building uses two generated variants of the same entrance-side 3x1 geometry under one `#Finished` root:
+The Folktails warehouse uses two generated variants of the same entrance-side 3x1 geometry under one `#Finished` root:
 
 - `#Finished/NormalModel` references
   `Buildings/Storage/DualDistrictWarehouse/DualDistrictWarehouse.Folktails.Model`;
