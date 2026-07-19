@@ -37,6 +37,32 @@ publish script.
 This unified tooling is still new. Until it has been proven by at least one successful real release publish flow, treat
 unexpected script behavior as a stop-and-investigate condition instead of silently falling back to ad hoc manual steps.
 
+## First release of a new mod
+
+For a mod without a verified Steam `PublishedFileId` or Mod.IO `ModId`, use a one-time platform identity bootstrap and
+then return to the ordinary release workflow. Do not maintain a separate first-release publishing pipeline.
+
+1. **Prepare locally without platform mutation.** Confirm the exact mod identity, first version, compatibility lanes,
+   title, package source and DLL, changelog, descriptions, thumbnail, category and compatibility metadata, and required
+   dependencies. Create the ordinary release inputs, build and validate the final package, date the changelog, and
+   commit the release preparation. A report may identify missing platform IDs, but it is preliminary and must not be
+   marked `ReadyForPublish`.
+2. **Bootstrap platform identities with separate explicit authorization.** The authorization must name the mod, each
+   platform to create, and the initial visibility or publication state. Through a bounded creation mode or a documented
+   manual step, show the exact account, game, title or slug, state, tags, dependencies, description source, and thumbnail
+   before creating only the requested Workshop item or Mod.IO page. Live-verify the returned identity, ownership, game
+   scope, mod identity, and state before adopting it. Never guess, reuse, or copy another mod's platform ID. Identity
+   creation does not authorize package upload, a later visibility change, a Git tag, or a GitHub Release.
+3. **Re-enter the normal immutable pipeline.** Record verified IDs in tracked release configuration or ignored local
+   platform configuration according to repository convention; never store credentials. Commit any tracked identity or
+   metadata adoption, configure and verify structured dependencies and compatibility/category tags, then rerun the full
+   final preflight. From that point use the normal upload order, live verification, partial-success stop gate, tagging,
+   GitHub Release, and post-release workflow.
+
+Prefer dry-run-first identity-bootstrap tooling that fails when creation mode is not explicit, an item already exists,
+or identity fields are incomplete. It must create and verify identities only and must not continue silently into package
+upload.
+
 ## Final preflight snapshot
 
 Treat a final preflight report marked ready for publishing as the immutable release snapshot, not merely as evidence
