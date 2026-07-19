@@ -1,0 +1,30 @@
+[h1]Support the mods[/h1]
+All my Timberborn mods are free. I make them for fun, because I enjoy improving the game and experimenting with new ideas.
+
+Donations are completely optional. If you enjoy the mods and want to say thanks, you can buy me a coffee or donate via PayPal. It is never required, but it is always appreciated and helps keep me motivated.
+
+[url=https://buymeacoffee.com/igor.zavoychinskiy]Buy Me a Coffee[/url]
+[url=https://www.paypal.com/donate/?hosted_button_id=8RPFC884ZEV9L]Donate via PayPal[/url]
+
+[hr][/hr]
+
+[h1]Shared storage across a district boundary[/h1]
+Let two adjacent districts use the same warehouse or tank directly.
+
+Each building has two opposite entrances and one synchronized inventory. Beavers from either district can deliver to or collect from the same stock, removing the need for a separate transfer route and extra workers just to move those goods across the boundary.
+
+[h1]Included buildings[/h1]
+[list]
+[*][b]Dual-District Warehouse[/b] — stores up to 200 units of boxed goods.
+[*][b]Dual-District Tank[/b] — stores up to 300 units of liquid.
+[/list]
+
+[h1]How to use[/h1]
+Place the building across a district boundary, with one entrance connected to each district's path network. Select what it should store, then use it like normal storage from either side.
+
+[i]Two doors. One stockpile. No paperwork.[/i]
+
+[hr][/hr]
+
+[h1]Source[/h1]
+GitHub repository: https://github.com/ihsoft/TimberbornMods
