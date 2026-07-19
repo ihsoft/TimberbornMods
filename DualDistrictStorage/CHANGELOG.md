@@ -1,5 +1,4 @@
 # v0.1.0 (TBD)
-
 * [Change] Rename the mod to Dual District Storage now that it supports both goods and liquids.
 * [Feature] Make both storage buildings available to the Iron Teeth faction with the same models and behavior.
 * [Visual] Give the dual-district warehouse and tank distinct menu icons marked with a district symbol.
