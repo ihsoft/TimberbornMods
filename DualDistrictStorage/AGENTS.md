@@ -3,6 +3,24 @@
 These instructions apply to work under `DualDistrictStorage/`. Follow the repository-wide instructions and
 Timberborn Timbermesh Operational Knowledge as well.
 
+## Dual-District Icon Contract
+
+`Tools/create_dual_district_icons.py` owns these generated icons and their adjacent `.png.meta.json` files:
+
+- stock `MediumWarehouseIcon` produces
+  `Mod/Buildings/Storage/DualDistrictWarehouse/DualDistrictWarehouseIcon.png`;
+- stock `MediumTankIcon` produces
+  `Mod/Buildings/Storage/DualDistrictTank/DualDistrictTankIcon.png`.
+
+The generator preserves each 112x112 stock building icon as the lower layer and adds one stock `DistrictCenterIcon`
+star, cropped by alpha bounds and composited at 35x35 at `(77, 0)`. Both faction blueprints for a building reference the
+same corresponding custom icon.
+
+When adding another dual-district building, extend the generator's explicit source/output map instead of hand-editing
+the generated icon. Follow Timberborn Icon Operational Knowledge for import, packaging, and validation. Revalidate the
+composition at construction-menu scale and choose a different overlay placement when the new silhouette needs it; the
+current size and coordinates are local confirmed values, not defaults for unrelated icons.
+
 ## Generated Model Ownership
 
 `Tools/create_half_timbermesh.py` owns both tracked generated models as one atomic artifact set; do not hand-edit either
