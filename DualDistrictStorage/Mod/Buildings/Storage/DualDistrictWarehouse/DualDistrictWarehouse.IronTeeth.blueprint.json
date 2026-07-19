@@ -127,7 +127,7 @@
     "DisplayNameLocKey": "Building.DualDistrictWarehouse.DisplayName",
     "DescriptionLocKey": "Building.DualDistrictWarehouse.Description",
     "FlavorDescriptionLocKey": "Building.DualDistrictWarehouse.FlavorDescription",
-    "Icon": "Buildings/Storage/MediumWarehouse/MediumWarehouseIcon"
+    "Icon": "Buildings/Storage/DualDistrictWarehouse/DualDistrictWarehouseIcon"
   },
   "BuildingAccessibleSpec": {
     "LocalAccess": {

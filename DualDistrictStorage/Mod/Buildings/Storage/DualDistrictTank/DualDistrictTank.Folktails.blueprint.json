@@ -131,7 +131,7 @@
     "DisplayNameLocKey": "Building.DualDistrictTank.DisplayName",
     "DescriptionLocKey": "Building.DualDistrictTank.Description",
     "FlavorDescriptionLocKey": "Building.DualDistrictTank.FlavorDescription",
-    "Icon": "Buildings/Storage/MediumTank/MediumTankIcon"
+    "Icon": "Buildings/Storage/DualDistrictTank/DualDistrictTankIcon"
   },
   "BuildingAccessibleSpec": {
     "LocalAccess": {
