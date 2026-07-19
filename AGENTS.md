@@ -41,7 +41,8 @@ blindly.
 | Creating or modifying in-game UI Toolkit views, UXML, USS, dialogs, panels, or fragments | `docs/timberborn-ui-toolkit-notes-for-ai-agents.md` |
 | Locating, extracting, generating, modifying, or packaging Timberborn `.timbermesh` models | `docs/agent-knowledge/Timberborn-Timbermesh-Operational-Knowledge-v1.md` |
 | Modifying instantiated runtime `UnityEngine.Mesh` geometry, UVs, or per-entity visualization meshes | `docs/agent-knowledge/Timberborn-Runtime-Unity-Mesh-Operational-Knowledge-v1.md` |
-| Designing a new feature or new mod | `docs/timberborn-modding-howto-for-ai-agents.md`, `docs/timberborn-repository-notes.md`, and `docs/timberborn-lessons-learned.md` |
+| Designing, creating, or integrating a new Timberborn mod project | `docs/agent-knowledge/Timberborn-New-Mod-Operational-Knowledge-v1.md` |
+| Designing a new feature inside an existing mod | `docs/timberborn-modding-howto-for-ai-agents.md`, `docs/timberborn-repository-notes.md`, and `docs/timberborn-lessons-learned.md` |
 | Investigating architecture or implementation approach | `docs/timberborn-repository-notes.md` and `docs/timberborn-lessons-learned.md` |
 | Diagnosing build, export, mod loading, runtime, UI, save/load, or platform behavior | `docs/agent-knowledge/Timberborn-Diagnostics-Operational-Knowledge-v1.md` |
 | Editing or reviewing GitHub Wiki pages | `docs/agent-knowledge/Wiki-Operational-Knowledge-v1.md` and `docs/timberborn-wiki-editing-rules-for-ai-agents.md` |
@@ -413,13 +414,9 @@ export, and focused test commands.
 
 ## New mod repository setup
 
-Follow `docs/timberborn-modding-howto-for-ai-agents.md` for the implementation workflow. For repository integration:
-
-1. Define C# and package-data ownership, compile-only validation, real-game build/export, and focused test selection;
-   add or update the mod's row in the `Package Build And Validation Matrix` in
-   `docs/agent-knowledge/Timberborn-Repository-Validation-Operational-Knowledge-v1.md`.
-2. Decide whether durable mod-specific rules justify a local `AGENTS.md`. Do not create an empty local instruction file
-   only to satisfy the checklist.
+Follow `docs/agent-knowledge/Timberborn-New-Mod-Operational-Knowledge-v1.md` for project boundaries, asset ownership,
+repository integration, validation registration, and release handoff. Load the larger architecture references or
+specialized workflows only when their routing conditions apply.
 
 ## Safety rule
 

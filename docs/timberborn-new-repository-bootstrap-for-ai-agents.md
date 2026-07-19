@@ -414,35 +414,15 @@ Do not edit generated files.
 
 ---
 
-## First Mod Project Rules
+## First Mod Project Handoff
 
-When creating the first mod project, do not copy a project layout blindly.
+Repository bootstrap establishes the local environment; it does not choose or authorize a project layout. Once the
+required local capabilities are ready, follow
+`docs/agent-knowledge/Timberborn-New-Mod-Operational-Knowledge-v1.md` to define the mod boundary, choose only the asset
+lanes the feature needs, create the smallest repository slice, and register its validation ownership.
 
-First:
-
-1. Understand the requested feature.
-2. Find the closest existing game feature.
-3. Study game data and decompiled classes.
-4. Trace data/spec to component, service, UI, persistence, and registration.
-5. Decide whether the mod needs code, blueprints, Unity assets, UI assets, Harmony patches, or a combination.
-
-Then create the smallest project layout that fits the feature and the repository rules.
-
-For C# mod projects:
-
-- configure Timberborn assembly references,
-- include `BepInEx.AssemblyPublicizer.MSBuild` when private/internal game access is expected,
-- set `Publicize="true"` on relevant Timberborn references when direct access is needed,
-- prefer publicized direct member access over reflection or `AccessTools`,
-- use reflection only when publicized direct access is unavailable or unsuitable,
-- use Harmony only when no reasonable extension point exists.
-
-For package data:
-
-- add `manifest.json`,
-- add localization files for user-facing text,
-- add blueprints/assets/UI files only when required by the feature,
-- decide whether a Unity project is needed before creating one.
+Load the C#, Unity, UI, localization, or mesh instructions only when that chosen slice triggers their root routing
+conditions. Do not copy a complete example layout merely because bootstrap made its tools or references available.
 
 ---
 
