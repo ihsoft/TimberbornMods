@@ -237,7 +237,7 @@
         },
         "ConstructionStage0": {
           "TimbermeshSpec": {
-            "Model": "Buildings/DistrictManagement/DistrictCrossing/DistrictCrossing.Folktails.ConstructionStage0.Model"
+            "Model": "Buildings/Storage/DualDistrictWarehouse/DualDistrictWarehouse.IronTeeth.ConstructionStage0.Model"
           },
           "CollidersSpec": {
             "BoxColliders": [

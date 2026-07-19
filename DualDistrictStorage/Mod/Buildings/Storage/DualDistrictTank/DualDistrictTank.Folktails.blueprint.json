@@ -2,9 +2,18 @@
   "BuildingSpec": {
     "SelectionSoundName": "Tank",
     "LoopingSoundName": "",
-    "BuildingCost": [],
+    "BuildingCost": [
+      {
+        "Id": "Plank",
+        "Amount": 30
+      },
+      {
+        "Id": "Gear",
+        "Amount": 20
+      }
+    ],
     "ScienceCost": 0,
-    "PlaceFinished": true,
+    "PlaceFinished": false,
     "FinishableWithBeaversOnSite": false,
     "DrawRangeBoundsOnIt": false
   },
@@ -195,6 +204,11 @@
       }
     ]
   },
+  "ConstructionSiteProgressVisualizerSpec": {
+    "ProgressThresholds": [
+      0.0
+    ]
+  },
   "Children": {
     "#Finished": {
       "TimbermeshSpec": {
@@ -221,8 +235,51 @@
     },
     "#Unfinished": {
       "Children": {
-        "ConstructionBase1x2#nested": {
-          "BlueprintPath": "ConstructionBases/ConstructionBase1x2/ConstructionBase1x2.blueprint"
+        "ConstructionBase": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Storage/DualDistrictTank/DualDistrictTank.ConstructionBase.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 1.0,
+                  "Y": 0.05,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 2.0,
+                  "Y": 0.1,
+                  "Z": 1.0
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
+        },
+        "ConstructionStage0": {
+          "TimbermeshSpec": {
+            "Model": "Buildings/Storage/DualDistrictTank/DualDistrictTank.Folktails.ConstructionStage0.Model"
+          },
+          "CollidersSpec": {
+            "BoxColliders": [
+              {
+                "Center": {
+                  "X": 1.0,
+                  "Y": 0.05,
+                  "Z": 0.5
+                },
+                "Size": {
+                  "X": 2.0,
+                  "Y": 0.1,
+                  "Z": 1.0
+                }
+              }
+            ],
+            "SphereColliders": [],
+            "CapsuleColliders": []
+          }
         }
       }
     }

@@ -1,6 +1,7 @@
 {
   "TemplateCollectionSpec": {
-    "TemplatePaths": [
+    "CollectionId": "Buildings.IronTeeth",
+    "Blueprints": [
       "Buildings/Storage/DualDistrictTank/DualDistrictTank.IronTeeth.blueprint",
       "Buildings/Storage/DualDistrictWarehouse/DualDistrictWarehouse.IronTeeth.blueprint"
     ]

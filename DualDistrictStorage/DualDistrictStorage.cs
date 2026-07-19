@@ -306,8 +306,9 @@ sealed class DualDistrictStorage : BaseComponent, IAwakableComponent, IFinishedS
     }
 
     var primary = PrimaryHalf();
+    var secondary = ReferenceEquals(primary, this) ? _linked : this;
     primary.ShowModelVariant(mirroredRoof: false);
-    primary._linked.ShowModelVariant(mirroredRoof: true);
+    secondary.ShowModelVariant(mirroredRoof: true);
   }
 
   void ShowModelVariant(bool mirroredRoof) {
