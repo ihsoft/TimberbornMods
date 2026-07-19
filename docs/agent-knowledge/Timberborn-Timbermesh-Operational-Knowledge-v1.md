@@ -73,6 +73,21 @@ For linked building halves, a normal placement rotation may produce the required
 negative-scale winding, normal, and tangent complications. This is a conditional design preference, not a universal
 prohibition on negative scale. Verify the actual owning placement system.
 
+## Preserve Continuity Across Lifecycle Models
+
+When several placed entities visually compose one larger object, evaluate every visible lifecycle model separately:
+finished geometry, construction bases, construction stages, and any other model that must cross the entity boundary.
+A correct finished split does not prove that independently selected unfinished models will join cleanly.
+
+When continuity matters and an appropriate stock full-size lifecycle model exists, prefer deriving each half from that
+shared source rather than assembling the state from unrelated smaller models. Independent bases or stages can have
+compatible dimensions and valid schemas while their perimeter geometry creates a visible seam. Do not borrow a
+different building's construction model merely because its footprint fits.
+
+This is a conditional source-selection rule, not a requirement to split every lifecycle asset. Establish the exact
+source identity, faction ownership, bounds, axis, and clipping plane for each model, and validate stage transitions and
+the composed appearance during ordinary construction in the real game.
+
 ## Preserve Mesh Semantics During Geometry Editing
 
 When a clipping plane intersects triangles, deleting every crossing triangle can create holes and damage structural
@@ -119,6 +134,28 @@ alone do not reproduce or validate the stock texture layout.
 
 Validate textured appearance in the real game. Do not describe an asset as finished based only on geometry preview or
 successful loading.
+
+## Map Materials Across Faction Repositories
+
+Changing a model or node to a target-faction identity can make the importer resolve its materials through that
+faction's material repository. A structurally valid Timbermesh derived from another faction may therefore fail to load
+when it still references source-faction material identities.
+
+Before generating a target-faction variant:
+
+1. Enumerate the complete set of material identities referenced by the source model.
+2. Build an explicit evidence-backed source-to-target mapping for every material that must change.
+3. Reject a missing mapping and reject mappings for material identities not present in the source.
+4. Apply the mapping to every mesh, round-trip the model, and verify the exact output material set.
+5. Confirm that every output material resolves in the target faction's current repository.
+
+Do not fix only the first material named by the loader; a partial map merely moves the failure to the next unresolved
+material. For a pure faction derivation, preserve geometry, indices, vertex properties, and other non-material payload,
+but do not require material descriptors to remain equal. Treat a faction-neutral material as shared only when current
+stock assets or material collections provide evidence for that ownership.
+
+Protobuf validation and deterministic hashes prove transformation and packaging, not runtime material resolution.
+Inspect the fresh game log and the rendered model before claiming the target-faction variant works.
 
 ## Choose Asset Variants Or Runtime Mutation Deliberately
 
@@ -243,6 +280,7 @@ Stop and investigate instead of guessing when:
 - axes or clipping planes cannot be established from bounds and blueprint evidence;
 - required vertex properties cannot be preserved;
 - target vertex indices are shared with surfaces that must remain unchanged;
+- a target-faction material map is incomplete or its output identities cannot be resolved;
 - output structural validation fails;
 - variant role selection cannot be made deterministic across the required lifecycle and persistence boundaries;
 - geometry works but texture or shading appearance remains unexplained;

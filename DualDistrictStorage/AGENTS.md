@@ -28,11 +28,12 @@ Revalidate the current game archive and official Timbermesh schema before adapti
 representation. When the generator interface or either output identity changes, update both outputs, the blueprint
 child references, and runtime activation contract in the same change.
 
-## Derived Iron Teeth Model Ownership
+## Derived Iron Teeth Model And Material Ownership
 
 `Tools/copy_timbermesh_model.py` owns three faction-specific Iron Teeth models derived one at a time from the tracked
 Folktails outputs. Each invocation requires `--timbermesh-plugin-dir`, `--source`, `--source-model`, `--output`, and
-`--output-model`. Do not hand-copy or hand-edit these binary assets:
+`--output-model`, plus one explicit `--material SOURCE=OUTPUT` argument for every source material. Do not hand-copy or
+hand-edit these binary assets:
 
 - `Mod/Buildings/Storage/DualDistrictWarehouse/DualDistrictWarehouse.Folktails.Model.timbermesh`, identity
   `DualDistrictWarehouse.Folktails.Model`, produces
@@ -47,19 +48,40 @@ Folktails outputs. Each invocation requires `--timbermesh-plugin-dir`, `--source
   `Mod/Buildings/Storage/DualDistrictTank/DualDistrictTank.IronTeeth.Model.timbermesh`, identity
   `DualDistrictTank.IronTeeth.Model`.
 
+Both warehouse variants use this complete material map:
+
+- `BaseWood_LightBrown.Folktails` -> `BaseWood_Grey.IronTeeth`;
+- `Paper.Folktails` -> `Paper.IronTeeth`;
+- `BaseWood_Brown.Folktails` -> `BaseWood_DarkBrown.IronTeeth`;
+- `IrregularPlanks_Brown.Folktails` -> `IrregularPlanks_DarkBrown.IronTeeth`;
+- `BaseWood_White.Folktails` -> `BaseWood_Indigo.IronTeeth`;
+- `IrregularPlanks_Mossy.Folktails` -> `IrregularPlanks_Indigo.IronTeeth`.
+
+The tank variant uses this complete material map:
+
+- `BaseWood_LightBrown.Folktails` -> `BaseWood_Grey.IronTeeth`;
+- `Paper.Folktails` -> `Paper.IronTeeth`;
+- `BaseWood_Brown.Folktails` -> `BaseWood_DarkBrown.IronTeeth`;
+- `WindowsAtlas.Folktails` -> `WindowsAtlas.IronTeeth`.
+
 The tool must parse the source through the official Timbermesh protobuf schema, require the expected one-node source
-identity, change only that identity, serialize and parse the result again, and verify the exact output identity. While
-these resources remain declared copies, verify that their geometry, material descriptors, indices, and other
-non-identity model payload match their corresponding Folktails sources. Regenerate a derived output whenever its source
-changes, then verify reproducible output, source/package hashes, and the ordinary package build.
+identity, enumerate the complete source material set, reject missing mappings and mappings for unknown materials,
+change the model and material identities, serialize and parse the result again, and verify the exact output identity
+and material set. While these resources remain derived copies, verify that geometry, indices, vertex properties, and
+other non-material model payload match their Folktails sources. Material descriptors are intentionally different.
+Regenerate a derived output whenever its source or mapping changes, then verify reproducible output, source/package
+hashes, the ordinary package build, and target-faction material resolution in the game log.
 
 Iron Teeth blueprints must reference only the corresponding Iron Teeth model identities. The derived files are not
 members of the warehouse generator's atomic Folktails output set; their separate copy-tool ownership is intentional.
 If faction-specific art later diverges, transfer each affected output to an appropriate reproducible generator and
 update its blueprint contract in the same change rather than editing the binary manually.
 
-The copy transformation, build, and packaged-file hashes have been validated. A separate real-game result for these
-Iron Teeth copies has not yet been reported; do not describe their runtime appearance as confirmed on that evidence.
+The Iron Teeth template collection keeps `TemplateCollectionSpec.CollectionId` equal to `Buildings.IronTeeth` and
+lists both building resources through `Blueprints`. Do not reintroduce the obsolete `TemplatePaths` shape.
+
+The transformation, build, packaged-file hashes, target-faction material resolution, toolbar availability, and rendered
+Iron Teeth finished models have been confirmed in the real game.
 
 ## Current Model Contract
 
@@ -76,6 +98,10 @@ that the building ownership model changed.
 Every instance defaults to `NormalModel` during `Awake`. After linking, the existing `PrimaryHalf()` GUID ordering keeps
 the primary half normal and activates `MirroredRoofModel` only on the secondary half. Both peers must compute the same
 role, and a missing expected child identity must remain a diagnostic warning rather than a silent fallback.
+
+`BuildingLinked` may run before the peer's reciprocal link field has been assigned. Determine the secondary directly
+from the two callback participants, equivalent to `ReferenceEquals(primary, this) ? _linked : this`; do not dereference
+`primary._linked` or otherwise assume reciprocal callback completion during unfinished placement.
 
 Runtime mesh cloning, optimized-geometry selection, and atlas-fragment UV mutation are not part of the current design.
 Do not reintroduce them merely because they were used by an earlier working implementation.
@@ -107,6 +133,64 @@ After changing the generator, either generated model, blueprint child identities
 
 Preserve the already validated geometry while testing one evidence-supported model or lifecycle hypothesis at a time.
 
+## Construction Model Ownership
+
+`Tools/create_construction_half_timbermesh.py` owns five independently generated construction models. It accepts the
+current game `resources.assets`, UnityPy and official Timbermesh schema directories, exact source and output identities,
+and an output path. It requires one source node, clips the entrance-side half at Timbermesh Z = 1, validates the result,
+and round-trips the compressed model. Do not hand-edit these outputs:
+
+- `ConstructionBase2x2.Model` produces
+  `Mod/Buildings/Storage/DualDistrictTank/DualDistrictTank.ConstructionBase.Model.timbermesh`, identity
+  `DualDistrictTank.ConstructionBase.Model`;
+- `MediumTank.Folktails.ConstructionStage0.Model` produces
+  `Mod/Buildings/Storage/DualDistrictTank/DualDistrictTank.Folktails.ConstructionStage0.Model.timbermesh`, identity
+  `DualDistrictTank.Folktails.ConstructionStage0.Model`;
+- `MediumTank.IronTeeth.ConstructionStage0.Model` produces
+  `Mod/Buildings/Storage/DualDistrictTank/DualDistrictTank.IronTeeth.ConstructionStage0.Model.timbermesh`, identity
+  `DualDistrictTank.IronTeeth.ConstructionStage0.Model`;
+- `MediumWarehouse.Folktails.ConstructionStage0.Model` produces
+  `Mod/Buildings/Storage/DualDistrictWarehouse/DualDistrictWarehouse.Folktails.ConstructionStage0.Model.timbermesh`,
+  identity `DualDistrictWarehouse.Folktails.ConstructionStage0.Model`;
+- `MediumWarehouse.IronTeeth.ConstructionStage0.Model` produces
+  `Mod/Buildings/Storage/DualDistrictWarehouse/DualDistrictWarehouse.IronTeeth.ConstructionStage0.Model.timbermesh`,
+  identity `DualDistrictWarehouse.IronTeeth.ConstructionStage0.Model`.
+
+The tank construction base is intentionally common because both stock faction tank blueprints reference the same
+`ConstructionBase2x2.Model`. Tank and warehouse stages remain faction-specific and retain their source faction's
+material identities. Revalidate those ownership facts before changing the source game version or introducing new
+faction art.
+
+## Construction Blueprint Contract
+
+The current unfinished models use direct child 0 as the construction base and direct child 1 as the generated
+`ConstructionStage0`. Keep `ConstructionSiteProgressVisualizerSpec.ProgressThresholds` equal to `[0.0]` for that
+two-state structure. Do not add, remove, or reorder direct children without updating and validating the threshold list.
+
+Each faction blueprint must reference its faction-specific generated stage. Both tank factions must reference the common
+`DualDistrictTank.ConstructionBase.Model`; do not compose the initial tank state from two independent
+`ConstructionBase1x2` models because their perimeter geometry creates a visible seam.
+
+The warehouse and tank use their own stock-derived construction sources. Do not substitute a dimensionally compatible
+stage from another building. The tank keeps `PlaceFinished` disabled and uses the stock Medium Tank construction costs
+so ordinary construction exercises the intended lifecycle.
+
+## Construction Model Validation
+
+After changing a construction generator, source, output, blueprint child, threshold, cost, or linking callback:
+
+1. Regenerate each affected output through the owning script and verify source identity, one-node structure, Z = 1
+   clipping, output identity, bounds, indices, materials, and serialization.
+2. Build through the ordinary package path and verify every affected source/package hash.
+3. Verify faction TemplateCollection registration, blueprint model identities, child order, and the exact threshold.
+4. Place and construct both factions normally in the real game; `PlaceFinished` or instant build is not sufficient.
+5. Inspect the initial base, every stage, the completed model, seams, linking behavior, and a fresh log. Confirm that
+   exactly one intended unfinished state is visible at a time.
+
+Ordinary construction has confirmed the warehouse stages, the common composed tank base, the faction tank stages,
+stage switching, linked placement, and target-faction model loading. Broader logistics and save/load behavior remain
+outside that evidence.
+
 ## DualDistrictTank Generated Model Ownership
 
 `Tools/create_tank_half_timbermesh.py` owns the independent tracked model
@@ -124,13 +208,13 @@ ownership path.
 Each physical tank entity is the entrance-side 2x1 half of the stock 2x2x3 Medium Tank. Two opposite placements link
 into one visual tank with opposite entrances and the existing shared replica inventory behavior.
 
-The blueprint must keep a valid `#Unfinished` model using
-`ConstructionBases/ConstructionBase1x2/ConstructionBase1x2.blueprint`. Its ground-level entrance participates in
-doorstep spawning, so `PlaceFinished` does not make an empty `UnfinishedModelName` valid.
+The blueprint must keep the valid `#Unfinished` base, faction stage, and progress visualizer defined by the Construction
+Blueprint Contract. Its ground-level entrance participates in doorstep spawning, so an empty `UnfinishedModelName` is
+not valid. Both faction blueprints keep `PlaceFinished` disabled and use the stock Medium Tank construction costs.
 
 The tank remains liquid-only and retains the stock logical capacity and stock liquid height/movement behavior while
-those gameplay decisions remain part of the prototype. Building costs, construction stages, final player-facing text,
-liquid-type scope, textures, and release metadata are not final.
+those gameplay decisions remain part of the prototype. Broader liquid-type scope, final textures, and release metadata
+remain separate decisions.
 
 ## DualDistrictTank Liquid Visualization Contract
 
@@ -155,7 +239,8 @@ After changing the tank model, blueprint, inventory behavior, or liquid visualiz
 
 1. Regenerate and structurally validate the tank-half Timbermesh when its source transformation changed.
 2. Build through the ordinary package path and verify the packaged DLL and model match current sources.
-3. Verify the valid unfinished model, doorstep placement, opposite entrances, and linked inventory in the real game.
+3. Verify ordinary construction, seam-free common-base composition, faction stage, progress switching, doorstep
+   placement, opposite entrances, and linked inventory in the real game.
 4. Test the liquid surface selected and unselected so each entity's half ownership, seam, bounds, and highlight are
    visible.
 5. Exercise source reassignment through initialization and relevant allowed-liquid changes; inspect a fresh runtime log
