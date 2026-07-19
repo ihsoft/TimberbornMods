@@ -37,6 +37,30 @@ Do not require exhaustive research. Resolve the decisions that determine package
 For an internal, low-risk uncertainty, choose the smallest reversible evidence-supported experiment and preserve the
 unknown for real-game validation.
 
+### Porting Or Reviving A Legacy Mod
+
+Before copying or modifying a legacy mod, establish its license, the user's authority to port it, and which code or
+assets may be redistributed. Keep an external or original upstream checkout read-only unless the user explicitly owns
+and authorizes changes there; perform migration work in the repository's intended working project and do not encode the
+upstream machine's absolute paths.
+
+Inventory the legacy source before choosing a migration plan. Classify code, data, and assets as:
+
+- active and referenced by the shipped package;
+- generated output with an identifiable owner;
+- commented out, unused, or historical;
+- tied to an obsolete framework or asset pipeline;
+- uncertain and requiring evidence or a user decision.
+
+Preserve the confirmed player-facing behavior, not every historical implementation. Do not automatically revive dead
+features, commented patches, unused assets, or old dependencies merely because they exist in the source tree. Ask before
+expanding the port to intentionally retired or optional behavior.
+
+For each active behavior, find the closest current stock feature and map the old concept to current game architecture.
+Treat old APIs, injection styles, specifications, prefabs, and build systems as evidence of past intent, not as the
+target design. Separate migration by the asset lanes that actually survive the inventory, and keep unresolved behavior
+or ownership choices explicit rather than hiding them inside a mechanical full-project conversion.
+
 ## 2. Choose Architecture And Asset Ownership
 
 Trace enough of the closest game feature to decide who owns data, behavior, registration, UI, and persistence. Prefer

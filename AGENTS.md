@@ -41,7 +41,7 @@ blindly.
 | Creating or modifying in-game UI Toolkit views, UXML, USS, dialogs, panels, or fragments | `docs/timberborn-ui-toolkit-notes-for-ai-agents.md` |
 | Locating, extracting, generating, modifying, or packaging Timberborn `.timbermesh` models | `docs/agent-knowledge/Timberborn-Timbermesh-Operational-Knowledge-v1.md` |
 | Modifying instantiated runtime `UnityEngine.Mesh` geometry, UVs, or per-entity visualization meshes | `docs/agent-knowledge/Timberborn-Runtime-Unity-Mesh-Operational-Knowledge-v1.md` |
-| Designing, creating, or integrating a new Timberborn mod project | `docs/agent-knowledge/Timberborn-New-Mod-Operational-Knowledge-v1.md` |
+| Designing, creating, porting, reviving, or integrating a Timberborn mod project | `docs/agent-knowledge/Timberborn-New-Mod-Operational-Knowledge-v1.md` |
 | Designing a new feature inside an existing mod | `docs/timberborn-modding-howto-for-ai-agents.md`, `docs/timberborn-repository-notes.md`, and `docs/timberborn-lessons-learned.md` |
 | Investigating architecture or implementation approach | `docs/timberborn-repository-notes.md` and `docs/timberborn-lessons-learned.md` |
 | Diagnosing build, export, mod loading, runtime, UI, save/load, or platform behavior | `docs/agent-knowledge/Timberborn-Diagnostics-Operational-Knowledge-v1.md` |
