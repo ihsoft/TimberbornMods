@@ -1,4 +1,7 @@
 ID,Text,Comment
+Building.DualDistrictPile.DisplayName,Dual-District Pile,Building name.
+Building.DualDistrictPile.Description,A pile accessible from two adjacent districts.,Building description.
+Building.DualDistrictPile.FlavorDescription,Two entrances. One pile. No fences.,Building flavor description.
 Building.DualDistrictTank.DisplayName,Dual-District Tank,Building name.
 Building.DualDistrictTank.Description,A tank accessible from two adjacent districts.,Building description.
 Building.DualDistrictTank.FlavorDescription,Two entrances. One tank. No borders.,Building flavor description.

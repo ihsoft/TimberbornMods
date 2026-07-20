@@ -141,7 +141,9 @@
     },
     "ForceOneFinalAccess": false
   },
-  "DualDistrictStorageSpec": {},
+  "DualDistrictStorageSpec": {
+    "SplitPlaneVisualization": true
+  },
   "LinkedBuildingSpec": {},
   "BlockObjectNavMeshSettingsSpec": {
     "NoAutoWalls": false,

@@ -15,9 +15,13 @@ def parse_arguments():
     )
     parser.add_argument("--warehouse-icon", required=True, type=Path)
     parser.add_argument("--tank-icon", required=True, type=Path)
+    parser.add_argument("--folktails-pile-icon", required=True, type=Path)
+    parser.add_argument("--iron-teeth-pile-icon", required=True, type=Path)
     parser.add_argument("--district-center-icon", required=True, type=Path)
     parser.add_argument("--warehouse-output", required=True, type=Path)
     parser.add_argument("--tank-output", required=True, type=Path)
+    parser.add_argument("--folktails-pile-output", required=True, type=Path)
+    parser.add_argument("--iron-teeth-pile-output", required=True, type=Path)
     return parser.parse_args()
 
 
@@ -57,11 +61,19 @@ def main():
     arguments = parse_arguments()
     warehouse = load_icon(arguments.warehouse_icon)
     tank = load_icon(arguments.tank_icon)
+    folktails_pile = load_icon(arguments.folktails_pile_icon)
+    iron_teeth_pile = load_icon(arguments.iron_teeth_pile_icon)
     district_center = load_icon(arguments.district_center_icon)
     overlay = create_overlay(district_center)
     compose(warehouse, overlay, arguments.warehouse_output)
     compose(tank, overlay, arguments.tank_output)
-    print(f"Created {arguments.warehouse_output} and {arguments.tank_output} at {ICON_SIZE}.")
+    compose(folktails_pile, overlay, arguments.folktails_pile_output)
+    compose(iron_teeth_pile, overlay, arguments.iron_teeth_pile_output)
+    print(
+        "Created four dual-district building icons at "
+        f"{ICON_SIZE}: {arguments.warehouse_output}, {arguments.tank_output}, "
+        f"{arguments.folktails_pile_output}, and {arguments.iron_teeth_pile_output}."
+    )
 
 
 if __name__ == "__main__":

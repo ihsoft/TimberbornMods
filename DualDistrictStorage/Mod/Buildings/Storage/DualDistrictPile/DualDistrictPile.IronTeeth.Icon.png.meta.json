@@ -1,0 +1,12 @@
+{
+  "isSprite": true,
+  "generateMipMaps": false,
+  "filterMode": "Bilinear",
+  "wrapMode": "Clamp",
+  "textureFormat": "RGBA32",
+  "spritePixelsPerUnit": 100,
+  "spritePivot": {
+    "x": 0.5,
+    "y": 0.5
+  }
+}

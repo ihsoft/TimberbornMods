@@ -27,17 +27,28 @@ sealed class DualDistrictStorage : BaseComponent, IAwakableComponent, IFinishedS
   bool _liquidMeshPreparationFailed;
   bool _registered;
   bool _finished;
+  bool _splitPlaneVisualization;
   bool _usesModelVariants;
+  int _visualizationShareNumerator;
+  int _visualizationShareDenominator;
+  bool _ownsSharedPlaneVisualization;
 
   internal Inventory Inventory => _inventory;
+  internal int VisualizationShareDenominator => _visualizationShareDenominator;
+  internal bool OwnsSharedPlaneVisualization => _ownsSharedPlaneVisualization;
 
   public DualDistrictStorage(DualDistrictStorageRegistry registry) {
     _registry = registry;
   }
 
   public void Awake() {
+    var spec = GetComponent<DualDistrictStorageSpec>();
     _inventory = GetComponent<Stockpile>().Inventory;
     _singleGoodAllower = GetComponent<SingleGoodAllower>();
+    _splitPlaneVisualization = spec.SplitPlaneVisualization;
+    _visualizationShareNumerator = spec.VisualizationShareNumerator;
+    _visualizationShareDenominator = spec.VisualizationShareDenominator;
+    _ownsSharedPlaneVisualization = spec.OwnsSharedPlaneVisualization;
     _normalModel = GameObject.transform.Find("#Finished/NormalModel")?.gameObject;
     _mirroredRoofModel = GameObject.transform.Find("#Finished/MirroredRoofModel")?.gameObject;
     if (_normalModel != null && _mirroredRoofModel != null) {
@@ -46,6 +57,7 @@ sealed class DualDistrictStorage : BaseComponent, IAwakableComponent, IFinishedS
     } else if (_normalModel != null || _mirroredRoofModel != null) {
       HostedDebugLog.Warning(this, "Found only one of the normal and mirrored finished models.");
     }
+    _singleGoodAllower.DisallowedGoodsChanged += OnDisallowedGoodsChanged;
     GetComponent<LinkedBuilding>().BuildingLinked += OnBuildingLinked;
   }
 
@@ -54,12 +66,11 @@ sealed class DualDistrictStorage : BaseComponent, IAwakableComponent, IFinishedS
     _inventory.InventoryEnabled += OnInventoryEnabled;
     _inventory.InventoryChanged += OnInventoryChanged;
     _inventory.InventoryStockChanged += OnInventoryStockChanged;
-    _singleGoodAllower.DisallowedGoodsChanged += OnDisallowedGoodsChanged;
     TryInitializePair();
   }
 
   public void LateUpdate() {
-    if (!_finished || _usesModelVariants) {
+    if (!_finished || !_splitPlaneVisualization) {
       return;
     }
 
@@ -217,7 +228,6 @@ sealed class DualDistrictStorage : BaseComponent, IAwakableComponent, IFinishedS
     _inventory.InventoryEnabled -= OnInventoryEnabled;
     _inventory.InventoryChanged -= OnInventoryChanged;
     _inventory.InventoryStockChanged -= OnInventoryStockChanged;
-    _singleGoodAllower.DisallowedGoodsChanged -= OnDisallowedGoodsChanged;
     UnregisterPair();
   }
 
@@ -228,6 +238,7 @@ sealed class DualDistrictStorage : BaseComponent, IAwakableComponent, IFinishedS
   }
 
   public void DeleteEntity() {
+    _singleGoodAllower.DisallowedGoodsChanged -= OnDisallowedGoodsChanged;
     if (_liquidHalfMesh != null) {
       UnityEngine.Object.Destroy(_liquidHalfMesh);
     }
@@ -250,7 +261,7 @@ sealed class DualDistrictStorage : BaseComponent, IAwakableComponent, IFinishedS
   }
 
   void OnDisallowedGoodsChanged(object sender, DisallowedGoodsChangedEventArgs e) {
-    if (_mirrorOperationLock.IsUnlocked && IsOperationalPair()) {
+    if (_mirrorOperationLock.IsUnlocked && _linked != null) {
       _linked.MirrorAllowedGood(_singleGoodAllower.AllowedGood);
     }
   }
@@ -280,6 +291,16 @@ sealed class DualDistrictStorage : BaseComponent, IAwakableComponent, IFinishedS
     using (_mirrorOperationLock.Lock()) {
       _singleGoodAllower.Allow(goodId);
     }
+  }
+
+  internal int VisualizedAmount(int totalAmount) {
+    if (_visualizationShareDenominator <= 0) {
+      return totalAmount;
+    }
+    if (_visualizationShareNumerator == _visualizationShareDenominator - 1) {
+      return totalAmount - totalAmount / _visualizationShareDenominator;
+    }
+    return totalAmount * _visualizationShareNumerator / _visualizationShareDenominator;
   }
 
   int ReservedStock(string goodId) {

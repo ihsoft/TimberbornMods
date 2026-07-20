@@ -1,0 +1,190 @@
+{
+  "BuildingSpec": {
+    "SelectionSoundName": "Pile",
+    "LoopingSoundName": "",
+    "BuildingCost": [
+      {
+        "Id": "Log",
+        "Amount": 6
+      }
+    ],
+    "ScienceCost": 0,
+    "PlaceFinished": false,
+    "FinishableWithBeaversOnSite": false,
+    "DrawRangeBoundsOnIt": false
+  },
+  "BuildingModelSpec": {
+    "FinishedModelName": "#Finished",
+    "UnfinishedModelName": "#Unfinished",
+    "FinishedUncoveredModelName": "",
+    "UndergroundModelName": "",
+    "ConstructionModeModel": "Finished",
+    "UndergroundModelDepth": 0
+  },
+  "StockpileSpec": {
+    "MaxCapacity": 180,
+    "WhitelistedGoodType": "Pileable"
+  },
+  "TemplateSpec": {
+    "TemplateName": "DualDistrictPile.Folktails",
+    "BackwardCompatibleTemplateNames": [],
+    "RequiredFeatureToggle": "",
+    "DisablingFeatureToggle": ""
+  },
+  "BlockObjectSpec": {
+    "Size": {
+      "X": 3,
+      "Y": 3,
+      "Z": 1
+    },
+    "Blocks": [
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      },
+      {
+        "MatterBelow": "GroundOrStackable",
+        "Occupations": "Bottom, Top, Corners, Path, Middle",
+        "Stackable": "None",
+        "OccupyAllBelow": false,
+        "Underground": false
+      }
+    ],
+    "Entrance": {
+      "HasEntrance": true,
+      "Coordinates": {
+        "X": 1,
+        "Y": -1,
+        "Z": 0
+      }
+    },
+    "BaseZ": 0,
+    "Overridable": false,
+    "Flippable": false
+  },
+  "EnterableSpec": {
+    "OperatingState": "Finished",
+    "LimitedCapacityFinished": false,
+    "CapacityFinished": 0,
+    "LimitedCapacityUnfinished": false,
+    "CapacityUnfinished": 0
+  },
+  "PlaceableBlockObjectSpec": {
+    "ToolGroupId": "Storage",
+    "ToolOrder": 47,
+    "ToolShape": "Square",
+    "Layout": "Single",
+    "CustomPivot": {
+      "HasCustomPivot": false,
+      "Coordinates": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    "CanBeAttachedToTerrainSide": false,
+    "DevModeTool": false
+  },
+  "LabeledEntitySpec": {
+    "DisplayNameLocKey": "Building.DualDistrictPile.DisplayName",
+    "DescriptionLocKey": "Building.DualDistrictPile.Description",
+    "FlavorDescriptionLocKey": "Building.DualDistrictPile.FlavorDescription",
+    "Icon": "Buildings/Storage/DualDistrictPile/DualDistrictPile.Folktails.Icon"
+  },
+  "BuildingAccessibleSpec": {
+    "LocalAccess": {
+      "X": 1.5,
+      "Y": 0.0,
+      "Z": 0.27
+    },
+    "ForceOneFinalAccess": false
+  },
+  "AsymmetricDualDistrictStoragePlacerSpec": {
+    "NarrowTemplateName": "DualDistrictPile.Narrow.Folktails",
+    "WideTemplateName": "DualDistrictPile.Wide.Folktails"
+  },
+  "Children": {
+    "#Finished": {
+      "TimbermeshSpec": {
+        "Model": "Buildings/Storage/LargePile/LargePile.Folktails.Model"
+      },
+      "CollidersSpec": {
+        "BoxColliders": [
+          {
+            "Center": {
+              "X": 1.5,
+              "Y": 0.5,
+              "Z": 1.5
+            },
+            "Size": {
+              "X": 3.0,
+              "Y": 1.0,
+              "Z": 3.0
+            }
+          }
+        ],
+        "SphereColliders": [],
+        "CapsuleColliders": []
+      }
+    },
+    "#Unfinished": {
+      "Children": {
+        "ConstructionBase3x3#nested": {
+          "BlueprintPath": "ConstructionBases/ConstructionBase3x3/ConstructionBase3x3.blueprint"
+        }
+      }
+    }
+  }
+}

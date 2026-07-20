@@ -102,7 +102,7 @@ def normalized(vector):
     return tuple(component / length for component in vector)
 
 
-def interpolate_vertex(first, second, factor):
+def interpolate_vertex(first, second, factor, clip_coordinate=CLIP_COORDINATE):
     result = []
     for property_index, (first_value, second_value) in enumerate(zip(first, second)):
         value = interpolate_vector(first_value, second_value, factor)
@@ -111,19 +111,21 @@ def interpolate_vertex(first, second, factor):
             value = direction + value[3:]
         result.append(value)
     position = list(result[0])
-    position[CLIP_AXIS] = CLIP_COORDINATE
+    position[CLIP_AXIS] = clip_coordinate
     result[0] = tuple(position)
     return result
 
 
-def clip_triangle(indices, source_vertices, intersection_cache):
+def clip_triangle(
+    indices, source_vertices, intersection_cache, clip_coordinate=CLIP_COORDINATE
+):
     polygon = [(('original', index), source_vertices[index]) for index in indices]
     clipped = []
     previous_key, previous_vertex = polygon[-1]
-    previous_inside = previous_vertex[0][CLIP_AXIS] <= CLIP_COORDINATE + EPSILON
+    previous_inside = previous_vertex[0][CLIP_AXIS] <= clip_coordinate + EPSILON
 
     for current_key, current_vertex in polygon:
-        current_inside = current_vertex[0][CLIP_AXIS] <= CLIP_COORDINATE + EPSILON
+        current_inside = current_vertex[0][CLIP_AXIS] <= clip_coordinate + EPSILON
         if previous_inside != current_inside:
             first_index = previous_key[1]
             second_index = current_key[1]
@@ -132,10 +134,12 @@ def clip_triangle(indices, source_vertices, intersection_cache):
             if intersection is None:
                 previous_coordinate = previous_vertex[0][CLIP_AXIS]
                 current_coordinate = current_vertex[0][CLIP_AXIS]
-                factor = (CLIP_COORDINATE - previous_coordinate) / (
+                factor = (clip_coordinate - previous_coordinate) / (
                     current_coordinate - previous_coordinate
                 )
-                intersection = interpolate_vertex(previous_vertex, current_vertex, factor)
+                intersection = interpolate_vertex(
+                    previous_vertex, current_vertex, factor, clip_coordinate
+                )
                 intersection_cache[edge_key] = intersection
             clipped.append((edge_key, intersection))
         if current_inside:
@@ -163,7 +167,7 @@ def triangle_is_degenerate(indices, vertices):
     return sum(component * component for component in cross) <= EPSILON * EPSILON
 
 
-def clip_node(node):
+def clip_node(node, clip_coordinate=CLIP_COORDINATE):
     decoded_properties = decode_vertex_properties(node)
     source_vertices = [
         [vectors[index] for _, vectors in decoded_properties]
@@ -189,7 +193,10 @@ def clip_node(node):
         del mesh.indices[:]
         for offset in range(0, len(source_indices), 3):
             polygon = clip_triangle(
-                source_indices[offset : offset + 3], source_vertices, intersection_cache
+                source_indices[offset : offset + 3],
+                source_vertices,
+                intersection_cache,
+                clip_coordinate,
             )
             if len(polygon) < 3:
                 continue
@@ -212,7 +219,7 @@ def clip_node(node):
     return source_vertices, output_vertices
 
 
-def validate_model(model):
+def validate_model(model, clip_coordinate=CLIP_COORDINATE):
     if len(model.nodes) != 1:
         raise RuntimeError(f"Expected one model node, found {len(model.nodes)}.")
     node = model.nodes[0]
@@ -220,7 +227,7 @@ def validate_model(model):
     positions = decoded_properties[0][1]
     if not positions:
         raise RuntimeError("Clipped model has no vertices.")
-    if max(position[CLIP_AXIS] for position in positions) > CLIP_COORDINATE + EPSILON:
+    if max(position[CLIP_AXIS] for position in positions) > clip_coordinate + EPSILON:
         raise RuntimeError("Clipped model still contains vertices behind the cut plane.")
     for mesh in node.meshes:
         if len(mesh.indices) % 3 != 0:

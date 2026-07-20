@@ -2,6 +2,9 @@
   "TemplateCollectionSpec": {
     "CollectionId": "Buildings.IronTeeth",
     "Blueprints": [
+      "Buildings/Storage/DualDistrictPile/DualDistrictPile.IronTeeth.blueprint",
+      "Buildings/Storage/DualDistrictPile/DualDistrictPile.Narrow.IronTeeth.blueprint",
+      "Buildings/Storage/DualDistrictPile/DualDistrictPile.Wide.IronTeeth.blueprint",
       "Buildings/Storage/DualDistrictTank/DualDistrictTank.IronTeeth.blueprint",
       "Buildings/Storage/DualDistrictWarehouse/DualDistrictWarehouse.IronTeeth.blueprint"
     ]

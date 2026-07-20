@@ -3,3 +3,5 @@
 * [Feature] Let two adjacent districts deliver to and collect from one synchronized inventory through opposite entrances, while keeping district-side storage controls independent.
 * [Feature] Support both Folktails and Iron Teeth.
 * [Visual] Add joined building and liquid models, normal construction stages, and distinct construction-menu icons for both storage types.
+* [Feature] Add the asymmetric Dual-District Pile for up to 180 units of pileable goods, with one shared stock spanning a 3x1 and a 3x2 district-side half.
+* [Fix] Keep the selected good synchronized between both halves while storage buildings are under construction.

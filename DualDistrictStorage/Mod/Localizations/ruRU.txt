@@ -1,4 +1,7 @@
 ID,Text,Comment
+Building.DualDistrictPile.DisplayName,Межрайонная площадка,Building name.
+Building.DualDistrictPile.Description,Площадка с независимым доступом из двух соседних районов.,Building description.
+Building.DualDistrictPile.FlavorDescription,Два входа. Одна куча. И никаких заборов.,Building flavor description.
 Building.DualDistrictTank.DisplayName,Межрайонный резервуар,Building name.
 Building.DualDistrictTank.Description,Резервуар с независимым доступом из двух соседних районов.,Building description.
 Building.DualDistrictTank.FlavorDescription,Два входа. Один резервуар. И никаких границ.,Building flavor description.
