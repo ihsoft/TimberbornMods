@@ -66,8 +66,8 @@ until ownership and process state show that the previous operation ended.
 Read-only Git operations do not require the coordination lock. Ordinary file editing also remains unlocked.
 
 Before asking the helper to commit, inspect the complete intended working-tree diff and obtain any user authorization
-required by the current task. Then use `tools/commit-repository-changes.ps1` with an exact list of files. The helper
-holds `git-transaction` across the complete mutation window:
+required by the current task. On Windows, use the public `tools/commit-repository-changes.cmd` entrypoint with an exact
+list of files. The helper holds `git-transaction` across the complete mutation window:
 
 1. Verify the expected `HEAD` when the caller supplied one.
 2. Reject any pre-existing staged paths rather than altering another task's index state.
@@ -80,11 +80,20 @@ holds `git-transaction` across the complete mutation window:
 Example:
 
 ```powershell
-tools/commit-repository-changes.ps1 `
-  -Path AGENTS.md,docs/agent-knowledge/Repository-Coordination-Operational-Knowledge-v2.md `
+tools/commit-repository-changes.cmd `
+  -Path "AGENTS.md,docs/agent-knowledge/Repository-Coordination-Operational-Knowledge-v2.md" `
   -Message "Coordinate shared repository operations" `
   -Owner "mentor-thread"
 ```
+
+The `.cmd` entrypoint invokes the adjacent tracked `.ps1` implementation with a process-scoped
+`-ExecutionPolicy Bypass`, forwards its arguments and exit code, and does not change machine or user policy. In Windows
+agent workflows, do not invoke `commit-repository-changes.ps1` directly, manually reconstruct its PowerShell command,
+or change persistent ExecutionPolicy. Pass multiple exact paths as one quoted comma-separated `-Path` value.
+
+ExecutionPolicy and environment sandbox authorization are separate concerns. The wrapper prevents the predictable
+direct-script policy failure; it does not grant permission to write the Git index or bypass an environment's approval
+boundary. Request the normal scoped Git-mutation authorization when the agent environment requires it.
 
 Do not pass a directory or broad pathspec. The helper intentionally requires exact files. If it finds foreign staged
 content, stop and coordinate; do not unstage, commit, or otherwise repair another task's index state.
