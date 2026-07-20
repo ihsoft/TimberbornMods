@@ -3,6 +3,9 @@
 
 import unittest
 from datetime import datetime, timezone
+from unittest import mock
+from urllib.error import HTTPError
+import time
 
 import classify
 import collect_gallery
@@ -35,6 +38,25 @@ class GalleryParsingTest(unittest.TestCase):
                 item, previous, datetime.min.replace(tzinfo=timezone.utc)
             )
         )
+
+    def test_does_not_retry_after_steam_rate_limit(self) -> None:
+        error = HTTPError("https://example", 429, "rate limited", {}, None)
+        with mock.patch.object(collect_gallery, "urlopen", side_effect=error) as request:
+            with self.assertRaises(collect_gallery.SteamThrottleError):
+                collect_gallery.fetch_gallery_urls("1", 0, time.monotonic() + 5)
+
+        self.assertEqual(1, request.call_count)
+
+    def test_doubles_cooldown_then_stops_on_third_rate_limit(self) -> None:
+        error = collect_gallery.SteamThrottleError(429, None)
+
+        first = collect_gallery.throttle_policy(error, 1, 5)
+        second = collect_gallery.throttle_policy(error, 2, first[2])
+        third = collect_gallery.throttle_policy(error, 3, second[2])
+
+        self.assertEqual((False, 60, 10), first)
+        self.assertEqual((False, 120, 20), second)
+        self.assertEqual((True, 0, 20), third)
 
 
 class MultiImageClassificationTest(unittest.TestCase):

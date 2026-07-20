@@ -20,14 +20,24 @@ GALLERY_BLOCK = re.compile(r"var rgScreenshotURLs\s*=\s*\{(?P<body>.*?)\};", re.
 GALLERY_URL = re.compile(r"https://images\.steamusercontent\.com/ugc/[^'\"\s]+")
 
 
+class SteamThrottleError(RuntimeError):
+    """Steam asked the crawler to stop making public item-page requests."""
+
+    def __init__(self, status_code: int, retry_after_seconds: int | None):
+        detail = f"; Retry-After={retry_after_seconds}" if retry_after_seconds else ""
+        super().__init__(f"HTTP {status_code}{detail}")
+        self.status_code = status_code
+        self.retry_after_seconds = retry_after_seconds
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--snapshot", required=True)
     parser.add_argument("--previous-results")
     parser.add_argument("--output", required=True)
-    parser.add_argument("--max-pages", type=int, default=300)
+    parser.add_argument("--max-pages", type=int, default=200)
     parser.add_argument("--max-images-per-map", type=int, default=8)
-    parser.add_argument("--delay-seconds", type=float, default=2.0)
+    parser.add_argument("--delay-seconds", type=float, default=5.0)
     parser.add_argument("--refresh-after-days", type=int, default=90)
     parser.add_argument("--max-consecutive-failures", type=int, default=3)
     parser.add_argument("--max-runtime-seconds", type=int, default=1_200)
@@ -83,14 +93,22 @@ def fetch_gallery_urls(
         if time.monotonic() >= deadline:
             raise TimeoutError("Gallery crawl time budget exhausted")
         if delay_seconds > 0:
-            time.sleep(delay_seconds)
+            time.sleep(delay_seconds + random.random())
         try:
             timeout = max(1, min(20, int(deadline - time.monotonic())))
             with urlopen(request, timeout=timeout) as response:
                 return parse_gallery_urls(response.read().decode("utf-8", errors="replace"))
         except HTTPError as exception:
             last_exception = exception
-            if exception.code not in (403, 429, 500, 502, 503, 504):
+            if exception.code in (403, 429):
+                retry_after = exception.headers.get("Retry-After")
+                retry_after_seconds = (
+                    int(retry_after) if retry_after and retry_after.isdigit() else None
+                )
+                raise SteamThrottleError(
+                    exception.code, retry_after_seconds
+                ) from exception
+            if exception.code not in (500, 502, 503, 504):
                 break
         except Exception as exception:
             last_exception = exception
@@ -119,6 +137,17 @@ def candidate_key(item: dict, previous: dict | None) -> tuple:
         return 1, -updated_at.timestamp()
     checked_at = parse_utc(previous.get("gallery_checked_at_utc")) or minimum
     return 2, checked_at.timestamp()
+
+
+def throttle_policy(
+    exception: SteamThrottleError, throttle_events: int, request_delay: float
+) -> tuple[bool, int, float]:
+    if exception.status_code == 403 or throttle_events >= 3:
+        return True, 0, request_delay
+    base_cooldown = exception.retry_after_seconds or 60
+    cooldown = base_cooldown * 2 ** (throttle_events - 1)
+    next_delay = min(30, max(10, request_delay * 2))
+    return False, cooldown, next_delay
 
 
 def main() -> int:
@@ -162,6 +191,8 @@ def main() -> int:
     fetched = 0
     failed = 0
     consecutive_failures = 0
+    throttle_events = 0
+    request_delay = args.delay_seconds
     fetching_enabled = True
     deadline = time.monotonic() + args.max_runtime_seconds
     for item in maps:
@@ -178,7 +209,7 @@ def main() -> int:
                 output_records.append({**previous, "collection_state": "deferred"})
             continue
         try:
-            urls = fetch_gallery_urls(published_file_id, args.delay_seconds, deadline)
+            urls = fetch_gallery_urls(published_file_id, request_delay, deadline)
             output_records.append(
                 {
                     "published_file_id": published_file_id,
@@ -192,6 +223,29 @@ def main() -> int:
             )
             fetched += 1
             consecutive_failures = 0
+        except SteamThrottleError as exception:
+            failed += 1
+            throttle_events += 1
+            if previous:
+                output_records.append({**previous, "collection_state": "deferred"})
+            stop, cooldown, request_delay = throttle_policy(
+                exception, throttle_events, request_delay
+            )
+            if stop:
+                fetching_enabled = False
+                print(
+                    f"Gallery crawl stopped after Steam throttling on "
+                    f"{published_file_id}: {exception}",
+                    flush=True,
+                )
+            else:
+                cooldown = min(cooldown, max(0, deadline - time.monotonic()))
+                print(
+                    f"Steam rate limit on {published_file_id}; cooling down for "
+                    f"{cooldown:.0f}s, then continuing with {request_delay:.0f}s delay",
+                    flush=True,
+                )
+                time.sleep(cooldown)
         except Exception as exception:
             failed += 1
             consecutive_failures += 1
