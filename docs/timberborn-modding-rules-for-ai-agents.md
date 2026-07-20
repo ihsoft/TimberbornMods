@@ -142,6 +142,10 @@ Debug.LogWarning($"Failed to read save version from {selectedSave.DisplayName}: 
 
 Prefer small, targeted patches.
 
+When using `IgorZ.TimberDev.Utils.HarmonyPatcher`, follow its API ownership contract: one patch ID owns one atomic set
+of patch types. Pass the complete set to one `ApplyPatch` call; a later call with the same ID is an error, not an
+extension operation. Use distinct IDs only for groups that must be applied and unapplied independently.
+
 When patching Timberborn game methods, prefer `nameof(TargetType.Method)` over string method names whenever the
 publicized game assemblies make the target method compile-visible. This lets compilation catch renamed or removed game
 methods after a Timberborn update.
