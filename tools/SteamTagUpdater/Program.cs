@@ -124,6 +124,11 @@ static int Query(ulong publishedFileId) {
         tags.Add(tag);
       }
       Console.WriteLine($"LIVE_TAGS_JSON={System.Text.Json.JsonSerializer.Serialize(tags)}");
+      Console.WriteLine($"LIVE_ITEM_JSON={System.Text.Json.JsonSerializer.Serialize(new {
+          Visibility = details.m_eVisibility.ToString(),
+          FileSize = details.m_nFileSize,
+          Updated = details.m_rtimeUpdated,
+      })}");
       return 0;
     }
     finally {
