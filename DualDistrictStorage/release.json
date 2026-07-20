@@ -1,0 +1,26 @@
+{
+  "ManifestPath": "DualDistrictStorage/Mod/manifest.json",
+  "ChangesPath": "DualDistrictStorage/CHANGELOG.md",
+  "ReleaseVersion": "1.0.0",
+  "ScriptFileBase": "DualDistrictStorage",
+  "ReadyForPublish": false,
+  "Package": {
+    "Mode": "LocalModFolder",
+    "SourcePath": "_MODS!/DualDistrictStorage",
+    "OutputPath": "_MODS!/DualDistrictStorage_v1.0.0.zip",
+    "MaxAgeDays": 14
+  },
+  "ManifestVersions": {
+    "version-1.1": "1.0.0"
+  },
+  "GameVersionCompatibility": {
+    "version-1.1": {
+      "MinimumGameVersion": "1.1.0.0",
+      "MaximumGameVersion": "1.1.99.99"
+    }
+  },
+  "Steam": {
+    "AllowSingleGameVersion": true,
+    "CompatibilityReason": "The initial release targets Update 1.1; no Update 1.0 release artifact exists."
+  }
+}

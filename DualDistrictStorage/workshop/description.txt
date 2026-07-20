@@ -9,14 +9,15 @@ Donations are completely optional. If you enjoy the mods and want to say thanks,
 [hr][/hr]
 
 [h1]Shared storage across a district boundary[/h1]
-Let two adjacent districts use the same warehouse or tank directly.
+Let two adjacent districts use the same pile, warehouse, or tank directly.
 
 Each building has two opposite entrances and one synchronized inventory. Beavers from either district can deliver to or collect from the same stock, removing the need for a separate transfer route and extra workers just to move those goods across the boundary.
 
 [h1]Included buildings[/h1]
 [list]
-[*][b]Dual-District Warehouse[/b] — stores up to 200 units of boxed goods.
-[*][b]Dual-District Tank[/b] — stores up to 300 units of liquid.
+[*][b]Dual-District Pile[/b]
+[*][b]Dual-District Warehouse[/b]
+[*][b]Dual-District Tank[/b]
 [/list]
 
 [h1]How to use[/h1]

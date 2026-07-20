@@ -1,6 +1,6 @@
 {
   "Name": "Dual District Storage",
-  "Version": "0.1.0",
+  "Version": "1.0.0",
   "Id": "Timberborn.IgorZ.DualDistrictStorage",
   "MinimumGameVersion": "1.1.0.0",
   "Description": "Adds storage buildings that can be used independently from two adjacent districts.",
