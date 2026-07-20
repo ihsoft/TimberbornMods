@@ -57,55 +57,6 @@ ModsUnityProject/Assets/Mods/<ModName>/Data/
 Do not assume there is only one `Mod` directory.
 For Unity-based mods, inspect the project files and existing asset references to find the actual package data location.
 
-### Loose-file blueprint packages
-
-For loose `.blueprint.json` files owned directly by a mod package, treat the compatibility-lane directory as the path
-root. A blueprint referenced as `Buildings/...` or `TemplateCollections/...` must be packaged at that path relative to
-the lane. Do not insert a `Blueprints/` prefix merely because extracted game assets use that organizational directory;
-use such a prefix only when the owning export pipeline explicitly requires and produces it.
-
-Before real-game validation, inspect every changed `BlockObjectSpec` and verify that `Blocks.Count` equals
-`Size.X * Size.Y * Size.Z`. Use the closest stock blueprint to establish the meaning and order of block entries rather
-than padding an incomplete list mechanically. A missing entry can fail during eager preview creation before the mod's
-intended behavior can be tested.
-
-When nesting another blueprint, copy the exact current stock child structure. In the confirmed current shape,
-`BlueprintPath` belongs to a named entry ending in `#nested` under `Children`; do not place it directly on the owning
-entity node, where the loader can interpret it as a component-spec key rather than a nested-blueprint reference.
-
-For faction building registration, inspect a current stock `TemplateCollectionSpec` instead of copying an older
-collection shape. In the confirmed current schema, the spec uses `CollectionId` for the target collection and
-`Blueprints` for its resource paths; an obsolete `TemplatePaths` shape can parse as authored data yet leave the
-buildings absent from the faction toolbar. Verify the exact faction collection identity and selectable tools in the real
-game.
-
-### Ground-level entrances and unfinished models
-
-In the confirmed current game lifecycle, a ground-level building entrance without `DoorstepSpawnDisablerSpec` requires
-a valid unfinished-model transform. Doorstep spawning parents its object to `BuildingModel.UnfinishedModel.transform`
-without treating a missing model as valid.
-
-`PlaceFinished` controls placement state; it does not remove this lifecycle dependency. Even a temporary
-`PlaceFinished` prototype must provide a valid `UnfinishedModelName` and referenced model when doorstep spawning remains
-enabled. Disable doorstep spawning only when the building intentionally does not need it and current architecture
-evidence supports that decision.
-
-### Construction model progress
-
-When `ConstructionSiteProgressVisualizerSpec` controls an unfinished model with N direct children, child 0 is the
-construction base and each following child is a progress stage. `ProgressThresholds.Count` must equal the direct child
-count minus one, in the same stage order. For a base plus one stage, the stock-shaped threshold list contains one value.
-Derive the actual threshold values from the closest current stock building instead of inventing them.
-
-Do not add progress-stage children without the owning visualizer contract. Without stage switching, multiple direct
-children can remain active and overlap even when every referenced model is individually valid.
-
-When changing construction models, costs, stage order, entrances, or linking behavior, validate ordinary unfinished
-placement and progression in the real game. `PlaceFinished` or instant-build/dev-mode placement does not exercise the
-unfinished lifecycle, stage switching, or callback order and cannot satisfy this gate by itself. Verify the initial
-base, every stage transition, the final model, relevant logs, and that exactly one intended construction state is
-visible at a time.
-
 ## Unity-generated assets
 
 When adding generated Unity `.meta` files, run `git diff --check` or `git diff --cached --check` before committing.

@@ -33,13 +33,14 @@ blindly.
 | Condition | Read |
 |--------|--------|
 | Generating or modifying C# code | `docs/csharp-formatting-rules-for-ai-agents.md` |
-| Modifying Timberborn mod implementation: C# behavior, gameplay data, UI structure or behavior, or package metadata | `docs/timberborn-modding-rules-for-ai-agents.md` and `docs/agent-knowledge/Timberborn-Repository-Validation-Operational-Knowledge-v1.md` |
+| Modifying Timberborn C# behavior, general mod integration, non-building gameplay data, or package metadata not covered by a more specific route | `docs/timberborn-modding-rules-for-ai-agents.md` and `docs/agent-knowledge/Timberborn-Repository-Validation-Operational-Knowledge-v1.md` |
+| Creating or modifying building blueprints, building TemplateCollections, block layouts, entrances, construction states, placement, or building colliders | `docs/agent-knowledge/Timberborn-Buildings-Operational-Knowledge-v1.md` and `docs/agent-knowledge/Timberborn-Repository-Validation-Operational-Knowledge-v1.md` |
 | Adding or modifying player-facing text, localization keys or files, localized UI strings, or `ILoc` usage | `docs/agent-knowledge/Timberborn-Localization-Operational-Knowledge-v1.md` and `docs/agent-knowledge/Timberborn-Repository-Validation-Operational-Knowledge-v1.md` |
 | Creating or modifying player-facing game icons or loose PNG/JPG sprite assets | `docs/agent-knowledge/Timberborn-Icon-Operational-Knowledge-v1.md` and `docs/agent-knowledge/Timberborn-Repository-Validation-Operational-Knowledge-v1.md` |
-| Working with `ModsUnityProject`, Unity-owned package data, compatibility lanes, or Unity export | `docs/agent-knowledge/Timberborn-Unity-Operational-Knowledge-v1.md` |
+| Working with `ModsUnityProject`, Unity-owned package data, compatibility lanes, or Unity export | `docs/agent-knowledge/Timberborn-Unity-Operational-Knowledge-v1.md` and `docs/agent-knowledge/Timberborn-Repository-Validation-Operational-Knowledge-v1.md` |
 | Changing Timberborn game, Unity Editor, or Unity package versions; running the importer; refreshing or validating imported game assemblies | `docs/agent-knowledge/Timberborn-Unity-Import-Operational-Knowledge-v1.md` and `docs/agent-knowledge/Timberborn-Unity-Operational-Knowledge-v1.md` |
 | Starting any agent-controlled Unity Editor or batch-mode launch for this repository's work, including a separate project, or staging, creating, or verifying a Git commit | `docs/agent-knowledge/Repository-Coordination-Operational-Knowledge-v2.md` |
-| Creating or modifying in-game UI Toolkit views, UXML, USS, dialogs, panels, or fragments | `docs/timberborn-ui-toolkit-notes-for-ai-agents.md` |
+| Creating or modifying in-game UI Toolkit views, UXML, USS, dialogs, panels, or fragments | `docs/timberborn-ui-toolkit-notes-for-ai-agents.md` and `docs/agent-knowledge/Timberborn-Repository-Validation-Operational-Knowledge-v1.md` |
 | Locating, extracting, generating, modifying, or packaging Timberborn `.timbermesh` models | `docs/agent-knowledge/Timberborn-Timbermesh-Operational-Knowledge-v1.md` |
 | Modifying instantiated runtime `UnityEngine.Mesh` geometry, UVs, or per-entity visualization meshes | `docs/agent-knowledge/Timberborn-Runtime-Unity-Mesh-Operational-Knowledge-v1.md` |
 | Designing, creating, porting, reviving, or integrating a Timberborn mod project | `docs/agent-knowledge/Timberborn-New-Mod-Operational-Knowledge-v1.md` |
