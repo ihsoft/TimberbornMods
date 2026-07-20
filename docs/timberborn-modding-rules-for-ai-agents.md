@@ -69,6 +69,10 @@ Before real-game validation, inspect every changed `BlockObjectSpec` and verify 
 than padding an incomplete list mechanically. A missing entry can fail during eager preview creation before the mod's
 intended behavior can be tested.
 
+When nesting another blueprint, copy the exact current stock child structure. In the confirmed current shape,
+`BlueprintPath` belongs to a named entry ending in `#nested` under `Children`; do not place it directly on the owning
+entity node, where the loader can interpret it as a component-spec key rather than a nested-blueprint reference.
+
 For faction building registration, inspect a current stock `TemplateCollectionSpec` instead of copying an older
 collection shape. In the confirmed current schema, the spec uses `CollectionId` for the target collection and
 `Blueprints` for its resource paths; an obsolete `TemplatePaths` shape can parse as authored data yet leave the
@@ -377,10 +381,12 @@ configurator. Do not hide context-specific branching inside one generic configur
 
 Any type defined by a package that must participate in DI must be registered by the package configurator.
 
-When adding a dialog, view, service, or patch helper that can be instantiated from more than one game area, verify every
-context that can create it. Include inherited constructor dependencies from base classes. If the type is used from both
-main-menu UI and in-game UI, its package bindings and any static dependency bridge must cover the required contexts
-explicitly instead of assuming the `Game` context is enough.
+For every new DI-created type, perform a binding-closure review before runtime validation. Enumerate its constructor
+dependencies, including inherited dependencies, and locate a binding for each exact requested type in every context
+that can create it. A `MultiBind<I>().To<T>()` registration does not by itself establish that concrete `T` is
+injectable. When concrete and abstraction identities must resolve to the same object, require evidence of an explicit
+alias such as `ToExisting<T>()` or an equivalent provider. Also inspect cycles introduced through enumerable
+multibindings. If a type is used from both main-menu UI and in-game UI, do not assume the `Game` context is enough.
 
 Common binding patterns:
 
@@ -451,7 +457,8 @@ static TemplateModule ProvideTemplateModule() {
 
 Decorator rules:
 
-- Register the runtime component in DI, usually as transient.
+- For every `AddDecorator<TSpec, TDecorator>()`, verify an appropriate concrete `TDecorator` binding in every applicable
+  context, usually as transient.
 - Register the `TemplateModule` provider.
 - Add the decorator mapping between the spec or source component and the runtime component.
 - Check existing game or repository decorators before creating a new pattern.
