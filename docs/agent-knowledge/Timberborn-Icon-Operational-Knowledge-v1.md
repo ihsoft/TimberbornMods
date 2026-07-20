@@ -69,3 +69,8 @@ vanish at menu scale, while a large badge may obscure the building or action the
 Do not generalize a mod's accepted coordinates, badge count, overlay size, source icon, or generated output contract.
 Keep those facts local. Route Unity-owned textures and asset-bundle workflows through Timberborn Unity Operational
 Knowledge; route UI hierarchy and interaction work through the UI Toolkit notes.
+
+This document covers images loaded by the game as tool, building, menu, or UI sprites. Preserve their verified native
+resolution and import contract as described above. Route external Steam Workshop, Mod.IO, or GitHub thumbnails,
+previews, slideshow images, screenshots, and banners through Timberborn Promotional Visual Operational Knowledge
+instead; their master and delivery resolutions follow a different ownership model.
