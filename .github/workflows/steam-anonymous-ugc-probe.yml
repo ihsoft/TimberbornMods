@@ -1,0 +1,28 @@
+name: Probe anonymous Steam UGC previews
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.100
+
+      - name: Build anonymous UGC probe
+        run: dotnet build tools/SteamAnonymousUgcProbe/SteamAnonymousUgcProbe.csproj -c Release
+
+      - name: Query additional previews without a Steam account
+        run: >-
+          dotnet tools/SteamAnonymousUgcProbe/bin/Release/net8.0/SteamAnonymousUgcProbe.dll
+          3535425318 3532441249 3383139185
