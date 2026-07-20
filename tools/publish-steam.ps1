@@ -487,8 +487,8 @@ function Write-WorkshopVdf(
     [string] $Title,
     [string[]] $Tags,
     [string] $ChangeNote) {
-    $tagLines = $Tags | ForEach-Object {
-        "        `"$_`""
+    $tagLines = for ($i = 0; $i -lt $Tags.Count; $i++) {
+        "        `"$i`" `"$(ConvertTo-VdfString $Tags[$i])`""
     }
     $visibilityLine = ""
     if (-not [string]::IsNullOrWhiteSpace($Visibility)) {

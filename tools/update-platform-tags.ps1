@@ -240,8 +240,8 @@ function Write-SteamTagsVdf(
     [string] $PublishedFileId,
     [string] $Title,
     [string[]] $Tags) {
-    $tagLines = $Tags | ForEach-Object {
-        "        `"$(ConvertTo-VdfString $_)`""
+    $tagLines = for ($i = 0; $i -lt $Tags.Count; $i++) {
+        "        `"$i`" `"$(ConvertTo-VdfString $Tags[$i])`""
     }
     $vdf = @"
 "workshopitem"
