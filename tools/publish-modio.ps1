@@ -17,6 +17,7 @@ param(
     [switch] $IncludeLegacyVersions,
     [switch] $SkipBuild,
     [switch] $SkipUnityExport,
+    [switch] $PublishPage,
     [switch] $Publish
 )
 
@@ -504,6 +505,17 @@ if (-not [string]::IsNullOrWhiteSpace($releaseConfig.ScriptFileBase)) {
     $scriptFileBase = [string]$releaseConfig.ScriptFileBase
 }
 
+function Set-ModIoPagePublic([string] $ApiBase, [string] $GameId, [string] $ModId, [string] $AccessToken) {
+    $uri = "$($ApiBase.TrimEnd('/'))/games/$GameId/mods/$ModId"
+    $headers = @{ Authorization = "Bearer $AccessToken"; Accept = "application/json" }
+    Invoke-RestMethod -Method Put -Uri $uri -Headers $headers `
+        -ContentType "application/x-www-form-urlencoded" -Body @{ visible = "1" } | Out-Null
+    $verified = Invoke-RestMethod -Uri $uri -Headers $headers
+    if ([int]$verified.visible -ne 1) {
+        throw "Mod.IO page visibility update completed, but live page is not public."
+    }
+}
+
 $packageMode = "Build"
 if (-not [string]::IsNullOrWhiteSpace($releaseConfig.Package.Mode)) {
     $packageMode = [string]$releaseConfig.Package.Mode
@@ -631,6 +643,7 @@ Write-Host "Package: $zipPath"
 Write-Host "SHA256: $hash"
 Write-Host "Game version folders: $($versionFolders -join ', ')"
 Write-Host "Corrective same-version replacement: $([bool]$CorrectiveReplacement)"
+Write-Host "Publish page after verified upload: $([bool]$PublishPage)"
 if ($releaseConfig.ReadyForPublish -eq $false) {
     Write-Host "Ready for publish: false"
 }
@@ -698,4 +711,8 @@ $scannedModfile = Wait-ModfileScan `
 Write-Host "Mod.IO virus scan complete for file id $($scannedModfile.id)."
 $activeModfile = Set-ModfileActive $apiBase $gameId $modId $accessToken ([int]$publishedModfile.id)
 Write-Host "Published to Mod.IO and marked file id $($activeModfile.id) active."
+if ($PublishPage) {
+    Set-ModIoPagePublic $apiBase $gameId $modId $accessToken
+    Write-Host "Mod.IO page is public and verified."
+}
 Write-Host $responseBody

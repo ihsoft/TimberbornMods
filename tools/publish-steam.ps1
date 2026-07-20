@@ -428,8 +428,30 @@ function Get-SteamDetails([string] $PublishedFileId) {
 }
 
 function Get-LiveSteamTags([string] $PublishedFileId) {
-    $details = Get-SteamDetails $PublishedFileId
-    return Get-UniqueTags @($details.tags | ForEach-Object { [string]$_.tag })
+    $projectPath = Resolve-RepoPath "tools/SteamTagUpdater/SteamTagUpdater.csproj"
+    Assert-PathExists $projectPath "Steam tag updater project"
+    & dotnet build $projectPath -c Release | Out-Host
+    if ($LASTEXITCODE -ne 0) {
+        throw "Steam tag updater build failed with exit code $LASTEXITCODE."
+    }
+    $dllPath = Resolve-RepoPath "tools/SteamTagUpdater/bin/Release/net8.0/SteamTagUpdater.dll"
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+        $output = @(& dotnet $dllPath --query $PublishedFileId 2>&1)
+        $queryExitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousErrorActionPreference
+    }
+    if ($queryExitCode -ne 0) {
+        throw "Steam tag query failed.`n$($output -join [Environment]::NewLine)"
+    }
+    $line = @($output | ForEach-Object { [string]$_ } | Where-Object { $_ -like "LIVE_TAGS_JSON=*" }) | Select-Object -Last 1
+    if ([string]::IsNullOrWhiteSpace($line)) {
+        throw "Steam tag query returned no machine-readable tag result."
+    }
+    return Get-UniqueTags @(($line.Substring("LIVE_TAGS_JSON=".Length) | ConvertFrom-Json) | ForEach-Object { [string]$_ })
 }
 
 function Invoke-SteamTagsUpdate([string] $PublishedFileId, [string[]] $TargetTags) {

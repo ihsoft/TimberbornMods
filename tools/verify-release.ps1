@@ -25,7 +25,9 @@ param(
     [switch] $SkipPlatformDescriptions,
     [switch] $SkipPlatformTags,
     [switch] $SkipSteam,
-    [switch] $SkipModIo
+    [switch] $SkipModIo,
+    [switch] $PublishSteamVisibility,
+    [switch] $PublishModIoPage
 )
 
 $ErrorActionPreference = "Stop"
@@ -342,6 +344,7 @@ if (-not $SkipSteam) {
     Add-OptionalArgument $steamArgs "-SteamConfigPath" $SteamConfigPath
     Add-OptionalArgument $steamArgs "-SteamCmdPath" $SteamCmdPath
     Add-OptionalArgument $steamArgs "-SteamUserName" $SteamUserName
+    Add-SwitchArgument $steamArgs "-UpdateVisibility" $PublishSteamVisibility
     $steps.Add((Invoke-ReleaseStep "Steam release dry run" "publish-steam.ps1" $steamArgs.ToArray()))
 }
 
@@ -350,6 +353,7 @@ if (-not $SkipModIo) {
     $modIoArgs.AddRange([string[]]$commonPublishArgs)
     Add-OptionalArgument $modIoArgs "-ConfigPath" $ModIoConfigPath
     Add-OptionalArgument $modIoArgs "-AccessTokenPath" $ModIoAccessTokenPath
+    Add-SwitchArgument $modIoArgs "-PublishPage" $PublishModIoPage
     $steps.Add((Invoke-ReleaseStep "Mod.IO release dry run" "publish-modio.ps1" $modIoArgs.ToArray()))
 }
 
@@ -395,6 +399,7 @@ if (-not $SkipPlatformTags) {
         Add-OptionalArgument $finalSteamArgs "-SteamConfigPath" $SteamConfigPath
         Add-OptionalArgument $finalSteamArgs "-SteamCmdPath" $SteamCmdPath
         Add-OptionalArgument $finalSteamArgs "-SteamUserName" $SteamUserName
+        Add-SwitchArgument $finalSteamArgs "-UpdateVisibility" $PublishSteamVisibility
         $steps.Add((Invoke-ReleaseStep "Final Steam release dry run" "publish-steam.ps1" $finalSteamArgs.ToArray()))
     }
 
@@ -403,6 +408,7 @@ if (-not $SkipPlatformTags) {
         $finalModIoArgs.AddRange([string[]]$finalPublishArgs)
         Add-OptionalArgument $finalModIoArgs "-ConfigPath" $ModIoConfigPath
         Add-OptionalArgument $finalModIoArgs "-AccessTokenPath" $ModIoAccessTokenPath
+        Add-SwitchArgument $finalModIoArgs "-PublishPage" $PublishModIoPage
         $steps.Add((Invoke-ReleaseStep "Final Mod.IO release dry run" "publish-modio.ps1" $finalModIoArgs.ToArray()))
     }
 
@@ -536,6 +542,8 @@ $report = [ordered]@{
         SkipSteam = [bool]$SkipSteam
         SkipModIo = [bool]$SkipModIo
         CorrectiveReplacement = [bool]$CorrectiveReplacement
+        PublishSteamVisibility = [bool]$PublishSteamVisibility
+        PublishModIoPage = [bool]$PublishModIoPage
     }
     Steps = [object[]]$steps.ToArray()
     ReadyForPublish = $true

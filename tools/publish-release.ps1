@@ -237,6 +237,7 @@ if (-not $SkipSteam -and -not [bool]$report.PreflightOptions.SkipSteam) {
     Add-OptionalArgument $steamArgs "-SteamConfigPath" $SteamConfigPath
     Add-OptionalArgument $steamArgs "-SteamCmdPath" $SteamCmdPath
     Add-OptionalArgument $steamArgs "-SteamUserName" $SteamUserName
+    Add-SwitchArgument $steamArgs "-UpdateVisibility" ([bool]$report.PreflightOptions.PublishSteamVisibility)
     $steamArgs.Add("-Publish")
     Invoke-ReleaseStep "Steam release publish" "publish-steam.ps1" $steamArgs.ToArray()
 }
@@ -246,6 +247,7 @@ if (-not $SkipModIo -and -not [bool]$report.PreflightOptions.SkipModIo) {
     $modIoArgs.AddRange([string[]]$commonPublishArgs)
     Add-OptionalArgument $modIoArgs "-ConfigPath" $ModIoConfigPath
     Add-OptionalArgument $modIoArgs "-AccessTokenPath" $ModIoAccessTokenPath
+    Add-SwitchArgument $modIoArgs "-PublishPage" ([bool]$report.PreflightOptions.PublishModIoPage)
     $modIoArgs.Add("-Publish")
     Invoke-ReleaseStep "Mod.IO release publish" "publish-modio.ps1" $modIoArgs.ToArray()
 }

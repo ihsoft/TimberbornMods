@@ -473,6 +473,33 @@ if ($MaterializeLocalOnly) {
     exit 0
 }
 
+function Get-AuthenticatedSteamTags([string] $PublishedFileId) {
+    $projectPath = Resolve-RepoPath "tools/SteamTagUpdater/SteamTagUpdater.csproj"
+    Assert-PathExists $projectPath "Steam tag updater project"
+    & dotnet build $projectPath -c Release | Out-Host
+    if ($LASTEXITCODE -ne 0) {
+        throw "Steam tag updater build failed with exit code $LASTEXITCODE."
+    }
+    $dllPath = Resolve-RepoPath "tools/SteamTagUpdater/bin/Release/net8.0/SteamTagUpdater.dll"
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+        $output = @(& dotnet $dllPath --query $PublishedFileId 2>&1)
+        $queryExitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousErrorActionPreference
+    }
+    if ($queryExitCode -ne 0) {
+        throw "Steam tag query failed.`n$($output -join [Environment]::NewLine)"
+    }
+    $line = @($output | ForEach-Object { [string]$_ } | Where-Object { $_ -like "LIVE_TAGS_JSON=*" }) | Select-Object -Last 1
+    if ([string]::IsNullOrWhiteSpace($line)) {
+        throw "Steam tag query returned no machine-readable tag result."
+    }
+    return Get-UniqueTags @(($line.Substring("LIVE_TAGS_JSON=".Length) | ConvertFrom-Json) | ForEach-Object { [string]$_ })
+}
+
 if ($Platform -eq "All" -or $Platform -eq "Steam") {
     $appId = "1062090"
     if ($null -ne $releaseConfig -and -not [string]::IsNullOrWhiteSpace($releaseConfig.Steam.AppId)) {
@@ -492,8 +519,7 @@ if ($Platform -eq "All" -or $Platform -eq "Steam") {
     $vdfPath = Join-Path (Resolve-RepoPath $SteamVdfRoot) "$ModName-tags.vdf"
     Write-SteamTagsVdf $vdfPath $appId $publishedFileId ([string]$workshopData.Name) $targetTags
 
-    $steamDetails = Get-SteamDetails $publishedFileId
-    $currentTags = Get-UniqueTags @($steamDetails.tags | ForEach-Object { [string]$_.tag })
+    $currentTags = Get-AuthenticatedSteamTags $publishedFileId
     $addTags = Get-AddedTags $targetTags $currentTags
     $removeTags = Get-RemovedTags $targetTags $currentTags
     $alreadySynced = $addTags.Count -eq 0 -and $removeTags.Count -eq 0
@@ -523,8 +549,7 @@ if ($Platform -eq "All" -or $Platform -eq "Steam") {
         if (-not $alreadySynced) {
             Invoke-SteamTagsUpdate $publishedFileId $appId $targetTags
             Start-Sleep -Seconds 2
-            $updatedDetails = Get-SteamDetails $publishedFileId
-            $updatedTags = Get-UniqueTags @($updatedDetails.tags | ForEach-Object { [string]$_.tag })
+            $updatedTags = Get-AuthenticatedSteamTags $publishedFileId
             $remainingAdds = Get-AddedTags $targetTags $updatedTags
             $remainingRemoves = Get-RemovedTags $targetTags $updatedTags
             if ($remainingAdds.Count -ne 0 -or $remainingRemoves.Count -ne 0) {
