@@ -27,6 +27,7 @@ testing is unnecessary or that an unrelated package's tests should be substitute
 | Automation | `Automation/Automation.csproj` | `dotnet run --project Automation.Tests/Automation.Tests.csproj` | `ModsUnityProject/Assets/Mods/Automation` | `Automation/AGENTS.md` |
 | AutomationForModdableWeather | `AutomationForModdableWeather/AutomationForModdableWeather.csproj` | No focused tests | Project-local manifest and content | None |
 | CustomTools | `CustomTools/CustomTools.csproj` | `dotnet run --project CustomTools.Tests/CustomTools.Tests.csproj` | `ModsUnityProject/Assets/Mods/CustomTools` | None |
+| DualDistrictStorage | `DualDistrictStorage/DualDistrictStorage.csproj` | No focused tests | `DualDistrictStorage/Mod` | `DualDistrictStorage/AGENTS.md` |
 | SmartHaulers | `SmartHaulers/SmartHaulers.csproj` | No focused tests | Split between `SmartHaulers/Mod` and `ModsUnityProject/Assets/Mods/SmartHaulers` | `SmartHaulers/AGENTS.md` |
 | SmartPower | `SmartPower/SmartPower.csproj` | `dotnet run --project SmartPower.Tests/SmartPower.Tests.csproj` | `ModsUnityProject/Assets/Mods/SmartPower` | None |
 | TimberCommons | `TimberCommons/TimberCommons.csproj` | `dotnet run --project TimberCommons.Tests/TimberCommons.Tests.csproj` | `ModsUnityProject/Assets/Mods/TimberCommons` | `docs/TimberCommons-modding-notes-for-ai-agents.md` |
