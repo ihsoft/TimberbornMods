@@ -63,6 +63,11 @@ Prefer dry-run-first identity-bootstrap tooling that fails when creation mode is
 or identity fields are incomplete. It must create and verify identities only and must not continue silently into package
 upload.
 
+Before a Steam item becomes public, verify it through an authenticated owner Steamworks UGC query. A missing or failed
+result from the public published-file details endpoint is not evidence that an owner-visible Private item is missing or
+invalid. The owner query must verify the intended item identity, title, visibility, tags, content state, and dependencies.
+After publication, also verify that the item is visible through the public endpoint.
+
 ## Final preflight snapshot
 
 Treat a final preflight report marked ready for publishing as the immutable release snapshot, not merely as evidence
@@ -76,6 +81,11 @@ exist, verify that changes after the selected release commit do not alter that m
 package source, or a shared release-critical dependency used by the artifact. If the correct release commit is
 ambiguous, or later changes affect its release inputs, stop and obtain an explicit commit selection or prepare a new
 release commit before final preflight.
+
+When publishing includes an explicitly authorized platform-state transition, the final preflight report must capture
+the action and exact target state for each platform, including Steam visibility and Mod.IO page publication. Publishing
+must consume that recorded intent rather than infer it from local metadata or make a new publish-time choice. Stop if
+the user authorization, preflight report, and publish command do not agree.
 
 After that snapshot is captured, publishing must not mutate the configured package source, update its
 `workshop_data.json` or tags, rebuild or repackage the release, or substitute a different package. Each platform
@@ -137,6 +147,14 @@ planning do not need elevation only because the task is a release.
 Prefer grouping read-only post-upload Mod.IO parent, file, virus-scan, platform-status, and live checks into one
 verification command when practical. Do not split them into several approvals unless a follow-up check depends on the
 previous result.
+
+## Unknown external outcomes
+
+Treat a timeout, interruption, lost command output, or ambiguous exit after a publish operation starts as an unknown
+external outcome, not as proof that the operation failed before mutation. Before retrying, perform read-only checks of
+every external boundary the operation may have reached, such as Steam item and content state, Mod.IO files and page
+state, Git tags, and GitHub Releases. Establish the last confirmed mutation, then retry only the incomplete step. If the
+boundary cannot be established reliably, stop and report the uncertainty instead of retrying.
 
 ## Dirty worktree before publishing
 
@@ -503,6 +521,11 @@ After uploading a Mod.IO file, verify that the uploaded file becomes the live fi
 uploaded but not live after scanning, explicitly activate the uploaded modfile through the Mod.IO API instead of
 assuming upload success is enough.
 
+For a first Mod.IO publication, keep the page Hidden through file upload, virus scanning, and active-file selection.
+Only after the intended file is active and verified may the explicitly authorized publication step make the page
+Public; then live-verify the page state. A Hidden identity page, even with an active file, is not a completed published
+release.
+
 ## Platform descriptions
 
 Local files under a mod's `Workshop` directory are the expected source for published platform descriptions.
@@ -671,6 +694,11 @@ Steam Guard mobile confirmation may take longer than an agent command timeout.
 Use a login-only/retry mode that opens SteamCMD for interactive login and does not build, stage, or publish anything.
 
 Do not store Steam passwords in repository files or local config files.
+
+Treat the Steam client Steamworks session and the SteamCMD cached login as separate sessions. If an authenticated owner
+query reports `BLoggedOn=false` while SteamCMD still works, restart or reauthenticate the Steam client and repeat the
+owner query; do not diagnose a missing item or platform failure from that state alone. Avoid unrelated SteamCMD work
+between the final authenticated owner verification and the intended upload.
 
 ## Git release tags
 
