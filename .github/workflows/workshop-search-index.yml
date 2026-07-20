@@ -59,9 +59,9 @@ jobs:
           --snapshot .work/workshop-items.jsonl
           --previous-results .work/previous-map-gallery.jsonl.gz
           --output .work/map-gallery.jsonl
-          --max-pages 200
+          --max-pages 50
           --max-images-per-map 8
-          --delay-seconds 5
+          --delay-seconds 20
           --max-runtime-seconds 1200
 
       - name: Plan incremental classification

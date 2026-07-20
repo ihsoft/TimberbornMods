@@ -50,13 +50,13 @@ class GalleryParsingTest(unittest.TestCase):
     def test_doubles_cooldown_then_stops_on_third_rate_limit(self) -> None:
         error = collect_gallery.SteamThrottleError(429, None)
 
-        first = collect_gallery.throttle_policy(error, 1, 5)
+        first = collect_gallery.throttle_policy(error, 1, 20)
         second = collect_gallery.throttle_policy(error, 2, first[2])
         third = collect_gallery.throttle_policy(error, 3, second[2])
 
-        self.assertEqual((False, 60, 10), first)
-        self.assertEqual((False, 120, 20), second)
-        self.assertEqual((True, 0, 20), third)
+        self.assertEqual((False, 60, 40), first)
+        self.assertEqual((False, 120, 80), second)
+        self.assertEqual((True, 0, 80), third)
 
 
 class MultiImageClassificationTest(unittest.TestCase):

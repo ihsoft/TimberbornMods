@@ -35,9 +35,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--snapshot", required=True)
     parser.add_argument("--previous-results")
     parser.add_argument("--output", required=True)
-    parser.add_argument("--max-pages", type=int, default=200)
+    parser.add_argument("--max-pages", type=int, default=50)
     parser.add_argument("--max-images-per-map", type=int, default=8)
-    parser.add_argument("--delay-seconds", type=float, default=5.0)
+    parser.add_argument("--delay-seconds", type=float, default=20.0)
     parser.add_argument("--refresh-after-days", type=int, default=90)
     parser.add_argument("--max-consecutive-failures", type=int, default=3)
     parser.add_argument("--max-runtime-seconds", type=int, default=1_200)
@@ -146,7 +146,7 @@ def throttle_policy(
         return True, 0, request_delay
     base_cooldown = exception.retry_after_seconds or 60
     cooldown = base_cooldown * 2 ** (throttle_events - 1)
-    next_delay = min(30, max(10, request_delay * 2))
+    next_delay = min(120, max(20, request_delay * 2))
     return False, cooldown, next_delay
 
 

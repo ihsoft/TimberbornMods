@@ -80,11 +80,11 @@ retaining the image corpus. At most eight resized gallery screenshots are consid
 limited to 2 MB, the public artifact is limited to 100 MB, and images are discarded after their scores are computed.
 The workflow uses no Steam account, API key, repository secret, or game process.
 
-The daily gallery pass attempts at most 200 item pages with a five-second delay plus jitter. On the first HTTP 429 it
-honors `Retry-After` or waits 60 seconds, doubles the request delay, and continues. A second 429 doubles the cooldown
-and request delay again. A third 429 or any HTTP 403 stops network activity for that run. The pass also stops after 20
-minutes or three consecutive transient failures. It checks changed items first, backfills recent unknown items next,
-and refreshes known galleries after 90 days.
+The daily gallery pass attempts at most 50 item pages with a 20-second delay plus jitter. On the first HTTP 429 it
+honors `Retry-After` or waits 60 seconds, doubles the request delay to 40 seconds, and continues. A second 429 doubles
+the cooldown and request delay again. A third 429 or any HTTP 403 stops network activity for that run. The pass also
+stops after 20 minutes or three consecutive transient failures. It checks changed items first, backfills recent unknown
+items next, and refreshes known galleries after 90 days.
 
 The published `manifest.json` reports how many maps were classified, reused, missing, or served with stale scores. If
 an updated preview cannot be downloaded after retries, the previous score is retained as stale and retried on the next
