@@ -3,23 +3,46 @@
 These instructions apply to work under `DualDistrictStorage/`. Follow the repository-wide instructions and
 Timberborn Timbermesh Operational Knowledge as well.
 
+When modifying the Dual-District Pile tool, its hidden physical templates, custom placement or preview behavior,
+generated pile models, or pile visualizations, also read
+`docs/DualDistrictPile-Operational-Knowledge-v1.md`.
+
 ## Dual-District Icon Contract
 
-`Tools/create_dual_district_icons.py` owns these generated icons and their adjacent `.png.meta.json` files:
+One invocation of `Tools/create_dual_district_icons.py` owns these generated PNG icons:
 
 - stock `MediumWarehouseIcon` produces
   `Mod/Buildings/Storage/DualDistrictWarehouse/DualDistrictWarehouseIcon.png`;
 - stock `MediumTankIcon` produces
-  `Mod/Buildings/Storage/DualDistrictTank/DualDistrictTankIcon.png`.
+  `Mod/Buildings/Storage/DualDistrictTank/DualDistrictTankIcon.png`;
+- stock Folktails `LargePileIcon` produces
+  `Mod/Buildings/Storage/DualDistrictPile/DualDistrictPile.Folktails.Icon.png`;
+- stock Iron Teeth `LargeIndustrialPileIcon` produces
+  `Mod/Buildings/Storage/DualDistrictPile/DualDistrictPile.IronTeeth.Icon.png`.
 
 The generator preserves each 112x112 stock building icon as the lower layer and adds one stock `DistrictCenterIcon`
-star, cropped by alpha bounds and composited at 35x35 at `(77, 0)`. Both faction blueprints for a building reference the
-same corresponding custom icon.
+star, cropped by alpha bounds and composited at 35x35 at `(77, 0)`. Warehouse and tank faction blueprints share their
+building-specific icon; each pile faction blueprint references its own faction-derived icon.
+
+Each generated PNG keeps its tracked adjacent `.png.meta.json` as the paired import contract. Validate and package the
+image and metadata together even though the composition script writes only the PNG.
 
 When adding another dual-district building, extend the generator's explicit source/output map instead of hand-editing
 the generated icon. Follow Timberborn Icon Operational Knowledge for import, packaging, and validation. Revalidate the
 composition at construction-menu scale and choose a different overlay placement when the new silhouette needs it; the
 current size and coordinates are local confirmed values, not defaults for unrelated icons.
+
+## Linked Configuration And Operational Lifetimes
+
+Selected-good replication is configuration state available during construction. Subscribe to
+`SingleGoodAllower.DisallowedGoodsChanged` for the entity lifetime from `Awake` through `DeleteEntity`, and mirror the
+allowed good whenever a linked peer exists. Do not move this subscription back to finished-state entry or gate it on
+`Inventory.Enabled`.
+
+Stock and reservation replication remain operational inventory behavior and keep their established finished/enabled
+gates. Do not give configuration and inventory events one shared lifecycle merely because both ultimately affect linked
+storage state. When changing either path, validate selected-good synchronization during ordinary construction as well
+as completed stock and reservation behavior.
 
 ## Generated Model Ownership
 
