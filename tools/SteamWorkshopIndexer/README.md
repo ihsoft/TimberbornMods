@@ -66,3 +66,7 @@ Other useful options:
 
 This is a bootstrap/full-refresh job. A later incremental layer can stop after a stable overlap window because browse
 results are ordered by last update, but that optimization is intentionally outside the current contract.
+
+Additional gallery screenshots are not returned by the anonymous batch details endpoint. The scheduled search-index
+workflow collects their URLs separately with `tools/TimberbornMapPreviewClassifier/collect_gallery.py`. That collector
+uses bounded, delayed public item-page requests and carries its published state between runs.

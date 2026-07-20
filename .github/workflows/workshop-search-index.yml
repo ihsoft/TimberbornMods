@@ -41,13 +41,28 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Download previous visual features
+      - name: Download previous incremental data
         run: |
           site="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}"
           curl --fail --location --retry 3 \
             --output .work/previous-map-visual-features.jsonl.gz \
             "$site/map-visual-features.jsonl.gz" \
             || rm -f .work/previous-map-visual-features.jsonl.gz
+          curl --fail --location --retry 3 \
+            --output .work/previous-map-gallery.jsonl.gz \
+            "$site/map-gallery.jsonl.gz" \
+            || rm -f .work/previous-map-gallery.jsonl.gz
+
+      - name: Collect bounded public map galleries
+        run: >-
+          python tools/TimberbornMapPreviewClassifier/collect_gallery.py
+          --snapshot .work/workshop-items.jsonl
+          --previous-results .work/previous-map-gallery.jsonl.gz
+          --output .work/map-gallery.jsonl
+          --max-pages 300
+          --max-images-per-map 8
+          --delay-seconds 2
+          --max-runtime-seconds 1200
 
       - name: Plan incremental classification
         id: classification-plan
@@ -55,6 +70,7 @@ jobs:
           python tools/TimberbornMapPreviewClassifier/classify.py \
             --snapshot .work/workshop-items.jsonl \
             --previous-results .work/previous-map-visual-features.jsonl.gz \
+            --gallery-results .work/map-gallery.jsonl \
             --download-previews \
             --plan-only \
             --plan-output .work/classification-plan.json
@@ -81,17 +97,26 @@ jobs:
           python tools/TimberbornMapPreviewClassifier/classify.py
           --snapshot .work/workshop-items.jsonl
           --previous-results .work/previous-map-visual-features.jsonl.gz
+          --gallery-results .work/map-gallery.jsonl
           --output .work/map-visual-features.jsonl
           --download-previews
           --download-concurrency 6
           --batch-size 24
+          --max-image-bytes 2000000
 
       - name: Build public search artifacts
         run: >-
           python tools/TimberbornMapPreviewClassifier/build_public_index.py
           --snapshot .work/workshop-items.jsonl
           --visual-features .work/map-visual-features.jsonl
+          --gallery-results .work/map-gallery.jsonl
           --output-directory .work/public
+
+      - name: Enforce public artifact size limit
+        run: |
+          bytes=$(du -sb .work/public | cut -f1)
+          echo "Public artifact size: $bytes bytes"
+          test "$bytes" -le 100000000
 
       - name: Upload diagnostic artifact
         uses: actions/upload-artifact@v4
