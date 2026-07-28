@@ -35,6 +35,9 @@ jobs:
           echo "LD_LIBRARY_PATH=$RUNNER_TEMP/steamcmd/linux64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
 
       - name: Query additional previews without a Steam account
+        env:
+          SteamAppId: "1062090"
+          SteamGameId: "1062090"
         run: >-
           dotnet tools/SteamAnonymousUgcProbe/bin/Release/net8.0/SteamAnonymousUgcProbe.dll
           3535425318 3532441249 3383139185
