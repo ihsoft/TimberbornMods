@@ -32,6 +32,7 @@ jobs:
           "$RUNNER_TEMP/steamcmd/steamcmd.sh" +quit
           test -s "$RUNNER_TEMP/steamcmd/linux64/steamclient.so"
           cp "$RUNNER_TEMP/steamcmd/linux64/steamclient.so" "$HOME/.steam/sdk64/steamclient.so"
+          echo "LD_LIBRARY_PATH=$RUNNER_TEMP/steamcmd/linux64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
 
       - name: Query additional previews without a Steam account
         run: >-

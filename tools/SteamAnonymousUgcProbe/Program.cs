@@ -13,10 +13,10 @@ if (!Packsize.Test() || !DllCheck.Test()) {
   return 2;
 }
 
-var initialized = GameServer.Init(
-    0, 0, 0, EServerMode.eServerModeNoAuthentication, "anonymous-ugc-probe");
-if (!initialized) {
-  Console.Error.WriteLine("Steam game-server initialization failed.");
+var initResult = GameServer.InitEx(
+    0, 0, 0, EServerMode.eServerModeNoAuthentication, "anonymous-ugc-probe", out var initError);
+if (initResult != ESteamAPIInitResult.k_ESteamAPIInitResult_OK) {
+  Console.Error.WriteLine($"Steam game-server initialization failed: {initResult}: {initError}");
   return 3;
 }
 
