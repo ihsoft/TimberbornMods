@@ -1,8 +1,8 @@
 # Timberborn Map Preview Classifier
 
-Builds search-oriented visual terrain features from public primary previews and Workshop gallery screenshots collected by
-`tools/SteamWorkshopIndexer`. It does not read Workshop package contents, use a Steam account, or use titles and
-descriptions as classifier inputs.
+Builds search-oriented visual terrain features from public primary previews and Workshop gallery screenshots collected
+by `tools/SteamWorkshopIndexer` and `tools/SteamWorkshopGalleryIndexer`. It does not read Workshop package contents,
+use a Steam account, or use titles and descriptions as classifier inputs.
 
 The classifier uses CLIP prompt pairs to produce relative visual scores for:
 
@@ -61,11 +61,11 @@ snapshot operation because percentiles depend on the complete current corpus.
 ## Scheduled public index
 
 `.github/workflows/workshop-search-index.yml` runs manually or daily. It collects a complete Workshop metadata snapshot
-without a preview cache. A bounded gallery pass prioritizes changed maps and then gradually backfills or periodically
-refreshes older public item pages. Steam throttling or the time budget defers remaining pages to later runs. The
-classifier reuses the previous raw score for every unchanged image URL, so PyTorch and CLIP are needed only for newly
-discovered or changed images. The job recomputes map aggregates and corpus-relative percentiles and publishes compact
-GitHub Pages artifacts:
+without a preview cache. An anonymous Steam game-server UGC query reads additional preview URLs in batches of up to 100
+map IDs without opening individual Workshop HTML pages. The bounded pass prioritizes changed or failed maps, gradually
+backfills unknown maps, and periodically refreshes old results. The classifier reuses the previous raw score for every
+unchanged image URL, so PyTorch and CLIP are needed only for newly discovered or changed images. The job recomputes map
+aggregates and corpus-relative percentiles and publishes compact GitHub Pages artifacts:
 
 ```text
 manifest.json
@@ -80,11 +80,11 @@ retaining the image corpus. At most eight resized gallery screenshots are consid
 limited to 2 MB, the public artifact is limited to 100 MB, and images are discarded after their scores are computed.
 The workflow uses no Steam account, API key, repository secret, or game process.
 
-The daily gallery pass attempts at most 50 item pages with a 20-second delay plus jitter. On the first HTTP 429 it
-honors `Retry-After` or waits 60 seconds, doubles the request delay to 40 seconds, and continues. A second 429 doubles
-the cooldown and request delay again. A third 429 or any HTTP 403 stops network activity for that run. The pass also
-stops after 20 minutes or three consecutive transient failures. It checks changed items first, backfills recent unknown
-items next, and refreshes known galleries after 90 days.
+The daily gallery pass processes at most 250 maps in up to three sequential UGC requests, with a short delay between
+batches. This bound controls new image downloads and CPU classification cost rather than Steam HTML throttling. The
+pass checks changed or previously failed items first, backfills recent unknown items next, and refreshes known galleries
+after 90 days. It initializes SteamCMD only as an ephemeral anonymous runtime on the GitHub runner; it does not use a
+Steam client login, API key, repository secret, or game process.
 
 The published `manifest.json` reports how many maps were classified, reused, missing, or served with stale scores. If
 an updated preview cannot be downloaded after retries, the previous score is retained as stale and retried on the next

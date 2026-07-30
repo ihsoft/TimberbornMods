@@ -30,6 +30,9 @@ jobs:
       - name: Build public Workshop indexer
         run: dotnet build tools/SteamWorkshopIndexer/SteamWorkshopIndexer.csproj -c Release
 
+      - name: Build anonymous Workshop gallery indexer
+        run: dotnet build tools/SteamWorkshopGalleryIndexer/SteamWorkshopGalleryIndexer.csproj -c Release
+
       - name: Collect public Workshop metadata
         run: >-
           dotnet tools/SteamWorkshopIndexer/bin/Release/net8.0/SteamWorkshopIndexer.dll
@@ -53,16 +56,31 @@ jobs:
             "$site/map-gallery.jsonl.gz" \
             || rm -f .work/previous-map-gallery.jsonl.gz
 
-      - name: Collect bounded public map galleries
+      - name: Install anonymous Steam game-server runtime
+        run: |
+          mkdir -p "$RUNNER_TEMP/steamcmd" "$HOME/.steam/sdk64"
+          curl --fail --location --retry 3 \
+            https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz \
+            --output "$RUNNER_TEMP/steamcmd_linux.tar.gz"
+          tar -xzf "$RUNNER_TEMP/steamcmd_linux.tar.gz" -C "$RUNNER_TEMP/steamcmd"
+          "$RUNNER_TEMP/steamcmd/steamcmd.sh" +quit
+          test -s "$RUNNER_TEMP/steamcmd/linux64/steamclient.so"
+          cp "$RUNNER_TEMP/steamcmd/linux64/steamclient.so" "$HOME/.steam/sdk64/steamclient.so"
+          echo "LD_LIBRARY_PATH=$RUNNER_TEMP/steamcmd/linux64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
+
+      - name: Collect incremental public map galleries
+        env:
+          SteamAppId: "1062090"
+          SteamGameId: "1062090"
         run: >-
-          python tools/TimberbornMapPreviewClassifier/collect_gallery.py
+          dotnet tools/SteamWorkshopGalleryIndexer/bin/Release/net8.0/SteamWorkshopGalleryIndexer.dll
           --snapshot .work/workshop-items.jsonl
           --previous-results .work/previous-map-gallery.jsonl.gz
           --output .work/map-gallery.jsonl
-          --max-pages 50
+          --batch-size 100
+          --max-items 250
           --max-images-per-map 8
-          --delay-seconds 20
-          --max-runtime-seconds 1200
+          --delay-milliseconds 250
 
       - name: Plan incremental classification
         id: classification-plan

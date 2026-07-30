@@ -84,7 +84,7 @@ def main() -> int:
     )
     manifest = {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
-        "source": "public-steam-workshop-http",
+        "source": "public-steam-workshop-http-and-anonymous-ugc",
         "workshop_items": len(workshop_items),
         "classified_maps": len(visual_features),
         "maps_missing_visual_features": missing_visual_maps,
