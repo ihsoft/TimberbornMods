@@ -86,6 +86,13 @@ pass checks changed or previously failed items first, backfills recent unknown i
 after 90 days. It initializes SteamCMD only as an ephemeral anonymous runtime on the GitHub runner; it does not use a
 Steam client login, API key, repository secret, or game process.
 
+`.github/workflows/workshop-gallery-backfill.yml` is a manual-only accelerator that runs the same publishing pipeline
+for at most 1,000 maps. It keeps UGC requests sequential, waits one second between batches, limits image downloads to
+two concurrent requests, and shares the daily job's concurrency lock. The gallery indexer stops before sending another
+UGC request after the first failed batch. The classifier does not retry Steam HTTP 403, 429, or server errors and stops
+queued downloads before starting its next image batch, so a throttled or unhealthy backfill fails visibly instead of
+continuing to pressure Steam.
+
 The published `manifest.json` reports how many maps were classified, reused, missing, or served with stale scores. If
 an updated preview cannot be downloaded after retries, the previous score is retained as stale and retried on the next
 run. A missing previous index, model change, or classifier-version change automatically falls back to a full visual

@@ -1,0 +1,17 @@
+name: Backfill Workshop map galleries
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  backfill:
+    uses: ./.github/workflows/workshop-search-index.yml
+    with:
+      gallery_max_items: 1000
+      gallery_delay_milliseconds: 1000
+      image_download_concurrency: 2

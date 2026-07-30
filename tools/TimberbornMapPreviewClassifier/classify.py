@@ -10,8 +10,10 @@ from io import BytesIO
 import json
 from pathlib import Path
 from statistics import fmean, median
+from threading import Event
 import time
 from typing import Iterable
+from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 CLASSIFIER_VERSION = "clip-prompts-v2-multi-image"
@@ -90,6 +92,10 @@ FEATURE_PROMPTS = {
         ],
     },
 }
+
+
+class SteamImageRequestStopError(RuntimeError):
+    """Steam returned a response that should stop further preview requests."""
 
 
 def parse_args() -> argparse.Namespace:
@@ -281,6 +287,21 @@ def load_image(item: dict, download_previews: bool, max_image_bytes: int) -> Ima
                     if len(image_bytes) > max_image_bytes:
                         raise RuntimeError(f"Image exceeds {max_image_bytes} byte limit")
                 break
+            except HTTPError as exception:
+                if exception.code in (403, 429, 500, 502, 503, 504):
+                    retry_after = (
+                        exception.headers.get("Retry-After")
+                        if exception.headers is not None
+                        else None
+                    )
+                    detail = f"; Retry-After={retry_after}" if retry_after else ""
+                    raise SteamImageRequestStopError(
+                        f"HTTP {exception.code}{detail}") from exception
+                last_exception = exception
+                if exception.code not in (404, 410) and attempt < 2:
+                    time.sleep(2**attempt)
+                else:
+                    break
             except Exception as exception:
                 last_exception = exception
                 if attempt < 2:
@@ -296,10 +317,17 @@ def load_image(item: dict, download_previews: bool, max_image_bytes: int) -> Ima
 
 
 def try_load_image(
-    item: dict, download_previews: bool, max_image_bytes: int
+    item: dict, download_previews: bool, max_image_bytes: int,
+    stop_downloads: Event | None = None,
 ) -> tuple[Image.Image | None, Exception | None]:
+    if stop_downloads is not None and stop_downloads.is_set():
+        return None, None
     try:
         return load_image(item, download_previews, max_image_bytes), None
+    except SteamImageRequestStopError as exception:
+        if stop_downloads is not None:
+            stop_downloads.set()
+        return None, exception
     except Exception as exception:
         return None, exception
 
@@ -334,12 +362,25 @@ def score_images(
     for batch_number, batch in enumerate(chunks(images_to_classify, batch_size), start=1):
         images: list[Image.Image] = []
         valid = []
+        stop_downloads = Event()
         with ThreadPoolExecutor(max_workers=download_concurrency) as executor:
             loaded_images = list(
                 executor.map(
-                    lambda item: try_load_image(item, download_previews, max_image_bytes), batch
+                    lambda item: try_load_image(
+                        item, download_previews, max_image_bytes, stop_downloads),
+                    batch,
                 )
             )
+        throttle_error = next(
+            (
+                exception
+                for _, exception in loaded_images
+                if isinstance(exception, SteamImageRequestStopError)
+            ),
+            None,
+        )
+        if throttle_error is not None:
+            raise throttle_error
         for item, (image, exception) in zip(batch, loaded_images):
             if image is not None:
                 images.append(image)

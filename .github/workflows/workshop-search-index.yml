@@ -1,6 +1,23 @@
 name: Build Workshop search index
 
 on:
+  workflow_call:
+    inputs:
+      gallery_max_items:
+        description: Maximum number of map galleries to refresh
+        required: false
+        type: number
+        default: 250
+      gallery_delay_milliseconds:
+        description: Delay between anonymous UGC batches
+        required: false
+        type: number
+        default: 250
+      image_download_concurrency:
+        description: Concurrent preview image downloads
+        required: false
+        type: number
+        default: 6
   workflow_dispatch:
   schedule:
     - cron: "17 9 * * *"
@@ -78,9 +95,9 @@ jobs:
           --previous-results .work/previous-map-gallery.jsonl.gz
           --output .work/map-gallery.jsonl
           --batch-size 100
-          --max-items 250
+          --max-items ${{ inputs.gallery_max_items || 250 }}
           --max-images-per-map 8
-          --delay-milliseconds 250
+          --delay-milliseconds ${{ inputs.gallery_delay_milliseconds || 250 }}
 
       - name: Plan incremental classification
         id: classification-plan
@@ -118,7 +135,7 @@ jobs:
           --gallery-results .work/map-gallery.jsonl
           --output .work/map-visual-features.jsonl
           --download-previews
-          --download-concurrency 6
+          --download-concurrency ${{ inputs.image_download_concurrency || 6 }}
           --batch-size 24
           --max-image-bytes 2000000
 

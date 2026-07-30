@@ -46,7 +46,6 @@ if (candidates.Count > 0) {
     Console.Out.Flush();
     var checkedAt = DateTimeOffset.UtcNow.ToString("O");
     var successfulBatches = 0;
-    var failedBatches = 0;
     var resolvedMaps = 0;
     for (var offset = 0; offset < candidates.Count; offset += options.BatchSize) {
       var batch = candidates.Skip(offset).Take(options.BatchSize).ToList();
@@ -67,20 +66,14 @@ if (candidates.Count > 0) {
         }
         successfulBatches++;
       } catch (Exception exception) {
-        failedBatches++;
-        Console.Error.WriteLine(
-            $"Gallery batch {offset / options.BatchSize + 1} failed: {exception.Message}");
-        foreach (var map in batch) {
-          var previous = previousById.GetValueOrDefault(map.PublishedFileId);
-          outputById[map.PublishedFileId] = previous is null
-              ? CreateFailedRecord(map)
-              : previous with { CollectionState = "stale" };
-        }
+        throw new InvalidOperationException(
+            $"Gallery batch {offset / options.BatchSize + 1} failed; stopping before the next Steam request.",
+            exception);
       }
 
       Console.WriteLine(
           $"Gallery progress: {Math.Min(offset + batch.Count, candidates.Count)} / {candidates.Count} maps; "
-          + $"{successfulBatches} batches succeeded, {failedBatches} failed");
+          + $"{successfulBatches} batches succeeded");
       Console.Out.Flush();
       if (offset + batch.Count < candidates.Count && options.DelayMilliseconds > 0) {
         Thread.Sleep(options.DelayMilliseconds);

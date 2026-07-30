@@ -106,5 +106,32 @@ class MultiImageClassificationTest(unittest.TestCase):
         )
 
 
+class ImageDownloadSafetyTest(unittest.TestCase):
+    def test_does_not_retry_after_image_stop_response(self) -> None:
+        for status_code in (403, 429, 503):
+            with self.subTest(status_code=status_code):
+                error = HTTPError("https://example", status_code, "stop", {}, None)
+                item = {"image_url": "https://example"}
+                with mock.patch.object(classify, "urlopen", side_effect=error) as request:
+                    with self.assertRaises(classify.SteamImageRequestStopError):
+                        classify.load_image(item, True, 2_000_000)
+
+                self.assertEqual(1, request.call_count)
+
+    def test_suppresses_queued_downloads_after_image_rate_limit(self) -> None:
+        error = HTTPError("https://example", 429, "rate limited", {}, None)
+        item = {"image_url": "https://example"}
+        stop_downloads = classify.Event()
+        with mock.patch.object(classify, "urlopen", side_effect=error) as request:
+            _, exception = classify.try_load_image(
+                item, True, 2_000_000, stop_downloads)
+            skipped = classify.try_load_image(
+                item, True, 2_000_000, stop_downloads)
+
+        self.assertIsInstance(exception, classify.SteamImageRequestStopError)
+        self.assertEqual((None, None), skipped)
+        self.assertEqual(1, request.call_count)
+
+
 if __name__ == "__main__":
     unittest.main()
