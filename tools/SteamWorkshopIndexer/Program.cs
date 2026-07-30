@@ -27,6 +27,7 @@ try {
       httpClient, previewDirectory, options.MaxPreviewCacheBytes, existingRecords);
   var records = new List<WorkshopRecord>();
   var seenIds = new HashSet<string>();
+  var pendingDetailIds = new List<string>();
   uint totalMatching = 0;
   uint pagesProcessed = 0;
   for (var page = options.StartPage; options.MaxPages == 0 || pagesProcessed < options.MaxPages; page++) {
@@ -40,34 +41,26 @@ try {
       break;
     }
 
-    foreach (var batch in newIds.Chunk(DetailsBatchSize)) {
-      var items = await QueryDetailsAsync(httpClient, batch, options.DelayMilliseconds);
-      using var previewSemaphore = new SemaphoreSlim(options.PreviewConcurrency);
-      var itemTasks = items.Select(async item => {
-        var classified = Classify(item);
-        if (!options.SkipPreviews && !string.IsNullOrWhiteSpace(classified.PreviewUrl)) {
-          await previewSemaphore.WaitAsync();
-          try {
-            classified = classified with {
-              PreviewCachePath = await previewCache.GetAsync(classified, options.DelayMilliseconds),
-            };
-          }
-          finally {
-            previewSemaphore.Release();
-          }
-        }
-        return classified;
-      });
-      records.AddRange(await Task.WhenAll(itemTasks));
+    pendingDetailIds.AddRange(newIds);
+    while (pendingDetailIds.Count >= DetailsBatchSize) {
+      var batch = pendingDetailIds.Take(DetailsBatchSize).ToList();
+      pendingDetailIds.RemoveRange(0, DetailsBatchSize);
+      records.AddRange(await QueryAndClassifyAsync(
+          httpClient, batch, options, previewCache));
     }
 
     pagesProcessed++;
     Console.WriteLine(
         $"Page {page}: {newIds.Count} IDs, {records.Count} detailed items, "
-            + $"preview cache {previewCache.CacheBytes} bytes.");
+            + $"{pendingDetailIds.Count} pending details, preview cache {previewCache.CacheBytes} bytes.");
     if (browsePage.IsLastPage) {
       break;
     }
+  }
+
+  if (pendingDetailIds.Count > 0) {
+    records.AddRange(await QueryAndClassifyAsync(
+        httpClient, pendingDetailIds, options, previewCache));
   }
 
   if (options.Append) {
@@ -94,7 +87,8 @@ static HttpClient CreateHttpClient() {
 static async Task<BrowsePageResult> QueryBrowsePageAsync(HttpClient client, uint page, int delayMilliseconds) {
   await DelayAsync(delayMilliseconds);
   var url = "https://steamcommunity.com/workshop/browse/"
-      + $"?appid={AppId}&browsesort=lastupdated&section=readytouseitems&actualsort=lastupdated&p={page}&l=english";
+      + $"?appid={AppId}&browsesort=lastupdated&section=readytouseitems&actualsort=lastupdated"
+      + $"&num_per_page=50&p={page}&l=english";
   var html = await client.GetStringAsync(url);
   var ids = Regex.Matches(html, @"publishedfileid\\+"":\\+""(\d+)")
       .Select(match => match.Groups[1].Value).Distinct().ToList();
@@ -109,7 +103,7 @@ static async Task<BrowsePageResult> QueryBrowsePageAsync(HttpClient client, uint
   }
 
   var totalMatching = ParseTotalMatching(html);
-  const uint itemsPerPage = 30;
+  const uint itemsPerPage = 50;
   var isLastPage = totalMatching > 0 && page * itemsPerPage >= totalMatching;
   return new BrowsePageResult(ids, totalMatching, isLastPage);
 }
@@ -151,6 +145,28 @@ static async Task<List<RawWorkshopRecord>> QueryDetailsAsync(
         GetSingle(item, "score")));
   }
   return results;
+}
+
+static async Task<List<WorkshopRecord>> QueryAndClassifyAsync(
+    HttpClient httpClient, IReadOnlyList<string> publishedFileIds, Options options, PreviewCache previewCache) {
+  var items = await QueryDetailsAsync(httpClient, publishedFileIds, options.DelayMilliseconds);
+  using var previewSemaphore = new SemaphoreSlim(options.PreviewConcurrency);
+  var itemTasks = items.Select(async item => {
+    var classified = Classify(item);
+    if (!options.SkipPreviews && !string.IsNullOrWhiteSpace(classified.PreviewUrl)) {
+      await previewSemaphore.WaitAsync();
+      try {
+        classified = classified with {
+          PreviewCachePath = await previewCache.GetAsync(classified, options.DelayMilliseconds),
+        };
+      }
+      finally {
+        previewSemaphore.Release();
+      }
+    }
+    return classified;
+  });
+  return [.. await Task.WhenAll(itemTasks)];
 }
 
 static string GetString(JsonElement item, string property) {

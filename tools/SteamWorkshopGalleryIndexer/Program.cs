@@ -131,12 +131,33 @@ static List<GalleryRecord> ReadGalleryRecords(string? path) {
   var records = new List<GalleryRecord>();
   while (reader.ReadLine() is { } line) {
     if (!string.IsNullOrWhiteSpace(line)) {
-      records.Add(
-          JsonSerializer.Deserialize<GalleryRecord>(line)
-              ?? throw new InvalidDataException("Gallery record could not be deserialized."));
+      var record = JsonSerializer.Deserialize<GalleryRecord>(line)
+          ?? throw new InvalidDataException("Gallery record could not be deserialized.");
+      records.Add(SanitizeGalleryRecord(record));
     }
   }
   return records;
+}
+
+static GalleryRecord SanitizeGalleryRecord(GalleryRecord record) {
+  var validUrls = record.GalleryUrls
+      .Where(IsValidGalleryUrl)
+      .Distinct(StringComparer.Ordinal)
+      .ToList();
+  var removedCount = record.GalleryUrls.Count - validUrls.Count;
+  if (removedCount == 0) {
+    return record;
+  }
+
+  Console.Error.WriteLine(
+      $"Discarded {removedCount} invalid cached gallery URLs for {record.PublishedFileId}; scheduling refresh.");
+  var imagesFound = Math.Max(validUrls.Count, record.GalleryImagesFound - removedCount);
+  return record with {
+    GalleryUrls = validUrls,
+    GalleryImagesFound = imagesFound,
+    GalleryTruncated = imagesFound > validUrls.Count,
+    CollectionState = "stale",
+  };
 }
 
 static Stream OpenRead(string path) {
@@ -229,7 +250,8 @@ static Dictionary<string, List<string>> QueryAdditionalPreviews(IReadOnlyCollect
       for (uint previewIndex = 0; previewIndex < previewCount; previewIndex++) {
         if (SteamGameServerUGC.GetQueryUGCAdditionalPreview(
                 query, itemIndex, previewIndex, out var url, 4096, out _, 1024, out var previewType)
-            && previewType == EItemPreviewType.k_EItemPreviewType_Image) {
+            && previewType == EItemPreviewType.k_EItemPreviewType_Image
+            && IsValidGalleryUrl(url)) {
           var normalized = NormalizeGalleryUrl(url);
           if (!urls.Contains(normalized, StringComparer.Ordinal)) {
             urls.Add(normalized);
@@ -243,6 +265,12 @@ static Dictionary<string, List<string>> QueryAdditionalPreviews(IReadOnlyCollect
   finally {
     SteamGameServerUGC.ReleaseQueryUGCRequest(query);
   }
+}
+
+static bool IsValidGalleryUrl(string value) {
+  return Uri.TryCreate(value, UriKind.Absolute, out var uri)
+      && uri.Scheme == Uri.UriSchemeHttps
+      && uri.Host.Equals("images.steamusercontent.com", StringComparison.OrdinalIgnoreCase);
 }
 
 static string NormalizeGalleryUrl(string value) {

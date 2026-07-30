@@ -43,8 +43,10 @@ dotnet tools/SteamWorkshopIndexer/bin/Release/net8.0/SteamWorkshopIndexer.dll `
   --start-page 1 --max-pages 40 --append
 ```
 
-The public browse page currently contains 30 results per page. The crawler reads Steam's embedded public
-`total_count` value and stops after the final page. It also stops when a page yields no new IDs.
+The crawler requests 50 results per browse page through Steam's supported `num_per_page=50` parameter, reads the
+embedded public `total_count` value, and stops after the final page. It also stops when a page yields no new IDs.
+Browse IDs are accumulated across pages and resolved through `GetPublishedFileDetails` in batches of up to 100, reducing
+the number of metadata requests without increasing the number of Workshop items processed.
 
 ## Disk and request controls
 
@@ -67,6 +69,6 @@ Other useful options:
 This is a bootstrap/full-refresh job. A later incremental layer can stop after a stable overlap window because browse
 results are ordered by last update, but that optimization is intentionally outside the current contract.
 
-Additional gallery screenshots are not returned by the anonymous batch details endpoint. The scheduled search-index
-workflow collects their URLs separately with `tools/TimberbornMapPreviewClassifier/collect_gallery.py`. That collector
-uses bounded, delayed public item-page requests and carries its published state between runs.
+Additional gallery screenshots are not returned by this anonymous HTTP details endpoint. The scheduled search-index
+workflow collects their URLs separately with `tools/SteamWorkshopGalleryIndexer` through anonymous, bounded Steam UGC
+batch queries and carries its published state between runs.
