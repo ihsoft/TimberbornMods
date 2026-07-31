@@ -11,6 +11,9 @@ from pathlib import Path
 import shutil
 
 
+PUBLIC_SCHEMA_VERSION = 1
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--snapshot", required=True)
@@ -118,6 +121,7 @@ def main() -> int:
         for item in workshop_items
     )
     manifest = {
+        "schema_version": PUBLIC_SCHEMA_VERSION,
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "source": "public-steam-workshop-http-and-anonymous-ugc",
         "workshop_items": len(workshop_items),

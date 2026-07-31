@@ -136,6 +136,9 @@ only `map_metadata.json` from each `.timber` archive. Exact `map_width` and `map
 `map-metadata.jsonl.gz` and merged into the search index. Records are reused until the Workshop item's update timestamp
 changes, so scheduled runs progressively backfill missing dimensions without repeatedly downloading unchanged maps.
 
+Frontend and other data consumers should use the versioned contract in
+[`PUBLIC-DATA-CONTRACT.md`](PUBLIC-DATA-CONTRACT.md).
+
 The daily gallery pass processes at most 250 maps in up to three sequential UGC requests, with a short delay between
 batches. This bound controls new image downloads and CPU classification cost rather than Steam HTML throttling. The
 pass checks changed or previously failed items first, backfills recent unknown items next, and refreshes known galleries
