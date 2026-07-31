@@ -17,9 +17,10 @@ Keep the existing native safety checks. Unity project lockfiles/process checks a
 non-participating processes and low-level collisions; repository coordination prevents the higher-level race between
 otherwise valid checks and commands.
 
-## Standalone Steamworks.NET Tools
+## Authenticated Standalone Steamworks.NET Tools
 
-Treat a standalone Steamworks.NET CLI as a repository tool, not as the Timberborn game process.
+For a standalone Steamworks.NET CLI that uses the logged-in Steam client, treat the CLI as a repository tool, not as
+the Timberborn game process.
 
 - Require a running, logged-in Steam client before calling Steamworks APIs.
 - Set both `SteamAppId` and `SteamGameId` to the intended application ID before `SteamAPI.Init()` so the tool does not
@@ -31,3 +32,14 @@ Treat a standalone Steamworks.NET CLI as a repository tool, not as the Timberbor
 Successful Steamworks initialization does not authorize Workshop changes. Read-only tools must remain read-only, and
 tools that mutate Steam state still require the explicit user authorization and release or publishing gates applicable
 to that operation.
+
+## Anonymous Workshop Gallery Indexing
+
+`SteamWorkshopGalleryIndexer` is intentionally not an authenticated Steam-client CLI. It uses an ephemeral anonymous
+Steam game-server session and `SteamGameServerUGC` to read public gallery image URLs. Do not apply the logged-in-client
+initialization contract above to this tool.
+
+Keep this path read-only, account-independent, and non-game-launching. It must not require a Steam account, client
+login, API key, repository secret, local Steam client, or Timberborn process, and it must not download Workshop package
+contents. Follow `docs/agent-knowledge/Timberborn-Workshop-Search-Index-Operational-Knowledge-v1.md` before changing
+this tool, its pipeline, published data, or consumers.
