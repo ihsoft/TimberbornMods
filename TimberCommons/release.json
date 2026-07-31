@@ -25,5 +25,8 @@
       "MinimumGameVersion": "1.1.0.0",
       "MaximumGameVersion": "1.1.99.99"
     }
+  },
+  "Steam": {
+    "PublishedFileId": "3337906807"
   }
 }

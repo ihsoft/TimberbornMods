@@ -42,50 +42,9 @@ function Test-SelectedMod([string] $Name) {
 }
 
 function Get-SteamDescriptionTargets() {
-    $targets = @(
-        [pscustomobject]@{
-            ModName = "Automation"
-            PublishedFileId = "3324234282"
-            LocalPath = "Automation/workshop/description.txt"
-        },
-        [pscustomobject]@{
-            ModName = "AutomationForModdableWeather"
-            PublishedFileId = "3562952077"
-            LocalPath = "AutomationForModdableWeather/workshop/description.txt"
-        },
-        [pscustomobject]@{
-            ModName = "CustomTools"
-            PublishedFileId = "3619414212"
-            LocalPath = "CustomTools/Workshop/Description.html"
-        },
-        [pscustomobject]@{
-            ModName = "SmartPower"
-            PublishedFileId = "3305038022"
-            LocalPath = "SmartPower/workshop/description.txt"
-        },
-        [pscustomobject]@{
-            ModName = "TimberCommons"
-            PublishedFileId = "3337906807"
-            LocalPath = "TimberCommons/workshop/description.txt"
-        },
-        [pscustomobject]@{
-            ModName = "XRay"
-            PublishedFileId = "3741998343"
-            LocalPath = "XRay/workshop/description.txt"
-        }
-    )
-
-    $knownModNames = @{}
-    foreach ($target in $targets) {
-        $knownModNames[$target.ModName] = $true
-    }
-
+    $targets = @()
     foreach ($releaseConfigPath in Get-ChildItem -LiteralPath $repoRoot -Recurse -Filter "release.json") {
         $targetModName = Split-Path -Leaf (Split-Path -Parent $releaseConfigPath.FullName)
-        if ($knownModNames.ContainsKey($targetModName)) {
-            continue
-        }
-
         $releaseConfig = Get-Content -Raw -LiteralPath $releaseConfigPath.FullName | ConvertFrom-Json
         if ($null -eq $releaseConfig.Steam -or [string]::IsNullOrWhiteSpace([string]$releaseConfig.Steam.PublishedFileId)) {
             continue
@@ -119,9 +78,6 @@ function Get-ModIoDescriptionTargets() {
         }
 
         $localPath = "$targetModName/workshop/description-ModIO.html"
-        if ($targetModName -eq "CustomTools") {
-            $localPath = "CustomTools/Workshop/ModIO-Description.html"
-        }
 
         [pscustomobject]@{
             ModName = $targetModName

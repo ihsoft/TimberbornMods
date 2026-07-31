@@ -37,9 +37,6 @@ function Get-VisibleHtmlText([string] $Html) {
 }
 
 function Get-LocalDescriptionPath([string] $Name) {
-    if ($Name -eq "CustomTools") {
-        return "CustomTools/Workshop/ModIO-Description.html"
-    }
     return "$Name/workshop/description-ModIO.html"
 }
 

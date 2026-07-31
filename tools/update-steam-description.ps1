@@ -30,41 +30,6 @@ function Normalize-SteamDescription([string] $Text) {
     return (($Text -replace "`r`n", "`n") -replace "`r", "`n").TrimEnd()
 }
 
-function Get-SteamDescriptionTargets() {
-    return @{
-        Automation = [pscustomobject]@{
-            PublishedFileId = "3324234282"
-            Title = "Advanced Automation"
-            LocalPath = "Automation/workshop/description.txt"
-        }
-        AutomationForModdableWeather = [pscustomobject]@{
-            PublishedFileId = "3562952077"
-            Title = "Automation+ModdableWeather"
-            LocalPath = "AutomationForModdableWeather/workshop/description.txt"
-        }
-        CustomTools = [pscustomobject]@{
-            PublishedFileId = "3619414212"
-            Title = "CustomTools"
-            LocalPath = "CustomTools/Workshop/Description.html"
-        }
-        SmartPower = [pscustomobject]@{
-            PublishedFileId = "3305038022"
-            Title = "SmartPower"
-            LocalPath = "SmartPower/workshop/description.txt"
-        }
-        TimberCommons = [pscustomobject]@{
-            PublishedFileId = "3337906807"
-            Title = "TimberCommons"
-            LocalPath = "TimberCommons/workshop/description.txt"
-        }
-        XRay = [pscustomobject]@{
-            PublishedFileId = "3741998343"
-            Title = "X-Ray"
-            LocalPath = "XRay/workshop/description.txt"
-        }
-    }
-}
-
 function Get-SteamDescriptionTargetFromReleaseConfig([string] $Name) {
     $releaseConfigPath = Resolve-RepoPath "$Name/release.json"
     if (-not (Test-Path -LiteralPath $releaseConfigPath)) {
@@ -199,17 +164,11 @@ function Get-SteamDescription([string] $PublishedFileId) {
     return [string]$item.description
 }
 
-$targets = Get-SteamDescriptionTargets
-if (-not $targets.ContainsKey($ModName)) {
-    $releaseConfigTarget = Get-SteamDescriptionTargetFromReleaseConfig $ModName
-    if ($null -eq $releaseConfigTarget) {
-        throw "Unsupported mod for Steam description update: $ModName"
-    }
-
-    $targets[$ModName] = $releaseConfigTarget
+$target = Get-SteamDescriptionTargetFromReleaseConfig $ModName
+if ($null -eq $target) {
+    throw "Steam description metadata is incomplete for $ModName. Expected release.json with Steam.PublishedFileId and workshop/description.txt."
 }
 
-$target = $targets[$ModName]
 $localPath = Resolve-RepoPath $target.LocalPath
 Assert-PathExists $localPath "Local Steam description"
 
