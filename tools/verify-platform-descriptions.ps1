@@ -42,7 +42,7 @@ function Test-SelectedMod([string] $Name) {
 }
 
 function Get-SteamDescriptionTargets() {
-    return @(
+    $targets = @(
         [pscustomobject]@{
             ModName = "Automation"
             PublishedFileId = "3324234282"
@@ -73,7 +73,37 @@ function Get-SteamDescriptionTargets() {
             PublishedFileId = "3741998343"
             LocalPath = "XRay/workshop/description.txt"
         }
-    ) | Where-Object { Test-SelectedMod $_.ModName }
+    )
+
+    $knownModNames = @{}
+    foreach ($target in $targets) {
+        $knownModNames[$target.ModName] = $true
+    }
+
+    foreach ($releaseConfigPath in Get-ChildItem -LiteralPath $repoRoot -Recurse -Filter "release.json") {
+        $targetModName = Split-Path -Leaf (Split-Path -Parent $releaseConfigPath.FullName)
+        if ($knownModNames.ContainsKey($targetModName)) {
+            continue
+        }
+
+        $releaseConfig = Get-Content -Raw -LiteralPath $releaseConfigPath.FullName | ConvertFrom-Json
+        if ($null -eq $releaseConfig.Steam -or [string]::IsNullOrWhiteSpace([string]$releaseConfig.Steam.PublishedFileId)) {
+            continue
+        }
+
+        $localPath = "$targetModName/workshop/description.txt"
+        if (-not (Test-Path -LiteralPath (Resolve-RepoPath $localPath))) {
+            continue
+        }
+
+        $targets += [pscustomobject]@{
+            ModName = $targetModName
+            PublishedFileId = [string]$releaseConfig.Steam.PublishedFileId
+            LocalPath = $localPath
+        }
+    }
+
+    return $targets | Where-Object { Test-SelectedMod $_.ModName }
 }
 
 function Get-ModIoDescriptionTargets() {

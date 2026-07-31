@@ -65,6 +65,41 @@ function Get-SteamDescriptionTargets() {
     }
 }
 
+function Get-SteamDescriptionTargetFromReleaseConfig([string] $Name) {
+    $releaseConfigPath = Resolve-RepoPath "$Name/release.json"
+    if (-not (Test-Path -LiteralPath $releaseConfigPath)) {
+        return $null
+    }
+
+    $releaseConfig = Get-Content -Raw -LiteralPath $releaseConfigPath | ConvertFrom-Json
+    if ($null -eq $releaseConfig.Steam -or [string]::IsNullOrWhiteSpace([string]$releaseConfig.Steam.PublishedFileId)) {
+        return $null
+    }
+
+    $localPath = "$Name/workshop/description.txt"
+    $resolvedLocalPath = Resolve-RepoPath $localPath
+    if (-not (Test-Path -LiteralPath $resolvedLocalPath)) {
+        return $null
+    }
+
+    $title = $Name
+    if (-not [string]::IsNullOrWhiteSpace([string]$releaseConfig.ManifestPath)) {
+        $manifestPath = Resolve-RepoPath ([string]$releaseConfig.ManifestPath)
+        if (Test-Path -LiteralPath $manifestPath) {
+            $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
+            if (-not [string]::IsNullOrWhiteSpace([string]$manifest.Name)) {
+                $title = [string]$manifest.Name
+            }
+        }
+    }
+
+    return [pscustomobject]@{
+        PublishedFileId = [string]$releaseConfig.Steam.PublishedFileId
+        Title = $title
+        LocalPath = $localPath
+    }
+}
+
 function Read-SteamConfig([string] $Path) {
     if ([string]::IsNullOrWhiteSpace($Path)) {
         $Path = Resolve-RepoPath ".tools/steam/steam.local.json"
@@ -166,7 +201,12 @@ function Get-SteamDescription([string] $PublishedFileId) {
 
 $targets = Get-SteamDescriptionTargets
 if (-not $targets.ContainsKey($ModName)) {
-    throw "Unsupported mod for Steam description update: $ModName"
+    $releaseConfigTarget = Get-SteamDescriptionTargetFromReleaseConfig $ModName
+    if ($null -eq $releaseConfigTarget) {
+        throw "Unsupported mod for Steam description update: $ModName"
+    }
+
+    $targets[$ModName] = $releaseConfigTarget
 }
 
 $target = $targets[$ModName]
