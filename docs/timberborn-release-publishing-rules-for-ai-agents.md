@@ -528,7 +528,19 @@ release.
 
 ## Platform descriptions
 
-Local files under a mod's `Workshop` directory are the expected source for published platform descriptions.
+For publishable mods, the mod's `release.json` is the tracked source for release-discoverable platform identity such as
+`Steam.PublishedFileId`. Keep platform-description tooling driven by release configs and local platform configs instead
+of hardcoded mod registries or copied Steam ID tables.
+
+Local files under a mod's `Workshop` directory are the expected source for published platform descriptions. Use the
+standard description paths:
+
+```text
+<ModName>/workshop/description.txt
+<ModName>/workshop/description-ModIO.html
+```
+
+Do not add per-mod description path exceptions when a mod can instead be moved to the common file names.
 
 Do not apply these rules to mods explicitly known as dead, unpublished, or kept only for reference. In this repository,
 `TimberUI` is a dead mod kept only for reference; it does not build and must be excluded from release and platform
