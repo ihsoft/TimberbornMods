@@ -20,6 +20,13 @@ if (initResult != ESteamAPIInitResult.k_ESteamAPIInitResult_OK) {
 
 try {
   ConnectAnonymously(options.Timeout);
+  var workshopDirectory = Path.GetFullPath("workshop-content");
+  Directory.CreateDirectory(workshopDirectory);
+  if (!SteamGameServerUGC.BInitWorkshopForGameServer(new DepotId_t(appId), workshopDirectory)) {
+    throw new InvalidOperationException("Steam rejected the explicit game-server Workshop directory.");
+  }
+  Console.WriteLine($"Initialized the game-server Workshop cache at {workshopDirectory}.");
+
   var details = QueryDetails(publishedFileId, options.Timeout);
   Console.WriteLine(
       $"Workshop item {options.PublishedFileId}: {details.m_rgchTitle}; declared size {details.m_nFileSize} bytes.");
