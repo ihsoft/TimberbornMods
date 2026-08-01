@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using IgorZ.TimberDev.UI;
 using Timberborn.CoreUI;
 using Timberborn.MapItemsUI;
 using Timberborn.MapThumbnail;
+using Timberborn.TooltipSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -19,17 +21,18 @@ sealed class MapBrowserDialog : AbstractDialog {
   readonly MapItemProvider _mapItemProvider;
   readonly MapThumbnailCache _mapThumbnailCache;
   readonly WorkshopMetadataService _metadataService;
+  readonly ITooltipRegistrar _tooltipRegistrar;
   readonly List<InstalledMap> _maps = [];
 
   ListView _list;
-  Label _status;
 
   MapBrowserDialog(
       MapItemProvider mapItemProvider, MapThumbnailCache mapThumbnailCache,
-      WorkshopMetadataService metadataService) {
+      WorkshopMetadataService metadataService, ITooltipRegistrar tooltipRegistrar) {
     _mapItemProvider = mapItemProvider;
     _mapThumbnailCache = mapThumbnailCache;
     _metadataService = metadataService;
+    _tooltipRegistrar = tooltipRegistrar;
   }
 
   protected override string DialogResourceName => DialogAsset;
@@ -48,7 +51,6 @@ sealed class MapBrowserDialog : AbstractDialog {
     }
 
     base.Show();
-    _status = Root.Q2<Label>("Status");
     _list = Root.Q2<ListView>("InstalledMapsList");
     _list.itemsSource = _maps;
     _list.makeItem = CreateMapRow;
@@ -58,7 +60,6 @@ sealed class MapBrowserDialog : AbstractDialog {
     RefreshMaps();
     _metadataService.MetadataChanged += OnMetadataChanged;
     _metadataService.EnsureLoaded();
-    UpdateStatus();
   }
 
   public override void Close() {
@@ -67,7 +68,6 @@ sealed class MapBrowserDialog : AbstractDialog {
     }
     _metadataService.MetadataChanged -= OnMetadataChanged;
     _list = null;
-    _status = null;
     _maps.Clear();
     base.Close();
   }
@@ -75,7 +75,7 @@ sealed class MapBrowserDialog : AbstractDialog {
   VisualElement CreateMapRow() {
     var row = new NineSliceVisualElement {
         style = {
-            minHeight = PreviewHeight,
+            height = PreviewHeight,
             flexDirection = FlexDirection.Row,
             marginBottom = 8,
             paddingTop = 8,
@@ -85,6 +85,9 @@ sealed class MapBrowserDialog : AbstractDialog {
         },
     };
     row.AddToClassList("bg-sub-box--green");
+    row.AddToClassList("list-view__item-background");
+    var binding = new RowBinding();
+    row.userData = binding;
     var preview = new Image {
         name = "Preview",
         scaleMode = ScaleMode.ScaleToFit,
@@ -95,25 +98,45 @@ sealed class MapBrowserDialog : AbstractDialog {
             marginRight = 14,
         },
     };
-    var textColumn = new VisualElement { style = { flexGrow = 1 } };
+    var textColumn = new VisualElement {
+        style = { flexGrow = 1, height = PreviewHeight, overflow = Overflow.Hidden },
+    };
     var title = new Label { name = "Title", style = { fontSize = 19, unityFontStyleAndWeight = FontStyle.Bold } };
     title.AddToClassList("text--default");
     textColumn.Add(title);
-    var description = new Label {
-        name = "Description",
+    var analysis = new Label {
+        name = "Analysis",
+        style = {
+            whiteSpace = WhiteSpace.Normal,
+            marginTop = 2,
+            fontSize = 13,
+            color = new Color(0.72f, 0.76f, 0.72f),
+        },
+    };
+    analysis.AddToClassList("text--default");
+    _tooltipRegistrar.Register(analysis, () => binding.Tooltip);
+    textColumn.Add(analysis);
+    var freshness = new Label {
+        name = "Freshness",
         style = { whiteSpace = WhiteSpace.Normal, marginTop = 3 },
     };
-    description.AddToClassList("text--default");
-    textColumn.Add(description);
-    var metadata = new Label {
-        name = "Metadata",
-        style = { whiteSpace = WhiteSpace.Normal, marginTop = 6 },
+    freshness.AddToClassList("text--default");
+    textColumn.Add(freshness);
+    var description = new Label {
+        name = "Description",
+        style = {
+            whiteSpace = WhiteSpace.Normal,
+            marginTop = 4,
+            flexGrow = 1,
+            flexShrink = 1,
+            overflow = Overflow.Hidden,
+        },
     };
-    metadata.AddToClassList("text--default");
-    textColumn.Add(metadata);
+    description.AddToClassList("text--default");
+    description.RegisterCallback<GeometryChangedEvent>(_ => FitDescription(description, binding.Description));
+    textColumn.Add(description);
     row.Add(preview);
     row.Add(textColumn);
-    row.userData = new RowBinding();
     return row;
   }
 
@@ -122,11 +145,20 @@ sealed class MapBrowserDialog : AbstractDialog {
     var binding = (RowBinding)row.userData;
     binding.Key = installedMap.Key;
     var metadata = _metadataService.Find(installedMap.PublishedFileId);
-    var title = metadata?.Title ?? installedMap.Map.DisplayName;
+    var title = GetDisplayTitle(installedMap);
     var description = metadata?.DescriptionPlain ?? installedMap.Map.DisplayDescription;
-    row.Q<Label>("Title").text = title;
-    row.Q<Label>("Description").text = string.IsNullOrWhiteSpace(description) ? "No description" : description;
-    row.Q<Label>("Metadata").text = FormatMetadata(installedMap, metadata);
+    row.Q<Label>("Title").text = $"{title} ({GetMapSize(installedMap)})";
+    var descriptionLabel = row.Q<Label>("Description");
+    binding.Description = string.IsNullOrWhiteSpace(description) ? "No description" : NormalizeDescription(description);
+    descriptionLabel.text = binding.Description;
+    descriptionLabel.schedule.Execute(() => FitDescription(descriptionLabel, binding.Description));
+    var analysis = row.Q<Label>("Analysis");
+    analysis.text = metadata != null ? FormatCompactAnalysis(metadata) : string.Empty;
+    analysis.ToggleDisplayStyle(metadata != null);
+    binding.Tooltip = metadata != null ? FormatAnalysisTooltip(metadata) : null;
+    var freshness = row.Q<Label>("Freshness");
+    freshness.text = FormatFreshness(installedMap, metadata);
+    freshness.ToggleDisplayStyle(installedMap.PublishedFileId != null && (metadata == null || metadata.VisualStale));
 
     var preview = row.Q<Image>("Preview");
     preview.image = _mapThumbnailCache.GetThumbnail(installedMap.Map.MapFileReference);
@@ -143,63 +175,146 @@ sealed class MapBrowserDialog : AbstractDialog {
   void RefreshMaps() {
     _maps.Clear();
     _maps.AddRange(_mapItemProvider.GetCustomMaps()
-        .Select(map => new InstalledMap(map, FindPublishedFileId(map.MapFileReference.Path)))
-        .OrderBy(map => map.Map.DisplayName, StringComparer.OrdinalIgnoreCase));
+        .Select(map => new InstalledMap(map, FindPublishedFileId(map.MapFileReference.Path))));
+    SortMaps();
     _list?.RefreshItems();
   }
 
   void OnMetadataChanged() {
-    UpdateStatus();
-    _list?.RefreshItems();
+    SortMaps();
+    _list?.Rebuild();
   }
 
-  void UpdateStatus() {
-    if (_status == null) {
-      return;
-    }
-    var steamMaps = _maps.Count(map => map.PublishedFileId != null);
-    var matchedMaps = _maps.Count(map => _metadataService.Find(map.PublishedFileId) != null);
-    var suffix = _metadataService.Loading
-        ? " Loading public Workshop metadata..."
-        : _metadataService.Error != null ? $" Workshop metadata unavailable: {_metadataService.Error}" : string.Empty;
-    _status.text = $"Maps: {_maps.Count}; Steam installations: {steamMaps}; matched metadata: {matchedMaps}.{suffix}";
+  void SortMaps() {
+    _maps.Sort((left, right) => StringComparer.OrdinalIgnoreCase.Compare(
+        GetDisplayTitle(left), GetDisplayTitle(right)));
   }
 
-  static string FormatMetadata(InstalledMap installedMap, WorkshopItemMetadata metadata) {
-    var size = installedMap.Map.Size is { } mapSize ? $"{mapSize.x}x{mapSize.y}" : "unknown";
-    if (metadata == null) {
-      var source = installedMap.PublishedFileId == null ? "local user map" : $"Steam {installedMap.PublishedFileId}";
-      return $"Source: {source} | Size: {size} | Path: {installedMap.Map.MapFileReference.Path}";
-    }
+  string GetDisplayTitle(InstalledMap installedMap) {
+    return _metadataService.Find(installedMap.PublishedFileId)?.Title ?? installedMap.Map.DisplayName;
+  }
 
-    var categories = string.Join(", ", metadata.Categories.Select(category =>
-        $"{category.Category}:{category.Score} [{string.Join(", ", category.Evidence)}]"));
-    var visualFeatures = string.Join(", ", metadata.VisualPercentiles.OrderBy(feature => feature.Key).Select(feature =>
-        $"{feature.Key}={feature.Value:0.000} (raw {GetVisualScore(metadata, feature.Key):0.000})"));
+  static string GetMapSize(InstalledMap installedMap) {
+    return installedMap.Map.Size is { } mapSize ? $"{mapSize.x}x{mapSize.y}" : "unknown";
+  }
+
+  static string FormatCompactAnalysis(WorkshopItemMetadata metadata) {
+    var terrain = GetVisualLevel(
+        metadata, "ruggedness", "Flat", "Mostly flat", "Mixed", "Rugged", "Mountainous");
+    var valleys = GetVisualLevel(
+        metadata, "canyonness", "Open", "Mostly open", "Mixed", "Narrow valleys", "Canyons");
+    var water = GetVisualLevel(
+        metadata, "water_dominance", "Dry", "Little water", "Moderate water", "Water-rich", "Water-dominated");
+    var forests = GetVisualLevel(
+        metadata, "forest_density", "Barren", "Sparse", "Moderate forests", "Forested", "Dense forest");
+    var landform = GetVisualLevel(
+        metadata, "islandness", "Mainland", "Mostly connected", "Mixed", "Fragmented", "Islands");
+    var layout = GetVisualLevel(
+        metadata, "artificial_layout", "Natural", "Mostly natural", "Mixed", "Structured", "Geometric");
+    return $"Terrain: {terrain}, {valleys}, {water}, {forests} | Landform: {landform} | Layout: {layout}";
+  }
+
+  static string FormatAnalysisTooltip(WorkshopItemMetadata metadata) {
+    var terrain = GetVisualLevel(
+        metadata, "ruggedness", "Flat", "Mostly flat", "Mixed", "Rugged", "Mountainous");
+    var valleys = GetVisualLevel(
+        metadata, "canyonness", "Open", "Mostly open", "Mixed", "Narrow valleys", "Canyons");
+    var water = GetVisualLevel(
+        metadata, "water_dominance", "Dry", "Little water", "Moderate water", "Water-rich", "Water-dominated");
+    var landform = GetVisualLevel(
+        metadata, "islandness", "Mainland", "Mostly connected", "Mixed", "Fragmented", "Islands");
+    var forests = GetVisualLevel(
+        metadata, "forest_density", "Barren", "Sparse", "Moderate forests", "Forested", "Dense forest");
+    var layout = GetVisualLevel(
+        metadata, "artificial_layout", "Natural", "Mostly natural", "Mixed", "Structured", "Geometric");
     var builder = new StringBuilder();
-    builder.Append($"Steam ID: {metadata.PublishedFileId} | Creator: {metadata.CreatorSteamId} | Size: {size}");
-    builder.Append($" | Votes: +{metadata.VotesUp}/-{metadata.VotesDown} | Score: {metadata.Score:0.###}");
-    builder.Append($"\nCreated: {metadata.CreatedAtUtc:u} | Updated: {metadata.UpdatedAtUtc:u}");
-    builder.Append($" | Primary: {metadata.PrimaryCategory} | Tags: {string.Join(", ", metadata.Tags)}");
-    if (categories.Length > 0) {
-      builder.Append($" | Categories: {categories}");
-    }
-    if (visualFeatures.Length > 0) {
-      builder.Append($"\nVisual: {visualFeatures} | Labels: {string.Join(", ", metadata.VisualLabels)}");
-      builder.Append($" | Images: {metadata.VisualImageCount} ({metadata.VisualGalleryImageCount} gallery, ");
-      builder.Append($"{metadata.VisualMissingImageCount} missing) | Stale: {metadata.VisualStale}");
-    }
-    if (metadata.GalleryUrls.Count > 0 || metadata.GalleryCollectionState != null) {
-      builder.Append($"\nGallery: {metadata.GalleryCollectionState}; {metadata.GalleryUrls.Count} images");
-      if (metadata.GalleryCheckedAtUtc.HasValue) {
-        builder.Append($"; checked {metadata.GalleryCheckedAtUtc.Value:u}");
-      }
-    }
+    builder.AppendLine("Our analysis");
+    builder.AppendLine($"Terrain: {terrain}");
+    builder.AppendLine($"Valleys: {valleys}");
+    builder.AppendLine($"Water: {water}");
+    builder.AppendLine($"Landform: {landform}");
+    builder.AppendLine($"Forests: {forests}");
+    builder.AppendLine($"Layout: {layout}");
+    builder.Append($"Based on {metadata.VisualImageCount} Workshop "
+        + (metadata.VisualImageCount == 1 ? "image" : "images"));
     return builder.ToString();
   }
 
-  static float GetVisualScore(WorkshopItemMetadata metadata, string feature) {
-    return metadata.VisualScores.TryGetValue(feature, out var score) ? score : 0;
+  static string GetVisualLevel(
+      WorkshopItemMetadata metadata, string feature, string veryLow, string low, string middle, string high,
+      string veryHigh) {
+    if (!metadata.VisualPercentiles.TryGetValue(feature, out var percentile)) {
+      return "Unknown";
+    }
+    return percentile switch {
+        < 0.2f => veryLow,
+        < 0.4f => low,
+        < 0.6f => middle,
+        < 0.8f => high,
+        _ => veryHigh,
+    };
+  }
+
+  static void FitDescription(Label label, string fullText) {
+    if (string.IsNullOrEmpty(fullText) || label.contentRect.width <= 0 || label.contentRect.height <= 0) {
+      return;
+    }
+    if (MeasureTextHeight(label, fullText) <= label.contentRect.height) {
+      if (label.text != fullText) {
+        label.text = fullText;
+      }
+      return;
+    }
+
+    var low = 0;
+    var high = fullText.Length;
+    while (low < high) {
+      var middle = (low + high + 1) / 2;
+      var candidate = fullText[..middle].TrimEnd() + "…";
+      if (MeasureTextHeight(label, candidate) <= label.contentRect.height) {
+        low = middle;
+      } else {
+        high = middle - 1;
+      }
+    }
+
+    var length = low;
+    while (length > 0 && !char.IsWhiteSpace(fullText[length - 1])) {
+      length--;
+    }
+    if (length == 0) {
+      length = low;
+    }
+    var fittedText = fullText[..length].TrimEnd() + "…";
+    if (label.text != fittedText) {
+      label.text = fittedText;
+    }
+  }
+
+  static string NormalizeDescription(string description) {
+    return Regex.Replace(description, @"\s+", " ").Trim();
+  }
+
+  static float MeasureTextHeight(Label label, string text) {
+    return label.MeasureTextSize(
+        text, label.contentRect.width, VisualElement.MeasureMode.Exactly,
+        0, VisualElement.MeasureMode.Undefined).y;
+  }
+
+  string FormatFreshness(InstalledMap installedMap, WorkshopItemMetadata metadata) {
+    if (metadata?.VisualStale == true) {
+      return "Freshness warning: The analysis above describes previously indexed images; the current Workshop "
+          + "images have changed and could not be reclassified yet.";
+    }
+    if (metadata != null || installedMap.PublishedFileId == null) {
+      return string.Empty;
+    }
+
+    var snapshot = _metadataService.IndexGeneratedAtUtc.HasValue
+        ? _metadataService.IndexGeneratedAtUtc.Value.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss 'UTC'")
+        : "unknown";
+    return $"Freshness: This map is not included in the latest index snapshot ({snapshot}). Analysis will become "
+        + "available after a later refresh.";
   }
 
   static string FindPublishedFileId(string mapPath) {
@@ -221,5 +336,7 @@ sealed class MapBrowserDialog : AbstractDialog {
 
   sealed class RowBinding {
     public string Key { get; set; }
+    public string Tooltip { get; set; }
+    public string Description { get; set; }
   }
 }

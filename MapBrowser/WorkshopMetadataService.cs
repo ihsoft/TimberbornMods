@@ -14,12 +14,14 @@ namespace IgorZ.MapBrowser;
 
 sealed class WorkshopMetadataService : IUnloadableSingleton, IUpdatableSingleton {
   const string MetadataUrl = "https://ihsoft.github.io/TimberbornMods/search-index.jsonl.gz";
+  const string ManifestUrl = "https://ihsoft.github.io/TimberbornMods/manifest.json";
 
   readonly Dictionary<string, WorkshopItemMetadata> _items = [];
   readonly Dictionary<string, Texture2D> _previewCache = [];
   readonly Dictionary<string, PreviewDownload> _previewDownloads = [];
 
   UnityWebRequest _metadataRequest;
+  UnityWebRequest _manifestRequest;
   Task<Dictionary<string, WorkshopItemMetadata>> _parseTask;
 
   public event Action MetadataChanged;
@@ -27,6 +29,8 @@ sealed class WorkshopMetadataService : IUnloadableSingleton, IUpdatableSingleton
   public bool Loading { get; private set; }
 
   public string Error { get; private set; }
+
+  public DateTimeOffset? IndexGeneratedAtUtc { get; private set; }
 
   public void EnsureLoaded() {
     if (Loading || _items.Count > 0 || Error != null) {
@@ -37,6 +41,8 @@ sealed class WorkshopMetadataService : IUnloadableSingleton, IUpdatableSingleton
     _metadataRequest = UnityWebRequest.Get(MetadataUrl);
     var operation = _metadataRequest.SendWebRequest();
     operation.completed += _ => CompleteMetadataRequest();
+    _manifestRequest = UnityWebRequest.Get(ManifestUrl);
+    _manifestRequest.SendWebRequest().completed += _ => CompleteManifestRequest();
   }
 
   public WorkshopItemMetadata Find(string publishedFileId) {
@@ -84,6 +90,8 @@ sealed class WorkshopMetadataService : IUnloadableSingleton, IUpdatableSingleton
   public void Unload() {
     _metadataRequest?.Abort();
     _metadataRequest?.Dispose();
+    _manifestRequest?.Abort();
+    _manifestRequest?.Dispose();
     foreach (var download in _previewDownloads.Values) {
       download.Request.Abort();
       download.Request.Dispose();
@@ -94,6 +102,23 @@ sealed class WorkshopMetadataService : IUnloadableSingleton, IUpdatableSingleton
     _previewDownloads.Clear();
     _previewCache.Clear();
     _items.Clear();
+  }
+
+  void CompleteManifestRequest() {
+    try {
+      if (_manifestRequest.result == UnityWebRequest.Result.Success) {
+        var manifest = JsonConvert.DeserializeObject<PublicIndexManifest>(_manifestRequest.downloadHandler.text);
+        IndexGeneratedAtUtc = manifest?.GeneratedAtUtc;
+        MetadataChanged?.Invoke();
+      } else {
+        Debug.LogWarning($"MapBrowser: could not load Workshop index manifest: {_manifestRequest.error}");
+      }
+    } catch (Exception exception) {
+      Debug.LogWarning($"MapBrowser: could not parse Workshop index manifest: {exception}");
+    } finally {
+      _manifestRequest.Dispose();
+      _manifestRequest = null;
+    }
   }
 
   void CompleteMetadataRequest() {
@@ -149,5 +174,10 @@ sealed class WorkshopMetadataService : IUnloadableSingleton, IUpdatableSingleton
 
     public UnityWebRequest Request { get; }
     public List<Action<Texture2D>> Callbacks { get; } = [];
+  }
+
+  sealed class PublicIndexManifest {
+    [JsonProperty("generated_at_utc")]
+    public DateTimeOffset GeneratedAtUtc { get; set; }
   }
 }
