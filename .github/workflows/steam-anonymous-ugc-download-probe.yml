@@ -1,0 +1,59 @@
+name: Probe anonymous Steam UGC payload download
+
+on:
+  workflow_dispatch:
+    inputs:
+      published_file_id:
+        description: Single Timberborn Workshop item to download
+        required: true
+        default: "3535425318"
+        type: string
+      max_download_bytes:
+        description: Refuse items larger than this declared size
+        required: true
+        default: "50000000"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.0.100
+
+      - name: Build anonymous UGC download probe
+        run: dotnet build tools/SteamAnonymousUgcDownloadProbe/SteamAnonymousUgcDownloadProbe.csproj -c Release
+
+      - name: Install anonymous Steam game-server runtime
+        run: |
+          mkdir -p "$RUNNER_TEMP/steamcmd" "$HOME/.steam/sdk64"
+          curl --fail --location --retry 3 \
+            https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz \
+            --output "$RUNNER_TEMP/steamcmd_linux.tar.gz"
+          tar -xzf "$RUNNER_TEMP/steamcmd_linux.tar.gz" -C "$RUNNER_TEMP/steamcmd"
+          "$RUNNER_TEMP/steamcmd/steamcmd.sh" +quit
+          test -s "$RUNNER_TEMP/steamcmd/linux64/steamclient.so"
+          cp "$RUNNER_TEMP/steamcmd/linux64/steamclient.so" "$HOME/.steam/sdk64/steamclient.so"
+          echo "LD_LIBRARY_PATH=$RUNNER_TEMP/steamcmd/linux64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
+
+      - name: Download one Workshop payload anonymously
+        env:
+          SteamAppId: "1062090"
+          SteamGameId: "1062090"
+          PUBLISHED_FILE_ID: ${{ inputs.published_file_id }}
+          MAX_DOWNLOAD_BYTES: ${{ inputs.max_download_bytes }}
+        working-directory: ${{ runner.temp }}/steamcmd
+        run: >-
+          dotnet $GITHUB_WORKSPACE/tools/SteamAnonymousUgcDownloadProbe/bin/Release/net8.0/SteamAnonymousUgcDownloadProbe.dll
+          "$PUBLISHED_FILE_ID"
+          "$MAX_DOWNLOAD_BYTES"
+          480
