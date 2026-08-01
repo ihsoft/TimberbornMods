@@ -132,6 +132,7 @@ Invoke-WithRepositoryLock -RepositoryRoot $repoRoot -Resource "unity-project" -O
     $unityArguments = @(
         "-batchmode",
         "-quit",
+        "-disable-assembly-updater",
         "-projectPath",
         $projectRoot,
         "-logFile",

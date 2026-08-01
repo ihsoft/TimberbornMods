@@ -1,0 +1,7 @@
+{
+  "Name": "MapBrowser",
+  "Version": "0.1.0",
+  "Id": "Timberborn.IgorZ.MapBrowser",
+  "MinimumGameVersion": "1.1.0.0",
+  "Description": "Browse installed custom maps with public Steam Workshop metadata"
+}

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B1EA7041-9C29-4EA5-8B98-5EE30894B1AB}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>IgorZ.MapBrowser</RootNamespace>
+    <AssemblyName>MapBrowser</AssemblyName>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>12</LangVersion>
+    <DebugType>embedded</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <DocumentationFile>bin\$(Configuration)\MapBrowser.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all" />
+    <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Timberborn.*.dll" Publicize="true" />
+    <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Unity*.dll" Publicize="false" />
+    <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Bindito.*.dll" Publicize="false" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\Dependencies\GameRoot\Timberborn_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\TimberDev\UI\AbstractDialog.cs">
+      <Link>TimberDev\UI\AbstractDialog.cs</Link>
+    </Compile>
+    <Compile Include="..\TimberDev\UI\DropdownItem.cs">
+      <Link>TimberDev\UI\DropdownItem.cs</Link>
+    </Compile>
+    <Compile Include="..\TimberDev\UI\PreciseSliderWrapper.cs">
+      <Link>TimberDev\UI\PreciseSliderWrapper.cs</Link>
+    </Compile>
+    <Compile Include="..\TimberDev\UI\ResizableDropdownElement.cs">
+      <Link>TimberDev\UI\ResizableDropdownElement.cs</Link>
+    </Compile>
+    <Compile Include="..\TimberDev\UI\UiFactory.cs">
+      <Link>TimberDev\UI\UiFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\TimberDev\UI\VisualElementExtensions.cs">
+      <Link>TimberDev\UI\VisualElementExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\UnityDevLite\DebugEx.cs">
+      <Link>UnityDevLite\DebugEx.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <PropertyGroup>
+    <ModPath>u:\Mods</ModPath>
+  </PropertyGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="Exists('$(ModPath)')">
+    <Message Text="### Copying MapBrowser to the game's mods folder... ###" Importance="high" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\..\ModsUnityProject\Assets\Mods\MapBrowser\manifest.json"
+          DestinationFolder="$(ModPath)\$(ProjectName)\version-1.1" />
+    <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\version-1.1\Scripts" />
+    <Copy SourceFiles="$(TargetDir)$(TargetName).xml" DestinationFolder="$(ModPath)\$(ProjectName)\version-1.1\Scripts"
+          Condition="Exists('$(TargetDir)$(TargetName).xml')" />
+  </Target>
+</Project>
