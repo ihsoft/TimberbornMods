@@ -42,6 +42,33 @@ jobs:
           tar -xzf "$RUNNER_TEMP/steamcmd_linux.tar.gz" -C "$RUNNER_TEMP/steamcmd"
           "$RUNNER_TEMP/steamcmd/steamcmd.sh" +quit
           test -s "$RUNNER_TEMP/steamcmd/linux64/steamclient.so"
+          mkdir -p \
+            "$RUNNER_TEMP/steamcmd/steamapps/common/Timberborn" \
+            "$RUNNER_TEMP/steamcmd/steamapps/downloading/1062090" \
+            "$RUNNER_TEMP/steamcmd/steamapps/workshop/content/1062090" \
+            "$RUNNER_TEMP/steamcmd/steamapps/workshop/downloads"
+          printf '%s\n' \
+            '"AppState"' \
+            '{' \
+            '  "appid" "1062090"' \
+            '  "name" "Timberborn"' \
+            '  "StateFlags" "4"' \
+            '  "installdir" "Timberborn"' \
+            '}' \
+            > "$RUNNER_TEMP/steamcmd/steamapps/appmanifest_1062090.acf"
+          printf '%s\n' \
+            '"libraryfolders"' \
+            '{' \
+            '  "0"' \
+            '  {' \
+            "    \"path\" \"$RUNNER_TEMP/steamcmd\"" \
+            '    "apps"' \
+            '    {' \
+            '      "1062090" "0"' \
+            '    }' \
+            '  }' \
+            '}' \
+            > "$RUNNER_TEMP/steamcmd/steamapps/libraryfolders.vdf"
           cp "$RUNNER_TEMP/steamcmd/linux64/steamclient.so" "$HOME/.steam/sdk64/steamclient.so"
           echo "LD_LIBRARY_PATH=$RUNNER_TEMP/steamcmd/linux64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
 
