@@ -1,4 +1,4 @@
-# v1.0.1 (TBD)
+# v1.0.1 (2026-08-02)
 
 * [Fix] Dual-District Piles did not offer the copy-building command.
 * [Fix] Dual-District Warehouses reserved empty blocks above their roofs and could not support stacked buildings.
