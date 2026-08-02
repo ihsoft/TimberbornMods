@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using IgorZ.TimberDev.UI;
 using Timberborn.CoreUI;
 using Timberborn.MapItemsUI;
+using Timberborn.MapRepositorySystem;
 using Timberborn.MapThumbnail;
 using Timberborn.TooltipSystem;
 using UnityEngine;
@@ -16,22 +17,28 @@ namespace IgorZ.MapBrowser;
 
 sealed class MapBrowserDialog : AbstractDialog {
   const string DialogAsset = "IgorZ.MapBrowser/MapBrowserDialog";
+  const string DeleteMapPromptLocKey = "LoadMapPanel.DeleteMapPrompt";
   const float PreviewHeight = 180;
 
   readonly MapItemProvider _mapItemProvider;
   readonly MapThumbnailCache _mapThumbnailCache;
+  readonly MapRepository _mapRepository;
   readonly WorkshopMetadataService _metadataService;
+  readonly WorkshopSubscriptionService _subscriptionService;
   readonly ITooltipRegistrar _tooltipRegistrar;
   readonly List<InstalledMap> _maps = [];
 
   ListView _list;
 
   MapBrowserDialog(
-      MapItemProvider mapItemProvider, MapThumbnailCache mapThumbnailCache,
-      WorkshopMetadataService metadataService, ITooltipRegistrar tooltipRegistrar) {
+      MapItemProvider mapItemProvider, MapThumbnailCache mapThumbnailCache, MapRepository mapRepository,
+      WorkshopMetadataService metadataService, WorkshopSubscriptionService subscriptionService,
+      ITooltipRegistrar tooltipRegistrar) {
     _mapItemProvider = mapItemProvider;
     _mapThumbnailCache = mapThumbnailCache;
+    _mapRepository = mapRepository;
     _metadataService = metadataService;
+    _subscriptionService = subscriptionService;
     _tooltipRegistrar = tooltipRegistrar;
   }
 
@@ -135,8 +142,51 @@ sealed class MapBrowserDialog : AbstractDialog {
     description.AddToClassList("text--default");
     description.RegisterCallback<GeometryChangedEvent>(_ => FitDescription(description, binding.Description));
     textColumn.Add(description);
+    var actionButton = new NineSliceButton {
+        name = "ActionButton",
+        style = {
+            position = Position.Absolute,
+            right = 8,
+            bottom = 8,
+            paddingTop = 2,
+            paddingRight = 8,
+            paddingBottom = 2,
+            paddingLeft = 8,
+        },
+    };
+    actionButton.AddToClassList("button-game");
+    actionButton.AddToClassList("game-text-small");
+    actionButton.ToggleDisplayStyle(false);
+    _tooltipRegistrar.Register(actionButton, () => binding.ActionTooltip);
+    actionButton.clicked += () => RemoveMap(binding, row, actionButton);
+    var removedOverlay = new Label {
+        name = "RemovedOverlay",
+        text = "Removed",
+        pickingMode = PickingMode.Ignore,
+        style = {
+            position = Position.Absolute,
+            left = 0,
+            right = 0,
+            top = 0,
+            bottom = 0,
+            fontSize = 24,
+            unityFontStyleAndWeight = FontStyle.Bold,
+            unityTextAlign = TextAnchor.MiddleCenter,
+            backgroundColor = new Color(0.05f, 0.08f, 0.07f, 0.75f),
+        },
+    };
+    removedOverlay.AddToClassList("text--default");
+    removedOverlay.ToggleDisplayStyle(false);
     row.Add(preview);
     row.Add(textColumn);
+    row.Add(actionButton);
+    row.Add(removedOverlay);
+    row.RegisterCallback<PointerEnterEvent>(_ => {
+      if (binding.Map is { Removed: false }) {
+        actionButton.ToggleDisplayStyle(true);
+      }
+    });
+    row.RegisterCallback<PointerLeaveEvent>(_ => actionButton.ToggleDisplayStyle(false));
     return row;
   }
 
@@ -144,6 +194,11 @@ sealed class MapBrowserDialog : AbstractDialog {
     var installedMap = _maps[index];
     var binding = (RowBinding)row.userData;
     binding.Key = installedMap.Key;
+    binding.Map = installedMap;
+    binding.ActionText = installedMap.PublishedFileId != null ? "Unsubscribe" : "Delete";
+    binding.ActionTooltip = installedMap.PublishedFileId != null
+        ? "Unsubscribe from this Steam Workshop map.\nYou can subscribe to it again later."
+        : "Permanently delete this local map file.\nThis cannot be undone.";
     var metadata = _metadataService.Find(installedMap.PublishedFileId);
     var title = GetDisplayTitle(installedMap);
     var description = metadata?.DescriptionPlain ?? installedMap.Map.DisplayDescription;
@@ -153,12 +208,13 @@ sealed class MapBrowserDialog : AbstractDialog {
     descriptionLabel.text = binding.Description;
     descriptionLabel.schedule.Execute(() => FitDescription(descriptionLabel, binding.Description));
     var analysis = row.Q<Label>("Analysis");
-    analysis.text = metadata != null ? FormatCompactAnalysis(metadata) : string.Empty;
-    analysis.ToggleDisplayStyle(metadata != null);
+    analysis.text = metadata != null ? FormatCompactAnalysis(metadata) : "Source: Local";
+    analysis.ToggleDisplayStyle(metadata != null || installedMap.PublishedFileId == null);
     binding.Tooltip = metadata != null ? FormatAnalysisTooltip(metadata) : null;
     var freshness = row.Q<Label>("Freshness");
     freshness.text = FormatFreshness(installedMap, metadata);
     freshness.ToggleDisplayStyle(installedMap.PublishedFileId != null && (metadata == null || metadata.VisualStale));
+    ApplyRemovedState(row, binding, installedMap.Removed);
 
     var preview = row.Q<Image>("Preview");
     preview.image = _mapThumbnailCache.GetThumbnail(installedMap.Map.MapFileReference);
@@ -301,6 +357,71 @@ sealed class MapBrowserDialog : AbstractDialog {
         0, VisualElement.MeasureMode.Undefined).y;
   }
 
+  void RemoveMap(RowBinding binding, VisualElement row, NineSliceButton button) {
+    var installedMap = binding.Map;
+    if (installedMap == null || installedMap.Removed) {
+      return;
+    }
+    if (installedMap.PublishedFileId == null) {
+      ShowLocalMapDeleteConfirmation(binding, row, button, installedMap);
+      return;
+    }
+
+    button.text = "Unsubscribing...";
+    button.SetEnabled(false);
+    _subscriptionService.Unsubscribe(installedMap.PublishedFileId, (succeeded, error) => {
+      if (succeeded) {
+        installedMap.Removed = true;
+      }
+      if (binding.Map != installedMap) {
+        return;
+      }
+      if (succeeded) {
+        ApplyRemovedState(row, binding, removed: true);
+      } else {
+        button.text = "Retry unsubscribe";
+        button.SetEnabled(true);
+        Debug.LogError($"MapBrowser: could not unsubscribe from {installedMap.PublishedFileId}: {error}");
+      }
+    });
+  }
+
+  void ShowLocalMapDeleteConfirmation(
+      RowBinding binding, VisualElement row, NineSliceButton button, InstalledMap installedMap) {
+    var message = string.Format(UiFactory.T(DeleteMapPromptLocKey), installedMap.Map.DisplayName);
+    DialogBoxShower.Create()
+        .SetMessage(message)
+        .SetConfirmButton(() => DeleteLocalMap(binding, row, button, installedMap))
+        .SetDefaultCancelButton()
+        .Show();
+  }
+
+  void DeleteLocalMap(
+      RowBinding binding, VisualElement row, NineSliceButton button, InstalledMap installedMap) {
+    button.text = "Deleting...";
+    button.SetEnabled(false);
+    try {
+      _mapRepository.DeleteMap(installedMap.Map.MapFileReference);
+      installedMap.Removed = true;
+      if (binding.Map == installedMap) {
+        ApplyRemovedState(row, binding, removed: true);
+      }
+    } catch (Exception exception) {
+      button.text = "Retry delete";
+      button.SetEnabled(true);
+      Debug.LogError($"MapBrowser: could not delete local map {installedMap.Key}: {exception}");
+    }
+  }
+
+  static void ApplyRemovedState(VisualElement row, RowBinding binding, bool removed) {
+    row.SetEnabled(!removed);
+    row.Q<Label>("RemovedOverlay").ToggleDisplayStyle(removed);
+    var button = row.Q<NineSliceButton>("ActionButton");
+    button.text = binding.ActionText;
+    button.SetEnabled(true);
+    button.ToggleDisplayStyle(false);
+  }
+
   string FormatFreshness(InstalledMap installedMap, WorkshopItemMetadata metadata) {
     if (metadata?.VisualStale == true) {
       return "Freshness warning: The analysis above describes previously indexed images; the current Workshop "
@@ -332,11 +453,15 @@ sealed class MapBrowserDialog : AbstractDialog {
 
   sealed record InstalledMap(MapItem Map, string PublishedFileId) {
     public string Key => Map.MapFileReference.Path ?? Map.MapFileReference.Name;
+    public bool Removed { get; set; }
   }
 
   sealed class RowBinding {
     public string Key { get; set; }
     public string Tooltip { get; set; }
     public string Description { get; set; }
+    public InstalledMap Map { get; set; }
+    public string ActionText { get; set; }
+    public string ActionTooltip { get; set; }
   }
 }

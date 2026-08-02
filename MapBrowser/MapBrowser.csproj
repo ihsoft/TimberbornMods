@@ -18,6 +18,8 @@
     <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Timberborn.*.dll" Publicize="true" />
     <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Unity*.dll" Publicize="false" />
     <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Bindito.*.dll" Publicize="false" />
+    <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\com.rlabrecque.steamworks.net.dll"
+               Publicize="false" />
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\Dependencies\GameRoot\Timberborn_Data\Managed\Newtonsoft.Json.dll</HintPath>
       <Private>false</Private>

@@ -9,6 +9,7 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<MainMenuMapBrowserButton>().AsSingleton();
     containerDefinition.Bind<MapBrowserDialog>().AsSingleton();
     containerDefinition.Bind<WorkshopMetadataService>().AsSingleton();
+    containerDefinition.Bind<WorkshopSubscriptionService>().AsSingleton();
     containerDefinition.Bind<UiFactory>().AsSingleton();
   }
 }
