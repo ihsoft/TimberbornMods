@@ -133,6 +133,11 @@ The Folktails warehouse uses two generated variants of the same entrance-side 3x
 - `#Finished/MirroredRoofModel` references
   `Buildings/Storage/DualDistrictWarehouse/DualDistrictWarehouse.Folktails.MirroredRoof.Model`.
 
+Each physical warehouse half preserves the stock Medium Warehouse vertical size and stackability. The stock source is
+3x2x1, so halving it changes only Y: `BlockObjectSpec.Size` must be 3x1x1 with exactly three blocks, each preserving
+`Stackable=BlockObject`. Do not transpose the removed depth into Z, create an empty upper layer, or replace the stock
+roof stackability with `Stackable=None`.
+
 The single `CollidersSpec` remains on `#Finished`; do not add separate colliders to the model children without evidence
 that the building ownership model changed.
 
@@ -167,8 +172,8 @@ After changing the generator, either generated model, blueprint child identities
    sources; review the two generated outputs as one set.
 5. Verify the exact blueprint child identities and inspect runtime logs for missing-model, missing-child, selection, or
    optimizer failures.
-6. Validate normal preview behavior, deterministic primary/secondary activation, geometry, placement, and roof
-   appearance in the real game.
+6. Validate normal preview behavior, deterministic primary/secondary activation, geometry, placement, occupied-block
+   overlay, roof appearance, and placement of a compatible building on the roof in the real game.
 7. Before claiming broader lifecycle completion, validate save/load restoration and the relevant linked-building
    logistics scenarios separately.
 
