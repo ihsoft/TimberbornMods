@@ -106,7 +106,7 @@
   },
   "PlaceableBlockObjectSpec": {
     "ToolGroupId": "Storage",
-    "ToolOrder": 46,
+    "ToolOrder": 101,
     "ToolShape": "Square",
     "Layout": "Half",
     "CustomPivot": {
