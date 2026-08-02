@@ -2,3 +2,4 @@
 
 * [Feature] Add a main-menu browser for installed custom maps and their public Steam Workshop metadata.
 * [Feature] Unsubscribe from Workshop maps or permanently delete local maps from the browser.
+* [Feature] Add a detailed map view with Workshop galleries and live Steam statistics.

@@ -1,3 +1,73 @@
 ID,Text,Comment
 IgorZ.MapBrowser.Dialog.Close,Close,Button that closes the map browser dialog.
 IgorZ.MapBrowser.Dialog.Header,Map Browser,Header of the installed map browser dialog.
+IgorZ.MapBrowser.Details.Header,Map Details,Header of the map details dialog.
+=,=,Map actions
+IgorZ.MapBrowser.Action.Delete,Delete,Button that permanently deletes a local map.
+IgorZ.MapBrowser.Action.DeleteTooltip,"Permanently delete this local map file.
+This cannot be undone.",Tooltip for deleting a local map.
+IgorZ.MapBrowser.Action.Deleting,Deleting...,Temporary button text while a local map is being deleted.
+IgorZ.MapBrowser.Action.Details,Details,Button that opens the map details dialog.
+IgorZ.MapBrowser.Action.Removed,Removed,Status shown after a map is removed from the game.
+IgorZ.MapBrowser.Action.RetryDelete,Retry delete,Button shown after deleting a local map fails.
+IgorZ.MapBrowser.Action.RetryUnsubscribe,Retry unsubscribe,Button shown after unsubscribing from a Workshop map fails.
+IgorZ.MapBrowser.Action.Unsubscribe,Unsubscribe,Button that unsubscribes from a Steam Workshop map.
+IgorZ.MapBrowser.Action.UnsubscribeTooltip,"Unsubscribe from this Steam Workshop map.
+You can subscribe to it again later.",Tooltip for unsubscribing from a Workshop map.
+IgorZ.MapBrowser.Action.Unsubscribing,Unsubscribing...,Temporary button text while a Workshop map is being unsubscribed.
+=,=,Map analysis
+IgorZ.MapBrowser.Analysis.BasedOnImage,Based on {0} Workshop image,Image count shown below the full map analysis.
+IgorZ.MapBrowser.Analysis.BasedOnImages,Based on {0} Workshop images,Image count shown below the full map analysis.
+IgorZ.MapBrowser.Analysis.Compact,"Terrain: {0}, {1}, {2}, {3} | Landform: {4} | Layout: {5}",Compact map analysis shown in the browser row.
+IgorZ.MapBrowser.Analysis.Full,"Terrain: {0}
+Valleys: {1}
+Water: {2}
+Landform: {3}
+Forests: {4}
+Layout: {5}",Full map analysis shown in the details dialog.
+IgorZ.MapBrowser.Analysis.Level.Barren,Barren,Very low forest density classification.
+IgorZ.MapBrowser.Analysis.Level.Canyons,Canyons,Very high canyon classification.
+IgorZ.MapBrowser.Analysis.Level.DenseForest,Dense forest,Very high forest density classification.
+IgorZ.MapBrowser.Analysis.Level.Dry,Dry,Very low water classification.
+IgorZ.MapBrowser.Analysis.Level.Flat,Flat,Very low ruggedness classification.
+IgorZ.MapBrowser.Analysis.Level.Forested,Forested,High forest density classification.
+IgorZ.MapBrowser.Analysis.Level.Fragmented,Fragmented,High islandness classification.
+IgorZ.MapBrowser.Analysis.Level.Geometric,Geometric,Very high artificial layout classification.
+IgorZ.MapBrowser.Analysis.Level.Islands,Islands,Very high islandness classification.
+IgorZ.MapBrowser.Analysis.Level.LittleWater,Little water,Low water classification.
+IgorZ.MapBrowser.Analysis.Level.Mainland,Mainland,Very low islandness classification.
+IgorZ.MapBrowser.Analysis.Level.Mixed,Mixed,Middle classification value.
+IgorZ.MapBrowser.Analysis.Level.ModerateForests,Moderate forests,Middle forest density classification.
+IgorZ.MapBrowser.Analysis.Level.ModerateWater,Moderate water,Middle water classification.
+IgorZ.MapBrowser.Analysis.Level.MostlyConnected,Mostly connected,Low islandness classification.
+IgorZ.MapBrowser.Analysis.Level.MostlyFlat,Mostly flat,Low ruggedness classification.
+IgorZ.MapBrowser.Analysis.Level.MostlyNatural,Mostly natural,Low artificial layout classification.
+IgorZ.MapBrowser.Analysis.Level.MostlyOpen,Mostly open,Low canyon classification.
+IgorZ.MapBrowser.Analysis.Level.Mountainous,Mountainous,Very high ruggedness classification.
+IgorZ.MapBrowser.Analysis.Level.NarrowValleys,Narrow valleys,High canyon classification.
+IgorZ.MapBrowser.Analysis.Level.Natural,Natural,Very low artificial layout classification.
+IgorZ.MapBrowser.Analysis.Level.Open,Open,Very low canyon classification.
+IgorZ.MapBrowser.Analysis.Level.Rugged,Rugged,High ruggedness classification.
+IgorZ.MapBrowser.Analysis.Level.Sparse,Sparse,Low forest density classification.
+IgorZ.MapBrowser.Analysis.Level.Structured,Structured,High artificial layout classification.
+IgorZ.MapBrowser.Analysis.Level.Unknown,Unknown,Classification value shown when analysis data is missing.
+IgorZ.MapBrowser.Analysis.Level.WaterDominated,Water-dominated,Very high water classification.
+IgorZ.MapBrowser.Analysis.Level.WaterRich,Water-rich,High water classification.
+IgorZ.MapBrowser.Analysis.Tooltip,"Our analysis
+{0}",Tooltip containing the full map analysis.
+=,=,Map browser
+IgorZ.MapBrowser.Browser.InstalledMaps,Installed custom maps,Heading above the installed map list.
+IgorZ.MapBrowser.Browser.TitleWithSize,"{0} ({1})",Map title followed by its dimensions.
+=,=,Common map text
+IgorZ.MapBrowser.Common.NoDescription,No description,Text shown when a map has no description.
+IgorZ.MapBrowser.Common.SourceLocal,Source: Local,Text identifying a local map.
+IgorZ.MapBrowser.Common.Unavailable,Unavailable,Value shown while live Steam data is unavailable.
+IgorZ.MapBrowser.Common.Unknown,Unknown,Value shown when metadata is unknown.
+=,=,Map details
+IgorZ.MapBrowser.Details.Size,Size: {0},Map dimensions shown in the details dialog.
+IgorZ.MapBrowser.Details.Subscribers,Subscribers: {0},Steam subscriber count shown in the details dialog.
+IgorZ.MapBrowser.Details.Votes,Votes: {0}/{1},Steam upvotes and downvotes shown in the details dialog.
+IgorZ.MapBrowser.Details.VotesUnavailable,Votes: Unavailable,Text shown while live Steam votes are unavailable.
+=,=,Metadata freshness
+IgorZ.MapBrowser.Freshness.Missing,"Freshness: This map is not included in the latest index snapshot ({0}). Analysis will become available after a later refresh.",Message shown for a Workshop map missing from the current public index.
+IgorZ.MapBrowser.Freshness.Stale,"Freshness warning: The analysis above describes previously indexed images; the current Workshop images have changed and could not be reclassified yet.",Warning shown when saved map analysis is stale.

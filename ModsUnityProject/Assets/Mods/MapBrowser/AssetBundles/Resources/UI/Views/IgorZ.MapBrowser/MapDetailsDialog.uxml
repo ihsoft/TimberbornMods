@@ -1,0 +1,35 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:Template name="NamedBoxTemplate" src="project://database/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml?fileID=9197481963319205126&amp;guid=b27c549e9f96d7843b45412cf82a0c6a&amp;type=3#NamedBoxTemplate" />
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle" />
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle" />
+    <engine:VisualElement class="content-row-centered">
+        <engine:Instance template="NamedBoxTemplate" style="width: 1200px; height: 760px; max-width: 94%; max-height: 92%;">
+            <AttributeOverrides element-name="Header" text="Map Details" text-loc-key="IgorZ.MapBrowser.Details.Header" />
+            <engine:VisualElement style="flex-direction: row; flex-grow: 1; min-height: 0;">
+                <engine:VisualElement style="width: 430px; min-width: 430px; margin-right: 18px;">
+                    <Timberborn.CoreUI.NineSliceVisualElement class="bg-sub-box--green" style="height: 250px; padding: 8px;">
+                        <engine:Image name="Preview" scale-mode="ScaleToFit" style="flex-grow: 1;" />
+                        <engine:VisualElement style="position: absolute; right: 10px; bottom: 10px; flex-direction: row;">
+                            <Timberborn.CoreUI.NineSliceButton name="PreviousImageButton" text="&lt;" class="button-game game-text-small" style="width: 38px; margin-right: 4px;" />
+                            <Timberborn.CoreUI.NineSliceButton name="NextImageButton" text="&gt;" class="button-game game-text-small" style="width: 38px;" />
+                        </engine:VisualElement>
+                    </Timberborn.CoreUI.NineSliceVisualElement>
+                    <engine:Label name="MapInformation" class="text--default" style="margin-top: 10px; white-space: normal;" />
+                    <engine:Label name="Analysis" class="text--default" style="margin-top: 10px; white-space: normal;" />
+                </engine:VisualElement>
+                <engine:VisualElement style="flex-grow: 1; min-width: 0;">
+                    <engine:Label name="Title" class="game-text-big text--bold" style="margin-bottom: 8px; flex-shrink: 0;" />
+                    <Timberborn.CoreUI.NineSliceVisualElement class="bg-sub-box--green" style="flex-grow: 1; min-height: 0; padding: 10px;">
+                        <engine:ScrollView name="DescriptionScroll" class="scroll--green-decorated" style="flex-grow: 1;">
+                            <engine:Label name="Description" class="text--default" style="white-space: normal; padding-right: 8px;" />
+                        </engine:ScrollView>
+                    </Timberborn.CoreUI.NineSliceVisualElement>
+                </engine:VisualElement>
+            </engine:VisualElement>
+            <engine:VisualElement style="flex-direction: row; justify-content: flex-end; align-items: center; margin-top: 12px; flex-shrink: 0;">
+                <Timberborn.CoreUI.NineSliceButton name="RemoveButton" class="menu-button menu-button--medium" style="margin-right: 10px;" />
+                <Timberborn.CoreUI.LocalizableButton name="ConfirmButton" text="Close" text-loc-key="IgorZ.MapBrowser.Dialog.Close" class="menu-button menu-button--medium" />
+            </engine:VisualElement>
+        </engine:Instance>
+    </engine:VisualElement>
+</engine:UXML>

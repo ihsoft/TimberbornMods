@@ -1,4 +1,5 @@
 using System.Linq;
+using IgorZ.TimberDev.UI;
 using Timberborn.CoreUI;
 using Timberborn.MainMenuPanels;
 using Timberborn.SingletonSystem;
@@ -9,12 +10,14 @@ namespace IgorZ.MapBrowser;
 sealed class MainMenuMapBrowserButton : IUpdatableSingleton {
   readonly MainMenuPanel _mainMenuPanel;
   readonly MapBrowserDialog _mapBrowserDialog;
+  readonly UiFactory _uiFactory;
 
   bool _buttonAdded;
 
-  MainMenuMapBrowserButton(MainMenuPanel mainMenuPanel, MapBrowserDialog mapBrowserDialog) {
+  MainMenuMapBrowserButton(MainMenuPanel mainMenuPanel, MapBrowserDialog mapBrowserDialog, UiFactory uiFactory) {
     _mainMenuPanel = mainMenuPanel;
     _mapBrowserDialog = mapBrowserDialog;
+    _uiFactory = uiFactory;
   }
 
   public void UpdateSingleton() {
@@ -30,7 +33,7 @@ sealed class MainMenuMapBrowserButton : IUpdatableSingleton {
 
     var button = new NineSliceButton {
         name = "MapBrowserButton",
-        text = "Map Browser",
+        text = _uiFactory.T("IgorZ.MapBrowser.Dialog.Header"),
     };
     button.clicked += _mapBrowserDialog.Show;
     foreach (var className in anchor.GetClasses().ToList()) {
