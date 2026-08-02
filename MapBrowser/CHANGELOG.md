@@ -7,3 +7,4 @@
 * [Feature] Find indexed Workshop maps by keywords and visual classifications with paged results.
 * [Feature] Subscribe to Workshop maps from search results or map details and show download progress without restarting the game.
 * [Fix] Keep subscription states synchronized across browser modes and display Unicode Workshop descriptions correctly.
+* [Fix] Preserve search position during subscription changes and refresh installed map details without reopening the dialog.

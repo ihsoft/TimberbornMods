@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using IgorZ.TimberDev.UI;
 using Timberborn.CoreUI;
+using Timberborn.MapItemsUI;
 using Timberborn.MapRepositorySystem;
 using Timberborn.MapThumbnail;
 using Timberborn.TooltipSystem;
@@ -42,6 +43,7 @@ sealed class MapDetailsDialog : AbstractDialog {
   const string UnsubscribingLocKey = "IgorZ.MapBrowser.Action.Unsubscribing";
 
   readonly MapThumbnailCache _mapThumbnailCache;
+  readonly MapItemProvider _mapItemProvider;
   readonly MapRepository _mapRepository;
   readonly WorkshopMetadataService _metadataService;
   readonly WorkshopLiveDetailsService _liveDetailsService;
@@ -55,15 +57,17 @@ sealed class MapDetailsDialog : AbstractDialog {
   Button _previousImageButton;
   Button _nextImageButton;
   NineSliceButton _removeButton;
+  Label _mapInformation;
   bool _allowResubscribe;
   bool _workshopSubscribed;
   int _imageIndex;
 
   MapDetailsDialog(
-      MapThumbnailCache mapThumbnailCache, MapRepository mapRepository, WorkshopMetadataService metadataService,
-      WorkshopLiveDetailsService liveDetailsService, WorkshopSubscriptionService subscriptionService,
-      ITooltipRegistrar tooltipRegistrar) {
+      MapThumbnailCache mapThumbnailCache, MapItemProvider mapItemProvider, MapRepository mapRepository,
+      WorkshopMetadataService metadataService, WorkshopLiveDetailsService liveDetailsService,
+      WorkshopSubscriptionService subscriptionService, ITooltipRegistrar tooltipRegistrar) {
     _mapThumbnailCache = mapThumbnailCache;
+    _mapItemProvider = mapItemProvider;
     _mapRepository = mapRepository;
     _metadataService = metadataService;
     _liveDetailsService = liveDetailsService;
@@ -82,7 +86,7 @@ sealed class MapDetailsDialog : AbstractDialog {
   protected override bool CheckHasChanges() => false;
 
   public void Show(
-      InstalledMap installedMap, bool allowResubscribe,
+      InstalledMap installedMap, bool allowResubscribe, bool workshopSubscribed,
       Action<InstalledMap, bool> subscriptionChangedCallback) {
     if (Root != null) {
       return;
@@ -90,6 +94,7 @@ sealed class MapDetailsDialog : AbstractDialog {
 
     _installedMap = installedMap;
     _allowResubscribe = allowResubscribe;
+    _workshopSubscribed = workshopSubscribed;
     _subscriptionChangedCallback = subscriptionChangedCallback;
     base.Show();
     _subscriptionService.DownloadProgressChanged += OnDownloadProgressChanged;
@@ -107,6 +112,7 @@ sealed class MapDetailsDialog : AbstractDialog {
     _previousImageButton = null;
     _nextImageButton = null;
     _removeButton = null;
+    _mapInformation = null;
     _allowResubscribe = false;
     _imageUrls.Clear();
   }
@@ -115,8 +121,8 @@ sealed class MapDetailsDialog : AbstractDialog {
     var metadata = _installedMap.Metadata ?? _metadataService.Find(_installedMap.PublishedFileId);
     Root.Q2<Label>("Title").text = metadata?.Title ?? _installedMap.Map?.DisplayName;
     Root.Q2<Label>("Description").text = GetDescription(metadata);
-    var mapInformation = Root.Q2<Label>("MapInformation");
-    mapInformation.text = GetMapInformation();
+    _mapInformation = Root.Q2<Label>("MapInformation");
+    _mapInformation.text = GetMapInformation();
     var analysis = Root.Q2<Label>("Analysis");
     analysis.text = metadata != null
         ? MapBrowserDialog.FormatFullAnalysis(metadata, UiFactory)
@@ -127,8 +133,6 @@ sealed class MapDetailsDialog : AbstractDialog {
     _previousImageButton.clicked += ShowPreviousImage;
     _nextImageButton.clicked += ShowNextImage;
     _removeButton = Root.Q2<NineSliceButton>("RemoveButton");
-    _workshopSubscribed = _installedMap.PublishedFileId != null
-        && (_installedMap.IsInstalled || _subscriptionService.IsSubscribed(_installedMap.PublishedFileId));
     _removeButton.text = UiFactory.T(_installedMap.PublishedFileId == null
         ? DeleteLocKey
         : _workshopSubscribed ? UnsubscribeLocKey : SubscribeLocKey);
@@ -137,7 +141,7 @@ sealed class MapDetailsDialog : AbstractDialog {
     _removeButton.clicked += ApplyMapAction;
     BuildImageList(metadata);
     ShowImage(0);
-    LoadLiveDetails(mapInformation);
+    LoadLiveDetails(_mapInformation);
   }
 
   string GetDescription(WorkshopItemMetadata metadata) {
@@ -334,9 +338,29 @@ sealed class MapDetailsDialog : AbstractDialog {
     }
     _removeButton.text = UiFactory.T(succeeded ? UnsubscribeLocKey : RetrySubscribeLocKey);
     _removeButton.SetEnabled(true);
-    if (!succeeded) {
+    if (succeeded) {
+      RefreshInstalledMap(publishedFileId, 10);
+    } else {
       _workshopSubscribed = false;
       Debug.LogError($"MapBrowser: could not download {publishedFileId}: {error}");
     }
+  }
+
+  void RefreshInstalledMap(string publishedFileId, int attemptsRemaining) {
+    if (Root == null || _installedMap?.PublishedFileId != publishedFileId) {
+      return;
+    }
+    var map = _mapItemProvider.GetCustomMaps().FirstOrDefault(
+        item => MapBrowserDialog.FindPublishedFileId(item.MapFileReference.Path) == publishedFileId);
+    if (map == null) {
+      if (attemptsRemaining > 0) {
+        Root.schedule.Execute(() => RefreshInstalledMap(publishedFileId, attemptsRemaining - 1)).ExecuteLater(100);
+      }
+      return;
+    }
+
+    _installedMap = _installedMap with { Map = map };
+    _mapInformation.text = GetMapInformation();
+    LoadLiveDetails(_mapInformation);
   }
 }

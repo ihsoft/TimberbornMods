@@ -460,13 +460,13 @@ sealed class MapBrowserDialog : AbstractDialog {
     }
   }
 
-  void RefreshInstalledMaps() {
+  void RefreshInstalledMaps(bool resetSearchNavigation = true) {
     ReloadInstalledMaps();
     if (_visibleMaps == _installedMaps) {
       UpdateModeHeading(false);
       _list?.RefreshItems();
     } else {
-      ApplySearch();
+      ApplySearch(resetSearchNavigation, resetSearchNavigation);
     }
   }
 
@@ -500,7 +500,7 @@ sealed class MapBrowserDialog : AbstractDialog {
     return installedMap.Metadata ?? _metadataService.Find(installedMap.PublishedFileId);
   }
 
-  void ApplySearch() {
+  void ApplySearch(bool resetPage = true, bool resetScroll = true) {
     _searchMatches.Clear();
     var installedById = _installedMaps
         .Where(map => map.PublishedFileId != null)
@@ -518,11 +518,13 @@ sealed class MapBrowserDialog : AbstractDialog {
           : new InstalledMap(null, metadata.PublishedFileId, metadata));
     }
     SortMaps(_searchMatches);
-    _pageIndex = 0;
-    RefreshSearchPage();
+    if (resetPage) {
+      _pageIndex = 0;
+    }
+    RefreshSearchPage(resetScroll);
   }
 
-  void RefreshSearchPage() {
+  void RefreshSearchPage(bool resetScroll = true) {
     var totalMaps = _metadataService.Items.Count(item => item.PrimaryCategory == "map");
     var pageCount = _searchMatches.Count == 0
         ? 0
@@ -536,7 +538,7 @@ sealed class MapBrowserDialog : AbstractDialog {
       _previousPageButton.SetEnabled(_pageIndex > 0);
       _nextPageButton.SetEnabled(_pageIndex + 1 < pageCount);
     }
-    ShowMaps(_searchResults);
+    ShowMaps(_searchResults, resetScroll);
   }
 
   void ChangePage(int delta) {
@@ -576,12 +578,12 @@ sealed class MapBrowserDialog : AbstractDialog {
     };
   }
 
-  void ShowMaps(List<InstalledMap> maps) {
+  void ShowMaps(List<InstalledMap> maps, bool resetScroll = true) {
     _visibleMaps = maps;
     if (_list != null) {
       _list.itemsSource = maps;
       _list.Rebuild();
-      if (maps.Count > 0) {
+      if (resetScroll && maps.Count > 0) {
         _list.schedule.Execute(() => _list?.ScrollToItem(0));
       }
     }
@@ -739,7 +741,7 @@ sealed class MapBrowserDialog : AbstractDialog {
     if (!succeeded) {
       Debug.LogError($"MapBrowser: could not download {publishedFileId}: {error}");
     }
-    RefreshInstalledMaps();
+    RefreshInstalledMaps(resetSearchNavigation: false);
   }
 
   void RemoveMap(RowBinding binding, VisualElement row, NineSliceButton button) {
@@ -771,7 +773,7 @@ sealed class MapBrowserDialog : AbstractDialog {
       if (succeeded) {
         binding.WorkshopSubscribed = false;
         if (_visibleMaps != _installedMaps) {
-          ApplySearch();
+          ApplySearch(resetPage: false, resetScroll: false);
           return;
         }
         if (installedMap.Removed) {
@@ -792,7 +794,8 @@ sealed class MapBrowserDialog : AbstractDialog {
 
   void ShowDetails(RowBinding binding) {
     if (binding.Map is { Removed: false } installedMap) {
-      _mapDetailsDialog.Show(installedMap, _visibleMaps != _installedMaps, OnDetailsMapRemoved);
+      _mapDetailsDialog.Show(
+          installedMap, _visibleMaps != _installedMaps, binding.WorkshopSubscribed, OnDetailsMapRemoved);
     }
   }
 
@@ -807,7 +810,7 @@ sealed class MapBrowserDialog : AbstractDialog {
     if (_visibleMaps != _installedMaps) {
       installedMap.Removed = false;
       ReloadInstalledMaps();
-      ApplySearch();
+      ApplySearch(resetPage: false, resetScroll: false);
     } else {
       _list?.RefreshItems();
     }
@@ -864,7 +867,7 @@ sealed class MapBrowserDialog : AbstractDialog {
     return UiFactory.T(FreshnessMissingLocKey, snapshot);
   }
 
-  static string FindPublishedFileId(string mapPath) {
+  internal static string FindPublishedFileId(string mapPath) {
     if (string.IsNullOrWhiteSpace(mapPath)) {
       return null;
     }
