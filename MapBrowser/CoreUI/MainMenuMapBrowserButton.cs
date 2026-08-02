@@ -32,7 +32,7 @@ sealed class MainMenuMapBrowserButton : IUpdatableSingleton {
     }
 
     var root = _mainMenuPanel.GetPanel();
-    var anchor = root?.Q<Button>("ModManagerButton");
+    var anchor = root?.Q<Button>("LoadMapButton");
     if (anchor?.parent == null) {
       return;
     }

@@ -120,7 +120,8 @@ sealed class MapDetailsDialog : AbstractDialog {
 
   void BindContent() {
     var metadata = _installedMap.Metadata ?? _metadataService.Find(_installedMap.PublishedFileId);
-    Root.Q2<Label>("Title").text = metadata?.Title ?? _installedMap.Map?.DisplayName;
+    Root.Q2<Label>("Title").text = MapBrowserDialog.RemoveEdgeMapSize(
+        metadata?.Title ?? _installedMap.Map?.DisplayName);
     Root.Q2<Label>("Description").text = GetDescription(metadata);
     _mapInformation = Root.Q2<Label>("MapInformation");
     _mapInformation.text = GetMapInformation();
@@ -153,7 +154,8 @@ sealed class MapDetailsDialog : AbstractDialog {
   }
 
   string GetMapInformation() {
-    var mapSize = MapBrowserDialog.GetMapSize(_installedMap, UiFactory.T(UnavailableLocKey));
+    var metadata = _installedMap.Metadata ?? _metadataService.Find(_installedMap.PublishedFileId);
+    var mapSize = MapBrowserDialog.GetMapSize(_installedMap, metadata, UiFactory.T(UnavailableLocKey));
     var size = UiFactory.T(SizeLocKey, mapSize);
     if (_installedMap.PublishedFileId == null) {
       return size;
@@ -174,7 +176,8 @@ sealed class MapDetailsDialog : AbstractDialog {
         return;
       }
       var subscribers = details.Subscribers is { } count ? count.ToString("N0") : UiFactory.T(UnavailableLocKey);
-      var mapSize = MapBrowserDialog.GetMapSize(requestedMap, UiFactory.T(UnknownLocKey));
+      var metadata = requestedMap.Metadata ?? _metadataService.Find(requestedMap.PublishedFileId);
+      var mapSize = MapBrowserDialog.GetMapSize(requestedMap, metadata, UiFactory.T(UnknownLocKey));
       mapInformation.text = UiFactory.T(SizeLocKey, mapSize)
           + "\n" + UiFactory.T(VotesLocKey, "+" + details.VotesUp, "-" + details.VotesDown)
           + "\n" + UiFactory.T(SubscribersLocKey, subscribers);

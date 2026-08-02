@@ -22,8 +22,6 @@ IgorZ.MapBrowser.Action.UnsubscribeTooltip,"Unsubscribe from this Steam Workshop
 You can subscribe to it again later.",Tooltip for unsubscribing from a Workshop map.
 IgorZ.MapBrowser.Action.Unsubscribing,Unsubscribing...,Temporary button text while a Workshop map is being unsubscribed.
 =,=,Map analysis
-IgorZ.MapBrowser.Analysis.BasedOnImage,Based on {0} Workshop image,Image count shown below the full map analysis.
-IgorZ.MapBrowser.Analysis.BasedOnImages,Based on {0} Workshop images,Image count shown below the full map analysis.
 IgorZ.MapBrowser.Analysis.Compact,"Terrain: {0}, {1}, {2}, {3} | Landform: {4} | Layout: {5}",Compact map analysis shown in the browser row.
 IgorZ.MapBrowser.Analysis.Full,"Terrain: {0}
 Valleys: {1}
@@ -59,12 +57,10 @@ IgorZ.MapBrowser.Analysis.Level.Structured,Structured,High artificial layout cla
 IgorZ.MapBrowser.Analysis.Level.Unknown,Unknown,Classification value shown when analysis data is missing.
 IgorZ.MapBrowser.Analysis.Level.WaterDominated,Water-dominated,Very high water classification.
 IgorZ.MapBrowser.Analysis.Level.WaterRich,Water-rich,High water classification.
-IgorZ.MapBrowser.Analysis.Tooltip,"Our analysis
-{0}",Tooltip containing the full map analysis.
 =,=,Map browser
 IgorZ.MapBrowser.Browser.InstalledMaps,Installed custom maps,Heading above the installed map list.
 IgorZ.MapBrowser.Browser.SearchMaps,Find Workshop maps,Heading above Workshop search results.
-IgorZ.MapBrowser.Browser.TitleWithSize,"{0} ({1})",Map title followed by its dimensions.
+IgorZ.MapBrowser.Browser.TitleWithSize,"({1}) {0}",Map title prefixed with its dimensions.
 =,=,Common map text
 IgorZ.MapBrowser.Common.SourceLocal,Source: Local,Text identifying a local map.
 IgorZ.MapBrowser.Common.Unavailable,Unavailable,Value shown while live Steam data is unavailable.
@@ -88,6 +84,7 @@ IgorZ.MapBrowser.Search.Filter.Water,Water,Label for the water search filter.
 IgorZ.MapBrowser.Search.Installed,Installed,Tab button that shows installed maps.
 IgorZ.MapBrowser.Search.Keywords,Keywords,Label for the Workshop text search field.
 IgorZ.MapBrowser.Search.MatchCount,"Matches: {0} / {1}",Number of matching maps and total indexed maps.
+IgorZ.MapBrowser.Search.MatchCountWithSnapshot,"Matches: {0} / {1} (snapshot: {2})",Number of matching maps with the index snapshot timestamp.
 IgorZ.MapBrowser.Search.NextPage,Next,Button that opens the next search-results page.
 IgorZ.MapBrowser.Search.Page,"Page {0} / {1}",Current and total search-results pages.
 IgorZ.MapBrowser.Search.PageSize,Page size,Label for the number of search results shown on one page.

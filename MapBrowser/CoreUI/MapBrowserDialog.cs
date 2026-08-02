@@ -21,13 +21,10 @@ using UnityEngine.UIElements;
 namespace IgorZ.MapBrowser.CoreUI;
 
 sealed class MapBrowserDialog : AbstractDialog {
-  const string AnalysisBasedOnImageLocKey = "IgorZ.MapBrowser.Analysis.BasedOnImage";
-  const string AnalysisBasedOnImagesLocKey = "IgorZ.MapBrowser.Analysis.BasedOnImages";
   const string AnalysisCompactLocKey = "IgorZ.MapBrowser.Analysis.Compact";
   const string AnalysisFullLocKey = "IgorZ.MapBrowser.Analysis.Full";
   const string AnalysisLevelLocKeyPrefix = "IgorZ.MapBrowser.Analysis.Level.";
   const string AnalysisLevelUnknownLocKey = "IgorZ.MapBrowser.Analysis.Level.Unknown";
-  const string AnalysisTooltipLocKey = "IgorZ.MapBrowser.Analysis.Tooltip";
   const string BrowserInstalledMapsLocKey = "IgorZ.MapBrowser.Browser.InstalledMaps";
   const string BrowserSearchMapsLocKey = "IgorZ.MapBrowser.Browser.SearchMaps";
   const string CommonUnknownLocKey = "IgorZ.MapBrowser.Common.Unknown";
@@ -36,6 +33,7 @@ sealed class MapBrowserDialog : AbstractDialog {
   const string SearchAnyLocKey = "IgorZ.MapBrowser.Search.Any";
   const string SearchInstalledLocKey = "IgorZ.MapBrowser.Search.Installed";
   const string SearchMatchCountLocKey = "IgorZ.MapBrowser.Search.MatchCount";
+  const string SearchMatchCountWithSnapshotLocKey = "IgorZ.MapBrowser.Search.MatchCountWithSnapshot";
   const string SearchPageLocKey = "IgorZ.MapBrowser.Search.Page";
   const string SearchSearchLocKey = "IgorZ.MapBrowser.Search.Search";
   const string DeleteMapPromptLocKey = "LoadMapPanel.DeleteMapPrompt";
@@ -61,6 +59,17 @@ sealed class MapBrowserDialog : AbstractDialog {
   const string FreshnessMissingLocKey = "IgorZ.MapBrowser.Freshness.Missing";
   const string FreshnessStaleLocKey = "IgorZ.MapBrowser.Freshness.Stale";
   const float PreviewHeight = 180;
+
+  static readonly Regex ParenthesizedMapSizeRegex = new(
+      @"\(\s*(?<width>\d{1,4})\s*[xX×]\s*(?<height>\d{1,4})\s*\)", RegexOptions.Compiled);
+  static readonly Regex MapSizePrefixRegex = new(
+      @"^\s*(?:[\(\[]\s*)?(?<width>\d{1,4})\s*[xX×]\s*(?<height>\d{1,4})(?:\s*[\)\]])?\s*(?:[-–—:|]\s*)?",
+      RegexOptions.Compiled);
+  static readonly Regex ParenthesizedTitlePrefixesRegex = new(
+      @"^(?:\s*\([^)]*\))+\s*(?:[-–—:|]\s*)?", RegexOptions.Compiled);
+  static readonly Regex ParenthesizedMapSizeSuffixRegex = new(
+      @"\s*(?:[-–—:|]\s*)?\(\s*(?<width>\d{1,4})\s*[xX×]\s*(?<height>\d{1,4})\s*\)\s*$",
+      RegexOptions.Compiled);
 
   static readonly SearchFilter[] SearchFilters = [
     new("ruggedness", ["Flat", "MostlyFlat", "Mixed", "Rugged", "Mountainous"]),
@@ -422,12 +431,10 @@ sealed class MapBrowserDialog : AbstractDialog {
         ? UiFactory.T(DeleteTooltipLocKey)
         : UiFactory.T(binding.WorkshopSubscribed ? UnsubscribeTooltipLocKey : SubscribeTooltipLocKey);
     var metadata = GetMetadata(installedMap);
-    var title = GetDisplayTitle(installedMap);
+    var title = FormatMapTitle(installedMap, metadata);
     var description = metadata?.DescriptionPlain ?? installedMap.Map?.DisplayDescription;
     var titleLabel = row.Q<Label>("Title");
-    titleLabel.text = installedMap.IsInstalled
-        ? UiFactory.T(TitleWithSizeLocKey, title, GetMapSize(installedMap, UiFactory.T(CommonUnknownLocKey)))
-        : title;
+    titleLabel.text = title;
     var descriptionLabel = row.Q<Label>("Description");
     binding.Description = string.IsNullOrWhiteSpace(description)
         ? UiFactory.T(NoDescriptionLocKey)
@@ -492,11 +499,26 @@ sealed class MapBrowserDialog : AbstractDialog {
 
   void SortMaps(List<InstalledMap> maps) {
     maps.Sort((left, right) => StringComparer.OrdinalIgnoreCase.Compare(
-        GetDisplayTitle(left), GetDisplayTitle(right)));
+        GetSortTitle(left), GetSortTitle(right)));
   }
 
-  string GetDisplayTitle(InstalledMap installedMap) {
+  string GetRawTitle(InstalledMap installedMap) {
     return (GetMetadata(installedMap)?.Title ?? installedMap.Map?.DisplayName ?? installedMap.PublishedFileId).Trim();
+  }
+
+  string GetSortTitle(InstalledMap installedMap) {
+    var title = RemoveEdgeMapSize(GetRawTitle(installedMap));
+    return ParenthesizedTitlePrefixesRegex.Replace(title, string.Empty).TrimStart();
+  }
+
+  string FormatMapTitle(InstalledMap installedMap, WorkshopItemMetadata metadata) {
+    var rawTitle = GetRawTitle(installedMap);
+    if (HasEmbeddedMapSize(rawTitle)) {
+      return rawTitle;
+    }
+    var title = RemoveEdgeMapSize(rawTitle);
+    var mapSize = GetMapSize(installedMap, metadata, null);
+    return mapSize != null ? UiFactory.T(TitleWithSizeLocKey, title, mapSize) : title;
   }
 
   WorkshopItemMetadata GetMetadata(InstalledMap installedMap) {
@@ -536,7 +558,11 @@ sealed class MapBrowserDialog : AbstractDialog {
     _searchResults.Clear();
     _searchResults.AddRange(_searchMatches.Skip(_pageIndex * _pageSize).Take(_pageSize));
     if (_matchesLabel != null && _pageLabel != null && _previousPageButton != null && _nextPageButton != null) {
-      _matchesLabel.text = UiFactory.T(SearchMatchCountLocKey, _searchMatches.Count, totalMaps);
+      _matchesLabel.text = _metadataService.IndexGeneratedAtUtc is { } generatedAtUtc
+          ? UiFactory.T(
+              SearchMatchCountWithSnapshotLocKey, _searchMatches.Count, totalMaps,
+              generatedAtUtc.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss 'UTC'"))
+          : UiFactory.T(SearchMatchCountLocKey, _searchMatches.Count, totalMaps);
       _pageLabel.text = UiFactory.T(SearchPageLocKey, pageCount == 0 ? 0 : _pageIndex + 1, pageCount);
       _previousPageButton.SetEnabled(_pageIndex > 0);
       _nextPageButton.SetEnabled(_pageIndex + 1 < pageCount);
@@ -592,8 +618,40 @@ sealed class MapBrowserDialog : AbstractDialog {
     }
   }
 
-  internal static string GetMapSize(InstalledMap installedMap, string unknown) {
-    return installedMap.Map?.Size is { } mapSize ? $"{mapSize.x}x{mapSize.y}" : unknown;
+  internal static string GetMapSize(
+      InstalledMap installedMap, WorkshopItemMetadata metadata, string unknown) {
+    if (installedMap.Map?.Size is { } mapSize) {
+      return $"{mapSize.x}x{mapSize.y}";
+    }
+    var title = metadata?.Title ?? installedMap.Map?.DisplayName ?? string.Empty;
+    var match = ParenthesizedMapSizeRegex.Match(title);
+    if (!match.Success) {
+      match = MapSizePrefixRegex.Match(title);
+    }
+    return match.Success
+        ? $"{match.Groups["width"].Value}x{match.Groups["height"].Value}"
+        : unknown;
+  }
+
+  internal static string RemoveEdgeMapSize(string title) {
+    var trimmedTitle = title?.Trim() ?? string.Empty;
+    var match = MapSizePrefixRegex.Match(trimmedTitle);
+    if (match.Success) {
+      var titleWithoutPrefix = trimmedTitle[match.Length..].TrimStart();
+      return titleWithoutPrefix.Length > 0 ? titleWithoutPrefix : trimmedTitle;
+    }
+    match = ParenthesizedMapSizeSuffixRegex.Match(trimmedTitle);
+    if (match.Success) {
+      var titleWithoutSuffix = trimmedTitle[..match.Index].TrimEnd();
+      return titleWithoutSuffix.Length > 0 ? titleWithoutSuffix : trimmedTitle;
+    }
+    return trimmedTitle;
+  }
+
+  static bool HasEmbeddedMapSize(string title) {
+    var trimmedTitle = title?.Trim() ?? string.Empty;
+    var match = ParenthesizedMapSizeRegex.Match(trimmedTitle);
+    return match.Success && match.Index > 0 && match.Index + match.Length < trimmedTitle.Length;
   }
 
   string FormatCompactAnalysis(WorkshopItemMetadata metadata) {
@@ -625,15 +683,11 @@ sealed class MapBrowserDialog : AbstractDialog {
         metadata, "forest_density", "Barren", "Sparse", "ModerateForests", "Forested", "DenseForest", uiFactory);
     var layout = GetVisualLevel(
         metadata, "artificial_layout", "Natural", "MostlyNatural", "Mixed", "Structured", "Geometric", uiFactory);
-    var analysis = string.Format(uiFactory.T(AnalysisFullLocKey), terrain, valleys, water, landform, forests, layout);
-    var imageCountKey = metadata.VisualImageCount == 1
-        ? AnalysisBasedOnImageLocKey
-        : AnalysisBasedOnImagesLocKey;
-    return analysis + "\n" + uiFactory.T(imageCountKey, metadata.VisualImageCount);
+    return string.Format(uiFactory.T(AnalysisFullLocKey), terrain, valleys, water, landform, forests, layout);
   }
 
   string FormatAnalysisTooltip(WorkshopItemMetadata metadata) {
-    return UiFactory.T(AnalysisTooltipLocKey, FormatFullAnalysis(metadata, UiFactory));
+    return FormatFullAnalysis(metadata, UiFactory);
   }
 
   static string GetVisualLevel(
