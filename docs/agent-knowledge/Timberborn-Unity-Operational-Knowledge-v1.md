@@ -47,7 +47,12 @@ Use the changed files and the package matrix:
 | imported DLLs or assets are missing or stale | follow Unity Import Operational Knowledge and the official interactive importer workflow from bootstrap |
 
 A successful C# build does not prove that Unity-owned data, localization, assets, or bundles were exported. A Unity
-export does not prove a separately built DLL is current unless the invoked export command explicitly builds code.
+export does not prove that DLL/XML output is current or present. When a final local package needs both Unity export and
+C# script output, always run Unity export first and then build the registered C# project into the exported package.
+Unity export may clean the destination, so a later export can erase a previously validated `Scripts` folder. Do not
+assume the export wrapper's `-BuildCode` switch builds an external project unless the package-specific pipeline proves
+that it does. After export and final C# build, verify `Scripts` and the changed Unity-owned files or bundles in the
+same package destination.
 
 For split ownership, such as a project-local `Mod` directory plus Unity resources, inspect every changed path and run
 each owning pipeline. The package matrix records known split layouts.

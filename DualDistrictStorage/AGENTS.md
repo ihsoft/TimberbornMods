@@ -18,6 +18,14 @@ Steam release tooling still requires root package metadata at `_MODS!/DualDistri
 materialized from tracked release/platform metadata or another documented verified source before Steam preflight. Normal
 release publishing must keep `UpdateVisibility=false` unless the user explicitly requested a Steam visibility change.
 
+## Toolbar Tool Order Contract
+
+Keep the visible DualDistrictStorage Storage tools as one contiguous ordered block after the stock Storage tools:
+Warehouse `100`, Tank `101`, and Pile `102` for every faction. Preserve the gap between the current stock maximum and
+`100` for third-party tools; do not add gaps inside the DualDistrictStorage block.
+
+Hidden Narrow/Wide pile templates remain non-toolbar tools and keep their existing hidden-tool order contract.
+
 ## Dual-District Icon Contract
 
 One invocation of `Tools/create_dual_district_icons.py` owns these generated PNG icons:
