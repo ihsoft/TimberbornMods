@@ -2,6 +2,7 @@ using Bindito.Core;
 using IgorZ.TimberDev.Utils;
 using Timberborn.BlockObjectTools;
 using Timberborn.TemplateInstantiation;
+using Timberborn.ToolSystem;
 
 namespace IgorZ.DualDistrictStorage;
 
@@ -14,6 +15,9 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<DualDistrictStorageRegistry>().AsSingleton();
     containerDefinition.Bind<AsymmetricDualDistrictStoragePlacementMarker>().AsTransient();
     containerDefinition.MultiBind<IBlockObjectPlacer>().To<AsymmetricDualDistrictStoragePlacer>().AsSingleton();
+    containerDefinition.MultiBind<IToolFinder>()
+        .To<AsymmetricDualDistrictStorageToolFinder>()
+        .AsSingleton();
     containerDefinition.MultiBind<TemplateModule>().ToProvider(ProvideTemplateModule).AsSingleton();
     HarmonyPatcher.ApplyPatch(
         PatchId,

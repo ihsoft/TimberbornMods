@@ -1,10 +1,12 @@
 using System.Collections.Generic;
+using System.Linq;
 using Timberborn.BlockObjectTools;
 using Timberborn.BlockSystem;
 using Timberborn.BuildingTools;
 using Timberborn.Buildings;
 using Timberborn.ConstructionSites;
 using Timberborn.Coordinates;
+using Timberborn.DuplicationSystem;
 using Timberborn.EntitySystem;
 using Timberborn.InputSystem;
 using Timberborn.LinkedBuildingSystem;
@@ -60,17 +62,27 @@ sealed class AsymmetricDualDistrictStoragePlacer : IBlockObjectPlacer {
     var widePlacement = new Placement(wideCoordinates, placement.Orientation.Flip(), placement.FlipMode);
     var placeFinished = _inputService.IsKeyHeld(PlaceFinishedKey)
         || entitySetupBuilder.Template.GetSpec<BuildingSpec>().PlaceFinished;
+    var duplicationInit = entitySetupBuilder.Build().InitComponents
+        .OfType<DuplicationInit>()
+        .SingleOrDefault();
 
-    var narrow = Create(narrowTemplate, narrowPlacement, placeFinished);
-    var wide = Create(wideTemplate, widePlacement, placeFinished);
+    var narrow = Create(narrowTemplate, narrowPlacement, placeFinished, duplicationInit);
+    var wide = Create(wideTemplate, widePlacement, placeFinished, duplicationInit);
     var narrowLinkedBuilding = narrow.GetComponent<LinkedBuilding>();
     var wideLinkedBuilding = wide.GetComponent<LinkedBuilding>();
     narrowLinkedBuilding.LinkBuilding(wideLinkedBuilding);
     wideLinkedBuilding.LinkBuilding(narrowLinkedBuilding);
   }
 
-  BlockObject Create(TemplateSpec template, Placement placement, bool placeFinished) {
+  BlockObject Create(
+      TemplateSpec template,
+      Placement placement,
+      bool placeFinished,
+      DuplicationInit duplicationInit) {
     var builder = new EntitySetup.Builder(template.Blueprint);
+    if (duplicationInit != null) {
+      builder.AddInitComponent(duplicationInit);
+    }
     return placeFinished
         ? _constructionFactory.CreateAsFinished(builder, placement)
         : _constructionFactory.CreateAsUnfinished(builder, placement);
