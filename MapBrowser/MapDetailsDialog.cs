@@ -88,8 +88,8 @@ sealed class MapDetailsDialog : AbstractDialog {
   }
 
   void BindContent() {
-    var metadata = _metadataService.Find(_installedMap.PublishedFileId);
-    Root.Q2<Label>("Title").text = metadata?.Title ?? _installedMap.Map.DisplayName;
+    var metadata = _installedMap.Metadata ?? _metadataService.Find(_installedMap.PublishedFileId);
+    Root.Q2<Label>("Title").text = metadata?.Title ?? _installedMap.Map?.DisplayName;
     Root.Q2<Label>("Description").text = GetDescription(metadata);
     var mapInformation = Root.Q2<Label>("MapInformation");
     mapInformation.text = GetMapInformation();
@@ -104,6 +104,7 @@ sealed class MapDetailsDialog : AbstractDialog {
     _nextImageButton.clicked += ShowNextImage;
     _removeButton = Root.Q2<NineSliceButton>("RemoveButton");
     _removeButton.text = UiFactory.T(_installedMap.PublishedFileId != null ? UnsubscribeLocKey : DeleteLocKey);
+    _removeButton.ToggleDisplayStyle(_installedMap.IsInstalled);
     _tooltipRegistrar.Register(_removeButton, GetRemoveTooltip);
     _removeButton.clicked += RemoveMap;
     BuildImageList(metadata);
@@ -112,14 +113,14 @@ sealed class MapDetailsDialog : AbstractDialog {
   }
 
   string GetDescription(WorkshopItemMetadata metadata) {
-    var description = metadata?.DescriptionRaw ?? _installedMap.Map.DisplayDescription;
+    var description = metadata?.DescriptionRaw ?? _installedMap.Map?.DisplayDescription;
     return string.IsNullOrWhiteSpace(description)
         ? UiFactory.T(NoDescriptionLocKey)
         : SteamDescriptionFormatter.Format(description);
   }
 
   string GetMapInformation() {
-    var mapSize = MapBrowserDialog.GetMapSize(_installedMap, UiFactory.T("IgorZ.MapBrowser.Common.Unknown"));
+    var mapSize = MapBrowserDialog.GetMapSize(_installedMap, UiFactory.T("IgorZ.MapBrowser.Common.Unavailable"));
     var size = UiFactory.T("IgorZ.MapBrowser.Details.Size", mapSize);
     if (_installedMap.PublishedFileId == null) {
       return size;
@@ -173,7 +174,9 @@ sealed class MapDetailsDialog : AbstractDialog {
   void ShowImage(int index) {
     _imageIndex = index;
     if (_imageUrls.Count == 0) {
-      _preview.image = _mapThumbnailCache.GetThumbnail(_installedMap.Map.MapFileReference);
+      _preview.image = _installedMap.Map != null
+          ? _mapThumbnailCache.GetThumbnail(_installedMap.Map.MapFileReference)
+          : null;
       return;
     }
 
@@ -193,7 +196,7 @@ sealed class MapDetailsDialog : AbstractDialog {
   }
 
   void RemoveMap() {
-    if (_installedMap is not { Removed: false }) {
+    if (_installedMap is not { IsInstalled: true, Removed: false }) {
       return;
     }
     if (_installedMap.PublishedFileId == null) {

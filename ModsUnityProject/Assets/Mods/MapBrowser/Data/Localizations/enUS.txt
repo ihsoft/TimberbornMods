@@ -57,6 +57,7 @@ IgorZ.MapBrowser.Analysis.Tooltip,"Our analysis
 {0}",Tooltip containing the full map analysis.
 =,=,Map browser
 IgorZ.MapBrowser.Browser.InstalledMaps,Installed custom maps,Heading above the installed map list.
+IgorZ.MapBrowser.Browser.SearchMaps,Find Workshop maps,Heading above Workshop search results.
 IgorZ.MapBrowser.Browser.TitleWithSize,"{0} ({1})",Map title followed by its dimensions.
 =,=,Common map text
 IgorZ.MapBrowser.Common.NoDescription,No description,Text shown when a map has no description.
@@ -71,3 +72,19 @@ IgorZ.MapBrowser.Details.VotesUnavailable,Votes: Unavailable,Text shown while li
 =,=,Metadata freshness
 IgorZ.MapBrowser.Freshness.Missing,"Freshness: This map is not included in the latest index snapshot ({0}). Analysis will become available after a later refresh.",Message shown for a Workshop map missing from the current public index.
 IgorZ.MapBrowser.Freshness.Stale,"Freshness warning: The analysis above describes previously indexed images; the current Workshop images have changed and could not be reclassified yet.",Warning shown when saved map analysis is stale.
+=,=,Workshop search
+IgorZ.MapBrowser.Search.Any,Any,Filter option that does not restrict search results.
+IgorZ.MapBrowser.Search.Filter.Forests,Forests,Label for the forest density search filter.
+IgorZ.MapBrowser.Search.Filter.Landform,Landform,Label for the landform search filter.
+IgorZ.MapBrowser.Search.Filter.Layout,Layout,Label for the layout search filter.
+IgorZ.MapBrowser.Search.Filter.Terrain,Terrain,Label for the terrain search filter.
+IgorZ.MapBrowser.Search.Filter.Valleys,Valleys,Label for the valley search filter.
+IgorZ.MapBrowser.Search.Filter.Water,Water,Label for the water search filter.
+IgorZ.MapBrowser.Search.Installed,Installed,Tab button that shows installed maps.
+IgorZ.MapBrowser.Search.Keywords,Keywords,Label for the Workshop text search field.
+IgorZ.MapBrowser.Search.MatchCount,"Matches: {0} / {1}",Number of matching maps and total indexed maps.
+IgorZ.MapBrowser.Search.NextPage,Next,Button that opens the next search-results page.
+IgorZ.MapBrowser.Search.Page,"Page {0} / {1}",Current and total search-results pages.
+IgorZ.MapBrowser.Search.PageSize,Page size,Label for the number of search results shown on one page.
+IgorZ.MapBrowser.Search.PreviousPage,Previous,Button that opens the previous search-results page.
+IgorZ.MapBrowser.Search.Search,Find maps,Tab button that opens Workshop map search.

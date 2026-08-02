@@ -1,0 +1,52 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle" />
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle" />
+    <engine:VisualElement>
+        <engine:VisualElement style="flex-direction: row; align-items: center;">
+            <Timberborn.CoreUI.LocalizableLabel text="Keywords" text-loc-key="IgorZ.MapBrowser.Search.Keywords" class="text--default" style="flex-shrink: 0; margin-right: 8px;" />
+            <engine:VisualElement name="KeywordsField" style="flex-grow: 1;" />
+        </engine:VisualElement>
+        <engine:VisualElement style="flex-direction: row; flex-wrap: wrap; margin-top: 6px;">
+            <engine:VisualElement name="ruggednessFilter" style="flex-direction: row; align-items: center; width: 33.333%; min-width: 300px; padding-right: 12px; margin-bottom: 6px;">
+                <Timberborn.CoreUI.LocalizableLabel name="ruggednessLabel" text="Terrain" text-loc-key="IgorZ.MapBrowser.Search.Filter.Terrain" class="text--default" style="flex-shrink: 0; margin-right: 5px;" />
+                <engine:VisualElement style="flex-grow: 1;" />
+                <Timberborn.DropdownSystem.Dropdown name="ruggednessDropdown" style="width: 220px; flex-shrink: 0;" />
+            </engine:VisualElement>
+            <engine:VisualElement name="canyonnessFilter" style="flex-direction: row; align-items: center; width: 33.333%; min-width: 300px; padding-right: 12px; margin-bottom: 6px;">
+                <Timberborn.CoreUI.LocalizableLabel name="canyonnessLabel" text="Valleys" text-loc-key="IgorZ.MapBrowser.Search.Filter.Valleys" class="text--default" style="flex-shrink: 0; margin-right: 5px;" />
+                <engine:VisualElement style="flex-grow: 1;" />
+                <Timberborn.DropdownSystem.Dropdown name="canyonnessDropdown" style="width: 220px; flex-shrink: 0;" />
+            </engine:VisualElement>
+            <engine:VisualElement name="water_dominanceFilter" style="flex-direction: row; align-items: center; width: 33.333%; min-width: 300px; margin-bottom: 6px;">
+                <Timberborn.CoreUI.LocalizableLabel name="water_dominanceLabel" text="Water" text-loc-key="IgorZ.MapBrowser.Search.Filter.Water" class="text--default" style="flex-shrink: 0; margin-right: 5px;" />
+                <engine:VisualElement style="flex-grow: 1;" />
+                <Timberborn.DropdownSystem.Dropdown name="water_dominanceDropdown" style="width: 220px; flex-shrink: 0;" />
+            </engine:VisualElement>
+            <engine:VisualElement name="forest_densityFilter" style="flex-direction: row; align-items: center; width: 33.333%; min-width: 300px; padding-right: 12px; margin-bottom: 6px;">
+                <Timberborn.CoreUI.LocalizableLabel name="forest_densityLabel" text="Forests" text-loc-key="IgorZ.MapBrowser.Search.Filter.Forests" class="text--default" style="flex-shrink: 0; margin-right: 5px;" />
+                <engine:VisualElement style="flex-grow: 1;" />
+                <Timberborn.DropdownSystem.Dropdown name="forest_densityDropdown" style="width: 220px; flex-shrink: 0;" />
+            </engine:VisualElement>
+            <engine:VisualElement name="islandnessFilter" style="flex-direction: row; align-items: center; width: 33.333%; min-width: 300px; padding-right: 12px; margin-bottom: 6px;">
+                <Timberborn.CoreUI.LocalizableLabel name="islandnessLabel" text="Landform" text-loc-key="IgorZ.MapBrowser.Search.Filter.Landform" class="text--default" style="flex-shrink: 0; margin-right: 5px;" />
+                <engine:VisualElement style="flex-grow: 1;" />
+                <Timberborn.DropdownSystem.Dropdown name="islandnessDropdown" style="width: 220px; flex-shrink: 0;" />
+            </engine:VisualElement>
+            <engine:VisualElement name="artificial_layoutFilter" style="flex-direction: row; align-items: center; width: 33.333%; min-width: 300px; margin-bottom: 6px;">
+                <Timberborn.CoreUI.LocalizableLabel name="artificial_layoutLabel" text="Layout" text-loc-key="IgorZ.MapBrowser.Search.Filter.Layout" class="text--default" style="flex-shrink: 0; margin-right: 5px;" />
+                <engine:VisualElement style="flex-grow: 1;" />
+                <Timberborn.DropdownSystem.Dropdown name="artificial_layoutDropdown" style="width: 220px; flex-shrink: 0;" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+        <engine:VisualElement style="flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; margin-top: 1px;">
+            <engine:Label name="MatchesLabel" class="text--default" style="flex-grow: 1; flex-shrink: 1; min-width: 220px; margin-right: 10px;" />
+            <engine:VisualElement style="flex-direction: row; align-items: center; flex-shrink: 0;">
+                <Timberborn.CoreUI.LocalizableLabel text="Page size" text-loc-key="IgorZ.MapBrowser.Search.PageSize" class="text--default" style="margin-right: 5px;" />
+                <Timberborn.DropdownSystem.Dropdown name="PageSizeDropdown" style="width: 75px; margin-right: 10px;" />
+                <Timberborn.CoreUI.NineSliceButton name="PreviousPageButton" class="button-square button-arrow-left" style="margin-right: 5px;" />
+                <engine:Label name="PageLabel" class="text--default" style="min-width: 100px; -unity-text-align: middle-center;" />
+                <Timberborn.CoreUI.NineSliceButton name="NextPageButton" class="button-square button-arrow-right" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

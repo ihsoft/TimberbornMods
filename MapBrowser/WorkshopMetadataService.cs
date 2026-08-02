@@ -32,6 +32,8 @@ sealed class WorkshopMetadataService : IUnloadableSingleton, IUpdatableSingleton
 
   public DateTimeOffset? IndexGeneratedAtUtc { get; private set; }
 
+  public IReadOnlyCollection<WorkshopItemMetadata> Items => _items.Values;
+
   public void EnsureLoaded() {
     if (Loading || _items.Count > 0 || Error != null) {
       return;

@@ -5,7 +5,9 @@
     <engine:VisualElement class="content-row-centered">
         <engine:Instance template="NamedBoxTemplate" style="width: 1200px; height: 820px; max-width: 94%; max-height: 92%;">
             <AttributeOverrides element-name="Header" text="Map Browser" text-loc-key="IgorZ.MapBrowser.Dialog.Header" />
-            <Timberborn.CoreUI.LocalizableLabel text="Installed custom maps" text-loc-key="IgorZ.MapBrowser.Browser.InstalledMaps" class="game-text-big text--bold" style="margin-bottom: 5px; flex-shrink: 0;" />
+            <engine:VisualElement name="TabButtons" style="flex-direction: row; margin-bottom: 8px; flex-shrink: 0;" />
+            <Timberborn.CoreUI.LocalizableLabel name="ModeHeading" text="Installed custom maps" text-loc-key="IgorZ.MapBrowser.Browser.InstalledMaps" class="game-text-big text--bold" style="margin-bottom: 5px; flex-shrink: 0;" />
+            <engine:VisualElement name="SearchPanel" style="display: none; margin-bottom: 8px; flex-shrink: 0;" />
             <Timberborn.CoreUI.NineSliceVisualElement class="bg-sub-box--green" style="flex-grow: 1; padding: 12px;">
                 <engine:ListView name="InstalledMapsList" class="panel-list-view scroll--green-decorated" style="flex-grow: 1;" />
             </Timberborn.CoreUI.NineSliceVisualElement>

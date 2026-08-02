@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using IgorZ.TimberDev.UI;
 using Timberborn.CoreUI;
+using Timberborn.DropdownSystem;
 using Timberborn.MapItemsUI;
 using Timberborn.MapRepositorySystem;
 using Timberborn.MapThumbnail;
@@ -16,6 +17,7 @@ namespace IgorZ.MapBrowser;
 
 sealed class MapBrowserDialog : AbstractDialog {
   const string DialogAsset = "IgorZ.MapBrowser/MapBrowserDialog";
+  const string SearchPanelAsset = "IgorZ.MapBrowser/MapSearchPanel";
   const string DeleteMapPromptLocKey = "LoadMapPanel.DeleteMapPrompt";
   const string DeleteLocKey = "IgorZ.MapBrowser.Action.Delete";
   const string DeleteTooltipLocKey = "IgorZ.MapBrowser.Action.DeleteTooltip";
@@ -32,6 +34,15 @@ sealed class MapBrowserDialog : AbstractDialog {
   const string UnsubscribingLocKey = "IgorZ.MapBrowser.Action.Unsubscribing";
   const float PreviewHeight = 180;
 
+  static readonly SearchFilter[] SearchFilters = [
+    new("ruggedness", ["Flat", "MostlyFlat", "Mixed", "Rugged", "Mountainous"]),
+    new("canyonness", ["Open", "MostlyOpen", "Mixed", "NarrowValleys", "Canyons"]),
+    new("water_dominance", ["Dry", "LittleWater", "ModerateWater", "WaterRich", "WaterDominated"]),
+    new("forest_density", ["Barren", "Sparse", "ModerateForests", "Forested", "DenseForest"]),
+    new("islandness", ["Mainland", "MostlyConnected", "Mixed", "Fragmented", "Islands"]),
+    new("artificial_layout", ["Natural", "MostlyNatural", "Mixed", "Structured", "Geometric"]),
+  ];
+
   readonly MapItemProvider _mapItemProvider;
   readonly MapThumbnailCache _mapThumbnailCache;
   readonly MapRepository _mapRepository;
@@ -39,15 +50,31 @@ sealed class MapBrowserDialog : AbstractDialog {
   readonly WorkshopMetadataService _metadataService;
   readonly WorkshopSubscriptionService _subscriptionService;
   readonly ITooltipRegistrar _tooltipRegistrar;
-  readonly List<InstalledMap> _maps = [];
+  readonly DropdownItemsSetter _dropdownItemsSetter;
+  readonly List<InstalledMap> _installedMaps = [];
+  readonly List<InstalledMap> _searchMatches = [];
+  readonly List<InstalledMap> _searchResults = [];
+  readonly Dictionary<string, SearchDropdownProvider> _searchFilters = [];
 
   ListView _list;
+  List<InstalledMap> _visibleMaps;
+  TextField _searchText;
+  VisualElement _searchPanel;
+  Label _modeHeading;
+  Button _installedTab;
+  Button _searchTab;
+  Label _matchesLabel;
+  Label _pageLabel;
+  Button _previousPageButton;
+  Button _nextPageButton;
+  int _pageIndex;
+  int _pageSize = 50;
 
   MapBrowserDialog(
       MapItemProvider mapItemProvider, MapThumbnailCache mapThumbnailCache, MapRepository mapRepository,
       MapDetailsDialog mapDetailsDialog, WorkshopMetadataService metadataService,
       WorkshopSubscriptionService subscriptionService,
-      ITooltipRegistrar tooltipRegistrar) {
+      ITooltipRegistrar tooltipRegistrar, DropdownItemsSetter dropdownItemsSetter) {
     _mapItemProvider = mapItemProvider;
     _mapThumbnailCache = mapThumbnailCache;
     _mapRepository = mapRepository;
@@ -55,6 +82,7 @@ sealed class MapBrowserDialog : AbstractDialog {
     _metadataService = metadataService;
     _subscriptionService = subscriptionService;
     _tooltipRegistrar = tooltipRegistrar;
+    _dropdownItemsSetter = dropdownItemsSetter;
   }
 
   protected override string DialogResourceName => DialogAsset;
@@ -73,13 +101,15 @@ sealed class MapBrowserDialog : AbstractDialog {
     }
 
     base.Show();
+    InitializeModes();
     _list = Root.Q2<ListView>("InstalledMapsList");
-    _list.itemsSource = _maps;
+    _visibleMaps = _installedMaps;
+    _list.itemsSource = _visibleMaps;
     _list.makeItem = CreateMapRow;
     _list.bindItem = BindMapRow;
     _list.selectionType = SelectionType.None;
     _list.virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight;
-    RefreshMaps();
+    RefreshInstalledMaps();
     _metadataService.MetadataChanged += OnMetadataChanged;
     _metadataService.EnsureLoaded();
   }
@@ -90,8 +120,95 @@ sealed class MapBrowserDialog : AbstractDialog {
     }
     _metadataService.MetadataChanged -= OnMetadataChanged;
     _list = null;
-    _maps.Clear();
+    _visibleMaps = null;
+    _searchText = null;
+    _searchPanel = null;
+    _modeHeading = null;
+    _installedTab = null;
+    _searchTab = null;
+    _installedMaps.Clear();
+    _searchMatches.Clear();
+    _searchResults.Clear();
+    _searchFilters.Clear();
     base.Close();
+  }
+
+  void InitializeModes() {
+    var tabs = Root.Q2<VisualElement>("TabButtons");
+    tabs.style.flexWrap = Wrap.Wrap;
+    _installedTab = UiFactory.CreateButton(
+        "IgorZ.MapBrowser.Search.Installed", _ => SetSearchMode(false), classes: ["game-text-small"]);
+    _installedTab.style.marginRight = 6;
+    _searchTab = UiFactory.CreateButton(
+        "IgorZ.MapBrowser.Search.Search", _ => SetSearchMode(true), classes: ["game-text-small"]);
+    tabs.Add(_installedTab);
+    tabs.Add(_searchTab);
+    _modeHeading = Root.Q2<Label>("ModeHeading");
+    _searchPanel = Root.Q2<VisualElement>("SearchPanel");
+    CreateSearchControls();
+    SetSearchMode(false);
+  }
+
+  void CreateSearchControls() {
+    var searchControls = UiFactory.LoadVisualTreeAsset(SearchPanelAsset);
+    _searchPanel.Add(searchControls);
+    _searchText = UiFactory.CreateTextField(classes: ["game-text-normal"]);
+    _searchText.style.flexGrow = 1;
+    _searchText.RegisterValueChangedCallback(_ => ApplySearch());
+    searchControls.Q2<VisualElement>("KeywordsField").Add(_searchText);
+    foreach (var filter in SearchFilters) {
+      BindSearchFilter(searchControls, filter);
+    }
+    BindSearchPagingControls(searchControls);
+  }
+
+  void BindSearchPagingControls(VisualElement searchControls) {
+    _matchesLabel = searchControls.Q2<Label>("MatchesLabel");
+    var pageSize = searchControls.Q2<Dropdown>("PageSizeDropdown");
+    var pageSizeProvider = new SearchDropdownProvider(["25", "50", "100", "200"]);
+    pageSizeProvider.SetValue(_pageSize.ToString());
+    pageSize.ValueChanged += (_, _) => {
+      if (int.TryParse(pageSizeProvider.GetValue(), out var parsedPageSize)) {
+        _pageSize = parsedPageSize;
+        _pageIndex = 0;
+        RefreshSearchPage();
+      }
+    };
+    _dropdownItemsSetter.SetItems(pageSize, pageSizeProvider);
+    _previousPageButton = searchControls.Q2<Button>("PreviousPageButton");
+    _previousPageButton.clicked += () => ChangePage(-1);
+    _pageLabel = searchControls.Q2<Label>("PageLabel");
+    _nextPageButton = searchControls.Q2<Button>("NextPageButton");
+    _nextPageButton.clicked += () => ChangePage(1);
+  }
+
+  void BindSearchFilter(VisualElement searchControls, SearchFilter filter) {
+    var dropdown = searchControls.Q2<Dropdown>(filter.Feature + "Dropdown");
+    var values = new[] { UiFactory.T("IgorZ.MapBrowser.Search.Any") }
+        .Concat(filter.Levels.Select(level => UiFactory.T("IgorZ.MapBrowser.Analysis.Level." + level)))
+        .ToArray();
+    var provider = new SearchDropdownProvider(values);
+    dropdown.ValueChanged += (_, _) => ApplySearch();
+    _dropdownItemsSetter.SetItems(dropdown, provider);
+    _searchFilters[filter.Feature] = provider;
+  }
+
+  void SetSearchMode(bool searchMode) {
+    _installedTab.SetEnabled(searchMode);
+    _searchTab.SetEnabled(!searchMode);
+    _searchPanel.ToggleDisplayStyle(searchMode);
+    UpdateModeHeading(searchMode);
+    if (searchMode) {
+      ApplySearch();
+    } else {
+      ShowMaps(_installedMaps);
+    }
+  }
+
+  void UpdateModeHeading(bool searchMode) {
+    _modeHeading.text = searchMode
+        ? UiFactory.T("IgorZ.MapBrowser.Browser.SearchMaps")
+        : $"{UiFactory.T("IgorZ.MapBrowser.Browser.InstalledMaps")} ({_installedMaps.Count})";
   }
 
   VisualElement CreateMapRow() {
@@ -123,7 +240,16 @@ sealed class MapBrowserDialog : AbstractDialog {
     var textColumn = new VisualElement {
         style = { flexGrow = 1, height = PreviewHeight, overflow = Overflow.Hidden },
     };
-    var title = new Label { name = "Title", style = { fontSize = 19, unityFontStyleAndWeight = FontStyle.Bold } };
+    var title = new Label {
+        name = "Title",
+        style = {
+            fontSize = 19,
+            unityFontStyleAndWeight = FontStyle.Bold,
+            whiteSpace = WhiteSpace.NoWrap,
+            overflow = Overflow.Hidden,
+            textOverflow = TextOverflow.Ellipsis,
+        },
+    };
     title.AddToClassList("text--default");
     textColumn.Add(title);
     var analysis = new Label {
@@ -213,19 +339,27 @@ sealed class MapBrowserDialog : AbstractDialog {
   }
 
   void BindMapRow(VisualElement row, int index) {
-    var installedMap = _maps[index];
+    var installedMap = _visibleMaps[index];
     var binding = (RowBinding)row.userData;
     binding.Key = installedMap.Key;
     binding.Map = installedMap;
-    binding.ActionText = UiFactory.T(installedMap.PublishedFileId != null ? UnsubscribeLocKey : DeleteLocKey);
-    binding.ActionTooltip = installedMap.PublishedFileId != null
-        ? UiFactory.T(UnsubscribeTooltipLocKey)
-        : UiFactory.T(DeleteTooltipLocKey);
-    var metadata = _metadataService.Find(installedMap.PublishedFileId);
+    binding.ActionText = installedMap.IsInstalled
+        ? UiFactory.T(installedMap.PublishedFileId != null ? UnsubscribeLocKey : DeleteLocKey)
+        : string.Empty;
+    binding.ActionTooltip = installedMap.IsInstalled
+        ? installedMap.PublishedFileId != null
+            ? UiFactory.T(UnsubscribeTooltipLocKey)
+            : UiFactory.T(DeleteTooltipLocKey)
+        : null;
+    var metadata = GetMetadata(installedMap);
     var title = GetDisplayTitle(installedMap);
-    var description = metadata?.DescriptionPlain ?? installedMap.Map.DisplayDescription;
-    var mapSize = GetMapSize(installedMap, UiFactory.T("IgorZ.MapBrowser.Common.Unknown"));
-    row.Q<Label>("Title").text = UiFactory.T(TitleWithSizeLocKey, title, mapSize);
+    var description = metadata?.DescriptionPlain ?? installedMap.Map?.DisplayDescription;
+    var titleLabel = row.Q<Label>("Title");
+    titleLabel.text = installedMap.IsInstalled
+        ? UiFactory.T(
+            TitleWithSizeLocKey, title,
+            GetMapSize(installedMap, UiFactory.T("IgorZ.MapBrowser.Common.Unknown")))
+        : title;
     var descriptionLabel = row.Q<Label>("Description");
     binding.Description = string.IsNullOrWhiteSpace(description)
         ? UiFactory.T(NoDescriptionLocKey)
@@ -242,7 +376,9 @@ sealed class MapBrowserDialog : AbstractDialog {
     ApplyRemovedState(row, binding, installedMap.Removed);
 
     var preview = row.Q<Image>("Preview");
-    preview.image = _mapThumbnailCache.GetThumbnail(installedMap.Map.MapFileReference);
+    preview.image = installedMap.Map != null
+        ? _mapThumbnailCache.GetThumbnail(installedMap.Map.MapFileReference)
+        : null;
     if (metadata?.PreviewUrl != null) {
       var requestedKey = binding.Key;
       _metadataService.GetPreview(metadata.PreviewUrl, texture => {
@@ -253,30 +389,128 @@ sealed class MapBrowserDialog : AbstractDialog {
     }
   }
 
-  void RefreshMaps() {
-    _maps.Clear();
-    _maps.AddRange(_mapItemProvider.GetCustomMaps()
+  void RefreshInstalledMaps() {
+    _installedMaps.Clear();
+    _installedMaps.AddRange(_mapItemProvider.GetCustomMaps()
         .Select(map => new InstalledMap(map, FindPublishedFileId(map.MapFileReference.Path))));
-    SortMaps();
-    _list?.RefreshItems();
+    SortMaps(_installedMaps);
+    if (_visibleMaps == _installedMaps) {
+      UpdateModeHeading(false);
+      _list?.RefreshItems();
+    } else {
+      ApplySearch();
+    }
   }
 
   void OnMetadataChanged() {
-    SortMaps();
-    _list?.Rebuild();
+    SortMaps(_installedMaps);
+    if (_visibleMaps == _installedMaps) {
+      _list?.Rebuild();
+    } else {
+      ApplySearch();
+    }
   }
 
-  void SortMaps() {
-    _maps.Sort((left, right) => StringComparer.OrdinalIgnoreCase.Compare(
+  void SortMaps(List<InstalledMap> maps) {
+    maps.Sort((left, right) => StringComparer.OrdinalIgnoreCase.Compare(
         GetDisplayTitle(left), GetDisplayTitle(right)));
   }
 
   string GetDisplayTitle(InstalledMap installedMap) {
-    return _metadataService.Find(installedMap.PublishedFileId)?.Title ?? installedMap.Map.DisplayName;
+    return GetMetadata(installedMap)?.Title ?? installedMap.Map?.DisplayName ?? installedMap.PublishedFileId;
+  }
+
+  WorkshopItemMetadata GetMetadata(InstalledMap installedMap) {
+    return installedMap.Metadata ?? _metadataService.Find(installedMap.PublishedFileId);
+  }
+
+  void ApplySearch() {
+    _searchMatches.Clear();
+    var installedById = _installedMaps
+        .Where(map => map.PublishedFileId != null)
+        .GroupBy(map => map.PublishedFileId, StringComparer.Ordinal)
+        .ToDictionary(group => group.Key, group => group.First(), StringComparer.Ordinal);
+    var terms = Regex.Split(_searchText?.value?.Trim() ?? string.Empty, @"\s+")
+        .Where(term => term.Length > 0)
+        .ToArray();
+    foreach (var metadata in _metadataService.Items.Where(item => item.PrimaryCategory == "map")) {
+      if (!MatchesText(metadata, terms) || !MatchesFilters(metadata)) {
+        continue;
+      }
+      _searchMatches.Add(installedById.TryGetValue(metadata.PublishedFileId, out var installedMap)
+          ? installedMap with { Metadata = metadata }
+          : new InstalledMap(null, metadata.PublishedFileId, metadata));
+    }
+    SortMaps(_searchMatches);
+    _pageIndex = 0;
+    RefreshSearchPage();
+  }
+
+  void RefreshSearchPage() {
+    var totalMaps = _metadataService.Items.Count(item => item.PrimaryCategory == "map");
+    var pageCount = _searchMatches.Count == 0
+        ? 0
+        : (_searchMatches.Count + _pageSize - 1) / _pageSize;
+    _pageIndex = pageCount == 0 ? 0 : Math.Clamp(_pageIndex, 0, pageCount - 1);
+    _searchResults.Clear();
+    _searchResults.AddRange(_searchMatches.Skip(_pageIndex * _pageSize).Take(_pageSize));
+    if (_matchesLabel != null && _pageLabel != null && _previousPageButton != null && _nextPageButton != null) {
+      _matchesLabel.text = UiFactory.T("IgorZ.MapBrowser.Search.MatchCount", _searchMatches.Count, totalMaps);
+      _pageLabel.text = UiFactory.T(
+          "IgorZ.MapBrowser.Search.Page", pageCount == 0 ? 0 : _pageIndex + 1, pageCount);
+      _previousPageButton.SetEnabled(_pageIndex > 0);
+      _nextPageButton.SetEnabled(_pageIndex + 1 < pageCount);
+    }
+    ShowMaps(_searchResults);
+  }
+
+  void ChangePage(int delta) {
+    _pageIndex += delta;
+    RefreshSearchPage();
+  }
+
+  static bool MatchesText(WorkshopItemMetadata metadata, IReadOnlyCollection<string> terms) {
+    if (terms.Count == 0) {
+      return true;
+    }
+    var searchableText = metadata.Title + "\n" + metadata.DescriptionPlain;
+    return terms.All(term => searchableText.Contains(term, StringComparison.OrdinalIgnoreCase));
+  }
+
+  bool MatchesFilters(WorkshopItemMetadata metadata) {
+    foreach (var filter in SearchFilters) {
+      var selectedIndex = _searchFilters.GetValueOrDefault(filter.Feature)?.SelectedIndex ?? 0;
+      if (selectedIndex == 0) {
+        continue;
+      }
+      if (!metadata.VisualPercentiles.TryGetValue(filter.Feature, out var percentile)
+          || GetPercentileBucket(percentile) != selectedIndex - 1) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  static int GetPercentileBucket(float percentile) {
+    return percentile switch {
+        < 0.2f => 0,
+        < 0.4f => 1,
+        < 0.6f => 2,
+        < 0.8f => 3,
+        _ => 4,
+    };
+  }
+
+  void ShowMaps(List<InstalledMap> maps) {
+    _visibleMaps = maps;
+    if (_list != null) {
+      _list.itemsSource = maps;
+      _list.Rebuild();
+    }
   }
 
   internal static string GetMapSize(InstalledMap installedMap, string unknown) {
-    return installedMap.Map.Size is { } mapSize ? $"{mapSize.x}x{mapSize.y}" : unknown;
+    return installedMap.Map?.Size is { } mapSize ? $"{mapSize.x}x{mapSize.y}" : unknown;
   }
 
   string FormatCompactAnalysis(WorkshopItemMetadata metadata) {
@@ -385,7 +619,7 @@ sealed class MapBrowserDialog : AbstractDialog {
 
   void RemoveMap(RowBinding binding, VisualElement row, NineSliceButton button) {
     var installedMap = binding.Map;
-    if (installedMap == null || installedMap.Removed) {
+    if (installedMap is not { IsInstalled: true, Removed: false }) {
       return;
     }
     if (installedMap.PublishedFileId == null) {
@@ -451,6 +685,7 @@ sealed class MapBrowserDialog : AbstractDialog {
     var button = row.Q<NineSliceButton>("ActionButton");
     button.text = binding.ActionText;
     button.SetEnabled(true);
+    button.ToggleDisplayStyle(binding.Map.IsInstalled && !removed);
     row.Q<VisualElement>("Actions").ToggleDisplayStyle(false);
   }
 
@@ -488,5 +723,27 @@ sealed class MapBrowserDialog : AbstractDialog {
     public InstalledMap Map { get; set; }
     public string ActionText { get; set; }
     public string ActionTooltip { get; set; }
+  }
+
+  sealed record SearchFilter(string Feature, string[] Levels);
+
+  sealed class SearchDropdownProvider : IDropdownProvider {
+    readonly string[] _items;
+
+    public SearchDropdownProvider(string[] items) {
+      _items = items;
+      Items = items;
+      Value = items.FirstOrDefault();
+    }
+
+    public IReadOnlyList<string> Items { get; }
+
+    string Value { get; set; }
+
+    public int SelectedIndex => Array.IndexOf(_items, Value);
+
+    public string GetValue() => Value;
+
+    public void SetValue(string value) => Value = value;
   }
 }
