@@ -114,6 +114,15 @@ For an active mod, ensure the applicable slice includes:
 - manifest dependencies and implementation-owned compatibility data, while deferring release-only platform config;
 - a local `AGENTS.md` only when durable mod-specific contracts justify one.
 
+New C# source files for a new mod must use the repository's established three-line source header for that package. When
+the package's declared license is Public Domain, the header is:
+
+```csharp
+// Timberborn Mod: <ModName>
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+```
+
 Do not create empty tests or local instructions merely to satisfy a checklist. A missing focused test project must be
 recorded honestly rather than replaced with unrelated tests.
 

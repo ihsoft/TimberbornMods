@@ -144,6 +144,10 @@ Declare localization keys as constants near the top of the class that uses them:
 const string ActionLocKey = "Some.Mod.Feature.Action";
 ```
 
+Do not leave stable localization key literals inline at call sites. This includes direct `ILoc.T(...)` calls and helper
+calls such as `UiFactory.T(...)`, button factories, or `RegisterLocalizable(...)`. For dynamic key families, declare a
+named prefix constant and compose the variable suffix deliberately.
+
 Resolve code-owned text through `ILoc.T(...)`:
 
 ```csharp
@@ -197,7 +201,8 @@ Before submitting a localization change:
    retranslation, normalization, or wording cleanup outside the requested scope.
 8. Do not automatically repair pre-existing missing keys, extra keys, duplicates, placeholder mismatches, or uncertain
    translations outside the requested scope. Report them and wait for explicit direction.
-9. Search the affected code and UI for accidental hardcoded player-facing text and stale key references.
+9. Search the affected code and UI for accidental hardcoded player-facing text, stale key references, and inline stable
+   localization key literals passed to `T(...)`, button factories, or `RegisterLocalizable(...)`.
 10. Use the owning Unity export or package build path, then follow the root real-game validation gate for the rendered
    player-visible result.
 

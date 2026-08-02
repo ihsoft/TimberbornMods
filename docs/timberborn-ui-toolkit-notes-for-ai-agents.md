@@ -27,6 +27,13 @@ ModsUnityProject/Assets/Mods/<ModName>/AssetBundles/Resources/UI/Views/
 TimberDev/UI/UiFactory.cs
 ```
 
+## UXML Ownership
+
+Declare stable static UI elements under their final parent in UXML. Do not create a static declarative layout in UXML
+and then reparent it in C# merely to move it to the intended container; that defeats the purpose of the UXML hierarchy
+and can make initialization order fragile. Use C# construction or reparenting only when the element is genuinely
+dynamic, depends on runtime data, or has another concrete lifecycle reason.
+
 ## Common Controls
 
 Prefer Timberborn controls for game-like UI.

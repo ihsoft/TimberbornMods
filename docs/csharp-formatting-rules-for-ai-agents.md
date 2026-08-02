@@ -258,6 +258,11 @@ Prefer the fewer-line version when both are readable.
 After adding, removing, or reordering constructor or method parameters, re-check whether the final signature can be
 formatted more compactly while staying readable and within the 120-character limit.
 
+After extracting string literals, renaming identifiers, or otherwise changing expression length, re-check nearby
+wrapping semantically. A maximum-line-length check only finds lines that are too long; it does not find obsolete wraps
+that became unnecessary after the expression got shorter. Collapse formerly necessary wrapping when the final code now
+fits cleanly on one readable line.
+
 ### `out` and `ref` parameters
 
 Avoid `out` and `ref` parameters in helper methods when they are used only to expose temporary local state.
