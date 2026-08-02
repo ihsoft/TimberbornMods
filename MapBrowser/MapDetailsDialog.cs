@@ -20,8 +20,12 @@ sealed class MapDetailsDialog : AbstractDialog {
   const string NoDescriptionLocKey = "IgorZ.MapBrowser.Common.NoDescription";
   const string RemovedLocKey = "IgorZ.MapBrowser.Action.Removed";
   const string RetryDeleteLocKey = "IgorZ.MapBrowser.Action.RetryDelete";
+  const string RetrySubscribeLocKey = "IgorZ.MapBrowser.Action.RetrySubscribe";
   const string RetryUnsubscribeLocKey = "IgorZ.MapBrowser.Action.RetryUnsubscribe";
   const string SourceLocalLocKey = "IgorZ.MapBrowser.Common.SourceLocal";
+  const string SubscribeLocKey = "IgorZ.MapBrowser.Action.Subscribe";
+  const string SubscribeTooltipLocKey = "IgorZ.MapBrowser.Action.SubscribeTooltip";
+  const string SubscribingLocKey = "IgorZ.MapBrowser.Action.Subscribing";
   const string UnavailableLocKey = "IgorZ.MapBrowser.Common.Unavailable";
   const string UnsubscribeLocKey = "IgorZ.MapBrowser.Action.Unsubscribe";
   const string UnsubscribeTooltipLocKey = "IgorZ.MapBrowser.Action.UnsubscribeTooltip";
@@ -36,11 +40,13 @@ sealed class MapDetailsDialog : AbstractDialog {
   readonly List<string> _imageUrls = [];
 
   InstalledMap _installedMap;
-  Action _removedCallback;
+  Action<InstalledMap, bool> _subscriptionChangedCallback;
   Image _preview;
   Button _previousImageButton;
   Button _nextImageButton;
   NineSliceButton _removeButton;
+  bool _allowResubscribe;
+  bool _workshopSubscribed;
   int _imageIndex;
 
   MapDetailsDialog(
@@ -65,25 +71,33 @@ sealed class MapDetailsDialog : AbstractDialog {
 
   protected override bool CheckHasChanges() => false;
 
-  public void Show(InstalledMap installedMap, Action removedCallback) {
+  public void Show(
+      InstalledMap installedMap, bool allowResubscribe,
+      Action<InstalledMap, bool> subscriptionChangedCallback) {
     if (Root != null) {
       return;
     }
 
     _installedMap = installedMap;
-    _removedCallback = removedCallback;
+    _allowResubscribe = allowResubscribe;
+    _subscriptionChangedCallback = subscriptionChangedCallback;
     base.Show();
+    _subscriptionService.DownloadProgressChanged += OnDownloadProgressChanged;
+    _subscriptionService.DownloadCompleted += OnDownloadCompleted;
     BindContent();
   }
 
   public override void Close() {
+    _subscriptionService.DownloadProgressChanged -= OnDownloadProgressChanged;
+    _subscriptionService.DownloadCompleted -= OnDownloadCompleted;
     base.Close();
     _installedMap = null;
-    _removedCallback = null;
+    _subscriptionChangedCallback = null;
     _preview = null;
     _previousImageButton = null;
     _nextImageButton = null;
     _removeButton = null;
+    _allowResubscribe = false;
     _imageUrls.Clear();
   }
 
@@ -103,10 +117,14 @@ sealed class MapDetailsDialog : AbstractDialog {
     _previousImageButton.clicked += ShowPreviousImage;
     _nextImageButton.clicked += ShowNextImage;
     _removeButton = Root.Q2<NineSliceButton>("RemoveButton");
-    _removeButton.text = UiFactory.T(_installedMap.PublishedFileId != null ? UnsubscribeLocKey : DeleteLocKey);
-    _removeButton.ToggleDisplayStyle(_installedMap.IsInstalled);
+    _workshopSubscribed = _installedMap.PublishedFileId != null
+        && (_installedMap.IsInstalled || _subscriptionService.IsSubscribed(_installedMap.PublishedFileId));
+    _removeButton.text = UiFactory.T(_installedMap.PublishedFileId == null
+        ? DeleteLocKey
+        : _workshopSubscribed ? UnsubscribeLocKey : SubscribeLocKey);
+    _removeButton.ToggleDisplayStyle(_installedMap.IsInstalled || _installedMap.PublishedFileId != null);
     _tooltipRegistrar.Register(_removeButton, GetRemoveTooltip);
-    _removeButton.clicked += RemoveMap;
+    _removeButton.clicked += ApplyMapAction;
     BuildImageList(metadata);
     ShowImage(0);
     LoadLiveDetails(mapInformation);
@@ -190,13 +208,42 @@ sealed class MapDetailsDialog : AbstractDialog {
   }
 
   string GetRemoveTooltip() {
-    return _installedMap?.PublishedFileId != null
-        ? UiFactory.T(UnsubscribeTooltipLocKey)
-        : UiFactory.T(DeleteTooltipLocKey);
+    if (_installedMap?.PublishedFileId == null) {
+      return UiFactory.T(DeleteTooltipLocKey);
+    }
+    return UiFactory.T(_workshopSubscribed ? UnsubscribeTooltipLocKey : SubscribeTooltipLocKey);
+  }
+
+  void ApplyMapAction() {
+    if (_installedMap?.PublishedFileId != null && !_workshopSubscribed) {
+      SubscribeMap();
+    } else {
+      RemoveMap();
+    }
+  }
+
+  void SubscribeMap() {
+    var installedMap = _installedMap;
+    _removeButton.text = UiFactory.T(SubscribingLocKey);
+    _removeButton.SetEnabled(false);
+    _subscriptionService.Subscribe(installedMap.PublishedFileId, (succeeded, error) => {
+      if (Root == null || _installedMap != installedMap) {
+        return;
+      }
+      if (succeeded) {
+        _workshopSubscribed = true;
+        _subscriptionChangedCallback?.Invoke(installedMap, true);
+        UpdateDownloadProgress();
+      } else {
+        _removeButton.text = UiFactory.T(RetrySubscribeLocKey);
+        _removeButton.SetEnabled(true);
+        Debug.LogError($"MapBrowser: could not subscribe to {installedMap.PublishedFileId}: {error}");
+      }
+    });
   }
 
   void RemoveMap() {
-    if (_installedMap is not { IsInstalled: true, Removed: false }) {
+    if (_installedMap is not { Removed: false }) {
       return;
     }
     if (_installedMap.PublishedFileId == null) {
@@ -214,7 +261,17 @@ sealed class MapDetailsDialog : AbstractDialog {
     var installedMap = _installedMap;
     _subscriptionService.Unsubscribe(installedMap.PublishedFileId, (succeeded, error) => {
       if (succeeded) {
-        MarkRemoved(installedMap);
+        _workshopSubscribed = false;
+        if (installedMap.IsInstalled && !_allowResubscribe) {
+          MarkRemoved(installedMap);
+        } else {
+          installedMap.Removed = false;
+          _subscriptionChangedCallback?.Invoke(installedMap, false);
+          if (Root != null && _installedMap == installedMap) {
+            _removeButton.text = UiFactory.T(SubscribeLocKey);
+            _removeButton.SetEnabled(true);
+          }
+        }
       } else if (Root != null && _installedMap == installedMap) {
         _removeButton.text = UiFactory.T(RetryUnsubscribeLocKey);
         _removeButton.SetEnabled(true);
@@ -239,10 +296,37 @@ sealed class MapDetailsDialog : AbstractDialog {
 
   void MarkRemoved(InstalledMap installedMap) {
     installedMap.Removed = true;
-    _removedCallback?.Invoke();
+    _subscriptionChangedCallback?.Invoke(installedMap, false);
     if (Root != null && _installedMap == installedMap) {
       _removeButton.text = UiFactory.T(RemovedLocKey);
       _removeButton.SetEnabled(false);
+    }
+  }
+
+  void OnDownloadProgressChanged(string publishedFileId) {
+    if (Root != null && _installedMap?.PublishedFileId == publishedFileId) {
+      UpdateDownloadProgress();
+    }
+  }
+
+  void UpdateDownloadProgress() {
+    if (_subscriptionService.TryGetDownloadProgress(_installedMap.PublishedFileId, out var progress)) {
+      _removeButton.text = UiFactory.T("IgorZ.MapBrowser.Action.Downloading", Mathf.FloorToInt(progress * 100));
+    } else {
+      _removeButton.text = UiFactory.T(SubscribingLocKey);
+    }
+    _removeButton.SetEnabled(false);
+  }
+
+  void OnDownloadCompleted(string publishedFileId, bool succeeded, string error) {
+    if (Root == null || _installedMap?.PublishedFileId != publishedFileId) {
+      return;
+    }
+    _removeButton.text = UiFactory.T(succeeded ? UnsubscribeLocKey : RetrySubscribeLocKey);
+    _removeButton.SetEnabled(true);
+    if (!succeeded) {
+      _workshopSubscribed = false;
+      Debug.LogError($"MapBrowser: could not download {publishedFileId}: {error}");
     }
   }
 }

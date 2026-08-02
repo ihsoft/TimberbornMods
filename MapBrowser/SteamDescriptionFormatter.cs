@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -39,7 +38,7 @@ static class SteamDescriptionFormatter {
       if (_quoteDepth > 0) {
         normalized = normalized.Replace("\n", "\n│ ");
       }
-      _builder.Append(WebUtility.HtmlEncode(normalized));
+      _builder.Append(normalized.Replace('<', '＜').Replace('>', '＞'));
     }
 
     public void AppendTag(string name, bool closing, string value, string original) {

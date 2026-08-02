@@ -23,12 +23,18 @@ sealed class MapBrowserDialog : AbstractDialog {
   const string DeleteTooltipLocKey = "IgorZ.MapBrowser.Action.DeleteTooltip";
   const string DeletingLocKey = "IgorZ.MapBrowser.Action.Deleting";
   const string DetailsLocKey = "IgorZ.MapBrowser.Action.Details";
+  const string DownloadingLocKey = "IgorZ.MapBrowser.Action.Downloading";
   const string NoDescriptionLocKey = "IgorZ.MapBrowser.Common.NoDescription";
   const string RemovedLocKey = "IgorZ.MapBrowser.Action.Removed";
   const string RetryDeleteLocKey = "IgorZ.MapBrowser.Action.RetryDelete";
+  const string RetrySubscribeLocKey = "IgorZ.MapBrowser.Action.RetrySubscribe";
   const string RetryUnsubscribeLocKey = "IgorZ.MapBrowser.Action.RetryUnsubscribe";
   const string SourceLocalLocKey = "IgorZ.MapBrowser.Common.SourceLocal";
   const string TitleWithSizeLocKey = "IgorZ.MapBrowser.Browser.TitleWithSize";
+  const string SubscribeLocKey = "IgorZ.MapBrowser.Action.Subscribe";
+  const string SubscribedLocKey = "IgorZ.MapBrowser.Action.Subscribed";
+  const string SubscribeTooltipLocKey = "IgorZ.MapBrowser.Action.SubscribeTooltip";
+  const string SubscribingLocKey = "IgorZ.MapBrowser.Action.Subscribing";
   const string UnsubscribeLocKey = "IgorZ.MapBrowser.Action.Unsubscribe";
   const string UnsubscribeTooltipLocKey = "IgorZ.MapBrowser.Action.UnsubscribeTooltip";
   const string UnsubscribingLocKey = "IgorZ.MapBrowser.Action.Unsubscribing";
@@ -54,12 +60,14 @@ sealed class MapBrowserDialog : AbstractDialog {
   readonly List<InstalledMap> _installedMaps = [];
   readonly List<InstalledMap> _searchMatches = [];
   readonly List<InstalledMap> _searchResults = [];
+  readonly HashSet<string> _removedWorkshopIds = [];
   readonly Dictionary<string, SearchDropdownProvider> _searchFilters = [];
 
   ListView _list;
   List<InstalledMap> _visibleMaps;
   TextField _searchText;
   VisualElement _searchPanel;
+  VisualElement _searchPagingPanel;
   Label _modeHeading;
   Button _installedTab;
   Button _searchTab;
@@ -111,6 +119,8 @@ sealed class MapBrowserDialog : AbstractDialog {
     _list.virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight;
     RefreshInstalledMaps();
     _metadataService.MetadataChanged += OnMetadataChanged;
+    _subscriptionService.DownloadProgressChanged += OnDownloadProgressChanged;
+    _subscriptionService.DownloadCompleted += OnDownloadCompleted;
     _metadataService.EnsureLoaded();
   }
 
@@ -119,16 +129,20 @@ sealed class MapBrowserDialog : AbstractDialog {
       return;
     }
     _metadataService.MetadataChanged -= OnMetadataChanged;
+    _subscriptionService.DownloadProgressChanged -= OnDownloadProgressChanged;
+    _subscriptionService.DownloadCompleted -= OnDownloadCompleted;
     _list = null;
     _visibleMaps = null;
     _searchText = null;
     _searchPanel = null;
+    _searchPagingPanel = null;
     _modeHeading = null;
     _installedTab = null;
     _searchTab = null;
     _installedMaps.Clear();
     _searchMatches.Clear();
     _searchResults.Clear();
+    _removedWorkshopIds.Clear();
     _searchFilters.Clear();
     base.Close();
   }
@@ -145,6 +159,7 @@ sealed class MapBrowserDialog : AbstractDialog {
     tabs.Add(_searchTab);
     _modeHeading = Root.Q2<Label>("ModeHeading");
     _searchPanel = Root.Q2<VisualElement>("SearchPanel");
+    _searchPagingPanel = Root.Q2<VisualElement>("SearchPagingPanel");
     CreateSearchControls();
     SetSearchMode(false);
   }
@@ -159,7 +174,7 @@ sealed class MapBrowserDialog : AbstractDialog {
     foreach (var filter in SearchFilters) {
       BindSearchFilter(searchControls, filter);
     }
-    BindSearchPagingControls(searchControls);
+    BindSearchPagingControls(_searchPagingPanel);
   }
 
   void BindSearchPagingControls(VisualElement searchControls) {
@@ -194,9 +209,11 @@ sealed class MapBrowserDialog : AbstractDialog {
   }
 
   void SetSearchMode(bool searchMode) {
+    ReloadInstalledMaps();
     _installedTab.SetEnabled(searchMode);
     _searchTab.SetEnabled(!searchMode);
     _searchPanel.ToggleDisplayStyle(searchMode);
+    _searchPagingPanel.ToggleDisplayStyle(searchMode);
     UpdateModeHeading(searchMode);
     if (searchMode) {
       ApplySearch();
@@ -248,6 +265,7 @@ sealed class MapBrowserDialog : AbstractDialog {
             whiteSpace = WhiteSpace.NoWrap,
             overflow = Overflow.Hidden,
             textOverflow = TextOverflow.Ellipsis,
+            paddingRight = 100,
         },
     };
     title.AddToClassList("text--default");
@@ -299,7 +317,7 @@ sealed class MapBrowserDialog : AbstractDialog {
     detailsButton.style.marginRight = 6;
     detailsButton.RegisterCallback<ClickEvent>(evt => evt.StopPropagation());
     var actionButton = (NineSliceButton)UiFactory.CreateButton(
-        DeleteLocKey, button => RemoveMap(binding, row, (NineSliceButton)button),
+        DeleteLocKey, button => ApplyMapAction(binding, row, (NineSliceButton)button),
         (2, 8, 2, 8), ["game-text-small"]);
     actionButton.name = "ActionButton";
     _tooltipRegistrar.Register(actionButton, () => binding.ActionTooltip);
@@ -324,17 +342,43 @@ sealed class MapBrowserDialog : AbstractDialog {
     };
     removedOverlay.AddToClassList("text--default");
     removedOverlay.ToggleDisplayStyle(false);
+    var subscriptionBadge = new NineSliceVisualElement {
+        name = "SubscriptionBadge",
+        style = {
+            position = Position.Absolute,
+            right = 8,
+            top = 8,
+            paddingTop = 2,
+            paddingRight = 7,
+            paddingBottom = 2,
+            paddingLeft = 7,
+        },
+    };
+    subscriptionBadge.AddToClassList("bg-box--brown");
+    var subscriptionLabel = new Label { text = UiFactory.T(SubscribedLocKey) };
+    subscriptionLabel.AddToClassList("game-text-small");
+    subscriptionBadge.Add(subscriptionLabel);
+    subscriptionBadge.ToggleDisplayStyle(false);
     row.Add(preview);
     row.Add(textColumn);
     row.Add(actions);
+    row.Add(subscriptionBadge);
     row.Add(removedOverlay);
     row.RegisterCallback<PointerEnterEvent>(_ => {
       if (binding.Map is { Removed: false }) {
         actions.ToggleDisplayStyle(true);
       }
     });
-    row.RegisterCallback<PointerLeaveEvent>(_ => actions.ToggleDisplayStyle(false));
-    row.RegisterCallback<ClickEvent>(_ => ShowDetails(binding));
+    row.RegisterCallback<PointerLeaveEvent>(_ => {
+      if (!binding.Downloading) {
+        actions.ToggleDisplayStyle(false);
+      }
+    });
+    row.RegisterCallback<ClickEvent>(evt => {
+      if (evt.target is not VisualElement target || !actions.Contains(target)) {
+        ShowDetails(binding);
+      }
+    });
     return row;
   }
 
@@ -343,14 +387,19 @@ sealed class MapBrowserDialog : AbstractDialog {
     var binding = (RowBinding)row.userData;
     binding.Key = installedMap.Key;
     binding.Map = installedMap;
-    binding.ActionText = installedMap.IsInstalled
-        ? UiFactory.T(installedMap.PublishedFileId != null ? UnsubscribeLocKey : DeleteLocKey)
-        : string.Empty;
-    binding.ActionTooltip = installedMap.IsInstalled
-        ? installedMap.PublishedFileId != null
-            ? UiFactory.T(UnsubscribeTooltipLocKey)
-            : UiFactory.T(DeleteTooltipLocKey)
-        : null;
+    binding.WorkshopSubscribed = installedMap.PublishedFileId != null
+        && !_removedWorkshopIds.Contains(installedMap.PublishedFileId)
+        && (installedMap.IsInstalled || _subscriptionService.IsSubscribed(installedMap.PublishedFileId));
+    binding.Downloading = installedMap.PublishedFileId != null
+        && _subscriptionService.IsDownloading(installedMap.PublishedFileId);
+    binding.ActionText = binding.Downloading
+        ? FormatDownloadProgress(installedMap.PublishedFileId)
+        : installedMap.PublishedFileId == null
+            ? UiFactory.T(DeleteLocKey)
+            : UiFactory.T(binding.WorkshopSubscribed ? UnsubscribeLocKey : SubscribeLocKey);
+    binding.ActionTooltip = installedMap.PublishedFileId == null
+        ? UiFactory.T(DeleteTooltipLocKey)
+        : UiFactory.T(binding.WorkshopSubscribed ? UnsubscribeTooltipLocKey : SubscribeTooltipLocKey);
     var metadata = GetMetadata(installedMap);
     var title = GetDisplayTitle(installedMap);
     var description = metadata?.DescriptionPlain ?? installedMap.Map?.DisplayDescription;
@@ -374,6 +423,10 @@ sealed class MapBrowserDialog : AbstractDialog {
     freshness.text = FormatFreshness(installedMap, metadata);
     freshness.ToggleDisplayStyle(installedMap.PublishedFileId != null && (metadata == null || metadata.VisualStale));
     ApplyRemovedState(row, binding, installedMap.Removed);
+    row.Q<NineSliceButton>("ActionButton").SetEnabled(!binding.Downloading);
+    row.Q<VisualElement>("Actions").ToggleDisplayStyle(binding.Downloading);
+    row.Q<VisualElement>("SubscriptionBadge").ToggleDisplayStyle(
+        _visibleMaps != _installedMaps && binding.WorkshopSubscribed);
 
     var preview = row.Q<Image>("Preview");
     preview.image = installedMap.Map != null
@@ -390,16 +443,21 @@ sealed class MapBrowserDialog : AbstractDialog {
   }
 
   void RefreshInstalledMaps() {
-    _installedMaps.Clear();
-    _installedMaps.AddRange(_mapItemProvider.GetCustomMaps()
-        .Select(map => new InstalledMap(map, FindPublishedFileId(map.MapFileReference.Path))));
-    SortMaps(_installedMaps);
+    ReloadInstalledMaps();
     if (_visibleMaps == _installedMaps) {
       UpdateModeHeading(false);
       _list?.RefreshItems();
     } else {
       ApplySearch();
     }
+  }
+
+  void ReloadInstalledMaps() {
+    _installedMaps.Clear();
+    _installedMaps.AddRange(_mapItemProvider.GetCustomMaps()
+        .Select(map => new InstalledMap(map, FindPublishedFileId(map.MapFileReference.Path)))
+        .Where(map => map.PublishedFileId == null || !_removedWorkshopIds.Contains(map.PublishedFileId)));
+    SortMaps(_installedMaps);
   }
 
   void OnMetadataChanged() {
@@ -417,7 +475,7 @@ sealed class MapBrowserDialog : AbstractDialog {
   }
 
   string GetDisplayTitle(InstalledMap installedMap) {
-    return GetMetadata(installedMap)?.Title ?? installedMap.Map?.DisplayName ?? installedMap.PublishedFileId;
+    return (GetMetadata(installedMap)?.Title ?? installedMap.Map?.DisplayName ?? installedMap.PublishedFileId).Trim();
   }
 
   WorkshopItemMetadata GetMetadata(InstalledMap installedMap) {
@@ -506,6 +564,9 @@ sealed class MapBrowserDialog : AbstractDialog {
     if (_list != null) {
       _list.itemsSource = maps;
       _list.Rebuild();
+      if (maps.Count > 0) {
+        _list.schedule.Execute(() => _list?.ScrollToItem(0));
+      }
     }
   }
 
@@ -617,13 +678,68 @@ sealed class MapBrowserDialog : AbstractDialog {
         0, VisualElement.MeasureMode.Undefined).y;
   }
 
+  void ApplyMapAction(RowBinding binding, VisualElement row, NineSliceButton button) {
+    if (binding.Map is { PublishedFileId: not null } installedMap && !binding.WorkshopSubscribed) {
+      SubscribeToMap(binding, button, installedMap);
+      return;
+    }
+    RemoveMap(binding, row, button);
+  }
+
+  void SubscribeToMap(RowBinding binding, NineSliceButton button, InstalledMap installedMap) {
+    button.text = UiFactory.T(SubscribingLocKey);
+    button.SetEnabled(false);
+    _subscriptionService.Subscribe(installedMap.PublishedFileId, (succeeded, error) => {
+      if (binding.Map != installedMap) {
+        return;
+      }
+      if (succeeded) {
+        _removedWorkshopIds.Remove(installedMap.PublishedFileId);
+        binding.WorkshopSubscribed = true;
+        binding.Downloading = true;
+        binding.ActionText = FormatDownloadProgress(installedMap.PublishedFileId);
+        binding.ActionTooltip = UiFactory.T(UnsubscribeTooltipLocKey);
+        button.text = binding.ActionText;
+      } else {
+        button.text = UiFactory.T(RetrySubscribeLocKey);
+        Debug.LogError($"MapBrowser: could not subscribe to {installedMap.PublishedFileId}: {error}");
+      }
+      button.SetEnabled(!binding.Downloading);
+    });
+  }
+
+  string FormatDownloadProgress(string publishedFileId) {
+    return _subscriptionService.TryGetDownloadProgress(publishedFileId, out var progress)
+        ? UiFactory.T(DownloadingLocKey, Mathf.FloorToInt(progress * 100))
+        : UiFactory.T(SubscribingLocKey);
+  }
+
+  void OnDownloadProgressChanged(string publishedFileId) {
+    if (_visibleMaps?.Any(map => map.PublishedFileId == publishedFileId) == true) {
+      _list?.RefreshItems();
+    }
+  }
+
+  void OnDownloadCompleted(string publishedFileId, bool succeeded, string error) {
+    if (!succeeded) {
+      Debug.LogError($"MapBrowser: could not download {publishedFileId}: {error}");
+    }
+    RefreshInstalledMaps();
+  }
+
   void RemoveMap(RowBinding binding, VisualElement row, NineSliceButton button) {
     var installedMap = binding.Map;
-    if (installedMap is not { IsInstalled: true, Removed: false }) {
+    if (installedMap is not { Removed: false }) {
       return;
     }
     if (installedMap.PublishedFileId == null) {
+      if (!installedMap.IsInstalled) {
+        return;
+      }
       ShowLocalMapDeleteConfirmation(binding, row, button, installedMap);
+      return;
+    }
+    if (!binding.WorkshopSubscribed) {
       return;
     }
 
@@ -631,13 +747,26 @@ sealed class MapBrowserDialog : AbstractDialog {
     button.SetEnabled(false);
     _subscriptionService.Unsubscribe(installedMap.PublishedFileId, (succeeded, error) => {
       if (succeeded) {
-        installedMap.Removed = true;
+        _removedWorkshopIds.Add(installedMap.PublishedFileId);
+        installedMap.Removed = installedMap.IsInstalled && _visibleMaps == _installedMaps;
       }
       if (binding.Map != installedMap) {
         return;
       }
       if (succeeded) {
-        ApplyRemovedState(row, binding, removed: true);
+        binding.WorkshopSubscribed = false;
+        if (_visibleMaps != _installedMaps) {
+          ApplySearch();
+          return;
+        }
+        if (installedMap.Removed) {
+          ApplyRemovedState(row, binding, removed: true);
+        } else {
+          binding.ActionText = UiFactory.T(SubscribeLocKey);
+          binding.ActionTooltip = UiFactory.T(SubscribeTooltipLocKey);
+          button.text = binding.ActionText;
+          button.SetEnabled(true);
+        }
       } else {
         button.text = UiFactory.T(RetryUnsubscribeLocKey);
         button.SetEnabled(true);
@@ -648,7 +777,24 @@ sealed class MapBrowserDialog : AbstractDialog {
 
   void ShowDetails(RowBinding binding) {
     if (binding.Map is { Removed: false } installedMap) {
-      _mapDetailsDialog.Show(installedMap, () => _list?.RefreshItems());
+      _mapDetailsDialog.Show(installedMap, _visibleMaps != _installedMaps, OnDetailsMapRemoved);
+    }
+  }
+
+  void OnDetailsMapRemoved(InstalledMap installedMap, bool subscribed) {
+    if (installedMap.PublishedFileId != null) {
+      if (subscribed) {
+        _removedWorkshopIds.Remove(installedMap.PublishedFileId);
+      } else {
+        _removedWorkshopIds.Add(installedMap.PublishedFileId);
+      }
+    }
+    if (_visibleMaps != _installedMaps) {
+      installedMap.Removed = false;
+      ReloadInstalledMaps();
+      ApplySearch();
+    } else {
+      _list?.RefreshItems();
     }
   }
 
@@ -685,7 +831,7 @@ sealed class MapBrowserDialog : AbstractDialog {
     var button = row.Q<NineSliceButton>("ActionButton");
     button.text = binding.ActionText;
     button.SetEnabled(true);
-    button.ToggleDisplayStyle(binding.Map.IsInstalled && !removed);
+    button.ToggleDisplayStyle((binding.Map.IsInstalled || binding.Map.PublishedFileId != null) && !removed);
     row.Q<VisualElement>("Actions").ToggleDisplayStyle(false);
   }
 
@@ -723,6 +869,8 @@ sealed class MapBrowserDialog : AbstractDialog {
     public InstalledMap Map { get; set; }
     public string ActionText { get; set; }
     public string ActionTooltip { get; set; }
+    public bool WorkshopSubscribed { get; set; }
+    public bool Downloading { get; set; }
   }
 
   sealed record SearchFilter(string Feature, string[] Levels);

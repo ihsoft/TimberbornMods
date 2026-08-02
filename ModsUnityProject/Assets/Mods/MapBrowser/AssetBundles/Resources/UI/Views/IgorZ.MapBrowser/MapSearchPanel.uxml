@@ -38,15 +38,5 @@
                 <Timberborn.DropdownSystem.Dropdown name="artificial_layoutDropdown" style="width: 220px; flex-shrink: 0;" />
             </engine:VisualElement>
         </engine:VisualElement>
-        <engine:VisualElement style="flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; margin-top: 1px;">
-            <engine:Label name="MatchesLabel" class="text--default" style="flex-grow: 1; flex-shrink: 1; min-width: 220px; margin-right: 10px;" />
-            <engine:VisualElement style="flex-direction: row; align-items: center; flex-shrink: 0;">
-                <Timberborn.CoreUI.LocalizableLabel text="Page size" text-loc-key="IgorZ.MapBrowser.Search.PageSize" class="text--default" style="margin-right: 5px;" />
-                <Timberborn.DropdownSystem.Dropdown name="PageSizeDropdown" style="width: 75px; margin-right: 10px;" />
-                <Timberborn.CoreUI.NineSliceButton name="PreviousPageButton" class="button-square button-arrow-left" style="margin-right: 5px;" />
-                <engine:Label name="PageLabel" class="text--default" style="min-width: 100px; -unity-text-align: middle-center;" />
-                <Timberborn.CoreUI.NineSliceButton name="NextPageButton" class="button-square button-arrow-right" />
-            </engine:VisualElement>
-        </engine:VisualElement>
     </engine:VisualElement>
 </engine:UXML>

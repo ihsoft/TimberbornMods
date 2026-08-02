@@ -8,9 +8,15 @@ IgorZ.MapBrowser.Action.DeleteTooltip,"Permanently delete this local map file.
 This cannot be undone.",Tooltip for deleting a local map.
 IgorZ.MapBrowser.Action.Deleting,Deleting...,Temporary button text while a local map is being deleted.
 IgorZ.MapBrowser.Action.Details,Details,Button that opens the map details dialog.
+IgorZ.MapBrowser.Action.Downloading,Downloading... {0}%,Button text showing Workshop map download progress.
 IgorZ.MapBrowser.Action.Removed,Removed,Status shown after a map is removed from the game.
 IgorZ.MapBrowser.Action.RetryDelete,Retry delete,Button shown after deleting a local map fails.
+IgorZ.MapBrowser.Action.RetrySubscribe,Retry subscribe,Button shown after subscribing to a Workshop map fails.
 IgorZ.MapBrowser.Action.RetryUnsubscribe,Retry unsubscribe,Button shown after unsubscribing from a Workshop map fails.
+IgorZ.MapBrowser.Action.Subscribe,Subscribe,Button that subscribes to a Steam Workshop map.
+IgorZ.MapBrowser.Action.Subscribed,Subscribed,Tag shown on subscribed maps in Workshop search results.
+IgorZ.MapBrowser.Action.SubscribeTooltip,Subscribe to this Steam Workshop map.,Tooltip for subscribing to a Workshop map.
+IgorZ.MapBrowser.Action.Subscribing,Subscribing...,Temporary button text while subscribing to a Workshop map.
 IgorZ.MapBrowser.Action.Unsubscribe,Unsubscribe,Button that unsubscribes from a Steam Workshop map.
 IgorZ.MapBrowser.Action.UnsubscribeTooltip,"Unsubscribe from this Steam Workshop map.
 You can subscribe to it again later.",Tooltip for unsubscribing from a Workshop map.

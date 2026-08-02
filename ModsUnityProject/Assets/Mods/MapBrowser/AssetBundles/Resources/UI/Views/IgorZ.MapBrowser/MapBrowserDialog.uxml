@@ -11,6 +11,16 @@
             <Timberborn.CoreUI.NineSliceVisualElement class="bg-sub-box--green" style="flex-grow: 1; padding: 12px;">
                 <engine:ListView name="InstalledMapsList" class="panel-list-view scroll--green-decorated" style="flex-grow: 1;" />
             </Timberborn.CoreUI.NineSliceVisualElement>
+            <engine:VisualElement name="SearchPagingPanel" style="display: none; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; margin-top: 8px; flex-shrink: 0;">
+                <engine:Label name="MatchesLabel" class="text--default" style="flex-grow: 1; flex-shrink: 1; min-width: 220px; margin-right: 10px;" />
+                <engine:VisualElement style="flex-direction: row; align-items: center; flex-shrink: 0;">
+                    <Timberborn.CoreUI.LocalizableLabel text="Page size" text-loc-key="IgorZ.MapBrowser.Search.PageSize" class="text--default" style="margin-right: 5px;" />
+                    <Timberborn.DropdownSystem.Dropdown name="PageSizeDropdown" style="width: 75px; margin-right: 10px;" />
+                    <Timberborn.CoreUI.NineSliceButton name="PreviousPageButton" class="button-square button-arrow-left" style="margin-right: 5px;" />
+                    <engine:Label name="PageLabel" class="text--default" style="min-width: 100px; -unity-text-align: middle-center;" />
+                    <Timberborn.CoreUI.NineSliceButton name="NextPageButton" class="button-square button-arrow-right" />
+                </engine:VisualElement>
+            </engine:VisualElement>
             <engine:VisualElement style="flex-direction: row; align-items: center; justify-content: center; margin-top: 12px; flex-shrink: 0;">
                 <Timberborn.CoreUI.LocalizableButton text="Close" text-loc-key="IgorZ.MapBrowser.Dialog.Close" name="ConfirmButton" class="menu-button menu-button--medium" />
             </engine:VisualElement>
