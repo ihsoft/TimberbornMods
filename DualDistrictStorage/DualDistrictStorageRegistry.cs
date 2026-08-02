@@ -1,3 +1,7 @@
+// Timberborn Mod: Dual District Storage
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+
 using System.Collections.Generic;
 using Timberborn.Goods;
 using Timberborn.ResourceCountingSystem;

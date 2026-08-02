@@ -1,3 +1,7 @@
+// Timberborn Mod: Dual District Storage
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+
 using HarmonyLib;
 using Timberborn.BlockSystem;
 using Timberborn.BuildingTools;
