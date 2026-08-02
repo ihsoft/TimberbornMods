@@ -1,3 +1,7 @@
+// Timberborn Mod: MapBrowser
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,8 +20,23 @@ using UnityEngine.UIElements;
 namespace IgorZ.MapBrowser;
 
 sealed class MapBrowserDialog : AbstractDialog {
+  const string AnalysisBasedOnImageLocKey = "IgorZ.MapBrowser.Analysis.BasedOnImage";
+  const string AnalysisBasedOnImagesLocKey = "IgorZ.MapBrowser.Analysis.BasedOnImages";
+  const string AnalysisCompactLocKey = "IgorZ.MapBrowser.Analysis.Compact";
+  const string AnalysisFullLocKey = "IgorZ.MapBrowser.Analysis.Full";
+  const string AnalysisLevelLocKeyPrefix = "IgorZ.MapBrowser.Analysis.Level.";
+  const string AnalysisLevelUnknownLocKey = "IgorZ.MapBrowser.Analysis.Level.Unknown";
+  const string AnalysisTooltipLocKey = "IgorZ.MapBrowser.Analysis.Tooltip";
+  const string BrowserInstalledMapsLocKey = "IgorZ.MapBrowser.Browser.InstalledMaps";
+  const string BrowserSearchMapsLocKey = "IgorZ.MapBrowser.Browser.SearchMaps";
+  const string CommonUnknownLocKey = "IgorZ.MapBrowser.Common.Unknown";
   const string DialogAsset = "IgorZ.MapBrowser/MapBrowserDialog";
   const string SearchPanelAsset = "IgorZ.MapBrowser/MapSearchPanel";
+  const string SearchAnyLocKey = "IgorZ.MapBrowser.Search.Any";
+  const string SearchInstalledLocKey = "IgorZ.MapBrowser.Search.Installed";
+  const string SearchMatchCountLocKey = "IgorZ.MapBrowser.Search.MatchCount";
+  const string SearchPageLocKey = "IgorZ.MapBrowser.Search.Page";
+  const string SearchSearchLocKey = "IgorZ.MapBrowser.Search.Search";
   const string DeleteMapPromptLocKey = "LoadMapPanel.DeleteMapPrompt";
   const string DeleteLocKey = "IgorZ.MapBrowser.Action.Delete";
   const string DeleteTooltipLocKey = "IgorZ.MapBrowser.Action.DeleteTooltip";
@@ -38,6 +57,8 @@ sealed class MapBrowserDialog : AbstractDialog {
   const string UnsubscribeLocKey = "IgorZ.MapBrowser.Action.Unsubscribe";
   const string UnsubscribeTooltipLocKey = "IgorZ.MapBrowser.Action.UnsubscribeTooltip";
   const string UnsubscribingLocKey = "IgorZ.MapBrowser.Action.Unsubscribing";
+  const string FreshnessMissingLocKey = "IgorZ.MapBrowser.Freshness.Missing";
+  const string FreshnessStaleLocKey = "IgorZ.MapBrowser.Freshness.Stale";
   const float PreviewHeight = 180;
 
   static readonly SearchFilter[] SearchFilters = [
@@ -151,10 +172,9 @@ sealed class MapBrowserDialog : AbstractDialog {
     var tabs = Root.Q2<VisualElement>("TabButtons");
     tabs.style.flexWrap = Wrap.Wrap;
     _installedTab = UiFactory.CreateButton(
-        "IgorZ.MapBrowser.Search.Installed", _ => SetSearchMode(false), classes: ["game-text-small"]);
+        SearchInstalledLocKey, _ => SetSearchMode(false), classes: ["game-text-small"]);
     _installedTab.style.marginRight = 6;
-    _searchTab = UiFactory.CreateButton(
-        "IgorZ.MapBrowser.Search.Search", _ => SetSearchMode(true), classes: ["game-text-small"]);
+    _searchTab = UiFactory.CreateButton(SearchSearchLocKey, _ => SetSearchMode(true), classes: ["game-text-small"]);
     tabs.Add(_installedTab);
     tabs.Add(_searchTab);
     _modeHeading = Root.Q2<Label>("ModeHeading");
@@ -199,8 +219,8 @@ sealed class MapBrowserDialog : AbstractDialog {
 
   void BindSearchFilter(VisualElement searchControls, SearchFilter filter) {
     var dropdown = searchControls.Q2<Dropdown>(filter.Feature + "Dropdown");
-    var values = new[] { UiFactory.T("IgorZ.MapBrowser.Search.Any") }
-        .Concat(filter.Levels.Select(level => UiFactory.T("IgorZ.MapBrowser.Analysis.Level." + level)))
+    var values = new[] { UiFactory.T(SearchAnyLocKey) }
+        .Concat(filter.Levels.Select(level => UiFactory.T(AnalysisLevelLocKeyPrefix + level)))
         .ToArray();
     var provider = new SearchDropdownProvider(values);
     dropdown.ValueChanged += (_, _) => ApplySearch();
@@ -224,8 +244,8 @@ sealed class MapBrowserDialog : AbstractDialog {
 
   void UpdateModeHeading(bool searchMode) {
     _modeHeading.text = searchMode
-        ? UiFactory.T("IgorZ.MapBrowser.Browser.SearchMaps")
-        : $"{UiFactory.T("IgorZ.MapBrowser.Browser.InstalledMaps")} ({_installedMaps.Count})";
+        ? UiFactory.T(BrowserSearchMapsLocKey)
+        : $"{UiFactory.T(BrowserInstalledMapsLocKey)} ({_installedMaps.Count})";
   }
 
   VisualElement CreateMapRow() {
@@ -405,9 +425,7 @@ sealed class MapBrowserDialog : AbstractDialog {
     var description = metadata?.DescriptionPlain ?? installedMap.Map?.DisplayDescription;
     var titleLabel = row.Q<Label>("Title");
     titleLabel.text = installedMap.IsInstalled
-        ? UiFactory.T(
-            TitleWithSizeLocKey, title,
-            GetMapSize(installedMap, UiFactory.T("IgorZ.MapBrowser.Common.Unknown")))
+        ? UiFactory.T(TitleWithSizeLocKey, title, GetMapSize(installedMap, UiFactory.T(CommonUnknownLocKey)))
         : title;
     var descriptionLabel = row.Q<Label>("Description");
     binding.Description = string.IsNullOrWhiteSpace(description)
@@ -513,9 +531,8 @@ sealed class MapBrowserDialog : AbstractDialog {
     _searchResults.Clear();
     _searchResults.AddRange(_searchMatches.Skip(_pageIndex * _pageSize).Take(_pageSize));
     if (_matchesLabel != null && _pageLabel != null && _previousPageButton != null && _nextPageButton != null) {
-      _matchesLabel.text = UiFactory.T("IgorZ.MapBrowser.Search.MatchCount", _searchMatches.Count, totalMaps);
-      _pageLabel.text = UiFactory.T(
-          "IgorZ.MapBrowser.Search.Page", pageCount == 0 ? 0 : _pageIndex + 1, pageCount);
+      _matchesLabel.text = UiFactory.T(SearchMatchCountLocKey, _searchMatches.Count, totalMaps);
+      _pageLabel.text = UiFactory.T(SearchPageLocKey, pageCount == 0 ? 0 : _pageIndex + 1, pageCount);
       _previousPageButton.SetEnabled(_pageIndex > 0);
       _nextPageButton.SetEnabled(_pageIndex + 1 < pageCount);
     }
@@ -587,8 +604,7 @@ sealed class MapBrowserDialog : AbstractDialog {
         metadata, "islandness", "Mainland", "MostlyConnected", "Mixed", "Fragmented", "Islands", UiFactory);
     var layout = GetVisualLevel(
         metadata, "artificial_layout", "Natural", "MostlyNatural", "Mixed", "Structured", "Geometric", UiFactory);
-    return string.Format(
-        UiFactory.T("IgorZ.MapBrowser.Analysis.Compact"), terrain, valleys, water, forests, landform, layout);
+    return string.Format(UiFactory.T(AnalysisCompactLocKey), terrain, valleys, water, forests, landform, layout);
   }
 
   internal static string FormatFullAnalysis(WorkshopItemMetadata metadata, UiFactory uiFactory) {
@@ -604,23 +620,22 @@ sealed class MapBrowserDialog : AbstractDialog {
         metadata, "forest_density", "Barren", "Sparse", "ModerateForests", "Forested", "DenseForest", uiFactory);
     var layout = GetVisualLevel(
         metadata, "artificial_layout", "Natural", "MostlyNatural", "Mixed", "Structured", "Geometric", uiFactory);
-    var analysis = string.Format(
-        uiFactory.T("IgorZ.MapBrowser.Analysis.Full"), terrain, valleys, water, landform, forests, layout);
+    var analysis = string.Format(uiFactory.T(AnalysisFullLocKey), terrain, valleys, water, landform, forests, layout);
     var imageCountKey = metadata.VisualImageCount == 1
-        ? "IgorZ.MapBrowser.Analysis.BasedOnImage"
-        : "IgorZ.MapBrowser.Analysis.BasedOnImages";
+        ? AnalysisBasedOnImageLocKey
+        : AnalysisBasedOnImagesLocKey;
     return analysis + "\n" + uiFactory.T(imageCountKey, metadata.VisualImageCount);
   }
 
   string FormatAnalysisTooltip(WorkshopItemMetadata metadata) {
-    return UiFactory.T("IgorZ.MapBrowser.Analysis.Tooltip", FormatFullAnalysis(metadata, UiFactory));
+    return UiFactory.T(AnalysisTooltipLocKey, FormatFullAnalysis(metadata, UiFactory));
   }
 
   static string GetVisualLevel(
       WorkshopItemMetadata metadata, string feature, string veryLow, string low, string middle, string high,
       string veryHigh, UiFactory uiFactory) {
     if (!metadata.VisualPercentiles.TryGetValue(feature, out var percentile)) {
-      return uiFactory.T("IgorZ.MapBrowser.Analysis.Level.Unknown");
+      return uiFactory.T(AnalysisLevelUnknownLocKey);
     }
     var level = percentile switch {
         < 0.2f => veryLow,
@@ -629,7 +644,7 @@ sealed class MapBrowserDialog : AbstractDialog {
         < 0.8f => high,
         _ => veryHigh,
     };
-    return uiFactory.T("IgorZ.MapBrowser.Analysis.Level." + level);
+    return uiFactory.T(AnalysisLevelLocKeyPrefix + level);
   }
 
   static void FitDescription(Label label, string fullText) {
@@ -837,7 +852,7 @@ sealed class MapBrowserDialog : AbstractDialog {
 
   string FormatFreshness(InstalledMap installedMap, WorkshopItemMetadata metadata) {
     if (metadata?.VisualStale == true) {
-      return UiFactory.T("IgorZ.MapBrowser.Freshness.Stale");
+      return UiFactory.T(FreshnessStaleLocKey);
     }
     if (metadata != null || installedMap.PublishedFileId == null) {
       return string.Empty;
@@ -845,8 +860,8 @@ sealed class MapBrowserDialog : AbstractDialog {
 
     var snapshot = _metadataService.IndexGeneratedAtUtc.HasValue
         ? _metadataService.IndexGeneratedAtUtc.Value.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss 'UTC'")
-        : UiFactory.T("IgorZ.MapBrowser.Common.Unknown");
-    return UiFactory.T("IgorZ.MapBrowser.Freshness.Missing", snapshot);
+        : UiFactory.T(CommonUnknownLocKey);
+    return UiFactory.T(FreshnessMissingLocKey, snapshot);
   }
 
   static string FindPublishedFileId(string mapPath) {

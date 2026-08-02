@@ -1,3 +1,7 @@
+// Timberborn Mod: MapBrowser
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+
 using Bindito.Core;
 using IgorZ.TimberDev.UI;
 

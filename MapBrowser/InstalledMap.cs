@@ -1,3 +1,7 @@
+// Timberborn Mod: MapBrowser
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+
 using Timberborn.MapItemsUI;
 
 namespace IgorZ.MapBrowser;

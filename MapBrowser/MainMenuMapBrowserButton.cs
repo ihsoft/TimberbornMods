@@ -1,3 +1,7 @@
+// Timberborn Mod: MapBrowser
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+
 using System.Linq;
 using IgorZ.TimberDev.UI;
 using Timberborn.CoreUI;
@@ -8,6 +12,8 @@ using UnityEngine.UIElements;
 namespace IgorZ.MapBrowser;
 
 sealed class MainMenuMapBrowserButton : IUpdatableSingleton {
+  const string DialogHeaderLocKey = "IgorZ.MapBrowser.Dialog.Header";
+
   readonly MainMenuPanel _mainMenuPanel;
   readonly MapBrowserDialog _mapBrowserDialog;
   readonly UiFactory _uiFactory;
@@ -33,7 +39,7 @@ sealed class MainMenuMapBrowserButton : IUpdatableSingleton {
 
     var button = new NineSliceButton {
         name = "MapBrowserButton",
-        text = _uiFactory.T("IgorZ.MapBrowser.Dialog.Header"),
+        text = _uiFactory.T(DialogHeaderLocKey),
     };
     button.clicked += _mapBrowserDialog.Show;
     foreach (var className in anchor.GetClasses().ToList()) {

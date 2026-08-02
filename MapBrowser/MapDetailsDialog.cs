@@ -1,3 +1,7 @@
+// Timberborn Mod: MapBrowser
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +16,11 @@ using UnityEngine.UIElements;
 namespace IgorZ.MapBrowser;
 
 sealed class MapDetailsDialog : AbstractDialog {
+  const string DownloadingLocKey = "IgorZ.MapBrowser.Action.Downloading";
+  const string SizeLocKey = "IgorZ.MapBrowser.Details.Size";
+  const string SubscribersLocKey = "IgorZ.MapBrowser.Details.Subscribers";
+  const string VotesLocKey = "IgorZ.MapBrowser.Details.Votes";
+  const string VotesUnavailableLocKey = "IgorZ.MapBrowser.Details.VotesUnavailable";
   const string DialogAsset = "IgorZ.MapBrowser/MapDetailsDialog";
   const string DeleteMapPromptLocKey = "LoadMapPanel.DeleteMapPrompt";
   const string DeleteLocKey = "IgorZ.MapBrowser.Action.Delete";
@@ -26,6 +35,7 @@ sealed class MapDetailsDialog : AbstractDialog {
   const string SubscribeLocKey = "IgorZ.MapBrowser.Action.Subscribe";
   const string SubscribeTooltipLocKey = "IgorZ.MapBrowser.Action.SubscribeTooltip";
   const string SubscribingLocKey = "IgorZ.MapBrowser.Action.Subscribing";
+  const string UnknownLocKey = "IgorZ.MapBrowser.Common.Unknown";
   const string UnavailableLocKey = "IgorZ.MapBrowser.Common.Unavailable";
   const string UnsubscribeLocKey = "IgorZ.MapBrowser.Action.Unsubscribe";
   const string UnsubscribeTooltipLocKey = "IgorZ.MapBrowser.Action.UnsubscribeTooltip";
@@ -138,14 +148,14 @@ sealed class MapDetailsDialog : AbstractDialog {
   }
 
   string GetMapInformation() {
-    var mapSize = MapBrowserDialog.GetMapSize(_installedMap, UiFactory.T("IgorZ.MapBrowser.Common.Unavailable"));
-    var size = UiFactory.T("IgorZ.MapBrowser.Details.Size", mapSize);
+    var mapSize = MapBrowserDialog.GetMapSize(_installedMap, UiFactory.T(UnavailableLocKey));
+    var size = UiFactory.T(SizeLocKey, mapSize);
     if (_installedMap.PublishedFileId == null) {
       return size;
     }
     var unavailable = UiFactory.T(UnavailableLocKey);
-    return size + "\n" + UiFactory.T("IgorZ.MapBrowser.Details.VotesUnavailable")
-        + "\n" + UiFactory.T("IgorZ.MapBrowser.Details.Subscribers", unavailable);
+    return size + "\n" + UiFactory.T(VotesUnavailableLocKey)
+        + "\n" + UiFactory.T(SubscribersLocKey, unavailable);
   }
 
   void LoadLiveDetails(Label mapInformation) {
@@ -159,10 +169,10 @@ sealed class MapDetailsDialog : AbstractDialog {
         return;
       }
       var subscribers = details.Subscribers is { } count ? count.ToString("N0") : UiFactory.T(UnavailableLocKey);
-      var mapSize = MapBrowserDialog.GetMapSize(requestedMap, UiFactory.T("IgorZ.MapBrowser.Common.Unknown"));
-      mapInformation.text = UiFactory.T("IgorZ.MapBrowser.Details.Size", mapSize)
-          + "\n" + UiFactory.T("IgorZ.MapBrowser.Details.Votes", "+" + details.VotesUp, "-" + details.VotesDown)
-          + "\n" + UiFactory.T("IgorZ.MapBrowser.Details.Subscribers", subscribers);
+      var mapSize = MapBrowserDialog.GetMapSize(requestedMap, UiFactory.T(UnknownLocKey));
+      mapInformation.text = UiFactory.T(SizeLocKey, mapSize)
+          + "\n" + UiFactory.T(VotesLocKey, "+" + details.VotesUp, "-" + details.VotesDown)
+          + "\n" + UiFactory.T(SubscribersLocKey, subscribers);
     });
   }
 
@@ -311,7 +321,7 @@ sealed class MapDetailsDialog : AbstractDialog {
 
   void UpdateDownloadProgress() {
     if (_subscriptionService.TryGetDownloadProgress(_installedMap.PublishedFileId, out var progress)) {
-      _removeButton.text = UiFactory.T("IgorZ.MapBrowser.Action.Downloading", Mathf.FloorToInt(progress * 100));
+      _removeButton.text = UiFactory.T(DownloadingLocKey, Mathf.FloorToInt(progress * 100));
     } else {
       _removeButton.text = UiFactory.T(SubscribingLocKey);
     }
