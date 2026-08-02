@@ -28,7 +28,7 @@ sealed class MapDetailsDialog : AbstractDialog {
   const string DeleteLocKey = "IgorZ.MapBrowser.Action.Delete";
   const string DeleteTooltipLocKey = "IgorZ.MapBrowser.Action.DeleteTooltip";
   const string DeletingLocKey = "IgorZ.MapBrowser.Action.Deleting";
-  const string NoDescriptionLocKey = "IgorZ.MapBrowser.Common.NoDescription";
+  const string NoDescriptionLocKey = "MapSelection.NoDescription";
   const string RemovedLocKey = "IgorZ.MapBrowser.Action.Removed";
   const string RetryDeleteLocKey = "IgorZ.MapBrowser.Action.RetryDelete";
   const string RetrySubscribeLocKey = "IgorZ.MapBrowser.Action.RetrySubscribe";

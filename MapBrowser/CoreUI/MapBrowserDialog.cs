@@ -44,7 +44,7 @@ sealed class MapBrowserDialog : AbstractDialog {
   const string DeletingLocKey = "IgorZ.MapBrowser.Action.Deleting";
   const string DetailsLocKey = "IgorZ.MapBrowser.Action.Details";
   const string DownloadingLocKey = "IgorZ.MapBrowser.Action.Downloading";
-  const string NoDescriptionLocKey = "IgorZ.MapBrowser.Common.NoDescription";
+  const string NoDescriptionLocKey = "MapSelection.NoDescription";
   const string RemovedLocKey = "IgorZ.MapBrowser.Action.Removed";
   const string RetryDeleteLocKey = "IgorZ.MapBrowser.Action.RetryDelete";
   const string RetrySubscribeLocKey = "IgorZ.MapBrowser.Action.RetrySubscribe";
@@ -139,11 +139,11 @@ sealed class MapBrowserDialog : AbstractDialog {
     _list.bindItem = BindMapRow;
     _list.selectionType = SelectionType.None;
     _list.virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight;
-    RefreshInstalledMaps();
     _metadataService.MetadataChanged += OnMetadataChanged;
     _subscriptionService.DownloadProgressChanged += OnDownloadProgressChanged;
     _subscriptionService.DownloadCompleted += OnDownloadCompleted;
     _metadataService.EnsureLoaded();
+    RefreshInstalledMaps();
   }
 
   public override void Close() {
@@ -440,7 +440,9 @@ sealed class MapBrowserDialog : AbstractDialog {
     binding.Tooltip = metadata != null ? FormatAnalysisTooltip(metadata) : null;
     var freshness = row.Q<Label>("Freshness");
     freshness.text = FormatFreshness(installedMap, metadata);
-    freshness.ToggleDisplayStyle(installedMap.PublishedFileId != null && (metadata == null || metadata.VisualStale));
+    freshness.ToggleDisplayStyle(
+        _metadataService.Loaded && installedMap.PublishedFileId != null
+        && (metadata == null || metadata.VisualStale));
     ApplyRemovedState(row, binding, installedMap.Removed);
     row.Q<NineSliceButton>("ActionButton").SetEnabled(!binding.Downloading);
     row.Q<VisualElement>("Actions").ToggleDisplayStyle(binding.Downloading);
@@ -855,6 +857,9 @@ sealed class MapBrowserDialog : AbstractDialog {
   }
 
   string FormatFreshness(InstalledMap installedMap, WorkshopItemMetadata metadata) {
+    if (!_metadataService.Loaded) {
+      return string.Empty;
+    }
     if (metadata?.VisualStale == true) {
       return UiFactory.T(FreshnessStaleLocKey);
     }

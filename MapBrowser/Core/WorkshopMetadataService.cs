@@ -32,6 +32,8 @@ sealed class WorkshopMetadataService : IUnloadableSingleton, IUpdatableSingleton
 
   public bool Loading { get; private set; }
 
+  public bool Loaded { get; private set; }
+
   public string Error { get; private set; }
 
   public DateTimeOffset? IndexGeneratedAtUtc { get; private set; }
@@ -39,7 +41,7 @@ sealed class WorkshopMetadataService : IUnloadableSingleton, IUpdatableSingleton
   public IReadOnlyCollection<WorkshopItemMetadata> Items => _items.Values;
 
   public void EnsureLoaded() {
-    if (Loading || _items.Count > 0 || Error != null) {
+    if (Loading || Loaded || Error != null) {
       return;
     }
 
@@ -85,6 +87,7 @@ sealed class WorkshopMetadataService : IUnloadableSingleton, IUpdatableSingleton
       foreach (var item in _parseTask.Result) {
         _items[item.Key] = item.Value;
       }
+      Loaded = true;
     } else {
       Error = _parseTask.Exception?.GetBaseException().Message ?? "Unknown metadata parsing error";
       Debug.LogError($"MapBrowser: could not parse Workshop metadata: {_parseTask.Exception}");
@@ -108,6 +111,7 @@ sealed class WorkshopMetadataService : IUnloadableSingleton, IUpdatableSingleton
     _previewDownloads.Clear();
     _previewCache.Clear();
     _items.Clear();
+    Loaded = false;
   }
 
   void CompleteManifestRequest() {
