@@ -69,6 +69,12 @@ project. The export wrapper does this automatically, then checks for an interact
 repository export tooling rather than hand-copying source into `_MODS!`; copying can miss filtering, platform bundles,
 layout, or lanes.
 
+Run `tools/export-unity-mod.ps1` outside the filesystem sandbox. Unity batch export depends on Unity Licensing Client
+access to user-scoped data under `%LOCALAPPDATA%\Unity`; a sandboxed launch can make the child licensing client exit
+silently and leave the editor cycling on `LicenseClient-*` messages without an access-denied error. If a sandboxed
+export stalls around licensing, retry the same repository export wrapper once with escalated filesystem access before
+diagnosing Hub sign-in, license activation, or Editor incompatibility.
+
 After export, verify the intended local output: lane, manifest identity/version, changed data or bundles, and current
 timestamps or content. When code is involved, also verify the DLL/XML produced by the C# pipeline.
 
