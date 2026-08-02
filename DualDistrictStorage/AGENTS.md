@@ -7,6 +7,17 @@ When modifying the Dual-District Pile tool, its hidden physical templates, custo
 generated pile models, or pile visualizations, also read
 `docs/DualDistrictPile-Operational-Knowledge-v1.md`.
 
+## Release Package Contract
+
+DualDistrictStorage is a project-local package, not a Unity-exported package. Build the C# project with `ModPath`
+pointing at the mods root, such as `_MODS!`, because the project appends `DualDistrictStorage/version-*` itself. Do not
+pass `_MODS!/DualDistrictStorage` as `ModPath`; that creates a nested `DualDistrictStorage/DualDistrictStorage`
+package inside the release source.
+
+Steam release tooling still requires root package metadata at `_MODS!/DualDistrictStorage/workshop_data.json`. Keep it
+materialized from tracked release/platform metadata or another documented verified source before Steam preflight. Normal
+release publishing must keep `UpdateVisibility=false` unless the user explicitly requested a Steam visibility change.
+
 ## Dual-District Icon Contract
 
 One invocation of `Tools/create_dual_district_icons.py` owns these generated PNG icons:

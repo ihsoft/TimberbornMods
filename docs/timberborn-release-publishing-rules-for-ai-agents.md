@@ -376,6 +376,12 @@ Before building a release ZIP from `Package.SourcePath`, make sure the current c
 source folder. For C# mods, run the mod project build with the real `ModPath` and verify that the expected DLL/XML
 files in the source folder were updated. Do not package a local mod folder that may contain stale binaries.
 
+Resolve `ModPath` according to the mod project's own build contract. Many project-local package projects append
+`$(ProjectName)` and the compatibility lane under `$(ModPath)`, so they expect `ModPath` to be the mods root, not the
+target mod folder. If a build creates `<ModName>/<ModName>/version-*` under the configured release source, treat that as
+wrong build output, remove only the verified generated nested folder, rebuild with the correct `ModPath`, and verify the
+final package source contains no nested duplicate mod folder before packaging.
+
 Before building the release binary, update the mod's `directory.build.props`. The DLL assembly version is taken from
 that file. Verify the built DLL assembly version after the build. Other version declarations still matter for their own
 consumers: the Unity `manifest.json` version is used by the game, and `release.json` is used by the release process.
