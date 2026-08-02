@@ -9,7 +9,7 @@ using Timberborn.MainMenuPanels;
 using Timberborn.SingletonSystem;
 using UnityEngine.UIElements;
 
-namespace IgorZ.MapBrowser;
+namespace IgorZ.MapBrowser.CoreUI;
 
 sealed class MainMenuMapBrowserButton : IUpdatableSingleton {
   const string DialogHeaderLocKey = "IgorZ.MapBrowser.Dialog.Header";

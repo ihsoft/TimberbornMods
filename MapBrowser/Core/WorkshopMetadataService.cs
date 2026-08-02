@@ -14,7 +14,7 @@ using Timberborn.SingletonSystem;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace IgorZ.MapBrowser;
+namespace IgorZ.MapBrowser.Core;
 
 sealed class WorkshopMetadataService : IUnloadableSingleton, IUpdatableSingleton {
   const string MetadataUrl = "https://ihsoft.github.io/TimberbornMods/search-index.jsonl.gz";

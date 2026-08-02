@@ -8,7 +8,7 @@ using Steamworks;
 using Timberborn.SingletonSystem;
 using Timberborn.SteamStoreSystem;
 
-namespace IgorZ.MapBrowser;
+namespace IgorZ.MapBrowser.Core;
 
 sealed class WorkshopLiveDetailsService(SteamManager steamManager) : IUnloadableSingleton {
   readonly List<PendingQuery> _pendingQueries = [];

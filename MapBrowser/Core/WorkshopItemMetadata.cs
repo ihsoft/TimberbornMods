@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace IgorZ.MapBrowser;
+namespace IgorZ.MapBrowser.Core;
 
 sealed class WorkshopItemMetadata {
   [JsonProperty("published_file_id")]

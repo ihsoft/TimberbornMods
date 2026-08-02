@@ -2,12 +2,11 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace IgorZ.MapBrowser;
+namespace IgorZ.MapBrowser.CoreUI;
 
 static class SteamDescriptionFormatter {
   static readonly Regex TagRegex = new(@"\[(?<close>/)?(?<name>[a-z0-9*]+)(?:=(?<value>[^\]]+))?\]",

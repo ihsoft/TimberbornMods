@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using IgorZ.MapBrowser.Core;
 using IgorZ.TimberDev.UI;
 using Timberborn.CoreUI;
 using Timberborn.DropdownSystem;
@@ -17,7 +18,7 @@ using Timberborn.TooltipSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace IgorZ.MapBrowser;
+namespace IgorZ.MapBrowser.CoreUI;
 
 sealed class MapBrowserDialog : AbstractDialog {
   const string AnalysisBasedOnImageLocKey = "IgorZ.MapBrowser.Analysis.BasedOnImage";

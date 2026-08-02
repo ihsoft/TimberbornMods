@@ -10,14 +10,12 @@ using Timberborn.SingletonSystem;
 using Timberborn.SteamStoreSystem;
 using UnityEngine;
 
-namespace IgorZ.MapBrowser;
+namespace IgorZ.MapBrowser.Core;
 
 sealed class WorkshopSubscriptionService : ILoadableSingleton, IUnloadableSingleton, IUpdatableSingleton {
   readonly SteamManager _steamManager;
   readonly MapRepository _mapRepository;
   readonly HashSet<PublishedFileId_t> _pendingDownloads = [];
-  readonly List<CallResult<RemoteStorageSubscribePublishedFileResult_t>> _subscribeCalls = [];
-  readonly List<CallResult<RemoteStorageUnsubscribePublishedFileResult_t>> _unsubscribeCalls = [];
 
   Callback<DownloadItemResult_t> _downloadResult;
   float _nextProgressUpdate;
@@ -41,8 +39,6 @@ sealed class WorkshopSubscriptionService : ILoadableSingleton, IUnloadableSingle
     _downloadResult?.Dispose();
     _downloadResult = null;
     _pendingDownloads.Clear();
-    _subscribeCalls.Clear();
-    _unsubscribeCalls.Clear();
   }
 
   public void UpdateSingleton() {
@@ -74,10 +70,8 @@ sealed class WorkshopSubscriptionService : ILoadableSingleton, IUnloadableSingle
     }
 
     var itemId = new PublishedFileId_t(parsedItemId);
-    ulong downloaded = 0;
-    ulong total = 0;
     if (!_pendingDownloads.Contains(itemId)
-        || !SteamUGC.GetItemDownloadInfo(itemId, out downloaded, out total) || total == 0) {
+        || !SteamUGC.GetItemDownloadInfo(itemId, out var downloaded, out var total) || total == 0) {
       return false;
     }
     progress = Mathf.Clamp01((float)downloaded / total);
@@ -95,9 +89,7 @@ sealed class WorkshopSubscriptionService : ILoadableSingleton, IUnloadableSingle
       return;
     }
     var callResult = CallResult<RemoteStorageSubscribePublishedFileResult_t>.Create();
-    _subscribeCalls.Add(callResult);
     callResult.Set(apiCall, (result, ioFailure) => {
-      _subscribeCalls.Remove(callResult);
       if (!ioFailure && result.m_eResult == EResult.k_EResultOK && SteamUGC.DownloadItem(itemId, true)) {
         _pendingDownloads.Add(itemId);
         callback(true, null);
@@ -119,9 +111,7 @@ sealed class WorkshopSubscriptionService : ILoadableSingleton, IUnloadableSingle
       return;
     }
     var callResult = CallResult<RemoteStorageUnsubscribePublishedFileResult_t>.Create();
-    _unsubscribeCalls.Add(callResult);
     callResult.Set(apiCall, (result, ioFailure) => {
-      _unsubscribeCalls.Remove(callResult);
       var succeeded = !ioFailure && result.m_eResult == EResult.k_EResultOK;
       if (succeeded) {
         _mapRepository.NotifyMapRepositoryChanged();

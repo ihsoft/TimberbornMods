@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using IgorZ.MapBrowser.Core;
 using IgorZ.TimberDev.UI;
 using Timberborn.CoreUI;
 using Timberborn.MapItemsUI;
@@ -14,7 +15,7 @@ using Timberborn.TooltipSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace IgorZ.MapBrowser;
+namespace IgorZ.MapBrowser.CoreUI;
 
 sealed class MapDetailsDialog : AbstractDialog {
   const string DownloadingLocKey = "IgorZ.MapBrowser.Action.Downloading";
