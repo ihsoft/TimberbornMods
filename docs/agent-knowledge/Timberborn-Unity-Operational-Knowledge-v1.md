@@ -78,6 +78,12 @@ diagnosing Hub sign-in, license activation, or Editor incompatibility.
 After export, verify the intended local output: lane, manifest identity/version, changed data or bundles, and current
 timestamps or content. When code is involved, also verify the DLL/XML produced by the C# pipeline.
 
+Do not pass both `-SkipWindowsAssetBundle` and `-SkipMacAssetBundle` when refreshing an existing package for a mod that
+owns bundled UI or other asset-bundle resources. The exporter may clean the destination and then omit previously
+exported bundles, leaving a package that loads far enough to expose UI entry points but fails later when UXML or other
+bundled assets are requested. If an asset-bundle skip mode is used, verify every required pre-existing bundle remains in
+the final package; otherwise perform a full export.
+
 For a release-capable `LocalModFolder`, `workshop_data.json` inside the selected current compatibility lane is
 Unity-owned exported metadata. The official export wrapper materializes it at `_MODS!/<ModName>/workshop_data.json` as
 the root interface consumed by release and tag tooling. It also materializes `thumbnail.jpg` when the selected lane
