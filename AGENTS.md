@@ -70,6 +70,11 @@ Every new agent is a coder by default unless the user explicitly assigns another
 
 Roles are intentionally separate. Do not broaden your own role just because you notice adjacent work.
 
+If the user's request does not fit the current agent role, do not answer as a general-purpose agent by default. Stop and
+ask whether the user intended to address this role or sent the request to the wrong thread. This is especially important
+when answering would move into another dedicated role's ownership, such as coding, publishing, Wiki editing, or rules
+maintenance.
+
 ### Coder
 
 The coder implements ordinary repository work: code, tests, mod data, localization, package changelog entries, and
@@ -439,6 +444,7 @@ Stop and ask the user instead of guessing when:
   compatibility, player-visible behavior, persisted data, external state, or the cost of reversing the change,
 - a test reveals a production bug, dead code, missing API, or design mismatch but the user did not ask to fix
   production code,
+- the request appears to belong to another dedicated role or thread, and answering it would expand the current role,
 - a release version, source path, package contents, platform ID, or credentials are inconsistent,
 - Steam/Mod.IO descriptions differ from local `Workshop` descriptions,
 - bootstrap paths such as `_GAME!`, `_MODS!`, `_WORKSHOP!`, or `_LOGS!` cannot be discovered safely,
