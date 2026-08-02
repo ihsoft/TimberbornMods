@@ -21,7 +21,7 @@
                     <engine:Label name="Title" class="game-text-big text--bold" style="margin-bottom: 8px; flex-shrink: 0;" />
                     <Timberborn.CoreUI.NineSliceVisualElement class="bg-sub-box--green" style="flex-grow: 1; min-height: 0; padding: 10px;">
                         <engine:ScrollView name="DescriptionScroll" class="scroll--green-decorated" style="flex-grow: 1;">
-                            <engine:Label name="Description" class="text--default" style="white-space: normal; padding-right: 8px;" />
+                            <engine:Label name="Description" enable-rich-text="true" class="text--default" style="white-space: normal; padding-right: 8px;" />
                         </engine:ScrollView>
                     </Timberborn.CoreUI.NineSliceVisualElement>
                 </engine:VisualElement>

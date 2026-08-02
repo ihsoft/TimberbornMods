@@ -112,10 +112,10 @@ sealed class MapDetailsDialog : AbstractDialog {
   }
 
   string GetDescription(WorkshopItemMetadata metadata) {
-    var description = metadata?.DescriptionPlain ?? _installedMap.Map.DisplayDescription;
+    var description = metadata?.DescriptionRaw ?? _installedMap.Map.DisplayDescription;
     return string.IsNullOrWhiteSpace(description)
         ? UiFactory.T(NoDescriptionLocKey)
-        : description.Trim();
+        : SteamDescriptionFormatter.Format(description);
   }
 
   string GetMapInformation() {
