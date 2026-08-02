@@ -30,6 +30,12 @@ templates carrying `AsymmetricDualDistrictStoragePlacerSpec`, leaving the custom
 owner. Register the complete repository patch set through the one atomic `HarmonyPatcher.ApplyPatch` call and one patch
 ID; do not register this patch separately under the same ID.
 
+The stock copy-building command finds tools by exact selected-entity `TemplateName`. Because selectable pile halves use
+hidden narrow and wide physical templates, they do not automatically map back to the visible 3x3 tool. Keep a custom
+`IToolFinder` path that maps every hidden physical `TemplateName` from `AsymmetricDualDistrictStoragePlacerSpec` to the
+visible tool. When replacing or wrapping the tool's `EntitySetup.Builder`, preserve `DuplicationInit` and apply it to
+every created physical entity that must receive copied settings.
+
 ## Preview Ownership
 
 The 3x3 tool preview is not an instance of the narrow and wide physical entities. Its ordinary entrance marker therefore
@@ -95,7 +101,9 @@ After changing pile blueprints, placement, preview, generated assets, colliders,
    both factions through the ordinary unfinished path.
 5. At zero progress, stage 0, and completion, verify exactly one intended visual state, normal-view selection, opposite
    entrances, linking, and a clean log.
-6. Verify selected-good synchronization during construction, completed inventory replication, 1/3 and 2/3 pile
+6. Validate the copy-building command from either selectable half and verify copied settings on both new physical
+   entities.
+7. Verify selected-good synchronization during construction, completed inventory replication, 1/3 and 2/3 pile
    visualization, and single dirt-plane ownership.
 
 The tool, preview, ordinary construction, active-state selection, completed linked behavior, and unfinished
