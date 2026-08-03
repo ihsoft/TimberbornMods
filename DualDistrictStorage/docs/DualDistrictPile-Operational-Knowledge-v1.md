@@ -36,6 +36,11 @@ hidden narrow and wide physical templates, they do not automatically map back to
 visible tool. When replacing or wrapping the tool's `EntitySetup.Builder`, preserve `DuplicationInit` and apply it to
 every created physical entity that must receive copied settings.
 
+DevMode enables hidden physical tools, so the stock exact-`TemplateName` finder can otherwise claim a hidden Narrow or
+Wide template before the custom composite finder runs. Exclude only hidden DualDistrictStorage physical templates from
+stock copy-tool ownership: templates with `DualDistrictStorageSpec`, `DevModeTool=true`, and an empty `ToolGroupId`.
+Ordinary player mode is not enough validation for duplication behavior.
+
 ## Preview Ownership
 
 The 3x3 tool preview is not an instance of the narrow and wide physical entities. Its ordinary entrance marker therefore
@@ -101,8 +106,8 @@ After changing pile blueprints, placement, preview, generated assets, colliders,
    both factions through the ordinary unfinished path.
 5. At zero progress, stage 0, and completion, verify exactly one intended visual state, normal-view selection, opposite
    entrances, linking, and a clean log.
-6. Validate the copy-building command from either selectable half and verify copied settings on both new physical
-   entities.
+6. Validate the copy-building command from either selectable half in ordinary mode and DevMode. Verify copied settings
+   on both new physical entities, preview move/rotation behavior, and a clean log.
 7. Verify selected-good synchronization during construction, completed inventory replication, 1/3 and 2/3 pile
    visualization, and single dirt-plane ownership.
 
