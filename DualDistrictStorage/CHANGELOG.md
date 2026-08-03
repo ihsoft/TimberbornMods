@@ -1,6 +1,7 @@
 # v1.0.2 (TBD)
 
 * [Change] Move dual-district buildings to the end of the Storage toolbar.
+* [Fix] Duplicating a Dual-District Pile in developer mode selected only one half and could crash the game.
 
 # v1.0.1 (2026-08-02)
 

@@ -27,6 +27,7 @@ sealed class Configurator : IConfigurator {
         PatchId,
         typeof(ResourceCountingServicePatch),
         typeof(BuildingPlacerPatch),
+        typeof(BlockObjectToolFinderPatch),
         typeof(StockpileGoodPileVisualizerPatch),
         typeof(StockpilePlaneVisualizerPatch));
   }
