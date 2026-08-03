@@ -20,7 +20,7 @@ on:
         default: 6
   workflow_dispatch:
   schedule:
-    - cron: "17 9 * * *"
+    - cron: "17 3,9,15,21 * * *"
 
 permissions:
   contents: read
