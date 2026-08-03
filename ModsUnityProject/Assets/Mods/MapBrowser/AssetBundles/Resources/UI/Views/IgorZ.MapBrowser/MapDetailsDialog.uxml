@@ -14,20 +14,20 @@
                             <Timberborn.CoreUI.NineSliceButton name="NextImageButton" text="&gt;" class="button-game game-text-small" style="width: 38px;" />
                         </engine:VisualElement>
                     </Timberborn.CoreUI.NineSliceVisualElement>
-                    <engine:Label name="MapInformation" class="text--default" style="margin-top: 10px; white-space: normal;" />
-                    <engine:Label name="Analysis" class="text--default" style="margin-top: 10px; white-space: normal;" />
+                    <engine:Label name="MapInformation" text="Size: 128x128&#10;Votes: +42/-3&#10;Subscribers: 12,345" class="text--default" style="margin-top: 10px; white-space: normal;" />
+                    <engine:Label name="Analysis" text="Terrain: Rugged&#10;Valleys: Narrow valleys&#10;Water: Moderate water&#10;Landform: Fragmented&#10;Forests: Forested&#10;Layout: Mostly natural" class="text--default" style="margin-top: 10px; white-space: normal;" />
                 </engine:VisualElement>
                 <engine:VisualElement style="flex-grow: 1; min-width: 0;">
-                    <engine:Label name="Title" class="game-text-big text--bold" style="margin-bottom: 8px; flex-shrink: 0;" />
+                    <engine:Label name="Title" text="Example Workshop Map" class="game-text-big text--bold" style="margin-bottom: 8px; flex-shrink: 0;" />
                     <Timberborn.CoreUI.NineSliceVisualElement class="bg-sub-box--green" style="flex-grow: 1; min-height: 0; padding: 10px;">
                         <engine:ScrollView name="DescriptionScroll" class="scroll--green-decorated" style="flex-grow: 1;">
-                            <engine:Label name="Description" enable-rich-text="true" class="text--default" style="white-space: normal; padding-right: 8px;" />
+                            <engine:Label name="Description" text="&lt;b&gt;A detailed Workshop description&lt;/b&gt;&#10;&#10;This preview text demonstrates how a long map description wraps and scrolls inside the details dialog. It includes multiple paragraphs so spacing, width, and readability can be reviewed directly in UI Builder.&#10;&#10;Features:&#10;• A challenging river valley&#10;• Several starting locations&#10;• Enough text to exercise the description scroller" enable-rich-text="true" class="text--default" style="white-space: normal; padding-right: 8px;" />
                         </engine:ScrollView>
                     </Timberborn.CoreUI.NineSliceVisualElement>
                 </engine:VisualElement>
             </engine:VisualElement>
             <engine:VisualElement style="flex-direction: row; justify-content: flex-end; align-items: center; margin-top: 12px; flex-shrink: 0;">
-                <Timberborn.CoreUI.NineSliceButton name="RemoveButton" class="menu-button menu-button--medium" style="margin-right: 10px;" />
+                <Timberborn.CoreUI.NineSliceButton name="RemoveButton" text="Unsubscribe" class="menu-button menu-button--medium" style="margin-right: 10px;" />
                 <Timberborn.CoreUI.LocalizableButton name="ConfirmButton" text="Close" text-loc-key="IgorZ.MapBrowser.Dialog.Close" class="menu-button menu-button--medium" />
             </engine:VisualElement>
         </engine:Instance>

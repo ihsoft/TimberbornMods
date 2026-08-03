@@ -9,5 +9,5 @@
 * [Fix] Keep subscription states synchronized across browser modes and display Unicode Workshop descriptions correctly.
 * [Fix] Preserve search position during subscription changes and refresh installed map details without reopening the dialog.
 * [Fix] Avoid reporting Workshop maps as missing from the index while metadata is still loading.
-* [Feature] Show the index snapshot timestamp in Workshop search and normalize map dimensions in map titles.
+* [Feature] Show the index snapshot timestamp in Workshop search and display normalized dimensions on map previews.
 * [Fix] Sort maps by their names instead of leading size, difficulty, or other parenthesized prefixes.

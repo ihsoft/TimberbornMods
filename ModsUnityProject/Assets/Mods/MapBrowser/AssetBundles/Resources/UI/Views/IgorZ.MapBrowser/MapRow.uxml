@@ -1,0 +1,23 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" noNamespaceSchemaLocation="../../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle" />
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle" />
+    <Timberborn.CoreUI.NineSliceVisualElement name="MapRow" class="bg-sub-box--green list-view__item-background" style="position: relative; flex-direction: row; margin-bottom: 8px; padding: 8px;">
+        <engine:Image name="Preview" scale-mode="ScaleToFit" style="position: relative; width: 320px; min-width: 320px; height: 180px; margin-right: 14px;">
+            <engine:Label name="MapSizeBadge" text="128x128" picking-mode="Ignore" class="game-text-small" style="position: absolute; align-self: flex-start; left: 5px; top: 5px; padding: 2px 6px; background-color: rgba(13, 20, 18, 0.82);" />
+        </engine:Image>
+        <engine:VisualElement name="TextColumn" style="flex-grow: 1; height: 180px; overflow: hidden;">
+            <engine:Label name="Title" text="Example Workshop Map" class="text--default" style="font-size: 19px; -unity-font-style: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 100px;" />
+            <engine:Label name="Analysis" text="Terrain: Mixed, Narrow valleys, Moderate water, Forested | Landform: Fragmented | Layout: Natural" class="text--default" style="white-space: normal; margin-top: 2px; font-size: 13px; color: rgb(184, 194, 184);" />
+            <engine:Label name="Freshness" text="Freshness warning: Example snapshot status." class="text--default" style="white-space: normal; margin-top: 3px;" />
+            <engine:Label name="Description" text="Example map description showing how Workshop text fits beside the preview image." class="text--default" style="white-space: normal; margin-top: 4px; flex-grow: 1; flex-shrink: 1; overflow: hidden;" />
+        </engine:VisualElement>
+        <engine:VisualElement name="Actions" style="display: none; position: absolute; right: 8px; bottom: 8px; flex-direction: row;">
+            <Timberborn.CoreUI.LocalizableButton name="DetailsButton" text="Details" text-loc-key="IgorZ.MapBrowser.Action.Details" class="button-game game-text-small" style="margin-right: 6px; padding: 2px 8px;" />
+            <Timberborn.CoreUI.NineSliceButton name="ActionButton" text="Subscribe" class="button-game game-text-small" style="padding: 2px 8px;" />
+        </engine:VisualElement>
+        <Timberborn.CoreUI.NineSliceVisualElement name="SubscriptionBadge" class="bg-box--brown" style="display: none; position: absolute; right: 8px; top: 8px; padding: 2px 7px;">
+            <Timberborn.CoreUI.LocalizableLabel text="Subscribed" text-loc-key="IgorZ.MapBrowser.Action.Subscribed" class="game-text-small" />
+        </Timberborn.CoreUI.NineSliceVisualElement>
+        <Timberborn.CoreUI.LocalizableLabel name="RemovedOverlay" text="Removed" text-loc-key="IgorZ.MapBrowser.Action.Removed" picking-mode="Ignore" class="text--default" style="display: none; position: absolute; left: 0; right: 0; top: 0; bottom: 0; font-size: 24px; -unity-font-style: bold; -unity-text-align: middle-center; background-color: rgba(13, 20, 18, 0.75);" />
+    </Timberborn.CoreUI.NineSliceVisualElement>
+</engine:UXML>

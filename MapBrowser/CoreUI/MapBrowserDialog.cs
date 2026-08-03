@@ -29,6 +29,7 @@ sealed class MapBrowserDialog : AbstractDialog {
   const string BrowserSearchMapsLocKey = "IgorZ.MapBrowser.Browser.SearchMaps";
   const string CommonUnknownLocKey = "IgorZ.MapBrowser.Common.Unknown";
   const string DialogAsset = "IgorZ.MapBrowser/MapBrowserDialog";
+  const string MapRowAsset = "IgorZ.MapBrowser/MapRow";
   const string SearchPanelAsset = "IgorZ.MapBrowser/MapSearchPanel";
   const string SearchAnyLocKey = "IgorZ.MapBrowser.Search.Any";
   const string SearchInstalledLocKey = "IgorZ.MapBrowser.Search.Installed";
@@ -40,17 +41,13 @@ sealed class MapBrowserDialog : AbstractDialog {
   const string DeleteLocKey = "IgorZ.MapBrowser.Action.Delete";
   const string DeleteTooltipLocKey = "IgorZ.MapBrowser.Action.DeleteTooltip";
   const string DeletingLocKey = "IgorZ.MapBrowser.Action.Deleting";
-  const string DetailsLocKey = "IgorZ.MapBrowser.Action.Details";
   const string DownloadingLocKey = "IgorZ.MapBrowser.Action.Downloading";
   const string NoDescriptionLocKey = "MapSelection.NoDescription";
-  const string RemovedLocKey = "IgorZ.MapBrowser.Action.Removed";
   const string RetryDeleteLocKey = "IgorZ.MapBrowser.Action.RetryDelete";
   const string RetrySubscribeLocKey = "IgorZ.MapBrowser.Action.RetrySubscribe";
   const string RetryUnsubscribeLocKey = "IgorZ.MapBrowser.Action.RetryUnsubscribe";
   const string SourceLocalLocKey = "IgorZ.MapBrowser.Common.SourceLocal";
-  const string TitleWithSizeLocKey = "IgorZ.MapBrowser.Browser.TitleWithSize";
   const string SubscribeLocKey = "IgorZ.MapBrowser.Action.Subscribe";
-  const string SubscribedLocKey = "IgorZ.MapBrowser.Action.Subscribed";
   const string SubscribeTooltipLocKey = "IgorZ.MapBrowser.Action.SubscribeTooltip";
   const string SubscribingLocKey = "IgorZ.MapBrowser.Action.Subscribing";
   const string UnsubscribeLocKey = "IgorZ.MapBrowser.Action.Unsubscribe";
@@ -58,8 +55,6 @@ sealed class MapBrowserDialog : AbstractDialog {
   const string UnsubscribingLocKey = "IgorZ.MapBrowser.Action.Unsubscribing";
   const string FreshnessMissingLocKey = "IgorZ.MapBrowser.Freshness.Missing";
   const string FreshnessStaleLocKey = "IgorZ.MapBrowser.Freshness.Stale";
-  const float PreviewHeight = 180;
-
   static readonly Regex ParenthesizedMapSizeRegex = new(
       @"\(\s*(?<width>\d{1,4})\s*[xX×]\s*(?<height>\d{1,4})\s*\)", RegexOptions.Compiled);
   static readonly Regex MapSizePrefixRegex = new(
@@ -179,14 +174,12 @@ sealed class MapBrowserDialog : AbstractDialog {
   }
 
   void InitializeModes() {
-    var tabs = Root.Q2<VisualElement>("TabButtons");
-    tabs.style.flexWrap = Wrap.Wrap;
-    _installedTab = UiFactory.CreateButton(
-        SearchInstalledLocKey, _ => SetSearchMode(false), classes: ["game-text-small"]);
-    _installedTab.style.marginRight = 6;
-    _searchTab = UiFactory.CreateButton(SearchSearchLocKey, _ => SetSearchMode(true), classes: ["game-text-small"]);
-    tabs.Add(_installedTab);
-    tabs.Add(_searchTab);
+    _installedTab = Root.Q2<NineSliceButton>("InstalledTabButton");
+    _installedTab.text = UiFactory.T(SearchInstalledLocKey);
+    _installedTab.clicked += () => SetSearchMode(false);
+    _searchTab = Root.Q2<NineSliceButton>("SearchTabButton");
+    _searchTab.text = UiFactory.T(SearchSearchLocKey);
+    _searchTab.clicked += () => SetSearchMode(true);
     _modeHeading = Root.Q2<Label>("ModeHeading");
     _searchPanel = Root.Q2<VisualElement>("SearchPanel");
     _searchPagingPanel = Root.Q2<VisualElement>("SearchPagingPanel");
@@ -197,10 +190,8 @@ sealed class MapBrowserDialog : AbstractDialog {
   void CreateSearchControls() {
     var searchControls = UiFactory.LoadVisualTreeAsset(SearchPanelAsset);
     _searchPanel.Add(searchControls);
-    _searchText = UiFactory.CreateTextField(classes: ["game-text-normal"]);
-    _searchText.style.flexGrow = 1;
+    _searchText = searchControls.Q2<TextField>("KeywordsTextField");
     _searchText.RegisterValueChangedCallback(_ => ApplySearch());
-    searchControls.Q2<VisualElement>("KeywordsField").Add(_searchText);
     foreach (var filter in SearchFilters) {
       BindSearchFilter(searchControls, filter);
     }
@@ -259,141 +250,21 @@ sealed class MapBrowserDialog : AbstractDialog {
   }
 
   VisualElement CreateMapRow() {
-    var row = new NineSliceVisualElement {
-        style = {
-            height = PreviewHeight,
-            flexDirection = FlexDirection.Row,
-            marginBottom = 8,
-            paddingTop = 8,
-            paddingRight = 8,
-            paddingBottom = 8,
-            paddingLeft = 8,
-        },
-    };
-    row.AddToClassList("bg-sub-box--green");
-    row.AddToClassList("list-view__item-background");
+    var row = UiFactory.LoadVisualTreeAsset(MapRowAsset);
     var binding = new RowBinding();
     row.userData = binding;
-    var preview = new Image {
-        name = "Preview",
-        scaleMode = ScaleMode.ScaleToFit,
-        style = {
-            width = 300,
-            minWidth = 300,
-            height = PreviewHeight,
-            marginRight = 14,
-        },
-    };
-    var textColumn = new VisualElement {
-        style = { flexGrow = 1, height = PreviewHeight, overflow = Overflow.Hidden },
-    };
-    var title = new Label {
-        name = "Title",
-        style = {
-            fontSize = 19,
-            unityFontStyleAndWeight = FontStyle.Bold,
-            whiteSpace = WhiteSpace.NoWrap,
-            overflow = Overflow.Hidden,
-            textOverflow = TextOverflow.Ellipsis,
-            paddingRight = 100,
-        },
-    };
-    title.AddToClassList("text--default");
-    textColumn.Add(title);
-    var analysis = new Label {
-        name = "Analysis",
-        style = {
-            whiteSpace = WhiteSpace.Normal,
-            marginTop = 2,
-            fontSize = 13,
-            color = new Color(0.72f, 0.76f, 0.72f),
-        },
-    };
-    analysis.AddToClassList("text--default");
+    var analysis = row.Q2<Label>("Analysis");
     _tooltipRegistrar.Register(analysis, () => binding.Tooltip);
-    textColumn.Add(analysis);
-    var freshness = new Label {
-        name = "Freshness",
-        style = { whiteSpace = WhiteSpace.Normal, marginTop = 3 },
-    };
-    freshness.AddToClassList("text--default");
-    textColumn.Add(freshness);
-    var description = new Label {
-        name = "Description",
-        style = {
-            whiteSpace = WhiteSpace.Normal,
-            marginTop = 4,
-            flexGrow = 1,
-            flexShrink = 1,
-            overflow = Overflow.Hidden,
-        },
-    };
-    description.AddToClassList("text--default");
+    var description = row.Q2<Label>("Description");
     description.RegisterCallback<GeometryChangedEvent>(_ => FitDescription(description, binding.Description));
-    textColumn.Add(description);
-    var actions = new VisualElement {
-        name = "Actions",
-        style = {
-            position = Position.Absolute,
-            right = 8,
-            bottom = 8,
-            flexDirection = FlexDirection.Row,
-        },
-    };
-    actions.ToggleDisplayStyle(false);
-    var detailsButton = (NineSliceButton)UiFactory.CreateButton(
-        DetailsLocKey, _ => ShowDetails(binding), (2, 8, 2, 8), ["game-text-small"]);
-    detailsButton.name = "DetailsButton";
-    detailsButton.style.marginRight = 6;
+    var actions = row.Q2<VisualElement>("Actions");
+    var detailsButton = row.Q2<Button>("DetailsButton");
+    detailsButton.clicked += () => ShowDetails(binding);
     detailsButton.RegisterCallback<ClickEvent>(evt => evt.StopPropagation());
-    var actionButton = (NineSliceButton)UiFactory.CreateButton(
-        DeleteLocKey, button => ApplyMapAction(binding, row, (NineSliceButton)button),
-        (2, 8, 2, 8), ["game-text-small"]);
-    actionButton.name = "ActionButton";
+    var actionButton = row.Q2<NineSliceButton>("ActionButton");
+    actionButton.clicked += () => ApplyMapAction(binding, row, actionButton);
     _tooltipRegistrar.Register(actionButton, () => binding.ActionTooltip);
     actionButton.RegisterCallback<ClickEvent>(evt => evt.StopPropagation());
-    actions.Add(detailsButton);
-    actions.Add(actionButton);
-    var removedOverlay = new Label {
-        name = "RemovedOverlay",
-        text = UiFactory.T(RemovedLocKey),
-        pickingMode = PickingMode.Ignore,
-        style = {
-            position = Position.Absolute,
-            left = 0,
-            right = 0,
-            top = 0,
-            bottom = 0,
-            fontSize = 24,
-            unityFontStyleAndWeight = FontStyle.Bold,
-            unityTextAlign = TextAnchor.MiddleCenter,
-            backgroundColor = new Color(0.05f, 0.08f, 0.07f, 0.75f),
-        },
-    };
-    removedOverlay.AddToClassList("text--default");
-    removedOverlay.ToggleDisplayStyle(false);
-    var subscriptionBadge = new NineSliceVisualElement {
-        name = "SubscriptionBadge",
-        style = {
-            position = Position.Absolute,
-            right = 8,
-            top = 8,
-            paddingTop = 2,
-            paddingRight = 7,
-            paddingBottom = 2,
-            paddingLeft = 7,
-        },
-    };
-    subscriptionBadge.AddToClassList("bg-box--brown");
-    var subscriptionLabel = new Label { text = UiFactory.T(SubscribedLocKey) };
-    subscriptionLabel.AddToClassList("game-text-small");
-    subscriptionBadge.Add(subscriptionLabel);
-    subscriptionBadge.ToggleDisplayStyle(false);
-    row.Add(preview);
-    row.Add(textColumn);
-    row.Add(actions);
-    row.Add(subscriptionBadge);
-    row.Add(removedOverlay);
     row.RegisterCallback<PointerEnterEvent>(_ => {
       if (binding.Map is { Removed: false }) {
         actions.ToggleDisplayStyle(true);
@@ -431,10 +302,14 @@ sealed class MapBrowserDialog : AbstractDialog {
         ? UiFactory.T(DeleteTooltipLocKey)
         : UiFactory.T(binding.WorkshopSubscribed ? UnsubscribeTooltipLocKey : SubscribeTooltipLocKey);
     var metadata = GetMetadata(installedMap);
-    var title = FormatMapTitle(installedMap, metadata);
+    var title = FormatMapTitle(installedMap);
     var description = metadata?.DescriptionPlain ?? installedMap.Map?.DisplayDescription;
     var titleLabel = row.Q<Label>("Title");
     titleLabel.text = title;
+    var mapSizeBadge = row.Q<Label>("MapSizeBadge");
+    var mapSize = GetMapSize(installedMap, metadata, null);
+    mapSizeBadge.text = mapSize;
+    mapSizeBadge.ToggleDisplayStyle(mapSize != null);
     var descriptionLabel = row.Q<Label>("Description");
     binding.Description = string.IsNullOrWhiteSpace(description)
         ? UiFactory.T(NoDescriptionLocKey)
@@ -511,14 +386,12 @@ sealed class MapBrowserDialog : AbstractDialog {
     return ParenthesizedTitlePrefixesRegex.Replace(title, string.Empty).TrimStart();
   }
 
-  string FormatMapTitle(InstalledMap installedMap, WorkshopItemMetadata metadata) {
+  string FormatMapTitle(InstalledMap installedMap) {
     var rawTitle = GetRawTitle(installedMap);
     if (HasEmbeddedMapSize(rawTitle)) {
       return rawTitle;
     }
-    var title = RemoveEdgeMapSize(rawTitle);
-    var mapSize = GetMapSize(installedMap, metadata, null);
-    return mapSize != null ? UiFactory.T(TitleWithSizeLocKey, title, mapSize) : title;
+    return RemoveEdgeMapSize(rawTitle);
   }
 
   WorkshopItemMetadata GetMetadata(InstalledMap installedMap) {

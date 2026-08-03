@@ -60,7 +60,6 @@ IgorZ.MapBrowser.Analysis.Level.WaterRich,Water-rich,High water classification.
 =,=,Map browser
 IgorZ.MapBrowser.Browser.InstalledMaps,Installed custom maps,Heading above the installed map list.
 IgorZ.MapBrowser.Browser.SearchMaps,Find Workshop maps,Heading above Workshop search results.
-IgorZ.MapBrowser.Browser.TitleWithSize,"({1}) {0}",Map title prefixed with its dimensions.
 =,=,Common map text
 IgorZ.MapBrowser.Common.SourceLocal,Source: Local,Text identifying a local map.
 IgorZ.MapBrowser.Common.Unavailable,Unavailable,Value shown while live Steam data is unavailable.

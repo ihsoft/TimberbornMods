@@ -4,7 +4,9 @@
     <engine:VisualElement>
         <engine:VisualElement style="flex-direction: row; align-items: center;">
             <Timberborn.CoreUI.LocalizableLabel text="Keywords" text-loc-key="IgorZ.MapBrowser.Search.Keywords" class="text--default" style="flex-shrink: 0; margin-right: 8px;" />
-            <engine:VisualElement name="KeywordsField" style="flex-grow: 1;" />
+            <engine:VisualElement name="KeywordsField" style="flex-grow: 1;">
+                <engine:TextField name="KeywordsTextField" class="game-text-normal" style="flex-grow: 1;" />
+            </engine:VisualElement>
         </engine:VisualElement>
         <engine:VisualElement style="flex-direction: row; flex-wrap: wrap; margin-top: 6px;">
             <engine:VisualElement name="ruggednessFilter" style="flex-direction: row; align-items: center; width: 33.333%; min-width: 300px; padding-right: 12px; margin-bottom: 6px;">
