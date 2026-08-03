@@ -150,7 +150,8 @@ public class UiFactory {
   /// Optional padding around the button text. If not set, then <see cref="StandardButtonPadding"/> will be used.
   /// </param>
   /// <param name="classes">
-  /// Classes to add to the control. If not set, then the component will be set up for the entity panel.
+  /// Classes to add to the control. If not set, then the component will be set up for
+  /// <see cref="EntityPanelTextClass"/>.
   /// </param>
   public Button CreateButton(string locKey, Action<Button> onClickFn,
                              (int top, int left, int bottom, int right)? padding = null,
