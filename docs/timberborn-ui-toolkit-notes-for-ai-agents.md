@@ -34,6 +34,11 @@ and then reparent it in C# merely to move it to the intended container; that def
 and can make initialization order fragile. Use C# construction or reparenting only when the element is genuinely
 dynamic, depends on runtime data, or has another concrete lifecycle reason.
 
+For UXML templates populated dynamically at runtime, give visible labels, badges, and controls representative
+authoring-time sample values when runtime binding will safely overwrite them. Choose samples that exercise realistic
+lengths and states so the asset is understandable in UI Builder and can expose layout issues before export. Do not make
+runtime behavior depend on the samples, and do not add localization keys solely for preview data.
+
 ## Common Controls
 
 Prefer Timberborn controls for game-like UI.
