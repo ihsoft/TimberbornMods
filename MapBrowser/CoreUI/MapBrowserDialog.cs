@@ -80,6 +80,7 @@ sealed class MapBrowserDialog : AbstractDialog {
   readonly MapRepository _mapRepository;
   readonly MapDetailsDialog _mapDetailsDialog;
   readonly WorkshopMetadataService _metadataService;
+  readonly WorkshopMapSizeService _mapSizeService;
   readonly WorkshopSubscriptionService _subscriptionService;
   readonly ITooltipRegistrar _tooltipRegistrar;
   readonly DropdownItemsSetter _dropdownItemsSetter;
@@ -107,13 +108,14 @@ sealed class MapBrowserDialog : AbstractDialog {
   MapBrowserDialog(
       MapItemProvider mapItemProvider, MapThumbnailCache mapThumbnailCache, MapRepository mapRepository,
       MapDetailsDialog mapDetailsDialog, WorkshopMetadataService metadataService,
-      WorkshopSubscriptionService subscriptionService,
+      WorkshopMapSizeService mapSizeService, WorkshopSubscriptionService subscriptionService,
       ITooltipRegistrar tooltipRegistrar, DropdownItemsSetter dropdownItemsSetter) {
     _mapItemProvider = mapItemProvider;
     _mapThumbnailCache = mapThumbnailCache;
     _mapRepository = mapRepository;
     _mapDetailsDialog = mapDetailsDialog;
     _metadataService = metadataService;
+    _mapSizeService = mapSizeService;
     _subscriptionService = subscriptionService;
     _tooltipRegistrar = tooltipRegistrar;
     _dropdownItemsSetter = dropdownItemsSetter;
@@ -144,6 +146,7 @@ sealed class MapBrowserDialog : AbstractDialog {
     _list.selectionType = SelectionType.None;
     _list.virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight;
     _metadataService.MetadataChanged += OnMetadataChanged;
+    _mapSizeService.MapSizeChanged += OnMapSizeChanged;
     _subscriptionService.DownloadProgressChanged += OnDownloadProgressChanged;
     _subscriptionService.DownloadCompleted += OnDownloadCompleted;
     _metadataService.EnsureLoaded();
@@ -155,6 +158,7 @@ sealed class MapBrowserDialog : AbstractDialog {
       return;
     }
     _metadataService.MetadataChanged -= OnMetadataChanged;
+    _mapSizeService.MapSizeChanged -= OnMapSizeChanged;
     _subscriptionService.DownloadProgressChanged -= OnDownloadProgressChanged;
     _subscriptionService.DownloadCompleted -= OnDownloadCompleted;
     _list = null;
@@ -307,7 +311,7 @@ sealed class MapBrowserDialog : AbstractDialog {
     var titleLabel = row.Q<Label>("Title");
     titleLabel.text = title;
     var mapSizeBadge = row.Q<Label>("MapSizeBadge");
-    var mapSize = GetMapSize(installedMap, metadata, null);
+    var mapSize = GetMapSize(installedMap, metadata, GetDownloadedMapSize(installedMap), null);
     mapSizeBadge.text = mapSize;
     mapSizeBadge.ToggleDisplayStyle(mapSize != null);
     var descriptionLabel = row.Q<Label>("Description");
@@ -370,6 +374,17 @@ sealed class MapBrowserDialog : AbstractDialog {
     } else {
       ApplySearch();
     }
+  }
+
+  void OnMapSizeChanged(string _) {
+    _list?.RefreshItems();
+  }
+
+  Vector2Int? GetDownloadedMapSize(InstalledMap installedMap) {
+    return installedMap.PublishedFileId != null
+        && _mapSizeService.TryGetCachedSize(installedMap.PublishedFileId, out var size)
+            ? size
+            : null;
   }
 
   void SortMaps(List<InstalledMap> maps) {
@@ -492,9 +507,12 @@ sealed class MapBrowserDialog : AbstractDialog {
   }
 
   internal static string GetMapSize(
-      InstalledMap installedMap, WorkshopItemMetadata metadata, string unknown) {
+      InstalledMap installedMap, WorkshopItemMetadata metadata, Vector2Int? downloadedSize, string unknown) {
     if (installedMap.Map?.Size is { } mapSize) {
       return $"{mapSize.x}x{mapSize.y}";
+    }
+    if (downloadedSize is { } cachedSize) {
+      return $"{cachedSize.x}x{cachedSize.y}";
     }
     var title = metadata?.Title ?? installedMap.Map?.DisplayName ?? string.Empty;
     var match = ParenthesizedMapSizeRegex.Match(title);

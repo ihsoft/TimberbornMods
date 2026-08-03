@@ -20,6 +20,7 @@ namespace IgorZ.MapBrowser.CoreUI;
 sealed class MapDetailsDialog : AbstractDialog {
   const string DownloadingLocKey = "IgorZ.MapBrowser.Action.Downloading";
   const string SizeLocKey = "IgorZ.MapBrowser.Details.Size";
+  const string SizeLoadingLocKey = "IgorZ.MapBrowser.Details.SizeLoading";
   const string SubscribersLocKey = "IgorZ.MapBrowser.Details.Subscribers";
   const string VotesLocKey = "IgorZ.MapBrowser.Details.Votes";
   const string VotesUnavailableLocKey = "IgorZ.MapBrowser.Details.VotesUnavailable";
@@ -48,6 +49,7 @@ sealed class MapDetailsDialog : AbstractDialog {
   readonly MapRepository _mapRepository;
   readonly WorkshopMetadataService _metadataService;
   readonly WorkshopLiveDetailsService _liveDetailsService;
+  readonly WorkshopMapSizeService _mapSizeService;
   readonly WorkshopSubscriptionService _subscriptionService;
   readonly ITooltipRegistrar _tooltipRegistrar;
   readonly List<string> _imageUrls = [];
@@ -61,17 +63,20 @@ sealed class MapDetailsDialog : AbstractDialog {
   Label _mapInformation;
   bool _allowResubscribe;
   bool _workshopSubscribed;
+  WorkshopLiveDetails _liveDetails;
   int _imageIndex;
 
   MapDetailsDialog(
       MapThumbnailCache mapThumbnailCache, MapItemProvider mapItemProvider, MapRepository mapRepository,
       WorkshopMetadataService metadataService, WorkshopLiveDetailsService liveDetailsService,
-      WorkshopSubscriptionService subscriptionService, ITooltipRegistrar tooltipRegistrar) {
+      WorkshopMapSizeService mapSizeService, WorkshopSubscriptionService subscriptionService,
+      ITooltipRegistrar tooltipRegistrar) {
     _mapThumbnailCache = mapThumbnailCache;
     _mapItemProvider = mapItemProvider;
     _mapRepository = mapRepository;
     _metadataService = metadataService;
     _liveDetailsService = liveDetailsService;
+    _mapSizeService = mapSizeService;
     _subscriptionService = subscriptionService;
     _tooltipRegistrar = tooltipRegistrar;
   }
@@ -115,6 +120,7 @@ sealed class MapDetailsDialog : AbstractDialog {
     _removeButton = null;
     _mapInformation = null;
     _allowResubscribe = false;
+    _liveDetails = null;
     _imageUrls.Clear();
   }
 
@@ -143,7 +149,8 @@ sealed class MapDetailsDialog : AbstractDialog {
     _removeButton.clicked += ApplyMapAction;
     BuildImageList(metadata);
     ShowImage(0);
-    LoadLiveDetails(_mapInformation);
+    LoadLiveDetails();
+    LoadExactMapSize();
   }
 
   string GetDescription(WorkshopItemMetadata metadata) {
@@ -155,17 +162,27 @@ sealed class MapDetailsDialog : AbstractDialog {
 
   string GetMapInformation() {
     var metadata = _installedMap.Metadata ?? _metadataService.Find(_installedMap.PublishedFileId);
-    var mapSize = MapBrowserDialog.GetMapSize(_installedMap, metadata, UiFactory.T(UnavailableLocKey));
-    var size = UiFactory.T(SizeLocKey, mapSize);
+    var mapSize = MapBrowserDialog.GetMapSize(
+        _installedMap, metadata, GetDownloadedMapSize(), UiFactory.T(UnknownLocKey));
+    var size = _mapSizeService.IsLoading(_installedMap.PublishedFileId)
+        ? UiFactory.T(SizeLoadingLocKey)
+        : UiFactory.T(SizeLocKey, mapSize);
     if (_installedMap.PublishedFileId == null) {
       return size;
     }
-    var unavailable = UiFactory.T(UnavailableLocKey);
-    return size + "\n" + UiFactory.T(VotesUnavailableLocKey)
-        + "\n" + UiFactory.T(SubscribersLocKey, unavailable);
+    if (_liveDetails == null) {
+      var unavailable = UiFactory.T(UnavailableLocKey);
+      return size + "\n" + UiFactory.T(VotesUnavailableLocKey)
+          + "\n" + UiFactory.T(SubscribersLocKey, unavailable);
+    }
+    var subscribers = _liveDetails.Subscribers is { } count
+        ? count.ToString("N0")
+        : UiFactory.T(UnavailableLocKey);
+    return size + "\n" + UiFactory.T(VotesLocKey, "+" + _liveDetails.VotesUp, "-" + _liveDetails.VotesDown)
+        + "\n" + UiFactory.T(SubscribersLocKey, subscribers);
   }
 
-  void LoadLiveDetails(Label mapInformation) {
+  void LoadLiveDetails() {
     if (_installedMap.PublishedFileId == null) {
       return;
     }
@@ -175,13 +192,29 @@ sealed class MapDetailsDialog : AbstractDialog {
       if (details == null || Root == null || _installedMap != requestedMap) {
         return;
       }
-      var subscribers = details.Subscribers is { } count ? count.ToString("N0") : UiFactory.T(UnavailableLocKey);
-      var metadata = requestedMap.Metadata ?? _metadataService.Find(requestedMap.PublishedFileId);
-      var mapSize = MapBrowserDialog.GetMapSize(requestedMap, metadata, UiFactory.T(UnknownLocKey));
-      mapInformation.text = UiFactory.T(SizeLocKey, mapSize)
-          + "\n" + UiFactory.T(VotesLocKey, "+" + details.VotesUp, "-" + details.VotesDown)
-          + "\n" + UiFactory.T(SubscribersLocKey, subscribers);
+      _liveDetails = details;
+      _mapInformation.text = GetMapInformation();
     });
+  }
+
+  void LoadExactMapSize() {
+    if (_installedMap.PublishedFileId == null || _installedMap.Map?.Size != null) {
+      return;
+    }
+    var requestedMap = _installedMap;
+    _mapSizeService.RequestSize(requestedMap.PublishedFileId, _ => {
+      if (Root != null && _installedMap == requestedMap) {
+        _mapInformation.text = GetMapInformation();
+      }
+    });
+    _mapInformation.text = GetMapInformation();
+  }
+
+  Vector2Int? GetDownloadedMapSize() {
+    return _installedMap.PublishedFileId != null
+        && _mapSizeService.TryGetCachedSize(_installedMap.PublishedFileId, out var size)
+            ? size
+            : null;
   }
 
   void BuildImageList(WorkshopItemMetadata metadata) {
@@ -365,6 +398,6 @@ sealed class MapDetailsDialog : AbstractDialog {
 
     _installedMap = _installedMap with { Map = map };
     _mapInformation.text = GetMapInformation();
-    LoadLiveDetails(_mapInformation);
+    LoadLiveDetails();
   }
 }

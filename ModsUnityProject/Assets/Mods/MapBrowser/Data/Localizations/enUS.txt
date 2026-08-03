@@ -66,6 +66,7 @@ IgorZ.MapBrowser.Common.Unavailable,Unavailable,Value shown while live Steam dat
 IgorZ.MapBrowser.Common.Unknown,Unknown,Value shown when metadata is unknown.
 =,=,Map details
 IgorZ.MapBrowser.Details.Size,Size: {0},Map dimensions shown in the details dialog.
+IgorZ.MapBrowser.Details.SizeLoading,Size: Loading...,Map dimensions shown while exact metadata is downloading.
 IgorZ.MapBrowser.Details.Subscribers,Subscribers: {0},Steam subscriber count shown in the details dialog.
 IgorZ.MapBrowser.Details.Votes,Votes: {0}/{1},Steam upvotes and downvotes shown in the details dialog.
 IgorZ.MapBrowser.Details.VotesUnavailable,Votes: Unavailable,Text shown while live Steam votes are unavailable.

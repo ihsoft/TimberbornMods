@@ -10,4 +10,5 @@
 * [Fix] Preserve search position during subscription changes and refresh installed map details without reopening the dialog.
 * [Fix] Avoid reporting Workshop maps as missing from the index while metadata is still loading.
 * [Feature] Show the index snapshot timestamp in Workshop search and display normalized dimensions on map previews.
+* [Feature] Resolve exact dimensions for unsubscribed Workshop maps from Steam downloads and cached map data.
 * [Fix] Sort maps by their names instead of leading size, difficulty, or other parenthesized prefixes.
