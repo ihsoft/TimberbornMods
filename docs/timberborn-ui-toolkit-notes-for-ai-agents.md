@@ -39,6 +39,11 @@ authoring-time sample values when runtime binding will safely overwrite them. Ch
 lengths and states so the asset is understandable in UI Builder and can expose layout issues before export. Do not make
 runtime behavior depend on the samples, and do not add localization keys solely for preview data.
 
+Before replacing a UI helper or factory call with UXML, inspect the complete helper contract and reproduce every
+relevant effect. Preserve the concrete control type, USS classes, documented default padding or margins, initialization
+behavior, localization ownership, callbacks, and tooltip registration. Treat documented defaults as behavior, then
+compare the resulting UXML against the full factory call rather than stopping after the first visible mismatch.
+
 ## Common Controls
 
 Prefer Timberborn controls for game-like UI.
