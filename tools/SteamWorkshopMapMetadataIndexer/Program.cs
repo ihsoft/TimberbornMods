@@ -53,9 +53,10 @@ if (candidates.Count > 0) {
 
       var map = candidates[index];
       try {
-        var metadata = DownloadAndReadMetadata(map.PublishedFileId, options);
+        var analysis = DownloadAndAnalyzeMap(map.PublishedFileId, options);
         outputById[map.PublishedFileId] = new MapMetadataRecord(
-            map.PublishedFileId, map.UpdatedAtUtc, metadata.Width, metadata.Height, "fetched");
+            map.PublishedFileId, map.UpdatedAtUtc, MapArchiveAnalyzer.AnalysisVersion,
+            analysis.Width, analysis.Height, analysis.Classifications, "fetched");
       } catch (Exception exception) {
         Console.Error.WriteLine($"Map metadata download failed for {map.PublishedFileId}: {exception.Message}");
         var previous = previousById.GetValueOrDefault(map.PublishedFileId);
@@ -78,7 +79,7 @@ Console.WriteLine(
     + $"complete {outputById.Values.Count(record => record.CollectionState != "stale")}.");
 return 0;
 
-static MapDimensions DownloadAndReadMetadata(string publishedFileId, Options options) {
+static MapArchiveAnalysis DownloadAndAnalyzeMap(string publishedFileId, Options options) {
   var itemId = new PublishedFileId_t(ulong.Parse(publishedFileId));
   var declaredSize = QueryDeclaredSize(itemId, options.RequestTimeout);
   if (declaredSize > options.MaxDownloadBytes) {
@@ -108,21 +109,13 @@ static MapDimensions DownloadAndReadMetadata(string publishedFileId, Options opt
         $"Downloaded payload is {sizeOnDisk} bytes; limit is {options.MaxDownloadBytes} bytes.");
   }
 
-  var mapFile = Directory.EnumerateFiles(folder, "*.timber", SearchOption.AllDirectories).SingleOrDefault()
-      ?? throw new InvalidDataException("Downloaded payload does not contain exactly one .timber map.");
-  using var archive = ZipFile.OpenRead(mapFile);
-  var entry = archive.GetEntry("map_metadata.json")
-      ?? throw new InvalidDataException("Map archive has no map_metadata.json entry.");
-  if (entry.Length is < 1 or > 65_536) {
-    throw new InvalidDataException($"Unexpected map_metadata.json size: {entry.Length} bytes.");
+  var mapFiles = Directory.EnumerateFiles(folder, "*.timber", SearchOption.AllDirectories).ToArray();
+  if (mapFiles.Length != 1) {
+    throw new InvalidDataException(
+        $"Downloaded payload for Workshop item {publishedFileId} contains {mapFiles.Length} .timber files; expected exactly one.");
   }
-  using var stream = entry.Open();
-  var metadata = JsonSerializer.Deserialize<MapDimensions>(stream)
-      ?? throw new InvalidDataException("Map metadata could not be deserialized.");
-  if (metadata.Width < 1 || metadata.Height < 1) {
-    throw new InvalidDataException($"Invalid map dimensions {metadata.Width}x{metadata.Height}.");
-  }
-  return metadata;
+  using var archive = ZipFile.OpenRead(mapFiles[0]);
+  return MapArchiveAnalyzer.Analyze(archive);
 }
 
 static ulong QueryDeclaredSize(PublishedFileId_t publishedFileId, TimeSpan timeout) {
@@ -206,7 +199,9 @@ static string? GetOptionalString(JsonElement element, string propertyName) {
 static bool NeedsRefresh(MapItem map, MapMetadataRecord? previous) {
   return previous is null || previous.CollectionState == "stale"
       || previous.SourceUpdatedAtUtc != map.UpdatedAtUtc
-      || previous.MapWidth < 1 || previous.MapHeight < 1;
+      || previous.AnalysisVersion != MapArchiveAnalyzer.AnalysisVersion
+      || previous.MapWidth < 1 || previous.MapHeight < 1
+      || previous.Classifications?.ContainsKey(ForestDensityClassifier.FeatureKey) != true;
 }
 
 static DateTimeOffset ParseTimestamp(string? value) {
@@ -253,15 +248,13 @@ static void WriteRecords(
 
 sealed record MapItem(string PublishedFileId, string? UpdatedAtUtc);
 
-sealed record MapDimensions(
-    [property: JsonPropertyName("Width")] int Width,
-    [property: JsonPropertyName("Height")] int Height);
-
 sealed record MapMetadataRecord(
     [property: JsonPropertyName("published_file_id")] string PublishedFileId,
     [property: JsonPropertyName("source_updated_at_utc")] string? SourceUpdatedAtUtc,
+    [property: JsonPropertyName("analysis_version")] int AnalysisVersion,
     [property: JsonPropertyName("map_width")] int MapWidth,
     [property: JsonPropertyName("map_height")] int MapHeight,
+    [property: JsonPropertyName("classifications")] IReadOnlyDictionary<string, JsonElement>? Classifications,
     [property: JsonPropertyName("collection_state")] string CollectionState);
 
 sealed record Options(

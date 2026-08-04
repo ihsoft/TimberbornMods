@@ -90,6 +90,9 @@ def main() -> int:
             record["map_width"] = map_metadata["map_width"]
             record["map_height"] = map_metadata["map_height"]
             record["map_metadata_collection_state"] = map_metadata.get("collection_state")
+            record["map_analysis_version"] = map_metadata.get("analysis_version")
+            if "classifications" in map_metadata:
+                record["map_classifications"] = map_metadata["classifications"]
         if visual:
             record["visual_scores"] = visual["visual_scores"]
             record["visual_score_aggregates"] = visual.get("visual_score_aggregates")
@@ -158,6 +161,10 @@ def main() -> int:
         "map_dimensions_known": len(map_metadata_results),
         "map_dimensions_stale": sum(
             record.get("collection_state") == "stale" for record in map_metadata_results
+        ),
+        "map_forest_density_known": sum(
+            "forest_density" in record.get("classifications", {})
+            for record in map_metadata_results
         ),
         "visual_model": visual_features[0]["model"] if visual_features else None,
         "visual_classifier_version": (

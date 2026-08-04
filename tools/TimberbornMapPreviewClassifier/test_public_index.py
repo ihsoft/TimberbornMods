@@ -59,8 +59,16 @@ class PublicIndexContractTest(unittest.TestCase):
             }])
             write_json_lines(map_metadata, [{
                 "published_file_id": "1",
+                "analysis_version": 1,
                 "map_width": 128,
                 "map_height": 128,
+                "classifications": {
+                    "forest_density": {
+                        "live_tree_count": 4096,
+                        "coverage_ratio": 0.25,
+                        "level": 2,
+                    },
+                },
                 "collection_state": "fetched",
             }])
             arguments = [
@@ -89,6 +97,11 @@ class PublicIndexContractTest(unittest.TestCase):
             self.assertEqual("1", consumer_records[0]["published_file_id"])
             self.assertEqual(128, consumer_records[0]["map_width"])
             self.assertEqual(128, consumer_records[0]["map_height"])
+            self.assertEqual(1, consumer_records[0]["map_analysis_version"])
+            self.assertEqual(
+                2,
+                consumer_records[0]["map_classifications"]["forest_density"]["level"],
+            )
             self.assertEqual(
                 ["https://example.test/gallery.jpg"],
                 consumer_records[0]["gallery_urls"],

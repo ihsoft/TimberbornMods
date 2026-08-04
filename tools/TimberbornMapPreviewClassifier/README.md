@@ -131,10 +131,16 @@ retaining the image corpus. At most eight resized gallery screenshots are consid
 limited to 2 MB, the public artifact is limited to 100 MB, and images are discarded after their scores are computed.
 The workflow uses no Steam account, API key, repository secret, or game process.
 
-The workflow also downloads a bounded number of map payloads through an anonymous Steam game-server session and reads
-only `map_metadata.json` from each `.timber` archive. Exact `map_width` and `map_height` values are retained in
-`map-metadata.jsonl.gz` and merged into the search index. Records are reused until the Workshop item's update timestamp
-changes, so scheduled runs progressively backfill missing dimensions without repeatedly downloading unchanged maps.
+The workflow also downloads a bounded number of map payloads through an anonymous Steam game-server session. A single
+archive analysis reads exact dimensions from `map_metadata.json` and feeds the entities in `world.json` to registered
+content classifiers. `map-metadata.jsonl.gz` currently retains dimensions plus exact initial living-tree count,
+tree-to-map-area ratio, and a fixed five-level forest-density classification. Adding another content classifier extends
+this shared entity scan instead of introducing another Workshop download or map scanner. Records are reused until the
+Workshop item's update timestamp or the map-analysis version changes, so scheduled runs progressively backfill new
+classifications without repeatedly downloading already complete maps.
+
+The content-derived forest classification should be preferred over the legacy preview-derived `forest_density` signal
+when it is available. The visual value remains in older and partially backfilled records for compatibility.
 
 Frontend and other data consumers should use the versioned contract in
 [`PUBLIC-DATA-CONTRACT.md`](PUBLIC-DATA-CONTRACT.md).

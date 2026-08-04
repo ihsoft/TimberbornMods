@@ -27,6 +27,7 @@ The manifest `files` object lists the canonical compressed data artifacts and th
 
 - `workshop-items.jsonl.gz` — the complete current public Workshop metadata snapshot;
 - `map-gallery.jsonl.gz` — incremental map gallery URL state;
+- `map-metadata.jsonl.gz` — incremental exact dimensions and content-derived map classifications;
 - `map-visual-features.jsonl.gz` — map-only visual profiles and image coverage;
 - `search-index.jsonl.gz` — metadata enriched with available gallery and visual fields; the normal consumer stream.
 
@@ -41,6 +42,7 @@ visually classified merely because they appear in `search-index.jsonl.gz`.
 The merged records retain public title, description, tags, author, timestamps, votes, category evidence, primary
 preview URL, and any known gallery URLs. Map records may additionally contain:
 
+- `map_width`, `map_height`, `map_analysis_version`, and `map_classifications` from inspected map payloads;
 - `visual_scores` and `visual_percentiles` for the median map profile;
 - `visual_score_aggregates` and `visual_percentile_aggregates` with `median`, `mean`, `min`, `max`, and `spread`;
 - `visual_labels` for coarse discovery;
@@ -49,6 +51,12 @@ preview URL, and any known gallery URLs. Map records may additionally contain:
 
 Fields can be absent when no visual or gallery result exists. Consumers must distinguish absence from a numeric zero,
 and should surface or filter stale and incomplete coverage when accuracy matters.
+
+`map_classifications` is an open object keyed by content-derived classifier name. The `forest_density` result contains
+`live_tree_count`, `coverage_ratio`, and an integer `level` from `0` through `4`. It counts initial map entities that
+yield logs and whose `LivingNaturalResource.IsDead` value is not `true`, then divides that count by `map_width`
+multiplied by `map_height`. Its fixed bands are `<5%`, `5–20%`, `20–35%`, `35–50%`, and `>50%`. Consumers must tolerate
+unknown future classifier keys and fields.
 
 ## Interpreting visual criteria
 
@@ -85,5 +93,6 @@ change.
 ## Images and account boundary
 
 Visual profiles are computed from the public primary preview and up to eight valid public gallery images per map.
-Images are transient inputs and are not retained in the published corpus. The dataset does not inspect Workshop package
-contents and does not require a Steam account, API key, repository secret, local Steam client, or running game.
+Images are transient inputs and are not retained in the published corpus. A separate bounded pass inspects downloaded
+public map payloads for exact content-derived classifications. Both paths remain anonymous and require no Steam account,
+API key, repository secret, local Steam client, or running game.

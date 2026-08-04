@@ -14,7 +14,7 @@ on:
         type: number
         default: 250
       map_metadata_max_items:
-        description: Maximum number of map payloads to inspect for exact dimensions
+        description: Maximum number of map payloads to inspect for exact features
         required: false
         type: number
         default: 250
@@ -149,7 +149,7 @@ jobs:
           --max-images-per-map 8
           --delay-milliseconds ${{ inputs.gallery_delay_milliseconds || 250 }}
 
-      - name: Collect exact map dimensions from anonymous payloads
+      - name: Collect exact map features from anonymous payloads
         env:
           SteamAppId: "1062090"
           SteamGameId: "1062090"
