@@ -85,8 +85,6 @@ IgorZ.MapBrowser.Search.Installed,Installed,Tab button that shows installed maps
 IgorZ.MapBrowser.Search.Keywords,Keywords,Label for the Workshop text search field.
 IgorZ.MapBrowser.Search.MatchCount,"Matches: {0} / {1}",Number of matching maps and total indexed maps.
 IgorZ.MapBrowser.Search.MatchCountWithSnapshot,"Matches: {0} / {1} (snapshot: {2})",Number of matching maps with the index snapshot timestamp.
-IgorZ.MapBrowser.Search.NextPage,Next,Button that opens the next search-results page.
 IgorZ.MapBrowser.Search.Page,"Page {0} / {1}",Current and total search-results pages.
 IgorZ.MapBrowser.Search.PageSize,Page size,Label for the number of search results shown on one page.
-IgorZ.MapBrowser.Search.PreviousPage,Previous,Button that opens the previous search-results page.
 IgorZ.MapBrowser.Search.Search,Find maps,Tab button that opens Workshop map search.

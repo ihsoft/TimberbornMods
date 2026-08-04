@@ -1,0 +1,90 @@
+ID,Text,Comment
+IgorZ.MapBrowser.Dialog.Close,Закрыть,Button that closes the map browser dialog.
+IgorZ.MapBrowser.Dialog.Header,Обзор карт,Header of the installed map browser dialog.
+IgorZ.MapBrowser.Details.Header,Сведения о карте,Header of the map details dialog.
+=,=,Map actions
+IgorZ.MapBrowser.Action.Delete,Удалить,Button that permanently deletes a local map.
+IgorZ.MapBrowser.Action.DeleteTooltip,"Навсегда удалить файл локальной карты.
+Это действие нельзя отменить.",Tooltip for deleting a local map.
+IgorZ.MapBrowser.Action.Deleting,Удаление...,Temporary button text while a local map is being deleted.
+IgorZ.MapBrowser.Action.Details,Подробнее,Button that opens the map details dialog.
+IgorZ.MapBrowser.Action.Downloading,Загрузка... {0}%,Button text showing Workshop map download progress.
+IgorZ.MapBrowser.Action.Removed,Удалена,Status shown after a map is removed from the game.
+IgorZ.MapBrowser.Action.RetryDelete,Повторить удаление,Button shown after deleting a local map fails.
+IgorZ.MapBrowser.Action.RetrySubscribe,Повторить подписку,Button shown after subscribing to a Workshop map fails.
+IgorZ.MapBrowser.Action.RetryUnsubscribe,Повторить отписку,Button shown after unsubscribing from a Workshop map fails.
+IgorZ.MapBrowser.Action.Subscribe,Подписаться,Button that subscribes to a Steam Workshop map.
+IgorZ.MapBrowser.Action.Subscribed,Подписка,Tag shown on subscribed maps in Workshop search results.
+IgorZ.MapBrowser.Action.SubscribeTooltip,Подписаться на эту карту в Steam Workshop.,Tooltip for subscribing to a Workshop map.
+IgorZ.MapBrowser.Action.Subscribing,Подписка...,Temporary button text while subscribing to a Workshop map.
+IgorZ.MapBrowser.Action.Unsubscribe,Отписаться,Button that unsubscribes from a Steam Workshop map.
+IgorZ.MapBrowser.Action.UnsubscribeTooltip,"Отписаться от этой карты в Steam Workshop.
+Позже на неё можно подписаться снова.",Tooltip for unsubscribing from a Workshop map.
+IgorZ.MapBrowser.Action.Unsubscribing,Отписка...,Temporary button text while a Workshop map is being unsubscribed.
+=,=,Map analysis
+IgorZ.MapBrowser.Analysis.Compact,"Рельеф: {0}, {1}, {2}, {3} | Форма суши: {4} | Планировка: {5}",Compact map analysis shown in the browser row.
+IgorZ.MapBrowser.Analysis.Full,"Рельеф: {0}
+Долины: {1}
+Вода: {2}
+Форма суши: {3}
+Леса: {4}
+Планировка: {5}",Full map analysis shown in the details dialog.
+IgorZ.MapBrowser.Analysis.Level.Barren,Мало леса,Very low forest density classification.
+IgorZ.MapBrowser.Analysis.Level.Canyons,Каньоны,Very high canyon classification.
+IgorZ.MapBrowser.Analysis.Level.DenseForest,Густой лес,Very high forest density classification.
+IgorZ.MapBrowser.Analysis.Level.Dry,Сухо,Very low water classification.
+IgorZ.MapBrowser.Analysis.Level.Flat,Равнина,Very low ruggedness classification.
+IgorZ.MapBrowser.Analysis.Level.Forested,Много леса,High forest density classification.
+IgorZ.MapBrowser.Analysis.Level.Fragmented,Раздробленная,High islandness classification.
+IgorZ.MapBrowser.Analysis.Level.Geometric,Геометрическая,Very high artificial layout classification.
+IgorZ.MapBrowser.Analysis.Level.Islands,Острова,Very high islandness classification.
+IgorZ.MapBrowser.Analysis.Level.LittleWater,Мало воды,Low water classification.
+IgorZ.MapBrowser.Analysis.Level.Mainland,Материк,Very low islandness classification.
+IgorZ.MapBrowser.Analysis.Level.Mixed,Смешанный тип,Middle classification value.
+IgorZ.MapBrowser.Analysis.Level.ModerateForests,Средняя лесистость,Middle forest density classification.
+IgorZ.MapBrowser.Analysis.Level.ModerateWater,Среднее количество воды,Middle water classification.
+IgorZ.MapBrowser.Analysis.Level.MostlyConnected,Почти цельная,Low islandness classification.
+IgorZ.MapBrowser.Analysis.Level.MostlyFlat,Почти равнина,Low ruggedness classification.
+IgorZ.MapBrowser.Analysis.Level.MostlyNatural,Почти естественная,Low artificial layout classification.
+IgorZ.MapBrowser.Analysis.Level.MostlyOpen,Преимущественно открытая,Low canyon classification.
+IgorZ.MapBrowser.Analysis.Level.Mountainous,Горы,Very high ruggedness classification.
+IgorZ.MapBrowser.Analysis.Level.NarrowValleys,Узкие долины,High canyon classification.
+IgorZ.MapBrowser.Analysis.Level.Natural,Естественная,Very low artificial layout classification.
+IgorZ.MapBrowser.Analysis.Level.Open,Открытая,Very low canyon classification.
+IgorZ.MapBrowser.Analysis.Level.Rugged,Пересечённая местность,High ruggedness classification.
+IgorZ.MapBrowser.Analysis.Level.Sparse,Редкий лес,Low forest density classification.
+IgorZ.MapBrowser.Analysis.Level.Structured,Структурированная,High artificial layout classification.
+IgorZ.MapBrowser.Analysis.Level.Unknown,Неизвестно,Classification value shown when analysis data is missing.
+IgorZ.MapBrowser.Analysis.Level.WaterDominated,Преобладает вода,Very high water classification.
+IgorZ.MapBrowser.Analysis.Level.WaterRich,Много воды,High water classification.
+=,=,Map browser
+IgorZ.MapBrowser.Browser.InstalledMaps,Установленные пользовательские карты,Heading above the installed map list.
+IgorZ.MapBrowser.Browser.SearchMaps,Поиск карт в Workshop,Heading above Workshop search results.
+=,=,Common map text
+IgorZ.MapBrowser.Common.SourceLocal,Источник: локальная карта,Text identifying a local map.
+IgorZ.MapBrowser.Common.Unavailable,Недоступно,Value shown while live Steam data is unavailable.
+IgorZ.MapBrowser.Common.Unknown,Неизвестно,Value shown when metadata is unknown.
+=,=,Map details
+IgorZ.MapBrowser.Details.Size,Размер: {0},Map dimensions shown in the details dialog.
+IgorZ.MapBrowser.Details.SizeLoading,Размер: загружается...,Map dimensions shown while exact metadata is downloading.
+IgorZ.MapBrowser.Details.Subscribers,Подписчики: {0},Steam subscriber count shown in the details dialog.
+IgorZ.MapBrowser.Details.Votes,Голоса: {0}/{1},Steam upvotes and downvotes shown in the details dialog.
+IgorZ.MapBrowser.Details.VotesUnavailable,Голоса: недоступно,Text shown while live Steam votes are unavailable.
+=,=,Metadata freshness
+IgorZ.MapBrowser.Freshness.Missing,"Актуальность: этой карты нет в последнем снимке индекса ({0}). Анализ появится после следующего обновления.",Message shown for a Workshop map missing from the current public index.
+IgorZ.MapBrowser.Freshness.Stale,"Предупреждение об актуальности: анализ выше описывает ранее проиндексированные изображения. Текущие изображения в Workshop изменились и ещё не были классифицированы заново.",Warning shown when saved map analysis is stale.
+=,=,Workshop search
+IgorZ.MapBrowser.Search.Any,Неважно,Filter option that does not restrict search results.
+IgorZ.MapBrowser.Search.Filter.Forests,Леса,Label for the forest density search filter.
+IgorZ.MapBrowser.Search.Filter.Landform,Форма суши,Label for the landform search filter.
+IgorZ.MapBrowser.Search.Filter.Layout,Планировка,Label for the layout search filter.
+IgorZ.MapBrowser.Search.Filter.Terrain,Рельеф,Label for the terrain search filter.
+IgorZ.MapBrowser.Search.Filter.Valleys,Долины,Label for the valley search filter.
+IgorZ.MapBrowser.Search.Filter.Water,Вода,Label for the water search filter.
+IgorZ.MapBrowser.Search.Installed,Установленные,Tab button that shows installed maps.
+IgorZ.MapBrowser.Search.Keywords,Ключевые слова,Label for the Workshop text search field.
+IgorZ.MapBrowser.Search.MatchCount,"Совпадения: {0} / {1}",Number of matching maps and total indexed maps.
+IgorZ.MapBrowser.Search.MatchCountWithSnapshot,"Совпадения: {0} / {1} (снимок: {2})",Number of matching maps with the index snapshot timestamp.
+IgorZ.MapBrowser.Search.Page,"Страница {0} / {1}",Current and total search-results pages.
+IgorZ.MapBrowser.Search.PageSize,На странице,Label for the number of search results shown on one page.
+IgorZ.MapBrowser.Search.Search,Найти карты,Tab button that opens Workshop map search.
