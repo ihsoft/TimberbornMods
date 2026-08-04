@@ -16,6 +16,8 @@ from typing import Iterable
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
+from workshop_records import is_map_item
+
 CLASSIFIER_VERSION = "clip-prompts-v5-absolute-levels"
 LEGACY_CLASSIFIER_VERSIONS = set()
 MOIST_SOIL_WEIGHT = 0.75
@@ -175,7 +177,7 @@ def load_maps(
     with snapshot.open("r", encoding="utf-8") as stream:
         for line in stream:
             record = json.loads(line)
-            if record.get("primary_category") != "map":
+            if not is_map_item(record):
                 continue
             preview_url = record.get("preview_url")
             cache_path = record.get("preview_cache_path")

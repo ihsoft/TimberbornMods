@@ -213,8 +213,8 @@ class ResumableMigrationIndexTest(unittest.TestCase):
             map_metadata = root / "map-metadata.jsonl"
             output = root / "public"
             items = [
-                {"published_file_id": "1", "title": "One", "primary_category": "map"},
-                {"published_file_id": "2", "title": "Two", "primary_category": "map"},
+                {"published_file_id": "1", "title": "One", "tags": ["Map"], "primary_category": "map"},
+                {"published_file_id": "2", "title": "Two", "tags": ["Map"], "primary_category": "map"},
             ]
             scores = {feature: 0.0 for feature in classify.FEATURE_PROMPTS}
             records = []

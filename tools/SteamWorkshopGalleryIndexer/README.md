@@ -4,8 +4,8 @@ Collects public additional-preview URLs for Timberborn maps through anonymous St
 is read-only and account-independent: it does not use a Steam client login, API key, repository secret, subscription,
 Workshop package download, or Timberborn process.
 
-The input is a JSONL snapshot produced by `tools/SteamWorkshopIndexer`. Only records whose `primary_category` is
-`map` are considered. The output is JSONL with one record per known map:
+The input is a JSONL snapshot produced by `tools/SteamWorkshopIndexer`. Only records whose Steam tag list contains
+`Map` are considered; other tags may coexist. The output is JSONL with one record per known map:
 
 ```text
 published_file_id

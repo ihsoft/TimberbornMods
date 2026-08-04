@@ -14,6 +14,8 @@ from pathlib import Path
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
+from workshop_records import is_map_item
+
 
 DEFAULT_INDEX = "https://ihsoft.github.io/TimberbornMods/search-index.jsonl.gz"
 DEFAULT_OUTPUT = ".tools/map-vision/forest-calibration"
@@ -60,7 +62,7 @@ def read_candidates(source: str, feature: str = FOREST_FEATURE) -> list[dict]:
             scores = record.get("visual_scores", {})
             percentiles = record.get("visual_percentiles", {})
             if (
-                record.get("primary_category") == "map"
+                is_map_item(record)
                 and record.get("preview_url")
                 and isinstance(scores.get(feature), (int, float))
                 and isinstance(percentiles.get(feature), (int, float))

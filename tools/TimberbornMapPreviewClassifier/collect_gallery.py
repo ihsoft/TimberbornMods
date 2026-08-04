@@ -15,6 +15,8 @@ import time
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
+from workshop_records import is_map_item
+
 
 GALLERY_BLOCK = re.compile(r"var rgScreenshotURLs\s*=\s*\{(?P<body>.*?)\};", re.DOTALL)
 GALLERY_URL = re.compile(r"https://images\.steamusercontent\.com/ugc/[^'\"\s]+")
@@ -166,7 +168,7 @@ def main() -> int:
     maps = [
         item
         for item in read_json_lines(Path(args.snapshot))
-        if item.get("primary_category") == "map"
+        if is_map_item(item)
     ]
     previous_records = read_json_lines(
         Path(args.previous_results) if args.previous_results else None

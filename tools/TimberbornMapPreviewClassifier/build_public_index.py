@@ -10,6 +10,8 @@ import json
 from pathlib import Path
 import shutil
 
+from workshop_records import is_map_item
+
 
 PUBLIC_SCHEMA_VERSION = 1
 
@@ -59,7 +61,7 @@ def main() -> int:
     map_ids = {
         item["published_file_id"]
         for item in workshop_items
-        if item.get("primary_category") == "map"
+        if is_map_item(item)
     }
     visual_by_id = {
         record["published_file_id"]: record for record in visual_features
@@ -119,7 +121,7 @@ def main() -> int:
     write_gzip_json_lines(output_directory / "search-index.jsonl.gz", search_index)
 
     missing_visual_maps = sum(
-        item.get("primary_category") == "map"
+        is_map_item(item)
         and item["published_file_id"] not in visual_by_id
         for item in workshop_items
     )

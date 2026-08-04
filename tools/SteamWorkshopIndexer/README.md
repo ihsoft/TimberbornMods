@@ -24,8 +24,10 @@ Default ignored outputs:
 ```
 
 The JSONL record contains public metadata, normalized description text, Steam tags, a coarse content-kind
-classification, the public preview URL, and the relative preview-cache path. Descriptions remain evidence, not ground
-truth for terrain classification.
+classification, the public preview URL, and the relative preview-cache path. An item is classified as a map when its
+Steam tag list contains `Map`; any other tags may coexist and do not affect that decision. Title and description text
+are never evidence that an item is a map. Descriptions remain weaker evidence for other coarse content kinds and
+search, not ground truth for terrain classification.
 
 ## Periodic job behavior
 

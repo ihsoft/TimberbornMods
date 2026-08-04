@@ -199,37 +199,12 @@ static Task DelayAsync(int milliseconds) {
 }
 
 static WorkshopRecord Classify(RawWorkshopRecord item) {
-  var searchableText = NormalizeSearchText(item.Title + "\n" + item.Description + "\n" + string.Join(' ', item.Tags));
-  var matches = CategoryRules.All.Select(rule => MatchRule(rule, searchableText, item.Tags)).Where(match => match.Score > 0)
-      .OrderByDescending(match => match.Score).ThenBy(match => match.Category).ToList();
-  var primaryCategory = matches.FirstOrDefault()?.Category ?? "other";
+  var classification = WorkshopCategoryClassifier.Classify(item.Title, item.Description, item.Tags);
   return new WorkshopRecord(
       item.PublishedFileId, item.Title, item.Description, StripSteamMarkup(item.Description), item.CreatorSteamId,
       DateTimeOffset.FromUnixTimeSeconds(item.CreatedAt).UtcDateTime,
       DateTimeOffset.FromUnixTimeSeconds(item.UpdatedAt).UtcDateTime, item.PreviewUrl, null, item.Tags,
-      item.VotesUp, item.VotesDown, item.Score, primaryCategory, matches);
-}
-
-static CategoryMatch MatchRule(CategoryRule rule, string searchableText, IReadOnlyList<string> tags) {
-  var evidence = new List<string>();
-  var score = 0;
-  foreach (var tag in tags) {
-    if (rule.Tags.Any(candidate => string.Equals(candidate, tag, StringComparison.OrdinalIgnoreCase))) {
-      evidence.Add($"tag:{tag}");
-      score += 5;
-    }
-  }
-  foreach (var term in rule.Terms) {
-    if (Regex.IsMatch(searchableText, $@"(?<![\p{{L}}\p{{N}}]){Regex.Escape(term)}(?![\p{{L}}\p{{N}}])")) {
-      evidence.Add($"term:{term}");
-      score++;
-    }
-  }
-  return new CategoryMatch(rule.Name, score, evidence);
-}
-
-static string NormalizeSearchText(string value) {
-  return Regex.Replace(value.ToLowerInvariant(), @"\s+", " ");
+      item.VotesUp, item.VotesDown, item.Score, classification.PrimaryCategory, classification.Matches);
 }
 
 static string StripSteamMarkup(string value) {
@@ -429,20 +404,3 @@ record WorkshopRecord(
     string PublishedFileId, string Title, string DescriptionRaw, string DescriptionPlain, string CreatorSteamId,
     DateTime CreatedAtUtc, DateTime UpdatedAtUtc, string PreviewUrl, string? PreviewCachePath, List<string> Tags,
     uint VotesUp, uint VotesDown, float Score, string PrimaryCategory, List<CategoryMatch> Categories);
-record CategoryMatch(string Category, int Score, List<string> Evidence);
-record CategoryRule(string Name, string[] Tags, string[] Terms);
-
-static class CategoryRules {
-  public static readonly CategoryRule[] All = [
-    new("map", ["Maps", "Map"], ["map", "maps", "terrain", "starting location", "challenge map"]),
-    new("buildings", ["Buildings", "Building"], [
-      "building", "buildings", "structure", "structures", "monument", "storage", "workplace", "housing",
-    ]),
-    new("qol", ["QoL", "Quality of Life", "UI"], [
-      "quality of life", "qol", "interface", "ui", "hotkey", "shortcut", "overlay", "tooltip", "management",
-    ]),
-    new("faction", ["Faction", "Factions"], [
-      "faction", "factions", "folktails", "iron teeth", "new faction", "custom faction",
-    ]),
-  ];
-}

@@ -35,9 +35,10 @@ Each compressed artifact is UTF-8 JSON Lines inside gzip: one independent JSON o
 
 ## Search-index scope
 
-Workshop metadata covers all discovered public item kinds. Gallery and visual fields are present only when applicable;
-visual classification intentionally covers records categorized as maps. Consumers must not describe non-map items as
-visually classified merely because they appear in `search-index.jsonl.gz`.
+Workshop metadata covers all discovered public item kinds. Gallery, payload-derived, and visual map fields are present
+only when applicable. Map scope is determined solely by whether Steam's tag list contains `Map`; other tags may coexist,
+while title and description text do not make an item a map. Consumers must not describe non-map items as visually
+classified merely because they appear in `search-index.jsonl.gz`.
 
 The merged records retain public title, description, tags, author, timestamps, votes, category evidence, primary
 preview URL, and any known gallery URLs. Map records may additionally contain:

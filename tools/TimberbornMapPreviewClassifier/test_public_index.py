@@ -40,6 +40,7 @@ class PublicIndexContractTest(unittest.TestCase):
             write_json_lines(snapshot, [{
                 "published_file_id": "1",
                 "title": "Test Map",
+                "tags": ["Map"],
                 "primary_category": "map",
                 "preview_url": "https://example.test/primary.jpg",
             }])

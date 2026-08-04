@@ -157,7 +157,7 @@ static List<MapItem> ReadMaps(string path) {
     }
     using var document = JsonDocument.Parse(line);
     var root = document.RootElement;
-    if (root.GetProperty("primary_category").GetString() == "map") {
+    if (HasTag(root, "Map")) {
       maps.Add(new MapItem(
           root.GetProperty("published_file_id").GetString()
               ?? throw new InvalidDataException("Workshop item has no published_file_id."),
@@ -165,6 +165,13 @@ static List<MapItem> ReadMaps(string path) {
     }
   }
   return maps;
+}
+
+static bool HasTag(JsonElement item, string expectedTag) {
+  return item.TryGetProperty("tags", out var tags)
+      && tags.ValueKind == JsonValueKind.Array
+      && tags.EnumerateArray().Any(tag => tag.ValueKind == JsonValueKind.String
+          && string.Equals(tag.GetString(), expectedTag, StringComparison.OrdinalIgnoreCase));
 }
 
 static List<MapMetadataRecord> ReadRecords(string? path) {

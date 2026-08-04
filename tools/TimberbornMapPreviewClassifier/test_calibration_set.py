@@ -12,6 +12,7 @@ def candidate(published_file_id: int, percentile: float) -> dict:
         "published_file_id": str(published_file_id),
         "title": f"Map {published_file_id}",
         "preview_url": f"https://example/{published_file_id}",
+        "tags": ["Map"],
         "primary_category": "map",
         "visual_scores": {"forest_density": percentile - 0.5},
         "visual_percentiles": {"forest_density": percentile},
