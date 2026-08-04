@@ -15,6 +15,7 @@ import build_public_index
 CANONICAL_DATA_FILES = {
     "workshop-items.jsonl.gz",
     "map-gallery.jsonl.gz",
+    "map-metadata.jsonl.gz",
     "map-visual-features.jsonl.gz",
     "search-index.jsonl.gz",
 }
@@ -34,6 +35,7 @@ class PublicIndexContractTest(unittest.TestCase):
             snapshot = root / "snapshot.jsonl"
             visual_features = root / "visual-features.jsonl"
             gallery_results = root / "gallery-results.jsonl"
+            map_metadata = root / "map-metadata.jsonl"
             output = root / "public"
             write_json_lines(snapshot, [{
                 "published_file_id": "1",
@@ -55,11 +57,19 @@ class PublicIndexContractTest(unittest.TestCase):
                 "gallery_urls": ["https://example.test/gallery.jpg"],
                 "collection_state": "reused",
             }])
+            write_json_lines(map_metadata, [{
+                "published_file_id": "1",
+                "map_width": 128,
+                "map_height": 128,
+                "collection_state": "fetched",
+            }])
             arguments = [
                 "build_public_index.py",
                 "--snapshot", str(snapshot),
                 "--visual-features", str(visual_features),
                 "--gallery-results", str(gallery_results),
+                "--map-metadata", str(map_metadata),
+                "--target-classifier-version", "test-classifier-v1",
                 "--output-directory", str(output),
             ]
 
@@ -77,6 +87,8 @@ class PublicIndexContractTest(unittest.TestCase):
 
             self.assertEqual(1, len(consumer_records))
             self.assertEqual("1", consumer_records[0]["published_file_id"])
+            self.assertEqual(128, consumer_records[0]["map_width"])
+            self.assertEqual(128, consumer_records[0]["map_height"])
             self.assertEqual(
                 ["https://example.test/gallery.jpg"],
                 consumer_records[0]["gallery_urls"],
