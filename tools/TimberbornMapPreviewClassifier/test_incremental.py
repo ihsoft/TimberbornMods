@@ -60,6 +60,27 @@ class GalleryParsingTest(unittest.TestCase):
 
 
 class MultiImageClassificationTest(unittest.TestCase):
+    def test_forest_density_uses_four_equal_area_quadrants(self) -> None:
+        self.assertEqual(
+            (
+                (0, 0, 50, 30),
+                (50, 0, 101, 30),
+                (0, 30, 50, 61),
+                (50, 30, 101, 61),
+            ),
+            classify.quadrant_boxes(101, 61),
+        )
+
+    def test_water_density_uses_nine_equal_area_regions(self) -> None:
+        boxes = classify.grid_boxes(101, 61, 3)
+
+        self.assertEqual(9, len(boxes))
+        self.assertEqual((67, 40, 101, 61), boxes[-1])
+
+    def test_moist_soil_has_less_weight_than_free_water(self) -> None:
+        self.assertGreater(classify.MOIST_SOIL_WEIGHT, 0)
+        self.assertLess(classify.MOIST_SOIL_WEIGHT, 1)
+
     def test_upgrades_legacy_primary_and_aggregates_gallery(self) -> None:
         zero_scores = {feature: 0.0 for feature in classify.FEATURE_PROMPTS}
         maps = [{
@@ -77,7 +98,7 @@ class MultiImageClassificationTest(unittest.TestCase):
             "preview_url": "primary",
             "visual_scores": zero_scores,
             "model": "openai/clip-vit-base-patch32",
-            "classifier_version": "clip-prompts-v1",
+            "classifier_version": classify.CLASSIFIER_VERSION,
         }]
 
         reusable, to_classify, previous_by_id = classify.plan_incremental(
@@ -104,6 +125,30 @@ class MultiImageClassificationTest(unittest.TestCase):
         self.assertEqual(
             0.5, result["visual_percentile_aggregates"]["ruggedness"]["max"]
         )
+
+    def test_reclassifies_older_scores_after_spatial_feature_change(self) -> None:
+        zero_scores = {feature: 0.0 for feature in classify.FEATURE_PROMPTS}
+        maps = [{
+            "published_file_id": "1",
+            "title": "Map",
+            "preview_url": "primary",
+            "images": [{"url": "primary", "role": "primary", "path": None}],
+            "gallery_collection_state": "fetched",
+        }]
+        previous = [{
+            "published_file_id": "1",
+            "preview_url": "primary",
+            "visual_scores": zero_scores,
+            "model": "openai/clip-vit-base-patch32",
+            "classifier_version": "clip-prompts-v3-green-tree-quadrants",
+        }]
+
+        reusable, to_classify, _ = classify.plan_incremental(
+            maps, previous, "openai/clip-vit-base-patch32"
+        )
+
+        self.assertEqual({}, reusable["1"])
+        self.assertEqual(["primary"], [image["image_url"] for image in to_classify])
 
 
 class ImageDownloadSafetyTest(unittest.TestCase):

@@ -10,11 +10,61 @@ The classifier uses CLIP prompt pairs to produce relative visual scores for:
 - canyons and narrow valleys;
 - water-dominated maps;
 - islands;
-- forest density;
+- living green-tree density relative to total map area (dead or dry trees are excluded);
 - artificial or geometric layouts.
 
 Raw CLIP similarities are not probabilities. The tool converts each score into a percentile within the current map
 corpus. Search should rank by these percentiles and treat labels as coarse discovery aids, not verified map geometry.
+
+Forest density is scored from the mean of four equal-area preview quadrants so that small tree groups are not lost when
+a full-map image is reduced to CLIP input size. Other terrain features continue to use the complete preview image.
+
+Water availability is scored on a 3-by-3 preview grid. The existing rivers-and-lakes CLIP signal represents free blue
+water, while a separate irrigated-green-soil signal contributes with weight `0.75`. Both signals are averaged over
+equal-area regions before combination, so the result measures presence relative to total map area rather than an
+absolute number of visible tiles.
+
+`normalize_map_preview.py` is an experimental diagnostic, not part of the published classifier pipeline. It requires
+`requirements-experiments.txt`. Edge-aware masking can remove border-connected sky in unusual previews such as
+`Painting Wall`, but evaluation on the 50-map water calibration set found that masking, cropping, and approximate
+perspective rectification all reduced threshold stability. Perspective normalization is therefore deliberately not
+applied during production classification.
+
+## Forest calibration set
+
+Create a local, human-labeled reference set without manually searching Workshop maps:
+
+```powershell
+python tools/TimberbornMapPreviewClassifier/create_forest_calibration_set.py
+```
+
+The script reads the current published index, selects 50 maps deterministically across the full forest-score range,
+includes Workshop item `3619540066` (`4 Point`) as a known false-negative candidate, downloads the selected primary
+previews, and writes the ignored local review page to:
+
+```text
+.tools/map-vision/forest-calibration/index.html
+```
+
+Open the page locally and assign one of five forest-density levels with keys `1` through `5`. Progress is saved in
+browser local storage. Use **Export labels.json** when finished; the exported file contains the original raw score and
+percentile beside each human label so fixed score thresholds can be calibrated separately from corpus-relative search
+ranking. Count only living green trees as forest; dead or dry trees do not count. Judge density relative to the map's
+total area rather than by absolute tree count: the same number of trees represents a lower density on a larger map.
+Treat the five levels as a practical Timberborn map-density scale: the highest level means the densest realistic forest
+presence in a map preview, not that trees cover the entire map area.
+
+Create the analogous water-availability reference set with:
+
+```powershell
+python tools/TimberbornMapPreviewClassifier/create_water_calibration_set.py
+```
+
+Its review page is written to `.tools/map-vision/water-calibration/index.html`. Blue free-water areas are the primary
+contribution; green irrigated or moist soil contributes less but remains meaningful. Both are judged relative to total
+map area rather than by absolute tile count. Workshop items `3672607632` (`001-Musje`) and `3652824726` (`00100`) are
+always included as known low-score maps with substantial visible moist ground. Forest and water pages use independent
+browser storage and export files.
 
 Each image is scored independently. The published map profile retains per-feature `median`, `mean`, `min`, `max`, and
 `spread` aggregates, their corpus-relative 0–1 percentiles, and image coverage. The median remains the backwards-

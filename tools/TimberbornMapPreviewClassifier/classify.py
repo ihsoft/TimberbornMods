@@ -16,8 +16,21 @@ from typing import Iterable
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
-CLASSIFIER_VERSION = "clip-prompts-v2-multi-image"
-LEGACY_CLASSIFIER_VERSIONS = {"clip-prompts-v1"}
+CLASSIFIER_VERSION = "clip-prompts-v4-spatial-forest-water"
+LEGACY_CLASSIFIER_VERSIONS = set()
+MOIST_SOIL_WEIGHT = 0.75
+MOIST_SOIL_PROMPTS = {
+    "positive": [
+        "a large proportion of this Timberborn map is green irrigated moist soil",
+        "an isometric map with extensive bright green watered ground relative to its total area",
+        "a map landscape containing a high density of green fertile soil supplied with water",
+    ],
+    "negative": [
+        "a Timberborn map dominated by dry brown barren soil",
+        "an isometric map with almost no green irrigated or moist ground",
+        "a dry map landscape containing a very low density of green watered soil",
+    ],
+}
 FEATURE_PROMPTS = {
     "ruggedness": {
         "positive": [
@@ -69,14 +82,14 @@ FEATURE_PROMPTS = {
     },
     "forest_density": {
         "positive": [
-            "a Timberborn map densely covered by forests and trees",
-            "a heavily forested isometric strategy game landscape",
-            "a lush terrain map with extensive tree cover",
+            "a Timberborn map with a high density of living green trees relative to its total area",
+            "an isometric strategy game map with many healthy green trees across the map",
+            "a map landscape containing dense groups of living green trees",
         ],
         "negative": [
-            "a barren Timberborn map with very few trees",
-            "an open isometric landscape without forests",
-            "a sparsely vegetated terrain map",
+            "a Timberborn map with no living green trees",
+            "an isometric strategy game map containing only dead dry trees and no green forest",
+            "a map landscape with very low green tree density relative to its total area",
         ],
     },
     "artificial_layout": {
@@ -335,17 +348,72 @@ def try_load_image(
 def build_text_prototypes(
     model: CLIPModel, processor: CLIPProcessor
 ) -> dict[str, tuple[torch.Tensor, torch.Tensor]]:
-    prototypes = {}
+    return {
+        feature: build_text_prototype_pair(model, processor, prompts)
+        for feature, prompts in FEATURE_PROMPTS.items()
+    }
+
+
+def build_text_prototype_pair(
+    model: CLIPModel, processor: CLIPProcessor, prompts: dict[str, list[str]]
+) -> tuple[torch.Tensor, torch.Tensor]:
+    feature_prototypes = []
     with torch.inference_mode():
-        for feature, prompts in FEATURE_PROMPTS.items():
-            feature_prototypes = []
-            for polarity in ("positive", "negative"):
-                inputs = processor(text=prompts[polarity], return_tensors="pt", padding=True)
-                embeddings = normalized(model.get_text_features(**inputs))
-                prototype = embeddings.mean(dim=0)
-                feature_prototypes.append(prototype / prototype.norm())
-            prototypes[feature] = (feature_prototypes[0], feature_prototypes[1])
-    return prototypes
+        for polarity in ("positive", "negative"):
+            inputs = processor(text=prompts[polarity], return_tensors="pt", padding=True)
+            embeddings = normalized(model.get_text_features(**inputs))
+            prototype = embeddings.mean(dim=0)
+            feature_prototypes.append(prototype / prototype.norm())
+    return feature_prototypes[0], feature_prototypes[1]
+
+
+def quadrant_boxes(width: int, height: int) -> tuple[tuple[int, int, int, int], ...]:
+    return grid_boxes(width, height, 2)
+
+
+def grid_boxes(width: int, height: int, grid_size: int) -> tuple[tuple[int, int, int, int], ...]:
+    if grid_size < 1:
+        raise ValueError("grid_size must be positive")
+    return tuple(
+        (
+            width * column // grid_size,
+            height * row // grid_size,
+            width * (column + 1) // grid_size,
+            height * (row + 1) // grid_size,
+        )
+        for row in range(grid_size)
+        for column in range(grid_size)
+    )
+
+
+def score_grid_features(
+    images: list[Image.Image], model: CLIPModel, processor: CLIPProcessor,
+    prototypes: dict[str, tuple[torch.Tensor, torch.Tensor]], batch_size: int,
+    grid_size: int,
+) -> dict[str, list[float]]:
+    crops = [
+        image.crop(box)
+        for image in images
+        for box in grid_boxes(*image.size, grid_size)
+    ]
+    crop_scores = {feature: [] for feature in prototypes}
+    for batch in chunks(crops, batch_size):
+        inputs = processor(images=batch, return_tensors="pt")
+        with torch.inference_mode():
+            embeddings = normalized(model.get_image_features(**inputs))
+        for feature, (positive, negative) in prototypes.items():
+            crop_scores[feature].extend(
+                float(embedding @ positive - embedding @ negative)
+                for embedding in embeddings
+            )
+    crops_per_image = grid_size * grid_size
+    return {
+        feature: [
+            fmean(scores[offset : offset + crops_per_image])
+            for offset in range(0, len(scores), crops_per_image)
+        ]
+        for feature, scores in crop_scores.items()
+    }
 
 
 def score_images(
@@ -358,6 +426,7 @@ def score_images(
     max_image_bytes: int,
 ) -> list[dict]:
     prototypes = build_text_prototypes(model, processor)
+    moist_soil_prototype = build_text_prototype_pair(model, processor, MOIST_SOIL_PROMPTS)
     results = []
     for batch_number, batch in enumerate(chunks(images_to_classify, batch_size), start=1):
         images: list[Image.Image] = []
@@ -392,10 +461,29 @@ def score_images(
         inputs = processor(images=images, return_tensors="pt")
         with torch.inference_mode():
             image_embeddings = normalized(model.get_image_features(**inputs))
-        for item, embedding in zip(valid, image_embeddings):
+        forest_scores = score_grid_features(
+            images, model, processor, {"forest_density": prototypes["forest_density"]}, batch_size, 2
+        )["forest_density"]
+        water_scores = score_grid_features(
+            images,
+            model,
+            processor,
+            {
+                "free_water": prototypes["water_dominance"],
+                "moist_soil": moist_soil_prototype,
+            },
+            batch_size,
+            3,
+        )
+        for index, (item, embedding, forest_score) in enumerate(zip(valid, image_embeddings, forest_scores)):
             scores = {}
             for feature, (positive, negative) in prototypes.items():
                 scores[feature] = float(embedding @ positive - embedding @ negative)
+            scores["forest_density"] = forest_score
+            scores["water_dominance"] = (
+                water_scores["free_water"][index]
+                + MOIST_SOIL_WEIGHT * water_scores["moist_soil"][index]
+            )
             results.append(
                 {
                     "published_file_id": item["published_file_id"],
