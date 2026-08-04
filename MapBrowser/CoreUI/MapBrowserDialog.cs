@@ -22,6 +22,7 @@ namespace IgorZ.MapBrowser.CoreUI;
 
 sealed class MapBrowserDialog : AbstractDialog {
   const string AnalysisCompactLocKey = "IgorZ.MapBrowser.Analysis.Compact";
+  const string AnalysisCompactMixedLocKeyPrefix = "IgorZ.MapBrowser.Analysis.CompactMixed.";
   const string AnalysisFullLocKey = "IgorZ.MapBrowser.Analysis.Full";
   const string AnalysisLevelLocKeyPrefix = "IgorZ.MapBrowser.Analysis.Level.";
   const string AnalysisLevelUnknownLocKey = "IgorZ.MapBrowser.Analysis.Level.Unknown";
@@ -548,18 +549,22 @@ sealed class MapBrowserDialog : AbstractDialog {
 
   string FormatCompactAnalysis(WorkshopItemMetadata metadata) {
     var terrain = GetVisualLevel(
-        metadata, "ruggedness", "Flat", "MostlyFlat", "Mixed", "Rugged", "Mountainous", UiFactory);
+        metadata, "ruggedness", "Flat", "MostlyFlat", "Mixed", "Rugged", "Mountainous", UiFactory,
+        AnalysisCompactMixedLocKeyPrefix + "Terrain");
     var valleys = GetVisualLevel(
-        metadata, "canyonness", "Open", "MostlyOpen", "Mixed", "NarrowValleys", "Canyons", UiFactory);
+        metadata, "canyonness", "Open", "MostlyOpen", "Mixed", "NarrowValleys", "Canyons", UiFactory,
+        AnalysisCompactMixedLocKeyPrefix + "Valleys");
+    var landform = GetVisualLevel(
+        metadata, "islandness", "Mainland", "MostlyConnected", "Mixed", "Fragmented", "Islands", UiFactory,
+        AnalysisCompactMixedLocKeyPrefix + "Landform");
+    var layout = GetVisualLevel(
+        metadata, "artificial_layout", "Natural", "MostlyNatural", "Mixed", "Structured", "Geometric", UiFactory,
+        AnalysisCompactMixedLocKeyPrefix + "Layout");
     var water = GetVisualLevel(
         metadata, "water_dominance", "Dry", "LittleWater", "ModerateWater", "WaterRich", "WaterDominated", UiFactory);
     var forests = GetVisualLevel(
         metadata, "forest_density", "Barren", "Sparse", "ModerateForests", "Forested", "DenseForest", UiFactory);
-    var landform = GetVisualLevel(
-        metadata, "islandness", "Mainland", "MostlyConnected", "Mixed", "Fragmented", "Islands", UiFactory);
-    var layout = GetVisualLevel(
-        metadata, "artificial_layout", "Natural", "MostlyNatural", "Mixed", "Structured", "Geometric", UiFactory);
-    return string.Format(UiFactory.T(AnalysisCompactLocKey), terrain, valleys, water, forests, landform, layout);
+    return string.Format(UiFactory.T(AnalysisCompactLocKey), terrain, valleys, landform, layout, water, forests);
   }
 
   internal static string FormatFullAnalysis(WorkshopItemMetadata metadata, UiFactory uiFactory) {
@@ -584,7 +589,7 @@ sealed class MapBrowserDialog : AbstractDialog {
 
   static string GetVisualLevel(
       WorkshopItemMetadata metadata, string feature, string veryLow, string low, string middle, string high,
-      string veryHigh, UiFactory uiFactory) {
+      string veryHigh, UiFactory uiFactory, string compactMiddleLocKey = null) {
     if (!metadata.VisualPercentiles.TryGetValue(feature, out var percentile)) {
       return uiFactory.T(AnalysisLevelUnknownLocKey);
     }
@@ -595,7 +600,9 @@ sealed class MapBrowserDialog : AbstractDialog {
         < 0.8f => high,
         _ => veryHigh,
     };
-    return uiFactory.T(AnalysisLevelLocKeyPrefix + level);
+    return uiFactory.T(level == middle && compactMiddleLocKey != null
+        ? compactMiddleLocKey
+        : AnalysisLevelLocKeyPrefix + level);
   }
 
   static void FitDescription(Label label, string fullText) {

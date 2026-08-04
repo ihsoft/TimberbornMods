@@ -22,7 +22,11 @@ IgorZ.MapBrowser.Action.UnsubscribeTooltip,"Unsubscribe from this Steam Workshop
 You can subscribe to it again later.",Tooltip for unsubscribing from a Workshop map.
 IgorZ.MapBrowser.Action.Unsubscribing,Unsubscribing...,Temporary button text while a Workshop map is being unsubscribed.
 =,=,Map analysis
-IgorZ.MapBrowser.Analysis.Compact,"Terrain: {0}, {1}, {2}, {3} | Landform: {4} | Layout: {5}",Compact map analysis shown in the browser row.
+IgorZ.MapBrowser.Analysis.Compact,"{0}, {1}, {2}, {3}, {4}, {5}",Compact map analysis shown in the browser row.
+IgorZ.MapBrowser.Analysis.CompactMixed.Landform,Mixed landform,Context-specific middle landform classification in compact analysis.
+IgorZ.MapBrowser.Analysis.CompactMixed.Layout,Mixed layout,Context-specific middle layout classification in compact analysis.
+IgorZ.MapBrowser.Analysis.CompactMixed.Terrain,Mixed terrain,Context-specific middle terrain classification in compact analysis.
+IgorZ.MapBrowser.Analysis.CompactMixed.Valleys,Mixed valleys,Context-specific middle valley classification in compact analysis.
 IgorZ.MapBrowser.Analysis.Full,"Terrain: {0}
 Valleys: {1}
 Water: {2}

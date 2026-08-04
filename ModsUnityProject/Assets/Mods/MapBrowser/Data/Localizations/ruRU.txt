@@ -22,7 +22,11 @@ IgorZ.MapBrowser.Action.UnsubscribeTooltip,"Отписаться от этой �
 Позже на неё можно подписаться снова.",Tooltip for unsubscribing from a Workshop map.
 IgorZ.MapBrowser.Action.Unsubscribing,Отписка...,Temporary button text while a Workshop map is being unsubscribed.
 =,=,Map analysis
-IgorZ.MapBrowser.Analysis.Compact,"Рельеф: {0}, {1}, {2}, {3} | Форма суши: {4} | Планировка: {5}",Compact map analysis shown in the browser row.
+IgorZ.MapBrowser.Analysis.Compact,"{0}, {1}, {2}, {3}, {4}, {5}",Compact map analysis shown in the browser row.
+IgorZ.MapBrowser.Analysis.CompactMixed.Landform,Смешанная форма суши,Context-specific middle landform classification in compact analysis.
+IgorZ.MapBrowser.Analysis.CompactMixed.Layout,Смешанная планировка,Context-specific middle layout classification in compact analysis.
+IgorZ.MapBrowser.Analysis.CompactMixed.Terrain,Смешанный рельеф,Context-specific middle terrain classification in compact analysis.
+IgorZ.MapBrowser.Analysis.CompactMixed.Valleys,Смешанные долины,Context-specific middle valley classification in compact analysis.
 IgorZ.MapBrowser.Analysis.Full,"Рельеф: {0}
 Долины: {1}
 Вода: {2}
