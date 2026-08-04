@@ -16,6 +16,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--snapshot", required=True)
     parser.add_argument("--visual-features", required=True)
     parser.add_argument("--gallery-results", required=True)
+    parser.add_argument("--map-metadata", required=True)
     parser.add_argument("--output-directory", required=True)
     parser.add_argument("--target-classifier-version")
     return parser.parse_args()
@@ -43,12 +44,14 @@ def main() -> int:
     snapshot_path = Path(args.snapshot)
     visual_path = Path(args.visual_features)
     gallery_path = Path(args.gallery_results)
+    map_metadata_path = Path(args.map_metadata)
     output_directory = Path(args.output_directory)
     output_directory.mkdir(parents=True, exist_ok=True)
 
     workshop_items = read_json_lines(snapshot_path)
     visual_features = read_json_lines(visual_path)
     gallery_results = read_json_lines(gallery_path)
+    map_metadata_results = read_json_lines(map_metadata_path)
     target_version = args.target_classifier_version
     map_ids = {
         item["published_file_id"]
@@ -67,15 +70,23 @@ def main() -> int:
     } if target_version else set()
     migration_complete = not migration_pending_ids
     gallery_by_id = {record["published_file_id"]: record for record in gallery_results}
+    map_metadata_by_id = {
+        record["published_file_id"]: record for record in map_metadata_results
+    }
     search_index = []
     for item in workshop_items:
         record = dict(item)
         visual = visual_by_id.get(item["published_file_id"])
         gallery = gallery_by_id.get(item["published_file_id"])
+        map_metadata = map_metadata_by_id.get(item["published_file_id"])
         if gallery:
             record["gallery_urls"] = gallery.get("gallery_urls", [])
             record["gallery_checked_at_utc"] = gallery.get("gallery_checked_at_utc")
             record["gallery_collection_state"] = gallery.get("collection_state")
+        if map_metadata:
+            record["map_width"] = map_metadata["map_width"]
+            record["map_height"] = map_metadata["map_height"]
+            record["map_metadata_collection_state"] = map_metadata.get("collection_state")
         if visual:
             record["visual_scores"] = visual["visual_scores"]
             record["visual_score_aggregates"] = visual.get("visual_score_aggregates")
@@ -97,6 +108,7 @@ def main() -> int:
 
     write_gzip_json_lines(output_directory / "workshop-items.jsonl.gz", workshop_items)
     write_gzip_json_lines(output_directory / "map-gallery.jsonl.gz", gallery_results)
+    write_gzip_json_lines(output_directory / "map-metadata.jsonl.gz", map_metadata_results)
     write_gzip_json_lines(output_directory / "map-visual-features.jsonl.gz", visual_features)
     write_gzip_json_lines(output_directory / "search-index.jsonl.gz", search_index)
 
@@ -138,6 +150,10 @@ def main() -> int:
         ),
         "visual_images_classified_this_run": sum(
             record.get("images_classified_this_run", 0) for record in visual_features
+        ),
+        "map_dimensions_known": len(map_metadata_results),
+        "map_dimensions_stale": sum(
+            record.get("collection_state") == "stale" for record in map_metadata_results
         ),
         "visual_model": visual_features[0]["model"] if visual_features else None,
         "visual_classifier_version": (

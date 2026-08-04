@@ -14,4 +14,5 @@ jobs:
     with:
       gallery_max_items: 1000
       gallery_delay_milliseconds: 1000
+      map_metadata_max_items: 1000
       image_download_concurrency: 2

@@ -515,6 +515,9 @@ sealed class MapBrowserDialog : AbstractDialog {
     if (downloadedSize is { } cachedSize) {
       return $"{cachedSize.x}x{cachedSize.y}";
     }
+    if (metadata is { MapWidth: > 0, MapHeight: > 0 }) {
+      return $"{metadata.MapWidth}x{metadata.MapHeight}";
+    }
     var title = metadata?.Title ?? installedMap.Map?.DisplayName ?? string.Empty;
     var match = ParenthesizedMapSizeRegex.Match(title);
     if (!match.Success) {

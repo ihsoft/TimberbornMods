@@ -1,0 +1,310 @@
+using System.IO.Compression;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Steamworks;
+
+const uint appId = 1062090;
+var options = Options.Parse(args);
+var maps = ReadMaps(options.Snapshot);
+var previousById = ReadRecords(options.PreviousResults).ToDictionary(record => record.PublishedFileId);
+var candidates = maps
+    .Where(map => NeedsRefresh(map, previousById.GetValueOrDefault(map.PublishedFileId)))
+    .OrderByDescending(map => ParseTimestamp(map.UpdatedAtUtc))
+    .Take(options.MaxItems == 0 ? int.MaxValue : options.MaxItems)
+    .ToList();
+var selectedIds = candidates.Select(map => map.PublishedFileId).ToHashSet();
+var outputById = maps
+    .Where(map => !selectedIds.Contains(map.PublishedFileId)
+        && previousById.ContainsKey(map.PublishedFileId))
+    .ToDictionary(map => map.PublishedFileId, map => previousById[map.PublishedFileId]);
+
+if (candidates.Count > 0) {
+  Environment.SetEnvironmentVariable("SteamAppId", appId.ToString());
+  Environment.SetEnvironmentVariable("SteamGameId", appId.ToString());
+  if (!Packsize.Test() || !DllCheck.Test()) {
+    Console.Error.WriteLine("Steamworks.NET native library validation failed.");
+    return 2;
+  }
+
+  var initResult = GameServer.InitEx(
+      0, 0, 0, EServerMode.eServerModeNoAuthentication, "workshop-map-metadata-indexer", out var initError);
+  if (initResult != ESteamAPIInitResult.k_ESteamAPIInitResult_OK) {
+    Console.Error.WriteLine($"Steam game-server initialization failed: {initResult}: {initError}");
+    return 3;
+  }
+
+  try {
+    ConnectAnonymously(options.RequestTimeout);
+    var workshopDirectory = Path.GetFullPath(options.WorkshopDirectory);
+    Directory.CreateDirectory(workshopDirectory);
+    if (!SteamGameServerUGC.BInitWorkshopForGameServer(new DepotId_t(appId), workshopDirectory)) {
+      throw new InvalidOperationException("Steam rejected the explicit game-server Workshop directory.");
+    }
+
+    var deadline = options.TimeBudget == TimeSpan.Zero
+        ? DateTimeOffset.MaxValue
+        : DateTimeOffset.UtcNow.Add(options.TimeBudget);
+    Console.WriteLine($"Anonymous Steam session connected; reading {candidates.Count} map payloads.");
+    for (var index = 0; index < candidates.Count; index++) {
+      if (DateTimeOffset.UtcNow >= deadline) {
+        Console.WriteLine($"Time budget reached after {index} / {candidates.Count} selected maps.");
+        break;
+      }
+
+      var map = candidates[index];
+      try {
+        var metadata = DownloadAndReadMetadata(map.PublishedFileId, options);
+        outputById[map.PublishedFileId] = new MapMetadataRecord(
+            map.PublishedFileId, map.UpdatedAtUtc, metadata.Width, metadata.Height, "fetched");
+      } catch (Exception exception) {
+        Console.Error.WriteLine($"Map metadata download failed for {map.PublishedFileId}: {exception.Message}");
+        var previous = previousById.GetValueOrDefault(map.PublishedFileId);
+        if (previous is not null) {
+          outputById[map.PublishedFileId] = previous with { CollectionState = "stale" };
+        }
+        break;
+      }
+      Console.WriteLine($"Map metadata progress: {index + 1} / {candidates.Count} selected maps.");
+    }
+  } finally {
+    SteamGameServer.LogOff();
+    GameServer.Shutdown();
+  }
+}
+
+WriteRecords(options.Output, maps, outputById);
+Console.WriteLine(
+    $"Wrote {outputById.Count} map metadata records; selected {candidates.Count}, "
+    + $"complete {outputById.Values.Count(record => record.CollectionState != "stale")}.");
+return 0;
+
+static MapDimensions DownloadAndReadMetadata(string publishedFileId, Options options) {
+  var itemId = new PublishedFileId_t(ulong.Parse(publishedFileId));
+  var declaredSize = QueryDeclaredSize(itemId, options.RequestTimeout);
+  if (declaredSize > options.MaxDownloadBytes) {
+    throw new InvalidOperationException(
+        $"Declared payload is {declaredSize} bytes; limit is {options.MaxDownloadBytes} bytes.");
+  }
+  var completed = false;
+  DownloadItemResult_t response = default;
+  using var callback = Callback<DownloadItemResult_t>.CreateGameServer(result => {
+    if (result.m_nPublishedFileId == itemId) {
+      response = result;
+      completed = true;
+    }
+  });
+  if (!SteamGameServerUGC.DownloadItem(itemId, false)) {
+    throw new InvalidOperationException("Steam rejected the anonymous Workshop download request.");
+  }
+  WaitForCallback(() => completed, "Workshop item download", options.RequestTimeout);
+  if (response.m_unAppID.m_AppId != appId || response.m_eResult != EResult.k_EResultOK) {
+    throw new InvalidOperationException($"Workshop download returned {response.m_eResult}.");
+  }
+  if (!SteamGameServerUGC.GetItemInstallInfo(itemId, out var sizeOnDisk, out var folder, 4096, out _)) {
+    throw new InvalidOperationException("GetItemInstallInfo returned false after download.");
+  }
+  if (sizeOnDisk > options.MaxDownloadBytes) {
+    throw new InvalidOperationException(
+        $"Downloaded payload is {sizeOnDisk} bytes; limit is {options.MaxDownloadBytes} bytes.");
+  }
+
+  var mapFile = Directory.EnumerateFiles(folder, "*.timber", SearchOption.AllDirectories).SingleOrDefault()
+      ?? throw new InvalidDataException("Downloaded payload does not contain exactly one .timber map.");
+  using var archive = ZipFile.OpenRead(mapFile);
+  var entry = archive.GetEntry("map_metadata.json")
+      ?? throw new InvalidDataException("Map archive has no map_metadata.json entry.");
+  if (entry.Length is < 1 or > 65_536) {
+    throw new InvalidDataException($"Unexpected map_metadata.json size: {entry.Length} bytes.");
+  }
+  using var stream = entry.Open();
+  var metadata = JsonSerializer.Deserialize<MapDimensions>(stream)
+      ?? throw new InvalidDataException("Map metadata could not be deserialized.");
+  if (metadata.Width < 1 || metadata.Height < 1) {
+    throw new InvalidDataException($"Invalid map dimensions {metadata.Width}x{metadata.Height}.");
+  }
+  return metadata;
+}
+
+static ulong QueryDeclaredSize(PublishedFileId_t publishedFileId, TimeSpan timeout) {
+  var query = SteamGameServerUGC.CreateQueryUGCDetailsRequest([publishedFileId], 1);
+  if (query == UGCQueryHandle_t.Invalid) {
+    throw new InvalidOperationException("Could not create the anonymous Workshop details query.");
+  }
+  try {
+    var completed = false;
+    var ioFailureResult = false;
+    SteamUGCQueryCompleted_t response = default;
+    using var callResult = CallResult<SteamUGCQueryCompleted_t>.Create();
+    callResult.Set(SteamGameServerUGC.SendQueryUGCRequest(query), (result, ioFailure) => {
+      response = result;
+      ioFailureResult = ioFailure;
+      completed = true;
+    });
+    WaitForCallback(() => completed, "anonymous Workshop query", timeout);
+    if (ioFailureResult || response.m_eResult != EResult.k_EResultOK || response.m_unNumResultsReturned != 1
+        || !SteamGameServerUGC.GetQueryUGCResult(query, 0, out var details)) {
+      throw new InvalidOperationException($"Anonymous Workshop query failed: {response.m_eResult}.");
+    }
+    if (details.m_nFileSize < 0) {
+      throw new InvalidDataException($"Workshop declared an invalid payload size: {details.m_nFileSize}.");
+    }
+    return (ulong)details.m_nFileSize;
+  } finally {
+    SteamGameServerUGC.ReleaseQueryUGCRequest(query);
+  }
+}
+
+static List<MapItem> ReadMaps(string path) {
+  using var stream = OpenRead(path);
+  using var reader = new StreamReader(stream);
+  var maps = new List<MapItem>();
+  while (reader.ReadLine() is { } line) {
+    if (string.IsNullOrWhiteSpace(line)) {
+      continue;
+    }
+    using var document = JsonDocument.Parse(line);
+    var root = document.RootElement;
+    if (root.GetProperty("primary_category").GetString() == "map") {
+      maps.Add(new MapItem(
+          root.GetProperty("published_file_id").GetString()
+              ?? throw new InvalidDataException("Workshop item has no published_file_id."),
+          GetOptionalString(root, "updated_at_utc")));
+    }
+  }
+  return maps;
+}
+
+static List<MapMetadataRecord> ReadRecords(string? path) {
+  if (path is null || !File.Exists(path)) {
+    return [];
+  }
+  using var stream = OpenRead(path);
+  using var reader = new StreamReader(stream);
+  var records = new List<MapMetadataRecord>();
+  while (reader.ReadLine() is { } line) {
+    if (!string.IsNullOrWhiteSpace(line)) {
+      records.Add(JsonSerializer.Deserialize<MapMetadataRecord>(line)
+          ?? throw new InvalidDataException("Map metadata record could not be deserialized."));
+    }
+  }
+  return records;
+}
+
+static Stream OpenRead(string path) {
+  var stream = File.OpenRead(path);
+  return path.EndsWith(".gz", StringComparison.OrdinalIgnoreCase)
+      ? new GZipStream(stream, CompressionMode.Decompress)
+      : stream;
+}
+
+static string? GetOptionalString(JsonElement element, string propertyName) {
+  return element.TryGetProperty(propertyName, out var property) && property.ValueKind != JsonValueKind.Null
+      ? property.GetString()
+      : null;
+}
+
+static bool NeedsRefresh(MapItem map, MapMetadataRecord? previous) {
+  return previous is null || previous.CollectionState == "stale"
+      || previous.SourceUpdatedAtUtc != map.UpdatedAtUtc
+      || previous.MapWidth < 1 || previous.MapHeight < 1;
+}
+
+static DateTimeOffset ParseTimestamp(string? value) {
+  return DateTimeOffset.TryParse(value, out var timestamp) ? timestamp : DateTimeOffset.MinValue;
+}
+
+static void ConnectAnonymously(TimeSpan timeout) {
+  var connected = false;
+  var connectFailure = EResult.k_EResultNone;
+  using var connectedCallback = Callback<SteamServersConnected_t>.CreateGameServer(_ => connected = true);
+  using var failedCallback = Callback<SteamServerConnectFailure_t>.CreateGameServer(
+      result => connectFailure = result.m_eResult);
+  SteamGameServer.LogOnAnonymous();
+  WaitForCallback(() => connected || connectFailure != EResult.k_EResultNone, "anonymous server login", timeout);
+  if (!connected) {
+    throw new InvalidOperationException($"Anonymous server login failed: {connectFailure}.");
+  }
+}
+
+static void WaitForCallback(Func<bool> completed, string operation, TimeSpan timeout) {
+  var deadline = DateTime.UtcNow.Add(timeout);
+  while (!completed() && DateTime.UtcNow < deadline) {
+    GameServer.RunCallbacks();
+    Thread.Sleep(100);
+  }
+  if (!completed()) {
+    throw new TimeoutException($"Timed out waiting for {operation}.");
+  }
+}
+
+static void WriteRecords(
+    string path, IReadOnlyCollection<MapItem> maps, IReadOnlyDictionary<string, MapMetadataRecord> outputById) {
+  var directory = Path.GetDirectoryName(Path.GetFullPath(path));
+  if (directory is not null) {
+    Directory.CreateDirectory(directory);
+  }
+  using var writer = new StreamWriter(path, false, new System.Text.UTF8Encoding(false));
+  foreach (var map in maps) {
+    if (outputById.TryGetValue(map.PublishedFileId, out var record)) {
+      writer.WriteLine(JsonSerializer.Serialize(record));
+    }
+  }
+}
+
+sealed record MapItem(string PublishedFileId, string? UpdatedAtUtc);
+
+sealed record MapDimensions(
+    [property: JsonPropertyName("Width")] int Width,
+    [property: JsonPropertyName("Height")] int Height);
+
+sealed record MapMetadataRecord(
+    [property: JsonPropertyName("published_file_id")] string PublishedFileId,
+    [property: JsonPropertyName("source_updated_at_utc")] string? SourceUpdatedAtUtc,
+    [property: JsonPropertyName("map_width")] int MapWidth,
+    [property: JsonPropertyName("map_height")] int MapHeight,
+    [property: JsonPropertyName("collection_state")] string CollectionState);
+
+sealed record Options(
+    string Snapshot,
+    string? PreviousResults,
+    string Output,
+    string WorkshopDirectory,
+    int MaxItems,
+    ulong MaxDownloadBytes,
+    TimeSpan RequestTimeout,
+    TimeSpan TimeBudget) {
+
+  internal static Options Parse(string[] args) {
+    var values = new Dictionary<string, string>();
+    for (var index = 0; index < args.Length; index += 2) {
+      if (index + 1 >= args.Length || !args[index].StartsWith("--", StringComparison.Ordinal)) {
+        throw new ArgumentException("Expected --name value arguments.");
+      }
+      values[args[index]] = args[index + 1];
+    }
+    var options = new Options(
+        Required(values, "--snapshot"), values.GetValueOrDefault("--previous-results"),
+        Required(values, "--output"), Required(values, "--workshop-directory"),
+        ParseInt(values, "--max-items", 250), ParseUlong(values, "--max-download-bytes", 50_000_000),
+        TimeSpan.FromSeconds(ParseInt(values, "--request-timeout-seconds", 120)),
+        TimeSpan.FromSeconds(ParseInt(values, "--time-budget-seconds", 7200)));
+    if (options.MaxItems < 0 || options.MaxDownloadBytes < 1
+        || options.RequestTimeout <= TimeSpan.Zero || options.RequestTimeout > TimeSpan.FromMinutes(10)
+        || options.TimeBudget < TimeSpan.Zero) {
+      throw new ArgumentOutOfRangeException(nameof(args), "Invalid numeric option.");
+    }
+    return options;
+  }
+
+  static string Required(IReadOnlyDictionary<string, string> values, string name) {
+    return values.GetValueOrDefault(name) ?? throw new ArgumentException($"Missing required option {name}.");
+  }
+
+  static int ParseInt(IReadOnlyDictionary<string, string> values, string name, int defaultValue) {
+    return values.TryGetValue(name, out var value) ? int.Parse(value) : defaultValue;
+  }
+
+  static ulong ParseUlong(IReadOnlyDictionary<string, string> values, string name, ulong defaultValue) {
+    return values.TryGetValue(name, out var value) ? ulong.Parse(value) : defaultValue;
+  }
+}

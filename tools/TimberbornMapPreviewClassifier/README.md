@@ -131,6 +131,11 @@ retaining the image corpus. At most eight resized gallery screenshots are consid
 limited to 2 MB, the public artifact is limited to 100 MB, and images are discarded after their scores are computed.
 The workflow uses no Steam account, API key, repository secret, or game process.
 
+The workflow also downloads a bounded number of map payloads through an anonymous Steam game-server session and reads
+only `map_metadata.json` from each `.timber` archive. Exact `map_width` and `map_height` values are retained in
+`map-metadata.jsonl.gz` and merged into the search index. Records are reused until the Workshop item's update timestamp
+changes, so scheduled runs progressively backfill missing dimensions without repeatedly downloading unchanged maps.
+
 The daily gallery pass processes at most 250 maps in up to three sequential UGC requests, with a short delay between
 batches. This bound controls new image downloads and CPU classification cost rather than Steam HTML throttling. The
 pass checks changed or previously failed items first, backfills recent unknown items next, and refreshes known galleries

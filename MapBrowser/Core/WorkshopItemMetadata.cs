@@ -60,6 +60,12 @@ sealed class WorkshopItemMetadata {
   [JsonProperty("gallery_collection_state")]
   public string GalleryCollectionState { get; set; }
 
+  [JsonProperty("map_width")]
+  public int? MapWidth { get; set; }
+
+  [JsonProperty("map_height")]
+  public int? MapHeight { get; set; }
+
   [JsonProperty("visual_scores")]
   public Dictionary<string, float> VisualScores { get; set; } = [];
 

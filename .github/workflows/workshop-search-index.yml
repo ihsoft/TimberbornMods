@@ -13,6 +13,11 @@ on:
         required: false
         type: number
         default: 250
+      map_metadata_max_items:
+        description: Maximum number of map payloads to inspect for exact dimensions
+        required: false
+        type: number
+        default: 250
       image_download_concurrency:
         description: Concurrent preview image downloads
         required: false
@@ -61,6 +66,9 @@ jobs:
       - name: Build anonymous Workshop gallery indexer
         run: dotnet build tools/SteamWorkshopGalleryIndexer/SteamWorkshopGalleryIndexer.csproj -c Release
 
+      - name: Build anonymous Workshop map metadata indexer
+        run: dotnet build tools/SteamWorkshopMapMetadataIndexer/SteamWorkshopMapMetadataIndexer.csproj -c Release
+
       - name: Collect public Workshop metadata
         run: >-
           dotnet tools/SteamWorkshopIndexer/bin/Release/net8.0/SteamWorkshopIndexer.dll
@@ -83,6 +91,10 @@ jobs:
             --output .work/previous-map-gallery.jsonl.gz \
             "$site/map-gallery.jsonl.gz" \
             || rm -f .work/previous-map-gallery.jsonl.gz
+          curl --fail --location --retry 3 \
+            --output .work/previous-map-metadata.jsonl.gz \
+            "$site/map-metadata.jsonl.gz" \
+            || rm -f .work/previous-map-metadata.jsonl.gz
 
       - name: Install anonymous Steam game-server runtime
         run: |
@@ -93,6 +105,33 @@ jobs:
           tar -xzf "$RUNNER_TEMP/steamcmd_linux.tar.gz" -C "$RUNNER_TEMP/steamcmd"
           "$RUNNER_TEMP/steamcmd/steamcmd.sh" +quit
           test -s "$RUNNER_TEMP/steamcmd/linux64/steamclient.so"
+          mkdir -p \
+            "$RUNNER_TEMP/steamcmd/steamapps/common/Timberborn" \
+            "$RUNNER_TEMP/steamcmd/steamapps/downloading/1062090" \
+            "$RUNNER_TEMP/steamcmd/steamapps/workshop/content/1062090" \
+            "$RUNNER_TEMP/steamcmd/steamapps/workshop/downloads"
+          printf '%s\n' \
+            '"AppState"' \
+            '{' \
+            '  "appid" "1062090"' \
+            '  "name" "Timberborn"' \
+            '  "StateFlags" "4"' \
+            '  "installdir" "Timberborn"' \
+            '}' \
+            > "$RUNNER_TEMP/steamcmd/steamapps/appmanifest_1062090.acf"
+          printf '%s\n' \
+            '"libraryfolders"' \
+            '{' \
+            '  "0"' \
+            '  {' \
+            "    \"path\" \"$RUNNER_TEMP/steamcmd\"" \
+            '    "apps"' \
+            '    {' \
+            '      "1062090" "0"' \
+            '    }' \
+            '  }' \
+            '}' \
+            > "$RUNNER_TEMP/steamcmd/steamapps/libraryfolders.vdf"
           cp "$RUNNER_TEMP/steamcmd/linux64/steamclient.so" "$HOME/.steam/sdk64/steamclient.so"
           echo "LD_LIBRARY_PATH=$RUNNER_TEMP/steamcmd/linux64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
 
@@ -109,6 +148,22 @@ jobs:
           --max-items ${{ inputs.gallery_max_items || 250 }}
           --max-images-per-map 8
           --delay-milliseconds ${{ inputs.gallery_delay_milliseconds || 250 }}
+
+      - name: Collect exact map dimensions from anonymous payloads
+        env:
+          SteamAppId: "1062090"
+          SteamGameId: "1062090"
+        working-directory: ${{ runner.temp }}/steamcmd
+        run: >-
+          dotnet $GITHUB_WORKSPACE/tools/SteamWorkshopMapMetadataIndexer/bin/Release/net8.0/SteamWorkshopMapMetadataIndexer.dll
+          --snapshot $GITHUB_WORKSPACE/.work/workshop-items.jsonl
+          --previous-results $GITHUB_WORKSPACE/.work/previous-map-metadata.jsonl.gz
+          --output $GITHUB_WORKSPACE/.work/map-metadata.jsonl
+          --workshop-directory $RUNNER_TEMP/steamcmd/workshop-content
+          --max-items ${{ inputs.map_metadata_max_items || 250 }}
+          --max-download-bytes 50000000
+          --request-timeout-seconds 120
+          --time-budget-seconds 7200
 
       - name: Plan incremental classification
         id: classification-plan
@@ -159,6 +214,7 @@ jobs:
           --snapshot .work/workshop-items.jsonl
           --visual-features .work/map-visual-features.jsonl
           --gallery-results .work/map-gallery.jsonl
+          --map-metadata .work/map-metadata.jsonl
           --target-classifier-version ${{ steps.classification-plan.outputs.classifier_version }}
           --output-directory .work/public
 

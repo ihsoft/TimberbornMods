@@ -210,6 +210,7 @@ class ResumableMigrationIndexTest(unittest.TestCase):
             snapshot = root / "items.jsonl"
             visual = root / "visual.jsonl"
             gallery = root / "gallery.jsonl"
+            map_metadata = root / "map-metadata.jsonl"
             output = root / "public"
             items = [
                 {"published_file_id": "1", "title": "One", "primary_category": "map"},
@@ -236,7 +237,15 @@ class ResumableMigrationIndexTest(unittest.TestCase):
                     }
                 else:
                     records[-1]["visual_percentiles"] = scores
-            for path, values in ((snapshot, items), (visual, records), (gallery, [])):
+            dimensions = [{
+                "published_file_id": "1",
+                "map_width": 128,
+                "map_height": 64,
+                "collection_state": "fetched",
+            }]
+            for path, values in (
+                (snapshot, items), (visual, records), (gallery, []), (map_metadata, dimensions)
+            ):
                 path.write_text("".join(json.dumps(value) + "\n" for value in values), encoding="utf-8")
 
             with mock.patch(
@@ -246,6 +255,7 @@ class ResumableMigrationIndexTest(unittest.TestCase):
                     "--snapshot", str(snapshot),
                     "--visual-features", str(visual),
                     "--gallery-results", str(gallery),
+                    "--map-metadata", str(map_metadata),
                     "--target-classifier-version", classify.CLASSIFIER_VERSION,
                     "--output-directory", str(output),
                 ],
@@ -257,6 +267,10 @@ class ResumableMigrationIndexTest(unittest.TestCase):
             self.assertFalse(manifest["visual_migration_complete"])
             self.assertEqual(1, manifest["visual_migration_maps_completed"])
             self.assertEqual(1, manifest["visual_migration_maps_remaining"])
+            self.assertEqual(1, manifest["map_dimensions_known"])
+            with gzip.open(output / "search-index.jsonl.gz", "rt", encoding="utf-8") as stream:
+                search_records = [json.loads(line) for line in stream]
+            self.assertEqual((128, 64), (search_records[0]["map_width"], search_records[0]["map_height"]))
             with gzip.open(output / "map-visual-features.jsonl.gz", "rt", encoding="utf-8") as stream:
                 published = [json.loads(line) for line in stream]
             self.assertEqual(
