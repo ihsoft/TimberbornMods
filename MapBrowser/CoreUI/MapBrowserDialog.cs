@@ -195,6 +195,7 @@ sealed class MapBrowserDialog : AbstractDialog {
     var searchControls = UiFactory.LoadVisualTreeAsset(SearchPanelAsset);
     _searchPanel.Add(searchControls);
     _searchText = searchControls.Q2<TextField>("KeywordsTextField");
+    _searchText.SetValueWithoutNotify(string.Empty);
     _searchText.RegisterValueChangedCallback(_ => ApplySearch());
     foreach (var filter in SearchFilters) {
       BindSearchFilter(searchControls, filter);
