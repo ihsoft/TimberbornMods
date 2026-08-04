@@ -479,15 +479,14 @@ sealed class MapBrowserDialog : AbstractDialog {
       if (selectedIndex == 0) {
         continue;
       }
-      if (!metadata.VisualPercentiles.TryGetValue(filter.Feature, out var percentile)
-          || GetPercentileBucket(percentile) != selectedIndex - 1) {
+      if (!TryGetVisualLevel(metadata, filter.Feature, out var level) || level != selectedIndex - 1) {
         return false;
       }
     }
     return true;
   }
 
-  static int GetPercentileBucket(float percentile) {
+  static int GetLegacyPercentileLevel(float percentile) {
     return percentile switch {
         < 0.2f => 0,
         < 0.4f => 1,
@@ -590,19 +589,32 @@ sealed class MapBrowserDialog : AbstractDialog {
   static string GetVisualLevel(
       WorkshopItemMetadata metadata, string feature, string veryLow, string low, string middle, string high,
       string veryHigh, UiFactory uiFactory, string compactMiddleLocKey = null) {
-    if (!metadata.VisualPercentiles.TryGetValue(feature, out var percentile)) {
+    if (!TryGetVisualLevel(metadata, feature, out var level)) {
       return uiFactory.T(AnalysisLevelUnknownLocKey);
     }
-    var level = percentile switch {
-        < 0.2f => veryLow,
-        < 0.4f => low,
-        < 0.6f => middle,
-        < 0.8f => high,
+    var levelName = level switch {
+        0 => veryLow,
+        1 => low,
+        2 => middle,
+        3 => high,
         _ => veryHigh,
     };
-    return uiFactory.T(level == middle && compactMiddleLocKey != null
+    return uiFactory.T(levelName == middle && compactMiddleLocKey != null
         ? compactMiddleLocKey
-        : AnalysisLevelLocKeyPrefix + level);
+        : AnalysisLevelLocKeyPrefix + levelName);
+  }
+
+  static bool TryGetVisualLevel(WorkshopItemMetadata metadata, string feature, out int level) {
+    if (metadata.VisualLevels.TryGetValue(feature, out level) && level is >= 0 and <= 4) {
+      return true;
+    }
+    // Compatibility with public snapshots from before the absolute-level migration. Remove after 2026-11-01.
+    if (metadata.VisualPercentiles.TryGetValue(feature, out var percentile)) {
+      level = GetLegacyPercentileLevel(percentile);
+      return true;
+    }
+    level = 0;
+    return false;
   }
 
   static void FitDescription(Label label, string fullText) {

@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import argparse
-import bisect
+from bisect import bisect_right
 from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 import json
@@ -16,7 +16,7 @@ from typing import Iterable
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
-CLASSIFIER_VERSION = "clip-prompts-v4-spatial-forest-water"
+CLASSIFIER_VERSION = "clip-prompts-v5-absolute-levels"
 LEGACY_CLASSIFIER_VERSIONS = set()
 MOIST_SOIL_WEIGHT = 0.75
 MOIST_SOIL_PROMPTS = {
@@ -106,6 +106,31 @@ FEATURE_PROMPTS = {
     },
 }
 
+# Levels are absolute classifier outputs, not corpus ranks. Water and forest
+# thresholds were fitted to human labels. The other thresholds freeze the five
+# buckets of the final v2 corpus so existing maps do not change merely because
+# more maps are indexed.
+FEATURE_LEVEL_THRESHOLDS = {
+    "ruggedness": (-0.018964573740959167, -0.012609973549842834,
+                   -0.007694557309150696, -0.002473115921020508),
+    "canyonness": (-0.0029955506324768066, 0.006061181426048279,
+                   0.012848049402236938, 0.019254907965660095),
+    "water_dominance": (-0.06195161077711317, -0.05205262742108769,
+                        -0.04278455053766568, -0.028576136670178838),
+    "islandness": (-0.011768221855163574, -0.007593408226966858,
+                   -0.0042498111724853516, -0.0002329796552658081),
+    "forest_density": (-0.030836759135127068, -0.019454829394817352,
+                       -0.019371796399354935, -0.013361547142267227),
+    "artificial_layout": (-0.015195921063423157, -0.006883591413497925,
+                          0.0017065554857254028, 0.0128001868724823),
+}
+
+FEATURE_LABEL_THRESHOLDS = {
+    "canyonness": 0.021233633160591125,
+    "islandness": 0.0011988431215286255,
+    "artificial_layout": 0.02357436716556549,
+}
+
 
 class SteamImageRequestStopError(RuntimeError):
     """Steam returned a response that should stop further preview requests."""
@@ -132,6 +157,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--gallery-results")
     parser.add_argument("--plan-only", action="store_true")
     parser.add_argument("--plan-output")
+    parser.add_argument(
+        "--time-budget-seconds",
+        type=int,
+        default=0,
+        help="Stop cleanly before starting another image batch after this many seconds",
+    )
     return parser.parse_args()
 
 
@@ -215,7 +246,10 @@ def previous_image_scores(previous: dict) -> list[dict]:
 
 def plan_incremental(
     maps: list[dict], previous_results: list[dict], model_name: str
-) -> tuple[dict[str, dict[str, dict]], list[dict], dict[str, dict]]:
+) -> tuple[dict[str, dict[str, dict]], list[dict], dict[str, dict], dict[str, dict]]:
+    all_previous_by_id = {
+        result["published_file_id"]: result for result in previous_results
+    }
     previous_by_id = {
         result["published_file_id"]: result
         for result in previous_results
@@ -244,7 +278,7 @@ def plan_incremental(
             for image in item["images"]
             if image["url"] not in previous_images
         )
-    return reusable_by_map, to_classify, previous_by_id
+    return reusable_by_map, to_classify, previous_by_id, all_previous_by_id
 
 
 def write_plan(
@@ -424,11 +458,22 @@ def score_images(
     download_previews: bool,
     download_concurrency: int,
     max_image_bytes: int,
-) -> list[dict]:
+    time_budget_seconds: int = 0,
+) -> tuple[list[dict], bool]:
     prototypes = build_text_prototypes(model, processor)
     moist_soil_prototype = build_text_prototype_pair(model, processor, MOIST_SOIL_PROMPTS)
     results = []
+    deadline = time.monotonic() + time_budget_seconds if time_budget_seconds else None
+    stopped_early = False
     for batch_number, batch in enumerate(chunks(images_to_classify, batch_size), start=1):
+        if deadline is not None and time.monotonic() >= deadline:
+            stopped_early = True
+            print(
+                f"Classification time budget reached after {len(results)} / "
+                f"{len(images_to_classify)} images",
+                flush=True,
+            )
+            break
         images: list[Image.Image] = []
         valid = []
         stop_downloads = Event()
@@ -496,13 +541,15 @@ def score_images(
             f"Batch {batch_number}: classified {len(results)} / {len(images_to_classify)} images",
             flush=True,
         )
-    return results
+    return results, stopped_early
 
 
 def aggregate_map_results(
     maps: list[dict], reusable_by_map: dict[str, dict[str, dict]],
-    classified: list[dict], previous_by_id: dict[str, dict]
+    classified: list[dict], previous_by_id: dict[str, dict],
+    all_previous_by_id: dict[str, dict] | None = None,
 ) -> list[dict]:
+    all_previous_by_id = all_previous_by_id or previous_by_id
     classified_by_map = {}
     for image in classified:
         classified_by_map.setdefault(image["published_file_id"], {})[image["url"]] = image
@@ -516,6 +563,14 @@ def aggregate_map_results(
         }
         missing_urls = desired_urls - images.keys()
         previous = previous_by_id.get(published_file_id)
+        if missing_urls:
+            carried = all_previous_by_id.get(published_file_id)
+            if carried:
+                carried = dict(carried)
+                carried["classification_state"] = "migration_pending"
+                carried["images_classified_this_run"] = 0
+                results.append(carried)
+                continue
         if not images and previous:
             images = {image["url"]: image for image in previous_image_scores(previous)}
         if not images:
@@ -563,48 +618,30 @@ def aggregate_map_results(
     return results
 
 
-def add_percentiles_and_labels(results: list[dict]) -> None:
-    aggregate_names = ("median", "mean", "min", "max", "spread")
-    distributions = {
-        feature: {
-            aggregate: sorted(
-                result["visual_score_aggregates"][feature][aggregate]
-                for result in results
-            )
-            for aggregate in aggregate_names
-        }
-        for feature in FEATURE_PROMPTS
-    }
-    count = len(results)
+def add_levels_and_labels(results: list[dict]) -> None:
     for result in results:
-        aggregate_percentiles = {}
-        for feature, feature_distributions in distributions.items():
-            aggregate_percentiles[feature] = {}
-            for aggregate, distribution in feature_distributions.items():
-                score = result["visual_score_aggregates"][feature][aggregate]
-                aggregate_percentiles[feature][aggregate] = (
-                    bisect.bisect_right(distribution, score) - 0.5
-                ) / count
-        result["visual_percentile_aggregates"] = aggregate_percentiles
-        percentiles = {
-            feature: aggregate_percentiles[feature]["median"]
+        if result.get("classification_state") == "migration_pending":
+            continue
+        scores = result["visual_scores"]
+        levels = {
+            feature: bisect_right(FEATURE_LEVEL_THRESHOLDS[feature], scores[feature])
             for feature in FEATURE_PROMPTS
         }
-        result["visual_percentiles"] = percentiles
+        result["visual_levels"] = levels
         labels = []
-        if percentiles["ruggedness"] >= 0.80:
+        if levels["ruggedness"] == 4:
             labels.append("predominantly_mountainous")
-        if percentiles["ruggedness"] <= 0.20:
+        if levels["ruggedness"] == 0:
             labels.append("predominantly_flat")
-        if percentiles["canyonness"] >= 0.85:
+        if scores["canyonness"] >= FEATURE_LABEL_THRESHOLDS["canyonness"]:
             labels.append("canyon_or_narrow_valley")
-        if percentiles["water_dominance"] >= 0.85:
+        if levels["water_dominance"] == 4:
             labels.append("water_dominated")
-        if percentiles["islandness"] >= 0.85:
+        if scores["islandness"] >= FEATURE_LABEL_THRESHOLDS["islandness"]:
             labels.append("islands")
-        if percentiles["forest_density"] >= 0.85:
+        if levels["forest_density"] == 4:
             labels.append("densely_forested")
-        if percentiles["artificial_layout"] >= 0.90:
+        if scores["artificial_layout"] >= FEATURE_LABEL_THRESHOLDS["artificial_layout"]:
             labels.append("artificial_layout")
         result["visual_labels"] = labels
 
@@ -613,8 +650,9 @@ def write_results(output: Path, results: list[dict], model_name: str) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
     with output.open("w", encoding="utf-8", newline="\n") as stream:
         for result in results:
-            result["model"] = model_name
-            result["classifier_version"] = CLASSIFIER_VERSION
+            if result.get("classification_state") != "migration_pending":
+                result["model"] = model_name
+                result["classifier_version"] = CLASSIFIER_VERSION
             stream.write(json.dumps(result, ensure_ascii=False, separators=(",", ":")) + "\n")
 
 
@@ -626,6 +664,8 @@ def main() -> int:
         raise ValueError("--download-concurrency must be between 1 and 16")
     if args.max_image_bytes < 1:
         raise ValueError("--max-image-bytes must be positive")
+    if args.time_budget_seconds < 0:
+        raise ValueError("--time-budget-seconds must not be negative")
     maps = load_maps(
         Path(args.snapshot),
         Path(args.preview_directory),
@@ -636,7 +676,7 @@ def main() -> int:
     if not maps:
         raise RuntimeError("No map previews were available")
     previous_results = read_json_lines(Path(args.previous_results)) if args.previous_results else []
-    reusable_by_map, to_classify, previous_by_id = plan_incremental(
+    reusable_by_map, to_classify, previous_by_id, all_previous_by_id = plan_incremental(
         maps, previous_results, args.model
     )
     write_plan(
@@ -655,7 +695,7 @@ def main() -> int:
         processor = CLIPProcessor.from_pretrained(args.model, use_fast=False)
         model = CLIPModel.from_pretrained(args.model)
         model.eval()
-        classified = score_images(
+        classified, stopped_early = score_images(
             to_classify,
             model,
             processor,
@@ -663,19 +703,24 @@ def main() -> int:
             args.download_previews,
             args.download_concurrency,
             args.max_image_bytes,
+            args.time_budget_seconds,
         )
+    else:
+        stopped_early = False
 
-    results = aggregate_map_results(maps, reusable_by_map, classified, previous_by_id)
+    results = aggregate_map_results(
+        maps, reusable_by_map, classified, previous_by_id, all_previous_by_id
+    )
     if not results:
         raise RuntimeError("No map previews could be classified or reused")
-    add_percentiles_and_labels(results)
+    add_levels_and_labels(results)
     write_results(Path(args.output), results, args.model)
-    stale_count = sum(result["visual_stale"] for result in results)
+    stale_count = sum(result.get("visual_stale", False) for result in results)
     reused_images = sum(len(images) for images in reusable_by_map.values())
     print(
         f"Wrote {len(results)} records to {Path(args.output).resolve()}; "
         f"reused {reused_images} images, classified {len(classified)} images, "
-        f"stale {stale_count} maps",
+        f"stale {stale_count} maps, stopped early {stopped_early}",
         flush=True,
     )
     return 0

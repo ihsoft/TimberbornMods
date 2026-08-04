@@ -17,11 +17,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--visual-features", required=True)
     parser.add_argument("--gallery-results", required=True)
     parser.add_argument("--output-directory", required=True)
+    parser.add_argument("--target-classifier-version")
     return parser.parse_args()
 
 
 def read_json_lines(path: Path) -> list[dict]:
-    with path.open("r", encoding="utf-8") as stream:
+    if not path.is_file():
+        return []
+    if path.suffix == ".gz":
+        stream = gzip.open(path, "rt", encoding="utf-8")
+    else:
+        stream = path.open("r", encoding="utf-8")
+    with stream:
         return [json.loads(line) for line in stream if line.strip()]
 
 
@@ -42,7 +49,23 @@ def main() -> int:
     workshop_items = read_json_lines(snapshot_path)
     visual_features = read_json_lines(visual_path)
     gallery_results = read_json_lines(gallery_path)
-    visual_by_id = {record["published_file_id"]: record for record in visual_features}
+    target_version = args.target_classifier_version
+    map_ids = {
+        item["published_file_id"]
+        for item in workshop_items
+        if item.get("primary_category") == "map"
+    }
+    visual_by_id = {
+        record["published_file_id"]: record for record in visual_features
+    }
+    migration_pending_ids = {
+        published_file_id
+        for published_file_id in map_ids
+        if published_file_id not in visual_by_id
+        or visual_by_id[published_file_id].get("classifier_version") != target_version
+        or visual_by_id[published_file_id].get("visual_missing_image_count", 0) > 0
+    } if target_version else set()
+    migration_complete = not migration_pending_ids
     gallery_by_id = {record["published_file_id"]: record for record in gallery_results}
     search_index = []
     for item in workshop_items:
@@ -56,10 +79,10 @@ def main() -> int:
         if visual:
             record["visual_scores"] = visual["visual_scores"]
             record["visual_score_aggregates"] = visual.get("visual_score_aggregates")
-            record["visual_percentiles"] = visual["visual_percentiles"]
-            record["visual_percentile_aggregates"] = visual.get(
-                "visual_percentile_aggregates"
-            )
+            if "visual_levels" in visual:
+                record["visual_levels"] = visual["visual_levels"]
+            if "visual_percentiles" in visual:
+                record["visual_percentiles"] = visual["visual_percentiles"]
             record["visual_labels"] = visual["visual_labels"]
             record["visual_image_count"] = visual.get("visual_image_count", 1)
             record["visual_gallery_image_count"] = visual.get("visual_gallery_image_count", 0)
@@ -118,7 +141,19 @@ def main() -> int:
         ),
         "visual_model": visual_features[0]["model"] if visual_features else None,
         "visual_classifier_version": (
-            visual_features[0].get("classifier_version") if visual_features else None
+            target_version if migration_complete else "mixed"
+        ),
+        "visual_migration_target_version": target_version,
+        "visual_migration_complete": migration_complete,
+        "visual_migration_maps_completed": len(map_ids) - len(migration_pending_ids),
+        "visual_migration_maps_remaining": len(migration_pending_ids),
+        "visual_migration_images_completed": sum(
+            record.get("visual_image_count", 1)
+            for record in visual_features
+            if record.get("classifier_version") == target_version
+        ),
+        "visual_migration_images_total": sum(
+            record.get("visual_image_count", 1) for record in visual_features
         ),
         "files": {
             path.name: path.stat().st_size

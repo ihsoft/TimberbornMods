@@ -66,6 +66,9 @@ sealed class WorkshopItemMetadata {
   [JsonProperty("visual_percentiles")]
   public Dictionary<string, float> VisualPercentiles { get; set; } = [];
 
+  [JsonProperty("visual_levels")]
+  public Dictionary<string, int> VisualLevels { get; set; } = [];
+
   [JsonProperty("visual_labels")]
   public List<string> VisualLabels { get; set; } = [];
 

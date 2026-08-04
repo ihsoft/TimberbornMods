@@ -18,7 +18,18 @@ on:
         required: false
         type: number
         default: 6
+      classification_time_budget_seconds:
+        description: Maximum classifier runtime before writing a resumable checkpoint
+        required: false
+        type: number
+        default: 7200
   workflow_dispatch:
+    inputs:
+      classification_time_budget_seconds:
+        description: Maximum classifier runtime before writing a resumable checkpoint
+        required: false
+        type: number
+        default: 7200
   schedule:
     - cron: "17 3,9,15,21 * * *"
 
@@ -110,7 +121,9 @@ jobs:
             --plan-only \
             --plan-output .work/classification-plan.json
           requires_model=$(python -c "import json; print(str(json.load(open('.work/classification-plan.json'))['requires_model']).lower())")
+          classifier_version=$(python -c "import json; print(json.load(open('.work/classification-plan.json'))['classifier_version'])")
           echo "requires_model=$requires_model" >> "$GITHUB_OUTPUT"
+          echo "classifier_version=$classifier_version" >> "$GITHUB_OUTPUT"
 
       - name: Restore CLIP model cache
         if: steps.classification-plan.outputs.requires_model == 'true'
@@ -138,6 +151,7 @@ jobs:
           --download-concurrency ${{ inputs.image_download_concurrency || 6 }}
           --batch-size 24
           --max-image-bytes 2000000
+          --time-budget-seconds ${{ inputs.classification_time_budget_seconds || 7200 }}
 
       - name: Build public search artifacts
         run: >-
@@ -145,6 +159,7 @@ jobs:
           --snapshot .work/workshop-items.jsonl
           --visual-features .work/map-visual-features.jsonl
           --gallery-results .work/map-gallery.jsonl
+          --target-classifier-version ${{ steps.classification-plan.outputs.classifier_version }}
           --output-directory .work/public
 
       - name: Enforce public artifact size limit
