@@ -5,8 +5,8 @@ Steam, a Steam account, an API key, or Timberborn. It never subscribes to items 
 contents.
 
 The job reads public Workshop browse pages to enumerate published file IDs, resolves metadata through the public
-`ISteamRemoteStorage/GetPublishedFileDetails` endpoint, and caches each item's public primary preview. The preview cache
-is intended as input for a separate visual map classifier.
+`ISteamRemoteStorage/GetPublishedFileDetails` endpoint. It retains each item's public primary-preview URL as metadata,
+but never downloads or analyzes the image.
 
 Build and run from the repository root:
 
@@ -20,11 +20,10 @@ Default ignored outputs:
 ```text
 .tools/workshop-index/timberborn-workshop-bootstrap.jsonl
 .tools/workshop-index/timberborn-workshop-bootstrap.summary.json
-.tools/workshop-index/previews/<published-file-id>.preview
 ```
 
 The JSONL record contains public metadata, normalized description text, Steam tags, a coarse content-kind
-classification, the public preview URL, and the relative preview-cache path. An item is classified as a map when its
+classification and the public preview URL. An item is classified as a map when its
 Steam tag list contains `Map`; any other tags may coexist and do not affect that decision. Title and description text
 are never evidence that an item is a map. Descriptions remain weaker evidence for other coarse content kinds and
 search, not ground truth for terrain classification.
@@ -50,27 +49,13 @@ embedded public `total_count` value, and stops after the final page. It also sto
 Browse IDs are accumulated across pages and resolved through `GetPublishedFileDetails` in batches of up to 100, reducing
 the number of metadata requests without increasing the number of Workshop items processed.
 
-## Disk and request controls
+## Request controls
 
-The default preview-cache ceiling is 8,000,000,000 bytes. The job stops before crossing it. Raising the ceiling must be
-an explicit operator choice:
-
-```powershell
-dotnet tools/SteamWorkshopIndexer/bin/Release/net8.0/SteamWorkshopIndexer.dll `
-  --append --max-preview-cache-bytes 8000000000
-```
-
-Other useful options:
-
-- `--skip-previews` indexes metadata without downloading images.
-- `--preview-directory <directory>` changes the image cache location.
 - `--delay-ms <milliseconds>` controls the polite delay between public requests; the default is 150 ms.
-- `--preview-concurrency <1-16>` limits parallel preview downloads; the default is 6.
 - `--output <jsonl>` changes the snapshot location.
 
 This is a bootstrap/full-refresh job. A later incremental layer can stop after a stable overlap window because browse
 results are ordered by last update, but that optimization is intentionally outside the current contract.
 
-Additional gallery screenshots are not returned by this anonymous HTTP details endpoint. The scheduled search-index
-workflow collects their URLs separately with `tools/SteamWorkshopGalleryIndexer` through anonymous, bounded Steam UGC
-batch queries and carries its published state between runs.
+The index retains the public primary preview URL as metadata but does not download or analyze preview or gallery
+images.

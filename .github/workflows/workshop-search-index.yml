@@ -3,38 +3,12 @@ name: Build Workshop search index
 on:
   workflow_call:
     inputs:
-      gallery_max_items:
-        description: Maximum number of map galleries to refresh
-        required: false
-        type: number
-        default: 250
-      gallery_delay_milliseconds:
-        description: Delay between anonymous UGC batches
-        required: false
-        type: number
-        default: 250
       map_metadata_max_items:
         description: Maximum number of map payloads to inspect for exact features
         required: false
         type: number
         default: 250
-      image_download_concurrency:
-        description: Concurrent preview image downloads
-        required: false
-        type: number
-        default: 6
-      classification_time_budget_seconds:
-        description: Maximum classifier runtime before writing a resumable checkpoint
-        required: false
-        type: number
-        default: 7200
   workflow_dispatch:
-    inputs:
-      classification_time_budget_seconds:
-        description: Maximum classifier runtime before writing a resumable checkpoint
-        required: false
-        type: number
-        default: 7200
   schedule:
     - cron: "17 3,9,15,21 * * *"
 
@@ -63,16 +37,12 @@ jobs:
       - name: Build public Workshop indexer
         run: dotnet build tools/SteamWorkshopIndexer/SteamWorkshopIndexer.csproj -c Release
 
-      - name: Build anonymous Workshop gallery indexer
-        run: dotnet build tools/SteamWorkshopGalleryIndexer/SteamWorkshopGalleryIndexer.csproj -c Release
-
       - name: Build anonymous Workshop map metadata indexer
         run: dotnet build tools/SteamWorkshopMapMetadataIndexer/SteamWorkshopMapMetadataIndexer.csproj -c Release
 
       - name: Collect public Workshop metadata
         run: >-
           dotnet tools/SteamWorkshopIndexer/bin/Release/net8.0/SteamWorkshopIndexer.dll
-          --skip-previews
           --output .work/workshop-items.jsonl
 
       - name: Set up Python
@@ -83,14 +53,6 @@ jobs:
       - name: Download previous incremental data
         run: |
           site="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}"
-          curl --fail --location --retry 3 \
-            --output .work/previous-map-visual-features.jsonl.gz \
-            "$site/map-visual-features.jsonl.gz" \
-            || rm -f .work/previous-map-visual-features.jsonl.gz
-          curl --fail --location --retry 3 \
-            --output .work/previous-map-gallery.jsonl.gz \
-            "$site/map-gallery.jsonl.gz" \
-            || rm -f .work/previous-map-gallery.jsonl.gz
           curl --fail --location --retry 3 \
             --output .work/previous-map-metadata.jsonl.gz \
             "$site/map-metadata.jsonl.gz" \
@@ -135,20 +97,6 @@ jobs:
           cp "$RUNNER_TEMP/steamcmd/linux64/steamclient.so" "$HOME/.steam/sdk64/steamclient.so"
           echo "LD_LIBRARY_PATH=$RUNNER_TEMP/steamcmd/linux64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
 
-      - name: Collect incremental public map galleries
-        env:
-          SteamAppId: "1062090"
-          SteamGameId: "1062090"
-        run: >-
-          dotnet tools/SteamWorkshopGalleryIndexer/bin/Release/net8.0/SteamWorkshopGalleryIndexer.dll
-          --snapshot .work/workshop-items.jsonl
-          --previous-results .work/previous-map-gallery.jsonl.gz
-          --output .work/map-gallery.jsonl
-          --batch-size 100
-          --max-items ${{ inputs.gallery_max_items || 250 }}
-          --max-images-per-map 8
-          --delay-milliseconds ${{ inputs.gallery_delay_milliseconds || 250 }}
-
       - name: Collect exact map features from anonymous payloads
         env:
           SteamAppId: "1062090"
@@ -165,57 +113,11 @@ jobs:
           --request-timeout-seconds 120
           --time-budget-seconds 7200
 
-      - name: Plan incremental classification
-        id: classification-plan
-        run: |
-          python tools/TimberbornMapPreviewClassifier/classify.py \
-            --snapshot .work/workshop-items.jsonl \
-            --previous-results .work/previous-map-visual-features.jsonl.gz \
-            --gallery-results .work/map-gallery.jsonl \
-            --download-previews \
-            --plan-only \
-            --plan-output .work/classification-plan.json
-          requires_model=$(python -c "import json; print(str(json.load(open('.work/classification-plan.json'))['requires_model']).lower())")
-          classifier_version=$(python -c "import json; print(json.load(open('.work/classification-plan.json'))['classifier_version'])")
-          echo "requires_model=$requires_model" >> "$GITHUB_OUTPUT"
-          echo "classifier_version=$classifier_version" >> "$GITHUB_OUTPUT"
-
-      - name: Restore CLIP model cache
-        if: steps.classification-plan.outputs.requires_model == 'true'
-        uses: actions/cache@v5
-        with:
-          path: |
-            ~/.cache/huggingface
-            ~/.cache/pip
-          key: clip-openai-vit-base-patch32-python-3.12-v1
-
-      - name: Install CPU classifier dependencies
-        if: steps.classification-plan.outputs.requires_model == 'true'
-        run: |
-          python -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.7.1
-          python -m pip install -r tools/TimberbornMapPreviewClassifier/requirements.txt
-
-      - name: Classify map previews without retaining images
-        run: >-
-          python tools/TimberbornMapPreviewClassifier/classify.py
-          --snapshot .work/workshop-items.jsonl
-          --previous-results .work/previous-map-visual-features.jsonl.gz
-          --gallery-results .work/map-gallery.jsonl
-          --output .work/map-visual-features.jsonl
-          --download-previews
-          --download-concurrency ${{ inputs.image_download_concurrency || 6 }}
-          --batch-size 24
-          --max-image-bytes 2000000
-          --time-budget-seconds ${{ inputs.classification_time_budget_seconds || 7200 }}
-
       - name: Build public search artifacts
         run: >-
           python tools/TimberbornMapPreviewClassifier/build_public_index.py
           --snapshot .work/workshop-items.jsonl
-          --visual-features .work/map-visual-features.jsonl
-          --gallery-results .work/map-gallery.jsonl
           --map-metadata .work/map-metadata.jsonl
-          --target-classifier-version ${{ steps.classification-plan.outputs.classifier_version }}
           --output-directory .work/public
 
       - name: Enforce public artifact size limit

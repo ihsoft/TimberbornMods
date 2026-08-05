@@ -10,20 +10,14 @@ import json
 from pathlib import Path
 import shutil
 
-from workshop_records import is_map_item
-
-
-PUBLIC_SCHEMA_VERSION = 1
+PUBLIC_SCHEMA_VERSION = 2
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--snapshot", required=True)
-    parser.add_argument("--visual-features", required=True)
-    parser.add_argument("--gallery-results", required=True)
     parser.add_argument("--map-metadata", required=True)
     parser.add_argument("--output-directory", required=True)
-    parser.add_argument("--target-classifier-version")
     return parser.parse_args()
 
 
@@ -47,47 +41,19 @@ def write_gzip_json_lines(path: Path, records: list[dict]) -> None:
 def main() -> int:
     args = parse_args()
     snapshot_path = Path(args.snapshot)
-    visual_path = Path(args.visual_features)
-    gallery_path = Path(args.gallery_results)
     map_metadata_path = Path(args.map_metadata)
     output_directory = Path(args.output_directory)
     output_directory.mkdir(parents=True, exist_ok=True)
 
     workshop_items = read_json_lines(snapshot_path)
-    visual_features = read_json_lines(visual_path)
-    gallery_results = read_json_lines(gallery_path)
     map_metadata_results = read_json_lines(map_metadata_path)
-    target_version = args.target_classifier_version
-    map_ids = {
-        item["published_file_id"]
-        for item in workshop_items
-        if is_map_item(item)
-    }
-    visual_by_id = {
-        record["published_file_id"]: record for record in visual_features
-    }
-    migration_pending_ids = {
-        published_file_id
-        for published_file_id in map_ids
-        if published_file_id not in visual_by_id
-        or visual_by_id[published_file_id].get("classifier_version") != target_version
-        or visual_by_id[published_file_id].get("visual_missing_image_count", 0) > 0
-    } if target_version else set()
-    migration_complete = not migration_pending_ids
-    gallery_by_id = {record["published_file_id"]: record for record in gallery_results}
     map_metadata_by_id = {
         record["published_file_id"]: record for record in map_metadata_results
     }
     search_index = []
     for item in workshop_items:
         record = dict(item)
-        visual = visual_by_id.get(item["published_file_id"])
-        gallery = gallery_by_id.get(item["published_file_id"])
         map_metadata = map_metadata_by_id.get(item["published_file_id"])
-        if gallery:
-            record["gallery_urls"] = gallery.get("gallery_urls", [])
-            record["gallery_checked_at_utc"] = gallery.get("gallery_checked_at_utc")
-            record["gallery_collection_state"] = gallery.get("collection_state")
         if map_metadata:
             record["map_width"] = map_metadata["map_width"]
             record["map_height"] = map_metadata["map_height"]
@@ -95,71 +61,16 @@ def main() -> int:
             record["map_analysis_version"] = map_metadata.get("analysis_version")
             if "classifications" in map_metadata:
                 record["map_classifications"] = map_metadata["classifications"]
-        if visual:
-            record["visual_scores"] = visual["visual_scores"]
-            record["visual_score_aggregates"] = visual.get("visual_score_aggregates")
-            if "visual_levels" in visual:
-                record["visual_levels"] = visual["visual_levels"]
-            if "visual_percentiles" in visual:
-                record["visual_percentiles"] = visual["visual_percentiles"]
-            record["visual_labels"] = visual["visual_labels"]
-            record["visual_image_count"] = visual.get("visual_image_count", 1)
-            record["visual_gallery_image_count"] = visual.get("visual_gallery_image_count", 0)
-            record["visual_missing_image_count"] = visual.get("visual_missing_image_count", 0)
-            record["visual_model"] = visual["model"]
-            record["visual_classifier_version"] = visual.get("classifier_version")
-            record["visual_stale"] = visual.get("visual_stale", False)
-            record["visual_classified_preview_url"] = visual.get(
-                "classified_preview_url", visual.get("preview_url")
-            )
         search_index.append(record)
 
     write_gzip_json_lines(output_directory / "workshop-items.jsonl.gz", workshop_items)
-    write_gzip_json_lines(output_directory / "map-gallery.jsonl.gz", gallery_results)
     write_gzip_json_lines(output_directory / "map-metadata.jsonl.gz", map_metadata_results)
-    write_gzip_json_lines(output_directory / "map-visual-features.jsonl.gz", visual_features)
     write_gzip_json_lines(output_directory / "search-index.jsonl.gz", search_index)
-
-    missing_visual_maps = sum(
-        is_map_item(item)
-        and item["published_file_id"] not in visual_by_id
-        for item in workshop_items
-    )
     manifest = {
         "schema_version": PUBLIC_SCHEMA_VERSION,
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
-        "source": "public-steam-workshop-http-and-anonymous-ugc",
+        "source": "public-steam-workshop-http-and-anonymous-map-payloads",
         "workshop_items": len(workshop_items),
-        "classified_maps": len(visual_features),
-        "maps_missing_visual_features": missing_visual_maps,
-        "maps_with_stale_visual_features": sum(
-            record.get("visual_stale", False) for record in visual_features
-        ),
-        "maps_classified_this_run": sum(
-            record.get("classification_state") == "classified"
-            for record in visual_features
-        ),
-        "maps_reused_this_run": sum(
-            record.get("classification_state") == "reused"
-            for record in visual_features
-        ),
-        "gallery_maps_known": len(gallery_results),
-        "gallery_maps_fetched_this_run": sum(
-            record.get("collection_state") == "fetched" for record in gallery_results
-        ),
-        "gallery_maps_stale": sum(
-            record.get("collection_state") in {"stale", "deferred"}
-            for record in gallery_results
-        ),
-        "gallery_images_known": sum(
-            len(record.get("gallery_urls", [])) for record in gallery_results
-        ),
-        "visual_images_classified": sum(
-            record.get("visual_image_count", 1) for record in visual_features
-        ),
-        "visual_images_classified_this_run": sum(
-            record.get("images_classified_this_run", 0) for record in visual_features
-        ),
         "map_dimensions_known": len(map_metadata_results),
         "map_dimensions_stale": sum(
             record.get("collection_state") == "stale" for record in map_metadata_results
@@ -168,21 +79,9 @@ def main() -> int:
             "forest_density" in record.get("classifications", {})
             for record in map_metadata_results
         ),
-        "visual_model": visual_features[0]["model"] if visual_features else None,
-        "visual_classifier_version": (
-            target_version if migration_complete else "mixed"
-        ),
-        "visual_migration_target_version": target_version,
-        "visual_migration_complete": migration_complete,
-        "visual_migration_maps_completed": len(map_ids) - len(migration_pending_ids),
-        "visual_migration_maps_remaining": len(migration_pending_ids),
-        "visual_migration_images_completed": sum(
-            record.get("visual_image_count", 1)
-            for record in visual_features
-            if record.get("classifier_version") == target_version
-        ),
-        "visual_migration_images_total": sum(
-            record.get("visual_image_count", 1) for record in visual_features
+        "map_water_known": sum(
+            "water" in record.get("classifications", {})
+            for record in map_metadata_results
         ),
         "files": {
             path.name: path.stat().st_size

@@ -1,4 +1,3 @@
-using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -13,18 +12,12 @@ if (options is null) {
 
 try {
   var outputPath = Path.GetFullPath(options.OutputPath);
-  var previewDirectory = Path.GetFullPath(options.PreviewDirectory);
   Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
-  if (!options.SkipPreviews) {
-    Directory.CreateDirectory(previewDirectory);
-  }
 
   var existingRecords = File.Exists(outputPath)
       ? ReadJsonLines(outputPath).ToDictionary(record => record.PublishedFileId)
       : new Dictionary<string, WorkshopRecord>();
   using var httpClient = CreateHttpClient();
-  var previewCache = new PreviewCache(
-      httpClient, previewDirectory, options.MaxPreviewCacheBytes, existingRecords);
   var records = new List<WorkshopRecord>();
   var seenIds = new HashSet<string>();
   var pendingDetailIds = new List<string>();
@@ -45,22 +38,20 @@ try {
     while (pendingDetailIds.Count >= DetailsBatchSize) {
       var batch = pendingDetailIds.Take(DetailsBatchSize).ToList();
       pendingDetailIds.RemoveRange(0, DetailsBatchSize);
-      records.AddRange(await QueryAndClassifyAsync(
-          httpClient, batch, options, previewCache));
+      records.AddRange(await QueryAndClassifyAsync(httpClient, batch, options));
     }
 
     pagesProcessed++;
     Console.WriteLine(
         $"Page {page}: {newIds.Count} IDs, {records.Count} detailed items, "
-            + $"{pendingDetailIds.Count} pending details, preview cache {previewCache.CacheBytes} bytes.");
+            + $"{pendingDetailIds.Count} pending details.");
     if (browsePage.IsLastPage) {
       break;
     }
   }
 
   if (pendingDetailIds.Count > 0) {
-    records.AddRange(await QueryAndClassifyAsync(
-        httpClient, pendingDetailIds, options, previewCache));
+    records.AddRange(await QueryAndClassifyAsync(httpClient, pendingDetailIds, options));
   }
 
   if (options.Append) {
@@ -69,7 +60,7 @@ try {
   records = records.GroupBy(record => record.PublishedFileId).Select(group => group.First())
       .OrderByDescending(record => record.UpdatedAtUtc).ToList();
   WriteJsonLines(outputPath, records);
-  WriteSummary(outputPath, records, totalMatching, options, previewCache.CacheBytes);
+  WriteSummary(outputPath, records, totalMatching);
   Console.WriteLine($"Wrote {records.Count} Workshop items to {outputPath}");
   return 0;
 }
@@ -148,25 +139,9 @@ static async Task<List<RawWorkshopRecord>> QueryDetailsAsync(
 }
 
 static async Task<List<WorkshopRecord>> QueryAndClassifyAsync(
-    HttpClient httpClient, IReadOnlyList<string> publishedFileIds, Options options, PreviewCache previewCache) {
+    HttpClient httpClient, IReadOnlyList<string> publishedFileIds, Options options) {
   var items = await QueryDetailsAsync(httpClient, publishedFileIds, options.DelayMilliseconds);
-  using var previewSemaphore = new SemaphoreSlim(options.PreviewConcurrency);
-  var itemTasks = items.Select(async item => {
-    var classified = Classify(item);
-    if (!options.SkipPreviews && !string.IsNullOrWhiteSpace(classified.PreviewUrl)) {
-      await previewSemaphore.WaitAsync();
-      try {
-        classified = classified with {
-          PreviewCachePath = await previewCache.GetAsync(classified, options.DelayMilliseconds),
-        };
-      }
-      finally {
-        previewSemaphore.Release();
-      }
-    }
-    return classified;
-  });
-  return [.. await Task.WhenAll(itemTasks)];
+  return items.Select(Classify).ToList();
 }
 
 static string GetString(JsonElement item, string property) {
@@ -203,7 +178,7 @@ static WorkshopRecord Classify(RawWorkshopRecord item) {
   return new WorkshopRecord(
       item.PublishedFileId, item.Title, item.Description, StripSteamMarkup(item.Description), item.CreatorSteamId,
       DateTimeOffset.FromUnixTimeSeconds(item.CreatedAt).UtcDateTime,
-      DateTimeOffset.FromUnixTimeSeconds(item.UpdatedAt).UtcDateTime, item.PreviewUrl, null, item.Tags,
+      DateTimeOffset.FromUnixTimeSeconds(item.UpdatedAt).UtcDateTime, item.PreviewUrl, item.Tags,
       item.VotesUp, item.VotesDown, item.Score, classification.PrimaryCategory, classification.Matches);
 }
 
@@ -234,16 +209,13 @@ static JsonSerializerOptions JsonOptions() {
   };
 }
 
-static void WriteSummary(
-    string outputPath, IReadOnlyList<WorkshopRecord> records, uint totalMatching, Options options, long previewCacheBytes) {
+static void WriteSummary(string outputPath, IReadOnlyList<WorkshopRecord> records, uint totalMatching) {
   var summary = new {
     generated_at_utc = DateTime.UtcNow,
     app_id = AppId,
     source = "public-http",
     collected_items = records.Count,
     steam_total_matching = totalMatching,
-    preview_cache_bytes = previewCacheBytes,
-    preview_cache_limit_bytes = options.MaxPreviewCacheBytes,
     primary_category_counts = records.GroupBy(record => record.PrimaryCategory)
         .OrderByDescending(group => group.Count()).ToDictionary(group => group.Key, group => group.Count()),
   };
@@ -252,102 +224,18 @@ static void WriteSummary(
       JsonSerializer.Serialize(summary, new JsonSerializerOptions { WriteIndented = true }));
 }
 
-sealed class PreviewCache {
-  readonly HttpClient _client;
-  readonly string _directory;
-  readonly long _limitBytes;
-  readonly IReadOnlyDictionary<string, WorkshopRecord> _existingRecords;
-  readonly object _cacheLock = new();
-  long _cacheBytes;
-
-  public PreviewCache(
-      HttpClient client, string directory, long limitBytes, IReadOnlyDictionary<string, WorkshopRecord> existingRecords) {
-    _client = client;
-    _directory = directory;
-    _limitBytes = limitBytes;
-    _existingRecords = existingRecords;
-    _cacheBytes = Directory.Exists(directory)
-        ? Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories).Sum(path => new FileInfo(path).Length)
-        : 0;
-  }
-
-  public long CacheBytes {
-    get {
-      lock (_cacheLock) {
-        return _cacheBytes;
-      }
-    }
-  }
-
-  public async Task<string> GetAsync(WorkshopRecord record, int delayMilliseconds) {
-    var relativePath = record.PublishedFileId + ".preview";
-    var path = Path.Combine(_directory, relativePath);
-    if (File.Exists(path)
-        && _existingRecords.TryGetValue(record.PublishedFileId, out var existing)
-        && string.Equals(existing.PreviewUrl, record.PreviewUrl, StringComparison.Ordinal)) {
-      return relativePath;
-    }
-
-    if (delayMilliseconds > 0) {
-      await Task.Delay(delayMilliseconds);
-    }
-    using var response = await _client.GetAsync(record.PreviewUrl, HttpCompletionOption.ResponseHeadersRead);
-    response.EnsureSuccessStatusCode();
-    var temporaryPath = path + ".tmp";
-    var previousLength = File.Exists(path) ? new FileInfo(path).Length : 0;
-    try {
-      await using var input = await response.Content.ReadAsStreamAsync();
-      await using var output = new FileStream(temporaryPath, FileMode.Create, FileAccess.Write, FileShare.None);
-      var buffer = new byte[81920];
-      long written = 0;
-      while (true) {
-        var read = await input.ReadAsync(buffer);
-        if (read == 0) {
-          break;
-        }
-        written += read;
-        await output.WriteAsync(buffer.AsMemory(0, read));
-      }
-      output.Close();
-      lock (_cacheLock) {
-        if (_cacheBytes - previousLength + written > _limitBytes) {
-          throw new InvalidOperationException(
-              $"Preview cache limit would be exceeded while downloading {record.PublishedFileId}. "
-                  + "Increase --max-preview-cache-bytes explicitly after reviewing disk usage.");
-        }
-        File.Move(temporaryPath, path, true);
-        _cacheBytes = _cacheBytes - previousLength + written;
-      }
-      return relativePath;
-    }
-    finally {
-      if (File.Exists(temporaryPath)) {
-        File.Delete(temporaryPath);
-      }
-    }
-  }
-}
-
 record Options(
-    string OutputPath, string PreviewDirectory, uint StartPage, uint MaxPages, bool Append, bool SkipPreviews,
-    long MaxPreviewCacheBytes, int DelayMilliseconds, int PreviewConcurrency) {
+    string OutputPath, uint StartPage, uint MaxPages, bool Append, int DelayMilliseconds) {
   public static Options? Parse(string[] args) {
     var output = Path.Combine(".tools", "workshop-index", "timberborn-workshop-bootstrap.jsonl");
-    var previews = Path.Combine(".tools", "workshop-index", "previews");
     uint startPage = 1;
     uint maxPages = 0;
     var append = false;
-    var skipPreviews = false;
-    long maxPreviewCacheBytes = 8_000_000_000;
     var delayMilliseconds = 150;
-    var previewConcurrency = 6;
     for (var index = 0; index < args.Length; index++) {
       switch (args[index]) {
         case "--output" when index + 1 < args.Length:
           output = args[++index];
-          break;
-        case "--preview-directory" when index + 1 < args.Length:
-          previews = args[++index];
           break;
         case "--max-pages" when index + 1 < args.Length && uint.TryParse(args[++index], out var parsed):
           maxPages = parsed;
@@ -355,20 +243,11 @@ record Options(
         case "--start-page" when index + 1 < args.Length && uint.TryParse(args[++index], out var parsed):
           startPage = parsed;
           break;
-        case "--max-preview-cache-bytes" when index + 1 < args.Length && long.TryParse(args[++index], out var parsed):
-          maxPreviewCacheBytes = parsed;
-          break;
         case "--delay-ms" when index + 1 < args.Length && int.TryParse(args[++index], out var parsed):
           delayMilliseconds = parsed;
           break;
-        case "--preview-concurrency" when index + 1 < args.Length && int.TryParse(args[++index], out var parsed):
-          previewConcurrency = parsed;
-          break;
         case "--append":
           append = true;
-          break;
-        case "--skip-previews":
-          skipPreviews = true;
           break;
         case "--help":
           PrintUsage();
@@ -379,20 +258,13 @@ record Options(
           return null;
       }
     }
-    if (previewConcurrency < 1 || previewConcurrency > 16) {
-      Console.Error.WriteLine("--preview-concurrency must be between 1 and 16.");
-      return null;
-    }
-    return new Options(
-        output, previews, startPage, maxPages, append, skipPreviews, maxPreviewCacheBytes, delayMilliseconds,
-        previewConcurrency);
+    return new Options(output, startPage, maxPages, append, delayMilliseconds);
   }
 
   static void PrintUsage() {
     Console.WriteLine(
-        "SteamWorkshopIndexer [--output <jsonl>] [--preview-directory <directory>] [--start-page <page>] "
-            + "[--max-pages <count>] [--append] [--skip-previews] [--max-preview-cache-bytes <bytes>] "
-            + "[--delay-ms <milliseconds>] [--preview-concurrency <1-16>]");
+        "SteamWorkshopIndexer [--output <jsonl>] [--start-page <page>] "
+            + "[--max-pages <count>] [--append] [--delay-ms <milliseconds>]");
   }
 }
 
@@ -402,5 +274,5 @@ record RawWorkshopRecord(
     string PreviewUrl, List<string> Tags, uint VotesUp, uint VotesDown, float Score);
 record WorkshopRecord(
     string PublishedFileId, string Title, string DescriptionRaw, string DescriptionPlain, string CreatorSteamId,
-    DateTime CreatedAtUtc, DateTime UpdatedAtUtc, string PreviewUrl, string? PreviewCachePath, List<string> Tags,
+    DateTime CreatedAtUtc, DateTime UpdatedAtUtc, string PreviewUrl, List<string> Tags,
     uint VotesUp, uint VotesDown, float Score, string PrimaryCategory, List<CategoryMatch> Categories);

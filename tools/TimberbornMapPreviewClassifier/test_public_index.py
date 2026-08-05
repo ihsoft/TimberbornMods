@@ -14,9 +14,7 @@ import build_public_index
 
 CANONICAL_DATA_FILES = {
     "workshop-items.jsonl.gz",
-    "map-gallery.jsonl.gz",
     "map-metadata.jsonl.gz",
-    "map-visual-features.jsonl.gz",
     "search-index.jsonl.gz",
 }
 
@@ -33,8 +31,6 @@ class PublicIndexContractTest(unittest.TestCase):
         with TemporaryDirectory() as temporary_directory:
             root = Path(temporary_directory)
             snapshot = root / "snapshot.jsonl"
-            visual_features = root / "visual-features.jsonl"
-            gallery_results = root / "gallery-results.jsonl"
             map_metadata = root / "map-metadata.jsonl"
             output = root / "public"
             write_json_lines(snapshot, [{
@@ -43,20 +39,6 @@ class PublicIndexContractTest(unittest.TestCase):
                 "tags": ["Map"],
                 "primary_category": "map",
                 "preview_url": "https://example.test/primary.jpg",
-            }])
-            write_json_lines(visual_features, [{
-                "published_file_id": "1",
-                "visual_scores": {"ruggedness": 0.75},
-                "visual_percentiles": {"ruggedness": 0.9},
-                "visual_labels": ["predominantly_mountainous"],
-                "visual_image_count": 2,
-                "model": "test-model",
-                "classifier_version": "test-classifier-v1",
-            }])
-            write_json_lines(gallery_results, [{
-                "published_file_id": "1",
-                "gallery_urls": ["https://example.test/gallery.jpg"],
-                "collection_state": "reused",
             }])
             write_json_lines(map_metadata, [{
                 "published_file_id": "1",
@@ -69,16 +51,19 @@ class PublicIndexContractTest(unittest.TestCase):
                         "coverage_ratio": 0.25,
                         "level": 2,
                     },
+                    "water": {
+                        "open_water_tiles": 8192,
+                        "open_water_ratio": 0.5,
+                        "lake_count": 1,
+                        "water_form": "lakes",
+                    },
                 },
                 "collection_state": "fetched",
             }])
             arguments = [
                 "build_public_index.py",
                 "--snapshot", str(snapshot),
-                "--visual-features", str(visual_features),
-                "--gallery-results", str(gallery_results),
                 "--map-metadata", str(map_metadata),
-                "--target-classifier-version", "test-classifier-v1",
                 "--output-directory", str(output),
             ]
 
@@ -86,9 +71,8 @@ class PublicIndexContractTest(unittest.TestCase):
                 self.assertEqual(0, build_public_index.main())
 
             manifest = json.loads((output / "manifest.json").read_text(encoding="utf-8"))
-            self.assertEqual(1, manifest["schema_version"])
+            self.assertEqual(2, manifest["schema_version"])
             self.assertIsInstance(manifest["schema_version"], int)
-            self.assertEqual("test-classifier-v1", manifest["visual_classifier_version"])
             self.assertEqual(CANONICAL_DATA_FILES, set(manifest["files"]))
 
             with gzip.open(output / "search-index.jsonl.gz", "rt", encoding="utf-8") as stream:
@@ -104,13 +88,11 @@ class PublicIndexContractTest(unittest.TestCase):
                 consumer_records[0]["map_classifications"]["forest_density"]["level"],
             )
             self.assertEqual(
-                ["https://example.test/gallery.jpg"],
-                consumer_records[0]["gallery_urls"],
+                "lakes",
+                consumer_records[0]["map_classifications"]["water"]["water_form"],
             )
-            self.assertEqual(
-                "test-classifier-v1",
-                consumer_records[0]["visual_classifier_version"],
-            )
+            self.assertNotIn("visual_scores", consumer_records[0])
+            self.assertNotIn("gallery_urls", consumer_records[0])
 
 
 if __name__ == "__main__":
