@@ -9,6 +9,15 @@
     <Compile Include="..\SteamWorkshopMapMetadataIndexer\MapArchiveAnalyzer.cs">
       <Link>MapArchiveAnalyzer.cs</Link>
     </Compile>
+    <Compile Include="..\SteamWorkshopMapMetadataIndexer\WaterMapDecoder.cs">
+      <Link>WaterMapDecoder.cs</Link>
+    </Compile>
+    <Compile Include="..\SteamWorkshopMapMetadataIndexer\WaterFeatureDiagnostics.cs">
+      <Link>WaterFeatureDiagnostics.cs</Link>
+    </Compile>
+    <Compile Include="..\SteamWorkshopMapMetadataIndexer\WaterFormClassifier.cs">
+      <Link>WaterFormClassifier.cs</Link>
+    </Compile>
     <Compile Include="..\..\TestSupport\Testing\Assert.cs">
       <Link>TestSupport\Assert.cs</Link>
     </Compile>

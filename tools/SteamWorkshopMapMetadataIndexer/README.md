@@ -21,10 +21,17 @@ To add another exact map criterion:
 3. Increment `MapArchiveAnalyzer.AnalysisVersion` so existing records are progressively backfilled.
 4. Add focused archive fixtures and document the public result fields.
 
-The initial `forest_density` classifier counts entities that yield `Log` and whose
+The `forest_density` classifier counts entities that yield `Log` and whose
 `LivingNaturalResource.IsDead` value is not `true`. Missing `IsDead` is the normal serialized form of a living tree.
 Coverage is the living-tree count divided by map width multiplied by map height. Levels `0` through `4` use the fixed
 bands `<5%`, `5–20%`, `20–35%`, `35–50%`, and `>50%`.
+
+The `water` classifier decodes serialized surface-water columns and excludes water below the highest terrain surface.
+It reports `open_water_tiles`, `open_water_ratio`, `lake_count`, and a searchable `water_form`: `none`, `rivers`,
+`lakes`, or `rivers_and_lakes`. Water form combines local surface-level segmentation, boundary throughput, flow
+coherence, shape, and the relative amount attributed to lake basins and river channels. It always chooses a concrete
+form; internal ambiguous diagnostic regions are not published as a search value. Consumers can derive a
+water-covered query directly from `open_water_ratio`, for example with a threshold greater than `0.4`.
 
 ## Output record
 

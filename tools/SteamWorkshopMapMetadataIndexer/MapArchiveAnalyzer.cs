@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 static class MapArchiveAnalyzer {
-  public const int AnalysisVersion = 1;
+  public const int AnalysisVersion = 2;
   const long MaxWorldJsonBytes = 250_000_000;
 
   static readonly IReadOnlyList<Func<IMapEntityClassifier>> ClassifierFactories = [
@@ -12,11 +12,16 @@ static class MapArchiveAnalyzer {
 
   public static MapArchiveAnalysis Analyze(ZipArchive archive) {
     var dimensions = ReadDimensions(archive);
+    using var world = ReadWorld(archive);
     var classifiers = ClassifierFactories.Select(factory => factory()).ToArray();
-    ScanEntities(archive, classifiers);
+    ScanEntities(world.RootElement, classifiers);
     var classifications = classifiers.ToDictionary(
         classifier => classifier.Key,
         classifier => classifier.BuildResult(dimensions));
+    classifications.Add(
+        WaterFormClassifier.FeatureKey,
+        JsonSerializer.SerializeToElement(
+            WaterFormClassifier.Analyze(world.RootElement, dimensions.Width, dimensions.Height)));
     return new MapArchiveAnalysis(dimensions.Width, dimensions.Height, classifications);
   }
 
@@ -36,7 +41,7 @@ static class MapArchiveAnalyzer {
     return dimensions;
   }
 
-  static void ScanEntities(ZipArchive archive, IReadOnlyCollection<IMapEntityClassifier> classifiers) {
+  static JsonDocument ReadWorld(ZipArchive archive) {
     var entry = archive.GetEntry("world.json")
         ?? throw new InvalidDataException("Map archive has no world.json entry.");
     if (entry.Length is < 2 or > MaxWorldJsonBytes) {
@@ -44,8 +49,11 @@ static class MapArchiveAnalyzer {
     }
 
     using var stream = entry.Open();
-    using var document = JsonDocument.Parse(stream);
-    if (!document.RootElement.TryGetProperty("Entities", out var entities)
+    return JsonDocument.Parse(stream);
+  }
+
+  static void ScanEntities(JsonElement world, IReadOnlyCollection<IMapEntityClassifier> classifiers) {
+    if (!world.TryGetProperty("Entities", out var entities)
         || entities.ValueKind != JsonValueKind.Array) {
       throw new InvalidDataException("Map world has no Entities array.");
     }
