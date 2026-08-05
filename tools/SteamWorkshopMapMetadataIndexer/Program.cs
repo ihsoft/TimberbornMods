@@ -12,10 +12,8 @@ var candidates = maps
     .OrderByDescending(map => ParseTimestamp(map.UpdatedAtUtc))
     .Take(options.MaxItems == 0 ? int.MaxValue : options.MaxItems)
     .ToList();
-var selectedIds = candidates.Select(map => map.PublishedFileId).ToHashSet();
 var outputById = maps
-    .Where(map => !selectedIds.Contains(map.PublishedFileId)
-        && previousById.ContainsKey(map.PublishedFileId))
+    .Where(map => previousById.ContainsKey(map.PublishedFileId))
     .ToDictionary(map => map.PublishedFileId, map => previousById[map.PublishedFileId]);
 
 if (candidates.Count > 0) {
@@ -53,7 +51,7 @@ if (candidates.Count > 0) {
 
       var map = candidates[index];
       try {
-        var analysis = DownloadAndAnalyzeMap(map.PublishedFileId, options);
+        var analysis = DownloadAndAnalyzeMapWithBusyRetry(map.PublishedFileId, options);
         outputById[map.PublishedFileId] = new MapMetadataRecord(
             map.PublishedFileId, map.UpdatedAtUtc, MapArchiveAnalyzer.AnalysisVersion,
             analysis.Width, analysis.Height, analysis.Classifications, "fetched", null);
@@ -84,6 +82,21 @@ Console.WriteLine(
     + $"complete {outputById.Values.Count(record => record.CollectionState != "stale")}.");
 return 0;
 
+static MapArchiveAnalysis DownloadAndAnalyzeMapWithBusyRetry(string publishedFileId, Options options) {
+  const int maxBusyRetries = 2;
+  var busyRetryDelay = TimeSpan.FromSeconds(10);
+  for (var attempt = 0; ; attempt++) {
+    try {
+      return DownloadAndAnalyzeMap(publishedFileId, options);
+    } catch (SteamPayloadBusyException) when (attempt < maxBusyRetries) {
+      Console.WriteLine(
+          $"Steam downloader busy for {publishedFileId}; retrying in {busyRetryDelay.TotalSeconds:0} seconds "
+          + $"({attempt + 1} / {maxBusyRetries}).");
+      Thread.Sleep(busyRetryDelay);
+    }
+  }
+}
+
 static MapArchiveAnalysis DownloadAndAnalyzeMap(string publishedFileId, Options options) {
   var itemId = new PublishedFileId_t(ulong.Parse(publishedFileId));
   var declaredSize = QueryDeclaredSize(itemId, options.RequestTimeout);
@@ -103,6 +116,9 @@ static MapArchiveAnalysis DownloadAndAnalyzeMap(string publishedFileId, Options 
     throw new InvalidOperationException("Steam rejected the anonymous Workshop download request.");
   }
   WaitForCallback(() => completed, "Workshop item download", options.RequestTimeout);
+  if (response.m_eResult == EResult.k_EResultBusy) {
+    throw new SteamPayloadBusyException();
+  }
   if (response.m_unAppID.m_AppId != appId || response.m_eResult != EResult.k_EResultOK) {
     throw new InvalidOperationException($"Workshop download returned {response.m_eResult}.");
   }
@@ -284,6 +300,8 @@ sealed record MapMetadataRecord(
 
 sealed class UnsupportedMapPayloadException(string message, Exception? innerException = null)
     : Exception(message, innerException);
+
+sealed class SteamPayloadBusyException() : Exception("Steam Workshop downloader is busy.");
 
 sealed record Options(
     string Snapshot,

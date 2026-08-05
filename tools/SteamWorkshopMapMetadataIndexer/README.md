@@ -10,6 +10,10 @@ sequential, and the first Steam/UGC request failure stops the pass before anothe
 whose archive or map format cannot be analyzed is recorded as `unsupported`, and processing continues with the next
 map. That result is retried only after the Workshop item or analysis version changes.
 
+The narrow transient `k_EResultBusy` download result is retried twice with a ten-second cooldown before it activates
+the circuit breaker. Other Steam/UGC failures are not broadly retried. If the pass stops early, previous records for
+selected but unprocessed maps remain unchanged in the checkpoint.
+
 ## Shared archive analysis
 
 Each selected `.timber` ZIP is downloaded and opened once. `MapArchiveAnalyzer` reads authoritative runtime dimensions
