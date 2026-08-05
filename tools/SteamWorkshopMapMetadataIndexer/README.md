@@ -6,12 +6,15 @@ process.
 
 The tool incrementally reuses records from `--previous-results`. A map is analyzed again when its Workshop update
 timestamp changes, its previous result is stale, or `MapArchiveAnalyzer.AnalysisVersion` increases. Steam requests are
-sequential, and the first failed payload stops the pass before another request is sent.
+sequential, and the first Steam/UGC request failure stops the pass before another request is sent. A downloaded payload
+whose archive or map format cannot be analyzed is recorded as `unsupported`, and processing continues with the next
+map. That result is retried only after the Workshop item or analysis version changes.
 
 ## Shared archive analysis
 
-Each selected `.timber` ZIP is downloaded and opened once. `MapArchiveAnalyzer` reads dimensions from
-`map_metadata.json`, then makes one pass through the `world.json` entity array. Registered `IMapEntityClassifier`
+Each selected `.timber` ZIP is downloaded and opened once. `MapArchiveAnalyzer` reads authoritative runtime dimensions
+from `world.json` under `Singletons.MapSize.Size`, falling back to `map_metadata.json` only for older payloads without
+that singleton. It then makes one pass through the `world.json` entity array. Registered `IMapEntityClassifier`
 instances observe that shared entity stream and independently emit values under the open `classifications` object.
 
 To add another exact map criterion:
@@ -45,7 +48,11 @@ map_width
 map_height
 classifications
 collection_state
+analysis_error
 ```
+
+`collection_state` is `fetched`, `stale`, or `unsupported`. Unsupported records have zero dimensions, no
+classifications, and a diagnostic `analysis_error`; consumers must not treat them as known map metadata.
 
 `tools/TimberbornMapPreviewClassifier/build_public_index.py` publishes classifications in merged search records as
 `map_classifications`. Consumers must tolerate additional classifier keys and result fields.

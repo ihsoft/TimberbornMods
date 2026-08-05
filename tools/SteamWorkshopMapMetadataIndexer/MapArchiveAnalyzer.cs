@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 static class MapArchiveAnalyzer {
-  public const int AnalysisVersion = 2;
+  public const int AnalysisVersion = 3;
   const long MaxWorldJsonBytes = 250_000_000;
 
   static readonly IReadOnlyList<Func<IMapEntityClassifier>> ClassifierFactories = [
@@ -11,8 +11,8 @@ static class MapArchiveAnalyzer {
   ];
 
   public static MapArchiveAnalysis Analyze(ZipArchive archive) {
-    var dimensions = ReadDimensions(archive);
     using var world = ReadWorld(archive);
+    var dimensions = ReadDimensions(world.RootElement, archive);
     var classifiers = ClassifierFactories.Select(factory => factory()).ToArray();
     ScanEntities(world.RootElement, classifiers);
     var classifications = classifiers.ToDictionary(
@@ -25,7 +25,18 @@ static class MapArchiveAnalyzer {
     return new MapArchiveAnalysis(dimensions.Width, dimensions.Height, classifications);
   }
 
-  static MapDimensions ReadDimensions(ZipArchive archive) {
+  static MapDimensions ReadDimensions(JsonElement world, ZipArchive archive) {
+    if (world.TryGetProperty("Singletons", out var singletons)
+        && singletons.TryGetProperty("MapSize", out var mapSize)
+        && mapSize.TryGetProperty("Size", out var size)
+        && size.TryGetProperty("X", out var widthElement)
+        && size.TryGetProperty("Y", out var heightElement)
+        && widthElement.TryGetInt32(out var width)
+        && heightElement.TryGetInt32(out var height)
+        && width > 0 && height > 0) {
+      return new MapDimensions(width, height);
+    }
+
     var entry = archive.GetEntry("map_metadata.json")
         ?? throw new InvalidDataException("Map archive has no map_metadata.json entry.");
     if (entry.Length is < 1 or > 65_536) {

@@ -30,6 +30,13 @@ Merged records retain public title, description, tags, author, timestamps, votes
 records may additionally contain `map_width`, `map_height`, `map_analysis_version`,
 `map_metadata_collection_state`, and `map_classifications`.
 
+`map_metadata_collection_state` may be `fetched`, `stale`, or `unsupported`. An unsupported record can expose
+`map_analysis_error` for diagnostics but does not expose dimensions or classifications. It is retried when its source
+Workshop timestamp or archive analysis version changes.
+
+Map dimensions come from the payload's runtime `world.json` map size. `map_metadata.json` is used only as a fallback
+for older payloads that do not serialize that runtime singleton.
+
 `map_classifications` is an open object. Consumers must tolerate future classifier keys and fields.
 
 The `forest_density` result contains `live_tree_count`, `coverage_ratio`, and an integer `level` from `0` through `4`.

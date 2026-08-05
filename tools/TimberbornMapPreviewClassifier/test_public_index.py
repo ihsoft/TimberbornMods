@@ -94,6 +94,41 @@ class PublicIndexContractTest(unittest.TestCase):
             self.assertNotIn("visual_scores", consumer_records[0])
             self.assertNotIn("gallery_urls", consumer_records[0])
 
+    def test_publishes_unsupported_state_without_fake_dimensions(self) -> None:
+        with TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            snapshot = root / "snapshot.jsonl"
+            map_metadata = root / "map-metadata.jsonl"
+            output = root / "public"
+            write_json_lines(snapshot, [{"published_file_id": "2", "tags": ["Map"]}])
+            write_json_lines(map_metadata, [{
+                "published_file_id": "2",
+                "analysis_version": 2,
+                "map_width": 0,
+                "map_height": 0,
+                "classifications": None,
+                "collection_state": "unsupported",
+                "analysis_error": "unknown terrain format",
+            }])
+
+            with mock.patch.object(sys, "argv", [
+                "build_public_index.py",
+                "--snapshot", str(snapshot),
+                "--map-metadata", str(map_metadata),
+                "--output-directory", str(output),
+            ]):
+                self.assertEqual(0, build_public_index.main())
+
+            manifest = json.loads((output / "manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(0, manifest["map_dimensions_known"])
+            self.assertEqual(1, manifest["map_metadata_unsupported"])
+            with gzip.open(output / "search-index.jsonl.gz", "rt", encoding="utf-8") as stream:
+                record = json.loads(next(stream))
+            self.assertEqual("unsupported", record["map_metadata_collection_state"])
+            self.assertEqual("unknown terrain format", record["map_analysis_error"])
+            self.assertNotIn("map_width", record)
+            self.assertNotIn("map_classifications", record)
+
 
 if __name__ == "__main__":
     unittest.main()

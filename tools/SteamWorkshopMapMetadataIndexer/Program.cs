@@ -56,9 +56,14 @@ if (candidates.Count > 0) {
         var analysis = DownloadAndAnalyzeMap(map.PublishedFileId, options);
         outputById[map.PublishedFileId] = new MapMetadataRecord(
             map.PublishedFileId, map.UpdatedAtUtc, MapArchiveAnalyzer.AnalysisVersion,
-            analysis.Width, analysis.Height, analysis.Classifications, "fetched");
+            analysis.Width, analysis.Height, analysis.Classifications, "fetched", null);
+      } catch (UnsupportedMapPayloadException exception) {
+        Console.Error.WriteLine($"Map payload unsupported for {map.PublishedFileId}: {exception.Message}");
+        outputById[map.PublishedFileId] = new MapMetadataRecord(
+            map.PublishedFileId, map.UpdatedAtUtc, MapArchiveAnalyzer.AnalysisVersion,
+            0, 0, null, "unsupported", exception.Message);
       } catch (Exception exception) {
-        Console.Error.WriteLine($"Map metadata download failed for {map.PublishedFileId}: {exception.Message}");
+        Console.Error.WriteLine($"Map payload request failed for {map.PublishedFileId}: {exception.Message}");
         var previous = previousById.GetValueOrDefault(map.PublishedFileId);
         if (previous is not null) {
           outputById[map.PublishedFileId] = previous with { CollectionState = "stale" };
@@ -83,7 +88,7 @@ static MapArchiveAnalysis DownloadAndAnalyzeMap(string publishedFileId, Options 
   var itemId = new PublishedFileId_t(ulong.Parse(publishedFileId));
   var declaredSize = QueryDeclaredSize(itemId, options.RequestTimeout);
   if (declaredSize > options.MaxDownloadBytes) {
-    throw new InvalidOperationException(
+    throw new UnsupportedMapPayloadException(
         $"Declared payload is {declaredSize} bytes; limit is {options.MaxDownloadBytes} bytes.");
   }
   var completed = false;
@@ -105,17 +110,22 @@ static MapArchiveAnalysis DownloadAndAnalyzeMap(string publishedFileId, Options 
     throw new InvalidOperationException("GetItemInstallInfo returned false after download.");
   }
   if (sizeOnDisk > options.MaxDownloadBytes) {
-    throw new InvalidOperationException(
+    throw new UnsupportedMapPayloadException(
         $"Downloaded payload is {sizeOnDisk} bytes; limit is {options.MaxDownloadBytes} bytes.");
   }
 
-  var mapFiles = Directory.EnumerateFiles(folder, "*.timber", SearchOption.AllDirectories).ToArray();
-  if (mapFiles.Length != 1) {
-    throw new InvalidDataException(
-        $"Downloaded payload for Workshop item {publishedFileId} contains {mapFiles.Length} .timber files; expected exactly one.");
+  try {
+    var mapFiles = Directory.EnumerateFiles(folder, "*.timber", SearchOption.AllDirectories).ToArray();
+    if (mapFiles.Length != 1) {
+      throw new InvalidDataException(
+          $"Payload contains {mapFiles.Length} .timber files; expected exactly one.");
+    }
+    using var archive = ZipFile.OpenRead(mapFiles[0]);
+    return MapArchiveAnalyzer.Analyze(archive);
+  } catch (Exception exception) when (exception is InvalidDataException or InvalidOperationException
+      or JsonException or IOException or UnauthorizedAccessException) {
+    throw new UnsupportedMapPayloadException(exception.Message, exception);
   }
-  using var archive = ZipFile.OpenRead(mapFiles[0]);
-  return MapArchiveAnalyzer.Analyze(archive);
 }
 
 static ulong QueryDeclaredSize(PublishedFileId_t publishedFileId, TimeSpan timeout) {
@@ -139,7 +149,8 @@ static ulong QueryDeclaredSize(PublishedFileId_t publishedFileId, TimeSpan timeo
       throw new InvalidOperationException($"Anonymous Workshop query failed: {response.m_eResult}.");
     }
     if (details.m_nFileSize < 0) {
-      throw new InvalidDataException($"Workshop declared an invalid payload size: {details.m_nFileSize}.");
+      throw new UnsupportedMapPayloadException(
+          $"Workshop declared an invalid payload size: {details.m_nFileSize}.");
     }
     return (ulong)details.m_nFileSize;
   } finally {
@@ -204,6 +215,12 @@ static string? GetOptionalString(JsonElement element, string propertyName) {
 }
 
 static bool NeedsRefresh(MapItem map, MapMetadataRecord? previous) {
+  if (previous is not null
+      && previous.CollectionState == "unsupported"
+      && previous.SourceUpdatedAtUtc == map.UpdatedAtUtc
+      && previous.AnalysisVersion == MapArchiveAnalyzer.AnalysisVersion) {
+    return false;
+  }
   return previous is null || previous.CollectionState == "stale"
       || previous.SourceUpdatedAtUtc != map.UpdatedAtUtc
       || previous.AnalysisVersion != MapArchiveAnalyzer.AnalysisVersion
@@ -262,7 +279,11 @@ sealed record MapMetadataRecord(
     [property: JsonPropertyName("map_width")] int MapWidth,
     [property: JsonPropertyName("map_height")] int MapHeight,
     [property: JsonPropertyName("classifications")] IReadOnlyDictionary<string, JsonElement>? Classifications,
-    [property: JsonPropertyName("collection_state")] string CollectionState);
+    [property: JsonPropertyName("collection_state")] string CollectionState,
+    [property: JsonPropertyName("analysis_error")] string? AnalysisError);
+
+sealed class UnsupportedMapPayloadException(string message, Exception? innerException = null)
+    : Exception(message, innerException);
 
 sealed record Options(
     string Snapshot,

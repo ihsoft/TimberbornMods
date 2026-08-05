@@ -55,11 +55,14 @@ def main() -> int:
         record = dict(item)
         map_metadata = map_metadata_by_id.get(item["published_file_id"])
         if map_metadata:
-            record["map_width"] = map_metadata["map_width"]
-            record["map_height"] = map_metadata["map_height"]
             record["map_metadata_collection_state"] = map_metadata.get("collection_state")
             record["map_analysis_version"] = map_metadata.get("analysis_version")
-            if "classifications" in map_metadata:
+            if map_metadata.get("analysis_error"):
+                record["map_analysis_error"] = map_metadata["analysis_error"]
+            if map_metadata.get("map_width", 0) > 0 and map_metadata.get("map_height", 0) > 0:
+                record["map_width"] = map_metadata["map_width"]
+                record["map_height"] = map_metadata["map_height"]
+            if isinstance(map_metadata.get("classifications"), dict):
                 record["map_classifications"] = map_metadata["classifications"]
         search_index.append(record)
 
@@ -71,16 +74,22 @@ def main() -> int:
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "source": "public-steam-workshop-http-and-anonymous-map-payloads",
         "workshop_items": len(workshop_items),
-        "map_dimensions_known": len(map_metadata_results),
+        "map_dimensions_known": sum(
+            record.get("map_width", 0) > 0 and record.get("map_height", 0) > 0
+            for record in map_metadata_results
+        ),
         "map_dimensions_stale": sum(
             record.get("collection_state") == "stale" for record in map_metadata_results
         ),
+        "map_metadata_unsupported": sum(
+            record.get("collection_state") == "unsupported" for record in map_metadata_results
+        ),
         "map_forest_density_known": sum(
-            "forest_density" in record.get("classifications", {})
+            "forest_density" in (record.get("classifications") or {})
             for record in map_metadata_results
         ),
         "map_water_known": sum(
-            "water" in record.get("classifications", {})
+            "water" in (record.get("classifications") or {})
             for record in map_metadata_results
         ),
         "files": {

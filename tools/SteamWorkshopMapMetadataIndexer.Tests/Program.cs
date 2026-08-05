@@ -4,6 +4,7 @@ using System.Text;
 static class Program {
   static readonly List<(string Name, Action Test)> Tests = [
       ("Archive analysis counts only living log trees", CountsOnlyLivingLogTrees),
+      ("Archive analysis trusts runtime map size over stale metadata", TrustsRuntimeMapSize),
       ("Forest levels use five evenly spaced bands", UsesExpectedForestBands),
       ("Water form always emits a searchable concrete value", EmitsConcreteWaterForms),
       ("Water decoder reads legacy heights and excludes buried columns", DecodesLegacySurfaceWater),
@@ -59,6 +60,28 @@ static class Program {
     Assert.Equal(3, ForestDensityClassifier.GetLevel(0.35));
     Assert.Equal(3, ForestDensityClassifier.GetLevel(0.50));
     Assert.Equal(4, ForestDensityClassifier.GetLevel(0.500001));
+  }
+
+  static void TrustsRuntimeMapSize() {
+    using var archiveStream = new MemoryStream();
+    using (var archive = new ZipArchive(archiveStream, ZipArchiveMode.Create, true)) {
+      WriteEntry(archive, "map_metadata.json", """{"Width":2,"Height":2}""");
+      var terrain = string.Join(' ', Enumerable.Repeat("0", 6));
+      var water = string.Join(' ', Enumerable.Repeat("0", 6));
+      var worldJson = """
+          {"Entities":[],"Singletons":{"MapSize":{"Size":{"X":3,"Y":2}},
+          "TerrainMap":{"Heights":{"Array":"__TERRAIN__"}},
+          "WaterMapNew":{"Levels":1,"WaterColumns":{"Array":"__WATER__"}}}}
+          """.Replace("__TERRAIN__", terrain).Replace("__WATER__", water);
+      WriteEntry(archive, "world.json", worldJson);
+    }
+    archiveStream.Position = 0;
+
+    using var archiveToRead = new ZipArchive(archiveStream, ZipArchiveMode.Read);
+    var analysis = MapArchiveAnalyzer.Analyze(archiveToRead);
+
+    Assert.Equal(3, analysis.Width);
+    Assert.Equal(2, analysis.Height);
   }
 
   static void EmitsConcreteWaterForms() {
