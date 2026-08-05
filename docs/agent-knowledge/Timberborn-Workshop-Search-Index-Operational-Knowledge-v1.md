@@ -10,21 +10,25 @@ commands and exact record fields belong in the closest tool README and the publi
 
 ## System Boundary
 
-The production pipeline has four distinct stages:
+The production pipeline has five distinct stages:
 
 1. Build a complete anonymous HTTP snapshot of all publicly discoverable Timberborn Workshop item kinds.
 2. Resume and refresh public gallery URLs only for records classified as maps, using an anonymous Steam game-server UGC
    session.
-3. Reuse or calculate per-image visual scores, then recompute map aggregates and corpus-relative percentiles.
-4. Merge and publish compact versioned artifacts through GitHub Pages.
+3. Resume and inspect a bounded set of public map payloads for exact content-derived map metadata, using an anonymous
+   Steam game-server UGC session.
+4. Reuse or calculate per-image visual scores, then recompute map aggregates and corpus-relative percentiles.
+5. Merge and publish compact versioned artifacts through GitHub Pages.
 
 Preserve these scope boundaries:
 
 - metadata covers all discovered item kinds;
-- gallery collection and visual classification cover maps only;
+- gallery collection, payload inspection, and visual classification cover maps only;
 - non-map search uses metadata, tags, and coarse category evidence, not visual features;
-- public image URLs are evidence inputs, while Workshop package contents are outside this pipeline;
+- public image URLs are evidence inputs;
+- Workshop package contents are inspected only by the reviewed bounded map-payload stage;
 - downloaded images are transient classifier inputs and are not part of the published corpus.
+- downloaded map payloads are transient exact-metadata inputs and are not part of the published corpus.
 
 Titles, descriptions, tags, categories, visual labels, and similarity scores are evidence for discovery. They are not
 ground truth for map terrain, geometry, compatibility, or item behavior.
@@ -34,13 +38,18 @@ ground truth for map terrain, geometry, compatibility, or item behavior.
 The recurring pipeline must remain runnable on a clean GitHub-hosted runner without a Steam account, Steam login, API
 key, repository secret, local Steam client, or Timberborn process.
 
-The gallery indexer is an intentional anonymous `SteamGameServerUGC` path. Do not replace it with authenticated
-Steam-client access merely to obtain more data or reuse a familiar repository CLI pattern. Any proposal to introduce
-account-bound access, credentials, package downloads, or a game launch is an architecture and security change that
-requires explicit user approval after the security and operations trade-offs are documented.
+The gallery indexer and map metadata indexer are intentional anonymous `SteamGameServerUGC` paths. Do not replace them
+with authenticated Steam-client access merely to obtain more data or reuse a familiar repository CLI pattern. Any
+proposal to introduce account-bound access, credentials, a game launch, or package downloads outside the reviewed map
+metadata stage is an architecture and security change that requires explicit user approval after the security and
+operations trade-offs are documented.
 
-Read-only access is part of the contract. Neither metadata nor gallery collection may subscribe to items, mutate
-Workshop state, or download Workshop package contents.
+Read-only access is part of the contract. Metadata and gallery collection must not subscribe to items, mutate Workshop
+state, or download Workshop package contents. `SteamWorkshopMapMetadataIndexer` is the narrow exception: it may
+sequentially download one public Map-tagged payload per selected item, within workflow size, item, timeout, and time
+budgets, to read exact map metadata and classifications. It must remain resumable from previous results, preserve stale
+records when a refreshed item cannot be fetched, stop the pass after the first failed payload request, and avoid
+publishing downloaded payload contents.
 
 ## Snapshot And Incremental Ownership
 
@@ -59,8 +68,8 @@ classification version, coverage, and stale state so consumers can judge its qua
 
 Treat the limits configured in the production and manual-backfill workflows as operational load and failure controls,
 not as convenient performance knobs. This includes request batch sizes, sequential UGC behavior, daily and backfill
-budgets, delays, image concurrency, refresh age, per-map image count, per-image size, retry behavior, and the public
-artifact ceiling.
+budgets, delays, payload item budgets, payload size caps, payload timeouts, image concurrency, refresh age, per-map image
+count, per-image size, retry behavior, and the public artifact ceiling.
 
 Do not increase those limits, shorten the refresh cadence, add broad retries, or classify additional item kinds merely
 to finish a bootstrap faster. First identify which bounded resource is insufficient, estimate the additional Steam,
