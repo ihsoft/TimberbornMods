@@ -113,15 +113,15 @@ static (MapArchiveAnalysis Analysis, bool Downloaded) ReadAndAnalyzeMapWithTrans
   if (cachedPayload is not null) {
     return (AnalyzePayload(new MemoryStream(cachedPayload, writable: false)), false);
   }
-  const int maxTransientRetries = 2;
-  var retryDelay = TimeSpan.FromSeconds(10);
+  var retryDelays = new[] { TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(40) };
   for (var attempt = 0; ; attempt++) {
     try {
       return (DownloadAndAnalyzeMap(map, options, payloadCache), true);
-    } catch (SteamPayloadTransientException exception) when (attempt < maxTransientRetries) {
+    } catch (SteamPayloadTransientException exception) when (attempt < retryDelays.Length) {
+      var retryDelay = retryDelays[attempt];
       Console.WriteLine(
           $"Steam request returned {exception.Result} for {map.PublishedFileId}; "
-          + $"retrying in {retryDelay.TotalSeconds:0} seconds ({attempt + 1} / {maxTransientRetries}).");
+          + $"retrying in {retryDelay.TotalSeconds:0} seconds ({attempt + 1} / {retryDelays.Length}).");
       Thread.Sleep(retryDelay);
     }
   }
