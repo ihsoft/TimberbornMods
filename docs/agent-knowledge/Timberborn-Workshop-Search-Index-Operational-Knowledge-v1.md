@@ -48,7 +48,7 @@ download preview or gallery images, or download Workshop package contents. `Stea
 narrow exception for package payloads: it may sequentially download one public Map-tagged payload per selected item,
 within workflow size, item, timeout, and time budgets, to read exact map metadata and classifications. It must remain
 resumable from previous results, preserve stale records when a refreshed item cannot be fetched, stop the pass after the
-first failed payload request, and avoid publishing downloaded payload contents.
+first non-retried or unrecovered payload failure, and avoid publishing downloaded payload contents.
 
 ## Snapshot And Incremental Ownership
 
@@ -63,6 +63,10 @@ or unknown map records within the configured budget, and refresh records when th
 Do not confuse reuse with permanence. A reused exact map metadata record still carries its source identity, analysis
 version, and collection state so consumers can judge its quality.
 
+When a payload pass stops early, preserve previous records for every selected-but-unprocessed map unchanged in the
+checkpoint/output. An early stop must not shrink the published corpus merely because a refreshed item was selected but
+not reached during the current run.
+
 ## Steam And Resource Safety Controls
 
 Treat the limits configured in the production and manual-backfill workflows as operational load and failure controls,
@@ -73,8 +77,10 @@ Do not increase those limits, shorten the refresh cadence, add broad retries, or
 to finish a bootstrap faster. First identify which bounded resource is insufficient, estimate the additional Steam,
 network, runner, and Pages load, and validate the new boundary through a manual GitHub-hosted run.
 
-Keep Steam UGC payload requests sequential. After a failed payload request, stop before sending another one. Preserve
-the previous usable result as stale when the current workflow supports that fallback.
+Keep Steam UGC payload requests sequential. Broad retries remain prohibited. The current narrow exception is
+`k_EResultBusy`: retry it only twice with a 10-second cooldown before activating the payload circuit breaker. Other
+Steam/UGC failures still stop the pass before another payload request is sent. Preserve the previous usable result as
+stale when the current workflow supports that fallback.
 
 The workflow files are authoritative for the current numeric limits. When a reviewed limit changes, update nearby
 technical documentation in the same change; do not maintain a second independent table of numbers here.
