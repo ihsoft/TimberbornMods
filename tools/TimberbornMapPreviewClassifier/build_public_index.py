@@ -72,7 +72,7 @@ def main() -> int:
     manifest = {
         "schema_version": PUBLIC_SCHEMA_VERSION,
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
-        "source": "public-steam-workshop-http-and-anonymous-map-payloads",
+        "source": "anonymous-steam-workshop-metadata-and-map-payloads",
         "workshop_items": len(workshop_items),
         "map_dimensions_known": sum(
             record.get("map_width", 0) > 0 and record.get("map_height", 0) > 0

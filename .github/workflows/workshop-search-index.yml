@@ -40,24 +40,6 @@ jobs:
       - name: Build anonymous Workshop map metadata indexer
         run: dotnet build tools/SteamWorkshopMapMetadataIndexer/SteamWorkshopMapMetadataIndexer.csproj -c Release
 
-      - name: Collect public Workshop metadata
-        run: >-
-          dotnet tools/SteamWorkshopIndexer/bin/Release/net8.0/SteamWorkshopIndexer.dll
-          --output .work/workshop-items.jsonl
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
-
-      - name: Download previous incremental data
-        run: |
-          site="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}"
-          curl --fail --location --retry 3 \
-            --output .work/previous-map-metadata.jsonl.gz \
-            "$site/map-metadata.jsonl.gz" \
-            || rm -f .work/previous-map-metadata.jsonl.gz
-
       - name: Install anonymous Steam game-server runtime
         run: |
           mkdir -p "$RUNNER_TEMP/steamcmd" "$HOME/.steam/sdk64"
@@ -96,6 +78,28 @@ jobs:
             > "$RUNNER_TEMP/steamcmd/steamapps/libraryfolders.vdf"
           cp "$RUNNER_TEMP/steamcmd/linux64/steamclient.so" "$HOME/.steam/sdk64/steamclient.so"
           echo "LD_LIBRARY_PATH=$RUNNER_TEMP/steamcmd/linux64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
+
+      - name: Collect public Workshop metadata
+        env:
+          SteamAppId: "1062090"
+          SteamGameId: "1062090"
+        working-directory: ${{ runner.temp }}/steamcmd
+        run: >-
+          dotnet $GITHUB_WORKSPACE/tools/SteamWorkshopIndexer/bin/Release/net8.0/SteamWorkshopIndexer.dll
+          --output $GITHUB_WORKSPACE/.work/workshop-items.jsonl
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Download previous incremental data
+        run: |
+          site="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}"
+          curl --fail --location --retry 3 \
+            --output .work/previous-map-metadata.jsonl.gz \
+            "$site/map-metadata.jsonl.gz" \
+            || rm -f .work/previous-map-metadata.jsonl.gz
 
       - name: Collect exact map features from anonymous payloads
         env:
