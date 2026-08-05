@@ -59,6 +59,10 @@ yield logs and whose `LivingNaturalResource.IsDead` value is not `true`, then di
 multiplied by `map_height`. Its fixed bands are `<5%`, `5–20%`, `20–35%`, `35–50%`, and `>50%`. Consumers must tolerate
 unknown future classifier keys and fields.
 
+The `water` result contains `open_water_tiles`, `open_water_ratio`, `lake_count`, and `water_form`. The form is one of
+`none`, `rivers`, `lakes`, or `rivers_and_lakes`. Consumers can derive water-covered searches directly from
+`open_water_ratio`, such as a threshold greater than `0.4`.
+
 ## Interpreting visual criteria
 
 Visual scores are CLIP similarity-derived ranking evidence, not probabilities and not verified map geometry. Percentiles
@@ -69,24 +73,25 @@ The median describes what predominantly characterizes the available images. `max
 only part of a gallery, while `spread` indicates disagreement across images. Labels are thresholded discovery aids and
 must not be presented as proof of exact counts, dimensions, resources, hazards, or gameplay behavior.
 
-Schema version 1 publishes these visual feature keys:
+Current visual-classifier records publish these feature keys:
 
 - `ruggedness`
 - `canyonness`
-- `water_dominance`
 - `islandness`
-- `forest_density`
 - `artificial_layout`
+
+Older records may additionally retain the legacy `water_dominance` and `forest_density` keys. Consumers may continue
+to deserialize them, but must not expect them on newly classified images.
 
 It may publish these labels:
 
 - `predominantly_mountainous`
 - `predominantly_flat`
 - `canyon_or_narrow_valley`
-- `water_dominated`
 - `islands`
-- `densely_forested`
 - `artificial_layout`
+
+Older records may likewise retain the legacy `water_dominated` and `densely_forested` labels.
 
 These lists are not closed enums for consumers. Future additive criteria and labels may appear without a schema-major
 change.

@@ -18,21 +18,8 @@ from urllib.request import Request, urlopen
 
 from workshop_records import is_map_item
 
-CLASSIFIER_VERSION = "clip-prompts-v5-absolute-levels"
+CLASSIFIER_VERSION = "clip-prompts-v6-terrain-only"
 LEGACY_CLASSIFIER_VERSIONS = set()
-MOIST_SOIL_WEIGHT = 0.75
-MOIST_SOIL_PROMPTS = {
-    "positive": [
-        "a large proportion of this Timberborn map is green irrigated moist soil",
-        "an isometric map with extensive bright green watered ground relative to its total area",
-        "a map landscape containing a high density of green fertile soil supplied with water",
-    ],
-    "negative": [
-        "a Timberborn map dominated by dry brown barren soil",
-        "an isometric map with almost no green irrigated or moist ground",
-        "a dry map landscape containing a very low density of green watered soil",
-    ],
-}
 FEATURE_PROMPTS = {
     "ruggedness": {
         "positive": [
@@ -58,18 +45,6 @@ FEATURE_PROMPTS = {
             "a landscape made of wide open terrain",
         ],
     },
-    "water_dominance": {
-        "positive": [
-            "a Timberborn map dominated by large rivers lakes and water",
-            "an isometric strategy game map with most of its area covered by water",
-            "a wet landscape with extensive waterways",
-        ],
-        "negative": [
-            "a dry Timberborn map with very little visible water",
-            "an isometric strategy game map dominated by dry land",
-            "an arid landscape with few waterways",
-        ],
-    },
     "islandness": {
         "positive": [
             "a Timberborn map made of islands surrounded by water",
@@ -80,18 +55,6 @@ FEATURE_PROMPTS = {
             "a continuous mainland landscape without islands",
             "a strategy game map made of one connected landmass",
             "an inland terrain map",
-        ],
-    },
-    "forest_density": {
-        "positive": [
-            "a Timberborn map with a high density of living green trees relative to its total area",
-            "an isometric strategy game map with many healthy green trees across the map",
-            "a map landscape containing dense groups of living green trees",
-        ],
-        "negative": [
-            "a Timberborn map with no living green trees",
-            "an isometric strategy game map containing only dead dry trees and no green forest",
-            "a map landscape with very low green tree density relative to its total area",
         ],
     },
     "artificial_layout": {
@@ -108,21 +71,16 @@ FEATURE_PROMPTS = {
     },
 }
 
-# Levels are absolute classifier outputs, not corpus ranks. Water and forest
-# thresholds were fitted to human labels. The other thresholds freeze the five
-# buckets of the final v2 corpus so existing maps do not change merely because
-# more maps are indexed.
+# Levels are absolute classifier outputs, not corpus ranks. Thresholds freeze
+# the five buckets of the final v2 corpus so existing maps do not change merely
+# because more maps are indexed.
 FEATURE_LEVEL_THRESHOLDS = {
     "ruggedness": (-0.018964573740959167, -0.012609973549842834,
                    -0.007694557309150696, -0.002473115921020508),
     "canyonness": (-0.0029955506324768066, 0.006061181426048279,
                    0.012848049402236938, 0.019254907965660095),
-    "water_dominance": (-0.06195161077711317, -0.05205262742108769,
-                        -0.04278455053766568, -0.028576136670178838),
     "islandness": (-0.011768221855163574, -0.007593408226966858,
                    -0.0042498111724853516, -0.0002329796552658081),
-    "forest_density": (-0.030836759135127068, -0.019454829394817352,
-                       -0.019371796399354935, -0.013361547142267227),
     "artificial_layout": (-0.015195921063423157, -0.006883591413497925,
                           0.0017065554857254028, 0.0128001868724823),
 }
@@ -403,55 +361,6 @@ def build_text_prototype_pair(
     return feature_prototypes[0], feature_prototypes[1]
 
 
-def quadrant_boxes(width: int, height: int) -> tuple[tuple[int, int, int, int], ...]:
-    return grid_boxes(width, height, 2)
-
-
-def grid_boxes(width: int, height: int, grid_size: int) -> tuple[tuple[int, int, int, int], ...]:
-    if grid_size < 1:
-        raise ValueError("grid_size must be positive")
-    return tuple(
-        (
-            width * column // grid_size,
-            height * row // grid_size,
-            width * (column + 1) // grid_size,
-            height * (row + 1) // grid_size,
-        )
-        for row in range(grid_size)
-        for column in range(grid_size)
-    )
-
-
-def score_grid_features(
-    images: list[Image.Image], model: CLIPModel, processor: CLIPProcessor,
-    prototypes: dict[str, tuple[torch.Tensor, torch.Tensor]], batch_size: int,
-    grid_size: int,
-) -> dict[str, list[float]]:
-    crops = [
-        image.crop(box)
-        for image in images
-        for box in grid_boxes(*image.size, grid_size)
-    ]
-    crop_scores = {feature: [] for feature in prototypes}
-    for batch in chunks(crops, batch_size):
-        inputs = processor(images=batch, return_tensors="pt")
-        with torch.inference_mode():
-            embeddings = normalized(model.get_image_features(**inputs))
-        for feature, (positive, negative) in prototypes.items():
-            crop_scores[feature].extend(
-                float(embedding @ positive - embedding @ negative)
-                for embedding in embeddings
-            )
-    crops_per_image = grid_size * grid_size
-    return {
-        feature: [
-            fmean(scores[offset : offset + crops_per_image])
-            for offset in range(0, len(scores), crops_per_image)
-        ]
-        for feature, scores in crop_scores.items()
-    }
-
-
 def score_images(
     images_to_classify: list[dict],
     model: CLIPModel,
@@ -463,7 +372,6 @@ def score_images(
     time_budget_seconds: int = 0,
 ) -> tuple[list[dict], bool]:
     prototypes = build_text_prototypes(model, processor)
-    moist_soil_prototype = build_text_prototype_pair(model, processor, MOIST_SOIL_PROMPTS)
     results = []
     deadline = time.monotonic() + time_budget_seconds if time_budget_seconds else None
     stopped_early = False
@@ -508,29 +416,10 @@ def score_images(
         inputs = processor(images=images, return_tensors="pt")
         with torch.inference_mode():
             image_embeddings = normalized(model.get_image_features(**inputs))
-        forest_scores = score_grid_features(
-            images, model, processor, {"forest_density": prototypes["forest_density"]}, batch_size, 2
-        )["forest_density"]
-        water_scores = score_grid_features(
-            images,
-            model,
-            processor,
-            {
-                "free_water": prototypes["water_dominance"],
-                "moist_soil": moist_soil_prototype,
-            },
-            batch_size,
-            3,
-        )
-        for index, (item, embedding, forest_score) in enumerate(zip(valid, image_embeddings, forest_scores)):
+        for item, embedding in zip(valid, image_embeddings):
             scores = {}
             for feature, (positive, negative) in prototypes.items():
                 scores[feature] = float(embedding @ positive - embedding @ negative)
-            scores["forest_density"] = forest_score
-            scores["water_dominance"] = (
-                water_scores["free_water"][index]
-                + MOIST_SOIL_WEIGHT * water_scores["moist_soil"][index]
-            )
             results.append(
                 {
                     "published_file_id": item["published_file_id"],
@@ -637,12 +526,8 @@ def add_levels_and_labels(results: list[dict]) -> None:
             labels.append("predominantly_flat")
         if scores["canyonness"] >= FEATURE_LABEL_THRESHOLDS["canyonness"]:
             labels.append("canyon_or_narrow_valley")
-        if levels["water_dominance"] == 4:
-            labels.append("water_dominated")
         if scores["islandness"] >= FEATURE_LABEL_THRESHOLDS["islandness"]:
             labels.append("islands")
-        if levels["forest_density"] == 4:
-            labels.append("densely_forested")
         if scores["artificial_layout"] >= FEATURE_LABEL_THRESHOLDS["artificial_layout"]:
             labels.append("artificial_layout")
         result["visual_labels"] = labels

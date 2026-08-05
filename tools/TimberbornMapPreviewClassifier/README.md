@@ -8,23 +8,15 @@ The classifier uses CLIP prompt pairs to produce relative visual scores for:
 
 - rugged or mountainous terrain;
 - canyons and narrow valleys;
-- water-dominated maps;
 - islands;
-- living green-tree density relative to total map area (dead or dry trees are excluded);
 - artificial or geometric layouts.
 
 Raw CLIP similarities are not probabilities. Each feature uses four fixed score thresholds to produce an absolute
 level from `0` through `4`. A map's level therefore depends only on its own previews and the classifier version; adding
-other maps to the index cannot change it. Water and forest thresholds are fitted to human labels. Thresholds for the
-remaining features freeze the final five score buckets of the v2 corpus until those features receive human calibration.
-
-Forest density is scored from the mean of four equal-area preview quadrants so that small tree groups are not lost when
-a full-map image is reduced to CLIP input size. Other terrain features continue to use the complete preview image.
-
-Water availability is scored on a 3-by-3 preview grid. The existing rivers-and-lakes CLIP signal represents free blue
-water, while a separate irrigated-green-soil signal contributes with weight `0.75`. Both signals are averaged over
-equal-area regions before combination, so the result measures presence relative to total map area rather than an
-absolute number of visible tiles.
+other maps to the index cannot change it. Thresholds freeze the final five score buckets of the v2 corpus until those
+features receive human calibration. Preview-derived `forest_density` and `water_dominance` are legacy fields: new
+visual classifications no longer compute them because exact payload-derived classifiers supersede them. Existing
+public fields and calibration utilities remain for compatibility and historical analysis.
 
 `normalize_map_preview.py` is an experimental diagnostic, not part of the published classifier pipeline. It requires
 `requirements-experiments.txt`. Edge-aware masking can remove border-connected sky in unusual previews such as
@@ -32,7 +24,7 @@ absolute number of visible tiles.
 perspective rectification all reduced threshold stability. Perspective normalization is therefore deliberately not
 applied during production classification.
 
-## Forest calibration set
+## Legacy forest and water calibration sets
 
 Create a local, human-labeled reference set without manually searching Workshop maps:
 
@@ -40,7 +32,8 @@ Create a local, human-labeled reference set without manually searching Workshop 
 python tools/TimberbornMapPreviewClassifier/create_forest_calibration_set.py
 ```
 
-The script reads the current published index, selects 50 maps deterministically across the full forest-score range,
+These utilities describe the retired preview-derived signals and are not part of current production classification.
+The forest script reads a compatible published index, selects 50 maps deterministically across the full score range,
 includes Workshop item `3619540066` (`4 Point`) as a known false-negative candidate, downloads the selected primary
 previews, and writes the ignored local review page to:
 
@@ -133,14 +126,15 @@ The workflow uses no Steam account, API key, repository secret, or game process.
 
 The workflow also downloads a bounded number of map payloads through an anonymous Steam game-server session. A single
 archive analysis reads exact dimensions from `map_metadata.json` and feeds the entities in `world.json` to registered
-content classifiers. `map-metadata.jsonl.gz` currently retains dimensions plus exact initial living-tree count,
-tree-to-map-area ratio, and a fixed five-level forest-density classification. Adding another content classifier extends
-this shared entity scan instead of introducing another Workshop download or map scanner. Records are reused until the
+content classifiers. `map-metadata.jsonl.gz` retains dimensions plus exact initial living-tree and open-water
+classifications. Adding another content classifier extends this shared archive analysis instead of introducing another
+Workshop download or map scanner. Records are reused until the
 Workshop item's update timestamp or the map-analysis version changes, so scheduled runs progressively backfill new
 classifications without repeatedly downloading already complete maps.
 
-The content-derived forest classification should be preferred over the legacy preview-derived `forest_density` signal
-when it is available. The visual value remains in older and partially backfilled records for compatibility.
+Content-derived forest and water classifications replace the legacy preview-derived `forest_density` and
+`water_dominance` signals. The visual values may remain in older or partially migrated records for compatibility, but
+the current visual classifier does not generate them.
 
 Frontend and other data consumers should use the versioned contract in
 [`PUBLIC-DATA-CONTRACT.md`](PUBLIC-DATA-CONTRACT.md).
