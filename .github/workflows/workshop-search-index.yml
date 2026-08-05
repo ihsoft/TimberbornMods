@@ -14,6 +14,7 @@ on:
 
 permissions:
   contents: read
+  packages: write
   pages: write
   id-token: write
 
@@ -101,10 +102,19 @@ jobs:
             "$site/map-metadata.jsonl.gz" \
             || rm -f .work/previous-map-metadata.jsonl.gz
 
+      - name: Install ORAS
+        uses: oras-project/setup-oras@v1
+
+      - name: Log in to GitHub Container Registry
+        env:
+          GHCR_TOKEN: ${{ github.token }}
+        run: echo "$GHCR_TOKEN" | oras login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+
       - name: Collect exact map features from anonymous payloads
         env:
           SteamAppId: "1062090"
           SteamGameId: "1062090"
+          MAP_PAYLOAD_CACHE_OCI_REPOSITORY: ghcr.io/ihsoft/timberborn-workshop-payload-cache
         working-directory: ${{ runner.temp }}/steamcmd
         run: >-
           dotnet $GITHUB_WORKSPACE/tools/SteamWorkshopMapMetadataIndexer/bin/Release/net8.0/SteamWorkshopMapMetadataIndexer.dll

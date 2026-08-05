@@ -14,6 +14,31 @@ The narrow transient `k_EResultBusy` and `k_EResultNoConnection` request results
 cooldown before they activate the circuit breaker. Other Steam/UGC failures are not broadly retried. If the pass stops
 early, previous records for selected but unprocessed maps remain unchanged in the checkpoint.
 
+## Private payload cache
+
+The analyzer can retain exact downloaded `.timber` payloads in a private OCI artifact hosted by GitHub Container
+Registry. Cached payloads are keyed by Workshop ID and source update timestamp, checked with SHA-256 when read, and
+never included in public Pages artifacts. Configure the repository name to enable it:
+
+```text
+MAP_PAYLOAD_CACHE_OCI_REPOSITORY=ghcr.io/ihsoft/timberborn-workshop-payload-cache
+```
+
+The workflow installs ORAS, authenticates with its short-lived `GITHUB_TOKEN`, and requires `packages: write`; no
+long-lived repository secret is needed. When the variable is absent, the analyzer keeps its previous no-cache behavior.
+The package remains private and is not part of the public search index.
+
+Payloads are distributed across 100 stable logical shards using `published_file_id % 100`. Every map remains a separate
+content-addressed OCI blob; a shard tag is only a small manifest referencing its blobs. Updating or adding a map uploads
+only that map and rewrites the small shard manifest, never the other payload bytes. A separate catalog maps each
+`(published_file_id, updated_at)` version to its shard, OCI digest, size, and SHA-256. The catalog is published last so
+it never points to a shard version that has not been uploaded successfully.
+
+Maps whose analysis version is stale and whose matching payload is cached are always processed first. They do not
+consume `--max-items`, which is the per-run Steam download budget. After cached reanalysis, the analyzer downloads at
+most that many missing or updated payloads. While the cache is incomplete, otherwise up-to-date maps are gradually
+downloaded within the same budget so a future classifier backfill can run from cached data.
+
 ## Shared archive analysis
 
 Each selected `.timber` ZIP is downloaded and opened once. `MapArchiveAnalyzer` reads authoritative runtime dimensions

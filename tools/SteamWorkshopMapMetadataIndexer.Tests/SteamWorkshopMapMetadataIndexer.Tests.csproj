@@ -6,6 +6,9 @@
     <Nullable>disable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\SteamWorkshopMapMetadataIndexer\OciPayloadCache.cs">
+      <Link>OciPayloadCache.cs</Link>
+    </Compile>
     <Compile Include="..\SteamWorkshopMapMetadataIndexer\MapArchiveAnalyzer.cs">
       <Link>MapArchiveAnalyzer.cs</Link>
     </Compile>

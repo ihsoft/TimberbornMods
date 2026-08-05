@@ -17,6 +17,8 @@ static class Program {
       ("Plateau classifier accepts disconnected nearby heights as flat", AcceptsNearbyFlatHeights),
       ("Plateau classifier keeps separated terrain levels distinct", KeepsDistinctTerrainLevels),
       ("Plateau classifier excludes open water", ExcludesOpenWaterFromPlateaus),
+      ("Payload cache keys use Workshop ID and canonical update time", BuildsStablePayloadCacheKey),
+      ("Payload cache shards use stable Workshop ID modulo", BuildsStablePayloadCacheShard),
   ];
 
   static int Main() {
@@ -232,6 +234,19 @@ static class Program {
     Assert.Equal("flat_map", result.PlateauLevel);
     Assert.Equal(1, result.PlateauCount);
     Assert.Equal(1d, result.PlateauLandRatio);
+  }
+
+  static void BuildsStablePayloadCacheKey() {
+    var utc = OciPayloadCache.CreateEntryName("12345", "2026-08-05T12:34:56Z");
+    var offset = OciPayloadCache.CreateEntryName("12345", "2026-08-05T05:34:56-07:00");
+    Assert.Equal(utc, offset);
+    Assert.Equal("12345/1785933296.timber", utc);
+  }
+
+  static void BuildsStablePayloadCacheShard() {
+    Assert.Equal("shard-000", OciPayloadCache.CreateShardTag("3675000000"));
+    Assert.Equal("shard-032", OciPayloadCache.CreateShardTag("3675000032"));
+    Assert.Equal("shard-099", OciPayloadCache.CreateShardTag("99"));
   }
 
   static DecodedWaterMap CreateDryMap(int width, int height, int[] heights) {

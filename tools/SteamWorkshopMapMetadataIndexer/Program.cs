@@ -7,15 +7,28 @@ const uint appId = 1062090;
 var options = Options.Parse(args);
 var maps = ReadMaps(options.Snapshot);
 var previousById = ReadRecords(options.PreviousResults).ToDictionary(record => record.PublishedFileId);
-var candidates = maps
-    .Where(map => NeedsRefresh(map, previousById.GetValueOrDefault(map.PublishedFileId)))
-    .OrderByDescending(map => ParseTimestamp(map.UpdatedAtUtc))
-    .Take(options.MaxItems == 0 ? int.MaxValue : options.MaxItems)
-    .ToList();
 var outputById = maps
     .Where(map => previousById.ContainsKey(map.PublishedFileId))
     .ToDictionary(map => map.PublishedFileId, map => previousById[map.PublishedFileId]);
 var processedThisRun = 0;
+var downloadedThisRun = 0;
+using var payloadCache = OciPayloadCache.CreateFromEnvironment();
+var refreshCandidates = maps
+    .Where(map => NeedsRefresh(map, previousById.GetValueOrDefault(map.PublishedFileId)))
+    .ToList();
+var cachedCandidates = payloadCache is null
+    ? []
+    : refreshCandidates.Where(map => payloadCache.Contains(map.PublishedFileId, map.UpdatedAtUtc))
+        .OrderBy(map => ParseTimestamp(map.UpdatedAtUtc)).ToList();
+var cachedIds = cachedCandidates.Select(map => map.PublishedFileId).ToHashSet();
+var downloadCandidates = refreshCandidates.Where(map => !cachedIds.Contains(map.PublishedFileId)).ToList();
+if (payloadCache is not null) {
+  downloadCandidates.AddRange(maps.Where(map => !NeedsRefresh(map, previousById.GetValueOrDefault(map.PublishedFileId))
+      && !payloadCache.Contains(map.PublishedFileId, map.UpdatedAtUtc)));
+}
+downloadCandidates = downloadCandidates.OrderByDescending(map => ParseTimestamp(map.UpdatedAtUtc))
+    .Take(options.MaxDownloadItems == 0 ? int.MaxValue : options.MaxDownloadItems).ToList();
+var candidates = cachedCandidates.Concat(downloadCandidates).ToList();
 
 if (candidates.Count > 0) {
   Environment.SetEnvironmentVariable("SteamAppId", appId.ToString());
@@ -43,7 +56,9 @@ if (candidates.Count > 0) {
     var deadline = options.TimeBudget == TimeSpan.Zero
         ? DateTimeOffset.MaxValue
         : DateTimeOffset.UtcNow.Add(options.TimeBudget);
-    Console.WriteLine($"Anonymous Steam session connected; reading {candidates.Count} map payloads.");
+    Console.WriteLine(
+        $"Anonymous Steam session connected; reading {cachedCandidates.Count} cached and "
+            + $"{downloadCandidates.Count} download-required map payloads.");
     for (var index = 0; index < candidates.Count; index++) {
       if (DateTimeOffset.UtcNow >= deadline) {
         Console.WriteLine($"Time budget reached after {index} / {candidates.Count} selected maps.");
@@ -52,7 +67,10 @@ if (candidates.Count > 0) {
 
       var map = candidates[index];
       try {
-        var analysis = DownloadAndAnalyzeMapWithTransientRetry(map.PublishedFileId, options);
+        var (analysis, downloaded) = ReadAndAnalyzeMapWithTransientRetry(map, options, payloadCache);
+        if (downloaded) {
+          downloadedThisRun++;
+        }
         outputById[map.PublishedFileId] = new MapMetadataRecord(
             map.PublishedFileId, map.UpdatedAtUtc, MapArchiveAnalyzer.AnalysisVersion,
             analysis.Width, analysis.Height, analysis.Classifications, "fetched", null);
@@ -78,33 +96,40 @@ if (candidates.Count > 0) {
   }
 }
 
+payloadCache?.Flush();
 WriteRecords(options.Output, maps, outputById);
 var upToDate = maps.Count(map => outputById.TryGetValue(map.PublishedFileId, out var record)
     && !NeedsRefresh(map, record));
 var stale = outputById.Values.Count(record => record.CollectionState == "stale");
 Console.WriteLine(
     $"Wrote {outputById.Count} map metadata records; selected {candidates.Count}, "
-    + $"processed this run {processedThisRun}, up-to-date {upToDate}, "
+    + $"processed this run {processedThisRun}, downloaded {downloadedThisRun}, up-to-date {upToDate}, "
     + $"remaining refresh {maps.Count - upToDate}, stale {stale}.");
 return 0;
 
-static MapArchiveAnalysis DownloadAndAnalyzeMapWithTransientRetry(string publishedFileId, Options options) {
+static (MapArchiveAnalysis Analysis, bool Downloaded) ReadAndAnalyzeMapWithTransientRetry(
+    MapItem map, Options options, OciPayloadCache? payloadCache) {
+  var cachedPayload = payloadCache?.TryRead(map.PublishedFileId, map.UpdatedAtUtc, options.MaxDownloadBytes);
+  if (cachedPayload is not null) {
+    return (AnalyzePayload(new MemoryStream(cachedPayload, writable: false)), false);
+  }
   const int maxTransientRetries = 2;
   var retryDelay = TimeSpan.FromSeconds(10);
   for (var attempt = 0; ; attempt++) {
     try {
-      return DownloadAndAnalyzeMap(publishedFileId, options);
+      return (DownloadAndAnalyzeMap(map, options, payloadCache), true);
     } catch (SteamPayloadTransientException exception) when (attempt < maxTransientRetries) {
       Console.WriteLine(
-          $"Steam request returned {exception.Result} for {publishedFileId}; "
+          $"Steam request returned {exception.Result} for {map.PublishedFileId}; "
           + $"retrying in {retryDelay.TotalSeconds:0} seconds ({attempt + 1} / {maxTransientRetries}).");
       Thread.Sleep(retryDelay);
     }
   }
 }
 
-static MapArchiveAnalysis DownloadAndAnalyzeMap(string publishedFileId, Options options) {
-  var itemId = new PublishedFileId_t(ulong.Parse(publishedFileId));
+static MapArchiveAnalysis DownloadAndAnalyzeMap(
+    MapItem map, Options options, OciPayloadCache? payloadCache) {
+  var itemId = new PublishedFileId_t(ulong.Parse(map.PublishedFileId));
   var declaredSize = QueryDeclaredSize(itemId, options.RequestTimeout);
   if (declaredSize > options.MaxDownloadBytes) {
     throw new UnsupportedMapPayloadException(
@@ -140,8 +165,10 @@ static MapArchiveAnalysis DownloadAndAnalyzeMap(string publishedFileId, Options 
       throw new InvalidDataException(
           $"Payload contains {mapFiles.Length} .timber files; expected exactly one.");
     }
-    using var archive = ZipFile.OpenRead(mapFiles[0]);
-    return MapArchiveAnalyzer.Analyze(archive);
+    using var payload = File.OpenRead(mapFiles[0]);
+    payloadCache?.Write(map.PublishedFileId, map.UpdatedAtUtc, payload);
+    payload.Position = 0;
+    return AnalyzePayload(payload);
   } catch (Exception exception) when (exception is InvalidDataException or InvalidOperationException
       or JsonException or IOException or UnauthorizedAccessException) {
     throw new UnsupportedMapPayloadException(exception.Message, exception);
@@ -176,6 +203,18 @@ static ulong QueryDeclaredSize(PublishedFileId_t publishedFileId, TimeSpan timeo
     return (ulong)details.m_nFileSize;
   } finally {
     SteamGameServerUGC.ReleaseQueryUGCRequest(query);
+  }
+}
+
+static MapArchiveAnalysis AnalyzePayload(Stream payload) {
+  try {
+    using (payload) {
+      using var archive = new ZipArchive(payload, ZipArchiveMode.Read);
+      return MapArchiveAnalyzer.Analyze(archive);
+    }
+  } catch (Exception exception) when (exception is InvalidDataException or InvalidOperationException
+      or JsonException or IOException or UnauthorizedAccessException) {
+    throw new UnsupportedMapPayloadException(exception.Message, exception);
   }
 }
 
@@ -322,7 +361,7 @@ sealed record Options(
     string? PreviousResults,
     string Output,
     string WorkshopDirectory,
-    int MaxItems,
+    int MaxDownloadItems,
     ulong MaxDownloadBytes,
     TimeSpan RequestTimeout,
     TimeSpan TimeBudget) {
@@ -341,7 +380,7 @@ sealed record Options(
         ParseInt(values, "--max-items", 250), ParseUlong(values, "--max-download-bytes", 50_000_000),
         TimeSpan.FromSeconds(ParseInt(values, "--request-timeout-seconds", 120)),
         TimeSpan.FromSeconds(ParseInt(values, "--time-budget-seconds", 7200)));
-    if (options.MaxItems < 0 || options.MaxDownloadBytes < 1
+    if (options.MaxDownloadItems < 0 || options.MaxDownloadBytes < 1
         || options.RequestTimeout <= TimeSpan.Zero || options.RequestTimeout > TimeSpan.FromMinutes(10)
         || options.TimeBudget < TimeSpan.Zero) {
       throw new ArgumentOutOfRangeException(nameof(args), "Invalid numeric option.");
