@@ -40,12 +40,17 @@ for older payloads that do not serialize that runtime singleton.
 `map_classifications` is an open object. Consumers must tolerate future classifier keys and fields.
 
 The `forest_density` result contains `live_tree_count`, `coverage_ratio`, and an integer `level` from `0` through `4`.
-It counts initial living entities that yield logs and divides the count by map area. Its fixed bands are `<5%`,
-`5–20%`, `20–35%`, `35–50%`, and `>50%`.
+It counts initial living entities that yield logs and divides the count by land area after open surface-water tiles are
+excluded. Its fixed bands are `<5%`, `5–20%`, `20–35%`, `35–50%`, and `>50%`.
 
 The `water` result contains `open_water_tiles`, `open_water_ratio`, `lake_count`, and `water_form`. The form is one of
 `none`, `rivers`, `lakes`, or `rivers_and_lakes`. Consumers can derive water-covered searches directly from
 `open_water_ratio`, for example with a threshold greater than `0.4`.
+
+The `plateaus` result contains `plateau_count`, `plateau_land_ratio`, and `plateau_level`. Only sufficiently wide,
+connected, dry terrain regions count as plateaus; coverage uses their complete area divided by land area. The level is
+one of `few_plateaus`, `has_plateaus`, `many_plateaus`, or `flat_map`. A flat map may contain disconnected regions or
+regions on neighboring heights, including land separated by open water.
 
 ## Anonymous execution boundary
 

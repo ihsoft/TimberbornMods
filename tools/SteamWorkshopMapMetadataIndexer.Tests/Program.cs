@@ -6,12 +6,17 @@ static class Program {
       ("Archive analysis counts only living log trees", CountsOnlyLivingLogTrees),
       ("Archive analysis trusts runtime map size over stale metadata", TrustsRuntimeMapSize),
       ("Forest levels use five evenly spaced bands", UsesExpectedForestBands),
+      ("Forest coverage excludes open surface water", ExcludesOpenWaterFromForestCoverage),
       ("Water form always emits a searchable concrete value", EmitsConcreteWaterForms),
       ("Water decoder reads legacy heights and excludes buried columns", DecodesLegacySurfaceWater),
       ("Water decoder reads voxel terrain", DecodesVoxelSurfaceWater),
       ("Lake diagnostics accept irregular connected shapes", DetectsIrregularLakeCore),
       ("River diagnostics exclude shallow lake shores", ExcludesLakeShoreFromRiverCandidates),
       ("Shallow lake diagnostics require a two-dimensional core", RequiresTwoDimensionalShallowLakeCore),
+      ("Plateau levels use full confirmed plateau coverage", UsesExpectedPlateauBands),
+      ("Plateau classifier accepts disconnected nearby heights as flat", AcceptsNearbyFlatHeights),
+      ("Plateau classifier keeps separated terrain levels distinct", KeepsDistinctTerrainLevels),
+      ("Plateau classifier excludes open water", ExcludesOpenWaterFromPlateaus),
   ];
 
   static int Main() {
@@ -60,6 +65,20 @@ static class Program {
     Assert.Equal(3, ForestDensityClassifier.GetLevel(0.35));
     Assert.Equal(3, ForestDensityClassifier.GetLevel(0.50));
     Assert.Equal(4, ForestDensityClassifier.GetLevel(0.500001));
+  }
+
+  static void ExcludesOpenWaterFromForestCoverage() {
+    using var entity = System.Text.Json.JsonDocument.Parse("""
+        {"Components":{"LivingNaturalResource":{},"Yielder:Cuttable":{"Yield":{"Good":"Log"}}}}
+        """);
+    var classifier = new ForestDensityClassifier();
+    for (var index = 0; index < 10; index++) {
+      classifier.ObserveEntity(entity.RootElement);
+    }
+    var result = classifier.BuildResult(new MapDimensions(10, 10), 50);
+    Assert.Equal(10L, result.GetProperty("live_tree_count").GetInt64());
+    Assert.Equal(0.20, result.GetProperty("coverage_ratio").GetDouble());
+    Assert.Equal(2, result.GetProperty("level").GetInt32());
   }
 
   static void TrustsRuntimeMapSize() {
@@ -162,6 +181,62 @@ static class Program {
     Assert.Equal(1, features.ShallowLakeCount);
     Assert.Equal(9, features.ShallowLakeCoreTileCount);
     Assert.True(features.RiverCandidateTileCount > 0);
+  }
+
+  static void UsesExpectedPlateauBands() {
+    Assert.Equal("few_plateaus", PlateauClassifier.GetLevel(0.249999, 0.20));
+    Assert.Equal("has_plateaus", PlateauClassifier.GetLevel(0.25, 0.20));
+    Assert.Equal("has_plateaus", PlateauClassifier.GetLevel(0.449999, 0.20));
+    Assert.Equal("many_plateaus", PlateauClassifier.GetLevel(0.45, 0.20));
+    Assert.Equal("flat_map", PlateauClassifier.GetLevel(0.80, 0.80));
+    Assert.Equal("flat_map", PlateauClassifier.GetLevel(0.85, 0.70));
+    Assert.Equal("many_plateaus", PlateauClassifier.GetLevel(0.849999, 0.70));
+  }
+
+  static void AcceptsNearbyFlatHeights() {
+    var heights = new int[20 * 20];
+    for (var y = 0; y < 20; y++) {
+      for (var x = 10; x < 20; x++) {
+        heights[x + y * 20] = 1;
+      }
+    }
+    var result = PlateauClassifier.Analyze(CreateDryMap(20, 20, heights));
+    Assert.Equal("flat_map", result.PlateauLevel);
+    Assert.Equal(2, result.PlateauCount);
+    Assert.Equal(1d, result.PlateauLandRatio);
+  }
+
+  static void KeepsDistinctTerrainLevels() {
+    var heights = new int[20 * 20];
+    for (var y = 0; y < 20; y++) {
+      for (var x = 10; x < 20; x++) {
+        heights[x + y * 20] = 4;
+      }
+    }
+    var result = PlateauClassifier.Analyze(CreateDryMap(20, 20, heights));
+    Assert.Equal("many_plateaus", result.PlateauLevel);
+    Assert.Equal(2, result.PlateauCount);
+    Assert.Equal(1d, result.PlateauLandRatio);
+  }
+
+  static void ExcludesOpenWaterFromPlateaus() {
+    var map = CreateDryMap(20, 20, new int[400]);
+    Array.Fill(map.SurfaceDepths, 1f);
+    for (var y = 5; y < 15; y++) {
+      for (var x = 5; x < 15; x++) {
+        map.SurfaceDepths[x + y * 20] = 0;
+      }
+    }
+    var result = PlateauClassifier.Analyze(map);
+    Assert.Equal("flat_map", result.PlateauLevel);
+    Assert.Equal(1, result.PlateauCount);
+    Assert.Equal(1d, result.PlateauLandRatio);
+  }
+
+  static DecodedWaterMap CreateDryMap(int width, int height, int[] heights) {
+    var area = checked(width * height);
+    return new DecodedWaterMap(
+        width, height, heights, (int[]) heights.Clone(), new float[area], new float[area], new float[area], [], 0, 1);
   }
 
   static void WriteEntry(ZipArchive archive, string name, string contents) {

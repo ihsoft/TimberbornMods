@@ -57,6 +57,11 @@ class PublicIndexContractTest(unittest.TestCase):
                         "lake_count": 1,
                         "water_form": "lakes",
                     },
+                    "plateaus": {
+                        "plateau_count": 4,
+                        "plateau_land_ratio": 0.6,
+                        "plateau_level": "many_plateaus",
+                    },
                 },
                 "collection_state": "fetched",
             }])
@@ -74,6 +79,7 @@ class PublicIndexContractTest(unittest.TestCase):
             self.assertEqual(2, manifest["schema_version"])
             self.assertIsInstance(manifest["schema_version"], int)
             self.assertEqual(CANONICAL_DATA_FILES, set(manifest["files"]))
+            self.assertEqual(1, manifest["map_plateaus_known"])
 
             with gzip.open(output / "search-index.jsonl.gz", "rt", encoding="utf-8") as stream:
                 consumer_records = [json.loads(line) for line in stream]
@@ -90,6 +96,10 @@ class PublicIndexContractTest(unittest.TestCase):
             self.assertEqual(
                 "lakes",
                 consumer_records[0]["map_classifications"]["water"]["water_form"],
+            )
+            self.assertEqual(
+                "many_plateaus",
+                consumer_records[0]["map_classifications"]["plateaus"]["plateau_level"],
             )
             self.assertNotIn("visual_scores", consumer_records[0])
             self.assertNotIn("gallery_urls", consumer_records[0])

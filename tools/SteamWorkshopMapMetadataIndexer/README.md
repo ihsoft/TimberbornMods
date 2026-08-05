@@ -30,8 +30,8 @@ To add another exact map criterion:
 
 The `forest_density` classifier counts entities that yield `Log` and whose
 `LivingNaturalResource.IsDead` value is not `true`. Missing `IsDead` is the normal serialized form of a living tree.
-Coverage is the living-tree count divided by map width multiplied by map height. Levels `0` through `4` use the fixed
-bands `<5%`, `5–20%`, `20–35%`, `35–50%`, and `>50%`.
+Coverage is the living-tree count divided by land area after open surface-water tiles are excluded. Underground water
+does not reduce land area. Levels `0` through `4` use the fixed bands `<5%`, `5–20%`, `20–35%`, `35–50%`, and `>50%`.
 
 The `water` classifier decodes serialized surface-water columns and excludes water below the highest terrain surface.
 It reports `open_water_tiles`, `open_water_ratio`, `lake_count`, and a searchable `water_form`: `none`, `rivers`,
@@ -39,6 +39,14 @@ It reports `open_water_tiles`, `open_water_ratio`, `lake_count`, and a searchabl
 coherence, shape, and the relative amount attributed to lake basins and river channels. It always chooses a concrete
 form; internal ambiguous diagnostic regions are not published as a search value. Consumers can derive a
 water-covered query directly from `open_water_ratio`, for example with a threshold greater than `0.4`.
+
+The `plateaus` classifier finds connected constant-height land regions after excluding open surface water. Isolated
+one- or two-tile height deviations are smoothed when their surrounding terrain supports a one-level correction. A
+region counts as a plateau only when it contains an interior core whose required radius grows sublinearly with map
+size and is capped at five tiles. Coverage uses the complete area of every confirmed plateau, divided by land area.
+It reports `plateau_count`, `plateau_land_ratio`, and a searchable `plateau_level`: `few_plateaus` below 25%,
+`has_plateaus` from 25% to 45%, `many_plateaus` from 45%, or `flat_map` when a dominant band of neighboring heights
+covers the map. Disconnected regions and regions separated by water may contribute to the same height band.
 
 ## Output record
 

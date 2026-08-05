@@ -6,6 +6,10 @@ static class WaterFormClassifier {
 
   public static WaterClassificationResult Analyze(JsonElement world, int width, int height) {
     var water = WaterMapDecoder.Decode(world, width, height);
+    return Analyze(water);
+  }
+
+  public static WaterClassificationResult Analyze(DecodedWaterMap water) {
     return Classify(water, WaterFeatureDiagnostics.Analyze(water));
   }
 

@@ -9,6 +9,9 @@
     <Compile Include="..\SteamWorkshopMapMetadataIndexer\MapArchiveAnalyzer.cs">
       <Link>MapArchiveAnalyzer.cs</Link>
     </Compile>
+    <Compile Include="..\SteamWorkshopMapMetadataIndexer\PlateauClassifier.cs">
+      <Link>PlateauClassifier.cs</Link>
+    </Compile>
     <Compile Include="..\SteamWorkshopMapMetadataIndexer\WaterMapDecoder.cs">
       <Link>WaterMapDecoder.cs</Link>
     </Compile>

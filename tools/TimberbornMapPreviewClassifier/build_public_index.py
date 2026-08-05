@@ -92,6 +92,10 @@ def main() -> int:
             "water" in (record.get("classifications") or {})
             for record in map_metadata_results
         ),
+        "map_plateaus_known": sum(
+            "plateaus" in (record.get("classifications") or {})
+            for record in map_metadata_results
+        ),
         "files": {
             path.name: path.stat().st_size
             for path in sorted(output_directory.glob("*.jsonl.gz"))

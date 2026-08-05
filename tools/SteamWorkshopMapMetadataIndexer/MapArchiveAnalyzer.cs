@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 static class MapArchiveAnalyzer {
-  public const int AnalysisVersion = 3;
+  public const int AnalysisVersion = 5;
   const long MaxWorldJsonBytes = 250_000_000;
 
   static readonly IReadOnlyList<Func<IMapEntityClassifier>> ClassifierFactories = [
@@ -15,13 +15,15 @@ static class MapArchiveAnalyzer {
     var dimensions = ReadDimensions(world.RootElement, archive);
     var classifiers = ClassifierFactories.Select(factory => factory()).ToArray();
     ScanEntities(world.RootElement, classifiers);
+    var water = WaterMapDecoder.Decode(world.RootElement, dimensions.Width, dimensions.Height);
+    var landArea = checked(dimensions.Width * dimensions.Height) - water.OpenWaterTileCount;
     var classifications = classifiers.ToDictionary(
         classifier => classifier.Key,
-        classifier => classifier.BuildResult(dimensions));
-    classifications.Add(
-        WaterFormClassifier.FeatureKey,
-        JsonSerializer.SerializeToElement(
-            WaterFormClassifier.Analyze(world.RootElement, dimensions.Width, dimensions.Height)));
+        classifier => classifier.BuildResult(dimensions, landArea));
+    classifications.Add(WaterFormClassifier.FeatureKey,
+        JsonSerializer.SerializeToElement(WaterFormClassifier.Analyze(water)));
+    classifications.Add(PlateauClassifier.FeatureKey,
+        JsonSerializer.SerializeToElement(PlateauClassifier.Analyze(water)));
     return new MapArchiveAnalysis(dimensions.Width, dimensions.Height, classifications);
   }
 
@@ -81,7 +83,7 @@ interface IMapEntityClassifier {
 
   void ObserveEntity(JsonElement entity);
 
-  JsonElement BuildResult(MapDimensions dimensions);
+  JsonElement BuildResult(MapDimensions dimensions, int landArea);
 }
 
 sealed class ForestDensityClassifier : IMapEntityClassifier {
@@ -111,9 +113,8 @@ sealed class ForestDensityClassifier : IMapEntityClassifier {
     _liveTreeCount++;
   }
 
-  public JsonElement BuildResult(MapDimensions dimensions) {
-    var mapArea = checked((long) dimensions.Width * dimensions.Height);
-    var coverageRatio = (double) _liveTreeCount / mapArea;
+  public JsonElement BuildResult(MapDimensions dimensions, int landArea) {
+    var coverageRatio = landArea > 0 ? (double) _liveTreeCount / landArea : 0;
     return JsonSerializer.SerializeToElement(
         new ForestDensityResult(_liveTreeCount, coverageRatio, GetLevel(coverageRatio)));
   }
