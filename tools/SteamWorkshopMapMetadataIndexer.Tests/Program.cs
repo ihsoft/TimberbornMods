@@ -3,7 +3,7 @@ using System.Text;
 
 static class Program {
   static readonly List<(string Name, Action Test)> Tests = [
-      ("Archive analysis counts only living log trees", CountsOnlyLivingLogTrees),
+      ("Archive analysis counts log trees unless explicitly dead", CountsOnlyLivingLogTrees),
       ("Archive analysis trusts runtime map size over stale metadata", TrustsRuntimeMapSize),
       ("Forest levels use five evenly spaced bands", UsesExpectedForestBands),
       ("Forest coverage excludes open surface water", ExcludesOpenWaterFromForestCoverage),
@@ -34,6 +34,7 @@ static class Program {
             {"Components":{"LivingNaturalResource":{},"Yielder:Cuttable":{"Yield":{"Good":"Log"}}}},
             {"Components":{"LivingNaturalResource":{"IsDead":false},"Yielder:Cuttable":{"Yield":{"Good":"Log"}}}},
             {"Components":{"LivingNaturalResource":{"IsDead":true},"Yielder:Cuttable":{"Yield":{"Good":"Log"}}}},
+            {"Components":{"Yielder:Cuttable":{"Yield":{"Good":"Log"}}}},
             {"Components":{"LivingNaturalResource":{},"Yielder:Gatherable":{"Yield":{"Good":"Berries"}}}},
             {"Components":{"LivingNaturalResource":{},"Yielder:Cuttable":{"Yield":{"Good":"Stone"}}}}
           ],"Singletons":{"TerrainMap":{"Heights":{"Array":"__TERRAIN__"}},
@@ -49,8 +50,8 @@ static class Program {
 
     Assert.Equal(10, analysis.Width);
     Assert.Equal(10, analysis.Height);
-    Assert.Equal(2L, forest.GetProperty("live_tree_count").GetInt64());
-    Assert.Equal(0.02, forest.GetProperty("coverage_ratio").GetDouble());
+    Assert.Equal(3L, forest.GetProperty("live_tree_count").GetInt64());
+    Assert.Equal(0.03, forest.GetProperty("coverage_ratio").GetDouble());
     Assert.Equal(0, forest.GetProperty("level").GetInt32());
     var water = analysis.Classifications[WaterFormClassifier.FeatureKey];
     Assert.Equal("none", water.GetProperty("water_form").GetString());

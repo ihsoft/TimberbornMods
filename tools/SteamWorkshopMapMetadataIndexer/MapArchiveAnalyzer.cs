@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 static class MapArchiveAnalyzer {
-  public const int AnalysisVersion = 5;
+  public const int AnalysisVersion = 6;
   const long MaxWorldJsonBytes = 250_000_000;
 
   static readonly IReadOnlyList<Func<IMapEntityClassifier>> ClassifierFactories = [
@@ -96,8 +96,6 @@ sealed class ForestDensityClassifier : IMapEntityClassifier {
     if (entity.ValueKind != JsonValueKind.Object
         || !entity.TryGetProperty("Components", out var components)
         || components.ValueKind != JsonValueKind.Object
-        || !components.TryGetProperty("LivingNaturalResource", out var livingResource)
-        || livingResource.ValueKind != JsonValueKind.Object
         || !components.TryGetProperty("Yielder:Cuttable", out var cuttable)
         || cuttable.ValueKind != JsonValueKind.Object
         || !cuttable.TryGetProperty("Yield", out var yield)
@@ -107,7 +105,10 @@ sealed class ForestDensityClassifier : IMapEntityClassifier {
         || good.GetString() != "Log") {
       return;
     }
-    if (livingResource.TryGetProperty("IsDead", out var isDead) && isDead.ValueKind == JsonValueKind.True) {
+    if (components.TryGetProperty("LivingNaturalResource", out var livingResource)
+        && livingResource.ValueKind == JsonValueKind.Object
+        && livingResource.TryGetProperty("IsDead", out var isDead)
+        && isDead.ValueKind == JsonValueKind.True) {
       return;
     }
     _liveTreeCount++;

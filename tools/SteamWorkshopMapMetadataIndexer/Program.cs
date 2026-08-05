@@ -15,6 +15,7 @@ var candidates = maps
 var outputById = maps
     .Where(map => previousById.ContainsKey(map.PublishedFileId))
     .ToDictionary(map => map.PublishedFileId, map => previousById[map.PublishedFileId]);
+var processedThisRun = 0;
 
 if (candidates.Count > 0) {
   Environment.SetEnvironmentVariable("SteamAppId", appId.ToString());
@@ -51,7 +52,7 @@ if (candidates.Count > 0) {
 
       var map = candidates[index];
       try {
-        var analysis = DownloadAndAnalyzeMapWithBusyRetry(map.PublishedFileId, options);
+        var analysis = DownloadAndAnalyzeMapWithTransientRetry(map.PublishedFileId, options);
         outputById[map.PublishedFileId] = new MapMetadataRecord(
             map.PublishedFileId, map.UpdatedAtUtc, MapArchiveAnalyzer.AnalysisVersion,
             analysis.Width, analysis.Height, analysis.Classifications, "fetched", null);
@@ -68,6 +69,7 @@ if (candidates.Count > 0) {
         }
         break;
       }
+      processedThisRun++;
       Console.WriteLine($"Map metadata progress: {index + 1} / {candidates.Count} selected maps.");
     }
   } finally {
@@ -77,22 +79,26 @@ if (candidates.Count > 0) {
 }
 
 WriteRecords(options.Output, maps, outputById);
+var upToDate = maps.Count(map => outputById.TryGetValue(map.PublishedFileId, out var record)
+    && !NeedsRefresh(map, record));
+var stale = outputById.Values.Count(record => record.CollectionState == "stale");
 Console.WriteLine(
     $"Wrote {outputById.Count} map metadata records; selected {candidates.Count}, "
-    + $"complete {outputById.Values.Count(record => record.CollectionState != "stale")}.");
+    + $"processed this run {processedThisRun}, up-to-date {upToDate}, "
+    + $"remaining refresh {maps.Count - upToDate}, stale {stale}.");
 return 0;
 
-static MapArchiveAnalysis DownloadAndAnalyzeMapWithBusyRetry(string publishedFileId, Options options) {
-  const int maxBusyRetries = 2;
-  var busyRetryDelay = TimeSpan.FromSeconds(10);
+static MapArchiveAnalysis DownloadAndAnalyzeMapWithTransientRetry(string publishedFileId, Options options) {
+  const int maxTransientRetries = 2;
+  var retryDelay = TimeSpan.FromSeconds(10);
   for (var attempt = 0; ; attempt++) {
     try {
       return DownloadAndAnalyzeMap(publishedFileId, options);
-    } catch (SteamPayloadBusyException) when (attempt < maxBusyRetries) {
+    } catch (SteamPayloadTransientException exception) when (attempt < maxTransientRetries) {
       Console.WriteLine(
-          $"Steam downloader busy for {publishedFileId}; retrying in {busyRetryDelay.TotalSeconds:0} seconds "
-          + $"({attempt + 1} / {maxBusyRetries}).");
-      Thread.Sleep(busyRetryDelay);
+          $"Steam request returned {exception.Result} for {publishedFileId}; "
+          + $"retrying in {retryDelay.TotalSeconds:0} seconds ({attempt + 1} / {maxTransientRetries}).");
+      Thread.Sleep(retryDelay);
     }
   }
 }
@@ -116,9 +122,7 @@ static MapArchiveAnalysis DownloadAndAnalyzeMap(string publishedFileId, Options 
     throw new InvalidOperationException("Steam rejected the anonymous Workshop download request.");
   }
   WaitForCallback(() => completed, "Workshop item download", options.RequestTimeout);
-  if (response.m_eResult == EResult.k_EResultBusy) {
-    throw new SteamPayloadBusyException();
-  }
+  ThrowIfTransient(response.m_eResult);
   if (response.m_unAppID.m_AppId != appId || response.m_eResult != EResult.k_EResultOK) {
     throw new InvalidOperationException($"Workshop download returned {response.m_eResult}.");
   }
@@ -160,6 +164,7 @@ static ulong QueryDeclaredSize(PublishedFileId_t publishedFileId, TimeSpan timeo
       completed = true;
     });
     WaitForCallback(() => completed, "anonymous Workshop query", timeout);
+    ThrowIfTransient(response.m_eResult);
     if (ioFailureResult || response.m_eResult != EResult.k_EResultOK || response.m_unNumResultsReturned != 1
         || !SteamGameServerUGC.GetQueryUGCResult(query, 0, out var details)) {
       throw new InvalidOperationException($"Anonymous Workshop query failed: {response.m_eResult}.");
@@ -171,6 +176,12 @@ static ulong QueryDeclaredSize(PublishedFileId_t publishedFileId, TimeSpan timeo
     return (ulong)details.m_nFileSize;
   } finally {
     SteamGameServerUGC.ReleaseQueryUGCRequest(query);
+  }
+}
+
+static void ThrowIfTransient(EResult result) {
+  if (result is EResult.k_EResultBusy or EResult.k_EResultNoConnection) {
+    throw new SteamPayloadTransientException(result);
   }
 }
 
@@ -301,7 +312,10 @@ sealed record MapMetadataRecord(
 sealed class UnsupportedMapPayloadException(string message, Exception? innerException = null)
     : Exception(message, innerException);
 
-sealed class SteamPayloadBusyException() : Exception("Steam Workshop downloader is busy.");
+sealed class SteamPayloadTransientException(EResult result)
+    : Exception($"Steam Workshop request returned transient result {result}.") {
+  public EResult Result { get; } = result;
+}
 
 sealed record Options(
     string Snapshot,

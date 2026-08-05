@@ -10,9 +10,9 @@ sequential, and the first Steam/UGC request failure stops the pass before anothe
 whose archive or map format cannot be analyzed is recorded as `unsupported`, and processing continues with the next
 map. That result is retried only after the Workshop item or analysis version changes.
 
-The narrow transient `k_EResultBusy` download result is retried twice with a ten-second cooldown before it activates
-the circuit breaker. Other Steam/UGC failures are not broadly retried. If the pass stops early, previous records for
-selected but unprocessed maps remain unchanged in the checkpoint.
+The narrow transient `k_EResultBusy` and `k_EResultNoConnection` request results are retried twice with a ten-second
+cooldown before they activate the circuit breaker. Other Steam/UGC failures are not broadly retried. If the pass stops
+early, previous records for selected but unprocessed maps remain unchanged in the checkpoint.
 
 ## Shared archive analysis
 
@@ -28,8 +28,8 @@ To add another exact map criterion:
 3. Increment `MapArchiveAnalyzer.AnalysisVersion` so existing records are progressively backfilled.
 4. Add focused archive fixtures and document the public result fields.
 
-The `forest_density` classifier counts entities that yield `Log` and whose
-`LivingNaturalResource.IsDead` value is not `true`. Missing `IsDead` is the normal serialized form of a living tree.
+The `forest_density` classifier counts entities that yield `Log` unless `LivingNaturalResource.IsDead` is explicitly
+`true`. A missing `LivingNaturalResource` component is the normal serialized form of a living tree.
 Coverage is the living-tree count divided by land area after open surface-water tiles are excluded. Underground water
 does not reduce land area. Levels `0` through `4` use the fixed bands `<5%`, `5–20%`, `20–35%`, `35–50%`, and `>50%`.
 

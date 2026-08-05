@@ -40,8 +40,8 @@ for older payloads that do not serialize that runtime singleton.
 `map_classifications` is an open object. Consumers must tolerate future classifier keys and fields.
 
 The `forest_density` result contains `live_tree_count`, `coverage_ratio`, and an integer `level` from `0` through `4`.
-It counts initial living entities that yield logs and divides the count by land area after open surface-water tiles are
-excluded. Its fixed bands are `<5%`, `5–20%`, `20–35%`, `35–50%`, and `>50%`.
+It counts initial entities that yield logs unless they are explicitly marked dead, and divides the count by land area
+after open surface-water tiles are excluded. Its fixed bands are `<5%`, `5–20%`, `20–35%`, `35–50%`, and `>50%`.
 
 The `water` result contains `open_water_tiles`, `open_water_ratio`, `lake_count`, and `water_form`. The form is one of
 `none`, `rivers`, `lakes`, or `rivers_and_lakes`. Consumers can derive water-covered searches directly from
