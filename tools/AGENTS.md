@@ -33,13 +33,14 @@ Successful Steamworks initialization does not authorize Workshop changes. Read-o
 tools that mutate Steam state still require the explicit user authorization and release or publishing gates applicable
 to that operation.
 
-## Anonymous Workshop Gallery Indexing
+## Anonymous Workshop Map Metadata Indexing
 
-`SteamWorkshopGalleryIndexer` is intentionally not an authenticated Steam-client CLI. It uses an ephemeral anonymous
-Steam game-server session and `SteamGameServerUGC` to read public gallery image URLs. Do not apply the logged-in-client
-initialization contract above to this tool.
+`SteamWorkshopMapMetadataIndexer` is intentionally not an authenticated Steam-client CLI. It uses an ephemeral
+anonymous Steam game-server session and `SteamGameServerUGC` to download a bounded set of public Map-tagged Workshop
+payloads for exact metadata inspection. Do not apply the logged-in-client initialization contract above to this tool.
 
-Keep this path read-only, account-independent, and non-game-launching. It must not require a Steam account, client
-login, API key, repository secret, local Steam client, or Timberborn process, and it must not download Workshop package
-contents. Follow `docs/agent-knowledge/Timberborn-Workshop-Search-Index-Operational-Knowledge-v1.md` before changing
-this tool, its pipeline, published data, or consumers.
+Keep this path read-only, account-independent, non-subscribing, and non-game-launching. It must not require a Steam
+account, client login, API key, repository secret, local Steam client, or Timberborn process. It may inspect downloaded
+map payload contents only inside the narrow bounds documented in
+`docs/agent-knowledge/Timberborn-Workshop-Search-Index-Operational-Knowledge-v1.md`; do not reintroduce gallery
+collection, preview downloading, image classification, or other package-download stages without explicit user approval.
