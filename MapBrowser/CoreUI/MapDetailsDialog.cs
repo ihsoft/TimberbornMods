@@ -19,6 +19,7 @@ namespace IgorZ.MapBrowser.CoreUI;
 
 sealed class MapDetailsDialog : AbstractDialog {
   const string DownloadingLocKey = "IgorZ.MapBrowser.Action.Downloading";
+  const string PublishedLocKey = "IgorZ.MapBrowser.Details.Published";
   const string SizeLocKey = "IgorZ.MapBrowser.Details.Size";
   const string SubscribersLocKey = "IgorZ.MapBrowser.Details.Subscribers";
   const string VotesLocKey = "IgorZ.MapBrowser.Details.Votes";
@@ -161,15 +162,20 @@ sealed class MapDetailsDialog : AbstractDialog {
     if (_installedMap.PublishedFileId == null) {
       return size;
     }
+    var published = metadata?.CreatedAtUtc is { } createdAtUtc && createdAtUtc != default
+        ? UiFactory.T(PublishedLocKey, createdAtUtc.ToLocalTime().ToString("g"))
+        : UiFactory.T(PublishedLocKey, UiFactory.T(UnavailableLocKey));
     if (_liveDetails == null) {
       var unavailable = UiFactory.T(UnavailableLocKey);
-      return size + "\n" + UiFactory.T(VotesUnavailableLocKey)
+      return size + "\n" + published
+          + "\n" + UiFactory.T(VotesUnavailableLocKey)
           + "\n" + UiFactory.T(SubscribersLocKey, unavailable);
     }
     var subscribers = _liveDetails.Subscribers is { } count
         ? count.ToString("N0")
         : UiFactory.T(UnavailableLocKey);
-    return size + "\n" + UiFactory.T(VotesLocKey, "+" + _liveDetails.VotesUp, "-" + _liveDetails.VotesDown)
+    return size + "\n" + published
+        + "\n" + UiFactory.T(VotesLocKey, "+" + _liveDetails.VotesUp, "-" + _liveDetails.VotesDown)
         + "\n" + UiFactory.T(SubscribersLocKey, subscribers);
   }
 

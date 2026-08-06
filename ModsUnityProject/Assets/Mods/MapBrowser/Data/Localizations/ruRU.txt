@@ -51,6 +51,7 @@ IgorZ.MapBrowser.Common.Unavailable,Недоступно,Value shown while live 
 IgorZ.MapBrowser.Common.Unknown,Неизвестно,Value shown when metadata is unknown.
 =,=,Map details
 IgorZ.MapBrowser.Details.Size,Размер: {0},Map dimensions shown in the details dialog.
+IgorZ.MapBrowser.Details.Published,Опубликовано: {0},Workshop publication date shown in the player's local time.
 IgorZ.MapBrowser.Details.Subscribers,Подписчики: {0},Steam subscriber count shown in the details dialog.
 IgorZ.MapBrowser.Details.Votes,Голоса: {0}/{1},Steam upvotes and downvotes shown in the details dialog.
 IgorZ.MapBrowser.Details.VotesUnavailable,Голоса: недоступно,Text shown while live Steam votes are unavailable.
