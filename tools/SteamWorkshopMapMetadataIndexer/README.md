@@ -42,6 +42,12 @@ cache is incomplete, otherwise up-to-date maps are gradually downloaded with the
 classifier backfill can run from cached data. A failure during cache-only population preserves an already-current
 metadata record unchanged instead of marking its valid analysis stale.
 
+Cached payloads are fetched from GHCR and analyzed in parallel, with concurrency bounded by
+`--max-analysis-parallelism` (four workers in the production workflow). This phase completes before the anonymous
+Steam phase begins. Steam metadata queries and payload downloads remain strictly sequential, and cache writes happen
+only in that sequential phase. A corrupt or unreadable cached payload affects only its own record and does not stop
+other cached analyses.
+
 ## Shared archive analysis
 
 Each selected `.timber` ZIP is downloaded and opened once. `MapArchiveAnalyzer` reads authoritative runtime dimensions

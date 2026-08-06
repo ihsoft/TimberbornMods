@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Steamworks;
@@ -32,8 +33,54 @@ if (payloadCache is not null) {
 var downloadCandidates = refreshDownloads.Concat(cacheFillDownloads)
     .Take(options.MaxDownloadItems == 0 ? int.MaxValue : options.MaxDownloadItems).ToList();
 var candidates = cachedCandidates.Concat(downloadCandidates).ToList();
+var deadline = options.TimeBudget == TimeSpan.Zero
+    ? DateTimeOffset.MaxValue
+    : DateTimeOffset.UtcNow.Add(options.TimeBudget);
 
-if (candidates.Count > 0) {
+if (cachedCandidates.Count > 0) {
+  Console.WriteLine(
+      $"Analyzing {cachedCandidates.Count} cached map payloads with "
+      + $"up to {options.MaxAnalysisParallelism} workers.");
+  var cachedResults = new ConcurrentDictionary<string, CachedAnalysisResult>(StringComparer.Ordinal);
+  var cachedProgress = 0;
+  Parallel.ForEach(cachedCandidates, new ParallelOptions {
+    MaxDegreeOfParallelism = options.MaxAnalysisParallelism,
+  }, map => {
+    if (DateTimeOffset.UtcNow >= deadline) {
+      return;
+    }
+    try {
+      var payload = payloadCache!.TryRead(map.PublishedFileId, map.UpdatedAtUtc, options.MaxDownloadBytes)
+          ?? throw new InvalidDataException("Payload cache catalog entry disappeared before analysis.");
+      cachedResults[map.PublishedFileId] = new CachedAnalysisResult(
+          AnalyzePayload(new MemoryStream(payload, writable: false)), null);
+    } catch (UnsupportedMapPayloadException exception) {
+      cachedResults[map.PublishedFileId] = new CachedAnalysisResult(null, exception);
+    } catch (Exception exception) {
+      Console.Error.WriteLine($"Cached map payload failed for {map.PublishedFileId}: {exception.Message}");
+      cachedResults[map.PublishedFileId] = new CachedAnalysisResult(null, exception);
+    } finally {
+      var progress = Interlocked.Increment(ref cachedProgress);
+      Console.WriteLine($"Cached map metadata progress: {progress} / {cachedCandidates.Count} selected maps.");
+    }
+  });
+  foreach (var map in cachedCandidates) {
+    if (!cachedResults.TryGetValue(map.PublishedFileId, out var result)) {
+      continue;
+    }
+    if (result.Analysis is not null) {
+      outputById[map.PublishedFileId] = CreateFetchedRecord(map, result.Analysis);
+    } else if (result.Error is UnsupportedMapPayloadException unsupported) {
+      Console.Error.WriteLine($"Map payload unsupported for {map.PublishedFileId}: {unsupported.Message}");
+      outputById[map.PublishedFileId] = CreateUnsupportedRecord(map, unsupported);
+    } else {
+      PreserveFailedRecord(map, previousById, outputById);
+    }
+    processedThisRun++;
+  }
+}
+
+if (downloadCandidates.Count > 0 && DateTimeOffset.UtcNow < deadline) {
   Environment.SetEnvironmentVariable("SteamAppId", appId.ToString());
   Environment.SetEnvironmentVariable("SteamGameId", appId.ToString());
   if (!Packsize.Test() || !DllCheck.Test()) {
@@ -56,48 +103,58 @@ if (candidates.Count > 0) {
       throw new InvalidOperationException("Steam rejected the explicit game-server Workshop directory.");
     }
 
-    var deadline = options.TimeBudget == TimeSpan.Zero
-        ? DateTimeOffset.MaxValue
-        : DateTimeOffset.UtcNow.Add(options.TimeBudget);
     Console.WriteLine(
-        $"Anonymous Steam session connected; reading {cachedCandidates.Count} cached and "
-            + $"{downloadCandidates.Count} download-required map payloads.");
-    for (var index = 0; index < candidates.Count; index++) {
+        $"Anonymous Steam session connected; reading {downloadCandidates.Count} download-required map payloads.");
+    for (var index = 0; index < downloadCandidates.Count; index++) {
       if (DateTimeOffset.UtcNow >= deadline) {
-        Console.WriteLine($"Time budget reached after {index} / {candidates.Count} selected maps.");
+        Console.WriteLine($"Time budget reached after {index} / {downloadCandidates.Count} Steam maps.");
         break;
       }
 
-      var map = candidates[index];
+      var map = downloadCandidates[index];
       try {
         var (analysis, downloaded) = ReadAndAnalyzeMapWithTransientRetry(map, options, payloadCache);
         if (downloaded) {
           downloadedThisRun++;
         }
-        outputById[map.PublishedFileId] = new MapMetadataRecord(
-            map.PublishedFileId, map.UpdatedAtUtc, MapArchiveAnalyzer.AnalysisVersion,
-            analysis.Width, analysis.Height, analysis.Classifications, "fetched", null);
+        outputById[map.PublishedFileId] = CreateFetchedRecord(map, analysis);
       } catch (UnsupportedMapPayloadException exception) {
         Console.Error.WriteLine($"Map payload unsupported for {map.PublishedFileId}: {exception.Message}");
-        outputById[map.PublishedFileId] = new MapMetadataRecord(
-            map.PublishedFileId, map.UpdatedAtUtc, MapArchiveAnalyzer.AnalysisVersion,
-            0, 0, null, "unsupported", exception.Message);
+        outputById[map.PublishedFileId] = CreateUnsupportedRecord(map, exception);
       } catch (Exception exception) {
         Console.Error.WriteLine($"Map payload request failed for {map.PublishedFileId}: {exception.Message}");
-        var previous = previousById.GetValueOrDefault(map.PublishedFileId);
-        if (previous is not null) {
-          outputById[map.PublishedFileId] = NeedsRefresh(map, previous)
-              ? previous with { CollectionState = "stale" }
-              : previous;
-        }
+        PreserveFailedRecord(map, previousById, outputById);
         break;
       }
       processedThisRun++;
-      Console.WriteLine($"Map metadata progress: {index + 1} / {candidates.Count} selected maps.");
+      Console.WriteLine($"Steam map metadata progress: {index + 1} / {downloadCandidates.Count} selected maps.");
     }
   } finally {
     SteamGameServer.LogOff();
     GameServer.Shutdown();
+  }
+}
+
+static MapMetadataRecord CreateFetchedRecord(MapItem map, MapArchiveAnalysis analysis) {
+  return new MapMetadataRecord(
+      map.PublishedFileId, map.UpdatedAtUtc, MapArchiveAnalyzer.AnalysisVersion,
+      analysis.Width, analysis.Height, analysis.Classifications, "fetched", null);
+}
+
+static MapMetadataRecord CreateUnsupportedRecord(MapItem map, Exception exception) {
+  return new MapMetadataRecord(
+      map.PublishedFileId, map.UpdatedAtUtc, MapArchiveAnalyzer.AnalysisVersion,
+      0, 0, null, "unsupported", exception.Message);
+}
+
+static void PreserveFailedRecord(
+    MapItem map, IReadOnlyDictionary<string, MapMetadataRecord> previousById,
+    IDictionary<string, MapMetadataRecord> outputById) {
+  var previous = previousById.GetValueOrDefault(map.PublishedFileId);
+  if (previous is not null) {
+    outputById[map.PublishedFileId] = NeedsRefresh(map, previous)
+        ? previous with { CollectionState = "stale" }
+        : previous;
   }
 }
 
@@ -343,6 +400,8 @@ static void WriteRecords(
 
 sealed record MapItem(string PublishedFileId, string? UpdatedAtUtc);
 
+sealed record CachedAnalysisResult(MapArchiveAnalysis? Analysis, Exception? Error);
+
 sealed record MapMetadataRecord(
     [property: JsonPropertyName("published_file_id")] string PublishedFileId,
     [property: JsonPropertyName("source_updated_at_utc")] string? SourceUpdatedAtUtc,
@@ -369,7 +428,8 @@ sealed record Options(
     int MaxDownloadItems,
     ulong MaxDownloadBytes,
     TimeSpan RequestTimeout,
-    TimeSpan TimeBudget) {
+    TimeSpan TimeBudget,
+    int MaxAnalysisParallelism) {
 
   internal static Options Parse(string[] args) {
     var values = new Dictionary<string, string>();
@@ -384,10 +444,12 @@ sealed record Options(
         Required(values, "--output"), Required(values, "--workshop-directory"),
         ParseInt(values, "--max-items", 50), ParseUlong(values, "--max-download-bytes", 50_000_000),
         TimeSpan.FromSeconds(ParseInt(values, "--request-timeout-seconds", 120)),
-        TimeSpan.FromSeconds(ParseInt(values, "--time-budget-seconds", 7200)));
+        TimeSpan.FromSeconds(ParseInt(values, "--time-budget-seconds", 7200)),
+        ParseInt(values, "--max-analysis-parallelism", Math.Min(Environment.ProcessorCount, 4)));
     if (options.MaxDownloadItems < 0 || options.MaxDownloadBytes < 1
         || options.RequestTimeout <= TimeSpan.Zero || options.RequestTimeout > TimeSpan.FromMinutes(10)
-        || options.TimeBudget < TimeSpan.Zero) {
+        || options.TimeBudget < TimeSpan.Zero || options.MaxAnalysisParallelism < 1
+        || options.MaxAnalysisParallelism > 16) {
       throw new ArgumentOutOfRangeException(nameof(args), "Invalid numeric option.");
     }
     return options;

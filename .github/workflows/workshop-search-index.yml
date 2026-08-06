@@ -126,6 +126,7 @@ jobs:
           --max-download-bytes 50000000
           --request-timeout-seconds 120
           --time-budget-seconds 7200
+          --max-analysis-parallelism 4
 
       - name: Build public search artifacts
         run: >-
