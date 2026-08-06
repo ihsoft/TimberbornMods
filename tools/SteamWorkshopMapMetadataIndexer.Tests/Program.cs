@@ -13,6 +13,8 @@ static class Program {
       ("Lake diagnostics accept irregular connected shapes", DetectsIrregularLakeCore),
       ("River diagnostics exclude shallow lake shores", ExcludesLakeShoreFromRiverCandidates),
       ("Shallow lake diagnostics require a two-dimensional core", RequiresTwoDimensionalShallowLakeCore),
+      ("Lake diagnostics allow a readable basin to cross the map edge", AllowsLakeAcrossMapEdge),
+      ("Water classifier preserves reviewed Workshop map baselines", PreservesWaterMapBaselines),
       ("Plateau levels use full confirmed plateau coverage", UsesExpectedPlateauBands),
       ("Plateau classifier accepts disconnected nearby heights as flat", AcceptsNearbyFlatHeights),
       ("Plateau classifier keeps separated terrain levels distinct", KeepsDistinctTerrainLevels),
@@ -184,6 +186,49 @@ static class Program {
     Assert.Equal(1, features.ShallowLakeCount);
     Assert.Equal(9, features.ShallowLakeCoreTileCount);
     Assert.True(features.RiverCandidateTileCount > 0);
+  }
+
+  static void PreservesWaterMapBaselines() {
+    var fixtures = Path.Combine(AppContext.BaseDirectory, "Fixtures", "Water");
+    AssertWaterFixture(fixtures, "down-by-the-river-3275489141.json.gz", "rivers", 1);
+    AssertWaterFixture(fixtures, "painting-wall-3350796155.json.gz", "rivers", 2);
+    AssertWaterFixture(fixtures, "00100-3652824726.json.gz", "rivers", 1);
+    AssertWaterFixture(fixtures, "001-musje-3672607632.json.gz", "rivers", 0);
+    AssertWaterFixture(fixtures, "creek-3685093589.json.gz", "rivers_and_lakes", 1);
+    AssertWaterFixture(fixtures, "mountain-pool-3721128633.json.gz", "rivers", 2);
+    AssertWaterFixture(fixtures, "tiny-plateaus-3725408732.json.gz", "rivers", 0);
+    AssertWaterFixture(fixtures, "grand-river-3752545142.json.gz", "rivers", 3);
+    AssertWaterFixture(fixtures, "gemini-origins-3758706362.json.gz", "rivers", 0);
+    AssertWaterFixture(fixtures, "ponds-3759577966.json.gz", "rivers_and_lakes", 7);
+    AssertWaterFixture(fixtures, "hurmevesi-3760651666.json.gz", "rivers_and_lakes", 4);
+    AssertWaterFixture(fixtures, "the-lake-3769190684.json.gz", "lakes", 2);
+    AssertWaterFixture(fixtures, "challenge-small-3775076404.json.gz", "rivers", 0);
+    AssertWaterFixture(fixtures, "limited-3761906496.json.gz", "rivers", 0);
+  }
+
+  static void AllowsLakeAcrossMapEdge() {
+    const int width = 20;
+    const int height = 20;
+    var depths = new float[width * height];
+    for (var y = 3; y <= 16; y++) {
+      for (var x = 0; x <= 10; x++) {
+        depths[x + y * width] = 3;
+      }
+    }
+    var map = new DecodedWaterMap(
+        width, height, new int[width * height], new int[width * height], depths,
+        new float[width * height], new float[width * height], [], 0, 1);
+    var features = WaterFeatureDiagnostics.Analyze(map);
+    Assert.Equal(1, features.LakeCount);
+  }
+
+  static void AssertWaterFixture(
+      string fixtureDirectory, string fixtureName, string expectedForm, int expectedLakeCount) {
+    var map = WaterRegressionFixture.Read(Path.Combine(fixtureDirectory, fixtureName));
+    var features = WaterFeatureDiagnostics.Analyze(map);
+    var classification = WaterFormClassifier.Classify(map, features);
+    Assert.Equal(expectedForm, classification.WaterForm);
+    Assert.Equal(expectedLakeCount, classification.LakeCount);
   }
 
   static void UsesExpectedPlateauBands() {

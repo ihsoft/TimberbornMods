@@ -1,8 +1,22 @@
 using System.IO.Compression;
 using System.Text.Json;
 
+if (args is ["--write-fixture", var fixtureMap, var fixturePath, var workshopId]) {
+  using var fixtureArchive = ZipFile.OpenRead(Path.GetFullPath(fixtureMap));
+  using var fixtureMetadata = ReadJson(fixtureArchive, "map_metadata.json");
+  using var fixtureWorld = ReadJson(fixtureArchive, "world.json");
+  var fixtureWidth = fixtureMetadata.RootElement.GetProperty("Width").GetInt32();
+  var fixtureHeight = fixtureMetadata.RootElement.GetProperty("Height").GetInt32();
+  WaterRegressionFixture.Write(
+      fixturePath, workshopId, WaterMapDecoder.Decode(fixtureWorld.RootElement, fixtureWidth, fixtureHeight));
+  Console.WriteLine($"Wrote {Path.GetFullPath(fixturePath)}");
+  return 0;
+}
+
 if (args.Length != 2) {
-  Console.Error.WriteLine("Usage: TimberbornMapWaterDecoder MAP.timber OUTPUT_DIRECTORY");
+  Console.Error.WriteLine(
+      "Usage: TimberbornMapWaterDecoder MAP.timber OUTPUT_DIRECTORY\n"
+          + "   or: TimberbornMapWaterDecoder --write-fixture MAP.timber OUTPUT.json.gz WORKSHOP_ID");
   return 2;
 }
 

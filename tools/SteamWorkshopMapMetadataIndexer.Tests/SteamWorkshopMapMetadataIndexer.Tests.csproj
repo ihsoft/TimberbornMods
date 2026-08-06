@@ -24,11 +24,17 @@
     <Compile Include="..\SteamWorkshopMapMetadataIndexer\WaterFormClassifier.cs">
       <Link>WaterFormClassifier.cs</Link>
     </Compile>
+    <Compile Include="..\TimberbornMapWaterDecoder\WaterRegressionFixture.cs">
+      <Link>WaterRegressionFixture.cs</Link>
+    </Compile>
     <Compile Include="..\..\TestSupport\Testing\Assert.cs">
       <Link>TestSupport\Assert.cs</Link>
     </Compile>
     <Compile Include="..\..\TestSupport\Testing\TestRunner.cs">
       <Link>TestSupport\TestRunner.cs</Link>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Fixtures\Water\*.json.gz" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
