@@ -382,7 +382,7 @@ sealed record Options(
     var options = new Options(
         Required(values, "--snapshot"), values.GetValueOrDefault("--previous-results"),
         Required(values, "--output"), Required(values, "--workshop-directory"),
-        ParseInt(values, "--max-items", 1000), ParseUlong(values, "--max-download-bytes", 50_000_000),
+        ParseInt(values, "--max-items", 50), ParseUlong(values, "--max-download-bytes", 50_000_000),
         TimeSpan.FromSeconds(ParseInt(values, "--request-timeout-seconds", 120)),
         TimeSpan.FromSeconds(ParseInt(values, "--time-budget-seconds", 7200)));
     if (options.MaxDownloadItems < 0 || options.MaxDownloadBytes < 1
