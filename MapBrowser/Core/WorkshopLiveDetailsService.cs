@@ -11,6 +11,7 @@ using Timberborn.SteamStoreSystem;
 namespace IgorZ.MapBrowser.Core;
 
 sealed class WorkshopLiveDetailsService(SteamManager steamManager) : IUnloadableSingleton {
+  const int MaxGalleryImages = 8;
   readonly List<PendingQuery> _pendingQueries = [];
 
   public void Query(string publishedFileId, Action<WorkshopLiveDetails, string> callback) {
@@ -26,6 +27,11 @@ sealed class WorkshopLiveDetailsService(SteamManager steamManager) : IUnloadable
     var query = SteamUGC.CreateQueryUGCDetailsRequest([new PublishedFileId_t(itemId)], 1);
     if (query == UGCQueryHandle_t.Invalid) {
       callback(null, "Steam rejected the Workshop details query.");
+      return;
+    }
+    if (!SteamUGC.SetReturnAdditionalPreviews(query, true)) {
+      SteamUGC.ReleaseQueryUGCRequest(query);
+      callback(null, "Steam rejected the Workshop gallery request.");
       return;
     }
     var apiCall = SteamUGC.SendQueryUGCRequest(query);
@@ -61,10 +67,41 @@ sealed class WorkshopLiveDetailsService(SteamManager steamManager) : IUnloadable
           pendingQuery.Query, 0, EItemStatistic.k_EItemStatistic_NumSubscriptions, out var subscriberCount)
           ? subscriberCount
           : null;
-      pendingQuery.Callback(new WorkshopLiveDetails(details.m_unVotesUp, details.m_unVotesDown, subscribers), null);
+      pendingQuery.Callback(new WorkshopLiveDetails(
+          details.m_unVotesUp, details.m_unVotesDown, subscribers, ReadGalleryUrls(pendingQuery.Query)), null);
     } finally {
       pendingQuery.Dispose();
     }
+  }
+
+  static IReadOnlyList<string> ReadGalleryUrls(UGCQueryHandle_t query) {
+    var urls = new List<string>();
+    var previewCount = SteamUGC.GetQueryUGCNumAdditionalPreviews(query, 0);
+    for (uint previewIndex = 0; previewIndex < previewCount && urls.Count < MaxGalleryImages; previewIndex++) {
+      if (!SteamUGC.GetQueryUGCAdditionalPreview(
+              query, 0, previewIndex, out var url, 4096, out _, 1024, out var previewType)
+          || previewType != EItemPreviewType.k_EItemPreviewType_Image
+          || !IsValidGalleryUrl(url)) {
+        continue;
+      }
+      var normalized = NormalizeGalleryUrl(url);
+      if (!urls.Contains(normalized)) {
+        urls.Add(normalized);
+      }
+    }
+    return urls;
+  }
+
+  static bool IsValidGalleryUrl(string value) {
+    return Uri.TryCreate(value, UriKind.Absolute, out var uri)
+        && uri.Scheme == Uri.UriSchemeHttps
+        && uri.Host.Equals("images.steamusercontent.com", StringComparison.OrdinalIgnoreCase);
+  }
+
+  static string NormalizeGalleryUrl(string value) {
+    var queryIndex = value.IndexOf('?');
+    var baseUrl = queryIndex >= 0 ? value[..queryIndex] : value;
+    return baseUrl + "?imw=637&imh=358&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true";
   }
 
   sealed class PendingQuery : IDisposable {
@@ -99,4 +136,5 @@ sealed class WorkshopLiveDetailsService(SteamManager steamManager) : IUnloadable
   }
 }
 
-sealed record WorkshopLiveDetails(uint VotesUp, uint VotesDown, ulong? Subscribers);
+sealed record WorkshopLiveDetails(
+    uint VotesUp, uint VotesDown, ulong? Subscribers, IReadOnlyList<string> GalleryUrls);

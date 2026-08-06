@@ -51,15 +51,6 @@ sealed class WorkshopItemMetadata {
   [JsonProperty("categories")]
   public List<WorkshopCategoryMatch> Categories { get; set; } = [];
 
-  [JsonProperty("gallery_urls")]
-  public List<string> GalleryUrls { get; set; } = [];
-
-  [JsonProperty("gallery_checked_at_utc")]
-  public DateTime? GalleryCheckedAtUtc { get; set; }
-
-  [JsonProperty("gallery_collection_state")]
-  public string GalleryCollectionState { get; set; }
-
   [JsonProperty("map_width")]
   public int MapWidth { get; set; }
 

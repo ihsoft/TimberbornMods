@@ -144,7 +144,7 @@ sealed class MapDetailsDialog : AbstractDialog {
     _removeButton.ToggleDisplayStyle(_installedMap.IsInstalled || _installedMap.PublishedFileId != null);
     _tooltipRegistrar.Register(_removeButton, GetRemoveTooltip);
     _removeButton.clicked += ApplyMapAction;
-    BuildImageList(metadata);
+    BuildImageList(metadata, []);
     ShowImage(0);
     LoadLiveDetails();
   }
@@ -190,20 +190,20 @@ sealed class MapDetailsDialog : AbstractDialog {
         return;
       }
       _liveDetails = details;
+      var metadata = _installedMap.Metadata ?? _metadataService.Find(_installedMap.PublishedFileId);
+      BuildImageList(metadata, details.GalleryUrls);
       _mapInformation.text = GetMapInformation();
     });
   }
 
-  void BuildImageList(WorkshopItemMetadata metadata) {
+  void BuildImageList(WorkshopItemMetadata metadata, IReadOnlyCollection<string> galleryUrls) {
     _imageUrls.Clear();
     if (!string.IsNullOrWhiteSpace(metadata?.PreviewUrl)) {
       _imageUrls.Add(metadata.PreviewUrl);
     }
-    if (metadata?.GalleryUrls != null) {
-      _imageUrls.AddRange(metadata.GalleryUrls
-          .Where(url => !string.IsNullOrWhiteSpace(url))
-          .Where(url => !_imageUrls.Contains(url, StringComparer.Ordinal)));
-    }
+    _imageUrls.AddRange(galleryUrls
+        .Where(url => !string.IsNullOrWhiteSpace(url))
+        .Where(url => !_imageUrls.Contains(url, StringComparer.Ordinal)));
     var hasGallery = _imageUrls.Count > 1;
     _previousImageButton.ToggleDisplayStyle(hasGallery);
     _nextImageButton.ToggleDisplayStyle(hasGallery);
