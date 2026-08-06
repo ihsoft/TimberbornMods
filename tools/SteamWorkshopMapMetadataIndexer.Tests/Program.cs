@@ -15,10 +15,11 @@ static class Program {
       ("Shallow lake diagnostics require a two-dimensional core", RequiresTwoDimensionalShallowLakeCore),
       ("Lake diagnostics allow a readable basin to cross the map edge", AllowsLakeAcrossMapEdge),
       ("Water classifier preserves reviewed Workshop map baselines", PreservesWaterMapBaselines),
-      ("Plateau levels use full confirmed plateau coverage", UsesExpectedPlateauBands),
-      ("Plateau classifier accepts disconnected nearby heights as flat", AcceptsNearbyFlatHeights),
-      ("Plateau classifier keeps separated terrain levels distinct", KeepsDistinctTerrainLevels),
-      ("Plateau classifier excludes open water", ExcludesOpenWaterFromPlateaus),
+      ("Settlement-space levels use absolute capacity and dominant shape", UsesExpectedSettlementSpaceLevels),
+      ("Settlement-space classifier accepts disconnected nearby heights as plain", AcceptsNearbyPlainHeights),
+      ("Settlement-space classifier keeps separated terrain levels distinct", KeepsDistinctTerrainLevels),
+      ("Settlement-space classifier excludes open water", ExcludesOpenWaterFromSettlementSpace),
+      ("Settlement-space classifier preserves reviewed Workshop map baselines", PreservesSettlementSpaceBaselines),
       ("Payload cache keys use Workshop ID and canonical update time", BuildsStablePayloadCacheKey),
       ("Payload cache shards use stable Workshop ID modulo", BuildsStablePayloadCacheShard),
   ];
@@ -231,27 +232,25 @@ static class Program {
     Assert.Equal(expectedLakeCount, classification.LakeCount);
   }
 
-  static void UsesExpectedPlateauBands() {
-    Assert.Equal("few_plateaus", PlateauClassifier.GetLevel(0.249999, 0.20));
-    Assert.Equal("has_plateaus", PlateauClassifier.GetLevel(0.25, 0.20));
-    Assert.Equal("has_plateaus", PlateauClassifier.GetLevel(0.449999, 0.20));
-    Assert.Equal("many_plateaus", PlateauClassifier.GetLevel(0.45, 0.20));
-    Assert.Equal("flat_map", PlateauClassifier.GetLevel(0.80, 0.80));
-    Assert.Equal("flat_map", PlateauClassifier.GetLevel(0.85, 0.70));
-    Assert.Equal("many_plateaus", PlateauClassifier.GetLevel(0.849999, 0.70));
+  static void UsesExpectedSettlementSpaceLevels() {
+    Assert.Equal("little_space", SettlementSpaceClassifier.GetSpaceType(7, 1, 1, 1, 0, 0));
+    Assert.Equal("plain", SettlementSpaceClassifier.GetSpaceType(8, 0.70, 0.80, 0, 0, 1));
+    Assert.Equal("much_space", SettlementSpaceClassifier.GetSpaceType(8, 0.699, 1, 0.34, 0.33, 0.33));
+    Assert.Equal("plain", SettlementSpaceClassifier.GetSpaceType(8, 0, 0, 0.35, 0.34, 0.31));
+    Assert.Equal("terraces", SettlementSpaceClassifier.GetSpaceType(8, 0, 0, 0.30, 0.36, 0.34));
+    Assert.Equal("plateau", SettlementSpaceClassifier.GetSpaceType(8, 0, 0, 0.30, 0.34, 0.36));
   }
 
-  static void AcceptsNearbyFlatHeights() {
+  static void AcceptsNearbyPlainHeights() {
     var heights = new int[20 * 20];
     for (var y = 0; y < 20; y++) {
       for (var x = 10; x < 20; x++) {
         heights[x + y * 20] = 1;
       }
     }
-    var result = PlateauClassifier.Analyze(CreateDryMap(20, 20, heights));
-    Assert.Equal("flat_map", result.PlateauLevel);
-    Assert.Equal(2, result.PlateauCount);
-    Assert.Equal(1d, result.PlateauLandRatio);
+    var result = SettlementSpaceClassifier.Analyze(CreateDryMap(20, 20, heights));
+    Assert.Equal("plain", result.SpaceType);
+    Assert.True(result.CoreCount >= 8);
   }
 
   static void KeepsDistinctTerrainLevels() {
@@ -261,13 +260,12 @@ static class Program {
         heights[x + y * 20] = 4;
       }
     }
-    var result = PlateauClassifier.Analyze(CreateDryMap(20, 20, heights));
-    Assert.Equal("many_plateaus", result.PlateauLevel);
-    Assert.Equal(2, result.PlateauCount);
-    Assert.Equal(1d, result.PlateauLandRatio);
+    var result = SettlementSpaceClassifier.Analyze(CreateDryMap(20, 20, heights));
+    Assert.Equal("plateau", result.SpaceType);
+    Assert.True(result.CoreCount >= 8);
   }
 
-  static void ExcludesOpenWaterFromPlateaus() {
+  static void ExcludesOpenWaterFromSettlementSpace() {
     var map = CreateDryMap(20, 20, new int[400]);
     Array.Fill(map.SurfaceDepths, 1f);
     for (var y = 5; y < 15; y++) {
@@ -275,10 +273,61 @@ static class Program {
         map.SurfaceDepths[x + y * 20] = 0;
       }
     }
-    var result = PlateauClassifier.Analyze(map);
-    Assert.Equal("flat_map", result.PlateauLevel);
-    Assert.Equal(1, result.PlateauCount);
-    Assert.Equal(1d, result.PlateauLandRatio);
+    var result = SettlementSpaceClassifier.Analyze(map);
+    Assert.Equal("plain", result.SpaceType);
+    Assert.Equal(8, result.CoreCount);
+  }
+
+  static void PreservesSettlementSpaceBaselines() {
+    var fixtures = Path.Combine(AppContext.BaseDirectory, "Fixtures", "SettlementSpace");
+    var expected = new Dictionary<string, string>() {
+        ["00100-3652824726.json.gz"] = "plain",
+        ["001-musje-3672607632.json.gz"] = "terraces",
+        ["30x-3742220646.json.gz"] = "plain",
+        ["9x255-painting-wall-3350796155.json.gz"] = "much_space",
+        ["basilisk-veins-3685652179.json.gz"] = "terraces",
+        ["beavcube-3741817984.json.gz"] = "much_space",
+        ["beaver-flats-3534679704.json.gz"] = "plain",
+        ["colony-3406201768.json.gz"] = "plain",
+        ["compression-suggestion-3756799738.json.gz"] = "little_space",
+        ["creek-3685093589.json.gz"] = "plain",
+        ["down-by-the-river-3275489141.json.gz"] = "much_space",
+        ["floods-3746978232.json.gz"] = "terraces",
+        ["gemini-origins-solo-3758706362.json.gz"] = "much_space",
+        ["grand-river-nice-side-3752545142.json.gz"] = "much_space",
+        ["high-rise-oasis-3743339720.json.gz"] = "plain",
+        ["hurmevesi-3760651666.json.gz"] = "plateau",
+        ["jonnomap-3492963393.json.gz"] = "plain",
+        ["klein-3739717350.json.gz"] = "plain",
+        ["liso-3432480619.json.gz"] = "plain",
+        ["map-3569648191.json.gz"] = "plain",
+        ["mini-3745965092.json.gz"] = "much_space",
+        ["minimum-viable-prospects-3777072465.json.gz"] = "little_space",
+        ["mountain-pool-3721128633.json.gz"] = "much_space",
+        ["ponds-3759577966.json.gz"] = "terraces",
+        ["rocky-3772930352.json.gz"] = "plateau",
+        ["rose-and-thorns-15x30-3737866930.json.gz"] = "plain",
+        ["shallow-falls-25x25-3755358505.json.gz"] = "little_space",
+        ["smol-map-3749630859.json.gz"] = "much_space",
+        ["spaceship-3744715163.json.gz"] = "little_space",
+        ["squares-3381213849.json.gz"] = "plain",
+        ["tedium-ad-infinitum-3751734928.json.gz"] = "little_space",
+        ["the-challenge-of-the-small-3775076404.json.gz"] = "much_space",
+        ["the-lake-jezero-3769190684.json.gz"] = "much_space",
+        ["the-sinkhole-3776247360.json.gz"] = "terraces",
+        ["the-ten-ten-3467052578.json.gz"] = "plain",
+        ["timbermutantninjaborners-3776832826.json.gz"] = "much_space",
+        ["tiny-plateaus-3725408732.json.gz"] = "little_space",
+        ["tiny-richland-wonder-challenge-3767764157.json.gz"] = "plain",
+        ["toll-3755525976.json.gz"] = "much_space",
+        ["treasure-room-flats-3681097397.json.gz"] = "plain",
+        ["water-fall-valley-3738934579.json.gz"] = "much_space",
+    };
+    foreach (var (fixtureName, expectedType) in expected) {
+      var map = WaterRegressionFixture.Read(Path.Combine(fixtures, fixtureName));
+      var result = SettlementSpaceClassifier.Analyze(map);
+      Assert.Equal(expectedType, result.SpaceType);
+    }
   }
 
   static void BuildsStablePayloadCacheKey() {

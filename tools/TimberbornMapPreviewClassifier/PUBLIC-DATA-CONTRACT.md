@@ -47,9 +47,9 @@ The `water` result contains `open_water_tiles`, `open_water_ratio`, `lake_count`
 `none`, `rivers`, `lakes`, or `rivers_and_lakes`. Consumers can derive water-covered searches directly from
 `open_water_ratio`, for example with a threshold greater than `0.4`.
 
-The `plateaus` result contains `plateau_count`, `plateau_land_ratio`, and `plateau_level`. Only sufficiently wide,
-connected, dry terrain regions count as plateaus; coverage uses their complete area divided by land area. The level is
-one of `few_plateaus`, `has_plateaus`, `many_plateaus`, or `flat_map`. A flat map may contain disconnected regions or
+The `settlement_space` result contains `core_count`, `plain_share`, `terrace_share`, `plateau_share`, `mixed_share`,
+and `space_type`. Only sufficiently wide, dry terrain regions contribute non-overlapping capacity cores. The searchable
+type is one of `little_space`, `much_space`, `plain`, `terraces`, or `plateau`. A plain may contain disconnected regions or
 regions on neighboring heights, including land separated by open water.
 
 ## Anonymous execution boundary

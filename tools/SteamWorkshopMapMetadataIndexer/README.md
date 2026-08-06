@@ -71,13 +71,14 @@ For water reaching the map edge, a lake also needs a meaningful visible shorelin
 Shorelines formed mostly by enclosed islands do not make the surrounding water a lake. A readable lake may still
 extend beyond one edge of the map.
 
-The `plateaus` classifier finds connected constant-height land regions after excluding open surface water. Isolated
-one- or two-tile height deviations are smoothed when their surrounding terrain supports a one-level correction. A
-region counts as a plateau only when it contains an interior core whose required radius grows sublinearly with map
-size and is capped at five tiles. Coverage uses the complete area of every confirmed plateau, divided by land area.
-It reports `plateau_count`, `plateau_land_ratio`, and a searchable `plateau_level`: `few_plateaus` below 25%,
-`has_plateaus` from 25% to 45%, `many_plateaus` from 45%, or `flat_map` when a dominant band of neighboring heights
-covers the map. Disconnected regions and regions separated by water may contribute to the same height band.
+The `settlement_space` classifier estimates how much dry, sufficiently wide terrain is available for a settlement and
+what shape dominates it. Isolated one- or two-tile height deviations are smoothed when their surrounding terrain
+supports a one-level correction. Candidate regions need an interior core whose required radius grows sublinearly with
+map size and is capped at five tiles. Non-overlapping cores measure absolute capacity; fewer than eight produces
+`little_space`. Larger regions are classified from their elevation boundaries as plains, terraces, plateaus, or mixed
+space. A dominant neighboring-height band may make disconnected dry regions a `plain`. The searchable `space_type` is
+one of `little_space`, `much_space`, `plain`, `terraces`, or `plateau`; the result also reports `core_count` and the
+capacity shares `plain_share`, `terrace_share`, `plateau_share`, and `mixed_share`.
 
 ## Output record
 

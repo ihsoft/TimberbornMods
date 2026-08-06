@@ -5,8 +5,7 @@ if (args is ["--write-fixture", var fixtureMap, var fixturePath, var workshopId]
   using var fixtureArchive = ZipFile.OpenRead(Path.GetFullPath(fixtureMap));
   using var fixtureMetadata = ReadJson(fixtureArchive, "map_metadata.json");
   using var fixtureWorld = ReadJson(fixtureArchive, "world.json");
-  var fixtureWidth = fixtureMetadata.RootElement.GetProperty("Width").GetInt32();
-  var fixtureHeight = fixtureMetadata.RootElement.GetProperty("Height").GetInt32();
+  var (fixtureWidth, fixtureHeight) = ReadDimensions(fixtureWorld.RootElement, fixtureMetadata.RootElement);
   WaterRegressionFixture.Write(
       fixturePath, workshopId, WaterMapDecoder.Decode(fixtureWorld.RootElement, fixtureWidth, fixtureHeight));
   Console.WriteLine($"Wrote {Path.GetFullPath(fixturePath)}");
@@ -26,8 +25,7 @@ Directory.CreateDirectory(outputDirectory);
 using var archive = ZipFile.OpenRead(mapPath);
 var metadata = ReadJson(archive, "map_metadata.json");
 var world = ReadJson(archive, "world.json");
-var width = metadata.RootElement.GetProperty("Width").GetInt32();
-var height = metadata.RootElement.GetProperty("Height").GetInt32();
+var (width, height) = ReadDimensions(world.RootElement, metadata.RootElement);
 var water = WaterMapDecoder.Decode(world.RootElement, width, height);
 var features = WaterFeatureDiagnostics.Analyze(water);
 var classification = WaterFormClassifier.Classify(water, features);
@@ -74,6 +72,15 @@ static JsonDocument ReadJson(ZipArchive archive, string name) {
   var entry = archive.GetEntry(name) ?? throw new InvalidDataException($"Map archive has no {name} entry.");
   using var stream = entry.Open();
   return JsonDocument.Parse(stream);
+}
+
+static (int Width, int Height) ReadDimensions(JsonElement world, JsonElement metadata) {
+  if (world.TryGetProperty("Singletons", out var singletons)
+      && singletons.TryGetProperty("MapSize", out var mapSize)
+      && mapSize.TryGetProperty("Size", out var size)) {
+    return (size.GetProperty("X").GetInt32(), size.GetProperty("Y").GetInt32());
+  }
+  return (metadata.GetProperty("Width").GetInt32(), metadata.GetProperty("Height").GetInt32());
 }
 
 static object GetPositiveFlowQuantiles(float[] flows) {

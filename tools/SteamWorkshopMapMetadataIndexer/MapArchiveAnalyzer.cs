@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 static class MapArchiveAnalyzer {
-  public const int AnalysisVersion = 7;
+  public const int AnalysisVersion = 8;
   const long MaxWorldJsonBytes = 250_000_000;
 
   static readonly IReadOnlyList<Func<IMapEntityClassifier>> ClassifierFactories = [
@@ -22,8 +22,8 @@ static class MapArchiveAnalyzer {
         classifier => classifier.BuildResult(dimensions, landArea));
     classifications.Add(WaterFormClassifier.FeatureKey,
         JsonSerializer.SerializeToElement(WaterFormClassifier.Analyze(water)));
-    classifications.Add(PlateauClassifier.FeatureKey,
-        JsonSerializer.SerializeToElement(PlateauClassifier.Analyze(water)));
+    classifications.Add(SettlementSpaceClassifier.FeatureKey,
+        JsonSerializer.SerializeToElement(SettlementSpaceClassifier.Analyze(water)));
     return new MapArchiveAnalysis(dimensions.Width, dimensions.Height, classifications);
   }
 
