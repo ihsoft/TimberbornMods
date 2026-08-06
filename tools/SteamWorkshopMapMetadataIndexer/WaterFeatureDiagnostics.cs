@@ -92,7 +92,7 @@ static class WaterFeatureDiagnostics {
     var combinedLakeCore = lakeCore.Zip(shallowLakeCore, (deep, shallow) => deep || shallow).ToArray();
     var lakeShore = FindLakeShore(openWater, combinedLakeCore, map.Width, map.Height);
     var riverCandidates = openWater.Select((value, cell) => value
-        && !lakeShore[cell] && !shallowLakeCore[cell] && !ambiguousBroadWater[cell]).ToArray();
+        && !lakeShore[cell] && !combinedLakeCore[cell] && !ambiguousBroadWater[cell]).ToArray();
     foreach (var component in FindComponents(riverCandidates, map.Width, map.Height)) {
       var minX = component.Min(cell => cell % map.Width);
       var maxX = component.Max(cell => cell % map.Width);

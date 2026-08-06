@@ -12,6 +12,8 @@ static class Program {
       ("Water decoder reads voxel terrain", DecodesVoxelSurfaceWater),
       ("Lake diagnostics accept irregular connected shapes", DetectsIrregularLakeCore),
       ("River diagnostics exclude shallow lake shores", ExcludesLakeShoreFromRiverCandidates),
+      ("River diagnostics exclude deep lake cores", ExcludesDeepLakeCoreFromRiverCandidates),
+      ("Water coverage requires a broad surface behind the wet boundary", ReportsBroadBoundaryWaterRatio),
       ("Shallow lake diagnostics require a two-dimensional core", RequiresTwoDimensionalShallowLakeCore),
       ("Lake diagnostics allow a readable basin to cross the map edge", AllowsLakeAcrossMapEdge),
       ("Water classifier preserves reviewed Workshop map baselines", PreservesWaterMapBaselines),
@@ -169,6 +171,38 @@ static class Program {
     Assert.Equal(12, features.RiverCandidateTileCount);
   }
 
+  static void ExcludesDeepLakeCoreFromRiverCandidates() {
+    var depths = new float[12 * 12];
+    for (var y = 2; y <= 8; y++) {
+      for (var x = 2; x <= 8; x++) {
+        depths[x + y * 12] = x is 2 or 8 || y is 2 or 8 ? 1 : 3;
+      }
+    }
+    var map = new DecodedWaterMap(
+        12, 12, new int[144], new int[144], depths, new float[144], new float[144], [], 0, 1);
+    var features = WaterFeatureDiagnostics.Analyze(map);
+    Assert.Equal(1, features.LakeCount);
+    Assert.Equal(0, features.RiverCandidateTileCount);
+  }
+
+  static void ReportsBroadBoundaryWaterRatio() {
+    var depths = new float[10 * 10];
+    for (var y = 0; y < 5; y++) {
+      for (var x = 0; x < 10; x++) {
+        depths[x + y * 10] = 1;
+      }
+    }
+    var map = new DecodedWaterMap(
+        10, 10, new int[100], new int[100], depths, new float[100], new float[100], [], 0, 1);
+    Assert.Equal(0.50, WaterFormClassifier.GetBroadBoundaryWaterRatio(map));
+
+    Array.Fill(depths, 0);
+    for (var x = 0; x < 10; x++) {
+      depths[x] = 1;
+    }
+    Assert.True(WaterFormClassifier.GetBroadBoundaryWaterRatio(map) < 0.50);
+  }
+
   static void RequiresTwoDimensionalShallowLakeCore() {
     var depths = new float[20 * 20];
     for (var y = 2; y <= 8; y++) {
@@ -201,7 +235,8 @@ static class Program {
     AssertWaterFixture(fixtures, "grand-river-3752545142.json.gz", "rivers", 3);
     AssertWaterFixture(fixtures, "gemini-origins-3758706362.json.gz", "rivers", 0);
     AssertWaterFixture(fixtures, "ponds-3759577966.json.gz", "rivers_and_lakes", 7);
-    AssertWaterFixture(fixtures, "hurmevesi-3760651666.json.gz", "rivers_and_lakes", 4);
+    AssertWaterFixture(fixtures, "112-3742639403.json.gz", "lakes", 8);
+    AssertWaterFixture(fixtures, "hurmevesi-3760651666.json.gz", "lakes", 4);
     AssertWaterFixture(fixtures, "the-lake-3769190684.json.gz", "lakes", 2);
     AssertWaterFixture(fixtures, "challenge-small-3775076404.json.gz", "rivers", 0);
     AssertWaterFixture(fixtures, "limited-3761906496.json.gz", "rivers", 0);

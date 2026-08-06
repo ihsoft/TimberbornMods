@@ -41,6 +41,7 @@ File.WriteAllText(summaryPath, JsonSerializer.Serialize(new {
   serialized_water_levels = water.SerializedLevels,
   open_water_tiles = water.OpenWaterTileCount,
   open_water_ratio = water.OpenWaterRatio,
+  broad_boundary_water_ratio = classification.BroadBoundaryWaterRatio,
   water_form = classification.WaterForm,
   maximum_surface_depth = water.MaximumSurfaceDepth,
   maximum_surface_flow = water.MaximumSurfaceFlow,

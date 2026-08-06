@@ -19,10 +19,10 @@
                 <engine:VisualElement style="flex-grow: 1;" />
                 <Timberborn.DropdownSystem.Dropdown name="waterDropdown" style="width: 220px; flex-shrink: 0;" />
             </engine:VisualElement>
-            <engine:VisualElement name="plateausFilter" style="flex-direction: row; align-items: center; width: 33.333%; min-width: 300px; margin-bottom: 6px;">
-                <Timberborn.CoreUI.LocalizableLabel name="plateausLabel" text="Plateaus" text-loc-key="IgorZ.MapBrowser.Search.Filter.Plateaus" class="text--default" style="flex-shrink: 0; margin-right: 5px;" />
+            <engine:VisualElement name="settlement_spaceFilter" style="flex-direction: row; align-items: center; width: 33.333%; min-width: 300px; margin-bottom: 6px;">
+                <Timberborn.CoreUI.LocalizableLabel name="settlement_spaceLabel" text="Space" text-loc-key="IgorZ.MapBrowser.Search.Filter.SettlementSpace" class="text--default" style="flex-shrink: 0; margin-right: 5px;" />
                 <engine:VisualElement style="flex-grow: 1;" />
-                <Timberborn.DropdownSystem.Dropdown name="plateausDropdown" style="width: 220px; flex-shrink: 0;" />
+                <Timberborn.DropdownSystem.Dropdown name="settlement_spaceDropdown" style="width: 220px; flex-shrink: 0;" />
             </engine:VisualElement>
         </engine:VisualElement>
     </engine:VisualElement>

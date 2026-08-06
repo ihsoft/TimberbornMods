@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 static class MapArchiveAnalyzer {
-  public const int AnalysisVersion = 8;
+  public const int AnalysisVersion = 9;
   const long MaxWorldJsonBytes = 250_000_000;
 
   static readonly IReadOnlyList<Func<IMapEntityClassifier>> ClassifierFactories = [

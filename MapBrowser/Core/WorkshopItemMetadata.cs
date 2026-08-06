@@ -83,8 +83,8 @@ sealed class MapClassifications {
   [JsonProperty("water")]
   public WaterClassification Water { get; set; }
 
-  [JsonProperty("plateaus")]
-  public PlateauClassification Plateaus { get; set; }
+  [JsonProperty("settlement_space")]
+  public SettlementSpaceClassification SettlementSpace { get; set; }
 }
 
 sealed class ForestDensityClassification {
@@ -96,13 +96,16 @@ sealed class WaterClassification {
   [JsonProperty("open_water_ratio")]
   public double? OpenWaterRatio { get; set; }
 
+  [JsonProperty("broad_boundary_water_ratio")]
+  public double? BroadBoundaryWaterRatio { get; set; }
+
   [JsonProperty("water_form")]
   public string WaterForm { get; set; }
 }
 
-sealed class PlateauClassification {
-  [JsonProperty("plateau_level")]
-  public string PlateauLevel { get; set; }
+sealed class SettlementSpaceClassification {
+  [JsonProperty("space_type")]
+  public string SpaceType { get; set; }
 }
 
 sealed class WorkshopCategoryMatch {

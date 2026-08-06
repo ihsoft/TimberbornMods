@@ -25,20 +25,21 @@ IgorZ.MapBrowser.Action.Unsubscribing,Отписка...,Temporary button text wh
 IgorZ.MapBrowser.Analysis.Compact,"{0}, {1}, {2}",Compact exact map analysis shown in the browser row.
 IgorZ.MapBrowser.Analysis.Full,"Леса: {0}
 Вода: {1}
-Плато: {2}",Full exact map analysis shown in the details dialog.
+Место: {2}",Full exact map analysis shown in the details dialog.
 IgorZ.MapBrowser.Analysis.Level.Barren,Мало леса,Very low forest density classification.
 IgorZ.MapBrowser.Analysis.Level.DenseForest,Густой лес,Very high forest density classification.
-IgorZ.MapBrowser.Analysis.Level.FewPlateaus,Мало плато,Low plateau coverage classification.
-IgorZ.MapBrowser.Analysis.Level.FlatMap,Плоская карта,Very high plateau coverage classification.
 IgorZ.MapBrowser.Analysis.Level.Forested,Много леса,High forest density classification.
-IgorZ.MapBrowser.Analysis.Level.HasPlateaus,Есть плато,Moderate plateau coverage classification.
 IgorZ.MapBrowser.Analysis.Level.Lakes,Озёра,Open water is mainly represented by lakes.
-IgorZ.MapBrowser.Analysis.Level.ManyPlateaus,Много плато,High plateau coverage classification.
+IgorZ.MapBrowser.Analysis.Level.LittleSpace,Мало места,Map has fewer than eight settlement-space cores.
 IgorZ.MapBrowser.Analysis.Level.ModerateForests,Средняя лесистость,Middle forest density classification.
+IgorZ.MapBrowser.Analysis.Level.MuchSpace,Много места,Map has sufficient settlement space without a dominant terrain shape.
 IgorZ.MapBrowser.Analysis.Level.NoWater,Нет открытой воды,No open water was found on the map.
+IgorZ.MapBrowser.Analysis.Level.Plain,Равнина,Most settlement space is on broad neighboring terrain levels.
+IgorZ.MapBrowser.Analysis.Level.Plateau,Плато,A significant share of settlement space is on elevated plateaus.
 IgorZ.MapBrowser.Analysis.Level.Rivers,Реки,Open water is mainly represented by rivers.
 IgorZ.MapBrowser.Analysis.Level.RiversAndLakes,Реки и озёра,Open water includes both rivers and lakes.
 IgorZ.MapBrowser.Analysis.Level.Sparse,Редкий лес,Low forest density classification.
+IgorZ.MapBrowser.Analysis.Level.Terraces,Уступы,A significant share of settlement space is on slope terraces.
 IgorZ.MapBrowser.Analysis.Level.Unknown,Неизвестно,Classification value shown when analysis data is missing.
 IgorZ.MapBrowser.Analysis.Level.WaterCovered,Покрыта водой,Open water covers more than 40 percent of the map.
 =,=,Map browser
@@ -60,7 +61,7 @@ IgorZ.MapBrowser.Freshness.Stale,"Предупреждение об актуал
 =,=,Workshop search
 IgorZ.MapBrowser.Search.Any,Неважно,Filter option that does not restrict search results.
 IgorZ.MapBrowser.Search.Filter.Forests,Леса,Label for the forest density search filter.
-IgorZ.MapBrowser.Search.Filter.Plateaus,Плато,Label for the plateau search filter.
+IgorZ.MapBrowser.Search.Filter.SettlementSpace,Место,Label for the settlement-space search filter.
 IgorZ.MapBrowser.Search.Filter.Water,Вода,Label for the water search filter.
 IgorZ.MapBrowser.Search.Installed,Установленные,Tab button that shows installed maps.
 IgorZ.MapBrowser.Search.Keywords,Ключевые слова,Label for the Workshop text search field.

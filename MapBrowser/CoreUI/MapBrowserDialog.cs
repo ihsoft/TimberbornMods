@@ -55,8 +55,9 @@ sealed class MapBrowserDialog : AbstractDialog {
   const string UnsubscribingLocKey = "IgorZ.MapBrowser.Action.Unsubscribing";
   const string FreshnessMissingLocKey = "IgorZ.MapBrowser.Freshness.Missing";
   const string FreshnessStaleLocKey = "IgorZ.MapBrowser.Freshness.Stale";
-  const int CurrentMapAnalysisVersion = 6;
+  const int CurrentMapAnalysisVersion = 9;
   const double WaterCoveredRatio = 0.40;
+  const double WaterCoveredBoundaryRatio = 0.50;
   static readonly Regex ParenthesizedMapSizeRegex = new(
       @"\(\s*(?<width>\d{1,4})\s*[xX×]\s*(?<height>\d{1,4})\s*\)", RegexOptions.Compiled);
   static readonly Regex MapSizePrefixRegex = new(
@@ -71,7 +72,7 @@ sealed class MapBrowserDialog : AbstractDialog {
   static readonly SearchFilter[] SearchFilters = [
     new("forest_density", ["Barren", "Sparse", "ModerateForests", "Forested", "DenseForest"]),
     new("water", ["NoWater", "Rivers", "Lakes", "RiversAndLakes", "WaterCovered"]),
-    new("plateaus", ["FewPlateaus", "HasPlateaus", "ManyPlateaus", "FlatMap"]),
+    new("settlement_space", ["LittleSpace", "MuchSpace", "Plain", "Terraces", "Plateau"]),
   ];
 
   readonly MapItemProvider _mapItemProvider;
@@ -547,13 +548,13 @@ sealed class MapBrowserDialog : AbstractDialog {
   string FormatCompactAnalysis(WorkshopItemMetadata metadata) {
     return string.Format(
         UiFactory.T(AnalysisCompactLocKey), GetForestLevel(metadata, UiFactory), GetWaterForm(metadata, UiFactory),
-        GetPlateauLevel(metadata, UiFactory));
+        GetSettlementSpace(metadata, UiFactory));
   }
 
   internal static string FormatFullAnalysis(WorkshopItemMetadata metadata, UiFactory uiFactory) {
     return string.Format(
         uiFactory.T(AnalysisFullLocKey), GetForestLevel(metadata, uiFactory), GetWaterForm(metadata, uiFactory),
-        GetPlateauLevel(metadata, uiFactory));
+        GetSettlementSpace(metadata, uiFactory));
   }
 
   string FormatAnalysisTooltip(WorkshopItemMetadata metadata) {
@@ -575,7 +576,7 @@ sealed class MapBrowserDialog : AbstractDialog {
 
   static string GetWaterForm(WorkshopItemMetadata metadata, UiFactory uiFactory) {
     var water = metadata.MapClassifications?.Water;
-    var levelName = water?.OpenWaterRatio > WaterCoveredRatio ? "WaterCovered" : water?.WaterForm switch {
+    var levelName = IsWaterCovered(water) ? "WaterCovered" : water?.WaterForm switch {
         "none" => "NoWater",
         "rivers" => "Rivers",
         "lakes" => "Lakes",
@@ -585,12 +586,13 @@ sealed class MapBrowserDialog : AbstractDialog {
     return GetLocalizedLevel(levelName, uiFactory);
   }
 
-  static string GetPlateauLevel(WorkshopItemMetadata metadata, UiFactory uiFactory) {
-    var levelName = metadata.MapClassifications?.Plateaus?.PlateauLevel switch {
-        "few_plateaus" => "FewPlateaus",
-        "has_plateaus" => "HasPlateaus",
-        "many_plateaus" => "ManyPlateaus",
-        "flat_map" => "FlatMap",
+  static string GetSettlementSpace(WorkshopItemMetadata metadata, UiFactory uiFactory) {
+    var levelName = metadata.MapClassifications?.SettlementSpace?.SpaceType switch {
+        "little_space" => "LittleSpace",
+        "much_space" => "MuchSpace",
+        "plain" => "Plain",
+        "terraces" => "Terraces",
+        "plateau" => "Plateau",
         _ => null,
     };
     return GetLocalizedLevel(levelName, uiFactory);
@@ -610,7 +612,7 @@ sealed class MapBrowserDialog : AbstractDialog {
             4 => "DenseForest",
             _ => null,
         },
-        "water" when metadata.MapClassifications?.Water?.OpenWaterRatio > WaterCoveredRatio => "WaterCovered",
+        "water" when IsWaterCovered(metadata.MapClassifications?.Water) => "WaterCovered",
         "water" => metadata.MapClassifications?.Water?.WaterForm switch {
             "none" => "NoWater",
             "rivers" => "Rivers",
@@ -618,16 +620,22 @@ sealed class MapBrowserDialog : AbstractDialog {
             "rivers_and_lakes" => "RiversAndLakes",
             _ => null,
         },
-        "plateaus" => metadata.MapClassifications?.Plateaus?.PlateauLevel switch {
-            "few_plateaus" => "FewPlateaus",
-            "has_plateaus" => "HasPlateaus",
-            "many_plateaus" => "ManyPlateaus",
-            "flat_map" => "FlatMap",
+        "settlement_space" => metadata.MapClassifications?.SettlementSpace?.SpaceType switch {
+            "little_space" => "LittleSpace",
+            "much_space" => "MuchSpace",
+            "plain" => "Plain",
+            "terraces" => "Terraces",
+            "plateau" => "Plateau",
             _ => null,
         },
         _ => null,
     };
     return value != null;
+  }
+
+  static bool IsWaterCovered(WaterClassification water) {
+    return water?.OpenWaterRatio > WaterCoveredRatio
+        && water.BroadBoundaryWaterRatio >= WaterCoveredBoundaryRatio;
   }
 
   static void FitDescription(Label label, string fullText) {
