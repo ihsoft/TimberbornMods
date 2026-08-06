@@ -37,8 +37,10 @@ it never points to a shard version that has not been uploaded successfully.
 
 Maps whose analysis version is stale and whose matching payload is cached are always processed first. They do not
 consume `--max-items`, which is the per-run Steam download budget. After cached reanalysis, the analyzer downloads at
-most that many missing or updated payloads. While the cache is incomplete, otherwise up-to-date maps are gradually
-downloaded within the same budget so a future classifier backfill can run from cached data.
+most that many missing or updated payloads. Analysis refreshes always precede background cache population. While the
+cache is incomplete, otherwise up-to-date maps are gradually downloaded with the remaining budget so a future
+classifier backfill can run from cached data. A failure during cache-only population preserves an already-current
+metadata record unchanged instead of marking its valid analysis stale.
 
 ## Shared archive analysis
 

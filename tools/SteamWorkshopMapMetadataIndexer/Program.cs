@@ -21,12 +21,15 @@ var cachedCandidates = payloadCache is null
     : refreshCandidates.Where(map => payloadCache.Contains(map.PublishedFileId, map.UpdatedAtUtc))
         .OrderBy(map => ParseTimestamp(map.UpdatedAtUtc)).ToList();
 var cachedIds = cachedCandidates.Select(map => map.PublishedFileId).ToHashSet();
-var downloadCandidates = refreshCandidates.Where(map => !cachedIds.Contains(map.PublishedFileId)).ToList();
+var refreshDownloads = refreshCandidates.Where(map => !cachedIds.Contains(map.PublishedFileId))
+    .OrderByDescending(map => ParseTimestamp(map.UpdatedAtUtc)).ToList();
+var cacheFillDownloads = new List<MapItem>();
 if (payloadCache is not null) {
-  downloadCandidates.AddRange(maps.Where(map => !NeedsRefresh(map, previousById.GetValueOrDefault(map.PublishedFileId))
-      && !payloadCache.Contains(map.PublishedFileId, map.UpdatedAtUtc)));
+  cacheFillDownloads = maps.Where(map => !NeedsRefresh(map, previousById.GetValueOrDefault(map.PublishedFileId))
+      && !payloadCache.Contains(map.PublishedFileId, map.UpdatedAtUtc))
+      .OrderByDescending(map => ParseTimestamp(map.UpdatedAtUtc)).ToList();
 }
-downloadCandidates = downloadCandidates.OrderByDescending(map => ParseTimestamp(map.UpdatedAtUtc))
+var downloadCandidates = refreshDownloads.Concat(cacheFillDownloads)
     .Take(options.MaxDownloadItems == 0 ? int.MaxValue : options.MaxDownloadItems).ToList();
 var candidates = cachedCandidates.Concat(downloadCandidates).ToList();
 
@@ -83,7 +86,9 @@ if (candidates.Count > 0) {
         Console.Error.WriteLine($"Map payload request failed for {map.PublishedFileId}: {exception.Message}");
         var previous = previousById.GetValueOrDefault(map.PublishedFileId);
         if (previous is not null) {
-          outputById[map.PublishedFileId] = previous with { CollectionState = "stale" };
+          outputById[map.PublishedFileId] = NeedsRefresh(map, previous)
+              ? previous with { CollectionState = "stale" }
+              : previous;
         }
         break;
       }
@@ -377,7 +382,7 @@ sealed record Options(
     var options = new Options(
         Required(values, "--snapshot"), values.GetValueOrDefault("--previous-results"),
         Required(values, "--output"), Required(values, "--workshop-directory"),
-        ParseInt(values, "--max-items", 250), ParseUlong(values, "--max-download-bytes", 50_000_000),
+        ParseInt(values, "--max-items", 1000), ParseUlong(values, "--max-download-bytes", 50_000_000),
         TimeSpan.FromSeconds(ParseInt(values, "--request-timeout-seconds", 120)),
         TimeSpan.FromSeconds(ParseInt(values, "--time-budget-seconds", 7200)));
     if (options.MaxDownloadItems < 0 || options.MaxDownloadBytes < 1
