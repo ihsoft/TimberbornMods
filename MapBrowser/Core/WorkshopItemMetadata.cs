@@ -61,10 +61,10 @@ sealed class WorkshopItemMetadata {
   public string GalleryCollectionState { get; set; }
 
   [JsonProperty("map_width")]
-  public int? MapWidth { get; set; }
+  public int MapWidth { get; set; }
 
   [JsonProperty("map_height")]
-  public int? MapHeight { get; set; }
+  public int MapHeight { get; set; }
 
   [JsonProperty("map_analysis_version")]
   public int? MapAnalysisVersion { get; set; }

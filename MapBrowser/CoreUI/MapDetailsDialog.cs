@@ -20,7 +20,6 @@ namespace IgorZ.MapBrowser.CoreUI;
 sealed class MapDetailsDialog : AbstractDialog {
   const string DownloadingLocKey = "IgorZ.MapBrowser.Action.Downloading";
   const string SizeLocKey = "IgorZ.MapBrowser.Details.Size";
-  const string SizeLoadingLocKey = "IgorZ.MapBrowser.Details.SizeLoading";
   const string SubscribersLocKey = "IgorZ.MapBrowser.Details.Subscribers";
   const string VotesLocKey = "IgorZ.MapBrowser.Details.Votes";
   const string VotesUnavailableLocKey = "IgorZ.MapBrowser.Details.VotesUnavailable";
@@ -38,7 +37,6 @@ sealed class MapDetailsDialog : AbstractDialog {
   const string SubscribeLocKey = "IgorZ.MapBrowser.Action.Subscribe";
   const string SubscribeTooltipLocKey = "IgorZ.MapBrowser.Action.SubscribeTooltip";
   const string SubscribingLocKey = "IgorZ.MapBrowser.Action.Subscribing";
-  const string UnknownLocKey = "IgorZ.MapBrowser.Common.Unknown";
   const string UnavailableLocKey = "IgorZ.MapBrowser.Common.Unavailable";
   const string UnsubscribeLocKey = "IgorZ.MapBrowser.Action.Unsubscribe";
   const string UnsubscribeTooltipLocKey = "IgorZ.MapBrowser.Action.UnsubscribeTooltip";
@@ -49,7 +47,6 @@ sealed class MapDetailsDialog : AbstractDialog {
   readonly MapRepository _mapRepository;
   readonly WorkshopMetadataService _metadataService;
   readonly WorkshopLiveDetailsService _liveDetailsService;
-  readonly WorkshopMapSizeService _mapSizeService;
   readonly WorkshopSubscriptionService _subscriptionService;
   readonly ITooltipRegistrar _tooltipRegistrar;
   readonly List<string> _imageUrls = [];
@@ -69,14 +66,13 @@ sealed class MapDetailsDialog : AbstractDialog {
   MapDetailsDialog(
       MapThumbnailCache mapThumbnailCache, MapItemProvider mapItemProvider, MapRepository mapRepository,
       WorkshopMetadataService metadataService, WorkshopLiveDetailsService liveDetailsService,
-      WorkshopMapSizeService mapSizeService, WorkshopSubscriptionService subscriptionService,
+      WorkshopSubscriptionService subscriptionService,
       ITooltipRegistrar tooltipRegistrar) {
     _mapThumbnailCache = mapThumbnailCache;
     _mapItemProvider = mapItemProvider;
     _mapRepository = mapRepository;
     _metadataService = metadataService;
     _liveDetailsService = liveDetailsService;
-    _mapSizeService = mapSizeService;
     _subscriptionService = subscriptionService;
     _tooltipRegistrar = tooltipRegistrar;
   }
@@ -150,7 +146,6 @@ sealed class MapDetailsDialog : AbstractDialog {
     BuildImageList(metadata);
     ShowImage(0);
     LoadLiveDetails();
-    LoadExactMapSize();
   }
 
   string GetDescription(WorkshopItemMetadata metadata) {
@@ -162,11 +157,7 @@ sealed class MapDetailsDialog : AbstractDialog {
 
   string GetMapInformation() {
     var metadata = _installedMap.Metadata ?? _metadataService.Find(_installedMap.PublishedFileId);
-    var mapSize = MapBrowserDialog.GetMapSize(
-        _installedMap, metadata, GetDownloadedMapSize(), UiFactory.T(UnknownLocKey));
-    var size = _mapSizeService.IsLoading(_installedMap.PublishedFileId)
-        ? UiFactory.T(SizeLoadingLocKey)
-        : UiFactory.T(SizeLocKey, mapSize);
+    var size = UiFactory.T(SizeLocKey, MapBrowserDialog.GetMapSize(_installedMap, metadata));
     if (_installedMap.PublishedFileId == null) {
       return size;
     }
@@ -195,26 +186,6 @@ sealed class MapDetailsDialog : AbstractDialog {
       _liveDetails = details;
       _mapInformation.text = GetMapInformation();
     });
-  }
-
-  void LoadExactMapSize() {
-    if (_installedMap.PublishedFileId == null || _installedMap.Map?.Size != null) {
-      return;
-    }
-    var requestedMap = _installedMap;
-    _mapSizeService.RequestSize(requestedMap.PublishedFileId, _ => {
-      if (Root != null && _installedMap == requestedMap) {
-        _mapInformation.text = GetMapInformation();
-      }
-    });
-    _mapInformation.text = GetMapInformation();
-  }
-
-  Vector2Int? GetDownloadedMapSize() {
-    return _installedMap.PublishedFileId != null
-        && _mapSizeService.TryGetCachedSize(_installedMap.PublishedFileId, out var size)
-            ? size
-            : null;
   }
 
   void BuildImageList(WorkshopItemMetadata metadata) {

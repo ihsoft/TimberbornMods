@@ -11,7 +11,6 @@ sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<WorkshopMetadataService>().AsSingleton();
     containerDefinition.Bind<WorkshopLiveDetailsService>().AsSingleton();
-    containerDefinition.Bind<WorkshopMapSizeService>().AsSingleton();
     containerDefinition.Bind<WorkshopSubscriptionService>().AsSingleton();
   }
 }

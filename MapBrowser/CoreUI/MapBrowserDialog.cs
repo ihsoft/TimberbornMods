@@ -58,8 +58,6 @@ sealed class MapBrowserDialog : AbstractDialog {
   const int CurrentMapAnalysisVersion = 9;
   const double WaterCoveredRatio = 0.40;
   const double WaterCoveredBoundaryRatio = 0.50;
-  static readonly Regex ParenthesizedMapSizeRegex = new(
-      @"\(\s*(?<width>\d{1,4})\s*[xX×]\s*(?<height>\d{1,4})\s*\)", RegexOptions.Compiled);
   static readonly Regex MapSizePrefixRegex = new(
       @"^\s*(?:[\(\[]\s*)?(?<width>\d{1,4})\s*[xX×]\s*(?<height>\d{1,4})(?:\s*[\)\]])?\s*(?:[-–—:|]\s*)?",
       RegexOptions.Compiled);
@@ -80,7 +78,6 @@ sealed class MapBrowserDialog : AbstractDialog {
   readonly MapRepository _mapRepository;
   readonly MapDetailsDialog _mapDetailsDialog;
   readonly WorkshopMetadataService _metadataService;
-  readonly WorkshopMapSizeService _mapSizeService;
   readonly WorkshopSubscriptionService _subscriptionService;
   readonly ITooltipRegistrar _tooltipRegistrar;
   readonly DropdownItemsSetter _dropdownItemsSetter;
@@ -108,14 +105,13 @@ sealed class MapBrowserDialog : AbstractDialog {
   MapBrowserDialog(
       MapItemProvider mapItemProvider, MapThumbnailCache mapThumbnailCache, MapRepository mapRepository,
       MapDetailsDialog mapDetailsDialog, WorkshopMetadataService metadataService,
-      WorkshopMapSizeService mapSizeService, WorkshopSubscriptionService subscriptionService,
+      WorkshopSubscriptionService subscriptionService,
       ITooltipRegistrar tooltipRegistrar, DropdownItemsSetter dropdownItemsSetter) {
     _mapItemProvider = mapItemProvider;
     _mapThumbnailCache = mapThumbnailCache;
     _mapRepository = mapRepository;
     _mapDetailsDialog = mapDetailsDialog;
     _metadataService = metadataService;
-    _mapSizeService = mapSizeService;
     _subscriptionService = subscriptionService;
     _tooltipRegistrar = tooltipRegistrar;
     _dropdownItemsSetter = dropdownItemsSetter;
@@ -146,7 +142,6 @@ sealed class MapBrowserDialog : AbstractDialog {
     _list.selectionType = SelectionType.None;
     _list.virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight;
     _metadataService.MetadataChanged += OnMetadataChanged;
-    _mapSizeService.MapSizeChanged += OnMapSizeChanged;
     _subscriptionService.DownloadProgressChanged += OnDownloadProgressChanged;
     _subscriptionService.DownloadCompleted += OnDownloadCompleted;
     _metadataService.EnsureLoaded();
@@ -158,7 +153,6 @@ sealed class MapBrowserDialog : AbstractDialog {
       return;
     }
     _metadataService.MetadataChanged -= OnMetadataChanged;
-    _mapSizeService.MapSizeChanged -= OnMapSizeChanged;
     _subscriptionService.DownloadProgressChanged -= OnDownloadProgressChanged;
     _subscriptionService.DownloadCompleted -= OnDownloadCompleted;
     _list = null;
@@ -312,7 +306,7 @@ sealed class MapBrowserDialog : AbstractDialog {
     var titleLabel = row.Q<Label>("Title");
     titleLabel.text = title;
     var mapSizeBadge = row.Q<Label>("MapSizeBadge");
-    var mapSize = GetMapSize(installedMap, metadata, GetDownloadedMapSize(installedMap), null);
+    var mapSize = GetMapSize(installedMap, metadata);
     mapSizeBadge.text = mapSize;
     mapSizeBadge.ToggleDisplayStyle(mapSize != null);
     var descriptionLabel = row.Q<Label>("Description");
@@ -377,17 +371,6 @@ sealed class MapBrowserDialog : AbstractDialog {
     }
   }
 
-  void OnMapSizeChanged(string _) {
-    _list?.RefreshItems();
-  }
-
-  Vector2Int? GetDownloadedMapSize(InstalledMap installedMap) {
-    return installedMap.PublishedFileId != null
-        && _mapSizeService.TryGetCachedSize(installedMap.PublishedFileId, out var size)
-            ? size
-            : null;
-  }
-
   void SortMaps(List<InstalledMap> maps) {
     maps.Sort((left, right) => StringComparer.OrdinalIgnoreCase.Compare(
         GetSortTitle(left), GetSortTitle(right)));
@@ -403,11 +386,7 @@ sealed class MapBrowserDialog : AbstractDialog {
   }
 
   string FormatMapTitle(InstalledMap installedMap) {
-    var rawTitle = GetRawTitle(installedMap);
-    if (HasEmbeddedMapSize(rawTitle)) {
-      return rawTitle;
-    }
-    return RemoveEdgeMapSize(rawTitle);
+    return RemoveEdgeMapSize(GetRawTitle(installedMap));
   }
 
   WorkshopItemMetadata GetMetadata(InstalledMap installedMap) {
@@ -489,7 +468,9 @@ sealed class MapBrowserDialog : AbstractDialog {
   static bool IsSearchableMap(WorkshopItemMetadata metadata) {
     return metadata.PrimaryCategory == "map"
         && metadata.MapAnalysisVersion == CurrentMapAnalysisVersion
-        && metadata.MapMetadataCollectionState == "fetched";
+        && metadata.MapMetadataCollectionState == "fetched"
+        && metadata.MapWidth > 0
+        && metadata.MapHeight > 0;
   }
 
   void ShowMaps(List<InstalledMap> maps, bool resetScroll = true) {
@@ -503,25 +484,14 @@ sealed class MapBrowserDialog : AbstractDialog {
     }
   }
 
-  internal static string GetMapSize(
-      InstalledMap installedMap, WorkshopItemMetadata metadata, Vector2Int? downloadedSize, string unknown) {
+  internal static string GetMapSize(InstalledMap installedMap, WorkshopItemMetadata metadata) {
     if (installedMap.Map?.Size is { } mapSize) {
       return $"{mapSize.x}x{mapSize.y}";
-    }
-    if (downloadedSize is { } cachedSize) {
-      return $"{cachedSize.x}x{cachedSize.y}";
     }
     if (metadata is { MapWidth: > 0, MapHeight: > 0 }) {
       return $"{metadata.MapWidth}x{metadata.MapHeight}";
     }
-    var title = metadata?.Title ?? installedMap.Map?.DisplayName ?? string.Empty;
-    var match = ParenthesizedMapSizeRegex.Match(title);
-    if (!match.Success) {
-      match = MapSizePrefixRegex.Match(title);
-    }
-    return match.Success
-        ? $"{match.Groups["width"].Value}x{match.Groups["height"].Value}"
-        : unknown;
+    throw new InvalidOperationException($"Map {installedMap.Key} has no dimensions in map data or index metadata.");
   }
 
   internal static string RemoveEdgeMapSize(string title) {
@@ -537,12 +507,6 @@ sealed class MapBrowserDialog : AbstractDialog {
       return titleWithoutSuffix.Length > 0 ? titleWithoutSuffix : trimmedTitle;
     }
     return trimmedTitle;
-  }
-
-  static bool HasEmbeddedMapSize(string title) {
-    var trimmedTitle = title?.Trim() ?? string.Empty;
-    var match = ParenthesizedMapSizeRegex.Match(trimmedTitle);
-    return match.Success && match.Index > 0 && match.Index + match.Length < trimmedTitle.Length;
   }
 
   string FormatCompactAnalysis(WorkshopItemMetadata metadata) {
