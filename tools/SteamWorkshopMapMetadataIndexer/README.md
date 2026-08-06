@@ -15,6 +15,11 @@ The narrow transient `k_EResultBusy` and `k_EResultNoConnection` request results
 failures are not broadly retried. If the pass stops early, previous records for selected but unprocessed maps remain
 unchanged in the checkpoint.
 
+After either transient result, the sequential Steam request stream enters slow mode. Requests are then spaced at least
+10 seconds apart until six consecutive requests complete without another `Busy` or `NoConnection`; either result resets
+that success count. Existing 20- and 40-second retry cooldowns already satisfy the slow-mode spacing and are not
+extended by another 10 seconds.
+
 ## Private payload cache
 
 The analyzer can retain exact downloaded `.timber` payloads in a private OCI artifact hosted by GitHub Container

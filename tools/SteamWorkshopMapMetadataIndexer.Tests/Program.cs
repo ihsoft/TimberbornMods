@@ -24,6 +24,8 @@ static class Program {
       ("Settlement-space classifier preserves reviewed Workshop map baselines", PreservesSettlementSpaceBaselines),
       ("Payload cache keys use Workshop ID and canonical update time", BuildsStablePayloadCacheKey),
       ("Payload cache shards use stable Workshop ID modulo", BuildsStablePayloadCacheShard),
+      ("Steam slow mode requires six consecutive successes", RequiresSixSuccessesToRecoverSteamPacing),
+      ("Steam retry cooldown is not extended by slow mode", DoesNotExtendExistingSteamRetryCooldown),
   ];
 
   static int Main() {
@@ -376,6 +378,39 @@ static class Program {
     Assert.Equal("shard-000", OciPayloadCache.CreateShardTag("3675000000"));
     Assert.Equal("shard-032", OciPayloadCache.CreateShardTag("3675000032"));
     Assert.Equal("shard-099", OciPayloadCache.CreateShardTag("99"));
+  }
+
+  static void RequiresSixSuccessesToRecoverSteamPacing() {
+    var delays = new List<TimeSpan>();
+    var pacer = new SteamRequestPacer(delays.Add, _ => { });
+    pacer.RecordTransientFailure("Busy");
+    for (var index = 0; index < 5; index++) {
+      pacer.WaitBeforeRequest(TimeSpan.Zero);
+      pacer.RecordSuccessfulRequest();
+    }
+    Assert.True(pacer.SlowModeActive);
+    Assert.Equal(5, pacer.ConsecutiveSuccessfulRequests);
+
+    pacer.RecordTransientFailure("NoConnection");
+    Assert.Equal(0, pacer.ConsecutiveSuccessfulRequests);
+    for (var index = 0; index < 6; index++) {
+      pacer.WaitBeforeRequest(TimeSpan.Zero);
+      pacer.RecordSuccessfulRequest();
+    }
+    Assert.False(pacer.SlowModeActive);
+    Assert.Equal(11, delays.Count);
+    Assert.True(delays.All(value => value == TimeSpan.FromSeconds(10)));
+  }
+
+  static void DoesNotExtendExistingSteamRetryCooldown() {
+    var delays = new List<TimeSpan>();
+    var pacer = new SteamRequestPacer(delays.Add, _ => { });
+    pacer.RecordTransientFailure("Busy");
+
+    pacer.WaitBeforeRequest(TimeSpan.FromSeconds(20));
+
+    Assert.Equal(0, delays.Count);
+    Assert.True(pacer.SlowModeActive);
   }
 
   static DecodedWaterMap CreateDryMap(int width, int height, int[] heights) {

@@ -105,6 +105,7 @@ if (downloadCandidates.Count > 0 && DateTimeOffset.UtcNow < deadline) {
 
     Console.WriteLine(
         $"Anonymous Steam session connected; reading {downloadCandidates.Count} download-required map payloads.");
+    var requestPacer = new SteamRequestPacer(Thread.Sleep);
     for (var index = 0; index < downloadCandidates.Count; index++) {
       if (DateTimeOffset.UtcNow >= deadline) {
         Console.WriteLine($"Time budget reached after {index} / {downloadCandidates.Count} Steam maps.");
@@ -113,7 +114,8 @@ if (downloadCandidates.Count > 0 && DateTimeOffset.UtcNow < deadline) {
 
       var map = downloadCandidates[index];
       try {
-        var (analysis, downloaded) = ReadAndAnalyzeMapWithTransientRetry(map, options, payloadCache);
+        var (analysis, downloaded) = ReadAndAnalyzeMapWithTransientRetry(
+            map, options, payloadCache, requestPacer);
         if (downloaded) {
           downloadedThisRun++;
         }
@@ -170,21 +172,33 @@ Console.WriteLine(
 return 0;
 
 static (MapArchiveAnalysis Analysis, bool Downloaded) ReadAndAnalyzeMapWithTransientRetry(
-    MapItem map, Options options, OciPayloadCache? payloadCache) {
+    MapItem map, Options options, OciPayloadCache? payloadCache, SteamRequestPacer requestPacer) {
   var cachedPayload = payloadCache?.TryRead(map.PublishedFileId, map.UpdatedAtUtc, options.MaxDownloadBytes);
   if (cachedPayload is not null) {
     return (AnalyzePayload(new MemoryStream(cachedPayload, writable: false)), false);
   }
   var retryDelays = new[] { TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(40) };
+  var delayAlreadyApplied = TimeSpan.Zero;
   for (var attempt = 0; ; attempt++) {
+    requestPacer.WaitBeforeRequest(delayAlreadyApplied);
     try {
-      return (DownloadAndAnalyzeMap(map, options, payloadCache), true);
-    } catch (SteamPayloadTransientException exception) when (attempt < retryDelays.Length) {
+      var analysis = DownloadAndAnalyzeMap(map, options, payloadCache);
+      requestPacer.RecordSuccessfulRequest();
+      return (analysis, true);
+    } catch (UnsupportedMapPayloadException) {
+      requestPacer.RecordSuccessfulRequest();
+      throw;
+    } catch (SteamPayloadTransientException exception) {
+      requestPacer.RecordTransientFailure(exception.Result.ToString());
+      if (attempt >= retryDelays.Length) {
+        throw;
+      }
       var retryDelay = retryDelays[attempt];
       Console.WriteLine(
           $"Steam request returned {exception.Result} for {map.PublishedFileId}; "
           + $"retrying in {retryDelay.TotalSeconds:0} seconds ({attempt + 1} / {retryDelays.Length}).");
       Thread.Sleep(retryDelay);
+      delayAlreadyApplied = retryDelay;
     }
   }
 }
