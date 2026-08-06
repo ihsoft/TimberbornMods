@@ -8,6 +8,8 @@ static class WaterFeatureDiagnostics {
     var shallowLakeCore = new bool[openWater.Length];
     var ambiguousBroadWater = new bool[openWater.Length];
     var broadRegionHydrology = new List<BroadWaterHydrology>();
+    var exteriorLand = FindExteriorLand(openWater, map.Width, map.Height);
+    var waterTopologies = new Dictionary<int, WaterRegionTopology>();
     var lakeCount = 0;
     var shallowLakeCount = 0;
     var surfaceElevations = map.SurfaceFloors.Zip(
@@ -47,21 +49,27 @@ static class WaterFeatureDiagnostics {
       var volume = component.Sum(cell => map.SurfaceDepths[cell]);
       var throughput = Math.Min(inflow, outflow);
       var throughputPerVolume = volume > 0 ? throughput / volume : 0;
+      var topology = GetWaterRegionTopology(
+          component[0], openWater, exteriorLand, map.Width, map.Height, waterTopologies);
       broadRegionHydrology.Add(new BroadWaterHydrology(
           component.Count, spanX, spanY,
           component.Average(cell => cell % map.Width), component.Average(cell => cell / map.Width),
           boundaryEdges, compactness, maximumShoreDistance, innerCoreTiles,
           volume, inflow, outflow, throughputPerVolume,
-          medianFlowCoherence, surfaceHeightSpread));
+          medianFlowCoherence, surfaceHeightSpread, topology));
       var innerCoreRatio = (double) innerCoreTiles / component.Count;
       var shapeSupportsBasin = compactness >= 0.22
           && (component.Count < 100 || innerCoreRatio >= 0.49 || compactness >= 0.45)
           || innerCoreRatio >= 0.7;
       var flowSupportsBasin = medianFlowCoherence <= 0.8f && throughputPerVolume <= 0.06
           || medianFlowCoherence <= 0.93f && throughputPerVolume <= 0.03 && compactness >= 0.4;
+      var boundarySupportsBasin = !topology.TouchesMapBoundary
+          || topology.ExteriorShoreEdges >= 8
+              && (double) topology.ExteriorShoreEdges
+                  / (topology.ExteriorShoreEdges + topology.IslandShoreEdges) >= 0.25;
       var confident = component.Count >= 9 && Math.Min(spanX, spanY) >= 3
           && (double) Math.Max(spanX, spanY) / Math.Min(spanX, spanY) <= 4
-          && shapeSupportsBasin && flowSupportsBasin && surfaceHeightSpread <= 0.25f;
+          && shapeSupportsBasin && flowSupportsBasin && boundarySupportsBasin && surfaceHeightSpread <= 0.25f;
       var confidentRiver = !confident && (surfaceHeightSpread > 0.25f
           || throughputPerVolume > 0.1 || medianFlowCoherence > 0.8f
           || (double) Math.Max(spanX, spanY) / Math.Min(spanX, spanY) > 4);
@@ -195,6 +203,88 @@ static class WaterFeatureDiagnostics {
     return components;
   }
 
+  static bool[] FindExteriorLand(bool[] openWater, int width, int height) {
+    var exteriorLand = new bool[openWater.Length];
+    var pending = new Queue<int>();
+    for (var x = 0; x < width; x++) {
+      VisitCell(x);
+      VisitCell(x + (height - 1) * width);
+    }
+    for (var y = 0; y < height; y++) {
+      VisitCell(y * width);
+      VisitCell(width - 1 + y * width);
+    }
+    while (pending.TryDequeue(out var cell)) {
+      var x = cell % width;
+      var y = cell / width;
+      VisitCoordinate(x - 1, y);
+      VisitCoordinate(x + 1, y);
+      VisitCoordinate(x, y - 1);
+      VisitCoordinate(x, y + 1);
+    }
+    return exteriorLand;
+
+    void VisitCell(int cell) {
+      if (!openWater[cell] && !exteriorLand[cell]) {
+        exteriorLand[cell] = true;
+        pending.Enqueue(cell);
+      }
+    }
+
+    void VisitCoordinate(int x, int y) {
+      if (x >= 0 && x < width && y >= 0 && y < height) {
+        VisitCell(x + y * width);
+      }
+    }
+  }
+
+  static WaterRegionTopology GetWaterRegionTopology(
+      int start, bool[] openWater, bool[] exteriorLand, int width, int height,
+      Dictionary<int, WaterRegionTopology> topologies) {
+    if (topologies.TryGetValue(start, out var existing)) {
+      return existing;
+    }
+    var component = new List<int>();
+    var visited = new HashSet<int>() { start };
+    var pending = new Queue<int>();
+    pending.Enqueue(start);
+    var touchesMapBoundary = false;
+    var exteriorShoreEdges = 0;
+    var islandShoreEdges = 0;
+    while (pending.TryDequeue(out var cell)) {
+      component.Add(cell);
+      var x = cell % width;
+      var y = cell / width;
+      Visit(x - 1, y);
+      Visit(x + 1, y);
+      Visit(x, y - 1);
+      Visit(x, y + 1);
+    }
+    var topology = new WaterRegionTopology(
+        component.Count, touchesMapBoundary, exteriorShoreEdges, islandShoreEdges);
+    foreach (var cell in component) {
+      topologies[cell] = topology;
+    }
+    return topology;
+
+    void Visit(int x, int y) {
+      if (x < 0 || x >= width || y < 0 || y >= height) {
+        touchesMapBoundary = true;
+        return;
+      }
+      var neighbour = x + y * width;
+      if (!openWater[neighbour]) {
+        if (exteriorLand[neighbour]) {
+          exteriorShoreEdges++;
+        } else {
+          islandShoreEdges++;
+        }
+      } else if (visited.Add(neighbour)) {
+        pending.Enqueue(neighbour);
+      }
+    }
+  }
+
   static IReadOnlyList<List<int>> FindSurfaceLevelComponents(
       bool[] mask, float[] surfaceElevations, int width, int height, float maximumSpread) {
     var components = new List<List<int>>();
@@ -254,4 +344,7 @@ sealed record BroadWaterHydrology(
     int CoreTiles, int SpanX, int SpanY, double CenterX, double CenterY,
     int BoundaryEdges, double Compactness, int MaximumShoreDistance, int InnerCoreTiles,
     double Volume, double Inflow, double Outflow, double ThroughputPerVolume,
-    double MedianFlowCoherence, double SurfaceHeightSpread);
+    double MedianFlowCoherence, double SurfaceHeightSpread, WaterRegionTopology Topology);
+
+sealed record WaterRegionTopology(
+    int WaterTiles, bool TouchesMapBoundary, int ExteriorShoreEdges, int IslandShoreEdges);

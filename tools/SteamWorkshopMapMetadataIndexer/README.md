@@ -67,6 +67,9 @@ It reports `open_water_tiles`, `open_water_ratio`, `lake_count`, and a searchabl
 coherence, shape, and the relative amount attributed to lake basins and river channels. It always chooses a concrete
 form; internal ambiguous diagnostic regions are not published as a search value. Consumers can derive a
 water-covered query directly from `open_water_ratio`, for example with a threshold greater than `0.4`.
+For water reaching the map edge, a lake also needs a meaningful visible shoreline with exterior, edge-connected land.
+Shorelines formed mostly by enclosed islands do not make the surrounding water a lake. A readable lake may still
+extend beyond one edge of the map.
 
 The `plateaus` classifier finds connected constant-height land regions after excluding open surface water. Isolated
 one- or two-tile height deviations are smoothed when their surrounding terrain supports a one-level correction. A
@@ -96,6 +99,9 @@ classifications, and a diagnostic `analysis_error`; consumers must not treat the
 
 `tools/TimberbornMapPreviewClassifier/build_public_index.py` publishes classifications in merged search records as
 `map_classifications`. Consumers must tolerate additional classifier keys and result fields.
+
+Reviewed real-map water inputs are stored as compressed decoded fixtures in the focused test project. They preserve
+the classifier inputs without redistributing complete Workshop payloads or requiring Steam during regression tests.
 
 The production invocation and numeric Steam/resource limits remain authoritative in
 `.github/workflows/workshop-search-index.yml`.
