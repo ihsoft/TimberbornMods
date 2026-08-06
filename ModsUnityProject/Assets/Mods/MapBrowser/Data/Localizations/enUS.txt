@@ -22,45 +22,24 @@ IgorZ.MapBrowser.Action.UnsubscribeTooltip,"Unsubscribe from this Steam Workshop
 You can subscribe to it again later.",Tooltip for unsubscribing from a Workshop map.
 IgorZ.MapBrowser.Action.Unsubscribing,Unsubscribing...,Temporary button text while a Workshop map is being unsubscribed.
 =,=,Map analysis
-IgorZ.MapBrowser.Analysis.Compact,"{0}, {1}, {2}, {3}, {4}, {5}",Compact map analysis shown in the browser row.
-IgorZ.MapBrowser.Analysis.CompactMixed.Landform,Mixed landform,Context-specific middle landform classification in compact analysis.
-IgorZ.MapBrowser.Analysis.CompactMixed.Layout,Mixed layout,Context-specific middle layout classification in compact analysis.
-IgorZ.MapBrowser.Analysis.CompactMixed.Terrain,Mixed terrain,Context-specific middle terrain classification in compact analysis.
-IgorZ.MapBrowser.Analysis.CompactMixed.Valleys,Mixed valleys,Context-specific middle valley classification in compact analysis.
-IgorZ.MapBrowser.Analysis.Full,"Terrain: {0}
-Valleys: {1}
-Water: {2}
-Landform: {3}
-Forests: {4}
-Layout: {5}",Full map analysis shown in the details dialog.
+IgorZ.MapBrowser.Analysis.Compact,"{0}, {1}, {2}",Compact exact map analysis shown in the browser row.
+IgorZ.MapBrowser.Analysis.Full,"Forests: {0}
+Water: {1}
+Plateaus: {2}",Full exact map analysis shown in the details dialog.
 IgorZ.MapBrowser.Analysis.Level.Barren,Barren,Very low forest density classification.
-IgorZ.MapBrowser.Analysis.Level.Canyons,Canyons,Very high canyon classification.
 IgorZ.MapBrowser.Analysis.Level.DenseForest,Dense forest,Very high forest density classification.
-IgorZ.MapBrowser.Analysis.Level.Dry,Dry,Very low water classification.
-IgorZ.MapBrowser.Analysis.Level.Flat,Flat,Very low ruggedness classification.
+IgorZ.MapBrowser.Analysis.Level.FewPlateaus,Few plateaus,Low plateau coverage classification.
+IgorZ.MapBrowser.Analysis.Level.FlatMap,Flat map,Very high plateau coverage classification.
 IgorZ.MapBrowser.Analysis.Level.Forested,Forested,High forest density classification.
-IgorZ.MapBrowser.Analysis.Level.Fragmented,Fragmented,High islandness classification.
-IgorZ.MapBrowser.Analysis.Level.Geometric,Geometric,Very high artificial layout classification.
-IgorZ.MapBrowser.Analysis.Level.Islands,Islands,Very high islandness classification.
-IgorZ.MapBrowser.Analysis.Level.LittleWater,Little water,Low water classification.
-IgorZ.MapBrowser.Analysis.Level.Mainland,Mainland,Very low islandness classification.
-IgorZ.MapBrowser.Analysis.Level.Mixed,Mixed,Middle classification value.
+IgorZ.MapBrowser.Analysis.Level.HasPlateaus,Has plateaus,Moderate plateau coverage classification.
+IgorZ.MapBrowser.Analysis.Level.Lakes,Lakes,Open water is mainly represented by lakes.
+IgorZ.MapBrowser.Analysis.Level.ManyPlateaus,Many plateaus,High plateau coverage classification.
 IgorZ.MapBrowser.Analysis.Level.ModerateForests,Moderate forests,Middle forest density classification.
-IgorZ.MapBrowser.Analysis.Level.ModerateWater,Moderate water,Middle water classification.
-IgorZ.MapBrowser.Analysis.Level.MostlyConnected,Mostly connected,Low islandness classification.
-IgorZ.MapBrowser.Analysis.Level.MostlyFlat,Mostly flat,Low ruggedness classification.
-IgorZ.MapBrowser.Analysis.Level.MostlyNatural,Mostly natural,Low artificial layout classification.
-IgorZ.MapBrowser.Analysis.Level.MostlyOpen,Mostly open,Low canyon classification.
-IgorZ.MapBrowser.Analysis.Level.Mountainous,Mountainous,Very high ruggedness classification.
-IgorZ.MapBrowser.Analysis.Level.NarrowValleys,Narrow valleys,High canyon classification.
-IgorZ.MapBrowser.Analysis.Level.Natural,Natural,Very low artificial layout classification.
-IgorZ.MapBrowser.Analysis.Level.Open,Open,Very low canyon classification.
-IgorZ.MapBrowser.Analysis.Level.Rugged,Rugged,High ruggedness classification.
+IgorZ.MapBrowser.Analysis.Level.NoWater,No open water,No open water was found on the map.
+IgorZ.MapBrowser.Analysis.Level.Rivers,Rivers,Open water is mainly represented by rivers.
+IgorZ.MapBrowser.Analysis.Level.RiversAndLakes,Rivers and lakes,Open water includes both rivers and lakes.
 IgorZ.MapBrowser.Analysis.Level.Sparse,Sparse,Low forest density classification.
-IgorZ.MapBrowser.Analysis.Level.Structured,Structured,High artificial layout classification.
 IgorZ.MapBrowser.Analysis.Level.Unknown,Unknown,Classification value shown when analysis data is missing.
-IgorZ.MapBrowser.Analysis.Level.WaterDominated,Water-dominated,Very high water classification.
-IgorZ.MapBrowser.Analysis.Level.WaterRich,Water-rich,High water classification.
 =,=,Map browser
 IgorZ.MapBrowser.Browser.InstalledMaps,Installed custom maps,Heading above the installed map list.
 IgorZ.MapBrowser.Browser.SearchMaps,Find Workshop maps,Heading above Workshop search results.
@@ -76,14 +55,11 @@ IgorZ.MapBrowser.Details.Votes,Votes: {0}/{1},Steam upvotes and downvotes shown 
 IgorZ.MapBrowser.Details.VotesUnavailable,Votes: Unavailable,Text shown while live Steam votes are unavailable.
 =,=,Metadata freshness
 IgorZ.MapBrowser.Freshness.Missing,"Freshness: This map is not included in the latest index snapshot ({0}). Analysis will become available after a later refresh.",Message shown for a Workshop map missing from the current public index.
-IgorZ.MapBrowser.Freshness.Stale,"Freshness warning: The analysis above describes previously indexed images; the current Workshop images have changed and could not be reclassified yet.",Warning shown when saved map analysis is stale.
+IgorZ.MapBrowser.Freshness.Stale,"Freshness warning: The map has changed since its exact analysis and has not been reindexed yet.",Warning shown when saved exact map analysis is stale.
 =,=,Workshop search
 IgorZ.MapBrowser.Search.Any,Any,Filter option that does not restrict search results.
 IgorZ.MapBrowser.Search.Filter.Forests,Forests,Label for the forest density search filter.
-IgorZ.MapBrowser.Search.Filter.Landform,Landform,Label for the landform search filter.
-IgorZ.MapBrowser.Search.Filter.Layout,Layout,Label for the layout search filter.
-IgorZ.MapBrowser.Search.Filter.Terrain,Terrain,Label for the terrain search filter.
-IgorZ.MapBrowser.Search.Filter.Valleys,Valleys,Label for the valley search filter.
+IgorZ.MapBrowser.Search.Filter.Plateaus,Plateaus,Label for the plateau search filter.
 IgorZ.MapBrowser.Search.Filter.Water,Water,Label for the water search filter.
 IgorZ.MapBrowser.Search.Installed,Installed,Tab button that shows installed maps.
 IgorZ.MapBrowser.Search.Keywords,Keywords,Label for the Workshop text search field.

@@ -66,35 +66,40 @@ sealed class WorkshopItemMetadata {
   [JsonProperty("map_height")]
   public int? MapHeight { get; set; }
 
-  [JsonProperty("visual_scores")]
-  public Dictionary<string, float> VisualScores { get; set; } = [];
+  [JsonProperty("map_analysis_version")]
+  public int? MapAnalysisVersion { get; set; }
 
-  [JsonProperty("visual_percentiles")]
-  public Dictionary<string, float> VisualPercentiles { get; set; } = [];
+  [JsonProperty("map_metadata_collection_state")]
+  public string MapMetadataCollectionState { get; set; }
 
-  [JsonProperty("visual_levels")]
-  public Dictionary<string, int> VisualLevels { get; set; } = [];
+  [JsonProperty("map_classifications")]
+  public MapClassifications MapClassifications { get; set; }
+}
 
-  [JsonProperty("visual_labels")]
-  public List<string> VisualLabels { get; set; } = [];
+sealed class MapClassifications {
+  [JsonProperty("forest_density")]
+  public ForestDensityClassification ForestDensity { get; set; }
 
-  [JsonProperty("visual_image_count")]
-  public int VisualImageCount { get; set; }
+  [JsonProperty("water")]
+  public WaterClassification Water { get; set; }
 
-  [JsonProperty("visual_gallery_image_count")]
-  public int VisualGalleryImageCount { get; set; }
+  [JsonProperty("plateaus")]
+  public PlateauClassification Plateaus { get; set; }
+}
 
-  [JsonProperty("visual_missing_image_count")]
-  public int VisualMissingImageCount { get; set; }
+sealed class ForestDensityClassification {
+  [JsonProperty("level")]
+  public int? Level { get; set; }
+}
 
-  [JsonProperty("visual_model")]
-  public string VisualModel { get; set; }
+sealed class WaterClassification {
+  [JsonProperty("water_form")]
+  public string WaterForm { get; set; }
+}
 
-  [JsonProperty("visual_classifier_version")]
-  public string VisualClassifierVersion { get; set; }
-
-  [JsonProperty("visual_stale")]
-  public bool VisualStale { get; set; }
+sealed class PlateauClassification {
+  [JsonProperty("plateau_level")]
+  public string PlateauLevel { get; set; }
 }
 
 sealed class WorkshopCategoryMatch {

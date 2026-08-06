@@ -15,7 +15,7 @@
                         </engine:VisualElement>
                     </Timberborn.CoreUI.NineSliceVisualElement>
                     <engine:Label name="MapInformation" text="Size: 128x128&#10;Votes: +42/-3&#10;Subscribers: 12,345" class="text--default" style="margin-top: 10px; white-space: normal;" />
-                    <engine:Label name="Analysis" text="Terrain: Rugged&#10;Valleys: Narrow valleys&#10;Water: Moderate water&#10;Landform: Fragmented&#10;Forests: Forested&#10;Layout: Mostly natural" class="text--default" style="margin-top: 10px; white-space: normal;" />
+                    <engine:Label name="Analysis" text="Forests: Moderate forests&#10;Water: Rivers and lakes&#10;Plateaus: Many plateaus" class="text--default" style="margin-top: 10px; white-space: normal;" />
                 </engine:VisualElement>
                 <engine:VisualElement style="flex-grow: 1; min-width: 0;">
                     <engine:Label name="Title" text="Example Workshop Map" class="game-text-big text--bold" style="margin-bottom: 8px; flex-shrink: 0;" />

@@ -22,7 +22,6 @@ namespace IgorZ.MapBrowser.CoreUI;
 
 sealed class MapBrowserDialog : AbstractDialog {
   const string AnalysisCompactLocKey = "IgorZ.MapBrowser.Analysis.Compact";
-  const string AnalysisCompactMixedLocKeyPrefix = "IgorZ.MapBrowser.Analysis.CompactMixed.";
   const string AnalysisFullLocKey = "IgorZ.MapBrowser.Analysis.Full";
   const string AnalysisLevelLocKeyPrefix = "IgorZ.MapBrowser.Analysis.Level.";
   const string AnalysisLevelUnknownLocKey = "IgorZ.MapBrowser.Analysis.Level.Unknown";
@@ -56,6 +55,7 @@ sealed class MapBrowserDialog : AbstractDialog {
   const string UnsubscribingLocKey = "IgorZ.MapBrowser.Action.Unsubscribing";
   const string FreshnessMissingLocKey = "IgorZ.MapBrowser.Freshness.Missing";
   const string FreshnessStaleLocKey = "IgorZ.MapBrowser.Freshness.Stale";
+  const int CurrentMapAnalysisVersion = 6;
   static readonly Regex ParenthesizedMapSizeRegex = new(
       @"\(\s*(?<width>\d{1,4})\s*[xX×]\s*(?<height>\d{1,4})\s*\)", RegexOptions.Compiled);
   static readonly Regex MapSizePrefixRegex = new(
@@ -68,12 +68,9 @@ sealed class MapBrowserDialog : AbstractDialog {
       RegexOptions.Compiled);
 
   static readonly SearchFilter[] SearchFilters = [
-    new("ruggedness", ["Flat", "MostlyFlat", "Mixed", "Rugged", "Mountainous"]),
-    new("canyonness", ["Open", "MostlyOpen", "Mixed", "NarrowValleys", "Canyons"]),
-    new("water_dominance", ["Dry", "LittleWater", "ModerateWater", "WaterRich", "WaterDominated"]),
     new("forest_density", ["Barren", "Sparse", "ModerateForests", "Forested", "DenseForest"]),
-    new("islandness", ["Mainland", "MostlyConnected", "Mixed", "Fragmented", "Islands"]),
-    new("artificial_layout", ["Natural", "MostlyNatural", "Mixed", "Structured", "Geometric"]),
+    new("water", ["NoWater", "Rivers", "Lakes", "RiversAndLakes"]),
+    new("plateaus", ["FewPlateaus", "HasPlateaus", "ManyPlateaus", "FlatMap"]),
   ];
 
   readonly MapItemProvider _mapItemProvider;
@@ -227,7 +224,7 @@ sealed class MapBrowserDialog : AbstractDialog {
   void BindSearchFilter(VisualElement searchControls, SearchFilter filter) {
     var dropdown = searchControls.Q2<Dropdown>(filter.Feature + "Dropdown");
     var values = new[] { UiFactory.T(SearchAnyLocKey) }
-        .Concat(filter.Levels.Select(level => UiFactory.T(AnalysisLevelLocKeyPrefix + level)))
+        .Concat(filter.Values.Select(level => UiFactory.T(AnalysisLevelLocKeyPrefix + level)))
         .ToArray();
     var provider = new SearchDropdownProvider(values);
     dropdown.ValueChanged += (_, _) => ApplySearch();
@@ -330,7 +327,7 @@ sealed class MapBrowserDialog : AbstractDialog {
     freshness.text = FormatFreshness(installedMap, metadata);
     freshness.ToggleDisplayStyle(
         _metadataService.Loaded && installedMap.PublishedFileId != null
-        && (metadata == null || metadata.VisualStale));
+        && (metadata == null || metadata.MapMetadataCollectionState == "stale"));
     ApplyRemovedState(row, binding, installedMap.Removed);
     row.Q<NineSliceButton>("ActionButton").SetEnabled(!binding.Downloading);
     row.Q<VisualElement>("Actions").ToggleDisplayStyle(binding.Downloading);
@@ -424,7 +421,7 @@ sealed class MapBrowserDialog : AbstractDialog {
     var terms = Regex.Split(_searchText?.value?.Trim() ?? string.Empty, @"\s+")
         .Where(term => term.Length > 0)
         .ToArray();
-    foreach (var metadata in _metadataService.Items.Where(item => item.PrimaryCategory == "map")) {
+    foreach (var metadata in _metadataService.Items.Where(IsSearchableMap)) {
       if (!MatchesText(metadata, terms) || !MatchesFilters(metadata)) {
         continue;
       }
@@ -440,7 +437,7 @@ sealed class MapBrowserDialog : AbstractDialog {
   }
 
   void RefreshSearchPage(bool resetScroll = true) {
-    var totalMaps = _metadataService.Items.Count(item => item.PrimaryCategory == "map");
+    var totalMaps = _metadataService.Items.Count(IsSearchableMap);
     var pageCount = _searchMatches.Count == 0
         ? 0
         : (_searchMatches.Count + _pageSize - 1) / _pageSize;
@@ -479,21 +476,18 @@ sealed class MapBrowserDialog : AbstractDialog {
       if (selectedIndex == 0) {
         continue;
       }
-      if (!TryGetVisualLevel(metadata, filter.Feature, out var level) || level != selectedIndex - 1) {
+      if (!TryGetClassificationValue(metadata, filter.Feature, out var value)
+          || value != filter.Values[selectedIndex - 1]) {
         return false;
       }
     }
     return true;
   }
 
-  static int GetLegacyPercentileLevel(float percentile) {
-    return percentile switch {
-        < 0.2f => 0,
-        < 0.4f => 1,
-        < 0.6f => 2,
-        < 0.8f => 3,
-        _ => 4,
-    };
+  static bool IsSearchableMap(WorkshopItemMetadata metadata) {
+    return metadata.PrimaryCategory == "map"
+        && metadata.MapAnalysisVersion == CurrentMapAnalysisVersion
+        && metadata.MapMetadataCollectionState == "fetched";
   }
 
   void ShowMaps(List<InstalledMap> maps, bool resetScroll = true) {
@@ -550,74 +544,87 @@ sealed class MapBrowserDialog : AbstractDialog {
   }
 
   string FormatCompactAnalysis(WorkshopItemMetadata metadata) {
-    var terrain = GetVisualLevel(
-        metadata, "ruggedness", "Flat", "MostlyFlat", "Mixed", "Rugged", "Mountainous", UiFactory,
-        AnalysisCompactMixedLocKeyPrefix + "Terrain");
-    var valleys = GetVisualLevel(
-        metadata, "canyonness", "Open", "MostlyOpen", "Mixed", "NarrowValleys", "Canyons", UiFactory,
-        AnalysisCompactMixedLocKeyPrefix + "Valleys");
-    var landform = GetVisualLevel(
-        metadata, "islandness", "Mainland", "MostlyConnected", "Mixed", "Fragmented", "Islands", UiFactory,
-        AnalysisCompactMixedLocKeyPrefix + "Landform");
-    var layout = GetVisualLevel(
-        metadata, "artificial_layout", "Natural", "MostlyNatural", "Mixed", "Structured", "Geometric", UiFactory,
-        AnalysisCompactMixedLocKeyPrefix + "Layout");
-    var water = GetVisualLevel(
-        metadata, "water_dominance", "Dry", "LittleWater", "ModerateWater", "WaterRich", "WaterDominated", UiFactory);
-    var forests = GetVisualLevel(
-        metadata, "forest_density", "Barren", "Sparse", "ModerateForests", "Forested", "DenseForest", UiFactory);
-    return string.Format(UiFactory.T(AnalysisCompactLocKey), terrain, valleys, landform, layout, water, forests);
+    return string.Format(
+        UiFactory.T(AnalysisCompactLocKey), GetForestLevel(metadata, UiFactory), GetWaterForm(metadata, UiFactory),
+        GetPlateauLevel(metadata, UiFactory));
   }
 
   internal static string FormatFullAnalysis(WorkshopItemMetadata metadata, UiFactory uiFactory) {
-    var terrain = GetVisualLevel(
-        metadata, "ruggedness", "Flat", "MostlyFlat", "Mixed", "Rugged", "Mountainous", uiFactory);
-    var valleys = GetVisualLevel(
-        metadata, "canyonness", "Open", "MostlyOpen", "Mixed", "NarrowValleys", "Canyons", uiFactory);
-    var water = GetVisualLevel(
-        metadata, "water_dominance", "Dry", "LittleWater", "ModerateWater", "WaterRich", "WaterDominated", uiFactory);
-    var landform = GetVisualLevel(
-        metadata, "islandness", "Mainland", "MostlyConnected", "Mixed", "Fragmented", "Islands", uiFactory);
-    var forests = GetVisualLevel(
-        metadata, "forest_density", "Barren", "Sparse", "ModerateForests", "Forested", "DenseForest", uiFactory);
-    var layout = GetVisualLevel(
-        metadata, "artificial_layout", "Natural", "MostlyNatural", "Mixed", "Structured", "Geometric", uiFactory);
-    return string.Format(uiFactory.T(AnalysisFullLocKey), terrain, valleys, water, landform, forests, layout);
+    return string.Format(
+        uiFactory.T(AnalysisFullLocKey), GetForestLevel(metadata, uiFactory), GetWaterForm(metadata, uiFactory),
+        GetPlateauLevel(metadata, uiFactory));
   }
 
   string FormatAnalysisTooltip(WorkshopItemMetadata metadata) {
     return FormatFullAnalysis(metadata, UiFactory);
   }
 
-  static string GetVisualLevel(
-      WorkshopItemMetadata metadata, string feature, string veryLow, string low, string middle, string high,
-      string veryHigh, UiFactory uiFactory, string compactMiddleLocKey = null) {
-    if (!TryGetVisualLevel(metadata, feature, out var level)) {
-      return uiFactory.T(AnalysisLevelUnknownLocKey);
-    }
+  static string GetForestLevel(WorkshopItemMetadata metadata, UiFactory uiFactory) {
+    var level = metadata.MapClassifications?.ForestDensity?.Level;
     var levelName = level switch {
-        0 => veryLow,
-        1 => low,
-        2 => middle,
-        3 => high,
-        _ => veryHigh,
+        0 => "Barren",
+        1 => "Sparse",
+        2 => "ModerateForests",
+        3 => "Forested",
+        4 => "DenseForest",
+        _ => null,
     };
-    return uiFactory.T(levelName == middle && compactMiddleLocKey != null
-        ? compactMiddleLocKey
-        : AnalysisLevelLocKeyPrefix + levelName);
+    return GetLocalizedLevel(levelName, uiFactory);
   }
 
-  static bool TryGetVisualLevel(WorkshopItemMetadata metadata, string feature, out int level) {
-    if (metadata.VisualLevels.TryGetValue(feature, out level) && level is >= 0 and <= 4) {
-      return true;
-    }
-    // Compatibility with public snapshots from before the absolute-level migration. Remove after 2026-11-01.
-    if (metadata.VisualPercentiles.TryGetValue(feature, out var percentile)) {
-      level = GetLegacyPercentileLevel(percentile);
-      return true;
-    }
-    level = 0;
-    return false;
+  static string GetWaterForm(WorkshopItemMetadata metadata, UiFactory uiFactory) {
+    var levelName = metadata.MapClassifications?.Water?.WaterForm switch {
+        "none" => "NoWater",
+        "rivers" => "Rivers",
+        "lakes" => "Lakes",
+        "rivers_and_lakes" => "RiversAndLakes",
+        _ => null,
+    };
+    return GetLocalizedLevel(levelName, uiFactory);
+  }
+
+  static string GetPlateauLevel(WorkshopItemMetadata metadata, UiFactory uiFactory) {
+    var levelName = metadata.MapClassifications?.Plateaus?.PlateauLevel switch {
+        "few_plateaus" => "FewPlateaus",
+        "has_plateaus" => "HasPlateaus",
+        "many_plateaus" => "ManyPlateaus",
+        "flat_map" => "FlatMap",
+        _ => null,
+    };
+    return GetLocalizedLevel(levelName, uiFactory);
+  }
+
+  static string GetLocalizedLevel(string levelName, UiFactory uiFactory) {
+    return uiFactory.T(levelName == null ? AnalysisLevelUnknownLocKey : AnalysisLevelLocKeyPrefix + levelName);
+  }
+
+  static bool TryGetClassificationValue(WorkshopItemMetadata metadata, string feature, out string value) {
+    value = feature switch {
+        "forest_density" => metadata.MapClassifications?.ForestDensity?.Level switch {
+            0 => "Barren",
+            1 => "Sparse",
+            2 => "ModerateForests",
+            3 => "Forested",
+            4 => "DenseForest",
+            _ => null,
+        },
+        "water" => metadata.MapClassifications?.Water?.WaterForm switch {
+            "none" => "NoWater",
+            "rivers" => "Rivers",
+            "lakes" => "Lakes",
+            "rivers_and_lakes" => "RiversAndLakes",
+            _ => null,
+        },
+        "plateaus" => metadata.MapClassifications?.Plateaus?.PlateauLevel switch {
+            "few_plateaus" => "FewPlateaus",
+            "has_plateaus" => "HasPlateaus",
+            "many_plateaus" => "ManyPlateaus",
+            "flat_map" => "FlatMap",
+            _ => null,
+        },
+        _ => null,
+    };
+    return value != null;
   }
 
   static void FitDescription(Label label, string fullText) {
@@ -828,7 +835,7 @@ sealed class MapBrowserDialog : AbstractDialog {
     if (!_metadataService.Loaded) {
       return string.Empty;
     }
-    if (metadata?.VisualStale == true) {
+    if (metadata?.MapMetadataCollectionState == "stale") {
       return UiFactory.T(FreshnessStaleLocKey);
     }
     if (metadata != null || installedMap.PublishedFileId == null) {
@@ -865,7 +872,7 @@ sealed class MapBrowserDialog : AbstractDialog {
     public bool Downloading { get; set; }
   }
 
-  sealed record SearchFilter(string Feature, string[] Levels);
+  sealed record SearchFilter(string Feature, string[] Values);
 
   sealed class SearchDropdownProvider : IDropdownProvider {
     readonly string[] _items;

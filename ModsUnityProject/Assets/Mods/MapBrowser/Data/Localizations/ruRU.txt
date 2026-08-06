@@ -22,45 +22,24 @@ IgorZ.MapBrowser.Action.UnsubscribeTooltip,"Отписаться от этой �
 Позже на неё можно подписаться снова.",Tooltip for unsubscribing from a Workshop map.
 IgorZ.MapBrowser.Action.Unsubscribing,Отписка...,Temporary button text while a Workshop map is being unsubscribed.
 =,=,Map analysis
-IgorZ.MapBrowser.Analysis.Compact,"{0}, {1}, {2}, {3}, {4}, {5}",Compact map analysis shown in the browser row.
-IgorZ.MapBrowser.Analysis.CompactMixed.Landform,Смешанная форма суши,Context-specific middle landform classification in compact analysis.
-IgorZ.MapBrowser.Analysis.CompactMixed.Layout,Смешанная планировка,Context-specific middle layout classification in compact analysis.
-IgorZ.MapBrowser.Analysis.CompactMixed.Terrain,Смешанный рельеф,Context-specific middle terrain classification in compact analysis.
-IgorZ.MapBrowser.Analysis.CompactMixed.Valleys,Смешанные долины,Context-specific middle valley classification in compact analysis.
-IgorZ.MapBrowser.Analysis.Full,"Рельеф: {0}
-Долины: {1}
-Вода: {2}
-Форма суши: {3}
-Леса: {4}
-Планировка: {5}",Full map analysis shown in the details dialog.
+IgorZ.MapBrowser.Analysis.Compact,"{0}, {1}, {2}",Compact exact map analysis shown in the browser row.
+IgorZ.MapBrowser.Analysis.Full,"Леса: {0}
+Вода: {1}
+Плато: {2}",Full exact map analysis shown in the details dialog.
 IgorZ.MapBrowser.Analysis.Level.Barren,Мало леса,Very low forest density classification.
-IgorZ.MapBrowser.Analysis.Level.Canyons,Каньоны,Very high canyon classification.
 IgorZ.MapBrowser.Analysis.Level.DenseForest,Густой лес,Very high forest density classification.
-IgorZ.MapBrowser.Analysis.Level.Dry,Сухо,Very low water classification.
-IgorZ.MapBrowser.Analysis.Level.Flat,Равнина,Very low ruggedness classification.
+IgorZ.MapBrowser.Analysis.Level.FewPlateaus,Мало плато,Low plateau coverage classification.
+IgorZ.MapBrowser.Analysis.Level.FlatMap,Плоская карта,Very high plateau coverage classification.
 IgorZ.MapBrowser.Analysis.Level.Forested,Много леса,High forest density classification.
-IgorZ.MapBrowser.Analysis.Level.Fragmented,Раздробленная,High islandness classification.
-IgorZ.MapBrowser.Analysis.Level.Geometric,Геометрическая,Very high artificial layout classification.
-IgorZ.MapBrowser.Analysis.Level.Islands,Острова,Very high islandness classification.
-IgorZ.MapBrowser.Analysis.Level.LittleWater,Мало воды,Low water classification.
-IgorZ.MapBrowser.Analysis.Level.Mainland,Материк,Very low islandness classification.
-IgorZ.MapBrowser.Analysis.Level.Mixed,Смешанный тип,Middle classification value.
+IgorZ.MapBrowser.Analysis.Level.HasPlateaus,Есть плато,Moderate plateau coverage classification.
+IgorZ.MapBrowser.Analysis.Level.Lakes,Озёра,Open water is mainly represented by lakes.
+IgorZ.MapBrowser.Analysis.Level.ManyPlateaus,Много плато,High plateau coverage classification.
 IgorZ.MapBrowser.Analysis.Level.ModerateForests,Средняя лесистость,Middle forest density classification.
-IgorZ.MapBrowser.Analysis.Level.ModerateWater,Среднее количество воды,Middle water classification.
-IgorZ.MapBrowser.Analysis.Level.MostlyConnected,Почти цельная,Low islandness classification.
-IgorZ.MapBrowser.Analysis.Level.MostlyFlat,Почти равнина,Low ruggedness classification.
-IgorZ.MapBrowser.Analysis.Level.MostlyNatural,Почти естественная,Low artificial layout classification.
-IgorZ.MapBrowser.Analysis.Level.MostlyOpen,Преимущественно открытая,Low canyon classification.
-IgorZ.MapBrowser.Analysis.Level.Mountainous,Горы,Very high ruggedness classification.
-IgorZ.MapBrowser.Analysis.Level.NarrowValleys,Узкие долины,High canyon classification.
-IgorZ.MapBrowser.Analysis.Level.Natural,Естественная,Very low artificial layout classification.
-IgorZ.MapBrowser.Analysis.Level.Open,Открытая,Very low canyon classification.
-IgorZ.MapBrowser.Analysis.Level.Rugged,Пересечённая местность,High ruggedness classification.
+IgorZ.MapBrowser.Analysis.Level.NoWater,Нет открытой воды,No open water was found on the map.
+IgorZ.MapBrowser.Analysis.Level.Rivers,Реки,Open water is mainly represented by rivers.
+IgorZ.MapBrowser.Analysis.Level.RiversAndLakes,Реки и озёра,Open water includes both rivers and lakes.
 IgorZ.MapBrowser.Analysis.Level.Sparse,Редкий лес,Low forest density classification.
-IgorZ.MapBrowser.Analysis.Level.Structured,Структурированная,High artificial layout classification.
 IgorZ.MapBrowser.Analysis.Level.Unknown,Неизвестно,Classification value shown when analysis data is missing.
-IgorZ.MapBrowser.Analysis.Level.WaterDominated,Преобладает вода,Very high water classification.
-IgorZ.MapBrowser.Analysis.Level.WaterRich,Много воды,High water classification.
 =,=,Map browser
 IgorZ.MapBrowser.Browser.InstalledMaps,Установленные пользовательские карты,Heading above the installed map list.
 IgorZ.MapBrowser.Browser.SearchMaps,Поиск карт в Workshop,Heading above Workshop search results.
@@ -76,14 +55,11 @@ IgorZ.MapBrowser.Details.Votes,Голоса: {0}/{1},Steam upvotes and downvotes
 IgorZ.MapBrowser.Details.VotesUnavailable,Голоса: недоступно,Text shown while live Steam votes are unavailable.
 =,=,Metadata freshness
 IgorZ.MapBrowser.Freshness.Missing,"Актуальность: этой карты нет в последнем снимке индекса ({0}). Анализ появится после следующего обновления.",Message shown for a Workshop map missing from the current public index.
-IgorZ.MapBrowser.Freshness.Stale,"Предупреждение об актуальности: анализ выше описывает ранее проиндексированные изображения. Текущие изображения в Workshop изменились и ещё не были классифицированы заново.",Warning shown when saved map analysis is stale.
+IgorZ.MapBrowser.Freshness.Stale,"Предупреждение об актуальности: карта изменилась после точного анализа и ещё не была проиндексирована заново.",Warning shown when saved exact map analysis is stale.
 =,=,Workshop search
 IgorZ.MapBrowser.Search.Any,Неважно,Filter option that does not restrict search results.
 IgorZ.MapBrowser.Search.Filter.Forests,Леса,Label for the forest density search filter.
-IgorZ.MapBrowser.Search.Filter.Landform,Форма суши,Label for the landform search filter.
-IgorZ.MapBrowser.Search.Filter.Layout,Планировка,Label for the layout search filter.
-IgorZ.MapBrowser.Search.Filter.Terrain,Рельеф,Label for the terrain search filter.
-IgorZ.MapBrowser.Search.Filter.Valleys,Долины,Label for the valley search filter.
+IgorZ.MapBrowser.Search.Filter.Plateaus,Плато,Label for the plateau search filter.
 IgorZ.MapBrowser.Search.Filter.Water,Вода,Label for the water search filter.
 IgorZ.MapBrowser.Search.Installed,Установленные,Tab button that shows installed maps.
 IgorZ.MapBrowser.Search.Keywords,Ключевые слова,Label for the Workshop text search field.
