@@ -1,0 +1,27 @@
+[h1]Support the mods[/h1]
+All my Timberborn mods are free. I make them for fun, because I enjoy improving the game and experimenting with new ideas.
+
+Donations are completely optional. If you enjoy the mods and want to say thanks, you can buy me a coffee or donate via PayPal. It is never required, but it is always appreciated and helps keep me motivated.
+
+[url=https://buymeacoffee.com/igor.zavoychinskiy]Buy Me a Coffee[/url]
+[url=https://www.paypal.com/donate/?hosted_button_id=8RPFC884ZEV9L]Donate via PayPal[/url]
+
+[hr][/hr]
+
+[h1]Browse maps without leaving Timberborn[/h1]
+Map Browser adds a main-menu browser for custom maps and public Steam Workshop map metadata.
+
+Use it to inspect installed custom maps, search Workshop maps by keywords and map classifications, preview map details, and subscribe to new maps without restarting the game.
+
+[h1]Features[/h1]
+[list]
+[*] Browse installed custom maps with Workshop titles, descriptions, previews, galleries, live statistics, and map dimensions.
+[*] Search indexed Workshop maps by keywords, terrain, valleys, water, forests, landform, and layout.
+[*] Subscribe to Workshop maps from search results or map details without restarting the game.
+[*] Unsubscribe from Workshop maps or permanently delete local map files.
+[/list]
+
+[hr][/hr]
+
+[h1]Source[/h1]
+GitHub repository: https://github.com/ihsoft/TimberbornMods
