@@ -93,6 +93,9 @@ sealed class ForestDensityClassification {
 }
 
 sealed class WaterClassification {
+  [JsonProperty("open_water_ratio")]
+  public double? OpenWaterRatio { get; set; }
+
   [JsonProperty("water_form")]
   public string WaterForm { get; set; }
 }

@@ -56,6 +56,7 @@ sealed class MapBrowserDialog : AbstractDialog {
   const string FreshnessMissingLocKey = "IgorZ.MapBrowser.Freshness.Missing";
   const string FreshnessStaleLocKey = "IgorZ.MapBrowser.Freshness.Stale";
   const int CurrentMapAnalysisVersion = 6;
+  const double WaterCoveredRatio = 0.40;
   static readonly Regex ParenthesizedMapSizeRegex = new(
       @"\(\s*(?<width>\d{1,4})\s*[xX×]\s*(?<height>\d{1,4})\s*\)", RegexOptions.Compiled);
   static readonly Regex MapSizePrefixRegex = new(
@@ -69,7 +70,7 @@ sealed class MapBrowserDialog : AbstractDialog {
 
   static readonly SearchFilter[] SearchFilters = [
     new("forest_density", ["Barren", "Sparse", "ModerateForests", "Forested", "DenseForest"]),
-    new("water", ["NoWater", "Rivers", "Lakes", "RiversAndLakes"]),
+    new("water", ["NoWater", "Rivers", "Lakes", "RiversAndLakes", "WaterCovered"]),
     new("plateaus", ["FewPlateaus", "HasPlateaus", "ManyPlateaus", "FlatMap"]),
   ];
 
@@ -573,7 +574,8 @@ sealed class MapBrowserDialog : AbstractDialog {
   }
 
   static string GetWaterForm(WorkshopItemMetadata metadata, UiFactory uiFactory) {
-    var levelName = metadata.MapClassifications?.Water?.WaterForm switch {
+    var water = metadata.MapClassifications?.Water;
+    var levelName = water?.OpenWaterRatio > WaterCoveredRatio ? "WaterCovered" : water?.WaterForm switch {
         "none" => "NoWater",
         "rivers" => "Rivers",
         "lakes" => "Lakes",
@@ -608,6 +610,7 @@ sealed class MapBrowserDialog : AbstractDialog {
             4 => "DenseForest",
             _ => null,
         },
+        "water" when metadata.MapClassifications?.Water?.OpenWaterRatio > WaterCoveredRatio => "WaterCovered",
         "water" => metadata.MapClassifications?.Water?.WaterForm switch {
             "none" => "NoWater",
             "rivers" => "Rivers",

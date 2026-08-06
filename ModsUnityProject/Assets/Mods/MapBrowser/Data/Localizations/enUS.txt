@@ -40,6 +40,7 @@ IgorZ.MapBrowser.Analysis.Level.Rivers,Rivers,Open water is mainly represented b
 IgorZ.MapBrowser.Analysis.Level.RiversAndLakes,Rivers and lakes,Open water includes both rivers and lakes.
 IgorZ.MapBrowser.Analysis.Level.Sparse,Sparse,Low forest density classification.
 IgorZ.MapBrowser.Analysis.Level.Unknown,Unknown,Classification value shown when analysis data is missing.
+IgorZ.MapBrowser.Analysis.Level.WaterCovered,Water-covered,Open water covers more than 40 percent of the map.
 =,=,Map browser
 IgorZ.MapBrowser.Browser.InstalledMaps,Installed custom maps,Heading above the installed map list.
 IgorZ.MapBrowser.Browser.SearchMaps,Find Workshop maps,Heading above Workshop search results.

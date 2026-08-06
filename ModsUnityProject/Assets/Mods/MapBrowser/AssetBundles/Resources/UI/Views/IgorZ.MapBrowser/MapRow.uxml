@@ -7,7 +7,7 @@
         </engine:Image>
         <engine:VisualElement name="TextColumn" style="flex-grow: 1; height: 180px; overflow: hidden;">
             <engine:Label name="Title" text="Example Workshop Map" class="text--default" style="font-size: 19px; -unity-font-style: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 100px;" />
-            <engine:Label name="Analysis" text="Moderate forests, rivers and lakes, many plateaus" class="text--default" style="white-space: normal; margin-top: 2px; font-size: 13px; color: rgb(184, 194, 184);" />
+            <engine:Label name="Analysis" text="Moderate forests, water-covered, many plateaus" class="text--default" style="white-space: normal; margin-top: 2px; font-size: 13px; color: rgb(184, 194, 184);" />
             <engine:Label name="Freshness" text="Freshness warning: Example snapshot status." class="text--default" style="white-space: normal; margin-top: 3px;" />
             <engine:Label name="Description" text="Example map description showing how Workshop text fits beside the preview image." class="text--default" style="white-space: normal; margin-top: 4px; flex-grow: 1; flex-shrink: 1; overflow: hidden;" />
         </engine:VisualElement>
