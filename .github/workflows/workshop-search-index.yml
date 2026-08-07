@@ -8,7 +8,18 @@ on:
         required: false
         type: number
         default: 50
+      payload_cache_prune_max_versions:
+        description: Maximum number of superseded payload cache versions to prune
+        required: false
+        type: number
+        default: 100
   workflow_dispatch:
+    inputs:
+      payload_cache_prune_max_versions:
+        description: Maximum number of superseded payload cache versions to prune
+        required: false
+        type: number
+        default: 100
   schedule:
     - cron: "17 */3 * * *"
 
@@ -161,11 +172,12 @@ jobs:
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
+          PAYLOAD_CACHE_PRUNE_MAX_VERSIONS: ${{ inputs.payload_cache_prune_max_versions || 100 }}
         run: |
           package_path="/users/ihsoft/packages/container/timberborn-workshop-payload-cache"
           version_ids=$(gh api --paginate "$package_path/versions?per_page=100" \
             --jq '.[] | select((.metadata.container.tags // []) | length == 0) | .id' \
-            | head -n 1000)
+            | head -n "$PAYLOAD_CACHE_PRUNE_MAX_VERSIONS")
           if [ -z "$version_ids" ]; then
             echo "No superseded payload cache versions to prune."
             exit 0

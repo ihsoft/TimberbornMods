@@ -45,8 +45,9 @@ refill only the missing cache entries instead of downloading the same maps as un
 
 After reading a complete Workshop snapshot, the analyzer removes every cache-catalog entry whose map ID is absent from
 that snapshot. Only affected shard manifests and the catalog are republished; no payload download or analysis is
-needed. After the public artifacts are prepared, the workflow also deletes up to 1000 untagged superseded GHCR package
-versions while the historical backlog is being reduced. Current tagged catalog and shard versions remain intact. The
+needed. After the public artifacts are prepared, the workflow also deletes untagged superseded GHCR package versions
+up to the configured per-run limit, which defaults to 100. A larger limit can be supplied explicitly for temporary
+backlog-cleanup runs. Current tagged catalog and shard versions remain intact. The
 bounded cleanup resumes on later runs and is nonfatal to public-index publication if GitHub Packages temporarily
 rejects listing or deletion.
 
