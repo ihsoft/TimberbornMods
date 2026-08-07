@@ -45,7 +45,7 @@ static class Program {
       ("Steam slow mode requires six consecutive successes", RequiresSixSuccessesToRecoverSteamPacing),
       ("Steam slow mode extends a shorter retry cooldown", ExtendsShortSteamRetryCooldown),
       ("Steam retry cooldown is not extended by slow mode", DoesNotExtendExistingSteamRetryCooldown),
-      ("Steam Fail is transient only inside slow mode", TreatsFailAsTransientOnlyInSlowMode),
+      ("Steam Fail is transient in normal and slow modes", TreatsFailAsTransientInEveryMode),
   ];
 
   static int Main() {
@@ -485,9 +485,9 @@ static class Program {
     Assert.True(pacer.SlowModeActive);
   }
 
-  static void TreatsFailAsTransientOnlyInSlowMode() {
+  static void TreatsFailAsTransientInEveryMode() {
     var pacer = new SteamRequestPacer(_ => { }, _ => { });
-    Assert.False(pacer.ShouldTreatAsTransient("k_EResultFail"));
+    Assert.True(pacer.ShouldTreatAsTransient("k_EResultFail"));
 
     pacer.RecordTransientFailure("k_EResultNoConnection");
     Assert.True(pacer.ShouldTreatAsTransient("k_EResultFail"));
@@ -496,7 +496,7 @@ static class Program {
     for (var request = 0; request < 6; request++) {
       pacer.RecordSuccessfulRequest();
     }
-    Assert.False(pacer.ShouldTreatAsTransient("k_EResultFail"));
+    Assert.True(pacer.ShouldTreatAsTransient("k_EResultFail"));
   }
 
   static DecodedWaterMap CreateDryMap(int width, int height, int[] heights) {

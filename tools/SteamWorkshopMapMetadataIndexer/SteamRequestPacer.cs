@@ -20,7 +20,7 @@ sealed class SteamRequestPacer(
   public int ConsecutiveSuccessfulRequests => _consecutiveSuccessfulRequests;
 
   public bool ShouldTreatAsTransient(string result) {
-    return SlowModeActive && result == "k_EResultFail";
+    return result == "k_EResultFail";
   }
 
   public void WaitBeforeRequest(TimeSpan delayAlreadyApplied) {

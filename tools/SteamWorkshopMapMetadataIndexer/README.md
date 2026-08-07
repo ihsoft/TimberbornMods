@@ -10,18 +10,16 @@ sequential, and the first Steam/UGC request failure stops the pass before anothe
 whose archive or map format cannot be analyzed is recorded as `unsupported`, and processing continues with the next
 map. That result is retried only after the Workshop item or analysis version changes.
 
-The narrow transient `k_EResultBusy` and `k_EResultNoConnection` request results, plus timeouts waiting for a Steam
-request callback, are retried twice: first after a 20-second cooldown and then after a 40-second cooldown. They activate
-the circuit breaker only after those attempts are exhausted. A generic `k_EResultFail` follows the same retry rules only
-while slow mode is already active; outside slow mode it activates the circuit breaker immediately. Other Steam/UGC
-failures are not broadly retried. If the pass stops early, previous records for selected but unprocessed maps remain
-unchanged in the checkpoint.
+The narrow transient `k_EResultBusy`, `k_EResultNoConnection`, and `k_EResultFail` request results, plus timeouts waiting
+for a Steam request callback, are retried twice: first after a 20-second cooldown and then after a 40-second cooldown.
+They activate the circuit breaker only after those attempts are exhausted. Other Steam/UGC failures are not broadly
+retried. If the pass stops early, previous records for selected but unprocessed maps remain unchanged in the checkpoint.
 
 After either transient result, the sequential Steam request stream enters slow mode. `--slow-mode-delay-seconds`
 controls its minimum request spacing and defaults to 15 seconds; the production workflow currently sets it to 40
-seconds. Slow mode ends after six consecutive requests complete without another `Busy`, `NoConnection`, or timeout;
-any of those failures resets that success count. With 40-second spacing, the first 20-second retry cooldown is extended
-by the remaining 20 seconds, while the second 40-second cooldown is not extended.
+seconds. Slow mode ends after six consecutive requests complete without another `Busy`, `NoConnection`, `Fail`, or
+timeout; any of those failures resets that success count. With 40-second spacing, the first 20-second retry cooldown is
+extended by the remaining 20 seconds, while the second 40-second cooldown is not extended.
 
 ## Private payload cache
 
