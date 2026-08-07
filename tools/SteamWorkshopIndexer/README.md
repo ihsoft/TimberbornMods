@@ -32,7 +32,9 @@ search, not ground truth for terrain classification.
 
 Every run creates a complete snapshot refresh, removing records no longer present in the public Workshop catalog.
 Steam returns at most 50 results per page. The indexer checks that the reported total remains stable, rejects duplicate
-IDs, and publishes output only after it has collected exactly the reported number of items.
+IDs, and publishes output only after it has processed exactly the reported number of result positions. An item-level
+`k_EResultFileNotFound` is logged and omitted because Steam can briefly retain an unavailable item in an otherwise
+successful query page. The summary reports the number of such omissions as `skipped_unavailable`.
 
 ## Request controls
 

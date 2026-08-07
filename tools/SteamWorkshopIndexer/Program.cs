@@ -29,7 +29,8 @@ try {
     var outputPath = Path.GetFullPath(options.OutputPath);
     Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
     WriteJsonLines(outputPath, records.Items);
-    WriteSummary(outputPath, records.Items, records.TotalMatching, records.PagesProcessed);
+    WriteSummary(
+        outputPath, records.Items, records.TotalMatching, records.PagesProcessed, records.SkippedUnavailable);
     Console.WriteLine($"Wrote {records.Items.Count} Workshop items to {outputPath}");
   } finally {
     SteamGameServer.LogOff();
@@ -47,6 +48,8 @@ static SnapshotResult CollectSnapshot(TimeSpan timeout) {
   var seenIds = new HashSet<string>();
   uint? expectedTotal = null;
   uint pagesProcessed = 0;
+  uint resultsProcessed = 0;
+  uint skippedUnavailable = 0;
   for (uint page = 1; page <= MaximumPages; page++) {
     var result = QueryPageWithRetry(page, timeout);
     expectedTotal ??= result.TotalMatching;
@@ -54,6 +57,8 @@ static SnapshotResult CollectSnapshot(TimeSpan timeout) {
       throw new InvalidDataException(
           $"Workshop total changed while collecting the snapshot: {expectedTotal} to {result.TotalMatching} on page {page}.");
     }
+    resultsProcessed = checked(resultsProcessed + result.ResultsProcessed);
+    skippedUnavailable = checked(skippedUnavailable + result.SkippedUnavailable);
     foreach (var item in result.Items) {
       if (!seenIds.Add(item.PublishedFileId)) {
         throw new InvalidDataException($"Workshop item {item.PublishedFileId} appeared more than once.");
@@ -61,19 +66,22 @@ static SnapshotResult CollectSnapshot(TimeSpan timeout) {
       rawRecords.Add(item);
     }
     pagesProcessed++;
-    Console.WriteLine($"Page {page}: {result.Items.Count} items; collected {rawRecords.Count} / {expectedTotal}.");
-    if (rawRecords.Count >= expectedTotal) {
+    Console.WriteLine(
+        $"Page {page}: {result.Items.Count} items, {result.SkippedUnavailable} unavailable; "
+        + $"processed {resultsProcessed} / {expectedTotal}.");
+    if (resultsProcessed >= expectedTotal) {
       break;
     }
-    if (result.Items.Count == 0) {
+    if (result.ResultsProcessed == 0) {
       throw new InvalidDataException($"Workshop page {page} was empty before the expected total was collected.");
     }
   }
-  if (expectedTotal is null || rawRecords.Count != expectedTotal) {
-    throw new InvalidDataException($"Incomplete Workshop snapshot: collected {rawRecords.Count} / {expectedTotal ?? 0} items.");
+  if (expectedTotal is null || resultsProcessed != expectedTotal) {
+    throw new InvalidDataException(
+        $"Incomplete Workshop snapshot: processed {resultsProcessed} / {expectedTotal ?? 0} results.");
   }
   return new SnapshotResult(
-      expectedTotal.Value, pagesProcessed,
+      expectedTotal.Value, pagesProcessed, skippedUnavailable,
       rawRecords.Select(Classify).OrderByDescending(record => record.UpdatedAtUtc).ToList());
 }
 
@@ -81,7 +89,8 @@ static PageResult QueryPageWithRetry(uint page, TimeSpan timeout) {
   for (var retry = 0; ; retry++) {
     var result = QueryPage(page, timeout);
     if (!result.IoFailure && result.Result == EResult.k_EResultOK) {
-      return new PageResult(result.TotalMatching, result.Items);
+      return new PageResult(
+          result.TotalMatching, result.Returned, result.SkippedUnavailable, result.Items);
     }
     var diagnostic = FormatFailure(page, result);
     if (!IsTransient(result.Result) || retry >= MaximumTransientRetries) {
@@ -122,12 +131,20 @@ static QueryAttempt QueryPage(uint page, TimeSpan timeout) {
         ? SteamGameServerUtils.GetAPICallFailureReason(apiCall)
         : ESteamAPICallFailure.k_ESteamAPICallFailureNone;
     var items = new List<RawWorkshopRecord>();
+    uint skippedUnavailable = 0;
     if (!ioFailure && response.m_eResult == EResult.k_EResultOK) {
       for (uint index = 0; index < response.m_unNumResultsReturned; index++) {
         if (!SteamGameServerUGC.GetQueryUGCResult(query, index, out var details)) {
           throw new InvalidDataException($"Workshop result {index} on page {page} was unavailable.");
         }
         if (details.m_eResult != EResult.k_EResultOK) {
+          if (details.m_eResult == EResult.k_EResultFileNotFound) {
+            skippedUnavailable++;
+            Console.Error.WriteLine(
+                $"Skipping unavailable Workshop item {details.m_nPublishedFileId.m_PublishedFileId} "
+                + $"on page {page}: {details.m_eResult}.");
+            continue;
+          }
           throw new InvalidDataException(
               $"Workshop item {details.m_nPublishedFileId.m_PublishedFileId} on page {page} returned {details.m_eResult}.");
         }
@@ -143,7 +160,7 @@ static QueryAttempt QueryPage(uint page, TimeSpan timeout) {
     }
     return new QueryAttempt(
         response.m_eResult, ioFailure, apiFailure, SteamGameServer.BLoggedOn(), response.m_bCachedData,
-        response.m_unNumResultsReturned, response.m_unTotalMatchingResults, items);
+        response.m_unNumResultsReturned, response.m_unTotalMatchingResults, skippedUnavailable, items);
   } finally {
     SteamGameServerUGC.ReleaseQueryUGCRequest(query);
   }
@@ -208,7 +225,8 @@ static JsonSerializerOptions JsonOptions() {
 }
 
 static void WriteSummary(
-    string outputPath, IReadOnlyList<WorkshopRecord> records, uint totalMatching, uint pagesProcessed) {
+    string outputPath, IReadOnlyList<WorkshopRecord> records, uint totalMatching, uint pagesProcessed,
+    uint skippedUnavailable) {
   var summary = new {
     generated_at_utc = DateTime.UtcNow,
     app_id = AppId,
@@ -216,6 +234,7 @@ static void WriteSummary(
     collected_items = records.Count,
     steam_total_matching = totalMatching,
     pages_processed = pagesProcessed,
+    skipped_unavailable = skippedUnavailable,
     primary_category_counts = records.GroupBy(record => record.PrimaryCategory)
         .OrderByDescending(group => group.Count()).ToDictionary(group => group.Key, group => group.Count()),
   };
@@ -256,9 +275,11 @@ sealed record Options(string OutputPath, TimeSpan RequestTimeout) {
 
 sealed record QueryAttempt(
     EResult Result, bool IoFailure, ESteamAPICallFailure ApiFailure, bool LoggedOn, bool CachedData,
-    uint Returned, uint TotalMatching, List<RawWorkshopRecord> Items);
-sealed record PageResult(uint TotalMatching, List<RawWorkshopRecord> Items);
-sealed record SnapshotResult(uint TotalMatching, uint PagesProcessed, List<WorkshopRecord> Items);
+    uint Returned, uint TotalMatching, uint SkippedUnavailable, List<RawWorkshopRecord> Items);
+sealed record PageResult(
+    uint TotalMatching, uint ResultsProcessed, uint SkippedUnavailable, List<RawWorkshopRecord> Items);
+sealed record SnapshotResult(
+    uint TotalMatching, uint PagesProcessed, uint SkippedUnavailable, List<WorkshopRecord> Items);
 sealed record RawWorkshopRecord(
     string PublishedFileId, string Title, string Description, string CreatorSteamId, uint CreatedAt, uint UpdatedAt,
     string PreviewUrl, List<string> Tags, uint VotesUp, uint VotesDown, float Score);
