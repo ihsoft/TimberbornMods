@@ -61,10 +61,10 @@
     <Compile Include="..\SteamWorkshopMapMetadataIndexer\Classifiers\WaterClassification.cs">
       <Link>WaterClassification.cs</Link>
     </Compile>
-    <Compile Include="..\TimberbornMapWaterDecoder\WaterRegressionFixture.cs">
+    <Compile Include="..\TimberbornMapAnalysisFixtureGenerator\WaterRegressionFixture.cs">
       <Link>WaterRegressionFixture.cs</Link>
     </Compile>
-    <Compile Include="..\TimberbornMapWaterDecoder\ForestRegressionFixture.cs">
+    <Compile Include="..\TimberbornMapAnalysisFixtureGenerator\ForestRegressionFixture.cs">
       <Link>ForestRegressionFixture.cs</Link>
     </Compile>
     <Compile Include="..\..\TestSupport\Testing\Assert.cs">

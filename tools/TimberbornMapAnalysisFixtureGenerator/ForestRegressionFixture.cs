@@ -5,7 +5,7 @@
 using System.IO.Compression;
 using System.Text.Json;
 
-namespace IgorZ.MapBrowser.WaterDecoder;
+namespace IgorZ.MapBrowser.MapAnalysisFixtureGeneration;
 
 static class ForestRegressionFixture {
   sealed record FixtureData(string WorkshopId, int LandArea, IReadOnlyList<JsonElement> Entities);

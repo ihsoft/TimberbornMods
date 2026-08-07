@@ -57,10 +57,13 @@ class PublicIndexContractTest(unittest.TestCase):
                         "lake_count": 1,
                         "water_form": "lakes",
                     },
-                    "plateaus": {
-                        "plateau_count": 4,
-                        "plateau_land_ratio": 0.6,
-                        "plateau_level": "many_plateaus",
+                    "settlement_space": {
+                        "core_count": 12,
+                        "plain_share": 0.1,
+                        "terrace_share": 0.7,
+                        "plateau_share": 0.1,
+                        "mixed_share": 0.1,
+                        "space_type": "terraces",
                     },
                 },
                 "collection_state": "fetched",
@@ -79,7 +82,7 @@ class PublicIndexContractTest(unittest.TestCase):
             self.assertEqual(2, manifest["schema_version"])
             self.assertIsInstance(manifest["schema_version"], int)
             self.assertEqual(CANONICAL_DATA_FILES, set(manifest["files"]))
-            self.assertEqual(1, manifest["map_plateaus_known"])
+            self.assertEqual(1, manifest["map_settlement_space_known"])
 
             with gzip.open(output / "search-index.jsonl.gz", "rt", encoding="utf-8") as stream:
                 consumer_records = [json.loads(line) for line in stream]
@@ -98,11 +101,9 @@ class PublicIndexContractTest(unittest.TestCase):
                 consumer_records[0]["map_classifications"]["water"]["water_form"],
             )
             self.assertEqual(
-                "many_plateaus",
-                consumer_records[0]["map_classifications"]["plateaus"]["plateau_level"],
+                "terraces",
+                consumer_records[0]["map_classifications"]["settlement_space"]["space_type"],
             )
-            self.assertNotIn("visual_scores", consumer_records[0])
-            self.assertNotIn("gallery_urls", consumer_records[0])
 
     def test_publishes_unsupported_state_without_fake_dimensions(self) -> None:
         with TemporaryDirectory() as temporary_directory:

@@ -130,7 +130,7 @@ jobs:
 
       - name: Build public search artifacts
         run: >-
-          python tools/TimberbornMapPreviewClassifier/build_public_index.py
+          python tools/TimberbornWorkshopSearchIndexPublisher/build_public_index.py
           --snapshot .work/workshop-items.jsonl
           --map-metadata .work/map-metadata.jsonl
           --output-directory .work/public

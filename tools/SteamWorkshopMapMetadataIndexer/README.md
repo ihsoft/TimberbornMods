@@ -59,13 +59,13 @@ other cached analyses.
 
 Each selected `.timber` ZIP is downloaded and opened once. `MapArchiveAnalyzer` reads authoritative runtime dimensions
 from `world.json` under `Singletons.MapSize.Size`, falling back to `map_metadata.json` only for older payloads without
-that singleton. It then makes one pass through the `world.json` entity array. Registered `IMapEntityClassifier`
-instances observe that shared entity stream and independently emit values under the open `classifications` object.
+that singleton. It decodes shared map state once and passes it to the exact classifiers, which emit values under the
+open `classifications` object.
 
 To add another exact map criterion:
 
-1. Implement `IMapEntityClassifier` without performing file or network access.
-2. Register its factory in `MapArchiveAnalyzer.ClassifierFactories`.
+1. Implement a classifier with a normal `Analyze` method and without file or network access.
+2. Invoke it from `MapArchiveAnalyzer.Analyze`, reusing already decoded map state where applicable.
 3. Increment `MapArchiveAnalyzer.AnalysisVersion` so existing records are progressively backfilled.
 4. Add focused archive fixtures and document the public result fields.
 
@@ -111,7 +111,7 @@ analysis_error
 `collection_state` is `fetched`, `stale`, or `unsupported`. Unsupported records have zero dimensions, no
 classifications, and a diagnostic `analysis_error`; consumers must not treat them as known map metadata.
 
-`tools/TimberbornMapPreviewClassifier/build_public_index.py` publishes classifications in merged search records as
+`tools/TimberbornWorkshopSearchIndexPublisher/build_public_index.py` publishes classifications in merged search records as
 `map_classifications`. Consumers must tolerate additional classifier keys and result fields.
 
 Reviewed real-map water inputs are stored as compressed decoded fixtures in the focused test project. They preserve

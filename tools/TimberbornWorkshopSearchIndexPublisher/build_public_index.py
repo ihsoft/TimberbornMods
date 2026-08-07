@@ -92,8 +92,8 @@ def main() -> int:
             "water" in (record.get("classifications") or {})
             for record in map_metadata_results
         ),
-        "map_plateaus_known": sum(
-            "plateaus" in (record.get("classifications") or {})
+        "map_settlement_space_known": sum(
+            "settlement_space" in (record.get("classifications") or {})
             for record in map_metadata_results
         ),
         "files": {

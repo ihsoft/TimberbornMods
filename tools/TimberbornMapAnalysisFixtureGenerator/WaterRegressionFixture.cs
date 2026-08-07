@@ -6,7 +6,7 @@ using System.IO.Compression;
 using System.Text.Json;
 using IgorZ.MapBrowser.WorkshopMapIndexing.Decoding;
 
-namespace IgorZ.MapBrowser.WaterDecoder;
+namespace IgorZ.MapBrowser.MapAnalysisFixtureGeneration;
 
 static class WaterRegressionFixture {
   sealed record FixtureData(

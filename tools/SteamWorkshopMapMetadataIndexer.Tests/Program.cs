@@ -4,7 +4,7 @@
 
 using System.IO.Compression;
 using System.Text;
-using IgorZ.MapBrowser.WaterDecoder;
+using IgorZ.MapBrowser.MapAnalysisFixtureGeneration;
 using IgorZ.MapBrowser.WorkshopMapIndexing;
 using IgorZ.MapBrowser.WorkshopMapIndexing.Classifiers;
 using IgorZ.MapBrowser.WorkshopMapIndexing.Decoding;

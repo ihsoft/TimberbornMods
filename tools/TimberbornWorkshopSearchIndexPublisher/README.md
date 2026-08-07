@@ -22,7 +22,7 @@ index.html
 Run from the repository root:
 
 ```powershell
-python tools/TimberbornMapPreviewClassifier/build_public_index.py `
+python tools/TimberbornWorkshopSearchIndexPublisher/build_public_index.py `
   --snapshot .work/workshop-items.jsonl `
   --map-metadata .work/map-metadata.jsonl `
   --output-directory .work/public

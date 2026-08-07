@@ -17,8 +17,7 @@ The manifest `files` object lists these UTF-8 JSON Lines gzip artifacts:
 - `map-metadata.jsonl.gz` — incremental exact dimensions and payload-derived map classifications;
 - `search-index.jsonl.gz` — the merged consumer stream.
 
-Schema version `2` removes the gallery and image-classification artifacts and their merged fields. The index was not
-yet consumed by a released MapBrowser version, so no compatibility bridge is published.
+Schema version `2` is the current exact-payload schema consumed by MapBrowser.
 
 ## Search-index scope
 
