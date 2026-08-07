@@ -18,7 +18,7 @@ sealed class OciPayloadCache : IDisposable {
   const string CatalogMediaType = "application/vnd.timberborn.workshop-payload-catalog.v1+json";
   const string ManifestMediaType = "application/vnd.oci.image.manifest.v1+json";
   const string ConfigMediaType = "application/vnd.oci.empty.v1+json";
-  static readonly TimeSpan[] BlobPushRetryDelays = [TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(40)];
+  static readonly TimeSpan[] RegistryWriteRetryDelays = [TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(40)];
 
   sealed class PayloadCacheException(string message, Exception? innerException = null)
       : Exception(message, innerException);
@@ -43,6 +43,7 @@ sealed class OciPayloadCache : IDisposable {
   readonly Dictionary<string, CatalogEntry> _catalog;
   readonly HashSet<string> _dirtyShards = [];
   bool _catalogDirty;
+  int _flushFailures;
   int _writeFailures;
 
   OciPayloadCache(string repository, string workDirectory, Dictionary<string, CatalogEntry> catalog) {
@@ -52,6 +53,9 @@ sealed class OciPayloadCache : IDisposable {
   }
 
   public int Count => _catalog.Count;
+
+  /// <summary>Number of final cache publications that failed after all registry attempts.</summary>
+  public int FlushFailures => _flushFailures;
 
   /// <summary>Number of downloaded payloads that could not be stored after all registry attempts.</summary>
   public int WriteFailures => _writeFailures;
@@ -138,63 +142,65 @@ sealed class OciPayloadCache : IDisposable {
   }
 
   OciDescriptor PushBlobWithRetry(string path, string publishedFileId) {
-    for (var attempt = 0; ; attempt++) {
-      try {
-        var result = RunOras([
-            "blob", "push", "--media-type", PayloadMediaType, "--descriptor", _repository, path,
-        ]);
-        var descriptor = JsonSerializer.Deserialize<OciDescriptor>(result.Output)
-            ?? throw new InvalidDataException("oras blob push returned no OCI descriptor.");
-        if (descriptor.Size != new FileInfo(path).Length || string.IsNullOrWhiteSpace(descriptor.Digest)) {
-          throw new InvalidDataException("oras blob push returned an inconsistent OCI descriptor.");
-        }
-        return descriptor;
-      } catch (PayloadCacheException exception) when (attempt < BlobPushRetryDelays.Length) {
-        var delay = BlobPushRetryDelays[attempt];
-        Console.Error.WriteLine(
-            $"Payload cache write failed for {publishedFileId}: {exception.Message}; "
-            + $"retrying in {delay.TotalSeconds:0} seconds ({attempt + 1} / {BlobPushRetryDelays.Length}).");
-        Thread.Sleep(delay);
-      }
+    var result = RunRegistryWriteWithRetry([
+        "blob", "push", "--media-type", PayloadMediaType, "--descriptor", _repository, path,
+    ], $"payload cache write for {publishedFileId}");
+    var descriptor = JsonSerializer.Deserialize<OciDescriptor>(result.Output)
+        ?? throw new InvalidDataException("oras blob push returned no OCI descriptor.");
+    if (descriptor.Size != new FileInfo(path).Length || string.IsNullOrWhiteSpace(descriptor.Digest)) {
+      throw new InvalidDataException("oras blob push returned an inconsistent OCI descriptor.");
     }
+    return descriptor;
   }
 
-  public void Flush() {
+  /// <summary>
+  /// Tries to publish pending cache manifests without allowing a registry failure to discard map analysis results.
+  /// </summary>
+  public bool TryFlush() {
     if (!_catalogDirty) {
-      return;
+      return true;
     }
-    var emptyConfigPath = Path.Combine(_workDirectory, "empty-config.json");
-    File.WriteAllText(emptyConfigPath, "{}");
-    var configResult = RunOras([
-        "blob", "push", "--media-type", ConfigMediaType, "--descriptor", _repository, emptyConfigPath,
-    ]);
-    var config = JsonSerializer.Deserialize<OciDescriptor>(configResult.Output)
-        ?? throw new InvalidDataException("oras blob push returned no config descriptor.");
+    try {
+      var emptyConfigPath = Path.Combine(_workDirectory, "empty-config.json");
+      File.WriteAllText(emptyConfigPath, "{}");
+      var configResult = RunRegistryWriteWithRetry([
+          "blob", "push", "--media-type", ConfigMediaType, "--descriptor", _repository, emptyConfigPath,
+      ], "payload cache config write");
+      var config = JsonSerializer.Deserialize<OciDescriptor>(configResult.Output)
+          ?? throw new InvalidDataException("oras blob push returned no config descriptor.");
 
-    foreach (var shard in _dirtyShards.Order()) {
-      var layers = _catalog.Where(pair => pair.Value.Shard == shard).OrderBy(pair => pair.Key)
-          .Select(pair => new OciDescriptor(
-              PayloadMediaType, pair.Value.Digest, pair.Value.Size,
-              new Dictionary<string, string> {
-                  ["org.opencontainers.image.title"] = pair.Key,
-                  ["com.ihsoft.timberborn.sha256"] = pair.Value.Sha256,
-              })).ToList();
-      var manifest = new OciManifest(2, ManifestMediaType, ArtifactType, config, layers);
-      var manifestPath = Path.Combine(_workDirectory, $"{shard}.manifest.json");
-      File.WriteAllText(manifestPath, JsonSerializer.Serialize(manifest));
-      RunOras(["manifest", "push", $"{_repository}:{shard}", manifestPath]);
-      Console.WriteLine($"Published payload cache manifest {shard} with {layers.Count} map versions.");
+      foreach (var shard in _dirtyShards.Order()) {
+        var layers = _catalog.Where(pair => pair.Value.Shard == shard).OrderBy(pair => pair.Key)
+            .Select(pair => new OciDescriptor(
+                PayloadMediaType, pair.Value.Digest, pair.Value.Size,
+                new Dictionary<string, string> {
+                    ["org.opencontainers.image.title"] = pair.Key,
+                    ["com.ihsoft.timberborn.sha256"] = pair.Value.Sha256,
+                })).ToList();
+        var manifest = new OciManifest(2, ManifestMediaType, ArtifactType, config, layers);
+        var manifestPath = Path.Combine(_workDirectory, $"{shard}.manifest.json");
+        File.WriteAllText(manifestPath, JsonSerializer.Serialize(manifest));
+        RunRegistryWriteWithRetry(
+            ["manifest", "push", $"{_repository}:{shard}", manifestPath], $"payload cache manifest {shard}");
+        Console.WriteLine($"Published payload cache manifest {shard} with {layers.Count} map versions.");
+      }
+
+      var catalogPath = Path.Combine(_workDirectory, "catalog.json");
+      File.WriteAllText(catalogPath, JsonSerializer.Serialize(_catalog));
+      RunRegistryWriteWithRetry([
+          "push", $"{_repository}:{CatalogTag}", "--artifact-type", ArtifactType,
+          $"{Path.GetFileName(catalogPath)}:{CatalogMediaType}",
+      ], "payload cache catalog write", _workDirectory);
+      Console.WriteLine($"Published payload cache catalog with {_catalog.Count} map versions.");
+      _dirtyShards.Clear();
+      _catalogDirty = false;
+      return true;
+    } catch (PayloadCacheException exception) {
+      _flushFailures++;
+      Console.Error.WriteLine(
+          $"Payload cache publication failed; continuing with map metadata output: {exception.Message}");
+      return false;
     }
-
-    var catalogPath = Path.Combine(_workDirectory, "catalog.json");
-    File.WriteAllText(catalogPath, JsonSerializer.Serialize(_catalog));
-    RunOras([
-        "push", $"{_repository}:{CatalogTag}", "--artifact-type", ArtifactType,
-        $"{Path.GetFileName(catalogPath)}:{CatalogMediaType}",
-    ], workingDirectory: _workDirectory);
-    Console.WriteLine($"Published payload cache catalog with {_catalog.Count} map versions.");
-    _dirtyShards.Clear();
-    _catalogDirty = false;
   }
 
   public void Dispose() {
@@ -245,6 +251,21 @@ sealed class OciPayloadCache : IDisposable {
       }
       throw new PayloadCacheException(
           $"oras {arguments[0]} failed with exit code {process.ExitCode}: {(error + output).Trim()}");
+    }
+  }
+
+  static OrasCommandResult RunRegistryWriteWithRetry(
+      IReadOnlyList<string> arguments, string operation, string? workingDirectory = null) {
+    for (var attempt = 0; ; attempt++) {
+      try {
+        return RunOras(arguments, workingDirectory: workingDirectory);
+      } catch (PayloadCacheException exception) when (attempt < RegistryWriteRetryDelays.Length) {
+        var delay = RegistryWriteRetryDelays[attempt];
+        Console.Error.WriteLine(
+            $"{operation} failed: {exception.Message}; retrying in {delay.TotalSeconds:0} seconds "
+            + $"({attempt + 1} / {RegistryWriteRetryDelays.Length}).");
+        Thread.Sleep(delay);
+      }
     }
   }
 

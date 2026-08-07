@@ -40,6 +40,10 @@ A failed GHCR blob write is retried after 20 and 40 seconds. If all attempts fai
 and the sequential Steam pass continues; the summary reports the cache write failure so a transient registry problem
 does not masquerade as a map payload request failure or stop the indexing batch.
 
+Final config, shard-manifest, and catalog writes use the same retry delays. If final cache publication still fails, the
+analyzer writes and publishes its map metadata normally. The next run can therefore reuse the completed analysis and
+refill only the missing cache entries instead of downloading the same maps as unprocessed analysis work.
+
 Payloads are distributed across 100 stable logical shards using `published_file_id % 100`. Every map remains a separate
 content-addressed OCI blob; a shard tag is only a small manifest referencing its blobs. Updating or adding a map uploads
 only that map and rewrites the small shard manifest, never the other payload bytes. A separate catalog maps each

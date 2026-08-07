@@ -248,7 +248,7 @@ sealed class MapMetadataIndexer {
       }
     }
 
-    payloadCache?.Flush();
+    payloadCache?.TryFlush();
     WriteRecords(options.Output, maps, outputById);
     var upToDate = maps.Count(map => outputById.TryGetValue(map.PublishedFileId, out var record)
         && !NeedsRefresh(map, record));
@@ -257,7 +257,8 @@ sealed class MapMetadataIndexer {
         $"Wrote {outputById.Count} map metadata records; selected {candidates.Count}, "
         + $"processed this run {processedThisRun}, downloaded {downloadedThisRun}, up-to-date {upToDate}, "
         + $"remaining refresh {maps.Count - upToDate}, stale {stale}, "
-        + $"payload cache write failures {payloadCache?.WriteFailures ?? 0}.");
+        + $"payload cache write failures {payloadCache?.WriteFailures ?? 0}, "
+        + $"payload cache publication failures {payloadCache?.FlushFailures ?? 0}.");
     return 0;
   }
 
