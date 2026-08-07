@@ -8,10 +8,12 @@ namespace IgorZ.MapBrowser.WorkshopMapIndexing;
 
 sealed class SteamRequestPacer(
     Action<TimeSpan> delay, Action<string>? log = null,
-    TimeSpan? slowModeDelay = null, int successfulRequestsToRecover = 6) {
+    TimeSpan? normalModeDelay = null, TimeSpan? slowModeDelay = null, int successfulRequestsToRecover = 6) {
+  readonly TimeSpan _normalModeDelay = normalModeDelay ?? TimeSpan.Zero;
   readonly TimeSpan _slowModeDelay = slowModeDelay ?? TimeSpan.FromSeconds(15);
   readonly Action<string> _log = log ?? Console.WriteLine;
   int _consecutiveSuccessfulRequests;
+  bool _requestStarted;
 
   public bool SlowModeActive { get; private set; }
 
@@ -22,15 +24,25 @@ sealed class SteamRequestPacer(
   }
 
   public void WaitBeforeRequest(TimeSpan delayAlreadyApplied) {
-    if (!SlowModeActive || delayAlreadyApplied >= _slowModeDelay) {
+    if (!_requestStarted) {
+      _requestStarted = true;
       return;
     }
-    var remainingDelay = _slowModeDelay - delayAlreadyApplied;
-    _log($"Steam slow mode: waiting {remainingDelay.TotalSeconds:0} seconds before the next request.");
+
+    var requiredDelay = SlowModeActive && _slowModeDelay > _normalModeDelay
+        ? _slowModeDelay
+        : _normalModeDelay;
+    if (delayAlreadyApplied >= requiredDelay) {
+      return;
+    }
+    var remainingDelay = requiredDelay - delayAlreadyApplied;
+    var mode = SlowModeActive ? "slow mode" : "normal mode";
+    _log($"Steam {mode}: waiting {remainingDelay.TotalSeconds:0} seconds before the next request.");
     delay(remainingDelay);
   }
 
   public void RecordTransientFailure(string result) {
+    _requestStarted = true;
     var action = SlowModeActive ? "reset" : "activated";
     SlowModeActive = true;
     _consecutiveSuccessfulRequests = 0;
@@ -40,6 +52,7 @@ sealed class SteamRequestPacer(
   }
 
   public void RecordSuccessfulRequest() {
+    _requestStarted = true;
     if (!SlowModeActive) {
       return;
     }

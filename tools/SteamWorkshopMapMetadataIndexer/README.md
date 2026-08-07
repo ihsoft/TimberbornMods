@@ -59,6 +59,9 @@ Steam phase begins. Steam metadata queries and payload downloads remain strictly
 only in that sequential phase. A corrupt or unreadable cached payload affects only its own record and does not stop
 other cached analyses.
 
+`--request-delay-seconds` sets the minimum delay between sequential map payload requests and defaults to zero. Retry
+cooldowns count toward that interval instead of being added to it, while slow mode raises the minimum to its own delay.
+
 ## Shared archive analysis
 
 Each selected `.timber` ZIP is downloaded and opened once. `MapArchiveAnalyzer` reads authoritative runtime dimensions

@@ -41,6 +41,7 @@ static class Program {
       ("Settlement-space classifier preserves reviewed Workshop map baselines", PreservesSettlementSpaceBaselines),
       ("Payload cache keys use Workshop ID and canonical update time", BuildsStablePayloadCacheKey),
       ("Payload cache shards use stable Workshop ID modulo", BuildsStablePayloadCacheShard),
+      ("Steam pacing applies the configured normal delay between requests", AppliesNormalSteamRequestDelay),
       ("Steam slow mode requires six consecutive successes", RequiresSixSuccessesToRecoverSteamPacing),
       ("Steam retry cooldown is not extended by slow mode", DoesNotExtendExistingSteamRetryCooldown),
       ("Steam Fail is transient only inside slow mode", TreatsFailAsTransientOnlyInSlowMode),
@@ -444,6 +445,20 @@ static class Program {
     Assert.False(pacer.SlowModeActive);
     Assert.Equal(11, delays.Count);
     Assert.True(delays.All(value => value == TimeSpan.FromSeconds(15)));
+  }
+
+  static void AppliesNormalSteamRequestDelay() {
+    var delays = new List<TimeSpan>();
+    var pacer = new SteamRequestPacer(delays.Add, _ => { }, normalModeDelay: TimeSpan.FromSeconds(3));
+
+    pacer.WaitBeforeRequest(TimeSpan.Zero);
+    pacer.WaitBeforeRequest(TimeSpan.Zero);
+    pacer.WaitBeforeRequest(TimeSpan.FromSeconds(2));
+    pacer.WaitBeforeRequest(TimeSpan.FromSeconds(20));
+
+    Assert.Equal(2, delays.Count);
+    Assert.Equal(TimeSpan.FromSeconds(3), delays[0]);
+    Assert.Equal(TimeSpan.FromSeconds(1), delays[1]);
   }
 
   static void DoesNotExtendExistingSteamRetryCooldown() {

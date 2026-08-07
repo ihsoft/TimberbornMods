@@ -125,6 +125,7 @@ jobs:
           --max-items ${{ inputs.map_metadata_max_items || 500 }}
           --max-download-bytes 50000000
           --request-timeout-seconds 120
+          --request-delay-seconds 3
           --time-budget-seconds 7200
           --max-analysis-parallelism 4
 
