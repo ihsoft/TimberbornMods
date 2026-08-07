@@ -21,7 +21,8 @@ on:
         type: number
         default: 100
   schedule:
-    - cron: "17 */3 * * *"
+    - cron: "17 0-23/3 * * *"
+    - cron: "47 1-23/3 * * *"
 
 permissions:
   contents: read
@@ -36,7 +37,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 60
     steps:
       - name: Check out repository
         uses: actions/checkout@v5
@@ -137,7 +138,7 @@ jobs:
           --max-download-bytes 50000000
           --request-timeout-seconds 120
           --slow-mode-delay-seconds 40
-          --time-budget-seconds 7200
+          --time-budget-seconds 3000
           --max-analysis-parallelism 4
 
       - name: Build public search artifacts
