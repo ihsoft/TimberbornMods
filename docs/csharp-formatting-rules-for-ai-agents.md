@@ -62,6 +62,33 @@ Prefer file-scoped namespaces.
 
     namespace MyProject.MyFeature;
 
+Every non-generated C# source file should use the project's intended namespace unless the surrounding project has an
+explicit, established reason to use the global namespace. Do not leave new or reorganized production and test types in
+the global namespace by omission.
+
+When creating or moving files between feature folders, verify that their namespaces still match the project's
+established namespace and feature organization. A filesystem move does not update the C# namespace automatically.
+
+When establishing or normalizing namespaces across a project, inspect the project file as part of the same change.
+Verify that `RootNamespace` is present and agrees with the intended common namespace root; add or correct it when the
+project would otherwise derive an inconsistent root from its project or assembly name.
+
+* * *
+
+## Application entry points
+
+Executable C# applications must keep all application functionality in named classes. Do not implement an application
+as top-level statements or leave operational code directly at module/file scope.
+
+Use one of these explicit entry-point shapes:
+
+  * an application class with a static `Main()` method, or
+  * a small entry-point/loader class whose `Main()` constructs or invokes the class that owns the application.
+
+Keep a separate loader thin. Argument handling may begin there, but substantive workflow, state, services, helpers,
+DTOs, and business logic belong to the application or feature classes. A short executable does not justify replacing
+the class structure with top-level statements.
+
 * * *
 
 ## Access modifiers
@@ -125,6 +152,52 @@ Wrapping is used only when:
   * The code becomes genuinely difficult to read.
 
 If code fits within 120 characters, keep it on one line.
+
+* * *
+
+## Broad style refactors
+
+Before a project-wide or otherwise broad C# style refactor, enumerate the exact target `.cs` files and audit each file
+at the code-construct level. Do not validate style only through whitespace heuristics such as odd indentation or line
+length.
+
+The audit should cover the repository style contracts that are easy to miss during mechanical cleanup:
+
+  * source header,
+  * namespace and project `RootNamespace`,
+  * explicit application class and entry point for executable projects,
+  * top-level, helper, DTO, and nested-type ownership and placement,
+  * field and constant placement,
+  * minimal access modifiers,
+  * wrapped declarations, calls, expressions, and collection initializers,
+  * raw string literals,
+  * final line length.
+
+Build a type inventory as well as a file inventory. A DTO or helper used only by the class that creates and owns it
+should normally be nested in that owner instead of remaining as an unrelated top-level type. Place nested types near
+the top of the owning class, after important class-level constants and fields, so the class structure is visible before
+its behavior. Preserve a top-level type when it has genuine independent ownership or reuse.
+
+If files or folders move during the refactor, re-check every affected namespace and the project's `RootNamespace`
+against the final organization. Compilation proves that names resolve; it does not prove that types were left in the
+intended architectural namespace.
+
+Do not run `dotnet format` or another generic formatter unless its effective configuration has first been verified to
+produce this repository's K&R braces, 2-space block indentation, 4-space continuation indentation, and compact wrapping.
+If no compatible `.editorconfig` or tool configuration exists, do not use formatter defaults.
+
+Never apply mechanical indentation rewrites across raw string literals. If a formatter or rewrite touches raw strings,
+inspect those regions carefully or restore them before continuing.
+
+After the user identifies a missed existing style rule, re-read the applicable style document and restart a complete
+audit of the requested scope. Do not fix only the examples named by the user when the same rule may have been missed in
+other files.
+
+When minimizing access modifiers on nested types, compile immediately after the modifier pass. Do not assume containing
+and nested C# types can freely use each other's private members in every direction.
+
+Before handoff, verify the exact diff scope so formatting tools have not modified linked, shared, or unrelated files
+outside the target set.
 
 * * *
 
