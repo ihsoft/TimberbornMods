@@ -391,7 +391,7 @@ static class Program {
     Assert.True(pacer.SlowModeActive);
     Assert.Equal(5, pacer.ConsecutiveSuccessfulRequests);
 
-    pacer.RecordTransientFailure("NoConnection");
+    pacer.RecordTransientFailure("Timeout");
     Assert.Equal(0, pacer.ConsecutiveSuccessfulRequests);
     for (var index = 0; index < 6; index++) {
       pacer.WaitBeforeRequest(TimeSpan.Zero);

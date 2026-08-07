@@ -188,19 +188,28 @@ static (MapArchiveAnalysis Analysis, bool Downloaded) ReadAndAnalyzeMapWithTrans
     } catch (UnsupportedMapPayloadException) {
       requestPacer.RecordSuccessfulRequest();
       throw;
-    } catch (SteamPayloadTransientException exception) {
-      requestPacer.RecordTransientFailure(exception.Result.ToString());
+    } catch (Exception exception) when (GetTransientFailureReason(exception) is not null) {
+      var reason = GetTransientFailureReason(exception)!;
+      requestPacer.RecordTransientFailure(reason);
       if (attempt >= retryDelays.Length) {
         throw;
       }
       var retryDelay = retryDelays[attempt];
       Console.WriteLine(
-          $"Steam request returned {exception.Result} for {map.PublishedFileId}; "
+          $"Steam request failed transiently with {reason} for {map.PublishedFileId}; "
           + $"retrying in {retryDelay.TotalSeconds:0} seconds ({attempt + 1} / {retryDelays.Length}).");
       Thread.Sleep(retryDelay);
       delayAlreadyApplied = retryDelay;
     }
   }
+}
+
+static string? GetTransientFailureReason(Exception exception) {
+  return exception switch {
+      SteamPayloadTransientException transient => transient.Result.ToString(),
+      TimeoutException => "Timeout",
+      _ => null,
+  };
 }
 
 static MapArchiveAnalysis DownloadAndAnalyzeMap(
