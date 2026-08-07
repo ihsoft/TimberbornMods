@@ -18,7 +18,7 @@ static class Program {
 sealed class MapMetadataIndexer {
   const uint AppId = 1062090;
 
-  sealed record MapItem(string PublishedFileId, string? UpdatedAtUtc);
+  sealed record MapItem(string PublishedFileId, string? UpdatedAtUtc, long PayloadSizeBytes);
 
   sealed record CachedAnalysisResult(MapArchiveAnalysis? Analysis, Exception? Error);
 
@@ -117,8 +117,13 @@ sealed class MapMetadataIndexer {
         .OrderByDescending(map => ParseTimestamp(map.UpdatedAtUtc)).ToList();
     var cacheFillDownloads = new List<MapItem>();
     if (payloadCache is not null) {
-      cacheFillDownloads = maps.Where(map => !NeedsRefresh(map, previousById.GetValueOrDefault(map.PublishedFileId))
-          && !payloadCache.Contains(map.PublishedFileId, map.UpdatedAtUtc))
+      cacheFillDownloads = maps.Where(map => {
+        var previous = previousById.GetValueOrDefault(map.PublishedFileId);
+        return MapPayloadCachePolicy.ShouldPopulate(
+            previous?.CollectionState,
+            NeedsRefresh(map, previous),
+            payloadCache.Contains(map.PublishedFileId, map.UpdatedAtUtc));
+      })
           .OrderByDescending(map => ParseTimestamp(map.UpdatedAtUtc)).ToList();
     }
     var downloadCandidates = refreshDownloads.Concat(cacheFillDownloads)
@@ -314,10 +319,13 @@ sealed class MapMetadataIndexer {
   MapArchiveAnalysis DownloadAndAnalyzeMap(
       MapItem map, Options options, OciPayloadCache? payloadCache) {
     var itemId = new PublishedFileId_t(ulong.Parse(map.PublishedFileId));
-    var declaredSize = QueryDeclaredSize(itemId, options.RequestTimeout);
-    if (declaredSize > options.MaxDownloadBytes) {
+    if (map.PayloadSizeBytes < 0) {
       throw new UnsupportedMapPayloadException(
-          $"Declared payload is {declaredSize} bytes; limit is {options.MaxDownloadBytes} bytes.");
+          $"Workshop declared an invalid payload size: {map.PayloadSizeBytes}.");
+    }
+    if ((ulong) map.PayloadSizeBytes > options.MaxDownloadBytes) {
+      throw new UnsupportedMapPayloadException(
+          $"Declared payload is {map.PayloadSizeBytes} bytes; limit is {options.MaxDownloadBytes} bytes.");
     }
     var completed = false;
     DownloadItemResult_t response = default;
@@ -362,40 +370,6 @@ sealed class MapMetadataIndexer {
     }
   }
 
-  static ulong QueryDeclaredSize(PublishedFileId_t publishedFileId, TimeSpan timeout) {
-    var query = SteamGameServerUGC.CreateQueryUGCDetailsRequest([publishedFileId], 1);
-    if (query == UGCQueryHandle_t.Invalid) {
-      throw new InvalidOperationException("Could not create the anonymous Workshop details query.");
-    }
-    try {
-      var completed = false;
-      var ioFailureResult = false;
-      SteamUGCQueryCompleted_t response = default;
-      using var callResult = CallResult<SteamUGCQueryCompleted_t>.Create();
-      callResult.Set(SteamGameServerUGC.SendQueryUGCRequest(query), (result, ioFailure) => {
-        response = result;
-        ioFailureResult = ioFailure;
-        completed = true;
-      });
-      WaitForCallback(() => completed, "anonymous Workshop query", timeout);
-      ThrowIfTransient(response.m_eResult);
-      if (response.m_eResult != EResult.k_EResultOK) {
-        throw new SteamPayloadRequestException("Anonymous Workshop query", response.m_eResult);
-      }
-      if (ioFailureResult || response.m_unNumResultsReturned != 1
-          || !SteamGameServerUGC.GetQueryUGCResult(query, 0, out var details)) {
-        throw new InvalidOperationException("Anonymous Workshop query returned no usable item details.");
-      }
-      if (details.m_nFileSize < 0) {
-        throw new UnsupportedMapPayloadException(
-            $"Workshop declared an invalid payload size: {details.m_nFileSize}.");
-      }
-      return (ulong) details.m_nFileSize;
-    } finally {
-      SteamGameServerUGC.ReleaseQueryUGCRequest(query);
-    }
-  }
-
   MapArchiveAnalysis AnalyzePayload(Stream payload) {
     try {
       using (payload) {
@@ -428,7 +402,8 @@ sealed class MapMetadataIndexer {
         maps.Add(new MapItem(
             root.GetProperty("published_file_id").GetString()
                 ?? throw new InvalidDataException("Workshop item has no published_file_id."),
-            GetOptionalString(root, "updated_at_utc")));
+            GetOptionalString(root, "updated_at_utc"),
+            root.GetProperty("payload_size_bytes").GetInt64()));
       }
     }
     return maps;

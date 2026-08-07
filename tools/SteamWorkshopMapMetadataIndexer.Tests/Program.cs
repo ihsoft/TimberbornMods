@@ -46,10 +46,18 @@ static class Program {
       ("Steam slow mode extends a shorter retry cooldown", ExtendsShortSteamRetryCooldown),
       ("Steam retry cooldown is not extended by slow mode", DoesNotExtendExistingSteamRetryCooldown),
       ("Steam Fail is transient in normal and slow modes", TreatsFailAsTransientInEveryMode),
+      ("Unsupported maps are excluded from payload cache population", ExcludesUnsupportedMapsFromCachePopulation),
   ];
 
   static int Main() {
     return TestRunner.Run(Tests);
+  }
+
+  static void ExcludesUnsupportedMapsFromCachePopulation() {
+    Assert.False(MapPayloadCachePolicy.ShouldPopulate("unsupported", false, false));
+    Assert.True(MapPayloadCachePolicy.ShouldPopulate("fetched", false, false));
+    Assert.False(MapPayloadCachePolicy.ShouldPopulate("fetched", true, false));
+    Assert.False(MapPayloadCachePolicy.ShouldPopulate("fetched", false, true));
   }
 
   static void CountsOnlyLivingLogTrees() {

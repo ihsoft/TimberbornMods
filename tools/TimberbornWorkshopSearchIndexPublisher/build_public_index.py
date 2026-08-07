@@ -46,12 +46,17 @@ def main() -> int:
     output_directory.mkdir(parents=True, exist_ok=True)
 
     workshop_items = read_json_lines(snapshot_path)
+    public_workshop_items = []
+    for item in workshop_items:
+        public_item = dict(item)
+        public_item.pop("payload_size_bytes", None)
+        public_workshop_items.append(public_item)
     map_metadata_results = read_json_lines(map_metadata_path)
     map_metadata_by_id = {
         record["published_file_id"]: record for record in map_metadata_results
     }
     search_index = []
-    for item in workshop_items:
+    for item in public_workshop_items:
         record = dict(item)
         map_metadata = map_metadata_by_id.get(item["published_file_id"])
         if map_metadata:
@@ -66,14 +71,14 @@ def main() -> int:
                 record["map_classifications"] = map_metadata["classifications"]
         search_index.append(record)
 
-    write_gzip_json_lines(output_directory / "workshop-items.jsonl.gz", workshop_items)
+    write_gzip_json_lines(output_directory / "workshop-items.jsonl.gz", public_workshop_items)
     write_gzip_json_lines(output_directory / "map-metadata.jsonl.gz", map_metadata_results)
     write_gzip_json_lines(output_directory / "search-index.jsonl.gz", search_index)
     manifest = {
         "schema_version": PUBLIC_SCHEMA_VERSION,
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "source": "anonymous-steam-workshop-metadata-and-map-payloads",
-        "workshop_items": len(workshop_items),
+        "workshop_items": len(public_workshop_items),
         "map_dimensions_known": sum(
             record.get("map_width", 0) > 0 and record.get("map_height", 0) > 0
             for record in map_metadata_results

@@ -31,11 +31,11 @@ sealed class WorkshopIndexer {
 
   sealed record RawWorkshopRecord(
       string PublishedFileId, string Title, string Description, string CreatorSteamId, uint CreatedAt, uint UpdatedAt,
-      string PreviewUrl, List<string> Tags, uint VotesUp, uint VotesDown, float Score);
+      long PayloadSizeBytes, string PreviewUrl, List<string> Tags, uint VotesUp, uint VotesDown, float Score);
 
   sealed record WorkshopRecord(
       string PublishedFileId, string Title, string DescriptionRaw, string DescriptionPlain, string CreatorSteamId,
-      DateTime CreatedAtUtc, DateTime UpdatedAtUtc, string PreviewUrl, List<string> Tags,
+      DateTime CreatedAtUtc, DateTime UpdatedAtUtc, long PayloadSizeBytes, string PreviewUrl, List<string> Tags,
       uint VotesUp, uint VotesDown, float Score, string PrimaryCategory, List<WorkshopCategoryMatch> Categories);
 
   sealed record Options(string OutputPath, TimeSpan RequestTimeout);
@@ -221,7 +221,8 @@ sealed class WorkshopIndexer {
           }
           items.Add(new RawWorkshopRecord(
               details.m_nPublishedFileId.m_PublishedFileId.ToString(), details.m_rgchTitle, details.m_rgchDescription,
-              details.m_ulSteamIDOwner.ToString(), details.m_rtimeCreated, details.m_rtimeUpdated, previewUrl,
+              details.m_ulSteamIDOwner.ToString(), details.m_rtimeCreated, details.m_rtimeUpdated,
+              details.m_nFileSize, previewUrl,
               details.m_rgchTags.Split(
                   ',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList(),
               details.m_unVotesUp, details.m_unVotesDown, details.m_flScore));
@@ -276,7 +277,7 @@ sealed class WorkshopIndexer {
     return new WorkshopRecord(
         item.PublishedFileId, item.Title, item.Description, StripSteamMarkup(item.Description), item.CreatorSteamId,
         DateTimeOffset.FromUnixTimeSeconds(item.CreatedAt).UtcDateTime,
-        DateTimeOffset.FromUnixTimeSeconds(item.UpdatedAt).UtcDateTime, item.PreviewUrl, item.Tags,
+        DateTimeOffset.FromUnixTimeSeconds(item.UpdatedAt).UtcDateTime, item.PayloadSizeBytes, item.PreviewUrl, item.Tags,
         item.VotesUp, item.VotesDown, item.Score, classification.PrimaryCategory, classification.Matches);
   }
 

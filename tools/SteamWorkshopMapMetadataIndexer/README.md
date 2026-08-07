@@ -8,7 +8,9 @@ The tool incrementally reuses records from `--previous-results`. A map is analyz
 timestamp changes, its previous result is stale, or `MapArchiveAnalyzer.AnalysisVersion` increases. Steam requests are
 sequential, and the first Steam/UGC request failure stops the pass before another request is sent. A downloaded payload
 whose archive or map format cannot be analyzed is recorded as `unsupported`, and processing continues with the next
-map. That result is retried only after the Workshop item or analysis version changes.
+map. Payloads whose snapshot-declared or downloaded size exceeds `--max-download-bytes` are handled the same way.
+Current `unsupported` results are excluded from background cache population and retried only after the Workshop item
+or analysis version changes.
 
 The narrow transient `k_EResultBusy`, `k_EResultNoConnection`, and `k_EResultFail` request results, plus timeouts waiting
 for a Steam request callback, are retried twice: first after a 20-second cooldown and then after a 40-second cooldown.
@@ -69,6 +71,10 @@ Cached payloads are fetched from GHCR and analyzed in parallel, with concurrency
 Steam phase begins. Steam metadata queries and payload downloads remain strictly sequential, and cache writes happen
 only in that sequential phase. A corrupt or unreadable cached payload affects only its own record and does not stop
 other cached analyses.
+
+The complete Workshop snapshot supplies each payload's declared size, so the analyzer can enforce its pre-download
+limit without issuing a separate per-map UGC details query. The downloaded install size is still checked before the
+payload is cached or analyzed.
 
 `--request-delay-seconds` sets the minimum delay between sequential map payload requests and defaults to zero. Retry
 cooldowns count toward that interval instead of being added to it, while slow mode raises the minimum to its own delay.

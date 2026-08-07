@@ -39,6 +39,7 @@ class PublicIndexContractTest(unittest.TestCase):
                 "tags": ["Map"],
                 "primary_category": "map",
                 "preview_url": "https://example.test/primary.jpg",
+                "payload_size_bytes": 12345,
             }])
             write_json_lines(map_metadata, [{
                 "published_file_id": "1",
@@ -84,11 +85,16 @@ class PublicIndexContractTest(unittest.TestCase):
             self.assertEqual(CANONICAL_DATA_FILES, set(manifest["files"]))
             self.assertEqual(1, manifest["map_settlement_space_known"])
 
+            with gzip.open(output / "workshop-items.jsonl.gz", "rt", encoding="utf-8") as stream:
+                public_workshop_records = [json.loads(line) for line in stream]
+            self.assertNotIn("payload_size_bytes", public_workshop_records[0])
+
             with gzip.open(output / "search-index.jsonl.gz", "rt", encoding="utf-8") as stream:
                 consumer_records = [json.loads(line) for line in stream]
 
             self.assertEqual(1, len(consumer_records))
             self.assertEqual("1", consumer_records[0]["published_file_id"])
+            self.assertNotIn("payload_size_bytes", consumer_records[0])
             self.assertEqual(128, consumer_records[0]["map_width"])
             self.assertEqual(128, consumer_records[0]["map_height"])
             self.assertEqual(1, consumer_records[0]["map_analysis_version"])

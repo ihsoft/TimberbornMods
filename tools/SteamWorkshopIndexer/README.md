@@ -22,8 +22,9 @@ Default ignored outputs:
 .tools/workshop-index/timberborn-workshop-bootstrap.summary.json
 ```
 
-The JSONL record contains public metadata, normalized description text, Steam tags, a coarse content-kind
-classification and the public preview URL. An item is classified as a map when its
+The JSONL record contains public metadata, normalized description text, Steam tags, the declared payload size, a
+coarse content-kind classification and the public preview URL. The payload size is passed to the bounded map analyzer
+as a pre-download safety check and is not copied into the public search artifact. An item is classified as a map when its
 Steam tag list contains `Map`; any other tags may coexist and do not affect that decision. Title and description text
 are never evidence that an item is a map. Descriptions remain weaker evidence for other coarse content kinds and
 search, not ground truth for terrain classification.
