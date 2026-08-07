@@ -13,6 +13,7 @@ namespace IgorZ.MapBrowser.WorkshopMapIndexing.Tests;
 
 static class Program {
   static readonly MapArchiveAnalyzer ArchiveAnalyzer = new();
+  static readonly ForestDensityClassifier ForestClassifier = new();
   static readonly WaterMapDecoder WaterDecoder = new();
   static readonly WaterFeatureDiagnostics WaterDiagnostics = new();
   static readonly WaterFormClassifier WaterClassifier = new();
@@ -22,6 +23,7 @@ static class Program {
       ("Archive analysis trusts runtime map size over stale metadata", TrustsRuntimeMapSize),
       ("Forest levels use five evenly spaced bands", UsesExpectedForestBands),
       ("Forest coverage excludes open surface water", ExcludesOpenWaterFromForestCoverage),
+      ("Forest classifier preserves Workshop map baselines", PreservesForestMapBaselines),
       ("Water form always emits a searchable concrete value", EmitsConcreteWaterForms),
       ("Water decoder reads legacy heights and excludes buried columns", DecodesLegacySurfaceWater),
       ("Water decoder reads voxel terrain", DecodesVoxelSurfaceWater),
@@ -94,17 +96,43 @@ static class Program {
   }
 
   static void ExcludesOpenWaterFromForestCoverage() {
-    using var entity = System.Text.Json.JsonDocument.Parse("""
-        {"Components":{"LivingNaturalResource":{},"Yielder:Cuttable":{"Yield":{"Good":"Log"}}}}
-        """);
-    var classifier = new ForestDensityClassifier();
-    for (var index = 0; index < 10; index++) {
-      classifier.ObserveEntity(entity.RootElement);
+    const string tree = """{"Components":{"LivingNaturalResource":{},"Yielder:Cuttable":{"Yield":{"Good":"Log"}}}}""";
+    using var world = System.Text.Json.JsonDocument.Parse(
+        $$"""{"Entities":[{{string.Join(',', Enumerable.Repeat(tree, 10))}}]}""");
+    var result = new ForestDensityClassifier().Analyze(world.RootElement, 50);
+    Assert.Equal(10L, result.LiveTreeCount);
+    Assert.Equal(0.20, result.CoverageRatio);
+    Assert.Equal(2, result.Level);
+  }
+
+  static void PreservesForestMapBaselines() {
+    var fixtures = Path.Combine(AppContext.BaseDirectory, "Fixtures", "Forest");
+    var expected = new Dictionary<string, (long Trees, int Level)>() {
+        ["00100-3652824726.json.gz"] = (936, 2),
+        ["001-musje-3672607632.json.gz"] = (4156, 1),
+        ["112-3742639403.json.gz"] = (1031, 1),
+        ["challenge-small-3775076404.json.gz"] = (292, 2),
+        ["creek-3685093589.json.gz"] = (200, 2),
+        ["down-by-the-river-3275489141.json.gz"] = (784, 2),
+        ["gemini-origins-3758706362.json.gz"] = (167, 4),
+        ["grand-river-3752545142.json.gz"] = (843, 0),
+        ["hurmevesi-3760651666.json.gz"] = (193, 0),
+        ["limited-3761906496.json.gz"] = (196, 1),
+        ["mountain-pool-3721128633.json.gz"] = (304, 0),
+        ["painting-wall-3350796155.json.gz"] = (0, 0),
+        ["ponds-3759577966.json.gz"] = (449, 0),
+        ["shallow-falls-25x25-3755358505.json.gz"] = (224, 3),
+        ["spaceship-3744715163.json.gz"] = (26, 3),
+        ["the-lake-3769190684.json.gz"] = (1470, 0),
+        ["tiny-plateaus-3725408732.json.gz"] = (66, 4),
+    };
+    foreach (var (fixtureName, baseline) in expected) {
+      var (world, landArea) = ForestRegressionFixture.Read(Path.Combine(fixtures, fixtureName));
+      var result = ForestClassifier.Analyze(world, landArea);
+      Assert.Equal(baseline.Trees, result.LiveTreeCount);
+      Assert.Equal(baseline.Trees / (double) landArea, result.CoverageRatio);
+      Assert.Equal(baseline.Level, result.Level);
     }
-    var result = classifier.BuildResult(new MapDimensions(10, 10), 50);
-    Assert.Equal(10L, result.GetProperty("live_tree_count").GetInt64());
-    Assert.Equal(0.20, result.GetProperty("coverage_ratio").GetDouble());
-    Assert.Equal(2, result.GetProperty("level").GetInt32());
   }
 
   static void TrustsRuntimeMapSize() {

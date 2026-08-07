@@ -13,24 +13,18 @@ sealed class MapArchiveAnalyzer {
   public const int AnalysisVersion = 9;
   const long MaxWorldJsonBytes = 250_000_000;
 
-  static readonly IReadOnlyList<Func<IMapEntityClassifier>> ClassifierFactories = [
-      static () => new ForestDensityClassifier(),
-  ];
-
   public MapArchiveAnalysis Analyze(ZipArchive archive) {
     using var world = ReadWorld(archive);
     var dimensions = ReadDimensions(world.RootElement, archive);
-    var classifiers = ClassifierFactories.Select(factory => factory()).ToArray();
-    ScanEntities(world.RootElement, classifiers);
     var water = new WaterMapDecoder().Decode(world.RootElement, dimensions.Width, dimensions.Height);
     var landArea = checked(dimensions.Width * dimensions.Height) - water.OpenWaterTileCount;
-    var classifications = classifiers.ToDictionary(
-        classifier => classifier.Key,
-        classifier => classifier.BuildResult(dimensions, landArea));
-    classifications.Add(WaterFormClassifier.FeatureKey,
-        JsonSerializer.SerializeToElement(new WaterFormClassifier().Analyze(water)));
-    classifications.Add(SettlementSpaceClassifier.FeatureKey,
-        JsonSerializer.SerializeToElement(new SettlementSpaceClassifier().Analyze(water)));
+    var classifications = new Dictionary<string, JsonElement>() {
+        [ForestDensityClassifier.FeatureKey] = JsonSerializer.SerializeToElement(
+            new ForestDensityClassifier().Analyze(world.RootElement, landArea)),
+        [WaterFormClassifier.FeatureKey] = JsonSerializer.SerializeToElement(new WaterFormClassifier().Analyze(water)),
+        [SettlementSpaceClassifier.FeatureKey] = JsonSerializer.SerializeToElement(
+            new SettlementSpaceClassifier().Analyze(water)),
+    };
     return new MapArchiveAnalysis(dimensions.Width, dimensions.Height, classifications);
   }
 
@@ -70,17 +64,5 @@ sealed class MapArchiveAnalyzer {
 
     using var stream = entry.Open();
     return JsonDocument.Parse(stream);
-  }
-
-  static void ScanEntities(JsonElement world, IReadOnlyCollection<IMapEntityClassifier> classifiers) {
-    if (!world.TryGetProperty("Entities", out var entities)
-        || entities.ValueKind != JsonValueKind.Array) {
-      throw new InvalidDataException("Map world has no Entities array.");
-    }
-    foreach (var entity in entities.EnumerateArray()) {
-      foreach (var classifier in classifiers) {
-        classifier.ObserveEntity(entity);
-      }
-    }
   }
 }

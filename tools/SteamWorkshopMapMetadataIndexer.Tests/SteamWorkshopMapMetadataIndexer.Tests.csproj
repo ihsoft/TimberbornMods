@@ -22,11 +22,11 @@
     <Compile Include="..\SteamWorkshopMapMetadataIndexer\MapDimensions.cs">
       <Link>MapDimensions.cs</Link>
     </Compile>
-    <Compile Include="..\SteamWorkshopMapMetadataIndexer\Classifiers\IMapEntityClassifier.cs">
-      <Link>IMapEntityClassifier.cs</Link>
-    </Compile>
     <Compile Include="..\SteamWorkshopMapMetadataIndexer\Classifiers\ForestDensityClassifier.cs">
       <Link>ForestDensityClassifier.cs</Link>
+    </Compile>
+    <Compile Include="..\SteamWorkshopMapMetadataIndexer\Classifiers\ForestDensityClassification.cs">
+      <Link>ForestDensityClassification.cs</Link>
     </Compile>
     <Compile Include="..\SteamWorkshopMapMetadataIndexer\Classifiers\SettlementSpaceClassifier.cs">
       <Link>SettlementSpaceClassifier.cs</Link>
@@ -64,6 +64,9 @@
     <Compile Include="..\TimberbornMapWaterDecoder\WaterRegressionFixture.cs">
       <Link>WaterRegressionFixture.cs</Link>
     </Compile>
+    <Compile Include="..\TimberbornMapWaterDecoder\ForestRegressionFixture.cs">
+      <Link>ForestRegressionFixture.cs</Link>
+    </Compile>
     <Compile Include="..\..\TestSupport\Testing\Assert.cs">
       <Link>TestSupport\Assert.cs</Link>
     </Compile>
@@ -74,5 +77,6 @@
   <ItemGroup>
     <None Include="Fixtures\Water\*.json.gz" CopyToOutputDirectory="PreserveNewest" />
     <None Include="Fixtures\SettlementSpace\*.json.gz" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Fixtures\Forest\*.json.gz" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

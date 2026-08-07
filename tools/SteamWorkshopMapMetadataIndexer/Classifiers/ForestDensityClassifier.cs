@@ -3,23 +3,23 @@
 // License: Public Domain
 
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace IgorZ.MapBrowser.WorkshopMapIndexing.Classifiers;
 
-sealed class ForestDensityClassifier : IMapEntityClassifier {
+sealed class ForestDensityClassifier {
   public const string FeatureKey = "forest_density";
 
-  sealed record ForestDensityResult(
-      [property: JsonPropertyName("live_tree_count")] long LiveTreeCount,
-      [property: JsonPropertyName("coverage_ratio")] double CoverageRatio,
-      [property: JsonPropertyName("level")] int Level);
+  public ForestDensityClassification Analyze(JsonElement world, int landArea) {
+    if (!world.TryGetProperty("Entities", out var entities)
+        || entities.ValueKind != JsonValueKind.Array) {
+      throw new InvalidDataException("Map world has no Entities array.");
+    }
+    var liveTreeCount = entities.EnumerateArray().LongCount(IsLiveTree);
+    var coverageRatio = landArea > 0 ? (double) liveTreeCount / landArea : 0;
+    return new ForestDensityClassification(liveTreeCount, coverageRatio, GetLevel(coverageRatio));
+  }
 
-  long _liveTreeCount;
-
-  public string Key => FeatureKey;
-
-  public void ObserveEntity(JsonElement entity) {
+  static bool IsLiveTree(JsonElement entity) {
     if (entity.ValueKind != JsonValueKind.Object
         || !entity.TryGetProperty("Components", out var components)
         || components.ValueKind != JsonValueKind.Object
@@ -30,21 +30,15 @@ sealed class ForestDensityClassifier : IMapEntityClassifier {
         || !yield.TryGetProperty("Good", out var good)
         || good.ValueKind != JsonValueKind.String
         || good.GetString() != "Log") {
-      return;
+      return false;
     }
     if (components.TryGetProperty("LivingNaturalResource", out var livingResource)
         && livingResource.ValueKind == JsonValueKind.Object
         && livingResource.TryGetProperty("IsDead", out var isDead)
         && isDead.ValueKind == JsonValueKind.True) {
-      return;
+      return false;
     }
-    _liveTreeCount++;
-  }
-
-  public JsonElement BuildResult(MapDimensions mapDimensions, int landArea) {
-    var coverageRatio = landArea > 0 ? (double) _liveTreeCount / landArea : 0;
-    return JsonSerializer.SerializeToElement(
-        new ForestDensityResult(_liveTreeCount, coverageRatio, GetLevel(coverageRatio)));
+    return true;
   }
 
   public static int GetLevel(double coverageRatio) {

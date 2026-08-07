@@ -19,6 +19,19 @@ sealed class WaterMapDecoderTool {
     var waterDiagnostics = new WaterFeatureDiagnostics();
     var waterClassifier = new WaterFormClassifier();
 
+    if (args is ["--write-forest-fixture", var forestMap, var forestFixturePath, var forestWorkshopId]) {
+      using var forestArchive = ZipFile.OpenRead(Path.GetFullPath(forestMap));
+      using var forestMetadata = ReadJson(forestArchive, "map_metadata.json");
+      using var forestWorld = ReadJson(forestArchive, "world.json");
+      var (forestWidth, forestHeight) = ReadDimensions(forestWorld.RootElement, forestMetadata.RootElement);
+      var forestWater = waterDecoder.Decode(forestWorld.RootElement, forestWidth, forestHeight);
+      var forestLandArea = checked(forestWidth * forestHeight) - forestWater.OpenWaterTileCount;
+      ForestRegressionFixture.Write(
+          forestFixturePath, forestWorkshopId, forestWorld.RootElement, forestLandArea);
+      Console.WriteLine($"Wrote {Path.GetFullPath(forestFixturePath)}");
+      return 0;
+    }
+
     if (args is ["--write-fixture", var fixtureMap, var fixturePath, var workshopId]) {
       using var fixtureArchive = ZipFile.OpenRead(Path.GetFullPath(fixtureMap));
       using var fixtureMetadata = ReadJson(fixtureArchive, "map_metadata.json");
@@ -33,7 +46,8 @@ sealed class WaterMapDecoderTool {
     if (args.Length != 2) {
       Console.Error.WriteLine(
           "Usage: TimberbornMapWaterDecoder MAP.timber OUTPUT_DIRECTORY\n"
-          + "   or: TimberbornMapWaterDecoder --write-fixture MAP.timber OUTPUT.json.gz WORKSHOP_ID");
+          + "   or: TimberbornMapWaterDecoder --write-fixture MAP.timber OUTPUT.json.gz WORKSHOP_ID\n"
+          + "   or: TimberbornMapWaterDecoder --write-forest-fixture MAP.timber OUTPUT.json.gz WORKSHOP_ID");
       return 2;
     }
 
