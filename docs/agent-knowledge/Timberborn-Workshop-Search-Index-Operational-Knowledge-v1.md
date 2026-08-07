@@ -107,8 +107,8 @@ Treat the GitHub Pages output as a public API. A normal consumer starts with `ma
 `search-index.jsonl.gz`. The remaining compressed artifacts expose the component Workshop metadata and exact map
 metadata datasets for diagnostics or specialized consumers.
 
-`tools/TimberbornMapPreviewClassifier/PUBLIC-DATA-CONTRACT.md` is authoritative for artifact purposes, record fields,
-and consumer behavior. Preserve these compatibility rules:
+Use `tools/TimberbornWorkshopSearchIndexPublisher/PUBLIC-DATA-CONTRACT.md` as authoritative for artifact purposes,
+record fields, and consumer behavior. Preserve these compatibility rules:
 
 - expose a public schema version separately from archive analysis and classifier versions;
 - prefer additive fields;
