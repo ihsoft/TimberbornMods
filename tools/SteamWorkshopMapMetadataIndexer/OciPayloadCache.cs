@@ -44,6 +44,8 @@ sealed class OciPayloadCache : IDisposable {
   readonly HashSet<string> _dirtyShards = [];
   bool _catalogDirty;
   int _flushFailures;
+  int _prunedMaps;
+  int _prunedVersions;
   int _writeFailures;
 
   OciPayloadCache(string repository, string workDirectory, Dictionary<string, CatalogEntry> catalog) {
@@ -56,6 +58,14 @@ sealed class OciPayloadCache : IDisposable {
 
   /// <summary>Number of final cache publications that failed after all registry attempts.</summary>
   public int FlushFailures => _flushFailures;
+
+  /// <summary>
+  /// Number of maps removed from the cache catalog because they are absent from the current snapshot.
+  /// </summary>
+  public int PrunedMaps => _prunedMaps;
+
+  /// <summary>Number of cached map versions removed while pruning maps absent from the current snapshot.</summary>
+  public int PrunedVersions => _prunedVersions;
 
   /// <summary>Number of downloaded payloads that could not be stored after all registry attempts.</summary>
   public int WriteFailures => _writeFailures;
@@ -86,6 +96,27 @@ sealed class OciPayloadCache : IDisposable {
 
   public bool Contains(string publishedFileId, string? updatedAtUtc) {
     return _catalog.ContainsKey(CreateEntryName(publishedFileId, updatedAtUtc));
+  }
+
+  /// <summary>Removes catalog entries for maps that are absent from the current complete Workshop snapshot.</summary>
+  public void PruneExcept(IReadOnlySet<string> activePublishedFileIds) {
+    var removedEntries = _catalog.Where(pair => !activePublishedFileIds.Contains(GetPublishedFileId(pair.Key)))
+        .ToList();
+    if (removedEntries.Count == 0) {
+      return;
+    }
+
+    var removedMapIds = new HashSet<string>(StringComparer.Ordinal);
+    foreach (var (entryName, entry) in removedEntries) {
+      _catalog.Remove(entryName);
+      _dirtyShards.Add(entry.Shard);
+      removedMapIds.Add(GetPublishedFileId(entryName));
+    }
+    _catalogDirty = true;
+    _prunedMaps += removedMapIds.Count;
+    _prunedVersions += removedEntries.Count;
+    Console.WriteLine(
+        $"Pruned {removedMapIds.Count} unavailable maps and {removedEntries.Count} versions from payload cache.");
   }
 
   public byte[]? TryRead(string publishedFileId, string? updatedAtUtc, ulong maximumBytes) {
@@ -252,6 +283,14 @@ sealed class OciPayloadCache : IDisposable {
       throw new PayloadCacheException(
           $"oras {arguments[0]} failed with exit code {process.ExitCode}: {(error + output).Trim()}");
     }
+  }
+
+  static string GetPublishedFileId(string entryName) {
+    var separator = entryName.IndexOf('/');
+    if (separator <= 0) {
+      throw new InvalidDataException($"Payload cache entry has an invalid name: {entryName}.");
+    }
+    return entryName[..separator];
   }
 
   static OrasCommandResult RunRegistryWriteWithRetry(

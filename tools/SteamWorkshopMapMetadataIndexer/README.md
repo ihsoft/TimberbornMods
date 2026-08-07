@@ -44,6 +44,10 @@ Final config, shard-manifest, and catalog writes use the same retry delays. If f
 analyzer writes and publishes its map metadata normally. The next run can therefore reuse the completed analysis and
 refill only the missing cache entries instead of downloading the same maps as unprocessed analysis work.
 
+After reading a complete Workshop snapshot, the analyzer removes every cache-catalog entry whose map ID is absent from
+that snapshot. Only affected shard manifests and the catalog are republished; no payload download or analysis is
+needed. This logical pruning does not yet delete superseded untagged GHCR package versions or their physical blobs.
+
 Payloads are distributed across 100 stable logical shards using `published_file_id % 100`. Every map remains a separate
 content-addressed OCI blob; a shard tag is only a small manifest referencing its blobs. Updating or adding a map uploads
 only that map and rewrites the small shard manifest, never the other payload bytes. A separate catalog maps each

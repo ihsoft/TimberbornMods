@@ -102,6 +102,7 @@ sealed class MapMetadataIndexer {
     var processedThisRun = 0;
     var downloadedThisRun = 0;
     using var payloadCache = OciPayloadCache.CreateFromEnvironment();
+    payloadCache?.PruneExcept(maps.Select(map => map.PublishedFileId).ToHashSet(StringComparer.Ordinal));
     var refreshCandidates = maps
         .Where(map => NeedsRefresh(map, previousById.GetValueOrDefault(map.PublishedFileId)))
         .ToList();
@@ -257,6 +258,8 @@ sealed class MapMetadataIndexer {
         $"Wrote {outputById.Count} map metadata records; selected {candidates.Count}, "
         + $"processed this run {processedThisRun}, downloaded {downloadedThisRun}, up-to-date {upToDate}, "
         + $"remaining refresh {maps.Count - upToDate}, stale {stale}, "
+        + $"payload cache pruned maps {payloadCache?.PrunedMaps ?? 0}, "
+        + $"payload cache pruned versions {payloadCache?.PrunedVersions ?? 0}, "
         + $"payload cache write failures {payloadCache?.WriteFailures ?? 0}, "
         + $"payload cache publication failures {payloadCache?.FlushFailures ?? 0}.");
     return 0;
