@@ -177,7 +177,7 @@ length.
 
 The audit should cover the repository style contracts that are easy to miss during mechanical cleanup:
 
-  * source header,
+  * source header and license ownership,
   * namespace and project `RootNamespace`,
   * unused imports and aliases,
   * explicit application class and entry point for executable projects,
@@ -188,6 +188,11 @@ The audit should cover the repository style contracts that are easy to miss duri
   * wrapped declarations, calls, expressions, and collection initializers,
   * raw string literals,
   * final line length.
+
+Before copying or adding a product-specific source header, license declaration, or namespace, determine the file's
+owner from its consumers, project identity, and distribution role. Do not infer ownership from directory proximity or
+from the conventions of nearby files. A broad cleanup must preserve each tool or product's actual attribution instead
+of making every file in the target folder look alike.
 
 Build a type inventory as well as a file inventory. A DTO or helper used only by the class that creates and owns it
 should normally be nested in that owner instead of remaining as an unrelated top-level type. Place nested types near

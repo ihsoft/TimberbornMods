@@ -3,6 +3,17 @@
 These instructions apply to standalone repository tools under `tools/`. They complement the root `AGENTS.md` and do
 not relax its role, safety, publication, or external-state gates.
 
+## Tool Ownership And Attribution
+
+Determine a tool's owner from its project identity, call sites, consumers, and distribution role before changing its
+source header, license declaration, namespace, or assembly identity. Do not infer ownership from directory proximity.
+
+Tools used by repository release, publishing, indexing, or maintenance scripts are repository tools unless an explicit
+project contract makes them part of a mod. They must use an ownership-neutral repository-tool namespace and must not
+receive a mod-specific source or license header merely because nearby tools belong to that mod. Preserve an existing
+tool-specific attribution contract when one is already established; do not invent or copy a license declaration during
+a style cleanup.
+
 ## Repository Coordination
 
 Use `repository-coordination.psm1` for tracked tools that need exclusive ownership of a shared local resource. Do not
