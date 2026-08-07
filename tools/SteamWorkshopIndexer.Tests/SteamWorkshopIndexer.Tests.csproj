@@ -2,12 +2,19 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>IgorZ.MapBrowser.WorkshopIndexing.Tests</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\SteamWorkshopIndexer\WorkshopCategoryClassifier.cs">
+    <Compile Include="..\SteamWorkshopIndexer\Classifiers\WorkshopCategoryClassifier.cs">
       <Link>WorkshopCategoryClassifier.cs</Link>
+    </Compile>
+    <Compile Include="..\SteamWorkshopIndexer\Classifiers\WorkshopCategoryClassification.cs">
+      <Link>WorkshopCategoryClassification.cs</Link>
+    </Compile>
+    <Compile Include="..\SteamWorkshopIndexer\Classifiers\WorkshopCategoryMatch.cs">
+      <Link>WorkshopCategoryMatch.cs</Link>
     </Compile>
     <Compile Include="..\..\TestSupport\Testing\Assert.cs">
       <Link>TestSupport\Assert.cs</Link>
