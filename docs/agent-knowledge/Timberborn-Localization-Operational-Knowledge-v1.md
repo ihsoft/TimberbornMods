@@ -97,8 +97,11 @@ ID,Text,Comment
   comment for the same key consistent across locale files, updating every copy when its context changes.
 - Preserve parameters such as `{0}`, `{1}`, and `{0:0.#}` with the same names, indexes, and format specifiers in every
   locale.
-- Quote text and comment fields when they contain commas, parentheses, parameters, quotes, or line breaks. Escape a
-  literal double quote according to CSV rules.
+- For ordinary localization records, always quote `Text` and every non-empty `Comment`, even when CSV syntax does not
+  require quoting. Leave an empty `Comment` field empty and unquoted; do not write `""` for it.
+- Escape a literal double quote inside a quoted field according to CSV rules.
+- Structural separator rows are not ordinary localization records. Keep them unquoted in the form
+  `=,=,<English block label>`.
 - Preserve the existing file encoding, line endings, row organization, and unrelated text.
 
 Example:
@@ -188,9 +191,11 @@ Before submitting a localization change:
 1. Parse every touched localization file with a real CSV parser rather than validating it by line splitting. If the
    package has any locale besides `enUS`, parse every localization file for the package.
 2. Confirm the header and three-column structure remain intact, every localization `ID` is unique within its file, and
-   empty player-facing `Text` fields are reported. Repeated structural separator rows with `ID` equal to `=` are allowed.
-3. Confirm separator rows use `=,=,<English block label>` and treat them as file structure rather than localization
-   keys.
+   empty player-facing `Text` fields are reported. Confirm ordinary records quote `Text` and every non-empty `Comment`
+   while leaving empty comments empty and unquoted. Repeated structural separator rows with `ID` equal to `=` are
+   allowed.
+3. Confirm separator rows remain unquoted as `=,=,<English block label>` and treat them as file structure rather than
+   localization keys.
 4. Compare the complete localization-key set of every non-canonical locale with the canonical source locale, normally
    `enUS`, excluding separator rows. Report every missing and extra key, including the affected locale and exact key
    names.
