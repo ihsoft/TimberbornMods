@@ -157,6 +157,26 @@ jobs:
         with:
           path: .work/public
 
+      - name: Prune superseded payload cache versions
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          package_path="/users/ihsoft/packages/container/timberborn-workshop-payload-cache"
+          version_ids=$(gh api --paginate "$package_path/versions?per_page=100" \
+            --jq '.[] | select((.metadata.container.tags // []) | length == 0) | .id' \
+            | head -n 100)
+          if [ -z "$version_ids" ]; then
+            echo "No superseded payload cache versions to prune."
+            exit 0
+          fi
+          pruned_versions=0
+          while IFS= read -r version_id; do
+            gh api --method DELETE "$package_path/versions/$version_id"
+            pruned_versions=$((pruned_versions + 1))
+          done <<< "$version_ids"
+          echo "Pruned $pruned_versions superseded payload cache versions."
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
