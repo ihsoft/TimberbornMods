@@ -12,8 +12,10 @@ map. That result is retried only after the Workshop item or analysis version cha
 
 The narrow transient `k_EResultBusy` and `k_EResultNoConnection` request results, plus timeouts waiting for a Steam
 request callback, are retried twice: first after a 20-second cooldown and then after a 40-second cooldown. They activate
-the circuit breaker only after those attempts are exhausted. Other Steam/UGC failures are not broadly retried. If the
-pass stops early, previous records for selected but unprocessed maps remain unchanged in the checkpoint.
+the circuit breaker only after those attempts are exhausted. A generic `k_EResultFail` follows the same retry rules only
+while slow mode is already active; outside slow mode it activates the circuit breaker immediately. Other Steam/UGC
+failures are not broadly retried. If the pass stops early, previous records for selected but unprocessed maps remain
+unchanged in the checkpoint.
 
 After either transient result, the sequential Steam request stream enters slow mode. Requests are then spaced at least
 15 seconds apart until six consecutive requests complete without another `Busy`, `NoConnection`, or timeout; any of

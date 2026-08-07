@@ -188,8 +188,8 @@ static (MapArchiveAnalysis Analysis, bool Downloaded) ReadAndAnalyzeMapWithTrans
     } catch (UnsupportedMapPayloadException) {
       requestPacer.RecordSuccessfulRequest();
       throw;
-    } catch (Exception exception) when (GetTransientFailureReason(exception) is not null) {
-      var reason = GetTransientFailureReason(exception)!;
+    } catch (Exception exception) when (GetTransientFailureReason(exception, requestPacer) is not null) {
+      var reason = GetTransientFailureReason(exception, requestPacer)!;
       requestPacer.RecordTransientFailure(reason);
       if (attempt >= retryDelays.Length) {
         throw;
@@ -204,9 +204,11 @@ static (MapArchiveAnalysis Analysis, bool Downloaded) ReadAndAnalyzeMapWithTrans
   }
 }
 
-static string? GetTransientFailureReason(Exception exception) {
+static string? GetTransientFailureReason(Exception exception, SteamRequestPacer requestPacer) {
   return exception switch {
       SteamPayloadTransientException transient => transient.Result.ToString(),
+      SteamPayloadRequestException failure
+          when requestPacer.ShouldTreatAsTransient(failure.Result.ToString()) => failure.Result.ToString(),
       TimeoutException => "Timeout",
       _ => null,
   };
@@ -233,8 +235,11 @@ static MapArchiveAnalysis DownloadAndAnalyzeMap(
   }
   WaitForCallback(() => completed, "Workshop item download", options.RequestTimeout);
   ThrowIfTransient(response.m_eResult);
-  if (response.m_unAppID.m_AppId != appId || response.m_eResult != EResult.k_EResultOK) {
-    throw new InvalidOperationException($"Workshop download returned {response.m_eResult}.");
+  if (response.m_eResult != EResult.k_EResultOK) {
+    throw new SteamPayloadRequestException("Workshop download", response.m_eResult);
+  }
+  if (response.m_unAppID.m_AppId != appId) {
+    throw new InvalidOperationException($"Workshop download returned AppID {response.m_unAppID.m_AppId}.");
   }
   if (!SteamGameServerUGC.GetItemInstallInfo(itemId, out var sizeOnDisk, out var folder, 4096, out _)) {
     throw new InvalidOperationException("GetItemInstallInfo returned false after download.");
@@ -277,9 +282,12 @@ static ulong QueryDeclaredSize(PublishedFileId_t publishedFileId, TimeSpan timeo
     });
     WaitForCallback(() => completed, "anonymous Workshop query", timeout);
     ThrowIfTransient(response.m_eResult);
-    if (ioFailureResult || response.m_eResult != EResult.k_EResultOK || response.m_unNumResultsReturned != 1
+    if (response.m_eResult != EResult.k_EResultOK) {
+      throw new SteamPayloadRequestException("Anonymous Workshop query", response.m_eResult);
+    }
+    if (ioFailureResult || response.m_unNumResultsReturned != 1
         || !SteamGameServerUGC.GetQueryUGCResult(query, 0, out var details)) {
-      throw new InvalidOperationException($"Anonymous Workshop query failed: {response.m_eResult}.");
+      throw new InvalidOperationException("Anonymous Workshop query returned no usable item details.");
     }
     if (details.m_nFileSize < 0) {
       throw new UnsupportedMapPayloadException(
@@ -440,6 +448,11 @@ sealed class UnsupportedMapPayloadException(string message, Exception? innerExce
 
 sealed class SteamPayloadTransientException(EResult result)
     : Exception($"Steam Workshop request returned transient result {result}.") {
+  public EResult Result { get; } = result;
+}
+
+sealed class SteamPayloadRequestException(string operation, EResult result)
+    : Exception($"{operation} returned {result}.") {
   public EResult Result { get; } = result;
 }
 

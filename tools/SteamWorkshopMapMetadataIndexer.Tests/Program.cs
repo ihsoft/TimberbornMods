@@ -26,6 +26,7 @@ static class Program {
       ("Payload cache shards use stable Workshop ID modulo", BuildsStablePayloadCacheShard),
       ("Steam slow mode requires six consecutive successes", RequiresSixSuccessesToRecoverSteamPacing),
       ("Steam retry cooldown is not extended by slow mode", DoesNotExtendExistingSteamRetryCooldown),
+      ("Steam Fail is transient only inside slow mode", TreatsFailAsTransientOnlyInSlowMode),
   ];
 
   static int Main() {
@@ -411,6 +412,20 @@ static class Program {
 
     Assert.Equal(0, delays.Count);
     Assert.True(pacer.SlowModeActive);
+  }
+
+  static void TreatsFailAsTransientOnlyInSlowMode() {
+    var pacer = new SteamRequestPacer(_ => { }, _ => { });
+    Assert.False(pacer.ShouldTreatAsTransient("k_EResultFail"));
+
+    pacer.RecordTransientFailure("k_EResultNoConnection");
+    Assert.True(pacer.ShouldTreatAsTransient("k_EResultFail"));
+    Assert.False(pacer.ShouldTreatAsTransient("k_EResultAccessDenied"));
+
+    for (var request = 0; request < 6; request++) {
+      pacer.RecordSuccessfulRequest();
+    }
+    Assert.False(pacer.ShouldTreatAsTransient("k_EResultFail"));
   }
 
   static DecodedWaterMap CreateDryMap(int width, int height, int[] heights) {

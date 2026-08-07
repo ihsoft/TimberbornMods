@@ -7,7 +7,7 @@ on:
         description: Maximum number of map payloads to inspect for exact features
         required: false
         type: number
-        default: 500
+        default: 50
   workflow_dispatch:
   schedule:
     - cron: "17 3,9,15,21 * * *"
@@ -122,7 +122,7 @@ jobs:
           --previous-results $GITHUB_WORKSPACE/.work/previous-map-metadata.jsonl.gz
           --output $GITHUB_WORKSPACE/.work/map-metadata.jsonl
           --workshop-directory $RUNNER_TEMP/steamcmd/workshop-content
-          --max-items ${{ inputs.map_metadata_max_items || 500 }}
+          --max-items ${{ inputs.map_metadata_max_items || 50 }}
           --max-download-bytes 50000000
           --request-timeout-seconds 120
           --time-budget-seconds 7200
