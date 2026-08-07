@@ -18,6 +18,7 @@ sealed class OciPayloadCache : IDisposable {
   const string CatalogMediaType = "application/vnd.timberborn.workshop-payload-catalog.v1+json";
   const string ManifestMediaType = "application/vnd.oci.image.manifest.v1+json";
   const string ConfigMediaType = "application/vnd.oci.empty.v1+json";
+  static readonly TimeSpan[] BlobPushRetryDelays = [TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(40)];
 
   sealed class PayloadCacheException(string message, Exception? innerException = null)
       : Exception(message, innerException);
@@ -42,6 +43,7 @@ sealed class OciPayloadCache : IDisposable {
   readonly Dictionary<string, CatalogEntry> _catalog;
   readonly HashSet<string> _dirtyShards = [];
   bool _catalogDirty;
+  int _writeFailures;
 
   OciPayloadCache(string repository, string workDirectory, Dictionary<string, CatalogEntry> catalog) {
     _repository = repository;
@@ -50,6 +52,9 @@ sealed class OciPayloadCache : IDisposable {
   }
 
   public int Count => _catalog.Count;
+
+  /// <summary>Number of downloaded payloads that could not be stored after all registry attempts.</summary>
+  public int WriteFailures => _writeFailures;
 
   public static OciPayloadCache? CreateFromEnvironment() {
     var repository = Environment.GetEnvironmentVariable("MAP_PAYLOAD_CACHE_OCI_REPOSITORY");
@@ -98,24 +103,30 @@ sealed class OciPayloadCache : IDisposable {
     return bytes;
   }
 
-  public void Write(string publishedFileId, string? updatedAtUtc, Stream payload) {
+  /// <summary>
+  /// Tries to store a downloaded payload without allowing a registry failure to interrupt map analysis.
+  /// </summary>
+  public bool TryWrite(string publishedFileId, string? updatedAtUtc, Stream payload) {
     var entryName = CreateEntryName(publishedFileId, updatedAtUtc);
-    foreach (var obsolete in _catalog.Keys.Where(key => key.StartsWith($"{publishedFileId}/", StringComparison.Ordinal)
-        && key != entryName).ToList()) {
-      _catalog.Remove(obsolete);
-    }
     var path = Path.Combine(_workDirectory, $"write-{Guid.NewGuid():N}.timber");
     using (var output = File.Create(path)) {
       payload.CopyTo(output);
     }
     var bytes = File.ReadAllBytes(path);
-    var descriptorResult = RunOras([
-        "blob", "push", "--media-type", PayloadMediaType, "--descriptor", _repository, path,
-    ]);
-    var descriptor = JsonSerializer.Deserialize<OciDescriptor>(descriptorResult.Output)
-        ?? throw new InvalidDataException("oras blob push returned no OCI descriptor.");
-    if (descriptor.Size != bytes.LongLength || string.IsNullOrWhiteSpace(descriptor.Digest)) {
-      throw new InvalidDataException("oras blob push returned an inconsistent OCI descriptor.");
+    OciDescriptor descriptor;
+    try {
+      descriptor = PushBlobWithRetry(path, publishedFileId);
+    } catch (Exception exception) when (exception is PayloadCacheException or InvalidDataException) {
+      _writeFailures++;
+      Console.Error.WriteLine(
+          $"Payload cache write failed for {publishedFileId}; continuing without caching it: {exception.Message}");
+      return false;
+    }
+
+    // Do not retire the previous cached version until the replacement blob is safely stored.
+    foreach (var obsolete in _catalog.Keys.Where(key => key.StartsWith($"{publishedFileId}/", StringComparison.Ordinal)
+        && key != entryName).ToList()) {
+      _catalog.Remove(obsolete);
     }
     var shard = CreateShardTag(publishedFileId);
     _catalog[entryName] = new CatalogEntry(
@@ -123,6 +134,29 @@ sealed class OciPayloadCache : IDisposable {
         Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant());
     _dirtyShards.Add(shard);
     _catalogDirty = true;
+    return true;
+  }
+
+  OciDescriptor PushBlobWithRetry(string path, string publishedFileId) {
+    for (var attempt = 0; ; attempt++) {
+      try {
+        var result = RunOras([
+            "blob", "push", "--media-type", PayloadMediaType, "--descriptor", _repository, path,
+        ]);
+        var descriptor = JsonSerializer.Deserialize<OciDescriptor>(result.Output)
+            ?? throw new InvalidDataException("oras blob push returned no OCI descriptor.");
+        if (descriptor.Size != new FileInfo(path).Length || string.IsNullOrWhiteSpace(descriptor.Digest)) {
+          throw new InvalidDataException("oras blob push returned an inconsistent OCI descriptor.");
+        }
+        return descriptor;
+      } catch (PayloadCacheException exception) when (attempt < BlobPushRetryDelays.Length) {
+        var delay = BlobPushRetryDelays[attempt];
+        Console.Error.WriteLine(
+            $"Payload cache write failed for {publishedFileId}: {exception.Message}; "
+            + $"retrying in {delay.TotalSeconds:0} seconds ({attempt + 1} / {BlobPushRetryDelays.Length}).");
+        Thread.Sleep(delay);
+      }
+    }
   }
 
   public void Flush() {

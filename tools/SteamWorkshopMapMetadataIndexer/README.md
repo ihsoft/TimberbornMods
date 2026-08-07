@@ -36,6 +36,10 @@ The workflow installs ORAS, authenticates with its short-lived `GITHUB_TOKEN`, a
 long-lived repository secret is needed. When the variable is absent, the analyzer keeps its previous no-cache behavior.
 The package remains private and is not part of the public search index.
 
+A failed GHCR blob write is retried after 20 and 40 seconds. If all attempts fail, the downloaded map is still analyzed
+and the sequential Steam pass continues; the summary reports the cache write failure so a transient registry problem
+does not masquerade as a map payload request failure or stop the indexing batch.
+
 Payloads are distributed across 100 stable logical shards using `published_file_id % 100`. Every map remains a separate
 content-addressed OCI blob; a shard tag is only a small manifest referencing its blobs. Updating or adding a map uploads
 only that map and rewrites the small shard manifest, never the other payload bytes. A separate catalog maps each

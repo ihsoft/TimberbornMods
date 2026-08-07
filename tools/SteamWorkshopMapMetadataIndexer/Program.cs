@@ -253,7 +253,8 @@ sealed class MapMetadataIndexer {
     Console.WriteLine(
         $"Wrote {outputById.Count} map metadata records; selected {candidates.Count}, "
         + $"processed this run {processedThisRun}, downloaded {downloadedThisRun}, up-to-date {upToDate}, "
-        + $"remaining refresh {maps.Count - upToDate}, stale {stale}.");
+        + $"remaining refresh {maps.Count - upToDate}, stale {stale}, "
+        + $"payload cache write failures {payloadCache?.WriteFailures ?? 0}.");
     return 0;
   }
 
@@ -342,7 +343,7 @@ sealed class MapMetadataIndexer {
             $"Payload contains {mapFiles.Length} .timber files; expected exactly one.");
       }
       using var payload = File.OpenRead(mapFiles[0]);
-      payloadCache?.Write(map.PublishedFileId, map.UpdatedAtUtc, payload);
+      payloadCache?.TryWrite(map.PublishedFileId, map.UpdatedAtUtc, payload);
       payload.Position = 0;
       return AnalyzePayload(payload);
     } catch (Exception exception) when (exception is InvalidDataException or InvalidOperationException
