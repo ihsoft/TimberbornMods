@@ -399,7 +399,7 @@ static class Program {
     }
     Assert.False(pacer.SlowModeActive);
     Assert.Equal(11, delays.Count);
-    Assert.True(delays.All(value => value == TimeSpan.FromSeconds(10)));
+    Assert.True(delays.All(value => value == TimeSpan.FromSeconds(15)));
   }
 
   static void DoesNotExtendExistingSteamRetryCooldown() {

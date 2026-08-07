@@ -3,7 +3,7 @@
 sealed class SteamRequestPacer(
     Action<TimeSpan> delay, Action<string>? log = null,
     TimeSpan? slowModeDelay = null, int successfulRequestsToRecover = 6) {
-  readonly TimeSpan _slowModeDelay = slowModeDelay ?? TimeSpan.FromSeconds(10);
+  readonly TimeSpan _slowModeDelay = slowModeDelay ?? TimeSpan.FromSeconds(15);
   readonly Action<string> _log = log ?? Console.WriteLine;
   int _consecutiveSuccessfulRequests;
 

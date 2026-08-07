@@ -16,9 +16,9 @@ the circuit breaker only after those attempts are exhausted. Other Steam/UGC fai
 pass stops early, previous records for selected but unprocessed maps remain unchanged in the checkpoint.
 
 After either transient result, the sequential Steam request stream enters slow mode. Requests are then spaced at least
-10 seconds apart until six consecutive requests complete without another `Busy`, `NoConnection`, or timeout; any of
+15 seconds apart until six consecutive requests complete without another `Busy`, `NoConnection`, or timeout; any of
 those failures resets that success count. Existing 20- and 40-second retry cooldowns already satisfy the slow-mode
-spacing and are not extended by another 10 seconds.
+spacing and are not extended by another 15 seconds.
 
 ## Private payload cache
 
