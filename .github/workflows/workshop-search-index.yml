@@ -3,11 +3,46 @@ name: Build Workshop search index
 on:
   workflow_call:
     inputs:
+      job_timeout_minutes:
+        description: Maximum duration of the build job
+        required: false
+        type: number
+        default: 80
       map_metadata_max_items:
         description: Maximum number of map payloads to download per run
         required: false
         type: number
         default: 500
+      map_payload_max_download_bytes:
+        description: Maximum accepted size of one map payload
+        required: false
+        type: number
+        default: 50000000
+      steam_request_timeout_seconds:
+        description: Timeout for one Steam callback
+        required: false
+        type: number
+        default: 120
+      steam_request_delay_seconds:
+        description: Delay between Steam requests in normal mode
+        required: false
+        type: number
+        default: 0
+      steam_slow_mode_delay_seconds:
+        description: Delay between Steam requests in slow mode
+        required: false
+        type: number
+        default: 40
+      map_index_time_budget_seconds:
+        description: Time budget for cached analysis and Steam payload collection
+        required: false
+        type: number
+        default: 3600
+      map_analysis_parallelism:
+        description: Maximum parallelism for cached payload analysis
+        required: false
+        type: number
+        default: 4
       payload_cache_prune_max_versions:
         description: Maximum number of superseded payload cache versions to prune
         required: false
@@ -15,6 +50,46 @@ on:
         default: 100
   workflow_dispatch:
     inputs:
+      job_timeout_minutes:
+        description: Maximum duration of the build job
+        required: false
+        type: number
+        default: 80
+      map_metadata_max_items:
+        description: Maximum number of map payloads to download per run
+        required: false
+        type: number
+        default: 500
+      map_payload_max_download_bytes:
+        description: Maximum accepted size of one map payload
+        required: false
+        type: number
+        default: 50000000
+      steam_request_timeout_seconds:
+        description: Timeout for one Steam callback
+        required: false
+        type: number
+        default: 120
+      steam_request_delay_seconds:
+        description: Delay between Steam requests in normal mode
+        required: false
+        type: number
+        default: 0
+      steam_slow_mode_delay_seconds:
+        description: Delay between Steam requests in slow mode
+        required: false
+        type: number
+        default: 40
+      map_index_time_budget_seconds:
+        description: Time budget for cached analysis and Steam payload collection
+        required: false
+        type: number
+        default: 3600
+      map_analysis_parallelism:
+        description: Maximum parallelism for cached payload analysis
+        required: false
+        type: number
+        default: 4
       payload_cache_prune_max_versions:
         description: Maximum number of superseded payload cache versions to prune
         required: false
@@ -37,7 +112,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 80
+    timeout-minutes: ${{ inputs.job_timeout_minutes || 80 }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v5
@@ -96,10 +171,12 @@ jobs:
         env:
           SteamAppId: "1062090"
           SteamGameId: "1062090"
+          STEAM_REQUEST_TIMEOUT_SECONDS: ${{ inputs.steam_request_timeout_seconds }}
         working-directory: ${{ runner.temp }}/steamcmd
         run: >-
           dotnet $GITHUB_WORKSPACE/tools/SteamWorkshopIndexer/bin/Release/net8.0/SteamWorkshopIndexer.dll
           --output $GITHUB_WORKSPACE/.work/workshop-items.jsonl
+          --request-timeout-seconds ${STEAM_REQUEST_TIMEOUT_SECONDS:-120}
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -127,6 +204,13 @@ jobs:
           SteamAppId: "1062090"
           SteamGameId: "1062090"
           MAP_PAYLOAD_CACHE_OCI_REPOSITORY: ghcr.io/ihsoft/timberborn-workshop-payload-cache
+          MAP_METADATA_MAX_ITEMS: ${{ inputs.map_metadata_max_items }}
+          MAP_PAYLOAD_MAX_DOWNLOAD_BYTES: ${{ inputs.map_payload_max_download_bytes }}
+          STEAM_REQUEST_TIMEOUT_SECONDS: ${{ inputs.steam_request_timeout_seconds }}
+          STEAM_REQUEST_DELAY_SECONDS: ${{ inputs.steam_request_delay_seconds }}
+          STEAM_SLOW_MODE_DELAY_SECONDS: ${{ inputs.steam_slow_mode_delay_seconds }}
+          MAP_INDEX_TIME_BUDGET_SECONDS: ${{ inputs.map_index_time_budget_seconds }}
+          MAP_ANALYSIS_PARALLELISM: ${{ inputs.map_analysis_parallelism }}
         working-directory: ${{ runner.temp }}/steamcmd
         run: >-
           dotnet $GITHUB_WORKSPACE/tools/SteamWorkshopMapMetadataIndexer/bin/Release/net8.0/SteamWorkshopMapMetadataIndexer.dll
@@ -134,12 +218,13 @@ jobs:
           --previous-results $GITHUB_WORKSPACE/.work/previous-map-metadata.jsonl.gz
           --output $GITHUB_WORKSPACE/.work/map-metadata.jsonl
           --workshop-directory $RUNNER_TEMP/steamcmd/workshop-content
-          --max-items ${{ inputs.map_metadata_max_items || 500 }}
-          --max-download-bytes 50000000
-          --request-timeout-seconds 120
-          --slow-mode-delay-seconds 40
-          --time-budget-seconds 3600
-          --max-analysis-parallelism 4
+          --max-items ${MAP_METADATA_MAX_ITEMS:-500}
+          --max-download-bytes ${MAP_PAYLOAD_MAX_DOWNLOAD_BYTES:-50000000}
+          --request-timeout-seconds ${STEAM_REQUEST_TIMEOUT_SECONDS:-120}
+          --request-delay-seconds ${STEAM_REQUEST_DELAY_SECONDS:-0}
+          --slow-mode-delay-seconds ${STEAM_SLOW_MODE_DELAY_SECONDS:-40}
+          --time-budget-seconds ${MAP_INDEX_TIME_BUDGET_SECONDS:-3600}
+          --max-analysis-parallelism ${MAP_ANALYSIS_PARALLELISM:-4}
 
       - name: Build public search artifacts
         run: >-
@@ -173,12 +258,13 @@ jobs:
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
-          PAYLOAD_CACHE_PRUNE_MAX_VERSIONS: ${{ inputs.payload_cache_prune_max_versions || 100 }}
+          PAYLOAD_CACHE_PRUNE_MAX_VERSIONS: ${{ inputs.payload_cache_prune_max_versions }}
         run: |
           package_path="/users/ihsoft/packages/container/timberborn-workshop-payload-cache"
+          prune_limit="${PAYLOAD_CACHE_PRUNE_MAX_VERSIONS:-100}"
           version_ids=$(gh api --paginate "$package_path/versions?per_page=100" \
             --jq '.[] | select((.metadata.container.tags // []) | length == 0) | .id' \
-            | head -n "$PAYLOAD_CACHE_PRUNE_MAX_VERSIONS")
+            | head -n "$prune_limit")
           if [ -z "$version_ids" ]; then
             echo "No superseded payload cache versions to prune."
             exit 0

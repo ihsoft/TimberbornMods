@@ -79,6 +79,36 @@ payload is cached or analyzed.
 `--request-delay-seconds` sets the minimum delay between sequential map payload requests and defaults to zero. Retry
 cooldowns count toward that interval instead of being added to it, while slow mode raises the minimum to its own delay.
 
+## Workflow inputs
+
+Scheduled runs use the defaults declared in `.github/workflows/workshop-search-index.yml`. Both reusable workflow calls
+and manual `workflow_dispatch` runs can override the complete operational configuration without editing the workflow:
+
+| Input | Default | Purpose |
+|---|---:|---|
+| `job_timeout_minutes` | 80 | Hard GitHub Actions limit for the build job. |
+| `map_metadata_max_items` | 500 | Maximum Steam payload downloads in one run. |
+| `map_payload_max_download_bytes` | 50000000 | Maximum accepted size of one payload. |
+| `steam_request_timeout_seconds` | 120 | Callback timeout for metadata and payload Steam requests. |
+| `steam_request_delay_seconds` | 0 | Normal-mode spacing between Steam requests. |
+| `steam_slow_mode_delay_seconds` | 40 | Slow-mode spacing between Steam requests. |
+| `map_index_time_budget_seconds` | 3600 | Budget for cached analysis and Steam payload collection. |
+| `map_analysis_parallelism` | 4 | Parallel workers used for cached payload analysis. |
+| `payload_cache_prune_max_versions` | 100 | Maximum superseded GHCR versions deleted after a run. |
+
+Retry counts, retry cooldowns, slow-mode recovery rules, and sequential Steam access remain fixed safety behavior rather
+than run parameters.
+
+For example, a short diagnostic run with explicit pacing can be started without changing tracked files:
+
+```powershell
+gh workflow run workshop-search-index.yml --repo ihsoft/TimberbornMods `
+    -f job_timeout_minutes=30 `
+    -f map_metadata_max_items=50 `
+    -f map_index_time_budget_seconds=1200 `
+    -f steam_request_delay_seconds=3
+```
+
 ## Shared archive analysis
 
 Each selected `.timber` ZIP is downloaded and opened once. `MapArchiveAnalyzer` reads authoritative runtime dimensions
