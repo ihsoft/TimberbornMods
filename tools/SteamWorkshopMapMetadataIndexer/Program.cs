@@ -47,8 +47,8 @@ sealed class MapMetadataIndexer {
 
   sealed record Options(
       string Snapshot, string? PreviousResults, string Output, string WorkshopDirectory, int MaxDownloadItems,
-      ulong MaxDownloadBytes, TimeSpan RequestTimeout, TimeSpan RequestDelay, TimeSpan TimeBudget,
-      int MaxAnalysisParallelism) {
+      ulong MaxDownloadBytes, TimeSpan RequestTimeout, TimeSpan RequestDelay, TimeSpan SlowModeDelay,
+      TimeSpan TimeBudget, int MaxAnalysisParallelism) {
 
     public static Options Parse(string[] args) {
       var values = new Dictionary<string, string>();
@@ -64,11 +64,13 @@ sealed class MapMetadataIndexer {
           ParseInt(values, "--max-items", 50), ParseUlong(values, "--max-download-bytes", 50_000_000),
           TimeSpan.FromSeconds(ParseInt(values, "--request-timeout-seconds", 120)),
           TimeSpan.FromSeconds(ParseInt(values, "--request-delay-seconds", 0)),
+          TimeSpan.FromSeconds(ParseInt(values, "--slow-mode-delay-seconds", 15)),
           TimeSpan.FromSeconds(ParseInt(values, "--time-budget-seconds", 7200)),
           ParseInt(values, "--max-analysis-parallelism", Math.Min(Environment.ProcessorCount, 4)));
       if (options.MaxDownloadItems < 0 || options.MaxDownloadBytes < 1
           || options.RequestTimeout <= TimeSpan.Zero || options.RequestTimeout > TimeSpan.FromMinutes(10)
           || options.RequestDelay < TimeSpan.Zero || options.RequestDelay > TimeSpan.FromMinutes(1)
+          || options.SlowModeDelay <= TimeSpan.Zero || options.SlowModeDelay > TimeSpan.FromMinutes(5)
           || options.TimeBudget < TimeSpan.Zero || options.MaxAnalysisParallelism < 1
           || options.MaxAnalysisParallelism > 16) {
         throw new ArgumentOutOfRangeException(nameof(args), "Invalid numeric option.");
@@ -194,7 +196,8 @@ sealed class MapMetadataIndexer {
 
         Console.WriteLine(
             $"Anonymous Steam session connected; reading {downloadCandidates.Count} download-required map payloads.");
-        var requestPacer = new SteamRequestPacer(Thread.Sleep, normalModeDelay: options.RequestDelay);
+        var requestPacer = new SteamRequestPacer(
+            Thread.Sleep, normalModeDelay: options.RequestDelay, slowModeDelay: options.SlowModeDelay);
         for (var index = 0; index < downloadCandidates.Count; index++) {
           if (DateTimeOffset.UtcNow >= deadline) {
             Console.WriteLine($"Time budget reached after {index} / {downloadCandidates.Count} Steam maps.");

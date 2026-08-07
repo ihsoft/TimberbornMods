@@ -17,10 +17,11 @@ while slow mode is already active; outside slow mode it activates the circuit br
 failures are not broadly retried. If the pass stops early, previous records for selected but unprocessed maps remain
 unchanged in the checkpoint.
 
-After either transient result, the sequential Steam request stream enters slow mode. Requests are then spaced at least
-15 seconds apart until six consecutive requests complete without another `Busy`, `NoConnection`, or timeout; any of
-those failures resets that success count. Existing 20- and 40-second retry cooldowns already satisfy the slow-mode
-spacing and are not extended by another 15 seconds.
+After either transient result, the sequential Steam request stream enters slow mode. `--slow-mode-delay-seconds`
+controls its minimum request spacing and defaults to 15 seconds; the production workflow currently sets it to 40
+seconds. Slow mode ends after six consecutive requests complete without another `Busy`, `NoConnection`, or timeout;
+any of those failures resets that success count. With 40-second spacing, the first 20-second retry cooldown is extended
+by the remaining 20 seconds, while the second 40-second cooldown is not extended.
 
 ## Private payload cache
 

@@ -43,6 +43,7 @@ static class Program {
       ("Payload cache shards use stable Workshop ID modulo", BuildsStablePayloadCacheShard),
       ("Steam pacing applies the configured normal delay between requests", AppliesNormalSteamRequestDelay),
       ("Steam slow mode requires six consecutive successes", RequiresSixSuccessesToRecoverSteamPacing),
+      ("Steam slow mode extends a shorter retry cooldown", ExtendsShortSteamRetryCooldown),
       ("Steam retry cooldown is not extended by slow mode", DoesNotExtendExistingSteamRetryCooldown),
       ("Steam Fail is transient only inside slow mode", TreatsFailAsTransientOnlyInSlowMode),
   ];
@@ -427,7 +428,7 @@ static class Program {
 
   static void RequiresSixSuccessesToRecoverSteamPacing() {
     var delays = new List<TimeSpan>();
-    var pacer = new SteamRequestPacer(delays.Add, _ => { });
+    var pacer = new SteamRequestPacer(delays.Add, _ => { }, slowModeDelay: TimeSpan.FromSeconds(40));
     pacer.RecordTransientFailure("Busy");
     for (var index = 0; index < 5; index++) {
       pacer.WaitBeforeRequest(TimeSpan.Zero);
@@ -444,7 +445,7 @@ static class Program {
     }
     Assert.False(pacer.SlowModeActive);
     Assert.Equal(11, delays.Count);
-    Assert.True(delays.All(value => value == TimeSpan.FromSeconds(15)));
+    Assert.True(delays.All(value => value == TimeSpan.FromSeconds(40)));
   }
 
   static void AppliesNormalSteamRequestDelay() {
@@ -463,12 +464,24 @@ static class Program {
 
   static void DoesNotExtendExistingSteamRetryCooldown() {
     var delays = new List<TimeSpan>();
-    var pacer = new SteamRequestPacer(delays.Add, _ => { });
+    var pacer = new SteamRequestPacer(delays.Add, _ => { }, slowModeDelay: TimeSpan.FromSeconds(40));
+    pacer.RecordTransientFailure("Busy");
+
+    pacer.WaitBeforeRequest(TimeSpan.FromSeconds(40));
+
+    Assert.Equal(0, delays.Count);
+    Assert.True(pacer.SlowModeActive);
+  }
+
+  static void ExtendsShortSteamRetryCooldown() {
+    var delays = new List<TimeSpan>();
+    var pacer = new SteamRequestPacer(delays.Add, _ => { }, slowModeDelay: TimeSpan.FromSeconds(40));
     pacer.RecordTransientFailure("Busy");
 
     pacer.WaitBeforeRequest(TimeSpan.FromSeconds(20));
 
-    Assert.Equal(0, delays.Count);
+    Assert.Equal(1, delays.Count);
+    Assert.Equal(TimeSpan.FromSeconds(20), delays[0]);
     Assert.True(pacer.SlowModeActive);
   }
 
