@@ -4,10 +4,10 @@ on:
   workflow_call:
     inputs:
       map_metadata_max_items:
-        description: Maximum number of map payloads to inspect for exact features
+        description: Maximum number of map payloads to download per run
         required: false
         type: number
-        default: 50
+        default: 500
       payload_cache_prune_max_versions:
         description: Maximum number of superseded payload cache versions to prune
         required: false
@@ -133,7 +133,7 @@ jobs:
           --previous-results $GITHUB_WORKSPACE/.work/previous-map-metadata.jsonl.gz
           --output $GITHUB_WORKSPACE/.work/map-metadata.jsonl
           --workshop-directory $RUNNER_TEMP/steamcmd/workshop-content
-          --max-items ${{ inputs.map_metadata_max_items || 50 }}
+          --max-items ${{ inputs.map_metadata_max_items || 500 }}
           --max-download-bytes 50000000
           --request-timeout-seconds 120
           --slow-mode-delay-seconds 40
