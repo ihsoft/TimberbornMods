@@ -56,6 +56,15 @@ Workshop metadata is a complete snapshot refresh. This allows removed or unliste
 next published index. Do not convert it to append-only accumulation without defining deletion and reconciliation
 semantics.
 
+A successfully returned metadata query page may contain an individual result with `k_EResultFileNotFound` for an item
+that Steam still includes in the page positions and total matching count. Treat only this item-level result as an
+unavailable record: log and omit the item, increment a dedicated skipped-unavailable summary count, and continue the
+page. Count the processed Steam result position when validating pagination completeness; emitted-record count is not a
+valid completeness measure when unavailable positions were skipped.
+
+Do not apply this exception to a page-level query or callback failure, and do not skip other item-level results without
+new evidence and review. Those failures remain fatal under the metadata snapshot contract.
+
 Map metadata state is incremental. Resume it from the previously published Pages artifact, prioritize changed, stale,
 or unknown map records within the configured budget, and refresh records when the source Workshop timestamp or
 `MapArchiveAnalyzer.AnalysisVersion` changes.
