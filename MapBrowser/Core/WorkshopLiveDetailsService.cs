@@ -14,30 +14,30 @@ sealed class WorkshopLiveDetailsService(SteamManager steamManager) : IUnloadable
   const int MaxGalleryImages = 8;
   readonly List<PendingQuery> _pendingQueries = [];
 
-  public void Query(string publishedFileId, Action<WorkshopLiveDetails, string> callback) {
+  public void Query(string publishedFileId, Action<WorkshopLiveDetailsResult> callback) {
     if (!steamManager.Initialized) {
-      callback(null, "Steam is not initialized.");
+      callback(new WorkshopLiveDetailsResult(null, false, "Steam is not initialized."));
       return;
     }
     if (!ulong.TryParse(publishedFileId, out var itemId)) {
-      callback(null, $"Invalid Steam Workshop ID: {publishedFileId}");
+      callback(new WorkshopLiveDetailsResult(null, false, $"Invalid Steam Workshop ID: {publishedFileId}"));
       return;
     }
 
     var query = SteamUGC.CreateQueryUGCDetailsRequest([new PublishedFileId_t(itemId)], 1);
     if (query == UGCQueryHandle_t.Invalid) {
-      callback(null, "Steam rejected the Workshop details query.");
+      callback(new WorkshopLiveDetailsResult(null, false, "Steam rejected the Workshop details query."));
       return;
     }
     if (!SteamUGC.SetReturnAdditionalPreviews(query, true)) {
       SteamUGC.ReleaseQueryUGCRequest(query);
-      callback(null, "Steam rejected the Workshop gallery request.");
+      callback(new WorkshopLiveDetailsResult(null, false, "Steam rejected the Workshop gallery request."));
       return;
     }
     var apiCall = SteamUGC.SendQueryUGCRequest(query);
     if (apiCall == SteamAPICall_t.Invalid) {
       SteamUGC.ReleaseQueryUGCRequest(query);
-      callback(null, "Steam rejected the Workshop details request.");
+      callback(new WorkshopLiveDetailsResult(null, false, "Steam rejected the Workshop details request."));
       return;
     }
 
@@ -56,10 +56,19 @@ sealed class WorkshopLiveDetailsService(SteamManager steamManager) : IUnloadable
   void CompleteQuery(PendingQuery pendingQuery, SteamUGCQueryCompleted_t result, bool ioFailure) {
     _pendingQueries.Remove(pendingQuery);
     try {
-      if (ioFailure || result.m_eResult != EResult.k_EResultOK
-          || !SteamUGC.GetQueryUGCResult(pendingQuery.Query, 0, out var details)) {
+      if (ioFailure || result.m_eResult != EResult.k_EResultOK) {
         var error = ioFailure ? "Steam I/O failure." : result.m_eResult.ToString();
-        pendingQuery.Callback(null, error);
+        pendingQuery.Callback(new WorkshopLiveDetailsResult(
+            null, !ioFailure && result.m_eResult == EResult.k_EResultFileNotFound, error));
+        return;
+      }
+      if (!SteamUGC.GetQueryUGCResult(pendingQuery.Query, 0, out var details)) {
+        pendingQuery.Callback(new WorkshopLiveDetailsResult(null, false, "Steam returned no Workshop item details."));
+        return;
+      }
+      if (details.m_eResult != EResult.k_EResultOK) {
+        pendingQuery.Callback(new WorkshopLiveDetailsResult(
+            null, details.m_eResult == EResult.k_EResultFileNotFound, details.m_eResult.ToString()));
         return;
       }
 
@@ -67,8 +76,10 @@ sealed class WorkshopLiveDetailsService(SteamManager steamManager) : IUnloadable
           pendingQuery.Query, 0, EItemStatistic.k_EItemStatistic_NumSubscriptions, out var subscriberCount)
           ? subscriberCount
           : null;
-      pendingQuery.Callback(new WorkshopLiveDetails(
-          details.m_unVotesUp, details.m_unVotesDown, subscribers, ReadGalleryUrls(pendingQuery.Query)), null);
+      pendingQuery.Callback(new WorkshopLiveDetailsResult(
+          new WorkshopLiveDetails(
+              details.m_unVotesUp, details.m_unVotesDown, subscribers, ReadGalleryUrls(pendingQuery.Query)),
+          false, null));
     } finally {
       pendingQuery.Dispose();
     }
@@ -109,7 +120,7 @@ sealed class WorkshopLiveDetailsService(SteamManager steamManager) : IUnloadable
     readonly CallResult<SteamUGCQueryCompleted_t> _callResult;
 
     public PendingQuery(
-        UGCQueryHandle_t query, Action<WorkshopLiveDetails, string> callback,
+        UGCQueryHandle_t query, Action<WorkshopLiveDetailsResult> callback,
         Action<PendingQuery, SteamUGCQueryCompleted_t, bool> completion) {
       Query = query;
       Callback = callback;
@@ -118,7 +129,7 @@ sealed class WorkshopLiveDetailsService(SteamManager steamManager) : IUnloadable
     }
 
     public UGCQueryHandle_t Query { get; }
-    public Action<WorkshopLiveDetails, string> Callback { get; }
+    public Action<WorkshopLiveDetailsResult> Callback { get; }
 
     public void Start(SteamAPICall_t apiCall) {
       _callResult.Set(apiCall, (result, ioFailure) => _completion(this, result, ioFailure));

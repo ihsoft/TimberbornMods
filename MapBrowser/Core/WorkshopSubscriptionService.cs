@@ -27,7 +27,7 @@ sealed class WorkshopSubscriptionService : ILoadableSingleton, IUnloadableSingle
 
   public event Action<string> DownloadProgressChanged;
 
-  public event Action<string, bool, string> DownloadCompleted;
+  public event Action<string, WorkshopSubscriptionResult> DownloadCompleted;
 
   public void Load() {
     if (_steamManager.Initialized) {
@@ -78,30 +78,44 @@ sealed class WorkshopSubscriptionService : ILoadableSingleton, IUnloadableSingle
     return true;
   }
 
-  public void Subscribe(string publishedFileId, Action<bool, string> callback) {
-    if (!TryGetPublishedFileId(publishedFileId, callback, out var itemId)) {
+  public void Subscribe(string publishedFileId, Action<WorkshopSubscriptionResult> callback) {
+    if (!TryGetPublishedFileId(publishedFileId, out var itemId, out var error)) {
+      callback(new WorkshopSubscriptionResult(false, false, error));
       return;
     }
 
     var apiCall = SteamUGC.SubscribeItem(itemId);
     if (apiCall == SteamAPICall_t.Invalid) {
-      callback(false, "Steam rejected the subscribe request.");
+      callback(new WorkshopSubscriptionResult(false, false, "Steam rejected the subscribe request."));
       return;
     }
     var callResult = CallResult<RemoteStorageSubscribePublishedFileResult_t>.Create();
     callResult.Set(apiCall, (result, ioFailure) => {
-      if (!ioFailure && result.m_eResult == EResult.k_EResultOK && SteamUGC.DownloadItem(itemId, true)) {
-        _pendingDownloads.Add(itemId);
-        callback(true, null);
-        DownloadProgressChanged?.Invoke(publishedFileId);
+      if (ioFailure) {
+        callback(new WorkshopSubscriptionResult(false, false, "Steam I/O failure."));
         return;
       }
-      callback(false, ioFailure ? "Steam I/O failure." : result.m_eResult.ToString());
+      if (result.m_eResult == EResult.k_EResultFileNotFound) {
+        callback(new WorkshopSubscriptionResult(false, true, result.m_eResult.ToString()));
+        return;
+      }
+      if (result.m_eResult != EResult.k_EResultOK) {
+        callback(new WorkshopSubscriptionResult(false, false, result.m_eResult.ToString()));
+        return;
+      }
+      if (!SteamUGC.DownloadItem(itemId, true)) {
+        callback(new WorkshopSubscriptionResult(false, false, "Steam rejected the Workshop download request."));
+        return;
+      }
+      _pendingDownloads.Add(itemId);
+      callback(new WorkshopSubscriptionResult(true, false, null));
+      DownloadProgressChanged?.Invoke(publishedFileId);
     });
   }
 
   public void Unsubscribe(string publishedFileId, Action<bool, string> callback) {
-    if (!TryGetPublishedFileId(publishedFileId, callback, out var itemId)) {
+    if (!TryGetPublishedFileId(publishedFileId, out var itemId, out var error)) {
+      callback(false, error);
       return;
     }
 
@@ -126,26 +140,29 @@ sealed class WorkshopSubscriptionService : ILoadableSingleton, IUnloadableSingle
     }
 
     var publishedFileId = result.m_nPublishedFileId.m_PublishedFileId.ToString();
-    var succeeded = result.m_eResult == EResult.k_EResultOK;
-    if (succeeded) {
+    var subscriptionResult = new WorkshopSubscriptionResult(
+        result.m_eResult == EResult.k_EResultOK,
+        result.m_eResult == EResult.k_EResultFileNotFound,
+        result.m_eResult.ToString());
+    if (subscriptionResult.Succeeded) {
       _mapRepository.NotifyMapRepositoryChanged();
     }
     DownloadProgressChanged?.Invoke(publishedFileId);
-    DownloadCompleted?.Invoke(publishedFileId, succeeded, result.m_eResult.ToString());
+    DownloadCompleted?.Invoke(publishedFileId, subscriptionResult);
   }
 
-  bool TryGetPublishedFileId(
-      string publishedFileId, Action<bool, string> callback, out PublishedFileId_t itemId) {
+  bool TryGetPublishedFileId(string publishedFileId, out PublishedFileId_t itemId, out string error) {
     itemId = default;
     if (!_steamManager.Initialized) {
-      callback(false, "Steam is not initialized.");
+      error = "Steam is not initialized.";
       return false;
     }
     if (!ulong.TryParse(publishedFileId, out var parsedItemId)) {
-      callback(false, $"Invalid Steam Workshop ID: {publishedFileId}");
+      error = $"Invalid Steam Workshop ID: {publishedFileId}";
       return false;
     }
     itemId = new PublishedFileId_t(parsedItemId);
+    error = null;
     return true;
   }
 }

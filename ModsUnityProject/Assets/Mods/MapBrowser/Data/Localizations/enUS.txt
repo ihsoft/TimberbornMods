@@ -21,6 +21,8 @@ IgorZ.MapBrowser.Action.Unsubscribe,Unsubscribe,Button that unsubscribes from a 
 IgorZ.MapBrowser.Action.UnsubscribeTooltip,"Unsubscribe from this Steam Workshop map.
 You can subscribe to it again later.",Tooltip for unsubscribing from a Workshop map.
 IgorZ.MapBrowser.Action.Unsubscribing,Unsubscribing...,Temporary button text while a Workshop map is being unsubscribed.
+IgorZ.MapBrowser.Action.WorkshopUnavailable,No longer available,Status shown when Steam reports that a Workshop map no longer exists or is inaccessible.
+IgorZ.MapBrowser.Action.WorkshopUnavailableTooltip,This map is no longer available on Steam Workshop and cannot be subscribed to.,Tooltip shown when Steam reports that a Workshop map is unavailable.
 =,=,Map analysis
 IgorZ.MapBrowser.Analysis.Compact,"{0}, {1}, {2}",Compact exact map analysis shown in the browser row.
 IgorZ.MapBrowser.Analysis.Full,"Forests: {0}
@@ -47,14 +49,13 @@ IgorZ.MapBrowser.Browser.InstalledMaps,Installed custom maps,Heading above the i
 IgorZ.MapBrowser.Browser.SearchMaps,Find Workshop maps,Heading above Workshop search results.
 =,=,Common map text
 IgorZ.MapBrowser.Common.SourceLocal,Source: Local,Text identifying a local map.
-IgorZ.MapBrowser.Common.Unavailable,Unavailable,Value shown while live Steam data is unavailable.
+IgorZ.MapBrowser.Common.Unavailable,unavailable,Value shown while live Steam data is unavailable.
 IgorZ.MapBrowser.Common.Unknown,Unknown,Value shown when metadata is unknown.
 =,=,Map details
 IgorZ.MapBrowser.Details.Size,Size: {0},Map dimensions shown in the details dialog.
 IgorZ.MapBrowser.Details.Published,Published: {0},Workshop publication date shown in the player's local time.
 IgorZ.MapBrowser.Details.Subscribers,Subscribers: {0},Steam subscriber count shown in the details dialog.
-IgorZ.MapBrowser.Details.Votes,Votes: {0}/{1},Steam upvotes and downvotes shown in the details dialog.
-IgorZ.MapBrowser.Details.VotesUnavailable,Votes: Unavailable,Text shown while live Steam votes are unavailable.
+IgorZ.MapBrowser.Details.Votes,Votes: {0},Steam vote summary or unavailable status shown in the details dialog.
 =,=,Metadata freshness
 IgorZ.MapBrowser.Freshness.Missing,"Freshness: This map is not included in the latest index snapshot ({0}). Analysis will become available after a later refresh.",Message shown for a Workshop map missing from the current public index.
 IgorZ.MapBrowser.Freshness.Stale,"Freshness warning: The map has changed since its exact analysis and has not been reindexed yet.",Warning shown when saved exact map analysis is stale.

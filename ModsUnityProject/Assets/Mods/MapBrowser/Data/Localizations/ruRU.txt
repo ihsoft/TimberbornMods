@@ -21,6 +21,8 @@ IgorZ.MapBrowser.Action.Unsubscribe,Отписаться,Button that unsubscribe
 IgorZ.MapBrowser.Action.UnsubscribeTooltip,"Отписаться от этой карты в Steam Workshop.
 Позже на неё можно подписаться снова.",Tooltip for unsubscribing from a Workshop map.
 IgorZ.MapBrowser.Action.Unsubscribing,Отписка...,Temporary button text while a Workshop map is being unsubscribed.
+IgorZ.MapBrowser.Action.WorkshopUnavailable,Больше недоступна,Status shown when Steam reports that a Workshop map no longer exists or is inaccessible.
+IgorZ.MapBrowser.Action.WorkshopUnavailableTooltip,"Эта карта больше недоступна в Steam Workshop, поэтому подписаться на неё нельзя.",Tooltip shown when Steam reports that a Workshop map is unavailable.
 =,=,Map analysis
 IgorZ.MapBrowser.Analysis.Compact,"{0}, {1}, {2}",Compact exact map analysis shown in the browser row.
 IgorZ.MapBrowser.Analysis.Full,"Леса: {0}
@@ -47,14 +49,13 @@ IgorZ.MapBrowser.Browser.InstalledMaps,Установленные пользов
 IgorZ.MapBrowser.Browser.SearchMaps,Поиск карт в Workshop,Heading above Workshop search results.
 =,=,Common map text
 IgorZ.MapBrowser.Common.SourceLocal,Источник: локальная карта,Text identifying a local map.
-IgorZ.MapBrowser.Common.Unavailable,Недоступно,Value shown while live Steam data is unavailable.
+IgorZ.MapBrowser.Common.Unavailable,недоступно,Value shown while live Steam data is unavailable.
 IgorZ.MapBrowser.Common.Unknown,Неизвестно,Value shown when metadata is unknown.
 =,=,Map details
 IgorZ.MapBrowser.Details.Size,Размер: {0},Map dimensions shown in the details dialog.
 IgorZ.MapBrowser.Details.Published,Опубликовано: {0},Workshop publication date shown in the player's local time.
 IgorZ.MapBrowser.Details.Subscribers,Подписчики: {0},Steam subscriber count shown in the details dialog.
-IgorZ.MapBrowser.Details.Votes,Голоса: {0}/{1},Steam upvotes and downvotes shown in the details dialog.
-IgorZ.MapBrowser.Details.VotesUnavailable,Голоса: недоступно,Text shown while live Steam votes are unavailable.
+IgorZ.MapBrowser.Details.Votes,Голоса: {0},Steam vote summary or unavailable status shown in the details dialog.
 =,=,Metadata freshness
 IgorZ.MapBrowser.Freshness.Missing,"Актуальность: этой карты нет в последнем снимке индекса ({0}). Анализ появится после следующего обновления.",Message shown for a Workshop map missing from the current public index.
 IgorZ.MapBrowser.Freshness.Stale,"Предупреждение об актуальности: карта изменилась после точного анализа и ещё не была проиндексирована заново.",Warning shown when saved exact map analysis is stale.
