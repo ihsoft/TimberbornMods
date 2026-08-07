@@ -2,6 +2,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>IgorZ.MapBrowser.WorkshopMapIndexing.Tests</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
   </PropertyGroup>
@@ -15,17 +16,50 @@
     <Compile Include="..\SteamWorkshopMapMetadataIndexer\MapArchiveAnalyzer.cs">
       <Link>MapArchiveAnalyzer.cs</Link>
     </Compile>
-    <Compile Include="..\SteamWorkshopMapMetadataIndexer\SettlementSpaceClassifier.cs">
+    <Compile Include="..\SteamWorkshopMapMetadataIndexer\MapArchiveAnalysis.cs">
+      <Link>MapArchiveAnalysis.cs</Link>
+    </Compile>
+    <Compile Include="..\SteamWorkshopMapMetadataIndexer\MapDimensions.cs">
+      <Link>MapDimensions.cs</Link>
+    </Compile>
+    <Compile Include="..\SteamWorkshopMapMetadataIndexer\Classifiers\IMapEntityClassifier.cs">
+      <Link>IMapEntityClassifier.cs</Link>
+    </Compile>
+    <Compile Include="..\SteamWorkshopMapMetadataIndexer\Classifiers\ForestDensityClassifier.cs">
+      <Link>ForestDensityClassifier.cs</Link>
+    </Compile>
+    <Compile Include="..\SteamWorkshopMapMetadataIndexer\Classifiers\SettlementSpaceClassifier.cs">
       <Link>SettlementSpaceClassifier.cs</Link>
     </Compile>
-    <Compile Include="..\SteamWorkshopMapMetadataIndexer\WaterMapDecoder.cs">
+    <Compile Include="..\SteamWorkshopMapMetadataIndexer\Classifiers\SettlementSpaceClassification.cs">
+      <Link>SettlementSpaceClassification.cs</Link>
+    </Compile>
+    <Compile Include="..\SteamWorkshopMapMetadataIndexer\Decoding\WaterMapDecoder.cs">
       <Link>WaterMapDecoder.cs</Link>
     </Compile>
-    <Compile Include="..\SteamWorkshopMapMetadataIndexer\WaterFeatureDiagnostics.cs">
+    <Compile Include="..\SteamWorkshopMapMetadataIndexer\Decoding\DecodedWaterMap.cs">
+      <Link>DecodedWaterMap.cs</Link>
+    </Compile>
+    <Compile Include="..\SteamWorkshopMapMetadataIndexer\Decoding\SurfaceFlowEdge.cs">
+      <Link>SurfaceFlowEdge.cs</Link>
+    </Compile>
+    <Compile Include="..\SteamWorkshopMapMetadataIndexer\Classifiers\WaterFeatureDiagnostics.cs">
       <Link>WaterFeatureDiagnostics.cs</Link>
     </Compile>
-    <Compile Include="..\SteamWorkshopMapMetadataIndexer\WaterFormClassifier.cs">
+    <Compile Include="..\SteamWorkshopMapMetadataIndexer\Classifiers\WaterFeatureAnalysis.cs">
+      <Link>WaterFeatureAnalysis.cs</Link>
+    </Compile>
+    <Compile Include="..\SteamWorkshopMapMetadataIndexer\Classifiers\BroadWaterHydrology.cs">
+      <Link>BroadWaterHydrology.cs</Link>
+    </Compile>
+    <Compile Include="..\SteamWorkshopMapMetadataIndexer\Classifiers\WaterRegionTopology.cs">
+      <Link>WaterRegionTopology.cs</Link>
+    </Compile>
+    <Compile Include="..\SteamWorkshopMapMetadataIndexer\Classifiers\WaterFormClassifier.cs">
       <Link>WaterFormClassifier.cs</Link>
+    </Compile>
+    <Compile Include="..\SteamWorkshopMapMetadataIndexer\Classifiers\WaterClassification.cs">
+      <Link>WaterClassification.cs</Link>
     </Compile>
     <Compile Include="..\TimberbornMapWaterDecoder\WaterRegressionFixture.cs">
       <Link>WaterRegressionFixture.cs</Link>

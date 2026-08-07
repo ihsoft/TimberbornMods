@@ -1,7 +1,22 @@
+// Timberborn Mod: MapBrowser
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+
 using System.IO.Compression;
 using System.Text;
+using IgorZ.MapBrowser.WaterDecoder;
+using IgorZ.MapBrowser.WorkshopMapIndexing;
+using IgorZ.MapBrowser.WorkshopMapIndexing.Classifiers;
+using IgorZ.MapBrowser.WorkshopMapIndexing.Decoding;
+
+namespace IgorZ.MapBrowser.WorkshopMapIndexing.Tests;
 
 static class Program {
+  static readonly MapArchiveAnalyzer ArchiveAnalyzer = new();
+  static readonly WaterMapDecoder WaterDecoder = new();
+  static readonly WaterFeatureDiagnostics WaterDiagnostics = new();
+  static readonly WaterFormClassifier WaterClassifier = new();
+  static readonly SettlementSpaceClassifier SettlementClassifier = new();
   static readonly List<(string Name, Action Test)> Tests = [
       ("Archive analysis counts log trees unless explicitly dead", CountsOnlyLivingLogTrees),
       ("Archive analysis trusts runtime map size over stale metadata", TrustsRuntimeMapSize),
@@ -55,7 +70,7 @@ static class Program {
     archiveStream.Position = 0;
 
     using var archiveToRead = new ZipArchive(archiveStream, ZipArchiveMode.Read);
-    var analysis = MapArchiveAnalyzer.Analyze(archiveToRead);
+    var analysis = ArchiveAnalyzer.Analyze(archiveToRead);
     var forest = analysis.Classifications[ForestDensityClassifier.FeatureKey];
 
     Assert.Equal(10, analysis.Width);
@@ -108,7 +123,7 @@ static class Program {
     archiveStream.Position = 0;
 
     using var archiveToRead = new ZipArchive(archiveStream, ZipArchiveMode.Read);
-    var analysis = MapArchiveAnalyzer.Analyze(archiveToRead);
+    var analysis = ArchiveAnalyzer.Analyze(archiveToRead);
 
     Assert.Equal(3, analysis.Width);
     Assert.Equal(2, analysis.Height);
@@ -127,7 +142,7 @@ static class Program {
         {"Singletons":{"TerrainMap":{"Heights":{"Array":"2 1"}},"WaterMapNew":{
           "Levels":2,"WaterColumns":{"Array":"3:0:0:0 2:0:0:1 1:0:0:2 4:0:0:3"}}}}
         """);
-    var water = WaterMapDecoder.Decode(world.RootElement, 2, 1);
+    var water = WaterDecoder.Decode(world.RootElement, 2, 1);
     Assert.Equal(2, water.OpenWaterTileCount);
     Assert.Equal(1, water.UndergroundWaterColumnCount);
     Assert.Equal(1f, water.SurfaceDepths[0]);
@@ -139,7 +154,7 @@ static class Program {
         {"Singletons":{"TerrainMap":{"Voxels":{"Array":"1 1 1 0 0 0"}},"WaterMapNew":{
           "Levels":1,"WaterColumns":{"Array":"2.5:0:0:2 1.5:0:0:1"}}}}
         """);
-    var water = WaterMapDecoder.Decode(world.RootElement, 2, 1);
+    var water = WaterDecoder.Decode(world.RootElement, 2, 1);
     Assert.Equal(2, water.OpenWaterTileCount);
     Assert.Equal(2.5f, water.SurfaceDepths[0]);
     Assert.Equal(1.5f, water.SurfaceDepths[1]);
@@ -152,7 +167,7 @@ static class Program {
     }
     var map = new DecodedWaterMap(
         9, 9, new int[81], new int[81], depths, new float[81], new float[81], [], 0, 1);
-    var features = WaterFeatureDiagnostics.Analyze(map);
+    var features = WaterDiagnostics.Analyze(map);
     Assert.Equal(1, features.LakeCount);
     Assert.Equal(25, features.LakeCoreTileCount);
   }
@@ -169,7 +184,7 @@ static class Program {
     }
     var map = new DecodedWaterMap(
         12, 12, new int[144], new int[144], depths, new float[144], new float[144], [], 0, 1);
-    var features = WaterFeatureDiagnostics.Analyze(map);
+    var features = WaterDiagnostics.Analyze(map);
     Assert.Equal(40, features.LakeShoreMask.Count(value => value));
     Assert.Equal(12, features.RiverCandidateTileCount);
   }
@@ -183,7 +198,7 @@ static class Program {
     }
     var map = new DecodedWaterMap(
         12, 12, new int[144], new int[144], depths, new float[144], new float[144], [], 0, 1);
-    var features = WaterFeatureDiagnostics.Analyze(map);
+    var features = WaterDiagnostics.Analyze(map);
     Assert.Equal(1, features.LakeCount);
     Assert.Equal(0, features.RiverCandidateTileCount);
   }
@@ -220,7 +235,7 @@ static class Program {
     }
     var map = new DecodedWaterMap(
         20, 20, new int[400], new int[400], depths, new float[400], new float[400], [], 0, 1);
-    var features = WaterFeatureDiagnostics.Analyze(map);
+    var features = WaterDiagnostics.Analyze(map);
     Assert.Equal(1, features.ShallowLakeCount);
     Assert.Equal(9, features.ShallowLakeCoreTileCount);
     Assert.True(features.RiverCandidateTileCount > 0);
@@ -257,15 +272,15 @@ static class Program {
     var map = new DecodedWaterMap(
         width, height, new int[width * height], new int[width * height], depths,
         new float[width * height], new float[width * height], [], 0, 1);
-    var features = WaterFeatureDiagnostics.Analyze(map);
+    var features = WaterDiagnostics.Analyze(map);
     Assert.Equal(1, features.LakeCount);
   }
 
   static void AssertWaterFixture(
       string fixtureDirectory, string fixtureName, string expectedForm, int expectedLakeCount) {
     var map = WaterRegressionFixture.Read(Path.Combine(fixtureDirectory, fixtureName));
-    var features = WaterFeatureDiagnostics.Analyze(map);
-    var classification = WaterFormClassifier.Classify(map, features);
+    var features = WaterDiagnostics.Analyze(map);
+    var classification = WaterClassifier.Classify(map, features);
     Assert.Equal(expectedForm, classification.WaterForm);
     Assert.Equal(expectedLakeCount, classification.LakeCount);
   }
@@ -286,7 +301,7 @@ static class Program {
         heights[x + y * 20] = 1;
       }
     }
-    var result = SettlementSpaceClassifier.Analyze(CreateDryMap(20, 20, heights));
+    var result = SettlementClassifier.Analyze(CreateDryMap(20, 20, heights));
     Assert.Equal("plain", result.SpaceType);
     Assert.True(result.CoreCount >= 8);
   }
@@ -298,7 +313,7 @@ static class Program {
         heights[x + y * 20] = 4;
       }
     }
-    var result = SettlementSpaceClassifier.Analyze(CreateDryMap(20, 20, heights));
+    var result = SettlementClassifier.Analyze(CreateDryMap(20, 20, heights));
     Assert.Equal("plateau", result.SpaceType);
     Assert.True(result.CoreCount >= 8);
   }
@@ -311,7 +326,7 @@ static class Program {
         map.SurfaceDepths[x + y * 20] = 0;
       }
     }
-    var result = SettlementSpaceClassifier.Analyze(map);
+    var result = SettlementClassifier.Analyze(map);
     Assert.Equal("plain", result.SpaceType);
     Assert.Equal(8, result.CoreCount);
   }
@@ -319,51 +334,51 @@ static class Program {
   static void PreservesSettlementSpaceBaselines() {
     var fixtures = Path.Combine(AppContext.BaseDirectory, "Fixtures", "SettlementSpace");
     var expected = new Dictionary<string, string>() {
-        ["00100-3652824726.json.gz"] = "plain",
-        ["001-musje-3672607632.json.gz"] = "terraces",
-        ["30x-3742220646.json.gz"] = "plain",
-        ["9x255-painting-wall-3350796155.json.gz"] = "much_space",
-        ["basilisk-veins-3685652179.json.gz"] = "terraces",
-        ["beavcube-3741817984.json.gz"] = "much_space",
-        ["beaver-flats-3534679704.json.gz"] = "plain",
-        ["colony-3406201768.json.gz"] = "plain",
-        ["compression-suggestion-3756799738.json.gz"] = "little_space",
-        ["creek-3685093589.json.gz"] = "plain",
-        ["down-by-the-river-3275489141.json.gz"] = "much_space",
-        ["floods-3746978232.json.gz"] = "terraces",
-        ["gemini-origins-solo-3758706362.json.gz"] = "much_space",
-        ["grand-river-nice-side-3752545142.json.gz"] = "much_space",
-        ["high-rise-oasis-3743339720.json.gz"] = "plain",
-        ["hurmevesi-3760651666.json.gz"] = "plateau",
-        ["jonnomap-3492963393.json.gz"] = "plain",
-        ["klein-3739717350.json.gz"] = "plain",
-        ["liso-3432480619.json.gz"] = "plain",
-        ["map-3569648191.json.gz"] = "plain",
-        ["mini-3745965092.json.gz"] = "much_space",
-        ["minimum-viable-prospects-3777072465.json.gz"] = "little_space",
-        ["mountain-pool-3721128633.json.gz"] = "much_space",
-        ["ponds-3759577966.json.gz"] = "terraces",
-        ["rocky-3772930352.json.gz"] = "plateau",
-        ["rose-and-thorns-15x30-3737866930.json.gz"] = "plain",
-        ["shallow-falls-25x25-3755358505.json.gz"] = "little_space",
-        ["smol-map-3749630859.json.gz"] = "much_space",
-        ["spaceship-3744715163.json.gz"] = "little_space",
-        ["squares-3381213849.json.gz"] = "plain",
-        ["tedium-ad-infinitum-3751734928.json.gz"] = "little_space",
-        ["the-challenge-of-the-small-3775076404.json.gz"] = "much_space",
-        ["the-lake-jezero-3769190684.json.gz"] = "much_space",
-        ["the-sinkhole-3776247360.json.gz"] = "terraces",
-        ["the-ten-ten-3467052578.json.gz"] = "plain",
-        ["timbermutantninjaborners-3776832826.json.gz"] = "much_space",
-        ["tiny-plateaus-3725408732.json.gz"] = "little_space",
-        ["tiny-richland-wonder-challenge-3767764157.json.gz"] = "plain",
-        ["toll-3755525976.json.gz"] = "much_space",
-        ["treasure-room-flats-3681097397.json.gz"] = "plain",
-        ["water-fall-valley-3738934579.json.gz"] = "much_space",
+      ["00100-3652824726.json.gz"] = "plain",
+      ["001-musje-3672607632.json.gz"] = "terraces",
+      ["30x-3742220646.json.gz"] = "plain",
+      ["9x255-painting-wall-3350796155.json.gz"] = "much_space",
+      ["basilisk-veins-3685652179.json.gz"] = "terraces",
+      ["beavcube-3741817984.json.gz"] = "much_space",
+      ["beaver-flats-3534679704.json.gz"] = "plain",
+      ["colony-3406201768.json.gz"] = "plain",
+      ["compression-suggestion-3756799738.json.gz"] = "little_space",
+      ["creek-3685093589.json.gz"] = "plain",
+      ["down-by-the-river-3275489141.json.gz"] = "much_space",
+      ["floods-3746978232.json.gz"] = "terraces",
+      ["gemini-origins-solo-3758706362.json.gz"] = "much_space",
+      ["grand-river-nice-side-3752545142.json.gz"] = "much_space",
+      ["high-rise-oasis-3743339720.json.gz"] = "plain",
+      ["hurmevesi-3760651666.json.gz"] = "plateau",
+      ["jonnomap-3492963393.json.gz"] = "plain",
+      ["klein-3739717350.json.gz"] = "plain",
+      ["liso-3432480619.json.gz"] = "plain",
+      ["map-3569648191.json.gz"] = "plain",
+      ["mini-3745965092.json.gz"] = "much_space",
+      ["minimum-viable-prospects-3777072465.json.gz"] = "little_space",
+      ["mountain-pool-3721128633.json.gz"] = "much_space",
+      ["ponds-3759577966.json.gz"] = "terraces",
+      ["rocky-3772930352.json.gz"] = "plateau",
+      ["rose-and-thorns-15x30-3737866930.json.gz"] = "plain",
+      ["shallow-falls-25x25-3755358505.json.gz"] = "little_space",
+      ["smol-map-3749630859.json.gz"] = "much_space",
+      ["spaceship-3744715163.json.gz"] = "little_space",
+      ["squares-3381213849.json.gz"] = "plain",
+      ["tedium-ad-infinitum-3751734928.json.gz"] = "little_space",
+      ["the-challenge-of-the-small-3775076404.json.gz"] = "much_space",
+      ["the-lake-jezero-3769190684.json.gz"] = "much_space",
+      ["the-sinkhole-3776247360.json.gz"] = "terraces",
+      ["the-ten-ten-3467052578.json.gz"] = "plain",
+      ["timbermutantninjaborners-3776832826.json.gz"] = "much_space",
+      ["tiny-plateaus-3725408732.json.gz"] = "little_space",
+      ["tiny-richland-wonder-challenge-3767764157.json.gz"] = "plain",
+      ["toll-3755525976.json.gz"] = "much_space",
+      ["treasure-room-flats-3681097397.json.gz"] = "plain",
+      ["water-fall-valley-3738934579.json.gz"] = "much_space",
     };
     foreach (var (fixtureName, expectedType) in expected) {
       var map = WaterRegressionFixture.Read(Path.Combine(fixtures, fixtureName));
-      var result = SettlementSpaceClassifier.Analyze(map);
+      var result = SettlementClassifier.Analyze(map);
       Assert.Equal(expectedType, result.SpaceType);
     }
   }
@@ -431,7 +446,7 @@ static class Program {
   static DecodedWaterMap CreateDryMap(int width, int height, int[] heights) {
     var area = checked(width * height);
     return new DecodedWaterMap(
-        width, height, heights, (int[]) heights.Clone(), new float[area], new float[area], new float[area], [], 0, 1);
+        width, height, heights, (int[])heights.Clone(), new float[area], new float[area], new float[area], [], 0, 1);
   }
 
   static void WriteEntry(ZipArchive archive, string name, string contents) {

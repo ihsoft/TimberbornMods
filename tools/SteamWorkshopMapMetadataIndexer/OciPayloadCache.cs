@@ -1,8 +1,14 @@
+// Timberborn Mod: MapBrowser
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+
 #nullable enable
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
+namespace IgorZ.MapBrowser.WorkshopMapIndexing;
 
 sealed class OciPayloadCache : IDisposable {
   const ulong ShardCount = 100;
@@ -12,6 +18,25 @@ sealed class OciPayloadCache : IDisposable {
   const string CatalogMediaType = "application/vnd.timberborn.workshop-payload-catalog.v1+json";
   const string ManifestMediaType = "application/vnd.oci.image.manifest.v1+json";
   const string ConfigMediaType = "application/vnd.oci.empty.v1+json";
+
+  sealed class PayloadCacheException(string message, Exception? innerException = null)
+      : Exception(message, innerException);
+
+  sealed record CatalogEntry(string Shard, string Digest, long Size, string Sha256);
+  sealed record OrasCommandResult(bool Success, string Output);
+  sealed record OciManifest(
+      [property: JsonPropertyName("schemaVersion")] int SchemaVersion,
+      [property: JsonPropertyName("mediaType")] string MediaType,
+      [property: JsonPropertyName("artifactType")] string ArtifactType,
+      [property: JsonPropertyName("config")] OciDescriptor Config,
+      [property: JsonPropertyName("layers")] IReadOnlyList<OciDescriptor> Layers);
+  sealed record OciDescriptor(
+      [property: JsonPropertyName("mediaType")] string MediaType,
+      [property: JsonPropertyName("digest")] string Digest,
+      [property: JsonPropertyName("size")] long Size,
+      [property: JsonPropertyName("annotations"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+      IReadOnlyDictionary<string, string>? Annotations = null);
+
   readonly string _repository;
   readonly string _workDirectory;
   readonly Dictionary<string, CatalogEntry> _catalog;
@@ -59,14 +84,15 @@ sealed class OciPayloadCache : IDisposable {
     if (!_catalog.TryGetValue(entryName, out var entry)) {
       return null;
     }
-    if (entry.Size < 0 || (ulong)entry.Size > maximumBytes) {
+    if (entry.Size < 0 || (ulong) entry.Size > maximumBytes) {
       throw new InvalidDataException($"Cached payload {entryName} has an unexpected size {entry.Size}.");
     }
     var path = Path.Combine(_workDirectory, $"read-{Guid.NewGuid():N}.timber");
     RunOras(["blob", "fetch", "--output", path, $"{_repository}@{entry.Digest}"]);
     var bytes = File.ReadAllBytes(path);
     var actualHash = Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
-    if (bytes.LongLength != entry.Size || !string.Equals(entry.Sha256, actualHash, StringComparison.OrdinalIgnoreCase)) {
+    if (bytes.LongLength != entry.Size
+        || !string.Equals(entry.Sha256, actualHash, StringComparison.OrdinalIgnoreCase)) {
       throw new InvalidDataException($"Cached payload {entryName} failed size or SHA-256 validation.");
     }
     return bytes;
@@ -84,7 +110,7 @@ sealed class OciPayloadCache : IDisposable {
     }
     var bytes = File.ReadAllBytes(path);
     var descriptorResult = RunOras([
-      "blob", "push", "--media-type", PayloadMediaType, "--descriptor", _repository, path,
+        "blob", "push", "--media-type", PayloadMediaType, "--descriptor", _repository, path,
     ]);
     var descriptor = JsonSerializer.Deserialize<OciDescriptor>(descriptorResult.Output)
         ?? throw new InvalidDataException("oras blob push returned no OCI descriptor.");
@@ -106,7 +132,7 @@ sealed class OciPayloadCache : IDisposable {
     var emptyConfigPath = Path.Combine(_workDirectory, "empty-config.json");
     File.WriteAllText(emptyConfigPath, "{}");
     var configResult = RunOras([
-      "blob", "push", "--media-type", ConfigMediaType, "--descriptor", _repository, emptyConfigPath,
+        "blob", "push", "--media-type", ConfigMediaType, "--descriptor", _repository, emptyConfigPath,
     ]);
     var config = JsonSerializer.Deserialize<OciDescriptor>(configResult.Output)
         ?? throw new InvalidDataException("oras blob push returned no config descriptor.");
@@ -116,8 +142,8 @@ sealed class OciPayloadCache : IDisposable {
           .Select(pair => new OciDescriptor(
               PayloadMediaType, pair.Value.Digest, pair.Value.Size,
               new Dictionary<string, string> {
-                ["org.opencontainers.image.title"] = pair.Key,
-                ["com.ihsoft.timberborn.sha256"] = pair.Value.Sha256,
+                  ["org.opencontainers.image.title"] = pair.Key,
+                  ["com.ihsoft.timberborn.sha256"] = pair.Value.Sha256,
               })).ToList();
       var manifest = new OciManifest(2, ManifestMediaType, ArtifactType, config, layers);
       var manifestPath = Path.Combine(_workDirectory, $"{shard}.manifest.json");
@@ -129,8 +155,8 @@ sealed class OciPayloadCache : IDisposable {
     var catalogPath = Path.Combine(_workDirectory, "catalog.json");
     File.WriteAllText(catalogPath, JsonSerializer.Serialize(_catalog));
     RunOras([
-      "push", $"{_repository}:{CatalogTag}", "--artifact-type", ArtifactType,
-      $"{Path.GetFileName(catalogPath)}:{CatalogMediaType}",
+        "push", $"{_repository}:{CatalogTag}", "--artifact-type", ArtifactType,
+        $"{Path.GetFileName(catalogPath)}:{CatalogMediaType}",
     ], workingDirectory: _workDirectory);
     Console.WriteLine($"Published payload cache catalog with {_catalog.Count} map versions.");
     _dirtyShards.Clear();
@@ -140,14 +166,14 @@ sealed class OciPayloadCache : IDisposable {
   public void Dispose() {
   }
 
-  internal static string CreateEntryName(string publishedFileId, string? updatedAtUtc) {
+  public static string CreateEntryName(string publishedFileId, string? updatedAtUtc) {
     var version = DateTimeOffset.TryParse(updatedAtUtc, out var timestamp)
         ? timestamp.ToUnixTimeSeconds().ToString()
         : throw new InvalidDataException($"Workshop item {publishedFileId} has no valid update timestamp.");
     return $"{publishedFileId}/{version}.timber";
   }
 
-  internal static string CreateShardTag(string publishedFileId) {
+  public static string CreateShardTag(string publishedFileId) {
     var shard = ulong.Parse(publishedFileId) % ShardCount;
     return $"shard-{shard:D3}";
   }
@@ -188,21 +214,4 @@ sealed class OciPayloadCache : IDisposable {
     }
   }
 
-  sealed record CatalogEntry(string Shard, string Digest, long Size, string Sha256);
-  sealed record OrasCommandResult(bool Success, string Output);
-  sealed record OciManifest(
-      [property: JsonPropertyName("schemaVersion")] int SchemaVersion,
-      [property: JsonPropertyName("mediaType")] string MediaType,
-      [property: JsonPropertyName("artifactType")] string ArtifactType,
-      [property: JsonPropertyName("config")] OciDescriptor Config,
-      [property: JsonPropertyName("layers")] IReadOnlyList<OciDescriptor> Layers);
-  sealed record OciDescriptor(
-      [property: JsonPropertyName("mediaType")] string MediaType,
-      [property: JsonPropertyName("digest")] string Digest,
-      [property: JsonPropertyName("size")] long Size,
-      [property: JsonPropertyName("annotations"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-      IReadOnlyDictionary<string, string>? Annotations = null);
 }
-
-sealed class PayloadCacheException(string message, Exception? innerException = null)
-    : Exception(message, innerException);

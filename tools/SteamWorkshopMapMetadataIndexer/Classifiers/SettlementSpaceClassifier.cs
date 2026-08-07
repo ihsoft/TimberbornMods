@@ -1,11 +1,46 @@
-using System.Text.Json.Serialization;
+// Timberborn Mod: MapBrowser
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
 
-static class SettlementSpaceClassifier {
+using IgorZ.MapBrowser.WorkshopMapIndexing.Decoding;
+
+namespace IgorZ.MapBrowser.WorkshopMapIndexing.Classifiers;
+
+sealed class SettlementSpaceClassifier {
   public const string FeatureKey = "settlement_space";
   const int MinimumSufficientCoreCount = 8;
   const double DominantShapeShare = 0.35;
 
-  public static SettlementSpaceClassificationResult Analyze(DecodedWaterMap map) {
+  readonly record struct HeightComponent(int Height, IReadOnlyList<int> Cells);
+  readonly record struct SettlementRegion(int Height, int Area, int CoreCount, SettlementShape Shape);
+  readonly record struct HeightBand(int Area, int CoreCount);
+
+  enum SettlementShape {
+    Plain,
+    Terrace,
+    Plateau,
+    Mixed,
+  }
+
+  // Accumulates terrain transitions around one candidate region. It stays local
+  // because the transition vectors are only meaningful during shape detection.
+  sealed class BoundarySummary {
+    internal int Higher { get; set; }
+    internal int Lower { get; set; }
+    internal int Water { get; set; }
+    internal int MapEdge { get; set; }
+    internal double HigherVectorX { get; set; }
+    internal double HigherVectorY { get; set; }
+    internal double LowerVectorX { get; set; }
+    internal double LowerVectorY { get; set; }
+  }
+
+  static readonly (int X, int Y)[] CardinalOffsets = [(-1, 0), (1, 0), (0, -1), (0, 1)];
+  static readonly (int X, int Y)[] DiagonalOffsets = [
+      (-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1),
+  ];
+
+  public SettlementSpaceClassification Analyze(DecodedWaterMap map) {
     var heights = SuppressTinyNoise(map.TerrainHeights, map.Width, map.Height);
     var openWater = map.SurfaceDepths.Select(depth => depth > 0).ToArray();
     var requiredRadius = GetRequiredRadius(map.Width, map.Height);
@@ -24,17 +59,17 @@ static class SettlementSpaceClassifier {
     var mixedShare = GetShare(capacityByShape, SettlementShape.Mixed, coreCount);
     var landArea = checked(map.Width * map.Height) - map.OpenWaterTileCount;
     var dominantBand = GetDominantHeightBand(regions);
-    var dominantBandLandRatio = dominantBand.Area / (double) Math.Max(landArea, 1);
-    var dominantBandCoreShare = dominantBand.CoreCount / (double) Math.Max(coreCount, 1);
+    var dominantBandLandRatio = dominantBand.Area / (double)Math.Max(landArea, 1);
+    var dominantBandCoreShare = dominantBand.CoreCount / (double)Math.Max(coreCount, 1);
     var spaceType = GetSpaceType(
         coreCount, dominantBandLandRatio, dominantBandCoreShare, plainShare, terraceShare, plateauShare);
-    return new SettlementSpaceClassificationResult(
+    return new SettlementSpaceClassification(
         coreCount, plainShare, terraceShare, plateauShare, mixedShare, spaceType);
   }
 
-  internal static string GetSpaceType(
-      int coreCount, double dominantBandLandRatio, double dominantBandCoreShare,
-      double plainShare, double terraceShare, double plateauShare) {
+  public static string GetSpaceType(
+      int coreCount, double dominantBandLandRatio, double dominantBandCoreShare, double plainShare,
+      double terraceShare, double plateauShare) {
     if (coreCount < MinimumSufficientCoreCount) {
       return "little_space";
     }
@@ -49,14 +84,14 @@ static class SettlementSpaceClassifier {
     return dominant.Share >= DominantShapeShare ? dominant.Type : "much_space";
   }
 
-  internal static int GetRequiredRadius(int width, int height) {
+  static int GetRequiredRadius(int width, int height) {
     var characteristic = Math.Sqrt(checked(width * height));
-    return Math.Clamp((int) Math.Round(Math.Log2(characteristic) - 2), 2, 5);
+    return Math.Clamp((int)Math.Round(Math.Log2(characteristic) - 2), 2, 5);
   }
 
   static double GetShare(
       IReadOnlyDictionary<SettlementShape, int> capacityByShape, SettlementShape shape, int total) {
-    return total > 0 ? capacityByShape.GetValueOrDefault(shape) / (double) total : 0;
+    return total > 0 ? capacityByShape.GetValueOrDefault(shape) / (double)total : 0;
   }
 
   static int[] SuppressTinyNoise(int[] source, int width, int height) {
@@ -97,7 +132,7 @@ static class SettlementSpaceClassifier {
       }
     }
 
-    var result = (int[]) source.Clone();
+    var result = (int[])source.Clone();
     foreach (var cell in accepted) {
       result[cell] = replacements[cell];
     }
@@ -244,7 +279,7 @@ static class SettlementSpaceClassifier {
       return 0;
     }
     return -(boundary.HigherVectorX * boundary.LowerVectorX + boundary.HigherVectorY * boundary.LowerVectorY)
-        / (higherLength * lowerLength);
+      / (higherLength * lowerLength);
   }
 
   static HeightBand GetDominantHeightBand(IReadOnlyCollection<SettlementRegion> regions) {
@@ -273,39 +308,4 @@ static class SettlementSpaceClassifier {
       }
     }
   }
-
-  static readonly (int X, int Y)[] CardinalOffsets = [(-1, 0), (1, 0), (0, -1), (0, 1)];
-  static readonly (int X, int Y)[] DiagonalOffsets = [
-      (-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1),
-  ];
-}
-
-sealed record SettlementSpaceClassificationResult(
-    [property: JsonPropertyName("core_count")] int CoreCount,
-    [property: JsonPropertyName("plain_share")] double PlainShare,
-    [property: JsonPropertyName("terrace_share")] double TerraceShare,
-    [property: JsonPropertyName("plateau_share")] double PlateauShare,
-    [property: JsonPropertyName("mixed_share")] double MixedShare,
-    [property: JsonPropertyName("space_type")] string SpaceType);
-
-readonly record struct HeightComponent(int Height, IReadOnlyList<int> Cells);
-readonly record struct SettlementRegion(int Height, int Area, int CoreCount, SettlementShape Shape);
-readonly record struct HeightBand(int Area, int CoreCount);
-
-enum SettlementShape {
-  Plain,
-  Terrace,
-  Plateau,
-  Mixed,
-}
-
-sealed class BoundarySummary {
-  public int Higher { get; set; }
-  public int Lower { get; set; }
-  public int Water { get; set; }
-  public int MapEdge { get; set; }
-  public double HigherVectorX { get; set; }
-  public double HigherVectorY { get; set; }
-  public double LowerVectorX { get; set; }
-  public double LowerVectorY { get; set; }
 }

@@ -1,8 +1,15 @@
+// Timberborn Mod: MapBrowser
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+
 using System.IO.Compression;
 using System.Text.Json;
-using System.Text.Json.Serialization;
+using IgorZ.MapBrowser.WorkshopMapIndexing.Classifiers;
+using IgorZ.MapBrowser.WorkshopMapIndexing.Decoding;
 
-static class MapArchiveAnalyzer {
+namespace IgorZ.MapBrowser.WorkshopMapIndexing;
+
+sealed class MapArchiveAnalyzer {
   public const int AnalysisVersion = 9;
   const long MaxWorldJsonBytes = 250_000_000;
 
@@ -10,20 +17,20 @@ static class MapArchiveAnalyzer {
       static () => new ForestDensityClassifier(),
   ];
 
-  public static MapArchiveAnalysis Analyze(ZipArchive archive) {
+  public MapArchiveAnalysis Analyze(ZipArchive archive) {
     using var world = ReadWorld(archive);
     var dimensions = ReadDimensions(world.RootElement, archive);
     var classifiers = ClassifierFactories.Select(factory => factory()).ToArray();
     ScanEntities(world.RootElement, classifiers);
-    var water = WaterMapDecoder.Decode(world.RootElement, dimensions.Width, dimensions.Height);
+    var water = new WaterMapDecoder().Decode(world.RootElement, dimensions.Width, dimensions.Height);
     var landArea = checked(dimensions.Width * dimensions.Height) - water.OpenWaterTileCount;
     var classifications = classifiers.ToDictionary(
         classifier => classifier.Key,
         classifier => classifier.BuildResult(dimensions, landArea));
     classifications.Add(WaterFormClassifier.FeatureKey,
-        JsonSerializer.SerializeToElement(WaterFormClassifier.Analyze(water)));
+        JsonSerializer.SerializeToElement(new WaterFormClassifier().Analyze(water)));
     classifications.Add(SettlementSpaceClassifier.FeatureKey,
-        JsonSerializer.SerializeToElement(SettlementSpaceClassifier.Analyze(water)));
+        JsonSerializer.SerializeToElement(new SettlementSpaceClassifier().Analyze(water)));
     return new MapArchiveAnalysis(dimensions.Width, dimensions.Height, classifications);
   }
 
@@ -77,73 +84,3 @@ static class MapArchiveAnalyzer {
     }
   }
 }
-
-interface IMapEntityClassifier {
-  string Key { get; }
-
-  void ObserveEntity(JsonElement entity);
-
-  JsonElement BuildResult(MapDimensions dimensions, int landArea);
-}
-
-sealed class ForestDensityClassifier : IMapEntityClassifier {
-  public const string FeatureKey = "forest_density";
-  long _liveTreeCount;
-
-  public string Key => FeatureKey;
-
-  public void ObserveEntity(JsonElement entity) {
-    if (entity.ValueKind != JsonValueKind.Object
-        || !entity.TryGetProperty("Components", out var components)
-        || components.ValueKind != JsonValueKind.Object
-        || !components.TryGetProperty("Yielder:Cuttable", out var cuttable)
-        || cuttable.ValueKind != JsonValueKind.Object
-        || !cuttable.TryGetProperty("Yield", out var yield)
-        || yield.ValueKind != JsonValueKind.Object
-        || !yield.TryGetProperty("Good", out var good)
-        || good.ValueKind != JsonValueKind.String
-        || good.GetString() != "Log") {
-      return;
-    }
-    if (components.TryGetProperty("LivingNaturalResource", out var livingResource)
-        && livingResource.ValueKind == JsonValueKind.Object
-        && livingResource.TryGetProperty("IsDead", out var isDead)
-        && isDead.ValueKind == JsonValueKind.True) {
-      return;
-    }
-    _liveTreeCount++;
-  }
-
-  public JsonElement BuildResult(MapDimensions dimensions, int landArea) {
-    var coverageRatio = landArea > 0 ? (double) _liveTreeCount / landArea : 0;
-    return JsonSerializer.SerializeToElement(
-        new ForestDensityResult(_liveTreeCount, coverageRatio, GetLevel(coverageRatio)));
-  }
-
-  public static int GetLevel(double coverageRatio) {
-    if (coverageRatio < 0.05) {
-      return 0;
-    }
-    if (coverageRatio < 0.20) {
-      return 1;
-    }
-    if (coverageRatio < 0.35) {
-      return 2;
-    }
-    return coverageRatio <= 0.50 ? 3 : 4;
-  }
-}
-
-sealed record MapDimensions(
-    [property: JsonPropertyName("Width")] int Width,
-    [property: JsonPropertyName("Height")] int Height);
-
-sealed record MapArchiveAnalysis(
-    int Width,
-    int Height,
-    IReadOnlyDictionary<string, JsonElement> Classifications);
-
-sealed record ForestDensityResult(
-    [property: JsonPropertyName("live_tree_count")] long LiveTreeCount,
-    [property: JsonPropertyName("coverage_ratio")] double CoverageRatio,
-    [property: JsonPropertyName("level")] int Level);

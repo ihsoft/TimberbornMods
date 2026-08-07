@@ -1,5 +1,13 @@
-static class WaterFeatureDiagnostics {
-  public static WaterFeatureAnalysis Analyze(DecodedWaterMap map) {
+// Timberborn Mod: MapBrowser
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+
+using IgorZ.MapBrowser.WorkshopMapIndexing.Decoding;
+
+namespace IgorZ.MapBrowser.WorkshopMapIndexing.Classifiers;
+
+sealed class WaterFeatureDiagnostics {
+  public WaterFeatureAnalysis Analyze(DecodedWaterMap map) {
     var openWater = map.SurfaceDepths.Select(depth => depth > 0).ToArray();
     var shallowWater = map.SurfaceDepths.Select(depth => depth > 0 && depth <= 2).ToArray();
     var distanceToShore = CalculateDistanceToShore(map.SurfaceDepths, map.Width, map.Height);
@@ -23,11 +31,11 @@ static class WaterFeatureDiagnostics {
       var spanX = maxX - minX + 1;
       var spanY = maxY - minY + 1;
       var medianFlowCoherence = component.Select(cell => map.SurfaceFlowCoherences[cell]).Order().ToArray()
-          [component.Count / 2];
+        [component.Count / 2];
       var surfaceHeights = component.Select(cell => map.SurfaceFloors[cell] + map.SurfaceDepths[cell])
           .Order().ToArray();
       var surfaceHeightSpread = surfaceHeights[(int) ((surfaceHeights.Length - 1) * 0.9)]
-          - surfaceHeights[(int) ((surfaceHeights.Length - 1) * 0.1)];
+        - surfaceHeights[(int) ((surfaceHeights.Length - 1) * 0.1)];
       var cells = component.ToHashSet();
       var boundaryEdges = component.Sum(cell => {
         var x = cell % map.Width;
@@ -65,8 +73,8 @@ static class WaterFeatureDiagnostics {
           || medianFlowCoherence <= 0.93f && throughputPerVolume <= 0.03 && compactness >= 0.4;
       var boundarySupportsBasin = !topology.TouchesMapBoundary
           || topology.ExteriorShoreEdges >= 8
-              && (double) topology.ExteriorShoreEdges
-                  / (topology.ExteriorShoreEdges + topology.IslandShoreEdges) >= 0.25;
+          && (double) topology.ExteriorShoreEdges
+            / (topology.ExteriorShoreEdges + topology.IslandShoreEdges) >= 0.25;
       var confident = component.Count >= 9 && Math.Min(spanX, spanY) >= 3
           && (double) Math.Max(spanX, spanY) / Math.Min(spanX, spanY) <= 4
           && shapeSupportsBasin && flowSupportsBasin && boundarySupportsBasin && surfaceHeightSpread <= 0.25f;
@@ -333,18 +341,3 @@ static class WaterFeatureDiagnostics {
     return components;
   }
 }
-
-sealed record WaterFeatureAnalysis(
-    bool[] LakeCoreMask, bool[] ShallowLakeCoreMask, bool[] AmbiguousBroadWaterMask, bool[] ShallowWaterMask,
-    bool[] LakeShoreMask, bool[] RiverCandidateMask, int LakeCount, int ShallowLakeCount, int LakeCoreTileCount,
-    int ShallowLakeCoreTileCount, int AmbiguousBroadWaterTileCount, int ShallowWaterTileCount,
-    int RiverCandidateTileCount, IReadOnlyList<BroadWaterHydrology> BroadRegionHydrology);
-
-sealed record BroadWaterHydrology(
-    int CoreTiles, int SpanX, int SpanY, double CenterX, double CenterY,
-    int BoundaryEdges, double Compactness, int MaximumShoreDistance, int InnerCoreTiles,
-    double Volume, double Inflow, double Outflow, double ThroughputPerVolume,
-    double MedianFlowCoherence, double SurfaceHeightSpread, WaterRegionTopology Topology);
-
-sealed record WaterRegionTopology(
-    int WaterTiles, bool TouchesMapBoundary, int ExteriorShoreEdges, int IslandShoreEdges);

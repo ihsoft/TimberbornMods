@@ -1,7 +1,18 @@
+// Timberborn Mod: MapBrowser
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+
 using System.IO.Compression;
 using System.Text.Json;
+using IgorZ.MapBrowser.WorkshopMapIndexing.Decoding;
+
+namespace IgorZ.MapBrowser.WaterDecoder;
 
 static class WaterRegressionFixture {
+  sealed record FixtureData(
+      string WorkshopId, int Width, int Height, int[] TerrainHeights, int[] SurfaceFloors, float[] SurfaceDepths,
+      float[] SurfaceFlowCoherences, IReadOnlyList<SurfaceFlowEdge> SurfaceFlowEdges);
+
   public static void Write(string path, string workshopId, DecodedWaterMap map) {
     Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))!);
     using var file = File.Create(path);
@@ -22,8 +33,4 @@ static class WaterRegressionFixture {
         fixture.Width, fixture.Height, terrainHeights, fixture.SurfaceFloors, fixture.SurfaceDepths,
         new float[area], fixture.SurfaceFlowCoherences, fixture.SurfaceFlowEdges, 0, 0);
   }
-
-  sealed record FixtureData(
-      string WorkshopId, int Width, int Height, int[] TerrainHeights, int[] SurfaceFloors, float[] SurfaceDepths,
-      float[] SurfaceFlowCoherences, IReadOnlyList<SurfaceFlowEdge> SurfaceFlowEdges);
 }

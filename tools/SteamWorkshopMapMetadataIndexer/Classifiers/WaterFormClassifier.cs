@@ -1,29 +1,35 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
+// Timberborn Mod: MapBrowser
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
 
-static class WaterFormClassifier {
+using System.Text.Json;
+using IgorZ.MapBrowser.WorkshopMapIndexing.Decoding;
+
+namespace IgorZ.MapBrowser.WorkshopMapIndexing.Classifiers;
+
+sealed class WaterFormClassifier {
   public const string FeatureKey = "water";
 
-  public static WaterClassificationResult Analyze(JsonElement world, int width, int height) {
-    var water = WaterMapDecoder.Decode(world, width, height);
+  public WaterClassification Analyze(JsonElement world, int width, int height) {
+    var water = new WaterMapDecoder().Decode(world, width, height);
     return Analyze(water);
   }
 
-  public static WaterClassificationResult Analyze(DecodedWaterMap water) {
-    return Classify(water, WaterFeatureDiagnostics.Analyze(water));
+  public WaterClassification Analyze(DecodedWaterMap water) {
+    return Classify(water, new WaterFeatureDiagnostics().Analyze(water));
   }
 
-  public static WaterClassificationResult Classify(DecodedWaterMap water, WaterFeatureAnalysis features) {
+  public WaterClassification Classify(DecodedWaterMap water, WaterFeatureAnalysis features) {
     var lakeTiles = Enumerable.Range(0, water.SurfaceDepths.Length).Count(cell =>
         features.LakeCoreMask[cell] || features.ShallowLakeCoreMask[cell] || features.LakeShoreMask[cell]);
     var riverTiles = features.RiverCandidateTileCount;
     var lakeCount = features.LakeCount + features.ShallowLakeCount;
-    return new WaterClassificationResult(
+    return new WaterClassification(
         water.OpenWaterTileCount, water.OpenWaterRatio, GetBroadBoundaryWaterRatio(water), lakeCount,
         GetWaterForm(water.OpenWaterTileCount, lakeCount, lakeTiles, riverTiles));
   }
 
-  internal static double GetBroadBoundaryWaterRatio(DecodedWaterMap water) {
+  public static double GetBroadBoundaryWaterRatio(DecodedWaterMap water) {
     const int requiredInwardDepth = 5;
     var boundaryTiles = water.Width == 1 || water.Height == 1
         ? water.Width * water.Height
@@ -62,7 +68,7 @@ static class WaterFormClassifier {
     }
   }
 
-  internal static string GetWaterForm(int openWaterTiles, int lakeCount, int lakeTiles, int riverTiles) {
+  public static string GetWaterForm(int openWaterTiles, int lakeCount, int lakeTiles, int riverTiles) {
     if (openWaterTiles == 0) {
       return "none";
     }
@@ -81,10 +87,3 @@ static class WaterFormClassifier {
     return "rivers_and_lakes";
   }
 }
-
-sealed record WaterClassificationResult(
-    [property: JsonPropertyName("open_water_tiles")] int OpenWaterTiles,
-    [property: JsonPropertyName("open_water_ratio")] double OpenWaterRatio,
-    [property: JsonPropertyName("broad_boundary_water_ratio")] double BroadBoundaryWaterRatio,
-    [property: JsonPropertyName("lake_count")] int LakeCount,
-    [property: JsonPropertyName("water_form")] string WaterForm);

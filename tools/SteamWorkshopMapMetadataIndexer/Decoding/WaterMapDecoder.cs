@@ -1,10 +1,21 @@
+// Timberborn Mod: MapBrowser
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+
 using System.Globalization;
 using System.Text.Json;
 
-static class WaterMapDecoder {
+namespace IgorZ.MapBrowser.WorkshopMapIndexing.Decoding;
+
+sealed class WaterMapDecoder {
   const float WaterEpsilon = 0.001f;
 
-  public static DecodedWaterMap Decode(JsonElement world, int width, int height) {
+  readonly record struct WaterColumnValue(float Depth, int Floor);
+
+  readonly record struct DecodedFlows(
+      float[] Magnitudes, float[] Coherences, IReadOnlyList<SurfaceFlowEdge> Edges);
+
+  public DecodedWaterMap Decode(JsonElement world, int width, int height) {
     var singletons = world.GetProperty("Singletons");
     var terrainHeights = DecodeTerrainHeights(singletons.GetProperty("TerrainMap"), width, height);
     var waterMap = singletons.GetProperty("WaterMapNew");
@@ -75,11 +86,11 @@ static class WaterMapDecoder {
           edges.Add(new SurfaceFlowEdge(cell, targetCell, flow));
         }
         var direction = index switch {
-            0 => (X: 0d, Y: -1d),
-            1 => (X: -1d, Y: 0d),
-            2 => (X: 0d, Y: 1d),
-            3 => (X: 1d, Y: 0d),
-            _ => GetTargetDirection(cell, targetIndex, width, height),
+          0 => (X: 0d, Y: -1d),
+          1 => (X: -1d, Y: 0d),
+          2 => (X: 0d, Y: 1d),
+          3 => (X: 1d, Y: 0d),
+          _ => GetTargetDirection(cell, targetIndex, width, height),
         };
         vectorX += direction.X * flow;
         vectorY += direction.Y * flow;
@@ -179,20 +190,3 @@ static class WaterMapDecoder {
         float.Parse(parts[0], CultureInfo.InvariantCulture), int.Parse(parts[3], CultureInfo.InvariantCulture));
   }
 }
-
-sealed record DecodedWaterMap(
-    int Width, int Height, int[] TerrainHeights, int[] SurfaceFloors, float[] SurfaceDepths,
-    float[] SurfaceFlowMagnitudes, float[] SurfaceFlowCoherences, IReadOnlyList<SurfaceFlowEdge> SurfaceFlowEdges,
-    int UndergroundWaterColumnCount, int SerializedLevels) {
-  public int OpenWaterTileCount => SurfaceDepths.Count(depth => depth > 0);
-  public double OpenWaterRatio => (double) OpenWaterTileCount / (Width * Height);
-  public float MaximumSurfaceDepth => SurfaceDepths.Length == 0 ? 0 : SurfaceDepths.Max();
-  public float MaximumSurfaceFlow => SurfaceFlowMagnitudes.Length == 0 ? 0 : SurfaceFlowMagnitudes.Max();
-}
-
-readonly record struct WaterColumnValue(float Depth, int Floor);
-
-readonly record struct SurfaceFlowEdge(int SourceCell, int TargetCell, float Flow);
-
-readonly record struct DecodedFlows(
-    float[] Magnitudes, float[] Coherences, IReadOnlyList<SurfaceFlowEdge> Edges);

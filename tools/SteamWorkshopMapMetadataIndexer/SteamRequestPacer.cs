@@ -1,4 +1,10 @@
+// Timberborn Mod: MapBrowser
+// Author: igor.zavoychinskiy@gmail.com
+// License: Public Domain
+
 #nullable enable
+
+namespace IgorZ.MapBrowser.WorkshopMapIndexing;
 
 sealed class SteamRequestPacer(
     Action<TimeSpan> delay, Action<string>? log = null,
@@ -7,15 +13,15 @@ sealed class SteamRequestPacer(
   readonly Action<string> _log = log ?? Console.WriteLine;
   int _consecutiveSuccessfulRequests;
 
-  internal bool SlowModeActive { get; private set; }
+  public bool SlowModeActive { get; private set; }
 
-  internal int ConsecutiveSuccessfulRequests => _consecutiveSuccessfulRequests;
+  public int ConsecutiveSuccessfulRequests => _consecutiveSuccessfulRequests;
 
-  internal bool ShouldTreatAsTransient(string result) {
+  public bool ShouldTreatAsTransient(string result) {
     return SlowModeActive && result == "k_EResultFail";
   }
 
-  internal void WaitBeforeRequest(TimeSpan delayAlreadyApplied) {
+  public void WaitBeforeRequest(TimeSpan delayAlreadyApplied) {
     if (!SlowModeActive || delayAlreadyApplied >= _slowModeDelay) {
       return;
     }
@@ -24,7 +30,7 @@ sealed class SteamRequestPacer(
     delay(remainingDelay);
   }
 
-  internal void RecordTransientFailure(string result) {
+  public void RecordTransientFailure(string result) {
     var action = SlowModeActive ? "reset" : "activated";
     SlowModeActive = true;
     _consecutiveSuccessfulRequests = 0;
@@ -33,7 +39,7 @@ sealed class SteamRequestPacer(
         + $"{successfulRequestsToRecover} consecutive successful requests required to recover.");
   }
 
-  internal void RecordSuccessfulRequest() {
+  public void RecordSuccessfulRequest() {
     if (!SlowModeActive) {
       return;
     }
