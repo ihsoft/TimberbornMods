@@ -1,73 +1,73 @@
 ID,Text,Comment
-IgorZ.MapBrowser.Dialog.Close,Close,Button that closes the map browser dialog.
-IgorZ.MapBrowser.Dialog.Header,Map Browser,Header of the installed map browser dialog.
-IgorZ.MapBrowser.Details.Header,Map Details,Header of the map details dialog.
+IgorZ.MapBrowser.Dialog.Close,"Close","Button that closes the map browser dialog."
+IgorZ.MapBrowser.Dialog.Header,"Map Browser","Header of the installed map browser dialog."
+IgorZ.MapBrowser.Details.Header,"Map Details","Header of the map details dialog."
 =,=,Map actions
-IgorZ.MapBrowser.Action.Delete,Delete,Button that permanently deletes a local map.
+IgorZ.MapBrowser.Action.Delete,"Delete","Button that permanently deletes a local map."
 IgorZ.MapBrowser.Action.DeleteTooltip,"Permanently delete this local map file.
-This cannot be undone.",Tooltip for deleting a local map.
-IgorZ.MapBrowser.Action.Deleting,Deleting...,Temporary button text while a local map is being deleted.
-IgorZ.MapBrowser.Action.Details,Details,Button that opens the map details dialog.
-IgorZ.MapBrowser.Action.Downloading,Downloading... {0}%,Button text showing Workshop map download progress.
-IgorZ.MapBrowser.Action.Removed,Removed,Status shown after a map is removed from the game.
-IgorZ.MapBrowser.Action.RetryDelete,Retry delete,Button shown after deleting a local map fails.
-IgorZ.MapBrowser.Action.RetrySubscribe,Retry subscribe,Button shown after subscribing to a Workshop map fails.
-IgorZ.MapBrowser.Action.RetryUnsubscribe,Retry unsubscribe,Button shown after unsubscribing from a Workshop map fails.
-IgorZ.MapBrowser.Action.Subscribe,Subscribe,Button that subscribes to a Steam Workshop map.
-IgorZ.MapBrowser.Action.Subscribed,Subscribed,Tag shown on subscribed maps in Workshop search results.
-IgorZ.MapBrowser.Action.SubscribeTooltip,Subscribe to this Steam Workshop map.,Tooltip for subscribing to a Workshop map.
-IgorZ.MapBrowser.Action.Subscribing,Subscribing...,Temporary button text while subscribing to a Workshop map.
-IgorZ.MapBrowser.Action.Unsubscribe,Unsubscribe,Button that unsubscribes from a Steam Workshop map.
+This cannot be undone.","Tooltip for deleting a local map."
+IgorZ.MapBrowser.Action.Deleting,"Deleting...","Temporary button text while a local map is being deleted."
+IgorZ.MapBrowser.Action.Details,"Details","Button that opens the map details dialog."
+IgorZ.MapBrowser.Action.Downloading,"Downloading... {0}%","Button text showing Workshop map download progress."
+IgorZ.MapBrowser.Action.Removed,"Removed","Status shown after a map is removed from the game."
+IgorZ.MapBrowser.Action.RetryDelete,"Retry delete","Button shown after deleting a local map fails."
+IgorZ.MapBrowser.Action.RetrySubscribe,"Retry subscribe","Button shown after subscribing to a Workshop map fails."
+IgorZ.MapBrowser.Action.RetryUnsubscribe,"Retry unsubscribe","Button shown after unsubscribing from a Workshop map fails."
+IgorZ.MapBrowser.Action.Subscribe,"Subscribe","Button that subscribes to a Steam Workshop map."
+IgorZ.MapBrowser.Action.Subscribed,"Subscribed","Tag shown on subscribed maps in Workshop search results."
+IgorZ.MapBrowser.Action.SubscribeTooltip,"Subscribe to this Steam Workshop map.","Tooltip for subscribing to a Workshop map."
+IgorZ.MapBrowser.Action.Subscribing,"Subscribing...","Temporary button text while subscribing to a Workshop map."
+IgorZ.MapBrowser.Action.Unsubscribe,"Unsubscribe","Button that unsubscribes from a Steam Workshop map."
 IgorZ.MapBrowser.Action.UnsubscribeTooltip,"Unsubscribe from this Steam Workshop map.
-You can subscribe to it again later.",Tooltip for unsubscribing from a Workshop map.
-IgorZ.MapBrowser.Action.Unsubscribing,Unsubscribing...,Temporary button text while a Workshop map is being unsubscribed.
-IgorZ.MapBrowser.Action.WorkshopUnavailable,No longer available,Status shown when Steam reports that a Workshop map no longer exists or is inaccessible.
-IgorZ.MapBrowser.Action.WorkshopUnavailableTooltip,This map is no longer available on Steam Workshop and cannot be subscribed to.,Tooltip shown when Steam reports that a Workshop map is unavailable.
+You can subscribe to it again later.","Tooltip for unsubscribing from a Workshop map."
+IgorZ.MapBrowser.Action.Unsubscribing,"Unsubscribing...","Temporary button text while a Workshop map is being unsubscribed."
+IgorZ.MapBrowser.Action.WorkshopUnavailable,"No longer available","Status shown when Steam reports that a Workshop map no longer exists or is inaccessible."
+IgorZ.MapBrowser.Action.WorkshopUnavailableTooltip,"This map is no longer available on Steam Workshop and cannot be subscribed to.","Tooltip shown when Steam reports that a Workshop map is unavailable."
 =,=,Map analysis
-IgorZ.MapBrowser.Analysis.Compact,"{0}, {1}, {2}",Compact exact map analysis shown in the browser row.
+IgorZ.MapBrowser.Analysis.Compact,"{0}, {1}, {2}","Compact exact map analysis shown in the browser row."
 IgorZ.MapBrowser.Analysis.Full,"Forests: {0}
 Water: {1}
-Space: {2}",Full exact map analysis shown in the details dialog.
-IgorZ.MapBrowser.Analysis.Level.Barren,Barren,Very low forest density classification.
-IgorZ.MapBrowser.Analysis.Level.DenseForest,Dense forest,Very high forest density classification.
-IgorZ.MapBrowser.Analysis.Level.Forested,Forested,High forest density classification.
-IgorZ.MapBrowser.Analysis.Level.Lakes,Lakes,Open water is mainly represented by lakes.
-IgorZ.MapBrowser.Analysis.Level.LittleSpace,Little space,Map has fewer than eight settlement-space cores.
-IgorZ.MapBrowser.Analysis.Level.ModerateForests,Moderate forests,Middle forest density classification.
-IgorZ.MapBrowser.Analysis.Level.MuchSpace,Much space,Map has sufficient settlement space without a dominant terrain shape.
-IgorZ.MapBrowser.Analysis.Level.NoWater,No open water,No open water was found on the map.
-IgorZ.MapBrowser.Analysis.Level.Plain,Plain,Most settlement space is on broad neighboring terrain levels.
-IgorZ.MapBrowser.Analysis.Level.Plateau,Plateau,A significant share of settlement space is on elevated plateaus.
-IgorZ.MapBrowser.Analysis.Level.Rivers,Rivers,Open water is mainly represented by rivers.
-IgorZ.MapBrowser.Analysis.Level.RiversAndLakes,Rivers and lakes,Open water includes both rivers and lakes.
-IgorZ.MapBrowser.Analysis.Level.Sparse,Sparse,Low forest density classification.
-IgorZ.MapBrowser.Analysis.Level.Terraces,Terraces,A significant share of settlement space is on slope terraces.
-IgorZ.MapBrowser.Analysis.Level.Unknown,Unknown,Classification value shown when analysis data is missing.
-IgorZ.MapBrowser.Analysis.Level.WaterCovered,Water-covered,Open water covers more than 40 percent of the map.
+Space: {2}","Full exact map analysis shown in the details dialog."
+IgorZ.MapBrowser.Analysis.Level.Barren,"Barren","Very low forest density classification."
+IgorZ.MapBrowser.Analysis.Level.DenseForest,"Dense forest","Very high forest density classification."
+IgorZ.MapBrowser.Analysis.Level.Forested,"Forested","High forest density classification."
+IgorZ.MapBrowser.Analysis.Level.Lakes,"Lakes","Open water is mainly represented by lakes."
+IgorZ.MapBrowser.Analysis.Level.LittleSpace,"Little space","Map has fewer than eight settlement-space cores."
+IgorZ.MapBrowser.Analysis.Level.ModerateForests,"Moderate forests","Middle forest density classification."
+IgorZ.MapBrowser.Analysis.Level.MuchSpace,"Much space","Map has sufficient settlement space without a dominant terrain shape."
+IgorZ.MapBrowser.Analysis.Level.NoWater,"No open water","No open water was found on the map."
+IgorZ.MapBrowser.Analysis.Level.Plain,"Plain","Most settlement space is on broad neighboring terrain levels."
+IgorZ.MapBrowser.Analysis.Level.Plateau,"Plateau","A significant share of settlement space is on elevated plateaus."
+IgorZ.MapBrowser.Analysis.Level.Rivers,"Rivers","Open water is mainly represented by rivers."
+IgorZ.MapBrowser.Analysis.Level.RiversAndLakes,"Rivers and lakes","Open water includes both rivers and lakes."
+IgorZ.MapBrowser.Analysis.Level.Sparse,"Sparse","Low forest density classification."
+IgorZ.MapBrowser.Analysis.Level.Terraces,"Terraces","A significant share of settlement space is on slope terraces."
+IgorZ.MapBrowser.Analysis.Level.Unknown,"Unknown","Classification value shown when analysis data is missing."
+IgorZ.MapBrowser.Analysis.Level.WaterCovered,"Water-covered","Open water covers more than 40 percent of the map."
 =,=,Map browser
-IgorZ.MapBrowser.Browser.InstalledMaps,Installed custom maps,Heading above the installed map list.
-IgorZ.MapBrowser.Browser.SearchMaps,Find Workshop maps,Heading above Workshop search results.
+IgorZ.MapBrowser.Browser.InstalledMaps,"Installed custom maps","Heading above the installed map list."
+IgorZ.MapBrowser.Browser.SearchMaps,"Find Workshop maps","Heading above Workshop search results."
 =,=,Common map text
-IgorZ.MapBrowser.Common.SourceLocal,Source: Local,Text identifying a local map.
-IgorZ.MapBrowser.Common.Unavailable,unavailable,Value shown while live Steam data is unavailable.
-IgorZ.MapBrowser.Common.Unknown,Unknown,Value shown when metadata is unknown.
+IgorZ.MapBrowser.Common.SourceLocal,"Source: Local","Text identifying a local map."
+IgorZ.MapBrowser.Common.Unavailable,"unavailable","Value shown while live Steam data is unavailable."
+IgorZ.MapBrowser.Common.Unknown,"Unknown","Value shown when metadata is unknown."
 =,=,Map details
-IgorZ.MapBrowser.Details.Size,Size: {0},Map dimensions shown in the details dialog.
-IgorZ.MapBrowser.Details.Published,Published: {0},Workshop publication date shown in the player's local time.
-IgorZ.MapBrowser.Details.Subscribers,Subscribers: {0},Steam subscriber count shown in the details dialog.
-IgorZ.MapBrowser.Details.Votes,Votes: {0},Steam vote summary or unavailable status shown in the details dialog.
+IgorZ.MapBrowser.Details.Size,"Size: {0}","Map dimensions shown in the details dialog."
+IgorZ.MapBrowser.Details.Published,"Published: {0}","Workshop publication date shown in the player's local time."
+IgorZ.MapBrowser.Details.Subscribers,"Subscribers: {0}","Steam subscriber count shown in the details dialog."
+IgorZ.MapBrowser.Details.Votes,"Votes: {0}","Steam vote summary or unavailable status shown in the details dialog."
 =,=,Metadata freshness
-IgorZ.MapBrowser.Freshness.Missing,"Freshness: This map is not included in the latest index snapshot ({0}). Analysis will become available after a later refresh.",Message shown for a Workshop map missing from the current public index.
-IgorZ.MapBrowser.Freshness.Stale,"Freshness warning: The map has changed since its exact analysis and has not been reindexed yet.",Warning shown when saved exact map analysis is stale.
+IgorZ.MapBrowser.Freshness.Missing,"Freshness: This map is not included in the latest index snapshot ({0}). Analysis will become available after a later refresh.","Message shown for a Workshop map missing from the current public index."
+IgorZ.MapBrowser.Freshness.Stale,"Freshness warning: The map has changed since its exact analysis and has not been reindexed yet.","Warning shown when saved exact map analysis is stale."
 =,=,Workshop search
-IgorZ.MapBrowser.Search.Any,Any,Filter option that does not restrict search results.
-IgorZ.MapBrowser.Search.Filter.Forests,Forests,Label for the forest density search filter.
-IgorZ.MapBrowser.Search.Filter.SettlementSpace,Space,Label for the settlement-space search filter.
-IgorZ.MapBrowser.Search.Filter.Water,Water,Label for the water search filter.
-IgorZ.MapBrowser.Search.Installed,Installed,Tab button that shows installed maps.
-IgorZ.MapBrowser.Search.Keywords,Keywords,Label for the Workshop text search field.
-IgorZ.MapBrowser.Search.MatchCount,"Matches: {0} / {1}",Number of matching maps and total indexed maps.
-IgorZ.MapBrowser.Search.MatchCountWithSnapshot,"Matches: {0} / {1} (snapshot: {2})",Number of matching maps with the index snapshot timestamp.
-IgorZ.MapBrowser.Search.Page,"Page {0} / {1}",Current and total search-results pages.
-IgorZ.MapBrowser.Search.PageSize,Page size,Label for the number of search results shown on one page.
-IgorZ.MapBrowser.Search.Search,Find maps,Tab button that opens Workshop map search.
+IgorZ.MapBrowser.Search.Any,"Any","Filter option that does not restrict search results."
+IgorZ.MapBrowser.Search.Filter.Forests,"Forests","Label for the forest density search filter."
+IgorZ.MapBrowser.Search.Filter.SettlementSpace,"Space","Label for the settlement-space search filter."
+IgorZ.MapBrowser.Search.Filter.Water,"Water","Label for the water search filter."
+IgorZ.MapBrowser.Search.Installed,"Installed","Tab button that shows installed maps."
+IgorZ.MapBrowser.Search.Keywords,"Keywords","Label for the Workshop text search field."
+IgorZ.MapBrowser.Search.MatchCount,"Matches: {0} / {1}","Number of matching maps and total indexed maps."
+IgorZ.MapBrowser.Search.MatchCountWithSnapshot,"Matches: {0} / {1} (snapshot: {2})","Number of matching maps with the index snapshot timestamp."
+IgorZ.MapBrowser.Search.Page,"Page {0} / {1}","Current and total search-results pages."
+IgorZ.MapBrowser.Search.PageSize,"Page size","Label for the number of search results shown on one page."
+IgorZ.MapBrowser.Search.Search,"Find maps","Tab button that opens Workshop map search."
