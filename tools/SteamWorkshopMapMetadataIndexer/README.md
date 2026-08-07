@@ -94,6 +94,7 @@ and manual `workflow_dispatch` runs can override the complete operational config
 | `steam_slow_mode_delay_seconds` | 40 | Slow-mode spacing between Steam requests. |
 | `map_index_time_budget_seconds` | 3600 | Budget for cached analysis and Steam payload collection. |
 | `map_analysis_parallelism` | 4 | Parallel workers used for cached payload analysis. |
+| `stop_request_poll_seconds` | 30 | Interval for checking a graceful stop request. |
 | `payload_cache_prune_max_versions` | 100 | Maximum superseded GHCR versions deleted after a run. |
 
 Retry counts, retry cooldowns, slow-mode recovery rules, and sequential Steam access remain fixed safety behavior rather
@@ -108,6 +109,24 @@ gh workflow run workshop-search-index.yml --repo ihsoft/TimberbornMods `
     -f map_index_time_budget_seconds=1200 `
     -f steam_request_delay_seconds=3
 ```
+
+## Graceful stop
+
+Do not cancel a collecting workflow run when its completed work should be published. Instead, replace the contents of
+`.github/workshop-search-index-stop` with the target run ID, then commit and push that file to `main`:
+
+```text
+31234567890
+```
+
+The active job polls the latest version of that public repository file through the GitHub Contents API, using its
+short-lived `GITHUB_TOKEN` and existing `contents: read` permission. After it sees its own run ID, the shell monitor
+creates a runner-local stop file. The analyzer sees that file before the next map, flushes the payload-cache catalog,
+writes the complete metadata checkpoint, and allows the normal artifact and Pages steps to finish. A request for
+another run ID is ignored, so the tracked value does not need a cleanup commit.
+
+The stop is cooperative rather than immediate. A request already in progress, its retry cooldown, or slow-mode delay
+finishes before the analyzer checks the stop file between maps.
 
 ## Shared archive analysis
 

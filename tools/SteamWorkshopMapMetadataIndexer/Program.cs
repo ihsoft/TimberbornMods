@@ -48,7 +48,7 @@ sealed class MapMetadataIndexer {
   sealed record Options(
       string Snapshot, string? PreviousResults, string Output, string WorkshopDirectory, int MaxDownloadItems,
       ulong MaxDownloadBytes, TimeSpan RequestTimeout, TimeSpan RequestDelay, TimeSpan SlowModeDelay,
-      TimeSpan TimeBudget, int MaxAnalysisParallelism) {
+      TimeSpan TimeBudget, int MaxAnalysisParallelism, string? StopRequestFile) {
 
     public static Options Parse(string[] args) {
       var values = new Dictionary<string, string>();
@@ -66,7 +66,8 @@ sealed class MapMetadataIndexer {
           TimeSpan.FromSeconds(ParseInt(values, "--request-delay-seconds", 0)),
           TimeSpan.FromSeconds(ParseInt(values, "--slow-mode-delay-seconds", 15)),
           TimeSpan.FromSeconds(ParseInt(values, "--time-budget-seconds", 7200)),
-          ParseInt(values, "--max-analysis-parallelism", Math.Min(Environment.ProcessorCount, 4)));
+          ParseInt(values, "--max-analysis-parallelism", Math.Min(Environment.ProcessorCount, 4)),
+          values.GetValueOrDefault("--stop-request-file"));
       if (options.MaxDownloadItems < 0 || options.MaxDownloadBytes < 1
           || options.RequestTimeout <= TimeSpan.Zero || options.RequestTimeout > TimeSpan.FromMinutes(10)
           || options.RequestDelay < TimeSpan.Zero || options.RequestDelay > TimeSpan.FromMinutes(1)
@@ -176,7 +177,9 @@ sealed class MapMetadataIndexer {
       }
     }
 
-    if (downloadCandidates.Count > 0 && DateTimeOffset.UtcNow < deadline) {
+    if (StopRequestMonitor.IsStopRequested(options.StopRequestFile)) {
+      Console.WriteLine("Graceful stop requested before the Steam payload pass.");
+    } else if (downloadCandidates.Count > 0 && DateTimeOffset.UtcNow < deadline) {
       Environment.SetEnvironmentVariable("SteamAppId", AppId.ToString());
       Environment.SetEnvironmentVariable("SteamGameId", AppId.ToString());
       if (!Packsize.Test() || !DllCheck.Test()) {
@@ -204,6 +207,10 @@ sealed class MapMetadataIndexer {
         var requestPacer = new SteamRequestPacer(
             Thread.Sleep, normalModeDelay: options.RequestDelay, slowModeDelay: options.SlowModeDelay);
         for (var index = 0; index < downloadCandidates.Count; index++) {
+          if (StopRequestMonitor.IsStopRequested(options.StopRequestFile)) {
+            Console.WriteLine($"Graceful stop requested after {index} / {downloadCandidates.Count} Steam maps.");
+            break;
+          }
           if (DateTimeOffset.UtcNow >= deadline) {
             Console.WriteLine($"Time budget reached after {index} / {downloadCandidates.Count} Steam maps.");
             break;

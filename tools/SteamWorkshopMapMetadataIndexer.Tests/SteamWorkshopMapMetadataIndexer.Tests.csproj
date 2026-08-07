@@ -16,6 +16,9 @@
     <Compile Include="..\SteamWorkshopMapMetadataIndexer\MapPayloadCachePolicy.cs">
       <Link>MapPayloadCachePolicy.cs</Link>
     </Compile>
+    <Compile Include="..\SteamWorkshopMapMetadataIndexer\StopRequestMonitor.cs">
+      <Link>StopRequestMonitor.cs</Link>
+    </Compile>
     <Compile Include="..\SteamWorkshopMapMetadataIndexer\MapArchiveAnalyzer.cs">
       <Link>MapArchiveAnalyzer.cs</Link>
     </Compile>

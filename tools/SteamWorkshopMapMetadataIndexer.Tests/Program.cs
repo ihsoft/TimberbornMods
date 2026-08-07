@@ -47,6 +47,7 @@ static class Program {
       ("Steam retry cooldown is not extended by slow mode", DoesNotExtendExistingSteamRetryCooldown),
       ("Steam Fail is transient in normal and slow modes", TreatsFailAsTransientInEveryMode),
       ("Unsupported maps are excluded from payload cache population", ExcludesUnsupportedMapsFromCachePopulation),
+      ("Stop requests are detected through the configured file", DetectsStopRequestFile),
   ];
 
   static int Main() {
@@ -58,6 +59,18 @@ static class Program {
     Assert.True(MapPayloadCachePolicy.ShouldPopulate("fetched", false, false));
     Assert.False(MapPayloadCachePolicy.ShouldPopulate("fetched", true, false));
     Assert.False(MapPayloadCachePolicy.ShouldPopulate("fetched", false, true));
+  }
+
+  static void DetectsStopRequestFile() {
+    var path = Path.Combine(Path.GetTempPath(), $"map-index-stop-{Guid.NewGuid():N}");
+    Assert.False(StopRequestMonitor.IsStopRequested(null));
+    Assert.False(StopRequestMonitor.IsStopRequested(path));
+    try {
+      File.WriteAllText(path, string.Empty);
+      Assert.True(StopRequestMonitor.IsStopRequested(path));
+    } finally {
+      File.Delete(path);
+    }
   }
 
   static void CountsOnlyLivingLogTrees() {
